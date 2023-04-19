@@ -59,6 +59,11 @@
     <Compile Include="Assets\Core\Vessel.cs" />
     <Compile Include="Assets\Core\Part.cs" />
     <Compile Include="Assets\Core\PartModule.cs" />
+    <Compile Include="Assets\Core\PartHierarchyUtils.cs" />
+    <Compile Include="Assets\Core\VesselFactory.cs" />
+    <Compile Include="Assets\Core\PartFactory.cs" />
+    <Compile Include="Assets\zTestingScript.cs" />
+    <Compile Include="Assets\Core\VesselUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

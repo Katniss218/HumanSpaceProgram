@@ -2,17 +2,36 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Vessel : MonoBehaviour
+namespace KatnisssSpaceSimulator.Core
 {
-    // Start is called before the first frame update
-    void Start()
+    public class Vessel : MonoBehaviour
     {
-        
-    }
+        public string DisplayName { get; set; }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        private Part _rootPart;
+        public Part RootPart
+        {
+            get
+            {
+                if(_rootPart == null )
+                {
+                    _rootPart = this.GetRootPart();
+                }
+                return _rootPart;
+            }
+        }
+
+        [field: SerializeField]
+        public Part[] Parts { get; private set; }
+
+        void Start()
+        {
+            Parts = this.RootPart.GetDescendants().ToArray();
+        }
+
+        void Update()
+        {
+
+        }
     }
 }

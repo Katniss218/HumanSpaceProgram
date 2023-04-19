@@ -2,17 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PartModule : MonoBehaviour
+namespace KatnisssSpaceSimulator.Core
 {
-    // Start is called before the first frame update
-    void Start()
+    public abstract class PartModule
     {
-        
-    }
+        // PartModule is *NOT* a MonoBehaviour to allow easier implementation of unloaded vessel processing (we would process each part without instantiating it).
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        // Part modules will be just normal classes that are added to the part.
+
+        public abstract void Start();
+        public abstract void Update();
+        public abstract void FixedUpdate();
     }
 }
