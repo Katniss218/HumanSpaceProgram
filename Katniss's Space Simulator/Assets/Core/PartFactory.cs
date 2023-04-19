@@ -16,19 +16,25 @@ namespace KatnisssSpaceSimulator.Core
 
         const string name = "tempname_part";
 
-        public Part CreateRoot( Vessel parent )
+        public Part CreateRoot( Vessel vessel )
         {
-            return Create( parent.transform, Vector3.zero, Quaternion.identity );
+            if( vessel.RootPart != null )
+            {
+                throw new InvalidOperationException( $"The vessel '{vessel}' already has a root part." );
+            }
+
+            Part part = Create( vessel.transform, Vector3.zero, Quaternion.identity );
+            vessel.SetRootPart( part );
+
+            return part;
         }
 
         public Part Create( Part parent )
         {
-            return Create( parent.transform, Vector3.zero, Quaternion.identity );
-        }
+            Part part = Create( parent.Vessel.transform, Vector3.zero, Quaternion.identity );
 
-        public Part Create( Part parent, Vector3 localPosition, Quaternion localRotation )
-        {
-            return Create( parent.transform, localPosition, localRotation );
+            part.SetParent( parent );
+            return part;
         }
 
         private Part Create( Transform parent, Vector3 localPosition, Quaternion localRotation )

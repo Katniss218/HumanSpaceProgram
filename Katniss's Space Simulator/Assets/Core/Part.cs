@@ -25,23 +25,67 @@ namespace KatnisssSpaceSimulator.Core
 
         public string DisplayName { get; set; }
 
+        [field: SerializeField]
         public Part Parent { get; private set; }
+
+        [field: SerializeField]
         public List<Part> Children { get; private set; } = new List<Part>();
+
+        [field: SerializeField]
         public List<PartModule> Modules { get; private set; } = new List<PartModule>();
 
-        public void RecalculateCachedHierarchy()
+        public void SetParent( Part parent )
         {
-            this.Parent = this.GetParent(); // Should throw when the part is contained in an invalid hierarchy.
-            if( Parent != null ) // this is not root.
+            if( this.Vessel.RootPart == this )
+            {
+                throw new System.InvalidOperationException( "Can't reparent the root object." );
+            }
+
+            if( parent.Vessel != this.Vessel )
+            {
+                // cross-vessel parenting.
+                // Move part to other vessel.
+
+                this.SetVessel( parent.Vessel );
+            }
+
+            if( this.Parent != null )
+            {
+                this.Parent.Children.Remove( this );
+            }
+
+            this.Parent = parent;
+
+            if( this.Parent != null )
             {
                 this.Parent.Children.Add( this );
             }
         }
 
-        void Awake()
+        public void SetPosition( Vector3 pos, bool moveChildren = true )
         {
-            // When part is created, add it to the cached hierarchy.
-            RecalculateCachedHierarchy();
+            this.transform.position = pos;
+
+            if( moveChildren )
+            {
+                foreach( var cp in this.Children )
+                {
+                    cp.SetPosition( pos, moveChildren );
+                }
+            }
+        }
+
+        public void SetRotation( Quaternion rot, bool moveChildren = true )
+        {
+            this.transform.rotation = rot;
+
+            if( moveChildren )
+            {
+                foreach( var cp in this.Children )
+                {
+                    cp.SetRotation( rot, moveChildren );
+                }
+            }
         }
 
         void Start()

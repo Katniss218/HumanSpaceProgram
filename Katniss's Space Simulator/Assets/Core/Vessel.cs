@@ -8,25 +8,24 @@ namespace KatnisssSpaceSimulator.Core
     {
         public string DisplayName { get; set; }
 
-        private Part _rootPart;
-        public Part RootPart
-        {
-            get
-            {
-                if(_rootPart == null )
-                {
-                    _rootPart = this.GetRootPart();
-                }
-                return _rootPart;
-            }
-        }
+        [field: SerializeField]
+        public Part RootPart { get; private set; }
 
         [field: SerializeField]
         public Part[] Parts { get; private set; }
 
+        public void SetRootPart( Part part )
+        {
+            if( part.Parent != null ) // change this because it's ugly.
+            {
+                throw new System.InvalidOperationException();
+            }
+            RootPart = part;
+        }
+
         void Start()
         {
-            Parts = this.RootPart.GetDescendants().ToArray();
+            Parts = this.GetParts().ToArray();
         }
 
         void Update()

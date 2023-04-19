@@ -18,10 +18,7 @@ namespace KatnisssSpaceSimulator.Core
 
         public Vessel Create( Func<Vessel, Part> rootPart )
         {
-            GameObject vesselGO = new GameObject( $"Vessel, '{name}'" );
-
-            Vessel vessel = vesselGO.AddComponent<Vessel>();
-            vessel.name = name;
+            Vessel vessel = CreateGO();
 
             rootPart( vessel );
 
@@ -33,7 +30,21 @@ namespace KatnisssSpaceSimulator.Core
 
         public Vessel Create( Part existingVesselPart )
         {
+            Vessel vessel = CreateGO();
 
+            existingVesselPart.SetVessel( vessel );
+
+            return vessel;
+        }
+
+        private Vessel CreateGO()
+        {
+            GameObject vesselGO = new GameObject( $"Vessel, '{name}'" );
+
+            Vessel vessel = vesselGO.AddComponent<Vessel>();
+            vessel.name = name;
+
+            return vessel;
         }
 
         public static void Destroy( Vessel vessel )
