@@ -28,11 +28,14 @@ namespace KatnisssSpaceSimulator.Core
             return vessel;
         }
 
+# warning TODO - this is kinda ugly. Allow empty vessels maybe? And then assign parts to that vessel. Ideally specifying a part to attach to as well.
         public Vessel Create( Part existingVesselPart )
         {
             Vessel vessel = CreateGO();
 
-            existingVesselPart.SetVessel( vessel );
+            existingVesselPart.SetVesselHierarchy( vessel );
+            existingVesselPart.SetParent( null );
+            vessel.SetRootPart( existingVesselPart );
 
             return vessel;
         }
@@ -49,6 +52,7 @@ namespace KatnisssSpaceSimulator.Core
 
         public static void Destroy( Vessel vessel )
         {
+            UnityEngine.Object.Destroy( vessel );
             // deletes the vessel and cleans all references to it.
         }
     }

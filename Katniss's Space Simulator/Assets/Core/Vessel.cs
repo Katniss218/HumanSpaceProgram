@@ -16,16 +16,12 @@ namespace KatnisssSpaceSimulator.Core
 
         public void SetRootPart( Part part )
         {
-            if( part.Parent != null ) // change this because it's ugly.
-            {
-                throw new System.InvalidOperationException();
-            }
             RootPart = part;
         }
 
         void Start()
         {
-            Parts = this.GetParts().ToArray();
+            Parts = this.GetPartsByHierarchy().ToArray();
         }
 
         void Update()

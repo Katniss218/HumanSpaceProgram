@@ -29,9 +29,9 @@ namespace KatnisssSpaceSimulator.Core
             return part;
         }
 
-        public Part Create( Part parent )
+        public Part Create( Part parent, Vector3 localPosition, Quaternion localRotation )
         {
-            Part part = Create( parent.Vessel.transform, Vector3.zero, Quaternion.identity );
+            Part part = Create( parent.Vessel.transform, localPosition, localRotation );
 
             part.SetParent( parent );
             return part;
@@ -46,6 +46,17 @@ namespace KatnisssSpaceSimulator.Core
 
             Part part = partGO.AddComponent<Part>();
             part.DisplayName = name;
+
+            GameObject gfx = new GameObject( "model" );
+            gfx.transform.SetParent( partGO.transform );
+            gfx.transform.localPosition = Vector3.zero;
+            gfx.transform.localRotation = Quaternion.identity;
+
+            MeshFilter mf = gfx.AddComponent<MeshFilter>();
+            mf.sharedMesh = UnityEngine.Object.FindObjectOfType<zTestingScript>().Mesh;
+
+            MeshRenderer mr = gfx.AddComponent<MeshRenderer>();
+            mr.sharedMaterial = UnityEngine.Object.FindObjectOfType<zTestingScript>().Material;
 
             // Add modules, etc.
 

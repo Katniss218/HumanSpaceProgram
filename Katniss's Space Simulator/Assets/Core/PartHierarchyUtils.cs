@@ -15,7 +15,7 @@ namespace KatnisssSpaceSimulator.Core
         /// <summary>
         /// Validates that the hierarchy is actually valid, and returns all of the parts by searching the hierarchy.
         /// </summary>
-        public static List<Part> GetParts( this Vessel vessel )
+        public static List<Part> GetPartsByHierarchy( this Vessel vessel )
         {
             List<Part> parts = new List<Part>();
 
@@ -33,7 +33,10 @@ namespace KatnisssSpaceSimulator.Core
             return parts;
         }
 
-        public static Vessel GetVessel( this Part part )
+        /// <summary>
+        /// Returns the vessel of a given part by searching its Unity hierarchy.
+        /// </summary>
+        public static Vessel GetVesselByHierarchy( this Part part )
         {
             Transform parent = part.transform.parent;
 
@@ -51,12 +54,15 @@ namespace KatnisssSpaceSimulator.Core
             return vessel;
         }
 
-        public static void SetVessel( this Part part, Vessel newVessel )
+        /// <summary>
+        /// Sets the part hierarchy to reflect being the root of a vessel.
+        /// </summary>
+        public static void SetVesselHierarchy( this Part part, Vessel newVessel )
         {
             part.transform.SetParent( newVessel.transform );
             foreach( var cp in part.Children )
             {
-                cp.SetVessel( newVessel );
+                cp.SetVesselHierarchy( newVessel );
             }
         }
     }

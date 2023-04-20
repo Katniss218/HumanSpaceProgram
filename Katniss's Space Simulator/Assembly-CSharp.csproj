@@ -56,14 +56,15 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Core\PartFactory.cs" />
+    <Compile Include="Assets\Terrain\MeshGeneratorTest.cs" />
+    <Compile Include="Assets\zTestingScript.cs" />
+    <Compile Include="Assets\Core\VesselFactory.cs" />
+    <Compile Include="Assets\Core\PartHierarchyUtils.cs" />
+    <Compile Include="Assets\Core\VesselUtils.cs" />
     <Compile Include="Assets\Core\Vessel.cs" />
     <Compile Include="Assets\Core\Part.cs" />
     <Compile Include="Assets\Core\PartModule.cs" />
-    <Compile Include="Assets\Core\PartHierarchyUtils.cs" />
-    <Compile Include="Assets\Core\VesselFactory.cs" />
-    <Compile Include="Assets\Core\PartFactory.cs" />
-    <Compile Include="Assets\zTestingScript.cs" />
-    <Compile Include="Assets\Core\VesselUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

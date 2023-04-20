@@ -13,7 +13,7 @@ namespace KatnisssSpaceSimulator.Core
             {
                 if( _vessel == null )
                 {
-                    _vessel = this.GetVessel();
+                    _vessel = this.GetVesselByHierarchy();
                 }
                 return _vessel;
             }
@@ -31,22 +31,24 @@ namespace KatnisssSpaceSimulator.Core
         [field: SerializeField]
         public List<Part> Children { get; private set; } = new List<Part>();
 
+        public bool IsRootPart { get => this.Vessel.RootPart == this; }
+
         [field: SerializeField]
         public List<PartModule> Modules { get; private set; } = new List<PartModule>();
 
         public void SetParent( Part parent )
         {
-            if( this.Vessel.RootPart == this )
+            if( this.IsRootPart )
             {
                 throw new System.InvalidOperationException( "Can't reparent the root object." );
             }
 
-            if( parent.Vessel != this.Vessel )
+            if( parent != null && parent.Vessel != this.Vessel )
             {
                 // cross-vessel parenting.
                 // Move part to other vessel.
 
-                this.SetVessel( parent.Vessel );
+                this.SetVesselHierarchy( parent.Vessel );
             }
 
             if( this.Parent != null )
@@ -109,6 +111,20 @@ namespace KatnisssSpaceSimulator.Core
             foreach( var module in Modules )
             {
                 module.FixedUpdate();
+            }
+        }
+
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere( this.transform.position, 0.1f );
+            if( this.Parent != null )
+            {
+                Gizmos.DrawLine( this.transform.position, this.Parent.transform.position + ((this.transform.position - this.Parent.transform.position).normalized * 0.3f) );
+            }
+            else
+            {
+                Gizmos.DrawWireSphere( this.transform.position, 0.2f );
             }
         }
     }
