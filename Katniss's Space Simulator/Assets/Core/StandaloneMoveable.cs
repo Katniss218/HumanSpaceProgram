@@ -54,6 +54,8 @@ namespace KatnisssSpaceSimulator.Core
             // - - This can be done by applying forces/changing positions manually.
 
 
+            // Bottom line is that we need to make the Unity's world space act like the local space of the selected reference frame.
+
 
 
             rb.AddForce( Vector3.down * 9.81f / 5.0f );
