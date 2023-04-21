@@ -1,4 +1,5 @@
 ﻿using KatnisssSpaceSimulator.Core;
+using KatnisssSpaceSimulator.Functionalities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +21,8 @@ namespace KatnisssSpaceSimulator
             Vessel v = fac.Create( pfac.CreateRoot );
             v.RootPart.DisplayName = "0";
 
+            Part origRoot = v.RootPart;
+
             pfac.Create( v.RootPart, new Vector3( 0, 2, 0 ), Quaternion.identity );
             v.RootPart.Children[0].DisplayName = "0.0";
 
@@ -36,6 +39,14 @@ namespace KatnisssSpaceSimulator
            // VesselStateUtils.SetParent( p, v.RootPart.Children[0] );
 
             VesselStateUtils.SetParent( v.RootPart, p );
+
+            origRoot.AddModule( new FRocketEngine()
+            {
+                MaxThrust = 50.0f,
+                ThrustTransform = origRoot.transform.Find( "thrust" )
+            } );
         }
     }
+
+    // Shadows seem like they will be a tough nut to crack.
 }

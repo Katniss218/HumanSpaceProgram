@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace KatnisssSpaceSimulator.Core
 {
+    [RequireComponent(typeof( PhysicsObject ) )]
     public class Vessel : MonoBehaviour
     {
         [SerializeField]
@@ -15,6 +16,8 @@ namespace KatnisssSpaceSimulator.Core
             get => _displayName;
             set { _displayName = value; this.gameObject.name = value; }
         }
+
+        public PhysicsObject PhysicsObject { get; private set; }
 
         [field: SerializeField]
         public Part RootPart { get; private set; }
@@ -51,29 +54,50 @@ namespace KatnisssSpaceSimulator.Core
             int count = 0;
             Stack<Part> stack = new Stack<Part>();
             stack.Push( RootPart );
+            List<Part> parts = new List<Part>();
 
             while( stack.Count > 0 )
             {
-                Part node = stack.Pop();
+                Part p = stack.Pop();
+                parts.Add( p );
                 count++;
 
-                foreach( Part child in node.Children )
+                foreach( Part cp in p.Children )
                 {
-                    stack.Push( child );
+                    stack.Push( cp );
                 }
             }
 
+            this.Parts = parts;
             PartCount = count;
         }
 
-        void Start()
+        public Vector3 GetCenterOfMass()
         {
+            Vector3 com = Vector3.zero;
+            float mass = 0;
+            foreach( var part in this.Parts )
+            {
+                // physicsless parts may be `continue`'d here.
 
+                com += part.transform.position * part.Mass;
+                mass += part.Mass;
+            }
+            if( mass > 0 )
+            {
+                com /= mass;
+            }
+            return com;
         }
 
-        void Update()
+        void Awake()
         {
+            this.PhysicsObject = this.GetComponent<PhysicsObject>();
+        }
 
+        private void FixedUpdate()
+        {
+            this.PhysicsObject.SetCoM( this.GetCenterOfMass() );
         }
     }
 }

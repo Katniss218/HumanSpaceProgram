@@ -33,16 +33,24 @@ namespace KatnisssSpaceSimulator.Core
             set { _displayName = value; this.gameObject.name = value; }
         }
 
+        public float Mass { get; set; }
+
+        public bool IsRootOfVessel { get => this.Vessel.RootPart == this; }
+
         [field: SerializeField]
         public Part Parent { get; internal set; }
 
         [field: SerializeField]
         public List<Part> Children { get; private set; } = new List<Part>();
 
-        public bool IsRootOfVessel { get => this.Vessel.RootPart == this; }
-
         [field: SerializeField]
         public List<Functionality> Modules { get; private set; } = new List<Functionality>();
+
+        public void AddModule( Functionality module )
+        {
+            module.Part = this;
+            this.Modules.Add( module );
+        }
 
         public void SetPosition( Vector3 pos, bool moveChildren = true )
         {

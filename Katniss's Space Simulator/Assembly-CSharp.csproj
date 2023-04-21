@@ -58,7 +58,7 @@
   <ItemGroup>
     <Compile Include="Assets\Core\PartFactory.cs" />
     <Compile Include="Assets\Terrain\MeshGeneratorTest.cs" />
-    <Compile Include="Assets\zTestingScript.cs" />
+    <Compile Include="Assets\zzzTestAssets\zTestingScript.cs" />
     <Compile Include="Assets\Core\VesselFactory.cs" />
     <Compile Include="Assets\Core\VesselStateUtils.cs" />
     <Compile Include="Assets\Core\Vessel.cs" />
@@ -66,8 +66,9 @@
     <Compile Include="Assets\Core\Functionality.cs" />
     <Compile Include="Assets\Core\Physics\ForceSolver.cs" />
     <Compile Include="Assets\_UnityEngine\Vector3Dbl.cs" />
-    <Compile Include="Assets\Core\StandaloneMoveable.cs" />
+    <Compile Include="Assets\Core\PhysicsObject.cs" />
     <Compile Include="Assets\Core\ReferenceFrames\DefaultFrame.cs" />
+    <Compile Include="Assets\Functionalities\FRocketEngine.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

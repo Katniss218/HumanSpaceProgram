@@ -29,6 +29,7 @@ namespace KatnisssSpaceSimulator.Core
             part.SetVesselRecursive( vessel );
 
             vessel.SetRootPart( part );
+            vessel.RecalculateParts();
 
             return part;
         }
@@ -45,6 +46,7 @@ namespace KatnisssSpaceSimulator.Core
 
             part.Parent = parent;
             part.Parent.Children.Add( part );
+            part.Vessel.RecalculateParts();
             return part;
         }
 
@@ -73,6 +75,14 @@ namespace KatnisssSpaceSimulator.Core
             SphereCollider c = gfx.AddComponent<SphereCollider>();
             c.radius = 0.5f;
 
+            GameObject downTest = new GameObject( "thrust" );
+            downTest.transform.SetParent( partGO.transform );
+            downTest.transform.localPosition = Vector3.zero;
+            downTest.transform.localRotation = Quaternion.identity;
+            downTest.transform.localScale = Vector3.one;
+            downTest.transform.forward = Vector3.up;
+            part.Mass = 1;
+
             // Add modules, etc.
 
             return part;
@@ -80,15 +90,19 @@ namespace KatnisssSpaceSimulator.Core
 
         public static void Destroy( Part part, bool keepChildren = false )
         {
-            if( keepChildren )
-            {
-                foreach( var cp in part.Children )
-                {
-                    cp.Parent = part.Parent;
-                }
-            }
-
             UnityEngine.Object.Destroy( part.gameObject );
+            foreach( var cp in part.Children )
+            {
+                Destroy( cp );
+            }
+            if( part.IsRootOfVessel )
+            {
+                VesselFactory.Destroy( part.Vessel );
+            }
+            else
+            {
+                part.Vessel.RecalculateParts();
+            }
         }
     }
 }

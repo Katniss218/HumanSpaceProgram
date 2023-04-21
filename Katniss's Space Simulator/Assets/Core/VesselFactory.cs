@@ -43,8 +43,6 @@ namespace KatnisssSpaceSimulator.Core
             Vessel vessel = vesselGO.AddComponent<Vessel>();
             vessel.name = name;
 
-            StandaloneMoveable sm = vesselGO.AddComponent<StandaloneMoveable>();
-
             return vessel;
         }
 
