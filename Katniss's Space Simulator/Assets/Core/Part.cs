@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,63 +7,42 @@ namespace KatnisssSpaceSimulator.Core
 {
     public class Part : MonoBehaviour
     {
-        private Vessel _vessel;
-        public Vessel Vessel
+        [field: SerializeField]
+        public Vessel Vessel { get; private set; }
+
+        /// <summary>
+        /// Sets the vessel of this part and any of its children to the specified value.
+        /// </summary>
+        /// <remarks>
+        /// DO NOT USE. This is intended for internal use and can create an invalid state. Use <see cref="VesselStateUtils.SetParent(Part, Part)"/> instead.
+        /// </remarks>
+        internal void SetVesselRecursive( Vessel vessel )
         {
-            get
+            Vessel = vessel;
+            foreach( var chp in this.Children ) // kinda ugly, but we need to make sure the children are always part of the same vessel.
             {
-                if( _vessel == null )
-                {
-                    _vessel = this.GetVesselByHierarchy();
-                }
-                return _vessel;
-            }
-            private set
-            {
-                _vessel = value;
+                chp.SetVesselRecursive( vessel );
             }
         }
 
-        public string DisplayName { get; set; }
+        [SerializeField]
+        private string _displayName;
+        public string DisplayName
+        {
+            get => _displayName;
+            set { _displayName = value; this.gameObject.name = value; }
+        }
 
         [field: SerializeField]
-        public Part Parent { get; private set; }
+        public Part Parent { get; internal set; }
 
         [field: SerializeField]
         public List<Part> Children { get; private set; } = new List<Part>();
 
-        public bool IsRootPart { get => this.Vessel.RootPart == this; }
+        public bool IsRootOfVessel { get => this.Vessel.RootPart == this; }
 
         [field: SerializeField]
-        public List<PartModule> Modules { get; private set; } = new List<PartModule>();
-
-        public void SetParent( Part parent )
-        {
-            if( this.IsRootPart )
-            {
-                throw new System.InvalidOperationException( "Can't reparent the root object." );
-            }
-
-            if( parent != null && parent.Vessel != this.Vessel )
-            {
-                // cross-vessel parenting.
-                // Move part to other vessel.
-
-                this.SetVesselHierarchy( parent.Vessel );
-            }
-
-            if( this.Parent != null )
-            {
-                this.Parent.Children.Remove( this );
-            }
-
-            this.Parent = parent;
-
-            if( this.Parent != null )
-            {
-                this.Parent.Children.Add( this );
-            }
-        }
+        public List<Functionality> Modules { get; private set; } = new List<Functionality>();
 
         public void SetPosition( Vector3 pos, bool moveChildren = true )
         {
@@ -116,15 +96,44 @@ namespace KatnisssSpaceSimulator.Core
 
         private void OnDrawGizmos()
         {
-            Gizmos.color = Color.red;
+            Gizmos.color = Color.black;
             Gizmos.DrawWireSphere( this.transform.position, 0.1f );
-            if( this.Parent != null )
+            if( this.Vessel == null )
             {
-                Gizmos.DrawLine( this.transform.position, this.Parent.transform.position + ((this.transform.position - this.Parent.transform.position).normalized * 0.3f) );
+                Debug.LogWarning( $"Invalid State: Part '{this}' is orphaned and doesn't have a vessel." );
+                Gizmos.color = Color.red;
+                Gizmos.DrawSphere( this.transform.position, 0.25f );
+                return;
+            }
+
+            if( this.Parent == null )
+            {
+                if( this.IsRootOfVessel )
+                {
+                    Gizmos.color = Color.green;
+                    Gizmos.DrawWireSphere( this.transform.position, 0.2f );
+                }
+                else
+                {
+                    Debug.LogWarning( $"Invalid State: Part '{this}' doesn't have a parent, and is not the root of a vessel." );
+                    Gizmos.color = Color.red;
+                    Gizmos.DrawSphere( this.transform.position, 0.1f );
+                }
             }
             else
             {
-                Gizmos.DrawWireSphere( this.transform.position, 0.2f );
+                if( this.IsRootOfVessel )
+                {
+                    Debug.LogWarning( $"Invalid State: Part '{this}' has a parent, and is the root of a vessel." );
+                    Gizmos.color = Color.red;
+                    Gizmos.DrawSphere( this.transform.position, 0.1f );
+                }
+
+                Vector3 lineEnd = this.transform.position - ((this.transform.position - this.Parent.transform.position).normalized * 0.3f);
+                Gizmos.DrawLine( this.Parent.transform.position, lineEnd );
+
+                Gizmos.color = Color.green;
+                Gizmos.DrawWireSphere( lineEnd, 0.05f );
             }
         }
     }

@@ -18,17 +18,24 @@ namespace KatnisssSpaceSimulator
             VesselFactory fac = new VesselFactory();
             PartFactory pfac = new PartFactory();
             Vessel v = fac.Create( pfac.CreateRoot );
+            v.RootPart.DisplayName = "0";
 
             pfac.Create( v.RootPart, new Vector3( 0, 2, 0 ), Quaternion.identity );
+            v.RootPart.Children[0].DisplayName = "0.0";
 
             pfac.Create( v.RootPart.Children[0], new Vector3( 2, 2, 0 ), Quaternion.identity );
+            v.RootPart.Children[0].Children[0].DisplayName = "0.0.0";
             pfac.Create( v.RootPart.Children[0], new Vector3( -2, 2, 0 ), Quaternion.identity );
+            v.RootPart.Children[0].Children[1].DisplayName = "0.0.1";
 
             pfac.Create( v.RootPart.Children[0].Children[0], new Vector3( 4, 2, 0 ), Quaternion.identity );
+            v.RootPart.Children[0].Children[0].Children[0].DisplayName = "0.0.0.0";
 
-            (_, Vessel newV) = VesselUtils.DetachVesselPart( v.RootPart.Children[0].Children[0] );
+            Part p = v.RootPart.Children[0].Children[0];
+            VesselStateUtils.SetParent( p, null );
+           // VesselStateUtils.SetParent( p, v.RootPart.Children[0] );
 
-            VesselUtils.AttachVesselPart( newV, v.RootPart.Children[0] );
+            VesselStateUtils.SetParent( v.RootPart, p );
         }
     }
 }

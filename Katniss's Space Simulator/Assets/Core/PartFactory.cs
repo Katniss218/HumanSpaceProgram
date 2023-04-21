@@ -12,6 +12,8 @@ namespace KatnisssSpaceSimulator.Core
     /// </summary>
     public class PartFactory
     {
+        // Parts are a flat Unity hierarchy of objects that are the direct child of a vessel object.
+
         // Add source for the part's persistent data and modules.
 
         const string name = "tempname_part";
@@ -24,6 +26,8 @@ namespace KatnisssSpaceSimulator.Core
             }
 
             Part part = Create( vessel.transform, Vector3.zero, Quaternion.identity );
+            part.SetVesselRecursive( vessel );
+
             vessel.SetRootPart( part );
 
             return part;
@@ -31,9 +35,16 @@ namespace KatnisssSpaceSimulator.Core
 
         public Part Create( Part parent, Vector3 localPosition, Quaternion localRotation )
         {
-            Part part = Create( parent.Vessel.transform, localPosition, localRotation );
+            if( parent == null )
+            {
+                throw new ArgumentNullException( nameof( parent ), $"Parent can't be null." );
+            }
 
-            part.SetParent( parent );
+            Part part = Create( parent.Vessel.transform, localPosition, localRotation );
+            part.SetVesselRecursive( parent.Vessel );
+
+            part.Parent = parent;
+            part.Parent.Children.Add( part );
             return part;
         }
 
@@ -51,6 +62,7 @@ namespace KatnisssSpaceSimulator.Core
             gfx.transform.SetParent( partGO.transform );
             gfx.transform.localPosition = Vector3.zero;
             gfx.transform.localRotation = Quaternion.identity;
+            gfx.transform.localScale = new Vector3( 0.125f, 0.125f, 0.125f );
 
             MeshFilter mf = gfx.AddComponent<MeshFilter>();
             mf.sharedMesh = UnityEngine.Object.FindObjectOfType<zTestingScript>().Mesh;
@@ -69,7 +81,7 @@ namespace KatnisssSpaceSimulator.Core
             {
                 foreach( var cp in part.Children )
                 {
-                    cp.SetParent( part.Parent );
+                    cp.Parent = part.Parent;
                 }
             }
 
