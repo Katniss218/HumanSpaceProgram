@@ -64,6 +64,10 @@
     <Compile Include="Assets\Core\Vessel.cs" />
     <Compile Include="Assets\Core\Part.cs" />
     <Compile Include="Assets\Core\Functionality.cs" />
+    <Compile Include="Assets\Core\Physics\ForceSolver.cs" />
+    <Compile Include="Assets\_UnityEngine\Vector3Dbl.cs" />
+    <Compile Include="Assets\Core\StandaloneMoveable.cs" />
+    <Compile Include="Assets\Core\ReferenceFrames\DefaultFrame.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

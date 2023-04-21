@@ -57,7 +57,7 @@ namespace KatnisssSpaceSimulator.Core
             {
                 if( part.IsRootOfVessel )
                 {
-                    SwapRoots( part, parentPart );
+                    SwapRoots( part, parentPart ); // Re-rooting as in KSP would be `Reparent( newRoot.Vessel.RootPart, newRoot )`
                 }
                 else
                 {
@@ -79,13 +79,14 @@ namespace KatnisssSpaceSimulator.Core
 
         // The following helper methods must always produce a legal state or throw an exception.
 
+        /// <summary>
+        /// Parents oldRoot to newRoot, and makes newRoot the root on the vessel.
+        /// </summary>
         private static void SwapRoots( Part oldRoot, Part newRoot )
         {
             Contract.Assert( oldRoot.Vessel == newRoot.Vessel );
             Contract.Assert( oldRoot.IsRootOfVessel );
             Contract.Assert( !newRoot.IsRootOfVessel );
-            // Set parent to be the root, set root to be its child.
-            // parent should have no parent.
 
             newRoot.Vessel.SetRootPart( newRoot );
             Reattach( oldRoot, newRoot );
@@ -93,11 +94,13 @@ namespace KatnisssSpaceSimulator.Core
             newRoot.Parent = null;
         }
 
+        /// <summary>
+        /// Attaches the part to the parent (assuming both are on the same vessel, and part is not its root).
+        /// </summary>
         private static void Reattach( Part part, Part parent )
         {
             Contract.Assert( part.Vessel == parent.Vessel );
             Contract.Assert( !part.IsRootOfVessel );
-            // Reparent part to parent.
 
             if( part.Parent != null )
             {
@@ -113,14 +116,17 @@ namespace KatnisssSpaceSimulator.Core
             Contract.Assert( partToJoin.IsRootOfVessel );
 
             Vessel oldVessel = partToJoin.Vessel;
-            oldVessel.SetRootPart( null );
+            oldVessel.SetRootPart( null ); // needed for the assert in the next method.
 
             JoinVesselsNotRoot( partToJoin, parent );
 
+            // If part being joined is the root, we need to delete the vessel being joined, since it would become partless after joining.
             VesselFactory.Destroy( oldVessel );
         }
 
-
+        /// <summary>
+        /// Joins the partToJoin to parent's vessel, using the parent as the parent for partToJoin.
+        /// </summary>
         private static void JoinVesselsNotRoot( Part partToJoin, Part parent )
         {
             Contract.Assert( partToJoin.Vessel != parent.Vessel );
@@ -137,6 +143,9 @@ namespace KatnisssSpaceSimulator.Core
             parent.Vessel.RecalculateParts();
         }
 
+        /// <summary>
+        /// Splits off the part from its original vessel, and makes a new vessel with it as its root.
+        /// </summary>
         private static Vessel MakeNewVessel( Part partToSplit )
         {
             Contract.Assert( !partToSplit.IsRootOfVessel );

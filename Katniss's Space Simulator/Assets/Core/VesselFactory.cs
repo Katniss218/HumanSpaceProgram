@@ -25,6 +25,7 @@ namespace KatnisssSpaceSimulator.Core
 
         public Vessel Create( Func<Vessel, Part> rootPart )
         {
+#warning TODO - position and reference frame?
             Vessel vessel = CreateGO();
 
             rootPart( vessel );
@@ -41,6 +42,8 @@ namespace KatnisssSpaceSimulator.Core
 
             Vessel vessel = vesselGO.AddComponent<Vessel>();
             vessel.name = name;
+
+            StandaloneMoveable sm = vesselGO.AddComponent<StandaloneMoveable>();
 
             return vessel;
         }

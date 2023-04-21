@@ -70,6 +70,9 @@ namespace KatnisssSpaceSimulator.Core
             MeshRenderer mr = gfx.AddComponent<MeshRenderer>();
             mr.sharedMaterial = UnityEngine.Object.FindObjectOfType<zTestingScript>().Material;
 
+            SphereCollider c = gfx.AddComponent<SphereCollider>();
+            c.radius = 0.5f;
+
             // Add modules, etc.
 
             return part;

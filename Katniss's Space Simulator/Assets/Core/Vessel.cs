@@ -30,10 +30,6 @@ namespace KatnisssSpaceSimulator.Core
         /// </remarks>
         internal void SetRootPart( Part part )
         {
-            /*if( part == null )
-            {
-                throw new ArgumentNullException( nameof(part), "Can't mark a null part as root" );
-            }*/
             if( part != null && part.Vessel != this )
             {
                 throw new ArgumentException( $"Can't set the part '{part}' from vessel '{part.Vessel}' as root. The part is not a part of this vessel." );
@@ -45,7 +41,29 @@ namespace KatnisssSpaceSimulator.Core
         public void RecalculateParts()
         {
             // take root and traverse its hierarchy to add up all parts.
-            //throw new NotImplementedException();
+
+            if( RootPart == null )
+            {
+                PartCount = 0;
+                return;
+            }
+
+            int count = 0;
+            Stack<Part> stack = new Stack<Part>();
+            stack.Push( RootPart );
+
+            while( stack.Count > 0 )
+            {
+                Part node = stack.Pop();
+                count++;
+
+                foreach( Part child in node.Children )
+                {
+                    stack.Push( child );
+                }
+            }
+
+            PartCount = count;
         }
 
         void Start()
