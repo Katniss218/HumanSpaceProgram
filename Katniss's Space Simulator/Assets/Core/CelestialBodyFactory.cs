@@ -17,10 +17,10 @@ namespace KatnisssSpaceSimulator.Core
         public const float mass = 5.97e24f;
         public const int subdivs = 7; // 7 is the maximum value for a single plane that won't cause issues here.
 
-        public CelestialBody Create( Vector3Large GIRFPosition )
+        public CelestialBody Create( Vector3Large AIRFPosition )
         {
             GameObject cbGO = new GameObject( "celestialbody" );
-            cbGO.transform.position = ReferenceFrameManager.CurrentReferenceFrame.InverseTransformPosition( GIRFPosition );
+            cbGO.transform.position = ReferenceFrameManager.WorldSpaceReferenceFrame.InverseTransformPosition( AIRFPosition );
             cbGO.transform.localScale = Vector3.one;
 
             Vector3[] offsets = new Vector3[6]
@@ -38,7 +38,7 @@ namespace KatnisssSpaceSimulator.Core
                 Transform t = CreateMeshPart( cbGO.transform );
                 t.localPosition = offsets[i];
 
-                Mesh mesh = new CubeSphereTerrain().GeneratePartialCubeSphere( subdivs, radius, (CubeSphereTerrain.Face)i );
+                Mesh mesh = CubeSphereTerrain.GeneratePartialCubeSphere( subdivs, radius, (CubeSphereTerrain.Face)i );
                 t.GetComponent<MeshCollider>().sharedMesh = mesh;
                 t.GetComponent<MeshFilter>().sharedMesh = mesh;
             }
@@ -46,7 +46,7 @@ namespace KatnisssSpaceSimulator.Core
             //SphereCollider c = cbGO.AddComponent<SphereCollider>();
 
             CelestialBody cb = cbGO.AddComponent<CelestialBody>();
-            cb.GIRFPosition = GIRFPosition;
+            cb.AIRFPosition = AIRFPosition;
             cb.Mass = mass;
             cb.Radius = radius;
 

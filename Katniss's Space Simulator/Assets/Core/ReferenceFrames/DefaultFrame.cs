@@ -16,7 +16,7 @@ namespace KatnisssSpaceSimulator.Core.ReferenceFrames
         // - the factor would be at most equal to half of the allowed floating origin radius.
         // - that way would disallow precise placement of the reference frame, we need probably around 10000 meters granularity at the least.
 
-        public Vector3Large ReferencePosition { get; private set; }
+        public Vector3Large ReferencePosition { get; private set; } // these could be a matrix mayhaps (+ rotation, and scale)?
 
         public DefaultFrame( Vector3Large referencePosition )
         {

@@ -21,7 +21,54 @@ namespace KatnisssSpaceSimulator.Camera
         [field: SerializeField]
         float zoomDist = 5;
 
-        float? previousZoomDist = null;
+        float? mapViewPreviousZoomDist = null;
+
+        void UpdateZoomLevel()
+        {
+            if( Input.mouseScrollDelta.y > 0 )
+            {
+                zoomDist -= zoomDist * 15.0f * Time.unscaledDeltaTime;
+            }
+            else if( Input.mouseScrollDelta.y < 0 )
+            {
+                zoomDist += zoomDist * 15.0f * Time.unscaledDeltaTime;
+            }
+
+            if( zoomDist < 2 )
+            {
+                zoomDist = 2;
+            }
+
+            // Toggle "map" - just zoom out for now, it's handy.
+            if( Input.GetKeyDown( KeyCode.M ) ) // map view, kind of
+            {
+                if( mapViewPreviousZoomDist == null )
+                {
+                    mapViewPreviousZoomDist = zoomDist;
+                    zoomDist = 25_000_000.0f;
+                }
+                else
+                {
+                    zoomDist = mapViewPreviousZoomDist.Value;
+                    mapViewPreviousZoomDist = null;
+                }
+            }
+
+            // ---
+            CameraParent.transform.localPosition = Vector3.back * zoomDist;
+        }
+
+        void UpdateOrientation()
+        {
+            if( Input.GetKey( KeyCode.Mouse1 ) ) // RMB
+            {
+                float mouseX = Input.GetAxis( "Mouse X" );
+                float mouseY = Input.GetAxis( "Mouse Y" );
+
+                this.transform.rotation *= Quaternion.AngleAxis( mouseX * 500 * Time.unscaledDeltaTime, Vector3.up );
+                this.transform.rotation *= Quaternion.AngleAxis( -mouseY * 500 * Time.unscaledDeltaTime, Vector3.right );
+            }
+        }
 
         void PreventViewFrustumException()
         {
@@ -38,43 +85,9 @@ namespace KatnisssSpaceSimulator.Camera
 
         void LateUpdate()
         {
-            if( Input.mouseScrollDelta.y > 0 )
-            {
-                zoomDist -= zoomDist * 15.0f * Time.unscaledDeltaTime;
-            }
-            if( Input.mouseScrollDelta.y < 0 )
-            {
-                zoomDist += zoomDist * 15.0f * Time.unscaledDeltaTime;
-            }
-            if( zoomDist < 2 )
-            {
-                zoomDist = 2;
-            }
+            UpdateZoomLevel();
 
-            CameraParent.transform.localPosition = Vector3.back * zoomDist;
-
-            if( Input.GetKey( KeyCode.Mouse1 ) ) // RMB
-            {
-                float mouseX = Input.GetAxis( "Mouse X" );
-                float mouseY = Input.GetAxis( "Mouse Y" );
-
-                this.transform.rotation *= Quaternion.AngleAxis( mouseX * 500 * Time.unscaledDeltaTime, Vector3.up );
-                this.transform.rotation *= Quaternion.AngleAxis( -mouseY * 500 * Time.unscaledDeltaTime, Vector3.right );
-            }
-
-            if( Input.GetKeyDown( KeyCode.M ) ) // map view, kind of
-            {
-                if( previousZoomDist == null )
-                {
-                    previousZoomDist = zoomDist;
-                    zoomDist = 25_000_000.0f;
-                }
-                else
-                {
-                    zoomDist = previousZoomDist.Value;
-                    previousZoomDist = null;
-                }
-            }
+            UpdateOrientation();
 
             PreventViewFrustumException();
 

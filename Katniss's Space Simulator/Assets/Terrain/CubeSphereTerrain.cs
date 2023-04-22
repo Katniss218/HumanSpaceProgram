@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace KatnisssSpaceSimulator.Terrain
 {
-    public class CubeSphereTerrain
+    public static class CubeSphereTerrain
     {
         // Simpler PQS-like generation for now.
         // we can use the more elaborate face-normal version later if needed.
@@ -27,12 +27,12 @@ namespace KatnisssSpaceSimulator.Terrain
             Zn
         }
 
-        Vector3 GetFaceNormal( Vector3 v1, Vector3 v2, Vector3 v3 )
+        static Vector3 GetFaceNormal( Vector3 v1, Vector3 v2, Vector3 v3 )
         {
             return Vector3.Cross( v1 - v2, v3 - v2 );
         }
 
-        Mesh MakeQuad()
+        static Mesh MakeQuad()
         {
             Vector3[] vertices = new Vector3[4];
             int[] triangles = new int[6];
@@ -68,18 +68,16 @@ namespace KatnisssSpaceSimulator.Terrain
             return mesh;
         }
 
-        public static Vector3 GetPosFromUV( float u, float v, float radius )
+        public static Vector3 UVToCartesian( float u, float v, float radius )
         {
             float theta = u * (2 * Mathf.PI) - Mathf.PI; // Multiplying by 2 because the input is in range [0..1]
             float phi = v * Mathf.PI;
-
 
             float x = radius * Mathf.Sin( phi ) * Mathf.Cos( theta );
             float y = radius * Mathf.Sin( phi ) * Mathf.Sin( theta );
             float z = radius * Mathf.Cos( phi );
             return new Vector3( x, y, z );
         }
-
 
         /// <summary>
         /// Z+ is up (V+), seam is in the direction of X-.
@@ -93,7 +91,6 @@ namespace KatnisssSpaceSimulator.Terrain
             float theta = Mathf.Atan2( y, x );
             float phi = Mathf.Acos( z / radius );
 
-
             // The thing returned here seems to also be the lat/lon but normalized to the range [0..1]
             // The outputs are normalized by the respective denominators.
             float u = (theta + Mathf.PI) / (2 * Mathf.PI); // dividing by 2 * pi ensures that the output is in [0..1]
@@ -101,7 +98,44 @@ namespace KatnisssSpaceSimulator.Terrain
             return new Vector2( u, v );
         }
 
-        public Mesh GeneratePartialCubeSphere( int subdivisions, float radius, Face face )
+        private static (Vector3 pos, Vector3 posOffset) GetSpherePoint( int i, int j, float edgeLength, float radius, Face face )
+        {
+            Vector3 pos;
+            Vector3 posOffset;
+            switch( face )
+            {
+                case Face.Xp:
+                    pos = new Vector3( radius, (j * edgeLength) - radius, (i * edgeLength) - radius );
+                    posOffset = new Vector3( radius, 0, 0 );
+                    break;
+                case Face.Xn:
+                    pos = new Vector3( -radius, (i * edgeLength) - radius, (j * edgeLength) - radius );
+                    posOffset = new Vector3( -radius, 0, 0 );
+                    break;
+                case Face.Yp:
+                    pos = new Vector3( (i * edgeLength) - radius, radius, (j * edgeLength) - radius );
+                    posOffset = new Vector3( 0, radius, 0 );
+                    break;
+                case Face.Yn:
+                    pos = new Vector3( (j * edgeLength) - radius, -radius, (i * edgeLength) - radius );
+                    posOffset = new Vector3( 0, -radius, 0 );
+                    break;
+                case Face.Zp:
+                    pos = new Vector3( (j * edgeLength) - radius, (i * edgeLength) - radius, radius );
+                    posOffset = new Vector3( 0, 0, radius );
+                    break;
+                case Face.Zn:
+                    pos = new Vector3( (i * edgeLength) - radius, (j * edgeLength) - radius, -radius );
+                    posOffset = new Vector3( 0, 0, -radius );
+                    break;
+                default:
+                    throw new ArgumentException( $"Invalid face orientation {face}", nameof( face ) );
+            }
+            pos.Normalize(); // unit sphere.
+            return (pos, posOffset);
+        }
+
+        public static Mesh GeneratePartialCubeSphere( int subdivisions, float radius, Face face )
         {
             float diameter = radius * 2;
 
@@ -125,43 +159,13 @@ namespace KatnisssSpaceSimulator.Terrain
                 {
                     int index = (i * numberOfEdges) + i + j;
 
-                    Vector3 pos;
-                    Vector3 posOffset;
-                    switch( face )
-                    {
-                        case Face.Xp:
-                            pos = new Vector3( radius, (j * edgeLength) - radius, (i * edgeLength) - radius );
-                            posOffset = new Vector3( radius, 0, 0 );
-                            break;
-                        case Face.Xn:
-                            pos = new Vector3( -radius, (i * edgeLength) - radius, (j * edgeLength) - radius );
-                            posOffset = new Vector3( -radius, 0, 0 ); 
-                            break;
-                        case Face.Yp:
-                            pos = new Vector3( (i * edgeLength) - radius, radius, (j * edgeLength) - radius );
-                            posOffset = new Vector3( 0, radius, 0 );
-                            break;
-                        case Face.Yn:
-                            pos = new Vector3( (j * edgeLength) - radius, -radius, (i * edgeLength) - radius );
-                            posOffset = new Vector3( 0, -radius, 0 );
-                            break;
-                        case Face.Zp:
-                            pos = new Vector3( (j * edgeLength) - radius, (i * edgeLength) - radius, radius );
-                            posOffset = new Vector3( 0, 0, radius );
-                            break;
-                        case Face.Zn:
-                            pos = new Vector3( (i * edgeLength) - radius, (j * edgeLength) - radius, -radius );
-                            posOffset = new Vector3( 0, 0, -radius );
-                            break;
-                        default:
-                            throw new ArgumentException( $"Invalid face orientation {face}", nameof( face ) );
-                    }
-                    pos.Normalize(); // unit sphere.
+                    (Vector3 pos, Vector3 posOffset) = GetSpherePoint( i, j, edgeLength, radius, face );
 
 #warning TODO - requires additional set of vertices at Z- because UVs need to overlap on both 0.0 and 1.0 there.
                     // for Zn, Yp, Yn, needs to add extra vertex for every vert with x=0
 
-                    uvs[index] = CartesianToUV( pos.x, pos.y, pos.z );
+                    Vector2 uv = CartesianToUV( pos.x, pos.z, pos.y ); // swizzle
+                    uvs[index] = new Vector2( 1 - uv.x, uv.y );
 
                     vertices[index] = pos * radius - posOffset;
                     normals[index] = pos; // Normals need to be calculated by hand to avoid seams not matching up.

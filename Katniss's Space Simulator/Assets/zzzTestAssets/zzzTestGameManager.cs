@@ -27,7 +27,7 @@ namespace KatnisssSpaceSimulator
         {
             VesselFactory fac = new VesselFactory();
             PartFactory pfac = new PartFactory();
-            Vessel v = fac.Create( CubeSphereTerrain.GetPosFromUV( 1900f / 4096f, 1200f / 4096f, CelestialBodyFactory.radius ), Quaternion.identity, pfac.CreateRoot );
+            Vessel v = fac.Create( CubeSphereTerrain.UVToCartesian( 1900f / 4096f, 1200f / 4096f, CelestialBodyFactory.radius ), Quaternion.identity, pfac.CreateRoot );
             v.RootPart.DisplayName = "0";
 
             Part origRoot = v.RootPart;

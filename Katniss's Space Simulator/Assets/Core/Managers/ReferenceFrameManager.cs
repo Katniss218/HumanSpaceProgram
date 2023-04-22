@@ -29,15 +29,17 @@ namespace KatnisssSpaceSimulator.Core.Managers
             OnReferenceFrameSwitch += ReferenceFrameSwitch_Trail;
         }
 
-
-        public static IReferenceFrame CurrentReferenceFrame { get; private set; } = new DefaultFrame( Vector3Large.zero );
+        /// <summary>
+        /// The reference frame that describes how to convert between Absolute Inertial Reference Frame and world space
+        /// </summary>
+        public static IReferenceFrame WorldSpaceReferenceFrame { get; private set; } = new DefaultFrame( Vector3Large.zero );
 
         public static event Action<ReferenceFrameSwitchData> OnReferenceFrameSwitch;
 
         public static void SwitchReferenceFrame( IReferenceFrame newFrame )
         {
-            IReferenceFrame old = CurrentReferenceFrame;
-            CurrentReferenceFrame = newFrame;
+            IReferenceFrame old = WorldSpaceReferenceFrame;
+            WorldSpaceReferenceFrame = newFrame;
 
             OnReferenceFrameSwitch?.Invoke( new ReferenceFrameSwitchData() { OldFrame = old, NewFrame = newFrame } );
         }
@@ -97,7 +99,7 @@ namespace KatnisssSpaceSimulator.Core.Managers
              || VesselManager.ActiveVessel.transform.position.y < min || VesselManager.ActiveVessel.transform.position.y > max
              || VesselManager.ActiveVessel.transform.position.z < min || VesselManager.ActiveVessel.transform.position.z > max )
             {
-                SwitchReferenceFrame( CurrentReferenceFrame.Shift( VesselManager.ActiveVessel.transform.position ) );
+                SwitchReferenceFrame( WorldSpaceReferenceFrame.Shift( VesselManager.ActiveVessel.transform.position ) );
             }
         }
     }

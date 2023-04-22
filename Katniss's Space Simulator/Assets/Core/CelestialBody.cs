@@ -9,7 +9,7 @@ namespace KatnisssSpaceSimulator.Core
 {
     public class CelestialBody : MonoBehaviour
     {
-        public Vector3Large GIRFPosition { get; set; } // fixed static body for now, global position.
+        public Vector3Large AIRFPosition { get; set; } // fixed static body for now, global position.
 
         public double Mass { get; set; }
         public double Radius { get; set; }
