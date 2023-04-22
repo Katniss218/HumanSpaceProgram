@@ -21,6 +21,8 @@ namespace KatnisssSpaceSimulator.Camera
         [field: SerializeField]
         float zoomDist = 5;
 
+        float? previousZoomDist = null;
+
         void PreventViewFrustumException()
         {
             // For some reason, at the distance of around Earth's radius, having the near camera enabled throws "position our of view frustum" exceptions.
@@ -58,6 +60,20 @@ namespace KatnisssSpaceSimulator.Camera
 
                 this.transform.rotation *= Quaternion.AngleAxis( mouseX * 500 * Time.unscaledDeltaTime, Vector3.up );
                 this.transform.rotation *= Quaternion.AngleAxis( -mouseY * 500 * Time.unscaledDeltaTime, Vector3.right );
+            }
+
+            if( Input.GetKeyDown( KeyCode.M ) ) // map view, kind of
+            {
+                if( previousZoomDist == null )
+                {
+                    previousZoomDist = zoomDist;
+                    zoomDist = 25_000_000.0f;
+                }
+                else
+                {
+                    zoomDist = previousZoomDist.Value;
+                    previousZoomDist = null;
+                }
             }
 
             PreventViewFrustumException();

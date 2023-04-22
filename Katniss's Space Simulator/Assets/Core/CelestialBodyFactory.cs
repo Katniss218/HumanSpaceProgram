@@ -15,12 +15,12 @@ namespace KatnisssSpaceSimulator.Core
         public const float radius = 6371000f;
         //const float mass = 20e16f; //5.97e24f; // kg  // 20e16f for 1km radius is good
         public const float mass = 5.97e24f;
-        public const int subdivs = 6;
+        public const int subdivs = 7; // 7 is the maximum value for a single plane that won't cause issues here.
 
-        public CelestialBody Create()
+        public CelestialBody Create( Vector3Large GIRFPosition )
         {
             GameObject cbGO = new GameObject( "celestialbody" );
-            cbGO.transform.position = new Vector3( 0, 0, 0 );
+            cbGO.transform.position = ReferenceFrameManager.CurrentReferenceFrame.InverseTransformPosition( GIRFPosition );
             cbGO.transform.localScale = Vector3.one;
 
             Vector3[] offsets = new Vector3[6]
@@ -46,7 +46,7 @@ namespace KatnisssSpaceSimulator.Core
             //SphereCollider c = cbGO.AddComponent<SphereCollider>();
 
             CelestialBody cb = cbGO.AddComponent<CelestialBody>();
-            cb.GIRFPosition = new Vector3Large( 0, -radius, 0 );
+            cb.GIRFPosition = GIRFPosition;
             cb.Mass = mass;
             cb.Radius = radius;
 

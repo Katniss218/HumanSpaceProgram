@@ -68,6 +68,39 @@ namespace KatnisssSpaceSimulator.Terrain
             return mesh;
         }
 
+        public static Vector3 GetPosFromUV( float u, float v, float radius )
+        {
+            float theta = u * (2 * Mathf.PI) - Mathf.PI; // Multiplying by 2 because the input is in range [0..1]
+            float phi = v * Mathf.PI;
+
+
+            float x = radius * Mathf.Sin( phi ) * Mathf.Cos( theta );
+            float y = radius * Mathf.Sin( phi ) * Mathf.Sin( theta );
+            float z = radius * Mathf.Cos( phi );
+            return new Vector3( x, y, z );
+        }
+
+
+        /// <summary>
+        /// Z+ is up (V+), seam is in the direction of X-.
+        /// U increases from 0 on the Y- side of the seam, decreases from 1 on the Y+ side.
+        /// </summary>
+        public static Vector2 CartesianToUV( float x, float y, float z )
+        {
+            // If we know for sure that the coordinates are for a unit sphere, we can remove the radius calculation entirely.
+            // Also remove the division by radius, since division by 1 (unit-sphere) doesn't change the divided number.
+            float radius = Mathf.Sqrt( x * x + y * y + z * z );
+            float theta = Mathf.Atan2( y, x );
+            float phi = Mathf.Acos( z / radius );
+
+
+            // The thing returned here seems to also be the lat/lon but normalized to the range [0..1]
+            // The outputs are normalized by the respective denominators.
+            float u = (theta + Mathf.PI) / (2 * Mathf.PI); // dividing by 2 * pi ensures that the output is in [0..1]
+            float v = phi / Mathf.PI;
+            return new Vector2( u, v );
+        }
+
         public Mesh GeneratePartialCubeSphere( int subdivisions, float radius, Face face )
         {
             float diameter = radius * 2;
@@ -75,6 +108,12 @@ namespace KatnisssSpaceSimulator.Terrain
             int numberOfEdges = 1 << subdivisions; // fast 2^n
             int numberOfVertices = numberOfEdges + 1;
             float edgeLength = diameter / numberOfEdges;
+
+            if( subdivisions > 7 )
+            {
+                // technically wrong, since Mesh.indexFormat can be switched to 32 bit, but i'll leave this for now. Meshes don't have to be over that value anyway because laggy and big and far away.
+                throw new ArgumentOutOfRangeException( $"Unity's Mesh can contain at most 65535 vertices (16-bit buffer). Tried to create a Mesh with {numberOfVertices}." );
+            }
 
             Vector3[] vertices = new Vector3[numberOfVertices * numberOfVertices];
             Vector3[] normals = new Vector3[numberOfVertices * numberOfVertices];
@@ -122,10 +161,7 @@ namespace KatnisssSpaceSimulator.Terrain
 #warning TODO - requires additional set of vertices at Z- because UVs need to overlap on both 0.0 and 1.0 there.
                     // for Zn, Yp, Yn, needs to add extra vertex for every vert with x=0
 
-
-                    float latitude = Mathf.Acos( pos.y ) / Mathf.PI;
-                    float longitude = (Mathf.Atan2( pos.x, pos.z ) + Mathf.PI) / (2 * Mathf.PI);
-                    uvs[index] = new Vector2( longitude, latitude );
+                    uvs[index] = CartesianToUV( pos.x, pos.y, pos.z );
 
                     vertices[index] = pos * radius - posOffset;
                     normals[index] = pos; // Normals need to be calculated by hand to avoid seams not matching up.

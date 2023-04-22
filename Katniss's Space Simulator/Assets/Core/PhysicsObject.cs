@@ -64,13 +64,13 @@ namespace KatnisssSpaceSimulator.Core
 
         void FixedUpdate()
         {
-            Vector3 gravityDir = Vector3.down;
-
             CelestialBody cb = CelestialBodyManager.Bodies[0];
 
             Vector3Large toBody = cb.GIRFPosition - ReferenceFrameManager.CurrentReferenceFrame.TransformPosition( this.transform.position );
 
-            double distanceSq = toBody.sqMagnitude;
+            Vector3 toBodyWorldSpace = ReferenceFrameManager.CurrentReferenceFrame.InverseTransformPosition( toBody );
+
+            float distanceSq = toBodyWorldSpace.sqrMagnitude;
 
             const double G = 6.67430e-11;
 
