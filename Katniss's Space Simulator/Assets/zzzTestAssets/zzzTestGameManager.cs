@@ -23,11 +23,25 @@ namespace KatnisssSpaceSimulator
         public Mesh Mesh;
         public Material Material;
 
+        public static Vector3 GetPosFromUV( float u, float v, float radius )
+        {
+            float latitude = v * Mathf.PI;
+            float longitude = u * 2 * Mathf.PI;
+
+            // Calculate the unit vector on the sphere's surface
+            float x = radius * Mathf.Sin( latitude ) * Mathf.Cos( longitude );
+            float y = radius * Mathf.Cos( latitude );
+            float z = -radius * Mathf.Sin( latitude ) * Mathf.Sin( longitude );
+            return new Vector3( x, y, z );
+
+            // with current mapping, seems to generate the antipode. 
+        }
+
         void Start()
         {
             VesselFactory fac = new VesselFactory();
             PartFactory pfac = new PartFactory();
-            Vessel v = fac.Create( pfac.CreateRoot );
+            Vessel v = fac.Create( GetPosFromUV( 1800f / 4096f, 1150f / 4096f, CelestialBodyFactory.radius ), Quaternion.identity, pfac.CreateRoot );
             v.RootPart.DisplayName = "0";
 
             Part origRoot = v.RootPart;
@@ -68,6 +82,8 @@ namespace KatnisssSpaceSimulator
             curve.AddKey( 1, 2.5f );
             tr.widthCurve = curve;
             tr.minVertexDistance = 5f;
+
+            VesselManager.ActiveVessel.transform.GetComponent<Rigidbody>().angularDrag = 1; // temp, doesn't veer off course.
 
             CelestialBody cb = new CelestialBodyFactory().Create();
         }

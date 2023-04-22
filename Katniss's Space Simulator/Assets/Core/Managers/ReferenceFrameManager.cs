@@ -97,10 +97,6 @@ namespace KatnisssSpaceSimulator.Core.Managers
              || VesselManager.ActiveVessel.transform.position.y < min || VesselManager.ActiveVessel.transform.position.y > max
              || VesselManager.ActiveVessel.transform.position.z < min || VesselManager.ActiveVessel.transform.position.z > max )
             {
-#warning TODO - at high speeds, this seems to cause issues with timewarp where things move faster than their velocity. Might get fixed with moving reference frames which would cause much fewer switches.
-                // not even at high speeds to be honest.
-                // seems to accumulate 10000 + whatever on each switch??? hmm
-                
                 SwitchReferenceFrame( CurrentReferenceFrame.Shift( VesselManager.ActiveVessel.transform.position ) );
             }
         }

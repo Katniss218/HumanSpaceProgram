@@ -160,7 +160,7 @@ namespace KatnisssSpaceSimulator.Core
             oldv.RecalculateParts();
 
             // Create the new vessel and add the parts to it.
-            Vessel v = new VesselFactory().CreatePartless();
+            Vessel v = new VesselFactory().CreatePartless( partToSplit.transform.position, partToSplit.transform.rotation );
             SetVesselHierarchy( partToSplit, v );
             partToSplit.SetVesselRecursive( v );
             v.SetRootPart( partToSplit );

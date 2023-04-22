@@ -16,16 +16,16 @@ namespace KatnisssSpaceSimulator.Core
 
         const string name = "tempname_vessel";
 
-        public Vessel CreatePartless()
+        public Vessel CreatePartless( Vector3 position, Quaternion rotation )
         {
-            Vessel vessel = CreateGO();
+            Vessel vessel = CreateGO( position, rotation );
 
             return vessel;
         }
 
-        public Vessel Create( Func<Vessel, Part> rootPart )
+        public Vessel Create( Vector3 position, Quaternion rotation, Func<Vessel, Part> rootPart )
         {
-            Vessel vessel = CreateGO();
+            Vessel vessel = CreateGO( position, rotation );
 
             rootPart( vessel );
 
@@ -35,9 +35,10 @@ namespace KatnisssSpaceSimulator.Core
             return vessel;
         }
 
-        private Vessel CreateGO()
+        private Vessel CreateGO( Vector3 position, Quaternion rotation )
         {
             GameObject vesselGO = new GameObject( $"Vessel, '{name}'" );
+            vesselGO.transform.SetPositionAndRotation( position, rotation );
 
             Vessel vessel = vesselGO.AddComponent<Vessel>();
             vessel.name = name;

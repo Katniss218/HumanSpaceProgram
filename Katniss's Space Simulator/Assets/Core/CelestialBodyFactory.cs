@@ -11,16 +11,16 @@ namespace KatnisssSpaceSimulator.Core
 {
     public class CelestialBodyFactory
     {
+        //const float radius = 1000; //6371000f; // m
+        public const float radius = 6371000f;
+        //const float mass = 20e16f; //5.97e24f; // kg  // 20e16f for 1km radius is good
+        public const float mass = 5.97e24f;
+        public const int subdivs = 6;
+
         public CelestialBody Create()
         {
-            //const float radius = 1000; //6371000f; // m
-            const float radius = 6371000f;
-            //const float mass = 20e16f; //5.97e24f; // kg  // 20e16f for 1km radius is good
-            const float mass = 5.97e24f;
-            const int subdivs = 6;
-
             GameObject cbGO = new GameObject( "celestialbody" );
-            cbGO.transform.position = new Vector3( 0, -radius, 0 );
+            cbGO.transform.position = new Vector3( 0, 0, 0 );
             cbGO.transform.localScale = Vector3.one;
 
             Vector3[] offsets = new Vector3[6]

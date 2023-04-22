@@ -27,6 +27,47 @@ namespace KatnisssSpaceSimulator.Terrain
             Zn
         }
 
+        Vector3 GetFaceNormal( Vector3 v1, Vector3 v2, Vector3 v3 )
+        {
+            return Vector3.Cross( v1 - v2, v3 - v2 );
+        }
+
+        Mesh MakeQuad()
+        {
+            Vector3[] vertices = new Vector3[4];
+            int[] triangles = new int[6];
+
+            const float radius = 6371011.123456f; // earth.
+
+            vertices[0] = new Vector3( 0, 0, 0 );
+            vertices[1] = new Vector3( 1, 0, 0 );
+            vertices[2] = new Vector3( 1, 0, 1 );
+            vertices[3] = new Vector3( 0, 0, 1 );
+
+            for( int i = 0; i < vertices.Length; i++ )
+            {
+                vertices[i] *= radius;
+            }
+
+            // Counter-Clockwise when looking towards the triangle. Faces away.
+
+            // Clockwise when looking towards the triangle. Faces you.
+            triangles[0] = 0;
+            triangles[1] = 3;
+            triangles[2] = 1;
+            triangles[3] = 1;
+            triangles[4] = 3;
+            triangles[5] = 2;
+
+            Mesh mesh = new Mesh();
+            mesh.SetVertices( vertices );
+            mesh.SetTriangles( triangles, 0 );
+            mesh.RecalculateNormals();
+            mesh.RecalculateTangents();
+
+            return mesh;
+        }
+
         public Mesh GeneratePartialCubeSphere( int subdivisions, float radius, Face face )
         {
             float diameter = radius * 2;
