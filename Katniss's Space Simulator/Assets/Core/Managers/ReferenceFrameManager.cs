@@ -55,7 +55,16 @@ namespace KatnisssSpaceSimulator.Core.Managers
         {
             foreach( var obj in UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects() )
             {
-                obj.transform.position = GetNewPosition( data.OldFrame, data.NewFrame, obj.transform.position );
+                /*Rigidbody rb = obj.GetComponent<Rigidbody>();
+                if( rb != null )
+                {
+                    rb.position = GetNewPosition( data.OldFrame, data.NewFrame, obj.transform.position );
+                }
+                else
+                {
+                */
+                    obj.transform.position = GetNewPosition( data.OldFrame, data.NewFrame, obj.transform.position );
+               // }
 
                 // TODO - add rotations/scaling/etc later.
                 // Add PhysicsObject integration for things that have to get their forces/velocities/angular velocities/etc recalculated.
@@ -77,7 +86,7 @@ namespace KatnisssSpaceSimulator.Core.Managers
 
         // something to force single instance would be nice in the future.
 
-        void LateUpdate()
+        void FixedUpdate()
         {
             const float MaxFloatingOriginRange = 10000.0f;
 
@@ -89,6 +98,9 @@ namespace KatnisssSpaceSimulator.Core.Managers
              || VesselManager.ActiveVessel.transform.position.z < min || VesselManager.ActiveVessel.transform.position.z > max )
             {
 #warning TODO - at high speeds, this seems to cause issues with timewarp where things move faster than their velocity. Might get fixed with moving reference frames which would cause much fewer switches.
+                // not even at high speeds to be honest.
+                // seems to accumulate 10000 + whatever on each switch??? hmm
+                
                 SwitchReferenceFrame( CurrentReferenceFrame.Shift( VesselManager.ActiveVessel.transform.position ) );
             }
         }

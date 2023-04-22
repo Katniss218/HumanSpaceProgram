@@ -23,9 +23,9 @@ namespace KatnisssSpaceSimulator.Core.ReferenceFrames
             this.ReferencePosition = referencePosition;
         }
 
-        public IReferenceFrame Shift( Vector3 distance )
+        public IReferenceFrame Shift( Vector3 distanceDelta )
         {
-            return new DefaultFrame( this.ReferencePosition + distance );
+            return new DefaultFrame( this.ReferencePosition + distanceDelta );
         }
 
         public Vector3 InverseTransformPosition( Vector3Large globalPosition )

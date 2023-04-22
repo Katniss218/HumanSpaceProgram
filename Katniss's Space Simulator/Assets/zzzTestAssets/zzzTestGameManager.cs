@@ -18,7 +18,7 @@ namespace KatnisssSpaceSimulator
     /// </summary>
     public class zzzTestGameManager : MonoBehaviour
     {
-        public Mesh CBMesh;
+        public Material CBMaterial;
 
         public Mesh Mesh;
         public Material Material;
@@ -62,33 +62,14 @@ namespace KatnisssSpaceSimulator
 
             TrailRenderer tr = VesselManager.ActiveVessel.gameObject.AddComponent<TrailRenderer>();
             tr.material = Material;
-            tr.time = 50;
+            tr.time = 250;
             AnimationCurve curve = new AnimationCurve();
             curve.AddKey( 0, 5.0f );
             curve.AddKey( 1, 2.5f );
             tr.widthCurve = curve;
             tr.minVertexDistance = 5f;
 
-
-            const float radius = 1000; //6371000f; // m
-            const float mass = 20e16f; //5.97e24f; // kg  // 20e16f for 1km radius is good
-            GameObject cbGO = new GameObject( "celestialbody" );
-            cbGO.transform.position = new Vector3( 0, -radius, 0 );
-            cbGO.transform.localScale = Vector3.one * 2 * radius;
-
-            SphereCollider c = cbGO.AddComponent<SphereCollider>();
-
-            CelestialBody cb = cbGO.AddComponent<CelestialBody>();
-            cb.GIRFPosition = new Vector3Large( 0, -radius, 0 );
-            cb.Mass = mass;
-
-            MeshFilter cbMesh = cbGO.AddComponent<MeshFilter>();
-            cbMesh.mesh = this.CBMesh;
-
-            MeshRenderer mr = cbGO.AddComponent<MeshRenderer>();
-            mr.material = this.Material;
-
-            CelestialBodyManager.Bodies.Add( cb );
+            CelestialBody cb = new CelestialBodyFactory().Create();
         }
     }
 

@@ -36,7 +36,7 @@ namespace KatnisssSpaceSimulator.Terrain
 
             for( int i = 0; i < 6; i++ )
             {
-                Mesh mesh = new CubeSphereTerrain().GeneratePartialCubeSphere( 5, (CubeSphereTerrain.Face)i );
+                Mesh mesh = new CubeSphereTerrain().GeneratePartialCubeSphere( 5, 10, (CubeSphereTerrain.Face)i );
                 col[i].sharedMesh = mesh;
                 mf[i].sharedMesh = mesh;
             }

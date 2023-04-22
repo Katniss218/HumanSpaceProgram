@@ -27,14 +27,13 @@ namespace KatnisssSpaceSimulator.Terrain
             Zn
         }
 
-        public Mesh GeneratePartialCubeSphere( int subdivisions, Face face )
+        public Mesh GeneratePartialCubeSphere( int subdivisions, float radius, Face face )
         {
-            const float radius = 10.0f;
-            const float halfRadius = radius / 2;
+            float diameter = radius * 2;
 
             int numberOfEdges = 1 << subdivisions; // fast 2^n
             int numberOfVertices = numberOfEdges + 1;
-            float edgeLength = radius / numberOfEdges;
+            float edgeLength = diameter / numberOfEdges;
 
             Vector3[] vertices = new Vector3[numberOfVertices * numberOfVertices];
             Vector3[] normals = new Vector3[numberOfVertices * numberOfVertices];
@@ -47,20 +46,33 @@ namespace KatnisssSpaceSimulator.Terrain
                     int index = (i * numberOfEdges) + i + j;
 
                     Vector3 pos;
+                    Vector3 posOffset;
                     switch( face )
                     {
                         case Face.Xp:
-                            pos = new Vector3( halfRadius, (j * edgeLength) - halfRadius, (i * edgeLength) - halfRadius ); break;
+                            pos = new Vector3( radius, (j * edgeLength) - radius, (i * edgeLength) - radius );
+                            posOffset = new Vector3( radius, 0, 0 );
+                            break;
                         case Face.Xn:
-                            pos = new Vector3( -halfRadius, (i * edgeLength) - halfRadius, (j * edgeLength) - halfRadius ); break;
+                            pos = new Vector3( -radius, (i * edgeLength) - radius, (j * edgeLength) - radius );
+                            posOffset = new Vector3( -radius, 0, 0 ); 
+                            break;
                         case Face.Yp:
-                            pos = new Vector3( (i * edgeLength) - halfRadius, halfRadius, (j * edgeLength) - halfRadius ); break;
+                            pos = new Vector3( (i * edgeLength) - radius, radius, (j * edgeLength) - radius );
+                            posOffset = new Vector3( 0, radius, 0 );
+                            break;
                         case Face.Yn:
-                            pos = new Vector3( (j * edgeLength) - halfRadius, -halfRadius, (i * edgeLength) - halfRadius ); break;
+                            pos = new Vector3( (j * edgeLength) - radius, -radius, (i * edgeLength) - radius );
+                            posOffset = new Vector3( 0, -radius, 0 );
+                            break;
                         case Face.Zp:
-                            pos = new Vector3( (j * edgeLength) - halfRadius, (i * edgeLength) - halfRadius, halfRadius ); break;
+                            pos = new Vector3( (j * edgeLength) - radius, (i * edgeLength) - radius, radius );
+                            posOffset = new Vector3( 0, 0, radius );
+                            break;
                         case Face.Zn:
-                            pos = new Vector3( (i * edgeLength) - halfRadius, (j * edgeLength) - halfRadius, -halfRadius ); break;
+                            pos = new Vector3( (i * edgeLength) - radius, (j * edgeLength) - radius, -radius );
+                            posOffset = new Vector3( 0, 0, -radius );
+                            break;
                         default:
                             throw new ArgumentException( $"Invalid face orientation {face}", nameof( face ) );
                     }
@@ -74,7 +86,7 @@ namespace KatnisssSpaceSimulator.Terrain
                     float longitude = (Mathf.Atan2( pos.x, pos.z ) + Mathf.PI) / (2 * Mathf.PI);
                     uvs[index] = new Vector2( longitude, latitude );
 
-                    vertices[index] = pos * radius;
+                    vertices[index] = pos * radius - posOffset;
                     normals[index] = pos; // Normals need to be calculated by hand to avoid seams not matching up.
                 }
             }

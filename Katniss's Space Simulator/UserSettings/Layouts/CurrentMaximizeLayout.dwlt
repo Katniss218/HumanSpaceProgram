@@ -24,7 +24,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 200}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 86848
+  controlID: 111882
 --- !u!114 &2
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -148,7 +148,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 200}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 1
-  controlID: 86849
+  controlID: 111883
 --- !u!114 &4
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -173,7 +173,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 100}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 86850
+  controlID: 111884
 --- !u!114 &5
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -231,9 +231,9 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 22d3fcff
-      m_LastClickedID: -208094
-      m_ExpandedIDs: f474fdff0c98fdff34edfdff3eedfdff0605feffb045feffa82ffffff82fffff34a8ffff8cb6ffff16bbffff52bbffffe0beffff32d2ffff6ed2ffff34fbffff4659000008bf000034bf00004cbf0000
+      m_SelectedIDs: 162ffcff
+      m_LastClickedID: -250090
+      m_ExpandedIDs: 9c3afcfff44efcff5065fcff2c9bfcff7c9bfcfff474fdff0c98fdff34edfdff3eedfdff0605feffb045feffa82ffffff82fffff34a8ffff8cb6ffff16bbffff52bbffffe0beffff32d2ffff6ed2ffff34fbffff4659000008bf000034bf00004cbf0000
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -542,9 +542,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 3.7868629, y: -19.58343, z: 37.206684}
+    m_Target: {x: 3448.9338, y: 104.25701, z: 458.59998}
     speed: 2
-    m_Value: {x: 3.7868629, y: -19.58343, z: 37.206684}
+    m_Value: {x: 3448.9338, y: 104.25701, z: 458.59998}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 2
@@ -590,13 +590,13 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0.5
   m_Rotation:
-    m_Target: {x: -0.23053402, y: -0.03880532, z: 0.0092678275, w: -0.97227675}
+    m_Target: {x: -0.0027295945, y: -0.9944281, z: 0.10210162, w: -0.027753992}
     speed: 2
-    m_Value: {x: -0.230534, y: -0.038805317, z: 0.0092678275, w: -0.97227675}
+    m_Value: {x: 0.0027295945, y: 0.9944281, z: -0.10210161, w: 0.02775399}
   m_Size:
-    m_Target: 30.304054
+    m_Target: 10
     speed: 2
-    m_Value: 30.304054
+    m_Value: 10
   m_Ortho:
     m_Target: 0
     speed: 2
@@ -631,7 +631,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 1
   m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: ConsoleWindow
+  m_Name: ProjectBrowser
   m_EditorClassIdentifier: 
   m_Children: []
   m_Position:
@@ -640,14 +640,14 @@ MonoBehaviour:
     y: 561
     width: 1465
     height: 386
-  m_MinSize: {x: 101, y: 121}
-  m_MaxSize: {x: 4001, y: 4021}
-  m_ActualView: {fileID: 11}
+  m_MinSize: {x: 231, y: 271}
+  m_MaxSize: {x: 10001, y: 10021}
+  m_ActualView: {fileID: 10}
   m_Panes:
   - {fileID: 10}
   - {fileID: 11}
-  m_Selected: 1
-  m_LastSelected: 0
+  m_Selected: 0
+  m_LastSelected: 1
 --- !u!114 &10
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -689,21 +689,21 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/zzzTestAssets
+    - Assets/UI
     m_Globs: []
     m_OriginalText: 
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/zzzTestAssets
+  - Assets/UI
   m_LastFoldersGridSize: -1
   m_LastProjectPath: E:\GIT\KatnisssSpaceSimulator\Katniss's Space Simulator
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: b0590000
-    m_LastClickedID: 22960
+    m_SelectedIDs: bec20000
+    m_LastClickedID: 49854
     m_ExpandedIDs: 000000009c590000a859000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -757,8 +757,8 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: 22d3fcff
-    m_LastClickedInstanceID: -208094
+    m_SelectedInstanceIDs: 162ffcff
+    m_LastClickedInstanceID: -250090
     m_HadKeyboardFocusLastEvent: 0
     m_ExpandedInstanceIDs: c6230000
     m_RenameOverlay:

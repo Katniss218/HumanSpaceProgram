@@ -7,7 +7,13 @@ namespace KatnisssSpaceSimulator.Camera
     public class CameraController : MonoBehaviour
     {
         [field: SerializeField]
-        public UnityEngine.Camera Camera { get; set; }
+        public Transform CameraParent { get; set; }
+
+        [field: SerializeField]
+        UnityEngine.Camera _closeCamera { get; set; }
+
+        [field: SerializeField]
+        UnityEngine.Camera _farCamera { get; set; }
 
         [field: SerializeField]
         public Transform ReferenceObject { get; set; }
@@ -15,12 +21,20 @@ namespace KatnisssSpaceSimulator.Camera
         [field: SerializeField]
         float zoomDist = 5;
 
-        void Start()
+        void PreventViewFrustumException()
         {
-
+            // For some reason, at the distance of around Earth's radius, having the near camera enabled throws "position our of view frustum" exceptions.
+            if( zoomDist > 1_000_000 ) // should be enough of a conservative value. Near cam is only 100km, not 1000.
+            {
+                this._closeCamera.enabled = false;
+            }
+            else
+            {
+                this._closeCamera.enabled = true;
+            }
         }
 
-        void Update()
+        void LateUpdate()
         {
             if( Input.mouseScrollDelta.y > 0 )
             {
@@ -35,20 +49,19 @@ namespace KatnisssSpaceSimulator.Camera
                 zoomDist = 2;
             }
 
-            this.Camera.transform.localPosition = Vector3.back * zoomDist;
+            CameraParent.transform.localPosition = Vector3.back * zoomDist;
 
             if( Input.GetKey( KeyCode.Mouse1 ) ) // RMB
             {
                 float mouseX = Input.GetAxis( "Mouse X" );
                 float mouseY = Input.GetAxis( "Mouse Y" );
 
-                this.transform.rotation *= Quaternion.AngleAxis( mouseX * 200 * Time.unscaledDeltaTime, Vector3.up );
-                this.transform.rotation *= Quaternion.AngleAxis( -mouseY * 200 * Time.unscaledDeltaTime, Vector3.right );
+                this.transform.rotation *= Quaternion.AngleAxis( mouseX * 500 * Time.unscaledDeltaTime, Vector3.up );
+                this.transform.rotation *= Quaternion.AngleAxis( -mouseY * 500 * Time.unscaledDeltaTime, Vector3.right );
             }
-        }
 
-        void LateUpdate()
-        {
+            PreventViewFrustumException();
+
             if( ReferenceObject != null )
             {
                 this.transform.position = ReferenceObject.transform.position;
