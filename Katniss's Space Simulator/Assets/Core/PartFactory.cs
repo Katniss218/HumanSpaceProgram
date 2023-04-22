@@ -10,7 +10,7 @@ namespace KatnisssSpaceSimulator.Core
     /// <summary>
     /// A class responsible for instantiating a part from a source (save file, picked in VAB, etc).
     /// </summary>
-    public class PartFactory
+    public sealed class PartFactory
     {
         // Parts are a flat Unity hierarchy of objects that are the direct child of a vessel object.
 

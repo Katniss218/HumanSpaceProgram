@@ -8,7 +8,7 @@ namespace UnityEngine
 {
     [Serializable]
     /// <summary>
-    /// A struct that can represent very large vectors reasonably accurately.
+    /// A struct that can represent vectors with extremely large magnitudes reasonably accurately.
     /// </summary>
     public struct Vector3Large
     {
@@ -19,6 +19,10 @@ namespace UnityEngine
         [SerializeField]
         public double z;
 
+        public double sqMagnitude => x * x + y * y + z * z;
+
+        public double magnitude => Math.Sqrt( sqMagnitude );
+
         public static readonly Vector3Large zero = new Vector3Large( 0, 0, 0 );
         public static readonly Vector3Large one = new Vector3Large( 1, 1, 1 );
 
@@ -27,6 +31,28 @@ namespace UnityEngine
             this.x = x;
             this.y = y;
             this.z = z;
+        }
+
+        public static Vector3 GetDirection( Vector3Large from, Vector3Large to )
+        {
+            Vector3Large dir = to - from;
+            dir.Normalize();
+
+            return new Vector3( (float)dir.x, (float)dir.y, (float)dir.z );
+        }
+
+        public void Normalize()
+        {
+            double magn = magnitude;
+            this.x /= magn;
+            this.y /= magn;
+            this.z /= magn;
+        }
+        
+        public Vector3 NormalizeToVector3()
+        {
+            double magn = magnitude;
+            return new Vector3( (float)(this.x / magn), (float)(this.y / magn), (float)(this.z / magn) );
         }
 
         public static Vector3Large Add( Vector3Large v1, Vector3Large v2 )

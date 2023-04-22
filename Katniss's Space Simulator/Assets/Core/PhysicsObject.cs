@@ -1,4 +1,4 @@
-﻿using KatnisssSpaceSimulator.Core.Physics;
+﻿using KatnisssSpaceSimulator.Core.Managers;
 using KatnisssSpaceSimulator.Core.ReferenceFrames;
 using System;
 using System.Collections.Generic;
@@ -15,16 +15,9 @@ namespace KatnisssSpaceSimulator.Core
     [RequireComponent( typeof( Rigidbody ) )]
     public class PhysicsObject : MonoBehaviour
     {
-        // this is basically either a celestial body, or a vessel. Something that moves on its own and is not parented to anything else.
-
-        /*ForceSolver forceSolver = new ForceSolver()
-        {
-            Mass = 5
-        };*/
+        // this class is basically either a celestial body of some kind, or a vessel. Something that moves on its own and is not parented to anything else.
 
         Rigidbody rb;
-
-        PhysicsScene test;
 
         /// <summary>
         /// Use this to add a force acting on the center of mass. Does not apply any torque.
@@ -54,6 +47,12 @@ namespace KatnisssSpaceSimulator.Core
             set => this.rb.centerOfMass = value;
         }
 
+        public Vector3 Velocity
+        {
+            get => this.rb.velocity;
+            set => this.rb.velocity = value;
+        }
+
         void Awake()
         {
             rb = this.GetComponent<Rigidbody>();
@@ -65,33 +64,20 @@ namespace KatnisssSpaceSimulator.Core
 
         void FixedUpdate()
         {
-            if( Input.GetKey( KeyCode.W ) )
-            {
-                //AddForce( Vector3.up * 12.0f * rb.mass );
-            }
-
             Vector3 gravityDir = Vector3.down;
 
+            CelestialBody cb = CelestialBodyManager.Bodies[0];
+
+            Vector3Large toBody = cb.GIRFPosition - ReferenceFrameManager.CurrentReferenceFrame.TransformPosition( this.transform.position );
+
+            double distanceSq = toBody.sqMagnitude;
+
+            const double G = 6.67430e-11;
+
+            float forceMagn = (float)(G * ((rb.mass * cb.Mass) / distanceSq));
+
             // F = m*a
-            AddForce( gravityDir * 9.81f * rb.mass );
-
-
-
-#warning TODO - this also needs to support floaring origin/krakensbane equivalent (resetting in-game velocity/position) to keep it running accurately.
-            // frames of reference maybe can be used for that.
-
-            // a rotating frame of reference will impart forces on the object just because it is rotating.
-            // the reference frame needs to keep high precision position / rotation of the reference object.
-            // - Every object's position will be transformed by this frame to get its "true" position, which might have arbitrary precision (and in reverse too, inverse to get local position).
-
-            // There is only one global reference frame for the scene.
-
-            // objects that are not centered on the reference frame need to be updated every frame (possibly less if they're very distant and can't be seen) to remain correct.
-            // - if the frame is centered on the active vessel, then "world" space in Unity needs to be transformed into local space for that frame.
-            // - - This can be done by applying forces/changing positions manually.
-
-
-            // Bottom line is that we need to make the Unity's world space act like the local space of the selected reference frame.
+            AddForce( toBody.NormalizeToVector3() * forceMagn );
 
 
             // ---------------------
@@ -100,15 +86,7 @@ namespace KatnisssSpaceSimulator.Core
             // doesn't seem like that to me reading the docs tho, but idk.
 
 
-            //forceSolver.AddForce( (Vector3.down * 9.81f) / (float)forceSolver.Mass );
 
-            // do more stuff here.
-
-            // Advance and update transform values.
-            //forceSolver.Advance( Time.fixedDeltaTime );
-
-            //this.transform.position = referenceFrame.TransformPosition( forceSolver.Position );
-            // rotation?
         }
     }
 }

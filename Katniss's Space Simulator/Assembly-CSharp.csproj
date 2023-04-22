@@ -61,7 +61,6 @@
     <Compile Include="Assets\zzzTestAssets\zzzTestGameManager.cs" />
     <Compile Include="Assets\Core\VesselFactory.cs" />
     <Compile Include="Assets\Functionalities\FRocketEngine.cs" />
-    <Compile Include="Assets\Core\Physics\ForceSolver.cs" />
     <Compile Include="Assets\_UnityEngine\Vector3Large.cs" />
     <Compile Include="Assets\Core\VesselStateUtils.cs" />
     <Compile Include="Assets\Core\PhysicsObject.cs" />
@@ -70,8 +69,38 @@
     <Compile Include="Assets\Core\Functionality.cs" />
     <Compile Include="Assets\Core\ReferenceFrames\DefaultFrame.cs" />
     <Compile Include="Assets\Core\ReferenceFrames\IReferenceFrame.cs" />
-    <Compile Include="Assets\Core\ReferenceFrameManager.cs" />
     <Compile Include="Assets\Camera\CameraController.cs" />
+    <Compile Include="Assets\Core\CelestialBody.cs" />
+    <Compile Include="Assets\TimeWarp\TimeWarpManager.cs" />
+    <Compile Include="Assets\UI\VelocityReadoutUI.cs" />
+    <Compile Include="Assets\Core\Managers\CelestialBodyManager.cs" />
+    <Compile Include="Assets\Core\Managers\ReferenceFrameManager.cs" />
+    <Compile Include="Assets\Core\Managers\VesselManager.cs" />
+    <Compile Include="Assets\UI\TimewarpReadoutUI.cs" />
+    <Compile Include="Assets\Terrain\CubeSphereTerrain.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\_TextMesh Pro\Shaders\TMPro.cginc" />
+    <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
+    <None Include="Assets\_TextMesh Pro\Shaders\TMP_Bitmap.shader" />
+    <None Include="Assets\_TextMesh Pro\Shaders\TMPro_Mobile.cginc" />
+    <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF SSD.shader" />
+    <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Surface-Mobile.shader" />
+    <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Surface.shader" />
+    <None Include="Assets\_TextMesh Pro\Sprites\EmojiOne Attribution.txt" />
+    <None Include="Assets\_TextMesh Pro\Shaders\TMP_Bitmap-Custom-Atlas.shader" />
+    <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF.shader" />
+    <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Mobile SSD.shader" />
+    <None Include="Assets\_TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
+    <None Include="Assets\_TextMesh Pro\Shaders\TMPro_Properties.cginc" />
+    <None Include="Assets\_TextMesh Pro\Shaders\TMPro_Surface.cginc" />
+    <None Include="Assets\_TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
+    <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Mobile Masking.shader" />
+    <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF Overlay.shader" />
+    <None Include="Assets\_TextMesh Pro\Shaders\TMP_Bitmap-Mobile.shader" />
+    <None Include="Assets\_TextMesh Pro\Fonts\LiberationSans - OFL.txt" />
+    <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Mobile.shader" />
+    <None Include="Assets\_TextMesh Pro\Shaders\TMP_Sprite.shader" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

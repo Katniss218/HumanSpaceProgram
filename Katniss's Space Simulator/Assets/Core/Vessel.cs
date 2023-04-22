@@ -7,7 +7,7 @@ using UnityEngine;
 namespace KatnisssSpaceSimulator.Core
 {
     [RequireComponent( typeof( PhysicsObject ) )]
-    public class Vessel : MonoBehaviour
+    public sealed class Vessel : MonoBehaviour
     {
         [SerializeField]
         private string _displayName;
@@ -17,8 +17,6 @@ namespace KatnisssSpaceSimulator.Core
             set { _displayName = value; this.gameObject.name = value; }
         }
 
-        public PhysicsObject PhysicsObject { get; private set; }
-
         [field: SerializeField]
         public Part RootPart { get; private set; }
 
@@ -27,6 +25,8 @@ namespace KatnisssSpaceSimulator.Core
 
         [field: SerializeField]
         public int PartCount { get; private set; }
+
+        public PhysicsObject PhysicsObject { get; private set; }
 
         /// <remarks>
         /// DO NOT USE. This is for internal use, and can produce an invalid state. Use <see cref="VesselStateUtils.SetParent(Part, Part)"/> instead.

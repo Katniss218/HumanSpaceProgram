@@ -23,25 +23,23 @@ namespace KatnisssSpaceSimulator.Terrain
         float radius = 6371011.123456f;
 
         [SerializeField]
-        MeshCollider col;
+        MeshCollider[] col;
+
         [SerializeField]
-        MeshFilter mf;
+        MeshFilter[] mf;
 
         // Start is called before the first frame update
         void Start()
         {
-            for( int i = 0; i < vertices.Length; i++ )
+            col = this.GetComponentsInChildren<MeshCollider>();
+            mf = this.GetComponentsInChildren<MeshFilter>();
+
+            for( int i = 0; i < 6; i++ )
             {
-                float angle = i * Mathf.PI * 2f / vertices.Length;
-                float x = Mathf.Cos( angle ) * radius;
-                float z = Mathf.Sin( angle ) * radius;
-
-                vertices[i] = new Vector3( x, 0, z );
+                Mesh mesh = new CubeSphereTerrain().GeneratePartialCubeSphere( 5, (CubeSphereTerrain.Face)i );
+                col[i].sharedMesh = mesh;
+                mf[i].sharedMesh = mesh;
             }
-
-            Mesh mesh = MakeQuad();
-            col.sharedMesh = mesh;
-            mf.sharedMesh = mesh;
         }
 
         // Update is called once per frame
@@ -57,8 +55,7 @@ namespace KatnisssSpaceSimulator.Terrain
 
         Mesh MakeQuad()
         {
-            //const float radius = 6371011.123456f;
-            const float radius = 6371011.123456f * 11;
+            const float radius = 6371011.123456f; // earth.
 
             vertices = new Vector3[4];
             vertices[0] = new Vector3( 0, 0, 0 );

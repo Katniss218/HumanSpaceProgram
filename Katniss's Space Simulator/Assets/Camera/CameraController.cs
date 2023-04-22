@@ -12,7 +12,9 @@ namespace KatnisssSpaceSimulator.Camera
         [field: SerializeField]
         public Transform ReferenceObject { get; set; }
 
-        // Start is called before the first frame update
+        [field: SerializeField]
+        float zoomDist = 5;
+
         void Start()
         {
 
@@ -20,19 +22,31 @@ namespace KatnisssSpaceSimulator.Camera
 
         void Update()
         {
-            Vector3 pos = this.Camera.transform.localPosition;
             if( Input.mouseScrollDelta.y > 0 )
             {
-                pos -= pos * 15.0f * Time.deltaTime;
+                zoomDist -= zoomDist * 15.0f * Time.unscaledDeltaTime;
             }
             if( Input.mouseScrollDelta.y < 0 )
             {
-                pos += pos * 15.0f * Time.deltaTime;
+                zoomDist += zoomDist * 15.0f * Time.unscaledDeltaTime;
             }
-            this.Camera.transform.localPosition = pos;
+            if( zoomDist < 2 )
+            {
+                zoomDist = 2;
+            }
+
+            this.Camera.transform.localPosition = Vector3.back * zoomDist;
+
+            if( Input.GetKey( KeyCode.Mouse1 ) ) // RMB
+            {
+                float mouseX = Input.GetAxis( "Mouse X" );
+                float mouseY = Input.GetAxis( "Mouse Y" );
+
+                this.transform.rotation *= Quaternion.AngleAxis( mouseX * 200 * Time.unscaledDeltaTime, Vector3.up );
+                this.transform.rotation *= Quaternion.AngleAxis( -mouseY * 200 * Time.unscaledDeltaTime, Vector3.right );
+            }
         }
 
-        // Update is called once per frame
         void LateUpdate()
         {
             if( ReferenceObject != null )

@@ -10,7 +10,7 @@ namespace KatnisssSpaceSimulator.Core
     /// <summary>
     /// A class responsible for instantiating a vessel from a source (save file, on launch, etc).
     /// </summary>
-    public class VesselFactory
+    public sealed class VesselFactory
     {
         // add source (save file / in memory scene change, etc).
 
