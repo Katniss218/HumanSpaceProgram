@@ -25,8 +25,8 @@ namespace KatnisssSpaceSimulator.Core
         {
             foreach( var obj in UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects() )
             {
-                Vector3Large globalPosition = CurrentReferenceFrame.InverseTransformPosition( obj.transform.position );
-                Vector3 newScenePosition = newFrame.TransformPosition( globalPosition );
+                Vector3Large globalPosition = CurrentReferenceFrame.TransformPosition( obj.transform.position );
+                Vector3 newScenePosition = newFrame.InverseTransformPosition( globalPosition );
                 obj.transform.position = newScenePosition;
 
                 // TODO - add rotations/scaling/etc later.

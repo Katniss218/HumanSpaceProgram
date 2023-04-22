@@ -26,19 +26,32 @@ namespace KatnisssSpaceSimulator.Core
 
         PhysicsScene test;
 
+        /// <summary>
+        /// Use this to add a force acting on the center of mass. Does not apply any torque.
+        /// </summary>
+        public void AddForce( Vector3 force )
+        {
+            this.rb.AddForce( force, ForceMode.Force );
+        }
+
+        /// <summary>
+        /// Use this to add a force at a specified position instead of at the center of mass.
+        /// </summary>
         public void AddForceAtPosition( Vector3 force, Vector3 position )
         {
             this.rb.AddForceAtPosition( force, position, ForceMode.Force );
         }
 
-        public void SetMass( float mass )
+        public float Mass
         {
-            this.rb.mass = mass;
+            get => this.rb.mass;
+            set => this.rb.mass = value;
         }
 
-        public void SetCoM( Vector3 com )
+        public Vector3 LocalCenterOfMass
         {
-            this.rb.centerOfMass = com;
+            get => this.rb.centerOfMass;
+            set => this.rb.centerOfMass = value;
         }
 
         void Awake()
@@ -60,7 +73,7 @@ namespace KatnisssSpaceSimulator.Core
             Vector3 gravityDir = Vector3.down;
 
             // F = m*a
-            AddForceAtPosition( gravityDir * 9.81f * rb.mass, this.rb.centerOfMass );
+            AddForce( gravityDir * 9.81f * rb.mass );
 
 
 

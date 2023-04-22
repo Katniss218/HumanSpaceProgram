@@ -73,7 +73,7 @@ namespace KatnisssSpaceSimulator
             {
                 ReferenceFrameManager.SwitchReferenceFrame( ReferenceFrameManager.CurrentReferenceFrame.Shift( activeVessel.transform.position ) );
             }
-            vesselGlobalPos = ReferenceFrameManager.CurrentReferenceFrame.InverseTransformPosition( activeVessel.transform.position );
+            vesselGlobalPos = ReferenceFrameManager.CurrentReferenceFrame.TransformPosition( activeVessel.transform.position );
         }
     }
 

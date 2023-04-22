@@ -64,7 +64,7 @@ namespace KatnisssSpaceSimulator.Core
             gfx.transform.SetParent( partGO.transform );
             gfx.transform.localPosition = Vector3.zero;
             gfx.transform.localRotation = Quaternion.identity;
-            gfx.transform.localScale = new Vector3( 0.125f, 0.125f, 0.125f );
+            gfx.transform.localScale = new Vector3( 1f, 1f, 1f );
 
             MeshFilter mf = gfx.AddComponent<MeshFilter>();
             mf.sharedMesh = UnityEngine.Object.FindObjectOfType<zzzTestGameManager>().Mesh;
@@ -73,7 +73,7 @@ namespace KatnisssSpaceSimulator.Core
             mr.sharedMaterial = UnityEngine.Object.FindObjectOfType<zzzTestGameManager>().Material;
 
             BoxCollider c = gfx.AddComponent<BoxCollider>();
-            c.size = Vector3.one * 5;
+            c.size = Vector3.one;
 
             GameObject downTest = new GameObject( "thrust" );
             downTest.transform.SetParent( partGO.transform );

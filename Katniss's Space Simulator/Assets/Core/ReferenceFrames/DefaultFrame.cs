@@ -28,11 +28,11 @@ namespace KatnisssSpaceSimulator.Core.ReferenceFrames
             return new DefaultFrame( this.ReferencePosition + distance );
         }
 
-        public Vector3 TransformPosition( Vector3Large globalPosition )
+        public Vector3 InverseTransformPosition( Vector3Large globalPosition )
         {
             return new Vector3( (float)(globalPosition.x - ReferencePosition.x), (float)(globalPosition.y - ReferencePosition.y), (float)(globalPosition.z - ReferencePosition.z) );
         }
-        public Vector3Large InverseTransformPosition( Vector3 localPosition )
+        public Vector3Large TransformPosition( Vector3 localPosition )
         {
             return ReferencePosition + localPosition;
         }

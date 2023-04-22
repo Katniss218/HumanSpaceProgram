@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace KatnisssSpaceSimulator.Core
 {
-    [RequireComponent(typeof( PhysicsObject ) )]
+    [RequireComponent( typeof( PhysicsObject ) )]
     public class Vessel : MonoBehaviour
     {
         [SerializeField]
@@ -72,7 +72,10 @@ namespace KatnisssSpaceSimulator.Core
             PartCount = count;
         }
 
-        public Vector3 GetCenterOfMass()
+        /// <summary>
+        /// Returns the local space center of mass.
+        /// </summary>
+        public Vector3 GetLocalCenterOfMass()
         {
             Vector3 com = Vector3.zero;
             float mass = 0;
@@ -80,7 +83,7 @@ namespace KatnisssSpaceSimulator.Core
             {
                 // physicsless parts may be `continue`'d here.
 
-                com += part.transform.position * part.Mass;
+                com += part.transform.localPosition * part.Mass;
                 mass += part.Mass;
             }
             if( mass > 0 )
@@ -95,15 +98,20 @@ namespace KatnisssSpaceSimulator.Core
             this.PhysicsObject = this.GetComponent<PhysicsObject>();
         }
 
+        void Start()
+        {
+            this.PhysicsObject.LocalCenterOfMass = this.GetLocalCenterOfMass();
+        }
+
         void FixedUpdate()
         {
-            this.PhysicsObject.SetCoM( this.GetCenterOfMass() );
+            this.PhysicsObject.LocalCenterOfMass = this.GetLocalCenterOfMass();
         }
 
         private void OnDrawGizmos()
         {
             Gizmos.color = Color.blue;
-            Gizmos.DrawWireCube( this.GetCenterOfMass(), Vector3.one * 0.25f );
+            Gizmos.DrawWireCube( this.transform.TransformPoint( this.PhysicsObject.LocalCenterOfMass), Vector3.one * 0.25f );
         }
     }
 }
