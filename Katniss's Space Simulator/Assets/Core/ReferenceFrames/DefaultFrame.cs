@@ -7,12 +7,6 @@ using UnityEngine;
 
 namespace KatnisssSpaceSimulator.Core.ReferenceFrames
 {
-    public interface IReferenceFrame
-    {
-        Vector3 TransformPosition( Vector3Dbl globalPosition );
-        Quaternion TransformRotation( Quaternion globalRotation );
-    }
-
     public class DefaultFrame : IReferenceFrame
     {
         // incomplete.
@@ -22,15 +16,25 @@ namespace KatnisssSpaceSimulator.Core.ReferenceFrames
         // - the factor would be at most equal to half of the allowed floating origin radius.
         // - that way would disallow precise placement of the reference frame, we need probably around 10000 meters granularity at the least.
 
+        public Vector3Large ReferencePosition { get; private set; }
 
-        public Vector3 TransformPosition( Vector3Dbl globalPosition )
+        public DefaultFrame( Vector3Large referencePosition )
         {
-            return new Vector3( (float)globalPosition.x, (float)globalPosition.y, (float)globalPosition.z );
+            this.ReferencePosition = referencePosition;
         }
 
-        public Quaternion TransformRotation( Quaternion globalRotation )
+        public IReferenceFrame Shift( Vector3 distance )
         {
-            return new Quaternion( (float)globalRotation.x, (float)globalRotation.y, (float)globalRotation.z, (float)globalRotation.w );
+            return new DefaultFrame( this.ReferencePosition + distance );
+        }
+
+        public Vector3 TransformPosition( Vector3Large globalPosition )
+        {
+            return new Vector3( (float)(globalPosition.x - ReferencePosition.x), (float)(globalPosition.y - ReferencePosition.y), (float)(globalPosition.z - ReferencePosition.z) );
+        }
+        public Vector3Large InverseTransformPosition( Vector3 localPosition )
+        {
+            return ReferencePosition + localPosition;
         }
     }
 }

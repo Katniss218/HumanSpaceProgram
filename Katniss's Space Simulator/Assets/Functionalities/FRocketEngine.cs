@@ -28,16 +28,16 @@ namespace KatnisssSpaceSimulator.Functionalities
             return this.MaxThrust * Throttle;
         }
 
-        public override void FixedUpdate()
+        void FixedUpdate()
         {
             Part.Vessel.PhysicsObject.AddForceAtPosition( this.ThrustTransform.forward * GetThrust(), this.ThrustTransform.position );
         }
 
-        public override void Start()
+        void Start()
         {
         }
 
-        public override void Update()
+        void Update()
         {
             if( Input.GetKeyDown( KeyCode.W ) )
             {

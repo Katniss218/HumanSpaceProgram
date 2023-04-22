@@ -95,9 +95,15 @@ namespace KatnisssSpaceSimulator.Core
             this.PhysicsObject = this.GetComponent<PhysicsObject>();
         }
 
-        private void FixedUpdate()
+        void FixedUpdate()
         {
             this.PhysicsObject.SetCoM( this.GetCenterOfMass() );
+        }
+
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.blue;
+            Gizmos.DrawWireCube( this.GetCenterOfMass(), Vector3.one * 0.25f );
         }
     }
 }

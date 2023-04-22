@@ -67,13 +67,13 @@ namespace KatnisssSpaceSimulator.Core
             gfx.transform.localScale = new Vector3( 0.125f, 0.125f, 0.125f );
 
             MeshFilter mf = gfx.AddComponent<MeshFilter>();
-            mf.sharedMesh = UnityEngine.Object.FindObjectOfType<zTestingScript>().Mesh;
+            mf.sharedMesh = UnityEngine.Object.FindObjectOfType<zzzTestGameManager>().Mesh;
 
             MeshRenderer mr = gfx.AddComponent<MeshRenderer>();
-            mr.sharedMaterial = UnityEngine.Object.FindObjectOfType<zTestingScript>().Material;
+            mr.sharedMaterial = UnityEngine.Object.FindObjectOfType<zzzTestGameManager>().Material;
 
-            SphereCollider c = gfx.AddComponent<SphereCollider>();
-            c.radius = 0.5f;
+            BoxCollider c = gfx.AddComponent<BoxCollider>();
+            c.size = Vector3.one * 5;
 
             GameObject downTest = new GameObject( "thrust" );
             downTest.transform.SetParent( partGO.transform );

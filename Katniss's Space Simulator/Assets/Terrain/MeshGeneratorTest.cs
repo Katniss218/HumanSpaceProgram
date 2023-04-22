@@ -57,7 +57,8 @@ namespace KatnisssSpaceSimulator.Terrain
 
         Mesh MakeQuad()
         {
-            const float radius = 6371011.123456f;
+            //const float radius = 6371011.123456f;
+            const float radius = 6371011.123456f * 11;
 
             vertices = new Vector3[4];
             vertices[0] = new Vector3( 0, 0, 0 );

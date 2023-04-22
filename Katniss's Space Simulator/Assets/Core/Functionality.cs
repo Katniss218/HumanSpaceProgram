@@ -4,8 +4,7 @@ using UnityEngine;
 
 namespace KatnisssSpaceSimulator.Core
 {
-    [System.Serializable]
-    public abstract class Functionality
+    public abstract class Functionality : MonoBehaviour
     {
         // Functionality is our generalized equivalent to PartModule.
 
@@ -17,9 +16,5 @@ namespace KatnisssSpaceSimulator.Core
 
         // This is kinda bad, because we ultimately want it generalized if possible.
         public Part Part { get; set; }
-
-        public abstract void Start();
-        public abstract void Update();
-        public abstract void FixedUpdate();
     }
 }

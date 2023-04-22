@@ -10,14 +10,12 @@ using UnityEngine;
 namespace KatnisssSpaceSimulator.Core
 {
     /// <summary>
-    /// Any object that is affected by physics.
+    /// Any object that calculates its own physics. This is a wrapper for some kind of internal physics solver / rigidbody.
     /// </summary>
     [RequireComponent( typeof( Rigidbody ) )]
     public class PhysicsObject : MonoBehaviour
     {
         // this is basically either a celestial body, or a vessel. Something that moves on its own and is not parented to anything else.
-
-        IReferenceFrame referenceFrame; // reference frame will need a reference point/object.
 
         /*ForceSolver forceSolver = new ForceSolver()
         {
@@ -28,23 +26,9 @@ namespace KatnisssSpaceSimulator.Core
 
         PhysicsScene test;
 
-        void Awake()
-        {
-            referenceFrame = new DefaultFrame();
-
-            rb = this.GetComponent<Rigidbody>();
-            rb.useGravity = false;
-            rb.mass = 5;
-        }
-
-        public void AddForce( Vector3 force )
-        {
-            this.rb.AddForce( force );
-        }
-        
         public void AddForceAtPosition( Vector3 force, Vector3 position )
         {
-            this.rb.AddForceAtPosition( force, position );
+            this.rb.AddForceAtPosition( force, position, ForceMode.Force );
         }
 
         public void SetMass( float mass )
@@ -57,6 +41,15 @@ namespace KatnisssSpaceSimulator.Core
             this.rb.centerOfMass = com;
         }
 
+        void Awake()
+        {
+            rb = this.GetComponent<Rigidbody>();
+            rb.useGravity = false;
+            rb.mass = 5;
+            rb.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+            rb.interpolation = RigidbodyInterpolation.Extrapolate;
+        }
+
         void FixedUpdate()
         {
             if( Input.GetKey( KeyCode.W ) )
@@ -67,7 +60,7 @@ namespace KatnisssSpaceSimulator.Core
             Vector3 gravityDir = Vector3.down;
 
             // F = m*a
-            AddForce( gravityDir * 9.81f * rb.mass );
+            AddForceAtPosition( gravityDir * 9.81f * rb.mass, this.rb.centerOfMass );
 
 
 

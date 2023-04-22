@@ -46,7 +46,7 @@ namespace KatnisssSpaceSimulator.Core
         [field: SerializeField]
         public List<Functionality> Modules { get; private set; } = new List<Functionality>();
 
-        public void AddModule( Functionality module )
+        public void RegisterModule( Functionality module )
         {
             module.Part = this;
             this.Modules.Add( module );
@@ -77,7 +77,7 @@ namespace KatnisssSpaceSimulator.Core
                 }
             }
         }
-
+        /*
         void Start()
         {
             foreach( var module in Modules )
@@ -100,7 +100,7 @@ namespace KatnisssSpaceSimulator.Core
             {
                 module.FixedUpdate();
             }
-        }
+        }*/
 
         private void OnDrawGizmos()
         {
