@@ -71,7 +71,7 @@ namespace KatnisssSpaceSimulator
             curve.AddKey( 0, 5.0f );
             curve.AddKey( 1, 2.5f );
             tr.widthCurve = curve;
-            tr.minVertexDistance = 5f;
+            tr.minVertexDistance = 50f;
 
             VesselManager.ActiveVessel.transform.GetComponent<Rigidbody>().angularDrag = 1; // temp, doesn't veer off course.
 

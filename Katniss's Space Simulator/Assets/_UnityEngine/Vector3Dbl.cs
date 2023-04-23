@@ -51,7 +51,7 @@ namespace UnityEngine
 
         public Vector3Dbl normalized
         {
-            get 
+            get
             {
                 double magn = magnitude;
                 return new Vector3Dbl( this.x / magn, this.y / magn, this.z / magn );
@@ -91,7 +91,7 @@ namespace UnityEngine
 
         public static Vector3Dbl operator +( Vector3Dbl v1, Vector3Dbl v2 )
         {
-            return Add( v1,v2 );
+            return Add( v1, v2 );
         }
         public static Vector3Dbl operator +( Vector3Dbl v1, Vector3 v2 )
         {
@@ -121,9 +121,14 @@ namespace UnityEngine
             return Divide( v, s );
         }
 
-        public static explicit operator Vector3(Vector3Dbl v )
+        public static explicit operator Vector3( Vector3Dbl v )
         {
             return new Vector3( (float)v.x, (float)v.y, (float)v.z );
+        }
+
+        public static implicit operator Vector3Dbl( Vector3 v )
+        {
+            return new Vector3Dbl( v.x, v.y, v.z );
         }
     }
 }

@@ -14,11 +14,10 @@ namespace KatnisssSpaceSimulator.Terrain
     [RequireComponent( typeof( CelestialBody ) )]
     public class LODQuadSphere : MonoBehaviour
     {
-        LODQuad[] _l0faces = new LODQuad[6];
+        public int DefaultSubdivisions { get; private set; } = 7;
 
+        LODQuad[] _l0faces;
         CelestialBody _celestialBody;
-
-        public int DefaultSubdivisions { get; private set; } = 6;
 
         void Awake()
         {
@@ -28,32 +27,14 @@ namespace KatnisssSpaceSimulator.Terrain
 
         void Start()
         {
-            Vector3Dbl[] offsets = new Vector3Dbl[6]
-            {
-                new Vector3Dbl( _celestialBody.Radius, 0, 0 ),
-                new Vector3Dbl( -_celestialBody.Radius, 0, 0 ),
-                new Vector3Dbl( 0, _celestialBody.Radius, 0 ),
-                new Vector3Dbl( 0, -_celestialBody.Radius, 0 ),
-                new Vector3Dbl( 0, 0, _celestialBody.Radius ),
-                new Vector3Dbl( 0, 0, -_celestialBody.Radius ),
-            };
-
+            _l0faces = new LODQuad[6];
             for( int i = 0; i < 6; i++ )
             {
-                GameObject quadGO = CreateMeshPart( _celestialBody.transform );
-                quadGO.transform.localPosition = (Vector3)offsets[i];
-
-                MeshRenderer mr = quadGO.AddComponent<MeshRenderer>();
-                mr.material = FindObjectOfType<zzzTestGameManager>().CBMaterial;
-
-                quadGO.AddComponent<MeshCollider>();
-
-                LODQuad q = quadGO.AddComponent<LODQuad>();
-                q.SetL0( offsets[i], DefaultSubdivisions, _celestialBody.Radius );
+                CreateMeshPart( _celestialBody.transform, (QuadSphereFace)i );
             }
         }
 
-        private static GameObject CreateMeshPart( Transform cbTransform )
+        private LODQuad CreateMeshPart( Transform cbTransform, QuadSphereFace face )
         {
             GameObject go = new GameObject( "mesh" );
             go.transform.SetParent( cbTransform );
@@ -61,7 +42,19 @@ namespace KatnisssSpaceSimulator.Terrain
             go.transform.localRotation = Quaternion.identity;
             go.transform.localScale = Vector3.one;
 
-            return go;
+            MeshRenderer mr = go.AddComponent<MeshRenderer>();
+            mr.material = FindObjectOfType<zzzTestGameManager>().CBMaterial;
+
+            go.AddComponent<MeshCollider>();
+
+            Vector3 dir = face.ToVector3();
+            Vector3Dbl offset = ((Vector3Dbl)dir) * _celestialBody.Radius;
+
+            LODQuad q = go.AddComponent<LODQuad>();
+            q.SetL0( offset, DefaultSubdivisions, _celestialBody.Radius );
+            _l0faces[(int)face] = q;
+
+            return q;
         }
     }
 }

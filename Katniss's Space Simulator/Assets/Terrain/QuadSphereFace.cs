@@ -10,6 +10,7 @@ namespace KatnisssSpaceSimulator.Terrain
 {
     public enum QuadSphereFace
     {
+        // Do not change the values, there are things that rely on this.
         Xp = 0,
         Xn = 1,
         Yp = 2,
@@ -45,6 +46,26 @@ namespace KatnisssSpaceSimulator.Terrain
                 return QuadSphereFace.Zn;
 
             throw new ArgumentException( $"Invalid vector {preciseVector}.", nameof( preciseVector ) );
+        }
+
+        public static Vector3 ToVector3( this QuadSphereFace v )
+        {
+            switch( v )
+            {
+                case QuadSphereFace.Xp:
+                    return new Vector3( 1, 0, 0 );
+                case QuadSphereFace.Xn:
+                    return new Vector3( -1, 0, 0 );
+                case QuadSphereFace.Yp:
+                    return new Vector3( 0, 1, 0 );
+                case QuadSphereFace.Yn:
+                    return new Vector3( 0, -1, 0 );
+                case QuadSphereFace.Zp:
+                    return new Vector3( 0, 0, 1 );
+                case QuadSphereFace.Zn:
+                    return new Vector3( 0, 0, -1 );
+            }
+            throw new ArgumentException( $"Unknown {nameof( QuadSphereFace )} '{v}'.", nameof( v ) );
         }
     }
 }

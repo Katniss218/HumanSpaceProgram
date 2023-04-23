@@ -66,6 +66,8 @@ namespace KatnisssSpaceSimulator.Terrain
             _precisePosition = origin;
             DefaultSubdivisions = defaultSubdivisions;
             BodyRadius = bodyRadius;
+
+            this.transform.localPosition = (Vector3)_precisePosition;
         }
 
         /// <summary>
