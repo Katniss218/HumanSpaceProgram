@@ -75,7 +75,6 @@
     <Compile Include="Assets\Core\Functionality.cs" />
     <Compile Include="Assets\TimeWarp\TimeWarpManager.cs" />
     <Compile Include="Assets\Core\ReferenceFrames\IReferenceFrame.cs" />
-    <Compile Include="Assets\Core\ReferenceFrames\DefaultFrame.cs" />
     <Compile Include="Assets\Terrain\LODQuad.cs" />
     <Compile Include="Assets\Terrain\CoordinateUtils.cs" />
     <Compile Include="Assets\Terrain\LODQuadSphere.cs" />
@@ -83,6 +82,8 @@
     <Compile Include="Assets\Terrain\MeshUtils.cs" />
     <Compile Include="Assets\Terrain\QuadSphereFace.cs" />
     <Compile Include="Assets\Core\ReferenceFrames\SceneReferenceFrameManager.cs" />
+    <Compile Include="Assets\Core\ReferenceFrames\OffsetReferenceFrame.cs" />
+    <Compile Include="Assets\Core\ReferenceFrames\ReferenceFrameUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro.cginc" />

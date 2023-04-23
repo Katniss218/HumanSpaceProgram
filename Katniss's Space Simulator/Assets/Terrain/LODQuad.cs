@@ -67,6 +67,10 @@ namespace KatnisssSpaceSimulator.Terrain
             DefaultSubdivisions = defaultSubdivisions;
             BodyRadius = bodyRadius;
 
+            // Unity keeps the local positions of objects internally.
+            // - Since the origin of each LODQuad is located at the 'sea level' of each celestial body, for large celestial bodies, we might run into problems.
+            // It is possible that we would want to keep the PQS parts as root objects,
+            // - that way they would not be subject to precision issues caused by the large distance between their origin and their parent.
             this.transform.localPosition = (Vector3)_precisePosition;
         }
 

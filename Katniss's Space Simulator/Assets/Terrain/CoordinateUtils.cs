@@ -83,10 +83,9 @@ namespace KatnisssSpaceSimulator.Terrain
                 default:
                     throw new ArgumentException( $"Invalid face orientation {face}", nameof( face ) );
             }
-#warning TODO - this normalize might bug it?
+
             pos.Normalize(); // unit sphere.
             return (pos, posOffset);
         }
-
     }
 }

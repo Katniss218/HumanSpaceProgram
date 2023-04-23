@@ -20,7 +20,7 @@ namespace KatnisssSpaceSimulator.Core
         public CelestialBody Create( Vector3Dbl AIRFPosition )
         {
             GameObject cbGO = new GameObject( "celestialbody" );
-            cbGO.transform.position = SceneReferenceFrameManager.WorldSpaceReferenceFrame.InverseTransformPosition( AIRFPosition );
+            cbGO.transform.position = SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformPosition( AIRFPosition );
             cbGO.transform.localScale = Vector3.one;
 
             //SphereCollider c = cbGO.AddComponent<SphereCollider>();

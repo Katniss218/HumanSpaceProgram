@@ -54,11 +54,11 @@ namespace KatnisssSpaceSimulator.Core
         {
             GameObject partGO = new GameObject( $"Part, '{name}'" );
             partGO.transform.SetParent( parent );
-            partGO.transform.localPosition = localPosition;
-            partGO.transform.localRotation = localRotation;
 
             Part part = partGO.AddComponent<Part>();
             part.DisplayName = name;
+            part.SetLocalPosition( localPosition, false );
+            part.SetLocalRotation( localRotation, false );
 
             GameObject gfx = new GameObject( "model" );
             gfx.transform.SetParent( partGO.transform );

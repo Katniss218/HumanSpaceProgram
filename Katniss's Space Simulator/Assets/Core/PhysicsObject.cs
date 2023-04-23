@@ -66,9 +66,9 @@ namespace KatnisssSpaceSimulator.Core
         {
             CelestialBody cb = CelestialBodyManager.Bodies[0];
 
-            Vector3Dbl toBody = cb.AIRFPosition - SceneReferenceFrameManager.WorldSpaceReferenceFrame.TransformPosition( this.transform.position );
+            Vector3Dbl toBody = cb.AIRFPosition - SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.transform.position );
 
-            Vector3 toBodyWorldSpace = SceneReferenceFrameManager.WorldSpaceReferenceFrame.InverseTransformPosition( toBody );
+            Vector3 toBodyWorldSpace = SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformPosition( toBody );
 
             float distanceSq = toBodyWorldSpace.sqrMagnitude;
 

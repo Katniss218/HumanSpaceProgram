@@ -18,7 +18,7 @@ namespace KatnisssSpaceSimulator.UI
         {
             CelestialBody body = CelestialBodyManager.Bodies[0];
             Vector3 posV = VesselManager.ActiveVessel.transform.position;
-            Vector3 posCB = SceneReferenceFrameManager.WorldSpaceReferenceFrame.InverseTransformPosition( body.AIRFPosition );
+            Vector3 posCB = SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformPosition( body.AIRFPosition );
 
             float magn = (posV-posCB).magnitude;
             float alt = magn - (float)body.Radius;

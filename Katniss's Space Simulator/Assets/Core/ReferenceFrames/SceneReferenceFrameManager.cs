@@ -13,6 +13,8 @@ namespace KatnisssSpaceSimulator.Core.ReferenceFrames
     /// </remarks>
     public class SceneReferenceFrameManager : MonoBehaviour
     {
+        // something to force single instance of this would be nice in the future.
+
         public struct ReferenceFrameSwitchData
         {
             public IReferenceFrame OldFrame { get; set; }
@@ -25,51 +27,37 @@ namespace KatnisssSpaceSimulator.Core.ReferenceFrames
 
         static SceneReferenceFrameManager()
         {
-            OnReferenceFrameSwitch += ReferenceFrameSwitch_Objects;
-            OnReferenceFrameSwitch += ReferenceFrameSwitch_Trail;
+            OnAfterReferenceFrameSwitch += ReferenceFrameSwitch_Objects;
+            OnAfterReferenceFrameSwitch += ReferenceFrameSwitch_Trail;
         }
-
-        /// <summary>
-        /// The reference frame that describes how to convert between Absolute Inertial Reference Frame and the scene's world space.
-        /// </summary>
-        public static IReferenceFrame WorldSpaceReferenceFrame { get; private set; } = new DefaultFrame( Vector3Dbl.zero );
 
         /// <summary>
         /// Called when the scene's reference frame switches.
         /// </summary>
-        public static event Action<ReferenceFrameSwitchData> OnReferenceFrameSwitch;
+        public static event Action<ReferenceFrameSwitchData> OnAfterReferenceFrameSwitch;
 
-        public static void SwitchReferenceFrame( IReferenceFrame newFrame )
+        /// <summary>
+        /// The reference frame that describes how to convert between Absolute Inertial Reference Frame and the scene's world space.
+        /// </summary>
+        public static IReferenceFrame SceneReferenceFrame { get; private set; } = new OffsetReferenceFrame( Vector3Dbl.zero );
+
+        /// <summary>
+        /// Sets the scene's reference frame to the specified frame, and calls out a frame switch event.
+        /// </summary>
+        public static void ChangeSceneReferenceFrame( IReferenceFrame newFrame )
         {
-            IReferenceFrame old = WorldSpaceReferenceFrame;
-            WorldSpaceReferenceFrame = newFrame;
+            IReferenceFrame old = SceneReferenceFrame;
+            SceneReferenceFrame = newFrame;
 
-            OnReferenceFrameSwitch?.Invoke( new ReferenceFrameSwitchData() { OldFrame = old, NewFrame = newFrame } );
-        }
-
-        public static Vector3 GetNewPosition( IReferenceFrame oldFrame, IReferenceFrame newFrame, Vector3 oldPosition )
-        {
-            // If both frames are inertial and not rotated, and scaled equally, it's enough to calculate the difference between any position.
-
-            Vector3Dbl globalPosition = oldFrame.TransformPosition( oldPosition );
-            Vector3 newPosition = newFrame.InverseTransformPosition( globalPosition );
-            return newPosition;
+            OnAfterReferenceFrameSwitch?.Invoke( new ReferenceFrameSwitchData() { OldFrame = old, NewFrame = newFrame } );
         }
 
         private static void ReferenceFrameSwitch_Objects( ReferenceFrameSwitchData data )
         {
             foreach( var obj in UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects() )
             {
-                /*Rigidbody rb = obj.GetComponent<Rigidbody>();
-                if( rb != null )
-                {
-                    rb.position = GetNewPosition( data.OldFrame, data.NewFrame, obj.transform.position );
-                }
-                else
-                {
-                */
-                    obj.transform.position = GetNewPosition( data.OldFrame, data.NewFrame, obj.transform.position );
-               // }
+#warning TODO - if something declares that it keeps a more accurate position in AIRF - use that (check for some interface, get airf, transform by new reference frame).
+                obj.transform.position = ReferenceFrameUtils.GetNewPosition( data.OldFrame, data.NewFrame, obj.transform.position );
 
                 // TODO - add rotations/scaling/etc later.
                 // Add PhysicsObject integration for things that have to get their forces/velocities/angular velocities/etc recalculated.
@@ -83,21 +71,28 @@ namespace KatnisssSpaceSimulator.Core.ReferenceFrames
             // WARN: This is very expensive to run when the trail has a lot of vertices.
             // When moving fast, don't use the default trail parameters, it produces too many vertices.
 
-            foreach( var trail in FindObjectsOfType<TrailRenderer>() )
+            foreach( var trail in FindObjectsOfType<TrailRenderer>() ) // this is slow. It would be beneficial to keep a cache, or wrap this in a module.
             {
                 for( int i = 0; i < trail.positionCount; i++ )
                 {
-                    trail.SetPosition( i, GetNewPosition( data.OldFrame, data.NewFrame, trail.GetPosition( i ) ) );
+                    trail.SetPosition( i, ReferenceFrameUtils.GetNewPosition( data.OldFrame, data.NewFrame, trail.GetPosition( i ) ) );
                 }
             }
         }
 
-        // something to force single instance would be nice in the future.
+        /// <summary>
+        /// The extents of the area aroundthe scene origin, in which the active vessel is permitted to exist.
+        /// </summary>
+        /// <remarks>
+        /// If the active vessel moves outside of this range, an origin shift will happen.
+        /// </remarks>
+        public static float MaxFloatingOriginRange { get; set; } = 32767.0f;
 
-        void FixedUpdate()
+        /// <summary>
+        /// Checks whether the current active vessel is too far away from the scene's origin, and performs an origin shift if it is.
+        /// </summary>
+        public static void TryFixActiveVesselOutOfBounds()
         {
-            const float MaxFloatingOriginRange = 10000.0f;
-
             float max = MaxFloatingOriginRange;
             float min = -max;
 
@@ -106,8 +101,13 @@ namespace KatnisssSpaceSimulator.Core.ReferenceFrames
              || position.y < min || position.y > max
              || position.z < min || position.z > max )
             {
-                SwitchReferenceFrame( WorldSpaceReferenceFrame.Shift( position ) );
+                ChangeSceneReferenceFrame( SceneReferenceFrame.Shift( position ) );
             }
+        }
+
+        void FixedUpdate()
+        {
+            TryFixActiveVesselOutOfBounds();
         }
     }
 }

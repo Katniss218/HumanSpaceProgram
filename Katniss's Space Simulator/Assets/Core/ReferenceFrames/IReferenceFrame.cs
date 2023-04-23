@@ -7,6 +7,9 @@ using UnityEngine;
 
 namespace KatnisssSpaceSimulator.Core.ReferenceFrames
 {
+    /// <summary>
+    /// An arbitrary reference frame.
+    /// </summary>
     public interface IReferenceFrame
     {
         // "Absolute Inertial Reference Frame" (AIRF) is my invention.
@@ -16,7 +19,9 @@ namespace KatnisssSpaceSimulator.Core.ReferenceFrames
 
 
 
-        // frames of reference maybe can be used for that.
+        // Bottom line is that we need to make the Unity's world space act like the local space of the selected reference frame.
+
+        // frames of reference can be used for that.
 
         // a rotating frame of reference will impart forces on the object just because it is rotating.
         // the reference frame needs to keep high precision position / rotation of the reference object.
@@ -28,22 +33,29 @@ namespace KatnisssSpaceSimulator.Core.ReferenceFrames
         // - if the frame is centered on the active vessel, then "world" space in Unity needs to be transformed into local space for that frame.
         // - - This can be done by applying forces/changing positions manually.
 
-
-        // Bottom line is that we need to make the Unity's world space act like the local space of the selected reference frame.
-
-
-        IReferenceFrame Shift( Vector3 vector );
+        /// <summary>
+        /// Returns a new reference frame that is shifted by a given amount in the Absolute Inertial Reference Frame (AIRF) space.
+        /// </summary>
+        IReferenceFrame Shift( Vector3Dbl vector );
 
         /// <summary>
-        /// Transforms a point in the scene space ("world space") to the Global Inertial Reference Frame space.
+        /// Transforms a point in the reference frame's space to the Absolute Inertial Reference Frame (AIRF) space.
         /// </summary>
         Vector3Dbl TransformPosition( Vector3 localPosition );
 
         /// <summary>
-        /// Transforms a point in the Global Inertial Reference Frame space to the scene space ("world space").
+        /// Transforms a point in the Absolute Inertial Reference Frame (AIRF) space to the reference frame's space.
         /// </summary>
         Vector3 InverseTransformPosition( Vector3Dbl globalPosition );
 
-        //Quaternion TransformRotation( Quaternion globalRotation );
+        /// <summary>
+        /// Transforms a rotation/orientation in the reference frame's space to the Absolute Inertial Reference Frame (AIRF) space.
+        /// </summary>
+        Quaternion TransformRotation( Quaternion localPosition );
+
+        /// <summary>
+        /// Transforms a rotation/orientation in the Absolute Inertial Reference Frame (AIRF) space to the reference frame's space.
+        /// </summary>
+        Quaternion InverseTransformRotation( Quaternion globalPosition );
     }
 }

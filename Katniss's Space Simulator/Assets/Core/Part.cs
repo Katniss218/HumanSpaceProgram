@@ -1,3 +1,4 @@
+using KatnisssSpaceSimulator.Core.ReferenceFrames;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -52,55 +53,40 @@ namespace KatnisssSpaceSimulator.Core
             this.Modules.Add( module );
         }
 
-        public void SetPosition( Vector3 pos, bool moveChildren = true )
+        public void SetLocalPosition( Vector3 pos, bool moveChildren = true )
         {
-            this.transform.position = pos;
+            Vector3 delta = pos - this.transform.localPosition;
+
+            this.transform.localPosition = pos;
 
             if( moveChildren )
             {
                 foreach( var cp in this.Children )
                 {
-                    cp.SetPosition( pos, moveChildren );
+                    cp.SetLocalPosition( cp.transform.position + delta, moveChildren );
                 }
             }
         }
 
-        public void SetRotation( Quaternion rot, bool moveChildren = true )
+        public void SetLocalRotation( Quaternion rot, bool moveChildren = true )
         {
-            this.transform.rotation = rot;
+            Quaternion delta = Quaternion.Inverse( this.transform.localRotation ) * rot; // I hope I did the math right.
+
+            this.transform.localRotation = rot;
 
             if( moveChildren )
             {
                 foreach( var cp in this.Children )
                 {
-                    cp.SetRotation( rot, moveChildren );
+                    cp.SetLocalRotation( cp.transform.localRotation * delta, moveChildren );
                 }
             }
         }
-        /*
-        void Start()
-        {
-            foreach( var module in Modules )
-            {
-                module.Start();
-            }
-        }
 
-        void Update()
-        {
-            foreach( var module in Modules )
-            {
-                module.Update();
-            }
-        }
 
-        void FixedUpdate()
-        {
-            foreach( var module in Modules )
-            {
-                module.FixedUpdate();
-            }
-        }*/
+
+        // -=-=-=-=-=-=-=-=-=-
+
 
         private void OnDrawGizmos()
         {

@@ -9,6 +9,9 @@ namespace KatnisssSpaceSimulator.Core
     [RequireComponent( typeof( PhysicsObject ) )]
     public sealed class Vessel : MonoBehaviour
     {
+        // Root objects have to store their AIRF positions, children natively store their local coordinates, which as long as they're not obscenely large, will be fine.
+        // - An object with a child at 0.00125f can be sent to 10e25 and brought back, and its child will remain at 0.00125f
+
         [SerializeField]
         private string _displayName;
         public string DisplayName
@@ -27,6 +30,8 @@ namespace KatnisssSpaceSimulator.Core
         public int PartCount { get; private set; }
 
         public PhysicsObject PhysicsObject { get; private set; }
+
+        public Vector3Dbl AIRFPosition { get; private set; }
 
         /// <remarks>
         /// DO NOT USE. This is for internal use, and can produce an invalid state. Use <see cref="VesselStateUtils.SetParent(Part, Part)"/> instead.
@@ -93,6 +98,12 @@ namespace KatnisssSpaceSimulator.Core
             return com;
         }
 
+        public void SetPosition( Vector3Dbl airfPosition )
+        {
+            this.AIRFPosition = airfPosition;
+            this.transform.position = ReferenceFrames.SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformPosition( airfPosition );
+        }
+
         void Awake()
         {
             this.PhysicsObject = this.GetComponent<PhysicsObject>();
@@ -106,6 +117,7 @@ namespace KatnisssSpaceSimulator.Core
         void FixedUpdate()
         {
             this.PhysicsObject.LocalCenterOfMass = this.GetLocalCenterOfMass();
+            this.AIRFPosition = ReferenceFrames.SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.transform.position );
         }
 
         private void OnDrawGizmos()

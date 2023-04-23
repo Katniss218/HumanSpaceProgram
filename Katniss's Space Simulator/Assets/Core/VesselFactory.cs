@@ -16,34 +16,25 @@ namespace KatnisssSpaceSimulator.Core
 
         const string name = "tempname_vessel";
 
-
-#warning TODO - We need to shift the reference frame before spawning the active vessel. Same for switching vessels, or spawning anything that needs precision really
-        // Also need to store a precise position for anything that is expected to be moved away far enough and then brought back without being unloaded and reloaded
-        // - (precision issues will round the positions of its constituent parts to the nearest available slot).
-        
-        public Vessel CreatePartless( Vector3 position, Quaternion rotation )
+        /// <summary>
+        /// Creates a new partless vessel at the specified global position.
+        /// </summary>
+        /// <param name="airfPosition">The `Absolute Inertial Reference Frame` position of the vessel to create.</param>
+        /// <param name="rotation">Rotation of the vessel in the `Absolute Inertial Reference Frame`</param>
+        /// <returns>The created partless vessel.</returns>
+        public Vessel CreatePartless( Vector3Dbl airfPosition, Quaternion rotation )
         {
-            Vessel vessel = CreateGO( position, rotation );
+            Vessel vessel = CreateGO( ReferenceFrames.SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformPosition( airfPosition ), rotation );
+
+            vessel.SetPosition( airfPosition );
 
             return vessel;
         }
 
-        public Vessel Create( Vector3 position, Quaternion rotation, Func<Vessel, Part> rootPart )
-        {
-            Vessel vessel = CreateGO( position, rotation );
-
-            rootPart( vessel );
-
-            // A vessel is the only physical "part" of the rocket. Parts are not physical.
-            // Add parts and more.
-
-            return vessel;
-        }
-
-        private Vessel CreateGO( Vector3 position, Quaternion rotation )
+        private static Vessel CreateGO( Vector3 scenePosition, Quaternion sceneRotation )
         {
             GameObject vesselGO = new GameObject( $"Vessel, '{name}'" );
-            vesselGO.transform.SetPositionAndRotation( position, rotation );
+            vesselGO.transform.SetPositionAndRotation( scenePosition, sceneRotation );
 
             Vessel vessel = vesselGO.AddComponent<Vessel>();
             vessel.name = name;
@@ -51,10 +42,12 @@ namespace KatnisssSpaceSimulator.Core
             return vessel;
         }
 
+        /// <summary>
+        /// Completely deletes a vessel and cleans up after it.
+        /// </summary>
         public static void Destroy( Vessel vessel )
         {
             UnityEngine.Object.Destroy( vessel.gameObject );
-            // deletes the vessel and cleans all references to it.
         }
     }
 }
