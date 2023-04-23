@@ -67,7 +67,7 @@
     <Compile Include="Assets\Core\VesselManager.cs" />
     <Compile Include="Assets\UI\VelocityReadoutUI.cs" />
     <Compile Include="Assets\Core\VesselStateUtils.cs" />
-    <Compile Include="Assets\Core\PhysicsObject.cs" />
+    <Compile Include="Assets\Core\Physics\PhysicsObject.cs" />
     <Compile Include="Assets\Core\CelestialBodyManager.cs" />
     <Compile Include="Assets\Core\Vessel.cs" />
     <Compile Include="Assets\UI\AltitudeReadoutUI.cs" />
@@ -84,6 +84,8 @@
     <Compile Include="Assets\Core\ReferenceFrames\SceneReferenceFrameManager.cs" />
     <Compile Include="Assets\Core\ReferenceFrames\OffsetReferenceFrame.cs" />
     <Compile Include="Assets\Core\ReferenceFrames\ReferenceFrameUtils.cs" />
+    <Compile Include="Assets\Core\ReferenceFrames\IReferenceFrameSwitchResponder.cs" />
+    <Compile Include="Assets\Core\Physics\PhysicsUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro.cginc" />

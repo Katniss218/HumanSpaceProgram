@@ -34,8 +34,14 @@ namespace KatnisssSpaceSimulator.Core
             set { _displayName = value; this.gameObject.name = value; }
         }
 
+        /// <summary>
+        /// The mass of the part in [kg].
+        /// </summary>
         public float Mass { get; set; }
 
+        /// <summary>
+        /// Checks whether or not this part is a root of its <see cref="Vessel"/>.
+        /// </summary>
         public bool IsRootOfVessel { get => this.Vessel.RootPart == this; }
 
         [field: SerializeField]
@@ -44,15 +50,9 @@ namespace KatnisssSpaceSimulator.Core
         [field: SerializeField]
         public List<Part> Children { get; private set; } = new List<Part>();
 
-        [field: SerializeField]
-        public List<Functionality> Modules { get; private set; } = new List<Functionality>();
-
-        public void RegisterModule( Functionality module )
-        {
-            module.Part = this;
-            this.Modules.Add( module );
-        }
-
+        /// <summary>
+        /// Sets the local position of the part relative to its <see cref="Vessel"/>.
+        /// </summary>
         public void SetLocalPosition( Vector3 pos, bool moveChildren = true )
         {
             Vector3 delta = pos - this.transform.localPosition;
@@ -63,11 +63,15 @@ namespace KatnisssSpaceSimulator.Core
             {
                 foreach( var cp in this.Children )
                 {
+                    // Potentially replace with iterative later, if it proves too slow.
                     cp.SetLocalPosition( cp.transform.position + delta, moveChildren );
                 }
             }
         }
 
+        /// <summary>
+        /// Sets the local rotation of the part relative to its <see cref="Vessel"/>.
+        /// </summary>
         public void SetLocalRotation( Quaternion rot, bool moveChildren = true )
         {
             Quaternion delta = Quaternion.Inverse( this.transform.localRotation ) * rot; // I hope I did the math right.
@@ -78,6 +82,7 @@ namespace KatnisssSpaceSimulator.Core
             {
                 foreach( var cp in this.Children )
                 {
+                    // Potentially replace with iterative later, if it proves too slow.
                     cp.SetLocalRotation( cp.transform.localRotation * delta, moveChildren );
                 }
             }

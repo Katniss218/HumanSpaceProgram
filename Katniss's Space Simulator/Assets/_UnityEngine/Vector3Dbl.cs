@@ -19,9 +19,9 @@ namespace UnityEngine
         [SerializeField]
         public double z;
 
-        public double sqMagnitude => x * x + y * y + z * z;
+        public double sqrMagnitude => x * x + y * y + z * z;
 
-        public double magnitude => Math.Sqrt( sqMagnitude );
+        public double magnitude => Math.Sqrt( sqrMagnitude );
 
         public static readonly Vector3Dbl zero = new Vector3Dbl( 0, 0, 0 );
         public static readonly Vector3Dbl one = new Vector3Dbl( 1, 1, 1 );

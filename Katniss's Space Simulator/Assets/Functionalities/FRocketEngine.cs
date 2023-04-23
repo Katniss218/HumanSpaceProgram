@@ -20,6 +20,8 @@ namespace KatnisssSpaceSimulator.Functionalities
         [field: SerializeField]
         public Transform ThrustTransform { get; set; }
 
+        Part _part;
+
         /// <summary>
         /// Returns the actual thrust at this moment in time.
         /// </summary>
@@ -28,13 +30,9 @@ namespace KatnisssSpaceSimulator.Functionalities
             return this.MaxThrust * Throttle;
         }
 
-        void FixedUpdate()
+        private void Awake()
         {
-            Part.Vessel.PhysicsObject.AddForceAtPosition( this.ThrustTransform.forward * GetThrust(), this.ThrustTransform.position );
-        }
-
-        void Start()
-        {
+            _part = this.GetComponent<Part>();
         }
 
         void Update()
@@ -42,6 +40,14 @@ namespace KatnisssSpaceSimulator.Functionalities
             if( Input.GetKeyDown( KeyCode.W ) )
             {
                 Throttle = Throttle > 0.5f ? 0.0f : 1.0f;
+            }
+        }
+
+        void FixedUpdate()
+        {
+            if( this.Throttle > 0.0f )
+            {
+                this._part.Vessel.PhysicsObject.AddForceAtPosition( this.ThrustTransform.forward * GetThrust(), this.ThrustTransform.position );
             }
         }
     }

@@ -56,8 +56,15 @@ namespace KatnisssSpaceSimulator.Core.ReferenceFrames
         {
             foreach( var obj in UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects() )
             {
-#warning TODO - if something declares that it keeps a more accurate position in AIRF - use that (check for some interface, get airf, transform by new reference frame).
+                IReferenceFrameSwitchResponder referenceFrameSwitch = obj.GetComponent<IReferenceFrameSwitchResponder>();
+                if( referenceFrameSwitch != null )
+                {
+                    referenceFrameSwitch.OnSceneReferenceFrameSwitch( data );
+                    return;
+                }
+
                 obj.transform.position = ReferenceFrameUtils.GetNewPosition( data.OldFrame, data.NewFrame, obj.transform.position );
+                obj.transform.rotation = ReferenceFrameUtils.GetNewRotation( data.OldFrame, data.NewFrame, obj.transform.rotation );
 
                 // TODO - add rotations/scaling/etc later.
                 // Add PhysicsObject integration for things that have to get their forces/velocities/angular velocities/etc recalculated.
@@ -80,6 +87,10 @@ namespace KatnisssSpaceSimulator.Core.ReferenceFrames
             }
         }
 
+        //
+        //
+        // Floating origin and active vessel following part of the class below:
+
         /// <summary>
         /// The extents of the area aroundthe scene origin, in which the active vessel is permitted to exist.
         /// </summary>
@@ -93,13 +104,8 @@ namespace KatnisssSpaceSimulator.Core.ReferenceFrames
         /// </summary>
         public static void TryFixActiveVesselOutOfBounds()
         {
-            float max = MaxFloatingOriginRange;
-            float min = -max;
-
             Vector3 position = VesselManager.ActiveVessel.transform.position;
-            if( position.x < min || position.x > max
-             || position.y < min || position.y > max
-             || position.z < min || position.z > max )
+            if( position.magnitude > MaxFloatingOriginRange )
             {
                 ChangeSceneReferenceFrame( SceneReferenceFrame.Shift( position ) );
             }

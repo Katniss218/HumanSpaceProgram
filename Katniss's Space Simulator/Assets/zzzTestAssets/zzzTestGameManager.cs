@@ -41,12 +41,6 @@ namespace KatnisssSpaceSimulator
 
             Vessel v = CreateDummyVessel( pos );
 
-            FRocketEngine rn = v.RootPart.gameObject.AddComponent<FRocketEngine>();
-            rn.MaxThrust = 100.0f;
-            rn.ThrustTransform = v.RootPart.transform.Find( "thrust" );
-
-            v.RootPart.RegisterModule( rn );
-
 
             // Vessel v2 = CreateDummyVessel( pos + Vector3Dbl.one * 6 );
 
@@ -71,19 +65,28 @@ namespace KatnisssSpaceSimulator
             Vessel v = fac.CreatePartless( airfPosition, Quaternion.identity );
             pfac.CreateRoot( v );
 
-            v.RootPart.DisplayName = "0";
+            const int partcount = 20;
+            const int engcount = 5;
 
-            pfac.Create( v.RootPart, new Vector3( 0, 2, 0 ), Quaternion.identity );
-            v.RootPart.Children[0].DisplayName = "0.0";
+            Part parent = v.RootPart;
+            for( int i = 0; i < partcount; i++ )
+            {
+                pfac.Create( parent, new Vector3( 0, 1.25f * i + 1.25f * engcount, 0 ), Quaternion.identity );
 
-            pfac.Create( v.RootPart.Children[0], new Vector3( 2, 2, 0 ), Quaternion.identity );
-            v.RootPart.Children[0].Children[0].DisplayName = "0.0.0";
-            pfac.Create( v.RootPart.Children[0], new Vector3( -2, 2, 0 ), Quaternion.identity );
-            v.RootPart.Children[0].Children[1].DisplayName = "0.0.1";
+                parent = parent.Children[0];
+            }
 
-            // pfac.Create( v.RootPart.Children[0].Children[0], new Vector3( 4, 2, 0 ), Quaternion.identity );
-            // v.RootPart.Children[0].Children[0].Children[0].DisplayName = "0.0.0.0";
+            parent = v.RootPart;
+            for( int i = 0; i < engcount; i++ )
+            {
+                pfac.Create( parent, new Vector3( 0, 1.125f * i, 0 ), Quaternion.identity );
 
+                FRocketEngine rn = v.RootPart.gameObject.AddComponent<FRocketEngine>();
+                rn.MaxThrust = 100.0f;
+                rn.ThrustTransform = v.RootPart.transform.Find( "thrust" );
+
+                parent = parent.Children[0];
+            }
 
             TrailRenderer tr = v.gameObject.AddComponent<TrailRenderer>();
             tr.material = Material;

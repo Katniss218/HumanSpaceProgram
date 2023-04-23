@@ -25,7 +25,11 @@ namespace KatnisssSpaceSimulator.Terrain
         /// </summary>
         public bool IsL0 { get => Parent == null; }
 
-        public int DefaultSubdivisions { get; set; }
+        /// <summary>
+        /// How many binary edge subdivisions per subdiv level.
+        /// </summary>
+        public int Subdivisions { get; set; }
+
         public double BodyRadius { get; set; }
 
 
@@ -46,13 +50,6 @@ namespace KatnisssSpaceSimulator.Terrain
             _meshRenderer = this.GetComponent<MeshRenderer>();
         }
 
-        void Start()
-        {
-            Mesh mesh = GeneratePartialCubeSphere( DefaultSubdivisions, (float)BodyRadius, _precisePosition );
-            this.transform.GetComponent<MeshCollider>().sharedMesh = mesh;
-            this.transform.GetComponent<MeshFilter>().sharedMesh = mesh;
-        }
-
         /// <summary>
         /// Set the <see cref="LODQuad"/> as a level 0 (root) face.
         /// </summary>
@@ -64,7 +61,7 @@ namespace KatnisssSpaceSimulator.Terrain
             }
 
             _precisePosition = origin;
-            DefaultSubdivisions = defaultSubdivisions;
+            Subdivisions = defaultSubdivisions;
             BodyRadius = bodyRadius;
 
             // Unity keeps the local positions of objects internally.
@@ -72,6 +69,8 @@ namespace KatnisssSpaceSimulator.Terrain
             // It is possible that we would want to keep the PQS parts as root objects,
             // - that way they would not be subject to precision issues caused by the large distance between their origin and their parent.
             this.transform.localPosition = (Vector3)_precisePosition;
+
+            this.GenerateMeshData();
         }
 
         /// <summary>
@@ -130,7 +129,9 @@ namespace KatnisssSpaceSimulator.Terrain
         /// </summary>
         void GenerateMeshData()
         {
-
+            Mesh mesh = GeneratePartialCubeSphere( Subdivisions, (float)BodyRadius, -1, 1, _precisePosition );
+            this.transform.GetComponent<MeshCollider>().sharedMesh = mesh;
+            this.transform.GetComponent<MeshFilter>().sharedMesh = mesh;
         }
 
         /// <summary>
@@ -150,14 +151,11 @@ namespace KatnisssSpaceSimulator.Terrain
         /// <summary>
         /// The method that generates the PQS mesh projected onto a sphere of the specified radius, with its origin at the center of the cube projected onto the same sphere.
         /// </summary>
-        static Mesh GeneratePartialCubeSphere( int subdivisions, float radius, Vector3Dbl origin )
+        static Mesh GeneratePartialCubeSphere( int subdivisions, float radius, float min, float max, Vector3Dbl origin )
         {
-            QuadSphereFace face = QuadSphereFaceEx.FromVector( origin.normalized );
-            // Origin of a valid subdivided quad can never be at the edge of any of the infinitely many theoretically possible subdivision levels.
+            // The origin of a valid, binarily subdivided quad will never be at the edge of any of the infinitely many theoretically possible subdivision levels.
 
-#warning TODO - this needs a min/max specifier to determine the subdivision (i.e. don't force entire [0..1] range).
-            // also useful for later, make the edge vertices align with the previous level subdivision if specified.
-            // - this aligning also needs to handle existing quad islands if their neighbor subdivides - we DON'T want to regenerate the entire quad then.
+            QuadSphereFace face = QuadSphereFaceEx.FromVector( origin.normalized );
 
             float diameter = radius * 2;
 
@@ -186,7 +184,7 @@ namespace KatnisssSpaceSimulator.Terrain
 #warning TODO - l0 requires an additional set of vertices at Z- because UVs need to overlap on both 0.0 and 1.0 there.
                     // for Zn, Yp, Yn, needs to add extra vertex for every vert with x=0
 
-                    Vector2 uv = CoordinateUtils.CartesianToUV( pos.x, pos.z, pos.y ); // swizzle
+                    Vector2 uv = CoordinateUtils.CartesianToUV( pos.x, -pos.z, -pos.y ); // swizzle
                     uvs[index] = new Vector2( 1 - uv.x, uv.y );
 
                     vertices[index] = pos * radius - posOffset;
