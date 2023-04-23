@@ -16,6 +16,11 @@ namespace KatnisssSpaceSimulator.Core
 
         const string name = "tempname_vessel";
 
+
+#warning TODO - We need to shift the reference frame before spawning the active vessel. Same for switching vessels, or spawning anything that needs precision really
+        // Also need to store a precise position for anything that is expected to be moved away far enough and then brought back without being unloaded and reloaded
+        // - (precision issues will round the positions of its constituent parts to the nearest available slot).
+        
         public Vessel CreatePartless( Vector3 position, Quaternion rotation )
         {
             Vessel vessel = CreateGO( position, rotation );

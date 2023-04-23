@@ -56,29 +56,33 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Camera\CameraController.cs" />
     <Compile Include="Assets\Core\PartFactory.cs" />
+    <Compile Include="Assets\Core\CelestialBody.cs" />
     <Compile Include="Assets\zzzTestAssets\zzzTestGameManager.cs" />
+    <Compile Include="Assets\Core\CelestialBodyFactory.cs" />
     <Compile Include="Assets\Core\VesselFactory.cs" />
+    <Compile Include="Assets\UI\TimewarpReadoutUI.cs" />
     <Compile Include="Assets\Functionalities\FRocketEngine.cs" />
-    <Compile Include="Assets\_UnityEngine\Vector3Large.cs" />
+    <Compile Include="Assets\Core\VesselManager.cs" />
+    <Compile Include="Assets\UI\VelocityReadoutUI.cs" />
     <Compile Include="Assets\Core\VesselStateUtils.cs" />
     <Compile Include="Assets\Core\PhysicsObject.cs" />
+    <Compile Include="Assets\Core\CelestialBodyManager.cs" />
     <Compile Include="Assets\Core\Vessel.cs" />
+    <Compile Include="Assets\UI\AltitudeReadoutUI.cs" />
     <Compile Include="Assets\Core\Part.cs" />
     <Compile Include="Assets\Core\Functionality.cs" />
-    <Compile Include="Assets\Core\ReferenceFrames\DefaultFrame.cs" />
-    <Compile Include="Assets\Core\ReferenceFrames\IReferenceFrame.cs" />
-    <Compile Include="Assets\Camera\CameraController.cs" />
-    <Compile Include="Assets\Core\CelestialBody.cs" />
     <Compile Include="Assets\TimeWarp\TimeWarpManager.cs" />
-    <Compile Include="Assets\UI\VelocityReadoutUI.cs" />
-    <Compile Include="Assets\Core\Managers\CelestialBodyManager.cs" />
-    <Compile Include="Assets\Core\Managers\ReferenceFrameManager.cs" />
-    <Compile Include="Assets\Core\Managers\VesselManager.cs" />
-    <Compile Include="Assets\UI\TimewarpReadoutUI.cs" />
-    <Compile Include="Assets\Terrain\CubeSphereTerrain.cs" />
-    <Compile Include="Assets\Core\CelestialBodyFactory.cs" />
-    <Compile Include="Assets\UI\AltitudeReadoutUI.cs" />
+    <Compile Include="Assets\Core\ReferenceFrames\IReferenceFrame.cs" />
+    <Compile Include="Assets\Core\ReferenceFrames\DefaultFrame.cs" />
+    <Compile Include="Assets\Terrain\LODQuad.cs" />
+    <Compile Include="Assets\Terrain\CoordinateUtils.cs" />
+    <Compile Include="Assets\Terrain\LODQuadSphere.cs" />
+    <Compile Include="Assets\_UnityEngine\Vector3Dbl.cs" />
+    <Compile Include="Assets\Terrain\MeshUtils.cs" />
+    <Compile Include="Assets\Terrain\QuadSphereFace.cs" />
+    <Compile Include="Assets\Core\ReferenceFrames\SceneReferenceFrameManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro.cginc" />

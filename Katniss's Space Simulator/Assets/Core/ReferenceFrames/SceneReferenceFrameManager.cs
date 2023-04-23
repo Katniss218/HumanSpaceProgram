@@ -6,12 +6,12 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace KatnisssSpaceSimulator.Core.Managers
+namespace KatnisssSpaceSimulator.Core.ReferenceFrames
 {
     /// <remarks>
     /// This class is my implementation of scene-wide Floating Origin / Krakensbane.
     /// </remarks>
-    public class ReferenceFrameManager : MonoBehaviour
+    public class SceneReferenceFrameManager : MonoBehaviour
     {
         public struct ReferenceFrameSwitchData
         {
@@ -23,17 +23,20 @@ namespace KatnisssSpaceSimulator.Core.Managers
 
         // "reference frame" is used to make the world space behave like the local space of said reference frame.
 
-        static ReferenceFrameManager()
+        static SceneReferenceFrameManager()
         {
             OnReferenceFrameSwitch += ReferenceFrameSwitch_Objects;
             OnReferenceFrameSwitch += ReferenceFrameSwitch_Trail;
         }
 
         /// <summary>
-        /// The reference frame that describes how to convert between Absolute Inertial Reference Frame and world space
+        /// The reference frame that describes how to convert between Absolute Inertial Reference Frame and the scene's world space.
         /// </summary>
-        public static IReferenceFrame WorldSpaceReferenceFrame { get; private set; } = new DefaultFrame( Vector3Large.zero );
+        public static IReferenceFrame WorldSpaceReferenceFrame { get; private set; } = new DefaultFrame( Vector3Dbl.zero );
 
+        /// <summary>
+        /// Called when the scene's reference frame switches.
+        /// </summary>
         public static event Action<ReferenceFrameSwitchData> OnReferenceFrameSwitch;
 
         public static void SwitchReferenceFrame( IReferenceFrame newFrame )
@@ -48,7 +51,7 @@ namespace KatnisssSpaceSimulator.Core.Managers
         {
             // If both frames are inertial and not rotated, and scaled equally, it's enough to calculate the difference between any position.
 
-            Vector3Large globalPosition = oldFrame.TransformPosition( oldPosition );
+            Vector3Dbl globalPosition = oldFrame.TransformPosition( oldPosition );
             Vector3 newPosition = newFrame.InverseTransformPosition( globalPosition );
             return newPosition;
         }
@@ -77,6 +80,9 @@ namespace KatnisssSpaceSimulator.Core.Managers
 
         private static void ReferenceFrameSwitch_Trail( ReferenceFrameSwitchData data )
         {
+            // WARN: This is very expensive to run when the trail has a lot of vertices.
+            // When moving fast, don't use the default trail parameters, it produces too many vertices.
+
             foreach( var trail in FindObjectsOfType<TrailRenderer>() )
             {
                 for( int i = 0; i < trail.positionCount; i++ )
@@ -95,11 +101,12 @@ namespace KatnisssSpaceSimulator.Core.Managers
             float max = MaxFloatingOriginRange;
             float min = -max;
 
-            if( VesselManager.ActiveVessel.transform.position.x < min || VesselManager.ActiveVessel.transform.position.x > max
-             || VesselManager.ActiveVessel.transform.position.y < min || VesselManager.ActiveVessel.transform.position.y > max
-             || VesselManager.ActiveVessel.transform.position.z < min || VesselManager.ActiveVessel.transform.position.z > max )
+            Vector3 position = VesselManager.ActiveVessel.transform.position;
+            if( position.x < min || position.x > max
+             || position.y < min || position.y > max
+             || position.z < min || position.z > max )
             {
-                SwitchReferenceFrame( WorldSpaceReferenceFrame.Shift( VesselManager.ActiveVessel.transform.position ) );
+                SwitchReferenceFrame( WorldSpaceReferenceFrame.Shift( position ) );
             }
         }
     }

@@ -27,7 +27,11 @@ namespace KatnisssSpaceSimulator
         {
             VesselFactory fac = new VesselFactory();
             PartFactory pfac = new PartFactory();
-            Vessel v = fac.Create( CubeSphereTerrain.UVToCartesian( 1900f / 4096f, 1200f / 4096f, CelestialBodyFactory.radius ), Quaternion.identity, pfac.CreateRoot );
+
+            Vector3 pos = CoordinateUtils.UVToCartesian( 1900f / 4096f, 1200f / 4096f, CelestialBodyFactory.radius );
+            pos = new Vector3( pos.x, pos.z, pos.y );
+
+            Vessel v = fac.Create( pos , Quaternion.identity, pfac.CreateRoot );
             v.RootPart.DisplayName = "0";
 
             Part origRoot = v.RootPart;
@@ -71,7 +75,15 @@ namespace KatnisssSpaceSimulator
 
             VesselManager.ActiveVessel.transform.GetComponent<Rigidbody>().angularDrag = 1; // temp, doesn't veer off course.
 
-            CelestialBody cb = new CelestialBodyFactory().Create( Vector3Large.zero );
+            CelestialBody cb = new CelestialBodyFactory().Create( Vector3Dbl.zero );
+
+            CelestialBody cb1 = new CelestialBodyFactory().Create( new Vector3Dbl( 440_000_000, 0, 0) );
+            CelestialBody cb2 = new CelestialBodyFactory().Create( new Vector3Dbl( 440_000_000, 100_000_000, 0) );
+            CelestialBody cb_farawayTEST = new CelestialBodyFactory().Create( new Vector3Dbl( 440_000_000_0.0, 100_000_000, 0) );
+            CelestialBody cb_farawayTEST2 = new CelestialBodyFactory().Create( new Vector3Dbl( 440_000_000_00.0, 100_000_000, 0) );
+
+#warning TODO - stuff really far away throws invalid world AABB and such. do not enable these, you can't see them anyway. 100 ly seems to work, but further away is a no-no.
+            CelestialBody cb_farawayTEST3FAR = new CelestialBodyFactory().Create( new Vector3Dbl( 10e17, 100_000_000, 0) ); // 10e17 is 100 ly away.
         }
     }
 

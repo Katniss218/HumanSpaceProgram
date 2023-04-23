@@ -1,4 +1,4 @@
-﻿using KatnisssSpaceSimulator.Core.Managers;
+﻿using KatnisssSpaceSimulator.Core.ReferenceFrames;
 using KatnisssSpaceSimulator.Terrain;
 using System;
 using System.Collections.Generic;
@@ -12,36 +12,16 @@ namespace KatnisssSpaceSimulator.Core
     public class CelestialBodyFactory
     {
         //const float radius = 1000; //6371000f; // m
-        public const float radius = 6371000f;
+        public const float radius = 63710000f;
         //const float mass = 20e16f; //5.97e24f; // kg  // 20e16f for 1km radius is good
         public const float mass = 5.97e24f;
         public const int subdivs = 7; // 7 is the maximum value for a single plane that won't cause issues here.
 
-        public CelestialBody Create( Vector3Large AIRFPosition )
+        public CelestialBody Create( Vector3Dbl AIRFPosition )
         {
             GameObject cbGO = new GameObject( "celestialbody" );
-            cbGO.transform.position = ReferenceFrameManager.WorldSpaceReferenceFrame.InverseTransformPosition( AIRFPosition );
+            cbGO.transform.position = SceneReferenceFrameManager.WorldSpaceReferenceFrame.InverseTransformPosition( AIRFPosition );
             cbGO.transform.localScale = Vector3.one;
-
-            Vector3[] offsets = new Vector3[6]
-            {
-                new Vector3( radius, 0, 0 ),
-                new Vector3( -radius, 0, 0 ),
-                new Vector3( 0, radius, 0 ),
-                new Vector3( 0, -radius, 0 ),
-                new Vector3( 0, 0, radius ),
-                new Vector3( 0, 0, -radius ),
-            };
-
-            for( int i = 0; i < 6; i++ )
-            {
-                Transform t = CreateMeshPart( cbGO.transform );
-                t.localPosition = offsets[i];
-
-                Mesh mesh = CubeSphereTerrain.GeneratePartialCubeSphere( subdivs, radius, (CubeSphereTerrain.Face)i );
-                t.GetComponent<MeshCollider>().sharedMesh = mesh;
-                t.GetComponent<MeshFilter>().sharedMesh = mesh;
-            }
 
             //SphereCollider c = cbGO.AddComponent<SphereCollider>();
 
@@ -50,26 +30,10 @@ namespace KatnisssSpaceSimulator.Core
             cb.Mass = mass;
             cb.Radius = radius;
 
+            LODQuadSphere lqs = cbGO.AddComponent<LODQuadSphere>();
+
             CelestialBodyManager.Bodies.Add( cb );
             return cb;
-        }
-
-        Transform CreateMeshPart( Transform cbTransform )
-        {
-            GameObject go = new GameObject( "mesh" );
-            go.transform.SetParent( cbTransform );
-            go.transform.localPosition = Vector3.zero;
-            go.transform.localRotation = Quaternion.identity;
-            go.transform.localScale = Vector3.one;
-
-            MeshFilter cbMesh = go.AddComponent<MeshFilter>();
-
-            MeshRenderer mr = go.AddComponent<MeshRenderer>();
-            mr.material = UnityEngine.Object.FindObjectOfType<zzzTestGameManager>().CBMaterial;
-
-            MeshCollider c = go.AddComponent<MeshCollider>();
-
-            return go.transform;
         }
     }
 }

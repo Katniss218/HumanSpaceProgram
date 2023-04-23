@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace KatnisssSpaceSimulator.Core.Managers
+namespace KatnisssSpaceSimulator.Core
 {
     public class CelestialBodyManager : MonoBehaviour
     {

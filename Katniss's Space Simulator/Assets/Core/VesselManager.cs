@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KatnisssSpaceSimulator.Core.Managers
+namespace KatnisssSpaceSimulator.Core
 {
     /// <summary>
     /// Manages loading, unloading, switching, etc of vessels.
