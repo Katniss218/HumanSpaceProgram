@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KatnisssSpaceSimulator.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -179,13 +180,13 @@ namespace KatnisssSpaceSimulator.Terrain
                 {
                     int index = (i * numberOfEdges) + i + j;
 
-                    (Vector3 pos, Vector3 posOffset) = CoordinateUtils.GetSpherePoint( i, j, edgeLength, radius, face );
+                    (Vector3 pos, Vector3 posOffset) = MeshUtils.GetSpherePoint( i, j, edgeLength, radius, face );
 
 #warning TODO - l0 requires an additional set of vertices at Z- because UVs need to overlap on both 0.0 and 1.0 there.
                     // for Zn, Yp, Yn, needs to add extra vertex for every vert with x=0
 
-                    Vector2 uv = CoordinateUtils.CartesianToUV( pos.x, -pos.z, -pos.y ); // swizzle
-                    uvs[index] = new Vector2( 1 - uv.x, uv.y );
+                    Vector3 lla = CoordinateUtils.EuclideanToGeodetic( pos.x, pos.y, pos.z );
+                    uvs[index] = new Vector2( (lla.x * Mathf.Deg2Rad + 1.5f * Mathf.PI ) / (2 * Mathf.PI), lla.y * Mathf.Deg2Rad / Mathf.PI );
 
                     vertices[index] = pos * radius - posOffset;
                     normals[index] = pos; // Normals need to be calculated by hand to avoid seams not matching up.

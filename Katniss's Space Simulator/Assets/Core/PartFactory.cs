@@ -78,9 +78,8 @@ namespace KatnisssSpaceSimulator.Core
             GameObject downTest = new GameObject( "thrust" );
             downTest.transform.SetParent( partGO.transform );
             downTest.transform.localPosition = Vector3.zero;
-            downTest.transform.localRotation = Quaternion.identity;
+            downTest.transform.localRotation = Quaternion.Euler( -90, 0, 0 );
             downTest.transform.localScale = Vector3.one;
-            downTest.transform.forward = Vector3.up;
             part.Mass = 1;
 
             // Add modules, etc.

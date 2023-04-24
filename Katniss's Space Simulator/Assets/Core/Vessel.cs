@@ -9,7 +9,7 @@ using UnityEngine;
 namespace KatnisssSpaceSimulator.Core
 {
     [RequireComponent( typeof( PhysicsObject ) )]
-    public sealed class Vessel : MonoBehaviour, IReferenceFrameSwitchResponder
+    public sealed class Vessel : MonoBehaviour
     {
         // Root objects have to store their AIRF positions, children natively store their local coordinates, which as long as they're not obscenely large, will be fine.
         // - An object with a child at 0.00125f can be sent to 10e25 and brought back, and its child will remain at 0.00125f
@@ -33,7 +33,7 @@ namespace KatnisssSpaceSimulator.Core
 
         public PhysicsObject PhysicsObject { get; private set; }
 
-        public Vector3Dbl AIRFPosition { get; private set; }
+        public Vector3Dbl AIRFPosition { get => this.PhysicsObject.AIRFPosition; }
 
         /// <remarks>
         /// DO NOT USE. This is for internal use, and can produce an invalid state. Use <see cref="VesselStateUtils.SetParent(Part, Part)"/> instead.
@@ -105,17 +105,24 @@ namespace KatnisssSpaceSimulator.Core
         /// </summary>
         public void SetPosition( Vector3Dbl airfPosition )
         {
-            this.AIRFPosition = airfPosition;
-            this.transform.position = SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformPosition( airfPosition );
+            this.PhysicsObject.SetPosition( airfPosition );
         }
 
         /// <summary>
-        /// Callback to the event.
+        /// Sets the rotation of the vessel in Absolute Inertial Reference Frame coordinates.
         /// </summary>
-        public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
+        public void SetRotation( Quaternion airfRotation )
         {
-            // Kinda ugly tbh. Maybe just subscribe to it, and use the interface as a marker to prevent auto-update position?
-            this.transform.position = SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformPosition( this.AIRFPosition );
+            this.PhysicsObject.SetRotation( airfRotation );
+        }
+
+        /// <summary>
+        /// Calculates the scene world-space point at the very bottom of the vessel. Useful when placing it at launchsites and such.
+        /// </summary>
+        public Vector3 GetBottomPosition()
+        {
+            Vector3 closestBound = this.PhysicsObject.ClosestPointOnBounds( this.transform.position - (this.transform.up * 500f) );
+            return closestBound;
         }
 
         void Awake()
@@ -148,8 +155,6 @@ namespace KatnisssSpaceSimulator.Core
 
             // There's also multi-scene physics, which apparently might be used to put the origin of the simulation at 2 different vessels, and have their positions accuratly updated???
             // doesn't seem like that to me reading the docs tho, but idk.
-
-            this.AIRFPosition = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.transform.position );
         }
 
 

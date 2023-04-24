@@ -22,6 +22,7 @@ namespace KatnisssSpaceSimulator.Core
             GameObject cbGO = new GameObject( "celestialbody" );
             cbGO.transform.position = SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformPosition( AIRFPosition );
             cbGO.transform.localScale = Vector3.one;
+            cbGO.transform.forward = Vector3.up;
 
             //SphereCollider c = cbGO.AddComponent<SphereCollider>();
 
@@ -29,6 +30,8 @@ namespace KatnisssSpaceSimulator.Core
             cb.AIRFPosition = AIRFPosition;
             cb.Mass = mass;
             cb.Radius = radius;
+
+            CelestialBodySurface stf = cbGO.AddComponent<CelestialBodySurface>();
 
             LODQuadSphere lqs = cbGO.AddComponent<LODQuadSphere>();
 

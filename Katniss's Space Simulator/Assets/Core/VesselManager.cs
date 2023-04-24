@@ -13,12 +13,5 @@ namespace KatnisssSpaceSimulator.Core
     public class VesselManager : MonoBehaviour
     {
         public static Vessel ActiveVessel { get; set; }
-
-        /*public static void SetActive( Vessel v )
-        {
-#warning TODO - first switch doesn't seem to switch the vessel pos to 0,0,0. Is this because rigidbody? idk, the other object with RB was in fact moved.
-            ActiveVessel = v;
-            ReferenceFrames.SceneReferenceFrameManager.TryFixActiveVesselOutOfBounds();
-        }*/
     }
 }

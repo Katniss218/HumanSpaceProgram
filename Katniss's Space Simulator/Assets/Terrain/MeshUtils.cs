@@ -58,5 +58,48 @@ namespace KatnisssSpaceSimulator.Terrain
             return mesh;
         }
 
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>Returns the normalized point on the surface of a cube, and the vector transforming the center-origin coordinates into face-origin.</returns>
+        public static (Vector3 pos, Vector3 posOffset) GetSpherePoint( int i, int j, float edgeLength, float radius, QuadSphereFace face )
+        {
+            Vector3 pos;
+            Vector3 posOffset;
+            switch( face )
+            {
+                case QuadSphereFace.Xp:
+                    pos = new Vector3( radius, (j * edgeLength) - radius, (i * edgeLength) - radius );
+                    posOffset = new Vector3( radius, 0, 0 );
+                    break;
+                case QuadSphereFace.Xn:
+                    pos = new Vector3( -radius, (i * edgeLength) - radius, (j * edgeLength) - radius );
+                    posOffset = new Vector3( -radius, 0, 0 );
+                    break;
+                case QuadSphereFace.Yp:
+                    pos = new Vector3( (i * edgeLength) - radius, radius, (j * edgeLength) - radius );
+                    posOffset = new Vector3( 0, radius, 0 );
+                    break;
+                case QuadSphereFace.Yn:
+                    pos = new Vector3( (j * edgeLength) - radius, -radius, (i * edgeLength) - radius );
+                    posOffset = new Vector3( 0, -radius, 0 );
+                    break;
+                case QuadSphereFace.Zp:
+                    pos = new Vector3( (j * edgeLength) - radius, (i * edgeLength) - radius, radius );
+                    posOffset = new Vector3( 0, 0, radius );
+                    break;
+                case QuadSphereFace.Zn:
+                    pos = new Vector3( (i * edgeLength) - radius, (j * edgeLength) - radius, -radius );
+                    posOffset = new Vector3( 0, 0, -radius );
+                    break;
+                default:
+                    throw new ArgumentException( $"Invalid face orientation {face}", nameof( face ) );
+            }
+
+            pos.Normalize(); // unit sphere.
+            return (pos, posOffset);
+        }
     }
 }
