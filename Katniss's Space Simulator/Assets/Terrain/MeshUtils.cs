@@ -58,8 +58,6 @@ namespace KatnisssSpaceSimulator.Terrain
             return mesh;
         }
 
-
-
         /// <summary>
         /// 
         /// </summary>

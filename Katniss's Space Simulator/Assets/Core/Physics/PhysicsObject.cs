@@ -114,7 +114,6 @@ namespace KatnisssSpaceSimulator.Core.Physics
 
         void FixedUpdate()
         {
-#warning TODO - this get called before OnSceneReferenceFrameSwitch is called, and thus sets the AIRF Position to an incorrect value (this.transform.position is already moved?).
             this.AIRFPosition = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.transform.position );
         }
 

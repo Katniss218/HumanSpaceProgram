@@ -18,6 +18,8 @@ namespace KatnisssSpaceSimulator.Terrain
     [RequireComponent( typeof( MeshRenderer ) )]
     public class LODQuad : MonoBehaviour
     {
+        // Generated meshes have relatively higher precision because the vertices are closer to the origin of the mesh, than to the origin of the celestial body.
+
         public LODQuad Parent { get; private set; }
         public LODQuad[] Children { get; private set; } = new LODQuad[4];
 
@@ -29,30 +31,18 @@ namespace KatnisssSpaceSimulator.Terrain
         /// <summary>
         /// How many binary edge subdivisions per subdiv level.
         /// </summary>
-        public int EdgeSubdivisions { get; set; }
+        public int EdgeSubdivisions { get; private set; }
 
-        public double CelestialBodyRadius { get; set; }
+        public CelestialBody CelestialBody { get; private set; }
 
         QuadSphereFace _face;
 
         MeshFilter _meshFilter;
         MeshRenderer _meshRenderer;
 
-        // Needs to be doubles to transform this into the world space at high zoom levels without accumulated errors.
-        // With floats, the position on the sphere would not be known precisely enough to place the quad with sub-meter precision for Earth.
-        // - And sub-meter precision is available in the scene because of the floating origin system.
-        /// <summary>
-        /// The precise position of the corners after projecting onto the undeformed sphere.
-        /// </summary>
-        //Vector3Dbl[,] _preciseCorners = new Vector3Dbl[3, 3]; // 0,0 top-left, 0,1 top, 0,2 top-right, 1,0 left, 1,1 center, 1,2 right, 2,0 bottom-left, 2,1 bottom, 2,2 bottom-right.
-        /// <summary>
-        /// The precise position of the center (pivot) after projecting onto the undeformed sphere.
-        /// </summary>
-        //Vector3Dbl _precisePosition { get => _preciseCorners[1, 1]; set => _preciseCorners[1, 1] = value; } // center = origin.
-
-        // Meshes are generated with high precision because the origin of the mesh is much closer to its vertices than the center of the planet would be.
-
+        // 2D center of the quad
         Vector2 _center;
+        // subdiv level
         int _lN;
 
         void Awake()
@@ -69,11 +59,9 @@ namespace KatnisssSpaceSimulator.Terrain
         /// <summary>
         /// Set the <see cref="LODQuad"/> as a level 0 (root) face.
         /// </summary>
-        public void SetLN( Vector3 origin, int edgeSubdivisions, double bodyRadius, Vector2 center, int lN, QuadSphereFace face )
+        public void SetLN( Vector3 origin, int edgeSubdivisions, Vector2 center, int lN, QuadSphereFace face )
         {
             this.EdgeSubdivisions = edgeSubdivisions;
-            this.CelestialBodyRadius = bodyRadius;
-           // this._precisePosition = origin;
             this._center = center;
             this._lN = lN;
             this._face = face;
@@ -98,33 +86,22 @@ namespace KatnisssSpaceSimulator.Terrain
             float halfSize = size / 2f;
             float quarterSize = size / 4f;
 
-            //Vector3[] origins = new Vector3[4];
             for( int i = 0; i < 4; i++ )
             {
                 int x = i % 2;
                 int y = i / 2;
 
-                // get the average lerped position of each origin and project it onto the sphere.
-               // origins[i] = (q._preciseCorners[x, y] + q._preciseCorners[x, y + 1] + q._preciseCorners[x + 1, y] + q._preciseCorners[x + 1, y + 1]) / 4.0;
-                //origins[i] = origins[i].normalized * q.CelestialBodyRadius;
-
                 Vector2 center = new Vector2( q._center.x - quarterSize + (x * halfSize), q._center.y - quarterSize + (y * halfSize) );
 
-                Vector3 origin = MeshUtils.GetSpherePoint( center.x, center.y, q._face ) * (float)q.CelestialBodyRadius;
+                Vector3 origin = MeshUtils.GetSpherePoint( center.x, center.y, q._face ) * (float)q.CelestialBody.Radius;
 
-                var quad = Create( q.transform.parent, origin, q.CelestialBodyRadius, q.EdgeSubdivisions, center, q._lN + 1, q._face ); ;
+                var quad = Create( q.transform.parent, origin, q.CelestialBody, q.EdgeSubdivisions, center, q._lN + 1, q._face ); ;
                 
                 q.Children[i] = quad;
                 quad.Parent = q;
             }
-#warning TODO - compute corner positions to interpolate and find centers.
 
             q.Hide();
-
-            // calculate the points (slerp isn't accurate with a cube-sphere, we need to get the average of 4 points and project it onto the sphere).
-
-            // splits itself into 4 smaller quads, each with origin at avg(4 corners), protected at the sphere.
-            // hide self.
         }
 
         /// <summary>
@@ -162,7 +139,7 @@ namespace KatnisssSpaceSimulator.Terrain
         /// </summary>
         void GenerateMeshData()
         {
-            Mesh mesh = GeneratePartialCubeSphere( EdgeSubdivisions, (float)CelestialBodyRadius, _center, _lN, this.transform.localPosition ); // (0, 0) and 2 are the full quad.
+            Mesh mesh = GeneratePartialCubeSphere( EdgeSubdivisions, (float)CelestialBody.Radius, _center, _lN, this.transform.localPosition ); // (0, 0) and 2 are the full quad.
             this.transform.GetComponent<MeshCollider>().sharedMesh = mesh;
             this.transform.GetComponent<MeshFilter>().sharedMesh = mesh;
         }
@@ -220,7 +197,8 @@ namespace KatnisssSpaceSimulator.Terrain
 
                     Vector3 pos = MeshUtils.GetSpherePoint( quadX, quadY, face );
 
-#warning TODO - l0 requires an additional set of vertices at Z- because UVs need to overlap on both 0.0 and 1.0 there.
+#warning TODO - l0 requires an additional set of vertices at Z- because UVs need to overlap on both 0.0 and 1.0 there. 
+                    // EuclideanToGeodetic also returns the same value regardless, we should check here.
                     // for Zn, Yp, Yn, needs to add extra vertex for every vert with x=0
 
                     Vector3 lla = CoordinateUtils.EuclideanToGeodetic( pos.x, pos.y, pos.z );
@@ -268,7 +246,7 @@ namespace KatnisssSpaceSimulator.Terrain
             return mesh;
         }
 
-        public static LODQuad Create( Transform parent, Vector3 localPosition, double celestialBodyRadius, int defaultSubdivisions, Vector2 center, int lN, QuadSphereFace face )
+        public static LODQuad Create( Transform parent, Vector3 localPosition, CelestialBody celestialBody, int defaultSubdivisions, Vector2 center, int lN, QuadSphereFace face )
         {
             GameObject go = new GameObject( $"LODQuad L{lN}, {face}, {center}" );
             go.transform.SetParent( parent );
@@ -279,7 +257,8 @@ namespace KatnisssSpaceSimulator.Terrain
             go.AddComponent<MeshCollider>();
 
             LODQuad q = go.AddComponent<LODQuad>();
-            q.SetLN( localPosition, defaultSubdivisions, celestialBodyRadius, center, lN, face );
+            q.CelestialBody = celestialBody;
+            q.SetLN( localPosition, defaultSubdivisions, center, lN, face );
 
             return q;
         }

@@ -33,7 +33,7 @@ namespace KatnisssSpaceSimulator.Terrain
             _l0faces = new LODQuad[6];
             for( int i = 0; i < 6; i++ )
             {
-                _l0faces[i] = LODQuad.Create( _celestialBody.transform, ((QuadSphereFace)i).ToVector3(), _celestialBody.Radius, EdgeSubdivisions, Vector2.zero, 0, (QuadSphereFace)i );
+                _l0faces[i] = LODQuad.Create( _celestialBody.transform, ((QuadSphereFace)i).ToVector3(), _celestialBody, EdgeSubdivisions, Vector2.zero, 0, (QuadSphereFace)i );
                 LODQuad.Subdivide( _l0faces[i] );
             }
         }

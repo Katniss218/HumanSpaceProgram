@@ -36,7 +36,7 @@ namespace KatnisssSpaceSimulator
             CelestialBody cb_farawayTEST2 = new CelestialBodyFactory().Create( new Vector3Dbl( 440_000_000_00.0, 100_000_000, 0 ) );
 
             CelestialBody cb_farawayTEST3FAR = new CelestialBodyFactory().Create( new Vector3Dbl( 10e17, 100_000_000, 0 ) ); // 10e17 is 100 ly away.
-#warning TODO - stuff really far away throws invalid world AABB and such. do not enable these, you can't see them anyway. 100 ly seems to work, but further away is a no-no.
+            // stuff really far away throws invalid world AABB and such. do not enable these, you can't see them anyway. 100 ly seems to work, but further away is a no-no.
 
 
             CelestialBodySurface srf = cb.GetComponent<CelestialBodySurface>();
