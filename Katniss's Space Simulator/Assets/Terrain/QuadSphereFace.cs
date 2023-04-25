@@ -21,33 +21,49 @@ namespace KatnisssSpaceSimulator.Terrain
 
     public static class QuadSphereFaceEx
     {
-        public static QuadSphereFace FromVector( Vector3Dbl preciseVector )
+        /// <summary>
+        /// Returns the quad sphere face for a given vector.
+        /// </summary>
+        public static QuadSphereFace FromVector( Vector3 vector )
         {
-            Contract.Assert( preciseVector.magnitude == 1.0 );
-            // Find which axis is the largest.
+            float x = vector.x;
+            float y = vector.y;
+            float z = vector.z;
 
-            double x = preciseVector.x;
-            double y = preciseVector.y;
-            double z = preciseVector.z;
+            int maxIndex = 0;
+            float maxValue = Math.Abs( x );
+            if( Math.Abs( y ) > maxValue )
+            {
+                maxIndex = 1;
+                maxValue = Math.Abs( y );
+            }
+            if( Math.Abs( z ) > maxValue )
+            {
+                maxIndex = 2;
+            }
+            float sign = Mathf.Sign( vector[maxIndex] );
 
-            if( x > y && x > z )
-                return QuadSphereFace.Xp;
-            if( x < y && x < z )
-                return QuadSphereFace.Xn;
-
-            if( y > x && y > z )
-                return QuadSphereFace.Yp;
-            if( y < x && y < z )
-                return QuadSphereFace.Yn;
-
-            if( z > x && z > y )
-                return QuadSphereFace.Zp;
-            if( z < x && z < y )
-                return QuadSphereFace.Zn;
-
-            throw new ArgumentException( $"Invalid vector {preciseVector}.", nameof( preciseVector ) );
+            if( maxIndex == 0 )
+            {
+                if( sign == 1 ) return QuadSphereFace.Xp;
+                if( sign == -1 ) return QuadSphereFace.Xn;
+            }
+            if( maxIndex == 1 )
+            {
+                if( sign == 1 ) return QuadSphereFace.Yp;
+                if( sign == -1 ) return QuadSphereFace.Yn;
+            }
+            if( maxIndex == 2 )
+            {
+                if( sign == 1 ) return QuadSphereFace.Zp;
+                if( sign == -1 ) return QuadSphereFace.Zn;
+            }
+            throw new InvalidOperationException();
         }
 
+        /// <summary>
+        /// Returns a unit vector pointing along the face's axis.
+        /// </summary>
         public static Vector3 ToVector3( this QuadSphereFace v )
         {
             switch( v )

@@ -14,7 +14,10 @@ namespace KatnisssSpaceSimulator.Terrain
     [RequireComponent( typeof( CelestialBody ) )]
     public class LODQuadSphere : MonoBehaviour
     {
-        public int DefaultSubdivisions { get; private set; } = 7;
+        /// <summary>
+        /// The number of binary subdivisions per edge of each of the quads at l0.
+        /// </summary>
+        public int EdgeSubdivisions { get; private set; } = 4;
 
         LODQuad[] _l0faces;
         CelestialBody _celestialBody;
@@ -30,9 +33,11 @@ namespace KatnisssSpaceSimulator.Terrain
             _l0faces = new LODQuad[6];
             for( int i = 0; i < 6; i++ )
             {
-                _l0faces[i] = LODQuad.Create( _celestialBody.transform, _celestialBody.Radius, DefaultSubdivisions, Vector2.zero, 0, (QuadSphereFace)i );
+                _l0faces[i] = LODQuad.Create( _celestialBody.transform, ((QuadSphereFace)i).ToVector3(), _celestialBody.Radius, EdgeSubdivisions, Vector2.zero, 0, (QuadSphereFace)i );
                 LODQuad.Subdivide( _l0faces[i] );
             }
         }
+
+        // ondestroy delete itself?
     }
 }
