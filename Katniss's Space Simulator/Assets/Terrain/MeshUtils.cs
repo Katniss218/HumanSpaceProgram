@@ -15,7 +15,7 @@ namespace KatnisssSpaceSimulator.Terrain
         /// <summary>
         /// Calculates the surface normal of a triangle.
         /// </summary>
-        [Obsolete("Requires testing to determine if the order of the vectors in the cross product is correct, or if it should be flipped, to match the behaviour of Unity and clockwise point order.")]
+        [Obsolete( "Requires testing to determine if the order of the vectors in the cross product is correct, or if it should be flipped, to match the behaviour of Unity and clockwise point order." )]
         public static Vector3 GetFaceNormal( Vector3 v1, Vector3 v2, Vector3 v3 )
         {
             return Vector3.Cross( v1 - v2, v3 - v2 ).normalized;
@@ -64,39 +64,69 @@ namespace KatnisssSpaceSimulator.Terrain
         /// 
         /// </summary>
         /// <returns>Returns the normalized point on the surface of a cube, and the vector transforming the center-origin coordinates into face-origin.</returns>
-        public static (Vector3 pos, Vector3 posOffset) GetSpherePoint( int i, int j, float edgeLength, float radius, QuadSphereFace face )
+        public static (Vector3 pos, Vector3 posOffset) GetSpherePoint( int i, int j, float edgeLength, float minX, float minY, QuadSphereFace face )
         {
             Vector3 pos;
             Vector3 posOffset;
             switch( face )
             {
                 case QuadSphereFace.Xp:
-                    pos = new Vector3( radius, (j * edgeLength) - radius, (i * edgeLength) - radius );
-                    posOffset = new Vector3( radius, 0, 0 );
+                    pos = new Vector3( 1.0f, (j * edgeLength) + minX, (i * edgeLength) + minY );
+                    posOffset = new Vector3( 1.0f, 0.0f, 0.0f );
                     break;
                 case QuadSphereFace.Xn:
-                    pos = new Vector3( -radius, (i * edgeLength) - radius, (j * edgeLength) - radius );
-                    posOffset = new Vector3( -radius, 0, 0 );
+                    pos = new Vector3( -1.0f, (i * edgeLength) + minX, (j * edgeLength) + minY );
+                    posOffset = new Vector3( -1.0f, 0.0f, 0.0f );
                     break;
                 case QuadSphereFace.Yp:
-                    pos = new Vector3( (i * edgeLength) - radius, radius, (j * edgeLength) - radius );
-                    posOffset = new Vector3( 0, radius, 0 );
+                    pos = new Vector3( (i * edgeLength) + minX, 1.0f, (j * edgeLength) + minY );
+                    posOffset = new Vector3( 0.0f, 1.0f, 0.0f );
                     break;
                 case QuadSphereFace.Yn:
-                    pos = new Vector3( (j * edgeLength) - radius, -radius, (i * edgeLength) - radius );
-                    posOffset = new Vector3( 0, -radius, 0 );
+                    pos = new Vector3( (j * edgeLength) + minX, -1.0f, (i * edgeLength) + minY );
+                    posOffset = new Vector3( 0.0f, -1.0f, 0.0f );
                     break;
                 case QuadSphereFace.Zp:
-                    pos = new Vector3( (j * edgeLength) - radius, (i * edgeLength) - radius, radius );
-                    posOffset = new Vector3( 0, 0, radius );
+                    pos = new Vector3( (j * edgeLength) + minX, (i * edgeLength) + minY, 1.0f );
+                    posOffset = new Vector3( 0.0f, 0.0f, 1.0f );
                     break;
                 case QuadSphereFace.Zn:
-                    pos = new Vector3( (i * edgeLength) - radius, (j * edgeLength) - radius, -radius );
-                    posOffset = new Vector3( 0, 0, -radius );
+                    pos = new Vector3( (i * edgeLength) + minX, (j * edgeLength) + minY, -1.0f );
+                    posOffset = new Vector3( 0.0f, 0.0f, -1.0f );
                     break;
                 default:
                     throw new ArgumentException( $"Invalid face orientation {face}", nameof( face ) );
             }
+            /*switch( face )
+            {
+                case QuadSphereFace.Xp:
+                   // pos = // edge length is given, min and max are given, so add those.
+                    pos = new Vector3( 1.0f, (j * edgeLength) - 1.0f, (i * edgeLength) - 1.0f );
+                    posOffset = new Vector3( 1.0f, 0.0f, 0.0f );
+                    break;
+                case QuadSphereFace.Xn:
+                    pos = new Vector3( -1.0f, (i * edgeLength) - 1.0f, (j * edgeLength) - 1.0f );
+                    posOffset = new Vector3( -1.0f, 0.0f, 0.0f );
+                    break;
+                case QuadSphereFace.Yp:
+                    pos = new Vector3( (i * edgeLength) - 1.0f, 1.0f, (j * edgeLength) - 1.0f );
+                    posOffset = new Vector3( 0.0f, 1.0f, 0.0f );
+                    break;
+                case QuadSphereFace.Yn:
+                    pos = new Vector3( (j * edgeLength) - 1.0f, -1.0f, (i * edgeLength) - 1.0f );
+                    posOffset = new Vector3( 0.0f, -1.0f, 0.0f );
+                    break;
+                case QuadSphereFace.Zp:
+                    pos = new Vector3( (j * edgeLength) - 1.0f, (i * edgeLength) - 1.0f, 1.0f );
+                    posOffset = new Vector3( 0.0f, 0.0f, 1.0f );
+                    break;
+                case QuadSphereFace.Zn:
+                    pos = new Vector3( (i * edgeLength) - 1.0f, (j * edgeLength) - 1.0f, -1.0f );
+                    posOffset = new Vector3( 0.0f, 0.0f, -1.0f );
+                    break;
+                default:
+                    throw new ArgumentException( $"Invalid face orientation {face}", nameof( face ) );
+            }*/
 
             pos.Normalize(); // unit sphere.
             return (pos, posOffset);

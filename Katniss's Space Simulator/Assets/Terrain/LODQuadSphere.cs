@@ -30,31 +30,9 @@ namespace KatnisssSpaceSimulator.Terrain
             _l0faces = new LODQuad[6];
             for( int i = 0; i < 6; i++ )
             {
-                CreateMeshPart( _celestialBody.transform, (QuadSphereFace)i );
+                _l0faces[i] = LODQuad.Create( _celestialBody.transform, _celestialBody.Radius, DefaultSubdivisions, Vector2.zero, 0, (QuadSphereFace)i );
+                LODQuad.Subdivide( _l0faces[i] );
             }
-        }
-
-        private LODQuad CreateMeshPart( Transform cbTransform, QuadSphereFace face )
-        {
-            GameObject go = new GameObject( "mesh" );
-            go.transform.SetParent( cbTransform );
-            go.transform.localPosition = Vector3.zero;
-            go.transform.localRotation = Quaternion.identity;
-            go.transform.localScale = Vector3.one;
-
-            MeshRenderer mr = go.AddComponent<MeshRenderer>();
-            mr.material = FindObjectOfType<zzzTestGameManager>().CBMaterial;
-
-            go.AddComponent<MeshCollider>();
-
-            Vector3 dir = face.ToVector3();
-            Vector3Dbl offset = ((Vector3Dbl)dir) * _celestialBody.Radius;
-
-            LODQuad q = go.AddComponent<LODQuad>();
-            q.SetL0( offset, DefaultSubdivisions, _celestialBody.Radius );
-            _l0faces[(int)face] = q;
-
-            return q;
         }
     }
 }
