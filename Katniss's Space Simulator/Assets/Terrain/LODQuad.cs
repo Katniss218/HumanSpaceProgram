@@ -1,4 +1,5 @@
 ﻿using KatnisssSpaceSimulator.Core;
+using KatnisssSpaceSimulator.Core.ReferenceFrames;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,30 +21,37 @@ namespace KatnisssSpaceSimulator.Terrain
     {
         // Generated meshes have relatively higher precision because the vertices are closer to the origin of the mesh, than to the origin of the celestial body.
 
-        public LODQuad Parent { get; private set; }
-        public LODQuad[] Children { get; private set; } = new LODQuad[4];
+        public const int HARD_LIMIT_LN = 10;
 
-        /// <summary>
-        /// Checks if the quad is l0 (doesn't have a parent). L0 is the quad with no subdivisions (0th level of subdivision).
-        /// </summary>
-        public bool IsL0 { get => _lN == 0; }
+        public LODQuadTree.Node Node { get; set; }
 
         /// <summary>
         /// How many binary edge subdivisions per subdiv level.
         /// </summary>
         public int EdgeSubdivisions { get; private set; }
 
+        LODQuadSphere _quadSphere;
+
         public CelestialBody CelestialBody { get; private set; }
+
+        public float SubdivisionDistance { get; private set; }
 
         QuadSphereFace _face;
 
         MeshFilter _meshFilter;
         MeshRenderer _meshRenderer;
 
+        public Vector3Dbl? airfPOI { get; set; }
+
         // 2D center of the quad
         Vector2 _center;
         // subdiv level
         int _lN;
+
+        /// <summary>
+        /// Checks if the quad is l0 (doesn't have a parent). L0 is the quad with no subdivisions (0th level of subdivision).
+        /// </summary>
+        public bool IsL0 { get => _lN == 0; }
 
         void Awake()
         {
@@ -51,9 +59,75 @@ namespace KatnisssSpaceSimulator.Terrain
             _meshRenderer = this.GetComponent<MeshRenderer>();
         }
 
+        void Update()
+        {
+            if( airfPOI == null )
+            {
+                if( !this.IsL0 )
+                {
+                    //  Unsubdivide( this );
+                }
+                return;
+            }
+
+            Vector3Dbl airfQuad = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.transform.position );
+            double dist = (airfPOI.Value - airfQuad).magnitude;
+            if( (float)dist < SubdivisionDistance )
+            {
+                if( this._lN < HARD_LIMIT_LN )
+                {
+                    Subdivide( this );
+                }
+                return;
+            }
+
+            if( !this.IsL0 )
+            {
+                foreach( var childNode in this.Node.Parent.Children )
+                {
+                    if( childNode.Value == null )
+                        return; // one of the siblings is subdivided
+                }
+
+                // if distance to would-be-parent is more than its subdiv radius
+                Vector2 center = this.GetSiblingCenter();
+                Vector3 originBodySpace = MeshUtils.GetSpherePoint( center.x, center.y, _face ) * (float)CelestialBody.Radius;
+
+                Vector3Dbl airfPosQuadParent = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.CelestialBody.transform.TransformPoint( originBodySpace ) );
+                double dist2 = (airfPOI.Value - airfPosQuadParent).magnitude;
+                if( dist2 > this.SubdivisionDistance * 2 )
+                {
+                    Unsubdivide( this );
+                }
+                return;
+            }
+        }
+
         private static float GetSize( int lN )
         {
-            return 2.0f / (lN + 1);
+            float s = 2.0f;
+            while( lN > 0 )
+            {
+                s /= 2f;
+                lN--;
+            }
+            return s;
+        }
+
+        private Vector2 GetSiblingCenter()
+        {
+            double centerX = 0;
+            double centerY = 0;
+
+            foreach( var qSibling in this.Node.Parent.Children )
+            {
+                centerX += qSibling.Value._center.x;
+                centerY += qSibling.Value._center.y;
+            }
+
+            centerX /= 4.0;
+            centerY /= 4.0;
+            return new Vector2( (float)centerX, (float)centerY );
         }
 
         /// <summary>
@@ -82,9 +156,21 @@ namespace KatnisssSpaceSimulator.Terrain
         /// </summary>
         public static void Subdivide( LODQuad q )
         {
+            if( q._lN >= HARD_LIMIT_LN )
+            {
+                return;
+            }
+            if( q.Node.Children != null )
+            {
+                Debug.LogWarning( "Tried subdividing a subdivided node" );
+                return;
+            }
+
             float size = GetSize( q._lN );
             float halfSize = size / 2f;
             float quarterSize = size / 4f;
+
+            q.Node.Children = new LODQuadTree.Node[2, 2];
 
             for( int i = 0; i < 4; i++ )
             {
@@ -95,43 +181,73 @@ namespace KatnisssSpaceSimulator.Terrain
 
                 Vector3 origin = MeshUtils.GetSpherePoint( center.x, center.y, q._face ) * (float)q.CelestialBody.Radius;
 
-                var quad = Create( q.transform.parent, origin, q.CelestialBody, q.EdgeSubdivisions, center, q._lN + 1, q._face ); ;
-                
-                q.Children[i] = quad;
-                quad.Parent = q;
+                var quad = Create( q.transform.parent, origin, q._quadSphere, q.CelestialBody, q.EdgeSubdivisions, center, q._lN + 1, q.SubdivisionDistance / 2f, q._face );
+
+                q.Node.Children[x, y] = new LODQuadTree.Node() { Value = quad, Parent = q.Node };
+                quad.Node = q.Node.Children[x, y];
             }
 
-            q.Hide();
+            q.airfPOI = null;
+            q.Node.Value = null;
+
+            Destroy( q.gameObject );
+            // q.Hide();
         }
 
         /// <summary>
         /// Joins the specified quad and its 3 siblings into a single quad of lower level.
         /// </summary>
-        public static void Unsubdivide( LODQuad q )
+        static void Unsubdivide( LODQuad q )
         {
-            if( q.IsL0 )
+            if( q._lN <= 0 )
             {
-                throw new ArgumentException( $"Can't unsubdivide a quad of level 0.", nameof( q ) );
+                Debug.LogWarning( "Tried subdividing an l0 node" );
+                return;
             }
 
-            LODQuad[] siblings = q.Parent.Children; // merge these.
+            foreach( var s in q.Node.Parent.Children )
+            {
+                if( s == null )
+                    return; // one of the siblings is subdivided
+            }
 
-            throw new NotImplementedException();
+            Vector2 center = q.GetSiblingCenter(); // this is good.
+            Vector3 origin = MeshUtils.GetSpherePoint( center.x, center.y, q._face ) * (float)q.CelestialBody.Radius; // good too
+            var quad = Create( q.transform.parent, origin, q._quadSphere, q.CelestialBody, q.EdgeSubdivisions, center, q._lN - 1, q.SubdivisionDistance * 2f, q._face );
+            quad.airfPOI = q.airfPOI; // VERY IMPORTANT (I don't like that it is). without it, the update will snatch it up and unsubdivide again and again and again.
+
+            quad.Node = q.Node.Parent;
+
+#warning TODO - Sometimes the un-subdivision fails. Quads get placed in weird places, and with weird levels of subdiv. idk why.
+            foreach( var qSibling in q.Node.Parent.Children )
+            {
+                qSibling.Value.airfPOI = null;
+                // qSibling.Hide();
+                Destroy( qSibling.Value.gameObject );
+            }
+
+            q.Node.Parent.Children = null;
+
+            // q.Hide();
+            // quadtree structure to store the hierarchy? that should make it easy to calc.
+
+            //q.Parent.Show();
+
             // Hide self, along with 3 siblings, and show the larger parent quad.
         }
 
         // Come up with some algorithm for determining when to discard the hidden (cached) levels' mesh data.
 
-        public bool IsHidden { get => this._meshRenderer.enabled; }
+        public bool IsHidden { get => this.gameObject.activeSelf; }
 
         void Show()
         {
-            this._meshRenderer.enabled = true;
+            this.gameObject.SetActive( true );
         }
 
         void Hide()
         {
-            this._meshRenderer.enabled = false;
+            this.gameObject.SetActive( false );
         }
 
         /// <summary>
@@ -246,9 +362,9 @@ namespace KatnisssSpaceSimulator.Terrain
             return mesh;
         }
 
-        public static LODQuad Create( Transform parent, Vector3 localPosition, CelestialBody celestialBody, int defaultSubdivisions, Vector2 center, int lN, QuadSphereFace face )
+        public static LODQuad Create( Transform parent, Vector3 localPosition, LODQuadSphere quadSphere, CelestialBody celestialBody, int defaultSubdivisions, Vector2 center, int lN, float subdivisionDistance, QuadSphereFace face )
         {
-            GameObject go = new GameObject( $"LODQuad L{lN}, {face}, {center}" );
+            GameObject go = new GameObject( $"LODQuad L{lN}, {face}, ({center.x:#0.################}, {center.y:#0.################})" );
             go.transform.SetParent( parent );
 
             MeshRenderer mr = go.AddComponent<MeshRenderer>();
@@ -258,6 +374,8 @@ namespace KatnisssSpaceSimulator.Terrain
 
             LODQuad q = go.AddComponent<LODQuad>();
             q.CelestialBody = celestialBody;
+            q._quadSphere = quadSphere;
+            q.SubdivisionDistance = subdivisionDistance;
             q.SetLN( localPosition, defaultSubdivisions, center, lN, face );
 
             return q;

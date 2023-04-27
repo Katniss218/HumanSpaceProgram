@@ -67,7 +67,7 @@ namespace KatnisssSpaceSimulator
             Vessel v = fac.CreatePartless( airfPosition, rotation );
             pfac.CreateRoot( v );
 
-            const int partcount = 300;
+            const int partcount = 5;
             const int engcount = 5;
 
             Part parent = v.RootPart;
@@ -84,7 +84,7 @@ namespace KatnisssSpaceSimulator
                 pfac.Create( parent, new Vector3( 0, 1.125f * i, 0 ), Quaternion.identity );
 
                 FRocketEngine rn = v.RootPart.gameObject.AddComponent<FRocketEngine>();
-                rn.MaxThrust = (100 / engcount) * (partcount / 20);
+                rn.MaxThrust = 100;
                 rn.ThrustTransform = v.RootPart.transform.Find( "thrust" );
 
                 parent = parent.Children[0];

@@ -19,7 +19,7 @@ namespace KatnisssSpaceSimulator.Terrain
         /// </summary>
         public int EdgeSubdivisions { get; private set; } = 4;
 
-        LODQuad[] _l0faces;
+        LODQuadTree[] _quadTree;
         CelestialBody _celestialBody;
 
         void Awake()
@@ -30,11 +30,28 @@ namespace KatnisssSpaceSimulator.Terrain
 
         void Start()
         {
-            _l0faces = new LODQuad[6];
+            _quadTree = new LODQuadTree[6];
             for( int i = 0; i < 6; i++ )
             {
-                _l0faces[i] = LODQuad.Create( _celestialBody.transform, ((QuadSphereFace)i).ToVector3(), _celestialBody, EdgeSubdivisions, Vector2.zero, 0, (QuadSphereFace)i );
-                LODQuad.Subdivide( _l0faces[i] );
+                var face = LODQuad.Create( _celestialBody.transform, ((QuadSphereFace)i).ToVector3() * (float)_celestialBody.Radius, this, _celestialBody, EdgeSubdivisions, Vector2.zero, 0, (float)_celestialBody.Radius * 2f, (QuadSphereFace)i );
+                _quadTree[i] = new LODQuadTree();
+                _quadTree[i].Root = new LODQuadTree.Node()
+                {
+                    Value = face
+                };
+                face.Node = _quadTree[i].Root;
+            }
+        }
+
+        void Update()
+        {
+            foreach( var q in _quadTree )
+            {
+                foreach( var qq in q.GetLeafNodes() ) // todo - optimize.
+                {
+                    if( qq != null )
+                        qq.airfPOI = VesselManager.ActiveVessel.AIRFPosition;
+                }
             }
         }
 

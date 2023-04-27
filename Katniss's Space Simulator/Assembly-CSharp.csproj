@@ -89,6 +89,7 @@
     <Compile Include="Assets\Core\Functionality.cs" />
     <Compile Include="Assets\TimeWarp\TimeWarpManager.cs" />
     <Compile Include="Assets\Core\ReferenceFrames\IReferenceFrame.cs" />
+    <Compile Include="Assets\Terrain\LODQuadTree.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro.cginc" />
