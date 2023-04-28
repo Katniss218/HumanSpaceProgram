@@ -46,12 +46,13 @@ namespace KatnisssSpaceSimulator.Terrain
         // 2D center of the quad
         Vector2 _center;
         // subdiv level
-        int _lN;
+        [field: SerializeField]
+        public int LN { get; private set; }
 
         /// <summary>
         /// Checks if the quad is l0 (doesn't have a parent). L0 is the quad with no subdivisions (0th level of subdivision).
         /// </summary>
-        public bool IsL0 { get => _lN == 0; }
+        public bool IsL0 { get => LN == 0; }
 
         void Awake()
         {
@@ -74,18 +75,19 @@ namespace KatnisssSpaceSimulator.Terrain
             double dist = (airfPOI.Value - airfQuad).magnitude;
             if( (float)dist < SubdivisionDistance )
             {
-                if( this._lN < HARD_LIMIT_LN )
+                if( this.LN < HARD_LIMIT_LN )
                 {
                     Subdivide( this );
                 }
                 return;
             }
 
-            if( !this.IsL0 )
+            if( this.LN > 0 )
             {
-                foreach( var childNode in this.Node.Parent.Children )
+                foreach( var siblingNode in this.Node.Parent.Children )
                 {
-                    if( childNode.Value == null )
+#warning TODO - doesn't catch correctly.
+                    if( siblingNode.Children != null )
                         return; // one of the siblings is subdivided
                 }
 
@@ -137,7 +139,7 @@ namespace KatnisssSpaceSimulator.Terrain
         {
             this.EdgeSubdivisions = edgeSubdivisions;
             this._center = center;
-            this._lN = lN;
+            this.LN = lN;
             this._face = face;
 
             // Unity keeps the local positions of objects internally.
@@ -156,7 +158,7 @@ namespace KatnisssSpaceSimulator.Terrain
         /// </summary>
         public static void Subdivide( LODQuad q )
         {
-            if( q._lN >= HARD_LIMIT_LN )
+            if( q.LN >= HARD_LIMIT_LN )
             {
                 return;
             }
@@ -166,7 +168,7 @@ namespace KatnisssSpaceSimulator.Terrain
                 return;
             }
 
-            float size = GetSize( q._lN );
+            float size = GetSize( q.LN );
             float halfSize = size / 2f;
             float quarterSize = size / 4f;
 
@@ -181,7 +183,7 @@ namespace KatnisssSpaceSimulator.Terrain
 
                 Vector3 origin = MeshUtils.GetSpherePoint( center.x, center.y, q._face ) * (float)q.CelestialBody.Radius;
 
-                var quad = Create( q.transform.parent, origin, q._quadSphere, q.CelestialBody, q.EdgeSubdivisions, center, q._lN + 1, q.SubdivisionDistance / 2f, q._face );
+                var quad = Create( q.transform.parent, origin, q._quadSphere, q.CelestialBody, q.EdgeSubdivisions, center, q.LN + 1, q.SubdivisionDistance / 2f, q._face );
 
                 q.Node.Children[x, y] = new LODQuadTree.Node() { Value = quad, Parent = q.Node };
                 quad.Node = q.Node.Children[x, y];
@@ -199,26 +201,27 @@ namespace KatnisssSpaceSimulator.Terrain
         /// </summary>
         static void Unsubdivide( LODQuad q )
         {
-            if( q._lN <= 0 )
+            if( q.LN <= 0 )
             {
                 Debug.LogWarning( "Tried subdividing an l0 node" );
                 return;
             }
 
-            foreach( var s in q.Node.Parent.Children )
+            foreach( var siblingNode in q.Node.Parent.Children )
             {
-                if( s == null )
+                if( siblingNode.Children != null )
                     return; // one of the siblings is subdivided
             }
 
             Vector2 center = q.GetSiblingCenter(); // this is good.
             Vector3 origin = MeshUtils.GetSpherePoint( center.x, center.y, q._face ) * (float)q.CelestialBody.Radius; // good too
-            var quad = Create( q.transform.parent, origin, q._quadSphere, q.CelestialBody, q.EdgeSubdivisions, center, q._lN - 1, q.SubdivisionDistance * 2f, q._face );
+            var quad = Create( q.transform.parent, origin, q._quadSphere, q.CelestialBody, q.EdgeSubdivisions, center, q.LN - 1, q.SubdivisionDistance * 2f, q._face );
             quad.airfPOI = q.airfPOI; // VERY IMPORTANT (I don't like that it is). without it, the update will snatch it up and unsubdivide again and again and again.
 
             quad.Node = q.Node.Parent;
+            // when unsubdividing, the children don't get reset correctly?
+            //quad.Node.Parent.Children[???] = quad;
 
-#warning TODO - Sometimes the un-subdivision fails. Quads get placed in weird places, and with weird levels of subdiv. idk why.
             foreach( var qSibling in q.Node.Parent.Children )
             {
                 qSibling.Value.airfPOI = null;
@@ -255,7 +258,7 @@ namespace KatnisssSpaceSimulator.Terrain
         /// </summary>
         void GenerateMeshData()
         {
-            Mesh mesh = GeneratePartialCubeSphere( EdgeSubdivisions, (float)CelestialBody.Radius, _center, _lN, this.transform.localPosition ); // (0, 0) and 2 are the full quad.
+            Mesh mesh = GeneratePartialCubeSphere( EdgeSubdivisions, (float)CelestialBody.Radius, _center, LN, this.transform.localPosition ); // (0, 0) and 2 are the full quad.
             this.transform.GetComponent<MeshCollider>().sharedMesh = mesh;
             this.transform.GetComponent<MeshFilter>().sharedMesh = mesh;
         }
