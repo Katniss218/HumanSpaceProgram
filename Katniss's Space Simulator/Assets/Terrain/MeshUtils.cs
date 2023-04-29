@@ -102,6 +102,7 @@ namespace KatnisssSpaceSimulator.Terrain
 
 
 #warning TODO - l0 requires an additional set of vertices at Z- because UVs need to overlap on both 0.0 and 1.0 there. non-l0 require to increase the U coordinate to 1 instead of 0.
+                    // alternatively, cubemap texture? (would fix also the other related jankiness)
                     // EuclideanToGeodetic also returns the same value regardless, we should implement this fix here.
 
                     Vector3 unitSpherePos = (Vector3)posD;
@@ -110,11 +111,11 @@ namespace KatnisssSpaceSimulator.Terrain
                     float u = (latitude * Mathf.Deg2Rad + 1.5f * Mathf.PI) / (2 * Mathf.PI);
                     float v = longitude * Mathf.Deg2Rad / Mathf.PI;
 
-                    if( (face == QuadSphereFace.Xn || face == QuadSphereFace.Zp || face == QuadSphereFace.Zn)
+                    /*if( (face == QuadSphereFace.Xn || face == QuadSphereFace.Zp || face == QuadSphereFace.Zn)
                       && unitSpherePos.y == 0 && unitSpherePos.x <= 0 )
                     {
                         u = 0.75f; // just setting to 0.75 doesn't work
-                    }
+                    }*/
 
                     uvs[index] = new Vector2( u, v );
                     vertices[index] = (Vector3)((posD * radius) - origin);
@@ -148,14 +149,107 @@ namespace KatnisssSpaceSimulator.Terrain
 
             Mesh mesh = new Mesh();
 
-            mesh.vertices = vertices.ToArray();
-            mesh.normals = normals;
-            mesh.uv = uvs; // UVs are harder, requires spherical coordinates and transforming from the planet origin to the mesh island origin.
-            mesh.triangles = triangles.ToArray();
+            mesh.SetVertices( vertices.ToArray() );
+            mesh.SetNormals( normals );
+            mesh.SetUVs( 0, uvs );
+            mesh.SetTriangles( triangles.ToArray(), 0 );
             mesh.RecalculateTangents();
+
+            // For SOME REASON, this fixes tangents on the relatively highly subdivided parts of the mesh.
+            // I have no idea why builtin solver can't handle them...
+            if( numberOfEdges * (1 << lN) >= 1024 ) // Also doesn't seem to be affected by the actual size of the mesh (changing body radius doesn't change which quads' tangents fail).
+            {
+                mesh.FlipTangents();
+            }
             mesh.RecalculateBounds();
 
             return mesh;
+        }
+
+        public static void FlipTangents( this Mesh mesh )
+        {
+            var tang = mesh.tangents;
+            for( int i = 0; i < tang.Length; i++ )
+            {
+                tang[i] = -tang[i];
+            }
+            mesh.tangents = tang;
+        }
+
+        public static void CalculateMeshTangents( this Mesh mesh )
+        {
+            //speed up math by copying the mesh arrays
+            int[] triangles = mesh.triangles;
+            Vector3[] vertices = mesh.vertices;
+            Vector2[] uv = mesh.uv;
+            Vector3[] normals = mesh.normals;
+
+            //variable definitions
+            int triangleCount = triangles.Length;
+            int vertexCount = vertices.Length;
+
+            Vector3[] tan1 = new Vector3[vertexCount];
+            Vector3[] tan2 = new Vector3[vertexCount];
+
+            Vector4[] tangents = new Vector4[vertexCount];
+
+            for( int i = 0; i < triangleCount; i += 3 )
+            {
+                int i1 = triangles[i];
+                int i2 = triangles[i + 1];
+                int i3 = triangles[i + 2];
+
+                Vector3 v1 = vertices[i1];
+                Vector3 v2 = vertices[i2];
+                Vector3 v3 = vertices[i3];
+
+                Vector2 uv1 = uv[i1];
+                Vector2 uv2 = uv[i2];
+                Vector2 uv3 = uv[i3];
+
+                float v1tov2X = v2.x - v1.x;
+                float v1tov3X = v3.x - v1.x;
+                float v1tov2Y = v2.y - v1.y;
+                float v1tov3Y = v3.y - v1.y;
+                float v1tov2Z = v2.z - v1.z;
+                float v1tov3Z = v3.z - v1.z;
+
+                float uv1ToUv2X = uv2.x - uv1.x;
+                float uv1ToUv3X = uv3.x - uv1.x;
+                float uv1ToUv2Y = uv2.y - uv1.y;
+                float uv1ToUv3Y = uv3.y - uv1.y;
+
+#warning TODO - this seems to mostly work, but this line causes issues with very high subdiv levels.
+                float div = uv1ToUv2X * uv1ToUv3Y - uv1ToUv3X * uv1ToUv2Y;
+                float r = div == 0.0f ? 0f : 1.0f / div;
+
+                Vector3 sdir = new Vector3( (uv1ToUv3Y * v1tov2X - uv1ToUv2Y * v1tov3X) * r, (uv1ToUv3Y * v1tov2Y - uv1ToUv2Y * v1tov3Y) * r, (uv1ToUv3Y * v1tov2Z - uv1ToUv2Y * v1tov3Z) * r );
+                Vector3 tdir = new Vector3( (uv1ToUv2X * v1tov3X - uv1ToUv3X * v1tov2X) * r, (uv1ToUv2X * v1tov3Y - uv1ToUv3X * v1tov2Y) * r, (uv1ToUv2X * v1tov3Z - uv1ToUv3X * v1tov2Z) * r );
+
+                tan1[i1] += sdir;
+                tan1[i2] += sdir;
+                tan1[i3] += sdir;
+
+                tan2[i1] += tdir;
+                tan2[i2] += tdir;
+                tan2[i3] += tdir;
+            }
+
+            for( int i = 0; i < vertexCount; ++i )
+            {
+                Vector3 normal = normals[i];
+                Vector3 tangent = tan1[i];
+
+                Vector3.OrthoNormalize( ref normal, ref tangent );
+                tangents[i].x = tangent.x;
+                tangents[i].y = tangent.y;
+                tangents[i].z = tangent.z;
+
+                // w is used to store "handedness" of the binormal.
+                tangents[i].w = (Vector3.Dot( Vector3.Cross( normal, tangent ), tan2[i] ) < 0.0f) ? -1.0f : 1.0f;
+            }
+
+            mesh.tangents = tangents;
         }
     }
 }
