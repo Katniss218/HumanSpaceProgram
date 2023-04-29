@@ -8,6 +8,7 @@ Executable/
 Assets/StreamingAssets/*.meta
 Logs/
 MemoryCaptures/
+ProfilerExports/
 
 # Visual Studio cache directory
 .vs/
