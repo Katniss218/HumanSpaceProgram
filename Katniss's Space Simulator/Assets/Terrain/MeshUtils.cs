@@ -155,10 +155,17 @@ namespace KatnisssSpaceSimulator.Terrain
             mesh.SetTriangles( triangles.ToArray(), 0 );
             mesh.RecalculateTangents();
 
+            var tang = mesh.tangents;
+            /*if(  )
+            {
+
+            }*/
             // For SOME REASON, this fixes tangents on the relatively highly subdivided parts of the mesh.
             // I have no idea why builtin solver can't handle them...
-            if( numberOfEdges * (1 << lN) >= 1024 ) // Also doesn't seem to be affected by the actual size of the mesh (changing body radius doesn't change which quads' tangents fail).
+            if( tang[tang.Length / 4].w == 1.0f /*numberOfEdges * (1 << lN) >= 1024*/ ) // Also doesn't seem to be affected by the actual size of the mesh (changing body radius doesn't change which quads' tangents fail).
             {
+                // at some point, some tangents seem to end up with positive `w`.
+                // I don't know why. Maybe not curvy enough? idfk...
                 mesh.FlipTangents();
             }
             mesh.RecalculateBounds();
