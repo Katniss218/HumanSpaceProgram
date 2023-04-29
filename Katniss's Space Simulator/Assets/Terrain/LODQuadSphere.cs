@@ -33,11 +33,15 @@ namespace KatnisssSpaceSimulator.Terrain
             _quadTree = new LODQuadTree[6];
             for( int i = 0; i < 6; i++ )
             {
-                var face = LODQuad.Create( _celestialBody.transform, ((QuadSphereFace)i).ToVector3() * (float)_celestialBody.Radius, this, _celestialBody, EdgeSubdivisions, Vector2.zero, 0, (float)_celestialBody.Radius * 2f, (QuadSphereFace)i );
+                Vector2 center = Vector2.zero;
+                int lN = 0;
+                var face = LODQuad.Create( _celestialBody.transform, ((QuadSphereFace)i).ToVector3() * (float)_celestialBody.Radius, this, _celestialBody, EdgeSubdivisions, center, lN, (float)_celestialBody.Radius * 2f, (QuadSphereFace)i );
                 _quadTree[i] = new LODQuadTree();
                 _quadTree[i].Root = new LODQuadTree.Node()
                 {
-                    Value = face
+                    Value = face,
+                    Center = center,
+                    Size = LODQuad.GetSize( lN )
                 };
                 face.Node = _quadTree[i].Root;
             }

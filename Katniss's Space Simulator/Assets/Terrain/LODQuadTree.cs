@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace KatnisssSpaceSimulator.Terrain
 {
@@ -11,6 +12,8 @@ namespace KatnisssSpaceSimulator.Terrain
         public class Node
         {
             public LODQuad Value { get; set; }
+            public Vector2 Center { get; set; }
+            public float Size { get; set; }
 
             public Node Parent { get; set; }
 

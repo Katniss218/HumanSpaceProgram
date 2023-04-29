@@ -21,7 +21,7 @@ namespace KatnisssSpaceSimulator.Terrain
     {
         // Generated meshes have relatively higher precision because the vertices are closer to the origin of the mesh, than to the origin of the celestial body.
 
-        public const int HARD_LIMIT_LN = 10;
+        public const int HARD_LIMIT_LN = 15;
 
         public LODQuadTree.Node Node { get; set; }
 
@@ -86,7 +86,6 @@ namespace KatnisssSpaceSimulator.Terrain
             {
                 foreach( var siblingNode in this.Node.Parent.Children )
                 {
-#warning TODO - doesn't catch correctly.
                     if( siblingNode.Children != null )
                         return; // one of the siblings is subdivided
                 }
@@ -105,7 +104,7 @@ namespace KatnisssSpaceSimulator.Terrain
             }
         }
 
-        private static float GetSize( int lN )
+        public static float GetSize( int lN )
         {
             float s = 2.0f;
             while( lN > 0 )
@@ -153,6 +152,38 @@ namespace KatnisssSpaceSimulator.Terrain
             this.GenerateMeshData();
         }
 
+        public static (int childXIndex, int childYIndex) GetChildIndex( int i )
+        {
+            int x = i % 2;
+            int y = i / 2;
+
+            return (x, y);
+        }
+
+        public static Vector2 GetChildCenter( Vector2 parentCenter, float parentSize, int childXIndex, int childYIndex )
+        {
+            // Returns the midpoints between the parent's center and the parent's edge.
+            // For both x and y, it should return:
+            // - childIndex == 0 => child < parent
+            // - childIndex == 1 => child > parent
+
+            float halfSize = parentSize / 2f;
+            float quarterSize = parentSize / 4f;
+
+            float x = parentCenter.x - quarterSize + (childXIndex * halfSize);
+            float y = parentCenter.y - quarterSize + (childYIndex * halfSize);
+            return new Vector2( x, y );
+        }
+
+        public static (int childXIndex, int childYIndex) GetChildIndex( Vector2 parentCenter, Vector2 childCenter )
+        {
+            // - childIndex == 0 => child < parent
+            // - childIndex == 1 => child > parent
+            int x = childCenter.x < parentCenter.x ? 0 : 1;
+            int y = childCenter.y < parentCenter.y ? 0 : 1;
+            return (x, y);
+        }
+
         /// <summary>
         /// Splits the specified quad into 4 separate quads.
         /// </summary>
@@ -168,25 +199,28 @@ namespace KatnisssSpaceSimulator.Terrain
                 return;
             }
 
-            float size = GetSize( q.LN );
-            float halfSize = size / 2f;
-            float quarterSize = size / 4f;
+            float parentSize = GetSize( q.LN );
 
             q.Node.Children = new LODQuadTree.Node[2, 2];
 
             for( int i = 0; i < 4; i++ )
             {
-                int x = i % 2;
-                int y = i / 2;
+                (int xIndex, int yIndex) = GetChildIndex( i );
 
-                Vector2 center = new Vector2( q._center.x - quarterSize + (x * halfSize), q._center.y - quarterSize + (y * halfSize) );
+                Vector2 center = GetChildCenter( q._center, parentSize, xIndex, yIndex );
 
                 Vector3 origin = MeshUtils.GetSpherePoint( center.x, center.y, q._face ) * (float)q.CelestialBody.Radius;
 
                 var quad = Create( q.transform.parent, origin, q._quadSphere, q.CelestialBody, q.EdgeSubdivisions, center, q.LN + 1, q.SubdivisionDistance / 2f, q._face );
 
-                q.Node.Children[x, y] = new LODQuadTree.Node() { Value = quad, Parent = q.Node };
-                quad.Node = q.Node.Children[x, y];
+                q.Node.Children[xIndex, yIndex] = new LODQuadTree.Node()
+                {
+                    Value = quad,
+                    Center = center,
+                    Size = GetSize( quad.LN ),
+                    Parent = q.Node
+                };
+                quad.Node = q.Node.Children[xIndex, yIndex];
             }
 
             q.airfPOI = null;
@@ -219,9 +253,15 @@ namespace KatnisssSpaceSimulator.Terrain
             quad.airfPOI = q.airfPOI; // VERY IMPORTANT (I don't like that it is). without it, the update will snatch it up and unsubdivide again and again and again.
 
             quad.Node = q.Node.Parent;
-            // when unsubdividing, the children don't get reset correctly?
-            //quad.Node.Parent.Children[???] = quad;
+            if( !quad.IsL0 )
+            {
+                // when unsubdividing, the children don't get reset correctly?
+                (int x, int y) = GetChildIndex( quad.Node.Parent.Center, center );
 
+                quad.Node.Parent.Children[x, y].Value = quad;
+            }
+
+            // Destroy the other 3 siblings of the unsubdivided quad.
             foreach( var qSibling in q.Node.Parent.Children )
             {
                 qSibling.Value.airfPOI = null;
@@ -283,9 +323,14 @@ namespace KatnisssSpaceSimulator.Terrain
         /// <param name="lN">How many times this mesh was subdivided (l0, l1, l2, ...).</param>
         static Mesh GeneratePartialCubeSphere( int subdivisions, float radius, Vector2 center, int lN, Vector3 origin )
         {
-            // The origin of a valid, binarily subdivided quad will never be at the edge of any of the infinitely many theoretically possible subdivision levels.
+            // The origin of a valid, the center will never be at any of the edges of its ancestors, and will always be at the point where the inner edges of its direct children meet.
 
-            // If converted to doubles internally, it should be more precise and match positions relative to body center for all subdiv levels (origin should remain as float vector though).
+            // Double conversion:
+            // - All inputs are still in floats (origin).
+            // - Expand them to doubles first.
+            // - Sphere-centric vertices are in doubles.
+            // - Subtract the double-precision origin from the double-precision vertex position.
+            // - Collapse the new vertex position back to floats (won't lose as much precision, because the origin-centric position is closer to (0,0,0) than sphere-centric position).
 
             QuadSphereFace face = QuadSphereFaceEx.FromVector( origin.normalized );
 
@@ -315,16 +360,22 @@ namespace KatnisssSpaceSimulator.Terrain
                     float quadY = (j * edgeLength) + minY;
 
                     Vector3 pos = MeshUtils.GetSpherePoint( quadX, quadY, face );
+#warning TODO - subdivisions require being able to make either of the 4 edges act like it's either lN, or lN-1 (if lN-1, then each other vertex will use the average of the vertices next to it).
+                    // Later should be able to regenerate an edge without regenerating the entire mesh.
 
-#warning TODO - l0 requires an additional set of vertices at Z- because UVs need to overlap on both 0.0 and 1.0 there. 
-                    // EuclideanToGeodetic also returns the same value regardless, we should check here.
+
+#warning TODO - l0 requires an additional set of vertices at Z- because UVs need to overlap on both 0.0 and 1.0 there. non-l0 require to increase the U coordinate to 1 instead of 0.
+                    // EuclideanToGeodetic also returns the same value regardless, we should implement this fix here.
                     // for Zn, Yp, Yn, needs to add extra vertex for every vert with x=0
 
                     Vector3 lla = CoordinateUtils.EuclideanToGeodetic( pos.x, pos.y, pos.z );
 
                     int index = (i * numberOfEdges) + i + j;
 
-                    uvs[index] = new Vector2( (lla.x * Mathf.Deg2Rad + 1.5f * Mathf.PI) / (2 * Mathf.PI), lla.y * Mathf.Deg2Rad / Mathf.PI );
+                    float u = (lla.x * Mathf.Deg2Rad + 1.5f * Mathf.PI) / (2 * Mathf.PI);
+                    float v = lla.y * Mathf.Deg2Rad / Mathf.PI;
+
+                    uvs[index] = new Vector2( u, v );
 
                     vertices[index] = (pos * radius) - origin;
                     normals[index] = pos; // Normals need to be calculated by hand to avoid seams not matching up.
