@@ -21,7 +21,10 @@ namespace KatnisssSpaceSimulator.Terrain
     {
         // Generated meshes have relatively higher precision because the vertices are closer to the origin of the mesh, than to the origin of the celestial body.
 
-        public const int HARD_LIMIT_LN = 15;
+        /// <summary>
+        /// The level of subdivision (lN) at which the quad will stop subdividing.
+        /// </summary>
+        public int HardLimitSubdivLevel { get; set; } = 20;
 
         public LODQuadTree.Node Node { get; set; }
 
@@ -75,7 +78,7 @@ namespace KatnisssSpaceSimulator.Terrain
             double dist = (airfPOI.Value - airfQuad).magnitude;
             if( (float)dist < SubdivisionDistance )
             {
-                if( this.LN < HARD_LIMIT_LN )
+                if( this.LN < HardLimitSubdivLevel )
                 {
                     Subdivide( this );
                 }
@@ -92,7 +95,7 @@ namespace KatnisssSpaceSimulator.Terrain
 
                 // if distance to would-be-parent is more than its subdiv radius
                 Vector2 center = this.GetSiblingCenter();
-                Vector3 originBodySpace = MeshUtils.GetSpherePoint( center.x, center.y, _face ) * (float)CelestialBody.Radius;
+                Vector3 originBodySpace = _face.GetSpherePoint( center.x, center.y ) * (float)CelestialBody.Radius;
 
                 Vector3Dbl airfPosQuadParent = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.CelestialBody.transform.TransformPoint( originBodySpace ) );
                 double dist2 = (airfPOI.Value - airfPosQuadParent).magnitude;
@@ -189,7 +192,7 @@ namespace KatnisssSpaceSimulator.Terrain
         /// </summary>
         public static void Subdivide( LODQuad q )
         {
-            if( q.LN >= HARD_LIMIT_LN )
+            if( q.LN >= q.HardLimitSubdivLevel )
             {
                 return;
             }
@@ -209,7 +212,7 @@ namespace KatnisssSpaceSimulator.Terrain
 
                 Vector2 center = GetChildCenter( q._center, parentSize, xIndex, yIndex );
 
-                Vector3 origin = MeshUtils.GetSpherePoint( center.x, center.y, q._face ) * (float)q.CelestialBody.Radius;
+                Vector3 origin = q._face.GetSpherePoint( center.x, center.y ) * (float)q.CelestialBody.Radius;
 
                 var quad = Create( q.transform.parent, origin, q._quadSphere, q.CelestialBody, q.EdgeSubdivisions, center, q.LN + 1, q.SubdivisionDistance / 2f, q._face );
 
@@ -248,7 +251,7 @@ namespace KatnisssSpaceSimulator.Terrain
             }
 
             Vector2 center = q.GetSiblingCenter(); // this is good.
-            Vector3 origin = MeshUtils.GetSpherePoint( center.x, center.y, q._face ) * (float)q.CelestialBody.Radius; // good too
+            Vector3 origin = q._face.GetSpherePoint( center.x, center.y ) * (float)q.CelestialBody.Radius; // good too
             var quad = Create( q.transform.parent, origin, q._quadSphere, q.CelestialBody, q.EdgeSubdivisions, center, q.LN - 1, q.SubdivisionDistance * 2f, q._face );
             quad.airfPOI = q.airfPOI; // VERY IMPORTANT (I don't like that it is). without it, the update will snatch it up and unsubdivide again and again and again.
 
@@ -359,14 +362,16 @@ namespace KatnisssSpaceSimulator.Terrain
                     float quadX = (i * edgeLength) + minX;
                     float quadY = (j * edgeLength) + minY;
 
-                    Vector3 pos = MeshUtils.GetSpherePoint( quadX, quadY, face );
-#warning TODO - subdivisions require being able to make either of the 4 edges act like it's either lN, or lN-1 (if lN-1, then each other vertex will use the average of the vertices next to it).
+                    Vector3Dbl posD = face.GetSpherePointDbl( quadX, quadY );
+#warning TODO - subdivisions require being able to make either of the 4 edges act like it's either lN, or lN-m (if lN-m, then each other vertex will use the weighted average of the nearby vertices at lN-m).
                     // Later should be able to regenerate an edge without regenerating the entire mesh.
 
 
 #warning TODO - l0 requires an additional set of vertices at Z- because UVs need to overlap on both 0.0 and 1.0 there. non-l0 require to increase the U coordinate to 1 instead of 0.
                     // EuclideanToGeodetic also returns the same value regardless, we should implement this fix here.
                     // for Zn, Yp, Yn, needs to add extra vertex for every vert with x=0
+
+                    Vector3 pos = (Vector3)posD;
 
                     Vector3 lla = CoordinateUtils.EuclideanToGeodetic( pos.x, pos.y, pos.z );
 
@@ -375,9 +380,10 @@ namespace KatnisssSpaceSimulator.Terrain
                     float u = (lla.x * Mathf.Deg2Rad + 1.5f * Mathf.PI) / (2 * Mathf.PI);
                     float v = lla.y * Mathf.Deg2Rad / Mathf.PI;
 
+#warning TODO - there is some funkiness with the collider physics (it acts as if the object was unparented (when unparenting, it changes scene position slightly)).
                     uvs[index] = new Vector2( u, v );
 
-                    vertices[index] = (pos * radius) - origin;
+                    vertices[index] = (Vector3)((posD * radius) - origin);
                     normals[index] = pos; // Normals need to be calculated by hand to avoid seams not matching up.
                 }
             }

@@ -57,41 +57,5 @@ namespace KatnisssSpaceSimulator.Terrain
 
             return mesh;
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns>Returns the normalized point on the surface of a cube, and the vector transforming the center-origin coordinates into face-origin.</returns>
-        public static Vector3 GetSpherePoint( float quadX, float quadY, QuadSphereFace face )
-        {
-            // quad x, y go in range [-1..1]
-            Vector3 pos;
-            switch( face )
-            {
-                case QuadSphereFace.Xp:
-                    pos = new Vector3( 1.0f, quadY, quadX );
-                    break;
-                case QuadSphereFace.Xn:
-                    pos = new Vector3( -1.0f, quadX, quadY );
-                    break;
-                case QuadSphereFace.Yp:
-                    pos = new Vector3( quadX, 1.0f, quadY );
-                    break;
-                case QuadSphereFace.Yn:
-                    pos = new Vector3( quadY, -1.0f, quadX );
-                    break;
-                case QuadSphereFace.Zp:
-                    pos = new Vector3( quadY, quadX, 1.0f );
-                    break;
-                case QuadSphereFace.Zn:
-                    pos = new Vector3( quadX, quadY, -1.0f );
-                    break;
-                default:
-                    throw new ArgumentException( $"Invalid face orientation {face}", nameof( face ) );
-            }
-
-            pos.Normalize(); // unit sphere.
-            return pos;
-        }
     }
 }

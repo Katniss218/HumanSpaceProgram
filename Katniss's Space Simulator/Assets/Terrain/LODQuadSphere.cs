@@ -54,7 +54,9 @@ namespace KatnisssSpaceSimulator.Terrain
                 foreach( var qq in q.GetLeafNodes() ) // todo - optimize.
                 {
                     if( qq != null )
+                    {
                         qq.airfPOI = VesselManager.ActiveVessel.AIRFPosition;
+                    }
                 }
             }
         }

@@ -9,12 +9,10 @@ using UnityEngine;
 namespace KatnisssSpaceSimulator.Core.ReferenceFrames
 {
     /// <remarks>
-    /// This class is my implementation of scene-wide Floating Origin / Krakensbane.
+    /// This class manages a scene-wide Floating Origin / Krakensbane.
     /// </remarks>
     public class SceneReferenceFrameManager : MonoBehaviour
     {
-        // something to force single instance of this would be nice in the future.
-
         public struct ReferenceFrameSwitchData
         {
             public IReferenceFrame OldFrame { get; set; }
@@ -60,16 +58,7 @@ namespace KatnisssSpaceSimulator.Core.ReferenceFrames
                 if( referenceFrameSwitch != null )
                 {
                     referenceFrameSwitch.OnSceneReferenceFrameSwitch( data );
-                    return;
                 }
-
-                obj.transform.position = ReferenceFrameUtils.GetNewPosition( data.OldFrame, data.NewFrame, obj.transform.position );
-                obj.transform.rotation = ReferenceFrameUtils.GetNewRotation( data.OldFrame, data.NewFrame, obj.transform.rotation );
-
-                // TODO - add rotations/scaling/etc later.
-                // Add PhysicsObject integration for things that have to get their forces/velocities/angular velocities/etc recalculated.
-
-                // trail/line renderers need to be updated too, if any exist. Possibly add an event here, so mods can hook into.
             }
         }
 

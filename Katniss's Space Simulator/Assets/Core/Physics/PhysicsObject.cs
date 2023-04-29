@@ -16,7 +16,8 @@ namespace KatnisssSpaceSimulator.Core.Physics
     /// This is a wrapper for some kind of internal physics solver and collision resolver.
     /// </remarks>
     [RequireComponent( typeof( Rigidbody ) )]
-    public class PhysicsObject : MonoBehaviour, IReferenceFrameSwitchResponder
+    [RequireComponent( typeof( RootObjectTransform ) )] // IMPORTANT: Changing the order here changes the order in which Awake() fires (setting the position of objects in the first frame depends on the fact that RB is added before root transform).
+    public class PhysicsObject : MonoBehaviour
     {
         // this class is basically either a celestial body of some kind, or a vessel. Something that moves on its own and is not parented to anything else.
 
@@ -48,30 +49,7 @@ namespace KatnisssSpaceSimulator.Core.Physics
         }
 
         Rigidbody _rb;
-
-        public Vector3Dbl AIRFPosition { get; private set; }
-
-        /// <summary>
-        /// Sets the position of the vessel in Absolute Inertial Reference Frame coordinates. Units in [m].
-        /// </summary>
-        public void SetPosition( Vector3Dbl airfPosition )
-        {
-            this.AIRFPosition = airfPosition;
-
-            Vector3 scenePos = SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformPosition( airfPosition );
-            this._rb.position = scenePos; // this is important.
-            this.transform.position = scenePos;
-        }
-
-        /// <summary>
-        /// Sets the rotation of the vessel in Absolute Inertial Reference Frame coordinates.
-        /// </summary>
-        public void SetRotation( Quaternion airfRotation )
-        {
-            Quaternion sceneRotation = SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformRotation( airfRotation );
-            this._rb.rotation = sceneRotation; // this is important.
-            this.transform.rotation = sceneRotation;
-        }
+        RootObjectTransform _rootTransform;
 
         /// <summary>
         /// Adds a force acting on the center of mass of the physics object. Does not apply any torque.
@@ -94,18 +72,11 @@ namespace KatnisssSpaceSimulator.Core.Physics
             return this._rb.ClosestPointOnBounds( worldSpacePosition );
         }
 
-        /// <summary>
-        /// Callback to the event.
-        /// </summary>
-        public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
-        {
-            // Kinda ugly tbh. Maybe just subscribe to it, and use the interface as a marker to prevent auto-update position?
-            this.transform.position = SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformPosition( this.AIRFPosition );
-        }
-
         void Awake()
         {
             _rb = this.GetComponent<Rigidbody>();
+            _rootTransform = this.GetComponent<RootObjectTransform>();
+
             _rb.useGravity = false;
             _rb.mass = 5;
             _rb.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
@@ -114,7 +85,8 @@ namespace KatnisssSpaceSimulator.Core.Physics
 
         void FixedUpdate()
         {
-            this.AIRFPosition = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.transform.position );
+            // I'm not a fan of the physics being calculated in scene-space, but that's the only way to handle collisions properly.
+            this._rootTransform.SetAIRFPosition( SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.transform.position ) );
         }
 
         void OnEnable()

@@ -83,12 +83,16 @@ namespace KatnisssSpaceSimulator.Camera
             }
         }
 
-        void LateUpdate()
+        void Update()
         {
             UpdateZoomLevel();
 
             UpdateOrientation();
+        }
 
+        void LateUpdate()
+        {
+            // after modifying position/rotation/zoom.
             PreventViewFrustumException();
 
             if( ReferenceObject != null )

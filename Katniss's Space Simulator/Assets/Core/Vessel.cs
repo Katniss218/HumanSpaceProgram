@@ -32,8 +32,9 @@ namespace KatnisssSpaceSimulator.Core
         public int PartCount { get; private set; }
 
         public PhysicsObject PhysicsObject { get; private set; }
+        public RootObjectTransform RootObjTransform { get; private set; }
 
-        public Vector3Dbl AIRFPosition { get => this.PhysicsObject.AIRFPosition; }
+        public Vector3Dbl AIRFPosition { get => this.RootObjTransform.GetAIRFPosition(); }
 
         /// <remarks>
         /// DO NOT USE. This is for internal use, and can produce an invalid state. Use <see cref="VesselStateUtils.SetParent(Part, Part)"/> instead.
@@ -105,7 +106,7 @@ namespace KatnisssSpaceSimulator.Core
         /// </summary>
         public void SetPosition( Vector3Dbl airfPosition )
         {
-            this.PhysicsObject.SetPosition( airfPosition );
+            this.RootObjTransform.SetAIRFPosition( airfPosition );
         }
 
         /// <summary>
@@ -113,7 +114,7 @@ namespace KatnisssSpaceSimulator.Core
         /// </summary>
         public void SetRotation( Quaternion airfRotation )
         {
-            this.PhysicsObject.SetRotation( airfRotation );
+            this.RootObjTransform.SetAIRFRotation( airfRotation );
         }
 
         /// <summary>
@@ -128,6 +129,7 @@ namespace KatnisssSpaceSimulator.Core
         void Awake()
         {
             this.PhysicsObject = this.GetComponent<PhysicsObject>();
+            this.RootObjTransform = this.GetComponent<RootObjectTransform>();
         }
 
         void SetPhysicsObjectParameters()

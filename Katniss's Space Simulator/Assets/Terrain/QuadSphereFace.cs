@@ -83,5 +83,86 @@ namespace KatnisssSpaceSimulator.Terrain
             }
             throw new ArgumentException( $"Unknown {nameof( QuadSphereFace )} '{v}'.", nameof( v ) );
         }
+
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>Returns the normalized point on the surface of a cube, and the vector transforming the center-origin coordinates into face-origin.</returns>
+        public static Vector3 GetSpherePoint( this QuadSphereFace face, float quadX, float quadY )
+        {
+            // quad x, y go in range [-1..1]
+            Contract.Assert( quadX >= -1 && quadX <= 1, $"{nameof( quadX )} has to be in range [-1..1]." );
+            Contract.Assert( quadY >= -1 && quadY <= 1, $"{nameof( quadX )} has to be in range [-1..1]." );
+
+            Vector3 pos;
+            switch( face )
+            {
+                case QuadSphereFace.Xp:
+                    pos = new Vector3( 1.0f, quadY, quadX );
+                    break;
+                case QuadSphereFace.Xn:
+                    pos = new Vector3( -1.0f, quadX, quadY );
+                    break;
+                case QuadSphereFace.Yp:
+                    pos = new Vector3( quadX, 1.0f, quadY );
+                    break;
+                case QuadSphereFace.Yn:
+                    pos = new Vector3( quadY, -1.0f, quadX );
+                    break;
+                case QuadSphereFace.Zp:
+                    pos = new Vector3( quadY, quadX, 1.0f );
+                    break;
+                case QuadSphereFace.Zn:
+                    pos = new Vector3( quadX, quadY, -1.0f );
+                    break;
+                default:
+                    throw new ArgumentException( $"Invalid face orientation {face}", nameof( face ) );
+            }
+
+            pos.Normalize(); // unit sphere.
+            return pos;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>Returns the normalized point on the surface of a cube, and the vector transforming the center-origin coordinates into face-origin.</returns>
+        public static Vector3Dbl GetSpherePointDbl( this QuadSphereFace face, float quadX, float quadY )
+        {
+            // quad x, y go in range [-1..1]
+            Contract.Assert( quadX >= -1 && quadX <= 1, $"{nameof( quadX )} has to be in range [-1..1]." );
+            Contract.Assert( quadY >= -1 && quadY <= 1, $"{nameof( quadX )} has to be in range [-1..1]." );
+
+            Vector3Dbl pos;
+            switch( face )
+            {
+                case QuadSphereFace.Xp:
+                    pos = new Vector3Dbl( 1.0, quadY, quadX );
+                    break;
+                case QuadSphereFace.Xn:
+                    pos = new Vector3Dbl( -1.0, quadX, quadY );
+                    break;
+                case QuadSphereFace.Yp:
+                    pos = new Vector3Dbl( quadX, 1.0, quadY );
+                    break;
+                case QuadSphereFace.Yn:
+                    pos = new Vector3Dbl( quadY, -1.0, quadX );
+                    break;
+                case QuadSphereFace.Zp:
+                    pos = new Vector3Dbl( quadY, quadX, 1.0 );
+                    break;
+                case QuadSphereFace.Zn:
+                    pos = new Vector3Dbl( quadX, quadY, -1.0 );
+                    break;
+                default:
+                    throw new ArgumentException( $"Invalid face orientation {face}", nameof( face ) );
+            }
+
+            pos.Normalize(); // unit sphere.
+            return pos;
+        }
     }
 }
