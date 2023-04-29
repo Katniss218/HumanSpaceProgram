@@ -31,14 +31,18 @@ namespace KatnisssSpaceSimulator.Core
         /// <summary>
         /// Z+ points towards the north pole (north is up).
         /// </summary>
-        public static Vector3 EuclideanToGeodetic( float x, float y, float z )
+        public static (float latitude, float longitude, float altitude) EuclideanToGeodetic( Vector3 v )
         {
+            float x = v.x;
+            float y = v.y;
+            float z = v.z;
+
             float altitude = Mathf.Sqrt( x * x + y * y + z * z );
 
             float theta = -Mathf.Atan2( y, x ) + Mathf.PI;
             float phi = -Mathf.Acos( z / altitude );
 
-            return new Vector3( theta * Mathf.Rad2Deg, phi * Mathf.Rad2Deg, altitude );
+            return (theta * Mathf.Rad2Deg, phi * Mathf.Rad2Deg, altitude);
         }
     }
 }

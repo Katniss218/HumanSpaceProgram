@@ -15,7 +15,7 @@ namespace KatnisssSpaceSimulator.Terrain
     public class LODQuadSphere : MonoBehaviour
     {
         /// <summary>
-        /// The number of binary subdivisions per edge of each of the quads at l0.
+        /// The number of binary subdivisions per edge of each of the quads.
         /// </summary>
         public int EdgeSubdivisions { get; private set; } = 4;
 
@@ -35,14 +35,17 @@ namespace KatnisssSpaceSimulator.Terrain
             {
                 Vector2 center = Vector2.zero;
                 int lN = 0;
-                var face = LODQuad.Create( _celestialBody.transform, ((QuadSphereFace)i).ToVector3() * (float)_celestialBody.Radius, this, _celestialBody, EdgeSubdivisions, center, lN, (float)_celestialBody.Radius * 2f, (QuadSphereFace)i );
+
                 _quadTree[i] = new LODQuadTree();
                 _quadTree[i].Root = new LODQuadTree.Node()
                 {
-                    Value = face,
                     Center = center,
-                    Size = LODQuad.GetSize( lN )
+                    Size = LODQuadUtils.GetSize( lN )
                 };
+#warning TODO - there is some funkiness with the collider physics (it acts as if the object was unparented (when unparenting, it changes scene position slightly)).
+
+                var face = LODQuad.Create( _celestialBody.transform, ((QuadSphereFace)i).ToVector3() * (float)_celestialBody.Radius, this, _celestialBody, EdgeSubdivisions, center, lN, _quadTree[i].Root, (float)_celestialBody.Radius * 2f, (QuadSphereFace)i );
+                
                 face.Node = _quadTree[i].Root;
             }
         }
@@ -51,7 +54,7 @@ namespace KatnisssSpaceSimulator.Terrain
         {
             foreach( var q in _quadTree )
             {
-                foreach( var qq in q.GetLeafNodes() ) // todo - optimize.
+                foreach( var qq in q.GetLeafNodes() ) // This can be optimized for large numbers of subdivs.
                 {
                     if( qq != null )
                     {

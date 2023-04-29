@@ -8,6 +8,9 @@ using UnityEngine;
 
 namespace KatnisssSpaceSimulator.Terrain
 {
+    /// <summary>
+    /// Contains information about which of the cube's faces a given quad represents.
+    /// </summary>
     public enum QuadSphereFace
     {
         // Do not change the values, there are things that rely on this.
@@ -22,8 +25,11 @@ namespace KatnisssSpaceSimulator.Terrain
     public static class QuadSphereFaceEx
     {
         /// <summary>
-        /// Returns the quad sphere face for a given vector.
+        /// Calculates the <see cref="QuadSphereFace"/> for a given vector.
         /// </summary>
+        /// <returns>
+        /// The QuadSphereFace corresponding to the vector's maximum axis.
+        /// </returns>
         public static QuadSphereFace FromVector( Vector3 vector )
         {
             float x = vector.x;
@@ -86,15 +92,12 @@ namespace KatnisssSpaceSimulator.Terrain
 
 
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns>Returns the normalized point on the surface of a cube, and the vector transforming the center-origin coordinates into face-origin.</returns>
+        /// <returns>Returns the point on the surface of a unit cube corresponding to the specified cube face and face coordinates.</returns>
         public static Vector3 GetSpherePoint( this QuadSphereFace face, float quadX, float quadY )
         {
             // quad x, y go in range [-1..1]
             Contract.Assert( quadX >= -1 && quadX <= 1, $"{nameof( quadX )} has to be in range [-1..1]." );
-            Contract.Assert( quadY >= -1 && quadY <= 1, $"{nameof( quadX )} has to be in range [-1..1]." );
+            Contract.Assert( quadY >= -1 && quadY <= 1, $"{nameof( quadY )} has to be in range [-1..1]." );
 
             Vector3 pos;
             switch( face )
@@ -125,16 +128,12 @@ namespace KatnisssSpaceSimulator.Terrain
             return pos;
         }
 
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns>Returns the normalized point on the surface of a cube, and the vector transforming the center-origin coordinates into face-origin.</returns>
+        /// <returns>Returns the point on the surface of a unit cube corresponding to the specified cube face and face coordinates.</returns>
         public static Vector3Dbl GetSpherePointDbl( this QuadSphereFace face, float quadX, float quadY )
         {
             // quad x, y go in range [-1..1]
             Contract.Assert( quadX >= -1 && quadX <= 1, $"{nameof( quadX )} has to be in range [-1..1]." );
-            Contract.Assert( quadY >= -1 && quadY <= 1, $"{nameof( quadX )} has to be in range [-1..1]." );
+            Contract.Assert( quadY >= -1 && quadY <= 1, $"{nameof( quadY )} has to be in range [-1..1]." );
 
             Vector3Dbl pos;
             switch( face )

@@ -18,6 +18,11 @@ namespace KatnisssSpaceSimulator.Terrain
             public Node Parent { get; set; }
 
             public Node[,] Children { get; set; }
+
+            /// <summary>
+            /// Contains itself (!)
+            /// </summary>
+            public Node[,] Siblings { get => this.Parent.Children; }
         }
 
         public Node Root { get; set; }
