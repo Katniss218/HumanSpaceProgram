@@ -23,8 +23,6 @@ namespace KatnisssSpaceSimulator
         public Shader cbShader;
         public Texture2D[] cbTextures = new Texture2D[6];
 
-        public Material CBMaterial;
-
         public Mesh Mesh;
         public Material Material;
 
@@ -37,10 +35,7 @@ namespace KatnisssSpaceSimulator
 
         void Start()
         {
-            Debug.Log( CoordinateUtils.GeodeticToEuclidean( 0, 0, 1 ) );
-            Debug.Log( CoordinateUtils.GeodeticToEuclidean( 90, 0, 1 ) );
-            Debug.Log( CoordinateUtils.GeodeticToEuclidean( 0, 90, 1 ) );
-            normalmap = new RenderTexture( heightmap.width, heightmap.height, 8, RenderTextureFormat.ARGB32 );
+            /*normalmap = new RenderTexture( heightmap.width, heightmap.height, 8, RenderTextureFormat.ARGB32 );
             normalmap.enableRandomWrite = true;
 
             shader.SetTexture( shader.FindKernel( "CalculateNormalMap" ), Shader.PropertyToID( "heightMap" ), heightmap );
@@ -48,7 +43,7 @@ namespace KatnisssSpaceSimulator
             shader.SetFloat( Shader.PropertyToID( "strength" ), 5.0f );
             shader.Dispatch( shader.FindKernel( "CalculateNormalMap" ), heightmap.width / 8, heightmap.height / 8, 1 );
 
-            uiImage.texture = normalmap;
+            uiImage.texture = normalmap;*/
 
             CelestialBody cb = new CelestialBodyFactory().Create( Vector3Dbl.zero );
 
@@ -57,7 +52,7 @@ namespace KatnisssSpaceSimulator
             CelestialBody cb_farawayTEST = new CelestialBodyFactory().Create( new Vector3Dbl( 440_000_000_0.0, 100_000_000, 0 ) );
             CelestialBody cb_farawayTEST2 = new CelestialBodyFactory().Create( new Vector3Dbl( 440_000_000_00.0, 100_000_000, 0 ) );
 
-            CelestialBody cb_farawayTEST3FAR = new CelestialBodyFactory().Create( new Vector3Dbl( 10e17, 100_000_000, 0 ) ); // 10e17 is 100 ly away.
+            CelestialBody cb_farawayTEST3FAR = new CelestialBodyFactory().Create( new Vector3Dbl( 1e18, 100_000_000, 0 ) ); // 1e18 is 100 ly away.
             // stuff really far away throws invalid world AABB and such. do not enable these, you can't see them anyway. 100 ly seems to work, but further away is a no-no.
 
 

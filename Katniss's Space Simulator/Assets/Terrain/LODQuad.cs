@@ -21,21 +21,26 @@ namespace KatnisssSpaceSimulator.Terrain
     [RequireComponent( typeof( MeshRenderer ) )]
     public class LODQuad : MonoBehaviour
     {
+        /// <summary>
+        /// Describes what a given <see cref="LODQuad"/> is currently doing.
+        /// </summary>
+        public enum State
+        {
+            Idle, // do nothing.
+            Active, // check for subdivs.
+            GeneratingMesh
+        }
+
         // Generated meshes have relatively higher precision because the vertices are closer to the origin of the mesh, than to the origin of the celestial body.
 
-        /// <summary>
-        /// The level of subdivision (lN) at which the quad will stop subdividing.
-        /// </summary>
-        public int HardLimitSubdivLevel { get; set; } = 20;
+        public State CurrentState { get; private set; }
 
-        public LODQuadTree.Node Node { get; set; }
+        public LODQuadTree.Node Node { get; private set; }
 
         /// <summary>
         /// How many edge subdivision steps to apply for each quad, on top of and regardless of <see cref="SubdivisionLevel"/>.
         /// </summary>
-        public int EdgeSubdivisions { get; private set; }
-
-        LODQuadSphere _quadSphere;
+        public int EdgeSubdivisions { get => _quadSphere.EdgeSubdivisions; }
 
         public CelestialBody CelestialBody { get; private set; }
 
@@ -47,10 +52,15 @@ namespace KatnisssSpaceSimulator.Terrain
         MeshCollider _meshCollider;
         MeshRenderer _meshRenderer;
 
-        public Vector3Dbl? airfPOI { get; set; }
+        public Vector3Dbl[] airfPOIs { get; set; }
 
         [field: SerializeField]
         public int SubdivisionLevel { get; private set; }
+
+        LODQuadSphere _quadSphere;
+
+        MakeQuadMesh_Job _job;
+        JobHandle _jobHandle;
 
         void Awake()
         {
@@ -61,62 +71,129 @@ namespace KatnisssSpaceSimulator.Terrain
 
         void Update()
         {
-            if( airfPOI == null )
+            if( CurrentState == State.Idle )
             {
-                if( this.SubdivisionLevel > 0 )
-                {
-                    // Should immediately unsubdivide all the way up to l0 if no POI is present.
-                    //  Unsubdivide( this );
-                }
                 return;
             }
 
-            Vector3Dbl airfQuad = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.transform.position );
-            double dist = (airfPOI.Value - airfQuad).magnitude;
-            if( (float)dist < SubdivisionDistance )
+            if( CurrentState == State.Active )
             {
-                if( this.SubdivisionLevel < HardLimitSubdivLevel )
+                if( ShouldSubdivide() )
                 {
                     Subdivide( this );
-                }
-                return;
-            }
-
-            if( this.SubdivisionLevel > 0 )
-            {
-                foreach( var siblingNode in this.Node.Siblings )
-                {
-                    if( siblingNode.Children != null )
-                    {
-                        return; // one of the siblings is subdivided
-                    }
+                    return;
                 }
 
-                // if distance to would-be-parent is more than its subdiv radius
-                Vector2 center = this.Node.Parent.Center;
-                Vector3 originBodySpace = _face.GetSpherePoint( center.x, center.y ) * (float)CelestialBody.Radius;
-
-                Vector3Dbl airfPosQuadParent = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.CelestialBody.transform.TransformPoint( originBodySpace ) );
-                double dist2 = (airfPOI.Value - airfPosQuadParent).magnitude;
-                if( dist2 > this.SubdivisionDistance * 2 )
+                if( ShouldUnsubdivide() )
                 {
                     Unsubdivide( this );
+                    return;
                 }
-                return;
             }
+        }
+
+        private void LateUpdate()
+        {
+            if( CurrentState == State.GeneratingMesh )
+            {
+                _jobHandle.Complete();
+
+                _job.Finish(this);
+
+                this.CurrentState = State.Active;
+            }
+        }
+
+        internal void SetMesh( Mesh mesh )
+        {
+            this._meshCollider.sharedMesh = mesh;
+            this._meshFilter.sharedMesh = mesh;
+        }
+
+        private bool ShouldSubdivide()
+        {
+            if( this.SubdivisionLevel >= _quadSphere.HardLimitSubdivLevel )
+            {
+                return false;
+            }
+
+            if( airfPOIs == null )
+            {
+                return false;
+            }
+
+            if( airfPOIs.Length == 0 )
+            {
+                return false;
+            }
+
+            // Check if any of the PIOs is within the subdiv radius.
+            foreach( var airfPOI in this.airfPOIs )
+            {
+                Vector3Dbl airfQuad = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.transform.position );
+                double dist = (airfPOI - airfQuad).magnitude;
+
+                if( (float)dist < SubdivisionDistance )
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool ShouldUnsubdivide()
+        {
+            if( this.SubdivisionLevel == 0 )
+            {
+                return false;
+            }
+
+            if( airfPOIs == null )
+            {
+                return false;
+            }
+
+            if( airfPOIs.Length == 0 )
+            {
+                return true;
+            }
+
+            // Don't unsubdivide if one of the siblings is subdivided. That would require handling nested unsubdivisions, and is nasty, blergh and unnecessary.
+            foreach( var siblingNode in this.Node.Siblings )
+            {
+                if( siblingNode.Children != null )
+                {
+                    return false;
+                }
+            }
+
+            // If the parent won't want to immediately subdivide again, unsubdivide.
+            Vector3 originBodySpace = _face.GetSpherePoint( this.Node.Parent.Center ) * (float)CelestialBody.Radius;
+            foreach( var airfPOI in this.airfPOIs )
+            {
+                Vector3Dbl parentQuadOriginAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.CelestialBody.transform.TransformPoint( originBodySpace ) );
+                double distanceToPoi = (airfPOI - parentQuadOriginAirf).magnitude;
+
+                if( distanceToPoi > this.SubdivisionDistance * 2 ) // times 2 because parent subdiv range is 2x more than its child.
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
         /// Splits the specified quad into 4 separate quads.
         /// </summary>
-        static void Subdivide( LODQuad q )
+        private static void Subdivide( LODQuad q )
         {
             if( q.Node.Children != null )
             {
                 throw new InvalidOperationException( "Tried subdividing a subdivided node" );
             }
 
-            if( q.SubdivisionLevel >= q.HardLimitSubdivLevel )
+            if( q.SubdivisionLevel >= q._quadSphere.HardLimitSubdivLevel )
             {
                 return;
             }
@@ -139,10 +216,10 @@ namespace KatnisssSpaceSimulator.Terrain
                     Parent = q.Node
                 };
 
-                LODQuad quad = Create( q.transform.parent, origin, q._quadSphere, q.CelestialBody, q.EdgeSubdivisions, center, lN, q.Node.Children[xIndex, yIndex], q.SubdivisionDistance / 2f, q._meshRenderer.material, q._face );
+                LODQuad quad = Create( q.transform.parent, origin, q._quadSphere, q.CelestialBody, center, lN, q.Node.Children[xIndex, yIndex], q.SubdivisionDistance / 2f, q._meshRenderer.material, q._face );
             }
 
-            q.airfPOI = null;
+            q.airfPOIs = null;
             q.Node.Value = null;
 
             Destroy( q.gameObject );
@@ -151,7 +228,7 @@ namespace KatnisssSpaceSimulator.Terrain
         /// <summary>
         /// Joins the specified quad and its 3 siblings into a single quad of lower level.
         /// </summary>
-        static void Unsubdivide( LODQuad q )
+        private static void Unsubdivide( LODQuad q )
         {
             if( q.SubdivisionLevel <= 0 )
             {
@@ -171,13 +248,13 @@ namespace KatnisssSpaceSimulator.Terrain
             Vector3 origin = q._face.GetSpherePoint( center.x, center.y ) * (float)q.CelestialBody.Radius;
             int lN = q.SubdivisionLevel - 1;
 
-            LODQuad quad = Create( q.transform.parent, origin, q._quadSphere, q.CelestialBody, q.EdgeSubdivisions, center, lN, q.Node.Parent, q.SubdivisionDistance * 2f, q._meshRenderer.material, q._face );
-            quad.airfPOI = q.airfPOI; // IMPORTANT.
+            LODQuad quad = Create( q.transform.parent, origin, q._quadSphere, q.CelestialBody, center, lN, q.Node.Parent, q.SubdivisionDistance * 2f, q._meshRenderer.material, q._face );
+            quad.airfPOIs = q.airfPOIs; // IMPORTANT.
 
             // Destroy the other 3 siblings of the unsubdivided quad.
             foreach( var qSibling in q.Node.Parent.Children )
             {
-                qSibling.Value.airfPOI = null;
+                //qSibling.Value.airfPOIs = null;
                 Destroy( qSibling.Value.gameObject );
             }
 
@@ -187,46 +264,17 @@ namespace KatnisssSpaceSimulator.Terrain
         /// <summary>
         /// Creates and caches the mesh for this LODQuad.
         /// </summary>
-        void GenerateMeshData()
+        private void GenerateMeshData()
         {
-            MakeQuadMesh_Job meshJob = new MakeQuadMesh_Job()
-            {
-                subdivisions = EdgeSubdivisions,
-                radius = (float)CelestialBody.Radius,
-                center = this.Node.Center,
-                lN = SubdivisionLevel,
-                origin = this.transform.localPosition
-            };
+            this.CurrentState = State.GeneratingMesh;
 
-            meshJob.Initialize();
+            _job = new MakeQuadMesh_Job();
 
-#warning TODO - add a proper state management to the LODQuad and make it schedule everything in update, wait for completion in lateupdate, depending on state. Currently the job doesn't actually speed up anything because of the waiting.
-            JobHandle jobHandle = meshJob.Schedule();
-            // configurable lodquad jobs based on reflection and method attributes that are called before/after it's run?
-
-            jobHandle.Complete();
-
-            Mesh mesh = new Mesh();
-
-            mesh.SetVertices( meshJob.vertices );
-            mesh.SetNormals( meshJob.normals );
-            mesh.SetUVs( 0, meshJob.uvs );
-            mesh.SetTriangles( meshJob.triangles.ToArray(), 0 );
-            // tangents calc'd here because job can't create Mesh object to calc them.
-            mesh.RecalculateTangents();
-            mesh.FixTangents(); // fix broken tangents.
-            mesh.RecalculateBounds();
-
-            this._meshCollider.sharedMesh = mesh;
-            this._meshFilter.sharedMesh = mesh;
-
-            meshJob.vertices.Dispose();
-            meshJob.normals.Dispose();
-            meshJob.uvs.Dispose();
-            meshJob.triangles.Dispose();
+            _job.Initialize( this ); // This (and collection) would have to be Reflection-ified to make it extendable by other user-provided assemblies.
+            _jobHandle = _job.Schedule();
         }
 
-        public static LODQuad Create( Transform parent, Vector3 localPosition, LODQuadSphere quadSphere, CelestialBody celestialBody, int edgeSubdivisions, Vector2 center, int lN, LODQuadTree.Node node, float subdivisionDistance, Material mat, QuadSphereFace face )
+        public static LODQuad Create( Transform parent, Vector3 localPosition, LODQuadSphere quadSphere, CelestialBody celestialBody, Vector2 center, int lN, LODQuadTree.Node node, float subdivisionDistance, Material mat, QuadSphereFace face )
         {
             // FIXME: this method kinda ugly. And prevent people from the outside from being able to create non-l0 quads.
 
@@ -253,7 +301,6 @@ namespace KatnisssSpaceSimulator.Terrain
             q._quadSphere = quadSphere;
             q.SubdivisionDistance = subdivisionDistance;
 
-            q.EdgeSubdivisions = edgeSubdivisions;
             q.SubdivisionLevel = lN;
             q._face = face;
 
@@ -261,6 +308,7 @@ namespace KatnisssSpaceSimulator.Terrain
             q.transform.localPosition = localPosition;
             q.transform.localRotation = Quaternion.identity;
             q.transform.localScale = Vector3.one;
+            q.CurrentState = State.Idle;
 
             q.GenerateMeshData();
 

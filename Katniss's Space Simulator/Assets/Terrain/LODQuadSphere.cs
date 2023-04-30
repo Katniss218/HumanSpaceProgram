@@ -17,7 +17,12 @@ namespace KatnisssSpaceSimulator.Terrain
         /// <summary>
         /// The number of binary subdivisions per edge of each of the quads.
         /// </summary>
-        public int EdgeSubdivisions { get; private set; } = 4;
+        public int EdgeSubdivisions { get; private set; } = 5;
+
+        /// <summary>
+        /// The level of subdivision (lN) at which the quad will stop subdividing.
+        /// </summary>
+        public int HardLimitSubdivLevel { get; set; } = 18;
 
         LODQuadTree[] _quadTree;
         CelestialBody _celestialBody;
@@ -52,9 +57,7 @@ namespace KatnisssSpaceSimulator.Terrain
                 mat.SetFloat( "_Glossiness", 0.05f );
                 mat.SetFloat( "_NormalStrength", 0.0f );
 
-                var face = LODQuad.Create( _celestialBody.transform, ((QuadSphereFace)i).ToVector3() * (float)_celestialBody.Radius, this, _celestialBody, EdgeSubdivisions, center, lN, _quadTree[i].Root, (float)_celestialBody.Radius * 2f, mat, (QuadSphereFace)i );
-
-                face.Node = _quadTree[i].Root;
+                var face = LODQuad.Create( _celestialBody.transform, ((QuadSphereFace)i).ToVector3() * (float)_celestialBody.Radius, this, _celestialBody, center, lN, _quadTree[i].Root, (float)_celestialBody.Radius * 2f, mat, (QuadSphereFace)i );
             }
         }
 
@@ -64,7 +67,7 @@ namespace KatnisssSpaceSimulator.Terrain
             {
                 foreach( var qq in q.GetLeafNodes() ) // This can be optimized for large numbers of subdivs.
                 {
-                    qq.airfPOI = VesselManager.ActiveVessel.AIRFPosition;
+                    qq.airfPOIs = new Vector3Dbl[] { VesselManager.ActiveVessel.AIRFPosition };
                 }
             }
         }

@@ -15,18 +15,16 @@ namespace KatnisssSpaceSimulator.Terrain
     /// </summary>
     public struct MakeQuadMesh_Job : IJob
     {
-        public int subdivisions;
-        public float radius;
-        public Vector2 center;
-        public int lN;
-        public Vector3 origin;
+        int subdivisions;
+        float radius;
+        Vector2 center;
+        int lN;
+        Vector3 origin;
 
-        //public Mesh resultMesh;
-
-        public NativeArray<Vector3> vertices;
-        public NativeArray<Vector3> normals;
-        public NativeArray<Vector2> uvs;
-        public NativeArray<int> triangles;
+        NativeArray<Vector3> resultVertices;
+        NativeArray<Vector3> resultNormals;
+        NativeArray<Vector2> resultUvs;
+        NativeArray<int> resultTriangles;
 
         float size;
 
@@ -36,8 +34,16 @@ namespace KatnisssSpaceSimulator.Terrain
         float minX;
         float minY;
 
-        public void Initialize()
+        public void Initialize( LODQuad quad )
         {
+            // Initialize is called on the main thread to initialize the job.
+
+            subdivisions = quad.EdgeSubdivisions;
+            radius = (float)quad.CelestialBody.Radius;
+            center = quad.Node.Center;
+            lN = quad.SubdivisionLevel;
+            origin = quad.transform.localPosition;
+
             size = LODQuadUtils.GetSize( lN );
 
             numberOfEdges = 1 << subdivisions; // Fast 2^n for integer types.
@@ -46,10 +52,33 @@ namespace KatnisssSpaceSimulator.Terrain
             minX = center.x - (size / 2f); // center minus half the edge length of the cube.
             minY = center.y - (size / 2f);
 
-            vertices = new NativeArray<Vector3>( numberOfVertices * numberOfVertices, Allocator.TempJob );
-            normals = new NativeArray<Vector3>( numberOfVertices * numberOfVertices, Allocator.TempJob );
-            uvs = new NativeArray<Vector2>( numberOfVertices * numberOfVertices, Allocator.TempJob );
-            triangles = new NativeArray<int>( (numberOfEdges * numberOfEdges) * 6, Allocator.TempJob );
+            resultVertices = new NativeArray<Vector3>( numberOfVertices * numberOfVertices, Allocator.TempJob );
+            resultNormals = new NativeArray<Vector3>( numberOfVertices * numberOfVertices, Allocator.TempJob );
+            resultUvs = new NativeArray<Vector2>( numberOfVertices * numberOfVertices, Allocator.TempJob );
+            resultTriangles = new NativeArray<int>( (numberOfEdges * numberOfEdges) * 6, Allocator.TempJob );
+        }
+
+        public void Finish( LODQuad quad )
+        {
+            // Finish is called on the main thread to collect the result and dispose of the job.
+
+            Mesh mesh = new Mesh();
+
+            mesh.SetVertices( resultVertices );
+            mesh.SetNormals( resultNormals );
+            mesh.SetUVs( 0, resultUvs );
+            mesh.SetTriangles( resultTriangles.ToArray(), 0 );
+            // tangents calc'd here because job can't create Mesh object to calc them.
+            mesh.RecalculateTangents();
+            mesh.FixTangents(); // fix broken tangents.
+            mesh.RecalculateBounds();
+
+            quad.SetMesh( mesh );
+
+            resultVertices.Dispose();
+            resultNormals.Dispose();
+            resultUvs.Dispose();
+            resultTriangles.Dispose();
         }
 
         public void Execute()
@@ -79,7 +108,7 @@ namespace KatnisssSpaceSimulator.Terrain
                 {
                     int index = (i * numberOfEdges) + i + j;
 
-                    float quadX = (i * edgeLength) + minX;
+                    float quadX = (i * edgeLength) + minX; // This might need to be turned into a double perhaps (for large bodies with lots of subdivs).
                     float quadY = (j * edgeLength) + minY;
 
                     Vector3Dbl posD = face.GetSpherePointDbl( quadX, quadY );
@@ -87,13 +116,15 @@ namespace KatnisssSpaceSimulator.Terrain
 
                     Vector3 unitSpherePos = (Vector3)posD;
 
-                    uvs[index] = new Vector2( quadX * 0.5f + 0.5f, quadY * 0.5f + 0.5f );
-                    vertices[index] = (Vector3)((posD * radius) - origin);
+                    resultVertices[index] = (Vector3)((posD * radius * (1.0 + (1 / radius) * Mathf.Sin( i * j ))) - origin);
+
+                    const float margin = 0.0f; // margin can be 0 when the texture wrap mode is set to mirror.
+                    resultUvs[index] = new Vector2( quadX * (0.5f - margin) + 0.5f, quadY * (0.5f - margin) + 0.5f );
 
                     // Normals after displacing by heightmap will need to be calculated by hand instead of with RecalculateNormals() to avoid seams not matching up.
                     // normals can be calculated by adding the normals of each face to its vertices, then normalizing.
                     // - this will compute smooth VERTEX normals!!
-                    normals[index] = unitSpherePos;
+                    resultNormals[index] = unitSpherePos;
                 }
             }
 
@@ -109,13 +140,13 @@ namespace KatnisssSpaceSimulator.Terrain
                     //   A - B
 
                     // Adding numberOfVertices makes it skip to the next row (number of vertices is 1 higher than edges).
-                    triangles[triIndex  ]= index; // A
-                    triangles[triIndex+1] = index + numberOfVertices + 1; // D
-                    triangles[triIndex+2] = index + numberOfVertices; // C
+                    resultTriangles[triIndex] = index; // A
+                    resultTriangles[triIndex + 1] = index + numberOfVertices + 1; // D
+                    resultTriangles[triIndex + 2] = index + numberOfVertices; // C
 
-                    triangles[triIndex+3] = index; // A
-                    triangles[triIndex+4] = index + 1; // B
-                    triangles[triIndex+5] = index + numberOfVertices + 1; // D
+                    resultTriangles[triIndex + 3] = index; // A
+                    resultTriangles[triIndex + 4] = index + 1; // B
+                    resultTriangles[triIndex + 5] = index + numberOfVertices + 1; // D
 
                     triIndex += 6;
                 }
