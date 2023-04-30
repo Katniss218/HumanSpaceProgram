@@ -139,7 +139,7 @@ namespace KatnisssSpaceSimulator.Terrain
                     Parent = q.Node
                 };
 
-                LODQuad quad = Create( q.transform.parent, origin, q._quadSphere, q.CelestialBody, q.EdgeSubdivisions, center, lN, q.Node.Children[xIndex, yIndex], q.SubdivisionDistance / 2f, q._face );
+                LODQuad quad = Create( q.transform.parent, origin, q._quadSphere, q.CelestialBody, q.EdgeSubdivisions, center, lN, q.Node.Children[xIndex, yIndex], q.SubdivisionDistance / 2f, q._meshRenderer.material, q._face );
             }
 
             q.airfPOI = null;
@@ -171,7 +171,7 @@ namespace KatnisssSpaceSimulator.Terrain
             Vector3 origin = q._face.GetSpherePoint( center.x, center.y ) * (float)q.CelestialBody.Radius;
             int lN = q.SubdivisionLevel - 1;
 
-            LODQuad quad = Create( q.transform.parent, origin, q._quadSphere, q.CelestialBody, q.EdgeSubdivisions, center, lN, q.Node.Parent, q.SubdivisionDistance * 2f, q._face );
+            LODQuad quad = Create( q.transform.parent, origin, q._quadSphere, q.CelestialBody, q.EdgeSubdivisions, center, lN, q.Node.Parent, q.SubdivisionDistance * 2f, q._meshRenderer.material, q._face );
             quad.airfPOI = q.airfPOI; // IMPORTANT.
 
             // Destroy the other 3 siblings of the unsubdivided quad.
@@ -226,7 +226,7 @@ namespace KatnisssSpaceSimulator.Terrain
             meshJob.triangles.Dispose();
         }
 
-        public static LODQuad Create( Transform parent, Vector3 localPosition, LODQuadSphere quadSphere, CelestialBody celestialBody, int edgeSubdivisions, Vector2 center, int lN, LODQuadTree.Node node, float subdivisionDistance, QuadSphereFace face )
+        public static LODQuad Create( Transform parent, Vector3 localPosition, LODQuadSphere quadSphere, CelestialBody celestialBody, int edgeSubdivisions, Vector2 center, int lN, LODQuadTree.Node node, float subdivisionDistance, Material mat, QuadSphereFace face )
         {
             // FIXME: this method kinda ugly. And prevent people from the outside from being able to create non-l0 quads.
 
@@ -234,7 +234,7 @@ namespace KatnisssSpaceSimulator.Terrain
             go.transform.SetParent( parent );
 
             MeshRenderer mr = go.AddComponent<MeshRenderer>();
-            mr.material = FindObjectOfType<zzzTestGameManager>().CBMaterial;
+            mr.material = mat;
 
             go.AddComponent<MeshCollider>();
 

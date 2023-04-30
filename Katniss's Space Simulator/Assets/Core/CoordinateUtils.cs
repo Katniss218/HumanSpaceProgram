@@ -15,6 +15,9 @@ namespace KatnisssSpaceSimulator.Core
         /// <summary>
         /// Z+ points towards the north pole (north is up).
         /// </summary>
+        /// <returns>
+        /// X- for (0,0,1), Z+ for (90,0,1), Y+ for (0,90,1)
+        /// </returns>
         public static Vector3 GeodeticToEuclidean( float latitude, float longitude, float altitude )
         {
             // ECEF but missing the oblateness.

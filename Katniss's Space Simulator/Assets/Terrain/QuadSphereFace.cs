@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -101,7 +102,7 @@ namespace KatnisssSpaceSimulator.Terrain
             switch( face )
             {
                 case QuadSphereFace.Xp:
-                    pos = new Vector3( 1.0f, quadY, quadX );
+                    pos = new Vector3( 1.0f, -quadX, quadY );
                     break;
                 case QuadSphereFace.Xn:
                     pos = new Vector3( -1.0f, quadX, quadY );
@@ -110,13 +111,13 @@ namespace KatnisssSpaceSimulator.Terrain
                     pos = new Vector3( quadX, 1.0f, quadY );
                     break;
                 case QuadSphereFace.Yn:
-                    pos = new Vector3( quadY, -1.0f, quadX );
+                    pos = new Vector3( -quadX, -1.0f, quadY );
                     break;
                 case QuadSphereFace.Zp:
                     pos = new Vector3( quadY, quadX, 1.0f );
                     break;
                 case QuadSphereFace.Zn:
-                    pos = new Vector3( quadX, quadY, -1.0f );
+                    pos = new Vector3( -quadY, quadX, -1.0f );
                     break;
                 default:
                     throw new ArgumentException( $"Invalid face orientation {face}", nameof( face ) );
@@ -126,8 +127,9 @@ namespace KatnisssSpaceSimulator.Terrain
             return pos;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         /// <returns>Returns the point on the surface of a unit cube corresponding to the specified cube face and face coordinates.</returns>
-        public static Vector3Dbl GetSpherePointDbl( this QuadSphereFace face, float quadX, float quadY )
+        public static Vector3Dbl GetQuadPointDbl( this QuadSphereFace face, float quadX, float quadY )
         {
             // quad x, y go in range [-1..1]
             Contract.Assert( quadX >= -1 && quadX <= 1, $"{nameof( quadX )} has to be in range [-1..1]." );
@@ -137,7 +139,7 @@ namespace KatnisssSpaceSimulator.Terrain
             switch( face )
             {
                 case QuadSphereFace.Xp:
-                    pos = new Vector3Dbl( 1.0, quadY, quadX );
+                    pos = new Vector3Dbl( 1.0, -quadX, quadY );
                     break;
                 case QuadSphereFace.Xn:
                     pos = new Vector3Dbl( -1.0, quadX, quadY );
@@ -146,18 +148,25 @@ namespace KatnisssSpaceSimulator.Terrain
                     pos = new Vector3Dbl( quadX, 1.0, quadY );
                     break;
                 case QuadSphereFace.Yn:
-                    pos = new Vector3Dbl( quadY, -1.0, quadX );
+                    pos = new Vector3Dbl( -quadX, -1.0, quadY );
                     break;
                 case QuadSphereFace.Zp:
                     pos = new Vector3Dbl( quadY, quadX, 1.0 );
                     break;
                 case QuadSphereFace.Zn:
-                    pos = new Vector3Dbl( quadX, quadY, -1.0 );
+                    pos = new Vector3Dbl( -quadY, quadX, -1.0 );
                     break;
                 default:
                     throw new ArgumentException( $"Invalid face orientation {face}", nameof( face ) );
             }
 
+            return pos;
+        }
+
+        /// <returns>Returns the point on the surface of a unit cube corresponding to the specified cube face and face coordinates.</returns>
+        public static Vector3Dbl GetSpherePointDbl( this QuadSphereFace face, float quadX, float quadY )
+        {
+            Vector3Dbl pos = GetQuadPointDbl( face, quadX, quadY );
             pos.Normalize(); // unit sphere.
             return pos;
         }

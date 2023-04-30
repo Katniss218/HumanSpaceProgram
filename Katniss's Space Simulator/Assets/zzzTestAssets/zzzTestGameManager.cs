@@ -20,6 +20,9 @@ namespace KatnisssSpaceSimulator
     /// </summary>
     public class zzzTestGameManager : MonoBehaviour
     {
+        public Shader cbShader;
+        public Texture2D[] cbTextures = new Texture2D[6];
+
         public Material CBMaterial;
 
         public Mesh Mesh;
@@ -34,6 +37,9 @@ namespace KatnisssSpaceSimulator
 
         void Start()
         {
+            Debug.Log( CoordinateUtils.GeodeticToEuclidean( 0, 0, 1 ) );
+            Debug.Log( CoordinateUtils.GeodeticToEuclidean( 90, 0, 1 ) );
+            Debug.Log( CoordinateUtils.GeodeticToEuclidean( 0, 90, 1 ) );
             normalmap = new RenderTexture( heightmap.width, heightmap.height, 8, RenderTextureFormat.ARGB32 );
             normalmap.enableRandomWrite = true;
 
@@ -83,7 +89,7 @@ namespace KatnisssSpaceSimulator
             Vessel v = fac.CreatePartless( airfPosition, rotation );
             pfac.CreateRoot( v );
 
-            const int partcount = 1250;
+            const int partcount = 5;
             const int engcount = 5;
 
             Part parent = v.RootPart;

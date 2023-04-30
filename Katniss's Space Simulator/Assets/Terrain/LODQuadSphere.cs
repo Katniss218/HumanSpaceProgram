@@ -30,6 +30,8 @@ namespace KatnisssSpaceSimulator.Terrain
 
         void Start()
         {
+            zzzTestGameManager t = FindObjectOfType<zzzTestGameManager>();
+
             _quadTree = new LODQuadTree[6];
             for( int i = 0; i < 6; i++ )
             {
@@ -44,7 +46,13 @@ namespace KatnisssSpaceSimulator.Terrain
                 };
 #warning TODO - there is some funkiness with the collider physics (it acts as if the object was unparented (when unparenting, it changes scene position slightly)).
 
-                var face = LODQuad.Create( _celestialBody.transform, ((QuadSphereFace)i).ToVector3() * (float)_celestialBody.Radius, this, _celestialBody, EdgeSubdivisions, center, lN, _quadTree[i].Root, (float)_celestialBody.Radius * 2f, (QuadSphereFace)i );
+
+                Material mat = new Material( t.cbShader );
+                mat.SetTexture( "_MainTex", t.cbTextures[i] );
+                mat.SetFloat( "_Glossiness", 0.05f );
+                mat.SetFloat( "_NormalStrength", 0.0f );
+
+                var face = LODQuad.Create( _celestialBody.transform, ((QuadSphereFace)i).ToVector3() * (float)_celestialBody.Radius, this, _celestialBody, EdgeSubdivisions, center, lN, _quadTree[i].Root, (float)_celestialBody.Radius * 2f, mat, (QuadSphereFace)i );
 
                 face.Node = _quadTree[i].Root;
             }

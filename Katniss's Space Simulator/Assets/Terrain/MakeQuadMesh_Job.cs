@@ -85,28 +85,9 @@ namespace KatnisssSpaceSimulator.Terrain
                     Vector3Dbl posD = face.GetSpherePointDbl( quadX, quadY );
 #warning TODO - LOD Terrain edge interpolation.
 
-#warning TODO - Fix the texture seam in LOD Terrain.
-                    // To be honest, a cubemap might be a better way to texture this...
-
-                    // cubemap would also allow high er resolutions, and dynamic resolutions for different quads.
-                    // also baked stuff in compute-shader-created pieces of the cubemap?
-
-                    // then we have one material per quad.
-
-
                     Vector3 unitSpherePos = (Vector3)posD;
-                    (float latitude, float longitude, _) = CoordinateUtils.EuclideanToGeodetic( unitSpherePos );
 
-                    float u = (latitude * Mathf.Deg2Rad + 1.5f * Mathf.PI) / (2 * Mathf.PI);
-                    float v = longitude * Mathf.Deg2Rad / Mathf.PI;
-
-                    if( (face == QuadSphereFace.Xn || face == QuadSphereFace.Zp || face == QuadSphereFace.Zn)
-                      && unitSpherePos.y == 0 && unitSpherePos.x <= 0 )
-                    {
-                        u = 0.75f; // just setting to 0.75 doesn't work
-                    }
-
-                    uvs[index] = new Vector2( u, v );
+                    uvs[index] = new Vector2( quadX * 0.5f + 0.5f, quadY * 0.5f + 0.5f );
                     vertices[index] = (Vector3)((posD * radius) - origin);
 
                     // Normals after displacing by heightmap will need to be calculated by hand instead of with RecalculateNormals() to avoid seams not matching up.
