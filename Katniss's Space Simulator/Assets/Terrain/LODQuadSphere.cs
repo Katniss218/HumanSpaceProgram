@@ -45,7 +45,7 @@ namespace KatnisssSpaceSimulator.Terrain
 #warning TODO - there is some funkiness with the collider physics (it acts as if the object was unparented (when unparenting, it changes scene position slightly)).
 
                 var face = LODQuad.Create( _celestialBody.transform, ((QuadSphereFace)i).ToVector3() * (float)_celestialBody.Radius, this, _celestialBody, EdgeSubdivisions, center, lN, _quadTree[i].Root, (float)_celestialBody.Radius * 2f, (QuadSphereFace)i );
-                
+
                 face.Node = _quadTree[i].Root;
             }
         }
@@ -56,10 +56,7 @@ namespace KatnisssSpaceSimulator.Terrain
             {
                 foreach( var qq in q.GetLeafNodes() ) // This can be optimized for large numbers of subdivs.
                 {
-                    if( qq != null )
-                    {
-                        qq.airfPOI = VesselManager.ActiveVessel.AIRFPosition;
-                    }
+                    qq.airfPOI = VesselManager.ActiveVessel.AIRFPosition;
                 }
             }
         }

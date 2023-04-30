@@ -1,0 +1,57 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using UnityEngine;
+
+namespace Assets.UI
+{
+    public class FPSCounterUI : MonoBehaviour
+    {
+        [SerializeField]
+        TMPro.TextMeshProUGUI _textBox;
+
+        float[] _fps = new float[128];
+        int _max = 0;
+        int _index = 0;
+
+        private float GetFps()
+        {
+            // If is paused, return 0 FPS.
+            if( Time.deltaTime == 0 )
+            {
+                return 0;
+            }
+            // Otherwise, calculate the real FPS.
+            return 1.0f / Time.deltaTime;
+        }
+
+        private void SampleFPS()
+        {
+            _fps[_index] = GetFps();
+            _index = (_index + 1) % _fps.Length;
+            if( _max < _fps.Length )
+            {
+                _max++;
+            }
+        }
+
+        private float GetAverageFps()
+        {
+            float acc = 0;
+            for( int i = 0; i < _max; i++ )
+            {
+                acc += _fps[i];
+            }
+            acc /= _max;
+            return acc;
+        }
+
+        void Update()
+        {
+            SampleFPS();
+            _textBox.text = $"FPS: {Mathf.CeilToInt( GetAverageFps() )}";
+        }
+    }
+}

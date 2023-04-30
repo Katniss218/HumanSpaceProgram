@@ -28,20 +28,30 @@ namespace KatnisssSpaceSimulator.Terrain
         public Node Root { get; set; }
 
 
-        List<LODQuad> GetLeafNodes( Node node )
+        List<LODQuad> GetLeafNodes( Node rootNode )
         {
-            List<LODQuad> leafNodes = new List<LODQuad>();
+            // This could be further optimized later by caching the list of nodes, if needed.
 
-            if( node.Children == null ) // this node has no children, so it's a leaf node
+            List<LODQuad> leafNodes = new List<LODQuad>();
+            Stack<Node> stack = new Stack<Node>();
+            stack.Push( rootNode );
+
+            while( stack.Count > 0 )
             {
-                leafNodes.Add( node.Value );
-            }
-            else
-            {
-                // recursively traverse each child node and add its leaf nodes to the list
-                foreach( Node child in node.Children )
+                Node currentNode = stack.Pop();
+                if( currentNode.Children == null )
                 {
-                    leafNodes.AddRange( GetLeafNodes( child ) );
+                    if( currentNode.Value != null )
+                    {
+                        leafNodes.Add( currentNode.Value );
+                    }
+                }
+                else
+                {
+                    foreach( Node child in currentNode.Children )
+                    {
+                        stack.Push( child );
+                    }
                 }
             }
 

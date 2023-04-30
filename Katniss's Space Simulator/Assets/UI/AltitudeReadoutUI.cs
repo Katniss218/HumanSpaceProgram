@@ -20,10 +20,10 @@ namespace KatnisssSpaceSimulator.UI
             Vector3 posV = VesselManager.ActiveVessel.transform.position;
             Vector3 posCB = SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformPosition( body.AIRFPosition );
 
-            float magn = (posV-posCB).magnitude;
+            float magn = (posV - posCB).magnitude;
             float alt = magn - (float)body.Radius;
 
-            _textBox.text = $"Altitude: {(alt/1000):#0.00} km";
+            _textBox.text = $"Altitude: {(alt / 1000.0f):#0} km";
         }
     }
 }

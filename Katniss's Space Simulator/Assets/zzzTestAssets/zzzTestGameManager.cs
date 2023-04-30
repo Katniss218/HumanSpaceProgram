@@ -83,7 +83,7 @@ namespace KatnisssSpaceSimulator
             Vessel v = fac.CreatePartless( airfPosition, rotation );
             pfac.CreateRoot( v );
 
-            const int partcount = 5;
+            const int partcount = 1250;
             const int engcount = 5;
 
             Part parent = v.RootPart;

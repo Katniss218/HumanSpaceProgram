@@ -90,8 +90,6 @@ namespace KatnisssSpaceSimulator.Terrain
             throw new ArgumentException( $"Unknown {nameof( QuadSphereFace )} '{v}'.", nameof( v ) );
         }
 
-
-
         /// <returns>Returns the point on the surface of a unit cube corresponding to the specified cube face and face coordinates.</returns>
         public static Vector3 GetSpherePoint( this QuadSphereFace face, float quadX, float quadY )
         {

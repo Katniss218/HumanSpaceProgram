@@ -202,6 +202,7 @@ namespace KatnisssSpaceSimulator.Terrain
 
 #warning TODO - add a proper state management to the LODQuad and make it schedule everything in update, wait for completion in lateupdate, depending on state. Currently the job doesn't actually speed up anything because of the waiting.
             JobHandle jobHandle = meshJob.Schedule();
+            // configurable lodquad jobs based on reflection and method attributes that are called before/after it's run?
 
             jobHandle.Complete();
 

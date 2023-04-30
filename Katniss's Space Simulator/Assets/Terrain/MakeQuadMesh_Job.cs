@@ -10,6 +10,9 @@ using UnityEngine;
 
 namespace KatnisssSpaceSimulator.Terrain
 {
+    /// <summary>
+    /// A job that constructs the base mesh for the terrain.
+    /// </summary>
     public struct MakeQuadMesh_Job : IJob
     {
         public int subdivisions;
@@ -80,13 +83,16 @@ namespace KatnisssSpaceSimulator.Terrain
                     float quadY = (j * edgeLength) + minY;
 
                     Vector3Dbl posD = face.GetSpherePointDbl( quadX, quadY );
-#warning TODO - subdivisions require being able to make either of the 4 edges act like it's either lN, or lN-m (if lN-m, then each other vertex will use the weighted average of the nearby vertices at lN-m).
-                    // Later should be able to regenerate an edge without regenerating the entire mesh.
+#warning TODO - LOD Terrain edge interpolation.
 
+#warning TODO - Fix the texture seam in LOD Terrain.
+                    // To be honest, a cubemap might be a better way to texture this...
 
-#warning TODO - l0 requires an additional set of vertices at Z- because UVs need to overlap on both 0.0 and 1.0 there. non-l0 require to increase the U coordinate to 1 instead of 0.
-                    // alternatively, cubemap texture? (would fix also the other related jankiness)
-                    // EuclideanToGeodetic also returns the same value regardless, we should implement this fix here.
+                    // cubemap would also allow high er resolutions, and dynamic resolutions for different quads.
+                    // also baked stuff in compute-shader-created pieces of the cubemap?
+
+                    // then we have one material per quad.
+
 
                     Vector3 unitSpherePos = (Vector3)posD;
                     (float latitude, float longitude, _) = CoordinateUtils.EuclideanToGeodetic( unitSpherePos );
@@ -94,11 +100,11 @@ namespace KatnisssSpaceSimulator.Terrain
                     float u = (latitude * Mathf.Deg2Rad + 1.5f * Mathf.PI) / (2 * Mathf.PI);
                     float v = longitude * Mathf.Deg2Rad / Mathf.PI;
 
-                    /*if( (face == QuadSphereFace.Xn || face == QuadSphereFace.Zp || face == QuadSphereFace.Zn)
+                    if( (face == QuadSphereFace.Xn || face == QuadSphereFace.Zp || face == QuadSphereFace.Zn)
                       && unitSpherePos.y == 0 && unitSpherePos.x <= 0 )
                     {
                         u = 0.75f; // just setting to 0.75 doesn't work
-                    }*/
+                    }
 
                     uvs[index] = new Vector2( u, v );
                     vertices[index] = (Vector3)((posD * radius) - origin);
