@@ -112,7 +112,6 @@ namespace KatnisssSpaceSimulator.Terrain
                     float quadY = (j * edgeLength) + minY;
 
                     Vector3Dbl posD = face.GetSpherePointDbl( quadX, quadY );
-#warning TODO - LOD Terrain edge interpolation.
 
                     Vector3 unitSpherePos = (Vector3)posD;
 

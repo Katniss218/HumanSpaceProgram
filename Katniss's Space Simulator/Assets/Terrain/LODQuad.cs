@@ -158,10 +158,16 @@ namespace KatnisssSpaceSimulator.Terrain
                 return true;
             }
 
-            // Don't unsubdivide if one of the siblings is subdivided. That would require handling nested unsubdivisions, and is nasty, blergh and unnecessary.
             foreach( var siblingNode in this.Node.Siblings )
             {
+                // Don't unsubdivide if one of the siblings is subdivided. That would require handling nested unsubdivisions, and is nasty, blergh and unnecessary.
                 if( siblingNode.Children != null )
+                {
+                    return false;
+                }
+                // Sibling node is still generating - don't unsubdivide.
+                // Not having this can lead to memory leaks with jobs.
+                if( siblingNode.Value != null && siblingNode.Value.CurrentState == State.GeneratingMesh )
                 {
                     return false;
                 }
@@ -182,6 +188,9 @@ namespace KatnisssSpaceSimulator.Terrain
 
             return false;
         }
+
+#warning TODO - LOD Terrain edge interpolation.
+        // we need something to tell the connectivity of parts. Could use the quadtree.
 
         /// <summary>
         /// Splits the specified quad into 4 separate quads.
