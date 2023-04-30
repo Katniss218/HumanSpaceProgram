@@ -85,13 +85,14 @@
     <Compile Include="Assets\Core\Part.cs" />
     <Compile Include="Assets\Core\CoordinateUtils.cs" />
     <Compile Include="Assets\Core\Physics\PhysicsUtils.cs" />
+    <Compile Include="Assets\Core\ReferenceFrames\RootObjectTransform.cs" />
     <Compile Include="Assets\Buildings\LaunchSite.cs" />
     <Compile Include="Assets\Terrain\LODQuad.cs" />
     <Compile Include="Assets\Core\Functionality.cs" />
     <Compile Include="Assets\TimeWarp\TimeWarpManager.cs" />
     <Compile Include="Assets\Core\ReferenceFrames\IReferenceFrame.cs" />
-    <Compile Include="Assets\Core\ReferenceFrames\RootObjectTransform.cs" />
     <Compile Include="Assets\Terrain\LODQuadUtils.cs" />
+    <Compile Include="Assets\Terrain\MakeQuadMesh_Job.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro.cginc" />
@@ -110,6 +111,7 @@
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro_Surface.cginc" />
     <None Include="Assets\_TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Mobile Masking.shader" />
+    <None Include="Assets\zzzTestAssets\ComputeNormalMap.compute" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF Overlay.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_Bitmap-Mobile.shader" />
     <None Include="Assets\_TextMesh Pro\Fonts\LiberationSans - OFL.txt" />

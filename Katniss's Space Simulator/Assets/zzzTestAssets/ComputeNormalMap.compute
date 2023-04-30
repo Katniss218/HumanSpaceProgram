@@ -1,0 +1,29 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CalculateNormalMap
+
+Texture2D<float> heightMap; // grayscale
+RWTexture2D<float4> normalMap; // rgba
+float4 _heightMap_TexelSize; // apparently contains float4(1 / width, 1 / height, width, height)
+
+float strength;
+
+[numthreads(8, 8, 1)]
+void CalculateNormalMap(uint3 threadID : SV_DispatchThreadID)
+{
+    uint2 pixelCoords = threadID.xy;
+    uint2 texSize = _heightMap_TexelSize.zw; // xy and zw seems to not change the result.
+
+    if (pixelCoords.x < 1 || pixelCoords.y < 1 || pixelCoords.x >= texSize.x - 1 || pixelCoords.y >= texSize.y - 1)
+        return;
+
+    float p = heightMap[pixelCoords];
+
+    float h1 = heightMap[pixelCoords + uint2(1, 0)];
+    float v1 = heightMap[pixelCoords + uint2(0, 1)];
+
+    float2 n = float2(p - h1, p - v1);
+    n *= strength;
+    n += 0.5;
+
+    normalMap[pixelCoords] = float4(normalize(float3(n, 1.0)), p);
+}

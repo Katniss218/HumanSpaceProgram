@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Unity.Jobs;
 using UnityEngine;
 
 namespace KatnisssSpaceSimulator.Terrain
@@ -188,9 +189,40 @@ namespace KatnisssSpaceSimulator.Terrain
         /// </summary>
         void GenerateMeshData()
         {
-            Mesh mesh = MeshUtils.GenerateCubeSphereFace( EdgeSubdivisions, (float)CelestialBody.Radius, this.Node.Center, SubdivisionLevel, this.transform.localPosition );
+            MakeQuadMesh_Job meshJob = new MakeQuadMesh_Job()
+            {
+                subdivisions = EdgeSubdivisions,
+                radius = (float)CelestialBody.Radius,
+                center = this.Node.Center,
+                lN = SubdivisionLevel,
+                origin = this.transform.localPosition
+            };
+
+            meshJob.Initialize();
+
+#warning TODO - add a proper state management to the LODQuad and make it schedule everything in update, wait for completion in lateupdate, depending on state. Currently the job doesn't actually speed up anything because of the waiting.
+            JobHandle jobHandle = meshJob.Schedule();
+
+            jobHandle.Complete();
+
+            Mesh mesh = new Mesh();
+
+            mesh.SetVertices( meshJob.vertices );
+            mesh.SetNormals( meshJob.normals );
+            mesh.SetUVs( 0, meshJob.uvs );
+            mesh.SetTriangles( meshJob.triangles.ToArray(), 0 );
+            // tangents calc'd here because job can't create Mesh object to calc them.
+            mesh.RecalculateTangents();
+            mesh.FixTangents(); // fix broken tangents.
+            mesh.RecalculateBounds();
+
             this._meshCollider.sharedMesh = mesh;
             this._meshFilter.sharedMesh = mesh;
+
+            meshJob.vertices.Dispose();
+            meshJob.normals.Dispose();
+            meshJob.uvs.Dispose();
+            meshJob.triangles.Dispose();
         }
 
         public static LODQuad Create( Transform parent, Vector3 localPosition, LODQuadSphere quadSphere, CelestialBody celestialBody, int edgeSubdivisions, Vector2 center, int lN, LODQuadTree.Node node, float subdivisionDistance, QuadSphereFace face )

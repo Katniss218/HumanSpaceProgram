@@ -58,7 +58,7 @@ namespace KatnisssSpaceSimulator.Terrain
 
             return mesh;
         }
-
+        /*
         /// <summary>
         /// The method that generates the PQS mesh projected onto a sphere of the specified radius, with its origin at the center of the cube projected onto the same sphere.
         /// </summary>
@@ -111,16 +111,18 @@ namespace KatnisssSpaceSimulator.Terrain
                     float u = (latitude * Mathf.Deg2Rad + 1.5f * Mathf.PI) / (2 * Mathf.PI);
                     float v = longitude * Mathf.Deg2Rad / Mathf.PI;
 
-                    /*if( (face == QuadSphereFace.Xn || face == QuadSphereFace.Zp || face == QuadSphereFace.Zn)
-                      && unitSpherePos.y == 0 && unitSpherePos.x <= 0 )
-                    {
-                        u = 0.75f; // just setting to 0.75 doesn't work
-                    }*/
+                    //if( (face == QuadSphereFace.Xn || face == QuadSphereFace.Zp || face == QuadSphereFace.Zn)
+                    // && unitSpherePos.y == 0 && unitSpherePos.x <= 0 )
+                    //{
+                    //    u = 0.75f; // just setting to 0.75 doesn't work
+                    //}
 
                     uvs[index] = new Vector2( u, v );
                     vertices[index] = (Vector3)((posD * radius) - origin);
 
                     // Normals after displacing by heightmap will need to be calculated by hand instead of with RecalculateNormals() to avoid seams not matching up.
+                    // normals can be calculated by adding the normals of each face to its vertices, then normalizing.
+                    // - this will compute smooth VERTEX normals!!
                     normals[index] = unitSpherePos;
                 }
             }
@@ -155,14 +157,10 @@ namespace KatnisssSpaceSimulator.Terrain
             mesh.SetTriangles( triangles.ToArray(), 0 );
             mesh.RecalculateTangents();
 
-            var tang = mesh.tangents;
-            /*if(  )
-            {
-
-            }*/
+            Vector4[] tang = mesh.tangents;
             // For SOME REASON, this fixes tangents on the relatively highly subdivided parts of the mesh.
             // I have no idea why builtin solver can't handle them...
-            if( tang[tang.Length / 4].w == 1.0f /*numberOfEdges * (1 << lN) >= 1024*/ ) // Also doesn't seem to be affected by the actual size of the mesh (changing body radius doesn't change which quads' tangents fail).
+            if( tang[tang.Length / 4].w == 1.0f /*numberOfEdges * (1 << lN) >= 1024 / ) // Also doesn't seem to be affected by the actual size of the mesh (changing body radius doesn't change which quads' tangents fail).
             {
                 // at some point, some tangents seem to end up with positive `w`.
                 // I don't know why. Maybe not curvy enough? idfk...
@@ -171,16 +169,34 @@ namespace KatnisssSpaceSimulator.Terrain
             mesh.RecalculateBounds();
 
             return mesh;
+        }*/
+
+        public static void FixTangents( this Mesh mesh )
+        {
+            // For SOME REASON, tangents are fucked (especially on subdivision levels > 6)
+            // - I have no idea why builtin solver can't handle them...
+            // At some point, some tangents end up with positive `w`. If we flip those, everything seems to look okay again.
+            // - I don't know why. Maybe not curvy enough? idfk...
+
+            Vector4[] tang = mesh.tangents;
+            for( int i = 0; i < tang.Length; i++ )
+            {
+                if( tang[i].w == 1.0f )
+                {
+                    tang[i] = -tang[i]; // flipping only w doesn't fix how the mesh looks.
+                }
+            }
+            mesh.SetTangents( tang );
         }
 
         public static void FlipTangents( this Mesh mesh )
         {
-            var tang = mesh.tangents;
+            Vector4[] tang = mesh.tangents;
             for( int i = 0; i < tang.Length; i++ )
             {
                 tang[i] = -tang[i];
             }
-            mesh.tangents = tang;
+            mesh.SetTangents( tang );
         }
 
         public static void CalculateMeshTangents( this Mesh mesh )

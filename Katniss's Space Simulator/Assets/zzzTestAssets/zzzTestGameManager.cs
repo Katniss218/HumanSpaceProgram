@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace KatnisssSpaceSimulator
 {
@@ -26,8 +27,23 @@ namespace KatnisssSpaceSimulator
 
         public GameObject TestLaunchSite;
 
+        public Texture2D heightmap;
+        public RenderTexture normalmap;
+        public ComputeShader shader;
+        public RawImage uiImage;
+
         void Start()
         {
+            normalmap = new RenderTexture( heightmap.width, heightmap.height, 8, RenderTextureFormat.ARGB32 );
+            normalmap.enableRandomWrite = true;
+
+            shader.SetTexture( shader.FindKernel( "CalculateNormalMap" ), Shader.PropertyToID( "heightMap" ), heightmap );
+            shader.SetTexture( shader.FindKernel( "CalculateNormalMap" ), Shader.PropertyToID( "normalMap" ), normalmap );
+            shader.SetFloat( Shader.PropertyToID( "strength" ), 5.0f );
+            shader.Dispatch( shader.FindKernel( "CalculateNormalMap" ), heightmap.width / 8, heightmap.height / 8, 1 );
+
+            uiImage.texture = normalmap;
+
             CelestialBody cb = new CelestialBodyFactory().Create( Vector3Dbl.zero );
 
             CelestialBody cb1 = new CelestialBodyFactory().Create( new Vector3Dbl( 440_000_000, 0, 0 ) );
