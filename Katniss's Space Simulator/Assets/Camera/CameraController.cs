@@ -1,27 +1,37 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering.PostProcessing;
 
 namespace KatnisssSpaceSimulator.Camera
 {
     public class CameraController : MonoBehaviour
     {
+        /// <summary>
+        /// The camera will focus on this object.
+        /// </summary>
+        [field: SerializeField]
+        public Transform ReferenceObject { get; set; }
+
         [field: SerializeField]
         public Transform CameraParent { get; set; }
 
         [field: SerializeField]
-        UnityEngine.Camera _closeCamera { get; set; }
+        UnityEngine.Camera _closeCamera;
 
         [field: SerializeField]
-        UnityEngine.Camera _farCamera { get; set; }
-
-        [field: SerializeField]
-        public Transform ReferenceObject { get; set; }
+        UnityEngine.Camera _farCamera;
 
         [field: SerializeField]
         float zoomDist = 5;
 
         float? mapViewPreviousZoomDist = null;
+
+        [field: SerializeField]
+        PostProcessLayer _closePPLayer;
+
+        [field: SerializeField]
+        PostProcessLayer _farPPLayer; 
 
         void UpdateZoomLevel()
         {
@@ -76,10 +86,14 @@ namespace KatnisssSpaceSimulator.Camera
             if( zoomDist > 1_000_000 ) // should be enough of a conservative value. Near cam is only 100km, not 1000.
             {
                 this._closeCamera.enabled = false;
+                this._closePPLayer.enabled = false;
+                this._farPPLayer.enabled = true;
             }
             else
             {
                 this._closeCamera.enabled = true;
+                this._closePPLayer.enabled = true;
+                this._farPPLayer.enabled = false;
             }
         }
 

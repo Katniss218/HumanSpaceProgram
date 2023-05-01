@@ -102,33 +102,6 @@ namespace KatnisssSpaceSimulator.Terrain
                 throw new ArgumentOutOfRangeException( $"Unity's Mesh can contain at most 65535 vertices (16-bit buffer). Tried to create a Mesh with {numberOfVertices}." );
             }
 
-            for( int i = 0; i < numberOfVertices; i++ )
-            {
-                for( int j = 0; j < numberOfVertices; j++ )
-                {
-                    int index = (i * numberOfEdges) + i + j;
-
-                    float quadX = (i * edgeLength) + minX; // This might need to be turned into a double perhaps (for large bodies with lots of subdivs).
-                    float quadY = (j * edgeLength) + minY;
-
-                    Vector3Dbl posD = face.GetSpherePointDbl( quadX, quadY );
-
-                    Vector3 unitSpherePos = (Vector3)posD;
-
-                    Vector3Dbl heightOff = posD * Math.Sin( (unitSpherePos.x * unitSpherePos.y * unitSpherePos.z) * radius );
-
-                    resultVertices[index] = (Vector3)(((posD * radius) + heightOff) - (Vector3Dbl)origin);
-
-                    const float margin = 0.0f; // margin can be 0 when the texture wrap mode is set to mirror.
-                    resultUvs[index] = new Vector2( quadX * (0.5f - margin) + 0.5f, quadY * (0.5f - margin) + 0.5f );
-
-                    // Normals after displacing by heightmap will need to be calculated by hand instead of with RecalculateNormals() to avoid seams not matching up.
-                    // normals can be calculated by adding the normals of each face to its vertices, then normalizing.
-                    // - this will compute smooth VERTEX normals!!
-                    resultNormals[index] = unitSpherePos;
-                }
-            }
-
             int triIndex = 0;
             for( int i = 0; i < numberOfEdges; i++ )
             {
@@ -150,6 +123,33 @@ namespace KatnisssSpaceSimulator.Terrain
                     resultTriangles[triIndex + 5] = index + numberOfVertices + 1; // D
 
                     triIndex += 6;
+                }
+            }
+
+            for( int i = 0; i < numberOfVertices; i++ )
+            {
+                for( int j = 0; j < numberOfVertices; j++ )
+                {
+                    int index = (i * numberOfEdges) + i + j;
+
+                    float quadX = (i * edgeLength) + minX; // This might need to be turned into a double perhaps (for large bodies with lots of subdivs).
+                    float quadY = (j * edgeLength) + minY;
+
+                    Vector3Dbl posD = face.GetSpherePointDbl( quadX, quadY );
+
+                    Vector3 unitSpherePos = (Vector3)posD;
+
+                    Vector3Dbl temporaryHeightOffset_Removelater = posD * Math.Sin( (unitSpherePos.x * unitSpherePos.y * unitSpherePos.z) * radius );
+
+                    resultVertices[index] = (Vector3)(((posD * radius) + temporaryHeightOffset_Removelater) - (Vector3Dbl)origin);
+
+                    const float margin = 0.0f; // margin can be 0 when the texture wrap mode is set to mirror.
+                    resultUvs[index] = new Vector2( quadX * (0.5f - margin) + 0.5f, quadY * (0.5f - margin) + 0.5f );
+
+                    // Normals after displacing by heightmap will need to be calculated by hand instead of with RecalculateNormals() to avoid seams not matching up.
+                    // normals can be calculated by adding the normals of each face to its vertices, then normalizing.
+                    // - this will compute smooth VERTEX normals!!
+                    resultNormals[index] = unitSpherePos;
                 }
             }
 

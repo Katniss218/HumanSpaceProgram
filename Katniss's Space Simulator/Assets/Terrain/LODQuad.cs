@@ -253,7 +253,10 @@ namespace KatnisssSpaceSimulator.Terrain
                 // Those will in most cases almost for sure contact a larger node on at least one side.
 
                 // if the new node should be interpolated, then it will have at most one neighbor in a given direction, because of how they are subdivided.
-
+                foreach( var node in queriedNeighborsAndSelf )
+                {
+                    // since there is at most 1 node, we can just loop over them, discard any that are smaller
+                }
                 // 
                 //quad._edges = q._edges; // not accurate for internal edges, only external
             }
@@ -265,6 +268,9 @@ namespace KatnisssSpaceSimulator.Terrain
                 if( q.Node == node )
                     continue; // itself.
 
+                if( node.Size > q.Node.Size )
+                    continue; // we don't want to update nodes that are larger than us.
+
                 Vector2 dir = q.Node.Center - node.Center;
 
                 if( Mathf.Abs( dir.x ) == Mathf.Abs( dir.y ) )
@@ -273,8 +279,8 @@ namespace KatnisssSpaceSimulator.Terrain
                 // We have to set the edges of the queried nodes to whatever the subdivided nodes are, but ONLY IF if the new subdivided nodes are smaller than the queried nodes.
                 // do the opposite when unsubdivving.
 
-                int index = LODQuadTree_NodeUtils.GetEdgeIndex( dir );
-                node.Value._edges[index] = q;
+                //int index = LODQuadTree_NodeUtils.GetEdgeIndex( dir );
+                //node.Value._edges[index] = q;
             }
 
             q.airfPOIs = null;
@@ -307,7 +313,7 @@ namespace KatnisssSpaceSimulator.Terrain
             int unsubdividedLN = q.SubdivisionLevel - 1;
 
             LODQuad newQuad = Create( q.transform.parent, unsubdividedOrigin, q._quadSphere, q.CelestialBody, unsubdividedCenter, unsubdividedLN, q.Node.Parent, q.SubdivisionDistance * 2f, q._meshRenderer.material, q._face );
-            
+
             // Destroy the old quads that were replaced by the unsubdivided quad.
             foreach( var qSibling in q.Node.Siblings )
             {
