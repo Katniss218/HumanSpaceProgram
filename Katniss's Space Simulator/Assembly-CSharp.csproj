@@ -62,6 +62,7 @@
     <Compile Include="Assets\zzzTestAssets\zzzTestGameManager.cs" />
     <Compile Include="Assets\Terrain\MeshUtils.cs" />
     <Compile Include="Assets\Core\CelestialBodyFactory.cs" />
+    <Compile Include="Assets\Terrain\MakeQuadMesh_Job.cs" />
     <Compile Include="Assets\Terrain\LODQuadSphere.cs" />
     <Compile Include="Assets\Core\ReferenceFrames\OffsetReferenceFrame.cs" />
     <Compile Include="Assets\Core\VesselFactory.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="Assets\Core\ReferenceFrames\IReferenceFrameSwitchResponder.cs" />
     <Compile Include="Assets\Core\CelestialBodySurface.cs" />
     <Compile Include="Assets\Core\ReferenceFrames\SceneReferenceFrameManager.cs" />
+    <Compile Include="Assets\UI\FPSCounterUI.cs" />
     <Compile Include="Assets\Core\Vessel.cs" />
     <Compile Include="Assets\Buildings\LaunchSiteFactory.cs" />
     <Compile Include="Assets\UI\AltitudeReadoutUI.cs" />
@@ -91,9 +93,7 @@
     <Compile Include="Assets\Core\Functionality.cs" />
     <Compile Include="Assets\TimeWarp\TimeWarpManager.cs" />
     <Compile Include="Assets\Core\ReferenceFrames\IReferenceFrame.cs" />
-    <Compile Include="Assets\Terrain\LODQuadUtils.cs" />
-    <Compile Include="Assets\Terrain\MakeQuadMesh_Job.cs" />
-    <Compile Include="Assets\UI\FPSCounterUI.cs" />
+    <Compile Include="Assets\Terrain\LODQuadTree_NodeUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro.cginc" />

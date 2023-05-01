@@ -62,6 +62,9 @@ namespace KatnisssSpaceSimulator.Terrain
         MakeQuadMesh_Job _job;
         JobHandle _jobHandle;
 
+        [SerializeField]
+        LODQuad[] _edges = new LODQuad[4];
+
         void Awake()
         {
             _meshFilter = this.GetComponent<MeshFilter>();
@@ -98,7 +101,7 @@ namespace KatnisssSpaceSimulator.Terrain
             {
                 _jobHandle.Complete();
 
-                _job.Finish(this);
+                _job.Finish( this );
 
                 this.CurrentState = State.Active;
             }
@@ -106,7 +109,7 @@ namespace KatnisssSpaceSimulator.Terrain
 
         internal void SetMesh( Mesh mesh )
         {
-            this._meshCollider.sharedMesh = mesh;
+            this._meshCollider.sharedMesh = mesh; // this is kinda slow.
             this._meshFilter.sharedMesh = mesh;
         }
 
@@ -148,7 +151,7 @@ namespace KatnisssSpaceSimulator.Terrain
                 return false;
             }
 
-            if( airfPOIs == null )
+            if( airfPOIs == null ) // default.
             {
                 return false;
             }
@@ -192,6 +195,29 @@ namespace KatnisssSpaceSimulator.Terrain
 #warning TODO - LOD Terrain edge interpolation.
         // we need something to tell the connectivity of parts. Could use the quadtree.
 
+        // Quads with lN1 adjust to the neighboring quads with lN2 <= lN1
+        // I.e. smaller quads adjust to bigger quads.
+
+        // the smaller quads will have their start/end vertices aligned with vertices on the larger quads if the contacting meshes don't have too different subdiv count
+
+        // the edge subdivision count determines the maximum difference in subdiv level of adjacent quads that will still align the start/end vertices on the small one.
+
+
+        // any height shaping function shouldn't change its output value for the same position, regardless of the quad calling it.
+
+        // ### 2. option 2
+
+        // we query the quadtree for the rectangle defined by the node that is being subdivided? (using <= instead of < we don't have to make it bigger because exactly representable floats)
+        // - this is simpler, less things to sync up, and would probably perform roughly the same in terms of speed.
+        // if min/max of the query region is 0 or 2, we can also query the edge of the adjacent quadtrees of the other sphere faces.
+        // maybe represent that as a separate class that can handle that.
+
+        // quadtree can be modified to store its min/max coordinates directly, with size/center accessors.
+        // since the subdivisions are binary, starting at size=2, these points will always be representable exactly (until we run out of available space in the exponent of the float).
+
+        // querying the quadtree for that should be reasonably fast.
+
+
         /// <summary>
         /// Splits the specified quad into 4 separate quads.
         /// </summary>
@@ -207,25 +233,48 @@ namespace KatnisssSpaceSimulator.Terrain
                 return;
             }
 
-            q.Node.Children = new LODQuadTree.Node[2, 2];
+            // Leaf Nodes that border the node `q`, as well as `q` itself is also included.
+            var queriedNeighborsAndSelf = q.Node.Root.QueryLeafNodes( q.Node.minX, q.Node.minY, q.Node.maxX, q.Node.maxY );
+
+            int subdividedLN = q.SubdivisionLevel + 1;
 
             for( int i = 0; i < 4; i++ )
             {
-                (int xIndex, int yIndex) = LODQuadUtils.GetChildIndex( i );
+                (int xIndex, int yIndex) = LODQuadTree_NodeUtils.GetChildIndex( i );
 
-                Vector2 center = LODQuadUtils.GetChildCenter( q.Node, xIndex, yIndex );
+                Vector2 subdividedCenter = LODQuadTree_NodeUtils.GetChildCenter( q.Node, xIndex, yIndex );
+                Vector3 subdividedOrigin = q._face.GetSpherePoint( subdividedCenter.x, subdividedCenter.y ) * (float)q.CelestialBody.Radius;
 
-                Vector3 origin = q._face.GetSpherePoint( center.x, center.y ) * (float)q.CelestialBody.Radius;
+                LODQuadTree.Node newNode = new LODQuadTree.Node( q.Node, subdividedCenter, LODQuadTree_NodeUtils.GetSize( subdividedLN ) );
 
-                int lN = q.SubdivisionLevel + 1;
-                q.Node.Children[xIndex, yIndex] = new LODQuadTree.Node()
-                {
-                    Center = center,
-                    Size = LODQuadUtils.GetSize( lN ),
-                    Parent = q.Node
-                };
+                LODQuad newQuad = Create( q.transform.parent, subdividedOrigin, q._quadSphere, q.CelestialBody, subdividedCenter, subdividedLN, newNode, q.SubdivisionDistance / 2f, q._meshRenderer.material, q._face );
 
-                LODQuad quad = Create( q.transform.parent, origin, q._quadSphere, q.CelestialBody, center, lN, q.Node.Children[xIndex, yIndex], q.SubdivisionDistance / 2f, q._meshRenderer.material, q._face );
+#warning TODO - We also need to set the edges for the newly subdivided nodes.
+                // Those will in most cases almost for sure contact a larger node on at least one side.
+
+                // if the new node should be interpolated, then it will have at most one neighbor in a given direction, because of how they are subdivided.
+
+                // 
+                //quad._edges = q._edges; // not accurate for internal edges, only external
+            }
+
+            // Update the surrounding nodes.
+            // this part is only really important for updating nodes that once had a larger neighbor, but no longer have one because it was subdivided.
+            foreach( var node in queriedNeighborsAndSelf )
+            {
+                if( q.Node == node )
+                    continue; // itself.
+
+                Vector2 dir = q.Node.Center - node.Center;
+
+                if( Mathf.Abs( dir.x ) == Mathf.Abs( dir.y ) )
+                    continue; // corner node.
+
+                // We have to set the edges of the queried nodes to whatever the subdivided nodes are, but ONLY IF if the new subdivided nodes are smaller than the queried nodes.
+                // do the opposite when unsubdivving.
+
+                int index = LODQuadTree_NodeUtils.GetEdgeIndex( dir );
+                node.Value._edges[index] = q;
             }
 
             q.airfPOIs = null;
@@ -245,29 +294,27 @@ namespace KatnisssSpaceSimulator.Terrain
                 return;
             }
 
-            foreach( var siblingNode in q.Node.Siblings )
+            foreach( var qSibling in q.Node.Siblings )
             {
-                if( siblingNode.Children != null )
+                if( qSibling.Children != null )
                 {
                     return; // one of the siblings is subdivided
                 }
             }
 
-            Vector2 center = q.Node.Parent.Center;
-            Vector3 origin = q._face.GetSpherePoint( center.x, center.y ) * (float)q.CelestialBody.Radius;
-            int lN = q.SubdivisionLevel - 1;
+            Vector2 unsubdividedCenter = q.Node.Parent.Center;
+            Vector3 unsubdividedOrigin = q._face.GetSpherePoint( unsubdividedCenter.x, unsubdividedCenter.y ) * (float)q.CelestialBody.Radius;
+            int unsubdividedLN = q.SubdivisionLevel - 1;
 
-            LODQuad quad = Create( q.transform.parent, origin, q._quadSphere, q.CelestialBody, center, lN, q.Node.Parent, q.SubdivisionDistance * 2f, q._meshRenderer.material, q._face );
-            quad.airfPOIs = q.airfPOIs; // IMPORTANT.
-
-            // Destroy the other 3 siblings of the unsubdivided quad.
-            foreach( var qSibling in q.Node.Parent.Children )
+            LODQuad newQuad = Create( q.transform.parent, unsubdividedOrigin, q._quadSphere, q.CelestialBody, unsubdividedCenter, unsubdividedLN, q.Node.Parent, q.SubdivisionDistance * 2f, q._meshRenderer.material, q._face );
+            
+            // Destroy the old quads that were replaced by the unsubdivided quad.
+            foreach( var qSibling in q.Node.Siblings )
             {
-                //qSibling.Value.airfPOIs = null;
                 Destroy( qSibling.Value.gameObject );
             }
 
-            q.Node.Parent.Children = null;
+            q.Node.Parent.MakeLeafNode();
         }
 
         /// <summary>
@@ -295,33 +342,33 @@ namespace KatnisssSpaceSimulator.Terrain
 
             go.AddComponent<MeshCollider>();
 
-            LODQuad q = go.AddComponent<LODQuad>();
-            q.Node = node;
-            node.Value = q;
+            LODQuad newQuad = go.AddComponent<LODQuad>();
+            newQuad.Node = node;
+            node.Value = newQuad;
 
             if( lN > 0 )
             {
-                (int x, int y) = LODQuadUtils.GetChildIndex( q.Node.Parent.Center, center );
+                (int x, int y) = LODQuadTree_NodeUtils.GetChildIndex( newQuad.Node );
 
-                q.Node.Parent.Children[x, y].Value = q;
+                newQuad.Node.Parent.Children[x, y].Value = newQuad;
             }
 
-            q.CelestialBody = celestialBody;
-            q._quadSphere = quadSphere;
-            q.SubdivisionDistance = subdivisionDistance;
+            newQuad.CelestialBody = celestialBody;
+            newQuad._quadSphere = quadSphere;
+            newQuad.SubdivisionDistance = subdivisionDistance;
 
-            q.SubdivisionLevel = lN;
-            q._face = face;
+            newQuad.SubdivisionLevel = lN;
+            newQuad._face = face;
 
             // Unity keeps the local positions of objects internally.
-            q.transform.localPosition = localPosition;
-            q.transform.localRotation = Quaternion.identity;
-            q.transform.localScale = Vector3.one;
-            q.CurrentState = State.Idle;
+            newQuad.transform.localPosition = localPosition;
+            newQuad.transform.localRotation = Quaternion.identity;
+            newQuad.transform.localScale = Vector3.one;
+            newQuad.CurrentState = State.Idle;
 
-            q.GenerateMeshData();
+            newQuad.GenerateMeshData();
 
-            return q;
+            return newQuad;
         }
     }
 }

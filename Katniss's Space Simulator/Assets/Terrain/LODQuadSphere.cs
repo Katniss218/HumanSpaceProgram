@@ -17,7 +17,7 @@ namespace KatnisssSpaceSimulator.Terrain
         /// <summary>
         /// The number of binary subdivisions per edge of each of the quads.
         /// </summary>
-        public int EdgeSubdivisions { get; private set; } = 5;
+        public int EdgeSubdivisions { get; private set; } = 4;
 
         /// <summary>
         /// The level of subdivision (lN) at which the quad will stop subdividing.
@@ -26,6 +26,8 @@ namespace KatnisssSpaceSimulator.Terrain
 
         LODQuadTree[] _quadTree;
         CelestialBody _celestialBody;
+
+        public const float QUAD_RANGE_MULTIPLIER = 2.0f; // 3.0 makes all joints only between the same subdiv.
 
         void Awake()
         {
@@ -44,11 +46,8 @@ namespace KatnisssSpaceSimulator.Terrain
                 int lN = 0;
 
                 _quadTree[i] = new LODQuadTree();
-                _quadTree[i].Root = new LODQuadTree.Node()
-                {
-                    Center = center,
-                    Size = LODQuadUtils.GetSize( lN )
-                };
+                _quadTree[i].Root = new LODQuadTree.Node( null, center, LODQuadTree_NodeUtils.GetSize( lN ) );
+
 #warning TODO - there is some funkiness with the collider physics (it acts as if the object was unparented (when unparenting, it changes scene position slightly)).
 
 
@@ -57,7 +56,7 @@ namespace KatnisssSpaceSimulator.Terrain
                 mat.SetFloat( "_Glossiness", 0.05f );
                 mat.SetFloat( "_NormalStrength", 0.0f );
 
-                var face = LODQuad.Create( _celestialBody.transform, ((QuadSphereFace)i).ToVector3() * (float)_celestialBody.Radius, this, _celestialBody, center, lN, _quadTree[i].Root, (float)_celestialBody.Radius * 2f, mat, (QuadSphereFace)i );
+                var face = LODQuad.Create( _celestialBody.transform, ((QuadSphereFace)i).ToVector3() * (float)_celestialBody.Radius, this, _celestialBody, center, lN, _quadTree[i].Root, (float)_celestialBody.Radius * QUAD_RANGE_MULTIPLIER, mat, (QuadSphereFace)i );
             }
         }
 
@@ -65,7 +64,7 @@ namespace KatnisssSpaceSimulator.Terrain
         {
             foreach( var q in _quadTree )
             {
-                foreach( var qq in q.GetLeafNodes() ) // This can be optimized for large numbers of subdivs.
+                foreach( var qq in q.GetNonNullLeafNodes() ) // This can be optimized for large numbers of subdivs.
                 {
                     qq.airfPOIs = new Vector3Dbl[] { VesselManager.ActiveVessel.AIRFPosition };
                 }

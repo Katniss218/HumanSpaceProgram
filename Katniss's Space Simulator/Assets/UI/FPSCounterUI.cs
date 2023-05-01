@@ -18,13 +18,7 @@ namespace Assets.UI
 
         private float GetFps()
         {
-            // If is paused, return 0 FPS.
-            if( Time.deltaTime == 0 )
-            {
-                return 0;
-            }
-            // Otherwise, calculate the real FPS.
-            return 1.0f / Time.deltaTime;
+            return 1.0f / Time.unscaledDeltaTime; // unscaled so timewarp / pausing doesn't fuck with it.
         }
 
         private void SampleFPS()

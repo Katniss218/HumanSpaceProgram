@@ -16,7 +16,7 @@ namespace KatnisssSpaceSimulator.Terrain
     public struct MakeQuadMesh_Job : IJob
     {
         int subdivisions;
-        float radius;
+        double radius;
         Vector2 center;
         int lN;
         Vector3 origin;
@@ -44,7 +44,7 @@ namespace KatnisssSpaceSimulator.Terrain
             lN = quad.SubdivisionLevel;
             origin = quad.transform.localPosition;
 
-            size = LODQuadUtils.GetSize( lN );
+            size = LODQuadTree_NodeUtils.GetSize( lN );
 
             numberOfEdges = 1 << subdivisions; // Fast 2^n for integer types.
             numberOfVertices = numberOfEdges + 1;
@@ -115,7 +115,9 @@ namespace KatnisssSpaceSimulator.Terrain
 
                     Vector3 unitSpherePos = (Vector3)posD;
 
-                    resultVertices[index] = (Vector3)((posD * radius * (1.0 + (1 / radius) * Mathf.Sin( i * j ))) - origin);
+                    Vector3Dbl heightOff = posD * Math.Sin( (unitSpherePos.x * unitSpherePos.y * unitSpherePos.z) * radius );
+
+                    resultVertices[index] = (Vector3)(((posD * radius) + heightOff) - (Vector3Dbl)origin);
 
                     const float margin = 0.0f; // margin can be 0 when the texture wrap mode is set to mirror.
                     resultUvs[index] = new Vector2( quadX * (0.5f - margin) + 0.5f, quadY * (0.5f - margin) + 0.5f );
