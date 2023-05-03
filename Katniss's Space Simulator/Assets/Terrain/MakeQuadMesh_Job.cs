@@ -94,7 +94,7 @@ namespace KatnisssSpaceSimulator.Terrain
         {
             // The origin of a valid, the center will never be at any of the edges of its ancestors, and will always be at the point where the inner edges of its direct children meet.
 
-            QuadSphereFace face = QuadSphereFaceEx.FromVector( origin.normalized );
+            Direction3D face = Direction3DUtils.BasisFromVector( origin.normalized );
 
             if( numberOfVertices > 65535 )
             {

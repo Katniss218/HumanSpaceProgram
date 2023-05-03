@@ -1937,12 +1937,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cbShader: {fileID: 4800000, guid: e3f72d5ef871243408ac05fea5ed9243, type: 3}
   cbTextures:
-  - {fileID: 2800000, guid: 305ae7eb94909c644a2f1a85d8e03dab, type: 3}
   - {fileID: 2800000, guid: d17090d9f818409458984d34346bcd0d, type: 3}
-  - {fileID: 2800000, guid: 0fbed77b25a64944a844b8a46204b031, type: 3}
+  - {fileID: 2800000, guid: 305ae7eb94909c644a2f1a85d8e03dab, type: 3}
   - {fileID: 2800000, guid: 90277dd122cd8f141ada4071bccb6a6e, type: 3}
-  - {fileID: 2800000, guid: fd3d8acf88cd7b74ea2a0753768ce440, type: 3}
+  - {fileID: 2800000, guid: 0fbed77b25a64944a844b8a46204b031, type: 3}
   - {fileID: 2800000, guid: 817733ada2fab5940bf97a27e89c538d, type: 3}
+  - {fileID: 2800000, guid: fd3d8acf88cd7b74ea2a0753768ce440, type: 3}
   Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   Material: {fileID: 2100000, guid: 23d92b14f1c3e2f4e983a19b15eb7596, type: 2}
   TestLaunchSite: {fileID: 2889124796493493744, guid: 315f9171e8abb8347b411d9e90572b3c, type: 3}

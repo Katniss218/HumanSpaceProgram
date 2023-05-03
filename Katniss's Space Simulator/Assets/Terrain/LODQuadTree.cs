@@ -11,6 +11,9 @@ namespace KatnisssSpaceSimulator.Terrain
     {
         public class Node
         {
+            /// <summary>
+            /// A way to retrieve the quad from the quadtree.
+            /// </summary>
             public LODQuad Value { get; set; }
 
             public float minX { get; }
@@ -18,28 +21,42 @@ namespace KatnisssSpaceSimulator.Terrain
             public float minY { get; }
             public float maxY { get; }
 
+            /// <summary>
+            /// Calculates and returns the center of the node.
+            /// </summary>
             public Vector2 Center => new Vector2( (minX + maxX) / 2.0f, (minY + maxY) / 2.0f );
-            public float Size => maxX - minX;
+            /// <summary>
+            /// Calculates and returns the (square) edge length of the node.
+            /// </summary>
+            public float Size => maxX - minX; // Nodes are supposed to be square, so we can use either coordinate.
 
+            /// <summary>
+            /// The root node of the entire quadtree.
+            /// </summary>
             public Node Root { get; private set; }
             public Node Parent { get; private set; }
 
             public Node[,] Children { get; private set; }
 
-            /// <summary>
+            /// <remarks>
             /// Contains itself (!)
-            /// </summary>
+            /// </remarks>
             public Node[,] Siblings => this.Parent?.Children;
 
-            public void MakeLeafNode()
+            public void MakeLeaf()
             {
                 foreach( var child in this.Children )
                 {
-                    child.Root = null;
-                    child.Parent = null;
+                    child.RemoveFromHierarchy();
                 }
 
                 this.Children = null;
+            }
+
+            private void RemoveFromHierarchy()
+            {
+                this.Root = null;
+                this.Parent = null;
             }
 
             public Node( Node parent, Vector2 center, float size )
@@ -67,8 +84,12 @@ namespace KatnisssSpaceSimulator.Terrain
                 }
             }
 
-            public List<Node> QueryLeafNodes( float minX, float minY, float maxX, float maxY )
+            /// <remarks>
+            /// Includes nodes that are intersecting, as well as if the edges or corners touch.
+            /// </remarks>
+            public List<Node> QueryOverlappingLeaves( float minX, float minY, float maxX, float maxY )
             {
+#warning TODO - Add a way to include other faces in the query. And not just the quad face of the current quad. Combine the 6 quadtrees into one datastructure.
                 // return the list of nodes that overlap with the region.
 
                 // we could also group the results based on direction from the center here.
@@ -84,7 +105,7 @@ namespace KatnisssSpaceSimulator.Terrain
 
                     foreach( var child in this.Children )
                     {
-                        nodes.AddRange( child.QueryLeafNodes( minX, minY, maxX, maxY ) );
+                        nodes.AddRange( child.QueryOverlappingLeaves( minX, minY, maxX, maxY ) );
                     }
 
                     return nodes;
@@ -94,7 +115,12 @@ namespace KatnisssSpaceSimulator.Terrain
             }
         }
 
-        public Node Root { get; set; }
+        public Node Root { get; private set; }
+
+        public LODQuadTree( Node root )
+        {
+            Root = root;
+        }
 
 
         List<LODQuad> GetNonNullLeafNodes( Node rootNode )

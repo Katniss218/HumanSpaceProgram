@@ -10,32 +10,39 @@ using UnityEngine;
 namespace KatnisssSpaceSimulator.Terrain
 {
     /// <summary>
-    /// Contains information about which of the cube's faces a given quad represents.
+    /// Represents a basis direction in 3D space.
     /// </summary>
-    public enum QuadSphereFace
+    /// <remarks>
+    /// Usable as an index into an array to keep track of things in each direction.
+    /// </remarks>
+    public enum Direction3D
     {
-        // Do not change the values, there are things that rely on this.
-        Xp = 0,
-        Xn = 1,
-        Yp = 2,
-        Yn = 3,
-        Zp = 4,
-        Zn = 5
+        // Not supposed to be combinable.
+        Xn = 0,
+        Xp = 1,
+
+        Yn = 2,
+        Yp = 3,
+
+        Zn = 4,
+        Zp = 5
+
+            // Actually, maybe make this as a struct? that way it'd have more options, like operators (mult by direction for example), etc.
     }
 
-    public static class QuadSphereFaceEx
+    public static class Direction3DUtils
     {
         /// <summary>
-        /// Calculates the <see cref="QuadSphereFace"/> for a given vector.
+        /// Calculates the <see cref="Direction3D"/> for a given vector.
         /// </summary>
         /// <returns>
         /// The QuadSphereFace corresponding to the vector's maximum axis.
         /// </returns>
-        public static QuadSphereFace FromVector( Vector3 vector )
+        public static Direction3D BasisFromVector( Vector3 vector )
         {
             float x = vector.x;
             float y = vector.y;
-            float z = vector.z;
+            float z = vector.z; // What it does is a combo between getting the maximum axis, and then getting a direction from that.
 
             int maxIndex = 0;
             float maxValue = Math.Abs( x );
@@ -52,18 +59,18 @@ namespace KatnisssSpaceSimulator.Terrain
 
             if( maxIndex == 0 )
             {
-                if( sign == 1 ) return QuadSphereFace.Xp;
-                if( sign == -1 ) return QuadSphereFace.Xn;
+                if( sign == 1 ) return Direction3D.Xp;
+                if( sign == -1 ) return Direction3D.Xn;
             }
             if( maxIndex == 1 )
             {
-                if( sign == 1 ) return QuadSphereFace.Yp;
-                if( sign == -1 ) return QuadSphereFace.Yn;
+                if( sign == 1 ) return Direction3D.Yp;
+                if( sign == -1 ) return Direction3D.Yn;
             }
             if( maxIndex == 2 )
             {
-                if( sign == 1 ) return QuadSphereFace.Zp;
-                if( sign == -1 ) return QuadSphereFace.Zn;
+                if( sign == 1 ) return Direction3D.Zp;
+                if( sign == -1 ) return Direction3D.Zn;
             }
             throw new InvalidOperationException();
         }
@@ -71,33 +78,35 @@ namespace KatnisssSpaceSimulator.Terrain
         /// <summary>
         /// Returns a unit vector pointing along the face's axis.
         /// </summary>
-        public static Vector3 ToVector3( this QuadSphereFace v )
+        public static Vector3 ToVector3( this Direction3D dir )
         {
-            switch( v )
+            switch( dir )
             {
-                case QuadSphereFace.Xp:
+                case Direction3D.Xp:
                     return new Vector3( 1, 0, 0 );
-                case QuadSphereFace.Xn:
+                case Direction3D.Xn:
                     return new Vector3( -1, 0, 0 );
-                case QuadSphereFace.Yp:
+                case Direction3D.Yp:
                     return new Vector3( 0, 1, 0 );
-                case QuadSphereFace.Yn:
+                case Direction3D.Yn:
                     return new Vector3( 0, -1, 0 );
-                case QuadSphereFace.Zp:
+                case Direction3D.Zp:
                     return new Vector3( 0, 0, 1 );
-                case QuadSphereFace.Zn:
+                case Direction3D.Zn:
                     return new Vector3( 0, 0, -1 );
             }
-            throw new ArgumentException( $"Unknown {nameof( QuadSphereFace )} '{v}'.", nameof( v ) );
+            throw new ArgumentException( $"Unknown {nameof( Direction3D )} '{dir}'.", nameof( dir ) );
         }
 
-        public static Vector3 GetSpherePoint( this QuadSphereFace face, Vector2 quadXY )
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static Vector3 GetSpherePoint( this Direction3D face, Vector2 quadXY )
         {
             return GetSpherePoint( face, quadXY.x, quadXY.y );
         }
 
         /// <returns>Returns the point on the surface of a unit cube corresponding to the specified cube face and face coordinates.</returns>
-        public static Vector3 GetSpherePoint( this QuadSphereFace face, float quadX, float quadY )
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static Vector3 GetSpherePoint( this Direction3D face, float quadX, float quadY )
         {
             // quad x, y go in range [-1..1]
             Contract.Assert( quadX >= -1 && quadX <= 1, $"{nameof( quadX )} has to be in range [-1..1]." );
@@ -106,22 +115,22 @@ namespace KatnisssSpaceSimulator.Terrain
             Vector3 pos;
             switch( face )
             {
-                case QuadSphereFace.Xp:
+                case Direction3D.Xp:
                     pos = new Vector3( 1.0f, -quadX, quadY );
                     break;
-                case QuadSphereFace.Xn:
+                case Direction3D.Xn:
                     pos = new Vector3( -1.0f, quadX, quadY );
                     break;
-                case QuadSphereFace.Yp:
+                case Direction3D.Yp:
                     pos = new Vector3( quadX, 1.0f, quadY );
                     break;
-                case QuadSphereFace.Yn:
+                case Direction3D.Yn:
                     pos = new Vector3( -quadX, -1.0f, quadY );
                     break;
-                case QuadSphereFace.Zp:
+                case Direction3D.Zp:
                     pos = new Vector3( quadY, quadX, 1.0f );
                     break;
-                case QuadSphereFace.Zn:
+                case Direction3D.Zn:
                     pos = new Vector3( -quadY, quadX, -1.0f );
                     break;
                 default:
@@ -132,9 +141,9 @@ namespace KatnisssSpaceSimulator.Terrain
             return pos;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         /// <returns>Returns the point on the surface of a unit cube corresponding to the specified cube face and face coordinates.</returns>
-        public static Vector3Dbl GetQuadPointDbl( this QuadSphereFace face, float quadX, float quadY )
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Vector3Dbl GetQuadPointDbl( this Direction3D face, float quadX, float quadY )
         {
             // quad x, y go in range [-1..1]
             Contract.Assert( quadX >= -1 && quadX <= 1, $"{nameof( quadX )} has to be in range [-1..1]." );
@@ -143,22 +152,22 @@ namespace KatnisssSpaceSimulator.Terrain
             Vector3Dbl pos;
             switch( face )
             {
-                case QuadSphereFace.Xp:
+                case Direction3D.Xp:
                     pos = new Vector3Dbl( 1.0, -quadX, quadY );
                     break;
-                case QuadSphereFace.Xn:
+                case Direction3D.Xn:
                     pos = new Vector3Dbl( -1.0, quadX, quadY );
                     break;
-                case QuadSphereFace.Yp:
+                case Direction3D.Yp:
                     pos = new Vector3Dbl( quadX, 1.0, quadY );
                     break;
-                case QuadSphereFace.Yn:
+                case Direction3D.Yn:
                     pos = new Vector3Dbl( -quadX, -1.0, quadY );
                     break;
-                case QuadSphereFace.Zp:
+                case Direction3D.Zp:
                     pos = new Vector3Dbl( quadY, quadX, 1.0 );
                     break;
-                case QuadSphereFace.Zn:
+                case Direction3D.Zn:
                     pos = new Vector3Dbl( -quadY, quadX, -1.0 );
                     break;
                 default:
@@ -169,7 +178,8 @@ namespace KatnisssSpaceSimulator.Terrain
         }
 
         /// <returns>Returns the point on the surface of a unit cube corresponding to the specified cube face and face coordinates.</returns>
-        public static Vector3Dbl GetSpherePointDbl( this QuadSphereFace face, float quadX, float quadY )
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static Vector3Dbl GetSpherePointDbl( this Direction3D face, float quadX, float quadY )
         {
             Vector3Dbl pos = GetQuadPointDbl( face, quadX, quadY );
             pos.Normalize(); // unit sphere.

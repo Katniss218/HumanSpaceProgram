@@ -45,8 +45,7 @@ namespace KatnisssSpaceSimulator.Terrain
                 Vector2 center = Vector2.zero;
                 int lN = 0;
 
-                _quadTree[i] = new LODQuadTree();
-                _quadTree[i].Root = new LODQuadTree.Node( null, center, LODQuadTree_NodeUtils.GetSize( lN ) );
+                _quadTree[i] = new LODQuadTree( new LODQuadTree.Node( null, center, LODQuadTree_NodeUtils.GetSize( lN ) ) );
 
 #warning TODO - there is some funkiness with the collider physics (it acts as if the object was unparented (when unparenting, it changes scene position slightly)).
 
@@ -56,7 +55,7 @@ namespace KatnisssSpaceSimulator.Terrain
                 mat.SetFloat( "_Glossiness", 0.05f );
                 mat.SetFloat( "_NormalStrength", 0.0f );
 
-                var face = LODQuad.Create( _celestialBody.transform, ((QuadSphereFace)i).ToVector3() * (float)_celestialBody.Radius, this, _celestialBody, center, lN, _quadTree[i].Root, (float)_celestialBody.Radius * QUAD_RANGE_MULTIPLIER, mat, (QuadSphereFace)i );
+                var face = LODQuad.Create( _celestialBody.transform, ((Direction3D)i).ToVector3() * (float)_celestialBody.Radius, this, _celestialBody, center, lN, _quadTree[i].Root, (float)_celestialBody.Radius * QUAD_RANGE_MULTIPLIER, mat, (Direction3D)i );
             }
         }
 
@@ -66,7 +65,7 @@ namespace KatnisssSpaceSimulator.Terrain
             {
                 foreach( var qq in q.GetNonNullLeafNodes() ) // This can be optimized for large numbers of subdivs.
                 {
-                    qq.airfPOIs = new Vector3Dbl[] { VesselManager.ActiveVessel.AIRFPosition };
+                    qq.AirfPOIs = new Vector3Dbl[] { VesselManager.ActiveVessel.AIRFPosition };
                 }
             }
         }
