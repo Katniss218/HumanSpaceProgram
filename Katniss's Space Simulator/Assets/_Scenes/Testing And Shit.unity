@@ -645,8 +645,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b90cb566caa0354083e05b18d589fa3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <CameraParent>k__BackingField: {fileID: 595670877}
   <ReferenceObject>k__BackingField: {fileID: 0}
+  <CameraParent>k__BackingField: {fileID: 595670877}
   _closeCamera: {fileID: 963194227}
   _farCamera: {fileID: 1425950488}
   zoomDist: 5

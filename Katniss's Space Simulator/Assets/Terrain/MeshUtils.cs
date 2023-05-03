@@ -87,6 +87,7 @@ namespace KatnisssSpaceSimulator.Terrain
             mesh.SetTangents( tang );
         }
 
+        [Obsolete( "Kinda buggy, read comments." )]
         public static void CalculateMeshTangents( this Mesh mesh )
         {
             //speed up math by copying the mesh arrays
