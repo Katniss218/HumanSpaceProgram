@@ -21,19 +21,25 @@ namespace KatnisssSpaceSimulator.Terrain
     [RequireComponent( typeof( MeshRenderer ) )]
     public class LODQuad : MonoBehaviour
     {
-        /// <summary>
-        /// Describes what a given <see cref="LODQuad"/> is currently doing.
-        /// </summary>
-        public enum State
+        public abstract class State
         {
-            Idle, // do nothing.
-            Active, // check for subdivs.
-            GeneratingMesh
+            public class Idle : State
+            {
+
+            }
+            public class Active : State
+            {
+
+            }
+            public class Rebuild : State
+            {
+                public MakeQuadMesh_Job Job;
+                public JobHandle JobHandle;
+            }
         }
 
-        // Generated meshes have relatively higher precision because the vertices are closer to the origin of the mesh, than to the origin of the celestial body.
-
         public State CurrentState { get; private set; }
+        public State NextState { get; private set; }
 
         public LODQuadTree.Node Node { get; private set; }
 
@@ -59,11 +65,8 @@ namespace KatnisssSpaceSimulator.Terrain
 
         LODQuadSphere _quadSphere;
 
-        MakeQuadMesh_Job _job;
-        JobHandle _jobHandle;
-
         [SerializeField]
-        LODQuad[] _edges = new LODQuad[4];
+        public LODQuad[] Edges = new LODQuad[4];
 
         void Awake()
         {
@@ -72,14 +75,22 @@ namespace KatnisssSpaceSimulator.Terrain
             _meshRenderer = this.GetComponent<MeshRenderer>();
         }
 
+        private void Start()
+        {
+            if( this.CurrentState is State.Idle )
+            {
+                GenerateMeshData();
+            }
+        }
+
         void Update()
         {
-            if( CurrentState == State.Idle )
+            if( CurrentState is State.Idle )
             {
                 return;
             }
 
-            if( CurrentState == State.Active )
+            if( CurrentState is State.Active )
             {
                 if( ShouldSubdivide() )
                 {
@@ -97,14 +108,58 @@ namespace KatnisssSpaceSimulator.Terrain
 
         private void LateUpdate()
         {
-            if( CurrentState == State.GeneratingMesh )
+            UpdateState();
+        }
+
+        void SetCurrentState( State state )
+        {
+            if( this.CurrentState is State.Rebuild r )
             {
-                _jobHandle.Complete();
-
-                _job.Finish( this );
-
-                this.CurrentState = State.Active;
+                r.JobHandle.Complete();
+                r.Job.Finish( this );
             }
+
+            if( state is State.Rebuild rebuild )
+            {
+                rebuild.Job.Initialize( this ); // This (and collection) would have to be Reflection-ified to make it extendable by other user-provided assemblies.
+                rebuild.JobHandle = rebuild.Job.Schedule();
+            }
+            this.CurrentState = state;
+        }
+
+        public void SetState( State newState )
+        {
+            if( newState == null )
+            {
+                throw new ArgumentNullException( $"The new state can't be null." );
+            }
+
+            if( this.CurrentState is State.Rebuild )
+            {
+                // If it rebuilding, we need to wait for the next frame to update the state.
+                this.NextState = newState;
+            }
+            else
+            {
+                SetCurrentState( newState );
+            }
+        }
+
+        private void UpdateState()
+        {
+            if( this.NextState == null && !(this.CurrentState is State.Rebuild) )
+            {
+                return;
+            }
+
+            if( this.NextState == null )
+            {
+                this.SetCurrentState( new State.Active() );
+                return;
+            }
+
+            SetCurrentState( this.NextState );
+            this.NextState = null;
         }
 
         internal void SetMesh( Mesh mesh )
@@ -169,8 +224,8 @@ namespace KatnisssSpaceSimulator.Terrain
                     return false;
                 }
                 // Sibling node is still generating - don't unsubdivide.
-                // Not having this can lead to memory leaks with jobs.
-                if( siblingNode.Value != null && siblingNode.Value.CurrentState == State.GeneratingMesh )
+                // Not having this can lead to memory leaks with jobs due to destroyed job handles not freeing their stuff.
+                if( siblingNode.Value != null && siblingNode.Value.CurrentState is State.Rebuild )
                 {
                     return false;
                 }
@@ -229,7 +284,11 @@ namespace KatnisssSpaceSimulator.Terrain
                     continue;
                 }
 
-                neighbor._edges[(int)inverseDirection] = newQuad;
+#warning TODO - neighbor (which in this case is actually one of the new subdivided quads) doesn't have its edges fully calculated, but we already call meshing, which will result in incorrect edges on the first frame, as well as flicker.
+                // I guess we could return the quads that have changed the edge status here, and mesh later (after the qubdiv processing is done) based on that.
+                
+                neighbor.Edges[(int)inverseDirection] = newQuad;
+                neighbor.GenerateMeshData();
             }
 
             if( neighborsInSpecifiedDirection.Count != 1 )
@@ -239,7 +298,7 @@ namespace KatnisssSpaceSimulator.Terrain
                 return;
             }
 
-            newQuad._edges[(int)direction] = neighborsInSpecifiedDirection[0];
+            newQuad.Edges[(int)direction] = neighborsInSpecifiedDirection[0];
         }
 
         /// <summary>
@@ -279,6 +338,8 @@ namespace KatnisssSpaceSimulator.Terrain
                 _4_quads[i] = newQuad;
             }
 
+#warning TODO - Subdiv level of 18 and higher is not registering in queries.
+
             // Update neighbors.
             foreach( var quad in _4_quads )
             {
@@ -290,6 +351,7 @@ namespace KatnisssSpaceSimulator.Terrain
                 {
                     UpdateNeighbors( queryResult.Where( n => n.Value != null ).Select( n => n.Value ), quad, direction );
                 }
+                quad.GenerateMeshData();
             }
         }
 
@@ -332,7 +394,7 @@ namespace KatnisssSpaceSimulator.Terrain
 
             // update neighbors.
             List<LODQuadTree.Node> queryResult = rootNode.QueryOverlappingLeaves( newQuad.Node.minX, newQuad.Node.minY, newQuad.Node.maxX, newQuad.Node.maxY );
-            
+
             foreach( var direction in Direction2DUtils.Every )
             {
                 UpdateNeighbors( queryResult.Where( n => n.Value != null ).Select( n => n.Value ), newQuad, direction );
@@ -344,12 +406,11 @@ namespace KatnisssSpaceSimulator.Terrain
         /// </summary>
         private void GenerateMeshData()
         {
-            this.CurrentState = State.GeneratingMesh;
+            var rebuild = new State.Rebuild();
 
-            _job = new MakeQuadMesh_Job();
+            rebuild.Job = new MakeQuadMesh_Job();
 
-            _job.Initialize( this ); // This (and collection) would have to be Reflection-ified to make it extendable by other user-provided assemblies.
-            _jobHandle = _job.Schedule();
+            this.SetState( rebuild );
         }
 
         /// <summary>
@@ -395,9 +456,7 @@ namespace KatnisssSpaceSimulator.Terrain
             newQuad.transform.localPosition = localPosition;
             newQuad.transform.localRotation = Quaternion.identity;
             newQuad.transform.localScale = Vector3.one;
-            newQuad.CurrentState = State.Idle;
-
-            newQuad.GenerateMeshData();
+            newQuad.SetState( new State.Idle() );
 
             return newQuad;
         }

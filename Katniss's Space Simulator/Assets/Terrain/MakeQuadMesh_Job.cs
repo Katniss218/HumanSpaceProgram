@@ -34,6 +34,8 @@ namespace KatnisssSpaceSimulator.Terrain
         float minX;
         float minY;
 
+        NativeArray<int> edgeSubdivisionRelative;
+
         public void Initialize( LODQuad quad )
         {
             // Initialize is called on the main thread to initialize the job.
@@ -52,7 +54,22 @@ namespace KatnisssSpaceSimulator.Terrain
             minX = center.x - (size / 2f); // center minus half the edge length of the cube.
             minY = center.y - (size / 2f);
 
-            resultVertices = new NativeArray<Vector3>( numberOfVertices * numberOfVertices, Allocator.TempJob );
+            edgeSubdivisionRelative = new NativeArray<int>(4, Allocator.TempJob );
+            for( int i = 0; i < edgeSubdivisionRelative.Length; i++ )
+            {
+                if( quad.Edges[i] == null )
+                {
+                    edgeSubdivisionRelative[i] = 0;
+                    continue;
+                }
+                edgeSubdivisionRelative[i] = quad.Edges[i].SubdivisionLevel - quad.SubdivisionLevel;
+            }
+            if( quad.SubdivisionLevel == 17 )
+            {
+                Debug.Log( quad.ToString() + " EDGES     " + ":" + edgeSubdivisionRelative[0] + ":" + edgeSubdivisionRelative[1] + ":" + edgeSubdivisionRelative[2] + ":" + edgeSubdivisionRelative[3] );
+            }
+
+                resultVertices = new NativeArray<Vector3>( numberOfVertices * numberOfVertices, Allocator.TempJob );
             resultNormals = new NativeArray<Vector3>( numberOfVertices * numberOfVertices, Allocator.TempJob );
             resultUvs = new NativeArray<Vector2>( numberOfVertices * numberOfVertices, Allocator.TempJob );
             resultTriangles = new NativeArray<int>( (numberOfEdges * numberOfEdges) * 6, Allocator.TempJob );
@@ -75,6 +92,8 @@ namespace KatnisssSpaceSimulator.Terrain
 
             quad.SetMesh( mesh );
 
+            edgeSubdivisionRelative.Dispose();
+
             resultVertices.Dispose();
             resultNormals.Dispose();
             resultUvs.Dispose();
@@ -84,6 +103,11 @@ namespace KatnisssSpaceSimulator.Terrain
         public void Execute()
         {
             GenerateCubeSphereFace();
+        }
+
+        int GetIndex( int x, int y )
+        {
+            return (x * numberOfEdges) + x + y;
         }
 
         /// <summary>
@@ -126,20 +150,20 @@ namespace KatnisssSpaceSimulator.Terrain
                 }
             }
 
-            for( int i = 0; i < numberOfVertices; i++ )
+            for( int x = 0; x < numberOfVertices; x++ )
             {
-                for( int j = 0; j < numberOfVertices; j++ )
+                for( int y = 0; y < numberOfVertices; y++ )
                 {
-                    int index = (i * numberOfEdges) + i + j;
+                    int index = GetIndex( x, y );
 
-                    float quadX = (i * edgeLength) + minX; // This might need to be turned into a double perhaps (for large bodies with lots of subdivs).
-                    float quadY = (j * edgeLength) + minY;
+                    float quadX = (x * edgeLength) + minX; // This might need to be turned into a double perhaps (for large bodies with lots of subdivs).
+                    float quadY = (y * edgeLength) + minY;
 
                     Vector3Dbl posD = face.GetSpherePointDbl( quadX, quadY );
 
                     Vector3 unitSpherePos = (Vector3)posD;
 
-                    Vector3Dbl temporaryHeightOffset_Removelater = posD * Math.Sin( (unitSpherePos.x * unitSpherePos.y * unitSpherePos.z) * radius );
+                    Vector3Dbl temporaryHeightOffset_Removelater = posD * Math.Sin( (unitSpherePos.x + unitSpherePos.y + unitSpherePos.z) * radius );
 
                     resultVertices[index] = (Vector3)(((posD * radius) + temporaryHeightOffset_Removelater) - (Vector3Dbl)origin);
 
@@ -150,6 +174,84 @@ namespace KatnisssSpaceSimulator.Terrain
                     // normals can be calculated by adding the normals of each face to its vertices, then normalizing.
                     // - this will compute smooth VERTEX normals!!
                     resultNormals[index] = unitSpherePos;
+                }
+            }
+
+
+            // the 4 repeated chunnks of code are ugly as fuck.
+
+            if( edgeSubdivisionRelative[0] < 0 )
+            {
+                int step = (1 << -edgeSubdivisionRelative[0]);
+                int x = 0;
+                for( int y = 0; y < numberOfVertices - step; y += step )
+                {
+                    int indexMin = GetIndex( x, y );
+                    int indexMax = GetIndex( x, y + step );
+                    for( int y2 = 0; y2 < step; y2++ )
+                    {
+                        int index = GetIndex( x, y + y2 );
+                        // find index of interval.
+                        // smoothly blend.
+
+                        resultVertices[index] = Vector3.Lerp( resultVertices[indexMin], resultVertices[indexMax], (float)y2 / step );
+                    }
+                }
+            }
+
+            if( edgeSubdivisionRelative[1] < 0 )
+            {
+                int step = (1 << -edgeSubdivisionRelative[1]);
+                int x = numberOfVertices - 1;
+                for( int y = 0; y < numberOfVertices - step; y += step )
+                {
+                    int indexMin = GetIndex( x, y );
+                    int indexMax = GetIndex( x, y + step );
+                    for( int y2 = 0; y2 < step; y2++ )
+                    {
+                        int index = GetIndex( x, y + y2 );
+                        // find index of interval.
+                        // smoothly blend.
+
+                        resultVertices[index] = Vector3.Lerp( resultVertices[indexMin], resultVertices[indexMax], (float)y2 / step );
+                    }
+                }
+            }
+
+            if( edgeSubdivisionRelative[2] < 0 )
+            {
+                int step = (1 << -edgeSubdivisionRelative[2]);
+                int y = 0;
+                for( int x = 0; x < numberOfVertices - step; x += step )
+                {
+                    int indexMin = GetIndex( x, y );
+                    int indexMax = GetIndex( x + step, y );
+                    for( int x2 = 0; x2 < step; x2++ )
+                    {
+                        int index = GetIndex( x + x2, y );
+                        // find index of interval.
+                        // smoothly blend.
+
+                        resultVertices[index] = Vector3.Lerp( resultVertices[indexMin], resultVertices[indexMax], (float)x2 / step );
+                    }
+                }
+            }
+            if( edgeSubdivisionRelative[3] < 0 )
+            {
+                int step = (1 << -edgeSubdivisionRelative[3]);
+                int y = numberOfVertices - 1;
+                for( int x = 0; x < numberOfVertices - step; x += step )
+                {
+                    int indexMin = GetIndex( x, y );
+                    int indexMax = GetIndex( x + step, y );
+                    for( int x2 = 0; x2 < step; x2++ )
+                    {
+                        int index = GetIndex( x + x2, y );
+                        // find index of interval.
+                        // smoothly blend.
+
+                        resultVertices[index] = Vector3.Lerp( resultVertices[indexMin], resultVertices[indexMax], (float)x2 / step );
+                    }
                 }
             }
 

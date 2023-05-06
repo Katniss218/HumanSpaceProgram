@@ -1,4 +1,5 @@
-﻿using KatnisssSpaceSimulator.Core;
+﻿using KatnisssSpaceSimulator.Control;
+using KatnisssSpaceSimulator.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +29,12 @@ namespace KatnisssSpaceSimulator.Functionalities
         public float GetThrust()
         {
             return this.MaxThrust * Throttle;
+        }
+
+        [ControlIn( "SetThrottle" )]
+        public void SetThrottle( float value )
+        {
+            this.Throttle = value;
         }
 
         private void Awake()
