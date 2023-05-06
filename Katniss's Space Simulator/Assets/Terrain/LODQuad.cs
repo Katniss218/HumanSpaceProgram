@@ -249,7 +249,7 @@ namespace KatnisssSpaceSimulator.Terrain
 
         static readonly float Cos45DegPlusEpsilon = Mathf.Cos( 45 * Mathf.Deg2Rad ) + 0.025f; // also, cos(45deg) is equal to sin(45deg)
 
-        public static void UpdateNeighbors( IEnumerable<LODQuad> neighborQuads, LODQuad newQuad, Direction2D direction )
+        public static List<LODQuad> UpdateNeighbors( IEnumerable<LODQuad> neighborQuads, LODQuad newQuad, Direction2D direction )
         {
             List<LODQuad> neighborsInSpecifiedDirection = new List<LODQuad>();
 
@@ -276,6 +276,8 @@ namespace KatnisssSpaceSimulator.Terrain
 
             Direction2D inverseDirection = direction.Inverse();
 
+            List<LODQuad> updatedNeighbors = new List<LODQuad>();
+
             // Always update the neighbors' edges - in case the current node was unsubdivided, and the edges of all its contacting neighbors need to be updated.
             foreach( var neighbor in neighborsInSpecifiedDirection )
             {
@@ -286,19 +288,24 @@ namespace KatnisssSpaceSimulator.Terrain
 
 #warning TODO - neighbor (which in this case is actually one of the new subdivided quads) doesn't have its edges fully calculated, but we already call meshing, which will result in incorrect edges on the first frame, as well as flicker.
                 // I guess we could return the quads that have changed the edge status here, and mesh later (after the qubdiv processing is done) based on that.
-                
-                neighbor.Edges[(int)inverseDirection] = newQuad;
-                neighbor.GenerateMeshData();
+
+                if( neighbor.Edges[(int)inverseDirection] != newQuad )
+                {
+                    neighbor.Edges[(int)inverseDirection] = newQuad;
+                    updatedNeighbors.Add( neighbor );
+                }
+                //neighbor.GenerateMeshData();
             }
 
             if( neighborsInSpecifiedDirection.Count != 1 )
             {
                 // Don't update the current node if there are multiple (smaller) nodes contacting it from a given direction.
                 // - Otherwise, possibly `unsubdividedQuad.neighbors[direction] = mixed;`. Maybe mark the edge with highest, lowest, or maybe mark each interval. idk.
-                return;
+                return updatedNeighbors;
             }
 
             newQuad.Edges[(int)direction] = neighborsInSpecifiedDirection[0];
+            return updatedNeighbors;
         }
 
         /// <summary>
@@ -340,6 +347,7 @@ namespace KatnisssSpaceSimulator.Terrain
 
 #warning TODO - Subdiv level of 18 and higher is not registering in queries.
 
+            var updatedNeighbors = new List<LODQuad>();
             // Update neighbors.
             foreach( var quad in _4_quads )
             {
@@ -349,9 +357,14 @@ namespace KatnisssSpaceSimulator.Terrain
 
                 foreach( var direction in Direction2DUtils.Every )
                 {
-                    UpdateNeighbors( queryResult.Where( n => n.Value != null ).Select( n => n.Value ), quad, direction );
+                    var newN = UpdateNeighbors( queryResult.Where( n => n.Value != null ).Select( n => n.Value ), quad, direction );
+                    updatedNeighbors.AddRange( newN );
                 }
                 quad.GenerateMeshData();
+            }
+            foreach( var n in updatedNeighbors.Distinct() )
+            {
+                n.GenerateMeshData();
             }
         }
 
@@ -395,9 +408,15 @@ namespace KatnisssSpaceSimulator.Terrain
             // update neighbors.
             List<LODQuadTree.Node> queryResult = rootNode.QueryOverlappingLeaves( newQuad.Node.minX, newQuad.Node.minY, newQuad.Node.maxX, newQuad.Node.maxY );
 
+            var updatedNeighbors = new List<LODQuad>();
             foreach( var direction in Direction2DUtils.Every )
             {
-                UpdateNeighbors( queryResult.Where( n => n.Value != null ).Select( n => n.Value ), newQuad, direction );
+                var newN = UpdateNeighbors( queryResult.Where( n => n.Value != null ).Select( n => n.Value ), newQuad, direction );
+                updatedNeighbors.AddRange( newN );
+            }
+            foreach( var n in updatedNeighbors.Distinct() )
+            {
+                n.GenerateMeshData();
             }
         }
 
