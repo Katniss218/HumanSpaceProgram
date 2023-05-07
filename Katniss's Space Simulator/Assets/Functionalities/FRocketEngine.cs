@@ -1,5 +1,6 @@
 ﻿using KatnisssSpaceSimulator.Control;
 using KatnisssSpaceSimulator.Core;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,6 +60,16 @@ namespace KatnisssSpaceSimulator.Functionalities
             {
                 this._part.Vessel.PhysicsObject.AddForceAtPosition( this.ThrustTransform.forward * GetThrust(), this.ThrustTransform.position );
             }
+        }
+
+        public override void Load( JToken data )
+        {
+            throw new NotImplementedException();
+        }
+
+        public override JToken Save()
+        {
+            throw new NotImplementedException();
         }
     }
 }

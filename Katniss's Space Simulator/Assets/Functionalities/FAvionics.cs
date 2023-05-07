@@ -1,4 +1,5 @@
 ﻿using KatnisssSpaceSimulator.Core;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,5 +16,14 @@ namespace KatnisssSpaceSimulator.Functionalities
         // the signal will depend on the part being connected. for example if the RCS is connected, the signal should be different for RCS positioned in different directions, and in different ways.
 
 
+        public override void Load( JToken data )
+        {
+            throw new NotImplementedException();
+        }
+
+        public override JToken Save()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

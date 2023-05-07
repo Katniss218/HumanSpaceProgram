@@ -96,14 +96,16 @@
     <Compile Include="Assets\TimeWarp\TimeWarpManager.cs" />
     <Compile Include="Assets\Core\ReferenceFrames\IReferenceFrame.cs" />
     <Compile Include="Assets\Terrain\LODQuadTree_NodeUtils.cs" />
-    <Compile Include="Assets\Core\Parts\DummyPartSource.cs" />
     <Compile Include="Assets\Core\Part.cs" />
-    <Compile Include="Assets\Core\Parts\PartFactory.cs" />
-    <Compile Include="Assets\Core\Parts\ResourcePartSource.cs" />
+    <Compile Include="Assets\Core\PartFactory.cs" />
     <Compile Include="Assets\Functionalities\FAvionics.cs" />
     <Compile Include="Assets\Core\BulkResource.cs" />
     <Compile Include="Assets\Functionalities\FBulkContainer.cs" />
     <Compile Include="Assets\Functionalities\FActuatorXY.cs" />
+    <Compile Include="Assets\Core\Vessel.Serialization.cs" />
+    <Compile Include="Assets\Core\Serialization\DummyPartSource.cs" />
+    <Compile Include="Assets\Core\Part.Serialization.cs" />
+    <Compile Include="Assets\Core\Serialization\AssetPartSource.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro.cginc" />

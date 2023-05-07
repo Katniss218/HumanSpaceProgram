@@ -2,7 +2,7 @@
 using KatnisssSpaceSimulator.Camera;
 using KatnisssSpaceSimulator.Core;
 using KatnisssSpaceSimulator.Core.Managers;
-using KatnisssSpaceSimulator.Core.Parts;
+using KatnisssSpaceSimulator.Core.Serialization;
 using KatnisssSpaceSimulator.Core.ReferenceFrames;
 using KatnisssSpaceSimulator.Functionalities;
 using KatnisssSpaceSimulator.Terrain;
@@ -83,10 +83,10 @@ namespace KatnisssSpaceSimulator
             //PartFactory pfac = new PartFactory( new DummyPartSource() );
             //PartFactory efac = new PartFactory( new ResourcePartSource( "Prefabs/engine_part" ) );
 
-            PartFactory intertank = new PartFactory( new ResourcePartSource( "Prefabs/intertank" ) );
-            PartFactory tank = new PartFactory( new ResourcePartSource( "Prefabs/tank" ) );
-            PartFactory tankLong = new PartFactory( new ResourcePartSource( "Prefabs/tank_long" ) );
-            PartFactory engine = new PartFactory( new ResourcePartSource( "Prefabs/engine" ) );
+            PartFactory intertank = new PartFactory( new AssetPartSource( "Prefabs/intertank" ) );
+            PartFactory tank = new PartFactory( new AssetPartSource( "Prefabs/tank" ) );
+            PartFactory tankLong = new PartFactory( new AssetPartSource( "Prefabs/tank_long" ) );
+            PartFactory engine = new PartFactory( new AssetPartSource( "Prefabs/engine" ) );
 
             Vessel v = fac.CreatePartless( airfPosition, rotation );
             Part root = intertank.CreateRoot( v );

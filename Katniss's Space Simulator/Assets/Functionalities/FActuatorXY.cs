@@ -1,5 +1,6 @@
 ﻿using KatnisssSpaceSimulator.Control;
 using KatnisssSpaceSimulator.Core;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,6 +45,16 @@ namespace KatnisssSpaceSimulator.Functionalities
         void Update()
         {
             // todo.
+        }
+
+        public override void Load( JToken data )
+        {
+            throw new NotImplementedException();
+        }
+
+        public override JToken Save()
+        {
+            throw new NotImplementedException();
         }
     }
 }

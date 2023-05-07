@@ -9,7 +9,7 @@ using UnityEngine;
 namespace KatnisssSpaceSimulator.Core
 {
     [RequireComponent( typeof( PhysicsObject ) )]
-    public sealed class Vessel : MonoBehaviour
+    public sealed partial class Vessel : MonoBehaviour
     {
         // Root objects have to store their AIRF positions, children natively store their local coordinates, which as long as they're not obscenely large, will be fine.
         // - An object with a child at 0.00125f can be sent to 10e25 and brought back, and its child will remain at 0.00125f
