@@ -101,9 +101,9 @@ namespace KatnisssSpaceSimulator.Terrain
             // this filtering stuff is kinda ugly.
             // And it's fucking retarded, because if I just check the _activeQuads, it breaks.
             _activeQuads = newActiveQuads.Where( q => q.Node.Value != null ).ToList();
-            needRemeshing = needRemeshing.Where( q => q.Node.Value != null ).ToList();
+            needRemeshing = needRemeshing.Where( q => q.Node.Value != null ).Distinct().ToList();
 
-            foreach( var quad in needRemeshing.Distinct() )
+            foreach( var quad in needRemeshing )
             {
                 Contract.Assert( quad.Node.Value != null, $"Quads to rebuild ({nameof( needRemeshing )}) must not contain destroyed quads." );
 
