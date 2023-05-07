@@ -24,7 +24,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 200}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 16066
+  controlID: 22556
 --- !u!114 &2
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -150,7 +150,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 200}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 1
-  controlID: 16067
+  controlID: 22520
 --- !u!114 &4
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -175,7 +175,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 100}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 16068
+  controlID: 22507
 --- !u!114 &5
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -232,10 +232,10 @@ MonoBehaviour:
     m_SaveData: []
   m_SceneHierarchy:
     m_TreeViewState:
-      scrollPos: {x: 0, y: 3681}
-      m_SelectedIDs: bc0bf6ff
-      m_LastClickedID: -652356
-      m_ExpandedIDs: 483ff8ff9e61f8ff389ff8ff1c37f9ff08fbffff8e5a0000605b0000
+      scrollPos: {x: 0, y: 0}
+      m_SelectedIDs: 
+      m_LastClickedID: 0
+      m_ExpandedIDs: e8c5f4ffaae8f5ff483ff8ff9e61f8ff389ff8ff1c37f9ff08fbffff8e5a0000605b0000
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -545,9 +545,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 23499.61, y: 1500.0845, z: 5193.8164}
+    m_Target: {x: 15618.176, y: 7606.0073, z: -1627.1906}
     speed: 2
-    m_Value: {x: 23499.61, y: 1500.0845, z: 5193.8164}
+    m_Value: {x: 15618.176, y: 7606.0073, z: -1627.1906}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 2
@@ -593,13 +593,13 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0.5
   m_Rotation:
-    m_Target: {x: -0.004932651, y: 0.9919529, z: 0.04138596, w: 0.11991273}
+    m_Target: {x: -0.012137986, y: 0.9870501, z: 0.09176151, w: 0.13135943}
     speed: 2
-    m_Value: {x: -0.004932651, y: 0.9919529, z: 0.04138596, w: 0.11991272}
+    m_Value: {x: -0.012137436, y: 0.9870054, z: 0.09175735, w: 0.13135348}
   m_Size:
-    m_Target: 626.5147
+    m_Target: 45.147614
     speed: 2
-    m_Value: 626.5147
+    m_Value: 45.147614
   m_Ortho:
     m_Target: 0
     speed: 2
@@ -684,7 +684,7 @@ MonoBehaviour:
         m_PaneScroll: {x: 0, y: 0}
         m_ViewType: 1
         updateViewLive: 0
-        m_CurrentFrameIndex: 97216
+        m_CurrentFrameIndex: -1
         m_HierarchyOverruledThreadFromSelection: 0
         m_ProfilerViewFilteringOptions: 1
         m_FrameDataHierarchyView:

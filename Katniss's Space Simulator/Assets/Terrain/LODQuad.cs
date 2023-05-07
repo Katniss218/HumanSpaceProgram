@@ -57,6 +57,9 @@ namespace KatnisssSpaceSimulator.Terrain
         State _currentState;
         State _nextState;
 
+        [SerializeField]
+        bool currentlySubdividing = false; // temp debugging
+
         Direction3D _quadSphereFace;
 
         MeshFilter _meshFilter;
@@ -127,6 +130,8 @@ namespace KatnisssSpaceSimulator.Terrain
                 rebuild.JobHandle = rebuild.Job.Schedule();
             }
             this._currentState = state;
+
+            currentlySubdividing = _currentState is State.Rebuild;
         }
 
         public void SetState( State newState )
@@ -349,10 +354,6 @@ namespace KatnisssSpaceSimulator.Terrain
             // Update neighbors.
             foreach( var quad in _4_quads )
             {
-                if( quad.SubdivisionLevel == 18 )
-                {
-
-                }
                 // Query area of each node separately
                 // - because if the entire area is queried, then the nodes that are not direct neighbors of the current node are included and it breaks shit.
                 List<LODQuadTree.Node> queryResult = rootNode.QueryOverlappingLeaves( quad.Node.minX, quad.Node.minY, quad.Node.maxX, quad.Node.maxY );
@@ -364,10 +365,18 @@ namespace KatnisssSpaceSimulator.Terrain
                 }
                 quad.GenerateMeshData();
             }
-#warning TODO - when moving at fast speeds, the neighbor has relative lN of -2, then the mesh is generated, and then the neighbor subdivides, which causes the mesh to be out of sync for 1 frame (because the job was already started).
+
+#warning TODO - When moving at high speeds relative to quad size, there is desync in the mesh.
             // at least I think this is what happens.
 
-            // something does happen that leads to it not being correctly updated though. I think when the neighbor subdivides, the quad next to it, that was interpolated, is not immediately un-interpolated.
+            // a quad was freshely created, its mesh was updated to the correct one, but its IsSubdividing was still true (maybe another subdiv started as next state?).
+            // then on the next frame, its neighbor subdivided, and updated its edges, but since the quad was already subdivided, the resubdiv was moved to the next state.
+
+
+            // Realistically, the proper way to do this would be to ensure that all the edges of every quad are resolved, and then call for rebuild of all quads that had their edges changed.
+
+            // and then we won't need to store the next state. everything should be done neatly all at once, after the subdivs/unsubdivs are fully resolved, then the meshing starts, and ends in lateupdate on the same frame.
+
 
             foreach( var n in updatedNeighbors.Distinct() )
             {
