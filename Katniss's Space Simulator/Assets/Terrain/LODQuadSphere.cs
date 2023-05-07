@@ -22,7 +22,7 @@ namespace KatnisssSpaceSimulator.Terrain
         /// <summary>
         /// The level of subdivision (lN) at which the quad will stop subdividing.
         /// </summary>
-        public int HardLimitSubdivLevel { get; set; } = 17;
+        public int HardLimitSubdivLevel { get; set; } = 32;
 
         [field: SerializeField]
         LODQuadTree[] _quadTree;
@@ -43,6 +43,13 @@ namespace KatnisssSpaceSimulator.Terrain
             _quadTree = new LODQuadTree[6];
             for( int i = 0; i < 6; i++ )
             {
+                // temporary, there's no data structure to hold this stuff yet.
+                Material mat = new Material( t.cbShader );
+                mat.SetTexture( "_MainTex", t.cbTextures[i] );
+                mat.SetFloat( "_Glossiness", 0.05f );
+                mat.SetFloat( "_NormalStrength", 0.0f );
+
+
                 Vector2 center = Vector2.zero;
                 int lN = 0;
 
@@ -50,26 +57,7 @@ namespace KatnisssSpaceSimulator.Terrain
 
 #warning TODO - there is some funkiness with the collider physics (it acts as if the object was unparented (when unparenting, it changes scene position slightly)).
 
-
-                Material mat = new Material( t.cbShader );
-                mat.SetTexture( "_MainTex", t.cbTextures[i] );
-                mat.SetFloat( "_Glossiness", 0.05f );
-                mat.SetFloat( "_NormalStrength", 0.0f );
-
                 var face = LODQuad.CreateL0( _celestialBody.transform, this, _celestialBody, _quadTree[i].Root, (float)_celestialBody.Radius * QUAD_RANGE_MULTIPLIER, mat, (Direction3D)i );
-            }
-        }
-
-        void Update()
-        {
-            foreach( var q in _quadTree )
-            {
-                foreach( var qq in q.GetNonNullLeafNodes() ) // This can be optimized for large numbers of subdivs.
-                {
-                    qq.AirfPOIs = new Vector3Dbl[] { VesselManager.ActiveVessel.AIRFPosition };
-
-#warning TODO - we *could* update them here.
-                }
             }
         }
 

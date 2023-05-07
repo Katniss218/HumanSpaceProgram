@@ -75,7 +75,7 @@ namespace KatnisssSpaceSimulator.Terrain
             _meshRenderer = this.GetComponent<MeshRenderer>();
         }
 
-        private void Start()
+        void Start()
         {
             if( this._currentState is State.Idle )
             {
@@ -85,6 +85,8 @@ namespace KatnisssSpaceSimulator.Terrain
 
         void Update()
         {
+            this.AirfPOIs = new Vector3Dbl[] { VesselManager.ActiveVessel.AIRFPosition };
+
             if( _currentState is State.Idle )
             {
                 return;
@@ -106,7 +108,7 @@ namespace KatnisssSpaceSimulator.Terrain
             }
         }
 
-        private void LateUpdate()
+        void LateUpdate()
         {
             UpdateState();
         }
@@ -261,10 +263,11 @@ namespace KatnisssSpaceSimulator.Terrain
 
                 Vector2 toNode = potentialQuad.Node.Center - newQuad.Node.Center;
 
-                if( toNode == Vector2.zero )
+                // Comparing with Vector2.zero for near-zero vectors leads to rounding errors.
+                if( toNode.x == 0.0f && toNode.y == 0.0f )
                     continue;
 
-                toNode.Normalize();
+                toNode /= toNode.magnitude; // Using Normalize() on near-zero vectors results in (0,0) instead of the correct vector.
 
                 // if vector's principal axis points towards direction.
                 float dot = Vector2.Dot( toNode, direction.ToVector2() );
@@ -346,6 +349,10 @@ namespace KatnisssSpaceSimulator.Terrain
             // Update neighbors.
             foreach( var quad in _4_quads )
             {
+                if( quad.SubdivisionLevel == 18 )
+                {
+
+                }
                 // Query area of each node separately
                 // - because if the entire area is queried, then the nodes that are not direct neighbors of the current node are included and it breaks shit.
                 List<LODQuadTree.Node> queryResult = rootNode.QueryOverlappingLeaves( quad.Node.minX, quad.Node.minY, quad.Node.maxX, quad.Node.maxY );
@@ -357,6 +364,11 @@ namespace KatnisssSpaceSimulator.Terrain
                 }
                 quad.GenerateMeshData();
             }
+#warning TODO - when moving at fast speeds, the neighbor has relative lN of -2, then the mesh is generated, and then the neighbor subdivides, which causes the mesh to be out of sync for 1 frame (because the job was already started).
+            // at least I think this is what happens.
+
+            // something does happen that leads to it not being correctly updated though. I think when the neighbor subdivides, the quad next to it, that was interpolated, is not immediately un-interpolated.
+
             foreach( var n in updatedNeighbors.Distinct() )
             {
                 n.GenerateMeshData();
