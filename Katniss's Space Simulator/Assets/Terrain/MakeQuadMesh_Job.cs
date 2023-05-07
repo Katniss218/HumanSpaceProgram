@@ -54,7 +54,7 @@ namespace KatnisssSpaceSimulator.Terrain
             minX = center.x - (size / 2f); // center minus half the edge length of the cube.
             minY = center.y - (size / 2f);
 
-            edgeSubdivisionRelative = new NativeArray<int>(4, Allocator.TempJob );
+            edgeSubdivisionRelative = new NativeArray<int>( 4, Allocator.TempJob );
             for( int i = 0; i < edgeSubdivisionRelative.Length; i++ )
             {
                 if( quad.Edges[i] == null )
@@ -64,12 +64,8 @@ namespace KatnisssSpaceSimulator.Terrain
                 }
                 edgeSubdivisionRelative[i] = quad.Edges[i].SubdivisionLevel - quad.SubdivisionLevel;
             }
-            if( quad.SubdivisionLevel == 17 )
-            {
-                Debug.Log( quad.ToString() + " EDGES     " + ":" + edgeSubdivisionRelative[0] + ":" + edgeSubdivisionRelative[1] + ":" + edgeSubdivisionRelative[2] + ":" + edgeSubdivisionRelative[3] );
-            }
 
-                resultVertices = new NativeArray<Vector3>( numberOfVertices * numberOfVertices, Allocator.TempJob );
+            resultVertices = new NativeArray<Vector3>( numberOfVertices * numberOfVertices, Allocator.TempJob );
             resultNormals = new NativeArray<Vector3>( numberOfVertices * numberOfVertices, Allocator.TempJob );
             resultUvs = new NativeArray<Vector2>( numberOfVertices * numberOfVertices, Allocator.TempJob );
             resultTriangles = new NativeArray<int>( (numberOfEdges * numberOfEdges) * 6, Allocator.TempJob );

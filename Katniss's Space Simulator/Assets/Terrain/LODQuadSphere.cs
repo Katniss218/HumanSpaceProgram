@@ -56,7 +56,7 @@ namespace KatnisssSpaceSimulator.Terrain
                 mat.SetFloat( "_Glossiness", 0.05f );
                 mat.SetFloat( "_NormalStrength", 0.0f );
 
-                var face = LODQuad.Create( _celestialBody.transform, ((Direction3D)i).ToVector3() * (float)_celestialBody.Radius, this, _celestialBody, center, lN, _quadTree[i].Root, (float)_celestialBody.Radius * QUAD_RANGE_MULTIPLIER, mat, (Direction3D)i );
+                var face = LODQuad.CreateL0( _celestialBody.transform, this, _celestialBody, _quadTree[i].Root, (float)_celestialBody.Radius * QUAD_RANGE_MULTIPLIER, mat, (Direction3D)i );
             }
         }
 
@@ -67,6 +67,8 @@ namespace KatnisssSpaceSimulator.Terrain
                 foreach( var qq in q.GetNonNullLeafNodes() ) // This can be optimized for large numbers of subdivs.
                 {
                     qq.AirfPOIs = new Vector3Dbl[] { VesselManager.ActiveVessel.AIRFPosition };
+
+#warning TODO - we *could* update them here.
                 }
             }
         }

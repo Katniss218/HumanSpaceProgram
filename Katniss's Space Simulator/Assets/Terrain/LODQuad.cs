@@ -38,9 +38,6 @@ namespace KatnisssSpaceSimulator.Terrain
             }
         }
 
-        public State CurrentState { get; private set; }
-        public State NextState { get; private set; }
-
         public LODQuadTree.Node Node { get; private set; }
 
         /// <summary>
@@ -56,6 +53,9 @@ namespace KatnisssSpaceSimulator.Terrain
 
         [field: SerializeField]
         public int SubdivisionLevel { get; private set; }
+
+        State _currentState;
+        State _nextState;
 
         Direction3D _quadSphereFace;
 
@@ -77,7 +77,7 @@ namespace KatnisssSpaceSimulator.Terrain
 
         private void Start()
         {
-            if( this.CurrentState is State.Idle )
+            if( this._currentState is State.Idle )
             {
                 GenerateMeshData();
             }
@@ -85,12 +85,12 @@ namespace KatnisssSpaceSimulator.Terrain
 
         void Update()
         {
-            if( CurrentState is State.Idle )
+            if( _currentState is State.Idle )
             {
                 return;
             }
 
-            if( CurrentState is State.Active )
+            if( _currentState is State.Active )
             {
                 if( ShouldSubdivide() )
                 {
@@ -113,7 +113,7 @@ namespace KatnisssSpaceSimulator.Terrain
 
         void SetCurrentState( State state )
         {
-            if( this.CurrentState is State.Rebuild r )
+            if( this._currentState is State.Rebuild r )
             {
                 r.JobHandle.Complete();
                 r.Job.Finish( this );
@@ -124,7 +124,7 @@ namespace KatnisssSpaceSimulator.Terrain
                 rebuild.Job.Initialize( this ); // This (and collection) would have to be Reflection-ified to make it extendable by other user-provided assemblies.
                 rebuild.JobHandle = rebuild.Job.Schedule();
             }
-            this.CurrentState = state;
+            this._currentState = state;
         }
 
         public void SetState( State newState )
@@ -134,10 +134,10 @@ namespace KatnisssSpaceSimulator.Terrain
                 throw new ArgumentNullException( $"The new state can't be null." );
             }
 
-            if( this.CurrentState is State.Rebuild )
+            if( this._currentState is State.Rebuild )
             {
                 // If it rebuilding, we need to wait for the next frame to update the state.
-                this.NextState = newState;
+                this._nextState = newState;
             }
             else
             {
@@ -147,19 +147,19 @@ namespace KatnisssSpaceSimulator.Terrain
 
         private void UpdateState()
         {
-            if( this.NextState == null && !(this.CurrentState is State.Rebuild) )
+            if( this._nextState == null && !(this._currentState is State.Rebuild) )
             {
                 return;
             }
 
-            if( this.NextState == null )
+            if( this._nextState == null )
             {
                 this.SetCurrentState( new State.Active() );
                 return;
             }
 
-            SetCurrentState( this.NextState );
-            this.NextState = null;
+            SetCurrentState( this._nextState );
+            this._nextState = null;
         }
 
         internal void SetMesh( Mesh mesh )
@@ -225,7 +225,7 @@ namespace KatnisssSpaceSimulator.Terrain
                 }
                 // Sibling node is still generating - don't unsubdivide.
                 // Not having this can lead to memory leaks with jobs due to destroyed job handles not freeing their stuff.
-                if( siblingNode.Value != null && siblingNode.Value.CurrentState is State.Rebuild )
+                if( siblingNode.Value != null && siblingNode.Value._currentState is State.Rebuild )
                 {
                     return false;
                 }
@@ -286,15 +286,12 @@ namespace KatnisssSpaceSimulator.Terrain
                     continue;
                 }
 
-#warning TODO - neighbor (which in this case is actually one of the new subdivided quads) doesn't have its edges fully calculated, but we already call meshing, which will result in incorrect edges on the first frame, as well as flicker.
-                // I guess we could return the quads that have changed the edge status here, and mesh later (after the qubdiv processing is done) based on that.
-
+                // Return the neighbors that have changed.
                 if( neighbor.Edges[(int)inverseDirection] != newQuad )
                 {
                     neighbor.Edges[(int)inverseDirection] = newQuad;
                     updatedNeighbors.Add( neighbor );
                 }
-                //neighbor.GenerateMeshData();
             }
 
             if( neighborsInSpecifiedDirection.Count != 1 )
@@ -344,8 +341,6 @@ namespace KatnisssSpaceSimulator.Terrain
                 LODQuad newQuad = Create( this.transform.parent, subdividedOrigin, this._quadSphere, this.CelestialBody, subdividedCenter, newSubdivisionLevel, newNode, this.SubdivisionDistance / 2f, this._meshRenderer.material, this._quadSphereFace );
                 _4_quads[i] = newQuad;
             }
-
-#warning TODO - Subdiv level of 18 and higher is not registering in queries.
 
             var updatedNeighbors = new List<LODQuad>();
             // Update neighbors.
@@ -441,10 +436,13 @@ namespace KatnisssSpaceSimulator.Terrain
             this.Node.Value = null;
         }
 
-        public static LODQuad Create( Transform parent, Vector3 localPosition, LODQuadSphere quadSphere, CelestialBody celestialBody, Vector2 center, int lN, LODQuadTree.Node node, float subdivisionDistance, Material mat, Direction3D face )
+        public static LODQuad CreateL0( Transform parent, LODQuadSphere quadSphere, CelestialBody celestialBody, LODQuadTree.Node node, float subdivisionDistance, Material mat, Direction3D face )
         {
-            // FIXME: this method kinda ugly. And prevent people from the outside from being able to create non-l0 quads.
+            return Create( parent, face.ToVector3() * (float)celestialBody.Radius, quadSphere, celestialBody, Vector2.zero, 0, node, subdivisionDistance, mat, face );
+        }
 
+        static LODQuad Create( Transform parent, Vector3 localPosition, LODQuadSphere quadSphere, CelestialBody celestialBody, Vector2 center, int lN, LODQuadTree.Node node, float subdivisionDistance, Material mat, Direction3D face )
+        {
             GameObject go = new GameObject( $"LODQuad L{lN}, {face}, ({center.x:#0.################}, {center.y:#0.################})" );
             go.transform.SetParent( parent );
 
