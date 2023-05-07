@@ -2,6 +2,7 @@
 using KatnisssSpaceSimulator.Camera;
 using KatnisssSpaceSimulator.Core;
 using KatnisssSpaceSimulator.Core.Managers;
+using KatnisssSpaceSimulator.Core.Parts;
 using KatnisssSpaceSimulator.Core.ReferenceFrames;
 using KatnisssSpaceSimulator.Functionalities;
 using KatnisssSpaceSimulator.Terrain;
@@ -79,18 +80,28 @@ namespace KatnisssSpaceSimulator
         Vessel CreateDummyVessel( Vector3Dbl airfPosition, Quaternion rotation )
         {
             VesselFactory fac = new VesselFactory();
-            PartFactory pfac = new PartFactory();
+            //PartFactory pfac = new PartFactory( new DummyPartSource() );
+            //PartFactory efac = new PartFactory( new ResourcePartSource( "Prefabs/engine_part" ) );
+
+            PartFactory intertank = new PartFactory( new ResourcePartSource( "Prefabs/intertank" ) );
+            PartFactory tank = new PartFactory( new ResourcePartSource( "Prefabs/tank" ) );
+            PartFactory tankLong = new PartFactory( new ResourcePartSource( "Prefabs/tank_long" ) );
+            PartFactory engine = new PartFactory( new ResourcePartSource( "Prefabs/engine" ) );
 
             Vessel v = fac.CreatePartless( airfPosition, rotation );
-            pfac.CreateRoot( v );
+            Part root = intertank.CreateRoot( v );
 
-            const int partcount = 5;
-            const int engcount = 5;
+            Part tankP = tank.Create( root, new Vector3( 0, -1.625f, 0 ), Quaternion.identity );
+            tankLong.Create( root, new Vector3( 0, 2.625f, 0 ), Quaternion.identity );
+            engine.Create( tankP, new Vector3( 0, -3.45533f, 0 ), Quaternion.identity );
 
-            Part parent = v.RootPart;
+            //const int partcount = 5;
+            //const int engcount = 5;
+
+            /*Part parent = v.RootPart;
             for( int i = 0; i < partcount; i++ )
             {
-                pfac.Create( parent, new Vector3( 0, 1.25f * i + 1.25f * engcount, 0 ), Quaternion.identity );
+                Part part = pfac.Create( parent, new Vector3( 0, 1.25f * i + 1.25f * engcount, 0 ), Quaternion.identity );
 
                 parent = parent.Children[0];
             }
@@ -98,14 +109,10 @@ namespace KatnisssSpaceSimulator
             parent = v.RootPart;
             for( int i = 0; i < engcount; i++ )
             {
-                pfac.Create( parent, new Vector3( 0, 1.125f * i, 0 ), Quaternion.identity );
-
-                FRocketEngine rn = v.RootPart.gameObject.AddComponent<FRocketEngine>();
-                rn.MaxThrust = 100;
-                rn.ThrustTransform = v.RootPart.transform.Find( "thrust" );
+                Part engine = efac.Create( parent, new Vector3( 0, 1.125f * i, 0 ), Quaternion.identity );
 
                 parent = parent.Children[0];
-            }
+            }*/
 
             TrailRenderer tr = v.gameObject.AddComponent<TrailRenderer>();
             tr.material = Material;

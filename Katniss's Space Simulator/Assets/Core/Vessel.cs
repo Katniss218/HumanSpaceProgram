@@ -122,8 +122,24 @@ namespace KatnisssSpaceSimulator.Core
         /// </summary>
         public Vector3 GetBottomPosition()
         {
-            Vector3 closestBound = this.PhysicsObject.ClosestPointOnBounds( this.transform.position - (this.transform.up * 500f) );
-            return closestBound;
+            Vector3 dir = this.transform.position - (this.transform.up * 500f);
+            Vector3 min = this.transform.position;
+            float minDist = float.MaxValue;
+            Collider[] cols = this.GetComponentsInChildren<Collider>();
+            foreach( var col in cols )
+            {
+                Vector3 closestBound = col.ClosestPointOnBounds( dir );
+                float dst = Vector3.Distance( dir, closestBound );
+                if( dst < minDist )
+                {
+                    minDist = dst;
+                    min = closestBound;
+                }
+            }
+            return min;
+
+            //Vector3 closestBound = this.PhysicsObject.ClosestPointOnBounds( this.transform.position - (this.transform.up * 500f) );
+            //return closestBound;
         }
 
         void Awake()

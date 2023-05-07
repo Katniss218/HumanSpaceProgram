@@ -1,4 +1,3 @@
-using KatnisssSpaceSimulator.Core.ReferenceFrames;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -37,6 +36,7 @@ namespace KatnisssSpaceSimulator.Core
         /// <summary>
         /// The mass of the part in [kg].
         /// </summary>
+        [field: SerializeField]
         public float Mass { get; set; }
 
         /// <summary>
@@ -99,6 +99,7 @@ namespace KatnisssSpaceSimulator.Core
             Gizmos.DrawWireSphere( this.transform.position, 0.1f );
             if( this.Vessel == null )
             {
+                // TODO - this also gets called if the part is a prefab and being set up.
                 Debug.LogWarning( $"Invalid State: Part '{this}' is orphaned and doesn't have a vessel." );
                 Gizmos.color = Color.red;
                 Gizmos.DrawSphere( this.transform.position, 0.25f );

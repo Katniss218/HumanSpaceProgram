@@ -57,7 +57,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Camera\CameraController.cs" />
-    <Compile Include="Assets\Core\PartFactory.cs" />
     <Compile Include="Assets\Core\CelestialBody.cs" />
     <Compile Include="Assets\zzzTestAssets\zzzTestGameManager.cs" />
     <Compile Include="Assets\Terrain\MeshUtils.cs" />
@@ -87,7 +86,6 @@
     <Compile Include="Assets\Core\Vessel.cs" />
     <Compile Include="Assets\Buildings\LaunchSiteFactory.cs" />
     <Compile Include="Assets\UI\AltitudeReadoutUI.cs" />
-    <Compile Include="Assets\Core\Part.cs" />
     <Compile Include="Assets\Core\CoordinateUtils.cs" />
     <Compile Include="Assets\Core\Physics\PhysicsUtils.cs" />
     <Compile Include="Assets\_UnityEngine\Direction2D.cs" />
@@ -98,6 +96,10 @@
     <Compile Include="Assets\TimeWarp\TimeWarpManager.cs" />
     <Compile Include="Assets\Core\ReferenceFrames\IReferenceFrame.cs" />
     <Compile Include="Assets\Terrain\LODQuadTree_NodeUtils.cs" />
+    <Compile Include="Assets\Core\Parts\DummyPartSource.cs" />
+    <Compile Include="Assets\Core\Part.cs" />
+    <Compile Include="Assets\Core\Parts\PartFactory.cs" />
+    <Compile Include="Assets\Core\Parts\ResourcePartSource.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro.cginc" />

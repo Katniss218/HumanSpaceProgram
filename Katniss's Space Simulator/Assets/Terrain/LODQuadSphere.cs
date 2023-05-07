@@ -23,7 +23,7 @@ namespace KatnisssSpaceSimulator.Terrain
         /// <summary>
         /// The level of subdivision (lN) at which the quad will stop subdividing.
         /// </summary>
-        public int HardLimitSubdivLevel { get; set; } = 32;
+        public int HardLimitSubdivLevel { get; set; } = 20;
 
         [field: SerializeField]
         LODQuadTree[] _quadTree;
