@@ -13,9 +13,6 @@ namespace KatnisssSpaceSimulator.Terrain
     /// <summary>
     /// A subdivisible inflated quad.
     /// </summary>
-    /// <remarks>
-    /// This class does all of the heavy lifting of the system. <see cref="LODQuadSphere"/> only manages the 6 quads and tells them where the POIs are.
-    /// </remarks>
     [RequireComponent( typeof( MeshFilter ) )]
     [RequireComponent( typeof( MeshCollider ) )]
     [RequireComponent( typeof( MeshRenderer ) )]
@@ -54,11 +51,7 @@ namespace KatnisssSpaceSimulator.Terrain
         [field: SerializeField]
         public int SubdivisionLevel { get; private set; }
 
-        State _currentState;
-        State _nextState;
-
-        [SerializeField]
-        bool currentlySubdividing = false; // temp debugging
+        internal State CurrentState { get; private set; }
 
         Direction3D _quadSphereFace;
 
@@ -78,47 +71,9 @@ namespace KatnisssSpaceSimulator.Terrain
             _meshRenderer = this.GetComponent<MeshRenderer>();
         }
 
-        void Start()
+        internal void SetState( State state )
         {
-            if( this._currentState is State.Idle )
-            {
-                GenerateMeshData();
-            }
-        }
-
-        void Update()
-        {
-            this.AirfPOIs = new Vector3Dbl[] { VesselManager.ActiveVessel.AIRFPosition };
-
-            if( _currentState is State.Idle )
-            {
-                return;
-            }
-
-            if( _currentState is State.Active )
-            {
-                if( ShouldSubdivide() )
-                {
-                    Subdivide();
-                    return;
-                }
-
-                if( ShouldUnsubdivide() )
-                {
-                    Unsubdivide();
-                    return;
-                }
-            }
-        }
-
-        void LateUpdate()
-        {
-            UpdateState();
-        }
-
-        void SetCurrentState( State state )
-        {
-            if( this._currentState is State.Rebuild r )
+            if( this.CurrentState is State.Rebuild r )
             {
                 r.JobHandle.Complete();
                 r.Job.Finish( this );
@@ -129,44 +84,8 @@ namespace KatnisssSpaceSimulator.Terrain
                 rebuild.Job.Initialize( this ); // This (and collection) would have to be Reflection-ified to make it extendable by other user-provided assemblies.
                 rebuild.JobHandle = rebuild.Job.Schedule();
             }
-            this._currentState = state;
 
-            currentlySubdividing = _currentState is State.Rebuild;
-        }
-
-        public void SetState( State newState )
-        {
-            if( newState == null )
-            {
-                throw new ArgumentNullException( $"The new state can't be null." );
-            }
-
-            if( this._currentState is State.Rebuild )
-            {
-                // If it rebuilding, we need to wait for the next frame to update the state.
-                this._nextState = newState;
-            }
-            else
-            {
-                SetCurrentState( newState );
-            }
-        }
-
-        private void UpdateState()
-        {
-            if( this._nextState == null && !(this._currentState is State.Rebuild) )
-            {
-                return;
-            }
-
-            if( this._nextState == null )
-            {
-                this.SetCurrentState( new State.Active() );
-                return;
-            }
-
-            SetCurrentState( this._nextState );
-            this._nextState = null;
+            this.CurrentState = state;
         }
 
         internal void SetMesh( Mesh mesh )
@@ -175,7 +94,7 @@ namespace KatnisssSpaceSimulator.Terrain
             this._meshFilter.sharedMesh = mesh;
         }
 
-        private bool ShouldSubdivide()
+        internal bool ShouldSubdivide()
         {
             if( this.SubdivisionLevel >= _quadSphere.HardLimitSubdivLevel )
             {
@@ -206,7 +125,7 @@ namespace KatnisssSpaceSimulator.Terrain
             return false;
         }
 
-        private bool ShouldUnsubdivide()
+        internal bool ShouldUnsubdivide()
         {
             if( this.SubdivisionLevel == 0 )
             {
@@ -232,7 +151,7 @@ namespace KatnisssSpaceSimulator.Terrain
                 }
                 // Sibling node is still generating - don't unsubdivide.
                 // Not having this can lead to memory leaks with jobs due to destroyed job handles not freeing their stuff.
-                if( siblingNode.Value != null && siblingNode.Value._currentState is State.Rebuild )
+                if( siblingNode.Value != null && siblingNode.Value.CurrentState is State.Rebuild )
                 {
                     return false;
                 }
@@ -256,7 +175,7 @@ namespace KatnisssSpaceSimulator.Terrain
 
         static readonly float Cos45DegPlusEpsilon = Mathf.Cos( 45 * Mathf.Deg2Rad ) + 0.025f; // also, cos(45deg) is equal to sin(45deg)
 
-        public static List<LODQuad> UpdateNeighbors( IEnumerable<LODQuad> neighborQuads, LODQuad newQuad, Direction2D direction )
+        private static List<LODQuad> UpdateNeighbors( IEnumerable<LODQuad> neighborQuads, LODQuad newQuad, Direction2D direction )
         {
             List<LODQuad> neighborsInSpecifiedDirection = new List<LODQuad>();
 
@@ -316,7 +235,7 @@ namespace KatnisssSpaceSimulator.Terrain
         /// <summary>
         /// Splits the quad into 4 separate quads.
         /// </summary>
-        private void Subdivide()
+        internal void Subdivide( ref List<LODQuad> activeQuads, ref List<LODQuad> needRemeshing )
         {
             if( this.Node.Children != null )
             {
@@ -331,6 +250,7 @@ namespace KatnisssSpaceSimulator.Terrain
             LODQuadTree.Node rootNode = this.Node.Root;
             int newSubdivisionLevel = this.SubdivisionLevel + 1;
 
+            activeQuads.Remove( this );
             this.Destroy();
             // Don't make the parent a leaf, because once subdivided there definitely are children.
 
@@ -348,9 +268,9 @@ namespace KatnisssSpaceSimulator.Terrain
 
                 LODQuad newQuad = Create( this.transform.parent, subdividedOrigin, this._quadSphere, this.CelestialBody, subdividedCenter, newSubdivisionLevel, newNode, this.SubdivisionDistance / 2f, this._meshRenderer.material, this._quadSphereFace );
                 _4_quads[i] = newQuad;
+                activeQuads.Add( newQuad );
             }
 
-            var updatedNeighbors = new List<LODQuad>();
             // Update neighbors.
             foreach( var quad in _4_quads )
             {
@@ -361,33 +281,16 @@ namespace KatnisssSpaceSimulator.Terrain
                 foreach( var direction in Direction2DUtils.Every )
                 {
                     var newN = UpdateNeighbors( queryResult.Where( n => n.Value != null ).Select( n => n.Value ), quad, direction );
-                    updatedNeighbors.AddRange( newN );
+                    needRemeshing.AddRange( newN );
                 }
-                quad.GenerateMeshData();
-            }
-
-#warning TODO - When moving at high speeds relative to quad size, there is desync in the mesh.
-            // at least I think this is what happens.
-
-            // a quad was freshely created, its mesh was updated to the correct one, but its IsSubdividing was still true (maybe another subdiv started as next state?).
-            // then on the next frame, its neighbor subdivided, and updated its edges, but since the quad was already subdivided, the resubdiv was moved to the next state.
-
-
-            // Realistically, the proper way to do this would be to ensure that all the edges of every quad are resolved, and then call for rebuild of all quads that had their edges changed.
-
-            // and then we won't need to store the next state. everything should be done neatly all at once, after the subdivs/unsubdivs are fully resolved, then the meshing starts, and ends in lateupdate on the same frame.
-
-
-            foreach( var n in updatedNeighbors.Distinct() )
-            {
-                n.GenerateMeshData();
+                needRemeshing.Add( quad );
             }
         }
 
         /// <summary>
         /// Joins the quad and its 3 siblings into a single quad of lower subdivision level.
         /// </summary>
-        private void Unsubdivide()
+        internal void Unsubdivide( ref List<LODQuad> activeQuads, ref List<LODQuad> needRemeshing )
         {
             if( this.SubdivisionLevel <= 0 )
             {
@@ -410,6 +313,7 @@ namespace KatnisssSpaceSimulator.Terrain
             foreach( var qSibling in this.Node.Siblings )
             {
                 qSibling.Value.Destroy();
+                activeQuads.Remove( qSibling.Value );
             }
             // Make the parent a leaf, because once unsubdivided, there will be no children. This should also remove it completely from the quadtree.
             this.Node.Parent.MakeLeaf();
@@ -421,31 +325,17 @@ namespace KatnisssSpaceSimulator.Terrain
 
             LODQuad newQuad = Create( this.transform.parent, unsubdividedOrigin, this._quadSphere, this.CelestialBody, unsubdividedCenter, newSubdivisionLevel, parentNode, this.SubdivisionDistance * 2f, this._meshRenderer.material, this._quadSphereFace );
 
+            activeQuads.Add( newQuad );
+
             // update neighbors.
             List<LODQuadTree.Node> queryResult = rootNode.QueryOverlappingLeaves( newQuad.Node.minX, newQuad.Node.minY, newQuad.Node.maxX, newQuad.Node.maxY );
 
-            var updatedNeighbors = new List<LODQuad>();
             foreach( var direction in Direction2DUtils.Every )
             {
                 var newN = UpdateNeighbors( queryResult.Where( n => n.Value != null ).Select( n => n.Value ), newQuad, direction );
-                updatedNeighbors.AddRange( newN );
+                needRemeshing.AddRange( newN );
             }
-            foreach( var n in updatedNeighbors.Distinct() )
-            {
-                n.GenerateMeshData();
-            }
-        }
-
-        /// <summary>
-        /// Creates and caches the mesh for this LODQuad.
-        /// </summary>
-        private void GenerateMeshData()
-        {
-            var rebuild = new State.Rebuild();
-
-            rebuild.Job = new MakeQuadMesh_Job();
-
-            this.SetState( rebuild );
+            needRemeshing.Add( newQuad );
         }
 
         /// <summary>
