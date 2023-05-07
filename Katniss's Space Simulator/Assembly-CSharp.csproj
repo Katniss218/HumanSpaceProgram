@@ -100,6 +100,10 @@
     <Compile Include="Assets\Core\Part.cs" />
     <Compile Include="Assets\Core\Parts\PartFactory.cs" />
     <Compile Include="Assets\Core\Parts\ResourcePartSource.cs" />
+    <Compile Include="Assets\Functionalities\FAvionics.cs" />
+    <Compile Include="Assets\Core\BulkResource.cs" />
+    <Compile Include="Assets\Functionalities\FBulkContainer.cs" />
+    <Compile Include="Assets\Functionalities\FActuatorXY.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro.cginc" />

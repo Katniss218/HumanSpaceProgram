@@ -18,6 +18,9 @@ namespace KatnisssSpaceSimulator.Functionalities
         [field: SerializeField]
         public float Throttle { get; set; }
 
+        /// <summary>
+        /// Defines which way the engine thrusts (thrust is applied along its `forward` (positive) axis).
+        /// </summary>
         [field: SerializeField]
         public Transform ThrustTransform { get; set; }
 
@@ -31,7 +34,7 @@ namespace KatnisssSpaceSimulator.Functionalities
             return this.MaxThrust * Throttle;
         }
 
-        [ControlIn( "SetThrottle" )]
+        [ControlIn( "set.throttle", "Set Throttle" )]
         public void SetThrottle( float value )
         {
             this.Throttle = value;

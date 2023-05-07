@@ -5,14 +5,19 @@ using UnityEngine;
 
 namespace KatnisssSpaceSimulator.Control
 {
+    /// <summary>
+    /// Marks a method as an input for a control channel.
+    /// </summary>
     [AttributeUsage( AttributeTargets.Method )]
     public class ControlInAttribute : Attribute
     {
-        public string Name { get; set; }
+        public string ID { get; set; }
+        public string DisplayName { get; set; }
 
-        public ControlInAttribute( string name )
+        public ControlInAttribute( string name, string displayName )
         {
-            this.Name = name;
+            this.ID = name;
+            this.DisplayName = displayName;
         }
     }
 }
