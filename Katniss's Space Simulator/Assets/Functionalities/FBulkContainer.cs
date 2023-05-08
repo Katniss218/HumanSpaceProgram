@@ -10,16 +10,10 @@ using UnityEngine;
 namespace KatnisssSpaceSimulator.Functionalities
 {
     /// <summary>
-    /// A container for <see cref="BulkResource"/>.
+    /// A container for a <see cref="BulkResource"/>.
     /// </summary>
     public class FBulkContainer : Functionality
     {
-        public struct Resource
-        {
-            public string ID { get; set; }
-            public float Volume { get; set; }
-        }
-
         /// <summary>
         /// The total available volume of the container, in [m^3].
         /// </summary>
@@ -27,13 +21,25 @@ namespace KatnisssSpaceSimulator.Functionalities
         public float MaxVolume { get; private set; }
 
         /// <summary>
-        /// Resource currently contained in a container.
+        /// Determines the center position of the container.
         /// </summary>
         [field: SerializeField]
-        public Resource[] Resources { get; set; }
+        public Transform VolumeTransform { get; set; }
 
         [field: SerializeField]
-        public FBulkContainer[] ConnectedTo { get; set; } // a list of one-way connections mayhaps?
+        public float Volume { get; set; }
+
+        /// <summary>
+        /// Inflow minus outflow. positive = inflow, negative = outflow.
+        /// </summary>
+        [field: SerializeField]
+        internal float TotalFlow { get; set; }
+
+        void FixedUpdate()
+        {
+            Volume += TotalFlow * Time.fixedDeltaTime;
+            // TODO - update the mass too, because the fluid weighs something.
+        }
 
         // flow between containers depends on many factors.
         // - acceleration on the container (ullage, only for liquids)
@@ -53,19 +59,19 @@ namespace KatnisssSpaceSimulator.Functionalities
         {
             throw new NotImplementedException();
 
-            return new JObject()
+            /*return new JObject()
             {
                 { "Resources", this.Resources.ToString() }, // temp
                 { "ConnectedTo", this.ConnectedTo.ToString() } // temp
-            };
+            };*/
         }
 
         public override void Load( JToken data )
         {
             throw new NotImplementedException();
 
-            this.Resources = new Resource[] { }; // temp
-            this.ConnectedTo = new FBulkContainer[] { }; // temp
+            //this.Resources = new Resource[] { }; // temp
+            //this.ConnectedTo = new FBulkContainer[] { }; // temp
         }
     }
 }

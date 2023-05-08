@@ -8,7 +8,8 @@ using UnityEngine;
 namespace KatnisssSpaceSimulator.Core
 {
     /// <summary>
-    /// Contains the data about a bulk resource (one that can be held in e.g. a tank).
+    /// Contains the data about a bulk resource (one that can be held in e.g. a tank). <br/>
+    /// Examples: Propellant
     /// </summary>
     public class BulkResource
     {

@@ -57,11 +57,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Camera\CameraController.cs" />
+    <Compile Include="Assets\Core\Serialization\AssetPartSource.cs" />
+    <Compile Include="Assets\Core\BulkResource.cs" />
     <Compile Include="Assets\Core\CelestialBody.cs" />
     <Compile Include="Assets\zzzTestAssets\zzzTestGameManager.cs" />
     <Compile Include="Assets\Terrain\MeshUtils.cs" />
     <Compile Include="Assets\Core\CelestialBodyFactory.cs" />
     <Compile Include="Assets\Terrain\MakeQuadMesh_Job.cs" />
+    <Compile Include="Assets\Core\Part.cs" />
+    <Compile Include="Assets\Functionalities\FAvionics.cs" />
     <Compile Include="Assets\Terrain\LODQuadSphere.cs" />
     <Compile Include="Assets\Core\ReferenceFrames\OffsetReferenceFrame.cs" />
     <Compile Include="Assets\Core\VesselFactory.cs" />
@@ -71,8 +75,11 @@
     <Compile Include="Assets\UI\VelocityReadoutUI.cs" />
     <Compile Include="Assets\Core\VesselStateUtils.cs" />
     <Compile Include="Assets\_UnityEngine\Vector2_Ex.cs" />
+    <Compile Include="Assets\Functionalities\FBulkContainer.cs" />
     <Compile Include="Assets\Core\Physics\PhysicsObject.cs" />
     <Compile Include="Assets\Terrain\LODQuadTree.cs" />
+    <Compile Include="Assets\Core\PartFactory.cs" />
+    <Compile Include="Assets\Core\Part.Serialization.cs" />
     <Compile Include="Assets\Core\CelestialBodyManager.cs" />
     <Compile Include="Assets\_UnityEngine\Vector3_Ex.cs" />
     <Compile Include="Assets\_UnityEngine\Direction3D.cs" />
@@ -85,6 +92,7 @@
     <Compile Include="Assets\UI\FPSCounterUI.cs" />
     <Compile Include="Assets\Core\Vessel.cs" />
     <Compile Include="Assets\Buildings\LaunchSiteFactory.cs" />
+    <Compile Include="Assets\Core\Vessel.Serialization.cs" />
     <Compile Include="Assets\UI\AltitudeReadoutUI.cs" />
     <Compile Include="Assets\Core\CoordinateUtils.cs" />
     <Compile Include="Assets\Core\Physics\PhysicsUtils.cs" />
@@ -92,20 +100,13 @@
     <Compile Include="Assets\Core\ReferenceFrames\RootObjectTransform.cs" />
     <Compile Include="Assets\Buildings\LaunchSite.cs" />
     <Compile Include="Assets\Terrain\LODQuad.cs" />
+    <Compile Include="Assets\Functionalities\FActuatorXY.cs" />
     <Compile Include="Assets\Core\Functionality.cs" />
     <Compile Include="Assets\TimeWarp\TimeWarpManager.cs" />
     <Compile Include="Assets\Core\ReferenceFrames\IReferenceFrame.cs" />
     <Compile Include="Assets\Terrain\LODQuadTree_NodeUtils.cs" />
-    <Compile Include="Assets\Core\Part.cs" />
-    <Compile Include="Assets\Core\PartFactory.cs" />
-    <Compile Include="Assets\Functionalities\FAvionics.cs" />
-    <Compile Include="Assets\Core\BulkResource.cs" />
-    <Compile Include="Assets\Functionalities\FBulkContainer.cs" />
-    <Compile Include="Assets\Functionalities\FActuatorXY.cs" />
-    <Compile Include="Assets\Core\Vessel.Serialization.cs" />
     <Compile Include="Assets\Core\Serialization\DummyPartSource.cs" />
-    <Compile Include="Assets\Core\Part.Serialization.cs" />
-    <Compile Include="Assets\Core\Serialization\AssetPartSource.cs" />
+    <Compile Include="Assets\Functionalities\FBulkContainerConnection.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro.cginc" />
