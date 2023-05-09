@@ -49,6 +49,16 @@ namespace KatnisssSpaceSimulator.Core.ReferenceFrames
         Vector3 InverseTransformPosition( Vector3Dbl globalPosition );
 
         /// <summary>
+        /// Transforms a direction in the reference frame's space to the Absolute Inertial Reference Frame (AIRF) space.
+        /// </summary>
+        Vector3 TransformDirection( Vector3 localDirection );
+
+        /// <summary>
+        /// Transforms a direction in the Absolute Inertial Reference Frame (AIRF) space to the reference frame's space.
+        /// </summary>
+        Vector3 InverseTransformDirection( Vector3 globalDirection );
+
+        /// <summary>
         /// Transforms a rotation/orientation in the reference frame's space to the Absolute Inertial Reference Frame (AIRF) space.
         /// </summary>
         Quaternion TransformRotation( Quaternion localPosition );

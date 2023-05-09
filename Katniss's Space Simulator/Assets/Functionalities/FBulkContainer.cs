@@ -18,7 +18,7 @@ namespace KatnisssSpaceSimulator.Functionalities
         /// The total available volume of the container, in [m^3].
         /// </summary>
         [field: SerializeField]
-        public float MaxVolume { get; private set; }
+        public float MaxVolume { get; set; }
 
         /// <summary>
         /// Determines the center position of the container.
@@ -33,11 +33,17 @@ namespace KatnisssSpaceSimulator.Functionalities
         /// Inflow minus outflow. positive = inflow, negative = outflow.
         /// </summary>
         [field: SerializeField]
-        internal float TotalFlow { get; set; }
+        internal float TotalInflow { get; set; }
+
+        /// <summary>
+        /// Average velocity of the contents at each connection connected to this container, multiplied by the number of connections.
+        /// </summary>
+        [field: SerializeField]
+        internal Vector3 TotalVelocity { get; set; }
 
         void FixedUpdate()
         {
-            Volume += TotalFlow * Time.fixedDeltaTime;
+            Volume += TotalInflow * Time.fixedDeltaTime;
             // TODO - update the mass too, because the fluid weighs something.
         }
 

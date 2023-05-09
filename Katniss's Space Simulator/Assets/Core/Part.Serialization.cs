@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace KatnisssSpaceSimulator.Core
 {
-    public sealed partial class Part
+    public sealed partial class Part : MonoBehaviour
     {
         // Serialization / Persistence logic of parts.
 

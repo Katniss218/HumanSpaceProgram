@@ -30,6 +30,16 @@ namespace KatnisssSpaceSimulator.Core.ReferenceFrames
         {
             return Vector3Dbl.Add( _referenceAirfPosition, localPosition );
         }
+        
+        public Vector3 InverseTransformDirection( Vector3 airfDirection )
+        {
+            return airfDirection;
+        }
+
+        public Vector3 TransformDirection( Vector3 localDirection )
+        {
+            return localDirection;
+        }
 
         public Quaternion InverseTransformRotation( Quaternion airfRotation )
         {

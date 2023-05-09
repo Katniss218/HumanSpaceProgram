@@ -92,8 +92,19 @@ namespace KatnisssSpaceSimulator
             Part root = intertank.CreateRoot( v );
 
             Part tankP = tank.Create( root, new Vector3( 0, -1.625f, 0 ), Quaternion.identity );
-            tankLong.Create( root, new Vector3( 0, 2.625f, 0 ), Quaternion.identity );
+            Part tankL1 = tankLong.Create( root, new Vector3( 0, 2.625f, 0 ), Quaternion.identity );
+            tankLong.Create( root, new Vector3( 2, 2.625f, 0 ), Quaternion.identity );
+            tankLong.Create( root, new Vector3( -2, 2.625f, 0 ), Quaternion.identity );
             engine.Create( tankP, new Vector3( 0, -3.45533f, 0 ), Quaternion.identity );
+
+            FBulkContainerConnection conn = tankP.gameObject.AddComponent<FBulkContainerConnection>();
+            conn.End1.Container = tankL1.GetComponent<FBulkContainer>();
+            conn.End2.Container = tankP.GetComponent<FBulkContainer>();
+
+            conn.End1.Container.Volume = 99999f;
+            conn.End2.Container.MaxVolume = 99999f;
+
+            conn.CrossSectionArea = 0.01f;
 
             //const int partcount = 5;
             //const int engcount = 5;

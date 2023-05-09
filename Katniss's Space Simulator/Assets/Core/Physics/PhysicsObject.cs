@@ -48,6 +48,9 @@ namespace KatnisssSpaceSimulator.Core.Physics
             set => this._rb.velocity = value;
         }
 
+        public Vector3 Acceleration { get; private set; }
+        Vector3 _oldVelocity;
+
         Rigidbody _rb;
         RootObjectTransform _rootTransform;
 
@@ -87,6 +90,8 @@ namespace KatnisssSpaceSimulator.Core.Physics
         {
             // I'm not a fan of the physics being calculated in scene-space, but that's the only way to handle collisions properly.
             this._rootTransform.SetAIRFPosition( SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.transform.position ) );
+            this.Acceleration = (Velocity - _oldVelocity) / Time.fixedDeltaTime;
+            this._oldVelocity = Velocity;
         }
 
         void OnEnable()
