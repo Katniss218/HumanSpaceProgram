@@ -74,6 +74,55 @@ namespace KatnisssSpaceSimulator.Functionalities
             return CrossSectionArea * velocity;
         }
 
+        /// <summary>
+        /// Calculates the height of a truncated unit sphere with the given volume as a [0..1] percentage of the unit sphere's volume.
+        /// </summary>
+        public static float SolveHeightOfTruncatedSphere( float volumePercent )
+        {
+            // https://math.stackexchange.com/questions/2364343/height-of-a-spherical-cap-from-volume-and-radius
+
+            const float UnitSphereVolume = 4.18879020479f; // 4/3 * pi     -- radius=1
+            const float TwoPi = 6.28318530718f;            // 2 * pi       -- radius=1
+            const float Sqrt3 = 1.73205080757f;
+
+            float Volume = UnitSphereVolume * volumePercent;
+
+            float A = 1.0f - ((3.0f * Volume) / TwoPi); // A is a coefficient, [-1..1] for volumePercent in [0..1]
+            float OneThirdArccosA = 0.333333333f * Mathf.Acos( A );
+            float height = Sqrt3 * Mathf.Sin( OneThirdArccosA ) - Mathf.Cos( OneThirdArccosA ) + 1.0f;
+            return height;
+        }
+
+        // in [kg/m^3]
+        const float fluidDensity = 1100.0f;
+
+        public (float end1Pressure, float end2Pressure) GetPressures( Vector3 fluidAccelerationWorldSpace )
+        {
+            // inlets on the surface of unit sphere in [m].
+            Vector3 end1PosUnit = (this.transform.TransformPoint( End1.Position ) - End1.Container.VolumeTransform.position).normalized;
+            Vector3 end2PosUnit = (this.transform.TransformPoint( End2.Position ) - End2.Container.VolumeTransform.position).normalized;
+
+            // fluidAccelerationWorldSpace is the orientation of the fluid column.
+
+            // find the pressure at each point.
+            // find the fluid height, assuming the tank is a unit sphere and that the fluid is settled towards the acceleration direction.
+
+            float end1Height = SolveHeightOfTruncatedSphere( End1.Container.Volume / End1.Container.MaxVolume );
+            float end2Height = SolveHeightOfTruncatedSphere( End2.Container.Volume / End2.Container.MaxVolume );
+
+#warning TODO - Use the position of each connection along the acceleration axis to find height. Currently assumes feeding bottom-to-bottom.
+
+#warning TODO - if the tanks are at different heights, and connected at the bottoms (relative to acceleration), the level should ultimately be equal for both.
+
+#warning TODO - multiply height by tank dimensions and use its magnitude to get more accurate pressure.
+
+            float end1Pressure = fluidAccelerationWorldSpace.magnitude * fluidDensity * end1Height;
+            float end2Pressure = fluidAccelerationWorldSpace.magnitude * fluidDensity * end2Height;
+
+            // in [Pa]
+            return (end1Pressure, end2Pressure);
+        }
+
         public (float flowrate, float velocity) CalculateFlowRate( Vector3 fluidAccelerationRelativeToContainer, float deltaTime )
         {
             if( CrossSectionArea <= 1e-6f )
@@ -85,15 +134,16 @@ namespace KatnisssSpaceSimulator.Functionalities
                 return (0.0f, 0.0f);
             }
 
-            Vector3 direction = (End2.Container.VolumeTransform.position - End1.Container.VolumeTransform.position).normalized;
+            // In [Pa]
+            (float end1Pressure, float end2Pressure) = GetPressures( fluidAccelerationRelativeToContainer );
 
-            // TODO - inlet direction based on inlet orientation.
+            // In [Pa] ([N/m^2]). Positive flows towards End2, negative flows towards End1, zero doesn't flow.
+            float relativePressure = end1Pressure - end2Pressure;
+            float relativePressureMagnitude = Mathf.Abs( relativePressure );
+            //float flowAcceleration = relativePressure / fluidDensity;
+            //float flowAccelerationMagnitude = Mathf.Abs( flowAcceleration );
 
-            // Positive flows towards End2, negative flows towards End1, zero doesn't flow.
-            float flowAcceleration = Vector3.Dot( fluidAccelerationRelativeToContainer, direction );
-            float flowAccelerationMagnitude = Mathf.Abs( flowAcceleration );
-
-            float newSignedVelocity = _velocity + flowAcceleration;
+            float newSignedVelocity = Mathf.Sign(relativePressure) * Mathf.Sqrt( 2 * relativePressureMagnitude / fluidDensity ); // _velocity + flowAcceleration;
             float newVelocityMagnitude = Mathf.Abs( newSignedVelocity );
 
             if( newVelocityMagnitude < 0.001f ) // skip calculating in freefall. Later, we can do rebound and stuff.
@@ -101,14 +151,9 @@ namespace KatnisssSpaceSimulator.Functionalities
                 return (0.0f, 0.0f);
             }
 
-            if( fluidAccelerationRelativeToContainer.magnitude < 1f )
-            {
-
-            }
-
             // Inlet depends on the sign of the acceleration.
-            End inlet = flowAcceleration < 0 ? End2 : End1;
-            End outlet = flowAcceleration < 0 ? End1 : End2;
+            End inlet = relativePressure < 0 ? End2 : End1;
+            End outlet = relativePressure < 0 ? End1 : End2;
 
             newSignedVelocity *= 0.95f; // friction.
 
@@ -121,14 +166,14 @@ namespace KatnisssSpaceSimulator.Functionalities
             float outletRemainingVolumeDt = (outlet.Container.MaxVolume - outlet.Container.Volume) / deltaTime;
 
             // Need to clamp the flow rate based on the inlet and outlet conditions.
-            float inletAvailableFlowrate = (inletVolumeDt * flowAccelerationMagnitude > newMaximumFlowrate) // unsigned
+            float inletAvailableFlowrate = (inletVolumeDt > newMaximumFlowrate) // unsigned
                 ? newMaximumFlowrate
                 : inletVolumeDt;
 
 #warning TODO - needs to be split evenly across all of the outlets flowing into the given tank, to stop oscillations. Also, conserve the volumes.
             // also, even with one outlet and constant deltatime, this somehow overshoots the maximum volume.
 
-            float outletAvailableFlowrate = (outletRemainingVolumeDt * flowAccelerationMagnitude > newMaximumFlowrate) // unsigned
+            float outletAvailableFlowrate = (outletRemainingVolumeDt > newMaximumFlowrate) // unsigned
                 ? newMaximumFlowrate
                 : outletRemainingVolumeDt;
 #warning TODO - something (acceleration?) breaks when the vessel crashes into the ground.
@@ -139,7 +184,7 @@ namespace KatnisssSpaceSimulator.Functionalities
 
             float newFlowrate = Mathf.Min( newMaximumFlowrate, inletAvailableFlowrate, outletAvailableFlowrate );
 
-            float newSignedFlowrate = Mathf.Sign( flowAcceleration ) * newFlowrate;
+            float newSignedFlowrate = Mathf.Sign( relativePressure ) * newFlowrate;
 
             // Use the clamped flow rate to calculate clamped velocity, to keep it in sync.
             newSignedVelocity = newSignedFlowrate / CrossSectionArea;
@@ -166,7 +211,6 @@ namespace KatnisssSpaceSimulator.Functionalities
             Vector3 vesselAcceleration = part.Vessel.PhysicsObject.Acceleration;
             sceneAcceleration -= vesselAcceleration; // acceleration = gravity minus whatever the container is doing.
 
-            Debug.Log( vesselAcceleration );
             // acceleration due to external forces (gravity) minus the acceleration of the vessel.
             Vector3 fluidAcceleration = sceneAcceleration;
 
