@@ -113,6 +113,8 @@ namespace KatnisssSpaceSimulator.Functionalities
 #warning TODO - Use the position of each connection along the acceleration axis to find height. Currently assumes feeding bottom-to-bottom.
 
 #warning TODO - if the tanks are at different heights, and connected at the bottoms (relative to acceleration), the level should ultimately be equal for both.
+            // doesn't really work with the "portal" connection model.
+            // this can be solved by extending the height along the acceleration axis until it reaches the end with the smaller position.
 
 #warning TODO - multiply height by tank dimensions and use its magnitude to get more accurate pressure.
 
