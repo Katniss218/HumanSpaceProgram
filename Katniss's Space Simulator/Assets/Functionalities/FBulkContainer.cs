@@ -26,6 +26,14 @@ namespace KatnisssSpaceSimulator.Functionalities
         [field: SerializeField]
         public Transform VolumeTransform { get; set; }
 
+        /// <summary>
+        /// Halves of Length, height, width of the container, in local space of the <see cref="VolumeTransform"/>.
+        /// </summary>
+        /// <remarks>
+        /// Used for calculating the pressure at connections' inlets/outlets.
+        /// </remarks>
+        public Vector3 LocalHalfLWH => VolumeTransform.localScale / 2f;
+
         [field: SerializeField]
         public float Volume { get; set; }
 

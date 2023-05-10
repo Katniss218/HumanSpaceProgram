@@ -104,9 +104,6 @@ namespace KatnisssSpaceSimulator.Functionalities
 
             // fluidAccelerationWorldSpace is the orientation of the fluid column.
 
-            // find the pressure at each point.
-            // find the fluid height, assuming the tank is a unit sphere and that the fluid is settled towards the acceleration direction.
-
             float end1Height = SolveHeightOfTruncatedSphere( End1.Container.Volume / End1.Container.MaxVolume );
             float end2Height = SolveHeightOfTruncatedSphere( End2.Container.Volume / End2.Container.MaxVolume );
 
@@ -142,8 +139,6 @@ namespace KatnisssSpaceSimulator.Functionalities
             // In [Pa] ([N/m^2]). Positive flows towards End2, negative flows towards End1, zero doesn't flow.
             float relativePressure = end1Pressure - end2Pressure;
             float relativePressureMagnitude = Mathf.Abs( relativePressure );
-            //float flowAcceleration = relativePressure / fluidDensity;
-            //float flowAccelerationMagnitude = Mathf.Abs( flowAcceleration );
 
             float newSignedVelocity = Mathf.Sign(relativePressure) * Mathf.Sqrt( 2 * relativePressureMagnitude / fluidDensity ); // _velocity + flowAcceleration;
             float newVelocityMagnitude = Mathf.Abs( newSignedVelocity );
@@ -153,7 +148,6 @@ namespace KatnisssSpaceSimulator.Functionalities
                 return (0.0f, 0.0f);
             }
 
-            // Inlet depends on the sign of the acceleration.
             End inlet = relativePressure < 0 ? End2 : End1;
             End outlet = relativePressure < 0 ? End1 : End2;
 
@@ -178,8 +172,6 @@ namespace KatnisssSpaceSimulator.Functionalities
             float outletAvailableFlowrate = (outletRemainingVolumeDt > newMaximumFlowrate) // unsigned
                 ? newMaximumFlowrate
                 : outletRemainingVolumeDt;
-#warning TODO - something (acceleration?) breaks when the vessel crashes into the ground.
-            // also the inflow didn't match outflow, somehow.
 
             inletAvailableFlowrate = Mathf.Max( 0.0f, inletAvailableFlowrate );
             outletAvailableFlowrate = Mathf.Max( 0.0f, outletAvailableFlowrate );
@@ -211,12 +203,11 @@ namespace KatnisssSpaceSimulator.Functionalities
             Vector3Dbl airfAcceleration = airfGravityForce / PlaceholderMass;
             Vector3 sceneAcceleration = SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformDirection( (Vector3)airfAcceleration );
             Vector3 vesselAcceleration = part.Vessel.PhysicsObject.Acceleration;
-            sceneAcceleration -= vesselAcceleration; // acceleration = gravity minus whatever the container is doing.
-
             // acceleration due to external forces (gravity) minus the acceleration of the vessel.
-            Vector3 fluidAcceleration = sceneAcceleration;
+            sceneAcceleration -= vesselAcceleration;
+#warning TODO - add angular acceleration to the mix.
 
-            (float newFlowrate, float newVelocity) = CalculateFlowRate( fluidAcceleration, Time.fixedDeltaTime );
+            (float newFlowrate, float newVelocity) = CalculateFlowRate( sceneAcceleration, Time.fixedDeltaTime );
 
             UpdateContainers( newFlowrate, newVelocity );
         }
