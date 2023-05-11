@@ -45,52 +45,33 @@ namespace KatnisssSpaceSimulator.Functionalities
 
         // across the pipe (pipe is 0-width, so inlet and outlet are the same thing).
         [field: SerializeField]
-        float _flowrate = 0;
+        FBulkContainer.BulkContents _flow = FBulkContainer.BulkContents.Empty;
         [field: SerializeField]
         float _velocity = 0;
 
-        void UpdateContainers( float newFlowrate, float newVelocity )
+        void UpdateContainers( FBulkContainer.BulkContents newFlow, float newVelocity )
         {
             // Remove the previous flow.
-            End1.Container.TotalInflow += _flowrate; // remove outflow (add the partial inflow from the other tank).
+            End1.Container.TotalInflow.Add( _flow ); // remove outflow (add the partial inflow from the other tank).
             End1.Container.TotalVelocity += End1.Forward * _velocity;
-            End2.Container.TotalInflow -= _flowrate; // remove inflow.
+            End2.Container.TotalInflow.Add( _flow, -1.0f ); // remove inflow.
             End2.Container.TotalVelocity -= End2.Forward * _velocity;
 
             // Add the new flow.
-            End1.Container.TotalInflow -= newFlowrate;
+            End1.Container.TotalInflow.Add( newFlow, -1.0f );
             End1.Container.TotalVelocity -= End1.Forward * newVelocity;
-            End2.Container.TotalInflow += newFlowrate;
+            End2.Container.TotalInflow.Add( newFlow );
             End2.Container.TotalVelocity += End2.Forward * newVelocity;
 
             // Cache.
-            _flowrate = newFlowrate;
+            _flow = newFlow;
             _velocity = newVelocity;
         }
 
-        public float GetMaximumFlowRate( float velocity )
+        public float GetVolumetricFlowrate( float velocity )
         {
             // Area in [m^2] * velocity in [m/s] = volumetric flow rate in [m^3/s]
             return CrossSectionArea * velocity;
-        }
-
-        /// <summary>
-        /// Calculates the height of a truncated unit sphere with the given volume as a [0..1] percentage of the unit sphere's volume.
-        /// </summary>
-        public static float SolveHeightOfTruncatedSphere( float volumePercent )
-        {
-            // https://math.stackexchange.com/questions/2364343/height-of-a-spherical-cap-from-volume-and-radius
-
-            const float UnitSphereVolume = 4.18879020479f; // 4/3 * pi     -- radius=1
-            const float TwoPi = 6.28318530718f;            // 2 * pi       -- radius=1
-            const float Sqrt3 = 1.73205080757f;
-
-            float Volume = UnitSphereVolume * volumePercent;
-
-            float A = 1.0f - ((3.0f * Volume) / TwoPi); // A is a coefficient, [-1..1] for volumePercent in [0..1]
-            float OneThirdArccosA = 0.333333333f * Mathf.Acos( A );
-            float height = Sqrt3 * Mathf.Sin( OneThirdArccosA ) - Mathf.Cos( OneThirdArccosA ) + 1.0f;
-            return height;
         }
 
         // in [kg/m^3]
@@ -122,15 +103,15 @@ namespace KatnisssSpaceSimulator.Functionalities
             return (end1Pressure, end2Pressure);
         }
 
-        public (float flowrate, float velocity) CalculateFlowRate( Vector3 fluidAccelerationRelativeToContainer, float deltaTime )
+        public (FBulkContainer.BulkContents flowrate, float velocity) CalculateFlowRate( Vector3 fluidAccelerationRelativeToContainer, float deltaTime )
         {
             if( CrossSectionArea <= 1e-6f )
             {
-                return (0.0f, 0.0f);
+                return (FBulkContainer.BulkContents.Empty, 0.0f);
             }
             if( fluidAccelerationRelativeToContainer.magnitude < 0.001f )
             {
-                return (0.0f, 0.0f);
+                return (FBulkContainer.BulkContents.Empty, 0.0f);
             }
 
             // In [Pa]
@@ -140,12 +121,12 @@ namespace KatnisssSpaceSimulator.Functionalities
             float relativePressure = end1Pressure - end2Pressure;
             float relativePressureMagnitude = Mathf.Abs( relativePressure );
 
-            float newSignedVelocity = Mathf.Sign(relativePressure) * Mathf.Sqrt( 2 * relativePressureMagnitude / fluidDensity ); // _velocity + flowAcceleration;
+            float newSignedVelocity = Mathf.Sign( relativePressure ) * Mathf.Sqrt( 2 * relativePressureMagnitude / fluidDensity ); // _velocity + flowAcceleration;
             float newVelocityMagnitude = Mathf.Abs( newSignedVelocity );
 
             if( newVelocityMagnitude < 0.001f ) // skip calculating in freefall. Later, we can do rebound and stuff.
             {
-                return (0.0f, 0.0f);
+                return (FBulkContainer.BulkContents.Empty, 0.0f);
             }
 
             End inlet = relativePressure < 0 ? End2 : End1;
@@ -154,12 +135,12 @@ namespace KatnisssSpaceSimulator.Functionalities
             newSignedVelocity *= 0.95f; // friction.
 
             // Flow rate actually depends on velocity of the fluid.
-            float newMaximumFlowrate = Mathf.Abs( GetMaximumFlowRate( newSignedVelocity ) );
+            float newMaximumFlowrate = Mathf.Abs( GetVolumetricFlowrate( newSignedVelocity ) );
 
             // Clamp based on how much can flow out of the inlet, and into the outlet.
             // Division by delta-time is because the removed/added volume will be multiplied by it later.
-            float inletVolumeDt = inlet.Container.Volume / deltaTime;
-            float outletRemainingVolumeDt = (outlet.Container.MaxVolume - outlet.Container.Volume) / deltaTime;
+            float inletVolumeDt = inlet.Container.Contents.Volume / deltaTime;
+            float outletRemainingVolumeDt = (outlet.Container.MaxVolume - outlet.Container.Contents.Volume) / deltaTime;
 
             // Need to clamp the flow rate based on the inlet and outlet conditions.
             float inletAvailableFlowrate = (inletVolumeDt > newMaximumFlowrate) // unsigned

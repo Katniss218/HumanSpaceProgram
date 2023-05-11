@@ -107,6 +107,7 @@
     <Compile Include="Assets\Core\ReferenceFrames\IReferenceFrame.cs" />
     <Compile Include="Assets\Terrain\LODQuadTree_NodeUtils.cs" />
     <Compile Include="Assets\Core\Serialization\DummyPartSource.cs" />
+    <Compile Include="Assets\Functionalities\ContainerShapes\SphericalContainerShape.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro.cginc" />
