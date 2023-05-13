@@ -80,6 +80,7 @@
     <Compile Include="Assets\Terrain\LODQuadTree.cs" />
     <Compile Include="Assets\Core\PartFactory.cs" />
     <Compile Include="Assets\Core\Part.Serialization.cs" />
+    <Compile Include="Assets\Functionalities\ContainerShapes\SphericalContainerShape.cs" />
     <Compile Include="Assets\Core\CelestialBodyManager.cs" />
     <Compile Include="Assets\_UnityEngine\Vector3_Ex.cs" />
     <Compile Include="Assets\_UnityEngine\Direction3D.cs" />
@@ -107,7 +108,6 @@
     <Compile Include="Assets\Core\ReferenceFrames\IReferenceFrame.cs" />
     <Compile Include="Assets\Terrain\LODQuadTree_NodeUtils.cs" />
     <Compile Include="Assets\Core\Serialization\DummyPartSource.cs" />
-    <Compile Include="Assets\Functionalities\ContainerShapes\SphericalContainerShape.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro.cginc" />

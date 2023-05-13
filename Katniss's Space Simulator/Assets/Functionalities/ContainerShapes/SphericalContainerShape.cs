@@ -36,10 +36,11 @@ namespace KatnisssSpaceSimulator.Functionalities.ContainerShapes
             }
 
             float heightOfLiquid = SolveHeightOfTruncatedSphere( container.Contents.Volume / container.MaxVolume );
-            
+
+            throw new NotImplementedException();
             // pressure in [Pa]
             float pressure = localAcceleration.magnitude * container.Contents.GetResources()[0].fluid.Density * heightOfLiquid;
-            return pressure;
+            //return pressure;
         }
     }
 }

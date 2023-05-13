@@ -79,14 +79,15 @@ namespace KatnisssSpaceSimulator.Functionalities
 
         public (float end1Pressure, float end2Pressure) GetPressures( Vector3 fluidAccelerationWorldSpace )
         {
+            return (1, 1);
             // inlets on the surface of unit sphere in [m].
-            Vector3 end1PosUnit = (this.transform.TransformPoint( End1.Position ) - End1.Container.VolumeTransform.position).normalized;
+           /* Vector3 end1PosUnit = (this.transform.TransformPoint( End1.Position ) - End1.Container.VolumeTransform.position).normalized;
             Vector3 end2PosUnit = (this.transform.TransformPoint( End2.Position ) - End2.Container.VolumeTransform.position).normalized;
 
             // fluidAccelerationWorldSpace is the orientation of the fluid column.
 
-            float end1Height = SolveHeightOfTruncatedSphere( End1.Container.Volume / End1.Container.MaxVolume );
-            float end2Height = SolveHeightOfTruncatedSphere( End2.Container.Volume / End2.Container.MaxVolume );
+            float end1Height = SolveHeightOfTruncatedSphere( End1.Container.Contents.Volume / End1.Container.MaxVolume );
+            float end2Height = SolveHeightOfTruncatedSphere( End2.Container.Contents.Volume / End2.Container.MaxVolume );
 
 #warning TODO - Use the position of each connection along the acceleration axis to find height. Currently assumes feeding bottom-to-bottom.
 
@@ -100,7 +101,7 @@ namespace KatnisssSpaceSimulator.Functionalities
             float end2Pressure = fluidAccelerationWorldSpace.magnitude * fluidDensity * end2Height;
 
             // in [Pa]
-            return (end1Pressure, end2Pressure);
+            return (end1Pressure, end2Pressure);*/
         }
 
         public (FBulkContainer.BulkContents flowrate, float velocity) CalculateFlowRate( Vector3 fluidAccelerationRelativeToContainer, float deltaTime )
@@ -164,7 +165,7 @@ namespace KatnisssSpaceSimulator.Functionalities
             // Use the clamped flow rate to calculate clamped velocity, to keep it in sync.
             newSignedVelocity = newSignedFlowrate / CrossSectionArea;
 
-            return (newSignedFlowrate, newSignedVelocity);
+            return (FBulkContainer.BulkContents.Empty, newSignedVelocity);
         }
 
         void FixedUpdate()
@@ -188,7 +189,7 @@ namespace KatnisssSpaceSimulator.Functionalities
             sceneAcceleration -= vesselAcceleration;
 #warning TODO - add angular acceleration to the mix.
 
-            (float newFlowrate, float newVelocity) = CalculateFlowRate( sceneAcceleration, Time.fixedDeltaTime );
+            (FBulkContainer.BulkContents newFlowrate, float newVelocity) = CalculateFlowRate( sceneAcceleration, Time.fixedDeltaTime );
 
             UpdateContainers( newFlowrate, newVelocity );
         }

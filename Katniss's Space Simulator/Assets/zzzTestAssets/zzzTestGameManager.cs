@@ -101,9 +101,9 @@ namespace KatnisssSpaceSimulator
             conn.End1.Container = tankL1.GetComponent<FBulkContainer>();
             conn.End2.Container = tankP.GetComponent<FBulkContainer>();
 
-            conn.End1.Container.Volume = conn.End1.Container.MaxVolume; // 99999f;
+           // conn.End1.Container.Volume = conn.End1.Container.MaxVolume; // 99999f;
             //conn.End1.Container.MaxVolume = 99999f;
-            conn.End2.Container.Volume = 0f;
+           // conn.End2.Container.Volume = 0f;
             //conn.End2.Container.MaxVolume = 99999f;
 
             conn.CrossSectionArea = 0.01f;
