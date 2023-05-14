@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
+using KatnisssSpaceSimulator.Functionalities.ResourceFlowSystem;
 
 namespace KatnisssSpaceSimulator
 {
@@ -98,8 +99,8 @@ namespace KatnisssSpaceSimulator
             engine.Create( tankP, new Vector3( 0, -3.45533f, 0 ), Quaternion.identity );
 
             FBulkContainerConnection conn = tankP.gameObject.AddComponent<FBulkContainerConnection>();
-            conn.End1.Container = tankL1.GetComponent<FBulkContainer>();
-            conn.End2.Container = tankP.GetComponent<FBulkContainer>();
+            conn.End1.Container = tankL1.GetComponent<FBulkContainer_Sphere>();
+            conn.End2.Container = tankP.GetComponent<FBulkContainer_Sphere>();
 
            // conn.End1.Container.Volume = conn.End1.Container.MaxVolume; // 99999f;
             //conn.End1.Container.MaxVolume = 99999f;

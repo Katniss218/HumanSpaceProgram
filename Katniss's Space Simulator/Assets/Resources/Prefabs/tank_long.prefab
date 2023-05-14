@@ -161,10 +161,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29de31ed357d6964a81c00244a4075bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <MaxVolume>k__BackingField: 14.016
   <VolumeTransform>k__BackingField: {fileID: 5604564238733955003}
-  <Volume>k__BackingField: 0
-  <TotalInflow>k__BackingField: 0
+  <MaxVolume>k__BackingField: 14.016
+  <Radius>k__BackingField: 5
   <TotalVelocity>k__BackingField: {x: 0, y: 0, z: 0}
 --- !u!1 &9221693052017665825
 GameObject:

@@ -10,14 +10,14 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace KatnisssSpaceSimulator.Functionalities
+namespace KatnisssSpaceSimulator.Functionalities.ResourceFlowSystem
 {
     public class FBulkContainerConnection : Functionality
     {
         [Serializable]
         public class End
         {
-            public FBulkContainer Container;
+            public FBulkContainer_Sphere Container;
             public Vector3 Position;
             public Vector3 Forward; // nominally faces into the tank.
         }
@@ -45,11 +45,11 @@ namespace KatnisssSpaceSimulator.Functionalities
 
         // across the pipe (pipe is 0-width, so inlet and outlet are the same thing).
         [field: SerializeField]
-        FBulkContainer.BulkContents _flow = FBulkContainer.BulkContents.Empty;
+        BulkContents _flow = BulkContents.Empty;
         [field: SerializeField]
         float _velocity = 0;
 
-        void UpdateContainers( FBulkContainer.BulkContents newFlow, float newVelocity )
+        void UpdateContainers( BulkContents newFlow, float newVelocity )
         {
             // Remove the previous flow.
             End1.Container.TotalInflow.Add( _flow ); // remove outflow (add the partial inflow from the other tank).
@@ -77,49 +77,25 @@ namespace KatnisssSpaceSimulator.Functionalities
         // in [kg/m^3]
         const float fluidDensity = 1100.0f;
 
-        public (float end1Pressure, float end2Pressure) GetPressures( Vector3 fluidAccelerationWorldSpace )
-        {
-            return (1, 1);
-            // inlets on the surface of unit sphere in [m].
-           /* Vector3 end1PosUnit = (this.transform.TransformPoint( End1.Position ) - End1.Container.VolumeTransform.position).normalized;
-            Vector3 end2PosUnit = (this.transform.TransformPoint( End2.Position ) - End2.Container.VolumeTransform.position).normalized;
-
-            // fluidAccelerationWorldSpace is the orientation of the fluid column.
-
-            float end1Height = SolveHeightOfTruncatedSphere( End1.Container.Contents.Volume / End1.Container.MaxVolume );
-            float end2Height = SolveHeightOfTruncatedSphere( End2.Container.Contents.Volume / End2.Container.MaxVolume );
-
-#warning TODO - Use the position of each connection along the acceleration axis to find height. Currently assumes feeding bottom-to-bottom.
-
-#warning TODO - if the tanks are at different heights, and connected at the bottoms (relative to acceleration), the level should ultimately be equal for both.
-            // doesn't really work with the "portal" connection model.
-            // this can be solved by extending the height along the acceleration axis until it reaches the end with the smaller position.
-
-#warning TODO - multiply height by tank dimensions and use its magnitude to get more accurate pressure.
-
-            float end1Pressure = fluidAccelerationWorldSpace.magnitude * fluidDensity * end1Height;
-            float end2Pressure = fluidAccelerationWorldSpace.magnitude * fluidDensity * end2Height;
-
-            // in [Pa]
-            return (end1Pressure, end2Pressure);*/
-        }
-
-        public (FBulkContainer.BulkContents flowrate, float velocity) CalculateFlowRate( Vector3 fluidAccelerationRelativeToContainer, float deltaTime )
+        public (BulkContents flowrate, float velocity) CalculateFlowRate( Vector3 fluidAccelerationRelativeToConnection, float deltaTime )
         {
             if( CrossSectionArea <= 1e-6f )
             {
-                return (FBulkContainer.BulkContents.Empty, 0.0f);
+                return (BulkContents.Empty, 0.0f);
             }
-            if( fluidAccelerationRelativeToContainer.magnitude < 0.001f )
+            if( fluidAccelerationRelativeToConnection.magnitude < 0.001f )
             {
-                return (FBulkContainer.BulkContents.Empty, 0.0f);
+                return (BulkContents.Empty, 0.0f);
             }
 
-            // In [Pa]
-            (float end1Pressure, float end2Pressure) = GetPressures( fluidAccelerationRelativeToContainer );
+#warning  TODO - for actual flow, we need pressure at the bottom for both, whichever is lower.
+            // species are going to be the same, regardless. pressure is different though
+            
+            BulkSampleData end1Sample = End1.Container.Sample( End1.Position, fluidAccelerationRelativeToConnection, CrossSectionArea );
+            BulkSampleData end2Sample = End2.Container.Sample( End2.Position, fluidAccelerationRelativeToConnection, CrossSectionArea );
 
             // In [Pa] ([N/m^2]). Positive flows towards End2, negative flows towards End1, zero doesn't flow.
-            float relativePressure = end1Pressure - end2Pressure;
+            float relativePressure = end1Sample.Pressure - end2Sample.Pressure;
             float relativePressureMagnitude = Mathf.Abs( relativePressure );
 
             float newSignedVelocity = Mathf.Sign( relativePressure ) * Mathf.Sqrt( 2 * relativePressureMagnitude / fluidDensity ); // _velocity + flowAcceleration;
@@ -127,7 +103,7 @@ namespace KatnisssSpaceSimulator.Functionalities
 
             if( newVelocityMagnitude < 0.001f ) // skip calculating in freefall. Later, we can do rebound and stuff.
             {
-                return (FBulkContainer.BulkContents.Empty, 0.0f);
+                return (BulkContents.Empty, 0.0f);
             }
 
             End inlet = relativePressure < 0 ? End2 : End1;
@@ -165,7 +141,7 @@ namespace KatnisssSpaceSimulator.Functionalities
             // Use the clamped flow rate to calculate clamped velocity, to keep it in sync.
             newSignedVelocity = newSignedFlowrate / CrossSectionArea;
 
-            return (FBulkContainer.BulkContents.Empty, newSignedVelocity);
+            return (BulkContents.Empty, newSignedVelocity);
         }
 
         void FixedUpdate()
@@ -189,7 +165,7 @@ namespace KatnisssSpaceSimulator.Functionalities
             sceneAcceleration -= vesselAcceleration;
 #warning TODO - add angular acceleration to the mix.
 
-            (FBulkContainer.BulkContents newFlowrate, float newVelocity) = CalculateFlowRate( sceneAcceleration, Time.fixedDeltaTime );
+            (BulkContents newFlowrate, float newVelocity) = CalculateFlowRate( sceneAcceleration, Time.fixedDeltaTime );
 
             UpdateContainers( newFlowrate, newVelocity );
         }
