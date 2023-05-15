@@ -58,7 +58,7 @@
   <ItemGroup>
     <Compile Include="Assets\Camera\CameraController.cs" />
     <Compile Include="Assets\Core\Serialization\AssetPartSource.cs" />
-    <Compile Include="Assets\Core\BulkResource.cs" />
+    <Compile Include="Assets\Core\Substance.cs" />
     <Compile Include="Assets\Core\CelestialBody.cs" />
     <Compile Include="Assets\zzzTestAssets\zzzTestGameManager.cs" />
     <Compile Include="Assets\Terrain\MeshUtils.cs" />
@@ -84,9 +84,11 @@
     <Compile Include="Assets\_UnityEngine\Vector3_Ex.cs" />
     <Compile Include="Assets\_UnityEngine\Direction3D.cs" />
     <Compile Include="Assets\_UnityEngine\Vector3Dbl.cs" />
+    <Compile Include="Assets\Functionalities\ResourceFlowSystem\IBulkContainer.cs" />
     <Compile Include="Assets\Core\Control\ControlInAttribute.cs" />
     <Compile Include="Assets\Core\ReferenceFrames\ReferenceFrameUtils.cs" />
     <Compile Include="Assets\Core\ReferenceFrames\IReferenceFrameSwitchResponder.cs" />
+    <Compile Include="Assets\Core\IIdentifiable.cs" />
     <Compile Include="Assets\Functionalities\ResourceFlowSystem\FBulkContainerConnection.cs" />
     <Compile Include="Assets\Core\CelestialBodySurface.cs" />
     <Compile Include="Assets\Core\ReferenceFrames\SceneReferenceFrameManager.cs" />
@@ -107,8 +109,6 @@
     <Compile Include="Assets\Core\ReferenceFrames\IReferenceFrame.cs" />
     <Compile Include="Assets\Terrain\LODQuadTree_NodeUtils.cs" />
     <Compile Include="Assets\Core\Serialization\DummyPartSource.cs" />
-    <Compile Include="Assets\Core\IIdentifiable.cs" />
-    <Compile Include="Assets\Functionalities\ResourceFlowSystem\IBulkContainer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro.cginc" />

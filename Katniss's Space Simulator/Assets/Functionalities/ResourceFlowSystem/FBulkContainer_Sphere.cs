@@ -11,7 +11,7 @@ namespace KatnisssSpaceSimulator.Functionalities.ResourceFlowSystem
 {
 
     /// <summary>
-    /// A container for a <see cref="BulkResource"/>.
+    /// A container for a <see cref="Substance"/>.
     /// </summary>
     public class FBulkContainer_Sphere : Functionality, IBulkContainer
     {
@@ -31,38 +31,44 @@ namespace KatnisssSpaceSimulator.Functionalities.ResourceFlowSystem
         public float Radius { get; set; }
 
         [field: SerializeField]
-        public BulkContents Contents { get; set; }
+        public SubstanceStateMultiple Contents { get; set; }
 
         /// <summary>
         /// Inflow minus outflow. positive = inflow, negative = outflow.
         /// </summary>
         [field: SerializeField]
-        public BulkContents TotalInflow { get; set; }
+        public SubstanceStateMultiple Inflow { get; set; }
 
-        /// <summary>
-        /// Average velocity of the contents at each connection connected to this container, multiplied by the number of connections.
-        /// </summary>
-        [field: SerializeField]
-        public Vector3 TotalVelocity { get; set; }
-
-        public BulkSampleData Sample( Vector3 localPosition, Vector3 localAcceleration, float holeArea )
+        public SubstanceStateMultiple Sample( Vector3 localPosition, Vector3 localAcceleration, float holeArea )
         {
-            if( this.Contents.ResourceCount > 1 )
+            if( this.Contents.SubstanceCount > 1 )
             {
                 throw new NotImplementedException( "Handling multiple fluids isn't implemented yet." );
             }
+            if( this.Contents == null )
+            {
+                return null; // no flow.
+            }
 
-            float heightOfLiquid = SolveHeightOfTruncatedSphere( this.Contents.Volume / this.MaxVolume ) * this.Radius;
+            SubstanceState[] substances = this.Contents.GetSubstances();
 
-            throw new NotImplementedException();
+            if( substances.Length == 0 )
+            {
+                return null;
+            }
+
+#warning  TODO - take the localposition into account. localposition being out-of-bounds must be handled here, because it's easier than checking with another method.
+            float heightOfLiquid = SolveHeightOfTruncatedSphere( this.Contents.GetVolume() / this.MaxVolume ) * this.Radius;
+
             // pressure in [Pa]
-            float pressure = localAcceleration.magnitude * this.Contents.GetResources()[0].fluid.Density * heightOfLiquid;
-            //return pressure;
+            float pressure = localAcceleration.magnitude * this.Contents.GetSubstances()[0].Data.Density * heightOfLiquid;
+
+            return new SubstanceStateMultiple( new FluidState() { Pressure = pressure, Temperature = 273.15f, Velocity = Vector3.zero }, Contents.GetSubstances() );
         }
 
         void FixedUpdate()
         {
-            Contents.Add( TotalInflow, Time.fixedDeltaTime );
+            Contents.Add( Inflow, Time.fixedDeltaTime );
             //Volume += TotalInflow * Time.fixedDeltaTime;
             // TODO - update the mass too, because the fluid weighs something.
         }

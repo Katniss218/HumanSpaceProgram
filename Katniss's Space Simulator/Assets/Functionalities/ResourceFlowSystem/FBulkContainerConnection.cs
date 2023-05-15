@@ -45,27 +45,27 @@ namespace KatnisssSpaceSimulator.Functionalities.ResourceFlowSystem
 
         // across the pipe (pipe is 0-width, so inlet and outlet are the same thing).
         [field: SerializeField]
-        BulkContents _flow = BulkContents.Empty;
-        [field: SerializeField]
-        float _velocity = 0;
+        SubstanceStateMultiple _flow = null;
 
-        void UpdateContainers( BulkContents newFlow, float newVelocity )
+        void UpdateContainers( SubstanceStateMultiple newFlow )
         {
-            // Remove the previous flow.
-            End1.Container.TotalInflow.Add( _flow ); // remove outflow (add the partial inflow from the other tank).
-            End1.Container.TotalVelocity += End1.Forward * _velocity;
-            End2.Container.TotalInflow.Add( _flow, -1.0f ); // remove inflow.
-            End2.Container.TotalVelocity -= End2.Forward * _velocity;
+            if( !SubstanceStateMultiple.IsNoFlow( _flow ) )
+            {
+#warning TODO - Inflow can potentially be null (in both ends).
+                // Remove the previous flow.
+                End1.Container.Inflow.Add( _flow ); // remove outflow (add the partial inflow from the other tank).
+                End2.Container.Inflow.Add( _flow, -1.0f ); // remove inflow.
+            }
 
-            // Add the new flow.
-            End1.Container.TotalInflow.Add( newFlow, -1.0f );
-            End1.Container.TotalVelocity -= End1.Forward * newVelocity;
-            End2.Container.TotalInflow.Add( newFlow );
-            End2.Container.TotalVelocity += End2.Forward * newVelocity;
+            if( !SubstanceStateMultiple.IsNoFlow( newFlow ) )
+            {
+                // Add the new flow.
+                End1.Container.Inflow.Add( newFlow, -1.0f );
+                End2.Container.Inflow.Add( newFlow );
+            }
 
             // Cache.
             _flow = newFlow;
-            _velocity = newVelocity;
         }
 
         public float GetVolumetricFlowrate( float velocity )
@@ -74,74 +74,99 @@ namespace KatnisssSpaceSimulator.Functionalities.ResourceFlowSystem
             return CrossSectionArea * velocity;
         }
 
-        // in [kg/m^3]
-        const float fluidDensity = 1100.0f;
-
-        public (BulkContents flowrate, float velocity) CalculateFlowRate( Vector3 fluidAccelerationRelativeToConnection, float deltaTime )
+        public SubstanceStateMultiple CalculateFlow( Vector3 fluidAccelerationRelativeToConnection, float deltaTime )
         {
             if( CrossSectionArea <= 1e-6f )
             {
-                return (BulkContents.Empty, 0.0f);
+                return SubstanceStateMultiple.NoFlow;
             }
             if( fluidAccelerationRelativeToConnection.magnitude < 0.001f )
             {
-                return (BulkContents.Empty, 0.0f);
+                return SubstanceStateMultiple.NoFlow;
             }
 
-#warning  TODO - for actual flow, we need pressure at the bottom for both, whichever is lower.
+#warning  TODO - for actual flow, we need pressure at the bottom for both, whichever is lower. Currently it assumes bottom-to-bottom.
             // species are going to be the same, regardless. pressure is different though
-            
-            BulkSampleData end1Sample = End1.Container.Sample( End1.Position, fluidAccelerationRelativeToConnection, CrossSectionArea );
-            BulkSampleData end2Sample = End2.Container.Sample( End2.Position, fluidAccelerationRelativeToConnection, CrossSectionArea );
+
+            SubstanceStateMultiple[] endSamples = new SubstanceStateMultiple[2];
+
+            endSamples[0] = End1.Container.Sample( End1.Position, fluidAccelerationRelativeToConnection, CrossSectionArea );
+            endSamples[1] = End2.Container.Sample( End2.Position, fluidAccelerationRelativeToConnection, CrossSectionArea );
+
+            if( endSamples[0] == null && endSamples[1] == null )
+            {
+                return SubstanceStateMultiple.NoFlow;
+            }
+
+            float[] endPressures = new float[2] { endSamples[0]?.FluidState.Pressure ?? 0.0f, endSamples[1]?.FluidState.Pressure ?? 0.0f };
 
             // In [Pa] ([N/m^2]). Positive flows towards End2, negative flows towards End1, zero doesn't flow.
-            float relativePressure = end1Sample.Pressure - end2Sample.Pressure;
+            float relativePressure = endPressures[0] - endPressures[1];
             float relativePressureMagnitude = Mathf.Abs( relativePressure );
 
-            float newSignedVelocity = Mathf.Sign( relativePressure ) * Mathf.Sqrt( 2 * relativePressureMagnitude / fluidDensity ); // _velocity + flowAcceleration;
-            float newVelocityMagnitude = Mathf.Abs( newSignedVelocity );
-
-            if( newVelocityMagnitude < 0.001f ) // skip calculating in freefall. Later, we can do rebound and stuff.
+            if( relativePressureMagnitude < 0.001f )
             {
-                return (BulkContents.Empty, 0.0f);
+                return SubstanceStateMultiple.NoFlow;
             }
 
-            End inlet = relativePressure < 0 ? End2 : End1;
-            End outlet = relativePressure < 0 ? End1 : End2;
+            int inlet = relativePressure < 0 ? 1 : 0;
+            int outlet = relativePressure < 0 ? 0 : 1;
 
-            newSignedVelocity *= 0.95f; // friction.
+            // need average density (weighed for amount) of the fluid exiting the hole.
+            float newSignedVelocity = Mathf.Sign( relativePressure ) * Mathf.Sqrt( 2 * relativePressureMagnitude / endSamples[inlet].GetAverageDensity() );
+            // float newVelocityMagnitude = Mathf.Abs( newSignedVelocity );
+
+            End[] ends = new End[2] { End1, End2 };
+
+            // newSignedVelocity *= 0.95f; // friction.
+
+            // v2 = sqrt((2/ρ)(P1 - P2 + ρgh1))
 
             // Flow rate actually depends on velocity of the fluid.
-            float newMaximumFlowrate = Mathf.Abs( GetVolumetricFlowrate( newSignedVelocity ) );
+            float maximumVolumetricFlowrate = Mathf.Abs( GetVolumetricFlowrate( newSignedVelocity ) );
 
             // Clamp based on how much can flow out of the inlet, and into the outlet.
             // Division by delta-time is because the removed/added volume will be multiplied by it later.
-            float inletVolumeDt = inlet.Container.Contents.Volume / deltaTime;
-            float outletRemainingVolumeDt = (outlet.Container.MaxVolume - outlet.Container.Contents.Volume) / deltaTime;
+            float inletVolumeDt = ends[inlet].Container.Contents.GetVolume() / deltaTime;
+            float outletRemainingVolumeDt = (ends[outlet].Container.MaxVolume - ends[outlet].Container.Contents.GetVolume()) / deltaTime;
 
             // Need to clamp the flow rate based on the inlet and outlet conditions.
-            float inletAvailableFlowrate = (inletVolumeDt > newMaximumFlowrate) // unsigned
-                ? newMaximumFlowrate
+            float inletAvailVolumetricFlowrate = (inletVolumeDt > maximumVolumetricFlowrate) // unsigned
+                ? maximumVolumetricFlowrate
                 : inletVolumeDt;
 
 #warning TODO - needs to be split evenly across all of the outlets flowing into the given tank, to stop oscillations. Also, conserve the volumes.
             // also, even with one outlet and constant deltatime, this somehow overshoots the maximum volume.
 
-            float outletAvailableFlowrate = (outletRemainingVolumeDt > newMaximumFlowrate) // unsigned
-                ? newMaximumFlowrate
+            float outletAvailVolumetricFlowrate = (outletRemainingVolumeDt > maximumVolumetricFlowrate) // unsigned
+                ? maximumVolumetricFlowrate
                 : outletRemainingVolumeDt;
 
-            inletAvailableFlowrate = Mathf.Max( 0.0f, inletAvailableFlowrate );
-            outletAvailableFlowrate = Mathf.Max( 0.0f, outletAvailableFlowrate );
+            inletAvailVolumetricFlowrate = Mathf.Max( 0.0f, inletAvailVolumetricFlowrate );
+            outletAvailVolumetricFlowrate = Mathf.Max( 0.0f, outletAvailVolumetricFlowrate );
 
-            float newFlowrate = Mathf.Min( newMaximumFlowrate, inletAvailableFlowrate, outletAvailableFlowrate );
+            float totalVolumetricFlowrate = Mathf.Min( maximumVolumetricFlowrate, inletAvailVolumetricFlowrate, outletAvailVolumetricFlowrate );
 
-            float newSignedFlowrate = Mathf.Sign( relativePressure ) * newFlowrate;
+            float flowSign = Mathf.Sign( relativePressure );
+            //  float newSignedFlowrate = Mathf.Sign( relativePressure ) * newFlowrate;
 
             // Use the clamped flow rate to calculate clamped velocity, to keep it in sync.
-            newSignedVelocity = newSignedFlowrate / CrossSectionArea;
+            //  newSignedVelocity = newSignedFlowrate / CrossSectionArea;
 
-            return (BulkContents.Empty, newSignedVelocity);
+            float totalMassAmount = endSamples[inlet].GetMass();
+
+            // convert volumetric to mass flowrate.
+            List<SubstanceState> flowrate = new List<SubstanceState>();
+            foreach( var sbs in endSamples[inlet].GetSubstances() )
+            {
+                float volumetricFlowofFluidI = (sbs.MassAmount / totalMassAmount) * flowSign * totalVolumetricFlowrate;
+
+                flowrate.Add( new SubstanceState( volumetricFlowofFluidI * sbs.Data.Density, sbs.Data ) );
+            }
+
+            return new SubstanceStateMultiple(
+                new FluidState() { Pressure = 0.0f, Temperature = 275.15f, Velocity = Vector3.zero },
+                flowrate );
         }
 
         void FixedUpdate()
@@ -165,9 +190,9 @@ namespace KatnisssSpaceSimulator.Functionalities.ResourceFlowSystem
             sceneAcceleration -= vesselAcceleration;
 #warning TODO - add angular acceleration to the mix.
 
-            (BulkContents newFlowrate, float newVelocity) = CalculateFlowRate( sceneAcceleration, Time.fixedDeltaTime );
+            SubstanceStateMultiple flow = CalculateFlow( sceneAcceleration, Time.fixedDeltaTime );
 
-            UpdateContainers( newFlowrate, newVelocity );
+            UpdateContainers( flow );
         }
 
         public override void Load( JToken data )

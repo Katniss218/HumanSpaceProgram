@@ -81,7 +81,15 @@ MonoBehaviour:
   <VolumeTransform>k__BackingField: {fileID: 5565276089906677883}
   <MaxVolume>k__BackingField: 7.7736
   <Radius>k__BackingField: 3
-  <TotalVelocity>k__BackingField: {x: 0, y: 0, z: 0}
+  <Contents>k__BackingField:
+    _substances:
+    - <MassAmount>k__BackingField: 5000
+      <Data>k__BackingField:
+        <ID>k__BackingField: aa
+        <DisplayName>k__BackingField: aa
+        <Density>k__BackingField: 1000
+  <Inflow>k__BackingField:
+    _substances: []
 --- !u!1 &2441066058776252235
 GameObject:
   m_ObjectHideFlags: 0
