@@ -41,28 +41,35 @@ namespace KatnisssSpaceSimulator.Functionalities.ResourceFlowSystem
 
         public SubstanceStateMultiple Sample( Vector3 localPosition, Vector3 localAcceleration, float holeArea )
         {
-            if( this.Contents.SubstanceCount > 1 )
-            {
-                throw new NotImplementedException( "Handling multiple fluids isn't implemented yet." );
-            }
             if( this.Contents == null )
             {
-                return null; // no flow.
+                return SubstanceStateMultiple.NoFlow;
             }
 
             SubstanceState[] substances = this.Contents.GetSubstances();
 
             if( substances.Length == 0 )
             {
-                return null;
+                return SubstanceStateMultiple.NoFlow;
             }
 
-#warning  TODO - take the localposition into account. localposition being out-of-bounds must be handled here, because it's easier than checking with another method.
             float heightOfLiquid = SolveHeightOfTruncatedSphere( this.Contents.GetVolume() / this.MaxVolume ) * this.Radius;
+
+            float distanceAlongAcceleration = Vector3.Dot( localPosition, localAcceleration.normalized );
+
+            // Adjust the height of the fluid column based on the distance along the acceleration direction
+            heightOfLiquid += distanceAlongAcceleration;
+            heightOfLiquid -= this.Radius; // since both distance and height of truncated sphere already contain that.
+
+            if( heightOfLiquid <= 0 )
+            {
+                return SubstanceStateMultiple.NoFlow;
+            }
 
             // pressure in [Pa]
             float pressure = localAcceleration.magnitude * this.Contents.GetSubstances()[0].Data.Density * heightOfLiquid;
 
+#warning TODO - assume not mixed?
             return new SubstanceStateMultiple( new FluidState() { Pressure = pressure, Temperature = 273.15f, Velocity = Vector3.zero }, Contents.GetSubstances() );
         }
 

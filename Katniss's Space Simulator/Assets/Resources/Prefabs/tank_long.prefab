@@ -163,8 +163,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <VolumeTransform>k__BackingField: {fileID: 5604564238733955003}
   <MaxVolume>k__BackingField: 14.016
-  <Radius>k__BackingField: 5
-  <TotalVelocity>k__BackingField: {x: 0, y: 0, z: 0}
+  <Radius>k__BackingField: 2.5
+  <Contents>k__BackingField:
+    _substances:
+    - <MassAmount>k__BackingField: 1000
+      <Data>k__BackingField:
+        <ID>k__BackingField: aa
+        <DisplayName>k__BackingField: aa
+        <Density>k__BackingField: 1100
+    - <MassAmount>k__BackingField: 500
+      <Data>k__BackingField:
+        <ID>k__BackingField: bb
+        <DisplayName>k__BackingField: bb
+        <Density>k__BackingField: 5000
+  <Inflow>k__BackingField:
+    _substances: []
 --- !u!1 &9221693052017665825
 GameObject:
   m_ObjectHideFlags: 0
@@ -190,7 +203,7 @@ Transform:
   m_GameObject: {fileID: 9221693052017665825}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2, y: 5, z: 2}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4053151552679614996}

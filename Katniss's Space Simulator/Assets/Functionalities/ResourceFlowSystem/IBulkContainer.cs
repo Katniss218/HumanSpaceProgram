@@ -138,6 +138,7 @@ namespace KatnisssSpaceSimulator.Functionalities.ResourceFlowSystem
             // average temperature based on physical characteristics.
             // combine velocities based on physical formulas.
 #warning TODO - deleting fluids too? needs fixing the unstable flow first though, we can't let it get to negatives because it's gonna be permanently lost.
+#warning TODO - combine the fluid state (temp, pressure, velocity).
 
 
             Dictionary<string, int> substanceIndexMap = new();
@@ -156,50 +157,24 @@ namespace KatnisssSpaceSimulator.Functionalities.ResourceFlowSystem
                 {
                     int index = substanceIndexMap[substanceId];
                     float amountDelta = other._substances[j].MassAmount * dt;
+                    float newAmount = this._substances[index].MassAmount + amountDelta;
 
-                    this._substances[index] = new SubstanceState( this._substances[index].MassAmount + amountDelta, this._substances[index].Data );
+                    if( newAmount <= 0 )
+                    {
+                        // Remove the entry from the _substances list
+                        _substances.RemoveAt( index );
+                        substanceIndexMap.Remove( substanceId );
+                    }
+                    else
+                    {
+                        this._substances[index] = new SubstanceState( newAmount, this._substances[index].Data );
+                    }
                 }
                 else
                 {
                     // Substance not present in this container yet, add it to newSubstances
                     _substances.Add( new SubstanceState( other._substances[j].MassAmount * dt, other._substances[j].Data ) );
                 }
-            }
-
-
-            return;
-
-
-            List<SubstanceState> newSubstances = new();
-
-            for( int i = 0; i < _substances.Count; i++ )
-            {
-                for( int j = 0; j < other._substances.Count; j++ )
-                {
-                    if( this._substances[i].Data.IdentityEquals( other._substances[j].Data ) )
-                    {
-                        float amountDelta = other._substances[j].MassAmount * dt;
-
-                        this._substances[i] = new SubstanceState( this._substances[i].MassAmount + amountDelta, this._substances[i].Data );
-                        break;
-                    }
-                    // Fluid not present in this container yet.
-                    if( j == other._substances.Count - 1 )
-                    {
-                        newSubstances.Add( new SubstanceState( other._substances[j].MassAmount * dt, other._substances[j].Data ) );
-                    }
-                }
-            }
-
-            /*if( newFluids.Count == 0 )
-            {
-                return;
-            }*/
-#warning TODO - doesn't add fluids correctly.
-            foreach( var substance in newSubstances )
-            {
-                float amountDelta = substance.MassAmount * dt;
-                _substances.Add( new SubstanceState( amountDelta, substance.Data ) );
             }
         }
     }

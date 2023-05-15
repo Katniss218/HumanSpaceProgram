@@ -51,7 +51,6 @@ namespace KatnisssSpaceSimulator.Functionalities.ResourceFlowSystem
         {
             if( !SubstanceStateMultiple.IsNoFlow( _flow ) )
             {
-#warning TODO - Inflow can potentially be null (in both ends).
                 // Remove the previous flow.
                 End1.Container.Inflow.Add( _flow ); // remove outflow (add the partial inflow from the other tank).
                 End2.Container.Inflow.Add( _flow, -1.0f ); // remove inflow.
@@ -74,27 +73,29 @@ namespace KatnisssSpaceSimulator.Functionalities.ResourceFlowSystem
             return CrossSectionArea * velocity;
         }
 
-        public SubstanceStateMultiple CalculateFlow( Vector3 fluidAccelerationRelativeToConnection, float deltaTime )
+        public SubstanceStateMultiple CalculateFlow( Vector3 fluidAccelerationSceneSpace, float deltaTime )
         {
             if( CrossSectionArea <= 1e-6f )
             {
                 return SubstanceStateMultiple.NoFlow;
             }
-            if( fluidAccelerationRelativeToConnection.magnitude < 0.001f )
+            if( fluidAccelerationSceneSpace.magnitude < 0.01f )
             {
                 return SubstanceStateMultiple.NoFlow;
             }
 
-#warning  TODO - for actual flow, we need pressure at the bottom for both, whichever is lower. Currently it assumes bottom-to-bottom.
+#warning  TODO - for actual flow, we need pressure at the bottom for both, whichever is lower.
             // species are going to be the same, regardless. pressure is different though
 
             SubstanceStateMultiple[] endSamples = new SubstanceStateMultiple[2];
 
-            endSamples[0] = End1.Container.Sample( End1.Position, fluidAccelerationRelativeToConnection, CrossSectionArea );
-            endSamples[1] = End2.Container.Sample( End2.Position, fluidAccelerationRelativeToConnection, CrossSectionArea );
+#warning TODO - doesn't work with multiple fluids.
+            endSamples[0] = End1.Container.Sample( End1.Position, End1.Container.VolumeTransform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea );
+            endSamples[1] = End2.Container.Sample( End2.Position, End2.Container.VolumeTransform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea );
 
             if( endSamples[0] == null && endSamples[1] == null )
             {
+#warning TODO - in reality, model flow in-out of the atmosphere/vacuum.
                 return SubstanceStateMultiple.NoFlow;
             }
 
@@ -134,9 +135,6 @@ namespace KatnisssSpaceSimulator.Functionalities.ResourceFlowSystem
             float inletAvailVolumetricFlowrate = (inletVolumeDt > maximumVolumetricFlowrate) // unsigned
                 ? maximumVolumetricFlowrate
                 : inletVolumeDt;
-
-#warning TODO - needs to be split evenly across all of the outlets flowing into the given tank, to stop oscillations. Also, conserve the volumes.
-            // also, even with one outlet and constant deltatime, this somehow overshoots the maximum volume.
 
             float outletAvailVolumetricFlowrate = (outletRemainingVolumeDt > maximumVolumetricFlowrate) // unsigned
                 ? maximumVolumetricFlowrate
