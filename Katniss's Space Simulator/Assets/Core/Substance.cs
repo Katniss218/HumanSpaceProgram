@@ -17,7 +17,7 @@ namespace KatnisssSpaceSimulator.Core
         // kinda ugly, encapsulate, and put in a separate BulkResourceRegistry class even.
         public static Dictionary<string, Substance> RegisteredResources { get; set; } = new Dictionary<string, Substance>();
 
-        [field:SerializeField]
+        [field: SerializeField]
         public string ID { get; set; }
 
         [field: SerializeField]
@@ -30,8 +30,6 @@ namespace KatnisssSpaceSimulator.Core
         public float Density { get; set; }
 
         // Need to figure out how gasses will work too.
-
-        // how about pre-mixed stuff?
-        // Density [kg/m^3] vs Temperature [K]
+        // how about pre-mixed stuff, like air being nitrogen + oxygen, or kerosene being a mix of hydrocarbons?
     }
 }

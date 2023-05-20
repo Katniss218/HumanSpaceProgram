@@ -158,25 +158,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 4352668300827386821}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 29de31ed357d6964a81c00244a4075bd, type: 3}
+  m_Script: {fileID: 11500000, guid: 8a2acfd99bc5e4a43829b3b3b3f86273, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <VolumeTransform>k__BackingField: {fileID: 5604564238733955003}
-  <MaxVolume>k__BackingField: 14.016
+  <VolumeTransform>k__BackingField: {fileID: 0}
+  <MaxVolume>k__BackingField: 14
   <Radius>k__BackingField: 2.5
   <Contents>k__BackingField:
-    _substances:
-    - <MassAmount>k__BackingField: 1000
-      <Data>k__BackingField:
-        <ID>k__BackingField: aa
-        <DisplayName>k__BackingField: aa
-        <Density>k__BackingField: 1100
-    - <MassAmount>k__BackingField: 500
-      <Data>k__BackingField:
-        <ID>k__BackingField: bb
-        <DisplayName>k__BackingField: bb
-        <Density>k__BackingField: 5000
+    _substances: []
   <Inflow>k__BackingField:
+    _substances: []
+  <Outflow>k__BackingField:
     _substances: []
 --- !u!1 &9221693052017665825
 GameObject:

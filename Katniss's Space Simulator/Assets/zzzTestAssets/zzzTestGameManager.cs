@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
-using KatnisssSpaceSimulator.Functionalities.ResourceFlowSystem;
+using KatnisssSpaceSimulator.Core.ResourceFlowSystem;
 
 namespace KatnisssSpaceSimulator
 {
@@ -99,17 +99,21 @@ namespace KatnisssSpaceSimulator
             engine.Create( tankP, new Vector3( 0, -3.45533f, 0 ), Quaternion.identity );
 
             FBulkContainerConnection conn = tankP.gameObject.AddComponent<FBulkContainerConnection>();
-            conn.End1.Container = tankL1.GetComponent<FBulkContainer_Sphere>();
+            conn.End1.O = tankL1.GetComponent<FBulkContainer_Sphere>();
             conn.End1.Position = new Vector3( 0.0f, -2.5f, 0.0f );
-            conn.End2.Container = tankP.GetComponent<FBulkContainer_Sphere>();
+            conn.End2.O = tankP.GetComponent<FBulkContainer_Sphere>();
             conn.End2.Position = new Vector3( 0.0f, 1.5f, 0.0f );
+
+            conn.CrossSectionArea = 0.1f;
+
+            tankL1.GetComponent<FBulkContainer_Sphere>().Contents = new SubstanceStateCollection(
+                new SubstanceState[] { new SubstanceState( 500, new Substance() { Density = 1100, DisplayName = "aa", ID = "substance.aa" } ) } );
 
             // conn.End1.Container.Volume = conn.End1.Container.MaxVolume; // 99999f;
             //conn.End1.Container.MaxVolume = 99999f;
             // conn.End2.Container.Volume = 0f;
             //conn.End2.Container.MaxVolume = 99999f;
 
-            conn.CrossSectionArea = 0.01f;
 
             //const int partcount = 5;
             //const int engcount = 5;

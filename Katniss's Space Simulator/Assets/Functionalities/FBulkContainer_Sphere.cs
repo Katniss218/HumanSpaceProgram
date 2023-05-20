@@ -1,19 +1,21 @@
 ﻿using KatnisssSpaceSimulator.Core;
+using KatnisssSpaceSimulator.Core.ResourceFlowSystem;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace KatnisssSpaceSimulator.Functionalities.ResourceFlowSystem
+namespace KatnisssSpaceSimulator.Functionalities
 {
 
     /// <summary>
     /// A container for a <see cref="Substance"/>.
     /// </summary>
-    public class FBulkContainer_Sphere : Functionality, IBulkContainer
+    public class FBulkContainer_Sphere : Functionality, IResourceConsumer, IResourceProducer
     {
         /// <summary>
         /// Determines the center position of the container.
@@ -31,28 +33,21 @@ namespace KatnisssSpaceSimulator.Functionalities.ResourceFlowSystem
         public float Radius { get; set; }
 
         [field: SerializeField]
-        public SubstanceStateMultiple Contents { get; set; }
+        public SubstanceStateCollection Contents { get; set; } = SubstanceStateCollection.Empty;
 
-        /// <summary>
-        /// Inflow minus outflow. positive = inflow, negative = outflow.
-        /// </summary>
         [field: SerializeField]
-        public SubstanceStateMultiple Inflow { get; set; }
+        public SubstanceStateCollection Inflow { get; set; }
 
-        public SubstanceStateMultiple Sample( Vector3 localPosition, Vector3 localAcceleration, float holeArea )
+        [field: SerializeField]
+        public SubstanceStateCollection Outflow { get; set; }
+
+        public void ClampIn( SubstanceStateCollection v )
         {
-            if( this.Contents == null )
-            {
-                return SubstanceStateMultiple.NoFlow;
-            }
 
-            SubstanceState[] substances = this.Contents.GetSubstances();
+        }
 
-            if( substances.Length == 0 )
-            {
-                return SubstanceStateMultiple.NoFlow;
-            }
-
+        public FluidState Sample( Vector3 localPosition, Vector3 localAcceleration, float holeArea )
+        {
             float heightOfLiquid = SolveHeightOfTruncatedSphere( this.Contents.GetVolume() / this.MaxVolume ) * this.Radius;
 
             float distanceAlongAcceleration = Vector3.Dot( localPosition, localAcceleration.normalized );
@@ -63,20 +58,47 @@ namespace KatnisssSpaceSimulator.Functionalities.ResourceFlowSystem
 
             if( heightOfLiquid <= 0 )
             {
-                return SubstanceStateMultiple.NoFlow;
+                return FluidState.Vacuum;
             }
 
             // pressure in [Pa]
-            float pressure = localAcceleration.magnitude * this.Contents.GetSubstances()[0].Data.Density * heightOfLiquid;
+            float pressure = localAcceleration.magnitude * this.Contents[0].Data.Density * heightOfLiquid;
 
-#warning TODO - assume not mixed?
-            return new SubstanceStateMultiple( new FluidState() { Pressure = pressure, Temperature = 273.15f, Velocity = Vector3.zero }, Contents.GetSubstances() );
+            return new FluidState( pressure, 273.15f, 0.0f );
+        }
+
+        public (SubstanceStateCollection, FluidState) SampleFlow( Vector3 localPosition, Vector3 localAcceleration, float holeArea, FluidState opposingFluid )
+        {
+            if( this.Contents.SubstanceCount == 0 )
+            {
+                return (SubstanceStateCollection.Empty, FluidState.Vacuum);
+            }
+
+            FluidState state = Sample( localPosition, localAcceleration, holeArea );
+
+            float relativePressure = state.Pressure - opposingFluid.Pressure;
+            if( relativePressure <= 0 )
+            {
+                return (SubstanceStateCollection.Empty, FluidState.Vacuum);
+            }
+
+#warning TODO - mixing and stratification.
+            SubstanceStateCollection flow = Contents.Clone();
+
+            float newSignedVelocity = Mathf.Sign( relativePressure ) * Mathf.Sqrt( 2 * relativePressure / flow.GetAverageDensity() );
+            float maximumVolumetricFlowrate = Mathf.Abs( FBulkContainerConnection.GetVolumetricFlowrate( holeArea, newSignedVelocity ) );
+
+            flow.SetVolume( maximumVolumetricFlowrate );
+
+            return (flow, new FluidState( relativePressure, state.Temperature, newSignedVelocity ));
         }
 
         void FixedUpdate()
         {
+            Contract.Assert( Contents != null, $"[{nameof( FBulkContainer_Sphere )}.{nameof( Sample )}] '{nameof( Contents )}' can't be null." );
+
+            Contents.Add( Outflow, -Time.fixedDeltaTime );
             Contents.Add( Inflow, Time.fixedDeltaTime );
-            //Volume += TotalInflow * Time.fixedDeltaTime;
             // TODO - update the mass too, because the fluid weighs something.
         }
 
