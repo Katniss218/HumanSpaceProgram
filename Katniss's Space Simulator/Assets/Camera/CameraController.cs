@@ -31,17 +31,20 @@ namespace KatnisssSpaceSimulator.Camera
         PostProcessLayer _closePPLayer;
 
         [field: SerializeField]
-        PostProcessLayer _farPPLayer; 
+        PostProcessLayer _farPPLayer;
+
+        const float MOVE_MULTIPLIER = 3.0f;
+        const float ZOOM_MULTIPLIER = 0.15f;
 
         void UpdateZoomLevel()
         {
             if( Input.mouseScrollDelta.y > 0 )
             {
-                zoomDist -= zoomDist * 15.0f * Time.unscaledDeltaTime;
+                zoomDist -= zoomDist * ZOOM_MULTIPLIER;
             }
             else if( Input.mouseScrollDelta.y < 0 )
             {
-                zoomDist += zoomDist * 15.0f * Time.unscaledDeltaTime;
+                zoomDist += zoomDist * ZOOM_MULTIPLIER;
             }
 
             if( zoomDist < 2 )
@@ -78,8 +81,8 @@ namespace KatnisssSpaceSimulator.Camera
                 float mouseX = Input.GetAxis( "Mouse X" );
                 float mouseY = Input.GetAxis( "Mouse Y" );
 
-                this.transform.rotation *= Quaternion.AngleAxis( mouseX * 500 * Time.unscaledDeltaTime, Vector3.up );
-                this.transform.rotation *= Quaternion.AngleAxis( -mouseY * 500 * Time.unscaledDeltaTime, Vector3.right );
+                this.transform.rotation *= Quaternion.AngleAxis( mouseX * MOVE_MULTIPLIER, Vector3.up );
+                this.transform.rotation *= Quaternion.AngleAxis( -mouseY * MOVE_MULTIPLIER, Vector3.right );
             }
         }
 
