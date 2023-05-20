@@ -48,17 +48,32 @@ namespace KatnisssSpaceSimulator.Core.Physics
             set => this._rb.velocity = value;
         }
 
+        /// <summary>
+        /// Gets or sets the physics object's velocity in scene space in [m/s].
+        /// </summary>
+        public Vector3 AngularVelocity
+        {
+            get => this._rb.angularVelocity;
+            set => this._rb.angularVelocity = value;
+        }
+
         public Vector3 Acceleration { get; private set; }
+        public Vector3 AngularAcceleration { get; private set; }
         Vector3 _oldVelocity;
+        Vector3 _oldAngularVelocity;
 
         Rigidbody _rb;
         RootObjectTransform _rootTransform;
+
+        Vector3 _accSum = Vector3.zero;
+        Vector3 _angularAccSum = Vector3.zero;
 
         /// <summary>
         /// Adds a force acting on the center of mass of the physics object. Does not apply any torque.
         /// </summary>
         public void AddForce( Vector3 force )
         {
+            _accSum += force / Mass;
             this._rb.AddForce( force, ForceMode.Force );
         }
 
@@ -67,12 +82,15 @@ namespace KatnisssSpaceSimulator.Core.Physics
         /// </summary>
         public void AddForceAtPosition( Vector3 force, Vector3 position )
         {
-            this._rb.AddForceAtPosition( force, position, ForceMode.Force );
-        }
+            // I think force / mass is still correct for this,
+            // - because 2 consecutive impulses in the same direction, but opposite positions (so that the angular accelerations cancel out)
+            // - should still produce linear acceleration of 2 * force / mass.
+            _accSum += force / Mass;
 
-        public Vector3 ClosestPointOnBounds( Vector3 worldSpacePosition )
-        {
-            return this._rb.ClosestPointOnBounds( worldSpacePosition );
+            Vector3 leverArm = position - this._rb.worldCenterOfMass;
+            _angularAccSum += Vector3.Cross( force, leverArm ) / Mass;
+
+            this._rb.AddForceAtPosition( force, position, ForceMode.Force );
         }
 
         void Awake()
@@ -86,14 +104,38 @@ namespace KatnisssSpaceSimulator.Core.Physics
             _rb.interpolation = RigidbodyInterpolation.Extrapolate;
         }
 
+        [field: SerializeField]
+        bool _isColliding;
+
+        void OnCollisionEnter( Collision collision )
+        {
+            _isColliding = true;
+        }
+
+        void OnCollisionExit( Collision collision )
+        {
+            _isColliding = false;
+        }
+
         void FixedUpdate()
         {
             // I'm not a fan of the physics being calculated in scene-space, but that's the only way to handle collisions properly.
             this._rootTransform.SetAIRFPosition( SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.transform.position ) );
 
-#warning TODO - Big values of velocity lack precision which in turn causes fluids to flow in freefall, because the vessel's acceleration is wrong.
-            this.Acceleration = ((Velocity / Time.fixedDeltaTime) - (_oldVelocity / Time.fixedDeltaTime));
+            if( _isColliding )
+            {
+                this.Acceleration = (Velocity - _oldVelocity) / Time.fixedDeltaTime;
+                this.AngularAcceleration = (AngularVelocity - _oldAngularVelocity) / Time.fixedDeltaTime;
+            }
+            else
+            {
+                this.Acceleration = _accSum;
+                this.AngularAcceleration = _angularAccSum;
+            }
             this._oldVelocity = Velocity;
+            this._oldAngularVelocity = AngularVelocity;
+            this._accSum = Vector3.zero;
+            this._angularAccSum = Vector3.zero;
         }
 
         void OnEnable()

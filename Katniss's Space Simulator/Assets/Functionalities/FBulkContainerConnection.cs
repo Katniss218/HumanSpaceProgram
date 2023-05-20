@@ -213,7 +213,6 @@ namespace KatnisssSpaceSimulator.Functionalities
                 return;
             }
 
-#warning TODO - there are NaN's, if the tank is somehow overfilled.
             (SubstanceStateCollection flow, _) = inletProducer.SampleFlow( inletEnd.Position, inletProducer.transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea, endSamples[outlet] );
 
             outletConsumer.ClampIn( flow, Time.fixedDeltaTime );
@@ -235,7 +234,7 @@ namespace KatnisssSpaceSimulator.Functionalities
 
             // acceleration due to external forces (gravity) minus the acceleration of the vessel.
             sceneAcceleration -= vesselAcceleration;
-#warning TODO - add angular acceleration to the mix.
+#warning TODO - Each part should have its own acceleration (which includes centrifugal acceleration due to spinning vessel), that way if the vessel is spinning, it'll work correctly.
 
             FixedUpdate_Flow( sceneAcceleration );
         }

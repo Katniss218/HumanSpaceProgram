@@ -149,6 +149,10 @@ namespace KatnisssSpaceSimulator.Functionalities
         /// <returns>Value between 0 and 2.</returns>
         public static float SolveHeightOfTruncatedSphere( float volumePercent )
         {
+            if( volumePercent > 1.0f )
+                return 2.0f;
+            if( volumePercent < 0.0f )
+                return 0.0f;
             // https://math.stackexchange.com/questions/2364343/height-of-a-spherical-cap-from-volume-and-radius
 
             const float UnitSphereVolume = 4.18879020479f; // 4/3 * pi     -- radius=1
