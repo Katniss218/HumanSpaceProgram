@@ -99,9 +99,9 @@ namespace KatnisssSpaceSimulator
             engine.Create( tankP, new Vector3( 0, -3.45533f, 0 ), Quaternion.identity );
 
             FBulkContainerConnection conn = tankP.gameObject.AddComponent<FBulkContainerConnection>();
-            conn.End1.O = tankL1.GetComponent<FBulkContainer_Sphere>();
+            conn.End1.ConnectTo( tankL1.GetComponent<FBulkContainer_Sphere>() );
             conn.End1.Position = new Vector3( 0.0f, -2.5f, 0.0f );
-            conn.End2.O = tankP.GetComponent<FBulkContainer_Sphere>();
+            conn.End2.ConnectTo( tankP.GetComponent<FBulkContainer_Sphere>() );
             conn.End2.Position = new Vector3( 0.0f, 1.5f, 0.0f );
 
             conn.CrossSectionArea = 0.1f;

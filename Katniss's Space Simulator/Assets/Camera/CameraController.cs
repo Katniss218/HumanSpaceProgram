@@ -64,6 +64,9 @@ namespace KatnisssSpaceSimulator.Camera
                 }
             }
 
+            // helps to make the shadow look nicer.
+            QualitySettings.shadowDistance = 2550.0f + 1.3f * zoomDist;
+
             // ---
             CameraParent.transform.localPosition = Vector3.back * zoomDist;
         }

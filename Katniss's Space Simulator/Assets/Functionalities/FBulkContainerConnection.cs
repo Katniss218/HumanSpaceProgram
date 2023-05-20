@@ -15,36 +15,67 @@ namespace KatnisssSpaceSimulator.Functionalities
 {
     public class FBulkContainerConnection : Functionality
     {
+        /// <summary>
+        /// Represents an inlet or outlet.
+        /// </summary>
         [Serializable]
-        public class End
+        public class Port
         {
-            public object O;
+            // idk if SerializeField works with interfaces. probably better to save over in json.
+            [SerializeField]
+            IResourceConsumer _objC;
+            [SerializeField]
+            IResourceProducer _objP;
 
+            /// <summary>
+            /// The position of the connection, in local space of the connected object.
+            /// </summary>
             public Vector3 Position;
-            public Vector3 Forward; // nominally faces into the tank.
+
+            /// <summary>
+            /// The orientation of the connection, in local space of the connected object.
+            /// </summary>
+            /// <remarks>
+            /// Nominally faces "inwards", into the container/tank.
+            /// </remarks>
+            public Vector3 Forward;
+
+            public void ConnectTo<T>( T obj ) where T : IResourceProducer, IResourceConsumer
+            {
+                // This is kind of a hack because the other two methods are ambiguous when assigning something that's both a producer and a consumer.
+                this._objC = obj;
+                this._objP = obj;
+            }
+
+            public void ConnectTo( IResourceConsumer consumer )
+            {
+                this._objC = consumer;
+                this._objP = consumer as IResourceProducer;
+            }
+
+            public void ConnectTo( IResourceProducer producer )
+            {
+                this._objC = producer as IResourceConsumer;
+                this._objP = producer;
+            }
+
+            public (IResourceConsumer, IResourceProducer) ConnectedTo()
+            {
+                return (this._objC, this._objP);
+            }
         }
 
         /// <summary>
         /// The container at one end of the connection.
         /// </summary>
         [field: SerializeField]
-        public End End1 { get; set; } = new End();
+        public Port End1 { get; private set; } = new Port();
 
         /// <summary>
         /// The container at the other end of the connection.
         /// </summary>
         [field: SerializeField]
-        public End End2 { get; set; } = new End();
-
-        public End GetEnd( int index )
-        {
-            switch( index )
-            {
-                case 0: return End1;
-                case 1: return End2;
-            }
-            throw new ArgumentOutOfRangeException( $"Index must be 0 or 1" );
-        }
+        public Port End2 { get; private set; } = new Port();
 
         /// <summary>
         /// Cross-sectional area of the connection (pipe) in [m^2].
@@ -56,31 +87,46 @@ namespace KatnisssSpaceSimulator.Functionalities
         // Since `flow out = flow in`, the magnitude of flow at both tanks due to this connection must be equal.
 
         // across the pipe (pipe is 0-width, so inlet and outlet are the same thing).
-        [field: SerializeField]
-        SubstanceStateCollection _flow = null;
-
+        SubstanceStateCollection _cacheFlow = null;
         int _cacheInlet;
         int _cacheOutlet;
 
-        private void UpdateContainers( SubstanceStateCollection newFlow, int inlet, int outlet )
+        /// <summary>
+        /// Returns the end by index. Useful when selecting the index by some criterion.
+        /// </summary>
+        public Port GetEnd( int index )
         {
-            var oldFlow = _flow;
+            switch( index )
+            {
+                case 0: return End1;
+                case 1: return End2;
+            }
+            throw new ArgumentOutOfRangeException( $"Index must be 0 or 1" );
+        }
+
+        private void SetFlowAcrossConnection( SubstanceStateCollection newFlow, int inlet, int outlet )
+        {
+            var oldFlow = _cacheFlow;
 
             if( !SubstanceStateCollection.IsNullOrEmpty( oldFlow ) )
             {
-                ((IResourceProducer)GetEnd( _cacheInlet ).O).Outflow.Add( oldFlow, -1.0f );
-                ((IResourceConsumer)GetEnd( _cacheOutlet ).O).Inflow.Add( oldFlow, -1.0f );
+                (_, var inletP) = GetEnd( _cacheInlet ).ConnectedTo();
+                (var outletC, _) = GetEnd( _cacheOutlet ).ConnectedTo();
+                inletP.Outflow.Add( oldFlow, -1.0f );
+                outletC.Inflow.Add( oldFlow, -1.0f );
             }
 
             // Cache.
-            _flow = newFlow;
+            _cacheFlow = newFlow;
             _cacheInlet = inlet;
             _cacheOutlet = outlet;
 
             if( !SubstanceStateCollection.IsNullOrEmpty( newFlow ) )
             {
-                ((IResourceProducer)GetEnd( inlet ).O).Outflow.Add( newFlow );
-                ((IResourceConsumer)GetEnd( outlet ).O).Inflow.Add( newFlow );
+                (_, var inletP) = GetEnd( inlet ).ConnectedTo();
+                (var outletC, _) = GetEnd( outlet ).ConnectedTo();
+                inletP.Outflow.Add( newFlow );
+                outletC.Inflow.Add( newFlow );
             }
         }
 
@@ -97,7 +143,7 @@ namespace KatnisssSpaceSimulator.Functionalities
             return area * velocity;
         }
 
-        public void FixedUpdate_Flow( Vector3 fluidAccelerationSceneSpace, float deltaTime )
+        public void FixedUpdate_Flow( Vector3 fluidAccelerationSceneSpace )
         {
             const float MIN_AREA = 1e-6f;
             const float MIN_ACCELERATION = 0.01f;
@@ -105,12 +151,12 @@ namespace KatnisssSpaceSimulator.Functionalities
 
             if( CrossSectionArea <= MIN_AREA )
             {
-                UpdateContainers( SubstanceStateCollection.Empty, _cacheInlet, _cacheOutlet );
+                SetFlowAcrossConnection( SubstanceStateCollection.Empty, _cacheInlet, _cacheOutlet );
                 return;
             }
             if( fluidAccelerationSceneSpace.magnitude < MIN_ACCELERATION )
             {
-                UpdateContainers( SubstanceStateCollection.Empty, _cacheInlet, _cacheOutlet );
+                SetFlowAcrossConnection( SubstanceStateCollection.Empty, _cacheInlet, _cacheOutlet );
                 return;
             }
 
@@ -122,44 +168,48 @@ namespace KatnisssSpaceSimulator.Functionalities
             // we can achieve that by increasing the height of the fluid column in the inlet tank so that it matches the outlet when projected along the acceleration direction.
 
             FluidState[] endSamples = new FluidState[2];
+            IResourceConsumer[] endC = new IResourceConsumer[2];
+            IResourceProducer[] endP = new IResourceProducer[2];
 
-            if( End1.O is IResourceConsumer c1 )
+            (endC[0], endP[0]) = End1.ConnectedTo();
+            (endC[1], endP[1]) = End2.ConnectedTo();
+
+            if( endC[0] != null )
             {
-                endSamples[0] = c1.Sample( End1.Position, c1.transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea );
+                endSamples[0] = endC[0].Sample( End1.Position, endC[0].transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea );
             }
-            else if( End1.O is IResourceProducer p1 )
+            else if( endP[0] != null )
             {
-                endSamples[0] = p1.Sample( End1.Position, p1.transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea );
-            }
-            if( End2.O is IResourceConsumer c2 )
-            {
-                endSamples[1] = c2.Sample( End2.Position, c2.transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea );
-            }
-            else if( End2.O is IResourceProducer p2 )
-            {
-                endSamples[1] = p2.Sample( End2.Position, p2.transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea );
+                endSamples[0] = endP[0].Sample( End1.Position, endP[0].transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea );
             }
 
-            // In [Pa] ([N/m^2]). Positive flows towards End2, negative flows towards End1, zero doesn't flow.
-            float relativePressure = endSamples[0].Pressure - endSamples[1].Pressure;
-            float relativePressureMagnitude = Mathf.Abs( relativePressure );
-
-            if( relativePressureMagnitude < MIN_PRESSURE_DIFFERENCE )
+            if( endC[1] != null )
             {
-                UpdateContainers( SubstanceStateCollection.Empty, _cacheInlet, _cacheOutlet );
+                endSamples[1] = endC[1].Sample( End2.Position, endC[1].transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea );
+            }
+            else if( endP[1] != null )
+            {
+                endSamples[1] = endP[1].Sample( End2.Position, endP[1].transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea );
+            }
+
+            // In [Pa]
+            float signedRelativePressure = endSamples[0].Pressure - endSamples[1].Pressure;
+
+            if( Mathf.Abs( signedRelativePressure ) < MIN_PRESSURE_DIFFERENCE )
+            {
+                SetFlowAcrossConnection( SubstanceStateCollection.Empty, _cacheInlet, _cacheOutlet );
                 return;
             }
 
-            (int inlet, int outlet) = GetInletAndOutletIndices( relativePressure );
+            (int inlet, int outlet) = GetInletAndOutletIndices( signedRelativePressure );
 
-            End inletEnd = this.GetEnd( inlet );
-            End outletEnd = this.GetEnd( outlet );
+            Port inletEnd = this.GetEnd( inlet );
 
-            IResourceProducer inletProducer = inletEnd.O as IResourceProducer; // inlet must have a producer, to produce the flow.
-            IResourceConsumer outletConsumer = outletEnd.O as IResourceConsumer; // outlet must have a consumer, to consume the flow.
+            IResourceProducer inletProducer = endP[inlet]; // inlet must have a producer, to produce the flow.
+            IResourceConsumer outletConsumer = endC[outlet]; // outlet must have a consumer, to consume the flow.
             if( inletProducer == null || outletConsumer == null ) // fluid can't flow.
             {
-                UpdateContainers( SubstanceStateCollection.Empty, _cacheInlet, _cacheOutlet );
+                SetFlowAcrossConnection( SubstanceStateCollection.Empty, _cacheInlet, _cacheOutlet );
                 return;
             }
 
@@ -167,7 +217,7 @@ namespace KatnisssSpaceSimulator.Functionalities
 
             outletConsumer.ClampIn( flow );
 
-            UpdateContainers( flow, inlet, outlet );
+            SetFlowAcrossConnection( flow, inlet, outlet );
         }
 
         void FixedUpdate()
@@ -188,8 +238,7 @@ namespace KatnisssSpaceSimulator.Functionalities
             sceneAcceleration -= vesselAcceleration;
 #warning TODO - add angular acceleration to the mix.
 
-            FixedUpdate_Flow( sceneAcceleration, Time.fixedDeltaTime );
-
+            FixedUpdate_Flow( sceneAcceleration );
         }
 
         public override void Load( JToken data )
