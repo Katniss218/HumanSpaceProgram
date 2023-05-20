@@ -90,7 +90,9 @@ namespace KatnisssSpaceSimulator.Core.Physics
         {
             // I'm not a fan of the physics being calculated in scene-space, but that's the only way to handle collisions properly.
             this._rootTransform.SetAIRFPosition( SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.transform.position ) );
-            this.Acceleration = (Velocity - _oldVelocity) / Time.fixedDeltaTime;
+
+#warning TODO - Big values of velocity lack precision which in turn causes fluids to flow in freefall, because the vessel's acceleration is wrong.
+            this.Acceleration = ((Velocity / Time.fixedDeltaTime) - (_oldVelocity / Time.fixedDeltaTime));
             this._oldVelocity = Velocity;
         }
 

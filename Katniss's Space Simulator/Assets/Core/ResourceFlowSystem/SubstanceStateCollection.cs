@@ -78,11 +78,6 @@ namespace KatnisssSpaceSimulator.Core.ResourceFlowSystem
         /// </summary>
         public void SetVolume( float volume )
         {
-            if( volume <= 0 )
-            {
-                throw new ArgumentException( $"The volume to set must be positive.", nameof( volume ) );
-            }
-
             if( IsEmpty() )
             {
                 throw new InvalidOperationException( $"Can't set volume for a {nameof( SubstanceStateCollection )} that is empty." );

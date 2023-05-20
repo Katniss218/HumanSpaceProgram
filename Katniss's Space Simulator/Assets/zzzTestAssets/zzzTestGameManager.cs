@@ -109,7 +109,7 @@ namespace KatnisssSpaceSimulator
 
             var tankTank = tankL1.GetComponent<FBulkContainer_Sphere>();
             tankTank.Contents = new SubstanceStateCollection(
-                new SubstanceState[] { new SubstanceState( tankTank.MaxVolume * 1100f, new Substance() { Density = 1100f, DisplayName = "aa", ID = "substance.aa" } ) } );
+                new SubstanceState[] { new SubstanceState( tankTank.MaxVolume * 1000f, new Substance() { Density = 1000f, DisplayName = "aa", ID = "substance.aa" } ) } );
 
             //FindObjectOfType<IResourceContainerUI>().Obj = tankL1.GetComponent<FBulkContainer_Sphere>();
 

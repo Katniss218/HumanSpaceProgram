@@ -22,7 +22,7 @@ namespace KatnisssSpaceSimulator.Core.ResourceFlowSystem
         /// <summary>
         /// Clamps the flow based on how much fluid can actually flow into the consumer object in 1 [s].
         /// </summary>
-        void ClampIn( SubstanceStateCollection flow );
+        void ClampIn( SubstanceStateCollection flow, float dt );
 
         /// <summary>
         /// Calculates the pressure acting at any given point inside the container, as well as what species will want to `flow` out of the container.

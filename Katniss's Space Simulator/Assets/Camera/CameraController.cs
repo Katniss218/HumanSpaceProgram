@@ -123,6 +123,11 @@ namespace KatnisssSpaceSimulator.Camera
 
         void Update()
         {
+            if( UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() )
+            {
+                return;
+            }
+
             UpdateZoomLevel();
 
             UpdateOrientation();

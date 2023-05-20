@@ -9,7 +9,7 @@ namespace KatnisssSpaceSimulator.Core.Physics
         /// </summary>
         public const double G = 6.67430e-11;
 
-        public static Vector3Dbl GetGravityForce( double vesselMass, Vector3Dbl airfPosition )
+        public static Vector3Dbl GetGravityAcceleration( Vector3Dbl airfPosition )
         {
             CelestialBody cb = CelestialBodyManager.Bodies[0]; // temporary.
 
@@ -21,9 +21,14 @@ namespace KatnisssSpaceSimulator.Core.Physics
                 return Vector3Dbl.zero;
             }
 
-            double forceMagn = G * ((vesselMass * cb.Mass) / distanceSq);
+            double forceMagn = G * (cb.Mass / distanceSq);
 
             return toBody.normalized * forceMagn;
+        }
+
+        public static Vector3Dbl GetGravityForce( double objectMass, Vector3Dbl airfPosition )
+        {
+            return objectMass * GetGravityAcceleration( airfPosition );
         }
     }
 }

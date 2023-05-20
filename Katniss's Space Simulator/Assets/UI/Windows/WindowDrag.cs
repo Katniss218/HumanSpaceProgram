@@ -25,6 +25,11 @@ namespace KatnisssSpaceSimulator.Assets.UI.Windows
 
         public override void OnPointerDown( PointerEventData eventData )
         {
+            if( eventData.button != PointerEventData.InputButton.Left )
+            {
+                return;
+            }
+
             cursorOffset = new Vector2( UITransform.position.x, UITransform.position.y ) - new Vector2( Input.mousePosition.x, Input.mousePosition.y );
             isDragging = true;
 
@@ -33,6 +38,11 @@ namespace KatnisssSpaceSimulator.Assets.UI.Windows
 
         public override void OnPointerUp( PointerEventData eventData )
         {
+            if( eventData.button != PointerEventData.InputButton.Left )
+            {
+                return;
+            }
+
             isDragging = false;
 
             base.OnPointerUp( eventData );

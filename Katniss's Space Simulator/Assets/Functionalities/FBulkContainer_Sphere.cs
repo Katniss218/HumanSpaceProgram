@@ -41,14 +41,15 @@ namespace KatnisssSpaceSimulator.Functionalities
         [field: SerializeField]
         public SubstanceStateCollection Outflow { get; set; }
 
-        public void ClampIn( SubstanceStateCollection inflow )
+        public void ClampIn( SubstanceStateCollection inflow, float dt )
         {
             float currentVol = this.Contents.GetVolume();
             float inflowVol = inflow.GetVolume();
 
-            if( currentVol + inflowVol > MaxVolume )
+            if( currentVol + (inflowVol * dt) > MaxVolume )
             {
-                inflow.SetVolume( currentVol - MaxVolume );
+                float remainingVol = MaxVolume - currentVol;
+                inflow.SetVolume( remainingVol / dt );
             }
         }
 

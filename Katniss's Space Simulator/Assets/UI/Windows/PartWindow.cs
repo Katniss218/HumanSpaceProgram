@@ -47,9 +47,9 @@ namespace KatnisssSpaceSimulator.UI.Windows
 #warning TODO - Find a better way to bind components to their UI elements.
             foreach( var comp in components )
             {
-                if( comp is IResourceContainer )
+                if( comp is IResourceContainer r )
                 {
-                    Debug.Log( "resource container" );
+                    IResourceContainerUI.Create( _list, r );
                 }
             }
         }

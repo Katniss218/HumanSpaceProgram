@@ -213,9 +213,10 @@ namespace KatnisssSpaceSimulator.Functionalities
                 return;
             }
 
+#warning TODO - there are NaN's, if the tank is somehow overfilled.
             (SubstanceStateCollection flow, _) = inletProducer.SampleFlow( inletEnd.Position, inletProducer.transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea, endSamples[outlet] );
 
-            outletConsumer.ClampIn( flow );
+            outletConsumer.ClampIn( flow, Time.fixedDeltaTime );
 
             SetFlowAcrossConnection( flow, inlet, outlet );
         }
@@ -227,13 +228,11 @@ namespace KatnisssSpaceSimulator.Functionalities
                 throw new InvalidOperationException( $"Both ends must exist" );
             }
 
-            const double PlaceholderMass = 8;
-
             Part part = this.GetComponent<Part>();
-            Vector3Dbl airfGravityForce = PhysicsUtils.GetGravityForce( PlaceholderMass, part.Vessel.AIRFPosition ); // Move airfposition to PhysicsObject maybe?
-            Vector3Dbl airfAcceleration = airfGravityForce / PlaceholderMass;
+            Vector3Dbl airfAcceleration = PhysicsUtils.GetGravityAcceleration( part.Vessel.AIRFPosition );
             Vector3 sceneAcceleration = SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformVector( (Vector3)airfAcceleration );
             Vector3 vesselAcceleration = part.Vessel.PhysicsObject.Acceleration;
+
             // acceleration due to external forces (gravity) minus the acceleration of the vessel.
             sceneAcceleration -= vesselAcceleration;
 #warning TODO - add angular acceleration to the mix.
