@@ -7,6 +7,16 @@ namespace KatnisssSpaceSimulator.Camera
 {
     public class CameraController : MonoBehaviour
     {
+        private static CameraController ___instance;
+        public static CameraController Instance
+        {
+            get
+            {
+                if( ___instance == null ) ___instance = FindObjectOfType<CameraController>();
+                return ___instance;
+            }
+        }
+
         /// <summary>
         /// The camera will focus on this object.
         /// </summary>
@@ -35,6 +45,14 @@ namespace KatnisssSpaceSimulator.Camera
 
         const float MOVE_MULTIPLIER = 3.0f;
         const float ZOOM_MULTIPLIER = 0.15f;
+
+        /// <summary>
+        /// Use this for raycasts and other methods that use a camera to calculate screen space positions, etc.
+        /// </summary>
+        /// <remarks>
+        /// Do not manually modify the fields of this camera.
+        /// </remarks>
+        public UnityEngine.Camera MainCamera { get => _closeCamera; }
 
         void UpdateZoomLevel()
         {
@@ -89,7 +107,7 @@ namespace KatnisssSpaceSimulator.Camera
         void PreventViewFrustumException()
         {
             // For some reason, at the distance of around Earth's radius, having the near camera enabled throws "position our of view frustum" exceptions.
-            if( zoomDist > 1_000_000 ) // should be enough of a conservative value. Near cam is only 100km, not 1000.
+            if( zoomDist > 1_000_000 ) // should be enough of a conservative value. Near cam is only 100 km, not 1000.
             {
                 this._closeCamera.enabled = false;
                 this._closePPLayer.enabled = false;

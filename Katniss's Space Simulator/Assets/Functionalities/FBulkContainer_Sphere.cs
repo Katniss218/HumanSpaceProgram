@@ -15,7 +15,7 @@ namespace KatnisssSpaceSimulator.Functionalities
     /// <summary>
     /// A container for a <see cref="Substance"/>.
     /// </summary>
-    public class FBulkContainer_Sphere : Functionality, IResourceConsumer, IResourceProducer
+    public class FBulkContainer_Sphere : MonoBehaviour, IResourceConsumer, IResourceProducer, IResourceContainer
     {
         /// <summary>
         /// Determines the center position of the container.
@@ -41,9 +41,15 @@ namespace KatnisssSpaceSimulator.Functionalities
         [field: SerializeField]
         public SubstanceStateCollection Outflow { get; set; }
 
-        public void ClampIn( SubstanceStateCollection v )
+        public void ClampIn( SubstanceStateCollection inflow )
         {
+            float currentVol = this.Contents.GetVolume();
+            float inflowVol = inflow.GetVolume();
 
+            if( currentVol + inflowVol > MaxVolume )
+            {
+                inflow.SetVolume( currentVol - MaxVolume );
+            }
         }
 
         public FluidState Sample( Vector3 localPosition, Vector3 localAcceleration, float holeArea )
@@ -116,7 +122,7 @@ namespace KatnisssSpaceSimulator.Functionalities
 
         // the connections would be set up in the VAB / by the save loader.
 
-        public override JToken Save()
+        public JToken Save()
         {
             throw new NotImplementedException();
 
@@ -127,7 +133,7 @@ namespace KatnisssSpaceSimulator.Functionalities
             };*/
         }
 
-        public override void Load( JToken data )
+        public void Load( JToken data )
         {
             throw new NotImplementedException();
 

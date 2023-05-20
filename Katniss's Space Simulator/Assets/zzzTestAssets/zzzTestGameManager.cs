@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using KatnisssSpaceSimulator.Core.ResourceFlowSystem;
+using KatnisssSpaceSimulator.UI;
 
 namespace KatnisssSpaceSimulator
 {
@@ -106,8 +107,11 @@ namespace KatnisssSpaceSimulator
 
             conn.CrossSectionArea = 0.1f;
 
-            tankL1.GetComponent<FBulkContainer_Sphere>().Contents = new SubstanceStateCollection(
-                new SubstanceState[] { new SubstanceState( 500, new Substance() { Density = 1100, DisplayName = "aa", ID = "substance.aa" } ) } );
+            var tankTank = tankL1.GetComponent<FBulkContainer_Sphere>();
+            tankTank.Contents = new SubstanceStateCollection(
+                new SubstanceState[] { new SubstanceState( tankTank.MaxVolume * 1100f, new Substance() { Density = 1100f, DisplayName = "aa", ID = "substance.aa" } ) } );
+
+            //FindObjectOfType<IResourceContainerUI>().Obj = tankL1.GetComponent<FBulkContainer_Sphere>();
 
             // conn.End1.Container.Volume = conn.End1.Container.MaxVolume; // 99999f;
             //conn.End1.Container.MaxVolume = 99999f;

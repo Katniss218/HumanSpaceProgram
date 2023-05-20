@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace KatnisssSpaceSimulator.Functionalities
 {
-    public class FBulkContainerConnection : Functionality
+    public class FBulkContainerConnection : MonoBehaviour
     {
         /// <summary>
         /// Represents an inlet or outlet.
@@ -241,12 +241,12 @@ namespace KatnisssSpaceSimulator.Functionalities
             FixedUpdate_Flow( sceneAcceleration );
         }
 
-        public override void Load( JToken data )
+        public void Load( JToken data )
         {
             throw new NotImplementedException();
         }
 
-        public override JToken Save()
+        public JToken Save()
         {
             throw new NotImplementedException();
         }

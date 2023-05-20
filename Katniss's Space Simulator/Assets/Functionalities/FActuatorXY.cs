@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace KatnisssSpaceSimulator.Functionalities
 {
-    public class FActuatorXY : Functionality
+    public class FActuatorXY : MonoBehaviour
     {
         // 2-axis actuator.
 
@@ -47,12 +47,12 @@ namespace KatnisssSpaceSimulator.Functionalities
             // todo.
         }
 
-        public override void Load( JToken data )
+        public void Load( JToken data )
         {
             throw new NotImplementedException();
         }
 
-        public override JToken Save()
+        public JToken Save()
         {
             throw new NotImplementedException();
         }

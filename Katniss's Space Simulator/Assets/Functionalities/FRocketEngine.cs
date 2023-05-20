@@ -11,7 +11,7 @@ using UnityEngine;
 namespace KatnisssSpaceSimulator.Functionalities
 {
     [Serializable]
-    public class FRocketEngine : Functionality
+    public class FRocketEngine : MonoBehaviour
     {
         [field: SerializeField]
         public float MaxThrust { get; set; }
@@ -44,6 +44,11 @@ namespace KatnisssSpaceSimulator.Functionalities
         private void Awake()
         {
             _part = this.GetComponent<Part>();
+            if( _part == null )
+            {
+                Destroy( this );
+                throw new InvalidOperationException( $"{nameof( FRocketEngine )} can only be added to a part." );
+            }
         }
 
         void Update()
@@ -62,12 +67,12 @@ namespace KatnisssSpaceSimulator.Functionalities
             }
         }
 
-        public override void Load( JToken data )
+        public void Load( JToken data )
         {
             throw new NotImplementedException();
         }
 
-        public override JToken Save()
+        public JToken Save()
         {
             throw new NotImplementedException();
         }
