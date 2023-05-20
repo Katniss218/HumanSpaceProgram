@@ -12,14 +12,14 @@ namespace KatnisssSpaceSimulator.Assets.UI.Windows
     {
         [SerializeField] public RectTransform UITransform;
 
-        bool isDragging = false;
-        Vector2 cursorOffset = Vector2.zero;
+        bool _isDragging = false;
+        Vector2 _cursorOffset = Vector2.zero;
 
         void Update()
         {
-            if( isDragging )
+            if( _isDragging )
             {
-                UITransform.position = new Vector2( Input.mousePosition.x, Input.mousePosition.y ) + cursorOffset;
+                UITransform.position = new Vector2( Input.mousePosition.x, Input.mousePosition.y ) + _cursorOffset;
             }
         }
 
@@ -30,8 +30,8 @@ namespace KatnisssSpaceSimulator.Assets.UI.Windows
                 return;
             }
 
-            cursorOffset = new Vector2( UITransform.position.x, UITransform.position.y ) - new Vector2( Input.mousePosition.x, Input.mousePosition.y );
-            isDragging = true;
+            _cursorOffset = new Vector2( UITransform.position.x, UITransform.position.y ) - new Vector2( Input.mousePosition.x, Input.mousePosition.y );
+            _isDragging = true;
 
             base.OnPointerDown( eventData );
         }
@@ -43,7 +43,7 @@ namespace KatnisssSpaceSimulator.Assets.UI.Windows
                 return;
             }
 
-            isDragging = false;
+            _isDragging = false;
 
             base.OnPointerUp( eventData );
         }

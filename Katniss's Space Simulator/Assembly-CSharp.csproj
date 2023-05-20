@@ -101,7 +101,7 @@
     <Compile Include="Assets\Core\Vessel.Serialization.cs" />
     <Compile Include="Assets\UI\AltitudeReadoutUI.cs" />
     <Compile Include="Assets\Core\CoordinateUtils.cs" />
-    <Compile Include="Assets\Core\Physics\PhysicsUtils.cs" />
+    <Compile Include="Assets\Core\Physics\GravityUtils.cs" />
     <Compile Include="Assets\_UnityEngine\Direction2D.cs" />
     <Compile Include="Assets\Core\ReferenceFrames\RootObjectTransform.cs" />
     <Compile Include="Assets\Buildings\LaunchSite.cs" />

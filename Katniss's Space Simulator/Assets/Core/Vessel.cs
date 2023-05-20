@@ -164,7 +164,7 @@ namespace KatnisssSpaceSimulator.Core
         {
             SetPhysicsObjectParameters();
 
-            Vector3Dbl airfGravityForce = PhysicsUtils.GetGravityForce( PhysicsObject.Mass, this.AIRFPosition ); // Move airfposition to PhysicsObject maybe?
+            Vector3Dbl airfGravityForce = GravityUtils.GetGravityForce( PhysicsObject.Mass, this.AIRFPosition ); // Move airfposition to PhysicsObject maybe?
 
             PhysicsObject.AddForce( (Vector3)airfGravityForce );
 

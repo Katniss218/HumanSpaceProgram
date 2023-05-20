@@ -106,22 +106,8 @@ namespace KatnisssSpaceSimulator.Functionalities
 
             Contents.Add( Outflow, -Time.fixedDeltaTime );
             Contents.Add( Inflow, Time.fixedDeltaTime );
-            // TODO - update the mass too, because the fluid weighs something.
+            // TODO - update the mass of the part (if applicable) too, because the fluid weighs something.
         }
-
-        // flow between containers depends on many factors.
-        // - acceleration on the container (ullage, only for liquids)
-        // - pressure difference across the containers (both liquids and gasses).
-        // - for mixed liquid + gas, gas will tend to accumulate on the opposite side to the liquid.
-        // - for mixed liquid the densest will accumulate at the bottom.
-        // - for mixed solid (gravel-like), orientation depends on where and when the resources came from. They don't tend to separate into layers based on density, unlike liquids and gasses.
-
-        // - ullage purposes assume spherical tank??? maybe?
-        //   - the orientation of the inlet could determine where on the sphere it is.
-
-        // tanks could have an arbitrary number of connections depending on where the player puts the pipes?
-
-        // the connections would be set up in the VAB / by the save loader.
 
         public JToken Save()
         {
@@ -142,18 +128,18 @@ namespace KatnisssSpaceSimulator.Functionalities
             //this.ConnectedTo = new FBulkContainer[] { }; // temp
         }
 
-
         /// <summary>
         /// Calculates the height of a truncated unit sphere with the given volume as a [0..1] percentage of the unit sphere's volume.
         /// </summary>
         /// <returns>Value between 0 and 2.</returns>
         public static float SolveHeightOfTruncatedSphere( float volumePercent )
         {
+            // https://math.stackexchange.com/questions/2364343/height-of-a-spherical-cap-from-volume-and-radius
+
             if( volumePercent > 1.0f )
                 return 2.0f;
             if( volumePercent < 0.0f )
                 return 0.0f;
-            // https://math.stackexchange.com/questions/2364343/height-of-a-spherical-cap-from-volume-and-radius
 
             const float UnitSphereVolume = 4.18879020479f; // 4/3 * pi     -- radius=1
             const float TwoPi = 6.28318530718f;            // 2 * pi       -- radius=1
@@ -166,6 +152,5 @@ namespace KatnisssSpaceSimulator.Functionalities
             float height = Sqrt3 * Mathf.Sin( OneThirdArccosA ) - Mathf.Cos( OneThirdArccosA ) + 1.0f;
             return height;
         }
-
     }
 }

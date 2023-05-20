@@ -228,7 +228,7 @@ namespace KatnisssSpaceSimulator.Functionalities
             }
 
             Part part = this.GetComponent<Part>();
-            Vector3Dbl airfAcceleration = PhysicsUtils.GetGravityAcceleration( part.Vessel.AIRFPosition );
+            Vector3Dbl airfAcceleration = GravityUtils.GetGravityAcceleration( part.Vessel.AIRFPosition );
             Vector3 sceneAcceleration = SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformVector( (Vector3)airfAcceleration );
             Vector3 vesselAcceleration = part.Vessel.PhysicsObject.Acceleration;
 

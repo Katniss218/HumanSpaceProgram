@@ -62,6 +62,7 @@ namespace KatnisssSpaceSimulator.Terrain
                 _activeQuads.Add( face );
             }
         }
+#warning TODO - L0 needs to be meshed at startup.
 
         List<LODQuad> _activeQuads = new List<LODQuad>();
 

@@ -141,7 +141,7 @@ namespace KatnisssSpaceSimulator.UILib
         /// Doesn't include a scrollbar, doesn't include any layout for the content.
         /// </remarks>
         /// <returns>The gameobject that will contain the contents.</returns>
-        public static GameObject AddScrollRect( GameObject obj, bool horizontal, bool vertical )
+        public static GameObject AddScrollRect( GameObject obj, float vertSize, bool horizontal, bool vertical )
         {
             GameObject items = UIHelper.UIFill( obj.transform, "items" );
 
@@ -151,7 +151,7 @@ namespace KatnisssSpaceSimulator.UILib
             Mask mask = viewport.AddComponent<Mask>();
             mask.showMaskGraphic = false;
 
-            GameObject content = UIHelper.UI( viewport.transform, "content", new Vector2( 0.0f, 1.0f ), new Vector2( 1, 1 ), Vector2.zero, new Vector2( 0.0f, 280.0f ) );
+            GameObject content = UIHelper.UI( viewport.transform, "content", new Vector2( 0.0f, 1.0f ), new Vector2( 1, 1 ), Vector2.zero, new Vector2( 0.0f, vertSize ) );
 
             ScrollRect scrollRect = items.AddComponent<ScrollRect>();
             scrollRect.content = (RectTransform)content.transform;

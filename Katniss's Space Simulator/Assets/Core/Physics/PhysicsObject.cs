@@ -19,8 +19,6 @@ namespace KatnisssSpaceSimulator.Core.Physics
     [RequireComponent( typeof( RootObjectTransform ) )] // IMPORTANT: Changing the order here changes the order in which Awake() fires (setting the position of objects in the first frame depends on the fact that RB is added before root transform).
     public class PhysicsObject : MonoBehaviour
     {
-        // this class is basically either a celestial body of some kind, or a vessel. Something that moves on its own and is not parented to anything else.
-
         /// <summary>
         /// Gets or sets the physics object's mass in [kg].
         /// </summary>
@@ -57,16 +55,24 @@ namespace KatnisssSpaceSimulator.Core.Physics
             set => this._rb.angularVelocity = value;
         }
 
+        /// <summary>
+        /// Gets the acceleration that this physics object is under at this instant.
+        /// </summary>
         public Vector3 Acceleration { get; private set; }
+
+        /// <summary>
+        /// Gets the angular acceleration that this physics object is under at this instant.
+        /// </summary>
         public Vector3 AngularAcceleration { get; private set; }
+
         Vector3 _oldVelocity;
         Vector3 _oldAngularVelocity;
 
-        Rigidbody _rb;
-        RootObjectTransform _rootTransform;
-
         Vector3 _accSum = Vector3.zero;
         Vector3 _angularAccSum = Vector3.zero;
+
+        Rigidbody _rb;
+        RootObjectTransform _rootTransform;
 
         /// <summary>
         /// Adds a force acting on the center of mass of the physics object. Does not apply any torque.
@@ -107,6 +113,11 @@ namespace KatnisssSpaceSimulator.Core.Physics
         [field: SerializeField]
         bool _isColliding;
 
+#warning TODO - force accumulating system will break, if something depends on the calculated acceleration before the acceleration has finished accumulating (exec order).
+
+        // If the object is colliding, we will use its rigidbody accelerations, because we don't have access to the forces due to collisions.
+        // Otherwise, we use our more precise method that relies on full encapsulation of the rigidbody.
+
         void OnCollisionEnter( Collision collision )
         {
             _isColliding = true;
@@ -119,7 +130,7 @@ namespace KatnisssSpaceSimulator.Core.Physics
 
         void FixedUpdate()
         {
-            // I'm not a fan of the physics being calculated in scene-space, but that's the only way to handle collisions properly.
+            // I'm not a huge fan of the physics being calculated in scene-space, but that's the only way to handle collisions properly.
             this._rootTransform.SetAIRFPosition( SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.transform.position ) );
 
             if( _isColliding )
@@ -132,6 +143,7 @@ namespace KatnisssSpaceSimulator.Core.Physics
                 this.Acceleration = _accSum;
                 this.AngularAcceleration = _angularAccSum;
             }
+
             this._oldVelocity = Velocity;
             this._oldAngularVelocity = AngularVelocity;
             this._accSum = Vector3.zero;

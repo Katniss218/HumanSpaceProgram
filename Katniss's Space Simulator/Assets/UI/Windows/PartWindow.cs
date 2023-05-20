@@ -84,7 +84,7 @@ namespace KatnisssSpaceSimulator.UI.Windows
             WindowRelationHighlight relationHighlight = rootGO.AddComponent<WindowRelationHighlight>();
             relationHighlight.UITransform = (RectTransform)rootGO.transform;
 
-            GameObject scrollRectGO = UIHelper.AddScrollRect( windowContentsGO, false, true );
+            GameObject scrollRectGO = UIHelper.AddScrollRect( windowContentsGO, 100 - 30, false, true );
 
             WindowDrag windowDrag = rootGO.AddComponent<WindowDrag>();
             windowDrag.UITransform = (RectTransform)rootGO.transform;
