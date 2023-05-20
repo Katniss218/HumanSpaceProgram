@@ -1,6 +1,7 @@
 ﻿using KatnisssSpaceSimulator.Core;
 using KatnisssSpaceSimulator.Core.Physics;
 using KatnisssSpaceSimulator.Core.ReferenceFrames;
+using KatnisssSpaceSimulator.Core.ResourceFlowSystem;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,8 @@ namespace KatnisssSpaceSimulator.Functionalities
         [Serializable]
         public class End
         {
-            public FBulkContainer Container;
+            public object O;
+
             public Vector3 Position;
             public Vector3 Forward; // nominally faces into the tank.
         }
@@ -34,6 +36,16 @@ namespace KatnisssSpaceSimulator.Functionalities
         [field: SerializeField]
         public End End2 { get; set; } = new End();
 
+        public End GetEnd( int index )
+        {
+            switch( index )
+            {
+                case 0: return End1;
+                case 1: return End2;
+            }
+            throw new ArgumentOutOfRangeException( $"Index must be 0 or 1" );
+        }
+
         /// <summary>
         /// Cross-sectional area of the connection (pipe) in [m^2].
         /// </summary>
@@ -45,171 +57,139 @@ namespace KatnisssSpaceSimulator.Functionalities
 
         // across the pipe (pipe is 0-width, so inlet and outlet are the same thing).
         [field: SerializeField]
-        float _flowrate = 0;
-        [field: SerializeField]
-        float _velocity = 0;
+        SubstanceStateCollection _flow = null;
 
-        void UpdateContainers( float newFlowrate, float newVelocity )
+        int _cacheInlet;
+        int _cacheOutlet;
+
+        private void UpdateContainers( SubstanceStateCollection newFlow, int inlet, int outlet )
         {
-            // Remove the previous flow.
-            End1.Container.TotalInflow += _flowrate; // remove outflow (add the partial inflow from the other tank).
-            End1.Container.TotalVelocity += End1.Forward * _velocity;
-            End2.Container.TotalInflow -= _flowrate; // remove inflow.
-            End2.Container.TotalVelocity -= End2.Forward * _velocity;
+            var oldFlow = _flow;
 
-            // Add the new flow.
-            End1.Container.TotalInflow -= newFlowrate;
-            End1.Container.TotalVelocity -= End1.Forward * newVelocity;
-            End2.Container.TotalInflow += newFlowrate;
-            End2.Container.TotalVelocity += End2.Forward * newVelocity;
+            if( !SubstanceStateCollection.IsNullOrEmpty( oldFlow ) )
+            {
+                ((IResourceProducer)GetEnd( _cacheInlet ).O).Outflow.Add( oldFlow, -1.0f );
+                ((IResourceConsumer)GetEnd( _cacheOutlet ).O).Inflow.Add( oldFlow, -1.0f );
+            }
 
             // Cache.
-            _flowrate = newFlowrate;
-            _velocity = newVelocity;
+            _flow = newFlow;
+            _cacheInlet = inlet;
+            _cacheOutlet = outlet;
+
+            if( !SubstanceStateCollection.IsNullOrEmpty( newFlow ) )
+            {
+                ((IResourceProducer)GetEnd( inlet ).O).Outflow.Add( newFlow );
+                ((IResourceConsumer)GetEnd( outlet ).O).Inflow.Add( newFlow );
+            }
         }
 
-        public float GetMaximumFlowRate( float velocity )
+        public static (int inlet, int outlet) GetInletAndOutletIndices( float sign )
+        {
+            int inlet = sign < 0 ? 1 : 0;
+            int outlet = sign < 0 ? 0 : 1;
+            return (inlet, outlet);
+        }
+
+        public static float GetVolumetricFlowrate( float area, float velocity )
         {
             // Area in [m^2] * velocity in [m/s] = volumetric flow rate in [m^3/s]
-            return CrossSectionArea * velocity;
+            return area * velocity;
         }
 
-        /// <summary>
-        /// Calculates the height of a truncated unit sphere with the given volume as a [0..1] percentage of the unit sphere's volume.
-        /// </summary>
-        public static float SolveHeightOfTruncatedSphere( float volumePercent )
+        public void FixedUpdate_Flow( Vector3 fluidAccelerationSceneSpace, float deltaTime )
         {
-            // https://math.stackexchange.com/questions/2364343/height-of-a-spherical-cap-from-volume-and-radius
+            const float MIN_AREA = 1e-6f;
+            const float MIN_ACCELERATION = 0.01f;
+            const float MIN_PRESSURE_DIFFERENCE = 0.001f;
 
-            const float UnitSphereVolume = 4.18879020479f; // 4/3 * pi     -- radius=1
-            const float TwoPi = 6.28318530718f;            // 2 * pi       -- radius=1
-            const float Sqrt3 = 1.73205080757f;
-
-            float Volume = UnitSphereVolume * volumePercent;
-
-            float A = 1.0f - ((3.0f * Volume) / TwoPi); // A is a coefficient, [-1..1] for volumePercent in [0..1]
-            float OneThirdArccosA = 0.333333333f * Mathf.Acos( A );
-            float height = Sqrt3 * Mathf.Sin( OneThirdArccosA ) - Mathf.Cos( OneThirdArccosA ) + 1.0f;
-            return height;
-        }
-
-        // in [kg/m^3]
-        const float fluidDensity = 1100.0f;
-
-        public (float end1Pressure, float end2Pressure) GetPressures( Vector3 fluidAccelerationWorldSpace )
-        {
-            // inlets on the surface of unit sphere in [m].
-            Vector3 end1PosUnit = (this.transform.TransformPoint( End1.Position ) - End1.Container.VolumeTransform.position).normalized;
-            Vector3 end2PosUnit = (this.transform.TransformPoint( End2.Position ) - End2.Container.VolumeTransform.position).normalized;
-
-            // fluidAccelerationWorldSpace is the orientation of the fluid column.
-
-            float end1Height = SolveHeightOfTruncatedSphere( End1.Container.Volume / End1.Container.MaxVolume );
-            float end2Height = SolveHeightOfTruncatedSphere( End2.Container.Volume / End2.Container.MaxVolume );
-
-#warning TODO - Use the position of each connection along the acceleration axis to find height. Currently assumes feeding bottom-to-bottom.
-
-#warning TODO - if the tanks are at different heights, and connected at the bottoms (relative to acceleration), the level should ultimately be equal for both.
-            // doesn't really work with the "portal" connection model.
-            // this can be solved by extending the height along the acceleration axis until it reaches the end with the smaller position.
-
-#warning TODO - multiply height by tank dimensions and use its magnitude to get more accurate pressure.
-
-            float end1Pressure = fluidAccelerationWorldSpace.magnitude * fluidDensity * end1Height;
-            float end2Pressure = fluidAccelerationWorldSpace.magnitude * fluidDensity * end2Height;
-
-            // in [Pa]
-            return (end1Pressure, end2Pressure);
-        }
-
-        public (float flowrate, float velocity) CalculateFlowRate( Vector3 fluidAccelerationRelativeToContainer, float deltaTime )
-        {
-            if( CrossSectionArea <= 1e-6f )
+            if( CrossSectionArea <= MIN_AREA )
             {
-                return (0.0f, 0.0f);
+                UpdateContainers( SubstanceStateCollection.Empty, _cacheInlet, _cacheOutlet );
+                return;
             }
-            if( fluidAccelerationRelativeToContainer.magnitude < 0.001f )
+            if( fluidAccelerationSceneSpace.magnitude < MIN_ACCELERATION )
             {
-                return (0.0f, 0.0f);
+                UpdateContainers( SubstanceStateCollection.Empty, _cacheInlet, _cacheOutlet );
+                return;
             }
 
-            // In [Pa]
-            (float end1Pressure, float end2Pressure) = GetPressures( fluidAccelerationRelativeToContainer );
+#warning  TODO - for actual flow, we need pressure at the bottom for both, whichever is lower.
+            // Imagine that tanks are connected.
+            // The tanks should equalize in such a way that the pressure in both should be the same when both samples' position along the acceleration direction is the same.
+            // - only valid if the pressure at both ends is greater than 0.
+
+            // we can achieve that by increasing the height of the fluid column in the inlet tank so that it matches the outlet when projected along the acceleration direction.
+
+            FluidState[] endSamples = new FluidState[2];
+
+            if( End1.O is IResourceConsumer c1 )
+            {
+                endSamples[0] = c1.Sample( End1.Position, c1.transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea );
+            }
+            else if( End1.O is IResourceProducer p1 )
+            {
+                endSamples[0] = p1.Sample( End1.Position, p1.transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea );
+            }
+            if( End2.O is IResourceConsumer c2 )
+            {
+                endSamples[1] = c2.Sample( End2.Position, c2.transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea );
+            }
+            else if( End2.O is IResourceProducer p2 )
+            {
+                endSamples[1] = p2.Sample( End2.Position, p2.transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea );
+            }
 
             // In [Pa] ([N/m^2]). Positive flows towards End2, negative flows towards End1, zero doesn't flow.
-            float relativePressure = end1Pressure - end2Pressure;
+            float relativePressure = endSamples[0].Pressure - endSamples[1].Pressure;
             float relativePressureMagnitude = Mathf.Abs( relativePressure );
 
-            float newSignedVelocity = Mathf.Sign(relativePressure) * Mathf.Sqrt( 2 * relativePressureMagnitude / fluidDensity ); // _velocity + flowAcceleration;
-            float newVelocityMagnitude = Mathf.Abs( newSignedVelocity );
-
-            if( newVelocityMagnitude < 0.001f ) // skip calculating in freefall. Later, we can do rebound and stuff.
+            if( relativePressureMagnitude < MIN_PRESSURE_DIFFERENCE )
             {
-                return (0.0f, 0.0f);
+                UpdateContainers( SubstanceStateCollection.Empty, _cacheInlet, _cacheOutlet );
+                return;
             }
 
-            End inlet = relativePressure < 0 ? End2 : End1;
-            End outlet = relativePressure < 0 ? End1 : End2;
+            (int inlet, int outlet) = GetInletAndOutletIndices( relativePressure );
 
-            newSignedVelocity *= 0.95f; // friction.
+            End inletEnd = this.GetEnd( inlet );
+            End outletEnd = this.GetEnd( outlet );
 
-            // Flow rate actually depends on velocity of the fluid.
-            float newMaximumFlowrate = Mathf.Abs( GetMaximumFlowRate( newSignedVelocity ) );
+            IResourceProducer inletProducer = inletEnd.O as IResourceProducer; // inlet must have a producer, to produce the flow.
+            IResourceConsumer outletConsumer = outletEnd.O as IResourceConsumer; // outlet must have a consumer, to consume the flow.
+            if( inletProducer == null || outletConsumer == null ) // fluid can't flow.
+            {
+                UpdateContainers( SubstanceStateCollection.Empty, _cacheInlet, _cacheOutlet );
+                return;
+            }
 
-            // Clamp based on how much can flow out of the inlet, and into the outlet.
-            // Division by delta-time is because the removed/added volume will be multiplied by it later.
-            float inletVolumeDt = inlet.Container.Volume / deltaTime;
-            float outletRemainingVolumeDt = (outlet.Container.MaxVolume - outlet.Container.Volume) / deltaTime;
+            (SubstanceStateCollection flow, _) = inletProducer.SampleFlow( inletEnd.Position, inletProducer.transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea, endSamples[outlet] );
 
-            // Need to clamp the flow rate based on the inlet and outlet conditions.
-            float inletAvailableFlowrate = (inletVolumeDt > newMaximumFlowrate) // unsigned
-                ? newMaximumFlowrate
-                : inletVolumeDt;
+            outletConsumer.ClampIn( flow );
 
-#warning TODO - needs to be split evenly across all of the outlets flowing into the given tank, to stop oscillations. Also, conserve the volumes.
-            // also, even with one outlet and constant deltatime, this somehow overshoots the maximum volume.
-
-            float outletAvailableFlowrate = (outletRemainingVolumeDt > newMaximumFlowrate) // unsigned
-                ? newMaximumFlowrate
-                : outletRemainingVolumeDt;
-
-            inletAvailableFlowrate = Mathf.Max( 0.0f, inletAvailableFlowrate );
-            outletAvailableFlowrate = Mathf.Max( 0.0f, outletAvailableFlowrate );
-
-            float newFlowrate = Mathf.Min( newMaximumFlowrate, inletAvailableFlowrate, outletAvailableFlowrate );
-
-            float newSignedFlowrate = Mathf.Sign( relativePressure ) * newFlowrate;
-
-            // Use the clamped flow rate to calculate clamped velocity, to keep it in sync.
-            newSignedVelocity = newSignedFlowrate / CrossSectionArea;
-
-            return (newSignedFlowrate, newSignedVelocity);
+            UpdateContainers( flow, inlet, outlet );
         }
 
         void FixedUpdate()
         {
-            Contract.Assert( End1 != null, "Both ends must be set." );
-            Contract.Assert( End2 != null, "Both ends must be set." );
-            // reset the tanks' inflow from last frame (subtract what was set previously, so we don't have to zero it out, and update anything in any particular order).
-            // as long as the order of scripts (container and connection) is consistent throughout the frames.
-
-
-            // since flow sign is `towards end2`, we should calculate the dot between acceleration and direction from end1 to end2.
+            if( End1 == null || End2 == null )
+            {
+                throw new InvalidOperationException( $"Both ends must exist" );
+            }
 
             const double PlaceholderMass = 8;
 
             Part part = this.GetComponent<Part>();
             Vector3Dbl airfGravityForce = PhysicsUtils.GetGravityForce( PlaceholderMass, part.Vessel.AIRFPosition ); // Move airfposition to PhysicsObject maybe?
             Vector3Dbl airfAcceleration = airfGravityForce / PlaceholderMass;
-            Vector3 sceneAcceleration = SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformDirection( (Vector3)airfAcceleration );
+            Vector3 sceneAcceleration = SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformVector( (Vector3)airfAcceleration );
             Vector3 vesselAcceleration = part.Vessel.PhysicsObject.Acceleration;
             // acceleration due to external forces (gravity) minus the acceleration of the vessel.
             sceneAcceleration -= vesselAcceleration;
 #warning TODO - add angular acceleration to the mix.
 
-            (float newFlowrate, float newVelocity) = CalculateFlowRate( sceneAcceleration, Time.fixedDeltaTime );
+            FixedUpdate_Flow( sceneAcceleration, Time.fixedDeltaTime );
 
-            UpdateContainers( newFlowrate, newVelocity );
         }
 
         public override void Load( JToken data )
