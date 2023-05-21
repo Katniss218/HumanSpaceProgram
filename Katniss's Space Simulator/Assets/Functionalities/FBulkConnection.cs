@@ -104,8 +104,12 @@ namespace KatnisssSpaceSimulator.Functionalities
             throw new ArgumentOutOfRangeException( $"Index must be 0 or 1" );
         }
 
-        private void SetFlowAcrossConnection( SubstanceStateCollection newFlow, int inlet, int outlet )
+        private void ResetFlowAcrossConnection()
         {
+            if( _cacheFlow == null )
+                return; // do not throw here without guarding for the first update, which will try reset a flow that's not flowing, before setting it to something.
+                        // Possibly fixable by initializing cacheflow to empty instead of null, but then we also need to make sure that it's not left unset by some return-guard.
+
             var oldFlow = _cacheFlow;
 
             if( !SubstanceStateCollection.IsNullOrEmpty( oldFlow ) )
@@ -115,6 +119,15 @@ namespace KatnisssSpaceSimulator.Functionalities
                 inletP.Outflow.Add( oldFlow, -1.0f );
                 outletC.Inflow.Add( oldFlow, -1.0f );
             }
+
+            // Cache.
+            _cacheFlow = null;
+        }
+
+        private void SetFlowAcrossConnection( SubstanceStateCollection newFlow, int inlet, int outlet )
+        {
+            if( _cacheFlow != null )
+                throw new InvalidOperationException( $"Can't set flow that's not been reset" );
 
             // Cache.
             _cacheFlow = newFlow;
@@ -145,18 +158,20 @@ namespace KatnisssSpaceSimulator.Functionalities
 
         public void FixedUpdate_Flow( Vector3 fluidAccelerationSceneSpace )
         {
+            ResetFlowAcrossConnection();
+
             const float MIN_AREA = 1e-6f;
             const float MIN_ACCELERATION = 0.01f;
             const float MIN_PRESSURE_DIFFERENCE = 0.001f;
 
             if( CrossSectionArea <= MIN_AREA )
             {
-                SetFlowAcrossConnection( SubstanceStateCollection.Empty, _cacheInlet, _cacheOutlet );
+                //SetFlowAcrossConnection( SubstanceStateCollection.Empty, _cacheInlet, _cacheOutlet );
                 return;
             }
             if( fluidAccelerationSceneSpace.magnitude < MIN_ACCELERATION )
             {
-                SetFlowAcrossConnection( SubstanceStateCollection.Empty, _cacheInlet, _cacheOutlet );
+                //SetFlowAcrossConnection( SubstanceStateCollection.Empty, _cacheInlet, _cacheOutlet );
                 return;
             }
 
@@ -197,7 +212,7 @@ namespace KatnisssSpaceSimulator.Functionalities
 
             if( Mathf.Abs( signedRelativePressure ) < MIN_PRESSURE_DIFFERENCE )
             {
-                SetFlowAcrossConnection( SubstanceStateCollection.Empty, _cacheInlet, _cacheOutlet );
+                //SetFlowAcrossConnection( SubstanceStateCollection.Empty, _cacheInlet, _cacheOutlet );
                 return;
             }
 
@@ -209,13 +224,12 @@ namespace KatnisssSpaceSimulator.Functionalities
             IResourceConsumer outletConsumer = endC[outlet]; // outlet must have a consumer, to consume the flow.
             if( inletProducer == null || outletConsumer == null ) // fluid can't flow.
             {
-                SetFlowAcrossConnection( SubstanceStateCollection.Empty, _cacheInlet, _cacheOutlet );
+                //SetFlowAcrossConnection( SubstanceStateCollection.Empty, _cacheInlet, _cacheOutlet );
                 return;
             }
 
-            (SubstanceStateCollection flow, var f) = inletProducer.SampleFlow( inletEnd.Position, inletProducer.transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea, Time.fixedDeltaTime, endSamples[outlet] );
+            (SubstanceStateCollection flow, _) = inletProducer.SampleFlow( inletEnd.Position, inletProducer.transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea, Time.fixedDeltaTime, endSamples[outlet] );
 
-            Debug.Log( f.Velocity );
             outletConsumer.ClampIn( flow, Time.fixedDeltaTime );
 
             SetFlowAcrossConnection( flow, inlet, outlet );

@@ -94,6 +94,7 @@
     <Compile Include="Assets\Core\ReferenceFrames\ReferenceFrameUtils.cs" />
     <Compile Include="Assets\Functionalities\FBulkContainer_Sphere.cs" />
     <Compile Include="Assets\Core\ReferenceFrames\IReferenceFrameSwitchResponder.cs" />
+    <Compile Include="Assets\Functionalities\FBulkConnection.cs" />
     <Compile Include="Assets\Core\IIdentifiable.cs" />
     <Compile Include="Assets\Core\ResourceFlowSystem\SubstanceState.cs" />
     <Compile Include="Assets\Core\CelestialBodySurface.cs" />
@@ -115,12 +116,12 @@
     <Compile Include="Assets\Functionalities\FActuatorXY.cs" />
     <Compile Include="Assets\TimeWarp\TimeWarpManager.cs" />
     <Compile Include="Assets\Core\ReferenceFrames\IReferenceFrame.cs" />
+    <Compile Include="Assets\Core\ResourceFlowSystem\FlowUtils.cs" />
     <Compile Include="Assets\Terrain\LODQuadTree_NodeUtils.cs" />
+    <Compile Include="Assets\UI\AccelerationReadoutUI.cs" />
     <Compile Include="Assets\Core\Serialization\DummyPartSource.cs" />
     <Compile Include="Assets\Core\ResourceFlowSystem\SubstanceStateCollection.cs" />
-    <Compile Include="Assets\UI\AccelerationReadoutUI.cs" />
-    <Compile Include="Assets\Functionalities\FBulkConnection.cs" />
-    <Compile Include="Assets\Core\ResourceFlowSystem\FlowUtils.cs" />
+    <Compile Include="Assets\Core\IMassCallback.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro.cginc" />

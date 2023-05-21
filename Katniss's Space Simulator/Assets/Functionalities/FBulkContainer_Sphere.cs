@@ -11,7 +11,6 @@ using UnityEngine;
 
 namespace KatnisssSpaceSimulator.Functionalities
 {
-
     /// <summary>
     /// A container for a <see cref="Substance"/>.
     /// </summary>
@@ -29,6 +28,9 @@ namespace KatnisssSpaceSimulator.Functionalities
         [field: SerializeField]
         public float MaxVolume { get; set; }
 
+        /// <summary>
+        /// The physical interior radius of the spherical container. Used for inlet/outlet pressure calculations only.
+        /// </summary>
         [field: SerializeField]
         public float Radius { get; set; }
 
@@ -104,12 +106,30 @@ namespace KatnisssSpaceSimulator.Functionalities
             return (flow, new FluidState( relativePressure, state.Temperature, newSignedVelocity ));
         }
 
+        IMassCallback[] _massComponents;
+
+        void Start()
+        {
+            _massComponents = this.GetComponents<IMassCallback>();
+
+            foreach( var mc in _massComponents )
+            {
+                mc.Mass += Contents.GetMass();
+            }
+        }
+
         void FixedUpdate()
         {
             Contract.Assert( Contents != null, $"[{nameof( FBulkContainer_Sphere )}.{nameof( Sample )}] '{nameof( Contents )}' can't be null." );
 
             Contents.Add( Outflow, -Time.fixedDeltaTime );
             Contents.Add( Inflow, Time.fixedDeltaTime );
+
+            foreach( var mc in _massComponents )
+            {
+                mc.Mass -= Outflow.GetMass() * Time.fixedDeltaTime;
+                mc.Mass += Inflow.GetMass() * Time.fixedDeltaTime;
+            }
             // TODO - update the mass of the part (if applicable) too, because the fluid weighs something.
         }
 

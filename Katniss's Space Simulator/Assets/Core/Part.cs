@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace KatnisssSpaceSimulator.Core
 {
-    public sealed partial class Part : MonoBehaviour
+    public sealed partial class Part : MonoBehaviour, IMassCallback
     {
         [field: SerializeField]
         public Vessel Vessel { get; private set; }

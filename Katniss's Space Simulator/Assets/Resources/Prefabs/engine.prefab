@@ -50,7 +50,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Vessel>k__BackingField: {fileID: 0}
   _displayName: engine
-  <Mass>k__BackingField: 1
+  <Mass>k__BackingField: 100
   <Parent>k__BackingField: {fileID: 0}
   <Children>k__BackingField: []
 --- !u!114 &7246255787398604706
@@ -65,7 +65,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a461ed77f23e8a4ab833297f99f6686, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <MaxThrust>k__BackingField: 1000
+  <MaxThrust>k__BackingField: 223000
   <Isp>k__BackingField: 300
   <Throttle>k__BackingField: 0
   <ThrustTransform>k__BackingField: {fileID: 2836283960901704833}

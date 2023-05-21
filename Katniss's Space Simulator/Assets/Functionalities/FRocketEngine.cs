@@ -14,6 +14,10 @@ namespace KatnisssSpaceSimulator.Functionalities
     [Serializable]
     public class FRocketEngine : MonoBehaviour, IResourceConsumer
     {
+        const float ISP_TO_EXVEL = 9.80665f;
+
+        float _currentThrust;
+
         /// <summary>
         /// The maximum thrust of the engine, in [N].
         /// </summary>
@@ -29,7 +33,7 @@ namespace KatnisssSpaceSimulator.Functionalities
         /// <summary>
         /// Maximum mass flow (at max thrust), in [kg/s]
         /// </summary>
-        public float MaxMassFlow => MaxThrust * 9.80665f / Isp;
+        public float MaxMassFlow => MaxThrust / (Isp * ISP_TO_EXVEL);
 
         [field: SerializeField]
         public float Throttle { get; set; }
@@ -50,7 +54,7 @@ namespace KatnisssSpaceSimulator.Functionalities
         /// </summary>
         public float GetThrust( float massFlow )
         {
-            return massFlow * this.Isp * Throttle;
+            return (this.Isp * ISP_TO_EXVEL) * massFlow * Throttle;
         }
 
         /*[ControlIn( "set.throttle", "Set Throttle" )]
@@ -79,10 +83,12 @@ namespace KatnisssSpaceSimulator.Functionalities
 
         void FixedUpdate()
         {
+            float thrust = GetThrust( Inflow.GetMass() );
             if( this.Throttle > 0.0f )
             {
-                this._part.Vessel.PhysicsObject.AddForceAtPosition( this.ThrustTransform.forward * GetThrust( Inflow.GetMass() ), this.ThrustTransform.position );
+                this._part.Vessel.PhysicsObject.AddForceAtPosition( this.ThrustTransform.forward * thrust, this.ThrustTransform.position );
             }
+            _currentThrust = thrust;
         }
 
         public void ClampIn( SubstanceStateCollection inflow, float dt )

@@ -7,41 +7,99 @@ using UnityEngine;
 
 namespace KatnisssSpaceSimulator.Core.Managers
 {
+    /// <summary>
+    /// Manages the speed at which the time flows.
+    /// </summary>
     public class TimeWarpManager : MonoBehaviour
     {
         public struct TimeScaleChangedData
         {
+            /// <summary>
+            /// The old timescale (before it was updated).
+            /// </summary>
             public float Old { get; set; }
+            /// <summary>
+            /// The new timescale (after it was updated).
+            /// </summary>
             public float New { get; set; }
+        }
+
+        static float _maxTimeScale = 128.0f; // VS is being dumb, it is read inside GetMaxTimescale() (but only when running outside of unity editor).
+
+        /// <summary>
+        /// Gets the current maximum timescale.
+        /// </summary>
+        public static float GetMaxTimescale()
+        {
+#if UNITY_EDITOR
+            return 100f;
+#else
+            return _maxTimeScale;
+#endif
+        }
+
+        /// <summary>
+        /// Sets the current maximum timescale.
+        /// </summary>
+        public static void SetMaxTimeScale( float value )
+        {
+#if UNITY_EDITOR
+            if( value > 100f )
+            {
+                Debug.LogWarning( $"Inside Unity Editor, timescale can be at most 100 :(." );
+                value = 100f;
+            }
+#endif
+            _maxTimeScale = value;
         }
 
         private static float _timeScale;
 
+        /// <summary>
+        /// Checks if the game is currently paused.
+        /// </summary>
         public static bool IsPaused { get => _timeScale == 0.0f; }
 
+        /// <summary>
+        /// Invoked when the timescale is changed by the <see cref="TimeWarpManager"/>.
+        /// </summary>
         public static event Action<TimeScaleChangedData> OnTimescaleChanged;
 
+        /// <summary>
+        /// Pauses the game, sets the timescale to 0.
+        /// </summary>
         public static void Pause()
         {
             SetTimeScale( 0.0f );
         }
 
+        /// <summary>
+        /// Gets the current value of the timescale.
+        /// </summary>
+        public static float GetTimeScale()
+        {
+            return _timeScale;
+        }
+
+        /// <summary>
+        /// Sets the timescale to the specified value.
+        /// </summary>
         public static void SetTimeScale( float timeScale )
         {
             if( timeScale < 0 )
             {
-                throw new ArgumentOutOfRangeException( nameof( timeScale ), "Time scale must be nonnegative." );
+                throw new ArgumentOutOfRangeException( nameof( timeScale ), $"Timescale must be greater or equal to 0." );
+            }
+            float max = GetMaxTimescale();
+            if( timeScale > max )
+            {
+                throw new ArgumentOutOfRangeException( nameof( timeScale ), $"Timescale must be smaller or equal to maximum timescale (currently {max})." );
             }
 
             float oldTimeScale = _timeScale;
             _timeScale = timeScale;
             Time.timeScale = timeScale;
             OnTimescaleChanged?.Invoke( new TimeScaleChangedData() { Old = oldTimeScale, New = timeScale } );
-        }
-
-        public static float GetTimeScale()
-        {
-            return _timeScale;
         }
 
         void Start()
@@ -55,16 +113,19 @@ namespace KatnisssSpaceSimulator.Core.Managers
             {
                 if( IsPaused )
                 {
-                    SetTimeScale( 1 );
+                    SetTimeScale( 1f );
                     return;
                 }
-                if( _timeScale >= 16 )
+                float newscale = _timeScale * 2f;
+
+                if( newscale > GetMaxTimescale() )
                     return;
-                SetTimeScale( _timeScale * 2f );
+                SetTimeScale( newscale );
             }
+
             if( Input.GetKeyDown( KeyCode.Comma ) )
             {
-                if( _timeScale <= 1 )
+                if( _timeScale <= 1f )
                     Pause();
                 else
                     SetTimeScale( _timeScale / 2f );

@@ -138,7 +138,7 @@ namespace KatnisssSpaceSimulator.Camera
             // after modifying position/rotation/zoom.
             PreventViewFrustumException();
 
-            if( ReferenceObject != null )
+            if( ReferenceObject != null ) // Raycasts using rays from the camera fail when the vessel is moving fast, but updating the camera earlier as well as later doesn't fix it.
             {
                 this.transform.position = ReferenceObject.transform.position;
             }

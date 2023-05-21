@@ -216,7 +216,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Vessel>k__BackingField: {fileID: 0}
   _displayName: intertank
-  <Mass>k__BackingField: 1
+  <Mass>k__BackingField: 50
   <Parent>k__BackingField: {fileID: 0}
   <Children>k__BackingField: []
 --- !u!65 &8804909419040182457

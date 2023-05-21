@@ -146,7 +146,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Vessel>k__BackingField: {fileID: 0}
   _displayName: tank (long)
-  <Mass>k__BackingField: 1
+  <Mass>k__BackingField: 100
   <Parent>k__BackingField: {fileID: 0}
   <Children>k__BackingField: []
 --- !u!114 &647930471848486042

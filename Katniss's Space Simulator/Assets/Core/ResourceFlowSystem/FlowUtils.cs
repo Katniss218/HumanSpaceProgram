@@ -82,10 +82,10 @@ namespace KatnisssSpaceSimulator.Core.ResourceFlowSystem
         /// <remarks>
         /// Mass flow-limited system.
         /// </remarks>
-        public static void ClampMaxMassFlow( SubstanceStateCollection inflow, float mass, float maxMass )
+        public static void ClampMaxMassFlow( SubstanceStateCollection inflow, float massFlow, float maxMassFlow )
         {
             float inflowMass = inflow.GetMass();
-            float remainingMass = maxMass - mass;
+            float remainingMass = maxMassFlow - massFlow;
 
             if( inflowMass > remainingMass )
             {

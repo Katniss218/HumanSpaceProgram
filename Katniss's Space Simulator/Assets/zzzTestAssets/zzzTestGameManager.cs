@@ -108,7 +108,7 @@ namespace KatnisssSpaceSimulator
 
             const float DENSITY = 1000f;
 
-            var tankTank = tankL1.GetComponent<FBulkContainer_Sphere>();
+            var tankTank = tankP.GetComponent<FBulkContainer_Sphere>();
             tankTank.Contents = new SubstanceStateCollection(
                 new SubstanceState[] { new SubstanceState( tankTank.MaxVolume * DENSITY, new Substance() { Density = DENSITY, DisplayName = "aa", ID = "substance.aa" } ) } );
 
@@ -117,7 +117,7 @@ namespace KatnisssSpaceSimulator
             conn2.End1.Position = new Vector3( 0.0f, -1.5f, 0.0f );
             conn2.End2.ConnectTo( engineP.GetComponent<FRocketEngine>() );
             conn2.End2.Position = new Vector3( 0.0f, 0.0f, 0.0f );
-            conn2.CrossSectionArea = 15f;
+            conn2.CrossSectionArea = 60f;
 
             //FindObjectOfType<IResourceContainerUI>().Obj = tankL1.GetComponent<FBulkContainer_Sphere>();
 
