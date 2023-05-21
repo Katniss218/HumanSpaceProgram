@@ -159,6 +159,9 @@ namespace KatnisssSpaceSimulator.Core
             partToSplit.Parent = null;
             oldv.RecalculateParts();
 
+#warning TODO - copy velocity and stuff.
+#warning TODO - position is incorrectly set.
+
             // Create the new vessel and add the parts to it.
             Vessel v = new VesselFactory().CreatePartless( partToSplit.transform.position, partToSplit.transform.rotation );
             SetVesselHierarchy( partToSplit, v );

@@ -104,7 +104,7 @@ namespace KatnisssSpaceSimulator.Functionalities
             throw new ArgumentOutOfRangeException( $"Index must be 0 or 1" );
         }
 
-        private void ResetFlowAcrossConnection()
+        private void TryResetFlowAcrossConnection()
         {
             if( _cacheFlow == null )
                 return; // do not throw here without guarding for the first update, which will try reset a flow that's not flowing, before setting it to something.
@@ -158,7 +158,8 @@ namespace KatnisssSpaceSimulator.Functionalities
 
         public void FixedUpdate_Flow( Vector3 fluidAccelerationSceneSpace )
         {
-            ResetFlowAcrossConnection();
+            // this is important. remove the current flow before calculating the new one, like done here, because restrictions on flow may apply, and they don't know that this flow is already flowing.
+            TryResetFlowAcrossConnection();
 
             const float MIN_AREA = 1e-6f;
             const float MIN_ACCELERATION = 0.01f;
@@ -166,12 +167,10 @@ namespace KatnisssSpaceSimulator.Functionalities
 
             if( CrossSectionArea <= MIN_AREA )
             {
-                //SetFlowAcrossConnection( SubstanceStateCollection.Empty, _cacheInlet, _cacheOutlet );
                 return;
             }
             if( fluidAccelerationSceneSpace.magnitude < MIN_ACCELERATION )
             {
-                //SetFlowAcrossConnection( SubstanceStateCollection.Empty, _cacheInlet, _cacheOutlet );
                 return;
             }
 
@@ -212,7 +211,6 @@ namespace KatnisssSpaceSimulator.Functionalities
 
             if( Mathf.Abs( signedRelativePressure ) < MIN_PRESSURE_DIFFERENCE )
             {
-                //SetFlowAcrossConnection( SubstanceStateCollection.Empty, _cacheInlet, _cacheOutlet );
                 return;
             }
 
@@ -224,7 +222,6 @@ namespace KatnisssSpaceSimulator.Functionalities
             IResourceConsumer outletConsumer = endC[outlet]; // outlet must have a consumer, to consume the flow.
             if( inletProducer == null || outletConsumer == null ) // fluid can't flow.
             {
-                //SetFlowAcrossConnection( SubstanceStateCollection.Empty, _cacheInlet, _cacheOutlet );
                 return;
             }
 

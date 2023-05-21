@@ -122,6 +122,7 @@
     <Compile Include="Assets\Core\Serialization\DummyPartSource.cs" />
     <Compile Include="Assets\Core\ResourceFlowSystem\SubstanceStateCollection.cs" />
     <Compile Include="Assets\Core\IMassCallback.cs" />
+    <Compile Include="Assets\Functionalities\FVesselSeparator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro.cginc" />
