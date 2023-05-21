@@ -18,7 +18,7 @@ namespace KatnisssSpaceSimulator.Core.ResourceFlowSystem
         /// <summary>
         /// Get or set the total outflow per 1 [s].
         /// </summary>
-        SubstanceStateCollection Outflow { get; set; }
+        SubstanceStateCollection Outflow { get; }
 
         /// <summary>
         /// Calculates the pressure acting at any given point inside the container, as well as what species will want to `flow` out of the container.
@@ -36,6 +36,6 @@ namespace KatnisssSpaceSimulator.Core.ResourceFlowSystem
         /// </summary>
         /// <param name="opposingPressure"></param>
         /// <returns>A new <see cref="SubstanceStateCollection"/> object containing the resources that can flow out in 1 [s].</returns>
-        (SubstanceStateCollection, FluidState) SampleFlow( Vector3 localPosition, Vector3 localAcceleration, float holeArea, FluidState opposingFluid );
+        (SubstanceStateCollection, FluidState) SampleFlow( Vector3 localPosition, Vector3 localAcceleration, float holeArea, float dt, FluidState opposingFluid );
     }
 }

@@ -8,14 +8,14 @@ using UnityEngine;
 
 namespace KatnisssSpaceSimulator.UI
 {
-    public class VelocityReadoutUI : MonoBehaviour
+    public class AccelerationReadoutUI : MonoBehaviour
     {
         [SerializeField]
         TMPro.TextMeshProUGUI _textBox;
 
         void LateUpdate()
         {
-            _textBox.text = $"Velocity: {VesselManager.ActiveVessel.PhysicsObject.Velocity.magnitude:#0} m/s";
+            _textBox.text = $"Acceleration: {VesselManager.ActiveVessel.PhysicsObject.Acceleration.magnitude:#0.0} m/s^2";
         }
     }
 }

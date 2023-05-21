@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace KatnisssSpaceSimulator.Assets.UI.Windows
+namespace KatnisssSpaceSimulator.UI.Windows
 {
     public class WindowExit : MonoBehaviour
     {

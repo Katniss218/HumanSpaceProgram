@@ -9,7 +9,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace KatnisssSpaceSimulator.Assets.UI.Windows
+namespace KatnisssSpaceSimulator.UI.Windows
 {
     /// <summary>
     /// A script that draws a graphical relationship between a UI element, and a scene object, when the UI element is hovered over.

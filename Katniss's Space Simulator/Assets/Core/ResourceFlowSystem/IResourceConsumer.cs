@@ -17,12 +17,12 @@ namespace KatnisssSpaceSimulator.Core.ResourceFlowSystem
         /// <summary>
         /// Get or set the total inflow per 1 [s].
         /// </summary>
-        SubstanceStateCollection Inflow { get; set; }
+        SubstanceStateCollection Inflow { get; }
 
         /// <summary>
         /// Clamps the flow based on how much fluid can actually flow into the consumer object in 1 [s].
         /// </summary>
-        void ClampIn( SubstanceStateCollection flow, float dt );
+        void ClampIn( SubstanceStateCollection inflow, float dt );
 
         /// <summary>
         /// Calculates the pressure acting at any given point inside the container, as well as what species will want to `flow` out of the container.

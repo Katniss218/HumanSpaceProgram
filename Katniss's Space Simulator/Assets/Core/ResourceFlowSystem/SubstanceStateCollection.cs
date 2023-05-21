@@ -89,9 +89,7 @@ namespace KatnisssSpaceSimulator.Core.ResourceFlowSystem
 
             for( int i = 0; i < _substances.Count; i++ )
             {
-                float density = _substances[i].Data.Density;
-                float massAmount = _substances[i].MassAmount;
-                float newMassAmount = scalingFactor * (massAmount / density);
+                float newMassAmount = scalingFactor * (_substances[i].MassAmount / _substances[i].Data.Density);
                 this._substances[i] = new SubstanceState( this._substances[i], newMassAmount );
             }
         }
@@ -106,6 +104,23 @@ namespace KatnisssSpaceSimulator.Core.ResourceFlowSystem
             return _substances.Sum( s => s.MassAmount );
         }
 
+        public void SetMass( float mass )
+        {
+            if( IsEmpty() )
+            {
+                throw new InvalidOperationException( $"Can't set volume for a {nameof( SubstanceStateCollection )} that is empty." );
+            }
+
+            // for compressibles, this needs to know their pressure.
+            float currentMass = GetMass();
+            float scalingFactor = mass / currentMass;
+
+            for( int i = 0; i < _substances.Count; i++ )
+            {
+                float newMassAmount = scalingFactor * _substances[i].MassAmount;
+                this._substances[i] = new SubstanceState( this._substances[i], newMassAmount );
+            }
+        }
         // set mass possibly too (preserving mass ratio of contents).
 
         public float GetAverageDensity()

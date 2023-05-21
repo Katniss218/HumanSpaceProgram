@@ -37,7 +37,7 @@ namespace KatnisssSpaceSimulator.Core
         /// The mass of the part in [kg].
         /// </summary>
         [field: SerializeField]
-        public float Mass { get; set; }
+        public float Mass { get; set; } = 1000f;
 
         /// <summary>
         /// Checks whether or not this part is a root of its <see cref="Vessel"/>.

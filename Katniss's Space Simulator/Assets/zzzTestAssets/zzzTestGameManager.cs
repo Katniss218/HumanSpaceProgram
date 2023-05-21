@@ -97,19 +97,27 @@ namespace KatnisssSpaceSimulator
             Part tankL1 = tankLong.Create( root, new Vector3( 0, 2.625f, 0 ), Quaternion.identity );
             tankLong.Create( root, new Vector3( 2, 2.625f, 0 ), Quaternion.identity );
             tankLong.Create( root, new Vector3( -2, 2.625f, 0 ), Quaternion.identity );
-            engine.Create( tankP, new Vector3( 0, -3.45533f, 0 ), Quaternion.identity );
+            Part engineP = engine.Create( tankP, new Vector3( 0, -3.45533f, 0 ), Quaternion.identity );
 
-            FBulkContainerConnection conn = tankP.gameObject.AddComponent<FBulkContainerConnection>();
+            FBulkConnection conn = tankP.gameObject.AddComponent<FBulkConnection>();
             conn.End1.ConnectTo( tankL1.GetComponent<FBulkContainer_Sphere>() );
             conn.End1.Position = new Vector3( 0.0f, -2.5f, 0.0f );
             conn.End2.ConnectTo( tankP.GetComponent<FBulkContainer_Sphere>() );
             conn.End2.Position = new Vector3( 0.0f, 1.5f, 0.0f );
-
             conn.CrossSectionArea = 0.1f;
+
+            const float DENSITY = 1000f;
 
             var tankTank = tankL1.GetComponent<FBulkContainer_Sphere>();
             tankTank.Contents = new SubstanceStateCollection(
-                new SubstanceState[] { new SubstanceState( tankTank.MaxVolume * 1000f, new Substance() { Density = 1000f, DisplayName = "aa", ID = "substance.aa" } ) } );
+                new SubstanceState[] { new SubstanceState( tankTank.MaxVolume * DENSITY, new Substance() { Density = DENSITY, DisplayName = "aa", ID = "substance.aa" } ) } );
+
+            FBulkConnection conn2 = engineP.gameObject.AddComponent<FBulkConnection>();
+            conn2.End1.ConnectTo( tankP.GetComponent<FBulkContainer_Sphere>() );
+            conn2.End1.Position = new Vector3( 0.0f, -1.5f, 0.0f );
+            conn2.End2.ConnectTo( engineP.GetComponent<FRocketEngine>() );
+            conn2.End2.Position = new Vector3( 0.0f, 0.0f, 0.0f );
+            conn2.CrossSectionArea = 15f;
 
             //FindObjectOfType<IResourceContainerUI>().Obj = tankL1.GetComponent<FBulkContainer_Sphere>();
 

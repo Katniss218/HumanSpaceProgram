@@ -36,21 +36,16 @@ namespace KatnisssSpaceSimulator.Functionalities
         public SubstanceStateCollection Contents { get; set; } = SubstanceStateCollection.Empty;
 
         [field: SerializeField]
-        public SubstanceStateCollection Inflow { get; set; }
+        public SubstanceStateCollection Inflow { get; private set; } = SubstanceStateCollection.Empty;
 
         [field: SerializeField]
-        public SubstanceStateCollection Outflow { get; set; }
+        public SubstanceStateCollection Outflow { get; private set; } = SubstanceStateCollection.Empty;
 
         public void ClampIn( SubstanceStateCollection inflow, float dt )
         {
             float currentVol = this.Contents.GetVolume();
-            float inflowVol = inflow.GetVolume();
 
-            if( currentVol + (inflowVol * dt) > MaxVolume )
-            {
-                float remainingVol = MaxVolume - currentVol;
-                inflow.SetVolume( remainingVol / dt );
-            }
+            FlowUtils.ClampMaxVolume( inflow, currentVol, MaxVolume, dt );
         }
 
         public FluidState Sample( Vector3 localPosition, Vector3 localAcceleration, float holeArea )
@@ -68,13 +63,12 @@ namespace KatnisssSpaceSimulator.Functionalities
                 return FluidState.Vacuum;
             }
 
-            // pressure in [Pa]
-            float pressure = localAcceleration.magnitude * this.Contents[0].Data.Density * heightOfLiquid;
+            float pressure = FlowUtils.GetStaticPressure( this.Contents[0].Data.Density, heightOfLiquid , localAcceleration.magnitude );
 
             return new FluidState( pressure, 273.15f, 0.0f );
         }
 
-        public (SubstanceStateCollection, FluidState) SampleFlow( Vector3 localPosition, Vector3 localAcceleration, float holeArea, FluidState opposingFluid )
+        public (SubstanceStateCollection, FluidState) SampleFlow( Vector3 localPosition, Vector3 localAcceleration, float holeArea, float dt, FluidState opposingFluid )
         {
             if( this.Contents.SubstanceCount == 0 )
             {
@@ -92,10 +86,20 @@ namespace KatnisssSpaceSimulator.Functionalities
 #warning TODO - mixing and stratification.
             SubstanceStateCollection flow = Contents.Clone();
 
+            // Toricelli's law `sqrt((2 * (P1 - P2)) / density)`.
+            // Pressure can be total dynamic pressure.
+            // P2 can be negative to create suction
             float newSignedVelocity = Mathf.Sign( relativePressure ) * Mathf.Sqrt( 2 * relativePressure / flow.GetAverageDensity() );
-            float maximumVolumetricFlowrate = Mathf.Abs( FBulkContainerConnection.GetVolumetricFlowrate( holeArea, newSignedVelocity ) );
+            float maximumVolumetricFlowrate = Mathf.Abs( FBulkConnection.GetVolumetricFlowrate( holeArea, newSignedVelocity ) );
 
             flow.SetVolume( maximumVolumetricFlowrate );
+
+            float remainingFluidInTank = Contents.GetVolume();
+
+            if( (flow.GetVolume() * dt) > remainingFluidInTank )
+            {
+                flow.SetVolume( remainingFluidInTank / dt );
+            }
 
             return (flow, new FluidState( relativePressure, state.Temperature, newSignedVelocity ));
         }

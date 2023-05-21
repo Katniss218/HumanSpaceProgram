@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace KatnisssSpaceSimulator.Functionalities
 {
-    public class FBulkContainerConnection : MonoBehaviour
+    public class FBulkConnection : MonoBehaviour
     {
         /// <summary>
         /// Represents an inlet or outlet.
@@ -160,7 +160,7 @@ namespace KatnisssSpaceSimulator.Functionalities
                 return;
             }
 
-#warning  TODO - for actual flow, we need pressure at the bottom for both, whichever is lower.
+#warning  TODO - for actual flow, we need pressure at the bottom for both, whichever is geometrically lower.
             // Imagine that tanks are connected.
             // The tanks should equalize in such a way that the pressure in both should be the same when both samples' position along the acceleration direction is the same.
             // - only valid if the pressure at both ends is greater than 0.
@@ -213,8 +213,9 @@ namespace KatnisssSpaceSimulator.Functionalities
                 return;
             }
 
-            (SubstanceStateCollection flow, _) = inletProducer.SampleFlow( inletEnd.Position, inletProducer.transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea, endSamples[outlet] );
+            (SubstanceStateCollection flow, var f) = inletProducer.SampleFlow( inletEnd.Position, inletProducer.transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea, Time.fixedDeltaTime, endSamples[outlet] );
 
+            Debug.Log( f.Velocity );
             outletConsumer.ClampIn( flow, Time.fixedDeltaTime );
 
             SetFlowAcrossConnection( flow, inlet, outlet );

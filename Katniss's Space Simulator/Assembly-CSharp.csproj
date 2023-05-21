@@ -58,12 +58,14 @@
   <ItemGroup>
     <Compile Include="Assets\Core\ResourceFlowSystem\IResourceConsumer.cs" />
     <Compile Include="Assets\Camera\CameraController.cs" />
+    <Compile Include="Assets\Core\ResourceFlowSystem\IResourceContainer.cs" />
     <Compile Include="Assets\Core\Serialization\AssetPartSource.cs" />
     <Compile Include="Assets\Core\Substance.cs" />
     <Compile Include="Assets\Core\CelestialBody.cs" />
     <Compile Include="Assets\zzzTestAssets\zzzTestGameManager.cs" />
     <Compile Include="Assets\Terrain\MeshUtils.cs" />
     <Compile Include="Assets\Core\ResourceFlowSystem\FluidState.cs" />
+    <Compile Include="Assets\UI\Windows\WindowDrag.cs" />
     <Compile Include="Assets\Core\CelestialBodyFactory.cs" />
     <Compile Include="Assets\Terrain\MakeQuadMesh_Job.cs" />
     <Compile Include="Assets\Core\Part.cs" />
@@ -71,6 +73,7 @@
     <Compile Include="Assets\Terrain\LODQuadSphere.cs" />
     <Compile Include="Assets\Core\ReferenceFrames\OffsetReferenceFrame.cs" />
     <Compile Include="Assets\Core\VesselFactory.cs" />
+    <Compile Include="Assets\UI\Windows\WindowRelationHighlight.cs" />
     <Compile Include="Assets\UI\TimewarpReadoutUI.cs" />
     <Compile Include="Assets\Functionalities\FRocketEngine.cs" />
     <Compile Include="Assets\Core\VesselManager.cs" />
@@ -86,6 +89,7 @@
     <Compile Include="Assets\_UnityEngine\Vector3_Ex.cs" />
     <Compile Include="Assets\_UnityEngine\Direction3D.cs" />
     <Compile Include="Assets\_UnityEngine\Vector3Dbl.cs" />
+    <Compile Include="Assets\UI\IResourceContainerUI.cs" />
     <Compile Include="Assets\Core\Control\ControlInAttribute.cs" />
     <Compile Include="Assets\Core\ReferenceFrames\ReferenceFrameUtils.cs" />
     <Compile Include="Assets\Functionalities\FBulkContainer_Sphere.cs" />
@@ -94,7 +98,8 @@
     <Compile Include="Assets\Core\ResourceFlowSystem\SubstanceState.cs" />
     <Compile Include="Assets\Core\CelestialBodySurface.cs" />
     <Compile Include="Assets\Core\ReferenceFrames\SceneReferenceFrameManager.cs" />
-    <Compile Include="Assets\Functionalities\FBulkContainerConnection.cs" />
+    <Compile Include="Assets\UI\Windows\WindowExit.cs" />
+    <Compile Include="Assets\UI\Windows\PartWindow.cs" />
     <Compile Include="Assets\UI\FPSCounterUI.cs" />
     <Compile Include="Assets\Core\Vessel.cs" />
     <Compile Include="Assets\Buildings\LaunchSiteFactory.cs" />
@@ -106,19 +111,16 @@
     <Compile Include="Assets\Core\ReferenceFrames\RootObjectTransform.cs" />
     <Compile Include="Assets\Buildings\LaunchSite.cs" />
     <Compile Include="Assets\Terrain\LODQuad.cs" />
+    <Compile Include="Assets\UI\PartWindowManager.cs" />
     <Compile Include="Assets\Functionalities\FActuatorXY.cs" />
     <Compile Include="Assets\TimeWarp\TimeWarpManager.cs" />
     <Compile Include="Assets\Core\ReferenceFrames\IReferenceFrame.cs" />
     <Compile Include="Assets\Terrain\LODQuadTree_NodeUtils.cs" />
     <Compile Include="Assets\Core\Serialization\DummyPartSource.cs" />
     <Compile Include="Assets\Core\ResourceFlowSystem\SubstanceStateCollection.cs" />
-    <Compile Include="Assets\Core\ResourceFlowSystem\IResourceContainer.cs" />
-    <Compile Include="Assets\UI\IResourceContainerUI.cs" />
-    <Compile Include="Assets\UI\Windows\PartWindow.cs" />
-    <Compile Include="Assets\UI\PartWindowManager.cs" />
-    <Compile Include="Assets\UI\Windows\WindowExit.cs" />
-    <Compile Include="Assets\UI\Windows\WindowDrag.cs" />
-    <Compile Include="Assets\UI\Windows\WindowRelationHighlight.cs" />
+    <Compile Include="Assets\UI\AccelerationReadoutUI.cs" />
+    <Compile Include="Assets\Functionalities\FBulkConnection.cs" />
+    <Compile Include="Assets\Core\ResourceFlowSystem\FlowUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro.cginc" />
@@ -800,6 +802,9 @@
     <Reference Include="Unity.VisualScripting.SettingsProvider.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.SettingsProvider.Editor.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.2D.Sprite.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.2D.Sprite.Editor.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.TestTools.CodeCoverage.Editor.OpenCover.Mono.Reflection">
       <HintPath>Library\ScriptAssemblies\Unity.TestTools.CodeCoverage.Editor.OpenCover.Mono.Reflection.dll</HintPath>
     </Reference>
@@ -815,11 +820,11 @@
     <Reference Include="Unity.Rider.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Rider.Editor.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.VisualScripting.Flow">
-      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Flow.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.VisualScripting.Flow">
+      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Flow.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Services.Core">
       <HintPath>Library\ScriptAssemblies\Unity.Services.Core.dll</HintPath>
@@ -850,9 +855,6 @@
     </Reference>
     <Reference Include="Unity.VisualScripting.State">
       <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.State.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.2D.Sprite.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.2D.Sprite.Editor.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

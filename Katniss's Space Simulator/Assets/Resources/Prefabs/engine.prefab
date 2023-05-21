@@ -66,8 +66,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <MaxThrust>k__BackingField: 1000
+  <Isp>k__BackingField: 300
   <Throttle>k__BackingField: 0
   <ThrustTransform>k__BackingField: {fileID: 2836283960901704833}
+  <Inflow>k__BackingField:
+    _substances: []
 --- !u!1 &3542603688393811688
 GameObject:
   m_ObjectHideFlags: 0

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Assets.UI
+namespace KatnisssSpaceSimulator.UI
 {
     public class FPSCounterUI : MonoBehaviour
     {

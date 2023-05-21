@@ -68,8 +68,8 @@ namespace KatnisssSpaceSimulator.Core.Physics
         Vector3 _oldVelocity;
         Vector3 _oldAngularVelocity;
 
-        Vector3 _accSum = Vector3.zero;
-        Vector3 _angularAccSum = Vector3.zero;
+        Vector3 _accelerationSum = Vector3.zero;
+        Vector3 _angularAccelerationSum = Vector3.zero;
 
         Rigidbody _rb;
         RootObjectTransform _rootTransform;
@@ -79,7 +79,7 @@ namespace KatnisssSpaceSimulator.Core.Physics
         /// </summary>
         public void AddForce( Vector3 force )
         {
-            _accSum += force / Mass;
+            _accelerationSum += force / Mass;
             this._rb.AddForce( force, ForceMode.Force );
         }
 
@@ -91,10 +91,10 @@ namespace KatnisssSpaceSimulator.Core.Physics
             // I think force / mass is still correct for this,
             // - because 2 consecutive impulses in the same direction, but opposite positions (so that the angular accelerations cancel out)
             // - should still produce linear acceleration of 2 * force / mass.
-            _accSum += force / Mass;
+            _accelerationSum += force / Mass;
 
             Vector3 leverArm = position - this._rb.worldCenterOfMass;
-            _angularAccSum += Vector3.Cross( force, leverArm ) / Mass;
+            _angularAccelerationSum += Vector3.Cross( force, leverArm ) / Mass;
 
             this._rb.AddForceAtPosition( force, position, ForceMode.Force );
         }
@@ -110,44 +110,56 @@ namespace KatnisssSpaceSimulator.Core.Physics
             _rb.interpolation = RigidbodyInterpolation.Extrapolate;
         }
 
-        [field: SerializeField]
-        bool _isColliding;
-
-#warning TODO - force accumulating system will break, if something depends on the calculated acceleration before the acceleration has finished accumulating (exec order).
-
-        // If the object is colliding, we will use its rigidbody accelerations, because we don't have access to the forces due to collisions.
-        // Otherwise, we use our more precise method that relies on full encapsulation of the rigidbody.
-
-        void OnCollisionEnter( Collision collision )
-        {
-            _isColliding = true;
-        }
-
-        void OnCollisionExit( Collision collision )
-        {
-            _isColliding = false;
-        }
-
         void FixedUpdate()
         {
             // I'm not a huge fan of the physics being calculated in scene-space, but that's the only way to handle collisions properly.
             this._rootTransform.SetAIRFPosition( SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.transform.position ) );
 
-            if( _isColliding )
+            // If the object is colliding, we will use its rigidbody accelerations, because we don't have access to the forces due to collisions.
+            // Otherwise, we use our more precise method that relies on full encapsulation of the rigidbody.
+
+            if( IsColliding )
             {
                 this.Acceleration = (Velocity - _oldVelocity) / Time.fixedDeltaTime;
                 this.AngularAcceleration = (AngularVelocity - _oldAngularVelocity) / Time.fixedDeltaTime;
             }
             else
             {
-                this.Acceleration = _accSum;
-                this.AngularAcceleration = _angularAccSum;
+                // accSum will be whatever that was accumulated over the time from the previous frame (when it was zeroed out) to this frame.
+                // I think it should work fine.
+                this.Acceleration = _accelerationSum;
+                this.AngularAcceleration = _angularAccelerationSum;
             }
 
             this._oldVelocity = Velocity;
             this._oldAngularVelocity = AngularVelocity;
-            this._accSum = Vector3.zero;
-            this._angularAccSum = Vector3.zero;
+            this._accelerationSum = Vector3.zero;
+            this._angularAccelerationSum = Vector3.zero;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether or not the physics object or any of its children colliders is currently colliding with something.
+        /// </summary>
+        [field: SerializeField]
+        public bool IsColliding { get; private set; }
+
+        void OnCollisionEnter( Collision collision )
+        {
+            IsColliding = true;
+        }
+
+        void OnCollisionStay( Collision collision )
+        {
+            // `OnCollisionEnter` / Exit are called for every collider.
+            // I've tried using an incrementing/decrementing int with enter/exit, but it wasn't updating correctly, and after some time, there were too many collisions.
+            // Using `OnCollisionStay` prevents desynchronization.
+
+            IsColliding = true;
+        }
+
+        void OnCollisionExit( Collision collision )
+        {
+            IsColliding = false;
         }
 
         void OnEnable()

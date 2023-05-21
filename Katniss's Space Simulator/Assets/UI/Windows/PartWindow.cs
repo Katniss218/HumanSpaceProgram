@@ -1,5 +1,4 @@
-﻿using KatnisssSpaceSimulator.Assets.UI.Windows;
-using KatnisssSpaceSimulator.Camera;
+﻿using KatnisssSpaceSimulator.Camera;
 using KatnisssSpaceSimulator.Core;
 using KatnisssSpaceSimulator.Core.ResourceFlowSystem;
 using KatnisssSpaceSimulator.UILib;

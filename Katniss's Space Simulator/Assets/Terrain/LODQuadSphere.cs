@@ -58,11 +58,12 @@ namespace KatnisssSpaceSimulator.Terrain
 
 #warning TODO - there is some funkiness with the collider physics (it acts as if the object was unparented (when unparenting, it changes scene position slightly)).
 
-                LODQuad face = LODQuad.CreateL0( _celestialBody.transform, this, _celestialBody, _quadTree[i].Root, (float)_celestialBody.Radius * QUAD_RANGE_MULTIPLIER, mat, (Direction3D)i );
-                _activeQuads.Add( face );
+                LODQuad quad = LODQuad.CreateL0( _celestialBody.transform, this, _celestialBody, _quadTree[i].Root, (float)_celestialBody.Radius * QUAD_RANGE_MULTIPLIER, mat, (Direction3D)i );
+                _activeQuads.Add( quad );
+
+                RemeshQuad( quad );
             }
         }
-#warning TODO - L0 needs to be meshed at startup.
 
         List<LODQuad> _activeQuads = new List<LODQuad>();
 
@@ -108,11 +109,7 @@ namespace KatnisssSpaceSimulator.Terrain
             {
                 Contract.Assert( quad.Node.Value != null, $"Quads to rebuild ({nameof( needRemeshing )}) must not contain destroyed quads." );
 
-                var rebuildState = new LODQuad.State.Rebuild();
-
-                rebuildState.Job = new MakeQuadMesh_Job();
-
-                quad.SetState( rebuildState );
+                RemeshQuad( quad );
             }
         }
 
@@ -124,6 +121,16 @@ namespace KatnisssSpaceSimulator.Terrain
 
                 quad.SetState( new LODQuad.State.Active() );
             }
+        }
+
+        void RemeshQuad( LODQuad quad )
+        {
+            var rebuildState = new LODQuad.State.Rebuild()
+            {
+                Job = new MakeQuadMesh_Job()
+            };
+
+            quad.SetState( rebuildState );
         }
 
         // ondestroy delete itself?
