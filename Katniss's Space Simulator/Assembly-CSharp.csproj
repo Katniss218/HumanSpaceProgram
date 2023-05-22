@@ -106,7 +106,9 @@
     <Compile Include="Assets\Buildings\LaunchSiteFactory.cs" />
     <Compile Include="Assets\Core\Vessel.Serialization.cs" />
     <Compile Include="Assets\UI\AltitudeReadoutUI.cs" />
+    <Compile Include="Assets\Functionalities\FVesselSeparator.cs" />
     <Compile Include="Assets\Core\CoordinateUtils.cs" />
+    <Compile Include="Assets\Core\IMassCallback.cs" />
     <Compile Include="Assets\Core\Physics\GravityUtils.cs" />
     <Compile Include="Assets\_UnityEngine\Direction2D.cs" />
     <Compile Include="Assets\Core\ReferenceFrames\RootObjectTransform.cs" />
@@ -121,8 +123,6 @@
     <Compile Include="Assets\UI\AccelerationReadoutUI.cs" />
     <Compile Include="Assets\Core\Serialization\DummyPartSource.cs" />
     <Compile Include="Assets\Core\ResourceFlowSystem\SubstanceStateCollection.cs" />
-    <Compile Include="Assets\Core\IMassCallback.cs" />
-    <Compile Include="Assets\Functionalities\FVesselSeparator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro.cginc" />

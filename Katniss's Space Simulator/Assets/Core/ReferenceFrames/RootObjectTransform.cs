@@ -72,7 +72,7 @@ namespace KatnisssSpaceSimulator.Core.ReferenceFrames
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public void UpdateSceneRotation()
         {
-            Quaternion sceneRotation = SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformRotation( _airfRotation );
+            Quaternion sceneRotation = SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformRotation( this._airfRotation );
             if( _rb != null )
             {
                 // THIS IS CRITICALLY IMPORTANT.

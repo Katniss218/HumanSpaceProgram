@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KatnisssSpaceSimulator.Core.ReferenceFrames;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
@@ -159,11 +160,14 @@ namespace KatnisssSpaceSimulator.Core
             partToSplit.Parent = null;
             oldv.RecalculateParts();
 
-#warning TODO - copy velocity and stuff.
-#warning TODO - position is incorrectly set.
-
             // Create the new vessel and add the parts to it.
-            Vessel v = new VesselFactory().CreatePartless( partToSplit.transform.position, partToSplit.transform.rotation );
+            Vessel v = new VesselFactory().CreatePartless(
+                SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( partToSplit.transform.position ),
+                SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( partToSplit.transform.rotation ),
+#warning TODO - get velocity of part (correctly works for spinning vessels).
+                partToSplit.Vessel.PhysicsObject.Velocity,
+                partToSplit.Vessel.PhysicsObject.AngularVelocity);
+
             SetVesselHierarchy( partToSplit, v );
             partToSplit.SetVesselRecursive( v );
             v.SetRootPart( partToSplit );

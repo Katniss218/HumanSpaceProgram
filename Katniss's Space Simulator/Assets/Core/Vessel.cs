@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace KatnisssSpaceSimulator.Core
 {
+    // Do not add RootObjectTransform explicitly *before* PhysicsObject. it messes up the initialization and rigidbody is not cached at the right time.
     [RequireComponent( typeof( PhysicsObject ) )]
     public sealed partial class Vessel : MonoBehaviour
     {
@@ -144,8 +145,8 @@ namespace KatnisssSpaceSimulator.Core
 
         void Awake()
         {
-            this.PhysicsObject = this.GetComponent<PhysicsObject>();
             this.RootObjTransform = this.GetComponent<RootObjectTransform>();
+            this.PhysicsObject = this.GetComponent<PhysicsObject>();
         }
 
         void SetPhysicsObjectParameters()

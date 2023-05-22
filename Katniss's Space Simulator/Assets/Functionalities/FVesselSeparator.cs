@@ -13,17 +13,24 @@ namespace KatnisssSpaceSimulator.Functionalities
         Vessel v;
         Part p;
 
-        private void Start()
+        bool separated = false;
+
+        void Start()
         {
             p = this.GetComponent<Part>();
             v = this.transform.parent.GetComponent<Vessel>();
         }
 
-        private void Update()
+        void Update()
         {
+            if( separated )
+            {
+                return;
+            }
             if( Input.GetKeyDown( KeyCode.Space ) )
             {
-#warning TODO - disconnect pipes, and stuff. event based?
+#warning TODO - disconnect pipes, and stuff. Probably event based.
+
                 VesselStateUtils.SetParent( p, null );
             }
         }

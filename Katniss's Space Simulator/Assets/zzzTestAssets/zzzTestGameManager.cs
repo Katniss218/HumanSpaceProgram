@@ -50,12 +50,12 @@ namespace KatnisssSpaceSimulator
 
             CelestialBody cb = new CelestialBodyFactory().Create( Vector3Dbl.zero );
 
-            CelestialBody cb1 = new CelestialBodyFactory().Create( new Vector3Dbl( 440_000_000, 0, 0 ) );
-            CelestialBody cb2 = new CelestialBodyFactory().Create( new Vector3Dbl( 440_000_000, 100_000_000, 0 ) );
-            CelestialBody cb_farawayTEST = new CelestialBodyFactory().Create( new Vector3Dbl( 440_000_000_0.0, 100_000_000, 0 ) );
-            CelestialBody cb_farawayTEST2 = new CelestialBodyFactory().Create( new Vector3Dbl( 440_000_000_00.0, 100_000_000, 0 ) );
+            //CelestialBody cb1 = new CelestialBodyFactory().Create( new Vector3Dbl( 440_000_000, 0, 0 ) );
+            //CelestialBody cb2 = new CelestialBodyFactory().Create( new Vector3Dbl( 440_000_000, 100_000_000, 0 ) );
+            //CelestialBody cb_farawayTEST = new CelestialBodyFactory().Create( new Vector3Dbl( 440_000_000_0.0, 100_000_000, 0 ) );
+            //CelestialBody cb_farawayTEST2 = new CelestialBodyFactory().Create( new Vector3Dbl( 440_000_000_00.0, 100_000_000, 0 ) );
 
-            CelestialBody cb_farawayTEST3FAR = new CelestialBodyFactory().Create( new Vector3Dbl( 1e18, 100_000_000, 0 ) ); // 1e18 is 100 ly away.
+            //CelestialBody cb_farawayTEST3FAR = new CelestialBodyFactory().Create( new Vector3Dbl( 1e18, 100_000_000, 0 ) ); // 1e18 is 100 ly away.
             // stuff really far away throws invalid world AABB and such. do not enable these, you can't see them anyway. 100 ly seems to work, but further away is a no-no.
 
 
@@ -90,13 +90,13 @@ namespace KatnisssSpaceSimulator
             PartFactory tankLong = new PartFactory( new AssetPartSource( "Prefabs/tank_long" ) );
             PartFactory engine = new PartFactory( new AssetPartSource( "Prefabs/engine" ) );
 
-            Vessel v = fac.CreatePartless( airfPosition, rotation );
+            Vessel v = fac.CreatePartless( airfPosition, rotation, Vector3.zero, Vector3.zero );
             Part root = intertank.CreateRoot( v );
 
             Part tankP = tank.Create( root, new Vector3( 0, -1.625f, 0 ), Quaternion.identity );
             Part tankL1 = tankLong.Create( root, new Vector3( 0, 2.625f, 0 ), Quaternion.identity );
-            tankLong.Create( root, new Vector3( 2, 2.625f, 0 ), Quaternion.identity );
-            tankLong.Create( root, new Vector3( -2, 2.625f, 0 ), Quaternion.identity );
+            var t1 = tankLong.Create( root, new Vector3( 2, 2.625f, 0 ), Quaternion.identity );
+            var t2 = tankLong.Create( root, new Vector3( -2, 2.625f, 0 ), Quaternion.identity );
             Part engineP = engine.Create( tankP, new Vector3( 0, -3.45533f, 0 ), Quaternion.identity );
 
             FBulkConnection conn = tankP.gameObject.AddComponent<FBulkConnection>();
@@ -118,6 +118,9 @@ namespace KatnisssSpaceSimulator
             conn2.End2.ConnectTo( engineP.GetComponent<FRocketEngine>() );
             conn2.End2.Position = new Vector3( 0.0f, 0.0f, 0.0f );
             conn2.CrossSectionArea = 60f;
+
+            t1.gameObject.AddComponent<FVesselSeparator>();
+            t2.gameObject.AddComponent<FVesselSeparator>();
 
             //FindObjectOfType<IResourceContainerUI>().Obj = tankL1.GetComponent<FBulkContainer_Sphere>();
 

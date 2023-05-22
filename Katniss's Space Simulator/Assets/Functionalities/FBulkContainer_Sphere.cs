@@ -130,7 +130,6 @@ namespace KatnisssSpaceSimulator.Functionalities
                 mc.Mass -= Outflow.GetMass() * Time.fixedDeltaTime;
                 mc.Mass += Inflow.GetMass() * Time.fixedDeltaTime;
             }
-            // TODO - update the mass of the part (if applicable) too, because the fluid weighs something.
         }
 
         public JToken Save()

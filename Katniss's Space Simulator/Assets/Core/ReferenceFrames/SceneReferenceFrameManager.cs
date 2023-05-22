@@ -94,6 +94,7 @@ namespace KatnisssSpaceSimulator.Core.ReferenceFrames
         /// </summary>
         public static void TryFixActiveVesselOutOfBounds()
         {
+            Vessel v = VesselManager.ActiveVessel;
             Vector3 position = VesselManager.ActiveVessel.transform.position;
             if( position.magnitude > MaxFloatingOriginRange )
             {
