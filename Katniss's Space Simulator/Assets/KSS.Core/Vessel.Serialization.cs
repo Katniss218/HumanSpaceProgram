@@ -17,11 +17,6 @@ namespace KSS.Core
         /// </summary>
         public JToken Save()
         {
-            if( this.RootPart == null )
-            {
-                throw new InvalidOperationException( "The vessel must contain at least 1 part in order to be serialized." );
-            }
-
             // save a vessel to a json file.
             // - save the parts, and their persistent state.
             JObject data = new JObject();
@@ -34,11 +29,6 @@ namespace KSS.Core
         /// </summary>
         public void Load( JToken data )
         {
-            if( this.RootPart != null )
-            {
-                throw new InvalidOperationException( "The vessel must be partless in order to use it for deserialization." );
-            }
-
             // load a vessel from a json file.
             // - create the vessel
             // - create the parts based on what parts are defined in the save (using appropriate part factories).

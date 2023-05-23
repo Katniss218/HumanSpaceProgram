@@ -1,4 +1,5 @@
-﻿using KSS.Core;
+﻿using KSS.Core.Serialization;
+using KSS.Core;
 using KSS.Core.Physics;
 using KSS.Core.ReferenceFrames;
 using KSS.Core.ResourceFlowSystem;
@@ -16,7 +17,7 @@ namespace KSS.Functionalities
     /// <summary>
     /// An object that connects two containers and calculates the resource flow between them.
     /// </summary>
-    public class FBulkConnection : MonoBehaviour
+    public class FBulkConnection : MonoBehaviour, IPersistent
     {
         /// <summary>
         /// Represents an inlet or outlet.
@@ -251,12 +252,12 @@ namespace KSS.Functionalities
             FixedUpdate_Flow( sceneAcceleration );
         }
 
-        public void Load( JToken data )
+        public JToken Save( int fileVersion )
         {
             throw new NotImplementedException();
         }
 
-        public JToken Save()
+        public void Load( int fileVersion, JToken data )
         {
             throw new NotImplementedException();
         }

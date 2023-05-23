@@ -1,5 +1,6 @@
 ﻿using KSS.Control;
 using KSS.Core;
+using KSS.Core.Serialization;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ using UnityEngine;
 
 namespace KSS.Functionalities
 {
-    public class FActuatorXY : MonoBehaviour
+    public class FActuatorXY : MonoBehaviour, IPersistent
     {
         // 2-axis actuator.
 
@@ -47,12 +48,12 @@ namespace KSS.Functionalities
             // todo.
         }
 
-        public void Load( JToken data )
+        public JToken Save( int fileVersion )
         {
             throw new NotImplementedException();
         }
 
-        public JToken Save()
+        public void Load( int fileVersion, JToken data )
         {
             throw new NotImplementedException();
         }

@@ -1,4 +1,5 @@
-﻿using KSS.Core;
+﻿using KSS.Core.Serialization;
+using KSS.Core;
 using KSS.Core.ResourceFlowSystem;
 using Newtonsoft.Json.Linq;
 using System;
@@ -14,7 +15,7 @@ namespace KSS.Functionalities
     /// <summary>
     /// A container for a <see cref="Substance"/>.
     /// </summary>
-    public class FBulkContainer_Sphere : MonoBehaviour, IResourceConsumer, IResourceProducer, IResourceContainer
+    public class FBulkContainer_Sphere : MonoBehaviour, IResourceConsumer, IResourceProducer, IResourceContainer, IPersistent
     {
         /// <summary>
         /// Determines the center position of the container.
@@ -132,7 +133,7 @@ namespace KSS.Functionalities
             }
         }
 
-        public JToken Save()
+        public JToken Save( int fileVersion )
         {
             throw new NotImplementedException();
 
@@ -143,7 +144,7 @@ namespace KSS.Functionalities
             };*/
         }
 
-        public void Load( JToken data )
+        public void Load( int fileVersion, JToken data )
         {
             throw new NotImplementedException();
 

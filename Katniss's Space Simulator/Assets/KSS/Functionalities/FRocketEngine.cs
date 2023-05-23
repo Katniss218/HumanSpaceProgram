@@ -1,6 +1,7 @@
 ﻿using KSS.Control;
 using KSS.Core;
 using KSS.Core.ResourceFlowSystem;
+using KSS.Core.Serialization;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ using UnityEngine;
 namespace KSS.Functionalities
 {
     [Serializable]
-    public class FRocketEngine : MonoBehaviour, IResourceConsumer
+    public class FRocketEngine : MonoBehaviour, IResourceConsumer, IPersistent
     {
         const float ISP_TO_EXVEL = 9.80665f;
 
@@ -101,12 +102,12 @@ namespace KSS.Functionalities
             return FluidState.Vacuum; // temp, inlet condition.
         }
 
-        public void Load( JToken data )
+        public JToken Save( int fileVersion )
         {
             throw new NotImplementedException();
         }
 
-        public JToken Save()
+        public void Load( int fileVersion, JToken data )
         {
             throw new NotImplementedException();
         }
