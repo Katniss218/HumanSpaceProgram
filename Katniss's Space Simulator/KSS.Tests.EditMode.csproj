@@ -59,7 +59,7 @@
     <Compile Include="Assets\KSS.Tests\EditMode\E_Template.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\KSS.Tests\EditMode\KSS.Tests.EditMode.asmdef" />
+    <None Include="Assets\KSS.Tests\EditMode\_KSS.Tests.EditMode.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

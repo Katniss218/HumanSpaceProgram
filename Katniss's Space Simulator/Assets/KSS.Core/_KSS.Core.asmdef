@@ -1,0 +1,16 @@
+{
+    "name": "KSS.Core",
+    "rootNamespace": "",
+    "references": [
+        "GUID:2f7a75fca464e944eaf94f058ade98d3"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

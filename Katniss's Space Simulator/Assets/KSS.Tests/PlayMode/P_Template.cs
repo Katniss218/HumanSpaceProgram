@@ -4,7 +4,7 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace KatnisssSpaceSimulator.Tests.PlayMode
+namespace KSS.Tests.PlayMode
 {
     public class P_Template
     {

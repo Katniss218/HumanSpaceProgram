@@ -56,80 +56,23 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Core\ResourceFlowSystem\IResourceConsumer.cs" />
-    <Compile Include="Assets\Camera\CameraController.cs" />
-    <Compile Include="Assets\Core\ResourceFlowSystem\IResourceContainer.cs" />
-    <Compile Include="Assets\Core\Serialization\AssetPartSource.cs" />
-    <Compile Include="Assets\Core\Substance.cs" />
-    <Compile Include="Assets\Core\CelestialBody.cs" />
-    <Compile Include="Assets\zzzTestAssets\zzzTestGameManager.cs" />
-    <Compile Include="Assets\Terrain\MeshUtils.cs" />
-    <Compile Include="Assets\Core\ResourceFlowSystem\FluidState.cs" />
-    <Compile Include="Assets\UI\Windows\WindowDrag.cs" />
-    <Compile Include="Assets\Core\CelestialBodyFactory.cs" />
-    <Compile Include="Assets\Terrain\MakeQuadMesh_Job.cs" />
-    <Compile Include="Assets\Core\Part.cs" />
-    <Compile Include="Assets\Functionalities\FAvionics.cs" />
-    <Compile Include="Assets\Terrain\LODQuadSphere.cs" />
-    <Compile Include="Assets\Core\ReferenceFrames\OffsetReferenceFrame.cs" />
-    <Compile Include="Assets\Core\VesselFactory.cs" />
-    <Compile Include="Assets\UI\Windows\WindowRelationHighlight.cs" />
-    <Compile Include="Assets\UI\TimewarpReadoutUI.cs" />
-    <Compile Include="Assets\Functionalities\FRocketEngine.cs" />
-    <Compile Include="Assets\Core\VesselManager.cs" />
-    <Compile Include="Assets\Core\ResourceFlowSystem\IResourceProducer.cs" />
-    <Compile Include="Assets\UI\VelocityReadoutUI.cs" />
-    <Compile Include="Assets\Core\VesselStateUtils.cs" />
-    <Compile Include="Assets\_UnityEngine\Vector2_Ex.cs" />
-    <Compile Include="Assets\Core\Physics\PhysicsObject.cs" />
-    <Compile Include="Assets\Terrain\LODQuadTree.cs" />
-    <Compile Include="Assets\Core\PartFactory.cs" />
-    <Compile Include="Assets\Core\Part.Serialization.cs" />
-    <Compile Include="Assets\Core\CelestialBodyManager.cs" />
-    <Compile Include="Assets\_UnityEngine\Vector3_Ex.cs" />
-    <Compile Include="Assets\_UnityEngine\Direction3D.cs" />
-    <Compile Include="Assets\_UnityEngine\Vector3Dbl.cs" />
-    <Compile Include="Assets\UI\IResourceContainerUI.cs" />
-    <Compile Include="Assets\Core\Control\ControlInAttribute.cs" />
-    <Compile Include="Assets\Core\ReferenceFrames\ReferenceFrameUtils.cs" />
-    <Compile Include="Assets\Functionalities\FBulkContainer_Sphere.cs" />
-    <Compile Include="Assets\Core\ReferenceFrames\IReferenceFrameSwitchResponder.cs" />
-    <Compile Include="Assets\Functionalities\FBulkConnection.cs" />
-    <Compile Include="Assets\Core\IIdentifiable.cs" />
-    <Compile Include="Assets\Core\ResourceFlowSystem\SubstanceState.cs" />
-    <Compile Include="Assets\Core\CelestialBodySurface.cs" />
-    <Compile Include="Assets\Core\ReferenceFrames\SceneReferenceFrameManager.cs" />
-    <Compile Include="Assets\UI\Windows\WindowExit.cs" />
-    <Compile Include="Assets\UI\Windows\PartWindow.cs" />
-    <Compile Include="Assets\UI\FPSCounterUI.cs" />
-    <Compile Include="Assets\Core\Vessel.cs" />
-    <Compile Include="Assets\Buildings\LaunchSiteFactory.cs" />
-    <Compile Include="Assets\Core\Vessel.Serialization.cs" />
-    <Compile Include="Assets\UI\AltitudeReadoutUI.cs" />
-    <Compile Include="Assets\Functionalities\FVesselSeparator.cs" />
-    <Compile Include="Assets\Core\CoordinateUtils.cs" />
-    <Compile Include="Assets\Core\IMassCallback.cs" />
-    <Compile Include="Assets\Core\Physics\GravityUtils.cs" />
-    <Compile Include="Assets\_UnityEngine\Direction2D.cs" />
-    <Compile Include="Assets\Core\ReferenceFrames\RootObjectTransform.cs" />
-    <Compile Include="Assets\Buildings\LaunchSite.cs" />
-    <Compile Include="Assets\Terrain\LODQuad.cs" />
-    <Compile Include="Assets\UI\PartWindowManager.cs" />
-    <Compile Include="Assets\Functionalities\FActuatorXY.cs" />
-    <Compile Include="Assets\TimeWarp\TimeWarpManager.cs" />
-    <Compile Include="Assets\Core\ReferenceFrames\IReferenceFrame.cs" />
-    <Compile Include="Assets\Core\ResourceFlowSystem\FlowUtils.cs" />
-    <Compile Include="Assets\Terrain\LODQuadTree_NodeUtils.cs" />
-    <Compile Include="Assets\UI\AccelerationReadoutUI.cs" />
-    <Compile Include="Assets\Core\Serialization\DummyPartSource.cs" />
-    <Compile Include="Assets\Core\ResourceFlowSystem\SubstanceStateCollection.cs" />
+    <Compile Include="Assets\KSS.UI\Windows\WindowDrag.cs" />
+    <Compile Include="Assets\KSS.UI\Windows\WindowRelationHighlight.cs" />
+    <Compile Include="Assets\KSS.UI\TimewarpReadoutUI.cs" />
+    <Compile Include="Assets\KSS.UI\VelocityReadoutUI.cs" />
+    <Compile Include="Assets\KSS.UI\IResourceContainerUI.cs" />
+    <Compile Include="Assets\KSS.UI\Windows\WindowExit.cs" />
+    <Compile Include="Assets\KSS.UI\Windows\PartWindow.cs" />
+    <Compile Include="Assets\KSS.UI\FPSCounterUI.cs" />
+    <Compile Include="Assets\KSS.UI\AltitudeReadoutUI.cs" />
+    <Compile Include="Assets\KSS.UI\PartWindowManager.cs" />
+    <Compile Include="Assets\KSS.UI\AccelerationReadoutUI.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro.cginc" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_Bitmap.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro_Mobile.cginc" />
-    <None Include="Assets\Terrain\TerrainShader.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF SSD.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Surface-Mobile.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Surface.shader" />
@@ -142,7 +85,6 @@
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro_Surface.cginc" />
     <None Include="Assets\_TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Mobile Masking.shader" />
-    <None Include="Assets\zzzTestAssets\ComputeNormalMap.compute" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF Overlay.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_Bitmap-Mobile.shader" />
     <None Include="Assets\_TextMesh Pro\Fonts\LiberationSans - OFL.txt" />
@@ -860,13 +802,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="_UnityEngine.csproj">
+      <Project>{AA320F23-E273-CF3D-ECC5-E3B3EE38E655}</Project>
+      <Name>_UnityEngine</Name>
+    </ProjectReference>
     <ProjectReference Include="UILib.csproj">
       <Project>{70FA2AF0-1725-15E3-F4B5-4083D9252BF4}</Project>
       <Name>UILib</Name>
     </ProjectReference>
-    <ProjectReference Include="UnityPlus.AssetManagement.csproj">
-      <Project>{3BD087B6-C6F9-34F4-6F71-1FB8C4DA545F}</Project>
-      <Name>UnityPlus.AssetManagement</Name>
+    <ProjectReference Include="KSS.DevUtils.csproj">
+      <Project>{D7208026-3029-DD39-0449-2AD64786FAF4}</Project>
+      <Name>KSS.DevUtils</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -8,7 +8,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace>KatnisssSpaceSimulator.UILib</RootNamespace>
+    <RootNamespace></RootNamespace>
     <ProjectGuid>{70FA2AF0-1725-15E3-F4B5-4083D9252BF4}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -59,7 +59,7 @@
     <Compile Include="Assets\UILib\UIHelper.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\UILib\UILib.asmdef" />
+    <None Include="Assets\UILib\_UILib.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

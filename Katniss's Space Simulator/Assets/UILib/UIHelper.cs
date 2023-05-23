@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace KatnisssSpaceSimulator.UILib
+namespace UILib
 {
     public static class UIHelper
     {
