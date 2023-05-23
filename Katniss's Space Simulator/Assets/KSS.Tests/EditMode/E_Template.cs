@@ -4,7 +4,7 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace KatnisssSpaceSimulator.Tests.EditMode
+namespace KSS.Tests.EditMode
 {
     public class E_Template
     {

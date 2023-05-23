@@ -24,7 +24,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 200}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 7885
+  controlID: 43
 --- !u!114 &2
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -150,7 +150,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 200}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 1
-  controlID: 7886
+  controlID: 44
 --- !u!114 &4
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -175,7 +175,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 100}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 7887
+  controlID: 45
 --- !u!114 &5
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -195,8 +195,8 @@ MonoBehaviour:
     y: 0
     width: 359
     height: 585
-  m_MinSize: {x: 201, y: 221}
-  m_MaxSize: {x: 4001, y: 4021}
+  m_MinSize: {x: 200, y: 200}
+  m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 6}
   m_Panes:
   - {fileID: 6}
@@ -233,9 +233,9 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 24dffcff
-      m_LastClickedID: -205020
-      m_ExpandedIDs: ea83feff48a6feff8ac2feff52f7feffd211ffffe613ffffe42bffff4c2cffff6647ffff8861ffff4cf8ffff08fbffff
+      m_SelectedIDs: 906b0000
+      m_LastClickedID: 27536
+      m_ExpandedIDs: 50e8ffff70e8ffff12e9ffff84e9ffffcee9ffff52ebffff08fbffff
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -286,7 +286,7 @@ MonoBehaviour:
   - {fileID: 2}
   - {fileID: 9}
   m_Selected: 1
-  m_LastSelected: 2
+  m_LastSelected: 0
 --- !u!114 &8
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -595,7 +595,7 @@ MonoBehaviour:
   m_Rotation:
     m_Target: {x: 0.015892621, y: 0.98256904, z: 0.15573633, w: -0.10027233}
     speed: 2
-    m_Value: {x: 0.015892621, y: 0.9825691, z: 0.15573633, w: -0.10027233}
+    m_Value: {x: 0.015892599, y: 0.9825676, z: 0.1557361, w: -0.100272186}
   m_Size:
     m_Target: 136.74261
     speed: 2
@@ -684,7 +684,7 @@ MonoBehaviour:
         m_PaneScroll: {x: 0, y: 0}
         m_ViewType: 1
         updateViewLive: 0
-        m_CurrentFrameIndex: 11261
+        m_CurrentFrameIndex: -1
         m_HierarchyOverruledThreadFromSelection: 0
         m_ProfilerViewFilteringOptions: 1
         m_FrameDataHierarchyView:
@@ -1718,7 +1718,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 1
   m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: ConsoleWindow
+  m_Name: ProjectBrowser
   m_EditorClassIdentifier: 
   m_Children: []
   m_Position:
@@ -1727,14 +1727,14 @@ MonoBehaviour:
     y: 585
     width: 1463
     height: 362
-  m_MinSize: {x: 101, y: 121}
-  m_MaxSize: {x: 4001, y: 4021}
-  m_ActualView: {fileID: 12}
+  m_MinSize: {x: 231, y: 271}
+  m_MaxSize: {x: 10001, y: 10021}
+  m_ActualView: {fileID: 11}
   m_Panes:
   - {fileID: 11}
   - {fileID: 12}
-  m_Selected: 1
-  m_LastSelected: 0
+  m_Selected: 0
+  m_LastSelected: 1
 --- !u!114 &11
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -1776,36 +1776,36 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Functionalities
+    - Assets/KSS
     m_Globs: []
     m_OriginalText: 
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/Functionalities
+  - Assets/KSS
   m_LastFoldersGridSize: -1
   m_LastProjectPath: E:\GIT\KatnisssSpaceSimulator\Katniss's Space Simulator
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 179}
-    m_SelectedIDs: 7c5d0000
-    m_LastClickedID: 23932
-    m_ExpandedIDs: 00000000585d00005a5d00005c5d00005e5d0000605d000000ca9a3b
+    scrollPos: {x: 0, y: 60}
+    m_SelectedIDs: ae6c0000
+    m_LastClickedID: 27822
+    m_ExpandedIDs: 00000000585d00005e5d00006e5d00006c680000866c0000ae6c0000d06c0000ae6e000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
-      m_Name: 
-      m_OriginalName: 
+      m_Name: _TextMesh Pro
+      m_OriginalName: _TextMesh Pro
       m_EditFieldRect:
         serializedVersion: 2
         x: 0
         y: 0
         width: 0
         height: 0
-      m_UserData: 0
+      m_UserData: 23916
       m_IsWaitingForDelay: 0
       m_IsRenaming: 0
-      m_OriginalEventType: 11
+      m_OriginalEventType: 0
       m_IsRenamingFilename: 1
       m_ClientGUIView: {fileID: 10}
     m_SearchString: 
@@ -1819,7 +1819,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 00000000585d00005a5d00005c5d00005e5d0000605d000000ca9a3b
+    m_ExpandedIDs: 00000000585d00005a5d00005c5d00005e5d0000605d0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1844,9 +1844,9 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: e4f7ffff
-    m_LastClickedInstanceID: -2076
-    m_HadKeyboardFocusLastEvent: 1
+    m_SelectedInstanceIDs: 906b0000
+    m_LastClickedInstanceID: 27536
+    m_HadKeyboardFocusLastEvent: 0
     m_ExpandedInstanceIDs: c6230000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -1863,7 +1863,7 @@ MonoBehaviour:
       m_IsRenaming: 0
       m_OriginalEventType: 11
       m_IsRenamingFilename: 1
-      m_ClientGUIView: {fileID: 7}
+      m_ClientGUIView: {fileID: 10}
     m_CreateAssetUtility:
       m_EndAction: {fileID: 0}
       m_InstanceID: 0
@@ -1980,22 +1980,361 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 12079, guid: 0000000000000000e000000000000000, type: 0}
+  m_Script: {fileID: 13401, guid: 0000000000000000e000000000000000, type: 0}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_MinSize: {x: 390, y: 390}
+  m_MinSize: {x: 100, y: 100}
   m_MaxSize: {x: 4000, y: 4000}
   m_TitleContent:
-    m_Text: Lighting
-    m_Image: {fileID: -1347227620855488341, guid: 0000000000000000d000000000000000, type: 0}
+    m_Text: Test Runner
+    m_Image: {fileID: 0}
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 1485
+    x: 1463
     y: 73
-    width: 434
+    width: 456
     height: 926
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
     m_LastAppliedPresetName: Default
     m_SaveData: []
+  m_Spl:
+    ID: 1156
+    splitterInitialOffset: 0
+    currentActiveSplitter: -1
+    realSizes:
+    - 642
+    - 214
+    relativeSizes:
+    - 0.75
+    - 0.25
+    minSizes:
+    - 32
+    - 32
+    maxSizes:
+    - 0
+    - 0
+    lastTotalSize: 856
+    splitSize: 6
+    xOffset: 0
+    m_Version: 1
+    oldRealSizes: 
+    oldMinSizes: 
+    oldMaxSizes: 
+    oldSplitSize: 0
+  m_TestTypeToolbarIndex: 0
+  m_PlayModeTestListGUI:
+    m_Window: {fileID: 15}
+    m_NewResultList:
+    - id: 1005
+      uniqueId: '[Katniss''s Space Simulator][suite]'
+      name: Katniss's Space Simulator
+      fullName: Katniss's Space Simulator
+      resultStatus: 1
+      duration: 0.0867894
+      messages: 
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 1
+      categories: []
+      parentId: 
+      parentUniqueId: 
+    - id: 1015
+      uniqueId: '[KSS.Tests.PlayMode.dll][suite]'
+      name: KSS.Tests.PlayMode.dll
+      fullName: E:/GIT/KatnisssSpaceSimulator/Katniss's Space Simulator/Library/ScriptAssemblies/KSS.Tests.PlayMode.dll
+      resultStatus: 1
+      duration: 0.0719861
+      messages: 
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 1
+      categories: []
+      parentId: 1011
+      parentUniqueId: '[Katniss''s Space Simulator][suite]'
+    - id: 1016
+      uniqueId: KSS.Tests.PlayMode.dll/[KatnisssSpaceSimulator][suite]
+      name: KatnisssSpaceSimulator
+      fullName: KatnisssSpaceSimulator
+      resultStatus: 0
+      duration: 0
+      messages: 
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 1
+      categories: []
+      parentId: 1015
+      parentUniqueId: '[KSS.Tests.PlayMode.dll][suite]'
+    - id: 1017
+      uniqueId: KSS.Tests.PlayMode.dll/KatnisssSpaceSimulator/[Tests][suite]
+      name: Tests
+      fullName: KatnisssSpaceSimulator.Tests
+      resultStatus: 0
+      duration: 0
+      messages: 
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 1
+      categories: []
+      parentId: 1016
+      parentUniqueId: KSS.Tests.PlayMode.dll/[KatnisssSpaceSimulator][suite]
+    - id: 1018
+      uniqueId: KSS.Tests.PlayMode.dll/KatnisssSpaceSimulator/Tests/[KSS.Tests.PlayMode][KatnisssSpaceSimulator.Tests.PlayMode][suite]
+      name: PlayMode
+      fullName: KatnisssSpaceSimulator.Tests.PlayMode
+      resultStatus: 0
+      duration: 0
+      messages: 
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 1
+      categories: []
+      parentId: 1017
+      parentUniqueId: KSS.Tests.PlayMode.dll/KatnisssSpaceSimulator/[Tests][suite]
+    - id: 1012
+      uniqueId: KSS.Tests.PlayMode.dll/KatnisssSpaceSimulator/Tests/PlayMode/[KSS.Tests.PlayMode][KatnisssSpaceSimulator.Tests.PlayMode.P_Template][suite]
+      name: P_Template
+      fullName: KatnisssSpaceSimulator.Tests.PlayMode.P_Template
+      resultStatus: 0
+      duration: 0
+      messages: 
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 1
+      categories: []
+      parentId: 1018
+      parentUniqueId: KSS.Tests.PlayMode.dll/KatnisssSpaceSimulator/Tests/[KSS.Tests.PlayMode][KatnisssSpaceSimulator.Tests.PlayMode][suite]
+    - id: 1013
+      uniqueId: KSS.Tests.PlayMode.dll/KatnisssSpaceSimulator/Tests/PlayMode/P_Template/[KSS.Tests.PlayMode][KatnisssSpaceSimulator.Tests.PlayMode.P_Template.NewTestScriptSimplePasses]
+      name: NewTestScriptSimplePasses
+      fullName: KatnisssSpaceSimulator.Tests.PlayMode.P_Template.NewTestScriptSimplePasses
+      resultStatus: 0
+      duration: 0
+      messages: 
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 0
+      categories:
+      - Uncategorized
+      parentId: 1012
+      parentUniqueId: KSS.Tests.PlayMode.dll/KatnisssSpaceSimulator/Tests/PlayMode/[KSS.Tests.PlayMode][KatnisssSpaceSimulator.Tests.PlayMode.P_Template][suite]
+    - id: 1014
+      uniqueId: KSS.Tests.PlayMode.dll/KatnisssSpaceSimulator/Tests/PlayMode/P_Template/[KSS.Tests.PlayMode][KatnisssSpaceSimulator.Tests.PlayMode.P_Template.NewTestScriptWithEnumeratorPasses]
+      name: NewTestScriptWithEnumeratorPasses
+      fullName: KatnisssSpaceSimulator.Tests.PlayMode.P_Template.NewTestScriptWithEnumeratorPasses
+      resultStatus: 0
+      duration: 0
+      messages: 
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 0
+      categories:
+      - Uncategorized
+      parentId: 1012
+      parentUniqueId: KSS.Tests.PlayMode.dll/KatnisssSpaceSimulator/Tests/PlayMode/[KSS.Tests.PlayMode][KatnisssSpaceSimulator.Tests.PlayMode.P_Template][suite]
+    m_ResultText: 
+    m_ResultStacktrace: 
+    m_TestListState:
+      scrollPos: {x: 0, y: 0}
+      m_SelectedIDs: 40740c32
+      m_LastClickedID: 839676992
+      m_ExpandedIDs: 18302687019ce6a5d2dac001a338db2940740c32f9bc9161ffffff7f
+      m_RenameOverlay:
+        m_UserAcceptedRename: 0
+        m_Name: 
+        m_OriginalName: 
+        m_EditFieldRect:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        m_UserData: 0
+        m_IsWaitingForDelay: 0
+        m_IsRenaming: 0
+        m_OriginalEventType: 11
+        m_IsRenamingFilename: 0
+        m_ClientGUIView: {fileID: 0}
+      m_SearchString: 
+    m_TestRunnerUIFilter:
+      PassedHidden: 0
+      FailedHidden: 0
+      NotRunHidden: 0
+      m_SearchString: 
+      selectedCategoryMask: 0
+      availableCategories:
+      - Uncategorized
+    m_SelectedOption: 0
+  m_EditModeTestListGUI:
+    m_Window: {fileID: 15}
+    m_NewResultList:
+    - id: 1000
+      uniqueId: '[Katniss''s Space Simulator][suite]'
+      name: Katniss's Space Simulator
+      fullName: Katniss's Space Simulator
+      resultStatus: 1
+      duration: 0.0336537
+      messages: 
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 1
+      categories: []
+      parentId: 
+      parentUniqueId: 
+    - id: 1003
+      uniqueId: '[KSS.Tests.EditMode.dll][suite]'
+      name: KSS.Tests.EditMode.dll
+      fullName: E:/GIT/KatnisssSpaceSimulator/Katniss's Space Simulator/Library/ScriptAssemblies/KSS.Tests.EditMode.dll
+      resultStatus: 1
+      duration: 0.0065791
+      messages: 
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 1
+      categories: []
+      parentId: 1000
+      parentUniqueId: '[Katniss''s Space Simulator][suite]'
+    - id: 1004
+      uniqueId: KSS.Tests.EditMode.dll/[KatnisssSpaceSimulator][suite]
+      name: KatnisssSpaceSimulator
+      fullName: KatnisssSpaceSimulator
+      resultStatus: 0
+      duration: 0
+      messages: 
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 1
+      categories: []
+      parentId: 1003
+      parentUniqueId: '[KSS.Tests.EditMode.dll][suite]'
+    - id: 1005
+      uniqueId: KSS.Tests.EditMode.dll/KatnisssSpaceSimulator/[Tests][suite]
+      name: Tests
+      fullName: KatnisssSpaceSimulator.Tests
+      resultStatus: 0
+      duration: 0
+      messages: 
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 1
+      categories: []
+      parentId: 1004
+      parentUniqueId: KSS.Tests.EditMode.dll/[KatnisssSpaceSimulator][suite]
+    - id: 1006
+      uniqueId: KSS.Tests.EditMode.dll/KatnisssSpaceSimulator/Tests/[KSS.Tests.EditMode][KatnisssSpaceSimulator.Tests.EditMode][suite]
+      name: EditMode
+      fullName: KatnisssSpaceSimulator.Tests.EditMode
+      resultStatus: 0
+      duration: 0
+      messages: 
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 1
+      categories: []
+      parentId: 1005
+      parentUniqueId: KSS.Tests.EditMode.dll/KatnisssSpaceSimulator/[Tests][suite]
+    - id: 1001
+      uniqueId: KSS.Tests.EditMode.dll/KatnisssSpaceSimulator/Tests/EditMode/[KSS.Tests.EditMode][KatnisssSpaceSimulator.Tests.EditMode.E_Template][suite]
+      name: E_Template
+      fullName: KatnisssSpaceSimulator.Tests.EditMode.E_Template
+      resultStatus: 0
+      duration: 0
+      messages: 
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 1
+      categories: []
+      parentId: 1006
+      parentUniqueId: KSS.Tests.EditMode.dll/KatnisssSpaceSimulator/Tests/[KSS.Tests.EditMode][KatnisssSpaceSimulator.Tests.EditMode][suite]
+    - id: 1002
+      uniqueId: KSS.Tests.EditMode.dll/KatnisssSpaceSimulator/Tests/EditMode/E_Template/[KSS.Tests.EditMode][KatnisssSpaceSimulator.Tests.EditMode.E_Template.CreatedGameObjectExists]
+      name: CreatedGameObjectExists
+      fullName: KatnisssSpaceSimulator.Tests.EditMode.E_Template.CreatedGameObjectExists
+      resultStatus: 0
+      duration: 0
+      messages: 
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 0
+      categories:
+      - Uncategorized
+      parentId: 1001
+      parentUniqueId: KSS.Tests.EditMode.dll/KatnisssSpaceSimulator/Tests/EditMode/[KSS.Tests.EditMode][KatnisssSpaceSimulator.Tests.EditMode.E_Template][suite]
+    m_ResultText: 
+    m_ResultStacktrace: 
+    m_TestListState:
+      scrollPos: {x: 0, y: 0}
+      m_SelectedIDs: 
+      m_LastClickedID: 0
+      m_ExpandedIDs: 6e0ce4a40ef5a0ae067943d4aab8a93a07892d48d052df4cf9bc9161252f2765a842747143252379ffffff7f
+      m_RenameOverlay:
+        m_UserAcceptedRename: 0
+        m_Name: 
+        m_OriginalName: 
+        m_EditFieldRect:
+          serializedVersion: 2
+          x: 0
+          y: 0
+          width: 0
+          height: 0
+        m_UserData: 0
+        m_IsWaitingForDelay: 0
+        m_IsRenaming: 0
+        m_OriginalEventType: 11
+        m_IsRenamingFilename: 0
+        m_ClientGUIView: {fileID: 0}
+      m_SearchString: 
+    m_TestRunnerUIFilter:
+      PassedHidden: 0
+      FailedHidden: 0
+      NotRunHidden: 0
+      m_SearchString: 
+      selectedCategoryMask: 0
+      availableCategories:
+      - Uncategorized

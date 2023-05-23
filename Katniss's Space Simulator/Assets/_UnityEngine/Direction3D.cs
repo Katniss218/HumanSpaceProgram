@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace KatnisssSpaceSimulator.Terrain
+namespace KSS.Terrain
 {
     /// <summary>
     /// Represents a basis direction in 3D space.

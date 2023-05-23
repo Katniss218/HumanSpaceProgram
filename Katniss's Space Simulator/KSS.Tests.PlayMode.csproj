@@ -59,7 +59,7 @@
     <Compile Include="Assets\KSS.Tests\PlayMode\P_Template.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\KSS.Tests\PlayMode\KSS.Tests.PlayMode.asmdef" />
+    <None Include="Assets\KSS.Tests\PlayMode\_KSS.Tests.PlayMode.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

@@ -62,7 +62,6 @@
     <Compile Include="Assets\UnityPlus.AssetManagement\Providers\IAssetProvider.cs" />
     <Compile Include="Assets\UnityPlus.AssetManagement\Providers\MaterialProviderResources.cs" />
     <Compile Include="Assets\UnityPlus.AssetManagement\Providers\Texture2DProviderResources.cs" />
-    <Compile Include="Assets\UnityPlus.AssetManagement\AssetRegistry.cs" />
     <Compile Include="Assets\UnityPlus.AssetManagement\Providers\GameObjectProviderResources.cs" />
   </ItemGroup>
   <ItemGroup>
