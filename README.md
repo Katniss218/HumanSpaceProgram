@@ -1,2 +1,2 @@
 # KatnisssSpaceSimulator
-Don't think much of this for now.
+A WIP open-source space simulator game, superficially similar to Kerbal Space Program.
