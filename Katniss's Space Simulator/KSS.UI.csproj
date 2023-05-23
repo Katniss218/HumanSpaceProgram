@@ -9,10 +9,10 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{6A093499-3B7A-71F2-8793-20E600CE8610}</ProjectGuid>
+    <ProjectGuid>{43C42401-C6C3-28EB-5BC7-32F0B5CC16C2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <AssemblyName>KSS</AssemblyName>
+    <AssemblyName>KSS.UI</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <BaseDirectory>.</BaseDirectory>
@@ -56,24 +56,20 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\KSS\Camera\CameraController.cs" />
-    <Compile Include="Assets\KSS\Terrain\MeshUtils.cs" />
-    <Compile Include="Assets\KSS\Terrain\MakeQuadMesh_Job.cs" />
-    <Compile Include="Assets\KSS\Functionalities\FAvionics.cs" />
-    <Compile Include="Assets\KSS\Terrain\LODQuadSphere.cs" />
-    <Compile Include="Assets\KSS\Functionalities\FRocketEngine.cs" />
-    <Compile Include="Assets\KSS\Terrain\LODQuadTree.cs" />
-    <Compile Include="Assets\KSS\Functionalities\FBulkContainer_Sphere.cs" />
-    <Compile Include="Assets\KSS\Functionalities\FBulkConnection.cs" />
-    <Compile Include="Assets\KSS\Functionalities\FVesselSeparator.cs" />
-    <Compile Include="Assets\KSS\Terrain\LODQuad.cs" />
-    <Compile Include="Assets\KSS\Functionalities\FActuatorXY.cs" />
-    <Compile Include="Assets\KSS\TimeWarp\TimeWarpManager.cs" />
-    <Compile Include="Assets\KSS\Terrain\LODQuadTree_NodeUtils.cs" />
+    <Compile Include="Assets\KSS.UI\Windows\WindowDrag.cs" />
+    <Compile Include="Assets\KSS.UI\Windows\WindowRelationHighlight.cs" />
+    <Compile Include="Assets\KSS.UI\TimewarpReadoutUI.cs" />
+    <Compile Include="Assets\KSS.UI\VelocityReadoutUI.cs" />
+    <Compile Include="Assets\KSS.UI\IResourceContainerUI.cs" />
+    <Compile Include="Assets\KSS.UI\Windows\WindowExit.cs" />
+    <Compile Include="Assets\KSS.UI\Windows\PartWindow.cs" />
+    <Compile Include="Assets\KSS.UI\FPSCounterUI.cs" />
+    <Compile Include="Assets\KSS.UI\AltitudeReadoutUI.cs" />
+    <Compile Include="Assets\KSS.UI\PartWindowManager.cs" />
+    <Compile Include="Assets\KSS.UI\AccelerationReadoutUI.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\KSS\Terrain\TerrainShader.shader" />
-    <None Include="Assets\KSS\_KSS.asmdef" />
+    <None Include="Assets\KSS.UI\_KSS.UI.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -724,11 +720,8 @@
     <Reference Include="System.Xml.Serialization">
       <HintPath>F:\UnityEditors\2022.1.8f1\Editor\Data\NetStandard\compat\2.1.0\shims\netfx\System.Xml.Serialization.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Postprocessing.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.Postprocessing.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Postprocessing.Runtime">
-      <HintPath>Library\ScriptAssemblies\Unity.Postprocessing.Runtime.dll</HintPath>
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.UI">
       <HintPath>Library\ScriptAssemblies\UnityEditor.UI.dll</HintPath>
@@ -742,9 +735,17 @@
       <Project>{AA320F23-E273-CF3D-ECC5-E3B3EE38E655}</Project>
       <Name>_UnityEngine</Name>
     </ProjectReference>
+    <ProjectReference Include="UILib.csproj">
+      <Project>{70FA2AF0-1725-15E3-F4B5-4083D9252BF4}</Project>
+      <Name>UILib</Name>
+    </ProjectReference>
     <ProjectReference Include="KSS.Core.csproj">
       <Project>{C615911B-EF2A-D5E1-1CFB-5D278FA273D2}</Project>
       <Name>KSS.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="KSS.csproj">
+      <Project>{6A093499-3B7A-71F2-8793-20E600CE8610}</Project>
+      <Name>KSS</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
