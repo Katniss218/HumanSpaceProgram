@@ -123,7 +123,6 @@ namespace KSS.Functionalities
                 outletC.Inflow.Add( oldFlow, -1.0f );
             }
 
-            // Cache.
             _cacheFlow = null;
         }
 
@@ -132,7 +131,6 @@ namespace KSS.Functionalities
             if( _cacheFlow != null )
                 throw new InvalidOperationException( $"Can't set flow that's not been reset" );
 
-            // Cache.
             _cacheFlow = newFlow;
             _cacheInlet = inlet;
             _cacheOutlet = outlet;
@@ -209,15 +207,14 @@ namespace KSS.Functionalities
                 endSamples[1] = endP[1].Sample( End2.Position, endP[1].transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea );
             }
 
-            // In [Pa]
-            float signedRelativePressure = endSamples[0].Pressure - endSamples[1].Pressure;
+            float signedRelativePressure_Pa = endSamples[0].Pressure - endSamples[1].Pressure;
 
-            if( Mathf.Abs( signedRelativePressure ) < MIN_PRESSURE_DIFFERENCE )
+            if( Mathf.Abs( signedRelativePressure_Pa ) < MIN_PRESSURE_DIFFERENCE )
             {
                 return;
             }
 
-            (int inlet, int outlet) = GetInletAndOutletIndices( signedRelativePressure );
+            (int inlet, int outlet) = GetInletAndOutletIndices( signedRelativePressure_Pa );
 
             Port inletEnd = this.GetEnd( inlet );
 
