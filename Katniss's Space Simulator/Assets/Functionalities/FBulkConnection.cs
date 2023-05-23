@@ -13,6 +13,9 @@ using UnityEngine;
 
 namespace KatnisssSpaceSimulator.Functionalities
 {
+    /// <summary>
+    /// An object that connects two containers and calculates the resource flow between them.
+    /// </summary>
     public class FBulkConnection : MonoBehaviour
     {
         /// <summary>

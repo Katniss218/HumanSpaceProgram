@@ -1,0 +1,6 @@
+{
+    "name": "KSS.Tests.PlayMode",
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}

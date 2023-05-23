@@ -1,0 +1,9 @@
+{
+    "name": "KSS.Tests.EditMode",
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ]
+}
