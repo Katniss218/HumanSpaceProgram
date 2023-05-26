@@ -24,7 +24,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 200}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 59713
+  controlID: 66944
 --- !u!114 &2
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -150,7 +150,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 200}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 1
-  controlID: 59714
+  controlID: 66945
 --- !u!114 &4
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -175,7 +175,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 100}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 59715
+  controlID: 66946
 --- !u!114 &5
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -233,9 +233,9 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 8c15ffff
-      m_LastClickedID: -60020
-      m_ExpandedIDs: 4cdbfeff68f3feffda1bffff3c1cffffd61dffff7c22ffffde22ffffc224ffff383bffff3e3bffffa43bffffa83bffff8e45ffffc650ffffd050ffffd250ffff7caeffff76b1ffffe4b7ffffeec3ffff14e8ffffd8f2ffffdaf2ffffdcf2ffffdef2ffffe2f2ffffe4f2ffffe6f2ffffeaf2ffffecf2fffff0f2fffff2f2fffff6f2fffff8f2fffffaf2fffffcf2ffff08f3ffff08fbffff3c5b0000ae5b0000b25b0000e25b00004c5c00006c5c00000c1c0100
+      m_SelectedIDs: 5cf0feff
+      m_LastClickedID: -69540
+      m_ExpandedIDs: 5c94feff6694feff6894fefff29bfeff4cdbfeff68f3feff60f7feffda1bffff3c1cffffd61dffff7c22ffffde22ffffc224ffff383bffff3e3bffffa43bffffa83bffff8e45ffffc650ffffd050ffffd250ffff7caeffff76b1ffffe4b7ffffeec3ffff14e8ffffd8f2ffffdaf2ffffdcf2ffffdef2ffffe2f2ffffe4f2ffffe6f2ffffeaf2ffffecf2fffff0f2fffff2f2fffff6f2fffff8f2fffffaf2fffffcf2ffff08f3ffff08fbffff3c5b0000ae5b0000b25b0000e25b00004c5c00006c5c0000f6190100281a0100041c01000c1c0100
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -407,7 +407,7 @@ MonoBehaviour:
       containerId: overlay-container--right
       floating: 0
       collapsed: 0
-      displayed: 0
+      displayed: 1
       snapOffset: {x: 0, y: 0}
       snapOffsetDelta: {x: 0, y: 0}
       snapCorner: 0
@@ -545,9 +545,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 20.805882, y: 394.3548, z: -457.4447}
+    m_Target: {x: 646.65753, y: 62.434364, z: 0.13748398}
     speed: 2
-    m_Value: {x: 20.805882, y: 394.3548, z: -457.4447}
+    m_Value: {x: 646.65753, y: 62.434364, z: 0.13748398}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -597,9 +597,9 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: 0, y: 0, z: 0, w: 1}
   m_Size:
-    m_Target: 56.58858
+    m_Target: 143.92796
     speed: 2
-    m_Value: 56.58858
+    m_Value: 143.92796
   m_Ortho:
     m_Target: 1
     speed: 2
@@ -1776,21 +1776,21 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Resources
+    - Assets/Resources/Sprites
     m_Globs: []
     m_OriginalText: 
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/Resources
+  - Assets/Resources/Sprites
   m_LastFoldersGridSize: -1
   m_LastProjectPath: E:\GIT\KatnisssSpaceSimulator\Katniss's Space Simulator
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 243}
-    m_SelectedIDs: 4a5d0000
-    m_LastClickedID: 23882
+    m_SelectedIDs: 605d0000
+    m_LastClickedID: 23904
     m_ExpandedIDs: 00000000485d00004a5d00004c5d00004e5d0000505d0000525d0000545d0000565d0000585d00005a5d00005c5d00005e5d0000605d000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -1844,8 +1844,8 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: 8c15ffff
-    m_LastClickedInstanceID: -60020
+    m_SelectedInstanceIDs: 5cf0feff
+    m_LastClickedInstanceID: -69540
     m_HadKeyboardFocusLastEvent: 0
     m_ExpandedInstanceIDs: c6230000
     m_RenameOverlay:
