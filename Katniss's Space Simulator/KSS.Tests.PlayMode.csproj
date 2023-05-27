@@ -56,10 +56,10 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\KSS.Tests\PlayMode\P_Template.cs" />
+    <Compile Include="Assets\Tests\PlayMode\P_Template.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\KSS.Tests\PlayMode\_KSS.Tests.PlayMode.asmdef" />
+    <None Include="Assets\Tests\PlayMode\Tests.PlayMode.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -691,6 +691,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="UILib.csproj">
+      <Project>{70FA2AF0-1725-15E3-F4B5-4083D9252BF4}</Project>
+      <Name>UILib</Name>
+    </ProjectReference>
     <ProjectReference Include="KSS.csproj">
       <Project>{6A093499-3B7A-71F2-8793-20E600CE8610}</Project>
       <Name>KSS</Name>
@@ -702,6 +706,10 @@
     <ProjectReference Include="KSS.DevUtils.csproj">
       <Project>{D7208026-3029-DD39-0449-2AD64786FAF4}</Project>
       <Name>KSS.DevUtils</Name>
+    </ProjectReference>
+    <ProjectReference Include="KSS.UI.csproj">
+      <Project>{43C42401-C6C3-28EB-5BC7-32F0B5CC16C2}</Project>
+      <Name>KSS.UI</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

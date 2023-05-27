@@ -1,16 +1,16 @@
 {
-    "name": "KSS.Tests.EditMode",
+    "name": "KSS.Tests.PlayMode",
     "rootNamespace": "",
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
+        "UILib",
         "KSS",
         "KSS.Core",
-        "KSS.DevUtils"
+        "KSS.DevUtils",
+        "KSS.UI"
     ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": true,

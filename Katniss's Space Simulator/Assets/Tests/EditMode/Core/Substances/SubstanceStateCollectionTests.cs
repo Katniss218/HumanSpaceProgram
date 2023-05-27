@@ -6,7 +6,7 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace KSS.Tests.EditMode
+namespace KSS_Tests_EditMode
 {
     public class SubstanceStateCollectionTests
     {
