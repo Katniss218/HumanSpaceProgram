@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,6 +12,19 @@ namespace UILib
         // Create UI elements with the specific properties with C#.
 
         // generalized:
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static (GameObject go, RectTransform t) CreateUI( RectTransform parent, string name, UILayoutInfo layoutInfo )
+        {
+            GameObject rootGO = new GameObject( name );
+
+            RectTransform rootT = rootGO.AddComponent<RectTransform>();
+            rootT.SetParent( parent );
+            rootT.SetLayoutInfo( layoutInfo );
+            rootT.localScale = Vector3.one;
+
+            return (rootGO, rootT);
+        }
 
         public static GameObject UI( Transform parent, string name, Vector2 anchorPivot, Vector2 anchoredPos, Vector2 sizeDelta )
         {

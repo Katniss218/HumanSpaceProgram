@@ -746,6 +746,10 @@
       <Project>{C615911B-EF2A-D5E1-1CFB-5D278FA273D2}</Project>
       <Name>KSS.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="UILib.csproj">
+      <Project>{70FA2AF0-1725-15E3-F4B5-4083D9252BF4}</Project>
+      <Name>UILib</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

@@ -58,6 +58,7 @@
   <ItemGroup>
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\IResourceConsumer.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\IResourceContainer.cs" />
+    <Compile Include="Assets\KSS.Core\Scenes\SceneManager.cs" />
     <Compile Include="Assets\KSS.Core\Serialization\AssetPartSource.cs" />
     <Compile Include="Assets\KSS.Core\Substance.cs" />
     <Compile Include="Assets\KSS.Core\CelestialBody.cs" />
@@ -92,7 +93,9 @@
     <Compile Include="Assets\KSS.Core\Buildings\LaunchSite.cs" />
     <Compile Include="Assets\KSS.Core\ReferenceFrames\IReferenceFrame.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\FlowUtils.cs" />
+    <Compile Include="Assets\KSS.Core\Scenes\AlwaysLoadedManager.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\SubstanceStateCollection.cs" />
+    <Compile Include="Assets\KSS.Core\Scenes\PlayButtonSwitcher.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.Core\_KSS.Core.asmdef" />
@@ -757,6 +760,10 @@
     <ProjectReference Include="_UnityEngine.csproj">
       <Project>{AA320F23-E273-CF3D-ECC5-E3B3EE38E655}</Project>
       <Name>_UnityEngine</Name>
+    </ProjectReference>
+    <ProjectReference Include="UILib.csproj">
+      <Project>{70FA2AF0-1725-15E3-F4B5-4083D9252BF4}</Project>
+      <Name>UILib</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -2,7 +2,8 @@
     "name": "KSS.Core",
     "rootNamespace": "",
     "references": [
-        "GUID:2f7a75fca464e944eaf94f058ade98d3"
+        "GUID:2f7a75fca464e944eaf94f058ade98d3",
+        "GUID:c82c696bae534834ea738d7d72110d7e"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
