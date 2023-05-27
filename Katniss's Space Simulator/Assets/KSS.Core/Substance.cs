@@ -14,6 +14,14 @@ namespace KSS.Core
     [Serializable]
     public class Substance : IIdentifiable
     {
+        public enum Type
+        {
+            Inert,
+            Fuel,
+            Oxidizer,
+            Combined
+        }
+
         // kinda ugly, encapsulate, and put in a separate BulkResourceRegistry class even.
         public static Dictionary<string, Substance> RegisteredResources { get; set; } = new Dictionary<string, Substance>();
 
@@ -29,6 +37,11 @@ namespace KSS.Core
         [field: SerializeField]
         public float Density { get; set; }
 
+        /// <summary>
+        /// The type of the substance. Mostly for visual purposes.
+        /// </summary>
+        [field: SerializeField]
+        public Type SubstanceType { get; set; }
         // Need to figure out how gasses will work too.
         // how about pre-mixed stuff, like air being nitrogen + oxygen, or kerosene being a mix of hydrocarbons?
     }

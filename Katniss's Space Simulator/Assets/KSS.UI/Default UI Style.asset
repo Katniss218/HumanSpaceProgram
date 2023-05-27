@@ -30,3 +30,10 @@ MonoBehaviour:
   AttitudeIndicatorBackground: {fileID: 21300000, guid: ee19134100d09b54b92af6b7e83bc21b, type: 3}
   AltitudeIndicatorBackground: {fileID: 0}
   VelocityIndicatorBackground: {fileID: 21300000, guid: c3906aad464be3a46a5bbb1d8b194a3a, type: 3}
+  BarColorInert: {r: 0.7490196, g: 0.7490196, b: 0.7490196, a: 1}
+  BarColorFuel: {r: 1, g: 0.3764706, b: 0.2509804, a: 1}
+  BarColorOxidizer: {r: 0.2509804, g: 0.56078434, b: 1, a: 1}
+  BarColorCombined: {r: 0.9, g: 0.9, b: 0.22685947, a: 1}
+  BarOpacitySolid: 1
+  BarOpacityLiquid: 0.75
+  BarOpacityGas: 0.333

@@ -149,41 +149,27 @@ namespace KSS.Core.ResourceFlowSystem
                 return;
             }
 
-            // ADDS OR REMOVES RESOURCES.
+            // ADDS (dt > 0) OR REMOVES (dt < 0) RESOURCES.
 
-            Dictionary<string, int> substanceIndexMap = new();
-
-            // Create a dictionary to store the index of each substance in the _substances list
-            for( int i = 0; i < _substances.Count; i++ )
+            List<SubstanceState> substancesMissing = new List<SubstanceState>();
+            foreach( var sbs in other._substances )
             {
-                substanceIndexMap[_substances[i].Data.ID] = i;
-            }
+                float amountDelta = sbs.MassAmount * dt;
 
-            for( int i = 0; i < other._substances.Count; i++ )
-            {
-                string substanceId = other._substances[i].Data.ID;
+                // potentially remove substances if abs(newamount) < epsilon
 
-                if( substanceIndexMap.ContainsKey( substanceId ) )
+                int index = this._substances.FindIndex( s => s.Data.ID == sbs.Data.ID );
+                if( index != -1 )
                 {
-                    int index = substanceIndexMap[substanceId];
-                    float amountDelta = other._substances[i].MassAmount * dt;
                     float newAmount = this._substances[index].MassAmount + amountDelta;
 
-                    if( newAmount <= 0 )
-                    {
-                        // Remove the entry from the _substances list
-                        _substances.RemoveAt( index );
-                        substanceIndexMap.Remove( substanceId );
-                    }
-                    else
-                    {
-                        this._substances[index] = new SubstanceState( newAmount, this._substances[index].Data );
-                    }
+                    this._substances[index] = new SubstanceState( newAmount, this._substances[index].Data );
                 }
                 else
                 {
-                    // Substance not present in this container yet, add it to newSubstances
-                    _substances.Add( new SubstanceState( other._substances[i], other._substances[i].MassAmount * dt ) );
+                    var newSub = new SubstanceState( amountDelta, sbs.Data );
+
+                    this._substances.Add( newSub );
                 }
             }
         }

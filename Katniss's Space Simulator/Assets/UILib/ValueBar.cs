@@ -110,10 +110,28 @@ namespace UILib
             return seg;
         }
 
-        public void SetWidth( ValueBarSegment elem, float width )
+        public void RemoveSegment( int index )
         {
-            int index = _segments.FindIndex( s => s.seg == elem );
+            var seg = _segments[index];
+            _segments.RemoveAt( index );
 
+            Destroy( seg.seg.gameObject );
+
+            SyncElements( index );
+        }
+
+        public void ClearSegments()
+        {
+            foreach( var seg in _segments )
+            {
+                Destroy( seg.seg.gameObject );
+            }
+            _segments.Clear();
+            // everything removed so nothing left to sync.
+        }
+
+        public void SetWidth( int index, float width )
+        {
             float remainingWidth = 1.0f - GetWidthExcluding( index );
             float segWidthPerc = Mathf.Clamp( width, 0, remainingWidth );
 

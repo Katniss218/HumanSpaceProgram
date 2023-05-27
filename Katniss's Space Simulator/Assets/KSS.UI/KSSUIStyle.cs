@@ -16,5 +16,14 @@ namespace KSS.UI
         public Sprite AltitudeIndicatorBackground;
 
         public Sprite VelocityIndicatorBackground;
+
+        public Color BarColorInert;
+        public Color BarColorFuel;
+        public Color BarColorOxidizer;
+        public Color BarColorCombined;
+
+        public float BarOpacitySolid;
+        public float BarOpacityLiquid;
+        public float BarOpacityGas;
     }
 }

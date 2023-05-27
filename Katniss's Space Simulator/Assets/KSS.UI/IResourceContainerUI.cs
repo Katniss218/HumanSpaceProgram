@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.AssetManagement;
+using UILib.Factories;
+using KSS.Core;
 
 namespace KSS.UI
 {
@@ -16,44 +18,36 @@ namespace KSS.UI
         public IResourceContainer ReferenceObject { get; set; }
 
         [SerializeField]
-        Image _image;
-
-        void Start()
-        {
-            _image.type = Image.Type.Filled;
-            _image.fillMethod = Image.FillMethod.Horizontal;
-            _image.fillOrigin = 0;
-        }
+        ValueBar _bar;
 
         void Update()
         {
-            float perc = ReferenceObject.Contents.GetVolume() / ReferenceObject.MaxVolume;
+            _bar.ClearSegments();
+            KSSUIStyle style = (KSSUIStyle)UIStyleManager.Instance.Style;
 
-            _image.fillAmount = perc;
+            for( int i = 0; i < this.ReferenceObject.Contents.SubstanceCount; i++ )
+            {
+                var sbs = this.ReferenceObject.Contents[i];
+                float perc = (sbs.MassAmount / sbs.Data.Density) / ReferenceObject.MaxVolume;
+
+                var seg = _bar.AddSegment( perc );
+                seg.Sprite = style.Bar;
+                seg.Color = style.BarColorFuel;
+
+                //_bar.SetWidth( i, perc );
+            }
         }
 
         public static IResourceContainerUI Create( RectTransform parent, IResourceContainer referenceObj )
         {
-            GameObject root = UIHelper.UI( parent, "resource container UI", Vector2.zero, Vector2.zero, new Vector2( 250, 25 ) );
+            KSSUIStyle style = (KSSUIStyle)UIStyleManager.Instance.Style;
 
-            GameObject bg = UIHelper.UI( root.transform, "background", Vector2.zero, Vector2.one, new Vector2( 0.5f, 0.5f ), Vector2.zero, Vector2.zero );
+            GameObject root = UIHelper.UI( parent, "resource container UI", Vector2.zero, Vector2.zero, new Vector2( 250, 15 ) );
 
-            Image image = bg.AddComponent<Image>();
-            image.color = Color.black;
-            image.raycastTarget = false;
-            image.type = Image.Type.Sliced;
-            image.sprite = AssetRegistry<Sprite>.GetAsset( "Sprites/ui_pw_fillbar" );
-
-            GameObject fg = UIHelper.UI( bg.transform, "foreground", Vector2.zero, Vector2.one, new Vector2( 0.5f, 0.5f ), Vector2.zero, Vector2.zero );
-
-            Image imagefg = fg.AddComponent<Image>();
-            imagefg.color = Color.green;
-            imagefg.raycastTarget = false;
-            imagefg.type = Image.Type.Filled;
-            imagefg.sprite = AssetRegistry<Sprite>.GetAsset( "Sprites/ui_pw_fillbar" );
+            (_, ValueBar bar) = BarFactory.CreateEmptyHorizontal( (RectTransform)root.transform, "bar", new UILayoutInfo( Vector2.zero, Vector2.one, new Vector2( 0.5f, 0.5f ), Vector2.zero, Vector2.zero ), style );
 
             IResourceContainerUI ui = root.AddComponent<IResourceContainerUI>();
-            ui._image = imagefg;
+            ui._bar = bar;
             ui.ReferenceObject = referenceObj;
 
             return ui;

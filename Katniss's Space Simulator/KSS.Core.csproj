@@ -96,6 +96,7 @@
     <Compile Include="Assets\KSS.Core\Scenes\AlwaysLoadedManager.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\SubstanceStateCollection.cs" />
     <Compile Include="Assets\KSS.Core\Scenes\PlayButtonSwitcher.cs" />
+    <Compile Include="Assets\KSS.Core\UIStyleManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.Core\_KSS.Core.asmdef" />
