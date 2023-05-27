@@ -13,118 +13,102 @@ namespace UILib
         [SerializeField]
         private float _left;
         [SerializeField]
-        private float _right;
+        private float _width;
+        [SerializeField]
+        private float _widthParent;
+        [SerializeField]
+        private float _offset;
 
-        public float Left
+        internal float Left
         {
             get { return _left; }
             set
             {
                 _left = value;
-                OnLeftOrRightChanged();
+                OnLeftOrWidthChanged();
             }
         }
 
-        public float Right
+        internal float Width
         {
-            get { return _right; }
+            get { return _width; }
             set
             {
-                _right = value;
-                OnLeftOrRightChanged();
+                _width = value;
+                OnLeftOrWidthChanged();
+            }
+        }
+
+
+        internal float WidthParent
+        {
+            get { return _widthParent; }
+            set
+            {
+                _widthParent = value;
+                OnLeftOrWidthChanged();
+            }
+        }
+
+        internal float ForegroundOffsetX
+        {
+            get { return _offset; }
+            set
+            {
+                _offset = value;
+                OnForegroundOffsetChanged();
             }
         }
 
         [SerializeField]
-        RectTransform _image;
+        RectTransform _imageT;
+        Image _image;
 
-        RectTransform _parent;
-        RectTransform _mask;
+        RectTransform _selfMask;
 
-        float width => _parent.rect.width;
-
-        [SerializeField]
-        private float _leftPadding;
-        [SerializeField]
-        private float _rightPadding;
-        public float LeftPadding
-        {
-            get { return _leftPadding; }
-            set
-            {
-                _leftPadding = value;
-                OnPaddingChanged();
-            }
-        }
-
-        public float RightPadding
-        {
-            get { return _rightPadding; }
-            set
-            {
-                _rightPadding = value;
-                OnPaddingChanged();
-            }
-        }
-
-        void RecacheParent()
-        {
-            _parent = (RectTransform)this.transform.parent;
-
-            if( _parent == null )
-            {
-                Debug.LogError( $"Can't add {nameof( ValueBarSegment )} to a root object." );
-                Destroy( this );
-            }
-        }
+        public Color Color { get => _image.color; set => _image.color = value; }
+        public Sprite Sprite { get => _image.sprite; set => _image.sprite = value; }
 
         void Awake()
         {
-            RecacheParent();
-            _mask = (RectTransform)this.transform;
+            _selfMask = (RectTransform)this.transform;
         }
 
-        public void SetImage( RectTransform image )
+        public void SetImage( Image image )
         {
             _image = image;
+            _imageT = (RectTransform)image.transform;
         }
 
 #warning TODO - text.
 
-        void OnLeftOrRightChanged()
+        void OnLeftOrWidthChanged()
         {
             // mask and image are always anchored on the left, and have pivots on the left too.
 
-            float leftPos = (width * Left);
-            float widthPx = (width * (1 - Right - Left)) - (LeftPadding + RightPadding);
-            _mask.sizeDelta = new Vector2( widthPx, 0 );
-            _mask.anchoredPosition = new Vector2( leftPos + LeftPadding, 0 );
-            _image.anchoredPosition = new Vector2( -leftPos, 0 );
+            _selfMask.sizeDelta = new Vector2( Width, 0 );
+            _imageT.sizeDelta = new Vector2( WidthParent, 0 );
+            _selfMask.anchoredPosition = new Vector2( Left, 0 );
+            _imageT.anchoredPosition = new Vector2( -Left + ForegroundOffsetX, 0 );
         }
 
-        void OnPaddingChanged()
+        void OnForegroundOffsetChanged()
         {
-            float widthPx = width - (LeftPadding + RightPadding);
-            _image.sizeDelta = new Vector2( widthPx, 0 );
+            _imageT.anchoredPosition = new Vector2( -Left + ForegroundOffsetX, 0 );
         }
 
 #if UNITY_EDITOR
         void OnValidate()
         {
-            if( this.transform.parent != _parent )
-            {
-                RecacheParent();
-            }
-
             if( _image != null ) // IsValidate can be called before a suitable image exists.
             {
-                OnLeftOrRightChanged();
-                OnPaddingChanged();
+                OnLeftOrWidthChanged();
+                OnForegroundOffsetChanged();
             }
         }
 #endif
 
-        internal static ValueBarSegment Create( RectTransform parent, Sprite foregroundSprite, float left, float right, float paddingLeft, float paddingRight )
+        internal static ValueBarSegment Create( RectTransform parent, float widthParent, float left, float width, float foregroundOffsetX )
         {
             (GameObject maskGO, RectTransform maskT) = UIHelper.CreateUI( parent, "mask", new UILayoutInfo( new Vector2( 0, 0 ), new Vector2( 0, 1 ), Vector2.zero, new Vector2( parent.rect.width, 0 ) ) );
 
@@ -139,16 +123,14 @@ namespace UILib
 
             Image foregroundImage = imgGO.AddComponent<Image>();
             foregroundImage.raycastTarget = false;
-            foregroundImage.sprite = foregroundSprite;
             foregroundImage.type = Image.Type.Sliced;
 
             ValueBarSegment barSegment = maskGO.AddComponent<ValueBarSegment>();
-
-            barSegment.SetImage( imgT );
-            barSegment.LeftPadding = paddingLeft;
-            barSegment.RightPadding = paddingRight;
+            barSegment.SetImage( foregroundImage );
+            barSegment.WidthParent = widthParent;
+            barSegment.ForegroundOffsetX = foregroundOffsetX;
             barSegment.Left = left;
-            barSegment.Right = right;
+            barSegment.Width = width;
 
             return barSegment;
         }

@@ -21,7 +21,15 @@ namespace KSS.UI.SceneFactories
             CreateSettingsButton( canvasTransform, style );
             CreateExitButton( canvasTransform, style );
 
-            BarFactory.CreateHorizontal( canvasTransform, "bar", 0.2f, 0.2f, new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, 35 ), new Vector2( 200, 30 ) ), style );
+            (_, var bar) = BarFactory.CreateEmptyHorizontal( canvasTransform, "bar", new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, 35 ), new Vector2( 200, 30 ) ), style );
+
+            var seg = bar.AddSegment( 0.5f );
+            seg.Sprite = style.Bar;
+            seg.Color = Color.red;
+
+            seg = bar.AddSegment( 0.25f );
+            seg.Sprite = style.Bar;
+            seg.Color = Color.blue;
         }
 
         // #-#-#-#-#-#-#-#-#-#
