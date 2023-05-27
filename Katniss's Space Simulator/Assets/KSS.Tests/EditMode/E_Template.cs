@@ -14,7 +14,7 @@ namespace KSS.Tests.EditMode
 
         // ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
-        // A Test behaves as an ordinary method
+        // A Test behaves like an ordinary method
         [Test]
         public void CreatedGameObjectExists()
         {

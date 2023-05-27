@@ -691,6 +691,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="KSS.csproj">
+      <Project>{6A093499-3B7A-71F2-8793-20E600CE8610}</Project>
+      <Name>KSS</Name>
+    </ProjectReference>
+    <ProjectReference Include="KSS.Core.csproj">
+      <Project>{C615911B-EF2A-D5E1-1CFB-5D278FA273D2}</Project>
+      <Name>KSS.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="KSS.DevUtils.csproj">
+      <Project>{D7208026-3029-DD39-0449-2AD64786FAF4}</Project>
+      <Name>KSS.DevUtils</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

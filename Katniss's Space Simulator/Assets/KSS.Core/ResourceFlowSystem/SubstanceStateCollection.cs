@@ -14,7 +14,7 @@ namespace KSS.Core.ResourceFlowSystem
     public class SubstanceStateCollection
     {
         [field: SerializeField]
-        List<SubstanceState> _substances = null; // different substances in the fluid.
+        List<SubstanceState> _substances = new List<SubstanceState>();
 
         public int SubstanceCount => _substances?.Count ?? 0;
 
@@ -36,6 +36,14 @@ namespace KSS.Core.ResourceFlowSystem
         public static SubstanceStateCollection Empty => new SubstanceStateCollection( null );
 
         public SubstanceStateCollection( IEnumerable<SubstanceState> substances )
+        {
+            if( substances != null )
+            {
+                this._substances = substances.ToList();
+            }
+        }
+        
+        public SubstanceStateCollection( params SubstanceState[] substances )
         {
             if( substances != null )
             {
@@ -171,19 +179,6 @@ namespace KSS.Core.ResourceFlowSystem
 
                     this._substances.Add( newSub );
                 }
-            }
-        }
-
-        public void Multiply( float amountMult )
-        {
-            if( IsEmpty() )
-            {
-                return;
-            }
-
-            for( int i = 0; i < _substances.Count; i++ )
-            {
-                this._substances[i] = new SubstanceState( this._substances[i], this._substances[i].MassAmount * amountMult );
             }
         }
 
