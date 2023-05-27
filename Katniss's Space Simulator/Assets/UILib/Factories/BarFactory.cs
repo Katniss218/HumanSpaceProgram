@@ -21,8 +21,9 @@ namespace UILib.Factories
             img.type = Image.Type.Sliced;
 
             ValueBar bar = rootGO.AddComponent<ValueBar>();
-            bar.PaddingLeft = 5f;
-            bar.PaddingRight = 5f;
+            bar.PaddingLeft = style.BarPaddingLeft;
+            bar.PaddingRight = style.BarPaddingRight;
+            bar.Spacing = style.BarSpacing;
 
             return (rootT, bar);
         }

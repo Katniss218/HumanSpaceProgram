@@ -40,7 +40,7 @@ namespace UILib
         }
 
 
-        internal float WidthParent
+        internal float TotalWidth
         {
             get { return _widthParent; }
             set
@@ -87,7 +87,7 @@ namespace UILib
             // mask and image are always anchored on the left, and have pivots on the left too.
 
             _selfMask.sizeDelta = new Vector2( Width, 0 );
-            _imageT.sizeDelta = new Vector2( WidthParent, 0 );
+            _imageT.sizeDelta = new Vector2( TotalWidth, 0 );
             _selfMask.anchoredPosition = new Vector2( Left, 0 );
             _imageT.anchoredPosition = new Vector2( -Left + ForegroundOffsetX, 0 );
         }
@@ -108,7 +108,10 @@ namespace UILib
         }
 #endif
 
-        internal static ValueBarSegment Create( RectTransform parent, float widthParent, float left, float width, float foregroundOffsetX )
+        /// <remarks>
+        /// Synchronize after creating a bar with this.
+        /// </remarks>
+        internal static ValueBarSegment Create( RectTransform parent, float totalWidth )
         {
             (GameObject maskGO, RectTransform maskT) = UIHelper.CreateUI( parent, "mask", new UILayoutInfo( new Vector2( 0, 0 ), new Vector2( 0, 1 ), Vector2.zero, new Vector2( parent.rect.width, 0 ) ) );
 
@@ -127,10 +130,7 @@ namespace UILib
 
             ValueBarSegment barSegment = maskGO.AddComponent<ValueBarSegment>();
             barSegment.SetImage( foregroundImage );
-            barSegment.WidthParent = widthParent;
-            barSegment.ForegroundOffsetX = foregroundOffsetX;
-            barSegment.Left = left;
-            barSegment.Width = width;
+            barSegment.TotalWidth = totalWidth;
 
             return barSegment;
         }

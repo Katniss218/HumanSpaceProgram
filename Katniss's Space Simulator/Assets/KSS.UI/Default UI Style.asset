@@ -20,8 +20,9 @@ MonoBehaviour:
   ButtonDisabled: {r: 0.5019608, g: 0.4637255, b: 0.4509804, a: 1}
   Button2Axis: {fileID: 21300000, guid: 03cee79809d597c45a34186a4ccb865e, type: 3}
   InputField: {fileID: 21300000, guid: 84147673ec8e2cb47bd5243c36cb4394, type: 3}
-  BarLeftPadding: 5
-  BarRightPadding: 5
+  BarSpacing: 1
+  BarPaddingLeft: 5
+  BarPaddingRight: 5
   Bar: {fileID: 21300000, guid: 82b082588549d3f40b568b3ea0021bdd, type: 3}
   BarBackground: {fileID: 21300000, guid: f5a3112f207dced4fb15eee1bcb26040, type: 3}
   PartWindowBackground: {fileID: 21300000, guid: 30c1eed1dbccd084594ed54b8817b6bc, type: 3}

@@ -18,8 +18,9 @@ namespace UILib
         public Sprite Button2Axis;
         public Sprite InputField;
 
-        public float BarLeftPadding;
-        public float BarRightPadding;
+        public float BarSpacing;
+        public float BarPaddingLeft;
+        public float BarPaddingRight;
         public Sprite Bar;
         public Sprite BarBackground;
     }

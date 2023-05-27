@@ -7,6 +7,9 @@ using UnityEngine;
 
 namespace UILib
 {
+    /// <summary>
+    /// A multi-segmented value (progress) bar.
+    /// </summary>
     public class ValueBar : MonoBehaviour
     {
         [Serializable]
@@ -16,7 +19,8 @@ namespace UILib
             public float width;
         }
 
-        //private float _spacing; 0
+        [SerializeField]
+        private float _spacing;
         [SerializeField]
         private float _paddingLeft;
         [SerializeField]
@@ -25,6 +29,16 @@ namespace UILib
         RectTransform _self;
         float paddedWidth => _self.rect.width - (PaddingLeft + PaddingRight);
 
+        public float Spacing
+        {
+            get { return _spacing; }
+            set
+            {
+                _spacing = value;
+                SyncElements( 0 );
+            }
+        }
+        
         public float PaddingLeft
         {
             get { return _paddingLeft; }
@@ -57,29 +71,41 @@ namespace UILib
 
         public int SegmentCount => _segments.Count;
 
+        /// <summary>
+        /// Gets the segment at the specified index.
+        /// </summary>
         public ValueBarSegment GetSegment( int index )
         {
             return _segments[index].seg;
         }
 
+        /// <summary>
+        /// Adds a segment of the specified width to the end of the bar.
+        /// </summary>
+        /// <param name="width">The width. Clamped to [0..RemainingWidth].</param>
+        /// <returns>The newly added segment.</returns>
         public ValueBarSegment AddSegment( float width )
         {
             return InsertSegment( _segments.Count, width );
         }
 
+        /// <summary>
+        /// Inserts a segment of the specified width at the specified index.
+        /// </summary>
+        /// <param name="width">The width. Clamped to [0..RemainingWidth].</param>
+        /// <returns>The newly added segment.</returns>
         public ValueBarSegment InsertSegment( int index, float width )
         {
             float totalWidthPx = this.paddedWidth;
-            float rightOfCurrentSegment = GetWidthBefore( index );
+            float remainingWidth = 1.0f - GetWidth();
 
-            float segWidthPerc = Mathf.Clamp( width, 0, 1.0f - rightOfCurrentSegment );
-            float segWidth = Mathf.Clamp( width, 0, 1.0f - rightOfCurrentSegment ) * totalWidthPx;
+            float segWidthPerc = Mathf.Clamp( width, 0, remainingWidth );
 
-            float segLeft = totalWidthPx * rightOfCurrentSegment + PaddingLeft;
-
-            ValueBarSegment seg = ValueBarSegment.Create( (RectTransform)this.transform, totalWidthPx, segLeft, segWidth, PaddingLeft );
+            ValueBarSegment seg = ValueBarSegment.Create( (RectTransform)this.transform, totalWidthPx );
 
             _segments.Insert( index, new Element() { seg = seg, width = segWidthPerc } );
+
+            SyncElements( index );
 
             return seg;
         }
@@ -88,41 +114,62 @@ namespace UILib
         {
             int index = _segments.FindIndex( s => s.seg == elem );
 
-            float rightOfCurrentSegment = GetWidthBefore( index );
-            float segWidthPerc = Mathf.Clamp( width, 0, 1.0f - rightOfCurrentSegment );
+            float remainingWidth = 1.0f - GetWidthExcluding( index );
+            float segWidthPerc = Mathf.Clamp( width, 0, remainingWidth );
 
             _segments[index].width = segWidthPerc;
 
             SyncElements( index );
         }
 
+        private float GetWidth()
+        {
+            return _segments.Sum( s => s.width );
+        }
+
+        private float GetWidthExcluding( int index )
+        {
+            float sum = 0.0f;
+            for( int i = 0; i < _segments.Count; i++ )
+            {
+                if( i == index ) continue;
+
+                sum += _segments[i].width;
+            }
+            return sum;
+        }
+
         private float GetWidthBefore( int index )
         {
-            float rightOfCurrentSegment = 0;
-            if( _segments.Count != 0 && index > 0 )
+            float sum = 0.0f;
+            for( int i = 0; i < index; i++ )
             {
-                rightOfCurrentSegment = _segments[index - 1].width;
+                sum += _segments[i].width;
             }
-            return rightOfCurrentSegment;
+            return sum;
         }
 
         private void SyncElements( int startingFrom )
         {
+            float halfSpacing = this.Spacing / 2f;
             float totalWidthPx = this.paddedWidth;
             float rightOfCurrentSegment = GetWidthBefore( startingFrom );
 
             // starting at the specified index (this element changed), update it and the elements after it.
             for( int i = startingFrom; i < _segments.Count; i++ )
             {
+                float extraPaddingLeft = i == 0 ? 0.0f : halfSpacing;
+                float extraPaddingRight = i == _segments.Count ? 0.0f : halfSpacing;
+
                 var elem = _segments[i];
-                float segLeft = totalWidthPx * rightOfCurrentSegment + PaddingLeft;
+                float segLeft = totalWidthPx * rightOfCurrentSegment + PaddingLeft + extraPaddingLeft;
 
                 elem.seg.transform.SetSiblingIndex( i );
 
-                elem.seg.WidthParent = totalWidthPx;
+                elem.seg.TotalWidth = totalWidthPx;
                 elem.seg.ForegroundOffsetX = PaddingLeft;
                 elem.seg.Left = segLeft;
-                elem.seg.Width = totalWidthPx * elem.width;
+                elem.seg.Width = Mathf.Max( 0, totalWidthPx * elem.width - extraPaddingLeft - extraPaddingRight );
                 rightOfCurrentSegment += elem.width;
             }
         }
