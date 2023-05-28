@@ -91,10 +91,10 @@ namespace KSS.DevUtils
             //PartFactory pfac = new PartFactory( new DummyPartSource() );
             //PartFactory efac = new PartFactory( new ResourcePartSource( "Prefabs/engine_part" ) );
 
-            PartFactory intertank = new PartFactory( new AssetPartSource( "Prefabs/intertank" ) );
-            PartFactory tank = new PartFactory( new AssetPartSource( "Prefabs/tank" ) );
-            PartFactory tankLong = new PartFactory( new AssetPartSource( "Prefabs/tank_long" ) );
-            PartFactory engine = new PartFactory( new AssetPartSource( "Prefabs/engine" ) );
+            PartFactory intertank = new PartFactory( new AssetPartSource( "part.intertank" ) );
+            PartFactory tank = new PartFactory( new AssetPartSource( "part.tank" ) );
+            PartFactory tankLong = new PartFactory( new AssetPartSource( "part.tank_long" ) );
+            PartFactory engine = new PartFactory( new AssetPartSource( "part.engine" ) );
 
             Vessel v = fac.CreatePartless( airfPosition, rotation, Vector3.zero, Vector3.zero );
             Part root = intertank.CreateRoot( v );
@@ -112,11 +112,14 @@ namespace KSS.DevUtils
             conn.End2.Position = new Vector3( 0.0f, 1.5f, 0.0f );
             conn.CrossSectionArea = 0.1f;
 
-            const float DENSITY = 1000f;
+            Substance sbs1 = Substance.RegisteredResources["substance.f"];
+            Substance sbs2 = Substance.RegisteredResources["substance.ox"];
 
-            var tankTank = tankP.GetComponent<FBulkContainer_Sphere>();
-            tankTank.Contents = new SubstanceStateCollection(
-                new SubstanceState[] { new SubstanceState( tankTank.MaxVolume * DENSITY, new Substance() { Density = DENSITY, DisplayName = "aa", ID = "substance.aa" } ) } );
+            var tankSmallTank = tankP.GetComponent<FBulkContainer_Sphere>();
+            tankSmallTank.Contents = new SubstanceStateCollection(
+                new SubstanceState[] {
+                    new SubstanceState( tankSmallTank.MaxVolume * ((sbs1.Density + sbs2.Density) / 2f) / 2f, sbs1 ),
+                    new SubstanceState( tankSmallTank.MaxVolume * ((sbs1.Density + sbs2.Density) / 2f) / 2f, sbs2 )} );
 
             FBulkConnection conn2 = engineP.gameObject.AddComponent<FBulkConnection>();
             conn2.End1.ConnectTo( tankP.GetComponent<FBulkContainer_Sphere>() );

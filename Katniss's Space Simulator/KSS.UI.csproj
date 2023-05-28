@@ -56,8 +56,10 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\KSS.UI\SceneFactories\MainMenuManager.cs" />
     <Compile Include="Assets\KSS.UI\Windows\WindowDrag.cs" />
     <Compile Include="Assets\KSS.UI\Windows\WindowRelationHighlight.cs" />
+    <Compile Include="Assets\KSS.UI\SceneFactories\MainMenuUIFactory.cs" />
     <Compile Include="Assets\KSS.UI\TimewarpReadoutUI.cs" />
     <Compile Include="Assets\KSS.UI\VelocityReadoutUI.cs" />
     <Compile Include="Assets\KSS.UI\IResourceContainerUI.cs" />
@@ -68,8 +70,6 @@
     <Compile Include="Assets\KSS.UI\AltitudeReadoutUI.cs" />
     <Compile Include="Assets\KSS.UI\PartWindowManager.cs" />
     <Compile Include="Assets\KSS.UI\AccelerationReadoutUI.cs" />
-    <Compile Include="Assets\KSS.UI\SceneFactories\MainMenuUIFactory.cs" />
-    <Compile Include="Assets\KSS.UI\SceneFactories\MainMenuManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.UI\_KSS.UI.asmdef" />

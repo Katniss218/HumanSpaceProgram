@@ -32,9 +32,7 @@ namespace KSS.UI
 
                 var seg = _bar.AddSegment( perc );
                 seg.Sprite = style.Bar;
-                seg.Color = style.BarColorFuel;
-
-                //_bar.SetWidth( i, perc );
+                seg.Color = sbs.Data.UIColor;
             }
         }
 

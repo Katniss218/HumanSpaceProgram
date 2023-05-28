@@ -96,7 +96,7 @@ GameObject:
   - component: {fileID: 7240939883116570868}
   - component: {fileID: 647930471848486042}
   m_Layer: 0
-  m_Name: tank_long
+  m_Name: part
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -144,6 +144,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1ba8a5298599c148a6b5258de87a68b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <ID>k__BackingField: part.tank_long
   <Vessel>k__BackingField: {fileID: 0}
   _displayName: tank (long)
   <Mass>k__BackingField: 100

@@ -58,13 +58,13 @@
   <ItemGroup>
     <Compile Include="Assets\UILib\UILayoutInfo.cs" />
     <Compile Include="Assets\UILib\Factories\InputFieldFactory.cs" />
+    <Compile Include="Assets\UILib\ValueBar.cs" />
+    <Compile Include="Assets\UILib\Factories\BarFactory.cs" />
     <Compile Include="Assets\UILib\Factories\TextFactory.cs" />
     <Compile Include="Assets\UILib\UIHelper.cs" />
     <Compile Include="Assets\UILib\UIStyle.cs" />
     <Compile Include="Assets\UILib\Factories\ButtonFactory.cs" />
-    <Compile Include="Assets\UILib\Factories\BarFactory.cs" />
     <Compile Include="Assets\UILib\ValueBarSegment.cs" />
-    <Compile Include="Assets\UILib\ValueBar.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\UILib\_UILib.asmdef" />

@@ -19,7 +19,7 @@ MonoBehaviour:
     width: 1920
     height: 997
   m_ShowMode: 4
-  m_Title: Scene
+  m_Title: Project
   m_RootView: {fileID: 2}
   m_MinSize: {x: 875, y: 300}
   m_MaxSize: {x: 10000, y: 10000}
@@ -119,7 +119,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 200}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 68727
+  controlID: 100
 --- !u!114 &6
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -139,12 +139,12 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 1463
+    width: 1462
     height: 947
   m_MinSize: {x: 200, y: 200}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 1
-  controlID: 68643
+  controlID: 52
 --- !u!114 &7
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -164,12 +164,12 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 1463
-    height: 585
+    width: 1462
+    height: 587
   m_MinSize: {x: 200, y: 100}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 68644
+  controlID: 22
 --- !u!114 &8
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -187,8 +187,8 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 359
-    height: 585
+    width: 354
+    height: 587
   m_MinSize: {x: 201, y: 221}
   m_MaxSize: {x: 4001, y: 4021}
   m_ActualView: {fileID: 13}
@@ -211,10 +211,10 @@ MonoBehaviour:
   m_Children: []
   m_Position:
     serializedVersion: 2
-    x: 359
+    x: 354
     y: 0
-    width: 1104
-    height: 585
+    width: 1108
+    height: 587
   m_MinSize: {x: 202, y: 221}
   m_MaxSize: {x: 4002, y: 4021}
   m_ActualView: {fileID: 14}
@@ -240,9 +240,9 @@ MonoBehaviour:
   m_Position:
     serializedVersion: 2
     x: 0
-    y: 585
-    width: 1463
-    height: 362
+    y: 587
+    width: 1462
+    height: 360
   m_MinSize: {x: 231, y: 271}
   m_MaxSize: {x: 10001, y: 10021}
   m_ActualView: {fileID: 16}
@@ -266,9 +266,9 @@ MonoBehaviour:
   m_Children: []
   m_Position:
     serializedVersion: 2
-    x: 1463
+    x: 1462
     y: 0
-    width: 457
+    width: 458
     height: 947
   m_MinSize: {x: 276, y: 71}
   m_MaxSize: {x: 4001, y: 4021}
@@ -298,10 +298,10 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 360
-    y: 19
-    width: 1102
-    height: 564
+    x: 354
+    y: 73
+    width: 1106
+    height: 566
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
     m_LastAppliedPresetName: Default
@@ -314,7 +314,7 @@ MonoBehaviour:
   m_ShowGizmos: 0
   m_TargetDisplay: 0
   m_ClearColor: {r: 0, g: 0, b: 0, a: 0}
-  m_TargetSize: {x: 1102, y: 543}
+  m_TargetSize: {x: 1106, y: 545}
   m_TextureFilterMode: 0
   m_TextureHideFlags: 61
   m_RenderIMGUI: 1
@@ -327,17 +327,17 @@ MonoBehaviour:
   m_VSyncEnabled: 0
   m_PlayFocused: 1
   m_Gizmos: 0
-  m_Stats: 1
+  m_Stats: 0
   m_SelectedSizes: 00000000000000000000000000000000000000000000000000000000000000000000000000000000
   m_ZoomArea:
     m_HRangeLocked: 0
     m_VRangeLocked: 0
     hZoomLockedByDefault: 0
     vZoomLockedByDefault: 0
-    m_HBaseRangeMin: -551
-    m_HBaseRangeMax: 551
-    m_VBaseRangeMin: -271.5
-    m_VBaseRangeMax: 271.5
+    m_HBaseRangeMin: -553
+    m_HBaseRangeMax: 553
+    m_VBaseRangeMin: -272.5
+    m_VBaseRangeMax: 272.5
     m_HAllowExceedBaseRangeMin: 1
     m_HAllowExceedBaseRangeMax: 1
     m_VAllowExceedBaseRangeMin: 1
@@ -355,23 +355,23 @@ MonoBehaviour:
       serializedVersion: 2
       x: 0
       y: 21
-      width: 1102
-      height: 543
+      width: 1106
+      height: 545
     m_Scale: {x: 1, y: 1}
-    m_Translation: {x: 551, y: 271.5}
+    m_Translation: {x: 553, y: 272.5}
     m_MarginLeft: 0
     m_MarginRight: 0
     m_MarginTop: 0
     m_MarginBottom: 0
     m_LastShownAreaInsideMargins:
       serializedVersion: 2
-      x: -551
-      y: -271.5
-      width: 1102
-      height: 543
+      x: -553
+      y: -272.5
+      width: 1106
+      height: 545
     m_MinimalGUI: 1
   m_defaultScale: 1
-  m_LastWindowPixelSize: {x: 1102, y: 564}
+  m_LastWindowPixelSize: {x: 1106, y: 566}
   m_ClearInEditMode: 1
   m_NoCameraWarning: 0
   m_LowResolutionForAspectRatios: 01000000000000000000
@@ -401,8 +401,8 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 73
-    width: 358
-    height: 564
+    width: 353
+    height: 566
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
     m_LastAppliedPresetName: Default
@@ -412,7 +412,7 @@ MonoBehaviour:
       scrollPos: {x: 0, y: 0}
       m_SelectedIDs: 
       m_LastClickedID: 0
-      m_ExpandedIDs: 5c94feff6694feff6894fefff29bfeff4cdbfeff68f3feff60f7feffda1bffff3c1cffffd61dffff7c22ffffde22ffffc224ffff383bffff3e3bffffa43bffffa83bffff8e45ffffc650ffffd050ffffd250ffff7caeffff76b1ffffe4b7ffffeec3ffff14e8ffffd8f2ffffdaf2ffffdcf2ffffdef2ffffe2f2ffffe4f2ffffe6f2ffffeaf2ffffecf2fffff0f2fffff2f2fffff6f2fffff8f2fffffaf2fffffcf2ffff08f3ffff08fbffff3c5b0000ae5b0000b25b0000e25b00004c5c00006c5c0000f6190100281a0100041c01000c1c0100
+      m_ExpandedIDs: 08fbffff
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -456,10 +456,10 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 359
+    x: 354
     y: 73
-    width: 1102
-    height: 564
+    width: 1106
+    height: 566
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
     m_LastAppliedPresetName: Default
@@ -689,14 +689,14 @@ MonoBehaviour:
   m_OverrideSceneCullingMask: 6917529027641081856
   m_SceneIsLit: 1
   m_SceneLighting: 1
-  m_2DMode: 1
+  m_2DMode: 0
   m_isRotationLocked: 0
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 491.7069, y: 246.57657, z: -3.7586694}
+    m_Target: {x: -678.1346, y: 2272.883, z: 4154.1914}
     speed: 2
-    m_Value: {x: 491.7069, y: 246.57657, z: -3.7586694}
+    m_Value: {x: -678.1346, y: 2272.883, z: 4154.1914}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -724,17 +724,17 @@ MonoBehaviour:
       m_Size: {x: 0, y: 0}
     yGrid:
       m_Fade:
-        m_Target: 0
+        m_Target: 1
         speed: 2
-        m_Value: 0
+        m_Value: 1
       m_Color: {r: 0.5, g: 0.5, b: 0.5, a: 0.4}
       m_Pivot: {x: 0, y: 0, z: 0}
       m_Size: {x: 1, y: 1}
     zGrid:
       m_Fade:
-        m_Target: 1
+        m_Target: 0
         speed: 2
-        m_Value: 1
+        m_Value: 0
       m_Color: {r: 0.5, g: 0.5, b: 0.5, a: 0.4}
       m_Pivot: {x: 0, y: 0, z: 0}
       m_Size: {x: 1, y: 1}
@@ -742,17 +742,17 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0.5
   m_Rotation:
-    m_Target: {x: 0, y: 0, z: 0, w: 1}
+    m_Target: {x: 0.16785637, y: 0.39330766, z: 0.073272154, w: -0.9009842}
     speed: 2
-    m_Value: {x: 0, y: 0, z: 0, w: 1}
+    m_Value: {x: 0.16785637, y: 0.39330763, z: 0.073272154, w: -0.90098417}
   m_Size:
-    m_Target: 308.07422
+    m_Target: 27.52166
     speed: 2
-    m_Value: 308.07422
+    m_Value: 27.52166
   m_Ortho:
-    m_Target: 1
+    m_Target: 0
     speed: 2
-    m_Value: 1
+    m_Value: 0
   m_CameraSettings:
     m_Speed: 0.001
     m_SpeedNormalized: 0
@@ -793,10 +793,10 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 359
+    x: 354
     y: 73
-    width: 1102
-    height: 564
+    width: 1106
+    height: 566
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
     m_LastAppliedPresetName: Default
@@ -1878,9 +1878,9 @@ MonoBehaviour:
   m_Pos:
     serializedVersion: 2
     x: 0
-    y: 658
-    width: 1462
-    height: 341
+    y: 660
+    width: 1461
+    height: 339
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
     m_LastAppliedPresetName: Default
@@ -1898,22 +1898,22 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Resources/Sprites
+    - Assets/Resources/Prefabs
     m_Globs: []
     m_OriginalText: 
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/Resources/Sprites
+  - Assets/Resources/Prefabs
   m_LastFoldersGridSize: -1
   m_LastProjectPath: E:\GIT\KatnisssSpaceSimulator\Katniss's Space Simulator
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 243}
-    m_SelectedIDs: 605d0000
-    m_LastClickedID: 23904
-    m_ExpandedIDs: 00000000485d00004a5d00004c5d00004e5d0000505d0000525d0000545d0000565d0000585d00005a5d00005c5d00005e5d0000605d000000ca9a3b
+    scrollPos: {x: 0, y: 261}
+    m_SelectedIDs: fe5c0000
+    m_LastClickedID: 23806
+    m_ExpandedIDs: 00000000d05b0000d25b0000d45b0000d65b0000d85b0000da5b0000dc5b0000de5b0000e05b0000e25b0000e45b0000e65b0000e85b0000ea5b0000ec5b000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1941,7 +1941,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 00000000485d00004a5d00004c5d00004e5d0000505d0000525d0000545d0000565d0000585d00005a5d00005c5d00005e5d0000605d000000ca9a3b
+    m_ExpandedIDs: 00000000d05b0000d25b0000d45b0000d65b0000d85b0000da5b0000dc5b0000de5b0000e05b0000e25b0000e45b0000e65b0000e85b0000ea5b0000ec5b0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1969,7 +1969,7 @@ MonoBehaviour:
     m_SelectedInstanceIDs: 
     m_LastClickedInstanceID: 0
     m_HadKeyboardFocusLastEvent: 0
-    m_ExpandedInstanceIDs: c6230000
+    m_ExpandedInstanceIDs: c6230000ea5b0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -2018,9 +2018,9 @@ MonoBehaviour:
   m_Pos:
     serializedVersion: 2
     x: 0
-    y: 658
-    width: 1462
-    height: 341
+    y: 660
+    width: 1461
+    height: 339
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
     m_LastAppliedPresetName: Default
@@ -2045,9 +2045,9 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 1463
+    x: 1462
     y: 73
-    width: 456
+    width: 457
     height: 926
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
@@ -2086,16 +2086,16 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 1463
+    x: 1462
     y: 73
-    width: 456
+    width: 457
     height: 926
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
     m_LastAppliedPresetName: Default
     m_SaveData: []
   m_Spl:
-    ID: 1156
+    ID: 72185
     splitterInitialOffset: 0
     currentActiveSplitter: -1
     realSizes:
@@ -2118,7 +2118,7 @@ MonoBehaviour:
     oldMinSizes: 
     oldMaxSizes: 
     oldSplitSize: 0
-  m_TestTypeToolbarIndex: 0
+  m_TestTypeToolbarIndex: 1
   m_PlayModeTestListGUI:
     m_Window: {fileID: 19}
     m_NewResultList:
@@ -2127,7 +2127,7 @@ MonoBehaviour:
       name: Katniss's Space Simulator
       fullName: Katniss's Space Simulator
       resultStatus: 1
-      duration: 0.0867894
+      duration: 0.1398095
       messages: 
       output: 
       stacktrace: 
@@ -2143,7 +2143,7 @@ MonoBehaviour:
       name: KSS.Tests.PlayMode.dll
       fullName: E:/GIT/KatnisssSpaceSimulator/Katniss's Space Simulator/Library/ScriptAssemblies/KSS.Tests.PlayMode.dll
       resultStatus: 1
-      duration: 0.0719861
+      duration: 0.1195634
       messages: 
       output: 
       stacktrace: 
@@ -2154,12 +2154,12 @@ MonoBehaviour:
       categories: []
       parentId: 1011
       parentUniqueId: '[Katniss''s Space Simulator][suite]'
-    - id: 1016
-      uniqueId: KSS.Tests.PlayMode.dll/[KatnisssSpaceSimulator][suite]
-      name: KatnisssSpaceSimulator
-      fullName: KatnisssSpaceSimulator
-      resultStatus: 0
-      duration: 0
+    - id: 1005
+      uniqueId: KSS.Tests.PlayMode.dll/[KSS][suite]
+      name: KSS
+      fullName: KSS
+      resultStatus: 1
+      duration: 0.1126392
       messages: 
       output: 
       stacktrace: 
@@ -2168,14 +2168,14 @@ MonoBehaviour:
       description: 
       isSuite: 1
       categories: []
-      parentId: 1015
+      parentId: 1004
       parentUniqueId: '[KSS.Tests.PlayMode.dll][suite]'
-    - id: 1017
-      uniqueId: KSS.Tests.PlayMode.dll/KatnisssSpaceSimulator/[Tests][suite]
+    - id: 1006
+      uniqueId: KSS.Tests.PlayMode.dll/KSS/[Tests][suite]
       name: Tests
-      fullName: KatnisssSpaceSimulator.Tests
-      resultStatus: 0
-      duration: 0
+      fullName: KSS.Tests
+      resultStatus: 1
+      duration: 0.1053634
       messages: 
       output: 
       stacktrace: 
@@ -2184,14 +2184,14 @@ MonoBehaviour:
       description: 
       isSuite: 1
       categories: []
-      parentId: 1016
-      parentUniqueId: KSS.Tests.PlayMode.dll/[KatnisssSpaceSimulator][suite]
-    - id: 1018
-      uniqueId: KSS.Tests.PlayMode.dll/KatnisssSpaceSimulator/Tests/[KSS.Tests.PlayMode][KatnisssSpaceSimulator.Tests.PlayMode][suite]
+      parentId: 1005
+      parentUniqueId: KSS.Tests.PlayMode.dll/[KSS][suite]
+    - id: 1007
+      uniqueId: KSS.Tests.PlayMode.dll/KSS/Tests/[KSS.Tests.PlayMode][KSS.Tests.PlayMode][suite]
       name: PlayMode
-      fullName: KatnisssSpaceSimulator.Tests.PlayMode
-      resultStatus: 0
-      duration: 0
+      fullName: KSS.Tests.PlayMode
+      resultStatus: 1
+      duration: 0.1019805
       messages: 
       output: 
       stacktrace: 
@@ -2200,14 +2200,14 @@ MonoBehaviour:
       description: 
       isSuite: 1
       categories: []
-      parentId: 1017
-      parentUniqueId: KSS.Tests.PlayMode.dll/KatnisssSpaceSimulator/[Tests][suite]
-    - id: 1012
-      uniqueId: KSS.Tests.PlayMode.dll/KatnisssSpaceSimulator/Tests/PlayMode/[KSS.Tests.PlayMode][KatnisssSpaceSimulator.Tests.PlayMode.P_Template][suite]
+      parentId: 1006
+      parentUniqueId: KSS.Tests.PlayMode.dll/KSS/[Tests][suite]
+    - id: 1001
+      uniqueId: KSS.Tests.PlayMode.dll/KSS/Tests/PlayMode/[KSS.Tests.PlayMode][KSS.Tests.PlayMode.P_Template][suite]
       name: P_Template
-      fullName: KatnisssSpaceSimulator.Tests.PlayMode.P_Template
-      resultStatus: 0
-      duration: 0
+      fullName: KSS.Tests.PlayMode.P_Template
+      resultStatus: 1
+      duration: 0.0963239
       messages: 
       output: 
       stacktrace: 
@@ -2216,14 +2216,14 @@ MonoBehaviour:
       description: 
       isSuite: 1
       categories: []
-      parentId: 1018
-      parentUniqueId: KSS.Tests.PlayMode.dll/KatnisssSpaceSimulator/Tests/[KSS.Tests.PlayMode][KatnisssSpaceSimulator.Tests.PlayMode][suite]
-    - id: 1013
-      uniqueId: KSS.Tests.PlayMode.dll/KatnisssSpaceSimulator/Tests/PlayMode/P_Template/[KSS.Tests.PlayMode][KatnisssSpaceSimulator.Tests.PlayMode.P_Template.NewTestScriptSimplePasses]
+      parentId: 1007
+      parentUniqueId: KSS.Tests.PlayMode.dll/KSS/Tests/[KSS.Tests.PlayMode][KSS.Tests.PlayMode][suite]
+    - id: 1002
+      uniqueId: KSS.Tests.PlayMode.dll/KSS/Tests/PlayMode/P_Template/[KSS.Tests.PlayMode][KSS.Tests.PlayMode.P_Template.NewTestScriptSimplePasses]
       name: NewTestScriptSimplePasses
-      fullName: KatnisssSpaceSimulator.Tests.PlayMode.P_Template.NewTestScriptSimplePasses
-      resultStatus: 0
-      duration: 0
+      fullName: KSS.Tests.PlayMode.P_Template.NewTestScriptSimplePasses
+      resultStatus: 1
+      duration: 0.024876
       messages: 
       output: 
       stacktrace: 
@@ -2233,14 +2233,14 @@ MonoBehaviour:
       isSuite: 0
       categories:
       - Uncategorized
-      parentId: 1012
-      parentUniqueId: KSS.Tests.PlayMode.dll/KatnisssSpaceSimulator/Tests/PlayMode/[KSS.Tests.PlayMode][KatnisssSpaceSimulator.Tests.PlayMode.P_Template][suite]
-    - id: 1014
-      uniqueId: KSS.Tests.PlayMode.dll/KatnisssSpaceSimulator/Tests/PlayMode/P_Template/[KSS.Tests.PlayMode][KatnisssSpaceSimulator.Tests.PlayMode.P_Template.NewTestScriptWithEnumeratorPasses]
+      parentId: 1001
+      parentUniqueId: KSS.Tests.PlayMode.dll/KSS/Tests/PlayMode/[KSS.Tests.PlayMode][KSS.Tests.PlayMode.P_Template][suite]
+    - id: 1003
+      uniqueId: KSS.Tests.PlayMode.dll/KSS/Tests/PlayMode/P_Template/[KSS.Tests.PlayMode][KSS.Tests.PlayMode.P_Template.NewTestScriptWithEnumeratorPasses]
       name: NewTestScriptWithEnumeratorPasses
-      fullName: KatnisssSpaceSimulator.Tests.PlayMode.P_Template.NewTestScriptWithEnumeratorPasses
-      resultStatus: 0
-      duration: 0
+      fullName: KSS.Tests.PlayMode.P_Template.NewTestScriptWithEnumeratorPasses
+      resultStatus: 1
+      duration: 0.0231991
       messages: 
       output: 
       stacktrace: 
@@ -2250,15 +2250,15 @@ MonoBehaviour:
       isSuite: 0
       categories:
       - Uncategorized
-      parentId: 1012
-      parentUniqueId: KSS.Tests.PlayMode.dll/KatnisssSpaceSimulator/Tests/PlayMode/[KSS.Tests.PlayMode][KatnisssSpaceSimulator.Tests.PlayMode.P_Template][suite]
+      parentId: 1001
+      parentUniqueId: KSS.Tests.PlayMode.dll/KSS/Tests/PlayMode/[KSS.Tests.PlayMode][KSS.Tests.PlayMode.P_Template][suite]
     m_ResultText: 
     m_ResultStacktrace: 
     m_TestListState:
       scrollPos: {x: 0, y: 0}
       m_SelectedIDs: 40740c32
       m_LastClickedID: 839676992
-      m_ExpandedIDs: 18302687019ce6a5d2dac001a338db2940740c32f9bc9161ffffff7f
+      m_ExpandedIDs: 1830268767eb6c91019ce6a533258eced2dac001a338db294537673040740c32f9bc9161a87c937effffff7f
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -2293,7 +2293,7 @@ MonoBehaviour:
       name: Katniss's Space Simulator
       fullName: Katniss's Space Simulator
       resultStatus: 1
-      duration: 0.0336537
+      duration: 0.1445511
       messages: 
       output: 
       stacktrace: 
@@ -2309,7 +2309,7 @@ MonoBehaviour:
       name: KSS.Tests.EditMode.dll
       fullName: E:/GIT/KatnisssSpaceSimulator/Katniss's Space Simulator/Library/ScriptAssemblies/KSS.Tests.EditMode.dll
       resultStatus: 1
-      duration: 0.0065791
+      duration: 0.0987461
       messages: 
       output: 
       stacktrace: 
@@ -2320,12 +2320,12 @@ MonoBehaviour:
       categories: []
       parentId: 1000
       parentUniqueId: '[Katniss''s Space Simulator][suite]'
-    - id: 1004
-      uniqueId: KSS.Tests.EditMode.dll/[KatnisssSpaceSimulator][suite]
-      name: KatnisssSpaceSimulator
-      fullName: KatnisssSpaceSimulator
-      resultStatus: 0
-      duration: 0
+    - id: 1015
+      uniqueId: KSS.Tests.EditMode.dll/[KSS.Tests.EditMode][KSS_Tests_EditMode][suite]
+      name: KSS_Tests_EditMode
+      fullName: KSS_Tests_EditMode
+      resultStatus: 1
+      duration: 0.097493
       messages: 
       output: 
       stacktrace: 
@@ -2334,46 +2334,14 @@ MonoBehaviour:
       description: 
       isSuite: 1
       categories: []
-      parentId: 1003
+      parentId: 1011
       parentUniqueId: '[KSS.Tests.EditMode.dll][suite]'
-    - id: 1005
-      uniqueId: KSS.Tests.EditMode.dll/KatnisssSpaceSimulator/[Tests][suite]
-      name: Tests
-      fullName: KatnisssSpaceSimulator.Tests
-      resultStatus: 0
-      duration: 0
-      messages: 
-      output: 
-      stacktrace: 
-      notRunnable: 0
-      ignoredOrSkipped: 0
-      description: 
-      isSuite: 1
-      categories: []
-      parentId: 1004
-      parentUniqueId: KSS.Tests.EditMode.dll/[KatnisssSpaceSimulator][suite]
-    - id: 1006
-      uniqueId: KSS.Tests.EditMode.dll/KatnisssSpaceSimulator/Tests/[KSS.Tests.EditMode][KatnisssSpaceSimulator.Tests.EditMode][suite]
-      name: EditMode
-      fullName: KatnisssSpaceSimulator.Tests.EditMode
-      resultStatus: 0
-      duration: 0
-      messages: 
-      output: 
-      stacktrace: 
-      notRunnable: 0
-      ignoredOrSkipped: 0
-      description: 
-      isSuite: 1
-      categories: []
-      parentId: 1005
-      parentUniqueId: KSS.Tests.EditMode.dll/KatnisssSpaceSimulator/[Tests][suite]
-    - id: 1001
-      uniqueId: KSS.Tests.EditMode.dll/KatnisssSpaceSimulator/Tests/EditMode/[KSS.Tests.EditMode][KatnisssSpaceSimulator.Tests.EditMode.E_Template][suite]
+    - id: 1009
+      uniqueId: KSS.Tests.EditMode.dll/KSS_Tests_EditMode/[KSS.Tests.EditMode][KSS_Tests_EditMode.E_Template][suite]
       name: E_Template
-      fullName: KatnisssSpaceSimulator.Tests.EditMode.E_Template
-      resultStatus: 0
-      duration: 0
+      fullName: KSS_Tests_EditMode.E_Template
+      resultStatus: 1
+      duration: 0.0799961
       messages: 
       output: 
       stacktrace: 
@@ -2382,14 +2350,14 @@ MonoBehaviour:
       description: 
       isSuite: 1
       categories: []
-      parentId: 1006
-      parentUniqueId: KSS.Tests.EditMode.dll/KatnisssSpaceSimulator/Tests/[KSS.Tests.EditMode][KatnisssSpaceSimulator.Tests.EditMode][suite]
-    - id: 1002
-      uniqueId: KSS.Tests.EditMode.dll/KatnisssSpaceSimulator/Tests/EditMode/E_Template/[KSS.Tests.EditMode][KatnisssSpaceSimulator.Tests.EditMode.E_Template.CreatedGameObjectExists]
+      parentId: 1012
+      parentUniqueId: KSS.Tests.EditMode.dll/[KSS.Tests.EditMode][KSS_Tests_EditMode][suite]
+    - id: 1010
+      uniqueId: KSS.Tests.EditMode.dll/KSS_Tests_EditMode/E_Template/[KSS.Tests.EditMode][KSS_Tests_EditMode.E_Template.CreatedGameObjectExists]
       name: CreatedGameObjectExists
-      fullName: KatnisssSpaceSimulator.Tests.EditMode.E_Template.CreatedGameObjectExists
-      resultStatus: 0
-      duration: 0
+      fullName: KSS_Tests_EditMode.E_Template.CreatedGameObjectExists
+      resultStatus: 1
+      duration: 0.0480063
       messages: 
       output: 
       stacktrace: 
@@ -2399,15 +2367,150 @@ MonoBehaviour:
       isSuite: 0
       categories:
       - Uncategorized
-      parentId: 1001
-      parentUniqueId: KSS.Tests.EditMode.dll/KatnisssSpaceSimulator/Tests/EditMode/[KSS.Tests.EditMode][KatnisssSpaceSimulator.Tests.EditMode.E_Template][suite]
-    m_ResultText: 
+      parentId: 1009
+      parentUniqueId: KSS.Tests.EditMode.dll/KSS_Tests_EditMode/[KSS.Tests.EditMode][KSS_Tests_EditMode.E_Template][suite]
+    - id: 1003
+      uniqueId: KSS.Tests.EditMode.dll/KSS_Tests_EditMode/[KSS.Tests.EditMode][KSS_Tests_EditMode.SubstanceStateCollectionTests][suite]
+      name: SubstanceStateCollectionTests
+      fullName: KSS_Tests_EditMode.SubstanceStateCollectionTests
+      resultStatus: 1
+      duration: 0.0154726
+      messages: 
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 1
+      categories: []
+      parentId: 1015
+      parentUniqueId: KSS.Tests.EditMode.dll/[KSS.Tests.EditMode][KSS_Tests_EditMode][suite]
+    - id: 1008
+      uniqueId: KSS.Tests.EditMode.dll/KSS_Tests_EditMode/SubstanceStateCollectionTests/[KSS.Tests.EditMode][KSS_Tests_EditMode.SubstanceStateCollectionTests.Add___MultipleSubstances___AddsToCorresponding]
+      name: Add___MultipleSubstances___AddsToCorresponding
+      fullName: KSS_Tests_EditMode.SubstanceStateCollectionTests.Add___MultipleSubstances___AddsToCorresponding
+      resultStatus: 1
+      duration: 0.0033034
+      messages: 
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 0
+      categories:
+      - Uncategorized
+      parentId: 1003
+      parentUniqueId: KSS.Tests.EditMode.dll/KSS_Tests_EditMode/[KSS.Tests.EditMode][KSS_Tests_EditMode.SubstanceStateCollectionTests][suite]
+    - id: 1006
+      uniqueId: KSS.Tests.EditMode.dll/KSS_Tests_EditMode/SubstanceStateCollectionTests/[KSS.Tests.EditMode][KSS_Tests_EditMode.SubstanceStateCollectionTests.Add___NegativeAmount___Subtracts]
+      name: Add___NegativeAmount___Subtracts
+      fullName: KSS_Tests_EditMode.SubstanceStateCollectionTests.Add___NegativeAmount___Subtracts
+      resultStatus: 1
+      duration: 0.0003579
+      messages: 
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 0
+      categories:
+      - Uncategorized
+      parentId: 1003
+      parentUniqueId: KSS.Tests.EditMode.dll/KSS_Tests_EditMode/[KSS.Tests.EditMode][KSS_Tests_EditMode.SubstanceStateCollectionTests][suite]
+    - id: 1005
+      uniqueId: KSS.Tests.EditMode.dll/KSS_Tests_EditMode/SubstanceStateCollectionTests/[KSS.Tests.EditMode][KSS_Tests_EditMode.SubstanceStateCollectionTests.Add___SingleSubstance___AddsToExisting]
+      name: Add___SingleSubstance___AddsToExisting
+      fullName: KSS_Tests_EditMode.SubstanceStateCollectionTests.Add___SingleSubstance___AddsToExisting
+      resultStatus: 1
+      duration: 0.0002959
+      messages: 
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 0
+      categories:
+      - Uncategorized
+      parentId: 1003
+      parentUniqueId: KSS.Tests.EditMode.dll/KSS_Tests_EditMode/[KSS.Tests.EditMode][KSS_Tests_EditMode.SubstanceStateCollectionTests][suite]
+    - id: 1007
+      uniqueId: KSS.Tests.EditMode.dll/KSS_Tests_EditMode/SubstanceStateCollectionTests/[KSS.Tests.EditMode][KSS_Tests_EditMode.SubstanceStateCollectionTests.Add___SingleSubstance_NegativeDt___RemovesFromExisting]
+      name: Add___SingleSubstance_NegativeDt___RemovesFromExisting
+      fullName: KSS_Tests_EditMode.SubstanceStateCollectionTests.Add___SingleSubstance_NegativeDt___RemovesFromExisting
+      resultStatus: 1
+      duration: 0.0002683
+      messages: 
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 0
+      categories:
+      - Uncategorized
+      parentId: 1003
+      parentUniqueId: KSS.Tests.EditMode.dll/KSS_Tests_EditMode/[KSS.Tests.EditMode][KSS_Tests_EditMode.SubstanceStateCollectionTests][suite]
+    - id: 1009
+      uniqueId: KSS.Tests.EditMode.dll/KSS_Tests_EditMode/SubstanceStateCollectionTests/[KSS.Tests.EditMode][KSS_Tests_EditMode.SubstanceStateCollectionTests.Add___ToEmpty___AddsNewSubstance]
+      name: Add___ToEmpty___AddsNewSubstance
+      fullName: KSS_Tests_EditMode.SubstanceStateCollectionTests.Add___ToEmpty___AddsNewSubstance
+      resultStatus: 1
+      duration: 0.0006032
+      messages: 
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 0
+      categories:
+      - Uncategorized
+      parentId: 1003
+      parentUniqueId: KSS.Tests.EditMode.dll/KSS_Tests_EditMode/[KSS.Tests.EditMode][KSS_Tests_EditMode.SubstanceStateCollectionTests][suite]
+    - id: 1010
+      uniqueId: KSS.Tests.EditMode.dll/KSS_Tests_EditMode/SubstanceStateCollectionTests/[KSS.Tests.EditMode][KSS_Tests_EditMode.SubstanceStateCollectionTests.Add___ToEmpty_NegativeDt___AddsNewSubstanceWithNegativeAmount]
+      name: Add___ToEmpty_NegativeDt___AddsNewSubstanceWithNegativeAmount
+      fullName: KSS_Tests_EditMode.SubstanceStateCollectionTests.Add___ToEmpty_NegativeDt___AddsNewSubstanceWithNegativeAmount
+      resultStatus: 1
+      duration: 0.0003569
+      messages: 
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 0
+      categories:
+      - Uncategorized
+      parentId: 1003
+      parentUniqueId: KSS.Tests.EditMode.dll/KSS_Tests_EditMode/[KSS.Tests.EditMode][KSS_Tests_EditMode.SubstanceStateCollectionTests][suite]
+    - id: 1004
+      uniqueId: KSS.Tests.EditMode.dll/KSS_Tests_EditMode/SubstanceStateCollectionTests/[KSS.Tests.EditMode][KSS_Tests_EditMode.SubstanceStateCollectionTests.Empty___ShouldBeEmpty]
+      name: Empty___ShouldBeEmpty
+      fullName: KSS_Tests_EditMode.SubstanceStateCollectionTests.Empty___ShouldBeEmpty
+      resultStatus: 1
+      duration: 0.00017
+      messages: 
+      output: 
+      stacktrace: 
+      notRunnable: 0
+      ignoredOrSkipped: 0
+      description: 
+      isSuite: 0
+      categories:
+      - Uncategorized
+      parentId: 1003
+      parentUniqueId: KSS.Tests.EditMode.dll/KSS_Tests_EditMode/[KSS.Tests.EditMode][KSS_Tests_EditMode.SubstanceStateCollectionTests][suite]
+    m_ResultText: Add___ToEmpty_NegativeDt___AddsNewSubstanceWithNegativeAmount (0,000s)
     m_ResultStacktrace: 
     m_TestListState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 
-      m_LastClickedID: 0
-      m_ExpandedIDs: 6e0ce4a40ef5a0ae067943d4aab8a93a07892d48d052df4cf9bc9161252f2765a842747143252379ffffff7f
+      m_SelectedIDs: 37d9d6db
+      m_LastClickedID: -606676681
+      m_ExpandedIDs: 129ae69a0cd3249d6e0ce4a4e743d7a90ef5a0ae990804b6067943d42c391b0f9815a125989a6734aab8a93a07892d48d052df4c78e61357f9bc9161252f2765a842747143252379ffffff7f
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 

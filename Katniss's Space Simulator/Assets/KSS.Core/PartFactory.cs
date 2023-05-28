@@ -17,6 +17,13 @@ namespace KSS.Core
         /// </summary>
         public abstract class PartSource
         {
+            public string PartID { get; set; }
+
+            public PartSource( string partID )
+            {
+                this.PartID = partID;
+            }
+
             /// <summary>
             /// Implement this to create a part in the scene, with the specified object as its parent, with the specified local (parent's space) position and rotation.
             /// </summary>
