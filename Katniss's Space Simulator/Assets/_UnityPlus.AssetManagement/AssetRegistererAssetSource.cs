@@ -114,7 +114,16 @@ namespace UnityPlus.AssetManagement
             _registerer.TrySetAssetsToRegister( entries.ToArray() );
         }
 
-        private void OnValidate()
+        void Awake()
+        {
+            var reg = this.GetComponents<AssetRegisterer>();
+            if( reg.Length == 1 ) // if more, let user choose.
+            {
+                this._registerer = reg[0];
+            }
+        }
+
+        void OnValidate()
         {
             if( _registerer != null && _autoUpdate )
             {
