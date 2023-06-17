@@ -59,7 +59,7 @@
     <Compile Include="Assets\KSS.DevUtils\zzzDevUtilsGameManager.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\KSS.DevUtils\_KSS.DevUtils.asmdef" />
+    <None Include="Assets\KSS.DevUtils\___KSS.DevUtils.asmdef" />
     <None Include="Assets\KSS.DevUtils\ComputeNormalMap.compute" />
   </ItemGroup>
   <ItemGroup>
@@ -726,6 +726,18 @@
       <Project>{AA320F23-E273-CF3D-ECC5-E3B3EE38E655}</Project>
       <Name>_UnityEngine</Name>
     </ProjectReference>
+    <ProjectReference Include="_UnityPlus.AssetManagement.csproj">
+      <Project>{1082B390-7315-9D8E-BF58-53BE9AF2F68A}</Project>
+      <Name>_UnityPlus.AssetManagement</Name>
+    </ProjectReference>
+    <ProjectReference Include="_UnityPlus.Serialization.csproj">
+      <Project>{53A4B44D-C587-1ED0-C944-834EA89508FD}</Project>
+      <Name>_UnityPlus.Serialization</Name>
+    </ProjectReference>
+    <ProjectReference Include="_UnityPlus.UILib.csproj">
+      <Project>{50861573-23A3-BCBD-DFDB-2A1CFB929A2F}</Project>
+      <Name>_UnityPlus.UILib</Name>
+    </ProjectReference>
     <ProjectReference Include="KSS.csproj">
       <Project>{6A093499-3B7A-71F2-8793-20E600CE8610}</Project>
       <Name>KSS</Name>
@@ -733,10 +745,6 @@
     <ProjectReference Include="KSS.Core.csproj">
       <Project>{C615911B-EF2A-D5E1-1CFB-5D278FA273D2}</Project>
       <Name>KSS.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="UILib.csproj">
-      <Project>{70FA2AF0-1725-15E3-F4B5-4083D9252BF4}</Project>
-      <Name>UILib</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

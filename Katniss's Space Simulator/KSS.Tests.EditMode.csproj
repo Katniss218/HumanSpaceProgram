@@ -710,10 +710,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="UILib.csproj">
-      <Project>{70FA2AF0-1725-15E3-F4B5-4083D9252BF4}</Project>
-      <Name>UILib</Name>
-    </ProjectReference>
     <ProjectReference Include="KSS.csproj">
       <Project>{6A093499-3B7A-71F2-8793-20E600CE8610}</Project>
       <Name>KSS</Name>

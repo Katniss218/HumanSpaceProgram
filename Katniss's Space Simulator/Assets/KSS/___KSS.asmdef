@@ -1,0 +1,22 @@
+{
+    "name": "KSS",
+    "rootNamespace": "",
+    "references": [
+        "GUID:a35efad8797223d499f8c68b1f545dbc",
+        "GUID:d60799ab2a985554ea1a39cd38695018",
+        "GUID:27d62e6e15e3fa24eabddedaa74a2424",
+        "GUID:3f85132a81c90724483587ec215e1407",
+        "GUID:f00983dade8147042b611005c376fd7e",
+        "GUID:c82c696bae534834ea738d7d72110d7e",
+        "GUID:8baf454908ccb9b4f9cb33c42dab4033"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

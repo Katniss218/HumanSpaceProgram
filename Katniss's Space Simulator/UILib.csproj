@@ -56,18 +56,18 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\UILib\UILayoutInfo.cs" />
-    <Compile Include="Assets\UILib\Factories\InputFieldFactory.cs" />
-    <Compile Include="Assets\UILib\ValueBar.cs" />
-    <Compile Include="Assets\UILib\Factories\BarFactory.cs" />
-    <Compile Include="Assets\UILib\Factories\TextFactory.cs" />
-    <Compile Include="Assets\UILib\UIHelper.cs" />
-    <Compile Include="Assets\UILib\UIStyle.cs" />
-    <Compile Include="Assets\UILib\Factories\ButtonFactory.cs" />
-    <Compile Include="Assets\UILib\ValueBarSegment.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\UILayoutInfo.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\Factories\InputFieldFactory.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\ValueBar.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\Factories\BarFactory.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\Factories\TextFactory.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\UIHelper.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\UIStyle.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\Factories\ButtonFactory.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\ValueBarSegment.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\UILib\_UILib.asmdef" />
+    <None Include="Assets\_UnityPlus.UILib\___UILib.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
