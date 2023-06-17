@@ -24,7 +24,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 200}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 3462
+  controlID: 4653
 --- !u!114 &2
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -150,7 +150,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 200}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 1
-  controlID: 3463
+  controlID: 4654
 --- !u!114 &4
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -175,7 +175,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 100}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 3464
+  controlID: 4655
 --- !u!114 &5
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -233,9 +233,9 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 
+      m_SelectedIDs: 82150000
       m_LastClickedID: 0
-      m_ExpandedIDs: 08fbffff
+      m_ExpandedIDs: aef3fbfff8f3fbff6af5fbffd6f5fbff08fbffff
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -1776,21 +1776,21 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets
+    - Assets/KSS.Core
     m_Globs: []
     m_OriginalText: 
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets
+  - Assets/KSS.Core
   m_LastFoldersGridSize: -1
   m_LastProjectPath: E:\GIT\KatnisssSpaceSimulator\Katniss's Space Simulator
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 13}
-    m_SelectedIDs: d05b0000
-    m_LastClickedID: 23504
+    scrollPos: {x: 0, y: 203}
+    m_SelectedIDs: d85b0000
+    m_LastClickedID: 23512
     m_ExpandedIDs: 00000000d05b0000d25b0000d45b0000d65b0000d85b0000da5b0000de5b0000e05b0000e25b0000e45b0000e65b0000e85b0000ea5b0000ec5b000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -1844,9 +1844,9 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: 
-    m_LastClickedInstanceID: 0
-    m_HadKeyboardFocusLastEvent: 1
+    m_SelectedInstanceIDs: 82150000
+    m_LastClickedInstanceID: 5506
+    m_HadKeyboardFocusLastEvent: 0
     m_ExpandedInstanceIDs: c6230000ea5b0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -2000,7 +2000,7 @@ MonoBehaviour:
     m_LastAppliedPresetName: Default
     m_SaveData: []
   m_Spl:
-    ID: 72185
+    ID: 4987
     splitterInitialOffset: 0
     currentActiveSplitter: -1
     realSizes:
@@ -2032,7 +2032,7 @@ MonoBehaviour:
       name: Katniss's Space Simulator
       fullName: Katniss's Space Simulator
       resultStatus: 1
-      duration: 0.1398095
+      duration: 0.0843501
       messages: 
       output: 
       stacktrace: 
@@ -2048,7 +2048,7 @@ MonoBehaviour:
       name: KSS.Tests.PlayMode.dll
       fullName: E:/GIT/KatnisssSpaceSimulator/Katniss's Space Simulator/Library/ScriptAssemblies/KSS.Tests.PlayMode.dll
       resultStatus: 1
-      duration: 0.1195634
+      duration: 0.067703
       messages: 
       output: 
       stacktrace: 
@@ -2064,7 +2064,7 @@ MonoBehaviour:
       name: KSS
       fullName: KSS
       resultStatus: 1
-      duration: 0.1126392
+      duration: 0.0642077
       messages: 
       output: 
       stacktrace: 
@@ -2080,7 +2080,7 @@ MonoBehaviour:
       name: Tests
       fullName: KSS.Tests
       resultStatus: 1
-      duration: 0.1053634
+      duration: 0.0609984
       messages: 
       output: 
       stacktrace: 
@@ -2096,7 +2096,7 @@ MonoBehaviour:
       name: PlayMode
       fullName: KSS.Tests.PlayMode
       resultStatus: 1
-      duration: 0.1019805
+      duration: 0.0578135
       messages: 
       output: 
       stacktrace: 
@@ -2112,7 +2112,7 @@ MonoBehaviour:
       name: P_Template
       fullName: KSS.Tests.PlayMode.P_Template
       resultStatus: 1
-      duration: 0.0963239
+      duration: 0.0531165
       messages: 
       output: 
       stacktrace: 
@@ -2128,7 +2128,7 @@ MonoBehaviour:
       name: NewTestScriptSimplePasses
       fullName: KSS.Tests.PlayMode.P_Template.NewTestScriptSimplePasses
       resultStatus: 1
-      duration: 0.024876
+      duration: 0.0095857
       messages: 
       output: 
       stacktrace: 
@@ -2145,7 +2145,7 @@ MonoBehaviour:
       name: NewTestScriptWithEnumeratorPasses
       fullName: KSS.Tests.PlayMode.P_Template.NewTestScriptWithEnumeratorPasses
       resultStatus: 1
-      duration: 0.0231991
+      duration: 0.0234607
       messages: 
       output: 
       stacktrace: 
@@ -2198,7 +2198,7 @@ MonoBehaviour:
       name: Katniss's Space Simulator
       fullName: Katniss's Space Simulator
       resultStatus: 1
-      duration: 0.1445511
+      duration: 0.0898693
       messages: 
       output: 
       stacktrace: 
@@ -2214,7 +2214,7 @@ MonoBehaviour:
       name: KSS.Tests.EditMode.dll
       fullName: E:/GIT/KatnisssSpaceSimulator/Katniss's Space Simulator/Library/ScriptAssemblies/KSS.Tests.EditMode.dll
       resultStatus: 1
-      duration: 0.0987461
+      duration: 0.0536503
       messages: 
       output: 
       stacktrace: 
@@ -2230,7 +2230,7 @@ MonoBehaviour:
       name: KSS_Tests_EditMode
       fullName: KSS_Tests_EditMode
       resultStatus: 1
-      duration: 0.097493
+      duration: 0.0521616
       messages: 
       output: 
       stacktrace: 
@@ -2246,7 +2246,7 @@ MonoBehaviour:
       name: E_Template
       fullName: KSS_Tests_EditMode.E_Template
       resultStatus: 1
-      duration: 0.0799961
+      duration: 0.0312758
       messages: 
       output: 
       stacktrace: 
@@ -2262,7 +2262,7 @@ MonoBehaviour:
       name: CreatedGameObjectExists
       fullName: KSS_Tests_EditMode.E_Template.CreatedGameObjectExists
       resultStatus: 1
-      duration: 0.0480063
+      duration: 0.0152839
       messages: 
       output: 
       stacktrace: 
@@ -2279,7 +2279,7 @@ MonoBehaviour:
       name: SubstanceStateCollectionTests
       fullName: KSS_Tests_EditMode.SubstanceStateCollectionTests
       resultStatus: 1
-      duration: 0.0154726
+      duration: 0.0147513
       messages: 
       output: 
       stacktrace: 
@@ -2295,7 +2295,7 @@ MonoBehaviour:
       name: Add___MultipleSubstances___AddsToCorresponding
       fullName: KSS_Tests_EditMode.SubstanceStateCollectionTests.Add___MultipleSubstances___AddsToCorresponding
       resultStatus: 1
-      duration: 0.0033034
+      duration: 0.0029743
       messages: 
       output: 
       stacktrace: 
@@ -2312,7 +2312,7 @@ MonoBehaviour:
       name: Add___NegativeAmount___Subtracts
       fullName: KSS_Tests_EditMode.SubstanceStateCollectionTests.Add___NegativeAmount___Subtracts
       resultStatus: 1
-      duration: 0.0003579
+      duration: 0.0003264
       messages: 
       output: 
       stacktrace: 
@@ -2329,7 +2329,7 @@ MonoBehaviour:
       name: Add___SingleSubstance___AddsToExisting
       fullName: KSS_Tests_EditMode.SubstanceStateCollectionTests.Add___SingleSubstance___AddsToExisting
       resultStatus: 1
-      duration: 0.0002959
+      duration: 0.0002729
       messages: 
       output: 
       stacktrace: 
@@ -2346,7 +2346,7 @@ MonoBehaviour:
       name: Add___SingleSubstance_NegativeDt___RemovesFromExisting
       fullName: KSS_Tests_EditMode.SubstanceStateCollectionTests.Add___SingleSubstance_NegativeDt___RemovesFromExisting
       resultStatus: 1
-      duration: 0.0002683
+      duration: 0.0002768
       messages: 
       output: 
       stacktrace: 
@@ -2363,7 +2363,7 @@ MonoBehaviour:
       name: Add___ToEmpty___AddsNewSubstance
       fullName: KSS_Tests_EditMode.SubstanceStateCollectionTests.Add___ToEmpty___AddsNewSubstance
       resultStatus: 1
-      duration: 0.0006032
+      duration: 0.0005924
       messages: 
       output: 
       stacktrace: 
@@ -2380,7 +2380,7 @@ MonoBehaviour:
       name: Add___ToEmpty_NegativeDt___AddsNewSubstanceWithNegativeAmount
       fullName: KSS_Tests_EditMode.SubstanceStateCollectionTests.Add___ToEmpty_NegativeDt___AddsNewSubstanceWithNegativeAmount
       resultStatus: 1
-      duration: 0.0003569
+      duration: 0.0003475
       messages: 
       output: 
       stacktrace: 
@@ -2397,7 +2397,7 @@ MonoBehaviour:
       name: Empty___ShouldBeEmpty
       fullName: KSS_Tests_EditMode.SubstanceStateCollectionTests.Empty___ShouldBeEmpty
       resultStatus: 1
-      duration: 0.00017
+      duration: 0.0001604
       messages: 
       output: 
       stacktrace: 

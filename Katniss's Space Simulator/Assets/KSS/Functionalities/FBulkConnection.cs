@@ -1,5 +1,4 @@
-﻿using KSS.Core.Serialization;
-using KSS.Core;
+﻿using KSS.Core;
 using KSS.Core.Physics;
 using KSS.Core.ReferenceFrames;
 using KSS.Core.ResourceFlowSystem;
@@ -11,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace KSS.Functionalities
 {
@@ -252,12 +252,12 @@ namespace KSS.Functionalities
             FixedUpdate_Flow( sceneAcceleration );
         }
 
-        public JToken Save( int fileVersion )
+        public void SetData( Loader l, SerializedData data )
         {
             throw new NotImplementedException();
         }
 
-        public void Load( int fileVersion, JToken data )
+        public SerializedData GetData( Saver s )
         {
             throw new NotImplementedException();
         }

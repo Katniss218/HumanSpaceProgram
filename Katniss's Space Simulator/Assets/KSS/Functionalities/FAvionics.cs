@@ -1,5 +1,4 @@
-﻿using KSS.Core.Serialization;
-using KSS.Core;
+﻿using KSS.Core;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -8,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using KSS.Control;
+using UnityPlus.Serialization;
 
 namespace KSS.Functionalities
 {
@@ -26,12 +26,12 @@ namespace KSS.Functionalities
         public event Action<float> SteerY;
 
 
-        public JToken Save( int fileVersion )
+        public void SetData( Loader l, SerializedData data )
         {
             throw new NotImplementedException();
         }
 
-        public void Load( int fileVersion, JToken data )
+        public SerializedData GetData( Saver s )
         {
             throw new NotImplementedException();
         }

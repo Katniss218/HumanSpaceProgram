@@ -1,5 +1,4 @@
-﻿using KSS.Core.Serialization;
-using KSS.Core;
+﻿using KSS.Core;
 using KSS.Core.ResourceFlowSystem;
 using Newtonsoft.Json.Linq;
 using System;
@@ -9,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace KSS.Functionalities
 {
@@ -133,23 +133,14 @@ namespace KSS.Functionalities
             }
         }
 
-        public JToken Save( int fileVersion )
+        public void SetData( Loader l, SerializedData data )
         {
             throw new NotImplementedException();
-
-            /*return new JObject()
-            {
-                { "Resources", this.Resources.ToString() }, // temp
-                { "ConnectedTo", this.ConnectedTo.ToString() } // temp
-            };*/
         }
 
-        public void Load( int fileVersion, JToken data )
+        public SerializedData GetData( Saver s )
         {
             throw new NotImplementedException();
-
-            //this.Resources = new Resource[] { }; // temp
-            //this.ConnectedTo = new FBulkContainer[] { }; // temp
         }
 
         /// <summary>

@@ -1,5 +1,4 @@
 ﻿using KSS.Core;
-using KSS.Core.Serialization;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -7,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace KSS.Functionalities
 {
@@ -37,6 +37,16 @@ namespace KSS.Functionalities
             }
         }
 
+
+        public void SetData( Loader l, SerializedData data )
+        {
+            throw new NotImplementedException();
+        }
+
+        public SerializedData GetData( Saver s )
+        {
+            throw new NotImplementedException();
+        }
         public JToken Save( int fileVersion )
         {
             switch( fileVersion )

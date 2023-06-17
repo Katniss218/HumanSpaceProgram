@@ -89,7 +89,6 @@
     <Compile Include="Assets\KSS.Core\CoordinateUtils.cs" />
     <Compile Include="Assets\KSS.Core\IMassCallback.cs" />
     <Compile Include="Assets\KSS.Core\Physics\GravityUtils.cs" />
-    <Compile Include="Assets\KSS.Core\Serialization\IPersistent.cs" />
     <Compile Include="Assets\KSS.Core\ReferenceFrames\RootObjectTransform.cs" />
     <Compile Include="Assets\KSS.Core\Buildings\LaunchSite.cs" />
     <Compile Include="Assets\KSS.Core\ReferenceFrames\IReferenceFrame.cs" />
