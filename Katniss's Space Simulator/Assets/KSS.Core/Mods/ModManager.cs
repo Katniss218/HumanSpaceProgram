@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KSS.Core.Utils;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,36 +10,20 @@ using UnityEngine;
 
 namespace KSS.Core.Mods
 {
-    [AttributeUsage( AttributeTargets.Method )]
-    public class ModStartupAttribute : Attribute
-    {
-
-    }
-
     public class ModManager : MonoBehaviour
     {
         // mods can be marked with an attribute that will be called at different points.
 
-        public static string GetExePath()
+        private static Dictionary<HumanSpaceProgramInvokeAttribute.Startup, List<MethodInfo>> _modMethods = new Dictionary<HumanSpaceProgramInvokeAttribute.Startup, List<MethodInfo>>();
+
+
+        private static void UpdateModMethods( Assembly a )
         {
-            RuntimePlatform platform = Application.platform;
-            string path = Application.dataPath;
-
-            if( platform == RuntimePlatform.WindowsEditor || platform == RuntimePlatform.LinuxEditor || platform == RuntimePlatform.OSXEditor )
-                return path + "/../";
-
-            if( platform == RuntimePlatform.OSXPlayer )
-                return path + "/../../";
-
-            if( platform == RuntimePlatform.WindowsPlayer || platform == RuntimePlatform.LinuxPlayer )
-                return path + "/../";
-
-            return path;
-        }
-
-        private static MethodInfo[] GetModMethods( Assembly a )
-        {
-            List<MethodInfo> methodsToReturn = new List<MethodInfo>();
+            _modMethods = new Dictionary<HumanSpaceProgramInvokeAttribute.Startup, List<MethodInfo>>();
+            foreach( HumanSpaceProgramInvokeAttribute.Startup w in Enum.GetValues( typeof( HumanSpaceProgramInvokeAttribute.Startup ) ) )
+            {
+                _modMethods[w] = new List<MethodInfo>();
+            }
 
             Type[] types = a.GetTypes();
             foreach( var t in types )
@@ -46,45 +31,59 @@ namespace KSS.Core.Mods
                 MethodInfo[] methods = t.GetMethods( BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static );
                 foreach( var m in methods )
                 {
-                    if( m.GetCustomAttribute<ModStartupAttribute>() != null )
+                    try
                     {
-                        methodsToReturn.Add( m );
+                        HumanSpaceProgramInvokeAttribute attr = m.GetCustomAttribute<HumanSpaceProgramInvokeAttribute>();
+                        if( attr == null )
+                        {
+                            continue;
+                        }
+
+                        _modMethods[attr.WhenToRun].Add( m );
+                    }
+                    catch( TypeLoadException ex )
+                    {
+                        Debug.LogWarning( $"Couldn't resolve a type from the mod `{a.FullName}`: {ex.Message}." );
                     }
                 }
             }
-
-            return methodsToReturn.ToArray();
         }
 
-        private static void LoadAssemblies()
+        private static void LoadAssembliesRecursive( string path )
         {
-            const string MOD_DIRECTORY = "GameData";
-
-            string dir = Path.Combine( GetExePath(), MOD_DIRECTORY );
-
-            if( !Directory.Exists( dir ) )
-                Directory.CreateDirectory( dir );
-
-            Debug.Log( $"Mod path: '{dir}'" );
-
-            string[] dlls = Directory.GetFiles( dir, "*.dll" );
+            string[] dlls = Directory.GetFiles( path, "*.dll" );
 
             foreach( var dll in dlls )
             {
                 byte[] file = File.ReadAllBytes( dll );
                 Assembly modAssembly = Assembly.Load( file );
 
-                var methods = GetModMethods( modAssembly );
-                foreach( var m in methods )
-                {
-                    m.Invoke( null, null );
-                }
+                UpdateModMethods( modAssembly );
+            }
+
+            string[] subfolders = Directory.GetDirectories( path );
+            foreach( var subfolder in subfolders )
+            {
+                LoadAssembliesRecursive( subfolder );
             }
         }
 
         void Awake()
         {
-            LoadAssemblies();
+            string dir = HumanSpaceProgram.GetGameDataPath();
+
+            if( !Directory.Exists( dir ) )
+                Directory.CreateDirectory( dir );
+
+            Debug.Log( $"Mod path: '{dir}'" );
+
+            LoadAssembliesRecursive( dir );
+
+            // methods marked with immediately should get invoked right at the start, in the always loaded scene.
+            foreach( var m in _modMethods[HumanSpaceProgramInvokeAttribute.Startup.Immediately] )
+            {
+                m.Invoke( null, null );
+            }
         }
     }
 }
