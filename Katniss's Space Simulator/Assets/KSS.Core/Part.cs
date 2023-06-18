@@ -1,4 +1,3 @@
-using KSS.Core.AssetDatabase;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,11 +5,8 @@ using UnityEngine;
 
 namespace KSS.Core
 {
-    public sealed partial class Part : MonoBehaviour, IIdentifiable, IMassCallback
+    public sealed partial class Part : MonoBehaviour, IHasMass
     {
-        [field: SerializeField]
-        public string ID { get; set; }
-
         [field: SerializeField]
         public Vessel Vessel { get; private set; }
 

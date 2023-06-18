@@ -107,11 +107,11 @@ namespace KSS.Functionalities
             return (flow, new FluidState( relativePressure, state.Temperature, newSignedVelocity ));
         }
 
-        IMassCallback[] _massComponents;
+        IHasMass[] _massComponents;
 
         void Start()
         {
-            _massComponents = this.GetComponents<IMassCallback>();
+            _massComponents = this.GetComponents<IHasMass>();
 
             foreach( var mc in _massComponents )
             {

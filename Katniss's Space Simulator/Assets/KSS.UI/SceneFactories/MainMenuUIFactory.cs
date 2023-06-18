@@ -52,7 +52,6 @@ namespace KSS.UI.SceneFactories
         private static void CreateExitButton( RectTransform parent, UIStyle style )
         {
             (_, Button btn) = ButtonFactory.CreateTextXY( parent, "exit button", "EXIT", new UILayoutInfo( new Vector2( 0.5f, 0 ), new Vector2( 0, 50), new Vector2( 200, 30 ) ), style );
-
         }
     }
 }

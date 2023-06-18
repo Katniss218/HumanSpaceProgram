@@ -28,7 +28,7 @@ namespace KSS_Tests_EditMode
         public void Add___SingleSubstance___AddsToExisting()
         {
             // Arrange
-            Substance sbs = new Substance() { ID = "test.1" };
+            Substance sbs = new Substance();
             SubstanceStateCollection collection1 = new SubstanceStateCollection( new SubstanceState( 50f, sbs ) );
             SubstanceStateCollection collection2 = new SubstanceStateCollection( new SubstanceState( 50f, sbs ) );
 
@@ -43,7 +43,7 @@ namespace KSS_Tests_EditMode
         public void Add___NegativeAmount___Subtracts()
         {
             // Arrange
-            Substance sbs = new Substance() { ID = "test.1" };
+            Substance sbs = new Substance();
             SubstanceStateCollection collection1 = new SubstanceStateCollection( new SubstanceState( 50f, sbs ) );
             SubstanceStateCollection collection2 = new SubstanceStateCollection( new SubstanceState( -50f, sbs ) );
 
@@ -58,7 +58,7 @@ namespace KSS_Tests_EditMode
         public void Add___SingleSubstance_NegativeDt___RemovesFromExisting()
         {
             // Arrange
-            Substance sbs = new Substance() { ID = "test.1" };
+            Substance sbs = new Substance();
             SubstanceStateCollection collection1 = new SubstanceStateCollection( new SubstanceState( 100f, sbs ) );
             SubstanceStateCollection collection2 = new SubstanceStateCollection( new SubstanceState( 50f, sbs ) );
 
@@ -73,10 +73,10 @@ namespace KSS_Tests_EditMode
         public void Add___MultipleSubstances___AddsToCorresponding()
         {
             // Arrange
-            Substance sbs1 = new Substance() { ID = "test.1" };
-            Substance sbs2 = new Substance() { ID = "test.2" };
-            Substance sbs3 = new Substance() { ID = "test.3" };
-            Substance sbs4 = new Substance() { ID = "test.4" };
+            Substance sbs1 = new Substance();
+            Substance sbs2 = new Substance();
+            Substance sbs3 = new Substance();
+            Substance sbs4 = new Substance();
 
             SubstanceStateCollection collection1 = new SubstanceStateCollection( 
                 new SubstanceState( 50f, sbs1 ), 
@@ -105,7 +105,7 @@ namespace KSS_Tests_EditMode
         public void Add___ToEmpty___AddsNewSubstance()
         {
             // Arrange
-            Substance sbs = new Substance() { ID = "test.1" };
+            Substance sbs = new Substance();
             SubstanceStateCollection collection1 = SubstanceStateCollection.Empty;
             SubstanceStateCollection collection2 = new SubstanceStateCollection( new SubstanceState( 50f, sbs ) );
 
@@ -120,7 +120,7 @@ namespace KSS_Tests_EditMode
         public void Add___ToEmpty_NegativeDt___AddsNewSubstanceWithNegativeAmount()
         {
             // Arrange
-            Substance sbs = new Substance() { ID = "test.1" };
+            Substance sbs = new Substance();
             SubstanceStateCollection collection1 = new SubstanceStateCollection();
             SubstanceStateCollection collection2 = new SubstanceStateCollection( new SubstanceState( 50f, sbs ) );
 

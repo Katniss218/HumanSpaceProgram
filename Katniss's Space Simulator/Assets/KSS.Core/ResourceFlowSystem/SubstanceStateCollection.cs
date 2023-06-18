@@ -166,7 +166,7 @@ namespace KSS.Core.ResourceFlowSystem
 
                 // potentially remove substances if abs(newamount) < epsilon
 
-                int index = this._substances.FindIndex( s => s.Data.ID == sbs.Data.ID );
+                int index = this._substances.FindIndex( s => (object)s.Data == sbs.Data );
                 if( index != -1 )
                 {
                     float newAmount = this._substances[index].MassAmount + amountDelta;

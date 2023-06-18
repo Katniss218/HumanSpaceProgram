@@ -76,7 +76,6 @@
     <Compile Include="Assets\_UnityPlus.Serialization\PersistentComponents\IPersistent_MeshFilter.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\LoaderEx_Primitives.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Json\JsonStringWriter.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\Strategies\ExplicitHierarchyStrategy.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Strategies\PrefabAndDataStrategy.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\IPersistentComponents_GetData.cs" />
   </ItemGroup>

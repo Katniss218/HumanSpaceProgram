@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Katniss's Space Simulator\KSS.Core.csproj" />
+    <ProjectReference Include="..\Katniss's Space Simulator\_UnityEngine.csproj" />
+    <ProjectReference Include="..\Katniss's Space Simulator\_UnityPlus.AssetManagement.csproj" />
+    <ProjectReference Include="..\Katniss's Space Simulator\_UnityPlus.Serialization.csproj" />
+    <ProjectReference Include="..\Katniss's Space Simulator\_UnityPlus.UILib.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="UnityEngine">
+      <HintPath>..\Katniss's Space Simulator\Build\Katniss's Space Simulator_Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>..\Katniss's Space Simulator\Build\Katniss's Space Simulator_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
