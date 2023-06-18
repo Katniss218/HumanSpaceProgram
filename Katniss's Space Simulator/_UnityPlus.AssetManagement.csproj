@@ -57,9 +57,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\_UnityPlus.AssetManagement\ClonedGameObject.cs" />
+    <Compile Include="Assets\_UnityPlus.AssetManagement\AssetRegistererAssetSource.cs" />
     <Compile Include="Assets\_UnityPlus.AssetManagement\AssetRegistry.cs" />
     <Compile Include="Assets\_UnityPlus.AssetManagement\AssetRegisterer.cs" />
-    <Compile Include="Assets\_UnityPlus.AssetManagement\AssetRegistererAssetSource.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_UnityPlus.AssetManagement\___UnityPlus.AssetManagement.asmdef" />
