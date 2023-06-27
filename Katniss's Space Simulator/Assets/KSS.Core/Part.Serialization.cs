@@ -20,7 +20,7 @@ namespace KSS.Core
         // the components aren't strictly defined, but whatever you decide to save I call persistent.
 
 
-        public void SetData( Loader l, SerializedData data )
+        public void SetData( ILoader l, SerializedData data )
         {
             // functionalities / modules on the part must be the same as in the json.
             throw new NotImplementedException();
@@ -28,7 +28,7 @@ namespace KSS.Core
             // parts should be spawned before their persistent data is applied, because that data might reference other parts.
         }
 
-        public SerializedData GetData( Saver s )
+        public SerializedData GetData( ISaver s )
         {
             throw new NotImplementedException();
         }

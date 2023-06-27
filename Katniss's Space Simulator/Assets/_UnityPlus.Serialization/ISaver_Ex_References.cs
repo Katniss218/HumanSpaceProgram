@@ -10,7 +10,7 @@ using UnityPlus.AssetManagement;
 
 namespace UnityPlus.Serialization
 {
-    public static class Saver_Ex_References
+    public static class ISaver_Ex_References
     {
         /// <summary>
         /// The special token name for a reference ID (part of Object).
@@ -30,7 +30,7 @@ namespace UnityPlus.Serialization
 
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static SerializedData WriteObjectReference( this Saver s, object value )
+        public static SerializedData WriteObjectReference( this ISaver s, object value )
         {
             // A missing '$ref' node means the reference is broken.
 
@@ -48,7 +48,7 @@ namespace UnityPlus.Serialization
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static SerializedObject WriteAssetReference( this Saver s, object assetRef )
+        public static SerializedObject WriteAssetReference( this ISaver s, object assetRef )
         {
             if( assetRef == null )
             {
@@ -75,7 +75,7 @@ namespace UnityPlus.Serialization
         /// 2. CHANGING CODE MIGHT INVALIDATE REFERENCES TO LAMBDAS.
         /// </remarks>
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static SerializedData WriteDelegate( this Saver s, Delegate delegateObj )
+        public static SerializedData WriteDelegate( this ISaver s, Delegate delegateObj )
         {
             SerializedArray invocationListJson = new SerializedArray();
 
@@ -89,7 +89,7 @@ namespace UnityPlus.Serialization
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        private static SerializedData WriteSingleDelegate( this Saver s, Delegate delegateObj )
+        private static SerializedData WriteSingleDelegate( this ISaver s, Delegate delegateObj )
         {
             Type delegateType = delegateObj.GetType();
 

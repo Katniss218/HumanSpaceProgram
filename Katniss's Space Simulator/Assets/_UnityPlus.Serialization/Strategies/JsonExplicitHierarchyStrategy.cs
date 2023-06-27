@@ -14,7 +14,7 @@ namespace UnityPlus.Serialization.Strategies
     /// Can be used to save the scene using the factory-gameobjectdata scheme.
     /// </summary>
     [Obsolete( "Incomplete" )]
-    public sealed class ExplicitHierarchyStrategy
+    public sealed class JsonExplicitHierarchyStrategy
     {
         // Object actions are suffixed by _Object
         // Data actions are suffixed by _Data

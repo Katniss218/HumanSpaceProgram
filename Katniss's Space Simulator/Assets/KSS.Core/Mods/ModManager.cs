@@ -70,7 +70,7 @@ namespace KSS.Core.Mods
 
         void Awake()
         {
-            string dir = HumanSpaceProgram.GetGameDataPath();
+            string dir = IOUtils.GetGameDataPath();
 
             if( !Directory.Exists( dir ) )
                 Directory.CreateDirectory( dir );

@@ -102,12 +102,12 @@ namespace KSS.Functionalities
             return FluidState.Vacuum; // temp, inlet condition.
         }
 
-        public void SetData( Loader l, SerializedData data )
+        public void SetData( ILoader l, SerializedData data )
         {
             throw new NotImplementedException();
         }
 
-        public SerializedData GetData( Saver s )
+        public SerializedData GetData( ISaver s )
         {
             throw new NotImplementedException();
         }

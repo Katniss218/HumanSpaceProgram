@@ -13,7 +13,7 @@ namespace UnityPlus.Serialization
     public static class IPersistent_MeshFilter
     {
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static SerializedData GetData( this MeshFilter mf, Saver s )
+        public static SerializedData GetData( this MeshFilter mf, ISaver s )
         {
             return new SerializedObject()
             {
@@ -22,7 +22,7 @@ namespace UnityPlus.Serialization
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static void SetData( this MeshFilter mf, Loader l, SerializedObject json )
+        public static void SetData( this MeshFilter mf, ILoader l, SerializedObject json )
         {
             if( json.TryGetValue( "shared_mesh", out var jsonSharedMesh ) )
                 mf.sharedMesh = l.ReadAssetReference<Mesh>( jsonSharedMesh );

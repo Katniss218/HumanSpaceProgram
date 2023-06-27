@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace KSS.Core.Utils
 {
-    public static class HumanSpaceProgram
+    public static class IOUtils
     {
         const string MOD_DIRECTORY = "GameData";
 

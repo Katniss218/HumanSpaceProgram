@@ -1,27 +1,34 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace UnityPlus.Serialization
 {
-    public class Saver : ISaver
+    public class AsyncSaver : IAsyncSaver
     {
         /// <summary>
         /// Specifies where to save the data.
         /// </summary>
         public string SaveDirectory { get; set; }
 
+        public float CurrentActionPercentCompleted { get; set; }
+        public float TotalPercentCompleted => (_completedActions + CurrentActionPercentCompleted) / (_objectActions.Count + _dataActions.Count);
+
+        int _completedActions;
+
         ISaver.State _currentState;
 
-        List<Action<ISaver>> _dataActions = new List<Action<ISaver>>();
-        List<Action<ISaver>> _objectActions = new List<Action<ISaver>>();
+        List<Func<ISaver, IEnumerator>> _dataActions = new List<Func<ISaver, IEnumerator>>();
+        List<Func<ISaver, IEnumerator>> _objectActions = new List<Func<ISaver, IEnumerator>>();
 
         Dictionary<object, Guid> _objectToGuid = new Dictionary<object, Guid>();
 
-        public Saver( string saveDirectory, IEnumerable<Action<ISaver>> dataActions, IEnumerable<Action<ISaver>> objectActions )
+        public AsyncSaver( string saveDirectory, IEnumerable<Func<ISaver, IEnumerator>> dataActions, IEnumerable<Func<ISaver, IEnumerator>> objectActions )
         {
             this.SaveDirectory = saveDirectory;
 
@@ -86,25 +93,48 @@ namespace UnityPlus.Serialization
         /// <summary>
         /// Performs a save to the current path, and with the current save actions.
         /// </summary>
-        public void Save()
+        public IEnumerator SaveCoroutine( MonoBehaviour coroutineContainer )
         {
+#if DEBUG
+            Debug.Log( "Saving..." );
+#endif
             ClearReferenceRegistry();
             _currentState = ISaver.State.SavingData;
+            _completedActions = 0;
+            CurrentActionPercentCompleted = 0.0f;
 
-            foreach( var action in _dataActions )
+            // Should save data before objects, because data will add the objects that are referenced to the registry.
+            foreach( var func in _dataActions )
             {
-                action?.Invoke( this );
+                yield return coroutineContainer.StartCoroutine( func( this ) );
+                _completedActions++;
             }
 
             _currentState = ISaver.State.SavingObjects;
 
-            foreach( var action in _objectActions )
+            foreach( var func in _objectActions )
             {
-                action?.Invoke( this );
+                yield return coroutineContainer.StartCoroutine( func( this ) );
+                _completedActions++;
             }
 
             ClearReferenceRegistry();
             _currentState = ISaver.State.Idle;
+#if DEBUG
+            Debug.Log( "Finished Saving" );
+#endif
+        }
+
+        /// <summary>
+        /// Starts saving asynchronously, using the specified monobehaviour as a container for the coroutine.
+        /// </summary>
+        public void SaveAsync( MonoBehaviour coroutineContainer )
+        {
+            if( _currentState != ISaver.State.Idle )
+            {
+                throw new InvalidOperationException( $"This saver instance is already running." );
+            }
+            coroutineContainer.StartCoroutine( SaveCoroutine( coroutineContainer ) );
         }
     }
 }

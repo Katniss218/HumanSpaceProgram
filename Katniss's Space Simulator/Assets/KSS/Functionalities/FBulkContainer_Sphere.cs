@@ -133,12 +133,12 @@ namespace KSS.Functionalities
             }
         }
 
-        public void SetData( Loader l, SerializedData data )
+        public void SetData( ILoader l, SerializedData data )
         {
             throw new NotImplementedException();
         }
 
-        public SerializedData GetData( Saver s )
+        public SerializedData GetData( ISaver s )
         {
             throw new NotImplementedException();
         }

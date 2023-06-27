@@ -174,6 +174,12 @@ namespace UnityPlus.Serialization.Json
 
             SerializedObject obj = new SerializedObject();
 
+            if( _currentChar == '}' )
+            {
+                Eat_ObjectEnd();
+                return obj;
+            }
+
             while( true )
             {
                 (string name, SerializedData val) = EatMember();
@@ -219,6 +225,12 @@ namespace UnityPlus.Serialization.Json
             EatWhiteSpace();
 
             SerializedArray arr = new SerializedArray();
+
+            if( _currentChar == ']' )
+            {
+                Eat_ArrayEnd();
+                return arr;
+            }
 
             while( true )
             {

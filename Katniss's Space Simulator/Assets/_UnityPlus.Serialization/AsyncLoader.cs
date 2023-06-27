@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -8,21 +9,26 @@ using UnityEngine;
 
 namespace UnityPlus.Serialization
 {
-    public class Loader : ILoader
+    public class AsyncLoader : IAsyncLoader
     {
         /// <summary>
         /// Specifies where to save the data.
         /// </summary>
         public string SaveDirectory { get; set; }
 
+        public float CurrentActionPercentCompleted { get; set; }
+        public float TotalPercentCompleted => (_completedActions + CurrentActionPercentCompleted) / (_objectActions.Count + _dataActions.Count);
+
+        int _completedActions;
+
         ILoader.State _currentState;
 
-        List<Action<ILoader>> _objectActions = new List<Action<ILoader>>();
-        List<Action<ILoader>> _dataActions = new List<Action<ILoader>>();
+        List<Func<ILoader, IEnumerator>> _objectActions = new List<Func<ILoader, IEnumerator>>();
+        List<Func<ILoader, IEnumerator>> _dataActions = new List<Func<ILoader, IEnumerator>>();
 
         Dictionary<Guid, object> _guidToObject = new Dictionary<Guid, object>();
 
-        public Loader( string saveDirectory, IEnumerable<Action<ILoader>> objectActions, IEnumerable<Action<ILoader>> dataActions )
+        public AsyncLoader( string saveDirectory, IEnumerable<Func<ILoader, IEnumerator>> objectActions, IEnumerable<Func<ILoader, IEnumerator>> dataActions )
         {
             this.SaveDirectory = saveDirectory;
 
@@ -86,29 +92,47 @@ namespace UnityPlus.Serialization
         //  -- -- -- --
         //
 
-        /// <summary>
-        /// Performs a load from the current path, and with the current save actions.
-        /// </summary>
-        public void Load()
+        private IEnumerator LoadCoroutine( MonoBehaviour coroutineContainer )
         {
+#if DEBUG
+            Debug.Log( "Loading..." );
+#endif
             ClearReferenceRegistry();
             _currentState = ILoader.State.LoadingObjects;
+            _completedActions = 0;
+            CurrentActionPercentCompleted = 0.0f;
 
-            // Create objects first, since data will reference them, so they must exist to be dereferenced.
-            foreach( var action in _objectActions )
+            foreach( var func in _objectActions )
             {
-                action?.Invoke( this );
+                yield return coroutineContainer.StartCoroutine( func( this ) );
+                _completedActions++;
             }
 
             _currentState = ILoader.State.LoadingData;
 
-            foreach( var action in _dataActions )
+            foreach( var func in _dataActions )
             {
-                action?.Invoke( this );
+                yield return coroutineContainer.StartCoroutine( func( this ) );
+                _completedActions++;
             }
 
             ClearReferenceRegistry();
             _currentState = ILoader.State.Idle;
+#if DEBUG
+            Debug.Log( "Finished Loading" );
+#endif
+        }
+
+        /// <summary>
+        /// Starts loading asynchronously, using the specified monobehaviour as a container for the coroutine.
+        /// </summary>
+        public void LoadAsync( MonoBehaviour coroutineContainer )
+        {
+            if( _currentState != ILoader.State.Idle )
+            {
+                throw new InvalidOperationException( $"This loader instance is already running." );
+            }
+            coroutineContainer.StartCoroutine( LoadCoroutine( coroutineContainer ) );
         }
     }
 }

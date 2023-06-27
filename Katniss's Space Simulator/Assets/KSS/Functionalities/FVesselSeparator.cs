@@ -38,39 +38,14 @@ namespace KSS.Functionalities
         }
 
 
-        public void SetData( Loader l, SerializedData data )
+        public void SetData( ILoader l, SerializedData data )
         {
             throw new NotImplementedException();
         }
 
-        public SerializedData GetData( Saver s )
+        public SerializedData GetData( ISaver s )
         {
             throw new NotImplementedException();
-        }
-        public JToken Save( int fileVersion )
-        {
-            switch( fileVersion )
-            {
-                case 0:
-                    return new JObject()
-                    {
-                        { "separated", this._separated }
-                    };
-                default:
-                    return new JObject();
-            }
-        }
-
-        public void Load( int fileVersion, JToken data )
-        {
-            switch( fileVersion )
-            {
-                case 0:
-                    this._separated = (bool)data["separated"];
-                    return;
-                default:
-                    return;
-            }
         }
     }
 }

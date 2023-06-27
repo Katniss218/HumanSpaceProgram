@@ -12,7 +12,7 @@ namespace UnityPlus.Serialization
     public static class IPersistent_Transform
     {
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static SerializedData GetData( this Transform t, Saver s )
+        public static SerializedData GetData( this Transform t, ISaver s )
         {
             return new SerializedObject()
             {
@@ -23,7 +23,7 @@ namespace UnityPlus.Serialization
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static void SetData( this Transform t, Loader l, SerializedObject json )
+        public static void SetData( this Transform t, ILoader l, SerializedObject json )
         {
             if( json.TryGetValue( "local_position", out var jsonLocalPosition ) )
                 t.localPosition = l.ReadVector3( jsonLocalPosition );

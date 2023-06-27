@@ -15,7 +15,7 @@ namespace UnityPlus.Serialization
     public static class IPersistentComponents_SetData
     {
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static void SetData( this Component c, Loader l, SerializedData json )
+        public static void SetData( this Component c, ILoader l, SerializedData json )
         {
             // component "data" means that the component (which is a referencable object) has already been added by an object action, and we're now reading its data.
 

@@ -12,7 +12,7 @@ namespace UnityPlus.Serialization
     public static partial class IPersistentComponents_GetData
     {
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static SerializedData GetData( this Component c, Saver s )
+        public static SerializedData GetData( this Component c, ISaver s )
         {
             switch( c )
             {
@@ -24,6 +24,16 @@ namespace UnityPlus.Serialization
                     return comp.GetData( s );
                 case MeshRenderer comp:
                     return comp.GetData( s );
+
+                    // particle system
+
+                    // navmesh stuff
+
+                    // colliders
+
+                    // rigidbody
+
+
             }
             return null;
         }

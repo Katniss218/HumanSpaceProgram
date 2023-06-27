@@ -12,7 +12,7 @@ namespace UnityPlus.Serialization
 {
     public static class IPersistent_MeshRenderer
     {
-        public static SerializedData GetData( this MeshRenderer mr, Saver s )
+        public static SerializedData GetData( this MeshRenderer mr, ISaver s )
         {
             SerializedArray matsJson = new SerializedArray();
             var mats = mr.sharedMaterials.Select( mat => s.WriteAssetReference( mat ) );
@@ -29,7 +29,7 @@ namespace UnityPlus.Serialization
             };
         }
 
-        public static void SetData( this MeshRenderer mr, Loader l, SerializedObject json )
+        public static void SetData( this MeshRenderer mr, ILoader l, SerializedObject json )
         {
             if( json.TryGetValue( "shared_materials", out var jsonSharedMaterials ) )
             {
