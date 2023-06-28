@@ -5,8 +5,8 @@ namespace TestMod
 {
     public class Class1
     {
-        [KSS.Core.Mods.HumanSpaceProgramInvoke( KSS.Core.Mods.HumanSpaceProgramInvokeAttribute.Startup.Immediately )]
-        public static void TestMethod()
+        [KSS.Core.Mods.StaticEventListener( "startup.immediately", "testmod.startup.immediately" )]
+        public static void TestMethod( object obj )
         {
             UnityEngine.Debug.Log( "running test mod" );
 

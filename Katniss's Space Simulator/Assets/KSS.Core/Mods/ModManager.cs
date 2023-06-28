@@ -7,39 +7,42 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityPlus.StaticEvents;
 
 namespace KSS.Core.Mods
 {
     public class ModManager : MonoBehaviour
     {
-        // mods can be marked with an attribute that will be called at different points.
+        public static OverridableEventManager StaticEvent { get; private set; } = new OverridableEventManager();
 
-        private static Dictionary<HumanSpaceProgramInvokeAttribute.Startup, List<MethodInfo>> _modMethods = new Dictionary<HumanSpaceProgramInvokeAttribute.Startup, List<MethodInfo>>();
-
-
-        private static void UpdateModMethods( Assembly a )
+        private static void CacheAutoRunMethods( Assembly a )
         {
-            _modMethods = new Dictionary<HumanSpaceProgramInvokeAttribute.Startup, List<MethodInfo>>();
-            foreach( HumanSpaceProgramInvokeAttribute.Startup w in Enum.GetValues( typeof( HumanSpaceProgramInvokeAttribute.Startup ) ) )
-            {
-                _modMethods[w] = new List<MethodInfo>();
-            }
-
             Type[] types = a.GetTypes();
             foreach( var t in types )
             {
                 MethodInfo[] methods = t.GetMethods( BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static );
-                foreach( var m in methods )
+                foreach( var method in methods )
                 {
                     try
                     {
-                        HumanSpaceProgramInvokeAttribute attr = m.GetCustomAttribute<HumanSpaceProgramInvokeAttribute>();
+                        StaticEventListenerAttribute attr = method.GetCustomAttribute<StaticEventListenerAttribute>();
                         if( attr == null )
                         {
                             continue;
                         }
 
-                        _modMethods[attr.WhenToRun].Add( m );
+                        var parameters = method.GetParameters();
+
+                        if( parameters.Length != 1 || parameters[0].ParameterType != typeof( object ) || method.ReturnType != typeof( void ) )
+                        {
+                            Debug.LogWarning( $"Ignoring a `{nameof( StaticEventListenerAttribute )}` attribute applied to method `{method.Name}` which doesn't follow the signature `void Method( object obj )`." );
+                            continue;
+                        }
+
+                        Action<object> methodDelegate = (Action<object>)Delegate.CreateDelegate( typeof( Action<object> ), method );
+
+                        StaticEvent.TryCreate( attr.EventID );
+                        StaticEvent.TryAddListener( attr.EventID, new OverridableEventListener<Action<object>>() { id = attr.ID, blacklist = attr.Blacklist, func = methodDelegate } );
                     }
                     catch( TypeLoadException ex )
                     {
@@ -49,7 +52,7 @@ namespace KSS.Core.Mods
             }
         }
 
-        private static void LoadAssembliesRecursive( string path )
+        private static void LoadAssembliesRecursive( string path, Action<Assembly> del )
         {
             string[] dlls = Directory.GetFiles( path, "*.dll" );
 
@@ -58,13 +61,13 @@ namespace KSS.Core.Mods
                 byte[] file = File.ReadAllBytes( dll );
                 Assembly modAssembly = Assembly.Load( file );
 
-                UpdateModMethods( modAssembly );
+                del?.Invoke( modAssembly );
             }
 
             string[] subfolders = Directory.GetDirectories( path );
             foreach( var subfolder in subfolders )
             {
-                LoadAssembliesRecursive( subfolder );
+                LoadAssembliesRecursive( subfolder, del );
             }
         }
 
@@ -77,13 +80,11 @@ namespace KSS.Core.Mods
 
             Debug.Log( $"Mod path: '{dir}'" );
 
-            LoadAssembliesRecursive( dir );
+            LoadAssembliesRecursive( dir, ( modAssembly ) => CacheAutoRunMethods( modAssembly ) );
 
             // methods marked with immediately should get invoked right at the start, in the always loaded scene.
-            foreach( var m in _modMethods[HumanSpaceProgramInvokeAttribute.Startup.Immediately] )
-            {
-                m.Invoke( null, null );
-            }
+
+            StaticEvent.TryInvoke( "startup.immediately" );
         }
     }
 }

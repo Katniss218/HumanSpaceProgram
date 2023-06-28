@@ -95,7 +95,7 @@
     <Compile Include="Assets\KSS.Core\ReferenceFrames\IReferenceFrame.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\FlowUtils.cs" />
     <Compile Include="Assets\KSS.Core\Scenes\AlwaysLoadedManager.cs" />
-    <Compile Include="Assets\KSS.Core\Mods\HumanSpaceProgramInvokeAttribute.cs" />
+    <Compile Include="Assets\KSS.Core\Mods\StaticEventListenerAttribute.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\SubstanceStateCollection.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -769,6 +769,10 @@
     <ProjectReference Include="_UnityPlus.Serialization.csproj">
       <Project>{53A4B44D-C587-1ED0-C944-834EA89508FD}</Project>
       <Name>_UnityPlus.Serialization</Name>
+    </ProjectReference>
+    <ProjectReference Include="_UnityPlus.StaticEvents.csproj">
+      <Project>{379A262A-69B2-FA05-9D5F-7E70A994B21D}</Project>
+      <Name>_UnityPlus.StaticEvents</Name>
     </ProjectReference>
     <ProjectReference Include="_UnityPlus.UILib.csproj">
       <Project>{50861573-23A3-BCBD-DFDB-2A1CFB929A2F}</Project>

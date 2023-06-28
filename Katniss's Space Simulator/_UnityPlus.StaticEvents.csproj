@@ -9,10 +9,10 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{AA320F23-E273-CF3D-ECC5-E3B3EE38E655}</ProjectGuid>
+    <ProjectGuid>{379A262A-69B2-FA05-9D5F-7E70A994B21D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <AssemblyName>_UnityEngine</AssemblyName>
+    <AssemblyName>_UnityPlus.StaticEvents</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <BaseDirectory>.</BaseDirectory>
@@ -56,21 +56,12 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\_UnityEngine\ComponentEx.cs" />
-    <Compile Include="Assets\_UnityEngine\Vector3Curve.cs" />
-    <Compile Include="Assets\_UnityEngine\GameObjectEx.cs" />
-    <Compile Include="Assets\_UnityEngine\QuaternionEx.cs" />
-    <Compile Include="Assets\_UnityEngine\Direction3D.cs" />
-    <Compile Include="Assets\_UnityEngine\Vector3Dbl.cs" />
-    <Compile Include="Assets\_UnityEngine\Vector2_Ex.cs" />
-    <Compile Include="Assets\_UnityEngine\Direction2D.cs" />
-    <Compile Include="Assets\_UnityEngine\QuaternionCurve.cs" />
-    <Compile Include="Assets\_UnityEngine\CoroutineRunner.cs" />
-    <Compile Include="Assets\_UnityEngine\Vector3_Ex.cs" />
-    <Compile Include="Assets\_UnityEngine\ObjectEx.cs" />
+    <Compile Include="Assets\_UnityPlus.StaticEvents\OverridableEventListener.cs" />
+    <Compile Include="Assets\_UnityPlus.StaticEvents\OverridableEventManager.cs" />
+    <Compile Include="Assets\_UnityPlus.StaticEvents\OverridableEvent.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\_UnityEngine\___UnityEngine.asmdef" />
+    <None Include="Assets\_UnityPlus.StaticEvents\___UnityPlus.StaticEvents.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -720,9 +711,6 @@
     </Reference>
     <Reference Include="System.Xml.Serialization">
       <HintPath>F:\UnityEditors\2022.1.8f1\Editor\Data\NetStandard\compat\2.1.0\shims\netfx\System.Xml.Serialization.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.TextMeshPro">
-      <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.UI">
       <HintPath>Library\ScriptAssemblies\UnityEditor.UI.dll</HintPath>
