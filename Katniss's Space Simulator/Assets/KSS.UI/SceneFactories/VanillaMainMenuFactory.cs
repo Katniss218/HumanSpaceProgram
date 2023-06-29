@@ -1,3 +1,5 @@
+using KSS.Core;
+using KSS.Core.Mods;
 using KSS.Core.Scenes;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,10 +13,13 @@ namespace KSS.UI.SceneFactories
     /// <summary>
     /// Creates the Main Menu UI elements.
     /// </summary>
-    public static class MainMenuUIFactory
+    public static class VanillaMainMenuFactory
     {
-        public static void Create( Canvas mainMenuCanvas, UIStyle style )
+        [OverridableEventListener( StaticEvent.STARTUP_MAINMENU, StaticEvent.NAMESPACE_VANILLA + ".mainmenu_ui" )]
+        public static void Create( object obj )
         {
+            (Canvas mainMenuCanvas, UIStyle style) = ((Canvas, UIStyle))obj;
+
             RectTransform canvasTransform = (RectTransform)mainMenuCanvas.transform;
 
             CreatePlayButton( canvasTransform, style );
@@ -44,14 +49,14 @@ namespace KSS.UI.SceneFactories
 
         private static void CreateSettingsButton( RectTransform parent, UIStyle style )
         {
-            (_, Button btn) = ButtonFactory.CreateTextXY( parent, "settings button", "SETTINGS", new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, -35), new Vector2( 200, 30 ) ), style );
-            
+            (_, Button btn) = ButtonFactory.CreateTextXY( parent, "settings button", "SETTINGS", new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, -35 ), new Vector2( 200, 30 ) ), style );
+
             btn.interactable = false;
         }
 
         private static void CreateExitButton( RectTransform parent, UIStyle style )
         {
-            (_, Button btn) = ButtonFactory.CreateTextXY( parent, "exit button", "EXIT", new UILayoutInfo( new Vector2( 0.5f, 0 ), new Vector2( 0, 50), new Vector2( 200, 30 ) ), style );
+            (_, Button btn) = ButtonFactory.CreateTextXY( parent, "exit button", "EXIT", new UILayoutInfo( new Vector2( 0.5f, 0 ), new Vector2( 0, 50 ), new Vector2( 200, 30 ) ), style );
         }
     }
 }

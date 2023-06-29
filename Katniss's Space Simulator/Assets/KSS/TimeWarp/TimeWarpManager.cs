@@ -109,6 +109,7 @@ namespace KSS.Core.Managers
 
         void Update()
         {
+#warning TODO - When saving, the game needs to be paused and not be unpaused until saving ends.
             if( Input.GetKeyDown( KeyCode.Period ) )
             {
                 if( IsPaused )

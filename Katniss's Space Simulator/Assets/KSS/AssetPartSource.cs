@@ -23,6 +23,7 @@ namespace KSS
 
         public override Part Instantiate( Transform parent, Vector3 localPosition, Quaternion localRotation )
         {
+#warning TODO - Use UnityPlus.AssetManagement.AssetRegistry, since part prefabs are assets.
             if( _objCache == null )
             {
                 _objCache = Resources.Load<GameObject>( PATH + PartID );

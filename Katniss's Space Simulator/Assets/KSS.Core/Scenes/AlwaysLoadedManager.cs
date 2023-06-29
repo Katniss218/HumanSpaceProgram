@@ -1,3 +1,5 @@
+using KSS.Core.Mods;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,14 +7,24 @@ using UnityEngine;
 namespace KSS.Core
 {
     /// <summary>
-    /// This manager is loaded first and always remains loaded until the game is exited.
+    /// The <see cref="AlwaysLoadedManager"/> is loaded immediately and remains loaded until the game is exited.
     /// </summary>
     public class AlwaysLoadedManager : MonoBehaviour
     {
         void Awake()
         {
-            // first scene should be the always loaded scene, so load the main menu.
+            // Load mods first, then cache, because mods might (will) define autorunning methods.
+            ModLoader.LoadModAssemblies();
 
+            OverridableEventListenerAttribute.CreateEventsForAutorunningMethods( AppDomain.CurrentDomain.GetAssemblies() );
+
+            StaticEvent.Instance.TryInvoke( StaticEvent.STARTUP_IMMEDIATELY );
+        }
+
+        void Start()
+        {
+            // Load the main menu after every Awake has finished processing.
+            // - The initial scene should be the "always loaded scene".
             Scenes.SceneManager.Instance.LoadScene( "MainMenu", true, false, null );
         }
     }
