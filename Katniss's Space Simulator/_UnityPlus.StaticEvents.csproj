@@ -57,8 +57,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\_UnityPlus.StaticEvents\OverridableEventListener.cs" />
-    <Compile Include="Assets\_UnityPlus.StaticEvents\OverridableEventManager.cs" />
     <Compile Include="Assets\_UnityPlus.StaticEvents\OverridableEvent.cs" />
+    <Compile Include="Assets\_UnityPlus.StaticEvents\OverridableEventManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_UnityPlus.StaticEvents\___UnityPlus.StaticEvents.asmdef" />

@@ -61,7 +61,7 @@
     <Compile Include="Assets\KSS\Terrain\MeshUtils.cs" />
     <Compile Include="Assets\KSS\AssetPartSource.cs" />
     <Compile Include="Assets\KSS\Terrain\MakeQuadMesh_Job.cs" />
-    <Compile Include="Assets\KSS\Functionalities\FAvionics.cs" />
+    <Compile Include="Assets\KSS\Functionalities\FController.cs" />
     <Compile Include="Assets\KSS\Terrain\LODQuadSphere.cs" />
     <Compile Include="Assets\KSS\Functionalities\FRocketEngine.cs" />
     <Compile Include="Assets\KSS\Terrain\LODQuadTree.cs" />

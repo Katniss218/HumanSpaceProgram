@@ -5,7 +5,7 @@ namespace TestMod
 {
     public class Class1
     {
-        [KSS.Core.Mods.StaticEventListener( "startup.immediately", "testmod.startup.immediately" )]
+        [KSS.Core.Mods.StaticEventListener( "startup.immediately", "testmod.startup.immediately", Blacklist = new[] { "vanilla.garbage" } )]
         public static void TestMethod( object obj )
         {
             UnityEngine.Debug.Log( "running test mod" );
