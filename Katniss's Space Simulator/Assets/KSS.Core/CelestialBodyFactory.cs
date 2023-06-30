@@ -1,5 +1,4 @@
 ﻿using KSS.Core.ReferenceFrames;
-using KSS.CelestialBodies;
 using System;
 using System.Collections.Generic;
 using System.Linq;
