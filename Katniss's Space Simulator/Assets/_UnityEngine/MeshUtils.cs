@@ -1,12 +1,6 @@
-﻿using KSS.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using System;
 
-namespace KSS.Terrain
+namespace UnityEngine
 {
     /// <summary>
     /// A class grouping helper methods relating to geometry and meshes.

@@ -4,7 +4,7 @@ using KSS.Core.Buildings;
 using KSS.Core.ReferenceFrames;
 using KSS.Core.ResourceFlowSystem;
 using KSS.Functionalities;
-using KSS.Terrain;
+using KSS.CelestialBodies.Surface;
 using UnityEngine;
 using UnityEngine.UI;
 

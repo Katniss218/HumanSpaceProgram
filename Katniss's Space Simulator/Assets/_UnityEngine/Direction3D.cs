@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace KSS.Terrain
+namespace KSS.CelestialBodies
 {
     /// <summary>
     /// Represents a basis direction in 3D space.

@@ -8,7 +8,7 @@ using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 
-namespace KSS.Terrain
+namespace KSS.CelestialBodies.Surface
 {
     /// <summary>
     /// A job that constructs the base mesh for the terrain.

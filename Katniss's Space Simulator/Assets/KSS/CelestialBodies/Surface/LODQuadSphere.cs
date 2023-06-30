@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace KSS.Terrain
+namespace KSS.CelestialBodies.Surface
 {
     /// <summary>
     /// Wraps around 6 faces of a sphere.

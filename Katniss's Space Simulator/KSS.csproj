@@ -58,23 +58,22 @@
   <ItemGroup>
     <Compile Include="Assets\KSS\Functionalities\FSequencer.cs" />
     <Compile Include="Assets\KSS\Camera\CameraController.cs" />
-    <Compile Include="Assets\KSS\Terrain\MeshUtils.cs" />
     <Compile Include="Assets\KSS\AssetPartSource.cs" />
-    <Compile Include="Assets\KSS\Terrain\MakeQuadMesh_Job.cs" />
+    <Compile Include="Assets\KSS\CelestialBodies\Surface\MakeQuadMesh_Job.cs" />
     <Compile Include="Assets\KSS\Functionalities\FController.cs" />
-    <Compile Include="Assets\KSS\Terrain\LODQuadSphere.cs" />
+    <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadSphere.cs" />
     <Compile Include="Assets\KSS\Functionalities\FRocketEngine.cs" />
-    <Compile Include="Assets\KSS\Terrain\LODQuadTree.cs" />
+    <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadTree.cs" />
     <Compile Include="Assets\KSS\Functionalities\FBulkContainer_Sphere.cs" />
     <Compile Include="Assets\KSS\Functionalities\FBulkConnection.cs" />
     <Compile Include="Assets\KSS\Functionalities\FVesselSeparator.cs" />
-    <Compile Include="Assets\KSS\Terrain\LODQuad.cs" />
+    <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuad.cs" />
     <Compile Include="Assets\KSS\Functionalities\FActuatorXY.cs" />
     <Compile Include="Assets\KSS\TimeWarp\TimeWarpManager.cs" />
-    <Compile Include="Assets\KSS\Terrain\LODQuadTree_NodeUtils.cs" />
+    <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadTree_NodeUtils.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\KSS\Terrain\TerrainShader.shader" />
+    <None Include="Assets\KSS\CelestialBodies\Surface\TerrainShader.shader" />
     <None Include="Assets\KSS\___KSS.asmdef" />
   </ItemGroup>
   <ItemGroup>

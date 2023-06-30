@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Unity.Jobs;
 using UnityEngine;
 
-namespace KSS.Terrain
+namespace KSS.CelestialBodies.Surface
 {
     /// <summary>
     /// A subdivisible inflated quad.
