@@ -71,10 +71,17 @@
     <Compile Include="Assets\KSS\Functionalities\FActuatorXY.cs" />
     <Compile Include="Assets\KSS\TimeWarp\TimeWarpManager.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadTree_NodeUtils.cs" />
+    <Compile Include="Assets\KSS\CelestialBodies\Atmosphere\AtmosphereRendererTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS\CelestialBodies\Surface\TerrainShader.shader" />
+    <None Include="Assets\KSS\CelestialBodies\AtmosphereRes\SebastianLagues_Atmosphere.shader" />
+    <None Include="Assets\KSS\CelestialBodies\Atmosphere\NewImageEffectShader.shader" />
+    <None Include="Assets\KSS\CelestialBodies\Atmosphere\Atmosphere.shader" />
     <None Include="Assets\KSS\___KSS.asmdef" />
+    <None Include="Assets\KSS\CelestialBodies\AtmosphereRes\SebastianLagues_Ocean.shader" />
+    <None Include="Assets\KSS\CelestialBodies\AtmosphereRes\Math.cginc" />
+    <None Include="Assets\KSS\CelestialBodies\AtmosphereRes\Triplanar.cginc" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
