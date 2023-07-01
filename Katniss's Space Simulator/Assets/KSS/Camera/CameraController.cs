@@ -116,6 +116,7 @@ namespace KSS.Camera
             if( zoomDist > 1_000_000 ) // should be enough of a conservative value. Near cam is only 100 km, not 1000.
             {
                 this._effectCamera.cullingMask = 1 << 31; // for some reason, this makes it draw properly.
+                //this._effectCamera.cullingMask += 1 << 0; // ???
                 this._closeCamera.enabled = false;
                 this._closePPLayer.enabled = false;
                 this._farPPLayer.enabled = true;
@@ -123,6 +124,7 @@ namespace KSS.Camera
             else
             {
                 this._effectCamera.cullingMask = 0;
+                //this._effectCamera.cullingMask += 1 << 0; // ???
                 this._closeCamera.enabled = true;
                 this._closePPLayer.enabled = true;
                 this._farPPLayer.enabled = false;

@@ -126,7 +126,7 @@ Shader "Hidden/Atmosphere"
 				fixed4 calculateSphere(v2f i)
 				{
 					float sceneDepthNonLinear = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv);
-					float sceneDepth = LinearEyeDepth(sceneDepthNonLinear) * length(i.viewVector);
+					float sceneDepth = LinearEyeDepth(sceneDepthNonLinear) *length(i.viewVector);
 
 					float3 rayOrigin = _WorldSpaceCameraPos;
 					float3 rayDir = normalize(i.viewVector);
