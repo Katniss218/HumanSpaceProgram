@@ -70,7 +70,7 @@ Material:
     - _Glossiness: 0.5
     - _GlossyReflections: 1
     - _InScatteringPointCount: 18
-    - _MaxRadius: 6971000
+    - _MaxRadius: 6571000
     - _Metallic: 0
     - _MinRadius: 6371000
     - _Mode: 0

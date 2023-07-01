@@ -175,7 +175,8 @@ Shader "Hidden/Atmosphere"
 						//	return fixed4(1, 0, 0, 1);
 						//return fixed4(1, 1, 0, 1);
 						float light = calculateLight(pointInAtmosphere, rayDir, inAtmosphere);
-						return (col * (1 - light)) + light;
+						fixed4 light3 = fixed4(0.5 * light, 0.75 * light, 1*light, 1);
+						return (col * (1 - light3)) + light3;
 					}
 					return col;
 				}

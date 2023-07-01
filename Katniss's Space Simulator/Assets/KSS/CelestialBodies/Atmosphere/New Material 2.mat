@@ -85,7 +85,7 @@ Material:
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
-    - _Center: {r: 925368.1, g: -3103088, b: -5619870, a: 1}
+    - _Center: {r: 966199.1, g: -3244510, b: -5887897, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SphereCenter: {r: 0, g: 0, b: 0, a: 0}
