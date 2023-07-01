@@ -26,6 +26,9 @@ namespace KSS.Camera
         [field: SerializeField]
         public Transform CameraParent { get; set; }
 
+        // Two-camera setup because the depth buffer in a single cam doesn't reach far enough.
+        // - in the future, possible to mask the cameras so they only render what's necessary, and maybe even add a third camera for drawing post-processing effects only. Depends on how expensive it gets.
+
         [field: SerializeField]
         UnityEngine.Camera _closeCamera;
 

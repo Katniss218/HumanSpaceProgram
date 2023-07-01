@@ -47,7 +47,8 @@ float Blend(float startHeight, float blendDst, float height) {
 // Returns vector (dstToSphere, dstThroughSphere)
 // If ray origin is inside sphere, dstToSphere = 0
 // If ray misses sphere, dstToSphere = maxValue; dstThroughSphere = 0
-float2 raySphere(float3 sphereCentre, float sphereRadius, float3 rayOrigin, float3 rayDir) {
+float2 raySphere(float3 rayOrigin, float3 rayDir, float3 sphereCentre, float sphereRadius)
+{
 	float3 offset = rayOrigin - sphereCentre;
 	float a = 1; // Set to dot(rayDir, rayDir) if rayDir might not be normalized
 	float b = 2 * dot(offset, rayDir);
@@ -55,13 +56,15 @@ float2 raySphere(float3 sphereCentre, float sphereRadius, float3 rayOrigin, floa
 	float d = b * b - 4 * a * c; // Discriminant from quadratic formula
 
 	// Number of intersections: 0 when d < 0; 1 when d = 0; 2 when d > 0
-	if (d > 0) {
+	if (d > 0)
+	{
 		float s = sqrt(d);
 		float dstToSphereNear = max(0, (-b - s) / (2 * a));
 		float dstToSphereFar = (-b + s) / (2 * a);
 
 		// Ignore intersections that occur behind the ray
-		if (dstToSphereFar >= 0) {
+		if (dstToSphereFar >= 0)
+		{
 			return float2(dstToSphereNear, dstToSphereFar - dstToSphereNear);
 		}
 	}
@@ -69,5 +72,23 @@ float2 raySphere(float3 sphereCentre, float sphereRadius, float3 rayOrigin, floa
 	return float2(maxFloat, 0);
 }
 
+/*float2 IntersectRaySphere(float3 rayorigin, float3 raydirection, float3 spherecenter, float sphereradius)
+{
+	float3 rayToSphere = spherecenter - rayorigin;
+	float projection = dot(rayToSphere, raydirection);
 
+    // Check if the sphere is behind the ray
+	//if (projection < 0)
+	//	return float2(0, 0); // this is wrong. ray can still be inside atmosphere.
 
+	float sphereDistanceSq = dot(rayToSphere, rayToSphere) - projection * projection;
+	float radiusSq = sphereradius * sphereradius;
+
+    // Check if the ray misses the sphere
+	if (sphereDistanceSq > radiusSq)
+		return float2(maxFloat, maxFloat);
+
+	float distance = sqrt(radiusSq - sphereDistanceSq);
+	
+	return float2(projection - distance, distance * 2);
+}*/

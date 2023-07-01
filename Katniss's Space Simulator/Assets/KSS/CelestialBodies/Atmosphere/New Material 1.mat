@@ -68,9 +68,9 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _MaxRadius: 6471000
+    - _MaxRadius: 6571000
     - _Metallic: 0
-    - _MinRadius: 0
+    - _MinRadius: 6371000
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
