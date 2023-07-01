@@ -69,13 +69,13 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _InScatteringPointCount: 5
-    - _MaxRadius: 109.4
+    - _InScatteringPointCount: 18
+    - _MaxRadius: 110
     - _Metallic: 0
     - _MinRadius: 0
     - _Mode: 0
     - _OcclusionStrength: 1
-    - _OpticalDepthPointCount: 5
+    - _OpticalDepthPointCount: 8
     - _Parallax: 0.02
     - _Radius: 113
     - _SmoothnessTextureChannel: 0
@@ -89,5 +89,5 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SphereCenter: {r: 0, g: 0, b: 0, a: 0}
-    - _SunPosition: {r: 5000, g: 0, b: 0, a: 1}
+    - _SunPosition: {r: 5, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []

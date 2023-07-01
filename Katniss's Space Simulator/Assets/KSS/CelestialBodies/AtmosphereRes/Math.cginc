@@ -71,24 +71,3 @@ float2 raySphere(float3 rayOrigin, float3 rayDir, float3 sphereCentre, float sph
 	// Ray did not intersect sphere
 	return float2(maxFloat, 0);
 }
-
-/*float2 IntersectRaySphere(float3 rayorigin, float3 raydirection, float3 spherecenter, float sphereradius)
-{
-	float3 rayToSphere = spherecenter - rayorigin;
-	float projection = dot(rayToSphere, raydirection);
-
-    // Check if the sphere is behind the ray
-	//if (projection < 0)
-	//	return float2(0, 0); // this is wrong. ray can still be inside atmosphere.
-
-	float sphereDistanceSq = dot(rayToSphere, rayToSphere) - projection * projection;
-	float radiusSq = sphereradius * sphereradius;
-
-    // Check if the ray misses the sphere
-	if (sphereDistanceSq > radiusSq)
-		return float2(maxFloat, maxFloat);
-
-	float distance = sqrt(radiusSq - sphereDistanceSq);
-	
-	return float2(projection - distance, distance * 2);
-}*/

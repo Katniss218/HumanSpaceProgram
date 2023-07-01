@@ -63,6 +63,8 @@ Shader "Hidden/Atmosphere"
 
 				float densityAtPoint(float3 samplePoint)
 				{
+					// A value in [0..1] representing the thickness of the atmosphere.
+
 					float heightAboveSurface = length(samplePoint - _Center) - _MinRadius;
 
 					float height01 = heightAboveSurface / (_MaxRadius - _MinRadius);
@@ -73,44 +75,42 @@ Shader "Hidden/Atmosphere"
 
 				float opticalDepth(float3 samplePoint, float3 rayDir, float rayLength)
 				{
+					// The ratio between the amount of incident light, and the amount of light transmitted to the point.
+					float3 densitySamplePoint = samplePoint; // HLSL passes parameters by reference.
 					float stepSize = rayLength / (_OpticalDepthPointCount - 1);
 					float3 rayStep = rayDir * stepSize;
 
 					float opticalDepth = 0;
-					for (int i = 0; i < _OpticalDepthPointCount; i++) // is there an analytic formula for the part of the exponential falloff?
+					for (int i = 0; i < _OpticalDepthPointCount; i++)
 					{
 						float localDensity = densityAtPoint(samplePoint);
 						opticalDepth += localDensity * stepSize;
-						samplePoint += rayStep;
+						densitySamplePoint += rayStep;
 					}
 					return opticalDepth;
 				}
 
 				float3 calculateLight(float3 rayOrigin, float3 rayDir, float rayLength)
 				{
-					float3 inScatterPoint = rayOrigin;
+					float3 dirToSun = normalize(_SunPosition - _Center);
 					float stepSize = rayLength / (_InScatteringPointCount - 1);
-					float inScatteredLight = 0;
-					float dirToSun = normalize(_SunPosition - _Center);
 					float3 rayStep = rayDir * stepSize;
 
+					float3 inScatterPoint = rayOrigin; // HLSL passes parameters by reference.
+					float inScatteredLight = 0;
 					for (int i = 0; i < _InScatteringPointCount; i++)
 					{
+						float localDensity = densityAtPoint(inScatterPoint);
+
 						// calculate the length of the ray from the point to the edge of the atmosphere, in the direction of the sun.
 						float2 toSun = raySphere(inScatterPoint, dirToSun, _Center, _MaxRadius);
 						float lengthToSun = toSun.y;
-						// TODO - there's some weird stuff going on.
 
 						float sunRayOpticalDepth = opticalDepth(inScatterPoint, dirToSun, lengthToSun); // average density of the ray from the point to the edge in the direction towards the sun.
-						
-						//if (sunRayOpticalDepth <= 0)
-						//	continue;
-						
 						float viewRayOpticalDepth = opticalDepth(inScatterPoint, -rayDir, stepSize * i); // I feel like this could be optimized.
 
 						// how much light reaches the point.
 						float transmittance = exp(-(sunRayOpticalDepth + viewRayOpticalDepth));
-						float localDensity = densityAtPoint(inScatterPoint);
 
 						inScatteredLight += localDensity * transmittance * stepSize;
 						inScatterPoint += rayStep;
@@ -167,10 +167,34 @@ Shader "Hidden/Atmosphere"
 					if (inAtmosphere > 0) // important.
 					{
 						float3 pointInAtmosphere = rayOrigin + (rayDir * toAtmosphere);
+						//if (pointInAtmosphere.x < 0)
+						//	return fixed4(1, 0, 0, 1);
+						//return fixed4(1, 1, 0, 1);
 						float light = calculateLight(pointInAtmosphere, rayDir, inAtmosphere);
 						return (col * (1 - light)) + light;
 					}
 					return col;
+				}
+
+				fixed4 calculateSphere3(v2f i)
+				{
+					float sceneDepthNonLinear = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv);
+					float sceneDepth = LinearEyeDepth(sceneDepthNonLinear) * length(i.viewVector);
+
+					float3 rayOrigin = _WorldSpaceCameraPos;
+					float3 rayDir = normalize(i.viewVector);
+
+					float2 hitInfo = raySphere(rayOrigin, rayDir, _Center, _MaxRadius);
+					float toAtmosphere = hitInfo.x;
+
+					if (toAtmosphere == maxFloat)
+					{
+						fixed4 col = tex2D(_MainTex, i.uv);
+						return col;
+					}
+					if ((rayOrigin + (rayDir * toAtmosphere)).x < 0)
+						return fixed4(1, 0, 0, 1);
+					return fixed4(1, 1, 0, 1);
 				}
 
 				v2f vert(appdata v)
