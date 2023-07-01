@@ -72,7 +72,7 @@ Material:
     - _InScatteringPointCount: 18
     - _MaxRadius: 110
     - _Metallic: 0
-    - _MinRadius: 0
+    - _MinRadius: 99
     - _Mode: 0
     - _OcclusionStrength: 1
     - _OpticalDepthPointCount: 8

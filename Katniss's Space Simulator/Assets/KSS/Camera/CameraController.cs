@@ -36,6 +36,9 @@ namespace KSS.Camera
         UnityEngine.Camera _farCamera;
 
         [field: SerializeField]
+        UnityEngine.Camera _effectCamera;
+
+        [field: SerializeField]
         float zoomDist = 5;
 
         float? mapViewPreviousZoomDist = null;
@@ -107,17 +110,19 @@ namespace KSS.Camera
             }
         }
 
-        void PreventViewFrustumException()
+        void TryToggleNearCamera()
         {
             // For some reason, at the distance of around Earth's radius, having the near camera enabled throws "position our of view frustum" exceptions.
             if( zoomDist > 1_000_000 ) // should be enough of a conservative value. Near cam is only 100 km, not 1000.
             {
+                this._effectCamera.cullingMask = 1 << 31; // for some reason, this makes it draw properly.
                 this._closeCamera.enabled = false;
                 this._closePPLayer.enabled = false;
                 this._farPPLayer.enabled = true;
             }
             else
             {
+                this._effectCamera.cullingMask = 0;
                 this._closeCamera.enabled = true;
                 this._closePPLayer.enabled = true;
                 this._farPPLayer.enabled = false;
@@ -139,7 +144,7 @@ namespace KSS.Camera
         void LateUpdate()
         {
             // after modifying position/rotation/zoom.
-            PreventViewFrustumException();
+            TryToggleNearCamera();
 
             if( ReferenceObject != null ) // Raycasts using rays from the camera fail when the vessel is moving fast, but updating the camera earlier as well as later doesn't fix it.
             {

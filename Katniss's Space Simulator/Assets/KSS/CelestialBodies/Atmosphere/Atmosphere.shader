@@ -65,9 +65,13 @@ Shader "Hidden/Atmosphere"
 				{
 					// A value in [0..1] representing the thickness of the atmosphere.
 
-					float heightAboveSurface = length(samplePoint - _Center) - _MinRadius;
+					//float heightAboveSurface = length(samplePoint - _Center) - _MinRadius;
+					float heightAboveSurface = length(samplePoint - _Center);
 
-					float height01 = heightAboveSurface / (_MaxRadius - _MinRadius);
+					//float height01 = heightAboveSurface / (_MaxRadius - _MinRadius);
+					float height01 = heightAboveSurface / (_MaxRadius);
+					if (height01 <= 0 || height01 >= 1)
+						return 0;
 
 					float localDensity = exp(-height01 * _DensityFalloffPower) * (1 - height01);
 					return localDensity;
