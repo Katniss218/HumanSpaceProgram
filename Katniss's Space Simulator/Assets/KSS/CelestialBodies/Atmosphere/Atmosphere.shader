@@ -6,15 +6,15 @@ Shader "Hidden/Atmosphere"
 		_MainTex("Texture", 2D) = "white" {}
 		_Center("Center", Vector) = (0, 0, 0)
 		_SunDirection("SunDirection", Vector) = (0, 0, 0)
-		//_ScatteringCoefficients("ScatteringCoefficients", Vector) = (0.213244481466, 0.648883128925, 1.36602691073) // 700, 530, 440, mul 2
-		_ScatteringWavelengths("ScatteringWavelengths", Vector) = (700, 530, 400)
-		_ScatteringStrength("ScatteringStrength", Float) = 4
-		_TerminatorFalloff("TerminatorFalloff", Float) = 32
-		_MinRadius("MinRadius", Float) = 0
-		_MaxRadius("MaxRadius", Float) = 125
-		_InScatteringPointCount("InScatteringPointCount", Int) = 5
-		_OpticalDepthPointCount("OpticalDepthPointCount", Int) = 5
-		_DensityFalloffPower("DensityFalloffPower", Float) = 1.77
+			//_ScatteringCoefficients("ScatteringCoefficients", Vector) = (0.213244481466, 0.648883128925, 1.36602691073) // 700, 530, 440, mul 2
+			_ScatteringWavelengths("ScatteringWavelengths", Vector) = (700, 530, 400)
+			_ScatteringStrength("ScatteringStrength", Float) = 4
+			_TerminatorFalloff("TerminatorFalloff", Float) = 32
+			_MinRadius("MinRadius", Float) = 0
+			_MaxRadius("MaxRadius", Float) = 125
+			_InScatteringPointCount("InScatteringPointCount", Int) = 5
+			_OpticalDepthPointCount("OpticalDepthPointCount", Int) = 5
+			_DensityFalloffPower("DensityFalloffPower", Float) = 1.77
 
 	}
 
@@ -87,6 +87,7 @@ Shader "Hidden/Atmosphere"
 
 				float opticalDepth(float3 samplePoint, float3 rayDir, float rayLength)
 				{
+					// I think this could be optimized with a lookup.
 					// The ratio between the amount of incident light, and the amount of light transmitted to the point.
 					float3 densitySamplePoint = samplePoint; // HLSL passes parameters by reference.
 					float stepSize = rayLength / (_OpticalDepthPointCount - 1);
@@ -119,27 +120,35 @@ Shader "Hidden/Atmosphere"
 						// calculate the length of the ray from the point to the edge of the atmosphere, in the direction of the sun.
 						float2 toSun = raySphere(inScatterPoint, dirToSun, _Center, _MaxRadius);
 						float lengthToSun = toSun.y;
+						float2 hitSurface = raySphere(inScatterPoint, dirToSun, _Center, _MinRadius);
+						lengthToSun = min(hitSurface.x + hitSurface.y, lengthToSun);
 
-						float sunRayOpticalDepth = opticalDepth(inScatterPoint, dirToSun, lengthToSun); // average density of the ray from the point to the edge in the direction towards the sun.
-						viewRayOpticalDepth = opticalDepth(inScatterPoint, -rayDir, stepSize * i); // I feel like this could be optimized.
-
-						if (i != _InScatteringPointCount - 1) // terminator and blacking out the back
+						if (hitSurface.x != maxFloat)
 						{
-							float2 hitSurface = raySphere(inScatterPoint, dirToSun, _Center, _MinRadius);
-							if (hitSurface.x != maxFloat)
-							{
-								sunRayOpticalDepth *= (hitSurface.y / _MaxRadius) * ((float(i) / float(_InScatteringPointCount)) * _TerminatorFalloff);
-							}
+							//continue;
 						}
 
+						float sunRayOpticalDepth = opticalDepth(inScatterPoint, dirToSun, lengthToSun); // average density of the ray from the point to the edge in the direction towards the sun.
+						viewRayOpticalDepth = opticalDepth(inScatterPoint, -rayDir, stepSize * i);
+
+						//if (i != _InScatteringPointCount - 1) // terminator and blacking out the back
+						//{
+						//	float2 hitSurface = raySphere(inScatterPoint, dirToSun, _Center, _MinRadius);
+						//	if (hitSurface.x != maxFloat)
+						//	{
+						//		sunRayOpticalDepth *= (hitSurface.y / _MaxRadius) * ((float(i) / float(_InScatteringPointCount)) * _TerminatorFalloff);
+						//	}
+						//}
+
 						// how much light reaches the point.
-						float3 transmittance = exp(-(sunRayOpticalDepth + viewRayOpticalDepth) * _ScatteringCoefficients);
+						float3 transmittance = exp(-(sunRayOpticalDepth)*_ScatteringCoefficients) * exp(-(viewRayOpticalDepth)); // apparently no scattering on the view ray is the way to go.
 
 						inScatteredLight += localDensity * transmittance * _ScatteringCoefficients * stepSize;
 						inScatterPoint += rayStep;
+
 					}
 
-					float originalColorTransmittance = exp(-viewRayOpticalDepth);
+					float originalColorTransmittance = exp(-viewRayOpticalDepth); // viewRayOpticalDepth should be the optical depth for the entire view ray here.
 
 					return originalColor * originalColorTransmittance + inScatteredLight;
 				}
@@ -177,18 +186,23 @@ Shader "Hidden/Atmosphere"
 					float3 rayOrigin = _WorldSpaceCameraPos;
 					float3 rayDir = normalize(i.viewVector);
 
+					// raycast against the outer edge of the atmosphere
 					float2 hitTop = raySphere(rayOrigin, rayDir, _Center, _MaxRadius);
 					float distToSurface = sceneDepth;
 
+					// and the inner edge (surface of the planet)
 					float2 hitSurface = raySphere(rayOrigin, rayDir, _Center, _MinRadius);
 					distToSurface = min(hitSurface.x, distToSurface);
 
+					// calculate the distance from camera to atmosphere, and run of the ray through (in) the atmosphere.
 					float toAtmosphere = hitTop.x;
 					float inAtmosphere = min(hitTop.y, distToSurface - toAtmosphere);
 
+					// hacky way for now so I can change wavelengths directly in the editor.
+					_ScatteringCoefficients = ((400 / _ScatteringWavelengths) * (400 / _ScatteringWavelengths) * (400 / _ScatteringWavelengths) * (400 / _ScatteringWavelengths)) * _ScatteringStrength;
+
 					fixed4 col = tex2D(_MainTex, i.uv);
 
-					_ScatteringCoefficients = ((400 / _ScatteringWavelengths) * (400 / _ScatteringWavelengths) * (400 / _ScatteringWavelengths) * (400 / _ScatteringWavelengths)) * _ScatteringStrength;
 					// if ray in atmosphere
 					if (inAtmosphere > 0) // important.
 					{

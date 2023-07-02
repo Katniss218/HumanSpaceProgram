@@ -24,7 +24,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 200}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 5520
+  controlID: 2864
 --- !u!114 &2
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -74,7 +74,7 @@ MonoBehaviour:
   m_VSyncEnabled: 0
   m_PlayFocused: 1
   m_Gizmos: 0
-  m_Stats: 1
+  m_Stats: 0
   m_SelectedSizes: 00000000000000000000000000000000000000000000000000000000000000000000000000000000
   m_ZoomArea:
     m_HRangeLocked: 0
@@ -150,7 +150,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 200}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 1
-  controlID: 5521
+  controlID: 2865
 --- !u!114 &4
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -175,7 +175,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 100}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 5522
+  controlID: 2866
 --- !u!114 &5
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -233,9 +233,9 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 2e840000
-      m_LastClickedID: 33838
-      m_ExpandedIDs: 02fdfeff4e8cffffca8dffffa4d4ffff8af1ffff28f4ffff20faffff08fbffff1a5f0000b27e00005884000072840000
+      m_SelectedIDs: 6a5e0000
+      m_LastClickedID: 0
+      m_ExpandedIDs: 125ffffff260ffff4062ffff6edbffff08fbffff006100001a6100005a66000074660000e467000000680000
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -1776,21 +1776,21 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/KSS
+    - Assets/KSS/CelestialBodies/Atmosphere
     m_Globs: []
     m_OriginalText: 
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/KSS
+  - Assets/KSS/CelestialBodies/Atmosphere
   m_LastFoldersGridSize: -1
   m_LastProjectPath: E:\GIT\KatnisssSpaceSimulator\Katniss's Space Simulator
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 79}
-    m_SelectedIDs: c45d0000
-    m_LastClickedID: 24004
+    scrollPos: {x: 0, y: 0}
+    m_SelectedIDs: 3e5e0000
+    m_LastClickedID: 24126
     m_ExpandedIDs: 00000000ba5d0000bc5d0000be5d0000c05d0000c25d0000c45d0000c65d0000c85d0000ca5d0000cc5d0000ce5d0000d05d0000d25d0000d45d0000d65d000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -1844,9 +1844,9 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: 2e840000
-    m_LastClickedInstanceID: 33838
-    m_HadKeyboardFocusLastEvent: 0
+    m_SelectedInstanceIDs: 6a5e0000
+    m_LastClickedInstanceID: 24170
+    m_HadKeyboardFocusLastEvent: 1
     m_ExpandedInstanceIDs: c6230000ea5b0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
