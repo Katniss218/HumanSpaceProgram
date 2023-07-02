@@ -31,7 +31,6 @@ Shader "Hidden/Atmosphere"
 
 				#include "UnityCG.cginc"
 				#include "../AtmosphereRes/Math.cginc"
-				#include "../AtmosphereRes/Triplanar.cginc"
 
 				sampler2D _MainTex;
 				sampler2D _CameraDepthTexture;
@@ -74,9 +73,9 @@ Shader "Hidden/Atmosphere"
 					// A value in [0..1] representing the thickness of the atmosphere.
 
 					//float heightAboveSurface = length(samplePoint - _Center) - _MinRadius;
-					float heightAboveSurface = length(samplePoint - _Center);
+					float heightAboveSurface = length(samplePoint - _Center); // not doing min radius messes with the terminator.
 
-					//float height01 = heightAboveSurface / (_MaxRadius - _MinRadius);
+					//float height01 = (heightAboveSurface / (_MaxRadius - _MinRadius)) - 0.0001; // messing with this epsilon reduces noise.
 					float height01 = heightAboveSurface / (_MaxRadius);
 					if (height01 <= 0 || height01 >= 1)
 						return 0;
@@ -87,8 +86,8 @@ Shader "Hidden/Atmosphere"
 
 				float opticalDepth(float3 samplePoint, float3 rayDir, float rayLength)
 				{
+					// Optical depth describes how much light has reached a given point, as a [0..1] percentage of the entire light.
 					// I think this could be optimized with a lookup.
-					// The ratio between the amount of incident light, and the amount of light transmitted to the point.
 					float3 densitySamplePoint = samplePoint; // HLSL passes parameters by reference.
 					float stepSize = rayLength / (_OpticalDepthPointCount - 1);
 					float3 rayStep = rayDir * stepSize;
@@ -120,18 +119,18 @@ Shader "Hidden/Atmosphere"
 						// calculate the length of the ray from the point to the edge of the atmosphere, in the direction of the sun.
 						float2 toSun = raySphere(inScatterPoint, dirToSun, _Center, _MaxRadius);
 						float lengthToSun = toSun.y;
-						float2 hitSurface = raySphere(inScatterPoint, dirToSun, _Center, _MinRadius);
-						lengthToSun = min(hitSurface.x + hitSurface.y, lengthToSun);
 
-						if (hitSurface.x != maxFloat)
-						{
+						//float2 hitSurface = raySphere(inScatterPoint, dirToSun, _Center, _MinRadius);
+						//lengthToSun = min(hitSurface.x + hitSurface.y, lengthToSun);
+						//if (hitSurface.x != maxFloat) // this can be done to black out the side behind the sun.
+						//{
 							//continue;
-						}
+						//}
 
 						float sunRayOpticalDepth = opticalDepth(inScatterPoint, dirToSun, lengthToSun); // average density of the ray from the point to the edge in the direction towards the sun.
 						viewRayOpticalDepth = opticalDepth(inScatterPoint, -rayDir, stepSize * i);
 
-						//if (i != _InScatteringPointCount - 1) // terminator and blacking out the back
+						//if (i != _InScatteringPointCount - 1) // terminator and blacking out the back side, different way to do it.
 						//{
 						//	float2 hitSurface = raySphere(inScatterPoint, dirToSun, _Center, _MinRadius);
 						//	if (hitSurface.x != maxFloat)
