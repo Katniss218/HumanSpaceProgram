@@ -5,7 +5,11 @@ Shader "Hidden/Atmosphere"
 	{
 		_MainTex("Texture", 2D) = "white" {}
 		_Center("Center", Vector) = (0, 0, 0)
-		_SunPosition("SunPosition", Vector) = (0, 0, 0)
+		_SunDirection("SunDirection", Vector) = (0, 0, 0)
+		//_ScatteringCoefficients("ScatteringCoefficients", Vector) = (0.213244481466, 0.648883128925, 1.36602691073) // 700, 530, 440, mul 2
+		_ScatteringWavelengths("ScatteringWavelengths", Vector) = (700, 530, 400)
+		_ScatteringStrength("ScatteringStrength", Float) = 4
+		_TerminatorFalloff("TerminatorFalloff", Float) = 32
 		_MinRadius("MinRadius", Float) = 0
 		_MaxRadius("MaxRadius", Float) = 125
 		_InScatteringPointCount("InScatteringPointCount", Int) = 5
@@ -32,7 +36,11 @@ Shader "Hidden/Atmosphere"
 				sampler2D _MainTex;
 				sampler2D _CameraDepthTexture;
 				float3 _Center;
-				float3 _SunPosition;
+				float3 _SunDirection;
+				float3 _ScatteringCoefficients;
+				float3 _ScatteringWavelengths;
+				float _ScatteringStrength;
+				float _TerminatorFalloff;
 				float _MaxRadius; // atmosphere radius (outer)
 				float _MinRadius; // planet radius (atm inner)
 				int _InScatteringPointCount;
@@ -94,14 +102,16 @@ Shader "Hidden/Atmosphere"
 					return opticalDepth;
 				}
 
-				float3 calculateLight(float3 rayOrigin, float3 rayDir, float rayLength)
+				float3 calculateLight(float3 rayOrigin, float3 rayDir, float rayLength, float3 originalColor)
 				{
-					float3 dirToSun = normalize(_SunPosition - _Center);
+					float3 dirToSun = normalize(_SunDirection);
 					float stepSize = rayLength / (_InScatteringPointCount - 1);
 					float3 rayStep = rayDir * stepSize;
 
+					float viewRayOpticalDepth; // use the last iteration later.
+
 					float3 inScatterPoint = rayOrigin; // HLSL passes parameters by reference.
-					float inScatteredLight = 0;
+					float3 inScatteredLight = 0;
 					for (int i = 0; i < _InScatteringPointCount; i++)
 					{
 						float localDensity = densityAtPoint(inScatterPoint);
@@ -111,22 +121,33 @@ Shader "Hidden/Atmosphere"
 						float lengthToSun = toSun.y;
 
 						float sunRayOpticalDepth = opticalDepth(inScatterPoint, dirToSun, lengthToSun); // average density of the ray from the point to the edge in the direction towards the sun.
-						float viewRayOpticalDepth = opticalDepth(inScatterPoint, -rayDir, stepSize * i); // I feel like this could be optimized.
+						viewRayOpticalDepth = opticalDepth(inScatterPoint, -rayDir, stepSize * i); // I feel like this could be optimized.
+
+						if (i != _InScatteringPointCount - 1) // terminator and blacking out the back
+						{
+							float2 hitSurface = raySphere(inScatterPoint, dirToSun, _Center, _MinRadius);
+							if (hitSurface.x != maxFloat)
+							{
+								sunRayOpticalDepth *= (hitSurface.y / _MaxRadius) * ((float(i) / float(_InScatteringPointCount)) * _TerminatorFalloff);
+							}
+						}
 
 						// how much light reaches the point.
-						float transmittance = exp(-(sunRayOpticalDepth + viewRayOpticalDepth));
+						float3 transmittance = exp(-(sunRayOpticalDepth + viewRayOpticalDepth) * _ScatteringCoefficients);
 
-						inScatteredLight += localDensity * transmittance * stepSize;
+						inScatteredLight += localDensity * transmittance * _ScatteringCoefficients * stepSize;
 						inScatterPoint += rayStep;
 					}
 
-					return inScatteredLight;
+					float originalColorTransmittance = exp(-viewRayOpticalDepth);
+
+					return originalColor * originalColorTransmittance + inScatteredLight;
 				}
 
 				fixed4 calculateSphere(v2f i)
 				{
 					float sceneDepthNonLinear = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv);
-					float sceneDepth = LinearEyeDepth(sceneDepthNonLinear) *length(i.viewVector);
+					float sceneDepth = LinearEyeDepth(sceneDepthNonLinear) * length(i.viewVector);
 
 					float3 rayOrigin = _WorldSpaceCameraPos;
 					float3 rayDir = normalize(i.viewVector);
@@ -167,39 +188,15 @@ Shader "Hidden/Atmosphere"
 
 					fixed4 col = tex2D(_MainTex, i.uv);
 
+					_ScatteringCoefficients = ((400 / _ScatteringWavelengths) * (400 / _ScatteringWavelengths) * (400 / _ScatteringWavelengths) * (400 / _ScatteringWavelengths)) * _ScatteringStrength;
 					// if ray in atmosphere
 					if (inAtmosphere > 0) // important.
 					{
 						float3 pointInAtmosphere = rayOrigin + (rayDir * toAtmosphere);
-						//if (pointInAtmosphere.x < 0)
-						//	return fixed4(1, 0, 0, 1);
-						//return fixed4(1, 1, 0, 1);
-						float light = calculateLight(pointInAtmosphere, rayDir, inAtmosphere);
-						fixed4 light3 = fixed4(0.5 * light, 0.75 * light, 1*light, 1);
-						return (col * (1 - light3)) + light3;
+						float3 light = calculateLight(pointInAtmosphere, rayDir, inAtmosphere, col.xyz);
+						return fixed4(light, col.w);
 					}
 					return col;
-				}
-
-				fixed4 calculateSphere3(v2f i)
-				{
-					float sceneDepthNonLinear = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv);
-					float sceneDepth = LinearEyeDepth(sceneDepthNonLinear) * length(i.viewVector);
-
-					float3 rayOrigin = _WorldSpaceCameraPos;
-					float3 rayDir = normalize(i.viewVector);
-
-					float2 hitInfo = raySphere(rayOrigin, rayDir, _Center, _MaxRadius);
-					float toAtmosphere = hitInfo.x;
-
-					if (toAtmosphere == maxFloat)
-					{
-						fixed4 col = tex2D(_MainTex, i.uv);
-						return col;
-					}
-					if ((rayOrigin + (rayDir * toAtmosphere)).x < 0)
-						return fixed4(1, 0, 0, 1);
-					return fixed4(1, 1, 0, 1);
 				}
 
 				v2f vert(appdata v)
