@@ -68,7 +68,7 @@ Shader "Hidden/Atmosphere"
 
 				// optimizations: possibly change the scattering point count based on the length between enter and exit points.
 
-				float densityAtPoint(float3 samplePoint)
+				float densityRatioAtPoint(float3 samplePoint)
 				{
 					// A value in [0..1] representing the thickness of the atmosphere.
 
@@ -95,8 +95,8 @@ Shader "Hidden/Atmosphere"
 					float opticalDepth = 0;
 					for (int i = 0; i < _OpticalDepthPointCount; i++)
 					{
-						float localDensity = densityAtPoint(samplePoint);
-						opticalDepth += localDensity * stepSize;
+						float localDensityRatio = densityRatioAtPoint(samplePoint);
+						opticalDepth += localDensityRatio * stepSize;
 						densitySamplePoint += rayStep;
 					}
 					return opticalDepth;
@@ -114,8 +114,6 @@ Shader "Hidden/Atmosphere"
 					float3 inScatteredLight = 0;
 					for (int i = 0; i < _InScatteringPointCount; i++)
 					{
-						float localDensity = densityAtPoint(inScatterPoint);
-
 						// calculate the length of the ray from the point to the edge of the atmosphere, in the direction of the sun.
 						float2 toSun = raySphere(inScatterPoint, dirToSun, _Center, _MaxRadius);
 						float lengthToSun = toSun.y;
@@ -128,7 +126,7 @@ Shader "Hidden/Atmosphere"
 						//}
 
 						float sunRayOpticalDepth = opticalDepth(inScatterPoint, dirToSun, lengthToSun); // average density of the ray from the point to the edge in the direction towards the sun.
-						viewRayOpticalDepth = opticalDepth(inScatterPoint, -rayDir, stepSize * i);
+						viewRayOpticalDepth = opticalDepth(inScatterPoint, -rayDir, stepSize * i); // * i to get the entire ray up to the current point.
 
 						//if (i != _InScatteringPointCount - 1) // terminator and blacking out the back side, different way to do it.
 						//{
@@ -142,7 +140,9 @@ Shader "Hidden/Atmosphere"
 						// how much light reaches the point.
 						float3 transmittance = exp(-(sunRayOpticalDepth)*_ScatteringCoefficients) * exp(-(viewRayOpticalDepth)); // apparently no scattering on the view ray is the way to go.
 
-						inScatteredLight += localDensity * transmittance * _ScatteringCoefficients * stepSize;
+						float localDensityRatio = densityRatioAtPoint(inScatterPoint);
+
+						inScatteredLight += localDensityRatio * transmittance * _ScatteringCoefficients * stepSize;
 						inScatterPoint += rayStep;
 
 					}
