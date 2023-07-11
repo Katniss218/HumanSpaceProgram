@@ -78,16 +78,20 @@ Material:
     - _OpticalDepthPointCount: 8
     - _Parallax: 0.02
     - _Radius: 113
+    - _ScatteringStrength: 4
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SphereRadius: 10
     - _SrcBlend: 1
+    - _TerminatorFalloff: 32
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
-    - _Center: {r: 966199.1, g: -3244510, b: -5887897, a: 1}
+    - _Center: {r: 0, g: 0, b: 0, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _ScatteringWavelengths: {r: 700, g: 530, b: 400, a: 1}
     - _SphereCenter: {r: 0, g: 0, b: 0, a: 0}
+    - _SunDirection: {r: 0, g: 0, b: 0, a: 1}
     - _SunPosition: {r: 1e+11, g: 0, b: 1e+11, a: 1}
   m_BuildTextureStacks: []

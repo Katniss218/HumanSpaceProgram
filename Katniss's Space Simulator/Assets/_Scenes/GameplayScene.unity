@@ -135,7 +135,7 @@ GameObject:
   - component: {fileID: 106201976}
   - component: {fileID: 106201974}
   m_Layer: 0
-  m_Name: Close camera
+  m_Name: Near camera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -247,7 +247,7 @@ Camera:
   m_Depth: -22
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 2147483671
+    m_Bits: 23
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -383,7 +383,7 @@ Camera:
   m_Depth: -25
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 2147483671
+    m_Bits: 23
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -760,10 +760,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <ReferenceObject>k__BackingField: {fileID: 0}
   <CameraParent>k__BackingField: {fileID: 1876639354}
-  _closeCamera: {fileID: 106201976}
+  <ZoomDist>k__BackingField: 5
+  _nearCamera: {fileID: 106201976}
   _farCamera: {fileID: 430979149}
   _effectCamera: {fileID: 1425163200}
-  zoomDist: 5
   _closePPLayer: {fileID: 106201974}
   _farPPLayer: {fileID: 430979147}
 --- !u!4 &1309349245
@@ -838,8 +838,8 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 20
-  far clip plane: 1e+18
+  near clip plane: 10
+  far clip plane: 1e+15
   field of view: 60
   orthographic: 0
   orthographic size: 5
@@ -871,6 +871,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mat: {fileID: 2100000, guid: 36ee735b35af6d547b69f8843c690673, type: 2}
+  atmosphereShader: {fileID: 4800000, guid: 2ae1634ae2ad45844b4e5a0087a6833b, type: 3}
 --- !u!1 &1690102431
 GameObject:
   m_ObjectHideFlags: 0
@@ -996,8 +997,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 430979148}
   - {fileID: 106201975}
+  - {fileID: 430979148}
   - {fileID: 1425163198}
   m_Father: {fileID: 1309349245}
   m_RootOrder: -1
@@ -1048,8 +1049,8 @@ Light:
     m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
-    m_Strength: 1
-    m_Bias: 0.25
+    m_Strength: 0.5
+    m_Bias: 0.75
     m_NormalBias: 0.125
     m_NearPlane: 0.2
     m_CullingMatrixOverride:
