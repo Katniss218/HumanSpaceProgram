@@ -636,6 +636,43 @@ PrefabInstance:
     m_RemovedComponents: []
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: 7bfe53ce724a8434a99c01a022e60e33, type: 3}
+--- !u!84 &31381203
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_ForcedFallbackFormat: 4
+  m_DownscaleFallback: 0
+  m_IsAlphaChannelOptional: 0
+  serializedVersion: 5
+  m_Width: 1920
+  m_Height: 1080
+  m_AntiAliasing: 1
+  m_MipCount: -1
+  m_DepthStencilFormat: 94
+  m_ColorFormat: 8
+  m_MipMap: 0
+  m_GenerateMips: 1
+  m_SRGB: 0
+  m_UseDynamicScale: 0
+  m_BindMS: 0
+  m_EnableCompatibleFormat: 1
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 1
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 1
+    m_WrapV: 1
+    m_WrapW: 1
+  m_Dimension: 2
+  m_VolumeDepth: 1
+  m_ShadowSamplingMode: 2
 --- !u!1 &54924485
 GameObject:
   m_ObjectHideFlags: 0
@@ -1955,6 +1992,7 @@ GameObject:
   m_Component:
   - component: {fileID: 207205945}
   - component: {fileID: 207205946}
+  - component: {fileID: 207205947}
   m_Layer: 0
   m_Name: Cam
   m_TagString: Untagged
@@ -1989,6 +2027,24 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 207205944}
   m_Enabled: 1
+--- !u!114 &207205947
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 207205944}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be95d50af03061047ae159c198a24d8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Passes>k__BackingField:
+  - <Renderer>k__BackingField: {fileID: 809900060}
+    <CopyMaterial>k__BackingField: {fileID: 2100000, guid: d852f3ff64a514b459443727a3123334, type: 2}
+  - <Renderer>k__BackingField: {fileID: 1126179635}
+    <CopyMaterial>k__BackingField: {fileID: 2100000, guid: d852f3ff64a514b459443727a3123334, type: 2}
+  _rtOutput: {fileID: 31381203}
 --- !u!1 &214547540
 GameObject:
   m_ObjectHideFlags: 0
@@ -3846,27 +3902,13 @@ GameObject:
   m_Component:
   - component: {fileID: 526959772}
   - component: {fileID: 526959771}
-  - component: {fileID: 526959769}
   m_Layer: 0
   m_Name: Effect Camera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &526959769
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 526959768}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4298a5610bd9d94f869f4cf69e24435, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mat: {fileID: 2100000, guid: a8f938b9453f4084ab607816cbcc130f, type: 2}
+  m_IsActive: 0
 --- !u!20 &526959771
 Camera:
   m_ObjectHideFlags: 0
@@ -3925,6 +3967,43 @@ Transform:
   m_Father: {fileID: 207205945}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!84 &537285797
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_ForcedFallbackFormat: 4
+  m_DownscaleFallback: 0
+  m_IsAlphaChannelOptional: 0
+  serializedVersion: 5
+  m_Width: 1920
+  m_Height: 1080
+  m_AntiAliasing: 1
+  m_MipCount: -1
+  m_DepthStencilFormat: 94
+  m_ColorFormat: 8
+  m_MipMap: 0
+  m_GenerateMips: 1
+  m_SRGB: 0
+  m_UseDynamicScale: 0
+  m_BindMS: 0
+  m_EnableCompatibleFormat: 1
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 1
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 1
+    m_WrapV: 1
+    m_WrapW: 1
+  m_Dimension: 2
+  m_VolumeDepth: 1
+  m_ShadowSamplingMode: 2
 --- !u!1 &549679003
 GameObject:
   m_ObjectHideFlags: 0
@@ -5402,7 +5481,7 @@ GameObject:
   m_Component:
   - component: {fileID: 809900056}
   - component: {fileID: 809900058}
-  - component: {fileID: 809900059}
+  - component: {fileID: 809900060}
   m_Layer: 0
   m_Name: Far Camera
   m_TagString: MainCamera
@@ -5458,7 +5537,7 @@ Camera:
     serializedVersion: 2
     m_Bits: 2147483671
   m_RenderingPath: -1
-  m_TargetTexture: {fileID: 0}
+  m_TargetTexture: {fileID: 944447159}
   m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 1
@@ -5468,20 +5547,19 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!114 &809900059
+--- !u!114 &809900060
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 809900055}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: af5d8e88b27febb4dbfb7265011c7a70, type: 3}
+  m_Script: {fileID: 11500000, guid: fa5978f983d9aee4fa6ab24dd971c3e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  depthBufferRT: {fileID: 8400000, guid: 83913731827bff84b9358f2456a6b4d8, type: 2}
-  compositeMat: {fileID: 2100000, guid: c928db14c9933cb45939534280889efe, type: 2}
+  RenderTexture: {fileID: 944447159}
 --- !u!1 &852523660
 GameObject:
   m_ObjectHideFlags: 0
@@ -6027,6 +6105,43 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!84 &944447159
+RenderTexture:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_ForcedFallbackFormat: 4
+  m_DownscaleFallback: 0
+  m_IsAlphaChannelOptional: 0
+  serializedVersion: 5
+  m_Width: 1920
+  m_Height: 1080
+  m_AntiAliasing: 1
+  m_MipCount: -1
+  m_DepthStencilFormat: 94
+  m_ColorFormat: 8
+  m_MipMap: 0
+  m_GenerateMips: 1
+  m_SRGB: 0
+  m_UseDynamicScale: 0
+  m_BindMS: 0
+  m_EnableCompatibleFormat: 1
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 1
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 1
+    m_WrapV: 1
+    m_WrapW: 1
+  m_Dimension: 2
+  m_VolumeDepth: 1
+  m_ShadowSamplingMode: 2
 --- !u!1 &953671446
 GameObject:
   m_ObjectHideFlags: 0
@@ -7797,6 +7912,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1126179634}
   - component: {fileID: 1126179633}
+  - component: {fileID: 1126179635}
   m_Layer: 0
   m_Name: Near Camera
   m_TagString: MainCamera
@@ -7813,7 +7929,7 @@ Camera:
   m_GameObject: {fileID: 1126179631}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 4
+  m_ClearFlags: 3
   m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
@@ -7837,7 +7953,7 @@ Camera:
     serializedVersion: 2
     m_Bits: 2147483671
   m_RenderingPath: -1
-  m_TargetTexture: {fileID: 0}
+  m_TargetTexture: {fileID: 537285797}
   m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 1
@@ -7862,6 +7978,19 @@ Transform:
   m_Father: {fileID: 207205945}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1126179635
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1126179631}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa5978f983d9aee4fa6ab24dd971c3e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  RenderTexture: {fileID: 537285797}
 --- !u!1 &1159158105
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,4 +1,4 @@
-Shader "Hidden/NewImageEffectShader"
+Shader "Hidden/CopyDepthBased"
 {
     Properties
     {
@@ -6,8 +6,7 @@ Shader "Hidden/NewImageEffectShader"
     }
     SubShader
     {
-        // No culling or depth
-        Cull Off ZWrite Off ZTest Always
+        Cull Off ZWrite Off ZTest LEqual
 
         Pass
         {

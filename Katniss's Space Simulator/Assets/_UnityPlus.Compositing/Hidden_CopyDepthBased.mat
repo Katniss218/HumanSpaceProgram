@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Hidden_NewImageEffectShader
-  m_Shader: {fileID: 4800000, guid: 04582081072386d4aaea5d2af1171157, type: 3}
+  m_Name: Hidden_CopyDepthBased
+  m_Shader: {fileID: 4800000, guid: 2d63d618e344e904fa452b900286a3b1, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
