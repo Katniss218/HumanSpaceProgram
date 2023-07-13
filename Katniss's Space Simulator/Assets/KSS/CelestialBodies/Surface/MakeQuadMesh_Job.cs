@@ -96,7 +96,7 @@ namespace KSS.CelestialBodies.Surface
             resultTriangles.Dispose();
         }
 
-        public void Execute()
+        public void Execute() // Called by Unity from a job thread.
         {
             GenerateCubeSphereFace();
         }

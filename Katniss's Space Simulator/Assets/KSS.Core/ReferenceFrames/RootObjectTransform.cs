@@ -106,6 +106,7 @@ namespace KSS.Core.ReferenceFrames
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
             UpdateScenePosition();
+           // UpdateSceneRotation();
         }
     }
 }

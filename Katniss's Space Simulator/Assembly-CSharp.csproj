@@ -56,23 +56,14 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\KSS.UI\Windows\WindowDrag.cs" />
-    <Compile Include="Assets\KSS.UI\Windows\WindowRelationHighlight.cs" />
-    <Compile Include="Assets\KSS.UI\TimewarpReadoutUI.cs" />
-    <Compile Include="Assets\KSS.UI\VelocityReadoutUI.cs" />
-    <Compile Include="Assets\KSS.UI\IResourceContainerUI.cs" />
-    <Compile Include="Assets\KSS.UI\Windows\WindowExit.cs" />
-    <Compile Include="Assets\KSS.UI\Windows\PartWindow.cs" />
-    <Compile Include="Assets\KSS.UI\FPSCounterUI.cs" />
-    <Compile Include="Assets\KSS.UI\AltitudeReadoutUI.cs" />
-    <Compile Include="Assets\KSS.UI\PartWindowManager.cs" />
-    <Compile Include="Assets\KSS.UI\AccelerationReadoutUI.cs" />
+    <Compile Include="Assets\_Scenes\DepthBufferCopier.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro.cginc" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_Bitmap.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro_Mobile.cginc" />
+    <None Include="Assets\_Scenes\CopyShader.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF SSD.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Surface-Mobile.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Surface.shader" />
@@ -734,14 +725,14 @@
     <Reference Include="Unity.Timeline">
       <HintPath>Library\ScriptAssemblies\Unity.Timeline.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.VisualScripting.Core.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Core.Editor.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.TextMeshPro">
       <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VisualScripting.State.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.State.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.VisualScripting.Core.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Core.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VisualScripting.SettingsProvider.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.SettingsProvider.Editor.dll</HintPath>
@@ -802,17 +793,33 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="_UnityEngine.csproj">
-      <Project>{AA320F23-E273-CF3D-ECC5-E3B3EE38E655}</Project>
-      <Name>_UnityEngine</Name>
+    <ProjectReference Include="_UnityPlus.Serialization.csproj">
+      <Project>{53A4B44D-C587-1ED0-C944-834EA89508FD}</Project>
+      <Name>_UnityPlus.Serialization</Name>
     </ProjectReference>
-    <ProjectReference Include="UILib.csproj">
-      <Project>{70FA2AF0-1725-15E3-F4B5-4083D9252BF4}</Project>
-      <Name>UILib</Name>
+    <ProjectReference Include="KSS.UI.csproj">
+      <Project>{43C42401-C6C3-28EB-5BC7-32F0B5CC16C2}</Project>
+      <Name>KSS.UI</Name>
     </ProjectReference>
     <ProjectReference Include="KSS.DevUtils.csproj">
       <Project>{D7208026-3029-DD39-0449-2AD64786FAF4}</Project>
       <Name>KSS.DevUtils</Name>
+    </ProjectReference>
+    <ProjectReference Include="_UnityPlus.UILib.csproj">
+      <Project>{50861573-23A3-BCBD-DFDB-2A1CFB929A2F}</Project>
+      <Name>_UnityPlus.UILib</Name>
+    </ProjectReference>
+    <ProjectReference Include="_UnityPlus.AssetManagement.csproj">
+      <Project>{1082B390-7315-9D8E-BF58-53BE9AF2F68A}</Project>
+      <Name>_UnityPlus.AssetManagement</Name>
+    </ProjectReference>
+    <ProjectReference Include="_UnityEngine.csproj">
+      <Project>{AA320F23-E273-CF3D-ECC5-E3B3EE38E655}</Project>
+      <Name>_UnityEngine</Name>
+    </ProjectReference>
+    <ProjectReference Include="_UnityPlus.StaticEvents.csproj">
+      <Project>{379A262A-69B2-FA05-9D5F-7E70A994B21D}</Project>
+      <Name>_UnityPlus.StaticEvents</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
