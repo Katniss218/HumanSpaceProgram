@@ -58,9 +58,11 @@
   <ItemGroup>
     <Compile Include="Assets\_UnityPlus.Compositing\Compositor.cs" />
     <Compile Include="Assets\_UnityPlus.Compositing\CompositeRenderer.cs" />
+    <Compile Include="Assets\_UnityPlus.Compositing\DepthTextureCopier.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\_UnityPlus.Compositing\CopyDepthBased.shader" />
+    <None Include="Assets\_UnityPlus.Compositing\CopyDepthToColor.shader" />
+    <None Include="Assets\_UnityPlus.Compositing\CopyDepthFromColor.shader" />
     <None Include="Assets\_UnityPlus.Compositing\___UnityPlus.Compositing.asmdef" />
   </ItemGroup>
   <ItemGroup>

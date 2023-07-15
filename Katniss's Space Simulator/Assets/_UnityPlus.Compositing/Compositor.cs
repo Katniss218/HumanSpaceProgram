@@ -63,7 +63,7 @@ namespace UnityPlus.Compositing
 #warning TODo - doesn't work.
             foreach( var c in Passes )
             {
-                Graphics.Blit( c.Renderer.RenderTexture, _rtOutput, c.CopyMaterial );
+                Graphics.Blit( c.Renderer.texture, _rtOutput, c.CopyMaterial );
             }
 
             Graphics.Blit( _rtOutput, (RenderTexture)null );

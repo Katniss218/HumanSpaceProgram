@@ -12,24 +12,20 @@ namespace UnityPlus.Compositing
     [ExecuteInEditMode, ImageEffectAllowedInSceneView]
     public class CompositeRenderer : MonoBehaviour
     {
-        Camera _camera;
+        [field: SerializeField]
+        public Camera Camera { get; private set; }
 
         [field: SerializeField]
-        public RenderTexture RenderTexture;
+        public RenderTexture texture;
 
 #warning TODO - use Compositor's RT???
 
         void Awake()
         {
-            _camera = this.GetComponent<Camera>();
-            RenderTexture = new RenderTexture( Screen.currentResolution.width, Screen.currentResolution.height, GraphicsFormat.R8G8B8A8_UNorm, GraphicsFormat.D32_SFloat_S8_UInt );
-            RenderTexture.Create();
-            _camera.targetTexture = RenderTexture;
-        }
-
-        public bool UsesCamera( Camera cam )
-        {
-            return _camera == cam;
+            Camera = this.GetComponent<Camera>();
+            texture = new RenderTexture( Screen.currentResolution.width, Screen.currentResolution.height, GraphicsFormat.R8G8B8A8_UNorm, GraphicsFormat.D32_SFloat_S8_UInt );
+            texture.Create();
+            Camera.targetTexture = texture;
         }
     }
 }
