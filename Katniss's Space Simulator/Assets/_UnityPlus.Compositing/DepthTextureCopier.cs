@@ -19,9 +19,9 @@ namespace UnityPlus.Compositing
         public RenderTexture TargetRenderTexture { get; set; }
 
         [field: SerializeField]
-        public float TargetNearPlane { get; set; }
+        public float TargetNearPlane { get; set; } = 0;
         [field: SerializeField]
-        public float TargetFarPlane { get; set; }
+        public float TargetFarPlane { get; set; } = 1;
 
         [field: SerializeField]
         public Shader Shader { get; set; }
@@ -31,11 +31,15 @@ namespace UnityPlus.Compositing
 
         Camera _camera;
 
+
+        [field: SerializeField]
+        public CompositeRenderer R { get; private set; }
+
         void Awake()
         {
             _camera = this.GetComponent<Camera>();
 
-            TargetRenderTexture = new RenderTexture( Screen.currentResolution.width, Screen.currentResolution.height, GraphicsFormat.None, GraphicsFormat.D32_SFloat_S8_UInt );
+            TargetRenderTexture = new RenderTexture( Screen.currentResolution.width, Screen.currentResolution.height, GraphicsFormat.R32_SFloat, GraphicsFormat.D32_SFloat_S8_UInt );
             TargetRenderTexture.Create();
         }
 
@@ -62,6 +66,11 @@ namespace UnityPlus.Compositing
             _mat.SetFloat( Shader.PropertyToID( "_InputMax" ), _camera.farClipPlane );
             _mat.SetFloat( Shader.PropertyToID( "_OutputMin" ), TargetNearPlane );
             _mat.SetFloat( Shader.PropertyToID( "_OutputMax" ), TargetFarPlane );
+
+            if( R != null )
+            {
+                R.sourceTexture = TargetRenderTexture;
+            }
         }
 
         void OnPostRender()

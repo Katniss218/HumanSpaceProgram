@@ -16,7 +16,16 @@ namespace UnityPlus.Compositing
         public Camera Camera { get; private set; }
 
         [field: SerializeField]
+        public RenderTexture sourceTexture;
+
+        [field: SerializeField]
         public RenderTexture texture;
+
+        [field: SerializeField]
+        public Shader Shader { get; set; }
+
+        [field: SerializeField]
+        Material _mat;
 
 #warning TODO - use Compositor's RT???
 
@@ -25,7 +34,28 @@ namespace UnityPlus.Compositing
             Camera = this.GetComponent<Camera>();
             texture = new RenderTexture( Screen.currentResolution.width, Screen.currentResolution.height, GraphicsFormat.R8G8B8A8_UNorm, GraphicsFormat.D32_SFloat_S8_UInt );
             texture.Create();
-            Camera.targetTexture = texture;
+
+        }
+
+        void Start()
+        {
+            if( Shader == null )
+            {
+                Debug.LogWarning( $"You need to assign the '{nameof( Shader )}' to the {nameof( DepthTextureCopier )} '{this.gameObject.name}'." );
+                return;
+            }
+            _mat = new Material( Shader );
+        }
+
+        void OnPreRender()
+        {
+            if( _mat != null )
+            {
+                Graphics.Blit( sourceTexture, texture, _mat );
+            }
+
+#warning TODO - the camera doesn't seem to care about the depth buffer in this texture.
+            Camera.SetTargetBuffers( texture.colorBuffer, texture.depthBuffer );
         }
     }
 }

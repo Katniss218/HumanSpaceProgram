@@ -1,4 +1,4 @@
-Shader "Hidden/CopyDepth"
+Shader "Hidden/CopyDepthFromColor"
 {
     Properties
     {
@@ -7,7 +7,7 @@ Shader "Hidden/CopyDepth"
 
     SubShader
     {
-        Cull Off ZWrite Off ZTest Always
+        Cull Off ZWrite Off ZTest Never
 
         Pass
         {
@@ -32,7 +32,7 @@ Shader "Hidden/CopyDepth"
             struct fragOutput 
             {
                 fixed4 color : SV_Target;
-                float depth : SV_Depth;
+                float depth : DEPTH;
             };
 
             v2f vert (appdata v)
@@ -49,30 +49,31 @@ Shader "Hidden/CopyDepth"
             float _InputMax;
             float _OutputMin;
             float _OutputMax;
-            float4 _CameraParams;
-
+             
             float Remap(float value, float minInput, float maxInput, float minOutput, float maxOutput) 
             {
                 return minOutput + (value - minInput) * (maxOutput - minOutput) / (maxInput - minInput);
             }
 
-            float LinearToNonlinearDepth(float linearDepth) // idfk
+            float RawDepthToLinearDepth(float depth)
             {
-                float nearClipPlane = _CameraParams.x;
-                float farClipPlane = _CameraParams.y;
-
-                float depthRange = farClipPlane - nearClipPlane;
-                float nonlinearDepth = (2.0 / depthRange) * (nearClipPlane * farClipPlane) /
-                    (farClipPlane + nearClipPlane - linearDepth * depthRange);
-
-                return nonlinearDepth;
+                // https://www.vertexfragment.com/ramblings/unity-custom-depth/
+                return 1.0 / (_ZBufferParams.x * depth + _ZBufferParams.y);
+            }
+            float LinearDepthToRawDepth(float linearDepth)
+            {
+                // https://www.vertexfragment.com/ramblings/unity-custom-depth/
+                return (1.0f - (linearDepth * _ZBufferParams.y)) / (linearDepth * _ZBufferParams.x);
             }
 
             fragOutput frag(v2f i)
             {
                 fragOutput o;
 
-                o.depth = LinearToNonlinearDepth(tex2D(_MainTex, i.uv).r);
+                o.depth = LinearDepthToRawDepth(tex2D(_MainTex, i.uv).r);
+                o.depth = 1.0f;
+
+                //o.color = fixed4(0, 0, 0, 0); // clear image (temp).
 
                 return o;
             }
