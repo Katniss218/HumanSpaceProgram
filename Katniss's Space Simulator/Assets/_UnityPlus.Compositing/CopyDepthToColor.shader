@@ -11,7 +11,7 @@ Shader "Hidden/CopyDepthToColor"
 
     SubShader
     {
-        Cull Off ZWrite Off ZTest Never
+        Cull Off ZWrite On ZTest Always
 
         Pass
         {

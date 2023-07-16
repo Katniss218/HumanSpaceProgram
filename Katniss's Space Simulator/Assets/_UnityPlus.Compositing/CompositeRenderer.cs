@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
+using UnityEngine.Rendering;
 
 namespace UnityPlus.Compositing
 {
@@ -35,6 +36,15 @@ namespace UnityPlus.Compositing
             texture = new RenderTexture( Screen.currentResolution.width, Screen.currentResolution.height, GraphicsFormat.R8G8B8A8_UNorm, GraphicsFormat.D32_SFloat_S8_UInt );
             texture.Create();
 
+            if( Camera.depthTextureMode == DepthTextureMode.None )
+                Camera.depthTextureMode = DepthTextureMode.Depth;
+
+            Camera.SetTargetBuffers( texture.colorBuffer, texture.depthBuffer );
+
+            CommandBuffer c = new CommandBuffer();
+            c.Blit( sourceTexture, texture, _mat ); // last opt parameter 'pass' specifies which pass from the shader to call
+            c.name = "Composite Depth Merge";
+            Camera.AddCommandBuffer( CameraEvent.BeforeForwardOpaque, c );
         }
 
         void Start()
@@ -44,7 +54,9 @@ namespace UnityPlus.Compositing
                 Debug.LogWarning( $"You need to assign the '{nameof( Shader )}' to the {nameof( DepthTextureCopier )} '{this.gameObject.name}'." );
                 return;
             }
+
             _mat = new Material( Shader );
+
         }
 
         void OnPreRender()
@@ -55,7 +67,6 @@ namespace UnityPlus.Compositing
             }
 
 #warning TODO - the camera doesn't seem to care about the depth buffer in this texture.
-            Camera.SetTargetBuffers( texture.colorBuffer, texture.depthBuffer );
         }
     }
 }

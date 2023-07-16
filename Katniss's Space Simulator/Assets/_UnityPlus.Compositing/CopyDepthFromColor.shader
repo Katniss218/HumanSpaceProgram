@@ -7,7 +7,7 @@ Shader "Hidden/CopyDepthFromColor"
 
     SubShader
     {
-        Cull Off ZWrite Off ZTest Never
+        Cull Off ZWrite Off ZTest Always
 
         Pass
         {
@@ -27,12 +27,6 @@ Shader "Hidden/CopyDepthFromColor"
             {
                 float2 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
-            };
-
-            struct fragOutput 
-            {
-                fixed4 color : SV_Target;
-                float depth : DEPTH;
             };
 
             v2f vert (appdata v)
@@ -66,14 +60,21 @@ Shader "Hidden/CopyDepthFromColor"
                 return (1.0f - (linearDepth * _ZBufferParams.y)) / (linearDepth * _ZBufferParams.x);
             }
 
+            struct fragOutput
+            {
+                fixed4 color : SV_Target;
+                float depth : SV_Depth;
+            };
+
             fragOutput frag(v2f i)
             {
                 fragOutput o;
 
-                o.depth = LinearDepthToRawDepth(tex2D(_MainTex, i.uv).r);
-                o.depth = 1.0f;
+                o.color = fixed4(0.5, 0, 0, 0); // clear image (temp).
 
-                //o.color = fixed4(0, 0, 0, 0); // clear image (temp).
+                //o.depth = LinearDepthToRawDepth(tex2D(_MainTex, i.uv).r);
+                o.depth = 0;
+
 
                 return o;
             }
