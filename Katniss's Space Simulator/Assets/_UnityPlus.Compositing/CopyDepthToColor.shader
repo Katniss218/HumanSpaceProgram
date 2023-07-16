@@ -2,7 +2,6 @@ Shader "Hidden/CopyDepthToColor"
 {
     Properties
     {
-        _MainTex("Texture", 2D) = "white" {}
         _InputMin("Input Min", Float) = 1
         _InputMax("Input Max", Float) = 2
         _OutputMin("Output Min", Float) = 1
@@ -11,7 +10,7 @@ Shader "Hidden/CopyDepthToColor"
 
     SubShader
     {
-        Cull Off ZWrite On ZTest Always
+        Cull Off ZWrite On ZTest Less // Works with ZTest Less and Always (and possibly other)
 
         Pass
         {
@@ -41,7 +40,6 @@ Shader "Hidden/CopyDepthToColor"
                 return o;
             }
 
-            sampler2D _MainTex;
             sampler2D _CameraDepthTexture;
             float _InputMin;
             float _InputMax;
@@ -53,7 +51,7 @@ Shader "Hidden/CopyDepthToColor"
                 return minOutput + (value - minInput) * (maxOutput - minOutput) / (maxInput - minInput);
             }
 
-            float RawDepthToLinearDepth(float depth)
+            float RawDepthToLinearDepth(float depth) // 2019's Linear01Depth
             {
                 // https://www.vertexfragment.com/ramblings/unity-custom-depth/
                 return 1.0 / (_ZBufferParams.x * depth + _ZBufferParams.y);
@@ -67,11 +65,11 @@ Shader "Hidden/CopyDepthToColor"
             float frag(v2f i) : SV_Target
             {
                 float col = Remap(
-                    RawDepthToLinearDepth(tex2D(_CameraDepthTexture, i.uv).r),
+                    Linear01Depth(tex2D(_CameraDepthTexture, i.uv).r),
                     0,
                     1,
-                    _OutputMin,
-                    _OutputMax
+                    0,
+                    1
                 );
 
                 return col;
