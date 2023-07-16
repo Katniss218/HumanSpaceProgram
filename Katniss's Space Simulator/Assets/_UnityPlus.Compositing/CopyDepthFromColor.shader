@@ -7,7 +7,7 @@ Shader "Hidden/CopyDepthFromColor"
 
     SubShader
     {
-        Cull Off ZWrite Off ZTest Always
+        Cull Off ZWrite On ZTest Always
 
         Pass
         {
@@ -72,8 +72,8 @@ Shader "Hidden/CopyDepthFromColor"
 
                 o.color = fixed4(0.5, 0, 0, 0); // clear image (temp).
 
-                //o.depth = LinearDepthToRawDepth(tex2D(_MainTex, i.uv).r);
-                o.depth = 0;
+                o.depth = LinearDepthToRawDepth(tex2D(_MainTex, i.uv).r);
+                //o.depth = 0.00005;
 
 
                 return o;
