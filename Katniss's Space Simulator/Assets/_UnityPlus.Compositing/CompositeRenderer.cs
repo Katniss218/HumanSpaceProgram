@@ -42,7 +42,7 @@ namespace UnityPlus.Compositing
             Camera.SetTargetBuffers( texture.colorBuffer, texture.depthBuffer ); // just doing Camera.targetTexture isn't enough.
 
             CommandBuffer c = new CommandBuffer();
-            c.Blit( sourceTexture, texture, _mat ); // last opt parameter 'pass' specifies which pass from the shader to call
+            c.Blit( null, texture, _mat );
             c.name = "Composite Depth Merge";
             Camera.AddCommandBuffer( CameraEvent.BeforeForwardOpaque, c ); // this does run the shader, it works.
         }
@@ -56,7 +56,14 @@ namespace UnityPlus.Compositing
             }
 
             _mat = new Material( Shader );
+            _mat.SetTexture( Shader.PropertyToID( "_SrcTex" ), sourceTexture );
+        }
 
+        void OnPreRender()
+        {
+            if( _mat != null )
+            {
+            }
         }
     }
 }

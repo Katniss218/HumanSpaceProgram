@@ -3,11 +3,12 @@ Shader "Hidden/CopyDepthFromColor"
     Properties
     {
         _MainTex("Texture", 2D) = "white" {}
+        _SrcTex("Texture", 2D) = "white" {}
     }
 
     SubShader
     {
-        Cull Off ZWrite On ZTest Less // ZWrite On is needed to write to SV_Depth, idk why. Works with ZTest Less and Always (and possibly other)
+        Cull Off ZWrite On ZTest Always Blend One Zero // ZWrite On is needed to write to SV_Depth, idk why. Works with ZTest Less and Always (and possibly other)
 
         Pass
         {
@@ -65,7 +66,7 @@ Shader "Hidden/CopyDepthFromColor"
                 return (1.0f - (linearDepth * _ZBufferParams.y)) / (linearDepth * _ZBufferParams.x);
             }
 
-            sampler2D _MainTex;
+            sampler2D _SrcTex;
 
             struct fragOutput
             {
@@ -77,12 +78,12 @@ Shader "Hidden/CopyDepthFromColor"
             {
                 fragOutput o;
 
-                o.color = fixed4(0.5, 0, 0, 0); // clear image (temp).
+               // o.color = fixed4(0.5, 0, 0, 0); // clear image (temp).
 
-                o.depth = InverseRawToLinear(tex2D(_MainTex, i.uv).r);
+               // o.depth = InverseRawToLinear(tex2D(_MainTex, i.uv).r);
 
 
-                o.color = fixed4(tex2D(_MainTex, i.uv).r,1,0,0);
+                o.color = fixed4(tex2D(_SrcTex, i.uv).r,1,0,0); // this samples as 0 if the target texture has depth buffer. idk why.
                 o.depth = 0.00005;
 
 

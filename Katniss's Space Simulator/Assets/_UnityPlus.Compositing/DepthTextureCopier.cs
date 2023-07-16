@@ -41,10 +41,7 @@ namespace UnityPlus.Compositing
 
             TargetRenderTexture = new RenderTexture( Screen.currentResolution.width, Screen.currentResolution.height, GraphicsFormat.R32_SFloat, GraphicsFormat.None );
             TargetRenderTexture.Create();
-        }
 
-        void Start()
-        {
             if( Shader == null )
             {
                 Debug.LogWarning( $"You need to assign the '{nameof( Shader )}' to the {nameof( DepthTextureCopier )} '{this.gameObject.name}'." );
@@ -71,6 +68,11 @@ namespace UnityPlus.Compositing
             {
                 R.sourceTexture = TargetRenderTexture;
             }
+        }
+
+        void Start()
+        {
+            
         }
 
         void OnPostRender()
