@@ -53,18 +53,19 @@ Shader "Hidden/CopyDepthFromColor"
 				return 1.0 / (_ZBufferParams.x * depth + _ZBufferParams.y);
 			}
 
-			float InverseRawToLinear(float linearDepth)
+			float LinearDepthToRawDepth(float linearDepth)
 			{
 				// according to https://www.mathway.com/Precalculus, for `1.0 / (_ZBufferParams.x * depth + _ZBufferParams.y)`
 				return (1 / (linearDepth * _ZBufferParams.x)) - (_ZBufferParams.y / _ZBufferParams.x);
 			}
 
-			float LinearDepthToRawDepth(float linearDepth)
+			float LinearDepthToRawDepth2(float linearDepth)
 			{
 				// https://www.vertexfragment.com/ramblings/unity-custom-depth/
 				return (1.0f - (linearDepth * _ZBufferParams.y)) / (linearDepth * _ZBufferParams.x);
 			}
 
+			sampler2D _CameraDepthTexture;
 			sampler2D _garbage;
 
 			struct fragOutput
@@ -77,12 +78,16 @@ Shader "Hidden/CopyDepthFromColor"
 			{
 				fragOutput o;
 
-				float depthTex = tex2D(_garbage, i.uv).r; // Texture values are wrong in commandbuffer, but correct in blit inside onprerender.
+				float depthTex = tex2D(_garbage, i.uv).r;
 
 				o.color = fixed4(depthTex,1,0,0);
-				depthTex = InverseRawToLinear(depthTex);
-				//o.depth = depthTex;
-				o.depth = 0.00005f; // works in commandbuffer, doesn't work in blit inside onprerender.
+				
+
+				depthTex = LinearDepthToRawDepth(depthTex); // I think this might need to do something else.
+												// this assumes input 0 equals this camera's near clip, when in reality it's the other camera's near clip plane, but scaled so that it corresponds to this camera's depth range.
+
+
+				o.depth = depthTex;
 
 				return o;
 			}

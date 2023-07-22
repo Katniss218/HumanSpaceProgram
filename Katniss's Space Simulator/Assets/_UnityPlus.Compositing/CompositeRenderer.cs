@@ -43,7 +43,8 @@ namespace UnityPlus.Compositing
                 Camera.depthTextureMode = DepthTextureMode.Depth;
 
             Camera.SetTargetBuffers( texture.colorBuffer, texture.depthBuffer ); // just doing Camera.targetTexture isn't enough.
-
+           
+            _mat = new Material( Shader );
             if( _mat != null )
             {
                 CommandBuffer c = new CommandBuffer();
@@ -70,6 +71,7 @@ namespace UnityPlus.Compositing
         {
             if( _mat != null )
             {
+                _mat.SetTexture( "_garbage", sourceTexture );
                 //Graphics.Blit( null, texture, _mat );
             }
         }

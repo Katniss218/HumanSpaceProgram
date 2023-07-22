@@ -39,12 +39,6 @@ namespace UnityPlus.Compositing
         {
             _camera = this.GetComponent<Camera>();
 
-            if( TargetRenderTexture != null )
-            {
-                TargetRenderTexture = new RenderTexture( Screen.currentResolution.width, Screen.currentResolution.height, GraphicsFormat.R32_SFloat, GraphicsFormat.None );
-                TargetRenderTexture.Create();
-            }
-
             if( Shader == null )
             {
                 Debug.LogWarning( $"You need to assign the '{nameof( Shader )}' to the {nameof( DepthTextureCopier )} '{this.gameObject.name}'." );
@@ -53,6 +47,11 @@ namespace UnityPlus.Compositing
             if( SourceRenderTexture == null )
             {
                 Debug.LogWarning( $"You need to assign the '{nameof( SourceRenderTexture )}' to the {nameof( DepthTextureCopier )} '{this.gameObject.name}'." );
+                return;
+            }
+            if( TargetRenderTexture != null )
+            {
+                Debug.LogWarning( $"You need to assign the '{nameof( TargetRenderTexture )}' to the {nameof( DepthTextureCopier )} '{this.gameObject.name}'." );
                 return;
             }
 

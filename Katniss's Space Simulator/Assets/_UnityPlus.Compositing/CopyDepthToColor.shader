@@ -56,6 +56,7 @@ Shader "Hidden/CopyDepthToColor"
                 // https://www.vertexfragment.com/ramblings/unity-custom-depth/
                 return 1.0 / (_ZBufferParams.x * depth + _ZBufferParams.y);
             }
+
             float LinearDepthToRawDepth(float linearDepth)
             {
                 // https://www.vertexfragment.com/ramblings/unity-custom-depth/
@@ -64,13 +65,11 @@ Shader "Hidden/CopyDepthToColor"
 
             float frag(v2f i) : SV_Target
             {
-                float col = Remap(
-                    Linear01Depth(tex2D(_CameraDepthTexture, i.uv).r),
-                    0,
-                    1,
-                    0,
-                    1
-                );
+                float col = RawDepthToLinearDepth(tex2D(_CameraDepthTexture, i.uv).r);
+                //col += 
+                    // figure out what value in range 0..1 corresponds to the near clip plane of this camera, or something. 
+                    // We need to offset the depth so the target can use it.
+                    // this would be easier if we worked with depth values in range min-max instead of 0-1.
 
                 return col;
             }
