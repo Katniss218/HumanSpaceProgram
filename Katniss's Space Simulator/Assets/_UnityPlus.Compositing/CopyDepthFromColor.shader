@@ -48,6 +48,7 @@ Shader "Hidden/CopyDepthFromColor"
 			// z = x/far
 			// w = 1/far
 
+
 			float RawDepthToLinear01Depth(float depth) // Unity 2019's Linear01Depth
 			{
 				return 1.0 / (_ZBufferParams.x * depth + _ZBufferParams.y);
@@ -87,7 +88,7 @@ Shader "Hidden/CopyDepthFromColor"
 				float depthTex = tex2D(_garbage, i.uv).r;
 
 				o.color = fixed4(depthTex,1,0,0);
-				
+
 
 				depthTex = LinearDepthToRawDepth(depthTex); // I think this might need to do something else.
 												// this assumes input 0 equals this camera's near clip, when in reality it's the other camera's near clip plane, but scaled so that it corresponds to this camera's depth range.

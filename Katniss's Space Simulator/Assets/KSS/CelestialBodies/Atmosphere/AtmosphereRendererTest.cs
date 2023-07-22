@@ -2,7 +2,9 @@ using KSS.Core.ReferenceFrames;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
+[RequireComponent( typeof( Camera ) )]
 [ExecuteInEditMode, ImageEffectAllowedInSceneView]
 public class AtmosphereRendererTest : MonoBehaviour
 {
@@ -10,6 +12,8 @@ public class AtmosphereRendererTest : MonoBehaviour
 
     [SerializeField]
     Material _mat;
+
+    Camera _camera;
 
     void OnReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
     {
@@ -23,6 +27,7 @@ public class AtmosphereRendererTest : MonoBehaviour
 
     void Awake()
     {
+        _camera = this.GetComponent<Camera>();
         _mat = new Material( atmosphereShader );
         _mat.SetVector( Shader.PropertyToID( "_Center" ), new Vector3( 0, 0, 0 ) );
         _mat.SetVector( Shader.PropertyToID( "_SunDirection" ), new Vector3( 1, 0, 1 ) );
@@ -34,6 +39,11 @@ public class AtmosphereRendererTest : MonoBehaviour
         _mat.SetFloat( Shader.PropertyToID( "_InScatteringPointCount" ), 16 );
         _mat.SetFloat( Shader.PropertyToID( "_OpticalDepthPointCount" ), 8 );
         _mat.SetFloat( Shader.PropertyToID( "_DensityFalloffPower" ), 13.7f );
+    }
+
+    void Start()
+    {
+        //_camera.AddCommandBuffer(CameraEvent.AfterForwardOpaque)
     }
 
     private void OnEnable()
