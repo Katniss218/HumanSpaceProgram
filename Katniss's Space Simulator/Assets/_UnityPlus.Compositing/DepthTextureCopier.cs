@@ -39,8 +39,11 @@ namespace UnityPlus.Compositing
         {
             _camera = this.GetComponent<Camera>();
 
-            TargetRenderTexture = new RenderTexture( Screen.currentResolution.width, Screen.currentResolution.height, GraphicsFormat.R32_SFloat, GraphicsFormat.None );
-            TargetRenderTexture.Create();
+            if( TargetRenderTexture != null )
+            {
+                TargetRenderTexture = new RenderTexture( Screen.currentResolution.width, Screen.currentResolution.height, GraphicsFormat.R32_SFloat, GraphicsFormat.None );
+                TargetRenderTexture.Create();
+            }
 
             if( Shader == null )
             {

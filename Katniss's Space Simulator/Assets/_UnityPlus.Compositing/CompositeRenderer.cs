@@ -44,13 +44,16 @@ namespace UnityPlus.Compositing
 
             Camera.SetTargetBuffers( texture.colorBuffer, texture.depthBuffer ); // just doing Camera.targetTexture isn't enough.
 
-            CommandBuffer c = new CommandBuffer();
-            c.name = "Composite Depth Merge";
-            //c.SetGlobalTexture( "_garbage", source2 );
-            c.Blit( null, texture, _mat, 0 );
-            Camera.AddCommandBuffer( CameraEvent.BeforeForwardOpaque, c ); // this does run the shader, it works, but doesn't read the texture correctly.
+            if( _mat != null )
+            {
+                CommandBuffer c = new CommandBuffer();
+                c.name = "Composite Depth Merge";
+                //c.SetGlobalTexture( "_garbage", source2 );
+                c.Blit( null, texture, _mat, 0 );
+                Camera.AddCommandBuffer( CameraEvent.BeforeForwardOpaque, c ); // this does run the shader, it works, but doesn't read the texture correctly.
+            }
         }
-
+         
         void Start()
         {
             if( Shader == null )
@@ -59,8 +62,8 @@ namespace UnityPlus.Compositing
                 return;
             }
 
-            _mat = new Material( Shader );
-            _mat.SetTexture( "_garbage", sourceTexture );
+            //_mat = new Material( Shader );
+            //_mat.SetTexture( "_garbage", sourceTexture );
         }
 
         void OnPreRender()
