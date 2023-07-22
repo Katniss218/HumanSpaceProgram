@@ -8,32 +8,27 @@ using UnityEngine.Experimental.Rendering;
 
 namespace UnityPlus.Compositing
 {
+    /// <summary>
+    /// Copies the depth texture from a RenderTexture to a separate texture.
+    /// </summary>
     [RequireComponent( typeof( Camera ) )]
     //[ExecuteInEditMode, ImageEffectAllowedInSceneView]
     public class DepthTextureCopier : MonoBehaviour
     {
         [field: SerializeField]
-        public RenderTexture SourceRenderTexture { get; set; }
-
-        [field: SerializeField]
-        public RenderTexture TargetRenderTexture { get; set; }
-
-        [field: SerializeField]
-        public float TargetNearPlane { get; set; } = 0;
-        [field: SerializeField]
-        public float TargetFarPlane { get; set; } = 1;
-
-        [field: SerializeField]
         public Shader Shader { get; set; }
 
         [field: SerializeField]
-        Material _mat;
-
-        Camera _camera;
-
+        public RenderTexture CameraRenderTexture { get; set; }
 
         [field: SerializeField]
-        public CompositeRenderer RendererWithTheCommandbuffer { get; private set; }
+        public RenderTexture ColorDepthTexture { get; set; }
+
+        [field: SerializeField]
+        public DepthTextureApplier RendererWithTheCommandbuffer { get; private set; }
+
+        Camera _camera;
+        Material _mat;
 
         void Awake()
         {
@@ -44,46 +39,35 @@ namespace UnityPlus.Compositing
                 Debug.LogWarning( $"You need to assign the '{nameof( Shader )}' to the {nameof( DepthTextureCopier )} '{this.gameObject.name}'." );
                 return;
             }
-            if( SourceRenderTexture == null )
+            if( CameraRenderTexture == null )
             {
-                Debug.LogWarning( $"You need to assign the '{nameof( SourceRenderTexture )}' to the {nameof( DepthTextureCopier )} '{this.gameObject.name}'." );
+                Debug.LogWarning( $"You need to assign the '{nameof( CameraRenderTexture )}' to the {nameof( DepthTextureCopier )} '{this.gameObject.name}'." );
                 return;
             }
-            if( TargetRenderTexture != null )
-            {
-                Debug.LogWarning( $"You need to assign the '{nameof( TargetRenderTexture )}' to the {nameof( DepthTextureCopier )} '{this.gameObject.name}'." );
+            if( ColorDepthTexture == null )
+            { 
+                Debug.LogWarning( $"You need to assign the '{nameof( ColorDepthTexture )}' to the {nameof( DepthTextureCopier )} '{this.gameObject.name}'." );
                 return;
             }
 
-            _camera.targetTexture = SourceRenderTexture;
-
-            _mat = new Material( Shader );
+            _camera.targetTexture = CameraRenderTexture;
 
             if( RendererWithTheCommandbuffer != null )
             {
-                RendererWithTheCommandbuffer.sourceTexture = TargetRenderTexture;
-            }
-        }
-
-        void Start()
-        {
-
-        }
-
-        void OnPreRender()
-        {
-            if( SourceRenderTexture != null && _mat != null )
-            {
-                //_camera.targetTexture = SourceRenderTexture;
+                RendererWithTheCommandbuffer.colorDepthTexture = ColorDepthTexture;
             }
         }
 
         void OnPostRender()
         {
-            if( SourceRenderTexture != null && _mat != null && _camera.targetTexture != null )
+            if( _mat == null )
             {
-                Graphics.Blit( SourceRenderTexture, TargetRenderTexture, _mat );
-                //_camera.targetTexture = null;
+                _mat = new Material( Shader );
+            }
+
+            if( CameraRenderTexture != null && _camera.targetTexture != null )
+            {
+                Graphics.Blit( CameraRenderTexture, ColorDepthTexture, _mat );
             }
         }
     }
