@@ -41,11 +41,6 @@ public class AtmosphereRendererTest : MonoBehaviour
         _mat.SetFloat( Shader.PropertyToID( "_DensityFalloffPower" ), 13.7f );
     }
 
-    void Start()
-    {
-        //_camera.AddCommandBuffer(CameraEvent.AfterForwardOpaque)
-    }
-
     private void OnEnable()
     {
         SceneReferenceFrameManager.OnAfterReferenceFrameSwitch += OnReferenceFrameSwitch;

@@ -58,7 +58,8 @@
   <ItemGroup>
     <Compile Include="Assets\_UnityPlus.Compositing\DepthTextureExtractor.cs" />
     <Compile Include="Assets\_UnityPlus.Compositing\DepthTextureApplier.cs" />
-    <Compile Include="Assets\_UnityPlus.Compositing\DepthAndColorCopierOnePass.cs" />
+    <Compile Include="Assets\_UnityPlus.Compositing\DepthAndColorCopier.cs" />
+    <Compile Include="Assets\_UnityPlus.Compositing\SequentialCompositor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_UnityPlus.Compositing\CopyDepth.shader" />

@@ -2030,6 +2030,8 @@ GameObject:
   m_Component:
   - component: {fileID: 207205945}
   - component: {fileID: 207205946}
+  - component: {fileID: 207205947}
+  - component: {fileID: 207205948}
   m_Layer: 0
   m_Name: Cam
   m_TagString: Untagged
@@ -2066,6 +2068,38 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 207205944}
   m_Enabled: 1
+--- !u!114 &207205947
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 207205944}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67d5bbc0f1514974887e7cce348c1398, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <SourceCam>k__BackingField: {fileID: 107321846}
+  <TargetCam>k__BackingField: {fileID: 1476210405}
+  <CopyShader>k__BackingField: {fileID: 4800000, guid: 3652ae74f7446ea4cb2c7a40ab28adb5, type: 3}
+--- !u!114 &207205948
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 207205944}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1e8503999691da498e3bf9aa2d33fa4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Entries>k__BackingField:
+  - camera: {fileID: 0}
+    color: {fileID: 0}
+    depth: {fileID: 0}
+  <CopyShader>k__BackingField: {fileID: 4800000, guid: 3652ae74f7446ea4cb2c7a40ab28adb5, type: 3}
 --- !u!1 &214547540
 GameObject:
   m_ObjectHideFlags: 0
@@ -9766,7 +9800,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1476210403}
   - component: {fileID: 1476210405}
-  - component: {fileID: 1476210406}
   m_Layer: 0
   m_Name: Near Camera (1)
   m_TagString: MainCamera
@@ -9832,25 +9865,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!114 &1476210406
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1476210402}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 67d5bbc0f1514974887e7cce348c1398, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _sourceCam: {fileID: 107321846}
-  _destinationCam: {fileID: 1476210405}
-  _copyShader: {fileID: 4800000, guid: 3652ae74f7446ea4cb2c7a40ab28adb5, type: 3}
-  srcColorRT: {fileID: 0}
-  srcDepthRT: {fileID: 0}
-  dstColorRT: {fileID: 0}
-  dstDepthRT: {fileID: 0}
 --- !u!1 &1500658126
 GameObject:
   m_ObjectHideFlags: 0
