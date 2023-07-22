@@ -48,21 +48,27 @@ Shader "Hidden/CopyDepthFromColor"
 			// z = x/far
 			// w = 1/far
 
-			float RawDepthToLinearDepth(float depth) // Unity 2019's Linear01Depth
+			float RawDepthToLinear01Depth(float depth) // Unity 2019's Linear01Depth
 			{
 				return 1.0 / (_ZBufferParams.x * depth + _ZBufferParams.y);
 			}
 
-			float LinearDepthToRawDepth(float linearDepth)
+			float Linear01DepthToRawDepth(float linearDepth)
 			{
 				// according to https://www.mathway.com/Precalculus, for `1.0 / (_ZBufferParams.x * depth + _ZBufferParams.y)`
 				return (1 / (linearDepth * _ZBufferParams.x)) - (_ZBufferParams.y / _ZBufferParams.x);
 			}
 
-			float LinearDepthToRawDepth2(float linearDepth)
+			float Linear01DepthToRawDepth2(float linearDepth)
 			{
 				// https://www.vertexfragment.com/ramblings/unity-custom-depth/
 				return (1.0f - (linearDepth * _ZBufferParams.y)) / (linearDepth * _ZBufferParams.x);
+			}
+
+			inline float LinearDepthToRawDepth(float linearDepth)
+			{
+				// according to https://www.mathway.com/Precalculus, for `1.0 / (_ZBufferParams.x * depth + _ZBufferParams.y)`
+				return (1 / (linearDepth * _ZBufferParams.z)) - (_ZBufferParams.w / _ZBufferParams.z);
 			}
 
 			sampler2D _CameraDepthTexture;

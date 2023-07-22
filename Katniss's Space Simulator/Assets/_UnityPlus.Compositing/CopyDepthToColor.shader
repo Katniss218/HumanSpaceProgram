@@ -51,16 +51,27 @@ Shader "Hidden/CopyDepthToColor"
                 return minOutput + (value - minInput) * (maxOutput - minOutput) / (maxInput - minInput);
             }
 
-            float RawDepthToLinearDepth(float depth) // 2019's Linear01Depth
+            float RawDepthToLinear01Depth(float depth) // 2019's Linear01Depth
             {
                 // https://www.vertexfragment.com/ramblings/unity-custom-depth/
                 return 1.0 / (_ZBufferParams.x * depth + _ZBufferParams.y);
             }
 
-            float LinearDepthToRawDepth(float linearDepth)
+            inline float RawDepthToLinearDepth(float z) // 2019's LinearEyeDepth
             {
-                // https://www.vertexfragment.com/ramblings/unity-custom-depth/
-                return (1.0f - (linearDepth * _ZBufferParams.y)) / (linearDepth * _ZBufferParams.x);
+                return 1.0 / (_ZBufferParams.z * z + _ZBufferParams.w);
+            }
+
+            float Linear01DepthToRawDepth(float linearDepth)
+            {
+                // according to https://www.mathway.com/Precalculus, for `1.0 / (_ZBufferParams.x * depth + _ZBufferParams.y)`
+                return (1 / (linearDepth * _ZBufferParams.x)) - (_ZBufferParams.y / _ZBufferParams.x);
+            }
+
+            inline float LinearDepthToRawDepth(float linearDepth)
+            {
+                // according to https://www.mathway.com/Precalculus, for `1.0 / (_ZBufferParams.z * depth + _ZBufferParams.w)`
+                return (1 / (linearDepth * _ZBufferParams.z)) - (_ZBufferParams.w / _ZBufferParams.z);
             }
 
             float frag(v2f i) : SV_Target
@@ -70,6 +81,9 @@ Shader "Hidden/CopyDepthToColor"
                     // figure out what value in range 0..1 corresponds to the near clip plane of this camera, or something. 
                     // We need to offset the depth so the target can use it.
                     // this would be easier if we worked with depth values in range min-max instead of 0-1.
+
+
+                // actually, does 0 correspond to near plane, or the position of the camera?
 
                 return col;
             }
