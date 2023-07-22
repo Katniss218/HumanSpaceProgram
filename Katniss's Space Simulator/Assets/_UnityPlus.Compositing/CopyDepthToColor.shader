@@ -2,10 +2,6 @@ Shader "Hidden/CopyDepthToColor"
 {
     Properties
     {
-        _InputMin("Input Min", Float) = 1
-        _InputMax("Input Max", Float) = 2
-        _OutputMin("Output Min", Float) = 1
-        _OutputMax("Output Max", Float) = 2
     }
 
     SubShader
@@ -41,15 +37,6 @@ Shader "Hidden/CopyDepthToColor"
             }
 
             sampler2D _CameraDepthTexture;
-            float _InputMin;
-            float _InputMax;
-            float _OutputMin;
-            float _OutputMax;
-
-            float Remap(float value, float minInput, float maxInput, float minOutput, float maxOutput) 
-            {
-                return minOutput + (value - minInput) * (maxOutput - minOutput) / (maxInput - minInput);
-            }
 
             float RawDepthToLinear01Depth(float depth) // 2019's Linear01Depth
             {
@@ -57,15 +44,15 @@ Shader "Hidden/CopyDepthToColor"
                 return 1.0 / (_ZBufferParams.x * depth + _ZBufferParams.y);
             }
 
-            inline float RawDepthToLinearDepth(float z) // 2019's LinearEyeDepth
-            {
-                return 1.0 / (_ZBufferParams.z * z + _ZBufferParams.w);
-            }
-
             float Linear01DepthToRawDepth(float linearDepth)
             {
                 // according to https://www.mathway.com/Precalculus, for `1.0 / (_ZBufferParams.x * depth + _ZBufferParams.y)`
                 return (1 / (linearDepth * _ZBufferParams.x)) - (_ZBufferParams.y / _ZBufferParams.x);
+            }
+
+            inline float RawDepthToLinearDepth(float z) // 2019's LinearEyeDepth
+            {
+                return 1.0 / (_ZBufferParams.z * z + _ZBufferParams.w);
             }
 
             inline float LinearDepthToRawDepth(float linearDepth)
@@ -77,13 +64,6 @@ Shader "Hidden/CopyDepthToColor"
             float frag(v2f i) : SV_Target
             {
                 float col = RawDepthToLinearDepth(tex2D(_CameraDepthTexture, i.uv).r);
-                //col += 
-                    // figure out what value in range 0..1 corresponds to the near clip plane of this camera, or something. 
-                    // We need to offset the depth so the target can use it.
-                    // this would be easier if we worked with depth values in range min-max instead of 0-1.
-
-
-                // actually, does 0 correspond to near plane, or the position of the camera?
 
                 return col;
             }

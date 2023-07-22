@@ -58,10 +58,6 @@ namespace UnityPlus.Compositing
             _camera.targetTexture = SourceRenderTexture;
 
             _mat = new Material( Shader );
-            _mat.SetFloat( Shader.PropertyToID( "_InputMin" ), _camera.nearClipPlane );
-            _mat.SetFloat( Shader.PropertyToID( "_InputMax" ), _camera.farClipPlane );
-            _mat.SetFloat( Shader.PropertyToID( "_OutputMin" ), TargetNearPlane );
-            _mat.SetFloat( Shader.PropertyToID( "_OutputMax" ), TargetFarPlane );
 
             if( RendererWithTheCommandbuffer != null )
             {
