@@ -22,8 +22,6 @@ namespace UnityPlus.Compositing
         Camera _camera;
         Material _mat;
 
-#warning TODO - apply directly from the camera render texture, skipping the color texture.
-
         void Awake()
         {
             _camera = this.GetComponent<Camera>();
@@ -33,11 +31,11 @@ namespace UnityPlus.Compositing
         {
             if( Shader == null )
             {
-                Debug.LogWarning( $"You need to assign the '{nameof( Shader )}' to the {nameof( DepthTextureCopier )} '{this.gameObject.name}'." );
+                Debug.LogWarning( $"You need to assign the '{nameof( Shader )}' to the {nameof( DepthTextureExtractor )} '{this.gameObject.name}'." );
                 return;
             }
 
-            targetTexture = new RenderTexture( Screen.currentResolution.width, Screen.currentResolution.height, GraphicsFormat.R8G8B8A8_UNorm, GraphicsFormat.D32_SFloat_S8_UInt );
+            targetTexture = new RenderTexture( _camera.pixelWidth, _camera.pixelHeight, GraphicsFormat.R8G8B8A8_UNorm, GraphicsFormat.D32_SFloat_S8_UInt );
             targetTexture.Create();
 
             if( _camera.depthTextureMode == DepthTextureMode.None )

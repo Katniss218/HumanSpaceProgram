@@ -5444,7 +5444,7 @@ Camera:
     serializedVersion: 2
     m_Bits: 2147483671
   m_RenderingPath: 1
-  m_TargetTexture: {fileID: 8400000, guid: 21e96e22a32a8b64faf93b29fef7d55d, type: 2}
+  m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
   m_TargetEye: 3
   m_HDR: 1
@@ -5467,8 +5467,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <Shader>k__BackingField: {fileID: 4800000, guid: 59b15d3073f1ac24c82d721ca68362f1, type: 3}
-  <CameraRenderTexture>k__BackingField: {fileID: 8400000, guid: 21e96e22a32a8b64faf93b29fef7d55d, type: 2}
-  <ColorDepthTexture>k__BackingField: {fileID: 8400000, guid: 399adb56636c85a40abdef98e11aa1e1, type: 2}
+  <CameraRenderTexture>k__BackingField: {fileID: 0}
+  <ColorDepthTexture>k__BackingField: {fileID: 0}
   <RendererWithTheCommandbuffer>k__BackingField: {fileID: 1126179635}
 --- !u!1 &852523660
 GameObject:
@@ -7863,7 +7863,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51d22488dafd0b24796f685b3bdbf8b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Camera>k__BackingField: {fileID: 0}
   <Shader>k__BackingField: {fileID: 4800000, guid: 5a8402eb734d0f8408e9bbcc32a9e32d, type: 3}
   colorDepthTexture: {fileID: 0}
   targetTexture: {fileID: 0}

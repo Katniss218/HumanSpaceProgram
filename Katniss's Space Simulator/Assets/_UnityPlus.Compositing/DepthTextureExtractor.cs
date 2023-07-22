@@ -13,7 +13,7 @@ namespace UnityPlus.Compositing
     /// </summary>
     [RequireComponent( typeof( Camera ) )]
     //[ExecuteInEditMode, ImageEffectAllowedInSceneView]
-    public class DepthTextureCopier : MonoBehaviour
+    public class DepthTextureExtractor : MonoBehaviour
     {
         [field: SerializeField]
         public Shader Shader { get; set; }
@@ -36,21 +36,17 @@ namespace UnityPlus.Compositing
 
             if( Shader == null )
             {
-                Debug.LogWarning( $"You need to assign the '{nameof( Shader )}' to the {nameof( DepthTextureCopier )} '{this.gameObject.name}'." );
-                return;
-            }
-            if( CameraRenderTexture == null )
-            {
-                Debug.LogWarning( $"You need to assign the '{nameof( CameraRenderTexture )}' to the {nameof( DepthTextureCopier )} '{this.gameObject.name}'." );
-                return;
-            }
-            if( ColorDepthTexture == null )
-            { 
-                Debug.LogWarning( $"You need to assign the '{nameof( ColorDepthTexture )}' to the {nameof( DepthTextureCopier )} '{this.gameObject.name}'." );
+                Debug.LogWarning( $"You need to assign the '{nameof( Shader )}' to the {nameof( DepthTextureExtractor )} '{this.gameObject.name}'." );
                 return;
             }
 
-            _camera.targetTexture = CameraRenderTexture;
+            CameraRenderTexture = new RenderTexture( _camera.pixelWidth, _camera.pixelHeight, GraphicsFormat.R8G8B8A8_UNorm, GraphicsFormat.D32_SFloat_S8_UInt );
+            CameraRenderTexture.Create();
+
+            ColorDepthTexture = new RenderTexture( _camera.pixelWidth, _camera.pixelHeight, GraphicsFormat.R32_SFloat, GraphicsFormat.None );
+            ColorDepthTexture.Create();
+
+            _camera.SetTargetBuffers( CameraRenderTexture.colorBuffer, CameraRenderTexture.depthBuffer );
 
             if( RendererWithTheCommandbuffer != null )
             {
@@ -65,7 +61,7 @@ namespace UnityPlus.Compositing
                 _mat = new Material( Shader );
             }
 
-            if( CameraRenderTexture != null && _camera.targetTexture != null )
+            if( CameraRenderTexture != null ) // copy the depth to a texture to await copy. This needs to be done under this camera, otherwise the projection variables are wrong.
             {
                 Graphics.Blit( CameraRenderTexture, ColorDepthTexture, _mat );
             }
