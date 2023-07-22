@@ -32,9 +32,6 @@ namespace UnityPlus.Compositing
         [SerializeField]
         RenderTexture dstDepthRT;
 
-       // [SerializeField]
-       // RenderTexture dstRT;
-
         void Start()
         {
             srcColorRT = new RenderTexture( _sourceCam.pixelWidth, _sourceCam.pixelHeight, GraphicsFormat.R8G8B8A8_UNorm, GraphicsFormat.None );
@@ -42,8 +39,6 @@ namespace UnityPlus.Compositing
             srcDepthRT = new RenderTexture( _sourceCam.pixelWidth, _sourceCam.pixelHeight, GraphicsFormat.None, GraphicsFormat.D32_SFloat_S8_UInt );
             srcDepthRT.Create();
 
-           // dstRT = new RenderTexture( _destinationCam.pixelWidth, _destinationCam.pixelHeight, GraphicsFormat.R8G8B8A8_UNorm, GraphicsFormat.D32_SFloat_S8_UInt );
-           // dstRT.Create();
             dstColorRT = new RenderTexture( _destinationCam.pixelWidth, _destinationCam.pixelHeight, GraphicsFormat.R8G8B8A8_UNorm, GraphicsFormat.None );
             dstColorRT.Create();
             dstDepthRT = new RenderTexture( _destinationCam.pixelWidth, _destinationCam.pixelHeight, GraphicsFormat.None, GraphicsFormat.D32_SFloat_S8_UInt );

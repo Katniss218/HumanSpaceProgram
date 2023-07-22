@@ -6,15 +6,15 @@ Shader "Hidden/Atmosphere"
 		_MainTex("Texture", 2D) = "white" {}
 		_Center("Center", Vector) = (0, 0, 0)
 		_SunDirection("SunDirection", Vector) = (0, 0, 0)
-			//_ScatteringCoefficients("ScatteringCoefficients", Vector) = (0.213244481466, 0.648883128925, 1.36602691073) // 700, 530, 440, mul 2
-			_ScatteringWavelengths("ScatteringWavelengths", Vector) = (700, 530, 400)
-			_ScatteringStrength("ScatteringStrength", Float) = 4
-			_TerminatorFalloff("TerminatorFalloff", Float) = 32
-			_MinRadius("MinRadius", Float) = 0
-			_MaxRadius("MaxRadius", Float) = 125
-			_InScatteringPointCount("InScatteringPointCount", Int) = 5
-			_OpticalDepthPointCount("OpticalDepthPointCount", Int) = 5
-			_DensityFalloffPower("DensityFalloffPower", Float) = 1.77
+			// _ScatteringCoefficients("ScatteringCoefficients", Vector) = (0.213244481466, 0.648883128925, 1.36602691073) // 700, 530, 440, mul 2
+		_ScatteringWavelengths("ScatteringWavelengths", Vector) = (700, 530, 400)
+		_ScatteringStrength("ScatteringStrength", Float) = 4
+		_TerminatorFalloff("TerminatorFalloff", Float) = 32
+		_MinRadius("MinRadius", Float) = 0
+		_MaxRadius("MaxRadius", Float) = 125
+		_InScatteringPointCount("InScatteringPointCount", Int) = 5
+		_OpticalDepthPointCount("OpticalDepthPointCount", Int) = 5
+		_DensityFalloffPower("DensityFalloffPower", Float) = 1.77
 
 	}
 
