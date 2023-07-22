@@ -9,7 +9,7 @@ using UnityEngine.Experimental.Rendering;
 namespace UnityPlus.Compositing
 {
     [RequireComponent( typeof( Camera ) )]
-    [ExecuteInEditMode, ImageEffectAllowedInSceneView]
+    //[ExecuteInEditMode, ImageEffectAllowedInSceneView]
     public class DepthTextureCopier : MonoBehaviour
     {
         [field: SerializeField]
@@ -33,7 +33,7 @@ namespace UnityPlus.Compositing
 
 
         [field: SerializeField]
-        public CompositeRenderer R { get; private set; }
+        public CompositeRenderer RendererWithTheCommandbuffer { get; private set; }
 
         void Awake()
         {
@@ -49,14 +49,11 @@ namespace UnityPlus.Compositing
             }
             if( SourceRenderTexture == null )
             {
-                if( _camera.targetTexture == null )
-                {
-                    Debug.LogWarning( $"You need to assign the '{nameof( SourceRenderTexture )}' to the {nameof( DepthTextureCopier )} '{this.gameObject.name}'." );
-                    return;
-                }
-
-                SourceRenderTexture = _camera.targetTexture;
+                Debug.LogWarning( $"You need to assign the '{nameof( SourceRenderTexture )}' to the {nameof( DepthTextureCopier )} '{this.gameObject.name}'." );
+                return;
             }
+
+            _camera.targetTexture = SourceRenderTexture;
 
             _mat = new Material( Shader );
             _mat.SetFloat( Shader.PropertyToID( "_InputMin" ), _camera.nearClipPlane );
@@ -64,22 +61,31 @@ namespace UnityPlus.Compositing
             _mat.SetFloat( Shader.PropertyToID( "_OutputMin" ), TargetNearPlane );
             _mat.SetFloat( Shader.PropertyToID( "_OutputMax" ), TargetFarPlane );
 
-            if( R != null )
+            if( RendererWithTheCommandbuffer != null )
             {
-                R.sourceTexture = TargetRenderTexture;
+                RendererWithTheCommandbuffer.sourceTexture = TargetRenderTexture;
             }
         }
 
         void Start()
         {
-            
+
+        }
+
+        void OnPreRender()
+        {
+            if( SourceRenderTexture != null && _mat != null )
+            {
+                //_camera.targetTexture = SourceRenderTexture;
+            }
         }
 
         void OnPostRender()
         {
-            if( SourceRenderTexture != null && _mat != null )
+            if( SourceRenderTexture != null && _mat != null && _camera.targetTexture != null )
             {
                 Graphics.Blit( SourceRenderTexture, TargetRenderTexture, _mat );
+                //_camera.targetTexture = null;
             }
         }
     }

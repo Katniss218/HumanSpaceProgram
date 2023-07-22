@@ -10,7 +10,7 @@ using UnityEngine.Rendering;
 namespace UnityPlus.Compositing
 {
     [RequireComponent( typeof( Camera ) )]
-    [ExecuteInEditMode, ImageEffectAllowedInSceneView]
+    //[ExecuteInEditMode, ImageEffectAllowedInSceneView]
     public class CompositeRenderer : MonoBehaviour
     {
         [field: SerializeField]
@@ -18,6 +18,9 @@ namespace UnityPlus.Compositing
 
         [field: SerializeField]
         public RenderTexture sourceTexture;
+
+        [field: SerializeField]
+        public Texture2D source2;
 
         [field: SerializeField]
         public RenderTexture texture;
@@ -42,9 +45,10 @@ namespace UnityPlus.Compositing
             Camera.SetTargetBuffers( texture.colorBuffer, texture.depthBuffer ); // just doing Camera.targetTexture isn't enough.
 
             CommandBuffer c = new CommandBuffer();
-            c.Blit( null, texture, _mat );
             c.name = "Composite Depth Merge";
-            Camera.AddCommandBuffer( CameraEvent.BeforeForwardOpaque, c ); // this does run the shader, it works.
+            //c.SetGlobalTexture( "_garbage", source2 );
+            c.Blit( null, texture, _mat, 0 );
+            Camera.AddCommandBuffer( CameraEvent.BeforeForwardOpaque, c ); // this does run the shader, it works, but doesn't read the texture correctly.
         }
 
         void Start()
@@ -56,13 +60,14 @@ namespace UnityPlus.Compositing
             }
 
             _mat = new Material( Shader );
-            _mat.SetTexture( Shader.PropertyToID( "_SrcTex" ), sourceTexture );
+            _mat.SetTexture( "_garbage", sourceTexture );
         }
 
         void OnPreRender()
         {
             if( _mat != null )
             {
+                //Graphics.Blit( null, texture, _mat );
             }
         }
     }
