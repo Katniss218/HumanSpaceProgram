@@ -10,8 +10,7 @@ sampler2D _ShadowMask;
 sampler2D _NoiseTex;
 float2 _NoiseScale;
 
-// Light vector
-// (reversed light direction in view space) * (ray-trace sample interval)
+// Light vector, but it has more calculations done to it on the C# side, it's not just the direction, it also has non-one length.
 float3 _LightVector;
 
 // How far in front of the ray position can the depth of an occluding pixel be
