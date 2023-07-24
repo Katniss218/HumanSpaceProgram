@@ -366,8 +366,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4298a5610bd9d94f869f4cf69e24435, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mat: {fileID: 2100000, guid: 36ee735b35af6d547b69f8843c690673, type: 2}
   atmosphereShader: {fileID: 4800000, guid: 2ae1634ae2ad45844b4e5a0087a6833b, type: 3}
+  _mat: {fileID: 257589125}
 --- !u!20 &244583699
 Camera:
   m_ObjectHideFlags: 0
@@ -411,6 +411,47 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!21 &257589125
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Hidden/Atmosphere
+  m_Shader: {fileID: 4800000, guid: 2ae1634ae2ad45844b4e5a0087a6833b, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _DensityFalloffPower: 13.7
+    - _InScatteringPointCount: 16
+    - _MaxRadius: 6500000
+    - _MinRadius: 6371000
+    - _OpticalDepthPointCount: 8
+    - _ScatteringStrength: 128
+    - _TerminatorFalloff: 32
+    m_Colors:
+    - _Center: {r: 0, g: 0, b: 0, a: 0}
+    - _ScatteringWavelengths: {r: 675, g: 530, b: 400, a: 0}
+    - _SunDirection: {r: 1, g: 0, b: 1, a: 0}
+  m_BuildTextureStacks: []
 --- !u!1 &420870234
 GameObject:
   m_ObjectHideFlags: 0
@@ -823,10 +864,10 @@ Light:
     m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
-    m_Strength: 0.5
-    m_Bias: 0.75
-    m_NormalBias: 0.125
-    m_NearPlane: 0.2
+    m_Strength: 1
+    m_Bias: 0.1
+    m_NormalBias: 0.25
+    m_NearPlane: 0.1
     m_CullingMatrixOverride:
       e00: 1
       e01: 0
@@ -1272,7 +1313,7 @@ MonoBehaviour:
     m_Bits: 2147483648
   stopNaNPropagation: 1
   finalBlitToCameraTarget: 0
-  antialiasingMode: 2
+  antialiasingMode: 3
   temporalAntialiasing:
     jitterSpread: 0.75
     sharpness: 0.25
@@ -1408,7 +1449,7 @@ MonoBehaviour:
     m_Bits: 2147483648
   stopNaNPropagation: 1
   finalBlitToCameraTarget: 0
-  antialiasingMode: 2
+  antialiasingMode: 3
   temporalAntialiasing:
     jitterSpread: 0.75
     sharpness: 0.25
