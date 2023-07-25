@@ -151,8 +151,8 @@ namespace PostEffects
 
             // Calculate the light vector in the view space.
             _material.SetVector( "_LightVector",
-                transform.InverseTransformDirection( -_light.transform.forward ) *
-                _light.shadowBias / (_sampleCount - 1.5f)
+                transform.InverseTransformDirection( -_light.transform.forward )
+               /* * _light.shadowBias / (_sampleCount - 1.5f) */
             );
 
             // Noise texture and its scale factor
