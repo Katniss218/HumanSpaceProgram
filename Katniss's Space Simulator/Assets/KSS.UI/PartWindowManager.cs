@@ -1,4 +1,4 @@
-﻿using KSS.Camera;
+﻿using KSS.Cameras;
 using KSS.Core;
 using KSS.UI.Windows;
 using System;

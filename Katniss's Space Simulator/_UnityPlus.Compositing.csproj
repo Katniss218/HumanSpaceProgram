@@ -56,16 +56,16 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\_UnityPlus.Compositing\DepthAndColorCopier.cs" />
-    <Compile Include="Assets\_UnityPlus.Compositing\SequentialCompositor.cs" />
-    <Compile Include="Assets\_UnityPlus.Compositing\DepthTextureExtractor.cs" />
-    <Compile Include="Assets\_UnityPlus.Compositing\DepthTextureApplier.cs" />
+    <Compile Include="Assets\_UnityPlus.Rendering\DepthAndColorCopier.cs" />
+    <Compile Include="Assets\_UnityPlus.Rendering\SequentialCompositor.cs" />
+    <Compile Include="Assets\_UnityPlus.Rendering\DepthTextureExtractor.cs" />
+    <Compile Include="Assets\_UnityPlus.Rendering\DepthTextureApplier.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\_UnityPlus.Compositing\CopyDepth.shader" />
-    <None Include="Assets\_UnityPlus.Compositing\CopyDepthToColor.shader" />
-    <None Include="Assets\_UnityPlus.Compositing\CopyDepthFromColor.shader" />
-    <None Include="Assets\_UnityPlus.Compositing\___UnityPlus.Compositing.asmdef" />
+    <None Include="Assets\_UnityPlus.Rendering\CopyDepth.shader" />
+    <None Include="Assets\_UnityPlus.Rendering\CopyDepthToColor.shader" />
+    <None Include="Assets\_UnityPlus.Rendering\CopyDepthFromColor.shader" />
+    <None Include="Assets\_UnityPlus.Rendering\___UnityPlus.Rendering.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
