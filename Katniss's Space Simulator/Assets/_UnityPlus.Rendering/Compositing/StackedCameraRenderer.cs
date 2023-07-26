@@ -3,34 +3,27 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace UnityPlus.Compositing
+namespace UnityPlus.Rendering.Compositing
 {
-    public class SequentialCompositor : MonoBehaviour
+    [RequireComponent( typeof( Camera ) )]
+    public class StackedCameraRenderer : MonoBehaviour
     {
-        [Serializable]
-        public struct RTEntry
-        {
-            public Camera camera;
-            public RenderTexture color;
-            public RenderTexture depth;
-        }
-
         // a list of cameras, rendering one after the other.
         // each next camera uses the last written depth.
         // at the end, write to the screen.
 
 
         [field: SerializeField]
-        public List<RTEntry> Entries { get; set; } = null;
+        public StackedCameraRenderer Next { get; set; }
 
-        [field: SerializeField]
-        public Shader CopyShader { get; set; }
+        Shader _shader;
+        Material _material;
 
-        Material _copyMaterial;
+
 
         void Awake()
         {
-            
+            _shader = Shader.Find( "Hidden/CopyDepth" );
         }
 
         void Start()
@@ -56,6 +49,14 @@ namespace UnityPlus.Compositing
             // But here's the problem...
             // Because it's sequential, we lose the detail rendered by the previous cameras every time we downscale, and don't gain it back when we upscale.
 
+        }
+
+        private void OnPreRender()
+        {
+            if( this.Next == null )
+            {
+                // draw to screen.
+            }
         }
     }
 }

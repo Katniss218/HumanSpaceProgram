@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace KSS.Effects.ContactShadows
+namespace UnityPlus.Rendering.ContactShadows
 {
     [RequireComponent( typeof( Camera ) )]
     public class ContactShadowsRenderer : MonoBehaviour
