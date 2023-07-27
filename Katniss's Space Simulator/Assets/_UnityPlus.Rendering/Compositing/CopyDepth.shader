@@ -101,7 +101,7 @@ Shader "Hidden/CopyDepth"
 
 				o.depth = rawDepthOut;
 				o.color = tex2D(_InputColor, i.uv);
-				o.color = fixed4(rawDepthIn, 1, 0, 0); // Use for debugging, displays the depth as yellow in the background of the front.
+				//o.color = fixed4(rawDepthIn, 1, 0, 0); // Use for debugging, displays the depth as yellow in the background of the front.
 
 				return o;
 			}

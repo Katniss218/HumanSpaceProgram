@@ -6,6 +6,7 @@ using UnityEngine.Rendering;
 
 namespace UnityPlus.Compositing
 {
+    [System.Obsolete("Use StackedCameraRenderer instead. This will be removed soon")]
     public class DepthAndColorCopier : MonoBehaviour
     {
         /// <summary>

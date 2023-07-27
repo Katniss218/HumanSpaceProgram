@@ -367,7 +367,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   atmosphereShader: {fileID: 4800000, guid: 2ae1634ae2ad45844b4e5a0087a6833b, type: 3}
-  _mat: {fileID: 257589125}
+  _mat: {fileID: 836931839}
 --- !u!20 &244583699
 Camera:
   m_ObjectHideFlags: 0
@@ -411,47 +411,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!21 &257589125
-Material:
-  serializedVersion: 8
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Hidden/Atmosphere
-  m_Shader: {fileID: 4800000, guid: 2ae1634ae2ad45844b4e5a0087a6833b, type: 3}
-  m_Parent: {fileID: 0}
-  m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
-  m_InvalidKeywords: []
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_LockedProperties: 
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Ints: []
-    m_Floats:
-    - _DensityFalloffPower: 13.7
-    - _InScatteringPointCount: 16
-    - _MaxRadius: 6500000
-    - _MinRadius: 6371000
-    - _OpticalDepthPointCount: 8
-    - _ScatteringStrength: 128
-    - _TerminatorFalloff: 32
-    m_Colors:
-    - _Center: {r: 0, g: 0, b: 0, a: 0}
-    - _ScatteringWavelengths: {r: 675, g: 530, b: 400, a: 0}
-    - _SunDirection: {r: 1, g: 0, b: 1, a: 0}
-  m_BuildTextureStacks: []
 --- !u!1 &420870234
 GameObject:
   m_ObjectHideFlags: 0
@@ -920,6 +879,47 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 225, z: 0}
+--- !u!21 &836931839
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Hidden/Atmosphere
+  m_Shader: {fileID: 4800000, guid: 2ae1634ae2ad45844b4e5a0087a6833b, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _DensityFalloffPower: 13.7
+    - _InScatteringPointCount: 16
+    - _MaxRadius: 6500000
+    - _MinRadius: 6371000
+    - _OpticalDepthPointCount: 8
+    - _ScatteringStrength: 128
+    - _TerminatorFalloff: 32
+    m_Colors:
+    - _Center: {r: 0, g: 0, b: 0, a: 0}
+    - _ScatteringWavelengths: {r: 675, g: 530, b: 400, a: 0}
+    - _SunDirection: {r: 1, g: 0, b: 1, a: 0}
+  m_BuildTextureStacks: []
 --- !u!1 &883598215
 GameObject:
   m_ObjectHideFlags: 0
@@ -949,8 +949,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1447923076}
   - {fileID: 1203930312}
+  - {fileID: 1447923076}
   - {fileID: 244583697}
   m_Father: {fileID: 1155517312}
   m_RootOrder: -1
@@ -1288,6 +1288,7 @@ GameObject:
   - component: {fileID: 1203930312}
   - component: {fileID: 1203930313}
   - component: {fileID: 1203930311}
+  - component: {fileID: 1203930314}
   m_Layer: 0
   m_Name: Far Camera
   m_TagString: Untagged
@@ -1316,9 +1317,9 @@ MonoBehaviour:
   antialiasingMode: 3
   temporalAntialiasing:
     jitterSpread: 0.75
-    sharpness: 0.25
+    sharpness: 0.15
     stationaryBlending: 0.95
-    motionBlending: 0.85
+    motionBlending: 0.25
   subpixelMorphologicalAntialiasing:
     quality: 2
   fastApproximateAntialiasing:
@@ -1413,6 +1414,19 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!114 &1203930314
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1203930310}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1e8503999691da498e3bf9aa2d33fa4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Next>k__BackingField: {fileID: 1447923078}
 --- !u!1 &1447923074
 GameObject:
   m_ObjectHideFlags: 0
@@ -1424,6 +1438,7 @@ GameObject:
   - component: {fileID: 1447923076}
   - component: {fileID: 1447923077}
   - component: {fileID: 1447923075}
+  - component: {fileID: 1447923078}
   m_Layer: 0
   m_Name: Near Camera
   m_TagString: Untagged
@@ -1452,9 +1467,9 @@ MonoBehaviour:
   antialiasingMode: 3
   temporalAntialiasing:
     jitterSpread: 0.75
-    sharpness: 0.25
+    sharpness: 0.15
     stationaryBlending: 0.95
-    motionBlending: 0.85
+    motionBlending: 0.25
   subpixelMorphologicalAntialiasing:
     quality: 2
   fastApproximateAntialiasing:
@@ -1549,6 +1564,19 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!114 &1447923078
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1447923074}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1e8503999691da498e3bf9aa2d33fa4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Next>k__BackingField: {fileID: 0}
 --- !u!1 &1558331224
 GameObject:
   m_ObjectHideFlags: 0
