@@ -38,8 +38,6 @@ namespace KSS.CelestialBodies
             _shader = Shader.Find( "Hidden/Atmosphere" );
             _material = new Material( _shader );
 
-            _rt = new RenderTexture( _camera.pixelWidth, _camera.pixelHeight, GraphicsFormat.R8G8B8A8_UNorm, GraphicsFormat.None );
-
             _cmdAtmospheres = new CommandBuffer()
             {
                 name = "Atmospheres - Render"
@@ -52,16 +50,20 @@ namespace KSS.CelestialBodies
             SceneReferenceFrameManager.OnAfterReferenceFrameSwitch += OnReferenceFrameSwitch;
         }
 
-        private void Update()
-        {
-            _camera.depthTextureMode &= ~DepthTextureMode.Depth; // NO DEPTH. this breaks (for now?).
-        }
-
         void OnDestroy()
         {
             SceneReferenceFrameManager.OnAfterReferenceFrameSwitch -= OnReferenceFrameSwitch;
+
+            if( _rt != null )
+                RenderTexture.ReleaseTemporary( _rt );
+
             _cmdAtmospheres?.Release();
             _cmdComposition?.Release();
+        }
+
+        private void Update()
+        {
+            _camera.depthTextureMode &= ~DepthTextureMode.Depth; // NO DEPTH. this breaks (for now?).
         }
 
         void OnPreRender()
@@ -79,16 +81,26 @@ namespace KSS.CelestialBodies
 
             this._camera.RemoveCommandBuffer( CameraEvent.AfterForwardOpaque, _cmdAtmospheres );
             this._camera.RemoveCommandBuffer( CameraEvent.AfterForwardOpaque, _cmdComposition );
+            this._rt = RenderTexture.GetTemporary( Screen.width, Screen.height/*_camera.pixelWidth, _camera.pixelHeight*/, 0, RenderTextureFormat.ARGB32 );
             UpdateCommandBuffers();
             this._camera.AddCommandBuffer( CameraEvent.AfterForwardOpaque, _cmdAtmospheres );
             this._camera.AddCommandBuffer( CameraEvent.AfterForwardOpaque, _cmdComposition );
         }
 
+        void OnPostRender()
+        {
+            // if doesn't work, move to the front of onprecull. Here it should allow others to reuse these textures.
+            if( _rt != null )
+            {
+                RenderTexture.ReleaseTemporary( _rt );
+                _rt = null;
+            }
+        }
+
         private void UpdateCommandBuffers()
         {
             _cmdAtmospheres.Clear();
-            _cmdAtmospheres.SetGlobalTexture( Shader.PropertyToID( "_texgsfs" ), BuiltinRenderTextureType.CurrentActive );
-            _cmdAtmospheres.SetGlobalTexture( Shader.PropertyToID( "_CameraDepthTexture" ), BuiltinRenderTextureType.Depth );
+            _cmdAtmospheres.SetGlobalTexture( Shader.PropertyToID( "_texgsfs" ), BuiltinRenderTextureType.CurrentActive ); // `_Texture` gets overriden by something else... Unity... >:{
             _cmdAtmospheres.SetRenderTarget( _rt );
             _cmdAtmospheres.Blit( null, _rt, _material, 0 );
 

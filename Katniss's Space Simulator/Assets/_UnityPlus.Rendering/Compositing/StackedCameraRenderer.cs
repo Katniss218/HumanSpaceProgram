@@ -45,8 +45,10 @@ namespace UnityPlus.Rendering.Compositing
                 Destroy( _material );
             }
 
-            this._colorRT?.Release();
-            this._depthRT?.Release();
+            if( _colorRT != null )
+                RenderTexture.ReleaseTemporary( _colorRT );
+            if( _depthRT != null )
+                RenderTexture.ReleaseTemporary( _depthRT );
             this._cmdCopy?.Release();
         }
 
