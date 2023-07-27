@@ -3,7 +3,7 @@ Shader "Hidden/Atmosphere"
 {
 	Properties
 	{
-		_MainTex("Texture", 2D) = "white" {}
+		_Texture("Texture", 2D) = "white" {}
 		_Center("Center", Vector) = (0, 0, 0)
 		_SunDirection("SunDirection", Vector) = (0, 0, 0)
 			// _ScatteringCoefficients("ScatteringCoefficients", Vector) = (0.213244481466, 0.648883128925, 1.36602691073) // 700, 530, 440, mul 2
@@ -32,7 +32,7 @@ Shader "Hidden/Atmosphere"
 				#include "UnityCG.cginc"
 				#include "../../CelestialBodies/AtmosphereRes/Math.cginc"
 
-				sampler2D _MainTex;
+				sampler2D _texgsfs;
 				sampler2D _CameraDepthTexture;
 				float3 _Center;
 				float3 _SunDirection;
@@ -171,7 +171,7 @@ Shader "Hidden/Atmosphere"
 
 					if (toAtmosphere == maxFloat)
 					{
-						fixed4 col = tex2D(_MainTex, i.uv);
+						fixed4 col = tex2D(_texgsfs, i.uv);
 						return col;
 					}
 					return inAtmosphere / (_MaxRadius * 2);
@@ -200,7 +200,7 @@ Shader "Hidden/Atmosphere"
 					// hacky way for now so I can change wavelengths directly in the editor.
 					_ScatteringCoefficients = ((400 / _ScatteringWavelengths) * (400 / _ScatteringWavelengths) * (400 / _ScatteringWavelengths) * (400 / _ScatteringWavelengths)) * _ScatteringStrength;
 
-					fixed4 col = tex2D(_MainTex, i.uv);
+					fixed4 col = tex2D(_texgsfs, i.uv);
 
 					// if ray in atmosphere
 					if (inAtmosphere > 0) // important.

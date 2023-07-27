@@ -55,8 +55,10 @@ namespace UnityPlus.Rendering.ContactShadows
         void Awake()
         {
             _camera = this.GetComponent<Camera>();
+
             _shader = Shader.Find( "Hidden/ContactShadows" );
             _material = new Material( _shader );
+
             _cmdShadows = new CommandBuffer()
             {
                 name = "Contact Shadows - Render"
@@ -84,7 +86,7 @@ namespace UnityPlus.Rendering.ContactShadows
             _cmdComposition?.Release();
         }
 
-        private void Update()
+        void Update()
         {
             _camera.depthTextureMode |= DepthTextureMode.Depth; // required.
         }
@@ -101,6 +103,8 @@ namespace UnityPlus.Rendering.ContactShadows
             {
                 return;
             }
+
+            _shadowRT = RenderTexture.GetTemporary( _camera.pixelWidth, _camera.pixelHeight, 0, RenderTextureFormat.R8 );
 
             _material.SetVector( Shader.PropertyToID( "_LightDir" ), this.transform.InverseTransformDirection( -this._light.transform.forward ) );
 
@@ -130,14 +134,8 @@ namespace UnityPlus.Rendering.ContactShadows
         void UpdateRenderCommandBuffer()
         {
             _cmdShadows.Clear();
-
-            _shadowRT = RenderTexture.GetTemporary( _camera.pixelWidth, _camera.pixelHeight, 0, RenderTextureFormat.R8 );
-
             _cmdShadows.SetGlobalTexture( Shader.PropertyToID( "_ShadowMask" ), BuiltinRenderTextureType.CurrentActive ); // shadow mask?
             _cmdShadows.SetRenderTarget( _shadowRT );
-
-            // this uses the vertex shader to draw the verts.
-            //cmd.DrawProcedural(Matrix4x4.identity, _material, 0, MeshTopology.Triangles, 3); // replace with Blit?
             _cmdShadows.Blit( null, _shadowRT, _material, 0 );
         }
 
