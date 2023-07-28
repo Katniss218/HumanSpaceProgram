@@ -60,15 +60,16 @@ Shader "Hidden/ContactShadows"
 				if (mask < 0.01)
 					return mask; // if already in shadow, return that.
 
-				float3 lightdir = ViewSpaceToClipSpace(_LightDir * _RayLength); // original _LightDir is in view space (aligned with camera, meter units).
+				float3 lightDirUV = ViewSpaceToClipSpace(_LightDir * _RayLength); // original _LightDir is in view space (aligned with camera, meter units).
 
 				float depth = LinearEyeDepth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, uv)); // depth value is in view space.
 
-				float2 uvStep = lightdir.xy / _SampleCount;
-				float depthStep = (_LightDir.z * _RayLength) / _SampleCount; // So this is also in view space.
+				float2 uvStep = lightDirUV.xy / _SampleCount;
+				float depthChangeRayTotal = _LightDir.z * _RayLength; // total depth change from the start to the end of the ray (ray is in view space already, so we take the component pointing towards the screen).
+				float depthStep = depthChangeRayTotal / _SampleCount; // So this is also in view space.
 				UNITY_LOOP for (int i = 0; i < _SampleCount; i++)
 				{
-					float depth2 = LinearEyeDepth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, uv + (uvStep * i))) - depthStep * i; // subtract the depth good.
+					float depth2 = LinearEyeDepth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, uv + (uvStep * i))) - (depthStep * i);
 
 					// there's still something wrong here, it makes too much stuff dark.
 
