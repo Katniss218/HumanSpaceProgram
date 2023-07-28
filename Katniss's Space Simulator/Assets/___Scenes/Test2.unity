@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 270790818}
   - component: {fileID: 270790819}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: CameraGO
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -147,7 +147,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 270790817}
-  m_LocalRotation: {x: 0, y: -0.80177563, z: 0, w: 0.5976252}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -155,7 +155,7 @@ Transform:
   - {fileID: 1231186022}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: -106.6, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &270790819
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -173,6 +173,38 @@ MonoBehaviour:
   blendDistance: 0
   weight: 1
   priority: 0
+--- !u!1 &304444761
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 304444762}
+  m_Layer: 0
+  m_Name: LightGO
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &304444762
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 304444761}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1495969647}
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!1001 &329032114
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -342,10 +374,10 @@ MonoBehaviour:
   finalBlitToCameraTarget: 0
   antialiasingMode: 3
   temporalAntialiasing:
-    jitterSpread: 0.75
+    jitterSpread: 0.65
     sharpness: 0
-    stationaryBlending: 0.95
-    motionBlending: 0.85
+    stationaryBlending: 0.99
+    motionBlending: 0.15
   subpixelMorphologicalAntialiasing:
     quality: 2
   fastApproximateAntialiasing:
@@ -396,10 +428,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _light: {fileID: 1495969646}
   <ShadowDistance>k__BackingField: 500
-  <Thickness>k__BackingField: 0.5
-  <RayLength>k__BackingField: 1
-  <Bias>k__BackingField: 0.04
-  <SampleCount>k__BackingField: 10
+  <Thickness>k__BackingField: 10
+  <RayLength>k__BackingField: 0.25
+  <Bias>k__BackingField: 0
+  <SampleCount>k__BackingField: 32
   _shadowRT: {fileID: 0}
   _shader: {fileID: 0}
   _material: {fileID: 0}
@@ -489,11 +521,11 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1495969645}
-  m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
-  m_LocalPosition: {x: 0, y: 3, z: 0}
+  m_LocalRotation: {x: 0.2588191, y: -0, z: -0, w: 0.9659258}
+  m_LocalPosition: {x: 0, y: 9.9, z: -17.15}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+  m_Father: {fileID: 304444762}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 30, y: 0, z: 0}

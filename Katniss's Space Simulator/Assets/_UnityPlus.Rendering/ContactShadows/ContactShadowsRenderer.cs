@@ -27,15 +27,19 @@ namespace UnityPlus.Rendering.ContactShadows
         public float ShadowDistance { get; set; } = 500;
 
         [field: SerializeField]
+        [field: Range( 0, 10 )]
         public float Thickness { get; set; } = 0.3f; // Treats all screen space objects as this thick.
 
         [field: SerializeField]
+        [field: Range( 0, 5 )]
         public float RayLength { get; set; } = 1f; // Maximum distance that a ray can travel.
 
         [field: SerializeField]
+        [field: Range( 0, 2 )]
         public float Bias { get; set; } = 0.04f; // Subtract this much from the pixel's depth (linear, meters).
 
         [field: SerializeField]
+        [field: Range( 0, 128 )]
         public int SampleCount { get; set; } = 10; // Number of samples per ray.
 
         Camera _camera;

@@ -7,7 +7,85 @@ Shader "Hidden/ContactShadows"
 	SubShader
 	{
 		Cull Off ZWrite Off ZTest Always
+		
+		Pass
+		{
+			// adapted from https://github.com/keijiro/ContactShadows
 
+			HLSLPROGRAM
+			#pragma vertex vert
+			#pragma fragment frag
+
+			#include "UnityCG.cginc"
+
+			sampler2D _ShadowMask;
+			sampler2D _CameraDepthTexture;
+			float3 _LightDir;
+			float _ShadowStrength;
+			float _ShadowDistance;
+			float _RayLength;
+			float _Thickness;
+			float _Bias;
+			int _SampleCount;
+
+			struct appdata
+			{
+				float4 vertex : POSITION;
+				float2 uv : TEXCOORD0;
+			};
+
+			struct v2f
+			{
+				float2 uv : TEXCOORD0;
+				float4 vertex : SV_POSITION;
+			};
+
+			v2f vert(appdata v)
+			{
+				v2f o;
+				o.vertex = UnityObjectToClipPos(v.vertex);
+				o.uv = v.uv;
+				return o;
+			}
+
+			float3 ViewSpaceToClipSpace(float3 vp)
+			{
+				float4 clipPos = mul(unity_CameraProjection, float4(vp.xy, -vp.z, 1));
+				return clipPos.xyz;
+			}
+
+			float CalculateShadows(float2 uv)
+			{
+				float mask = tex2D(_ShadowMask, uv).r;
+				if (mask < 0.01)
+					return mask; // if already in shadow, return that.
+
+				float3 lightdir = ViewSpaceToClipSpace(_LightDir * _RayLength);
+
+				float depth = LinearEyeDepth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, uv));
+
+				float2 uvStep = lightdir.xy / _SampleCount;
+				float depthStep = (_LightDir.z * _RayLength) / _SampleCount;
+				UNITY_LOOP for (int i = 0; i < _SampleCount; i++)
+				{
+					float depth2 = LinearEyeDepth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, uv + (uvStep * i))) - depthStep * i; // subtract the depth good.
+
+					// there's still something wrong here, it makes too much stuff dark.
+
+					float diff = depth - depth2;
+					if (diff > _Bias && diff < _Thickness)
+						return 0;
+				}
+				return 1;
+			}
+
+			fixed4 frag(v2f i) : SV_Target
+			{
+				return CalculateShadows(i.uv);
+			}
+
+			ENDHLSL
+		}
 		Pass
 		{
 			// adapted from https://github.com/keijiro/ContactShadows
