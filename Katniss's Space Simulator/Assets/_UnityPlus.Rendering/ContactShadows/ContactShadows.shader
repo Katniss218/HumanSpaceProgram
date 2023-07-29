@@ -48,9 +48,9 @@ Shader "Hidden/ContactShadows"
 				return o;
 			}
 
-			float3 ViewSpaceToClipSpace(float3 vp)
+			float3 ViewSpaceToClipSpace(float3 viewPos)
 			{
-				float4 clipPos = mul(unity_CameraProjection, float4(vp.xy, -vp.z, 1));
+				float4 clipPos = mul(unity_CameraProjection, float4(viewPos, 1));
 				return clipPos.xyz;
 			}
 
@@ -60,24 +60,29 @@ Shader "Hidden/ContactShadows"
 				if (mask < 0.01)
 					return mask; // if already in shadow, return that.
 
-				float3 lightDirUV = ViewSpaceToClipSpace(_LightDir * _RayLength); // original _LightDir is in view space (aligned with camera, meter units).
-
 				float depth = LinearEyeDepth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, uv)); // depth value is in view space.
 
-				float2 uvStep = lightDirUV.xy / _SampleCount;
-				float depthChangeRayTotal = _LightDir.z * _RayLength; // total depth change from the start to the end of the ray (ray is in view space already, so we take the component pointing towards the screen).
+				if (depth > _ShadowDistance)
+					return mask; // Background.
+
+				float2 lightDirUV = ViewSpaceToClipSpace(_LightDir * _RayLength).xy; // original _LightDir is in view space (aligned with camera, meter units).
+				float2 uvStep = lightDirUV / _SampleCount;
+
+				// invert light dir depth since Z+ points into the screen in view space.
+				float depthChangeRayTotal = -_LightDir.z * _RayLength; // total depth change from the start to the end of the ray (ray is in view space already, so we take the component pointing towards the screen).
 				float depthStep = depthChangeRayTotal / _SampleCount; // So this is also in view space.
+				
 				UNITY_LOOP for (int i = 0; i < _SampleCount; i++)
 				{
-					float depth2 = LinearEyeDepth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, uv + (uvStep * i))) - (depthStep * i);
+					float depth2 = LinearEyeDepth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, uv + (uvStep * i))) + (depthStep * i);
 
 					// there's still something wrong here, it makes too much stuff dark.
 
 					float diff = depth - depth2;
 					if (diff > _Bias && diff < _Thickness) // depth2 can't be too close to, or too much in front of depth.
-						return 0;
+						return 1 - _ShadowStrength;
 				}
-				return 1;
+				return mask;
 			}
 
 			fixed4 frag(v2f i) : SV_Target
