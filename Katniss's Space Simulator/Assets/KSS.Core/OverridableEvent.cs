@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UnityPlus.StaticEvents;
+using UnityPlus.OverridableEvents;
 
 namespace KSS.Core
 {
-    public static class StaticEvent
+    public static class OverridableEvent
     {
         public static OverridableEventManager Instance { get; private set; } = new OverridableEventManager();
 

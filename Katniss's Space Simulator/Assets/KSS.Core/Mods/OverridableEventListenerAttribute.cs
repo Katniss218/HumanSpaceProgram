@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityPlus.StaticEvents;
+using UnityPlus.OverridableEvents;
 
 namespace KSS.Core.Mods
 {
@@ -50,8 +50,8 @@ namespace KSS.Core.Mods
 
             Action<object> methodDelegate = (Action<object>)Delegate.CreateDelegate( typeof( Action<object> ), method );
 
-            StaticEvent.Instance.TryCreate( attr.EventID );
-            StaticEvent.Instance.TryAddListener( attr.EventID, new OverridableEventListener<Action<object>>() { id = attr.ID, blacklist = attr.Blacklist, func = methodDelegate } );
+            OverridableEvent.Instance.TryCreate( attr.EventID );
+            OverridableEvent.Instance.TryAddListener( attr.EventID, new OverridableEventListener<Action<object>>() { id = attr.ID, blacklist = attr.Blacklist, func = methodDelegate } );
         }
 
         /// <summary>

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace UnityPlus.StaticEvents
+namespace UnityPlus.OverridableEvents
 {
     /// <summary>
     /// Manages overridable game events.

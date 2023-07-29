@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace UnityPlus.StaticEvents
+namespace UnityPlus.OverridableEvents
 {
     /// <summary>
     /// Represents an event which listeners can block other listeners from being fired.

@@ -1,6 +1,6 @@
 using System;
 
-namespace UnityPlus.StaticEvents
+namespace UnityPlus.OverridableEvents
 {
     /// <summary>
     /// Represents a generic event listener that can block other listeners from executing.

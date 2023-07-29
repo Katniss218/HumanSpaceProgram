@@ -18,7 +18,7 @@ namespace KSS.Core
 
             OverridableEventListenerAttribute.CreateEventsForAutorunningMethods( AppDomain.CurrentDomain.GetAssemblies() );
 
-            StaticEvent.Instance.TryInvoke( StaticEvent.STARTUP_IMMEDIATELY );
+            OverridableEvent.Instance.TryInvoke( OverridableEvent.STARTUP_IMMEDIATELY );
         }
 
         void Start()

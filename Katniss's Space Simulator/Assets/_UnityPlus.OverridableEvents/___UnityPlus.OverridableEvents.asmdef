@@ -1,5 +1,5 @@
 {
-    "name": "_UnityPlus.StaticEvents",
+    "name": "_UnityPlus.OverridableEvents",
     "rootNamespace": "",
     "references": [],
     "includePlatforms": [],

@@ -8,7 +8,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <ProjectGuid>{C615911B-EF2A-D5E1-1CFB-5D278FA273D2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -70,7 +71,7 @@
     <Compile Include="Assets\KSS.Core\VesselManager.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\IResourceProducer.cs" />
     <Compile Include="Assets\KSS.Core\VesselStateUtils.cs" />
-    <Compile Include="Assets\KSS.Core\StaticEvent.cs" />
+    <Compile Include="Assets\KSS.Core\OverridableEvent.cs" />
     <Compile Include="Assets\KSS.Core\Physics\PhysicsObject.cs" />
     <Compile Include="Assets\KSS.Core\PartFactory.cs" />
     <Compile Include="Assets\KSS.Core\Part.Serialization.cs" />
@@ -771,9 +772,9 @@
       <Project>{53A4B44D-C587-1ED0-C944-834EA89508FD}</Project>
       <Name>_UnityPlus.Serialization</Name>
     </ProjectReference>
-    <ProjectReference Include="_UnityPlus.StaticEvents.csproj">
-      <Project>{379A262A-69B2-FA05-9D5F-7E70A994B21D}</Project>
-      <Name>_UnityPlus.StaticEvents</Name>
+    <ProjectReference Include="_UnityPlus.OverridableEvents.csproj">
+      <Project>{D26EF55E-D30C-518A-2340-C096B47A9C02}</Project>
+      <Name>_UnityPlus.OverridableEvents</Name>
     </ProjectReference>
     <ProjectReference Include="_UnityPlus.UILib.csproj">
       <Project>{50861573-23A3-BCBD-DFDB-2A1CFB929A2F}</Project>

@@ -18,7 +18,7 @@ namespace KSS.Core
 
         void Awake()
         {
-            StaticEvent.Instance.TryInvoke( StaticEvent.STARTUP_MAINMENU, (_mainMenuCanvas, _style) );
+            OverridableEvent.Instance.TryInvoke( OverridableEvent.STARTUP_MAINMENU, (_mainMenuCanvas, _style) );
         }
     }
 }

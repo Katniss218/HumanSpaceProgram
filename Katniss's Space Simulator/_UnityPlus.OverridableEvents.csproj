@@ -9,10 +9,10 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{379A262A-69B2-FA05-9D5F-7E70A994B21D}</ProjectGuid>
+    <ProjectGuid>{D26EF55E-D30C-518A-2340-C096B47A9C02}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <AssemblyName>_UnityPlus.StaticEvents</AssemblyName>
+    <AssemblyName>_UnityPlus.OverridableEvents</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <BaseDirectory>.</BaseDirectory>
