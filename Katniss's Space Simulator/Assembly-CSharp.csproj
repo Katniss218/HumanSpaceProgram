@@ -56,16 +56,20 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\_Scenes\DepthBufferCopier.cs" />
+    <Compile Include="Assets\ScreenSpaceShadows\Scripts\NoiseTextureSet.cs" />
+    <Compile Include="Assets\ScreenSpaceShadows\ContactShadows.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro.cginc" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
+    <None Include="Assets\ScreenSpaceShadows\Shaders\Raytrace.cginc" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_Bitmap.shader" />
+    <None Include="Assets\ScreenSpaceShadows\Shaders\Common.cginc" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro_Mobile.cginc" />
-    <None Include="Assets\_Scenes\CopyShader.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF SSD.shader" />
+    <None Include="Assets\ScreenSpaceShadows\Shaders\ContactShadows.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Surface-Mobile.shader" />
+    <None Include="Assets\ScreenSpaceShadows\Shaders\TempFilter.cginc" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Surface.shader" />
     <None Include="Assets\_TextMesh Pro\Sprites\EmojiOne Attribution.txt" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_Bitmap-Custom-Atlas.shader" />
@@ -75,6 +79,7 @@
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro_Properties.cginc" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro_Surface.cginc" />
     <None Include="Assets\_TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
+    <None Include="Assets\ScreenSpaceShadows\Shaders\Composite.cginc" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Mobile Masking.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF Overlay.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_Bitmap-Mobile.shader" />
@@ -796,6 +801,10 @@
     <ProjectReference Include="_UnityPlus.Serialization.csproj">
       <Project>{53A4B44D-C587-1ED0-C944-834EA89508FD}</Project>
       <Name>_UnityPlus.Serialization</Name>
+    </ProjectReference>
+    <ProjectReference Include="_UnityPlus.Rendering.csproj">
+      <Project>{B125B7BC-A321-D392-2929-42AA482B2263}</Project>
+      <Name>_UnityPlus.Rendering</Name>
     </ProjectReference>
     <ProjectReference Include="KSS.UI.csproj">
       <Project>{43C42401-C6C3-28EB-5BC7-32F0B5CC16C2}</Project>

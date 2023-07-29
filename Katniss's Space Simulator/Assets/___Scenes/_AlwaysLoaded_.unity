@@ -1,0 +1,1026 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!29 &1
+OcclusionCullingSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_OcclusionBakeSettings:
+    smallestOccluder: 5
+    smallestHole: 0.25
+    backfaceThreshold: 100
+  m_SceneGUID: 00000000000000000000000000000000
+  m_OcclusionCullingData: {fileID: 0}
+--- !u!104 &2
+RenderSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 9
+  m_Fog: 0
+  m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  m_FogMode: 3
+  m_FogDensity: 0.01
+  m_LinearFogStart: 0
+  m_LinearFogEnd: 300
+  m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
+  m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
+  m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
+  m_AmbientIntensity: 1
+  m_AmbientMode: 0
+  m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
+  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_HaloStrength: 0.5
+  m_FlareStrength: 1
+  m_FlareFadeSpeed: 3
+  m_HaloTexture: {fileID: 0}
+  m_SpotCookie: {fileID: 10001, guid: 0000000000000000e000000000000000, type: 0}
+  m_DefaultReflectionMode: 0
+  m_DefaultReflectionResolution: 128
+  m_ReflectionBounces: 1
+  m_ReflectionIntensity: 1
+  m_CustomReflection: {fileID: 0}
+  m_Sun: {fileID: 0}
+  m_IndirectSpecularColor: {r: 0.12731749, g: 0.13414757, b: 0.1210787, a: 1}
+  m_UseRadianceAmbientProbe: 0
+--- !u!157 &3
+LightmapSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 12
+  m_GIWorkflowMode: 1
+  m_GISettings:
+    serializedVersion: 2
+    m_BounceScale: 1
+    m_IndirectOutputScale: 1
+    m_AlbedoBoost: 1
+    m_EnvironmentLightingMode: 0
+    m_EnableBakedLightmaps: 1
+    m_EnableRealtimeLightmaps: 0
+  m_LightmapEditorSettings:
+    serializedVersion: 12
+    m_Resolution: 2
+    m_BakeResolution: 40
+    m_AtlasSize: 1024
+    m_AO: 0
+    m_AOMaxDistance: 1
+    m_CompAOExponent: 1
+    m_CompAOExponentDirect: 0
+    m_ExtractAmbientOcclusion: 0
+    m_Padding: 2
+    m_LightmapParameters: {fileID: 0}
+    m_LightmapsBakeMode: 1
+    m_TextureCompression: 1
+    m_FinalGather: 0
+    m_FinalGatherFiltering: 1
+    m_FinalGatherRayCount: 256
+    m_ReflectionCompression: 2
+    m_MixedBakeMode: 2
+    m_BakeBackend: 1
+    m_PVRSampling: 1
+    m_PVRDirectSampleCount: 32
+    m_PVRSampleCount: 512
+    m_PVRBounces: 2
+    m_PVREnvironmentSampleCount: 256
+    m_PVREnvironmentReferencePointCount: 2048
+    m_PVRFilteringMode: 1
+    m_PVRDenoiserTypeDirect: 1
+    m_PVRDenoiserTypeIndirect: 1
+    m_PVRDenoiserTypeAO: 1
+    m_PVRFilterTypeDirect: 0
+    m_PVRFilterTypeIndirect: 0
+    m_PVRFilterTypeAO: 0
+    m_PVREnvironmentMIS: 1
+    m_PVRCulling: 1
+    m_PVRFilteringGaussRadiusDirect: 1
+    m_PVRFilteringGaussRadiusIndirect: 5
+    m_PVRFilteringGaussRadiusAO: 2
+    m_PVRFilteringAtrousPositionSigmaDirect: 0.5
+    m_PVRFilteringAtrousPositionSigmaIndirect: 2
+    m_PVRFilteringAtrousPositionSigmaAO: 1
+    m_ExportTrainingData: 0
+    m_TrainingDataDestination: TrainingData
+    m_LightProbeSampleCountMultiplier: 4
+  m_LightingDataAsset: {fileID: 0}
+  m_LightingSettings: {fileID: 0}
+--- !u!196 &4
+NavMeshSettings:
+  serializedVersion: 2
+  m_ObjectHideFlags: 0
+  m_BuildSettings:
+    serializedVersion: 2
+    agentTypeID: 0
+    agentRadius: 0.5
+    agentHeight: 2
+    agentSlope: 45
+    agentClimb: 0.4
+    ledgeDropHeight: 0
+    maxJumpAcrossDistance: 0
+    minRegionArea: 2
+    manualCellSize: 0
+    cellSize: 0.16666667
+    manualTileSize: 0
+    tileSize: 256
+    accuratePlacement: 0
+    maxJobWorkers: 0
+    preserveTilesOutsideBounds: 0
+    debug:
+      m_Flags: 0
+  m_NavMeshData: {fileID: 0}
+--- !u!1 &637743640
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 637743642}
+  - component: {fileID: 637743641}
+  m_Layer: 31
+  m_Name: PPP
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &637743641
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 637743640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b9a305e18de0c04dbd257a21cd47087, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sharedProfile: {fileID: 11400000, guid: ff73d90665a086142b2905f01db7174a, type: 2}
+  isGlobal: 1
+  blendDistance: 0
+  weight: 1
+  priority: 0
+--- !u!4 &637743642
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 637743640}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &911430593
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 911430596}
+  - component: {fileID: 911430595}
+  - component: {fileID: 911430594}
+  m_Layer: 0
+  m_Name: _ DefaultAssetLoader
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &911430594
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 911430593}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfbad14e977fcbc4c8edf15ea507789d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _registerer: {fileID: 911430595}
+  _autoUpdate: 0
+  _constrainPath: Assets/
+  _assetPrefix: 'builtin::'
+--- !u!114 &911430595
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 911430593}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 616dcb8ac2fa7da4d9fe4543d53ea5e1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _assetsToRegister:
+  - assetID: builtin::GUI/Text Shader
+    asset: {fileID: 10101, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::Internal-Skinning
+    asset: {fileID: 300, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::Internal-BlendShape
+    asset: {fileID: 301, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::Internal-VT-TranslationTableReplace
+    asset: {fileID: 400, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::Internal-VT-TranslationTableUpsample
+    asset: {fileID: 401, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::Soft
+    asset: {fileID: 10001, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::Font Material
+    asset: {fileID: 10100, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::Arial
+    asset: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::Font Texture
+    asset: {fileID: 10103, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::Cube
+    asset: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::Cylinder
+    asset: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::Sphere
+    asset: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::Capsule
+    asset: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::Plane
+    asset: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::Quad
+    asset: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::Icosphere
+    asset: {fileID: 10211, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::icosahedron
+    asset: {fileID: 10212, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::pyramid
+    asset: {fileID: 10213, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::pSphere1
+    asset: {fileID: 10200, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::pCylinder1
+    asset: {fileID: 10203, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::pPlane1
+    asset: {fileID: 10204, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::polySurface2
+    asset: {fileID: 10205, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::UnityWatermark-small
+    asset: {fileID: 10400, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::EscToExit_back
+    asset: {fileID: 10401, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::EscToExit_Text
+    asset: {fileID: 10402, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::UnityWatermark-trial-big
+    asset: {fileID: 10406, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::UnityWatermark-trial
+    asset: {fileID: 10407, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::UnityWatermark-beta
+    asset: {fileID: 10408, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::UnityWatermark-edu
+    asset: {fileID: 10409, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::UnityWatermark-dev
+    asset: {fileID: 10410, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::WarningSign
+    asset: {fileID: 10411, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::UnityWatermark-proto
+    asset: {fileID: 10413, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::UnityWatermarkPlugin-beta
+    asset: {fileID: 10414, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::UnitySplash-cube
+    asset: {fileID: 10403, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::UnitySplash-cube
+    asset: {fileID: 10404, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::FrameDebuggerRenderTargetDisplay
+    asset: {fileID: 10756, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::GameSkin
+    asset: {fileID: 11000, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::box
+    asset: {fileID: 11001, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::button active
+    asset: {fileID: 11002, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::button hover
+    asset: {fileID: 11003, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::button on hover
+    asset: {fileID: 11004, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::button on
+    asset: {fileID: 11005, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::button
+    asset: {fileID: 11006, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::horizontal scrollbar thumb
+    asset: {fileID: 11007, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::horizontal scrollbar
+    asset: {fileID: 11008, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::horizontalslider
+    asset: {fileID: 11009, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::slider thumb active
+    asset: {fileID: 11010, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::slider thumb
+    asset: {fileID: 11011, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::slidert humb hover
+    asset: {fileID: 11012, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::toggle active
+    asset: {fileID: 11013, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::toggle hover
+    asset: {fileID: 11014, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::toggle on hover
+    asset: {fileID: 11015, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::toggle on
+    asset: {fileID: 11016, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::toggle on active
+    asset: {fileID: 11017, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::toggle
+    asset: {fileID: 11018, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::vertical scrollbar thumb
+    asset: {fileID: 11019, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::vertical scrollbar
+    asset: {fileID: 11020, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::verticalslider
+    asset: {fileID: 11021, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::window on
+    asset: {fileID: 11022, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::window
+    asset: {fileID: 11023, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::textfield
+    asset: {fileID: 11024, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::textfield on
+    asset: {fileID: 11025, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::textfield hover
+    asset: {fileID: 11026, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::UnitySplash-HolographicTrackingLoss
+    asset: {fileID: 15000, guid: 0000000000000000e000000000000000, type: 0}
+  - assetID: builtin::Sprites/Default
+    asset: {fileID: 10753, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::UI/Default
+    asset: {fileID: 10770, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Standard (Specular setup)
+    asset: {fileID: 45, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Standard
+    asset: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Autodesk Interactive
+    asset: {fileID: 47, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::FX/Flare
+    asset: {fileID: 101, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Skybox/Cubemap
+    asset: {fileID: 103, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Skybox/6 Sided
+    asset: {fileID: 104, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Skybox/Procedural
+    asset: {fileID: 106, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Skybox/Panoramic
+    asset: {fileID: 108, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Particles/Standard Surface
+    asset: {fileID: 210, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Particles/Standard Unlit
+    asset: {fileID: 211, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Sprites/Diffuse
+    asset: {fileID: 10800, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Nature/Terrain/Diffuse
+    asset: {fileID: 10505, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Nature/Tree Soft Occlusion Bark
+    asset: {fileID: 10509, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Nature/Tree Soft Occlusion Leaves
+    asset: {fileID: 10511, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Nature/Tree Creator Bark
+    asset: {fileID: 10600, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Nature/Tree Creator Leaves
+    asset: {fileID: 10601, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Nature/Tree Creator Leaves Fast
+    asset: {fileID: 10606, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Nature/Terrain/Specular
+    asset: {fileID: 10620, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Nature/Terrain/Standard
+    asset: {fileID: 10623, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Mobile/Skybox
+    asset: {fileID: 10700, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Mobile/VertexLit
+    asset: {fileID: 10701, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Mobile/Diffuse
+    asset: {fileID: 10703, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Mobile/Bumped Diffuse
+    asset: {fileID: 10704, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Mobile/Bumped Specular
+    asset: {fileID: 10705, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Mobile/Bumped Specular (1 Directional Realtime Light)
+    asset: {fileID: 10706, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Mobile/VertexLit (Only Directional Lights)
+    asset: {fileID: 10707, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Mobile/Unlit (Supports Lightmap)
+    asset: {fileID: 10708, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Mobile/Particles/Additive
+    asset: {fileID: 10720, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Mobile/Particles/Alpha Blended
+    asset: {fileID: 10721, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Mobile/Particles/VertexLit Blended
+    asset: {fileID: 10722, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Mobile/Particles/Multiply
+    asset: {fileID: 10723, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Unlit/Transparent
+    asset: {fileID: 10750, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Unlit/Transparent Cutout
+    asset: {fileID: 10751, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Unlit/Texture
+    asset: {fileID: 10752, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Unlit/Color
+    asset: {fileID: 10755, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Sprites/Mask
+    asset: {fileID: 10757, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::UI/Unlit/Transparent
+    asset: {fileID: 10760, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::UI/Unlit/Detail
+    asset: {fileID: 10761, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::UI/Unlit/Text
+    asset: {fileID: 10762, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::UI/Unlit/Text Detail
+    asset: {fileID: 10763, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::UI/Lit/Transparent
+    asset: {fileID: 10764, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::UI/Lit/Bumped
+    asset: {fileID: 10765, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::UI/Lit/Detail
+    asset: {fileID: 10766, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::UI/Lit/Refraction
+    asset: {fileID: 10767, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::UI/Lit/Refraction Detail
+    asset: {fileID: 10768, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::UI/Default Font
+    asset: {fileID: 10782, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::UI/DefaultETC1
+    asset: {fileID: 10783, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Nature/SpeedTree
+    asset: {fileID: 14000, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Nature/SpeedTree Billboard
+    asset: {fileID: 14001, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Nature/SpeedTree8
+    asset: {fileID: 14002, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::VR/SpatialMapping/Occlusion
+    asset: {fileID: 15300, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::VR/SpatialMapping/Wireframe
+    asset: {fileID: 15301, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Sprites-Default
+    asset: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Default-Terrain-Diffuse
+    asset: {fileID: 10650, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Default-Terrain-Specular
+    asset: {fileID: 10651, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Default-Terrain-Standard
+    asset: {fileID: 10652, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Sprites-Mask
+    asset: {fileID: 10758, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Default-Particle
+    asset: {fileID: 10300, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Default-Particle
+    asset: {fileID: 10301, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Default-Diffuse
+    asset: {fileID: 10302, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Default-Material
+    asset: {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Default-Skybox
+    asset: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Default-Checker
+    asset: {fileID: 10305, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Default-Line
+    asset: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Default-ParticleSystem
+    asset: {fileID: 10307, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Default-ParticleSystem
+    asset: {fileID: 10308, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Default-Checker-Gray
+    asset: {fileID: 10309, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Checkmark
+    asset: {fileID: 10900, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Checkmark
+    asset: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::UISprite
+    asset: {fileID: 10904, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::UISprite
+    asset: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Background
+    asset: {fileID: 10906, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Background
+    asset: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::InputFieldBackground
+    asset: {fileID: 10910, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::InputFieldBackground
+    asset: {fileID: 10911, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Knob
+    asset: {fileID: 10912, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Knob
+    asset: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::DropdownArrow
+    asset: {fileID: 10914, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::DropdownArrow
+    asset: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::UIMask
+    asset: {fileID: 10916, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::UIMask
+    asset: {fileID: 10917, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Default-HighResolution
+    asset: {fileID: 15200, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Default-LowResolution
+    asset: {fileID: 15201, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Default-VeryLowResolution
+    asset: {fileID: 15203, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Default-Medium
+    asset: {fileID: 15204, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::SpatialMappingOcclusion
+    asset: {fileID: 15302, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::SpatialMappingWireframe
+    asset: {fileID: 15303, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Resources/Sprites/ui_button_horizontal
+    asset: {fileID: 2800000, guid: 004fa9aad5df7e04bad109d135827eca, type: 3}
+  - assetID: builtin::Resources/Sprites/ui_part_window
+    asset: {fileID: 2800000, guid: 30c1eed1dbccd084594ed54b8817b6bc, type: 3}
+  - assetID: builtin::KSS.DevUtils/cube/Xp
+    asset: {fileID: 2800000, guid: 305ae7eb94909c644a2f1a85d8e03dab, type: 3}
+  - assetID: builtin::_TextMesh Pro/Shaders/TMPro
+    asset: {fileID: 10900000, guid: 407bc68d299748449bbf7f48ee690f8d, type: 3}
+  - assetID: builtin::Resources/Prefabs/Parts/part.tank
+    asset: {fileID: 1175757436153444479, guid: 90c1928201a9f4745b5556dbfcb4d2f7, type: 3}
+  - assetID: builtin::KSS.DevUtils/cube/Yn
+    asset: {fileID: 2800000, guid: 90277dd122cd8f141ada4071bccb6a6e, type: 3}
+  - assetID: builtin::_TextMesh Pro/Shaders/TMP_SDF-Mobile Overlay
+    asset: {fileID: 4800000, guid: a02a7d8c237544f1962732b55a9aebf1, type: 3}
+  - assetID: builtin::Resources/Sprites/std0/ui_percent_bar_L_fg
+    asset: {fileID: 2800000, guid: d0de82cb22c4d81479ccc54061760a9f, type: 3}
+  - assetID: builtin::Resources/Sprites/ui_seqicon_separator_vertical
+    asset: {fileID: 2800000, guid: 010002d76dc7a0e48a9a6d050e87f443, type: 3}
+  - assetID: builtin::_Scenes/GameplayScene
+    asset: {fileID: 102900000, guid: 0104d408cf7e4384dae23fbe2673980c, type: 3}
+  - assetID: builtin::Resources/Prefabs/testlaunchsite
+    asset: {fileID: 2889124796493493744, guid: 315f9171e8abb8347b411d9e90572b3c, type: 3}
+  - assetID: builtin::KSS.DevUtils/cube/Zn
+    asset: {fileID: 2800000, guid: 817733ada2fab5940bf97a27e89c538d, type: 3}
+  - assetID: builtin::Resources/Sprites/std0/ui_percent_bar_L_bg
+    asset: {fileID: 2800000, guid: 813c3b3ec38dd5449852743c0b33481c, type: 3}
+  - assetID: builtin::KSS.DevUtils/cube/Xn
+    asset: {fileID: 2800000, guid: d17090d9f818409458984d34346bcd0d, type: 3}
+  - assetID: builtin::_TextMesh Pro/Shaders/TMP_Bitmap
+    asset: {fileID: 4800000, guid: 128e987d567d4e2c824d754223b3f3b0, type: 3}
+  - assetID: builtin::Resources/Sprites/std0/ui_part_module_panel
+    asset: {fileID: 2800000, guid: 3262eb4434fc1e54eaef01a574f93f68, type: 3}
+  - assetID: builtin::Resources/Sprites/ui_bar
+    asset: {fileID: 2800000, guid: 82b082588549d3f40b568b3ea0021bdd, type: 3}
+  - assetID: builtin::Resources/Sprites/ui_button_biaxial
+    asset: {fileID: 2800000, guid: 03cee79809d597c45a34186a4ccb865e, type: 3}
+  - assetID: builtin::Resources/Sprites/ui_button_up
+    asset: {fileID: 2800000, guid: 132871611e02df84ca6f2856586f1d65, type: 3}
+  - assetID: builtin::Resources/New Material 2
+    asset: {fileID: 2100000, guid: 23d92b14f1c3e2f4e983a19b15eb7596, type: 2}
+  - assetID: builtin::Resources/Sprites/ui_speed_indicator
+    asset: {fileID: 2800000, guid: c3906aad464be3a46a5bbb1d8b194a3a, type: 3}
+  - assetID: builtin::_TextMesh Pro/Shaders/TMPro_Mobile
+    asset: {fileID: 10900000, guid: c334973cef89a9840b0b0c507e0377ab, type: 3}
+  - assetID: builtin::_TextMesh Pro/Fonts/LiberationSans
+    asset: {fileID: 12800000, guid: e3265ab4bf004d28a9537516768c1c75, type: 3}
+  - assetID: builtin::KSS/Terrain/TerrainShader
+    asset: {fileID: 4800000, guid: e3f72d5ef871243408ac05fea5ed9243, type: 3}
+  - assetID: builtin::Resources/Sprites/std0/ui_percent_bar_bg
+    asset: {fileID: 2800000, guid: f329ac740530a7640993d6c7647d30b6, type: 3}
+  - assetID: builtin::_TextMesh Pro/Shaders/TMP_SDF SSD
+    asset: {fileID: 4800000, guid: 14eb328de4b8eb245bb7cea29e4ac00b, type: 3}
+  - assetID: builtin::Resources/Sprites/nodes/m_radial_in
+    asset: {fileID: 2800000, guid: 24448dd11258ca34f8b94fb72bd83cc3, type: 3}
+  - assetID: builtin::Resources/Sprites/ui_button_x
+    asset: {fileID: 2800000, guid: 44201c46f3fcaa84488125cc4456843a, type: 3}
+  - assetID: builtin::Resources/Sprites/std0/ui_scrollbar_handle
+    asset: {fileID: 2800000, guid: 74812eb8ed9029d4a93c1a07dc22f7b0, type: 3}
+  - assetID: builtin::Resources/Sprites/ui_input
+    asset: {fileID: 2800000, guid: 84147673ec8e2cb47bd5243c36cb4394, type: 3}
+  - assetID: builtin::Resources/Sprites/std0/ui_percent_bar_R_bg
+    asset: {fileID: 2800000, guid: 94e06069a322b62489cea5cc0be1e1e1, type: 3}
+  - assetID: builtin::_TextMesh Pro/Resources/Sprite Assets/EmojiOne
+    asset: {fileID: 11400000, guid: c41005c129ba4d66911b75229fd70b45, type: 2}
+  - assetID: builtin::Resources/Sprites/nodes/m_retrograde
+    asset: {fileID: 2800000, guid: e44b747185cc2874db45086d91d2ae93, type: 3}
+  - assetID: builtin::Resources/navball
+    asset: {fileID: 2100000, guid: 35d2f520ab42c974aa2816029d77aaad, type: 2}
+  - assetID: builtin::_Scenes/MainMenu
+    asset: {fileID: 102900000, guid: 354f7f24182ca50469834dcc2098ce89, type: 3}
+  - assetID: builtin::Resources/Sprites/ui_scrollbar_handle 1
+    asset: {fileID: 2800000, guid: 756502bed87e0ef44833f473ecf93f4c, type: 3}
+  - assetID: builtin::_TextMesh Pro/Shaders/TMP_SDF-Surface-Mobile
+    asset: {fileID: 4800000, guid: 85187c2149c549c5b33f0cdb02836b17, type: 3}
+  - assetID: builtin::Resources/Sprites/ui_button_down
+    asset: {fileID: 2800000, guid: b58c6794019cfb3408fa347e4da7952e, type: 3}
+  - assetID: builtin::Resources/Prefabs/Parts/part.tank_long
+    asset: {fileID: 4352668300827386821, guid: c5dea841ccf103e429343bc85e87246b, type: 3}
+  - assetID: builtin::Resources/Sprites/ui_action_menu
+    asset: {fileID: 2800000, guid: d5bf74d19103df54fadc848051a225d0, type: 3}
+  - assetID: builtin::Resources/Sprites/ui_bar_background
+    asset: {fileID: 2800000, guid: f5a3112f207dced4fb15eee1bcb26040, type: 3}
+  - assetID: builtin::Resources/Sprites/std0/ui_percent_bar_R_fg
+    asset: {fileID: 2800000, guid: 069941aab790b5d43a2b0bb035104594, type: 3}
+  - assetID: builtin::Resources/Sprites/ui_button_list_gold
+    asset: {fileID: 2800000, guid: 162ae6dbea1fd634fbcd4cf5a986e017, type: 3}
+  - assetID: builtin::KSS.DevUtils/skybox
+    asset: {fileID: 2100000, guid: 160bf2fe69d7f344f904939601e96160, type: 2}
+  - assetID: builtin::Resources/Sprites/ui_button_down_gold
+    asset: {fileID: 2800000, guid: 163e65f48c58aa144b4a35216167e123, type: 3}
+  - assetID: builtin::Resources/Sprites/std0/ui_percent_bar_fg
+    asset: {fileID: 2800000, guid: 2606db97e3012174880af29285f3b56f, type: 3}
+  - assetID: builtin::Resources/engine
+    asset: {fileID: 919132149155446097, guid: 96227cebe98f0b4409158980bcfbd5a1, type: 3}
+  - assetID: builtin::KSS.UI/Default UI Style
+    asset: {fileID: 11400000, guid: 96240dd52f3c3e64692a0f9842e3e9dc, type: 2}
+  - assetID: builtin::Resources/Sprites/std0/ui_button_square
+    asset: {fileID: 2800000, guid: d6214bb3953756441b1a84f6286d1173, type: 3}
+  - assetID: builtin::Tests/___doc
+    asset: {fileID: 4900000, guid: d6087065e6258a6439efa8a9bf82fac6, type: 3}
+  - assetID: builtin::_Scenes/_AlwaysLoaded_
+    asset: {fileID: 102900000, guid: c7a3cb11faa75aa4caf1c4baa7da50ab, type: 3}
+  - assetID: builtin::_TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF
+      - Drop Shadow
+    asset: {fileID: 2100000, guid: e73a58f6e2794ae7b1b7e50b7fb811b0, type: 2}
+  - assetID: builtin::_TextMesh Pro/Shaders/TMP_SDF-Surface
+    asset: {fileID: 4800000, guid: f7ada0af4f174f0694ca6a487b8f543d, type: 3}
+  - assetID: builtin::KSS.DevUtils/_untitled
+    asset: {fileID: 919132149155446097, guid: 08c7c20484f02a847b27b65fc2349dce, type: 3}
+  - assetID: builtin::Resources/Sprites/ui_functionality_panel
+    asset: {fileID: 2800000, guid: 28a4aa528268eb44583f185d1ef1f4c8, type: 3}
+  - assetID: builtin::Resources/Sprites/ui_seqicon_rocket_engine
+    asset: {fileID: 2800000, guid: 38950cd7021bf214c89d029b777d7b83, type: 3}
+  - assetID: builtin::_TextMesh Pro/Sprites/EmojiOne Attribution
+    asset: {fileID: 4900000, guid: 381dcb09d5029d14897e55f98031fca5, type: 3}
+  - assetID: builtin::_TextMesh Pro/Shaders/TMP_Bitmap-Custom-Atlas
+    asset: {fileID: 4800000, guid: 48bb5f55d8670e349b6e614913f9d910, type: 3}
+  - assetID: builtin::_TextMesh Pro/Shaders/TMP_SDF
+    asset: {fileID: 4800000, guid: 68e6db2ebdc24f95958faec2be5558d6, type: 3}
+  - assetID: builtin::Resources/Sprites/std0/ui_button_square_X
+    asset: {fileID: 2800000, guid: 88453b013e52c784d8879a0721f9d739, type: 3}
+  - assetID: builtin::_TextMesh Pro/Shaders/TMP_SDF-Mobile SSD
+    asset: {fileID: 4800000, guid: c8d12adcee749c344b8117cf7c7eb912, type: 3}
+  - assetID: builtin::_TextMesh Pro/Resources/LineBreaking Leading Characters
+    asset: {fileID: 4900000, guid: d82c1b31c7e74239bff1220585707d2b, type: 3}
+  - assetID: builtin::KSS.DevUtils/Moon_NRM
+    asset: {fileID: 2800000, guid: 39f68ee7435c4ce41876eda985365625, type: 3}
+  - assetID: builtin::_TextMesh Pro/Shaders/TMPro_Properties
+    asset: {fileID: 10900000, guid: 3997e2241185407d80309a82f9148466, type: 3}
+  - assetID: builtin::Resources/Sprites/ui_seqicon_separator_horizontal
+    asset: {fileID: 2800000, guid: 49a9f2bcf014dce49a2d03cbebdd1da0, type: 3}
+  - assetID: builtin::_TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF
+      - Outline
+    asset: {fileID: 2100000, guid: 79459efec17a4d00a321bdcc27bbc385, type: 2}
+  - assetID: builtin::_TextMesh Pro/Shaders/TMPro_Surface
+    asset: {fileID: 10900000, guid: d930090c0cd643c7b55f19a38538c162, type: 3}
+  - assetID: builtin::_TextMesh Pro/Resources/Style Sheets/Default Style Sheet
+    asset: {fileID: 11400000, guid: f952c082cb03451daed3ee968ac6c63e, type: 2}
+  - assetID: builtin::Resources/Sprites/std0/ui_sequencer_item
+    asset: {fileID: 2800000, guid: 1a42060aa0081994c83857d0dbf0d8bb, type: 3}
+  - assetID: builtin::Resources/Sprites/ui_button_minus
+    asset: {fileID: 2800000, guid: 4aa49280941c5524b8e8c86431569a4b, type: 3}
+  - assetID: builtin::Resources/Sprites/ui_button_plus
+    asset: {fileID: 2800000, guid: 5a42ef63da71e644092d6117af9cc766, type: 3}
+  - assetID: builtin::Resources/Sprites/ui_button_x_gold
+    asset: {fileID: 2800000, guid: ba7b9b3e2ab14ba44ab7744ee7792f21, type: 3}
+  - assetID: builtin::Resources/navball_tex
+    asset: {fileID: 2800000, guid: ea77c6bbb32de2546821543872b8968a, type: 3}
+  - assetID: builtin::_TextMesh Pro/Resources/LineBreaking Following Characters
+    asset: {fileID: 4900000, guid: fade42e8bc714b018fac513c043d323b, type: 3}
+  - assetID: builtin::Resources/navball
+    asset: {fileID: 919132149155446097, guid: 7bfe53ce724a8434a99c01a022e60e33, type: 3}
+  - assetID: builtin::Resources/Prefabs/Parts/part.intertank
+    asset: {fileID: 6352053399650574342, guid: 7b4f3db04e45017419dd70eb8c043cae, type: 3}
+  - assetID: builtin::Resources/Prefabs/Parts/part.engine
+    asset: {fileID: 1364953004931670300, guid: 8bea1bbd189d59f49affc43660b4bdf3, type: 3}
+  - assetID: builtin::Resources/Sprites/nodes/m_normal
+    asset: {fileID: 2800000, guid: db8e0f4eb49cd78479eac1492d80f4b8, type: 3}
+  - assetID: builtin::Resources/1mil_sphere
+    asset: {fileID: 919132149155446097, guid: 0cccc6ea3eaab75469e0c61245c20874, type: 3}
+  - assetID: builtin::Resources/Sprites/ui_button_vertical
+    asset: {fileID: 2800000, guid: 2c965aa7e8ba0a94a96b12b5163c22e6, type: 3}
+  - assetID: builtin::_Scenes/UI Prototyping
+    asset: {fileID: 102900000, guid: 3ce3257fcb4019144a2d08a849ea10bd, type: 3}
+  - assetID: builtin::Resources/Sprites/ui_button_list
+    asset: {fileID: 2800000, guid: 6ca76087579315445add0a2333ee1986, type: 3}
+  - assetID: builtin::Resources/Sprites/ui_button_x_large
+    asset: {fileID: 2800000, guid: 7c480b13426bf7e4a988e3e7150cfe8f, type: 3}
+  - assetID: builtin::Resources/Sprites/ui_sequencer_element
+    asset: {fileID: 2800000, guid: 8ce16ffe586c9774ba38ecdd86dc5996, type: 3}
+  - assetID: builtin::Resources/Sprites/nodes/m_prograde
+    asset: {fileID: 2800000, guid: 8ce61a6ed15160e499b0fe1266a4ffa4, type: 3}
+  - assetID: builtin::_TextMesh Pro/Shaders/TMP_SDF-Mobile Masking
+    asset: {fileID: 4800000, guid: bc1ede39bf3643ee8e493720e4259791, type: 3}
+  - assetID: builtin::Resources/Sprites/std0/ui_part_window_background
+    asset: {fileID: 2800000, guid: 0d0a0c1f1ce27594da9118ec38f781bb, type: 3}
+  - assetID: builtin::Resources/Sprites/ui_button
+    asset: {fileID: 2800000, guid: 4d0232bbefabf9a4aaa5bf74d24f105e, type: 3}
+  - assetID: builtin::KSS.DevUtils/ComputeNormalMap
+    asset: {fileID: 7200000, guid: 4d84a3051c8260143acab627c99eddb3, type: 3}
+  - assetID: builtin::Resources/New Material 1
+    asset: {fileID: 2100000, guid: 5d5eb27ce3d34fc4895579332f962090, type: 2}
+  - assetID: builtin::Resources/tank_long
+    asset: {fileID: 919132149155446097, guid: 9d5e81916336ac74e97b9db47fd00789, type: 3}
+  - assetID: builtin::Resources/Sprites/nodes/m_antinormal
+    asset: {fileID: 2800000, guid: bd2f82d882e296d4696e972329c0ea3a, type: 3}
+  - assetID: builtin::KSS.DevUtils/MoonColor
+    asset: {fileID: 2800000, guid: cdde2fc7eeb3a214f9d38dd56cfb5470, type: 3}
+  - assetID: builtin::_TextMesh Pro/Shaders/TMP_SDF Overlay
+    asset: {fileID: 4800000, guid: dd89cf5b9246416f84610a006f916af7, type: 3}
+  - assetID: builtin::Resources/navball_RT
+    asset: {fileID: 8400000, guid: dd5f8e490fc8a7d44a864be66c800b89, type: 2}
+  - assetID: builtin::KSS.DevUtils/cube/Zp
+    asset: {fileID: 2800000, guid: fd3d8acf88cd7b74ea2a0753768ce440, type: 3}
+  - assetID: builtin::_TextMesh Pro/Shaders/TMP_Bitmap-Mobile
+    asset: {fileID: 4800000, guid: 1e3b057af24249748ff873be7fafee47, type: 3}
+  - assetID: builtin::_TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF
+      - Fallback
+    asset: {fileID: 11400000, guid: 2e498d1c8094910479dc3e1b768306a4, type: 2}
+  - assetID: builtin::Resources/Sprites/ui_button_up_gold
+    asset: {fileID: 2800000, guid: 6e732583f0e58d44b94a96b1d55550fd, type: 3}
+  - assetID: builtin::_TextMesh Pro/Fonts/LiberationSans - OFL
+    asset: {fileID: 4900000, guid: 6e59c59b81ab47f9b6ec5781fa725d2c, type: 3}
+  - assetID: builtin::Resources/New Material
+    asset: {fileID: 2100000, guid: 7e17c63d2327f624ab099cf586363d59, type: 2}
+  - assetID: builtin::Resources/intertank_LOD1
+    asset: {fileID: 919132149155446097, guid: 8ee912a8ec4bcfe46963028a215051c8, type: 3}
+  - assetID: builtin::Resources/Sprites/ui_attitude_indicator
+    asset: {fileID: 2800000, guid: ee19134100d09b54b92af6b7e83bc21b, type: 3}
+  - assetID: builtin::_TextMesh Pro/Shaders/TMP_SDF-Mobile
+    asset: {fileID: 4800000, guid: fe393ace9b354375a9cb14cdbbc28be4, type: 3}
+  - assetID: builtin::KSS.DevUtils/cube/Yp
+    asset: {fileID: 2800000, guid: 0fbed77b25a64944a844b8a46204b031, type: 3}
+  - assetID: builtin::KSS.DevUtils/MoonNrm_RT
+    asset: {fileID: 8400000, guid: 2fdada8e1127fbe478fb4808954eb395, type: 2}
+  - assetID: builtin::_TextMesh Pro/Resources/TMP Settings
+    asset: {fileID: 11400000, guid: 3f5b5dff67a942289a9defa416b206f3, type: 2}
+  - assetID: builtin::Resources/Sprites/std0/ui_scrollbar_background
+    asset: {fileID: 2800000, guid: 4f933230104877445b21901bed3d2c9e, type: 3}
+  - assetID: builtin::_TextMesh Pro/Sprites/EmojiOne
+    asset: {fileID: 4900000, guid: 8f05276190cf498a8153f6cbe761d4e6, type: 3}
+  - assetID: builtin::Resources/Sprites/std0/ui_navball
+    asset: {fileID: 2800000, guid: 8f65958a56142014a92b96a64020c76e, type: 3}
+  - assetID: builtin::_TextMesh Pro/Resources/Fonts & Materials/LiberationSans SDF
+    asset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  - assetID: builtin::_Scenes/Testing And Shit
+    asset: {fileID: 102900000, guid: 9fc0d4010bbf28b4594072e72b8655ab, type: 3}
+  - assetID: builtin::Resources/intertank
+    asset: {fileID: 919132149155446097, guid: afbf93c77d731b3439b9171b6885fec2, type: 3}
+  - assetID: builtin::KSS.DevUtils/old_CB_material
+    asset: {fileID: 2100000, guid: cf90961ca5c5fc346a6f5f5b3bdefbcf, type: 2}
+  - assetID: builtin::_TextMesh Pro/Shaders/TMP_Sprite
+    asset: {fileID: 4800000, guid: cf81c85f95fe47e1a27f6ae460cf182c, type: 3}
+  - assetID: builtin::KSS.DevUtils/sv
+    asset: {fileID: 919132149155446097, guid: df49b77668743fb41ad8028805e8e722, type: 3}
+  - assetID: builtin::KSS.DevUtils/skybox
+    asset: {fileID: 8900000, guid: dfbd7da3b669e154ba52e80cadb0ee69, type: 3}
+  - assetID: builtin::_TextMesh Pro/Sprites/EmojiOne
+    asset: {fileID: 2800000, guid: dffef66376be4fa480fb02b19edbe903, type: 3}
+  - assetID: builtin::Resources/tank
+    asset: {fileID: 919132149155446097, guid: ff41ce40e17dd454cacb22f004c6bae7, type: 3}
+  - assetID: builtin::_Scenes/PPP
+    asset: {fileID: 11400000, guid: ff73d90665a086142b2905f01db7174a, type: 2}
+  - assetID: builtin::Resources/Sprites/nodes/m_radial_out
+    asset: {fileID: 2800000, guid: ff7cfc8dd1c732c4587a9eea5a1c54f6, type: 3}
+--- !u!4 &911430596
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 911430593}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1057024939
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1057024942}
+  - component: {fileID: 1057024941}
+  - component: {fileID: 1057024940}
+  m_Layer: 0
+  m_Name: EventSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1057024940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1057024939}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f231c4fb786f3946a6b90b886c48677, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalAxis: Horizontal
+  m_VerticalAxis: Vertical
+  m_SubmitButton: Submit
+  m_CancelButton: Cancel
+  m_InputActionsPerSecond: 10
+  m_RepeatDelay: 0.5
+  m_ForceModuleActive: 0
+--- !u!114 &1057024941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1057024939}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_FirstSelected: {fileID: 0}
+  m_sendNavigationEvents: 1
+  m_DragThreshold: 10
+--- !u!4 &1057024942
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1057024939}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1266006115
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1266006119}
+  - component: {fileID: 1266006118}
+  - component: {fileID: 1266006117}
+  - component: {fileID: 1266006116}
+  m_Layer: 5
+  m_Name: Canvas - 99Console
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1266006116
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1266006115}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreReversedGraphics: 1
+  m_BlockingObjects: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+--- !u!114 &1266006117
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1266006115}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_UiScaleMode: 1
+  m_ReferencePixelsPerUnit: 50
+  m_ScaleFactor: 1
+  m_ReferenceResolution: {x: 1920, y: 1080}
+  m_ScreenMatchMode: 0
+  m_MatchWidthOrHeight: 0
+  m_PhysicalUnit: 3
+  m_FallbackScreenDPI: 96
+  m_DefaultSpriteDPI: 96
+  m_DynamicPixelsPerUnit: 1
+  m_PresetInfoIsWorld: 0
+--- !u!223 &1266006118
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1266006115}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 0
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 0
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_AdditionalShaderChannelsFlag: 25
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 99
+  m_TargetDisplay: 0
+--- !u!224 &1266006119
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1266006115}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0, y: 0, z: 0}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0, y: 0}
+--- !u!1 &1611604357
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1611604359}
+  - component: {fileID: 1611604358}
+  - component: {fileID: 1611604360}
+  - component: {fileID: 1611604361}
+  m_Layer: 0
+  m_Name: _ ALWAYS LOADED MANAGERS _
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1611604358
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1611604357}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d3bb9650b2446e4da2a000831a851bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1611604359
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1611604357}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1611604360
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1611604357}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f26c91c250fad5441ae825679dbf9e31, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1611604361
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1611604357}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3b36d6377e167e4d9bb9bac86795aaf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Style>k__BackingField: {fileID: 11400000, guid: 96240dd52f3c3e64692a0f9842e3e9dc, type: 2}

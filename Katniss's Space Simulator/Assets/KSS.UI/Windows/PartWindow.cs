@@ -1,4 +1,4 @@
-﻿using KSS.Camera;
+﻿using KSS.Cameras;
 using KSS.Core;
 using KSS.Core.ResourceFlowSystem;
 using UILib;
