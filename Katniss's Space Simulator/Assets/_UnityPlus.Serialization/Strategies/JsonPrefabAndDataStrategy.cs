@@ -29,7 +29,7 @@ namespace UnityPlus.Serialization.Strategies
             return UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
         }
 
-        private static void WriteReferencedChildRecursive( ISaver s, GameObject go, ref SerializedArray sArr, string parentPath )
+        private static void WriteReferencedChildrenRecursive( ISaver s, GameObject go, ref SerializedArray sArr, string parentPath )
         {
             // write the IDs of referenced components/child gameobjects of the parent into the array, along with the path to them.
 
@@ -64,7 +64,7 @@ namespace UnityPlus.Serialization.Strategies
             foreach( Transform ct in go.transform )
             {
                 string path = $"{i.ToString( CultureInfo.InvariantCulture )}:"; // colon at the end is important
-                WriteReferencedChildRecursive( s, ct.gameObject, ref sArr, path );
+                WriteReferencedChildrenRecursive( s, ct.gameObject, ref sArr, path );
                 i++;
             }
         }
@@ -74,13 +74,13 @@ namespace UnityPlus.Serialization.Strategies
             Guid objectGuid = s.GetID( go );
 
             SerializedArray sArr = new SerializedArray();
-            WriteReferencedChildRecursive( s, go, ref sArr, "" );
+            WriteReferencedChildrenRecursive( s, go, ref sArr, "" );
 
             SerializedObject goJson = new SerializedObject()
             {
                 { ISaver_Ex_References.ID, s.WriteGuid(objectGuid) },
                 { "prefab", s.WriteAssetReference(cbf.OriginalAsset) },
-                { "referenced_children", sArr }
+                { "children_ids", sArr }
             };
 
             return goJson;
@@ -119,7 +119,7 @@ namespace UnityPlus.Serialization.Strategies
             }
         }
 
-        private static void SetReferencedChildrenIDs( ILoader l, GameObject go, ref SerializedArray sArr )
+        private static void AssignIDsToReferencedChildren( ILoader l, GameObject go, ref SerializedArray sArr )
         {
             // Set the IDs of all objects in the array.
             foreach( var s in sArr )
@@ -148,8 +148,8 @@ namespace UnityPlus.Serialization.Strategies
 
             l.SetID( go, objectGuid );
 
-            SerializedArray refChildren = (SerializedArray)goJson["referenced_children"];
-            SetReferencedChildrenIDs( l, go, ref refChildren );
+            SerializedArray refChildren = (SerializedArray)goJson["children_ids"];
+            AssignIDsToReferencedChildren( l, go, ref refChildren );
 
             return go;
         }
@@ -159,7 +159,7 @@ namespace UnityPlus.Serialization.Strategies
         {
             // saves the information about what exists and what factory can be used to create that thing.
 
-            // this should save to a file. to a specified dir.
+            // this should save to a file. to a directory specified by this strategy.
 
             IEnumerable<GameObject> rootObjects = GetRootGameObjects();
 
@@ -169,17 +169,17 @@ namespace UnityPlus.Serialization.Strategies
             {
                 // maybe some sort of customizable tag/layer masking
 
-                ClonedGameObject cbf = go.GetComponent<ClonedGameObject>();
-                if( cbf == null )
+                ClonedGameObject cloneComp = go.GetComponent<ClonedGameObject>();
+                if( cloneComp == null )
                 {
 #warning TODO - if root doesn't have factory component, look through children.
                     continue;
                 }
 
-                yield return null;
-
-                SerializedObject goJson = WriteAssetGameObject( s, go, cbf );
+                SerializedObject goJson = WriteAssetGameObject( s, go, cloneComp );
                 objectsJson.Add( goJson );
+
+                yield return null;
             }
 
             var sb = new StringBuilder();
@@ -207,10 +207,10 @@ namespace UnityPlus.Serialization.Strategies
                 {
                     Guid cid = s.GetID( comp );
                     SerializedObject compData = new SerializedObject()
-                        {
-                            { "$ref", s.WriteGuid(cid) },
-                            { "data", dataJson }
-                        };
+                    {
+                        { "$ref", s.WriteGuid(cid) },
+                        { "data", dataJson }
+                    };
                     components.Add( compData );
                 }
                 i++;

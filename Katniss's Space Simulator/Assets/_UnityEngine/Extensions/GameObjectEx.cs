@@ -17,5 +17,10 @@ namespace UnityEngine
         {
             return gameObject.GetComponents<Component>();
         }
+
+        public static bool IsInLayerMask( this GameObject gameObject, int layerMask )
+        {
+            return ((1 << gameObject.layer) & layerMask) != 0;
+        }
     }
 }

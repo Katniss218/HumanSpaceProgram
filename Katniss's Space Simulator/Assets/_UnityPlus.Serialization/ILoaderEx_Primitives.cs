@@ -11,8 +11,6 @@ namespace UnityPlus.Serialization
 {
     public static class ILoaderEx_Primitives
     {
-        static Dictionary<string, Type> _stringToType = new Dictionary<string, Type>();
-
         // Primitives in this context are types that are always saved in-place.
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
@@ -60,6 +58,8 @@ namespace UnityPlus.Serialization
             // GUIDs should be saved in the '00000000-0000-0000-0000-000000000000' format.
             return Guid.ParseExact( (string)(SerializedPrimitive)json, "D" );
         }
+
+        static Dictionary<string, Type> _stringToType = new Dictionary<string, Type>();
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public static Type ReadType( this ILoader _, SerializedData json )

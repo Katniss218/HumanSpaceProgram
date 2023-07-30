@@ -9,13 +9,14 @@ using UnityEngine;
 
 namespace UnityPlus.Serialization
 {
+    /// <summary>
+    /// An asynchronous saver.
+    /// </summary>
+    /// <remarks>
+    /// Handles the pausing of the application to serialize correctly.
+    /// </remarks>
     public class AsyncSaver : IAsyncSaver
     {
-        /// <summary>
-        /// Specifies where to save the data.
-        /// </summary>
-        public string SaveDirectory { get; set; }
-
         public float CurrentActionPercentCompleted { get; set; }
         public float TotalPercentCompleted => (_completedActions + CurrentActionPercentCompleted) / (_objectActions.Count + _dataActions.Count);
 
@@ -26,11 +27,22 @@ namespace UnityPlus.Serialization
         List<Func<ISaver, IEnumerator>> _dataActions = new List<Func<ISaver, IEnumerator>>();
         List<Func<ISaver, IEnumerator>> _objectActions = new List<Func<ISaver, IEnumerator>>();
 
+        Action _pauseFunc;
+        Action _unpauseFunc;
+
         Dictionary<object, Guid> _objectToGuid = new Dictionary<object, Guid>();
 
-        public AsyncSaver( string saveDirectory, IEnumerable<Func<ISaver, IEnumerator>> dataActions, IEnumerable<Func<ISaver, IEnumerator>> objectActions )
+        /// <param name="pauseFunc">A function delegate that can pause the game completely.</param>
+        /// <param name="unpauseFunc">A function delegate that can unpause the game, and bring it to its previous state.</param>
+        public AsyncSaver( Action pauseFunc, Action unpauseFunc, IEnumerable<Func<ISaver, IEnumerator>> objectActions, IEnumerable<Func<ISaver, IEnumerator>> dataActions )
         {
-            this.SaveDirectory = saveDirectory;
+            if( pauseFunc == null )
+                throw new ArgumentNullException( nameof( pauseFunc ), $"Pause delegate can't be null. {nameof( AsyncSaver )} requires the application to be paused to deserialize correctly." );
+            if( unpauseFunc == null )
+                throw new ArgumentNullException( nameof( unpauseFunc ), $"Unpause delegate can't be null. {nameof( AsyncSaver )} requires the application to be paused to deserialize correctly." );
+
+            this._pauseFunc = pauseFunc;
+            this._unpauseFunc = unpauseFunc;
 
             foreach( var action in objectActions )
             {
@@ -98,6 +110,7 @@ namespace UnityPlus.Serialization
 #if DEBUG
             Debug.Log( "Saving..." );
 #endif
+            _pauseFunc();
             ClearReferenceRegistry();
             _currentState = ISaver.State.SavingData;
             _completedActions = 0;
@@ -123,6 +136,7 @@ namespace UnityPlus.Serialization
 #if DEBUG
             Debug.Log( "Finished Saving" );
 #endif
+            _unpauseFunc();
         }
 
         /// <summary>
@@ -134,6 +148,7 @@ namespace UnityPlus.Serialization
             {
                 throw new InvalidOperationException( $"This saver instance is already running." );
             }
+
             coroutineContainer.StartCoroutine( SaveCoroutine( coroutineContainer ) );
         }
     }

@@ -15,18 +15,18 @@ namespace UnityPlus.Serialization
     {
         /// <summary>
         /// The current state of the loader. <br />
-        /// Loading is split into 2 stages.
+        /// Loading is split into 2 stages - see the enum values.
         /// </summary>
         public enum State : byte
         {
             /// <summary>
-            /// Not saving.
+            /// Not loading.
             /// </summary>
             Idle = 0,
 
             /// <summary>
             /// 1. Creation of referencable objects. <br />
-            ///    These objects will have default parameters, can can be created by a factory, or a number of other methods. <br />
+            ///    These objects will have default parameters, and can can be created by a factory, or a number of other methods. <br />
             ///    This step includes deserializing other save-specific items, such as dialogues (if applicable).
             /// </summary>
             LoadingObjects,
@@ -65,7 +65,16 @@ namespace UnityPlus.Serialization
     /// </summary>
     public interface IAsyncLoader : ILoader
     {
+        /// <summary>
+        /// The percentage (in [0..1]) of completion of the current action (0 = 0% completed, 1 = 100% completed).
+        /// </summary>
+        /// <remarks>
+        /// Intended to be set by the serialization strategy, and not by the loader.
+        /// </remarks>
         float CurrentActionPercentCompleted { get; set; }
+        /// <summary>
+        /// The percentage (in [0..1]) of completion of the entire loading process (0 = 0% completed, 1 = 100% completed).
+        /// </summary>
         float TotalPercentCompleted { get; }
     }
 }

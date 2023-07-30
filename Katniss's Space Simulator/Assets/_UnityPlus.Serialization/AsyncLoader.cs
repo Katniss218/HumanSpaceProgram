@@ -9,13 +9,14 @@ using UnityEngine;
 
 namespace UnityPlus.Serialization
 {
+    /// <summary>
+    /// An asynchronous loader.
+    /// </summary>
+    /// <remarks>
+    /// Handles the pausing of the application to deserialize correctly.
+    /// </remarks>
     public class AsyncLoader : IAsyncLoader
     {
-        /// <summary>
-        /// Specifies where to save the data.
-        /// </summary>
-        public string SaveDirectory { get; set; }
-
         public float CurrentActionPercentCompleted { get; set; }
         public float TotalPercentCompleted => (_completedActions + CurrentActionPercentCompleted) / (_objectActions.Count + _dataActions.Count);
 
@@ -26,11 +27,22 @@ namespace UnityPlus.Serialization
         List<Func<ILoader, IEnumerator>> _objectActions = new List<Func<ILoader, IEnumerator>>();
         List<Func<ILoader, IEnumerator>> _dataActions = new List<Func<ILoader, IEnumerator>>();
 
+        Action _pauseFunc;
+        Action _unpauseFunc;
+
         Dictionary<Guid, object> _guidToObject = new Dictionary<Guid, object>();
 
-        public AsyncLoader( string saveDirectory, IEnumerable<Func<ILoader, IEnumerator>> objectActions, IEnumerable<Func<ILoader, IEnumerator>> dataActions )
+        /// <param name="pauseFunc">A function delegate that can pause the game completely.</param>
+        /// <param name="unpauseFunc">A function delegate that can unpause the game, and bring it to its previous state.</param>
+        public AsyncLoader( Action pauseFunc, Action unpauseFunc, IEnumerable<Func<ILoader, IEnumerator>> objectActions, IEnumerable<Func<ILoader, IEnumerator>> dataActions )
         {
-            this.SaveDirectory = saveDirectory;
+            if( pauseFunc == null )
+                throw new ArgumentNullException( nameof( pauseFunc ), $"Pause delegate can't be null. {nameof(AsyncLoader)} requires the application to be paused to serialize correctly." );
+            if( unpauseFunc == null )
+                throw new ArgumentNullException( nameof( unpauseFunc ), $"Unpause delegate can't be null. {nameof( AsyncLoader )} requires the application to be paused to serialize correctly." );
+
+            this._pauseFunc = pauseFunc;
+            this._unpauseFunc = unpauseFunc;
 
             // Loader should load objects before data.
             foreach( var action in objectActions )
@@ -97,6 +109,7 @@ namespace UnityPlus.Serialization
 #if DEBUG
             Debug.Log( "Loading..." );
 #endif
+            _pauseFunc();
             ClearReferenceRegistry();
             _currentState = ILoader.State.LoadingObjects;
             _completedActions = 0;
@@ -121,6 +134,7 @@ namespace UnityPlus.Serialization
 #if DEBUG
             Debug.Log( "Finished Loading" );
 #endif
+            _unpauseFunc();
         }
 
         /// <summary>

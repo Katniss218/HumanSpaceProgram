@@ -8,13 +8,11 @@ using UnityEngine;
 
 namespace UnityPlus.Serialization
 {
+    /// <summary>
+    /// A synchronous loader.
+    /// </summary>
     public class Loader : ILoader
     {
-        /// <summary>
-        /// Specifies where to save the data.
-        /// </summary>
-        public string SaveDirectory { get; set; }
-
         ILoader.State _currentState;
 
         List<Action<ILoader>> _objectActions = new List<Action<ILoader>>();
@@ -22,10 +20,8 @@ namespace UnityPlus.Serialization
 
         Dictionary<Guid, object> _guidToObject = new Dictionary<Guid, object>();
 
-        public Loader( string saveDirectory, IEnumerable<Action<ILoader>> objectActions, IEnumerable<Action<ILoader>> dataActions )
+        public Loader( IEnumerable<Action<ILoader>> objectActions, IEnumerable<Action<ILoader>> dataActions )
         {
-            this.SaveDirectory = saveDirectory;
-
             // Loader should load objects before data.
             foreach( var action in objectActions )
             {

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace UnityPlus.Serialization
 {
     /// <summary>
-    /// Inherit from this to specify that your class handles assigning persistent data for itself.
+    /// Inherit from this interface to specify that your class handles persisting its data by itself.
     /// </summary>
     public interface IPersistent
     {

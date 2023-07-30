@@ -7,13 +7,11 @@ using System.Threading.Tasks;
 
 namespace UnityPlus.Serialization
 {
+    /// <summary>
+    /// A synchronous saver.
+    /// </summary>
     public class Saver : ISaver
     {
-        /// <summary>
-        /// Specifies where to save the data.
-        /// </summary>
-        public string SaveDirectory { get; set; }
-
         ISaver.State _currentState;
 
         List<Action<ISaver>> _dataActions = new List<Action<ISaver>>();
@@ -21,10 +19,8 @@ namespace UnityPlus.Serialization
 
         Dictionary<object, Guid> _objectToGuid = new Dictionary<object, Guid>();
 
-        public Saver( string saveDirectory, IEnumerable<Action<ISaver>> dataActions, IEnumerable<Action<ISaver>> objectActions )
+        public Saver( IEnumerable<Action<ISaver>> dataActions, IEnumerable<Action<ISaver>> objectActions )
         {
-            this.SaveDirectory = saveDirectory;
-
             foreach( var action in objectActions )
             {
                 this._objectActions.Add( action );

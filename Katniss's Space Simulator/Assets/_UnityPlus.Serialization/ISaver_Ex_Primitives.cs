@@ -11,8 +11,6 @@ namespace UnityPlus.Serialization
 {
     public static class ISaver_Ex_Primitives
     {
-        static readonly Dictionary<Type, string> _typeToString = new Dictionary<Type, string>();
-
         // Primitives in this context are types that are always saved in-place.
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
@@ -60,6 +58,8 @@ namespace UnityPlus.Serialization
             // GUIDs should be saved in the '00000000-0000-0000-0000-000000000000' format.
             return (SerializedPrimitive)value.ToString( "D" );
         }
+
+        static readonly Dictionary<Type, string> _typeToString = new Dictionary<Type, string>();
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public static SerializedPrimitive WriteType( this ISaver _, Type value )
