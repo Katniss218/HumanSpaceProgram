@@ -70,7 +70,6 @@
     <Compile Include="Assets\KSS\Functionalities\FVesselSeparator.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuad.cs" />
     <Compile Include="Assets\KSS\Functionalities\FActuatorXY.cs" />
-    <Compile Include="Assets\KSS\TimeWarp\TimeWarpManager.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadTree_NodeUtils.cs" />
   </ItemGroup>
   <ItemGroup>

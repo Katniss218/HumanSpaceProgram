@@ -15,7 +15,7 @@ namespace KSS.UI.SceneFactories
     /// </summary>
     public static class VanillaMainMenuFactory
     {
-        [OverridableEventListener( OverridableEvent.STARTUP_MAINMENU, OverridableEvent.NAMESPACE_VANILLA + ".mainmenu_ui" )]
+        [OverridableEventListener( HSPOverridableEvent.EVENT_STARTUP_MAINMENU, HSPOverridableEvent.NAMESPACE_VANILLA + ".mainmenu_ui" )]
         public static void Create( object obj )
         {
             (Canvas mainMenuCanvas, UIStyle style) = ((Canvas, UIStyle))obj;

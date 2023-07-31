@@ -14,33 +14,7 @@ namespace KSS.Core.Mods
     /// </summary>
     public static class ModLoader
     {
-        /// <summary>
-        /// Figures out and returns the path to the `GameData` directory.
-        /// </summary>
-        public static string GetGameDataPath()
-        {
-            string dataPath = Application.dataPath;
-
-            switch( Application.platform )
-            {
-                case RuntimePlatform.WindowsEditor:
-                case RuntimePlatform.LinuxEditor:
-                case RuntimePlatform.OSXEditor:
-                    dataPath = Directory.GetParent( dataPath ).FullName; // "/../";
-                    break;
-                case RuntimePlatform.WindowsPlayer:
-                case RuntimePlatform.LinuxPlayer:
-                    dataPath = Directory.GetParent( dataPath ).FullName; // "/../";
-                    break;
-                case RuntimePlatform.OSXPlayer:
-                    dataPath = Directory.GetParent( dataPath ).Parent.FullName; // "/../../";
-                    break;
-            }
-
-            return Path.Combine( dataPath, "GameData" );
-        }
-
-        public static string GetModDirectory() => GetGameDataPath();
+        public static string GetModDirectory() => HumanSpaceProgram.GetGameDataPath();
 
         private static void LoadAssembliesRecursive( string path )
         {
