@@ -57,9 +57,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\IResourceConsumer.cs" />
+    <Compile Include="Assets\KSS.Core\HSPOverridableEvent.cs" />
     <Compile Include="Assets\KSS.Core\Serialization\TimelineManager.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\IResourceContainer.cs" />
     <Compile Include="Assets\KSS.Core\Scenes\SceneManager.cs" />
+    <Compile Include="Assets\KSS.Core\TimeWarp\TimeWarpManager.cs" />
     <Compile Include="Assets\KSS.Core\Substance.cs" />
     <Compile Include="Assets\KSS.Core\CelestialBody.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\FluidState.cs" />
@@ -68,14 +70,18 @@
     <Compile Include="Assets\KSS.Core\Part.cs" />
     <Compile Include="Assets\KSS.Core\ReferenceFrames\OffsetReferenceFrame.cs" />
     <Compile Include="Assets\KSS.Core\VesselFactory.cs" />
+    <Compile Include="Assets\KSS.Core\Serialization\SaveMetadata.cs" />
     <Compile Include="Assets\KSS.Core\VesselManager.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\IResourceProducer.cs" />
     <Compile Include="Assets\KSS.Core\VesselStateUtils.cs" />
+    <Compile Include="Assets\KSS.Core\Serialization\IOHelper.cs" />
     <Compile Include="Assets\KSS.Core\Physics\PhysicsObject.cs" />
     <Compile Include="Assets\KSS.Core\PartFactory.cs" />
     <Compile Include="Assets\KSS.Core\Part.Serialization.cs" />
+    <Compile Include="Assets\KSS.Core\Serialization\TimelineMetadata.cs" />
     <Compile Include="Assets\KSS.Core\CelestialBodyManager.cs" />
     <Compile Include="Assets\KSS.Core\UIStyleManager.cs" />
+    <Compile Include="Assets\KSS.Core\HumanSpaceProgram.cs" />
     <Compile Include="Assets\KSS.Core\Control\ControlInAttribute.cs" />
     <Compile Include="Assets\KSS.Core\ReferenceFrames\ReferenceFrameUtils.cs" />
     <Compile Include="Assets\KSS.Core\Control\ControlOutAttribute.cs" />
@@ -98,12 +104,6 @@
     <Compile Include="Assets\KSS.Core\Scenes\AlwaysLoadedManager.cs" />
     <Compile Include="Assets\KSS.Core\Mods\OverridableEventListenerAttribute.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\SubstanceStateCollection.cs" />
-    <Compile Include="Assets\KSS.Core\Serialization\SaveMetadata.cs" />
-    <Compile Include="Assets\KSS.Core\Serialization\TimelineMetadata.cs" />
-    <Compile Include="Assets\KSS.Core\Serialization\IOHelper.cs" />
-    <Compile Include="Assets\KSS.Core\HumanSpaceProgram.cs" />
-    <Compile Include="Assets\KSS.Core\HSPOverridableEvent.cs" />
-    <Compile Include="Assets\KSS.Core\TimeWarp\TimeWarpManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.Core\___KSS.Core.asmdef" />

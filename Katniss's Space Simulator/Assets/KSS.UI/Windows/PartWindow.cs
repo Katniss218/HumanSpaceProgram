@@ -78,7 +78,7 @@ namespace KSS.UI.Windows
             exitImage.raycastTarget = true;
             exitImage.color = Color.red;
             Button exitBtn = exitButtonGO.AddComponent<Button>();
-            WindowExit ex = exitButtonGO.AddComponent<WindowExit>();
+            RectTransformCloser ex = exitButtonGO.AddComponent<RectTransformCloser>();
             ex.ExitButton = exitBtn;
             ex.UITransform = (RectTransform)rootGO.transform;
 
@@ -89,7 +89,7 @@ namespace KSS.UI.Windows
 
             GameObject scrollRectGO = UIHelper.AddScrollRect( windowContentsGO, 100 - 30, false, true );
 
-            WindowDrag windowDrag = rootGO.AddComponent<WindowDrag>();
+            RectTransformDragger windowDrag = rootGO.AddComponent<RectTransformDragger>();
             windowDrag.UITransform = (RectTransform)rootGO.transform;
 
             PartWindow partWindow = rootGO.AddComponent<PartWindow>();
