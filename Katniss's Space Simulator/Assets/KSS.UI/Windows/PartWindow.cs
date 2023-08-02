@@ -67,7 +67,7 @@ namespace KSS.UI.Windows
 
         public static PartWindow Create( Part part )
         {
-            GameObject rootGO = UIHelper.UI( FindObjectOfType<Canvas>().transform, "part window", new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 250f, 100f ) );
+            GameObject rootGO = UIHelper.UI( CanvasManager.GetCanvas( CanvasManager.WINDOWS ).transform, "part window", new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 250f, 100f ) );
 
             Image pwBackgroundImage = rootGO.AddComponent<Image>();
             pwBackgroundImage.raycastTarget = true;

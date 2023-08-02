@@ -18,9 +18,9 @@ namespace KSS.UI.SceneFactories
         [OverridableEventListener( HSPOverridableEvent.EVENT_STARTUP_MAINMENU, HSPOverridableEvent.NAMESPACE_VANILLA + ".mainmenu_ui" )]
         public static void Create( object obj )
         {
-            (Canvas mainMenuCanvas, UIStyle style) = ((Canvas, UIStyle))obj;
+            (_, UIStyle style) = ((Canvas, UIStyle))obj;
 
-            RectTransform canvasTransform = (RectTransform)mainMenuCanvas.transform;
+            RectTransform canvasTransform = (RectTransform)CanvasManager.GetCanvas( CanvasManager.STATIC ).transform;
 
             CreatePlayButton( canvasTransform, style );
             CreateSettingsButton( canvasTransform, style );
