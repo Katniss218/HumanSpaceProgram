@@ -10,7 +10,8 @@ using UnityPlus.OverridableEvents;
 namespace KSS.Core.Mods
 {
     /// <summary>
-    /// Specifies that a method should be run when a specified overridable event is fired.
+    /// Specifies that a method should be run when a specified overridable event is fired. <br/>
+    /// This can be applied to any static method with the signature: `static void Method( object )`.
     /// </summary>
     [AttributeUsage( AttributeTargets.Method )]
     public class OverridableEventListenerAttribute : Attribute
@@ -29,8 +30,9 @@ namespace KSS.Core.Mods
         // ---
         //
 
-        private static bool AcceptMethodSignature( MethodInfo method )
+        private static bool IsValidMethodSignature( MethodInfo method )
         {
+            // TODO - Potentially, this could check the type of the method against the type of the event in the future. To make it type-safe, without the `object` box.
             ParameterInfo[] parameters = method.GetParameters();
 
             return parameters.Length == 1
@@ -42,7 +44,7 @@ namespace KSS.Core.Mods
         {
             ParameterInfo[] parameters = method.GetParameters();
 
-            if( !AcceptMethodSignature( method ) )
+            if( !IsValidMethodSignature( method ) )
             {
                 Debug.LogWarning( $"Ignoring a `{nameof( OverridableEventListenerAttribute )}` attribute applied to method `{method.Name}` which has an incorrect signature." );
                 return;
@@ -55,7 +57,7 @@ namespace KSS.Core.Mods
         }
 
         /// <summary>
-        /// Searches for autorunning methods in the specified assemblies and registers them as listeners.
+        /// Searches for "autorunning" methods (i.e. with the attribute) in the specified assemblies and registers them as listeners.
         /// </summary>
         internal static void CreateEventsForAutorunningMethods( IEnumerable<Assembly> assemblies )
         {

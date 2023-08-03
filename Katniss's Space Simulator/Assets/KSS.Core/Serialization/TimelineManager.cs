@@ -77,7 +77,7 @@ namespace KSS.Core.Serialization
 
             CreateDefaultLoader();
 
-            HSPOverridableEvent.EventManager.TryInvoke( HSPOverridableEvent.EVENT_TIMELINE_LOADER_CREATE );
+            HSPOverridableEvent.EventManager.TryInvoke( HSPOverridableEvent.TIMELINE_LOADER_CREATE );
 
             throw new NotImplementedException();
             // if universe is given, and saveId is null, load the default.

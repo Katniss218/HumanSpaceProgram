@@ -60,7 +60,7 @@
     <Compile Include="Assets\KSS.UI\RectTransformDragger.cs" />
     <Compile Include="Assets\KSS.UI\RectTransformCloser.cs" />
     <Compile Include="Assets\KSS.UI\Windows\WindowRelationHighlight.cs" />
-    <Compile Include="Assets\KSS.UI\SceneFactories\VanillaMainMenuFactory.cs" />
+    <Compile Include="Assets\KSS.UI\SceneFactories\VanillaMainMenuUIFactory.cs" />
     <Compile Include="Assets\KSS.UI\TimewarpReadoutUI.cs" />
     <Compile Include="Assets\KSS.UI\CanvasManager.cs" />
     <Compile Include="Assets\KSS.UI\VelocityReadoutUI.cs" />
@@ -73,6 +73,7 @@
     <Compile Include="Assets\KSS.UI\AltitudeReadoutUI.cs" />
     <Compile Include="Assets\KSS.UI\PartWindowManager.cs" />
     <Compile Include="Assets\KSS.UI\AccelerationReadoutUI.cs" />
+    <Compile Include="Assets\KSS.UI\SceneFactories\VanillaGameplayUIFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.UI\___KSS.UI.asmdef" />

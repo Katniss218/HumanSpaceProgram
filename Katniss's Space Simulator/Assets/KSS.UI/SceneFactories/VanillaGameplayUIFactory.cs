@@ -1,21 +1,18 @@
-using KSS.Core;
+﻿using KSS.Core;
 using KSS.Core.Mods;
 using KSS.Core.Scenes;
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UILib;
 using UILib.Factories;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace KSS.UI.SceneFactories
+namespace Assets.KSS.UI.SceneFactories
 {
-    /// <summary>
-    /// Creates the Main Menu UI elements.
-    /// </summary>
-    public static class VanillaMainMenuFactory
+    public static class VanillaGameplayUIFactory
     {
-        [OverridableEventListener( HSPOverridableEvent.EVENT_STARTUP_MAINMENU, HSPOverridableEvent.NAMESPACE_VANILLA + ".mainmenu_ui" )]
+        [OverridableEventListener( HSPOverridableEvent.STARTUP_GAMEPLAY, HSPOverridableEvent.NAMESPACE_VANILLA + ".gameplay_ui" )]
         public static void Create( object obj )
         {
             (_, UIStyle style) = ((Canvas, UIStyle))obj;

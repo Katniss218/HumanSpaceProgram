@@ -18,7 +18,7 @@ namespace KSS.Core
 
         void Awake()
         {
-            HSPOverridableEvent.EventManager.TryInvoke( HSPOverridableEvent.EVENT_STARTUP_MAINMENU, (_mainMenuCanvas, _style) );
+            HSPOverridableEvent.EventManager.TryInvoke( HSPOverridableEvent.STARTUP_MAINMENU, (_mainMenuCanvas, _style) );
         }
     }
 }

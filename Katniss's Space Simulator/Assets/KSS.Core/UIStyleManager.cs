@@ -8,6 +8,9 @@ using UnityEngine;
 
 namespace KSS.Core
 {
+    /// <summary>
+    /// A holder for the current UI style.
+    /// </summary>
     public class UIStyleManager : MonoBehaviour
     {
         static UIStyleManager _instance;

@@ -15,6 +15,9 @@ namespace UILib
         public Color ButtonClick;
         public Color ButtonDisabled;
 
+        /// <summary>
+        /// Bi-axial standard button sprite, can be either vertical, horizontal, or square, of any size.
+        /// </summary>
         public Sprite Button2Axis;
         public Sprite InputField;
 

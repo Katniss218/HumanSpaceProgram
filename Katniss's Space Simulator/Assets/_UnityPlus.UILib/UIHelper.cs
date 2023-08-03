@@ -60,7 +60,7 @@ namespace UILib
         }
 
         [Obsolete( "The anchored position and size calculations are wrong. Only works for (0,0,0,0)" )]
-        static GameObject UIFill( Transform parent, string name, float left, float right, float top, float bottom )
+        public static GameObject UIFill( Transform parent, string name, float left, float right, float top, float bottom )
         {
             Vector2 anchorMin = new Vector2( 0.0f, 0.0f );
             Vector2 anchorMax = new Vector2( 1.0f, 1.0f );
@@ -155,7 +155,7 @@ namespace UILib
         /// Doesn't include a scrollbar, doesn't include any layout for the content.
         /// </remarks>
         /// <returns>The gameobject that will contain the contents.</returns>
-        public static GameObject AddScrollRect( GameObject obj, float vertSize, bool horizontal, bool vertical )
+        public static GameObject AddScrollRect( GameObject obj, float contentVerticalSize, bool horizontal, bool vertical )
         {
             GameObject items = UIHelper.UIFill( obj.transform, "items" );
 
@@ -165,7 +165,7 @@ namespace UILib
             Mask mask = viewport.AddComponent<Mask>();
             mask.showMaskGraphic = false;
 
-            GameObject content = UIHelper.UI( viewport.transform, "content", new Vector2( 0.0f, 1.0f ), new Vector2( 1, 1 ), Vector2.zero, new Vector2( 0.0f, vertSize ) );
+            GameObject content = UIHelper.UI( viewport.transform, "content", new Vector2( 0.0f, 1.0f ), new Vector2( 1, 1 ), Vector2.zero, new Vector2( 0.0f, contentVerticalSize ) );
 
             ScrollRect scrollRect = items.AddComponent<ScrollRect>();
             scrollRect.content = (RectTransform)content.transform;
