@@ -8,9 +8,9 @@ namespace UnityPlus.OverridableEvents
     /// <summary>
     /// Manages overridable game events.
     /// </summary>
-    public class OverridableEventManager
+    public class OverridableEventManager<T>
     {
-        Dictionary<string, OverridableEvent> _events = new Dictionary<string, OverridableEvent>();
+        Dictionary<string, OverridableEvent<T>> _events = new Dictionary<string, OverridableEvent<T>>();
 
         /// <summary>
         /// Tries to create an event with the given ID.
@@ -28,7 +28,7 @@ namespace UnityPlus.OverridableEvents
                 return false;
             }
 
-            _events.Add( eventId, new OverridableEvent( eventId ) );
+            _events.Add( eventId, new OverridableEvent<T>() );
             return true;
         }
 
@@ -51,24 +51,21 @@ namespace UnityPlus.OverridableEvents
         /// <param name="eventId">The event ID to add the listener to.</param>
         /// <param name="listener">The listener to add.</param>
         /// <returns>False if the listener id was already added, or if the event doesn't exist. Otherwise true.</returns>
-        public bool TryAddListener( string eventId, OverridableEventListener<Action<object>> listener )
+        public bool TryAddListener( string eventId, OverridableEventListener<T> listener )
         {
             if( eventId == null )
             {
                 throw new ArgumentNullException( nameof( eventId ), $"Event ID can't be null." );
             }
 
-            if( _events.TryGetValue( eventId, out OverridableEvent @event ) )
+            if( _events.TryGetValue( eventId, out OverridableEvent<T> @event ) )
             {
-                return @event.TryAddListener( listener );
+                @event.TryAddListener( listener );
+                return true;
             }
 
             return false; // unknown event ID.
         }
-
-        // You can't remove listeners.
-        // This is because removing them would necessitate caching the entire invocation list, regardless of what is blocked,
-        //   and then unblocking those that would no longer be blocked by the removed listener.
 
         /// <summary>
         /// Safely invokes each non-blocked listener of a specific event one-by-one.
@@ -76,16 +73,17 @@ namespace UnityPlus.OverridableEvents
         /// <param name="eventId">The event ID of the event to invoke.</param>
         /// <param name="obj">The object parameter to invoke the events with.</param>
         /// <returns>False if the event doesn't exist.</returns>
-        public bool TryInvoke( string eventId, object obj = null )
+        public bool TryInvoke( string eventId, T obj = default )
         {
             if( eventId == null )
             {
                 throw new ArgumentNullException( nameof( eventId ), $"Event ID can't be null." );
             }
 
-            if( _events.TryGetValue( eventId, out OverridableEvent @event ) )
+            if( _events.TryGetValue( eventId, out OverridableEvent<T> @event ) )
             {
-                return @event.TryInvoke( obj );
+                @event.Invoke( obj );
+                return true;
             }
 
             return false;

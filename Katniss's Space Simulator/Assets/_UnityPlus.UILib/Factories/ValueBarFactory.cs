@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 namespace UILib.Factories
 {
-    public static class BarFactory
+    public static class ValueBarFactory
     {
         public static (RectTransform t, ValueBar bar)
             CreateEmptyHorizontal( RectTransform parent, string name, UILayoutInfo layoutInfo, UIStyle style )

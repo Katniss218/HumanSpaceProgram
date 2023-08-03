@@ -9,7 +9,7 @@ namespace KSS.Core
 {
     public static class HSPOverridableEvent
     {
-        public static OverridableEventManager EventManager { get; private set; } = new OverridableEventManager();
+        public static OverridableEventManager<object> EventManager { get; private set; } = new OverridableEventManager<object>();
 
         public const string NAMESPACE_VANILLA = "vanilla";
 

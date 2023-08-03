@@ -8,74 +8,100 @@ using UnityEngine;
 namespace UnityPlus.OverridableEvents
 {
     /// <summary>
-    /// Represents an event which listeners can block other listeners from being fired.
+    /// Represents a strongly-typed event whoose listeners can block other listeners from being executed.
     /// </summary>
-    public class OverridableEvent
+    public class OverridableEvent<T>
     {
-        string _id;
-
-        Dictionary<string, Action<object>> _listeners = new Dictionary<string, Action<object>>();
-        HashSet<string> _blacklist = new HashSet<string>();
-
-        public OverridableEvent( string id )
+        private struct Listener // cache struct.
         {
-            if( id == null )
-            {
-                throw new ArgumentNullException( nameof( id ), $"The ID parameter can't be null." );
-            }
-
-            this._id = id;
+            public Action<T> Func;
+            public string[] BlockList;
         }
 
-        public bool TryAddListener( OverridableEventListener<Action<object>> listener )
+        Dictionary<string, Listener> _allListeners = new Dictionary<string, Listener>();
+        Action<T>[] _cachedListeners = null;
+
+        private void RecacheNotBlockedListeners()
         {
-            if( _listeners.ContainsKey( listener.id ) )
+            // Purpose:
+            // - Figure out which listeners are not blocked, and cache them so this doesn't have to be done on every invoke.
+
+            HashSet<string> blockList = new HashSet<string>();
+            foreach( var listener in _allListeners.Values )
+            {
+                if( listener.BlockList == null )
+                    continue;
+                foreach( var block in listener.BlockList )
+                {
+                    blockList.Add( block );
+                }
+            }
+
+            List<Action<T>> notBlockedListeners = new List<Action<T>>( _allListeners.Count ); // Limits resizes.
+            foreach( var (listenerId, listener) in _allListeners )
+            {
+                if( !blockList.Contains( listenerId ) )
+                {
+                    notBlockedListeners.Add( listener.Func );
+                }
+            }
+
+            _cachedListeners = notBlockedListeners.ToArray();
+        }
+
+        /// <summary>
+        /// Tries to add a listener to the event.
+        /// </summary>
+        /// <returns>False if a listener with the specified ID is already present in the listener list.</returns>
+        public bool TryAddListener( OverridableEventListener<T> listener )
+        {
+            if( _allListeners.ContainsKey( listener.id ) )
             {
                 return false;
             }
 
-            if( listener.blacklist != null )
-            {
-                // Allows a mod to block itself (!), but I don't think that's a problem.
-                foreach( string blockedId in listener.blacklist )
-                {
-                    _blacklist.Add( blockedId );
-                }
-
-                // Remove listners that are on the new blacklist.
-                foreach( string blockedId in listener.blacklist )
-                {
-                    if( _listeners.Remove( blockedId ) )
-                    {
-                        Debug.Log( $"{nameof( OverridableEvent )}: `{_id}`: Listener `{blockedId}` was blocked by `{listener.id}`." );
-                    }
-                }
-            }
-
-            if( _blacklist.Contains( listener.id ) )
-            {
-                Debug.Log( $"{nameof( OverridableEvent )}: `{_id}`: Listener `{listener.id}` is blocked." );
-                return false;
-            }
-
-            _listeners.Add( listener.id, listener.func );
+            _allListeners.Add( listener.id, new Listener() { Func = listener.func, BlockList = listener.blacklist } );
+            _cachedListeners = null;
             return true;
         }
 
-        public bool TryInvoke( object obj )
+        /// <summary>
+        /// Tries to remove a listener from the event.
+        /// </summary>
+        /// <returns>False if a listener with the specified ID isn't present in the listener list.</returns>
+        public bool TryRemoveListener( string id )
         {
-            foreach( var listener in _listeners.Values )
+            if( !_allListeners.ContainsKey( id ) )
+            {
+                return false;
+            }
+
+            _allListeners.Remove( id );
+            _cachedListeners = null;
+            return true;
+        }
+
+        /// <summary>
+        /// Invokes the event with the specified parameter value.
+        /// </summary>
+        public void Invoke( T obj )
+        {
+            if( _cachedListeners == null )
+            {
+                RecacheNotBlockedListeners();
+            }
+
+            foreach( var listenerFunc in _cachedListeners )
             {
                 try
                 {
-                    listener( obj );
+                    listenerFunc( obj );
                 }
                 catch( Exception ex )
                 {
                     Debug.LogException( ex );
                 }
             }
-            return true;
         }
     }
 }

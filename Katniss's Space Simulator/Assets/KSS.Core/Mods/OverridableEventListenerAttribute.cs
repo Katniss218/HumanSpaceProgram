@@ -51,7 +51,7 @@ namespace KSS.Core.Mods
             Action<object> methodDelegate = (Action<object>)Delegate.CreateDelegate( typeof( Action<object> ), method );
 
             HSPOverridableEvent.EventManager.TryCreate( attr.EventID );
-            HSPOverridableEvent.EventManager.TryAddListener( attr.EventID, new OverridableEventListener<Action<object>>() { id = attr.ID, blacklist = attr.Blacklist, func = methodDelegate } );
+            HSPOverridableEvent.EventManager.TryAddListener( attr.EventID, new OverridableEventListener<object>() { id = attr.ID, blacklist = attr.Blacklist, func = methodDelegate } );
         }
 
         /// <summary>

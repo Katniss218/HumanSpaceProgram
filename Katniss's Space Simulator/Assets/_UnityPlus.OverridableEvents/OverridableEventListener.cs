@@ -19,6 +19,6 @@ namespace UnityPlus.OverridableEvents
         /// <summary>
         /// The delegate that this listener responds with.
         /// </summary>
-        public T func;
+        public Action<T> func;
     }
 }
