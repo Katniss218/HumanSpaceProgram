@@ -1,12 +1,9 @@
 using KSS.Core.ResourceFlowSystem;
-using UILib;
-using System.Collections;
+using UnityPlus.UILib;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityPlus.AssetManagement;
-using UILib.Factories;
-using KSS.Core;
+using UnityPlus.UILib.UIElements;
 
 namespace KSS.UI
 {
@@ -23,7 +20,6 @@ namespace KSS.UI
         void Update()
         {
             _bar.ClearSegments();
-            KSSUIStyle style = (KSSUIStyle)UIStyleManager.Instance.Style;
 
             for( int i = 0; i < this.ReferenceObject.Contents.SubstanceCount; i++ )
             {
@@ -31,21 +27,19 @@ namespace KSS.UI
                 float perc = (sbs.MassAmount / sbs.Data.Density) / ReferenceObject.MaxVolume;
 
                 var seg = _bar.AddSegment( perc );
-                seg.Sprite = style.Bar;
+                seg.Sprite = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/ui_bar" );
                 seg.Color = sbs.Data.UIColor;
             }
         }
 
         public static IResourceContainerUI Create( RectTransform parent, IResourceContainer referenceObj )
         {
-            KSSUIStyle style = (KSSUIStyle)UIStyleManager.Instance.Style;
+            (GameObject root, _) = UIHelper.CreateUI( parent, "Resource Container UI", new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 250, 15 ) ) );
 
-            GameObject root = UIHelper.UI( parent, "resource container UI", Vector2.zero, Vector2.zero, new Vector2( 250, 15 ) );
-
-            (_, ValueBar bar) = UIValueBarEx.CreateEmptyHorizontal( (RectTransform)root.transform, "bar", new UILayoutInfo( Vector2.zero, Vector2.one, new Vector2( 0.5f, 0.5f ), Vector2.zero, Vector2.zero ), style );
+            UIValueBar bar = UIValueBarEx.AddHorizontalValueBar( new UIElement( (RectTransform)root.transform ), new UILayoutInfo( Vector2.zero, Vector2.one, new Vector2( 0.5f, 0.5f ), Vector2.zero, Vector2.zero ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/ui_bar_background" ) );
 
             IResourceContainerUI ui = root.AddComponent<IResourceContainerUI>();
-            ui._bar = bar;
+            ui._bar = bar.valueBarComponent;
             ui.ReferenceObject = referenceObj;
 
             return ui;

@@ -80,7 +80,6 @@
     <Compile Include="Assets\KSS.Core\Part.Serialization.cs" />
     <Compile Include="Assets\KSS.Core\Serialization\TimelineMetadata.cs" />
     <Compile Include="Assets\KSS.Core\CelestialBodyManager.cs" />
-    <Compile Include="Assets\KSS.Core\UIStyleManager.cs" />
     <Compile Include="Assets\KSS.Core\HumanSpaceProgram.cs" />
     <Compile Include="Assets\KSS.Core\Control\ControlInAttribute.cs" />
     <Compile Include="Assets\KSS.Core\ReferenceFrames\ReferenceFrameUtils.cs" />

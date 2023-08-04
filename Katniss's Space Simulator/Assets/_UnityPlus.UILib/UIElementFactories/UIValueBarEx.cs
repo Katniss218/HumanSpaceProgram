@@ -11,7 +11,7 @@ namespace UnityPlus.UILib
 {
     public static class UIValueBarEx
     {
-        public static UIValueBar AddHorizontalValueBar( UIElement parent, UILayoutInfo layout, Sprite background )
+        public static UIValueBar AddHorizontalValueBar( this UIElement parent, UILayoutInfo layout, Sprite background )
         {
             (GameObject rootGameObject, RectTransform rootTransform) = UIHelper.CreateUI( parent, "uilib-valuebar", layout );
 

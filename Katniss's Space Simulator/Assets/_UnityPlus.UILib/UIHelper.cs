@@ -126,37 +126,5 @@ namespace UnityPlus.UILib
                 cs.verticalFit = ContentSizeFitter.FitMode.Unconstrained;
             }
         }
-
-        /// <summary>
-        /// Makes the specified object into a scroll rect. Adds the required child elements.
-        /// </summary>
-        /// <remarks>
-        /// Doesn't include a scrollbar, doesn't include any layout for the content.
-        /// </remarks>
-        /// <returns>The gameobject that will contain the contents.</returns>
-        public static GameObject AddScrollRect( GameObject obj, float contentVerticalSize, bool horizontal, bool vertical )
-        {
-            GameObject items = UIHelper.UIFill( obj.transform, "items" );
-
-            GameObject viewport = UIHelper.UIFill( items.transform, "viewport" );
-
-            Image maskImage = viewport.AddComponent<Image>();
-            Mask mask = viewport.AddComponent<Mask>();
-            mask.showMaskGraphic = false;
-
-            GameObject content = UIHelper.UI( viewport.transform, "content", new Vector2( 0.0f, 1.0f ), new Vector2( 1, 1 ), Vector2.zero, new Vector2( 0.0f, contentVerticalSize ) );
-
-            ScrollRect scrollRect = items.AddComponent<ScrollRect>();
-            scrollRect.content = (RectTransform)content.transform;
-            scrollRect.movementType = ScrollRect.MovementType.Clamped;
-            scrollRect.horizontal = horizontal;
-            scrollRect.vertical = vertical;
-            scrollRect.inertia = true;
-            scrollRect.decelerationRate = 0.5f;
-            scrollRect.scrollSensitivity = 30f;
-            scrollRect.viewport = (RectTransform)viewport.transform;
-
-            return content;
-        }
     }
 }

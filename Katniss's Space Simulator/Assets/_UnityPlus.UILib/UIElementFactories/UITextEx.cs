@@ -7,7 +7,7 @@ namespace UnityPlus.UILib
 {
     public static class UITextEx
     {
-        public static UIText AddText( RectTransform parent, UILayoutInfo layoutInfo, string text )
+        public static UIText AddText( this UIElement parent, UILayoutInfo layoutInfo, string text )
         {
             (GameObject rootGameObject, RectTransform rootTransform) = UIHelper.CreateUI( parent, "uilib-text", layoutInfo );
 

@@ -30,6 +30,7 @@ namespace UnityPlus.UILib
                 pressedColor = Color.white,
                 disabledColor = Color.gray
             };
+            buttonComponent.targetGraphic = imageComponent;
 
             if( onClick != null )
             {

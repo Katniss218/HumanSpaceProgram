@@ -1,7 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using UILib;
 using UnityEngine;
 
 namespace KSS.Core

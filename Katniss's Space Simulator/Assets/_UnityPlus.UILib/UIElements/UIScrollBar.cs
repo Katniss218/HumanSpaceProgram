@@ -10,9 +10,7 @@ namespace UnityPlus.UILib.UIElements
 
         public UIScrollBar( RectTransform transform, UnityEngine.UI.Scrollbar scrollbarComponent ) : base( transform )
         {
-            this.scrollbarHorizontal = scrollbarHorizontal;
-            this.scrollbarVertical = scrollbarVertical;
-            this.contents = scrollbarVertical;
+            this.scrollbarComponent = scrollbarComponent;
         }
     }
 }
