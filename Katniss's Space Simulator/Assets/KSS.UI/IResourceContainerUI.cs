@@ -42,7 +42,7 @@ namespace KSS.UI
 
             GameObject root = UIHelper.UI( parent, "resource container UI", Vector2.zero, Vector2.zero, new Vector2( 250, 15 ) );
 
-            (_, ValueBar bar) = ValueBarFactory.CreateEmptyHorizontal( (RectTransform)root.transform, "bar", new UILayoutInfo( Vector2.zero, Vector2.one, new Vector2( 0.5f, 0.5f ), Vector2.zero, Vector2.zero ), style );
+            (_, ValueBar bar) = UIValueBarEx.CreateEmptyHorizontal( (RectTransform)root.transform, "bar", new UILayoutInfo( Vector2.zero, Vector2.one, new Vector2( 0.5f, 0.5f ), Vector2.zero, Vector2.zero ), style );
 
             IResourceContainerUI ui = root.AddComponent<IResourceContainerUI>();
             ui._bar = bar;

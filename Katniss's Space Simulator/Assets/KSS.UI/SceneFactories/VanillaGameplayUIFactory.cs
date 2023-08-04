@@ -16,8 +16,6 @@ namespace Assets.KSS.UI.SceneFactories
         [OverridableEventListener( HSPOverridableEvent.STARTUP_GAMEPLAY, HSPOverridableEvent.NAMESPACE_VANILLA + ".gameplay_ui" )]
         public static void Create( object obj )
         {
-            (_, UIStyle style) = ((UIStyle, UIStyle))obj;
-
             RectTransform canvasTransform = (RectTransform)CanvasManager.GetCanvas( CanvasManager.STATIC ).transform;
 
 #warning todo complete the mainmenu factory.
@@ -25,17 +23,17 @@ namespace Assets.KSS.UI.SceneFactories
 
         // #-#-#-#-#-#-#-#-#-#
 
-        private static void CreateMainMenuButton( RectTransform parent, UIStyle style )
+        private static void CreateMainMenuButton( RectTransform parent )
         {
 
         }
 
-        private static void CreateSaveButton( RectTransform parent, UIStyle style )
+        private static void CreateSaveButton( RectTransform parent )
         {
 
         }
 
-        private static void CreateLoadButton( RectTransform parent, UIStyle style )
+        private static void CreateLoadButton( RectTransform parent )
         {
 
         }

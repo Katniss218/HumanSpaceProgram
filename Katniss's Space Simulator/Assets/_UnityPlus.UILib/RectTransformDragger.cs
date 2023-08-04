@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace KSS.UI
+namespace UnityPlus.UILib
 {
     /// <summary>
     /// Enables a <see cref="RectTransform"/> to be dragged around by the mouse.

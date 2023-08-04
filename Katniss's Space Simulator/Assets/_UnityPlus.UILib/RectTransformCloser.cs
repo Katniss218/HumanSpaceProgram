@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace KSS.UI
+namespace UnityPlus.UILib
 {
     /// <summary>
     /// Destroys a <see cref="GameObject"/> after the specified button has been pressed.

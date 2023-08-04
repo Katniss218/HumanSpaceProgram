@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace UILib
+namespace UnityPlus.UILib
 {
     /// <summary>
-    /// A compact way to store and pass <see cref="RectTransform"/> layout values.
+    /// A compact way to store and pass <see cref="RectTransform"/> layout information.
     /// </summary>
     public struct UILayoutInfo
     {
@@ -15,7 +15,7 @@ namespace UILib
         public Vector2 anchoredPosition;
         public Vector2 sizeDelta;
 
-        /// <param name="anchorPivot">The value for both anchors and pivot.</param>
+        /// <param name="anchorPivot">The value for anchorMin, anchorMax, and pivot.</param>
         public UILayoutInfo( Vector2 anchorPivot, Vector2 anchoredPosition, Vector2 sizeDelta )
         {
             this.anchorMin = anchorPivot;

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace KSS.UI
+namespace UnityPlus.UILib
 {
     [RequireComponent( typeof( Canvas ) )]
     public class CanvasID : MonoBehaviour
