@@ -11,14 +11,11 @@ namespace KSS.Core
 #warning TODO - turn MainMenuManager into a singleton with the editor-assigned fields.
 
         [SerializeField]
-        Canvas _mainMenuCanvas;
-
-        [SerializeField]
         UIStyle _style;
 
         void Awake()
         {
-            HSPOverridableEvent.EventManager.TryInvoke( HSPOverridableEvent.STARTUP_MAINMENU, (_mainMenuCanvas, _style) );
+            HSPOverridableEvent.EventManager.TryInvoke( HSPOverridableEvent.STARTUP_MAINMENU, (_style, _style) );
         }
     }
 }
