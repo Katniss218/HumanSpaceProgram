@@ -6,7 +6,7 @@ namespace UnityPlus.UILib.UIElements
 {
     public class UIWindow : UIElement
     {
-        UnityEngine.UI.Image backgroundComponent;
+        public readonly UnityEngine.UI.Image backgroundComponent;
 
         public UIWindow( RectTransform transform, UnityEngine.UI.Image backgroundComponent ) : base( transform )
         {

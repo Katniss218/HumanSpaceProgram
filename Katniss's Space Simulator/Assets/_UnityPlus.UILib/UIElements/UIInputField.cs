@@ -6,9 +6,9 @@ namespace UnityPlus.UILib.UIElements
 {
     public class UIInputField : UIElement
     {
-        public TMPro.TMP_InputField inputFieldComponent;
-        public TMPro.TextMeshProUGUI textComponent;
-        public TMPro.TextMeshProUGUI placeholderComponent;
+        public readonly TMPro.TMP_InputField inputFieldComponent;
+        public readonly TMPro.TextMeshProUGUI textComponent;
+        public readonly TMPro.TextMeshProUGUI placeholderComponent;
 
         public UIInputField( RectTransform transform, TMPro.TMP_InputField inputFieldComponent, TMPro.TextMeshProUGUI textComponent, TMPro.TextMeshProUGUI placeholderComponent ) : base( transform )
         {

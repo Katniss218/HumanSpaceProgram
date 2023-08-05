@@ -23,12 +23,12 @@ namespace UnityPlus.UILib
         {
             (GameObject rootGameObject, RectTransform rootTransform) = UIHelper.CreateUI( parent, "uilib-panel", layoutInfo );
 
-            Image imageComponent = rootGameObject.AddComponent<Image>();
-            imageComponent.raycastTarget = false;
-            imageComponent.sprite = background;
-            imageComponent.type = Image.Type.Sliced;
+            Image backgroundComponent = rootGameObject.AddComponent<Image>();
+            backgroundComponent.raycastTarget = false;
+            backgroundComponent.sprite = background;
+            backgroundComponent.type = Image.Type.Sliced;
 
-            return new UIPanel( rootTransform, imageComponent );
+            return new UIPanel( rootTransform, backgroundComponent );
         }
 
         public static UIPanel WithTint( this UIPanel panel, Color tint )

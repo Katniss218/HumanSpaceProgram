@@ -6,11 +6,11 @@ namespace UnityPlus.UILib.UIElements
 {
     public class UIScrollView : UIElement
     {
-        public UnityEngine.UI.ScrollRect scrollRectComponent;
+        public readonly UnityEngine.UI.ScrollRect scrollRectComponent;
 
         public UIScrollBar scrollbarHorizontal;
         public UIScrollBar scrollbarVertical;
-        public UIElement contents;
+        public readonly UIElement contents;
 
         public UIScrollView( RectTransform transform, UnityEngine.UI.ScrollRect scrollRectComponent, UIScrollBar scrollbarHorizontal, UIScrollBar scrollbarVertical, UIElement contents ) : base( transform )
         {
