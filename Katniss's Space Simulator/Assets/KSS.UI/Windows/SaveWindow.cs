@@ -22,7 +22,7 @@ namespace KSS.UI
 
             SaveWindow window = uiGO.AddComponent<SaveWindow>();
 
-            UIScrollView scrollView = ((UIElement)rootRT).AddScrollView( UILayoutInfo.Fill(), new Vector2(0, 300), false, true );
+            UIScrollView scrollView = ((UIElement)rootRT).AddScrollView( UILayoutInfo.Fill( 2, 2, 30, 60 ), new Vector2( 0, 300 ), false, true );
 
             ((UIElement)rootRT).AddButton( new UILayoutInfo( Vector2.right, new Vector2( -2, 5 ), new Vector2( 95, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ) );
 

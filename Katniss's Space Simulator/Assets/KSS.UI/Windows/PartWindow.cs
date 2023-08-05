@@ -11,6 +11,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UnityPlus.UILib.UIElements;
+using UnityPlus.AssetManagement;
 
 namespace KSS.UI.Windows
 {
@@ -68,31 +69,18 @@ namespace KSS.UI.Windows
 
         public static PartWindow Create( Part part )
         {
-            (GameObject rootGO, RectTransform rootRT) = UIHelper.CreateUI( (UIElement)CanvasManager.Get( CanvasName.WINDOWS ).transform, "part window", new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 250f, 100f ) ) );
+            UIWindow window = CanvasManager.Get( CanvasName.WINDOWS ).AddWindow( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 300f, 300f ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_window" ) )
+                .Draggable()
+                .WithCloseButton( new UILayoutInfo( Vector2.one, new Vector2( -7, -5 ), new Vector2( 20, 20 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ )
+                .WithRelationHightlight( out WindowRelationHighlight relationHighlight );
 
-            WindowRelationHighlight relationHighlight = rootGO.AddComponent<WindowRelationHighlight>();
-            relationHighlight.UITransform = (RectTransform)rootGO.transform;
+            window.AddText( new UILayoutInfo( Vector2.up, Vector2.one, Vector2.zero, new Vector2( 0, 30 ) ), part.DisplayName )
+                .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
+                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
-            RectTransformDragger windowDrag = rootGO.AddComponent<RectTransformDragger>();
-            windowDrag.UITransform = (RectTransform)rootGO.transform;
+            UIScrollView scrollView = window.AddScrollView( new UILayoutInfo( Vector2.zero, Vector2.one, new Vector2( 0.5f, 0.5f ), new Vector2( 0, -15 ), new Vector2( 0, -30 ) ), new Vector2( 0, 100 - 30 ), false, true );
 
-            Image pwBackgroundImage = rootGO.AddComponent<Image>();
-            pwBackgroundImage.raycastTarget = true;
-            pwBackgroundImage.color = Color.gray;
-
-            (GameObject exitButtonGO, RectTransform exitRT) = UIHelper.CreateUI( rootRT, "X", new UILayoutInfo( Vector2.one, Vector2.zero, new Vector2( 30, 30 )) );
-            Image exitImage = exitButtonGO.AddComponent<Image>();
-            exitImage.raycastTarget = true;
-            exitImage.color = Color.red;
-            Button exitBtn = exitButtonGO.AddComponent<Button>();
-
-            RectTransformCloser ex = exitButtonGO.AddComponent<RectTransformCloser>();
-            ex.ExitButton = exitBtn;
-            ex.UITransform = (RectTransform)rootGO.transform;
-
-            UIScrollView scrollView = ((UIElement)rootRT).AddScrollView( new UILayoutInfo( Vector2.zero, Vector2.one, new Vector2( 0.5f, 0.5f ), new Vector2( 0, -15 ), new Vector2( 0, -30 )), new Vector2(0, 100 - 30), false, true );
-
-            PartWindow partWindow = rootGO.AddComponent<PartWindow>();
+            PartWindow partWindow = window.gameObject.AddComponent<PartWindow>();
             partWindow._list = scrollView.contents.transform;
             partWindow._relationHighlighter = relationHighlight;
             partWindow.SetPart( part );

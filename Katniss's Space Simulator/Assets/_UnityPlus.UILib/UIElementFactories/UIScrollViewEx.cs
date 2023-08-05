@@ -8,14 +8,16 @@ namespace UnityPlus.UILib
 {
     public static class UIScrollViewEx
     {
+        public static UIScrollView AddScrollViewHorizontal( this UIElement parent, UILayoutInfo layout, Vector2 contentSize )
+        {
+            return AddScrollView( parent, layout, contentSize, true, false );
+        }
 
-        /// <summary>
-        /// Makes the specified object into a scroll rect. Adds the required child elements.
-        /// </summary>
-        /// <remarks>
-        /// Doesn't include a scrollbar, doesn't include any layout for the content.
-        /// </remarks>
-        /// <returns>The gameobject that will contain the contents.</returns>
+        public static UIScrollView AddScrollViewVertical( this UIElement parent, UILayoutInfo layout, Vector2 contentSize )
+        {
+            return AddScrollView( parent, layout, contentSize, false, true );
+        }
+
         public static UIScrollView AddScrollView( this UIElement parent, UILayoutInfo layout, Vector2 contentSize, bool horizontal, bool vertical )
         {
             (GameObject root, RectTransform rootTransform) = UIHelper.CreateUI( parent, "uilib-scrollview", layout );
@@ -56,10 +58,15 @@ namespace UnityPlus.UILib
             return scrollView;
         }
 
-        public static UIScrollView WithVerticalScrollbar( this UIScrollView scrollView, UILayoutInfo layout, Sprite background, Sprite foreground )
+        public static UIScrollView WithHorizontalScrollbar( this UIScrollView scrollView, UILayoutInfo layout, Sprite background, Sprite foreground, out UIScrollBar scrollBar )
         {
-            (GameObject root, RectTransform rootTransform) = UIHelper.CreateUI( scrollView, "uilib-scrollbar-vertical", layout );
+            scrollBar = scrollView.AddScrollbar( layout, background, foreground, false );
+            return scrollView;
+        }
 
+        public static UIScrollView WithVerticalScrollbar( this UIScrollView scrollView, UILayoutInfo layout, Sprite background, Sprite foreground, out UIScrollBar scrollBar )
+        {
+            scrollBar = scrollView.AddScrollbar( layout, background, foreground, true );
             return scrollView;
         }
     }

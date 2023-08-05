@@ -34,19 +34,6 @@ namespace UnityPlus.UILib
         }
 
         /*
-        [Obsolete( "The anchored position and size calculations are wrong. Only works for (0,0,0,0)" )]
-        public static GameObject UIFill( Transform parent, string name, float left, float right, float top, float bottom )
-        {
-            Vector2 anchorMin = new Vector2( 0.0f, 0.0f );
-            Vector2 anchorMax = new Vector2( 1.0f, 1.0f );
-            Vector2 pivot = new Vector2( 0.5f, 0.5f );
-
-            Vector2 anchoredPos = new Vector2( left, -top );
-            Vector2 sizeDelta = new Vector2( -left - right, -top - bottom );
-
-            return UI( parent, name, anchorMin, anchorMax, pivot, anchoredPos, sizeDelta );
-        }
-
         /// <summary>
         /// Creates a new UI object that fills its parent, and the edges are at the specific percent marks of the parent.
         /// </summary>
@@ -65,20 +52,6 @@ namespace UnityPlus.UILib
             return UI( parent, name, anchorMin, anchorMax, pivot, anchoredPos, sizeDelta );
         }
         
-        /// <summary>
-        /// Makes the UI element a raycast target for the UI event system. Enables the UI object to listen to UI event system inputs.
-        /// </summary>
-        public static void MakeRaycastTarget( GameObject go )
-        {
-            Image raycastImage = go.GetComponent<Image>();
-            if( raycastImage == null )
-            {
-                raycastImage = go.AddComponent<Image>(); // Image is required to register raycasts without a custom component.
-                raycastImage.color = new Color( 0, 0, 0, 0 ); // Setting alpha to 0 makes image invisible.
-            }
-            raycastImage.raycastTarget = true;
-        }
-
         /// <summary>
         /// Makes the specific object a vertical layout group.
         /// </summary>

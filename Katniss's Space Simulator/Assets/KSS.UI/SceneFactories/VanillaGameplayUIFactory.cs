@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using UnityPlus.UILib;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityPlus.UILib.UIElements;
 
 namespace Assets.KSS.UI.SceneFactories
 {
@@ -15,7 +16,7 @@ namespace Assets.KSS.UI.SceneFactories
         [OverridableEventListener( HSPOverridableEvent.STARTUP_GAMEPLAY, HSPOverridableEvent.NAMESPACE_VANILLA + ".gameplay_ui" )]
         public static void Create( object obj )
         {
-            RectTransform canvasTransform = (RectTransform)CanvasManager.Get( CanvasName.STATIC ).transform;
+            UIElement canvasTransform = (UIElement)CanvasManager.Get( CanvasName.STATIC );
 
 #warning todo complete the mainmenu factory.
         }

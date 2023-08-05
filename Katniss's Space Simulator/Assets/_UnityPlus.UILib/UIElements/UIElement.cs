@@ -41,5 +41,10 @@ namespace UnityPlus.UILib.UIElements
         {
             return uiElement.transform;
         }
+
+        public static explicit operator UIElement( Canvas canvas )
+        {
+            return new UIElement( (RectTransform)canvas.transform );
+        }
     }
 }

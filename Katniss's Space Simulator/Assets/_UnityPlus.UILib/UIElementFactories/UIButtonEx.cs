@@ -15,6 +15,7 @@ namespace UnityPlus.UILib
             (GameObject rootGameObject, RectTransform rootTransform) = UIHelper.CreateUI( parent, "uilib-button", layout );
 
             Image imageComponent = rootGameObject.AddComponent<Image>();
+            imageComponent.raycastTarget = true;
             imageComponent.sprite = sprite;
             imageComponent.type = Image.Type.Sliced;
 

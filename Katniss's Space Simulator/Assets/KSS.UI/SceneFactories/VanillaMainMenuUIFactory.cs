@@ -20,13 +20,13 @@ namespace KSS.UI.SceneFactories
         [OverridableEventListener( HSPOverridableEvent.STARTUP_MAINMENU, HSPOverridableEvent.NAMESPACE_VANILLA + ".mainmenu_ui" )]
         public static void Create( object obj )
         {
-            RectTransform canvasTransform = (RectTransform)CanvasManager.Get( CanvasName.STATIC ).transform;
+            UIElement canvas = (UIElement)CanvasManager.Get( CanvasName.STATIC );
 
-            CreatePlayButton( canvasTransform );
-            CreateSettingsButton( canvasTransform );
-            CreateExitButton( canvasTransform );
+            CreatePlayButton( canvas );
+            CreateSettingsButton( canvas );
+            CreateExitButton( canvas );
 
-            UIValueBar bar = UIValueBarEx.AddHorizontalValueBar( (UIElement)canvasTransform, new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, 35 ), new Vector2( 200, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/bar_background" ) )
+            UIValueBar bar = UIValueBarEx.AddHorizontalValueBar( canvas, new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, 35 ), new Vector2( 200, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/bar_background" ) )
                 .WithPadding( 5, 5, 1 );
 
             var seg = bar.valueBarComponent.AddSegment( 0.25f );
@@ -40,9 +40,9 @@ namespace KSS.UI.SceneFactories
 
         // #-#-#-#-#-#-#-#-#-#
 
-        private static void CreatePlayButton( RectTransform parent )
+        private static void CreatePlayButton( UIElement parent )
         {
-            UIButton button = ((UIElement)parent).AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 200, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ) );
+            UIButton button = parent.AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 200, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ) );
 
             button.AddText( UILayoutInfo.Fill(), "PLAY" )
                 .WithFont( AssetRegistry.Get<TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
@@ -52,18 +52,18 @@ namespace KSS.UI.SceneFactories
             button.buttonComponent.onClick.AddListener( pbs.StartGame );
         }
 
-        private static void CreateSettingsButton( RectTransform parent )
+        private static void CreateSettingsButton( UIElement parent )
         {
-            ((UIElement)parent).AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, -35 ), new Vector2( 200, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ) )
+            parent.AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, -35 ), new Vector2( 200, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ) )
                 .Disabled()
                 .AddText( UILayoutInfo.Fill(), "SETTINGS" )
                 .WithFont( AssetRegistry.Get<TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
                 .WithAlignment( HorizontalAlignmentOptions.Center );
         }
 
-        private static void CreateExitButton( RectTransform parent )
+        private static void CreateExitButton( UIElement parent )
         {
-            ((UIElement)parent).AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, -35 ), new Vector2( 200, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ) )
+            parent.AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, -35 ), new Vector2( 200, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ) )
                 .AddText( UILayoutInfo.Fill(), "EXIT" )
                 .WithFont( AssetRegistry.Get<TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
                 .WithAlignment( HorizontalAlignmentOptions.Center );

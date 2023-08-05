@@ -4,11 +4,11 @@ using UnityEngine;
 
 namespace UnityPlus.UILib.UIElements
 {
-    public class UIWindow : UIElement
+    public class UIPanel : UIElement
     {
-        UnityEngine.UI.Image backgroundComponent;
+        public UnityEngine.UI.Image backgroundComponent;
 
-        public UIWindow( RectTransform transform, UnityEngine.UI.Image backgroundComponent ) : base( transform )
+        public UIPanel( RectTransform transform, UnityEngine.UI.Image backgroundComponent ) : base( transform )
         {
             this.backgroundComponent = backgroundComponent;
         }
