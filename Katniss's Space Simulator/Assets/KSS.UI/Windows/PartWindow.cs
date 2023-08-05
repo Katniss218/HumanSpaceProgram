@@ -75,11 +75,11 @@ namespace KSS.UI.Windows
                 .WithCloseButton( new UILayoutInfo( Vector2.one, new Vector2( -7, -5 ), new Vector2( 20, 20 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ )
                 .WithRelationHightlight( out WindowRelationHighlight relationHighlight );
 
-            window.AddText( new UILayoutInfo( Vector2.up, Vector2.one, Vector2.zero, new Vector2( 0, 30 ) ), part.DisplayName )
+            window.AddText( UILayoutInfo.FillHorizontal(0, 0, 1f, 0, 30 ), part.DisplayName )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
-            UIScrollView scrollView = window.AddScrollView( new UILayoutInfo( Vector2.zero, Vector2.one, new Vector2( 0.5f, 0.5f ), new Vector2( 0, -15 ), new Vector2( 0, -30 ) ), new Vector2( 0, 100 - 30 ), false, true );
+            UIScrollView scrollView = window.AddScrollView( UILayoutInfo.Fill( 2, 2, 75, 15 ), new Vector2( 0, 200 ), false, true );
 
             PartWindow partWindow = window.gameObject.AddComponent<PartWindow>();
             partWindow._list = scrollView.contents.transform;

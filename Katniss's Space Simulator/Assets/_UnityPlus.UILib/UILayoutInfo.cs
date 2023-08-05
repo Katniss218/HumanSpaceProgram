@@ -68,7 +68,7 @@ namespace UnityPlus.UILib
                 anchorMin = Vector2.zero,
                 anchorMax = Vector2.one,
                 pivot = new Vector2( 0.5f, 0.5f ),
-                anchoredPosition = new Vector2( left - right, top - bottom ),
+                anchoredPosition = new Vector2( (left - right) / 2, (bottom - top) / 2 ),
                 sizeDelta = new Vector2( -(left + right), -(top + bottom) )
             };
         }
@@ -83,7 +83,7 @@ namespace UnityPlus.UILib
                 anchorMin = new Vector2( 0.0f, anchorPivotY ),
                 anchorMax = new Vector2( 1.0f, anchorPivotY ),
                 pivot = new Vector2( 0.5f, anchorPivotY ),
-                anchoredPosition = new Vector2( left - right, posY ),
+                anchoredPosition = new Vector2( (left - right) / 2, posY ),
                 sizeDelta = new Vector2( -(left + right), height )
             };
         }
@@ -98,7 +98,7 @@ namespace UnityPlus.UILib
                 anchorMin = new Vector2( anchorPivotX, 0.0f ),
                 anchorMax = new Vector2( anchorPivotX, 1.0f ),
                 pivot = new Vector2( anchorPivotX, 0.5f ),
-                anchoredPosition = new Vector2( posX, top - bottom ),
+                anchoredPosition = new Vector2( posX, (bottom - top) / 2 ),
                 sizeDelta = new Vector2( width, -(top + bottom) )
             };
         }
