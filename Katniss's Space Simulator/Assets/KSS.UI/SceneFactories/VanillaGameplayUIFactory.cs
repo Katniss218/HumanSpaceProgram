@@ -1,6 +1,6 @@
 ﻿using KSS.Core;
 using KSS.Core.Mods;
-using KSS.Core.Scenes;
+using KSS.Core.SceneManagement;
 using KSS.UI;
 using System;
 using System.Collections.Generic;
@@ -14,7 +14,7 @@ namespace KSS.UI.SceneFactories
 {
     public static class VanillaGameplayUIFactory
     {
-        [OverridableEventListener( HSPOverridableEvent.STARTUP_GAMEPLAY, HSPOverridableEvent.NAMESPACE_VANILLA + ".gameplay_ui" )]
+        [OverridableEventListener( HSPEvent.STARTUP_GAMEPLAY, HSPEvent.NAMESPACE_VANILLA + ".gameplay_ui" )]
         public static void Create( object obj )
         {
             Canvas canvas = CanvasManager.Get( CanvasName.STATIC );

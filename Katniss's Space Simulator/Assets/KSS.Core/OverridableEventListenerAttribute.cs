@@ -10,9 +10,11 @@ using UnityPlus.OverridableEvents;
 namespace KSS.Core
 {
     /// <summary>
-    /// Specifies that a method should be run when a specified overridable event is fired. <br/>
-    /// This can be applied to any static method with the signature: `static void Method( object )`.
+    /// Specifies that a method should be run when a specified overridable event is fired.
     /// </summary>
+    /// <remarks>
+    /// This attribute can be applied to any static method with the signature `static void Method( object )`.
+    /// </remarks>
     [AttributeUsage( AttributeTargets.Method )]
     public class OverridableEventListenerAttribute : Attribute
     {
@@ -52,8 +54,8 @@ namespace KSS.Core
 
             Action<object> methodDelegate = (Action<object>)Delegate.CreateDelegate( typeof( Action<object> ), method );
 
-            HSPOverridableEvent.EventManager.TryCreate( attr.EventID );
-            HSPOverridableEvent.EventManager.TryAddListener( attr.EventID, new OverridableEventListener<object>() { id = attr.ID, blacklist = attr.Blacklist, func = methodDelegate } );
+            HSPEvent.EventManager.TryCreate( attr.EventID );
+            HSPEvent.EventManager.TryAddListener( attr.EventID, new OverridableEventListener<object>() { id = attr.ID, blacklist = attr.Blacklist, func = methodDelegate } );
         }
 
         /// <summary>
@@ -81,7 +83,7 @@ namespace KSS.Core
                         }
                         catch( TypeLoadException ex )
                         {
-                            Debug.LogWarning( $"Couldn't resolve a type from the mod `{assembly.FullName}`: {ex.Message}." );
+                            Debug.LogWarning( $"The mod `{assembly.FullName}` expected a type `{ex.TypeName}` to exist, but it didn't.: {ex.Message}." );
                         }
                     }
                 }

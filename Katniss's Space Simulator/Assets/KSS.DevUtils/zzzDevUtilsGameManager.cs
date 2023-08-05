@@ -42,27 +42,6 @@ namespace KSS.DevUtils
             LODQuadSphere.cbTex = this.cbTextures;
         }
 
-        private void Update()
-        {
-            if( Input.GetKeyDown( KeyCode.Escape ) )
-            {
-                if( !TimeWarpManager.PreventPlayerChangingTimescale )
-                {
-                    if( TimeWarpManager.IsPaused )
-                    {
-                        TimeWarpManager.Unpause();
-                        HSPOverridableEvent.EventManager.TryInvoke( HSPOverridableEvent.ESCAPE_GAMEPLAY, null );
-                    }
-                    else
-                    {
-                        TimeWarpManager.Pause();
-                        HSPOverridableEvent.EventManager.TryInvoke( HSPOverridableEvent.ESCAPE_GAMEPLAY, null );
-                    }
-
-                }
-            }
-        }
-
         void Start()
         {
             /*normalmap = new RenderTexture( heightmap.width, heightmap.height, 8, RenderTextureFormat.ARGB32 );

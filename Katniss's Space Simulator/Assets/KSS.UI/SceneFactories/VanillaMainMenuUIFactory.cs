@@ -1,6 +1,6 @@
 using KSS.Core;
 using KSS.Core.Mods;
-using KSS.Core.Scenes;
+using KSS.Core.SceneManagement;
 using System;
 using System.Collections.Generic;
 using UnityPlus.UILib;
@@ -17,7 +17,7 @@ namespace KSS.UI.SceneFactories
     /// </summary>
     public static class VanillaMainMenuUIFactory
     {
-        [OverridableEventListener( HSPOverridableEvent.STARTUP_MAINMENU, HSPOverridableEvent.NAMESPACE_VANILLA + ".mainmenu_ui" )]
+        [OverridableEventListener( HSPEvent.STARTUP_MAINMENU, HSPEvent.NAMESPACE_VANILLA + ".mainmenu_ui" )]
         public static void Create( object obj )
         {
             UIElement canvas = (UIElement)CanvasManager.Get( CanvasName.STATIC );
@@ -42,14 +42,14 @@ namespace KSS.UI.SceneFactories
 
         private static void CreatePlayButton( UIElement parent )
         {
-            UIButton button = parent.AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 200, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ) );
+            UIButton button = parent.AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 200, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
+            {
+                SceneLoader.UnloadSceneAsync( "MainMenu", () => SceneLoader.LoadSceneAsync( "Testing And Shit", true, false, null ) );
+            } );
 
             button.AddText( UILayoutInfo.Fill(), "PLAY" )
                 .WithFont( AssetRegistry.Get<TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
                 .WithAlignment( HorizontalAlignmentOptions.Center );
-
-            PlayButtonSwitcher pbs = button.gameObject.AddComponent<PlayButtonSwitcher>();
-            button.buttonComponent.onClick.AddListener( pbs.StartGame );
         }
 
         private static void CreateSettingsButton( UIElement parent )

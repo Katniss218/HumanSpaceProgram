@@ -7,7 +7,10 @@ using UnityPlus.OverridableEvents;
 
 namespace KSS.Core
 {
-    public static class HSPOverridableEvent
+    /// <summary>
+    /// A container for the overridable event manager and builtin event identifiers.
+    /// </summary>
+    public static class HSPEvent
     {
         /// <summary>
         /// The static event manager for the entire Human Space Program.
@@ -26,21 +29,27 @@ namespace KSS.Core
         /// Invoked at the immediate start of the game. This is always the first invoked event.
         /// </summary>
         public const string STARTUP_IMMEDIATELY = NAMESPACE_VANILLA + ".startup.immediately";
+
         /// <summary>
         /// Invoked immediately after loading the main menu scene.
         /// </summary>
         public const string STARTUP_MAINMENU = NAMESPACE_VANILLA + ".startup.mainmenu";
+
         /// <summary>
         /// Invoked immediately after loading the gameplay scene.
         /// </summary>
         public const string STARTUP_GAMEPLAY = NAMESPACE_VANILLA + ".startup.gameplay";
 
+        /// <summary>
+        /// Invoked when the player toggles the escape (pause) menu in the gameplay scene.
+        /// </summary>
         public const string ESCAPE_GAMEPLAY = NAMESPACE_VANILLA + ".escape.gameplay";
 
         /// <summary>
         /// Invoked to create the timeline loader.
         /// </summary>
         public const string TIMELINE_LOADER_CREATE = NAMESPACE_VANILLA + ".timeline.loader.create";
+
         /// <summary>
         /// Invoked to create the timeline saver.
         /// </summary>

@@ -18,7 +18,7 @@ namespace KSS.UI.SceneFactories
     {
         static GameObject escapeMenuWindow;
 
-        [OverridableEventListener( HSPOverridableEvent.ESCAPE_GAMEPLAY, HSPOverridableEvent.NAMESPACE_VANILLA + ".escape_menu_ui" )]
+        [OverridableEventListener( HSPEvent.ESCAPE_GAMEPLAY, HSPEvent.NAMESPACE_VANILLA + ".escape_menu_ui" )]
         public static void OnGameplayEscape( object obj )
         {
             if( escapeMenuWindow != null )
