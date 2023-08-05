@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_UnityPlus.UILib", "_UnityPlus.UILib.csproj", "{50861573-23A3-BCBD-DFDB-2A1CFB929A2F}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_UnityPlus.Serialization", "_UnityPlus.Serialization.csproj", "{53A4B44D-C587-1ED0-C944-834EA89508FD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KSS", "KSS.csproj", "{6A093499-3B7A-71F2-8793-20E600CE8610}"
@@ -17,8 +19,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_UnityEngine", "_UnityEngin
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_UnityPlus.OverridableEvents", "_UnityPlus.OverridableEvents.csproj", "{D26EF55E-D30C-518A-2340-C096B47A9C02}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_UnityPlus.UILib", "_UnityPlus.UILib.csproj", "{50861573-23A3-BCBD-DFDB-2A1CFB929A2F}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KSS.DevUtils", "KSS.DevUtils.csproj", "{D7208026-3029-DD39-0449-2AD64786FAF4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KSS.Tests.PlayMode", "KSS.Tests.PlayMode.csproj", "{454E0C8A-2709-D62E-8923-9DB187FD6F18}"
@@ -33,6 +33,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{50861573-23A3-BCBD-DFDB-2A1CFB929A2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50861573-23A3-BCBD-DFDB-2A1CFB929A2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50861573-23A3-BCBD-DFDB-2A1CFB929A2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50861573-23A3-BCBD-DFDB-2A1CFB929A2F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{53A4B44D-C587-1ED0-C944-834EA89508FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{53A4B44D-C587-1ED0-C944-834EA89508FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{53A4B44D-C587-1ED0-C944-834EA89508FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -65,10 +69,6 @@ Global
 		{D26EF55E-D30C-518A-2340-C096B47A9C02}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D26EF55E-D30C-518A-2340-C096B47A9C02}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D26EF55E-D30C-518A-2340-C096B47A9C02}.Release|Any CPU.Build.0 = Release|Any CPU
-		{50861573-23A3-BCBD-DFDB-2A1CFB929A2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{50861573-23A3-BCBD-DFDB-2A1CFB929A2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{50861573-23A3-BCBD-DFDB-2A1CFB929A2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{50861573-23A3-BCBD-DFDB-2A1CFB929A2F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D7208026-3029-DD39-0449-2AD64786FAF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D7208026-3029-DD39-0449-2AD64786FAF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D7208026-3029-DD39-0449-2AD64786FAF4}.Release|Any CPU.ActiveCfg = Release|Any CPU

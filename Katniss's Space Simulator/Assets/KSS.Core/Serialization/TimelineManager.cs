@@ -60,6 +60,7 @@ namespace KSS.Core.Serialization
 #warning TODO - check saver's state and prevent calling if not 'ready'.
 
             CreateDefaultSaver();
+            HSPOverridableEvent.EventManager.TryInvoke( HSPOverridableEvent.TIMELINE_SAVER_CREATE );
 
             throw new NotImplementedException();
             // if universe is given, and saveId is null, overwrite the default (this shouldn't really be done in practice, but if you want to, you can).
@@ -76,7 +77,6 @@ namespace KSS.Core.Serialization
 #warning TODO - check loader's state and prevent calling if not 'ready'.
 
             CreateDefaultLoader();
-
             HSPOverridableEvent.EventManager.TryInvoke( HSPOverridableEvent.TIMELINE_LOADER_CREATE );
 
             throw new NotImplementedException();

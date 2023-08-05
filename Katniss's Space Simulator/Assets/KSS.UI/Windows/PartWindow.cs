@@ -1,7 +1,7 @@
 ﻿using KSS.Cameras;
 using KSS.Core;
 using KSS.Core.ResourceFlowSystem;
-using UILib;
+using UnityPlus.UILib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UnityPlus.UILib.UIElements;
+using UnityPlus.AssetManagement;
 
 namespace KSS.UI.Windows
 {
@@ -67,33 +69,20 @@ namespace KSS.UI.Windows
 
         public static PartWindow Create( Part part )
         {
-            GameObject rootGO = UIHelper.UI( CanvasManager.GetCanvas( CanvasManager.WINDOWS ).transform, "part window", new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 250f, 100f ) );
+            UIWindow window = CanvasManager.Get( CanvasName.WINDOWS ).AddWindow( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 300f, 300f ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_window" ) )
+                .Draggable()
+                .Focusable()
+                .WithCloseButton( new UILayoutInfo( Vector2.one, new Vector2( -7, -5 ), new Vector2( 20, 20 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ )
+                .WithRelationHightlight( out WindowRelationHighlight relationHighlight );
 
-            Image pwBackgroundImage = rootGO.AddComponent<Image>();
-            pwBackgroundImage.raycastTarget = true;
-            pwBackgroundImage.color = Color.gray;
+            window.AddText( UILayoutInfo.FillHorizontal(0, 0, 1f, 0, 30 ), part.DisplayName )
+                .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
+                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
-            GameObject exitButtonGO = UIHelper.UI( rootGO.transform, "X", Vector2.one, Vector2.zero, new Vector2( 30, 30 ) );
-            Image exitImage = exitButtonGO.AddComponent<Image>();
-            exitImage.raycastTarget = true;
-            exitImage.color = Color.red;
-            Button exitBtn = exitButtonGO.AddComponent<Button>();
-            RectTransformCloser ex = exitButtonGO.AddComponent<RectTransformCloser>();
-            ex.ExitButton = exitBtn;
-            ex.UITransform = (RectTransform)rootGO.transform;
+            UIScrollView scrollView = window.AddScrollView( UILayoutInfo.Fill( 2, 2, 75, 15 ), new Vector2( 0, 200 ), false, true );
 
-            GameObject windowContentsGO = UIHelper.UI( rootGO.transform, "contents", Vector2.zero, Vector2.one, new Vector2( 0.5f, 0.5f ), new Vector2( 0, -15 ), new Vector2( 0, -30 ) );
-
-            WindowRelationHighlight relationHighlight = rootGO.AddComponent<WindowRelationHighlight>();
-            relationHighlight.UITransform = (RectTransform)rootGO.transform;
-
-            GameObject scrollRectGO = UIHelper.AddScrollRect( windowContentsGO, 100 - 30, false, true );
-
-            RectTransformDragger windowDrag = rootGO.AddComponent<RectTransformDragger>();
-            windowDrag.UITransform = (RectTransform)rootGO.transform;
-
-            PartWindow partWindow = rootGO.AddComponent<PartWindow>();
-            partWindow._list = (RectTransform)scrollRectGO.transform;
+            PartWindow partWindow = window.gameObject.AddComponent<PartWindow>();
+            partWindow._list = scrollView.contents.transform;
             partWindow._relationHighlighter = relationHighlight;
             partWindow.SetPart( part );
 

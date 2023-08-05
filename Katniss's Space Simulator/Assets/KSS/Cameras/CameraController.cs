@@ -75,6 +75,8 @@ namespace KSS.Cameras
         /// </remarks>
         public UnityEngine.Camera MainCamera { get => _nearCamera; }
 
+        bool _isMoving;
+
         void UpdateZoomLevel()
         {
             if( Input.mouseScrollDelta.y > 0 )
@@ -115,14 +117,12 @@ namespace KSS.Cameras
 
         void UpdateOrientation()
         {
-            if( Input.GetKey( KeyCode.Mouse1 ) ) // RMB
-            {
-                float mouseX = Input.GetAxis( "Mouse X" );
-                float mouseY = Input.GetAxis( "Mouse Y" );
+            float mouseX = Input.GetAxis( "Mouse X" );
+            float mouseY = Input.GetAxis( "Mouse Y" );
 
-                this.transform.rotation *= Quaternion.AngleAxis( mouseX * MOVE_MULTIPLIER, Vector3.up );
-                this.transform.rotation *= Quaternion.AngleAxis( -mouseY * MOVE_MULTIPLIER, Vector3.right );
-            }
+            this.transform.rotation *= Quaternion.AngleAxis( mouseX * MOVE_MULTIPLIER, Vector3.up );
+            this.transform.rotation *= Quaternion.AngleAxis( -mouseY * MOVE_MULTIPLIER, Vector3.right );
+
         }
 
         void TryToggleNearCamera()
@@ -155,14 +155,25 @@ namespace KSS.Cameras
 
         void Update()
         {
-            if( UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() )
+            if( !UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() )
             {
-                return;
+                UpdateZoomLevel();
+
+                if( Input.GetKeyDown( KeyCode.Mouse1 ) ) // Mouse1 = Right Mouse Button
+                {
+                    _isMoving = true;
+                }
             }
 
-            UpdateZoomLevel();
+            if( _isMoving && Input.GetKeyUp( KeyCode.Mouse1 ) )
+            {
+                _isMoving = false;
+            }
 
-            UpdateOrientation();
+            if( _isMoving )
+            {
+                UpdateOrientation();
+            }
         }
 
         void LateUpdate()

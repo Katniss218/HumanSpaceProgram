@@ -75,6 +75,22 @@ namespace UnityPlus.AssetManagement
             return null;
         }
 
+        public static (string, T)[] GetAll<T>() where T : class
+        {
+            int count = _cache.Count;
+            List<(string, T)> assets = new List<(string, T)>();
+
+            foreach( var kvp in _cache )
+            {
+                if( kvp.Value is not T )
+                    continue;
+
+                assets.Add( (kvp.Key, (T)kvp.Value) );
+            }
+
+            return assets.ToArray();
+        }
+
         /// <summary>
         /// Registers an object as an asset.
         /// </summary>

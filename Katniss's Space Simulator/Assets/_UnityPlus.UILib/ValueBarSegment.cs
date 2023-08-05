@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace UILib
+namespace UnityPlus.UILib
 {
     public class ValueBarSegment : MonoBehaviour
     {
@@ -38,7 +38,6 @@ namespace UILib
                 OnLeftOrWidthChanged();
             }
         }
-
 
         internal float TotalWidth
         {

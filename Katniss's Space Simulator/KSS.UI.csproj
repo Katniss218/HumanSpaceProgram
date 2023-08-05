@@ -57,23 +57,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\KSS.UI\Windows\LoadWindow.cs" />
-    <Compile Include="Assets\KSS.UI\RectTransformDragger.cs" />
-    <Compile Include="Assets\KSS.UI\RectTransformCloser.cs" />
     <Compile Include="Assets\KSS.UI\SceneFactories\VanillaGameplayUIFactory.cs" />
     <Compile Include="Assets\KSS.UI\Windows\WindowRelationHighlight.cs" />
     <Compile Include="Assets\KSS.UI\SceneFactories\VanillaMainMenuUIFactory.cs" />
     <Compile Include="Assets\KSS.UI\TimewarpReadoutUI.cs" />
-    <Compile Include="Assets\KSS.UI\CanvasManager.cs" />
     <Compile Include="Assets\KSS.UI\VelocityReadoutUI.cs" />
-    <Compile Include="Assets\KSS.UI\CanvasID.cs" />
     <Compile Include="Assets\KSS.UI\IResourceContainerUI.cs" />
     <Compile Include="Assets\KSS.UI\Windows\SaveWindow.cs" />
-    <Compile Include="Assets\KSS.UI\KSSUIStyle.cs" />
     <Compile Include="Assets\KSS.UI\Windows\PartWindow.cs" />
     <Compile Include="Assets\KSS.UI\FPSCounterUI.cs" />
     <Compile Include="Assets\KSS.UI\AltitudeReadoutUI.cs" />
     <Compile Include="Assets\KSS.UI\PartWindowManager.cs" />
     <Compile Include="Assets\KSS.UI\AccelerationReadoutUI.cs" />
+    <Compile Include="Assets\KSS.UI\CanvasName.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.UI\___KSS.UI.asmdef" />

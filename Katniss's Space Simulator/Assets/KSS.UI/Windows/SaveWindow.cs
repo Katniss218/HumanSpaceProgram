@@ -1,35 +1,41 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UILib;
-using UILib.Factories;
+using UnityPlus.UILib;
+using UnityPlus.UILib.UIElements;
 using KSS.Core;
 using UnityEngine.UI;
+using UnityPlus.AssetManagement;
 
 namespace KSS.UI
 {
     public class SaveWindow : MonoBehaviour
     {
-        //
-#warning TODO - add buttons to gameplay scene (and a full factory for it like mainmenu as well)
         /// <summary>
         /// Creates a save window with the current context.
         /// </summary>
         public static SaveWindow Create()
         {
-            KSSUIStyle style = (KSSUIStyle)UIStyleManager.Instance.Style;
+            UIWindow window = CanvasManager.Get( CanvasName.WINDOWS ).AddWindow( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 250f, 100f ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_window" ) )
+                .Draggable()
+                .Focusable()
+                .WithCloseButton( new UILayoutInfo( Vector2.one, new Vector2( -7, -5 ), new Vector2( 20, 20 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ );
 
-            GameObject uiGO = UIHelper.UI( CanvasManager.GetCanvas( CanvasManager.WINDOWS ).transform, "part window", new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 250f, 100f ) );
+            SaveWindow saveWindow = window.gameObject.AddComponent<SaveWindow>();
 
-            SaveWindow window = uiGO.AddComponent<SaveWindow>();
+            UIScrollView scrollView = window.AddVerticalScrollView( UILayoutInfo.Fill( 2, 2, 30, 60 ), new Vector2( 0, 300 ) )
+                .WithVerticalScrollbar( UILayoutInfo.FillVertical( 2, 2, 1f, 30, 60 ), null, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_handle" ), out UIScrollBar scrollbar );
 
-            GameObject goList = UIHelper.UIFill( uiGO.transform, "list", 2, 2, 30, 60 );
 
-            GameObject content = UIHelper.AddScrollRect( goList, 300, false, true );
+            UIButton saveBtn = window.AddButton( new UILayoutInfo( Vector2.right, new Vector2( -2, 5 ), new Vector2( 95, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ) );
 
-            (_, Button btn) = ButtonFactory.CreateTextXY( (RectTransform)uiGO.transform, "btn", "Button", new UILayoutInfo( Vector2.right, new Vector2( -2, 5 ), new Vector2( 95, 15 ) ), style );
+            saveBtn.AddText( UILayoutInfo.Fill(), "Save" )
+                .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
+                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
-            return window;
+            UIInputField inputField = window.AddInputField( UILayoutInfo.FillHorizontal( 2, 99, 0f, 5, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
+
+            return saveWindow;
         }
     }
 }

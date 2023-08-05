@@ -7,23 +7,24 @@ namespace KSS.UI
 {
     public class TimewarpReadoutUI : MonoBehaviour
     {
-        [SerializeField]
-        TMPro.TextMeshProUGUI _textBox;
+        [field: SerializeField]
+        public TMPro.TextMeshProUGUI TextBox { get; set; }
 
         void Start()
         {
             TimeWarpManager.OnTimescaleChanged += OnTimescaleChanged_Listener;
+            UpdateText( TimeWarpManager.TimeScale );
         }
 
         void UpdateText( float rate )
         {
             if( rate == 0 )
             {
-                _textBox.text = $"Warp Rate: PAUSED";
+                TextBox.text = $"Warp Rate: PAUSED";
                 return;
             }
 
-            _textBox.text = $"Warp Rate: {rate}x";
+            TextBox.text = $"Warp Rate: {rate}x";
         }
 
         void OnTimescaleChanged_Listener( TimeWarpManager.TimeScaleChangedData data )

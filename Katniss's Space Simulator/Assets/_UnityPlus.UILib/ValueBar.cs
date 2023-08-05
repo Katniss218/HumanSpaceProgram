@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace UILib
+namespace UnityPlus.UILib
 {
     /// <summary>
     /// A multi-segmented value (progress) bar.
