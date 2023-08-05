@@ -21,7 +21,7 @@ namespace Assets.KSS.UI.SceneFactories
 
 
             UIText text = canvas.AddPanel( new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 150, 25 ) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
-                .WithTint(Color.gray)
+                .WithTint( Color.gray )
                 .AddText( UILayoutInfo.Fill(), "Velocity: <missing>" )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
@@ -70,24 +70,35 @@ namespace Assets.KSS.UI.SceneFactories
             ui5.TextBox = text.textComponent;
 
 
-#warning todo complete the mainmenu factory.
-        }
+            UIPanel navball = canvas.AddPanel( new UILayoutInfo( new Vector2( 0.5f, 0 ), Vector2.zero, new Vector2( 222, 202 ) ), null );
 
-        // #-#-#-#-#-#-#-#-#-#
+            (GameObject rootGameObject, RectTransform rootTransform) = UIHelper.CreateUI( navball.transform, "mask", new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 190, 190 ) ) );
 
-        private static void CreateMainMenuButton( RectTransform parent )
-        {
+            Image imageComponent = rootGameObject.AddComponent<Image>();
+            imageComponent.raycastTarget = false;
+            imageComponent.maskable = true;
+            imageComponent.sprite = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/std0/ui_navball" );
+            imageComponent.type = Image.Type.Simple;
 
-        }
+            Mask mask = rootGameObject.AddComponent<Mask>();
+            mask.showMaskGraphic = false;
 
-        private static void CreateSaveButton( RectTransform parent )
-        {
+            (GameObject rawGameObject, RectTransform rawTransform) = UIHelper.CreateUI( rootTransform, "raw", UILayoutInfo.Fill() );
+            RawImage rawImage = rawGameObject.AddComponent<RawImage>();
+            rawImage.texture = null;
 
-        }
+            UIIcon velocityIcon = navball.AddIcon( UILayoutInfo.Fill(), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/attitude_indicator" ) )
+                .AddIcon( new UILayoutInfo( new Vector2( 0.5f, 1f ), new Vector2( 0, 15 ), new Vector2( 167.5f, 40 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/velocity_indicator" ) );
 
-        private static void CreateLoadButton( RectTransform parent )
-        {
+            velocityIcon.AddButton( new UILayoutInfo( new Vector2( 0, 0.5f ), new Vector2( 2, 0 ), new Vector2( 20, 20 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_list_gold" ) );
+            velocityIcon.AddButton( new UILayoutInfo( new Vector2( 1, 0.5f ), new Vector2( -2, 0 ), new Vector2( 20, 20 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_down_gold" ) );
 
+            UIText velText = velocityIcon.AddText( UILayoutInfo.Fill( 31.5f, 31.5f, 0, 0 ), "Velocity" )
+                .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
+                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
+
+            VelocityReadoutUI vel = velocityIcon.gameObject.AddComponent<VelocityReadoutUI>();
+            vel.TextBox = velText.textComponent;
         }
     }
 }
