@@ -11,7 +11,8 @@ namespace UnityPlus.AssetManagement
     /// Marks the GameObject as created from a specified asset (prefab).
     /// </summary>
     /// <remarks>
-    /// Not supposed to be added by hand. Please use <see cref="ClonedGameObject.Instantiate"/> to create an object from an asset.
+    /// This component is NOT supposed to be added by hand. <br />
+    /// Use <see cref="ClonedGameObject.Instantiate"/> to instantiate a <see cref="GameObject"/> from an asset.
     /// </remarks>
     [DisallowMultipleComponent]
     public class ClonedGameObject : MonoBehaviour
@@ -24,9 +25,9 @@ namespace UnityPlus.AssetManagement
 
         void Start()
         {
-            if( OriginalAsset == null )
+            if( OriginalAsset == null ) // this is broken if the component is deserialized over multiple frames.
             {
-                Debug.LogWarning( $"{nameof( ClonedGameObject )} `{this.name}` - The `{nameof( OriginalAsset )}` was left unset, or the asset was unloaded destroying the link. Deleting the marker component..." );
+                Debug.LogWarning( $"{nameof( ClonedGameObject )} `{this.name}` - The `{nameof( OriginalAsset )}` was left unset (possibly by adding this component explicitly) or the asset was unloaded, destroying the link to the asset. Deleting the marker component..." );
                 Destroy( this );
             }
         }

@@ -58,6 +58,53 @@ namespace UnityPlus.AssetManagement
             entries.Add( new AssetRegisterer.Entry() { assetID = assetID, asset = asset } );
         }
 
+        void LoadCustomAsset( ref List<AssetRegisterer.Entry> entries, string path )
+        {
+            // convert a path into asset(s).
+            // some paths might have multiple assets to load.
+
+            UnityEngine.Object[] assets;
+            Type mainAssetType = AssetDatabase.GetMainAssetTypeAtPath( path );
+            if( mainAssetType == typeof( SceneAsset ) )
+            {
+                assets = new[] { AssetDatabase.LoadMainAssetAtPath( path ) };
+            }
+            else if( mainAssetType == typeof( GameObject ) )
+            {
+                assets = new[] { AssetDatabase.LoadMainAssetAtPath( path ) };
+            }
+            else
+            {
+                assets = AssetDatabase.LoadAllAssetsAtPath( path );
+            }
+
+            if( assets.Length == 0 )
+                return;
+
+            // texture2D assets also have Sprite assets sometimes. in this case, we want a sprite.
+            UnityEngine.Object asset = assets[0];
+            if( mainAssetType == typeof( Texture2D ) )
+            {
+                int i = 0;
+                foreach( var a in assets )
+                {
+                    if( a.GetType() == typeof( Sprite ) )
+                    {
+                        asset = assets[i];
+                        break;
+                    }
+                    i++;
+                }
+            }
+
+            int start = _constrainPath.Length;
+            int end = path.LastIndexOf( '.' );
+            string assetID = end == -1 ? path[start..] : path[start..end];
+            assetID = $"{_assetPrefix}{assetID}";
+
+            AddEntry( ref entries, assetID, asset );
+        }
+
         internal void TryUpdateEntries()
         {
             string[] allAssetPaths = AssetDatabase.GetAllAssetPaths();
@@ -101,14 +148,7 @@ namespace UnityPlus.AssetManagement
                     continue;
                 }
 
-                UnityEngine.Object asset = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>( path );
-
-                int start = _constrainPath.Length;
-                int end = path.LastIndexOf( '.' );
-                string assetID = end == -1 ? path[start..] : path[start..end];
-                assetID = $"{_assetPrefix}{assetID}";
-
-                AddEntry( ref entries, assetID, asset );
+                LoadCustomAsset( ref entries, path );
             }
 
             _registerer.TrySetAssetsToRegister( entries.ToArray() );
