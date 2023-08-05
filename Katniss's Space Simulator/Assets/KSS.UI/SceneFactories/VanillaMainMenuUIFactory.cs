@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityPlus.UILib.UIElements;
 using UnityPlus.AssetManagement;
+using TMPro;
 
 namespace KSS.UI.SceneFactories
 {
@@ -44,7 +45,8 @@ namespace KSS.UI.SceneFactories
             UIButton button = ((UIElement)parent).AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 200, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/ui_button_biaxial" ) );
 
             button.AddText( UILayoutInfo.Fill(), "PLAY" )
-                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/LiberationSans SDF" ), 12, Color.white );
+                .WithFont( AssetRegistry.Get<TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
+                .WithAlignment( HorizontalAlignmentOptions.Center );
 
             PlayButtonSwitcher pbs = button.gameObject.AddComponent<PlayButtonSwitcher>();
             button.buttonComponent.onClick.AddListener( pbs.StartGame );
@@ -55,14 +57,16 @@ namespace KSS.UI.SceneFactories
             ((UIElement)parent).AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, -35 ), new Vector2( 200, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/ui_button_biaxial" ) )
                 .Disabled()
                 .AddText( UILayoutInfo.Fill(), "SETTINGS" )
-                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/LiberationSans SDF" ), 12, Color.white );
+                .WithFont( AssetRegistry.Get<TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
+                .WithAlignment( HorizontalAlignmentOptions.Center );
         }
 
         private static void CreateExitButton( RectTransform parent )
         {
             ((UIElement)parent).AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, -35 ), new Vector2( 200, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/ui_button_biaxial" ) )
                 .AddText( UILayoutInfo.Fill(), "EXIT" )
-                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/LiberationSans SDF" ), 12, Color.white );
+                .WithFont( AssetRegistry.Get<TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
+                .WithAlignment( HorizontalAlignmentOptions.Center );
         }
     }
 }

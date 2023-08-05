@@ -73,7 +73,7 @@ namespace UnityPlus.AssetManagement
                 return;
             }
 #endif
-            Debug.LogWarning( $"{nameof( AssetRegisterer )} - Tried to set assets to register while in play mode." );
+            Debug.LogWarning( $"{nameof( AssetRegisterer )} - Tried to set `{nameof( _assetsToRegister )}` while in play mode." );
         }
 
         void Awake()
@@ -87,12 +87,12 @@ namespace UnityPlus.AssetManagement
             {
                 if( entry.assetID == null )
                 {
-                    Debug.LogWarning( $"Null asset ID present in list of assets to register." );
+                    Debug.LogWarning( $"Null Asset ID present in the list of Assets to register (Asset: {entry.asset})." );
                     continue;
                 }
                 if( entry.asset == null )
                 {
-                    Debug.LogWarning( $"Null asset present in list of assets to register." );
+                    Debug.LogWarning( $"Null Asset present in the list of Assets to register (Asset ID: {entry.asset})." );
                     continue;
                 }
                 AssetRegistry.Register( entry.assetID, entry.asset );

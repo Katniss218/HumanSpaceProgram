@@ -32,6 +32,18 @@ namespace UnityPlus.UILib
             return text;
         }
 
+        public static UIText WithAlignment( this UIText text, TMPro.HorizontalAlignmentOptions horizontalAlignment )
+        {
+            text.textComponent.horizontalAlignment = horizontalAlignment;
+            return text;
+        }
+
+        public static UIText WithAlignment( this UIText text, TMPro.VerticalAlignmentOptions verticalAlignment )
+        {
+            text.textComponent.verticalAlignment = verticalAlignment;
+            return text;
+        }
+
         public static UIText WithAlignment( this UIText text, TMPro.HorizontalAlignmentOptions horizontalAlignment, TMPro.VerticalAlignmentOptions verticalAlignment )
         {
             var textComponent = text.textComponent;
