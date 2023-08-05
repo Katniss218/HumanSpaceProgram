@@ -28,7 +28,7 @@ namespace UnityPlus.UILib
             return new UIValueBar( rootTransform, valueBarComponent );
         }
 
-        public static UIValueBar WithPadding( UIValueBar valueBar, float paddingleft, float paddingRight, float spacing )
+        public static UIValueBar WithPadding( this UIValueBar valueBar, float paddingleft, float paddingRight, float spacing )
         {
             var valueBarComponent = valueBar.valueBarComponent;
             valueBarComponent.PaddingLeft = paddingleft;
