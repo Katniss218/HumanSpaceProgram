@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UILib;
-using UILib.Factories;
+using UnityPlus.UILib;
+using UnityPlus.UILib.UIElements;
 using KSS.Core;
 using UnityEngine.UI;
+using UnityPlus.AssetManagement;
 
 namespace KSS.UI
 {
@@ -17,17 +18,13 @@ namespace KSS.UI
         /// </summary>
         public static SaveWindow Create()
         {
-            KSSUIStyle style = (KSSUIStyle)UIStyleManager.Instance.Style;
-
-            GameObject uiGO = UIHelper.UI( CanvasManager.GetCanvas( CanvasManager.WINDOWS ).transform, "part window", new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 250f, 100f ) );
+            (GameObject uiGO, RectTransform rootRT) = UIHelper.CreateUI( (UIElement)CanvasManager.Get( CanvasName.WINDOWS ).transform, "part window", new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 250f, 100f ) ) );
 
             SaveWindow window = uiGO.AddComponent<SaveWindow>();
 
-            GameObject goList = UIHelper.UIFill( uiGO.transform, "list", 2, 2, 30, 60 );
+            UIScrollView scrollView = ((UIElement)rootRT).AddScrollView( UILayoutInfo.Fill(), new Vector2(0, 300), false, true );
 
-            GameObject content = UIHelper.AddScrollRect( goList, 300, false, true );
-
-            (_, Button btn) = ButtonFactory.CreateTextXY( (RectTransform)uiGO.transform, "btn", "Button", new UILayoutInfo( Vector2.right, new Vector2( -2, 5 ), new Vector2( 95, 15 ) ), style );
+            ((UIElement)rootRT).AddButton( new UILayoutInfo( Vector2.right, new Vector2( -2, 5 ), new Vector2( 95, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/ui_button_biaxial" ) );
 
             return window;
         }

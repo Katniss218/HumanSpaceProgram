@@ -1,5 +1,5 @@
 ﻿using KSS.Cameras;
-using UILib;
+using UnityPlus.UILib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UnityPlus.UILib.UIElements;
 
 namespace KSS.UI.Windows
 {
@@ -33,8 +34,8 @@ namespace KSS.UI.Windows
 
         void OnPointerEnter()
         {
-            GameObject highlighterGO = UIHelper.UI( this.transform, "relation highlight", Vector2.zero, Vector2.zero, new Vector2( 10, 10 ) );
-            _isHighlighting = (RectTransform)highlighterGO.transform;
+            ( GameObject highlighterGO, RectTransform rt) = UIHelper.CreateUI( (UIElement)this.transform, "relation highlight", new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 10, 10 ) ) );
+            _isHighlighting = rt;
 
             Image exitImage = highlighterGO.AddComponent<Image>();
             exitImage.raycastTarget = true;

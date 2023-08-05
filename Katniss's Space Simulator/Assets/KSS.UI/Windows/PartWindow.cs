@@ -1,7 +1,7 @@
 ﻿using KSS.Cameras;
 using KSS.Core;
 using KSS.Core.ResourceFlowSystem;
-using UILib;
+using UnityPlus.UILib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UnityPlus.UILib.UIElements;
 
 namespace KSS.UI.Windows
 {
@@ -67,33 +68,32 @@ namespace KSS.UI.Windows
 
         public static PartWindow Create( Part part )
         {
-            GameObject rootGO = UIHelper.UI( CanvasManager.GetCanvas( CanvasManager.WINDOWS ).transform, "part window", new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 250f, 100f ) );
+            (GameObject rootGO, RectTransform rootRT) = UIHelper.CreateUI( (UIElement)CanvasManager.Get( CanvasName.WINDOWS ).transform, "part window", new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 250f, 100f ) ) );
+
+            WindowRelationHighlight relationHighlight = rootGO.AddComponent<WindowRelationHighlight>();
+            relationHighlight.UITransform = (RectTransform)rootGO.transform;
+
+            RectTransformDragger windowDrag = rootGO.AddComponent<RectTransformDragger>();
+            windowDrag.UITransform = (RectTransform)rootGO.transform;
 
             Image pwBackgroundImage = rootGO.AddComponent<Image>();
             pwBackgroundImage.raycastTarget = true;
             pwBackgroundImage.color = Color.gray;
 
-            GameObject exitButtonGO = UIHelper.UI( rootGO.transform, "X", Vector2.one, Vector2.zero, new Vector2( 30, 30 ) );
+            (GameObject exitButtonGO, RectTransform exitRT) = UIHelper.CreateUI( rootRT, "X", new UILayoutInfo( Vector2.one, Vector2.zero, new Vector2( 30, 30 )) );
             Image exitImage = exitButtonGO.AddComponent<Image>();
             exitImage.raycastTarget = true;
             exitImage.color = Color.red;
             Button exitBtn = exitButtonGO.AddComponent<Button>();
+
             RectTransformCloser ex = exitButtonGO.AddComponent<RectTransformCloser>();
             ex.ExitButton = exitBtn;
             ex.UITransform = (RectTransform)rootGO.transform;
 
-            GameObject windowContentsGO = UIHelper.UI( rootGO.transform, "contents", Vector2.zero, Vector2.one, new Vector2( 0.5f, 0.5f ), new Vector2( 0, -15 ), new Vector2( 0, -30 ) );
-
-            WindowRelationHighlight relationHighlight = rootGO.AddComponent<WindowRelationHighlight>();
-            relationHighlight.UITransform = (RectTransform)rootGO.transform;
-
-            GameObject scrollRectGO = UIHelper.AddScrollRect( windowContentsGO, 100 - 30, false, true );
-
-            RectTransformDragger windowDrag = rootGO.AddComponent<RectTransformDragger>();
-            windowDrag.UITransform = (RectTransform)rootGO.transform;
+            UIScrollView scrollView = ((UIElement)rootRT).AddScrollView( new UILayoutInfo( Vector2.zero, Vector2.one, new Vector2( 0.5f, 0.5f ), new Vector2( 0, -15 ), new Vector2( 0, -30 )), new Vector2(0, 100 - 30), false, true );
 
             PartWindow partWindow = rootGO.AddComponent<PartWindow>();
-            partWindow._list = (RectTransform)scrollRectGO.transform;
+            partWindow._list = scrollView.contents.transform;
             partWindow._relationHighlighter = relationHighlight;
             partWindow.SetPart( part );
 

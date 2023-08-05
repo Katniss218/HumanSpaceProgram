@@ -17,7 +17,7 @@ namespace UnityPlus.UILib
         /// Registers a canvas under a specified ID.
         /// </summary>
         /// <exception cref="InvalidOperationException"/>
-        public static void RegisterCanvas( string id, Canvas canvas )
+        public static void Register( string id, Canvas canvas )
         {
             if( _canvasDict.ContainsKey( id ) )
             {
@@ -40,7 +40,7 @@ namespace UnityPlus.UILib
                 {
                     Canvas canvas = canvasLayer.GetComponent<Canvas>();
 
-                    RegisterCanvas( canvasLayer.ID, canvas );
+                    Register( canvasLayer.ID, canvas );
                 }
                 catch( Exception ex )
                 {
@@ -56,7 +56,7 @@ namespace UnityPlus.UILib
         /// <remarks>
         /// Tries to find the canvas is it isn't cached yet.
         /// </remarks>
-        public static Canvas GetCanvas( string id )
+        public static Canvas Get( string id )
         {
             if( _canvasDict.TryGetValue( id, out Canvas canvas ) )
             {

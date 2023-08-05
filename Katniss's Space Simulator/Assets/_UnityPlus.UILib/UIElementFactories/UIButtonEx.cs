@@ -10,7 +10,7 @@ namespace UnityPlus.UILib
 {
     public static class UIButtonEx
     {
-        public static UIButton AddButton( this UIElement parent, UILayoutInfo layout, Sprite sprite, UnityAction onClick )
+        public static UIButton AddButton( this UIElement parent, UILayoutInfo layout, Sprite sprite, UnityAction onClick = null )
         {
             (GameObject rootGameObject, RectTransform rootTransform) = UIHelper.CreateUI( parent, "uilib-button", layout );
 
@@ -51,6 +51,13 @@ namespace UnityPlus.UILib
                 pressedColor = clicked,
                 disabledColor = disabled
             };
+
+            return button;
+        }
+
+        public static UIButton Disabled( this UIButton button )
+        {
+            button.buttonComponent.interactable = false;
 
             return button;
         }

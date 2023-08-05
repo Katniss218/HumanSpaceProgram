@@ -1,6 +1,6 @@
 ﻿namespace KSS.UI
 {
-    public static class CanvasManager
+    public static class CanvasName
     {
         /// <summary>
         /// The canvas for the console overlay. Always on top.
