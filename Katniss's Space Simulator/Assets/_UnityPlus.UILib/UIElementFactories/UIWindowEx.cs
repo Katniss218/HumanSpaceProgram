@@ -12,12 +12,17 @@ namespace UnityPlus.UILib
         {
             (GameObject rootGameObject, RectTransform rootTransform) = UIHelper.CreateUI( (RectTransform)parent.transform, "uilib-window", layoutInfo );
 
-            Image imageComponent = rootGameObject.AddComponent<Image>();
-            imageComponent.raycastTarget = true;
-            imageComponent.sprite = background;
-            imageComponent.type = Image.Type.Filled;
+            Image backgroundComponent = rootGameObject.AddComponent<Image>();
+            backgroundComponent.raycastTarget = true;
+            backgroundComponent.sprite = background;
+            backgroundComponent.type = Image.Type.Sliced;
 
-            return new UIWindow( rootTransform, imageComponent );
+            if( background == null )
+            {
+                backgroundComponent.color = new Color( 0, 0, 0, 0 );
+            }
+
+            return new UIWindow( rootTransform, backgroundComponent );
         }
 
         public static UIWindow Focusable( this UIWindow window )
@@ -40,7 +45,7 @@ namespace UnityPlus.UILib
         {
             closeButton = window.AddButton( layoutInfo, buttonSprite, null );
 
-            RectTransformCloser closer = window.gameObject.AddComponent<RectTransformCloser>();
+            RectTransformCloser closer = closeButton.gameObject.AddComponent<RectTransformCloser>();
             closer.ExitButton = closeButton.buttonComponent;
             closer.UITransform = window.transform;
 

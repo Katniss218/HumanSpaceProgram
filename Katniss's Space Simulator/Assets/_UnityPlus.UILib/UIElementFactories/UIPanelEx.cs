@@ -28,6 +28,11 @@ namespace UnityPlus.UILib
             backgroundComponent.sprite = background;
             backgroundComponent.type = Image.Type.Sliced;
 
+            if( background == null )
+            {
+                backgroundComponent.color = new Color( 0, 0, 0, 0 );
+            }
+
             return new UIPanel( rootTransform, backgroundComponent );
         }
 

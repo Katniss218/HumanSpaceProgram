@@ -19,6 +19,13 @@ namespace UnityPlus.UILib
         [field: SerializeField]
         Button _exitButton;
 
+        public Func<bool> CanClose { get; set; } = True;
+
+        static bool True()
+        {
+            return true;
+        }
+
         public Button ExitButton
         {
             get => _exitButton;
@@ -50,6 +57,10 @@ namespace UnityPlus.UILib
 
         void TryClose()
         {
+            if( CanClose != null && !(CanClose()) )
+            {
+                return;
+            }
             if( UITransform == null )
             {
                 return;
