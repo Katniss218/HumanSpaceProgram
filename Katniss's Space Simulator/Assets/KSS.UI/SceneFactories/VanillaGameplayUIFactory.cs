@@ -10,7 +10,7 @@ using UnityEngine.UI;
 using UnityPlus.UILib.UIElements;
 using UnityPlus.AssetManagement;
 
-namespace Assets.KSS.UI.SceneFactories
+namespace KSS.UI.SceneFactories
 {
     public static class VanillaGameplayUIFactory
     {

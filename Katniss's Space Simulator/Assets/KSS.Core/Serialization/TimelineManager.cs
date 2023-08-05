@@ -1,9 +1,11 @@
+using KSS.Core.TimeWarp;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityPlus.OverridableEvents;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Strategies;
 
 namespace KSS.Core.Serialization
 {
@@ -12,24 +14,43 @@ namespace KSS.Core.Serialization
     /// </summary>
     public static class TimelineManager
     {
+        /// <summary>
+        /// The saver used by the <see cref="TimelineManager"/> to serialize the currently loaded game state. <br/>
+        /// Mod developers can hook into it to save additional data.
+        /// </summary>
+        public static AsyncSaver Saver { get; private set; }
+
+        /// <summary>
+        /// The loader used by the <see cref="TimelineManager"/> to deserialize a saved game state. <br/>
+        /// Mod developers can hook into it to load additional data.
+        /// </summary>
+        public static AsyncLoader Loader { get; private set; }
+
+        /// <summary>
+        /// Contains information if a timeline is currently being either saved or loaded.
+        /// </summary>
+        public static bool IsSerializing { get; private set; } = false;
+
+        static JsonPrefabAndDataStrategy _serializationStrat = new JsonPrefabAndDataStrategy();
         static TimelineMetadata _currentTimeline; // currently playing timeline.
-
-        // Public saver/loader for mod compat - mods might want to modify what is saved and how.
-        public static AsyncSaver Saver;
-        public static AsyncLoader Loader;
-
-        static UnityPlus.Serialization.Strategies.JsonPrefabAndDataStrategy _serializationStrat = new UnityPlus.Serialization.Strategies.JsonPrefabAndDataStrategy();
+        static bool _shouldUnpause = false;
 
         public static void SerializationPauseFunc()
         {
-            TimeWarp.TimeWarpManager.PreventPlayerChangingTimescale = true;
-            TimeWarp.TimeWarpManager.Pause();
+            TimeWarpManager.PreventPlayerChangingTimescale = true;
+            _shouldUnpause = !TimeWarpManager.IsPaused;
+            TimeWarpManager.Pause();
+            IsSerializing = true;
         }
 
         public static void SerializationUnpauseFunc()
         {
-            TimeWarp.TimeWarpManager.Unpause();
-            TimeWarp.TimeWarpManager.PreventPlayerChangingTimescale = false;
+            IsSerializing = false;
+            if( _shouldUnpause )
+            {
+                TimeWarpManager.Unpause();
+            }
+            TimeWarpManager.PreventPlayerChangingTimescale = false;
         }
 
         static void CreateDefaultSaver()

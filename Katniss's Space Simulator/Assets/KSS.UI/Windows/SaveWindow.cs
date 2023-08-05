@@ -24,7 +24,7 @@ namespace KSS.UI
             SaveWindow saveWindow = window.gameObject.AddComponent<SaveWindow>();
 
             UIScrollView scrollView = window.AddVerticalScrollView( UILayoutInfo.Fill( 2, 2, 30, 60 ), new Vector2( 0, 300 ) )
-                .WithVerticalScrollbar( UILayoutInfo.FillVertical( 2, 2, 1f, 30, 60 ), null, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_handle" ), out UIScrollBar scrollbar );
+                .WithVerticalScrollbar( UILayoutInfo.FillVertical( 2, 2, 1f, 0, 4 ), null, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_handle" ), out UIScrollBar scrollbar );
 
 
             UIButton saveBtn = window.AddButton( new UILayoutInfo( Vector2.right, new Vector2( -2, 5 ), new Vector2( 95, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ) );

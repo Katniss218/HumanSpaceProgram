@@ -7,6 +7,7 @@ using KSS.Functionalities;
 using KSS.CelestialBodies.Surface;
 using UnityEngine;
 using UnityEngine.UI;
+using KSS.Core.TimeWarp;
 
 namespace KSS.DevUtils
 {
@@ -39,6 +40,27 @@ namespace KSS.DevUtils
         {
             LODQuadSphere.cbShader = this.cbShader;
             LODQuadSphere.cbTex = this.cbTextures;
+        }
+
+        private void Update()
+        {
+            if( Input.GetKeyDown( KeyCode.Escape ) )
+            {
+                if( !TimeWarpManager.PreventPlayerChangingTimescale )
+                {
+                    if( TimeWarpManager.IsPaused )
+                    {
+                        TimeWarpManager.Unpause();
+                        HSPOverridableEvent.EventManager.TryInvoke( HSPOverridableEvent.ESCAPE_GAMEPLAY, null );
+                    }
+                    else
+                    {
+                        TimeWarpManager.Pause();
+                        HSPOverridableEvent.EventManager.TryInvoke( HSPOverridableEvent.ESCAPE_GAMEPLAY, null );
+                    }
+
+                }
+            }
         }
 
         void Start()

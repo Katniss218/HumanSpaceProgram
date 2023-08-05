@@ -85,7 +85,7 @@
     <Compile Include="Assets\_UnityPlus.UILib\UIElementFactories\UIPanelEx.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIPanel.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElementFactories\UIWindowEx.cs" />
-    <Compile Include="Assets\_UnityPlus.UILib\UIElementFactories\UIScrollBarEx1.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\UIElementFactories\UIScrollBarEx.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\RectTransformFocuser.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElementFactories\UIContextMenuEx.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\ContextMenu.cs" />

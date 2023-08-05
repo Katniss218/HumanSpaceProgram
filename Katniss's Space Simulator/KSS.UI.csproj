@@ -70,6 +70,7 @@
     <Compile Include="Assets\KSS.UI\PartWindowManager.cs" />
     <Compile Include="Assets\KSS.UI\AccelerationReadoutUI.cs" />
     <Compile Include="Assets\KSS.UI\CanvasName.cs" />
+    <Compile Include="Assets\KSS.UI\SceneFactories\GameplayEscapeUIFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.UI\___KSS.UI.asmdef" />

@@ -23,10 +23,10 @@ namespace UnityPlus.UILib
             (GameObject slidingAreaGameObject, RectTransform slidingAreaTransform) = UIHelper.CreateUI( rootTransform, "uilib-scrollbar-slidingarea", UILayoutInfo.Fill() );
             (GameObject handleGameObject, RectTransform handleTransform) = UIHelper.CreateUI( slidingAreaTransform, "uilib-scrollbar-handle", UILayoutInfo.Fill() );
 
-            Image image = handleGameObject.AddComponent<Image>();
-            image.sprite = foreground;
-            image.type = Image.Type.Sliced;
-            image.raycastTarget = true;
+            Image handleImage = handleGameObject.AddComponent<Image>();
+            handleImage.sprite = foreground;
+            handleImage.type = Image.Type.Sliced;
+            handleImage.raycastTarget = true;
 
             Scrollbar scrollbarComponent = rootGameObject.AddComponent<Scrollbar>();
             scrollbarComponent.transition = Selectable.Transition.ColorTint;
@@ -41,6 +41,12 @@ namespace UnityPlus.UILib
             };
             scrollbarComponent.handleRect = handleTransform;
             scrollbarComponent.direction = isVertical ? Scrollbar.Direction.BottomToTop : Scrollbar.Direction.LeftToRight;
+            scrollbarComponent.targetGraphic = handleImage;
+
+            if( isVertical )
+                scrollView.scrollRectComponent.verticalScrollbar = scrollbarComponent;
+            else
+                scrollView.scrollRectComponent.horizontalScrollbar = scrollbarComponent;
 
             UIScrollBar scrollBar = new UIScrollBar( rootTransform, scrollbarComponent );
 

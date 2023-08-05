@@ -35,6 +35,8 @@ namespace KSS.Core
         /// </summary>
         public const string STARTUP_GAMEPLAY = NAMESPACE_VANILLA + ".startup.gameplay";
 
+        public const string ESCAPE_GAMEPLAY = NAMESPACE_VANILLA + ".escape.gameplay";
+
         /// <summary>
         /// Invoked to create the timeline loader.
         /// </summary>

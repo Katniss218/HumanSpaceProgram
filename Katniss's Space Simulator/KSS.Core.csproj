@@ -101,7 +101,7 @@
     <Compile Include="Assets\KSS.Core\Scenes\MainMenuManager.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\FlowUtils.cs" />
     <Compile Include="Assets\KSS.Core\Scenes\AlwaysLoadedManager.cs" />
-    <Compile Include="Assets\KSS.Core\Mods\OverridableEventListenerAttribute.cs" />
+    <Compile Include="Assets\KSS.Core\OverridableEventListenerAttribute.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\SubstanceStateCollection.cs" />
     <Compile Include="Assets\KSS.Core\Scenes\GameplaySceneManager.cs" />
   </ItemGroup>

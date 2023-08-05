@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.OverridableEvents;
 
-namespace KSS.Core.Mods
+namespace KSS.Core
 {
     /// <summary>
     /// Specifies that a method should be run when a specified overridable event is fired. <br/>
