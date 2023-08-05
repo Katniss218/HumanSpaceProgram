@@ -20,6 +20,14 @@ namespace UnityPlus.UILib
             return new UIWindow( rootTransform, imageComponent );
         }
 
+        public static UIWindow Focusable( this UIWindow window )
+        {
+            RectTransformFocuser windowDrag = window.gameObject.AddComponent<RectTransformFocuser>();
+            windowDrag.UITransform = window.transform;
+
+            return window;
+        }
+
         public static UIWindow Draggable( this UIWindow window )
         {
             RectTransformDragger windowDrag = window.gameObject.AddComponent<RectTransformDragger>();

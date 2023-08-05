@@ -86,6 +86,7 @@
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIPanel.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElementFactories\UIWindowEx.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElementFactories\UIScrollBarEx1.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\RectTransformFocuser.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_UnityPlus.UILib\___UnityPlus.UILib.asmdef" />
