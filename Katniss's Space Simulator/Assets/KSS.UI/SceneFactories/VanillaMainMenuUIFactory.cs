@@ -25,7 +25,8 @@ namespace KSS.UI.SceneFactories
             CreateSettingsButton( canvasTransform );
             CreateExitButton( canvasTransform );
 
-            UIValueBar bar = UIValueBarEx.AddHorizontalValueBar( (UIElement)canvasTransform, new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, 35 ), new Vector2( 200, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/ui_bar_background" ) );
+            UIValueBar bar = UIValueBarEx.AddHorizontalValueBar( (UIElement)canvasTransform, new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, 35 ), new Vector2( 200, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/ui_bar_background" ) )
+                .WithPadding( 5, 5, 1 );
 
             var seg = bar.valueBarComponent.AddSegment( 0.25f );
             seg.Sprite = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/ui_bar" );
