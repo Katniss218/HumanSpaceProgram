@@ -64,7 +64,7 @@ namespace UnityPlus.UILib
 
             return UI( parent, name, anchorMin, anchorMax, pivot, anchoredPos, sizeDelta );
         }
-        */
+        
         /// <summary>
         /// Makes the UI element a raycast target for the UI event system. Enables the UI object to listen to UI event system inputs.
         /// </summary>
@@ -126,5 +126,6 @@ namespace UnityPlus.UILib
                 cs.verticalFit = ContentSizeFitter.FitMode.Unconstrained;
             }
         }
+        */
     }
 }

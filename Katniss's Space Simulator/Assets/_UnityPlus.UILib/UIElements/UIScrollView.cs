@@ -17,7 +17,7 @@ namespace UnityPlus.UILib.UIElements
             this.scrollRectComponent = scrollRectComponent;
             this.scrollbarHorizontal = scrollbarHorizontal;
             this.scrollbarVertical = scrollbarVertical;
-            this.contents = scrollbarVertical;
+            this.contents = contents;
         }
     }
 }

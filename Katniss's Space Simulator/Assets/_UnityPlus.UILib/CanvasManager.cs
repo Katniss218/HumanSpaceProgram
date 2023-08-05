@@ -32,6 +32,17 @@ namespace UnityPlus.UILib
             CanvasID[] canvasLayers = Object.FindObjectsOfType<CanvasID>();
             foreach( var canvasLayer in canvasLayers )
             {
+                if( _canvasDict.TryGetValue( canvasLayer.ID, out Canvas c ) )
+                {
+                    if( c == null )
+                    {
+                        _canvasDict.Remove( canvasLayer.ID );
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
                 if( canvasLayer.ID == null )
                 {
                     Debug.LogWarning( $"Can't register a canvas `{canvasLayer.gameObject.name}` before its identifier is initialized." );
@@ -60,12 +71,10 @@ namespace UnityPlus.UILib
         {
             if( _canvasDict.TryGetValue( id, out Canvas canvas ) )
             {
-                if( canvas == null )
+                if( canvas != null )
                 {
-                    _canvasDict.Remove( id );
-                    throw new ArgumentException( $"A canvas with the ID `{id}` doesn't exist." );
+                    return canvas;
                 }
-                return canvas;
             }
 
             // If no canvas is found, we should try to find it, because it might've been loaded/created after the previous invocation of this method.
