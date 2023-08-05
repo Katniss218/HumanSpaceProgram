@@ -26,6 +26,12 @@ namespace UnityPlus.UILib
             return new UIIcon( rootTransform, imageComponent );
         }
 
+        public static UIIcon WithTint( this UIIcon icon, Color tint )
+        {
+            icon.imageComponent.color = tint;
+            return icon;
+        }
+
         public static UIIcon Raycastable( this UIIcon icon, bool raycastable = true )
         {
             icon.imageComponent.raycastTarget = raycastable;

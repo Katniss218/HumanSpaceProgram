@@ -26,9 +26,15 @@ namespace UnityPlus.UILib
             Image imageComponent = rootGameObject.AddComponent<Image>();
             imageComponent.raycastTarget = false;
             imageComponent.sprite = background;
-            imageComponent.type = Image.Type.Filled;
+            imageComponent.type = Image.Type.Sliced;
 
             return new UIPanel( rootTransform, imageComponent );
+        }
+
+        public static UIPanel WithTint( this UIPanel panel, Color tint )
+        {
+            panel.backgroundComponent.color = tint;
+            return panel;
         }
 
         public static UIPanel Raycastable( this UIPanel panel, bool raycastable = true )

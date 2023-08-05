@@ -10,12 +10,12 @@ namespace KSS.UI
 {
     public class AccelerationReadoutUI : MonoBehaviour
     {
-        [SerializeField]
-        TMPro.TextMeshProUGUI _textBox;
+        [field: SerializeField]
+        public TMPro.TextMeshProUGUI TextBox { get; set; }
 
         void LateUpdate()
         {
-            _textBox.text = $"Acceleration: {VesselManager.ActiveVessel.PhysicsObject.Acceleration.magnitude:#0.0} m/s^2";
+            TextBox.text = $"Acceleration: {VesselManager.ActiveVessel.PhysicsObject.Acceleration.magnitude:#0.0} m/s^2";
         }
     }
 }

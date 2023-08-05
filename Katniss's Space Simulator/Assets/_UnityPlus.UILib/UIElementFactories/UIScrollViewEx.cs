@@ -8,12 +8,12 @@ namespace UnityPlus.UILib
 {
     public static class UIScrollViewEx
     {
-        public static UIScrollView AddScrollViewHorizontal( this UIElement parent, UILayoutInfo layout, Vector2 contentSize )
+        public static UIScrollView AddHorizontalScrollView( this UIElement parent, UILayoutInfo layout, Vector2 contentSize )
         {
             return AddScrollView( parent, layout, contentSize, true, false );
         }
 
-        public static UIScrollView AddScrollViewVertical( this UIElement parent, UILayoutInfo layout, Vector2 contentSize )
+        public static UIScrollView AddVerticalScrollView( this UIElement parent, UILayoutInfo layout, Vector2 contentSize )
         {
             return AddScrollView( parent, layout, contentSize, false, true );
         }

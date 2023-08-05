@@ -41,13 +41,30 @@ namespace UnityPlus.UILib
             return new UIButton( rootTransform, buttonComponent );
         }
 
-        public static UIButton WithColors( this UIButton button, Color hovered, Color clicked, Color disabled )
+        public static UIButton WithTint( this UIButton button, Color tint )
         {
+            var colors = button.buttonComponent.colors;
             button.buttonComponent.colors = new ColorBlock()
             {
-                normalColor = Color.white,
-                selectedColor = Color.white,
-                colorMultiplier = 1.0f,
+                normalColor = tint,
+                selectedColor = colors.selectedColor,
+                colorMultiplier = colors.colorMultiplier,
+                highlightedColor = colors.highlightedColor,
+                pressedColor = colors.pressedColor,
+                disabledColor = colors.disabledColor
+            };
+
+            return button;
+        }
+
+        public static UIButton WithColors( this UIButton button, Color hovered, Color clicked, Color disabled )
+        {
+            var colors = button.buttonComponent.colors;
+            button.buttonComponent.colors = new ColorBlock()
+            {
+                normalColor = colors.normalColor,
+                selectedColor = colors.selectedColor,
+                colorMultiplier = colors.colorMultiplier,
                 highlightedColor = hovered,
                 pressedColor = clicked,
                 disabledColor = disabled

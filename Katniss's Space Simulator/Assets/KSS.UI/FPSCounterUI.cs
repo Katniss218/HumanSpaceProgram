@@ -9,8 +9,8 @@ namespace KSS.UI
 {
     public class FPSCounterUI : MonoBehaviour
     {
-        [SerializeField]
-        TMPro.TextMeshProUGUI _textBox;
+        [field: SerializeField]
+        public TMPro.TextMeshProUGUI TextBox { get; set; }
 
         float[] _fps = new float[128];
         int _max = 0;
@@ -45,7 +45,7 @@ namespace KSS.UI
         void Update()
         {
             SampleFPS();
-            _textBox.text = $"FPS: {Mathf.CeilToInt( GetAverageFps() )}";
+            TextBox.text = $"FPS: {Mathf.CeilToInt( GetAverageFps() )}";
         }
     }
 }

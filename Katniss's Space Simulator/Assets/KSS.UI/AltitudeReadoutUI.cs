@@ -11,8 +11,8 @@ namespace KSS.UI
 {
     public class AltitudeReadoutUI : MonoBehaviour
     {
-        [SerializeField]
-        TMPro.TextMeshProUGUI _textBox;
+        [field: SerializeField]
+        public TMPro.TextMeshProUGUI TextBox { get; set; }
 
         void LateUpdate()
         {
@@ -23,7 +23,7 @@ namespace KSS.UI
             float magn = (posV - posCB).magnitude;
             float alt = magn - (float)body.Radius;
 
-            _textBox.text = $"Altitude: {(alt / 1000.0f):#0} km";
+            TextBox.text = $"Altitude: {(alt / 1000.0f):#0} km";
         }
     }
 }
