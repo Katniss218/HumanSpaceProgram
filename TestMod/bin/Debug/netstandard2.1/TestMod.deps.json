@@ -15,7 +15,6 @@
           "_UnityEngine": "0.0.0.0",
           "_UnityPlus.AssetManagement": "0.0.0.0",
           "_UnityPlus.Serialization": "0.0.0.0",
-          "_UnityPlus.StaticEvents": "0.0.0.0",
           "_UnityPlus.UILib": "0.0.0.0"
         },
         "runtime": {
@@ -70,14 +69,6 @@
           }
         }
       },
-      "_UnityPlus.StaticEvents/0.0.0.0": {
-        "runtime": {
-          "_UnityPlus.StaticEvents.dll": {
-            "assemblyVersion": "0.0.0.0",
-            "fileVersion": "0.0.0.0"
-          }
-        }
-      },
       "_UnityPlus.UILib/0.0.0.0": {
         "runtime": {
           "_UnityPlus.UILib.dll": {
@@ -86,9 +77,25 @@
           }
         }
       },
+      "_UnityPlus.OverridableEvents/0.0.0.0": {
+        "runtime": {
+          "_UnityPlus.OverridableEvents.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
       "UnityEngine.PhysicsModule/0.0.0.0": {
         "runtime": {
           "UnityEngine.PhysicsModule.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "UnityEngine.InputLegacyModule/0.0.0.0": {
+        "runtime": {
+          "UnityEngine.InputLegacyModule.dll": {
             "assemblyVersion": "0.0.0.0",
             "fileVersion": "0.0.0.0"
           }
@@ -129,14 +136,6 @@
       "UnityEngine.AndroidJNIModule/0.0.0.0": {
         "runtime": {
           "UnityEngine.AndroidJNIModule.dll": {
-            "assemblyVersion": "0.0.0.0",
-            "fileVersion": "0.0.0.0"
-          }
-        }
-      },
-      "UnityEngine.InputLegacyModule/0.0.0.0": {
-        "runtime": {
-          "UnityEngine.InputLegacyModule.dll": {
             "assemblyVersion": "0.0.0.0",
             "fileVersion": "0.0.0.0"
           }
@@ -550,19 +549,19 @@
           }
         }
       },
-      "Unity.TextMeshPro/0.0.0.0": {
-        "runtime": {
-          "Unity.TextMeshPro.dll": {
-            "assemblyVersion": "0.0.0.0",
-            "fileVersion": "0.0.0.0"
-          }
-        }
-      },
       "UnityEngine.UI/1.0.0.0": {
         "runtime": {
           "UnityEngine.UI.dll": {
             "assemblyVersion": "1.0.0.0",
             "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "Unity.TextMeshPro/0.0.0.0": {
+        "runtime": {
+          "Unity.TextMeshPro.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.0.0.0"
           }
         }
       }
@@ -604,17 +603,22 @@
       "serviceable": false,
       "sha512": ""
     },
-    "_UnityPlus.StaticEvents/0.0.0.0": {
-      "type": "reference",
-      "serviceable": false,
-      "sha512": ""
-    },
     "_UnityPlus.UILib/0.0.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
     },
+    "_UnityPlus.OverridableEvents/0.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
     "UnityEngine.PhysicsModule/0.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "UnityEngine.InputLegacyModule/0.0.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
@@ -640,11 +644,6 @@
       "sha512": ""
     },
     "UnityEngine.AndroidJNIModule/0.0.0.0": {
-      "type": "reference",
-      "serviceable": false,
-      "sha512": ""
-    },
-    "UnityEngine.InputLegacyModule/0.0.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
@@ -904,12 +903,12 @@
       "serviceable": false,
       "sha512": ""
     },
-    "Unity.TextMeshPro/0.0.0.0": {
+    "UnityEngine.UI/1.0.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
     },
-    "UnityEngine.UI/1.0.0.0": {
+    "Unity.TextMeshPro/0.0.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""

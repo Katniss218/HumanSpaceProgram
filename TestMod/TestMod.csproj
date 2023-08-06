@@ -23,9 +23,6 @@
     <Reference Include="_UnityPlus.Serialization">
       <HintPath>..\Katniss's Space Simulator\Library\ScriptAssemblies\_UnityPlus.Serialization.dll</HintPath>
     </Reference>
-    <Reference Include="_UnityPlus.StaticEvents">
-      <HintPath>..\Katniss's Space Simulator\Library\ScriptAssemblies\_UnityPlus.StaticEvents.dll</HintPath>
-    </Reference>
     <Reference Include="_UnityPlus.UILib">
       <HintPath>..\Katniss's Space Simulator\Library\ScriptAssemblies\_UnityPlus.UILib.dll</HintPath>
     </Reference>
