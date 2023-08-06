@@ -4,7 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Json;
 
 namespace KSS.Core.Serialization
 {
@@ -13,6 +15,8 @@ namespace KSS.Core.Serialization
     /// </summary>
     public sealed class TimelineMetadata
     {
+        public const string TIMELINE_FILENAME = "_timeline.json";
+
         /// <summary>
         /// The display name shown in the GUI.
         /// </summary>
@@ -31,11 +35,19 @@ namespace KSS.Core.Serialization
         }
 
         /// <summary>
-        /// Computes the file path for a given timeline ID.
+        /// Returns the file path to the directory containing the timelines.
         /// </summary>
-        public static string GetPath( string timelineId )
+        public static string GetTimelinesPath()
         {
-            return Path.Combine( HumanSpaceProgram.GetSavesPath(), timelineId );
+            return HumanSpaceProgram.GetSaveDirectoryPath();
+        }
+
+        /// <summary>
+        /// Returns the file path to the directory containing the saves of a given timeline.
+        /// </summary>
+        public static string GetSavesPath( string timelineId )
+        {
+            return Path.Combine( GetTimelinesPath(), timelineId );
         }
 
         /// <summary>
@@ -66,6 +78,51 @@ namespace KSS.Core.Serialization
             }
 
             return new TimelineMetadata( split[savesIndex + 1] ); // `Saves/<timelineId>/<saveId>/_save.json`
+        }
+
+        /// <summary>
+        /// Reads all timelines from disk and returns a list of their metadata.
+        /// </summary>
+        /// <returns></returns>
+        public static IEnumerable<TimelineMetadata> ReadAllTimelines()
+        {
+            string timelinesDirectory = GetTimelinesPath();
+
+            string[] potentialTimelines;
+            try
+            {
+                potentialTimelines = Directory.GetDirectories( timelinesDirectory );
+            }
+            catch
+            {
+                Debug.LogWarning( $"Couldn't open `{timelinesDirectory}` directory." );
+
+                return new TimelineMetadata[] { };
+            }
+
+            List<TimelineMetadata> timelines = new List<TimelineMetadata>();
+
+            foreach( var timeline in potentialTimelines )
+            {
+                try
+                {
+                    string path = Path.Combine( timeline, TIMELINE_FILENAME );
+
+                    string saveJson = File.ReadAllText( path );
+
+                    SerializedData data = new JsonStringReader( saveJson ).Read();
+
+                    TimelineMetadata timelineMetadata = TimelineMetadata.EmptyFromFilePath( path );
+                    timelineMetadata.SetData( data );
+                    timelines.Add( timelineMetadata );
+                }
+                catch
+                {
+                    Debug.LogWarning( $"Couldn't load timeline `{timeline}`." );
+                }
+            }
+
+            return timelines;
         }
 
         public void SetData( SerializedData data )

@@ -1,9 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
-using KSS.Core;
 using UnityEngine.UI;
 using UnityPlus.AssetManagement;
 using KSS.Core.Serialization;
@@ -36,7 +34,7 @@ namespace KSS.UI
 
             SaveWindow saveWindow = window.gameObject.AddComponent<SaveWindow>();
 
-            IEnumerable<SaveMetadata> saves = SaveMetadata.GetAllSaves( TimelineManager.CurrentTimeline.TimelineID );
+            IEnumerable<SaveMetadata> saves = SaveMetadata.ReadAllSaves( TimelineManager.CurrentTimeline.TimelineID );
 
             foreach( var save in saves )
             {

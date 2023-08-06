@@ -68,7 +68,7 @@ namespace KSS.Core.Serialization
         /// Asynchronously saves the current game state over multiple frames. <br/>
         /// The game should remain paused for the duration of the saving (this is generally handled automatically, but be careful).
         /// </summary>
-        public static void SaveAsync( string timelineId, string saveId )
+        public static void BeginSaveAsync( string timelineId, string saveId )
         {
             if( string.IsNullOrEmpty( timelineId ) && string.IsNullOrEmpty( saveId ) )
             {
@@ -96,7 +96,7 @@ namespace KSS.Core.Serialization
         /// Asynchronously loads the saved game state over multiple frames. <br/>
         /// The game should remain paused for the duration of the loading (this is generally handled automatically, but be careful).
         /// </summary>
-        public static void LoadAsync( string timelineId, string saveId )
+        public static void BeginLoadAsync( string timelineId, string saveId )
         {
             if( string.IsNullOrEmpty( timelineId ) && string.IsNullOrEmpty( saveId ) )
             {
@@ -107,7 +107,7 @@ namespace KSS.Core.Serialization
                 throw new InvalidOperationException( $"Can't start loading while already saving/loading." );
             }
 
-            TimelineMetadata loadedTimeline = TimelineMetadata.EmptyFromFilePath( TimelineMetadata.GetPath( timelineId ) );
+            TimelineMetadata loadedTimeline = TimelineMetadata.EmptyFromFilePath( TimelineMetadata.GetSavesPath( timelineId ) );
 
             CreateDefaultLoader();
             HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_LOAD, _loader );
@@ -136,7 +136,7 @@ namespace KSS.Core.Serialization
                 throw new InvalidOperationException( $"Can't start loading while already saving/loading." );
             }
 
-            TimelineMetadata newTimeline = TimelineMetadata.EmptyFromFilePath( TimelineMetadata.GetPath( timelineId ) );
+            TimelineMetadata newTimeline = TimelineMetadata.EmptyFromFilePath( TimelineMetadata.GetSavesPath( timelineId ) );
 
             HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_NEW );
 

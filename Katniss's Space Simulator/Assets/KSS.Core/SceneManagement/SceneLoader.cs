@@ -26,13 +26,28 @@ namespace KSS.Core.SceneManagement
         }
         #endregion
 
+        public static void UnloadActiveSceneAsync( Action onAfterUnloaded )
+        {            
+            _instance.StartCoroutine( UnloadAsync( SceneManager.GetActiveScene().name, onAfterUnloaded ) );
+        }
+
         public static void UnloadSceneAsync( string scene, Action onAfterUnloaded )
         {
+            if( string.IsNullOrEmpty( scene ) )
+            {
+                throw new ArgumentNullException(nameof(scene), $"The scene can't be null" );
+            }
+
             _instance.StartCoroutine( UnloadAsync( scene, onAfterUnloaded ) );
         }
 
         public static void LoadSceneAsync( string scene, bool additive, bool localPhysics, Action onAfterLoaded )
         {
+            if( string.IsNullOrEmpty( scene ) )
+            {
+                throw new ArgumentNullException( nameof( scene ), $"The scene can't be null" );
+            }
+
             _instance.StartCoroutine( LoadAsync( scene, additive, localPhysics, onAfterLoaded ) );
         }
 

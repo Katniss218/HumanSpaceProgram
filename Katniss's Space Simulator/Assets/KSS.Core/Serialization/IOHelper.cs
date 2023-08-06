@@ -24,7 +24,7 @@ namespace KSS.Core.Serialization
 
             string sanitizedName = rawFileName.ToLowerInvariant();
 
-            const string charsToReplace = "[^a-zA-Z0-9]";
+            const string charsToReplace = "[^a-z0-9]";
             sanitizedName = Regex.Replace( sanitizedName, charsToReplace, "_" );
 
             string[] forbiddenNames =

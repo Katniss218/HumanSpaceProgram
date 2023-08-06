@@ -12,6 +12,8 @@ namespace KSS.Core
     /// </summary>
     public class AlwaysLoadedManager : MonoBehaviour
     {
+        public const string ALWAYS_LOADED_SCENE_NAME = "_AlwaysLoaded";
+
         void Awake()
         {
             // Load mods before caching autorunning methods.

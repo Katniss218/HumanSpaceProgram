@@ -73,6 +73,7 @@
     <Compile Include="Assets\KSS.UI\AccelerationReadoutUI.cs" />
     <Compile Include="Assets\KSS.UI\SaveMetadataUI.cs" />
     <Compile Include="Assets\KSS.UI\Windows\StartNewGameWindow.cs" />
+    <Compile Include="Assets\KSS.UI\TimelineMetadataUI.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.UI\___KSS.UI.asmdef" />

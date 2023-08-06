@@ -11,7 +11,7 @@ namespace KSS.UI
 {
     public class SaveMetadataUI : MonoBehaviour
     {
-        public SaveMetadata SaveMetadata { get; private set; }
+        public SaveMetadata Save { get; private set; }
 
         public static SaveMetadataUI Create( UIElement parent, UILayoutInfo layout, SaveMetadata save )
         {

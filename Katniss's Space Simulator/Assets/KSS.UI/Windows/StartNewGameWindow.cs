@@ -16,7 +16,7 @@ namespace KSS.UI
 
         public void StartGame()
         {
-            SceneLoader.UnloadSceneAsync( "MainMenu", () => SceneLoader.LoadSceneAsync( "Testing And Shit", true, false, () =>
+            SceneLoader.UnloadActiveSceneAsync( () => SceneLoader.LoadSceneAsync( "Testing And Shit", true, false, () =>
             {
                 TimelineManager.CreateNew( IOHelper.SanitizeFileName( _nameInputField.text ), SaveMetadata.PERSISTENT_SAVE_ID );
             } ) );

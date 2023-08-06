@@ -46,7 +46,7 @@ namespace KSS.Core.Serialization
         /// </summary>
         public static string GetPath( string timelineId, string saveId )
         {
-            return Path.Combine( HumanSpaceProgram.GetSavesPath(), timelineId, saveId );
+            return Path.Combine( HumanSpaceProgram.GetSaveDirectoryPath(), timelineId, saveId );
         }
 
         /// <summary>
@@ -83,9 +83,9 @@ namespace KSS.Core.Serialization
         /// Reads all the saves for a given timeline from disk and returns their parsed <see cref="SaveMetadata"/>s.
         /// </summary>
         /// <param name="timelineId">The timeline ID to get the saves for.</param>
-        public static IEnumerable<SaveMetadata> GetAllSaves( string timelineId )
+        public static IEnumerable<SaveMetadata> ReadAllSaves( string timelineId )
         {
-            string timelinePath = TimelineMetadata.GetPath( timelineId );
+            string timelinePath = TimelineMetadata.GetSavesPath( timelineId );
 
             string[] potentialSaves;
             try
@@ -94,7 +94,7 @@ namespace KSS.Core.Serialization
             }
             catch
             {
-                Debug.LogWarning( $"Couldn't open saves directory (`{timelinePath}`)." );
+                Debug.LogWarning( $"Couldn't open `{timelinePath}` directory." );
 
                 return new SaveMetadata[] { };
             }
@@ -111,9 +111,9 @@ namespace KSS.Core.Serialization
 
                     SerializedData data = new JsonStringReader( saveJson ).Read();
 
-                    SaveMetadata timeline = SaveMetadata.EmptyFromFilePath( path );
-                    timeline.SetData( data );
-                    saves.Add( timeline );
+                    SaveMetadata saveMetadata = SaveMetadata.EmptyFromFilePath( path );
+                    saveMetadata.SetData( data );
+                    saves.Add( saveMetadata );
                 }
                 catch
                 {

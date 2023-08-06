@@ -8,6 +8,8 @@ namespace KSS.Core
     /// </summary>
     public class GameplayManager : MonoBehaviour
     {
+        public const string GAMEPLAY_SCENE_NAME = "Testing And Shit"; // TODO - swap out for "Gameplay" when the save system is working.
+
         void Awake()
         {
             HSPEvent.EventManager.TryInvoke( HSPEvent.STARTUP_GAMEPLAY );
