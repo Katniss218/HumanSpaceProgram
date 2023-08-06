@@ -13,12 +13,16 @@ namespace KSS.Core
     public static class HSPEvent
     {
         /// <summary>
-        /// The static event manager for the entire Human Space Program.
+        /// The event manager for Human Space Program game (global) events.
         /// </summary>
         /// <remarks>
-        /// Used for a variety of actions relating to the game, loading scenes, and creating things.
+        /// Used for a variety of actions relating to the game, see the constants for an exhaustive list of vanilla events. <br/>
+        /// TO MODDERS: Don't use it for events specific to some entity.
         /// </remarks>
         public static OverridableEventManager<object> EventManager { get; private set; } = new OverridableEventManager<object>();
+
+        // TO DEVELOPERS:
+        // - Every vanilla game event should have a public constant here.
 
         /// <summary>
         /// The identifier of the vanilla namespace. Use this to avoid magic strings.
@@ -46,13 +50,33 @@ namespace KSS.Core
         public const string ESCAPE_GAMEPLAY = NAMESPACE_VANILLA + ".escape.gameplay";
 
         /// <summary>
-        /// Invoked to create the timeline loader.
+        /// Invoked before loading a new game state (timeline + save).
         /// </summary>
-        public const string TIMELINE_LOADER_CREATE = NAMESPACE_VANILLA + ".timeline.loader.create";
+        public const string TIMELINE_BEFORE_LOAD = NAMESPACE_VANILLA + ".timeline.load.before";
 
         /// <summary>
-        /// Invoked to create the timeline saver.
+        /// Invoked after loading a new game state (timeline + save).
         /// </summary>
-        public const string TIMELINE_SAVER_CREATE = NAMESPACE_VANILLA + ".timeline.loader.create";
+        public const string TIMELINE_AFTER_LOAD = NAMESPACE_VANILLA + ".timeline.load.after";
+
+        /// <summary>
+        /// Invoked before saving the current game state (timeline + save).
+        /// </summary>
+        public const string TIMELINE_BEFORE_SAVE = NAMESPACE_VANILLA + ".timeline.save.before";
+
+        /// <summary>
+        /// Invoked after saving the current game state (timeline + save).
+        /// </summary>
+        public const string TIMELINE_AFTER_SAVE = NAMESPACE_VANILLA + ".timeline.save.after";
+
+        /// <summary>
+        /// Invoked before creating a new game state (timeline + default save).
+        /// </summary>
+        public const string TIMELINE_BEFORE_NEW = NAMESPACE_VANILLA + ".timeline.new.before";
+
+        /// <summary>
+        /// Invoked after creating a new game state (timeline + default save).
+        /// </summary>
+        public const string TIMELINE_AFTER_NEW = NAMESPACE_VANILLA + ".timeline.new.after";
     }
 }

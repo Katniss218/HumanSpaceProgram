@@ -18,7 +18,7 @@ namespace KSS.UI.SceneFactories
     {
         static GameObject escapeMenuWindow;
 
-        [OverridableEventListener( HSPEvent.ESCAPE_GAMEPLAY, HSPEvent.NAMESPACE_VANILLA + ".escape_menu_ui" )]
+        [HSPEventListener( HSPEvent.ESCAPE_GAMEPLAY, HSPEvent.NAMESPACE_VANILLA + ".escape_menu_ui" )]
         public static void OnGameplayEscape( object obj )
         {
             if( escapeMenuWindow != null )
@@ -36,10 +36,10 @@ namespace KSS.UI.SceneFactories
 
             escapeMenuWindow = window.gameObject;
 
-            closebutton.gameObject.GetComponent<RectTransformCloser>().CanClose = () => !TimeWarpManager.PreventPlayerChangingTimescale;
+            closebutton.gameObject.GetComponent<RectTransformCloser>().CanClose = () => !TimeWarpManager.LockTimescale;
             closebutton.buttonComponent.onClick.AddListener( () =>
             {
-                if( !TimeWarpManager.PreventPlayerChangingTimescale ) 
+                if( !TimeWarpManager.LockTimescale ) 
                     TimeWarpManager.Unpause();
             } );
 

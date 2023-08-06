@@ -6,6 +6,7 @@ using UnityPlus.UILib.UIElements;
 using KSS.Core;
 using UnityEngine.UI;
 using UnityPlus.AssetManagement;
+using KSS.Core.Serialization;
 
 namespace KSS.UI
 {
@@ -21,8 +22,6 @@ namespace KSS.UI
                 .Focusable()
                 .WithCloseButton( new UILayoutInfo( Vector2.one, new Vector2( -7, -5 ), new Vector2( 20, 20 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ );
 
-            SaveWindow saveWindow = window.gameObject.AddComponent<SaveWindow>();
-
             UIScrollView scrollView = window.AddVerticalScrollView( UILayoutInfo.Fill( 2, 2, 30, 22 ), new Vector2( 0, 75 ) )
                 .WithVerticalScrollbar( UILayoutInfo.FillVertical( 2, 2, 1f, 0, 10 ), null, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_handle" ), out UIScrollBar scrollbar );
 
@@ -34,6 +33,15 @@ namespace KSS.UI
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
             UIInputField inputField = window.AddInputField( UILayoutInfo.FillHorizontal( 2, 99, 0f, 5, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
+
+            SaveWindow saveWindow = window.gameObject.AddComponent<SaveWindow>();
+
+            IEnumerable<SaveMetadata> saves = SaveMetadata.GetAllSaves( TimelineManager.CurrentTimeline.TimelineID );
+
+            foreach( var save in saves )
+            {
+                SaveMetadataUI.Create( scrollView.contents, UILayoutInfo.FillHorizontal( 0, 0, 0, 0, 40 ), save );
+            }
 
             return saveWindow;
         }

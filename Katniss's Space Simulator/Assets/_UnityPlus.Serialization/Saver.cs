@@ -10,7 +10,7 @@ namespace UnityPlus.Serialization
     /// <summary>
     /// A synchronous saver.
     /// </summary>
-    public class Saver : ISaver
+    public sealed class Saver : ISaver
     {
         ISaver.State _currentState;
 

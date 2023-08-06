@@ -14,48 +14,41 @@ namespace KSS.Core.Serialization
     /// </summary>
     public static class TimelineManager
     {
-        /// <summary>
-        /// The saver used by the <see cref="TimelineManager"/> to serialize the currently loaded game state. <br/>
-        /// Mod developers can hook into it to save additional data.
-        /// </summary>
-        public static AsyncSaver Saver { get; private set; }
+        static readonly JsonPrefabAndDataStrategy _serializationStrat = new JsonPrefabAndDataStrategy();
 
         /// <summary>
-        /// The loader used by the <see cref="TimelineManager"/> to deserialize a saved game state. <br/>
-        /// Mod developers can hook into it to load additional data.
+        /// Checks if a timeline is currently being either saved or loaded.
         /// </summary>
-        public static AsyncLoader Loader { get; private set; }
+        public static bool IsSavingOrLoading =>
+            (_saver != null && _saver.CurrentState != ISaver.State.Idle)
+         || (_loader != null && _loader.CurrentState != ILoader.State.Idle);
 
-        /// <summary>
-        /// Contains information if a timeline is currently being either saved or loaded.
-        /// </summary>
-        public static bool IsSerializing { get; private set; } = false;
+        public static TimelineMetadata CurrentTimeline { get; private set; }
 
-        static JsonPrefabAndDataStrategy _serializationStrat = new JsonPrefabAndDataStrategy();
-        static TimelineMetadata _currentTimeline; // currently playing timeline.
-        static bool _shouldUnpause = false;
+        static AsyncSaver _saver;
+        static AsyncLoader _loader;
+
+        static bool _wasPausedBeforeSerializing = false;
 
         public static void SerializationPauseFunc()
         {
-            TimeWarpManager.PreventPlayerChangingTimescale = true;
-            _shouldUnpause = !TimeWarpManager.IsPaused;
+            _wasPausedBeforeSerializing = TimeWarpManager.IsPaused;
             TimeWarpManager.Pause();
-            IsSerializing = true;
+            TimeWarpManager.LockTimescale = true;
         }
 
         public static void SerializationUnpauseFunc()
         {
-            IsSerializing = false;
-            if( _shouldUnpause )
+            if( !_wasPausedBeforeSerializing )
             {
                 TimeWarpManager.Unpause();
             }
-            TimeWarpManager.PreventPlayerChangingTimescale = false;
+            TimeWarpManager.LockTimescale = false;
         }
 
         static void CreateDefaultSaver()
         {
-            Saver = new AsyncSaver(
+            _saver = new AsyncSaver(
                 SerializationPauseFunc, SerializationUnpauseFunc,
                 new Func<ISaver, IEnumerator>[] { _serializationStrat.SaveSceneObjects_Object },
                 new Func<ISaver, IEnumerator>[] { _serializationStrat.SaveSceneObjects_Data }
@@ -64,47 +57,91 @@ namespace KSS.Core.Serialization
 
         static void CreateDefaultLoader()
         {
-            Loader = new AsyncLoader(
+            _loader = new AsyncLoader(
                 SerializationPauseFunc, SerializationUnpauseFunc,
                 new Func<ILoader, IEnumerator>[] { _serializationStrat.LoadSceneObjects_Object },
                 new Func<ILoader, IEnumerator>[] { _serializationStrat.LoadSceneObjects_Data }
             );
         }
 
-        public static void Save( string timelineId, string saveId = null ) // save the current game state.
+        /// <summary>
+        /// Asynchronously saves the current game state over multiple frames. <br/>
+        /// The game should remain paused for the duration of the saving (this is generally handled automatically, but be careful).
+        /// </summary>
+        public static void SaveAsync( string timelineId, string saveId )
         {
             if( string.IsNullOrEmpty( timelineId ) && string.IsNullOrEmpty( saveId ) )
             {
                 throw new ArgumentException( $"Both can't be null." );
             }
-
-#warning TODO - check saver's state and prevent calling if not 'ready'.
+            if( IsSavingOrLoading )
+            {
+                throw new InvalidOperationException( $"Can't start saving while already saving/loading." );
+            }
 
             CreateDefaultSaver();
-            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_SAVER_CREATE );
+
+            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_SAVE, _saver );
+
+            //
+            // TODO - Save
+            //
+
+            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_SAVE, _saver );
 
             throw new NotImplementedException();
-            // if universe is given, and saveId is null, overwrite the default (this shouldn't really be done in practice, but if you want to, you can).
-            // if timeline is null, assume current.
         }
 
-        public static void Load( string timelineId, string saveId = null ) // modifies the current game state.
+        /// <summary>
+        /// Asynchronously loads the saved game state over multiple frames. <br/>
+        /// The game should remain paused for the duration of the loading (this is generally handled automatically, but be careful).
+        /// </summary>
+        public static void LoadAsync( string timelineId, string saveId )
         {
             if( string.IsNullOrEmpty( timelineId ) && string.IsNullOrEmpty( saveId ) )
             {
                 throw new ArgumentException( $"Both can't be null." );
             }
+            if( IsSavingOrLoading )
+            {
+                throw new InvalidOperationException( $"Can't start loading while already saving/loading." );
+            }
 
-#warning TODO - check loader's state and prevent calling if not 'ready'.
+            TimelineMetadata loadedTimeline = TimelineMetadata.EmptyFromFilePath( TimelineMetadata.GetPath( timelineId ) );
 
             CreateDefaultLoader();
-            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_LOADER_CREATE );
+            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_LOAD, _loader );
+
+            //
+            // TODO - Load
+            //
+            CurrentTimeline = loadedTimeline;
+
+            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_LOAD, _loader );
 
             throw new NotImplementedException();
-            // if universe is given, and saveId is null, load the default.
-            // if timeline is null, assume current.
+        }
 
-            // additional loading/saving strategies can serialize things like in-game time, etc.
+        /// <summary>
+        /// Creates a new default (empty) timeline and "loads" it.
+        /// </summary>
+        public static void CreateNew( string timelineId, string saveId )
+        {
+            if( string.IsNullOrEmpty( timelineId ) && string.IsNullOrEmpty( saveId ) )
+            {
+                throw new ArgumentException( $"Both can't be null." );
+            }
+            if( IsSavingOrLoading )
+            {
+                throw new InvalidOperationException( $"Can't start loading while already saving/loading." );
+            }
+
+            TimelineMetadata newTimeline = TimelineMetadata.EmptyFromFilePath( TimelineMetadata.GetPath( timelineId ) );
+
+            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_NEW );
+
+            CurrentTimeline = newTimeline;
+            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_NEW );
         }
     }
 }

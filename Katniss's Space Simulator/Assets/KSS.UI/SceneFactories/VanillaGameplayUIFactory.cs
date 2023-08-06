@@ -14,7 +14,7 @@ namespace KSS.UI.SceneFactories
 {
     public static class VanillaGameplayUIFactory
     {
-        [OverridableEventListener( HSPEvent.STARTUP_GAMEPLAY, HSPEvent.NAMESPACE_VANILLA + ".gameplay_ui" )]
+        [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, HSPEvent.NAMESPACE_VANILLA + ".gameplay_ui" )]
         public static void Create( object obj )
         {
             Canvas canvas = CanvasManager.Get( CanvasName.STATIC );

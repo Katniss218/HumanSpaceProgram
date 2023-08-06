@@ -15,14 +15,14 @@ namespace UnityPlus.Serialization
     /// <remarks>
     /// Handles the pausing of the application to deserialize correctly.
     /// </remarks>
-    public class AsyncLoader : IAsyncLoader
+    public sealed class AsyncLoader : IAsyncLoader
     {
         public float CurrentActionPercentCompleted { get; set; }
         public float TotalPercentCompleted => (_completedActions + CurrentActionPercentCompleted) / (_objectActions.Count + _dataActions.Count);
 
         int _completedActions;
 
-        ILoader.State _currentState;
+        public ILoader.State CurrentState { get; private set; }
 
         List<Func<ILoader, IEnumerator>> _objectActions = new List<Func<ILoader, IEnumerator>>();
         List<Func<ILoader, IEnumerator>> _dataActions = new List<Func<ILoader, IEnumerator>>();
@@ -73,7 +73,7 @@ namespace UnityPlus.Serialization
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public void SetID( object obj, Guid id )
         {
-            if( _currentState != ILoader.State.LoadingObjects )
+            if( CurrentState != ILoader.State.LoadingObjects )
             {
                 throw new InvalidOperationException( $"You can only set an ID while creating the objects. Please move the functionality to an object action" );
             }
@@ -111,7 +111,7 @@ namespace UnityPlus.Serialization
 #endif
             _pauseFunc();
             ClearReferenceRegistry();
-            _currentState = ILoader.State.LoadingObjects;
+            CurrentState = ILoader.State.LoadingObjects;
             _completedActions = 0;
             CurrentActionPercentCompleted = 0.0f;
 
@@ -121,7 +121,7 @@ namespace UnityPlus.Serialization
                 _completedActions++;
             }
 
-            _currentState = ILoader.State.LoadingData;
+            CurrentState = ILoader.State.LoadingData;
 
             foreach( var func in _dataActions )
             {
@@ -130,7 +130,7 @@ namespace UnityPlus.Serialization
             }
 
             ClearReferenceRegistry();
-            _currentState = ILoader.State.Idle;
+            CurrentState = ILoader.State.Idle;
 #if DEBUG
             Debug.Log( "Finished Loading" );
 #endif
@@ -142,7 +142,7 @@ namespace UnityPlus.Serialization
         /// </summary>
         public void LoadAsync( MonoBehaviour coroutineContainer )
         {
-            if( _currentState != ILoader.State.Idle )
+            if( CurrentState != ILoader.State.Idle )
             {
                 throw new InvalidOperationException( $"This loader instance is already running." );
             }

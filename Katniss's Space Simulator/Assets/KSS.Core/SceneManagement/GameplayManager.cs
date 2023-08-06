@@ -19,7 +19,7 @@ namespace KSS.Core
         {
             if( Input.GetKeyDown( KeyCode.Escape ) )
             {
-                if( !TimeWarpManager.PreventPlayerChangingTimescale )
+                if( !TimeWarpManager.LockTimescale )
                 {
                     toggle = !toggle;
                     if( toggle )

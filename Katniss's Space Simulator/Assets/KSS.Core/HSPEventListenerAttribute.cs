@@ -10,19 +10,19 @@ using UnityPlus.OverridableEvents;
 namespace KSS.Core
 {
     /// <summary>
-    /// Specifies that a method should be run when a specified overridable event is fired.
+    /// Specifies that a method should be run when a specified game event is fired.
     /// </summary>
     /// <remarks>
-    /// This attribute can be applied to any static method with the signature `static void Method( object )`.
+    /// This attribute can be applied to any static method with the signature `static void Method( object e )`.
     /// </remarks>
     [AttributeUsage( AttributeTargets.Method )]
-    public class OverridableEventListenerAttribute : Attribute
+    public class HSPEventListenerAttribute : Attribute
     {
         public string EventID { get; set; }
         public string ID { get; set; }
         public string[] Blacklist { get; set; }
 
-        public OverridableEventListenerAttribute( string eventId, string id )
+        public HSPEventListenerAttribute( string eventId, string id )
         {
             this.EventID = eventId;
             this.ID = id;
@@ -42,13 +42,13 @@ namespace KSS.Core
                 && method.ReturnType == typeof( void );
         }
 
-        private static void ProcessMethod( OverridableEventListenerAttribute attr, MethodInfo method )
+        private static void ProcessMethod( HSPEventListenerAttribute attr, MethodInfo method )
         {
             ParameterInfo[] parameters = method.GetParameters();
 
             if( !IsValidMethodSignature( method ) )
             {
-                Debug.LogWarning( $"Ignoring a `{nameof( OverridableEventListenerAttribute )}` attribute applied to method `{method.Name}` which has an incorrect signature." );
+                Debug.LogWarning( $"Ignoring a `{nameof( HSPEventListenerAttribute )}` attribute applied to method `{method.Name}` which has an incorrect signature." );
                 return;
             }
 
@@ -73,7 +73,7 @@ namespace KSS.Core
                     {
                         try
                         {
-                            OverridableEventListenerAttribute attr = method.GetCustomAttribute<OverridableEventListenerAttribute>();
+                            HSPEventListenerAttribute attr = method.GetCustomAttribute<HSPEventListenerAttribute>();
                             if( attr == null )
                             {
                                 continue;

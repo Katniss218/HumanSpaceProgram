@@ -13,9 +13,29 @@ namespace UnityPlus.UILib
             (GameObject rootGameObject, RectTransform rootTransform) = UIHelper.CreateUI( parent, "uilib-inputfield", layout );
 
             Image imageComponent = rootGameObject.AddComponent<Image>();
-            imageComponent.raycastTarget = false;
+            imageComponent.raycastTarget = true;
             imageComponent.sprite = background;
             imageComponent.type = Image.Type.Sliced;
+
+            (GameObject textareaGameObject, RectTransform textareaTransform) = UIHelper.CreateUI( rootTransform, "uilib-inputfieldtextarea", new UILayoutInfo( Vector2.zero, Vector2.one, Vector2.zero, new Vector2( -10, -10 ) ) );
+
+            RectMask2D mask = textareaGameObject.AddComponent<RectMask2D>();
+            mask.padding = new Vector4( -5, -5, -5, -5 );
+
+            (GameObject placeholderGameObject, _) = UIHelper.CreateUI( textareaTransform, "uilib-inputfieldplaceholder", UILayoutInfo.Fill() );
+
+            TMPro.TextMeshProUGUI placeholderText = placeholderGameObject.AddComponent<TMPro.TextMeshProUGUI>();
+            placeholderText.raycastTarget = false;
+            placeholderText.verticalAlignment = TMPro.VerticalAlignmentOptions.Middle;
+            placeholderText.horizontalAlignment = TMPro.HorizontalAlignmentOptions.Left;
+            placeholderText.fontStyle = TMPro.FontStyles.Italic;
+
+            (GameObject textGameObject, _) = UIHelper.CreateUI( textareaTransform, "uilib-inputfieldtext", UILayoutInfo.Fill() );
+
+            TMPro.TextMeshProUGUI realText = textGameObject.AddComponent<TMPro.TextMeshProUGUI>();
+            realText.raycastTarget = false;
+            realText.verticalAlignment = TMPro.VerticalAlignmentOptions.Middle;
+            realText.horizontalAlignment = TMPro.HorizontalAlignmentOptions.Left;
 
             TMPro.TMP_InputField inputFieldComponent = rootGameObject.AddComponent<TMPro.TMP_InputField>();
             inputFieldComponent.colors = new ColorBlock()
@@ -28,29 +48,14 @@ namespace UnityPlus.UILib
                 disabledColor = Color.gray
             };
 
-            (GameObject textareaGameObject, RectTransform textareaTransform) = UIHelper.CreateUI( rootTransform, "uilib-inputfieldtextarea", new UILayoutInfo( Vector2.zero, Vector2.one, Vector2.zero, new Vector2( -10, -10 ) ) );
-
-            RectMask2D mask = textareaGameObject.AddComponent<RectMask2D>();
-            mask.padding = new Vector4( -5, -5, -5, -5 );
-
-            (GameObject placeholderGameObject, _) = UIHelper.CreateUI( textareaTransform, "uilib-inputfieldplaceholder", UILayoutInfo.Fill() );
-
-            TMPro.TextMeshProUGUI placeholderText = placeholderGameObject.AddComponent<TMPro.TextMeshProUGUI>();
-            placeholderText.verticalAlignment = TMPro.VerticalAlignmentOptions.Middle;
-            placeholderText.horizontalAlignment = TMPro.HorizontalAlignmentOptions.Left;
-            placeholderText.fontStyle = TMPro.FontStyles.Italic;
-
-            (GameObject textGameObject, _) = UIHelper.CreateUI( textareaTransform, "uilib-inputfieldtext", UILayoutInfo.Fill() );
-
-            TMPro.TextMeshProUGUI realText = textGameObject.AddComponent<TMPro.TextMeshProUGUI>();
-            realText.verticalAlignment = TMPro.VerticalAlignmentOptions.Middle;
-            realText.horizontalAlignment = TMPro.HorizontalAlignmentOptions.Left;
-
+            inputFieldComponent.richText = false;
             inputFieldComponent.targetGraphic = imageComponent;
             inputFieldComponent.textViewport = textareaTransform;
             inputFieldComponent.textComponent = realText;
             inputFieldComponent.placeholder = placeholderText;
             inputFieldComponent.selectionColor = Color.gray;
+
+            inputFieldComponent.RegenerateCaret();
 
             return new UIInputField( rootTransform, inputFieldComponent, realText, placeholderText );
         }
@@ -68,6 +73,21 @@ namespace UnityPlus.UILib
             placeholderComponent.color = new Color( color.r, color.g, color.b, color.a * 0.5f );
 
             return inputField;
+        }
+
+        public static UIInputField WithPlaceholder( this UIInputField inputField, string placeholderText )
+        {
+            inputField.placeholderComponent.text = placeholderText;
+            return inputField;
+        }
+    }
+
+    public static class TMP_InputField_Ex
+    {
+        public static void RegenerateCaret( this TMPro.TMP_InputField inputField )
+        {
+            inputField.enabled = false;
+            inputField.enabled = true; // regenerate the caret. For some reason this works... :shrug:
         }
     }
 }

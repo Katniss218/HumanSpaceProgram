@@ -8,13 +8,14 @@ using KSS.CelestialBodies.Surface;
 using UnityEngine;
 using UnityEngine.UI;
 using KSS.Core.TimeWarp;
+using KSS.Core.Serialization;
 
 namespace KSS.DevUtils
 {
     /// <summary>
     /// Game manager for testing.
     /// </summary>
-    public class zzzDevUtilsGameManager : MonoBehaviour
+    public class DevUtilsGameplayManager : MonoBehaviour
     {
         public Shader cbShader;
         public Texture2D[] cbTextures = new Texture2D[6];
@@ -29,14 +30,14 @@ namespace KSS.DevUtils
         public ComputeShader shader;
         public RawImage uiImage;
 
-        CelestialBody CreateCB( Vector3Dbl pos )
+        static CelestialBody CreateCB( Vector3Dbl pos )
         {
             CelestialBody cb = new CelestialBodyFactory().Create( pos );
             LODQuadSphere lqs = cb.gameObject.AddComponent<LODQuadSphere>();
             return cb;
         }
 
-        private void Awake()
+        void Awake()
         {
             LODQuadSphere.cbShader = this.cbShader;
             LODQuadSphere.cbTex = this.cbTextures;
@@ -53,7 +54,11 @@ namespace KSS.DevUtils
             shader.Dispatch( shader.FindKernel( "CalculateNormalMap" ), heightmap.width / 8, heightmap.height / 8, 1 );
 
             uiImage.texture = normalmap;*/
+        }
 
+        [HSPEventListener( HSPEvent.TIMELINE_AFTER_NEW, "devutils.timeline.new.after" )]
+        static void OnAfterCreateDefault( object e )
+        {
             CelestialBody cb = CreateCB( Vector3Dbl.zero );
 
             CelestialBody cb1 = CreateCB( new Vector3Dbl( 440_000_000, 0, 0 ) );
@@ -64,10 +69,9 @@ namespace KSS.DevUtils
             CelestialBody cb_farawayTEST3FAR = CreateCB( new Vector3Dbl( 1e18, 100_000_000, 0 ) ); // 1e18 is 100 ly away.
             // stuff really far away throws invalid world AABB and such. do not enable these, you can't see them anyway. 100 ly seems to work, but further away is a no-no.
 
-
             CelestialBodySurface srf = cb.GetComponent<CelestialBodySurface>();
             var group = srf.SpawnGroup( "aabb", 28.5857702f, -80.6507262f, (float)(cb.Radius + 1.0) );
-            LaunchSite launchSite = new LaunchSiteFactory() { Prefab = this.TestLaunchSite }.Create( group, Vector3.zero, Quaternion.identity );
+            LaunchSite launchSite = new LaunchSiteFactory() { Prefab = FindObjectOfType<DevUtilsGameplayManager>().TestLaunchSite }.Create( group, Vector3.zero, Quaternion.identity );
 
             Vector3Dbl spawnerPosAirf = launchSite.GetSpawnerAIRFPosition();
 
@@ -85,11 +89,9 @@ namespace KSS.DevUtils
             VesselManager.ActiveVessel.transform.GetComponent<Rigidbody>().angularDrag = 1; // temp, doesn't veer off course.
         }
 
-        Vessel CreateDummyVessel( Vector3Dbl airfPosition, Quaternion rotation )
+        static Vessel CreateDummyVessel( Vector3Dbl airfPosition, Quaternion rotation )
         {
             VesselFactory fac = new VesselFactory();
-            //PartFactory pfac = new PartFactory( new DummyPartSource() );
-            //PartFactory efac = new PartFactory( new ResourcePartSource( "Prefabs/engine_part" ) );
 
             PartFactory intertank = new PartFactory( new AssetPartSource( "part.intertank" ) );
             PartFactory tank = new PartFactory( new AssetPartSource( "part.tank" ) );
@@ -131,35 +133,8 @@ namespace KSS.DevUtils
             t1.gameObject.AddComponent<FVesselSeparator>();
             t2.gameObject.AddComponent<FVesselSeparator>();
 
-            //FindObjectOfType<IResourceContainerUI>().Obj = tankL1.GetComponent<FBulkContainer_Sphere>();
-
-            // conn.End1.Container.Volume = conn.End1.Container.MaxVolume; // 99999f;
-            //conn.End1.Container.MaxVolume = 99999f;
-            // conn.End2.Container.Volume = 0f;
-            //conn.End2.Container.MaxVolume = 99999f;
-
-
-            //const int partcount = 5;
-            //const int engcount = 5;
-
-            /*Part parent = v.RootPart;
-            for( int i = 0; i < partcount; i++ )
-            {
-                Part part = pfac.Create( parent, new Vector3( 0, 1.25f * i + 1.25f * engcount, 0 ), Quaternion.identity );
-
-                parent = parent.Children[0];
-            }
-
-            parent = v.RootPart;
-            for( int i = 0; i < engcount; i++ )
-            {
-                Part engine = efac.Create( parent, new Vector3( 0, 1.125f * i, 0 ), Quaternion.identity );
-
-                parent = parent.Children[0];
-            }*/
-
             TrailRenderer tr = v.gameObject.AddComponent<TrailRenderer>();
-            tr.material = Material;
+            tr.material = FindObjectOfType<DevUtilsGameplayManager>().Material;
             tr.time = 250;
             AnimationCurve curve = new AnimationCurve();
             curve.AddKey( 0, 5.0f );

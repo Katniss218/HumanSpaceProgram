@@ -11,7 +11,7 @@ namespace KSS.Core.Serialization
     /// <summary>
     /// Serializable (meta)data of a timeline.
     /// </summary>
-    public class TimelineMetadata
+    public sealed class TimelineMetadata
     {
         /// <summary>
         /// The display name shown in the GUI.
@@ -23,12 +23,17 @@ namespace KSS.Core.Serialization
         /// </summary>
         public string Description { get; set; }
 
-        string _pathId;
+        public readonly string TimelineID;
+
+        TimelineMetadata( string timelineId )
+        {
+            this.TimelineID = timelineId;
+        }
 
         /// <summary>
-        /// Computes the directory path for a given timeline ID.
+        /// Computes the file path for a given timeline ID.
         /// </summary>
-        public static string GetDirectoryPath( string timelineId )
+        public static string GetPath( string timelineId )
         {
             return Path.Combine( HumanSpaceProgram.GetSavesPath(), timelineId );
         }
@@ -36,10 +41,10 @@ namespace KSS.Core.Serialization
         /// <summary>
         /// Creates a new empty <see cref="TimelineMetadata"/> that points to the specified timeline. Does not initialize any display parameters.
         /// </summary>
-        /// <param name="path">The path to use to parse out the timeline ID.</param>
-        public static TimelineMetadata EmptyFromFilePath( string path )
+        /// <param name="validPath">The path to use to parse out the timeline ID.</param>
+        public static TimelineMetadata EmptyFromFilePath( string validPath )
         {
-            string[] split = path.Split( new char[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries );
+            string[] split = validPath.Split( new char[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries );
 
             int savesIndex = -1;
             for( int i = 0; i < split.Length; i++ )
@@ -53,17 +58,14 @@ namespace KSS.Core.Serialization
 
             if( savesIndex <= 0 || savesIndex >= split.Length )
             {
-                throw new ArgumentException( $"The path `{path}` doesn't contain the `{HumanSpaceProgram.SavesDirectoryName}` directory." );
+                throw new ArgumentException( $"The path `{validPath}` doesn't contain the `{HumanSpaceProgram.SavesDirectoryName}` directory." );
             }
             if( savesIndex >= split.Length - 1 )
             {
-                throw new ArgumentException( $"The path `{path}` points directly to the `{HumanSpaceProgram.SavesDirectoryName}` directory. It must point to a specific timeline." );
+                throw new ArgumentException( $"The path `{validPath}` points directly to the `{HumanSpaceProgram.SavesDirectoryName}` directory. It must point to a specific timeline." );
             }
 
-            return new TimelineMetadata()
-            {
-                _pathId = split[savesIndex + 1] // `Saves/<timelineId>/<saveId>/_save.json`
-            };
+            return new TimelineMetadata( split[savesIndex + 1] ); // `Saves/<timelineId>/<saveId>/_save.json`
         }
 
         public void SetData( SerializedData data )

@@ -58,19 +58,26 @@
   <ItemGroup>
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIInputField.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIScrollView.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\UIElementFactories\UIPanelEx.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\RectTransformFocuser.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIScrollBar.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIElement.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\RectTransformDragger.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\UIElementFactories\UIContextMenuEx.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UILayoutInfo.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIContextMenu.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIInputSlider.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\RectTransformCloser.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIButton.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIPanel.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\CanvasID.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\UIElementFactories\UIWindowEx.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElementFactories\UIValueBarEx.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\UIElementFactories\UIScrollBarEx.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIText.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElementFactories\UIInputFieldEx.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\ValueBar.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\ContextMenu.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElementFactories\UITextEx.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIHelper.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIIcon.cs" />
@@ -78,17 +85,10 @@
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIInputToggle.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIValueBar.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElementFactories\UIButtonEx.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\UIElementFactories\UIIconEx.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIWindow.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\ValueBarSegment.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElementFactories\UIScrollViewEx.cs" />
-    <Compile Include="Assets\_UnityPlus.UILib\UIElementFactories\UIIconEx.cs" />
-    <Compile Include="Assets\_UnityPlus.UILib\UIElementFactories\UIPanelEx.cs" />
-    <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIPanel.cs" />
-    <Compile Include="Assets\_UnityPlus.UILib\UIElementFactories\UIWindowEx.cs" />
-    <Compile Include="Assets\_UnityPlus.UILib\UIElementFactories\UIScrollBarEx.cs" />
-    <Compile Include="Assets\_UnityPlus.UILib\RectTransformFocuser.cs" />
-    <Compile Include="Assets\_UnityPlus.UILib\UIElementFactories\UIContextMenuEx.cs" />
-    <Compile Include="Assets\_UnityPlus.UILib\ContextMenu.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_UnityPlus.UILib\___UnityPlus.UILib.asmdef" />

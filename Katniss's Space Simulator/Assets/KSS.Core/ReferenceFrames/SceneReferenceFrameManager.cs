@@ -84,17 +84,21 @@ namespace KSS.Core.ReferenceFrames
         /// The extents of the area aroundthe scene origin, in which the active vessel is permitted to exist.
         /// </summary>
         /// <remarks>
-        /// If the active vessel moves outside of this range, an origin shift will happen.
+        /// If the active vessel moves outside of this range, an origin shift will happen. <br/>
+        /// Larger values of MaxFloatingOriginRange can make the vessel's parts appear spread apart (because of limited number of possible world positions to map to).
         /// </remarks>
         public static float MaxFloatingOriginRange { get; set; } = 8192.0f;
-        // larger values of MaxFloatingOriginRange both make the vessel's parts less precise, and also make them fly apart (because of limited number of possible world positions).
 
         /// <summary>
         /// Checks whether the current active vessel is too far away from the scene's origin, and performs an origin shift if it is.
         /// </summary>
         public static void TryFixActiveVesselOutOfBounds()
         {
-            Vessel v = VesselManager.ActiveVessel;
+            if( VesselManager.ActiveVessel == null )
+            {
+                return;
+            }
+
             Vector3 position = VesselManager.ActiveVessel.transform.position;
             if( position.magnitude > MaxFloatingOriginRange )
             {

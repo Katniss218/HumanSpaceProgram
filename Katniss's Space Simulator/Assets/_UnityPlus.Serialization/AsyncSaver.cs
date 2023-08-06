@@ -15,14 +15,14 @@ namespace UnityPlus.Serialization
     /// <remarks>
     /// Handles the pausing of the application to serialize correctly.
     /// </remarks>
-    public class AsyncSaver : IAsyncSaver
+    public sealed class AsyncSaver : IAsyncSaver
     {
         public float CurrentActionPercentCompleted { get; set; }
         public float TotalPercentCompleted => (_completedActions + CurrentActionPercentCompleted) / (_objectActions.Count + _dataActions.Count);
 
         int _completedActions;
 
-        ISaver.State _currentState;
+        public ISaver.State CurrentState { get; private set; }
 
         List<Func<ISaver, IEnumerator>> _dataActions = new List<Func<ISaver, IEnumerator>>();
         List<Func<ISaver, IEnumerator>> _objectActions = new List<Func<ISaver, IEnumerator>>();
@@ -66,7 +66,7 @@ namespace UnityPlus.Serialization
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public bool TryGetID( object obj, out Guid id )
         {
-            if( _currentState == ISaver.State.Idle )
+            if( CurrentState == ISaver.State.Idle )
             {
                 throw new InvalidOperationException( $"Can't save an object (or its ID) when the saver is idle." );
             }
@@ -83,7 +83,7 @@ namespace UnityPlus.Serialization
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public Guid GetID( object obj )
         {
-            if( _currentState == ISaver.State.Idle )
+            if( CurrentState == ISaver.State.Idle )
             {
                 throw new InvalidOperationException( $"Can't save an object (or its ID) when the saver is idle." );
             }
@@ -112,7 +112,7 @@ namespace UnityPlus.Serialization
 #endif
             _pauseFunc();
             ClearReferenceRegistry();
-            _currentState = ISaver.State.SavingData;
+            CurrentState = ISaver.State.SavingData;
             _completedActions = 0;
             CurrentActionPercentCompleted = 0.0f;
 
@@ -123,7 +123,7 @@ namespace UnityPlus.Serialization
                 _completedActions++;
             }
 
-            _currentState = ISaver.State.SavingObjects;
+            CurrentState = ISaver.State.SavingObjects;
 
             foreach( var func in _objectActions )
             {
@@ -132,7 +132,7 @@ namespace UnityPlus.Serialization
             }
 
             ClearReferenceRegistry();
-            _currentState = ISaver.State.Idle;
+            CurrentState = ISaver.State.Idle;
 #if DEBUG
             Debug.Log( "Finished Saving" );
 #endif
@@ -144,7 +144,7 @@ namespace UnityPlus.Serialization
         /// </summary>
         public void SaveAsync( MonoBehaviour coroutineContainer )
         {
-            if( _currentState != ISaver.State.Idle )
+            if( CurrentState != ISaver.State.Idle )
             {
                 throw new InvalidOperationException( $"This saver instance is already running." );
             }

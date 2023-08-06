@@ -18,7 +18,7 @@ namespace KSS.Core
             // Because mods might (will / should) use autorunning methods via the attributes.
             ModLoader.LoadModAssemblies();
 
-            OverridableEventListenerAttribute.CreateEventsForAutorunningMethods( AppDomain.CurrentDomain.GetAssemblies() );
+            HSPEventListenerAttribute.CreateEventsForAutorunningMethods( AppDomain.CurrentDomain.GetAssemblies() );
 
             HSPEvent.EventManager.TryInvoke( HSPEvent.STARTUP_IMMEDIATELY );
         }
