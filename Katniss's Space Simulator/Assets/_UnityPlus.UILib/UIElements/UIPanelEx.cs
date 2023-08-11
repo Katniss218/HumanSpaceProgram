@@ -2,9 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityPlus.UILib.UIElements;
 
-namespace UnityPlus.UILib
+namespace UnityPlus.UILib.UIElements
 {
     public static class UIPanelEx
     {
@@ -21,7 +20,7 @@ namespace UnityPlus.UILib
 
         public static UIPanel AddPanel( this UIElement parent, UILayoutInfo layoutInfo, Sprite background )
         {
-            (GameObject rootGameObject, RectTransform rootTransform) = UIHelper.CreateUI( parent, "uilib-panel", layoutInfo );
+            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( parent, "uilib-panel", layoutInfo );
 
             Image backgroundComponent = rootGameObject.AddComponent<Image>();
             backgroundComponent.raycastTarget = false;

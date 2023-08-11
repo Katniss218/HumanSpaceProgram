@@ -66,6 +66,11 @@ namespace KSS.UI
 
         void RefreshTimelineList()
         {
+            if( _timelineList == null )
+            {
+                return;
+            }
+
             foreach( Transform timelineUI in _timelineList )
             {
                 Destroy( timelineUI.gameObject );
@@ -94,12 +99,22 @@ namespace KSS.UI
 
         public static LoadWindow Create()
         {
-            UIWindow window = CanvasManager.Get( CanvasName.WINDOWS ).AddWindow( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 250f, 100f ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_window" ) )
+            UIWindow window = CanvasManager.Get( CanvasName.WINDOWS ).AddWindow( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 350f, 400f ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_window" ) )
                 .Draggable()
                 .Focusable()
                 .WithCloseButton( new UILayoutInfo( Vector2.one, new Vector2( -7, -5 ), new Vector2( 20, 20 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ );
 
+            UIScrollView timelineList = window.AddVerticalScrollView( UILayoutInfo.FillVertical( 30, 0, 0f, 0, 100 ), new Vector2( 300, 100 ) )
+                .WithVerticalScrollbar( UILayoutInfo.FillVertical( 0, 0, 1f, 0, 10 ), null, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_handle" ), out _ );
+
+            UIScrollView saveList = window.AddVerticalScrollView( UILayoutInfo.FillVertical( 30, 0, 1f, 0, 250 ), new Vector2( 300, 100 ) )
+                .WithVerticalScrollbar( UILayoutInfo.FillVertical( 0, 0, 1f, 0, 10 ), null, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_handle" ), out _ );
+
+#warning TODO - needs proper layout support in the UILib
+
             LoadWindow loadWindow = window.gameObject.AddComponent<LoadWindow>();
+            loadWindow._timelineList = timelineList.transform;
+            loadWindow._saveList = saveList.transform;
             return loadWindow;
         }
     }

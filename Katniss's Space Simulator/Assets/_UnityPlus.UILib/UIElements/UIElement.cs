@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace UnityPlus.UILib.UIElements
@@ -20,6 +21,26 @@ namespace UnityPlus.UILib.UIElements
         {
             this.transform = transform;
             this.gameObject = transform.gameObject;
+        }
+
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static (GameObject go, RectTransform t) CreateUI( UIElement parent, string name, UILayoutInfo layout )
+        {
+            return CreateUI( parent.transform, name, layout );
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static (GameObject go, RectTransform t) CreateUI( RectTransform parent, string name, UILayoutInfo layout )
+        {
+            GameObject rootGO = new GameObject( name );
+
+            RectTransform rootT = rootGO.AddComponent<RectTransform>();
+            rootT.SetParent( parent );
+            rootT.SetLayoutInfo( layout );
+            rootT.localScale = Vector3.one;
+
+            return (rootGO, rootT);
         }
 
         public static explicit operator UIElement( RectTransform rectTransform )

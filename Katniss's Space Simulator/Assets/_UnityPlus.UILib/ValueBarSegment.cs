@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityPlus.UILib.UIElements;
 
 namespace UnityPlus.UILib
 {
@@ -112,7 +113,7 @@ namespace UnityPlus.UILib
         /// </remarks>
         internal static ValueBarSegment Create( RectTransform parent, float totalWidth )
         {
-            (GameObject maskGO, RectTransform maskT) = UIHelper.CreateUI( parent, "mask", new UILayoutInfo( new Vector2( 0, 0 ), new Vector2( 0, 1 ), Vector2.zero, new Vector2( parent.rect.width, 0 ) ) );
+            (GameObject maskGO, RectTransform maskT) = UIElement.CreateUI( parent, "mask", new UILayoutInfo( new Vector2( 0, 0 ), new Vector2( 0, 1 ), Vector2.zero, new Vector2( parent.rect.width, 0 ) ) );
 
             Image maskImage = maskGO.AddComponent<Image>();
             maskImage.raycastTarget = false;
@@ -121,7 +122,7 @@ namespace UnityPlus.UILib
             Mask mask = maskGO.AddComponent<Mask>();
             mask.showMaskGraphic = false;
 
-            (GameObject imgGO, RectTransform imgT) = UIHelper.CreateUI( maskT, "foreground", new UILayoutInfo( new Vector2( 0, 0 ), new Vector2( 0, 1 ), Vector2.zero, new Vector2( parent.rect.width, 0 ) ) );
+            (GameObject imgGO, RectTransform imgT) = UIElement.CreateUI( maskT, "foreground", new UILayoutInfo( new Vector2( 0, 0 ), new Vector2( 0, 1 ), Vector2.zero, new Vector2( parent.rect.width, 0 ) ) );
 
             Image foregroundImage = imgGO.AddComponent<Image>();
             foregroundImage.raycastTarget = false;

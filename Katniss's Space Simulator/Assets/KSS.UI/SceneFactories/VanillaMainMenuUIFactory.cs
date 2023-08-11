@@ -19,6 +19,7 @@ namespace KSS.UI.SceneFactories
     public static class VanillaMainMenuUIFactory
     {
         static GameObject _startNewGameWindow; // singleton window
+        static GameObject _loadWindow; // singleton window
 
         [HSPEventListener( HSPEvent.STARTUP_MAINMENU, HSPEvent.NAMESPACE_VANILLA + ".mainmenu_ui" )]
         public static void Create( object e )
@@ -60,9 +61,9 @@ namespace KSS.UI.SceneFactories
         {
             parent.AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, -20 ), new Vector2( 200, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
             {
-                // open a standard load window (same as in flight).
+                if( _loadWindow == null )
+                    _loadWindow = LoadWindow.Create().gameObject;
             } )
-                .Disabled()
                 .AddText( UILayoutInfo.Fill(), "Load Game" )
                 .WithFont( AssetRegistry.Get<TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
                 .WithAlignment( HorizontalAlignmentOptions.Center );

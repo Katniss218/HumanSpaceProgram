@@ -2,15 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityPlus.UILib.UIElements;
 
-namespace UnityPlus.UILib
+namespace UnityPlus.UILib.UIElements
 {
     public static class UIWindowEx
     {
         public static UIWindow AddWindow( this Canvas parent, UILayoutInfo layoutInfo, Sprite background )
         {
-            (GameObject rootGameObject, RectTransform rootTransform) = UIHelper.CreateUI( (RectTransform)parent.transform, "uilib-window", layoutInfo );
+            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( (RectTransform)parent.transform, "uilib-window", layoutInfo );
 
             Image backgroundComponent = rootGameObject.AddComponent<Image>();
             backgroundComponent.raycastTarget = true;

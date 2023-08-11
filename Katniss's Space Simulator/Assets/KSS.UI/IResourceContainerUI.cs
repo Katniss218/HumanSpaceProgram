@@ -34,7 +34,7 @@ namespace KSS.UI
 
         public static IResourceContainerUI Create( RectTransform parent, IResourceContainer referenceObj )
         {
-            (GameObject root, _) = UIHelper.CreateUI( parent, "Resource Container UI", new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 250, 15 ) ) );
+            (GameObject root, _) = UIElement.CreateUI( parent, "Resource Container UI", new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 250, 15 ) ) );
 
             UIValueBar bar = UIValueBarEx.AddHorizontalValueBar( new UIElement( (RectTransform)root.transform ), new UILayoutInfo( Vector2.zero, Vector2.one, new Vector2( 0.5f, 0.5f ), Vector2.zero, Vector2.zero ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/bar_background" ) )
                 .WithPadding( 5, 5, 1 );

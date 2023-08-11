@@ -4,15 +4,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using UnityPlus.UILib.UIElements;
 
-namespace UnityPlus.UILib
+namespace UnityPlus.UILib.UIElements
 {
     public static class UIButtonEx
     {
         public static UIButton AddButton( this UIElement parent, UILayoutInfo layout, Sprite sprite, UnityAction onClick = null )
         {
-            (GameObject rootGameObject, RectTransform rootTransform) = UIHelper.CreateUI( parent, "uilib-button", layout );
+            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( parent, "uilib-button", layout );
 
             Image imageComponent = rootGameObject.AddComponent<Image>();
             imageComponent.raycastTarget = true;

@@ -56,31 +56,31 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\_UnityPlus.Serialization\ISaver_Ex_References.cs" />
+    <Compile Include="Assets\_UnityPlus.Serialization\ISaver_Ex_Primitives.cs" />
+    <Compile Include="Assets\_UnityPlus.Serialization\AsyncSaver.cs" />
+    <Compile Include="Assets\_UnityPlus.Serialization\ILoader.cs" />
+    <Compile Include="Assets\_UnityPlus.Serialization\ILoaderEx_References.cs" />
+    <Compile Include="Assets\_UnityPlus.Serialization\SerializedPrimitive.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Loader.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\PersistentComponents\IPersistent_MeshRenderer.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\PersistentComponents\IPersistent_Transform.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\Saver.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\ISaver_Ex_Primitives.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\SerializedPrimitive.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\ISaver.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\ComponentFinder.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\IPersistentComponents_SetData.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\IPersistent.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\SerializedObject.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\ISaver_Ex_References.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\ILoaderEx_References.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Json\JsonStreamWriter.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\SerializedData.cs" />
+    <Compile Include="Assets\_UnityPlus.Serialization\ISaver.cs" />
+    <Compile Include="Assets\_UnityPlus.Serialization\PersistentComponents\IPersistent_Transform.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\SerializedArray.cs" />
+    <Compile Include="Assets\_UnityPlus.Serialization\Strategies\JsonExplicitHierarchyStrategy.cs" />
+    <Compile Include="Assets\_UnityPlus.Serialization\ComponentFinder.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Json\JsonStringReader.cs" />
+    <Compile Include="Assets\_UnityPlus.Serialization\IPersistentComponents_SetData.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\PersistentComponents\IPersistent_MeshFilter.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\ILoaderEx_Primitives.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Json\JsonStringWriter.cs" />
+    <Compile Include="Assets\_UnityPlus.Serialization\IPersistent.cs" />
+    <Compile Include="Assets\_UnityPlus.Serialization\SerializedObject.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Strategies\JsonPrefabAndDataStrategy.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\AsyncSaver.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\ILoader.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\Strategies\JsonExplicitHierarchyStrategy.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\IPersistentComponents_GetData.cs" />
+    <Compile Include="Assets\_UnityPlus.Serialization\Saver.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\AsyncLoader.cs" />
   </ItemGroup>
   <ItemGroup>

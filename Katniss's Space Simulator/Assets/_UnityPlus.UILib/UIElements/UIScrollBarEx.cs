@@ -2,15 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityPlus.UILib.UIElements;
 
-namespace UnityPlus.UILib
+namespace UnityPlus.UILib.UIElements
 {
     public static class UIScrollBarEx
     {
         public static UIScrollBar AddScrollbar( this UIScrollView scrollView, UILayoutInfo layout, Sprite background, Sprite foreground, bool isVertical )
         {
-            (GameObject rootGameObject, RectTransform rootTransform) = UIHelper.CreateUI( scrollView, isVertical ? "uilib-scrollbar-vertical" : "uilib-scrollbar-horizontal", layout );
+            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( scrollView, isVertical ? "uilib-scrollbar-vertical" : "uilib-scrollbar-horizontal", layout );
 
             if( background != null )
             {
@@ -20,8 +19,8 @@ namespace UnityPlus.UILib
                 bg.raycastTarget = true;
             }
 
-            (GameObject slidingAreaGameObject, RectTransform slidingAreaTransform) = UIHelper.CreateUI( rootTransform, "uilib-scrollbar-slidingarea", UILayoutInfo.Fill() );
-            (GameObject handleGameObject, RectTransform handleTransform) = UIHelper.CreateUI( slidingAreaTransform, "uilib-scrollbar-handle", UILayoutInfo.Fill() );
+            (GameObject slidingAreaGameObject, RectTransform slidingAreaTransform) = UIElement.CreateUI( rootTransform, "uilib-scrollbar-slidingarea", UILayoutInfo.Fill() );
+            (GameObject handleGameObject, RectTransform handleTransform) = UIElement.CreateUI( slidingAreaTransform, "uilib-scrollbar-handle", UILayoutInfo.Fill() );
 
             Image handleImage = handleGameObject.AddComponent<Image>();
             handleImage.sprite = foreground;

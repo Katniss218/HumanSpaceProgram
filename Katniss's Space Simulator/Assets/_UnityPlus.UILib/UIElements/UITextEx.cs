@@ -1,9 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityPlus.UILib.UIElements;
 
-namespace UnityPlus.UILib
+namespace UnityPlus.UILib.UIElements
 {
     public static class UITextEx
     {
@@ -15,7 +14,7 @@ namespace UnityPlus.UILib
 
         public static UIText AddText( this UIElement parent, UILayoutInfo layoutInfo, string text )
         {
-            (GameObject rootGameObject, RectTransform rootTransform) = UIHelper.CreateUI( parent, "uilib-text", layoutInfo );
+            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( parent, "uilib-text", layoutInfo );
 
             TMPro.TextMeshProUGUI textComponent = rootGameObject.AddComponent<TMPro.TextMeshProUGUI>();
             textComponent.raycastTarget = false;

@@ -5,15 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityPlus.UILib.UIElements;
 
-namespace UnityPlus.UILib
+namespace UnityPlus.UILib.UIElements
 {
     public static class UIValueBarEx
     {
         public static UIValueBar AddHorizontalValueBar( this UIElement parent, UILayoutInfo layout, Sprite background )
         {
-            (GameObject rootGameObject, RectTransform rootTransform) = UIHelper.CreateUI( parent, "uilib-valuebar", layout );
+            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( parent, "uilib-valuebar", layout );
 
             Image imageComponent = rootGameObject.AddComponent<Image>();
             imageComponent.raycastTarget = false;

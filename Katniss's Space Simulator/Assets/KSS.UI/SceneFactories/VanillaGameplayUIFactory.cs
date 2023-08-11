@@ -72,7 +72,7 @@ namespace KSS.UI.SceneFactories
 
             UIPanel navball = canvas.AddPanel( new UILayoutInfo( new Vector2( 0.5f, 0 ), Vector2.zero, new Vector2( 222, 202 ) ), null );
 
-            (GameObject rootGameObject, RectTransform rootTransform) = UIHelper.CreateUI( navball.transform, "mask", new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 190, 190 ) ) );
+            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( navball.transform, "mask", new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 190, 190 ) ) );
 
             Image imageComponent = rootGameObject.AddComponent<Image>();
             imageComponent.raycastTarget = false;
@@ -83,7 +83,7 @@ namespace KSS.UI.SceneFactories
             Mask mask = rootGameObject.AddComponent<Mask>();
             mask.showMaskGraphic = false;
 
-            (GameObject rawGameObject, RectTransform rawTransform) = UIHelper.CreateUI( rootTransform, "raw", UILayoutInfo.Fill() );
+            (GameObject rawGameObject, RectTransform rawTransform) = UIElement.CreateUI( rootTransform, "raw", UILayoutInfo.Fill() );
             RawImage rawImage = rawGameObject.AddComponent<RawImage>();
             rawImage.texture = null;
 

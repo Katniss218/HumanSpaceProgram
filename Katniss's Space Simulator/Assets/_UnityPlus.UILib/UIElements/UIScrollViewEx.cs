@@ -2,9 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityPlus.UILib.UIElements;
 
-namespace UnityPlus.UILib
+namespace UnityPlus.UILib.UIElements
 {
     public static class UIScrollViewEx
     {
@@ -20,16 +19,16 @@ namespace UnityPlus.UILib
 
         public static UIScrollView AddScrollView( this UIElement parent, UILayoutInfo layout, Vector2 contentSize, bool horizontal, bool vertical )
         {
-            (GameObject root, RectTransform rootTransform) = UIHelper.CreateUI( parent, "uilib-scrollview", layout );
+            (GameObject root, RectTransform rootTransform) = UIElement.CreateUI( parent, "uilib-scrollview", layout );
 
-            (GameObject viewport, RectTransform viewportTransform) = UIHelper.CreateUI( rootTransform, "uilib-scrollviewviewport", UILayoutInfo.Fill() );
+            (GameObject viewport, RectTransform viewportTransform) = UIElement.CreateUI( rootTransform, "uilib-scrollviewviewport", UILayoutInfo.Fill() );
 
             Image maskImage = viewport.AddComponent<Image>();
             maskImage.maskable = true;
             Mask mask = viewport.AddComponent<Mask>();
             mask.showMaskGraphic = false;
 
-            (GameObject content, RectTransform contentTransform) = UIHelper.CreateUI( viewportTransform, "uilib-scrollviewcontent", new UILayoutInfo( new Vector2( 0.0f, 1.0f ), new Vector2( 1, 1 ), Vector2.zero, contentSize ) );
+            (GameObject content, RectTransform contentTransform) = UIElement.CreateUI( viewportTransform, "uilib-scrollviewcontent", new UILayoutInfo( new Vector2( 0.0f, 1.0f ), new Vector2( 1, 1 ), Vector2.zero, contentSize ) );
 
             ScrollRect scrollRect = root.AddComponent<ScrollRect>();
             scrollRect.content = (RectTransform)content.transform;
