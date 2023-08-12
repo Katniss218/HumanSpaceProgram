@@ -27,7 +27,7 @@ namespace UnityPlus.UILib.UIElements
         public static UIWindow Focusable( this UIWindow window )
         {
             RectTransformFocuser windowDrag = window.gameObject.AddComponent<RectTransformFocuser>();
-            windowDrag.UITransform = window.transform;
+            windowDrag.UITransform = window.rectTransform;
 
             return window;
         }
@@ -35,7 +35,7 @@ namespace UnityPlus.UILib.UIElements
         public static UIWindow Draggable( this UIWindow window )
         {
             RectTransformDragger windowDrag = window.gameObject.AddComponent<RectTransformDragger>();
-            windowDrag.UITransform = window.transform;
+            windowDrag.UITransform = window.rectTransform;
 
             return window;
         }
@@ -46,7 +46,7 @@ namespace UnityPlus.UILib.UIElements
 
             RectTransformCloser closer = closeButton.gameObject.AddComponent<RectTransformCloser>();
             closer.ExitButton = closeButton.buttonComponent;
-            closer.UITransform = window.transform;
+            closer.UITransform = window.rectTransform;
 
             return window;
         }

@@ -89,7 +89,7 @@ namespace KSS.UI.Windows
         public static UIWindow WithRelationHightlight( this UIWindow window, out WindowRelationHighlight relationHightlight )
         {
             relationHightlight = window.gameObject.AddComponent<WindowRelationHighlight>();
-            relationHightlight.UITransform = window.transform;
+            relationHightlight.UITransform = window.rectTransform;
 
             return window;
         }

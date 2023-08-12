@@ -2,13 +2,13 @@ using KSS.Core.TimeWarp;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityPlus.UILib.UIElements;
 
 namespace KSS.UI
 {
     public class TimewarpReadoutUI : MonoBehaviour
     {
-        [field: SerializeField]
-        public TMPro.TextMeshProUGUI TextBox { get; set; }
+        public UIText Text { get; set; }
 
         void Start()
         {
@@ -20,11 +20,11 @@ namespace KSS.UI
         {
             if( rate == 0 )
             {
-                TextBox.text = $"Warp Rate: PAUSED";
+                Text.text = $"Warp Rate: PAUSED";
                 return;
             }
 
-            TextBox.text = $"Warp Rate: {rate}x";
+            Text.text = $"Warp Rate: {rate}x";
         }
 
         void OnTimescaleChanged_Listener( TimeWarpManager.TimeScaleChangedData data )

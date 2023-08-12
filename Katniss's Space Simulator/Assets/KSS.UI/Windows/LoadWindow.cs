@@ -113,8 +113,8 @@ namespace KSS.UI
 #warning TODO - needs proper layout support in the UILib
 
             LoadWindow loadWindow = window.gameObject.AddComponent<LoadWindow>();
-            loadWindow._timelineList = timelineList.transform;
-            loadWindow._saveList = saveList.transform;
+            loadWindow._timelineList = timelineList.rectTransform;
+            loadWindow._saveList = saveList.rectTransform;
             return loadWindow;
         }
     }

@@ -6,28 +6,60 @@ using UnityEngine;
 
 namespace UnityPlus.UILib.UIElements
 {
+    /// <summary>
+    /// Represents a generic UI element.
+    /// </summary>
     public class UIElement
     {
-        // The purpose of the UI elements' subclasses is to serve as lightweight wrappers around the actual UI components (and in some cases entire hierarchies),
-        // - for the purpose of easier creation and chaining.
+        // PURPOSE:
+        // - This class (and its subclasses) is a lightweight wrapper around entire hierarchies of UI elements / gameobjects.
 
-        public readonly RectTransform transform;
+        // REASON:
+        // - Many UI elements consist of many objects.
+        // - Their initialization is an annoying ordeal and they can end up with an invalid or non-standard state easily.
+        // - This fixes that by encapsulating everything.
+
+        // Some UI elements here have somewhat duplicated purpose. This is for increased verbosity. Lets you specify exactly what you're creating.
+
+        /// <summary>
+        /// Don't directly modify the fields/state of the rectTransform unless you know what you're doing. You can produce invalid state.
+        /// </summary>
+        public readonly RectTransform rectTransform;
+        /// <summary>
+        /// Don't directly modify the fields/state of the gameObject unless you know what you're doing. You can produce invalid state.
+        /// </summary>
         public readonly GameObject gameObject;
 
-        // Can also store additional info about how the children should lay themselves out.
-        // Then set it with extension methods, for a static horizontal/vertical/grid layout.
+        // LAYOUT:
+        // - Since everything is encapsulated here, we have FULL CONTROL over when the properties of the underlying components change.
+        // - We can do static and dynamic layout without having to rely on Unity's builtin layout components.
 
-        public UIElement( RectTransform transform )
+        public UIElement( RectTransform rectTransform )
         {
-            this.transform = transform;
-            this.gameObject = transform.gameObject;
+            this.rectTransform = rectTransform;
+            this.gameObject = rectTransform.gameObject;
         }
 
+        /// <summary>
+        /// Checks if the underlying UI element has been destroyed.
+        /// </summary>
+        public virtual bool IsDestroyed => gameObject == null;
+
+        public virtual void Destroy()
+        {
+            // TODO - add a guard that prevents destruction of certain objects, like contents container of a scroll view.
+
+            if( IsDestroyed )
+            {
+                return; // Silent quit.
+            }
+            UnityEngine.Object.Destroy( gameObject );
+        }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public static (GameObject go, RectTransform t) CreateUI( UIElement parent, string name, UILayoutInfo layout )
         {
-            return CreateUI( parent.transform, name, layout );
+            return CreateUI( parent.rectTransform, name, layout );
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
@@ -50,7 +82,7 @@ namespace UnityPlus.UILib.UIElements
 
         public static explicit operator RectTransform( UIElement uiElement )
         {
-            return uiElement.transform;
+            return uiElement.rectTransform;
         }
 
         public static explicit operator UIElement( Transform transform )
@@ -60,7 +92,7 @@ namespace UnityPlus.UILib.UIElements
 
         public static explicit operator Transform( UIElement uiElement )
         {
-            return uiElement.transform;
+            return uiElement.rectTransform;
         }
 
         public static explicit operator UIElement( Canvas canvas )

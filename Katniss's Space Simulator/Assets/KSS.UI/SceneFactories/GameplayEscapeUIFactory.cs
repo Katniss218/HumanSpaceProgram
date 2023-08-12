@@ -37,7 +37,7 @@ namespace KSS.UI.SceneFactories
             escapeMenuWindow = window.gameObject;
 
             closebutton.gameObject.GetComponent<RectTransformCloser>().CanClose = () => !TimeWarpManager.LockTimescale;
-            closebutton.buttonComponent.onClick.AddListener( () =>
+            closebutton.onClick.AddListener( () =>
             {
                 if( !TimeWarpManager.LockTimescale ) 
                     TimeWarpManager.Unpause();

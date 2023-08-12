@@ -13,13 +13,13 @@ namespace UnityPlus.UILib.UIElements
         {
             (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( parent, "uilib-button", layout );
 
-            Image imageComponent = rootGameObject.AddComponent<Image>();
-            imageComponent.raycastTarget = true;
-            imageComponent.sprite = sprite;
-            imageComponent.type = Image.Type.Sliced;
+            Image backgroundComponent = rootGameObject.AddComponent<Image>();
+            backgroundComponent.raycastTarget = true;
+            backgroundComponent.sprite = sprite;
+            backgroundComponent.type = Image.Type.Sliced;
 
             Button buttonComponent = rootGameObject.AddComponent<Button>();
-            buttonComponent.targetGraphic = imageComponent;
+            buttonComponent.targetGraphic = backgroundComponent;
             buttonComponent.transition = Selectable.Transition.ColorTint;
             buttonComponent.colors = new ColorBlock()
             {
@@ -30,14 +30,14 @@ namespace UnityPlus.UILib.UIElements
                 pressedColor = Color.white,
                 disabledColor = Color.gray
             };
-            buttonComponent.targetGraphic = imageComponent;
+            buttonComponent.targetGraphic = backgroundComponent;
 
             if( onClick != null )
             {
                 buttonComponent.onClick.AddListener( onClick ); // Find a way to cast System.Action to UnityAction if possible (the signatures of both delegates match).
             }
 
-            return new UIButton( rootTransform, buttonComponent );
+            return new UIButton( rootTransform, buttonComponent, backgroundComponent );
         }
 
         public static UIButton WithTint( this UIButton button, Color tint )

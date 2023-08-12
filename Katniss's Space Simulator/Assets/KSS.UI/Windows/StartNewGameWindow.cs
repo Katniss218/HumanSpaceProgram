@@ -12,13 +12,13 @@ namespace KSS.UI
 {
     public class StartNewGameWindow : MonoBehaviour
     {
-        TMP_InputField _nameInputField;
+        UIInputField _nameInputField;
 
         public void StartGame()
         {
             SceneLoader.UnloadActiveSceneAsync( () => SceneLoader.LoadSceneAsync( "Testing And Shit", true, false, () =>
             {
-                TimelineManager.CreateNew( IOHelper.SanitizeFileName( _nameInputField.text ), SaveMetadata.PERSISTENT_SAVE_ID );
+                TimelineManager.CreateNew( IOHelper.SanitizeFileName( _nameInputField.Text ), SaveMetadata.PERSISTENT_SAVE_ID );
             } ) );
         }
 
@@ -45,7 +45,7 @@ namespace KSS.UI
                 .WithFont( AssetRegistry.Get<TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
                 .WithAlignment( HorizontalAlignmentOptions.Center );
 
-            windowComponent._nameInputField = inputField.inputFieldComponent;
+            windowComponent._nameInputField = inputField;
 
             return windowComponent;
         }

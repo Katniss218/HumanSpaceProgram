@@ -5,17 +5,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityPlus.UILib.UIElements;
 
 namespace KSS.UI
 {
     public class AccelerationReadoutUI : MonoBehaviour
     {
-        [field: SerializeField]
-        public TMPro.TextMeshProUGUI TextBox { get; set; }
+        public UIText Text { get; set; }
 
         void LateUpdate()
         {
-            TextBox.text = $"Acceleration: {VesselManager.ActiveVessel.PhysicsObject.Acceleration.magnitude:#0.0} m/s^2";
+            Text.text = $"Acceleration: {VesselManager.ActiveVessel.PhysicsObject.Acceleration.magnitude:#0.0} m/s^2";
         }
     }
 }

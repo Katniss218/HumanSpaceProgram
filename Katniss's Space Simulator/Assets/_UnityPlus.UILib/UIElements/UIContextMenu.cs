@@ -7,13 +7,15 @@ namespace UnityPlus.UILib.UIElements
 {
     public class UIContextMenu : UIElement
     {
-        public readonly ContextMenu contextMenuComponent;
-        public readonly Image backgroundComponent;
+        internal readonly ContextMenu contextMenuComponent;
+        internal readonly Image backgroundComponent;
 
         public UIContextMenu( RectTransform transform, ContextMenu contextMenuComponent, Image backgroundComponent ) : base( transform )
         {
             this.contextMenuComponent = contextMenuComponent;
             this.backgroundComponent = backgroundComponent;
         }
+
+        public Sprite Background { get => backgroundComponent.sprite; set => backgroundComponent.sprite = value; }
     }
 }

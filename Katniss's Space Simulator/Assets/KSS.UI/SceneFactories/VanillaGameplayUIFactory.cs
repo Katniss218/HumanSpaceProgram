@@ -27,7 +27,7 @@ namespace KSS.UI.SceneFactories
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
             VelocityReadoutUI ui = text.gameObject.AddComponent<VelocityReadoutUI>();
-            ui.TextBox = text.textComponent;
+            ui.Text = text;
 
 
             text = canvas.AddPanel( new UILayoutInfo( Vector2.zero, new Vector2( 0, 25 ), new Vector2( 150, 25 ) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
@@ -37,7 +37,7 @@ namespace KSS.UI.SceneFactories
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
             AccelerationReadoutUI ui2 = text.gameObject.AddComponent<AccelerationReadoutUI>();
-            ui2.TextBox = text.textComponent;
+            ui2.Text = text;
 
 
             text = canvas.AddPanel( new UILayoutInfo( Vector2.zero, new Vector2( 0, 50 ), new Vector2( 150, 25 ) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
@@ -47,7 +47,7 @@ namespace KSS.UI.SceneFactories
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
             AltitudeReadoutUI ui3 = text.gameObject.AddComponent<AltitudeReadoutUI>();
-            ui3.TextBox = text.textComponent;
+            ui3.Text = text;
 
 
             text = canvas.AddPanel( new UILayoutInfo( Vector2.zero, new Vector2( 0, 75 ), new Vector2( 150, 25 ) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
@@ -57,7 +57,7 @@ namespace KSS.UI.SceneFactories
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
             TimewarpReadoutUI ui4 = text.gameObject.AddComponent<TimewarpReadoutUI>();
-            ui4.TextBox = text.textComponent;
+            ui4.Text = text;
 
 
             text = canvas.AddPanel( new UILayoutInfo( Vector2.up, new Vector2( 0, 0 ), new Vector2( 150, 25 ) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
@@ -67,12 +67,12 @@ namespace KSS.UI.SceneFactories
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
             FPSCounterUI ui5 = text.gameObject.AddComponent<FPSCounterUI>();
-            ui5.TextBox = text.textComponent;
+            ui5.Text = text;
 
 
             UIPanel navball = canvas.AddPanel( new UILayoutInfo( new Vector2( 0.5f, 0 ), Vector2.zero, new Vector2( 222, 202 ) ), null );
 
-            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( navball.transform, "mask", new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 190, 190 ) ) );
+            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( navball.rectTransform, "mask", new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 190, 190 ) ) );
 
             Image imageComponent = rootGameObject.AddComponent<Image>();
             imageComponent.raycastTarget = false;
@@ -98,7 +98,7 @@ namespace KSS.UI.SceneFactories
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
             VelocityReadoutUI vel = velocityIcon.gameObject.AddComponent<VelocityReadoutUI>();
-            vel.TextBox = velText.textComponent;
+            vel.Text = velText;
         }
     }
 }

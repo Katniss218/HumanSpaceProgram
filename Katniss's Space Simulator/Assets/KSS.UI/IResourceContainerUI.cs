@@ -14,8 +14,7 @@ namespace KSS.UI
         /// </summary>
         public IResourceContainer ReferenceObject { get; set; }
 
-        [SerializeField]
-        ValueBar _bar;
+        UIValueBar _bar;
 
         void Update()
         {
@@ -40,7 +39,7 @@ namespace KSS.UI
                 .WithPadding( 5, 5, 1 );
 
             IResourceContainerUI ui = root.AddComponent<IResourceContainerUI>();
-            ui._bar = bar.valueBarComponent;
+            ui._bar = bar;
             ui.ReferenceObject = referenceObj;
 
             return ui;

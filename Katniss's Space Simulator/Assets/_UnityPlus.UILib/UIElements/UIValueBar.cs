@@ -6,11 +6,26 @@ namespace UnityPlus.UILib.UIElements
 {
     public class UIValueBar : UIElement
     {
-        public readonly UnityPlus.UILib.ValueBar valueBarComponent;
+        internal readonly UnityPlus.UILib.ValueBar valueBarComponent;
 
         public UIValueBar( RectTransform transform, UnityPlus.UILib.ValueBar valueBarComponent ) : base( transform )
         {
             this.valueBarComponent = valueBarComponent;
+        }
+
+        public void ClearSegments()
+        {
+            valueBarComponent.ClearSegments();
+        }
+
+        public ValueBarSegment AddSegment( float width )
+        {
+            return valueBarComponent.AddSegment( width );
+        }
+
+        public ValueBarSegment InsertSegment( int index, float width )
+        {
+            return valueBarComponent.InsertSegment( index, width );
         }
     }
 }

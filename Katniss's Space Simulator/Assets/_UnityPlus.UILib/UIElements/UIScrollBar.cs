@@ -6,7 +6,7 @@ namespace UnityPlus.UILib.UIElements
 {
     public class UIScrollBar : UIElement
     {
-        public readonly UnityEngine.UI.Scrollbar scrollbarComponent;
+        internal readonly UnityEngine.UI.Scrollbar scrollbarComponent;
 
         public UIScrollBar( RectTransform transform, UnityEngine.UI.Scrollbar scrollbarComponent ) : base( transform )
         {

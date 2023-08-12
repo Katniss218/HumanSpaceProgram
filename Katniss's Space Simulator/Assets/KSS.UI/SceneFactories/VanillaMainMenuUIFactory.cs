@@ -34,11 +34,11 @@ namespace KSS.UI.SceneFactories
             UIValueBar bar = UIValueBarEx.AddHorizontalValueBar( canvas, new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, 35 ), new Vector2( 200, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/bar_background" ) )
                 .WithPadding( 5, 5, 1 );
 
-            var seg = bar.valueBarComponent.AddSegment( 0.25f );
+            var seg = bar.AddSegment( 0.25f );
             seg.Sprite = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/bar" );
             seg.Color = Color.blue;
 
-            seg = bar.valueBarComponent.InsertSegment( 0, 0.5f );
+            seg = bar.InsertSegment( 0, 0.5f );
             seg.Sprite = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/bar" );
             seg.Color = Color.red;
         }

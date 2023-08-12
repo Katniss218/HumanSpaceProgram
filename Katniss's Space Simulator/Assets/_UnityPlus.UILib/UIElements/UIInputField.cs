@@ -1,14 +1,13 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace UnityPlus.UILib.UIElements
 {
     public class UIInputField : UIElement
     {
-        public readonly TMPro.TMP_InputField inputFieldComponent;
-        public readonly TMPro.TextMeshProUGUI textComponent;
-        public readonly TMPro.TextMeshProUGUI placeholderComponent;
+        internal readonly TMPro.TMP_InputField inputFieldComponent;
+        internal readonly TMPro.TextMeshProUGUI textComponent;
+        internal readonly TMPro.TextMeshProUGUI placeholderComponent;
+        internal readonly UnityEngine.UI.Image backgroundComponent;
 
         public UIInputField( RectTransform transform, TMPro.TMP_InputField inputFieldComponent, TMPro.TextMeshProUGUI textComponent, TMPro.TextMeshProUGUI placeholderComponent ) : base( transform )
         {
@@ -16,5 +15,9 @@ namespace UnityPlus.UILib.UIElements
             this.textComponent = textComponent;
             this.placeholderComponent = placeholderComponent;
         }
+
+        public string Text { get => textComponent.text; set => textComponent.text = value; }
+
+        public Sprite Background { get => backgroundComponent.sprite; set => backgroundComponent.sprite = value; }
     }
 }

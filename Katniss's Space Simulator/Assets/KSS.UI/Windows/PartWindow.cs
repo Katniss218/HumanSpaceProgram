@@ -82,7 +82,7 @@ namespace KSS.UI.Windows
             UIScrollView scrollView = window.AddScrollView( UILayoutInfo.Fill( 2, 2, 75, 15 ), new Vector2( 0, 200 ), false, true );
 
             PartWindow partWindow = window.gameObject.AddComponent<PartWindow>();
-            partWindow._list = scrollView.contents.transform;
+            partWindow._list = scrollView.contents.rectTransform;
             partWindow._relationHighlighter = relationHighlight;
             partWindow.SetPart( part );
 

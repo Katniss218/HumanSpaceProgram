@@ -6,7 +6,7 @@ namespace UnityPlus.UILib.UIElements
 {
     public class UIScrollView : UIElement
     {
-        public readonly UnityEngine.UI.ScrollRect scrollRectComponent;
+        internal readonly UnityEngine.UI.ScrollRect scrollRectComponent;
 
         public UIScrollBar scrollbarHorizontal;
         public UIScrollBar scrollbarVertical;
