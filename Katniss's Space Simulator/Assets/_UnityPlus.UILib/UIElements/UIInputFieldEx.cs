@@ -7,7 +7,7 @@ namespace UnityPlus.UILib.UIElements
 {
     public static class UIInputFieldEx
     {
-        public static UIInputField AddInputField( this IUIElementParent parent, UILayoutInfo layout, Sprite background )
+        public static UIInputField AddInputField( this IUIElementContainer parent, UILayoutInfo layout, Sprite background )
         {
             (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( parent.contents, "uilib-inputfield", layout );
 

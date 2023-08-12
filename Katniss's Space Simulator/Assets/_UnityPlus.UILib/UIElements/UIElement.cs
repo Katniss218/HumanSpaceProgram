@@ -40,8 +40,6 @@ namespace UnityPlus.UILib.UIElements
 
         public UIElement( RectTransform rectTransform )
         {
-            //this._parent = null;
-            //this._children = new List<UIElement>();
             this._rectTransform = rectTransform;
             this._gameObject = rectTransform.gameObject;
         }
@@ -63,11 +61,6 @@ namespace UnityPlus.UILib.UIElements
                 return; // Silent quit.
             }
             UnityEngine.Object.Destroy( this.gameObject );
-            //this._parent._children.Remove( this );
-            //foreach( var child in this._children )
-            //{
-            //    child.Destroy();
-            //}
         }
 
         public virtual Vector2 GetPreferredSize()

@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace UnityPlus.UILib.UIElements
 {
-    public class UICanvas : UIElement, IUIElementParent
+    public class UICanvas : UIElement, IUIElementContainer
     {
         public RectTransform contents => base.rectTransform;
 

@@ -13,7 +13,7 @@ namespace KSS.UI
     {
         public SaveMetadata Save { get; private set; }
 
-        public static SaveMetadataUI Create( IUIElementParent parent, UILayoutInfo layout, SaveMetadata save )
+        public static SaveMetadataUI Create( IUIElementContainer parent, UILayoutInfo layout, SaveMetadata save )
         {
             UIPanel panel = parent.AddPanel( layout, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/functionality_panel" ) );
 

@@ -62,7 +62,7 @@
     <Compile Include="Assets\KSS.UI\SceneFactories\VanillaGameplayUIFactory.cs" />
     <Compile Include="Assets\KSS.UI\IResourceContainerUI.cs" />
     <Compile Include="Assets\KSS.UI\Windows\LoadWindow.cs" />
-    <Compile Include="Assets\KSS.UI\SceneFactories\GameplayEscapeUIFactory.cs" />
+    <Compile Include="Assets\KSS.UI\SceneFactories\VanillaGameplayEscapeUIFactory.cs" />
     <Compile Include="Assets\KSS.UI\Windows\WindowRelationHighlight.cs" />
     <Compile Include="Assets\KSS.UI\SceneFactories\VanillaMainMenuUIFactory.cs" />
     <Compile Include="Assets\KSS.UI\TimewarpReadoutUI.cs" />

@@ -7,17 +7,17 @@ namespace UnityPlus.UILib.UIElements
 {
     public static class UIScrollViewEx
     {
-        public static UIScrollView AddHorizontalScrollView( this IUIElementParent parent, UILayoutInfo layout, Vector2 contentSize )
+        public static UIScrollView AddHorizontalScrollView( this IUIElementContainer parent, UILayoutInfo layout, Vector2 contentSize )
         {
             return AddScrollView( parent, layout, contentSize, true, false );
         }
 
-        public static UIScrollView AddVerticalScrollView( this IUIElementParent parent, UILayoutInfo layout, Vector2 contentSize )
+        public static UIScrollView AddVerticalScrollView( this IUIElementContainer parent, UILayoutInfo layout, Vector2 contentSize )
         {
             return AddScrollView( parent, layout, contentSize, false, true );
         }
 
-        public static UIScrollView AddScrollView( this IUIElementParent parent, UILayoutInfo layout, Vector2 contentSize, bool horizontal, bool vertical )
+        public static UIScrollView AddScrollView( this IUIElementContainer parent, UILayoutInfo layout, Vector2 contentSize, bool horizontal, bool vertical )
         {
             (GameObject root, RectTransform rootTransform) = UIElement.CreateUI( parent.contents, "uilib-scrollview", layout );
 

@@ -9,13 +9,13 @@ namespace UnityPlus.UILib.UIElements
 {
     public static class UIButtonEx
     {
-        public static T AddButton<T>( this T parent, UILayoutInfo layout, Sprite sprite, UnityAction onClick, out UIButton button ) where T : IUIElementParent
+        public static T AddButton<T>( this T parent, UILayoutInfo layout, Sprite sprite, UnityAction onClick, out UIButton button ) where T : IUIElementContainer
         {
             button = AddButton( parent, layout, sprite, onClick );
             return parent;
         }
 
-        public static UIButton AddButton( this IUIElementParent parent, UILayoutInfo layout, Sprite sprite, UnityAction onClick = null )
+        public static UIButton AddButton( this IUIElementContainer parent, UILayoutInfo layout, Sprite sprite, UnityAction onClick = null )
         {
             (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( parent.contents, "uilib-button", layout );
 

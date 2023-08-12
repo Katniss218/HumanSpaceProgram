@@ -90,7 +90,7 @@
     <Compile Include="Assets\_UnityPlus.UILib\UILayoutInfo.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIContextMenu.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UILayout.cs" />
-    <Compile Include="Assets\_UnityPlus.UILib\UIElements\IUIElementParent.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\UIElements\IUIElementContainer.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UICanvas.cs" />
   </ItemGroup>
   <ItemGroup>

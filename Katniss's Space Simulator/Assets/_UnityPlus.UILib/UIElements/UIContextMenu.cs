@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace UnityPlus.UILib.UIElements
 {
-    public sealed class UIContextMenu : UIElement, IUIElementParent
+    public sealed class UIContextMenu : UIElement, IUIElementContainer
     {
         internal readonly ContextMenu contextMenuComponent;
         internal readonly Image backgroundComponent;
@@ -13,11 +13,11 @@ namespace UnityPlus.UILib.UIElements
 
         public List<UIElement> Children { get; }
 
-        internal readonly IUIElementParent _parent;
-        public IUIElementParent parent { get => _parent; }
+        internal readonly IUIElementContainer _parent;
+        public IUIElementContainer parent { get => _parent; }
 
 
-        public UIContextMenu( RectTransform transform, IUIElementParent parent, ContextMenu contextMenuComponent, Image backgroundComponent ) : base( transform )
+        public UIContextMenu( RectTransform transform, IUIElementContainer parent, ContextMenu contextMenuComponent, Image backgroundComponent ) : base( transform )
         {
             this._parent = parent;
             this.parent.Children.Add( this );

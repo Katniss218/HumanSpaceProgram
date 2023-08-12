@@ -7,13 +7,13 @@ namespace UnityPlus.UILib.UIElements
 {
     public static class UIIconEx
     {
-        public static T WithIcon<T>( this T parent, UILayoutInfo layout, Sprite icon, out UIIcon uiIcon ) where T : IUIElementParent
+        public static T WithIcon<T>( this T parent, UILayoutInfo layout, Sprite icon, out UIIcon uiIcon ) where T : IUIElementContainer
         {
             uiIcon = AddIcon( parent, layout, icon );
             return parent;
         }
 
-        public static UIIcon AddIcon( this IUIElementParent parent, UILayoutInfo layoutInfo, Sprite icon )
+        public static UIIcon AddIcon( this IUIElementContainer parent, UILayoutInfo layoutInfo, Sprite icon )
         {
             (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( parent.contents, "uilib-icon", layoutInfo );
 

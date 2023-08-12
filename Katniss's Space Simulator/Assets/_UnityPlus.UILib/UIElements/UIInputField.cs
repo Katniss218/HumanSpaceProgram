@@ -9,10 +9,10 @@ namespace UnityPlus.UILib.UIElements
         internal readonly TMPro.TextMeshProUGUI placeholderComponent;
         internal readonly UnityEngine.UI.Image backgroundComponent;
 
-        internal readonly IUIElementParent _parent;
-        public IUIElementParent parent { get => _parent; }
+        internal readonly IUIElementContainer _parent;
+        public IUIElementContainer parent { get => _parent; }
 
-        internal UIInputField( RectTransform transform, IUIElementParent parent, TMPro.TMP_InputField inputFieldComponent, TMPro.TextMeshProUGUI textComponent, TMPro.TextMeshProUGUI placeholderComponent ) : base( transform )
+        internal UIInputField( RectTransform transform, IUIElementContainer parent, TMPro.TMP_InputField inputFieldComponent, TMPro.TextMeshProUGUI textComponent, TMPro.TextMeshProUGUI placeholderComponent ) : base( transform )
         {
             this._parent = parent;
             this.inputFieldComponent = inputFieldComponent;

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace UnityPlus.UILib.UIElements
 {
-    public sealed class UIScrollView : UIElement, IUIElementParent
+    public sealed class UIScrollView : UIElement, IUIElementContainer
     {
         internal readonly UnityEngine.UI.ScrollRect scrollRectComponent;
 
@@ -15,10 +15,10 @@ namespace UnityPlus.UILib.UIElements
 
         public List<UIElement> Children { get; }
 
-        internal readonly IUIElementParent _parent;
-        public IUIElementParent parent { get => _parent; }
+        internal readonly IUIElementContainer _parent;
+        public IUIElementContainer parent { get => _parent; }
 
-        internal UIScrollView( RectTransform transform, IUIElementParent parent, UnityEngine.UI.ScrollRect scrollRectComponent, UIScrollBar scrollbarHorizontal, UIScrollBar scrollbarVertical, RectTransform contents ) : base( transform )
+        internal UIScrollView( RectTransform transform, IUIElementContainer parent, UnityEngine.UI.ScrollRect scrollRectComponent, UIScrollBar scrollbarHorizontal, UIScrollBar scrollbarVertical, RectTransform contents ) : base( transform )
         {
             this._parent = parent;
             this.parent.Children.Add( this );

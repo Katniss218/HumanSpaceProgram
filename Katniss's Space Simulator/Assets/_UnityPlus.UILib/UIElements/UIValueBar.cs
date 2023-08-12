@@ -8,10 +8,10 @@ namespace UnityPlus.UILib.UIElements
     {
         internal readonly UnityPlus.UILib.ValueBar valueBarComponent;
 
-        internal readonly IUIElementParent _parent;
-        public IUIElementParent parent { get => _parent; }
+        internal readonly IUIElementContainer _parent;
+        public IUIElementContainer parent { get => _parent; }
 
-        public UIValueBar( RectTransform transform, IUIElementParent parent, UnityPlus.UILib.ValueBar valueBarComponent ) : base( transform )
+        public UIValueBar( RectTransform transform, IUIElementContainer parent, UnityPlus.UILib.ValueBar valueBarComponent ) : base( transform )
         {
             this._parent = parent;
             this.valueBarComponent = valueBarComponent;

@@ -8,10 +8,10 @@ namespace UnityPlus.UILib.UIElements
     {
         // Toggle has 2 sprites, one for inactive, and other for active.
 
-        internal readonly IUIElementParent _parent;
-        public IUIElementParent parent { get => _parent; }
+        internal readonly IUIElementContainer _parent;
+        public IUIElementContainer parent { get => _parent; }
 
-        internal UIInputToggle( RectTransform transform, IUIElementParent parent ) : base( transform )
+        internal UIInputToggle( RectTransform transform, IUIElementContainer parent ) : base( transform )
         {
             this._parent = parent;
         }

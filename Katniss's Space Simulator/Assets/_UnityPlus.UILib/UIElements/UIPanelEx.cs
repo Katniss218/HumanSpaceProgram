@@ -7,13 +7,13 @@ namespace UnityPlus.UILib.UIElements
 {
     public static class UIPanelEx
     {
-        public static T WithPanel<T>( this T parent, UILayoutInfo layout, Sprite background, out UIPanel uiPanel ) where T : IUIElementParent
+        public static T WithPanel<T>( this T parent, UILayoutInfo layout, Sprite background, out UIPanel uiPanel ) where T : IUIElementContainer
         {
             uiPanel = AddPanel( parent, layout, background );
             return parent;
         }
 
-        public static UIPanel AddPanel( this IUIElementParent parent, UILayoutInfo layoutInfo, Sprite background )
+        public static UIPanel AddPanel( this IUIElementContainer parent, UILayoutInfo layoutInfo, Sprite background )
         {
             (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( parent.contents, "uilib-panel", layoutInfo );
 

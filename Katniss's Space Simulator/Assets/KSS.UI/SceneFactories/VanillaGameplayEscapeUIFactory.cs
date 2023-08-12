@@ -14,7 +14,7 @@ using Object = UnityEngine.Object;
 
 namespace KSS.UI.SceneFactories
 {
-    public static class GameplayEscapeUIFactory
+    public static class VanillaGameplayEscapeUIFactory
     {
         static GameObject escapeMenuWindow;
 

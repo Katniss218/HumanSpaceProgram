@@ -17,8 +17,8 @@ namespace KSS.UI
         SaveMetadataUI[] _selectedTimelineSaves;
         SaveMetadataUI _selectedSave;
 
-        IUIElementParent _saveList;
-        IUIElementParent _timelineList;
+        IUIElementContainer _saveList;
+        IUIElementContainer _timelineList;
 
         [SerializeField]
         Button _loadButton;

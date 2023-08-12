@@ -26,7 +26,7 @@ namespace KSS.UI.Windows
         [field: SerializeField]
         public Part Part { get; private set; }
 
-        IUIElementParent _list;
+        IUIElementContainer _list;
         WindowRelationHighlight _relationHighlighter;
 
         public void SetPart( Part part )

@@ -32,7 +32,7 @@ namespace KSS.UI
             }
         }
 
-        public static IResourceContainerUI Create( IUIElementParent parent, IResourceContainer referenceObj )
+        public static IResourceContainerUI Create( IUIElementContainer parent, IResourceContainer referenceObj )
         {
             UIPanel panel = parent.AddPanel( new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 250, 15 ) ), null );
 

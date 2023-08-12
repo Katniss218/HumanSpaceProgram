@@ -5,7 +5,7 @@ using UnityEngine.Events;
 
 namespace UnityPlus.UILib.UIElements
 {
-    public sealed class UIButton : UIElement, IUIElementParent
+    public sealed class UIButton : UIElement, IUIElementContainer
     {
         internal readonly UnityEngine.UI.Button buttonComponent;
         internal readonly UnityEngine.UI.Image backgroundComponent;
@@ -13,10 +13,10 @@ namespace UnityPlus.UILib.UIElements
 
         public List<UIElement> Children { get; }
 
-        internal readonly IUIElementParent _parent;
-        public IUIElementParent parent { get => _parent; }
+        internal readonly IUIElementContainer _parent;
+        public IUIElementContainer parent { get => _parent; }
 
-        internal UIButton( RectTransform transform, IUIElementParent parent, UnityEngine.UI.Button buttonComponent, UnityEngine.UI.Image backgroundComponent ) : base( transform )
+        internal UIButton( RectTransform transform, IUIElementContainer parent, UnityEngine.UI.Button buttonComponent, UnityEngine.UI.Image backgroundComponent ) : base( transform )
         {
             this._parent = parent;
             this.parent.Children.Add( this );

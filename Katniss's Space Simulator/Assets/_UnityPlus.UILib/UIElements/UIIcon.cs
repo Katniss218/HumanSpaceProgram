@@ -7,21 +7,17 @@ namespace UnityPlus.UILib.UIElements
     /// <summary>
     /// Represents a simple icon UI element.
     /// </summary>
-    public sealed class UIIcon : UIElement, IUIElementParent
+    public sealed class UIIcon : UIElement
     {
         internal readonly UnityEngine.UI.Image imageComponent;
-        public RectTransform contents => base.rectTransform;
 
-        public List<UIElement> Children { get; }
+        internal readonly IUIElementContainer _parent;
+        public IUIElementContainer parent { get => _parent; }
 
-        internal readonly IUIElementParent _parent;
-        public IUIElementParent parent { get => _parent; }
-
-        internal UIIcon( RectTransform transform, IUIElementParent parent, UnityEngine.UI.Image imageComponent ) : base( transform )
+        internal UIIcon( RectTransform transform, IUIElementContainer parent, UnityEngine.UI.Image imageComponent ) : base( transform )
         {
             this._parent = parent;
             this.parent.Children.Add( this );
-            Children = new List<UIElement>();
             this.imageComponent = imageComponent;
         }
 

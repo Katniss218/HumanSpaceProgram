@@ -11,16 +11,23 @@ namespace UnityPlus.UILib.UIElements
     {
         internal readonly TMPro.TextMeshProUGUI textComponent;
 
-        internal readonly IUIElementParent _parent;
-        public IUIElementParent parent { get => _parent; }
+        internal readonly IUIElementContainer _parent;
+        public IUIElementContainer parent { get => _parent; }
 
-        internal UIText( RectTransform transform, IUIElementParent parent, TMPro.TextMeshProUGUI textComponent ) : base(transform)
+        internal UIText( RectTransform transform, IUIElementContainer parent, TMPro.TextMeshProUGUI textComponent ) : base( transform )
         {
             this._parent = parent;
             this.textComponent = textComponent;
         }
 
-        public string text { get => textComponent.text; set => textComponent.text = value; }
+        public string text
+        {
+            get => textComponent.text;
+            set
+            {
+                textComponent.text = value;
+            }
+        }
 
         public override Vector2 GetPreferredSize()
         {

@@ -7,16 +7,16 @@ namespace UnityPlus.UILib.UIElements
     /// <summary>
     /// Represents a window, which is a defined section of the canvas.
     /// </summary>
-    public sealed class UIWindow : UIElement, IUIElementParent
+    public sealed class UIWindow : UIElement, IUIElementContainer
     {
         internal readonly UnityEngine.UI.Image backgroundComponent;
         public RectTransform contents => base.rectTransform;
 
         public List<UIElement> Children { get; }
-        internal readonly IUIElementParent _parent;
-        public IUIElementParent parent { get => _parent; }
+        internal readonly IUIElementContainer _parent;
+        public IUIElementContainer parent { get => _parent; }
 
-        internal UIWindow( RectTransform transform, IUIElementParent parent, UnityEngine.UI.Image backgroundComponent ) : base( transform )
+        internal UIWindow( RectTransform transform, IUIElementContainer parent, UnityEngine.UI.Image backgroundComponent ) : base( transform )
         {
             this._parent = parent;
             this.parent.Children.Add( this );

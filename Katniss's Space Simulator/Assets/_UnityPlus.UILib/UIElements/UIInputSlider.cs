@@ -8,10 +8,10 @@ namespace UnityPlus.UILib.UIElements
     {
         // A slider produces float values, between a and b, with rounding to the nearest multiple of x.
 
-        internal readonly IUIElementParent _parent;
-        public IUIElementParent parent { get => _parent; }
+        internal readonly IUIElementContainer _parent;
+        public IUIElementContainer parent { get => _parent; }
 
-        internal UIInputSlider( RectTransform transform, IUIElementParent parent ) : base( transform )
+        internal UIInputSlider( RectTransform transform, IUIElementContainer parent ) : base( transform )
         {
             this._parent = parent;
         }

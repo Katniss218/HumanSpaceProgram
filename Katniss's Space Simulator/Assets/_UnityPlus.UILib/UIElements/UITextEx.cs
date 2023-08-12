@@ -6,13 +6,13 @@ namespace UnityPlus.UILib.UIElements
 {
     public static class UITextEx
     {
-        public static T WithText<T>( this T parent, UILayoutInfo layout, string text, out UIText uiText ) where T : IUIElementParent
+        public static T WithText<T>( this T parent, UILayoutInfo layout, string text, out UIText uiText ) where T : IUIElementContainer
         {
             uiText = AddText( parent, layout, text );
             return parent;
         }
 
-        public static UIText AddText( this IUIElementParent parent, UILayoutInfo layoutInfo, string text )
+        public static UIText AddText( this IUIElementContainer parent, UILayoutInfo layoutInfo, string text )
         {
             (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( parent.contents, "uilib-text", layoutInfo );
 
