@@ -1,23 +1,33 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityPlus.UILib.Layout;
 
 namespace UnityPlus.UILib.UIElements
 {
     /// <summary>
     /// A UI element that is a container for text.
     /// </summary>
-    public sealed class UIText : UIElement
+    public sealed class UIText : UIElement, IUIElementChild
     {
         internal readonly TMPro.TextMeshProUGUI textComponent;
 
         internal readonly IUIElementContainer _parent;
-        public IUIElementContainer parent { get => _parent; }
+        public IUIElementContainer Parent { get => _parent; }
+
+        //public LayoutDriver LayoutDriver { get; } = new FitToSizeDriver();
 
         internal UIText( RectTransform transform, IUIElementContainer parent, TMPro.TextMeshProUGUI textComponent ) : base( transform )
         {
             this._parent = parent;
+            this.Parent.Children.Add( this );
             this.textComponent = textComponent;
+        }
+
+        public override void Destroy()
+        {
+            base.Destroy();
+            this.Parent.Children.Remove( this );
         }
 
         public string text
@@ -26,6 +36,7 @@ namespace UnityPlus.UILib.UIElements
             set
             {
                 textComponent.text = value;
+                //this.LayoutDriver.RunSelf( this );
             }
         }
 

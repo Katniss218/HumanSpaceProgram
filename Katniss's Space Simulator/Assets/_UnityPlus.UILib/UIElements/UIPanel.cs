@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityPlus.UILib.Layout;
 
 namespace UnityPlus.UILib.UIElements
 {
@@ -16,11 +17,13 @@ namespace UnityPlus.UILib.UIElements
         internal readonly IUIElementContainer _parent;
         public IUIElementContainer parent { get => _parent; }
 
+        public LayoutDriver LayoutDriver { get; set; }
+
         internal UIPanel( RectTransform transform, IUIElementContainer parent, UnityEngine.UI.Image backgroundComponent ) : base( transform )
         {
+            Children = new List<UIElement>();
             this._parent = parent;
             this.parent.Children.Add( this );
-            Children = new List<UIElement>();
             this.backgroundComponent = backgroundComponent;
         }
 

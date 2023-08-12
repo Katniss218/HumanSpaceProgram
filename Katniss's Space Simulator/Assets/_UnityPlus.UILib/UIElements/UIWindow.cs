@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityPlus.UILib.Layout;
 
 namespace UnityPlus.UILib.UIElements
 {
@@ -12,24 +13,24 @@ namespace UnityPlus.UILib.UIElements
         internal readonly UnityEngine.UI.Image backgroundComponent;
         public RectTransform contents => base.rectTransform;
 
+        public UICanvas Parent { get; }
         public List<UIElement> Children { get; }
-        internal readonly IUIElementContainer _parent;
-        public IUIElementContainer parent { get => _parent; }
+        public LayoutDriver LayoutDriver { get; set; }
 
-        internal UIWindow( RectTransform transform, IUIElementContainer parent, UnityEngine.UI.Image backgroundComponent ) : base( transform )
+        internal UIWindow( RectTransform transform, UICanvas parent, UnityEngine.UI.Image backgroundComponent ) : base( transform )
         {
-            this._parent = parent;
-            this.parent.Children.Add( this );
-            Children = new List<UIElement>();
+            this.Children = new List<UIElement>();
+            this.Parent = parent;
+            this.Parent.Children.Add( this );
             this.backgroundComponent = backgroundComponent;
         }
-
-        public Sprite Background { get => backgroundComponent.sprite; set => backgroundComponent.sprite = value; }
 
         public override void Destroy()
         {
             base.Destroy();
-            this.parent.Children.Remove( this );
+            this.Parent.Children.Remove( this );
         }
+
+        public Sprite Background { get => backgroundComponent.sprite; set => backgroundComponent.sprite = value; }
     }
 }

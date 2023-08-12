@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityPlus.UILib.Layout;
 
 namespace UnityPlus.UILib.UIElements
 {
@@ -12,6 +13,8 @@ namespace UnityPlus.UILib.UIElements
         public RectTransform contents => base.rectTransform;
 
         public List<UIElement> Children { get; }
+
+        public LayoutDriver LayoutDriver { get; set; }
 
         public UICanvas( Canvas canvas ) : base( (RectTransform)canvas.transform )
         {

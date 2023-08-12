@@ -27,7 +27,7 @@ namespace KSS.UI.SceneFactories
                 return;
             }
 
-            UICanvas canvas = (UICanvas)CanvasManager.Get( CanvasName.WINDOWS );
+            UICanvas canvas = CanvasManager.Get( CanvasName.WINDOWS );
 
             UIWindow window = canvas.AddWindow( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 300, 300 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_window" ) )
                 .Draggable()

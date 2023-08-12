@@ -2,10 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityPlus.UILib.Layout;
 
 namespace UnityPlus.UILib.UIElements
 {
-    public sealed class UIButton : UIElement, IUIElementContainer
+    public sealed class UIButton : UIElement, IUIElementContainer, IUIElementChild
     {
         internal readonly UnityEngine.UI.Button buttonComponent;
         internal readonly UnityEngine.UI.Image backgroundComponent;
@@ -14,13 +15,15 @@ namespace UnityPlus.UILib.UIElements
         public List<UIElement> Children { get; }
 
         internal readonly IUIElementContainer _parent;
-        public IUIElementContainer parent { get => _parent; }
+        public IUIElementContainer Parent { get => _parent; }
+
+        public LayoutDriver LayoutDriver { get; set; }
 
         internal UIButton( RectTransform transform, IUIElementContainer parent, UnityEngine.UI.Button buttonComponent, UnityEngine.UI.Image backgroundComponent ) : base( transform )
         {
-            this._parent = parent;
-            this.parent.Children.Add( this );
             Children = new List<UIElement>();
+            this._parent = parent;
+            this.Parent.Children.Add( this );
             this.buttonComponent = buttonComponent;
             this.backgroundComponent = backgroundComponent;
         }

@@ -24,7 +24,7 @@ namespace KSS.UI.SceneFactories
         [HSPEventListener( HSPEvent.STARTUP_MAINMENU, HSPEvent.NAMESPACE_VANILLA + ".mainmenu_ui" )]
         public static void Create( object e )
         {
-            UICanvas canvas = (UICanvas)CanvasManager.Get( CanvasName.STATIC );
+            UICanvas canvas = CanvasManager.Get( CanvasName.STATIC );
 
             CreateStartNewGameButton( canvas );
             CreateLoadButton( canvas );

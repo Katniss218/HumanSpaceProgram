@@ -19,7 +19,7 @@ namespace UnityPlus.UILib.UIElements
             ContextMenu contextMenu = rootGameObject.AddComponent<ContextMenu>();
             contextMenu.Target = track;
 
-            return new UIContextMenu( track, contextMenuCanvas, contextMenu, backgroundComponent );
+            return new UIContextMenu( track, null, contextMenu, backgroundComponent );
         }
 
         public static UIContextMenu WithTint( this UIContextMenu contextMenu, Color tint )

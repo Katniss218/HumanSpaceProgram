@@ -47,7 +47,7 @@ namespace UnityPlus.UILib.UIElements
         /// <summary>
         /// Checks if the underlying UI element has been destroyed.
         /// </summary>
-        public virtual bool IsDestroyed => this.gameObject == null;
+        internal virtual bool isDestroyed => this.gameObject == null;
 
         /// <summary>
         /// Destroys the specified UI element along with its children UI elements.
@@ -56,7 +56,7 @@ namespace UnityPlus.UILib.UIElements
         {
             // TODO - add a guard that prevents destruction of certain objects, like the contents container of a scroll view.
 
-            if( IsDestroyed )
+            if( isDestroyed )
             {
                 return; // Silent quit.
             }
@@ -99,6 +99,14 @@ namespace UnityPlus.UILib.UIElements
         public static explicit operator Transform( UIElement uiElement )
         {
             return uiElement.rectTransform;
+        }
+    }
+
+    public static class UIElementEx
+    {
+        public static bool IsDestroyed( this UIElement uiElement )
+        {
+            return uiElement == null || uiElement.isDestroyed;
         }
     }
 }

@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityPlus.UILib.Layout;
 
 namespace UnityPlus.UILib.UIElements
 {
-    public sealed class UIScrollView : UIElement, IUIElementContainer
+    public sealed class UIScrollView : UIElement, IUIElementContainer, IUIElementChild
     {
         internal readonly UnityEngine.UI.ScrollRect scrollRectComponent;
 
@@ -16,13 +17,15 @@ namespace UnityPlus.UILib.UIElements
         public List<UIElement> Children { get; }
 
         internal readonly IUIElementContainer _parent;
-        public IUIElementContainer parent { get => _parent; }
+        public IUIElementContainer Parent { get => _parent; }
+
+        public LayoutDriver LayoutDriver { get; set; }
 
         internal UIScrollView( RectTransform transform, IUIElementContainer parent, UnityEngine.UI.ScrollRect scrollRectComponent, UIScrollBar scrollbarHorizontal, UIScrollBar scrollbarVertical, RectTransform contents ) : base( transform )
         {
-            this._parent = parent;
-            this.parent.Children.Add( this );
             Children = new List<UIElement>();
+            this._parent = parent;
+            this.Parent.Children.Add( this );
             this.scrollRectComponent = scrollRectComponent;
             this.scrollbarHorizontal = scrollbarHorizontal;
             this.scrollbarVertical = scrollbarVertical;
@@ -32,7 +35,7 @@ namespace UnityPlus.UILib.UIElements
         public override void Destroy()
         {
             base.Destroy();
-            this.parent.Children.Remove( this );
+            this.Parent.Children.Remove( this );
         }
     }
 }

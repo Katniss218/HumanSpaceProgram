@@ -9,7 +9,7 @@ namespace UnityPlus.UILib.UIElements
     {
         public static UIWindow AddWindow( this UICanvas parent, UILayoutInfo layoutInfo, Sprite background )
         {
-            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( parent.contents, "uilib-window", layoutInfo );
+            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( parent.rectTransform, "uilib-window", layoutInfo );
 
             Image backgroundComponent = rootGameObject.AddComponent<Image>();
             backgroundComponent.raycastTarget = true;

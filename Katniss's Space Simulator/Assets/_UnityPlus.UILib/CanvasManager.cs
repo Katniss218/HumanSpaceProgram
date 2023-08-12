@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityPlus.UILib.UIElements;
 using Object = UnityEngine.Object;
 
 namespace UnityPlus.UILib
@@ -11,13 +12,13 @@ namespace UnityPlus.UILib
     /// </summary>
     public static class CanvasManager
     {
-        static Dictionary<string, Canvas> _canvasDict = new Dictionary<string, Canvas>();
+        static Dictionary<string, UICanvas> _canvasDict = new Dictionary<string, UICanvas>();
 
         /// <summary>
         /// Registers a canvas under a specified ID.
         /// </summary>
         /// <exception cref="InvalidOperationException"/>
-        public static void Register( string id, Canvas canvas )
+        public static void Register( string id, UICanvas canvas )
         {
             if( _canvasDict.ContainsKey( id ) )
             {
@@ -32,9 +33,9 @@ namespace UnityPlus.UILib
             CanvasID[] canvasLayers = Object.FindObjectsOfType<CanvasID>();
             foreach( var canvasLayer in canvasLayers )
             {
-                if( _canvasDict.TryGetValue( canvasLayer.ID, out Canvas c ) )
+                if( _canvasDict.TryGetValue( canvasLayer.ID, out UICanvas c ) )
                 {
-                    if( c == null )
+                    if( c.IsDestroyed() )
                     {
                         _canvasDict.Remove( canvasLayer.ID );
                     }
@@ -51,7 +52,7 @@ namespace UnityPlus.UILib
                 {
                     Canvas canvas = canvasLayer.GetComponent<Canvas>();
 
-                    Register( canvasLayer.ID, canvas );
+                    Register( canvasLayer.ID, new UICanvas( canvas ) );
                 }
                 catch( Exception ex )
                 {
@@ -67,11 +68,11 @@ namespace UnityPlus.UILib
         /// <remarks>
         /// Tries to find the canvas is it isn't cached yet.
         /// </remarks>
-        public static Canvas Get( string id )
+        public static UICanvas Get( string id )
         {
-            if( _canvasDict.TryGetValue( id, out Canvas canvas ) )
+            if( _canvasDict.TryGetValue( id, out UICanvas canvas ) )
             {
-                if( canvas != null )
+                if( !canvas.IsDestroyed() )
                 {
                     return canvas;
                 }
