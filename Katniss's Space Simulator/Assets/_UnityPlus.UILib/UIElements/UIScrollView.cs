@@ -4,20 +4,35 @@ using UnityEngine;
 
 namespace UnityPlus.UILib.UIElements
 {
-    public class UIScrollView : UIElement
+    public sealed class UIScrollView : UIElement, IUIElementParent
     {
         internal readonly UnityEngine.UI.ScrollRect scrollRectComponent;
 
         public UIScrollBar scrollbarHorizontal;
         public UIScrollBar scrollbarVertical;
-        public readonly UIElement contents;
+        readonly RectTransform _contents;
+        public RectTransform contents { get => _contents; }
 
-        public UIScrollView( RectTransform transform, UnityEngine.UI.ScrollRect scrollRectComponent, UIScrollBar scrollbarHorizontal, UIScrollBar scrollbarVertical, UIElement contents ) : base( transform )
+        public List<UIElement> Children { get; }
+
+        internal readonly IUIElementParent _parent;
+        public IUIElementParent parent { get => _parent; }
+
+        internal UIScrollView( RectTransform transform, IUIElementParent parent, UnityEngine.UI.ScrollRect scrollRectComponent, UIScrollBar scrollbarHorizontal, UIScrollBar scrollbarVertical, RectTransform contents ) : base( transform )
         {
+            this._parent = parent;
+            this.parent.Children.Add( this );
+            Children = new List<UIElement>();
             this.scrollRectComponent = scrollRectComponent;
             this.scrollbarHorizontal = scrollbarHorizontal;
             this.scrollbarVertical = scrollbarVertical;
-            this.contents = contents;
+            this._contents = contents;
+        }
+
+        public override void Destroy()
+        {
+            base.Destroy();
+            this.parent.Children.Remove( this );
         }
     }
 }

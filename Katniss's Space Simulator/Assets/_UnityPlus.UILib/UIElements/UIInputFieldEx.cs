@@ -7,9 +7,9 @@ namespace UnityPlus.UILib.UIElements
 {
     public static class UIInputFieldEx
     {
-        public static UIInputField AddInputField( this UIElement parent, UILayoutInfo layout, Sprite background )
+        public static UIInputField AddInputField( this IUIElementParent parent, UILayoutInfo layout, Sprite background )
         {
-            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( parent, "uilib-inputfield", layout );
+            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( parent.contents, "uilib-inputfield", layout );
 
             Image imageComponent = rootGameObject.AddComponent<Image>();
             imageComponent.raycastTarget = true;
@@ -56,7 +56,7 @@ namespace UnityPlus.UILib.UIElements
 
             inputFieldComponent.RegenerateCaret();
 
-            return new UIInputField( rootTransform, inputFieldComponent, realText, placeholderText );
+            return new UIInputField( rootTransform, parent, inputFieldComponent, realText, placeholderText );
         }
 
         public static UIInputField WithFont( this UIInputField inputField, TMPro.TMP_FontAsset font, float fontSize, Color color )

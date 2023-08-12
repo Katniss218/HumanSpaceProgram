@@ -7,9 +7,9 @@ namespace UnityPlus.UILib.UIElements
 {
     public static class UIWindowEx
     {
-        public static UIWindow AddWindow( this Canvas parent, UILayoutInfo layoutInfo, Sprite background )
+        public static UIWindow AddWindow( this UICanvas parent, UILayoutInfo layoutInfo, Sprite background )
         {
-            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( (RectTransform)parent.transform, "uilib-window", layoutInfo );
+            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( parent.contents, "uilib-window", layoutInfo );
 
             Image backgroundComponent = rootGameObject.AddComponent<Image>();
             backgroundComponent.raycastTarget = true;
@@ -21,7 +21,7 @@ namespace UnityPlus.UILib.UIElements
                 backgroundComponent.color = new Color( 0, 0, 0, 0 );
             }
 
-            return new UIWindow( rootTransform, backgroundComponent );
+            return new UIWindow( rootTransform, parent, backgroundComponent );
         }
 
         public static UIWindow Focusable( this UIWindow window )

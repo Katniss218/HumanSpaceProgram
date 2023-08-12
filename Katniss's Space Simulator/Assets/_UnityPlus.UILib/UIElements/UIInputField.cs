@@ -2,15 +2,19 @@ using UnityEngine;
 
 namespace UnityPlus.UILib.UIElements
 {
-    public class UIInputField : UIElement
+    public sealed class UIInputField : UIElement
     {
         internal readonly TMPro.TMP_InputField inputFieldComponent;
         internal readonly TMPro.TextMeshProUGUI textComponent;
         internal readonly TMPro.TextMeshProUGUI placeholderComponent;
         internal readonly UnityEngine.UI.Image backgroundComponent;
 
-        public UIInputField( RectTransform transform, TMPro.TMP_InputField inputFieldComponent, TMPro.TextMeshProUGUI textComponent, TMPro.TextMeshProUGUI placeholderComponent ) : base( transform )
+        internal readonly IUIElementParent _parent;
+        public IUIElementParent parent { get => _parent; }
+
+        internal UIInputField( RectTransform transform, IUIElementParent parent, TMPro.TMP_InputField inputFieldComponent, TMPro.TextMeshProUGUI textComponent, TMPro.TextMeshProUGUI placeholderComponent ) : base( transform )
         {
+            this._parent = parent;
             this.inputFieldComponent = inputFieldComponent;
             this.textComponent = textComponent;
             this.placeholderComponent = placeholderComponent;

@@ -15,9 +15,9 @@ namespace KSS.UI.SceneFactories
     public static class VanillaGameplayUIFactory
     {
         [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, HSPEvent.NAMESPACE_VANILLA + ".gameplay_ui" )]
-        public static void Create( object obj )
+        public static void Create( object e )
         {
-            Canvas canvas = CanvasManager.Get( CanvasName.STATIC );
+            UICanvas canvas = (UICanvas)CanvasManager.Get( CanvasName.STATIC );
 
 
             UIText text = canvas.AddPanel( new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 150, 25 ) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )

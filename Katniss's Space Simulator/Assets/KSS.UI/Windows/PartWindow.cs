@@ -26,7 +26,7 @@ namespace KSS.UI.Windows
         [field: SerializeField]
         public Part Part { get; private set; }
 
-        RectTransform _list;
+        IUIElementParent _list;
         WindowRelationHighlight _relationHighlighter;
 
         public void SetPart( Part part )
@@ -38,9 +38,9 @@ namespace KSS.UI.Windows
 
         private void ReDraw()
         {
-            foreach( GameObject go in _list )
+            foreach( UIElement go in _list.Children )
             {
-                Destroy( go );
+                go.Destroy();
             }
 
             Component[] components = Part.GetComponents<Component>();
@@ -69,7 +69,7 @@ namespace KSS.UI.Windows
 
         public static PartWindow Create( Part part )
         {
-            UIWindow window = CanvasManager.Get( CanvasName.WINDOWS ).AddWindow( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 300f, 300f ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_window" ) )
+            UIWindow window = ((UICanvas)CanvasManager.Get( CanvasName.WINDOWS )).AddWindow( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 300f, 300f ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_window" ) )
                 .Draggable()
                 .Focusable()
                 .WithCloseButton( new UILayoutInfo( Vector2.one, new Vector2( -7, -5 ), new Vector2( 20, 20 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ )
@@ -82,7 +82,7 @@ namespace KSS.UI.Windows
             UIScrollView scrollView = window.AddScrollView( UILayoutInfo.Fill( 2, 2, 75, 15 ), new Vector2( 0, 200 ), false, true );
 
             PartWindow partWindow = window.gameObject.AddComponent<PartWindow>();
-            partWindow._list = scrollView.contents.rectTransform;
+            partWindow._list = scrollView;
             partWindow._relationHighlighter = relationHighlight;
             partWindow.SetPart( part );
 

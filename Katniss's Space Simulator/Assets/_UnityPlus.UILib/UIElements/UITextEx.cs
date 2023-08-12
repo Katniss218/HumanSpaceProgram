@@ -6,15 +6,15 @@ namespace UnityPlus.UILib.UIElements
 {
     public static class UITextEx
     {
-        public static T WithText<T>( this T parent, UILayoutInfo layout, string text, out UIText uiText ) where T : UIElement
+        public static T WithText<T>( this T parent, UILayoutInfo layout, string text, out UIText uiText ) where T : IUIElementParent
         {
             uiText = AddText( parent, layout, text );
             return parent;
         }
 
-        public static UIText AddText( this UIElement parent, UILayoutInfo layoutInfo, string text )
+        public static UIText AddText( this IUIElementParent parent, UILayoutInfo layoutInfo, string text )
         {
-            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( parent, "uilib-text", layoutInfo );
+            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( parent.contents, "uilib-text", layoutInfo );
 
             TMPro.TextMeshProUGUI textComponent = rootGameObject.AddComponent<TMPro.TextMeshProUGUI>();
             textComponent.raycastTarget = false;
@@ -24,7 +24,7 @@ namespace UnityPlus.UILib.UIElements
 
             textComponent.text = text;
 
-            return new UIText( rootTransform, textComponent );
+            return new UIText( rootTransform, parent, textComponent );
         }
 
         public static UIText WithFont( this UIText text, TMPro.TMP_FontAsset font, float fontSize, Color color )

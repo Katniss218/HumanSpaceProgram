@@ -4,12 +4,16 @@ using UnityEngine;
 
 namespace UnityPlus.UILib.UIElements
 {
-    public class UIValueBar : UIElement
+    public sealed class UIValueBar : UIElement
     {
         internal readonly UnityPlus.UILib.ValueBar valueBarComponent;
 
-        public UIValueBar( RectTransform transform, UnityPlus.UILib.ValueBar valueBarComponent ) : base( transform )
+        internal readonly IUIElementParent _parent;
+        public IUIElementParent parent { get => _parent; }
+
+        public UIValueBar( RectTransform transform, IUIElementParent parent, UnityPlus.UILib.ValueBar valueBarComponent ) : base( transform )
         {
+            this._parent = parent;
             this.valueBarComponent = valueBarComponent;
         }
 

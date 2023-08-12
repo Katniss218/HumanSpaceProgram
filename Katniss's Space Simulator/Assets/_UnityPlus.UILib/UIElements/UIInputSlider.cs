@@ -4,13 +4,16 @@ using UnityEngine;
 
 namespace UnityPlus.UILib.UIElements
 {
-    public class UIInputSlider : UIElement
+    public sealed class UIInputSlider : UIElement
     {
         // A slider produces float values, between a and b, with rounding to the nearest multiple of x.
 
-        public UIInputSlider( RectTransform transform ) : base( transform )
-        {
+        internal readonly IUIElementParent _parent;
+        public IUIElementParent parent { get => _parent; }
 
+        internal UIInputSlider( RectTransform transform, IUIElementParent parent ) : base( transform )
+        {
+            this._parent = parent;
         }
     }
 }

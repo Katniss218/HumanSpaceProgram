@@ -7,19 +7,19 @@ namespace UnityPlus.UILib.UIElements
 {
     public static class UIScrollViewEx
     {
-        public static UIScrollView AddHorizontalScrollView( this UIElement parent, UILayoutInfo layout, Vector2 contentSize )
+        public static UIScrollView AddHorizontalScrollView( this IUIElementParent parent, UILayoutInfo layout, Vector2 contentSize )
         {
             return AddScrollView( parent, layout, contentSize, true, false );
         }
 
-        public static UIScrollView AddVerticalScrollView( this UIElement parent, UILayoutInfo layout, Vector2 contentSize )
+        public static UIScrollView AddVerticalScrollView( this IUIElementParent parent, UILayoutInfo layout, Vector2 contentSize )
         {
             return AddScrollView( parent, layout, contentSize, false, true );
         }
 
-        public static UIScrollView AddScrollView( this UIElement parent, UILayoutInfo layout, Vector2 contentSize, bool horizontal, bool vertical )
+        public static UIScrollView AddScrollView( this IUIElementParent parent, UILayoutInfo layout, Vector2 contentSize, bool horizontal, bool vertical )
         {
-            (GameObject root, RectTransform rootTransform) = UIElement.CreateUI( parent, "uilib-scrollview", layout );
+            (GameObject root, RectTransform rootTransform) = UIElement.CreateUI( parent.contents, "uilib-scrollview", layout );
 
             (GameObject viewport, RectTransform viewportTransform) = UIElement.CreateUI( rootTransform, "uilib-scrollviewviewport", UILayoutInfo.Fill() );
 
@@ -43,7 +43,7 @@ namespace UnityPlus.UILib.UIElements
             scrollRect.scrollSensitivity = 30f;
             scrollRect.decelerationRate = 0.5f;
 
-            return new UIScrollView( rootTransform, scrollRect, null, null, new UIElement( contentTransform ) );
+            return new UIScrollView( rootTransform, parent, scrollRect, null, null, contentTransform );
         }
 
         public static UIScrollView WithSensitivity( this UIScrollView scrollView, float sensitivity, float deceleration )

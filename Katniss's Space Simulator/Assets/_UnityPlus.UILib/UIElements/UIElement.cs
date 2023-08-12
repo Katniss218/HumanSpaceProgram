@@ -12,60 +12,67 @@ namespace UnityPlus.UILib.UIElements
     public class UIElement
     {
         // PURPOSE:
-        // - This class (and its subclasses) is a lightweight wrapper around entire hierarchies of UI elements / gameobjects.
-        // Technically, these classes could also be monobehaviours themselves with no difference to the outside code.
+        // - This class (and its subclasses) is a wrapper around hierarchies of Unity components / gameobjects.
+        // Technically, it could also be made a monobehaviour with no changes to the outside code.
 
         // REASON:
-        // - Many UI elements consist of many objects.
+        // - Many UI elements consist of multiple objects.
         // - Their initialization is an annoying ordeal and they can end up with an invalid or non-standard state easily.
         // - This fixes that by encapsulating everything.
 
         // Some UI elements here have somewhat duplicated purpose. This is for increased verbosity. Lets you specify exactly what you're creating.
 
+        readonly RectTransform _rectTransform;
         /// <summary>
         /// Don't directly modify the fields/state of the rectTransform unless you know what you're doing. You can produce invalid state.
         /// </summary>
-        public readonly RectTransform rectTransform;
+        public RectTransform rectTransform { get => _rectTransform; }
+        readonly GameObject _gameObject;
         /// <summary>
         /// Don't directly modify the fields/state of the gameObject unless you know what you're doing. You can produce invalid state.
         /// </summary>
-        public readonly GameObject gameObject;
+        public GameObject gameObject { get => _gameObject; }
 
         // LAYOUT:
         // - Since everything is encapsulated here, we have FULL CONTROL over when the properties of the underlying components change.
         // - We can do static and dynamic layout without having to rely on Unity's builtin layout components.
+        // - Once assigned, the parent can't be changed.
 
         public UIElement( RectTransform rectTransform )
         {
-            this.rectTransform = rectTransform;
-            this.gameObject = rectTransform.gameObject;
+            //this._parent = null;
+            //this._children = new List<UIElement>();
+            this._rectTransform = rectTransform;
+            this._gameObject = rectTransform.gameObject;
         }
 
         /// <summary>
         /// Checks if the underlying UI element has been destroyed.
         /// </summary>
-        public virtual bool IsDestroyed => gameObject == null;
+        public virtual bool IsDestroyed => this.gameObject == null;
 
+        /// <summary>
+        /// Destroys the specified UI element along with its children UI elements.
+        /// </summary>
         public virtual void Destroy()
         {
-            // TODO - add a guard that prevents destruction of certain objects, like contents container of a scroll view.
+            // TODO - add a guard that prevents destruction of certain objects, like the contents container of a scroll view.
 
             if( IsDestroyed )
             {
                 return; // Silent quit.
             }
-            UnityEngine.Object.Destroy( gameObject );
+            UnityEngine.Object.Destroy( this.gameObject );
+            //this._parent._children.Remove( this );
+            //foreach( var child in this._children )
+            //{
+            //    child.Destroy();
+            //}
         }
 
         public virtual Vector2 GetPreferredSize()
         {
             return rectTransform.sizeDelta;
-        }
-
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static (GameObject go, RectTransform t) CreateUI( UIElement parent, string name, UILayoutInfo layout )
-        {
-            return CreateUI( parent.rectTransform, name, layout );
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
@@ -99,11 +106,6 @@ namespace UnityPlus.UILib.UIElements
         public static explicit operator Transform( UIElement uiElement )
         {
             return uiElement.rectTransform;
-        }
-
-        public static explicit operator UIElement( Canvas canvas )
-        {
-            return new UIElement( (RectTransform)canvas.transform );
         }
     }
 }

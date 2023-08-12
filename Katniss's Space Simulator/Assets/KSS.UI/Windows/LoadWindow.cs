@@ -17,11 +17,8 @@ namespace KSS.UI
         SaveMetadataUI[] _selectedTimelineSaves;
         SaveMetadataUI _selectedSave;
 
-        [SerializeField]
-        RectTransform _saveList;
-
-        [SerializeField]
-        RectTransform _timelineList;
+        IUIElementParent _saveList;
+        IUIElementParent _timelineList;
 
         [SerializeField]
         Button _loadButton;
@@ -51,16 +48,17 @@ namespace KSS.UI
 
         void RefreshSaveList()
         {
-            foreach( Transform saveUI in _saveList )
+            foreach( UIElement saveUI in _saveList.Children )
             {
-                Destroy( saveUI.gameObject );
+#warning TODO - Doesn't remove from the list.
+                saveUI.Destroy();
             }
 
             var saves = SaveMetadata.ReadAllSaves( _selectedTimeline.Timeline.TimelineID ).ToArray();
             _selectedTimelineSaves = new SaveMetadataUI[saves.Length];
             for( int i = 0; i < _timelines.Length; i++ )
             {
-                _selectedTimelineSaves[i] = SaveMetadataUI.Create( (UIElement)_saveList, UILayoutInfo.FillHorizontal( 0, 0, 0, 0, 40 ), saves[i] );
+                _selectedTimelineSaves[i] = SaveMetadataUI.Create( _saveList, UILayoutInfo.FillHorizontal( 0, 0, 0, 0, 40 ), saves[i] );
             }
         }
 
@@ -71,16 +69,17 @@ namespace KSS.UI
                 return;
             }
 
-            foreach( Transform timelineUI in _timelineList )
+            foreach( UIElement timelineUI in _timelineList.Children )
             {
-                Destroy( timelineUI.gameObject );
+#warning TODO - Doesn't remove from the list.
+                timelineUI.Destroy();
             }
 
             var timelines = TimelineMetadata.ReadAllTimelines().ToArray();
             _timelines = new TimelineMetadataUI[timelines.Length];
             for( int i = 0; i < _timelines.Length; i++ )
             {
-                _timelines[i] = TimelineMetadataUI.Create( (UIElement)_timelineList, UILayoutInfo.FillHorizontal( 0, 0, 0, 0, 40 ), timelines[i] );
+                _timelines[i] = TimelineMetadataUI.Create( _timelineList, UILayoutInfo.FillHorizontal( 0, 0, 0, 0, 40 ), timelines[i] );
             }
         }
 
@@ -99,7 +98,7 @@ namespace KSS.UI
 
         public static LoadWindow Create()
         {
-            UIWindow window = CanvasManager.Get( CanvasName.WINDOWS ).AddWindow( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 350f, 400f ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_window" ) )
+            UIWindow window = ((UICanvas)CanvasManager.Get( CanvasName.WINDOWS )).AddWindow( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 350f, 400f ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_window" ) )
                 .Draggable()
                 .Focusable()
                 .WithCloseButton( new UILayoutInfo( Vector2.one, new Vector2( -7, -5 ), new Vector2( 20, 20 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ );
@@ -113,8 +112,8 @@ namespace KSS.UI
 #warning TODO - needs proper layout support in the UILib
 
             LoadWindow loadWindow = window.gameObject.AddComponent<LoadWindow>();
-            loadWindow._timelineList = timelineList.rectTransform;
-            loadWindow._saveList = saveList.rectTransform;
+            loadWindow._timelineList = timelineList;
+            loadWindow._saveList = saveList;
             return loadWindow;
         }
     }

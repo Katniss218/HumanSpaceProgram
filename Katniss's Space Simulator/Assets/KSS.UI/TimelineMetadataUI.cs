@@ -13,7 +13,7 @@ namespace KSS.UI
     {
         public TimelineMetadata Timeline { get; private set; }
 
-        public static TimelineMetadataUI Create( UIElement parent, UILayoutInfo layout, TimelineMetadata timeline )
+        public static TimelineMetadataUI Create( IUIElementParent parent, UILayoutInfo layout, TimelineMetadata timeline )
         {
             UIPanel panel = parent.AddPanel( layout, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/functionality_panel" ) );
 

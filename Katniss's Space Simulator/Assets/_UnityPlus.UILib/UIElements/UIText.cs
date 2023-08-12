@@ -4,12 +4,19 @@ using UnityEngine;
 
 namespace UnityPlus.UILib.UIElements
 {
-    public class UIText : UIElement
+    /// <summary>
+    /// A UI element that is a container for text.
+    /// </summary>
+    public sealed class UIText : UIElement
     {
         internal readonly TMPro.TextMeshProUGUI textComponent;
 
-        public UIText( RectTransform transform, TMPro.TextMeshProUGUI textComponent ) : base(transform)
+        internal readonly IUIElementParent _parent;
+        public IUIElementParent parent { get => _parent; }
+
+        internal UIText( RectTransform transform, IUIElementParent parent, TMPro.TextMeshProUGUI textComponent ) : base(transform)
         {
+            this._parent = parent;
             this.textComponent = textComponent;
         }
 

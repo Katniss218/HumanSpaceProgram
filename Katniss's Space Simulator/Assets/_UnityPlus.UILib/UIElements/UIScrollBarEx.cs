@@ -9,7 +9,7 @@ namespace UnityPlus.UILib.UIElements
     {
         public static UIScrollBar AddScrollbar( this UIScrollView scrollView, UILayoutInfo layout, Sprite background, Sprite foreground, bool isVertical )
         {
-            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( scrollView, isVertical ? "uilib-scrollbar-vertical" : "uilib-scrollbar-horizontal", layout );
+            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( scrollView.rectTransform, isVertical ? "uilib-scrollbar-vertical" : "uilib-scrollbar-horizontal", layout );
 
             if( background != null )
             {
@@ -47,7 +47,7 @@ namespace UnityPlus.UILib.UIElements
             else
                 scrollView.scrollRectComponent.horizontalScrollbar = scrollbarComponent;
 
-            UIScrollBar scrollBar = new UIScrollBar( rootTransform, scrollbarComponent );
+            UIScrollBar scrollBar = new UIScrollBar( rootTransform, scrollView, scrollbarComponent );
 
             scrollView.scrollbarHorizontal = scrollBar;
             return scrollBar;

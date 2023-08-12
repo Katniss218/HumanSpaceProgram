@@ -15,7 +15,7 @@ namespace KSS.UI
         /// </summary>
         public static SaveWindow Create()
         {
-            UIWindow window = CanvasManager.Get( CanvasName.WINDOWS ).AddWindow( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 250f, 100f ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_window" ) )
+            UIWindow window = ((UICanvas)CanvasManager.Get( CanvasName.WINDOWS )).AddWindow( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 250f, 100f ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_window" ) )
                 .Draggable()
                 .Focusable()
                 .WithCloseButton( new UILayoutInfo( Vector2.one, new Vector2( -7, -5 ), new Vector2( 20, 20 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ );
@@ -38,7 +38,7 @@ namespace KSS.UI
 
             foreach( var save in saves )
             {
-                SaveMetadataUI.Create( scrollView.contents, UILayoutInfo.FillHorizontal( 0, 0, 0, 0, 40 ), save );
+                SaveMetadataUI.Create( scrollView, UILayoutInfo.FillHorizontal( 0, 0, 0, 0, 40 ), save );
             }
 
             return saveWindow;

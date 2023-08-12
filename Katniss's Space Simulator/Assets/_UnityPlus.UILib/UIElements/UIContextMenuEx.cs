@@ -7,9 +7,9 @@ namespace UnityPlus.UILib.UIElements
 {
     public static class UIContextMenuEx
     {
-        public static UIContextMenu CreateContextMenu( this RectTransform track, Canvas contextMenuCanvas, UILayoutInfo layoutInfo, Sprite background )
+        public static UIContextMenu CreateContextMenu( this RectTransform track, UICanvas contextMenuCanvas, UILayoutInfo layoutInfo, Sprite background )
         {
-            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( (UIElement)contextMenuCanvas, "uilib-contextmenu", layoutInfo );
+            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( contextMenuCanvas.rectTransform, "uilib-contextmenu", layoutInfo );
 
             Image backgroundComponent = rootGameObject.AddComponent<Image>();
             backgroundComponent.raycastTarget = false;
@@ -19,7 +19,7 @@ namespace UnityPlus.UILib.UIElements
             ContextMenu contextMenu = rootGameObject.AddComponent<ContextMenu>();
             contextMenu.Target = track;
 
-            return new UIContextMenu( track, contextMenu, backgroundComponent );
+            return new UIContextMenu( track, contextMenuCanvas, contextMenu, backgroundComponent );
         }
 
         public static UIContextMenu WithTint( this UIContextMenu contextMenu, Color tint )

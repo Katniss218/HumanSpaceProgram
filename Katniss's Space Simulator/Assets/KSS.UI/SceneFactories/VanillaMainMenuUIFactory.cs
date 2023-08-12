@@ -24,7 +24,7 @@ namespace KSS.UI.SceneFactories
         [HSPEventListener( HSPEvent.STARTUP_MAINMENU, HSPEvent.NAMESPACE_VANILLA + ".mainmenu_ui" )]
         public static void Create( object e )
         {
-            UIElement canvas = (UIElement)CanvasManager.Get( CanvasName.STATIC );
+            UICanvas canvas = (UICanvas)CanvasManager.Get( CanvasName.STATIC );
 
             CreateStartNewGameButton( canvas );
             CreateLoadButton( canvas );
@@ -45,7 +45,7 @@ namespace KSS.UI.SceneFactories
 
         // #-#-#-#-#-#-#-#-#-#
 
-        private static void CreateStartNewGameButton( UIElement parent )
+        private static void CreateStartNewGameButton( IUIElementParent parent )
         {
             parent.AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, 0 ), new Vector2( 200, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
             {
@@ -57,7 +57,7 @@ namespace KSS.UI.SceneFactories
                 .WithAlignment( HorizontalAlignmentOptions.Center );
         }
 
-        private static void CreateLoadButton( UIElement parent )
+        private static void CreateLoadButton( IUIElementParent parent )
         {
             parent.AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, -20 ), new Vector2( 200, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
             {
@@ -69,7 +69,7 @@ namespace KSS.UI.SceneFactories
                 .WithAlignment( HorizontalAlignmentOptions.Center );
         }
 
-        private static void CreateSettingsButton( UIElement parent )
+        private static void CreateSettingsButton( IUIElementParent parent )
         {
             parent.AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, -60 ), new Vector2( 200, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ) )
                 .Disabled()
@@ -78,7 +78,7 @@ namespace KSS.UI.SceneFactories
                 .WithAlignment( HorizontalAlignmentOptions.Center );
         }
 
-        private static void CreateExitButton( UIElement parent )
+        private static void CreateExitButton( IUIElementParent parent )
         {
             parent.AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, -80 ), new Vector2( 200, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ) )
                 .AddText( UILayoutInfo.Fill(), "Exit" )

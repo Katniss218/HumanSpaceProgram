@@ -9,9 +9,15 @@ namespace UnityPlus.UILib.UIElements
 {
     public static class UIButtonEx
     {
-        public static UIButton AddButton( this UIElement parent, UILayoutInfo layout, Sprite sprite, UnityAction onClick = null )
+        public static T AddButton<T>( this T parent, UILayoutInfo layout, Sprite sprite, UnityAction onClick, out UIButton button ) where T : IUIElementParent
         {
-            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( parent, "uilib-button", layout );
+            button = AddButton( parent, layout, sprite, onClick );
+            return parent;
+        }
+
+        public static UIButton AddButton( this IUIElementParent parent, UILayoutInfo layout, Sprite sprite, UnityAction onClick = null )
+        {
+            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( parent.contents, "uilib-button", layout );
 
             Image backgroundComponent = rootGameObject.AddComponent<Image>();
             backgroundComponent.raycastTarget = true;
@@ -37,7 +43,7 @@ namespace UnityPlus.UILib.UIElements
                 buttonComponent.onClick.AddListener( onClick ); // Find a way to cast System.Action to UnityAction if possible (the signatures of both delegates match).
             }
 
-            return new UIButton( rootTransform, buttonComponent, backgroundComponent );
+            return new UIButton( rootTransform, parent, buttonComponent, backgroundComponent );
         }
 
         public static UIButton WithTint( this UIButton button, Color tint )
