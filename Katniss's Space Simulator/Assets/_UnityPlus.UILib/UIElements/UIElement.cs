@@ -13,6 +13,7 @@ namespace UnityPlus.UILib.UIElements
     {
         // PURPOSE:
         // - This class (and its subclasses) is a lightweight wrapper around entire hierarchies of UI elements / gameobjects.
+        // Technically, these classes could also be monobehaviours themselves with no difference to the outside code.
 
         // REASON:
         // - Many UI elements consist of many objects.
@@ -54,6 +55,11 @@ namespace UnityPlus.UILib.UIElements
                 return; // Silent quit.
             }
             UnityEngine.Object.Destroy( gameObject );
+        }
+
+        public virtual Vector2 GetPreferredSize()
+        {
+            return rectTransform.sizeDelta;
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]

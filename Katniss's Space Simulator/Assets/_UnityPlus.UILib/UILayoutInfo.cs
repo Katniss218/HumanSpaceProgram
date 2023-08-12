@@ -15,6 +15,15 @@ namespace UnityPlus.UILib
         public Vector2 anchoredPosition;
         public Vector2 sizeDelta;
 
+        /// <summary>
+        /// True if the UI element is set to fill the width of its parent.
+        /// </summary>
+        public bool FillsWidth => (anchorMin.x != anchorMax.x);
+        /// <summary>
+        /// True if the UI element is set to fill the height of its parent.
+        /// </summary>
+        public bool FillsHeight => (anchorMin.y != anchorMax.y);
+
         /// <param name="anchorPivot">The value for anchorMin, anchorMax, and pivot, x: [left..right], y: [bottom..top].</param>
         public UILayoutInfo( Vector2 anchorPivot, Vector2 anchoredPosition, Vector2 sizeDelta )
         {
@@ -116,6 +125,24 @@ namespace UnityPlus.UILib
                 anchoredPosition = Vector2.zero,
                 sizeDelta = Vector2.zero
             };
+        }
+
+        /// <summary>
+        /// Calculates the actual size of the UI element with the current layout parameters, and a specified parent size.
+        /// </summary>
+        /// <param name="parentSize">The size of the parent UI element.</param>
+        /// <returns>The width and height of the UI element.</returns>
+        public Vector2 GetActualSize( Vector2 parentSize )
+        {
+            if( anchorMin == anchorMax )
+            {
+                return sizeDelta;
+            }
+
+            Vector2 cornerMin = Vector2.Scale( anchorMin, parentSize );
+            Vector2 cornerMax = Vector2.Scale( anchorMax, parentSize );
+            Vector2 cornerDelta = cornerMax - cornerMin;
+            return cornerDelta + sizeDelta; // With filled width/height, reducing sizeDelta makes the rect smaller. Thus we need to add sizeDelta instead of subtracting.
         }
     }
 

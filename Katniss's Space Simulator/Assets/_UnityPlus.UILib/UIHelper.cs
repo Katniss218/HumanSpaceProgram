@@ -16,24 +16,6 @@ namespace UnityPlus.UILib
 
         /*
         /// <summary>
-        /// Creates a new UI object that fills its parent, and the edges are at the specific percent marks of the parent.
-        /// </summary>
-        /// <param name="left">Horizontal percent value of the parent.</param>
-        /// <param name="right">Horizontal percent value of the parent.</param>
-        /// <param name="top">Vertical percent value of the parent.</param>
-        /// <param name="bottom">Vertical percent value of the parent.</param>
-        public static GameObject UIFillPercent( Transform parent, string name, float left, float right, float top, float bottom )
-        {
-            Vector2 anchorMin = new Vector2( left, bottom );
-            Vector2 anchorMax = new Vector2( 1.0f - right, 1.0f - top );
-            Vector2 pivot = new Vector2( 0.5f, 0.5f );
-            Vector2 anchoredPos = new Vector2( left, -top );
-            Vector2 sizeDelta = new Vector2( -left - right, -top - bottom );
-
-            return UI( parent, name, anchorMin, anchorMax, pivot, anchoredPos, sizeDelta );
-        }
-        
-        /// <summary>
         /// Makes the specific object a vertical layout group.
         /// </summary>
         public static void MakeVerticalLayoutGroup( GameObject go, int padding, int spacing, bool containerFitsContents, bool reversed = false )

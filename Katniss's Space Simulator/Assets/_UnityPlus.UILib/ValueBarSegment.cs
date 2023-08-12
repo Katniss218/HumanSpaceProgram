@@ -11,6 +11,8 @@ namespace UnityPlus.UILib
 {
     public class ValueBarSegment : MonoBehaviour
     {
+#warning TODO - this along with the value bar can be turned to have a proper wrapper, analogous to everything else.
+
         [SerializeField]
         private float _left;
         [SerializeField]
