@@ -17,10 +17,17 @@ namespace UnityPlus.UILib
         // - horizontal
         // - vertical
         // - grid
-        // - "circular"
 
         // "fit" layout (fit to size of contents)
 
-        // when an object is modified in a way that changes its layout, it needs to communicate that change to its parent. The parent can then adjust its layout.
+
+
+        // when property of UI element is modified, it needs to notify that UI element (sprite, text, etc). Mostly text though.
+
+        // when the size of the UI element is modified, it needs to notify the children, then the parent (recursively).
+        // - if child is text and new size has less lines, it can shrink (assuming fit to size vert or hor is present)
+        // - - then the parent can use the new chrunken child and move the vertical layout elements up to fill the now empty space.
+        // when the position is changed, it only needs to notify the parent.
+        // - if parent is sequential layout group, it will just overwrite the position change.
     }
 }
