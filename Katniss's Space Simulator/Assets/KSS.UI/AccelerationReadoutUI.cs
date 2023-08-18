@@ -15,7 +15,7 @@ namespace KSS.UI
 
         void LateUpdate()
         {
-            Text.text = $"Acceleration: {VesselManager.ActiveVessel.PhysicsObject.Acceleration.magnitude:#0.0} m/s^2";
+            Text.Text = $"Acceleration: {VesselManager.ActiveVessel.PhysicsObject.Acceleration.magnitude:#0.0} m/s^2";
         }
     }
 }

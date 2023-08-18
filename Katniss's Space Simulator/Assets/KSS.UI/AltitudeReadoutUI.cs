@@ -23,7 +23,7 @@ namespace KSS.UI
             float magn = (posV - posCB).magnitude;
             float alt = magn - (float)body.Radius;
 
-            Text.text = $"Altitude: {(alt / 1000.0f):#0} km";
+            Text.Text = $"Altitude: {(alt / 1000.0f):#0} km";
         }
     }
 }

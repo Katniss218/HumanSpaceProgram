@@ -130,17 +130,17 @@ namespace UnityPlus.UILib
         /// <summary>
         /// Calculates the actual size of the UI element with the current layout parameters, and a specified parent size.
         /// </summary>
-        /// <param name="parentSize">The size of the parent UI element.</param>
+        /// <param name="parentActualSize">The actual size of the parent UI element.</param>
         /// <returns>The width and height of the UI element.</returns>
-        public Vector2 GetActualSize( Vector2 parentSize )
+        public Vector2 GetActualSize( Vector2 parentActualSize )
         {
             if( anchorMin == anchorMax )
             {
                 return sizeDelta;
             }
 
-            Vector2 cornerMin = Vector2.Scale( anchorMin, parentSize );
-            Vector2 cornerMax = Vector2.Scale( anchorMax, parentSize );
+            Vector2 cornerMin = Vector2.Scale( anchorMin, parentActualSize );
+            Vector2 cornerMax = Vector2.Scale( anchorMax, parentActualSize );
             Vector2 cornerDelta = cornerMax - cornerMin;
             return cornerDelta + sizeDelta; // With filled width/height, reducing sizeDelta makes the rect smaller. Thus we need to add sizeDelta instead of subtracting.
         }

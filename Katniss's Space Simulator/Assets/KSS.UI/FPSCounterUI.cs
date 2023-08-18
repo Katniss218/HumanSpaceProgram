@@ -45,7 +45,7 @@ namespace KSS.UI
         void Update()
         {
             SampleFPS();
-            Text.text = $"FPS: {Mathf.CeilToInt( GetAverageFps() )}";
+            Text.Text = $"FPS: {Mathf.CeilToInt( GetAverageFps() )}";
         }
     }
 }

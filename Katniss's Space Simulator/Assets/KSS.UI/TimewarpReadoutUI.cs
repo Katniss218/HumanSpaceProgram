@@ -20,11 +20,11 @@ namespace KSS.UI
         {
             if( rate == 0 )
             {
-                Text.text = $"Warp Rate: PAUSED";
+                Text.Text = $"Warp Rate: PAUSED";
                 return;
             }
 
-            Text.text = $"Warp Rate: {rate}x";
+            Text.Text = $"Warp Rate: {rate}x";
         }
 
         void OnTimescaleChanged_Listener( TimeWarpManager.TimeScaleChangedData data )

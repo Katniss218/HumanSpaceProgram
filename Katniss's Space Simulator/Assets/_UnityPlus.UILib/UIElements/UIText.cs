@@ -13,9 +13,20 @@ namespace UnityPlus.UILib.UIElements
         internal readonly TMPro.TextMeshProUGUI textComponent;
 
         internal readonly IUIElementContainer _parent;
+
         public IUIElementContainer Parent { get => _parent; }
 
-        //public LayoutDriver LayoutDriver { get; } = new FitToSizeDriver();
+        public bool FitToContents { get; set; } = false;
+
+        public string Text
+        {
+            get => textComponent.text;
+            set
+            {
+                textComponent.text = value;
+                TryFitToContents();
+            }
+        }
 
         internal UIText( RectTransform transform, IUIElementContainer parent, TMPro.TextMeshProUGUI textComponent ) : base( transform )
         {
@@ -30,33 +41,28 @@ namespace UnityPlus.UILib.UIElements
             this.Parent.Children.Remove( this );
         }
 
-        public string text
+        private void TryFitToContents()
         {
-            get => textComponent.text;
-            set
+            if( !FitToContents )
             {
-                textComponent.text = value;
-                //this.LayoutDriver.RunSelf( this );
+                return;
             }
-        }
 
-        public override Vector2 GetPreferredSize()
-        {
-            var layout = this.rectTransform.GetLayoutInfo();
+            UILayoutInfo layout = this.rectTransform.GetLayoutInfo();
 
             // Preferred size depends on how many line breaks exist in the text after wrapping to the size of the container.
             if( layout.FillsWidth && !layout.FillsHeight )
             {
-                return new Vector2( this.rectTransform.sizeDelta.x, textComponent.GetPreferredValues( this.rectTransform.sizeDelta.x, 0 ).y );
+                this.rectTransform.sizeDelta = new Vector2( this.rectTransform.sizeDelta.x, textComponent.GetPreferredValues( this.rectTransform.sizeDelta.x, 0 ).y );
+                UILayout.BroadcastLayoutUpdate( this );
+                return;
             }
             if( layout.FillsHeight && !layout.FillsWidth )
             {
-                return new Vector2( textComponent.GetPreferredValues( 0, this.rectTransform.sizeDelta.y ).x, this.rectTransform.sizeDelta.y );
+                this.rectTransform.sizeDelta = new Vector2( textComponent.GetPreferredValues( 0, this.rectTransform.sizeDelta.y ).x, this.rectTransform.sizeDelta.y );
+                UILayout.BroadcastLayoutUpdate( this );
+                return;
             }
-
-            // If the text wrapping can't grow its container in any direction.
-            return layout.sizeDelta; // `sizeDelta` is wrong, should return the absolute size in xy instead of difference from anchor.
-                                     // We can't use rectTransform.rect because it might be driven by other components.
         }
     }
 }

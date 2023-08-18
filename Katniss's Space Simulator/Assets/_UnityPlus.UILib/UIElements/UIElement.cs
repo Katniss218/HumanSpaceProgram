@@ -63,11 +63,6 @@ namespace UnityPlus.UILib.UIElements
             UnityEngine.Object.Destroy( this.gameObject );
         }
 
-        public virtual Vector2 GetPreferredSize()
-        {
-            return rectTransform.sizeDelta;
-        }
-
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public static (GameObject go, RectTransform t) CreateUI( RectTransform parent, string name, UILayoutInfo layout )
         {

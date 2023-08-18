@@ -8,12 +8,9 @@ using UnityPlus.UILib.Layout;
 
 namespace UnityPlus.UILib.UIElements
 {
-    public interface IUICustomLayout
+    public interface IUILayoutDriven
     {
-        /// <summary>
-        /// The current layout driver driving the positioning of child elements. Can be null for manual control.
-        /// </summary>
-        LayoutDriver LayoutDriver { get; }
+        LayoutDriver LayoutDriver { get; set; }
     }
 
     /// <summary>
@@ -21,12 +18,25 @@ namespace UnityPlus.UILib.UIElements
     /// </summary>
     public interface IUIElementContainer
     {
+        /// <summary>
+        /// The 'root' transform of this UI element.
+        /// </summary>
         RectTransform rectTransform { get; }
-        RectTransform contents { get; }
+
+        /// <summary>
+        /// The root GameObject of this UI element.
+        /// </summary>
         GameObject gameObject { get; }
 
-        List<UIElement> Children { get; }
+        /// <summary>
+        /// The immediate parent transform of the child elements.
+        /// </summary>
+        RectTransform contents { get; }
 
+        /// <summary>
+        /// The child elements of this UI element container.
+        /// </summary>
+        List<UIElement> Children { get; }
     }
 
     /// <summary>
@@ -34,9 +44,19 @@ namespace UnityPlus.UILib.UIElements
     /// </summary>
     public interface IUIElementChild
     {
+        /// <summary>
+        /// The 'root' transform of this UI element.
+        /// </summary>
         RectTransform rectTransform { get; }
+
+        /// <summary>
+        /// The root GameObject of this UI element.
+        /// </summary>
         GameObject gameObject { get; }
 
+        /// <summary>
+        /// The parent of this UI element.
+        /// </summary>
         IUIElementContainer Parent { get; }
     }
 }
