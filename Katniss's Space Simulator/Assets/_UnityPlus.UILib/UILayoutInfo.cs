@@ -144,6 +144,26 @@ namespace UnityPlus.UILib
             Vector2 cornerDelta = cornerMax - cornerMin;
             return cornerDelta + sizeDelta; // With filled width/height, reducing sizeDelta makes the rect smaller. Thus we need to add sizeDelta instead of subtracting.
         }
+
+        /// <summary>
+        /// Calculates the actual size of the UI element with the current layout parameters, and a specified parent size.
+        /// </summary>
+        /// <param name="parentActualSize">The actual size of the parent UI element.</param>
+        /// <returns>The width and height of the UI element.</returns>
+        public static Vector2 GetActualSize( RectTransform rt )
+        {
+            if( rt.anchorMin == rt.anchorMax || rt.parent == null )
+            {
+                return rt.sizeDelta;
+            }
+
+            Vector2 parentActualSize = GetActualSize( (RectTransform)rt.parent );
+
+            Vector2 cornerMin = Vector2.Scale( rt.anchorMin, parentActualSize );
+            Vector2 cornerMax = Vector2.Scale( rt.anchorMax, parentActualSize );
+            Vector2 cornerDelta = cornerMax - cornerMin;
+            return cornerDelta + rt.sizeDelta; // With filled width/height, reducing sizeDelta makes the rect smaller. Thus we need to add sizeDelta instead of subtracting.
+        }
     }
 
     public static class LayoutInfoEx

@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 using UnityPlus.UILib.UIElements;
 
 namespace UnityPlus.UILib.Layout
 {
-    public class VerticalLayoutDriver : LayoutDriver
+    public sealed class VerticalLayoutDriver : LayoutDriver
     {
         public enum Direction : byte
         {
@@ -26,8 +27,6 @@ namespace UnityPlus.UILib.Layout
             // lays out the children in a vertical list.
             // doesn't care about the horizontal dimensions at all, just aligns everything to line up.
 
-            UILayoutInfo parentLayoutInfo = c.rectTransform.GetLayoutInfo();
-
             float ySum = 0;
             foreach( var child in c.Children )
             {
@@ -38,31 +37,50 @@ namespace UnityPlus.UILib.Layout
                     throw new InvalidOperationException( $"Can't align vertically, a UI element {child.gameObject.name} fills height." );
                 }
 
+                #region [Commented out], This doesn't work, but might be useful...
+                // - doesn't work because the canvas scaler fucks with the unit sizes or something like that.
+
                 // The desired value for anchoredPosition depends on the child element's vertical anchor and pivot values, its size, and the size of its container.
                 // Increasing the pivot moves the UI element down.
                 // Increasing the anchor moves the UI element up.
-
+                /*
                 float vertPos = 0;
-                float height = child.rectTransform.sizeDelta.y;
+                float height = layoutInfo.sizeDelta.y;
 
                 if( Dir == Direction.TopToBottom )
                 {
                     // plus, minus, minus, and inverse of anchor/pivot.
-                    vertPos += (1 - layoutInfo.anchorMax.y) * parentLayoutInfo.sizeDelta.y; // Relative to anchor -> absolute.
-                    vertPos -= (1 - layoutInfo.pivot.y) * layoutInfo.sizeDelta.y;           // Relative to pivot -> absolute.
-                    vertPos -= ySum;                                                        // Absolute -> absolute
+                    vertPos += (1 - layoutInfo.anchorMax.y) * parentSize.y;
+                    vertPos -= (1 - layoutInfo.pivot.y) * height;
+                    vertPos -= ySum;
                 }
                 else if( Dir == Direction.BottomToTop )
                 {
                     // minus, plus, plus (reverse of 'to bottom').
-                    vertPos -= (layoutInfo.anchorMax.y) * parentLayoutInfo.sizeDelta.y;
-                    vertPos += (layoutInfo.pivot.y) * layoutInfo.sizeDelta.y;
+                    vertPos -= (layoutInfo.anchorMax.y) * parentSize.y;
+                    vertPos += (layoutInfo.pivot.y) * height;
                     vertPos += ySum;
+                }*/
+                #endregion
+
+                if( Dir == Direction.TopToBottom )
+                {
+                    layoutInfo.anchorMin.y = 1f;
+                    layoutInfo.anchorMax.y = 1f;
+                    layoutInfo.pivot.y = 1f;
+                    layoutInfo.anchoredPosition.y = -ySum;
                 }
+                else if( Dir == Direction.BottomToTop )
+                {
+                    layoutInfo.anchorMin.y = 0f;
+                    layoutInfo.anchorMax.y = 0f;
+                    layoutInfo.pivot.y = 0f;
+                    layoutInfo.anchoredPosition.y = ySum;
+                }
+               
+                child.rectTransform.SetLayoutInfo( layoutInfo );
 
-                layoutInfo.anchoredPosition.x = vertPos;
-
-                ySum += height + Spacing; // Y+ towards the top.
+                ySum += layoutInfo.sizeDelta.y + Spacing; // Y+ towards the top.
             }
         }
     }
