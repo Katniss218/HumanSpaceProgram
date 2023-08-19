@@ -31,9 +31,10 @@ namespace UnityPlus.UILib.Layout
         // when the position is changed, it only needs to notify the parent.
         // - if parent is sequential layout group, it will just overwrite the position change.
 
-        public static void BroadcastLayoutUpdate( object elem ) // `object` is kinda ugly here.
+        static HashSet<object> _set = new HashSet<object>();
+
+        private static void BroadcastLayoutUpdateRecursive( object elem )
         {
-#warning TODO - call this when element is added or rearranged.
             // passed in element is the element that is updating.
             // we need to update its children.
             // then update its parent.
@@ -48,16 +49,19 @@ namespace UnityPlus.UILib.Layout
 
             // ----
 
-            // TODO - this can be optimized in many ways - caching and updating only once, not updating if nothing has changed, etc.
+            // TODO - this can be optimized in many ways - marking as stale with something changes and redrawing only once in lateupdate, not updating if nothing has changed, etc.
 
             // Update children.
             if( elem is IUIElementContainer co )
             {
-#warning TODO - This stack overflows because it always calls update on itself (child) after being called on the parent.
-                /*foreach( var e in co.Children )
+                foreach( var e in co.Children )
                 {
-                    BroadcastLayoutUpdate( e );
-                }*/
+                    if( !_set.Contains( e ) )
+                    {
+                        _set.Add( e );
+                        BroadcastLayoutUpdateRecursive( e );
+                    }
+                }
             }
 
             // Update self.
@@ -73,8 +77,20 @@ namespace UnityPlus.UILib.Layout
             // Update parent.
             if( elem is IUIElementChild ci )
             {
-                BroadcastLayoutUpdate( ci.Parent );
+                if( !_set.Contains( ci.Parent ) )
+                {
+                    _set.Add( ci.Parent );
+                    BroadcastLayoutUpdateRecursive( ci.Parent );
+                }
             }
+        }
+
+        public static void BroadcastLayoutUpdate( object elem ) // `object` is kinda ugly here.
+        {
+#warning TODO - call this when element is added or rearranged.
+
+            _set.Clear();
+            BroadcastLayoutUpdateRecursive( elem );
         }
     }
 }
