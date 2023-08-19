@@ -50,7 +50,11 @@ namespace KSS.Core
             RootPart = part;
         }
 
-#warning TODO - vessels' position sometimes glitches out when far away from the origin/active vessel.
+#warning TODO - Vessels' position sometimes glitches out when far away from the origin. Setting the rigidbody to kinematic fixes the issue, which suggests that it is caused by a collision response.
+        // Possibly a response to newly unsubdivided planet LOD quad.
+
+
+        // the active vessel has also glithed out and accelerated to the speed of light at least once after jettisonning the side tanks on the pad.
 
         public void RecalculateParts()
         {
