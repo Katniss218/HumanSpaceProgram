@@ -14,7 +14,7 @@ namespace UnityPlus.UILib.UIElements
         readonly RectTransform _contents;
         public RectTransform contents { get => _contents; }
 
-        public List<UIElement> Children { get; }
+        public List<IUIElementChild> Children { get; }
 
         internal readonly IUIElementContainer _parent;
         public IUIElementContainer Parent { get => _parent; }
@@ -23,7 +23,7 @@ namespace UnityPlus.UILib.UIElements
 
         internal UIScrollView( RectTransform transform, IUIElementContainer parent, UnityEngine.UI.ScrollRect scrollRectComponent, UIScrollBar scrollbarHorizontal, UIScrollBar scrollbarVertical, RectTransform contents ) : base( transform )
         {
-            Children = new List<UIElement>();
+            Children = new List<IUIElementChild>();
             this._parent = parent;
             this.Parent.Children.Add( this );
             this.scrollRectComponent = scrollRectComponent;

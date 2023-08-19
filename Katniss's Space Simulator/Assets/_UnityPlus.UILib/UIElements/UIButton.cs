@@ -12,7 +12,7 @@ namespace UnityPlus.UILib.UIElements
         internal readonly UnityEngine.UI.Image backgroundComponent;
         public RectTransform contents => base.rectTransform;
 
-        public List<UIElement> Children { get; }
+        public List<IUIElementChild> Children { get; }
 
         internal readonly IUIElementContainer _parent;
         public IUIElementContainer Parent { get => _parent; }
@@ -21,7 +21,7 @@ namespace UnityPlus.UILib.UIElements
 
         internal UIButton( RectTransform transform, IUIElementContainer parent, UnityEngine.UI.Button buttonComponent, UnityEngine.UI.Image backgroundComponent ) : base( transform )
         {
-            Children = new List<UIElement>();
+            Children = new List<IUIElementChild>();
             this._parent = parent;
             this.Parent.Children.Add( this );
             this.buttonComponent = buttonComponent;

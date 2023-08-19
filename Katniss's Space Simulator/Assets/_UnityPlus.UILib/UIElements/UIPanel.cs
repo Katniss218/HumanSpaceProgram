@@ -8,22 +8,22 @@ namespace UnityPlus.UILib.UIElements
     /// <summary>
     /// Represents a section of the canvas, or of a different UI element.
     /// </summary>
-    public sealed class UIPanel : UIElement, IUIElementContainer, IUILayoutDriven
+    public sealed class UIPanel : UIElement, IUIElementContainer, IUIElementChild, IUILayoutDriven
     {
         internal readonly UnityEngine.UI.Image backgroundComponent;
         public RectTransform contents => base.rectTransform;
 
-        public List<UIElement> Children { get; }
+        public List<IUIElementChild> Children { get; }
         internal readonly IUIElementContainer _parent;
-        public IUIElementContainer parent { get => _parent; }
+        public IUIElementContainer Parent { get => _parent; }
 
         public LayoutDriver LayoutDriver { get; set; }
 
         internal UIPanel( RectTransform transform, IUIElementContainer parent, UnityEngine.UI.Image backgroundComponent ) : base( transform )
         {
-            Children = new List<UIElement>();
+            Children = new List<IUIElementChild>();
             this._parent = parent;
-            this.parent.Children.Add( this );
+            this.Parent.Children.Add( this );
             this.backgroundComponent = backgroundComponent;
         }
 
@@ -32,7 +32,7 @@ namespace UnityPlus.UILib.UIElements
         public override void Destroy()
         {
             base.Destroy();
-            this.parent.Children.Remove( this );
+            this.Parent.Children.Remove( this );
         }
     }
 }

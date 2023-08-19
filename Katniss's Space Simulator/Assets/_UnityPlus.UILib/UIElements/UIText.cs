@@ -10,6 +10,8 @@ namespace UnityPlus.UILib.UIElements
     /// </summary>
     public sealed class UIText : UIElement, IUIElementChild, IUILayoutSelf
     {
+        // possibly we could have different types of text elements that format themselves in different ways. Headers, paragraphs, etc.
+
         internal readonly TMPro.TextMeshProUGUI textComponent;
 
         internal readonly IUIElementContainer _parent;

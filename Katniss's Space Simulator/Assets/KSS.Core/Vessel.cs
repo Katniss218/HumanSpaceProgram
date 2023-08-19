@@ -50,6 +50,8 @@ namespace KSS.Core
             RootPart = part;
         }
 
+#warning TODO - vessels' position sometimes glitches out when far away from the origin/active vessel.
+
         public void RecalculateParts()
         {
             // take root and traverse its hierarchy to add up all parts.

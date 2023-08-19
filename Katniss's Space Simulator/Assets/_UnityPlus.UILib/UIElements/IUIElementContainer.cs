@@ -10,14 +10,14 @@ namespace UnityPlus.UILib.UIElements
     public interface IUIElementContainer
     {
         /// <summary>
-        /// The 'root' transform of this UI element.
-        /// </summary>
-        RectTransform rectTransform { get; }
-
-        /// <summary>
         /// The root GameObject of this UI element.
         /// </summary>
         GameObject gameObject { get; }
+
+        /// <summary>
+        /// The 'root' transform of this UI element.
+        /// </summary>
+        RectTransform rectTransform { get; }
 
         /// <summary>
         /// The immediate parent transform of the child elements.
@@ -27,6 +27,6 @@ namespace UnityPlus.UILib.UIElements
         /// <summary>
         /// The child elements of this UI element container.
         /// </summary>
-        List<UIElement> Children { get; }
+        List<IUIElementChild> Children { get; }
     }
 }

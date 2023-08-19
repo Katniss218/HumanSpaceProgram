@@ -30,7 +30,7 @@ namespace KSS.UI.Windows
         public Transform ReferenceTransform { get; set; }
 
 
-        RectTransform _isHighlighting = null;
+        RectTransform _highlightedObject = null;
 
         public override void OnPointerEnter( PointerEventData eventData )
         {
@@ -38,13 +38,13 @@ namespace KSS.UI.Windows
             {
                 return;
             }
-            if( _isHighlighting != null )
+            if( _highlightedObject != null )
             {
                 return;
             }
 
             (GameObject highlighterGO, RectTransform rt) = UIElement.CreateUI( (RectTransform)this.transform, "relation highlight", new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 10, 10 ) ) );
-            _isHighlighting = rt;
+            _highlightedObject = rt;
 
             Image exitImage = highlighterGO.AddComponent<Image>();
             exitImage.raycastTarget = true;
@@ -59,13 +59,13 @@ namespace KSS.UI.Windows
             {
                 return;
             }
-            if( _isHighlighting == null )
+            if( _highlightedObject == null )
             {
                 return;
             }
 
-            Destroy( _isHighlighting.gameObject );
-            _isHighlighting = null;
+            Destroy( _highlightedObject.gameObject );
+            _highlightedObject = null;
 
             base.OnPointerExit( eventData );
         }
@@ -77,9 +77,12 @@ namespace KSS.UI.Windows
                 return;
             }
 
-            if( _isHighlighting != null )
+            if( _highlightedObject != null )
             {
-                _isHighlighting.position = CameraController.Instance.MainCamera.WorldToScreenPoint( ReferenceTransform.position );
+                Vector3 targetScreenPos = CameraController.Instance.MainCamera.WorldToScreenPoint( ReferenceTransform.position );
+                targetScreenPos.z = 0.0f;
+
+                _highlightedObject.position = targetScreenPos;
             }
         }
     }

@@ -15,7 +15,7 @@ namespace UnityPlus.UILib.UIElements
         internal readonly Image backgroundComponent;
         public RectTransform contents => base.rectTransform;
 
-        public List<UIElement> Children { get; }
+        public List<IUIElementChild> Children { get; }
 
         internal readonly IUIElementContainer _parent;
         public IUIElementContainer Parent { get => _parent; }
@@ -25,7 +25,7 @@ namespace UnityPlus.UILib.UIElements
 
         public UIContextMenu( RectTransform transform, IUIElementContainer parent, ContextMenu contextMenuComponent, Image backgroundComponent ) : base( transform )
         {
-            this.Children = new List<UIElement>();
+            this.Children = new List<IUIElementChild>();
             this._parent = parent;
             this.Parent.Children.Add( this );
             this.contextMenuComponent = contextMenuComponent;
