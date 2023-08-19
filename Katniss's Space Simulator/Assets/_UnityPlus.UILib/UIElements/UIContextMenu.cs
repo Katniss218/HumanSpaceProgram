@@ -9,7 +9,7 @@ namespace UnityPlus.UILib.UIElements
     /// <summary>
     /// A context menu contains a list of items.
     /// </summary>
-    public sealed class UIContextMenu : UIElement, IUIElementContainer, IUIElementChild
+    public sealed class UIContextMenu : UIElement, IUIElementContainer, IUIElementChild, IUILayoutDriven
     {
         internal readonly ContextMenu contextMenuComponent;
         internal readonly Image backgroundComponent;

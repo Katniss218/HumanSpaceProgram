@@ -44,12 +44,15 @@ namespace KSS.UI.SceneFactories
             seg.Color = Color.red;
 
             UIPanel panel = canvas.AddPanel( UILayoutInfo.Fill(), null );
+            panel.LayoutDriver = new VerticalLayoutDriver()
+            {
+                Spacing = 5f
+            };
             panel.AddButton( UILayoutInfo.FillHorizontal( 0, 0, 0.5f, 0, 50 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), null );
             panel.AddButton( UILayoutInfo.FillHorizontal( 0, 0, 0.5f, 0, 50 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), null );
             panel.AddButton( UILayoutInfo.FillHorizontal( 0, 0, 0.5f, 0, 50 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), null );
             panel.AddButton( UILayoutInfo.FillHorizontal( 0, 0, 0.5f, 0, 50 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), null );
-            LayoutDriver d = new VerticalLayoutDriver();
-            d.DoLayout( panel );
+            UILayout.BroadcastLayoutUpdate( panel );
         }
 
         // #-#-#-#-#-#-#-#-#-#

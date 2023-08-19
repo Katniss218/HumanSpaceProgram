@@ -5,7 +5,7 @@ using UnityEngine;
 namespace UnityPlus.UILib
 {
     /// <summary>
-    /// A compact way to store and pass <see cref="RectTransform"/> layout information.
+    /// A compact way to store and pass UI element layout information.
     /// </summary>
     public struct UILayoutInfo
     {
@@ -163,36 +163,6 @@ namespace UnityPlus.UILib
             Vector2 cornerMax = Vector2.Scale( rt.anchorMax, parentActualSize );
             Vector2 cornerDelta = cornerMax - cornerMin;
             return cornerDelta + rt.sizeDelta; // With filled width/height, reducing sizeDelta makes the rect smaller. Thus we need to add sizeDelta instead of subtracting.
-        }
-    }
-
-    public static class LayoutInfoEx
-    {
-        /// <summary>
-        /// Sets the layout properties of this Rect Transform to the specified values.
-        /// </summary>
-        public static void SetLayoutInfo( this RectTransform transform, UILayoutInfo layoutInfo )
-        {
-            transform.anchorMin = layoutInfo.anchorMin;
-            transform.anchorMax = layoutInfo.anchorMax;
-            transform.pivot = layoutInfo.pivot;
-            transform.anchoredPosition = layoutInfo.anchoredPosition;
-            transform.sizeDelta = layoutInfo.sizeDelta;
-        }
-
-        /// <summary>
-        /// Gets the layout properties of this Rect Transform.
-        /// </summary>
-        public static UILayoutInfo GetLayoutInfo( this RectTransform transform )
-        {
-            return new UILayoutInfo()
-            {
-                anchorMin = transform.anchorMin,
-                anchorMax = transform.anchorMax,
-                pivot = transform.pivot,
-                anchoredPosition = transform.anchoredPosition,
-                sizeDelta = transform.sizeDelta
-            };
         }
     }
 }

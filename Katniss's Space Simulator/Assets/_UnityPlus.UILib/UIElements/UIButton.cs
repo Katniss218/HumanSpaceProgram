@@ -6,7 +6,7 @@ using UnityPlus.UILib.Layout;
 
 namespace UnityPlus.UILib.UIElements
 {
-    public sealed class UIButton : UIElement, IUIElementContainer, IUIElementChild
+    public sealed class UIButton : UIElement, IUIElementContainer, IUIElementChild, IUILayoutDriven
     {
         internal readonly UnityEngine.UI.Button buttonComponent;
         internal readonly UnityEngine.UI.Image backgroundComponent;

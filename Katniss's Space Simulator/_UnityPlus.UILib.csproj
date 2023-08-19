@@ -62,19 +62,19 @@
     <Compile Include="Assets\_UnityPlus.UILib\RectTransformCloser.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UITextEx.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIValueBarEx.cs" />
-    <Compile Include="Assets\_UnityPlus.UILib\UIHelper.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIScrollBarEx.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UICanvas.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\IUIElementContainer.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIText.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIIcon.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\Layout\VerticalLayoutDriver.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIInputFieldEx.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\ValueBar.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\CanvasManager.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIInputToggle.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIScrollView.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIValueBar.cs" />
-    <Compile Include="Assets\_UnityPlus.UILib\UILayout.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\Layout\UILayout.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIButtonEx.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIPanelEx.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\RectTransformFocuser.cs" />
@@ -93,7 +93,11 @@
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIScrollViewEx.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UILayoutInfo.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIContextMenu.cs" />
-    <Compile Include="Assets\_UnityPlus.UILib\Layout\VerticalLayoutDriver.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIElementEx.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\UILayoutInfoEx.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\UIElements\IUIElementChild.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\UIElements\IUILayoutDriven.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\UIElements\IUILayoutSelf.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_UnityPlus.UILib\___UnityPlus.UILib.asmdef" />

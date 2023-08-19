@@ -8,7 +8,7 @@ using UnityPlus.UILib.Layout;
 
 namespace UnityPlus.UILib.UIElements
 {
-    public class UICanvas : UIElement, IUIElementContainer
+    public class UICanvas : UIElement, IUIElementContainer, IUILayoutDriven
     {
         public RectTransform contents => base.rectTransform;
 

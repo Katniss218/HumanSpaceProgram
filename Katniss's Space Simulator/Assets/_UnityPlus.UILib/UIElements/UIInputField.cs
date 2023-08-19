@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace UnityPlus.UILib.UIElements
 {
-    public sealed class UIInputField : UIElement
+    public sealed class UIInputField : UIElement, IUIElementChild
     {
         internal readonly TMPro.TMP_InputField inputFieldComponent;
         internal readonly TMPro.TextMeshProUGUI textComponent;
@@ -10,7 +10,7 @@ namespace UnityPlus.UILib.UIElements
         internal readonly UnityEngine.UI.Image backgroundComponent;
 
         internal readonly IUIElementContainer _parent;
-        public IUIElementContainer parent { get => _parent; }
+        public IUIElementContainer Parent { get => _parent; }
 
         internal UIInputField( RectTransform transform, IUIElementContainer parent, TMPro.TMP_InputField inputFieldComponent, TMPro.TextMeshProUGUI textComponent, TMPro.TextMeshProUGUI placeholderComponent ) : base( transform )
         {

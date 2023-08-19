@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace UnityPlus.UILib.UIElements
 {
+
     /// <summary>
-    /// A UI element that can contain other UI elements.
+    /// A UI element that can be contained by other UI elements.
     /// </summary>
-    public interface IUIElementContainer
+    public interface IUIElementChild
     {
         /// <summary>
         /// The 'root' transform of this UI element.
@@ -20,13 +24,8 @@ namespace UnityPlus.UILib.UIElements
         GameObject gameObject { get; }
 
         /// <summary>
-        /// The immediate parent transform of the child elements.
+        /// The parent of this UI element.
         /// </summary>
-        RectTransform contents { get; }
-
-        /// <summary>
-        /// The child elements of this UI element container.
-        /// </summary>
-        List<UIElement> Children { get; }
+        IUIElementContainer Parent { get; }
     }
 }

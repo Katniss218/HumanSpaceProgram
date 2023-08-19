@@ -22,16 +22,17 @@ namespace UnityPlus.UILib.UIElements
 
         // Some UI elements here have somewhat duplicated purpose. This is for increased verbosity. Lets you specify exactly what you're creating.
 
-        readonly RectTransform _rectTransform;
         /// <summary>
         /// Don't directly modify the fields/state of the rectTransform unless you know what you're doing. You can produce invalid state.
         /// </summary>
         public RectTransform rectTransform { get => _rectTransform; }
-        readonly GameObject _gameObject;
+        readonly RectTransform _rectTransform;
+
         /// <summary>
         /// Don't directly modify the fields/state of the gameObject unless you know what you're doing. You can produce invalid state.
         /// </summary>
         public GameObject gameObject { get => _gameObject; }
+        readonly GameObject _gameObject;
 
         // LAYOUT:
         // - Since everything is encapsulated here, we have FULL CONTROL over when the properties of the underlying components change.
@@ -47,7 +48,7 @@ namespace UnityPlus.UILib.UIElements
         /// <summary>
         /// Checks if the underlying UI element has been destroyed.
         /// </summary>
-        internal virtual bool isDestroyed => this.gameObject == null;
+        internal virtual bool IsDestroyed => this.gameObject == null;
 
         /// <summary>
         /// Destroys the specified UI element along with its children UI elements.
@@ -56,7 +57,7 @@ namespace UnityPlus.UILib.UIElements
         {
             // TODO - add a guard that prevents destruction of certain objects, like the contents container of a scroll view.
 
-            if( isDestroyed )
+            if( IsDestroyed )
             {
                 return; // Silent quit.
             }
@@ -94,14 +95,6 @@ namespace UnityPlus.UILib.UIElements
         public static explicit operator Transform( UIElement uiElement )
         {
             return uiElement.rectTransform;
-        }
-    }
-
-    public static class UIElementEx
-    {
-        public static bool IsDestroyed( this UIElement uiElement )
-        {
-            return uiElement == null || uiElement.isDestroyed;
         }
     }
 }

@@ -69,6 +69,7 @@
     <Compile Include="Assets\_UnityEngine\QuaternionCurve.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\ComponentEx.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\Vector2_Ex.cs" />
+    <Compile Include="Assets\_UnityEngine\Extensions\RectTransformEx.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_UnityEngine\___UnityEngine.asmdef" />

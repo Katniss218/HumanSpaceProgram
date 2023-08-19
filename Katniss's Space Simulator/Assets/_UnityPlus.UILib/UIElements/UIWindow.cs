@@ -8,7 +8,7 @@ namespace UnityPlus.UILib.UIElements
     /// <summary>
     /// Represents a window, which is a defined section of the canvas.
     /// </summary>
-    public sealed class UIWindow : UIElement, IUIElementContainer
+    public sealed class UIWindow : UIElement, IUIElementContainer, IUILayoutDriven
     {
         internal readonly UnityEngine.UI.Image backgroundComponent;
         public RectTransform contents => base.rectTransform;

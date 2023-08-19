@@ -5,7 +5,7 @@ using UnityPlus.UILib.Layout;
 
 namespace UnityPlus.UILib.UIElements
 {
-    public sealed class UIScrollView : UIElement, IUIElementContainer, IUIElementChild
+    public sealed class UIScrollView : UIElement, IUIElementContainer, IUIElementChild, IUILayoutDriven
     {
         internal readonly UnityEngine.UI.ScrollRect scrollRectComponent;
 

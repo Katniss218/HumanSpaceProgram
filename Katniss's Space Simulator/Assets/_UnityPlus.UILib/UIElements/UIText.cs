@@ -8,7 +8,7 @@ namespace UnityPlus.UILib.UIElements
     /// <summary>
     /// A UI element that is a container for text.
     /// </summary>
-    public sealed class UIText : UIElement, IUIElementChild
+    public sealed class UIText : UIElement, IUIElementChild, IUILayoutSelf
     {
         internal readonly TMPro.TextMeshProUGUI textComponent;
 
@@ -24,7 +24,7 @@ namespace UnityPlus.UILib.UIElements
             set
             {
                 textComponent.text = value;
-                TryFitToContents();
+                UILayout.BroadcastLayoutUpdate( this );
             }
         }
 
@@ -41,7 +41,7 @@ namespace UnityPlus.UILib.UIElements
             this.Parent.Children.Remove( this );
         }
 
-        private void TryFitToContents()
+        public void DoLayout()
         {
             if( !FitToContents )
             {
@@ -54,13 +54,11 @@ namespace UnityPlus.UILib.UIElements
             if( layout.FillsWidth && !layout.FillsHeight )
             {
                 this.rectTransform.sizeDelta = new Vector2( this.rectTransform.sizeDelta.x, textComponent.GetPreferredValues( this.rectTransform.sizeDelta.x, 0 ).y );
-                UILayout.BroadcastLayoutUpdate( this );
                 return;
             }
             if( layout.FillsHeight && !layout.FillsWidth )
             {
                 this.rectTransform.sizeDelta = new Vector2( textComponent.GetPreferredValues( 0, this.rectTransform.sizeDelta.y ).x, this.rectTransform.sizeDelta.y );
-                UILayout.BroadcastLayoutUpdate( this );
                 return;
             }
         }

@@ -8,6 +8,9 @@ using UnityPlus.UILib.UIElements;
 
 namespace UnityPlus.UILib.Layout
 {
+    /// <summary>
+    /// A sequential vertical layout driver.
+    /// </summary>
     public sealed class VerticalLayoutDriver : LayoutDriver
     {
         public enum Direction : byte
@@ -16,26 +19,41 @@ namespace UnityPlus.UILib.Layout
             BottomToTop
         }
 
+        /// <summary>
+        /// The direction in which the vertical layout will lay the elements.
+        /// </summary>
+        /// <remarks>
+        /// The first child always goes at the beginning, and the last goes at the end of the sequence.
+        /// </remarks>
         public Direction Dir { get; set; } = Direction.TopToBottom;
 
+        /// <summary>
+        /// The vertical spacing between the child elements, in [px].
+        /// </summary>
         public float Spacing { get; set; }
 
-        // TODO - do we do fit to size here or somewhere else? here would reduce code duplication
+        /// <summary>
+        /// If true, then the height of the container element will be set to fit the combined height of its contents.
+        /// </summary>
+        public bool FitToSize { get; set; }
 
         public override void DoLayout( IUIElementContainer c )
         {
             // lays out the children in a vertical list.
             // doesn't care about the horizontal dimensions at all, just aligns everything to line up.
 
+            foreach( var child in c.Children )
+            {
+                if( child.rectTransform.anchorMin.y != child.rectTransform.anchorMax.y )
+                {
+                    throw new InvalidOperationException( $"Can't fit to size vertically, the child element {c.gameObject.name} fills height." );
+                }
+            }
+
             float ySum = 0;
             foreach( var child in c.Children )
             {
                 UILayoutInfo layoutInfo = child.rectTransform.GetLayoutInfo();
-
-                if( layoutInfo.FillsHeight )
-                {
-                    throw new InvalidOperationException( $"Can't align vertically, a UI element {child.gameObject.name} fills height." );
-                }
 
                 #region [Commented out], This doesn't work, but might be useful...
                 // - doesn't work because the canvas scaler fucks with the unit sizes or something like that.
@@ -77,11 +95,31 @@ namespace UnityPlus.UILib.Layout
                     layoutInfo.pivot.y = 0f;
                     layoutInfo.anchoredPosition.y = ySum;
                 }
-               
+
                 child.rectTransform.SetLayoutInfo( layoutInfo );
 
                 ySum += layoutInfo.sizeDelta.y + Spacing; // Y+ towards the top.
             }
+
+            if( FitToSize )
+            {
+                if( c.contents.anchorMin.y != c.contents.anchorMax.y )
+                {
+                    throw new InvalidOperationException( $"Can't fit to size vertically, the container element {c.gameObject.name} fills height." );
+                }
+
+                if( ySum != 0 )
+                    ySum -= Spacing; // remove the last spacing if there are any elements.
+
+                c.contents.SetSizeWithCurrentAnchors( RectTransform.Axis.Vertical, ySum );
+            }
+        }
+
+        public static void SetSizeWithCurrentAnchors( RectTransform rt, int i, float newSize )
+        {
+            Vector2 sizeDelta = rt.sizeDelta;
+            sizeDelta[i] = newSize - (rt.GetParentSize()[i] * (rt.anchorMax[i] - rt.anchorMin[i]));
+            rt.sizeDelta = sizeDelta;
         }
     }
 }
