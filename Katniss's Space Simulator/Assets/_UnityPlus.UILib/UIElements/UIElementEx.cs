@@ -9,11 +9,11 @@ namespace UnityPlus.UILib.UIElements
     public static class UIElementEx
     {
         /// <summary>
-        /// Checks whether or not the specified UI element has been permanently destroyed (not visible).
+        /// Checks whether or not the specified UI element has been destroyed.
         /// </summary>
-        public static bool IsDestroyed( this UIElement uiElement )
+        public static bool IsNullOrDestroyed( this IUIElement uiElement )
         {
-            return uiElement == null || uiElement.IsDestroyed;
+            return uiElement == null || uiElement.gameObject == null;
         }
     }
 }

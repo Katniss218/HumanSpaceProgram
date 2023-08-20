@@ -79,7 +79,7 @@ namespace KSS.UI.Windows
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
-            UIScrollView scrollView = window.AddScrollView( UILayoutInfo.Fill( 2, 2, 75, 15 ), new Vector2( 0, 200 ), false, true );
+            UIScrollView scrollView = window.AddVerticalScrollView( UILayoutInfo.Fill( 2, 2, 75, 15 ), 200 );
 
             PartWindow partWindow = window.gameObject.AddComponent<PartWindow>();
             partWindow._list = scrollView;

@@ -8,14 +8,20 @@ namespace UnityEngine
 {
     public static class RectTransformEx
     {
-        public static Vector2 GetParentSize( this RectTransform rt )
+        /// <summary>
+        /// Calculates the actual size of a rect transform.
+        /// </summary>
+        public static Vector2 GetActualSize( this RectTransform rt )
         {
-            Transform parent = rt.parent;
+            Vector2 actualSize = rt.sizeDelta;
 
-            if( parent == null )
-                return rt.sizeDelta;
+            while( rt.parent != null )
+            {
+                rt = (RectTransform)rt.parent;
+                actualSize += rt.sizeDelta;
+            }
 
-            return GetParentSize( (RectTransform)parent );
+            return actualSize;
         }
     }
 }

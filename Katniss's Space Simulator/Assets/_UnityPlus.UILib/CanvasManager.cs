@@ -35,7 +35,7 @@ namespace UnityPlus.UILib
             {
                 if( _canvasDict.TryGetValue( canvasLayer.ID, out UICanvas c ) )
                 {
-                    if( c.IsDestroyed() )
+                    if( c.IsNullOrDestroyed() )
                     {
                         _canvasDict.Remove( canvasLayer.ID );
                     }
@@ -72,7 +72,7 @@ namespace UnityPlus.UILib
         {
             if( _canvasDict.TryGetValue( id, out UICanvas canvas ) )
             {
-                if( !canvas.IsDestroyed() )
+                if( !canvas.IsNullOrDestroyed() )
                 {
                     return canvas;
                 }

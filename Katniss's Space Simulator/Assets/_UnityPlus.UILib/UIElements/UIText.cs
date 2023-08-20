@@ -53,14 +53,15 @@ namespace UnityPlus.UILib.UIElements
             UILayoutInfo layout = this.rectTransform.GetLayoutInfo();
 
             // Preferred size depends on how many line breaks exist in the text after wrapping to the size of the container.
+            // `textComponent.GetPreferredValues` seems to use the current anchors and size when computing the preferred size of the text container.
             if( layout.FillsWidth && !layout.FillsHeight )
             {
-                this.rectTransform.sizeDelta = new Vector2( this.rectTransform.sizeDelta.x, textComponent.GetPreferredValues( this.rectTransform.sizeDelta.x, 0 ).y );
+                this.rectTransform.sizeDelta = new Vector2( this.rectTransform.sizeDelta.x, textComponent.GetPreferredValues().y );
                 return;
             }
             if( layout.FillsHeight && !layout.FillsWidth )
             {
-                this.rectTransform.sizeDelta = new Vector2( textComponent.GetPreferredValues( 0, this.rectTransform.sizeDelta.y ).x, this.rectTransform.sizeDelta.y );
+                this.rectTransform.sizeDelta = new Vector2( textComponent.GetPreferredValues().x, this.rectTransform.GetActualSize().y );
                 return;
             }
         }

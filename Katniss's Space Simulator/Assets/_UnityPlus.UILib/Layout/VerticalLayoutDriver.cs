@@ -114,12 +114,5 @@ namespace UnityPlus.UILib.Layout
                 c.contents.SetSizeWithCurrentAnchors( RectTransform.Axis.Vertical, ySum );
             }
         }
-
-        public static void SetSizeWithCurrentAnchors( RectTransform rt, int i, float newSize )
-        {
-            Vector2 sizeDelta = rt.sizeDelta;
-            sizeDelta[i] = newSize - (rt.GetParentSize()[i] * (rt.anchorMax[i] - rt.anchorMin[i]));
-            rt.sizeDelta = sizeDelta;
-        }
     }
 }

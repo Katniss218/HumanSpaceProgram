@@ -46,18 +46,11 @@ namespace UnityPlus.UILib.UIElements
         }
 
         /// <summary>
-        /// Checks if the underlying UI element has been destroyed.
-        /// </summary>
-        internal virtual bool IsDestroyed => this.gameObject == null;
-
-        /// <summary>
         /// Destroys the specified UI element along with its children UI elements.
         /// </summary>
         public virtual void Destroy()
         {
-            // TODO - add a guard that prevents destruction of certain objects, like the contents container of a scroll view.
-
-            if( IsDestroyed )
+            if( this.gameObject == null )
             {
                 return; // Silent quit.
             }

@@ -116,9 +116,10 @@ namespace KSS.Core.Serialization
                     timelineMetadata.SetData( data );
                     timelines.Add( timelineMetadata );
                 }
-                catch
+                catch( Exception ex )
                 {
                     Debug.LogWarning( $"Couldn't load timeline `{timeline}`." );
+                    Debug.LogException( ex );
                 }
             }
 

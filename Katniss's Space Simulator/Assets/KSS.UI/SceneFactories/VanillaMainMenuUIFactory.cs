@@ -42,17 +42,6 @@ namespace KSS.UI.SceneFactories
             seg = bar.InsertSegment( 0, 0.5f );
             seg.Sprite = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/bar" );
             seg.Color = Color.red;
-
-            UIPanel panel = canvas.AddPanel( UILayoutInfo.Fill(), null );
-            panel.LayoutDriver = new VerticalLayoutDriver()
-            {
-                Spacing = 5f
-            };
-            panel.AddButton( UILayoutInfo.FillHorizontal( 0, 0, 0.5f, 0, 50 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), null );
-            panel.AddButton( UILayoutInfo.FillHorizontal( 0, 0, 0.5f, 0, 50 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), null );
-            panel.AddButton( UILayoutInfo.FillHorizontal( 0, 0, 0.5f, 0, 50 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), null );
-            panel.AddButton( UILayoutInfo.FillHorizontal( 0, 0, 0.5f, 0, 50 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), null );
-            UILayout.BroadcastLayoutUpdate( panel );
         }
 
         // #-#-#-#-#-#-#-#-#-#
