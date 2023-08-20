@@ -57,11 +57,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIWindowEx.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\UIElements\IUILayoutDriven.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIInputField.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIInputSlider.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\RectTransformCloser.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UITextEx.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIValueBarEx.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\UIElements\IUIElementChild.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIScrollBarEx.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UICanvas.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\IUIElementContainer.cs" />
@@ -70,6 +72,7 @@
     <Compile Include="Assets\_UnityPlus.UILib\Layout\VerticalLayoutDriver.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIInputFieldEx.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\ValueBar.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\UIElements\IUILayoutSelf.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\CanvasManager.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIInputToggle.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIScrollView.cs" />
@@ -81,11 +84,13 @@
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIButton.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIIconEx.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\Layout\LayoutDriver.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\UILayoutInfoEx.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIScrollBar.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIElement.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\RectTransformDragger.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIWindow.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIPanel.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIElementEx.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIContextMenuEx.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\ContextMenu.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\ValueBarSegment.cs" />
@@ -93,11 +98,6 @@
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIScrollViewEx.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UILayoutInfo.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIContextMenu.cs" />
-    <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIElementEx.cs" />
-    <Compile Include="Assets\_UnityPlus.UILib\UILayoutInfoEx.cs" />
-    <Compile Include="Assets\_UnityPlus.UILib\UIElements\IUIElementChild.cs" />
-    <Compile Include="Assets\_UnityPlus.UILib\UIElements\IUILayoutDriven.cs" />
-    <Compile Include="Assets\_UnityPlus.UILib\UIElements\IUILayoutSelf.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_UnityPlus.UILib\___UnityPlus.UILib.asmdef" />
