@@ -13,7 +13,8 @@ namespace UnityPlus.UILib.UIElements
     {
         // PURPOSE:
         // - This class (and its subclasses) is a wrapper around hierarchies of Unity components / gameobjects.
-        // Technically, it could also be made a monobehaviour with no changes to the outside code.
+#warning TODO - I think I want it to be a monobehaviour (no changes in the outside code).
+        // this will achieve parity with the other custom UI elems which are MBs.
 
         // REASON:
         // - Many UI elements consist of multiple objects.

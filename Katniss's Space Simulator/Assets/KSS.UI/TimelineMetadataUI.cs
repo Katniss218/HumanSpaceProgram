@@ -12,7 +12,12 @@ namespace KSS.UI
 {
     public class TimelineMetadataUI : MonoBehaviour
     {
+        public IUIElementContainer saveContainer { get; set; }
+
         public TimelineMetadata Timeline { get; private set; }
+
+        // raycastee to click on the timeline
+        // when clicked, the other panel shows the saves - reference to other panel.
 
         public static TimelineMetadataUI Create( IUIElementContainer parent, UILayoutInfo layout, TimelineMetadata timeline )
         {
