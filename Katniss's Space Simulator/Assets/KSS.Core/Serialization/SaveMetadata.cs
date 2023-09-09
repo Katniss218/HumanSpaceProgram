@@ -11,9 +11,9 @@ using UnityPlus.Serialization.Json;
 namespace KSS.Core.Serialization
 {
     /// <summary>
-    /// Serializable (meta)data of a timeline's save.
+    /// Serializable (meta)data of a specific timeline's save.
     /// </summary>
-    public sealed class SaveMetadata // represents the save file metadata. Not in-timeline data.
+    public sealed class SaveMetadata
     {
         public const string SAVE_FILENAME = "_save.json";
 
@@ -32,7 +32,13 @@ namespace KSS.Core.Serialization
         /// </summary>
         public string Description { get; set; }
 
+        /// <summary>
+        /// The unique ID of this specific save's timeline.
+        /// </summary>
         public readonly string TimelineID;
+        /// <summary>
+        /// The unique ID of this specific save.
+        /// </summary>
         public readonly string SaveID;
 
         SaveMetadata( string timelineId, string saveId )

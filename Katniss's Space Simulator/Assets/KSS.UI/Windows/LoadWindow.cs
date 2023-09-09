@@ -88,7 +88,7 @@ namespace KSS.UI
             _timelines = new TimelineMetadataUI[timelines.Length];
             for( int i = 0; i < _timelines.Length; i++ )
             {
-                _timelines[i] = TimelineMetadataUI.Create( _timelineListUI, UILayoutInfo.FillHorizontal( 0, 0, 0, 0, 40 ), timelines[i] );
+                _timelines[i] = TimelineMetadataUI.Create( _timelineListUI, _saveListUI, UILayoutInfo.FillHorizontal( 0, 0, 0, 0, 40 ), timelines[i] );
             }
         }
 

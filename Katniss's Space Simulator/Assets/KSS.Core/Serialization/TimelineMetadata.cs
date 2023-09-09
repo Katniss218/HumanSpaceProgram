@@ -27,6 +27,9 @@ namespace KSS.Core.Serialization
         /// </summary>
         public string Description { get; set; }
 
+        /// <summary>
+        /// The unique ID of this specific timeline.
+        /// </summary>
         public readonly string TimelineID;
 
         TimelineMetadata( string timelineId )

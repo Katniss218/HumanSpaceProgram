@@ -49,6 +49,9 @@ namespace UnityPlus.UILib.UIElements
         /// <summary>
         /// Destroys the specified UI element along with its children UI elements.
         /// </summary>
+        /// <remarks>
+        /// Override this method if a more complex destroy logic is required.
+        /// </remarks>
         public virtual void Destroy()
         {
             if( this.gameObject == null )
