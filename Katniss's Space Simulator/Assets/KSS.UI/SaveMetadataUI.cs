@@ -1,4 +1,5 @@
-﻿using KSS.Core.Serialization;
+﻿using KSS.Core.SceneManagement;
+using KSS.Core.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,22 +16,25 @@ namespace KSS.UI
     {
         public SaveMetadata Save { get; private set; }
 
+        public Action<SaveMetadataUI> onClick;
+
         public override void OnPointerClick( PointerEventData eventData )
         {
             if( eventData.button == PointerEventData.InputButton.Left )
             {
-                //startgame with the specific save/timeline.
+                onClick?.Invoke(this);
             }
 
             base.OnPointerClick( eventData );
         }
 
-        public static SaveMetadataUI Create( IUIElementContainer parent, UILayoutInfo layout, SaveMetadata save )
+        public static SaveMetadataUI Create( IUIElementContainer parent, UILayoutInfo layout, SaveMetadata save, Action<SaveMetadataUI> onClick )
         {
             UIPanel panel = parent.AddPanel( layout, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/functionality_panel" ) );
 
             SaveMetadataUI component = panel.gameObject.AddComponent<SaveMetadataUI>();
             component.Save = save;
+            component.onClick = onClick;
 
             panel.AddText( UILayoutInfo.FillPercent( 0, 0, 0, 0.5f ), save.Name );
             panel.AddText( UILayoutInfo.FillPercent( 0, 0, 0.5f, 0f ), save.Description );

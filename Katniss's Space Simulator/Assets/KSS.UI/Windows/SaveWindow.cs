@@ -38,7 +38,7 @@ namespace KSS.UI
 
             foreach( var save in saves )
             {
-                SaveMetadataUI.Create( scrollView, UILayoutInfo.FillHorizontal( 0, 0, 0, 0, 40 ), save );
+                SaveMetadataUI.Create( scrollView, UILayoutInfo.FillHorizontal( 0, 0, 0, 0, 40 ), save, null );
             }
 
             return saveWindow;
