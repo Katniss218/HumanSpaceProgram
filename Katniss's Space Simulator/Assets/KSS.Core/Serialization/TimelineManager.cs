@@ -1,4 +1,3 @@
-using KSS.Core.TimeWarp;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -32,18 +31,18 @@ namespace KSS.Core.Serialization
 
         public static void SerializationPauseFunc()
         {
-            _wasPausedBeforeSerializing = TimeWarpManager.IsPaused;
-            TimeWarpManager.Pause();
-            TimeWarpManager.LockTimescale = true;
+            _wasPausedBeforeSerializing = TimeManager.IsPaused;
+            TimeManager.Pause();
+            TimeManager.LockTimescale = true;
         }
 
         public static void SerializationUnpauseFunc()
         {
             if( !_wasPausedBeforeSerializing )
             {
-                TimeWarpManager.Unpause();
+                TimeManager.Unpause();
             }
-            TimeWarpManager.LockTimescale = false;
+            TimeManager.LockTimescale = false;
         }
 
         static void CreateDefaultSaver()

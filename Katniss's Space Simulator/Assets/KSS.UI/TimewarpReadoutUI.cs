@@ -1,4 +1,4 @@
-using KSS.Core.TimeWarp;
+using KSS.Core;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,8 +12,8 @@ namespace KSS.UI
 
         void Start()
         {
-            TimeWarpManager.OnTimescaleChanged += OnTimescaleChanged_Listener;
-            UpdateText( TimeWarpManager.TimeScale );
+            TimeManager.OnTimescaleChanged += OnTimescaleChanged_Listener;
+            UpdateText( TimeManager.TimeScale );
         }
 
         void UpdateText( float rate )
@@ -27,7 +27,7 @@ namespace KSS.UI
             Text.Text = $"Warp Rate: {rate}x";
         }
 
-        void OnTimescaleChanged_Listener( TimeWarpManager.TimeScaleChangedData data )
+        void OnTimescaleChanged_Listener( TimeManager.TimeScaleChangedData data )
         {
             UpdateText( data.New );
         }

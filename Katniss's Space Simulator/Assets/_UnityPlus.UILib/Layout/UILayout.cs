@@ -57,6 +57,8 @@ namespace UnityPlus.UILib.Layout
         {
 #warning TODO - This needs to be called when a UI element is added, removed, or has changed its sibling order.
 
+            // also when an object is destroyed, it desyncs.
+
             _set.Clear();
             BroadcastLayoutUpdateRecursive( elem );
         }

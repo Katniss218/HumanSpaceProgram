@@ -11,7 +11,7 @@ namespace KSS.Core.SceneManagement
     /// </summary>
     public class SceneLoader : MonoBehaviour
     {
-        #region singleton bleh
+        #region singleton bleh but an object is required for the coroutine.
         static SceneLoader ___instance;
         static SceneLoader _instance
         {

@@ -1,6 +1,5 @@
 ﻿using KSS.Core;
 using KSS.Core.Serialization;
-using KSS.Core.TimeWarp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,11 +35,11 @@ namespace KSS.UI.SceneFactories
 
             escapeMenuWindow = window.gameObject;
 
-            closebutton.gameObject.GetComponent<RectTransformCloser>().CanClose = () => !TimeWarpManager.LockTimescale;
+            closebutton.gameObject.GetComponent<RectTransformCloser>().CanClose = () => !TimeManager.LockTimescale;
             closebutton.onClick.AddListener( () =>
             {
-                if( !TimeWarpManager.LockTimescale ) 
-                    TimeWarpManager.Unpause();
+                if( !TimeManager.LockTimescale ) 
+                    TimeManager.Unpause();
             } );
 
             window.AddButton( UILayoutInfo.FillHorizontal( 50, 50, 1, -50, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ) )

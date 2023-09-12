@@ -1,4 +1,3 @@
-using KSS.Core.TimeWarp;
 using UnityEngine;
 
 namespace KSS.Core
@@ -21,17 +20,17 @@ namespace KSS.Core
         {
             if( Input.GetKeyDown( KeyCode.Escape ) )
             {
-                if( !TimeWarpManager.LockTimescale )
+                if( !TimeManager.LockTimescale )
                 {
                     toggle = !toggle;
                     if( toggle )
                     {
-                        TimeWarpManager.Pause();
+                        TimeManager.Pause();
                         HSPEvent.EventManager.TryInvoke( HSPEvent.ESCAPE_GAMEPLAY, null );
                     }
                     else
                     {
-                        TimeWarpManager.Unpause();
+                        TimeManager.Unpause();
                         HSPEvent.EventManager.TryInvoke( HSPEvent.ESCAPE_GAMEPLAY, null );
                     }
                 }

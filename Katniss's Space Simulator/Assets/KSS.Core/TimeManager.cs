@@ -5,13 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace KSS.Core.TimeWarp
+namespace KSS.Core
 {
     /// <summary>
     /// Manages the speed at which the time flows.
     /// </summary>
     [DisallowMultipleComponent]
-    public class TimeWarpManager : MonoBehaviour
+    public class TimeManager : MonoBehaviour
     {
         public struct TimeScaleChangedData
         {
@@ -49,6 +49,7 @@ namespace KSS.Core.TimeWarp
         /// </summary>
         public static event Action<TimeScaleChangedData> OnTimescaleChanged;
 
+#warning TODO - add a deltatime wrapper here (or split into several classes) because the deltatimes can be different.
         static float _maxTimeScale = 128.0f;
 
         private static float _timeScale;
@@ -111,7 +112,7 @@ namespace KSS.Core.TimeWarp
 
             _oldTimeScale = _timeScale;
             _timeScale = timeScale;
-            Time.timeScale = timeScale;
+            UnityEngine.Time.timeScale = timeScale;
             OnTimescaleChanged?.Invoke( new TimeScaleChangedData() { Old = _oldTimeScale, New = timeScale } );
         }
 

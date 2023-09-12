@@ -5,11 +5,50 @@ using UnityPlus.UILib.UIElements;
 using UnityEngine.UI;
 using UnityPlus.AssetManagement;
 using KSS.Core.Serialization;
+using System.Linq;
 
 namespace KSS.UI
 {
     public class SaveWindow : MonoBehaviour
     {
+        SaveMetadataUI[] _selectedTimelineSaves;
+        SaveMetadataUI _selectedSave;
+
+        IUIElementContainer _saveListUI;
+        IUIElementContainer _timelineListUI;
+
+        [SerializeField]
+        Button _saveButton;
+
+        void RefreshSaveList()
+        {
+            if( _saveListUI.IsNullOrDestroyed() )
+            {
+                return;
+            }
+
+            foreach( UIElement saveUI in _saveListUI.Children.ToArray() )
+            {
+                saveUI.Destroy();
+            }
+
+            if( TimelineManager.CurrentTimeline == null )
+            {
+                return;
+            }
+
+            SaveMetadata[] saves = SaveMetadata.ReadAllSaves( TimelineManager.CurrentTimeline.TimelineID ).ToArray();
+            _selectedTimelineSaves = new SaveMetadataUI[saves.Length];
+            for( int i = 0; i < _selectedTimelineSaves.Length; i++ )
+            {
+                _selectedTimelineSaves[i] = SaveMetadataUI.Create( _saveListUI, UILayoutInfo.FillHorizontal( 0, 0, 0, 0, 40 ), saves[i], ( ui ) =>
+                {
+                    _selectedSave = ui;
+                    _selectedSave.Save.LoadAsync();
+                } );
+            }
+        }
+
         /// <summary>
         /// Creates a save window with the current context.
         /// </summary>
