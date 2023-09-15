@@ -15,7 +15,8 @@ namespace KSS.UI
         SaveMetadataUI _selectedSave;
 
         IUIElementContainer _saveListUI;
-        IUIElementContainer _timelineListUI;
+
+        UIInputField _inputField;
 
         [SerializeField]
         Button _saveButton;
@@ -44,8 +45,19 @@ namespace KSS.UI
                 _selectedTimelineSaves[i] = SaveMetadataUI.Create( _saveListUI, UILayoutInfo.FillHorizontal( 0, 0, 0, 0, 40 ), saves[i], ( ui ) =>
                 {
                     _selectedSave = ui;
-                    _selectedSave.Save.LoadAsync();
                 } );
+            }
+        }
+
+        void OnSave()
+        {
+            if( _inputField.Text != null )
+            {
+                TimelineManager.BeginSaveAsync( TimelineManager.CurrentTimeline.TimelineID, _inputField.Text );
+            }
+            else
+            {
+                TimelineManager.BeginSaveAsync( TimelineManager.CurrentTimeline.TimelineID, _selectedSave.Save.SaveID );
             }
         }
 
@@ -59,11 +71,13 @@ namespace KSS.UI
                 .Focusable()
                 .WithCloseButton( new UILayoutInfo( Vector2.one, new Vector2( -7, -5 ), new Vector2( 20, 20 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ );
 
-            UIScrollView scrollView = window.AddVerticalScrollView( UILayoutInfo.Fill( 2, 2, 30, 22 ), 75 )
+            SaveWindow saveWindow = window.gameObject.AddComponent<SaveWindow>();
+
+            UIScrollView saveScrollView = window.AddVerticalScrollView( UILayoutInfo.Fill( 2, 2, 30, 22 ), 75 )
                 .WithVerticalScrollbar( UILayoutInfo.FillVertical( 2, 2, 1f, 0, 10 ), null, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_handle" ), out UIScrollBar scrollbar );
 
 
-            UIButton saveBtn = window.AddButton( new UILayoutInfo( Vector2.right, new Vector2( -2, 5 ), new Vector2( 95, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ) );
+            UIButton saveBtn = window.AddButton( new UILayoutInfo( Vector2.right, new Vector2( -2, 5 ), new Vector2( 95, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), saveWindow.OnSave );
 
             saveBtn.AddText( UILayoutInfo.Fill(), "Save" )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
@@ -71,13 +85,14 @@ namespace KSS.UI
 
             UIInputField inputField = window.AddInputField( UILayoutInfo.FillHorizontal( 2, 99, 0f, 5, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
 
-            SaveWindow saveWindow = window.gameObject.AddComponent<SaveWindow>();
+            saveWindow._inputField = inputField;
+            saveWindow._saveListUI = saveScrollView;
 
             IEnumerable<SaveMetadata> saves = SaveMetadata.ReadAllSaves( TimelineManager.CurrentTimeline.TimelineID );
 
             foreach( var save in saves )
             {
-                SaveMetadataUI.Create( scrollView, UILayoutInfo.FillHorizontal( 0, 0, 0, 0, 40 ), save, null );
+                SaveMetadataUI.Create( saveScrollView, UILayoutInfo.FillHorizontal( 0, 0, 0, 0, 40 ), save, null );
             }
 
             return saveWindow;

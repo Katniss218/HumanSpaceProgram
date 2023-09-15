@@ -66,7 +66,6 @@ namespace KSS.UI
                 _selectedTimelineSaves[i] = SaveMetadataUI.Create( _saveListUI, UILayoutInfo.FillHorizontal( 0, 0, 0, 0, 40 ), saves[i], ( ui ) =>
                 {
                     _selectedSave = ui;
-                    _selectedSave.Save.LoadAsync();
                 } );
             }
         }
@@ -95,12 +94,19 @@ namespace KSS.UI
             }
         }
 
+        void OnLoad()
+        {
+            _selectedSave.Save.LoadAsync();
+        }
+
         public static LoadWindow Create()
         {
             UIWindow window = CanvasManager.Get( CanvasName.WINDOWS ).AddWindow( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 350f, 400f ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_window" ) )
                 .Draggable()
                 .Focusable()
                 .WithCloseButton( new UILayoutInfo( Vector2.one, new Vector2( -7, -5 ), new Vector2( 20, 20 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ );
+
+            LoadWindow loadWindow = window.gameObject.AddComponent<LoadWindow>();
 
             UIScrollView timelineList = window.AddVerticalScrollView( UILayoutInfo.FillVertical( 30, 30, 0f, 0, 100 ), 100 )
                 .WithVerticalScrollbar( UILayoutInfo.FillVertical( 0, 0, 1f, 0, 10 ), null, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_handle" ), out _ );
@@ -112,9 +118,8 @@ namespace KSS.UI
 
             saveList.LayoutDriver = new VerticalLayoutDriver() { FitToSize = true };
 
-            UIButton loadButton = window.AddButton( UILayoutInfo.FillHorizontal( 5, 5, 0, 0, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ), null );
+            UIButton loadButton = window.AddButton( UILayoutInfo.FillHorizontal( 5, 5, 0, 0, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ), loadWindow.OnLoad );
 
-            LoadWindow loadWindow = window.gameObject.AddComponent<LoadWindow>();
             loadWindow._timelineListUI = timelineList;
             loadWindow._saveListUI = saveList;
 

@@ -30,14 +30,18 @@ namespace KSS.UI
 
         public static SaveMetadataUI Create( IUIElementContainer parent, UILayoutInfo layout, SaveMetadata save, Action<SaveMetadataUI> onClick )
         {
-            UIPanel panel = parent.AddPanel( layout, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/functionality_panel" ) );
+            UIPanel panel = parent.AddPanel( layout, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/functionality_panel" ) )
+                .Raycastable();
+            panel.LayoutDriver = new VerticalLayoutDriver() { FitToSize = true };
 
             SaveMetadataUI component = panel.gameObject.AddComponent<SaveMetadataUI>();
             component.Save = save;
             component.onClick = onClick;
 
-            panel.AddText( UILayoutInfo.FillPercent( 0, 0, 0, 0.5f ), save.Name );
-            panel.AddText( UILayoutInfo.FillPercent( 0, 0, 0.5f, 0f ), save.Description );
+            UIText t = panel.AddText( UILayoutInfo.FillHorizontal( 0, 0, 0f, 0, 0.5f ), save.Name );
+            t.FitToContents = true;
+            t = panel.AddText( UILayoutInfo.FillHorizontal( 0, 0, 0f, 0.5f, 0f ), save.Description );
+            t.FitToContents = true;
 
             UILayout.BroadcastLayoutUpdate( panel );
 

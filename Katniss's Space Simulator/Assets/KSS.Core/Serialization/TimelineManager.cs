@@ -11,8 +11,23 @@ namespace KSS.Core.Serialization
     /// <summary>
     /// Manages the currently loaded timeline (save/workspace). See <see cref="TimelineMetadata"/> and <see cref="SaveMetadata"/>.
     /// </summary>
-    public static class TimelineManager
+    public class TimelineManager : MonoBehaviour
     {
+        #region SINGLETON UGLINESS
+        private static TimelineManager ___instance;
+        public static TimelineManager Instance
+        {
+            get
+            {
+                if( ___instance == null )
+                {
+                    ___instance = FindObjectOfType<TimelineManager>();
+                }
+                return ___instance;
+            }
+        }
+        #endregion
+
         static readonly JsonPrefabAndDataStrategy _serializationStrat = new JsonPrefabAndDataStrategy();
 
         /// <summary>
@@ -82,13 +97,9 @@ namespace KSS.Core.Serialization
 
             HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_SAVE, _saver );
 
-            //
-            // TODO - Save
-            //
+            _saver.SaveAsync( Instance );
 
             HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_SAVE, _saver );
-
-            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -109,16 +120,13 @@ namespace KSS.Core.Serialization
             TimelineMetadata loadedTimeline = TimelineMetadata.EmptyFromFilePath( TimelineMetadata.GetSavesPath( timelineId ) );
 
             CreateDefaultLoader();
+
             HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_LOAD, _loader );
 
-            //
-            // TODO - Load
-            //
+            _loader.LoadAsync( Instance );
             CurrentTimeline = loadedTimeline;
 
             HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_LOAD, _loader );
-
-            throw new NotImplementedException();
         }
 
         /// <summary>

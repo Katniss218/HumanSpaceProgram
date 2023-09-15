@@ -42,7 +42,7 @@ namespace KSS.UI.SceneFactories
                     TimeManager.Unpause();
             } );
 
-            window.AddButton( UILayoutInfo.FillHorizontal( 50, 50, 1, -50, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ) )
+            window.AddButton( UILayoutInfo.FillHorizontal( 50, 50, 1, -50, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ), null )
                 .Disabled()
                 .AddText( UILayoutInfo.Fill(), "SETTINGS" )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
@@ -58,13 +58,13 @@ namespace KSS.UI.SceneFactories
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
-            window.AddButton( UILayoutInfo.FillHorizontal( 50, 50, 1, -110, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ) )
+            window.AddButton( UILayoutInfo.FillHorizontal( 50, 50, 1, -110, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ), null )
                 .Disabled()
                 .AddText( UILayoutInfo.Fill(), "MAIN MENU" )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
-            window.AddButton( UILayoutInfo.FillHorizontal( 50, 50, 1, -150, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ) )
+            window.AddButton( UILayoutInfo.FillHorizontal( 50, 50, 1, -150, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ), null )
                 .Disabled()
                 .AddText( UILayoutInfo.Fill(), "EXIT" )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )

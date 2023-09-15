@@ -15,7 +15,7 @@ namespace UnityPlus.UILib.UIElements
             return parent;
         }
 
-        public static UIButton AddButton( this IUIElementContainer parent, UILayoutInfo layout, Sprite sprite, UnityAction onClick = null )
+        public static UIButton AddButton( this IUIElementContainer parent, UILayoutInfo layout, Sprite sprite, UnityAction onClick )
         {
             (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( parent.contents, "uilib-button", layout );
 
