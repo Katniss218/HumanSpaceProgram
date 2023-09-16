@@ -25,6 +25,8 @@ namespace UnityPlus.Serialization.Strategies
         // TODO - We might want to specify which components to *not* serialize, because they might be managed entirely by a supervisor.
         //      - This shouldn't be a problem if the components are deterministic though.
 
+        // doesn't matter if its json actually.
+
         private static IEnumerable<GameObject> GetRootGameObjects()
         {
             return UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
