@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using UnityEngine;
@@ -17,8 +18,8 @@ namespace UnityPlus.Serialization.Strategies
         // Object actions are suffixed by _Object
         // Data actions are suffixed by _Data
 
-        private static string jsonO;
-        private static string jsonD;
+        public string ObjectsFilename { get; set; }
+        public string DataFilename { get; set; }
 
         public int IncludedObjectsMask { get; set; } = int.MaxValue;
 
@@ -149,9 +150,7 @@ namespace UnityPlus.Serialization.Strategies
 
             var sb = new StringBuilder();
             new Serialization.Json.JsonStringWriter( objectsJson, sb ).Write();
-            jsonO = sb.ToString();
-
-            Debug.Log( jsonO );
+            File.WriteAllText( ObjectsFilename, sb.ToString(), Encoding.UTF8 );
         }
         private void SaveObjectDataRecursive( ISaver s, GameObject go, ref SerializedArray objects )
         {
@@ -221,16 +220,14 @@ namespace UnityPlus.Serialization.Strategies
 
             var sb = new StringBuilder();
             new Serialization.Json.JsonStringWriter( objData, sb ).Write();
-            jsonD = sb.ToString();
-
-            //TMPro.TMP_InputField inp = UnityEngine.Object.FindObjectOfType<TMPro.TMP_InputField>();
-            //inp.text = jsonD;
-            Debug.Log( jsonD );
+            File.WriteAllText( DataFilename, sb.ToString(), Encoding.UTF8 );
         }
 
         public IEnumerator LoadSceneObjects_Object( ILoader l )
         {
-            SerializedArray objectsJson = (SerializedArray)new Serialization.Json.JsonStringReader( jsonO ).Read();
+#warning TODO - this should be loaded asynchronously from a file or multiple files - jsonstreamreader.
+            string objectsStr = File.ReadAllText( ObjectsFilename, Encoding.UTF8 );
+            SerializedArray objectsJson = (SerializedArray)new Serialization.Json.JsonStringReader( objectsStr ).Read();
 
             foreach( var goJson in objectsJson )
             {
@@ -250,7 +247,8 @@ namespace UnityPlus.Serialization.Strategies
 
         public IEnumerator LoadSceneObjects_Data( ILoader l )
         {
-            SerializedArray data = (SerializedArray)new Serialization.Json.JsonStringReader( jsonD ).Read();
+            string dataStr = File.ReadAllText( ObjectsFilename, Encoding.UTF8 );
+            SerializedArray data = (SerializedArray)new Serialization.Json.JsonStringReader( dataStr ).Read();
 
             foreach( var goData in data )
             {

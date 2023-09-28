@@ -22,7 +22,7 @@ namespace KSS.Core.Serialization
                 return "___";
             }
 
-            string sanitizedName = rawFileName.ToLowerInvariant();
+            string sanitizedName = rawFileName.ToLowerInvariant().Trim();
 
             const string charsToReplace = "[^a-z0-9]";
             sanitizedName = Regex.Replace( sanitizedName, charsToReplace, "_" );

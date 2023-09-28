@@ -20,7 +20,7 @@ namespace UnityPlus.UILib.UIElements
             this.placeholderComponent = placeholderComponent;
         }
 
-        public string Text { get => textComponent.text; set => textComponent.text = value; }
+        public string Text { get => inputFieldComponent.text; set => inputFieldComponent.text = value; }
 
         public Sprite Background { get => backgroundComponent.sprite; set => backgroundComponent.sprite = value; }
     }
