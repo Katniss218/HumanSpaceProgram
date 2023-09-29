@@ -28,7 +28,7 @@ namespace KSS.Core.Serialization
         }
         #endregion
 
-        static readonly JsonPrefabAndDataStrategy _serializationStrat = new JsonPrefabAndDataStrategy();
+        static readonly JsonExplicitHierarchyStrategy _serializationStrat = new JsonExplicitHierarchyStrategy();
 
         /// <summary>
         /// Checks if a timeline is currently being either saved or loaded.
@@ -55,6 +55,7 @@ namespace KSS.Core.Serialization
         {
             if( !_wasPausedBeforeSerializing )
             {
+#warning TODO - doesn't unpause - something else sets the "old" timescale.
                 TimeManager.Unpause();
             }
             TimeManager.LockTimescale = false;
