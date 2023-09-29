@@ -5,21 +5,27 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Assets.KSS.Core.Serialization
+namespace KSS.Core.Serialization
 {
     public static class IOHelper
     {
-        public static string GeneratePathID( string name )
+        /// <summary>
+        /// Sanitizes the user-provided name into a valid cross-platform filename.
+        /// </summary>
+        /// <remarks>
+        /// Remember to check if a file with the returned name already exists before saving to it (!)
+        /// </remarks>
+        public static string SanitizeFileName( string rawFileName )
         {
-            if( string.IsNullOrEmpty( name ) )
+            if( string.IsNullOrEmpty( rawFileName ) )
             {
                 return "___";
             }
 
-            string sanitizedName = name.ToLowerInvariant();
+            string sanitizedName = rawFileName.ToLowerInvariant().Trim();
 
-            const string allowedChars = "[^a-zA-Z0-9]";
-            sanitizedName = Regex.Replace( sanitizedName, allowedChars, "_" );
+            const string charsToReplace = "[^a-z0-9]";
+            sanitizedName = Regex.Replace( sanitizedName, charsToReplace, "_" );
 
             string[] forbiddenNames =
             { "CON", "PRN", "AUX", "NUL",
@@ -33,15 +39,13 @@ namespace Assets.KSS.Core.Serialization
                 sanitizedName = $"_{sanitizedName}";
             }
 
-            const int maxLength = 32;
+            const int maxLength = 32; // conservative length limit because length limit is for absolute paths, ours is just a filename (`12345678901234567890123456789012`).
             if( sanitizedName.Length > maxLength )
             {
                 sanitizedName = sanitizedName.Substring( 0, maxLength );
             }
 
             return sanitizedName;
-
-            // We should append a number if file is already taken. But that's the responsibility of the exception handler that checks the directory.
         }
     }
 }

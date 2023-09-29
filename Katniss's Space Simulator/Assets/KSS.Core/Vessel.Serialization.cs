@@ -1,9 +1,9 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityPlus.Serialization;
 
 namespace KSS.Core
 {
@@ -15,11 +15,11 @@ namespace KSS.Core
         /// <summary>
         /// Saves the vessel's persistent data to JSON.
         /// </summary>
-        public JToken Save()
+        public SerializedData Save()
         {
             // save a vessel to a json file.
             // - save the parts, and their persistent state.
-            JObject data = new JObject();
+            SerializedData data = new SerializedObject();
 
             throw new NotImplementedException();
         }
@@ -27,7 +27,7 @@ namespace KSS.Core
         /// <summary>
         /// Loads the vessel's persistent data from JSON.
         /// </summary>
-        public void Load( JToken data )
+        public void Load( SerializedData data )
         {
             // load a vessel from a json file.
             // - create the vessel

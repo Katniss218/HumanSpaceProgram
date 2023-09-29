@@ -14,11 +14,11 @@ namespace KSS.UI
         /// </summary>
         public IResourceContainer ReferenceObject { get; set; }
 
-        [SerializeField]
-        ValueBar _bar;
+        UIValueBar _bar;
 
         void Update()
         {
+#warning TODO - Inefficient as fuck.
             _bar.ClearSegments();
 
             for( int i = 0; i < this.ReferenceObject.Contents.SubstanceCount; i++ )
@@ -32,15 +32,15 @@ namespace KSS.UI
             }
         }
 
-        public static IResourceContainerUI Create( RectTransform parent, IResourceContainer referenceObj )
+        public static IResourceContainerUI Create( IUIElementContainer parent, IResourceContainer referenceObj )
         {
-            (GameObject root, _) = UIHelper.CreateUI( parent, "Resource Container UI", new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 250, 15 ) ) );
+            UIPanel panel = parent.AddPanel( new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 250, 15 ) ), null );
 
-            UIValueBar bar = UIValueBarEx.AddHorizontalValueBar( new UIElement( (RectTransform)root.transform ), new UILayoutInfo( Vector2.zero, Vector2.one, new Vector2( 0.5f, 0.5f ), Vector2.zero, Vector2.zero ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/bar_background" ) )
+            UIValueBar bar = panel.AddHorizontalValueBar(new UILayoutInfo( Vector2.zero, Vector2.one, new Vector2( 0.5f, 0.5f ), Vector2.zero, Vector2.zero ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/bar_background" ) )
                 .WithPadding( 5, 5, 1 );
 
-            IResourceContainerUI ui = root.AddComponent<IResourceContainerUI>();
-            ui._bar = bar.valueBarComponent;
+            IResourceContainerUI ui = panel.gameObject.AddComponent<IResourceContainerUI>();
+            ui._bar = bar;
             ui.ReferenceObject = referenceObj;
 
             return ui;

@@ -5,7 +5,7 @@ using UnityEngine;
 namespace UnityPlus.UILib
 {
     /// <summary>
-    /// A compact way to store and pass <see cref="RectTransform"/> layout information.
+    /// A compact way to store and pass UI element layout information.
     /// </summary>
     public struct UILayoutInfo
     {
@@ -14,6 +14,15 @@ namespace UnityPlus.UILib
         public Vector2 pivot;
         public Vector2 anchoredPosition;
         public Vector2 sizeDelta;
+
+        /// <summary>
+        /// True if the UI element is set to fill the width of its parent.
+        /// </summary>
+        public bool FillsWidth => (anchorMin.x != anchorMax.x);
+        /// <summary>
+        /// True if the UI element is set to fill the height of its parent.
+        /// </summary>
+        public bool FillsHeight => (anchorMin.y != anchorMax.y);
 
         /// <param name="anchorPivot">The value for anchorMin, anchorMax, and pivot, x: [left..right], y: [bottom..top].</param>
         public UILayoutInfo( Vector2 anchorPivot, Vector2 anchoredPosition, Vector2 sizeDelta )
@@ -117,35 +126,43 @@ namespace UnityPlus.UILib
                 sizeDelta = Vector2.zero
             };
         }
-    }
 
-    public static class LayoutInfoEx
-    {
         /// <summary>
-        /// Sets the layout properties of this Rect Transform to the specified values.
+        /// Calculates the actual size of the UI element with the current layout parameters, and a specified parent size.
         /// </summary>
-        public static void SetLayoutInfo( this RectTransform transform, UILayoutInfo layoutInfo )
+        /// <param name="parentActualSize">The actual size of the parent UI element.</param>
+        /// <returns>The width and height of the UI element.</returns>
+        public Vector2 GetActualSize( Vector2 parentActualSize )
         {
-            transform.anchorMin = layoutInfo.anchorMin;
-            transform.anchorMax = layoutInfo.anchorMax;
-            transform.pivot = layoutInfo.pivot;
-            transform.anchoredPosition = layoutInfo.anchoredPosition;
-            transform.sizeDelta = layoutInfo.sizeDelta;
+            if( anchorMin == anchorMax )
+            {
+                return sizeDelta;
+            }
+
+            Vector2 cornerMin = Vector2.Scale( anchorMin, parentActualSize );
+            Vector2 cornerMax = Vector2.Scale( anchorMax, parentActualSize );
+            Vector2 cornerDelta = cornerMax - cornerMin;
+            return cornerDelta + sizeDelta; // With filled width/height, reducing sizeDelta makes the rect smaller. Thus we need to add sizeDelta instead of subtracting.
         }
 
         /// <summary>
-        /// Gets the layout properties of this Rect Transform.
+        /// Calculates the actual size of the UI element with the current layout parameters, and a specified parent size.
         /// </summary>
-        public static UILayoutInfo GetLayoutInfo( this RectTransform transform )
+        /// <param name="parentActualSize">The actual size of the parent UI element.</param>
+        /// <returns>The width and height of the UI element.</returns>
+        public static Vector2 GetActualSize( RectTransform rt )
         {
-            return new UILayoutInfo()
+            if( rt.anchorMin == rt.anchorMax || rt.parent == null )
             {
-                anchorMin = transform.anchorMin,
-                anchorMax = transform.anchorMax,
-                pivot = transform.pivot,
-                anchoredPosition = transform.anchoredPosition,
-                sizeDelta = transform.sizeDelta
-            };
+                return rt.sizeDelta;
+            }
+
+            Vector2 parentActualSize = GetActualSize( (RectTransform)rt.parent );
+
+            Vector2 cornerMin = Vector2.Scale( rt.anchorMin, parentActualSize );
+            Vector2 cornerMax = Vector2.Scale( rt.anchorMax, parentActualSize );
+            Vector2 cornerDelta = cornerMax - cornerMin;
+            return cornerDelta + rt.sizeDelta; // With filled width/height, reducing sizeDelta makes the rect smaller. Thus we need to add sizeDelta instead of subtracting.
         }
     }
 }

@@ -4,12 +4,16 @@ using UnityEngine;
 
 namespace UnityPlus.UILib.UIElements
 {
-    public class UIScrollBar : UIElement
+    public sealed class UIScrollBar : UIElement
     {
-        public readonly UnityEngine.UI.Scrollbar scrollbarComponent;
+        internal readonly UnityEngine.UI.Scrollbar scrollbarComponent;
 
-        public UIScrollBar( RectTransform transform, UnityEngine.UI.Scrollbar scrollbarComponent ) : base( transform )
+        internal readonly IUIElementContainer _parent;
+        public IUIElementContainer parent { get => _parent; }
+
+        internal UIScrollBar( RectTransform transform, IUIElementContainer parent, UnityEngine.UI.Scrollbar scrollbarComponent ) : base( transform )
         {
+            this._parent = parent;
             this.scrollbarComponent = scrollbarComponent;
         }
     }

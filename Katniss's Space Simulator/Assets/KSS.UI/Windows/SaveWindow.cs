@@ -1,16 +1,66 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
-using KSS.Core;
 using UnityEngine.UI;
 using UnityPlus.AssetManagement;
+using KSS.Core.Serialization;
+using System.Linq;
 
 namespace KSS.UI
 {
     public class SaveWindow : MonoBehaviour
     {
+        SaveMetadataUI[] _selectedTimelineSaves;
+        SaveMetadataUI _selectedSave;
+
+        IUIElementContainer _saveListUI;
+
+        UIInputField _inputField;
+
+        [SerializeField]
+        Button _saveButton;
+
+        void RefreshSaveList()
+        {
+            if( _saveListUI.IsNullOrDestroyed() )
+            {
+                return;
+            }
+
+            foreach( UIElement saveUI in _saveListUI.Children.ToArray() )
+            {
+                saveUI.Destroy();
+            }
+
+            if( TimelineManager.CurrentTimeline == null )
+            {
+                return;
+            }
+
+            SaveMetadata[] saves = SaveMetadata.ReadAllSaves( TimelineManager.CurrentTimeline.TimelineID ).ToArray();
+            _selectedTimelineSaves = new SaveMetadataUI[saves.Length];
+            for( int i = 0; i < _selectedTimelineSaves.Length; i++ )
+            {
+                _selectedTimelineSaves[i] = SaveMetadataUI.Create( _saveListUI, UILayoutInfo.FillHorizontal( 0, 0, 0, 0, 40 ), saves[i], ( ui ) =>
+                {
+                    _selectedSave = ui;
+                } );
+            }
+        }
+
+        void OnSave()
+        {
+            if( _inputField.Text != null )
+            {
+                TimelineManager.BeginSaveAsync( TimelineManager.CurrentTimeline.TimelineID, _inputField.Text );
+            }
+            else
+            {
+                TimelineManager.BeginSaveAsync( TimelineManager.CurrentTimeline.TimelineID, _selectedSave.Save.SaveID );
+            }
+        }
+
         /// <summary>
         /// Creates a save window with the current context.
         /// </summary>
@@ -23,17 +73,27 @@ namespace KSS.UI
 
             SaveWindow saveWindow = window.gameObject.AddComponent<SaveWindow>();
 
-            UIScrollView scrollView = window.AddVerticalScrollView( UILayoutInfo.Fill( 2, 2, 30, 22 ), new Vector2( 0, 75 ) )
+            UIScrollView saveScrollView = window.AddVerticalScrollView( UILayoutInfo.Fill( 2, 2, 30, 22 ), 75 )
                 .WithVerticalScrollbar( UILayoutInfo.FillVertical( 2, 2, 1f, 0, 10 ), null, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_handle" ), out UIScrollBar scrollbar );
 
 
-            UIButton saveBtn = window.AddButton( new UILayoutInfo( Vector2.right, new Vector2( -2, 5 ), new Vector2( 95, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ) );
+            UIButton saveBtn = window.AddButton( new UILayoutInfo( Vector2.right, new Vector2( -2, 5 ), new Vector2( 95, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), saveWindow.OnSave );
 
             saveBtn.AddText( UILayoutInfo.Fill(), "Save" )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
             UIInputField inputField = window.AddInputField( UILayoutInfo.FillHorizontal( 2, 99, 0f, 5, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
+
+            saveWindow._inputField = inputField;
+            saveWindow._saveListUI = saveScrollView;
+
+            IEnumerable<SaveMetadata> saves = SaveMetadata.ReadAllSaves( TimelineManager.CurrentTimeline.TimelineID );
+
+            foreach( var save in saves )
+            {
+                SaveMetadataUI.Create( saveScrollView, UILayoutInfo.FillHorizontal( 0, 0, 0, 0, 40 ), save, null );
+            }
 
             return saveWindow;
         }

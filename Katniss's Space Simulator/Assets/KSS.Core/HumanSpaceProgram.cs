@@ -52,7 +52,7 @@ namespace KSS.Core
         /// <summary>
         /// Computes the path to the `GameData` directory.
         /// </summary>
-        public static string GetGameDataPath()
+        public static string GetGameDataDirectoryPath()
         {
             return Path.Combine( GetBaseDirectoryPath(), GameDataDirectoryName );
         }
@@ -60,7 +60,7 @@ namespace KSS.Core
         /// <summary>
         /// Figures out and returns the path to the `Saves` directory.
         /// </summary>
-        public static string GetSavesPath()
+        public static string GetSaveDirectoryPath()
         {
             return Path.Combine( GetBaseDirectoryPath(), SavesDirectoryName );
         }

@@ -11,7 +11,7 @@ namespace UnityPlus.Serialization
     /// <summary>
     /// A synchronous loader.
     /// </summary>
-    public class Loader : ILoader
+    public sealed class Loader : ILoader
     {
         ILoader.State _currentState;
 

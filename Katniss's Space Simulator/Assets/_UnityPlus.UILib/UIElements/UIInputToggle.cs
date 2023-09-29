@@ -4,13 +4,16 @@ using UnityEngine;
 
 namespace UnityPlus.UILib.UIElements
 {
-    public class UIInputToggle : UIElement
+    public sealed class UIInputToggle : UIElement
     {
         // Toggle has 2 sprites, one for inactive, and other for active.
 
-        public UIInputToggle( RectTransform transform ) : base( transform )
-        {
+        internal readonly IUIElementContainer _parent;
+        public IUIElementContainer parent { get => _parent; }
 
+        internal UIInputToggle( RectTransform transform, IUIElementContainer parent ) : base( transform )
+        {
+            this._parent = parent;
         }
     }
 }

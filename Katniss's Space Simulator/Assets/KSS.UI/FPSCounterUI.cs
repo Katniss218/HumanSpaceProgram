@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityPlus.UILib.UIElements;
 
 namespace KSS.UI
 {
     public class FPSCounterUI : MonoBehaviour
     {
-        [field: SerializeField]
-        public TMPro.TextMeshProUGUI TextBox { get; set; }
+        public UIText Text { get; set; }
 
         float[] _fps = new float[128];
         int _max = 0;
@@ -45,7 +45,7 @@ namespace KSS.UI
         void Update()
         {
             SampleFPS();
-            TextBox.text = $"FPS: {Mathf.CeilToInt( GetAverageFps() )}";
+            Text.Text = $"FPS: {Mathf.CeilToInt( GetAverageFps() )}";
         }
     }
 }

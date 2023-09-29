@@ -15,7 +15,7 @@ EditorBuildSettings:
     path: Assets/___Scenes/Testing And Shit.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
   - enabled: 1
-    path: Assets/___Scenes/GameplayScene.unity
+    path: Assets/___Scenes/Gameplay.unity
     guid: 0104d408cf7e4384dae23fbe2673980c
   - enabled: 1
     path: Assets/___Scenes/UI Prototyping.unity

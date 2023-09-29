@@ -11,11 +11,16 @@ using UnityPlus.Serialization.Json;
 namespace KSS.Core.Serialization
 {
     /// <summary>
-    /// Serializable (meta)data of a timeline's save.
+    /// Serializable (meta)data of a specific timeline's save.
     /// </summary>
-    public class SaveMetadata // represents the save file metadata. Not in-timeline data.
+    public sealed class SaveMetadata
     {
         public const string SAVE_FILENAME = "_save.json";
+
+        /// <summary>
+        /// The persistent save's ID. A persistent save is the default save when a custom save is not specified.
+        /// </summary>
+        public const string PERSISTENT_SAVE_ID = "___persistent";
 
         /// <summary>
         /// The display name shown in the GUI.
@@ -27,24 +32,36 @@ namespace KSS.Core.Serialization
         /// </summary>
         public string Description { get; set; }
 
-        string _timelineId;
-        string _pathId;
+        /// <summary>
+        /// The unique ID of this specific save's timeline.
+        /// </summary>
+        public readonly string TimelineID;
+        /// <summary>
+        /// The unique ID of this specific save.
+        /// </summary>
+        public readonly string SaveID;
+
+        SaveMetadata( string timelineId, string saveId )
+        {
+            this.TimelineID = timelineId;
+            this.SaveID = saveId;
+        }
 
         /// <summary>
-        /// Computes the directory path for a given timeline ID.
+        /// Computes the file path for a given timeline ID.
         /// </summary>
-        public static string GetDirectoryPath( string timelineId, string saveId )
+        public static string GetPath( string timelineId, string saveId )
         {
-            return Path.Combine( HumanSpaceProgram.GetSavesPath(), timelineId, saveId );
+            return Path.Combine( HumanSpaceProgram.GetSaveDirectoryPath(), timelineId, saveId );
         }
 
         /// <summary>
         /// Creates a new empty <see cref="SaveMetadata"/> that points to the specified save. Does not initialize any display parameters.
         /// </summary>
-        /// <param name="path">The path to use to parse out the timeline and save IDs.</param>
-        public static SaveMetadata EmptyFromFilePath( string path )
+        /// <param name="validPath">The path to use to parse out the timeline and save IDs.</param>
+        public static SaveMetadata EmptyFromFilePath( string validPath )
         {
-            string[] split = path.Split( new char[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries );
+            string[] split = validPath.Split( new char[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries );
 
             int savesIndex = -1;
             for( int i = 0; i < split.Length; i++ )
@@ -58,27 +75,23 @@ namespace KSS.Core.Serialization
 
             if( savesIndex <= 0 || savesIndex >= split.Length )
             {
-                throw new ArgumentException( $"The path `{path}` doesn't contain the `{HumanSpaceProgram.SavesDirectoryName}` directory." );
+                throw new ArgumentException( $"The path `{validPath}` doesn't contain the `{HumanSpaceProgram.SavesDirectoryName}` directory." );
             }
             if( savesIndex >= split.Length - 2 )
             {
-                throw new ArgumentException( $"The path `{path}` points directly to the `{HumanSpaceProgram.SavesDirectoryName}` directory. It must point to a specific save of a specific timeline." );
+                throw new ArgumentException( $"The path `{validPath}` points directly to the `{HumanSpaceProgram.SavesDirectoryName}` directory. It must point to a specific save of a specific timeline." );
             }
 
-            return new SaveMetadata()
-            {
-                _timelineId = split[savesIndex + 1], // `Saves/<timelineId>/<saveId>/_save.json`
-                _pathId = split[savesIndex + 2]
-            };
+            return new SaveMetadata( split[savesIndex + 1], split[savesIndex + 2] ); // `Saves/<timelineId>/<saveId>/_save.json`
         }
 
         /// <summary>
         /// Reads all the saves for a given timeline from disk and returns their parsed <see cref="SaveMetadata"/>s.
         /// </summary>
         /// <param name="timelineId">The timeline ID to get the saves for.</param>
-        public static IEnumerable<SaveMetadata> GetAllSaves( string timelineId )
+        public static IEnumerable<SaveMetadata> ReadAllSaves( string timelineId )
         {
-            string timelinePath = TimelineMetadata.GetDirectoryPath( timelineId );
+            string timelinePath = TimelineMetadata.GetSavesPath( timelineId );
 
             string[] potentialSaves;
             try
@@ -87,7 +100,7 @@ namespace KSS.Core.Serialization
             }
             catch
             {
-                Debug.LogWarning( $"Couldn't open saves directory (`{timelinePath}`)." );
+                Debug.LogWarning( $"Couldn't open `{timelinePath}` directory." );
 
                 return new SaveMetadata[] { };
             }
@@ -104,9 +117,9 @@ namespace KSS.Core.Serialization
 
                     SerializedData data = new JsonStringReader( saveJson ).Read();
 
-                    SaveMetadata timeline = SaveMetadata.EmptyFromFilePath( path );
-                    timeline.SetData( data );
-                    saves.Add( timeline );
+                    SaveMetadata saveMetadata = SaveMetadata.EmptyFromFilePath( path );
+                    saveMetadata.SetData( data );
+                    saves.Add( saveMetadata );
                 }
                 catch
                 {

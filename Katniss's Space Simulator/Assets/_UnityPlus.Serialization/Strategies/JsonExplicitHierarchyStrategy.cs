@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using UnityEngine;
@@ -11,19 +12,20 @@ namespace UnityPlus.Serialization.Strategies
     /// <summary>
     /// Can be used to save the scene using the factory-gameobjectdata scheme.
     /// </summary>
-    [Obsolete( "Incomplete" )]
     public sealed class JsonExplicitHierarchyStrategy
     {
         // Object actions are suffixed by _Object
         // Data actions are suffixed by _Data
 
-        private static string jsonO;
-        private static string jsonD;
+        public string ObjectsFilename { get; set; }
+        public string DataFilename { get; set; }
 
         public int IncludedObjectsMask { get; set; } = int.MaxValue;
 
         // TODO - We might want to specify which components to *not* serialize, because they might be managed entirely by a supervisor.
         //      - This shouldn't be a problem if the components are deterministic though.
+
+        // doesn't matter if its json actually.
 
         private static IEnumerable<GameObject> GetRootGameObjects()
         {
@@ -132,6 +134,10 @@ namespace UnityPlus.Serialization.Strategies
 
         public IEnumerator SaveSceneObjects_Object( ISaver s )
         {
+            if( string.IsNullOrEmpty( ObjectsFilename ) )
+            {
+                throw new InvalidOperationException( $"Can't save scene objects, file name is not set." );
+            }
             IEnumerable<GameObject> rootObjects = GetRootGameObjects();
 
             SerializedArray objectsJson = new SerializedArray();
@@ -147,9 +153,7 @@ namespace UnityPlus.Serialization.Strategies
 
             var sb = new StringBuilder();
             new Serialization.Json.JsonStringWriter( objectsJson, sb ).Write();
-            jsonO = sb.ToString();
-
-            Debug.Log( jsonO );
+            File.WriteAllText( ObjectsFilename, sb.ToString(), Encoding.UTF8 );
         }
         private void SaveObjectDataRecursive( ISaver s, GameObject go, ref SerializedArray objects )
         {
@@ -167,15 +171,24 @@ namespace UnityPlus.Serialization.Strategies
             int i = 0;
             foreach( var comp in comps )
             {
-                var dataJson = comp.GetData( s );
+                SerializedData data = null;
+                try
+                {
+                    data = comp.GetData( s );
+                }
+                catch(Exception ex)
+                {
+                    Debug.LogWarning( $"Couldn't serialize component '{comp}': {ex.Message}." );
+                    Debug.LogException( ex );
+                }
 
-                if( dataJson != null )
+                if( data != null )
                 {
                     Guid cid = s.GetID( comp );
                     SerializedObject compData = new SerializedObject()
                     {
                         { "$ref", s.WriteGuid(cid) },
-                        { "data", dataJson }
+                        { "data", data }
                     };
                     components.Add( compData );
                 }
@@ -202,6 +215,10 @@ namespace UnityPlus.Serialization.Strategies
         //public void SaveSceneObjects_Data( ISaver s )
         public IEnumerator SaveSceneObjects_Data( ISaver s )
         {
+            if( string.IsNullOrEmpty( DataFilename ) )
+            {
+                throw new InvalidOperationException( $"Can't save scene objects, file name is not set." );
+            }
             // saves the persistent information about the existing objects.
 
             // persistent information is one that is expected to change and be preserved (i.e. health, inventory, etc).
@@ -219,16 +236,18 @@ namespace UnityPlus.Serialization.Strategies
 
             var sb = new StringBuilder();
             new Serialization.Json.JsonStringWriter( objData, sb ).Write();
-            jsonD = sb.ToString();
-
-            //TMPro.TMP_InputField inp = UnityEngine.Object.FindObjectOfType<TMPro.TMP_InputField>();
-            //inp.text = jsonD;
-            Debug.Log( jsonD );
+            File.WriteAllText( DataFilename, sb.ToString(), Encoding.UTF8 );
         }
 
         public IEnumerator LoadSceneObjects_Object( ILoader l )
         {
-            SerializedArray objectsJson = (SerializedArray)new Serialization.Json.JsonStringReader( jsonO ).Read();
+            if( string.IsNullOrEmpty( ObjectsFilename ) )
+            {
+                throw new InvalidOperationException( $"Can't load scene objects, file name is not set." );
+            }
+#warning TODO - this should be loaded asynchronously from a file or multiple files - jsonstreamreader.
+            string objectsStr = File.ReadAllText( ObjectsFilename, Encoding.UTF8 );
+            SerializedArray objectsJson = (SerializedArray)new Serialization.Json.JsonStringReader( objectsStr ).Read();
 
             foreach( var goJson in objectsJson )
             {
@@ -248,7 +267,12 @@ namespace UnityPlus.Serialization.Strategies
 
         public IEnumerator LoadSceneObjects_Data( ILoader l )
         {
-            SerializedArray data = (SerializedArray)new Serialization.Json.JsonStringReader( jsonD ).Read();
+            if( string.IsNullOrEmpty( DataFilename ) )
+            {
+                throw new InvalidOperationException( $"Can't load scene objects' data, file name is not set." );
+            }
+            string dataStr = File.ReadAllText( DataFilename, Encoding.UTF8 );
+            SerializedArray data = (SerializedArray)new Serialization.Json.JsonStringReader( dataStr ).Read();
 
             foreach( var goData in data )
             {

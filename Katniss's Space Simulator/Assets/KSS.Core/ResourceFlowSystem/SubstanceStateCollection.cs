@@ -159,7 +159,6 @@ namespace KSS.Core.ResourceFlowSystem
 
             // ADDS (dt > 0) OR REMOVES (dt < 0) RESOURCES.
 
-            List<SubstanceState> substancesMissing = new List<SubstanceState>();
             foreach( var sbs in other._substances )
             {
                 float amountDelta = sbs.MassAmount * dt;

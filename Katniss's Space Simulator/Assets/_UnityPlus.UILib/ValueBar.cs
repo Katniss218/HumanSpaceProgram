@@ -150,7 +150,8 @@ namespace UnityPlus.UILib
             float sum = 0.0f;
             for( int i = 0; i < _segments.Count; i++ )
             {
-                if( i == index ) continue;
+                if( i == index )
+                    continue;
 
                 sum += _segments[i].width;
             }

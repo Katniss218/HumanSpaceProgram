@@ -1,23 +1,41 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityPlus.UILib.Layout;
 
 namespace UnityPlus.UILib.UIElements
 {
-    public class UIScrollView : UIElement
+    public sealed class UIScrollView : UIElement, IUIElementContainer, IUIElementChild, IUILayoutDriven
     {
-        public readonly UnityEngine.UI.ScrollRect scrollRectComponent;
+        internal readonly UnityEngine.UI.ScrollRect scrollRectComponent;
 
         public UIScrollBar scrollbarHorizontal;
         public UIScrollBar scrollbarVertical;
-        public readonly UIElement contents;
+        readonly RectTransform _contents;
+        public RectTransform contents { get => _contents; }
 
-        public UIScrollView( RectTransform transform, UnityEngine.UI.ScrollRect scrollRectComponent, UIScrollBar scrollbarHorizontal, UIScrollBar scrollbarVertical, UIElement contents ) : base( transform )
+        public List<IUIElementChild> Children { get; }
+
+        internal readonly IUIElementContainer _parent;
+        public IUIElementContainer Parent { get => _parent; }
+
+        public LayoutDriver LayoutDriver { get; set; }
+
+        internal UIScrollView( RectTransform transform, IUIElementContainer parent, UnityEngine.UI.ScrollRect scrollRectComponent, UIScrollBar scrollbarHorizontal, UIScrollBar scrollbarVertical, RectTransform contents ) : base( transform )
         {
+            Children = new List<IUIElementChild>();
+            this._parent = parent;
+            this.Parent.Children.Add( this );
             this.scrollRectComponent = scrollRectComponent;
             this.scrollbarHorizontal = scrollbarHorizontal;
             this.scrollbarVertical = scrollbarVertical;
-            this.contents = contents;
+            this._contents = contents;
+        }
+
+        public override void Destroy()
+        {
+            base.Destroy();
+            this.Parent.Children.Remove( this );
         }
     }
 }

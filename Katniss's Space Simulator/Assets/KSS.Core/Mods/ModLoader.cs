@@ -14,7 +14,7 @@ namespace KSS.Core.Mods
     /// </summary>
     public static class ModLoader
     {
-        public static string GetModDirectory() => HumanSpaceProgram.GetGameDataPath();
+        public static string GetModDirectory() => HumanSpaceProgram.GetGameDataDirectoryPath();
 
         private static void LoadAssembliesRecursive( string path )
         {
