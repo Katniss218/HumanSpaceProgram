@@ -139,10 +139,10 @@ namespace KSS.Core
             Vessel oldv = partToJoin.GetVessel();
             //partToJoin.SetVesselRecursive( GetVessel( parent ) );
             Reattach( partToJoin, parent );
-            SetVesselHierarchy( partToJoin, parent.GetVessel() );
+            partToJoin.SetParent( parent.GetVessel().transform );
 
             oldv.RecalculateParts();
-            //parent.Vessel.RecalculateParts();
+            parent.GetVessel().RecalculateParts();
         }
 
         /// <summary>
@@ -159,7 +159,6 @@ namespace KSS.Core
                 partToSplit.Parent.Children.Remove( partToSplit );
             }*/
             //partToSplit.Parent = null;
-            oldv.RecalculateParts();
 
             // Create the new vessel and add the parts to it.
             Vessel partToSplitVessel = partToSplit.GetVessel();
@@ -170,9 +169,10 @@ namespace KSS.Core
                 partToSplitVessel.PhysicsObject.Velocity,
                 partToSplitVessel.PhysicsObject.AngularVelocity );
 
-            SetVesselHierarchy( partToSplit, v );
+            partToSplit.SetParent( v.transform );
             //partToSplit.SetVesselRecursive( v );
             v.SetRootPart( partToSplit );
+            oldv.RecalculateParts();
             v.RecalculateParts();
 
             return v;
@@ -180,16 +180,5 @@ namespace KSS.Core
 
         // The following helper methods are not required to produce a legal result.
 
-        /// <summary>
-        /// Sets the part hierarchy to reflect being the root of a vessel.
-        /// </summary>
-        private static void SetVesselHierarchy( Transform part, Vessel newVessel )
-        {
-            part.transform.SetParent( newVessel.transform );
-            foreach( Transform cp in part )
-            {
-                SetVesselHierarchy( cp, newVessel );
-            }
-        }
     }
 }

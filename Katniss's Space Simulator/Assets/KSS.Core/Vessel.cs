@@ -68,8 +68,13 @@ namespace KSS.Core
 
         // the active vessel has also glithed out and accelerated to the speed of light at least once after jettisonning the side tanks on the pad.
 
+        [field: SerializeField]
         int PartCount { get; set; } = 0;
+        [SerializeField]
         IHasMass[] _partsWithMass;
+
+        [SerializeField] int temp_partsWithMassLength;
+        [SerializeField]
         Collider[] _partsWithCollider;
 
         public event Action OnAfterRecalculateParts;
@@ -80,6 +85,8 @@ namespace KSS.Core
             {
                 PartCount = 0;
                 _partsWithMass = new IHasMass[] { };
+                _partsWithCollider = new Collider[] { };
+                temp_partsWithMassLength = 0;
                 OnAfterRecalculateParts?.Invoke();
                 return;
             }
@@ -101,6 +108,7 @@ namespace KSS.Core
 
             PartCount = count;
             _partsWithMass = RootPart.GetComponentsInChildren<IHasMass>(); // GetComponentsInChildren might be slower than custom methods? (needs testing)
+            temp_partsWithMassLength = _partsWithMass.Length;
             _partsWithCollider = RootPart.GetComponentsInChildren<Collider>(); // GetComponentsInChildren might be slower than custom methods? (needs testing)
             OnAfterRecalculateParts?.Invoke();
         }

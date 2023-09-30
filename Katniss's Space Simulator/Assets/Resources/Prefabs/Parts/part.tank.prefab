@@ -10,10 +10,10 @@ GameObject:
   m_Component:
   - component: {fileID: 2261676805652714824}
   - component: {fileID: 4963803651901674474}
-  - component: {fileID: 3852526575887378288}
+  - component: {fileID: 7896127776030597572}
   - component: {fileID: 6544856856546271155}
   m_Layer: 0
-  m_Name: part
+  m_Name: part.tank
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -49,7 +49,7 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 2, y: 3, z: 2}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &3852526575887378288
+--- !u!114 &7896127776030597572
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -58,15 +58,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1175757436153444479}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1ba8a5298599c148a6b5258de87a68b, type: 3}
+  m_Script: {fileID: 11500000, guid: 1858aa7f4234f7241a13904bac31eaae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <ID>k__BackingField: part.tank
-  <Vessel>k__BackingField: {fileID: 0}
-  _displayName: tank
-  <Mass>k__BackingField: 75
-  <Parent>k__BackingField: {fileID: 0}
-  <Children>k__BackingField: []
+  _mass: 200
 --- !u!114 &6544856856546271155
 MonoBehaviour:
   m_ObjectHideFlags: 0

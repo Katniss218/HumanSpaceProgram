@@ -16,10 +16,12 @@ using UnityPlus.AssetManagement;
 namespace KSS.UI.Windows
 {
     /// <summary>
-    /// A pop-up window for a <see cref="Core.Part"/>.
+    /// A pop-up window containing the information about some part of a vessel.
     /// </summary>
     public class PartWindow : EventTrigger
     {
+        static List<PartWindow> _activePartWindows = new List<PartWindow>();
+
         /// <summary>
         /// The part that is currently referenced by this part window.
         /// </summary>
@@ -44,7 +46,6 @@ namespace KSS.UI.Windows
             }
 
             Component[] components = ReferencePart.GetComponents<Component>();
-#warning TODO - if reference part has reference redirection, use the list of parts specified in there to draw components.
 
 #warning TODO - Find a better way to overridably bind components to their UI elements.
             // one kinda ugly way would be to put the type in the path.
@@ -68,8 +69,33 @@ namespace KSS.UI.Windows
             }
         }
 
+        public static bool ExistsFor( Transform referencePart )
+        {
+            // Remove destroyed windows, and windows referencing destroyed parts (if any leaked out) from the list.
+            _activePartWindows = _activePartWindows.Where( pw => pw != null && pw.ReferencePart != null ).ToList();
+
+            if( referencePart == null )
+            {
+                throw new ArgumentNullException( nameof( referencePart ), $"Part windows don't exist for nonexistant parts." );
+            }
+
+            foreach( var partWindow in _activePartWindows )
+            {
+                if( partWindow.ReferencePart == referencePart )
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public static PartWindow Create( Transform referencePart )
         {
+            if( referencePart == null )
+            {
+                throw new ArgumentNullException( nameof( referencePart ), $"Can't create a part window for a nonexistent part." );
+            }
+
             UIWindow window = CanvasManager.Get( CanvasName.WINDOWS ).AddWindow( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 300f, 300f ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_window" ) )
                 .Draggable()
                 .Focusable()
@@ -87,6 +113,7 @@ namespace KSS.UI.Windows
             partWindow._list = scrollView;
             partWindow._relationHighlighter = relationHighlight;
             partWindow.SetPart( referencePart );
+            _activePartWindows.Add( partWindow );
 
             return partWindow;
         }

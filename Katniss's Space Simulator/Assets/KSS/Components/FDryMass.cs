@@ -10,6 +10,7 @@ namespace KSS.Components
 {
     public class FDryMass : MonoBehaviour, IHasMass
     {
+        [SerializeField]
         private float _mass;
         public float Mass
         {

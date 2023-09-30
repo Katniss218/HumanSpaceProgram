@@ -9,10 +9,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4889107292375027461}
-  - component: {fileID: 4340100085494843189}
   - component: {fileID: 7246255787398604706}
+  - component: {fileID: 4782972237774635296}
   m_Layer: 0
-  m_Name: part
+  m_Name: part.engine
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -36,24 +36,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4340100085494843189
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1364953004931670300}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1ba8a5298599c148a6b5258de87a68b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  <ID>k__BackingField: part.engine
-  <Vessel>k__BackingField: {fileID: 0}
-  _displayName: engine
-  <Mass>k__BackingField: 100
-  <Parent>k__BackingField: {fileID: 0}
-  <Children>k__BackingField: []
 --- !u!114 &7246255787398604706
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -67,11 +49,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <MaxThrust>k__BackingField: 223000
-  <Isp>k__BackingField: 300
+  <Isp>k__BackingField: 3000
   <Throttle>k__BackingField: 0
   <ThrustTransform>k__BackingField: {fileID: 2836283960901704833}
   <Inflow>k__BackingField:
     _substances: []
+--- !u!114 &4782972237774635296
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1364953004931670300}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1858aa7f4234f7241a13904bac31eaae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mass: 100
 --- !u!1 &3542603688393811688
 GameObject:
   m_ObjectHideFlags: 0

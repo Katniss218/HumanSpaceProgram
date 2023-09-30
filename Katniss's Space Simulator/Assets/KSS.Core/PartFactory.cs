@@ -58,14 +58,14 @@ namespace KSS.Core
             return part;
         }
 
-        public Transform Create( Transform parent, Vector3 vesselPosition, Quaternion vesselRotation )
+        public Transform Create( Transform parent, Vector3 localPosition, Quaternion localRotation )
         {
             if( parent == null )
             {
                 throw new ArgumentNullException( nameof( parent ), $"Parent can't be null." );
             }
 
-            Transform part = Source.Instantiate( parent, vesselPosition, vesselRotation );
+            Transform part = Source.Instantiate( parent, localPosition, localRotation );
             //part.SetVesselRecursive( parent.Vessel );
 
             //part.Parent = parent;
