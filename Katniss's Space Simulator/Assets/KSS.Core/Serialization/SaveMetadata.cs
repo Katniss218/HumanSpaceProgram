@@ -41,48 +41,34 @@ namespace KSS.Core.Serialization
         /// </summary>
         public readonly string SaveID;
 
-        SaveMetadata( string timelineId, string saveId )
+        public SaveMetadata( string timelineId, string saveId )
         {
             this.TimelineID = timelineId;
             this.SaveID = saveId;
         }
 
         /// <summary>
-        /// Computes the file path for a given timeline ID.
+        /// Root directory is the directory that contains the _save.json file.
         /// </summary>
-        public static string GetPath( string timelineId, string saveId )
+        public string GetRootDirectory()
         {
-            return Path.Combine( HumanSpaceProgram.GetSaveDirectoryPath(), timelineId, saveId );
+            return GetRootDirectory( this.TimelineID, this.SaveID );
         }
 
         /// <summary>
-        /// Creates a new empty <see cref="SaveMetadata"/> that points to the specified save. Does not initialize any display parameters.
+        /// Root directory is the directory that contains the _save.json file.
         /// </summary>
-        /// <param name="validPath">The path to use to parse out the timeline and save IDs.</param>
-        public static SaveMetadata EmptyFromFilePath( string validPath )
+        public static string GetRootDirectory( string timelineId, string saveId )
         {
-            string[] split = validPath.Split( new char[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries );
+            return Path.Combine( TimelineMetadata.GetRootDirectory( timelineId ), saveId );
+        }
 
-            int savesIndex = -1;
-            for( int i = 0; i < split.Length; i++ )
-            {
-                if( split[i] == HumanSpaceProgram.SavesDirectoryName )
-                {
-                    savesIndex = i;
-                    break;
-                }
-            }
-
-            if( savesIndex <= 0 || savesIndex >= split.Length )
-            {
-                throw new ArgumentException( $"The path `{validPath}` doesn't contain the `{HumanSpaceProgram.SavesDirectoryName}` directory." );
-            }
-            if( savesIndex >= split.Length - 2 )
-            {
-                throw new ArgumentException( $"The path `{validPath}` points directly to the `{HumanSpaceProgram.SavesDirectoryName}` directory. It must point to a specific save of a specific timeline." );
-            }
-
-            return new SaveMetadata( split[savesIndex + 1], split[savesIndex + 2] ); // `Saves/<timelineId>/<saveId>/_save.json`
+        /// <summary>
+        /// Returns the file path to the directory containing the saves of a given timeline.
+        /// </summary>
+        public static string GetSavesPath( string timelineId )
+        {
+            return TimelineMetadata.GetRootDirectory( timelineId );
         }
 
         /// <summary>
@@ -91,43 +77,54 @@ namespace KSS.Core.Serialization
         /// <param name="timelineId">The timeline ID to get the saves for.</param>
         public static IEnumerable<SaveMetadata> ReadAllSaves( string timelineId )
         {
-            string timelinePath = TimelineMetadata.GetSavesPath( timelineId );
+            string savesPath = GetSavesPath( timelineId );
 
             string[] potentialSaves;
             try
             {
-                potentialSaves = Directory.GetDirectories( timelinePath );
+                potentialSaves = Directory.GetDirectories( savesPath );
             }
             catch
             {
-                Debug.LogWarning( $"Couldn't open `{timelinePath}` directory." );
+                Debug.LogWarning( $"Couldn't open `{savesPath}` directory." );
 
                 return new SaveMetadata[] { };
             }
 
             List<SaveMetadata> saves = new List<SaveMetadata>();
 
-            foreach( var save in potentialSaves )
+            foreach( var saveDirName in potentialSaves )
             {
                 try
                 {
-                    string path = Path.Combine( save, SAVE_FILENAME );
+                    string path = Path.Combine( saveDirName, SAVE_FILENAME );
 
                     string saveJson = File.ReadAllText( path );
 
                     SerializedData data = new JsonStringReader( saveJson ).Read();
 
-                    SaveMetadata saveMetadata = SaveMetadata.EmptyFromFilePath( path );
+                    SaveMetadata saveMetadata = new SaveMetadata( timelineId, saveDirName );
                     saveMetadata.SetData( data );
                     saves.Add( saveMetadata );
                 }
                 catch
                 {
-                    Debug.LogWarning( $"Couldn't load save `{save}`." );
+                    Debug.LogWarning( $"Couldn't load save `{saveDirName}`." );
                 }
             }
 
             return saves;
+        }
+
+        public void WriteToDisk()
+        {
+            string savePath = GetRootDirectory();
+            string saveFilePath = Path.Combine( savePath, SAVE_FILENAME );
+
+            StringBuilder sb = new StringBuilder();
+            new JsonStringWriter( this.GetData(), sb ).Write();
+
+            File.WriteAllText( saveFilePath, sb.ToString(), Encoding.UTF8 );
         }
 
         public void SetData( SerializedData data )

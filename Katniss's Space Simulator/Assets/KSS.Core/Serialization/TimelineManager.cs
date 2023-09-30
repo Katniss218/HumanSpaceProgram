@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityPlus.OverridableEvents;
 using UnityPlus.Serialization;
@@ -96,8 +97,16 @@ namespace KSS.Core.Serialization
 
             CreateDefaultSaver();
 
+            _serializationStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "objects.json" );
+            _serializationStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "data.json" );
+            if( !Directory.Exists( SaveMetadata.GetRootDirectory( timelineId, saveId ) ) )
+            {
+                Directory.CreateDirectory( SaveMetadata.GetRootDirectory( timelineId, saveId ) );
+            }
             HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_SAVE, _saver );
 
+            // write timeline.json to disk
+            // write save.json to disk.
             _saver.SaveAsync( Instance );
 
             HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_SAVE, _saver );
@@ -118,12 +127,18 @@ namespace KSS.Core.Serialization
                 throw new InvalidOperationException( $"Can't start loading while already saving/loading." );
             }
 
-            TimelineMetadata loadedTimeline = TimelineMetadata.EmptyFromFilePath( TimelineMetadata.GetSavesPath( timelineId ) );
+            TimelineMetadata loadedTimeline = new TimelineMetadata( timelineId );
+#warning TODO - load timeline's metadata too.
 
             CreateDefaultLoader();
 
+            _serializationStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "objects.json" );
+            _serializationStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "data.json" );
+            if( !Directory.Exists( SaveMetadata.GetRootDirectory( timelineId, saveId ) ) )
+            {
+                Directory.CreateDirectory( SaveMetadata.GetRootDirectory( timelineId, saveId ) );
+            }
             HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_LOAD, _loader );
-
             _loader.LoadAsync( Instance );
             CurrentTimeline = loadedTimeline;
 
@@ -144,7 +159,7 @@ namespace KSS.Core.Serialization
                 throw new InvalidOperationException( $"Can't start loading while already saving/loading." );
             }
 
-            TimelineMetadata newTimeline = TimelineMetadata.EmptyFromFilePath( TimelineMetadata.GetSavesPath( timelineId ) );
+            TimelineMetadata newTimeline = new TimelineMetadata( timelineId );
 
             HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_NEW );
 
