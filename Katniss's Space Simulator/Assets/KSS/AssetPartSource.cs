@@ -21,7 +21,7 @@ namespace KSS
         {
         }
 
-        public override Part Instantiate( Transform parent, Vector3 localPosition, Quaternion localRotation )
+        public override Transform Instantiate( Transform parent, Vector3 localPosition, Quaternion localRotation )
         {
 #warning TODO - Use UnityPlus.AssetManagement.AssetRegistry, since part prefabs are assets.
             if( _objCache == null )
@@ -30,15 +30,11 @@ namespace KSS
             }
 
             GameObject partGO = UnityEngine.Object.Instantiate( _objCache, parent );
-            Part part = partGO.GetComponent<Part>();
-            if( part == null )
-            {
-                throw new InvalidOperationException( $"Tried to instantiate a part from a prefab asset at the path '{PATH + PartID}', that didn't have a {nameof( Part )} component." );
-            }
+
             partGO.transform.localPosition = localPosition;
             partGO.transform.localRotation = localRotation;
 
-            return part;
+            return partGO.transform;
         }
     }
 }

@@ -61,8 +61,6 @@
     <Compile Include="Assets\KSS.Core\Buildings\LaunchSiteFactory.cs" />
     <Compile Include="Assets\KSS.Core\Vessel.Serialization.cs" />
     <Compile Include="Assets\KSS.Core\Physics\PhysicsObject.cs" />
-    <Compile Include="Assets\KSS.Core\PartFactory.cs" />
-    <Compile Include="Assets\KSS.Core\Part.Serialization.cs" />
     <Compile Include="Assets\KSS.Core\Serialization\TimelineMetadata.cs" />
     <Compile Include="Assets\KSS.Core\HSPEvent.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\FluidState.cs" />
@@ -71,7 +69,6 @@
     <Compile Include="Assets\KSS.Core\SceneManagement\GameplayManager.cs" />
     <Compile Include="Assets\KSS.Core\CelestialBodyFactory.cs" />
     <Compile Include="Assets\KSS.Core\Serialization\TimelineManager.cs" />
-    <Compile Include="Assets\KSS.Core\Part.cs" />
     <Compile Include="Assets\KSS.Core\Mods\ModLoader.cs" />
     <Compile Include="Assets\KSS.Core\HSPEventListenerAttribute.cs" />
     <Compile Include="Assets\KSS.Core\CoordinateUtils.cs" />
@@ -104,6 +101,7 @@
     <Compile Include="Assets\KSS.Core\CelestialBody.cs" />
     <Compile Include="Assets\KSS.Core\Serialization\IOHelper.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\SubstanceStateCollection.cs" />
+    <Compile Include="Assets\KSS.Core\PartFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.Core\___KSS.Core.asmdef" />

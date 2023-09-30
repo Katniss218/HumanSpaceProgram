@@ -8,6 +8,24 @@ using UnityEngine;
 
 namespace KSS.Core
 {
+    public static class VesselEx
+    {
+        public static bool IsRootOfVessel( this Transform part )
+        {
+            if( part.root != part.parent )
+                return false;
+            Vessel v = part.parent.GetComponent<Vessel>();
+            if( v == null )
+                return false;
+            return v.RootPart == part;
+        }
+
+        public static Vessel GetVessel( this Transform part )
+        {
+            return part.root.GetComponent<Vessel>();
+        }
+    }
+
     // Do not add RootObjectTransform explicitly *before* PhysicsObject. it messes up the initialization and rigidbody is not cached at the right time.
     [RequireComponent( typeof( PhysicsObject ) )]
     public sealed partial class Vessel : MonoBehaviour
@@ -24,13 +42,7 @@ namespace KSS.Core
         }
 
         [field: SerializeField]
-        public Part RootPart { get; private set; }
-
-        [field: SerializeField]
-        public IEnumerable<Part> Parts { get; private set; }
-
-        [field: SerializeField]
-        public int PartCount { get; private set; }
+        public Transform RootPart { get; private set; }
 
         public PhysicsObject PhysicsObject { get; private set; }
         public RootObjectTransform RootObjTransform { get; private set; }
@@ -38,13 +50,13 @@ namespace KSS.Core
         public Vector3Dbl AIRFPosition { get => this.RootObjTransform.GetAIRFPosition(); }
 
         /// <remarks>
-        /// DO NOT USE. This is for internal use, and can produce an invalid state. Use <see cref="VesselStateUtils.SetParent(Part, Part)"/> instead.
+        /// DO NOT USE. This is for internal use, and can produce an invalid state. Use <see cref="VesselStateUtils.SetParent(Transform, Transform)"/> instead.
         /// </remarks>
-        internal void SetRootPart( Part part )
+        internal void SetRootPart( Transform part )
         {
-            if( part != null && part.Vessel != this )
+            if( part != null && part.GetVessel() != this )
             {
-                throw new ArgumentException( $"Can't set the part '{part}' from vessel '{part.Vessel}' as root. The part is not a part of this vessel." );
+                throw new ArgumentException( $"Can't set the part '{part}' from vessel '{part.GetVessel()}' as root. The part is not a part of this vessel." );
             }
 
             RootPart = part;
@@ -56,56 +68,60 @@ namespace KSS.Core
 
         // the active vessel has also glithed out and accelerated to the speed of light at least once after jettisonning the side tanks on the pad.
 
+        int PartCount { get; set; } = 0;
+        IHasMass[] _partsWithMass;
+        Collider[] _partsWithCollider;
+
+        public event Action OnAfterRecalculateParts;
+
         public void RecalculateParts()
         {
-            // take root and traverse its hierarchy to add up all parts.
-
             if( RootPart == null )
             {
                 PartCount = 0;
+                _partsWithMass = new IHasMass[] { };
+                OnAfterRecalculateParts?.Invoke();
                 return;
             }
 
             int count = 0;
-            Stack<Part> stack = new Stack<Part>();
+            Stack<Transform> stack = new Stack<Transform>();
             stack.Push( RootPart );
-            List<Part> parts = new List<Part>();
 
             while( stack.Count > 0 )
             {
-                Part p = stack.Pop();
-                parts.Add( p );
+                Transform part = stack.Pop();
                 count++;
 
-                foreach( Part cp in p.Children )
+                foreach( Transform childPart in part )
                 {
-                    stack.Push( cp );
+                    stack.Push( childPart );
                 }
             }
 
-            this.Parts = parts;
             PartCount = count;
+            _partsWithMass = RootPart.GetComponentsInChildren<IHasMass>(); // GetComponentsInChildren might be slower than custom methods? (needs testing)
+            _partsWithCollider = RootPart.GetComponentsInChildren<Collider>(); // GetComponentsInChildren might be slower than custom methods? (needs testing)
+            OnAfterRecalculateParts?.Invoke();
         }
 
         /// <summary>
         /// Returns the local space center of mass, and the mass [kg] itself.
         /// </summary>
-        public (Vector3 localCenterOfMass, float mass) CalculateMassInfo()
+        public (Vector3 localCenterOfMass, float mass) RecalculateMass()
         {
-            Vector3 com = Vector3.zero;
+            Vector3 centerOfMass = Vector3.zero;
             float mass = 0;
-            foreach( var part in this.Parts )
+            foreach( var massivePart in this._partsWithMass )
             {
-                // physicsless parts may be `continue`'d here.
-
-                com += part.transform.localPosition * part.Mass;
-                mass += part.Mass;
+                centerOfMass += this.transform.InverseTransformPoint( massivePart.transform.position ) * massivePart.Mass; // potentially precision issues if vessel is far away from origin.
+                mass += massivePart.Mass;
             }
             if( mass > 0 )
             {
-                com /= mass;
+                centerOfMass /= mass;
             }
-            return (com, mass);
+            return (centerOfMass, mass);
         }
 
         /// <summary>
@@ -129,13 +145,12 @@ namespace KSS.Core
         /// </summary>
         public Vector3 GetBottomPosition()
         {
-            Vector3 dir = this.transform.position - (this.transform.up * 500f);
+            Vector3 dir = this.transform.position - (this.transform.up * 500f); // can bug out for large vessels. need to take the point relative to the center and size of the currently checked collider.
             Vector3 min = this.transform.position;
             float minDist = float.MaxValue;
-            Collider[] cols = this.GetComponentsInChildren<Collider>();
-            foreach( var col in cols )
+            foreach( var collider in _partsWithCollider )
             {
-                Vector3 closestBound = col.ClosestPointOnBounds( dir );
+                Vector3 closestBound = collider.ClosestPointOnBounds( dir );
                 float dst = Vector3.Distance( dir, closestBound );
                 if( dst < minDist )
                 {
@@ -144,9 +159,6 @@ namespace KSS.Core
                 }
             }
             return min;
-
-            //Vector3 closestBound = this.PhysicsObject.ClosestPointOnBounds( this.transform.position - (this.transform.up * 500f) );
-            //return closestBound;
         }
 
         void Awake()
@@ -157,7 +169,7 @@ namespace KSS.Core
 
         void SetPhysicsObjectParameters()
         {
-            (Vector3 comLocal, float mass) = this.CalculateMassInfo();
+            (Vector3 comLocal, float mass) = this.RecalculateMass();
             this.PhysicsObject.LocalCenterOfMass = comLocal;
             this.PhysicsObject.Mass = mass;
         }

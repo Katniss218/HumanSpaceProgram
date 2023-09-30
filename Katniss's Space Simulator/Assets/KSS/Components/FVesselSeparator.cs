@@ -3,19 +3,19 @@ using System;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace KSS.Functionalities
+namespace KSS.Components
 {
     public class FVesselSeparator : MonoBehaviour, IPersistent
     {
         Vessel v;
-        Part p;
+        Transform p;
 
         bool _separated = false;
 
         void Start()
         {
-            p = this.GetComponent<Part>();
-            v = this.transform.parent.GetComponent<Vessel>();
+            p = this.transform;
+            v = this.transform.GetVessel();
         }
 
         void Update()
@@ -26,7 +26,7 @@ namespace KSS.Functionalities
             }
             if( Input.GetKeyDown( KeyCode.Space ) )
             {
-#warning TODO - disconnect pipes, and stuff. Probably event based.
+#warning TODO - disconnect pipes, and stuff. Use 'OnVesselSeparate' and 'OnVesselJoin' events.
 
                 VesselStateUtils.SetParent( p, null );
             }

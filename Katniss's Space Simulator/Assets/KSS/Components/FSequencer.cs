@@ -4,7 +4,7 @@ using System.Reflection;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace KSS.Functionalities
+namespace KSS.Components
 {
     [Obsolete( "It's a prototype" )]
     public class KeyboardSequenceElement : Sequence.Element

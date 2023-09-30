@@ -3,17 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace KSS.Core
 {
     /// <summary>
-    /// Specifies a component that can have its mass changed by other components.
+    /// Specifies that a component has mass.
     /// </summary>
-    public interface IHasMass
+    public interface IHasMass : IComponent
     {
+        public delegate void MassChange( float massDelta );
+
         /// <summary>
-        /// The total mass of the object.
+        /// The total mass of the component.
         /// </summary>
-        public float Mass { get; set; }
+        float Mass { get; }
+
+        event MassChange OnAfterMassChanged;
     }
 }

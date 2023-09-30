@@ -31,7 +31,7 @@ namespace KSS.Core
         /// </remarks>
         /// <param name="part">The part to set as a child of <paramref name="parentPart"/>.</param>
         /// <param name="parentPart">The part to set as the parent of <paramref name="part"/></param>
-        public static void SetParent( Part part, Part parentPart )
+        public static void SetParent( Transform part, Transform parentPart )
         {
             if( part == null )
             {
@@ -44,7 +44,7 @@ namespace KSS.Core
                 // We could detach the parts from the vessel entirely, but that's not a legal state.
                 // We could create a new vessel with the specified part as its root.
 
-                if( part.IsRootOfVessel )
+                if( part.IsRootOfVessel() )
                 {
                     // create a new vessel, but the part is already the root of a new vessel. This is equivalent to recreating the original vessel and deleting the old one (i.e. a "do nothing").
                     return;
@@ -54,9 +54,9 @@ namespace KSS.Core
                 return;
             }
 
-            if( part.Vessel == parentPart.Vessel )
+            if( part.GetVessel() == parentPart.GetVessel() )
             {
-                if( part.IsRootOfVessel )
+                if( part.IsRootOfVessel() )
                 {
                     SwapRoots( part, parentPart ); // Re-rooting as in KSP would be `Reparent( newRoot.Vessel.RootPart, newRoot )`
                 }
@@ -67,7 +67,7 @@ namespace KSS.Core
             }
             else
             {
-                if( part.IsRootOfVessel )
+                if( part.IsRootOfVessel() )
                 {
                     JoinVesselsRoot( part, parentPart );
                 }
@@ -83,40 +83,41 @@ namespace KSS.Core
         /// <summary>
         /// Parents oldRoot to newRoot, and makes newRoot the root on the vessel.
         /// </summary>
-        private static void SwapRoots( Part oldRoot, Part newRoot )
+        private static void SwapRoots( Transform oldRoot, Transform newRoot )
         {
-            Contract.Assert( oldRoot.Vessel == newRoot.Vessel );
-            Contract.Assert( oldRoot.IsRootOfVessel );
-            Contract.Assert( !newRoot.IsRootOfVessel );
+            Contract.Assert( oldRoot.GetVessel() == newRoot.GetVessel() );
+            Contract.Assert( oldRoot.IsRootOfVessel() );
+            Contract.Assert( !newRoot.IsRootOfVessel() );
 
-            newRoot.Vessel.SetRootPart( newRoot );
+            newRoot.GetVessel().SetRootPart( newRoot );
             Reattach( oldRoot, newRoot );
-            newRoot.Parent.Children.Remove( newRoot ); // since it's not a root, it will have a parent.
-            newRoot.Parent = null;
+            //newRoot.Parent.Children.Remove( newRoot ); // since it's not a root, it will have a parent.
+            //newRoot.Parent = null;
         }
 
         /// <summary>
         /// Attaches the part to the parent (assuming both are on the same vessel, and part is not its root).
         /// </summary>
-        private static void Reattach( Part part, Part parent )
+        private static void Reattach( Transform part, Transform parent )
         {
-            Contract.Assert( part.Vessel == parent.Vessel );
-            Contract.Assert( !part.IsRootOfVessel );
+            Contract.Assert( part.GetVessel() == parent.GetVessel() );
+            Contract.Assert( !part.IsRootOfVessel() );
 
-            if( part.Parent != null )
+            /*if( part.parent != null )
             {
                 part.Parent.Children.Remove( part );
-            }
-            part.Parent = parent;
-            part.Parent.Children.Add( part );
+            }*/
+            part.SetParent( parent );
+            //part.Parent = parent;
+            //part.Parent.Children.Add( part );
         }
 
-        private static void JoinVesselsRoot( Part partToJoin, Part parent )
+        private static void JoinVesselsRoot( Transform partToJoin, Transform parent )
         {
-            Contract.Assert( partToJoin.Vessel != parent.Vessel );
-            Contract.Assert( partToJoin.IsRootOfVessel );
+            Contract.Assert( partToJoin.GetVessel() != parent.GetVessel() );
+            Contract.Assert( partToJoin.IsRootOfVessel() );
 
-            Vessel oldVessel = partToJoin.Vessel;
+            Vessel oldVessel = partToJoin.GetVessel();
             oldVessel.SetRootPart( null ); // needed for the assert in the next method.
 
             JoinVesselsNotRoot( partToJoin, parent );
@@ -128,48 +129,49 @@ namespace KSS.Core
         /// <summary>
         /// Joins the partToJoin to parent's vessel, using the parent as the parent for partToJoin.
         /// </summary>
-        private static void JoinVesselsNotRoot( Part partToJoin, Part parent )
+        private static void JoinVesselsNotRoot( Transform partToJoin, Transform parent )
         {
-            Contract.Assert( partToJoin.Vessel != parent.Vessel );
-            Contract.Assert( !partToJoin.IsRootOfVessel );
+            Contract.Assert( partToJoin.GetVessel() != parent.GetVessel() );
+            Contract.Assert( !partToJoin.IsRootOfVessel() );
             // Move partToJoin to parent's vessel.
             // Attach partToJoin to parent.
 
-            Vessel oldv = partToJoin.Vessel;
-            partToJoin.SetVesselRecursive( parent.Vessel );
+            Vessel oldv = partToJoin.GetVessel();
+            //partToJoin.SetVesselRecursive( GetVessel( parent ) );
             Reattach( partToJoin, parent );
-            SetVesselHierarchy( partToJoin, parent.Vessel );
+            SetVesselHierarchy( partToJoin, parent.GetVessel() );
 
             oldv.RecalculateParts();
-            parent.Vessel.RecalculateParts();
+            //parent.Vessel.RecalculateParts();
         }
 
         /// <summary>
         /// Splits off the part from its original vessel, and makes a new vessel with it as its root.
         /// </summary>
-        private static Vessel MakeNewVessel( Part partToSplit )
+        private static Vessel MakeNewVessel( Transform partToSplit )
         {
-            Contract.Assert( !partToSplit.IsRootOfVessel );
+            Contract.Assert( !partToSplit.IsRootOfVessel() );
 
             // Detach the parts from the old vessel.
-            Vessel oldv = partToSplit.Vessel;
-            if( partToSplit.Parent != null )
+            Vessel oldv = partToSplit.GetVessel();
+            /*if( partToSplit.Parent != null )
             {
                 partToSplit.Parent.Children.Remove( partToSplit );
-            }
-            partToSplit.Parent = null;
+            }*/
+            //partToSplit.Parent = null;
             oldv.RecalculateParts();
 
             // Create the new vessel and add the parts to it.
+            Vessel partToSplitVessel = partToSplit.GetVessel();
             Vessel v = new VesselFactory().CreatePartless(
                 SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( partToSplit.transform.position ),
                 SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( partToSplit.transform.rotation ),
-#warning TODO - get velocity of part (correctly works for spinning vessels).
-                partToSplit.Vessel.PhysicsObject.Velocity,
-                partToSplit.Vessel.PhysicsObject.AngularVelocity);
+#warning TODO - Use linear and angular velocities of part that works correctly for spinning vessels.
+                partToSplitVessel.PhysicsObject.Velocity,
+                partToSplitVessel.PhysicsObject.AngularVelocity );
 
             SetVesselHierarchy( partToSplit, v );
-            partToSplit.SetVesselRecursive( v );
+            //partToSplit.SetVesselRecursive( v );
             v.SetRootPart( partToSplit );
             v.RecalculateParts();
 
@@ -181,10 +183,10 @@ namespace KSS.Core
         /// <summary>
         /// Sets the part hierarchy to reflect being the root of a vessel.
         /// </summary>
-        private static void SetVesselHierarchy( Part part, Vessel newVessel )
+        private static void SetVesselHierarchy( Transform part, Vessel newVessel )
         {
             part.transform.SetParent( newVessel.transform );
-            foreach( var cp in part.Children )
+            foreach( Transform cp in part )
             {
                 SetVesselHierarchy( cp, newVessel );
             }

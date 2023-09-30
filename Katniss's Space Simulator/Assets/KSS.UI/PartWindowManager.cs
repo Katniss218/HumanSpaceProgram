@@ -28,8 +28,8 @@ namespace KSS.UI
                     return;
                 }
 
-                Part part = hit.collider.GetComponentInParent<Part>();
-                if( part == null )
+                Transform part = hit.collider.transform;
+                if( part.GetVessel() == null )
                 {
                     return;
                 }
@@ -38,7 +38,7 @@ namespace KSS.UI
 
                 foreach( var pw in _partWindows )
                 {
-                    if( pw.Part == part )
+                    if( pw.ReferencePart == part )
                     {
                         return;
                     }

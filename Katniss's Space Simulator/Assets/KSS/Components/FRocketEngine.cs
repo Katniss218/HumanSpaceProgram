@@ -4,7 +4,7 @@ using System;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace KSS.Functionalities
+namespace KSS.Components
 {
     [Serializable]
     public class FRocketEngine : MonoBehaviour, IResourceConsumer, IPersistent
@@ -42,8 +42,6 @@ namespace KSS.Functionalities
         [field: SerializeField]
         public SubstanceStateCollection Inflow { get; private set; } = SubstanceStateCollection.Empty;
 
-        Part _part;
-
         /// <summary>
         /// Returns the actual thrust at this moment in time.
         /// </summary>
@@ -58,16 +56,6 @@ namespace KSS.Functionalities
             this.Throttle = value;
         }*/
 
-        private void Awake()
-        {
-            _part = this.GetComponent<Part>();
-            if( _part == null )
-            {
-                Destroy( this );
-                throw new InvalidOperationException( $"{nameof( FRocketEngine )} can only be added to a part." );
-            }
-        }
-
         void Update()
         {
             if( Input.GetKeyDown( KeyCode.W ) )
@@ -81,7 +69,11 @@ namespace KSS.Functionalities
             float thrust = GetThrust( Inflow.GetMass() );
             if( this.Throttle > 0.0f )
             {
-                this._part.Vessel.PhysicsObject.AddForceAtPosition( this.ThrustTransform.forward * thrust, this.ThrustTransform.position );
+                Vessel vessel = this.transform.GetVessel();
+                if( vessel != null )
+                {
+                    vessel.PhysicsObject.AddForceAtPosition( this.ThrustTransform.forward * thrust, this.ThrustTransform.position );
+                }
             }
             _currentThrust = thrust;
         }

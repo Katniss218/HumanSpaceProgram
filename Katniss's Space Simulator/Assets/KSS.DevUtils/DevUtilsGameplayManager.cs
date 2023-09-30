@@ -3,7 +3,7 @@ using KSS.Core;
 using KSS.Core.Buildings;
 using KSS.Core.ReferenceFrames;
 using KSS.Core.ResourceFlowSystem;
-using KSS.Functionalities;
+using KSS.Components;
 using KSS.CelestialBodies.Surface;
 using UnityEngine;
 using UnityEngine.UI;
@@ -82,7 +82,7 @@ namespace KSS.DevUtils
             Vector3Dbl pos = spawnerPosAirf + closestBoundToVesselAirf;
             v.SetPosition( pos );
 
-            VesselManager.ActiveVessel = v.RootPart.Vessel;
+            VesselManager.ActiveVessel = v.RootPart.GetVessel();
             FindObjectOfType<CameraController>().ReferenceObject = v.RootPart.transform;
 
             VesselManager.ActiveVessel.transform.GetComponent<Rigidbody>().angularDrag = 1; // temp, doesn't veer off course.
@@ -98,13 +98,13 @@ namespace KSS.DevUtils
             PartFactory engine = new PartFactory( new AssetPartSource( "part.engine" ) );
 
             Vessel v = fac.CreatePartless( airfPosition, rotation, Vector3.zero, Vector3.zero );
-            Part root = intertank.CreateRoot( v );
+            Transform root = intertank.CreateRoot( v );
 
-            Part tankP = tank.Create( root, new Vector3( 0, -1.625f, 0 ), Quaternion.identity );
-            Part tankL1 = tankLong.Create( root, new Vector3( 0, 2.625f, 0 ), Quaternion.identity );
-            var t1 = tankLong.Create( root, new Vector3( 2, 2.625f, 0 ), Quaternion.identity );
-            var t2 = tankLong.Create( root, new Vector3( -2, 2.625f, 0 ), Quaternion.identity );
-            Part engineP = engine.Create( tankP, new Vector3( 0, -3.45533f, 0 ), Quaternion.identity );
+            Transform tankP = tank.Create( root, new Vector3( 0, -1.625f, 0 ), Quaternion.identity );
+            Transform tankL1 = tankLong.Create( root, new Vector3( 0, 2.625f, 0 ), Quaternion.identity );
+            Transform t1 = tankLong.Create( root, new Vector3( 2, 2.625f, 0 ), Quaternion.identity );
+            Transform t2 = tankLong.Create( root, new Vector3( -2, 2.625f, 0 ), Quaternion.identity );
+            Transform engineP = engine.Create( tankP, new Vector3( 0, -3.45533f, 0 ), Quaternion.identity );
 
             FBulkConnection conn = tankP.gameObject.AddComponent<FBulkConnection>();
             conn.End1.ConnectTo( tankL1.GetComponent<FBulkContainer_Sphere>() );

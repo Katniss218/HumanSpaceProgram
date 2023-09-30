@@ -6,7 +6,7 @@ using System;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace KSS.Functionalities
+namespace KSS.Components
 {
     /// <summary>
     /// An object that connects two containers and calculates the resource flow between them.
@@ -234,10 +234,10 @@ namespace KSS.Functionalities
                 throw new InvalidOperationException( $"Both ends must exist" );
             }
 
-            Part part = this.GetComponent<Part>();
-            Vector3Dbl airfAcceleration = GravityUtils.GetGravityAcceleration( part.Vessel.AIRFPosition );
+            Vessel vessel = this.transform.GetVessel();
+            Vector3Dbl airfAcceleration = GravityUtils.GetGravityAcceleration( vessel.AIRFPosition );
             Vector3 sceneAcceleration = SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformVector( (Vector3)airfAcceleration );
-            Vector3 vesselAcceleration = part.Vessel.PhysicsObject.Acceleration;
+            Vector3 vesselAcceleration = vessel.PhysicsObject.Acceleration;
 
             // acceleration due to external forces (gravity) minus the acceleration of the vessel.
             sceneAcceleration -= vesselAcceleration;

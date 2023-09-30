@@ -3,7 +3,7 @@ using System;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace KSS.Functionalities
+namespace KSS.Components
 {
     public class FActuatorXY : MonoBehaviour, IPersistent
     {

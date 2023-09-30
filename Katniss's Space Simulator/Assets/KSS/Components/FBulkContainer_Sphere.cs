@@ -5,7 +5,7 @@ using System.Diagnostics.Contracts;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace KSS.Functionalities
+namespace KSS.Components
 {
     /// <summary>
     /// A container for a <see cref="Substance"/>.
@@ -102,30 +102,18 @@ namespace KSS.Functionalities
             return (flow, new FluidState( relativePressure, state.Temperature, newSignedVelocity ));
         }
 
-        IHasMass[] _massComponents;
+        public float Mass { get => Contents.GetMass(); }
 
-        void Start()
-        {
-            _massComponents = this.GetComponents<IHasMass>();
-
-            foreach( var mc in _massComponents )
-            {
-                mc.Mass += Contents.GetMass();
-            }
-        }
+        public event IHasMass.MassChange OnAfterMassChanged;
 
         void FixedUpdate()
         {
             Contract.Assert( Contents != null, $"[{nameof( FBulkContainer_Sphere )}.{nameof( Sample )}] '{nameof( Contents )}' can't be null." );
 
+            float oldMass = this.Mass;
             Contents.Add( Outflow, -Time.fixedDeltaTime );
             Contents.Add( Inflow, Time.fixedDeltaTime );
-
-            foreach( var mc in _massComponents )
-            {
-                mc.Mass -= Outflow.GetMass() * Time.fixedDeltaTime;
-                mc.Mass += Inflow.GetMass() * Time.fixedDeltaTime;
-            }
+            OnAfterMassChanged?.Invoke( this.Mass - oldMass );
         }
 
         public void SetData( ILoader l, SerializedData data )
