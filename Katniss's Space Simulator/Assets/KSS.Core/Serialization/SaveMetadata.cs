@@ -23,6 +23,15 @@ namespace KSS.Core.Serialization
         public const string PERSISTENT_SAVE_ID = "___persistent";
 
         /// <summary>
+        /// The unique ID of this specific save's timeline.
+        /// </summary>
+        public readonly string TimelineID;
+        /// <summary>
+        /// The unique ID of this specific save.
+        /// </summary>
+        public readonly string SaveID;
+
+        /// <summary>
         /// The display name shown in the GUI.
         /// </summary>
         public string Name { get; set; }
@@ -32,14 +41,7 @@ namespace KSS.Core.Serialization
         /// </summary>
         public string Description { get; set; }
 
-        /// <summary>
-        /// The unique ID of this specific save's timeline.
-        /// </summary>
-        public readonly string TimelineID;
-        /// <summary>
-        /// The unique ID of this specific save.
-        /// </summary>
-        public readonly string SaveID;
+        public string SaveVersion { get; set; }
 
         public SaveMetadata( string timelineId, string saveId )
         {

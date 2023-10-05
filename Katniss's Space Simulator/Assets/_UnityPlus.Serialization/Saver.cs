@@ -58,7 +58,7 @@ namespace UnityPlus.Serialization
         /// Call this to map an object to an ID when saving an object reference.
         /// </remarks>
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public Guid GetID( object obj )
+        public Guid GetReferenceID( object obj )
         {
             if( _currentState == ISaver.State.Idle )
             {
@@ -73,6 +73,23 @@ namespace UnityPlus.Serialization
             Guid newID = Guid.NewGuid();
             _objectToGuid.Add( obj, newID );
             return newID;
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public Guid GetReferenceID( object obj, Guid guid )
+        {
+            if( _currentState == ISaver.State.Idle )
+            {
+                throw new InvalidOperationException( $"Can't save an object (or its ID) when the saver is idle." );
+            }
+
+            if( _objectToGuid.TryGetValue( obj, out Guid id ) ) // if registered, return old guid.
+            {
+                return id;
+            }
+
+            _objectToGuid.Add( obj, guid );
+            return guid;
         }
 
         //

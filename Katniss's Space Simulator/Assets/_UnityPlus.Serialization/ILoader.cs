@@ -47,9 +47,10 @@ namespace UnityPlus.Serialization
         /// Registers the specified object with the specified ID.
         /// </summary>
         /// <remarks>
-        /// Call this method when loading an object that might be referenced.
+        /// Call this method when loading an object that might be referenced. <br />
+        /// Implementations should throw an exception if the object is already registered.
         /// </remarks>
-        void SetID( object obj, Guid id );
+        void SetReferenceID( object obj, Guid id );
 
         /// <summary>
         /// Returns the previously registered object.

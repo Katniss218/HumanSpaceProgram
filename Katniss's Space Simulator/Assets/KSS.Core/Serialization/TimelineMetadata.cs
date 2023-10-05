@@ -18,6 +18,11 @@ namespace KSS.Core.Serialization
         public const string TIMELINE_FILENAME = "_timeline.json";
 
         /// <summary>
+        /// The unique ID of this specific timeline.
+        /// </summary>
+        public readonly string TimelineID;
+
+        /// <summary>
         /// The display name shown in the GUI.
         /// </summary>
         public string Name { get; set; }
@@ -26,11 +31,6 @@ namespace KSS.Core.Serialization
         /// The description shown in the GUI.
         /// </summary>
         public string Description { get; set; }
-
-        /// <summary>
-        /// The unique ID of this specific timeline.
-        /// </summary>
-        public readonly string TimelineID;
 
         public TimelineMetadata( string timelineId )
         {

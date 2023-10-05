@@ -71,7 +71,7 @@ namespace UnityPlus.Serialization
         /// Call this method when loading an object that might be referenced.
         /// </remarks>
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public void SetID( object obj, Guid id )
+        public void SetReferenceID( object obj, Guid id )
         {
             if( CurrentState != ILoader.State.LoadingObjects )
             {

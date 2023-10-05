@@ -29,7 +29,9 @@ namespace KSS.Core.Serialization
         }
         #endregion
 
-        static readonly JsonExplicitHierarchyStrategy _serializationStrat = new JsonExplicitHierarchyStrategy();
+        static readonly JsonPreexistingGameObjectsStrategy _managersStrat = new JsonPreexistingGameObjectsStrategy();
+        static readonly JsonPreexistingGameObjectsStrategy _celestialBodiesStrat = new JsonPreexistingGameObjectsStrategy();
+        static readonly JsonExplicitHierarchyGameObjectsStrategy _objectStrat = new JsonExplicitHierarchyGameObjectsStrategy();
 
         /// <summary>
         /// Checks if a timeline is currently being either saved or loaded.
@@ -66,8 +68,8 @@ namespace KSS.Core.Serialization
         {
             _saver = new AsyncSaver(
                 SerializationPauseFunc, SerializationUnpauseFunc,
-                new Func<ISaver, IEnumerator>[] { _serializationStrat.SaveSceneObjects_Object },
-                new Func<ISaver, IEnumerator>[] { _serializationStrat.SaveSceneObjects_Data }
+                new Func<ISaver, IEnumerator>[] { _objectStrat.Save_Object },
+                new Func<ISaver, IEnumerator>[] { _managersStrat.Save_Data, _celestialBodiesStrat.Save_Data, _objectStrat.Save_Data }
             );
         }
 
@@ -75,8 +77,8 @@ namespace KSS.Core.Serialization
         {
             _loader = new AsyncLoader(
                 SerializationPauseFunc, SerializationUnpauseFunc,
-                new Func<ILoader, IEnumerator>[] { _serializationStrat.LoadSceneObjects_Object },
-                new Func<ILoader, IEnumerator>[] { _serializationStrat.LoadSceneObjects_Data }
+                new Func<ILoader, IEnumerator>[] { _managersStrat.Load_Object, _celestialBodiesStrat.Load_Object, _objectStrat.Load_Object },
+                new Func<ILoader, IEnumerator>[] { _objectStrat.Load_Data }
             );
         }
 
@@ -97,8 +99,8 @@ namespace KSS.Core.Serialization
 
             CreateDefaultSaver();
 
-            _serializationStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "objects.json" );
-            _serializationStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "data.json" );
+            _objectStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "objects.json" );
+            _objectStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "data.json" );
             if( !Directory.Exists( SaveMetadata.GetRootDirectory( timelineId, saveId ) ) )
             {
                 Directory.CreateDirectory( SaveMetadata.GetRootDirectory( timelineId, saveId ) );
@@ -132,8 +134,8 @@ namespace KSS.Core.Serialization
 
             CreateDefaultLoader();
 
-            _serializationStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "objects.json" );
-            _serializationStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "data.json" );
+            _objectStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "objects.json" );
+            _objectStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "data.json" );
             if( !Directory.Exists( SaveMetadata.GetRootDirectory( timelineId, saveId ) ) )
             {
                 Directory.CreateDirectory( SaveMetadata.GetRootDirectory( timelineId, saveId ) );

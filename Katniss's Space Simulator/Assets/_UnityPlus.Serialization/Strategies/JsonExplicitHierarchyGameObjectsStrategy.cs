@@ -10,9 +10,9 @@ using UnityPlus.AssetManagement;
 namespace UnityPlus.Serialization.Strategies
 {
     /// <summary>
-    /// Can be used to save the scene using the factory-gameobjectdata scheme.
+    /// A serialization strategy that can round-trip full scene data.
     /// </summary>
-    public sealed class JsonExplicitHierarchyStrategy
+    public sealed class JsonExplicitHierarchyGameObjectsStrategy
     {
         // Object actions are suffixed by _Object
         // Data actions are suffixed by _Data
@@ -49,7 +49,7 @@ namespace UnityPlus.Serialization.Strategies
             Guid objectGuid = l.ReadGuid( goJson[ISaver_Ex_References.ID] );
 
             GameObject go = new GameObject();
-            l.SetID( go, objectGuid );
+            l.SetReferenceID( go, objectGuid );
 
             if( parent != null )
             {
@@ -66,11 +66,11 @@ namespace UnityPlus.Serialization.Strategies
 
                     Component co = GetTransformOrAddComponent( go, compType );
 
-                    l.SetID( co, compID );
+                    l.SetReferenceID( co, compID );
                 }
                 catch( Exception ex )
                 {
-                    Debug.LogError( $"[{nameof( JsonExplicitHierarchyStrategy )}] Failed to deserialize a component of GameObject with ID: `{objectGuid}`." );
+                    Debug.LogError( $"[{nameof( JsonExplicitHierarchyGameObjectsStrategy )}] Failed to deserialize a component of GameObject with ID: `{objectGuid}`." );
                     Debug.LogException( ex );
                 }
             }
@@ -84,7 +84,7 @@ namespace UnityPlus.Serialization.Strategies
                 }
                 catch( Exception ex )
                 {
-                    Debug.LogError( $"[{nameof( JsonExplicitHierarchyStrategy )}] Failed to deserialize a child GameObject of GameObject with ID: `{objectGuid}`." );
+                    Debug.LogError( $"[{nameof( JsonExplicitHierarchyGameObjectsStrategy )}] Failed to deserialize a child GameObject of GameObject with ID: `{objectGuid}`." );
                     Debug.LogException( ex );
                 }
             }
@@ -97,7 +97,7 @@ namespace UnityPlus.Serialization.Strategies
                 return;
             }
 
-            Guid objectGuid = s.GetID( go );
+            Guid objectGuid = s.GetReferenceID( go );
 
             // recursive.
             SerializedObject obj = new SerializedObject()
@@ -116,7 +116,7 @@ namespace UnityPlus.Serialization.Strategies
 
             foreach( var comp in go.GetComponents<Component>() )
             {
-                Guid id = s.GetID( comp );
+                Guid id = s.GetReferenceID( comp );
                 SerializedObject compObj = new SerializedObject()
                 {
                     { "$id", s.WriteGuid(id) },
@@ -132,7 +132,7 @@ namespace UnityPlus.Serialization.Strategies
             arr.Add( obj );
         }
 
-        public IEnumerator SaveSceneObjects_Object( ISaver s )
+        public IEnumerator Save_Object( ISaver s )
         {
             if( string.IsNullOrEmpty( ObjectsFilename ) )
             {
@@ -162,7 +162,7 @@ namespace UnityPlus.Serialization.Strategies
                 return;
             }
 
-            Guid id = s.GetID( go );
+            Guid id = s.GetReferenceID( go );
 
             SerializedArray components = new SerializedArray();
 
@@ -184,7 +184,7 @@ namespace UnityPlus.Serialization.Strategies
 
                 if( data != null )
                 {
-                    Guid cid = s.GetID( comp );
+                    Guid cid = s.GetReferenceID( comp );
                     SerializedObject compData = new SerializedObject()
                     {
                         { "$ref", s.WriteGuid(cid) },
@@ -197,7 +197,7 @@ namespace UnityPlus.Serialization.Strategies
 
             objects.Add( new SerializedObject()
             {
-                { "$ref", id.ToString( "D" ) },
+                { "$ref", s.WriteGuid( id ) },
                 { "name", go.name },
                 { "layer", go.layer },
                 { "is_active", go.activeSelf },
@@ -213,7 +213,7 @@ namespace UnityPlus.Serialization.Strategies
         }
 
         //public void SaveSceneObjects_Data( ISaver s )
-        public IEnumerator SaveSceneObjects_Data( ISaver s )
+        public IEnumerator Save_Data( ISaver s )
         {
             if( string.IsNullOrEmpty( DataFilename ) )
             {
@@ -239,7 +239,7 @@ namespace UnityPlus.Serialization.Strategies
             File.WriteAllText( DataFilename, sb.ToString(), Encoding.UTF8 );
         }
 
-        public IEnumerator LoadSceneObjects_Object( ILoader l )
+        public IEnumerator Load_Object( ILoader l )
         {
             if( string.IsNullOrEmpty( ObjectsFilename ) )
             {
@@ -257,7 +257,7 @@ namespace UnityPlus.Serialization.Strategies
                 }
                 catch( Exception ex )
                 {
-                    Debug.LogError( $"[{nameof( JsonExplicitHierarchyStrategy )}] Failed to deserialize a root GameObject, ID: `{goJson?["$id"]}`." );
+                    Debug.LogError( $"[{nameof( JsonExplicitHierarchyGameObjectsStrategy )}] Failed to deserialize a root GameObject, ID: `{goJson?["$id"]}`." );
                     Debug.LogException( ex );
                 }
 
@@ -265,7 +265,7 @@ namespace UnityPlus.Serialization.Strategies
             }
         }
 
-        public IEnumerator LoadSceneObjects_Data( ILoader l )
+        public IEnumerator Load_Data( ILoader l )
         {
             if( string.IsNullOrEmpty( DataFilename ) )
             {
@@ -290,7 +290,7 @@ namespace UnityPlus.Serialization.Strategies
                 }
                 catch( Exception ex )
                 {
-                    Debug.LogError( $"[{nameof( JsonExplicitHierarchyStrategy )}] Failed to deserialize data of gameobject with ID: `{goData?["$ref"]}`." );
+                    Debug.LogError( $"[{nameof( JsonExplicitHierarchyGameObjectsStrategy )}] Failed to deserialize data of gameobject with ID: `{goData?["$ref"]}`." );
                     Debug.LogException( ex );
                 }
 
@@ -306,7 +306,7 @@ namespace UnityPlus.Serialization.Strategies
                     }
                     catch( Exception ex )
                     {
-                        Debug.LogError( $"[{nameof( JsonExplicitHierarchyStrategy )}] Failed to deserialize data of component with ID: `{componentData?["$ref"]}`." );
+                        Debug.LogError( $"[{nameof( JsonExplicitHierarchyGameObjectsStrategy )}] Failed to deserialize data of component with ID: `{componentData?["$ref"]}`." );
                         Debug.LogException( ex );
                     }
                 }

@@ -9,6 +9,13 @@ namespace KSS.Core.Serialization
 {
     public static class IOHelper
     {
+        readonly static string[] FORBIDDEN_FILE_NAMES =
+        {
+            "con", "prn", "aux", "nul",
+            "com1", "com2", "com3", "com4", "com5", "com6", "com7", "com8", "com9",
+            "lpt1", "lpt2", "lpt3", "lpt4", "lpt5", "lpt6", "lpt7", "lpt8", "lpt9"
+        };
+
         /// <summary>
         /// Sanitizes the user-provided name into a valid cross-platform filename.
         /// </summary>
@@ -22,19 +29,14 @@ namespace KSS.Core.Serialization
                 return "___";
             }
 
+            const string FORBIDDEN_CHARS = "[^a-z0-9]";
+
             string sanitizedName = rawFileName.ToLowerInvariant().Trim();
 
-            const string charsToReplace = "[^a-z0-9]";
-            sanitizedName = Regex.Replace( sanitizedName, charsToReplace, "_" );
-
-            string[] forbiddenNames =
-            { "CON", "PRN", "AUX", "NUL",
-              "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
-              "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"
-            };
+            sanitizedName = Regex.Replace( sanitizedName, FORBIDDEN_CHARS, "_" );
 
             // Sanitize if the input name matches a forbidden name exactly.
-            if( forbiddenNames.Contains( sanitizedName ) )
+            if( FORBIDDEN_FILE_NAMES.Contains( sanitizedName ) )
             {
                 sanitizedName = $"_{sanitizedName}";
             }

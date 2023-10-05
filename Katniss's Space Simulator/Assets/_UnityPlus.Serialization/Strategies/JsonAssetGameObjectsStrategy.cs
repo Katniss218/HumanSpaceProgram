@@ -13,7 +13,7 @@ namespace UnityPlus.Serialization.Strategies
     /// <summary>
     /// Can be used to save the scene using the factory-gameobjectdata scheme.
     /// </summary>
-    public sealed class JsonPrefabAndDataStrategy
+    public sealed class JsonAssetGameObjectsStrategy
     {
         // Object actions are suffixed by _Object
         // Data actions are suffixed by _Data
@@ -70,7 +70,7 @@ namespace UnityPlus.Serialization.Strategies
 
         private static SerializedObject WriteAssetGameObject( ISaver s, GameObject go, ClonedGameObject cbf )
         {
-            Guid objectGuid = s.GetID( go );
+            Guid objectGuid = s.GetReferenceID( go );
 
             SerializedArray sArr = new SerializedArray();
             WriteReferencedChildrenRecursive( s, go, ref sArr, "" );
@@ -128,7 +128,7 @@ namespace UnityPlus.Serialization.Strategies
 
                 var obj = GetComponentOrGameObject( go, path );
 
-                l.SetID( obj, id );
+                l.SetReferenceID( obj, id );
             }
         }
 
@@ -145,7 +145,7 @@ namespace UnityPlus.Serialization.Strategies
 
             GameObject go = ClonedGameObject.Instantiate( prefab );
 
-            l.SetID( go, objectGuid );
+            l.SetReferenceID( go, objectGuid );
 
             SerializedArray refChildren = (SerializedArray)goJson["children_ids"];
             AssignIDsToReferencedChildren( l, go, ref refChildren );
@@ -192,7 +192,7 @@ namespace UnityPlus.Serialization.Strategies
 
         private static void SaveObjectDataRecursive( ISaver s, GameObject go, ref SerializedArray objects )
         {
-            Guid id = s.GetID( go );
+            Guid id = s.GetReferenceID( go );
 
             SerializedArray components = new SerializedArray();
 
@@ -204,7 +204,7 @@ namespace UnityPlus.Serialization.Strategies
 
                 if( dataJson != null )
                 {
-                    Guid cid = s.GetID( comp );
+                    Guid cid = s.GetReferenceID( comp );
                     SerializedObject compData = new SerializedObject()
                     {
                         { "$ref", s.WriteGuid(cid) },

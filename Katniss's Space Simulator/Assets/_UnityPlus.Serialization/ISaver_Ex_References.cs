@@ -38,7 +38,7 @@ namespace UnityPlus.Serialization
                 return new SerializedObject();
             }
 
-            Guid guid = s.GetID( value );
+            Guid guid = s.GetReferenceID( value );
 
             return new SerializedObject()
             {

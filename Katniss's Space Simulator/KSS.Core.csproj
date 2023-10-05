@@ -87,6 +87,7 @@
     <Compile Include="Assets\KSS.Core\Serialization\SaveMetadata.cs" />
     <Compile Include="Assets\KSS.Core\VesselManager.cs" />
     <Compile Include="Assets\KSS.Core\ReferenceFrames\IReferenceFrameSwitchResponder.cs" />
+    <Compile Include="Assets\KSS.Core\Serialization\VesselSerializationStrategy.cs" />
     <Compile Include="Assets\KSS.Core\TimeManager.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\IResourceProducer.cs" />
     <Compile Include="Assets\KSS.Core\ReferenceFrames\IReferenceFrame.cs" />
@@ -101,6 +102,7 @@
     <Compile Include="Assets\KSS.Core\Substance.cs" />
     <Compile Include="Assets\KSS.Core\CelestialBody.cs" />
     <Compile Include="Assets\KSS.Core\Serialization\IOHelper.cs" />
+    <Compile Include="Assets\KSS.Core\Serialization\CelestialBodySerializationStrategy.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\SubstanceStateCollection.cs" />
   </ItemGroup>
   <ItemGroup>
