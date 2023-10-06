@@ -16,7 +16,7 @@ namespace KSS.UI
 
         void LateUpdate()
         {
-            CelestialBody body = CelestialBodyManager.Bodies[0];
+            CelestialBody body = CelestialBodyManager.CelestialBodies[0];
             Vector3 posV = VesselManager.ActiveVessel.transform.position;
             Vector3 posCB = SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformPosition( body.AIRFPosition );
 

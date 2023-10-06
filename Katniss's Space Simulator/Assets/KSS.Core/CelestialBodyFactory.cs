@@ -32,7 +32,6 @@ namespace KSS.Core
 
             CelestialBodySurface stf = cbGO.AddComponent<CelestialBodySurface>();
 
-            CelestialBodyManager.Bodies.Add( cb );
             return cb;
         }
     }

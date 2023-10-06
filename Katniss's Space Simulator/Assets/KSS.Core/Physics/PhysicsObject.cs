@@ -119,8 +119,8 @@ namespace KSS.Core.Physics
 
             if( IsColliding )
             {
-                this.Acceleration = (Velocity - _oldVelocity) / Time.fixedDeltaTime;
-                this.AngularAcceleration = (AngularVelocity - _oldAngularVelocity) / Time.fixedDeltaTime;
+                this.Acceleration = (Velocity - _oldVelocity) / TimeManager.FixedDeltaTime;
+                this.AngularAcceleration = (AngularVelocity - _oldAngularVelocity) / TimeManager.FixedDeltaTime;
             }
             else
             {

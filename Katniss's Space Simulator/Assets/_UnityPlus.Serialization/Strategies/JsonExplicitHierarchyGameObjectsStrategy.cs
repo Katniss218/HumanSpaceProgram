@@ -20,6 +20,7 @@ namespace UnityPlus.Serialization.Strategies
         public string ObjectsFilename { get; set; }
         public string DataFilename { get; set; }
 
+        public Func<GameObject[]> RootObjectsGetter { get; }
         public int IncludedObjectsMask { get; set; } = int.MaxValue;
 
         // TODO - We might want to specify which components to *not* serialize, because they might be managed entirely by a supervisor.
@@ -27,21 +28,21 @@ namespace UnityPlus.Serialization.Strategies
 
         // doesn't matter if its json actually.
 
-        private static IEnumerable<GameObject> GetRootGameObjects()
+        public JsonExplicitHierarchyGameObjectsStrategy( Func<GameObject[]> rootObjectsGetter )
         {
-            return UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
+            if( rootObjectsGetter == null )
+            {
+                throw new ArgumentNullException( nameof( rootObjectsGetter ), $"Object getter func must not be null." );
+            }
+            this.RootObjectsGetter = rootObjectsGetter;
         }
 
-        private static Component GetTransformOrAddComponent(GameObject go, Type componentType )
+        private static Component GetTransformOrAddComponent( GameObject go, Type componentType )
         {
             if( componentType == typeof( Transform ) )
-            {
                 return go.transform;
-            }
-            else
-            {
-                return go.AddComponent( componentType );
-            }
+
+            return go.AddComponent( componentType );
         }
 
         private static void CreateGameObjectWithComponents( ILoader l, SerializedData goJson, GameObject parent )
@@ -138,21 +139,21 @@ namespace UnityPlus.Serialization.Strategies
             {
                 throw new InvalidOperationException( $"Can't save scene objects, file name is not set." );
             }
-            IEnumerable<GameObject> rootObjects = GetRootGameObjects();
+            IEnumerable<GameObject> rootObjects = RootObjectsGetter();
 
-            SerializedArray objectsJson = new SerializedArray();
+            SerializedArray objData = new SerializedArray();
 
             foreach( var go in rootObjects )
             {
                 // maybe some sort of customizable tag/layer masking
 
-                WriteGameObjectHierarchy( go, s, ref objectsJson );
+                WriteGameObjectHierarchy( go, s, ref objData );
 
                 yield return null;
             }
 
             var sb = new StringBuilder();
-            new Serialization.Json.JsonStringWriter( objectsJson, sb ).Write();
+            new Serialization.Json.JsonStringWriter( objData, sb ).Write();
             File.WriteAllText( ObjectsFilename, sb.ToString(), Encoding.UTF8 );
         }
         private void SaveObjectDataRecursive( ISaver s, GameObject go, ref SerializedArray objects )
@@ -176,7 +177,7 @@ namespace UnityPlus.Serialization.Strategies
                 {
                     data = comp.GetData( s );
                 }
-                catch(Exception ex)
+                catch( Exception ex )
                 {
                     Debug.LogWarning( $"Couldn't serialize component '{comp}': {ex.Message}." );
                     Debug.LogException( ex );
@@ -223,7 +224,7 @@ namespace UnityPlus.Serialization.Strategies
 
             // persistent information is one that is expected to change and be preserved (i.e. health, inventory, etc).
 
-            IEnumerable<GameObject> rootObjects = GetRootGameObjects();
+            IEnumerable<GameObject> rootObjects = RootObjectsGetter();
 
             SerializedArray objData = new SerializedArray();
 

@@ -41,7 +41,7 @@ namespace KSS.Core.Serialization
         /// </summary>
         public string Description { get; set; }
 
-        public string SaveVersion { get; set; }
+        public SaveVersion SaveVersion { get; set; } // TODO - split into separate save versions for each mod.
 
         public SaveMetadata( string timelineId, string saveId )
         {
@@ -133,6 +133,7 @@ namespace KSS.Core.Serialization
         {
             this.Name = data["name"];
             this.Description = data["description"];
+            this.SaveVersion = SaveVersion.Parse( data["save_version"] );
         }
 
         public SerializedData GetData()
@@ -140,7 +141,8 @@ namespace KSS.Core.Serialization
             return new SerializedObject()
             {
                 { "name", this.Name },
-                { "description", this.Description }
+                { "description", this.Description },
+                { "save_version", this.SaveVersion.ToString() }
             };
         }
     }

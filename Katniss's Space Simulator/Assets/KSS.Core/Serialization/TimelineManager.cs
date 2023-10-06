@@ -29,16 +29,21 @@ namespace KSS.Core.Serialization
         }
         #endregion
 
-        static readonly JsonPreexistingGameObjectsStrategy _managersStrat = new JsonPreexistingGameObjectsStrategy();
-        static readonly JsonPreexistingGameObjectsStrategy _celestialBodiesStrat = new JsonPreexistingGameObjectsStrategy();
-        static readonly JsonExplicitHierarchyGameObjectsStrategy _objectStrat = new JsonExplicitHierarchyGameObjectsStrategy();
+        static readonly JsonPreexistingGameObjectsStrategy _managersStrat = new JsonPreexistingGameObjectsStrategy( AlwaysLoadedManager.GetAllManagerGameObjects );
+        static readonly JsonPreexistingGameObjectsStrategy _celestialBodiesStrat = new JsonPreexistingGameObjectsStrategy( CelestialBodyManager.GetAllRootGameObjects );
+        static readonly JsonExplicitHierarchyGameObjectsStrategy _vesselsStrat = new JsonExplicitHierarchyGameObjectsStrategy( VesselManager.GetAllRootGameObjects );
+
+        /// <summary>
+        /// The save file version to use when creating new save files.
+        /// </summary>
+        public static readonly SaveVersion CURRENT_SAVE_VERSION = new SaveVersion( 0, 0 );
 
         /// <summary>
         /// Checks if a timeline is currently being either saved or loaded.
         /// </summary>
         public static bool IsSavingOrLoading =>
-            (_saver != null && _saver.CurrentState != ISaver.State.Idle)
-         || (_loader != null && _loader.CurrentState != ILoader.State.Idle);
+                (_saver != null && _saver.CurrentState != ISaver.State.Idle)
+             || (_loader != null && _loader.CurrentState != ILoader.State.Idle);
 
         public static TimelineMetadata CurrentTimeline { get; private set; }
 
@@ -68,8 +73,8 @@ namespace KSS.Core.Serialization
         {
             _saver = new AsyncSaver(
                 SerializationPauseFunc, SerializationUnpauseFunc,
-                new Func<ISaver, IEnumerator>[] { _objectStrat.Save_Object },
-                new Func<ISaver, IEnumerator>[] { _managersStrat.Save_Data, _celestialBodiesStrat.Save_Data, _objectStrat.Save_Data }
+                new Func<ISaver, IEnumerator>[] { _vesselsStrat.Save_Object },
+                new Func<ISaver, IEnumerator>[] { _managersStrat.Save_Data, _celestialBodiesStrat.Save_Data, _vesselsStrat.Save_Data }
             );
         }
 
@@ -77,9 +82,32 @@ namespace KSS.Core.Serialization
         {
             _loader = new AsyncLoader(
                 SerializationPauseFunc, SerializationUnpauseFunc,
-                new Func<ILoader, IEnumerator>[] { _managersStrat.Load_Object, _celestialBodiesStrat.Load_Object, _objectStrat.Load_Object },
-                new Func<ILoader, IEnumerator>[] { _objectStrat.Load_Data }
+                new Func<ILoader, IEnumerator>[] { _managersStrat.Load_Object, _celestialBodiesStrat.Load_Object, _vesselsStrat.Load_Object },
+                new Func<ILoader, IEnumerator>[] { _vesselsStrat.Load_Data }
             );
+        }
+
+        static void EnsureDirectory( string path )
+        {
+            if( !Directory.Exists( path ) )
+            {
+                Directory.CreateDirectory( path );
+            }
+        }
+
+        static void SetStratPaths( string timelineId, string saveId )
+        {
+            EnsureDirectory( SaveMetadata.GetRootDirectory( timelineId, saveId ) );
+
+            EnsureDirectory( Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "Vessels" ) );
+            _vesselsStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "Vessels", "objects.json" );
+            _vesselsStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "Vessels", "data.json" );
+            EnsureDirectory( Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "CelestialBodies" ) );
+            _celestialBodiesStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "CelestialBodies", "objects.json" );
+            _celestialBodiesStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "CelestialBodies", "data.json" );
+            EnsureDirectory( Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "Gameplay" ) );
+            _managersStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "Gameplay", "objects.json" );
+            _managersStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "Gameplay", "data.json" );
         }
 
         /// <summary>
@@ -99,17 +127,15 @@ namespace KSS.Core.Serialization
 
             CreateDefaultSaver();
 
-            _objectStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "objects.json" );
-            _objectStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "data.json" );
-            if( !Directory.Exists( SaveMetadata.GetRootDirectory( timelineId, saveId ) ) )
-            {
-                Directory.CreateDirectory( SaveMetadata.GetRootDirectory( timelineId, saveId ) );
-            }
+            SetStratPaths( timelineId, saveId );
             HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_SAVE, _saver );
 
             // write timeline.json to disk
             // write save.json to disk.
             _saver.SaveAsync( Instance );
+            SaveMetadata savedSave = new SaveMetadata( timelineId, saveId );
+            savedSave.SaveVersion = CURRENT_SAVE_VERSION;
+            savedSave.WriteToDisk();
 
             HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_SAVE, _saver );
         }
@@ -130,17 +156,14 @@ namespace KSS.Core.Serialization
             }
 
             TimelineMetadata loadedTimeline = new TimelineMetadata( timelineId );
-#warning TODO - load timeline's metadata too.
+            SaveMetadata loadedSave = new SaveMetadata( timelineId, saveId );
+#warning TODO - load timeline's and save's metadata too.
 
             CreateDefaultLoader();
 
-            _objectStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "objects.json" );
-            _objectStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "data.json" );
-            if( !Directory.Exists( SaveMetadata.GetRootDirectory( timelineId, saveId ) ) )
-            {
-                Directory.CreateDirectory( SaveMetadata.GetRootDirectory( timelineId, saveId ) );
-            }
+            SetStratPaths( timelineId, saveId );
             HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_LOAD, _loader );
+
             _loader.LoadAsync( Instance );
             CurrentTimeline = loadedTimeline;
 

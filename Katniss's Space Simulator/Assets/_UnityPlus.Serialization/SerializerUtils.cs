@@ -11,26 +11,32 @@ namespace UnityPlus.Serialization
 {
     public static class SerializerUtils
     {
-        // unify some of the gameobject-level save/load methods. Format-agnostic.
-
+        /// <summary>
+        /// Writes the 'data' part of a gameobject (only gameobject, not components).
+        /// </summary>
+        /// <param name="objects">The serialized array to add the serialized data object to.</param>
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static void WriteGameObjectData( ISaver s, GameObject go, ref SerializedArray objects )
+        public static void WriteGameObjectData( ISaver s, GameObject gameObject, ref SerializedArray objects )
         {
             objects.Add( new SerializedObject()
             {
-                { "$ref", s.WriteGuid( s.GetReferenceID( go ) ) },
-                { "name", go.name },
-                { "layer", go.layer },
-                { "is_active", go.activeSelf },
-                { "is_static", go.isStatic },
-                { "tag", go.tag }
+                { "$ref", s.WriteGuid( s.GetReferenceID( gameObject ) ) },
+                { "name", gameObject.name },
+                { "layer", gameObject.layer },
+                { "is_active", gameObject.activeSelf },
+                { "is_static", gameObject.isStatic },
+                { "tag", gameObject.tag }
             } );
         }
-        
+
+        /// <summary>
+        /// Writes the 'data' part for all of the gameobject's components.
+        /// </summary>
+        /// <param name="objects">The serialized array to add the serialized data objects to.</param>
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static void WriteGameObjectComponentsData( ISaver s, GameObject go, ref SerializedArray objects )
+        public static void WriteGameObjectComponentsData( ISaver s, GameObject gameObject, ref SerializedArray objects )
         {
-            Component[] comps = go.GetComponents();
+            Component[] comps = gameObject.GetComponents();
             for( int i = 0; i < comps.Length; i++ )
             {
                 Component comp = comps[i];

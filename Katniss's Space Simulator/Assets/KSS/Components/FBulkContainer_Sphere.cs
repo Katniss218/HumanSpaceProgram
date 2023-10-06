@@ -111,8 +111,8 @@ namespace KSS.Components
             Contract.Assert( Contents != null, $"[{nameof( FBulkContainer_Sphere )}.{nameof( Sample )}] '{nameof( Contents )}' can't be null." );
 
             float oldMass = this.Mass;
-            Contents.Add( Outflow, -Time.fixedDeltaTime );
-            Contents.Add( Inflow, Time.fixedDeltaTime );
+            Contents.Add( Outflow, -TimeManager.FixedDeltaTime );
+            Contents.Add( Inflow, TimeManager.FixedDeltaTime );
             OnAfterMassChanged?.Invoke( this.Mass - oldMass );
         }
 

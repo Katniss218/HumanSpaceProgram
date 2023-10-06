@@ -187,6 +187,16 @@ namespace KSS.Core
             SetPhysicsObjectParameters();
         }
 
+        void OnEnable()
+        {
+            VesselManager.Vessels.Add( this );
+        }
+        
+        void OnDisable()
+        {
+            VesselManager.Vessels.Remove( this );
+        }
+
         void FixedUpdate()
         {
             SetPhysicsObjectParameters();

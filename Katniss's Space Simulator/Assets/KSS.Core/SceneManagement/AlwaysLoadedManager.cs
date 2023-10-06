@@ -29,5 +29,10 @@ namespace KSS.Core
         {
             SceneLoader.LoadSceneAsync( "MainMenu", true, false, null );
         }
+
+        internal static GameObject[] GetAllManagerGameObjects()
+        {
+            return new GameObject[] { };
+        }
     }
 }

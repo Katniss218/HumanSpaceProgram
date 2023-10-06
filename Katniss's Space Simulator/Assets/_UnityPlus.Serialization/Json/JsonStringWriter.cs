@@ -85,6 +85,7 @@ namespace UnityPlus.Serialization.Json
         {
             if( value == null )
             {
+#warning TODO - move all of these constants and stuff to a separate class.
                 _sb.Append( "null" );
                 return;
             }
@@ -111,6 +112,12 @@ namespace UnityPlus.Serialization.Json
 
         void WriteString( string sIn )
         {
+            if( sIn == null )
+            {
+                _sb.Append( "null" );
+                return;
+            }
+
             _sb.Append( '\"' );
 
             int i = 0;

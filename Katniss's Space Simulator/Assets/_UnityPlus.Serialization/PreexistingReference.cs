@@ -23,12 +23,24 @@ namespace UnityPlus.Serialization
     }
 #endif
 
+    /// <summary>
+    /// Represents a gameobject that has a pre-set fixed reference identifier.
+    /// </summary>
     public class PreexistingReference : MonoBehaviour
     {
         [SerializeField] [HideInInspector]
         byte[] _guidData = null;
 
         public Guid GetGuid() => new Guid( _guidData );
+
+        private void Awake()
+        {
+            if( _guidData == null )
+            {
+                Debug.LogError( $"Preexisting reference with unassigned GUID - '{this.gameObject.name}'. Please assign a valid guid." );
+                Destroy( this );
+            }
+        }
 
         private void OnValidate()
         {

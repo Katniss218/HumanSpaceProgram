@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,12 +21,19 @@ namespace UnityPlus.Serialization.Strategies
 
 #warning TODO - something to tell the strategy where to put the JSON file(s) and how to structure them.
 
-        private static string jsonO;
-        private static string jsonD;
+        public string ObjectsFilename { get; set; }
+        public string DataFilename { get; set; }
 
-        private static IEnumerable<GameObject> GetRootGameObjects()
+        public Func<GameObject[]> RootObjectsGetter { get; }
+        public int IncludedObjectsMask { get; set; } = int.MaxValue;
+
+        public JsonAssetGameObjectsStrategy( Func<GameObject[]> rootObjectsGetter )
         {
-            return UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects();
+            if( rootObjectsGetter == null )
+            {
+                throw new ArgumentNullException( nameof( rootObjectsGetter ), $"Object getter func must not be null." );
+            }
+            this.RootObjectsGetter = rootObjectsGetter;
         }
 
         private static void WriteReferencedChildrenRecursive( ISaver s, GameObject go, ref SerializedArray sArr, string parentPath )
@@ -160,7 +168,7 @@ namespace UnityPlus.Serialization.Strategies
 
             // this should save to a file. to a directory specified by this strategy.
 
-            IEnumerable<GameObject> rootObjects = GetRootGameObjects();
+            IEnumerable<GameObject> rootObjects = RootObjectsGetter();
 
             SerializedArray objectsJson = new SerializedArray();
 
@@ -183,11 +191,7 @@ namespace UnityPlus.Serialization.Strategies
 
             var sb = new StringBuilder();
             new Serialization.Json.JsonStringWriter( objectsJson, sb ).Write();
-            jsonO = sb.ToString();
-
-            //TMPro.TMP_InputField inp = UnityEngine.Object.FindObjectOfType<TMPro.TMP_InputField>();
-            //inp.text = jsonO;
-            Debug.Log( jsonO );
+            File.WriteAllText( ObjectsFilename, sb.ToString(), Encoding.UTF8 );
         }
 
         private static void SaveObjectDataRecursive( ISaver s, GameObject go, ref SerializedArray objects )
@@ -237,7 +241,7 @@ namespace UnityPlus.Serialization.Strategies
 
             // persistent information is one that is expected to change and be preserved (i.e. health, inventory, etc).
 
-            IEnumerable<GameObject> rootObjects = GetRootGameObjects();
+            IEnumerable<GameObject> rootObjects = RootObjectsGetter();
 
             SerializedArray objData = new SerializedArray();
 
@@ -255,21 +259,18 @@ namespace UnityPlus.Serialization.Strategies
 
             var sb = new StringBuilder();
             new Serialization.Json.JsonStringWriter( objData, sb ).Write();
-            jsonD = sb.ToString();
-
-            //TMPro.TMP_InputField inp = UnityEngine.Object.FindObjectOfType<TMPro.TMP_InputField>();
-            //inp.text = jsonD;
-            Debug.Log( jsonD );
+            File.WriteAllText( DataFilename, sb.ToString(), Encoding.UTF8 );
         }
 
         //public void LoadSceneObjects_Object( ILoader l )
         public IEnumerator LoadSceneObjects_Object( ILoader l )
         {
-            // Assumes that factories are already registered.
-
-            // create dummy GOs with factories.
-
-            SerializedArray objectsJson = (SerializedArray)new Serialization.Json.JsonStringReader( jsonO ).Read();
+            if( string.IsNullOrEmpty( ObjectsFilename ) )
+            {
+                throw new InvalidOperationException( $"Can't load scene objects, file name is not set." );
+            }
+            string objectsStr = File.ReadAllText( ObjectsFilename, Encoding.UTF8 );
+            SerializedArray objectsJson = (SerializedArray)new Serialization.Json.JsonStringReader( objectsStr ).Read();
 
             foreach( var goJson in objectsJson )
             {
@@ -282,9 +283,12 @@ namespace UnityPlus.Serialization.Strategies
         //public void LoadSceneObjects_Data( ILoader l )
         public IEnumerator LoadSceneObjects_Data( ILoader l )
         {
-            // loop through object data, get the corresponding objects using ID from registry, and apply.
-
-            SerializedArray objectsJson = (SerializedArray)new Serialization.Json.JsonStringReader( jsonD ).Read();
+            if( string.IsNullOrEmpty( DataFilename ) )
+            {
+                throw new InvalidOperationException( $"Can't load scene objects, file name is not set." );
+            }
+            string objectsStr = File.ReadAllText( DataFilename, Encoding.UTF8 );
+            SerializedArray objectsJson = (SerializedArray)new Serialization.Json.JsonStringReader( objectsStr ).Read();
 
             foreach( var goJson in objectsJson )
             {

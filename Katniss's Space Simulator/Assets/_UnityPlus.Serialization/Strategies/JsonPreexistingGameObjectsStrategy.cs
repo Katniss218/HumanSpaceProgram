@@ -18,8 +18,17 @@ namespace UnityPlus.Serialization
         public string ObjectsFilename { get; set; }
         public string DataFilename { get; set; }
 
-        public Func<GameObject[]> RootObjectsGetter { get; set; }
+        public Func<GameObject[]> RootObjectsGetter { get; }
         public int IncludedObjectsMask { get; set; } = int.MaxValue;
+
+        public JsonPreexistingGameObjectsStrategy( Func<GameObject[]> rootObjectsGetter )
+        {
+            if( rootObjectsGetter == null )
+            {
+                throw new ArgumentNullException( nameof( rootObjectsGetter ), $"Object getter func must not be null." );
+            }
+            this.RootObjectsGetter = rootObjectsGetter;
+        }
 
         private void SaveGameObjectData( ISaver s, GameObject go, ref SerializedArray objects )
         {

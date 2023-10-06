@@ -13,5 +13,25 @@ namespace KSS.Core
     public class VesselManager : MonoBehaviour
     {
         public static Vessel ActiveVessel { get; set; }
+
+        public static List<Vessel> Vessels { get; set; }
+
+        void Awake()
+        {
+            Vessels = new List<Vessel>();
+        }
+
+        internal static GameObject[] GetAllRootGameObjects()
+        {
+
+            GameObject[] gos = new GameObject[Vessels.Count];
+            for( int i = 0; i < Vessels.Count; i++ )
+            {
+                gos[i] = Vessels[i].gameObject;
+            }
+            return gos;
+        }
+
+        // save/load
     }
 }

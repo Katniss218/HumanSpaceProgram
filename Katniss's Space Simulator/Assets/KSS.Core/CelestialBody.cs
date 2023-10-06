@@ -18,9 +18,19 @@ namespace KSS.Core
 
         RootObjectTransform _rootTransform;
 
-        private void Awake()
+        void Awake()
         {
             _rootTransform = this.GetComponent<RootObjectTransform>();
+        }
+
+        void OnEnable()
+        {
+            CelestialBodyManager.CelestialBodies.Add( this );
+        }
+
+        void OnDisable()
+        {
+            CelestialBodyManager.CelestialBodies.Remove( this );
         }
     }
 }
