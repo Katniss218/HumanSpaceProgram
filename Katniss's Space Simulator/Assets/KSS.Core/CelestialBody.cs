@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace KSS.Core
 {
+    [RequireComponent( typeof( UnityPlus.Serialization.PreexistingReference ) )]
     [RequireComponent( typeof( RootObjectTransform ) )]
     public class CelestialBody : MonoBehaviour
     {

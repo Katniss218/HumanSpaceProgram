@@ -8,7 +8,7 @@ using UnityPlus.OverridableEvents;
 namespace KSS.Core
 {
     /// <summary>
-    /// A container for the overridable event manager and builtin event identifiers.
+    /// A container for the overridable event manager and builtin (vanilla) event identifiers.
     /// </summary>
     public static class HSPEvent
     {
@@ -29,6 +29,8 @@ namespace KSS.Core
         /// </summary>
         public const string NAMESPACE_VANILLA = "vanilla";
 
+        //
+
         /// <summary>
         /// Invoked at the immediate start of the game. This is always the first invoked event.
         /// </summary>
@@ -44,10 +46,14 @@ namespace KSS.Core
         /// </summary>
         public const string STARTUP_GAMEPLAY = NAMESPACE_VANILLA + ".startup.gameplay";
 
+        //
+
         /// <summary>
         /// Invoked when the player toggles the escape (pause) menu in the gameplay scene.
         /// </summary>
         public const string ESCAPE_GAMEPLAY = NAMESPACE_VANILLA + ".escape.gameplay";
+
+        //
 
         /// <summary>
         /// Invoked before loading a new game state (timeline + save).

@@ -32,6 +32,7 @@ namespace UnityPlus.Serialization
         byte[] _guidData = null;
 
         public Guid GetGuid() => new Guid( _guidData );
+        public void SetGuid( Guid guid ) => _guidData = guid.ToByteArray();
 
         private void Awake()
         {
