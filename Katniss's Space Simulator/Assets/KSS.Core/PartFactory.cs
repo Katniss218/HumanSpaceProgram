@@ -8,7 +8,7 @@ using UnityEngine;
 namespace KSS.Core
 {
     /// <summary>
-    /// A class responsible for instantiating a part from a source (save file, picked in VAB, etc).
+    /// A class responsible for instantiating part hierarchy from a source (save file, picked in VAB, etc).
     /// </summary>
     public sealed class PartFactory
     {

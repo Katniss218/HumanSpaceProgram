@@ -21,10 +21,10 @@ namespace UnityPlus.Serialization
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static void SetData( this MeshFilter mf, ILoader l, SerializedObject json )
+        public static void SetData( this MeshFilter mf, ILoader l, SerializedObject data )
         {
-            if( json.TryGetValue( "shared_mesh", out var jsonSharedMesh ) )
-                mf.sharedMesh = l.ReadAssetReference<Mesh>( jsonSharedMesh );
+            if( data.TryGetValue( "shared_mesh", out var sharedMesh ) )
+                mf.sharedMesh = l.ReadAssetReference<Mesh>( sharedMesh );
         }
     }
 }

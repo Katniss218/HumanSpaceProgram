@@ -24,14 +24,14 @@ namespace UnityPlus.Serialization
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public static void SetData( this Transform t, ILoader l, SerializedObject data )
         {
-            if( data.TryGetValue( "local_position", out var jsonLocalPosition ) )
-                t.localPosition = l.ReadVector3( jsonLocalPosition );
+            if( data.TryGetValue( "local_position", out var localPosition ) )
+                t.localPosition = l.ReadVector3( localPosition );
 
-            if( data.TryGetValue( "local_rotation", out var jsonLocalRotation ) )
-                t.localRotation = l.ReadQuaternion( jsonLocalRotation );
+            if( data.TryGetValue( "local_rotation", out var localRotation ) )
+                t.localRotation = l.ReadQuaternion( localRotation );
 
-            if( data.TryGetValue( "local_scale", out var jsonLocalScale ) )
-                t.localScale = l.ReadVector3( jsonLocalScale );
+            if( data.TryGetValue( "local_scale", out var localScale ) )
+                t.localScale = l.ReadVector3( localScale );
         }
     }
 }

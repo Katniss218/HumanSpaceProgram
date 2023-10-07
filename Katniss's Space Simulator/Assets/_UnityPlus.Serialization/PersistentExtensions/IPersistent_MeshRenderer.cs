@@ -28,12 +28,12 @@ namespace UnityPlus.Serialization
             };
         }
 
-        public static void SetData( this MeshRenderer mr, ILoader l, SerializedObject json )
+        public static void SetData( this MeshRenderer mr, ILoader l, SerializedObject data )
         {
-            if( json.TryGetValue( "shared_materials", out var jsonSharedMaterials ) )
+            if( data.TryGetValue( "shared_materials", out var sharedMaterials ) )
             {
                 List<Material> mats = new List<Material>();
-                foreach( var sharedMatJson in (SerializedArray)jsonSharedMaterials )
+                foreach( var sharedMatJson in (SerializedArray)sharedMaterials )
                 {
                     Material mat = l.ReadAssetReference<Material>( sharedMatJson );
                     mats.Add( mat );
@@ -42,11 +42,11 @@ namespace UnityPlus.Serialization
                 mr.sharedMaterials = mats.ToArray();
             }
 
-            if( json.TryGetValue( "shadow_casting_mode", out var jsonShadowCastingMode ) )
-                mr.shadowCastingMode = Enum.Parse<ShadowCastingMode>( (string)jsonShadowCastingMode );
+            if( data.TryGetValue( "shadow_casting_mode", out var shadowCastingMode ) )
+                mr.shadowCastingMode = Enum.Parse<ShadowCastingMode>( (string)shadowCastingMode );
 
-            if( json.TryGetValue( "receive_shadows", out var jsonReceiveShadows ) )
-                mr.receiveShadows = (bool)jsonReceiveShadows;
+            if( data.TryGetValue( "receive_shadows", out var receiveShadows ) )
+                mr.receiveShadows = (bool)receiveShadows;
         }
     }
 }

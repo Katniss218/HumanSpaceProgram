@@ -92,10 +92,10 @@ namespace KSS.DevUtils
         {
             VesselFactory fac = new VesselFactory();
 
-            PartFactory intertank = new PartFactory( new AssetPartSource( "part.intertank" ) );
-            PartFactory tank = new PartFactory( new AssetPartSource( "part.tank" ) );
-            PartFactory tankLong = new PartFactory( new AssetPartSource( "part.tank_long" ) );
-            PartFactory engine = new PartFactory( new AssetPartSource( "part.engine" ) );
+            PartFactory intertank = new PartFactory( new AssetPartSource( "builtin::Resources/Prefabs/Parts/part.intertank" ) );
+            PartFactory tank = new PartFactory( new AssetPartSource( "builtin::Resources/Prefabs/Parts/part.tank" ) );
+            PartFactory tankLong = new PartFactory( new AssetPartSource( "builtin::Resources/Prefabs/Parts/part.tank_long" ) );
+            PartFactory engine = new PartFactory( new AssetPartSource( "builtin::Resources/Prefabs/Parts/part.engine" ) );
 
             Vessel v = fac.CreatePartless( airfPosition, rotation, Vector3.zero, Vector3.zero );
             Transform root = intertank.CreateRoot( v );

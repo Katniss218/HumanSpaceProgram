@@ -12,21 +12,29 @@ namespace UnityPlus.Serialization.Strategies
     /// <summary>
     /// A serialization strategy that can round-trip full scene data.
     /// </summary>
+    /// <remarks>
+    /// - Object actions are suffixed by _Object <br />
+    /// - Data actions are suffixed by _Data
+    /// </remarks>
     public sealed class JsonExplicitHierarchyGameObjectsStrategy
     {
-        // Object actions are suffixed by _Object
-        // Data actions are suffixed by _Data
-
+        /// <summary>
+        /// The name of the file into which the object data will be saved.
+        /// </summary>
         public string ObjectsFilename { get; set; }
+        /// <summary>
+        /// The name of the file into which the data data will be saved.
+        /// </summary>
         public string DataFilename { get; set; }
 
+        /// <summary>
+        /// Determines which objects will be saved.
+        /// </summary>
         public Func<GameObject[]> RootObjectsGetter { get; }
+        /// <summary>
+        /// Determines which objects (including child objects) returned by the <see cref="RootObjectsGetter"/> will be excluded from saving.
+        /// </summary>
         public int IncludedObjectsMask { get; set; } = int.MaxValue;
-
-        // TODO - We might want to specify which components to *not* serialize, because they might be managed entirely by a supervisor.
-        //      - This shouldn't be a problem if the components are deterministic though.
-
-        // doesn't matter if its json actually.
 
         public JsonExplicitHierarchyGameObjectsStrategy( Func<GameObject[]> rootObjectsGetter )
         {
@@ -37,15 +45,7 @@ namespace UnityPlus.Serialization.Strategies
             this.RootObjectsGetter = rootObjectsGetter;
         }
 
-        private static Component GetTransformOrAddComponent( GameObject go, Type componentType )
-        {
-            if( componentType == typeof( Transform ) )
-                return go.transform;
-
-            return go.AddComponent( componentType );
-        }
-
-        private static void CreateGameObjectWithComponents( ILoader l, SerializedData goJson, GameObject parent )
+        private static void CreateGameObjectHierarchy( ILoader l, SerializedData goJson, GameObject parent )
         {
             Guid objectGuid = l.ReadGuid( goJson[ISaver_Ex_References.ID] );
 
@@ -58,40 +58,40 @@ namespace UnityPlus.Serialization.Strategies
             }
 
             SerializedArray components = (SerializedArray)goJson["components"];
-            foreach( var c in components )
+            foreach( var compData in components )
             {
                 try
                 {
-                    Type compType = l.ReadType( c["$type"] );
-                    Guid compID = l.ReadGuid( c["$id"] );
+                    Guid compID = l.ReadGuid( compData["$id"] );
+                    Type compType = l.ReadType( compData["$type"] );
 
-                    Component co = GetTransformOrAddComponent( go, compType );
+                    Component co = go.GetTransformOrAddComponent( compType );
 
                     l.SetReferenceID( co, compID );
                 }
                 catch( Exception ex )
                 {
-                    Debug.LogError( $"[{nameof( JsonExplicitHierarchyGameObjectsStrategy )}] Failed to deserialize a component of GameObject with ID: `{objectGuid}`." );
+                    Debug.LogError( $"[{nameof( JsonExplicitHierarchyGameObjectsStrategy )}] Failed to deserialize a component with ID: `{compData?["$id"] ?? "<null>"}`." );
                     Debug.LogException( ex );
                 }
             }
 
             SerializedArray children = (SerializedArray)goJson["children"];
-            foreach( var c in children )
+            foreach( var childData in children )
             {
                 try
                 {
-                    CreateGameObjectWithComponents( l, c, go );
+                    CreateGameObjectHierarchy( l, childData, go );
                 }
                 catch( Exception ex )
                 {
-                    Debug.LogError( $"[{nameof( JsonExplicitHierarchyGameObjectsStrategy )}] Failed to deserialize a child GameObject of GameObject with ID: `{objectGuid}`." );
+                    Debug.LogError( $"[{nameof( JsonExplicitHierarchyGameObjectsStrategy )}] Failed to deserialize a child GameObject with ID: `{childData?["$id"] ?? "<null>"}`." );
                     Debug.LogException( ex );
                 }
             }
         }
 
-        private void WriteGameObjectHierarchy( GameObject go, ISaver s, ref SerializedArray arr )
+        private void SaveGameObjectHierarchy( GameObject go, ISaver s, ref SerializedArray arr )
         {
             if( !go.IsInLayerMask( IncludedObjectsMask ) )
             {
@@ -110,7 +110,7 @@ namespace UnityPlus.Serialization.Strategies
 
             foreach( Transform child in go.transform )
             {
-                WriteGameObjectHierarchy( child.gameObject, s, ref children );
+                SaveGameObjectHierarchy( child.gameObject, s, ref children );
             }
 
             SerializedArray components = new SerializedArray();
@@ -137,17 +137,16 @@ namespace UnityPlus.Serialization.Strategies
         {
             if( string.IsNullOrEmpty( ObjectsFilename ) )
             {
-                throw new InvalidOperationException( $"Can't save scene objects, file name is not set." );
+                throw new InvalidOperationException( $"Can't save objects, file name is not set." );
             }
+
             IEnumerable<GameObject> rootObjects = RootObjectsGetter();
 
             SerializedArray objData = new SerializedArray();
 
             foreach( var go in rootObjects )
             {
-                // maybe some sort of customizable tag/layer masking
-
-                WriteGameObjectHierarchy( go, s, ref objData );
+                SaveGameObjectHierarchy( go, s, ref objData );
 
                 yield return null;
             }
@@ -156,73 +155,47 @@ namespace UnityPlus.Serialization.Strategies
             new Serialization.Json.JsonStringWriter( objData, sb ).Write();
             File.WriteAllText( ObjectsFilename, sb.ToString(), Encoding.UTF8 );
         }
-        private void SaveObjectDataRecursive( ISaver s, GameObject go, ref SerializedArray objects )
+        private void SaveGameObjectDataRecursive( ISaver s, GameObject go, ref SerializedArray objects )
         {
             if( !go.IsInLayerMask( IncludedObjectsMask ) )
             {
                 return;
             }
 
-            Guid id = s.GetReferenceID( go );
-
-            SerializedArray components = new SerializedArray();
-
-            // components' properties.
             Component[] comps = go.GetComponents();
-            int i = 0;
-            foreach( var comp in comps )
+            for( int i = 0; i < comps.Length; i++ )
             {
-                SerializedData data = null;
+                Component comp = comps[i];
+                SerializedData compData = null;
                 try
                 {
-                    data = comp.GetData( s );
+                    compData = comp.GetData( s );
                 }
                 catch( Exception ex )
                 {
-                    Debug.LogWarning( $"Couldn't serialize component '{comp}': {ex.Message}." );
+                    Debug.LogWarning( $"[{nameof( JsonExplicitHierarchyGameObjectsStrategy )}] Couldn't serialize component '{comp}': {ex.Message}." );
                     Debug.LogException( ex );
                 }
 
-                if( data != null )
-                {
-                    Guid cid = s.GetReferenceID( comp );
-                    SerializedObject compData = new SerializedObject()
-                    {
-                        { "$ref", s.WriteGuid(cid) },
-                        { "data", data }
-                    };
-                    components.Add( compData );
-                }
-                i++;
+                SerializerUtils.TryWriteData( s, go, compData, ref objects );
             }
 
-            objects.Add( new SerializedObject()
-            {
-                { "$ref", s.WriteGuid( id ) },
-                { "name", go.name },
-                { "layer", go.layer },
-                { "is_active", go.activeSelf },
-                { "is_static", go.isStatic },
-                { "tag", go.tag },
-                { "components", components }
-            } );
+            SerializedData goData = go.GetData( s );
+            SerializerUtils.TryWriteData( s, go, goData, ref objects );
 
             foreach( Transform ct in go.transform )
             {
-                SaveObjectDataRecursive( s, ct.gameObject, ref objects );
+                SaveGameObjectDataRecursive( s, ct.gameObject, ref objects );
             }
         }
 
-        //public void SaveSceneObjects_Data( ISaver s )
+        //public void Save_Data( ISaver s )
         public IEnumerator Save_Data( ISaver s )
         {
             if( string.IsNullOrEmpty( DataFilename ) )
             {
-                throw new InvalidOperationException( $"Can't save scene objects, file name is not set." );
+                throw new InvalidOperationException( $"Can't save objects' data, file name is not set." );
             }
-            // saves the persistent information about the existing objects.
-
-            // persistent information is one that is expected to change and be preserved (i.e. health, inventory, etc).
 
             IEnumerable<GameObject> rootObjects = RootObjectsGetter();
 
@@ -230,7 +203,7 @@ namespace UnityPlus.Serialization.Strategies
 
             foreach( var go in rootObjects )
             {
-                SaveObjectDataRecursive( s, go, ref objData );
+                SaveGameObjectDataRecursive( s, go, ref objData );
 
                 yield return null;
             }
@@ -240,12 +213,18 @@ namespace UnityPlus.Serialization.Strategies
             File.WriteAllText( DataFilename, sb.ToString(), Encoding.UTF8 );
         }
 
+        //public void Load_Object( ILoader s )
         public IEnumerator Load_Object( ILoader l )
         {
             if( string.IsNullOrEmpty( ObjectsFilename ) )
             {
-                throw new InvalidOperationException( $"Can't load scene objects, file name is not set." );
+                throw new InvalidOperationException( $"Can't load objects, file name is not set." );
             }
+            if( !File.Exists( ObjectsFilename ) )
+            {
+                throw new InvalidOperationException( $"Can't load objects, file `{ObjectsFilename}` doesn't exist." );
+            }
+
 #warning TODO - this should be loaded asynchronously from a file or multiple files - jsonstreamreader.
             string objectsStr = File.ReadAllText( ObjectsFilename, Encoding.UTF8 );
             SerializedArray objectsJson = (SerializedArray)new Serialization.Json.JsonStringReader( objectsStr ).Read();
@@ -254,11 +233,11 @@ namespace UnityPlus.Serialization.Strategies
             {
                 try
                 {
-                    CreateGameObjectWithComponents( l, goJson, null );
+                    CreateGameObjectHierarchy( l, goJson, null );
                 }
                 catch( Exception ex )
                 {
-                    Debug.LogError( $"[{nameof( JsonExplicitHierarchyGameObjectsStrategy )}] Failed to deserialize a root GameObject, ID: `{goJson?["$id"]}`." );
+                    Debug.LogError( $"[{nameof( JsonExplicitHierarchyGameObjectsStrategy )}] Failed to deserialize a root GameObject with ID: `{goJson?["$id"] ?? "<null>"}`." );
                     Debug.LogException( ex );
                 }
 
@@ -270,46 +249,37 @@ namespace UnityPlus.Serialization.Strategies
         {
             if( string.IsNullOrEmpty( DataFilename ) )
             {
-                throw new InvalidOperationException( $"Can't load scene objects' data, file name is not set." );
+                throw new InvalidOperationException( $"Can't load objects' data, file name is not set." );
             }
+            if( !File.Exists( DataFilename ) )
+            {
+                throw new InvalidOperationException( $"Can't load objects' data, file `{DataFilename}` doesn't exist." );
+            }
+
             string dataStr = File.ReadAllText( DataFilename, Encoding.UTF8 );
             SerializedArray data = (SerializedArray)new Serialization.Json.JsonStringReader( dataStr ).Read();
 
-            foreach( var goData in data )
+            foreach( var dataElement in data )
             {
-                try
+                Guid id = l.ReadGuid( dataElement["$ref"] );
+                object obj = l.Get( id );
+                switch( obj )
                 {
-                    Guid goId = l.ReadGuid( goData["$ref"] );
+                    case GameObject go:
+                        go.SetData( l, dataElement["data"] );
+                        break;
 
-                    GameObject go = (GameObject)l.Get( goId );
-
-                    go.name = (string)goData["name"];
-                    go.layer = (int)goData["layer"];
-                    go.SetActive( (bool)goData["is_active"] );
-                    go.isStatic = (bool)goData["is_static"];
-                    go.tag = (string)goData["tag"];
-                }
-                catch( Exception ex )
-                {
-                    Debug.LogError( $"[{nameof( JsonExplicitHierarchyGameObjectsStrategy )}] Failed to deserialize data of gameobject with ID: `{goData?["$ref"]}`." );
-                    Debug.LogException( ex );
-                }
-
-                foreach( var componentData in (SerializedArray)goData["components"] ) // the components don't have to be under the gameobject. They will be found anyway.
-                {
-                    try
-                    {
-                        Guid compId = l.ReadGuid( componentData["$ref"] );
-
-                        Component comp = (Component)l.Get( compId );
-
-                        comp.SetData( l, componentData["data"] );
-                    }
-                    catch( Exception ex )
-                    {
-                        Debug.LogError( $"[{nameof( JsonExplicitHierarchyGameObjectsStrategy )}] Failed to deserialize data of component with ID: `{componentData?["$ref"]}`." );
-                        Debug.LogException( ex );
-                    }
+                    case Component comp:
+                        try
+                        {
+                            comp.SetData( l, dataElement["data"] );
+                        }
+                        catch( Exception ex )
+                        {
+                            Debug.LogError( $"[{nameof( JsonExplicitHierarchyGameObjectsStrategy )}] Failed to deserialize data of component with ID: `{dataElement?["$ref"] ?? "<null>"}`." );
+                            Debug.LogException( ex );
+                        }
+                        break;
                 }
 
                 yield return null;

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 
@@ -28,27 +24,19 @@ namespace UnityPlus.Serialization
     /// </summary>
     public class PreexistingReference : MonoBehaviour
     {
-        [SerializeField] [HideInInspector]
+        [SerializeField]
+        [HideInInspector]
         byte[] _guidData = null;
 
         public Guid GetGuid() => new Guid( _guidData );
         public void SetGuid( Guid guid ) => _guidData = guid.ToByteArray();
 
-        private void Awake()
+        void Start()
         {
             if( _guidData == null )
             {
-                Debug.LogError( $"Preexisting reference with unassigned GUID - '{this.gameObject.name}'. Please assign a valid guid." );
+                Debug.LogError( $"Deleting preexisting reference with unassigned GUID - '{this.gameObject.name}'. Please assign a valid guid first." );
                 Destroy( this );
-            }
-        }
-
-        private void OnValidate()
-        {
-            if( _guidData == null )
-            {
-                Guid guid = Guid.NewGuid();
-                _guidData = guid.ToByteArray();
             }
         }
     }

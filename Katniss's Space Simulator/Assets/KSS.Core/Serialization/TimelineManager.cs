@@ -83,7 +83,7 @@ namespace KSS.Core.Serialization
             _loader = new AsyncLoader(
                 SerializationPauseFunc, SerializationUnpauseFunc,
                 new Func<ILoader, IEnumerator>[] { _managersStrat.Load_Object, _celestialBodiesStrat.Load_Object, _vesselsStrat.Load_Object },
-                new Func<ILoader, IEnumerator>[] { _vesselsStrat.Load_Data }
+                new Func<ILoader, IEnumerator>[] { _managersStrat.Load_Data, _celestialBodiesStrat.Load_Data, _vesselsStrat.Load_Data }
             );
         }
 

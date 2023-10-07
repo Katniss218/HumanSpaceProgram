@@ -14,17 +14,28 @@ namespace UnityPlus.Serialization.Strategies
     /// <summary>
     /// Can be used to save the scene using the factory-gameobjectdata scheme.
     /// </summary>
+    /// <remarks>
+    /// - Object actions are suffixed by _Object <br />
+    /// - Data actions are suffixed by _Data
+    /// </remarks>
     public sealed class JsonAssetGameObjectsStrategy
     {
-        // Object actions are suffixed by _Object
-        // Data actions are suffixed by _Data
-
-#warning TODO - something to tell the strategy where to put the JSON file(s) and how to structure them.
-
+        /// <summary>
+        /// The name of the file into which the object data will be saved.
+        /// </summary>
         public string ObjectsFilename { get; set; }
+        /// <summary>
+        /// The name of the file into which the data data will be saved.
+        /// </summary>
         public string DataFilename { get; set; }
 
+        /// <summary>
+        /// Determines which objects will be saved.
+        /// </summary>
         public Func<GameObject[]> RootObjectsGetter { get; }
+        /// <summary>
+        /// Determines which objects returned by the <see cref="RootObjectsGetter"/> will be excluded from saving.
+        /// </summary>
         public int IncludedObjectsMask { get; set; } = int.MaxValue;
 
         public JsonAssetGameObjectsStrategy( Func<GameObject[]> rootObjectsGetter )
@@ -161,12 +172,13 @@ namespace UnityPlus.Serialization.Strategies
             return go;
         }
 
-        //public void SaveSceneObjects_Object( ISaver s )
-        public IEnumerator SaveSceneObjects_Object( ISaver s )
+        //public void Save_Object( ISaver s )
+        public IEnumerator Save_Object( ISaver s )
         {
-            // saves the information about what exists and what factory can be used to create that thing.
-
-            // this should save to a file. to a directory specified by this strategy.
+            if( string.IsNullOrEmpty( ObjectsFilename ) )
+            {
+                throw new InvalidOperationException( $"Can't save objects, file name is not set." );
+            }
 
             IEnumerable<GameObject> rootObjects = RootObjectsGetter();
 
@@ -193,53 +205,47 @@ namespace UnityPlus.Serialization.Strategies
             new Serialization.Json.JsonStringWriter( objectsJson, sb ).Write();
             File.WriteAllText( ObjectsFilename, sb.ToString(), Encoding.UTF8 );
         }
-
-        private static void SaveObjectDataRecursive( ISaver s, GameObject go, ref SerializedArray objects )
+        private void SaveGameObjectDataRecursive( ISaver s, GameObject go, ref SerializedArray objects )
         {
-            Guid id = s.GetReferenceID( go );
-
-            SerializedArray components = new SerializedArray();
+            if( !go.IsInLayerMask( IncludedObjectsMask ) )
+            {
+                return;
+            }
 
             Component[] comps = go.GetComponents();
-            int i = 0;
-            foreach( var comp in comps )
+            for( int i = 0; i < comps.Length; i++ )
             {
-                var dataJson = comp.GetData( s );
-
-                if( dataJson != null )
+                Component comp = comps[i];
+                SerializedData compData = null;
+                try
                 {
-                    Guid cid = s.GetReferenceID( comp );
-                    SerializedObject compData = new SerializedObject()
-                    {
-                        { "$ref", s.WriteGuid(cid) },
-                        { "data", dataJson }
-                    };
-                    components.Add( compData );
+                    compData = comp.GetData( s );
                 }
-                i++;
+                catch( Exception ex )
+                {
+                    Debug.LogWarning( $"[{nameof( JsonAssetGameObjectsStrategy )}] Couldn't serialize component '{comp}': {ex.Message}." );
+                    Debug.LogException( ex );
+                }
+
+                SerializerUtils.TryWriteData( s, go, compData, ref objects );
             }
 
-            if( components.Any() )
-            {
-                objects.Add( new SerializedObject()
-                {
-                    { "$ref", id.ToString( "D" ) },
-                    { "components", components }
-                } );
-            }
+            SerializedData goData = go.GetData( s );
+            SerializerUtils.TryWriteData( s, go, goData, ref objects );
 
             foreach( Transform ct in go.transform )
             {
-                SaveObjectDataRecursive( s, ct.gameObject, ref objects );
+                SaveGameObjectDataRecursive( s, ct.gameObject, ref objects );
             }
         }
 
-        //public void SaveSceneObjects_Data( ISaver s )
-        public IEnumerator SaveSceneObjects_Data( ISaver s )
+        //public void Save_Data( ISaver s )
+        public IEnumerator Save_Data( ISaver s )
         {
-            // saves the persistent information about the existing objects.
-
-            // persistent information is one that is expected to change and be preserved (i.e. health, inventory, etc).
+            if( string.IsNullOrEmpty( DataFilename ) )
+            {
+                throw new InvalidOperationException( $"Can't save objects' data, file name is not set." );
+            }
 
             IEnumerable<GameObject> rootObjects = RootObjectsGetter();
 
@@ -247,14 +253,13 @@ namespace UnityPlus.Serialization.Strategies
 
             foreach( var go in rootObjects )
             {
-                ClonedGameObject cbf = go.GetComponent<ClonedGameObject>();
-                if( cbf == null )
+                if( go.GetComponent<ClonedGameObject>() == null )
                 {
                     continue;
                 }
                 yield return null;
 
-                SaveObjectDataRecursive( s, go, ref objData );
+                SaveGameObjectDataRecursive( s, go, ref objData );
             }
 
             var sb = new StringBuilder();
@@ -262,13 +267,18 @@ namespace UnityPlus.Serialization.Strategies
             File.WriteAllText( DataFilename, sb.ToString(), Encoding.UTF8 );
         }
 
-        //public void LoadSceneObjects_Object( ILoader l )
-        public IEnumerator LoadSceneObjects_Object( ILoader l )
+        //public void Load_Object( ILoader l )
+        public IEnumerator Load_Object( ILoader l )
         {
             if( string.IsNullOrEmpty( ObjectsFilename ) )
             {
-                throw new InvalidOperationException( $"Can't load scene objects, file name is not set." );
+                throw new InvalidOperationException( $"Can't load objects, file name is not set." );
             }
+            if( !File.Exists( ObjectsFilename ) )
+            {
+                throw new InvalidOperationException( $"Can't load objects, file `{ObjectsFilename}` doesn't exist." );
+            }
+
             string objectsStr = File.ReadAllText( ObjectsFilename, Encoding.UTF8 );
             SerializedArray objectsJson = (SerializedArray)new Serialization.Json.JsonStringReader( objectsStr ).Read();
 
@@ -280,31 +290,42 @@ namespace UnityPlus.Serialization.Strategies
             }
         }
 
-        //public void LoadSceneObjects_Data( ILoader l )
-        public IEnumerator LoadSceneObjects_Data( ILoader l )
+        //public void Load_Data( ILoader l )
+        public IEnumerator Load_Data( ILoader l )
         {
             if( string.IsNullOrEmpty( DataFilename ) )
             {
-                throw new InvalidOperationException( $"Can't load scene objects, file name is not set." );
+                throw new InvalidOperationException( $"Can't load objects' data, file name is not set." );
             }
-            string objectsStr = File.ReadAllText( DataFilename, Encoding.UTF8 );
-            SerializedArray objectsJson = (SerializedArray)new Serialization.Json.JsonStringReader( objectsStr ).Read();
-
-            foreach( var goJson in objectsJson )
+            if( !File.Exists( DataFilename ) )
             {
-                object obj = l.Get( l.ReadGuid( goJson["$ref"] ) );
+                throw new InvalidOperationException( $"Can't load objects' data, file `{DataFilename}` doesn't exist." );
+            }
 
-                GameObject go = (GameObject)obj;
+            string dataStr = File.ReadAllText( DataFilename, Encoding.UTF8 );
+            SerializedArray data = (SerializedArray)new Serialization.Json.JsonStringReader( dataStr ).Read();
 
-                Component[] comps = go.GetComponents();
-
-                foreach( var compjson in (SerializedArray)goJson["components"] ) // the components don't have to be under the gameobject. They will be found anyway.
+            foreach( var dataElement in data )
+            {
+                Guid id = l.ReadGuid( dataElement["$ref"] );
+                object obj = l.Get( id );
+                switch( obj )
                 {
-                    Guid id = l.ReadGuid( compjson["$ref"] );
+                    case GameObject go:
+                        go.SetData( l, dataElement["data"] );
+                        break;
 
-                    Component comp = (Component)l.Get( id );
-
-                    comp.SetData( l, compjson["data"] );
+                    case Component comp:
+                        try
+                        {
+                            comp.SetData( l, dataElement["data"] );
+                        }
+                        catch( Exception ex )
+                        {
+                            Debug.LogError( $"[{nameof( JsonPreexistingGameObjectsStrategy )}] Failed to deserialize data of component with ID: `{dataElement?["$ref"] ?? "<null>"}`." );
+                            Debug.LogException( ex );
+                        }
+                        break;
                 }
 
                 yield return null;

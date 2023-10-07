@@ -11,16 +11,33 @@ using UnityPlus.Serialization;
 namespace UnityPlus.Serialization
 {
     /// <summary>
-    /// Serializes already existing scene objects (gameplay managers).
+    /// Serializes only the data of already existing scene objects.
     /// </summary>
+    /// <remarks>
+    /// - Object actions are suffixed by _Object <br />
+    /// - Data actions are suffixed by _Data
+    /// </remarks>
     public sealed class JsonPreexistingGameObjectsStrategy
     {
+        /// <summary>
+        /// The name of the file into which the object data will be saved.
+        /// </summary>
         public string ObjectsFilename { get; set; }
+        /// <summary>
+        /// The name of the file into which the data data will be saved.
+        /// </summary>
         public string DataFilename { get; set; }
 
+        /// <summary>
+        /// Determines which objects will have their data saved, and loaded.
+        /// </summary>
         public Func<GameObject[]> RootObjectsGetter { get; }
+        /// <summary>
+        /// Determines which objects returned by the <see cref="RootObjectsGetter"/> will be excluded from saving.
+        /// </summary>
         public int IncludedObjectsMask { get; set; } = int.MaxValue;
 
+        /// <param name="rootObjectsGetter">Determines which objects will have their data saved, and loaded.</param>
         public JsonPreexistingGameObjectsStrategy( Func<GameObject[]> rootObjectsGetter )
         {
             if( rootObjectsGetter == null )
@@ -37,20 +54,34 @@ namespace UnityPlus.Serialization
                 return;
             }
 
-            SerializerUtils.WriteGameObjectComponentsData( s, go, ref objects );
+            Component[] comps = go.GetComponents();
+            for( int i = 0; i < comps.Length; i++ )
+            {
+                Component comp = comps[i];
+                SerializedData compData = null;
+                try
+                {
+                    compData = comp.GetData( s );
+                }
+                catch( Exception ex )
+                {
+                    Debug.LogWarning( $"[{nameof( JsonPreexistingGameObjectsStrategy )}] Couldn't serialize component '{comp}': {ex.Message}." );
+                    Debug.LogException( ex );
+                }
 
-            SerializerUtils.WriteGameObjectData( s, go, ref objects );
+                SerializerUtils.TryWriteData( s, go, compData, ref objects );
+            }
+
+            SerializedData goData = go.GetData( s );
+            SerializerUtils.TryWriteData( s, go, goData, ref objects );
         }
 
         public IEnumerator Save_Data( ISaver s )
         {
             if( string.IsNullOrEmpty( DataFilename ) )
             {
-                throw new InvalidOperationException( $"Can't save scene objects, file name is not set." );
+                throw new InvalidOperationException( $"Can't save objects, file name is not set." );
             }
-            // saves the persistent information about the existing objects.
-
-            // persistent information is one that is expected to change and be preserved (i.e. health, inventory, etc).
 
             GameObject[] rootObjects = RootObjectsGetter();
 
@@ -70,12 +101,20 @@ namespace UnityPlus.Serialization
 
         public IEnumerator Load_Object( ILoader l )
         {
+            if( string.IsNullOrEmpty( ObjectsFilename ) )
+            {
+                throw new InvalidOperationException( $"Can't load objects, file name is not set." );
+            }
+            if( !File.Exists( ObjectsFilename ) )
+            {
+                throw new InvalidOperationException( $"Can't load objects, file `{DataFilename}` doesn't exist." );
+            }
+
+            // Objects are assumed to be already existing in the scene (same as on save).
+            // Loop through the objects to be loaded, and 
             GameObject[] objects = RootObjectsGetter.Invoke();
             foreach( var obj in objects )
             {
-                // the only difference between this and the prefab strat is that we don't spawn the object on load, it is assumed to already exist in the scene when the loader is run.
-                // match the component map to a guid returned from the guid getter for a specific root object.
-
                 PreexistingReference guidComp = obj.GetComponent<PreexistingReference>();
                 if( guidComp == null )
                 {
@@ -83,6 +122,43 @@ namespace UnityPlus.Serialization
                 }
 
                 l.SetReferenceID( obj, guidComp.GetGuid() );
+
+                yield return null;
+            }
+        }
+
+        public IEnumerator Load_Data( ILoader l )
+        {
+            if( string.IsNullOrEmpty( DataFilename ) )
+            {
+                throw new InvalidOperationException( $"Can't load objects' data, file name is not set." );
+            }
+
+            string dataStr = File.ReadAllText( DataFilename, Encoding.UTF8 );
+            SerializedArray data = (SerializedArray)new Serialization.Json.JsonStringReader( dataStr ).Read();
+
+            foreach( var dataElement in data )
+            {
+                Guid id = l.ReadGuid( dataElement["$ref"] );
+                object obj = l.Get( id );
+                switch( obj )
+                {
+                    case GameObject go:
+                        go.SetData( l, dataElement["data"] );
+                        break;
+
+                    case Component comp:
+                        try
+                        {
+                            comp.SetData( l, dataElement["data"] );
+                        }
+                        catch( Exception ex )
+                        {
+                            Debug.LogError( $"[{nameof( JsonPreexistingGameObjectsStrategy )}] Failed to deserialize data of component with ID: `{dataElement?["$ref"] ?? "<null>"}`." );
+                            Debug.LogException( ex );
+                        }
+                        break;
+                }
 
                 yield return null;
             }

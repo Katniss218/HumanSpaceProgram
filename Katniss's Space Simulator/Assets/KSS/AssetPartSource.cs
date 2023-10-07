@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityPlus.AssetManagement;
 
 namespace KSS
 {
@@ -13,23 +14,13 @@ namespace KSS
     /// </summary>
     public class AssetPartSource : PartFactory.PartSource
     {
-        const string PATH = "Prefabs/Parts/";
-
-        private GameObject _objCache;
-
-        public AssetPartSource( string partID ) : base( partID )
+        public AssetPartSource( string assetID ) : base( assetID )
         {
         }
 
         public override Transform Instantiate( Transform parent, Vector3 localPosition, Quaternion localRotation )
         {
-#warning TODO - Use UnityPlus.AssetManagement.AssetRegistry, since part prefabs are assets.
-            if( _objCache == null )
-            {
-                _objCache = Resources.Load<GameObject>( PATH + PartID );
-            }
-
-            GameObject partGO = UnityEngine.Object.Instantiate( _objCache, parent );
+            GameObject partGO = UnityEngine.Object.Instantiate( AssetRegistry.Get<GameObject>( PartID ), parent );
 
             partGO.transform.localPosition = localPosition;
             partGO.transform.localRotation = localRotation;
