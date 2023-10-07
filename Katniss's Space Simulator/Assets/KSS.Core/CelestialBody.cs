@@ -14,6 +14,7 @@ namespace KSS.Core
     {
         public Vector3Dbl AIRFPosition { get => this._rootTransform.GetAIRFPosition(); set => this._rootTransform.SetAIRFPosition( value ); }
 
+        public string Name { get; set; }
         public double Mass { get; set; }
         public double Radius { get; set; }
 
@@ -26,12 +27,12 @@ namespace KSS.Core
 
         void OnEnable()
         {
-            CelestialBodyManager.CelestialBodies.Add( this );
+            CelestialBodyManager.RegisterCelestialBody( this );
         }
 
         void OnDisable()
         {
-            CelestialBodyManager.CelestialBodies.Remove( this );
+            CelestialBodyManager.UnregisterCelestialBody( this );
         }
     }
 }

@@ -25,6 +25,12 @@ namespace UnityEngine
 
         public static readonly Vector3Dbl zero = new Vector3Dbl( 0, 0, 0 );
         public static readonly Vector3Dbl one = new Vector3Dbl( 1, 1, 1 );
+        public static readonly Vector3Dbl forward = new Vector3Dbl( 0, 0, 1 );
+        public static readonly Vector3Dbl back = new Vector3Dbl( 0, 0, -1 );
+        public static readonly Vector3Dbl right = new Vector3Dbl( 1, 0, 0 );
+        public static readonly Vector3Dbl left = new Vector3Dbl( -1, 0, 0 );
+        public static readonly Vector3Dbl up = new Vector3Dbl( 0, 1, 0 );
+        public static readonly Vector3Dbl down = new Vector3Dbl( 0, -1, 0 );
 
         public Vector3Dbl( double x, double y, double z )
         {
@@ -62,6 +68,20 @@ namespace UnityEngine
         {
             double magn = magnitude;
             return new Vector3( (float)(this.x / magn), (float)(this.y / magn), (float)(this.z / magn) );
+        }
+
+        public static double Dot( Vector3Dbl a, Vector3Dbl b )
+        {
+            return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
+        }
+        
+        public static Vector3Dbl Cross( Vector3Dbl v1, Vector3Dbl v2 )
+        {
+            double x = (v1.y * v2.z) - (v1.z * v2.y);
+            double y = (v1.z * v2.x) - (v1.x * v2.z);
+            double z = (v1.x * v2.y) - (v1.y * v2.x);
+
+            return new Vector3Dbl( x, y, z );
         }
 
         public static Vector3Dbl Add( Vector3Dbl v1, Vector3Dbl v2 )

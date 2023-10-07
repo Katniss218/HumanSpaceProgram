@@ -35,10 +35,10 @@ namespace KSS.Core
         public static float TimeScale { get => _timeScale; }
 
         /// <summary>
-        /// Returns the current in-universe time.
+        /// Returns the current universal time.
         /// </summary>
-        public static float Time { get => UnityEngine.Time.time; } // TODO - change this to date or time since some reference point.
-
+        public static double UT { get; private set; }
+        
         /// <summary>
         /// Returns the delta-time for the current frame.
         /// </summary>
@@ -156,6 +156,11 @@ namespace KSS.Core
         void Start()
         {
             SetTimeScale( 1 );
+        }
+
+        private void FixedUpdate()
+        {
+            UT += FixedDeltaTime;
         }
 
         void Update()

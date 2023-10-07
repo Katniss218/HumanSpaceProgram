@@ -11,9 +11,18 @@ namespace KSS.Core
     {
         public static List<CelestialBody> CelestialBodies { get; set; }
 
-        void Awake()
+        public static void RegisterCelestialBody( CelestialBody celestialBody )
         {
-            CelestialBodies = new List<CelestialBody>();
+            if( CelestialBodies == null )
+                CelestialBodies = new List<CelestialBody>();
+
+            CelestialBodies.Add( celestialBody );
+        }
+
+        public static void UnregisterCelestialBody( CelestialBody celestialBody )
+        {
+            if( CelestialBodies != null )
+                CelestialBodies.Remove( celestialBody );
         }
 
         internal static GameObject[] GetAllRootGameObjects()

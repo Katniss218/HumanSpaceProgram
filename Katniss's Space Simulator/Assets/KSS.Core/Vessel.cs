@@ -189,12 +189,12 @@ namespace KSS.Core
 
         void OnEnable()
         {
-            VesselManager.Vessels.Add( this );
+            VesselManager.RegisterVessel( this );
         }
-        
+
         void OnDisable()
         {
-            VesselManager.Vessels.Remove( this );
+            VesselManager.UnregisterVessel( this );
         }
 
         void FixedUpdate()

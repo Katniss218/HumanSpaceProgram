@@ -14,13 +14,23 @@ namespace KSS.Core
     {
         public static Vessel ActiveVessel { get; set; }
 
-        public static List<Vessel> Vessels { get; set; }
+        static List<Vessel> Vessels { get; set; }
 
-        void Awake()
+        public static void RegisterVessel( Vessel vessel )
         {
-            Vessels = new List<Vessel>();
+            if( Vessels == null )
+                Vessels = new List<Vessel>();
+
+            Vessels.Add( vessel );
         }
 
+        public static void UnregisterVessel( Vessel vessel )
+        {
+            if( Vessels != null )
+                Vessels.Remove( vessel );
+        }
+
+#warning TODO - implement custom save/load methods for the managers, aggregate them into the file. Need to save the active vessel.
         internal static GameObject[] GetAllRootGameObjects()
         {
 

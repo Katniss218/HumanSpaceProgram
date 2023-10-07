@@ -20,10 +20,6 @@ namespace UnityPlus.Serialization
     public sealed class JsonPreexistingGameObjectsStrategy
     {
         /// <summary>
-        /// The name of the file into which the object data will be saved.
-        /// </summary>
-        public string ObjectsFilename { get; set; }
-        /// <summary>
         /// The name of the file into which the data data will be saved.
         /// </summary>
         public string DataFilename { get; set; }
@@ -101,15 +97,6 @@ namespace UnityPlus.Serialization
 
         public IEnumerator Load_Object( ILoader l )
         {
-            if( string.IsNullOrEmpty( ObjectsFilename ) )
-            {
-                throw new InvalidOperationException( $"Can't load objects, file name is not set." );
-            }
-            if( !File.Exists( ObjectsFilename ) )
-            {
-                throw new InvalidOperationException( $"Can't load objects, file `{DataFilename}` doesn't exist." );
-            }
-
             // Objects are assumed to be already existing in the scene (same as on save).
             // Loop through the objects to be loaded, and 
             GameObject[] objects = RootObjectsGetter.Invoke();

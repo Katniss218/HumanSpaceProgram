@@ -98,10 +98,8 @@ namespace KSS.Core.Serialization
             _vesselsStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "Vessels", "objects.json" );
             _vesselsStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "Vessels", "data.json" );
             EnsureDirectoryExists( Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "CelestialBodies" ) );
-            _celestialBodiesStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "CelestialBodies", "objects.json" );
             _celestialBodiesStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "CelestialBodies", "data.json" );
             EnsureDirectoryExists( Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "Gameplay" ) );
-            _managersStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "Gameplay", "objects.json" );
             _managersStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "Gameplay", "data.json" );
         }
 
