@@ -82,7 +82,7 @@
     <Compile Include="Assets\KSS.Core\SceneManagement\SceneLoader.cs" />
     <Compile Include="Assets\KSS.Core\Buildings\LaunchSite.cs" />
     <Compile Include="Assets\KSS.Core\Control\ControlInAttribute.cs" />
-    <Compile Include="Assets\KSS.Core\Serialization\SaveVersion.cs" />
+    <Compile Include="Assets\KSS.Core\Serialization\Version.cs" />
     <Compile Include="Assets\KSS.Core\ReferenceFrames\ReferenceFrameUtils.cs" />
     <Compile Include="Assets\KSS.Core\Control\ControlOutAttribute.cs" />
     <Compile Include="Assets\KSS.Core\Serialization\SaveMetadata.cs" />

@@ -44,5 +44,7 @@ namespace KSS.Core.Mods
 
             LoadAssembliesRecursive( modDirectory );
         }
+
+        // todo - later, assembly should contain at least 1 class implementing the 'IMod' interface, which will specify the mod ID, and mod version. For version checking.
     }
 }

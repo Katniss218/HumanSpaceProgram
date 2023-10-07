@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 namespace KSS.Core.Serialization
 {
     /// <summary>
-    /// Represents the version of a serialized file.
+    /// Represents a version where the major number indicates breaking changes, and minor indicates non-breaking changes.
     /// </summary>
     /// <remarks>
-    /// Can be used to compare if 2 files are compatible with each other, or if breaking changes occurred.
+    /// Can be used to compare if 2 versions are compatible with each other, or if breaking changes occurred.
     /// </remarks>
-    public struct SaveVersion
+    public struct Version
     {
         /// <summary>
         /// The number indicating the major (breaking) part of the version.
@@ -23,45 +23,45 @@ namespace KSS.Core.Serialization
         /// </summary>
         public int Minor { get; }
 
-        public SaveVersion( int major, int minor )
+        public Version( int major, int minor )
         {
             this.Major = major;
             this.Minor = minor;
         }
 
-        public static bool AreCompatible( SaveVersion v1, SaveVersion v2 )
+        public static bool AreCompatible( Version v1, Version v2 )
         {
             // Versions are compatible if they don't have any breaking changes between them (major is the same).
             return v1.Major == v2.Major;
         }
 
-        public static bool operator <( SaveVersion v1, SaveVersion v2 )
+        public static bool operator <( Version v1, Version v2 )
         {
             if( v1.Major < v2.Major ) return true;
             if( v1.Major > v2.Major ) return false;
             return v1.Minor < v2.Minor;
         }
 
-        public static bool operator >( SaveVersion v1, SaveVersion v2 )
+        public static bool operator >( Version v1, Version v2 )
         {
             if( v1.Major > v2.Major ) return true;
             if( v1.Major < v2.Major ) return false;
             return v1.Minor > v2.Minor;
         }
 
-        public static bool operator ==( SaveVersion v1, SaveVersion v2 )
+        public static bool operator ==( Version v1, Version v2 )
         {
             return v1.Minor == v2.Minor && v1.Major == v2.Major;
         }
 
-        public static bool operator !=( SaveVersion v1, SaveVersion v2 )
+        public static bool operator !=( Version v1, Version v2 )
         {
             return v1.Minor != v2.Minor || v1.Major != v2.Major;
         }
 
         public override bool Equals( object obj )
         {
-            if( obj is not SaveVersion v )
+            if( obj is not Version v )
             {
                 return false;
             }
@@ -78,7 +78,7 @@ namespace KSS.Core.Serialization
             return Major.ToString( "#########0" ) + "." + Minor.ToString( "#########0" );
         }
 
-        public static SaveVersion Parse( string s )
+        public static Version Parse( string s )
         {
             string[] strings = s.Split( '.' );
             if( strings.Length != 2 )
@@ -87,7 +87,7 @@ namespace KSS.Core.Serialization
             }
             int major = int.Parse( strings[0] );
             int minor = int.Parse( strings[1] );
-            return new SaveVersion( major, minor );
+            return new Version( major, minor );
         }
     }
 }

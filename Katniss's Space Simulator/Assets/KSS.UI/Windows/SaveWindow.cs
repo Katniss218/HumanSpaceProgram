@@ -16,7 +16,8 @@ namespace KSS.UI
 
         IUIElementContainer _saveListUI;
 
-        UIInputField _inputField;
+        UIInputField _nameInputField;
+        UIInputField _descriptionInputField;
 
         [SerializeField]
         Button _saveButton;
@@ -51,13 +52,13 @@ namespace KSS.UI
 
         void OnSave()
         {
-            if( _inputField.Text != null )
+            if( _nameInputField.Text != null )
             {
-                TimelineManager.BeginSaveAsync( TimelineManager.CurrentTimeline.TimelineID, _inputField.Text );
+                TimelineManager.BeginSaveAsync( TimelineManager.CurrentTimeline.TimelineID, IOHelper.SanitizeFileName( _nameInputField.Text ), _nameInputField.Text, _descriptionInputField.Text );
             }
             else
             {
-                TimelineManager.BeginSaveAsync( TimelineManager.CurrentTimeline.TimelineID, _selectedSave.Save.SaveID );
+                TimelineManager.BeginSaveAsync( TimelineManager.CurrentTimeline.TimelineID, _selectedSave.Save.SaveID, _selectedSave.Save.Name, _selectedSave.Save.Description );
             }
         }
 
@@ -85,15 +86,11 @@ namespace KSS.UI
 
             UIInputField inputField = window.AddInputField( UILayoutInfo.FillHorizontal( 2, 99, 0f, 5, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
 
-            saveWindow._inputField = inputField;
+            saveWindow._nameInputField = inputField;
+            saveWindow._descriptionInputField = inputField;
             saveWindow._saveListUI = saveScrollView;
 
-            IEnumerable<SaveMetadata> saves = SaveMetadata.ReadAllSaves( TimelineManager.CurrentTimeline.TimelineID );
-
-            foreach( var save in saves )
-            {
-                SaveMetadataUI.Create( saveScrollView, UILayoutInfo.FillHorizontal( 0, 0, 0, 0, 40 ), save, null );
-            }
+            saveWindow.RefreshSaveList();
 
             return saveWindow;
         }

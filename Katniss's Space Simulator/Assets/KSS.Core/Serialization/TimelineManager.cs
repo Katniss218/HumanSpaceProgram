@@ -16,7 +16,7 @@ namespace KSS.Core.Serialization
     {
         #region SINGLETON UGLINESS
         private static TimelineManager ___instance;
-        public static TimelineManager Instance
+        private static TimelineManager instance
         {
             get
             {
@@ -32,11 +32,6 @@ namespace KSS.Core.Serialization
         static readonly JsonPreexistingGameObjectsStrategy _managersStrat = new JsonPreexistingGameObjectsStrategy( AlwaysLoadedManager.GetAllManagerGameObjects );
         static readonly JsonPreexistingGameObjectsStrategy _celestialBodiesStrat = new JsonPreexistingGameObjectsStrategy( CelestialBodyManager.GetAllRootGameObjects );
         static readonly JsonExplicitHierarchyGameObjectsStrategy _vesselsStrat = new JsonExplicitHierarchyGameObjectsStrategy( VesselManager.GetAllRootGameObjects );
-
-        /// <summary>
-        /// The save file version to use when creating new save files.
-        /// </summary>
-        public static readonly SaveVersion CURRENT_SAVE_VERSION = new SaveVersion( 0, 0 );
 
         /// <summary>
         /// Checks if a timeline is currently being either saved or loaded.
@@ -87,7 +82,7 @@ namespace KSS.Core.Serialization
             );
         }
 
-        static void EnsureDirectory( string path )
+        static void EnsureDirectoryExists( string path )
         {
             if( !Directory.Exists( path ) )
             {
@@ -95,17 +90,17 @@ namespace KSS.Core.Serialization
             }
         }
 
-        static void SetStratPaths( string timelineId, string saveId )
+        static void SetSerializationStrategyPaths( string timelineId, string saveId )
         {
-            EnsureDirectory( SaveMetadata.GetRootDirectory( timelineId, saveId ) );
+            EnsureDirectoryExists( SaveMetadata.GetRootDirectory( timelineId, saveId ) );
 
-            EnsureDirectory( Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "Vessels" ) );
+            EnsureDirectoryExists( Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "Vessels" ) );
             _vesselsStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "Vessels", "objects.json" );
             _vesselsStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "Vessels", "data.json" );
-            EnsureDirectory( Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "CelestialBodies" ) );
+            EnsureDirectoryExists( Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "CelestialBodies" ) );
             _celestialBodiesStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "CelestialBodies", "objects.json" );
             _celestialBodiesStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "CelestialBodies", "data.json" );
-            EnsureDirectory( Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "Gameplay" ) );
+            EnsureDirectoryExists( Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "Gameplay" ) );
             _managersStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "Gameplay", "objects.json" );
             _managersStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "Gameplay", "data.json" );
         }
@@ -114,7 +109,7 @@ namespace KSS.Core.Serialization
         /// Asynchronously saves the current game state over multiple frames. <br/>
         /// The game should remain paused for the duration of the saving (this is generally handled automatically, but be careful).
         /// </summary>
-        public static void BeginSaveAsync( string timelineId, string saveId )
+        public static void BeginSaveAsync( string timelineId, string saveId, string saveName, string saveDescription )
         {
             if( string.IsNullOrEmpty( timelineId ) && string.IsNullOrEmpty( saveId ) )
             {
@@ -127,15 +122,18 @@ namespace KSS.Core.Serialization
 
             CreateDefaultSaver();
 
-            SetStratPaths( timelineId, saveId );
+            SetSerializationStrategyPaths( timelineId, saveId );
             HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_SAVE, _saver );
 
             // write timeline.json to disk
             // write save.json to disk.
-            _saver.SaveAsync( Instance );
+            _saver.SaveAsync( instance );
             SaveMetadata savedSave = new SaveMetadata( timelineId, saveId );
-            savedSave.SaveVersion = CURRENT_SAVE_VERSION;
+            savedSave.Name = saveName;
+            savedSave.Description = saveDescription;
+            savedSave.FileVersion = SaveMetadata.CURRENT_SAVE_FILE_VERSION;
             savedSave.WriteToDisk();
+            CurrentTimeline.WriteToDisk();
 
             HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_SAVE, _saver );
         }
@@ -156,15 +154,16 @@ namespace KSS.Core.Serialization
             }
 
             TimelineMetadata loadedTimeline = new TimelineMetadata( timelineId );
+            loadedTimeline.ReadDataFromDisk();
             SaveMetadata loadedSave = new SaveMetadata( timelineId, saveId );
-#warning TODO - load timeline's and save's metadata too.
+            loadedSave.ReadDataFromDisk();
 
             CreateDefaultLoader();
 
-            SetStratPaths( timelineId, saveId );
+            SetSerializationStrategyPaths( timelineId, saveId );
             HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_LOAD, _loader );
 
-            _loader.LoadAsync( Instance );
+            _loader.LoadAsync( instance );
             CurrentTimeline = loadedTimeline;
 
             HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_LOAD, _loader );
@@ -173,7 +172,7 @@ namespace KSS.Core.Serialization
         /// <summary>
         /// Creates a new default (empty) timeline and "loads" it.
         /// </summary>
-        public static void CreateNew( string timelineId, string saveId )
+        public static void CreateNew( string timelineId, string saveId, string timelineName, string timelineDescription )
         {
             if( string.IsNullOrEmpty( timelineId ) && string.IsNullOrEmpty( saveId ) )
             {
@@ -185,6 +184,8 @@ namespace KSS.Core.Serialization
             }
 
             TimelineMetadata newTimeline = new TimelineMetadata( timelineId );
+            newTimeline.Name = timelineName;
+            newTimeline.Description = timelineDescription;
 
             HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_NEW );
 

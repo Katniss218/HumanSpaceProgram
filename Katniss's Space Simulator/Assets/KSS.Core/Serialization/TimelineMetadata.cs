@@ -15,6 +15,9 @@ namespace KSS.Core.Serialization
     /// </summary>
     public sealed class TimelineMetadata
     {
+        /// <summary>
+        /// The name of the file that stores the timeline metadata.
+        /// </summary>
         public const string TIMELINE_FILENAME = "_timeline.json";
 
         /// <summary>
@@ -52,7 +55,7 @@ namespace KSS.Core.Serialization
         {
             return Path.Combine( GetTimelinesPath(), timelineId );
         }
-        
+
         /// <summary>
         /// Returns the path to the (root) directory of the timeline.
         /// </summary>
@@ -87,14 +90,8 @@ namespace KSS.Core.Serialization
             {
                 try
                 {
-                    string path = Path.Combine( timelineDirName, TIMELINE_FILENAME );
-
-                    string saveJson = File.ReadAllText( path );
-
-                    SerializedData data = new JsonStringReader( saveJson ).Read();
-
                     TimelineMetadata timelineMetadata = new TimelineMetadata( timelineDirName );
-                    timelineMetadata.SetData( data );
+                    timelineMetadata.ReadDataFromDisk();
                     timelines.Add( timelineMetadata );
                 }
                 catch( Exception ex )
@@ -118,10 +115,29 @@ namespace KSS.Core.Serialization
             File.WriteAllText( saveFilePath, sb.ToString(), Encoding.UTF8 );
         }
 
+        public void ReadDataFromDisk()
+        {
+            string savePath = GetRootDirectory();
+            string saveFilePath = Path.Combine( savePath, TIMELINE_FILENAME );
+
+            string saveJson = File.ReadAllText( saveFilePath, Encoding.UTF8 );
+
+            SerializedData data = new JsonStringReader( saveJson ).Read();
+
+            this.SetData( data );
+        }
+
         public void SetData( SerializedData data )
         {
-            this.Name = data["name"];
-            this.Description = data["description"];
+            if( data.TryGetValue( "name", out var name ) )
+            {
+                this.Name = (string)name;
+            }
+
+            if( data.TryGetValue( "description", out var description ) )
+            {
+                this.Description = (string)description;
+            }
         }
 
         public SerializedData GetData()
