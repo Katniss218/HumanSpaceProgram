@@ -310,7 +310,36 @@ namespace KSS.Core
 
         public static Orbit FromStateVectors( double gravParameter, Vector3Dbl position, Vector3Dbl velocity )
         {
-            double positionMagn = position.magnitude;
+            // https://downloads.rene-schwarz.com/download/M002-Cartesian_State_Vectors_to_Keplerian_Orbit_Elements.pdf
+
+            Vector3Dbl momentum = Vector3Dbl.Cross( position, velocity );
+            Vector3Dbl eccentricityVector = (Vector3Dbl.Cross( velocity, momentum ) / gravParameter) - (position / position.magnitude);
+
+            Vector3Dbl nodeVector = Vector3Dbl.Cross( Vector3Dbl.forward, momentum ); // points towards the ascending node.
+
+            double trueAnomaly = Math.Acos( Vector3Dbl.Dot( eccentricityVector, position ) / (eccentricityVector.magnitude * position.magnitude) );
+            if( Vector3Dbl.Dot( position, velocity ) < 0 )
+                trueAnomaly = TwoPI - trueAnomaly;
+
+            double inclination = Math.Acos( momentum.z / momentum.magnitude );
+            double eccentricity = eccentricityVector.magnitude;
+            double eccentricAnomaly = 2 * Math.Atan( Math.Tan( trueAnomaly / 2 ) / Math.Sqrt( (1 + eccentricity) / (1 - eccentricity) ) );
+
+            double longitudeOfAscendingNode = Math.Acos( nodeVector.x / nodeVector.magnitude );
+            if( nodeVector.y < 0 )
+                longitudeOfAscendingNode = TwoPI - longitudeOfAscendingNode;
+
+            double argumentOfPeriapsis = Math.Acos( Vector3Dbl.Dot( nodeVector, eccentricityVector ) / (nodeVector.magnitude * eccentricity) );
+            if( eccentricityVector.z < 0 )
+                argumentOfPeriapsis = TwoPI - argumentOfPeriapsis;
+
+            double meanAnomaly = eccentricAnomaly - eccentricity * Math.Sin( eccentricAnomaly );
+            double semiMajorAxis = 1 / ((2 / position.magnitude) - (velocity.sqrMagnitude / gravParameter));
+
+            return new Orbit( semiMajorAxis, eccentricity, inclination, longitudeOfAscendingNode, argumentOfPeriapsis, meanAnomaly );
+
+            // Mechjeb version (uses right handed vectors/quaternions)
+            /*double positionMagn = position.magnitude;
             double velocityMagn = velocity.magnitude;
             Vector3Dbl dirToPosition = position.normalized;
             var angularVelocity = Vector3Dbl.Cross( position, velocity );
@@ -352,7 +381,7 @@ namespace KSS.Core
             double argumentOfPeriapsis = Wrap2PI( eccentricity > 0.0001 ? Math.Atan2( h, xk ) - longitudeOfAscendingNode : 0.0 );
             double trueAnomaly = Wrap2PI( xlambdot - longitudeOfAscendingNode - argumentOfPeriapsis );
 
-            return new Orbit( semimajorAxis, eccentricity, inclination, longitudeOfAscendingNode, argumentOfPeriapsis, meanAnomaly );
+            return new Orbit( semimajorAxis, eccentricity, inclination, longitudeOfAscendingNode, argumentOfPeriapsis, meanAnomaly );*/
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
@@ -376,8 +405,12 @@ namespace KSS.Core
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public (Vector3Dbl position, Vector3Dbl velocity) ToStateVectors( double gravParameter, double semiLatusRectum )
+        public (Vector3Dbl position, Vector3Dbl velocity) ToStateVectors( double gravParameter )
         {
+            // Mechjeb version (uses right handed vectors/quaternions)
+
+            (double trueAnomaly, _) = AnomaliesFromMean( meanAnomaly, eccentricity );
+
             (Vector3Dbl p, Vector3Dbl q) = PerifocalFromElements( gravParameter, semiLatusRectum, eccentricity, trueAnomaly );
             QuaternionDbl rot = PerifocalToECIMatrix( inclination, argumentOfPeriapsis, longitudeOfAscendingNode );
 
