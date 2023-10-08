@@ -73,12 +73,19 @@ namespace KSS.CelestialBodies.Surface
             List<LODQuad> newActiveQuads = new List<LODQuad>( _activeQuads ); // todo - kinda unoptimal.
             List<LODQuad> needRemeshing = new List<LODQuad>();
 
+            Vessel[] vessels = VesselManager.GetVessels();
+            Vector3Dbl[] airfPOIs = new Vector3Dbl[vessels.Length];
+            for( int i = 0; i < vessels.Length; i++ )
+            {
+                airfPOIs[i] = vessels[i].AIRFPosition;
+            }
+
             foreach( var quad in _activeQuads )
             {
                 if( quad.Node.Value == null ) // marked as destroyed.
                     continue;
 
-                quad.AirfPOIs = new Vector3Dbl[] { VesselManager.ActiveVessel.AIRFPosition };
+                quad.AirfPOIs = airfPOIs;
 
                 if( quad.CurrentState is LODQuad.State.Idle )
                 {

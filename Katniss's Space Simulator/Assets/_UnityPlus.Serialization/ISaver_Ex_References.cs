@@ -11,23 +11,6 @@ namespace UnityPlus.Serialization
 {
     public static class ISaver_Ex_References
     {
-        /// <summary>
-        /// The special token name for a reference ID (part of Object).
-        /// </summary>
-        public const string ID = "$id";
-
-        /// <summary>
-        /// The special token name for a reference (part of Reference).
-        /// </summary>
-        public const string REF = "$ref";
-
-        /// <summary>
-        /// The special token name for an asset reference.
-        /// </summary>
-        public const string ASSETREF = "$assetref";
-
-
-
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public static SerializedData WriteObjectReference( this ISaver s, object value )
         {
@@ -42,7 +25,7 @@ namespace UnityPlus.Serialization
 
             return new SerializedObject()
             {
-                { $"{REF}", s.WriteGuid( guid) }
+                { $"{SerializerUtils.REF}", s.WriteGuid( guid) }
             };
         }
 
@@ -62,7 +45,7 @@ namespace UnityPlus.Serialization
 
             return new SerializedObject()
             {
-                { $"{ASSETREF}", assetID }
+                { $"{SerializerUtils.ASSETREF}", assetID }
             };
         }
 

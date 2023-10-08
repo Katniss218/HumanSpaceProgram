@@ -26,13 +26,10 @@ namespace KSS.Core
         }
     }
 
-    // Do not add RootObjectTransform explicitly *before* PhysicsObject. it messes up the initialization and rigidbody is not cached at the right time.
+    // ### WARNING ### Do not add "require RootObjectTransform" explicitly. it messes up the initialization and rigidbody is not cached at the right time.
     [RequireComponent( typeof( PhysicsObject ) )]
     public sealed partial class Vessel : MonoBehaviour
     {
-        // Root objects have to store their AIRF positions, children natively store their local coordinates, which as long as they're not obscenely large, will be fine.
-        // - An object with a child at 0.00125f can be sent to 10e25 and brought back, and its child will remain at 0.00125f
-
         [SerializeField]
         private string _displayName;
         public string DisplayName
@@ -46,8 +43,6 @@ namespace KSS.Core
 
         public PhysicsObject PhysicsObject { get; private set; }
         public RootObjectTransform RootObjTransform { get; private set; }
-
-        public Vector3Dbl AIRFPosition { get => this.RootObjTransform.GetAIRFPosition(); }
 
         /// <remarks>
         /// DO NOT USE. This is for internal use, and can produce an invalid state. Use <see cref="VesselStateUtils.SetParent(Transform, Transform)"/> instead.
@@ -132,21 +127,8 @@ namespace KSS.Core
             return (centerOfMass, mass);
         }
 
-        /// <summary>
-        /// Sets the position of the vessel in Absolute Inertial Reference Frame coordinates. Units in [m].
-        /// </summary>
-        public void SetPosition( Vector3Dbl airfPosition )
-        {
-            this.RootObjTransform.SetAIRFPosition( airfPosition );
-        }
-
-        /// <summary>
-        /// Sets the rotation of the vessel in Absolute Inertial Reference Frame coordinates.
-        /// </summary>
-        public void SetRotation( Quaternion airfRotation )
-        {
-            this.RootObjTransform.SetAIRFRotation( airfRotation );
-        }
+        public Vector3Dbl AIRFPosition { get => this.RootObjTransform.AIRFPosition; set => this.RootObjTransform.AIRFPosition = value; }
+        public QuaternionDbl AIRFRotation { get => this.RootObjTransform.AIRFRotation; set => this.RootObjTransform.AIRFRotation = value; }
 
         /// <summary>
         /// Calculates the scene world-space point at the very bottom of the vessel. Useful when placing it at launchsites and such.
@@ -220,6 +202,37 @@ namespace KSS.Core
         {
             Gizmos.color = Color.blue;
             Gizmos.DrawWireCube( this.transform.TransformPoint( this.PhysicsObject.LocalCenterOfMass ), Vector3.one * 0.25f );
+        }
+
+        public static double GetExhaustVelocity( (Vector3 thrust, float exhaustVelocity)[] thrusters )
+        {
+            Vector3 totalThrust = Vector3.zero;
+            float totalMassFlow = 0.0f;
+
+            foreach( (var thrust, var exhaustVelocity) in thrusters )
+            {
+                totalThrust += thrust;
+                totalMassFlow += thrust.magnitude * exhaustVelocity;
+            }
+
+            return totalThrust.magnitude / totalMassFlow;
+        }
+
+        public static double GetDeltaV( double exhaustVelocity, double initialMass, double finalMass )
+        {
+            return exhaustVelocity * Math.Log( initialMass / finalMass );
+        }
+
+        /// <summary>
+        /// Calculates the initial mass required for a vehicle to achieve a given delta-V.
+        /// </summary>
+        /// <param name="deltaV">The desired delta-V, in [m/s].</param>
+        /// <param name="exhaustVelocity">The effective exhaust velocity, in [m/s].</param>
+        /// <param name="finalMass">The final mass of the vehicle after the burn, in [kg].</param>
+        /// <returns>The initial mass, in [kg].</returns>
+        public static double GetInitialMass( double deltaV, double exhaustVelocity, double finalMass )
+        {
+            return finalMass * Math.Exp( deltaV / exhaustVelocity );
         }
     }
 }

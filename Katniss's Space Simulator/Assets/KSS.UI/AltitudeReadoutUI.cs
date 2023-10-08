@@ -16,14 +16,21 @@ namespace KSS.UI
 
         void LateUpdate()
         {
-            CelestialBody body = CelestialBodyManager.CelestialBodies[0];
-            Vector3 posV = VesselManager.ActiveVessel.transform.position;
-            Vector3 posCB = SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformPosition( body.AIRFPosition );
+            if( VesselManager.ActiveVessel == null )
+            {
+                Text.Text = "";
+            }
+            else
+            {
+                CelestialBody body = CelestialBodyManager.CelestialBodies[0];
+                Vector3 posV = VesselManager.ActiveVessel.transform.position;
+                Vector3 posCB = SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformPosition( body.AIRFPosition );
 
-            float magn = (posV - posCB).magnitude;
-            float alt = magn - (float)body.Radius;
+                float magn = (posV - posCB).magnitude;
+                float alt = magn - (float)body.Radius;
 
-            Text.Text = $"Altitude: {(alt / 1000.0f):#0} km";
+                Text.Text = $"Altitude: {(alt / 1000.0f):#0} km";
+            }
         }
     }
 }

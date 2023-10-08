@@ -18,12 +18,9 @@ namespace KSS.Core
         public float mass = 5.97e24f;
         public const int subdivs = 7; // 7 is the maximum value for a single plane that won't cause issues here.
 
-        public CelestialBody Create( Vector3Dbl AIRFPosition )
+        public CelestialBody Create( Vector3Dbl airfPosition, QuaternionDbl airfRotation )
         {
             GameObject gameObject = new GameObject( "celestialbody" );
-            gameObject.transform.position = SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformPosition( AIRFPosition );
-            gameObject.transform.localScale = Vector3.one;
-            gameObject.transform.forward = Vector3.up;
 
             //SphereCollider c = cbGO.AddComponent<SphereCollider>();
 
@@ -31,7 +28,8 @@ namespace KSS.Core
             pr.SetGuid( GuidFromHash( Encoding.ASCII.GetBytes( $"{radius}{mass}" ) ) );
 
             CelestialBody body = gameObject.AddComponent<CelestialBody>();
-            body.AIRFPosition = AIRFPosition;
+            body.AIRFPosition = airfPosition;
+            body.AIRFRotation = airfRotation;
             body.Mass = mass;
             body.Radius = radius;
 

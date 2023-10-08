@@ -9,7 +9,7 @@ namespace KSS.Components
     [Serializable]
     public class FRocketEngine : MonoBehaviour, IResourceConsumer, IPersistent
     {
-        const float ISP_TO_EXVEL = 9.80665f;
+        const float g = 9.80665f;
 
         float _currentThrust;
 
@@ -28,13 +28,13 @@ namespace KSS.Components
         /// <summary>
         /// Maximum mass flow (at max thrust), in [kg/s]
         /// </summary>
-        public float MaxMassFlow => MaxThrust / (Isp * ISP_TO_EXVEL);
+        public float MaxMassFlow => MaxThrust / (Isp * g);
 
         [field: SerializeField]
         public float Throttle { get; set; }
 
         /// <summary>
-        /// Defines which way the engine thrusts (thrust is applied along its `forward` (positive) axis).
+        /// Defines which way the engine thrusts (thrust is applied in its `forward` (Z+) direction).
         /// </summary>
         [field: SerializeField]
         public Transform ThrustTransform { get; set; }
@@ -43,11 +43,11 @@ namespace KSS.Components
         public SubstanceStateCollection Inflow { get; private set; } = SubstanceStateCollection.Empty;
 
         /// <summary>
-        /// Returns the actual thrust at this moment in time.
+        /// Returns the actual thrust produced by the engine at this moment in time.
         /// </summary>
         public float GetThrust( float massFlow )
         {
-            return (this.Isp * ISP_TO_EXVEL) * massFlow * Throttle;
+            return (this.Isp * g) * massFlow * Throttle;
         }
 
         /*[ControlIn( "set.throttle", "Set Throttle" )]
@@ -85,17 +85,21 @@ namespace KSS.Components
 
         public FluidState Sample( Vector3 localPosition, Vector3 localAcceleration, float holeArea )
         {
-            return FluidState.Vacuum; // temp, inlet condition.
-        }
-
-        public void SetData( ILoader l, SerializedData data )
-        {
-            throw new NotImplementedException();
+            return FluidState.Vacuum; // temp, inlet condition (possible backflow, etc).
         }
 
         public SerializedData GetData( ISaver s )
         {
-            throw new NotImplementedException();
+            return new SerializedObject()
+            {
+                { "throttle", this.Throttle }
+            };
+        }
+
+        public void SetData( ILoader l, SerializedData data )
+        {
+            if( data.TryGetValue( "throttle", out var throttle ) )
+                this.Throttle = throttle;
         }
     }
 }

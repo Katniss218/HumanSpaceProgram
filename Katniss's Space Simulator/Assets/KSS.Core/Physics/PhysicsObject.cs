@@ -112,7 +112,7 @@ namespace KSS.Core.Physics
         void FixedUpdate()
         {
             // I'm not a huge fan of the physics being calculated in scene-space, but that's the only way to handle collisions properly.
-            this._rootTransform.SetAIRFPosition( SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.transform.position ) );
+            this._rootTransform.AIRFPosition = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.transform.position );
 
             // If the object is colliding, we will use its rigidbody accelerations, because we don't have access to the forces due to collisions.
             // Otherwise, we use our more precise method that relies on full encapsulation of the rigidbody.

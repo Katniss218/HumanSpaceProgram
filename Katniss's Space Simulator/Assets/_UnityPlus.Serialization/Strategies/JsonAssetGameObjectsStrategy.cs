@@ -58,7 +58,7 @@ namespace UnityPlus.Serialization.Strategies
                 {
                     sArr.Add( new SerializedObject()
                 {
-                    { "$id", s.WriteGuid( id ) },
+                    { $"{SerializerUtils.ID}", s.WriteGuid( id ) },
                     { "path", $"{parentPath}" }
                 } );
                 }
@@ -71,7 +71,7 @@ namespace UnityPlus.Serialization.Strategies
                 {
                     sArr.Add( new SerializedObject()
                     {
-                        { "$id", s.WriteGuid( id ) },
+                        { $"{SerializerUtils.ID}", s.WriteGuid( id ) },
                         { "path", $"{parentPath}*{i.ToString(CultureInfo.InvariantCulture)}" }
                     } );
                 }
@@ -96,7 +96,7 @@ namespace UnityPlus.Serialization.Strategies
 
             SerializedObject goJson = new SerializedObject()
             {
-                { ISaver_Ex_References.ID, s.WriteGuid(objectGuid) },
+                { SerializerUtils.ID, s.WriteGuid(objectGuid) },
                 { "prefab", s.WriteAssetReference(cbf.OriginalAsset) },
                 { "children_ids", sArr }
             };
@@ -153,7 +153,7 @@ namespace UnityPlus.Serialization.Strategies
 
         private static GameObject ReadAssetGameObject( ILoader l, SerializedData goJson )
         {
-            Guid objectGuid = l.ReadGuid( goJson[ISaver_Ex_References.ID] );
+            Guid objectGuid = l.ReadGuid( goJson[SerializerUtils.ID] );
 
             GameObject prefab = l.ReadAssetReference<GameObject>( goJson["prefab"] );
 

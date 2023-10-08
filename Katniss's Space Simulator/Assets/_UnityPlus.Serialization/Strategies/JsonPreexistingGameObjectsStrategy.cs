@@ -72,6 +72,9 @@ namespace UnityPlus.Serialization
             SerializerUtils.TryWriteData( s, go, goData, ref objects );
         }
 
+        /// <summary>
+        /// Saves the data about the gameobjects and their persistent components. Does not include child objects.
+        /// </summary>
         public IEnumerator Save_Data( ISaver s )
         {
             if( string.IsNullOrEmpty( DataFilename ) )

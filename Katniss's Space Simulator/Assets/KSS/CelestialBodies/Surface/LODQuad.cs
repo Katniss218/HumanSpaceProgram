@@ -112,9 +112,9 @@ namespace KSS.CelestialBodies.Surface
             }
 
             // Check if any of the PIOs is within the subdiv radius.
+            Vector3Dbl airfQuad = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.transform.position );
             foreach( var airfPOI in this.AirfPOIs )
             {
-                Vector3Dbl airfQuad = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.transform.position );
                 double dist = (airfPOI - airfQuad).magnitude;
 
                 if( (float)dist < SubdivisionDistance )
@@ -159,18 +159,18 @@ namespace KSS.CelestialBodies.Surface
 
             // If the parent won't want to immediately subdivide again, unsubdivide.
             Vector3 originBodySpace = _quadSphereFace.GetSpherePoint( this.Node.Parent.Center ) * (float)CelestialBody.Radius;
+            Vector3Dbl parentQuadOriginAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.CelestialBody.transform.TransformPoint( originBodySpace ) );
             foreach( var airfPOI in this.AirfPOIs )
             {
-                Vector3Dbl parentQuadOriginAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.CelestialBody.transform.TransformPoint( originBodySpace ) );
                 double distanceToPoi = (airfPOI - parentQuadOriginAirf).magnitude;
 
-                if( distanceToPoi > this.SubdivisionDistance * 2 ) // times 2 because parent subdiv range is 2x more than its child.
+                if( distanceToPoi <= this.SubdivisionDistance * 2 ) // times 2 because parent subdiv range is 2x more than its child.
                 {
-                    return true;
+                    return false;
                 }
             }
 
-            return false;
+            return true;
         }
 
         static readonly float Cos45DegPlusEpsilon = Mathf.Cos( 45 * Mathf.Deg2Rad ) + 0.025f; // also, cos(45deg) is equal to sin(45deg)

@@ -4,17 +4,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace KSS.Core
 {
     /// <summary>
     /// Manages loading, unloading, switching, etc of vessels.
     /// </summary>
-    public class VesselManager : MonoBehaviour
+    public class VesselManager : MonoBehaviour, IPersistent
     {
         public static Vessel ActiveVessel { get; set; }
 
         static List<Vessel> Vessels { get; set; }
+
+        public static Vessel[] GetVessels()
+        {
+            return Vessels.ToArray();
+        }
 
         public static void RegisterVessel( Vessel vessel )
         {
@@ -42,6 +48,19 @@ namespace KSS.Core
             return gos;
         }
 
-        // save/load
+        public SerializedData GetData( ISaver s )
+        {
+            return new SerializedObject()
+            {
+                { "active_vessel", s.WriteObjectReference( ActiveVessel ) }
+            };
+        }
+
+        public void SetData( ILoader l, SerializedData data )
+        {
+            if( data.TryGetValue( "active_vessel", out var activeVessel ) )
+                ActiveVessel = (Vessel)l.ReadObjectReference( activeVessel );
+            throw new NotImplementedException();
+        }
     }
 }

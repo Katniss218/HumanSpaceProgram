@@ -51,21 +51,21 @@ namespace KSS.Core.ReferenceFrames
         /// <summary>
         /// Transforms a direction vector in the reference frame's space to the Absolute Inertial Reference Frame (AIRF) space.
         /// </summary>
-        Vector3 TransformVector( Vector3 localDirection );
+        Vector3 TransformDirection( Vector3 localDirection );
 
         /// <summary>
         /// Transforms a direction vector in the Absolute Inertial Reference Frame (AIRF) space to the reference frame's space.
         /// </summary>
-        Vector3 InverseTransformVector( Vector3 globalDirection );
+        Vector3 InverseTransformDirection( Vector3 globalDirection );
 
         /// <summary>
         /// Transforms a rotation/orientation in the reference frame's space to the Absolute Inertial Reference Frame (AIRF) space.
         /// </summary>
-        Quaternion TransformRotation( Quaternion localPosition );
+        QuaternionDbl TransformRotation( Quaternion localRotation );
 
         /// <summary>
         /// Transforms a rotation/orientation in the Absolute Inertial Reference Frame (AIRF) space to the reference frame's space.
         /// </summary>
-        Quaternion InverseTransformRotation( Quaternion globalPosition );
+        Quaternion InverseTransformRotation( QuaternionDbl globalRotation );
     }
 }

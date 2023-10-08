@@ -236,7 +236,7 @@ namespace KSS.Components
 
             Vessel vessel = this.transform.GetVessel();
             Vector3Dbl airfAcceleration = GravityUtils.GetGravityAcceleration( vessel.AIRFPosition );
-            Vector3 sceneAcceleration = SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformVector( (Vector3)airfAcceleration );
+            Vector3 sceneAcceleration = SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformDirection( (Vector3)airfAcceleration );
             Vector3 vesselAcceleration = vessel.PhysicsObject.Acceleration;
 
             // acceleration due to external forces (gravity) minus the acceleration of the vessel.

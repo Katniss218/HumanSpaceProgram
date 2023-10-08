@@ -19,6 +19,11 @@ namespace KSS.Core
         // State vectors too.
 
         /// <summary>
+        /// The value of the gravitational constant, in [m^3/kg/s^2].
+        /// </summary>
+        public const double G = 6.6743e-11;
+
+        /// <summary>
         /// The semi-major axis of the orbit, in [m].
         /// </summary>
         public double semiMajorAxis;
@@ -44,21 +49,36 @@ namespace KSS.Core
         public double argumentOfPeriapsis;
 
         /// <summary>
-        /// The mean anomaly of the orbit (at UT = 0?), in [Rad].
+        /// The mean anomaly of the orbiting object, at <see cref="epoch"/>, in [Rad]. <br />
+        /// Mean anomaly is the angle between the periapsis, the central body, and the orbiting body, if the orbit was circular and with the same orbital period.
         /// </summary>
+        /// <remarks>
+        /// This angle can be set outside the standard range [0..2*PI].
+        /// </remarks>
         public double meanAnomaly; // We store the mean anomaly because it is convenient.
+
+        /// <summary>
+        /// The reference epoch for the orbit, UT, in [s].
+        /// </summary>
+        public double epoch;
 
         /// <summary>
         /// The length of half of the chord line perpendicular to the major axis, and passing through the focus.
         /// </summary>
         public double semiLatusRectum => semiMajorAxis * (1 - (eccentricity * eccentricity));
 
+        /// <summary>
+        /// Returns the orbital mean motion for a circular orbit of the same orbital period. <br />
+        /// This can be used to calculate the mean anomaly at a different time.
+        /// </summary>
+        /// <param name="gravParameter">The standard gravitational parameter for the parent body, in [m^3/s^2].</param>
+        /// <returns>The mean motion, in [Rad/s].</returns>
         public double GetMeanMotion( double gravParameter )
         {
             return Math.Sqrt( gravParameter / Math.Abs( semiMajorAxis * semiMajorAxis * semiMajorAxis ) );
         }
 
-        public Orbit( double semiMajorAxis, double eccentricity, double inclination, double longitudeOfAscendingNode, double argumentOfPeriapsis, double meanAnomaly )
+        public Orbit( double semiMajorAxis, double eccentricity, double inclination, double longitudeOfAscendingNode, double argumentOfPeriapsis, double meanAnomaly, double epoch )
         {
             this.semiMajorAxis = semiMajorAxis;
             this.eccentricity = eccentricity;
@@ -66,39 +86,130 @@ namespace KSS.Core
             this.longitudeOfAscendingNode = longitudeOfAscendingNode;
             this.argumentOfPeriapsis = argumentOfPeriapsis;
             this.meanAnomaly = meanAnomaly;
+            this.epoch = epoch;
         }
 
-        public Vector3Dbl ProgradeAt( double UT )
+        /// <summary>
+        /// calculates the standard gravitational parameter for a celestial body with the specified mass.
+        /// </summary>
+        /// <param name="bodyMass">The mass of the celestial body, in [kg].</param>
+        /// <returns>The standard gravitational parameter for a body with the given mass, in [m^3/s^2].</returns>
+        public double GetGravParameter( double bodyMass )
         {
-            throw new NotImplementedException();
-        }
-        public Vector3Dbl RetrogradeAt( double UT )
-        {
-            throw new NotImplementedException();
-        }
-
-        public Vector3Dbl NormalAt( double UT )
-        {
-            return GetNormal();
-        }
-        public Vector3Dbl AntinormalAt( double UT )
-        {
-            return -GetNormal();
+            return G * bodyMass;
         }
 
-        public Vector3Dbl RadialAt( double UT )
+        /// <summary>
+        /// Calculates the orbital period of this orbit, around a given body.
+        /// </summary>
+        /// <param name="gravParameter">The standard gravitational parameter for the parent body, in [m^3/s^2].</param>
+        /// <returns>The orbital period, in [s].</returns>
+        public double GetOrbitalPeriod( double gravParameter )
         {
-            throw new NotImplementedException();
+            return (2 * Math.PI) * Math.Sqrt( (semiMajorAxis * semiMajorAxis * semiMajorAxis) / gravParameter );
         }
-        public Vector3Dbl AntiradialAt( double UT )
+
+        /// <summary>
+        /// Calculates the escape velocity at a point a certain distance away from the center of gravity.
+        /// </summary>
+        /// <param name="gravParameter">The standard gravitational parameter for the parent body, in [m^3/s^2].</param>
+        /// <param name="radius">The distance from the center of gravity of the parent body, in [m].</param>
+        /// <returns>The escape velocity, in [m/s]</returns>
+        public static double GetEscapeVelocity( double gravParameter, double radius )
+        {
+            return Math.Sqrt( (2 * gravParameter) / radius );
+        }
+
+        /// <summary>
+        /// Returns the semi-major axis for a circular or elliptical orbit with a given orbital period.
+        /// </summary>
+        /// <param name="gravParameter">The standard gravitational parameter for the parent body, in [m^3/s^2].</param>
+        /// <param name="targetPeriod">The desired period, in [s].</param>
+        /// <returns>The semi-major axis, in [m].</returns>
+        public double GetSemiMajorAxis( double gravParameter, double targetPeriod )
+        {
+            return Math.Cbrt( (gravParameter * (targetPeriod * targetPeriod)) / (4 * (Math.PI * Math.PI)) );
+        }
+
+        public double apoapsis => (1 + eccentricity) * semiMajorAxis;
+        public double periapsis => (1 - eccentricity) * semiMajorAxis;
+
+        /// <summary>
+        /// Calculates the minimum speed (at apoapsis) of a given circular or elliptical orbit.
+        /// </summary>
+        /// <param name="gravParameter">The standard gravitational parameter for the parent body, in [m^3/s^2].</param>
+        /// <returns>The speed, in [m/s].</returns>
+        public double GetApoapsisSpeed( double gravParameter )
+        {
+            return Math.Sqrt( ((1 - eccentricity) * gravParameter) / ((1 + eccentricity) * semiMajorAxis) );
+        }
+
+        /// <summary>
+        /// Calculates the maximum speed (at periapsis) of a given circular or elliptical orbit.
+        /// </summary>
+        /// <param name="gravParameter">The standard gravitational parameter for the parent body, in [m^3/s^2].</param>
+        /// <returns>The speed, in [m/s].</returns>
+        public double GetPeriapsisSpeed( double gravParameter )
+        {
+            return Math.Sqrt( ((1 + eccentricity) * gravParameter) / ((1 - eccentricity) * semiMajorAxis) );
+        }
+
+        /// <summary>
+        /// Calculates the specific orbital energy (a.k.a. vis-viva energy) for a body orbiting another body.
+        /// </summary>
+        /// <param name="gravParameter">The sum of the standard gravitational parameters of both orbiting bodies, in [m^3/s^2].</param>
+        /// <returns>The specific orbital energy, in [J/kg].</returns>
+        public double GetSpecificOrbitalEnergy( double gravParameter )
+        {
+            return -( gravParameter / (2 * semiMajorAxis) );
+        }
+
+        // pricipal directions at UT.
+
+        /// <summary>
+        /// Calculates the 'prograde' direction at a given universal time.
+        /// </summary>
+        /// <param name="UT">The universal time.</param>
+        /// <returns>A unit vector pointing prograde.</returns>
+        public Vector3 ProgradeAt( double UT )
         {
             throw new NotImplementedException();
         }
 
         /// <summary>
+        /// Calculates the 'retrograde' direction at a given universal time.
+        /// </summary>
+        /// <param name="UT">The universal time.</param>
+        /// <returns>A unit vector pointing retrograde.</returns>
+        public Vector3 RetrogradeAt( double UT )
+        {
+            throw new NotImplementedException();
+        }
+
+        public Vector3 NormalAt( double UT )
+        {
+            return GetOrbitNormal();
+        }
+        public Vector3 AntinormalAt( double UT )
+        {
+            return -GetOrbitNormal();
+        }
+
+        public Vector3 RadialAt( double UT )
+        {
+            throw new NotImplementedException();
+        }
+        public Vector3 AntiradialAt( double UT )
+        {
+            throw new NotImplementedException();
+        }
+
+        //
+
+        /// <summary>
         /// Returns the vector normal to the plane of the orbit.
         /// </summary>
-        public Vector3 GetNormal()
+        public Vector3 GetOrbitNormal()
         {
             throw new NotImplementedException(); // which way?
         }
@@ -128,7 +239,7 @@ namespace KSS.Core
         public static (double eccentricAnomaly, double trueAnomaly) AnomaliesFromMean( double meanAnomaly, double eccentricity )
         {
             // Danby's method
-            meanAnomaly = meanAnomaly - TwoPI * Math.Floor( meanAnomaly / TwoPI ); // modulo.
+            meanAnomaly = meanAnomaly - (2 * Math.PI) * Math.Floor( meanAnomaly / (2 * Math.PI) ); // modulo.
             double eccentricAnomaly;
             double trueAnomaly;
 
@@ -209,8 +320,6 @@ namespace KSS.Core
 
             return (eccentricAnomaly, trueAnomaly);
         }
-
-        const double G = 6.6743e-11;
 
         /*public static Orbit FromStateVectors( Vector3Dbl position, Vector3Dbl velocity, double parentBodyMass )
         {
@@ -299,13 +408,11 @@ namespace KSS.Core
             throw new NotImplementedException();
         }*/
 
-        public const double TwoPI = 6.2831853071795864769252867665590057;
-
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public static double Wrap2PI( double x )
         {
-            x %= TwoPI;
-            return x < 0 ? x + TwoPI : x;
+            x %= (2 * Math.PI);
+            return x < 0 ? x + (2 * Math.PI) : x;
         }
 
         public static Orbit FromStateVectors( double gravParameter, Vector3Dbl position, Vector3Dbl velocity )
@@ -319,7 +426,7 @@ namespace KSS.Core
 
             double trueAnomaly = Math.Acos( Vector3Dbl.Dot( eccentricityVector, position ) / (eccentricityVector.magnitude * position.magnitude) );
             if( Vector3Dbl.Dot( position, velocity ) < 0 )
-                trueAnomaly = TwoPI - trueAnomaly;
+                trueAnomaly = (2 * Math.PI) - trueAnomaly;
 
             double inclination = Math.Acos( momentum.z / momentum.magnitude );
             double eccentricity = eccentricityVector.magnitude;
@@ -327,16 +434,16 @@ namespace KSS.Core
 
             double longitudeOfAscendingNode = Math.Acos( nodeVector.x / nodeVector.magnitude );
             if( nodeVector.y < 0 )
-                longitudeOfAscendingNode = TwoPI - longitudeOfAscendingNode;
+                longitudeOfAscendingNode = (2 * Math.PI) - longitudeOfAscendingNode;
 
             double argumentOfPeriapsis = Math.Acos( Vector3Dbl.Dot( nodeVector, eccentricityVector ) / (nodeVector.magnitude * eccentricity) );
             if( eccentricityVector.z < 0 )
-                argumentOfPeriapsis = TwoPI - argumentOfPeriapsis;
+                argumentOfPeriapsis = (2 * Math.PI) - argumentOfPeriapsis;
 
             double meanAnomaly = eccentricAnomaly - eccentricity * Math.Sin( eccentricAnomaly );
             double semiMajorAxis = 1 / ((2 / position.magnitude) - (velocity.sqrMagnitude / gravParameter));
 
-            return new Orbit( semiMajorAxis, eccentricity, inclination, longitudeOfAscendingNode, argumentOfPeriapsis, meanAnomaly );
+            return new Orbit( semiMajorAxis, eccentricity, inclination, longitudeOfAscendingNode, argumentOfPeriapsis, meanAnomaly, TimeManager.UT );
 
             // Mechjeb version (uses right handed vectors/quaternions)
             /*double positionMagn = position.magnitude;

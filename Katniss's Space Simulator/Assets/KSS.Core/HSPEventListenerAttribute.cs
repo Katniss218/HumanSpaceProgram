@@ -15,7 +15,7 @@ namespace KSS.Core
     /// <remarks>
     /// This attribute can be applied to any static method with the signature `static void Method( object e )`.
     /// </remarks>
-    [AttributeUsage( AttributeTargets.Method )]
+    [AttributeUsage( AttributeTargets.Method, AllowMultiple = true )]
     public class HSPEventListenerAttribute : Attribute
     {
         public string EventID { get; set; }
@@ -73,13 +73,16 @@ namespace KSS.Core
                     {
                         try
                         {
-                            HSPEventListenerAttribute attr = method.GetCustomAttribute<HSPEventListenerAttribute>();
-                            if( attr == null )
+                            IEnumerable<HSPEventListenerAttribute> attrs = method.GetCustomAttributes<HSPEventListenerAttribute>();
+                            if( attrs == null || !attrs.Any() )
                             {
                                 continue;
                             }
 
-                            ProcessMethod( attr, method );
+                            foreach( var attr in attrs )
+                            {
+                                ProcessMethod( attr, method );
+                            }
                         }
                         catch( TypeLoadException ex )
                         {

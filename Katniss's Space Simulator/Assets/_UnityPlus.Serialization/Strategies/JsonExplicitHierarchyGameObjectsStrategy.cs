@@ -47,7 +47,7 @@ namespace UnityPlus.Serialization.Strategies
 
         private static void CreateGameObjectHierarchy( ILoader l, SerializedData goJson, GameObject parent )
         {
-            Guid objectGuid = l.ReadGuid( goJson[ISaver_Ex_References.ID] );
+            Guid objectGuid = l.ReadGuid( goJson[SerializerUtils.ID] );
 
             GameObject go = new GameObject();
             l.SetReferenceID( go, objectGuid );
@@ -103,7 +103,7 @@ namespace UnityPlus.Serialization.Strategies
             // recursive.
             SerializedObject obj = new SerializedObject()
             {
-                { "$id", s.WriteGuid(objectGuid) }
+                { $"{SerializerUtils.ID}", s.WriteGuid(objectGuid) }
             };
 
             SerializedArray children = new SerializedArray();
@@ -120,7 +120,7 @@ namespace UnityPlus.Serialization.Strategies
                 Guid id = s.GetReferenceID( comp );
                 SerializedObject compObj = new SerializedObject()
                 {
-                    { "$id", s.WriteGuid(id) },
+                    { $"{SerializerUtils.ID}", s.WriteGuid(id) },
                     { "$type", s.WriteType(comp.GetType()) }
                 };
 

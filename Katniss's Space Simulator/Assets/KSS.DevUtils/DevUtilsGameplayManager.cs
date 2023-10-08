@@ -29,9 +29,9 @@ namespace KSS.DevUtils
         public ComputeShader shader;
         public RawImage uiImage;
 
-        static CelestialBody CreateCB( Vector3Dbl pos )
+        static CelestialBody CreateCB( Vector3Dbl airfPos, QuaternionDbl airfRot )
         {
-            CelestialBody cb = new CelestialBodyFactory().Create( pos );
+            CelestialBody cb = new CelestialBodyFactory().Create( airfPos, airfRot );
             LODQuadSphere lqs = cb.gameObject.AddComponent<LODQuadSphere>();
             return cb;
         }
@@ -54,38 +54,61 @@ namespace KSS.DevUtils
 
             uiImage.texture = normalmap;*/
         }
+        static LaunchSite launchSite;
 
-        [HSPEventListener( HSPEvent.TIMELINE_AFTER_NEW, "devutils.timeline.new.after" )]
-        static void OnAfterCreateDefault( object e )
+        [HSPEventListener( HSPEvent.TIMELINE_BEFORE_NEW, "devutils.timeline.new.before" )]
+        [HSPEventListener( HSPEvent.TIMELINE_BEFORE_LOAD, "devutils.timeline.load.before" )]
+        static void OnBeforeCreateDefault( object e )
         {
-            CelestialBody cb = CreateCB( Vector3Dbl.zero );
+            QuaternionDbl orientation = Quaternion.Euler( 270, 0, 0 );
+            CelestialBody cb = CreateCB( Vector3Dbl.zero, orientation );
 
-            CelestialBody cb1 = CreateCB( new Vector3Dbl( 440_000_000, 0, 0 ) );
-            CelestialBody cb2 = CreateCB( new Vector3Dbl( 440_000_000, 100_000_000, 0 ) );
-            CelestialBody cb_farawayTEST = CreateCB( new Vector3Dbl( 440_000_000_0.0, 100_000_000, 0 ) );
-            CelestialBody cb_farawayTEST2 = CreateCB( new Vector3Dbl( 440_000_000_00.0, 100_000_000, 0 ) );
+            CelestialBody cb1 = CreateCB( new Vector3Dbl( 440_000_000, 0, 0 ), orientation );
+            CelestialBody cb2 = CreateCB( new Vector3Dbl( 440_000_000, 100_000_000, 0 ), orientation );
+            CelestialBody cb_farawayTEST = CreateCB( new Vector3Dbl( 440_000_000_0.0, 100_000_000, 0 ), orientation );
+            CelestialBody cb_farawayTEST2 = CreateCB( new Vector3Dbl( 440_000_000_00.0, 100_000_000, 0 ), orientation );
 
-            CelestialBody cb_farawayTEST3FAR = CreateCB( new Vector3Dbl( 1e18, 100_000_000, 0 ) ); // 1e18 is 100 ly away.
+            CelestialBody cb_farawayTEST3FAR = CreateCB( new Vector3Dbl( 1e18, 100_000_000, 0 ), QuaternionDbl.identity ); // 1e18 is 100 ly away.
             // stuff really far away throws invalid world AABB and such. do not enable these, you can't see them anyway. 100 ly seems to work, but further away is a no-no.
 
             CelestialBodySurface srf = cb.GetComponent<CelestialBodySurface>();
             var group = srf.SpawnGroup( "aabb", 28.5857702f, -80.6507262f, (float)(cb.Radius + 1.0) );
-            LaunchSite launchSite = new LaunchSiteFactory() { Prefab = FindObjectOfType<DevUtilsGameplayManager>().TestLaunchSite }.Create( group, Vector3.zero, Quaternion.identity );
+            launchSite = new LaunchSiteFactory() { Prefab = FindObjectOfType<DevUtilsGameplayManager>().TestLaunchSite }.Create( group, Vector3.zero, Quaternion.identity );
 
-            Vector3Dbl spawnerPosAirf = launchSite.GetSpawnerAIRFPosition();
+        }
 
-            Vessel v = CreateDummyVessel( new Vector3Dbl( 1, 0.0, 0.0 ), launchSite.Spawner.rotation ); // position is temp.
+        static Vessel v;
 
-            Vector3 bottomBoundPos = v.GetBottomPosition();
-            Vector3Dbl closestBoundAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( bottomBoundPos );
-            Vector3Dbl closestBoundToVesselAirf = v.AIRFPosition - closestBoundAirf;
-            Vector3Dbl pos = spawnerPosAirf + closestBoundToVesselAirf;
-            v.SetPosition( pos );
-
+        [HSPEventListener( HSPEvent.TIMELINE_AFTER_NEW, "devutils.timeline.new.after" )]
+        static void OnAfterCreateDefault( object e )
+        {
+            v = CreateVessel();
             VesselManager.ActiveVessel = v.RootPart.GetVessel();
             FindObjectOfType<CameraController>().ReferenceObject = v.RootPart.transform;
 
             VesselManager.ActiveVessel.transform.GetComponent<Rigidbody>().angularDrag = 1; // temp, doesn't veer off course.
+        }
+
+        static Vessel CreateVessel()
+        {
+            Vector3Dbl spawnerPosAirf = launchSite.GetSpawnerAIRFPosition();
+
+            var v = CreateDummyVessel( new Vector3Dbl( 1, 0.0, 0.0 ), launchSite.Spawner.rotation ); // position is temp.
+
+            Vector3 bottomBoundPos = v.GetBottomPosition();
+            Vector3Dbl closestBoundAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( bottomBoundPos );
+            Vector3Dbl closestBoundToVesselAirf = v.AIRFPosition - closestBoundAirf;
+            Vector3Dbl airfPos = spawnerPosAirf + closestBoundToVesselAirf;
+            v.AIRFPosition = airfPos;
+            return v;
+        }
+
+        private void Update()
+        {
+            if( Input.GetKeyDown( KeyCode.F5 ) )
+            {
+                CreateVessel();
+            }
         }
 
         static Vessel CreateDummyVessel( Vector3Dbl airfPosition, Quaternion rotation )

@@ -19,7 +19,7 @@ namespace UnityPlus.Serialization
         {
             return new SerializedObject()
             {
-                { "$ref", s.WriteGuid( s.GetReferenceID( gameObject ) ) },
+                { $"{SerializerUtils.REF}", s.WriteGuid( s.GetReferenceID( gameObject ) ) },
                 { "name", gameObject.name },
                 { "layer", gameObject.layer },
                 { "is_active", gameObject.activeSelf },

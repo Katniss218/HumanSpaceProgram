@@ -123,5 +123,15 @@ namespace UnityEngine
         {
             return Multiply( lhs, rhs );
         }
+
+        public static explicit operator Quaternion( QuaternionDbl q )
+        {
+            return new Quaternion( (float)q.x, (float)q.y, (float)q.z, (float)q.w );
+        }
+
+        public static implicit operator QuaternionDbl( Quaternion q )
+        {
+            return new QuaternionDbl( q.x, q.y, q.z, q.w );
+        }
     }
 }
