@@ -11,7 +11,7 @@ namespace KSS.Core
     /// <summary>
     /// Manages loading, unloading, switching, etc of vessels.
     /// </summary>
-    public class VesselManager : MonoBehaviour, IPersistent
+    public class VesselManager : SerializedManager, IPersistent
     {
         public static Vessel ActiveVessel { get; set; }
 

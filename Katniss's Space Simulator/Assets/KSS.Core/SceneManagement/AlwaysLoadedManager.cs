@@ -1,6 +1,7 @@
 using KSS.Core.Mods;
 using KSS.Core.SceneManagement;
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -32,7 +33,22 @@ namespace KSS.Core
 
         internal static GameObject[] GetAllManagerGameObjects()
         {
-            return new GameObject[] { };
+            // An alternative approach could be to have a layer for manager objects (canonically a single object for all tho).
+
+            SerializedManager[] managers = FindObjectsOfType<SerializedManager>();
+            List<GameObject> gameObjects = new List<GameObject>();
+
+            foreach( var manager in managers )
+            {
+                if( gameObjects.Contains( manager.gameObject ) )
+                {
+                    continue;
+                }
+
+                gameObjects.Add( manager.gameObject );
+            }
+
+            return gameObjects.ToArray();
         }
     }
 }

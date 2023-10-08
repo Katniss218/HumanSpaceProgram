@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace KSS.Core
 {
-    public class CelestialBodyManager : MonoBehaviour
+    public class CelestialBodyManager : SerializedManager
     {
         public static List<CelestialBody> CelestialBodies { get; set; }
 
