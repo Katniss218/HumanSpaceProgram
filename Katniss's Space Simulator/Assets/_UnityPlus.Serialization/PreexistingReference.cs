@@ -14,22 +14,32 @@ namespace UnityPlus.Serialization
 
             DrawDefaultInspector();
 
-            GUILayout.Label( "Guid: " + updater.GetGuid() );
+            GUILayout.Label( "Guid: " + updater.GetPersistentGuid() );
         }
     }
 #endif
 
     /// <summary>
-    /// Represents a gameobject that has a pre-set fixed reference identifier.
+    /// Holds a persistent reference identifier for this component's game object.
     /// </summary>
+    /// <remarks>
+    /// Used by <see cref="JsonPreexistingGameObjectsStrategy"/>.
+    /// </remarks>
     public class PreexistingReference : MonoBehaviour
     {
         [SerializeField]
         [HideInInspector]
         byte[] _guidData = null;
 
-        public Guid GetGuid() => new Guid( _guidData );
-        public void SetGuid( Guid guid ) => _guidData = guid.ToByteArray();
+        /// <summary>
+        /// Gets the persistent (unchanging) global identifier for this object.
+        /// </summary>
+        public Guid GetPersistentGuid() => new Guid( _guidData );
+
+        /// <summary>
+        /// Sets the persistent (unchanging) global identifier for this object.
+        /// </summary>
+        public void SetPersistentGuid( Guid guid ) => _guidData = guid.ToByteArray();
 
         void Start()
         {

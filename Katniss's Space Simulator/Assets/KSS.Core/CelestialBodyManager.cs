@@ -9,20 +9,26 @@ namespace KSS.Core
 {
     public class CelestialBodyManager : SerializedManager
     {
-        public static List<CelestialBody> CelestialBodies { get; set; }
+        public static Dictionary<Guid, CelestialBody> CelestialBodies { get; set; }
 
-        public static void RegisterCelestialBody( CelestialBody celestialBody )
+        /// <summary>
+        /// Registers a celestial body instance under the specified ID.
+        /// </summary>
+        public static void RegisterCelestialBody( Guid id, CelestialBody celestialBody )
         {
             if( CelestialBodies == null )
-                CelestialBodies = new List<CelestialBody>();
+                CelestialBodies = new Dictionary<Guid, CelestialBody>();
 
-            CelestialBodies.Add( celestialBody );
+            CelestialBodies.Add( id, celestialBody );
         }
 
-        public static void UnregisterCelestialBody( CelestialBody celestialBody )
+        /// <summary>
+        /// Unregisters a celestial body instance with the specified ID.
+        /// </summary>
+        public static void UnregisterCelestialBody( Guid id )
         {
             if( CelestialBodies != null )
-                CelestialBodies.Remove( celestialBody );
+                CelestialBodies.Remove( id );
         }
 
         internal static GameObject[] GetAllRootGameObjects()

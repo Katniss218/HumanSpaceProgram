@@ -29,13 +29,6 @@ namespace KSS.DevUtils
         public ComputeShader shader;
         public RawImage uiImage;
 
-        static CelestialBody CreateCB( Vector3Dbl airfPos, QuaternionDbl airfRot )
-        {
-            CelestialBody cb = new CelestialBodyFactory().Create( airfPos, airfRot );
-            LODQuadSphere lqs = cb.gameObject.AddComponent<LODQuadSphere>();
-            return cb;
-        }
-
         void Awake()
         {
             LODQuadSphere.cbShader = this.cbShader;
@@ -55,27 +48,6 @@ namespace KSS.DevUtils
             uiImage.texture = normalmap;*/
         }
         static LaunchSite launchSite;
-
-        [HSPEventListener( HSPEvent.TIMELINE_BEFORE_NEW, "devutils.timeline.new.before" )]
-        [HSPEventListener( HSPEvent.TIMELINE_BEFORE_LOAD, "devutils.timeline.load.before" )]
-        static void OnBeforeCreateDefault( object e )
-        {
-            QuaternionDbl orientation = Quaternion.Euler( 270, 0, 0 );
-            CelestialBody cb = CreateCB( Vector3Dbl.zero, orientation );
-
-            CelestialBody cb1 = CreateCB( new Vector3Dbl( 440_000_000, 0, 0 ), orientation );
-            CelestialBody cb2 = CreateCB( new Vector3Dbl( 440_000_000, 100_000_000, 0 ), orientation );
-            CelestialBody cb_farawayTEST = CreateCB( new Vector3Dbl( 440_000_000_0.0, 100_000_000, 0 ), orientation );
-            CelestialBody cb_farawayTEST2 = CreateCB( new Vector3Dbl( 440_000_000_00.0, 100_000_000, 0 ), orientation );
-
-            CelestialBody cb_farawayTEST3FAR = CreateCB( new Vector3Dbl( 1e18, 100_000_000, 0 ), QuaternionDbl.identity ); // 1e18 is 100 ly away.
-            // stuff really far away throws invalid world AABB and such. do not enable these, you can't see them anyway. 100 ly seems to work, but further away is a no-no.
-
-            CelestialBodySurface srf = cb.GetComponent<CelestialBodySurface>();
-            var group = srf.SpawnGroup( "aabb", 28.5857702f, -80.6507262f, (float)(cb.Radius + 1.0) );
-            launchSite = new LaunchSiteFactory() { Prefab = FindObjectOfType<DevUtilsGameplayManager>().TestLaunchSite }.Create( group, Vector3.zero, Quaternion.identity );
-
-        }
 
         static Vessel v;
 

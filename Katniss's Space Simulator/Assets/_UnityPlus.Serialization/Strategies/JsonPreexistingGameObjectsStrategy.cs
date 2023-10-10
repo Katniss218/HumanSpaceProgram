@@ -111,7 +111,7 @@ namespace UnityPlus.Serialization
                     continue;
                 }
 
-                l.SetReferenceID( obj, guidComp.GetGuid() );
+                l.SetReferenceID( obj, guidComp.GetPersistentGuid() );
 
                 yield return null;
             }

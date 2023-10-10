@@ -21,20 +21,22 @@ namespace KSS.Core
         public double Radius { get; set; }
 
         RootObjectTransform _rootTransform;
+        PreexistingReference _ref;
 
         void Awake()
         {
             _rootTransform = this.GetComponent<RootObjectTransform>();
+            _ref = this.GetComponent<PreexistingReference>();
         }
 
         void OnEnable()
         {
-            CelestialBodyManager.RegisterCelestialBody( this );
+            CelestialBodyManager.RegisterCelestialBody( _ref.GetPersistentGuid(), this );
         }
 
         void OnDisable()
         {
-            CelestialBodyManager.UnregisterCelestialBody( this );
+            CelestialBodyManager.UnregisterCelestialBody( _ref.GetPersistentGuid() );
         }
 
         public SerializedData GetData( ISaver s )

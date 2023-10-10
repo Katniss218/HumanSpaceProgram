@@ -73,6 +73,7 @@
     <Compile Include="Assets\KSS\Components\FBulkConnection.cs" />
     <Compile Include="Assets\KSS\Components\FActuatorXY.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadTree_NodeUtils.cs" />
+    <Compile Include="Assets\KSS\CelestialBodies\VanillaPlanetarySystemFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS\CelestialBodies\Surface\TerrainShader.shader" />

@@ -12,11 +12,18 @@ namespace KSS.Core
 {
     public class CelestialBodyFactory
     {
+        public string ID { get; }
+
         //const float radius = 1000; //6371000f; // m
-        public float radius = 6371000f;
         //const float mass = 20e16f; //5.97e24f; // kg  // 20e16f for 1km radius is good
+        public float radius = 6371000f;
         public float mass = 5.97e24f;
         public const int subdivs = 7; // 7 is the maximum value for a single plane that won't cause issues here.
+
+        public CelestialBodyFactory( string id )
+        {
+            this.ID = id;
+        }
 
         public CelestialBody Create( Vector3Dbl airfPosition, QuaternionDbl airfRotation )
         {
@@ -25,7 +32,7 @@ namespace KSS.Core
             //SphereCollider c = cbGO.AddComponent<SphereCollider>();
 
             PreexistingReference pr = gameObject.AddComponent<PreexistingReference>();
-            pr.SetGuid( GuidFromHash( Encoding.ASCII.GetBytes( $"{radius}{mass}" ) ) );
+            pr.SetPersistentGuid( GuidFromHash( Encoding.ASCII.GetBytes( ID ) ) );
 
             CelestialBody body = gameObject.AddComponent<CelestialBody>();
             body.AIRFPosition = airfPosition;
