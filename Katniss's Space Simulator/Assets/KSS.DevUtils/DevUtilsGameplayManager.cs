@@ -47,13 +47,13 @@ namespace KSS.DevUtils
 
             uiImage.texture = normalmap;*/
         }
-        static LaunchSite launchSite;
 
         static Vessel v;
 
         [HSPEventListener( HSPEvent.TIMELINE_AFTER_NEW, "devutils.timeline.new.after" )]
         static void OnAfterCreateDefault( object e )
         {
+            launchSite = new LaunchSiteFactory() { Prefab = FindObjectOfType<DevUtilsGameplayManager>().TestLaunchSite }.Create( group, Vector3.zero, Quaternion.identity );
             v = CreateVessel();
             VesselManager.ActiveVessel = v.RootPart.GetVessel();
             FindObjectOfType<CameraController>().ReferenceObject = v.RootPart.transform;

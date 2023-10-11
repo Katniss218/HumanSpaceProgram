@@ -19,7 +19,7 @@ namespace KSS.Core.Physics
     public class PhysicsObject : MonoBehaviour
     {
         /// <summary>
-        /// Gets or sets the physics object's mass in [kg].
+        /// Gets or sets the physics object's mass, in [kg].
         /// </summary>
         public float Mass
         {
@@ -28,7 +28,7 @@ namespace KSS.Core.Physics
         }
 
         /// <summary>
-        /// Gets or sets the physics object's local center of mass (relative to the physics object).
+        /// Gets or sets the physics object's local center of mass (in physics object's coordinate space).
         /// </summary>
         public Vector3 LocalCenterOfMass
         {
@@ -37,7 +37,7 @@ namespace KSS.Core.Physics
         }
 
         /// <summary>
-        /// Gets or sets the physics object's velocity in scene space in [m/s].
+        /// Gets or sets the physics object's velocity in scene space, in [m/s].
         /// </summary>
         public Vector3 Velocity
         {
@@ -46,7 +46,7 @@ namespace KSS.Core.Physics
         }
 
         /// <summary>
-        /// Gets or sets the physics object's velocity in scene space in [m/s].
+        /// Gets or sets the physics object's angular velocity in scene space, in [Rad/s].
         /// </summary>
         public Vector3 AngularVelocity
         {
@@ -55,12 +55,12 @@ namespace KSS.Core.Physics
         }
 
         /// <summary>
-        /// Gets the acceleration that this physics object is under at this instant.
+        /// Gets the acceleration that this physics object is under at this instant, in [m/s^2].
         /// </summary>
         public Vector3 Acceleration { get; private set; }
 
         /// <summary>
-        /// Gets the angular acceleration that this physics object is under at this instant.
+        /// Gets the angular acceleration that this physics object is under at this instant, in [Rad/s^2].
         /// </summary>
         public Vector3 AngularAcceleration { get; private set; }
 
@@ -74,7 +74,7 @@ namespace KSS.Core.Physics
         RootObjectTransform _rootTransform;
 
         /// <summary>
-        /// Adds a force acting on the center of mass of the physics object. Does not apply any torque.
+        /// Applies a force at the center of mass, in [N].
         /// </summary>
         public void AddForce( Vector3 force )
         {
@@ -83,7 +83,7 @@ namespace KSS.Core.Physics
         }
 
         /// <summary>
-        /// Adds a force at a specified position instead of at the center of mass.
+        /// Applies a force at the specified position, in [N].
         /// </summary>
         public void AddForceAtPosition( Vector3 force, Vector3 position )
         {
@@ -137,7 +137,7 @@ namespace KSS.Core.Physics
         }
 
         /// <summary>
-        /// Gets a value indicating whether or not the physics object or any of its children colliders is currently colliding with something.
+        /// True if the physics object is colliding with any other objects in the current frame, false otherwise.
         /// </summary>
         [field: SerializeField]
         public bool IsColliding { get; private set; }

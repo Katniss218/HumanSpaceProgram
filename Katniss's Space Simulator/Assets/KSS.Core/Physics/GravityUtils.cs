@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 
 namespace KSS.Core.Physics
 {
@@ -16,7 +17,7 @@ namespace KSS.Core.Physics
         /// <returns>The calculated acceleration, in [m/s^2].</returns>
         public static Vector3Dbl GetGravityAcceleration( Vector3Dbl airfPosition )
         {
-            CelestialBody cb = CelestialBodyManager.CelestialBodies[0]; // temporary.
+            CelestialBody cb = CelestialBodyManager.CelestialBodies.Values.First(); // temporary.
 
             Vector3Dbl toBody = cb.AIRFPosition - airfPosition;
 

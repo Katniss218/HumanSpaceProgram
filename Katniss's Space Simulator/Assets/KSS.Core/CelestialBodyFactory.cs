@@ -10,8 +10,12 @@ using UnityPlus.Serialization;
 
 namespace KSS.Core
 {
+    /// <summary>
+    /// Creates celestial body instances (game objects).
+    /// </summary>
     public class CelestialBodyFactory
     {
+#warning TODO - celestial bodies are just serialized json gameobjects (prefabs).
         public string ID { get; }
 
         //const float radius = 1000; //6371000f; // m

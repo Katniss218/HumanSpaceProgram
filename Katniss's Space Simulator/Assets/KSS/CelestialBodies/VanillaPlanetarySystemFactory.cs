@@ -21,7 +21,7 @@ namespace KSS.CelestialBodies
 
         [HSPEventListener( HSPEvent.TIMELINE_BEFORE_NEW, HSPEvent.NAMESPACE_VANILLA + ".create.universe" )]
         [HSPEventListener( HSPEvent.TIMELINE_BEFORE_LOAD, HSPEvent.NAMESPACE_VANILLA + ".create.universe" )]
-        public static void CreatePlanetarySystem()
+        public static void CreateDefaultPlanetarySystem()
         {
             QuaternionDbl orientation = Quaternion.Euler( 270, 0, 0 );
             CelestialBody cb = CreateCB( "main", Vector3Dbl.zero, orientation );
@@ -36,7 +36,7 @@ namespace KSS.CelestialBodies
 
             CelestialBodySurface srf = cb.GetComponent<CelestialBodySurface>();
             var group = srf.SpawnGroup( "aabb", 28.5857702f, -80.6507262f, (float)(cb.Radius + 1.0) );
-            launchSite = new LaunchSiteFactory() { Prefab = FindObjectOfType<DevUtilsGameplayManager>().TestLaunchSite }.Create( group, Vector3.zero, Quaternion.identity );
+
         }
     }
 }

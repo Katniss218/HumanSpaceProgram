@@ -4,12 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace KSS.Core
 {
-    public class CelestialBodyManager : SerializedManager
+    public class CelestialBodyManager : SerializedManager, IPersistent
     {
-        public static Dictionary<Guid, CelestialBody> CelestialBodies { get; set; }
+        public static Dictionary<Guid, CelestialBody> CelestialBodies { get; private set; }
 
         /// <summary>
         /// Registers a celestial body instance under the specified ID.
@@ -33,14 +34,20 @@ namespace KSS.Core
 
         internal static GameObject[] GetAllRootGameObjects()
         {
-            GameObject[] gos = new GameObject[CelestialBodies.Count];
-            for( int i = 0; i < CelestialBodies.Count; i++ )
-            {
-                gos[i] = CelestialBodies[i].gameObject;
-            }
-            return gos;
+            return CelestialBodies.Values.Select( cb => cb.gameObject ).ToArray();
         }
 
-        // save/load
+        public SerializedData GetData( ISaver s )
+        {
+            return new SerializedObject()
+            {
+
+            };
+        }
+
+        public void SetData( ILoader l, SerializedData data )
+        {
+            // nothing yet.
+        }
     }
 }
