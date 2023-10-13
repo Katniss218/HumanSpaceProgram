@@ -45,7 +45,7 @@ namespace KSS.Core
         public RootObjectTransform RootObjTransform { get; private set; }
 
         /// <remarks>
-        /// DO NOT USE. This is for internal use, and can produce an invalid state. Use <see cref="VesselStateUtils.SetParent(Transform, Transform)"/> instead.
+        /// DO NOT USE. This is for internal use, and can produce an invalid state. Use <see cref="VesselHierarchyUtils.SetParent(Transform, Transform)"/> instead.
         /// </remarks>
         internal void SetRootPart( Transform part )
         {

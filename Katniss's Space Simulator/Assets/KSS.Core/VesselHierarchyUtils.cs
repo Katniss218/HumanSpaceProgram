@@ -15,7 +15,7 @@ namespace KSS.Core
     /// <remarks>
     /// The public methods in this class are guaranteed to never produce an invalid state (i.e. a vessel with an unparented part that's not its root).
     /// </remarks>
-    public static class VesselStateUtils
+    public static class VesselHierarchyUtils
     {
         /// <summary>
         /// Change the state of the part hierarchy.
@@ -178,7 +178,17 @@ namespace KSS.Core
             return v;
         }
 
-        // The following helper methods are not required to produce a legal result.
+        public static void ReRoot( Transform newRoot )
+        {
+            ReRootRecursive( newRoot );
+        }
+
+        static void ReRootRecursive( Transform current )
+        {
+            Transform parent = current.parent;
+            parent.SetParent( current );
+            ReRootRecursive( parent );
+        }
 
     }
 }

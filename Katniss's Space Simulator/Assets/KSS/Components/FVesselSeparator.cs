@@ -28,7 +28,7 @@ namespace KSS.Components
             {
 #warning TODO - disconnect pipes, and stuff. Use 'OnVesselSeparate' and 'OnVesselJoin' events.
 
-                VesselStateUtils.SetParent( p, null );
+                VesselHierarchyUtils.SetParent( p, null );
             }
         }
 

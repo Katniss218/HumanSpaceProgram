@@ -100,7 +100,7 @@
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\FlowUtils.cs" />
     <Compile Include="Assets\KSS.Core\SceneManagement\AlwaysLoadedManager.cs" />
     <Compile Include="Assets\KSS.Core\CelestialBodySurface.cs" />
-    <Compile Include="Assets\KSS.Core\VesselStateUtils.cs" />
+    <Compile Include="Assets\KSS.Core\VesselHierarchyUtils.cs" />
     <Compile Include="Assets\KSS.Core\ReferenceFrames\SceneReferenceFrameManager.cs" />
     <Compile Include="Assets\KSS.Core\Substance.cs" />
     <Compile Include="Assets\KSS.Core\CelestialBody.cs" />
