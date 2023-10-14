@@ -1,6 +1,5 @@
 ﻿using KSS.CelestialBodies.Surface;
 using KSS.Core;
-using KSS.Core.Buildings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +20,7 @@ namespace KSS.CelestialBodies
 
         [HSPEventListener( HSPEvent.TIMELINE_BEFORE_NEW, HSPEvent.NAMESPACE_VANILLA + ".create.universe" )]
         [HSPEventListener( HSPEvent.TIMELINE_BEFORE_LOAD, HSPEvent.NAMESPACE_VANILLA + ".create.universe" )]
-        public static void CreateDefaultPlanetarySystem()
+        public static void CreateDefaultPlanetarySystem( object e )
         {
             QuaternionDbl orientation = Quaternion.Euler( 270, 0, 0 );
             CelestialBody cb = CreateCB( "main", Vector3Dbl.zero, orientation );
@@ -35,7 +34,7 @@ namespace KSS.CelestialBodies
             // stuff really far away throws invalid world AABB and such. do not enable these, you can't see them anyway. 100 ly seems to work, but further away is a no-no.
 
             CelestialBodySurface srf = cb.GetComponent<CelestialBodySurface>();
-            var group = srf.SpawnGroup( "aabb", 28.5857702f, -80.6507262f, (float)(cb.Radius + 1.0) );
+            //var group = srf.SpawnGroup( "aabb", 28.5857702f, -80.6507262f, (float)(cb.Radius + 1.0) );
 
         }
     }

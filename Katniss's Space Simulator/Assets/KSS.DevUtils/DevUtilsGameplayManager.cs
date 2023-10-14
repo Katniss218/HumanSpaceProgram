@@ -1,6 +1,5 @@
 ﻿using KSS.Cameras;
 using KSS.Core;
-using KSS.Core.Buildings;
 using KSS.Core.ReferenceFrames;
 using KSS.Core.ResourceFlowSystem;
 using KSS.Components;
@@ -8,6 +7,8 @@ using KSS.CelestialBodies.Surface;
 using UnityEngine;
 using UnityEngine.UI;
 using KSS.Core.Serialization;
+using KSS.Core.Components;
+using System;
 
 namespace KSS.DevUtils
 {
@@ -48,42 +49,56 @@ namespace KSS.DevUtils
             uiImage.texture = normalmap;*/
         }
 
-        static Vessel v;
+        static Building launchSite;
 
         [HSPEventListener( HSPEvent.TIMELINE_AFTER_NEW, "devutils.timeline.new.after" )]
         static void OnAfterCreateDefault( object e )
         {
-            launchSite = new LaunchSiteFactory() { Prefab = FindObjectOfType<DevUtilsGameplayManager>().TestLaunchSite }.Create( group, Vector3.zero, Quaternion.identity );
-            v = CreateVessel();
+            CelestialBody body = CelestialBodyManager.Get( "main" );
+            Vector3 localPos = CoordinateUtils.GeodeticToEuclidean( 28.5857702f, -80.6507262f, (float)(body.Radius + 1.0) );
+
+            PartFactory launchSitePart = new PartFactory( new AssetPartSource( "builtin::Resources/Prefabs/testlaunchsite" ) );
+            launchSite = new BuildingFactory().CreatePartless( body, localPos, Quaternion.FromToRotation( Vector3.up, localPos.normalized ) );
+
+            Transform root = launchSitePart.CreateRoot( launchSite );
+
+            var v = CreateVessel( launchSite );
             VesselManager.ActiveVessel = v.RootPart.GetVessel();
             FindObjectOfType<CameraController>().ReferenceObject = v.RootPart.transform;
 
             VesselManager.ActiveVessel.transform.GetComponent<Rigidbody>().angularDrag = 1; // temp, doesn't veer off course.
         }
 
-        static Vessel CreateVessel()
+        static Vessel CreateVessel( Building launchSite )
         {
-            Vector3Dbl spawnerPosAirf = launchSite.GetSpawnerAIRFPosition();
+            if( launchSite == null )
+            {
+                throw new ArgumentNullException( nameof( launchSite ), "launchSite is null" );
+            }
+            Vector3Dbl spawnerPosAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition(
+                launchSite.gameObject.GetComponentInChildren<FLaunchSiteMarker>().transform.position );
+            QuaternionDbl spawnerRotAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation(
+                launchSite.gameObject.GetComponentInChildren<FLaunchSiteMarker>().transform.rotation );
 
-            var v = CreateDummyVessel( new Vector3Dbl( 1, 0.0, 0.0 ), launchSite.Spawner.rotation ); // position is temp.
+            var v2 = CreateDummyVessel( spawnerPosAirf, spawnerRotAirf ); // position is temp.
 
-            Vector3 bottomBoundPos = v.GetBottomPosition();
+            Vector3 bottomBoundPos = v2.GetBottomPosition();
             Vector3Dbl closestBoundAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( bottomBoundPos );
-            Vector3Dbl closestBoundToVesselAirf = v.AIRFPosition - closestBoundAirf;
+            Vector3Dbl closestBoundToVesselAirf = v2.AIRFPosition - closestBoundAirf;
             Vector3Dbl airfPos = spawnerPosAirf + closestBoundToVesselAirf;
-            v.AIRFPosition = airfPos;
-            return v;
+            v2.AIRFPosition = airfPos;
+            return v2;
         }
 
         private void Update()
         {
             if( Input.GetKeyDown( KeyCode.F5 ) )
             {
-                CreateVessel();
+                CreateVessel( launchSite );
             }
         }
 
-        static Vessel CreateDummyVessel( Vector3Dbl airfPosition, Quaternion rotation )
+        static Vessel CreateDummyVessel( Vector3Dbl airfPosition, QuaternionDbl rotation )
         {
             VesselFactory fac = new VesselFactory();
 

@@ -10,11 +10,11 @@ namespace KSS.Core
     /// <summary>
     /// A class responsible for instantiating a vessel from a source (save file, on launch, etc).
     /// </summary>
-    public sealed class VesselFactory
+    public sealed class BuildingFactory
     {
         // add source (save file / in memory scene change, etc).
 
-        const string name = "tempname_vessel";
+        const string name = "tempname_building";
 
         /// <summary>
         /// Creates a new partless vessel at the specified global position.
@@ -22,34 +22,32 @@ namespace KSS.Core
         /// <param name="airfPosition">The `Absolute Inertial Reference Frame` position of the vessel to create.</param>
         /// <param name="airfRotation">Rotation of the vessel in the `Absolute Inertial Reference Frame`</param>
         /// <returns>The created partless vessel.</returns>
-        public Vessel CreatePartless( Vector3Dbl airfPosition, QuaternionDbl airfRotation, Vector3 sceneVelocity, Vector3 sceneAngularVelocity )
+        public Building CreatePartless( CelestialBody referenceBody, Vector3Dbl localPosition, QuaternionDbl localRotation )
         {
-            Vessel vessel = CreateGO( airfPosition, airfRotation );
+            Building building = CreateGO( referenceBody, localPosition, localRotation );
 
-            vessel.PhysicsObject.Velocity = sceneVelocity;
-            vessel.PhysicsObject.AngularVelocity = sceneAngularVelocity;
-
-            return vessel;
+            return building;
         }
 
-        private static Vessel CreateGO( Vector3Dbl airfPosition, QuaternionDbl airfRotation )
+        private static Building CreateGO( CelestialBody referenceBody, Vector3Dbl localPosition, QuaternionDbl localRotation )
         {
-            GameObject gameObject = new GameObject( $"Vessel, '{name}'" );
+            GameObject gameObject = new GameObject( $"Building, '{name}'" );
 
-            Vessel vessel = gameObject.AddComponent<Vessel>();
-            vessel.name = name;
-            vessel.AIRFPosition = airfPosition;
-            vessel.AIRFRotation = airfRotation;
+            Building building = gameObject.AddComponent<Building>();
+            building.name = name;
+            building.ReferenceBody = referenceBody;
+            building.LocalPosition = localPosition;
+            building.LocalRotation = localRotation;
 
-            return vessel;
+            return building;
         }
 
         /// <summary>
         /// Completely deletes a vessel and cleans up after it.
         /// </summary>
-        public static void Destroy( Vessel vessel )
+        public static void Destroy( Building building )
         {
-            UnityEngine.Object.Destroy( vessel.gameObject );
+            UnityEngine.Object.Destroy( building.gameObject );
         }
     }
 }

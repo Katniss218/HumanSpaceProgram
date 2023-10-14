@@ -42,7 +42,7 @@ namespace KSS.Core
                 && method.ReturnType == typeof( void );
         }
 
-        private static void ProcessMethod( HSPEventListenerAttribute attr, MethodInfo method )
+        private static void ProcessMethod( IEnumerable<HSPEventListenerAttribute> attrs, MethodInfo method )
         {
             ParameterInfo[] parameters = method.GetParameters();
 
@@ -54,8 +54,11 @@ namespace KSS.Core
 
             Action<object> methodDelegate = (Action<object>)Delegate.CreateDelegate( typeof( Action<object> ), method );
 
-            HSPEvent.EventManager.TryCreate( attr.EventID );
-            HSPEvent.EventManager.TryAddListener( attr.EventID, new OverridableEventListener<object>() { id = attr.ID, blacklist = attr.Blacklist, func = methodDelegate } );
+            foreach( var attr in attrs )
+            {
+                HSPEvent.EventManager.TryCreate( attr.EventID );
+                HSPEvent.EventManager.TryAddListener( attr.EventID, new OverridableEventListener<object>() { id = attr.ID, blacklist = attr.Blacklist, func = methodDelegate } );
+            }
         }
 
         /// <summary>
@@ -79,10 +82,7 @@ namespace KSS.Core
                                 continue;
                             }
 
-                            foreach( var attr in attrs )
-                            {
-                                ProcessMethod( attr, method );
-                            }
+                            ProcessMethod( attrs, method );
                         }
                         catch( TypeLoadException ex )
                         {

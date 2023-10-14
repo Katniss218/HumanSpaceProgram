@@ -17,7 +17,7 @@ namespace KSS.Core.ReferenceFrames
             // If both frames are inertial and not rotated, and scaled equally, it's enough to calculate the difference between any position.
 
             Vector3Dbl airfPosition = oldFrame.TransformPosition( oldLocalPosition );
-            Vector3 newPosition = newFrame.InverseTransformPosition( airfPosition );
+            Vector3 newPosition = (Vector3)newFrame.InverseTransformPosition( airfPosition );
             return newPosition;
         }
 
@@ -41,7 +41,7 @@ namespace KSS.Core.ReferenceFrames
             // If both frames are inertial and not rotated, and scaled equally, it's enough to calculate the difference between any position.
 
             QuaternionDbl airfRotation = oldFrame.TransformRotation( oldLocalRotation );
-            Quaternion newRotation = newFrame.InverseTransformRotation( airfRotation );
+            Quaternion newRotation = (Quaternion)newFrame.InverseTransformRotation( airfRotation );
             return newRotation;
         }
     }

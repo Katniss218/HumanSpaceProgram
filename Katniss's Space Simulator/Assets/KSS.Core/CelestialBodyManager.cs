@@ -10,23 +10,28 @@ namespace KSS.Core
 {
     public class CelestialBodyManager : SerializedManager, IPersistent
     {
-        public static Dictionary<Guid, CelestialBody> CelestialBodies { get; private set; }
+        public static Dictionary<string, CelestialBody> CelestialBodies { get; private set; }
 
-        /// <summary>
-        /// Registers a celestial body instance under the specified ID.
-        /// </summary>
-        public static void RegisterCelestialBody( Guid id, CelestialBody celestialBody )
+        public static CelestialBody Get( string id )
         {
-            if( CelestialBodies == null )
-                CelestialBodies = new Dictionary<Guid, CelestialBody>();
+            if( CelestialBodies != null
+             && CelestialBodies.TryGetValue( id, out CelestialBody body ) )
+            {
+                return body;
+            }
 
-            CelestialBodies.Add( id, celestialBody );
+            return null;
         }
 
-        /// <summary>
-        /// Unregisters a celestial body instance with the specified ID.
-        /// </summary>
-        public static void UnregisterCelestialBody( Guid id )
+        internal static void Register( CelestialBody celestialBody )
+        {
+            if( CelestialBodies == null )
+                CelestialBodies = new Dictionary<string, CelestialBody>();
+
+            CelestialBodies[celestialBody.ID] = celestialBody;
+        }
+
+        internal static void Unregister( string id )
         {
             if( CelestialBodies != null )
                 CelestialBodies.Remove( id );

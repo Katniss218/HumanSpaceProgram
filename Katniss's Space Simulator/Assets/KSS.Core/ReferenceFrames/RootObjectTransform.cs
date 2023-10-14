@@ -58,7 +58,7 @@ namespace KSS.Core.ReferenceFrames
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         private void UpdateScenePosition()
         {
-            Vector3 scenePos = SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformPosition( this._airfPosition );
+            Vector3 scenePos = (Vector3)SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformPosition( this._airfPosition );
             if( _rb != null )
             {
                 // THIS IS CRITICALLY IMPORTANT.
@@ -71,7 +71,7 @@ namespace KSS.Core.ReferenceFrames
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         private void UpdateSceneRotation()
         {
-            Quaternion sceneRotation = SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformRotation( this._airfRotation );
+            Quaternion sceneRotation = (Quaternion)SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformRotation( this._airfRotation );
             if( _rb != null )
             {
                 // THIS IS CRITICALLY IMPORTANT.

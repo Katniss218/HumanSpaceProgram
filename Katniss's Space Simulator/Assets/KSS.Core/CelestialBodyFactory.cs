@@ -39,6 +39,7 @@ namespace KSS.Core
             pr.SetPersistentGuid( GuidFromHash( Encoding.ASCII.GetBytes( ID ) ) );
 
             CelestialBody body = gameObject.AddComponent<CelestialBody>();
+            body.ID = this.ID;
             body.AIRFPosition = airfPosition;
             body.AIRFRotation = airfRotation;
             body.Mass = mass;

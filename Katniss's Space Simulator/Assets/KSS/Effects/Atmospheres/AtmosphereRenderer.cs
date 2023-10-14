@@ -28,7 +28,7 @@ namespace KSS.CelestialBodies
         void OnReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
             Vector3Dbl oldAirfPos = data.OldFrame.TransformPosition( _center );
-            _center = data.NewFrame.InverseTransformPosition( oldAirfPos );
+            _center = (Vector3)data.NewFrame.InverseTransformPosition( oldAirfPos );
         }
 
         void Awake()

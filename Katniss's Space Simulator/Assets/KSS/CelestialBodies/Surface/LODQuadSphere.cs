@@ -73,7 +73,7 @@ namespace KSS.CelestialBodies.Surface
             List<LODQuad> newActiveQuads = new List<LODQuad>( _activeQuads ); // todo - kinda unoptimal.
             List<LODQuad> needRemeshing = new List<LODQuad>();
 
-            Vessel[] vessels = VesselManager.GetVessels();
+            Vessel[] vessels = VesselManager.GetLoadedVessels(); // can be static and evaluated once per frame.
             Vector3Dbl[] airfPOIs = new Vector3Dbl[vessels.Length];
             for( int i = 0; i < vessels.Length; i++ )
             {

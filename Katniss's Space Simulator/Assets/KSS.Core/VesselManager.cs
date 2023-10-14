@@ -15,35 +15,34 @@ namespace KSS.Core
     {
         public static Vessel ActiveVessel { get; set; }
 
-        static List<Vessel> Vessels { get; set; }
+        static List<Vessel> _vessels;
 
-        public static Vessel[] GetVessels()
+        public static Vessel[] GetLoadedVessels()
         {
-            return Vessels.ToArray();
+            return _vessels.ToArray();
         }
 
-        public static void RegisterVessel( Vessel vessel )
+        internal static void Register( Vessel vessel )
         {
-            if( Vessels == null )
-                Vessels = new List<Vessel>();
+            if( _vessels == null )
+                _vessels = new List<Vessel>();
 
-            Vessels.Add( vessel );
+            _vessels.Add( vessel );
         }
 
-        public static void UnregisterVessel( Vessel vessel )
+        internal static void Unregister( Vessel vessel )
         {
-            if( Vessels != null )
-                Vessels.Remove( vessel );
+            if( _vessels != null )
+                _vessels.Remove( vessel );
         }
 
-#warning TODO - implement custom save/load methods for the managers, aggregate them into the file. Need to save the active vessel.
         internal static GameObject[] GetAllRootGameObjects()
         {
 
-            GameObject[] gos = new GameObject[Vessels.Count];
-            for( int i = 0; i < Vessels.Count; i++ )
+            GameObject[] gos = new GameObject[_vessels.Count];
+            for( int i = 0; i < _vessels.Count; i++ )
             {
-                gos[i] = Vessels[i].gameObject;
+                gos[i] = _vessels[i].gameObject;
             }
             return gos;
         }
@@ -60,7 +59,6 @@ namespace KSS.Core
         {
             if( data.TryGetValue( "active_vessel", out var activeVessel ) )
                 ActiveVessel = (Vessel)l.ReadObjectReference( activeVessel );
-            throw new NotImplementedException();
         }
     }
 }

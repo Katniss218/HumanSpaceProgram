@@ -73,6 +73,12 @@ namespace KSS.Core.Physics
         Rigidbody _rb;
         RootObjectTransform _rootTransform;
 
+        public bool IsKinematic
+        {
+            get => this._rb.isKinematic;
+            set => this._rb.isKinematic = value;
+        }
+
         /// <summary>
         /// Applies a force at the center of mass, in [N].
         /// </summary>
@@ -111,7 +117,6 @@ namespace KSS.Core.Physics
 
         void FixedUpdate()
         {
-            // I'm not a huge fan of the physics being calculated in scene-space, but that's the only way to handle collisions properly.
             this._rootTransform.AIRFPosition = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.transform.position );
 
             // If the object is colliding, we will use its rigidbody accelerations, because we don't have access to the forces due to collisions.
@@ -124,8 +129,7 @@ namespace KSS.Core.Physics
             }
             else
             {
-                // accSum will be whatever that was accumulated over the time from the previous frame (when it was zeroed out) to this frame.
-                // I think it should work fine.
+                // Acceleration sum will be whatever was accumulated between the previous frame (after it was zeroed out) and this frame. I think it should work fine.
                 this.Acceleration = _accelerationSum;
                 this.AngularAcceleration = _angularAccelerationSum;
             }

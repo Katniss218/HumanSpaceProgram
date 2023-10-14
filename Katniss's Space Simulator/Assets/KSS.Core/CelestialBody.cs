@@ -22,10 +22,28 @@ namespace KSS.Core
         /// </summary>
         public QuaternionDbl AIRFRotation { get => this._rootTransform.AIRFRotation; set => this._rootTransform.AIRFRotation = value; }
 
+        public string _id;
         /// <summary>
-        /// Gets or sets the name of the celestial body.
+        /// Gets the id of the celestial body.
         /// </summary>
-        public string Name { get; set; }
+        public string ID
+        {
+            get => _id;
+            set
+            {
+                if( value == null ) throw new ArgumentNullException( "value", "Can't assign a null ID." );
+
+                if( _id != null )
+                    CelestialBodyManager.Unregister( _id );
+                _id = value;
+                CelestialBodyManager.Register( this );
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the display name of the celestial body.
+        /// </summary>
+        public string DisplayName { get; set; }
         /// <summary>
         /// Gets the mass of the celestial body.
         /// </summary>
@@ -44,15 +62,27 @@ namespace KSS.Core
             _ref = this.GetComponent<PreexistingReference>();
         }
 
-        void OnEnable()
+        void Start()
         {
-            CelestialBodyManager.RegisterCelestialBody( _ref.GetPersistentGuid(), this );
+            if( this.ID == null )
+                Debug.LogError( $"Celestial body '{this.gameObject.name}' has not been assigned an ID." );
         }
 
         void OnDisable()
         {
-            CelestialBodyManager.UnregisterCelestialBody( _ref.GetPersistentGuid() );
+            if( this.ID != null )
+                CelestialBodyManager.Unregister( this.ID );
         }
+
+        /// <summary>
+        /// Constructs the reference frame centered on this body, with axes aligned with the AIRF frame.
+        /// </summary>
+        public IReferenceFrame CenteredReferenceFrame => new CenteredReferenceFrame( this.AIRFPosition );
+
+        /// <summary>
+        /// Constructs the reference frame centered on this body, with axes aligned with the body.
+        /// </summary>
+        public IReferenceFrame OrientedReferenceFrame => new OrientedReferenceFrame( this.AIRFPosition, this.AIRFRotation );
 
         public SerializedData GetData( ISaver s )
         {

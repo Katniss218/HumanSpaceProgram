@@ -72,6 +72,7 @@
     <Compile Include="Assets\_UnityEngine\Extensions\ComponentEx.cs" />
     <Compile Include="Assets\_UnityEngine\IComponent.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\Vector2_Ex.cs" />
+    <Compile Include="Assets\_UnityEngine\Matrix4x4Dbl.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_UnityEngine\___UnityEngine.asmdef" />

@@ -37,7 +37,7 @@ namespace KSS.Core.ReferenceFrames
         /// <summary>
         /// The reference frame that describes how to convert between Absolute Inertial Reference Frame and the scene's world space.
         /// </summary>
-        public static IReferenceFrame SceneReferenceFrame { get; private set; } = new OffsetReferenceFrame( Vector3Dbl.zero );
+        public static IReferenceFrame SceneReferenceFrame { get; private set; } = new CenteredReferenceFrame( Vector3Dbl.zero );
 
         /// <summary>
         /// Sets the scene's reference frame to the specified frame, and calls out a frame switch event.

@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
-
+﻿
 namespace UnityEngine
 {
     /// <summary>
-    /// An interface restricting placement of other interfaces to components
+    /// Implement this interface if you wish to restrict implementing your interface to classes derived from <see cref="Component"/>.
     /// </summary>
     public interface IComponent
     {
@@ -16,6 +10,6 @@ namespace UnityEngine
         GameObject gameObject { get; }
         string tag { get; set; }
 
-        // TODO - we can add the rest of methods and fields actually.
+        // The rest of the methods and fields defined by Unity can be added too, but I didn't bother.
     }
 }

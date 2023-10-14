@@ -1,4 +1,5 @@
-﻿using KSS.Core.ReferenceFrames;
+﻿using KSS.Core.Components;
+using KSS.Core.ReferenceFrames;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
@@ -50,7 +51,7 @@ namespace KSS.Core
                     return;
                 }
 
-                MakeNewVessel( part );
+                MakeNewVesselOrBuilding( part );
                 return;
             }
 
@@ -148,7 +149,7 @@ namespace KSS.Core
         /// <summary>
         /// Splits off the part from its original vessel, and makes a new vessel with it as its root.
         /// </summary>
-        private static Vessel MakeNewVessel( Transform partToSplit )
+        private static void MakeNewVesselOrBuilding( Transform partToSplit )
         {
             Contract.Assert( !partToSplit.IsRootOfVessel() );
 
@@ -160,35 +161,76 @@ namespace KSS.Core
             }*/
             //partToSplit.Parent = null;
 
-            // Create the new vessel and add the parts to it.
-            Vessel partToSplitVessel = partToSplit.GetVessel();
-            Vessel v = new VesselFactory().CreatePartless(
-                SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( partToSplit.transform.position ),
-                SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( partToSplit.transform.rotation ),
 #warning TODO - Use linear and angular velocities of part that works correctly for spinning vessels.
-                partToSplitVessel.PhysicsObject.Velocity,
-                partToSplitVessel.PhysicsObject.AngularVelocity );
+            // Create the new vessel and add the parts to it.
+            bool isAnchored = IsAnchored( partToSplit );
+            IPartObject partObject = partToSplit.GetPartObject();
+            if( isAnchored )
+            {
+                Building bOrig = partToSplit.GetBuilding();
+                Building b = new BuildingFactory().CreatePartless(
+                    bOrig.ReferenceBody,
+                    bOrig.LocalPosition,
+                    bOrig.LocalRotation
+                    );
 
-            partToSplit.SetParent( v.transform );
-            //partToSplit.SetVesselRecursive( v );
-            v.SetRootPart( partToSplit );
-            oldv.RecalculateParts();
-            v.RecalculateParts();
+                partToSplit.SetParent( b.transform );
+                //partToSplit.SetVesselRecursive( v );
+                b.SetRootPart( partToSplit );
+                oldv.RecalculateParts();
+                //b.RecalculateParts();
+            }
+            else 
+            {
+                Vessel v = new VesselFactory().CreatePartless(
+                    SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( partToSplit.transform.position ),
+                    SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( partToSplit.transform.rotation ),
+                partObject.PhysicsObject.Velocity,
+                    partObject.PhysicsObject.AngularVelocity );
 
-            return v;
+                partToSplit.SetParent( v.transform );
+                //partToSplit.SetVesselRecursive( v );
+                v.SetRootPart( partToSplit );
+                oldv.RecalculateParts();
+                v.RecalculateParts();
+            }
         }
 
+        /// <summary>
+        /// Sets the root object in the hierarchy to the specified object.
+        /// </summary>
         public static void ReRoot( Transform newRoot )
         {
-            ReRootRecursive( newRoot );
+            // To set the root, means to set the parent chain to be a child chain.
+            // This can be seen graphically on the following tree:
+            /*
+                        1
+                       / \
+                      2   3
+                     /   / \ 
+                    4   9  [8]   <---- new root
+                           / \
+                          6   7
+            */
+            Transform parent = newRoot.parent;
+            parent.SetParent( newRoot, true ); // worldPositionStays *might* introduce precision issues if performed far away from origin.
+            ReRoot( parent );
         }
 
-        static void ReRootRecursive( Transform current )
+        /// <summary>
+        /// Checks if the object should be anchored.
+        /// </summary>
+        public static bool IsAnchored( Transform transform )
         {
-            Transform parent = current.parent;
-            parent.SetParent( current );
-            ReRootRecursive( parent );
+            return transform.gameObject.HasComponentInChildren<FAnchor>();
         }
 
+        /// <summary>
+        /// Checks if the root of the object should be anchored.
+        /// </summary>
+        public static bool IsRootAnchored( Transform transform )
+        {
+            return transform.root.gameObject.HasComponentInChildren<FAnchor>();
+        }
     }
 }

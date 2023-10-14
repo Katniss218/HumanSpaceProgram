@@ -59,7 +59,6 @@
     <Compile Include="Assets\KSS.Core\Serialization\SaveMetadataEx.cs" />
     <Compile Include="Assets\KSS.Core\Vessel.cs" />
     <Compile Include="Assets\KSS.Core\Orbit.cs" />
-    <Compile Include="Assets\KSS.Core\Buildings\LaunchSiteFactory.cs" />
     <Compile Include="Assets\KSS.Core\Vessel.Serialization.cs" />
     <Compile Include="Assets\KSS.Core\Physics\PhysicsObject.cs" />
     <Compile Include="Assets\KSS.Core\PartFactory.cs" />
@@ -76,12 +75,11 @@
     <Compile Include="Assets\KSS.Core\CoordinateUtils.cs" />
     <Compile Include="Assets\KSS.Core\IHasMass.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\IResourceContainer.cs" />
-    <Compile Include="Assets\KSS.Core\ReferenceFrames\OffsetReferenceFrame.cs" />
+    <Compile Include="Assets\KSS.Core\ReferenceFrames\CenteredReferenceFrame.cs" />
     <Compile Include="Assets\KSS.Core\Physics\GravityUtils.cs" />
     <Compile Include="Assets\KSS.Core\ReferenceFrames\RootObjectTransform.cs" />
     <Compile Include="Assets\KSS.Core\VesselFactory.cs" />
     <Compile Include="Assets\KSS.Core\SceneManagement\SceneLoader.cs" />
-    <Compile Include="Assets\KSS.Core\Buildings\LaunchSite.cs" />
     <Compile Include="Assets\KSS.Core\SerializedManager.cs" />
     <Compile Include="Assets\KSS.Core\ReferenceFrames\IAcceleratingReferenceFrame.cs" />
     <Compile Include="Assets\KSS.Core\Control\ControlInAttribute.cs" />
@@ -106,6 +104,13 @@
     <Compile Include="Assets\KSS.Core\CelestialBody.cs" />
     <Compile Include="Assets\KSS.Core\Serialization\IOHelper.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\SubstanceStateCollection.cs" />
+    <Compile Include="Assets\KSS.Core\Components\FAnchor.cs" />
+    <Compile Include="Assets\KSS.Core\Building.cs" />
+    <Compile Include="Assets\KSS.Core\BuildingManager.cs" />
+    <Compile Include="Assets\KSS.Core\IPartObject.cs" />
+    <Compile Include="Assets\KSS.Core\BuildingFactory.cs" />
+    <Compile Include="Assets\KSS.Core\Components\FLaunchSiteMarker.cs" />
+    <Compile Include="Assets\KSS.Core\ReferenceFrames\OrientedReferenceFrame.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.Core\___KSS.Core.asmdef" />

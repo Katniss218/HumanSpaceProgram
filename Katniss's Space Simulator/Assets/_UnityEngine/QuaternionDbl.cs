@@ -9,6 +9,9 @@ namespace UnityEngine
 {
     public struct QuaternionDbl
     {
+        const double radToDeg = 180.0 / Math.PI;
+        const double degToRad = Math.PI / 180.0;
+
         /// <summary>
         /// First imaginary coefficient ('b' from 'a + bi + cj + dk').
         /// </summary>
@@ -84,6 +87,28 @@ namespace UnityEngine
             return new QuaternionDbl( axisSin.x, axisSin.y, axisSin.z, (float)Math.Cos( angleRadians ) ).normalized;
         }
 
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static QuaternionDbl Inverse( QuaternionDbl q )
+        {
+            double lengthSq = q.sqrMagnitude;
+            if( lengthSq != 0.0 )
+            {
+                double i = 1.0 / lengthSq;
+                return new QuaternionDbl( q.x * -i, q.y * -i, q.z * -i, q.w * i );
+            }
+            return q;
+        }
+
+        /// <summary>
+        /// Returns the angle in degrees between two rotations.
+        /// </summary>
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static double Angle( QuaternionDbl a, QuaternionDbl b )
+        {
+            double dot = QuaternionDbl.Dot( a, b );
+            return Math.Acos( Math.Min( Math.Abs( dot ), 1f ) ) * 2f * radToDeg;
+        }
+
         /// <summary>
         /// Combines the rotations in order: q1, then q2.
         /// </summary>
@@ -94,7 +119,7 @@ namespace UnityEngine
                 (lhs.w * rhs.x) + (lhs.x * rhs.w) + (lhs.y * rhs.z) - (lhs.z * rhs.y),
                 (lhs.w * rhs.y) + (lhs.y * rhs.w) + (lhs.z * rhs.x) - (lhs.x * rhs.z),
                 (lhs.w * rhs.z) + (lhs.z * rhs.w) + (lhs.x * rhs.y) - (lhs.y * rhs.x),
-                (lhs.w * rhs.w) - (lhs.x * rhs.x) - (lhs.y * rhs.y) - (lhs.z * rhs.z) );
+                (lhs.w * rhs.w) - (lhs.x * rhs.x) - (lhs.y * rhs.y) - (lhs.z * rhs.z) ).normalized;
         }
 
         public static Vector3Dbl operator *( QuaternionDbl rotation, Vector3Dbl point )

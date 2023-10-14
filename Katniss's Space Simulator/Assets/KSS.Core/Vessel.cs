@@ -20,6 +20,10 @@ namespace KSS.Core
             return v.RootPart == part;
         }
 
+        /// <summary>
+        /// Gets the <see cref="Vessel"/> attached to this transform.
+        /// </summary>
+        /// <returns>The vessel. Null if the transform is not part of a vessel.</returns>
         public static Vessel GetVessel( this Transform part )
         {
             return part.root.GetComponent<Vessel>();
@@ -28,7 +32,7 @@ namespace KSS.Core
 
     // ### WARNING ### Do not add "require RootObjectTransform" explicitly. it messes up the initialization and rigidbody is not cached at the right time.
     [RequireComponent( typeof( PhysicsObject ) )]
-    public sealed partial class Vessel : MonoBehaviour
+    public sealed partial class Vessel : MonoBehaviour, IPartObject
     {
         [SerializeField]
         private string _displayName;
@@ -47,6 +51,7 @@ namespace KSS.Core
         /// <remarks>
         /// DO NOT USE. This is for internal use, and can produce an invalid state. Use <see cref="VesselHierarchyUtils.SetParent(Transform, Transform)"/> instead.
         /// </remarks>
+        [Obsolete( "This is for internal use, and can produce an invalid state." )]
         internal void SetRootPart( Transform part )
         {
             if( part != null && part.GetVessel() != this )
@@ -68,9 +73,8 @@ namespace KSS.Core
         [SerializeField]
         IHasMass[] _partsWithMass;
 
-        [SerializeField] int temp_partsWithMassLength;
         [SerializeField]
-        Collider[] _partsWithCollider;
+        Collider[] _partsWithCollider; // TODO - this probably should be a dictionary with type as input, for modding support.
 
         public event Action OnAfterRecalculateParts;
 
@@ -81,7 +85,6 @@ namespace KSS.Core
                 PartCount = 0;
                 _partsWithMass = new IHasMass[] { };
                 _partsWithCollider = new Collider[] { };
-                temp_partsWithMassLength = 0;
                 OnAfterRecalculateParts?.Invoke();
                 return;
             }
@@ -103,7 +106,6 @@ namespace KSS.Core
 
             PartCount = count;
             _partsWithMass = RootPart.GetComponentsInChildren<IHasMass>(); // GetComponentsInChildren might be slower than custom methods? (needs testing)
-            temp_partsWithMassLength = _partsWithMass.Length;
             _partsWithCollider = RootPart.GetComponentsInChildren<Collider>(); // GetComponentsInChildren might be slower than custom methods? (needs testing)
             OnAfterRecalculateParts?.Invoke();
         }
@@ -171,12 +173,12 @@ namespace KSS.Core
 
         void OnEnable()
         {
-            VesselManager.RegisterVessel( this );
+            VesselManager.Register( this );
         }
 
         void OnDisable()
         {
-            VesselManager.UnregisterVessel( this );
+            VesselManager.Unregister( this );
         }
 
         void FixedUpdate()
