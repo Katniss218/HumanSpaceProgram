@@ -167,5 +167,18 @@ namespace UnityEngine
         {
             return new Vector3Dbl( v.x, v.y, v.z );
         }
+
+        public static bool operator ==( Vector3Dbl lhs, Vector3Dbl rhs )
+        {
+            return Math.Abs( lhs.x - rhs.x ) < 1e-12
+                && Math.Abs( lhs.y - rhs.y ) < 1e-12
+                && Math.Abs( lhs.z - rhs.z ) < 1e-12;
+        }
+        public static bool operator !=( Vector3Dbl lhs, Vector3Dbl rhs )
+        {
+            return Math.Abs( lhs.x - rhs.x ) >= 1e-12
+                || Math.Abs( lhs.y - rhs.y ) >= 1e-12
+                || Math.Abs( lhs.z - rhs.z ) >= 1e-12;
+        }
     }
 }
