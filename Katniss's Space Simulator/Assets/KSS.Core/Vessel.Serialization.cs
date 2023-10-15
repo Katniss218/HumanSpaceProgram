@@ -12,17 +12,22 @@ namespace KSS.Core
     {
         public SerializedData GetData( ISaver s )
         {
-            Debug.LogWarning( "saving vessel" );
             return new SerializedObject()
             {
-
+                { "display_name", this.DisplayName },
+                { "root_part", s.WriteObjectReference( this.RootPart ) },
+                { "on_after_recalculate_parts", s.WriteDelegate( this.OnAfterRecalculateParts ) }
             };
-            // save vessel data itself.
         }
 
         public void SetData( ILoader l, SerializedData data )
         {
-            Debug.LogWarning( "loading vessel" );
+            if( data.TryGetValue( "display_name", out var displayName ) )
+                this.DisplayName = (string)displayName;
+            if( data.TryGetValue( "root_part", out var rootPart ) )
+                this.RootPart = (Transform)l.ReadObjectReference( rootPart );
+            if( data.TryGetValue( "on_after_recalculate_parts", out var onAfterRecalculateParts ) )
+                this.OnAfterRecalculateParts = (Action)l.ReadDelegate( onAfterRecalculateParts );
         }
     }
 }

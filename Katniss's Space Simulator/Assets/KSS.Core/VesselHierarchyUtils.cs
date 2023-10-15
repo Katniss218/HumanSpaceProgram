@@ -170,8 +170,8 @@ namespace KSS.Core
                 Building bOrig = partToSplit.GetBuilding();
                 Building b = new BuildingFactory().CreatePartless(
                     bOrig.ReferenceBody,
-                    bOrig.LocalPosition,
-                    bOrig.LocalRotation
+                    bOrig.ReferencePosition,
+                    bOrig.ReferenceRotation
                     );
 
                 partToSplit.SetParent( b.transform );

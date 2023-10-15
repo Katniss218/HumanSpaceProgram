@@ -65,7 +65,7 @@ namespace UnityPlus.Serialization
                     Debug.LogException( ex );
                 }
 
-                SerializerUtils.TryWriteData( s, go, compData, ref objects );
+                SerializerUtils.TryWriteData( s, comp, compData, ref objects );
             }
 
             SerializedData goData = go.GetData( s );
@@ -110,6 +110,7 @@ namespace UnityPlus.Serialization
                 {
                     continue;
                 }
+#warning TODO - need to load components. Which have nondeterministic guids. Otherwise this will not load data.
 
                 l.SetReferenceID( obj, guidComp.GetPersistentGuid() );
 

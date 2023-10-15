@@ -17,7 +17,7 @@ namespace KSS.Components
         /// Represents an inlet or outlet.
         /// </summary>
         [Serializable]
-        public class Port
+        public class Port : IPersistent
         {
             // idk if SerializeField works with interfaces. probably better to save over in json.
             [SerializeField]
@@ -60,6 +60,29 @@ namespace KSS.Components
             public (IResourceConsumer, IResourceProducer) ConnectedTo()
             {
                 return (this._objC, this._objP);
+            }
+
+            public SerializedData GetData( ISaver s )
+            {
+                return new SerializedObject()
+                {
+                    { "obj_c", s.WriteObjectReference( this._objC ) },
+                    { "obj_p", s.WriteObjectReference( this._objP ) },
+                    { "position", s.WriteVector3( this.Position ) },
+                    { "forward", s.WriteVector3( this.Forward ) }
+                };
+            }
+
+            public void SetData( ILoader l, SerializedData data )
+            {
+                if( data.TryGetValue( "obj_c", out var objC ) )
+                    this._objC = (IResourceConsumer)l.ReadObjectReference( objC );
+                if( data.TryGetValue( "obj_p", out var objP ) )
+                    this._objP = (IResourceProducer)l.ReadObjectReference( objP );
+                if( data.TryGetValue( "position", out var position ) )
+                    this.Position = l.ReadVector3( position );
+                if( data.TryGetValue( "forward", out var forward ) )
+                    this.Forward = l.ReadVector3( forward );
             }
         }
 
@@ -246,14 +269,24 @@ namespace KSS.Components
             FixedUpdate_Flow( sceneAcceleration );
         }
 
-        public void SetData( ILoader l, SerializedData data )
-        {
-            throw new NotImplementedException();
-        }
-
         public SerializedData GetData( ISaver s )
         {
-            throw new NotImplementedException();
+            return new SerializedObject()
+            {
+                { "end1", this.End1.GetData( s ) },
+                { "end2", this.End2.GetData( s ) },
+                { "cross_section_area", this.CrossSectionArea }
+            };
+        }
+
+        public void SetData( ILoader l, SerializedData data )
+        {
+            if( data.TryGetValue( "end1", out var end1 ) )
+                this.End1.SetData( l, end1 );
+            if( data.TryGetValue( "end2", out var end2 ) )
+                this.End2.SetData( l, end2 );
+            if( data.TryGetValue( "cross_section_area", out var crossSectionArea ) )
+                this.CrossSectionArea = (float)crossSectionArea;
         }
     }
 }

@@ -35,8 +35,15 @@ namespace KSS.Core
     /// Buildings are a lot like vessels, but anchored to the planet.
     /// </summary>
     [RequireComponent( typeof( PhysicsObject ) )]
-    public class Building : MonoBehaviour, IPartObject
+    public partial class Building : MonoBehaviour, IPartObject
     {
+        [SerializeField]
+        private string _displayName;
+        public string DisplayName
+        {
+            get => _displayName;
+            set { _displayName = value; this.gameObject.name = value; }
+        }
 
         [field: SerializeField]
         public Transform RootPart { get; private set; }
@@ -50,17 +57,19 @@ namespace KSS.Core
             get => _referenceBody;
             set { _referenceBody = value; RecalculatePosition(); }
         }
-        Vector3Dbl _localPosition = Vector3.zero;
-        public Vector3Dbl LocalPosition
+
+        Vector3Dbl _referencePosition = Vector3.zero;
+        public Vector3Dbl ReferencePosition
         {
-            get => _localPosition;
-            set { _localPosition = value; RecalculatePosition(); }
+            get => _referencePosition;
+            set { _referencePosition = value; RecalculatePosition(); }
         }
-        QuaternionDbl _localRotation = QuaternionDbl.identity;
-        public QuaternionDbl LocalRotation
+
+        QuaternionDbl _referenceRotation = QuaternionDbl.identity;
+        public QuaternionDbl ReferenceRotation
         {
-            get => _localRotation;
-            set { _localRotation = value; RecalculatePosition(); }
+            get => _referenceRotation;
+            set { _referenceRotation = value; RecalculatePosition(); }
         }
 
         /// <remarks>
@@ -82,8 +91,8 @@ namespace KSS.Core
             if( ReferenceBody == null )
                 return;
 
-            this.RootObjTransform.AIRFPosition = ReferenceBody.OrientedReferenceFrame.TransformPosition( LocalPosition );
-            this.RootObjTransform.AIRFRotation = ReferenceBody.OrientedReferenceFrame.TransformRotation( LocalRotation );
+            this.RootObjTransform.AIRFPosition = ReferenceBody.OrientedReferenceFrame.TransformPosition( ReferencePosition );
+            this.RootObjTransform.AIRFRotation = ReferenceBody.OrientedReferenceFrame.TransformRotation( ReferenceRotation );
         }
 
         void Awake()

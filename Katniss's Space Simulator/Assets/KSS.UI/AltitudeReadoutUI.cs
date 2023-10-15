@@ -22,7 +22,7 @@ namespace KSS.UI
             }
             else
             {
-                CelestialBody body = CelestialBodyManager.CelestialBodies.Values.First();
+                CelestialBody body = CelestialBodyManager.Get( "main" );
                 Vector3Dbl posV = VesselManager.ActiveVessel.AIRFPosition;
                 Vector3Dbl posCB = body.AIRFPosition;
 

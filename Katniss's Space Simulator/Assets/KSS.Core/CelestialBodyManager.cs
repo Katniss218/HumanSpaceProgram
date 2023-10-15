@@ -12,12 +12,11 @@ namespace KSS.Core
 {
     public class CelestialBodyManager : SerializedManager, IPersistent
     {
-        public static Dictionary<string, CelestialBody> CelestialBodies { get; private set; }
+        private static Dictionary<string, CelestialBody> _celestialBodies = new Dictionary<string, CelestialBody>();
 
         public static CelestialBody Get( string id )
         {
-            if( CelestialBodies != null
-             && CelestialBodies.TryGetValue( id, out CelestialBody body ) )
+            if( _celestialBodies.TryGetValue( id, out CelestialBody body ) )
             {
                 return body;
             }
@@ -27,16 +26,12 @@ namespace KSS.Core
 
         internal static void Register( CelestialBody celestialBody )
         {
-            if( CelestialBodies == null )
-                CelestialBodies = new Dictionary<string, CelestialBody>();
-
-            CelestialBodies[celestialBody.ID] = celestialBody;
+            _celestialBodies[celestialBody.ID] = celestialBody;
         }
 
         internal static void Unregister( string id )
         {
-            if( CelestialBodies != null )
-                CelestialBodies.Remove( id );
+            _celestialBodies.Remove( id );
         }
 
 
@@ -57,10 +52,10 @@ namespace KSS.Core
 
         private static GameObject[] GetAllRootGameObjects()
         {
-            return CelestialBodies.Values.Select( cb => cb.gameObject ).ToArray();
+            return _celestialBodies.Values.Select( cb => cb.gameObject ).ToArray();
         }
 
-        [HSPEventListener( HSPEvent.TIMELINE_BEFORE_SAVE, HSPEvent.NAMESPACE_VANILLA + ".serialize_managers" )]
+        [HSPEventListener( HSPEvent.TIMELINE_BEFORE_SAVE, HSPEvent.NAMESPACE_VANILLA + ".serialize_celestial_bodies" )]
         private static void OnBeforeSave( object ee )
         {
             var e = (TimelineManager.SaveEventData)ee;
@@ -71,7 +66,7 @@ namespace KSS.Core
             e.dataActions.Add( _celestialBodiesStrat.Save_Data );
         }
 
-        [HSPEventListener( HSPEvent.TIMELINE_BEFORE_LOAD, HSPEvent.NAMESPACE_VANILLA + ".deserialize_managers" )]
+        [HSPEventListener( HSPEvent.TIMELINE_BEFORE_LOAD, HSPEvent.NAMESPACE_VANILLA + ".deserialize_celestial_bodies" )]
         private static void OnBeforeLoad( object ee )
         {
             var e = (TimelineManager.LoadEventData)ee;

@@ -94,12 +94,12 @@ namespace KSS.Core.Serialization
             TimeManager.LockTimescale = false;
         }
 
-        private static void CreateSaver( List<Func<ISaver, IEnumerator>> dataActions, List<Func<ISaver, IEnumerator>> objectActions )
+        private static void CreateSaver( List<Func<ISaver, IEnumerator>> objectActions, List<Func<ISaver, IEnumerator>> dataActions )
         {
             _saver = new AsyncSaver( SerializationPauseFunc, SerializationUnpauseFunc, objectActions, dataActions );
         }
 
-        private static void CreateLoader( List<Func<ILoader, IEnumerator>> dataActions, List<Func<ILoader, IEnumerator>> objectActions )
+        private static void CreateLoader( List<Func<ILoader, IEnumerator>> objectActions, List<Func<ILoader, IEnumerator>> dataActions )
         {
             _loader = new AsyncLoader( SerializationPauseFunc, SerializationUnpauseFunc, objectActions, dataActions );
         }
@@ -131,7 +131,6 @@ namespace KSS.Core.Serialization
 
             SaveEventData e = new SaveEventData( timelineId, saveId );
             HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_SAVE, e );
-
             CreateSaver( e.objectActions, e.dataActions );
 
             _saver.SaveAsync( instance );
@@ -169,9 +168,8 @@ namespace KSS.Core.Serialization
             loadedSave.ReadDataFromDisk();
 
             LoadEventData e = new LoadEventData( timelineId, saveId );
-            CreateLoader( e.objectActions, e.dataActions );
-
             HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_LOAD, e );
+            CreateLoader( e.objectActions, e.dataActions );
 
             _loader.LoadAsync( instance );
             CurrentTimeline = loadedTimeline;

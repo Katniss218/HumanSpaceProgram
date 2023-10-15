@@ -10,7 +10,7 @@ namespace KSS.Components
         Vessel v;
         Transform p;
 
-        bool _separated = false;
+        bool _hasSeparated = false;
 
         void Start()
         {
@@ -20,7 +20,7 @@ namespace KSS.Components
 
         void Update()
         {
-            if( _separated )
+            if( _hasSeparated )
             {
                 return;
             }
@@ -32,15 +32,18 @@ namespace KSS.Components
             }
         }
 
+        public SerializedData GetData( ISaver s )
+        {
+            return new SerializedObject()
+            {
+                { "has_separated", this._hasSeparated }
+            };
+        }
 
         public void SetData( ILoader l, SerializedData data )
         {
-            throw new NotImplementedException();
-        }
-
-        public SerializedData GetData( ISaver s )
-        {
-            throw new NotImplementedException();
+            if( data.TryGetValue( "has_separated", out var hasSeparated ) )
+                this._hasSeparated = (bool)hasSeparated;
         }
     }
 }

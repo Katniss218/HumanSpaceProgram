@@ -116,14 +116,24 @@ namespace KSS.Components
             OnAfterMassChanged?.Invoke( this.Mass - oldMass );
         }
 
-        public void SetData( ILoader l, SerializedData data )
-        {
-            throw new NotImplementedException();
-        }
-
         public SerializedData GetData( ISaver s )
         {
-            throw new NotImplementedException();
+            return new SerializedObject()
+            {
+                { "volume_transform", s.WriteObjectReference( this.VolumeTransform ) },
+                { "max_volume", this.MaxVolume },
+                { "radius", this.Radius }
+            };
+        }
+
+        public void SetData( ILoader l, SerializedData data )
+        {
+            if( data.TryGetValue( "volume_transform", out var volumeTransform ) )
+                this.VolumeTransform = (Transform)l.ReadObjectReference( volumeTransform );
+            if( data.TryGetValue( "max_volume", out var maxVolume ) )
+                this.MaxVolume = (float)maxVolume;
+            if( data.TryGetValue( "radius", out var radius ) )
+                this.Radius = (float)radius;
         }
 
         /// <summary>

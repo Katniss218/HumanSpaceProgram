@@ -29,6 +29,12 @@ namespace UnityPlus.Serialization
         {
             return new Vector3( (float)json[0], (float)json[1], (float)json[2] );
         }
+        
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static Vector3Dbl ReadVector3Dbl( this ILoader _, SerializedData json )
+        {
+            return new Vector3Dbl( (double)json[0], (double)json[1], (double)json[2] );
+        }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public static Vector3Int ReadVector3Int( this ILoader _, SerializedData json )
@@ -46,6 +52,12 @@ namespace UnityPlus.Serialization
         public static Quaternion ReadQuaternion( this ILoader _, SerializedData json )
         {
             return new Quaternion( (float)json[0], (float)json[1], (float)json[2], (float)json[3] );
+        }
+        
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static QuaternionDbl ReadQuaternionDbl( this ILoader _, SerializedData json )
+        {
+            return new QuaternionDbl( (double)json[0], (double)json[1], (double)json[2], (double)json[3] );
         }
 
         /// <summary>

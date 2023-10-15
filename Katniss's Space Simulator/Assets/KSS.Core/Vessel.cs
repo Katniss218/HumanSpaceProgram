@@ -168,7 +168,7 @@ namespace KSS.Core
 
         void Start()
         {
-            SetPhysicsObjectParameters();
+            //SetPhysicsObjectParameters();
         }
 
         void OnEnable()

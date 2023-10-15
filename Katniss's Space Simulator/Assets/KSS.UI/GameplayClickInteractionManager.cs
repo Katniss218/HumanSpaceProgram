@@ -43,7 +43,7 @@ namespace KSS.UI
                 FClickInteractionRedirect redirectComponent = clickedPart.GetComponent<FClickInteractionRedirect>();
                 if( redirectComponent != null )
                 {
-                    clickedPart = redirectComponent.target;
+                    clickedPart = redirectComponent.Target;
                 }
 
                 PartWindow.ExistsFor( clickedPart );

@@ -36,8 +36,8 @@ namespace KSS.Core
             Building building = gameObject.AddComponent<Building>();
             building.name = name;
             building.ReferenceBody = referenceBody;
-            building.LocalPosition = localPosition;
-            building.LocalRotation = localRotation;
+            building.ReferencePosition = localPosition;
+            building.ReferenceRotation = localRotation;
 
             return building;
         }

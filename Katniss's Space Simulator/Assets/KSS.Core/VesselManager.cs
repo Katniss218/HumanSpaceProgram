@@ -18,7 +18,7 @@ namespace KSS.Core
     {
         public static Vessel ActiveVessel { get; set; }
 
-        static List<Vessel> _vessels;
+        static List<Vessel> _vessels = new List<Vessel>();
 
         public static Vessel[] GetLoadedVessels()
         {
@@ -27,16 +27,12 @@ namespace KSS.Core
 
         internal static void Register( Vessel vessel )
         {
-            if( _vessels == null )
-                _vessels = new List<Vessel>();
-
             _vessels.Add( vessel );
         }
 
         internal static void Unregister( Vessel vessel )
         {
-            if( _vessels != null )
-                _vessels.Remove( vessel );
+            _vessels.Remove( vessel );
         }
 
         public SerializedData GetData( ISaver s )

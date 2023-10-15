@@ -17,7 +17,7 @@ namespace KSS.Core.Physics
         /// <returns>The calculated acceleration, in [m/s^2].</returns>
         public static Vector3Dbl GetGravityAcceleration( Vector3Dbl airfPosition )
         {
-            CelestialBody cb = CelestialBodyManager.CelestialBodies.Values.First(); // temporary.
+            CelestialBody cb = CelestialBodyManager.Get( "main" ); // temporary.
 
             Vector3Dbl toBody = cb.AIRFPosition - airfPosition;
 

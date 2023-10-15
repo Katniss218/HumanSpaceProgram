@@ -26,6 +26,13 @@ namespace UnityPlus.Serialization.Json
 
         void WriteJson( SerializedData data )
         {
+            if( data == null )
+            {
+#warning TODO - move all of these constants and stuff to a separate class.
+                _sb.Append( "null" );
+                return;
+            }
+
             if( data is SerializedObject o )
                 WriteJson( o );
             else if( data is SerializedArray a )
@@ -83,13 +90,6 @@ namespace UnityPlus.Serialization.Json
 
         void WriteJson( SerializedPrimitive value )
         {
-            if( value == null )
-            {
-#warning TODO - move all of these constants and stuff to a separate class.
-                _sb.Append( "null" );
-                return;
-            }
-
             string s = null;
             switch( value._type )
             {

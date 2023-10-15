@@ -13,7 +13,7 @@ namespace KSS.Core
 {
     public class BuildingManager : SerializedManager, IPersistent
     {
-        private static List<Building> _loadedBuildings;
+        private static List<Building> _loadedBuildings = new List<Building>();
 
         public static Building[] GetLoadedBuildings()
         {
@@ -22,16 +22,12 @@ namespace KSS.Core
 
         internal static void Register( Building vessel )
         {
-            if( _loadedBuildings == null )
-                _loadedBuildings = new List<Building>();
-
             _loadedBuildings.Add( vessel );
         }
 
         internal static void Unregister( Building vessel )
         {
-            if( _loadedBuildings != null )
-                _loadedBuildings.Remove( vessel );
+            _loadedBuildings.Remove( vessel );
         }
 
         public SerializedData GetData( ISaver s )
