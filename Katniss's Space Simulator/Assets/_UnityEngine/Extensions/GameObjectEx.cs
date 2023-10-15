@@ -48,7 +48,7 @@ namespace UnityEngine
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public static bool HasComponent<T>( this GameObject gameObject )
         {
-            return gameObject.GetComponent<T>() == null;
+            return gameObject.GetComponent<T>() != null;
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace UnityEngine
         public static bool HasComponent<T>( this GameObject gameObject, out T component )
         {
             component = gameObject.GetComponent<T>();
-            return component == null;
+            return component != null;
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace UnityEngine
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public static bool HasComponentInChildren<T>( this GameObject gameObject )
         {
-            return gameObject.GetComponentInChildren<T>() == null;
+            return gameObject.GetComponentInChildren<T>() != null;
         }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace UnityEngine
         public static bool HasComponentInChildren<T>( this GameObject gameObject, out T component )
         {
             component = gameObject.GetComponentInChildren<T>();
-            return component == null;
+            return component != null;
         }
 
         /// <summary>

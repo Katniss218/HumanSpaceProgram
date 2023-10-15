@@ -5,6 +5,9 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityPlus.Serialization;
+using KSS.Core.Serialization;
+using System.IO;
 
 namespace KSS.Core
 {
@@ -31,7 +34,10 @@ namespace KSS.Core
             SceneLoader.LoadSceneAsync( "MainMenu", true, false, null );
         }
 
-        internal static GameObject[] GetAllManagerGameObjects()
+
+        private static readonly JsonPreexistingGameObjectsStrategy _managersStrat = new JsonPreexistingGameObjectsStrategy( GetAllManagerGameObjects );
+
+        private static GameObject[] GetAllManagerGameObjects()
         {
             // An alternative approach could be to have a layer for manager objects (canonically a single object for all tho).
 
@@ -49,6 +55,28 @@ namespace KSS.Core
             }
 
             return gameObjects.ToArray();
+        }
+
+        [HSPEventListener( HSPEvent.TIMELINE_BEFORE_SAVE, HSPEvent.NAMESPACE_VANILLA + ".serialize_managers" )]
+        private static void OnBeforeSave( object ee )
+        {
+            var e = (TimelineManager.SaveEventData)ee;
+
+            TimelineManager.EnsureDirectoryExists( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay" ) );
+            _managersStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay", "data.json" );
+            // INFO - preexisting objects strat doesn't have Save_Objects method.
+            e.dataActions.Add( _managersStrat.Save_Data );
+        }
+
+        [HSPEventListener( HSPEvent.TIMELINE_BEFORE_LOAD, HSPEvent.NAMESPACE_VANILLA + ".deserialize_managers" )]
+        private static void OnBeforeLoad( object ee )
+        {
+            var e = (TimelineManager.LoadEventData)ee;
+
+            TimelineManager.EnsureDirectoryExists( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay" ) );
+            _managersStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay", "data.json" );
+            e.objectActions.Add( _managersStrat.Load_Object );
+            e.dataActions.Add( _managersStrat.Load_Data );
         }
     }
 }

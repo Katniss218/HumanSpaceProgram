@@ -64,15 +64,16 @@
     <Compile Include="Assets\_UnityEngine\Direction3D.cs" />
     <Compile Include="Assets\_UnityEngine\Direction2D.cs" />
     <Compile Include="Assets\_UnityEngine\CoroutineRunner.cs" />
+    <Compile Include="Assets\_UnityEngine\Matrix4x4Dbl.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\Vector3_Ex.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\ObjectEx.cs" />
+    <Compile Include="Assets\_UnityEngine\MathD.cs" />
     <Compile Include="Assets\_UnityEngine\MeshUtils.cs" />
     <Compile Include="Assets\_UnityEngine\Vector3Dbl.cs" />
     <Compile Include="Assets\_UnityEngine\QuaternionCurve.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\ComponentEx.cs" />
     <Compile Include="Assets\_UnityEngine\IComponent.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\Vector2_Ex.cs" />
-    <Compile Include="Assets\_UnityEngine\Matrix4x4Dbl.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_UnityEngine\___UnityEngine.asmdef" />

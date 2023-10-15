@@ -29,11 +29,39 @@ namespace KSS.Core.Serialization
         }
         #endregion
 
+        public struct SaveEventData
+        {
+            public string timelineId;
+            public string saveId;
+            public List<Func<ISaver, IEnumerator>> objectActions;
+            public List<Func<ISaver, IEnumerator>> dataActions;
+
+            public SaveEventData( string timelineId, string saveId )
+            {
+                this.timelineId = timelineId;
+                this.saveId = saveId;
+                this.objectActions = new List<Func<ISaver, IEnumerator>>();
+                this.dataActions = new List<Func<ISaver, IEnumerator>>();
+            }
+        }
+
+        public struct LoadEventData
+        {
+            public string timelineId;
+            public string saveId;
+            public List<Func<ILoader, IEnumerator>> objectActions;
+            public List<Func<ILoader, IEnumerator>> dataActions;
+
+            public LoadEventData( string timelineId, string saveId )
+            {
+                this.timelineId = timelineId;
+                this.saveId = saveId;
+                this.objectActions = new List<Func<ILoader, IEnumerator>>();
+                this.dataActions = new List<Func<ILoader, IEnumerator>>();
+            }
+        }
+
 #warning TODO - use an event to add these strategies to the savers/loaders, they don't belong here.
-        static readonly JsonPreexistingGameObjectsStrategy _managersStrat = new JsonPreexistingGameObjectsStrategy( AlwaysLoadedManager.GetAllManagerGameObjects );
-        static readonly JsonPreexistingGameObjectsStrategy _celestialBodiesStrat = new JsonPreexistingGameObjectsStrategy( CelestialBodyManager.GetAllRootGameObjects );
-        static readonly JsonExplicitHierarchyGameObjectsStrategy _buildingsStrat = new JsonExplicitHierarchyGameObjectsStrategy( BuildingManager.GetAllRootGameObjects );
-        static readonly JsonExplicitHierarchyGameObjectsStrategy _vesselsStrat = new JsonExplicitHierarchyGameObjectsStrategy( VesselManager.GetAllRootGameObjects );
 
         /// <summary>
         /// Checks if a timeline is currently being either saved or loaded.
@@ -66,46 +94,22 @@ namespace KSS.Core.Serialization
             TimeManager.LockTimescale = false;
         }
 
-        static void CreateDefaultSaver()
+        private static void CreateSaver( List<Func<ISaver, IEnumerator>> dataActions, List<Func<ISaver, IEnumerator>> objectActions )
         {
-            _saver = new AsyncSaver(
-                SerializationPauseFunc, SerializationUnpauseFunc,
-                new Func<ISaver, IEnumerator>[] { _vesselsStrat.Save_Object, _buildingsStrat.Save_Object },
-                new Func<ISaver, IEnumerator>[] { _managersStrat.Save_Data, _celestialBodiesStrat.Save_Data, _vesselsStrat.Save_Data, _buildingsStrat.Save_Data }
-            );
+            _saver = new AsyncSaver( SerializationPauseFunc, SerializationUnpauseFunc, objectActions, dataActions );
         }
 
-        static void CreateDefaultLoader()
+        private static void CreateLoader( List<Func<ILoader, IEnumerator>> dataActions, List<Func<ILoader, IEnumerator>> objectActions )
         {
-            _loader = new AsyncLoader(
-                SerializationPauseFunc, SerializationUnpauseFunc,
-                new Func<ILoader, IEnumerator>[] { _managersStrat.Load_Object, _celestialBodiesStrat.Load_Object, _vesselsStrat.Load_Object, _buildingsStrat.Load_Object },
-                new Func<ILoader, IEnumerator>[] { _managersStrat.Load_Data, _celestialBodiesStrat.Load_Data, _vesselsStrat.Load_Data, _buildingsStrat.Load_Data }
-            );
+            _loader = new AsyncLoader( SerializationPauseFunc, SerializationUnpauseFunc, objectActions, dataActions );
         }
 
-        static void EnsureDirectoryExists( string path )
+        public static void EnsureDirectoryExists( string path )
         {
             if( !Directory.Exists( path ) )
             {
                 Directory.CreateDirectory( path );
             }
-        }
-
-        static void SetSerializationStrategyPaths( string timelineId, string saveId )
-        {
-            EnsureDirectoryExists( SaveMetadata.GetRootDirectory( timelineId, saveId ) );
-
-            EnsureDirectoryExists( Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "Vessels" ) );
-            _vesselsStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "Vessels", "objects.json" );
-            _vesselsStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "Vessels", "data.json" );
-            EnsureDirectoryExists( Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "Buildings" ) );
-            _buildingsStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "Buildings", "objects.json" );
-            _buildingsStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "Buildings", "data.json" );
-            EnsureDirectoryExists( Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "CelestialBodies" ) );
-            _celestialBodiesStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "CelestialBodies", "data.json" );
-            EnsureDirectoryExists( Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "Gameplay" ) );
-            _managersStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( timelineId, saveId ), "Gameplay", "data.json" );
         }
 
         /// <summary>
@@ -120,25 +124,26 @@ namespace KSS.Core.Serialization
             }
             if( IsSavingOrLoading )
             {
-                throw new InvalidOperationException( $"Can't start saving while already saving/loading." );
+                throw new InvalidOperationException( $"Can't start saving a timeline while already saving or loading." );
             }
 
-            CreateDefaultSaver();
+            EnsureDirectoryExists( SaveMetadata.GetRootDirectory( timelineId, saveId ) );
 
-            SetSerializationStrategyPaths( timelineId, saveId );
-            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_SAVE, _saver );
+            SaveEventData e = new SaveEventData( timelineId, saveId );
+            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_SAVE, e );
 
-            // write timeline.json to disk
-            // write save.json to disk.
+            CreateSaver( e.objectActions, e.dataActions );
+
             _saver.SaveAsync( instance );
+
+            CurrentTimeline.WriteToDisk();
             SaveMetadata savedSave = new SaveMetadata( timelineId, saveId );
             savedSave.Name = saveName;
             savedSave.Description = saveDescription;
             savedSave.FileVersion = SaveMetadata.CURRENT_SAVE_FILE_VERSION;
             savedSave.WriteToDisk();
-            CurrentTimeline.WriteToDisk();
 
-            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_SAVE, _saver );
+            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_SAVE, e );
         }
 
         /// <summary>
@@ -153,23 +158,25 @@ namespace KSS.Core.Serialization
             }
             if( IsSavingOrLoading )
             {
-                throw new InvalidOperationException( $"Can't start loading while already saving/loading." );
+                throw new InvalidOperationException( $"Can't start loading a timeline while already saving or loading." );
             }
+
+            EnsureDirectoryExists( SaveMetadata.GetRootDirectory( timelineId, saveId ) );
 
             TimelineMetadata loadedTimeline = new TimelineMetadata( timelineId );
             loadedTimeline.ReadDataFromDisk();
             SaveMetadata loadedSave = new SaveMetadata( timelineId, saveId );
             loadedSave.ReadDataFromDisk();
 
-            CreateDefaultLoader();
+            LoadEventData e = new LoadEventData( timelineId, saveId );
+            CreateLoader( e.objectActions, e.dataActions );
 
-            SetSerializationStrategyPaths( timelineId, saveId );
-            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_LOAD, _loader );
+            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_LOAD, e );
 
             _loader.LoadAsync( instance );
             CurrentTimeline = loadedTimeline;
 
-            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_LOAD, _loader );
+            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_LOAD, e );
         }
 
         /// <summary>
@@ -183,7 +190,7 @@ namespace KSS.Core.Serialization
             }
             if( IsSavingOrLoading )
             {
-                throw new InvalidOperationException( $"Can't start loading while already saving/loading." );
+                throw new InvalidOperationException( $"Can't create a new timeline while already saving or loading." );
             }
 
             TimelineMetadata newTimeline = new TimelineMetadata( timelineId );
