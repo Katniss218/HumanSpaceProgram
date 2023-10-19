@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace KSS.Core.Physics
 {
@@ -16,7 +17,7 @@ namespace KSS.Core.Physics
     /// </remarks>
     [RequireComponent( typeof( Rigidbody ) )]
     [RequireComponent( typeof( RootObjectTransform ) )] // IMPORTANT: Changing the order here changes the order in which Awake() fires (setting the position of objects in the first frame depends on the fact that RB is added before root transform).
-    public class PhysicsObject : MonoBehaviour
+    public class PhysicsObject : MonoBehaviour, IPersistent
     {
         /// <summary>
         /// Gets or sets the physics object's mass, in [kg].
@@ -54,6 +55,12 @@ namespace KSS.Core.Physics
             set => this._rb.angularVelocity = value;
         }
 
+        public bool IsKinematic
+        {
+            get => this._rb.isKinematic;
+            set => this._rb.isKinematic = value;
+        }
+
         /// <summary>
         /// Gets the acceleration that this physics object is under at this instant, in [m/s^2].
         /// </summary>
@@ -72,12 +79,6 @@ namespace KSS.Core.Physics
 
         Rigidbody _rb;
         RootObjectTransform _rootTransform;
-
-        public bool IsKinematic
-        {
-            get => this._rb.isKinematic;
-            set => this._rb.isKinematic = value;
-        }
 
         /// <summary>
         /// Applies a force at the center of mass, in [N].
@@ -173,6 +174,36 @@ namespace KSS.Core.Physics
         void OnDisable()
         {
             _rb.isKinematic = true;
+        }
+
+        public SerializedData GetData( ISaver s )
+        {
+            return new SerializedObject()
+            {
+                { "mass", this.Mass },
+                { "local_center_of_mass", s.WriteVector3( this.LocalCenterOfMass ) },
+                { "velocity", s.WriteVector3( this.Velocity ) },
+                { "angular_velocity", s.WriteVector3( this.AngularVelocity ) },
+                { "is_kinematic", this.IsKinematic }
+            };
+        }
+
+        public void SetData( ILoader l, SerializedData data )
+        {
+            if( data.TryGetValue( "mass", out var mass ) )
+                this.Mass = (float)mass;
+
+            if( data.TryGetValue( "local_center_of_mass", out var localCenterOfMass ) )
+                this.LocalCenterOfMass = l.ReadVector3( localCenterOfMass );
+
+            if( data.TryGetValue( "velocity", out var velocity ) )
+                this.Velocity = l.ReadVector3( velocity );
+
+            if( data.TryGetValue( "angular_velocity", out var angularVelocity ) )
+                this.AngularVelocity = l.ReadVector3( angularVelocity );
+
+            if( data.TryGetValue( "is_kinematic", out var isKinematic ) )
+                this.IsKinematic = (bool)isKinematic;
         }
     }
 }

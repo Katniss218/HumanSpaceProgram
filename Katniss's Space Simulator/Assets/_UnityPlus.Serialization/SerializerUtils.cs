@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -36,6 +37,95 @@ namespace UnityPlus.Serialization
                     { $"{SerializerUtils.REF}", s.WriteGuid( s.GetReferenceID( obj ) ) },
                     { "data", data }
                 } );
+            }
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static void TryWriteDataWithChildrenPaths( ISaver s, object obj, SerializedData data, SerializedArray childrenPaths, ref SerializedArray objects )
+        {
+            if( data != null )
+            {
+                objects.Add( new SerializedObject()
+                {
+                    { $"{SerializerUtils.REF}", s.WriteGuid( s.GetReferenceID( obj ) ) },
+                    { "data", data },
+                    { "children_ids", childrenPaths }
+                } );
+            }
+        }
+
+        public static void WriteReferencedChildrenRecursive( ISaver s, GameObject go, ref SerializedArray sArr, string parentPath )
+        {
+            // write the IDs of referenced components/child gameobjects of the parent into the array, along with the path to them.
+
+            // root is always added, recursive children might not be.
+            if( !string.IsNullOrEmpty( parentPath ) )
+            {
+                if( s.TryGetID( go, out Guid id ) )
+                {
+                    sArr.Add( new SerializedObject()
+                {
+                    { $"{SerializerUtils.ID}", s.WriteGuid( id ) },
+                    { "path", $"{parentPath}" }
+                } );
+                }
+            }
+
+            int i = 0;
+            foreach( var comp in go.GetComponents() )
+            {
+                if( s.TryGetID( comp, out Guid id ) )
+                {
+                    sArr.Add( new SerializedObject()
+                    {
+                        { $"{SerializerUtils.ID}", s.WriteGuid( id ) },
+                        { "path", $"{parentPath}*{i:#########0}" }
+                    } );
+                }
+                i++;
+            }
+
+            i = 0;
+            foreach( Transform ct in go.transform )
+            {
+                string path = $"{i:#########0}:"; // colon at the end is important
+                WriteReferencedChildrenRecursive( s, ct.gameObject, ref sArr, path );
+                i++;
+            }
+        }
+
+        public static UnityEngine.Object GetComponentOrGameObject( this GameObject root, string path )
+        {
+            if( string.IsNullOrEmpty( path ) )
+            {
+                return root;
+            }
+
+            string[] pathSegments = path.Split( ':' );
+
+            Transform obj = root.transform;
+            for( int i = 0; i < pathSegments.Length - 1; i++ )
+            {
+                int index = int.Parse( pathSegments[i] );
+                obj = obj.transform.GetChild( index );
+            }
+
+            // component is always last.
+            string lastSegment = pathSegments[pathSegments.Length - 1];
+            if( lastSegment == "" )
+            {
+                return obj.gameObject;
+            }
+            if( lastSegment[0] == '*' )
+            {
+                int index = int.Parse( lastSegment[1..] );
+                return obj.GetComponents()[index];
+            }
+            else
+            {
+                int index = int.Parse( lastSegment );
+                obj = obj.transform.GetChild( index );
+                return obj;
             }
         }
     }

@@ -20,6 +20,10 @@ namespace UnityPlus.Serialization
     public sealed class JsonPreexistingGameObjectsStrategy
     {
         /// <summary>
+        /// The name of the file into which the object data will be saved.
+        /// </summary>
+        public string ObjectsFilename { get; set; }
+        /// <summary>
         /// The name of the file into which the data data will be saved.
         /// </summary>
         public string DataFilename { get; set; }
@@ -31,7 +35,7 @@ namespace UnityPlus.Serialization
         /// <summary>
         /// Determines which objects returned by the <see cref="RootObjectsGetter"/> will be excluded from saving.
         /// </summary>
-        public int IncludedObjectsMask { get; set; } = int.MaxValue;
+        public uint IncludedObjectsMask { get; set; } = uint.MaxValue;
 
         /// <param name="rootObjectsGetter">Determines which objects will have their data saved, and loaded.</param>
         public JsonPreexistingGameObjectsStrategy( Func<GameObject[]> rootObjectsGetter )
@@ -41,6 +45,20 @@ namespace UnityPlus.Serialization
                 throw new ArgumentNullException( nameof( rootObjectsGetter ), $"Object getter func must not be null." );
             }
             this.RootObjectsGetter = rootObjectsGetter;
+        }
+
+        private static SerializedObject WriteGameObject( ISaver s, GameObject go, PreexistingReference guidComp )
+        {
+            SerializedArray sArr = new SerializedArray();
+            SerializerUtils.WriteReferencedChildrenRecursive( s, go, ref sArr, "" );
+
+            SerializedObject goJson = new SerializedObject()
+            {
+                { SerializerUtils.ID, s.WriteGuid( guidComp.GetPersistentGuid() ) },
+                { "children_ids", sArr }
+            };
+
+            return goJson;
         }
 
         private void SaveGameObjectData( ISaver s, GameObject go, ref SerializedArray objects )
@@ -72,6 +90,37 @@ namespace UnityPlus.Serialization
             SerializerUtils.TryWriteData( s, go, goData, ref objects );
         }
 
+        //public void Save_Object( ISaver s )
+        public IEnumerator Save_Object( ISaver s )
+        {
+            if( string.IsNullOrEmpty( ObjectsFilename ) )
+            {
+                throw new InvalidOperationException( $"Can't save objects, file name is not set." );
+            }
+
+            IEnumerable<GameObject> rootObjects = RootObjectsGetter();
+
+            SerializedArray objectsJson = new SerializedArray();
+
+            foreach( var go in rootObjects )
+            {
+                PreexistingReference guidComp = go.GetComponent<PreexistingReference>();
+                if( guidComp == null )
+                {
+                    continue;
+                }
+
+                SerializedObject goJson = WriteGameObject( s, go, guidComp );
+                objectsJson.Add( goJson );
+
+                yield return null;
+            }
+
+            var sb = new StringBuilder();
+            new Serialization.Json.JsonStringWriter( objectsJson, sb ).Write();
+            File.WriteAllText( ObjectsFilename, sb.ToString(), Encoding.UTF8 );
+        }
+
         /// <summary>
         /// Saves the data about the gameobjects and their persistent components. Does not include child objects.
         /// </summary>
@@ -98,21 +147,55 @@ namespace UnityPlus.Serialization
             File.WriteAllText( DataFilename, sb.ToString(), Encoding.UTF8 );
         }
 
+        private static void AssignIDsToReferencedChildren( ILoader l, GameObject go, ref SerializedArray sArr )
+        {
+            // Set the IDs of all objects in the array.
+            foreach( var s in sArr )
+            {
+                Guid id = l.ReadGuid( s["$id"] );
+                string path = s["path"];
+
+                var refObj = go.GetComponentOrGameObject( path );
+
+                l.SetReferenceID( refObj, id );
+            }
+        }
+
         public IEnumerator Load_Object( ILoader l )
         {
-            // Objects are assumed to be already existing in the scene (same as on save).
-            // Loop through the objects to be loaded, and 
-            GameObject[] objects = RootObjectsGetter.Invoke();
-            foreach( var obj in objects )
+            if( string.IsNullOrEmpty( ObjectsFilename ) )
             {
-                PreexistingReference guidComp = obj.GetComponent<PreexistingReference>();
+                throw new InvalidOperationException( $"Can't load objects, file name is not set." );
+            }
+            if( !File.Exists( ObjectsFilename ) )
+            {
+                throw new InvalidOperationException( $"Can't load objects, file `{ObjectsFilename}` doesn't exist." );
+            }
+
+            GameObject[] rootObjects = RootObjectsGetter.Invoke();
+            foreach( var go in rootObjects )
+            {
+                PreexistingReference guidComp = go.GetComponent<PreexistingReference>();
                 if( guidComp == null )
                 {
                     continue;
                 }
-#warning TODO - need to load components. Which have nondeterministic guids. Otherwise this will not load data.
 
-                l.SetReferenceID( obj, guidComp.GetPersistentGuid() );
+                l.SetReferenceID( go, guidComp.GetPersistentGuid() );
+
+                yield return null;
+            }
+
+            // Loads the IDs of objects returned by the getter func, then gets them by ID from the loader's reference dict.
+
+            string objectsStr = File.ReadAllText( ObjectsFilename, Encoding.UTF8 );
+            SerializedArray objectsJson = (SerializedArray)new Serialization.Json.JsonStringReader( objectsStr ).Read();
+
+            foreach( var goJson in objectsJson )
+            {
+                Guid objectGuid = l.ReadGuid( goJson[SerializerUtils.ID] );
+                SerializedArray refChildren = (SerializedArray)goJson["children_ids"];
+                AssignIDsToReferencedChildren( l, (GameObject)l.Get( objectGuid ), ref refChildren );
 
                 yield return null;
             }

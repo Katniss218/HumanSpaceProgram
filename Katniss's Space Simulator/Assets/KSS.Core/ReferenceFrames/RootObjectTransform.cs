@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace KSS.Core.ReferenceFrames
 {
@@ -14,7 +15,7 @@ namespace KSS.Core.ReferenceFrames
     /// <remarks>
     /// Add this to any object that is supposed to be affected by the <see cref="SceneReferenceFrameManager"/>.
     /// </remarks>
-    public class RootObjectTransform : MonoBehaviour, IReferenceFrameSwitchResponder
+    public class RootObjectTransform : MonoBehaviour, IPersistent, IReferenceFrameSwitchResponder
     {
         // Should to be added to any root object that is an actual [physical] object in the scene (not UI elements, empties, etc).
 
@@ -105,7 +106,25 @@ namespace KSS.Core.ReferenceFrames
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
             UpdateScenePosition();
-            //UpdateSceneRotation();
+            UpdateSceneRotation();
+        }
+
+        public SerializedData GetData( ISaver s )
+        {
+            return new SerializedObject()
+            {
+                { "airf_position", s.WriteVector3Dbl( this.AIRFPosition ) },
+                { "airf_rotation", s.WriteQuaternionDbl( this.AIRFRotation ) }
+            };
+        }
+
+        public void SetData( ILoader l, SerializedData data )
+        {
+            if( data.TryGetValue( "airf_position", out var airfPosition ) )
+                this.AIRFPosition = l.ReadVector3Dbl( airfPosition );
+
+            if( data.TryGetValue( "airf_rotation", out var airfRotation ) )
+                this.AIRFRotation = l.ReadQuaternionDbl( airfRotation );
         }
     }
 }

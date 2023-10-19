@@ -25,6 +25,7 @@ namespace UnityPlus.Serialization
     /// <remarks>
     /// Used by <see cref="JsonPreexistingGameObjectsStrategy"/>.
     /// </remarks>
+    [ExecuteInEditMode]
     public class PreexistingReference : MonoBehaviour
     {
         [SerializeField]
@@ -49,5 +50,16 @@ namespace UnityPlus.Serialization
                 Destroy( this );
             }
         }
+
+#if UNITY_EDITOR
+        void OnValidate()
+        {
+            if( _guidData == null )
+            {
+                _guidData = new byte[16];
+                new System.Random().NextBytes( _guidData );
+            }
+        }
     }
+#endif
 }

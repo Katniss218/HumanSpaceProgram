@@ -41,7 +41,7 @@ namespace KSS.Core
         {
             // An alternative approach could be to have a layer for manager objects (canonically a single object for all tho).
 
-            SerializedManager[] managers = FindObjectsOfType<SerializedManager>();
+            HSPManager[] managers = FindObjectsOfType<HSPManager>();
             List<GameObject> gameObjects = new List<GameObject>();
 
             foreach( var manager in managers )
@@ -63,8 +63,9 @@ namespace KSS.Core
             var e = (TimelineManager.SaveEventData)ee;
 
             TimelineManager.EnsureDirectoryExists( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay" ) );
+            _managersStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay", "objects.json" );
             _managersStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay", "data.json" );
-            // INFO - preexisting objects strat doesn't have Save_Objects method.
+            e.objectActions.Add( _managersStrat.Save_Object );
             e.dataActions.Add( _managersStrat.Save_Data );
         }
 
@@ -74,6 +75,7 @@ namespace KSS.Core
             var e = (TimelineManager.LoadEventData)ee;
 
             TimelineManager.EnsureDirectoryExists( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay" ) );
+            _managersStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay", "objects.json" );
             _managersStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay", "data.json" );
             e.objectActions.Add( _managersStrat.Load_Object );
             e.dataActions.Add( _managersStrat.Load_Data );

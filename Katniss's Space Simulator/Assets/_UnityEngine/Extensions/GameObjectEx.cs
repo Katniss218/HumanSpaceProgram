@@ -86,7 +86,7 @@ namespace UnityEngine
         /// <summary>
         /// Checks if the gameobject is contained in a given layer mask.
         /// </summary>
-        public static bool IsInLayerMask( this GameObject gameObject, int layerMask )
+        public static bool IsInLayerMask( this GameObject gameObject, uint layerMask )
         {
             return ((1 << gameObject.layer) & layerMask) != 0;
         }

@@ -36,7 +36,7 @@ namespace UnityPlus.Serialization.Strategies
         /// <summary>
         /// Determines which objects returned by the <see cref="RootObjectsGetter"/> will be excluded from saving.
         /// </summary>
-        public int IncludedObjectsMask { get; set; } = int.MaxValue;
+        public uint IncludedObjectsMask { get; set; } = uint.MaxValue;
 
         public JsonAssetGameObjectsStrategy( Func<GameObject[]> rootObjectsGetter )
         {
@@ -47,52 +47,12 @@ namespace UnityPlus.Serialization.Strategies
             this.RootObjectsGetter = rootObjectsGetter;
         }
 
-        private static void WriteReferencedChildrenRecursive( ISaver s, GameObject go, ref SerializedArray sArr, string parentPath )
-        {
-            // write the IDs of referenced components/child gameobjects of the parent into the array, along with the path to them.
-
-            // root is always added, recursive children might not be.
-            if( !string.IsNullOrEmpty( parentPath ) )
-            {
-                if( s.TryGetID( go, out Guid id ) )
-                {
-                    sArr.Add( new SerializedObject()
-                {
-                    { $"{SerializerUtils.ID}", s.WriteGuid( id ) },
-                    { "path", $"{parentPath}" }
-                } );
-                }
-            }
-
-            int i = 0;
-            foreach( var comp in go.GetComponents() )
-            {
-                if( s.TryGetID( comp, out Guid id ) )
-                {
-                    sArr.Add( new SerializedObject()
-                    {
-                        { $"{SerializerUtils.ID}", s.WriteGuid( id ) },
-                        { "path", $"{parentPath}*{i.ToString(CultureInfo.InvariantCulture)}" }
-                    } );
-                }
-                i++;
-            }
-
-            i = 0;
-            foreach( Transform ct in go.transform )
-            {
-                string path = $"{i.ToString( CultureInfo.InvariantCulture )}:"; // colon at the end is important
-                WriteReferencedChildrenRecursive( s, ct.gameObject, ref sArr, path );
-                i++;
-            }
-        }
-
         private static SerializedObject WriteAssetGameObject( ISaver s, GameObject go, ClonedGameObject cbf )
         {
             Guid objectGuid = s.GetReferenceID( go );
 
             SerializedArray sArr = new SerializedArray();
-            WriteReferencedChildrenRecursive( s, go, ref sArr, "" );
+            SerializerUtils.WriteReferencedChildrenRecursive( s, go, ref sArr, "" );
 
             SerializedObject goJson = new SerializedObject()
             {
@@ -104,39 +64,6 @@ namespace UnityPlus.Serialization.Strategies
             return goJson;
         }
 
-        private static UnityEngine.Object GetComponentOrGameObject( GameObject root, string path )
-        {
-            if( path == "" )
-                return root;
-
-            string[] pathSegments = path.Split( ':' );
-
-            Transform obj = root.transform;
-            for( int i = 0; i < pathSegments.Length - 1; i++ )
-            {
-                int index = int.Parse( pathSegments[i] );
-                obj = obj.transform.GetChild( index );
-            }
-
-            // component is always last.
-            string lastSegment = pathSegments[pathSegments.Length - 1];
-            if( lastSegment == "" )
-            {
-                return obj.gameObject;
-            }
-            if( lastSegment[0] == '*' )
-            {
-                int index = int.Parse( lastSegment[1..] );
-                return obj.GetComponents()[index];
-            }
-            else
-            {
-                int index = int.Parse( lastSegment );
-                obj = obj.transform.GetChild( index );
-                return obj;
-            }
-        }
-
         private static void AssignIDsToReferencedChildren( ILoader l, GameObject go, ref SerializedArray sArr )
         {
             // Set the IDs of all objects in the array.
@@ -145,9 +72,9 @@ namespace UnityPlus.Serialization.Strategies
                 Guid id = l.ReadGuid( s["$id"] );
                 string path = s["path"];
 
-                var obj = GetComponentOrGameObject( go, path );
+                var refObj = go.GetComponentOrGameObject( path );
 
-                l.SetReferenceID( obj, id );
+                l.SetReferenceID( refObj, id );
             }
         }
 
@@ -205,6 +132,7 @@ namespace UnityPlus.Serialization.Strategies
             new Serialization.Json.JsonStringWriter( objectsJson, sb ).Write();
             File.WriteAllText( ObjectsFilename, sb.ToString(), Encoding.UTF8 );
         }
+
         private void SaveGameObjectDataRecursive( ISaver s, GameObject go, ref SerializedArray objects )
         {
             if( !go.IsInLayerMask( IncludedObjectsMask ) )

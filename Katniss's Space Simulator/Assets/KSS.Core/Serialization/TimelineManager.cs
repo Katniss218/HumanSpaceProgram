@@ -12,7 +12,7 @@ namespace KSS.Core.Serialization
     /// <summary>
     /// Manages the currently loaded timeline (save/workspace). See <see cref="TimelineMetadata"/> and <see cref="SaveMetadata"/>.
     /// </summary>
-    public class TimelineManager : SerializedManager
+    public class TimelineManager : HSPManager
     {
         #region SINGLETON UGLINESS
         private static TimelineManager ___instance;

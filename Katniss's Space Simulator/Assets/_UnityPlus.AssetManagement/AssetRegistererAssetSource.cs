@@ -69,10 +69,10 @@ namespace UnityPlus.AssetManagement
             {
                 assets = new[] { AssetDatabase.LoadMainAssetAtPath( path ) };
             }
-            else if( mainAssetType == typeof( GameObject ) )
+            /*else if( mainAssetType == typeof( GameObject ) )
             {
                 assets = new[] { AssetDatabase.LoadMainAssetAtPath( path ) };
-            }
+            }*/
             else
             {
                 assets = AssetDatabase.LoadAllAssetsAtPath( path );
@@ -85,15 +85,25 @@ namespace UnityPlus.AssetManagement
             UnityEngine.Object asset = assets[0];
             if( mainAssetType == typeof( Texture2D ) )
             {
-                int i = 0;
-                foreach( var a in assets )
+                for( int i = 1; i < assets.Length; i++ ) // start at 1, skips main.
                 {
-                    if( a.GetType() == typeof( Sprite ) )
+                    if( assets[i].GetType() == typeof( Sprite ) )
                     {
                         asset = assets[i];
                         break;
                     }
-                    i++;
+                }
+            }
+            // mesh assets are grouped under gameobjects, idk why but they are.
+            else if( mainAssetType == typeof( GameObject ) )
+            {
+                for( int i = 1; i < assets.Length; i++ ) // start at 1, skips main.
+                {
+                    if( assets[i].GetType() == typeof( Mesh ) ) // should add multiple but whatever
+                    {
+                        asset = assets[i];
+                        break;
+                    }
                 }
             }
 

@@ -34,7 +34,7 @@ namespace UnityPlus.Serialization.Strategies
         /// <summary>
         /// Determines which objects (including child objects) returned by the <see cref="RootObjectsGetter"/> will be excluded from saving.
         /// </summary>
-        public int IncludedObjectsMask { get; set; } = int.MaxValue;
+        public uint IncludedObjectsMask { get; set; } = uint.MaxValue;
 
         public JsonExplicitHierarchyGameObjectsStrategy( Func<GameObject[]> rootObjectsGetter )
         {

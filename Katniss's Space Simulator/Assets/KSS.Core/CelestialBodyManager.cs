@@ -10,7 +10,7 @@ using UnityPlus.Serialization;
 
 namespace KSS.Core
 {
-    public class CelestialBodyManager : SerializedManager, IPersistent
+    public class CelestialBodyManager : HSPManager, IPersistent
     {
         private static Dictionary<string, CelestialBody> _celestialBodies = new Dictionary<string, CelestialBody>();
 
@@ -61,8 +61,9 @@ namespace KSS.Core
             var e = (TimelineManager.SaveEventData)ee;
 
             TimelineManager.EnsureDirectoryExists( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies" ) );
+            _celestialBodiesStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies", "object.json" );
             _celestialBodiesStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies", "data.json" );
-            // INFO - preexisting objects strat doesn't have Save_Objects method.
+            e.objectActions.Add( _celestialBodiesStrat.Save_Object );
             e.dataActions.Add( _celestialBodiesStrat.Save_Data );
         }
 
@@ -72,6 +73,7 @@ namespace KSS.Core
             var e = (TimelineManager.LoadEventData)ee;
 
             TimelineManager.EnsureDirectoryExists( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies" ) );
+            _celestialBodiesStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies", "object.json" );
             _celestialBodiesStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies", "data.json" );
             e.objectActions.Add( _celestialBodiesStrat.Load_Object );
             e.dataActions.Add( _celestialBodiesStrat.Load_Data );
