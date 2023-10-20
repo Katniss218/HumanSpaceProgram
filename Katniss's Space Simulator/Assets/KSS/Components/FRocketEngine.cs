@@ -92,14 +92,23 @@ namespace KSS.Components
         {
             return new SerializedObject()
             {
-                { "throttle", this.Throttle }
+                { "max_thrust", this.MaxThrust },
+                { "isp", this.Isp },
+                { "throttle", this.Throttle },
+                { "thrust_transform", s.WriteObjectReference( this.ThrustTransform ) }
             };
         }
 
         public void SetData( ILoader l, SerializedData data )
         {
+            if( data.TryGetValue( "max_thrust", out var maxThrust ) )
+                this.MaxThrust = (float)maxThrust;
+            if( data.TryGetValue( "isp", out var isp ) )
+                this.Isp = (float)isp;
             if( data.TryGetValue( "throttle", out var throttle ) )
-                this.Throttle = throttle;
+                this.Throttle = (float)throttle;
+            if( data.TryGetValue( "thrust_transform", out var thrustTransform ) )
+                this.ThrustTransform = (Transform)l.ReadObjectReference( thrustTransform );
         }
     }
 }

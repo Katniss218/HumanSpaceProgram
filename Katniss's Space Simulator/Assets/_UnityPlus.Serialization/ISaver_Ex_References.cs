@@ -59,9 +59,10 @@ namespace UnityPlus.Serialization
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public static SerializedData WriteDelegate( this ISaver s, Delegate delegateObj )
         {
-            SerializedArray invocationListJson = new SerializedArray();
             if( delegateObj == null )
                 return null;
+
+            SerializedArray invocationListJson = new SerializedArray();
 
             foreach( var del in delegateObj.GetInvocationList() )
             {

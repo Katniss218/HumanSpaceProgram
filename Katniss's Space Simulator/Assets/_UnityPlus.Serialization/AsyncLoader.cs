@@ -78,6 +78,9 @@ namespace UnityPlus.Serialization
                 throw new InvalidOperationException( $"You can only set an ID while creating the objects. Please move the functionality to an object action" );
             }
 
+            if( id == Guid.Empty )
+                return;
+
             _guidToObject.Add( id, obj );
         }
 
@@ -90,6 +93,9 @@ namespace UnityPlus.Serialization
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public object Get( Guid id )
         {
+            if( id == Guid.Empty )
+                return null;
+
             if( _guidToObject.TryGetValue( id, out object obj ) )
             {
                 return obj;

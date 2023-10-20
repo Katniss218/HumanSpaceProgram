@@ -61,35 +61,6 @@ namespace UnityPlus.Serialization
             return goJson;
         }
 
-        private void SaveGameObjectData( ISaver s, GameObject go, ref SerializedArray objects )
-        {
-            if( !go.IsInLayerMask( IncludedObjectsMask ) )
-            {
-                return;
-            }
-
-            Component[] comps = go.GetComponents();
-            for( int i = 0; i < comps.Length; i++ )
-            {
-                Component comp = comps[i];
-                SerializedData compData = null;
-                try
-                {
-                    compData = comp.GetData( s );
-                }
-                catch( Exception ex )
-                {
-                    Debug.LogWarning( $"[{nameof( JsonPreexistingGameObjectsStrategy )}] Couldn't serialize component '{comp}': {ex.Message}." );
-                    Debug.LogException( ex );
-                }
-
-                SerializerUtils.TryWriteData( s, comp, compData, ref objects );
-            }
-
-            SerializedData goData = go.GetData( s );
-            SerializerUtils.TryWriteData( s, go, goData, ref objects );
-        }
-
         //public void Save_Object( ISaver s )
         public IEnumerator Save_Object( ISaver s )
         {
@@ -121,6 +92,39 @@ namespace UnityPlus.Serialization
             File.WriteAllText( ObjectsFilename, sb.ToString(), Encoding.UTF8 );
         }
 
+        private void SaveGameObjectData( ISaver s, GameObject go, PreexistingReference guidComp, ref SerializedArray objects )
+        {
+            if( !go.IsInLayerMask( IncludedObjectsMask ) )
+            {
+                return;
+            }
+
+            Component[] comps = go.GetComponents();
+            for( int i = 0; i < comps.Length; i++ )
+            {
+                Component comp = comps[i];
+                SerializedData compData = null;
+                try
+                {
+                    compData = comp.GetData( s );
+                }
+                catch( Exception ex )
+                {
+                    Debug.LogWarning( $"[{nameof( JsonPreexistingGameObjectsStrategy )}] Couldn't serialize component '{comp}': {ex.Message}." );
+                    Debug.LogException( ex );
+                }
+
+                SerializerUtils.TryWriteData( s, comp, compData, ref objects );
+            }
+
+            SerializedData goData = go.GetData( s );
+            objects.Add( new SerializedObject()
+            {
+                { $"{SerializerUtils.REF}", s.WriteGuid( guidComp.GetPersistentGuid() ) },
+                { "data", goData }
+            } );
+        }
+
         /// <summary>
         /// Saves the data about the gameobjects and their persistent components. Does not include child objects.
         /// </summary>
@@ -137,7 +141,13 @@ namespace UnityPlus.Serialization
 
             foreach( var go in rootObjects )
             {
-                SaveGameObjectData( s, go, ref objData );
+                PreexistingReference guidComp = go.GetComponent<PreexistingReference>();
+                if( guidComp == null )
+                {
+                    continue;
+                }
+
+                SaveGameObjectData( s, go, guidComp, ref objData );
 
                 yield return null;
             }

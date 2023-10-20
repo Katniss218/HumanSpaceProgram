@@ -157,7 +157,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a2acfd99bc5e4a43829b3b3b3f86273, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <VolumeTransform>k__BackingField: {fileID: 0}
+  <VolumeTransform>k__BackingField: {fileID: 5604564238733955003}
   <MaxVolume>k__BackingField: 14
   <Radius>k__BackingField: 2.5
   <Contents>k__BackingField:

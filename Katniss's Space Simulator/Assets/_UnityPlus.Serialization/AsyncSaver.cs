@@ -71,6 +71,12 @@ namespace UnityPlus.Serialization
                 throw new InvalidOperationException( $"Can't save an object (or its ID) when the saver is idle." );
             }
 
+            if( obj == null )
+            {
+                id = Guid.Empty;
+                return true;
+            }
+
             return _objectToGuid.TryGetValue( obj, out id );
         }
 
@@ -93,11 +99,14 @@ namespace UnityPlus.Serialization
                 return id;
             }
 
+            if( obj == null )
+                return Guid.Empty;
+
             Guid newID = Guid.NewGuid();
             _objectToGuid.Add( obj, newID );
             return newID;
         }
-        
+
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public Guid GetReferenceID( object obj, Guid guid )
         {

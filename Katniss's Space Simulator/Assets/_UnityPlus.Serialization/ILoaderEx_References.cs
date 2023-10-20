@@ -50,6 +50,9 @@ namespace UnityPlus.Serialization
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public static Delegate ReadDelegate( this ILoader l, SerializedData json )
         {
+            if( json == null )
+                return null;
+
             SerializedArray jsonA = (SerializedArray)json;
 
             if( jsonA.Count == 1 )

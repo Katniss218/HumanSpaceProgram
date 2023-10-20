@@ -177,7 +177,7 @@ namespace UnityPlus.Serialization.Strategies
                     Debug.LogException( ex );
                 }
 
-                SerializerUtils.TryWriteData( s, go, compData, ref objects );
+                SerializerUtils.TryWriteData( s, comp, compData, ref objects );
             }
 
             SerializedData goData = go.GetData( s );
