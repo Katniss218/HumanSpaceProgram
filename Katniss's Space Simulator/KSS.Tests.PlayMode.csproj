@@ -691,6 +691,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="_UnityPlus.UILib.csproj">
+      <Project>{50861573-23A3-BCBD-DFDB-2A1CFB929A2F}</Project>
+      <Name>_UnityPlus.UILib</Name>
+    </ProjectReference>
+    <ProjectReference Include="_UnityPlus.Serialization.csproj">
+      <Project>{53A4B44D-C587-1ED0-C944-834EA89508FD}</Project>
+      <Name>_UnityPlus.Serialization</Name>
+    </ProjectReference>
     <ProjectReference Include="KSS.csproj">
       <Project>{6A093499-3B7A-71F2-8793-20E600CE8610}</Project>
       <Name>KSS</Name>

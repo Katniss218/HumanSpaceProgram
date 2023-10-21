@@ -61,7 +61,7 @@ namespace KSS.Components
                 return FluidState.Vacuum;
             }
 
-            float pressure = FlowUtils.GetStaticPressure( this.Contents[0].Data.Density, heightOfLiquid , localAcceleration.magnitude );
+            float pressure = FlowUtils.GetStaticPressure( this.Contents[0].Substance.Density, heightOfLiquid, localAcceleration.magnitude );
 
             return new FluidState( pressure, 273.15f, 0.0f );
         }
@@ -122,7 +122,8 @@ namespace KSS.Components
             {
                 { "volume_transform", s.WriteObjectReference( this.VolumeTransform ) },
                 { "max_volume", this.MaxVolume },
-                { "radius", this.Radius }
+                { "radius", this.Radius },
+                { "contents", this.Contents.GetData( s ) }
             };
         }
 
@@ -134,6 +135,8 @@ namespace KSS.Components
                 this.MaxVolume = (float)maxVolume;
             if( data.TryGetValue( "radius", out var radius ) )
                 this.Radius = (float)radius;
+            if( data.TryGetValue( "contents", out var contents ) )
+                this.Contents.SetData( l, contents );
         }
 
         /// <summary>

@@ -55,10 +55,15 @@ namespace KSS.Core.Physics
             set => this._rb.angularVelocity = value;
         }
 
+        bool _isKinematic;
         public bool IsKinematic
         {
-            get => this._rb.isKinematic;
-            set => this._rb.isKinematic = value;
+            get => _isKinematic;
+            set
+            {
+                _isKinematic = value;
+                this._rb.isKinematic = value;
+            }
         }
 
         /// <summary>
@@ -118,7 +123,8 @@ namespace KSS.Core.Physics
 
         void FixedUpdate()
         {
-            this._rootTransform.AIRFPosition = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.transform.position );
+            this._rootTransform.AIRFPosition = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this._rb.position );
+            this._rootTransform.AIRFRotation = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( this._rb.rotation );
 
             // If the object is colliding, we will use its rigidbody accelerations, because we don't have access to the forces due to collisions.
             // Otherwise, we use our more precise method that relies on full encapsulation of the rigidbody.
@@ -168,12 +174,12 @@ namespace KSS.Core.Physics
 
         void OnEnable()
         {
-            _rb.isKinematic = false;
+            _rb.isKinematic = _isKinematic; // Rigidbody doesn't have `enabled`, so we set it to kinematic.
         }
 
         void OnDisable()
         {
-            _rb.isKinematic = true;
+            _rb.isKinematic = true; // Rigidbody doesn't have `enabled`, so we set it to kinematic.
         }
 
         public SerializedData GetData( ISaver s )
@@ -196,14 +202,17 @@ namespace KSS.Core.Physics
             if( data.TryGetValue( "local_center_of_mass", out var localCenterOfMass ) )
                 this.LocalCenterOfMass = l.ReadVector3( localCenterOfMass );
 
-            if( data.TryGetValue( "velocity", out var velocity ) )
-                this.Velocity = l.ReadVector3( velocity );
-
-            if( data.TryGetValue( "angular_velocity", out var angularVelocity ) )
-                this.AngularVelocity = l.ReadVector3( angularVelocity );
-
             if( data.TryGetValue( "is_kinematic", out var isKinematic ) )
                 this.IsKinematic = (bool)isKinematic;
+
+            if( !this.IsKinematic )
+            {
+                if( data.TryGetValue( "velocity", out var velocity ) )
+                    this.Velocity = l.ReadVector3( velocity );
+
+                if( data.TryGetValue( "angular_velocity", out var angularVelocity ) )
+                    this.AngularVelocity = l.ReadVector3( angularVelocity );
+            }
         }
     }
 }

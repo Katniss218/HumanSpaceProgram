@@ -27,22 +27,22 @@ namespace UnityPlus.Serialization
         List<Func<ISaver, IEnumerator>> _dataActions = new List<Func<ISaver, IEnumerator>>();
         List<Func<ISaver, IEnumerator>> _objectActions = new List<Func<ISaver, IEnumerator>>();
 
-        Action _pauseFunc;
-        Action _unpauseFunc;
+        Action _startFunc;
+        Action _finishFunc;
 
         Dictionary<object, Guid> _objectToGuid = new Dictionary<object, Guid>();
 
-        /// <param name="pauseFunc">A function delegate that can pause the game completely.</param>
-        /// <param name="unpauseFunc">A function delegate that can unpause the game, and bring it to its previous state.</param>
-        public AsyncSaver( Action pauseFunc, Action unpauseFunc, IEnumerable<Func<ISaver, IEnumerator>> objectActions, IEnumerable<Func<ISaver, IEnumerator>> dataActions )
+        /// <param name="startFunc">A function delegate that can pause the game completely.</param>
+        /// <param name="finishFunc">A function delegate that can unpause the game, and bring it to its previous state.</param>
+        public AsyncSaver( Action startFunc, Action finishFunc, IEnumerable<Func<ISaver, IEnumerator>> objectActions, IEnumerable<Func<ISaver, IEnumerator>> dataActions )
         {
-            if( pauseFunc == null )
-                throw new ArgumentNullException( nameof( pauseFunc ), $"Pause delegate can't be null. {nameof( AsyncSaver )} requires the application to be paused to deserialize correctly." );
-            if( unpauseFunc == null )
-                throw new ArgumentNullException( nameof( unpauseFunc ), $"Unpause delegate can't be null. {nameof( AsyncSaver )} requires the application to be paused to deserialize correctly." );
+            if( startFunc == null )
+                throw new ArgumentNullException( nameof( startFunc ), $"Start delegate can't be null. {nameof( AsyncSaver )} requires the application to be paused to deserialize correctly." );
+            if( finishFunc == null )
+                throw new ArgumentNullException( nameof( finishFunc ), $"Finish delegate can't be null. {nameof( AsyncSaver )} requires the application to be paused to deserialize correctly." );
 
-            this._pauseFunc = pauseFunc;
-            this._unpauseFunc = unpauseFunc;
+            this._startFunc = startFunc;
+            this._finishFunc = finishFunc;
 
             foreach( var action in objectActions )
             {
@@ -136,7 +136,7 @@ namespace UnityPlus.Serialization
 #if DEBUG
             Debug.Log( "Saving..." );
 #endif
-            _pauseFunc();
+            _startFunc?.Invoke();
             ClearReferenceRegistry();
             CurrentState = ISaver.State.SavingData;
             _completedActions = 0;
@@ -162,7 +162,7 @@ namespace UnityPlus.Serialization
 #if DEBUG
             Debug.Log( "Finished Saving" );
 #endif
-            _unpauseFunc();
+            _finishFunc?.Invoke();
         }
 
         /// <summary>

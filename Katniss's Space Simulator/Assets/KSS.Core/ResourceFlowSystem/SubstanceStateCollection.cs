@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace KSS.Core.ResourceFlowSystem
 {
@@ -11,7 +12,7 @@ namespace KSS.Core.ResourceFlowSystem
     /// Contains state information about multiple resources, and methods to combine them.
     /// </summary>
     [Serializable]
-    public class SubstanceStateCollection
+    public class SubstanceStateCollection : IPersistent
     {
         [field: SerializeField]
         List<SubstanceState> _substances = new List<SubstanceState>();
@@ -42,7 +43,7 @@ namespace KSS.Core.ResourceFlowSystem
                 this._substances = substances.ToList();
             }
         }
-        
+
         public SubstanceStateCollection( params SubstanceState[] substances )
         {
             if( substances != null )
@@ -78,7 +79,7 @@ namespace KSS.Core.ResourceFlowSystem
             }
 
             // for compressibles, this needs to know their pressure.
-            return _substances.Sum( s => s.MassAmount / s.Data.Density );
+            return _substances.Sum( s => s.MassAmount / s.Substance.Density );
         }
 
         /// <summary>
@@ -97,7 +98,7 @@ namespace KSS.Core.ResourceFlowSystem
 
             for( int i = 0; i < _substances.Count; i++ )
             {
-                float newMassAmount = scalingFactor * (_substances[i].MassAmount / _substances[i].Data.Density);
+                float newMassAmount = scalingFactor * (_substances[i].MassAmount / _substances[i].Substance.Density);
                 this._substances[i] = new SubstanceState( this._substances[i], newMassAmount );
             }
         }
@@ -144,7 +145,7 @@ namespace KSS.Core.ResourceFlowSystem
             foreach( var substance in _substances )
             {
                 totalMass += substance.MassAmount;
-                weightedSum += substance.MassAmount * substance.Data.Density; // idk if this is right.
+                weightedSum += substance.MassAmount * substance.Substance.Density; // idk if this is right.
             }
 
             return weightedSum / totalMass;
@@ -165,16 +166,16 @@ namespace KSS.Core.ResourceFlowSystem
 
                 // potentially remove substances if abs(newamount) < epsilon
 
-                int index = this._substances.FindIndex( s => (object)s.Data == sbs.Data );
+                int index = this._substances.FindIndex( s => (object)s.Substance == sbs.Substance );
                 if( index != -1 )
                 {
                     float newAmount = this._substances[index].MassAmount + amountDelta;
 
-                    this._substances[index] = new SubstanceState( newAmount, this._substances[index].Data );
+                    this._substances[index] = new SubstanceState( newAmount, this._substances[index].Substance );
                 }
                 else
                 {
-                    var newSub = new SubstanceState( amountDelta, sbs.Data );
+                    var newSub = new SubstanceState( amountDelta, sbs.Substance );
 
                     this._substances.Add( newSub );
                 }
@@ -184,6 +185,27 @@ namespace KSS.Core.ResourceFlowSystem
         public SubstanceStateCollection Clone()
         {
             return new SubstanceStateCollection( _substances?.ToArray() );
+        }
+
+        public SerializedData GetData( ISaver s )
+        {
+            SerializedArray arr = new SerializedArray();
+
+            foreach( var sbs in this._substances )
+                arr.Add( sbs.GetData( s ) );
+
+            return arr;
+        }
+
+        public void SetData( ILoader l, SerializedData data )
+        {
+            this._substances.Clear();
+            foreach( var sbsD in (SerializedArray)data )
+            {
+                var sbs = new SubstanceState();
+                sbs.SetData( l, sbsD );
+                this._substances.Add( sbs );
+            }
         }
     }
 }

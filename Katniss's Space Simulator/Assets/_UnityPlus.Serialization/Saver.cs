@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace UnityPlus.Serialization
 {
@@ -17,10 +18,16 @@ namespace UnityPlus.Serialization
         List<Action<ISaver>> _dataActions = new List<Action<ISaver>>();
         List<Action<ISaver>> _objectActions = new List<Action<ISaver>>();
 
+        Action _startFunc;
+        Action _finishFunc;
+
         Dictionary<object, Guid> _objectToGuid = new Dictionary<object, Guid>();
 
-        public Saver( IEnumerable<Action<ISaver>> dataActions, IEnumerable<Action<ISaver>> objectActions )
+        public Saver( Action startFunc, Action finishFunc, IEnumerable<Action<ISaver>> dataActions, IEnumerable<Action<ISaver>> objectActions )
         {
+            this._startFunc = startFunc;
+            this._finishFunc = finishFunc;
+
             foreach( var action in objectActions )
             {
                 this._objectActions.Add( action );
@@ -110,6 +117,10 @@ namespace UnityPlus.Serialization
         /// </summary>
         public void Save()
         {
+#if DEBUG
+            Debug.Log( "Saving..." );
+#endif
+            _startFunc?.Invoke();
             ClearReferenceRegistry();
             _currentState = ISaver.State.SavingData;
 
@@ -127,6 +138,10 @@ namespace UnityPlus.Serialization
 
             ClearReferenceRegistry();
             _currentState = ISaver.State.Idle;
+#if DEBUG
+            Debug.Log( "Finished Saving" );
+#endif
+            _finishFunc?.Invoke();
         }
     }
 }

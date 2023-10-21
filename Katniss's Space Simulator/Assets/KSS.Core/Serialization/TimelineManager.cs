@@ -77,31 +77,48 @@ namespace KSS.Core.Serialization
 
         static bool _wasPausedBeforeSerializing = false;
 
-        public static void SerializationPauseFunc()
+        public static void SaveStartFunc()
         {
             _wasPausedBeforeSerializing = TimeManager.IsPaused;
             TimeManager.Pause();
             TimeManager.LockTimescale = true;
         }
 
-        public static void SerializationUnpauseFunc()
+        public static void LoadStartFunc()
         {
+            _wasPausedBeforeSerializing = TimeManager.IsPaused;
+            TimeManager.Pause();
+            TimeManager.LockTimescale = true;
+        }
+
+        public static void SaveFinishFunc()
+        {
+            TimeManager.LockTimescale = false;
             if( !_wasPausedBeforeSerializing )
             {
-#warning TODO - doesn't unpause - something else sets the "old" timescale.
                 TimeManager.Unpause();
             }
+            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_SAVE, eSave );
+        }
+        
+        public static void LoadFinishFunc()
+        {
             TimeManager.LockTimescale = false;
+            if( !_wasPausedBeforeSerializing )
+            {
+                TimeManager.Unpause();
+            }
+            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_LOAD, eLoad );
         }
 
         private static void CreateSaver( List<Func<ISaver, IEnumerator>> objectActions, List<Func<ISaver, IEnumerator>> dataActions )
         {
-            _saver = new AsyncSaver( SerializationPauseFunc, SerializationUnpauseFunc, objectActions, dataActions );
+            _saver = new AsyncSaver( SaveStartFunc, SaveFinishFunc, objectActions, dataActions );
         }
 
         private static void CreateLoader( List<Func<ILoader, IEnumerator>> objectActions, List<Func<ILoader, IEnumerator>> dataActions )
         {
-            _loader = new AsyncLoader( SerializationPauseFunc, SerializationUnpauseFunc, objectActions, dataActions );
+            _loader = new AsyncLoader( LoadStartFunc, LoadFinishFunc, objectActions, dataActions );
         }
 
         public static void EnsureDirectoryExists( string path )
@@ -111,6 +128,9 @@ namespace KSS.Core.Serialization
                 Directory.CreateDirectory( path );
             }
         }
+
+        static SaveEventData eSave;
+        static LoadEventData eLoad;
 
         /// <summary>
         /// Asynchronously saves the current game state over multiple frames. <br/>
@@ -129,9 +149,9 @@ namespace KSS.Core.Serialization
 
             EnsureDirectoryExists( SaveMetadata.GetRootDirectory( timelineId, saveId ) );
 
-            SaveEventData e = new SaveEventData( timelineId, saveId );
-            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_SAVE, e );
-            CreateSaver( e.objectActions, e.dataActions );
+            eSave = new SaveEventData( timelineId, saveId );
+            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_SAVE, eSave );
+            CreateSaver( eSave.objectActions, eSave.dataActions );
 
             _saver.SaveAsync( instance );
 
@@ -142,7 +162,6 @@ namespace KSS.Core.Serialization
             savedSave.FileVersion = SaveMetadata.CURRENT_SAVE_FILE_VERSION;
             savedSave.WriteToDisk();
 
-            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_SAVE, e );
         }
 
         /// <summary>
@@ -167,14 +186,14 @@ namespace KSS.Core.Serialization
             SaveMetadata loadedSave = new SaveMetadata( timelineId, saveId );
             loadedSave.ReadDataFromDisk();
 
-            LoadEventData e = new LoadEventData( timelineId, saveId );
-            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_LOAD, e );
-            CreateLoader( e.objectActions, e.dataActions );
+            eLoad = new LoadEventData( timelineId, saveId );
+            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_LOAD, eLoad );
+            CreateLoader( eLoad.objectActions, eLoad.dataActions );
 
             _loader.LoadAsync( instance );
             CurrentTimeline = loadedTimeline;
 
-            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_LOAD, e );
+#warning TODO - this is invoked after coroutine finishes.
         }
 
         /// <summary>

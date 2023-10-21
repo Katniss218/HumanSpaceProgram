@@ -23,6 +23,16 @@ namespace UnityPlus.Serialization
                     return comp.GetData( s );
                 case MeshRenderer comp:
                     return comp.GetData( s );
+                case BoxCollider comp:
+                    return comp.GetData( s );
+                case SphereCollider comp:
+                    return comp.GetData( s );
+                case CapsuleCollider comp:
+                    return comp.GetData( s );
+                case MeshCollider comp:
+                    return comp.GetData( s );
+                case Rigidbody comp:
+                    return comp.GetData( s );
 
                     // particle system
 
@@ -52,6 +62,16 @@ namespace UnityPlus.Serialization
                 case MeshFilter comp:
                     comp.SetData( l, jsonObj ); break;
                 case MeshRenderer comp:
+                    comp.SetData( l, jsonObj ); break;
+                case BoxCollider comp:
+                    comp.SetData( l, jsonObj ); break;
+                case SphereCollider comp:
+                    comp.SetData( l, jsonObj ); break;
+                case CapsuleCollider comp:
+                    comp.SetData( l, jsonObj ); break;
+                case MeshCollider comp:
+                    comp.SetData( l, jsonObj ); break;
+                case Rigidbody comp:
                     comp.SetData( l, jsonObj ); break;
             }
         }

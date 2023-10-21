@@ -9,6 +9,7 @@ using UnityEngine.UI;
 using KSS.Core.Serialization;
 using KSS.Core.Components;
 using System;
+using UnityPlus.AssetManagement;
 
 namespace KSS.DevUtils
 {
@@ -51,6 +52,13 @@ namespace KSS.DevUtils
 
         static Building launchSite;
 
+        [HSPEventListener( HSPEvent.STARTUP_IMMEDIATELY, "devutils.load_game_data" )]
+        static void LoadGameData( object e )
+        {
+            AssetRegistry.Register( "substance.f", new Substance() { Density = 1000, DisplayName = "Fuel", UIColor = new Color( 1.0f, 0.3764706f, 0.2509804f ) } );
+            AssetRegistry.Register( "substance.ox", new Substance() { Density = 1000, DisplayName = "Oxidizer", UIColor = new Color( 0.2509804f, 0.5607843f, 1.0f ) } );
+        }
+
         [HSPEventListener( HSPEvent.TIMELINE_AFTER_NEW, "devutils.timeline.new.after" )]
         static void OnAfterCreateDefault( object e )
         {
@@ -64,8 +72,6 @@ namespace KSS.DevUtils
 
             var v = CreateVessel( launchSite );
             VesselManager.ActiveVessel = v.RootPart.GetVessel();
-            FindObjectOfType<CameraController>().ReferenceObject = v.RootPart.transform;
-
             VesselManager.ActiveVessel.transform.GetComponent<Rigidbody>().angularDrag = 1; // temp, doesn't veer off course.
         }
 
@@ -123,14 +129,14 @@ namespace KSS.DevUtils
             conn.End2.Position = new Vector3( 0.0f, 1.5f, 0.0f );
             conn.CrossSectionArea = 0.1f;
 
-            Substance sbs1 = Substance.RegisteredResources["substance.f"];
-            Substance sbs2 = Substance.RegisteredResources["substance.ox"];
+            Substance sbsF = AssetRegistry.Get<Substance>("substance.f");
+            Substance sbsOX = AssetRegistry.Get<Substance>( "substance.ox" );
 
             var tankSmallTank = tankP.GetComponent<FBulkContainer_Sphere>();
             tankSmallTank.Contents = new SubstanceStateCollection(
                 new SubstanceState[] {
-                    new SubstanceState( tankSmallTank.MaxVolume * ((sbs1.Density + sbs2.Density) / 2f) / 2f, sbs1 ),
-                    new SubstanceState( tankSmallTank.MaxVolume * ((sbs1.Density + sbs2.Density) / 2f) / 2f, sbs2 )} );
+                    new SubstanceState( tankSmallTank.MaxVolume * ((sbsF.Density + sbsOX.Density) / 2f) / 2f, sbsF ),
+                    new SubstanceState( tankSmallTank.MaxVolume * ((sbsF.Density + sbsOX.Density) / 2f) / 2f, sbsOX )} );
 
             FBulkConnection conn2 = engineP.gameObject.AddComponent<FBulkConnection>();
             conn2.End1.ConnectTo( tankP.GetComponent<FBulkContainer_Sphere>() );

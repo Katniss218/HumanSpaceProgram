@@ -24,11 +24,11 @@ namespace KSS.UI
             for( int i = 0; i < this.ReferenceObject.Contents.SubstanceCount; i++ )
             {
                 var sbs = this.ReferenceObject.Contents[i];
-                float perc = (sbs.MassAmount / sbs.Data.Density) / ReferenceObject.MaxVolume;
+                float perc = (sbs.MassAmount / sbs.Substance.Density) / ReferenceObject.MaxVolume;
 
                 var seg = _bar.AddSegment( perc );
                 seg.Sprite = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/bar" );
-                seg.Color = sbs.Data.UIColor;
+                seg.Color = sbs.Substance.UIColor;
             }
         }
 

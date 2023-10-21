@@ -168,6 +168,7 @@ namespace KSS.Core
 
         void Start()
         {
+            RecalculateParts();
             //SetPhysicsObjectParameters();
         }
 
@@ -180,7 +181,7 @@ namespace KSS.Core
         {
             VesselManager.Unregister( this );
         }
-#warning TODO - maybe a 3rd pass after all the data is applied? - a "start" pass.
+
         void FixedUpdate()
         {
             SetPhysicsObjectParameters();

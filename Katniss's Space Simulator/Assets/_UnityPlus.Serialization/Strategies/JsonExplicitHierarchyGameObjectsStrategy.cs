@@ -45,7 +45,7 @@ namespace UnityPlus.Serialization.Strategies
             this.RootObjectsGetter = rootObjectsGetter;
         }
 
-        private static void CreateGameObjectHierarchy( ILoader l, SerializedData goJson, GameObject parent )
+        private static void CreateGameObjectHierarchy( ILoader l, SerializedData goJson, GameObject parent, List<Behaviour> behsUGLYDONTDOTHIS )
         {
             Guid objectGuid = l.ReadGuid( goJson[SerializerUtils.ID] );
 
@@ -65,8 +65,12 @@ namespace UnityPlus.Serialization.Strategies
                     Guid compID = l.ReadGuid( compData["$id"] );
                     Type compType = l.ReadType( compData["$type"] );
 
+#warning TODO - maybe we can prevent "start" firing prematurely (before everything is serialized) when using async loader by disabling the components. Then after *everything* is loaded, we undisable them.
                     Component co = go.GetTransformOrAddComponent( compType );
-
+                    if( co is Behaviour b ) {
+                        b.enabled = false;
+                        behsUGLYDONTDOTHIS.Add( b );
+                    }
                     l.SetReferenceID( co, compID );
                 }
                 catch( Exception ex )
@@ -81,7 +85,7 @@ namespace UnityPlus.Serialization.Strategies
             {
                 try
                 {
-                    CreateGameObjectHierarchy( l, childData, go );
+                    CreateGameObjectHierarchy( l, childData, go, behsUGLYDONTDOTHIS );
                 }
                 catch( Exception ex )
                 {
@@ -233,7 +237,7 @@ namespace UnityPlus.Serialization.Strategies
             {
                 try
                 {
-                    CreateGameObjectHierarchy( l, goJson, null );
+                    CreateGameObjectHierarchy( l, goJson, null, behsToReenable );
                 }
                 catch( Exception ex )
                 {
@@ -284,6 +288,13 @@ namespace UnityPlus.Serialization.Strategies
 
                 yield return null;
             }
+
+            yield return null;
+            foreach( var beh in behsToReenable )
+                beh.enabled = true;
+            behsToReenable = new List<Behaviour>();
         }
+
+        List<Behaviour> behsToReenable = new List<Behaviour>();
     }
 }

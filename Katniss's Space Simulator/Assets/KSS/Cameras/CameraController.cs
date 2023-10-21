@@ -1,3 +1,4 @@
+using KSS.Core;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -188,6 +189,14 @@ namespace KSS.Cameras
 
             // Helps to prevent exceptions being thrown at medium zoom levels (due to something with precision of the view frustum).
             _effectCamera.nearClipPlane = _effectCameraNearPlane * (1 + (ZoomDist * ZOOM_NEAR_PLANE_MULT));
+        }
+
+
+        [HSPEventListener( HSPEvent.TIMELINE_AFTER_NEW, HSPEvent.NAMESPACE_VANILLA + "camera_controller.snap_to_vessel" )]
+        [HSPEventListener( HSPEvent.TIMELINE_AFTER_LOAD, HSPEvent.NAMESPACE_VANILLA + "camera_controller.snap_to_vessel" )]
+        static void SnapToActiveVessel( object e )
+        {
+            Instance.ReferenceObject = VesselManager.ActiveVessel.RootPart.transform;
         }
     }
 }

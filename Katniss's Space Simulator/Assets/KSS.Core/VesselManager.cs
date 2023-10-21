@@ -16,7 +16,16 @@ namespace KSS.Core
     /// </summary>
     public class VesselManager : HSPManager, IPersistent
     {
-        public static Vessel ActiveVessel { get; set; }
+        private static Vessel _activeVessel;
+        public static Vessel ActiveVessel
+        {
+            get => _activeVessel;
+            set
+            {
+                _activeVessel = value;
+                // TODO - focus camera (probs with event).
+            }
+        }
 
         static List<Vessel> _vessels = new List<Vessel>();
 
