@@ -123,9 +123,6 @@ namespace KSS.Core.Physics
 
         void FixedUpdate()
         {
-            this._rootTransform.AIRFPosition = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this._rb.position );
-            this._rootTransform.AIRFRotation = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( this._rb.rotation );
-
             // If the object is colliding, we will use its rigidbody accelerations, because we don't have access to the forces due to collisions.
             // Otherwise, we use our more precise method that relies on full encapsulation of the rigidbody.
 

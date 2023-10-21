@@ -96,7 +96,11 @@ namespace KSS.Core.ReferenceFrames
         }
 
         // we need to move the object if the reference frame is moving, and move/rotate it, if the reference frame is rotating.
-
+        void FixedUpdate()
+        {
+            this.AIRFPosition = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this._rb == null ? this.transform.position : this._rb.position );
+            this.AIRFRotation = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( this._rb == null ? this.transform.rotation : this._rb.rotation );
+        }
 
 
 
