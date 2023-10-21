@@ -242,7 +242,7 @@ namespace KSS.Components
             {
                 return;
             }
-#warning TODO - fast rotations/collisions destabilize and break the flow, same mode as when the flow wasn't cleared before.
+
             (SubstanceStateCollection flow, _) = inletProducer.SampleFlow( inletEnd.Position, inletProducer.transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea, TimeManager.FixedDeltaTime, endSamples[outlet] );
 
             outletConsumer.ClampIn( flow, TimeManager.FixedDeltaTime );

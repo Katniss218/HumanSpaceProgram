@@ -134,6 +134,10 @@ namespace KSS.Cameras
                 this._effectCamera.cullingMask = 1 << 31; // for some reason, this makes it draw properly, also has the effect of drawing PPP on top of everything.
                 this._nearCamera.cullingMask -= 1 << 31;
                 this._farCamera.cullingMask -= 1 << 31;
+                // instead of disabling, it's possible that we can increase the near clipping plane instead, the further the camera is zoomed out (up to ~30k at very far zooms).
+                // Map view could work by constructing a virtual environment (planets at l0 subdivs) with the camera always in the center.
+                // the camera would toggle to only render that view (like scaled space, but real size)
+                // vessels and buildings would be invisible in map view.
                 this._nearCamera.enabled = false;
                 this._closePPLayer.enabled = false;
                 this._farPPLayer.enabled = true;

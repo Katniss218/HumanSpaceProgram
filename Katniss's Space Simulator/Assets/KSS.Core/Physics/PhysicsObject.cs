@@ -10,13 +10,12 @@ using UnityPlus.Serialization;
 namespace KSS.Core.Physics
 {
     /// <summary>
-    /// Any object that calculates its own physics.
+    /// Any object that interacts with the collision/physics system.
     /// </summary>
     /// <remarks>
-    /// This is a wrapper for some kind of internal physics solver and collision resolver.
+    /// This is a wrapper for a rigidbody.
     /// </remarks>
     [RequireComponent( typeof( Rigidbody ) )]
-    [RequireComponent( typeof( RootObjectTransform ) )] // IMPORTANT: Changing the order here changes the order in which Awake() fires (setting the position of objects in the first frame depends on the fact that RB is added before root transform).
     public class PhysicsObject : MonoBehaviour, IPersistent
     {
         /// <summary>
@@ -83,7 +82,6 @@ namespace KSS.Core.Physics
         Vector3 _angularAccelerationSum = Vector3.zero;
 
         Rigidbody _rb;
-        RootObjectTransform _rootTransform;
 
         /// <summary>
         /// Applies a force at the center of mass, in [N].
@@ -113,7 +111,6 @@ namespace KSS.Core.Physics
         void Awake()
         {
             _rb = this.GetComponent<Rigidbody>();
-            _rootTransform = this.GetComponent<RootObjectTransform>();
 
             _rb.useGravity = false;
             _rb.mass = 5;

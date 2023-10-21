@@ -32,9 +32,10 @@ namespace KSS.Core
     }
 
     /// <summary>
-    /// Buildings are a lot like vessels, but anchored to the planet.
+    /// Buildings are a lot like <see cref="Vessel"/>s, but anchored to the planet.
     /// </summary>
     [RequireComponent( typeof( PhysicsObject ) )]
+    [RequireComponent( typeof( RootObjectTransform ) )]
     public partial class Building : MonoBehaviour, IPartObject
     {
         [SerializeField]

@@ -61,8 +61,6 @@ namespace KSS.Core.Serialization
             }
         }
 
-#warning TODO - use an event to add these strategies to the savers/loaders, they don't belong here.
-
         /// <summary>
         /// Checks if a timeline is currently being either saved or loaded.
         /// </summary>
@@ -72,10 +70,10 @@ namespace KSS.Core.Serialization
 
         public static TimelineMetadata CurrentTimeline { get; private set; }
 
-        static AsyncSaver _saver;
-        static AsyncLoader _loader;
+        private static AsyncSaver _saver;
+        private static AsyncLoader _loader;
 
-        static bool _wasPausedBeforeSerializing = false;
+        private static bool _wasPausedBeforeSerializing = false;
 
         public static void SaveStartFunc()
         {
@@ -98,7 +96,7 @@ namespace KSS.Core.Serialization
             {
                 TimeManager.Unpause();
             }
-            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_SAVE, eSave );
+            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_SAVE, _eSave );
         }
         
         public static void LoadFinishFunc()
@@ -108,7 +106,7 @@ namespace KSS.Core.Serialization
             {
                 TimeManager.Unpause();
             }
-            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_LOAD, eLoad );
+            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_LOAD, _eLoad );
         }
 
         private static void CreateSaver( List<Func<ISaver, IEnumerator>> objectActions, List<Func<ISaver, IEnumerator>> dataActions )
@@ -129,8 +127,8 @@ namespace KSS.Core.Serialization
             }
         }
 
-        static SaveEventData eSave;
-        static LoadEventData eLoad;
+        private static SaveEventData _eSave;
+        private static LoadEventData _eLoad;
 
         /// <summary>
         /// Asynchronously saves the current game state over multiple frames. <br/>
@@ -149,9 +147,9 @@ namespace KSS.Core.Serialization
 
             EnsureDirectoryExists( SaveMetadata.GetRootDirectory( timelineId, saveId ) );
 
-            eSave = new SaveEventData( timelineId, saveId );
-            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_SAVE, eSave );
-            CreateSaver( eSave.objectActions, eSave.dataActions );
+            _eSave = new SaveEventData( timelineId, saveId );
+            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_SAVE, _eSave );
+            CreateSaver( _eSave.objectActions, _eSave.dataActions );
 
             _saver.SaveAsync( instance );
 
@@ -161,7 +159,6 @@ namespace KSS.Core.Serialization
             savedSave.Description = saveDescription;
             savedSave.FileVersion = SaveMetadata.CURRENT_SAVE_FILE_VERSION;
             savedSave.WriteToDisk();
-
         }
 
         /// <summary>
@@ -186,14 +183,12 @@ namespace KSS.Core.Serialization
             SaveMetadata loadedSave = new SaveMetadata( timelineId, saveId );
             loadedSave.ReadDataFromDisk();
 
-            eLoad = new LoadEventData( timelineId, saveId );
-            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_LOAD, eLoad );
-            CreateLoader( eLoad.objectActions, eLoad.dataActions );
+            _eLoad = new LoadEventData( timelineId, saveId );
+            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_LOAD, _eLoad );
+            CreateLoader( _eLoad.objectActions, _eLoad.dataActions );
 
             _loader.LoadAsync( instance );
             CurrentTimeline = loadedTimeline;
-
-#warning TODO - this is invoked after coroutine finishes.
         }
 
         /// <summary>

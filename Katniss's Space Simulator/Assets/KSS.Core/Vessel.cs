@@ -30,8 +30,11 @@ namespace KSS.Core
         }
     }
 
-    // ### WARNING ### Do not add "require RootObjectTransform" explicitly. it messes up the initialization and rigidbody is not cached at the right time.
+    /// <summary>
+    /// A vessel is a moving object consisting of a hierarchy of "parts".
+    /// </summary>
     [RequireComponent( typeof( PhysicsObject ) )]
+    [RequireComponent( typeof( RootObjectTransform ) )]
     public sealed partial class Vessel : MonoBehaviour, IPartObject
     {
         [SerializeField]
