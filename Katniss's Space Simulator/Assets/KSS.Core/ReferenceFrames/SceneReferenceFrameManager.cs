@@ -23,12 +23,6 @@ namespace KSS.Core.ReferenceFrames
 
         // "reference frame" is used to make the world space behave like the local space of said reference frame.
 
-        static SceneReferenceFrameManager()
-        {
-            OnAfterReferenceFrameSwitch += ReferenceFrameSwitch_Objects;
-            OnAfterReferenceFrameSwitch += ReferenceFrameSwitch_Trail;
-        }
-
         /// <summary>
         /// Called when the scene's reference frame switches.
         /// </summary>
@@ -37,7 +31,7 @@ namespace KSS.Core.ReferenceFrames
         /// <summary>
         /// The reference frame that describes how to convert between Absolute Inertial Reference Frame and the scene's world space.
         /// </summary>
-        public static IReferenceFrame SceneReferenceFrame { get; private set; } = new CenteredReferenceFrame( Vector3Dbl.zero );
+        public static IReferenceFrame SceneReferenceFrame { get; private set; }
 
         /// <summary>
         /// Sets the scene's reference frame to the specified frame, and calls out a frame switch event.
@@ -104,6 +98,18 @@ namespace KSS.Core.ReferenceFrames
             {
                 ChangeSceneReferenceFrame( SceneReferenceFrame.Shift( position ) );
             }
+        }
+
+        static SceneReferenceFrameManager() // If this is set in awake, the atmosphere renderer and other might get detached.
+        {
+            OnAfterReferenceFrameSwitch = null;
+            OnAfterReferenceFrameSwitch += ReferenceFrameSwitch_Objects;
+            OnAfterReferenceFrameSwitch += ReferenceFrameSwitch_Trail;
+        }
+
+        void Awake()
+        {
+            SceneReferenceFrame = new CenteredReferenceFrame( Vector3Dbl.zero );
         }
 
         void FixedUpdate()

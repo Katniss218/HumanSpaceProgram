@@ -1,4 +1,5 @@
 ﻿using KSS.Core;
+using KSS.Core.SceneManagement;
 using KSS.Core.Serialization;
 using System;
 using System.Collections.Generic;
@@ -38,7 +39,7 @@ namespace KSS.UI.SceneFactories
             closebutton.gameObject.GetComponent<RectTransformCloser>().CanClose = () => !TimeManager.LockTimescale;
             closebutton.onClick.AddListener( () =>
             {
-                if( !TimeManager.LockTimescale ) 
+                if( !TimeManager.LockTimescale )
                     TimeManager.Unpause();
             } );
 
@@ -48,19 +49,21 @@ namespace KSS.UI.SceneFactories
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
-            window.AddButton( UILayoutInfo.FillHorizontal( 50, 50, 1, -70, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ), () => SaveWindow.Create() )
-                .AddText(UILayoutInfo.Fill(), "SAVE" )
-                .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
-                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
-
-            window.AddButton( UILayoutInfo.FillHorizontal( 50, 50, 1, -90, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ), () => LoadWindow.Create() )
-                .AddText( UILayoutInfo.Fill(), "LOAD" )
-                .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
-                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
-
-            window.AddButton( UILayoutInfo.FillHorizontal( 50, 50, 1, -110, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ), null )
-                .Disabled()
+            window.AddButton( UILayoutInfo.FillHorizontal( 50, 50, 1, -70, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ), () =>
+            {
+                SceneLoader.UnloadActiveSceneAsync( () => SceneLoader.LoadSceneAsync( "MainMenu", true, false, null ) );
+            } )
                 .AddText( UILayoutInfo.Fill(), "MAIN MENU" )
+                .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
+                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
+
+            window.AddButton( UILayoutInfo.FillHorizontal( 50, 50, 1, -90, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ), () => SaveWindow.Create() )
+                .AddText( UILayoutInfo.Fill(), "SAVE" )
+                .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
+                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
+
+            window.AddButton( UILayoutInfo.FillHorizontal( 50, 50, 1, -110, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ), () => LoadWindow.Create() )
+                .AddText( UILayoutInfo.Fill(), "LOAD" )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
