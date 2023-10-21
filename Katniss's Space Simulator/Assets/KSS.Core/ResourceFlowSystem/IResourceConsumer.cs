@@ -10,10 +10,8 @@ namespace KSS.Core.ResourceFlowSystem
     /// <summary>
     /// Anything that can consume resources. E.g. rocket engine, lightbulb (elec), vent, etc.
     /// </summary>
-    public interface IResourceConsumer
+    public interface IResourceConsumer : IComponent
     {
-        Transform transform { get; }
-
         /// <summary>
         /// Get or set the total inflow per 1 [s].
         /// </summary>

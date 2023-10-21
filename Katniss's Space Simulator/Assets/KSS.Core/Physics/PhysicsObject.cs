@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace KSS.Core.Physics
 {
@@ -16,10 +17,10 @@ namespace KSS.Core.Physics
     /// </remarks>
     [RequireComponent( typeof( Rigidbody ) )]
     [RequireComponent( typeof( RootObjectTransform ) )] // IMPORTANT: Changing the order here changes the order in which Awake() fires (setting the position of objects in the first frame depends on the fact that RB is added before root transform).
-    public class PhysicsObject : MonoBehaviour
+    public class PhysicsObject : MonoBehaviour, IPersistent
     {
         /// <summary>
-        /// Gets or sets the physics object's mass in [kg].
+        /// Gets or sets the physics object's mass, in [kg].
         /// </summary>
         public float Mass
         {
@@ -28,7 +29,7 @@ namespace KSS.Core.Physics
         }
 
         /// <summary>
-        /// Gets or sets the physics object's local center of mass (relative to the physics object).
+        /// Gets or sets the physics object's local center of mass (in physics object's coordinate space).
         /// </summary>
         public Vector3 LocalCenterOfMass
         {
@@ -37,7 +38,7 @@ namespace KSS.Core.Physics
         }
 
         /// <summary>
-        /// Gets or sets the physics object's velocity in scene space in [m/s].
+        /// Gets or sets the physics object's velocity in scene space, in [m/s].
         /// </summary>
         public Vector3 Velocity
         {
@@ -46,7 +47,7 @@ namespace KSS.Core.Physics
         }
 
         /// <summary>
-        /// Gets or sets the physics object's velocity in scene space in [m/s].
+        /// Gets or sets the physics object's angular velocity in scene space, in [Rad/s].
         /// </summary>
         public Vector3 AngularVelocity
         {
@@ -54,13 +55,24 @@ namespace KSS.Core.Physics
             set => this._rb.angularVelocity = value;
         }
 
+        bool _isKinematic;
+        public bool IsKinematic
+        {
+            get => _isKinematic;
+            set
+            {
+                _isKinematic = value;
+                this._rb.isKinematic = value;
+            }
+        }
+
         /// <summary>
-        /// Gets the acceleration that this physics object is under at this instant.
+        /// Gets the acceleration that this physics object is under at this instant, in [m/s^2].
         /// </summary>
         public Vector3 Acceleration { get; private set; }
 
         /// <summary>
-        /// Gets the angular acceleration that this physics object is under at this instant.
+        /// Gets the angular acceleration that this physics object is under at this instant, in [Rad/s^2].
         /// </summary>
         public Vector3 AngularAcceleration { get; private set; }
 
@@ -74,7 +86,7 @@ namespace KSS.Core.Physics
         RootObjectTransform _rootTransform;
 
         /// <summary>
-        /// Adds a force acting on the center of mass of the physics object. Does not apply any torque.
+        /// Applies a force at the center of mass, in [N].
         /// </summary>
         public void AddForce( Vector3 force )
         {
@@ -83,7 +95,7 @@ namespace KSS.Core.Physics
         }
 
         /// <summary>
-        /// Adds a force at a specified position instead of at the center of mass.
+        /// Applies a force at the specified position, in [N].
         /// </summary>
         public void AddForceAtPosition( Vector3 force, Vector3 position )
         {
@@ -111,21 +123,17 @@ namespace KSS.Core.Physics
 
         void FixedUpdate()
         {
-            // I'm not a huge fan of the physics being calculated in scene-space, but that's the only way to handle collisions properly.
-            this._rootTransform.SetAIRFPosition( SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.transform.position ) );
-
             // If the object is colliding, we will use its rigidbody accelerations, because we don't have access to the forces due to collisions.
             // Otherwise, we use our more precise method that relies on full encapsulation of the rigidbody.
 
             if( IsColliding )
             {
-                this.Acceleration = (Velocity - _oldVelocity) / Time.fixedDeltaTime;
-                this.AngularAcceleration = (AngularVelocity - _oldAngularVelocity) / Time.fixedDeltaTime;
+                this.Acceleration = (Velocity - _oldVelocity) / TimeManager.FixedDeltaTime;
+                this.AngularAcceleration = (AngularVelocity - _oldAngularVelocity) / TimeManager.FixedDeltaTime;
             }
             else
             {
-                // accSum will be whatever that was accumulated over the time from the previous frame (when it was zeroed out) to this frame.
-                // I think it should work fine.
+                // Acceleration sum will be whatever was accumulated between the previous frame (after it was zeroed out) and this frame. I think it should work fine.
                 this.Acceleration = _accelerationSum;
                 this.AngularAcceleration = _angularAccelerationSum;
             }
@@ -137,7 +145,7 @@ namespace KSS.Core.Physics
         }
 
         /// <summary>
-        /// Gets a value indicating whether or not the physics object or any of its children colliders is currently colliding with something.
+        /// True if the physics object is colliding with any other objects in the current frame, false otherwise.
         /// </summary>
         [field: SerializeField]
         public bool IsColliding { get; private set; }
@@ -163,12 +171,45 @@ namespace KSS.Core.Physics
 
         void OnEnable()
         {
-            _rb.isKinematic = false;
+            _rb.isKinematic = _isKinematic; // Rigidbody doesn't have `enabled`, so we set it to kinematic.
         }
 
         void OnDisable()
         {
-            _rb.isKinematic = true;
+            _rb.isKinematic = true; // Rigidbody doesn't have `enabled`, so we set it to kinematic.
+        }
+
+        public SerializedData GetData( ISaver s )
+        {
+            return new SerializedObject()
+            {
+                { "mass", this.Mass },
+                { "local_center_of_mass", s.WriteVector3( this.LocalCenterOfMass ) },
+                { "velocity", s.WriteVector3( this.Velocity ) },
+                { "angular_velocity", s.WriteVector3( this.AngularVelocity ) },
+                { "is_kinematic", this.IsKinematic }
+            };
+        }
+
+        public void SetData( ILoader l, SerializedData data )
+        {
+            if( data.TryGetValue( "mass", out var mass ) )
+                this.Mass = (float)mass;
+
+            if( data.TryGetValue( "local_center_of_mass", out var localCenterOfMass ) )
+                this.LocalCenterOfMass = l.ReadVector3( localCenterOfMass );
+
+            if( data.TryGetValue( "is_kinematic", out var isKinematic ) )
+                this.IsKinematic = (bool)isKinematic;
+
+            if( !this.IsKinematic )
+            {
+                if( data.TryGetValue( "velocity", out var velocity ) )
+                    this.Velocity = l.ReadVector3( velocity );
+
+                if( data.TryGetValue( "angular_velocity", out var angularVelocity ) )
+                    this.AngularVelocity = l.ReadVector3( angularVelocity );
+            }
         }
     }
 }

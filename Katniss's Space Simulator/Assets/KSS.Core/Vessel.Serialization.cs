@@ -3,40 +3,31 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 using UnityPlus.Serialization;
 
 namespace KSS.Core
 {
-    public sealed partial class Vessel
+    public sealed partial class Vessel : IPersistent
     {
-        // Serialization / Persistence logic of vessels.
-
-
-        /// <summary>
-        /// Saves the vessel's persistent data to JSON.
-        /// </summary>
-        public SerializedData Save()
+        public SerializedData GetData( ISaver s )
         {
-            // save a vessel to a json file.
-            // - save the parts, and their persistent state.
-            SerializedData data = new SerializedObject();
-
-            throw new NotImplementedException();
+            return new SerializedObject()
+            {
+                { "display_name", this.DisplayName },
+                { "root_part", s.WriteObjectReference( this.RootPart ) },
+                { "on_after_recalculate_parts", s.WriteDelegate( this.OnAfterRecalculateParts ) }
+            };
         }
 
-        /// <summary>
-        /// Loads the vessel's persistent data from JSON.
-        /// </summary>
-        public void Load( SerializedData data )
+        public void SetData( ILoader l, SerializedData data )
         {
-            // load a vessel from a json file.
-            // - create the vessel
-            // - create the parts based on what parts are defined in the save (using appropriate part factories).
-            // - load persistent data of parts.
-
-            // json factory?
-            // normal factory + json later?
-            throw new NotImplementedException();
+            if( data.TryGetValue( "display_name", out var displayName ) )
+                this.DisplayName = (string)displayName;
+            if( data.TryGetValue( "root_part", out var rootPart ) )
+                this.RootPart = (Transform)l.ReadObjectReference( rootPart );
+            if( data.TryGetValue( "on_after_recalculate_parts", out var onAfterRecalculateParts ) )
+                this.OnAfterRecalculateParts = (Action)l.ReadDelegate( onAfterRecalculateParts );
         }
     }
 }

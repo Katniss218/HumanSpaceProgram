@@ -8,7 +8,7 @@ using UnityEngine;
 namespace KSS.Core
 {
     /// <summary>
-    /// A class responsible for instantiating a part from a source (save file, picked in VAB, etc).
+    /// A class responsible for instantiating part hierarchy from a source (save file, picked in VAB, etc).
     /// </summary>
     public sealed class PartFactory
     {
@@ -28,7 +28,7 @@ namespace KSS.Core
             /// Implement this to create a part in the scene, with the specified object as its parent, with the specified local (parent's space) position and rotation.
             /// </summary>
             /// <returns>The newly created part that exists in the scene.</returns>
-            public abstract Part Instantiate( Transform parent, Vector3 localPosition, Quaternion localRotation );
+            public abstract Transform Instantiate( Transform parent, Vector3 localPosition, Quaternion localRotation );
         }
 
         // Parts are a flat Unity hierarchy of objects that are the direct child of a vessel object.
@@ -42,52 +42,62 @@ namespace KSS.Core
             this.Source = source;
         }
 
-        public Part CreateRoot( Vessel vessel )
+#warning TODO - modify it so that you first create a vessel/building and then add parts to it.
+        public Transform CreateRoot( Vessel vessel )
         {
             if( vessel.RootPart != null )
             {
                 throw new InvalidOperationException( $"The vessel '{vessel}' already has a root part." );
             }
 
-            Part part = Source.Instantiate( vessel.transform, Vector3.zero, Quaternion.identity );
-            part.SetVesselRecursive( vessel );
+            Transform part = Source.Instantiate( vessel.transform, Vector3.zero, Quaternion.identity );
 
             vessel.SetRootPart( part );
             vessel.RecalculateParts();
 
             return part;
         }
+        public Transform CreateRoot( Building building )
+        {
+            if( building.RootPart != null )
+            {
+                throw new InvalidOperationException( $"The building '{building}' already has a root part." );
+            }
 
-        public Part Create( Part parent, Vector3 vesselPosition, Quaternion vesselRotation )
+            Transform part = Source.Instantiate( building.transform, Vector3.zero, Quaternion.identity );
+
+            building.SetRootPart( part );
+
+            return part;
+        }
+
+        public Transform Create( Transform parent, Vector3 localPosition, Quaternion localRotation )
         {
             if( parent == null )
             {
                 throw new ArgumentNullException( nameof( parent ), $"Parent can't be null." );
             }
 
-            Part part = Source.Instantiate( parent.Vessel.transform, vesselPosition, vesselRotation );
-            part.SetVesselRecursive( parent.Vessel );
+            Transform part = Source.Instantiate( parent, localPosition, localRotation );
+            //part.SetVesselRecursive( parent.Vessel );
 
-            part.Parent = parent;
-            part.Parent.Children.Add( part );
-            part.Vessel.RecalculateParts();
+            //part.Parent = parent;
+            //part.Parent.Children.Add( part );
+            part.GetVessel().RecalculateParts();
             return part;
         }
 
-        public static void Destroy( Part part, bool keepChildren = false )
+        public static void Destroy( Transform part )
         {
             UnityEngine.Object.Destroy( part.gameObject );
-            foreach( var cp in part.Children )
+
+            if( part.IsRootOfVessel() )
             {
-                Destroy( cp );
-            }
-            if( part.IsRootOfVessel )
-            {
-                VesselFactory.Destroy( part.Vessel );
+                VesselFactory.Destroy( part.GetVessel() );
             }
             else
             {
-                part.Vessel.RecalculateParts();
+                part.GetVessel().RecalculateParts();
             }
         }
     }

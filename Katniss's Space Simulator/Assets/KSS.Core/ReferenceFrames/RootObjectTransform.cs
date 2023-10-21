@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace KSS.Core.ReferenceFrames
 {
@@ -14,52 +15,51 @@ namespace KSS.Core.ReferenceFrames
     /// <remarks>
     /// Add this to any object that is supposed to be affected by the <see cref="SceneReferenceFrameManager"/>.
     /// </remarks>
-    public class RootObjectTransform : MonoBehaviour, IReferenceFrameSwitchResponder
+    public class RootObjectTransform : MonoBehaviour, IPersistent, IReferenceFrameSwitchResponder
     {
         // Should to be added to any root object that is an actual [physical] object in the scene (not UI elements, empties, etc).
 
+        // Root objects store their AIRF positions, children natively store their local coordinates, which as long as they're not obscenely large, will be fine.
+        // - An object with a child at 0.00125f can be sent to 10e25 and brought back, and its child will remain at 0.00125f
+
         Vector3Dbl _airfPosition;
-        Quaternion _airfRotation;
+        QuaternionDbl _airfRotation;
 
 
         Rigidbody _rb;
 
-        public Vector3Dbl GetAIRFPosition()
+        /// <summary>
+        /// Gets or sets the position of the object in Absolute Inertial Reference Frame coordinates. Units in [m].
+        /// </summary>
+        public Vector3Dbl AIRFPosition
         {
-            return this._airfPosition;
+            get => this._airfPosition;
+            set
+            {
+                this._airfPosition = value;
+
+                UpdateScenePosition();
+            }
         }
 
         /// <summary>
-        /// Sets the position of the vessel in Absolute Inertial Reference Frame coordinates. Units in [m].
+        /// Gets or sets the rotation of the object in Absolute Inertial Reference Frame coordinates.
         /// </summary>
-        public void SetAIRFPosition( Vector3Dbl airfPosition )
+        public QuaternionDbl AIRFRotation
         {
-            this._airfPosition = airfPosition;
+            get => this._airfRotation;
+            set
+            {
+                this._airfRotation = value;
 
-            UpdateScenePosition();
+                UpdateSceneRotation();
+            }
         }
-
-
-        public Quaternion GetAIRFRotation()
-        {
-            return this._airfRotation;
-        }
-
-        /// <summary>
-        /// Sets the rotation of the vessel in Absolute Inertial Reference Frame coordinates.
-        /// </summary>
-        public void SetAIRFRotation( Quaternion airfRotation )
-        {
-            this._airfRotation = airfRotation;
-
-            UpdateSceneRotation();
-        }
-
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         private void UpdateScenePosition()
         {
-            Vector3 scenePos = SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformPosition( this._airfPosition );
+            Vector3 scenePos = (Vector3)SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformPosition( this._airfPosition );
             if( _rb != null )
             {
                 // THIS IS CRITICALLY IMPORTANT.
@@ -70,9 +70,9 @@ namespace KSS.Core.ReferenceFrames
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public void UpdateSceneRotation()
+        private void UpdateSceneRotation()
         {
-            Quaternion sceneRotation = SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformRotation( this._airfRotation );
+            Quaternion sceneRotation = (Quaternion)SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformRotation( this._airfRotation );
             if( _rb != null )
             {
                 // THIS IS CRITICALLY IMPORTANT.
@@ -96,7 +96,11 @@ namespace KSS.Core.ReferenceFrames
         }
 
         // we need to move the object if the reference frame is moving, and move/rotate it, if the reference frame is rotating.
-
+        void FixedUpdate()
+        {
+            this.AIRFPosition = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this._rb == null ? this.transform.position : this._rb.position );
+            this.AIRFRotation = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( this._rb == null ? this.transform.rotation : this._rb.rotation );
+        }
 
 
 
@@ -106,7 +110,25 @@ namespace KSS.Core.ReferenceFrames
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
             UpdateScenePosition();
-           // UpdateSceneRotation();
+            UpdateSceneRotation();
+        }
+
+        public SerializedData GetData( ISaver s )
+        {
+            return new SerializedObject()
+            {
+                { "airf_position", s.WriteVector3Dbl( this.AIRFPosition ) },
+                { "airf_rotation", s.WriteQuaternionDbl( this.AIRFRotation ) }
+            };
+        }
+
+        public void SetData( ILoader l, SerializedData data )
+        {
+            if( data.TryGetValue( "airf_position", out var airfPosition ) )
+                this.AIRFPosition = l.ReadVector3Dbl( airfPosition );
+
+            if( data.TryGetValue( "airf_rotation", out var airfRotation ) )
+                this.AIRFRotation = l.ReadQuaternionDbl( airfRotation );
         }
     }
 }

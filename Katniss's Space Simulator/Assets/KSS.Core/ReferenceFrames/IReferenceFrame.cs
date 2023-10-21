@@ -36,36 +36,36 @@ namespace KSS.Core.ReferenceFrames
         /// <summary>
         /// Returns a new reference frame that is shifted by a given amount in the Absolute Inertial Reference Frame (AIRF) space.
         /// </summary>
-        IReferenceFrame Shift( Vector3Dbl vector );
+        IReferenceFrame Shift( Vector3Dbl airfDistanceDelta );
 
         /// <summary>
         /// Transforms a point in the reference frame's space to the Absolute Inertial Reference Frame (AIRF) space.
         /// </summary>
-        Vector3Dbl TransformPosition( Vector3 localPosition );
+        Vector3Dbl TransformPosition( Vector3Dbl localPosition );
 
         /// <summary>
         /// Transforms a point in the Absolute Inertial Reference Frame (AIRF) space to the reference frame's space.
         /// </summary>
-        Vector3 InverseTransformPosition( Vector3Dbl globalPosition );
+        Vector3Dbl InverseTransformPosition( Vector3Dbl globalPosition );
 
         /// <summary>
         /// Transforms a direction vector in the reference frame's space to the Absolute Inertial Reference Frame (AIRF) space.
         /// </summary>
-        Vector3 TransformVector( Vector3 localDirection );
+        Vector3 TransformDirection( Vector3 localDirection );
 
         /// <summary>
         /// Transforms a direction vector in the Absolute Inertial Reference Frame (AIRF) space to the reference frame's space.
         /// </summary>
-        Vector3 InverseTransformVector( Vector3 globalDirection );
+        Vector3 InverseTransformDirection( Vector3 globalDirection );
 
         /// <summary>
         /// Transforms a rotation/orientation in the reference frame's space to the Absolute Inertial Reference Frame (AIRF) space.
         /// </summary>
-        Quaternion TransformRotation( Quaternion localPosition );
+        QuaternionDbl TransformRotation( QuaternionDbl localRotation );
 
         /// <summary>
         /// Transforms a rotation/orientation in the Absolute Inertial Reference Frame (AIRF) space to the reference frame's space.
         /// </summary>
-        Quaternion InverseTransformRotation( Quaternion globalPosition );
+        QuaternionDbl InverseTransformRotation( QuaternionDbl globalRotation );
     }
 }

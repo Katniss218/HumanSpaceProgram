@@ -12,17 +12,24 @@ namespace UnityPlus.Serialization
     public interface IPersistent
     {
         /// <summary>
-        /// Sets the persistent data after creating the object with default parameters.
-        /// </summary>
-        /// <param name="l">The loader. Can be used to read references, etc.</param>
-        /// <param name="data">The serialized structure that contains the data. Identical to what is created by <see cref="GetData"/>.</param>
-        void SetData( ILoader l, SerializedData data );
-
-        /// <summary>
         /// Gets the persistent data from an object.
         /// </summary>
+        /// <remarks>
+        /// This should return the data required to reconstruct the full internal state of the object.
+        /// </remarks>
         /// <param name="s">The saver. Can be used to write references, etc.</param>
         /// <returns>The serialized structure that contains the data. Identical to what is read by <see cref="SetData"/>.</returns>
         SerializedData GetData( ISaver s );
+
+        /// <summary>
+        /// Sets the persistent data after creating the object with default parameters.
+        /// </summary>
+        /// <remarks>
+        /// This should reconstruct the full internal state of the object from the given data. <br />
+        /// *The data may be partial.*
+        /// </remarks>
+        /// <param name="l">The loader. Can be used to read references, etc.</param>
+        /// <param name="data">The serialized structure that contains the data. Identical to what is created by <see cref="GetData"/>.</param>
+        void SetData( ILoader l, SerializedData data );
     }
 }

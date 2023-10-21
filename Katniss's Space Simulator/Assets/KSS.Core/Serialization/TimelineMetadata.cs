@@ -15,7 +15,15 @@ namespace KSS.Core.Serialization
     /// </summary>
     public sealed class TimelineMetadata
     {
+        /// <summary>
+        /// The name of the file that stores the timeline metadata.
+        /// </summary>
         public const string TIMELINE_FILENAME = "_timeline.json";
+
+        /// <summary>
+        /// The unique ID of this specific timeline.
+        /// </summary>
+        public readonly string TimelineID;
 
         /// <summary>
         /// The display name shown in the GUI.
@@ -27,18 +35,13 @@ namespace KSS.Core.Serialization
         /// </summary>
         public string Description { get; set; }
 
-        /// <summary>
-        /// The unique ID of this specific timeline.
-        /// </summary>
-        public readonly string TimelineID;
-
-        TimelineMetadata( string timelineId )
+        public TimelineMetadata( string timelineId )
         {
             this.TimelineID = timelineId;
         }
 
         /// <summary>
-        /// Returns the file path to the directory containing the timelines.
+        /// Root directory is the directory that contains the _timeline.json file.
         /// </summary>
         public static string GetTimelinesPath()
         {
@@ -46,41 +49,19 @@ namespace KSS.Core.Serialization
         }
 
         /// <summary>
-        /// Returns the file path to the directory containing the saves of a given timeline.
+        /// Root directory is the directory that contains the _timeline.json file.
         /// </summary>
-        public static string GetSavesPath( string timelineId )
+        public static string GetRootDirectory( string timelineId )
         {
             return Path.Combine( GetTimelinesPath(), timelineId );
         }
 
         /// <summary>
-        /// Creates a new empty <see cref="TimelineMetadata"/> that points to the specified timeline. Does not initialize any display parameters.
+        /// Returns the path to the (root) directory of the timeline.
         /// </summary>
-        /// <param name="validPath">The path to use to parse out the timeline ID.</param>
-        public static TimelineMetadata EmptyFromFilePath( string validPath )
+        public string GetRootDirectory()
         {
-            string[] split = validPath.Split( new char[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries );
-
-            int savesIndex = -1;
-            for( int i = 0; i < split.Length; i++ )
-            {
-                if( split[i] == HumanSpaceProgram.SavesDirectoryName )
-                {
-                    savesIndex = i;
-                    break;
-                }
-            }
-
-            if( savesIndex <= 0 || savesIndex >= split.Length )
-            {
-                throw new ArgumentException( $"The path `{validPath}` doesn't contain the `{HumanSpaceProgram.SavesDirectoryName}` directory." );
-            }
-            if( savesIndex >= split.Length - 1 )
-            {
-                throw new ArgumentException( $"The path `{validPath}` points directly to the `{HumanSpaceProgram.SavesDirectoryName}` directory. It must point to a specific timeline." );
-            }
-
-            return new TimelineMetadata( split[savesIndex + 1] ); // `Saves/<timelineId>/<saveId>/_save.json`
+            return GetRootDirectory( this.TimelineID );
         }
 
         /// <summary>
@@ -105,23 +86,17 @@ namespace KSS.Core.Serialization
 
             List<TimelineMetadata> timelines = new List<TimelineMetadata>();
 
-            foreach( var timeline in potentialTimelines )
+            foreach( var timelineDirName in potentialTimelines )
             {
                 try
                 {
-                    string path = Path.Combine( timeline, TIMELINE_FILENAME );
-
-                    string saveJson = File.ReadAllText( path );
-
-                    SerializedData data = new JsonStringReader( saveJson ).Read();
-
-                    TimelineMetadata timelineMetadata = TimelineMetadata.EmptyFromFilePath( path );
-                    timelineMetadata.SetData( data );
+                    TimelineMetadata timelineMetadata = new TimelineMetadata( timelineDirName );
+                    timelineMetadata.ReadDataFromDisk();
                     timelines.Add( timelineMetadata );
                 }
                 catch( Exception ex )
                 {
-                    Debug.LogWarning( $"Couldn't load timeline `{timeline}`." );
+                    Debug.LogWarning( $"Couldn't load timeline `{timelineDirName}`." );
                     Debug.LogException( ex );
                 }
             }
@@ -129,10 +104,40 @@ namespace KSS.Core.Serialization
             return timelines;
         }
 
+        public void WriteToDisk()
+        {
+            string savePath = GetRootDirectory();
+            string saveFilePath = Path.Combine( savePath, TIMELINE_FILENAME );
+
+            StringBuilder sb = new StringBuilder();
+            new JsonStringWriter( this.GetData(), sb ).Write();
+
+            File.WriteAllText( saveFilePath, sb.ToString(), Encoding.UTF8 );
+        }
+
+        public void ReadDataFromDisk()
+        {
+            string savePath = GetRootDirectory();
+            string saveFilePath = Path.Combine( savePath, TIMELINE_FILENAME );
+
+            string saveJson = File.ReadAllText( saveFilePath, Encoding.UTF8 );
+
+            SerializedData data = new JsonStringReader( saveJson ).Read();
+
+            this.SetData( data );
+        }
+
         public void SetData( SerializedData data )
         {
-            this.Name = data["name"];
-            this.Description = data["description"];
+            if( data.TryGetValue( "name", out var name ) )
+            {
+                this.Name = (string)name;
+            }
+
+            if( data.TryGetValue( "description", out var description ) )
+            {
+                this.Description = (string)description;
+            }
         }
 
         public SerializedData GetData()

@@ -8,13 +8,32 @@ using UnityEngine;
 
 namespace KSS.Core
 {
-    // Do not add RootObjectTransform explicitly *before* PhysicsObject. it messes up the initialization and rigidbody is not cached at the right time.
-    [RequireComponent( typeof( PhysicsObject ) )]
-    public sealed partial class Vessel : MonoBehaviour
+    public static class VesselEx
     {
-        // Root objects have to store their AIRF positions, children natively store their local coordinates, which as long as they're not obscenely large, will be fine.
-        // - An object with a child at 0.00125f can be sent to 10e25 and brought back, and its child will remain at 0.00125f
+        public static bool IsRootOfVessel( this Transform part )
+        {
+            if( part.root != part.parent )
+                return false;
+            Vessel v = part.parent.GetComponent<Vessel>();
+            if( v == null )
+                return false;
+            return v.RootPart == part;
+        }
 
+        /// <summary>
+        /// Gets the <see cref="Vessel"/> attached to this transform.
+        /// </summary>
+        /// <returns>The vessel. Null if the transform is not part of a vessel.</returns>
+        public static Vessel GetVessel( this Transform part )
+        {
+            return part.root.GetComponent<Vessel>();
+        }
+    }
+
+    // ### WARNING ### Do not add "require RootObjectTransform" explicitly. it messes up the initialization and rigidbody is not cached at the right time.
+    [RequireComponent( typeof( PhysicsObject ) )]
+    public sealed partial class Vessel : MonoBehaviour, IPartObject
+    {
         [SerializeField]
         private string _displayName;
         public string DisplayName
@@ -24,27 +43,20 @@ namespace KSS.Core
         }
 
         [field: SerializeField]
-        public Part RootPart { get; private set; }
-
-        [field: SerializeField]
-        public IEnumerable<Part> Parts { get; private set; }
-
-        [field: SerializeField]
-        public int PartCount { get; private set; }
+        public Transform RootPart { get; private set; }
 
         public PhysicsObject PhysicsObject { get; private set; }
         public RootObjectTransform RootObjTransform { get; private set; }
 
-        public Vector3Dbl AIRFPosition { get => this.RootObjTransform.GetAIRFPosition(); }
-
         /// <remarks>
-        /// DO NOT USE. This is for internal use, and can produce an invalid state. Use <see cref="VesselStateUtils.SetParent(Part, Part)"/> instead.
+        /// DO NOT USE. This is for internal use, and can produce an invalid state. Use <see cref="VesselHierarchyUtils.SetParent(Transform, Transform)"/> instead.
         /// </remarks>
-        internal void SetRootPart( Part part )
+        [Obsolete( "This is for internal use, and can produce an invalid state." )]
+        internal void SetRootPart( Transform part )
         {
-            if( part != null && part.Vessel != this )
+            if( part != null && part.GetVessel() != this )
             {
-                throw new ArgumentException( $"Can't set the part '{part}' from vessel '{part.Vessel}' as root. The part is not a part of this vessel." );
+                throw new ArgumentException( $"Can't set the part '{part}' from vessel '{part.GetVessel()}' as root. The part is not a part of this vessel." );
             }
 
             RootPart = part;
@@ -56,86 +68,81 @@ namespace KSS.Core
 
         // the active vessel has also glithed out and accelerated to the speed of light at least once after jettisonning the side tanks on the pad.
 
+        [field: SerializeField]
+        int PartCount { get; set; } = 0;
+        [SerializeField]
+        IHasMass[] _partsWithMass;
+
+        [SerializeField]
+        Collider[] _partsWithCollider; // TODO - this probably should be a dictionary with type as input, for modding support.
+
+        public event Action OnAfterRecalculateParts;
+
         public void RecalculateParts()
         {
-            // take root and traverse its hierarchy to add up all parts.
-
             if( RootPart == null )
             {
                 PartCount = 0;
+                _partsWithMass = new IHasMass[] { };
+                _partsWithCollider = new Collider[] { };
+                OnAfterRecalculateParts?.Invoke();
                 return;
             }
 
             int count = 0;
-            Stack<Part> stack = new Stack<Part>();
+            Stack<Transform> stack = new Stack<Transform>();
             stack.Push( RootPart );
-            List<Part> parts = new List<Part>();
 
             while( stack.Count > 0 )
             {
-                Part p = stack.Pop();
-                parts.Add( p );
+                Transform part = stack.Pop();
                 count++;
 
-                foreach( Part cp in p.Children )
+                foreach( Transform childPart in part )
                 {
-                    stack.Push( cp );
+                    stack.Push( childPart );
                 }
             }
 
-            this.Parts = parts;
             PartCount = count;
+            _partsWithMass = RootPart.GetComponentsInChildren<IHasMass>(); // GetComponentsInChildren might be slower than custom methods? (needs testing)
+            _partsWithCollider = RootPart.GetComponentsInChildren<Collider>(); // GetComponentsInChildren might be slower than custom methods? (needs testing)
+            OnAfterRecalculateParts?.Invoke();
         }
 
         /// <summary>
         /// Returns the local space center of mass, and the mass [kg] itself.
         /// </summary>
-        public (Vector3 localCenterOfMass, float mass) CalculateMassInfo()
+        public (Vector3 localCenterOfMass, float mass) RecalculateMass()
         {
-            Vector3 com = Vector3.zero;
+            Vector3 centerOfMass = Vector3.zero;
             float mass = 0;
-            foreach( var part in this.Parts )
+            foreach( var massivePart in this._partsWithMass )
             {
-                // physicsless parts may be `continue`'d here.
-
-                com += part.transform.localPosition * part.Mass;
-                mass += part.Mass;
+                centerOfMass += this.transform.InverseTransformPoint( massivePart.transform.position ) * massivePart.Mass; // potentially precision issues if vessel is far away from origin.
+                mass += massivePart.Mass;
             }
             if( mass > 0 )
             {
-                com /= mass;
+                centerOfMass /= mass;
             }
-            return (com, mass);
+            return (centerOfMass, mass);
         }
 
-        /// <summary>
-        /// Sets the position of the vessel in Absolute Inertial Reference Frame coordinates. Units in [m].
-        /// </summary>
-        public void SetPosition( Vector3Dbl airfPosition )
-        {
-            this.RootObjTransform.SetAIRFPosition( airfPosition );
-        }
-
-        /// <summary>
-        /// Sets the rotation of the vessel in Absolute Inertial Reference Frame coordinates.
-        /// </summary>
-        public void SetRotation( Quaternion airfRotation )
-        {
-            this.RootObjTransform.SetAIRFRotation( airfRotation );
-        }
+        public Vector3Dbl AIRFPosition { get => this.RootObjTransform.AIRFPosition; set => this.RootObjTransform.AIRFPosition = value; }
+        public QuaternionDbl AIRFRotation { get => this.RootObjTransform.AIRFRotation; set => this.RootObjTransform.AIRFRotation = value; }
 
         /// <summary>
         /// Calculates the scene world-space point at the very bottom of the vessel. Useful when placing it at launchsites and such.
         /// </summary>
         public Vector3 GetBottomPosition()
         {
-            Vector3 dir = this.transform.position - (this.transform.up * 500f);
+            Vector3 dir = this.transform.position - (this.transform.up * 500f); // can bug out for large vessels. need to take the point relative to the center and size of the currently checked collider.
             Vector3 min = this.transform.position;
             float minDist = float.MaxValue;
-            Collider[] cols = this.GetComponentsInChildren<Collider>();
-            foreach( var col in cols )
+            foreach( var collider in _partsWithCollider )
             {
-                Vector3 closestBound = col.ClosestPointOnBounds( dir );
+                Vector3 closestBound = collider.ClosestPointOnBounds( dir );
                 float dst = Vector3.Distance( dir, closestBound );
                 if( dst < minDist )
                 {
@@ -144,9 +151,6 @@ namespace KSS.Core
                 }
             }
             return min;
-
-            //Vector3 closestBound = this.PhysicsObject.ClosestPointOnBounds( this.transform.position - (this.transform.up * 500f) );
-            //return closestBound;
         }
 
         void Awake()
@@ -157,14 +161,25 @@ namespace KSS.Core
 
         void SetPhysicsObjectParameters()
         {
-            (Vector3 comLocal, float mass) = this.CalculateMassInfo();
+            (Vector3 comLocal, float mass) = this.RecalculateMass();
             this.PhysicsObject.LocalCenterOfMass = comLocal;
             this.PhysicsObject.Mass = mass;
         }
 
         void Start()
         {
-            SetPhysicsObjectParameters();
+            RecalculateParts();
+            //SetPhysicsObjectParameters();
+        }
+
+        void OnEnable()
+        {
+            VesselManager.Register( this );
+        }
+
+        void OnDisable()
+        {
+            VesselManager.Unregister( this );
         }
 
         void FixedUpdate()
@@ -190,6 +205,37 @@ namespace KSS.Core
         {
             Gizmos.color = Color.blue;
             Gizmos.DrawWireCube( this.transform.TransformPoint( this.PhysicsObject.LocalCenterOfMass ), Vector3.one * 0.25f );
+        }
+
+        public static double GetExhaustVelocity( (Vector3 thrust, float exhaustVelocity)[] thrusters )
+        {
+            Vector3 totalThrust = Vector3.zero;
+            float totalMassFlow = 0.0f;
+
+            foreach( (var thrust, var exhaustVelocity) in thrusters )
+            {
+                totalThrust += thrust;
+                totalMassFlow += thrust.magnitude * exhaustVelocity;
+            }
+
+            return totalThrust.magnitude / totalMassFlow;
+        }
+
+        public static double GetDeltaV( double exhaustVelocity, double initialMass, double finalMass )
+        {
+            return exhaustVelocity * Math.Log( initialMass / finalMass );
+        }
+
+        /// <summary>
+        /// Calculates the initial mass required for a vehicle to achieve a given delta-V.
+        /// </summary>
+        /// <param name="deltaV">The desired delta-V, in [m/s].</param>
+        /// <param name="exhaustVelocity">The effective exhaust velocity, in [m/s].</param>
+        /// <param name="finalMass">The final mass of the vehicle after the burn, in [kg].</param>
+        /// <returns>The initial mass, in [kg].</returns>
+        public static double GetInitialMass( double deltaV, double exhaustVelocity, double finalMass )
+        {
+            return finalMass * Math.Exp( deltaV / exhaustVelocity );
         }
     }
 }

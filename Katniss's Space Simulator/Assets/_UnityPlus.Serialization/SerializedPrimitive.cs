@@ -203,7 +203,8 @@ namespace UnityPlus.Serialization
             DataType.Decimal => (decimal)v._value.@decimal,
             _ => throw new InvalidOperationException( $"Can't convert to `decimal` from `{v._type}`." ),
         };
-        public static implicit operator string( SerializedPrimitive v ) => v._type switch
+        //                                                                   \/ string is the only type that can actually hold null. When deserializing, it can be initialized to null.
+        public static implicit operator string( SerializedPrimitive v ) => v == null ? default : v._type switch
         {
             DataType.String => v._value.str,
             _ => throw new InvalidOperationException( $"Can't convert to `string` from `{v._type}`." ),

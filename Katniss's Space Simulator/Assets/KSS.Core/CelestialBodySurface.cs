@@ -9,7 +9,7 @@ namespace KSS.Core
     {
         public class FeatureGroup : MonoBehaviour
         {
-
+            // can be used for LODs of a group of objects instead of a single object?
         }
 
 

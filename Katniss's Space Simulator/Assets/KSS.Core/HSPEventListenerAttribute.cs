@@ -15,7 +15,7 @@ namespace KSS.Core
     /// <remarks>
     /// This attribute can be applied to any static method with the signature `static void Method( object e )`.
     /// </remarks>
-    [AttributeUsage( AttributeTargets.Method )]
+    [AttributeUsage( AttributeTargets.Method, AllowMultiple = true )]
     public class HSPEventListenerAttribute : Attribute
     {
         public string EventID { get; set; }
@@ -42,7 +42,7 @@ namespace KSS.Core
                 && method.ReturnType == typeof( void );
         }
 
-        private static void ProcessMethod( HSPEventListenerAttribute attr, MethodInfo method )
+        private static void ProcessMethod( IEnumerable<HSPEventListenerAttribute> attrs, MethodInfo method )
         {
             ParameterInfo[] parameters = method.GetParameters();
 
@@ -54,8 +54,11 @@ namespace KSS.Core
 
             Action<object> methodDelegate = (Action<object>)Delegate.CreateDelegate( typeof( Action<object> ), method );
 
-            HSPEvent.EventManager.TryCreate( attr.EventID );
-            HSPEvent.EventManager.TryAddListener( attr.EventID, new OverridableEventListener<object>() { id = attr.ID, blacklist = attr.Blacklist, func = methodDelegate } );
+            foreach( var attr in attrs )
+            {
+                HSPEvent.EventManager.TryCreate( attr.EventID );
+                HSPEvent.EventManager.TryAddListener( attr.EventID, new OverridableEventListener<object>() { id = attr.ID, blacklist = attr.Blacklist, func = methodDelegate } );
+            }
         }
 
         /// <summary>
@@ -73,13 +76,13 @@ namespace KSS.Core
                     {
                         try
                         {
-                            HSPEventListenerAttribute attr = method.GetCustomAttribute<HSPEventListenerAttribute>();
-                            if( attr == null )
+                            IEnumerable<HSPEventListenerAttribute> attrs = method.GetCustomAttributes<HSPEventListenerAttribute>();
+                            if( attrs == null || !attrs.Any() )
                             {
                                 continue;
                             }
 
-                            ProcessMethod( attr, method );
+                            ProcessMethod( attrs, method );
                         }
                         catch( TypeLoadException ex )
                         {

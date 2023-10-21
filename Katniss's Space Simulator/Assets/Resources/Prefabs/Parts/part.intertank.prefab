@@ -175,9 +175,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5193809938905173626}
-  - component: {fileID: 3313124812178492539}
   - component: {fileID: 8804909419040182457}
   - component: {fileID: 5557714343821677624}
+  - component: {fileID: 881548991537354002}
   m_Layer: 0
   m_Name: part.intertank
   m_TagString: Untagged
@@ -202,24 +202,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3313124812178492539
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6352053399650574342}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1ba8a5298599c148a6b5258de87a68b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  <ID>k__BackingField: part.intertank
-  <Vessel>k__BackingField: {fileID: 0}
-  _displayName: intertank
-  <Mass>k__BackingField: 50
-  <Parent>k__BackingField: {fileID: 0}
-  <Children>k__BackingField: []
 --- !u!65 &8804909419040182457
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -259,3 +241,16 @@ LODGroup:
     fadeTransitionWidth: 0
     renderers: []
   m_Enabled: 1
+--- !u!114 &881548991537354002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6352053399650574342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1858aa7f4234f7241a13904bac31eaae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mass: 100

@@ -68,38 +68,99 @@ namespace KSS.CelestialBodies.Surface
 
         List<LODQuad> _activeQuads = new List<LODQuad>();
 
+        private static Vector3Dbl[] GetVesselPOIs()
+        {
+            Vessel[] vessels = VesselManager.GetLoadedVessels();
+            Vector3Dbl[] airfPOIs = new Vector3Dbl[vessels.Length];
+            for( int i = 0; i < vessels.Length; i++ )
+            {
+                airfPOIs[i] = vessels[i].AIRFPosition;
+            }
+            return airfPOIs;
+        }
+
+        private static bool ApproximatelyDifferent( Vector3Dbl lhs, Vector3Dbl rhs )
+        {
+            const double UPDATE_THRESHOLD = 0.5;
+
+            return Math.Abs( lhs.x - rhs.x ) >= UPDATE_THRESHOLD
+                || Math.Abs( lhs.y - rhs.y ) >= UPDATE_THRESHOLD
+                || Math.Abs( lhs.z - rhs.z ) >= UPDATE_THRESHOLD;
+        }
+
+        private bool NewPoisTheSameAsLastFrame( Vector3Dbl[] airfPOIs ) // with moving vessels, we will need to use POIs in celestial body space.
+        {
+            // Checks if the new pois are close enough to the old pois that we don't need to change the subdivisions.
+            if( _poisAtLastChange == null )
+                return false;
+
+            if( _poisAtLastChange.Length != airfPOIs.Length )
+                return false;
+
+            for( int i = 0; i < airfPOIs.Length; i++ )
+            {
+                if( ApproximatelyDifferent( airfPOIs[i], _poisAtLastChange[i] ) )
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        bool _wasChangedLastFrame = true; // initial value true is important for initial subdivision. This can only be removed if the CB is pre-subdivided to the initial pois ahead of time.
+        Vector3Dbl[] _poisAtLastChange = null; // Initial value null is important.
+
         void Update()
         {
-            List<LODQuad> newActiveQuads = new List<LODQuad>( _activeQuads ); // todo - kinda unoptimal.
+            List<LODQuad> newActiveQuads = new List<LODQuad>( _activeQuads );
             List<LODQuad> needRemeshing = new List<LODQuad>();
 
-            foreach( var quad in _activeQuads )
+            Vector3Dbl[] airfPOIs = GetVesselPOIs();
+
+            bool allPoisTheSame = NewPoisTheSameAsLastFrame( airfPOIs );
+
+            bool wasChangedThisFrame = false;
+            // Optimization is applied:
+            // - The quads only need to be checked if they were changed in the last frame (potentially still not subdivided enough / too much), or if the pois changed by some threshold.
+            if( !allPoisTheSame || _wasChangedLastFrame )
             {
-                if( quad.Node.Value == null ) // marked as destroyed.
-                    continue;
-
-                quad.AirfPOIs = new Vector3Dbl[] { VesselManager.ActiveVessel.AIRFPosition };
-
-                if( quad.CurrentState is LODQuad.State.Idle )
+                foreach( var quad in _activeQuads )
                 {
-                    continue;
-                }
+                    if( quad.Node.Value == null ) // marked as destroyed.
+                        continue;
 
-                if( quad.CurrentState is LODQuad.State.Active )
-                {
-                    if( quad.ShouldSubdivide() )
+                    quad.AirfPOIs = airfPOIs;
+
+                    if( quad.CurrentState is LODQuad.State.Idle )
                     {
-                        quad.Subdivide( ref newActiveQuads, ref needRemeshing );
                         continue;
                     }
 
-                    if( quad.ShouldUnsubdivide() )
+                    if( quad.CurrentState is LODQuad.State.Active )
                     {
-                        quad.Unsubdivide( ref newActiveQuads, ref needRemeshing );
-                        continue;
+                        if( quad.ShouldSubdivide() )
+                        {
+                            quad.Subdivide( ref newActiveQuads, ref needRemeshing );
+                            wasChangedThisFrame = true;
+                            continue;
+                        }
+
+                        if( quad.ShouldUnsubdivide() )
+                        {
+                            quad.Unsubdivide( ref newActiveQuads, ref needRemeshing );
+                            wasChangedThisFrame = true;
+                            continue;
+                        }
                     }
                 }
             }
+
+            if( wasChangedThisFrame )
+            {
+                _poisAtLastChange = airfPOIs;
+            }
+            _wasChangedLastFrame = wasChangedThisFrame;
 
             // this filtering stuff is kinda ugly.
             // And it's fucking retarded, because if I just check the _activeQuads, it breaks.

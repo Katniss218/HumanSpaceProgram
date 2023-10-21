@@ -13,12 +13,13 @@ namespace KSS.UI
     public class StartNewGameWindow : MonoBehaviour
     {
         UIInputField _nameInputField;
+        UIInputField _descriptionInputField;
 
         public void StartGame()
         {
             SceneLoader.UnloadActiveSceneAsync( () => SceneLoader.LoadSceneAsync( "Testing And Shit", true, false, () =>
             {
-                TimelineManager.CreateNew( IOHelper.SanitizeFileName( _nameInputField.Text ), SaveMetadata.PERSISTENT_SAVE_ID );
+                TimelineManager.CreateNew( IOHelper.SanitizeFileName( _nameInputField.Text ), SaveMetadata.PERSISTENT_SAVE_ID, _nameInputField.Text, _descriptionInputField.Text );
             } ) );
         }
 
@@ -46,6 +47,8 @@ namespace KSS.UI
                 .WithAlignment( HorizontalAlignmentOptions.Center );
 
             windowComponent._nameInputField = inputField;
+#warning TODO - add a description box.
+            windowComponent._descriptionInputField = inputField;
 
             return windowComponent;
         }

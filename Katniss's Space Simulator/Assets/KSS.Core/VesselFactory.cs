@@ -22,7 +22,7 @@ namespace KSS.Core
         /// <param name="airfPosition">The `Absolute Inertial Reference Frame` position of the vessel to create.</param>
         /// <param name="airfRotation">Rotation of the vessel in the `Absolute Inertial Reference Frame`</param>
         /// <returns>The created partless vessel.</returns>
-        public Vessel CreatePartless( Vector3Dbl airfPosition, Quaternion airfRotation, Vector3 sceneVelocity, Vector3 sceneAngularVelocity )
+        public Vessel CreatePartless( Vector3Dbl airfPosition, QuaternionDbl airfRotation, Vector3 sceneVelocity, Vector3 sceneAngularVelocity )
         {
             Vessel vessel = CreateGO( airfPosition, airfRotation );
 
@@ -32,14 +32,14 @@ namespace KSS.Core
             return vessel;
         }
 
-        private static Vessel CreateGO( Vector3Dbl airfPosition, Quaternion airfRotation )
+        private static Vessel CreateGO( Vector3Dbl airfPosition, QuaternionDbl airfRotation )
         {
-            GameObject vesselGO = new GameObject( $"Vessel, '{name}'" );
+            GameObject gameObject = new GameObject( $"Vessel, '{name}'" );
 
-            Vessel vessel = vesselGO.AddComponent<Vessel>();
+            Vessel vessel = gameObject.AddComponent<Vessel>();
             vessel.name = name;
-            vessel.SetPosition( airfPosition );
-            vessel.SetRotation( airfRotation );
+            vessel.AIRFPosition = airfPosition;
+            vessel.AIRFRotation = airfRotation;
 
             return vessel;
         }

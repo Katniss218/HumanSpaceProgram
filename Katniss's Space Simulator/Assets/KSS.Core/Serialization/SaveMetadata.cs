@@ -15,12 +15,29 @@ namespace KSS.Core.Serialization
     /// </summary>
     public sealed class SaveMetadata
     {
+        /// <summary>
+        /// The current version of new save files.
+        /// </summary>
+        public static readonly Version CURRENT_SAVE_FILE_VERSION = new Version( 0, 0 );
+
+        /// <summary>
+        /// The name of the file that stores the save metadata.
+        /// </summary>
         public const string SAVE_FILENAME = "_save.json";
 
         /// <summary>
         /// The persistent save's ID. A persistent save is the default save when a custom save is not specified.
         /// </summary>
         public const string PERSISTENT_SAVE_ID = "___persistent";
+
+        /// <summary>
+        /// The unique ID of this specific save's timeline.
+        /// </summary>
+        public readonly string TimelineID;
+        /// <summary>
+        /// The unique ID of this specific save.
+        /// </summary>
+        public readonly string SaveID;
 
         /// <summary>
         /// The display name shown in the GUI.
@@ -33,56 +50,43 @@ namespace KSS.Core.Serialization
         public string Description { get; set; }
 
         /// <summary>
-        /// The unique ID of this specific save's timeline.
+        /// The version of the save file.
         /// </summary>
-        public readonly string TimelineID;
-        /// <summary>
-        /// The unique ID of this specific save.
-        /// </summary>
-        public readonly string SaveID;
+        public Version FileVersion { get; set; }
 
-        SaveMetadata( string timelineId, string saveId )
+        /// <summary>
+        /// The versions of all the mods used when the save file was created.
+        /// </summary>
+        public Dictionary<string, Version> ModVersions { get; set; } = new Dictionary<string, Version>();
+
+        public SaveMetadata( string timelineId, string saveId )
         {
             this.TimelineID = timelineId;
             this.SaveID = saveId;
         }
 
         /// <summary>
-        /// Computes the file path for a given timeline ID.
+        /// Root directory is the directory that contains the _save.json file.
         /// </summary>
-        public static string GetPath( string timelineId, string saveId )
+        public string GetRootDirectory()
         {
-            return Path.Combine( HumanSpaceProgram.GetSaveDirectoryPath(), timelineId, saveId );
+            return GetRootDirectory( this.TimelineID, this.SaveID );
         }
 
         /// <summary>
-        /// Creates a new empty <see cref="SaveMetadata"/> that points to the specified save. Does not initialize any display parameters.
+        /// Root directory is the directory that contains the _save.json file.
         /// </summary>
-        /// <param name="validPath">The path to use to parse out the timeline and save IDs.</param>
-        public static SaveMetadata EmptyFromFilePath( string validPath )
+        public static string GetRootDirectory( string timelineId, string saveId )
         {
-            string[] split = validPath.Split( new char[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries );
+            return Path.Combine( TimelineMetadata.GetRootDirectory( timelineId ), saveId );
+        }
 
-            int savesIndex = -1;
-            for( int i = 0; i < split.Length; i++ )
-            {
-                if( split[i] == HumanSpaceProgram.SavesDirectoryName )
-                {
-                    savesIndex = i;
-                    break;
-                }
-            }
-
-            if( savesIndex <= 0 || savesIndex >= split.Length )
-            {
-                throw new ArgumentException( $"The path `{validPath}` doesn't contain the `{HumanSpaceProgram.SavesDirectoryName}` directory." );
-            }
-            if( savesIndex >= split.Length - 2 )
-            {
-                throw new ArgumentException( $"The path `{validPath}` points directly to the `{HumanSpaceProgram.SavesDirectoryName}` directory. It must point to a specific save of a specific timeline." );
-            }
-
-            return new SaveMetadata( split[savesIndex + 1], split[savesIndex + 2] ); // `Saves/<timelineId>/<saveId>/_save.json`
+        /// <summary>
+        /// Returns the file path to the directory containing the saves of a given timeline.
+        /// </summary>
+        public static string GetSavesPath( string timelineId )
+        {
+            return TimelineMetadata.GetRootDirectory( timelineId );
         }
 
         /// <summary>
@@ -91,57 +95,101 @@ namespace KSS.Core.Serialization
         /// <param name="timelineId">The timeline ID to get the saves for.</param>
         public static IEnumerable<SaveMetadata> ReadAllSaves( string timelineId )
         {
-            string timelinePath = TimelineMetadata.GetSavesPath( timelineId );
+            string savesPath = GetSavesPath( timelineId );
 
             string[] potentialSaves;
             try
             {
-                potentialSaves = Directory.GetDirectories( timelinePath );
+                potentialSaves = Directory.GetDirectories( savesPath );
             }
             catch
             {
-                Debug.LogWarning( $"Couldn't open `{timelinePath}` directory." );
+                Debug.LogWarning( $"Couldn't open `{savesPath}` directory." );
 
                 return new SaveMetadata[] { };
             }
 
             List<SaveMetadata> saves = new List<SaveMetadata>();
 
-            foreach( var save in potentialSaves )
+            foreach( var saveDirPath in potentialSaves )
             {
                 try
                 {
-                    string path = Path.Combine( save, SAVE_FILENAME );
-
-                    string saveJson = File.ReadAllText( path );
-
-                    SerializedData data = new JsonStringReader( saveJson ).Read();
-
-                    SaveMetadata saveMetadata = SaveMetadata.EmptyFromFilePath( path );
-                    saveMetadata.SetData( data );
+                    SaveMetadata saveMetadata = new SaveMetadata( timelineId, saveDirPath );
+                    saveMetadata.ReadDataFromDisk();
                     saves.Add( saveMetadata );
                 }
-                catch
+                catch( Exception ex )
                 {
-                    Debug.LogWarning( $"Couldn't load save `{save}`." );
+                    Debug.LogWarning( $"Couldn't load save `{saveDirPath}`: {ex.Message}" );
+                    Debug.LogException( ex );
                 }
             }
 
             return saves;
         }
 
+        public void WriteToDisk()
+        {
+            string savePath = GetRootDirectory();
+            string saveFilePath = Path.Combine( savePath, SAVE_FILENAME );
+
+            StringBuilder sb = new StringBuilder();
+            new JsonStringWriter( this.GetData(), sb ).Write();
+
+            File.WriteAllText( saveFilePath, sb.ToString(), Encoding.UTF8 );
+        }
+
+        public void ReadDataFromDisk()
+        {
+            string savePath = GetRootDirectory();
+            string saveFilePath = Path.Combine( savePath, SAVE_FILENAME );
+
+            string saveJson = File.ReadAllText( saveFilePath, Encoding.UTF8 );
+
+            SerializedData data = new JsonStringReader( saveJson ).Read();
+
+            this.SetData( data );
+        }
+
         public void SetData( SerializedData data )
         {
-            this.Name = data["name"];
-            this.Description = data["description"];
+            if( data.TryGetValue( "name", out var name ) )
+            {
+                this.Name = (string)name;
+            }
+            if( data.TryGetValue( "description", out var description ) )
+            {
+                this.Description = (string)description;
+            }
+            if( data.TryGetValue( "file_version", out var saveVersion ) )
+            {
+                this.FileVersion = Version.Parse( (string)saveVersion );
+            }
+
+            if( data.TryGetValue( "mod_versions", out var modVersions ) )
+            {
+                this.ModVersions = new Dictionary<string, Version>();
+                foreach( var elemKvp in (SerializedObject)modVersions )
+                {
+                    this.ModVersions.Add( elemKvp.Key, Version.Parse( (string)elemKvp.Value ) );
+                }
+            }
         }
 
         public SerializedData GetData()
         {
+            SerializedObject modVersions = new SerializedObject();
+            foreach( var elemKvp in this.ModVersions )
+            {
+                modVersions.Add( elemKvp.Key, elemKvp.Value.ToString() );
+            }
             return new SerializedObject()
             {
                 { "name", this.Name },
-                { "description", this.Description }
+                { "description", this.Description },
+                { "file_version", this.FileVersion.ToString() },
+                { "mod_versions", modVersions }
             };
         }
     }

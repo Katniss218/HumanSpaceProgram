@@ -18,10 +18,16 @@ namespace UnityPlus.Serialization
         List<Action<ILoader>> _objectActions = new List<Action<ILoader>>();
         List<Action<ILoader>> _dataActions = new List<Action<ILoader>>();
 
+        Action _startFunc;
+        Action _finishFunc;
+
         Dictionary<Guid, object> _guidToObject = new Dictionary<Guid, object>();
 
-        public Loader( IEnumerable<Action<ILoader>> objectActions, IEnumerable<Action<ILoader>> dataActions )
+        public Loader( Action startFunc, Action finishFunc, IEnumerable<Action<ILoader>> objectActions, IEnumerable<Action<ILoader>> dataActions )
         {
+            this._startFunc = startFunc;
+            this._finishFunc = finishFunc;
+
             // Loader should load objects before data.
             foreach( var action in objectActions )
             {
@@ -49,12 +55,15 @@ namespace UnityPlus.Serialization
         /// Call this method when loading an object that might be referenced.
         /// </remarks>
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public void SetID( object obj, Guid id )
+        public void SetReferenceID( object obj, Guid id )
         {
             if( _currentState != ILoader.State.LoadingObjects )
             {
                 throw new InvalidOperationException( $"You can only set an ID while creating the objects. Please move the functionality to an object action" );
             }
+
+            if( id == Guid.Empty )
+                return;
 
             _guidToObject.Add( id, obj );
         }
@@ -68,6 +77,8 @@ namespace UnityPlus.Serialization
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public object Get( Guid id )
         {
+            if( id == Guid.Empty )
+                return null;
             if( _guidToObject.TryGetValue( id, out object obj ) )
             {
                 return obj;
@@ -87,6 +98,10 @@ namespace UnityPlus.Serialization
         /// </summary>
         public void Load()
         {
+#if DEBUG
+            Debug.Log( "Loading..." );
+#endif
+            _startFunc?.Invoke();
             ClearReferenceRegistry();
             _currentState = ILoader.State.LoadingObjects;
 
@@ -105,6 +120,10 @@ namespace UnityPlus.Serialization
 
             ClearReferenceRegistry();
             _currentState = ILoader.State.Idle;
+#if DEBUG
+            Debug.Log( "Finished Loading" );
+#endif
+            _finishFunc?.Invoke();
         }
     }
 }

@@ -31,6 +31,12 @@ namespace UnityPlus.Serialization
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static SerializedArray WriteVector3Dbl( this ISaver _, Vector3Dbl v )
+        {
+            return new SerializedArray() { (SerializedPrimitive)v.x, (SerializedPrimitive)v.y, (SerializedPrimitive)v.z };
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public static SerializedArray WriteVector3Int( this ISaver _, Vector3Int v )
         {
             return new SerializedArray() { (SerializedPrimitive)v.x, (SerializedPrimitive)v.y, (SerializedPrimitive)v.z };
@@ -44,6 +50,12 @@ namespace UnityPlus.Serialization
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public static SerializedArray WriteQuaternion( this ISaver _, Quaternion q )
+        {
+            return new SerializedArray() { (SerializedPrimitive)q.x, (SerializedPrimitive)q.y, (SerializedPrimitive)q.z, (SerializedPrimitive)q.w };
+        }
+        
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static SerializedArray WriteQuaternionDbl( this ISaver _, QuaternionDbl q )
         {
             return new SerializedArray() { (SerializedPrimitive)q.x, (SerializedPrimitive)q.y, (SerializedPrimitive)q.z, (SerializedPrimitive)q.w };
         }

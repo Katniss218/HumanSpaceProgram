@@ -1,13 +1,15 @@
 ﻿using KSS.Cameras;
 using KSS.Core;
-using KSS.Core.Buildings;
 using KSS.Core.ReferenceFrames;
 using KSS.Core.ResourceFlowSystem;
-using KSS.Functionalities;
+using KSS.Components;
 using KSS.CelestialBodies.Surface;
 using UnityEngine;
 using UnityEngine.UI;
 using KSS.Core.Serialization;
+using KSS.Core.Components;
+using System;
+using UnityPlus.AssetManagement;
 
 namespace KSS.DevUtils
 {
@@ -29,13 +31,6 @@ namespace KSS.DevUtils
         public ComputeShader shader;
         public RawImage uiImage;
 
-        static CelestialBody CreateCB( Vector3Dbl pos )
-        {
-            CelestialBody cb = new CelestialBodyFactory().Create( pos );
-            LODQuadSphere lqs = cb.gameObject.AddComponent<LODQuadSphere>();
-            return cb;
-        }
-
         void Awake()
         {
             LODQuadSphere.cbShader = this.cbShader;
@@ -55,56 +50,77 @@ namespace KSS.DevUtils
             uiImage.texture = normalmap;*/
         }
 
+        static Building launchSite;
+
+        [HSPEventListener( HSPEvent.STARTUP_IMMEDIATELY, "devutils.load_game_data" )]
+        static void LoadGameData( object e )
+        {
+            AssetRegistry.Register( "substance.f", new Substance() { Density = 1000, DisplayName = "Fuel", UIColor = new Color( 1.0f, 0.3764706f, 0.2509804f ) } );
+            AssetRegistry.Register( "substance.ox", new Substance() { Density = 1000, DisplayName = "Oxidizer", UIColor = new Color( 0.2509804f, 0.5607843f, 1.0f ) } );
+        }
+
         [HSPEventListener( HSPEvent.TIMELINE_AFTER_NEW, "devutils.timeline.new.after" )]
         static void OnAfterCreateDefault( object e )
         {
-            CelestialBody cb = CreateCB( Vector3Dbl.zero );
+            CelestialBody body = CelestialBodyManager.Get( "main" );
+            Vector3 localPos = CoordinateUtils.GeodeticToEuclidean( 28.5857702f, -80.6507262f, (float)(body.Radius + 1.0) );
 
-            CelestialBody cb1 = CreateCB( new Vector3Dbl( 440_000_000, 0, 0 ) );
-            CelestialBody cb2 = CreateCB( new Vector3Dbl( 440_000_000, 100_000_000, 0 ) );
-            CelestialBody cb_farawayTEST = CreateCB( new Vector3Dbl( 440_000_000_0.0, 100_000_000, 0 ) );
-            CelestialBody cb_farawayTEST2 = CreateCB( new Vector3Dbl( 440_000_000_00.0, 100_000_000, 0 ) );
+            PartFactory launchSitePart = new PartFactory( new AssetPartSource( "builtin::Resources/Prefabs/testlaunchsite" ) );
+            launchSite = new BuildingFactory().CreatePartless( body, localPos, Quaternion.FromToRotation( Vector3.up, localPos.normalized ) );
 
-            CelestialBody cb_farawayTEST3FAR = CreateCB( new Vector3Dbl( 1e18, 100_000_000, 0 ) ); // 1e18 is 100 ly away.
-            // stuff really far away throws invalid world AABB and such. do not enable these, you can't see them anyway. 100 ly seems to work, but further away is a no-no.
+            Transform root = launchSitePart.CreateRoot( launchSite );
 
-            CelestialBodySurface srf = cb.GetComponent<CelestialBodySurface>();
-            var group = srf.SpawnGroup( "aabb", 28.5857702f, -80.6507262f, (float)(cb.Radius + 1.0) );
-            LaunchSite launchSite = new LaunchSiteFactory() { Prefab = FindObjectOfType<DevUtilsGameplayManager>().TestLaunchSite }.Create( group, Vector3.zero, Quaternion.identity );
-
-            Vector3Dbl spawnerPosAirf = launchSite.GetSpawnerAIRFPosition();
-
-            Vessel v = CreateDummyVessel( new Vector3Dbl( 1, 0.0, 0.0 ), launchSite.Spawner.rotation ); // position is temp.
-
-            Vector3 bottomBoundPos = v.GetBottomPosition();
-            Vector3Dbl closestBoundAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( bottomBoundPos );
-            Vector3Dbl closestBoundToVesselAirf = v.AIRFPosition - closestBoundAirf;
-            Vector3Dbl pos = spawnerPosAirf + closestBoundToVesselAirf;
-            v.SetPosition( pos );
-
-            VesselManager.ActiveVessel = v.RootPart.Vessel;
-            FindObjectOfType<CameraController>().ReferenceObject = v.RootPart.transform;
-
+            var v = CreateVessel( launchSite );
+            VesselManager.ActiveVessel = v.RootPart.GetVessel();
             VesselManager.ActiveVessel.transform.GetComponent<Rigidbody>().angularDrag = 1; // temp, doesn't veer off course.
         }
 
-        static Vessel CreateDummyVessel( Vector3Dbl airfPosition, Quaternion rotation )
+        static Vessel CreateVessel( Building launchSite )
+        {
+            if( launchSite == null )
+            {
+                throw new ArgumentNullException( nameof( launchSite ), "launchSite is null" );
+            }
+            Vector3Dbl spawnerPosAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition(
+                launchSite.gameObject.GetComponentInChildren<FLaunchSiteMarker>().transform.position );
+            QuaternionDbl spawnerRotAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation(
+                launchSite.gameObject.GetComponentInChildren<FLaunchSiteMarker>().transform.rotation );
+
+            var v2 = CreateDummyVessel( spawnerPosAirf, spawnerRotAirf ); // position is temp.
+
+            Vector3 bottomBoundPos = v2.GetBottomPosition();
+            Vector3Dbl closestBoundAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( bottomBoundPos );
+            Vector3Dbl closestBoundToVesselAirf = v2.AIRFPosition - closestBoundAirf;
+            Vector3Dbl airfPos = spawnerPosAirf + closestBoundToVesselAirf;
+            v2.AIRFPosition = airfPos;
+            return v2;
+        }
+
+        private void Update()
+        {
+            if( Input.GetKeyDown( KeyCode.F5 ) )
+            {
+                CreateVessel( launchSite );
+            }
+        }
+
+        static Vessel CreateDummyVessel( Vector3Dbl airfPosition, QuaternionDbl rotation )
         {
             VesselFactory fac = new VesselFactory();
 
-            PartFactory intertank = new PartFactory( new AssetPartSource( "part.intertank" ) );
-            PartFactory tank = new PartFactory( new AssetPartSource( "part.tank" ) );
-            PartFactory tankLong = new PartFactory( new AssetPartSource( "part.tank_long" ) );
-            PartFactory engine = new PartFactory( new AssetPartSource( "part.engine" ) );
+            PartFactory intertank = new PartFactory( new AssetPartSource( "builtin::Resources/Prefabs/Parts/part.intertank" ) );
+            PartFactory tank = new PartFactory( new AssetPartSource( "builtin::Resources/Prefabs/Parts/part.tank" ) );
+            PartFactory tankLong = new PartFactory( new AssetPartSource( "builtin::Resources/Prefabs/Parts/part.tank_long" ) );
+            PartFactory engine = new PartFactory( new AssetPartSource( "builtin::Resources/Prefabs/Parts/part.engine" ) );
 
             Vessel v = fac.CreatePartless( airfPosition, rotation, Vector3.zero, Vector3.zero );
-            Part root = intertank.CreateRoot( v );
+            Transform root = intertank.CreateRoot( v );
 
-            Part tankP = tank.Create( root, new Vector3( 0, -1.625f, 0 ), Quaternion.identity );
-            Part tankL1 = tankLong.Create( root, new Vector3( 0, 2.625f, 0 ), Quaternion.identity );
-            var t1 = tankLong.Create( root, new Vector3( 2, 2.625f, 0 ), Quaternion.identity );
-            var t2 = tankLong.Create( root, new Vector3( -2, 2.625f, 0 ), Quaternion.identity );
-            Part engineP = engine.Create( tankP, new Vector3( 0, -3.45533f, 0 ), Quaternion.identity );
+            Transform tankP = tank.Create( root, new Vector3( 0, -1.625f, 0 ), Quaternion.identity );
+            Transform tankL1 = tankLong.Create( root, new Vector3( 0, 2.625f, 0 ), Quaternion.identity );
+            Transform t1 = tankLong.Create( root, new Vector3( 2, 2.625f, 0 ), Quaternion.identity );
+            Transform t2 = tankLong.Create( root, new Vector3( -2, 2.625f, 0 ), Quaternion.identity );
+            Transform engineP = engine.Create( tankP, new Vector3( 0, -3.45533f, 0 ), Quaternion.identity );
 
             FBulkConnection conn = tankP.gameObject.AddComponent<FBulkConnection>();
             conn.End1.ConnectTo( tankL1.GetComponent<FBulkContainer_Sphere>() );
@@ -113,14 +129,14 @@ namespace KSS.DevUtils
             conn.End2.Position = new Vector3( 0.0f, 1.5f, 0.0f );
             conn.CrossSectionArea = 0.1f;
 
-            Substance sbs1 = Substance.RegisteredResources["substance.f"];
-            Substance sbs2 = Substance.RegisteredResources["substance.ox"];
+            Substance sbsF = AssetRegistry.Get<Substance>("substance.f");
+            Substance sbsOX = AssetRegistry.Get<Substance>( "substance.ox" );
 
             var tankSmallTank = tankP.GetComponent<FBulkContainer_Sphere>();
             tankSmallTank.Contents = new SubstanceStateCollection(
                 new SubstanceState[] {
-                    new SubstanceState( tankSmallTank.MaxVolume * ((sbs1.Density + sbs2.Density) / 2f) / 2f, sbs1 ),
-                    new SubstanceState( tankSmallTank.MaxVolume * ((sbs1.Density + sbs2.Density) / 2f) / 2f, sbs2 )} );
+                    new SubstanceState( tankSmallTank.MaxVolume * ((sbsF.Density + sbsOX.Density) / 2f) / 2f, sbsF ),
+                    new SubstanceState( tankSmallTank.MaxVolume * ((sbsF.Density + sbsOX.Density) / 2f) / 2f, sbsOX )} );
 
             FBulkConnection conn2 = engineP.gameObject.AddComponent<FBulkConnection>();
             conn2.End1.ConnectTo( tankP.GetComponent<FBulkContainer_Sphere>() );

@@ -56,6 +56,7 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\_UnityEngine\QuaternionDbl.cs" />
     <Compile Include="Assets\_UnityEngine\Vector3Curve.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\GameObjectEx.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\QuaternionEx.cs" />
@@ -63,12 +64,15 @@
     <Compile Include="Assets\_UnityEngine\Direction3D.cs" />
     <Compile Include="Assets\_UnityEngine\Direction2D.cs" />
     <Compile Include="Assets\_UnityEngine\CoroutineRunner.cs" />
+    <Compile Include="Assets\_UnityEngine\Matrix4x4Dbl.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\Vector3_Ex.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\ObjectEx.cs" />
+    <Compile Include="Assets\_UnityEngine\MathD.cs" />
     <Compile Include="Assets\_UnityEngine\MeshUtils.cs" />
     <Compile Include="Assets\_UnityEngine\Vector3Dbl.cs" />
     <Compile Include="Assets\_UnityEngine\QuaternionCurve.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\ComponentEx.cs" />
+    <Compile Include="Assets\_UnityEngine\IComponent.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\Vector2_Ex.cs" />
   </ItemGroup>
   <ItemGroup>

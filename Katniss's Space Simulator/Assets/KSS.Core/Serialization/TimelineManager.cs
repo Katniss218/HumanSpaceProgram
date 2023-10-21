@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityPlus.OverridableEvents;
 using UnityPlus.Serialization;
@@ -11,11 +12,11 @@ namespace KSS.Core.Serialization
     /// <summary>
     /// Manages the currently loaded timeline (save/workspace). See <see cref="TimelineMetadata"/> and <see cref="SaveMetadata"/>.
     /// </summary>
-    public class TimelineManager : MonoBehaviour
+    public class TimelineManager : HSPManager
     {
         #region SINGLETON UGLINESS
         private static TimelineManager ___instance;
-        public static TimelineManager Instance
+        private static TimelineManager instance
         {
             get
             {
@@ -28,14 +29,46 @@ namespace KSS.Core.Serialization
         }
         #endregion
 
-        static readonly JsonExplicitHierarchyStrategy _serializationStrat = new JsonExplicitHierarchyStrategy();
+        public struct SaveEventData
+        {
+            public string timelineId;
+            public string saveId;
+            public List<Func<ISaver, IEnumerator>> objectActions;
+            public List<Func<ISaver, IEnumerator>> dataActions;
+
+            public SaveEventData( string timelineId, string saveId )
+            {
+                this.timelineId = timelineId;
+                this.saveId = saveId;
+                this.objectActions = new List<Func<ISaver, IEnumerator>>();
+                this.dataActions = new List<Func<ISaver, IEnumerator>>();
+            }
+        }
+
+        public struct LoadEventData
+        {
+            public string timelineId;
+            public string saveId;
+            public List<Func<ILoader, IEnumerator>> objectActions;
+            public List<Func<ILoader, IEnumerator>> dataActions;
+
+            public LoadEventData( string timelineId, string saveId )
+            {
+                this.timelineId = timelineId;
+                this.saveId = saveId;
+                this.objectActions = new List<Func<ILoader, IEnumerator>>();
+                this.dataActions = new List<Func<ILoader, IEnumerator>>();
+            }
+        }
+
+#warning TODO - use an event to add these strategies to the savers/loaders, they don't belong here.
 
         /// <summary>
         /// Checks if a timeline is currently being either saved or loaded.
         /// </summary>
         public static bool IsSavingOrLoading =>
-            (_saver != null && _saver.CurrentState != ISaver.State.Idle)
-         || (_loader != null && _loader.CurrentState != ILoader.State.Idle);
+                (_saver != null && _saver.CurrentState != ISaver.State.Idle)
+             || (_loader != null && _loader.CurrentState != ILoader.State.Idle);
 
         public static TimelineMetadata CurrentTimeline { get; private set; }
 
@@ -44,46 +77,66 @@ namespace KSS.Core.Serialization
 
         static bool _wasPausedBeforeSerializing = false;
 
-        public static void SerializationPauseFunc()
+        public static void SaveStartFunc()
         {
             _wasPausedBeforeSerializing = TimeManager.IsPaused;
             TimeManager.Pause();
             TimeManager.LockTimescale = true;
         }
 
-        public static void SerializationUnpauseFunc()
+        public static void LoadStartFunc()
         {
+            _wasPausedBeforeSerializing = TimeManager.IsPaused;
+            TimeManager.Pause();
+            TimeManager.LockTimescale = true;
+        }
+
+        public static void SaveFinishFunc()
+        {
+            TimeManager.LockTimescale = false;
             if( !_wasPausedBeforeSerializing )
             {
-#warning TODO - doesn't unpause - something else sets the "old" timescale.
                 TimeManager.Unpause();
             }
+            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_SAVE, eSave );
+        }
+        
+        public static void LoadFinishFunc()
+        {
             TimeManager.LockTimescale = false;
+            if( !_wasPausedBeforeSerializing )
+            {
+                TimeManager.Unpause();
+            }
+            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_LOAD, eLoad );
         }
 
-        static void CreateDefaultSaver()
+        private static void CreateSaver( List<Func<ISaver, IEnumerator>> objectActions, List<Func<ISaver, IEnumerator>> dataActions )
         {
-            _saver = new AsyncSaver(
-                SerializationPauseFunc, SerializationUnpauseFunc,
-                new Func<ISaver, IEnumerator>[] { _serializationStrat.SaveSceneObjects_Object },
-                new Func<ISaver, IEnumerator>[] { _serializationStrat.SaveSceneObjects_Data }
-            );
+            _saver = new AsyncSaver( SaveStartFunc, SaveFinishFunc, objectActions, dataActions );
         }
 
-        static void CreateDefaultLoader()
+        private static void CreateLoader( List<Func<ILoader, IEnumerator>> objectActions, List<Func<ILoader, IEnumerator>> dataActions )
         {
-            _loader = new AsyncLoader(
-                SerializationPauseFunc, SerializationUnpauseFunc,
-                new Func<ILoader, IEnumerator>[] { _serializationStrat.LoadSceneObjects_Object },
-                new Func<ILoader, IEnumerator>[] { _serializationStrat.LoadSceneObjects_Data }
-            );
+            _loader = new AsyncLoader( LoadStartFunc, LoadFinishFunc, objectActions, dataActions );
         }
+
+        public static void EnsureDirectoryExists( string path )
+        {
+            if( !Directory.Exists( path ) )
+            {
+                Directory.CreateDirectory( path );
+            }
+        }
+
+        static SaveEventData eSave;
+        static LoadEventData eLoad;
 
         /// <summary>
         /// Asynchronously saves the current game state over multiple frames. <br/>
         /// The game should remain paused for the duration of the saving (this is generally handled automatically, but be careful).
         /// </summary>
-        public static void BeginSaveAsync( string timelineId, string saveId )
+        public static void BeginSaveAsync( string timelineId, string saveId, string saveName, string saveDescription )
         {
             if( string.IsNullOrEmpty( timelineId ) && string.IsNullOrEmpty( saveId ) )
             {
@@ -91,16 +144,24 @@ namespace KSS.Core.Serialization
             }
             if( IsSavingOrLoading )
             {
-                throw new InvalidOperationException( $"Can't start saving while already saving/loading." );
+                throw new InvalidOperationException( $"Can't start saving a timeline while already saving or loading." );
             }
 
-            CreateDefaultSaver();
+            EnsureDirectoryExists( SaveMetadata.GetRootDirectory( timelineId, saveId ) );
 
-            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_SAVE, _saver );
+            eSave = new SaveEventData( timelineId, saveId );
+            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_SAVE, eSave );
+            CreateSaver( eSave.objectActions, eSave.dataActions );
 
-            _saver.SaveAsync( Instance );
+            _saver.SaveAsync( instance );
 
-            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_SAVE, _saver );
+            CurrentTimeline.WriteToDisk();
+            SaveMetadata savedSave = new SaveMetadata( timelineId, saveId );
+            savedSave.Name = saveName;
+            savedSave.Description = saveDescription;
+            savedSave.FileVersion = SaveMetadata.CURRENT_SAVE_FILE_VERSION;
+            savedSave.WriteToDisk();
+
         }
 
         /// <summary>
@@ -115,25 +176,30 @@ namespace KSS.Core.Serialization
             }
             if( IsSavingOrLoading )
             {
-                throw new InvalidOperationException( $"Can't start loading while already saving/loading." );
+                throw new InvalidOperationException( $"Can't start loading a timeline while already saving or loading." );
             }
 
-            TimelineMetadata loadedTimeline = TimelineMetadata.EmptyFromFilePath( TimelineMetadata.GetSavesPath( timelineId ) );
+            EnsureDirectoryExists( SaveMetadata.GetRootDirectory( timelineId, saveId ) );
 
-            CreateDefaultLoader();
+            TimelineMetadata loadedTimeline = new TimelineMetadata( timelineId );
+            loadedTimeline.ReadDataFromDisk();
+            SaveMetadata loadedSave = new SaveMetadata( timelineId, saveId );
+            loadedSave.ReadDataFromDisk();
 
-            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_LOAD, _loader );
+            eLoad = new LoadEventData( timelineId, saveId );
+            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_LOAD, eLoad );
+            CreateLoader( eLoad.objectActions, eLoad.dataActions );
 
-            _loader.LoadAsync( Instance );
+            _loader.LoadAsync( instance );
             CurrentTimeline = loadedTimeline;
 
-            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_LOAD, _loader );
+#warning TODO - this is invoked after coroutine finishes.
         }
 
         /// <summary>
         /// Creates a new default (empty) timeline and "loads" it.
         /// </summary>
-        public static void CreateNew( string timelineId, string saveId )
+        public static void CreateNew( string timelineId, string saveId, string timelineName, string timelineDescription )
         {
             if( string.IsNullOrEmpty( timelineId ) && string.IsNullOrEmpty( saveId ) )
             {
@@ -141,10 +207,12 @@ namespace KSS.Core.Serialization
             }
             if( IsSavingOrLoading )
             {
-                throw new InvalidOperationException( $"Can't start loading while already saving/loading." );
+                throw new InvalidOperationException( $"Can't create a new timeline while already saving or loading." );
             }
 
-            TimelineMetadata newTimeline = TimelineMetadata.EmptyFromFilePath( TimelineMetadata.GetSavesPath( timelineId ) );
+            TimelineMetadata newTimeline = new TimelineMetadata( timelineId );
+            newTimeline.Name = timelineName;
+            newTimeline.Description = timelineDescription;
 
             HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_NEW );
 

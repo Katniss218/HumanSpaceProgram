@@ -26,13 +26,28 @@ namespace KSS.Core
         }
 
         //
-        //      All code modifying the time scale should use this class instead of `UnityEngine.Time.timeScale` for consistent behaviour.
+        //      All code relating to time should use this class instead of `UnityEngine.Time` for consistent behaviour.
         //
 
         /// <summary>
         /// The multiplier for the speed at which the time currently flows.
         /// </summary>
         public static float TimeScale { get => _timeScale; }
+
+        /// <summary>
+        /// Returns the current universal time.
+        /// </summary>
+        public static double UT { get; private set; }
+        
+        /// <summary>
+        /// Returns the delta-time for the current frame.
+        /// </summary>
+        public static float DeltaTime { get => UnityEngine.Time.deltaTime; } // TODO - use when implementing on-rails warp and variable-step time
+
+        /// <summary>
+        /// Returns the fixed delta-time (use in FixedUpdate) for the current frame.
+        /// </summary>
+        public static float FixedDeltaTime { get => UnityEngine.Time.fixedDeltaTime; } // TODO - use when implementing on-rails warp and variable-step time
 
         /// <summary>
         /// Checks if the game is currently paused.
@@ -49,7 +64,6 @@ namespace KSS.Core
         /// </summary>
         public static event Action<TimeScaleChangedData> OnTimescaleChanged;
 
-#warning TODO - add a deltatime wrapper here (or split into several classes) because the deltatimes can be different.
         static float _maxTimeScale = 128.0f;
 
         private static float _timeScale;
@@ -142,6 +156,11 @@ namespace KSS.Core
         void Start()
         {
             SetTimeScale( 1 );
+        }
+
+        private void FixedUpdate()
+        {
+            UT += FixedDeltaTime;
         }
 
         void Update()
