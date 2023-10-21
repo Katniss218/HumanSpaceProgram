@@ -60,6 +60,6 @@ namespace UnityPlus.Serialization
                 new System.Random().NextBytes( _guidData );
             }
         }
-    }
 #endif
+    }
 }

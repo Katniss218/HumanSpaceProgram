@@ -250,6 +250,8 @@ namespace KSS.Components
             SetFlowAcrossConnection( flow, inlet, outlet );
         }
 
+        Vector3 oldSceneAcceleration;
+
         void FixedUpdate()
         {
             if( End1 == null || End2 == null )
@@ -266,7 +268,10 @@ namespace KSS.Components
             sceneAcceleration -= vesselAcceleration;
 #warning TODO - Each part should have its own acceleration (which includes centrifugal acceleration due to spinning vessel), that way if the vessel is spinning, it'll work correctly.
 
-            FixedUpdate_Flow( sceneAcceleration );
+            // this averaging fixes a situation where the thrust is 1, but the flow is 0, then the thrust is 0, but flow is 1, and it alternated like that.
+            FixedUpdate_Flow( (sceneAcceleration + oldSceneAcceleration) / 2 );
+
+            oldSceneAcceleration = sceneAcceleration;
         }
 
         public SerializedData GetData( ISaver s )

@@ -39,6 +39,9 @@ namespace KSS.Core
         /// </summary>
         public static double UT { get; private set; }
         
+        public static float FixedUnscaledDeltaTime { get => UnityEngine.Time.fixedUnscaledDeltaTime; }
+        public static float UnscaledDeltaTime { get => UnityEngine.Time.unscaledDeltaTime; }
+        
         /// <summary>
         /// Returns the delta-time for the current frame.
         /// </summary>
@@ -124,6 +127,8 @@ namespace KSS.Core
                 return;
             }
 
+            Time.fixedDeltaTime = Mathf.Clamp( 0.02f * (timeScale / 8.0f), 0.02f, 0.08f );
+
             _oldTimeScale = _timeScale;
             _timeScale = timeScale;
             UnityEngine.Time.timeScale = timeScale;
@@ -152,6 +157,13 @@ namespace KSS.Core
         //
         // ---
         //
+
+        void Awake()
+        {
+            Time.fixedDeltaTime = 0.02f;
+            Time.maximumDeltaTime = 0.06f;
+            Time.maximumParticleDeltaTime = 0.03f;
+        }
 
         void Start()
         {
@@ -186,7 +198,7 @@ namespace KSS.Core
 
             if( Input.GetKeyDown( KeyCode.Comma ) )
             {
-                if( _timeScale <= 1f )
+                if( _timeScale <= 1.0f )
                     SetTimeScale( 0.0f );
                 else
                     SetTimeScale( _timeScale / 2f );
