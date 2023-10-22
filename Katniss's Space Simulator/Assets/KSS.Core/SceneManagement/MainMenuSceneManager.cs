@@ -5,9 +5,9 @@ namespace KSS.Core
     /// <summary>
     /// A manager that is active in the main menu.
     /// </summary>
-    public class MainMenuManager : MonoBehaviour
+    public class MainMenuSceneManager : MonoBehaviour
     {
-        public const string MAIN_MENU_SCENE_NAME = "MainMenu";
+        public const string SCENE_NAME = "MainMenu";
 
         void Awake()
         {

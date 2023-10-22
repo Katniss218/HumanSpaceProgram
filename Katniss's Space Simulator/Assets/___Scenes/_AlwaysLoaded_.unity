@@ -577,12 +577,16 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: c3906aad464be3a46a5bbb1d8b194a3a, type: 3}
   - assetID: builtin::_TextMesh Pro/Shaders/TMPro_Mobile
     asset: {fileID: 10900000, guid: c334973cef89a9840b0b0c507e0377ab, type: 3}
+  - assetID: builtin::Resources/Sprites/UI/icon_move
+    asset: {fileID: 21300000, guid: d333c4de13ab35746a0f92e8c9569bac, type: 3}
   - assetID: builtin::_TextMesh Pro/Fonts/LiberationSans
     asset: {fileID: 12800000, guid: e3265ab4bf004d28a9537516768c1c75, type: 3}
   - assetID: builtin::KSS/CelestialBodies/Surface/TerrainShader
     asset: {fileID: 4800000, guid: e3f72d5ef871243408ac05fea5ed9243, type: 3}
   - assetID: builtin::Resources/Sprites/std0/ui_percent_bar_bg
     asset: {fileID: 21300000, guid: f329ac740530a7640993d6c7647d30b6, type: 3}
+  - assetID: builtin::Resources/Sprites/UI/icon_pick
+    asset: {fileID: 21300000, guid: f30bc85b231fc2f42bdd29eaf8c8a429, type: 3}
   - assetID: builtin::_TextMesh Pro/Shaders/TMP_SDF SSD
     asset: {fileID: 4800000, guid: 14eb328de4b8eb245bb7cea29e4ac00b, type: 3}
   - assetID: builtin::Resources/Sprites/nodes/m_radial_in
@@ -597,6 +601,8 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: 84147673ec8e2cb47bd5243c36cb4394, type: 3}
   - assetID: builtin::Resources/Sprites/std0/ui_percent_bar_R_bg
     asset: {fileID: 21300000, guid: 94e06069a322b62489cea5cc0be1e1e1, type: 3}
+  - assetID: builtin::KSS.DevUtils/vab
+    asset: {fileID: 4416803039647088028, guid: a4405d36089eda445b6e5e8a3a9565e9, type: 3}
   - assetID: builtin::_TextMesh Pro/Resources/EmojiOne
     asset: {fileID: 11400000, guid: c41005c129ba4d66911b75229fd70b45, type: 2}
   - assetID: builtin::Resources/Sprites/nodes/m_retrograde
@@ -699,12 +705,16 @@ MonoBehaviour:
     asset: {fileID: 1364953004931670300, guid: 8bea1bbd189d59f49affc43660b4bdf3, type: 3}
   - assetID: builtin::Resources/Sprites/nodes/m_normal
     asset: {fileID: 21300000, guid: db8e0f4eb49cd78479eac1492d80f4b8, type: 3}
+  - assetID: builtin::Resources/Sprites/UI/icon_reroot
+    asset: {fileID: 21300000, guid: 0c1966121a464a74aa5f7a889fff13e2, type: 3}
   - assetID: builtin::Resources/1mil_sphere
     asset: {fileID: 4711208715938537054, guid: 0cccc6ea3eaab75469e0c61245c20874, type: 3}
   - assetID: builtin::Resources/Sprites/UI/button_vertical
     asset: {fileID: 21300000, guid: 2c965aa7e8ba0a94a96b12b5163c22e6, type: 3}
   - assetID: builtin::___Scenes/UI Prototyping
     asset: {fileID: 102900000, guid: 3ce3257fcb4019144a2d08a849ea10bd, type: 3}
+  - assetID: builtin::___Scenes/Design
+    asset: {fileID: 102900000, guid: 5caa233315e78dd41b4e84e78aaa336b, type: 3}
   - assetID: builtin::Resources/Sprites/UI/button_list
     asset: {fileID: 21300000, guid: 6ca76087579315445add0a2333ee1986, type: 3}
   - assetID: builtin::Resources/Sprites/UI/button_x_gold_large
@@ -761,6 +771,8 @@ MonoBehaviour:
     asset: {fileID: 8400000, guid: 2fdada8e1127fbe478fb4808954eb395, type: 2}
   - assetID: builtin::_TextMesh Pro/Resources/TMP Settings
     asset: {fileID: 11400000, guid: 3f5b5dff67a942289a9defa416b206f3, type: 2}
+  - assetID: builtin::Resources/Sprites/UI/icon_rotate
+    asset: {fileID: 21300000, guid: 3fee9a7b986e22b43a0f19b9a5a2dd5f, type: 3}
   - assetID: builtin::Resources/Sprites/std0/ui_scrollbar_background
     asset: {fileID: 21300000, guid: 4f933230104877445b21901bed3d2c9e, type: 3}
   - assetID: builtin::_TextMesh Pro/Sprites/EmojiOne
@@ -1000,7 +1012,7 @@ GameObject:
   - component: {fileID: 1611604360}
   - component: {fileID: 1611604361}
   m_Layer: 0
-  m_Name: _ ALWAYS LOADED MANAGERS _
+  m_Name: _ ALWAYS LOADED MANAGER _
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

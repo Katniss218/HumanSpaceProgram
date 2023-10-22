@@ -32,7 +32,7 @@ namespace KSS.Core
         //
 
         /// <summary>
-        /// Invoked at the immediate start of the game. This is always the first invoked event.
+        /// Invoked at the immediate start of the game. This event is always invoked first.
         /// </summary>
         public const string STARTUP_IMMEDIATELY = NAMESPACE_VANILLA + ".startup.immediately";
 
@@ -46,12 +46,22 @@ namespace KSS.Core
         /// </summary>
         public const string STARTUP_GAMEPLAY = NAMESPACE_VANILLA + ".startup.gameplay";
 
+        /// <summary>
+        /// Invoked immediately after loading the design scene.
+        /// </summary>
+        public const string STARTUP_DESIGN = NAMESPACE_VANILLA + ".startup.design";
+
         //
 
         /// <summary>
         /// Invoked when the player toggles the escape (pause) menu in the gameplay scene.
         /// </summary>
         public const string ESCAPE_GAMEPLAY = NAMESPACE_VANILLA + ".escape.gameplay";
+        
+        /// <summary>
+        /// Invoked when the player toggles the escape (pause) menu in the design scene.
+        /// </summary>
+        public const string ESCAPE_DESIGN = NAMESPACE_VANILLA + ".escape.design";
 
         //
 

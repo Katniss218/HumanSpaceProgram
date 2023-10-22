@@ -11,7 +11,7 @@ namespace KSS.Core.Serialization
     {
         public static void LoadAsync( this SaveMetadata save )
         {
-            SceneLoader.UnloadActiveSceneAsync( () => SceneLoader.LoadSceneAsync( "Testing And Shit", true, false, () =>
+            SceneLoader.UnloadActiveSceneAsync( () => SceneLoader.LoadSceneAsync( GameplaySceneManager.SCENE_NAME, true, false, () =>
             {
                 TimelineManager.BeginLoadAsync( save.TimelineID, save.SaveID );
             } ) );

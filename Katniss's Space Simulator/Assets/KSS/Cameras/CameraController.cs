@@ -76,7 +76,8 @@ namespace KSS.Cameras
         /// </remarks>
         public UnityEngine.Camera MainCamera { get => _nearCamera; }
 
-        bool _isMoving;
+        bool _isTranslating;
+        bool _isRotating;
 
         void UpdateZoomLevel()
         {
@@ -123,7 +124,18 @@ namespace KSS.Cameras
 
             this.transform.rotation *= Quaternion.AngleAxis( mouseX * MOVE_MULTIPLIER, Vector3.up );
             this.transform.rotation *= Quaternion.AngleAxis( -mouseY * MOVE_MULTIPLIER, Vector3.right );
+        }
+        
+        void UpdatePosition()
+        {
+            if( ReferenceObject != null )
+                return;
 
+            float mouseX = Input.GetAxis( "Mouse X" );
+            float mouseY = Input.GetAxis( "Mouse Y" );
+
+            this.transform.position += mouseX * MOVE_MULTIPLIER * this.transform.right;
+            this.transform.position += mouseY * MOVE_MULTIPLIER * this.transform.forward;
         }
 
         void TryToggleNearCamera()
@@ -166,18 +178,30 @@ namespace KSS.Cameras
 
                 if( Input.GetKeyDown( KeyCode.Mouse1 ) ) // Mouse1 = Right Mouse Button
                 {
-                    _isMoving = true;
+                    _isRotating = true;
+                }
+                if( Input.GetKeyDown( KeyCode.Mouse2 ) ) // Mouse2 = Middle Mouse Button
+                {
+                    _isTranslating = true;
                 }
             }
 
-            if( _isMoving && Input.GetKeyUp( KeyCode.Mouse1 ) )
+            if( _isRotating && Input.GetKeyUp( KeyCode.Mouse1 ) )
             {
-                _isMoving = false;
+                _isRotating = false;
+            }
+            if( _isTranslating && Input.GetKeyUp( KeyCode.Mouse2 ) )
+            {
+                _isTranslating = false;
             }
 
-            if( _isMoving )
+            if( _isRotating )
             {
                 UpdateOrientation();
+            }
+            if( _isTranslating )
+            {
+                UpdatePosition();
             }
         }
 

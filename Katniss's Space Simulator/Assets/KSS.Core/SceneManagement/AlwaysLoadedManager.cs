@@ -31,7 +31,7 @@ namespace KSS.Core
 
         void Start()
         {
-            SceneLoader.LoadSceneAsync( "MainMenu", true, false, null );
+            SceneLoader.LoadSceneAsync( MainMenuSceneManager.SCENE_NAME, true, false, null );
         }
 
 

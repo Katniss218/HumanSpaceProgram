@@ -12,7 +12,7 @@ using UnityPlus.AssetManagement;
 
 namespace KSS.UI.SceneFactories
 {
-    public static class VanillaGameplayUIFactory
+    public static class GameplaySceneUIFactory
     {
         [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, HSPEvent.NAMESPACE_VANILLA + ".gameplay_ui" )]
         public static void Create( object e )

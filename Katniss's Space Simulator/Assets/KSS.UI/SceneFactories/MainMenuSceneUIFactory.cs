@@ -17,7 +17,7 @@ namespace KSS.UI.SceneFactories
     /// <summary>
     /// Creates the Main Menu UI elements.
     /// </summary>
-    public static class VanillaMainMenuUIFactory
+    public static class MainMenuSceneUIFactory
     {
         static GameObject _startNewGameWindow; // singleton window
         static GameObject _loadWindow; // singleton window
@@ -29,6 +29,8 @@ namespace KSS.UI.SceneFactories
 
             CreateStartNewGameButton( canvas );
             CreateLoadButton( canvas );
+            CreateDesignARocketButton( canvas );
+            CreateDesignAPartButton( canvas );
             CreateSettingsButton( canvas );
             CreateExitButton( canvas );
 
@@ -70,9 +72,29 @@ namespace KSS.UI.SceneFactories
                 .WithAlignment( HorizontalAlignmentOptions.Center );
         }
 
+        private static void CreateDesignARocketButton( IUIElementContainer parent )
+        {
+            parent.AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, -100 ), new Vector2( 200, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
+            {
+                SceneLoader.UnloadActiveSceneAsync( () => SceneLoader.LoadSceneAsync( DesignSceneManager.SCENE_NAME, true, false, null ) );
+            } )
+                .AddText( UILayoutInfo.Fill(), "Design a Rocket" )
+                .WithFont( AssetRegistry.Get<TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
+                .WithAlignment( HorizontalAlignmentOptions.Center );
+        }
+
+        private static void CreateDesignAPartButton( IUIElementContainer parent )
+        {
+            parent.AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, -120 ), new Vector2( 200, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), null )
+                .Disabled()
+                .AddText( UILayoutInfo.Fill(), "Design a Part" )
+                .WithFont( AssetRegistry.Get<TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
+                .WithAlignment( HorizontalAlignmentOptions.Center );
+        }
+
         private static void CreateSettingsButton( IUIElementContainer parent )
         {
-            parent.AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, -60 ), new Vector2( 200, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), null )
+            parent.AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, -200 ), new Vector2( 200, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), null )
                 .Disabled()
                 .AddText( UILayoutInfo.Fill(), "Settings" )
                 .WithFont( AssetRegistry.Get<TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
@@ -81,7 +103,7 @@ namespace KSS.UI.SceneFactories
 
         private static void CreateExitButton( IUIElementContainer parent )
         {
-            parent.AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, -80 ), new Vector2( 200, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
+            parent.AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, -300 ), new Vector2( 150, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
             {
 #if UNITY_EDITOR
                 UnityEditor.EditorApplication.isPlaying = false;

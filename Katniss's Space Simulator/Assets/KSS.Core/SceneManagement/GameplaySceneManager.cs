@@ -5,9 +5,9 @@ namespace KSS.Core
     /// <summary>
     /// A Manager that is active in the gameplay scene.
     /// </summary>
-    public class GameplayManager : MonoBehaviour
+    public class GameplaySceneManager : MonoBehaviour
     {
-        public const string GAMEPLAY_SCENE_NAME = "Testing And Shit"; // TODO - swap out for "Gameplay" when the save system is working.
+        public const string SCENE_NAME = "Testing And Shit"; // TODO - swap out for "Gameplay" when the part with creating and loading rockets is done.
 
         void Awake()
         {

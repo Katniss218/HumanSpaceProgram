@@ -69,7 +69,7 @@
     <Compile Include="Assets\KSS.Core\CelestialBodyManager.cs" />
     <Compile Include="Assets\KSS.Core\BuildingManager.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\IResourceConsumer.cs" />
-    <Compile Include="Assets\KSS.Core\SceneManagement\GameplayManager.cs" />
+    <Compile Include="Assets\KSS.Core\SceneManagement\GameplaySceneManager.cs" />
     <Compile Include="Assets\KSS.Core\CelestialBodyFactory.cs" />
     <Compile Include="Assets\KSS.Core\Building.Serialization.cs" />
     <Compile Include="Assets\KSS.Core\Serialization\TimelineManager.cs" />
@@ -99,7 +99,7 @@
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\IResourceProducer.cs" />
     <Compile Include="Assets\KSS.Core\ReferenceFrames\IReferenceFrame.cs" />
     <Compile Include="Assets\KSS.Core\HumanSpaceProgram.cs" />
-    <Compile Include="Assets\KSS.Core\SceneManagement\MainMenuManager.cs" />
+    <Compile Include="Assets\KSS.Core\SceneManagement\MainMenuSceneManager.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\SubstanceState.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\FlowUtils.cs" />
     <Compile Include="Assets\KSS.Core\SceneManagement\AlwaysLoadedManager.cs" />
@@ -112,6 +112,7 @@
     <Compile Include="Assets\KSS.Core\IPartObject.cs" />
     <Compile Include="Assets\KSS.Core\Components\FLaunchSiteMarker.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\SubstanceStateCollection.cs" />
+    <Compile Include="Assets\KSS.Core\SceneManagement\DesignSceneManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.Core\___KSS.Core.asmdef" />

@@ -14,7 +14,7 @@ using Object = UnityEngine.Object;
 
 namespace KSS.UI.SceneFactories
 {
-    public static class VanillaGameplayEscapeUIFactory
+    public static class GameplayEscapeUIFactory
     {
         static GameObject escapeMenuWindow;
 
@@ -51,7 +51,7 @@ namespace KSS.UI.SceneFactories
 
             window.AddButton( UILayoutInfo.FillHorizontal( 50, 50, 1, -70, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ), () =>
             {
-                SceneLoader.UnloadActiveSceneAsync( () => SceneLoader.LoadSceneAsync( "MainMenu", true, false, null ) );
+                SceneLoader.UnloadActiveSceneAsync( () => SceneLoader.LoadSceneAsync( MainMenuSceneManager.SCENE_NAME, true, false, null ) );
             } )
                 .AddText( UILayoutInfo.Fill(), "MAIN MENU" )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
