@@ -13,24 +13,25 @@ namespace UnityEngine
         /// </summary>
         public static Vector3 GetPrincipalAxis( this Vector3 v )
         {
+            Vector3 newV = v;
             float absX = Mathf.Abs( v.x );
             float absY = Mathf.Abs( v.y );
             float absZ = Mathf.Abs( v.z );
 
             if( absX < absY || absX < absZ )
             {
-                v.x = 0.0f;
+                newV.x = 0.0f;
             }
             if( absY < absX || absY < absZ )
             {
-                v.y = 0.0f;
+                newV.y = 0.0f;
             }
             if( absZ < absX || absZ < absY )
             {
-                v.z = 0.0f;
+                newV.z = 0.0f;
             }
 
-            return v;
+            return newV;
         }
     }
 }

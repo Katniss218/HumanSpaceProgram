@@ -13,6 +13,7 @@ namespace UnityEngine
         /// </summary>
         public static Vector2 GetPrincipalAxis( this Vector2 v )
         {
+            Vector2 newV = v;
             float absX = Mathf.Abs( v.x );
             float absY = Mathf.Abs( v.y );
 
@@ -20,14 +21,14 @@ namespace UnityEngine
             // Leave the vector if it doesn't have the principal axis.
             if( absX < absY )
             {
-                v.x = 0.0f;
+                newV.x = 0.0f;
             }
             if( absY < absX )
             {
-                v.y = 0.0f;
+                newV.y = 0.0f;
             }
 
-            return v;
+            return newV;
         }
     }
 }
