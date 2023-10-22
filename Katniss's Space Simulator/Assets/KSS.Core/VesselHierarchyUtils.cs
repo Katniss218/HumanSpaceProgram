@@ -194,7 +194,7 @@ namespace KSS.Core
                 oldv.RecalculateParts();
                 v.RecalculateParts();
 
-                // Fixing oldv's AIRF pos/rot shouldn't be required here.
+#warning TODO - Fixing oldv's AIRF pos/rot shouldn't be required here. RE: RootObjectTransform airfpos is incorrect.
                 oldv.AIRFPosition = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( oldv.RootPart.position );
                 oldv.AIRFRotation = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( oldv.RootPart.rotation );
             }

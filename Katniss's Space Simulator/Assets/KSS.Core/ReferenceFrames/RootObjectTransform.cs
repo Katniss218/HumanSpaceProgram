@@ -32,7 +32,10 @@ namespace KSS.Core.ReferenceFrames
         /// </summary>
         public Vector3Dbl AIRFPosition
         {
-            get => this._airfPosition;
+            get
+            {
+                return this._airfPosition;
+            }
             set
             {
                 this._airfPosition = value;
@@ -46,7 +49,10 @@ namespace KSS.Core.ReferenceFrames
         /// </summary>
         public QuaternionDbl AIRFRotation
         {
-            get => this._airfRotation;
+            get
+            {
+                return this._airfRotation;
+            }
             set
             {
                 this._airfRotation = value;
@@ -103,8 +109,8 @@ namespace KSS.Core.ReferenceFrames
         //void LateUpdate()
         //{
 #warning TODO - AIRFPosition seems to lag behind one frame, behind the correct position. 
-            // Transforming the scene position on demand instead of getting the AIRF value seems to work some of the time.
-            // Updating it also in lateupdate also seems to fix it, but it breaks loaded position, making the craft drop underground somewhat.
+        // Transforming the scene position on demand instead of getting the AIRF value seems to work some of the time.
+        // Updating it also in lateupdate also seems to fix it, but it breaks loaded position, making the craft drop underground somewhat.
 
         //    this.AIRFPosition = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.transform.position );
         //    this.AIRFRotation = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( this.transform.rotation );
