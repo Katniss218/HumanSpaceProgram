@@ -22,9 +22,8 @@ namespace KSS.Core.ReferenceFrames
         // Root objects store their AIRF positions, children natively store their local coordinates, which as long as they're not obscenely large, will be fine.
         // - An object with a child at 0.00125f can be sent to 10e25 and brought back, and its child will remain at 0.00125f
 
-        Vector3Dbl _airfPosition;
-        QuaternionDbl _airfRotation;
-
+        [SerializeField] Vector3Dbl _airfPosition;
+        [SerializeField] QuaternionDbl _airfRotation;
 
         Rigidbody _rb;
 
@@ -66,7 +65,7 @@ namespace KSS.Core.ReferenceFrames
                 // Rigidbodies keep their own position/rotation and will overwrite the object's position/rotation sometimes.
                 this._rb.position = scenePos;
             }
-            this.transform.position = scenePos;
+            this.transform.position = scenePos; // This is also important to happen always.
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
@@ -79,9 +78,8 @@ namespace KSS.Core.ReferenceFrames
                 // Rigidbodies keep their own position/rotation and will overwrite the object's position/rotation sometimes.
                 this._rb.rotation = sceneRotation;
             }
-            this.transform.rotation = sceneRotation;
+            this.transform.rotation = sceneRotation; // This is also important to happen always.
         }
-
 
         void Awake()
         {
@@ -91,17 +89,26 @@ namespace KSS.Core.ReferenceFrames
 
         void Start()
         {
-            // In case RB is added later (I don't want to lazily check every time though).
+            // In case RB is added later (I don't want to lazily check every time it's retrieved, RB is not required).
             _rb = this.GetComponent<Rigidbody>();
         }
 
         // we need to move the object if the reference frame is moving, and move/rotate it, if the reference frame is rotating.
         void FixedUpdate()
         {
-            this.AIRFPosition = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this._rb == null ? this.transform.position : this._rb.position );
-            this.AIRFRotation = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( this._rb == null ? this.transform.rotation : this._rb.rotation );
+            this.AIRFPosition = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.transform.position );
+            this.AIRFRotation = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( this.transform.rotation );
         }
 
+        //void LateUpdate()
+        //{
+#warning TODO - AIRFPosition seems to lag behind one frame, behind the correct position. 
+            // Transforming the scene position on demand instead of getting the AIRF value seems to work some of the time.
+            // Updating it also in lateupdate also seems to fix it, but it breaks loaded position, making the craft drop underground somewhat.
+
+        //    this.AIRFPosition = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.transform.position );
+        //    this.AIRFRotation = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( this.transform.rotation );
+        //}
 
 
         /// <summary>

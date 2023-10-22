@@ -161,7 +161,6 @@ namespace KSS.Core
             }*/
             //partToSplit.Parent = null;
 
-#warning TODO - Use linear and angular velocities of part that works correctly for spinning vessels.
             // Create the new vessel and add the parts to it.
             bool isAnchored = IsAnchored( partToSplit );
             IPartObject partObject = partToSplit.GetPartObject();
@@ -180,12 +179,13 @@ namespace KSS.Core
                 oldv.RecalculateParts();
                 //b.RecalculateParts();
             }
-            else 
+            else
             {
+#warning TODO - Use linear and angular velocities of part that works correctly for spinning vessels.
                 Vessel v = new VesselFactory().CreatePartless(
                     SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( partToSplit.transform.position ),
                     SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( partToSplit.transform.rotation ),
-                partObject.PhysicsObject.Velocity,
+                    partObject.PhysicsObject.Velocity,
                     partObject.PhysicsObject.AngularVelocity );
 
                 partToSplit.SetParent( v.transform );
@@ -193,6 +193,10 @@ namespace KSS.Core
                 v.SetRootPart( partToSplit );
                 oldv.RecalculateParts();
                 v.RecalculateParts();
+
+                // Fixing oldv's AIRF pos/rot shouldn't be required here.
+                oldv.AIRFPosition = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( oldv.RootPart.position );
+                oldv.AIRFRotation = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( oldv.RootPart.rotation );
             }
         }
 

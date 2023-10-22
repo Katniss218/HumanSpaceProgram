@@ -81,10 +81,10 @@ namespace KSS.DevUtils
             {
                 throw new ArgumentNullException( nameof( launchSite ), "launchSite is null" );
             }
-            Vector3Dbl spawnerPosAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition(
-                launchSite.gameObject.GetComponentInChildren<FLaunchSiteMarker>().transform.position );
-            QuaternionDbl spawnerRotAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation(
-                launchSite.gameObject.GetComponentInChildren<FLaunchSiteMarker>().transform.rotation );
+
+            FLaunchSiteMarker launchSiteSpawner = launchSite.gameObject.GetComponentInChildren<FLaunchSiteMarker>();
+            Vector3Dbl spawnerPosAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( launchSiteSpawner.transform.position );
+            QuaternionDbl spawnerRotAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( launchSiteSpawner.transform.rotation );
 
             var v2 = CreateDummyVessel( spawnerPosAirf, spawnerRotAirf ); // position is temp.
 
@@ -129,7 +129,7 @@ namespace KSS.DevUtils
             conn.End2.Position = new Vector3( 0.0f, 1.5f, 0.0f );
             conn.CrossSectionArea = 0.1f;
 
-            Substance sbsF = AssetRegistry.Get<Substance>("substance.f");
+            Substance sbsF = AssetRegistry.Get<Substance>( "substance.f" );
             Substance sbsOX = AssetRegistry.Get<Substance>( "substance.ox" );
 
             var tankSmallTank = tankP.GetComponent<FBulkContainer_Sphere>();

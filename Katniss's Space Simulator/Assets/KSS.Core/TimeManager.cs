@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace KSS.Core
 {
@@ -11,7 +12,7 @@ namespace KSS.Core
     /// Manages the speed at which the time flows.
     /// </summary>
     [DisallowMultipleComponent]
-    public class TimeManager : MonoBehaviour
+    public class TimeManager : HSPManager, IPersistent
     {
         public struct TimeScaleChangedData
         {
@@ -38,10 +39,10 @@ namespace KSS.Core
         /// Returns the current universal time.
         /// </summary>
         public static double UT { get; private set; }
-        
+
         public static float FixedUnscaledDeltaTime { get => UnityEngine.Time.fixedUnscaledDeltaTime; }
         public static float UnscaledDeltaTime { get => UnityEngine.Time.unscaledDeltaTime; }
-        
+
         /// <summary>
         /// Returns the delta-time for the current frame.
         /// </summary>
@@ -203,6 +204,20 @@ namespace KSS.Core
                 else
                     SetTimeScale( _timeScale / 2f );
             }
+        }
+
+        public SerializedData GetData( ISaver s )
+        {
+            return new SerializedObject()
+            {
+                { "ut", UT }
+            };
+        }
+
+        public void SetData( ILoader l, SerializedData data )
+        {
+            if( data.TryGetValue( "ut", out var ut ) )
+                UT = ut;
         }
     }
 }

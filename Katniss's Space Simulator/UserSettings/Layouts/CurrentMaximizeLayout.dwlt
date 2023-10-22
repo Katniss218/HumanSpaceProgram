@@ -24,7 +24,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 200}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 13455
+  controlID: 5978
 --- !u!114 &2
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -150,7 +150,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 200}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 1
-  controlID: 13456
+  controlID: 5979
 --- !u!114 &4
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -175,7 +175,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 100}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 13457
+  controlID: 5980
 --- !u!114 &5
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -195,8 +195,8 @@ MonoBehaviour:
     y: 0
     width: 313
     height: 590
-  m_MinSize: {x: 201, y: 221}
-  m_MaxSize: {x: 4001, y: 4021}
+  m_MinSize: {x: 200, y: 200}
+  m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 6}
   m_Panes:
   - {fileID: 6}
@@ -235,21 +235,21 @@ MonoBehaviour:
       scrollPos: {x: 0, y: 0}
       m_SelectedIDs: 
       m_LastClickedID: 0
-      m_ExpandedIDs: 7090ebff92ceebff9acdecffeacdecff76cfecffaacfecfff2cfecfff8cfecff14d0ecffea47eeff1249eeff2665eeff0e7eeeffea16efff3058efffd297efffc4a6efff2ed2efff2af1efffda0ff0fff679f0ff1aacf1ffd6caf1ff8209f2ff1c27f2ffe085f2ffec85f2ff4287f2ffbca5f2fff6e4f2ff02e5f2ff58e6f2ff7eeff2ffc40ef3ff0e38f3ffeafefdff022effff1c2effff2a2effff2232ffff206cffffc26effff1870ffffb697ffffd097ffffde97ffff749affff809affffd69bffff86baffff08d9ffff98f7ffff08fbffff6a8c0000888c0000208f00003e8f0000
+      m_ExpandedIDs: b4c8fdff5a80fefff892feff3ca4feff46b6feff4ce3feff42f2feff5c00ffffa210ffff4c20ffff3a30ffffe63effff8078ffff328bffff5c9cffffeaa9ffffa8b7fffff0c8ffff5edfffff60e6ffffb0f5ffff4cf8ffffc8f8ffffd0f9ffff0cfaffff08fbffff
       m_RenameOverlay:
         m_UserAcceptedRename: 0
-        m_Name: 
-        m_OriginalName: 
+        m_Name: tempname_vessel
+        m_OriginalName: tempname_vessel
         m_EditFieldRect:
           serializedVersion: 2
           x: 0
           y: 0
           width: 0
           height: 0
-        m_UserData: 0
+        m_UserData: -71516
         m_IsWaitingForDelay: 0
         m_IsRenaming: 0
-        m_OriginalEventType: 11
+        m_OriginalEventType: 0
         m_IsRenamingFilename: 0
         m_ClientGUIView: {fileID: 5}
       m_SearchString: 
@@ -545,9 +545,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: -0.81260777, y: 23.974342, z: -7.7593555}
+    m_Target: {x: -1037.5084, y: 3590.005, z: 6666.774}
     speed: 2
-    m_Value: {x: -0.81260777, y: 23.974342, z: -7.7593555}
+    m_Value: {x: -1037.5084, y: 3590.005, z: 6666.774}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 2
@@ -593,13 +593,13 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0.5
   m_Rotation:
-    m_Target: {x: -0.036930524, y: 0.8941605, z: 0.43989748, w: 0.07532493}
+    m_Target: {x: 0.31464583, y: 0.56455386, z: 0.24577554, w: -0.7224611}
     speed: 2
-    m_Value: {x: -0.03692922, y: 0.894129, z: 0.43988195, w: 0.07532227}
+    m_Value: {x: 0.31463346, y: 0.5645316, z: 0.24576586, w: -0.7224327}
   m_Size:
-    m_Target: 51.253956
+    m_Target: 8.603972
     speed: 2
-    m_Value: 51.253956
+    m_Value: 8.603972
   m_Ortho:
     m_Target: 0
     speed: 2
@@ -647,7 +647,7 @@ MonoBehaviour:
     x: 313
     y: 73
     width: 1115
-    height: 568
+    height: 569
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
     m_LastAppliedPresetName: Default
@@ -1718,7 +1718,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 1
   m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: ProjectBrowser
+  m_Name: ConsoleWindow
   m_EditorClassIdentifier: 
   m_Children: []
   m_Position:
@@ -1727,14 +1727,14 @@ MonoBehaviour:
     y: 590
     width: 1430
     height: 357
-  m_MinSize: {x: 231, y: 271}
-  m_MaxSize: {x: 10001, y: 10021}
-  m_ActualView: {fileID: 11}
+  m_MinSize: {x: 100, y: 100}
+  m_MaxSize: {x: 4000, y: 4000}
+  m_ActualView: {fileID: 12}
   m_Panes:
   - {fileID: 11}
   - {fileID: 12}
-  m_Selected: 0
-  m_LastSelected: 1
+  m_Selected: 1
+  m_LastSelected: 0
 --- !u!114 &11
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -1776,22 +1776,22 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/KSS/Effects/Atmospheres
+    - Assets/KSS.UI
     m_Globs: []
     m_OriginalText: 
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/KSS/Effects/Atmospheres
+  - Assets/KSS.UI
   m_LastFoldersGridSize: -1
   m_LastProjectPath: E:\GIT\KatnisssSpaceSimulator\Katniss's Space Simulator
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 383}
-    m_SelectedIDs: ee4a0000
-    m_LastClickedID: 19182
-    m_ExpandedIDs: 00000000a04a0000a24a0000a44a0000a64a0000a84a0000aa4a0000ac4a0000ae4a0000b04a0000b24a0000b44a0000b64a0000b84a0000ba4a0000bc4a0000be4a0000c04a0000c24a0000c44a0000c64a0000c84a0000ca4a0000cc4a000000ca9a3b
+    scrollPos: {x: 0, y: 276}
+    m_SelectedIDs: 464a0000
+    m_LastClickedID: 19014
+    m_ExpandedIDs: 00000000224a0000244a0000264a0000284a00002a4a00002c4a00002e4a0000304a0000324a0000344a0000364a0000384a00003a4a00003c4a00003e4a0000404a0000424a0000444a0000464a0000484a00004a4a00004c4a00004e4a000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1819,7 +1819,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 00000000a04a0000a24a0000a44a0000a64a0000a84a0000aa4a0000ac4a0000ae4a0000b04a0000b24a0000b44a0000b64a0000b84a0000ba4a0000bc4a0000be4a0000c04a0000c24a0000c44a0000c64a0000c84a0000ca4a0000cc4a000000ca9a3b
+    m_ExpandedIDs: 00000000224a0000244a0000264a0000284a00002a4a00002c4a00002e4a0000304a0000324a0000344a0000364a0000384a00003a4a00003c4a00003e4a0000404a0000424a0000444a0000464a0000484a00004a4a00004c4a00004e4a000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1922,15 +1922,15 @@ MonoBehaviour:
     y: 0
     width: 490
     height: 947
-  m_MinSize: {x: 276, y: 71}
-  m_MaxSize: {x: 4001, y: 4021}
+  m_MinSize: {x: 275, y: 50}
+  m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 14}
   m_Panes:
   - {fileID: 14}
   - {fileID: 15}
   - {fileID: 16}
   m_Selected: 0
-  m_LastSelected: 2
+  m_LastSelected: 1
 --- !u!114 &14
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -1992,16 +1992,16 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 1443
+    x: 1430
     y: 73
-    width: 476
+    width: 489
     height: 926
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
     m_LastAppliedPresetName: Default
     m_SaveData: []
   m_Spl:
-    ID: 9869
+    ID: 160
     splitterInitialOffset: 0
     currentActiveSplitter: -1
     realSizes:
@@ -2199,7 +2199,7 @@ MonoBehaviour:
       name: Katniss's Space Simulator
       fullName: Katniss's Space Simulator
       resultStatus: 1
-      duration: 0.0773057
+      duration: 0.0998598
       messages: 
       output: 
       stacktrace: 
@@ -2215,7 +2215,7 @@ MonoBehaviour:
       name: KSS.Tests.EditMode.dll
       fullName: E:/GIT/KatnisssSpaceSimulator/Katniss's Space Simulator/Library/ScriptAssemblies/KSS.Tests.EditMode.dll
       resultStatus: 1
-      duration: 0.0485785
+      duration: 0.0693544
       messages: 
       output: 
       stacktrace: 
@@ -2231,7 +2231,7 @@ MonoBehaviour:
       name: KSS_Tests_EditMode
       fullName: KSS_Tests_EditMode
       resultStatus: 1
-      duration: 0.047523
+      duration: 0.0684131
       messages: 
       output: 
       stacktrace: 
@@ -2247,7 +2247,7 @@ MonoBehaviour:
       name: E_Template
       fullName: KSS_Tests_EditMode.E_Template
       resultStatus: 1
-      duration: 0.0307628
+      duration: 0.0537337
       messages: 
       output: 
       stacktrace: 
@@ -2263,7 +2263,7 @@ MonoBehaviour:
       name: CreatedGameObjectExists
       fullName: KSS_Tests_EditMode.E_Template.CreatedGameObjectExists
       resultStatus: 1
-      duration: 0.0149021
+      duration: 0.038397
       messages: 
       output: 
       stacktrace: 
@@ -2280,7 +2280,7 @@ MonoBehaviour:
       name: SubstanceStateCollectionTests
       fullName: KSS_Tests_EditMode.SubstanceStateCollectionTests
       resultStatus: 1
-      duration: 0.0147791
+      duration: 0.0130061
       messages: 
       output: 
       stacktrace: 
@@ -2296,7 +2296,7 @@ MonoBehaviour:
       name: Add___MultipleSubstances___AddsToCorresponding
       fullName: KSS_Tests_EditMode.SubstanceStateCollectionTests.Add___MultipleSubstances___AddsToCorresponding
       resultStatus: 1
-      duration: 0.002761
+      duration: 0.0027055
       messages: 
       output: 
       stacktrace: 
@@ -2313,7 +2313,7 @@ MonoBehaviour:
       name: Add___NegativeAmount___Subtracts
       fullName: KSS_Tests_EditMode.SubstanceStateCollectionTests.Add___NegativeAmount___Subtracts
       resultStatus: 1
-      duration: 0.000329
+      duration: 0.0002628
       messages: 
       output: 
       stacktrace: 
@@ -2330,7 +2330,7 @@ MonoBehaviour:
       name: Add___SingleSubstance___AddsToExisting
       fullName: KSS_Tests_EditMode.SubstanceStateCollectionTests.Add___SingleSubstance___AddsToExisting
       resultStatus: 1
-      duration: 0.0002542
+      duration: 0.0002457
       messages: 
       output: 
       stacktrace: 
@@ -2347,7 +2347,7 @@ MonoBehaviour:
       name: Add___SingleSubstance_NegativeDt___RemovesFromExisting
       fullName: KSS_Tests_EditMode.SubstanceStateCollectionTests.Add___SingleSubstance_NegativeDt___RemovesFromExisting
       resultStatus: 1
-      duration: 0.0003205
+      duration: 0.0002411
       messages: 
       output: 
       stacktrace: 
@@ -2364,7 +2364,7 @@ MonoBehaviour:
       name: Add___ToEmpty___AddsNewSubstance
       fullName: KSS_Tests_EditMode.SubstanceStateCollectionTests.Add___ToEmpty___AddsNewSubstance
       resultStatus: 1
-      duration: 0.0005822
+      duration: 0.0005282
       messages: 
       output: 
       stacktrace: 
@@ -2381,7 +2381,7 @@ MonoBehaviour:
       name: Add___ToEmpty_NegativeDt___AddsNewSubstanceWithNegativeAmount
       fullName: KSS_Tests_EditMode.SubstanceStateCollectionTests.Add___ToEmpty_NegativeDt___AddsNewSubstanceWithNegativeAmount
       resultStatus: 1
-      duration: 0.0003474
+      duration: 0.0003221
       messages: 
       output: 
       stacktrace: 
@@ -2398,7 +2398,7 @@ MonoBehaviour:
       name: Empty___ShouldBeEmpty
       fullName: KSS_Tests_EditMode.SubstanceStateCollectionTests.Empty___ShouldBeEmpty
       resultStatus: 1
-      duration: 0.0001587
+      duration: 0.0001458
       messages: 
       output: 
       stacktrace: 
@@ -2462,9 +2462,9 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 1445
+    x: 1430
     y: 73
-    width: 474
+    width: 489
     height: 926
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:

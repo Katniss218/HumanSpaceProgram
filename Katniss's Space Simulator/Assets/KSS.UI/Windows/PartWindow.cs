@@ -69,6 +69,9 @@ namespace KSS.UI.Windows
             }
         }
 
+        /// <summary>
+        /// Checks if there is a part window being displayed for the specified transform.
+        /// </summary>
         public static bool ExistsFor( Transform referencePart )
         {
             // Remove destroyed windows, and windows referencing destroyed parts (if any leaked out) from the list.
@@ -89,8 +92,11 @@ namespace KSS.UI.Windows
             return false;
         }
 
+        /// <param name="referencePart">The transform that will serve as the root for the part window.</param>
         public static PartWindow Create( Transform referencePart )
         {
+            // Note that this method shouldn't handle any redirecting,
+            // so if you invoke it with the transform of a collider that doesn't have any functionalities attached, it will not show anything.
             if( referencePart == null )
             {
                 throw new ArgumentNullException( nameof( referencePart ), $"Can't create a part window for a nonexistent part." );
@@ -103,7 +109,9 @@ namespace KSS.UI.Windows
                 .WithRelationHightlight( out WindowRelationHighlight relationHighlight );
 
 #warning TODO - proper display names. (display name could be searched towards the root)
-            window.AddText( UILayoutInfo.FillHorizontal(0, 0, 1f, 0, 30 ), referencePart.gameObject.name )
+            // masses/etc can be summed up from components in children of reference part.
+
+            window.AddText( UILayoutInfo.FillHorizontal( 0, 0, 1f, 0, 30 ), referencePart.gameObject.name )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 

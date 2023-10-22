@@ -11,7 +11,7 @@ namespace KSS.UI
     /// <summary>
     /// Manages clicking in the physical world of the gameplay scene.
     /// </summary>
-    public class GameplayClickInteractionManager : MonoBehaviour
+    public class GameplayClickInteractionManager : HSPManager
     {
         /*
         
@@ -22,13 +22,13 @@ namespace KSS.UI
 
         private void Update()
         {
-            if( UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() )
-            {
-                return;
-            }
-
             if( Input.GetKeyDown( KeyCode.Mouse0 ) )
             {
+                if( UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() )
+                {
+                    return;
+                }
+
                 if( !Physics.Raycast( CameraController.Instance.MainCamera.ScreenPointToRay( Input.mousePosition ), out RaycastHit hit ) )
                 {
                     return;

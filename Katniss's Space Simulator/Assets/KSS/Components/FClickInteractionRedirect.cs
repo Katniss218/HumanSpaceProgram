@@ -8,9 +8,15 @@ using UnityPlus.Serialization;
 
 namespace KSS.Components
 {
+    /// <summary>
+    /// Redirects click interactions to a different transform.
+    /// </summary>
     [RequireComponent( typeof( Collider ) )]
     public class FClickInteractionRedirect : MonoBehaviour, IPersistent
     {
+        /// <summary>
+        /// The click action on the object of this component will be redirected to this target.
+        /// </summary>
         [field: SerializeField]
         public Transform Target { get; set; }
 
