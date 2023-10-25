@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace KSS.Components
+namespace KSS.Core.Components
 {
     /// <summary>
-    /// Redirects click interactions to a different transform.
+    /// Redirects click interactions to a different <see cref="GameObject"/>.
     /// </summary>
     [RequireComponent( typeof( Collider ) )]
     public class FClickInteractionRedirect : MonoBehaviour, IPersistent
@@ -18,7 +18,7 @@ namespace KSS.Components
         /// The click action on the object of this component will be redirected to this target.
         /// </summary>
         [field: SerializeField]
-        public Transform Target { get; set; }
+        public GameObject Target { get; set; }
 
         public SerializedData GetData( ISaver s )
         {
@@ -31,7 +31,7 @@ namespace KSS.Components
         public void SetData( ILoader l, SerializedData data )
         {
             if( data.TryGetValue( "target", out var target ) )
-                this.Target = (Transform)l.ReadObjectReference( target );
+                this.Target = (GameObject)l.ReadObjectReference( target );
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using KSS.Cameras;
-using KSS.Components;
 using KSS.Core;
+using KSS.Core.Components;
 using KSS.UI.Windows;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,9 +41,9 @@ namespace KSS.UI
                 }
 
                 FClickInteractionRedirect redirectComponent = clickedPart.GetComponent<FClickInteractionRedirect>();
-                if( redirectComponent != null )
+                if( redirectComponent != null && redirectComponent.Target != null )
                 {
-                    clickedPart = redirectComponent.Target;
+                    clickedPart = redirectComponent.Target.transform;
                 }
 
                 PartWindow.ExistsFor( clickedPart );

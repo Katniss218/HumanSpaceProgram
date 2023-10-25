@@ -90,5 +90,17 @@ namespace UnityEngine
         {
             return ((1 << gameObject.layer) & layerMask) != 0;
         }
+
+        public static void SetLayer( this GameObject gameObject, int layer, bool recursive = false )
+        {
+            gameObject.layer = layer;
+            if( recursive )
+            {
+                foreach( Transform child in gameObject.transform )
+                {
+                    SetLayer( child.gameObject, layer, true );
+                }
+            }
+        }
     }
 }

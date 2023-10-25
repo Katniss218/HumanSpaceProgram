@@ -61,10 +61,12 @@
     <Compile Include="Assets\KSS.UI\CanvasName.cs" />
     <Compile Include="Assets\KSS.UI\SceneFactories\GameplaySceneUIFactory.cs" />
     <Compile Include="Assets\KSS.UI\IResourceContainerUI.cs" />
+    <Compile Include="Assets\KSS.UI\PartListEntryUI.cs" />
     <Compile Include="Assets\KSS.UI\Windows\LoadWindow.cs" />
     <Compile Include="Assets\KSS.UI\SceneFactories\GameplayEscapeUIFactory.cs" />
     <Compile Include="Assets\KSS.UI\Windows\WindowRelationHighlight.cs" />
     <Compile Include="Assets\KSS.UI\SceneFactories\MainMenuSceneUIFactory.cs" />
+    <Compile Include="Assets\KSS.UI\PartListUI.cs" />
     <Compile Include="Assets\KSS.UI\TimewarpReadoutUI.cs" />
     <Compile Include="Assets\KSS.UI\GameplayClickInteractionManager.cs" />
     <Compile Include="Assets\KSS.UI\TimelineMetadataUI.cs" />
@@ -73,10 +75,8 @@
     <Compile Include="Assets\KSS.UI\Windows\StartNewGameWindow.cs" />
     <Compile Include="Assets\KSS.UI\Windows\PartWindow.cs" />
     <Compile Include="Assets\KSS.UI\AccelerationReadoutUI.cs" />
-    <Compile Include="Assets\KSS.UI\FPSCounterUI.cs" />
     <Compile Include="Assets\KSS.UI\SceneFactories\DesignSceneUIFactory.cs" />
-    <Compile Include="Assets\KSS.UI\PartListUI.cs" />
-    <Compile Include="Assets\KSS.UI\PartListEntryUI.cs" />
+    <Compile Include="Assets\KSS.UI\FPSCounterUI.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.UI\___KSS.UI.asmdef" />

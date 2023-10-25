@@ -14,6 +14,10 @@ namespace KSS.UI
     {
         private string _partId;
 
+        void OnClick()
+        {
+
+        }
 
         public static PartListEntryUI Create( IUIElementContainer parent, UILayoutInfo layout, string partId )
         {
