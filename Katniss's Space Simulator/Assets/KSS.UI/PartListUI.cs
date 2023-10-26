@@ -37,8 +37,10 @@ namespace KSS.UI
 
         public static PartListUI Create( IUIElementContainer parent, UILayoutInfo layout )
         {
-            UIPanel uiPanel = parent.AddPanel( layout, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/sequencer_element" ) );
-            UIScrollView uiScroll = uiPanel.AddVerticalScrollView( layout, 200 );
+            UIPanel uiPanel = parent.AddPanel( layout, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_list_background" ) );
+            UIScrollView uiScroll = uiPanel.AddVerticalScrollView( UILayoutInfo.Fill( 0, 0, 24, 100 ), 200 )
+                .WithVerticalScrollbar( UILayoutInfo.FillVertical( 0, 0, 1f, -2, 10 ), null, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_handle" ), out _ );
+            UIInputField filterIF = uiPanel.AddInputField( UILayoutInfo.FillHorizontal( 2, 2, 1f, -2, 20 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field_ha" ) );
 
             PartListUI partListUI = uiPanel.gameObject.AddComponent<PartListUI>();
             partListUI._partIds = new List<string>();
