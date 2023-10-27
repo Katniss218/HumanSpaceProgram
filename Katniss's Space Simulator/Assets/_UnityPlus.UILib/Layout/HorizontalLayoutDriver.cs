@@ -9,9 +9,9 @@ using UnityPlus.UILib.UIElements;
 namespace UnityPlus.UILib.Layout
 {
     /// <summary>
-    /// A layout driver that lays the elements out vertically and sequentially.
+    /// A layout driver that lays the elements out horizontally and sequentially.
     /// </summary>
-    public sealed class VerticalLayoutDriver : LayoutDriver
+    public sealed class HorizontalLayoutDriver : LayoutDriver
     {
         public enum Direction : byte
         {

@@ -14,7 +14,7 @@ namespace UnityPlus.UILib.UIElements
 
         public static UIScrollView AddVerticalScrollView( this IUIElementContainer parent, UILayoutInfo layout, float contentHeight )
         {
-            return AddScrollView( parent, layout, UILayoutInfo.FillHorizontal( 0, 0, 0.0f, 0, contentHeight ), false, true );
+            return AddScrollView( parent, layout, UILayoutInfo.FillHorizontal( 0, 0, 1.0f, 0, contentHeight ), false, true );
         }
 
         static UIScrollView AddScrollView( this IUIElementContainer parent, UILayoutInfo layout, UILayoutInfo contentLayout, bool horizontal, bool vertical )

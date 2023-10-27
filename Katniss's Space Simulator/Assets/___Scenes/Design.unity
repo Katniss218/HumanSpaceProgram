@@ -465,9 +465,32 @@ PrefabInstance:
       propertyPath: m_Name
       value: sv
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: df49b77668743fb41ad8028805e8e722, type: 3}
+      propertyPath: m_Layer
+      value: 24
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []
   m_SourcePrefab: {fileID: 100100000, guid: df49b77668743fb41ad8028805e8e722, type: 3}
+--- !u!1 &289283173 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: df49b77668743fb41ad8028805e8e722, type: 3}
+  m_PrefabInstance: {fileID: 289283172}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &289283174
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 289283173}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -2124705421725058983, guid: df49b77668743fb41ad8028805e8e722, type: 3}
 --- !u!1 &307652030
 GameObject:
   m_ObjectHideFlags: 0
@@ -910,6 +933,47 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 14
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!21 &552443191
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Hidden/Atmosphere
+  m_Shader: {fileID: 4800000, guid: 2ae1634ae2ad45844b4e5a0087a6833b, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _Texture:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _DensityFalloffPower: 1.77
+    - _InScatteringPointCount: 5
+    - _MaxRadius: 125
+    - _MinRadius: 0
+    - _OpticalDepthPointCount: 5
+    - _ScatteringStrength: 4
+    - _TerminatorFalloff: 32
+    m_Colors:
+    - _Center: {r: 0, g: 0, b: 0, a: 1}
+    - _ScatteringWavelengths: {r: 700, g: 530, b: 400, a: 1}
+    - _SunDirection: {r: 0, g: 0, b: 0, a: 1}
+  m_BuildTextureStacks: []
 --- !u!1 &917183402
 GameObject:
   m_ObjectHideFlags: 0
@@ -1202,47 +1266,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!21 &1135141674
-Material:
-  serializedVersion: 8
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Hidden/Atmosphere
-  m_Shader: {fileID: 4800000, guid: 2ae1634ae2ad45844b4e5a0087a6833b, type: 3}
-  m_Parent: {fileID: 0}
-  m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
-  m_InvalidKeywords: []
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_LockedProperties: 
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _Texture:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Ints: []
-    m_Floats:
-    - _DensityFalloffPower: 1.77
-    - _InScatteringPointCount: 5
-    - _MaxRadius: 125
-    - _MinRadius: 0
-    - _OpticalDepthPointCount: 5
-    - _ScatteringStrength: 4
-    - _TerminatorFalloff: 32
-    m_Colors:
-    - _Center: {r: 0, g: 0, b: 0, a: 1}
-    - _ScatteringWavelengths: {r: 700, g: 530, b: 400, a: 1}
-    - _SunDirection: {r: 0, g: 0, b: 0, a: 1}
-  m_BuildTextureStacks: []
 --- !u!1 &1144275547
 GameObject:
   m_ObjectHideFlags: 0
@@ -1316,7 +1339,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4298a5610bd9d94f869f4cf69e24435, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _material: {fileID: 1135141674}
+  _material: {fileID: 552443191}
   _rt: {fileID: 0}
 --- !u!4 &1144275550
 Transform:
@@ -1697,7 +1720,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1870219029}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: af267f450cd2b8f41ba79897725c7711, type: 3}
+  m_Script: {fileID: 11500000, guid: 12e66a667bdacb54e80fa9ce46c3be0b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _heldPart: {fileID: 0}

@@ -535,8 +535,12 @@ MonoBehaviour:
     asset: {fileID: 2800000, guid: 305ae7eb94909c644a2f1a85d8e03dab, type: 3}
   - assetID: builtin::_TextMesh Pro/Shaders/TMPro
     asset: {fileID: 10900000, guid: 407bc68d299748449bbf7f48ee690f8d, type: 3}
+  - assetID: builtin::Resources/Sprites/UI/button_30x30
+    asset: {fileID: 21300000, guid: 50efd038fddeadf4abde841f91139ac1, type: 3}
   - assetID: builtin::Resources/Sprites/UI/part_list_entry_background
     asset: {fileID: 21300000, guid: 7099b0c3ab08cbc4c9257ebf49c24b1d, type: 3}
+  - assetID: builtin::Resources/Sprites/UI/category_background
+    asset: {fileID: 21300000, guid: 80ca6d8af4c830041b7842e6323e7e0c, type: 3}
   - assetID: builtin::Resources/Prefabs/Parts/part.tank
     asset: {fileID: 1175757436153444479, guid: 90c1928201a9f4745b5556dbfcb4d2f7, type: 3}
   - assetID: builtin::KSS.DevUtils/cube/Yn
@@ -699,6 +703,8 @@ MonoBehaviour:
     asset: {fileID: 11400000, guid: f952c082cb03451daed3ee968ac6c63e, type: 2}
   - assetID: builtin::KSS.DevUtils/untitled 1
     asset: {fileID: 6239881831769578202, guid: f9eaf569e8e8f9b4e976a3fb0fdf85c8, type: 3}
+  - assetID: builtin::Resources/Sprites/UI/icon_snap
+    asset: {fileID: 21300000, guid: 0aaedc3b6c55cd34f8e7dd710d94ed84, type: 3}
   - assetID: builtin::Resources/Sprites/std0/ui_sequencer_item
     asset: {fileID: 21300000, guid: 1a42060aa0081994c83857d0dbf0d8bb, type: 3}
   - assetID: builtin::KSS/Effects/Atmospheres/Atmosphere

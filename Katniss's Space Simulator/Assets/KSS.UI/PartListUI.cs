@@ -15,7 +15,9 @@ namespace KSS.UI
     {
         private List<string> _partIds;
         private List<PartListEntryUI> _entries = new List<PartListEntryUI>();
+
         private IUIElementContainer _list;
+        private IUIElementContainer _categoryList;
 
         public void Refresh()
         {
@@ -38,13 +40,15 @@ namespace KSS.UI
         public static PartListUI Create( IUIElementContainer parent, UILayoutInfo layout )
         {
             UIPanel uiPanel = parent.AddPanel( layout, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_list_background" ) );
-            UIScrollView uiScroll = uiPanel.AddVerticalScrollView( UILayoutInfo.Fill( 0, 0, 24, 100 ), 200 )
-                .WithVerticalScrollbar( UILayoutInfo.FillVertical( 0, 0, 1f, -2, 10 ), null, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_handle" ), out _ );
             UIInputField filterIF = uiPanel.AddInputField( UILayoutInfo.FillHorizontal( 2, 2, 1f, -2, 20 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field_ha" ) );
+            UIScrollView uiScroll = uiPanel.AddVerticalScrollView( UILayoutInfo.Fill( 42, 2, 24, 100 ), 200 )
+                .WithVerticalScrollbar( UILayoutInfo.FillVertical( 0, 0, 1f, 0, 10 ), null, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_handle" ), out _ );
+            UIScrollView categoryScroll = uiPanel.AddVerticalScrollView( UILayoutInfo.FillVertical( 24, 100, 0f, 0, 40 ), 200 );
 
             PartListUI partListUI = uiPanel.gameObject.AddComponent<PartListUI>();
             partListUI._partIds = new List<string>();
             partListUI._list = uiScroll;
+            partListUI._categoryList = categoryScroll;
             partListUI.Refresh();
 
             return partListUI;

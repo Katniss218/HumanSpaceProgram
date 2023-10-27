@@ -25,10 +25,11 @@ namespace KSS.UI.SceneFactories
 
             CreatePartList( canvas );
             CreateTopPanel( canvas );
-            CreateGizmoToggles( canvas );
+            CreateToolSelector( canvas );
+            CreatePickToolOptions( canvas );
         }
 
-        const float PART_LIST_WIDTH = 250f;
+        const float PART_LIST_WIDTH = 285f;
 
         private static void CreatePartList( UICanvas canvas )
         {
@@ -54,7 +55,7 @@ namespace KSS.UI.SceneFactories
             } );
         }
 
-        private static void CreateGizmoToggles( UICanvas canvas )
+        private static void CreateToolSelector( UICanvas canvas )
         {
             UIPanel uiPanel = canvas.AddPanel( new UILayoutInfo( new Vector2( 0, 1 ), new Vector2( PART_LIST_WIDTH + 10, -32 ), new Vector2( (30 + 2) * 4, 30 ) ), null );
 
@@ -62,6 +63,14 @@ namespace KSS.UI.SceneFactories
             UIButton moveButton = uiPanel.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 32, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/toolicon_move" ), null );
             UIButton rotateButton = uiPanel.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 64, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/toolicon_rotate" ), null );
             UIButton rerootButton = uiPanel.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 96, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/toolicon_reroot" ), null );
+        }
+
+        private static void CreatePickToolOptions( UICanvas canvas )
+        {
+            UIPanel uiPanel = canvas.AddPanel( new UILayoutInfo( new Vector2( 0, 1 ), new Vector2( PART_LIST_WIDTH + 10 + ((30 + 2) * 4) + 10, -32 ), new Vector2( 62, 30 ) ), null );
+
+            UIButton buttonSnap = uiPanel.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 0, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/icon_snap" ), null );
+            UIButton buttonSnapNum = uiPanel.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 32, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
         }
     }
 }
