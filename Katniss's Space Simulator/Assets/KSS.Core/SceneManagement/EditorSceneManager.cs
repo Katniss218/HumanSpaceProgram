@@ -6,9 +6,9 @@ namespace KSS.Core
     /// <summary>
     /// A Manager that is active in the gameplay scene.
     /// </summary>
-    public class DesignSceneManager : MonoBehaviour
+    public class EditorSceneManager : MonoBehaviour
     {
-        public const string SCENE_NAME = "Design";
+        public const string SCENE_NAME = "Editor";
 
         void Awake()
         {

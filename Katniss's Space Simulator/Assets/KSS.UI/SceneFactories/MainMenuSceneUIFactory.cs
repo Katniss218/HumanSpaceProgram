@@ -85,9 +85,12 @@ namespace KSS.UI.SceneFactories
 
         private static void CreateDesignAPartButton( IUIElementContainer parent )
         {
-            parent.AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, -120 ), new Vector2( 200, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), null )
+            parent.AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, -120 ), new Vector2( 200, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
+            {
+                SceneLoader.UnloadActiveSceneAsync( () => SceneLoader.LoadSceneAsync( EditorSceneManager.SCENE_NAME, true, false, null ) );
+            } )
                 .Disabled()
-                .AddText( UILayoutInfo.Fill(), "Design a Part" )
+                .AddText( UILayoutInfo.Fill(), "Part Editor" )
                 .WithFont( AssetRegistry.Get<TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
                 .WithAlignment( HorizontalAlignmentOptions.Center );
         }

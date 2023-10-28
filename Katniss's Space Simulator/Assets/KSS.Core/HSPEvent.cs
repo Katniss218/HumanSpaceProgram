@@ -50,9 +50,19 @@ namespace KSS.Core
         /// Invoked immediately after loading the design scene.
         /// </summary>
         public const string STARTUP_DESIGN = NAMESPACE_VANILLA + ".startup.design";
+        
+        /// <summary>
+        /// Invoked immediately after loading the editor scene.
+        /// </summary>
+        public const string STARTUP_EDITOR = NAMESPACE_VANILLA + ".startup.editor";
 
         //
 
+        /// <summary>
+        /// Invoked when the player toggles the escape (pause) menu in the gameplay scene.
+        /// </summary>
+        public const string ESCAPE_MAINMENU = NAMESPACE_VANILLA + ".escape.mainmenu";
+        
         /// <summary>
         /// Invoked when the player toggles the escape (pause) menu in the gameplay scene.
         /// </summary>
@@ -62,6 +72,11 @@ namespace KSS.Core
         /// Invoked when the player toggles the escape (pause) menu in the design scene.
         /// </summary>
         public const string ESCAPE_DESIGN = NAMESPACE_VANILLA + ".escape.design";
+        
+        /// <summary>
+        /// Invoked when the player toggles the escape (pause) menu in the design scene.
+        /// </summary>
+        public const string ESCAPE_EDITOR = NAMESPACE_VANILLA + ".escape.editor";
 
         //
 
