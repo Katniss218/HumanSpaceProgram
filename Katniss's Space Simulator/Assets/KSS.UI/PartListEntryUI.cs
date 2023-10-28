@@ -21,7 +21,7 @@ namespace KSS.UI
 
         public static PartListEntryUI Create( IUIElementContainer parent, UILayoutInfo layout, string partId )
         {
-            UIPanel uiPanel = parent.AddPanel( layout, null );
+            UIPanel uiPanel = parent.AddPanel( layout, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_list_entry_background" ) );
 
             PartListEntryUI partListEntryUI = uiPanel.gameObject.AddComponent<PartListEntryUI>();
             partListEntryUI._partId = partId;

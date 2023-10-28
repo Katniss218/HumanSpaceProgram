@@ -33,7 +33,7 @@ namespace UnityPlus.UILib.Layout
         public float Spacing { get; set; }
 
         /// <summary>
-        /// If true, then the height of the container element will be set to fit the combined height of its contents.
+        /// If true, the height of the container element will be set to fit the combined height of its contents.
         /// </summary>
         public bool FitToSize { get; set; }
 
@@ -46,7 +46,7 @@ namespace UnityPlus.UILib.Layout
             {
                 if( child.rectTransform.anchorMin.y != child.rectTransform.anchorMax.y )
                 {
-                    throw new InvalidOperationException( $"Can't fit to size vertically, the child element {c.gameObject.name} fills height." );
+                    throw new InvalidOperationException( $"Can't layout vertically, the child element {c.gameObject.name} fills height." );
                 }
             }
 

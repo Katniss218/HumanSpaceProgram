@@ -15,8 +15,8 @@ namespace UnityPlus.UILib.Layout
     {
         public enum Direction : byte
         {
-            TopToBottom,
-            BottomToTop
+            LeftToRight,
+            RightToLeft
         }
 
         /// <summary>
@@ -25,15 +25,15 @@ namespace UnityPlus.UILib.Layout
         /// <remarks>
         /// The first child always goes at the beginning, and the last goes at the end of the sequence.
         /// </remarks>
-        public Direction Dir { get; set; } = Direction.TopToBottom;
+        public Direction Dir { get; set; } = Direction.LeftToRight;
 
         /// <summary>
-        /// The vertical spacing between the child elements, in [px].
+        /// The horizontal spacing between the child elements, in [px].
         /// </summary>
         public float Spacing { get; set; }
 
         /// <summary>
-        /// If true, then the height of the container element will be set to fit the combined height of its contents.
+        /// If true, the height of the container element will be set to fit the combined height of its contents.
         /// </summary>
         public bool FitToSize { get; set; }
 
@@ -44,13 +44,13 @@ namespace UnityPlus.UILib.Layout
 
             foreach( var child in c.Children )
             {
-                if( child.rectTransform.anchorMin.y != child.rectTransform.anchorMax.y )
+                if( child.rectTransform.anchorMin.x != child.rectTransform.anchorMax.x )
                 {
-                    throw new InvalidOperationException( $"Can't fit to size vertically, the child element {c.gameObject.name} fills height." );
+                    throw new InvalidOperationException( $"Can't layout horizontally, the child element {c.gameObject.name} fills width." );
                 }
             }
 
-            float ySum = 0;
+            float xSum = 0;
             foreach( var child in c.Children )
             {
                 UILayoutInfo layoutInfo = child.rectTransform.GetLayoutInfo();
@@ -65,53 +65,53 @@ namespace UnityPlus.UILib.Layout
                 float vertPos = 0;
                 float height = layoutInfo.sizeDelta.y;
 
-                if( Dir == Direction.TopToBottom )
-                {
-                    // plus, minus, minus, and inverse of anchor/pivot.
-                    vertPos += (1 - layoutInfo.anchorMax.y) * parentSize.y;
-                    vertPos -= (1 - layoutInfo.pivot.y) * height;
-                    vertPos -= ySum;
-                }
-                else if( Dir == Direction.BottomToTop )
+                if( Dir == Direction.LeftToRight )
                 {
                     // minus, plus, plus (reverse of 'to bottom').
-                    vertPos -= (layoutInfo.anchorMax.y) * parentSize.y;
-                    vertPos += (layoutInfo.pivot.y) * height;
-                    vertPos += ySum;
+                    vertPos -= (layoutInfo.anchorMax.x) * parentSize.x;
+                    vertPos += (layoutInfo.pivot.x) * height;
+                    vertPos += xSum;
+                }
+                else if( Dir == Direction.RightToLeft )
+                {
+                    // plus, minus, minus, and inverse of anchor/pivot.
+                    vertPos += (1 - layoutInfo.anchorMax.x) * parentSize.x;
+                    vertPos -= (1 - layoutInfo.pivot.x) * height;
+                    vertPos -= xSum;
                 }*/
                 #endregion
 
-                if( Dir == Direction.TopToBottom )
+                if( Dir == Direction.LeftToRight )
                 {
-                    layoutInfo.anchorMin.y = 1f;
-                    layoutInfo.anchorMax.y = 1f;
-                    layoutInfo.pivot.y = 1f;
-                    layoutInfo.anchoredPosition.y = -ySum;
+                    layoutInfo.anchorMin.x = 0f;
+                    layoutInfo.anchorMax.x = 0f;
+                    layoutInfo.pivot.x = 0f;
+                    layoutInfo.anchoredPosition.x = xSum;
                 }
-                else if( Dir == Direction.BottomToTop )
+                else if( Dir == Direction.RightToLeft )
                 {
-                    layoutInfo.anchorMin.y = 0f;
-                    layoutInfo.anchorMax.y = 0f;
-                    layoutInfo.pivot.y = 0f;
-                    layoutInfo.anchoredPosition.y = ySum;
+                    layoutInfo.anchorMin.x = 1f;
+                    layoutInfo.anchorMax.x = 1f;
+                    layoutInfo.pivot.x = 1f;
+                    layoutInfo.anchoredPosition.x = -xSum;
                 }
 
                 child.rectTransform.SetLayoutInfo( layoutInfo );
 
-                ySum += layoutInfo.sizeDelta.y + Spacing; // Y+ towards the top.
+                xSum += layoutInfo.sizeDelta.x + Spacing; // Y+ towards the top.
             }
 
             if( FitToSize )
             {
-                if( c.contents.anchorMin.y != c.contents.anchorMax.y )
+                if( c.contents.anchorMin.x != c.contents.anchorMax.x )
                 {
-                    throw new InvalidOperationException( $"Can't fit to size vertically, the container element {c.gameObject.name} fills height." );
+                    throw new InvalidOperationException( $"Can't fit to size horizontally, the container element {c.gameObject.name} fills width." );
                 }
 
-                if( ySum != 0 )
-                    ySum -= Spacing; // remove the last spacing if there are any elements.
+                if( xSum != 0 )
+                    xSum -= Spacing; // remove the last spacing if there are any elements.
 
-                c.contents.SetSizeWithCurrentAnchors( RectTransform.Axis.Vertical, ySum );
+                c.contents.SetSizeWithCurrentAnchors( RectTransform.Axis.Horizontal, xSum );
             }
         }
     }
