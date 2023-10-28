@@ -44,7 +44,9 @@ namespace KSS.UI.SceneFactories
             UIButton openBtn = p1.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 40, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_open" ), null );
             UIButton saveBtn = p1.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 80, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_save" ), null );
             UIPanel p2 = topPanel.AddPanel( UILayoutInfo.FillVertical( 0, 0, 0.5f, 0, 300 ), null );
-            UIInputField nameInputField = p2.AddInputField( UILayoutInfo.FillVertical( 0, 0, 0.5f, 0, 300 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
+            UIInputField nameInputField = p2.AddInputField( UILayoutInfo.FillVertical( 0, 0, 0.5f, 0, 300 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) )
+                .WithMargins( 5, 5, 5, 5 )
+                .WithPlaceholder( "vessel's name..." );
             UIPanel p3 = topPanel.AddPanel( UILayoutInfo.FillVertical( 0, 0, 0.5f, 150 + 30 + 10, 60 ), null );
             UIButton undoBtn = p3.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 0, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_undo" ), null );
             UIButton redoBtn = p3.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 32, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_redo" ), null );

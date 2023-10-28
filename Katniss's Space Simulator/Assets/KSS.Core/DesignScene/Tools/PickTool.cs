@@ -17,7 +17,13 @@ namespace KSS.Core.DesignScene.Tools
         Transform _heldPart;
 
         [SerializeField]
+        Vector3 _heldOffset;
+
+        [SerializeField]
         Camera _camera;
+
+        public bool SnappingEnabled { get; set; }
+        public float SnapAngle { get; set; }
 
         void Update()
         {
@@ -61,6 +67,7 @@ namespace KSS.Core.DesignScene.Tools
                 }
 
                 _heldPart = hitObj.transform;
+                _heldOffset = hitInfo.point - hitObj.transform.position;
                 _heldPart.gameObject.SetLayer( 25, true );
                 _heldPart.SetParent( null );
                 // recalc vessel data.
@@ -98,15 +105,16 @@ namespace KSS.Core.DesignScene.Tools
         {
             // Held part is moved on a plane defined by the normal = camera forward, and through point = current position of picked up part.
 
-            Vector3 point = _heldPart.position;
+            Vector3 point = _heldPart.position + _heldOffset;
 
             Ray ray = _camera.ScreenPointToRay( Input.mousePosition );
 
             // Snap to surface.
-            if( !Input.GetKeyDown( KeyCode.LeftAlt )
+            if( !Input.GetKey( KeyCode.LeftAlt )
              && UnityEngine.Physics.Raycast( ray, out RaycastHit hitInfo, 8192, 1 << 24 ) )
-#warning TODO - this reycasts against the held part too, which it shouldn't.
             {
+                // TODO - angle snap like in KSP.
+
                 _heldPart.rotation = Quaternion.LookRotation( hitInfo.normal, Vector3.up );
                 _heldPart.position = hitInfo.point; // todo - use surface attach node if available.
 
@@ -117,7 +125,7 @@ namespace KSS.Core.DesignScene.Tools
             if( p.Raycast( ray, out float intersectionDistance ) )
             {
                 Vector3 intersectionPoint = ray.GetPoint( intersectionDistance );
-                _heldPart.position = intersectionPoint;
+                _heldPart.position = intersectionPoint - _heldOffset;
             }
         }
     }

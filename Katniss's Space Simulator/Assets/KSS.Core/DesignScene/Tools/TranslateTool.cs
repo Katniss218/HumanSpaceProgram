@@ -15,6 +15,9 @@ namespace KSS.Core.DesignScene.Tools
         [SerializeField]
         Camera _camera;
 
+        public bool SnappingEnabled { get; set; }
+        public float SnapInterval { get; set; }
+
         void Update()
         {
             // click on part to select and toggle handles.
