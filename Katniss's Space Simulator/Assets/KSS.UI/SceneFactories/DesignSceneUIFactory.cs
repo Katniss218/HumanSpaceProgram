@@ -1,4 +1,6 @@
 ﻿using KSS.Core;
+using KSS.Core.DesignScene;
+using KSS.Core.DesignScene.Tools;
 using KSS.Core.SceneManagement;
 using System;
 using System.Collections.Generic;
@@ -18,6 +20,8 @@ namespace KSS.UI.SceneFactories
     /// </summary>
     public static class DesignSceneUIFactory
     {
+        public static UIPanel _toolOptionsPanel;
+
         [HSPEventListener( HSPEvent.STARTUP_DESIGN, HSPEvent.NAMESPACE_VANILLA + ".design_scene_ui" )]
         public static void Create( object e )
         {
@@ -26,7 +30,6 @@ namespace KSS.UI.SceneFactories
             CreatePartList( canvas );
             CreateTopPanel( canvas );
             CreateToolSelector( canvas );
-            CreatePickToolOptions( canvas );
             CreateWindowToggleList( canvas );
         }
 
@@ -62,18 +65,56 @@ namespace KSS.UI.SceneFactories
         {
             UIPanel uiPanel = canvas.AddPanel( new UILayoutInfo( new Vector2( 0, 1 ), new Vector2( PART_LIST_WIDTH + 10, -32 ), new Vector2( (30 + 2) * 4, 30 ) ), null );
 
-            UIButton pickButton = uiPanel.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 0, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/toolicon_pick" ), null );
-            UIButton moveButton = uiPanel.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 32, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/toolicon_move" ), null );
-            UIButton rotateButton = uiPanel.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 64, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/toolicon_rotate" ), null );
-            UIButton rerootButton = uiPanel.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 96, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/toolicon_reroot" ), null );
+            UIButton pickButton = uiPanel.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 0, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/toolicon_pick" ), () =>
+            {
+                DesignSceneToolManager.UseTool<PickTool>();
+            } );
+            UIButton moveButton = uiPanel.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 32, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/toolicon_move" ), () =>
+            {
+                DesignSceneToolManager.UseTool<TranslateTool>();
+            } );
+            UIButton rotateButton = uiPanel.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 64, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/toolicon_rotate" ), () =>
+            {
+                DesignSceneToolManager.UseTool<RotateTool>();
+            } );
+            UIButton rerootButton = uiPanel.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 96, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/toolicon_reroot" ), () =>
+            {
+                DesignSceneToolManager.UseTool<RerootTool>();
+            } );
         }
 
-        private static void CreatePickToolOptions( UICanvas canvas )
+        [HSPEventListener( HSPEvent.DESIGN_TOOL_CHANGED, HSPEvent.NAMESPACE_VANILLA + ".tool_changed_ui" )]
+        private static void CreateCurrentToolOptions( object e )
         {
-            UIPanel uiPanel = canvas.AddPanel( new UILayoutInfo( new Vector2( 0, 1 ), new Vector2( PART_LIST_WIDTH + 10 + ((30 + 2) * 4) + 10, -32 ), new Vector2( 62, 30 ) ), null );
+            if( !_toolOptionsPanel.IsNullOrDestroyed() )
+            {
+                _toolOptionsPanel.Destroy();
+            }
+            UICanvas canvas = CanvasManager.Get( CanvasName.STATIC );
 
-            UIButton buttonSnap = uiPanel.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 0, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/icon_snap" ), null );
-            UIButton buttonSnapNum = uiPanel.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 32, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
+            Type toolType = DesignSceneToolManager.ActiveToolType;
+            if( toolType != null )
+            {
+                _toolOptionsPanel = canvas.AddPanel( new UILayoutInfo( new Vector2( 0, 1 ), new Vector2( PART_LIST_WIDTH + 10 + ((30 + 2) * 4) + 10, -32 ), new Vector2( 62, 30 ) ), null );
+
+                if( toolType == typeof( PickTool ) )
+                {
+                    UIButton buttonSnap = _toolOptionsPanel.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 0, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/icon_snap" ), null );
+                    UIButton buttonSnapNum = _toolOptionsPanel.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 32, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
+                }
+                if( toolType == typeof( TranslateTool ) )
+                {
+                    UIText t = _toolOptionsPanel.AddText( UILayoutInfo.Fill(), "translate" );
+                }
+                if( toolType == typeof( RotateTool ) )
+                {
+                    UIText t = _toolOptionsPanel.AddText( UILayoutInfo.Fill(), "rotate" );
+                }
+                if( toolType == typeof( RerootTool ) )
+                {
+                    UIText t = _toolOptionsPanel.AddText( UILayoutInfo.Fill(), "reroot" );
+                }
+            }
         }
 
         private static void CreateWindowToggleList( UICanvas canvas )
@@ -89,7 +130,7 @@ namespace KSS.UI.SceneFactories
             UIButton deltaVAnalysisWindow = uiPanel.AddButton( new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
             UIButton controlSetupWindow = uiPanel.AddButton( new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
             UIButton button3 = uiPanel.AddButton( new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
-            
+
             UILayout.BroadcastLayoutUpdate( uiPanel );
         }
     }

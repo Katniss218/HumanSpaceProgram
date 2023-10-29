@@ -933,7 +933,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 14
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!21 &711521279
+--- !u!21 &868590690
 Material:
   serializedVersion: 8
   m_ObjectHideFlags: 0
@@ -1339,7 +1339,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4298a5610bd9d94f869f4cf69e24435, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _material: {fileID: 711521279}
+  _material: {fileID: 868590690}
   _rt: {fileID: 0}
 --- !u!4 &1144275550
 Transform:
@@ -1720,12 +1720,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1870219029}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 12e66a667bdacb54e80fa9ce46c3be0b, type: 3}
+  m_Script: {fileID: 11500000, guid: 096c4dfae3f8fa140b4e6da869c9b8b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _heldPart: {fileID: 0}
-  _heldOffset: {x: 0, y: 0, z: 0}
-  _camera: {fileID: 1971509467}
 --- !u!1 &1895017350
 GameObject:
   m_ObjectHideFlags: 0

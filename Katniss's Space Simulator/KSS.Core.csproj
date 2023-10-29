@@ -62,6 +62,7 @@
     <Compile Include="Assets\KSS.Core\Building.cs" />
     <Compile Include="Assets\KSS.Core\Vessel.Serialization.cs" />
     <Compile Include="Assets\KSS.Core\Physics\PhysicsObject.cs" />
+    <Compile Include="Assets\KSS.Core\SceneManagement\EditorSceneManager.cs" />
     <Compile Include="Assets\KSS.Core\PartFactory.cs" />
     <Compile Include="Assets\KSS.Core\Serialization\TimelineMetadata.cs" />
     <Compile Include="Assets\KSS.Core\HSPEvent.cs" />
@@ -70,6 +71,7 @@
     <Compile Include="Assets\KSS.Core\BuildingManager.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\IResourceConsumer.cs" />
     <Compile Include="Assets\KSS.Core\SceneManagement\GameplaySceneManager.cs" />
+    <Compile Include="Assets\KSS.Core\Serialization\PartMetadata.cs" />
     <Compile Include="Assets\KSS.Core\CelestialBodyFactory.cs" />
     <Compile Include="Assets\KSS.Core\Building.Serialization.cs" />
     <Compile Include="Assets\KSS.Core\Serialization\TimelineManager.cs" />
@@ -82,8 +84,8 @@
     <Compile Include="Assets\KSS.Core\IHasMass.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\IResourceContainer.cs" />
     <Compile Include="Assets\KSS.Core\ReferenceFrames\CenteredReferenceFrame.cs" />
+    <Compile Include="Assets\KSS.Core\Serialization\VesselMetadata.cs" />
     <Compile Include="Assets\KSS.Core\Physics\GravityUtils.cs" />
-    <Compile Include="Assets\KSS.Core\DesignScene\Tools\PickTool.cs" />
     <Compile Include="Assets\KSS.Core\ReferenceFrames\RootObjectTransform.cs" />
     <Compile Include="Assets\KSS.Core\VesselFactory.cs" />
     <Compile Include="Assets\KSS.Core\SceneManagement\SceneLoader.cs" />
@@ -92,7 +94,6 @@
     <Compile Include="Assets\KSS.Core\Control\ControlInAttribute.cs" />
     <Compile Include="Assets\KSS.Core\Serialization\Version.cs" />
     <Compile Include="Assets\KSS.Core\ReferenceFrames\ReferenceFrameUtils.cs" />
-    <Compile Include="Assets\KSS.Core\DesignScene\ToolManager.cs" />
     <Compile Include="Assets\KSS.Core\Control\ControlOutAttribute.cs" />
     <Compile Include="Assets\KSS.Core\Serialization\SaveMetadata.cs" />
     <Compile Include="Assets\KSS.Core\ReferenceFrames\OrientedReferenceFrame.cs" />
@@ -120,9 +121,9 @@
     <Compile Include="Assets\KSS.Core\IPartObject.cs" />
     <Compile Include="Assets\KSS.Core\Components\FLaunchSiteMarker.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\SubstanceStateCollection.cs" />
-    <Compile Include="Assets\KSS.Core\Serialization\VesselMetadata.cs" />
-    <Compile Include="Assets\KSS.Core\Serialization\PartMetadata.cs" />
-    <Compile Include="Assets\KSS.Core\SceneManagement\EditorSceneManager.cs" />
+    <Compile Include="Assets\KSS.Core\DesignScene\Tools\VanillaToolRegisterer.cs" />
+    <Compile Include="Assets\KSS.Core\DesignScene\Tools\PickTool.cs" />
+    <Compile Include="Assets\KSS.Core\DesignScene\DesignSceneToolManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.Core\___KSS.Core.asmdef" />

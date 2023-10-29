@@ -13,17 +13,19 @@ namespace KSS.Core.DesignScene.Tools
     /// </summary>
     public class PickTool : MonoBehaviour
     {
-        [SerializeField]
-        Transform _heldPart;
+        Transform _heldPart = null;
 
-        [SerializeField]
         Vector3 _heldOffset;
 
-        [SerializeField]
         Camera _camera;
 
         public bool SnappingEnabled { get; set; }
         public float SnapAngle { get; set; }
+
+        void Awake()
+        {
+            _camera = GameObject.Find( "Near camera" ).GetComponent<Camera>();
+        }
 
         void Update()
         {
@@ -48,8 +50,16 @@ namespace KSS.Core.DesignScene.Tools
 
                 if( Input.GetKeyDown( KeyCode.Mouse0 ) )
                 {
-                    TryPlacePart();
+                    PlacePart();
                 }
+            }
+        }
+
+        void OnDisable() // if tool switched while action is performed.
+        {
+            if( _heldPart != null )
+            {
+                PlacePart();
             }
         }
 
@@ -74,7 +84,7 @@ namespace KSS.Core.DesignScene.Tools
             }
         }
 
-        private void TryPlacePart()
+        private void PlacePart()
         {
             Ray ray = _camera.ScreenPointToRay( Input.mousePosition );
             if( UnityEngine.Physics.Raycast( ray, out RaycastHit hitInfo, 8192, 1 << 24 ) )

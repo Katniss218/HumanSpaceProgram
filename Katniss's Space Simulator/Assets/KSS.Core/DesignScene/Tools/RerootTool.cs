@@ -7,10 +7,18 @@ using UnityEngine;
 
 namespace KSS.Core.DesignScene.Tools
 {
+    /// <summary>
+    /// Allows to change the root of the design vessel.
+    /// </summary>
     public class RerootTool : MonoBehaviour
     {
         [SerializeField]
         Camera _camera;
+
+        void Awake()
+        {
+            _camera = GameObject.Find( "Near camera" ).GetComponent<Camera>();
+        }
 
         void Update()
         {

@@ -109,5 +109,14 @@ namespace KSS.Core
         /// Invoked after creating a new game state (timeline + default save).
         /// </summary>
         public const string TIMELINE_AFTER_NEW = NAMESPACE_VANILLA + ".timeline.new.after";
+
+        // design scene runtime events.
+
+        /// <summary>
+        /// Invoked after the currently active tool in the design scene has changed.
+        /// </summary>
+        public const string DESIGN_TOOL_CHANGED = NAMESPACE_VANILLA + ".designscene.tool.changed";
+
+        // ---
     }
 }

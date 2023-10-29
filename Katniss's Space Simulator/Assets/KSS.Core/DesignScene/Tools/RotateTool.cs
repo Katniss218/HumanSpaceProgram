@@ -7,6 +7,9 @@ using UnityEngine;
 
 namespace KSS.Core.DesignScene.Tools
 {
+    /// <summary>
+    /// Allows to move a selected part after placing.
+    /// </summary>
     public class RotateTool : MonoBehaviour
     {
         [SerializeField]
@@ -17,6 +20,11 @@ namespace KSS.Core.DesignScene.Tools
 
         public bool SnappingEnabled { get; set; }
         public float SnapAngle { get; set; }
+
+        void Awake()
+        {
+            _camera = GameObject.Find( "Near camera" ).GetComponent<Camera>();
+        }
 
         void Update()
         {
