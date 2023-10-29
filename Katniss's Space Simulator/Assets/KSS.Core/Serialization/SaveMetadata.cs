@@ -152,6 +152,22 @@ namespace KSS.Core.Serialization
             this.SetData( data );
         }
 
+        public SerializedData GetData()
+        {
+            SerializedObject modVersions = new SerializedObject();
+            foreach( var elemKvp in this.ModVersions )
+            {
+                modVersions.Add( elemKvp.Key, elemKvp.Value.ToString() );
+            }
+            return new SerializedObject()
+            {
+                { "name", this.Name },
+                { "description", this.Description },
+                { "file_version", this.FileVersion.ToString() },
+                { "mod_versions", modVersions }
+            };
+        }
+
         public void SetData( SerializedData data )
         {
             if( data.TryGetValue( "name", out var name ) )
@@ -175,22 +191,6 @@ namespace KSS.Core.Serialization
                     this.ModVersions.Add( elemKvp.Key, Version.Parse( (string)elemKvp.Value ) );
                 }
             }
-        }
-
-        public SerializedData GetData()
-        {
-            SerializedObject modVersions = new SerializedObject();
-            foreach( var elemKvp in this.ModVersions )
-            {
-                modVersions.Add( elemKvp.Key, elemKvp.Value.ToString() );
-            }
-            return new SerializedObject()
-            {
-                { "name", this.Name },
-                { "description", this.Description },
-                { "file_version", this.FileVersion.ToString() },
-                { "mod_versions", modVersions }
-            };
         }
     }
 }

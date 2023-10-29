@@ -33,7 +33,13 @@ namespace KSS.Core.Serialization
         {
             public string timelineId;
             public string saveId;
+            /// <summary>
+            /// Use these to add save actions of the object stage.
+            /// </summary>
             public List<Func<ISaver, IEnumerator>> objectActions;
+            /// <summary>
+            /// Use these to add save actions of the data stage.
+            /// </summary>
             public List<Func<ISaver, IEnumerator>> dataActions;
 
             public SaveEventData( string timelineId, string saveId )
@@ -49,7 +55,13 @@ namespace KSS.Core.Serialization
         {
             public string timelineId;
             public string saveId;
+            /// <summary>
+            /// Use these to add load actions of the object stage.
+            /// </summary>
             public List<Func<ILoader, IEnumerator>> objectActions;
+            /// <summary>
+            /// Use these to add load actions of the data stage.
+            /// </summary>
             public List<Func<ILoader, IEnumerator>> dataActions;
 
             public LoadEventData( string timelineId, string saveId )
@@ -75,14 +87,7 @@ namespace KSS.Core.Serialization
 
         private static bool _wasPausedBeforeSerializing = false;
 
-        public static void SaveStartFunc()
-        {
-            _wasPausedBeforeSerializing = TimeManager.IsPaused;
-            TimeManager.Pause();
-            TimeManager.LockTimescale = true;
-        }
-
-        public static void LoadStartFunc()
+        public static void SaveLoadStartFunc()
         {
             _wasPausedBeforeSerializing = TimeManager.IsPaused;
             TimeManager.Pause();
@@ -96,7 +101,7 @@ namespace KSS.Core.Serialization
             {
                 TimeManager.Unpause();
             }
-            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_SAVE, _eSave );
+            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_SAVE, _eSave ); // invoke here because otherwise the invoking method finishes before the coroutine.
         }
         
         public static void LoadFinishFunc()
@@ -106,17 +111,17 @@ namespace KSS.Core.Serialization
             {
                 TimeManager.Unpause();
             }
-            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_LOAD, _eLoad );
+            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_LOAD, _eLoad ); // invoke here because otherwise the invoking method finishes before the coroutine.
         }
 
-        private static void CreateSaver( List<Func<ISaver, IEnumerator>> objectActions, List<Func<ISaver, IEnumerator>> dataActions )
+        private static void CreateSaver( IEnumerable<Func<ISaver, IEnumerator>> objectActions, IEnumerable<Func<ISaver, IEnumerator>> dataActions )
         {
-            _saver = new AsyncSaver( SaveStartFunc, SaveFinishFunc, objectActions, dataActions );
+            _saver = new AsyncSaver( SaveLoadStartFunc, SaveFinishFunc, objectActions, dataActions );
         }
 
-        private static void CreateLoader( List<Func<ILoader, IEnumerator>> objectActions, List<Func<ILoader, IEnumerator>> dataActions )
+        private static void CreateLoader( IEnumerable<Func<ILoader, IEnumerator>> objectActions, IEnumerable<Func<ILoader, IEnumerator>> dataActions )
         {
-            _loader = new AsyncLoader( LoadStartFunc, LoadFinishFunc, objectActions, dataActions );
+            _loader = new AsyncLoader( SaveLoadStartFunc, LoadFinishFunc, objectActions, dataActions );
         }
 
         public static void EnsureDirectoryExists( string path )

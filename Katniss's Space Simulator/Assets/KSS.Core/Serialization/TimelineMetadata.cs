@@ -127,6 +127,15 @@ namespace KSS.Core.Serialization
             this.SetData( data );
         }
 
+        public SerializedData GetData()
+        {
+            return new SerializedObject()
+            {
+                { "name", this.Name },
+                { "description", this.Description }
+            };
+        }
+
         public void SetData( SerializedData data )
         {
             if( data.TryGetValue( "name", out var name ) )
@@ -138,15 +147,6 @@ namespace KSS.Core.Serialization
             {
                 this.Description = (string)description;
             }
-        }
-
-        public SerializedData GetData()
-        {
-            return new SerializedObject()
-            {
-                { "name", this.Name },
-                { "description", this.Description }
-            };
         }
     }
 }

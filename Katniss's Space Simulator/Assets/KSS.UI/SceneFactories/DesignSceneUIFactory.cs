@@ -2,6 +2,8 @@
 using KSS.Core.DesignScene;
 using KSS.Core.DesignScene.Tools;
 using KSS.Core.SceneManagement;
+using KSS.Core.Serialization;
+using KSS.UI.Windows;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,7 +47,13 @@ namespace KSS.UI.SceneFactories
             UIPanel topPanel = canvas.AddPanel( UILayoutInfo.FillHorizontal( 0, 0, 1f, 0, 30 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/top_panel_background" ) );
             UIPanel p1 = topPanel.AddPanel( UILayoutInfo.FillVertical( 0, 0, 0f, 20, 110 ), null );
             UIButton newBtn = p1.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 0, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_new" ), null );
-            UIButton openBtn = p1.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 40, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_open" ), null );
+            UIButton openBtn = p1.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 40, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_open" ), () =>
+            {
+                CanvasManager.Get( CanvasName.WINDOWS ).AddTextSelectionWindow( "Load ...", "vessel name/ID", ( text ) =>
+                {
+                    DesignVesselManager.LoadVessel( IOHelper.SanitizeFileName( text ) );
+                } );
+            } );
             UIButton saveBtn = p1.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 80, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_save" ), null );
             UIPanel p2 = topPanel.AddPanel( UILayoutInfo.FillVertical( 0, 0, 0.5f, 0, 300 ), null );
             UIInputField nameInputField = p2.AddInputField( UILayoutInfo.FillVertical( 0, 0, 0.5f, 0, 300 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) )

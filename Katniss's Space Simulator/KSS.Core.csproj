@@ -66,6 +66,7 @@
     <Compile Include="Assets\KSS.Core\SceneManagement\EditorSceneManager.cs" />
     <Compile Include="Assets\KSS.Core\PartFactory.cs" />
     <Compile Include="Assets\KSS.Core\Serialization\TimelineMetadata.cs" />
+    <Compile Include="Assets\KSS.Core\DesignScene\DesignVesselManager.cs" />
     <Compile Include="Assets\KSS.Core\HSPEvent.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\FluidState.cs" />
     <Compile Include="Assets\KSS.Core\CelestialBodyManager.cs" />
@@ -124,7 +125,6 @@
     <Compile Include="Assets\KSS.Core\IPartObject.cs" />
     <Compile Include="Assets\KSS.Core\Components\FLaunchSiteMarker.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\SubstanceStateCollection.cs" />
-    <Compile Include="Assets\KSS.Core\DesignScene\DesignVesselManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.Core\___KSS.Core.asmdef" />
