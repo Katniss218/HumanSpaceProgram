@@ -446,6 +446,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 543436772}
+  - component: {fileID: 543436774}
   - component: {fileID: 543436773}
   m_Layer: 0
   m_Name: _ MAIN MENU MANAGER _
@@ -481,6 +482,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6fbff5dd248bfa3499abecd0ec1406dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &543436774
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 543436770}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da99e03421c20d24e9eef7ddba33dc92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _guidData: ffe93cd4f439b91de47a1155c2d2264a
 --- !u!1 &1206758905
 GameObject:
   m_ObjectHideFlags: 0
