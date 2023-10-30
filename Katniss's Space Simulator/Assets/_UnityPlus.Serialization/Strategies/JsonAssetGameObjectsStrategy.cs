@@ -89,7 +89,7 @@ namespace UnityPlus.Serialization.Strategies
                 Debug.LogWarning( $"Couldn't find a prefab `{goJson["prefab"]}`." );
             }
 
-            GameObject go = ClonedGameObject.Instantiate( prefab );
+            GameObject go = ClonedGameObject.Instantiate( prefab ); // assumes the asset is immutable and needs to be cloned. God knows if this preserves lambdas and other non-serializable fields.
 
             l.SetReferenceID( go, objectGuid );
 

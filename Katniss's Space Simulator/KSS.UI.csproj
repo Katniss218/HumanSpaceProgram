@@ -59,6 +59,7 @@
     <Compile Include="Assets\KSS.UI\AltitudeReadoutUI.cs" />
     <Compile Include="Assets\KSS.UI\SaveMetadataUI.cs" />
     <Compile Include="Assets\KSS.UI\CanvasName.cs" />
+    <Compile Include="Assets\KSS.UI\Windows\ComfirmationWindow_Ex.cs" />
     <Compile Include="Assets\KSS.UI\SceneFactories\GameplaySceneUIFactory.cs" />
     <Compile Include="Assets\KSS.UI\IResourceContainerUI.cs" />
     <Compile Include="Assets\KSS.UI\PartListEntryUI.cs" />
@@ -68,6 +69,7 @@
     <Compile Include="Assets\KSS.UI\SceneFactories\MainMenuSceneUIFactory.cs" />
     <Compile Include="Assets\KSS.UI\PartListUI.cs" />
     <Compile Include="Assets\KSS.UI\TimewarpReadoutUI.cs" />
+    <Compile Include="Assets\KSS.UI\Windows\DesignLoadVesselWindow.cs" />
     <Compile Include="Assets\KSS.UI\GameplayClickInteractionManager.cs" />
     <Compile Include="Assets\KSS.UI\TimelineMetadataUI.cs" />
     <Compile Include="Assets\KSS.UI\VelocityReadoutUI.cs" />
@@ -77,8 +79,6 @@
     <Compile Include="Assets\KSS.UI\AccelerationReadoutUI.cs" />
     <Compile Include="Assets\KSS.UI\SceneFactories\DesignSceneUIFactory.cs" />
     <Compile Include="Assets\KSS.UI\FPSCounterUI.cs" />
-    <Compile Include="Assets\KSS.UI\Windows\DesignLoadVesselWindow.cs" />
-    <Compile Include="Assets\KSS.UI\Windows\ComfirmationWindow_Ex.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.UI\___KSS.UI.asmdef" />
