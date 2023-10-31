@@ -10,17 +10,12 @@ namespace KSS.Core.Serialization
     /// <summary>
     /// Represents additional metadata of a saved part of a vessel/building.
     /// </summary>
-    public class PartMetadata : IPersistent
+    public class PartMetadata
     {
         /// <summary>
         /// The unique ID of this part.
         /// </summary>
         public readonly string ID;
-
-        /// <summary>
-        /// The name of the author of the part.
-        /// </summary>
-        public string Author { get; set; }
 
         /// <summary>
         /// The display name shown in the GUI.
@@ -31,6 +26,11 @@ namespace KSS.Core.Serialization
         /// The description shown in the GUI.
         /// </summary>
         public string Description { get; set; }
+
+        /// <summary>
+        /// The name of the author of the part.
+        /// </summary>
+        public string Author { get; set; }
 
         /// <summary>
         /// The (filter) categories that this part belongs to.
@@ -62,25 +62,69 @@ namespace KSS.Core.Serialization
 
         public static HashSet<string> GetUniqueCategories( IEnumerable<PartMetadata> parts )
         {
-            HashSet<string> cats = new HashSet<string>();
+            HashSet<string> uniqueCategories = new HashSet<string>();
             foreach( var part in parts )
             {
-                foreach( var cat in part.Categories )
+                foreach( var category in part.Categories )
                 {
-                    cats.Add( cat );
+                    uniqueCategories.Add( category );
                 }
             }
-            return cats;
+            return uniqueCategories;
         }
 
-        public SerializedData GetData( ISaver s )
+        public SerializedData GetData()
         {
-            throw new NotImplementedException();
+            SerializedArray categories = new SerializedArray();
+            foreach( var category in this.Categories )
+            {
+                categories.Add( category );
+            }
+            return new SerializedObject()
+            {
+                { "name", this.Name },
+                { "description", this.Description },
+                { "author", this.Author },
+                { "categories", categories },
+                { "filter", this.Filter },
+                { "group", this.Group }
+            };
         }
 
-        public void SetData( ILoader l, SerializedData data )
+        public void SetData( SerializedData data )
         {
-            throw new NotImplementedException();
+            if( data.TryGetValue( "name", out var name ) )
+            {
+                this.Name = (string)name;
+            }
+            if( data.TryGetValue( "description", out var description ) )
+            {
+                this.Description = (string)description;
+            }
+            if( data.TryGetValue( "author", out var author ) )
+            {
+                this.Author = (string)author;
+            }
+
+            if( data.TryGetValue( "categories", out var cat ) )
+            {
+                SerializedArray categories = (SerializedArray)cat;
+                this.Categories = new string[categories.Count];
+                int i = 0;
+                foreach( var elemKvp in (SerializedArray)categories )
+                {
+                    this.Categories[i] = (string)categories;
+                    i++;
+                }
+            }
+            if( data.TryGetValue( "filter", out var filter ) )
+            {
+                this.Filter = (string)filter;
+            }
+            if( data.TryGetValue( "group", out var group ) )
+            {
+                this.Group = (string)group;
+            }
         }
     }
 }

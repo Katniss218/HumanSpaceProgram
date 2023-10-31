@@ -90,13 +90,21 @@ namespace KSS.Core.Serialization
         {
             return new SerializedObject()
             {
-
+                { "name", this.Name },
+                { "description", this.Description },
             };
         }
 
         public void SetData( SerializedData data )
         {
-
+            if( data.TryGetValue( "name", out var name ) )
+            {
+                this.Name = (string)name;
+            }
+            if( data.TryGetValue( "description", out var description ) )
+            {
+                this.Description = (string)description;
+            }
         }
     }
 }

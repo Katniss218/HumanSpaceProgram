@@ -17,7 +17,7 @@ namespace UnityPlus.Serialization.Strategies
             {
                 objects.Add( new SerializedObject()
                 {
-                    { $"{KeyNames.REF}", s.WriteGuid( s.GetReferenceID( obj ) ) },
+                    { KeyNames.REF, s.WriteGuid( s.GetReferenceID( obj ) ) },
                     { "data", data }
                 } );
             }
@@ -30,7 +30,7 @@ namespace UnityPlus.Serialization.Strategies
             {
                 objects.Add( new SerializedObject()
                 {
-                    { $"{KeyNames.REF}", s.WriteGuid( s.GetReferenceID( obj ) ) },
+                    { KeyNames.REF, s.WriteGuid( s.GetReferenceID( obj ) ) },
                     { "data", data },
                     { "children_ids", childrenPaths }
                 } );
@@ -64,7 +64,7 @@ namespace UnityPlus.Serialization.Strategies
                 {
                     sArr.Add( new SerializedObject()
                 {
-                    { $"{KeyNames.ID}", s.WriteGuid( id ) },
+                    { KeyNames.ID, s.WriteGuid( id ) },
                     { "path", $"{parentPath}" }
                 } );
                 }
@@ -77,7 +77,7 @@ namespace UnityPlus.Serialization.Strategies
                 {
                     sArr.Add( new SerializedObject()
                     {
-                        { $"{KeyNames.ID}", s.WriteGuid( id ) },
+                        { KeyNames.ID, s.WriteGuid( id ) },
                         { "path", $"{parentPath}*{i:#########0}" }
                     } );
                 }
@@ -161,6 +161,10 @@ namespace UnityPlus.Serialization.Strategies
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public static void SaveGameObjectHierarchy_Objects( GameObject go, ISaver s, uint includedObjectsMask, SerializedArray siblingsArray )
         {
+            if( go == null )
+            {
+                return;
+            }
             if( !go.IsInLayerMask( includedObjectsMask ) )
             {
                 return;
@@ -195,6 +199,10 @@ namespace UnityPlus.Serialization.Strategies
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public static void SaveGameObjectHierarchy_Data( ISaver s, GameObject go, uint includedObjectsMask, ref SerializedArray dataArray )
         {
+            if( go == null )
+            {
+                return;
+            }
             if( !go.IsInLayerMask( includedObjectsMask ) )
             {
                 return;

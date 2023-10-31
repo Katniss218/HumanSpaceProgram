@@ -106,7 +106,7 @@ namespace UnityPlus.Serialization.Strategies
         public IEnumerator LoadAsync_Data( ILoader l )
         {
             StratCommon.ValidateFileOnLoad( DataFilename, StratCommon.OBJECTS_DATA_NOUN );
-            SerializedArray data = (SerializedArray)StratCommon.ReadFromFile( ObjectsFilename );
+            SerializedArray data = (SerializedArray)StratCommon.ReadFromFile( DataFilename );
 
             foreach( var dataElement in data )
             {
