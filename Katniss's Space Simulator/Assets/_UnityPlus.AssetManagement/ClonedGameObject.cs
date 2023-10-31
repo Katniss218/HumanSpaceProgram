@@ -15,7 +15,6 @@ namespace UnityPlus.AssetManagement
     /// Use <see cref="ClonedGameObject.Instantiate"/> to instantiate a <see cref="GameObject"/> from an asset.
     /// </remarks>
     [DisallowMultipleComponent]
-    [Obsolete( "GameObject assets can be marked as non-cacheable and re-instantiated using the lazy loader on every get." )]
     public class ClonedGameObject : MonoBehaviour
     {
         /// <summary>
@@ -34,7 +33,7 @@ namespace UnityPlus.AssetManagement
         }
 
         /// <summary>
-        /// Instantiates a gameobject from the specified original. <br />
+        /// Instantiates a gameobject from the specified asset. <br />
         /// Marks the cloned object as created from the <paramref name="assetRef"/> using a <see cref="ClonedGameObject"/> component.
         /// </summary>
         public static GameObject Instantiate( GameObject assetRef )

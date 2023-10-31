@@ -67,8 +67,8 @@ namespace KSS.Core
             TimelineManager.EnsureDirectoryExists( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Buildings" ) );
             _buildingsStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Buildings", "objects.json" );
             _buildingsStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Buildings", "data.json" );
-            e.objectActions.Add( _buildingsStrat.Save_Object );
-            e.dataActions.Add( _buildingsStrat.Save_Data );
+            e.objectActions.Add( _buildingsStrat.SaveAsync_Object );
+            e.dataActions.Add( _buildingsStrat.SaveAsync_Data );
         }
 
         [HSPEventListener( HSPEvent.TIMELINE_BEFORE_LOAD, HSPEvent.NAMESPACE_VANILLA + ".deserialize_buildings" )]
@@ -79,8 +79,8 @@ namespace KSS.Core
             TimelineManager.EnsureDirectoryExists( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Buildings" ) );
             _buildingsStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Buildings", "objects.json" );
             _buildingsStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Buildings", "data.json" );
-            e.objectActions.Add( _buildingsStrat.Load_Object );
-            e.dataActions.Add( _buildingsStrat.Load_Data );
+            e.objectActions.Add( _buildingsStrat.LoadAsync_Object );
+            e.dataActions.Add( _buildingsStrat.LoadAsync_Data );
         }
     }
 }

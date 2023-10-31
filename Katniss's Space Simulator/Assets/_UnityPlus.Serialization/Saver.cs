@@ -23,7 +23,16 @@ namespace UnityPlus.Serialization
 
         Dictionary<object, Guid> _objectToGuid = new Dictionary<object, Guid>();
 
-        public Saver( Action startFunc, Action finishFunc, IEnumerable<Action<ISaver>> dataActions, IEnumerable<Action<ISaver>> objectActions )
+        public Saver( Action startFunc, Action finishFunc, Action<ISaver> objectAction, Action<ISaver> dataAction )
+        {
+            this._startFunc = startFunc;
+            this._finishFunc = finishFunc;
+
+            this._objectActions.Add( objectAction );
+            this._dataActions.Add( dataAction );
+        }
+
+        public Saver( Action startFunc, Action finishFunc, IEnumerable<Action<ISaver>> objectActions, IEnumerable<Action<ISaver>> dataActions )
         {
             this._startFunc = startFunc;
             this._finishFunc = finishFunc;

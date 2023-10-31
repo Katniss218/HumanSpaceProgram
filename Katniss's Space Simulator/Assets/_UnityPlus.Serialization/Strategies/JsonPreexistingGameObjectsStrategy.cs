@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace UnityPlus.Serialization
+namespace UnityPlus.Serialization.Strategies
 {
     /// <summary>
     /// Serializes only the data of already existing scene objects.
@@ -50,46 +50,15 @@ namespace UnityPlus.Serialization
         private static SerializedObject WriteGameObject( ISaver s, GameObject go, PreexistingReference guidComp )
         {
             SerializedArray sArr = new SerializedArray();
-            SerializerUtils.WriteReferencedChildrenRecursive( s, go, ref sArr, "" );
+            StratUtils.WriteReferencedChildrenRecursive( s, go, ref sArr, "" );
 
             SerializedObject goJson = new SerializedObject()
             {
-                { SerializerUtils.ID, s.WriteGuid( guidComp.GetPersistentGuid() ) },
+                { KeyNames.ID, s.WriteGuid( guidComp.GetPersistentGuid() ) },
                 { "children_ids", sArr }
             };
 
             return goJson;
-        }
-
-        //public void Save_Object( ISaver s )
-        public IEnumerator Save_Object( ISaver s )
-        {
-            if( string.IsNullOrEmpty( ObjectsFilename ) )
-            {
-                throw new InvalidOperationException( $"Can't save objects, file name is not set." );
-            }
-
-            IEnumerable<GameObject> rootObjects = RootObjectsGetter();
-
-            SerializedArray objectsJson = new SerializedArray();
-
-            foreach( var go in rootObjects )
-            {
-                PreexistingReference guidComp = go.GetComponent<PreexistingReference>();
-                if( guidComp == null )
-                {
-                    continue;
-                }
-
-                SerializedObject goJson = WriteGameObject( s, go, guidComp );
-                objectsJson.Add( goJson );
-
-                yield return null;
-            }
-
-            var sb = new StringBuilder();
-            new Serialization.Json.JsonStringWriter( objectsJson, sb ).Write();
-            File.WriteAllText( ObjectsFilename, sb.ToString(), Encoding.UTF8 );
         }
 
         private void SaveGameObjectData( ISaver s, GameObject go, PreexistingReference guidComp, ref SerializedArray objects )
@@ -114,26 +83,48 @@ namespace UnityPlus.Serialization
                     Debug.LogException( ex );
                 }
 
-                SerializerUtils.TryWriteData( s, comp, compData, ref objects );
+                StratUtils.TryWriteData( s, comp, compData, ref objects );
             }
 
             SerializedData goData = go.GetData( s );
             objects.Add( new SerializedObject()
             {
-                { $"{SerializerUtils.REF}", s.WriteGuid( guidComp.GetPersistentGuid() ) },
+                { KeyNames.REF, s.WriteGuid( guidComp.GetPersistentGuid() ) },
                 { "data", goData }
             } );
+        }
+
+        public IEnumerator SaveAsync_Object( ISaver s )
+        {
+            StratCommon.ValidateFileOnSave( ObjectsFilename, StratCommon.OBJECTS_NOUN );
+
+            IEnumerable<GameObject> rootObjects = RootObjectsGetter();
+
+            SerializedArray objectsJson = new SerializedArray();
+
+            foreach( var go in rootObjects )
+            {
+                PreexistingReference guidComp = go.GetComponent<PreexistingReference>();
+                if( guidComp == null )
+                {
+                    continue;
+                }
+
+                SerializedObject goJson = WriteGameObject( s, go, guidComp );
+                objectsJson.Add( goJson );
+
+                yield return null;
+            }
+
+            StratCommon.WriteToFile( ObjectsFilename, objectsJson );
         }
 
         /// <summary>
         /// Saves the data about the gameobjects and their persistent components. Does not include child objects.
         /// </summary>
-        public IEnumerator Save_Data( ISaver s )
+        public IEnumerator SaveAsync_Data( ISaver s )
         {
-            if( string.IsNullOrEmpty( DataFilename ) )
-            {
-                throw new InvalidOperationException( $"Can't save objects, file name is not set." );
-            }
+            StratCommon.ValidateFileOnSave( DataFilename, StratCommon.OBJECTS_DATA_NOUN );
 
             GameObject[] rootObjects = RootObjectsGetter();
 
@@ -152,35 +143,12 @@ namespace UnityPlus.Serialization
                 yield return null;
             }
 
-            var sb = new StringBuilder();
-            new Serialization.Json.JsonStringWriter( objData, sb ).Write();
-            File.WriteAllText( DataFilename, sb.ToString(), Encoding.UTF8 );
+            StratCommon.WriteToFile( DataFilename, objData );
         }
 
-        private static void AssignIDsToReferencedChildren( ILoader l, GameObject go, ref SerializedArray sArr )
+        public IEnumerator LoadAsync_Object( ILoader l )
         {
-            // Set the IDs of all objects in the array.
-            foreach( var s in sArr )
-            {
-                Guid id = l.ReadGuid( s["$id"] );
-                string path = s["path"];
-
-                var refObj = go.GetComponentOrGameObject( path );
-
-                l.SetReferenceID( refObj, id );
-            }
-        }
-
-        public IEnumerator Load_Object( ILoader l )
-        {
-            if( string.IsNullOrEmpty( ObjectsFilename ) )
-            {
-                throw new InvalidOperationException( $"Can't load objects, file name is not set." );
-            }
-            if( !File.Exists( ObjectsFilename ) )
-            {
-                throw new InvalidOperationException( $"Can't load objects, file `{ObjectsFilename}` doesn't exist." );
-            }
+            StratCommon.ValidateFileOnLoad( ObjectsFilename, StratCommon.OBJECTS_NOUN );
 
             GameObject[] rootObjects = RootObjectsGetter.Invoke();
             foreach( var go in rootObjects )
@@ -198,51 +166,26 @@ namespace UnityPlus.Serialization
 
             // Loads the IDs of objects returned by the getter func, then gets them by ID from the loader's reference dict.
 
-            string objectsStr = File.ReadAllText( ObjectsFilename, Encoding.UTF8 );
-            SerializedArray objectsJson = (SerializedArray)new Serialization.Json.JsonStringReader( objectsStr ).Read();
+            SerializedArray objectsJson = (SerializedArray)StratCommon.ReadFromFile( ObjectsFilename );
 
             foreach( var goJson in objectsJson )
             {
-                Guid objectGuid = l.ReadGuid( goJson[SerializerUtils.ID] );
+                Guid objectGuid = l.ReadGuid( goJson[KeyNames.ID] );
                 SerializedArray refChildren = (SerializedArray)goJson["children_ids"];
-                AssignIDsToReferencedChildren( l, (GameObject)l.Get( objectGuid ), ref refChildren );
+                StratUtils.AssignIDsToReferencedChildren( l, (GameObject)l.Get( objectGuid ), ref refChildren );
 
                 yield return null;
             }
         }
 
-        public IEnumerator Load_Data( ILoader l )
+        public IEnumerator LoadAsync_Data( ILoader l )
         {
-            if( string.IsNullOrEmpty( DataFilename ) )
-            {
-                throw new InvalidOperationException( $"Can't load objects' data, file name is not set." );
-            }
-
-            string dataStr = File.ReadAllText( DataFilename, Encoding.UTF8 );
-            SerializedArray data = (SerializedArray)new Serialization.Json.JsonStringReader( dataStr ).Read();
+            StratCommon.ValidateFileOnLoad( DataFilename, StratCommon.OBJECTS_DATA_NOUN );
+            SerializedArray data = (SerializedArray)StratCommon.ReadFromFile( ObjectsFilename );
 
             foreach( var dataElement in data )
             {
-                Guid id = l.ReadGuid( dataElement["$ref"] );
-                object obj = l.Get( id );
-                switch( obj )
-                {
-                    case GameObject go:
-                        go.SetData( l, dataElement["data"] );
-                        break;
-
-                    case Component comp:
-                        try
-                        {
-                            comp.SetData( l, dataElement["data"] );
-                        }
-                        catch( Exception ex )
-                        {
-                            Debug.LogError( $"[{nameof( JsonPreexistingGameObjectsStrategy )}] Failed to deserialize data of component with ID: `{dataElement?["$ref"] ?? "<null>"}`." );
-                            Debug.LogException( ex );
-                        }
-                        break;
-                }
+                StratUtils.ApplyDataToHierarchyElement( l, dataElement );
 
                 yield return null;
             }

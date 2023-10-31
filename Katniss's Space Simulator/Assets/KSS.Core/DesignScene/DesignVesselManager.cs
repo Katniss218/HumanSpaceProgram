@@ -73,7 +73,7 @@ namespace KSS.Core.DesignScene
             _vesselStrategy.ObjectsFilename = Path.Combine( CurrentVesselMetadata.GetRootDirectory(), "objects.json" );
             _vesselStrategy.DataFilename = Path.Combine( CurrentVesselMetadata.GetRootDirectory(), "data.json" );
 
-            CreateSaver( new Func<ISaver, IEnumerator>[] { _vesselStrategy.Save_Object }, new Func<ISaver, IEnumerator>[] { _vesselStrategy.Save_Data } );
+            CreateSaver( new Func<ISaver, IEnumerator>[] { _vesselStrategy.SaveAsync_Object }, new Func<ISaver, IEnumerator>[] { _vesselStrategy.SaveAsync_Data } );
 
             _saver.SaveAsync( instance );
 
@@ -90,7 +90,7 @@ namespace KSS.Core.DesignScene
             _vesselStrategy.ObjectsFilename = Path.Combine( loadedVesselMetadata.GetRootDirectory(), "objects.json" );
             _vesselStrategy.DataFilename = Path.Combine( loadedVesselMetadata.GetRootDirectory(), "data.json" );
 
-            CreateLoader( new Func<ILoader, IEnumerator>[] { _vesselStrategy.Load_Object }, new Func<ILoader, IEnumerator>[] { _vesselStrategy.Load_Data } );
+            CreateLoader( new Func<ILoader, IEnumerator>[] { _vesselStrategy.LoadAsync_Object }, new Func<ILoader, IEnumerator>[] { _vesselStrategy.LoadAsync_Data } );
             _loader.LoadAsync( instance );
             CurrentVesselMetadata = loadedVesselMetadata;
         }

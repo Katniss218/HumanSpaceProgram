@@ -82,8 +82,8 @@ namespace KSS.Core
             TimelineManager.EnsureDirectoryExists( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels" ) );
             _vesselsStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels", "objects.json" );
             _vesselsStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels", "data.json" );
-            e.objectActions.Add( _vesselsStrat.Save_Object );
-            e.dataActions.Add( _vesselsStrat.Save_Data );
+            e.objectActions.Add( _vesselsStrat.SaveAsync_Object );
+            e.dataActions.Add( _vesselsStrat.SaveAsync_Data );
         }
 
         [HSPEventListener( HSPEvent.TIMELINE_BEFORE_LOAD, HSPEvent.NAMESPACE_VANILLA + ".deserialize_vessels" )]
@@ -94,8 +94,8 @@ namespace KSS.Core
             TimelineManager.EnsureDirectoryExists( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels" ) );
             _vesselsStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels", "objects.json" );
             _vesselsStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels", "data.json" );
-            e.objectActions.Add( _vesselsStrat.Load_Object );
-            e.dataActions.Add( _vesselsStrat.Load_Data );
+            e.objectActions.Add( _vesselsStrat.LoadAsync_Object );
+            e.dataActions.Add( _vesselsStrat.LoadAsync_Data );
         }
     }
 }

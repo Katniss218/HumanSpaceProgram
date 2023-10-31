@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Strategies;
 
 namespace KSS.Core
 {
@@ -63,8 +64,8 @@ namespace KSS.Core
             TimelineManager.EnsureDirectoryExists( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies" ) );
             _celestialBodiesStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies", "object.json" );
             _celestialBodiesStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies", "data.json" );
-            e.objectActions.Add( _celestialBodiesStrat.Save_Object );
-            e.dataActions.Add( _celestialBodiesStrat.Save_Data );
+            e.objectActions.Add( _celestialBodiesStrat.SaveAsync_Object );
+            e.dataActions.Add( _celestialBodiesStrat.SaveAsync_Data );
         }
 
         [HSPEventListener( HSPEvent.TIMELINE_BEFORE_LOAD, HSPEvent.NAMESPACE_VANILLA + ".deserialize_celestial_bodies" )]
@@ -75,8 +76,8 @@ namespace KSS.Core
             TimelineManager.EnsureDirectoryExists( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies" ) );
             _celestialBodiesStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies", "object.json" );
             _celestialBodiesStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies", "data.json" );
-            e.objectActions.Add( _celestialBodiesStrat.Load_Object );
-            e.dataActions.Add( _celestialBodiesStrat.Load_Data );
+            e.objectActions.Add( _celestialBodiesStrat.LoadAsync_Object );
+            e.dataActions.Add( _celestialBodiesStrat.LoadAsync_Data );
         }
     }
 }

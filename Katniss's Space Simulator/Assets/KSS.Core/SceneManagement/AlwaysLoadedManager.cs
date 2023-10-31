@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityPlus.Serialization;
 using KSS.Core.Serialization;
 using System.IO;
+using UnityPlus.Serialization.Strategies;
 
 namespace KSS.Core
 {
@@ -65,8 +66,8 @@ namespace KSS.Core
             TimelineManager.EnsureDirectoryExists( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay" ) );
             _managersStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay", "objects.json" );
             _managersStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay", "data.json" );
-            e.objectActions.Add( _managersStrat.Save_Object );
-            e.dataActions.Add( _managersStrat.Save_Data );
+            e.objectActions.Add( _managersStrat.SaveAsync_Object );
+            e.dataActions.Add( _managersStrat.SaveAsync_Data );
         }
 
         [HSPEventListener( HSPEvent.TIMELINE_BEFORE_LOAD, HSPEvent.NAMESPACE_VANILLA + ".deserialize_managers" )]
@@ -77,8 +78,8 @@ namespace KSS.Core
             TimelineManager.EnsureDirectoryExists( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay" ) );
             _managersStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay", "objects.json" );
             _managersStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay", "data.json" );
-            e.objectActions.Add( _managersStrat.Load_Object );
-            e.dataActions.Add( _managersStrat.Load_Data );
+            e.objectActions.Add( _managersStrat.LoadAsync_Object );
+            e.dataActions.Add( _managersStrat.LoadAsync_Data );
         }
     }
 }

@@ -51,6 +51,7 @@ namespace KSS.DevUtils
         }
 
         static Building launchSite;
+        static GameObject vessel;
 
         [HSPEventListener( HSPEvent.STARTUP_IMMEDIATELY, "devutils.load_game_data" )]
         static void LoadGameData( object e )
@@ -73,6 +74,7 @@ namespace KSS.DevUtils
             var v = CreateVessel( launchSite );
             VesselManager.ActiveVessel = v.RootPart.GetVessel();
             VesselManager.ActiveVessel.transform.GetComponent<Rigidbody>().angularDrag = 1; // temp, doesn't veer off course.
+            vessel = v.gameObject;
         }
 
         static Vessel CreateVessel( Building launchSite )

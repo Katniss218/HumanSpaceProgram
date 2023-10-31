@@ -18,7 +18,7 @@ namespace UnityPlus.Serialization
 
             // A missing '$ref' node means the reference couldn't save properly.
 
-            if( ((SerializedObject)json).TryGetValue( $"{SerializerUtils.REF}", out SerializedData refJson ) )
+            if( ((SerializedObject)json).TryGetValue( KeyNames.REF, out SerializedData refJson ) )
             {
                 Guid guid = l.ReadGuid( refJson );
 
@@ -30,7 +30,7 @@ namespace UnityPlus.Serialization
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public static T ReadAssetReference<T>( this ILoader l, SerializedData json ) where T : class
         {
-            if( ((SerializedObject)json).TryGetValue( $"{SerializerUtils.ASSETREF}", out SerializedData refJson ) )
+            if( ((SerializedObject)json).TryGetValue( KeyNames.ASSETREF, out SerializedData refJson ) )
             {
                 string assetID = (string)refJson;
 
