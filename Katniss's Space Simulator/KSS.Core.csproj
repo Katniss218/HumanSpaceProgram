@@ -76,6 +76,7 @@
     <Compile Include="Assets\KSS.Core\Serialization\PartMetadata.cs" />
     <Compile Include="Assets\KSS.Core\CelestialBodyFactory.cs" />
     <Compile Include="Assets\KSS.Core\Building.Serialization.cs" />
+    <Compile Include="Assets\KSS.Core\Layer.cs" />
     <Compile Include="Assets\KSS.Core\Serialization\TimelineManager.cs" />
     <Compile Include="Assets\KSS.Core\DesignScene\Tools\VanillaToolRegisterer.cs" />
     <Compile Include="Assets\KSS.Core\Mods\ModLoader.cs" />
@@ -122,10 +123,9 @@
     <Compile Include="Assets\KSS.Core\CelestialBody.cs" />
     <Compile Include="Assets\KSS.Core\Serialization\IOHelper.cs" />
     <Compile Include="Assets\KSS.Core\IPartObject.cs" />
+    <Compile Include="Assets\KSS.Core\SceneManagement\InvalidSceneManagerException.cs" />
     <Compile Include="Assets\KSS.Core\Components\FLaunchSiteMarker.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\SubstanceStateCollection.cs" />
-    <Compile Include="Assets\KSS.Core\Layer.cs" />
-    <Compile Include="Assets\KSS.Core\SceneManagement\InvalidSceneManagerException.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.Core\___KSS.Core.asmdef" />

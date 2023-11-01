@@ -25,14 +25,25 @@ namespace KSS.Core.DesignScene
 
         private List<Transform> _looseParts = new List<Transform>();
 
-        public static bool CanPickUp( Transform t )
+#warning TODO - these methods are quite ugly.
+        public static bool CanPickup( Transform t )
         {
             return instance._looseParts.Contains( t.root ) || t.root == instance._vessel.transform;
+        }
+
+        public static void VesselPlace( Transform t )
+        {
+            instance._vessel = t.GetComponent<IPartObject>();
         }
 
         public static void GhostPlace( Transform t )
         {
             instance._looseParts.Add( t );
+        }
+        
+        public static void VesselPickup()
+        {
+            instance._vessel = null;
         }
         
         public static void GhostPickup( Transform t )
@@ -42,6 +53,8 @@ namespace KSS.Core.DesignScene
 
         public static bool IsVessel( Transform t )
         {
+            if( instance._vessel == null )
+                return false;
             return t.root == instance._vessel.transform;
         }
 

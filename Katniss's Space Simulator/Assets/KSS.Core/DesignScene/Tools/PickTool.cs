@@ -85,19 +85,30 @@ namespace KSS.Core.DesignScene.Tools
             Ray ray = _camera.ScreenPointToRay( Input.mousePosition );
             if( UnityEngine.Physics.Raycast( ray, out RaycastHit hitInfo, 8192, int.MaxValue ) )
             {
-                GameObject hitObj = hitInfo.collider.gameObject;
+                Transform clickedObj = hitInfo.collider.transform;
 
-                FClickInteractionRedirect r = hitObj.GetComponent<FClickInteractionRedirect>();
+                FClickInteractionRedirect r = clickedObj.GetComponent<FClickInteractionRedirect>();
                 if( r != null && r.Target != null )
                 {
-                    hitObj = r.Target;
+                    clickedObj = r.Target.transform;
                 }
 
-                if( DesignVesselManager.CanPickUp( hitObj.transform ) )
+                bool isVessel = false;
+                // pick up vessel directly, if clicked thing is the root.
+                if( clickedObj.parent == clickedObj.root && clickedObj.parent.HasComponent<IPartObject>() )
                 {
-                    DesignVesselManager.GhostPickup( hitObj.transform );
-                    HeldPart = hitObj.transform;
-                    _heldOffset = hitInfo.point - hitObj.transform.position;
+                    clickedObj = clickedObj.parent;
+                    isVessel = true;
+                }
+
+                if( DesignVesselManager.CanPickup( clickedObj ) )
+                {
+                    if( isVessel )
+                        DesignVesselManager.VesselPickup();
+                    else
+                        DesignVesselManager.GhostPickup( clickedObj );
+                    HeldPart = clickedObj;
+                    _heldOffset = hitInfo.point - clickedObj.position;
                 }
                 // recalc vessel data.
             }
@@ -109,17 +120,20 @@ namespace KSS.Core.DesignScene.Tools
             IEnumerable<RaycastHit> hits = UnityEngine.Physics.RaycastAll( ray, 8192, int.MaxValue ).OrderBy( h => h.distance );
             foreach( var hit in hits )
             {
-                GameObject hitObj = hit.collider.gameObject;
+                Transform hitObj = hit.collider.transform;
 
                 FClickInteractionRedirect r = hitObj.GetComponent<FClickInteractionRedirect>();
                 if( r != null && r.Target != null )
                 {
-                    hitObj = r.Target;
+                    hitObj = r.Target.transform;
                 }
 
-                if( DesignVesselManager.IsVessel( hitObj.transform ) )
+                if( hitObj.root == _heldPart )
+                    continue;
+
+                if( DesignVesselManager.IsVessel( hitObj ) )
                 {
-                    _heldPart.SetParent( hitObj.transform );
+                    _heldPart.SetParent( hitObj );
                     _heldPart = null;
                     // recalc vessel data.
                     return;
@@ -128,7 +142,10 @@ namespace KSS.Core.DesignScene.Tools
 
             // KSP would place as ghost here
 
-            DesignVesselManager.GhostPlace( _heldPart );
+            if( _heldPart.HasComponent<IPartObject>() )
+                DesignVesselManager.VesselPlace( _heldPart );
+            else
+                DesignVesselManager.GhostPlace( _heldPart );
             _heldPart = null;
         }
 
