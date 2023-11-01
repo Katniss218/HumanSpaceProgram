@@ -13,6 +13,7 @@ using UnityPlus.AssetManagement;
 using KSS.AssetLoaders.GameData;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.Strategies;
+using System.IO;
 
 namespace KSS.DevUtils
 {
@@ -117,7 +118,7 @@ namespace KSS.DevUtils
                 PartMetadata pm;
 
                 partDir = gameDataPath + "/Vanilla/Parts/part.engine";
-                TimelineManager.EnsureDirectoryExists( partDir );
+                Directory.CreateDirectory( partDir );
                 pm = new PartMetadata( partDir );
                 pm.Name = "Engine"; pm.Author = "Katniss"; pm.Categories = new string[] { "engine" };
                 pm.WriteToDisk();
@@ -128,7 +129,7 @@ namespace KSS.DevUtils
 
 
                 partDir = gameDataPath + "/Vanilla/Parts/part.intertank";
-                TimelineManager.EnsureDirectoryExists( partDir );
+                Directory.CreateDirectory( partDir );
                 pm = new PartMetadata( partDir );
                 pm.Name = "Intertank"; pm.Author = "Katniss"; pm.Categories = new string[] { "structural" };
                 pm.WriteToDisk();
@@ -139,7 +140,7 @@ namespace KSS.DevUtils
 
 
                 partDir = gameDataPath + "/Vanilla/Parts/part.tank";
-                TimelineManager.EnsureDirectoryExists( partDir );
+                Directory.CreateDirectory( partDir );
                 pm = new PartMetadata( partDir );
                 pm.Name = "Tank"; pm.Author = "Katniss"; pm.Categories = new string[] { "fuel_tank" };
                 pm.WriteToDisk();
@@ -150,7 +151,7 @@ namespace KSS.DevUtils
 
 
                 partDir = gameDataPath + "/Vanilla/Parts/part.tank_long";
-                TimelineManager.EnsureDirectoryExists( partDir );
+                Directory.CreateDirectory( partDir );
                 pm = new PartMetadata( partDir );
                 pm.Name = "Long Tank"; pm.Author = "Katniss"; pm.Categories = new string[] { "fuel_tank" };
                 pm.WriteToDisk();

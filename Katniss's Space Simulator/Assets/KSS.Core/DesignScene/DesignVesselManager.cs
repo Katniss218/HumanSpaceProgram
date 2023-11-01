@@ -19,9 +19,10 @@ namespace KSS.Core.DesignScene
     {
         static JsonSingleExplicitHierarchyStrategy _vesselStrategy = new JsonSingleExplicitHierarchyStrategy( GetGameObject );
 
-        private static IPartObject _vessel;
+        private IPartObject _vessel;
 
-        public static bool VesselExists = _vessel != null;
+        public static bool VesselExists = instance._vessel != null;
+
         /// <summary>
         /// Checks if a vessel/building/etc is currently being either saved or loaded.
         /// </summary>
@@ -71,7 +72,7 @@ namespace KSS.Core.DesignScene
         public static void SaveVessel()
         {
             // save current vessel to the files defined by metadata's ID.
-            TimelineManager.EnsureDirectoryExists( CurrentVesselMetadata.GetRootDirectory() );
+            Directory.CreateDirectory( CurrentVesselMetadata.GetRootDirectory() );
             _vesselStrategy.ObjectsFilename = Path.Combine( CurrentVesselMetadata.GetRootDirectory(), "objects.json" );
             _vesselStrategy.DataFilename = Path.Combine( CurrentVesselMetadata.GetRootDirectory(), "data.json" );
 
@@ -88,7 +89,7 @@ namespace KSS.Core.DesignScene
             loadedVesselMetadata.ReadDataFromDisk();
 
             // load current vessel from the files defined by metadata's ID.
-            TimelineManager.EnsureDirectoryExists( loadedVesselMetadata.GetRootDirectory() );
+            Directory.CreateDirectory( loadedVesselMetadata.GetRootDirectory() );
             _vesselStrategy.ObjectsFilename = Path.Combine( loadedVesselMetadata.GetRootDirectory(), "objects.json" );
             _vesselStrategy.DataFilename = Path.Combine( loadedVesselMetadata.GetRootDirectory(), "data.json" );
 
@@ -101,7 +102,7 @@ namespace KSS.Core.DesignScene
 
         private static GameObject GetGameObject()
         {
-            return _vessel.gameObject;
+            return instance._vessel.gameObject;
         }
     }
 }

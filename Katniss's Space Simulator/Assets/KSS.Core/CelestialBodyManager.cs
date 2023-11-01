@@ -1,4 +1,5 @@
-﻿using KSS.Core.Serialization;
+﻿using KSS.Core.SceneManagement;
+using KSS.Core.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,8 +19,8 @@ namespace KSS.Core
 
         public static CelestialBody Get( string id )
         {
-            if( instance == null )
-                throw new InvalidOperationException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
+            if( !exists )
+                throw new InvalidSceneManagerException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
 
             if( instance._celestialBodies.TryGetValue( id, out CelestialBody body ) )
             {
@@ -31,24 +32,24 @@ namespace KSS.Core
 
         public static CelestialBody[] GetAll()
         {
-            if( instance == null ) 
-                throw new InvalidOperationException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
+            if( !exists )
+                throw new InvalidSceneManagerException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
 
             return instance._celestialBodies.Values.ToArray();
         }
 
         internal static void Register( CelestialBody celestialBody )
         {
-            if( instance == null )
-                throw new InvalidOperationException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
+            if( !exists )
+                throw new InvalidSceneManagerException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
 
             instance._celestialBodies[celestialBody.ID] = celestialBody;
         }
 
         internal static void Unregister( string id )
         {
-            if( instance == null )
-                throw new InvalidOperationException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
+            if( !exists )
+                throw new InvalidSceneManagerException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
 
             instance._celestialBodies.Remove( id );
         }
@@ -79,7 +80,7 @@ namespace KSS.Core
         {
             var e = (TimelineManager.SaveEventData)ee;
 
-            TimelineManager.EnsureDirectoryExists( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies" ) );
+            Directory.CreateDirectory( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies" ) );
             _celestialBodiesStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies", "object.json" );
             _celestialBodiesStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies", "data.json" );
             e.objectActions.Add( _celestialBodiesStrat.SaveAsync_Object );
@@ -91,7 +92,7 @@ namespace KSS.Core
         {
             var e = (TimelineManager.LoadEventData)ee;
 
-            TimelineManager.EnsureDirectoryExists( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies" ) );
+            Directory.CreateDirectory( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies" ) );
             _celestialBodiesStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies", "object.json" );
             _celestialBodiesStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies", "data.json" );
             e.objectActions.Add( _celestialBodiesStrat.LoadAsync_Object );

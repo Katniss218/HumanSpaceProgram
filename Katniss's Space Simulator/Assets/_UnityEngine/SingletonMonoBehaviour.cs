@@ -20,10 +20,22 @@ namespace UnityEngine
                     __instance = FindObjectOfType<T>();
                     if( __instance == null )
                     {
-                        Debug.LogError( $"Requested {nameof( MonoBehaviour )} {nameof( T )} was not found." );
+                        throw new InvalidOperationException( $"Requested {nameof( MonoBehaviour )} {typeof( T ).Name} was not found." );
                     }
                 }
                 return __instance;
+            }
+        }
+
+        protected static bool exists
+        {
+            get
+            {
+                if( __instance == null )
+                {
+                    __instance = FindObjectOfType<T>();
+                }
+                return __instance != null;
             }
         }
     }

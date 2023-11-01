@@ -109,14 +109,6 @@ namespace KSS.Core.Serialization
             _loader = new AsyncLoader( SaveLoadStartFunc, LoadFinishFunc, objectActions, dataActions );
         }
 
-        public static void EnsureDirectoryExists( string path )
-        {
-            if( !Directory.Exists( path ) )
-            {
-                Directory.CreateDirectory( path );
-            }
-        }
-
         private static SaveEventData _eSave;
         private static LoadEventData _eLoad;
 
@@ -135,7 +127,7 @@ namespace KSS.Core.Serialization
                 throw new InvalidOperationException( $"Can't start saving a timeline while already saving or loading." );
             }
 
-            EnsureDirectoryExists( SaveMetadata.GetRootDirectory( timelineId, saveId ) );
+            Directory.CreateDirectory( SaveMetadata.GetRootDirectory( timelineId, saveId ) );
 
             _eSave = new SaveEventData( timelineId, saveId );
             HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_SAVE, _eSave );
@@ -166,7 +158,7 @@ namespace KSS.Core.Serialization
                 throw new InvalidOperationException( $"Can't start loading a timeline while already saving or loading." );
             }
 
-            EnsureDirectoryExists( SaveMetadata.GetRootDirectory( timelineId, saveId ) );
+            Directory.CreateDirectory( SaveMetadata.GetRootDirectory( timelineId, saveId ) );
 
             TimelineMetadata loadedTimeline = new TimelineMetadata( timelineId );
             loadedTimeline.ReadDataFromDisk();
