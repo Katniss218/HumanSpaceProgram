@@ -28,7 +28,6 @@ namespace KSS.Core.DesignScene.Tools
                 }
                 _heldPart = value;
                 _heldOffset = Vector3.zero;
-                _heldPart.gameObject.SetLayer( (int)Layer.VESSEL_DESIGN_HELD, true );
                 _heldPart.SetParent( null );
             }
         }
@@ -84,7 +83,7 @@ namespace KSS.Core.DesignScene.Tools
         private void TryGrabPart()
         {
             Ray ray = _camera.ScreenPointToRay( Input.mousePosition );
-            if( UnityEngine.Physics.Raycast( ray, out RaycastHit hitInfo, 8192, 1 << (int)Layer.VESSEL_DESIGN ) )
+            if( UnityEngine.Physics.Raycast( ray, out RaycastHit hitInfo, 8192, int.MaxValue ) )
             {
                 GameObject hitObj = hitInfo.collider.gameObject;
 
@@ -94,8 +93,12 @@ namespace KSS.Core.DesignScene.Tools
                     hitObj = r.Target;
                 }
 
-                HeldPart = hitObj.transform;
-                _heldOffset = hitInfo.point - hitObj.transform.position;
+                if( DesignVesselManager.CanPickUp( hitObj.transform ) )
+                {
+                    DesignVesselManager.GhostPickup( hitObj.transform );
+                    HeldPart = hitObj.transform;
+                    _heldOffset = hitInfo.point - hitObj.transform.position;
+                }
                 // recalc vessel data.
             }
         }
@@ -103,9 +106,10 @@ namespace KSS.Core.DesignScene.Tools
         private void PlacePart()
         {
             Ray ray = _camera.ScreenPointToRay( Input.mousePosition );
-            if( UnityEngine.Physics.Raycast( ray, out RaycastHit hitInfo, 8192, 1 << (int)Layer.VESSEL_DESIGN ) )
+            IEnumerable<RaycastHit> hits = UnityEngine.Physics.RaycastAll( ray, 8192, int.MaxValue ).OrderBy( h => h.distance );
+            foreach( var hit in hits )
             {
-                GameObject hitObj = hitInfo.collider.gameObject;
+                GameObject hitObj = hit.collider.gameObject;
 
                 FClickInteractionRedirect r = hitObj.GetComponent<FClickInteractionRedirect>();
                 if( r != null && r.Target != null )
@@ -113,18 +117,19 @@ namespace KSS.Core.DesignScene.Tools
                     hitObj = r.Target;
                 }
 
-                _heldPart.gameObject.SetLayer( (int)Layer.VESSEL_DESIGN, true );
-                _heldPart.SetParent( hitObj.transform );
-                _heldPart = null;
-                // recalc vessel data.
+                if( DesignVesselManager.IsVessel( hitObj.transform ) )
+                {
+                    _heldPart.SetParent( hitObj.transform );
+                    _heldPart = null;
+                    // recalc vessel data.
+                    return;
+                }
             }
-            else
-            {
-                // KSP would place as ghost here
 
-                _heldPart.gameObject.SetLayer( (int)Layer.VESSEL_DESIGN, true );
-                _heldPart = null;
-            }
+            // KSP would place as ghost here
+
+            DesignVesselManager.GhostPlace( _heldPart );
+            _heldPart = null;
         }
 
         private void PositionHeldPart()
@@ -136,15 +141,21 @@ namespace KSS.Core.DesignScene.Tools
             Ray ray = _camera.ScreenPointToRay( Input.mousePosition );
 
             // Snap to surface.
-            if( !Input.GetKey( KeyCode.LeftAlt )
-             && UnityEngine.Physics.Raycast( ray, out RaycastHit hitInfo, 8192, 1 << (int)Layer.VESSEL_DESIGN ) )
+            if( !Input.GetKey( KeyCode.LeftAlt ) )
             {
-                // TODO - angle snap like in KSP.
+                IEnumerable<RaycastHit> hits = UnityEngine.Physics.RaycastAll( ray, 8192, int.MaxValue ).OrderBy( h => h.distance );
+                foreach( var hit in hits )
+                {
+                    if( DesignVesselManager.IsVessel( hit.collider.transform ) )
+                    {
+                        // TODO - angle snap like in KSP.
 
-                _heldPart.rotation = Quaternion.LookRotation( hitInfo.normal, Vector3.up );
-                _heldPart.position = hitInfo.point; // todo - use surface attach node if available.
+                        _heldPart.rotation = Quaternion.LookRotation( hit.normal, Vector3.up );
+                        _heldPart.position = hit.point; // todo - use surface attach node if available.
 
-                return;
+                        return;
+                    }
+                }
             }
 
             Plane p = new Plane( _camera.transform.forward, point );

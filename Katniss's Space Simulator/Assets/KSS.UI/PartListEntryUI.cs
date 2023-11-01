@@ -32,9 +32,9 @@ namespace KSS.UI
             }
             else
             {
-                spawnedPart.SetLayer( (int)Layer.VESSEL_DESIGN, true );
                 spawnedPart.transform.localPosition = Vector3.zero;
                 spawnedPart.transform.localRotation = Quaternion.identity;
+                DesignVesselManager.TryCreateNewVessel( spawnedPart );
             }
         }
 

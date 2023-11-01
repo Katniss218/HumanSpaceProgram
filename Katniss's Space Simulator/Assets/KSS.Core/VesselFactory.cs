@@ -32,6 +32,19 @@ namespace KSS.Core
             return vessel;
         }
 
+        public Vessel Create( Vector3Dbl airfPosition, QuaternionDbl airfRotation, GameObject rootPart )
+        {
+            Vessel vessel = CreateGO( airfPosition, airfRotation );
+
+            rootPart.transform.SetParent( vessel.transform );
+            rootPart.transform.localPosition = Vector3.zero;
+            rootPart.transform.localRotation = Quaternion.identity;
+            vessel.SetRootPart( rootPart.transform );
+            vessel.RecalculateParts();
+
+            return vessel;
+        }
+
         private static Vessel CreateGO( Vector3Dbl airfPosition, QuaternionDbl airfRotation )
         {
             GameObject gameObject = new GameObject( $"Vessel, '{name}'" );

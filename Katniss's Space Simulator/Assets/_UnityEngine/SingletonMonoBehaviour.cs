@@ -11,29 +11,46 @@ namespace UnityEngine
     {
         private static T __instance;
 
+        /// <summary>
+        /// Gets the cached instance. <br/>
+        /// If nothing is cached, attempts to find the instance. Throws an exception if the number of instances is not 1.
+        /// </summary>
         protected static T instance
         {
             get
             {
                 if( __instance == null )
                 {
-                    __instance = FindObjectOfType<T>();
-                    if( __instance == null )
+                    var instances = FindObjectsOfType<T>( true );
+                    if( instances.Length == 0 )
                     {
                         throw new InvalidOperationException( $"Requested {nameof( MonoBehaviour )} {typeof( T ).Name} was not found." );
                     }
+                    if( instances.Length > 1 )
+                    {
+                        throw new InvalidOperationException( $"Too many instances of {nameof( MonoBehaviour )} {typeof( T ).Name}." );
+                    }
+                    __instance = instances[0];
                 }
                 return __instance;
             }
         }
 
+        /// <summary>
+        /// Checks if at least 1 instance of this behaviour exists. <br/>
+        /// </summary>
         protected static bool exists
         {
             get
             {
                 if( __instance == null )
                 {
-                    __instance = FindObjectOfType<T>();
+                    var instances = FindObjectsOfType<T>( true );
+                    if( instances.Length == 0 )
+                    {
+                        return false;
+                    }
+                    __instance = instances[0];
                 }
                 return __instance != null;
             }

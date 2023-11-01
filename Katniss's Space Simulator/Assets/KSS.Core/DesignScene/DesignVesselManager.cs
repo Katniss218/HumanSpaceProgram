@@ -21,7 +21,38 @@ namespace KSS.Core.DesignScene
 
         private IPartObject _vessel;
 
-        public static bool VesselExists = instance._vessel != null;
+        public static bool VesselExists => instance._vessel != null;
+
+        private List<Transform> _looseParts = new List<Transform>();
+
+        public static bool CanPickUp( Transform t )
+        {
+            return instance._looseParts.Contains( t.root ) || t.root == instance._vessel.transform;
+        }
+
+        public static void GhostPlace( Transform t )
+        {
+            instance._looseParts.Add( t );
+        }
+        
+        public static void GhostPickup( Transform t )
+        {
+            instance._looseParts.Remove( t );
+        }
+
+        public static bool IsVessel( Transform t )
+        {
+            return t.root == instance._vessel.transform;
+        }
+
+        public static void TryCreateNewVessel( GameObject root )
+        {
+            if( instance._vessel == null )
+            {
+                //Vessel v = new VesselFactory().Create( Vector3Dbl.zero, QuaternionDbl.identity, root );
+                //instance._vessel = v;
+            }
+        }
 
         /// <summary>
         /// Checks if a vessel/building/etc is currently being either saved or loaded.
@@ -54,7 +85,7 @@ namespace KSS.Core.DesignScene
             {
                 TimeManager.Unpause();
             }
-            _vesselStrategy.LastSpawnedRoot.SetLayer( (int)Layer.VESSEL_DESIGN, true );
+            instance._vessel = _vesselStrategy.LastSpawnedRoot.GetComponent<IPartObject>();
         }
 
         private static void CreateSaver( IEnumerable<Func<ISaver, IEnumerator>> objectActions, IEnumerable<Func<ISaver, IEnumerator>> dataActions )
