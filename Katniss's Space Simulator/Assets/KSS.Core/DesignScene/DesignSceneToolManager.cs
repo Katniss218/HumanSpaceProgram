@@ -11,23 +11,8 @@ namespace KSS.Core.DesignScene
     /// <summary>
     /// Manages the available design scene viewport tools, and which is currently active.
     /// </summary>
-    public class DesignSceneToolManager : MonoBehaviour
+    public class DesignSceneToolManager : SingletonMonoBehaviour<DesignSceneToolManager>
     {
-        #region SINGLETON UGLINESS
-        private static DesignSceneToolManager ___instance;
-        private static DesignSceneToolManager instance
-        {
-            get
-            {
-                if( ___instance == null )
-                {
-                    ___instance = FindObjectOfType<DesignSceneToolManager>();
-                }
-                return ___instance;
-            }
-        }
-        #endregion
-
         private List<MonoBehaviour> _tools = new List<MonoBehaviour>();
         private MonoBehaviour _currentTool = null;
 
@@ -37,7 +22,7 @@ namespace KSS.Core.DesignScene
         public static Type ActiveToolType { get => instance?._currentTool?.GetType(); }
 
         /// <summary>
-        /// Registers a tool with the specified type.
+        /// Registers a tool with the specified type for future use.
         /// </summary>
         public static void RegisterTool<T>() where T : MonoBehaviour
         {
@@ -65,9 +50,10 @@ namespace KSS.Core.DesignScene
         /// <remarks>
         /// Tool instances are persisted. Selecting a tool, and going back to a previous one keeps its data.
         /// </remarks>
-        public static void UseTool<T>() where T : MonoBehaviour
+        /// <returns>The instance of the tool that was enabled.</returns>
+        public static T UseTool<T>() where T : MonoBehaviour
         {
-            UseTool( typeof( T ) );
+            return (T)UseTool( typeof( T ) );
         }
 
         /// <summary>
@@ -76,7 +62,8 @@ namespace KSS.Core.DesignScene
         /// <remarks>
         /// Tool instances are persisted. Selecting a tool, and going back to a previous one keeps its data.
         /// </remarks>
-        public static void UseTool( Type toolType )
+        /// <returns>The instance of the tool that was enabled.</returns>
+        public static object UseTool( Type toolType )
         {
             if( instance == null )
             {
@@ -110,6 +97,7 @@ namespace KSS.Core.DesignScene
             instance._currentTool = tool;
             instance._currentTool.enabled = true;
             HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_TOOL_CHANGED );
+            return instance._currentTool;
         }
 
         void Start()

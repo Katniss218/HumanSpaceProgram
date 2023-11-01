@@ -1,4 +1,5 @@
 ﻿using KSS.Core;
+using KSS.Core.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,63 +12,34 @@ namespace KSS.AssetLoaders.GameData
 {
     public static class JsonPartLoader
     {
-        const string OBJECTS_SUFFIX = "_o.json";
-        const string DATA_SUFFIX = "_d.json";
-
         static JsonPartStrategy _strat = new JsonPartStrategy(); // this can be used to save a part too.
         static Loader _loader = new Loader( null, null, _strat.Load_Object, _strat.Load_Data );
-
-        private static IEnumerable<string> GroupFiles( IEnumerable<string> files, params string[] suffixes )
-        {
-            Dictionary<string, int> partGroups = new Dictionary<string, int>();
-
-            foreach( var file in files )
-            {
-                foreach( var suffix in suffixes )
-                {
-                    if( file.EndsWith( suffix ) )
-                    {
-                        string fileBase = file[..(OBJECTS_SUFFIX.Length)];
-                        if( partGroups.TryGetValue( fileBase, out var count ) )
-                        {
-                            partGroups[fileBase] = count + 1;
-                        }
-                        else
-                        {
-                            partGroups[fileBase] = 1;
-                        }
-                    }
-                }
-            }
-
-            List<string> accepted = new List<string>();
-            foreach( var kvp in partGroups )
-            {
-                if( kvp.Value == suffixes.Length )
-                {
-                    accepted.Add( kvp.Key );
-                }
-            }
-
-            return accepted;
-        }
 
         [HSPEventListener( HSPEvent.STARTUP_IMMEDIATELY, HSPEvent.NAMESPACE_VANILLA + ".load_parts" )]
         private static void OnStartup( object e )
         {
+            // <mod_folder>/Parts/<part_id>/objects.json, data.json, _part.json
             string gameDataPath = HumanSpaceProgram.GetGameDataDirectoryPath();
-            string[] jsonFiles = Directory.GetFiles( gameDataPath, "*.json", SearchOption.AllDirectories );
+            string[] modDirectories = Directory.GetDirectories( gameDataPath );
 
-            IEnumerable<string> baseFiles = GroupFiles( jsonFiles, OBJECTS_SUFFIX, DATA_SUFFIX );
+            List<string> partDirectories = new List<string>();
+            foreach( var modDirectory in modDirectories )
+            {
+                string partsDir = Path.Combine( modDirectory, "Parts" );
+                if( Directory.Exists( partsDir ) )
+                    partDirectories.AddRange( Directory.GetDirectories( partsDir ) );
+            }
 
             // register a loader for each part.
-            foreach( var baseFile in baseFiles )
+            foreach( var partPath in partDirectories )
             {
-                string pathRelativeToGameData = Path.GetRelativePath( gameDataPath, baseFile );
-                AssetRegistry.RegisterLazy( $"gamedata::{pathRelativeToGameData}", () =>
+                PartMetadata partMeta = new PartMetadata( partPath );
+                partMeta.ReadDataFromDisk();
+                AssetRegistry.Register( $"part::m/{partMeta.ID}", partMeta );
+                AssetRegistry.RegisterLazy( $"part::h/{partMeta.ID}", () =>
                 {
-                    _strat.ObjectsFilename = baseFile + OBJECTS_SUFFIX;
-                    _strat.DataFilename = baseFile + DATA_SUFFIX;
+                    _strat.ObjectsFilename = Path.Combine( partPath, "objects.json" );
+                    _strat.DataFilename = Path.Combine( partPath, "data.json" );
                     _loader.Load();
                     return _strat.LastSpawnedRoot;
                 }, isCacheable: false );

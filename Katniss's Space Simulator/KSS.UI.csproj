@@ -69,7 +69,6 @@
     <Compile Include="Assets\KSS.UI\SceneFactories\MainMenuSceneUIFactory.cs" />
     <Compile Include="Assets\KSS.UI\PartListUI.cs" />
     <Compile Include="Assets\KSS.UI\TimewarpReadoutUI.cs" />
-    <Compile Include="Assets\KSS.UI\Windows\DesignLoadVesselWindow.cs" />
     <Compile Include="Assets\KSS.UI\GameplayClickInteractionManager.cs" />
     <Compile Include="Assets\KSS.UI\TimelineMetadataUI.cs" />
     <Compile Include="Assets\KSS.UI\VelocityReadoutUI.cs" />

@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\KSS\CelestialBodies\VanillaPlanetarySystemFactory.cs" />
+    <Compile Include="Assets\KSS\AssetLoaders\GameData\JsonPartStrategy.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadTree.cs" />
     <Compile Include="Assets\KSS\Components\FVesselSeparator.cs" />
     <Compile Include="Assets\KSS\AssetPartSource.cs" />
@@ -72,9 +73,8 @@
     <Compile Include="Assets\KSS\Components\FBulkContainer_Sphere.cs" />
     <Compile Include="Assets\KSS\Components\FBulkConnection.cs" />
     <Compile Include="Assets\KSS\Components\FActuatorXY.cs" />
-    <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadTree_NodeUtils.cs" />
     <Compile Include="Assets\KSS\AssetLoaders\GameData\JsonPartLoader.cs" />
-    <Compile Include="Assets\KSS\AssetLoaders\GameData\JsonPartStrategy.cs" />
+    <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadTree_NodeUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS\CelestialBodies\Surface\TerrainShader.shader" />

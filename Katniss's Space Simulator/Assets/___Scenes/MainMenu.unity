@@ -448,7 +448,7 @@ GameObject:
   - component: {fileID: 543436772}
   - component: {fileID: 543436774}
   - component: {fileID: 543436773}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: _ MAIN MENU MANAGER _
   m_TagString: Untagged
   m_Icon: {fileID: 0}

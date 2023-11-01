@@ -12,23 +12,8 @@ namespace KSS.Core.Serialization
     /// <summary>
     /// Manages the currently loaded timeline (save/workspace). See <see cref="TimelineMetadata"/> and <see cref="SaveMetadata"/>.
     /// </summary>
-    public class TimelineManager : HSPManager
+    public class TimelineManager : SingletonMonoBehaviour<TimelineManager>
     {
-        #region SINGLETON UGLINESS
-        private static TimelineManager ___instance;
-        private static TimelineManager instance
-        {
-            get
-            {
-                if( ___instance == null )
-                {
-                    ___instance = FindObjectOfType<TimelineManager>();
-                }
-                return ___instance;
-            }
-        }
-        #endregion
-
         public struct SaveEventData
         {
             public string timelineId;

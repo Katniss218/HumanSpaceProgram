@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Json;
 
 namespace KSS.Core.Serialization
 {
@@ -12,6 +15,16 @@ namespace KSS.Core.Serialization
     /// </summary>
     public class PartMetadata
     {
+        /// <summary>
+        /// The name of the file that stores the part metadata.
+        /// </summary>
+        public const string PART_FILENAME = "_part.json";
+
+        /// <summary>
+        /// The filepath of this metadata.
+        /// </summary>
+        public readonly string Path;
+
         /// <summary>
         /// The unique ID of this part.
         /// </summary>
@@ -32,10 +45,12 @@ namespace KSS.Core.Serialization
         /// </summary>
         public string Author { get; set; }
 
+        //public Sprite Icon { get; set; }
+
         /// <summary>
         /// The (filter) categories that this part belongs to.
         /// </summary>
-        public string[] Categories { get; set; }
+        public string[] Categories { get; set; } = new string[] { };
 
         /// <summary>
         /// The filter string for searching this part.
@@ -47,20 +62,43 @@ namespace KSS.Core.Serialization
         /// </summary>
         public string Group { get; set; } = null;
 
-        public PartMetadata( string id )
+        public PartMetadata( string path )
         {
-            this.ID = id;
+            if( path.EndsWith( PART_FILENAME ) )
+            {
+                path = path[..PART_FILENAME.Length];
+            }
+            this.Path = path;
+            this.ID = System.IO.Path.GetFileName( path );
         }
 
-        public static IEnumerable<PartMetadata> Filtered( IEnumerable<PartMetadata> parts, string filter )
+        /// <summary>
+        /// Returns the path to the (root) directory of the timeline.
+        /// </summary>
+        public string GetRootDirectory()
+        {
+            return this.Path;
+        }
+
+        public static IEnumerable<PartMetadata> Filtered( IEnumerable<PartMetadata> parts, string category, string filter )
         {
             return parts.Where(
-                p => (p.Name?.Contains( filter, StringComparison.InvariantCultureIgnoreCase ) ?? false)
-                  || (p.Author?.Contains( filter, StringComparison.InvariantCultureIgnoreCase ) ?? false)
-                  || (p.Filter?.Contains( filter, StringComparison.InvariantCultureIgnoreCase ) ?? false) );
+                p =>
+                {
+                    bool isCategory = category == null
+                        ? true
+                        : (p.Categories?.Contains( category ) ?? true);
+                    bool isFilter = filter == null
+                        ? true
+                        : (p.Name?.Contains( filter, StringComparison.InvariantCultureIgnoreCase ) ?? false)
+                       || (p.Author?.Contains( filter, StringComparison.InvariantCultureIgnoreCase ) ?? false)
+                       || (p.Filter?.Contains( filter, StringComparison.InvariantCultureIgnoreCase ) ?? false);
+                    return
+                        isCategory && isFilter;
+                } );
         }
 
-        public static HashSet<string> GetUniqueCategories( IEnumerable<PartMetadata> parts )
+        public static string[] GetUniqueCategories( IEnumerable<PartMetadata> parts )
         {
             HashSet<string> uniqueCategories = new HashSet<string>();
             foreach( var part in parts )
@@ -70,7 +108,30 @@ namespace KSS.Core.Serialization
                     uniqueCategories.Add( category );
                 }
             }
-            return uniqueCategories;
+            return uniqueCategories.ToArray();
+        }
+
+        public void WriteToDisk()
+        {
+            string savePath = GetRootDirectory();
+            string saveFilePath = System.IO.Path.Combine( savePath, PART_FILENAME );
+
+            StringBuilder sb = new StringBuilder();
+            new JsonStringWriter( this.GetData(), sb ).Write();
+
+            File.WriteAllText( saveFilePath, sb.ToString(), Encoding.UTF8 );
+        }
+
+        public void ReadDataFromDisk()
+        {
+            string savePath = GetRootDirectory();
+            string saveFilePath = System.IO.Path.Combine( savePath, PART_FILENAME );
+
+            string saveJson = File.ReadAllText( saveFilePath, Encoding.UTF8 );
+
+            SerializedData data = new JsonStringReader( saveJson ).Read();
+
+            this.SetData( data );
         }
 
         public SerializedData GetData()
@@ -113,7 +174,7 @@ namespace KSS.Core.Serialization
                 int i = 0;
                 foreach( var elemKvp in (SerializedArray)categories )
                 {
-                    this.Categories[i] = (string)categories;
+                    this.Categories[i] = (string)elemKvp;
                     i++;
                 }
             }

@@ -1,4 +1,6 @@
-﻿using KSS.Core.Serialization;
+﻿using KSS.Core.DesignScene;
+using KSS.Core.DesignScene.Tools;
+using KSS.Core.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +22,10 @@ namespace KSS.UI
             // set current tool to pick tool.
             // if vessel exists, add to pick tool
             // otherwise, spawn a new vessel with that part as root.
+            PickTool pickTool = DesignSceneToolManager.UseTool<PickTool>();
+
+            GameObject spawnedPart = AssetRegistry.Get<GameObject>( $"part::h/{_part.ID}" );
+            pickTool.HeldPart = spawnedPart.transform;
         }
 
         public static PartListEntryUI Create( IUIElementContainer parent, UILayoutInfo layout, PartMetadata part )

@@ -63,6 +63,22 @@ namespace KSS.Core.DesignScene.Tools
             }
         }
 
+        public Transform HeldPart
+        {
+            get => _heldPart;
+            set
+            {
+                if( _heldPart != null )
+                {
+                    Destroy( _heldPart.gameObject );
+                }
+                _heldPart = value;
+                _heldOffset = Vector3.zero;
+                _heldPart.gameObject.SetLayer( 25, true );
+                _heldPart.SetParent( null );
+            }
+        }
+
         private void TryGrabPart()
         {
             Ray ray = _camera.ScreenPointToRay( Input.mousePosition );
@@ -76,10 +92,8 @@ namespace KSS.Core.DesignScene.Tools
                     hitObj = r.Target;
                 }
 
-                _heldPart = hitObj.transform;
+                HeldPart = hitObj.transform;
                 _heldOffset = hitInfo.point - hitObj.transform.position;
-                _heldPart.gameObject.SetLayer( 25, true );
-                _heldPart.SetParent( null );
                 // recalc vessel data.
             }
         }

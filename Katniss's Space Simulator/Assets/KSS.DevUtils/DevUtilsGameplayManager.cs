@@ -10,6 +10,8 @@ using KSS.Core.Serialization;
 using KSS.Core.Components;
 using System;
 using UnityPlus.AssetManagement;
+using KSS.AssetLoaders.GameData;
+using UnityPlus.Serialization;
 
 namespace KSS.DevUtils
 {
@@ -103,6 +105,58 @@ namespace KSS.DevUtils
             if( Input.GetKeyDown( KeyCode.F5 ) )
             {
                 CreateVessel( launchSite );
+            }
+            if( Input.GetKeyDown( KeyCode.F1 ) )
+            {
+                JsonPartStrategy strat = new JsonPartStrategy(); // this can be used to save a part too.
+                Saver saver = new Saver( null, null, strat.Save_Object, strat.Save_Data );
+
+                string gameDataPath = HumanSpaceProgram.GetGameDataDirectoryPath();
+                string partDir;
+                PartMetadata pm;
+
+                partDir = gameDataPath + "/Vanilla/Parts/part.engine";
+                TimelineManager.EnsureDirectoryExists( partDir );
+                pm = new PartMetadata( partDir );
+                pm.Name = "Engine"; pm.Author = "Katniss"; pm.Categories = new string[] { "engine" };
+                pm.WriteToDisk();
+                strat.RootToSave = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/part.engine" );
+                strat.ObjectsFilename = partDir + "/objects.json";
+                strat.DataFilename = partDir + "/data.json";
+                saver.Save();
+
+
+                partDir = gameDataPath + "/Vanilla/Parts/part.intertank";
+                TimelineManager.EnsureDirectoryExists( partDir );
+                pm = new PartMetadata( partDir );
+                pm.Name = "Intertank"; pm.Author = "Katniss"; pm.Categories = new string[] { "structural" };
+                pm.WriteToDisk();
+                strat.RootToSave = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/part.intertank" );
+                strat.ObjectsFilename = partDir + "/objects.json";
+                strat.DataFilename = partDir + "/data.json";
+                saver.Save();
+
+
+                partDir = gameDataPath + "/Vanilla/Parts/part.tank";
+                TimelineManager.EnsureDirectoryExists( partDir );
+                pm = new PartMetadata( partDir );
+                pm.Name = "Tank"; pm.Author = "Katniss"; pm.Categories = new string[] { "fuel_tank" };
+                pm.WriteToDisk();
+                strat.RootToSave = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/part.tank" );
+                strat.ObjectsFilename = partDir + "/objects.json";
+                strat.DataFilename = partDir + "/data.json";
+                saver.Save();
+
+
+                partDir = gameDataPath + "/Vanilla/Parts/part.tank_long";
+                TimelineManager.EnsureDirectoryExists( partDir );
+                pm = new PartMetadata( partDir );
+                pm.Name = "Long Tank"; pm.Author = "Katniss"; pm.Categories = new string[] { "fuel_tank" };
+                pm.WriteToDisk();
+                strat.RootToSave = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/part.tank_long" );
+                strat.ObjectsFilename = partDir + "/objects.json";
+                strat.DataFilename = partDir + "/data.json";
+                saver.Save();
             }
         }
 

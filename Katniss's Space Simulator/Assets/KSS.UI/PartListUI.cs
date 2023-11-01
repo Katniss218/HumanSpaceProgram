@@ -1,5 +1,6 @@
 ﻿using KSS.Core.Serialization;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
@@ -10,8 +11,8 @@ namespace KSS.UI
 {
     public class PartListUI : MonoBehaviour
     {
-        private List<PartMetadata> _parts;
-        private List<string> _categories;
+        private PartMetadata[] _parts;
+        private string[] _categories;
 
         private IUIElementContainer _list;
         private IUIElementContainer _categoryList;
@@ -30,24 +31,42 @@ namespace KSS.UI
                 cat.Destroy();
             }
 
-            foreach( var id in _parts )
+            foreach( var id in PartMetadata.Filtered( _parts, _category, _filter ) )
             {
-                // TODO - filter.
                 PartListEntryUI.Create( _list, new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 75, 75 ) ), id );
             }
             UILayout.BroadcastLayoutUpdate( _list );
 
             foreach( var cat in _categories )
             {
+                string label = cat == null ? "ALL" : cat.Length < 4 ? cat : cat.Substring( 0, 4 );
                 _categoryList.AddButton( new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 40, 34 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/category_background" ), () =>
                  {
                      this._category = cat;
                      this.Refresh();
                  } )
-                    .WithText( UILayoutInfo.Fill(), cat?[0].ToString() ?? "all", out var text );
+                    .WithText( UILayoutInfo.Fill(), label ?? "all", out var text );
                 text.WithAlignment( TMPro.HorizontalAlignmentOptions.Center, TMPro.VerticalAlignmentOptions.Middle );
             }
             UILayout.BroadcastLayoutUpdate( _categoryList );
+        }
+
+        private static PartMetadata[] GetParts()
+        {
+            var assetsAndIds = AssetRegistry.GetAll<PartMetadata>( "part::m/" );
+            PartMetadata[] assets = new PartMetadata[assetsAndIds.Length];
+            for( int i = 0; i < assetsAndIds.Length; i++ )
+            {
+                assets[i] = assetsAndIds[i].asset;
+            }
+            return assets;
+            return new PartMetadata[]
+            {
+                new PartMetadata( "part.engine.f_1" ) { Author = "Katniss", Name = "F-1 Engine", Description = "Powerful", Categories = new [] { "engine" }, Filter = "nasa saturn apollo f1 f-1" },
+                new PartMetadata( "part.engine.j_2" ) { Author = "Katniss", Name = "J-2 Engine", Description = "Powerful", Categories = new [] { "engine" }, Filter = "nasa saturn apollo f1 f-1" },
+                new PartMetadata( "part.engine.ro_11" ) { Author = "Katniss", Name = "RO-11 Engine", Description = "Powerful", Categories = new [] { "engine" }, Filter = "nasa saturn apollo f1 f-1" },
+                new PartMetadata( "part.apollo_cm" ) { Author = "Katniss", Name = "Apollo CM", Description = "Powerful", Categories = new [] { "command" }, Filter = "nasa saturn apollo f1 f-1" }
+            };
         }
 
         public static PartListUI Create( IUIElementContainer parent, UILayoutInfo layout )
@@ -77,23 +96,13 @@ namespace KSS.UI
             PartListUI partListUI = uiPanel.gameObject.AddComponent<PartListUI>();
 
             // update part IDs from *somewhere*
-            partListUI._parts = new List<PartMetadata>()
-            {
-                new PartMetadata( "part.engine.f_1" ) { Author = "Katniss", Name = "F-1 Engine", Description = "Powerful", Categories = new [] { "engine" }, Filter = "nasa saturn apollo f1 f-1" },
-                new PartMetadata( "part.engine.j_2" ) { Author = "Katniss", Name = "J-2 Engine", Description = "Powerful", Categories = new [] { "engine" }, Filter = "nasa saturn apollo f1 f-1" },
-                new PartMetadata( "part.engine.ro_11" ) { Author = "Katniss", Name = "RO-11 Engine", Description = "Powerful", Categories = new [] { "engine" }, Filter = "nasa saturn apollo f1 f-1" },
-                new PartMetadata( "part.apollo_cm" ) { Author = "Katniss", Name = "Apollo CM", Description = "Powerful", Categories = new [] { "command" }, Filter = "nasa saturn apollo f1 f-1" }
-            };
+            partListUI._parts = GetParts();
 
-            partListUI._categories = new List<string>()
-            {
-                null,
-                "command",
-                "fuel_tank",
-                "engine",
-                "aero",
-                "structural",
-            };
+            var categories = new List<string>();
+            var categories2 = PartMetadata.GetUniqueCategories( partListUI._parts );
+            categories.Add( null );
+            categories.AddRange( categories2 );
+            partListUI._categories = categories.ToArray();
 
             partListUI._list = uiPartList;
             partListUI._categoryList = categoryScroll;

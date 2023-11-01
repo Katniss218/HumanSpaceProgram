@@ -111,12 +111,13 @@ namespace UnityPlus.AssetManagement
         }
 
         /// <summary>
-        /// Returns all registered assets.
+        /// Returns all registered assets, optionally with a given prefix.
         /// </summary>
         /// <remarks>
         /// This method doesn't include lazy-loaded assets, unless already cached.
         /// </remarks>
-        public static (string, T)[] GetAll<T>() where T : class
+        /// <param name="path">The optional prefix that all the returned assets must match.</param>
+        public static (string assetID, T asset)[] GetAll<T>( string path = null ) where T : class
         {
             List<(string, T)> assets = new List<(string, T)>();
 
@@ -125,7 +126,10 @@ namespace UnityPlus.AssetManagement
                 if( kvp.Value is not T )
                     continue;
 
-                assets.Add( (kvp.Key, (T)kvp.Value) );
+                if( path == null || kvp.Key.StartsWith( path ) )
+                {
+                    assets.Add( (kvp.Key, (T)kvp.Value) );
+                }
             }
 
             return assets.ToArray();

@@ -1037,7 +1037,7 @@ GameObject:
   - component: {fileID: 1611604358}
   - component: {fileID: 1611604360}
   - component: {fileID: 1611604361}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: _ ALWAYS LOADED MANAGER _
   m_TagString: Untagged
   m_Icon: {fileID: 0}
