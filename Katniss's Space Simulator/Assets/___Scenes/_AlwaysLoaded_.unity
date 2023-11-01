@@ -1035,7 +1035,6 @@ GameObject:
   - component: {fileID: 1611604359}
   - component: {fileID: 1611604362}
   - component: {fileID: 1611604358}
-  - component: {fileID: 1611604360}
   - component: {fileID: 1611604361}
   m_Layer: 3
   m_Name: _ ALWAYS LOADED MANAGER _
@@ -1071,18 +1070,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1611604360
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1611604357}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f26c91c250fad5441ae825679dbf9e31, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1611604361
 MonoBehaviour:
   m_ObjectHideFlags: 0

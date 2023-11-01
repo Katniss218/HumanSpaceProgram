@@ -11,13 +11,17 @@ using UnityPlus.Serialization.Strategies;
 
 namespace KSS.Core
 {
-    public class CelestialBodyManager : HSPManager, IPersistent
+    [RequireComponent( typeof( PreexistingReference ) )]
+    public class CelestialBodyManager : SingletonMonoBehaviour<CelestialBodyManager>, IPersistent
     {
-        private static Dictionary<string, CelestialBody> _celestialBodies = new Dictionary<string, CelestialBody>();
+        private Dictionary<string, CelestialBody> _celestialBodies = new Dictionary<string, CelestialBody>();
 
         public static CelestialBody Get( string id )
         {
-            if( _celestialBodies.TryGetValue( id, out CelestialBody body ) )
+            if( instance == null )
+                throw new InvalidOperationException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
+
+            if( instance._celestialBodies.TryGetValue( id, out CelestialBody body ) )
             {
                 return body;
             }
@@ -25,14 +29,28 @@ namespace KSS.Core
             return null;
         }
 
+        public static CelestialBody[] GetAll()
+        {
+            if( instance == null ) 
+                throw new InvalidOperationException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
+
+            return instance._celestialBodies.Values.ToArray();
+        }
+
         internal static void Register( CelestialBody celestialBody )
         {
-            _celestialBodies[celestialBody.ID] = celestialBody;
+            if( instance == null )
+                throw new InvalidOperationException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
+
+            instance._celestialBodies[celestialBody.ID] = celestialBody;
         }
 
         internal static void Unregister( string id )
         {
-            _celestialBodies.Remove( id );
+            if( instance == null )
+                throw new InvalidOperationException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
+
+            instance._celestialBodies.Remove( id );
         }
 
 
@@ -53,7 +71,7 @@ namespace KSS.Core
 
         private static GameObject[] GetAllRootGameObjects()
         {
-            return _celestialBodies.Values.Select( cb => cb.gameObject ).ToArray();
+            return instance._celestialBodies.Values.Select( cb => cb.gameObject ).ToArray();
         }
 
         [HSPEventListener( HSPEvent.TIMELINE_BEFORE_SAVE, HSPEvent.NAMESPACE_VANILLA + ".serialize_celestial_bodies" )]

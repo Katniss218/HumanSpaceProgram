@@ -13,13 +13,13 @@ namespace KSS.Core.DesignScene
     /// </summary>
     public class DesignSceneToolManager : SingletonMonoBehaviour<DesignSceneToolManager>
     {
-        private List<MonoBehaviour> _tools = new List<MonoBehaviour>();
-        private MonoBehaviour _currentTool = null;
+        private List<MonoBehaviour> _availableTools = new List<MonoBehaviour>();
+        private MonoBehaviour _activeTool = null;
 
         /// <summary>
         /// This can return null if no tool is selected.
         /// </summary>
-        public static Type ActiveToolType { get => instance?._currentTool?.GetType(); }
+        public static Type ActiveToolType { get => instance?._activeTool?.GetType(); }
 
         /// <summary>
         /// Registers a tool with the specified type for future use.
@@ -31,7 +31,7 @@ namespace KSS.Core.DesignScene
                 throw new InvalidOperationException( $"{nameof( DesignSceneToolManager )} is accessible only in the design scene." );
             }
 
-            foreach( var tool in instance._tools )
+            foreach( var tool in instance._availableTools )
             {
                 if( tool.GetType() == typeof( T ) )
                 {
@@ -41,7 +41,7 @@ namespace KSS.Core.DesignScene
             MonoBehaviour comp = instance.gameObject.AddComponent<T>();
             comp.enabled = false;
 
-            instance._tools.Add( comp );
+            instance._availableTools.Add( comp );
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace KSS.Core.DesignScene
             }
 
             MonoBehaviour tool = null;
-            foreach( var t in instance._tools )
+            foreach( var t in instance._availableTools )
             {
                 if( t.GetType() == toolType )
                 {
@@ -91,19 +91,19 @@ namespace KSS.Core.DesignScene
             }
 
             // Tool already being used.
-            if( instance._currentTool == tool )
+            if( instance._activeTool == tool )
             {
-                return instance._currentTool;
+                return instance._activeTool;
             }
 
-            if( instance._currentTool != null )
+            if( instance._activeTool != null )
             {
-                instance._currentTool.enabled = false;
+                instance._activeTool.enabled = false;
             }
-            instance._currentTool = tool;
-            instance._currentTool.enabled = true;
+            instance._activeTool = tool;
+            instance._activeTool.enabled = true;
             HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_TOOL_CHANGED );
-            return instance._currentTool;
+            return instance._activeTool;
         }
 
         void Start()
@@ -129,7 +129,7 @@ namespace KSS.Core.DesignScene
             {
                 try
                 {
-                    UseTool( _tools[0].GetType() );
+                    UseTool( _availableTools[0].GetType() );
                 }
                 catch { }
             }
@@ -137,7 +137,7 @@ namespace KSS.Core.DesignScene
             {
                 try
                 {
-                    UseTool( _tools[1].GetType() );
+                    UseTool( _availableTools[1].GetType() );
                 }
                 catch { }
             }
@@ -145,7 +145,7 @@ namespace KSS.Core.DesignScene
             {
                 try
                 {
-                    UseTool( _tools[2].GetType() );
+                    UseTool( _availableTools[2].GetType() );
                 }
                 catch { }
             }
@@ -153,7 +153,7 @@ namespace KSS.Core.DesignScene
             {
                 try
                 {
-                    UseTool( _tools[3].GetType() );
+                    UseTool( _availableTools[3].GetType() );
                 }
                 catch { }
             }
@@ -161,7 +161,7 @@ namespace KSS.Core.DesignScene
             {
                 try
                 {
-                    UseTool( _tools[4].GetType() );
+                    UseTool( _availableTools[4].GetType() );
                 }
                 catch { }
             }
@@ -169,7 +169,7 @@ namespace KSS.Core.DesignScene
             {
                 try
                 {
-                    UseTool( _tools[5].GetType() );
+                    UseTool( _availableTools[5].GetType() );
                 }
                 catch { }
             }
@@ -177,7 +177,7 @@ namespace KSS.Core.DesignScene
             {
                 try
                 {
-                    UseTool( _tools[6].GetType() );
+                    UseTool( _availableTools[6].GetType() );
                 }
                 catch { }
             }
@@ -185,7 +185,7 @@ namespace KSS.Core.DesignScene
             {
                 try
                 {
-                    UseTool( _tools[7].GetType() );
+                    UseTool( _availableTools[7].GetType() );
                 }
                 catch { }
             }
@@ -193,7 +193,7 @@ namespace KSS.Core.DesignScene
             {
                 try
                 {
-                    UseTool( _tools[8].GetType() );
+                    UseTool( _availableTools[8].GetType() );
                 }
                 catch { }
             }
@@ -201,7 +201,7 @@ namespace KSS.Core.DesignScene
             {
                 try
                 {
-                    UseTool( _tools[9].GetType() );
+                    UseTool( _availableTools[9].GetType() );
                 }
                 catch { }
             }

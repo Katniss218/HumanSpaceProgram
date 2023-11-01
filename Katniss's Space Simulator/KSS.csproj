@@ -63,7 +63,7 @@
     <Compile Include="Assets\KSS\Effects\Atmospheres\AtmosphereRenderer.cs" />
     <Compile Include="Assets\KSS\Components\FSequencer.cs" />
     <Compile Include="Assets\KSS\Components\FDryMass.cs" />
-    <Compile Include="Assets\KSS\Cameras\CameraController.cs" />
+    <Compile Include="Assets\KSS\Cameras\GameplayCameraController.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\MakeQuadMesh_Job.cs" />
     <Compile Include="Assets\KSS\Components\FController.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadSphere.cs" />

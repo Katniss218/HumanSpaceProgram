@@ -11,7 +11,8 @@ using UnityPlus.Serialization.Strategies;
 
 namespace KSS.Core
 {
-    public class BuildingManager : HSPManager, IPersistent
+    [RequireComponent( typeof( PreexistingReference ) )]
+    public class BuildingManager : SingletonMonoBehaviour<BuildingManager>, IPersistent
     {
         private static List<Building> _loadedBuildings = new List<Building>();
 

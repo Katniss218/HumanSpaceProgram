@@ -71,7 +71,16 @@ namespace KSS.Core
         void OnDisable()
         {
             if( this.ID != null )
-                CelestialBodyManager.Unregister( this.ID );
+            {
+                try
+                {
+                    CelestialBodyManager.Unregister( this.ID );
+                }
+                catch( InvalidOperationException ex )
+                {
+                    // OnDisable was called when scene was unloaded, ignore.
+                }
+            }
         }
 
         /// <summary>

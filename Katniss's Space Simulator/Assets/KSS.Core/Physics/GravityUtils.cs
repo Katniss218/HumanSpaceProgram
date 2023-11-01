@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using UnityEngine;
 
 namespace KSS.Core.Physics
@@ -17,19 +18,24 @@ namespace KSS.Core.Physics
         /// <returns>The calculated acceleration, in [m/s^2].</returns>
         public static Vector3Dbl GetGravityAcceleration( Vector3Dbl airfPosition )
         {
-            CelestialBody cb = CelestialBodyManager.Get( "main" ); // temporary.
+            CelestialBody[] bodies = CelestialBodyManager.GetAll(); // this can be optimized.
 
-            Vector3Dbl toBody = cb.AIRFPosition - airfPosition;
-
-            double distanceSq = toBody.sqrMagnitude;
-            if( distanceSq == 0.0 )
+            Vector3Dbl accSum = Vector3Dbl.zero;
+            foreach( var body in bodies )
             {
-                return Vector3Dbl.zero;
+                Vector3Dbl toBody = body.AIRFPosition - airfPosition;
+
+                double distanceSq = toBody.sqrMagnitude;
+                if( distanceSq == 0.0 )
+                {
+                    continue;
+                }
+
+                double forceMagn = G * (body.Mass / distanceSq);
+                accSum += toBody.normalized * forceMagn;
             }
 
-            double forceMagn = G * (cb.Mass / distanceSq);
-
-            return toBody.normalized * forceMagn;
+            return accSum;
         }
 
         /// <summary>
@@ -37,7 +43,7 @@ namespace KSS.Core.Physics
         /// </summary>
         /// <param name="airfPosition">The position of the point in absolute inertial reference frame.</param>
         /// <returns>The calculated force, in [N].</returns>
-        public static Vector3Dbl GetGravityForce( double objectMass, Vector3Dbl airfPosition )
+        public static Vector3Dbl GetGravityForce( Vector3Dbl airfPosition, double objectMass )
         {
             return objectMass * GetGravityAcceleration( airfPosition );
         }

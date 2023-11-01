@@ -6,18 +6,8 @@ using UnityEngine.Rendering.PostProcessing;
 
 namespace KSS.Cameras
 {
-    public class CameraController : MonoBehaviour
+    public class GameplayCameraController : SingletonMonoBehaviour<GameplayCameraController>
     {
-        private static CameraController ___instance;
-        public static CameraController Instance
-        {
-            get
-            {
-                if( ___instance == null ) ___instance = FindObjectOfType<CameraController>();
-                return ___instance;
-            }
-        }
-
         /// <summary>
         /// The camera will focus on this object.
         /// </summary>
@@ -37,19 +27,19 @@ namespace KSS.Cameras
         /// Used for rendering the vessels and other close / small objects, as well as shadows.
         /// </summary>
         [field: SerializeField]
-        UnityEngine.Camera _nearCamera;
+        Camera _nearCamera;
 
         /// <summary>
         /// Used for rendering the planets mostly.
         /// </summary>
         [field: SerializeField]
-        UnityEngine.Camera _farCamera;
+        Camera _farCamera;
 
         /// <summary>
         /// Used for rendering screen space effects, like atmospheres.
         /// </summary>
         [field: SerializeField]
-        UnityEngine.Camera _effectCamera;
+        Camera _effectCamera;
 
         float? mapViewPreviousZoomDist = null;
 
@@ -74,7 +64,7 @@ namespace KSS.Cameras
         /// <remarks>
         /// Do not manually modify the fields of this camera.
         /// </remarks>
-        public UnityEngine.Camera MainCamera { get => _nearCamera; }
+        public static Camera MainCamera { get => instance._nearCamera; }
 
         bool _isTranslating;
         bool _isRotating;
@@ -224,7 +214,7 @@ namespace KSS.Cameras
         [HSPEventListener( HSPEvent.TIMELINE_AFTER_LOAD, HSPEvent.NAMESPACE_VANILLA + "camera_controller.snap_to_vessel" )]
         static void SnapToActiveVessel( object e )
         {
-            Instance.ReferenceObject = VesselManager.ActiveVessel.RootPart.transform;
+            instance.ReferenceObject = VesselManager.ActiveVessel.RootPart.transform;
         }
     }
 }

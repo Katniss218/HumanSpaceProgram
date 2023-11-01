@@ -53,7 +53,7 @@ namespace KSS.Core.DesignScene
             {
                 TimeManager.Unpause();
             }
-            _vesselStrategy.LastSpawnedRoot.SetLayer( HumanSpaceProgram.LAYER_VESSEL_DESIGN, true );
+            _vesselStrategy.LastSpawnedRoot.SetLayer( (int)Layer.VESSEL_DESIGN, true );
         }
 
         private static void CreateSaver( IEnumerable<Func<ISaver, IEnumerator>> objectActions, IEnumerable<Func<ISaver, IEnumerator>> dataActions )

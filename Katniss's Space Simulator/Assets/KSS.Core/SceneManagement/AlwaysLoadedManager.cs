@@ -1,13 +1,12 @@
 using KSS.Core.Mods;
 using KSS.Core.SceneManagement;
+using KSS.Core.Serialization;
 using System;
-using System.Linq;
-using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
-using KSS.Core.Serialization;
-using System.IO;
 using UnityPlus.Serialization.Strategies;
 
 namespace KSS.Core
@@ -15,9 +14,13 @@ namespace KSS.Core
     /// <summary>
     /// A manager that is loaded immediately and remains loaded until the game is exited.
     /// </summary>
-    public class AlwaysLoadedManager : MonoBehaviour
+    [RequireComponent( typeof( PreexistingReference ) )]
+    public class AlwaysLoadedManager : SingletonMonoBehaviour<AlwaysLoadedManager>
     {
         public const string ALWAYS_LOADED_SCENE_NAME = "_AlwaysLoaded";
+
+        public static AlwaysLoadedManager Instance => instance;
+        public static GameObject GameObject => instance.gameObject;
 
         void Awake()
         {
@@ -35,19 +38,20 @@ namespace KSS.Core
             SceneLoader.LoadSceneAsync( MainMenuSceneManager.SCENE_NAME, true, false, null );
         }
 
+        //
+        //      SERIALIZATION OF MANAGERS - this can be moved to its own class.
+        //
 
         private static readonly JsonPreexistingGameObjectsStrategy _managersStrat = new JsonPreexistingGameObjectsStrategy( GetAllManagerGameObjects );
 
         private static GameObject[] GetAllManagerGameObjects()
         {
-            // An alternative approach could be to have a layer for manager objects (canonically a single object for all tho).
-
-            HSPManager[] managers =  FindObjectsOfType<HSPManager>();
-            List<GameObject> gameObjects = new List<GameObject>();
+            PreexistingReference[] managers = FindObjectsOfType<PreexistingReference>();
+            HashSet<GameObject> gameObjects = new HashSet<GameObject>();
 
             foreach( var manager in managers )
             {
-                if( gameObjects.Contains( manager.gameObject ) )
+                if( manager.gameObject.layer != (int)Layer.MANAGERS )
                 {
                     continue;
                 }

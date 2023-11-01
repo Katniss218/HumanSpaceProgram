@@ -9,49 +9,34 @@ namespace KSS.Core.SceneManagement
     /// <summary>
     /// Can load and unload scenes easily.
     /// </summary>
-    public class SceneLoader : MonoBehaviour
+    public class SceneLoader
     {
-        #region singleton bleh but an object is required for the coroutine.
-        static SceneLoader ___instance;
-        static SceneLoader _instance
-        {
-            get
-            {
-                if( ___instance == null )
-                {
-                    ___instance = FindObjectOfType<SceneLoader>();
-                }
-                return ___instance;
-            }
-        }
-        #endregion
-
         public static void UnloadActiveSceneAsync( Action onAfterUnloaded )
-        {            
-            _instance.StartCoroutine( UnloadAsync( SceneManager.GetActiveScene().name, onAfterUnloaded ) );
+        {
+            AlwaysLoadedManager.Instance.StartCoroutine( UnloadCoroutine( SceneManager.GetActiveScene().name, onAfterUnloaded ) );
         }
 
         public static void UnloadSceneAsync( string scene, Action onAfterUnloaded )
         {
             if( string.IsNullOrEmpty( scene ) )
             {
-                throw new ArgumentNullException(nameof(scene), $"The scene can't be null" );
+                throw new ArgumentNullException( nameof( scene ), $"The scene to unload can't be null." );
             }
 
-            _instance.StartCoroutine( UnloadAsync( scene, onAfterUnloaded ) );
+            AlwaysLoadedManager.Instance.StartCoroutine( UnloadCoroutine( scene, onAfterUnloaded ) );
         }
 
-        public static void LoadSceneAsync( string scene, bool additive, bool localPhysics, Action onAfterLoaded )
+        public static void LoadSceneAsync( string scene, bool additive, bool hasLocalPhysics, Action onAfterLoaded )
         {
             if( string.IsNullOrEmpty( scene ) )
             {
-                throw new ArgumentNullException( nameof( scene ), $"The scene can't be null" );
+                throw new ArgumentNullException( nameof( scene ), $"The scene to load can't be null." );
             }
 
-            _instance.StartCoroutine( LoadAsync( scene, additive, localPhysics, onAfterLoaded ) );
+            AlwaysLoadedManager.Instance.StartCoroutine( LoadCoroutine( scene, additive, hasLocalPhysics, onAfterLoaded ) );
         }
 
-        static IEnumerator UnloadAsync( string sceneToUnload, Action onAfterUnloaded )
+        private static IEnumerator UnloadCoroutine( string sceneToUnload, Action onAfterUnloaded )
         {
             Scene scene = SceneManager.GetSceneByName( sceneToUnload );
             AsyncOperation op = SceneManager.UnloadSceneAsync( scene );
@@ -65,10 +50,10 @@ namespace KSS.Core.SceneManagement
             onAfterUnloaded?.Invoke();
         }
 
-        static IEnumerator LoadAsync( string sceneToLoad, bool additive, bool localPhysics, Action onAfterLoaded )
+        private static IEnumerator LoadCoroutine( string sceneToLoad, bool additive, bool hasLocalPhysics, Action onAfterLoaded )
         {
             LoadSceneMode lm = additive ? LoadSceneMode.Additive : LoadSceneMode.Single;
-            LocalPhysicsMode lp = localPhysics ? LocalPhysicsMode.Physics3D : LocalPhysicsMode.None;
+            LocalPhysicsMode lp = hasLocalPhysics ? LocalPhysicsMode.Physics3D : LocalPhysicsMode.None;
 
             AsyncOperation op = SceneManager.LoadSceneAsync( sceneToLoad, new LoadSceneParameters( lm, lp ) );
             op.completed += ( x ) =>

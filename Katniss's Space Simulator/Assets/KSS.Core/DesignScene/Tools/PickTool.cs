@@ -14,13 +14,31 @@ namespace KSS.Core.DesignScene.Tools
     public class PickTool : MonoBehaviour
     {
         Transform _heldPart = null;
+        /// <summary>
+        /// Gets or sets the part that's currently "held" by the cursor.
+        /// </summary>
+        public Transform HeldPart
+        {
+            get => _heldPart;
+            set
+            {
+                if( _heldPart != null )
+                {
+                    Destroy( _heldPart.gameObject );
+                }
+                _heldPart = value;
+                _heldOffset = Vector3.zero;
+                _heldPart.gameObject.SetLayer( (int)Layer.VESSEL_DESIGN_HELD, true );
+                _heldPart.SetParent( null );
+            }
+        }
 
         Vector3 _heldOffset;
 
-        Camera _camera;
-
         public bool SnappingEnabled { get; set; }
         public float SnapAngle { get; set; }
+
+        Camera _camera;
 
         void Awake()
         {
@@ -63,26 +81,10 @@ namespace KSS.Core.DesignScene.Tools
             }
         }
 
-        public Transform HeldPart
-        {
-            get => _heldPart;
-            set
-            {
-                if( _heldPart != null )
-                {
-                    Destroy( _heldPart.gameObject );
-                }
-                _heldPart = value;
-                _heldOffset = Vector3.zero;
-                _heldPart.gameObject.SetLayer( HumanSpaceProgram.LAYER_VESSEL_DESIGN_HELD, true );
-                _heldPart.SetParent( null );
-            }
-        }
-
         private void TryGrabPart()
         {
             Ray ray = _camera.ScreenPointToRay( Input.mousePosition );
-            if( UnityEngine.Physics.Raycast( ray, out RaycastHit hitInfo, 8192, 1 << HumanSpaceProgram.LAYER_VESSEL_DESIGN ) )
+            if( UnityEngine.Physics.Raycast( ray, out RaycastHit hitInfo, 8192, 1 << (int)Layer.VESSEL_DESIGN ) )
             {
                 GameObject hitObj = hitInfo.collider.gameObject;
 
@@ -101,7 +103,7 @@ namespace KSS.Core.DesignScene.Tools
         private void PlacePart()
         {
             Ray ray = _camera.ScreenPointToRay( Input.mousePosition );
-            if( UnityEngine.Physics.Raycast( ray, out RaycastHit hitInfo, 8192, 1 << HumanSpaceProgram.LAYER_VESSEL_DESIGN ) )
+            if( UnityEngine.Physics.Raycast( ray, out RaycastHit hitInfo, 8192, 1 << (int)Layer.VESSEL_DESIGN ) )
             {
                 GameObject hitObj = hitInfo.collider.gameObject;
 
@@ -111,16 +113,16 @@ namespace KSS.Core.DesignScene.Tools
                     hitObj = r.Target;
                 }
 
-                _heldPart.gameObject.SetLayer( HumanSpaceProgram.LAYER_VESSEL_DESIGN, true );
+                _heldPart.gameObject.SetLayer( (int)Layer.VESSEL_DESIGN, true );
                 _heldPart.SetParent( hitObj.transform );
                 _heldPart = null;
                 // recalc vessel data.
             }
             else
             {
-                // place as ghost
+                // KSP would place as ghost here
 
-                _heldPart.gameObject.SetLayer( HumanSpaceProgram.LAYER_VESSEL_DESIGN, true );
+                _heldPart.gameObject.SetLayer( (int)Layer.VESSEL_DESIGN, true );
                 _heldPart = null;
             }
         }
@@ -135,7 +137,7 @@ namespace KSS.Core.DesignScene.Tools
 
             // Snap to surface.
             if( !Input.GetKey( KeyCode.LeftAlt )
-             && UnityEngine.Physics.Raycast( ray, out RaycastHit hitInfo, 8192, 1 << HumanSpaceProgram.LAYER_VESSEL_DESIGN ) )
+             && UnityEngine.Physics.Raycast( ray, out RaycastHit hitInfo, 8192, 1 << (int)Layer.VESSEL_DESIGN ) )
             {
                 // TODO - angle snap like in KSP.
 

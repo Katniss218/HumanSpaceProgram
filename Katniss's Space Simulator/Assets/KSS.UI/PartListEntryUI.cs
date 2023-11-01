@@ -32,7 +32,7 @@ namespace KSS.UI
             }
             else
             {
-                spawnedPart.SetLayer( HumanSpaceProgram.LAYER_VESSEL_DESIGN, true );
+                spawnedPart.SetLayer( (int)Layer.VESSEL_DESIGN, true );
                 spawnedPart.transform.localPosition = Vector3.zero;
                 spawnedPart.transform.localRotation = Quaternion.identity;
             }

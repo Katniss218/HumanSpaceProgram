@@ -1,14 +1,18 @@
 using UnityEngine;
-using UnityPlus.UILib.UIElements;
+using UnityPlus.Serialization;
 
 namespace KSS.Core
 {
     /// <summary>
     /// A Manager that is active in the gameplay scene.
     /// </summary>
-    public class DesignSceneManager : MonoBehaviour
+    [RequireComponent( typeof( PreexistingReference ) )]
+    public class DesignSceneManager : SingletonMonoBehaviour<DesignSceneManager>
     {
         public const string SCENE_NAME = "Design";
+
+        public static DesignSceneManager Instance => instance;
+        public static GameObject GameObject => instance.gameObject;
 
         void Awake()
         {
