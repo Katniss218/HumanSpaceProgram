@@ -8,8 +8,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace>
-    </RootNamespace>
+    <RootNamespace></RootNamespace>
     <ProjectGuid>{C615911B-EF2A-D5E1-1CFB-5D278FA273D2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -94,7 +93,6 @@
     <Compile Include="Assets\KSS.Core\ReferenceFrames\RootObjectTransform.cs" />
     <Compile Include="Assets\KSS.Core\VesselFactory.cs" />
     <Compile Include="Assets\KSS.Core\SceneManagement\SceneLoader.cs" />
-    <Compile Include="Assets\KSS.Core\HSPManager.cs" />
     <Compile Include="Assets\KSS.Core\ReferenceFrames\IAcceleratingReferenceFrame.cs" />
     <Compile Include="Assets\KSS.Core\Control\ControlInAttribute.cs" />
     <Compile Include="Assets\KSS.Core\Serialization\Version.cs" />
@@ -126,6 +124,7 @@
     <Compile Include="Assets\KSS.Core\IPartObject.cs" />
     <Compile Include="Assets\KSS.Core\Components\FLaunchSiteMarker.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\SubstanceStateCollection.cs" />
+    <Compile Include="Assets\KSS.Core\HSPManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.Core\___KSS.Core.asmdef" />

@@ -17,10 +17,11 @@ namespace KSS.Core.DesignScene
     /// </summary>
     public class DesignVesselManager : SingletonMonoBehaviour<DesignVesselManager>
     {
-        static JsonExplicitHierarchyGameObjectsStrategy _vesselStrategy = new JsonExplicitHierarchyGameObjectsStrategy( GetGameObjects );
+        static JsonSingleExplicitHierarchyStrategy _vesselStrategy = new JsonSingleExplicitHierarchyStrategy( GetGameObject );
 
         private static IPartObject _vessel;
 
+        public static bool VesselExists = _vessel != null;
         /// <summary>
         /// Checks if a vessel/building/etc is currently being either saved or loaded.
         /// </summary>
@@ -52,6 +53,7 @@ namespace KSS.Core.DesignScene
             {
                 TimeManager.Unpause();
             }
+            _vesselStrategy.LastSpawnedRoot.SetLayer( HumanSpaceProgram.LAYER_VESSEL_DESIGN, true );
         }
 
         private static void CreateSaver( IEnumerable<Func<ISaver, IEnumerator>> objectActions, IEnumerable<Func<ISaver, IEnumerator>> dataActions )
@@ -97,9 +99,9 @@ namespace KSS.Core.DesignScene
 
         // ------
 
-        private static GameObject[] GetGameObjects()
+        private static GameObject GetGameObject()
         {
-            return new GameObject[] { _vessel.gameObject };
+            return _vessel.gameObject;
         }
     }
 }

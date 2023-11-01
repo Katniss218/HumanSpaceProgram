@@ -1,4 +1,5 @@
-﻿using KSS.Core.DesignScene;
+﻿using KSS.Core;
+using KSS.Core.DesignScene;
 using KSS.Core.DesignScene.Tools;
 using KSS.Core.Serialization;
 using System;
@@ -25,7 +26,16 @@ namespace KSS.UI
             PickTool pickTool = DesignSceneToolManager.UseTool<PickTool>();
 
             GameObject spawnedPart = AssetRegistry.Get<GameObject>( $"part::h/{_part.ID}" );
-            pickTool.HeldPart = spawnedPart.transform;
+            if( DesignVesselManager.VesselExists )
+            {
+                pickTool.HeldPart = spawnedPart.transform;
+            }
+            else
+            {
+                spawnedPart.SetLayer( HumanSpaceProgram.LAYER_VESSEL_DESIGN, true );
+                spawnedPart.transform.localPosition = Vector3.zero;
+                spawnedPart.transform.localRotation = Quaternion.identity;
+            }
         }
 
         public static PartListEntryUI Create( IUIElementContainer parent, UILayoutInfo layout, PartMetadata part )

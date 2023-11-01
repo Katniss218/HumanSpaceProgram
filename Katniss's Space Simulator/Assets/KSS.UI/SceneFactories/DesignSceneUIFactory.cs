@@ -54,7 +54,13 @@ namespace KSS.UI.SceneFactories
                     DesignVesselManager.LoadVessel( IOHelper.SanitizeFileName( text ) );
                 } );
             } );
-            UIButton saveBtn = p1.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 80, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_save" ), null );
+            UIButton saveBtn = p1.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 80, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_save" ), () =>
+            {
+                CanvasManager.Get( CanvasName.WINDOWS ).AddConfirmationWindow( "Save ...", "Confirm saving the vessel", () =>
+                {
+                    DesignVesselManager.SaveVessel();
+                } );
+            } );
             UIPanel p2 = topPanel.AddPanel( UILayoutInfo.FillVertical( 0, 0, 0.5f, 0, 300 ), null );
             UIInputField nameInputField = p2.AddInputField( UILayoutInfo.FillVertical( 0, 0, 0.5f, 0, 300 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) )
                 .WithMargins( 5, 5, 5, 5 )

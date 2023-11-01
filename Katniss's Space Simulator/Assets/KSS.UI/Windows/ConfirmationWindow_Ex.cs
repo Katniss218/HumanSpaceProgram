@@ -10,11 +10,11 @@ using UnityPlus.UILib.UIElements;
 
 namespace KSS.UI.Windows
 {
-    public static class ComfirmationWindow_Ex
+    public static class ConfirmationWindow_Ex
     {
         // a simple generic confirmation window that lets you pass an action to call when OK is clicked.
 
-        public static UIWindow AddComfirmationWindow( this UICanvas canvas, string title, string text, Action onClick )
+        public static UIWindow AddConfirmationWindow( this UICanvas canvas, string title, string text, Action onClick )
         {
             UIWindow window = canvas.AddWindow( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 250f, 100f ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_window" ) )
                 .Draggable()

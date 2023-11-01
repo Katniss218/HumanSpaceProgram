@@ -90,6 +90,12 @@ namespace KSS.Core.DesignScene
                 throw new InvalidOperationException( $"A tool of type {toolType.FullName} has not been registered. Please register a tool type before trying to use it." );
             }
 
+            // Tool already being used.
+            if( instance._currentTool == tool )
+            {
+                return instance._currentTool;
+            }
+
             if( instance._currentTool != null )
             {
                 instance._currentTool.enabled = false;

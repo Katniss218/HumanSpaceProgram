@@ -29,11 +29,13 @@ namespace UnityPlus.Serialization.Strategies
         /// <summary>
         /// Determines which objects will be saved.
         /// </summary>
-        public Func<IEnumerable<GameObject>> RootObjectsGetter { get; }
+        public Func<IEnumerable<GameObject>> RootObjectsGetter { get; set; }
         /// <summary>
         /// Determines which objects (including child objects) returned by the <see cref="RootObjectsGetter"/> will be excluded from saving.
         /// </summary>
         public uint IncludedObjectsMask { get; set; } = uint.MaxValue;
+
+        public List<GameObject> LastSpawnedRoots { get; private set; } = new List<GameObject>();
 
         public JsonExplicitHierarchyGameObjectsStrategy( Func<IEnumerable<GameObject>> rootObjectsGetter )
         {
@@ -87,11 +89,13 @@ namespace UnityPlus.Serialization.Strategies
             StratCommon.ValidateFileOnLoad( ObjectsFilename, StratCommon.OBJECTS_NOUN );
             SerializedArray objects = (SerializedArray)StratCommon.ReadFromFile( ObjectsFilename );
 
+            LastSpawnedRoots.Clear();
             foreach( var goJson in objects )
             {
                 try
                 {
-                    StratUtils.InstantiateHierarchyObjects( l, goJson, null, behsToReenable );
+                    GameObject root = StratUtils.InstantiateHierarchyObjects( l, goJson, null, behsToReenable );
+                    LastSpawnedRoots.Add( root );
                 }
                 catch( Exception ex )
                 {

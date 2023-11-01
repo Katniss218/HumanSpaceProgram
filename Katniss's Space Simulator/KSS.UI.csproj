@@ -59,7 +59,7 @@
     <Compile Include="Assets\KSS.UI\AltitudeReadoutUI.cs" />
     <Compile Include="Assets\KSS.UI\SaveMetadataUI.cs" />
     <Compile Include="Assets\KSS.UI\CanvasName.cs" />
-    <Compile Include="Assets\KSS.UI\Windows\ComfirmationWindow_Ex.cs" />
+    <Compile Include="Assets\KSS.UI\Windows\ConfirmationWindow_Ex.cs" />
     <Compile Include="Assets\KSS.UI\SceneFactories\GameplaySceneUIFactory.cs" />
     <Compile Include="Assets\KSS.UI\IResourceContainerUI.cs" />
     <Compile Include="Assets\KSS.UI\PartListEntryUI.cs" />

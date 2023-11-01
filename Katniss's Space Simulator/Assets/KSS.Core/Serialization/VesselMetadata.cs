@@ -34,6 +34,11 @@ namespace KSS.Core.Serialization
         /// </summary>
         public string Description { get; set; }
 
+        /// <summary>
+        /// The name of the author of the vessel.
+        /// </summary>
+        public string Author { get; set; }
+
         public VesselMetadata( string id )
         {
             this.ID = id;
@@ -92,6 +97,7 @@ namespace KSS.Core.Serialization
             {
                 { "name", this.Name },
                 { "description", this.Description },
+                { "author", this.Author },
             };
         }
 
@@ -104,6 +110,10 @@ namespace KSS.Core.Serialization
             if( data.TryGetValue( "description", out var description ) )
             {
                 this.Description = (string)description;
+            }
+            if( data.TryGetValue( "author", out var author ) )
+            {
+                this.Author = (string)author;
             }
         }
     }

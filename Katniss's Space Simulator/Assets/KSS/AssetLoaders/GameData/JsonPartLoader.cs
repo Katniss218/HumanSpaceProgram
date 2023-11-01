@@ -7,12 +7,13 @@ using System.Linq;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Strategies;
 
 namespace KSS.AssetLoaders.GameData
 {
     public static class JsonPartLoader
     {
-        static JsonPartStrategy _strat = new JsonPartStrategy(); // this can be used to save a part too.
+        static JsonSingleExplicitHierarchyStrategy _strat = new JsonSingleExplicitHierarchyStrategy( () => throw new NotSupportedException( $"Tried to save something using a part *loader*" ) ); // this can be used to save a part too.
         static Loader _loader = new Loader( null, null, _strat.Load_Object, _strat.Load_Data );
 
         [HSPEventListener( HSPEvent.STARTUP_IMMEDIATELY, HSPEvent.NAMESPACE_VANILLA + ".load_parts" )]

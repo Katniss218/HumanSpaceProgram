@@ -13,6 +13,18 @@ namespace KSS.Core
     /// </summary>
     public static class HumanSpaceProgram
     {
+        //public static int LAYER_DEFAULT = 0;
+        //public static int LAYER_TRANSPARENTFX = 1;
+        //public static int LAYER_IGNORE_RAYCAST = 2;
+        public static int LAYER_MANAGERS = 3;
+        //public static int LAYER_WATER = 4;
+        //public static int LAYER_UI = 5;
+        public static int LAYER_CELESTIAL_BODY = 10;
+        public static int LAYER_CELESTIAL_BODY_LIGHT = 11;
+        public static int LAYER_VESSEL_DESIGN = 24;
+        public static int LAYER_VESSEL_DESIGN_HELD = 25;
+        public static int LAYER_POST_PROCESSING = 31;
+
         /// <summary>
         /// The name of the `GameData` directory.
         /// </summary>

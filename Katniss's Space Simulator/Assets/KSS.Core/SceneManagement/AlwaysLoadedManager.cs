@@ -42,7 +42,7 @@ namespace KSS.Core
         {
             // An alternative approach could be to have a layer for manager objects (canonically a single object for all tho).
 
-            HSPManager[] managers = FindObjectsOfType<HSPManager>();
+            HSPManager[] managers =  FindObjectsOfType<HSPManager>();
             List<GameObject> gameObjects = new List<GameObject>();
 
             foreach( var manager in managers )

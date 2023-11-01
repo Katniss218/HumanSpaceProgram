@@ -60,13 +60,6 @@ namespace KSS.UI
                 assets[i] = assetsAndIds[i].asset;
             }
             return assets;
-            return new PartMetadata[]
-            {
-                new PartMetadata( "part.engine.f_1" ) { Author = "Katniss", Name = "F-1 Engine", Description = "Powerful", Categories = new [] { "engine" }, Filter = "nasa saturn apollo f1 f-1" },
-                new PartMetadata( "part.engine.j_2" ) { Author = "Katniss", Name = "J-2 Engine", Description = "Powerful", Categories = new [] { "engine" }, Filter = "nasa saturn apollo f1 f-1" },
-                new PartMetadata( "part.engine.ro_11" ) { Author = "Katniss", Name = "RO-11 Engine", Description = "Powerful", Categories = new [] { "engine" }, Filter = "nasa saturn apollo f1 f-1" },
-                new PartMetadata( "part.apollo_cm" ) { Author = "Katniss", Name = "Apollo CM", Description = "Powerful", Categories = new [] { "command" }, Filter = "nasa saturn apollo f1 f-1" }
-            };
         }
 
         public static PartListUI Create( IUIElementContainer parent, UILayoutInfo layout )

@@ -74,7 +74,7 @@ namespace KSS.Core.DesignScene.Tools
                 }
                 _heldPart = value;
                 _heldOffset = Vector3.zero;
-                _heldPart.gameObject.SetLayer( 25, true );
+                _heldPart.gameObject.SetLayer( HumanSpaceProgram.LAYER_VESSEL_DESIGN_HELD, true );
                 _heldPart.SetParent( null );
             }
         }
@@ -82,7 +82,7 @@ namespace KSS.Core.DesignScene.Tools
         private void TryGrabPart()
         {
             Ray ray = _camera.ScreenPointToRay( Input.mousePosition );
-            if( UnityEngine.Physics.Raycast( ray, out RaycastHit hitInfo, 8192, 1 << 24 ) )
+            if( UnityEngine.Physics.Raycast( ray, out RaycastHit hitInfo, 8192, 1 << HumanSpaceProgram.LAYER_VESSEL_DESIGN ) )
             {
                 GameObject hitObj = hitInfo.collider.gameObject;
 
@@ -101,7 +101,7 @@ namespace KSS.Core.DesignScene.Tools
         private void PlacePart()
         {
             Ray ray = _camera.ScreenPointToRay( Input.mousePosition );
-            if( UnityEngine.Physics.Raycast( ray, out RaycastHit hitInfo, 8192, 1 << 24 ) )
+            if( UnityEngine.Physics.Raycast( ray, out RaycastHit hitInfo, 8192, 1 << HumanSpaceProgram.LAYER_VESSEL_DESIGN ) )
             {
                 GameObject hitObj = hitInfo.collider.gameObject;
 
@@ -111,7 +111,7 @@ namespace KSS.Core.DesignScene.Tools
                     hitObj = r.Target;
                 }
 
-                _heldPart.gameObject.SetLayer( 24, true );
+                _heldPart.gameObject.SetLayer( HumanSpaceProgram.LAYER_VESSEL_DESIGN, true );
                 _heldPart.SetParent( hitObj.transform );
                 _heldPart = null;
                 // recalc vessel data.
@@ -120,7 +120,7 @@ namespace KSS.Core.DesignScene.Tools
             {
                 // place as ghost
 
-                _heldPart.gameObject.SetLayer( 24, true );
+                _heldPart.gameObject.SetLayer( HumanSpaceProgram.LAYER_VESSEL_DESIGN, true );
                 _heldPart = null;
             }
         }
@@ -135,7 +135,7 @@ namespace KSS.Core.DesignScene.Tools
 
             // Snap to surface.
             if( !Input.GetKey( KeyCode.LeftAlt )
-             && UnityEngine.Physics.Raycast( ray, out RaycastHit hitInfo, 8192, 1 << 24 ) )
+             && UnityEngine.Physics.Raycast( ray, out RaycastHit hitInfo, 8192, 1 << HumanSpaceProgram.LAYER_VESSEL_DESIGN ) )
             {
                 // TODO - angle snap like in KSP.
 
