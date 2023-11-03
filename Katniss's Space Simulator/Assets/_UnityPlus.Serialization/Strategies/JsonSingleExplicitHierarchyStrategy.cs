@@ -28,7 +28,7 @@ namespace UnityPlus.Serialization.Strategies
         /// <summary>
         /// Determines which objects will be saved.
         /// </summary>
-        public Func<GameObject> RootObjectGetter { get; set; }
+        public Func<GameObject> RootObjectGetter { get; }
 
         public JsonSingleExplicitHierarchyStrategy( Func<GameObject> rootObjectGetter )
         {

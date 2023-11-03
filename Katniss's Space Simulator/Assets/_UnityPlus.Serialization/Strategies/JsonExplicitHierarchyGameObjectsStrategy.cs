@@ -17,19 +17,13 @@ namespace UnityPlus.Serialization.Strategies
     /// </remarks>
     public sealed class JsonExplicitHierarchyGameObjectsStrategy
     {
-        /// <summary>
-        /// The name of the file into which the object data will be saved.
-        /// </summary>
-        public string ObjectsFilename { get; set; }
-        /// <summary>
-        /// The name of the file into which the data data will be saved.
-        /// </summary>
-        public string DataFilename { get; set; }
+        public Func<(SerializedData objects, SerializedData data)> DataLoader { get; }
+        public Action<(SerializedData objects, SerializedData data)> DataSaver { get; }
 
         /// <summary>
         /// Determines which objects will be saved.
         /// </summary>
-        public Func<IEnumerable<GameObject>> RootObjectsGetter { get; set; }
+        public Func<IEnumerable<GameObject>> RootObjectsGetter { get; }
         /// <summary>
         /// Determines which objects (including child objects) returned by the <see cref="RootObjectsGetter"/> will be excluded from saving.
         /// </summary>
@@ -37,7 +31,13 @@ namespace UnityPlus.Serialization.Strategies
 
         public List<GameObject> LastSpawnedRoots { get; private set; } = new List<GameObject>();
 
-        public JsonExplicitHierarchyGameObjectsStrategy( Func<IEnumerable<GameObject>> rootObjectsGetter )
+        SerializedData _objs;
+        SerializedData _data;
+
+        public JsonExplicitHierarchyGameObjectsStrategy( 
+            Func<(SerializedData objects, SerializedData data)> dataLoader,
+            Action<(SerializedData objects, SerializedData data)> dataSaver,
+            Func<IEnumerable<GameObject>> rootObjectsGetter )
         {
             if( rootObjectsGetter == null )
             {
@@ -48,8 +48,6 @@ namespace UnityPlus.Serialization.Strategies
 
         public IEnumerator SaveAsync_Object( ISaver s )
         {
-            StratCommon.ValidateFileOnSave( ObjectsFilename, StratCommon.OBJECTS_NOUN );
-
             IEnumerable<GameObject> rootObjects = RootObjectsGetter();
 
             SerializedArray objData = new SerializedArray();
@@ -61,7 +59,7 @@ namespace UnityPlus.Serialization.Strategies
                 yield return null;
             }
 
-            StratCommon.WriteToFile( ObjectsFilename, objData );
+            _objs = objData;
         }
 
         public IEnumerator SaveAsync_Data( ISaver s )
@@ -79,6 +77,7 @@ namespace UnityPlus.Serialization.Strategies
                 yield return null;
             }
 
+            DataSaver( (_objs, objData) );
             StratCommon.WriteToFile( DataFilename, objData );
         }
 
