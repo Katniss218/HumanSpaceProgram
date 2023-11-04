@@ -21,29 +21,31 @@ namespace UnityPlus.Serialization.Strategies
     public sealed class JsonAssetGameObjectsStrategy
     {
         /// <summary>
-        /// The name of the file into which the object data will be saved.
-        /// </summary>
-        public string ObjectsFilename { get; set; }
-        /// <summary>
-        /// The name of the file into which the data data will be saved.
-        /// </summary>
-        public string DataFilename { get; set; }
-
-        /// <summary>
         /// Determines which objects will be saved.
         /// </summary>
-        public Func<GameObject[]> RootObjectsGetter { get; }
+        public Func<IEnumerable<GameObject>> RootObjectsGetter { get; }
+
+        public ISerializedDataHandler DataHandler { get; }
+
         /// <summary>
         /// Determines which objects returned by the <see cref="RootObjectsGetter"/> will be excluded from saving.
         /// </summary>
         public uint IncludedObjectsMask { get; set; } = uint.MaxValue;
 
-        public JsonAssetGameObjectsStrategy( Func<GameObject[]> rootObjectsGetter )
+        SerializedData _objects;
+        SerializedData _data;
+
+        public JsonAssetGameObjectsStrategy( ISerializedDataHandler dataHandler, Func<IEnumerable<GameObject>> rootObjectsGetter )
         {
+            if( dataHandler == null )
+            {
+                throw new ArgumentNullException( nameof( dataHandler ), $"Serialized data handler must not be null." );
+            }
             if( rootObjectsGetter == null )
             {
                 throw new ArgumentNullException( nameof( rootObjectsGetter ), $"Object getter func must not be null." );
             }
+            this.DataHandler = dataHandler;
             this.RootObjectsGetter = rootObjectsGetter;
         }
 
@@ -119,40 +121,10 @@ namespace UnityPlus.Serialization.Strategies
             }
         }
 
-        //public void Save_Object( ISaver s )
-        public IEnumerator Save_Object( ISaver s )
-        {
-            StratCommon.ValidateFileOnSave( ObjectsFilename, StratCommon.OBJECTS_NOUN );
-
-            IEnumerable<GameObject> rootObjects = RootObjectsGetter();
-
-            SerializedArray objectsJson = new SerializedArray();
-
-            foreach( var go in rootObjects )
-            {
-                // maybe some sort of customizable tag/layer masking
-
-                ClonedGameObject cloneComp = go.GetComponent<ClonedGameObject>();
-                if( cloneComp == null )
-                {
-                    continue;
-                }
-
-                SerializedObject goJson = WriteAssetGameObject( s, go, cloneComp );
-                objectsJson.Add( goJson );
-
-                yield return null;
-            }
-
-            var sb = new StringBuilder();
-            new Serialization.Json.JsonStringWriter( objectsJson, sb ).Write();
-            File.WriteAllText( ObjectsFilename, sb.ToString(), Encoding.UTF8 );
-        }
+        // -=-=-=-
 
         public IEnumerator SaveAsync_Data( ISaver s )
         {
-            StratCommon.ValidateFileOnSave( DataFilename, StratCommon.OBJECTS_DATA_NOUN );
-
             IEnumerable<GameObject> rootObjects = RootObjectsGetter();
 
             SerializedArray objData = new SerializedArray();
@@ -168,41 +140,66 @@ namespace UnityPlus.Serialization.Strategies
                 SaveGameObjectDataRecursive( s, go, ref objData );
             }
 
-            var sb = new StringBuilder();
-            new Serialization.Json.JsonStringWriter( objData, sb ).Write();
-            File.WriteAllText( DataFilename, sb.ToString(), Encoding.UTF8 );
+            this._data = objData;
         }
 
-        //public void Load_Object( ILoader l )
+        public IEnumerator SaveAdync_Object( ISaver s )
+        {
+            IEnumerable<GameObject> rootObjects = RootObjectsGetter();
+
+            SerializedArray objData = new SerializedArray();
+
+            foreach( var go in rootObjects )
+            {
+                // maybe some sort of customizable tag/layer masking
+
+                ClonedGameObject cloneComp = go.GetComponent<ClonedGameObject>();
+                if( cloneComp == null )
+                {
+                    continue;
+                }
+
+                SerializedObject goJson = WriteAssetGameObject( s, go, cloneComp );
+                objData.Add( goJson );
+
+                yield return null;
+            }
+
+            // Cleanup Stage. \/
+
+            this._objects = objData;
+            DataHandler.WriteObjectsAndData( _objects, _data );
+            this._objects = null;
+            this._data = null;
+        }
+
         public IEnumerator LoadAsync_Object( ILoader l )
         {
-            StratCommon.ValidateFileOnLoad( ObjectsFilename, StratCommon.OBJECTS_NOUN );
+            (_objects, _data) = DataHandler.ReadObjectsAndData();
 
-            string objectsStr = File.ReadAllText( ObjectsFilename, Encoding.UTF8 );
-            SerializedArray objectsJson = (SerializedArray)new Serialization.Json.JsonStringReader( objectsStr ).Read();
-
-            foreach( var goJson in objectsJson )
+            foreach( var goData in (SerializedArray)_objects )
             {
-                ReadAssetGameObject( l, goJson );
+                ReadAssetGameObject( l, goData );
 
                 yield return null;
             }
         }
 
-        //public void Load_Data( ILoader l )
         public IEnumerator LoadAsync_Data( ILoader l )
         {
-            StratCommon.ValidateFileOnLoad( DataFilename, StratCommon.OBJECTS_DATA_NOUN );
-
-            string dataStr = File.ReadAllText( DataFilename, Encoding.UTF8 );
-            SerializedArray data = (SerializedArray)new Serialization.Json.JsonStringReader( dataStr ).Read();
-
-            foreach( var dataElement in data )
+            foreach( var dataElement in (SerializedArray)_data )
             {
                 StratUtils.ApplyDataToHierarchyElement( l, dataElement );
 
                 yield return null;
             }
+
+            yield return null;
+
+            // Cleanup Stage. \/
+
+            this._objects = null;
+            this._data = null;
         }
     }
 }

@@ -42,7 +42,8 @@ namespace KSS.Core
         //      SERIALIZATION OF MANAGERS - this can be moved to its own class.
         //
 
-        private static readonly JsonPreexistingGameObjectsStrategy _managersStrat = new JsonPreexistingGameObjectsStrategy( GetAllManagerGameObjects );
+        private static readonly JsonSeparateFileSerializedDataHandler _managersDataHandler = new JsonSeparateFileSerializedDataHandler();
+        private static readonly JsonPreexistingGameObjectsStrategy _managersStrat = new JsonPreexistingGameObjectsStrategy( _managersDataHandler, GetAllManagerGameObjects );
 
         private static GameObject[] GetAllManagerGameObjects()
         {
@@ -68,8 +69,8 @@ namespace KSS.Core
             var e = (TimelineManager.SaveEventData)ee;
 
             Directory.CreateDirectory( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay" ) );
-            _managersStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay", "objects.json" );
-            _managersStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay", "data.json" );
+            _managersDataHandler.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay", "objects.json" );
+            _managersDataHandler.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay", "data.json" );
             e.objectActions.Add( _managersStrat.SaveAsync_Object );
             e.dataActions.Add( _managersStrat.SaveAsync_Data );
         }
@@ -80,8 +81,8 @@ namespace KSS.Core
             var e = (TimelineManager.LoadEventData)ee;
 
             Directory.CreateDirectory( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay" ) );
-            _managersStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay", "objects.json" );
-            _managersStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay", "data.json" );
+            _managersDataHandler.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay", "objects.json" );
+            _managersDataHandler.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay", "data.json" );
             e.objectActions.Add( _managersStrat.LoadAsync_Object );
             e.dataActions.Add( _managersStrat.LoadAsync_Data );
         }

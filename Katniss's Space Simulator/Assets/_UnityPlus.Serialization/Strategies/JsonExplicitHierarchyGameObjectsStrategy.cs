@@ -24,13 +24,13 @@ namespace UnityPlus.Serialization.Strategies
 
         public ISerializedDataHandler DataHandler { get; }
 
-        SerializedData _objects;
-        SerializedData _data;
-
         /// <summary>
         /// Determines which objects (including child objects) returned by the <see cref="RootObjectsGetter"/> will be excluded from saving.
         /// </summary>
         public uint IncludedObjectsMask { get; set; } = uint.MaxValue;
+
+        SerializedData _objects;
+        SerializedData _data;
 
         public List<GameObject> LastSpawnedRoots { get; private set; } = new List<GameObject>();
 

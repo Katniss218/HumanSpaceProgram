@@ -20,30 +20,32 @@ namespace UnityPlus.Serialization.Strategies
     public sealed class JsonPreexistingGameObjectsStrategy
     {
         /// <summary>
-        /// The name of the file into which the object data will be saved.
-        /// </summary>
-        public string ObjectsFilename { get; set; }
-        /// <summary>
-        /// The name of the file into which the data data will be saved.
-        /// </summary>
-        public string DataFilename { get; set; }
-
-        /// <summary>
         /// Determines which objects will have their data saved, and loaded.
         /// </summary>
-        public Func<GameObject[]> RootObjectsGetter { get; }
+        public Func<IEnumerable<GameObject>> RootObjectsGetter { get; }
+
+        public ISerializedDataHandler DataHandler { get; }
+
         /// <summary>
         /// Determines which objects returned by the <see cref="RootObjectsGetter"/> will be excluded from saving.
         /// </summary>
         public uint IncludedObjectsMask { get; set; } = uint.MaxValue;
 
+        SerializedData _objects;
+        SerializedData _data;
+
         /// <param name="rootObjectsGetter">Determines which objects will have their data saved, and loaded.</param>
-        public JsonPreexistingGameObjectsStrategy( Func<GameObject[]> rootObjectsGetter )
+        public JsonPreexistingGameObjectsStrategy( ISerializedDataHandler dataHandler, Func<IEnumerable<GameObject>> rootObjectsGetter )
         {
+            if( dataHandler == null )
+            {
+                throw new ArgumentNullException( nameof( dataHandler ), $"Serialized data handler must not be null." );
+            }
             if( rootObjectsGetter == null )
             {
                 throw new ArgumentNullException( nameof( rootObjectsGetter ), $"Object getter func must not be null." );
             }
+            this.DataHandler = dataHandler;
             this.RootObjectsGetter = rootObjectsGetter;
         }
 
@@ -94,39 +96,12 @@ namespace UnityPlus.Serialization.Strategies
             } );
         }
 
-        public IEnumerator SaveAsync_Object( ISaver s )
-        {
-            StratCommon.ValidateFileOnSave( ObjectsFilename, StratCommon.OBJECTS_NOUN );
-
-            IEnumerable<GameObject> rootObjects = RootObjectsGetter();
-
-            SerializedArray objectsJson = new SerializedArray();
-
-            foreach( var go in rootObjects )
-            {
-                PreexistingReference guidComp = go.GetComponent<PreexistingReference>();
-                if( guidComp == null )
-                {
-                    continue;
-                }
-
-                SerializedObject goJson = WriteGameObject( s, go, guidComp );
-                objectsJson.Add( goJson );
-
-                yield return null;
-            }
-
-            StratCommon.WriteToFile( ObjectsFilename, objectsJson );
-        }
-
         /// <summary>
         /// Saves the data about the gameobjects and their persistent components. Does not include child objects.
         /// </summary>
         public IEnumerator SaveAsync_Data( ISaver s )
         {
-            StratCommon.ValidateFileOnSave( DataFilename, StratCommon.OBJECTS_DATA_NOUN );
-
-            GameObject[] rootObjects = RootObjectsGetter();
+            IEnumerable<GameObject> rootObjects = RootObjectsGetter();
 
             SerializedArray objData = new SerializedArray();
 
@@ -143,14 +118,40 @@ namespace UnityPlus.Serialization.Strategies
                 yield return null;
             }
 
-            StratCommon.WriteToFile( DataFilename, objData );
+            this._data = objData;
+        }
+
+        public IEnumerator SaveAsync_Object( ISaver s )
+        {
+            IEnumerable<GameObject> rootObjects = RootObjectsGetter();
+
+            SerializedArray objData = new SerializedArray();
+
+            foreach( var go in rootObjects )
+            {
+                PreexistingReference guidComp = go.GetComponent<PreexistingReference>();
+                if( guidComp == null )
+                {
+                    continue;
+                }
+
+                SerializedObject goJson = WriteGameObject( s, go, guidComp );
+                objData.Add( goJson );
+
+                yield return null;
+            }
+
+            // Cleanup Stage. \/
+
+            this._objects = objData;
+            DataHandler.WriteObjectsAndData( _objects, _data );
+            this._objects = null;
+            this._data = null;
         }
 
         public IEnumerator LoadAsync_Object( ILoader l )
         {
-            StratCommon.ValidateFileOnLoad( ObjectsFilename, StratCommon.OBJECTS_NOUN );
-
-            GameObject[] rootObjects = RootObjectsGetter.Invoke();
+            IEnumerable<GameObject> rootObjects = RootObjectsGetter.Invoke();
             foreach( var go in rootObjects )
             {
                 PreexistingReference guidComp = go.GetComponent<PreexistingReference>();
@@ -166,12 +167,12 @@ namespace UnityPlus.Serialization.Strategies
 
             // Loads the IDs of objects returned by the getter func, then gets them by ID from the loader's reference dict.
 
-            SerializedArray objectsJson = (SerializedArray)StratCommon.ReadFromFile( ObjectsFilename );
+            (_objects, _data) = DataHandler.ReadObjectsAndData();
 
-            foreach( var goJson in objectsJson )
+            foreach( var goData in (SerializedArray)_objects )
             {
-                Guid objectGuid = l.ReadGuid( goJson[KeyNames.ID] );
-                SerializedArray refChildren = (SerializedArray)goJson["children_ids"];
+                Guid objectGuid = l.ReadGuid( goData[KeyNames.ID] );
+                SerializedArray refChildren = (SerializedArray)goData["children_ids"];
                 StratUtils.AssignIDsToReferencedChildren( l, (GameObject)l.Get( objectGuid ), ref refChildren );
 
                 yield return null;
@@ -180,15 +181,19 @@ namespace UnityPlus.Serialization.Strategies
 
         public IEnumerator LoadAsync_Data( ILoader l )
         {
-            StratCommon.ValidateFileOnLoad( DataFilename, StratCommon.OBJECTS_DATA_NOUN );
-            SerializedArray data = (SerializedArray)StratCommon.ReadFromFile( DataFilename );
-
-            foreach( var dataElement in data )
+            foreach( var dataElement in (SerializedArray)_data )
             {
                 StratUtils.ApplyDataToHierarchyElement( l, dataElement );
 
                 yield return null;
             }
+
+            yield return null;
+
+            // Cleanup Stage. \/
+
+            this._objects = null;
+            this._data = null;
         }
     }
 }
