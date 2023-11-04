@@ -114,6 +114,22 @@ namespace KSS.Core.DesignScene
 
         // undos stored in files, preserved across sessions?
 
+        /*
+        When the ship is loaded, the entire thing is serialized, then each action additionally operates on that serialized data. Creating patches adding or removing only what has changed.
+        then when the time to undo/redo comes, the changes are applied to the existing vessel.
+        - for that, we need a strategy that can remove or add objects, and apply data to existing objects.
+          - for that we need to keep the object's IDs in the loader.
+          - it would work like this:
+            1. Have the IDs of existing objects in the strategy.
+            2. Have a stack of patches that is updated every time an action happens. These patches contain the serialized data. This can be stored separately. Our strat is a `ExplicitHierarchyPatchStrategy`
+            3. Add the IDs to the saver/loader immediately.
+            4. Apply the selected patch:
+               1. O: Delete() the objects that need to be removed (if any).
+               2. O: Create the objects that need to be added (if any).
+               3. D: Apply data to the objects (if any).
+            5. Get the IDs to persist for later.
+        */
+
         public static void SaveVessel()
         {
             // save current vessel to the files defined by metadata's ID.
