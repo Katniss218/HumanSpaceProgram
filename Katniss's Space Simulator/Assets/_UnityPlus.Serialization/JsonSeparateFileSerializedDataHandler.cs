@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityPlus.Serialization.Json;
 
-namespace UnityPlus.Serialization.Strategies
+namespace UnityPlus.Serialization
 {
     /// <summary>
     /// A serialized data handler that reads and writes objects and data to and from 2 separate json files.
