@@ -17,7 +17,8 @@ namespace KSS.Core.DesignScene
     /// </summary>
     public class DesignVesselManager : SingletonMonoBehaviour<DesignVesselManager>
     {
-        static JsonSingleExplicitHierarchyStrategy _vesselStrategy = new JsonSingleExplicitHierarchyStrategy( GetGameObject );
+        static JsonSeparateFileSerializedDataHandler _vesselDataHandler = new JsonSeparateFileSerializedDataHandler();
+        static JsonSingleExplicitHierarchyStrategy _vesselStrategy = new JsonSingleExplicitHierarchyStrategy( _vesselDataHandler, GetGameObject );
 
         private IPartObject _vessel;
 
@@ -117,8 +118,8 @@ namespace KSS.Core.DesignScene
         {
             // save current vessel to the files defined by metadata's ID.
             Directory.CreateDirectory( CurrentVesselMetadata.GetRootDirectory() );
-            _vesselStrategy.ObjectsFilename = Path.Combine( CurrentVesselMetadata.GetRootDirectory(), "objects.json" );
-            _vesselStrategy.DataFilename = Path.Combine( CurrentVesselMetadata.GetRootDirectory(), "data.json" );
+            _vesselDataHandler.ObjectsFilename = Path.Combine( CurrentVesselMetadata.GetRootDirectory(), "objects.json" );
+            _vesselDataHandler.DataFilename = Path.Combine( CurrentVesselMetadata.GetRootDirectory(), "data.json" );
 
             CreateSaver( new Func<ISaver, IEnumerator>[] { _vesselStrategy.SaveAsync_Object }, new Func<ISaver, IEnumerator>[] { _vesselStrategy.SaveAsync_Data } );
 
@@ -134,8 +135,8 @@ namespace KSS.Core.DesignScene
 
             // load current vessel from the files defined by metadata's ID.
             Directory.CreateDirectory( loadedVesselMetadata.GetRootDirectory() );
-            _vesselStrategy.ObjectsFilename = Path.Combine( loadedVesselMetadata.GetRootDirectory(), "objects.json" );
-            _vesselStrategy.DataFilename = Path.Combine( loadedVesselMetadata.GetRootDirectory(), "data.json" );
+            _vesselDataHandler.ObjectsFilename = Path.Combine( loadedVesselMetadata.GetRootDirectory(), "objects.json" );
+            _vesselDataHandler.DataFilename = Path.Combine( loadedVesselMetadata.GetRootDirectory(), "data.json" );
 
             CreateLoader( new Func<ILoader, IEnumerator>[] { _vesselStrategy.LoadAsync_Object }, new Func<ILoader, IEnumerator>[] { _vesselStrategy.LoadAsync_Data } );
             _loader.LoadAsync( instance );

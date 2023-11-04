@@ -58,7 +58,8 @@ namespace KSS.Core
 
 
         // move below to separate class "BuildingSerializer" or something.
-        private static readonly JsonExplicitHierarchyGameObjectsStrategy _buildingsStrat = new JsonExplicitHierarchyGameObjectsStrategy( GetAllRootGameObjects );
+        private static readonly JsonSeparateFileSerializedDataHandler _buildingDataHandler = new JsonSeparateFileSerializedDataHandler();
+        private static readonly JsonExplicitHierarchyGameObjectsStrategy _buildingsStrat = new JsonExplicitHierarchyGameObjectsStrategy( _buildingDataHandler, GetAllRootGameObjects );
 
         private static GameObject[] GetAllRootGameObjects()
         {
@@ -76,8 +77,8 @@ namespace KSS.Core
             var e = (TimelineManager.SaveEventData)ee;
 
             Directory.CreateDirectory( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Buildings" ) );
-            _buildingsStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Buildings", "objects.json" );
-            _buildingsStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Buildings", "data.json" );
+            _buildingDataHandler.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Buildings", "objects.json" );
+            _buildingDataHandler.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Buildings", "data.json" );
             e.objectActions.Add( _buildingsStrat.SaveAsync_Object );
             e.dataActions.Add( _buildingsStrat.SaveAsync_Data );
         }
@@ -88,8 +89,8 @@ namespace KSS.Core
             var e = (TimelineManager.LoadEventData)ee;
 
             Directory.CreateDirectory( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Buildings" ) );
-            _buildingsStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Buildings", "objects.json" );
-            _buildingsStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Buildings", "data.json" );
+            _buildingDataHandler.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Buildings", "objects.json" );
+            _buildingDataHandler.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Buildings", "data.json" );
             e.objectActions.Add( _buildingsStrat.LoadAsync_Object );
             e.dataActions.Add( _buildingsStrat.LoadAsync_Data );
         }

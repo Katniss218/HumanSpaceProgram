@@ -17,13 +17,16 @@ namespace UnityPlus.Serialization.Strategies
     /// </remarks>
     public sealed class JsonExplicitHierarchyGameObjectsStrategy
     {
-        public Func<(SerializedData objects, SerializedData data)> DataLoader { get; }
-        public Action<(SerializedData objects, SerializedData data)> DataSaver { get; }
-
         /// <summary>
         /// Determines which objects will be saved.
         /// </summary>
         public Func<IEnumerable<GameObject>> RootObjectsGetter { get; }
+
+        public ISerializedDataHandler DataHandler { get; }
+
+        SerializedData _objects;
+        SerializedData _data;
+
         /// <summary>
         /// Determines which objects (including child objects) returned by the <see cref="RootObjectsGetter"/> will be excluded from saving.
         /// </summary>
@@ -31,70 +34,70 @@ namespace UnityPlus.Serialization.Strategies
 
         public List<GameObject> LastSpawnedRoots { get; private set; } = new List<GameObject>();
 
-        SerializedData _objs;
-        SerializedData _data;
-
-        public JsonExplicitHierarchyGameObjectsStrategy( 
-            Func<(SerializedData objects, SerializedData data)> dataLoader,
-            Action<(SerializedData objects, SerializedData data)> dataSaver,
-            Func<IEnumerable<GameObject>> rootObjectsGetter )
+        public JsonExplicitHierarchyGameObjectsStrategy( ISerializedDataHandler dataHandler, Func<IEnumerable<GameObject>> rootObjectsGetter )
         {
+            if( dataHandler == null )
+            {
+                throw new ArgumentNullException( nameof( dataHandler ), $"Serialized data handler must not be null." );
+            }
             if( rootObjectsGetter == null )
             {
                 throw new ArgumentNullException( nameof( rootObjectsGetter ), $"Object getter func must not be null." );
             }
+            this.DataHandler = dataHandler;
             this.RootObjectsGetter = rootObjectsGetter;
-        }
-
-        public IEnumerator SaveAsync_Object( ISaver s )
-        {
-            IEnumerable<GameObject> rootObjects = RootObjectsGetter();
-
-            SerializedArray objData = new SerializedArray();
-
-            foreach( var go in rootObjects )
-            {
-                StratUtils.SaveGameObjectHierarchy_Objects( go, s, IncludedObjectsMask, objData );
-
-                yield return null;
-            }
-
-            _objs = objData;
         }
 
         public IEnumerator SaveAsync_Data( ISaver s )
         {
-            StratCommon.ValidateFileOnSave( DataFilename, StratCommon.OBJECTS_DATA_NOUN );
-
-            IEnumerable<GameObject> rootObjects = RootObjectsGetter();
+            IEnumerable<GameObject> rootObjects = this.RootObjectsGetter();
 
             SerializedArray objData = new SerializedArray();
 
             foreach( var go in rootObjects )
             {
-                StratUtils.SaveGameObjectHierarchy_Data( s, go, IncludedObjectsMask, ref objData );
+                StratUtils.SaveGameObjectHierarchy_Data( s, go, this.IncludedObjectsMask, ref objData );
 
                 yield return null;
             }
 
-            DataSaver( (_objs, objData) );
-            StratCommon.WriteToFile( DataFilename, objData );
+            this._data = objData;
+        }
+
+        public IEnumerator SaveAsync_Object( ISaver s )
+        {
+            IEnumerable<GameObject> rootObjects = this.RootObjectsGetter();
+
+            SerializedArray objData = new SerializedArray();
+
+            foreach( var go in rootObjects )
+            {
+                StratUtils.SaveGameObjectHierarchy_Objects( go, s, this.IncludedObjectsMask, objData );
+
+                yield return null;
+            }
+
+            // Cleanup Stage. \/
+
+            this._objects = objData;
+            DataHandler.WriteObjectsAndData( _objects, _data );
+            this._objects = null;
+            this._data = null;
         }
 
         List<Behaviour> behsToReenable = new List<Behaviour>();
 
         public IEnumerator LoadAsync_Object( ILoader l )
         {
-            StratCommon.ValidateFileOnLoad( ObjectsFilename, StratCommon.OBJECTS_NOUN );
-            SerializedArray objects = (SerializedArray)StratCommon.ReadFromFile( ObjectsFilename );
+            (_objects, _data) = DataHandler.ReadObjectsAndData();
 
-            LastSpawnedRoots.Clear();
-            foreach( var goJson in objects )
+            this.LastSpawnedRoots.Clear();
+            foreach( var goJson in (SerializedArray)this._objects )
             {
                 try
                 {
-                    GameObject root = StratUtils.InstantiateHierarchyObjects( l, goJson, null, behsToReenable );
-                    LastSpawnedRoots.Add( root );
+                    GameObject root = StratUtils.InstantiateHierarchyObjects( l, goJson, null, this.behsToReenable );
+                    this.LastSpawnedRoots.Add( root );
                 }
                 catch( Exception ex )
                 {
@@ -108,10 +111,7 @@ namespace UnityPlus.Serialization.Strategies
 
         public IEnumerator LoadAsync_Data( ILoader l )
         {
-            StratCommon.ValidateFileOnLoad( DataFilename, StratCommon.OBJECTS_DATA_NOUN );
-            SerializedArray data = (SerializedArray)StratCommon.ReadFromFile( DataFilename );
-
-            foreach( var dataElement in data )
+            foreach( var dataElement in (SerializedArray)this._data )
             {
                 StratUtils.ApplyDataToHierarchyElement( l, dataElement );
 
@@ -120,9 +120,13 @@ namespace UnityPlus.Serialization.Strategies
 
             yield return null;
 
-            foreach( var beh in behsToReenable )
+            // Cleanup Stage. \/
+
+            foreach( var beh in this.behsToReenable )
                 beh.enabled = true;
-            behsToReenable = new List<Behaviour>();
+            this.behsToReenable = new List<Behaviour>();
+            this._objects = null;
+            this._data = null;
         }
     }
 }

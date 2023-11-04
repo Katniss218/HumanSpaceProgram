@@ -13,7 +13,8 @@ namespace KSS.AssetLoaders.GameData
 {
     public static class JsonPartLoader
     {
-        static JsonSingleExplicitHierarchyStrategy _strat = new JsonSingleExplicitHierarchyStrategy( () => throw new NotSupportedException( $"Tried to save something using a part *loader*" ) ); // this can be used to save a part too.
+        static JsonSeparateFileSerializedDataHandler _handler = new JsonSeparateFileSerializedDataHandler();
+        static JsonSingleExplicitHierarchyStrategy _strat = new JsonSingleExplicitHierarchyStrategy( _handler, () => throw new NotSupportedException( $"Tried to save something using a part *loader*" ) ); // this can be used to save a part too.
         static Loader _loader = new Loader( null, null, _strat.Load_Object, _strat.Load_Data );
 
         [HSPEventListener( HSPEvent.STARTUP_IMMEDIATELY, HSPEvent.NAMESPACE_VANILLA + ".load_parts" )]
@@ -39,8 +40,8 @@ namespace KSS.AssetLoaders.GameData
                 AssetRegistry.Register( $"part::m/{partMeta.ID}", partMeta );
                 AssetRegistry.RegisterLazy( $"part::h/{partMeta.ID}", () =>
                 {
-                    _strat.ObjectsFilename = Path.Combine( partPath, "objects.json" );
-                    _strat.DataFilename = Path.Combine( partPath, "data.json" );
+                    _handler.ObjectsFilename = Path.Combine( partPath, "objects.json" );
+                    _handler.DataFilename = Path.Combine( partPath, "data.json" );
                     _loader.Load();
                     return _strat.LastSpawnedRoot;
                 }, isCacheable: false );

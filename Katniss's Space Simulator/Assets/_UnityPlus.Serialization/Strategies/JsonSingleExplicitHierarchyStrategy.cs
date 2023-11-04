@@ -15,90 +15,92 @@ namespace UnityPlus.Serialization.Strategies
     public sealed class JsonSingleExplicitHierarchyStrategy
     {
         /// <summary>
-        /// The name of the file into which the object data will be saved.
+        /// Determines which objects will be saved.
         /// </summary>
-        public string ObjectsFilename { get; set; }
-        /// <summary>
-        /// The name of the file into which the data data will be saved.
-        /// </summary>
-        public string DataFilename { get; set; }
+        public Func<GameObject> RootObjectGetter { get; set; }
+
+        public ISerializedDataHandler DataHandler { get; }
 
         public GameObject LastSpawnedRoot { get; private set; }
 
-        /// <summary>
-        /// Determines which objects will be saved.
-        /// </summary>
-        public Func<GameObject> RootObjectGetter { get; }
+        SerializedData _objects;
+        SerializedData _data;
 
-        public JsonSingleExplicitHierarchyStrategy( Func<GameObject> rootObjectGetter )
+        public JsonSingleExplicitHierarchyStrategy( ISerializedDataHandler dataHandler, Func<GameObject> rootObjectGetter )
         {
+            if( dataHandler == null )
+            {
+                throw new ArgumentNullException( nameof( dataHandler ), $"Serialized data handler must not be null." );
+            }
             if( rootObjectGetter == null )
             {
                 throw new ArgumentNullException( nameof( rootObjectGetter ), $"Object getter func must not be null." );
             }
+            this.DataHandler = dataHandler;
             this.RootObjectGetter = rootObjectGetter;
-        }
-
-        public void Save_Object( ISaver s )
-        {
-            StratCommon.ValidateFileOnSave( ObjectsFilename, StratCommon.OBJECTS_NOUN );
-
-            SerializedArray objData = new SerializedArray();
-
-            StratUtils.SaveGameObjectHierarchy_Objects( RootObjectGetter(), s, uint.MaxValue, objData );
-
-            StratCommon.WriteToFile( ObjectsFilename, objData );
-        }
-        
-        public IEnumerator SaveAsync_Object( ISaver s )
-        {
-            StratCommon.ValidateFileOnSave( ObjectsFilename, StratCommon.OBJECTS_NOUN );
-
-            SerializedArray objData = new SerializedArray();
-
-            StratUtils.SaveGameObjectHierarchy_Objects( RootObjectGetter(), s, uint.MaxValue, objData );
-
-            yield return null;
-
-            StratCommon.WriteToFile( ObjectsFilename, objData );
         }
 
         public void Save_Data( ISaver s )
         {
-            StratCommon.ValidateFileOnSave( DataFilename, StratCommon.OBJECTS_DATA_NOUN );
-
             SerializedArray objData = new SerializedArray();
 
-            StratUtils.SaveGameObjectHierarchy_Data( s, RootObjectGetter(), uint.MaxValue, ref objData );
+            StratUtils.SaveGameObjectHierarchy_Data( s, this.RootObjectGetter(), uint.MaxValue, ref objData );
 
-            StratCommon.WriteToFile( DataFilename, objData );
+            this._data = objData;
         }
         
         public IEnumerator SaveAsync_Data( ISaver s )
         {
-            StratCommon.ValidateFileOnSave( DataFilename, StratCommon.OBJECTS_DATA_NOUN );
-
             SerializedArray objData = new SerializedArray();
 
-            StratUtils.SaveGameObjectHierarchy_Data( s, RootObjectGetter(), uint.MaxValue, ref objData );
+            StratUtils.SaveGameObjectHierarchy_Data( s, this.RootObjectGetter(), uint.MaxValue, ref objData );
 
             yield return null;
 
-            StratCommon.WriteToFile( DataFilename, objData );
+            this._data = objData;
+        }
+
+        public void Save_Object( ISaver s )
+        {
+            SerializedArray objData = new SerializedArray();
+
+            StratUtils.SaveGameObjectHierarchy_Objects( this.RootObjectGetter(), s, uint.MaxValue, objData );
+
+            // Cleanup Stage. \/
+
+            this._objects = objData;
+            DataHandler.WriteObjectsAndData( _objects, _data );
+            this._objects = null;
+            this._data = null;
+        }
+
+        public IEnumerator SaveAsync_Object( ISaver s )
+        {
+            SerializedArray objData = new SerializedArray();
+
+            StratUtils.SaveGameObjectHierarchy_Objects( this.RootObjectGetter(), s, uint.MaxValue, objData );
+
+            yield return null;
+
+            // Cleanup Stage. \/
+
+            this._objects = objData;
+            DataHandler.WriteObjectsAndData( _objects, _data );
+            this._objects = null;
+            this._data = null;
         }
 
         List<Behaviour> behsToReenable = new List<Behaviour>();
 
         public void Load_Object( ILoader l )
         {
-            StratCommon.ValidateFileOnLoad( ObjectsFilename, StratCommon.OBJECTS_NOUN );
-            SerializedArray objects = (SerializedArray)StratCommon.ReadFromFile( ObjectsFilename );
+            (_objects, _data) = DataHandler.ReadObjectsAndData();
 
-            var obj = objects.First();
+            SerializedData obj = ((SerializedArray)_objects).First();
 
             try
             {
-                LastSpawnedRoot = StratUtils.InstantiateHierarchyObjects( l, obj, null, behsToReenable );
+                this.LastSpawnedRoot = StratUtils.InstantiateHierarchyObjects( l, obj, null, this.behsToReenable );
             }
             catch( Exception ex )
             {
@@ -109,14 +111,13 @@ namespace UnityPlus.Serialization.Strategies
         
         public IEnumerator LoadAsync_Object( ILoader l )
         {
-            StratCommon.ValidateFileOnLoad( ObjectsFilename, StratCommon.OBJECTS_NOUN );
-            SerializedArray objects = (SerializedArray)StratCommon.ReadFromFile( ObjectsFilename );
+            (_objects, _data) = DataHandler.ReadObjectsAndData();
 
-            var obj = objects.First();
+            SerializedData obj = ((SerializedArray)_objects).First();
 
             try
             {
-                LastSpawnedRoot = StratUtils.InstantiateHierarchyObjects( l, obj, null, behsToReenable );
+                this.LastSpawnedRoot = StratUtils.InstantiateHierarchyObjects( l, obj, null, this.behsToReenable );
             }
             catch( Exception ex )
             {
@@ -129,21 +130,20 @@ namespace UnityPlus.Serialization.Strategies
 
         public void Load_Data( ILoader l )
         {
-            StratCommon.ValidateFileOnLoad( DataFilename, StratCommon.OBJECTS_DATA_NOUN );
-            SerializedArray dataArray = (SerializedArray)StratCommon.ReadFromFile( DataFilename );
-
-            foreach( var dataElement in dataArray )
+            foreach( var dataElement in (SerializedArray)_data )
             {
                 StratUtils.ApplyDataToHierarchyElement( l, dataElement );
             }
+
+            // Cleanup Stage. \/
+
+            this._objects = null;
+            this._data = null;
         }
 
         public IEnumerator LoadAsync_Data( ILoader l )
         {
-            StratCommon.ValidateFileOnLoad( DataFilename, StratCommon.OBJECTS_DATA_NOUN );
-            SerializedArray dataArray = (SerializedArray)StratCommon.ReadFromFile( DataFilename );
-
-            foreach( var dataElement in dataArray )
+            foreach( var dataElement in (SerializedArray)_data )
             {
                 StratUtils.ApplyDataToHierarchyElement( l, dataElement );
 
@@ -152,9 +152,14 @@ namespace UnityPlus.Serialization.Strategies
 
             yield return null;
 
-            foreach( var beh in behsToReenable )
+            // Cleanup Stage. \/
+
+            foreach( var beh in this.behsToReenable )
                 beh.enabled = true;
-            behsToReenable = new List<Behaviour>();
+            this.behsToReenable = new List<Behaviour>();
+
+            this._objects = null;
+            this._data = null;
         }
     }
 }

@@ -110,7 +110,8 @@ namespace KSS.DevUtils
             }
             if( Input.GetKeyDown( KeyCode.F1 ) )
             {
-                JsonSingleExplicitHierarchyStrategy strat = new JsonSingleExplicitHierarchyStrategy(() => null);
+                JsonSeparateFileSerializedDataHandler handler = new JsonSeparateFileSerializedDataHandler();
+                JsonSingleExplicitHierarchyStrategy strat = new JsonSingleExplicitHierarchyStrategy( handler, () => null );
                 Saver saver = new Saver( null, null, strat.Save_Object, strat.Save_Data );
 
                 string gameDataPath = HumanSpaceProgram.GetGameDataDirectoryPath();
@@ -123,8 +124,8 @@ namespace KSS.DevUtils
                 pm.Name = "Engine"; pm.Author = "Katniss"; pm.Categories = new string[] { "engine" };
                 pm.WriteToDisk();
                 strat.RootObjectGetter = () => AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/part.engine" );
-                strat.ObjectsFilename = partDir + "/objects.json";
-                strat.DataFilename = partDir + "/data.json";
+                handler.ObjectsFilename = partDir + "/objects.json";
+                handler.DataFilename = partDir + "/data.json";
                 saver.Save();
 
 
@@ -134,8 +135,8 @@ namespace KSS.DevUtils
                 pm.Name = "Intertank"; pm.Author = "Katniss"; pm.Categories = new string[] { "structural" };
                 pm.WriteToDisk();
                 strat.RootObjectGetter = () => AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/part.intertank" );
-                strat.ObjectsFilename = partDir + "/objects.json";
-                strat.DataFilename = partDir + "/data.json";
+                handler.ObjectsFilename = partDir + "/objects.json";
+                handler.DataFilename = partDir + "/data.json";
                 saver.Save();
 
 
@@ -145,8 +146,8 @@ namespace KSS.DevUtils
                 pm.Name = "Tank"; pm.Author = "Katniss"; pm.Categories = new string[] { "fuel_tank" };
                 pm.WriteToDisk();
                 strat.RootObjectGetter = () => AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/part.tank" );
-                strat.ObjectsFilename = partDir + "/objects.json";
-                strat.DataFilename = partDir + "/data.json";
+                handler.ObjectsFilename = partDir + "/objects.json";
+                handler.DataFilename = partDir + "/data.json";
                 saver.Save();
 
 
@@ -156,8 +157,8 @@ namespace KSS.DevUtils
                 pm.Name = "Long Tank"; pm.Author = "Katniss"; pm.Categories = new string[] { "fuel_tank" };
                 pm.WriteToDisk();
                 strat.RootObjectGetter = () => AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/part.tank_long" );
-                strat.ObjectsFilename = partDir + "/objects.json";
-                strat.DataFilename = partDir + "/data.json";
+                handler.ObjectsFilename = partDir + "/objects.json";
+                handler.DataFilename = partDir + "/data.json";
                 saver.Save();
             }
         }
