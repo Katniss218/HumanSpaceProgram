@@ -66,7 +66,7 @@
     <Compile Include="Assets\KSS.Core\SceneManagement\EditorSceneManager.cs" />
     <Compile Include="Assets\KSS.Core\PartFactory.cs" />
     <Compile Include="Assets\KSS.Core\Serialization\TimelineMetadata.cs" />
-    <Compile Include="Assets\KSS.Core\DesignScene\DesignVesselManager.cs" />
+    <Compile Include="Assets\KSS.Core\DesignScene\DesignObjectManager.cs" />
     <Compile Include="Assets\KSS.Core\HSPEvent.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\FluidState.cs" />
     <Compile Include="Assets\KSS.Core\CelestialBodyManager.cs" />

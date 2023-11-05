@@ -26,7 +26,7 @@ namespace KSS.UI
             PickTool pickTool = DesignSceneToolManager.UseTool<PickTool>();
 
             GameObject spawnedPart = AssetRegistry.Get<GameObject>( $"part::h/{_part.ID}" );
-            if( DesignVesselManager.DesignObjectHasRootPart() )
+            if( DesignObjectManager.DesignObjectHasRootPart() )
             {
                 pickTool.HeldPart = spawnedPart.transform;
             }
@@ -34,7 +34,7 @@ namespace KSS.UI
             {
                 spawnedPart.transform.localPosition = Vector3.zero;
                 spawnedPart.transform.localRotation = Quaternion.identity;
-                DesignVesselManager.PlaceRoot( spawnedPart.transform );
+                DesignObjectManager.PlaceRoot( spawnedPart.transform );
             }
         }
 

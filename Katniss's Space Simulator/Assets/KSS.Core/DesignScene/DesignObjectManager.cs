@@ -15,62 +15,114 @@ namespace KSS.Core.DesignScene
     /// <summary>
     /// Manages the object (vessel/building/etc) being built in the design scene.
     /// </summary>
-    public class DesignVesselManager : SingletonMonoBehaviour<DesignVesselManager>
+    public class DesignObjectManager : SingletonMonoBehaviour<DesignObjectManager>
     {
-        static JsonSeparateFileSerializedDataHandler _vesselDataHandler = new JsonSeparateFileSerializedDataHandler();
-        static JsonSingleExplicitHierarchyStrategy _vesselStrategy = new JsonSingleExplicitHierarchyStrategy( _vesselDataHandler, GetGameObject );
+        static JsonSeparateFileSerializedDataHandler _designObjDataHandler = new JsonSeparateFileSerializedDataHandler();
+        static JsonSingleExplicitHierarchyStrategy _designObjStrategy = new JsonSingleExplicitHierarchyStrategy( _designObjDataHandler, GetGameObject );
 
+        [SerializeField]
         private DesignObject _designObj;
 
+        [SerializeField]
         private List<Transform> _looseParts = new List<Transform>();
 
-        public static void PickUp( Transform t )
+        /// <summary>
+        /// Picks up the specified object (removes it from the actionable objects).
+        /// </summary>
+        public static void PickUp( Transform obj )
         {
-            if( IsRootOfDesignObj( t ) )
+            if( !IsActionable( obj ) )
+            {
+                throw new ArgumentException( $"object to pick up must be an actionable object.", nameof( obj ) );
+            }
+
+            if( IsRootOfDesignObj( obj ) )
             {
                 instance._designObj.RootPart = null;
-                t.SetParent( null );
+                obj.SetParent( null );
             }
             else
             {
-                instance._looseParts.Remove( t );
-                //t.SetParent( null ); not needed
+                instance._looseParts.Remove( obj ); // sometimes will do nothing, since the part might not be a loose part.
+                obj.SetParent( null );
             }
         }
 
-        public static void Place( Transform t, Transform parent )
+        /// <summary>
+        /// Places the selected object as the child of the specified object (adds to the actionable parts).
+        /// </summary>
+        /// <param name="parent">The new parent, can be null, in which case, the part will be placed as a loose part.</param>
+        public static void Place( Transform obj, Transform parent )
         {
+            if( IsActionable( obj ) )
+            {
+                throw new ArgumentException( $"object to place must NOT be an actionable object.", nameof( obj ) );
+            }
+            if( parent != null && !IsActionable( parent ) )
+            {
+                throw new ArgumentException( $"Parent must be null or an actionable object.", nameof( parent ) );
+            }
+
             if( parent == null )
-                instance._looseParts.Add( t );
-            t.SetParent( parent );
+            {
+                instance._looseParts.Add( obj );
+            }
+            obj.SetParent( parent );
         }
-        
+
         /// <summary>
         /// Places the selected object as the new root of the design object.
         /// </summary>
-        public static void PlaceRoot( Transform t )
+        /// <remarks>
+        /// This will destroy the already existing root part, if any.
+        /// </remarks>
+        public static void PlaceRoot( Transform obj )
         {
-            t.SetParent( instance._designObj.transform );
-            instance._designObj.RootPart = t;
+            if( IsActionable( obj ) )
+            {
+                throw new ArgumentException( $"object to place must NOT be an actionable object.", nameof( obj ) );
+            }
+
+            if( instance._designObj.RootPart != null )
+            {
+                Destroy( instance._designObj.RootPart );
+            }
+            obj.SetParent( instance._designObj.transform );
+            instance._designObj.RootPart = obj;
         }
 
         /// <summary>
-        /// True if the object can be manipulated in the design scene (not part of the scenery, etc).
+        /// True if the object can be interacted with (not part of the scenery, etc).
         /// </summary>
-        public static bool IsActionable( Transform t )
+        public static bool IsActionable( Transform obj )
         {
-            return instance._looseParts.Contains( t.root )
-                || t.root == instance._designObj.transform;
+            if( obj == null )
+                return false;
+
+            return instance._looseParts.Contains( obj.root )
+                || obj.root == instance._designObj.transform;
         }
 
-        public static bool IsAttachedToDesignObj( Transform t )
+        /// <summary>
+        /// Checks whether the specified object is part of the design object.
+        /// </summary>
+        public static bool IsAttachedToDesignObj( Transform obj )
         {
-            return t.root == instance._designObj.transform;
+            if( obj == null )
+                return false;
+
+            return obj.root == instance._designObj.transform;
         }
 
-        public static bool IsRootOfDesignObj( Transform t )
+        /// <summary>
+        /// Checks whether the specified object is the root part of the design object.
+        /// </summary>
+        public static bool IsRootOfDesignObj( Transform obj )
         {
-            return t.parent == t.root && t.parent == instance._designObj.transform;
+            if( obj == null )
+                return false;
+
+            return obj.parent == obj.root && obj.parent == instance._designObj.transform;
         }
 
         public static bool DesignObjectHasRootPart()
@@ -105,7 +157,7 @@ namespace KSS.Core.DesignScene
         public static void FinishFunc()
         {
             TimeManager.LockTimescale = false;
-            instance._designObj.RootPart = _vesselStrategy.LastSpawnedRoot.transform;
+            instance._designObj.RootPart = _designObjStrategy.LastSpawnedRoot.transform;
             if( !_wasPausedBeforeSerializing )
             {
                 TimeManager.Unpause();
@@ -150,11 +202,12 @@ namespace KSS.Core.DesignScene
         public static void SaveVessel()
         {
             // save current vessel to the files defined by metadata's ID.
+#warning TODO - take the input from the user to create the metadata. I.e. the UI should automatically update the metadata in DesignObjectManager, since we don't know that Ui even exists here.
             Directory.CreateDirectory( CurrentVesselMetadata.GetRootDirectory() );
-            _vesselDataHandler.ObjectsFilename = Path.Combine( CurrentVesselMetadata.GetRootDirectory(), "objects.json" );
-            _vesselDataHandler.DataFilename = Path.Combine( CurrentVesselMetadata.GetRootDirectory(), "data.json" );
+            _designObjDataHandler.ObjectsFilename = Path.Combine( CurrentVesselMetadata.GetRootDirectory(), "objects.json" );
+            _designObjDataHandler.DataFilename = Path.Combine( CurrentVesselMetadata.GetRootDirectory(), "data.json" );
 
-            CreateSaver( new Func<ISaver, IEnumerator>[] { _vesselStrategy.SaveAsync_Object }, new Func<ISaver, IEnumerator>[] { _vesselStrategy.SaveAsync_Data } );
+            CreateSaver( new Func<ISaver, IEnumerator>[] { _designObjStrategy.SaveAsync_Object }, new Func<ISaver, IEnumerator>[] { _designObjStrategy.SaveAsync_Data } );
 
             _saver.SaveAsync( instance );
 
@@ -168,10 +221,10 @@ namespace KSS.Core.DesignScene
 
             // load current vessel from the files defined by metadata's ID.
             Directory.CreateDirectory( loadedVesselMetadata.GetRootDirectory() );
-            _vesselDataHandler.ObjectsFilename = Path.Combine( loadedVesselMetadata.GetRootDirectory(), "objects.json" );
-            _vesselDataHandler.DataFilename = Path.Combine( loadedVesselMetadata.GetRootDirectory(), "data.json" );
+            _designObjDataHandler.ObjectsFilename = Path.Combine( loadedVesselMetadata.GetRootDirectory(), "objects.json" );
+            _designObjDataHandler.DataFilename = Path.Combine( loadedVesselMetadata.GetRootDirectory(), "data.json" );
 
-            CreateLoader( new Func<ILoader, IEnumerator>[] { _vesselStrategy.LoadAsync_Object }, new Func<ILoader, IEnumerator>[] { _vesselStrategy.LoadAsync_Data } );
+            CreateLoader( new Func<ILoader, IEnumerator>[] { _designObjStrategy.LoadAsync_Object }, new Func<ILoader, IEnumerator>[] { _designObjStrategy.LoadAsync_Data } );
             _loader.LoadAsync( instance );
             CurrentVesselMetadata = loadedVesselMetadata;
         }

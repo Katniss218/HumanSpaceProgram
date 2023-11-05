@@ -53,7 +53,7 @@ namespace KSS.Core.DesignScene.Tools
 
             if( _heldPart == null )
             {
-                if( Input.GetKeyDown( KeyCode.Mouse0 ) )
+                if( Input.GetKeyUp( KeyCode.Mouse0 ) )
                 {
                     TryGrabPart();
 
@@ -67,7 +67,7 @@ namespace KSS.Core.DesignScene.Tools
             {
                 PositionHeldPart();
 
-                if( Input.GetKeyDown( KeyCode.Mouse0 ) )
+                if( Input.GetKeyUp( KeyCode.Mouse0 ) )
                 {
                     PlacePart();
                 }
@@ -95,9 +95,9 @@ namespace KSS.Core.DesignScene.Tools
                     clickedObj = r.Target.transform;
                 }
 
-                if( DesignVesselManager.IsActionable( clickedObj ) )
+                if( DesignObjectManager.IsActionable( clickedObj ) )
                 {
-                    DesignVesselManager.PickUp( clickedObj );
+                    DesignObjectManager.PickUp( clickedObj );
                     HeldPart = clickedObj;
                     _heldOffset = hitInfo.point - clickedObj.position;
                 }
@@ -108,8 +108,9 @@ namespace KSS.Core.DesignScene.Tools
         {
             if( snappedToNode != null )
             {
-                _heldPart.SetParent( snappedToNode.transform.parent );
+                DesignObjectManager.Place( _heldPart, snappedToNode.transform.parent );
                 _heldPart = null;
+                snappedToNode = null;
 
                 return;
             }
@@ -130,9 +131,9 @@ namespace KSS.Core.DesignScene.Tools
                 if( hitObj.root == _heldPart )
                     continue;
 
-                if( DesignVesselManager.IsAttachedToDesignObj( hitObj ) )
+                if( DesignObjectManager.IsAttachedToDesignObj( hitObj ) )
                 {
-                    DesignVesselManager.Place( _heldPart, hitObj );
+                    DesignObjectManager.Place( _heldPart, hitObj );
                     _heldPart = null;
                     // recalc vessel data.
                     return;
@@ -141,7 +142,7 @@ namespace KSS.Core.DesignScene.Tools
 
             // KSP would place as ghost here
 
-            DesignVesselManager.Place( _heldPart, null );
+            DesignObjectManager.Place( _heldPart, null );
             _heldPart = null;
         }
 
@@ -159,7 +160,7 @@ namespace KSS.Core.DesignScene.Tools
                 IEnumerable<RaycastHit> hits = UnityEngine.Physics.RaycastAll( ray, 8192, int.MaxValue ).OrderBy( h => h.distance );
                 foreach( var hit in hits )
                 {
-                    if( DesignVesselManager.IsAttachedToDesignObj( hit.collider.transform ) )
+                    if( DesignObjectManager.IsActionable( hit.collider.transform ) )
                     {
                         // TODO - angle snap like in KSP.
 
@@ -187,6 +188,10 @@ namespace KSS.Core.DesignScene.Tools
                 if( tuple != null )
                 {
                     snappedToNode = tuple.Value.tgt;
+                }
+                else
+                {
+                    snappedToNode = null;
                 }
             }
         }
