@@ -28,7 +28,6 @@ namespace KSS.Core.DesignScene.Tools
                 }
                 _heldPart = value;
                 _heldOffset = Vector3.zero;
-                _heldPart.SetParent( null );
             }
         }
 
@@ -96,25 +95,12 @@ namespace KSS.Core.DesignScene.Tools
                     clickedObj = r.Target.transform;
                 }
 
-                bool isVessel = false;
-                // pick up vessel directly, if clicked thing is the root.
-                if( clickedObj.parent == clickedObj.root && clickedObj.parent.HasComponent<IPartObject>() )
+                if( DesignVesselManager.IsActionable( clickedObj ) )
                 {
-                    clickedObj = clickedObj.parent;
-                    isVessel = true;
-                }
-
-                if( DesignVesselManager.CanPickup( clickedObj ) )
-                {
-                    if( isVessel )
-                        DesignVesselManager.VesselPickup();
-                    else
-                        DesignVesselManager.GhostPickup( clickedObj );
-                    HeldPart = clickedObj; // sets parent to null, etc
+                    DesignVesselManager.PickUp( clickedObj );
+                    HeldPart = clickedObj;
                     _heldOffset = hitInfo.point - clickedObj.position;
                 }
-
-                // recalc vessel data.
             }
         }
 
@@ -144,9 +130,9 @@ namespace KSS.Core.DesignScene.Tools
                 if( hitObj.root == _heldPart )
                     continue;
 
-                if( DesignVesselManager.IsVessel( hitObj ) )
+                if( DesignVesselManager.IsAttachedToDesignObj( hitObj ) )
                 {
-                    _heldPart.SetParent( hitObj );
+                    DesignVesselManager.Place( _heldPart, hitObj );
                     _heldPart = null;
                     // recalc vessel data.
                     return;
@@ -155,10 +141,7 @@ namespace KSS.Core.DesignScene.Tools
 
             // KSP would place as ghost here
 
-            if( _heldPart.HasComponent<IPartObject>() ) // this will be always false.
-                DesignVesselManager.VesselPlace( _heldPart );
-            else
-                DesignVesselManager.GhostPlace( _heldPart );
+            DesignVesselManager.Place( _heldPart, null );
             _heldPart = null;
         }
 
@@ -176,7 +159,7 @@ namespace KSS.Core.DesignScene.Tools
                 IEnumerable<RaycastHit> hits = UnityEngine.Physics.RaycastAll( ray, 8192, int.MaxValue ).OrderBy( h => h.distance );
                 foreach( var hit in hits )
                 {
-                    if( DesignVesselManager.IsVessel( hit.collider.transform ) )
+                    if( DesignVesselManager.IsAttachedToDesignObj( hit.collider.transform ) )
                     {
                         // TODO - angle snap like in KSP.
 

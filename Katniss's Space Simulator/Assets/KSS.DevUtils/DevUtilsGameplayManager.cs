@@ -77,7 +77,6 @@ namespace KSS.DevUtils
 
             var v = CreateVessel( launchSite );
             VesselManager.ActiveVessel = v.RootPart.GetVessel();
-            VesselManager.ActiveVessel.transform.GetComponent<Rigidbody>().angularDrag = 1; // temp, doesn't veer off course.
             vessel = v.gameObject;
         }
 

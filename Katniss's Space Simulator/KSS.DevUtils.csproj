@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\KSS.DevUtils\DevUtilsGameplayManager.cs" />
+    <Compile Include="Assets\KSS.DevUtils\AIRFRotationFixer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.DevUtils\___KSS.DevUtils.asmdef" />

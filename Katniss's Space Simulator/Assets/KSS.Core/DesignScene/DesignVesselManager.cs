@@ -20,52 +20,62 @@ namespace KSS.Core.DesignScene
         static JsonSeparateFileSerializedDataHandler _vesselDataHandler = new JsonSeparateFileSerializedDataHandler();
         static JsonSingleExplicitHierarchyStrategy _vesselStrategy = new JsonSingleExplicitHierarchyStrategy( _vesselDataHandler, GetGameObject );
 
-        private IPartObject _vessel;
-
-        public static bool VesselExists => instance._vessel != null;
+        private DesignObject _designObj;
 
         private List<Transform> _looseParts = new List<Transform>();
 
-#warning TODO - these methods are quite ugly.
-        public static bool CanPickup( Transform t )
+        public static void PickUp( Transform t )
         {
-            return instance._looseParts.Contains( t.root ) || t.root == instance._vessel.transform;
-        }
-
-        public static void VesselPlace( Transform t )
-        {
-            instance._vessel = t.GetComponent<IPartObject>();
-        }
-
-        public static void GhostPlace( Transform t )
-        {
-            instance._looseParts.Add( t );
-        }
-        
-        public static void VesselPickup()
-        {
-            instance._vessel = null;
-        }
-        
-        public static void GhostPickup( Transform t )
-        {
-            instance._looseParts.Remove( t );
-        }
-
-        public static bool IsVessel( Transform t )
-        {
-            if( instance._vessel == null )
-                return false;
-            return t.root == instance._vessel.transform;
-        }
-
-        public static void TryCreateNewVessel( GameObject root )
-        {
-            if( instance._vessel == null )
+            if( IsRootOfDesignObj( t ) )
             {
-                //Vessel v = new VesselFactory().Create( Vector3Dbl.zero, QuaternionDbl.identity, root );
-                //instance._vessel = v;
+                instance._designObj.RootPart = null;
+                t.SetParent( null );
             }
+            else
+            {
+                instance._looseParts.Remove( t );
+                //t.SetParent( null ); not needed
+            }
+        }
+
+        public static void Place( Transform t, Transform parent )
+        {
+            if( parent == null )
+                instance._looseParts.Add( t );
+            t.SetParent( parent );
+        }
+        
+        /// <summary>
+        /// Places the selected object as the new root of the design object.
+        /// </summary>
+        public static void PlaceRoot( Transform t )
+        {
+            t.SetParent( instance._designObj.transform );
+            instance._designObj.RootPart = t;
+        }
+
+        /// <summary>
+        /// True if the object can be manipulated in the design scene (not part of the scenery, etc).
+        /// </summary>
+        public static bool IsActionable( Transform t )
+        {
+            return instance._looseParts.Contains( t.root )
+                || t.root == instance._designObj.transform;
+        }
+
+        public static bool IsAttachedToDesignObj( Transform t )
+        {
+            return t.root == instance._designObj.transform;
+        }
+
+        public static bool IsRootOfDesignObj( Transform t )
+        {
+            return t.parent == t.root && t.parent == instance._designObj.transform;
+        }
+
+        public static bool DesignObjectHasRootPart()
+        {
+            return instance._designObj.RootPart != null;
         }
 
         /// <summary>
@@ -95,11 +105,11 @@ namespace KSS.Core.DesignScene
         public static void FinishFunc()
         {
             TimeManager.LockTimescale = false;
+            instance._designObj.RootPart = _vesselStrategy.LastSpawnedRoot.transform;
             if( !_wasPausedBeforeSerializing )
             {
                 TimeManager.Unpause();
             }
-            instance._vessel = _vesselStrategy.LastSpawnedRoot.GetComponent<IPartObject>();
         }
 
         private static void CreateSaver( IEnumerable<Func<ISaver, IEnumerator>> objectActions, IEnumerable<Func<ISaver, IEnumerator>> dataActions )
@@ -129,6 +139,13 @@ namespace KSS.Core.DesignScene
                3. D: Apply data to the objects (if any).
             5. Get the IDs to persist for later.
         */
+
+        void Awake()
+        {
+            _designObj = DesignObjectFactory.CreatePartless( Vector3.zero, Quaternion.identity );
+        }
+
+
 
         public static void SaveVessel()
         {
@@ -163,7 +180,7 @@ namespace KSS.Core.DesignScene
 
         private static GameObject GetGameObject()
         {
-            return instance._vessel.gameObject;
+            return instance._designObj.RootPart.gameObject;
         }
     }
 }
