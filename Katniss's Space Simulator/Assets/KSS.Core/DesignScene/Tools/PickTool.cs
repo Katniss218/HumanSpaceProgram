@@ -34,10 +34,13 @@ namespace KSS.Core.DesignScene.Tools
 
         Vector3 _heldOffset;
 
+        FAttachNode[] _nodes;
+
         public bool SnappingEnabled { get; set; }
         public float SnapAngle { get; set; }
 
         Camera _camera;
+        FAttachNode snappedToNode = null;
 
         void Awake()
         {
@@ -107,16 +110,26 @@ namespace KSS.Core.DesignScene.Tools
                         DesignVesselManager.VesselPickup();
                     else
                         DesignVesselManager.GhostPickup( clickedObj );
-                    HeldPart = clickedObj;
+                    HeldPart = clickedObj; // sets parent to null, etc
                     _heldOffset = hitInfo.point - clickedObj.position;
                 }
+
                 // recalc vessel data.
             }
         }
 
         private void PlacePart()
         {
+            if( snappedToNode != null )
+            {
+                _heldPart.SetParent( snappedToNode.transform.parent );
+                _heldPart = null;
+
+                return;
+            }
+
             Ray ray = _camera.ScreenPointToRay( Input.mousePosition );
+
             IEnumerable<RaycastHit> hits = UnityEngine.Physics.RaycastAll( ray, 8192, int.MaxValue ).OrderBy( h => h.distance );
             foreach( var hit in hits )
             {
@@ -142,7 +155,7 @@ namespace KSS.Core.DesignScene.Tools
 
             // KSP would place as ghost here
 
-            if( _heldPart.HasComponent<IPartObject>() )
+            if( _heldPart.HasComponent<IPartObject>() ) // this will be always false.
                 DesignVesselManager.VesselPlace( _heldPart );
             else
                 DesignVesselManager.GhostPlace( _heldPart );
@@ -179,7 +192,23 @@ namespace KSS.Core.DesignScene.Tools
             if( p.Raycast( ray, out float intersectionDistance ) )
             {
                 Vector3 intersectionPoint = ray.GetPoint( intersectionDistance );
+
                 _heldPart.position = intersectionPoint - _heldOffset;
+
+                // snap to node, if available.
+                _nodes = FindObjectsOfType<FAttachNode>().Where( n => n.transform.root != HeldPart ).ToArray();
+                snappedToNode = null;
+                FAttachNode[] heldNodes = _heldPart.GetComponentsInChildren<FAttachNode>();
+                foreach( var heldNode in heldNodes )
+                {
+                    var attachedTo = heldNode.TrySnap( _heldPart, _nodes );
+                    if( attachedTo != null )
+                    {
+#warning TODO - sort so that it tries to position between pairs of nodes in ascending distance.
+                        snappedToNode = attachedTo;
+                        break;
+                    }
+                }
             }
         }
     }

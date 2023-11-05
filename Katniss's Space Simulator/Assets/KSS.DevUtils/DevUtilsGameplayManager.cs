@@ -71,7 +71,7 @@ namespace KSS.DevUtils
             Vector3 localPos = CoordinateUtils.GeodeticToEuclidean( 28.5857702f, -80.6507262f, (float)(body.Radius + 1.0) );
 
             PartFactory launchSitePart = new PartFactory( new AssetPartSource( "builtin::Resources/Prefabs/testlaunchsite" ) );
-            launchSite = new BuildingFactory().CreatePartless( body, localPos, Quaternion.FromToRotation( Vector3.up, localPos.normalized ) );
+            launchSite = BuildingFactory.CreatePartless( body, localPos, Quaternion.FromToRotation( Vector3.up, localPos.normalized ) );
 
             Transform root = launchSitePart.CreateRoot( launchSite );
 
@@ -165,14 +165,12 @@ namespace KSS.DevUtils
 
         static Vessel CreateDummyVessel( Vector3Dbl airfPosition, QuaternionDbl rotation )
         {
-            VesselFactory fac = new VesselFactory();
-
             PartFactory intertank = new PartFactory( new AssetPartSource( "builtin::Resources/Prefabs/Parts/part.intertank" ) );
             PartFactory tank = new PartFactory( new AssetPartSource( "builtin::Resources/Prefabs/Parts/part.tank" ) );
             PartFactory tankLong = new PartFactory( new AssetPartSource( "builtin::Resources/Prefabs/Parts/part.tank_long" ) );
             PartFactory engine = new PartFactory( new AssetPartSource( "builtin::Resources/Prefabs/Parts/part.engine" ) );
 
-            Vessel v = fac.CreatePartless( airfPosition, rotation, Vector3.zero, Vector3.zero );
+            Vessel v = VesselFactory.CreatePartless( airfPosition, rotation, Vector3.zero, Vector3.zero );
             Transform root = intertank.CreateRoot( v );
 
             Transform tankP = tank.Create( root, new Vector3( 0, -1.625f, 0 ), Quaternion.identity );

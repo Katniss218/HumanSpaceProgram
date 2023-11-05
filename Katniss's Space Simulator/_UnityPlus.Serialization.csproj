@@ -68,11 +68,13 @@
     <Compile Include="Assets\_UnityPlus.Serialization\Loader.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\PersistentExtensions\IPersistent_Rigidbody.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Strategies\JsonPreexistingGameObjectsStrategy.cs" />
+    <Compile Include="Assets\_UnityPlus.Serialization\ISerializedDataHandler.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Strategies\JsonSingleExplicitHierarchyStrategy.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\PersistentExtensions\IPersistent_MeshRenderer.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Json\JsonStreamWriter.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\SerializedData.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\ISaver.cs" />
+    <Compile Include="Assets\_UnityPlus.Serialization\JsonSeparateFileSerializedDataHandler.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\PersistentExtensions\IPersistent_Transform.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\PersistentExtensions\IPersistent_LODGroup.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\PersistentExtensions\IPersistent_BoxCollider.cs" />
@@ -84,6 +86,7 @@
     <Compile Include="Assets\_UnityPlus.Serialization\Json\JsonStringReader.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\PersistentExtensions\IPersistent_MeshFilter.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\PersistentExtensions\IPersistent_SphereCollider.cs" />
+    <Compile Include="Assets\_UnityPlus.Serialization\JsonSingleFileSerializedDataHandler.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Strategies\StratUtils.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\ILoaderEx_Primitives.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Json\JsonStringWriter.cs" />
@@ -94,9 +97,6 @@
     <Compile Include="Assets\_UnityPlus.Serialization\Saver.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\PersistentExtensions\IPersistent_Component.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\AsyncLoader.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\JsonSeparateFileSerializedDataHandler.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\ISerializedDataHandler.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\JsonSingleFileSerializedDataHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_UnityPlus.Serialization\___UnityPlus.Serialization.asmdef" />
