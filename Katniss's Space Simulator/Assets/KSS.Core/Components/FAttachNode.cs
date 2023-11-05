@@ -20,39 +20,46 @@ namespace KSS.Core.Components
         /// <summary>
         /// Tries to snap the node to any of the specified nodes. Takes the snapping rules into account.
         /// </summary>
-        public FAttachNode TrySnap( Transform obj, IEnumerable<FAttachNode> other )
+        public static (FAttachNode obj, FAttachNode tgt)? TrySnap( Transform obj, FAttachNode[] objNodes, FAttachNode[] targetNodes )
         {
-            var orderedNodes = other.OrderByDescending( o => o.Range );
-
-            Vector3 pos = this.transform.position;
-            Vector3 forward = this.transform.forward;
-
-            foreach( var node in orderedNodes )
+            List<(FAttachNode obj, FAttachNode tgt)> nodePairs = new List<(FAttachNode, FAttachNode)>();
+            foreach( var objNode in objNodes )
             {
-                if( Vector3.Distance( pos, node.transform.position ) < Mathf.Max( this.Range, node.Range ) )
+                foreach( var targetNode in targetNodes )
                 {
-                    if( Vector3.Angle( forward, node.transform.forward ) > (180 - SnapThresholdAngle) )
+#warning TODO - incorporate view ray into the filtering.
+                    if( Vector3.Distance( objNode.transform.position, targetNode.transform.position ) > Mathf.Max( objNode.Range, targetNode.Range )
+                     || Vector3.Angle( -objNode.transform.forward, targetNode.transform.forward ) > SnapThresholdAngle )
                     {
-                        this.SnapTo( obj, node );
-                        return node;
+                        continue;
                     }
+
+                    nodePairs.Add( (objNode, targetNode) );
                 }
             }
-#warning TODO - ioncorporate view direction and position (view ray).
+
+            var orderedNodePairs = nodePairs.OrderBy( tuple => Vector3.Distance( tuple.obj.transform.position, tuple.tgt.transform.position ) ).ToList();
+
+            var tuple = orderedNodePairs.FirstOrDefault();
+            if( tuple != default )
+            {
+                SnapTo( obj, tuple.obj, tuple.tgt );
+                return tuple;
+            }
 
             return null;
         }
 
-        public void SnapTo( Transform obj, FAttachNode other )
+        public static void SnapTo( Transform obj, FAttachNode objNode, FAttachNode targetNode )
         {
-            Quaternion nodeRotation = Quaternion.FromToRotation( -this.transform.forward, other.transform.forward );
+            Quaternion nodeRotation = Quaternion.FromToRotation( -objNode.transform.forward, targetNode.transform.forward );
             obj.transform.rotation = nodeRotation * obj.transform.rotation;
 
-            nodeRotation = Quaternion.FromToRotation( this.transform.up, other.transform.up );
+            nodeRotation = Quaternion.FromToRotation( objNode.transform.up, targetNode.transform.up );
             obj.transform.rotation = nodeRotation * obj.transform.rotation;
 
-            Vector3 offset = obj.transform.position - this.transform.position;
-            obj.position = other.transform.position + offset;
+            Vector3 offset = obj.transform.position - objNode.transform.position;
+            obj.position = targetNode.transform.position + offset;
         }
 
         // A node is supposed to be placed on its own gameobject. the orientation of that 

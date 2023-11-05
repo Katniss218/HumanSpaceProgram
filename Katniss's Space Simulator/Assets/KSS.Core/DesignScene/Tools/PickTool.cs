@@ -196,18 +196,14 @@ namespace KSS.Core.DesignScene.Tools
                 _heldPart.position = intersectionPoint - _heldOffset;
 
                 // snap to node, if available.
-                _nodes = FindObjectsOfType<FAttachNode>().Where( n => n.transform.root != HeldPart ).ToArray();
-                snappedToNode = null;
+#warning TODO - snapping sometimes snaps to the wrong node.
                 FAttachNode[] heldNodes = _heldPart.GetComponentsInChildren<FAttachNode>();
-                foreach( var heldNode in heldNodes )
+                FAttachNode[] targetNodes = FindObjectsOfType<FAttachNode>().Where( n => n.transform.root != HeldPart ).ToArray();
+
+                var tuple = FAttachNode.TrySnap( _heldPart, heldNodes, targetNodes );
+                if( tuple != null )
                 {
-                    var attachedTo = heldNode.TrySnap( _heldPart, _nodes );
-                    if( attachedTo != null )
-                    {
-#warning TODO - sort so that it tries to position between pairs of nodes in ascending distance.
-                        snappedToNode = attachedTo;
-                        break;
-                    }
+                    snappedToNode = tuple.Value.tgt;
                 }
             }
         }
