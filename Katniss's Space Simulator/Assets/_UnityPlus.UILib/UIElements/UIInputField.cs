@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace UnityPlus.UILib.UIElements
@@ -11,6 +12,12 @@ namespace UnityPlus.UILib.UIElements
 
         internal readonly IUIElementContainer _parent;
         public IUIElementContainer Parent { get => _parent; }
+
+        public void SetOnTextChange( Action<string> onTextChange )
+        {
+            inputFieldComponent.onValueChanged.RemoveAllListeners();
+            inputFieldComponent.onValueChanged.AddListener( ( s ) => onTextChange( inputFieldComponent.text ) );
+        }
 
         internal UIInputField( RectTransform transform, IUIElementContainer parent, TMPro.TMP_InputField inputFieldComponent, TMPro.TextMeshProUGUI textComponent, TMPro.TextMeshProUGUI placeholderComponent ) : base( transform )
         {

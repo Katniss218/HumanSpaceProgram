@@ -117,6 +117,14 @@ namespace KSS.Core
         /// </summary>
         public const string DESIGN_TOOL_CHANGED = NAMESPACE_VANILLA + ".designscene.tool.changed";
 
+        public const string DESIGN_BEFORE_LOAD = NAMESPACE_VANILLA + ".designscene.load.before";
+
+        public const string DESIGN_AFTER_LOAD = NAMESPACE_VANILLA + ".designscene.load.after";
+
+        public const string DESIGN_BEFORE_SAVE = NAMESPACE_VANILLA + ".designscene.save.before";
+        
+        public const string DESIGN_AFTER_SAVE = NAMESPACE_VANILLA + ".designscene.save.after";
+
         // ---
     }
 }

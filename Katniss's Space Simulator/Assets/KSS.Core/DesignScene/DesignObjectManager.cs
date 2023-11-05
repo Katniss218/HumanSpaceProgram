@@ -154,7 +154,17 @@ namespace KSS.Core.DesignScene
             TimeManager.LockTimescale = true;
         }
 
-        public static void FinishFunc()
+        public static void FinishSaveFunc()
+        {
+            TimeManager.LockTimescale = false;
+            if( !_wasPausedBeforeSerializing )
+            {
+                TimeManager.Unpause();
+            }
+            HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_AFTER_SAVE, null );
+        }
+        
+        public static void FinishLoadFunc()
         {
             TimeManager.LockTimescale = false;
             instance._designObj.RootPart = _designObjStrategy.LastSpawnedRoot.transform;
@@ -162,16 +172,17 @@ namespace KSS.Core.DesignScene
             {
                 TimeManager.Unpause();
             }
+            HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_AFTER_LOAD, null );
         }
 
         private static void CreateSaver( IEnumerable<Func<ISaver, IEnumerator>> objectActions, IEnumerable<Func<ISaver, IEnumerator>> dataActions )
         {
-            _saver = new AsyncSaver( StartFunc, FinishFunc, objectActions, dataActions );
+            _saver = new AsyncSaver( StartFunc, FinishSaveFunc, objectActions, dataActions );
         }
 
         private static void CreateLoader( IEnumerable<Func<ILoader, IEnumerator>> objectActions, IEnumerable<Func<ILoader, IEnumerator>> dataActions )
         {
-            _loader = new AsyncLoader( StartFunc, FinishFunc, objectActions, dataActions );
+            _loader = new AsyncLoader( StartFunc, FinishLoadFunc, objectActions, dataActions );
         }
 
         // undos stored in files, preserved across sessions?
@@ -207,6 +218,8 @@ namespace KSS.Core.DesignScene
             _designObjDataHandler.ObjectsFilename = Path.Combine( CurrentVesselMetadata.GetRootDirectory(), "objects.json" );
             _designObjDataHandler.DataFilename = Path.Combine( CurrentVesselMetadata.GetRootDirectory(), "data.json" );
 
+            HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_BEFORE_SAVE, null );
+
             CreateSaver( new Func<ISaver, IEnumerator>[] { _designObjStrategy.SaveAsync_Object }, new Func<ISaver, IEnumerator>[] { _designObjStrategy.SaveAsync_Data } );
 
             _saver.SaveAsync( instance );
@@ -224,9 +237,11 @@ namespace KSS.Core.DesignScene
             _designObjDataHandler.ObjectsFilename = Path.Combine( loadedVesselMetadata.GetRootDirectory(), "objects.json" );
             _designObjDataHandler.DataFilename = Path.Combine( loadedVesselMetadata.GetRootDirectory(), "data.json" );
 
+            HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_BEFORE_LOAD, null );
+            CurrentVesselMetadata = loadedVesselMetadata; // CurrentVesselMetadata should be set after invoking before load.
+
             CreateLoader( new Func<ILoader, IEnumerator>[] { _designObjStrategy.LoadAsync_Object }, new Func<ILoader, IEnumerator>[] { _designObjStrategy.LoadAsync_Data } );
             _loader.LoadAsync( instance );
-            CurrentVesselMetadata = loadedVesselMetadata;
         }
 
         // ------
