@@ -21,9 +21,6 @@ namespace KSS.UI
         IUIElementContainer _saveListUI;
         IUIElementContainer _timelineListUI;
 
-        [SerializeField]
-        Button _loadButton;
-
         // load window will contain a scrollable list of timelines, and then for each timeline, you can load a specific save, or a default (persistent) save.
 
         // after clicking on a timeline

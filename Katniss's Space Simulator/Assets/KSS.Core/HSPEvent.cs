@@ -32,7 +32,7 @@ namespace KSS.Core
         //
 
         /// <summary>
-        /// Invoked at the immediate start of the game. This is always the first invoked event.
+        /// Invoked at the immediate start of the game. This event is always invoked first.
         /// </summary>
         public const string STARTUP_IMMEDIATELY = NAMESPACE_VANILLA + ".startup.immediately";
 
@@ -46,12 +46,37 @@ namespace KSS.Core
         /// </summary>
         public const string STARTUP_GAMEPLAY = NAMESPACE_VANILLA + ".startup.gameplay";
 
+        /// <summary>
+        /// Invoked immediately after loading the design scene.
+        /// </summary>
+        public const string STARTUP_DESIGN = NAMESPACE_VANILLA + ".startup.design";
+        
+        /// <summary>
+        /// Invoked immediately after loading the editor scene.
+        /// </summary>
+        public const string STARTUP_EDITOR = NAMESPACE_VANILLA + ".startup.editor";
+
         //
 
         /// <summary>
         /// Invoked when the player toggles the escape (pause) menu in the gameplay scene.
         /// </summary>
+        public const string ESCAPE_MAINMENU = NAMESPACE_VANILLA + ".escape.mainmenu";
+        
+        /// <summary>
+        /// Invoked when the player toggles the escape (pause) menu in the gameplay scene.
+        /// </summary>
         public const string ESCAPE_GAMEPLAY = NAMESPACE_VANILLA + ".escape.gameplay";
+        
+        /// <summary>
+        /// Invoked when the player toggles the escape (pause) menu in the design scene.
+        /// </summary>
+        public const string ESCAPE_DESIGN = NAMESPACE_VANILLA + ".escape.design";
+        
+        /// <summary>
+        /// Invoked when the player toggles the escape (pause) menu in the design scene.
+        /// </summary>
+        public const string ESCAPE_EDITOR = NAMESPACE_VANILLA + ".escape.editor";
 
         //
 
@@ -84,5 +109,22 @@ namespace KSS.Core
         /// Invoked after creating a new game state (timeline + default save).
         /// </summary>
         public const string TIMELINE_AFTER_NEW = NAMESPACE_VANILLA + ".timeline.new.after";
+
+        // design scene runtime events.
+
+        /// <summary>
+        /// Invoked after the currently active tool in the design scene has changed.
+        /// </summary>
+        public const string DESIGN_TOOL_CHANGED = NAMESPACE_VANILLA + ".designscene.tool.changed";
+
+        public const string DESIGN_BEFORE_LOAD = NAMESPACE_VANILLA + ".designscene.load.before";
+
+        public const string DESIGN_AFTER_LOAD = NAMESPACE_VANILLA + ".designscene.load.after";
+
+        public const string DESIGN_BEFORE_SAVE = NAMESPACE_VANILLA + ".designscene.save.before";
+        
+        public const string DESIGN_AFTER_SAVE = NAMESPACE_VANILLA + ".designscene.save.after";
+
+        // ---
     }
 }

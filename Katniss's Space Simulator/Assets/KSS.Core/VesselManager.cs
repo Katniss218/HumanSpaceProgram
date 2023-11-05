@@ -1,4 +1,5 @@
-﻿using KSS.Core.Serialization;
+﻿using KSS.Core.SceneManagement;
+using KSS.Core.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,34 +15,44 @@ namespace KSS.Core
     /// <summary>
     /// Manages loading, unloading, switching, etc of vessels.
     /// </summary>
-    public class VesselManager : HSPManager, IPersistent
+    [RequireComponent( typeof( PreexistingReference ) )]
+    public class VesselManager : SingletonMonoBehaviour<VesselManager>, IPersistent
     {
-        private static Vessel _activeVessel;
+        private Vessel _activeVessel;
         public static Vessel ActiveVessel
         {
-            get => _activeVessel;
+            get => instance._activeVessel;
             set
             {
-                _activeVessel = value;
+                instance._activeVessel = value;
                 // TODO - focus camera (probs with event).
             }
         }
 
-        static List<Vessel> _vessels = new List<Vessel>();
+        private List<Vessel> _vessels = new List<Vessel>();
 
         public static Vessel[] GetLoadedVessels()
         {
-            return _vessels.ToArray();
+            if( !exists )
+                throw new InvalidSceneManagerException( $"{nameof( VesselManager )} is only available in the gameplay scene." );
+
+            return instance._vessels.ToArray();
         }
 
         internal static void Register( Vessel vessel )
         {
-            _vessels.Add( vessel );
+            if( !exists )
+                throw new InvalidSceneManagerException( $"{nameof( VesselManager )} is only available in the gameplay scene." );
+
+            instance._vessels.Add( vessel );
         }
 
         internal static void Unregister( Vessel vessel )
         {
-            _vessels.Remove( vessel );
+            if( !exists )
+                throw new InvalidSceneManagerException( $"{nameof( VesselManager )} is only available in the gameplay scene." );
+
+            instance._vessels.Remove( vessel );
         }
 
         public SerializedData GetData( ISaver s )
@@ -62,14 +73,15 @@ namespace KSS.Core
 
 
         // move below to separate class "BuildingSerializer" or something.
-        private static readonly JsonExplicitHierarchyGameObjectsStrategy _vesselsStrat = new JsonExplicitHierarchyGameObjectsStrategy( GetAllRootGameObjects );
+        private static readonly JsonSeparateFileSerializedDataHandler _vesselsDataHandler = new JsonSeparateFileSerializedDataHandler();
+        private static readonly JsonExplicitHierarchyGameObjectsStrategy _vesselsStrat = new JsonExplicitHierarchyGameObjectsStrategy( _vesselsDataHandler, GetAllRootGameObjects );
 
         private static GameObject[] GetAllRootGameObjects()
         {
-            GameObject[] gos = new GameObject[_vessels.Count];
-            for( int i = 0; i < _vessels.Count; i++ )
+            GameObject[] gos = new GameObject[instance._vessels.Count];
+            for( int i = 0; i < instance._vessels.Count; i++ )
             {
-                gos[i] = _vessels[i].gameObject;
+                gos[i] = instance._vessels[i].gameObject;
             }
             return gos;
         }
@@ -79,11 +91,11 @@ namespace KSS.Core
         {
             var e = (TimelineManager.SaveEventData)ee;
 
-            TimelineManager.EnsureDirectoryExists( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels" ) );
-            _vesselsStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels", "objects.json" );
-            _vesselsStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels", "data.json" );
-            e.objectActions.Add( _vesselsStrat.Save_Object );
-            e.dataActions.Add( _vesselsStrat.Save_Data );
+            Directory.CreateDirectory( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels" ) );
+            _vesselsDataHandler.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels", "objects.json" );
+            _vesselsDataHandler.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels", "data.json" );
+            e.objectActions.Add( _vesselsStrat.SaveAsync_Object );
+            e.dataActions.Add( _vesselsStrat.SaveAsync_Data );
         }
 
         [HSPEventListener( HSPEvent.TIMELINE_BEFORE_LOAD, HSPEvent.NAMESPACE_VANILLA + ".deserialize_vessels" )]
@@ -91,11 +103,11 @@ namespace KSS.Core
         {
             var e = (TimelineManager.LoadEventData)ee;
 
-            TimelineManager.EnsureDirectoryExists( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels" ) );
-            _vesselsStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels", "objects.json" );
-            _vesselsStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels", "data.json" );
-            e.objectActions.Add( _vesselsStrat.Load_Object );
-            e.dataActions.Add( _vesselsStrat.Load_Data );
+            Directory.CreateDirectory( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels" ) );
+            _vesselsDataHandler.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels", "objects.json" );
+            _vesselsDataHandler.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels", "data.json" );
+            e.objectActions.Add( _vesselsStrat.LoadAsync_Object );
+            e.dataActions.Add( _vesselsStrat.LoadAsync_Data );
         }
     }
 }

@@ -19,7 +19,7 @@ MonoBehaviour:
     width: 1920
     height: 997
   m_ShowMode: 4
-  m_Title: Game
+  m_Title: Hierarchy
   m_RootView: {fileID: 2}
   m_MinSize: {x: 875, y: 300}
   m_MaxSize: {x: 10000, y: 10000}
@@ -119,7 +119,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 200}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 14946
+  controlID: 50
 --- !u!114 &6
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -139,12 +139,12 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 1430
+    width: 1440
     height: 947
   m_MinSize: {x: 200, y: 200}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 1
-  controlID: 14887
+  controlID: 51
 --- !u!114 &7
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -164,12 +164,12 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 1430
+    width: 1440
     height: 590
   m_MinSize: {x: 200, y: 100}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 14888
+  controlID: 42
 --- !u!114 &8
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -187,10 +187,10 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 313
+    width: 315
     height: 590
-  m_MinSize: {x: 201, y: 221}
-  m_MaxSize: {x: 4001, y: 4021}
+  m_MinSize: {x: 200, y: 200}
+  m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 13}
   m_Panes:
   - {fileID: 13}
@@ -211,9 +211,9 @@ MonoBehaviour:
   m_Children: []
   m_Position:
     serializedVersion: 2
-    x: 313
+    x: 315
     y: 0
-    width: 1117
+    width: 1125
     height: 590
   m_MinSize: {x: 202, y: 221}
   m_MaxSize: {x: 4002, y: 4021}
@@ -234,23 +234,23 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 1
   m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: ConsoleWindow
+  m_Name: ProjectBrowser
   m_EditorClassIdentifier: 
   m_Children: []
   m_Position:
     serializedVersion: 2
     x: 0
     y: 590
-    width: 1430
+    width: 1440
     height: 357
-  m_MinSize: {x: 101, y: 121}
-  m_MaxSize: {x: 4001, y: 4021}
-  m_ActualView: {fileID: 17}
+  m_MinSize: {x: 231, y: 271}
+  m_MaxSize: {x: 10001, y: 10021}
+  m_ActualView: {fileID: 16}
   m_Panes:
   - {fileID: 16}
   - {fileID: 17}
-  m_Selected: 1
-  m_LastSelected: 0
+  m_Selected: 0
+  m_LastSelected: 1
 --- !u!114 &11
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -266,9 +266,9 @@ MonoBehaviour:
   m_Children: []
   m_Position:
     serializedVersion: 2
-    x: 1430
+    x: 1440
     y: 0
-    width: 490
+    width: 480
     height: 947
   m_MinSize: {x: 276, y: 71}
   m_MaxSize: {x: 4001, y: 4021}
@@ -278,7 +278,7 @@ MonoBehaviour:
   - {fileID: 19}
   - {fileID: 20}
   m_Selected: 0
-  m_LastSelected: 2
+  m_LastSelected: 1
 --- !u!114 &12
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -299,9 +299,9 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 313
+    x: 315
     y: 73
-    width: 1115
+    width: 1123
     height: 569
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
@@ -315,7 +315,7 @@ MonoBehaviour:
   m_ShowGizmos: 0
   m_TargetDisplay: 0
   m_ClearColor: {r: 0, g: 0, b: 0, a: 0}
-  m_TargetSize: {x: 1115, y: 548}
+  m_TargetSize: {x: 1123, y: 548}
   m_TextureFilterMode: 0
   m_TextureHideFlags: 61
   m_RenderIMGUI: 1
@@ -335,8 +335,8 @@ MonoBehaviour:
     m_VRangeLocked: 0
     hZoomLockedByDefault: 0
     vZoomLockedByDefault: 0
-    m_HBaseRangeMin: -557.5
-    m_HBaseRangeMax: 557.5
+    m_HBaseRangeMin: -561.5
+    m_HBaseRangeMax: 561.5
     m_VBaseRangeMin: -274
     m_VBaseRangeMax: 274
     m_HAllowExceedBaseRangeMin: 1
@@ -356,23 +356,23 @@ MonoBehaviour:
       serializedVersion: 2
       x: 0
       y: 21
-      width: 1115
+      width: 1123
       height: 548
     m_Scale: {x: 1, y: 1}
-    m_Translation: {x: 557.5, y: 274}
+    m_Translation: {x: 561.5, y: 274}
     m_MarginLeft: 0
     m_MarginRight: 0
     m_MarginTop: 0
     m_MarginBottom: 0
     m_LastShownAreaInsideMargins:
       serializedVersion: 2
-      x: -557.5
+      x: -561.5
       y: -274
-      width: 1115
+      width: 1123
       height: 548
     m_MinimalGUI: 1
   m_defaultScale: 1
-  m_LastWindowPixelSize: {x: 1115, y: 569}
+  m_LastWindowPixelSize: {x: 1123, y: 569}
   m_ClearInEditMode: 1
   m_NoCameraWarning: 0
   m_LowResolutionForAspectRatios: 01000000000000000000
@@ -402,7 +402,7 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 73
-    width: 312
+    width: 314
     height: 569
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
@@ -413,21 +413,21 @@ MonoBehaviour:
       scrollPos: {x: 0, y: 0}
       m_SelectedIDs: 
       m_LastClickedID: 0
-      m_ExpandedIDs: be5deaffd85deaffe65deaffde61eaff2a86eaff86a5eaffa2c5eaff9ae3eaff7090ebff92ceebff9acdecffeacdecff76cfecffaacfecfff2cfecfff8cfecff14d0ecffea47eeff1249eeff2665eeff0e7eeeffea16efff3058efffd297efffc4a6efff2ed2efff2af1efffda0ff0fff679f0ff1aacf1ffd6caf1ff8209f2ff1c27f2ffe085f2ffec85f2ff4287f2ffbca5f2fff6e4f2ff02e5f2ff58e6f2ff7eeff2ffc40ef3ff0e38f3ffeafefdff022effff1c2effff2a2effff2232ffff206cffffc26effff1870ffffb697ffffd097ffffde97ffff749affff809affffd69bffff86baffff08d9ffff98f7ffff08fbffff6a8c0000888c0000208f00003e8f000048b3000066b300005eb400007cb40000feb500001cb6000014b7000032b70000
+      m_ExpandedIDs: fc31ffff6e33fffffc35ffff74c0ffffe6c1ffff62c6ffffd4c6ffffc6caffffc8caffffbccbffff72ccfffff4cdffff2eceffffccf9ffff08fbffffd84b0000f44e0000d6520000
       m_RenameOverlay:
         m_UserAcceptedRename: 0
-        m_Name: 
-        m_OriginalName: 
+        m_Name: smoke
+        m_OriginalName: smoke
         m_EditFieldRect:
           serializedVersion: 2
           x: 0
           y: 0
           width: 0
           height: 0
-        m_UserData: 0
+        m_UserData: 22332
         m_IsWaitingForDelay: 0
         m_IsRenaming: 0
-        m_OriginalEventType: 11
+        m_OriginalEventType: 0
         m_IsRenamingFilename: 0
         m_ClientGUIView: {fileID: 8}
       m_SearchString: 
@@ -457,9 +457,9 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 313
+    x: 315
     y: 73
-    width: 1115
+    width: 1123
     height: 569
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
@@ -657,7 +657,7 @@ MonoBehaviour:
       floating: 0
       collapsed: 0
       displayed: 0
-      snapOffset: {x: 0, y: 0}
+      snapOffset: {x: 0, y: 25}
       snapOffsetDelta: {x: 0, y: 0}
       snapCorner: 0
       id: Scene View/Particles
@@ -695,9 +695,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: -915.8159, y: 3018.7053, z: 5497.448}
+    m_Target: {x: -43.07428, y: -36.358486, z: -41.810207}
     speed: 2
-    m_Value: {x: -915.8159, y: 3018.7053, z: 5497.448}
+    m_Value: {x: -43.07428, y: -36.358486, z: -41.810207}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 2
@@ -743,13 +743,13 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0.5
   m_Rotation:
-    m_Target: {x: 0.02978675, y: 0.9315973, z: 0.07810971, w: -0.3538547}
+    m_Target: {x: -0.048393447, y: 0.9461132, z: -0.16807899, w: -0.27259094}
     speed: 2
-    m_Value: {x: 0.029785633, y: 0.9315623, z: 0.078106776, w: -0.3538414}
+    m_Value: {x: -0.049148608, y: 0.9448635, z: -0.16785713, w: -0.2768417}
   m_Size:
-    m_Target: 10
+    m_Target: 44.227028
     speed: 2
-    m_Value: 10
+    m_Value: 44.227028
   m_Ortho:
     m_Target: 0
     speed: 2
@@ -794,10 +794,10 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 313
+    x: 315
     y: 73
-    width: 1115
-    height: 568
+    width: 1123
+    height: 569
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
     m_LastAppliedPresetName: Default
@@ -840,10 +840,10 @@ MonoBehaviour:
         m_FrameDataHierarchyView:
           m_Serialized: 1
           m_TreeViewState:
-            scrollPos: {x: 0, y: 2004}
-            m_SelectedIDs: 1a010000
-            m_LastClickedID: 282
-            m_ExpandedIDs: 0400000014000000e300000009010000
+            scrollPos: {x: 0, y: 10}
+            m_SelectedIDs: 
+            m_LastClickedID: 0
+            m_ExpandedIDs: 
             m_RenameOverlay:
               m_UserAcceptedRename: 0
               m_Name: 
@@ -1289,7 +1289,7 @@ MonoBehaviour:
                 m_SortedColumns: 03000000
           m_FullThreadName: Main Thread
           m_ThreadName: Main Thread
-          <threadId>k__BackingField: 20812
+          <threadId>k__BackingField: 18464
           <threadIndex>k__BackingField: 0
           m_GroupName: 
     - rid: 7719947645730684977
@@ -1880,7 +1880,7 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 663
-    width: 1429
+    width: 1439
     height: 336
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
@@ -1899,22 +1899,22 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/KSS.Core
+    - Assets/KSS.DevUtils
     m_Globs: []
     m_OriginalText: 
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/KSS.Core
+  - Assets/KSS.DevUtils
   m_LastFoldersGridSize: -1
   m_LastProjectPath: E:\GIT\KatnisssSpaceSimulator\Katniss's Space Simulator
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 116}
-    m_SelectedIDs: cc4a0000
-    m_LastClickedID: 19148
-    m_ExpandedIDs: 00000000a04a0000a24a0000a44a0000a64a0000a84a0000aa4a0000ac4a0000ae4a0000b04a0000b24a0000b44a0000b64a0000b84a0000ba4a0000bc4a0000be4a0000c04a0000c24a0000c44a0000c64a0000c84a0000ca4a0000cc4a000000ca9a3b
+    scrollPos: {x: 0, y: 536}
+    m_SelectedIDs: 1a4b0000
+    m_LastClickedID: 19226
+    m_ExpandedIDs: 00000000a24a0000a44a0000a64a0000a84a0000aa4a0000ac4a0000ae4a0000b04a0000b24a0000b44a0000b64a0000b84a0000ba4a0000bc4a0000be4a0000c04a0000c24a0000c44a0000c64a0000c84a0000ca4a0000cc4a0000ce4a0000d04a000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1942,7 +1942,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 00000000a04a0000a24a0000a44a0000a64a0000a84a0000aa4a0000ac4a0000ae4a0000b04a0000b24a0000b44a0000b64a0000b84a0000ba4a0000bc4a0000be4a0000c04a0000c24a0000c44a0000c64a0000c84a0000ca4a0000cc4a000000ca9a3b
+    m_ExpandedIDs: 00000000a24a0000a44a0000a64a0000a84a0000aa4a0000ac4a0000ae4a0000b04a0000b24a0000b44a0000b64a0000b84a0000ba4a0000bc4a0000be4a0000c04a0000c24a0000c44a0000c64a0000c84a0000ca4a0000cc4a0000ce4a0000d04a0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1967,10 +1967,10 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: a65deaff
-    m_LastClickedInstanceID: -1417818
-    m_HadKeyboardFocusLastEvent: 0
-    m_ExpandedInstanceIDs: c6230000ea5b000076630000000000000c5c0000
+    m_SelectedInstanceIDs: 
+    m_LastClickedInstanceID: 0
+    m_HadKeyboardFocusLastEvent: 1
+    m_ExpandedInstanceIDs: c6230000ea5b000076630000000000000c5c0000668b0000204c0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1994,7 +1994,7 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
     m_NewAssetIndexInList: -1
-    m_ScrollPosition: {x: 0, y: 0}
+    m_ScrollPosition: {x: 0, y: 5.5}
     m_GridSize: 64
   m_SkipHiddenPackages: 0
   m_DirectoriesAreaWidth: 407
@@ -2020,7 +2020,7 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 663
-    width: 1429
+    width: 1439
     height: 336
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
@@ -2046,9 +2046,9 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 1430
+    x: 1440
     y: 73
-    width: 489
+    width: 479
     height: 926
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
@@ -2087,16 +2087,16 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 1443
+    x: 1430
     y: 73
-    width: 476
+    width: 489
     height: 926
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
     m_LastAppliedPresetName: Default
     m_SaveData: []
   m_Spl:
-    ID: 9869
+    ID: 160
     splitterInitialOffset: 0
     currentActiveSplitter: -1
     realSizes:
@@ -2294,7 +2294,7 @@ MonoBehaviour:
       name: Katniss's Space Simulator
       fullName: Katniss's Space Simulator
       resultStatus: 1
-      duration: 0.0773057
+      duration: 0.0998598
       messages: 
       output: 
       stacktrace: 
@@ -2310,7 +2310,7 @@ MonoBehaviour:
       name: KSS.Tests.EditMode.dll
       fullName: E:/GIT/KatnisssSpaceSimulator/Katniss's Space Simulator/Library/ScriptAssemblies/KSS.Tests.EditMode.dll
       resultStatus: 1
-      duration: 0.0485785
+      duration: 0.0693544
       messages: 
       output: 
       stacktrace: 
@@ -2326,7 +2326,7 @@ MonoBehaviour:
       name: KSS_Tests_EditMode
       fullName: KSS_Tests_EditMode
       resultStatus: 1
-      duration: 0.047523
+      duration: 0.0684131
       messages: 
       output: 
       stacktrace: 
@@ -2342,7 +2342,7 @@ MonoBehaviour:
       name: E_Template
       fullName: KSS_Tests_EditMode.E_Template
       resultStatus: 1
-      duration: 0.0307628
+      duration: 0.0537337
       messages: 
       output: 
       stacktrace: 
@@ -2358,7 +2358,7 @@ MonoBehaviour:
       name: CreatedGameObjectExists
       fullName: KSS_Tests_EditMode.E_Template.CreatedGameObjectExists
       resultStatus: 1
-      duration: 0.0149021
+      duration: 0.038397
       messages: 
       output: 
       stacktrace: 
@@ -2375,7 +2375,7 @@ MonoBehaviour:
       name: SubstanceStateCollectionTests
       fullName: KSS_Tests_EditMode.SubstanceStateCollectionTests
       resultStatus: 1
-      duration: 0.0147791
+      duration: 0.0130061
       messages: 
       output: 
       stacktrace: 
@@ -2391,7 +2391,7 @@ MonoBehaviour:
       name: Add___MultipleSubstances___AddsToCorresponding
       fullName: KSS_Tests_EditMode.SubstanceStateCollectionTests.Add___MultipleSubstances___AddsToCorresponding
       resultStatus: 1
-      duration: 0.002761
+      duration: 0.0027055
       messages: 
       output: 
       stacktrace: 
@@ -2408,7 +2408,7 @@ MonoBehaviour:
       name: Add___NegativeAmount___Subtracts
       fullName: KSS_Tests_EditMode.SubstanceStateCollectionTests.Add___NegativeAmount___Subtracts
       resultStatus: 1
-      duration: 0.000329
+      duration: 0.0002628
       messages: 
       output: 
       stacktrace: 
@@ -2425,7 +2425,7 @@ MonoBehaviour:
       name: Add___SingleSubstance___AddsToExisting
       fullName: KSS_Tests_EditMode.SubstanceStateCollectionTests.Add___SingleSubstance___AddsToExisting
       resultStatus: 1
-      duration: 0.0002542
+      duration: 0.0002457
       messages: 
       output: 
       stacktrace: 
@@ -2442,7 +2442,7 @@ MonoBehaviour:
       name: Add___SingleSubstance_NegativeDt___RemovesFromExisting
       fullName: KSS_Tests_EditMode.SubstanceStateCollectionTests.Add___SingleSubstance_NegativeDt___RemovesFromExisting
       resultStatus: 1
-      duration: 0.0003205
+      duration: 0.0002411
       messages: 
       output: 
       stacktrace: 
@@ -2459,7 +2459,7 @@ MonoBehaviour:
       name: Add___ToEmpty___AddsNewSubstance
       fullName: KSS_Tests_EditMode.SubstanceStateCollectionTests.Add___ToEmpty___AddsNewSubstance
       resultStatus: 1
-      duration: 0.0005822
+      duration: 0.0005282
       messages: 
       output: 
       stacktrace: 
@@ -2476,7 +2476,7 @@ MonoBehaviour:
       name: Add___ToEmpty_NegativeDt___AddsNewSubstanceWithNegativeAmount
       fullName: KSS_Tests_EditMode.SubstanceStateCollectionTests.Add___ToEmpty_NegativeDt___AddsNewSubstanceWithNegativeAmount
       resultStatus: 1
-      duration: 0.0003474
+      duration: 0.0003221
       messages: 
       output: 
       stacktrace: 
@@ -2493,7 +2493,7 @@ MonoBehaviour:
       name: Empty___ShouldBeEmpty
       fullName: KSS_Tests_EditMode.SubstanceStateCollectionTests.Empty___ShouldBeEmpty
       resultStatus: 1
-      duration: 0.0001587
+      duration: 0.0001458
       messages: 
       output: 
       stacktrace: 
@@ -2557,9 +2557,9 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 1445
+    x: 1430
     y: 73
-    width: 474
+    width: 489
     height: 926
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:

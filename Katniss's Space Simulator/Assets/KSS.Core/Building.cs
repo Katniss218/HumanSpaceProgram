@@ -1,5 +1,6 @@
 ﻿ using KSS.Core.Physics;
 using KSS.Core.ReferenceFrames;
+using KSS.Core.SceneManagement;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -110,7 +111,14 @@ namespace KSS.Core
 
         void OnDisable()
         {
-            BuildingManager.Unregister( this );
+            try
+            {
+                BuildingManager.Unregister( this );
+            }
+            catch( InvalidSceneManagerException )
+            {
+                // scene unloaded.
+            }
         }
     }
 }

@@ -74,7 +74,6 @@ namespace KSS.CelestialBodies.Surface
         public void Finish( LODQuad quad )
         {
             // Finish is called on the main thread to collect the result and dispose of the job.
-
             Mesh mesh = new Mesh();
 
             mesh.SetVertices( resultVertices );
@@ -251,8 +250,7 @@ namespace KSS.CelestialBodies.Surface
                 }
             }
 
-            // Sadly can't calculate tangents properly easily here.
-            // custom method is fucky, and a Mesh object can't be created here.
+            // We can use the fact that the geometry is predictible and that normals are always known to generate tangents here easily.
         }
     }
 }

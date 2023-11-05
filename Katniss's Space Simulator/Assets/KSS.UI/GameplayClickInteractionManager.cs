@@ -1,17 +1,19 @@
 ﻿using KSS.Cameras;
-using KSS.Components;
 using KSS.Core;
+using KSS.Core.Components;
 using KSS.UI.Windows;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace KSS.UI
 {
     /// <summary>
     /// Manages clicking in the physical world of the gameplay scene.
     /// </summary>
-    public class GameplayClickInteractionManager : HSPManager
+    [RequireComponent( typeof( PreexistingReference ) )]
+    public class GameplayClickInteractionManager : SingletonMonoBehaviour<GameplayClickInteractionManager>
     {
         /*
         
@@ -29,7 +31,7 @@ namespace KSS.UI
                     return;
                 }
 
-                if( !Physics.Raycast( CameraController.Instance.MainCamera.ScreenPointToRay( Input.mousePosition ), out RaycastHit hit ) )
+                if( !Physics.Raycast( GameplayCameraController.MainCamera.ScreenPointToRay( Input.mousePosition ), out RaycastHit hit ) )
                 {
                     return;
                 }
@@ -41,9 +43,9 @@ namespace KSS.UI
                 }
 
                 FClickInteractionRedirect redirectComponent = clickedPart.GetComponent<FClickInteractionRedirect>();
-                if( redirectComponent != null )
+                if( redirectComponent != null && redirectComponent.Target != null )
                 {
-                    clickedPart = redirectComponent.Target;
+                    clickedPart = redirectComponent.Target.transform;
                 }
 
                 PartWindow.ExistsFor( clickedPart );

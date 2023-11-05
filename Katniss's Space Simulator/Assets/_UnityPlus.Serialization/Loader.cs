@@ -23,6 +23,15 @@ namespace UnityPlus.Serialization
 
         Dictionary<Guid, object> _guidToObject = new Dictionary<Guid, object>();
 
+        public Loader( Action startFunc, Action finishFunc, Action<ILoader> objectAction, Action<ILoader> dataAction )
+        {
+            this._startFunc = startFunc;
+            this._finishFunc = finishFunc;
+
+            this._objectActions.Add( objectAction );
+            this._dataActions.Add( dataAction );
+        }
+
         public Loader( Action startFunc, Action finishFunc, IEnumerable<Action<ILoader>> objectActions, IEnumerable<Action<ILoader>> dataActions )
         {
             this._startFunc = startFunc;

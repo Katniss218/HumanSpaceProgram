@@ -9,13 +9,13 @@ namespace UnityPlus.UILib.UIElements
 {
     public static class UIButtonEx
     {
-        public static T AddButton<T>( this T parent, UILayoutInfo layout, Sprite sprite, UnityAction onClick, out UIButton button ) where T : IUIElementContainer
+        public static T AddButton<T>( this T parent, UILayoutInfo layout, Sprite sprite, Action onClick, out UIButton button ) where T : IUIElementContainer
         {
             button = AddButton( parent, layout, sprite, onClick );
             return parent;
         }
 
-        public static UIButton AddButton( this IUIElementContainer parent, UILayoutInfo layout, Sprite sprite, UnityAction onClick )
+        public static UIButton AddButton( this IUIElementContainer parent, UILayoutInfo layout, Sprite sprite, Action onClick )
         {
             (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( parent.contents, "uilib-button", layout );
 
@@ -40,7 +40,7 @@ namespace UnityPlus.UILib.UIElements
 
             if( onClick != null )
             {
-                buttonComponent.onClick.AddListener( onClick ); // Find a way to cast System.Action to UnityAction if possible (the signatures of both delegates match).
+                buttonComponent.onClick.AddListener( () => onClick() ); // Find a way to cast System.Action to UnityAction if possible (the signatures of both delegates match).
             }
 
             return new UIButton( rootTransform, parent, buttonComponent, backgroundComponent );

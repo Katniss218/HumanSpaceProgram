@@ -10,7 +10,7 @@ namespace KSS.Core
     /// <summary>
     /// A class responsible for instantiating a vessel from a source (save file, on launch, etc).
     /// </summary>
-    public sealed class VesselFactory
+    public static class VesselFactory
     {
         // add source (save file / in memory scene change, etc).
 
@@ -22,7 +22,7 @@ namespace KSS.Core
         /// <param name="airfPosition">The `Absolute Inertial Reference Frame` position of the vessel to create.</param>
         /// <param name="airfRotation">Rotation of the vessel in the `Absolute Inertial Reference Frame`</param>
         /// <returns>The created partless vessel.</returns>
-        public Vessel CreatePartless( Vector3Dbl airfPosition, QuaternionDbl airfRotation, Vector3 sceneVelocity, Vector3 sceneAngularVelocity )
+        public static Vessel CreatePartless( Vector3Dbl airfPosition, QuaternionDbl airfRotation, Vector3 sceneVelocity, Vector3 sceneAngularVelocity )
         {
             Vessel vessel = CreateGO( airfPosition, airfRotation );
 

@@ -56,6 +56,7 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\_UnityEngine\Extensions\Vector3Dbl_Ex.cs" />
     <Compile Include="Assets\_UnityEngine\QuaternionDbl.cs" />
     <Compile Include="Assets\_UnityEngine\Vector3Curve.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\GameObjectEx.cs" />
@@ -68,14 +69,14 @@
     <Compile Include="Assets\_UnityEngine\Extensions\Vector3_Ex.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\ObjectEx.cs" />
     <Compile Include="Assets\_UnityEngine\MathD.cs" />
+    <Compile Include="Assets\_UnityEngine\SingletonMonoBehaviour.cs" />
+    <Compile Include="Assets\_UnityEngine\Extensions\QuaternionDbl_Ex.cs" />
     <Compile Include="Assets\_UnityEngine\MeshUtils.cs" />
     <Compile Include="Assets\_UnityEngine\Vector3Dbl.cs" />
     <Compile Include="Assets\_UnityEngine\QuaternionCurve.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\ComponentEx.cs" />
     <Compile Include="Assets\_UnityEngine\IComponent.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\Vector2_Ex.cs" />
-    <Compile Include="Assets\_UnityEngine\Extensions\Vector3Dbl_Ex.cs" />
-    <Compile Include="Assets\_UnityEngine\Extensions\QuaternionDbl_Ex.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_UnityEngine\___UnityEngine.asmdef" />

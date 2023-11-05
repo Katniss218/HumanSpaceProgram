@@ -105,6 +105,7 @@ namespace KSS.Core.Physics
             Vector3 leverArm = position - this._rb.worldCenterOfMass;
             _angularAccelerationSum += Vector3.Cross( force, leverArm ) / Mass;
 
+            // TODO - possibly cache the values across a frame and apply it once instead of n-times.
             this._rb.AddForceAtPosition( force, position, ForceMode.Force );
         }
 

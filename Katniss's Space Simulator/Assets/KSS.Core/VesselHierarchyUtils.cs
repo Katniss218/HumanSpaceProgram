@@ -167,7 +167,7 @@ namespace KSS.Core
             if( isAnchored )
             {
                 Building bOrig = partToSplit.GetBuilding();
-                Building b = new BuildingFactory().CreatePartless(
+                Building b = BuildingFactory.CreatePartless(
                     bOrig.ReferenceBody,
                     bOrig.ReferencePosition,
                     bOrig.ReferenceRotation
@@ -182,7 +182,7 @@ namespace KSS.Core
             else
             {
 #warning TODO - Use linear and angular velocities of part that works correctly for spinning vessels.
-                Vessel v = new VesselFactory().CreatePartless(
+                Vessel v = VesselFactory.CreatePartless(
                     SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( partToSplit.transform.position ),
                     SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( partToSplit.transform.rotation ),
                     partObject.PhysicsObject.Velocity,

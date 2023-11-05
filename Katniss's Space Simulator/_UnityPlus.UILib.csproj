@@ -61,6 +61,7 @@
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIInputField.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIInputSlider.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\RectTransformCloser.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\Layout\HorizontalLayoutDriver.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UITextEx.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIValueBarEx.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\IUIElementChild.cs" />
@@ -78,6 +79,7 @@
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIInputToggle.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIScrollView.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIValueBar.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\Layout\BidirectionalLayoutDriver.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\Layout\UILayout.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIButtonEx.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIPanelEx.cs" />

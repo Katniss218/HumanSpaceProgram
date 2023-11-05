@@ -79,7 +79,7 @@ namespace KSS.UI.Windows
 
             if( _highlightedObject != null )
             {
-                Vector3 targetScreenPos = CameraController.Instance.MainCamera.WorldToScreenPoint( ReferenceTransform.position );
+                Vector3 targetScreenPos = GameplayCameraController.MainCamera.WorldToScreenPoint( ReferenceTransform.position );
                 targetScreenPos.z = 0.0f;
 
                 _highlightedObject.position = targetScreenPos;

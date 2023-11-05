@@ -59,6 +59,13 @@ namespace UnityPlus.UILib.UIElements
             return new UIInputField( rootTransform, parent, inputFieldComponent, realText, placeholderText );
         }
 
+        public static UIInputField WithMargins( this UIInputField inputField, float left, float right, float top, float bottom )
+        {
+            inputField.textComponent.rectTransform.SetLayoutInfo( UILayoutInfo.Fill( left, right, top, bottom ) );
+            inputField.placeholderComponent.rectTransform.SetLayoutInfo( UILayoutInfo.Fill( left, right, top, bottom ) );
+            return inputField;
+        }
+
         public static UIInputField WithFont( this UIInputField inputField, TMPro.TMP_FontAsset font, float fontSize, Color color )
         {
             var textComponent = inputField.textComponent;

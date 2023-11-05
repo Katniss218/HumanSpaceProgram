@@ -1,5 +1,6 @@
 using KSS.Core.Physics;
 using KSS.Core.ReferenceFrames;
+using KSS.Core.SceneManagement;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -182,14 +183,21 @@ namespace KSS.Core
 
         void OnDisable()
         {
-            VesselManager.Unregister( this );
+            try
+            {
+                VesselManager.Unregister( this );
+            }
+            catch( InvalidSceneManagerException )
+            {
+                // scene unloaded.
+            }
         }
 
         void FixedUpdate()
         {
             SetPhysicsObjectParameters();
 
-            Vector3Dbl airfGravityForce = GravityUtils.GetGravityForce( PhysicsObject.Mass, this.AIRFPosition ); // Move airfposition to PhysicsObject maybe?
+            Vector3Dbl airfGravityForce = GravityUtils.GetGravityForce( this.AIRFPosition, PhysicsObject.Mass );
 
             PhysicsObject.AddForce( (Vector3)airfGravityForce );
 

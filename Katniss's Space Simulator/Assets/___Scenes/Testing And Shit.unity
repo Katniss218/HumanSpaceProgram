@@ -200,7 +200,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_AdditionalShaderChannelsFlag: 25
+  m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 5
@@ -283,8 +283,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4298a5610bd9d94f869f4cf69e24435, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _material: {fileID: 1620128386}
-  _rt: {fileID: 1533111487}
+  _material: {fileID: 1475037332}
+  _rt: {fileID: 0}
 --- !u!20 &244583699
 Camera:
   m_ObjectHideFlags: 0
@@ -803,7 +803,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_AdditionalShaderChannelsFlag: 25
+  m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 40
@@ -1253,44 +1253,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <Next>k__BackingField: {fileID: 0}
---- !u!84 &1533111487
-RenderTexture:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  m_ImageContentsHash:
-    serializedVersion: 2
-    Hash: 00000000000000000000000000000000
-  m_ForcedFallbackFormat: 4
-  m_DownscaleFallback: 0
-  m_IsAlphaChannelOptional: 0
-  serializedVersion: 5
-  m_Width: 1102
-  m_Height: 544
-  m_AntiAliasing: 1
-  m_MipCount: -1
-  m_DepthStencilFormat: 0
-  m_ColorFormat: 8
-  m_MipMap: 0
-  m_GenerateMips: 1
-  m_SRGB: 0
-  m_UseDynamicScale: 0
-  m_BindMS: 0
-  m_EnableCompatibleFormat: 1
-  m_TextureSettings:
-    serializedVersion: 2
-    m_FilterMode: 1
-    m_Aniso: 1
-    m_MipBias: 0
-    m_WrapU: 1
-    m_WrapV: 1
-    m_WrapW: 1
-  m_Dimension: 2
-  m_VolumeDepth: 1
-  m_ShadowSamplingMode: 2
---- !u!21 &1620128386
+--- !u!21 &1475037332
 Material:
   serializedVersion: 8
   m_ObjectHideFlags: 0
@@ -1342,13 +1305,14 @@ GameObject:
   - component: {fileID: 1624596520}
   - component: {fileID: 1624596530}
   - component: {fileID: 1624596529}
+  - component: {fileID: 1624596524}
   - component: {fileID: 1624596528}
   - component: {fileID: 1624596521}
-  - component: {fileID: 1624596524}
   - component: {fileID: 1624596525}
+  - component: {fileID: 1624596531}
   - component: {fileID: 1624596527}
-  m_Layer: 31
-  m_Name: _ GAME MANAGER _
+  m_Layer: 3
+  m_Name: _ GAMEPLAY MANAGER _
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1454,3 +1418,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _guidData: 87832d822e48357003f29cf1ade72c88
+--- !u!114 &1624596531
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1624596518}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8462e7d23a57f649816b06e079cdac4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

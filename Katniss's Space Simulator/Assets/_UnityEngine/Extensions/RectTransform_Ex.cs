@@ -13,19 +13,26 @@ namespace UnityEngine
         /// </summary>
         public static Vector2 GetActualSize( this RectTransform rt )
         {
-            // RectTransform.sizeDelta is equal to actual size - parent's actual size. If there is no parent, size delta is the actual size.
-            // Thus if we sum up these size differences, we get the actual size.
+            Stack<(Vector2 size, Vector2 anchor)> hierarchyDeltas = new Stack<(Vector2, Vector2)>();
 
-            Vector2 actualSize = rt.sizeDelta;
+            hierarchyDeltas.Push( (rt.sizeDelta, rt.anchorMax - rt.anchorMin) );
 
-            // Doesn't matter which way up/down the chain we're going.
+            // Figure out which objects contribute to the actual size and reverse their order (to 'parent then child').
             while( rt.parent != null )
             {
                 rt = (RectTransform)rt.parent;
-                actualSize += rt.sizeDelta;
+                if( rt.anchorMax != rt.anchorMin ) // if the anchors are equal, then the actual size is always equal to sizeDelta.
+                    hierarchyDeltas.Push( (rt.sizeDelta, rt.anchorMax - rt.anchorMin) );
             }
 
-            return actualSize;
+            // Calculate the actual size.
+            Vector2 currentSize = Vector2.zero;
+            foreach( var delta in hierarchyDeltas )
+            {
+                currentSize = (currentSize * delta.anchor) + delta.size;
+            }
+
+            return currentSize;
         }
     }
 }

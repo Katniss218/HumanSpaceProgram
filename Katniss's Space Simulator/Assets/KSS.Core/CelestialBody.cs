@@ -1,4 +1,5 @@
 ﻿using KSS.Core.ReferenceFrames;
+using KSS.Core.SceneManagement;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -71,7 +72,16 @@ namespace KSS.Core
         void OnDisable()
         {
             if( this.ID != null )
-                CelestialBodyManager.Unregister( this.ID );
+            {
+                try
+                {
+                    CelestialBodyManager.Unregister( this.ID );
+                }
+                catch( InvalidSceneManagerException )
+                {
+                    // OnDisable was called when scene was unloaded, ignore.
+                }
+            }
         }
 
         /// <summary>

@@ -1,3 +1,4 @@
+using KSS.Core;
 using KSS.Core.SceneManagement;
 using KSS.Core.Serialization;
 using System.Collections;
@@ -17,7 +18,7 @@ namespace KSS.UI
 
         public void StartGame()
         {
-            SceneLoader.UnloadActiveSceneAsync( () => SceneLoader.LoadSceneAsync( "Testing And Shit", true, false, () =>
+            SceneLoader.UnloadActiveSceneAsync( () => SceneLoader.LoadSceneAsync( GameplaySceneManager.SCENE_NAME, true, false, () =>
             {
                 TimelineManager.CreateNew( IOHelper.SanitizeFileName( _nameInputField.Text ), SaveMetadata.PERSISTENT_SAVE_ID, _nameInputField.Text, _descriptionInputField.Text );
             } ) );

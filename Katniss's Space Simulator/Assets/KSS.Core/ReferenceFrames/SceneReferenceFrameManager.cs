@@ -5,13 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace KSS.Core.ReferenceFrames
 {
     /// <remarks>
     /// This class manages a scene-wide Floating Origin / Krakensbane.
     /// </remarks>
-    public class SceneReferenceFrameManager : HSPManager
+    [RequireComponent( typeof( PreexistingReference ) )]
+    public class SceneReferenceFrameManager : SingletonMonoBehaviour<SceneReferenceFrameManager>
     {
         public struct ReferenceFrameSwitchData
         {

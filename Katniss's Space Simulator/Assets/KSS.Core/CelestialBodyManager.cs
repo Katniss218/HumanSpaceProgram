@@ -1,4 +1,5 @@
-﻿using KSS.Core.Serialization;
+﻿using KSS.Core.SceneManagement;
+using KSS.Core.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,16 +8,21 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Strategies;
 
 namespace KSS.Core
 {
-    public class CelestialBodyManager : HSPManager, IPersistent
+    [RequireComponent( typeof( PreexistingReference ) )]
+    public class CelestialBodyManager : SingletonMonoBehaviour<CelestialBodyManager>, IPersistent
     {
-        private static Dictionary<string, CelestialBody> _celestialBodies = new Dictionary<string, CelestialBody>();
+        private Dictionary<string, CelestialBody> _celestialBodies = new Dictionary<string, CelestialBody>();
 
         public static CelestialBody Get( string id )
         {
-            if( _celestialBodies.TryGetValue( id, out CelestialBody body ) )
+            if( !exists )
+                throw new InvalidSceneManagerException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
+
+            if( instance._celestialBodies.TryGetValue( id, out CelestialBody body ) )
             {
                 return body;
             }
@@ -24,14 +30,28 @@ namespace KSS.Core
             return null;
         }
 
+        public static CelestialBody[] GetAll()
+        {
+            if( !exists )
+                throw new InvalidSceneManagerException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
+
+            return instance._celestialBodies.Values.ToArray();
+        }
+
         internal static void Register( CelestialBody celestialBody )
         {
-            _celestialBodies[celestialBody.ID] = celestialBody;
+            if( !exists )
+                throw new InvalidSceneManagerException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
+
+            instance._celestialBodies[celestialBody.ID] = celestialBody;
         }
 
         internal static void Unregister( string id )
         {
-            _celestialBodies.Remove( id );
+            if( !exists )
+                throw new InvalidSceneManagerException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
+
+            instance._celestialBodies.Remove( id );
         }
 
 
@@ -48,11 +68,12 @@ namespace KSS.Core
             // nothing yet.
         }
 
-        private static readonly JsonPreexistingGameObjectsStrategy _celestialBodiesStrat = new JsonPreexistingGameObjectsStrategy( GetAllRootGameObjects );
+        private static readonly JsonSeparateFileSerializedDataHandler _celestialBodiesDataHandler = new JsonSeparateFileSerializedDataHandler();
+        private static readonly JsonPreexistingGameObjectsStrategy _celestialBodiesStrat = new JsonPreexistingGameObjectsStrategy( _celestialBodiesDataHandler, GetAllRootGameObjects );
 
         private static GameObject[] GetAllRootGameObjects()
         {
-            return _celestialBodies.Values.Select( cb => cb.gameObject ).ToArray();
+            return instance._celestialBodies.Values.Select( cb => cb.gameObject ).ToArray();
         }
 
         [HSPEventListener( HSPEvent.TIMELINE_BEFORE_SAVE, HSPEvent.NAMESPACE_VANILLA + ".serialize_celestial_bodies" )]
@@ -60,11 +81,11 @@ namespace KSS.Core
         {
             var e = (TimelineManager.SaveEventData)ee;
 
-            TimelineManager.EnsureDirectoryExists( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies" ) );
-            _celestialBodiesStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies", "object.json" );
-            _celestialBodiesStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies", "data.json" );
-            e.objectActions.Add( _celestialBodiesStrat.Save_Object );
-            e.dataActions.Add( _celestialBodiesStrat.Save_Data );
+            Directory.CreateDirectory( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies" ) );
+            _celestialBodiesDataHandler.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies", "object.json" );
+            _celestialBodiesDataHandler.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies", "data.json" );
+            e.objectActions.Add( _celestialBodiesStrat.SaveAsync_Object );
+            e.dataActions.Add( _celestialBodiesStrat.SaveAsync_Data );
         }
 
         [HSPEventListener( HSPEvent.TIMELINE_BEFORE_LOAD, HSPEvent.NAMESPACE_VANILLA + ".deserialize_celestial_bodies" )]
@@ -72,11 +93,11 @@ namespace KSS.Core
         {
             var e = (TimelineManager.LoadEventData)ee;
 
-            TimelineManager.EnsureDirectoryExists( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies" ) );
-            _celestialBodiesStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies", "object.json" );
-            _celestialBodiesStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies", "data.json" );
-            e.objectActions.Add( _celestialBodiesStrat.Load_Object );
-            e.dataActions.Add( _celestialBodiesStrat.Load_Data );
+            Directory.CreateDirectory( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies" ) );
+            _celestialBodiesDataHandler.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies", "object.json" );
+            _celestialBodiesDataHandler.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies", "data.json" );
+            e.objectActions.Add( _celestialBodiesStrat.LoadAsync_Object );
+            e.dataActions.Add( _celestialBodiesStrat.LoadAsync_Data );
         }
     }
 }

@@ -34,12 +34,28 @@ namespace UnityPlus.Serialization
 
         /// <param name="startFunc">A function delegate that can pause the game completely.</param>
         /// <param name="finishFunc">A function delegate that can unpause the game, and bring it to its previous state.</param>
+        public AsyncSaver( Action startFunc, Action finishFunc, Func<ISaver, IEnumerator> objectAction, Func<ISaver, IEnumerator> dataAction )
+        {
+            if( startFunc == null )
+                throw new ArgumentNullException( nameof( startFunc ), $"Start delegate can't be null. {nameof( AsyncSaver )} requires the function to pause to deserialize correctly." );
+            if( finishFunc == null )
+                throw new ArgumentNullException( nameof( finishFunc ), $"Finish delegate can't be null. {nameof( AsyncSaver )} requires the function to unpause to deserialize correctly." );
+
+            this._startFunc = startFunc;
+            this._finishFunc = finishFunc;
+
+            this._objectActions.Add( objectAction );
+            this._dataActions.Add( dataAction );
+        }
+
+        /// <param name="startFunc">A function delegate that can pause the game completely.</param>
+        /// <param name="finishFunc">A function delegate that can unpause the game, and bring it to its previous state.</param>
         public AsyncSaver( Action startFunc, Action finishFunc, IEnumerable<Func<ISaver, IEnumerator>> objectActions, IEnumerable<Func<ISaver, IEnumerator>> dataActions )
         {
             if( startFunc == null )
-                throw new ArgumentNullException( nameof( startFunc ), $"Start delegate can't be null. {nameof( AsyncSaver )} requires the application to be paused to deserialize correctly." );
+                throw new ArgumentNullException( nameof( startFunc ), $"Start delegate can't be null. {nameof( AsyncSaver )} requires the function to pause to deserialize correctly." );
             if( finishFunc == null )
-                throw new ArgumentNullException( nameof( finishFunc ), $"Finish delegate can't be null. {nameof( AsyncSaver )} requires the application to be paused to deserialize correctly." );
+                throw new ArgumentNullException( nameof( finishFunc ), $"Finish delegate can't be null. {nameof( AsyncSaver )} requires the function to unpause to deserialize correctly." );
 
             this._startFunc = startFunc;
             this._finishFunc = finishFunc;

@@ -1,4 +1,5 @@
-﻿using KSS.Core.Serialization;
+﻿using KSS.Core.SceneManagement;
+using KSS.Core.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,23 +12,33 @@ using UnityPlus.Serialization.Strategies;
 
 namespace KSS.Core
 {
-    public class BuildingManager : HSPManager, IPersistent
+    [RequireComponent( typeof( PreexistingReference ) )]
+    public class BuildingManager : SingletonMonoBehaviour<BuildingManager>, IPersistent
     {
-        private static List<Building> _loadedBuildings = new List<Building>();
+        private List<Building> _loadedBuildings = new List<Building>();
 
         public static Building[] GetLoadedBuildings()
         {
-            return _loadedBuildings.ToArray();
+            if( !exists )
+                throw new InvalidSceneManagerException( $"{nameof( BuildingManager )} is only available in the gameplay scene." );
+
+            return instance._loadedBuildings.ToArray();
         }
 
         internal static void Register( Building vessel )
         {
-            _loadedBuildings.Add( vessel );
+            if( !exists )
+                throw new InvalidSceneManagerException( $"{nameof( BuildingManager )} is only available in the gameplay scene." );
+
+            instance._loadedBuildings.Add( vessel );
         }
 
         internal static void Unregister( Building vessel )
         {
-            _loadedBuildings.Remove( vessel );
+            if( !exists )
+                throw new InvalidSceneManagerException( $"{nameof( BuildingManager )} is only available in the gameplay scene." );
+
+            instance._loadedBuildings.Remove( vessel );
         }
 
         public SerializedData GetData( ISaver s )
@@ -47,14 +58,15 @@ namespace KSS.Core
 
 
         // move below to separate class "BuildingSerializer" or something.
-        private static readonly JsonExplicitHierarchyGameObjectsStrategy _buildingsStrat = new JsonExplicitHierarchyGameObjectsStrategy( GetAllRootGameObjects );
+        private static readonly JsonSeparateFileSerializedDataHandler _buildingDataHandler = new JsonSeparateFileSerializedDataHandler();
+        private static readonly JsonExplicitHierarchyGameObjectsStrategy _buildingsStrat = new JsonExplicitHierarchyGameObjectsStrategy( _buildingDataHandler, GetAllRootGameObjects );
 
         private static GameObject[] GetAllRootGameObjects()
         {
-            GameObject[] gos = new GameObject[_loadedBuildings.Count];
-            for( int i = 0; i < _loadedBuildings.Count; i++ )
+            GameObject[] gos = new GameObject[instance._loadedBuildings.Count];
+            for( int i = 0; i < instance._loadedBuildings.Count; i++ )
             {
-                gos[i] = _loadedBuildings[i].gameObject;
+                gos[i] = instance._loadedBuildings[i].gameObject;
             }
             return gos;
         }
@@ -64,11 +76,11 @@ namespace KSS.Core
         {
             var e = (TimelineManager.SaveEventData)ee;
 
-            TimelineManager.EnsureDirectoryExists( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Buildings" ) );
-            _buildingsStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Buildings", "objects.json" );
-            _buildingsStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Buildings", "data.json" );
-            e.objectActions.Add( _buildingsStrat.Save_Object );
-            e.dataActions.Add( _buildingsStrat.Save_Data );
+            Directory.CreateDirectory( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Buildings" ) );
+            _buildingDataHandler.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Buildings", "objects.json" );
+            _buildingDataHandler.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Buildings", "data.json" );
+            e.objectActions.Add( _buildingsStrat.SaveAsync_Object );
+            e.dataActions.Add( _buildingsStrat.SaveAsync_Data );
         }
 
         [HSPEventListener( HSPEvent.TIMELINE_BEFORE_LOAD, HSPEvent.NAMESPACE_VANILLA + ".deserialize_buildings" )]
@@ -76,11 +88,11 @@ namespace KSS.Core
         {
             var e = (TimelineManager.LoadEventData)ee;
 
-            TimelineManager.EnsureDirectoryExists( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Buildings" ) );
-            _buildingsStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Buildings", "objects.json" );
-            _buildingsStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Buildings", "data.json" );
-            e.objectActions.Add( _buildingsStrat.Load_Object );
-            e.dataActions.Add( _buildingsStrat.Load_Data );
+            Directory.CreateDirectory( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Buildings" ) );
+            _buildingDataHandler.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Buildings", "objects.json" );
+            _buildingDataHandler.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Buildings", "data.json" );
+            e.objectActions.Add( _buildingsStrat.LoadAsync_Object );
+            e.dataActions.Add( _buildingsStrat.LoadAsync_Data );
         }
     }
 }

@@ -138,6 +138,14 @@ namespace KSS.Core.Serialization
             new JsonStringWriter( this.GetData(), sb ).Write();
 
             File.WriteAllText( saveFilePath, sb.ToString(), Encoding.UTF8 );
+            /*Saver saver = new Saver( null, null, null, ( s ) =>
+            {
+                StringBuilder sb = new StringBuilder();
+                new JsonStringWriter( this.GetData( s ), sb ).Write();
+
+                File.WriteAllText( saveFilePath, sb.ToString(), Encoding.UTF8 );
+            } );
+            saver.Save();*/
         }
 
         public void ReadDataFromDisk()
@@ -150,6 +158,27 @@ namespace KSS.Core.Serialization
             SerializedData data = new JsonStringReader( saveJson ).Read();
 
             this.SetData( data );
+            /*Loader loader = new Loader( null, null, null, ( l ) =>
+            {
+                this.SetData( l, data );
+            } );
+            loader.Load();*/
+        }
+
+        public SerializedData GetData()
+        {
+            SerializedObject modVersions = new SerializedObject();
+            foreach( var elemKvp in this.ModVersions )
+            {
+                modVersions.Add( elemKvp.Key, elemKvp.Value.ToString() );
+            }
+            return new SerializedObject()
+            {
+                { "name", this.Name },
+                { "description", this.Description },
+                { "file_version", this.FileVersion.ToString() },
+                { "mod_versions", modVersions }
+            };
         }
 
         public void SetData( SerializedData data )
@@ -175,22 +204,6 @@ namespace KSS.Core.Serialization
                     this.ModVersions.Add( elemKvp.Key, Version.Parse( (string)elemKvp.Value ) );
                 }
             }
-        }
-
-        public SerializedData GetData()
-        {
-            SerializedObject modVersions = new SerializedObject();
-            foreach( var elemKvp in this.ModVersions )
-            {
-                modVersions.Add( elemKvp.Key, elemKvp.Value.ToString() );
-            }
-            return new SerializedObject()
-            {
-                { "name", this.Name },
-                { "description", this.Description },
-                { "file_version", this.FileVersion.ToString() },
-                { "mod_versions", modVersions }
-            };
         }
     }
 }

@@ -535,10 +535,18 @@ MonoBehaviour:
     asset: {fileID: 2800000, guid: 305ae7eb94909c644a2f1a85d8e03dab, type: 3}
   - assetID: builtin::_TextMesh Pro/Shaders/TMPro
     asset: {fileID: 10900000, guid: 407bc68d299748449bbf7f48ee690f8d, type: 3}
+  - assetID: builtin::Resources/Sprites/UI/button_30x30
+    asset: {fileID: 21300000, guid: 50efd038fddeadf4abde841f91139ac1, type: 3}
+  - assetID: builtin::Resources/Sprites/UI/part_list_entry_background
+    asset: {fileID: 21300000, guid: 7099b0c3ab08cbc4c9257ebf49c24b1d, type: 3}
+  - assetID: builtin::Resources/Sprites/UI/category_background
+    asset: {fileID: 21300000, guid: 80ca6d8af4c830041b7842e6323e7e0c, type: 3}
   - assetID: builtin::Resources/Prefabs/Parts/part.tank
     asset: {fileID: 1175757436153444479, guid: 90c1928201a9f4745b5556dbfcb4d2f7, type: 3}
   - assetID: builtin::KSS.DevUtils/cube/Yn
     asset: {fileID: 2800000, guid: 90277dd122cd8f141ada4071bccb6a6e, type: 3}
+  - assetID: builtin::Resources/Sprites/UI/button_large_open
+    asset: {fileID: 21300000, guid: 90db8b30936c5cf4ab0a587573da8a60, type: 3}
   - assetID: builtin::_TextMesh Pro/Shaders/TMP_SDF-Mobile Overlay
     asset: {fileID: 4800000, guid: a02a7d8c237544f1962732b55a9aebf1, type: 3}
   - assetID: builtin::KSS.DevUtils/Saturn
@@ -559,6 +567,8 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: 813c3b3ec38dd5449852743c0b33481c, type: 3}
   - assetID: builtin::KSS.DevUtils/cube/Xn
     asset: {fileID: 2800000, guid: d17090d9f818409458984d34346bcd0d, type: 3}
+  - assetID: builtin::Resources/Sprites/UI/button_large_new
+    asset: {fileID: 21300000, guid: 0259fe815d290b74eb497477eba0e1a9, type: 3}
   - assetID: builtin::_TextMesh Pro/Shaders/TMP_Bitmap
     asset: {fileID: 4800000, guid: 128e987d567d4e2c824d754223b3f3b0, type: 3}
   - assetID: builtin::Resources/Sprites/std0/ui_part_module_panel
@@ -577,14 +587,20 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: c3906aad464be3a46a5bbb1d8b194a3a, type: 3}
   - assetID: builtin::_TextMesh Pro/Shaders/TMPro_Mobile
     asset: {fileID: 10900000, guid: c334973cef89a9840b0b0c507e0377ab, type: 3}
+  - assetID: builtin::Resources/Sprites/UI/toolicon_move
+    asset: {fileID: 21300000, guid: d333c4de13ab35746a0f92e8c9569bac, type: 3}
   - assetID: builtin::_TextMesh Pro/Fonts/LiberationSans
     asset: {fileID: 12800000, guid: e3265ab4bf004d28a9537516768c1c75, type: 3}
   - assetID: builtin::KSS/CelestialBodies/Surface/TerrainShader
     asset: {fileID: 4800000, guid: e3f72d5ef871243408ac05fea5ed9243, type: 3}
   - assetID: builtin::Resources/Sprites/std0/ui_percent_bar_bg
     asset: {fileID: 21300000, guid: f329ac740530a7640993d6c7647d30b6, type: 3}
+  - assetID: builtin::Resources/Sprites/UI/toolicon_pick
+    asset: {fileID: 21300000, guid: f30bc85b231fc2f42bdd29eaf8c8a429, type: 3}
   - assetID: builtin::_TextMesh Pro/Shaders/TMP_SDF SSD
     asset: {fileID: 4800000, guid: 14eb328de4b8eb245bb7cea29e4ac00b, type: 3}
+  - assetID: builtin::Resources/Sprites/UI/button_large_leave
+    asset: {fileID: 21300000, guid: 24701081e5f345447ab80e5dc8104580, type: 3}
   - assetID: builtin::Resources/Sprites/nodes/m_radial_in
     asset: {fileID: 21300000, guid: 24448dd11258ca34f8b94fb72bd83cc3, type: 3}
   - assetID: builtin::Resources/Sprites/UI/button_x
@@ -597,10 +613,14 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: 84147673ec8e2cb47bd5243c36cb4394, type: 3}
   - assetID: builtin::Resources/Sprites/std0/ui_percent_bar_R_bg
     asset: {fileID: 21300000, guid: 94e06069a322b62489cea5cc0be1e1e1, type: 3}
+  - assetID: builtin::KSS.DevUtils/vab
+    asset: {fileID: 4416803039647088028, guid: a4405d36089eda445b6e5e8a3a9565e9, type: 3}
   - assetID: builtin::_TextMesh Pro/Resources/EmojiOne
     asset: {fileID: 11400000, guid: c41005c129ba4d66911b75229fd70b45, type: 2}
   - assetID: builtin::Resources/Sprites/nodes/m_retrograde
     asset: {fileID: 21300000, guid: e44b747185cc2874db45086d91d2ae93, type: 3}
+  - assetID: builtin::Resources/Sprites/UI/top_panel_background
+    asset: {fileID: 21300000, guid: f42d77e9a19ffc0438a43e3d10dc6140, type: 3}
   - assetID: builtin::Resources/navball
     asset: {fileID: 2100000, guid: 35d2f520ab42c974aa2816029d77aaad, type: 2}
   - assetID: builtin::___Scenes/MainMenu
@@ -625,6 +645,8 @@ MonoBehaviour:
     asset: {fileID: 2100000, guid: 160bf2fe69d7f344f904939601e96160, type: 2}
   - assetID: builtin::Resources/Sprites/UI/button_down_gold
     asset: {fileID: 21300000, guid: 163e65f48c58aa144b4a35216167e123, type: 3}
+  - assetID: builtin::Resources/Sprites/UI/part_list_background
+    asset: {fileID: 21300000, guid: 264265b2a93823e4d88c628cd7de09a5, type: 3}
   - assetID: builtin::Resources/Sprites/std0/ui_percent_bar_fg
     asset: {fileID: 21300000, guid: 2606db97e3012174880af29285f3b56f, type: 3}
   - assetID: builtin::_UnityPlus.Rendering/Compositing/CopyDepth
@@ -633,6 +655,8 @@ MonoBehaviour:
     asset: {fileID: 2100000, guid: 36ee735b35af6d547b69f8843c690673, type: 2}
   - assetID: builtin::Resources/engine
     asset: {fileID: -3534920711011820904, guid: 96227cebe98f0b4409158980bcfbd5a1, type: 3}
+  - assetID: builtin::Resources/Sprites/UI/input_field_ha
+    asset: {fileID: 21300000, guid: 96dd8aa86ed031e44aa4b8eb1868e3e8, type: 3}
   - assetID: builtin::KSS.DevUtils/S-IC-ThrustStructure
     asset: {fileID: -7621046423043655963, guid: 965ee988c0e48fb47896c37deaaac11c, type: 3}
   - assetID: builtin::Resources/Sprites/std0/ui_button_square
@@ -671,12 +695,16 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: 49a9f2bcf014dce49a2d03cbebdd1da0, type: 3}
   - assetID: builtin::Resources/Fonts/liberation_sans - Outline
     asset: {fileID: 2100000, guid: 79459efec17a4d00a321bdcc27bbc385, type: 2}
+  - assetID: builtin::Resources/Sprites/UI/button_large_redo
+    asset: {fileID: 21300000, guid: 7959e8ccaf90edc4c8161e14929e34c4, type: 3}
   - assetID: builtin::_TextMesh Pro/Shaders/TMPro_Surface
     asset: {fileID: 10900000, guid: d930090c0cd643c7b55f19a38538c162, type: 3}
   - assetID: builtin::_TextMesh Pro/Resources/Default Style Sheet
     asset: {fileID: 11400000, guid: f952c082cb03451daed3ee968ac6c63e, type: 2}
   - assetID: builtin::KSS.DevUtils/untitled 1
     asset: {fileID: 6239881831769578202, guid: f9eaf569e8e8f9b4e976a3fb0fdf85c8, type: 3}
+  - assetID: builtin::Resources/Sprites/UI/icon_snap
+    asset: {fileID: 21300000, guid: 0aaedc3b6c55cd34f8e7dd710d94ed84, type: 3}
   - assetID: builtin::Resources/Sprites/std0/ui_sequencer_item
     asset: {fileID: 21300000, guid: 1a42060aa0081994c83857d0dbf0d8bb, type: 3}
   - assetID: builtin::KSS/Effects/Atmospheres/Atmosphere
@@ -699,12 +727,16 @@ MonoBehaviour:
     asset: {fileID: 1364953004931670300, guid: 8bea1bbd189d59f49affc43660b4bdf3, type: 3}
   - assetID: builtin::Resources/Sprites/nodes/m_normal
     asset: {fileID: 21300000, guid: db8e0f4eb49cd78479eac1492d80f4b8, type: 3}
+  - assetID: builtin::Resources/Sprites/UI/toolicon_reroot
+    asset: {fileID: 21300000, guid: 0c1966121a464a74aa5f7a889fff13e2, type: 3}
   - assetID: builtin::Resources/1mil_sphere
     asset: {fileID: 4711208715938537054, guid: 0cccc6ea3eaab75469e0c61245c20874, type: 3}
   - assetID: builtin::Resources/Sprites/UI/button_vertical
     asset: {fileID: 21300000, guid: 2c965aa7e8ba0a94a96b12b5163c22e6, type: 3}
   - assetID: builtin::___Scenes/UI Prototyping
     asset: {fileID: 102900000, guid: 3ce3257fcb4019144a2d08a849ea10bd, type: 3}
+  - assetID: builtin::___Scenes/Design
+    asset: {fileID: 102900000, guid: 5caa233315e78dd41b4e84e78aaa336b, type: 3}
   - assetID: builtin::Resources/Sprites/UI/button_list
     asset: {fileID: 21300000, guid: 6ca76087579315445add0a2333ee1986, type: 3}
   - assetID: builtin::Resources/Sprites/UI/button_x_gold_large
@@ -715,6 +747,8 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: 8ce61a6ed15160e499b0fe1266a4ffa4, type: 3}
   - assetID: builtin::KSS.DevUtils/untitled
     asset: {fileID: 2534964839176971238, guid: ac9253b94eb783048a42e2b95dff51d7, type: 3}
+  - assetID: builtin::Resources/Sprites/UI/button_large_undo
+    asset: {fileID: 21300000, guid: acfbb3e88a5d4dc438b977a930cde17d, type: 3}
   - assetID: builtin::_TextMesh Pro/Shaders/TMP_SDF-Mobile Masking
     asset: {fileID: 4800000, guid: bc1ede39bf3643ee8e493720e4259791, type: 3}
   - assetID: builtin::KSS/CelestialBodies/AtmosphereRes/Math
@@ -761,12 +795,16 @@ MonoBehaviour:
     asset: {fileID: 8400000, guid: 2fdada8e1127fbe478fb4808954eb395, type: 2}
   - assetID: builtin::_TextMesh Pro/Resources/TMP Settings
     asset: {fileID: 11400000, guid: 3f5b5dff67a942289a9defa416b206f3, type: 2}
+  - assetID: builtin::Resources/Sprites/UI/toolicon_rotate
+    asset: {fileID: 21300000, guid: 3fee9a7b986e22b43a0f19b9a5a2dd5f, type: 3}
   - assetID: builtin::Resources/Sprites/std0/ui_scrollbar_background
     asset: {fileID: 21300000, guid: 4f933230104877445b21901bed3d2c9e, type: 3}
   - assetID: builtin::_TextMesh Pro/Sprites/EmojiOne
     asset: {fileID: 4900000, guid: 8f05276190cf498a8153f6cbe761d4e6, type: 3}
   - assetID: builtin::Resources/Sprites/std0/ui_navball
     asset: {fileID: 21300000, guid: 8f65958a56142014a92b96a64020c76e, type: 3}
+  - assetID: builtin::Resources/Sprites/UI/button_large_save
+    asset: {fileID: 21300000, guid: 8f9514c9f1dc10841aee00277ba07500, type: 3}
   - assetID: builtin::Resources/Fonts/liberation_sans
     asset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   - assetID: builtin::___Scenes/Testing And Shit
@@ -948,7 +986,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_AdditionalShaderChannelsFlag: 25
+  m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 99
@@ -997,10 +1035,9 @@ GameObject:
   - component: {fileID: 1611604359}
   - component: {fileID: 1611604362}
   - component: {fileID: 1611604358}
-  - component: {fileID: 1611604360}
   - component: {fileID: 1611604361}
-  m_Layer: 0
-  m_Name: _ ALWAYS LOADED MANAGERS _
+  m_Layer: 3
+  m_Name: _ ALWAYS LOADED MANAGER _
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1033,18 +1070,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1611604360
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1611604357}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f26c91c250fad5441ae825679dbf9e31, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1611604361
 MonoBehaviour:
   m_ObjectHideFlags: 0

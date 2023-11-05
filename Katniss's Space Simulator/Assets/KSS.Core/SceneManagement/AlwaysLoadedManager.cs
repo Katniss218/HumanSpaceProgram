@@ -1,22 +1,26 @@
 using KSS.Core.Mods;
 using KSS.Core.SceneManagement;
+using KSS.Core.Serialization;
 using System;
-using System.Linq;
-using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
-using KSS.Core.Serialization;
-using System.IO;
+using UnityPlus.Serialization.Strategies;
 
 namespace KSS.Core
 {
     /// <summary>
     /// A manager that is loaded immediately and remains loaded until the game is exited.
     /// </summary>
-    public class AlwaysLoadedManager : MonoBehaviour
+    [RequireComponent( typeof( PreexistingReference ) )]
+    public class AlwaysLoadedManager : SingletonMonoBehaviour<AlwaysLoadedManager>
     {
         public const string ALWAYS_LOADED_SCENE_NAME = "_AlwaysLoaded";
+
+        public static AlwaysLoadedManager Instance => instance;
+        public static GameObject GameObject => instance.gameObject;
 
         void Awake()
         {
@@ -31,22 +35,24 @@ namespace KSS.Core
 
         void Start()
         {
-            SceneLoader.LoadSceneAsync( "MainMenu", true, false, null );
+            SceneLoader.LoadSceneAsync( MainMenuSceneManager.SCENE_NAME, true, false, null );
         }
 
+        //
+        //      SERIALIZATION OF MANAGERS - this can be moved to its own class.
+        //
 
-        private static readonly JsonPreexistingGameObjectsStrategy _managersStrat = new JsonPreexistingGameObjectsStrategy( GetAllManagerGameObjects );
+        private static readonly JsonSeparateFileSerializedDataHandler _managersDataHandler = new JsonSeparateFileSerializedDataHandler();
+        private static readonly JsonPreexistingGameObjectsStrategy _managersStrat = new JsonPreexistingGameObjectsStrategy( _managersDataHandler, GetAllManagerGameObjects );
 
         private static GameObject[] GetAllManagerGameObjects()
         {
-            // An alternative approach could be to have a layer for manager objects (canonically a single object for all tho).
-
-            HSPManager[] managers = FindObjectsOfType<HSPManager>();
-            List<GameObject> gameObjects = new List<GameObject>();
+            PreexistingReference[] managers = FindObjectsOfType<PreexistingReference>();
+            HashSet<GameObject> gameObjects = new HashSet<GameObject>();
 
             foreach( var manager in managers )
             {
-                if( gameObjects.Contains( manager.gameObject ) )
+                if( manager.gameObject.layer != (int)Layer.MANAGERS )
                 {
                     continue;
                 }
@@ -62,11 +68,11 @@ namespace KSS.Core
         {
             var e = (TimelineManager.SaveEventData)ee;
 
-            TimelineManager.EnsureDirectoryExists( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay" ) );
-            _managersStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay", "objects.json" );
-            _managersStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay", "data.json" );
-            e.objectActions.Add( _managersStrat.Save_Object );
-            e.dataActions.Add( _managersStrat.Save_Data );
+            Directory.CreateDirectory( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay" ) );
+            _managersDataHandler.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay", "objects.json" );
+            _managersDataHandler.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay", "data.json" );
+            e.objectActions.Add( _managersStrat.SaveAsync_Object );
+            e.dataActions.Add( _managersStrat.SaveAsync_Data );
         }
 
         [HSPEventListener( HSPEvent.TIMELINE_BEFORE_LOAD, HSPEvent.NAMESPACE_VANILLA + ".deserialize_managers" )]
@@ -74,11 +80,11 @@ namespace KSS.Core
         {
             var e = (TimelineManager.LoadEventData)ee;
 
-            TimelineManager.EnsureDirectoryExists( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay" ) );
-            _managersStrat.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay", "objects.json" );
-            _managersStrat.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay", "data.json" );
-            e.objectActions.Add( _managersStrat.Load_Object );
-            e.dataActions.Add( _managersStrat.Load_Data );
+            Directory.CreateDirectory( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay" ) );
+            _managersDataHandler.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay", "objects.json" );
+            _managersDataHandler.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Gameplay", "data.json" );
+            e.objectActions.Add( _managersStrat.LoadAsync_Object );
+            e.dataActions.Add( _managersStrat.LoadAsync_Data );
         }
     }
 }

@@ -19,9 +19,6 @@ namespace KSS.UI
         UIInputField _nameInputField;
         UIInputField _descriptionInputField;
 
-        [SerializeField]
-        Button _saveButton;
-
         void RefreshSaveList()
         {
             if( _saveListUI.IsNullOrDestroyed() )

@@ -25,7 +25,7 @@ namespace UnityPlus.Serialization
 
             return new SerializedObject()
             {
-                { $"{SerializerUtils.REF}", s.WriteGuid( guid) }
+                { KeyNames.REF, s.WriteGuid( guid) }
             };
         }
 
@@ -45,7 +45,7 @@ namespace UnityPlus.Serialization
 
             return new SerializedObject()
             {
-                { $"{SerializerUtils.ASSETREF}", assetID }
+                { KeyNames.ASSETREF, assetID }
             };
         }
 
