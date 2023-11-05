@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4963803651901674474}
   - component: {fileID: 7896127776030597572}
   - component: {fileID: 6544856856546271155}
+  - component: {fileID: 2831796584560580002}
   m_Layer: 0
   m_Name: part.tank
   m_TagString: Untagged
@@ -85,6 +86,19 @@ MonoBehaviour:
     _substances: []
   <Outflow>k__BackingField:
     _substances: []
+--- !u!114 &2831796584560580002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1175757436153444479}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9dbaab46dfbfb3d45b402c96d954e966, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <PartID>k__BackingField: part.tank
 --- !u!1 &2441066058776252235
 GameObject:
   m_ObjectHideFlags: 0

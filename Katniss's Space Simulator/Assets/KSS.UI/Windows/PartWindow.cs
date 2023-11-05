@@ -12,6 +12,8 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UnityPlus.UILib.UIElements;
 using UnityPlus.AssetManagement;
+using KSS.Core.Serialization;
+using KSS.Core.Components;
 
 namespace KSS.UI.Windows
 {
@@ -101,6 +103,11 @@ namespace KSS.UI.Windows
             {
                 throw new ArgumentNullException( nameof( referencePart ), $"Can't create a part window for a nonexistent part." );
             }
+            PartMetadata part = FPart.GetPart( referencePart );
+            if( part == null )
+            {
+                throw new ArgumentNullException( nameof( referencePart ), $"Can't create a part window for an object that can't be mapped to a {nameof( PartMetadata )}." );
+            }
 
             UIWindow window = CanvasManager.Get( CanvasName.WINDOWS ).AddWindow( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 300f, 300f ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_window" ) )
                 .Draggable()
@@ -108,10 +115,9 @@ namespace KSS.UI.Windows
                 .WithCloseButton( new UILayoutInfo( Vector2.one, new Vector2( -7, -5 ), new Vector2( 20, 20 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ )
                 .WithRelationHightlight( out WindowRelationHighlight relationHighlight );
 
-#warning TODO - proper display names. (display name could be searched towards the root)
             // masses/etc can be summed up from components in children of reference part.
 
-            window.AddText( UILayoutInfo.FillHorizontal( 0, 0, 1f, 0, 30 ), referencePart.gameObject.name )
+            window.AddText( UILayoutInfo.FillHorizontal( 0, 0, 1f, 0, 30 ), part.Name )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 

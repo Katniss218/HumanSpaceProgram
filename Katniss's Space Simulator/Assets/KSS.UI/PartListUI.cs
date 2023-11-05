@@ -1,4 +1,5 @@
-﻿using KSS.Core.Serialization;
+﻿using KSS.Core;
+using KSS.Core.Serialization;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -51,17 +52,6 @@ namespace KSS.UI
             UILayout.BroadcastLayoutUpdate( _categoryList );
         }
 
-        private static PartMetadata[] GetParts()
-        {
-            var assetsAndIds = AssetRegistry.GetAll<PartMetadata>( "part::m/" );
-            PartMetadata[] assets = new PartMetadata[assetsAndIds.Length];
-            for( int i = 0; i < assetsAndIds.Length; i++ )
-            {
-                assets[i] = assetsAndIds[i].asset;
-            }
-            return assets;
-        }
-
         public static PartListUI Create( IUIElementContainer parent, UILayoutInfo layout )
         {
             UIPanel uiPanel = parent.AddPanel( layout, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_list_background" ) );
@@ -89,7 +79,7 @@ namespace KSS.UI
             PartListUI partListUI = uiPanel.gameObject.AddComponent<PartListUI>();
 
             // update part IDs from *somewhere*
-            partListUI._parts = GetParts();
+            partListUI._parts = PartHelper.GetAllParts();
 
             var categories = new List<string>();
             var categories2 = PartMetadata.GetUniqueCategories( partListUI._parts );

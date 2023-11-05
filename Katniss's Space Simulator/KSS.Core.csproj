@@ -129,6 +129,8 @@
     <Compile Include="Assets\KSS.Core\Components\FAttachNode.cs" />
     <Compile Include="Assets\KSS.Core\DesignScene\DesignObjectFactory.cs" />
     <Compile Include="Assets\KSS.Core\DesignScene\DesignObject.cs" />
+    <Compile Include="Assets\KSS.Core\Components\FPart.cs" />
+    <Compile Include="Assets\KSS.Core\PartHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.Core\___KSS.Core.asmdef" />

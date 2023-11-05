@@ -37,14 +37,13 @@ namespace KSS.AssetLoaders.GameData
             {
                 PartMetadata partMeta = new PartMetadata( partPath );
                 partMeta.ReadDataFromDisk();
-                AssetRegistry.Register( $"part::m/{partMeta.ID}", partMeta );
-                AssetRegistry.RegisterLazy( $"part::h/{partMeta.ID}", () =>
+                PartHelper.RegisterPart( partMeta, () =>
                 {
                     _handler.ObjectsFilename = Path.Combine( partPath, "objects.json" );
                     _handler.DataFilename = Path.Combine( partPath, "data.json" );
                     _loader.Load();
                     return _strat.LastSpawnedRoot;
-                }, isCacheable: false );
+                } );
             }
         }
     }

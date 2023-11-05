@@ -26,7 +26,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>0169</NoWarn>
-    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -35,7 +35,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <NoWarn>0169</NoWarn>
-    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <NoConfig>true</NoConfig>
@@ -56,22 +56,16 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\ScreenSpaceShadows\Scripts\NoiseTextureSet.cs" />
-    <Compile Include="Assets\ScreenSpaceShadows\ContactShadows.cs" />
+    <Compile Include="Assets\PartHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro.cginc" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
-    <None Include="Assets\ScreenSpaceShadows\Shaders\Raytrace.cginc" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_Bitmap.shader" />
-    <None Include="Assets\ScreenSpaceShadows\Shaders\Common.cginc" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro_Mobile.cginc" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF SSD.shader" />
-    <None Include="Assets\ScreenSpaceShadows\Shaders\ContactShadows.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Surface-Mobile.shader" />
-    <None Include="Assets\ScreenSpaceShadows\Shaders\TempFilter.cginc" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Surface.shader" />
-    <None Include="Assets\_TextMesh Pro\Sprites\EmojiOne Attribution.txt" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_Bitmap-Custom-Atlas.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Mobile SSD.shader" />
@@ -79,11 +73,9 @@
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro_Properties.cginc" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro_Surface.cginc" />
     <None Include="Assets\_TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
-    <None Include="Assets\ScreenSpaceShadows\Shaders\Composite.cginc" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Mobile Masking.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF Overlay.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_Bitmap-Mobile.shader" />
-    <None Include="Assets\_TextMesh Pro\Fonts\LiberationSans - OFL.txt" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Mobile.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_Sprite.shader" />
   </ItemGroup>
@@ -334,14 +326,8 @@
     <Reference Include="UnityEditor.UnityConnectModule">
       <HintPath>F:\UnityEditors\2022.1.8f1\Editor\Data\Managed\UnityEngine\UnityEditor.UnityConnectModule.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.VisualScripting.Antlr3.Runtime">
-      <HintPath>Library\PackageCache\com.unity.visualscripting@1.7.8\Runtime\VisualScripting.Flow\Dependencies\NCalc\Unity.VisualScripting.Antlr3.Runtime.dll</HintPath>
-    </Reference>
     <Reference Include="ReportGeneratorMerged">
       <HintPath>Library\PackageCache\com.unity.testtools.codecoverage@1.1.1\lib\ReportGenerator\ReportGeneratorMerged.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>Library\PackageCache\com.unity.nuget.newtonsoft-json@3.0.2\Runtime\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
       <HintPath>F:\UnityEditors\2022.1.8f1\Editor\Data\NetStandard\ref\2.1.0\netstandard.dll</HintPath>
@@ -709,14 +695,17 @@
     <Reference Include="System.Xml.Serialization">
       <HintPath>F:\UnityEditors\2022.1.8f1\Editor\Data\NetStandard\compat\2.1.0\shims\netfx\System.Xml.Serialization.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.VisualScripting.Flow.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Flow.Editor.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.VSCode.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.VSCode.Editor.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.Postprocessing.Runtime">
+      <HintPath>Library\ScriptAssemblies\Unity.Postprocessing.Runtime.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.TextMeshPro.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.VisualStudio.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.VisualStudio.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Performance.Profile-Analyzer.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Performance.Profile-Analyzer.Editor.dll</HintPath>
@@ -724,23 +713,8 @@
     <Reference Include="Unity.TestTools.CodeCoverage.Editor.OpenCover.Model">
       <HintPath>Library\ScriptAssemblies\Unity.TestTools.CodeCoverage.Editor.OpenCover.Model.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.VisualStudio.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.VisualStudio.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Timeline">
-      <HintPath>Library\ScriptAssemblies\Unity.Timeline.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.TextMeshPro">
       <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.VisualScripting.State.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.State.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.VisualScripting.Core.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Core.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.VisualScripting.SettingsProvider.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.SettingsProvider.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.2D.Sprite.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.2D.Sprite.Editor.dll</HintPath>
@@ -754,47 +728,17 @@
     <Reference Include="UnityEditor.UI">
       <HintPath>Library\ScriptAssemblies\UnityEditor.UI.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.PlasticSCM.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.PlasticSCM.Editor.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.Rider.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.Rider.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.VisualScripting.Flow">
-      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Flow.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Services.Core">
-      <HintPath>Library\ScriptAssemblies\Unity.Services.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.VisualScripting.Core">
-      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.EditorCoroutines.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.EditorCoroutines.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Services.Core.Analytics">
-      <HintPath>Library\ScriptAssemblies\Unity.Services.Core.Analytics.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Postprocessing.Runtime">
-      <HintPath>Library\ScriptAssemblies\Unity.Postprocessing.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.VisualScripting.Shared.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.Shared.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Services.Core.Environments">
-      <HintPath>Library\ScriptAssemblies\Unity.Services.Core.Environments.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.Timeline.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.Timeline.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TestTools.CodeCoverage.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.TestTools.CodeCoverage.Editor.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.VisualScripting.State">
-      <HintPath>Library\ScriptAssemblies\Unity.VisualScripting.State.dll</HintPath>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.EditorCoroutines.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.EditorCoroutines.Editor.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -802,13 +746,17 @@
       <Project>{53A4B44D-C587-1ED0-C944-834EA89508FD}</Project>
       <Name>_UnityPlus.Serialization</Name>
     </ProjectReference>
-    <ProjectReference Include="_UnityPlus.Rendering.csproj">
-      <Project>{B125B7BC-A321-D392-2929-42AA482B2263}</Project>
-      <Name>_UnityPlus.Rendering</Name>
+    <ProjectReference Include="_UnityEngine.csproj">
+      <Project>{AA320F23-E273-CF3D-ECC5-E3B3EE38E655}</Project>
+      <Name>_UnityEngine</Name>
     </ProjectReference>
     <ProjectReference Include="KSS.UI.csproj">
       <Project>{43C42401-C6C3-28EB-5BC7-32F0B5CC16C2}</Project>
       <Name>KSS.UI</Name>
+    </ProjectReference>
+    <ProjectReference Include="_UnityPlus.Rendering.csproj">
+      <Project>{B125B7BC-A321-D392-2929-42AA482B2263}</Project>
+      <Name>_UnityPlus.Rendering</Name>
     </ProjectReference>
     <ProjectReference Include="KSS.DevUtils.csproj">
       <Project>{D7208026-3029-DD39-0449-2AD64786FAF4}</Project>
@@ -818,17 +766,13 @@
       <Project>{50861573-23A3-BCBD-DFDB-2A1CFB929A2F}</Project>
       <Name>_UnityPlus.UILib</Name>
     </ProjectReference>
+    <ProjectReference Include="_UnityPlus.OverridableEvents.csproj">
+      <Project>{D26EF55E-D30C-518A-2340-C096B47A9C02}</Project>
+      <Name>_UnityPlus.OverridableEvents</Name>
+    </ProjectReference>
     <ProjectReference Include="_UnityPlus.AssetManagement.csproj">
       <Project>{1082B390-7315-9D8E-BF58-53BE9AF2F68A}</Project>
       <Name>_UnityPlus.AssetManagement</Name>
-    </ProjectReference>
-    <ProjectReference Include="_UnityEngine.csproj">
-      <Project>{AA320F23-E273-CF3D-ECC5-E3B3EE38E655}</Project>
-      <Name>_UnityEngine</Name>
-    </ProjectReference>
-    <ProjectReference Include="_UnityPlus.StaticEvents.csproj">
-      <Project>{379A262A-69B2-FA05-9D5F-7E70A994B21D}</Project>
-      <Name>_UnityPlus.StaticEvents</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
