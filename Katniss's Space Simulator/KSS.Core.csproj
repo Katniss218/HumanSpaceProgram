@@ -58,6 +58,7 @@
   <ItemGroup>
     <Compile Include="Assets\KSS.Core\Serialization\SaveMetadataEx.cs" />
     <Compile Include="Assets\KSS.Core\Vessel.cs" />
+    <Compile Include="Assets\KSS.Core\PartHelper.cs" />
     <Compile Include="Assets\KSS.Core\Orbit.cs" />
     <Compile Include="Assets\KSS.Core\Building.cs" />
     <Compile Include="Assets\KSS.Core\Vessel.Serialization.cs" />
@@ -93,6 +94,7 @@
     <Compile Include="Assets\KSS.Core\DesignScene\DesignSceneToolManager.cs" />
     <Compile Include="Assets\KSS.Core\ReferenceFrames\RootObjectTransform.cs" />
     <Compile Include="Assets\KSS.Core\VesselFactory.cs" />
+    <Compile Include="Assets\KSS.Core\Components\FPart.cs" />
     <Compile Include="Assets\KSS.Core\SceneManagement\SceneLoader.cs" />
     <Compile Include="Assets\KSS.Core\ReferenceFrames\IAcceleratingReferenceFrame.cs" />
     <Compile Include="Assets\KSS.Core\Control\ControlInAttribute.cs" />
@@ -104,6 +106,8 @@
     <Compile Include="Assets\KSS.Core\ReferenceFrames\IReferenceFrameSwitchResponder.cs" />
     <Compile Include="Assets\KSS.Core\VesselManager.cs" />
     <Compile Include="Assets\KSS.Core\Components\FAnchor.cs" />
+    <Compile Include="Assets\KSS.Core\DesignScene\DesignObject.cs" />
+    <Compile Include="Assets\KSS.Core\Components\FAttachNode.cs" />
     <Compile Include="Assets\KSS.Core\TimeManager.cs" />
     <Compile Include="Assets\KSS.Core\DesignScene\Tools\TranslateTool.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\IResourceProducer.cs" />
@@ -122,15 +126,11 @@
     <Compile Include="Assets\KSS.Core\Substance.cs" />
     <Compile Include="Assets\KSS.Core\CelestialBody.cs" />
     <Compile Include="Assets\KSS.Core\Serialization\IOHelper.cs" />
+    <Compile Include="Assets\KSS.Core\DesignScene\DesignObjectFactory.cs" />
     <Compile Include="Assets\KSS.Core\IPartObject.cs" />
     <Compile Include="Assets\KSS.Core\SceneManagement\InvalidSceneManagerException.cs" />
     <Compile Include="Assets\KSS.Core\Components\FLaunchSiteMarker.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\SubstanceStateCollection.cs" />
-    <Compile Include="Assets\KSS.Core\Components\FAttachNode.cs" />
-    <Compile Include="Assets\KSS.Core\DesignScene\DesignObjectFactory.cs" />
-    <Compile Include="Assets\KSS.Core\DesignScene\DesignObject.cs" />
-    <Compile Include="Assets\KSS.Core\Components\FPart.cs" />
-    <Compile Include="Assets\KSS.Core\PartHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.Core\___KSS.Core.asmdef" />
