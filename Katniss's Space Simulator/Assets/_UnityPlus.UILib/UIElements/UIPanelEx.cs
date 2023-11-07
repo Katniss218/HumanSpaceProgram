@@ -7,27 +7,15 @@ namespace UnityPlus.UILib.UIElements
 {
     public static class UIPanelEx
     {
-        public static T WithPanel<T>( this T parent, UILayoutInfo layout, Sprite background, out UIPanel uiPanel ) where T : IUIElementContainer
+        public static T WithPanel<T>( this T parent, UILayoutInfo layoutInfo, Sprite background, out UIPanel uiPanel ) where T : IUIElementContainer
         {
-            uiPanel = AddPanel( parent, layout, background );
+            uiPanel = UIPanel.Create( parent, layoutInfo, background );
             return parent;
         }
 
         public static UIPanel AddPanel( this IUIElementContainer parent, UILayoutInfo layoutInfo, Sprite background )
         {
-            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( parent.contents, "uilib-panel", layoutInfo );
-
-            Image backgroundComponent = rootGameObject.AddComponent<Image>();
-            backgroundComponent.raycastTarget = false;
-            backgroundComponent.sprite = background;
-            backgroundComponent.type = Image.Type.Sliced;
-
-            if( background == null )
-            {
-                backgroundComponent.color = new Color( 0, 0, 0, 0 );
-            }
-
-            return new UIPanel( rootTransform, parent, backgroundComponent );
+            return UIPanel.Create( parent, layoutInfo, background );
         }
 
         public static UIPanel WithTint( this UIPanel panel, Color tint )

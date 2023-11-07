@@ -11,39 +11,13 @@ namespace UnityPlus.UILib.UIElements
     {
         public static T AddButton<T>( this T parent, UILayoutInfo layout, Sprite sprite, Action onClick, out UIButton button ) where T : IUIElementContainer
         {
-            button = AddButton( parent, layout, sprite, onClick );
+            button = UIButton.Create( parent, layout, sprite, onClick );
             return parent;
         }
 
         public static UIButton AddButton( this IUIElementContainer parent, UILayoutInfo layout, Sprite sprite, Action onClick )
         {
-            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( parent.contents, "uilib-button", layout );
-
-            Image backgroundComponent = rootGameObject.AddComponent<Image>();
-            backgroundComponent.raycastTarget = true;
-            backgroundComponent.sprite = sprite;
-            backgroundComponent.type = Image.Type.Sliced;
-
-            Button buttonComponent = rootGameObject.AddComponent<Button>();
-            buttonComponent.targetGraphic = backgroundComponent;
-            buttonComponent.transition = Selectable.Transition.ColorTint;
-            buttonComponent.colors = new ColorBlock()
-            {
-                normalColor = Color.white,
-                selectedColor = Color.white,
-                colorMultiplier = 1.0f,
-                highlightedColor = Color.white,
-                pressedColor = Color.white,
-                disabledColor = Color.gray
-            };
-            buttonComponent.targetGraphic = backgroundComponent;
-
-            if( onClick != null )
-            {
-                buttonComponent.onClick.AddListener( () => onClick() ); // Find a way to cast System.Action to UnityAction if possible (the signatures of both delegates match).
-            }
-
-            return new UIButton( rootTransform, parent, buttonComponent, backgroundComponent );
+            return UIButton.Create( parent, layout, sprite, onClick );
         }
 
         public static UIButton WithTint( this UIButton button, Color tint )

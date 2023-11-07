@@ -13,7 +13,7 @@ namespace UnityPlus.UILib.UIElements
         /// </summary>
         public static bool IsNullOrDestroyed( this IUIElement uiElement )
         {
-            return uiElement == null || uiElement.gameObject == null;
+            return uiElement.IsUnityNull();
         }
     }
 }

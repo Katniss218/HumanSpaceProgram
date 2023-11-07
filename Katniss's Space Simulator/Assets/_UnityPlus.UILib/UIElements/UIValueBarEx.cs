@@ -10,21 +10,9 @@ namespace UnityPlus.UILib.UIElements
 {
     public static class UIValueBarEx
     {
-        public static UIValueBar AddHorizontalValueBar( this IUIElementContainer parent, UILayoutInfo layout, Sprite background )
+        public static UIValueBar AddHorizontalValueBar( this IUIElementContainer parent, UILayoutInfo layoutInfo, Sprite background )
         {
-            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( parent.contents, "uilib-valuebar", layout );
-
-            Image imageComponent = rootGameObject.AddComponent<Image>();
-            imageComponent.raycastTarget = false;
-            imageComponent.sprite = background;
-            imageComponent.type = Image.Type.Sliced;
-
-            ValueBar valueBarComponent = rootGameObject.AddComponent<ValueBar>();
-            valueBarComponent.PaddingLeft = 1.0f;
-            valueBarComponent.PaddingRight = 1.0f;
-            valueBarComponent.Spacing = 1.0f;
-
-            return new UIValueBar( rootTransform, parent, valueBarComponent );
+            return UIValueBar.Create( parent, layoutInfo, background );
         }
 
         public static UIValueBar WithPadding( this UIValueBar valueBar, float paddingleft, float paddingRight, float spacing )

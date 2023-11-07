@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityPlus.UILib.Layout;
 
 namespace UnityPlus.UILib.UIElements
@@ -10,19 +11,12 @@ namespace UnityPlus.UILib.UIElements
     /// </summary>
     public sealed class UIIcon : UIElement, IUIElementChild
     {
-        internal readonly UnityEngine.UI.Image imageComponent;
+        internal Image imageComponent;
 
-        internal readonly IUIElementContainer _parent;
+        internal IUIElementContainer _parent;
         public IUIElementContainer Parent { get => _parent; }
 
         public LayoutDriver LayoutDriver { get; set; }
-
-        internal UIIcon( RectTransform transform, IUIElementContainer parent, UnityEngine.UI.Image imageComponent ) : base( transform )
-        {
-            this._parent = parent;
-            this.Parent.Children.Add( this );
-            this.imageComponent = imageComponent;
-        }
 
         public Sprite Sprite { get => imageComponent.sprite; set => imageComponent.sprite = value; }
 
@@ -30,6 +24,22 @@ namespace UnityPlus.UILib.UIElements
         {
             base.Destroy();
             this.Parent.Children.Remove( this );
+        }
+
+        public static UIIcon Create( IUIElementContainer parent, UILayoutInfo layoutInfo, Sprite icon )
+        {
+            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( parent.contents, "uilib-icon", layoutInfo );
+
+            Image imageComponent = rootGameObject.AddComponent<Image>();
+            imageComponent.raycastTarget = false;
+            imageComponent.sprite = icon;
+            imageComponent.type = Image.Type.Simple;
+
+            UIIcon iconC = rootGameObject.AddComponent<UIIcon>();
+            iconC._parent = parent;
+            iconC.Parent.Children.Add( iconC );
+            iconC.imageComponent = imageComponent;
+            return iconC;
         }
     }
 }

@@ -1,32 +1,25 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 using UnityPlus.UILib.Layout;
 
 namespace UnityPlus.UILib.UIElements
 {
     public sealed class UIButton : UIElement, IUIElementContainer, IUIElementChild, IUILayoutDriven
     {
-        internal readonly UnityEngine.UI.Button buttonComponent;
-        internal readonly UnityEngine.UI.Image backgroundComponent;
+        internal Button buttonComponent;
+        internal Image backgroundComponent;
         public RectTransform contents => base.rectTransform;
 
-        public List<IUIElementChild> Children { get; }
+        public List<IUIElementChild> Children { get; private set; }
 
-        internal readonly IUIElementContainer _parent;
+        internal IUIElementContainer _parent;
         public IUIElementContainer Parent { get => _parent; }
 
         public LayoutDriver LayoutDriver { get; set; }
-
-        internal UIButton( RectTransform transform, IUIElementContainer parent, UnityEngine.UI.Button buttonComponent, UnityEngine.UI.Image backgroundComponent ) : base( transform )
-        {
-            Children = new List<IUIElementChild>();
-            this._parent = parent;
-            this.Parent.Children.Add( this );
-            this.buttonComponent = buttonComponent;
-            this.backgroundComponent = backgroundComponent;
-        }
 
         public override void Destroy()
         {
@@ -37,5 +30,43 @@ namespace UnityPlus.UILib.UIElements
         public Sprite Background { get => backgroundComponent.sprite; set => backgroundComponent.sprite = value; }
 
         public UnityEvent onClick => buttonComponent.onClick;
+
+        public static UIButton Create( IUIElementContainer parent, UILayoutInfo layout, Sprite sprite, Action onClick )
+        {
+            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( parent.contents, "uilib-button", layout );
+
+            Image backgroundComponent = rootGameObject.AddComponent<Image>();
+            backgroundComponent.raycastTarget = true;
+            backgroundComponent.sprite = sprite;
+            backgroundComponent.type = Image.Type.Sliced;
+
+            Button buttonComponent = rootGameObject.AddComponent<Button>();
+            buttonComponent.targetGraphic = backgroundComponent;
+            buttonComponent.transition = Selectable.Transition.ColorTint;
+            buttonComponent.colors = new ColorBlock()
+            {
+                normalColor = Color.white,
+                selectedColor = Color.white,
+                colorMultiplier = 1.0f,
+                highlightedColor = Color.white,
+                pressedColor = Color.white,
+                disabledColor = Color.gray
+            };
+            buttonComponent.targetGraphic = backgroundComponent;
+
+            if( onClick != null )
+            {
+                buttonComponent.onClick.AddListener( () => onClick() ); // Find a way to cast System.Action to UnityAction if possible (the signatures of both delegates match).
+            }
+
+            UIButton button = rootGameObject.AddComponent<UIButton>();
+
+            button.Children = new List<IUIElementChild>();
+            button._parent = parent;
+            button.Parent.Children.Add( button );
+            button.buttonComponent = buttonComponent;
+            button.backgroundComponent = backgroundComponent;
+            return button;
+        }
     }
 }

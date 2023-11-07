@@ -17,33 +17,9 @@ namespace UnityPlus.UILib.UIElements
             return AddScrollView( parent, layout, UILayoutInfo.FillHorizontal( 0, 0, 1.0f, 0, contentHeight ), false, true );
         }
 
-        static UIScrollView AddScrollView( this IUIElementContainer parent, UILayoutInfo layout, UILayoutInfo contentLayout, bool horizontal, bool vertical )
+        public static UIScrollView AddScrollView( this IUIElementContainer parent, UILayoutInfo layout, UILayoutInfo contentLayout, bool horizontal, bool vertical )
         {
-            (GameObject root, RectTransform rootTransform) = UIElement.CreateUI( parent.contents, "uilib-scrollview", layout );
-
-            (GameObject viewport, RectTransform viewportTransform) = UIElement.CreateUI( rootTransform, "uilib-scrollviewviewport", UILayoutInfo.Fill() );
-
-            Image maskImage = viewport.AddComponent<Image>();
-            maskImage.maskable = true;
-            Mask mask = viewport.AddComponent<Mask>();
-            mask.showMaskGraphic = false;
-
-            (GameObject content, RectTransform contentTransform) = UIElement.CreateUI( viewportTransform, "uilib-scrollviewcontent", contentLayout );
-
-            ScrollRect scrollRect = root.AddComponent<ScrollRect>();
-            scrollRect.content = (RectTransform)content.transform;
-            scrollRect.horizontal = horizontal;
-            scrollRect.vertical = vertical;
-            scrollRect.viewport = (RectTransform)viewport.transform;
-            scrollRect.horizontalScrollbarSpacing = 0.0f;
-            scrollRect.verticalScrollbarSpacing = 0.0f;
-
-            scrollRect.movementType = ScrollRect.MovementType.Clamped;
-            scrollRect.inertia = true;
-            scrollRect.scrollSensitivity = 30f;
-            scrollRect.decelerationRate = 0.5f;
-
-            return new UIScrollView( rootTransform, parent, scrollRect, null, null, contentTransform );
+            return UIScrollView.Create( parent, layout, contentLayout, horizontal, vertical );
         }
 
         public static UIScrollView WithSensitivity( this UIScrollView scrollView, float sensitivity, float deceleration )

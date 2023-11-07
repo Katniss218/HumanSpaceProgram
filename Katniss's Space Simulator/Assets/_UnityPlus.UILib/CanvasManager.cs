@@ -30,7 +30,7 @@ namespace UnityPlus.UILib
 
         private static void TryRegisterUnknownCanvases()
         {
-            CanvasID[] canvasLayers = Object.FindObjectsOfType<CanvasID>();
+            UICanvas[] canvasLayers = Object.FindObjectsOfType<UICanvas>();
             foreach( var canvasLayer in canvasLayers )
             {
                 if( _canvasDict.TryGetValue( canvasLayer.ID, out UICanvas c ) )
@@ -46,13 +46,14 @@ namespace UnityPlus.UILib
                 }
                 if( canvasLayer.ID == null )
                 {
-                    Debug.LogWarning( $"Can't register a canvas `{canvasLayer.gameObject.name}` before its identifier is initialized." );
+                    Debug.LogWarning( $"Can't register a canvas `{canvasLayer.gameObject.name}` before its ID is set." );
+                    continue;
                 }
                 try
                 {
-                    Canvas canvas = canvasLayer.GetComponent<Canvas>();
+                    UICanvas canvas = canvasLayer.GetComponent<UICanvas>();
 
-                    Register( canvasLayer.ID, new UICanvas( canvas ) );
+                    Register( canvasLayer.ID, canvas );
                 }
                 catch( Exception ex )
                 {

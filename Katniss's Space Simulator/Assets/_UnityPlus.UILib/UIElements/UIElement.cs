@@ -9,7 +9,7 @@ namespace UnityPlus.UILib.UIElements
     /// <summary>
     /// Represents a generic UI element.
     /// </summary>
-    public class UIElement
+    public class UIElement : MonoBehaviour
     {
         // PURPOSE:
         // - This class (and its subclasses) is a wrapper around hierarchies of Unity components / gameobjects.
@@ -26,25 +26,7 @@ namespace UnityPlus.UILib.UIElements
         /// <summary>
         /// Don't directly modify the fields/state of the rectTransform unless you know what you're doing. You can produce invalid state.
         /// </summary>
-        public RectTransform rectTransform { get => _rectTransform; }
-        readonly RectTransform _rectTransform;
-
-        /// <summary>
-        /// Don't directly modify the fields/state of the gameObject unless you know what you're doing. You can produce invalid state.
-        /// </summary>
-        public GameObject gameObject { get => _gameObject; }
-        readonly GameObject _gameObject;
-
-        // LAYOUT:
-        // - Since everything is encapsulated here, we have FULL CONTROL over when the properties of the underlying components change.
-        // - We can do static and dynamic layout without having to rely on Unity's builtin layout components.
-        // - Once assigned, the parent can't be changed.
-
-        public UIElement( RectTransform rectTransform )
-        {
-            this._rectTransform = rectTransform;
-            this._gameObject = rectTransform.gameObject;
-        }
+        public RectTransform rectTransform { get => (RectTransform)this.transform; }
 
         /// <summary>
         /// Destroys the specified UI element along with its children UI elements.
@@ -58,7 +40,8 @@ namespace UnityPlus.UILib.UIElements
             {
                 return; // Silent quit.
             }
-            UnityEngine.Object.Destroy( this.gameObject );
+
+            Destroy( this.gameObject );
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
@@ -72,26 +55,6 @@ namespace UnityPlus.UILib.UIElements
             rootT.localScale = Vector3.one;
 
             return (rootGO, rootT);
-        }
-
-        public static explicit operator UIElement( RectTransform rectTransform )
-        {
-            return new UIElement( rectTransform );
-        }
-
-        public static explicit operator RectTransform( UIElement uiElement )
-        {
-            return uiElement.rectTransform;
-        }
-
-        public static explicit operator UIElement( Transform transform )
-        {
-            return new UIElement( (RectTransform)transform );
-        }
-
-        public static explicit operator Transform( UIElement uiElement )
-        {
-            return uiElement.rectTransform;
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,9 +12,10 @@ namespace UnityPlus.UILib.UIElements
         internal readonly IUIElementContainer _parent;
         public IUIElementContainer parent { get => _parent; }
 
-        internal UIInputToggle( RectTransform transform, IUIElementContainer parent ) : base( transform )
+        public static UIInputToggle Create()
         {
-            this._parent = parent;
+            throw new NotImplementedException();
+            // uiInputToggle._parent = parent;
         }
     }
 }

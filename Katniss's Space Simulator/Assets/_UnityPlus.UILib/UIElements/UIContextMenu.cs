@@ -11,26 +11,16 @@ namespace UnityPlus.UILib.UIElements
     /// </summary>
     public sealed class UIContextMenu : UIElement, IUIElementContainer, IUIElementChild, IUILayoutDriven
     {
-        internal readonly ContextMenu contextMenuComponent;
-        internal readonly Image backgroundComponent;
+        internal ContextMenu contextMenuComponent;
+        internal Image backgroundComponent;
         public RectTransform contents => base.rectTransform;
 
-        public List<IUIElementChild> Children { get; }
+        public List<IUIElementChild> Children { get; private set; }
 
-        internal readonly IUIElementContainer _parent;
+        internal IUIElementContainer _parent;
         public IUIElementContainer Parent { get => _parent; }
 
         public LayoutDriver LayoutDriver { get; set; }
-
-
-        public UIContextMenu( RectTransform transform, IUIElementContainer parent, ContextMenu contextMenuComponent, Image backgroundComponent ) : base( transform )
-        {
-            this.Children = new List<IUIElementChild>();
-            this._parent = parent;
-            this.Parent.Children.Add( this );
-            this.contextMenuComponent = contextMenuComponent;
-            this.backgroundComponent = backgroundComponent;
-        }
 
         public override void Destroy()
         {
@@ -39,5 +29,26 @@ namespace UnityPlus.UILib.UIElements
         }
 
         public Sprite Background { get => backgroundComponent.sprite; set => backgroundComponent.sprite = value; }
+
+        public static UIContextMenu Create( RectTransform track, UICanvas contextMenuCanvas, UILayoutInfo layoutInfo, Sprite background )
+        {
+            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( contextMenuCanvas.rectTransform, "uilib-contextmenu", layoutInfo );
+
+            Image backgroundComponent = rootGameObject.AddComponent<Image>();
+            backgroundComponent.raycastTarget = false;
+            backgroundComponent.sprite = background;
+            backgroundComponent.type = Image.Type.Sliced;
+
+            ContextMenu contextMenuComponent = rootGameObject.AddComponent<ContextMenu>();
+            contextMenuComponent.Target = track;
+
+            UIContextMenu contextMenu = rootGameObject.AddComponent<UIContextMenu>();
+            contextMenu.Children = new List<IUIElementChild>();
+            contextMenu._parent = null;
+            contextMenu.Parent?.Children.Add( contextMenu );
+            contextMenu.contextMenuComponent = contextMenuComponent;
+            contextMenu.backgroundComponent = backgroundComponent;
+            return contextMenu;
+        }
     }
 }

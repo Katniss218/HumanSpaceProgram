@@ -12,9 +12,9 @@ namespace UnityPlus.UILib.UIElements
     {
         // possibly we could have different types of text elements that format themselves in different ways. Headers, paragraphs, etc.
 
-        internal readonly TMPro.TextMeshProUGUI textComponent;
+        internal TMPro.TextMeshProUGUI textComponent;
 
-        internal readonly IUIElementContainer _parent;
+        internal IUIElementContainer _parent;
 
         public IUIElementContainer Parent { get => _parent; }
 
@@ -28,13 +28,6 @@ namespace UnityPlus.UILib.UIElements
                 textComponent.text = value;
                 UILayout.BroadcastLayoutUpdate( this );
             }
-        }
-
-        internal UIText( RectTransform transform, IUIElementContainer parent, TMPro.TextMeshProUGUI textComponent ) : base( transform )
-        {
-            this._parent = parent;
-            this.Parent.Children.Add( this );
-            this.textComponent = textComponent;
         }
 
         public override void Destroy()
@@ -64,6 +57,25 @@ namespace UnityPlus.UILib.UIElements
                 this.rectTransform.sizeDelta = new Vector2( textComponent.GetPreferredValues().x, this.rectTransform.GetActualSize().y );
                 return;
             }
+        }
+
+        public static UIText Create( IUIElementContainer parent, UILayoutInfo layoutInfo, string text )
+        {
+            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( parent.contents, "uilib-text", layoutInfo );
+
+            TMPro.TextMeshProUGUI textComponent = rootGameObject.AddComponent<TMPro.TextMeshProUGUI>();
+            textComponent.raycastTarget = false;
+            textComponent.richText = false;
+            textComponent.horizontalAlignment = TMPro.HorizontalAlignmentOptions.Left;
+            textComponent.verticalAlignment = TMPro.VerticalAlignmentOptions.Middle;
+
+            textComponent.text = text;
+
+            UIText uiText = rootGameObject.AddComponent<UIText>();
+            uiText._parent = parent;
+            uiText.Parent.Children.Add( uiText );
+            uiText.textComponent = textComponent;
+            return uiText;
         }
     }
 }

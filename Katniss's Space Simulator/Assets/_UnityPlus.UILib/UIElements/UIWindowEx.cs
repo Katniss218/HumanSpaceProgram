@@ -9,19 +9,7 @@ namespace UnityPlus.UILib.UIElements
     {
         public static UIWindow AddWindow( this UICanvas parent, UILayoutInfo layoutInfo, Sprite background )
         {
-            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( parent.rectTransform, "uilib-window", layoutInfo );
-
-            Image backgroundComponent = rootGameObject.AddComponent<Image>();
-            backgroundComponent.raycastTarget = true;
-            backgroundComponent.sprite = background;
-            backgroundComponent.type = Image.Type.Sliced;
-
-            if( background == null )
-            {
-                backgroundComponent.color = new Color( 0, 0, 0, 0 );
-            }
-
-            return new UIWindow( rootTransform, parent, backgroundComponent );
+            return UIWindow.Create( parent, layoutInfo, background );
         }
 
         public static UIWindow Focusable( this UIWindow window )
