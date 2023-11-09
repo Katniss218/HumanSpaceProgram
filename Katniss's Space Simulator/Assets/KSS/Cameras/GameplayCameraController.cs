@@ -115,7 +115,7 @@ namespace KSS.Cameras
             this.transform.rotation *= Quaternion.AngleAxis( mouseX * MOVE_MULTIPLIER, Vector3.up );
             this.transform.rotation *= Quaternion.AngleAxis( -mouseY * MOVE_MULTIPLIER, Vector3.right );
         }
-        
+
         void UpdatePosition()
         {
             if( ReferenceObject != null )
@@ -210,11 +210,13 @@ namespace KSS.Cameras
         }
 
 
-        [HSPEventListener( HSPEvent.TIMELINE_AFTER_NEW, HSPEvent.NAMESPACE_VANILLA + "camera_controller.snap_to_vessel" )]
-        [HSPEventListener( HSPEvent.TIMELINE_AFTER_LOAD, HSPEvent.NAMESPACE_VANILLA + "camera_controller.snap_to_vessel" )]
-        static void SnapToActiveVessel( object e )
+        [HSPEventListener( HSPEvent.GAMEPLAY_AFTER_ACTIVE_OBJECT_CHANGE, HSPEvent.NAMESPACE_VANILLA + "camera.snap_to_vessel" )]
+        static void SnapToActiveObject( object e )
         {
-            instance.ReferenceObject = VesselManager.ActiveVessel.RootPart.transform;
+            if( ActiveObjectManager.ActiveObject == null )
+                instance.ReferenceObject = null;
+            else
+                instance.ReferenceObject = ActiveObjectManager.ActiveObject.transform;
         }
     }
 }

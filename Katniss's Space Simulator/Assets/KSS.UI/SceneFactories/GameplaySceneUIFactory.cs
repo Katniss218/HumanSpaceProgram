@@ -14,13 +14,39 @@ namespace KSS.UI.SceneFactories
 {
     public static class GameplaySceneUIFactory
     {
+        static UIPanel mainPanel;
+
+        [HSPEventListener( HSPEvent.GAMEPLAY_AFTER_ACTIVE_OBJECT_CHANGE, HSPEvent.NAMESPACE_VANILLA + ".gameplay_ui" )]
         [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, HSPEvent.NAMESPACE_VANILLA + ".gameplay_ui" )]
-        public static void Create( object e )
+        public static void CreateUI( object e )
         {
             UICanvas canvas = CanvasManager.Get( CanvasName.STATIC );
 
+            if( !mainPanel.IsNullOrDestroyed() )
+            {
+                mainPanel.Destroy();
+            }
 
-            UIText text = canvas.AddPanel( new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 150, 25 ) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
+            mainPanel = canvas.AddPanel( UILayoutInfo.Fill(), null );
+
+            if( ActiveObjectManager.ActiveObject == null )
+            {
+                CreateUIActiveObjectNull();
+            }
+            else
+            {
+                CreateUIActiveObjectExists();
+            }
+        }
+
+        public static void CreateUIActiveObjectNull()
+        {
+
+        }
+
+        public static void CreateUIActiveObjectExists()
+        {
+            UIText text = mainPanel.AddPanel( new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 150, 25 ) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
                 .WithTint( Color.gray )
                 .AddText( UILayoutInfo.Fill(), "Velocity: <missing>" )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
@@ -30,7 +56,7 @@ namespace KSS.UI.SceneFactories
             ui.Text = text;
 
 
-            text = canvas.AddPanel( new UILayoutInfo( Vector2.zero, new Vector2( 0, 25 ), new Vector2( 150, 25 ) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
+            text = mainPanel.AddPanel( new UILayoutInfo( Vector2.zero, new Vector2( 0, 25 ), new Vector2( 150, 25 ) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
                 .WithTint( Color.gray )
                 .AddText( UILayoutInfo.Fill(), "Acceleration: <missing>" )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
@@ -40,7 +66,7 @@ namespace KSS.UI.SceneFactories
             ui2.Text = text;
 
 
-            text = canvas.AddPanel( new UILayoutInfo( Vector2.zero, new Vector2( 0, 50 ), new Vector2( 150, 25 ) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
+            text = mainPanel.AddPanel( new UILayoutInfo( Vector2.zero, new Vector2( 0, 50 ), new Vector2( 150, 25 ) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
                 .WithTint( Color.gray )
                 .AddText( UILayoutInfo.Fill(), "Altitude: <missing>" )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
@@ -50,7 +76,7 @@ namespace KSS.UI.SceneFactories
             ui3.Text = text;
 
 
-            text = canvas.AddPanel( new UILayoutInfo( Vector2.zero, new Vector2( 0, 75 ), new Vector2( 150, 25 ) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
+            text = mainPanel.AddPanel( new UILayoutInfo( Vector2.zero, new Vector2( 0, 75 ), new Vector2( 150, 25 ) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
                 .WithTint( Color.gray )
                 .AddText( UILayoutInfo.Fill(), "Warp Rate: <missing>" )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
@@ -60,7 +86,7 @@ namespace KSS.UI.SceneFactories
             ui4.Text = text;
 
 
-            text = canvas.AddPanel( new UILayoutInfo( Vector2.up, new Vector2( 0, 0 ), new Vector2( 150, 25 ) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
+            text = mainPanel.AddPanel( new UILayoutInfo( Vector2.up, new Vector2( 0, 0 ), new Vector2( 150, 25 ) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
                 .WithTint( Color.gray )
                 .AddText( UILayoutInfo.Fill(), "FPS: <missing>" )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
@@ -70,7 +96,7 @@ namespace KSS.UI.SceneFactories
             ui5.Text = text;
 
 
-            UIPanel navball = canvas.AddPanel( new UILayoutInfo( new Vector2( 0.5f, 0 ), Vector2.zero, new Vector2( 222, 202 ) ), null );
+            UIPanel navball = mainPanel.AddPanel( new UILayoutInfo( new Vector2( 0.5f, 0 ), Vector2.zero, new Vector2( 222, 202 ) ), null );
 
             (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( navball.rectTransform, "mask", new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 190, 190 ) ) );
 

@@ -88,14 +88,14 @@ namespace KSS.Core.ReferenceFrames
         /// <summary>
         /// Checks whether the current active vessel is too far away from the scene's origin, and performs an origin shift if it is.
         /// </summary>
-        public static void TryFixActiveVesselOutOfBounds()
+        public static void TryFixActiveObjectOutOfBounds()
         {
-            if( VesselManager.ActiveVessel == null )
+            if( ActiveObjectManager.ActiveObject == null )
             {
                 return;
             }
 
-            Vector3 position = VesselManager.ActiveVessel.transform.position;
+            Vector3 position = ActiveObjectManager.ActiveObject.transform.position;
             if( position.magnitude > MaxFloatingOriginRange )
             {
                 ChangeSceneReferenceFrame( SceneReferenceFrame.Shift( position ) );
@@ -116,7 +116,13 @@ namespace KSS.Core.ReferenceFrames
 
         void FixedUpdate()
         {
-            TryFixActiveVesselOutOfBounds();
+            TryFixActiveObjectOutOfBounds();
+        }
+
+        [HSPEventListener( HSPEvent.GAMEPLAY_AFTER_ACTIVE_OBJECT_CHANGE, HSPEvent.NAMESPACE_VANILLA + ".reframe_active" )]
+        private static void OnActiveObjectChanged( object e )
+        {
+            TryFixActiveObjectOutOfBounds();
         }
     }
 }

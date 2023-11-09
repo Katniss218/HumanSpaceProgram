@@ -1,4 +1,5 @@
 ﻿using KSS.Core;
+using KSS.Core.Physics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,8 @@ namespace KSS.UI
 
         void LateUpdate()
         {
-            Text.Text = VesselManager.ActiveVessel == null ? "" : $"Acceleration: {VesselManager.ActiveVessel.PhysicsObject.Acceleration.magnitude:#0.0} m/s^2";
+            var physObj = ActiveObjectManager.ActiveObject?.GetComponent<PhysicsObject>();
+            Text.Text = physObj == null ? "" : $"Acceleration: {physObj.Acceleration.magnitude:#0.0} m/s^2";
         }
     }
 }

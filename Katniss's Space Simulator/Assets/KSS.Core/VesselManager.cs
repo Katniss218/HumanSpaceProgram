@@ -18,17 +18,6 @@ namespace KSS.Core
     [RequireComponent( typeof( PreexistingReference ) )]
     public class VesselManager : SingletonMonoBehaviour<VesselManager>, IPersistent
     {
-        private Vessel _activeVessel;
-        public static Vessel ActiveVessel
-        {
-            get => instance._activeVessel;
-            set
-            {
-                instance._activeVessel = value;
-                // TODO - focus camera (probs with event).
-            }
-        }
-
         private List<Vessel> _vessels = new List<Vessel>();
 
         public static Vessel[] GetLoadedVessels()
@@ -54,22 +43,18 @@ namespace KSS.Core
 
             instance._vessels.Remove( vessel );
         }
-
         public SerializedData GetData( IReverseReferenceMap s )
         {
             return new SerializedObject()
             {
-                { "active_vessel", s.WriteObjectReference( ActiveVessel ) }
+
             };
         }
 
         public void SetData( IForwardReferenceMap l, SerializedData data )
         {
-            if( data.TryGetValue( "active_vessel", out var activeVessel ) )
-                ActiveVessel = (Vessel)l.ReadObjectReference( activeVessel );
+
         }
-
-
 
 
         // move below to separate class "BuildingSerializer" or something.

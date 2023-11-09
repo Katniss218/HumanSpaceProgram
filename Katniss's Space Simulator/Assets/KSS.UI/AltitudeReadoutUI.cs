@@ -16,14 +16,15 @@ namespace KSS.UI
 
         void LateUpdate()
         {
-            if( VesselManager.ActiveVessel == null )
+            var activeObj = ActiveObjectManager.ActiveObject?.GetComponent<RootObjectTransform>();
+            if( activeObj == null )
             {
                 Text.Text = "";
             }
             else
             {
                 CelestialBody body = CelestialBodyManager.Get( "main" );
-                Vector3Dbl posV = VesselManager.ActiveVessel.AIRFPosition;
+                Vector3Dbl posV = activeObj.AIRFPosition;
                 Vector3Dbl posCB = body.AIRFPosition;
 
                 double magn = (posV - posCB).magnitude;

@@ -76,7 +76,7 @@ namespace KSS.DevUtils
             Transform root = launchSitePart.CreateRoot( launchSite );
 
             var v = CreateVessel( launchSite );
-            VesselManager.ActiveVessel = v.RootPart.GetVessel();
+            ActiveObjectManager.ActiveObject = v.RootPart.GetVessel().gameObject;
             vessel = v.gameObject;
         }
 
@@ -103,6 +103,29 @@ namespace KSS.DevUtils
 
         private void Update()
         {
+            if( Input.GetKeyDown( KeyCode.F4 ) )
+            {
+                if( ActiveObjectManager.ActiveObject == null )
+                {
+                    if( Physics.Raycast( GameplayCameraController.MainCamera.ScreenPointToRay( Input.mousePosition ), out RaycastHit hit ) )
+                    {
+                        if( hit.collider.transform.root.HasComponent<Vessel>( out var vessel ) )
+                        {
+                            ActiveObjectManager.ActiveObject = vessel.gameObject;
+                        }
+                    }
+                }
+                else
+                {
+                    if( Physics.Raycast( GameplayCameraController.MainCamera.ScreenPointToRay( Input.mousePosition ), out RaycastHit hit ) )
+                    {
+                        if( !hit.collider.transform.root.HasComponent<Vessel>() )
+                        {
+                            ActiveObjectManager.ActiveObject = null;
+                        }
+                    }
+                }
+            }
             if( Input.GetKeyDown( KeyCode.F5 ) )
             {
                 CreateVessel( launchSite );

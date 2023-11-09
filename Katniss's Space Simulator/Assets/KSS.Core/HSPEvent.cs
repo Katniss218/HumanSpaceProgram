@@ -125,6 +125,9 @@ namespace KSS.Core
         
         public const string DESIGN_AFTER_SAVE = NAMESPACE_VANILLA + ".designscene.save.after";
 
+        // gameplay scene runtime events
+
+        public const string GAMEPLAY_AFTER_ACTIVE_OBJECT_CHANGE = NAMESPACE_VANILLA + ".gameplayscene.after_activeobj_changed";
         // ---
     }
 }
