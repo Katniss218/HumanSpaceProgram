@@ -73,14 +73,8 @@ namespace UnityPlus.Serialization
             return _objectToGuid.TryGetValue( obj, out id );
         }
 
-        /// <summary>
-        /// Registers the specified object in the registry (if not registered already) and returns its reference ID.
-        /// </summary>
-        /// <remarks>
-        /// Call this to map an object to an ID when saving an object reference.
-        /// </remarks>
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public Guid GetReferenceID( object obj )
+        public Guid GetID( object obj )
         {
             if( _currentState == ISaver.State.Idle )
             {
@@ -101,20 +95,17 @@ namespace UnityPlus.Serialization
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public Guid GetReferenceID( object obj, Guid guid )
+        public void SetID( object obj, Guid id )
         {
             if( _currentState == ISaver.State.Idle )
             {
                 throw new InvalidOperationException( $"Can't save an object (or its ID) when the saver is idle." );
             }
 
-            if( _objectToGuid.TryGetValue( obj, out Guid id ) ) // if registered, return old guid.
-            {
-                return id;
-            }
+            if( id == Guid.Empty )
+                return;
 
-            _objectToGuid.Add( obj, guid );
-            return guid;
+            _objectToGuid.Add( obj, id );
         }
 
         //
@@ -129,9 +120,9 @@ namespace UnityPlus.Serialization
 #if DEBUG
             Debug.Log( "Saving..." );
 #endif
-            _startFunc?.Invoke();
-            ClearReferenceRegistry();
             _currentState = ISaver.State.SavingData;
+            ClearReferenceRegistry();
+            _startFunc?.Invoke();
 
             foreach( var action in _dataActions )
             {
@@ -145,12 +136,12 @@ namespace UnityPlus.Serialization
                 action?.Invoke( this );
             }
 
+            _finishFunc?.Invoke();
             ClearReferenceRegistry();
             _currentState = ISaver.State.Idle;
 #if DEBUG
             Debug.Log( "Finished Saving" );
 #endif
-            _finishFunc?.Invoke();
         }
     }
 }

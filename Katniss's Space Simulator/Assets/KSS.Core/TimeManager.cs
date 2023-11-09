@@ -206,7 +206,7 @@ namespace KSS.Core
             }
         }
 
-        public SerializedData GetData( ISaver s )
+        public SerializedData GetData( IReverseReferenceMap s )
         {
             return new SerializedObject()
             {
@@ -214,7 +214,7 @@ namespace KSS.Core
             };
         }
 
-        public void SetData( ILoader l, SerializedData data )
+        public void SetData( IForwardReferenceMap l, SerializedData data )
         {
             if( data.TryGetValue( "ut", out var ut ) )
                 UT = ut;

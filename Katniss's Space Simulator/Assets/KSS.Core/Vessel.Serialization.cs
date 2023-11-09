@@ -10,7 +10,7 @@ namespace KSS.Core
 {
     public sealed partial class Vessel : IPersistent
     {
-        public SerializedData GetData( ISaver s )
+        public SerializedData GetData( IReverseReferenceMap s )
         {
             return new SerializedObject()
             {
@@ -20,7 +20,7 @@ namespace KSS.Core
             };
         }
 
-        public void SetData( ILoader l, SerializedData data )
+        public void SetData( IForwardReferenceMap l, SerializedData data )
         {
             if( data.TryGetValue( "display_name", out var displayName ) )
                 this.DisplayName = (string)displayName;

@@ -17,7 +17,7 @@ namespace KSS.Core.Components
         [field: SerializeField]
         public string PartID { get; set; }
 
-        public SerializedData GetData( ISaver s )
+        public SerializedData GetData( IReverseReferenceMap s )
         {
             return new SerializedObject()
             {
@@ -25,7 +25,7 @@ namespace KSS.Core.Components
             };
         }
 
-        public void SetData( ILoader l, SerializedData data )
+        public void SetData( IForwardReferenceMap l, SerializedData data )
         {
             if( data.TryGetValue( "part_id", out var partId ) )
                 this.PartID = (string)partId;

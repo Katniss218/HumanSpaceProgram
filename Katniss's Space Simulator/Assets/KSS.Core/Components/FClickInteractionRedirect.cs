@@ -20,7 +20,7 @@ namespace KSS.Core.Components
         [field: SerializeField]
         public GameObject Target { get; set; }
 
-        public SerializedData GetData( ISaver s )
+        public SerializedData GetData( IReverseReferenceMap s )
         {
             return new SerializedObject()
             {
@@ -28,7 +28,7 @@ namespace KSS.Core.Components
             };
         }
 
-        public void SetData( ILoader l, SerializedData data )
+        public void SetData( IForwardReferenceMap l, SerializedData data )
         {
             if( data.TryGetValue( "target", out var target ) )
                 this.Target = (GameObject)l.ReadObjectReference( target );

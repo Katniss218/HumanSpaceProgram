@@ -177,7 +177,7 @@ namespace KSS.Core.Physics
             _rb.isKinematic = true; // Rigidbody doesn't have `enabled`, so we set it to kinematic.
         }
 
-        public SerializedData GetData( ISaver s )
+        public SerializedData GetData( IReverseReferenceMap s )
         {
             return new SerializedObject()
             {
@@ -189,7 +189,7 @@ namespace KSS.Core.Physics
             };
         }
 
-        public void SetData( ILoader l, SerializedData data )
+        public void SetData( IForwardReferenceMap l, SerializedData data )
         {
             if( data.TryGetValue( "mass", out var mass ) )
                 this.Mass = (float)mass;

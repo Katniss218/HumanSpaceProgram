@@ -187,7 +187,7 @@ namespace KSS.Core.ResourceFlowSystem
             return new SubstanceStateCollection( _substances?.ToArray() );
         }
 
-        public SerializedData GetData( ISaver s )
+        public SerializedData GetData( IReverseReferenceMap s )
         {
             SerializedArray arr = new SerializedArray();
 
@@ -197,7 +197,7 @@ namespace KSS.Core.ResourceFlowSystem
             return arr;
         }
 
-        public void SetData( ILoader l, SerializedData data )
+        public void SetData( IForwardReferenceMap l, SerializedData data )
         {
             this._substances.Clear();
             foreach( var sbsD in (SerializedArray)data )

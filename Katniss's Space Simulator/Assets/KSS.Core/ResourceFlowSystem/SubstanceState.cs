@@ -38,7 +38,7 @@ namespace KSS.Core.ResourceFlowSystem
             this.MassAmount = massAmount;
         }
 
-        public SerializedData GetData( ISaver s )
+        public SerializedData GetData( IReverseReferenceMap s )
         {
             return new SerializedObject()
             {
@@ -47,7 +47,7 @@ namespace KSS.Core.ResourceFlowSystem
             };
         }
 
-        public void SetData( ILoader l, SerializedData data )
+        public void SetData( IForwardReferenceMap l, SerializedData data )
         {
             Substance = l.ReadAssetReference<Substance>( data["substance"] );
             MassAmount = (float)data["mass_amount"];

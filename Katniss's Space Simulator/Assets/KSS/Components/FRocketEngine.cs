@@ -88,7 +88,7 @@ namespace KSS.Components
             return FluidState.Vacuum; // temp, inlet condition (possible backflow, etc).
         }
 
-        public SerializedData GetData( ISaver s )
+        public SerializedData GetData( IReverseReferenceMap s )
         {
             return new SerializedObject()
             {
@@ -99,7 +99,7 @@ namespace KSS.Components
             };
         }
 
-        public void SetData( ILoader l, SerializedData data )
+        public void SetData( IForwardReferenceMap l, SerializedData data )
         {
             if( data.TryGetValue( "max_thrust", out var maxThrust ) )
                 this.MaxThrust = (float)maxThrust;

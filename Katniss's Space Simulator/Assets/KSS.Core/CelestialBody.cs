@@ -94,7 +94,7 @@ namespace KSS.Core
         /// </summary>
         public IReferenceFrame OrientedReferenceFrame => new OrientedReferenceFrame( this.AIRFPosition, this.AIRFRotation );
 
-        public SerializedData GetData( ISaver s )
+        public SerializedData GetData( IReverseReferenceMap s )
         {
             // save cb data itself.
             return new SerializedObject()
@@ -103,7 +103,7 @@ namespace KSS.Core
             };
         }
 
-        public void SetData( ILoader l, SerializedData data )
+        public void SetData( IForwardReferenceMap l, SerializedData data )
         {
 
         }

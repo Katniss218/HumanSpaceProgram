@@ -10,7 +10,7 @@ namespace UnityPlus.Serialization
     /// <summary>
     /// Represents an abstract functionality that can save a collection of objects while persisting their references.
     /// </summary>
-    public interface ISaver
+    public interface ISaver : IReverseReferenceMap
     {
         /// <summary>
         /// The current state of the saver. <br />
@@ -40,25 +40,6 @@ namespace UnityPlus.Serialization
             // This setup lets us know what objects are referenced by something before we start saving those potentially-referenced objects.
             // It also lets us decouple the instances from their data.
         }
-
-        bool TryGetID( object obj, out Guid id );
-
-        /// <summary>
-        /// Registers the specified object in the registry (if not registered already) under a random ID, and returns its reference ID.
-        /// </summary>
-        /// <remarks>
-        /// Call this to map an object to an ID when saving an object reference.
-        /// </remarks>
-        Guid GetReferenceID( object obj );
-
-        /// <summary>
-        /// Registers the specified object in the registry (if not registered already) under a specific ID.
-        /// </summary>
-        /// <remarks>
-        /// Call this to map an object to an ID when saving an object reference. <br />
-        /// For reference safety, the user should always use the return value instead of the input parameter, because the object might've been already registered under a different ID.
-        /// </remarks>
-        Guid GetReferenceID( object obj, Guid guid );
     }
 
     /// <summary>

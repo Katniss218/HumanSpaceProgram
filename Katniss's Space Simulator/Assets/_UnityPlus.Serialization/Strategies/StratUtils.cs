@@ -17,7 +17,7 @@ namespace UnityPlus.Serialization.Strategies
             {
                 objects.Add( new SerializedObject()
                 {
-                    { KeyNames.REF, s.WriteGuid( s.GetReferenceID( obj ) ) },
+                    { KeyNames.REF, s.WriteGuid( s.GetID( obj ) ) },
                     { "data", data }
                 } );
             }
@@ -30,7 +30,7 @@ namespace UnityPlus.Serialization.Strategies
             {
                 objects.Add( new SerializedObject()
                 {
-                    { KeyNames.REF, s.WriteGuid( s.GetReferenceID( obj ) ) },
+                    { KeyNames.REF, s.WriteGuid( s.GetID( obj ) ) },
                     { "data", data },
                     { "children_ids", childrenPaths }
                 } );
@@ -48,7 +48,7 @@ namespace UnityPlus.Serialization.Strategies
 
                 var refObj = go.GetComponentOrGameObject( path );
 
-                l.SetReferenceID( refObj, id );
+                l.SetObj( id, refObj );
             }
         }
 
@@ -143,7 +143,7 @@ namespace UnityPlus.Serialization.Strategies
 
             foreach( var comp in go.GetComponents() )
             {
-                Guid id = s.GetReferenceID( comp );
+                Guid id = s.GetID( comp );
                 SerializedObject compObj = new SerializedObject()
                 {
                     { KeyNames.ID, s.WriteGuid(id) },
@@ -170,7 +170,7 @@ namespace UnityPlus.Serialization.Strategies
                 return;
             }
 
-            Guid objectGuid = s.GetReferenceID( go );
+            Guid objectGuid = s.GetID( go );
 
             // recursive.
             SerializedObject obj = new SerializedObject()
@@ -244,7 +244,7 @@ namespace UnityPlus.Serialization.Strategies
             Guid objectGuid = l.ReadGuid( goJson[KeyNames.ID] );
 
             GameObject go = new GameObject();
-            l.SetReferenceID( go, objectGuid );
+            l.SetObj( objectGuid, go );
 
             if( parent != null )
             {
@@ -266,7 +266,7 @@ namespace UnityPlus.Serialization.Strategies
                         b.enabled = false;
                         behsUGLYDONTDOTHIS?.Add( b );
                     }
-                    l.SetReferenceID( co, compID );
+                    l.SetObj( compID, co );
                 }
                 catch( Exception ex )
                 {
@@ -298,7 +298,7 @@ namespace UnityPlus.Serialization.Strategies
             // If it's a gameobject or a component on a gameobject, apply the data to it.
 
             Guid id = l.ReadGuid( dataElement[KeyNames.REF] );
-            object obj = l.Get( id );
+            object obj = l.GetObj( id );
 
             switch( obj )
             {

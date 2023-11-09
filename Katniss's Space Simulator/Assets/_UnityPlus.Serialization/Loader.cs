@@ -57,34 +57,19 @@ namespace UnityPlus.Serialization
             _guidToObject.Clear();
         }
 
-        /// <summary>
-        /// Registers the specified object with the specified ID.
-        /// </summary>
-        /// <remarks>
-        /// Call this method when loading an object that might be referenced.
-        /// </remarks>
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public void SetReferenceID( object obj, Guid id )
+        public bool TryGetObj( Guid id, out object obj )
         {
-            if( _currentState != ILoader.State.LoadingObjects )
-            {
-                throw new InvalidOperationException( $"You can only set an ID while creating the objects. Please move the functionality to an object action" );
-            }
-
             if( id == Guid.Empty )
-                return;
-
-            _guidToObject.Add( id, obj );
+            {
+                obj = null;
+                return false;
+            }
+            return _guidToObject.TryGetValue( id, out obj );
         }
 
-        /// <summary>
-        /// Returns the previously registered object.
-        /// </summary>
-        /// <remarks>
-        /// Call this method to deserialize a previously loaded object reference.
-        /// </remarks>
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public object Get( Guid id )
+        public object GetObj( Guid id )
         {
             if( id == Guid.Empty )
                 return null;
@@ -98,21 +83,32 @@ namespace UnityPlus.Serialization
             return null;
         }
 
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public void SetObj( Guid id, object obj )
+        {
+            if( _currentState != ILoader.State.LoadingObjects )
+            {
+                throw new InvalidOperationException( $"You can only set an ID while creating the objects. Please move the functionality to an object action" );
+            }
+
+            if( id == Guid.Empty )
+                return;
+
+            _guidToObject.Add( id, obj );
+        }
+
         //
         //  -- -- -- --
         //
 
-        /// <summary>
-        /// Performs a load from the current path, and with the current save actions.
-        /// </summary>
         public void Load()
         {
 #if DEBUG
             Debug.Log( "Loading..." );
 #endif
-            _startFunc?.Invoke();
-            ClearReferenceRegistry();
             _currentState = ILoader.State.LoadingObjects;
+            ClearReferenceRegistry();
+            _startFunc?.Invoke();
 
             // Create objects first, since data will reference them, so they must exist to be dereferenced.
             foreach( var action in _objectActions )
@@ -127,12 +123,12 @@ namespace UnityPlus.Serialization
                 action?.Invoke( this );
             }
 
+            _finishFunc?.Invoke();
             ClearReferenceRegistry();
             _currentState = ILoader.State.Idle;
 #if DEBUG
             Debug.Log( "Finished Loading" );
 #endif
-            _finishFunc?.Invoke();
         }
     }
 }

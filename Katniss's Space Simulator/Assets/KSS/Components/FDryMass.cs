@@ -26,7 +26,7 @@ namespace KSS.Components
 
         public event IHasMass.MassChange OnAfterMassChanged = null;
 
-        public SerializedData GetData( ISaver s )
+        public SerializedData GetData( IReverseReferenceMap s )
         {
             return new SerializedObject()
             {
@@ -35,7 +35,7 @@ namespace KSS.Components
             };
         }
 
-        public void SetData( ILoader l, SerializedData data )
+        public void SetData( IForwardReferenceMap l, SerializedData data )
         {
             if( data.TryGetValue( "mass", out var mass ) )
                 this._mass = (float)mass;

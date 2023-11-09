@@ -56,12 +56,12 @@ namespace KSS.Core
             _groups.Remove(existing);
         }
 
-        public SerializedData GetData( ISaver s )
+        public SerializedData GetData( IReverseReferenceMap s )
         {
             throw new System.NotImplementedException();
         }
 
-        public void SetData( ILoader l, SerializedData data )
+        public void SetData( IForwardReferenceMap l, SerializedData data )
         {
             throw new System.NotImplementedException();
         }

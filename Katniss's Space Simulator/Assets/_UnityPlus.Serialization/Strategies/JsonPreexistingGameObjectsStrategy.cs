@@ -160,7 +160,7 @@ namespace UnityPlus.Serialization.Strategies
                     continue;
                 }
 
-                l.SetReferenceID( go, guidComp.GetPersistentGuid() );
+                l.SetObj( guidComp.GetPersistentGuid(), go );
 
                 yield return null;
             }
@@ -173,7 +173,7 @@ namespace UnityPlus.Serialization.Strategies
             {
                 Guid objectGuid = l.ReadGuid( goData[KeyNames.ID] );
                 SerializedArray refChildren = (SerializedArray)goData["children_ids"];
-                StratUtils.AssignIDsToReferencedChildren( l, (GameObject)l.Get( objectGuid ), ref refChildren );
+                StratUtils.AssignIDsToReferencedChildren( l, (GameObject)l.GetObj( objectGuid ), ref refChildren );
 
                 yield return null;
             }

@@ -20,15 +20,15 @@ namespace KSS.Components
         [ControlOut( "steer.y", "Steer Y" )]
         public event Action<float> SteerY;
 
-
-        public void SetData( ILoader l, SerializedData data )
+        public SerializedData GetData( IReverseReferenceMap s )
         {
             throw new NotImplementedException();
         }
 
-        public SerializedData GetData( ISaver s )
+        public void SetData( IForwardReferenceMap l, SerializedData data )
         {
             throw new NotImplementedException();
         }
+
     }
 }

@@ -51,7 +51,7 @@ namespace UnityPlus.Serialization.Strategies
 
         private static SerializedObject WriteAssetGameObject( ISaver s, GameObject go, ClonedGameObject cbf )
         {
-            Guid objectGuid = s.GetReferenceID( go );
+            Guid objectGuid = s.GetID( go );
 
             SerializedArray sArr = new SerializedArray();
             StratUtils.WriteReferencedChildrenRecursive( s, go, ref sArr, "" );
@@ -79,7 +79,7 @@ namespace UnityPlus.Serialization.Strategies
 
             GameObject go = ClonedGameObject.Instantiate( prefab ); // assumes the asset is immutable and needs to be cloned. God knows if this preserves lambdas and other non-serializable fields.
 
-            l.SetReferenceID( go, objectGuid );
+            l.SetObj( objectGuid, go );
 
             SerializedArray refChildren = (SerializedArray)goJson["children_ids"];
             StratUtils.AssignIDsToReferencedChildren( l, go, ref refChildren );

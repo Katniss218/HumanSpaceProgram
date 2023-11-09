@@ -126,7 +126,7 @@ namespace KSS.Core.ReferenceFrames
             UpdateSceneRotation();
         }
 
-        public SerializedData GetData( ISaver s )
+        public SerializedData GetData( IReverseReferenceMap s )
         {
             return new SerializedObject()
             {
@@ -135,7 +135,7 @@ namespace KSS.Core.ReferenceFrames
             };
         }
 
-        public void SetData( ILoader l, SerializedData data )
+        public void SetData( IForwardReferenceMap l, SerializedData data )
         {
             if( data.TryGetValue( "airf_position", out var airfPosition ) )
                 this.AIRFPosition = l.ReadVector3Dbl( airfPosition );

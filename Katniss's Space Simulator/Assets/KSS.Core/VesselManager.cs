@@ -55,7 +55,7 @@ namespace KSS.Core
             instance._vessels.Remove( vessel );
         }
 
-        public SerializedData GetData( ISaver s )
+        public SerializedData GetData( IReverseReferenceMap s )
         {
             return new SerializedObject()
             {
@@ -63,7 +63,7 @@ namespace KSS.Core
             };
         }
 
-        public void SetData( ILoader l, SerializedData data )
+        public void SetData( IForwardReferenceMap l, SerializedData data )
         {
             if( data.TryGetValue( "active_vessel", out var activeVessel ) )
                 ActiveVessel = (Vessel)l.ReadObjectReference( activeVessel );

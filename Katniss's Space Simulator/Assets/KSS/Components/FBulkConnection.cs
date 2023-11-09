@@ -62,7 +62,7 @@ namespace KSS.Components
                 return (this._objC, this._objP);
             }
 
-            public SerializedData GetData( ISaver s )
+            public SerializedData GetData( IReverseReferenceMap s )
             {
                 return new SerializedObject()
                 {
@@ -73,7 +73,7 @@ namespace KSS.Components
                 };
             }
 
-            public void SetData( ILoader l, SerializedData data )
+            public void SetData( IForwardReferenceMap l, SerializedData data )
             {
                 if( data.TryGetValue( "obj_c", out var objC ) )
                     this._objC = (IResourceConsumer)l.ReadObjectReference( objC );
@@ -274,7 +274,7 @@ namespace KSS.Components
             oldSceneAcceleration = sceneAcceleration;
         }
 
-        public SerializedData GetData( ISaver s )
+        public SerializedData GetData( IReverseReferenceMap s )
         {
             return new SerializedObject()
             {
@@ -284,7 +284,7 @@ namespace KSS.Components
             };
         }
 
-        public void SetData( ILoader l, SerializedData data )
+        public void SetData( IForwardReferenceMap l, SerializedData data )
         {
             if( data.TryGetValue( "end1", out var end1 ) )
                 this.End1.SetData( l, end1 );

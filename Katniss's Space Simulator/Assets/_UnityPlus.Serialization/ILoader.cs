@@ -11,7 +11,7 @@ namespace UnityPlus.Serialization
     /// <summary>
     /// Represents an abstract functionality that can load a collection of objects while persisting their references.
     /// </summary>
-    public interface ILoader
+    public interface ILoader : IForwardReferenceMap
     {
         /// <summary>
         /// The current state of the loader. <br />
@@ -42,23 +42,6 @@ namespace UnityPlus.Serialization
 
             // It lets us do that without hacking some system together, that loads objects as the references are resolved, and also allows circular referencing.
         }
-
-        /// <summary>
-        /// Registers the specified object with the specified ID.
-        /// </summary>
-        /// <remarks>
-        /// Call this method when loading an object that might be referenced. <br />
-        /// Implementations should throw an exception if the object is already registered.
-        /// </remarks>
-        void SetReferenceID( object obj, Guid id );
-
-        /// <summary>
-        /// Returns the previously registered object.
-        /// </summary>
-        /// <remarks>
-        /// Call this method to deserialize a previously loaded object reference.
-        /// </remarks>
-        public object Get( Guid id );
     }
 
     /// <summary>

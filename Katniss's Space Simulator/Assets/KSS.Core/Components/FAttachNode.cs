@@ -72,7 +72,7 @@ namespace KSS.Core.Components
             Gizmos.DrawLine( this.transform.position, this.transform.position + this.transform.forward * this.Range );
         }
 
-        public SerializedData GetData( ISaver s )
+        public SerializedData GetData( IReverseReferenceMap s )
         {
             return new SerializedObject()
             {
@@ -80,7 +80,7 @@ namespace KSS.Core.Components
             };
         }
 
-        public void SetData( ILoader l, SerializedData data )
+        public void SetData( IForwardReferenceMap l, SerializedData data )
         {
             if( data.TryGetValue( "range", out var range ) )
                 this.Range = (float)range;

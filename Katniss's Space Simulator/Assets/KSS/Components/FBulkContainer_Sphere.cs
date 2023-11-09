@@ -116,7 +116,7 @@ namespace KSS.Components
             OnAfterMassChanged?.Invoke( this.Mass - oldMass );
         }
 
-        public SerializedData GetData( ISaver s )
+        public SerializedData GetData( IReverseReferenceMap s )
         {
             return new SerializedObject()
             {
@@ -127,7 +127,7 @@ namespace KSS.Components
             };
         }
 
-        public void SetData( ILoader l, SerializedData data )
+        public void SetData( IForwardReferenceMap l, SerializedData data )
         {
             if( data.TryGetValue( "volume_transform", out var volumeTransform ) )
                 this.VolumeTransform = (Transform)l.ReadObjectReference( volumeTransform );
