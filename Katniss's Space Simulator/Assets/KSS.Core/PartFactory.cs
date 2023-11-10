@@ -42,35 +42,6 @@ namespace KSS.Core
             this.Source = source;
         }
 
-#warning TODO - modify it so that you first create a vessel/building and then add parts to it.
-        public Transform CreateRoot( Vessel vessel )
-        {
-            if( vessel.RootPart != null )
-            {
-                throw new InvalidOperationException( $"The vessel '{vessel}' already has a root part." );
-            }
-
-            Transform part = Source.Instantiate( vessel.transform, Vector3.zero, Quaternion.identity );
-
-            vessel.SetRootPart( part );
-            vessel.RecalculateParts();
-
-            return part;
-        }
-        public Transform CreateRoot( Building building )
-        {
-            if( building.RootPart != null )
-            {
-                throw new InvalidOperationException( $"The building '{building}' already has a root part." );
-            }
-
-            Transform part = Source.Instantiate( building.transform, Vector3.zero, Quaternion.identity );
-
-            building.SetRootPart( part );
-
-            return part;
-        }
-
         public Transform Create( Transform parent, Vector3 localPosition, Quaternion localRotation )
         {
             if( parent == null )
@@ -83,7 +54,7 @@ namespace KSS.Core
 
             //part.Parent = parent;
             //part.Parent.Children.Add( part );
-            part.GetVessel().RecalculateParts();
+            part.GetVessel()?.RecalculateParts();
             return part;
         }
 

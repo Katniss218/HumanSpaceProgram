@@ -14,6 +14,7 @@ using KSS.AssetLoaders.GameData;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.Strategies;
 using System.IO;
+using System.Collections;
 
 namespace KSS.DevUtils
 {
@@ -55,7 +56,7 @@ namespace KSS.DevUtils
         }
 
         static Building launchSite;
-        static GameObject vessel;
+        static Vessel vessel;
 
         [HSPEventListener( HSPEvent.STARTUP_IMMEDIATELY, "devutils.load_game_data" )]
         static void LoadGameData( object e )
@@ -73,11 +74,11 @@ namespace KSS.DevUtils
             PartFactory launchSitePart = new PartFactory( new AssetPartSource( "builtin::Resources/Prefabs/testlaunchsite" ) );
             launchSite = BuildingFactory.CreatePartless( body, localPos, Quaternion.FromToRotation( Vector3.up, localPos.normalized ) );
 
-            Transform root = launchSitePart.CreateRoot( launchSite );
+            Transform root = launchSitePart.Create( launchSite.transform, Vector3.zero, Quaternion.identity );
 
             var v = CreateVessel( launchSite );
             ActiveObjectManager.ActiveObject = v.RootPart.GetVessel().gameObject;
-            vessel = v.gameObject;
+            vessel = v;
         }
 
         static Vessel CreateVessel( Building launchSite )
@@ -103,6 +104,41 @@ namespace KSS.DevUtils
 
         private void Update()
         {
+            if( Input.GetKeyDown( KeyCode.F4 ) )
+            {
+                JsonSeparateFileSerializedDataHandler _designObjDataHandler = new JsonSeparateFileSerializedDataHandler();
+                JsonSingleExplicitHierarchyStrategy _designObjStrategy = new JsonSingleExplicitHierarchyStrategy( _designObjDataHandler, () => null );
+
+                VesselMetadata loadedVesselMetadata = new VesselMetadata( "vessel2" );
+                loadedVesselMetadata.ReadDataFromDisk();
+
+                // load current vessel from the files defined by metadata's ID.
+                Directory.CreateDirectory( loadedVesselMetadata.GetRootDirectory() );
+                _designObjDataHandler.ObjectsFilename = Path.Combine( loadedVesselMetadata.GetRootDirectory(), "objects.json" );
+                _designObjDataHandler.DataFilename = Path.Combine( loadedVesselMetadata.GetRootDirectory(), "data.json" );
+
+                HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_BEFORE_LOAD, null );
+
+                Loader _loader = new Loader( null, null, new Action<ILoader>[] { _designObjStrategy.Load_Object }, new Action<ILoader>[] { _designObjStrategy.Load_Data } );
+
+                _loader.Load();
+
+                FLaunchSiteMarker launchSiteSpawner = launchSite.gameObject.GetComponentInChildren<FLaunchSiteMarker>();
+                Vector3Dbl spawnerPosAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( launchSiteSpawner.transform.position );
+                QuaternionDbl spawnerRotAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( launchSiteSpawner.transform.rotation );
+
+                Vessel v2 = VesselFactory.CreatePartless( spawnerPosAirf, spawnerRotAirf, Vector3.zero, Vector3.zero );
+
+                v2.RootPart = _designObjStrategy.LastSpawnedRoot.transform;
+                v2.RootPart.localPosition = Vector3.zero;
+                v2.RootPart.localRotation = Quaternion.identity;
+
+                Vector3 bottomBoundPos = v2.GetBottomPosition();
+                Vector3Dbl closestBoundAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( bottomBoundPos );
+                Vector3Dbl closestBoundToVesselAirf = v2.AIRFPosition - closestBoundAirf;
+                Vector3Dbl airfPos = spawnerPosAirf + closestBoundToVesselAirf;
+                v2.AIRFPosition = airfPos;
+            }
             if( Input.GetKeyDown( KeyCode.F5 ) )
             {
                 CreateVessel( launchSite );
@@ -115,6 +151,18 @@ namespace KSS.DevUtils
 
                 string gameDataPath = HumanSpaceProgram.GetGameDataDirectoryPath();
                 string partDir;
+
+                VesselMetadata vm;
+                partDir = HumanSpaceProgram.GetSavedVesselsDirectoryPath() + "/vessel";
+                Directory.CreateDirectory( partDir );
+                vm = new VesselMetadata( "vessel" );
+                vm.Name = "Engine"; vm.Description = "default"; vm.Author = "Katniss";
+                vm.WriteToDisk();
+                strat.RootObjectGetter = () => vessel.RootPart.gameObject;
+                handler.ObjectsFilename = partDir + "/objects.json";
+                handler.DataFilename = partDir + "/data.json";
+                saver.Save();
+
                 PartMetadata pm;
 
                 partDir = gameDataPath + "/Vanilla/Parts/part.engine";
@@ -170,13 +218,14 @@ namespace KSS.DevUtils
             PartFactory engine = new PartFactory( new AssetPartSource( "builtin::Resources/Prefabs/Parts/part.engine" ) );
 
             Vessel v = VesselFactory.CreatePartless( airfPosition, rotation, Vector3.zero, Vector3.zero );
-            Transform root = intertank.CreateRoot( v );
+            Transform root = intertank.Create( v.transform, Vector3.zero, Quaternion.identity );
 
             Transform tankP = tank.Create( root, new Vector3( 0, -1.625f, 0 ), Quaternion.identity );
             Transform tankL1 = tankLong.Create( root, new Vector3( 0, 2.625f, 0 ), Quaternion.identity );
             Transform t1 = tankLong.Create( root, new Vector3( 2, 2.625f, 0 ), Quaternion.identity );
             Transform t2 = tankLong.Create( root, new Vector3( -2, 2.625f, 0 ), Quaternion.identity );
             Transform engineP = engine.Create( tankP, new Vector3( 0, -3.45533f, 0 ), Quaternion.identity );
+            v.RootPart = root;
 
             FBulkConnection conn = tankP.gameObject.AddComponent<FBulkConnection>();
             conn.End1.ConnectTo( tankL1.GetComponent<FBulkContainer_Sphere>() );

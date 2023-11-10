@@ -21,19 +21,44 @@ namespace KSS.UI
         [HSPEventListener( HSPEvent.GAMEPLAY_AFTER_VESSEL_REGISTERED, "vanilla.vessel_huds" )]
         static void OnVesselRegistered( Vessel vessel )
         {
-            var hud = VesselHUD.Create( CanvasManager.Get( CanvasName.BACKGROUND ), new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_new" ), vessel );
-            instance._huds.Add( hud );
+            if( ActiveObjectManager.ActiveObject == null )
+            {
+                var hud = VesselHUD.Create( CanvasManager.Get( CanvasName.BACKGROUND ), new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_new" ), vessel );
+                instance._huds.Add( hud );
+            }
         }
 
         [HSPEventListener( HSPEvent.GAMEPLAY_AFTER_VESSEL_UNREGISTERED, "vanilla.vessel_huds" )]
         static void OnVesselUnregistered( Vessel vessel )
         {
-            foreach( var hud in instance._huds )
+            foreach( var hud in instance._huds.ToArray() )
             {
                 if( hud.Vessel == vessel )
                 {
                     Destroy( hud.gameObject ); // hud can be null if exiting a scene - it doesn't affect anything, but gives ugly warnings.
+                    instance._huds.Remove( hud );
                 }
+            }
+        }
+
+        [HSPEventListener( HSPEvent.GAMEPLAY_AFTER_ACTIVE_OBJECT_CHANGE, "vanilla.vessel_huds" )]
+        static void OnActiveObjectChanged()
+        {
+            if( ActiveObjectManager.ActiveObject == null )
+            {
+                foreach( var vessel in VesselManager.GetLoadedVessels() )
+                {
+                    var hud = VesselHUD.Create( CanvasManager.Get( CanvasName.BACKGROUND ), new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_new" ), vessel );
+                    instance._huds.Add( hud );
+                }
+            }
+            else
+            {
+                foreach( var hud in instance._huds )
+                {
+                    Destroy( hud.gameObject );
+                }
+                instance._huds.Clear();
             }
         }
     }

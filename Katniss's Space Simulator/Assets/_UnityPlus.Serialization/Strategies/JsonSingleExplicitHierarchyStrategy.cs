@@ -137,6 +137,10 @@ namespace UnityPlus.Serialization.Strategies
 
             // Cleanup Stage. \/
 
+            foreach( var beh in this.behsToReenable )
+                beh.enabled = true;
+            this.behsToReenable = new List<Behaviour>();
+
             this._objects = null;
             this._data = null;
         }

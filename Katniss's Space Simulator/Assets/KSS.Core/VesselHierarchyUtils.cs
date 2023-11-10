@@ -90,7 +90,7 @@ namespace KSS.Core
             Contract.Assert( oldRoot.IsRootOfVessel() );
             Contract.Assert( !newRoot.IsRootOfVessel() );
 
-            newRoot.GetVessel().SetRootPart( newRoot );
+            newRoot.GetVessel().RootPart = newRoot;
             Reattach( oldRoot, newRoot );
             //newRoot.Parent.Children.Remove( newRoot ); // since it's not a root, it will have a parent.
             //newRoot.Parent = null;
@@ -119,7 +119,7 @@ namespace KSS.Core
             Contract.Assert( partToJoin.IsRootOfVessel() );
 
             Vessel oldVessel = partToJoin.GetVessel();
-            oldVessel.SetRootPart( null ); // needed for the assert in the next method.
+            oldVessel.RootPart = null; // needed for the assert in the next method.
 
             JoinVesselsNotRoot( partToJoin, parent );
 
@@ -175,7 +175,8 @@ namespace KSS.Core
 
                 partToSplit.SetParent( b.transform );
                 //partToSplit.SetVesselRecursive( v );
-                b.SetRootPart( partToSplit );
+                b.RootPart = partToSplit;
+#warning TODO - after changing to RootPart = value, the recalculate parts might not be needed. also move recalculation if the root was already in a vessel
                 oldv.RecalculateParts();
                 //b.RecalculateParts();
             }
@@ -190,7 +191,7 @@ namespace KSS.Core
 
                 partToSplit.SetParent( v.transform );
                 //partToSplit.SetVesselRecursive( v );
-                v.SetRootPart( partToSplit );
+                v.RootPart = partToSplit;
                 oldv.RecalculateParts();
                 v.RecalculateParts();
 

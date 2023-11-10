@@ -12,7 +12,8 @@ namespace KSS.DevUtils
     {
         private void Update()
         {
-            this.transform.rotation = (Quaternion)SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformRotation( QuaternionDbl.identity );
+            if( SceneReferenceFrameManager.SceneReferenceFrame != null )
+                this.transform.rotation = (Quaternion)SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformRotation( QuaternionDbl.identity );
         }
     }
 }

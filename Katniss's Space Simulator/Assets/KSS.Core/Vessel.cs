@@ -46,25 +46,24 @@ namespace KSS.Core
             set { _displayName = value; this.gameObject.name = value; }
         }
 
-        [field: SerializeField]
-        public Transform RootPart { get; private set; }
+        [SerializeField]
+        Transform _rootPart;
+        public Transform RootPart
+        {
+            get => _rootPart;
+            set
+            {
+                if( _rootPart != null )
+                    _rootPart.SetParent( null );
+                _rootPart = value;
+                if( _rootPart != null )
+                    _rootPart.SetParent( this.transform );
+                RecalculateParts();
+            }
+        }
 
         public PhysicsObject PhysicsObject { get; private set; }
         public RootObjectTransform RootObjTransform { get; private set; }
-
-        /// <remarks>
-        /// DO NOT USE. This is for internal use, and can produce an invalid state. Use <see cref="VesselHierarchyUtils.SetParent(Transform, Transform)"/> instead.
-        /// </remarks>
-        [Obsolete( "This is for internal use, and can produce an invalid state." )]
-        internal void SetRootPart( Transform part )
-        {
-            if( part != null && part.GetVessel() != this )
-            {
-                throw new ArgumentException( $"Can't set the part '{part}' from vessel '{part.GetVessel()}' as root. The part is not a part of this vessel." );
-            }
-
-            RootPart = part;
-        }
 
 #warning TODO - Vessels' position sometimes glitches out when far away from the origin. Setting the rigidbody to kinematic fixes the issue, which suggests that it is caused by a collision response.
         // Possibly a response to newly unsubdivided planet LOD quad.
