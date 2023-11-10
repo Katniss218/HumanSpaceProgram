@@ -128,6 +128,9 @@ namespace KSS.Core
         // gameplay scene runtime events
 
         public const string GAMEPLAY_AFTER_ACTIVE_OBJECT_CHANGE = NAMESPACE_VANILLA + ".gameplayscene.after_activeobj_changed";
+
+        public const string GAMEPLAY_AFTER_VESSEL_REGISTERED = NAMESPACE_VANILLA + ".gameplayscene.after_vessel_created";
+        public const string GAMEPLAY_AFTER_VESSEL_UNREGISTERED = NAMESPACE_VANILLA + ".gameplayscene.after_vessel_destroyed";
         // ---
     }
 }

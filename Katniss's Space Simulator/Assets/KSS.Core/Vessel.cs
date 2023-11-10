@@ -199,6 +199,7 @@ namespace KSS.Core
 
             Vector3Dbl airfGravityForce = GravityUtils.GetGravityForce( this.AIRFPosition, PhysicsObject.Mass );
 
+#warning TODO - Put on rails if too far from the active object.
             PhysicsObject.AddForce( (Vector3)airfGravityForce );
 
 

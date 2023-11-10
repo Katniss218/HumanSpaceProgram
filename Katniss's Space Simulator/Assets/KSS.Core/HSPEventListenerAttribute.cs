@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,27 +33,92 @@ namespace KSS.Core
         // ---
         //
 
-        private static bool IsValidMethodSignature( MethodInfo method )
+        enum ListenerType
         {
-            // TODO - Potentially, this could check the type of the method against the type of the event in the future. To make it type-safe, without the `object` box.
+            Invalid = 0,
+            ParameterDirect,
+            ParameterDowncasted,
+            Parameterless
+        }
+
+        /// <summary>
+        /// Checks if the signature is valid, and the type of listener to generate for the given signature.
+        /// </summary>
+        private static ListenerType CheckValidSignatures( MethodInfo method )
+        {
+            if( !method.IsStatic )
+                return ListenerType.Invalid;
+
             ParameterInfo[] parameters = method.GetParameters();
 
-            return parameters.Length == 1
-                && parameters[0].ParameterType == typeof( object )
-                && method.ReturnType == typeof( void );
+            if( parameters.Length > 1 )
+                return ListenerType.Invalid;
+
+            if( parameters.Length == 0 )
+                return ListenerType.Parameterless;
+
+            if( parameters[0].ParameterType == typeof( object ) && method.ReturnType == typeof( void ) )
+                return ListenerType.ParameterDirect;
+
+            if( method.ReturnType == typeof( void ) )
+                return ListenerType.ParameterDowncasted;
+
+            return ListenerType.Invalid;
+        }
+
+        private static Action<object> GenerateLambdaCallingParameterless( MethodInfo targetMethod )
+        {
+            // Generates a lambda that looks like this: `(object o) => targetMethod();`
+            // 150x faster than InvokeDynamic, and doesn't require ugly modifications to the event system itself, not serializable though but we don't need that.
+
+            ParameterExpression parameter = Expression.Parameter( typeof( object ), "o" );
+            MethodCallExpression methodCallExpression = Expression.Call( null, targetMethod );
+
+            return (Action<object>)Expression.Lambda( methodCallExpression, parameter ).Compile();
+        }
+        
+        private static Action<object> GenerateLambdaCallingDowncasted( MethodInfo targetMethod, Type targetType )
+        {
+            // Generates a lambda that looks like this: `(object o) => targetMethod( (targetType)o );`
+            // 150x faster than InvokeDynamic, and doesn't require ugly modifications to the event system itself, not serializable though but we don't need that.
+
+            ParameterExpression parameter = Expression.Parameter( typeof( object ), "o" );
+            UnaryExpression convertExpression = Expression.Convert( parameter, targetType );
+            MethodCallExpression methodCallExpression = Expression.Call( null, targetMethod, convertExpression );
+
+            return (Action<object>)Expression.Lambda( methodCallExpression, parameter ).Compile();
         }
 
         private static void ProcessMethod( IEnumerable<HSPEventListenerAttribute> attrs, MethodInfo method )
         {
             ParameterInfo[] parameters = method.GetParameters();
 
-            if( !IsValidMethodSignature( method ) )
+            ListenerType listenerType = CheckValidSignatures( method );
+            if( listenerType == ListenerType.Invalid )
             {
                 Debug.LogWarning( $"Ignoring a `{nameof( HSPEventListenerAttribute )}` attribute applied to method `{method.Name}` which has an incorrect signature." );
                 return;
             }
 
-            Action<object> methodDelegate = (Action<object>)Delegate.CreateDelegate( typeof( Action<object> ), method );
+            Action<object> methodDelegate;
+
+            if( listenerType == ListenerType.ParameterDirect )
+            {
+                // if signature matches exactly, just call the method itself.
+                methodDelegate = (Action<object>)Delegate.CreateDelegate( typeof( Action<object> ), method );
+            }
+            else if( listenerType == ListenerType.ParameterDowncasted )
+            {
+                methodDelegate = GenerateLambdaCallingDowncasted( method, parameters[0].ParameterType );
+            }
+            else if( listenerType == ListenerType.Parameterless )
+            {
+                methodDelegate = GenerateLambdaCallingParameterless( method );
+            }
+            else // unknown/unsupported type
+            {
+                return;
+            }
 
             foreach( var attr in attrs )
             {

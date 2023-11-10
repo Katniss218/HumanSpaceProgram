@@ -77,10 +77,8 @@ namespace KSS.Core
         }
 
         [HSPEventListener( HSPEvent.TIMELINE_BEFORE_SAVE, HSPEvent.NAMESPACE_VANILLA + ".serialize_celestial_bodies" )]
-        private static void OnBeforeSave( object ee )
+        private static void OnBeforeSave( TimelineManager.SaveEventData e )
         {
-            var e = (TimelineManager.SaveEventData)ee;
-
             Directory.CreateDirectory( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies" ) );
             _celestialBodiesDataHandler.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies", "object.json" );
             _celestialBodiesDataHandler.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies", "data.json" );
@@ -89,10 +87,8 @@ namespace KSS.Core
         }
 
         [HSPEventListener( HSPEvent.TIMELINE_BEFORE_LOAD, HSPEvent.NAMESPACE_VANILLA + ".deserialize_celestial_bodies" )]
-        private static void OnBeforeLoad( object ee )
+        private static void OnBeforeLoad( TimelineManager.LoadEventData e )
         {
-            var e = (TimelineManager.LoadEventData)ee;
-
             Directory.CreateDirectory( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies" ) );
             _celestialBodiesDataHandler.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies", "object.json" );
             _celestialBodiesDataHandler.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies", "data.json" );

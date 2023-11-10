@@ -34,7 +34,8 @@ namespace KSS.Core
                 throw new InvalidSceneManagerException( $"{nameof( VesselManager )} is only available in the gameplay scene." );
 
             instance._vessels.Add( vessel );
-            OnAfterVesselCreated?.Invoke( vessel );
+            HSPEvent.EventManager.TryInvoke( HSPEvent.GAMEPLAY_AFTER_VESSEL_REGISTERED, vessel );
+            //OnAfterVesselCreated?.Invoke( vessel );
         }
 
         internal static void Unregister( Vessel vessel )
@@ -43,11 +44,12 @@ namespace KSS.Core
                 throw new InvalidSceneManagerException( $"{nameof( VesselManager )} is only available in the gameplay scene." );
 
             instance._vessels.Remove( vessel );
-            OnAfterVesselDestroyed?.Invoke( vessel );
+            HSPEvent.EventManager.TryInvoke( HSPEvent.GAMEPLAY_AFTER_VESSEL_UNREGISTERED, vessel );
+            //OnAfterVesselDestroyed?.Invoke( vessel );
         }
 
-        public static event Action<Vessel> OnAfterVesselCreated;
-        public static event Action<Vessel> OnAfterVesselDestroyed;
+        //public static event Action<Vessel> OnAfterVesselCreated;
+        //public static event Action<Vessel> OnAfterVesselDestroyed;
 
         public SerializedData GetData( IReverseReferenceMap s )
         {
@@ -78,10 +80,8 @@ namespace KSS.Core
         }
 
         [HSPEventListener( HSPEvent.TIMELINE_BEFORE_SAVE, HSPEvent.NAMESPACE_VANILLA + ".serialize_vessels" )]
-        private static void OnBeforeSave( object ee )
+        private static void OnBeforeSave( TimelineManager.SaveEventData e )
         {
-            var e = (TimelineManager.SaveEventData)ee;
-
             Directory.CreateDirectory( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels" ) );
             _vesselsDataHandler.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels", "objects.json" );
             _vesselsDataHandler.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels", "data.json" );
@@ -90,10 +90,8 @@ namespace KSS.Core
         }
 
         [HSPEventListener( HSPEvent.TIMELINE_BEFORE_LOAD, HSPEvent.NAMESPACE_VANILLA + ".deserialize_vessels" )]
-        private static void OnBeforeLoad( object ee )
+        private static void OnBeforeLoad( TimelineManager.LoadEventData e )
         {
-            var e = (TimelineManager.LoadEventData)ee;
-
             Directory.CreateDirectory( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels" ) );
             _vesselsDataHandler.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels", "objects.json" );
             _vesselsDataHandler.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels", "data.json" );
