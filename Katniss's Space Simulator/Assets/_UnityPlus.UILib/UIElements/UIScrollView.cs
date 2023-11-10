@@ -17,14 +17,12 @@ namespace UnityPlus.UILib.UIElements
 
         public List<IUIElementChild> Children { get; private set; }
 
-        internal IUIElementContainer _parent;
-        public IUIElementContainer Parent { get => _parent; }
+        public IUIElementContainer Parent { get; private set; }
 
         public LayoutDriver LayoutDriver { get; set; }
 
-        public override void Destroy()
+        void OnDestroy()
         {
-            base.Destroy();
             this.Parent.Children.Remove( this );
         }
 
@@ -54,16 +52,16 @@ namespace UnityPlus.UILib.UIElements
             scrollRect.scrollSensitivity = 30f;
             scrollRect.decelerationRate = 0.5f;
 
-            UIScrollView scrollView = root.AddComponent<UIScrollView>();
+            UIScrollView uiScrollView = root.AddComponent<UIScrollView>();
 
-            scrollView. Children = new List<IUIElementChild>();
-            scrollView._parent = parent;
-            scrollView.Parent.Children.Add( scrollView );
-            scrollView.scrollRectComponent = scrollRect;
-            scrollView.scrollbarHorizontal = null;
-            scrollView.scrollbarVertical = null;
-            scrollView._contents = contentTransform;
-            return scrollView;
+            uiScrollView. Children = new List<IUIElementChild>();
+            uiScrollView.Parent = parent;
+            uiScrollView.Parent.Children.Add( uiScrollView );
+            uiScrollView.scrollRectComponent = scrollRect;
+            uiScrollView.scrollbarHorizontal = null;
+            uiScrollView.scrollbarVertical = null;
+            uiScrollView._contents = contentTransform;
+            return uiScrollView;
         }
     }
 }

@@ -13,16 +13,14 @@ namespace UnityPlus.UILib.UIElements
     {
         internal Image imageComponent;
 
-        internal IUIElementContainer _parent;
-        public IUIElementContainer Parent { get => _parent; }
+        public IUIElementContainer Parent { get; private set; }
 
         public LayoutDriver LayoutDriver { get; set; }
 
         public Sprite Sprite { get => imageComponent.sprite; set => imageComponent.sprite = value; }
 
-        public override void Destroy()
+        void OnDestroy()
         {
-            base.Destroy();
             this.Parent.Children.Remove( this );
         }
 
@@ -35,11 +33,11 @@ namespace UnityPlus.UILib.UIElements
             imageComponent.sprite = icon;
             imageComponent.type = Image.Type.Simple;
 
-            UIIcon iconC = rootGameObject.AddComponent<UIIcon>();
-            iconC._parent = parent;
-            iconC.Parent.Children.Add( iconC );
-            iconC.imageComponent = imageComponent;
-            return iconC;
+            UIIcon uiIcon = rootGameObject.AddComponent<UIIcon>();
+            uiIcon.Parent = parent;
+            uiIcon.Parent.Children.Add( uiIcon );
+            uiIcon.imageComponent = imageComponent;
+            return uiIcon;
         }
     }
 }

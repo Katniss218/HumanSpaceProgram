@@ -47,7 +47,7 @@ namespace KSS.UI
             PartListEntryUI partListEntryUI = uiButton.gameObject.AddComponent<PartListEntryUI>();
             partListEntryUI._part = part;
 
-            uiButton.onClick.AddListener( partListEntryUI.OnClick );
+            uiButton.onClick = partListEntryUI.OnClick;
             return partListEntryUI;
         }
     }

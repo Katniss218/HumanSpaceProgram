@@ -37,11 +37,11 @@ namespace KSS.UI.SceneFactories
             escapeMenuWindow = window.gameObject;
 
             closebutton.gameObject.GetComponent<RectTransformCloser>().CanClose = () => !TimeManager.LockTimescale;
-            closebutton.onClick.AddListener( () =>
+            closebutton.onClick = () =>
             {
                 if( !TimeManager.LockTimescale )
                     TimeManager.Unpause();
-            } );
+            };
 
             window.AddButton( UILayoutInfo.FillHorizontal( 50, 50, 1, -50, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ), null )
                 .Disabled()

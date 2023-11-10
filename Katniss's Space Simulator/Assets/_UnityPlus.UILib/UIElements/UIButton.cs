@@ -16,20 +16,31 @@ namespace UnityPlus.UILib.UIElements
 
         public List<IUIElementChild> Children { get; private set; }
 
-        internal IUIElementContainer _parent;
-        public IUIElementContainer Parent { get => _parent; }
+        public IUIElementContainer Parent { get; private set; }
 
         public LayoutDriver LayoutDriver { get; set; }
 
-        public override void Destroy()
+        void OnDestroy()
         {
-            base.Destroy();
-            _parent.Children.Remove( this );
+            this.Parent.Children.Remove( this );
         }
 
         public Sprite Background { get => backgroundComponent.sprite; set => backgroundComponent.sprite = value; }
 
-        public UnityEvent onClick => buttonComponent.onClick;
+        Action _onClick;
+        public Action onClick
+        {
+            get => _onClick;
+            set
+            {
+                buttonComponent.onClick.RemoveAllListeners();
+                _onClick = value;
+                if( _onClick != null )
+                {
+                    buttonComponent.onClick.AddListener( () => _onClick() ); // Find a way to cast System.Action to UnityAction if possible (the signatures of both delegates match).
+                }
+            }
+        }
 
         public static UIButton Create( IUIElementContainer parent, UILayoutInfo layout, Sprite sprite, Action onClick )
         {
@@ -54,19 +65,15 @@ namespace UnityPlus.UILib.UIElements
             };
             buttonComponent.targetGraphic = backgroundComponent;
 
-            if( onClick != null )
-            {
-                buttonComponent.onClick.AddListener( () => onClick() ); // Find a way to cast System.Action to UnityAction if possible (the signatures of both delegates match).
-            }
+            UIButton uiButton = rootGameObject.AddComponent<UIButton>();
 
-            UIButton button = rootGameObject.AddComponent<UIButton>();
-
-            button.Children = new List<IUIElementChild>();
-            button._parent = parent;
-            button.Parent.Children.Add( button );
-            button.buttonComponent = buttonComponent;
-            button.backgroundComponent = backgroundComponent;
-            return button;
+            uiButton.Children = new List<IUIElementChild>();
+            uiButton.Parent = parent;
+            uiButton.Parent.Children.Add( uiButton );
+            uiButton.buttonComponent = buttonComponent;
+            uiButton.backgroundComponent = backgroundComponent;
+            uiButton.onClick = onClick;
+            return uiButton;
         }
     }
 }

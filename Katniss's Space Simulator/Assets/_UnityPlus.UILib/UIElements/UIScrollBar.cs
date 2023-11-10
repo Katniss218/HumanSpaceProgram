@@ -9,8 +9,7 @@ namespace UnityPlus.UILib.UIElements
     {
         internal Scrollbar scrollbarComponent;
 
-        internal IUIElementContainer _parent;
-        public IUIElementContainer parent { get => _parent; }
+        UIScrollView _parent;
 
         public static UIScrollBar Create( UIScrollView scrollView, UILayoutInfo layout, Sprite background, Sprite foreground, bool isVertical )
         {
@@ -52,12 +51,12 @@ namespace UnityPlus.UILib.UIElements
             else
                 scrollView.scrollRectComponent.horizontalScrollbar = scrollbarComponent;
 
-            UIScrollBar scrollBar = rootGameObject.AddComponent<UIScrollBar>();
-            scrollBar._parent = scrollView;
-            scrollBar.scrollbarComponent = scrollbarComponent;
+            UIScrollBar uiScrollBar = rootGameObject.AddComponent<UIScrollBar>();
+            uiScrollBar._parent = scrollView;
+            uiScrollBar.scrollbarComponent = scrollbarComponent;
 
-            scrollView.scrollbarHorizontal = scrollBar;
-            return scrollBar;
+            scrollView.scrollbarHorizontal = uiScrollBar;
+            return uiScrollBar;
         }
     }
 }

@@ -78,6 +78,8 @@
     <Compile Include="Assets\KSS.UI\AccelerationReadoutUI.cs" />
     <Compile Include="Assets\KSS.UI\SceneFactories\DesignSceneUIFactory.cs" />
     <Compile Include="Assets\KSS.UI\FPSCounterUI.cs" />
+    <Compile Include="Assets\KSS.UI\UIVesselHUD.cs" />
+    <Compile Include="Assets\KSS.UI\UIVesselHUDManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.UI\___KSS.UI.asmdef" />

@@ -18,9 +18,8 @@ namespace UnityPlus.UILib.UIElements
         public List<IUIElementChild> Children { get; private set; }
         public LayoutDriver LayoutDriver { get; set; }
 
-        public override void Destroy()
+        void OnDestroy()
         {
-            base.Destroy();
             this.Parent.Children.Remove( this );
         }
 

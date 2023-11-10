@@ -34,6 +34,7 @@ namespace KSS.Core
                 throw new InvalidSceneManagerException( $"{nameof( VesselManager )} is only available in the gameplay scene." );
 
             instance._vessels.Add( vessel );
+            OnAfterVesselCreated?.Invoke( vessel );
         }
 
         internal static void Unregister( Vessel vessel )
@@ -42,7 +43,12 @@ namespace KSS.Core
                 throw new InvalidSceneManagerException( $"{nameof( VesselManager )} is only available in the gameplay scene." );
 
             instance._vessels.Remove( vessel );
+            OnAfterVesselDestroyed?.Invoke( vessel );
         }
+
+        public static event Action<Vessel> OnAfterVesselCreated;
+        public static event Action<Vessel> OnAfterVesselDestroyed;
+
         public SerializedData GetData( IReverseReferenceMap s )
         {
             return new SerializedObject()

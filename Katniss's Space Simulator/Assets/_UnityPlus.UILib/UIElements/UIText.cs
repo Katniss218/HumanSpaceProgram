@@ -14,9 +14,7 @@ namespace UnityPlus.UILib.UIElements
 
         internal TMPro.TextMeshProUGUI textComponent;
 
-        internal IUIElementContainer _parent;
-
-        public IUIElementContainer Parent { get => _parent; }
+        public IUIElementContainer Parent { get; private set; }
 
         public bool FitToContents { get; set; } = false;
 
@@ -30,9 +28,8 @@ namespace UnityPlus.UILib.UIElements
             }
         }
 
-        public override void Destroy()
+        void OnDestroy()
         {
-            base.Destroy();
             this.Parent.Children.Remove( this );
         }
 
@@ -72,7 +69,7 @@ namespace UnityPlus.UILib.UIElements
             textComponent.text = text;
 
             UIText uiText = rootGameObject.AddComponent<UIText>();
-            uiText._parent = parent;
+            uiText.Parent = parent;
             uiText.Parent.Children.Add( uiText );
             uiText.textComponent = textComponent;
             return uiText;

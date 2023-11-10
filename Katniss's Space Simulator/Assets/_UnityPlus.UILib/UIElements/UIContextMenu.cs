@@ -16,15 +16,12 @@ namespace UnityPlus.UILib.UIElements
         public RectTransform contents => base.rectTransform;
 
         public List<IUIElementChild> Children { get; private set; }
-
-        internal IUIElementContainer _parent;
-        public IUIElementContainer Parent { get => _parent; }
+        public IUIElementContainer Parent { get; private set; }
 
         public LayoutDriver LayoutDriver { get; set; }
 
-        public override void Destroy()
+        void OnDestroy()
         {
-            base.Destroy();
             this.Parent.Children.Remove( this );
         }
 
@@ -42,13 +39,13 @@ namespace UnityPlus.UILib.UIElements
             ContextMenu contextMenuComponent = rootGameObject.AddComponent<ContextMenu>();
             contextMenuComponent.Target = track;
 
-            UIContextMenu contextMenu = rootGameObject.AddComponent<UIContextMenu>();
-            contextMenu.Children = new List<IUIElementChild>();
-            contextMenu._parent = null;
-            contextMenu.Parent?.Children.Add( contextMenu );
-            contextMenu.contextMenuComponent = contextMenuComponent;
-            contextMenu.backgroundComponent = backgroundComponent;
-            return contextMenu;
+            UIContextMenu uiContextMenu = rootGameObject.AddComponent<UIContextMenu>();
+            uiContextMenu.Children = new List<IUIElementChild>();
+            uiContextMenu.Parent = null;
+            uiContextMenu.Parent?.Children.Add( uiContextMenu );
+            uiContextMenu.contextMenuComponent = contextMenuComponent;
+            uiContextMenu.backgroundComponent = backgroundComponent;
+            return uiContextMenu;
         }
     }
 }

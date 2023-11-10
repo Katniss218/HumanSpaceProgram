@@ -15,16 +15,14 @@ namespace UnityPlus.UILib.UIElements
         public RectTransform contents => base.rectTransform;
 
         public List<IUIElementChild> Children { get; private set; }
-        internal IUIElementContainer _parent;
-        public IUIElementContainer Parent { get => _parent; }
+        public IUIElementContainer Parent { get; private set; }
 
         public LayoutDriver LayoutDriver { get; set; }
 
         public Sprite Background { get => backgroundComponent.sprite; set => backgroundComponent.sprite = value; }
 
-        public override void Destroy()
+        void OnDestroy()
         {
-            base.Destroy();
             this.Parent.Children.Remove( this );
         }
 
@@ -42,13 +40,13 @@ namespace UnityPlus.UILib.UIElements
                 backgroundComponent.color = new Color( 0, 0, 0, 0 );
             }
 
-            UIPanel panel = rootGameObject.AddComponent<UIPanel>();
-            panel.Children = new List<IUIElementChild>();
-            panel._parent = parent;
-            panel.Parent.Children.Add( panel );
-            panel.backgroundComponent = backgroundComponent;
+            UIPanel uiPanel = rootGameObject.AddComponent<UIPanel>();
+            uiPanel.Children = new List<IUIElementChild>();
+            uiPanel.Parent = parent;
+            uiPanel.Parent.Children.Add( uiPanel );
+            uiPanel.backgroundComponent = backgroundComponent;
 
-            return panel;
+            return uiPanel;
         }
     }
 }

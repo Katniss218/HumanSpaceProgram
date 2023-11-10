@@ -5,13 +5,12 @@ using UnityEngine.UI;
 
 namespace UnityPlus.UILib.UIElements
 {
-    public sealed class UIValueBar : UIElement
+    public sealed class UIValueBar : UIElement, IUIElementChild
     {
 #warning TODO - merge this with ValueBar
         internal ValueBar valueBarComponent;
 
-        internal IUIElementContainer _parent;
-        public IUIElementContainer parent { get => _parent; }
+        public IUIElementContainer Parent { get; private set; }
 
         public void ClearSegments()
         {
@@ -42,10 +41,11 @@ namespace UnityPlus.UILib.UIElements
             valueBarComponent.PaddingRight = 1.0f;
             valueBarComponent.Spacing = 1.0f;
 
-            UIValueBar bar = rootGameObject.AddComponent<UIValueBar>();
-            bar._parent = parent;
-            bar.valueBarComponent = valueBarComponent;
-            return bar;
+            UIValueBar uiValueBar = rootGameObject.AddComponent<UIValueBar>();
+            uiValueBar.Parent = parent;
+            uiValueBar.Parent.Children.Add( uiValueBar );
+            uiValueBar.valueBarComponent = valueBarComponent;
+            return uiValueBar;
         }
 
     }

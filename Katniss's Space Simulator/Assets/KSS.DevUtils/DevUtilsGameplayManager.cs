@@ -103,29 +103,6 @@ namespace KSS.DevUtils
 
         private void Update()
         {
-            if( Input.GetKeyDown( KeyCode.F4 ) )
-            {
-                if( ActiveObjectManager.ActiveObject == null )
-                {
-                    if( Physics.Raycast( GameplayCameraController.MainCamera.ScreenPointToRay( Input.mousePosition ), out RaycastHit hit ) )
-                    {
-                        if( hit.collider.transform.root.HasComponent<Vessel>( out var vessel ) )
-                        {
-                            ActiveObjectManager.ActiveObject = vessel.gameObject;
-                        }
-                    }
-                }
-                else
-                {
-                    if( Physics.Raycast( GameplayCameraController.MainCamera.ScreenPointToRay( Input.mousePosition ), out RaycastHit hit ) )
-                    {
-                        if( !hit.collider.transform.root.HasComponent<Vessel>() )
-                        {
-                            ActiveObjectManager.ActiveObject = null;
-                        }
-                    }
-                }
-            }
             if( Input.GetKeyDown( KeyCode.F5 ) )
             {
                 CreateVessel( launchSite );

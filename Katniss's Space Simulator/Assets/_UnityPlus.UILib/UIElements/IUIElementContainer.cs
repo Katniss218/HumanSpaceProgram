@@ -10,12 +10,12 @@ namespace UnityPlus.UILib.UIElements
     public interface IUIElementContainer : IUIElement
     {
         /// <summary>
-        /// The immediate parent transform of the child elements.
+        /// The <see cref="RectTransform"/> whoose children are the children of this container.
         /// </summary>
         RectTransform contents { get; }
 
         /// <summary>
-        /// The child elements of this UI element container.
+        /// The child elements of this container.
         /// </summary>
         List<IUIElementChild> Children { get; }
     }
