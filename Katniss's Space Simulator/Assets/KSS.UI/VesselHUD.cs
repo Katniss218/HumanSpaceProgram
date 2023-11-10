@@ -8,7 +8,7 @@ using UnityPlus.UILib.UIElements;
 
 namespace KSS.UI
 {
-    public class UIVesselHUD : MonoBehaviour
+    public class VesselHUD : MonoBehaviour
     {
         public Vessel Vessel { get; private set; }
 
@@ -22,14 +22,14 @@ namespace KSS.UI
             ((RectTransform)this.transform).SetScreenPosition( Cameras.GameplayCameraController.MainCamera, Vessel.transform.position );
         }
 
-        public static UIVesselHUD Create( IUIElementContainer parent, UILayoutInfo layoutInfo, Sprite background, Vessel vessel )
+        public static VesselHUD Create( IUIElementContainer parent, UILayoutInfo layoutInfo, Sprite background, Vessel vessel )
         {
             if( vessel == null )
                 throw new ArgumentNullException( nameof( vessel ) );
 
             UIButton button = parent.AddButton( layoutInfo, background, null );
 
-            UIVesselHUD uiHUD = button.gameObject.AddComponent<UIVesselHUD>();
+            VesselHUD uiHUD = button.gameObject.AddComponent<VesselHUD>();
             button.onClick = uiHUD.OnClick;
             uiHUD.Vessel = vessel;
             return uiHUD;

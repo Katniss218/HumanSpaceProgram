@@ -8,20 +8,20 @@ using UnityPlus.UILib;
 
 namespace KSS.UI
 {
-    public class UIVesselHUDManager : SingletonMonoBehaviour<UIVesselHUDManager>
+    public class VesselHUDManager : SingletonMonoBehaviour<VesselHUDManager>
     {
-        List<UIVesselHUD> _huds = new List<UIVesselHUD>();
+        List<VesselHUD> _huds = new List<VesselHUD>();
 
         [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, "vanilla.vessel_huds" )]
         static void OnStartup( object e )
         {
-            GameplaySceneManager.GameObject.AddComponent<UIVesselHUDManager>(); // add to the scene. This could be done in the editor.
+            GameplaySceneManager.GameObject.AddComponent<VesselHUDManager>(); // add to the scene. This could be done in the editor.
         }
 
         [HSPEventListener( HSPEvent.GAMEPLAY_AFTER_VESSEL_REGISTERED, "vanilla.vessel_huds" )]
         static void OnVesselRegistered( Vessel vessel )
         {
-            var hud = UIVesselHUD.Create( CanvasManager.Get( CanvasName.BACKGROUND ), new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_new" ), vessel );
+            var hud = VesselHUD.Create( CanvasManager.Get( CanvasName.BACKGROUND ), new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_new" ), vessel );
             instance._huds.Add( hud );
         }
 
@@ -32,7 +32,6 @@ namespace KSS.UI
             {
                 if( hud.Vessel == vessel )
                 {
-#warning TODO - hud is a UI thing, add proper destroy.
                     Destroy( hud.gameObject ); // hud can be null if exiting a scene - it doesn't affect anything, but gives ugly warnings.
                 }
             }

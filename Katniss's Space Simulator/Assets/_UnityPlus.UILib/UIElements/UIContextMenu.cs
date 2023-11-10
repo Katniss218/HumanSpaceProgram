@@ -29,7 +29,7 @@ namespace UnityPlus.UILib.UIElements
 
         public static UIContextMenu Create( RectTransform track, UICanvas contextMenuCanvas, UILayoutInfo layoutInfo, Sprite background )
         {
-            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( contextMenuCanvas.rectTransform, "uilib-contextmenu", layoutInfo );
+            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( contextMenuCanvas.contents, "uilib-contextmenu", layoutInfo );
 
             Image backgroundComponent = rootGameObject.AddComponent<Image>();
             backgroundComponent.raycastTarget = false;
