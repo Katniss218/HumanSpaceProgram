@@ -9,12 +9,12 @@ namespace UnityPlus.UILib.Layout
 {
     public static class UILayout
     {
-        static HashSet<object> _set = new HashSet<object>();
-
-        private static void BroadcastLayoutUpdateRecursive( object elem )
+        private static void BroadcastLayoutUpdateRecursive( HashSet<object> alreadyUpdated, object elem )
         {
             // TODO - this can be optimized:
-            // - Mark as stale when something changes and redraw only once in lateupdate (problem - might lag a frame behind if the thing marking it as stale also runs in lateupdate).
+            // - Mark as stale when something changes and redraw only once in lateupdate.
+            // a set of objects on which broadcastlayoutupdate was called. then call once per object.
+            // this needs to be turned into a monobehaviour for that to work as well.
 
             // ----
 
@@ -24,10 +24,10 @@ namespace UnityPlus.UILib.Layout
             {
                 foreach( var e in co.Children )
                 {
-                    if( !_set.Contains( e ) )
+                    if( !alreadyUpdated.Contains( e ) )
                     {
-                        _set.Add( e );
-                        BroadcastLayoutUpdateRecursive( e );
+                        alreadyUpdated.Add( e );
+                        BroadcastLayoutUpdateRecursive( alreadyUpdated, e );
                     }
                 }
             }
@@ -45,22 +45,17 @@ namespace UnityPlus.UILib.Layout
             // Notify the parent, so it can re-layout itself if the dimensions of our element have changed.
             if( elem is IUIElementChild ci )
             {
-                if( !_set.Contains( ci.Parent ) )
+                if( !alreadyUpdated.Contains( ci.Parent ) )
                 {
-                    _set.Add( ci.Parent );
-                    BroadcastLayoutUpdateRecursive( ci.Parent );
+                    alreadyUpdated.Add( ci.Parent );
+                    BroadcastLayoutUpdateRecursive( alreadyUpdated, ci.Parent );
                 }
             }
         }
 
         public static void BroadcastLayoutUpdate( IUIElement elem )
         {
-#warning TODO - This needs to be called when a UI element is added, removed, or has changed its sibling order.
-
-            // also when an object is destroyed, it desyncs.
-
-            _set.Clear();
-            BroadcastLayoutUpdateRecursive( elem );
+            BroadcastLayoutUpdateRecursive( new HashSet<object>(), elem );
         }
     }
 }

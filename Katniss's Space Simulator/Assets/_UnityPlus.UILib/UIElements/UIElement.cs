@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using UnityPlus.UILib.Layout;
 
 namespace UnityPlus.UILib.UIElements
 {
@@ -55,11 +56,7 @@ namespace UnityPlus.UILib.UIElements
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public static (GameObject go, RectTransform t, T uiElement) CreateUIGameObject<T>( IUIElementContainer parent, string name, UILayoutInfo layout ) where T : Component, IUIElementChild
         {
-            GameObject rootGO = new GameObject( name );
-
-            RectTransform rootT = rootGO.AddComponent<RectTransform>();
-            rootT.SetLayoutInfo( layout );
-            rootT.localScale = Vector3.one;
+            (GameObject rootGO, RectTransform rootT) = CreateUIGameObject( parent.contents, name, layout );
 
             T uiElement = rootGO.AddComponent<T>();
             uiElement.SetParent( parent );
@@ -82,6 +79,8 @@ namespace UnityPlus.UILib.UIElements
             child.Parent = parent;
             parent.Children.Add( child );
             child.rectTransform.SetParent( parent.contents );
+
+            UILayout.BroadcastLayoutUpdate( child );
         }
     }
 }
