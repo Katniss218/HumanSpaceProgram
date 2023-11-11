@@ -13,7 +13,7 @@ namespace UnityPlus.UILib.UIElements
     {
         internal Image imageComponent;
 
-        public IUIElementContainer Parent { get; private set; }
+        public IUIElementContainer Parent { get; set; }
 
         public LayoutDriver LayoutDriver { get; set; }
 
@@ -26,16 +26,13 @@ namespace UnityPlus.UILib.UIElements
 
         public static UIIcon Create( IUIElementContainer parent, UILayoutInfo layoutInfo, Sprite icon )
         {
-            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( parent.contents, "uilib-icon", layoutInfo );
+            (GameObject rootGameObject, RectTransform rootTransform, UIIcon uiIcon) = UIElement.CreateUIGameObject<UIIcon>( parent, "uilib-icon", layoutInfo );
 
             Image imageComponent = rootGameObject.AddComponent<Image>();
             imageComponent.raycastTarget = false;
             imageComponent.sprite = icon;
             imageComponent.type = Image.Type.Simple;
 
-            UIIcon uiIcon = rootGameObject.AddComponent<UIIcon>();
-            uiIcon.Parent = parent;
-            uiIcon.Parent.Children.Add( uiIcon );
             uiIcon.imageComponent = imageComponent;
             return uiIcon;
         }

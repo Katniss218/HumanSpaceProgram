@@ -14,9 +14,8 @@ namespace UnityPlus.UILib.UIElements
         internal Image backgroundComponent;
         public RectTransform contents => base.rectTransform;
 
-        public List<IUIElementChild> Children { get; private set; }
-
-        public IUIElementContainer Parent { get; private set; }
+        public IUIElementContainer Parent { get; set; }
+        public List<IUIElementChild> Children { get; } = new List<IUIElementChild>();
 
         public LayoutDriver LayoutDriver { get; set; }
 
@@ -44,7 +43,7 @@ namespace UnityPlus.UILib.UIElements
 
         public static UIButton Create( IUIElementContainer parent, UILayoutInfo layout, Sprite sprite, Action onClick )
         {
-            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( parent.contents, "uilib-button", layout );
+            (GameObject rootGameObject, RectTransform rootTransform, UIButton uiButton) = UIElement.CreateUIGameObject<UIButton>( parent, "uilib-button", layout );
 
             Image backgroundComponent = rootGameObject.AddComponent<Image>();
             backgroundComponent.raycastTarget = true;
@@ -65,11 +64,6 @@ namespace UnityPlus.UILib.UIElements
             };
             buttonComponent.targetGraphic = backgroundComponent;
 
-            UIButton uiButton = rootGameObject.AddComponent<UIButton>();
-
-            uiButton.Children = new List<IUIElementChild>();
-            uiButton.Parent = parent;
-            uiButton.Parent.Children.Add( uiButton );
             uiButton.buttonComponent = buttonComponent;
             uiButton.backgroundComponent = backgroundComponent;
             uiButton.onClick = onClick;

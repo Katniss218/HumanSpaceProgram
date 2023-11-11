@@ -14,8 +14,8 @@ namespace UnityPlus.UILib.UIElements
         internal Image backgroundComponent;
         public RectTransform contents => base.rectTransform;
 
-        public List<IUIElementChild> Children { get; private set; }
-        public IUIElementContainer Parent { get; private set; }
+        public IUIElementContainer Parent { get; set; }
+        public List<IUIElementChild> Children { get; } = new List<IUIElementChild>();
 
         public LayoutDriver LayoutDriver { get; set; }
 
@@ -28,7 +28,7 @@ namespace UnityPlus.UILib.UIElements
 
         public static UIPanel Create( IUIElementContainer parent, UILayoutInfo layoutInfo, Sprite background )
         {
-            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( parent.contents, "uilib-panel", layoutInfo );
+            (GameObject rootGameObject, RectTransform rootTransform, UIPanel uiPanel) = UIElement.CreateUIGameObject<UIPanel>( parent, "uilib-panel", layoutInfo );
 
             Image backgroundComponent = rootGameObject.AddComponent<Image>();
             backgroundComponent.raycastTarget = false;
@@ -40,10 +40,6 @@ namespace UnityPlus.UILib.UIElements
                 backgroundComponent.color = new Color( 0, 0, 0, 0 );
             }
 
-            UIPanel uiPanel = rootGameObject.AddComponent<UIPanel>();
-            uiPanel.Children = new List<IUIElementChild>();
-            uiPanel.Parent = parent;
-            uiPanel.Parent.Children.Add( uiPanel );
             uiPanel.backgroundComponent = backgroundComponent;
 
             return uiPanel;

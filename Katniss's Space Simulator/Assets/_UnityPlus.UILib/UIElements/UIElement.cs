@@ -33,8 +33,11 @@ namespace UnityPlus.UILib.UIElements
             Destroy( this.gameObject );
         }
 
+        /// <summary>
+        /// A wrapper to create a UI gameobject
+        /// </summary>
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static (GameObject go, RectTransform t) CreateUI( RectTransform parent, string name, UILayoutInfo layout )
+        public static (GameObject go, RectTransform t) CreateUIGameObject( RectTransform parent, string name, UILayoutInfo layout )
         {
             GameObject rootGO = new GameObject( name );
 
@@ -44,6 +47,41 @@ namespace UnityPlus.UILib.UIElements
             rootT.localScale = Vector3.one;
 
             return (rootGO, rootT);
+        }
+
+        /// <summary>
+        /// A wrapper to create a UI gameobject with a UI element properly initialized. Use this to create the root gameobject for a custom UI element.
+        /// </summary>
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static (GameObject go, RectTransform t, T uiElement) CreateUIGameObject<T>( IUIElementContainer parent, string name, UILayoutInfo layout ) where T : Component, IUIElementChild
+        {
+            GameObject rootGO = new GameObject( name );
+
+            RectTransform rootT = rootGO.AddComponent<RectTransform>();
+            rootT.SetLayoutInfo( layout );
+            rootT.localScale = Vector3.one;
+
+            T uiElement = rootGO.AddComponent<T>();
+            uiElement.SetParent( parent );
+            return (rootGO, rootT, uiElement);
+        }
+    }
+    public static class UIElement_Ex
+    {
+        public static void SetParent( this IUIElementChild child, IUIElementContainer parent )
+        {
+            if( child == null )
+                throw new ArgumentNullException( nameof( child ) );
+            if( parent == null )
+                throw new ArgumentNullException( nameof( parent ) );
+
+            if( child.Parent != null )
+            {
+                child.Parent.Children.Remove( child );
+            }
+            child.Parent = parent;
+            parent.Children.Add( child );
+            child.rectTransform.SetParent( parent.contents );
         }
     }
 }

@@ -13,7 +13,7 @@ namespace UnityPlus.UILib.UIElements
 
         public static UIScrollBar Create( UIScrollView scrollView, UILayoutInfo layout, Sprite background, Sprite foreground, bool isVertical )
         {
-            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( scrollView.rectTransform, isVertical ? "uilib-scrollbar-vertical" : "uilib-scrollbar-horizontal", layout );
+            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUIGameObject( scrollView.rectTransform, isVertical ? "uilib-scrollbar-vertical" : "uilib-scrollbar-horizontal", layout );
 
             if( background != null )
             {
@@ -23,8 +23,8 @@ namespace UnityPlus.UILib.UIElements
                 bg.raycastTarget = true;
             }
 
-            (GameObject slidingAreaGameObject, RectTransform slidingAreaTransform) = UIElement.CreateUI( rootTransform, "uilib-scrollbar-slidingarea", UILayoutInfo.Fill() );
-            (GameObject handleGameObject, RectTransform handleTransform) = UIElement.CreateUI( slidingAreaTransform, "uilib-scrollbar-handle", UILayoutInfo.Fill() );
+            (GameObject slidingAreaGameObject, RectTransform slidingAreaTransform) = UIElement.CreateUIGameObject( rootTransform, "uilib-scrollbar-slidingarea", UILayoutInfo.Fill() );
+            (GameObject handleGameObject, RectTransform handleTransform) = UIElement.CreateUIGameObject( slidingAreaTransform, "uilib-scrollbar-handle", UILayoutInfo.Fill() );
 
             Image handleImage = handleGameObject.AddComponent<Image>();
             handleImage.sprite = foreground;

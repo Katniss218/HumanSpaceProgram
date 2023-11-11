@@ -14,7 +14,7 @@ namespace UnityPlus.UILib.UIElements
 
         internal TMPro.TextMeshProUGUI textComponent;
 
-        public IUIElementContainer Parent { get; private set; }
+        public IUIElementContainer Parent { get; set; }
 
         public bool FitToContents { get; set; } = false;
 
@@ -58,7 +58,7 @@ namespace UnityPlus.UILib.UIElements
 
         public static UIText Create( IUIElementContainer parent, UILayoutInfo layoutInfo, string text )
         {
-            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( parent.contents, "uilib-text", layoutInfo );
+            (GameObject rootGameObject, RectTransform rootTransform, UIText uiText) = UIElement.CreateUIGameObject<UIText>( parent, "uilib-text", layoutInfo );
 
             TMPro.TextMeshProUGUI textComponent = rootGameObject.AddComponent<TMPro.TextMeshProUGUI>();
             textComponent.raycastTarget = false;
@@ -68,9 +68,6 @@ namespace UnityPlus.UILib.UIElements
 
             textComponent.text = text;
 
-            UIText uiText = rootGameObject.AddComponent<UIText>();
-            uiText.Parent = parent;
-            uiText.Parent.Children.Add( uiText );
             uiText.textComponent = textComponent;
             return uiText;
         }

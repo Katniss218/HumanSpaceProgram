@@ -16,6 +16,6 @@ namespace UnityPlus.UILib.UIElements
         /// <summary>
         /// The parent of this UI element.
         /// </summary>
-        IUIElementContainer Parent { get; }
+        IUIElementContainer Parent { get; set; }
     }
 }

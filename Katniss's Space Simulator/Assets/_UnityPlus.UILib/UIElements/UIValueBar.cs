@@ -7,10 +7,10 @@ namespace UnityPlus.UILib.UIElements
 {
     public sealed class UIValueBar : UIElement, IUIElementChild
     {
-#warning TODO - merge this with ValueBar
+        // TODO - Merge UIValueBar with ValueBar?
         internal ValueBar valueBarComponent;
 
-        public IUIElementContainer Parent { get; private set; }
+        public IUIElementContainer Parent { get; set; }
 
         public void ClearSegments()
         {
@@ -29,7 +29,7 @@ namespace UnityPlus.UILib.UIElements
 
         public static UIValueBar Create( IUIElementContainer parent, UILayoutInfo layout, Sprite background )
         {
-            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( parent.contents, "uilib-valuebar", layout );
+            (GameObject rootGameObject, RectTransform rootTransform, UIValueBar uiValueBar) = UIElement.CreateUIGameObject<UIValueBar>( parent, "uilib-valuebar", layout );
 
             Image imageComponent = rootGameObject.AddComponent<Image>();
             imageComponent.raycastTarget = false;
@@ -41,12 +41,8 @@ namespace UnityPlus.UILib.UIElements
             valueBarComponent.PaddingRight = 1.0f;
             valueBarComponent.Spacing = 1.0f;
 
-            UIValueBar uiValueBar = rootGameObject.AddComponent<UIValueBar>();
-            uiValueBar.Parent = parent;
-            uiValueBar.Parent.Children.Add( uiValueBar );
             uiValueBar.valueBarComponent = valueBarComponent;
             return uiValueBar;
         }
-
     }
 }

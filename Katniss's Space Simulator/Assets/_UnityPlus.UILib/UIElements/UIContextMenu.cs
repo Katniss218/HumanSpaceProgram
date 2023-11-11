@@ -15,8 +15,8 @@ namespace UnityPlus.UILib.UIElements
         internal Image backgroundComponent;
         public RectTransform contents => base.rectTransform;
 
-        public List<IUIElementChild> Children { get; private set; }
-        public IUIElementContainer Parent { get; private set; }
+        public IUIElementContainer Parent { get; set; }
+        public List<IUIElementChild> Children { get; } = new List<IUIElementChild>();
 
         public LayoutDriver LayoutDriver { get; set; }
 
@@ -29,7 +29,7 @@ namespace UnityPlus.UILib.UIElements
 
         public static UIContextMenu Create( RectTransform track, UICanvas contextMenuCanvas, UILayoutInfo layoutInfo, Sprite background )
         {
-            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( contextMenuCanvas.contents, "uilib-contextmenu", layoutInfo );
+            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUIGameObject( contextMenuCanvas.contents, "uilib-contextmenu", layoutInfo );
 
             Image backgroundComponent = rootGameObject.AddComponent<Image>();
             backgroundComponent.raycastTarget = false;
@@ -40,9 +40,8 @@ namespace UnityPlus.UILib.UIElements
             contextMenuComponent.Target = track;
 
             UIContextMenu uiContextMenu = rootGameObject.AddComponent<UIContextMenu>();
-            uiContextMenu.Children = new List<IUIElementChild>();
-            uiContextMenu.Parent = null;
-            uiContextMenu.Parent?.Children.Add( uiContextMenu );
+            //uiContextMenu.Parent = null;
+            //uiContextMenu.Parent?.Children.Add( uiContextMenu );
             uiContextMenu.contextMenuComponent = contextMenuComponent;
             uiContextMenu.backgroundComponent = backgroundComponent;
             return uiContextMenu;

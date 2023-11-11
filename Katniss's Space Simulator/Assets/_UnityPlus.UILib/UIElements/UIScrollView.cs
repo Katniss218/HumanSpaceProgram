@@ -15,9 +15,8 @@ namespace UnityPlus.UILib.UIElements
         RectTransform _contents;
         public RectTransform contents { get => _contents; }
 
-        public List<IUIElementChild> Children { get; private set; }
-
-        public IUIElementContainer Parent { get; private set; }
+        public IUIElementContainer Parent { get; set; }
+        public List<IUIElementChild> Children { get; } = new List<IUIElementChild>();
 
         public LayoutDriver LayoutDriver { get; set; }
 
@@ -28,18 +27,18 @@ namespace UnityPlus.UILib.UIElements
 
         public static UIScrollView Create( IUIElementContainer parent, UILayoutInfo layout, UILayoutInfo contentLayout, bool horizontal, bool vertical )
         {
-            (GameObject root, RectTransform rootTransform) = UIElement.CreateUI( parent.contents, "uilib-scrollview", layout );
+            (GameObject rootGameObject, RectTransform rootTransform, UIScrollView uiScrollView) = UIElement.CreateUIGameObject<UIScrollView>( parent, "uilib-scrollview", layout );
 
-            (GameObject viewport, RectTransform viewportTransform) = UIElement.CreateUI( rootTransform, "uilib-scrollviewviewport", UILayoutInfo.Fill() );
+            (GameObject viewport, RectTransform viewportTransform) = UIElement.CreateUIGameObject( rootTransform, "uilib-scrollviewviewport", UILayoutInfo.Fill() );
 
             Image maskImage = viewport.AddComponent<Image>();
             maskImage.maskable = true;
             Mask mask = viewport.AddComponent<Mask>();
             mask.showMaskGraphic = false;
 
-            (GameObject content, RectTransform contentTransform) = UIElement.CreateUI( viewportTransform, "uilib-scrollviewcontent", contentLayout );
+            (GameObject content, RectTransform contentTransform) = UIElement.CreateUIGameObject( viewportTransform, "uilib-scrollviewcontent", contentLayout );
 
-            ScrollRect scrollRect = root.AddComponent<ScrollRect>();
+            ScrollRect scrollRect = rootGameObject.AddComponent<ScrollRect>();
             scrollRect.content = (RectTransform)content.transform;
             scrollRect.horizontal = horizontal;
             scrollRect.vertical = vertical;
@@ -52,11 +51,6 @@ namespace UnityPlus.UILib.UIElements
             scrollRect.scrollSensitivity = 30f;
             scrollRect.decelerationRate = 0.5f;
 
-            UIScrollView uiScrollView = root.AddComponent<UIScrollView>();
-
-            uiScrollView. Children = new List<IUIElementChild>();
-            uiScrollView.Parent = parent;
-            uiScrollView.Parent.Children.Add( uiScrollView );
             uiScrollView.scrollRectComponent = scrollRect;
             uiScrollView.scrollbarHorizontal = null;
             uiScrollView.scrollbarVertical = null;

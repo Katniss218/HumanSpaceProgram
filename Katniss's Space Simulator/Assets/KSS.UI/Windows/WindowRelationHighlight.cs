@@ -43,7 +43,7 @@ namespace KSS.UI.Windows
                 return;
             }
 
-            (GameObject highlighterGO, RectTransform rt) = UIElement.CreateUI( (RectTransform)this.transform, "relation highlight", new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 10, 10 ) ) );
+            (GameObject highlighterGO, RectTransform rt) = UIElement.CreateUIGameObject( (RectTransform)this.transform, "relation highlight", new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 10, 10 ) ) );
             _highlightedObject = rt;
 
             Image exitImage = highlighterGO.AddComponent<Image>();

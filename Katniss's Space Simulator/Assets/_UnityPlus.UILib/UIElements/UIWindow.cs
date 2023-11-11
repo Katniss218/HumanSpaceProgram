@@ -14,8 +14,9 @@ namespace UnityPlus.UILib.UIElements
         internal Image backgroundComponent;
         public RectTransform contents => base.rectTransform;
 
-        public IUIElementContainer Parent { get; private set; }
-        public List<IUIElementChild> Children { get; private set; }
+        public IUIElementContainer Parent { get; set; }
+        public List<IUIElementChild> Children { get; } = new List<IUIElementChild>();
+
         public LayoutDriver LayoutDriver { get; set; }
 
         void OnDestroy()
@@ -27,7 +28,7 @@ namespace UnityPlus.UILib.UIElements
 
         public static UIWindow Create( UICanvas parent, UILayoutInfo layoutInfo, Sprite background )
         {
-            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUI( parent.rectTransform, "uilib-window", layoutInfo );
+            (GameObject rootGameObject, RectTransform rootTransform, UIWindow uiWindow) = UIElement.CreateUIGameObject<UIWindow>( parent, "uilib-window", layoutInfo );
 
             Image backgroundComponent = rootGameObject.AddComponent<Image>();
             backgroundComponent.raycastTarget = true;
@@ -39,10 +40,6 @@ namespace UnityPlus.UILib.UIElements
                 backgroundComponent.color = new Color( 0, 0, 0, 0 );
             }
 
-            UIWindow uiWindow = rootGameObject.AddComponent<UIWindow>();
-            uiWindow.Children = new List<IUIElementChild>();
-            uiWindow.Parent = parent;
-            uiWindow.Parent.Children.Add( uiWindow );
             uiWindow.backgroundComponent = backgroundComponent;
             return uiWindow;
         }
