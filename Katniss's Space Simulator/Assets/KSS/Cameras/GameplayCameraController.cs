@@ -1,4 +1,6 @@
 using KSS.Core;
+using KSS.Core.Physics;
+using KSS.Core.ReferenceFrames;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,8 +22,7 @@ namespace KSS.Cameras
         [field: SerializeField]
         public float ZoomDist { get; private set; } = 5;
 
-        // Two-camera setup because the depth buffer in a single cam doesn't reach far enough.
-        // - in the future, possible to mask the cameras so they only render what's necessary, and maybe even add a third camera for drawing post-processing effects only. Depends on how expensive it gets.
+        // Two-camera setup because the shadow distance is permanently tied to the far plane distance.
 
         /// <summary>
         /// Used for rendering the vessels and other close / small objects, as well as shadows.
@@ -41,8 +42,6 @@ namespace KSS.Cameras
         [field: SerializeField]
         Camera _effectCamera;
 
-        float? mapViewPreviousZoomDist = null;
-
         [field: SerializeField]
         PostProcessLayer _closePPLayer;
 
@@ -54,9 +53,15 @@ namespace KSS.Cameras
         const float MOVE_MULTIPLIER = 3.0f;
         const float ZOOM_MULTIPLIER = 0.15f;
 
-        const float MAP_ZOOM_DISTANCE = 25_000_000.0f;
+        const float ZOOM_NEAR_PLANE_MULT = 1e-8f;
 
-        const float ZOOM_NEAR_PLANE_MULT = 1f / MAP_ZOOM_DISTANCE;
+        const float MIN_ZOOM_DISTANCE = 1f;
+        const float MAX_ZOOM_DISTANCE = 1e10f;
+
+        const float NEAR_CUTOFF_DISTANCE = 1e6f; // should be enough of a conservative value. Near cam is only 100 km, not 1000.
+
+        const float NEAR_MIN = 0.1f;
+        const float NEAR_MAX = 200.0f;
 
         /// <summary>
         /// Use this for raycasts and other methods that use a camera to calculate screen space positions, etc.
@@ -80,25 +85,7 @@ namespace KSS.Cameras
                 ZoomDist += ZoomDist * ZOOM_MULTIPLIER;
             }
 
-            if( ZoomDist < 2 )
-            {
-                ZoomDist = 2;
-            }
-
-            // Toggle "map" - just zoom out for now, it's handy.
-            if( Input.GetKeyDown( KeyCode.M ) ) // map view, kind of
-            {
-                if( mapViewPreviousZoomDist == null )
-                {
-                    mapViewPreviousZoomDist = ZoomDist;
-                    ZoomDist = MAP_ZOOM_DISTANCE;
-                }
-                else
-                {
-                    ZoomDist = mapViewPreviousZoomDist.Value;
-                    mapViewPreviousZoomDist = null;
-                }
-            }
+            ZoomDist = Mathf.Clamp( ZoomDist, MIN_ZOOM_DISTANCE, MAX_ZOOM_DISTANCE );
 
             // helps to make the shadow look nicer.
             QualitySettings.shadowDistance = 2550.0f + 1.3f * ZoomDist;
@@ -131,11 +118,12 @@ namespace KSS.Cameras
         void TryToggleNearCamera()
         {
             // For some reason, at the distance of around Earth's radius, having the near camera enabled throws "position our of view frustum" exceptions.
-            if( ZoomDist > 1_000_000 ) // should be enough of a conservative value. Near cam is only 100 km, not 1000.
+            if( ZoomDist > NEAR_CUTOFF_DISTANCE )
             {
-                this._effectCamera.cullingMask = 1 << 31; // for some reason, this makes it draw properly, also has the effect of drawing PPP on top of everything.
                 this._nearCamera.cullingMask -= 1 << 31;
                 this._farCamera.cullingMask -= 1 << 31;
+                this._effectCamera.cullingMask = 1 << 31; // for some reason, this makes it draw properly, also has the effect of drawing PPP on top of everything.
+
                 // instead of disabling, it's possible that we can increase the near clipping plane instead, the further the camera is zoomed out (up to ~30k at very far zooms).
                 // Map view could work by constructing a virtual environment (planets at l0 subdivs) with the camera always in the center.
                 // the camera would toggle to only render that view (like scaled space, but real size)
@@ -146,9 +134,10 @@ namespace KSS.Cameras
             }
             else
             {
-                this._effectCamera.cullingMask = 0; // Prevents the atmosphere drawing over the geometry, somehow.
                 this._nearCamera.cullingMask += 1 << 31;
                 this._farCamera.cullingMask += 1 << 31;
+                this._effectCamera.cullingMask = 0; // Prevents the atmosphere drawing over the geometry, somehow.
+
                 this._nearCamera.enabled = true;
                 this._closePPLayer.enabled = true;
                 this._farPPLayer.enabled = false;
@@ -207,8 +196,8 @@ namespace KSS.Cameras
 
             // Helps to prevent exceptions being thrown at medium zoom levels (due to something with precision of the view frustum).
             _effectCamera.nearClipPlane = _effectCameraNearPlane * (1 + (ZoomDist * ZOOM_NEAR_PLANE_MULT));
+            _nearCamera.nearClipPlane = (float)MathD.Map( ZoomDist, MIN_ZOOM_DISTANCE, NEAR_CUTOFF_DISTANCE, NEAR_MIN, NEAR_MAX );
         }
-
 
         [HSPEventListener( HSPEvent.GAMEPLAY_AFTER_ACTIVE_OBJECT_CHANGE, HSPEvent.NAMESPACE_VANILLA + "camera.snap_to_vessel" )]
         static void SnapToActiveObject( object e )

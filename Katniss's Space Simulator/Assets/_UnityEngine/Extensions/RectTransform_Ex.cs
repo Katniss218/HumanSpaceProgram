@@ -38,9 +38,9 @@ namespace UnityEngine
         /// <summary>
         /// Sets the screen space position to the value provided by using <see cref="Camera.WorldToScreenPoint(Vector3)"/>.
         /// </summary>
-        public static void SetScreenPosition( this RectTransform rt, Vector3 screenSpacePosition, bool hideBehind = true )
+        public static void SetScreenPosition( this RectTransform rt, Vector3 screenSpacePosition, bool hideWhenBehindCamera = true )
         {
-            if( screenSpacePosition.z < 0 && hideBehind )
+            if( screenSpacePosition.z < 0 && hideWhenBehindCamera )
                 screenSpacePosition = new Vector3( float.MaxValue, 0.0f, float.MaxValue );
             else
                 screenSpacePosition.z = 0.0f; // reset depth.
@@ -50,14 +50,10 @@ namespace UnityEngine
         /// <summary>
         /// Sets the screen space position to the world space position viewed by the given camera.
         /// </summary>
-        public static void SetScreenPosition( this RectTransform rt, Camera camera, Vector3 worldSpacePosition, bool hideBehind = true )
+        public static void SetScreenPosition( this RectTransform rt, Camera camera, Vector3 worldSpacePosition, bool hideWhenBehindCamera = true )
         {
             Vector3 screenSpacePosition = camera.WorldToScreenPoint( worldSpacePosition, camera.stereoActiveEye );
-            if( screenSpacePosition.z < 0 && hideBehind )
-                screenSpacePosition = new Vector3( float.MaxValue, 0.0f, float.MaxValue );
-            else
-                screenSpacePosition.z = 0.0f; // reset depth.
-            rt.position = screenSpacePosition;
+            SetScreenPosition( rt, screenSpacePosition, hideWhenBehindCamera );
         }
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace UnityPlus.Serialization
+namespace UnityEngine
 {
     public class CoroutineRunner : MonoBehaviour
     {

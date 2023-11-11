@@ -6,6 +6,14 @@ using System.Threading.Tasks;
 
 namespace UnityEngine
 {
+    /// <summary>
+    /// SingletonMonoBehaviour is a base class for Unity scripts that can have at most one instance. <br />
+    /// The instance is available via a static field, and loaded lazily.
+    /// </summary>
+    /// <remarks>
+    /// Usage Example: `public class PlayerManager : SingletonMonoBehaviour<![CDATA[<]]>PlayerManager<![CDATA[>]]>`.
+    /// </remarks>
+    /// <typeparam name="T">The inheriting type.</typeparam>
     [DisallowMultipleComponent]
     public class SingletonMonoBehaviour<T> : MonoBehaviour where T : SingletonMonoBehaviour<T>
     {
@@ -21,7 +29,7 @@ namespace UnityEngine
             {
                 if( __instance == null )
                 {
-                    var instances = FindObjectsOfType<T>( true );
+                    T[] instances = FindObjectsOfType<T>( true );
                     if( instances.Length == 0 )
                     {
                         throw new InvalidOperationException( $"Requested {nameof( MonoBehaviour )} {typeof( T ).Name} was not found." );
@@ -30,6 +38,7 @@ namespace UnityEngine
                     {
                         throw new InvalidOperationException( $"Too many instances of {nameof( MonoBehaviour )} {typeof( T ).Name}." );
                     }
+
                     __instance = instances[0];
                 }
                 return __instance;
@@ -37,7 +46,7 @@ namespace UnityEngine
         }
 
         /// <summary>
-        /// Checks if at least 1 instance of this behaviour exists. <br/>
+        /// Checks if exactly 1 instance of this behaviour exists.
         /// </summary>
         protected static bool exists
         {
@@ -45,12 +54,13 @@ namespace UnityEngine
             {
                 if( __instance == null )
                 {
-                    var instances = FindObjectsOfType<T>( true );
-                    if( instances.Length == 0 )
+                    T[] instances = FindObjectsOfType<T>( true );
+                    if( instances.Length != 1 )
                     {
                         return false;
                     }
-                    __instance = instances[0];
+
+                    __instance = instances[0]; // Might as well assign it, since we already have it.
                 }
                 return __instance != null;
             }

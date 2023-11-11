@@ -101,6 +101,7 @@ namespace KSS.CelestialBodies
         {
             _cmdAtmospheres.Clear();
             _cmdAtmospheres.SetGlobalTexture( Shader.PropertyToID( "_texgsfs" ), BuiltinRenderTextureType.CurrentActive ); // `_Texture` gets overriden by something else... Unity... >:{
+#warning TODO - this needs a merge of 2 depth textures (near and far) and use that as the depth, since stacked depth is clipped beyond 0..1
             _cmdAtmospheres.SetRenderTarget( _rt );
             _cmdAtmospheres.Blit( null, _rt, _material, 0 );
 

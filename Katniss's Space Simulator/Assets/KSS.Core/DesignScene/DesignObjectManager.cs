@@ -83,7 +83,7 @@ namespace KSS.Core.DesignScene
                 throw new ArgumentException( $"object to place must NOT be an actionable object.", nameof( obj ) );
             }
 
-            if( instance._designObj.RootPart != null )
+            if( DesignObjectHasRootPart() )
             {
                 Destroy( instance._designObj.RootPart );
             }
@@ -213,7 +213,6 @@ namespace KSS.Core.DesignScene
         public static void SaveVessel()
         {
             // save current vessel to the files defined by metadata's ID.
-#warning TODO - take the input from the user to create the metadata. I.e. the UI should automatically update the metadata in DesignObjectManager, since we don't know that Ui even exists here.
             Directory.CreateDirectory( CurrentVesselMetadata.GetRootDirectory() );
             _designObjDataHandler.ObjectsFilename = Path.Combine( CurrentVesselMetadata.GetRootDirectory(), "objects.json" );
             _designObjDataHandler.DataFilename = Path.Combine( CurrentVesselMetadata.GetRootDirectory(), "data.json" );
@@ -248,7 +247,7 @@ namespace KSS.Core.DesignScene
 
         private static GameObject GetGameObject()
         {
-            if( instance._designObj.RootPart == null )
+            if( !DesignObjectHasRootPart() )
                 throw new InvalidOperationException( $"Can't save, the design object is empty." );
 
             return instance._designObj.RootPart.gameObject;
