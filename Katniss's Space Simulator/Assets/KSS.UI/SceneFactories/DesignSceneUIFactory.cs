@@ -67,7 +67,7 @@ namespace KSS.UI.SceneFactories
             } );
             UIButton saveBtn = p1.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 80, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_save" ), () =>
             {
-                CanvasManager.Get( CanvasName.WINDOWS ).AddConfirmationWindow( "Save ...", "Confirm saving the vessel", () =>
+                CanvasManager.Get( CanvasName.WINDOWS ).AddConfirmationWindow( "Save ...", $"Confirm saving the vessel {DesignObjectManager.CurrentVesselMetadata.ID}", () =>
                 {
                     DesignObjectManager.SaveVessel();
                 } );

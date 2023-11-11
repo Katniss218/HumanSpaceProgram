@@ -248,6 +248,9 @@ namespace KSS.Core.DesignScene
 
         private static GameObject GetGameObject()
         {
+            if( instance._designObj.RootPart == null )
+                throw new InvalidOperationException( $"Can't save, the design object is empty." );
+
             return instance._designObj.RootPart.gameObject;
         }
     }
