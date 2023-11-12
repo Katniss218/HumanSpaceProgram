@@ -73,6 +73,7 @@
     <Compile Include="Assets\KSS\Components\FActuatorXY.cs" />
     <Compile Include="Assets\KSS\AssetLoaders\GameDataJsonPartFactory.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadTree_NodeUtils.cs" />
+    <Compile Include="Assets\KSS\AssetLoaders\GameDataJsonVesselFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS\CelestialBodies\Surface\TerrainShader.shader" />

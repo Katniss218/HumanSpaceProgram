@@ -9,7 +9,7 @@ using UnityPlus.AssetManagement;
 
 namespace UnityPlus.Serialization
 {
-    public static class ILoaderEx_References
+    public static class IForwardReferenceMap_Ex_References
     {
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public static object ReadObjectReference( this IForwardReferenceMap l, SerializedData json )

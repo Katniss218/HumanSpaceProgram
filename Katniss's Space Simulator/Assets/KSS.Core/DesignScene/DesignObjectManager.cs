@@ -205,7 +205,11 @@ namespace KSS.Core.DesignScene
 
         void Awake()
         {
-            _designObj = DesignObjectFactory.CreatePartless( Vector3.zero, Quaternion.identity );
+            GameObject gameObject = new GameObject( $"Vessel, '{name}'" );
+
+            _designObj = gameObject.AddComponent<DesignObject>();
+            _designObj.name = name;
+            _designObj.transform.SetPositionAndRotation( Vector3.zero, Quaternion.identity );
         }
 
 

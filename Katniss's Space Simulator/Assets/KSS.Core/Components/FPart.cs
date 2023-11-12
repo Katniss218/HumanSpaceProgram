@@ -16,21 +16,20 @@ namespace KSS.Core.Components
     public class FPart : MonoBehaviour, IPersistent
     {
         [field: SerializeField]
-        public NamespacedID PartID { get; set; }
+        public NamespacedIdentifier PartID { get; set; }
 
         public SerializedData GetData( IReverseReferenceMap s )
         {
             return new SerializedObject()
             {
-#warning TODO - extension to serialize directly.
-                { "part_id", this.PartID.ToString() }
+                { "part_id", s.WriteNamespacedIdentifier( this.PartID ) }
             };
         }
 
         public void SetData( IForwardReferenceMap l, SerializedData data )
         {
             if( data.TryGetValue( "part_id", out var partId ) )
-                this.PartID = NamespacedID.Parse( (string)partId );
+                this.PartID = l.ReadNamespacedIdentifier( partId );
         }
 
         public static PartMetadata GetPart( Transform obj )

@@ -15,6 +15,7 @@ using UnityPlus.Serialization;
 using UnityPlus.Serialization.Strategies;
 using System.IO;
 using System.Collections;
+using KSS.Core.Mods;
 
 namespace KSS.DevUtils
 {
@@ -149,7 +150,7 @@ namespace KSS.DevUtils
                 JsonSingleExplicitHierarchyStrategy strat = new JsonSingleExplicitHierarchyStrategy( handler, () => null );
                 Saver saver = new Saver( null, null, strat.Save_Object, strat.Save_Data );
 
-                string gameDataPath = HumanSpaceProgram.GetGameDataDirectoryPath();
+                string gameDataPath = HumanSpaceProgramMods.GetModDirectoryPath();
                 string partDir;
 
                 VesselMetadata vm;

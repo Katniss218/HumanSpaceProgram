@@ -8,7 +8,7 @@ using UnityEngine;
 namespace KSS.Core
 {
     /// <summary>
-    /// A class responsible for instantiating a vessel from a source (save file, on launch, etc).
+    /// A class responsible for instantiating a building from a source (save file, on launch, etc).
     /// </summary>
     public static class BuildingFactory
     {
@@ -17,11 +17,11 @@ namespace KSS.Core
         const string name = "tempname_building";
 
         /// <summary>
-        /// Creates a new partless vessel at the specified global position.
+        /// Creates a new partless building at the specified global position.
         /// </summary>
-        /// <param name="airfPosition">The `Absolute Inertial Reference Frame` position of the vessel to create.</param>
-        /// <param name="airfRotation">Rotation of the vessel in the `Absolute Inertial Reference Frame`</param>
-        /// <returns>The created partless vessel.</returns>
+        /// <param name="airfPosition">The `Absolute Inertial Reference Frame` position of the building to create.</param>
+        /// <param name="airfRotation">Rotation of the building in the `Absolute Inertial Reference Frame`</param>
+        /// <returns>The created partless building.</returns>
         public static Building CreatePartless( CelestialBody referenceBody, Vector3Dbl localPosition, QuaternionDbl localRotation )
         {
             Building building = CreateGO( referenceBody, localPosition, localRotation );
@@ -43,7 +43,7 @@ namespace KSS.Core
         }
 
         /// <summary>
-        /// Completely deletes a vessel and cleans up after it.
+        /// Completely deletes a building and cleans up after it.
         /// </summary>
         public static void Destroy( Building building )
         {

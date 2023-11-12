@@ -25,8 +25,8 @@ namespace KSS.Core
         void Awake()
         {
             // Load mods before caching autorunning methods.
-            // Because mods might (will / should) use autorunning methods via the attributes.
-            ModLoader.LoadModAssemblies();
+            // Because mods might (WILL and SHOULD) attach autorunning methods via the attributes.
+            HumanSpaceProgramMods.LoadModAssemblies();
 
             HSPEventListenerAttribute.CreateEventsForAutorunningMethods( AppDomain.CurrentDomain.GetAssemblies() );
 

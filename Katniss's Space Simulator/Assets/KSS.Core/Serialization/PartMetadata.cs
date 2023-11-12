@@ -29,7 +29,7 @@ namespace KSS.Core.Serialization
         /// <summary>
         /// The unique ID of this part.
         /// </summary>
-        public readonly NamespacedID ID;
+        public readonly NamespacedIdentifier ID;
 
         /// <summary>
         /// The display name shown in the GUI.
@@ -73,7 +73,7 @@ namespace KSS.Core.Serialization
 
             string partId = Path.GetFileName( path );
             string modId = Path.GetFileName( Path.GetDirectoryName( Path.GetDirectoryName( path ) ) );
-            this.ID = new NamespacedID( modId, partId );
+            this.ID = new NamespacedIdentifier( modId, partId );
         }
 
         /// <summary>

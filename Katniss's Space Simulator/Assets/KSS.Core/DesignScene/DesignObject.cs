@@ -9,6 +9,7 @@ using UnityEngine;
 
 namespace KSS.Core.DesignScene
 {
+    [RequireComponent( typeof( RootObjectTransform ) )]
     public class DesignObject : MonoBehaviour, IPartObject
     {
         [SerializeField]
@@ -26,7 +27,7 @@ namespace KSS.Core.DesignScene
             }
         }
 
-        public PhysicsObject PhysicsObject => throw new NotSupportedException( $"Design vessels can't move using the physics system." );
+        public PhysicsObject PhysicsObject => throw new NotSupportedException( $"Design objects can't move using the physics system." );
         public RootObjectTransform RootObjTransform { get; private set; }
 
         void Awake()

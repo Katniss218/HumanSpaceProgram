@@ -78,7 +78,6 @@
     <Compile Include="Assets\KSS.Core\Layer.cs" />
     <Compile Include="Assets\KSS.Core\Serialization\TimelineManager.cs" />
     <Compile Include="Assets\KSS.Core\DesignScene\Tools\VanillaToolRegisterer.cs" />
-    <Compile Include="Assets\KSS.Core\Mods\ModLoader.cs" />
     <Compile Include="Assets\KSS.Core\DesignScene\Tools\RotateTool.cs" />
     <Compile Include="Assets\KSS.Core\HSPEventListenerAttribute.cs" />
     <Compile Include="Assets\KSS.Core\SymmetryDataContainer.cs" />
@@ -124,14 +123,16 @@
     <Compile Include="Assets\KSS.Core\Substance.cs" />
     <Compile Include="Assets\KSS.Core\CelestialBody.cs" />
     <Compile Include="Assets\KSS.Core\Serialization\IOHelper.cs" />
-    <Compile Include="Assets\KSS.Core\DesignScene\DesignObjectFactory.cs" />
     <Compile Include="Assets\KSS.Core\IPartObject.cs" />
     <Compile Include="Assets\KSS.Core\SceneManagement\InvalidSceneManagerException.cs" />
     <Compile Include="Assets\KSS.Core\Components\FLaunchSiteMarker.cs" />
     <Compile Include="Assets\KSS.Core\ActiveObjectManager.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\SubstanceStateCollection.cs" />
     <Compile Include="Assets\KSS.Core\PartRegistry.cs" />
-    <Compile Include="Assets\KSS.Core\Mods\NamespacedID.cs" />
+    <Compile Include="Assets\KSS.Core\Mods\NamespacedIdentifier.cs" />
+    <Compile Include="Assets\KSS.Core\Mods\IReferenceMap_Ex_NamespacedIdentifier.cs" />
+    <Compile Include="Assets\KSS.Core\PartFactory.cs" />
+    <Compile Include="Assets\KSS.Core\Mods\HumanSpaceProgramMods.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.Core\___KSS.Core.asmdef" />

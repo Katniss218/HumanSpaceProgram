@@ -16,7 +16,7 @@ namespace KSS.Core.Physics
         /// </summary>
         /// <param name="airfPosition">The position of the point in absolute inertial reference frame.</param>
         /// <returns>The calculated acceleration, in [m/s^2].</returns>
-        public static Vector3Dbl GetGravityAcceleration( Vector3Dbl airfPosition )
+        public static Vector3Dbl GetNBodyGravityAcceleration( Vector3Dbl airfPosition )
         {
             CelestialBody[] bodies = CelestialBodyManager.GetAll(); // this can be optimized.
 
@@ -43,9 +43,9 @@ namespace KSS.Core.Physics
         /// </summary>
         /// <param name="airfPosition">The position of the point in absolute inertial reference frame.</param>
         /// <returns>The calculated force, in [N].</returns>
-        public static Vector3Dbl GetGravityForce( Vector3Dbl airfPosition, double objectMass )
+        public static Vector3Dbl GetNBodyGravityForce( Vector3Dbl airfPosition, double objectMass )
         {
-            return objectMass * GetGravityAcceleration( airfPosition );
+            return objectMass * GetNBodyGravityAcceleration( airfPosition );
         }
     }
 }

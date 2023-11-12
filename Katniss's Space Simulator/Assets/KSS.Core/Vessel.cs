@@ -196,7 +196,7 @@ namespace KSS.Core
         {
             SetPhysicsObjectParameters();
 
-            Vector3Dbl airfGravityForce = GravityUtils.GetGravityForce( this.AIRFPosition, PhysicsObject.Mass );
+            Vector3Dbl airfGravityForce = GravityUtils.GetNBodyGravityForce( this.AIRFPosition, PhysicsObject.Mass );
 
             PhysicsObject.AddForce( (Vector3)airfGravityForce );
 

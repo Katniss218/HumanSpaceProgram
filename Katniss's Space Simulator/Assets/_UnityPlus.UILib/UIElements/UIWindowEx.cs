@@ -29,6 +29,9 @@ namespace UnityPlus.UILib.UIElements
             return window;
         }
 
+        /// <summary>
+        /// A shorthand for AddButton that closes the window.
+        /// </summary>
         public static UIWindow WithCloseButton( this UIWindow window, UILayoutInfo layoutInfo, Sprite buttonSprite, out UIButton closeButton )
         {
             closeButton = window.AddButton( layoutInfo, buttonSprite, () =>

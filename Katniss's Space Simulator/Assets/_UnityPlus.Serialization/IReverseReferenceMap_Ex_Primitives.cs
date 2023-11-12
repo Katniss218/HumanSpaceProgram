@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace UnityPlus.Serialization
 {
-    public static class ISaver_Ex_Primitives
+    public static class IReverseReferenceMap_Ex_Primitives
     {
         // Primitives in this context are types that are always saved in-place.
 

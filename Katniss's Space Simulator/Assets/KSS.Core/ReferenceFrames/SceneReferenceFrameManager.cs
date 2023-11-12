@@ -30,10 +30,15 @@ namespace KSS.Core.ReferenceFrames
         /// </summary>
         public static event Action<ReferenceFrameSwitchData> OnAfterReferenceFrameSwitch;
 
+        private IReferenceFrame _sceneReferenceFrame;
         /// <summary>
         /// The reference frame that describes how to convert between Absolute Inertial Reference Frame and the scene's world space.
         /// </summary>
-        public static IReferenceFrame SceneReferenceFrame { get; private set; }
+        public static IReferenceFrame SceneReferenceFrame
+        {
+            get => instance._sceneReferenceFrame;
+            set => instance._sceneReferenceFrame = value;
+        }
 
         /// <summary>
         /// Sets the scene's reference frame to the specified frame, and calls out a frame switch event.

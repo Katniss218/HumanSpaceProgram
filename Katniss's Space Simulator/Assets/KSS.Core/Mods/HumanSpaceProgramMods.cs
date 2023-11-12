@@ -10,11 +10,22 @@ using UnityEngine;
 namespace KSS.Core.Mods
 {
     /// <summary>
-    /// Knows how to load mods from a mod directory.
+    /// Constants regarding mods for HSP.
     /// </summary>
-    public static class ModLoader
+    public class HumanSpaceProgramMods
     {
-        public static string GetModDirectory() => HumanSpaceProgram.GetGameDataDirectoryPath();
+        /// <summary>
+        /// The name of the `GameData` directory.
+        /// </summary>
+        public const string GameDataDirectoryName = "GameData";
+
+        /// <summary>
+        /// Computes the path to the directory containing mods.
+        /// </summary>
+        public static string GetModDirectoryPath()
+        {
+            return Path.Combine( HumanSpaceProgram.GetBaseDirectoryPath(), GameDataDirectoryName );
+        }
 
         private static void LoadAssembliesRecursive( string path )
         {
@@ -35,7 +46,7 @@ namespace KSS.Core.Mods
         /// </summary>
         internal static void LoadModAssemblies()
         {
-            string modDirectory = GetModDirectory();
+            string modDirectory = HumanSpaceProgramMods.GetModDirectoryPath();
 
             if( !Directory.Exists( modDirectory ) )
                 Directory.CreateDirectory( modDirectory );
@@ -45,6 +56,7 @@ namespace KSS.Core.Mods
             LoadAssembliesRecursive( modDirectory );
         }
 
-        // todo - later, assembly should contain at least 1 class implementing the 'IMod' interface, which will specify the mod ID, and mod version. For version checking.
+        // TODO - Later, a mod should be located in an appropriate folder, along with a `_mod.json` file containing ModMetadata (name, author, etc, and a version info for compatibility checking)
+        //        If ModMetadata is not present, the mod should be skipped. Also things that load from GameData should enumerate the list of found mods, not the raw directories.
     }
 }

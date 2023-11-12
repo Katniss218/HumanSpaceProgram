@@ -259,8 +259,8 @@ namespace KSS.Components
                 throw new InvalidOperationException( $"Both ends must exist" );
             }
 
-            Vessel vessel = this.transform.GetVessel();
-            Vector3Dbl airfAcceleration = GravityUtils.GetGravityAcceleration( vessel.AIRFPosition );
+            IPartObject vessel = this.transform.GetPartObject();
+            Vector3Dbl airfAcceleration = GravityUtils.GetNBodyGravityAcceleration( vessel.RootObjTransform.AIRFPosition );
             Vector3 sceneAcceleration = SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformDirection( (Vector3)airfAcceleration );
             Vector3 vesselAcceleration = vessel.PhysicsObject.Acceleration;
 

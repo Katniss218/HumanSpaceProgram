@@ -14,11 +14,6 @@ namespace KSS.Core
     public static class HumanSpaceProgram
     {
         /// <summary>
-        /// The name of the `GameData` directory.
-        /// </summary>
-        public const string GameDataDirectoryName = "GameData";
-
-        /// <summary>
         /// The name of the `Saves` directory.
         /// </summary>
         public const string SavesDirectoryName = "Saves";
@@ -52,14 +47,6 @@ namespace KSS.Core
             }
 
             return dataPath;
-        }
-
-        /// <summary>
-        /// Computes the path to the `GameData` directory.
-        /// </summary>
-        public static string GetGameDataDirectoryPath()
-        {
-            return Path.Combine( GetBaseDirectoryPath(), GameDataDirectoryName );
         }
 
         /// <summary>

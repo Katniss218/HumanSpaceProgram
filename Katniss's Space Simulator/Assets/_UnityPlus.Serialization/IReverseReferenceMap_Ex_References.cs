@@ -9,7 +9,7 @@ using UnityPlus.AssetManagement;
 
 namespace UnityPlus.Serialization
 {
-    public static class ISaver_Ex_References
+    public static class IReverseReferenceMap_Ex_References
     {
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public static SerializedData WriteObjectReference( this IReverseReferenceMap s, object value )

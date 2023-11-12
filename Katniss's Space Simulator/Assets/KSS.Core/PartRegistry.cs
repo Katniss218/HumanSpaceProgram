@@ -14,14 +14,27 @@ namespace KSS.Core
     /// </summary>
     public static class PartRegistry
     {
-        private static Dictionary<NamespacedID, PartFactory> _registry = new Dictionary<NamespacedID, PartFactory>();
+        private static Dictionary<NamespacedIdentifier, PartFactory> _registry = new Dictionary<NamespacedIdentifier, PartFactory>();
 
         /// <summary>
         /// Registers a Unity hierarchy factory under the specified mod and part IDs.
         /// </summary>
-        public static void Register( NamespacedID namespacedPartId, PartFactory factory )
+        public static void Register( NamespacedIdentifier namespacedPartId, PartFactory factory )
         {
             _registry.Add( namespacedPartId, factory );
+        }
+
+        /// <summary>
+        /// Unregisters a Unity hierarchy factory under the specified mod and part IDs.
+        /// </summary>
+        public static void Unregister( NamespacedIdentifier namespacedPartId )
+        {
+            _registry.Remove( namespacedPartId );
+        }
+        
+        public static void UnregisterAll()
+        {
+            _registry.Clear();
         }
 
         /// <summary>
@@ -60,7 +73,7 @@ namespace KSS.Core
         /// <summary>
         /// Loads a specified registered part metadata from its source.
         /// </summary>
-        public static PartMetadata LoadMetadata( NamespacedID namespacedPartId )
+        public static PartMetadata LoadMetadata( NamespacedIdentifier namespacedPartId )
         {
             if( _registry.TryGetValue( namespacedPartId, out PartFactory factory ) )
             {
@@ -73,7 +86,7 @@ namespace KSS.Core
         /// <summary>
         /// Loads a specified registered unity hierarchy from its source.
         /// </summary>
-        public static GameObject Load( NamespacedID namespacedPartId )
+        public static GameObject Load( NamespacedIdentifier namespacedPartId )
         {
             if( _registry.TryGetValue( namespacedPartId, out PartFactory factory ) )
             {
@@ -83,24 +96,4 @@ namespace KSS.Core
             return null;
         }
     }
-
-    /// <summary>
-    /// Inherit from this class to provide an implementation of a hierarchy instantiator, and a metadata provider.
-    /// </summary>
-    public abstract class PartFactory
-    {
-        /// <summary>
-        /// Loads the part metadata of this specific part from the original source.
-        /// </summary>
-        /// <returns>The loaded part metadata.</returns>
-        public abstract PartMetadata LoadMetadata();
-
-        /// <summary>
-        /// Instantiates the gameobject hierarchy of this specific part from the original source.
-        /// </summary>
-        /// <returns>The root game object of the instantiated hierarchy.</returns>
-        public abstract GameObject Load();
-    }
-
-    // TODO - Analogous thing could be done for vessels, although they're just parts.
 }

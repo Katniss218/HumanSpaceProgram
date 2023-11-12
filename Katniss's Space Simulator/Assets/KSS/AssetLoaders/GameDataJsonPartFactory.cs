@@ -40,11 +40,13 @@ namespace KSS.AssetLoaders
             return _strat.LastSpawnedRoot;
         }
 
+        // TODO - This can also be used to load saved vessels - saved vessels serialize as their root parts.
+
         [HSPEventListener( HSPEvent.STARTUP_IMMEDIATELY, HSPEvent.NAMESPACE_VANILLA + ".load_parts" )]
         private static void OnStartup()
         {
             // <mod_folder>/Parts/<part_id>/objects.json, data.json, _part.json
-            string gameDataPath = HumanSpaceProgram.GetGameDataDirectoryPath();
+            string gameDataPath = HumanSpaceProgramMods.GetModDirectoryPath();
             string[] modDirectories = Directory.GetDirectories( gameDataPath );
 
             foreach( var modPath in modDirectories )
@@ -63,7 +65,7 @@ namespace KSS.AssetLoaders
                     {
                         _filePath = partPath
                     };
-                    PartRegistry.Register( new NamespacedID( Path.GetFileName( modPath ), Path.GetFileName( partPath ) ), fac );
+                    PartRegistry.Register( new NamespacedIdentifier( Path.GetFileName( modPath ), Path.GetFileName( partPath ) ), fac );
                 }
             }
         }
