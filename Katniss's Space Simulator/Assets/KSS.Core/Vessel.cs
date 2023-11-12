@@ -56,8 +56,8 @@ namespace KSS.Core
                 if( _rootPart != null )
                     _rootPart.SetParent( null );
                 _rootPart = value;
-                if( _rootPart != null )
-                    _rootPart.SetParent( this.transform );
+                if( value != null )
+                    value.SetParent( this.transform );
                 RecalculateParts();
             }
         }

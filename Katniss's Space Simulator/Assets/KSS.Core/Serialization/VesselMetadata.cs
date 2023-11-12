@@ -17,12 +17,12 @@ namespace KSS.Core.Serialization
         /// <summary>
         /// The name of the file that stores the vessel metadata.
         /// </summary>
-        public const string VESSEL_FILENAME = "_vessel.json";
+        public const string VESSEL_METADATA_FILENAME = "_vessel.json";
 
         /// <summary>
-        /// The unique ID of this part.
+        /// The unique ID of this vessel.
         /// </summary>
-        public readonly string ID;
+        public readonly string ID; // Vessels don't have a namespace, they're player-created.
 
         /// <summary>
         /// The display name shown in the GUI.
@@ -71,7 +71,7 @@ namespace KSS.Core.Serialization
         public void WriteToDisk()
         {
             string savePath = GetRootDirectory();
-            string saveFilePath = Path.Combine( savePath, VESSEL_FILENAME );
+            string saveFilePath = Path.Combine( savePath, VESSEL_METADATA_FILENAME );
 
             StringBuilder sb = new StringBuilder();
             new JsonStringWriter( this.GetData(), sb ).Write();
@@ -82,7 +82,7 @@ namespace KSS.Core.Serialization
         public void ReadDataFromDisk()
         {
             string savePath = GetRootDirectory();
-            string saveFilePath = Path.Combine( savePath, VESSEL_FILENAME );
+            string saveFilePath = Path.Combine( savePath, VESSEL_METADATA_FILENAME );
 
             string saveJson = File.ReadAllText( saveFilePath, Encoding.UTF8 );
 

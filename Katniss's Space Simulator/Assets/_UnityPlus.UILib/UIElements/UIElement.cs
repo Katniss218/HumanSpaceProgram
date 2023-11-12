@@ -26,7 +26,17 @@ namespace UnityPlus.UILib.UIElements
 
         public void Destroy() // UI elements should be attached to the root GameObject of their subtree.
         {
+            this.DestroyFixChildren();
             Destroy( this.gameObject );
+        }
+
+        void DestroyFixChildren() // UI elements should be attached to the root GameObject of their subtree.
+        {
+            if( this is IUIElementChild child )
+                child.Parent.Children.Remove( child ); // Removing with OnDestroy lags one frame behind, making destroying and recreating elements (refreshing) layout act as if the old items were still there.
+
+            if( this is IUIElementContainer co )
+                co.Children.Clear();
         }
 
         /// <summary>

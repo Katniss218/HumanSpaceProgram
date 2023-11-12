@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 6544856856546271155}
   - component: {fileID: 2831796584560580002}
   m_Layer: 0
-  m_Name: part.tank
+  m_Name: tank
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -98,7 +98,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9dbaab46dfbfb3d45b402c96d954e966, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <PartID>k__BackingField: part.tank
+  <PartID>k__BackingField:
+    _data: Vanilla::tank
 --- !u!1 &2441066058776252235
 GameObject:
   m_ObjectHideFlags: 0

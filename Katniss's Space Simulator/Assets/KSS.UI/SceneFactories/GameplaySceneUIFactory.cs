@@ -43,6 +43,7 @@ namespace KSS.UI.SceneFactories
         public static void CreateUIActiveObjectNull()
         {
             CreateTopPanel();
+            CreateBottomPanelInactive();
 
             CreateWindowToggleList();
         }
@@ -137,14 +138,44 @@ namespace KSS.UI.SceneFactories
         private static void CreateTopPanel()
         {
             UIPanel topPanel = _mainPanel.AddPanel( UILayoutInfo.FillHorizontal( 0, 0, 1f, 0, 30 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/top_panel_background" ) );
-            UIPanel p4 = topPanel.AddPanel( UILayoutInfo.FillVertical( 0, 0, 1f, -20, 30 ), null );
-            if( ActiveObjectManager.ActiveObject != null )
+            if( ActiveObjectManager.ActiveObject == null )
             {
+
+            }
+            else
+            {
+                UIPanel p4 = topPanel.AddPanel( UILayoutInfo.FillVertical( 0, 0, 1f, -20, 30 ), null );
                 UIButton deselectActive = p4.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 0, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), () =>
                 {
                     ActiveObjectManager.ActiveObject = null;
                 } );
             }
+        }
+
+        private static void CreateBottomPanelInactive()
+        {
+            UIPanel bottomPanel = _mainPanel.AddPanel( UILayoutInfo.FillHorizontal( 0, 0, 0f, 0, 30 ), null );
+
+            UIButton constructButton = bottomPanel.AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( -16, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), () =>
+            {
+                // construct will spawn a construction site.
+                // the site can be placed anywhere where allowed.
+                // the site can NOT be moved after, but the player needs a way of finely positioning it.
+                // maybe place it temporarily first, and then finely adjust using move/rotate tools, before confirming?
+
+                // would be neat if there was a way of automating that.
+
+                // needs an easy one-call way of spawning a c-site.
+
+
+                // in KSP, the positioning is dictated by the position of the root in VAB
+            } )
+            .WithText( UILayoutInfo.Fill(), "C", out _ );
+            UIButton deconstructButton = bottomPanel.AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 16, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), () =>
+            {
+
+            } )
+                .WithText( UILayoutInfo.Fill(), "D", out _ );
         }
 
         private static void CreateWindowToggleList()

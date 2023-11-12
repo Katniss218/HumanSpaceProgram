@@ -79,7 +79,7 @@ namespace KSS.UI
             PartListUI partListUI = uiPanel.gameObject.AddComponent<PartListUI>();
 
             // update part IDs from *somewhere*
-            partListUI._parts = PartHelper.GetAllParts();
+            partListUI._parts = PartRegistry.LoadAllMetadata();
 
             var categories = new List<string>();
             var categories2 = PartMetadata.GetUniqueCategories( partListUI._parts );

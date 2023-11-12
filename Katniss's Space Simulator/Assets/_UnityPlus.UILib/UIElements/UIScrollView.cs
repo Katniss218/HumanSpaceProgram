@@ -20,11 +20,6 @@ namespace UnityPlus.UILib.UIElements
 
         public LayoutDriver LayoutDriver { get; set; }
 
-        void OnDestroy()
-        {
-            this.Parent.Children.Remove( this );
-        }
-
         public static UIScrollView Create( IUIElementContainer parent, UILayoutInfo layout, UILayoutInfo contentLayout, bool horizontal, bool vertical )
         {
             (GameObject rootGameObject, RectTransform rootTransform, UIScrollView uiScrollView) = UIElement.CreateUIGameObject<UIScrollView>( parent, "uilib-scrollview", layout );

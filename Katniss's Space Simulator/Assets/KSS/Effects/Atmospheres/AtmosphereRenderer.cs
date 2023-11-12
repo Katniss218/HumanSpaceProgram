@@ -21,6 +21,8 @@ namespace KSS.CelestialBodies
         CommandBuffer _cmdComposition;
 
         Vector3 _center = Vector3.zero;
+        [SerializeField]
+        Light light;
 
         [SerializeField]
         RenderTexture _rt;
@@ -69,7 +71,7 @@ namespace KSS.CelestialBodies
         void OnPreRender()
         {
             _material.SetVector( Shader.PropertyToID( "_Center" ), _center );
-            _material.SetVector( Shader.PropertyToID( "_SunDirection" ), new Vector3( 1, 0, 1 ) );
+            _material.SetVector( Shader.PropertyToID( "_SunDirection" ), -light.transform.forward );
             _material.SetVector( Shader.PropertyToID( "_ScatteringWavelengths" ), new Vector3( 675, 530, 400 ) );
             _material.SetFloat( Shader.PropertyToID( "_ScatteringStrength" ), 128 );
             _material.SetFloat( Shader.PropertyToID( "_TerminatorFalloff" ), 32 );

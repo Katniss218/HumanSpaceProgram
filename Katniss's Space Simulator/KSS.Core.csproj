@@ -58,14 +58,12 @@
   <ItemGroup>
     <Compile Include="Assets\KSS.Core\Serialization\SaveMetadataEx.cs" />
     <Compile Include="Assets\KSS.Core\Vessel.cs" />
-    <Compile Include="Assets\KSS.Core\PartHelper.cs" />
     <Compile Include="Assets\KSS.Core\Orbit.cs" />
     <Compile Include="Assets\KSS.Core\Building.cs" />
     <Compile Include="Assets\KSS.Core\Vessel.Serialization.cs" />
     <Compile Include="Assets\KSS.Core\DesignScene\Tools\PickTool.cs" />
     <Compile Include="Assets\KSS.Core\Physics\PhysicsObject.cs" />
     <Compile Include="Assets\KSS.Core\SceneManagement\EditorSceneManager.cs" />
-    <Compile Include="Assets\KSS.Core\PartFactory.cs" />
     <Compile Include="Assets\KSS.Core\Serialization\TimelineMetadata.cs" />
     <Compile Include="Assets\KSS.Core\DesignScene\DesignObjectManager.cs" />
     <Compile Include="Assets\KSS.Core\HSPEvent.cs" />
@@ -132,6 +130,8 @@
     <Compile Include="Assets\KSS.Core\Components\FLaunchSiteMarker.cs" />
     <Compile Include="Assets\KSS.Core\ActiveObjectManager.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\SubstanceStateCollection.cs" />
+    <Compile Include="Assets\KSS.Core\PartRegistry.cs" />
+    <Compile Include="Assets\KSS.Core\Mods\NamespacedID.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.Core\___KSS.Core.asmdef" />

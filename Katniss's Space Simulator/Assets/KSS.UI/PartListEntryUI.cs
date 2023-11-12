@@ -25,7 +25,7 @@ namespace KSS.UI
             // otherwise, spawn a new vessel with that part as root.
             PickTool pickTool = DesignSceneToolManager.UseTool<PickTool>();
 
-            GameObject spawnedPart = PartHelper.InstantiatePart( _part.ID );
+            GameObject spawnedPart = PartRegistry.Load( _part.ID );
             if( DesignObjectManager.DesignObjectHasRootPart() )
             {
                 pickTool.HeldPart = spawnedPart.transform;

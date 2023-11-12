@@ -225,7 +225,7 @@ GameObject:
   - component: {fileID: 881548991537354002}
   - component: {fileID: 4847280572405610972}
   m_Layer: 0
-  m_Name: part.intertank
+  m_Name: intertank
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -314,7 +314,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9dbaab46dfbfb3d45b402c96d954e966, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <PartID>k__BackingField: part.intertank
+  <PartID>k__BackingField:
+    _data: Vanilla::intertank
 --- !u!1 &8895903900501251924
 GameObject:
   m_ObjectHideFlags: 0

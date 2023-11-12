@@ -65,7 +65,7 @@ namespace UnityEngine
         /// Checks if the gameobject or any of its children (recursive) have a component of a specified type.
         /// </summary>
         /// <remarks>
-        /// Don't use this overload if you want to later do something with the component. Use <see cref="GameObject.GetComponentInChildren{T}"/> or <see cref="GetComponentInChildren{T}(GameObject, out T)"/> instead.
+        /// Don't use this overload if you want to later do something with the component. Use <see cref="GameObject.GetComponentInChildren{T}"/> or <see cref="HasComponentInChildren{T}(GameObject, out T)"/> instead.
         /// </remarks>
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public static bool HasComponentInChildren<T>( this GameObject gameObject )

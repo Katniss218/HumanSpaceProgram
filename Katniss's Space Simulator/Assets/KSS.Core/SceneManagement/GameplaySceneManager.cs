@@ -19,23 +19,20 @@ namespace KSS.Core
             HSPEvent.EventManager.TryInvoke( HSPEvent.STARTUP_GAMEPLAY );
         }
 
-        bool toggle = false;
-
         void Update()
         {
             if( Input.GetKeyDown( KeyCode.Escape ) )
             {
                 if( !TimeManager.LockTimescale )
                 {
-                    toggle = !toggle;
-                    if( toggle )
+                    if( TimeManager.IsPaused )
                     {
-                        TimeManager.Pause();
+                        TimeManager.Unpause();
                         HSPEvent.EventManager.TryInvoke( HSPEvent.ESCAPE_GAMEPLAY, null );
                     }
                     else
                     {
-                        TimeManager.Unpause();
+                        TimeManager.Pause();
                         HSPEvent.EventManager.TryInvoke( HSPEvent.ESCAPE_GAMEPLAY, null );
                     }
                 }

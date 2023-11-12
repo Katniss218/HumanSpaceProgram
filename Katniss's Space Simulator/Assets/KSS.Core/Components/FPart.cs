@@ -1,4 +1,5 @@
-﻿using KSS.Core.Serialization;
+﻿using KSS.Core.Mods;
+using KSS.Core.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,20 +16,21 @@ namespace KSS.Core.Components
     public class FPart : MonoBehaviour, IPersistent
     {
         [field: SerializeField]
-        public string PartID { get; set; }
+        public NamespacedID PartID { get; set; }
 
         public SerializedData GetData( IReverseReferenceMap s )
         {
             return new SerializedObject()
             {
-                { "part_id", this.PartID }
+#warning TODO - extension to serialize directly.
+                { "part_id", this.PartID.ToString() }
             };
         }
 
         public void SetData( IForwardReferenceMap l, SerializedData data )
         {
             if( data.TryGetValue( "part_id", out var partId ) )
-                this.PartID = (string)partId;
+                this.PartID = NamespacedID.Parse( (string)partId );
         }
 
         public static PartMetadata GetPart( Transform obj )
@@ -38,7 +40,7 @@ namespace KSS.Core.Components
                 FPart part = obj.GetComponent<FPart>();
                 if( part != null )
                 {
-                    return PartHelper.GetPartMetadata( part.PartID );
+                    return PartRegistry.LoadMetadata( part.PartID );
                 }
                 obj = obj.parent;
             }

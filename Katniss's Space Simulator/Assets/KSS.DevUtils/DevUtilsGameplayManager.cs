@@ -10,7 +10,7 @@ using KSS.Core.Serialization;
 using KSS.Core.Components;
 using System;
 using UnityPlus.AssetManagement;
-using KSS.AssetLoaders.GameData;
+using KSS.AssetLoaders;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.Strategies;
 using System.IO;
@@ -71,10 +71,10 @@ namespace KSS.DevUtils
             CelestialBody body = CelestialBodyManager.Get( "main" );
             Vector3 localPos = CoordinateUtils.GeodeticToEuclidean( 28.5857702f, -80.6507262f, (float)(body.Radius + 1.0) );
 
-            PartFactory launchSitePart = new PartFactory( new AssetPartSource( "builtin::Resources/Prefabs/testlaunchsite" ) );
             launchSite = BuildingFactory.CreatePartless( body, localPos, Quaternion.FromToRotation( Vector3.up, localPos.normalized ) );
 
-            Transform root = launchSitePart.Create( launchSite.transform, Vector3.zero, Quaternion.identity );
+            GameObject launchSitePrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/testlaunchsite" );
+            GameObject root = InstantiateLocal( launchSitePrefab, launchSite.transform, Vector3.zero, Quaternion.identity );
 
             var v = CreateVessel( launchSite );
             ActiveObjectManager.ActiveObject = v.RootPart.GetVessel().gameObject;
@@ -165,66 +165,74 @@ namespace KSS.DevUtils
 
                 PartMetadata pm;
 
-                partDir = gameDataPath + "/Vanilla/Parts/part.engine";
+                partDir = gameDataPath + "/Vanilla/Parts/engine";
                 Directory.CreateDirectory( partDir );
                 pm = new PartMetadata( partDir );
                 pm.Name = "Engine"; pm.Author = "Katniss"; pm.Categories = new string[] { "engine" };
                 pm.WriteToDisk();
-                strat.RootObjectGetter = () => AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/part.engine" );
+                strat.RootObjectGetter = () => AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/engine" );
                 handler.ObjectsFilename = partDir + "/objects.json";
                 handler.DataFilename = partDir + "/data.json";
                 saver.Save();
 
 
-                partDir = gameDataPath + "/Vanilla/Parts/part.intertank";
+                partDir = gameDataPath + "/Vanilla/Parts/intertank";
                 Directory.CreateDirectory( partDir );
                 pm = new PartMetadata( partDir );
                 pm.Name = "Intertank"; pm.Author = "Katniss"; pm.Categories = new string[] { "structural" };
                 pm.WriteToDisk();
-                strat.RootObjectGetter = () => AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/part.intertank" );
+                strat.RootObjectGetter = () => AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/intertank" );
                 handler.ObjectsFilename = partDir + "/objects.json";
                 handler.DataFilename = partDir + "/data.json";
                 saver.Save();
 
 
-                partDir = gameDataPath + "/Vanilla/Parts/part.tank";
+                partDir = gameDataPath + "/Vanilla/Parts/tank";
                 Directory.CreateDirectory( partDir );
                 pm = new PartMetadata( partDir );
                 pm.Name = "Tank"; pm.Author = "Katniss"; pm.Categories = new string[] { "fuel_tank" };
                 pm.WriteToDisk();
-                strat.RootObjectGetter = () => AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/part.tank" );
+                strat.RootObjectGetter = () => AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/tank" );
                 handler.ObjectsFilename = partDir + "/objects.json";
                 handler.DataFilename = partDir + "/data.json";
                 saver.Save();
 
 
-                partDir = gameDataPath + "/Vanilla/Parts/part.tank_long";
+                partDir = gameDataPath + "/Vanilla/Parts/tank_long";
                 Directory.CreateDirectory( partDir );
                 pm = new PartMetadata( partDir );
                 pm.Name = "Long Tank"; pm.Author = "Katniss"; pm.Categories = new string[] { "fuel_tank" };
                 pm.WriteToDisk();
-                strat.RootObjectGetter = () => AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/part.tank_long" );
+                strat.RootObjectGetter = () => AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/tank_long" );
                 handler.ObjectsFilename = partDir + "/objects.json";
                 handler.DataFilename = partDir + "/data.json";
                 saver.Save();
             }
         }
 
+        static GameObject InstantiateLocal( GameObject original, Transform parent, Vector3 pos, Quaternion rot )
+        {
+            GameObject go = Instantiate( original, parent );
+            go.transform.localPosition = pos;
+            go.transform.localRotation = rot;
+            return go;
+        }
+
         static Vessel CreateDummyVessel( Vector3Dbl airfPosition, QuaternionDbl rotation )
         {
-            PartFactory intertank = new PartFactory( new AssetPartSource( "builtin::Resources/Prefabs/Parts/part.intertank" ) );
-            PartFactory tank = new PartFactory( new AssetPartSource( "builtin::Resources/Prefabs/Parts/part.tank" ) );
-            PartFactory tankLong = new PartFactory( new AssetPartSource( "builtin::Resources/Prefabs/Parts/part.tank_long" ) );
-            PartFactory engine = new PartFactory( new AssetPartSource( "builtin::Resources/Prefabs/Parts/part.engine" ) );
+            GameObject intertankPrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/intertank" );
+            GameObject tankPrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/tank" );
+            GameObject tankLongPrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/tank_long" );
+            GameObject enginePrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/engine" );
 
             Vessel v = VesselFactory.CreatePartless( airfPosition, rotation, Vector3.zero, Vector3.zero );
-            Transform root = intertank.Create( v.transform, Vector3.zero, Quaternion.identity );
+            Transform root = InstantiateLocal( intertankPrefab, v.transform, Vector3.zero, Quaternion.identity ).transform;
 
-            Transform tankP = tank.Create( root, new Vector3( 0, -1.625f, 0 ), Quaternion.identity );
-            Transform tankL1 = tankLong.Create( root, new Vector3( 0, 2.625f, 0 ), Quaternion.identity );
-            Transform t1 = tankLong.Create( root, new Vector3( 2, 2.625f, 0 ), Quaternion.identity );
-            Transform t2 = tankLong.Create( root, new Vector3( -2, 2.625f, 0 ), Quaternion.identity );
-            Transform engineP = engine.Create( tankP, new Vector3( 0, -3.45533f, 0 ), Quaternion.identity );
+            Transform tankP = InstantiateLocal( tankPrefab, root, new Vector3( 0, -1.625f, 0 ), Quaternion.identity ).transform;
+            Transform tankL1 = InstantiateLocal( tankLongPrefab, root, new Vector3( 0, 2.625f, 0 ), Quaternion.identity ).transform;
+            Transform t1 = InstantiateLocal( tankLongPrefab, root, new Vector3( 2, 2.625f, 0 ), Quaternion.identity ).transform;
+            Transform t2 = InstantiateLocal( tankLongPrefab, root, new Vector3( -2, 2.625f, 0 ), Quaternion.identity ).transform;
+            Transform engineP = InstantiateLocal( enginePrefab, tankP, new Vector3( 0, -3.45533f, 0 ), Quaternion.identity ).transform;
             v.RootPart = root;
 
             FBulkConnection conn = tankP.gameObject.AddComponent<FBulkConnection>();

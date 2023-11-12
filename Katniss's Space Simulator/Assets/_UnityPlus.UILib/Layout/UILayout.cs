@@ -9,7 +9,7 @@ namespace UnityPlus.UILib.Layout
 {
     public static class UILayout
     {
-        private static void BroadcastLayoutUpdateRecursive( HashSet<object> alreadyUpdated, object elem )
+        private static void BroadcastLayoutUpdateRecursive( HashSet<IUIElement> alreadyUpdated, IUIElement elem )
         {
             // TODO - this can be optimized:
             // - Mark as stale when something changes and redraw only once in lateupdate.
@@ -55,7 +55,7 @@ namespace UnityPlus.UILib.Layout
 
         public static void BroadcastLayoutUpdate( IUIElement elem )
         {
-            BroadcastLayoutUpdateRecursive( new HashSet<object>(), elem );
+            BroadcastLayoutUpdateRecursive( new HashSet<IUIElement>(), elem );
         }
     }
 }

@@ -19,11 +19,6 @@ namespace UnityPlus.UILib.UIElements
 
         public Sprite Sprite { get => imageComponent.sprite; set => imageComponent.sprite = value; }
 
-        void OnDestroy()
-        {
-            this.Parent.Children.Remove( this );
-        }
-
         public static UIIcon Create( IUIElementContainer parent, UILayoutInfo layoutInfo, Sprite icon )
         {
             (GameObject rootGameObject, RectTransform rootTransform, UIIcon uiIcon) = UIElement.CreateUIGameObject<UIIcon>( parent, "uilib-icon", layoutInfo );

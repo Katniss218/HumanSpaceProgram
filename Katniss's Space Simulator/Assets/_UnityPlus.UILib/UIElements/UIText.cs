@@ -28,18 +28,16 @@ namespace UnityPlus.UILib.UIElements
             }
         }
 
-        void OnDestroy()
-        {
-            this.Parent.Children.Remove( this );
-        }
-
         public void DoLayout()
         {
             if( !FitToContents )
             {
                 return;
             }
+            if( this.rectTransform == null )
+            {
 
+            }
             UILayoutInfo layout = this.rectTransform.GetLayoutInfo();
 
             // Preferred size depends on how many line breaks exist in the text after wrapping to the size of the container.

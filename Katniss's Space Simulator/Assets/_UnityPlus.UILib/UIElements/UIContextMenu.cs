@@ -20,11 +20,6 @@ namespace UnityPlus.UILib.UIElements
 
         public LayoutDriver LayoutDriver { get; set; }
 
-        void OnDestroy()
-        {
-            this.Parent.Children.Remove( this );
-        }
-
         public Sprite Background { get => backgroundComponent.sprite; set => backgroundComponent.sprite = value; }
 
         public static UIContextMenu Create( RectTransform track, UICanvas contextMenuCanvas, UILayoutInfo layoutInfo, Sprite background )

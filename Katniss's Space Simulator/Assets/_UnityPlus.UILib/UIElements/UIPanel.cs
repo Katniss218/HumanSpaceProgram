@@ -21,11 +21,6 @@ namespace UnityPlus.UILib.UIElements
 
         public Sprite Background { get => backgroundComponent.sprite; set => backgroundComponent.sprite = value; }
 
-        void OnDestroy()
-        {
-            this.Parent.Children.Remove( this );
-        }
-
         public static UIPanel Create( IUIElementContainer parent, UILayoutInfo layoutInfo, Sprite background )
         {
             (GameObject rootGameObject, RectTransform rootTransform, UIPanel uiPanel) = UIElement.CreateUIGameObject<UIPanel>( parent, "uilib-panel", layoutInfo );

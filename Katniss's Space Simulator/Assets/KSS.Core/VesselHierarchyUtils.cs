@@ -18,6 +18,7 @@ namespace KSS.Core
     /// </remarks>
     public static class VesselHierarchyUtils
     {
+
         /// <summary>
         /// Change the state of the part hierarchy.
         /// </summary>
@@ -92,8 +93,6 @@ namespace KSS.Core
 
             newRoot.GetVessel().RootPart = newRoot;
             Reattach( oldRoot, newRoot );
-            //newRoot.Parent.Children.Remove( newRoot ); // since it's not a root, it will have a parent.
-            //newRoot.Parent = null;
         }
 
         /// <summary>
@@ -104,13 +103,7 @@ namespace KSS.Core
             Contract.Assert( part.GetVessel() == parent.GetVessel() );
             Contract.Assert( !part.IsRootOfVessel() );
 
-            /*if( part.parent != null )
-            {
-                part.Parent.Children.Remove( part );
-            }*/
             part.SetParent( parent );
-            //part.Parent = parent;
-            //part.Parent.Children.Add( part );
         }
 
         private static void JoinVesselsRoot( Transform partToJoin, Transform parent )
@@ -138,7 +131,6 @@ namespace KSS.Core
             // Attach partToJoin to parent.
 
             Vessel oldv = partToJoin.GetVessel();
-            //partToJoin.SetVesselRecursive( GetVessel( parent ) );
             Reattach( partToJoin, parent );
             partToJoin.SetParent( parent.GetVessel().transform );
 
@@ -155,11 +147,6 @@ namespace KSS.Core
 
             // Detach the parts from the old vessel.
             Vessel oldv = partToSplit.GetVessel();
-            /*if( partToSplit.Parent != null )
-            {
-                partToSplit.Parent.Children.Remove( partToSplit );
-            }*/
-            //partToSplit.Parent = null;
 
             // Create the new vessel and add the parts to it.
             bool isAnchored = IsAnchored( partToSplit );
@@ -174,11 +161,9 @@ namespace KSS.Core
                     );
 
                 partToSplit.SetParent( b.transform );
-                //partToSplit.SetVesselRecursive( v );
                 b.RootPart = partToSplit;
 #warning TODO - after changing to RootPart = value, the recalculate parts might not be needed. also move recalculation if the root was already in a vessel
                 oldv.RecalculateParts();
-                //b.RecalculateParts();
             }
             else
             {
@@ -190,7 +175,6 @@ namespace KSS.Core
                     partObject.PhysicsObject.AngularVelocity );
 
                 partToSplit.SetParent( v.transform );
-                //partToSplit.SetVesselRecursive( v );
                 v.RootPart = partToSplit;
                 oldv.RecalculateParts();
                 v.RecalculateParts();

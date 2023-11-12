@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KSS.Core.Mods;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,17 +19,17 @@ namespace KSS.Core.Serialization
         /// <summary>
         /// The name of the file that stores the part metadata.
         /// </summary>
-        public const string PART_FILENAME = "_part.json";
+        public const string PART_METADATA_FILENAME = "_part.json";
 
         /// <summary>
         /// The filepath of this metadata.
         /// </summary>
-        public readonly string Path;
+        public readonly string Filepath;
 
         /// <summary>
         /// The unique ID of this part.
         /// </summary>
-        public readonly string ID;
+        public readonly NamespacedID ID;
 
         /// <summary>
         /// The display name shown in the GUI.
@@ -64,12 +65,15 @@ namespace KSS.Core.Serialization
 
         public PartMetadata( string path )
         {
-            if( path.EndsWith( PART_FILENAME ) )
+            if( path.EndsWith( PART_METADATA_FILENAME ) )
             {
-                path = path[..PART_FILENAME.Length];
+                path = path[..PART_METADATA_FILENAME.Length];
             }
-            this.Path = path;
-            this.ID = System.IO.Path.GetFileName( path );
+            this.Filepath = path;
+
+            string partId = Path.GetFileName( path );
+            string modId = Path.GetFileName( Path.GetDirectoryName( Path.GetDirectoryName( path ) ) );
+            this.ID = new NamespacedID( modId, partId );
         }
 
         /// <summary>
@@ -77,7 +81,7 @@ namespace KSS.Core.Serialization
         /// </summary>
         public string GetRootDirectory()
         {
-            return this.Path;
+            return this.Filepath;
         }
 
         public static IEnumerable<PartMetadata> Filtered( IEnumerable<PartMetadata> parts, string category, string filter )
@@ -88,11 +92,13 @@ namespace KSS.Core.Serialization
                     bool isCategory = category == null
                         ? true
                         : (p.Categories?.Contains( category ) ?? true);
+
                     bool isFilter = filter == null
                         ? true
                         : (p.Name?.Contains( filter, StringComparison.InvariantCultureIgnoreCase ) ?? false)
                        || (p.Author?.Contains( filter, StringComparison.InvariantCultureIgnoreCase ) ?? false)
                        || (p.Filter?.Contains( filter, StringComparison.InvariantCultureIgnoreCase ) ?? false);
+
                     return
                         isCategory && isFilter;
                 } );
@@ -114,7 +120,7 @@ namespace KSS.Core.Serialization
         public void WriteToDisk()
         {
             string savePath = GetRootDirectory();
-            string saveFilePath = System.IO.Path.Combine( savePath, PART_FILENAME );
+            string saveFilePath = Path.Combine( savePath, PART_METADATA_FILENAME );
 
             StringBuilder sb = new StringBuilder();
             new JsonStringWriter( this.GetData(), sb ).Write();
@@ -125,7 +131,7 @@ namespace KSS.Core.Serialization
         public void ReadDataFromDisk()
         {
             string savePath = GetRootDirectory();
-            string saveFilePath = System.IO.Path.Combine( savePath, PART_FILENAME );
+            string saveFilePath = Path.Combine( savePath, PART_METADATA_FILENAME );
 
             string saveJson = File.ReadAllText( saveFilePath, Encoding.UTF8 );
 
