@@ -8,7 +8,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <ProjectGuid>{6A093499-3B7A-71F2-8793-20E600CE8610}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -56,24 +57,33 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\KSS\DesignScene\Tools\PickTool.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\VanillaPlanetarySystemFactory.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadTree.cs" />
+    <Compile Include="Assets\KSS\DesignScene\DesignObjectManager.cs" />
     <Compile Include="Assets\KSS\Components\FVesselSeparator.cs" />
     <Compile Include="Assets\KSS\Effects\Atmospheres\AtmosphereRenderer.cs" />
     <Compile Include="Assets\KSS\Components\FSequencer.cs" />
     <Compile Include="Assets\KSS\Components\FDryMass.cs" />
     <Compile Include="Assets\KSS\Cameras\GameplayCameraController.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\MakeQuadMesh_Job.cs" />
+    <Compile Include="Assets\KSS\DesignScene\Tools\VanillaToolRegisterer.cs" />
     <Compile Include="Assets\KSS\Components\FController.cs" />
+    <Compile Include="Assets\KSS\DesignScene\Tools\RotateTool.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadSphere.cs" />
+    <Compile Include="Assets\KSS\DesignScene\DesignSceneToolManager.cs" />
     <Compile Include="Assets\KSS\Components\FRocketEngine.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuad.cs" />
     <Compile Include="Assets\KSS\Components\FBulkContainer_Sphere.cs" />
+    <Compile Include="Assets\KSS\DesignScene\DesignObject.cs" />
     <Compile Include="Assets\KSS\Components\FBulkConnection.cs" />
     <Compile Include="Assets\KSS\Components\FActuatorXY.cs" />
+    <Compile Include="Assets\KSS\DesignScene\Tools\TranslateTool.cs" />
     <Compile Include="Assets\KSS\AssetLoaders\GameDataJsonPartFactory.cs" />
+    <Compile Include="Assets\KSS\DesignScene\Tools\RerootTool.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadTree_NodeUtils.cs" />
     <Compile Include="Assets\KSS\AssetLoaders\GameDataJsonVesselFactory.cs" />
+    <Compile Include="Assets\KSS\AssetLoaders\GameDataTextureLoader.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS\CelestialBodies\Surface\TerrainShader.shader" />
@@ -726,6 +736,10 @@
       <Project>{1082B390-7315-9D8E-BF58-53BE9AF2F68A}</Project>
       <Name>_UnityPlus.AssetManagement</Name>
     </ProjectReference>
+    <ProjectReference Include="_UnityPlus.OverridableEvents.csproj">
+      <Project>{D26EF55E-D30C-518A-2340-C096B47A9C02}</Project>
+      <Name>_UnityPlus.OverridableEvents</Name>
+    </ProjectReference>
     <ProjectReference Include="_UnityPlus.Serialization.csproj">
       <Project>{53A4B44D-C587-1ED0-C944-834EA89508FD}</Project>
       <Name>_UnityPlus.Serialization</Name>
@@ -738,6 +752,9 @@
       <Project>{C615911B-EF2A-D5E1-1CFB-5D278FA273D2}</Project>
       <Name>KSS.Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Assets\KSS\GameplayScene\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

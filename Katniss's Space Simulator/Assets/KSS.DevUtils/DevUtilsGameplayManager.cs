@@ -22,7 +22,7 @@ namespace KSS.DevUtils
     /// <summary>
     /// Game manager for testing.
     /// </summary>
-    public class DevUtilsGameplayManager : MonoBehaviour
+    public class DevUtilsGameplayManager : SingletonMonoBehaviour<DevUtilsGameplayManager>
     {
         public Shader cbShader;
         public Texture2D[] cbTextures = new Texture2D[6];
@@ -65,7 +65,7 @@ namespace KSS.DevUtils
             AssetRegistry.Register( "substance.f", new Substance() { Density = 1000, DisplayName = "Fuel", UIColor = new Color( 1.0f, 0.3764706f, 0.2509804f ) } );
             AssetRegistry.Register( "substance.ox", new Substance() { Density = 1000, DisplayName = "Oxidizer", UIColor = new Color( 0.2509804f, 0.5607843f, 1.0f ) } );
         }
-
+        
         [HSPEventListener( HSPEvent.TIMELINE_AFTER_NEW, "devutils.timeline.new.after" )]
         static void OnAfterCreateDefault( object e )
         {

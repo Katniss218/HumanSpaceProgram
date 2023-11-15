@@ -45,8 +45,6 @@ namespace KSS.AssetLoaders
             return _strat.LastSpawnedRoot;
         }
 
-        // TODO - This can also be used to load saved vessels - saved vessels serialize as their root parts.
-
         [HSPEventListener( HSPEvent.STARTUP_IMMEDIATELY, HSPEvent.NAMESPACE_VANILLA + ".load_vessels" )]
         private static void OnStartup()
         {

@@ -163,7 +163,8 @@ namespace UnityPlus.AssetManagement
         /// </summary>
         /// <remarks>
         /// A lazy-loaded asset will only be loaded if/when it's requested. <br />
-        /// A lazy-loaded asset will still be loaded even if you unregister it after loading.
+        /// A loaded asset will remain cached after you call <see cref="UnregisterLazy"/> on it. <br />
+        /// The lazy-loader is *NOT* unloaded, so the cached asset itself can be later unloaded and then reloaded if needed.
         /// </remarks>
         /// <param name="assetID">The Asset ID to register the object under.</param>
         /// <param name="loader">The function that will load the asset when requested.</param>
@@ -229,6 +230,48 @@ namespace UnityPlus.AssetManagement
             }
 
             return _lazyRegistry.Remove( assetID );
+        }
+
+        /// <summary>
+        /// Removes the specified asset from cache.
+        /// </summary>
+        /// <remarks>
+        /// If there is no lazy loader registered for the specified asset ID, it will not unload.
+        /// </remarks>
+        /// <param name="assetID">The asset to unregister.</param>
+        /// <returns>True if the asset has been removed from cache. Otherwise false.</returns>
+        public static bool TryUncache( string assetID )
+        {
+            if( _lazyRegistry.ContainsKey( assetID ) )
+            {
+                if( _cache.TryGetValue( assetID, out object asset ) )
+                    _inverseCache.Remove( asset );
+                _cache.Remove( assetID );
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Removes the specified asset from cache.
+        /// </summary>
+        /// <remarks>
+        /// If there is no lazy loader registered for the asset ID of the specified asset, it will not unload.
+        /// </remarks>
+        /// <param name="asset">The asset to unregister.</param>
+        /// <returns>True if the asset has been removed from cache. Otherwise false.</returns>
+        public static bool TryUncache( object asset )
+        {
+            if( _inverseCache.TryGetValue( asset, out string assetID ) )
+            {
+                if( _lazyRegistry.ContainsKey( assetID ) )
+                {
+                    _cache.Remove( assetID );
+                    _inverseCache.Remove( asset );
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }
