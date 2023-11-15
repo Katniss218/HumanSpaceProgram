@@ -61,4 +61,20 @@ namespace UnityPlus.Serialization
             _reverse.Add( obj, id );
         }
     }
+
+    public static class BidirectionalReferenceStore_Ex
+    {
+        public static void UsePersistentReferenceStore( this ILoader l, IForwardReferenceMap store )
+        {
+            throw new NotImplementedException();
+            // add store to a data method
+        }
+
+
+        public static void UsePersistentReferenceStore( this ISaver l, IReverseReferenceMap store )
+        {
+            throw new NotImplementedException();
+            // add store to a 'first' method, to make sure the data uses its stored references instead of random.
+        }
+    }
 }

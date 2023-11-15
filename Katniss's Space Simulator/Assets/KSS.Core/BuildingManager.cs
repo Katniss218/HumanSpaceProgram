@@ -59,7 +59,7 @@ namespace KSS.Core
 
         // move below to separate class "BuildingSerializer" or something.
         private static readonly JsonSeparateFileSerializedDataHandler _buildingDataHandler = new JsonSeparateFileSerializedDataHandler();
-        private static readonly JsonExplicitHierarchyGameObjectsStrategy _buildingsStrat = new JsonExplicitHierarchyGameObjectsStrategy( _buildingDataHandler, GetAllRootGameObjects );
+        private static readonly ExplicitHierarchyGameObjectsStrategy _buildingsStrat = new ExplicitHierarchyGameObjectsStrategy( _buildingDataHandler, GetAllRootGameObjects );
 
         private static GameObject[] GetAllRootGameObjects()
         {

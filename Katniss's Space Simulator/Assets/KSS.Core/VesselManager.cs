@@ -67,7 +67,7 @@ namespace KSS.Core
 
         // move below to separate class "BuildingSerializer" or something.
         private static readonly JsonSeparateFileSerializedDataHandler _vesselsDataHandler = new JsonSeparateFileSerializedDataHandler();
-        private static readonly JsonExplicitHierarchyGameObjectsStrategy _vesselsStrat = new JsonExplicitHierarchyGameObjectsStrategy( _vesselsDataHandler, GetAllRootGameObjects );
+        private static readonly ExplicitHierarchyGameObjectsStrategy _vesselsStrat = new ExplicitHierarchyGameObjectsStrategy( _vesselsDataHandler, GetAllRootGameObjects );
 
         private static GameObject[] GetAllRootGameObjects()
         {

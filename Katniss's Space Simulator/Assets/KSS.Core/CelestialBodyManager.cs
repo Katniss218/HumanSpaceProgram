@@ -69,7 +69,7 @@ namespace KSS.Core
         }
 
         private static readonly JsonSeparateFileSerializedDataHandler _celestialBodiesDataHandler = new JsonSeparateFileSerializedDataHandler();
-        private static readonly JsonPreexistingGameObjectsStrategy _celestialBodiesStrat = new JsonPreexistingGameObjectsStrategy( _celestialBodiesDataHandler, GetAllRootGameObjects );
+        private static readonly PreexistingGameObjectsStrategy _celestialBodiesStrat = new PreexistingGameObjectsStrategy( _celestialBodiesDataHandler, GetAllRootGameObjects );
 
         private static GameObject[] GetAllRootGameObjects()
         {

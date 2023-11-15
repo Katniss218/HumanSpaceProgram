@@ -43,7 +43,7 @@ namespace KSS.Core
         //
 
         private static readonly JsonSeparateFileSerializedDataHandler _managersDataHandler = new JsonSeparateFileSerializedDataHandler();
-        private static readonly JsonPreexistingGameObjectsStrategy _managersStrat = new JsonPreexistingGameObjectsStrategy( _managersDataHandler, GetAllManagerGameObjects );
+        private static readonly PreexistingGameObjectsStrategy _managersStrat = new PreexistingGameObjectsStrategy( _managersDataHandler, GetAllManagerGameObjects );
 
         private static GameObject[] GetAllManagerGameObjects()
         {

@@ -1,27 +1,27 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityPlus.AssetManagement;
+using UnityPlus.Serialization;
+using UnityPlus.Serialization.DataHandlers;
 
 namespace UnityPlus.Serialization.Strategies
 {
     /// <summary>
-    /// Can be used to save the scene using the factory-gameobjectdata scheme.
+    /// Serializes only the data of already existing scene objects.
     /// </summary>
     /// <remarks>
     /// - Object actions are suffixed by _Object <br />
     /// - Data actions are suffixed by _Data
     /// </remarks>
-    public sealed class JsonAssetGameObjectsStrategy
+    public sealed class PreexistingGameObjectsStrategy
     {
         /// <summary>
-        /// Determines which objects will be saved.
+        /// Determines which objects will have their data saved, and loaded.
         /// </summary>
         public Func<IEnumerable<GameObject>> RootObjectsGetter { get; }
 
@@ -35,7 +35,8 @@ namespace UnityPlus.Serialization.Strategies
         SerializedData _objects;
         SerializedData _data;
 
-        public JsonAssetGameObjectsStrategy( ISerializedDataHandler dataHandler, Func<IEnumerable<GameObject>> rootObjectsGetter )
+        /// <param name="rootObjectsGetter">Determines which objects will have their data saved, and loaded.</param>
+        public PreexistingGameObjectsStrategy( ISerializedDataHandler dataHandler, Func<IEnumerable<GameObject>> rootObjectsGetter )
         {
             if( dataHandler == null )
             {
@@ -49,45 +50,21 @@ namespace UnityPlus.Serialization.Strategies
             this.RootObjectsGetter = rootObjectsGetter;
         }
 
-        private static SerializedObject WriteAssetGameObject( ISaver s, GameObject go, ClonedGameObject cbf )
+        private static SerializedObject WriteGameObject( ISaver s, GameObject go, PreexistingReference guidComp )
         {
-            Guid objectGuid = s.GetID( go );
-
             SerializedArray sArr = new SerializedArray();
             StratUtils.WriteReferencedChildrenRecursive( s, go, ref sArr, "" );
 
             SerializedObject goJson = new SerializedObject()
             {
-                { KeyNames.ID, s.WriteGuid(objectGuid) },
-                { "prefab", s.WriteAssetReference(cbf.OriginalAsset) },
+                { KeyNames.ID, s.WriteGuid( guidComp.GetPersistentGuid() ) },
                 { "children_ids", sArr }
             };
 
             return goJson;
         }
 
-        private static GameObject ReadAssetGameObject( ILoader l, SerializedData goJson )
-        {
-            Guid objectGuid = l.ReadGuid( goJson[KeyNames.ID] );
-
-            GameObject prefab = l.ReadAssetReference<GameObject>( goJson["prefab"] );
-
-            if( prefab == null )
-            {
-                Debug.LogWarning( $"Couldn't find a prefab `{goJson["prefab"]}`." );
-            }
-
-            GameObject go = ClonedGameObject.Instantiate( prefab ); // assumes the asset is immutable and needs to be cloned. God knows if this preserves lambdas and other non-serializable fields.
-
-            l.SetObj( objectGuid, go );
-
-            SerializedArray refChildren = (SerializedArray)goJson["children_ids"];
-            StratUtils.AssignIDsToReferencedChildren( l, go, ref refChildren );
-
-            return go;
-        }
-
-        private void SaveGameObjectDataRecursive( ISaver s, GameObject go, ref SerializedArray objects )
+        private void SaveGameObjectData( ISaver s, GameObject go, PreexistingReference guidComp, ref SerializedArray objects )
         {
             if( !go.IsInLayerMask( IncludedObjectsMask ) )
             {
@@ -105,24 +82,24 @@ namespace UnityPlus.Serialization.Strategies
                 }
                 catch( Exception ex )
                 {
-                    Debug.LogWarning( $"[{nameof( JsonAssetGameObjectsStrategy )}] Couldn't serialize component '{comp}': {ex.Message}." );
+                    Debug.LogWarning( $"[{nameof( PreexistingGameObjectsStrategy )}] Couldn't serialize component '{comp}': {ex.Message}." );
                     Debug.LogException( ex );
                 }
 
-                StratUtils.TryWriteData( s, go, compData, ref objects );
+                StratUtils.TryWriteData( s, comp, compData, ref objects );
             }
 
             SerializedData goData = go.GetData( s );
-            StratUtils.TryWriteData( s, go, goData, ref objects );
-
-            foreach( Transform ct in go.transform )
+            objects.Add( new SerializedObject()
             {
-                SaveGameObjectDataRecursive( s, ct.gameObject, ref objects );
-            }
+                { KeyNames.REF, s.WriteGuid( guidComp.GetPersistentGuid() ) },
+                { "data", goData }
+            } );
         }
 
-        // -=-=-=-
-
+        /// <summary>
+        /// Saves the data about the gameobjects and their persistent components. Does not include child objects.
+        /// </summary>
         public IEnumerator SaveAsync_Data( ISaver s )
         {
             IEnumerable<GameObject> rootObjects = RootObjectsGetter();
@@ -131,19 +108,21 @@ namespace UnityPlus.Serialization.Strategies
 
             foreach( var go in rootObjects )
             {
-                if( go.GetComponent<ClonedGameObject>() == null )
+                PreexistingReference guidComp = go.GetComponent<PreexistingReference>();
+                if( guidComp == null )
                 {
                     continue;
                 }
-                yield return null;
 
-                SaveGameObjectDataRecursive( s, go, ref objData );
+                SaveGameObjectData( s, go, guidComp, ref objData );
+
+                yield return null;
             }
 
             this._data = objData;
         }
 
-        public IEnumerator SaveAdync_Object( ISaver s )
+        public IEnumerator SaveAsync_Object( ISaver s )
         {
             IEnumerable<GameObject> rootObjects = RootObjectsGetter();
 
@@ -151,15 +130,13 @@ namespace UnityPlus.Serialization.Strategies
 
             foreach( var go in rootObjects )
             {
-                // maybe some sort of customizable tag/layer masking
-
-                ClonedGameObject cloneComp = go.GetComponent<ClonedGameObject>();
-                if( cloneComp == null )
+                PreexistingReference guidComp = go.GetComponent<PreexistingReference>();
+                if( guidComp == null )
                 {
                     continue;
                 }
 
-                SerializedObject goJson = WriteAssetGameObject( s, go, cloneComp );
+                SerializedObject goJson = WriteGameObject( s, go, guidComp );
                 objData.Add( goJson );
 
                 yield return null;
@@ -175,11 +152,29 @@ namespace UnityPlus.Serialization.Strategies
 
         public IEnumerator LoadAsync_Object( ILoader l )
         {
+            IEnumerable<GameObject> rootObjects = RootObjectsGetter.Invoke();
+            foreach( var go in rootObjects )
+            {
+                PreexistingReference guidComp = go.GetComponent<PreexistingReference>();
+                if( guidComp == null )
+                {
+                    continue;
+                }
+
+                l.SetObj( guidComp.GetPersistentGuid(), go );
+
+                yield return null;
+            }
+
+            // Loads the IDs of objects returned by the getter func, then gets them by ID from the loader's reference dict.
+
             (_objects, _data) = DataHandler.ReadObjectsAndData();
 
             foreach( var goData in (SerializedArray)_objects )
             {
-                ReadAssetGameObject( l, goData );
+                Guid objectGuid = l.ReadGuid( goData[KeyNames.ID] );
+                SerializedArray refChildren = (SerializedArray)goData["children_ids"];
+                StratUtils.AssignIDsToReferencedChildren( l, (GameObject)l.GetObj( objectGuid ), ref refChildren );
 
                 yield return null;
             }

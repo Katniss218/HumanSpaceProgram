@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace UnityPlus.Serialization
 {
+    /// <summary>
+    /// An arbitrary structure that has the ability to map Identifiers to Objects.
+    /// </summary>
     public interface IForwardReferenceMap
     {
         /// <summary>
@@ -26,6 +29,9 @@ namespace UnityPlus.Serialization
         void SetObj( Guid id, object obj );
     }
 
+    /// <summary>
+    /// An arbitrary structure that has the ability to map Objects to Identifiers.
+    /// </summary>
     public interface IReverseReferenceMap
     {
         /// <summary>

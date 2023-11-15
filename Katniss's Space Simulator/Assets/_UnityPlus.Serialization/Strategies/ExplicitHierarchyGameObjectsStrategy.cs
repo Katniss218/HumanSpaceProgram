@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using UnityPlus.Serialization.DataHandlers;
 
 namespace UnityPlus.Serialization.Strategies
 {
@@ -15,7 +16,7 @@ namespace UnityPlus.Serialization.Strategies
     /// - Object actions are suffixed by _Object <br />
     /// - Data actions are suffixed by _Data
     /// </remarks>
-    public sealed class JsonExplicitHierarchyGameObjectsStrategy
+    public sealed class ExplicitHierarchyGameObjectsStrategy
     {
         /// <summary>
         /// Determines which objects will be saved.
@@ -34,7 +35,7 @@ namespace UnityPlus.Serialization.Strategies
 
         public List<GameObject> LastSpawnedRoots { get; private set; } = new List<GameObject>();
 
-        public JsonExplicitHierarchyGameObjectsStrategy( ISerializedDataHandler dataHandler, Func<IEnumerable<GameObject>> rootObjectsGetter )
+        public ExplicitHierarchyGameObjectsStrategy( ISerializedDataHandler dataHandler, Func<IEnumerable<GameObject>> rootObjectsGetter )
         {
             if( dataHandler == null )
             {
@@ -101,7 +102,7 @@ namespace UnityPlus.Serialization.Strategies
                 }
                 catch( Exception ex )
                 {
-                    Debug.LogError( $"[{nameof( JsonExplicitHierarchyGameObjectsStrategy )}] Failed to deserialize a root GameObject with ID: `{goJson?[KeyNames.ID] ?? "<null>"}`." );
+                    Debug.LogError( $"[{nameof( ExplicitHierarchyGameObjectsStrategy )}] Failed to deserialize a root GameObject with ID: `{goJson?[KeyNames.ID] ?? "<null>"}`." );
                     Debug.LogException( ex );
                 }
 

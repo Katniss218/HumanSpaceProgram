@@ -19,7 +19,7 @@ namespace KSS.DesignScene
     public class DesignObjectManager : SingletonMonoBehaviour<DesignObjectManager>
     {
         static JsonSeparateFileSerializedDataHandler _designObjDataHandler = new JsonSeparateFileSerializedDataHandler();
-        static JsonSingleExplicitHierarchyStrategy _designObjStrategy = new JsonSingleExplicitHierarchyStrategy( _designObjDataHandler, GetGameObject );
+        static SingleExplicitHierarchyStrategy _designObjStrategy = new SingleExplicitHierarchyStrategy( _designObjDataHandler, GetGameObject );
 
         [SerializeField]
         private DesignObject _designObj;

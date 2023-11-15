@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Assets
+namespace UnityPlus.Serialization
 {
-    public class PartRegistry
+    /*public class AsyncPatcher
     {
-    }
+        // TODO
+    }*/
 }

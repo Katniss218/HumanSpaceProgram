@@ -18,7 +18,7 @@ namespace KSS.AssetLoaders
     public sealed class GameDataJsonVesselFactory : PartFactory
     {
         private static JsonSeparateFileSerializedDataHandler _handler = new JsonSeparateFileSerializedDataHandler();
-        private static JsonSingleExplicitHierarchyStrategy _strat = new JsonSingleExplicitHierarchyStrategy( _handler, () => throw new NotSupportedException( $"Tried to save something using a part *loader*" ) );
+        private static SingleExplicitHierarchyStrategy _strat = new SingleExplicitHierarchyStrategy( _handler, () => throw new NotSupportedException( $"Tried to save something using a part *loader*" ) );
 
         private static Loader _loader = new Loader( null, null, _strat.Load_Object, _strat.Load_Data );
 

@@ -6,13 +6,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityPlus.Serialization.DataHandlers;
 
 namespace UnityPlus.Serialization.Strategies
 {
     /// <summary>
     /// Explicit hierarchy but for a single root object.
     /// </summary>
-    public sealed class JsonSingleExplicitHierarchyStrategy
+    public sealed class SingleExplicitHierarchyStrategy
     {
         /// <summary>
         /// Determines which objects will be saved.
@@ -26,7 +27,7 @@ namespace UnityPlus.Serialization.Strategies
         SerializedData _objects;
         SerializedData _data;
 
-        public JsonSingleExplicitHierarchyStrategy( ISerializedDataHandler dataHandler, Func<GameObject> rootObjectGetter )
+        public SingleExplicitHierarchyStrategy( ISerializedDataHandler dataHandler, Func<GameObject> rootObjectGetter )
         {
             if( dataHandler == null )
             {

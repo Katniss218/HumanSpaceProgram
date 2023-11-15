@@ -108,7 +108,7 @@ namespace KSS.DevUtils
             if( Input.GetKeyDown( KeyCode.F4 ) )
             {
                 JsonSeparateFileSerializedDataHandler _designObjDataHandler = new JsonSeparateFileSerializedDataHandler();
-                JsonSingleExplicitHierarchyStrategy _designObjStrategy = new JsonSingleExplicitHierarchyStrategy( _designObjDataHandler, () => null );
+                SingleExplicitHierarchyStrategy _designObjStrategy = new SingleExplicitHierarchyStrategy( _designObjDataHandler, () => null );
 
                 VesselMetadata loadedVesselMetadata = new VesselMetadata( "vessel2" );
                 loadedVesselMetadata.ReadDataFromDisk();
@@ -147,7 +147,7 @@ namespace KSS.DevUtils
             if( Input.GetKeyDown( KeyCode.F1 ) )
             {
                 JsonSeparateFileSerializedDataHandler handler = new JsonSeparateFileSerializedDataHandler();
-                JsonSingleExplicitHierarchyStrategy strat = new JsonSingleExplicitHierarchyStrategy( handler, () => null );
+                SingleExplicitHierarchyStrategy strat = new SingleExplicitHierarchyStrategy( handler, () => null );
                 Saver saver = new Saver( null, null, strat.Save_Object, strat.Save_Data );
 
                 string gameDataPath = HumanSpaceProgramMods.GetModDirectoryPath();

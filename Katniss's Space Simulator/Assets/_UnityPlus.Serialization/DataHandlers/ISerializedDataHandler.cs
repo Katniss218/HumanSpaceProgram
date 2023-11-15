@@ -1,5 +1,5 @@
 ﻿
-namespace UnityPlus.Serialization
+namespace UnityPlus.Serialization.DataHandlers
 {
     /// <summary>
     /// Handles reading and writing serialized data to an abstract source.
