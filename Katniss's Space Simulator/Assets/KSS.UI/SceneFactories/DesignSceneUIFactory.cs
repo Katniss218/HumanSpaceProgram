@@ -1,6 +1,6 @@
 ﻿using KSS.Core;
-using KSS.Core.DesignScene;
-using KSS.Core.DesignScene.Tools;
+using KSS.DesignScene;
+using KSS.DesignScene.Tools;
 using KSS.Core.SceneManagement;
 using KSS.Core.Serialization;
 using KSS.UI.Windows;

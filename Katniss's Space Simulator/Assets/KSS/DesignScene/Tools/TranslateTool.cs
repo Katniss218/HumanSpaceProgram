@@ -5,15 +5,21 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace KSS.Core.DesignScene.Tools
+namespace KSS.DesignScene.Tools
 {
     /// <summary>
-    /// Allows to change the root of the design vessel.
+    /// Allows to move a selected part after placing.
     /// </summary>
-    public class RerootTool : MonoBehaviour
+    public class TranslateTool : MonoBehaviour
     {
         [SerializeField]
+        Transform _selectedPart;
+
+        [SerializeField]
         Camera _camera;
+
+        public bool SnappingEnabled { get; set; }
+        public float SnapInterval { get; set; }
 
         void Awake()
         {
@@ -22,7 +28,8 @@ namespace KSS.Core.DesignScene.Tools
 
         void Update()
         {
-            // click on part to set root.
+            // click on part to select and toggle handles.
+            // hold and mouse over handles to translate.
             // Takes into account redirects ofc.
         }
     }

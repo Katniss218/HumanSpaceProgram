@@ -1,4 +1,5 @@
-﻿using KSS.Core.DesignScene.Tools;
+﻿using KSS.Core;
+using KSS.DesignScene.Tools;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace KSS.Core.DesignScene
+namespace KSS.DesignScene
 {
     /// <summary>
     /// Manages the available design scene viewport tools, and which is currently active.
@@ -125,6 +126,9 @@ namespace KSS.Core.DesignScene
 
         private void TrySelectToolByNumberKey()
         {
+            if( UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() )
+                return;
+
             if( Input.GetKeyDown( KeyCode.Alpha1 ) )
             {
                 try

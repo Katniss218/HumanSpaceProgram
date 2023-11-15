@@ -1,10 +1,11 @@
-﻿using System;
+﻿using KSS.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace KSS.Core.DesignScene.Tools
+namespace KSS.DesignScene.Tools
 {
     public static class VanillaToolRegisterer
     {
