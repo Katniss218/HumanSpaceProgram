@@ -6,15 +6,15 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace UnityPlus.Serialization
+namespace UnityPlus.Serialization.ReferenceMaps
 {
     /// <summary>
     /// Stores mappings between serialization groups and object instances.
     /// </summary>
     public class BidirectionalReferenceStore : IForwardReferenceMap, IReverseReferenceMap
     {
-        private Dictionary<Guid, object> _forward = new Dictionary<Guid, object>();
-        private Dictionary<object, Guid> _reverse = new Dictionary<object, Guid>();
+        private readonly Dictionary<Guid, object> _forward = new Dictionary<Guid, object>();
+        private readonly Dictionary<object, Guid> _reverse = new Dictionary<object, Guid>();
 
         //
         //  FORWARD

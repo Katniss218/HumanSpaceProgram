@@ -17,6 +17,7 @@ using System.IO;
 using System.Collections;
 using KSS.Core.Mods;
 using UnityPlus.Serialization.DataHandlers;
+using UnityPlus.Serialization.ReferenceMaps;
 
 namespace KSS.DevUtils
 {

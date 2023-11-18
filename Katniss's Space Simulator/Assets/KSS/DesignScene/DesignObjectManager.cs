@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.DataHandlers;
+using UnityPlus.Serialization.ReferenceMaps;
 using UnityPlus.Serialization.Strategies;
 
 namespace KSS.DesignScene

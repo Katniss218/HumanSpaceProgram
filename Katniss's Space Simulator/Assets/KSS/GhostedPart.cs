@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Patching;
 
 namespace KSS
 {
@@ -18,8 +19,8 @@ namespace KSS
     {
         public IReverseReferenceMap RefMap { get; private set; }
 
-        public EditObjectsPatch OriginalToGhostPatch { get; private set; }
-        public EditObjectsPatch GhostToOriginalPatch { get; private set; }
+        public SetDataPatch OriginalToGhostPatch { get; private set; }
+        public SetDataPatch GhostToOriginalPatch { get; private set; }
 
         /// <summary>
         /// 
@@ -84,8 +85,8 @@ namespace KSS
                 return new GhostedPart()
                 {
                     RefMap = refMap,
-                    OriginalToGhostPatch = new EditObjectsPatch( forwardPatch ),
-                    GhostToOriginalPatch = new EditObjectsPatch( reversePatch )
+                    OriginalToGhostPatch = new SetDataPatch( forwardPatch ),
+                    GhostToOriginalPatch = new SetDataPatch( reversePatch )
                 };
             }
             throw new ArgumentException( $"the specified {nameof( root )} object must be contained in the {nameof( partMap )}.", nameof( root ) );

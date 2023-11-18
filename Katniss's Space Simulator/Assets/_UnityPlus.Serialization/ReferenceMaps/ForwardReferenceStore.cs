@@ -6,14 +6,14 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace UnityPlus.Serialization
+namespace UnityPlus.Serialization.ReferenceMaps
 {
     /// <summary>
     /// Stores mappings between serialization groups and object instances.
     /// </summary>
     public class ForwardReferenceStore : IForwardReferenceMap
     {
-        private Dictionary<Guid, object> _forward = new Dictionary<Guid, object>();
+        private readonly Dictionary<Guid, object> _forward = new Dictionary<Guid, object>();
 
         //
         //  FORWARD

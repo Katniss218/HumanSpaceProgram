@@ -5,6 +5,7 @@ using System.IO;
 using UnityEngine;
 using UnityPlus.OverridableEvents;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.ReferenceMaps;
 using UnityPlus.Serialization.Strategies;
 
 namespace KSS.Core.Serialization

@@ -6,14 +6,14 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace UnityPlus.Serialization
+namespace UnityPlus.Serialization.ReferenceMaps
 {
     /// <summary>
     /// Stores mappings between serialization groups and object instances.
     /// </summary>
     public class ReverseReferenceStore : IReverseReferenceMap
     {
-        private Dictionary<object, Guid> _reverse = new Dictionary<object, Guid>();
+        private readonly Dictionary<object, Guid> _reverse = new Dictionary<object, Guid>();
 
         //
         //  REVERSE

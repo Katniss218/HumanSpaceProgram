@@ -2,7 +2,7 @@
 namespace UnityPlus.Serialization.DataHandlers
 {
     /// <summary>
-    /// Handles reading and writing serialized data to an abstract source.
+    /// Handles reading and writing serialized data to an abstract source (file, network, memory, etc).
     /// </summary>
     public interface ISerializedDataHandler
     {

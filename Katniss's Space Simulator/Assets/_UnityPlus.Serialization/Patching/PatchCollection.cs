@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityPlus.Serialization.Patching;
 
 namespace UnityPlus.Serialization
 {
     public class PatchCollection
     {
-        private Dictionary<object, List<IPatch>> _patches;
+        private readonly Dictionary<object, List<IPatch>> _patches;
 
         public PatchCollection()
         {

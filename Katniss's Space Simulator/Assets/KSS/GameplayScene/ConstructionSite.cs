@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.ReferenceMaps;
 
 namespace KSS.GameplayScene
 {
@@ -112,6 +113,7 @@ namespace KSS.GameplayScene
         public static (Transform rot, Dictionary<FConstructible, DataEntry>, BidirectionalReferenceStore) SpawnGhost( string vesselId )
         {
             // step 1. player clicks, and spawns ghost to place.
+
             BidirectionalReferenceStore refStore = new BidirectionalReferenceStore();
             GameObject rootGo = PartRegistry.Load( new Core.Mods.NamespacedIdentifier( "Vessels", vesselId ), refStore );
 
@@ -129,7 +131,15 @@ namespace KSS.GameplayScene
 
         public static ConstructionSite PlaceGhost( Transform ghostRoot, List<GhostedPart> ghostParts, Transform parent, BidirectionalReferenceStore refMap )
         {
-#warning TODO - what if standalone?
+            // step 6. Player places the ghost.
+
+            // assume the position is already set.
+
+            if( parent == null )
+            {
+#warning TODO - vessel or building, but I think there should be a separate thing for that decision.
+            }
+
             ConstructionSite cSite = parent.GetComponentInParent<ConstructionSite>();
             if( cSite == null )
             {
@@ -137,11 +147,9 @@ namespace KSS.GameplayScene
             }
 
             throw new NotImplementedException();
-            // step 6. Player places the ghost.
 
             ghostRoot.transform.SetParent( parent );
 
-            // if parent's ancestral chain has a c-site - add to that c-site, otherwise - make new c-site.
         }
 
         public void PickupGhost( Transform ghostRoot )
