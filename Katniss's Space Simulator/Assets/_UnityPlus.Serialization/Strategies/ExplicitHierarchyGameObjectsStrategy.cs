@@ -49,6 +49,20 @@ namespace UnityPlus.Serialization.Strategies
             this.RootObjectsGetter = rootObjectsGetter;
         }
 
+        public void Save_Data( IReverseReferenceMap s )
+        {
+            IEnumerable<GameObject> rootObjects = this.RootObjectsGetter();
+
+            SerializedArray objData = new SerializedArray();
+
+            foreach( var go in rootObjects )
+            {
+                StratUtils.SaveGameObjectHierarchy_Data( s, go, this.IncludedObjectsMask, ref objData );
+            }
+
+            this._data = objData;
+        }
+        
         public IEnumerator SaveAsync_Data( IReverseReferenceMap s )
         {
             IEnumerable<GameObject> rootObjects = this.RootObjectsGetter();
@@ -65,6 +79,25 @@ namespace UnityPlus.Serialization.Strategies
             this._data = objData;
         }
 
+        public void Save_Object( IReverseReferenceMap s )
+        {
+            IEnumerable<GameObject> rootObjects = this.RootObjectsGetter();
+
+            SerializedArray objData = new SerializedArray();
+
+            foreach( var go in rootObjects )
+            {
+                StratUtils.SaveGameObjectHierarchy_Objects( go, s, this.IncludedObjectsMask, objData );
+            }
+
+            // Cleanup Stage. \/
+
+            this._objects = objData;
+            DataHandler.WriteObjectsAndData( _objects, _data );
+            this._objects = null;
+            this._data = null;
+        }
+        
         public IEnumerator SaveAsync_Object( IReverseReferenceMap s )
         {
             IEnumerable<GameObject> rootObjects = this.RootObjectsGetter();
@@ -88,6 +121,26 @@ namespace UnityPlus.Serialization.Strategies
 
         List<Behaviour> behsToReenable = new List<Behaviour>();
 
+        public void Load_Object( IForwardReferenceMap l )
+        {
+            (_objects, _data) = DataHandler.ReadObjectsAndData();
+
+            this.LastSpawnedRoots.Clear();
+            foreach( var goJson in (SerializedArray)this._objects )
+            {
+                try
+                {
+                    GameObject root = StratUtils.InstantiateHierarchyObjects( l, goJson, null, this.behsToReenable );
+                    this.LastSpawnedRoots.Add( root );
+                }
+                catch( Exception ex )
+                {
+                    Debug.LogError( $"[{nameof( ExplicitHierarchyGameObjectsStrategy )}] Failed to deserialize a root GameObject with ID: `{goJson?[KeyNames.ID] ?? "<null>"}`." );
+                    Debug.LogException( ex );
+                }
+            }
+        }
+        
         public IEnumerator LoadAsync_Object( IForwardReferenceMap l )
         {
             (_objects, _data) = DataHandler.ReadObjectsAndData();
@@ -108,6 +161,22 @@ namespace UnityPlus.Serialization.Strategies
 
                 yield return null;
             }
+        }
+
+        public void Load_Data( IForwardReferenceMap l )
+        {
+            foreach( var dataElement in (SerializedArray)this._data )
+            {
+                StratUtils.ApplyDataToHierarchyElement( l, dataElement );
+            }
+
+            // Cleanup Stage. \/
+
+            foreach( var beh in this.behsToReenable )
+                beh.enabled = true;
+            this.behsToReenable = new List<Behaviour>();
+            this._objects = null;
+            this._data = null;
         }
 
         public IEnumerator LoadAsync_Data( IForwardReferenceMap l )

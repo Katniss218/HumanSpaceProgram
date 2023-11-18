@@ -1,4 +1,5 @@
-﻿using KSS.Core.Components;
+﻿using KSS.Components;
+using KSS.Core.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,18 +16,10 @@ namespace KSS
     /// </summary>
     public class GhostedPart
     {
-        private BidirectionalReferenceStore refMap;
+        public IReverseReferenceMap RefMap { get; private set; }
 
-        private EditObjectsPatch forwardPatch; // patch to make ghosted.
-        private EditObjectsPatch reversePatch; // patch to stop ghosted.
-
-        /// <summary>
-        /// Makes the loader load a ghosted hierarchy.
-        /// </summary>
-        public static void ApplyTo( ILoader loader )
-        {
-            // 
-        }
+        public EditObjectsPatch OriginalToGhostPatch { get; private set; }
+        public EditObjectsPatch GhostToOriginalPatch { get; private set; }
 
         /// <summary>
         /// 
@@ -35,7 +28,7 @@ namespace KSS
         /// <param name="partMap"></param>
         /// <param name="refMap">The reference map saved from when the objects were loaded.</param>
         /// <returns></returns>
-        public static GhostedPart MakeGhostPatch( FPart root, Dictionary<FPart, List<Transform>> partMap, BidirectionalReferenceStore refMap )
+        public static GhostedPart MakeGhostPatch( FConstructible root, Dictionary<FConstructible, List<Transform>> partMap, IReverseReferenceMap refMap )
         {
             if( partMap.TryGetValue( root, out List<Transform> list ) )
             {
@@ -90,9 +83,9 @@ namespace KSS
 
                 return new GhostedPart()
                 {
-                    refMap = refMap,
-                    forwardPatch = new EditObjectsPatch( forwardPatch ),
-                    reversePatch = new EditObjectsPatch( reversePatch )
+                    RefMap = refMap,
+                    OriginalToGhostPatch = new EditObjectsPatch( forwardPatch ),
+                    GhostToOriginalPatch = new EditObjectsPatch( reversePatch )
                 };
             }
             throw new ArgumentException( $"the specified {nameof( root )} object must be contained in the {nameof( partMap )}.", nameof( root ) );

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace UnityPlus.Serialization
 {
     /// <summary>
-    /// An arbitrary structure that has the ability to map Identifiers to Objects.
+    /// An arbitrary structure that has the ability to map IDs to Objects.
     /// </summary>
     public interface IForwardReferenceMap
     {
@@ -34,7 +34,7 @@ namespace UnityPlus.Serialization
     }
 
     /// <summary>
-    /// An arbitrary structure that has the ability to map Objects to Identifiers.
+    /// An arbitrary structure that has the ability to map Objects to IDs.
     /// </summary>
     public interface IReverseReferenceMap
     {

@@ -35,13 +35,13 @@ namespace KSS.AssetLoaders
             return partMeta;
         }
 
-        public override GameObject Load()
+        public override GameObject Load( IForwardReferenceMap refMap )
         {
             string filePath = VesselMetadata.GetRootDirectory( _vesselId );
 
             _handler.ObjectsFilename = Path.Combine( filePath, "objects.json" );
             _handler.DataFilename = Path.Combine( filePath, "data.json" );
-            _loader.RefMap = new ForwardReferenceStore();
+            _loader.RefMap = refMap;
             _loader.Load();
             return _strat.LastSpawnedRoot;
         }

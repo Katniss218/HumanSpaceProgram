@@ -16,6 +16,10 @@ namespace UnityPlus.Serialization
 
     public class CreateGameObjectsPatch : IPatch
     {
+        static JsonSeparateFileSerializedDataHandler dataHandler = new JsonSeparateFileSerializedDataHandler();
+        static ExplicitHierarchyGameObjectsStrategy strat = new ExplicitHierarchyGameObjectsStrategy( dataHandler, () => throw new Exception() );
+        static Loader loader = new Loader( null, null, null, strat.Load_Object, strat.Load_Data );
+
         SerializedArray _hierarachy;
         SerializedArray _data;
 
@@ -23,11 +27,8 @@ namespace UnityPlus.Serialization
         {
             // basically "run a deserialization on the data"
 
-            JsonSeparateFileSerializedDataHandler dataHandler = new JsonSeparateFileSerializedDataHandler();
-            ExplicitHierarchyGameObjectsStrategy strat = new ExplicitHierarchyGameObjectsStrategy( dataHandler, () => throw new Exception() );
-#warning TODO - add synchronous methods to this strat.
-            //Loader loader = new Loader( patcher.ReferenceStore, null, null, strat.Load_Object, strat.Load_Data );
-            //loader.Load();
+            loader.RefMap = patcher.ReferenceMap;
+            loader.Load();
         }
     }
 
@@ -39,7 +40,7 @@ namespace UnityPlus.Serialization
         {
             foreach( var objectId in _objectIds )
             {
-                GameObject go = (GameObject)patcher.ReferenceStore.GetObj( objectId );
+                GameObject go = (GameObject)patcher.ReferenceMap.GetObj( objectId );
                 UnityEngine.Object.Destroy( go );
             }
         }
@@ -58,9 +59,9 @@ namespace UnityPlus.Serialization
         {
             foreach( var change in _changes )
             {
-                object obj = patcher.ReferenceStore.GetObj( change.objId );
+                object obj = patcher.ReferenceMap.GetObj( change.objId );
 
-                obj.SetData( patcher.ReferenceStore, change.data );
+                obj.SetData( patcher.ReferenceMap, change.data );
             }
         }
     }

@@ -1,4 +1,6 @@
-﻿using KSS.Core.Components;
+﻿using KSS.Components;
+using KSS.Core;
+using KSS.Core.Components;
 using KSS.Core.ReferenceFrames;
 using System;
 using System.Collections.Generic;
@@ -35,41 +37,105 @@ namespace KSS.GameplayScene
     10. As parts of the ghost are constructed, construction site runs the reverse (into-original) patches for the specified part.
     11. When construction finishes completely, the construction site is removed and everything becomes functional again.
 
+
+        deconstruction:
+
+        click to deconstruct
+        deconstruction starts progressing, making parts ghostly.
+        on finish, ghost parts are destroyed.
+
         */
 
-        public ConstructionMode CurrentMode { get; set; } = ConstructionMode.Paused;
+        public class DataEntry
+        {
+            public GhostedPart gPart;
+            public float buildPoints;
+        }
+
+        public ConstructionMode CurrentMode { get; private set; } = ConstructionMode.Paused;
 
         Patcher _patcher;
 
-        List<GhostedPart> _ghostedParts;
+        Dictionary<FConstructible, DataEntry> _constructionData;
 
-        Dictionary<FPart, float> _progress;
+        public float BuildSpeedTotal { get; set; } // cumulative total build speed per second.
+
+        public int TotalCount { get => _constructionData.Count; }
+
+        public int CompletedCount { get; private set; } = 0;
 
         void Update()
         {
+            float buildSpeedPerPart = BuildSpeedTotal / (TotalCount - CompletedCount);
             if( CurrentMode == ConstructionMode.Construction )
             {
-                
+                if( CompletedCount == TotalCount )
+                {
+                    Destroy( this );
+                    return;
+                }
+                foreach( var kvp in _constructionData )
+                {
+                    kvp.Value.buildPoints += buildSpeedPerPart * TimeManager.DeltaTime;
+                    if( kvp.Value.buildPoints >= kvp.Key.MaxBuildPoints )
+                    {
+                        CompletedCount++;
+                        kvp.Value.buildPoints = kvp.Key.MaxBuildPoints;
+                        kvp.Value.gPart.GhostToOriginalPatch.Run( _patcher );
+                    }
+                }
             }
             if( CurrentMode == ConstructionMode.Deconstruction )
             {
-                
+                if( CompletedCount == TotalCount )
+                {
+                    foreach( var kvp in _constructionData )
+                    {
+                        Destroy( kvp.Key.gameObject );
+                    }
+                    Destroy( this );
+                    return;
+                }
+                foreach( var kvp in _constructionData )
+                {
+                    kvp.Value.buildPoints -= buildSpeedPerPart * TimeManager.DeltaTime;
+                    if( kvp.Value.buildPoints <= 0 )
+                    {
+                        CompletedCount++;
+                        kvp.Value.buildPoints = 0;
+                        kvp.Value.gPart.OriginalToGhostPatch.Run( _patcher );
+                    }
+                }
             }
         }
 
-        void LateUpdate()
+        public static (Transform rot, Dictionary<FConstructible, DataEntry>, BidirectionalReferenceStore) SpawnGhost( string vesselId )
         {
-            
-        }
-
-        public static Transform SpawnGhost( string vesselId )
-        {
-            throw new NotImplementedException();
             // step 1. player clicks, and spawns ghost to place.
+            BidirectionalReferenceStore refStore = new BidirectionalReferenceStore();
+            GameObject rootGo = PartRegistry.Load( new Core.Mods.NamespacedIdentifier( "Vessels", vesselId ), refStore );
+
+            Dictionary<FConstructible, List<Transform>> partMap = MapToAncestralComponent<FConstructible>( rootGo.transform );
+            FConstructible[] constructibles = rootGo.GetComponentsInChildren<FConstructible>();
+            Dictionary<FConstructible, DataEntry> gParts = new Dictionary<FConstructible, DataEntry>();
+            foreach( var con in constructibles )
+            {
+                GhostedPart gpart = GhostedPart.MakeGhostPatch( con, partMap, refStore );
+                gParts.Add( con, new DataEntry() { gPart = gpart, buildPoints = 0.0f } );
+            }
+
+            return (rootGo.transform, gParts, refStore);
         }
 
-        public static ConstructionSite PlaceGhost( Transform ghostRoot, Transform parent )
+        public static ConstructionSite PlaceGhost( Transform ghostRoot, List<GhostedPart> ghostParts, Transform parent, BidirectionalReferenceStore refMap )
         {
+#warning TODO - what if standalone?
+            ConstructionSite cSite = parent.GetComponentInParent<ConstructionSite>();
+            if( cSite == null )
+            {
+                cSite = parent.gameObject.AddComponent<ConstructionSite>();
+            }
+
             throw new NotImplementedException();
             // step 6. Player places the ghost.
 
@@ -85,13 +151,13 @@ namespace KSS.GameplayScene
             // if parent's ancestral chain has a c-site - add to that c-site, otherwise - make new c-site.
         }
 
+        /// <summary>
+        /// This returns a map that maps each T component in the tree, starting at root, to the descendants that belong to it. <br />
+        /// Each descendant belongs to its closest ancestor that has the T component. <br />
+        /// Descendants that have the T component are mapped to their own component.
+        /// </summary>
         public static Dictionary<T, List<Transform>> MapToAncestralComponent<T>( Transform root ) where T : Component
         {
-            // This returns a map that maps each T component in the tree, starting at root, to the descendants that belong to it.
-            // Each descendant belongs to its closest ancestor that has the T component.
-            // Descendants that have the T component are mapped to their own component.
-#warning TODO - this map should probably be part of the vessel. It's useful.
-
             T rootsPart = root.GetComponent<T>();
             if( rootsPart == null )
             {

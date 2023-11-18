@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace KSS.Core
 {
@@ -90,7 +91,25 @@ namespace KSS.Core
         {
             if( _registry.TryGetValue( namespacedPartId, out PartFactory factory ) )
             {
-                return factory.Load();
+                return factory.Load( new ForwardReferenceStore() );
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Loads a specified registered unity hierarchy from its source.
+        /// </summary>
+        public static GameObject Load( NamespacedIdentifier namespacedPartId, IForwardReferenceMap refMap )
+        {
+            if( refMap == null )
+            {
+                throw new ArgumentNullException( nameof( refMap ), $"Reference map can't be null." );
+            }
+
+            if( _registry.TryGetValue( namespacedPartId, out PartFactory factory ) )
+            {
+                return factory.Load( refMap );
             }
 
             return null;

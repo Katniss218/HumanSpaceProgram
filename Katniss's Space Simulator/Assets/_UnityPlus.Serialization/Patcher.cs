@@ -8,7 +8,7 @@ namespace UnityPlus.Serialization
 {
     public class Patcher
     {
-        public BidirectionalReferenceStore ReferenceStore { get; private set; }
+        public BidirectionalReferenceStore ReferenceMap { get; private set; }
         // todo - maybe the patcher itself should be the Ireferencemap
 
         // todo

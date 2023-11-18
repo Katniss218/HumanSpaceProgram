@@ -32,11 +32,11 @@ namespace KSS.AssetLoaders
             return partMeta;
         }
 
-        public override GameObject Load()
+        public override GameObject Load( IForwardReferenceMap refMap )
         {
             _handler.ObjectsFilename = Path.Combine( _filePath, "objects.json" );
             _handler.DataFilename = Path.Combine( _filePath, "data.json" );
-            _loader.RefMap = new ForwardReferenceStore();
+            _loader.RefMap = refMap;
             _loader.Load();
             return _strat.LastSpawnedRoot;
         }
