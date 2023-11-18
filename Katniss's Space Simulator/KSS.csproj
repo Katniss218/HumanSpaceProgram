@@ -61,7 +61,9 @@
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadTree.cs" />
     <Compile Include="Assets\KSS\DesignScene\DesignObjectManager.cs" />
     <Compile Include="Assets\KSS\Components\FVesselSeparator.cs" />
+    <Compile Include="Assets\KSS\GameplayScene\ConstructionSite.cs" />
     <Compile Include="Assets\KSS\Effects\Atmospheres\AtmosphereRenderer.cs" />
+    <Compile Include="Assets\KSS\GhostedPart.cs" />
     <Compile Include="Assets\KSS\Components\FSequencer.cs" />
     <Compile Include="Assets\KSS\Components\FDryMass.cs" />
     <Compile Include="Assets\KSS\Cameras\GameplayCameraController.cs" />
@@ -76,14 +78,13 @@
     <Compile Include="Assets\KSS\Components\FBulkContainer_Sphere.cs" />
     <Compile Include="Assets\KSS\DesignScene\DesignObject.cs" />
     <Compile Include="Assets\KSS\Components\FBulkConnection.cs" />
+    <Compile Include="Assets\KSS\AssetLoaders\GameDataTextureLoader.cs" />
     <Compile Include="Assets\KSS\Components\FActuatorXY.cs" />
     <Compile Include="Assets\KSS\DesignScene\Tools\TranslateTool.cs" />
     <Compile Include="Assets\KSS\AssetLoaders\GameDataJsonPartFactory.cs" />
     <Compile Include="Assets\KSS\DesignScene\Tools\RerootTool.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadTree_NodeUtils.cs" />
     <Compile Include="Assets\KSS\AssetLoaders\GameDataJsonVesselFactory.cs" />
-    <Compile Include="Assets\KSS\AssetLoaders\GameDataTextureLoader.cs" />
-    <Compile Include="Assets\KSS\GameplayScene\ConstructionSite.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS\CelestialBodies\Surface\TerrainShader.shader" />

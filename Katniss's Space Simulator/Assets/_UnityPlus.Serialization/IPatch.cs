@@ -12,31 +12,12 @@ namespace UnityPlus.Serialization
     public interface IPatch
     {
         void Run( Patcher patcher );
-
-        public static Dictionary<object, IPatch> CreateForwardPatches( (SerializedData o, SerializedData d) modified, (SerializedData o, SerializedData d) original )
-        {
-            // creates a patch based on the difference between modified and original.
-            throw new NotImplementedException();
-
-            // this creates a dict of patches that turn `original` into `modified`.
-            // swapping the terms should create the inverse patch.
-        }
-
-        public static IPatch[] Invert( IEnumerable<IPatch> patches )
-        {
-            // creates the inverse of the specified list of patches
-            throw new NotImplementedException();
-
-            // for create object patches, replace them with destroy.
-            // for destroy, replace them with create.
-            // for edit - we need to store the previous data somewhere.
-        }
     }
 
     public class CreateGameObjectsPatch : IPatch
     {
-        SerializedArray hierarachy;
-        SerializedArray data;
+        SerializedArray _hierarachy;
+        SerializedArray _data;
 
         public void Run( Patcher patcher )
         {
@@ -53,11 +34,11 @@ namespace UnityPlus.Serialization
 
     public class DestroyGameObjectsPatch : IPatch
     {
-        Guid[] objectIds;
+        Guid[] _objectIds;
 
         public void Run( Patcher patcher )
         {
-            foreach( var objectId in objectIds )
+            foreach( var objectId in _objectIds )
             {
                 GameObject go = (GameObject)patcher.ReferenceStore.GetObj( objectId );
                 UnityEngine.Object.Destroy( go );
@@ -67,11 +48,16 @@ namespace UnityPlus.Serialization
 
     public class EditObjectsPatch : IPatch
     {
-        (Guid objId, SerializedData data)[] changes;
+        (Guid objId, SerializedData data)[] _changes;
+
+        public EditObjectsPatch( IEnumerable<(Guid objId, SerializedData data)> changes )
+        {
+            this._changes = changes.ToArray();
+        }
 
         public void Run( Patcher patcher )
         {
-            foreach( var change in changes )
+            foreach( var change in _changes )
             {
                 object obj = patcher.ReferenceStore.GetObj( change.objId );
 

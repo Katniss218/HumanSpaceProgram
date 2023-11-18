@@ -13,12 +13,8 @@ namespace UnityPlus.Serialization
     {
         public static SerializedData GetData( this MeshRenderer mr, ISaver s )
         {
-            SerializedArray matsJson = new SerializedArray();
             var mats = mr.sharedMaterials.Select( mat => s.WriteAssetReference( mat ) );
-            foreach( var mat in mats )
-            {
-                matsJson.Add( mat );
-            }
+            SerializedArray matsJson = new SerializedArray( mats );
 
             return new SerializedObject()
             {

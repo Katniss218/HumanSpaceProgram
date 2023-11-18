@@ -92,8 +92,8 @@
     <Compile Include="Assets\KSS.Core\Components\FPart.cs" />
     <Compile Include="Assets\KSS.Core\SceneManagement\SceneLoader.cs" />
     <Compile Include="Assets\KSS.Core\ReferenceFrames\IAcceleratingReferenceFrame.cs" />
-    <Compile Include="Assets\KSS.Core\Control\ControlInAttribute.cs" />
     <Compile Include="Assets\KSS.Core\Serialization\Version.cs" />
+    <Compile Include="Assets\KSS.Core\Control\ControlInAttribute.cs" />
     <Compile Include="Assets\KSS.Core\ReferenceFrames\ReferenceFrameUtils.cs" />
     <Compile Include="Assets\KSS.Core\Control\ControlOutAttribute.cs" />
     <Compile Include="Assets\KSS.Core\Serialization\SaveMetadata.cs" />
@@ -113,8 +113,8 @@
     <Compile Include="Assets\KSS.Core\SceneManagement\AlwaysLoadedManager.cs" />
     <Compile Include="Assets\KSS.Core\Components\FClickInteractionRedirect.cs" />
     <Compile Include="Assets\KSS.Core\Mods\HumanSpaceProgramMods.cs" />
-    <Compile Include="Assets\KSS.Core\CelestialBodySurface.cs" />
     <Compile Include="Assets\KSS.Core\PartFactory.cs" />
+    <Compile Include="Assets\KSS.Core\CelestialBodySurface.cs" />
     <Compile Include="Assets\KSS.Core\VesselHierarchyUtils.cs" />
     <Compile Include="Assets\KSS.Core\ReferenceFrames\SceneReferenceFrameManager.cs" />
     <Compile Include="Assets\KSS.Core\Substance.cs" />

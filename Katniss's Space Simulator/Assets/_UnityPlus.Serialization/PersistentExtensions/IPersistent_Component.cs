@@ -11,7 +11,7 @@ namespace UnityPlus.Serialization
     public static class IPersistent_Component
     {
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static SerializedData GetData( this Component c, ISaver s )
+        public static SerializedData GetData( this Component c, IReverseReferenceMap s )
         {
             switch( c )
             {
@@ -48,7 +48,7 @@ namespace UnityPlus.Serialization
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static void SetData( this Component component, ILoader l, SerializedData data )
+        public static void SetData( this Component component, IForwardReferenceMap l, SerializedData data )
         {
             // component "data" means that the component (which is a referencable object) has already been added by an object action, and we're now reading its data.
 

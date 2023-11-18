@@ -20,6 +20,11 @@ namespace UnityPlus.Serialization
             _children = new List<SerializedData>();
         }
 
+        public SerializedArray( IEnumerable<SerializedData> children )
+        {
+            _children = new List<SerializedData>( children );
+        }
+
         public override SerializedData this[int index]
         {
             get => _children[index];

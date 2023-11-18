@@ -7,26 +7,50 @@ using UnityPlus.Serialization;
 
 namespace KSS.GameplayScene
 {
+    public enum ConstructionMode
+    {
+        Construction,
+        Deconstruction
+    }
+
     [RequireComponent( typeof( RootObjectTransform ) )]
     [DisallowMultipleComponent]
     public class ConstructionSite : MonoBehaviour
     {
-        // construction site stores the patches to apply after each gameobject is completed.
+        /*
+        
+    1. The player clicks button, selects what to construct.
+       - Original is spawned.
+       - Patches that can transform the original into the ghost and vice versa are created.
+       - The forward (into-ghost) patches are ran.
+    6. The player places the ghost hierarchy.
+       - The ghost hierarchy is attached and a construction site is created.
+       - The parent part to where the construction is attached, and all its children become nonfunctional.
+    8. The player adjusts the ghost's position/rotation.
+       - Construction site updates the ghost's color to indicate if construction will be able to proceeed (nothing overlaps basically).
+    9. The player accepts the position/rotation of the construction site. 
+       - Construction starts progressing.
+    10. As parts of the ghost are constructed, construction site runs the reverse (into-original) patches for the specified part.
+    11. When construction finishes completely, the construction site is removed and everything becomes functional again.
 
-        // if something is being attached to an object, the entire object becomes nonfunctional.
-        // doesn't matter if it's only an engine being attached to the side of a vab somewhere.
+        */
 
-        // construction site is always added to the root object.
-        // there can be only one construction site per object. But the set of constructed objects can be expanded and shrunk dynamically.
+        List<GhostedPart> ghostedParts;
 
-        Dictionary<GameObject, IPatch[]> patchesLeftToApply; // list of patches to apply when the construction of the specific object is finished.
+        public ConstructionMode Mode;
 
         Patcher patcher;
 
-        public void Add( GameObject toConstructRoot, Transform parent )
+        public void Add( GameObject toConstructRoot, Transform parent, PatchCollection patches )
         {
+            // this is step 6, if it is added to an existing c-site.
             if( parent.root != this.transform.root )
                 throw new InvalidOperationException( $"Can't start construction if parent doesn't belong to this construction site." );
+
+            toConstructRoot.transform.SetParent( parent );
+
+            // should be already 'ghost'ed, but we need to get the patches from somewhere.
+            patchesLeftToApply = PatchCollection.Combine( patchesLeftToApply, patches );
 
             // appends the specified object to the list of things under construction, and specifies under which object to parent it.
         }
@@ -40,10 +64,54 @@ namespace KSS.GameplayScene
             if( inProgressRoot.transform.root != this.transform.root )
                 throw new InvalidOperationException( $"Can't remove construction if the object doesn't belong to this construction site." );
 
-            if( notInProgress( inProgressRoot ) )
-                throw new Exception();
+            if( patchesLeftToApply.ContainsKey( inProgressRoot ) )
+                throw new InvalidOperationException( $"Can't remove construction if the object isn't under construction." );
 
-            UnityEngine.Object.Destroy( inProgressRoot );
+            Destroy( inProgressRoot );
+        }
+
+        public static Dictionary<T, List<Transform>> MapToAncestralComponent<T>( Transform root ) where T : Component
+        {
+            // This returns a map that maps each T component in the tree, starting at root, to the descendants that belong to it.
+            // Each descendant belongs to its closest ancestor that has the T component.
+            // Descendants that have the T component are mapped to their own component.
+#warning TODO - this map should probably be part of the vessel. It's useful.
+
+            T rootsPart = root.GetComponent<T>();
+            if( rootsPart == null )
+            {
+                throw new ArgumentException( $"Root must contain {typeof( T ).FullName}." );
+            }
+
+            Dictionary<T, List<Transform>> map = new Dictionary<T, List<Transform>>();
+            Stack<(Transform parent, T parentPart)> stack = new Stack<(Transform, T)>();
+
+            stack.Push( (root, rootsPart) ); // Initial entry with null parentPart
+
+            while( stack.Count > 0 )
+            {
+                (Transform current, T parentPart) = stack.Pop();
+
+                T currentPart = current.GetComponent<T>();
+                if( currentPart == null )
+                    currentPart = parentPart; // Inherit parent's part if the current doesn't have one
+
+                if( map.TryGetValue( currentPart, out var list ) )
+                {
+                    list.Add( current );
+                }
+                else
+                {
+                    map.Add( currentPart, new List<Transform>() { current } );
+                }
+
+                foreach( Transform child in current )
+                {
+                    stack.Push( (child, currentPart) );
+                }
+            }
+
+            return map;
         }
     }
 }
