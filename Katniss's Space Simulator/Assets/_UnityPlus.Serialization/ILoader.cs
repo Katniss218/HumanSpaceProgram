@@ -46,6 +46,9 @@ namespace UnityPlus.Serialization
             // It lets us do that without hacking some system together, that loads objects as the references are resolved, and also allows circular referencing.
         }
 
+        /// <summary>
+        /// The reference map used to map object IDs to references when deserializing.
+        /// </summary>
         IForwardReferenceMap RefMap { get; }
     }
 

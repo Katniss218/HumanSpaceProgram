@@ -44,6 +44,9 @@ namespace UnityPlus.Serialization
             // It also lets us decouple the instances from their data.
         }
 
+        /// <summary>
+        /// The reference map used to map object IDs to references when serializing.
+        /// </summary>
         IReverseReferenceMap RefMap { get; }
     }
 

@@ -97,7 +97,6 @@
     <Compile Include="Assets\_UnityPlus.Serialization\PreexistingReference.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Strategies\AssetGameObjectsStrategy.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Strategies\ExplicitHierarchyGameObjectsStrategy.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\Patcher.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Saver.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\PersistentExtensions\IPersistent_Component.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\AsyncLoader.cs" />

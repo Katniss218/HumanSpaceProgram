@@ -33,9 +33,12 @@ namespace KSS.UI
         {
             foreach( var hud in instance._huds.ToArray() )
             {
+                if( hud == null ) // hud can be null if exiting a scene - it doesn't affect anything, but gives ugly warnings.
+                    return;
+
                 if( hud.Vessel == vessel )
                 {
-                    Destroy( hud.gameObject ); // hud can be null if exiting a scene - it doesn't affect anything, but gives ugly warnings.
+                    Destroy( hud.gameObject );
                     instance._huds.Remove( hud );
                 }
             }

@@ -11,7 +11,7 @@ namespace UnityPlus.Serialization
 {
     public interface IPatch
     {
-        void Run( Patcher patcher );
+        void Run( BidirectionalReferenceStore refMap );
     }
 
     public class CreateGameObjectsPatch : IPatch
@@ -23,11 +23,11 @@ namespace UnityPlus.Serialization
         SerializedArray _hierarachy;
         SerializedArray _data;
 
-        public void Run( Patcher patcher )
+        public void Run( BidirectionalReferenceStore refMap )
         {
             // basically "run a deserialization on the data"
 
-            loader.RefMap = patcher.ReferenceMap;
+            loader.RefMap = refMap;
             loader.Load();
         }
     }
@@ -36,11 +36,11 @@ namespace UnityPlus.Serialization
     {
         Guid[] _objectIds;
 
-        public void Run( Patcher patcher )
+        public void Run( BidirectionalReferenceStore refMap )
         {
             foreach( var objectId in _objectIds )
             {
-                GameObject go = (GameObject)patcher.ReferenceMap.GetObj( objectId );
+                GameObject go = (GameObject)refMap.GetObj( objectId );
                 UnityEngine.Object.Destroy( go );
             }
         }
@@ -55,13 +55,13 @@ namespace UnityPlus.Serialization
             this._changes = changes.ToArray();
         }
 
-        public void Run( Patcher patcher )
+        public void Run( BidirectionalReferenceStore refMap )
         {
             foreach( var change in _changes )
             {
-                object obj = patcher.ReferenceMap.GetObj( change.objId );
+                object obj = refMap.GetObj( change.objId );
 
-                obj.SetData( patcher.ReferenceMap, change.data );
+                obj.SetData( refMap, change.data );
             }
         }
     }

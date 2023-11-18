@@ -54,7 +54,7 @@ namespace KSS.GameplayScene
 
         public ConstructionMode CurrentMode { get; private set; } = ConstructionMode.Paused;
 
-        Patcher _patcher;
+        BidirectionalReferenceStore _refMap;
 
         Dictionary<FConstructible, DataEntry> _constructionData;
 
@@ -81,7 +81,7 @@ namespace KSS.GameplayScene
                     {
                         CompletedCount++;
                         kvp.Value.buildPoints = kvp.Key.MaxBuildPoints;
-                        kvp.Value.gPart.GhostToOriginalPatch.Run( _patcher );
+                        kvp.Value.gPart.GhostToOriginalPatch.Run( _refMap );
                     }
                 }
             }
@@ -103,7 +103,7 @@ namespace KSS.GameplayScene
                     {
                         CompletedCount++;
                         kvp.Value.buildPoints = 0;
-                        kvp.Value.gPart.OriginalToGhostPatch.Run( _patcher );
+                        kvp.Value.gPart.OriginalToGhostPatch.Run( _refMap );
                     }
                 }
             }
