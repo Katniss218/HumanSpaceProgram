@@ -26,9 +26,8 @@ namespace UnityPlus.Serialization
             JsonSeparateFileSerializedDataHandler dataHandler = new JsonSeparateFileSerializedDataHandler();
             ExplicitHierarchyGameObjectsStrategy strat = new ExplicitHierarchyGameObjectsStrategy( dataHandler, () => throw new Exception() );
 #warning TODO - add synchronous methods to this strat.
-            Loader loader = new Loader( null, null, strat.Load_Object, strat.Load_Data );
-            loader.UsePersistentReferenceStore( patcher.ReferenceStore ); // Adds the serialization map to the reference store.
-            loader.Load();
+            //Loader loader = new Loader( patcher.ReferenceStore, null, null, strat.Load_Object, strat.Load_Data );
+            //loader.Load();
         }
     }
 
@@ -61,7 +60,6 @@ namespace UnityPlus.Serialization
             {
                 object obj = patcher.ReferenceStore.GetObj( change.objId );
 
-#warning TODO - Add a generalized (extension) method to apply the data to an arbitrary object type, making use of hardcoded setdata for builtin types and the IPersistent interface for custom.
                 obj.SetData( patcher.ReferenceStore, change.data );
             }
         }

@@ -8,6 +8,7 @@ using System.Linq;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.DataHandlers;
 using UnityPlus.Serialization.Strategies;
 
 namespace KSS.AssetLoaders
@@ -20,8 +21,7 @@ namespace KSS.AssetLoaders
         private static JsonSeparateFileSerializedDataHandler _handler = new JsonSeparateFileSerializedDataHandler();
         private static SingleExplicitHierarchyStrategy _strat = new SingleExplicitHierarchyStrategy( _handler, () => throw new NotSupportedException( $"Tried to save something using a part *loader*" ) );
 
-        private static Loader _loader = new Loader( null, null, _strat.Load_Object, _strat.Load_Data );
-
+        private static Loader _loader = new Loader( null, null, null, _strat.Load_Object, _strat.Load_Data );
 
         private string _vesselId;
 
@@ -41,6 +41,7 @@ namespace KSS.AssetLoaders
 
             _handler.ObjectsFilename = Path.Combine( filePath, "objects.json" );
             _handler.DataFilename = Path.Combine( filePath, "data.json" );
+            _loader.RefMap = new ForwardReferenceStore();
             _loader.Load();
             return _strat.LastSpawnedRoot;
         }

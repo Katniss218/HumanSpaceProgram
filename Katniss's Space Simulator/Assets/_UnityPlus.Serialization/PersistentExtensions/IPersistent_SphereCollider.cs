@@ -11,7 +11,7 @@ namespace UnityPlus.Serialization
 {
     public static class IPersistent_SphereCollider
     {
-        public static SerializedData GetData( this SphereCollider sc, ISaver s )
+        public static SerializedData GetData( this SphereCollider sc, IReverseReferenceMap s )
         {
             return new SerializedObject()
             {
@@ -21,7 +21,7 @@ namespace UnityPlus.Serialization
             };
         }
 
-        public static void SetData( this SphereCollider sc, ILoader l, SerializedObject data )
+        public static void SetData( this SphereCollider sc, IForwardReferenceMap l, SerializedData data )
         {
             if( data.TryGetValue( "radius", out var radius ) )
                 sc.radius = (float)radius;

@@ -8,7 +8,7 @@ namespace UnityEngine.Extensions
 {
     public static class Transform_Ex
     {
-        public static IEnumerable<Transform> Children( Transform transform )
+        public static IEnumerable<Transform> Children( this Transform transform )
         {
             foreach( object child in transform )
             {
@@ -16,7 +16,7 @@ namespace UnityEngine.Extensions
             }
         }
 
-        public static IEnumerable<Transform> Descendants( Transform transform )
+        public static IEnumerable<Transform> Descendants( this Transform transform )
         {
             Stack<Transform> stack = new Stack<Transform>();
             stack.Push( transform );
@@ -32,6 +32,24 @@ namespace UnityEngine.Extensions
                     stack.Push( (Transform)child );
                 }
             }
+        }
+
+        public static bool IsParentOf( this Transform parent, Transform other )
+        {
+            return other.parent == parent;
+        }
+
+        public static bool IsAncestorOf( this Transform ancestor, Transform other )
+        {
+            while( other != null )
+            {
+                if( other.parent == ancestor )
+                    return true;
+
+                other = other.parent;
+            }
+
+            return false;
         }
     }
 }

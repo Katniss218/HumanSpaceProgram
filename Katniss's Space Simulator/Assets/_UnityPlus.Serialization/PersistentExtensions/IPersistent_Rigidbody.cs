@@ -11,7 +11,7 @@ namespace UnityPlus.Serialization
 {
     public static class IPersistent_Rigidbody
     {
-        public static SerializedData GetData( this Rigidbody rb, ISaver s )
+        public static SerializedData GetData( this Rigidbody rb, IReverseReferenceMap s )
         {
             return new SerializedObject()
             {
@@ -19,7 +19,7 @@ namespace UnityPlus.Serialization
             };
         }
 
-        public static void SetData( this Rigidbody rb, ILoader l, SerializedObject data )
+        public static void SetData( this Rigidbody rb, IForwardReferenceMap l, SerializedData data )
         {
             if( data.TryGetValue( "is_kinematic", out var isKinematic ) )
                 rb.isKinematic = (bool)isKinematic;

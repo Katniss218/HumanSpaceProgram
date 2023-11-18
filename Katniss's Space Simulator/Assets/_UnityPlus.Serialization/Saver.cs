@@ -15,97 +15,30 @@ namespace UnityPlus.Serialization
     {
         ISaver.State _currentState;
 
-        List<Action<ISaver>> _dataActions = new List<Action<ISaver>>();
-        List<Action<ISaver>> _objectActions = new List<Action<ISaver>>();
+        List<ISaver.Action> _dataActions;
+        List<ISaver.Action> _objectActions;
 
         Action _startFunc;
         Action _finishFunc;
 
-        Dictionary<object, Guid> _objectToGuid = new Dictionary<object, Guid>();
+        public IReverseReferenceMap RefMap { get; set; }
 
-        public Saver( Action startFunc, Action finishFunc, Action<ISaver> objectAction, Action<ISaver> dataAction )
+        public Saver( IReverseReferenceMap refMap, Action startFunc, Action finishFunc, ISaver.Action objectAction, ISaver.Action dataAction )
         {
+            this.RefMap = refMap;
             this._startFunc = startFunc;
             this._finishFunc = finishFunc;
-
-            this._objectActions.Add( objectAction );
-            this._dataActions.Add( dataAction );
+            this._objectActions = new List<ISaver.Action>() { objectAction };
+            this._dataActions = new List<ISaver.Action>() { objectAction };
         }
 
-        public Saver( Action startFunc, Action finishFunc, IEnumerable<Action<ISaver>> objectActions, IEnumerable<Action<ISaver>> dataActions )
+        public Saver( IReverseReferenceMap refMap, Action startFunc, Action finishFunc, IEnumerable<ISaver.Action> objectActions, IEnumerable<ISaver.Action> dataActions )
         {
+            this.RefMap = refMap;
             this._startFunc = startFunc;
             this._finishFunc = finishFunc;
-
-            foreach( var action in objectActions )
-            {
-                this._objectActions.Add( action );
-            }
-            foreach( var action in dataActions )
-            {
-                this._dataActions.Add( action );
-            }
-        }
-
-        //
-        //  -- -- -- --
-        //
-
-        private void ClearReferenceRegistry()
-        {
-            _objectToGuid.Clear();
-        }
-
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public bool TryGetID( object obj, out Guid id )
-        {
-            if( _currentState == ISaver.State.Idle )
-            {
-                throw new InvalidOperationException( $"Can't save an object (or its ID) when the saver is idle." );
-            }
-
-            if( obj == null )
-            {
-                id = Guid.Empty;
-                return true;
-            }
-
-            return _objectToGuid.TryGetValue( obj, out id );
-        }
-
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public Guid GetID( object obj )
-        {
-            if( _currentState == ISaver.State.Idle )
-            {
-                throw new InvalidOperationException( $"Can't save an object (or its ID) when the saver is idle." );
-            }
-
-            if( _objectToGuid.TryGetValue( obj, out Guid id ) )
-            {
-                return id;
-            }
-
-            if( obj == null )
-                return Guid.Empty;
-
-            Guid newID = Guid.NewGuid();
-            _objectToGuid.Add( obj, newID );
-            return newID;
-        }
-
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public void SetID( object obj, Guid id )
-        {
-            if( _currentState == ISaver.State.Idle )
-            {
-                throw new InvalidOperationException( $"Can't save an object (or its ID) when the saver is idle." );
-            }
-
-            if( id == Guid.Empty )
-                return;
-
-            _objectToGuid.Add( obj, id );
+            this._objectActions = new List<ISaver.Action>( objectActions );
+            this._dataActions = new List<ISaver.Action>( dataActions );
         }
 
         //
@@ -121,23 +54,23 @@ namespace UnityPlus.Serialization
             Debug.Log( "Saving..." );
 #endif
             _currentState = ISaver.State.SavingData;
-            ClearReferenceRegistry();
+            //ClearReferenceRegistry();
             _startFunc?.Invoke();
 
             foreach( var action in _dataActions )
             {
-                action?.Invoke( this );
+                action?.Invoke( this.RefMap );
             }
 
             _currentState = ISaver.State.SavingObjects;
 
             foreach( var action in _objectActions )
             {
-                action?.Invoke( this );
+                action?.Invoke( this.RefMap );
             }
 
             _finishFunc?.Invoke();
-            ClearReferenceRegistry();
+            //ClearReferenceRegistry();
             _currentState = ISaver.State.Idle;
 #if DEBUG
             Debug.Log( "Finished Saving" );

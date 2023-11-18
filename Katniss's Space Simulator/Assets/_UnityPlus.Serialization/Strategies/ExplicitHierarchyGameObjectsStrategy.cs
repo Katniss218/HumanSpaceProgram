@@ -49,7 +49,7 @@ namespace UnityPlus.Serialization.Strategies
             this.RootObjectsGetter = rootObjectsGetter;
         }
 
-        public IEnumerator SaveAsync_Data( ISaver s )
+        public IEnumerator SaveAsync_Data( IReverseReferenceMap s )
         {
             IEnumerable<GameObject> rootObjects = this.RootObjectsGetter();
 
@@ -65,7 +65,7 @@ namespace UnityPlus.Serialization.Strategies
             this._data = objData;
         }
 
-        public IEnumerator SaveAsync_Object( ISaver s )
+        public IEnumerator SaveAsync_Object( IReverseReferenceMap s )
         {
             IEnumerable<GameObject> rootObjects = this.RootObjectsGetter();
 
@@ -88,7 +88,7 @@ namespace UnityPlus.Serialization.Strategies
 
         List<Behaviour> behsToReenable = new List<Behaviour>();
 
-        public IEnumerator LoadAsync_Object( ILoader l )
+        public IEnumerator LoadAsync_Object( IForwardReferenceMap l )
         {
             (_objects, _data) = DataHandler.ReadObjectsAndData();
 
@@ -110,7 +110,7 @@ namespace UnityPlus.Serialization.Strategies
             }
         }
 
-        public IEnumerator LoadAsync_Data( ILoader l )
+        public IEnumerator LoadAsync_Data( IForwardReferenceMap l )
         {
             foreach( var dataElement in (SerializedArray)this._data )
             {

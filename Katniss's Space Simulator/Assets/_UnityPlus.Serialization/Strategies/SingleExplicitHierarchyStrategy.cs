@@ -41,7 +41,7 @@ namespace UnityPlus.Serialization.Strategies
             this.RootObjectGetter = rootObjectGetter;
         }
 
-        public void Save_Data( ISaver s )
+        public void Save_Data( IReverseReferenceMap s )
         {
             SerializedArray objData = new SerializedArray();
 
@@ -50,7 +50,7 @@ namespace UnityPlus.Serialization.Strategies
             this._data = objData;
         }
         
-        public IEnumerator SaveAsync_Data( ISaver s )
+        public IEnumerator SaveAsync_Data( IReverseReferenceMap s )
         {
             SerializedArray objData = new SerializedArray();
 
@@ -61,7 +61,7 @@ namespace UnityPlus.Serialization.Strategies
             this._data = objData;
         }
 
-        public void Save_Object( ISaver s )
+        public void Save_Object( IReverseReferenceMap s )
         {
             SerializedArray objData = new SerializedArray();
 
@@ -75,7 +75,7 @@ namespace UnityPlus.Serialization.Strategies
             this._data = null;
         }
 
-        public IEnumerator SaveAsync_Object( ISaver s )
+        public IEnumerator SaveAsync_Object( IReverseReferenceMap s )
         {
             SerializedArray objData = new SerializedArray();
 
@@ -93,7 +93,7 @@ namespace UnityPlus.Serialization.Strategies
 
         List<Behaviour> behsToReenable = new List<Behaviour>();
 
-        public void Load_Object( ILoader l )
+        public void Load_Object( IForwardReferenceMap l )
         {
             (_objects, _data) = DataHandler.ReadObjectsAndData();
 
@@ -110,7 +110,7 @@ namespace UnityPlus.Serialization.Strategies
             }
         }
         
-        public IEnumerator LoadAsync_Object( ILoader l )
+        public IEnumerator LoadAsync_Object( IForwardReferenceMap l )
         {
             (_objects, _data) = DataHandler.ReadObjectsAndData();
 
@@ -129,7 +129,7 @@ namespace UnityPlus.Serialization.Strategies
             yield return null;
         }
 
-        public void Load_Data( ILoader l )
+        public void Load_Data( IForwardReferenceMap l )
         {
             foreach( var dataElement in (SerializedArray)_data )
             {
@@ -146,7 +146,7 @@ namespace UnityPlus.Serialization.Strategies
             this._data = null;
         }
 
-        public IEnumerator LoadAsync_Data( ILoader l )
+        public IEnumerator LoadAsync_Data( IForwardReferenceMap l )
         {
             foreach( var dataElement in (SerializedArray)_data )
             {

@@ -15,86 +15,30 @@ namespace UnityPlus.Serialization
     {
         ILoader.State _currentState;
 
-        List<Action<ILoader>> _objectActions = new List<Action<ILoader>>();
-        List<Action<ILoader>> _dataActions = new List<Action<ILoader>>();
+        List<ILoader.Action> _objectActions;
+        List<ILoader.Action> _dataActions;
 
         Action _startFunc;
         Action _finishFunc;
 
-        Dictionary<Guid, object> _guidToObject = new Dictionary<Guid, object>();
+        public IForwardReferenceMap RefMap { get; set; }
 
-        public Loader( Action startFunc, Action finishFunc, Action<ILoader> objectAction, Action<ILoader> dataAction )
+        public Loader( IForwardReferenceMap refMap, Action startFunc, Action finishFunc, ILoader.Action objectAction, ILoader.Action dataAction )
         {
+            this.RefMap = refMap;
             this._startFunc = startFunc;
             this._finishFunc = finishFunc;
-
-            this._objectActions.Add( objectAction );
-            this._dataActions.Add( dataAction );
+            this._objectActions = new List<ILoader.Action>() { objectAction };
+            this._dataActions = new List<ILoader.Action>() { objectAction };
         }
 
-        public Loader( Action startFunc, Action finishFunc, IEnumerable<Action<ILoader>> objectActions, IEnumerable<Action<ILoader>> dataActions )
+        public Loader( IForwardReferenceMap refMap, Action startFunc, Action finishFunc, IEnumerable<ILoader.Action> objectActions, IEnumerable<ILoader.Action> dataActions )
         {
+            this.RefMap = refMap;
             this._startFunc = startFunc;
             this._finishFunc = finishFunc;
-
-            // Loader should load objects before data.
-            foreach( var action in objectActions )
-            {
-                this._objectActions.Add( action );
-            }
-            foreach( var action in dataActions )
-            {
-                this._dataActions.Add( action );
-            }
-        }
-
-        //
-        //  -- -- -- --
-        //
-
-        private void ClearReferenceRegistry()
-        {
-            _guidToObject.Clear();
-        }
-
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public bool TryGetObj( Guid id, out object obj )
-        {
-            if( id == Guid.Empty )
-            {
-                obj = null;
-                return false;
-            }
-            return _guidToObject.TryGetValue( id, out obj );
-        }
-
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public object GetObj( Guid id )
-        {
-            if( id == Guid.Empty )
-                return null;
-            if( _guidToObject.TryGetValue( id, out object obj ) )
-            {
-                return obj;
-            }
-#if DEBUG
-            Debug.Log( $"Tried to get a reference to object `{id:D}` before it was loaded." );
-#endif
-            return null;
-        }
-
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public void SetObj( Guid id, object obj )
-        {
-            if( _currentState != ILoader.State.LoadingObjects )
-            {
-                throw new InvalidOperationException( $"You can only set an ID while creating the objects. Please move the functionality to an object action" );
-            }
-
-            if( id == Guid.Empty )
-                return;
-
-            _guidToObject.Add( id, obj );
+            this._objectActions = new List<ILoader.Action>( objectActions );
+            this._dataActions = new List<ILoader.Action>( dataActions );
         }
 
         //
@@ -107,24 +51,24 @@ namespace UnityPlus.Serialization
             Debug.Log( "Loading..." );
 #endif
             _currentState = ILoader.State.LoadingObjects;
-            ClearReferenceRegistry();
+            //ClearReferenceRegistry();
             _startFunc?.Invoke();
 
             // Create objects first, since data will reference them, so they must exist to be dereferenced.
             foreach( var action in _objectActions )
             {
-                action?.Invoke( this );
+                action?.Invoke( this.RefMap );
             }
 
             _currentState = ILoader.State.LoadingData;
 
             foreach( var action in _dataActions )
             {
-                action?.Invoke( this );
+                action?.Invoke( this.RefMap );
             }
 
             _finishFunc?.Invoke();
-            ClearReferenceRegistry();
+            //ClearReferenceRegistry();
             _currentState = ILoader.State.Idle;
 #if DEBUG
             Debug.Log( "Finished Loading" );

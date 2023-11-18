@@ -24,111 +24,44 @@ namespace UnityPlus.Serialization
 
         public ISaver.State CurrentState { get; private set; }
 
-        List<Func<ISaver, IEnumerator>> _dataActions = new List<Func<ISaver, IEnumerator>>();
-        List<Func<ISaver, IEnumerator>> _objectActions = new List<Func<ISaver, IEnumerator>>();
+        List<IAsyncSaver.Action> _dataActions;
+        List<IAsyncSaver.Action> _objectActions;
 
         Action _startFunc;
         Action _finishFunc;
 
-        Dictionary<object, Guid> _objectToGuid = new Dictionary<object, Guid>();
+        public IReverseReferenceMap RefMap { get; set; }
 
         /// <param name="startFunc">A function delegate that can pause the game completely.</param>
         /// <param name="finishFunc">A function delegate that can unpause the game, and bring it to its previous state.</param>
-        public AsyncSaver( Action startFunc, Action finishFunc, Func<ISaver, IEnumerator> objectAction, Func<ISaver, IEnumerator> dataAction )
+        public AsyncSaver( IReverseReferenceMap refMap, Action startFunc, Action finishFunc, IAsyncSaver.Action objectAction, IAsyncSaver.Action dataAction )
         {
             if( startFunc == null )
                 throw new ArgumentNullException( nameof( startFunc ), $"Start delegate can't be null. {nameof( AsyncSaver )} requires the function to pause to deserialize correctly." );
             if( finishFunc == null )
                 throw new ArgumentNullException( nameof( finishFunc ), $"Finish delegate can't be null. {nameof( AsyncSaver )} requires the function to unpause to deserialize correctly." );
 
+            this.RefMap = refMap;
             this._startFunc = startFunc;
             this._finishFunc = finishFunc;
-
-            this._objectActions.Add( objectAction );
-            this._dataActions.Add( dataAction );
+            this._objectActions = new List<IAsyncSaver.Action>() { objectAction };
+            this._dataActions = new List<IAsyncSaver.Action>() { objectAction };
         }
 
         /// <param name="startFunc">A function delegate that can pause the game completely.</param>
         /// <param name="finishFunc">A function delegate that can unpause the game, and bring it to its previous state.</param>
-        public AsyncSaver( Action startFunc, Action finishFunc, IEnumerable<Func<ISaver, IEnumerator>> objectActions, IEnumerable<Func<ISaver, IEnumerator>> dataActions )
+        public AsyncSaver( IReverseReferenceMap refMap, Action startFunc, Action finishFunc, IEnumerable<IAsyncSaver.Action> objectActions, IEnumerable<IAsyncSaver.Action> dataActions )
         {
             if( startFunc == null )
                 throw new ArgumentNullException( nameof( startFunc ), $"Start delegate can't be null. {nameof( AsyncSaver )} requires the function to pause to deserialize correctly." );
             if( finishFunc == null )
                 throw new ArgumentNullException( nameof( finishFunc ), $"Finish delegate can't be null. {nameof( AsyncSaver )} requires the function to unpause to deserialize correctly." );
 
+            this.RefMap = refMap;
             this._startFunc = startFunc;
             this._finishFunc = finishFunc;
-
-            foreach( var action in objectActions )
-            {
-                this._objectActions.Add( action );
-            }
-            foreach( var action in dataActions )
-            {
-                this._dataActions.Add( action );
-            }
-        }
-
-        //
-        //  -- -- -- --
-        //
-
-        private void ClearReferenceRegistry()
-        {
-            _objectToGuid.Clear();
-        }
-
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public bool TryGetID( object obj, out Guid id )
-        {
-            if( CurrentState == ISaver.State.Idle )
-            {
-                throw new InvalidOperationException( $"Can't save an object (or its ID) when the saver is idle." );
-            }
-
-            if( obj == null )
-            {
-                id = Guid.Empty;
-                return true;
-            }
-
-            return _objectToGuid.TryGetValue( obj, out id );
-        }
-
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public Guid GetID( object obj )
-        {
-            if( CurrentState == ISaver.State.Idle )
-            {
-                throw new InvalidOperationException( $"Can't save an object (or its ID) when the saver is idle." );
-            }
-
-            if( _objectToGuid.TryGetValue( obj, out Guid id ) )
-            {
-                return id;
-            }
-
-            if( obj == null )
-                return Guid.Empty;
-
-            Guid newID = Guid.NewGuid();
-            _objectToGuid.Add( obj, newID );
-            return newID;
-        }
-
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public void SetID( object obj, Guid id )
-        {
-            if( CurrentState == ISaver.State.Idle )
-            {
-                throw new InvalidOperationException( $"Can't save an object (or its ID) when the saver is idle." );
-            }
-
-            if( id == Guid.Empty )
-                return;
-
-            _objectToGuid.Add( obj, id );
+            this._objectActions = new List<IAsyncSaver.Action>( objectActions );
+            this._dataActions = new List<IAsyncSaver.Action>( dataActions );
         }
 
         //
@@ -144,7 +77,7 @@ namespace UnityPlus.Serialization
             Debug.Log( "Saving..." );
 #endif
             CurrentState = ISaver.State.SavingData;
-            ClearReferenceRegistry();
+            //ClearReferenceRegistry();
             _startFunc?.Invoke();
             _completedActions = 0;
             CurrentActionPercentCompleted = 0.0f;
@@ -152,7 +85,7 @@ namespace UnityPlus.Serialization
             // Should save data before objects, because data will add the objects that are referenced to the registry.
             foreach( var func in _dataActions )
             {
-                yield return coroutineContainer.StartCoroutine( func( this ) );
+                yield return coroutineContainer.StartCoroutine( func( this.RefMap ) );
                 _completedActions++;
             }
 
@@ -160,12 +93,12 @@ namespace UnityPlus.Serialization
 
             foreach( var func in _objectActions )
             {
-                yield return coroutineContainer.StartCoroutine( func( this ) );
+                yield return coroutineContainer.StartCoroutine( func( this.RefMap ) );
                 _completedActions++;
             }
 
             _finishFunc?.Invoke();
-            ClearReferenceRegistry();
+            //ClearReferenceRegistry();
             CurrentState = ISaver.State.Idle;
 #if DEBUG
             Debug.Log( "Finished Saving" );

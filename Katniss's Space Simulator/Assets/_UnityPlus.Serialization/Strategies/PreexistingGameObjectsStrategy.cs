@@ -50,7 +50,7 @@ namespace UnityPlus.Serialization.Strategies
             this.RootObjectsGetter = rootObjectsGetter;
         }
 
-        private static SerializedObject WriteGameObject( ISaver s, GameObject go, PreexistingReference guidComp )
+        private static SerializedObject WriteGameObject( IReverseReferenceMap s, GameObject go, PreexistingReference guidComp )
         {
             SerializedArray sArr = new SerializedArray();
             StratUtils.WriteReferencedChildrenRecursive( s, go, ref sArr, "" );
@@ -64,7 +64,7 @@ namespace UnityPlus.Serialization.Strategies
             return goJson;
         }
 
-        private void SaveGameObjectData( ISaver s, GameObject go, PreexistingReference guidComp, ref SerializedArray objects )
+        private void SaveGameObjectData( IReverseReferenceMap s, GameObject go, PreexistingReference guidComp, ref SerializedArray objects )
         {
             if( !go.IsInLayerMask( IncludedObjectsMask ) )
             {
@@ -100,7 +100,7 @@ namespace UnityPlus.Serialization.Strategies
         /// <summary>
         /// Saves the data about the gameobjects and their persistent components. Does not include child objects.
         /// </summary>
-        public IEnumerator SaveAsync_Data( ISaver s )
+        public IEnumerator SaveAsync_Data( IReverseReferenceMap s )
         {
             IEnumerable<GameObject> rootObjects = RootObjectsGetter();
 
@@ -122,7 +122,7 @@ namespace UnityPlus.Serialization.Strategies
             this._data = objData;
         }
 
-        public IEnumerator SaveAsync_Object( ISaver s )
+        public IEnumerator SaveAsync_Object( IReverseReferenceMap s )
         {
             IEnumerable<GameObject> rootObjects = RootObjectsGetter();
 
@@ -150,7 +150,7 @@ namespace UnityPlus.Serialization.Strategies
             this._data = null;
         }
 
-        public IEnumerator LoadAsync_Object( ILoader l )
+        public IEnumerator LoadAsync_Object( IForwardReferenceMap l )
         {
             IEnumerable<GameObject> rootObjects = RootObjectsGetter.Invoke();
             foreach( var go in rootObjects )
@@ -180,7 +180,7 @@ namespace UnityPlus.Serialization.Strategies
             }
         }
 
-        public IEnumerator LoadAsync_Data( ILoader l )
+        public IEnumerator LoadAsync_Data( IForwardReferenceMap l )
         {
             foreach( var dataElement in (SerializedArray)_data )
             {

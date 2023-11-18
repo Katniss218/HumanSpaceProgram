@@ -1,4 +1,5 @@
-﻿using KSS.Core.ReferenceFrames;
+﻿using KSS.Core.Components;
+using KSS.Core.ReferenceFrames;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,7 @@ namespace KSS.GameplayScene
 {
     public enum ConstructionMode
     {
+        Paused = 0,
         Construction,
         Deconstruction
     }
@@ -35,39 +37,52 @@ namespace KSS.GameplayScene
 
         */
 
-        List<GhostedPart> ghostedParts;
+        public ConstructionMode CurrentMode { get; set; } = ConstructionMode.Paused;
 
-        public ConstructionMode Mode;
+        Patcher _patcher;
 
-        Patcher patcher;
+        List<GhostedPart> _ghostedParts;
 
-        public void Add( GameObject toConstructRoot, Transform parent, PatchCollection patches )
+        Dictionary<FPart, float> _progress;
+
+        void Update()
         {
-            // this is step 6, if it is added to an existing c-site.
-            if( parent.root != this.transform.root )
-                throw new InvalidOperationException( $"Can't start construction if parent doesn't belong to this construction site." );
-
-            toConstructRoot.transform.SetParent( parent );
-
-            // should be already 'ghost'ed, but we need to get the patches from somewhere.
-            patchesLeftToApply = PatchCollection.Combine( patchesLeftToApply, patches );
-
-            // appends the specified object to the list of things under construction, and specifies under which object to parent it.
+            if( CurrentMode == ConstructionMode.Construction )
+            {
+                
+            }
+            if( CurrentMode == ConstructionMode.Deconstruction )
+            {
+                
+            }
         }
 
-        /// <summary>
-        /// Removes the specified object, and all its children from construction.
-        /// </summary>
-        /// <param name="inProgressRoot">The root object of the subhierarchy to remove from construction.</param>
-        public void Remove( GameObject inProgressRoot )
+        void LateUpdate()
         {
-            if( inProgressRoot.transform.root != this.transform.root )
-                throw new InvalidOperationException( $"Can't remove construction if the object doesn't belong to this construction site." );
+            
+        }
 
-            if( patchesLeftToApply.ContainsKey( inProgressRoot ) )
-                throw new InvalidOperationException( $"Can't remove construction if the object isn't under construction." );
+        public static Transform SpawnGhost( string vesselId )
+        {
+            throw new NotImplementedException();
+            // step 1. player clicks, and spawns ghost to place.
+        }
 
-            Destroy( inProgressRoot );
+        public static ConstructionSite PlaceGhost( Transform ghostRoot, Transform parent )
+        {
+            throw new NotImplementedException();
+            // step 6. Player places the ghost.
+
+            ghostRoot.transform.SetParent( parent );
+
+            // if parent's ancestral chain has a c-site - add to that c-site, otherwise - make new c-site.
+        }
+
+        public void PickupGhost( Transform ghostRoot )
+        {
+            // reverse of step 6. Player picks up the ghost.
+
+            // if parent's ancestral chain has a c-site - add to that c-site, otherwise - make new c-site.
         }
 
         public static Dictionary<T, List<Transform>> MapToAncestralComponent<T>( Transform root ) where T : Component

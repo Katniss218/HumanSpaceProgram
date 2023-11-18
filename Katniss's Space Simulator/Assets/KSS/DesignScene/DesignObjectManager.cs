@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.DataHandlers;
 using UnityPlus.Serialization.Strategies;
 
 namespace KSS.DesignScene
@@ -186,16 +187,6 @@ namespace KSS.DesignScene
             HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_AFTER_LOAD, null );
         }
 
-        private static void CreateSaver( IEnumerable<Func<ISaver, IEnumerator>> objectActions, IEnumerable<Func<ISaver, IEnumerator>> dataActions )
-        {
-            _saver = new AsyncSaver( StartFunc, FinishSaveFunc, objectActions, dataActions );
-        }
-
-        private static void CreateLoader( IEnumerable<Func<ILoader, IEnumerator>> objectActions, IEnumerable<Func<ILoader, IEnumerator>> dataActions )
-        {
-            _loader = new AsyncLoader( StartFunc, FinishLoadFunc, objectActions, dataActions );
-        }
-
         // undos stored in files, preserved across sessions?
 
         /*
@@ -233,7 +224,7 @@ namespace KSS.DesignScene
 
             HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_BEFORE_SAVE, null );
 
-            CreateSaver( new Func<ISaver, IEnumerator>[] { _designObjStrategy.SaveAsync_Object }, new Func<ISaver, IEnumerator>[] { _designObjStrategy.SaveAsync_Data } );
+            _saver = new AsyncSaver( new ReverseReferenceStore(), StartFunc, FinishSaveFunc, _designObjStrategy.SaveAsync_Object, _designObjStrategy.SaveAsync_Data );
 
             _saver.SaveAsync( instance );
 
@@ -253,7 +244,7 @@ namespace KSS.DesignScene
             HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_BEFORE_LOAD, null );
             CurrentVesselMetadata = loadedVesselMetadata; // CurrentVesselMetadata should be set after invoking before load.
 
-            CreateLoader( new Func<ILoader, IEnumerator>[] { _designObjStrategy.LoadAsync_Object }, new Func<ILoader, IEnumerator>[] { _designObjStrategy.LoadAsync_Data } );
+            _loader = new AsyncLoader( new ForwardReferenceStore(), StartFunc, FinishLoadFunc, _designObjStrategy.LoadAsync_Object, _designObjStrategy.LoadAsync_Data );
             _loader.LoadAsync( instance );
         }
 

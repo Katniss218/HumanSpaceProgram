@@ -21,18 +21,18 @@ namespace KSS.Core.Serialization
             /// <summary>
             /// Use these to add save actions of the object stage.
             /// </summary>
-            public List<Func<ISaver, IEnumerator>> objectActions;
+            public List<IAsyncSaver.Action> objectActions;
             /// <summary>
             /// Use these to add save actions of the data stage.
             /// </summary>
-            public List<Func<ISaver, IEnumerator>> dataActions;
+            public List<IAsyncSaver.Action> dataActions;
 
             public SaveEventData( string timelineId, string saveId )
             {
                 this.timelineId = timelineId;
                 this.saveId = saveId;
-                this.objectActions = new List<Func<ISaver, IEnumerator>>();
-                this.dataActions = new List<Func<ISaver, IEnumerator>>();
+                this.objectActions = new List<IAsyncSaver.Action>();
+                this.dataActions = new List<IAsyncSaver.Action>();
             }
         }
 
@@ -43,18 +43,18 @@ namespace KSS.Core.Serialization
             /// <summary>
             /// Use these to add load actions of the object stage.
             /// </summary>
-            public List<Func<ILoader, IEnumerator>> objectActions;
+            public List<IAsyncLoader.Action> objectActions;
             /// <summary>
             /// Use these to add load actions of the data stage.
             /// </summary>
-            public List<Func<ILoader, IEnumerator>> dataActions;
+            public List<IAsyncLoader.Action> dataActions;
 
             public LoadEventData( string timelineId, string saveId )
             {
                 this.timelineId = timelineId;
                 this.saveId = saveId;
-                this.objectActions = new List<Func<ILoader, IEnumerator>>();
-                this.dataActions = new List<Func<ILoader, IEnumerator>>();
+                this.objectActions = new List<IAsyncLoader.Action>();
+                this.dataActions = new List<IAsyncLoader.Action>();
             }
         }
 
@@ -88,7 +88,7 @@ namespace KSS.Core.Serialization
             }
             HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_SAVE, _eSave ); // invoke here because otherwise the invoking method finishes before the coroutine.
         }
-        
+
         public static void LoadFinishFunc()
         {
             TimeManager.LockTimescale = false;
@@ -99,14 +99,14 @@ namespace KSS.Core.Serialization
             HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_LOAD, _eLoad ); // invoke here because otherwise the invoking method finishes before the coroutine.
         }
 
-        private static void CreateSaver( IEnumerable<Func<ISaver, IEnumerator>> objectActions, IEnumerable<Func<ISaver, IEnumerator>> dataActions )
+        private static void CreateSaver( IEnumerable<IAsyncSaver.Action> objectActions, IEnumerable<IAsyncSaver.Action> dataActions )
         {
-            _saver = new AsyncSaver( SaveLoadStartFunc, SaveFinishFunc, objectActions, dataActions );
+            _saver = new AsyncSaver( null, SaveLoadStartFunc, SaveFinishFunc, objectActions, dataActions );
         }
 
-        private static void CreateLoader( IEnumerable<Func<ILoader, IEnumerator>> objectActions, IEnumerable<Func<ILoader, IEnumerator>> dataActions )
+        private static void CreateLoader( IEnumerable<IAsyncLoader.Action> objectActions, IEnumerable<IAsyncLoader.Action> dataActions )
         {
-            _loader = new AsyncLoader( SaveLoadStartFunc, LoadFinishFunc, objectActions, dataActions );
+            _loader = new AsyncLoader( null, SaveLoadStartFunc, LoadFinishFunc, objectActions, dataActions );
         }
 
         private static SaveEventData _eSave;
@@ -133,6 +133,7 @@ namespace KSS.Core.Serialization
             HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_SAVE, _eSave );
             CreateSaver( _eSave.objectActions, _eSave.dataActions );
 
+            _saver.RefMap = new ReverseReferenceStore();
             _saver.SaveAsync( instance );
 
             CurrentTimeline.WriteToDisk();
@@ -169,6 +170,7 @@ namespace KSS.Core.Serialization
             HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_LOAD, _eLoad );
             CreateLoader( _eLoad.objectActions, _eLoad.dataActions );
 
+            _loader.RefMap = new ForwardReferenceStore();
             _loader.LoadAsync( instance );
             CurrentTimeline = loadedTimeline;
         }

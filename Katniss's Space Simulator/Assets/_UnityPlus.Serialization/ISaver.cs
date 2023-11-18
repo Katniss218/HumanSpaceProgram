@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -10,8 +11,10 @@ namespace UnityPlus.Serialization
     /// <summary>
     /// Represents an abstract functionality that can save a collection of objects while persisting their references.
     /// </summary>
-    public interface ISaver : IReverseReferenceMap
+    public interface ISaver
     {
+        public delegate void Action( IReverseReferenceMap s );
+
         /// <summary>
         /// The current state of the saver. <br />
         /// Saving is split into 2 stages - see the enum values.
@@ -40,6 +43,8 @@ namespace UnityPlus.Serialization
             // This setup lets us know what objects are referenced by something before we start saving those potentially-referenced objects.
             // It also lets us decouple the instances from their data.
         }
+
+        IReverseReferenceMap RefMap { get; }
     }
 
     /// <summary>
@@ -47,6 +52,8 @@ namespace UnityPlus.Serialization
     /// </summary>
     public interface IAsyncSaver : ISaver
     {
+        new public delegate IEnumerator Action( IReverseReferenceMap s );
+
         /// <summary>
         /// The percentage (in [0..1]) of completion of the current action (0 = 0% completed, 1 = 100% completed).
         /// </summary>

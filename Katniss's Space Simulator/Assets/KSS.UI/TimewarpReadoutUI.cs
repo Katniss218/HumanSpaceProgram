@@ -10,10 +10,19 @@ namespace KSS.UI
     {
         public UIText Text { get; set; }
 
-        void Start()
+        void OnEnable()
         {
             TimeManager.OnTimescaleChanged += OnTimescaleChanged_Listener;
+        }
+
+        void Start()
+        {
             UpdateText( TimeManager.TimeScale );
+        }
+
+        void OnDisable()
+        {
+            TimeManager.OnTimescaleChanged -= OnTimescaleChanged_Listener;
         }
 
         void UpdateText( float rate )

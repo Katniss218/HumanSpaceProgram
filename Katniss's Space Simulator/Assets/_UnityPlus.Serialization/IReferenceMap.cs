@@ -14,15 +14,19 @@ namespace UnityPlus.Serialization
         /// <summary>
         /// Tries to return a previously registered object for a specific ID.
         /// </summary>
+        /// <remarks>
+        /// Should always return false for references that are not registered.
+        /// </remarks>
         bool TryGetObj( Guid id, out object obj );
 
         /// <summary>
         /// Returns the previously registered object.
         /// </summary>
         /// <remarks>
-        /// Should return <see cref="null"/> for invalid references.
+        /// Should always return <see cref="null"/> for <see cref="Guid.Empty"/>. <br />
         /// </remarks>
         object GetObj( Guid id );
+
         /// <summary>
         /// Registers the specified object with the specified ID.
         /// </summary>
@@ -37,14 +41,20 @@ namespace UnityPlus.Serialization
         /// <summary>
         /// Tries to return the ID of a previously registered object.
         /// </summary>
+        /// <remarks>
+        /// Should always return false for <see cref="null"/>.
+        /// </remarks>
         bool TryGetID( object obj, out Guid id );
+
         /// <summary>
         /// Returns the ID for the given object.
         /// </summary>
         /// <remarks>
-        /// Should register the object under a random unique ID if the object is not yet registered.
+        /// Should always return <see cref="Guid.Empty"/> for <see cref="null"/>. <br />
+        /// Should register the <paramref name="obj"/> under a random <see cref="Guid"/> if not yet registered.
         /// </remarks>
         Guid GetID( object obj );
+
         /// <summary>
         /// Registers the specified object with the specified ID.
         /// </summary>

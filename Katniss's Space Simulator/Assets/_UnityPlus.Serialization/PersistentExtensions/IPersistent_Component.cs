@@ -52,27 +52,26 @@ namespace UnityPlus.Serialization
         {
             // component "data" means that the component (which is a referencable object) has already been added by an object action, and we're now reading its data.
 
-            SerializedObject jsonObj = (SerializedObject)data;
             switch( component )
             {
                 case IPersistent comp:
-                    comp.SetData( l, jsonObj ); break;
+                    comp.SetData( l, data ); break;
                 case Transform comp:
-                    comp.SetData( l, jsonObj ); break;
+                    comp.SetData( l, data ); break;
                 case MeshFilter comp:
-                    comp.SetData( l, jsonObj ); break;
+                    comp.SetData( l, data ); break;
                 case MeshRenderer comp:
-                    comp.SetData( l, jsonObj ); break;
+                    comp.SetData( l, data ); break;
                 case BoxCollider comp:
-                    comp.SetData( l, jsonObj ); break;
+                    comp.SetData( l, data ); break;
                 case SphereCollider comp:
-                    comp.SetData( l, jsonObj ); break;
+                    comp.SetData( l, data ); break;
                 case CapsuleCollider comp:
-                    comp.SetData( l, jsonObj ); break;
+                    comp.SetData( l, data ); break;
                 case MeshCollider comp:
-                    comp.SetData( l, jsonObj ); break;
+                    comp.SetData( l, data ); break;
                 case Rigidbody comp:
-                    comp.SetData( l, jsonObj ); break;
+                    comp.SetData( l, data ); break;
             }
         }
     }

@@ -11,39 +11,9 @@ namespace UnityPlus.Serialization
     /// <summary>
     /// Stores mappings between serialization groups and object instances.
     /// </summary>
-    public class BidirectionalReferenceStore : IForwardReferenceMap, IReverseReferenceMap
+    public class ReverseReferenceStore : IReverseReferenceMap
     {
-        private Dictionary<Guid, object> _forward = new Dictionary<Guid, object>();
         private Dictionary<object, Guid> _reverse = new Dictionary<object, Guid>();
-
-        //
-        //  FORWARD
-        //
-
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public bool TryGetObj( Guid id, out object obj )
-        {
-            return _forward.TryGetValue( id, out obj );
-        }
-
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public object GetObj( Guid id )
-        {
-            if( _forward.TryGetValue( id, out object obj ) )
-                return obj;
-
-            return null;
-        }
-
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public void SetObj( Guid id, object obj )
-        {
-            if( id == Guid.Empty || obj.IsUnityNull() )
-                return;
-
-            _forward.Add( id, obj ); // same as setid
-            _reverse.Add( obj, id );
-        }
 
         //
         //  REVERSE
@@ -65,7 +35,6 @@ namespace UnityPlus.Serialization
                 return id;
 
             Guid guid = Guid.NewGuid();
-            _forward.Add( id, obj );
             _reverse.Add( obj, id );
 
             return guid;
@@ -77,7 +46,6 @@ namespace UnityPlus.Serialization
             if( obj.IsUnityNull() || id == Guid.Empty )
                 return;
 
-            _forward.Add( id, obj ); // same as setobj
             _reverse.Add( obj, id );
         }
     }

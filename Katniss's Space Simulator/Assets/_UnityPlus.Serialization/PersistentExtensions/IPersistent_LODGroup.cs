@@ -11,7 +11,7 @@ namespace UnityPlus.Serialization
     public static class IPersistent_LODGroup
     {
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static SerializedData GetData( this LODGroup lg, ISaver s )
+        public static SerializedData GetData( this LODGroup lg, IReverseReferenceMap s )
         {
             LOD[] lods = lg.GetLODs();
             SerializedArray lodsArray = new SerializedArray();
@@ -37,7 +37,7 @@ namespace UnityPlus.Serialization
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static void SetData( this LODGroup lg, ILoader l, SerializedObject data )
+        public static void SetData( this LODGroup lg, IForwardReferenceMap l, SerializedData data )
         {
             if( data.TryGetValue( "lods", out var lods1 ) )
             {

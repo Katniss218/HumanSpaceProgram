@@ -11,7 +11,7 @@ namespace UnityPlus.Serialization
 {
     public static class IPersistent_BoxCollider
     {
-        public static SerializedData GetData( this BoxCollider bc, ISaver s )
+        public static SerializedData GetData( this BoxCollider bc, IReverseReferenceMap s )
         {
             return new SerializedObject()
             {
@@ -21,7 +21,7 @@ namespace UnityPlus.Serialization
             };
         }
 
-        public static void SetData( this BoxCollider bc, ILoader l, SerializedObject data )
+        public static void SetData( this BoxCollider bc, IForwardReferenceMap l, SerializedData data )
         {
             if( data.TryGetValue( "size", out var size ) )
                 bc.size = l.ReadVector3( size );

@@ -16,6 +16,7 @@ using UnityPlus.Serialization.Strategies;
 using System.IO;
 using System.Collections;
 using KSS.Core.Mods;
+using UnityPlus.Serialization.DataHandlers;
 
 namespace KSS.DevUtils
 {
@@ -120,7 +121,7 @@ namespace KSS.DevUtils
 
                 HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_BEFORE_LOAD, null );
 
-                Loader _loader = new Loader( null, null, new Action<ILoader>[] { _designObjStrategy.Load_Object }, new Action<ILoader>[] { _designObjStrategy.Load_Data } );
+                Loader _loader = new Loader( new ForwardReferenceStore(), null, null, new ILoader.Action[] { _designObjStrategy.Load_Object }, new ILoader.Action[] { _designObjStrategy.Load_Data } );
 
                 _loader.Load();
 
@@ -148,7 +149,7 @@ namespace KSS.DevUtils
             {
                 JsonSeparateFileSerializedDataHandler handler = new JsonSeparateFileSerializedDataHandler();
                 SingleExplicitHierarchyStrategy strat = new SingleExplicitHierarchyStrategy( handler, () => null );
-                Saver saver = new Saver( null, null, strat.Save_Object, strat.Save_Data );
+                Saver saver = new Saver( new ReverseReferenceStore(), null, null, strat.Save_Object, strat.Save_Data );
 
                 string gameDataPath = HumanSpaceProgramMods.GetModDirectoryPath();
                 string partDir;

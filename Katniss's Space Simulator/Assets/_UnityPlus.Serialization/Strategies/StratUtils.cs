@@ -11,7 +11,7 @@ namespace UnityPlus.Serialization.Strategies
     public static class StratUtils
     {
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static void TryWriteData( ISaver s, object obj, SerializedData data, ref SerializedArray objects )
+        public static void TryWriteData( IReverseReferenceMap s, object obj, SerializedData data, ref SerializedArray objects )
         {
             if( data != null )
             {
@@ -24,7 +24,7 @@ namespace UnityPlus.Serialization.Strategies
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static void TryWriteDataWithChildrenPaths( ISaver s, object obj, SerializedData data, SerializedArray childrenPaths, ref SerializedArray objects )
+        public static void TryWriteDataWithChildrenPaths( IReverseReferenceMap s, object obj, SerializedData data, SerializedArray childrenPaths, ref SerializedArray objects )
         {
             if( data != null )
             {
@@ -38,7 +38,7 @@ namespace UnityPlus.Serialization.Strategies
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static void AssignIDsToReferencedChildren( ILoader l, GameObject go, ref SerializedArray sArr )
+        public static void AssignIDsToReferencedChildren( IForwardReferenceMap l, GameObject go, ref SerializedArray sArr )
         {
             // Set the IDs of all objects in the array.
             foreach( var s in sArr )
@@ -53,7 +53,7 @@ namespace UnityPlus.Serialization.Strategies
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static void WriteReferencedChildrenRecursive( ISaver s, GameObject go, ref SerializedArray sArr, string parentPath )
+        public static void WriteReferencedChildrenRecursive( IReverseReferenceMap s, GameObject go, ref SerializedArray sArr, string parentPath )
         {
             // write the IDs of referenced components/child gameobjects of the parent into the array, along with the path to them.
 
@@ -137,7 +137,7 @@ namespace UnityPlus.Serialization.Strategies
         /// Saves the components a gameobject (object pass).
         /// </summary>
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static SerializedArray SaveComponents_Objects( GameObject go, ISaver s )
+        public static SerializedArray SaveComponents_Objects( GameObject go, IReverseReferenceMap s )
         {
             SerializedArray components = new SerializedArray();
 
@@ -159,7 +159,7 @@ namespace UnityPlus.Serialization.Strategies
         /// Saves the hierarchy of a gameobject (object pass).
         /// </summary>
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static void SaveGameObjectHierarchy_Objects( GameObject go, ISaver s, uint includedObjectsMask, SerializedArray siblingsArray )
+        public static void SaveGameObjectHierarchy_Objects( GameObject go, IReverseReferenceMap s, uint includedObjectsMask, SerializedArray siblingsArray )
         {
             if( go == null )
             {
@@ -197,7 +197,7 @@ namespace UnityPlus.Serialization.Strategies
         /// Saves the hierarchy of a gameobject (data pass).
         /// </summary>
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static void SaveGameObjectHierarchy_Data( ISaver s, GameObject go, uint includedObjectsMask, ref SerializedArray dataArray )
+        public static void SaveGameObjectHierarchy_Data( IReverseReferenceMap s, GameObject go, uint includedObjectsMask, ref SerializedArray dataArray )
         {
             if( go == null )
             {
@@ -239,7 +239,7 @@ namespace UnityPlus.Serialization.Strategies
         /// Loads (instantiates) a hierarchy of gameobjects from saved data (object pass).
         /// </summary>
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static GameObject InstantiateHierarchyObjects( ILoader l, SerializedData goJson, GameObject parent, List<Behaviour> behsUGLYDONTDOTHIS )
+        public static GameObject InstantiateHierarchyObjects( IForwardReferenceMap l, SerializedData goJson, GameObject parent, List<Behaviour> behsUGLYDONTDOTHIS )
         {
             Guid objectGuid = l.ReadGuid( goJson[KeyNames.ID] );
 
@@ -292,7 +292,7 @@ namespace UnityPlus.Serialization.Strategies
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static void ApplyDataToHierarchyElement( ILoader l, SerializedData dataElement )
+        public static void ApplyDataToHierarchyElement( IForwardReferenceMap l, SerializedData dataElement )
         {
             // Get whatever the data is pointing to.
             // If it's a gameobject or a component on a gameobject, apply the data to it.
