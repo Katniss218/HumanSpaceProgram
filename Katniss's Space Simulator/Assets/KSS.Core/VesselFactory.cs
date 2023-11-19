@@ -1,4 +1,6 @@
-﻿using System;
+﻿using KSS.Core.Physics;
+using KSS.Core.ReferenceFrames;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,10 +38,14 @@ namespace KSS.Core
         {
             GameObject gameObject = new GameObject( $"Vessel, '{name}'" );
 
+            FreePhysicsObject fpo = gameObject.AddComponent<FreePhysicsObject>();
+
+            RootObjectTransform ro = gameObject.AddComponent<RootObjectTransform>(); // order here matters because RootObjectTransform caches a rigidbody at awake (start is too late).
+
             Vessel vessel = gameObject.AddComponent<Vessel>();
             vessel.name = name;
-            vessel.AIRFPosition = airfPosition;
-            vessel.AIRFRotation = airfRotation;
+            ro.AIRFPosition = airfPosition;
+            ro.AIRFRotation = airfRotation;
 
             return vessel;
         }

@@ -58,7 +58,7 @@ namespace KSS.DevUtils
             uiImage.texture = normalmap;*/
         }
 
-        static Building launchSite;
+        static Vessel launchSite;
         static Vessel vessel;
 
         [HSPEventListener( HSPEvent.STARTUP_IMMEDIATELY, "devutils.load_game_data" )]
@@ -74,17 +74,20 @@ namespace KSS.DevUtils
             CelestialBody body = CelestialBodyManager.Get( "main" );
             Vector3 localPos = CoordinateUtils.GeodeticToEuclidean( 28.5857702f, -80.6507262f, (float)(body.Radius + 1.0) );
 
-            launchSite = BuildingFactory.CreatePartless( body, localPos, Quaternion.FromToRotation( Vector3.up, localPos.normalized ) );
+            launchSite = VesselFactory.CreatePartless( Vector3Dbl.zero, QuaternionDbl.identity, Vector3.zero, Vector3.zero );
+            launchSite.gameObject.name = "launchsite";
+            launchSite.Pin( body, localPos, Quaternion.FromToRotation( Vector3.up, localPos.normalized ) );
 
             GameObject launchSitePrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/testlaunchsite" );
             GameObject root = InstantiateLocal( launchSitePrefab, launchSite.transform, Vector3.zero, Quaternion.identity );
+            launchSite.RootPart = root.transform;
 
             var v = CreateVessel( launchSite );
             ActiveObjectManager.ActiveObject = v.RootPart.GetVessel().gameObject;
             vessel = v;
         }
 
-        static Vessel CreateVessel( Building launchSite )
+        static Vessel CreateVessel( Vessel launchSite )
         {
             if( launchSite == null )
             {

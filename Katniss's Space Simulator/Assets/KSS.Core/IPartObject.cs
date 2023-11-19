@@ -24,7 +24,7 @@ namespace KSS.Core
     public interface IPartObject : IComponent
     {
         Transform RootPart { get; }
-        PhysicsObject PhysicsObject { get; }
+        IPhysicsObject PhysicsObject { get; }
         RootObjectTransform RootObjTransform { get; }
     }
 }

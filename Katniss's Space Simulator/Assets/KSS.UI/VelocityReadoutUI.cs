@@ -16,7 +16,7 @@ namespace KSS.UI
 
         void LateUpdate()
         {
-            var physObj = ActiveObjectManager.ActiveObject?.GetComponent<PhysicsObject>();
+            var physObj = ActiveObjectManager.ActiveObject?.GetComponent<FreePhysicsObject>();
             Text.Text = physObj == null ? "" : $"{physObj.Velocity.magnitude:#0} m/s";
         }
     }

@@ -64,11 +64,11 @@ namespace UnityPlus.Serialization.ReferenceMaps
             if( _reverse.TryGetValue( obj, out Guid id ) )
                 return id;
 
-            Guid guid = Guid.NewGuid();
+            id = Guid.NewGuid();
             _forward.Add( id, obj );
             _reverse.Add( obj, id );
 
-            return guid;
+            return id;
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]

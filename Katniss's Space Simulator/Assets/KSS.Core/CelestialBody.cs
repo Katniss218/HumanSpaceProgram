@@ -90,7 +90,7 @@ namespace KSS.Core
         public IReferenceFrame CenteredReferenceFrame => new CenteredReferenceFrame( this.AIRFPosition );
 
         /// <summary>
-        /// Constructs the reference frame centered on this body, with axes aligned with the body.
+        /// Constructs the reference frame centered on this body, with axes aligned with the body (i.e. local body space).
         /// </summary>
         public IReferenceFrame OrientedReferenceFrame => new OrientedReferenceFrame( this.AIRFPosition, this.AIRFRotation );
 

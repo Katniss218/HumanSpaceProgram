@@ -34,7 +34,6 @@ namespace KSS.Core
     /// <summary>
     /// A vessel is a moving object consisting of a hierarchy of "parts".
     /// </summary>
-    [RequireComponent( typeof( PhysicsObject ) )]
     [RequireComponent( typeof( RootObjectTransform ) )]
     public sealed partial class Vessel : MonoBehaviour, IPartObject
     {
@@ -62,7 +61,7 @@ namespace KSS.Core
             }
         }
 
-        public PhysicsObject PhysicsObject { get; private set; }
+        public IPhysicsObject PhysicsObject { get; private set; }
         public RootObjectTransform RootObjTransform { get; private set; }
 
 #warning TODO - Vessels' position sometimes glitches out when far away from the origin. Setting the rigidbody to kinematic fixes the issue, which suggests that it is caused by a collision response.
@@ -135,6 +134,26 @@ namespace KSS.Core
         public Vector3Dbl AIRFPosition { get => this.RootObjTransform.AIRFPosition; set => this.RootObjTransform.AIRFPosition = value; }
         public QuaternionDbl AIRFRotation { get => this.RootObjTransform.AIRFRotation; set => this.RootObjTransform.AIRFRotation = value; }
 
+        public bool IsPinned { get; private set; }
+
+        public void Pin( CelestialBody body, Vector3Dbl localPosition, QuaternionDbl localRotation )
+        {
+            DestroyImmediate( (Component)this.PhysicsObject );
+            PinnedPhysicsObject ppo = this.gameObject.AddComponent<PinnedPhysicsObject>();
+            ppo.ReferenceBody = body;
+            ppo.ReferencePosition = localPosition;
+            ppo.ReferenceRotation = localRotation;
+            this.PhysicsObject = ppo;
+            this.IsPinned = true;
+        }
+
+        public void Unpin()
+        {
+            DestroyImmediate( (Component)this.PhysicsObject );
+            this.PhysicsObject = this.gameObject.AddComponent<FreePhysicsObject>();
+            this.IsPinned = false;
+        }
+
         /// <summary>
         /// Calculates the scene world-space point at the very bottom of the vessel. Useful when placing it at launchsites and such.
         /// </summary>
@@ -159,7 +178,7 @@ namespace KSS.Core
         void Awake()
         {
             this.RootObjTransform = this.GetComponent<RootObjectTransform>();
-            this.PhysicsObject = this.GetComponent<PhysicsObject>();
+            this.PhysicsObject = this.GetComponent<IPhysicsObject>();
         }
 
         void SetPhysicsObjectParameters()
@@ -171,6 +190,7 @@ namespace KSS.Core
 
         void Start()
         {
+            this.PhysicsObject = this.GetComponent<IPhysicsObject>(); // needs to be here for deserialization, because it might be added in any order and I can't use RequireComponent because it needs to be removed when pinning.
             RecalculateParts();
             //SetPhysicsObjectParameters();
         }

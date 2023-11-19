@@ -28,7 +28,7 @@ namespace KSS.DesignScene
             }
         }
 
-        public PhysicsObject PhysicsObject => throw new NotSupportedException( $"Design objects can't move using the physics system." );
+        public IPhysicsObject PhysicsObject => throw new NotSupportedException( $"Design objects can't move using the physics system." );
         public RootObjectTransform RootObjTransform => throw new NotSupportedException( $"Design objects can't use the reference frames." );
 
         void Awake()

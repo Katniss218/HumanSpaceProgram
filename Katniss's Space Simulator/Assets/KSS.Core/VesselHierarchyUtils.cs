@@ -1,4 +1,5 @@
 ﻿using KSS.Core.Components;
+using KSS.Core.Physics;
 using KSS.Core.ReferenceFrames;
 using System;
 using System.Collections.Generic;
@@ -148,37 +149,25 @@ namespace KSS.Core
             // Detach the parts from the old vessel.
             Vessel oldv = partToSplit.GetVessel();
 
-            // Create the new vessel and add the parts to it.
-            bool isAnchored = IsAnchored( partToSplit );
-            IPartObject partObject = partToSplit.GetPartObject();
-            if( isAnchored )
-            {
-                Building bOrig = partToSplit.GetBuilding();
-                Building b = BuildingFactory.CreatePartless(
-                    bOrig.ReferenceBody,
-                    bOrig.ReferencePosition,
-                    bOrig.ReferenceRotation
-                    );
+#warning TODO - Use linear and angular velocities of part that works correctly for spinning vessels.
+            Vessel newVessel = VesselFactory.CreatePartless(
+                SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( partToSplit.transform.position ),
+                SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( partToSplit.transform.rotation ),
+                oldv.PhysicsObject.Velocity,
+                oldv.PhysicsObject.AngularVelocity );
 
-                partToSplit.SetParent( b.transform );
-                b.RootPart = partToSplit;
-#warning TODO - after changing to RootPart = value, the recalculate parts might not be needed. also move recalculation if the root was already in a vessel
-                oldv.RecalculateParts();
+            partToSplit.SetParent( newVessel.transform );
+            newVessel.RootPart = partToSplit;
+            oldv.RecalculateParts();
+            newVessel.RecalculateParts();
+
+            if( IsAnchored( partToSplit ) )
+            {
+                PinnedPhysicsObject ppo = oldv.GetComponent<PinnedPhysicsObject>();
+                newVessel.Pin( ppo.ReferenceBody, ppo.ReferencePosition, ppo.ReferenceRotation );
             }
             else
             {
-#warning TODO - Use linear and angular velocities of part that works correctly for spinning vessels.
-                Vessel v = VesselFactory.CreatePartless(
-                    SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( partToSplit.transform.position ),
-                    SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( partToSplit.transform.rotation ),
-                    partObject.PhysicsObject.Velocity,
-                    partObject.PhysicsObject.AngularVelocity );
-
-                partToSplit.SetParent( v.transform );
-                v.RootPart = partToSplit;
-                oldv.RecalculateParts();
-                v.RecalculateParts();
-
 #warning TODO - Fixing oldv's AIRF pos/rot shouldn't be required here. RE: RootObjectTransform airfpos is incorrect.
                 oldv.AIRFPosition = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( oldv.RootPart.position );
                 oldv.AIRFRotation = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( oldv.RootPart.rotation );

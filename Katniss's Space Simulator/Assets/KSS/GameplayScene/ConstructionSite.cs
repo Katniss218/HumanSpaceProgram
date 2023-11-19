@@ -137,8 +137,16 @@ namespace KSS.GameplayScene
 
             if( parent == null )
             {
-#warning TODO - vessel or building, but I think there should be a separate thing for that decision.
+#warning TODO - vessel or building, but I think there should be a separate thing for that decision. Also tying into that, vessels need to be anchored when far away so they could probably be combined.
+
+                VesselFactory.CreatePartless(
+                    SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( ghostRoot.position ),
+                    SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( ghostRoot.rotation ),
+                    Vector3.zero,
+                    Vector3.zero );
             }
+#warning TODO - these hierarchyutils are kinda old, somewhat not used, and bleh. Need to figure out a standard way of doing things again.
+            // VesselHierarchyUtils.SetParent()
 
             ConstructionSite cSite = parent.GetComponentInParent<ConstructionSite>();
             if( cSite == null )
