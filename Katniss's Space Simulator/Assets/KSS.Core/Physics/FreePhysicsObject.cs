@@ -12,7 +12,7 @@ namespace KSS.Core.Physics
     /// <remarks>
     /// This is a wrapper for a rigidbody.
     /// </remarks>
-    //[RequireComponent( typeof( RootObjectTransform ) )] This can't be required here because the components need to be added in reverse order for initialization.
+    [RequireComponent( typeof( RootObjectTransform ) )]
     [RequireComponent( typeof( Rigidbody ) )]
     [DisallowMultipleComponent]
     public class FreePhysicsObject : MonoBehaviour, IPhysicsObject, IPersistent
@@ -53,6 +53,7 @@ namespace KSS.Core.Physics
         Vector3 _accelerationSum = Vector3.zero;
         Vector3 _angularAccelerationSum = Vector3.zero;
 
+        RootObjectTransform _rootObjTransform;
         Rigidbody _rb;
 
         public void AddForce( Vector3 force )
@@ -91,6 +92,8 @@ namespace KSS.Core.Physics
             }
 
             _rb = this.GetComponent<Rigidbody>();
+            _rootObjTransform = this.gameObject.GetOrAddComponent<RootObjectTransform>();
+            _rootObjTransform.RefreshCachedRigidbody();
 
             _rb.useGravity = false;
             _rb.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;

@@ -123,6 +123,10 @@ namespace KSS.CelestialBodies.Surface
             bool wasChangedThisFrame = false;
             // Optimization is applied:
             // - The quads only need to be checked if they were changed in the last frame (potentially still not subdivided enough / too much), or if the pois changed by some threshold.
+
+            // TODO - Another optimization could be to not check every ~800 quads (for large set of objects), but check their virtual parents first - the number of parents is exponentially less.
+
+            // TODO - Another optimization could be to not subdivide further if there is no additional detail that would become visible.
             if( !allPoisTheSame || _wasChangedLastFrame )
             {
                 foreach( var quad in _activeQuads )

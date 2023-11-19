@@ -12,7 +12,7 @@ namespace KSS.Core.Physics
     /// <remarks>
     /// A physobj that is pinned to a fixed pos/rot in the local coordinate system of a celestial body.
     /// </remarks>
-    //[RequireComponent( typeof( RootObjectTransform ) )] This can't be required here because the components need to be added in reverse order for initialization.
+    [RequireComponent( typeof( RootObjectTransform ) )]
     [RequireComponent( typeof( Rigidbody ) )]
     [DisallowMultipleComponent]
     public class PinnedPhysicsObject : MonoBehaviour, IPhysicsObject, IPersistent
@@ -68,7 +68,6 @@ namespace KSS.Core.Physics
         }
 
         public bool IsColliding { get; private set; }
-        RootObjectTransform _rootObjTransform;
 
         Vector3 _oldVelocity;
         Vector3 _oldAngularVelocity;
@@ -76,6 +75,7 @@ namespace KSS.Core.Physics
         Vector3 _accelerationSum = Vector3.zero;
         Vector3 _angularAccelerationSum = Vector3.zero;
 
+        RootObjectTransform _rootObjTransform;
         Rigidbody _rb;
 
         public void AddForce( Vector3 force )
@@ -109,8 +109,9 @@ namespace KSS.Core.Physics
             if( ReferenceBody == null )
                 return;
 
-            this._rootObjTransform.AIRFPosition = ReferenceBody.OrientedReferenceFrame.TransformPosition( ReferencePosition );
-            this._rootObjTransform.AIRFRotation = ReferenceBody.OrientedReferenceFrame.TransformRotation( ReferenceRotation );
+            var frame = ReferenceBody.OrientedReferenceFrame;
+            this._rootObjTransform.AIRFPosition = frame.TransformPosition( ReferencePosition );
+            this._rootObjTransform.AIRFRotation = frame.TransformRotation( ReferenceRotation );
         }
 
         void Awake()
@@ -123,7 +124,8 @@ namespace KSS.Core.Physics
             }
 
             _rb = this.GetComponent<Rigidbody>();
-            _rootObjTransform = this.GetComponent<RootObjectTransform>();
+            _rootObjTransform = this.gameObject.GetOrAddComponent<RootObjectTransform>();
+            _rootObjTransform.RefreshCachedRigidbody();
 
             _rb.useGravity = false;
             _rb.collisionDetectionMode = CollisionDetectionMode.Discrete;
@@ -133,11 +135,11 @@ namespace KSS.Core.Physics
 
         void FixedUpdate()
         {
-            // If the object is colliding, we will use its rigidbody accelerations, because we don't have access to the forces due to collisions.
-            // Otherwise, we use our more precise method that relies on full encapsulation of the rigidbody.
-            
+            // Reference can be moving, and we aren't parented (due to precision), thus we continuously update.
             this.UpdateAIRFPositionFromReference();
 
+            // If the object is colliding, we will use its rigidbody accelerations, because we don't have access to the forces due to collisions.
+            // Otherwise, we use our more precise method that relies on full encapsulation of the rigidbody.
             if( IsColliding )
             {
                 this.Acceleration = (Velocity - _oldVelocity) / TimeManager.FixedDeltaTime;

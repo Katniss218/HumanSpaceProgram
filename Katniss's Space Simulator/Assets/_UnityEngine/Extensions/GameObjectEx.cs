@@ -10,17 +10,6 @@ namespace UnityEngine
     public static class GameObjectEx
     {
         /// <summary>
-        /// A version of <see cref="GameObject.AddComponent(Type)"/> that is safe to use with the <see cref="Transform"/> type.
-        /// </summary>
-        public static Component GetTransformOrAddComponent( this GameObject gameObject, Type componentType )
-        {
-            if( componentType == typeof( Transform ) )
-                return gameObject.transform;
-
-            return gameObject.AddComponent( componentType );
-        }
-
-        /// <summary>
         /// Gets every component attached to the gameobject, including its <see cref="Transform"/>.
         /// </summary>
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
@@ -81,6 +70,31 @@ namespace UnityEngine
         {
             component = gameObject.GetComponentInChildren<T>();
             return component != null;
+        }
+
+        /// <summary>
+        /// A version of <see cref="GameObject.AddComponent(Type)"/> that is safe to use with the <see cref="Transform"/> type.
+        /// </summary>
+        public static Component GetTransformOrAddComponent( this GameObject gameObject, Type componentType )
+        {
+            if( componentType == typeof( Transform ) )
+                return gameObject.transform;
+
+            return gameObject.AddComponent( componentType );
+        }
+
+        /// <summary>
+        /// Checks if the component's gameobject or any of its children (recursive) have a component of a specified type. Additionally returns the component, if present.
+        /// </summary>
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static T GetOrAddComponent<T>( this GameObject gameObject ) where T : Component
+        {
+            T comp = gameObject.GetComponent<T>();
+            if( comp == null )
+            {
+                comp = gameObject.AddComponent<T>();
+            }
+            return comp;
         }
 
         /// <summary>

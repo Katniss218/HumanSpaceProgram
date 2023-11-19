@@ -38,9 +38,8 @@ namespace KSS.Core
         {
             GameObject gameObject = new GameObject( $"Vessel, '{name}'" );
 
+            RootObjectTransform ro = gameObject.AddComponent<RootObjectTransform>();
             FreePhysicsObject fpo = gameObject.AddComponent<FreePhysicsObject>();
-
-            RootObjectTransform ro = gameObject.AddComponent<RootObjectTransform>(); // order here matters because RootObjectTransform caches a rigidbody at awake (start is too late).
 
             Vessel vessel = gameObject.AddComponent<Vessel>();
             vessel.name = name;
