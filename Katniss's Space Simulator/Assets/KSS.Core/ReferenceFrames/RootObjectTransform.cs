@@ -94,16 +94,9 @@ namespace KSS.Core.ReferenceFrames
             this._airfRotation = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( this.transform.rotation );
         }
 
-        //void LateUpdate()
-        //{
 #warning TODO - AIRFPosition seems to lag behind one frame, behind the correct position. 
-        // Transforming the scene position on demand instead of getting the AIRF value seems to work some of the time.
-        // Updating it also in lateupdate also seems to fix it, but it breaks loaded position, making the craft drop underground somewhat.
-
-        //    this.AIRFPosition = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.transform.position );
-        //    this.AIRFRotation = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( this.transform.rotation );
-        //}
-
+        // updating it in lateupdate doesn't change anything.
+        // updating it in the physicsobject also doesn't do anything.
 
         /// <summary>
         /// Callback to the event.

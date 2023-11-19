@@ -137,8 +137,6 @@ namespace KSS.GameplayScene
 
             if( parent == null )
             {
-#warning TODO - vessel or building, but I think there should be a separate thing for that decision. Also tying into that, vessels need to be anchored when far away so they could probably be combined.
-
                 VesselFactory.CreatePartless(
                     SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( ghostRoot.position ),
                     SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( ghostRoot.rotation ),
