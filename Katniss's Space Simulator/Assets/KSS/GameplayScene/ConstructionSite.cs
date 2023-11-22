@@ -137,14 +137,20 @@ namespace KSS.GameplayScene
 
             if( parent == null )
             {
-                VesselFactory.CreatePartless(
+                Vessel v = VesselFactory.CreatePartless(
                     SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( ghostRoot.position ),
                     SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( ghostRoot.rotation ),
                     Vector3.zero,
                     Vector3.zero );
+
+                v.RootPart = ghostRoot;
             }
+            else
+            {
+                VesselHierarchyUtils.SetParent( ghostRoot, parent );
+            }
+
 #warning TODO - these hierarchyutils are kinda old, somewhat not used, and bleh. Need to figure out a standard way of doing things again.
-            // VesselHierarchyUtils.SetParent()
 
             ConstructionSite cSite = parent.GetComponentInParent<ConstructionSite>();
             if( cSite == null )

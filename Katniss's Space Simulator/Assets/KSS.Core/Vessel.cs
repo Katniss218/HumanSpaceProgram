@@ -53,10 +53,10 @@ namespace KSS.Core
             set
             {
                 if( _rootPart != null )
-                    _rootPart.SetParent( null );
+                    _rootPart.SetParent( null, true );
                 _rootPart = value;
                 if( value != null )
-                    value.SetParent( this.transform );
+                    value.SetParent( this.transform, true );
                 RecalculateParts();
             }
         }
