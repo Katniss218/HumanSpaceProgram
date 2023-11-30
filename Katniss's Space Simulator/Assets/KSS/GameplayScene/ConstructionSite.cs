@@ -110,7 +110,7 @@ namespace KSS.GameplayScene
             }
         }
 
-        public static (Transform rot, Dictionary<FConstructible, DataEntry>, BidirectionalReferenceStore) SpawnGhost( string vesselId )
+        public static (Transform root, Dictionary<FConstructible, DataEntry>, BidirectionalReferenceStore) SpawnGhost( string vesselId )
         {
             // step 1. player clicks, and spawns ghost to place.
 
@@ -119,17 +119,17 @@ namespace KSS.GameplayScene
 
             Dictionary<FConstructible, List<Transform>> partMap = MapToAncestralComponent<FConstructible>( rootGo.transform );
             FConstructible[] constructibles = rootGo.GetComponentsInChildren<FConstructible>();
-            Dictionary<FConstructible, DataEntry> gParts = new Dictionary<FConstructible, DataEntry>();
+            Dictionary<FConstructible, DataEntry> ghostParts = new Dictionary<FConstructible, DataEntry>();
             foreach( var con in constructibles )
             {
                 GhostedPart gpart = GhostedPart.MakeGhostPatch( con, partMap, refStore );
-                gParts.Add( con, new DataEntry() { gPart = gpart, buildPoints = 0.0f } );
+                ghostParts.Add( con, new DataEntry() { gPart = gpart, buildPoints = 0.0f } );
             }
 
-            return (rootGo.transform, gParts, refStore);
+            return (rootGo.transform, ghostParts, refStore);
         }
 
-        public static ConstructionSite PlaceGhost( Transform ghostRoot, List<GhostedPart> ghostParts, Transform parent, BidirectionalReferenceStore refMap )
+        public static ConstructionSite PlaceGhost( Transform ghostRoot, Dictionary<FConstructible, DataEntry> ghostParts, Transform parent, BidirectionalReferenceStore refMap )
         {
             // step 6. Player places the ghost.
 
@@ -149,8 +149,6 @@ namespace KSS.GameplayScene
             {
                 VesselHierarchyUtils.SetParent( ghostRoot, parent );
             }
-
-#warning TODO - these hierarchyutils are kinda old, somewhat not used, and bleh. Need to figure out a standard way of doing things again.
 
             ConstructionSite cSite = parent.GetComponentInParent<ConstructionSite>();
             if( cSite == null )

@@ -10,6 +10,13 @@ using UnityEngine.UI;
 using UnityPlus.UILib.UIElements;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib.Layout;
+using KSS.UI.Windows;
+using KSS.GameplayScene;
+using UnityPlus.Serialization.ReferenceMaps;
+using UnityPlus.Serialization;
+using UnityPlus.Serialization.DataHandlers;
+using UnityPlus.Serialization.Strategies;
+using KSS.Components;
 
 namespace KSS.UI.SceneFactories
 {
@@ -158,19 +165,15 @@ namespace KSS.UI.SceneFactories
 
             UIButton constructButton = bottomPanel.AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( -16, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), () =>
             {
-                // construct will spawn a construction site.
-                // the site can be placed anywhere where allowed.
-                // the site can NOT be moved after, but the player needs a way of finely positioning it.
-                // maybe place it temporarily first, and then finely adjust using move/rotate tools, before confirming?
-
-                // would be neat if there was a way of automating that.
-
-                // needs an easy one-call way of spawning a c-site.
-
-
-                // in KSP, the positioning is dictated by the position of the root in VAB
+                CanvasManager.Get( CanvasName.WINDOWS ).AddTextSelectionWindow( "Vessel to create...", "id here", s =>
+                {
+                    (Transform root, Dictionary<FConstructible, ConstructionSite.DataEntry> de, BidirectionalReferenceStore refMap) = ConstructionSite.SpawnGhost( s );
+                    root.position = Cameras.GameplayCameraController.MainCamera.transform.position;
+                    ConstructionSite.PlaceGhost( root, de, null, refMap );
+                } );
             } )
-            .WithText( UILayoutInfo.Fill(), "C", out _ );
+                .WithText( UILayoutInfo.Fill(), "C", out _ );
+
             UIButton deconstructButton = bottomPanel.AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 16, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), () =>
             {
 
