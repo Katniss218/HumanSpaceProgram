@@ -45,7 +45,7 @@ namespace UnityPlus.Serialization
             this._startFunc = startFunc;
             this._finishFunc = finishFunc;
             this._objectActions = new List<IAsyncLoader.Action>() { objectAction };
-            this._dataActions = new List<IAsyncLoader.Action>() { objectAction };
+            this._dataActions = new List<IAsyncLoader.Action>() { dataAction };
         }
 
         /// <param name="startFunc">A function delegate that can pause the game completely.</param>

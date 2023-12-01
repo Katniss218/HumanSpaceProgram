@@ -20,7 +20,7 @@ namespace KSS.DesignScene
         /// <summary>
         /// This can return null if no tool is selected.
         /// </summary>
-        public static Type ActiveToolType { get => instance?._activeTool?.GetType(); }
+        public static Type ActiveToolType { get => instance._activeTool.GetType(); }
 
         /// <summary>
         /// Registers a tool with the specified type for future use.
@@ -39,6 +39,7 @@ namespace KSS.DesignScene
                     throw new InvalidOperationException( $"The tool of type {typeof( T ).FullName} has already been registered." );
                 }
             }
+
             MonoBehaviour comp = instance.gameObject.AddComponent<T>();
             comp.enabled = false;
 
@@ -70,6 +71,7 @@ namespace KSS.DesignScene
             {
                 throw new InvalidOperationException( $"{nameof( DesignSceneToolManager )} is accessible only in the design scene." );
             }
+
             Type baseToolType = typeof( MonoBehaviour );
             if( !(baseToolType.IsAssignableFrom( toolType )) )
             {
@@ -101,9 +103,10 @@ namespace KSS.DesignScene
             {
                 instance._activeTool.enabled = false;
             }
+
             instance._activeTool = tool;
             instance._activeTool.enabled = true;
-            HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_TOOL_CHANGED );
+            HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_AFTER_TOOL_CHANGED );
             return instance._activeTool;
         }
 

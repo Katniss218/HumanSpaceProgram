@@ -117,7 +117,7 @@ namespace KSS.UI.SceneFactories
             } );
         }
 
-        [HSPEventListener( HSPEvent.DESIGN_TOOL_CHANGED, HSPEvent.NAMESPACE_VANILLA + ".tool_changed_ui" )]
+        [HSPEventListener( HSPEvent.DESIGN_AFTER_TOOL_CHANGED, HSPEvent.NAMESPACE_VANILLA + ".tool_changed_ui" )]
         private static void CreateCurrentToolOptions( object e )
         {
             if( !_toolOptionsPanel.IsNullOrDestroyed() )

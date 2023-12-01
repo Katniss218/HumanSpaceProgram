@@ -29,7 +29,7 @@ namespace UnityPlus.Serialization
             this._startFunc = startFunc;
             this._finishFunc = finishFunc;
             this._objectActions = new List<ILoader.Action>() { objectAction };
-            this._dataActions = new List<ILoader.Action>() { objectAction };
+            this._dataActions = new List<ILoader.Action>() { dataAction };
         }
 
         public Loader( IForwardReferenceMap refMap, Action startFunc, Action finishFunc, IEnumerable<ILoader.Action> objectActions, IEnumerable<ILoader.Action> dataActions )

@@ -21,7 +21,7 @@ namespace UnityEngine
 
         /// <summary>
         /// Gets the cached instance. <br/>
-        /// If nothing is cached, attempts to find the instance. Throws an exception if the number of instances is not 1.
+        /// If nothing is cached, attempts to find the instance. Throws an exception if the number of active instances is not exactly 1.
         /// </summary>
         protected static T instance
         {

@@ -74,7 +74,7 @@ namespace KSS.Core
         public const string ESCAPE_DESIGN = NAMESPACE_VANILLA + ".escape.design";
         
         /// <summary>
-        /// Invoked when the player toggles the escape (pause) menu in the design scene.
+        /// Invoked when the player toggles the escape (pause) menu in the editor scene.
         /// </summary>
         public const string ESCAPE_EDITOR = NAMESPACE_VANILLA + ".escape.editor";
 
@@ -115,21 +115,48 @@ namespace KSS.Core
         /// <summary>
         /// Invoked after the currently active tool in the design scene has changed.
         /// </summary>
-        public const string DESIGN_TOOL_CHANGED = NAMESPACE_VANILLA + ".designscene.tool.changed";
+        public const string DESIGN_AFTER_TOOL_CHANGED = NAMESPACE_VANILLA + ".designscene.tool.changed";
 
+        /// <summary>
+        /// Invoked before the vessel is loaded in the design scene.
+        /// </summary>
         public const string DESIGN_BEFORE_LOAD = NAMESPACE_VANILLA + ".designscene.load.before";
 
+        /// <summary>
+        /// Invoked after the vessel is loaded in the design scene.
+        /// </summary>
         public const string DESIGN_AFTER_LOAD = NAMESPACE_VANILLA + ".designscene.load.after";
 
+        /// <summary>
+        /// Invoked before the vessel is saved in the design scene.
+        /// </summary>
         public const string DESIGN_BEFORE_SAVE = NAMESPACE_VANILLA + ".designscene.save.before";
-        
+
+        /// <summary>
+        /// Invoked after the vessel is saved in the design scene.
+        /// </summary>
         public const string DESIGN_AFTER_SAVE = NAMESPACE_VANILLA + ".designscene.save.after";
 
         // gameplay scene runtime events
 
+        /// <summary>
+        /// Invoked after the currently active tool in the gameplay scene has changed.
+        /// </summary>
+        public const string GAMEPLAY_AFTER_TOOL_CHANGED = NAMESPACE_VANILLA + ".gameplayscene.tool.changed";
+
+        /// <summary>
+        /// Invoked after the active object changes.
+        /// </summary>
         public const string GAMEPLAY_AFTER_ACTIVE_OBJECT_CHANGE = NAMESPACE_VANILLA + ".gameplayscene.after_activeobj_changed";
 
+        /// <summary>
+        /// Invoked after a vessel is first created and registered.
+        /// </summary>
         public const string GAMEPLAY_AFTER_VESSEL_REGISTERED = NAMESPACE_VANILLA + ".gameplayscene.after_vessel_created";
+
+        /// <summary>
+        /// Invoked after a vessel is destroyed and unregistered.
+        /// </summary>
         public const string GAMEPLAY_AFTER_VESSEL_UNREGISTERED = NAMESPACE_VANILLA + ".gameplayscene.after_vessel_destroyed";
         // ---
     }
