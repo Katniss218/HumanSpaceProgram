@@ -11,11 +11,27 @@ using UnityPlus.Serialization.ReferenceMaps;
 
 namespace KSS.GameplayScene
 {
-    public enum ConstructionMode
+    public enum ConstructionState : sbyte
     {
-        Paused = 0,
-        Construction,
-        Deconstruction
+        NotStarted = 0,
+        Constructing = 1,
+        PausedConstructing = 2,
+        Deconstructing = -1,
+        PausedDeconstructing = -2,
+        Waiting = 8
+    }
+
+    public static class ConstructionState_Ex
+    {
+        public static bool IsConstruction( this ConstructionState state )
+        {
+            return (int)state > 0;
+        }
+
+        public static bool IsDeconstruction( this ConstructionState state )
+        {
+            return (int)state < 0;
+        }
     }
 
     [RequireComponent( typeof( RootObjectTransform ) )]
@@ -47,19 +63,24 @@ namespace KSS.GameplayScene
 
         */
 
-        public class DataEntry
+        public enum ConstructibleState : sbyte
         {
-            public GhostedPart gPart;
-            public float buildPoints;
-            public sbyte state = 0; // -1 = finished deconstructing, 0 = in-progress or not started yet, 1 = finished constructing.
+            FinishedDeconstruction = -1,
+            InProgress = 0,
+            FinishedConstruction = 1
         }
 
-        [field: SerializeField]
-        public ConstructionMode CurrentMode { get; private set; } = ConstructionMode.Paused;
+        /// <summary>
+        /// Tracks progress of a single constructible.
+        /// </summary>
+        public class ConstructibleData
+        {
+            public GhostPatchSet patchSet;
+            public float accumulatedBuildPoints;
+            public ConstructibleState state = ConstructibleState.InProgress;
+        }
 
-        BidirectionalReferenceStore _refMap;
-
-        Dictionary<FConstructible, DataEntry> _constructionData = new Dictionary<FConstructible, DataEntry>();
+        public ConstructionState State { get; private set; } = ConstructionState.Waiting;
 
         /// <summary>
         /// Cumulative total build speed per second. This is divided by the number of child objects currently under construction.
@@ -67,66 +88,147 @@ namespace KSS.GameplayScene
         [field: SerializeField]
         public float BuildSpeedTotal { get; set; }
 
-        public int TotalCount { get => _constructionData.Count; }
+        /// <summary>
+        /// The total number of parts (constructibles) belonging to this construction site.
+        /// </summary>
+        public int TotalPartCount { get => _constructionData.Count; }
 
-        public int CompletedCount { get; private set; } = 0;
+        /// <summary>
+        /// The sum of parts (constructibles) constructed (when constructing) or parts deconstructed (when deconstructing).
+        /// </summary>
+        public int CompletedPartCount { get; private set; } = 0;
+
+        BidirectionalReferenceStore _referenceMap = new BidirectionalReferenceStore();
+
+        Dictionary<FConstructible, ConstructibleData> _constructionData = new Dictionary<FConstructible, ConstructibleData>();
+
+        /// <remarks>
+        /// Can be called while deconstructing to cancel, and start constructing instead.
+        /// </remarks>
+        public void StartConstruction()
+        {
+            if( State == ConstructionState.Constructing )
+                return;
+
+            this.CompletedPartCount = _constructionData.Values
+                .Where( v => v.state == ConstructibleState.FinishedConstruction )
+                .Count();
+            this.State = ConstructionState.Constructing;
+        }
+
+        /// <remarks>
+        /// Can be called while constructing to cancel, and start deconstructing instead.
+        /// </remarks>
+        public void StartDeconstruction()
+        {
+            if( State == ConstructionState.Deconstructing )
+                return;
+
+            this.CompletedPartCount = _constructionData.Values
+                .Where( v => v.state == ConstructibleState.FinishedDeconstruction )
+                .Count();
+            this.State = ConstructionState.Deconstructing;
+        }
+
+        public void Pause()
+        {
+            if( this.State == ConstructionState.Constructing )
+            {
+                this.State = ConstructionState.PausedConstructing;
+                return;
+            }
+            if( this.State == ConstructionState.Deconstructing )
+            {
+                this.State = ConstructionState.PausedDeconstructing;
+                return;
+            }
+        }
 
         void Update()
         {
-            float buildSpeedPerPart = BuildSpeedTotal / (TotalCount - CompletedCount);
-            if( CurrentMode == ConstructionMode.Construction )
+            if( Input.GetKeyDown( KeyCode.G ) )
             {
-                if( CompletedCount == TotalCount )
+                StartConstruction();
+            }
+
+            float buildSpeedPerPart = BuildSpeedTotal / (TotalPartCount - CompletedPartCount);
+            if( State == ConstructionState.Constructing )
+            {
+                if( CompletedPartCount == TotalPartCount )
                 {
-                    Destroy( this );
+                    ForceFinish();
                     return;
                 }
-                foreach( var kvp in _constructionData )
+                foreach( (var constructible, var data) in _constructionData )
                 {
-                    var dataEntry = kvp.Value;
-                    if( dataEntry.state != 1 )
+                    if( data.state != ConstructibleState.FinishedConstruction )
                     {
-                        dataEntry.buildPoints += buildSpeedPerPart * TimeManager.DeltaTime;
-                        if( dataEntry.buildPoints > kvp.Key.MaxBuildPoints )
+                        data.accumulatedBuildPoints += buildSpeedPerPart * TimeManager.DeltaTime;
+                        if( data.accumulatedBuildPoints > constructible.MaxBuildPoints )
                         {
-                            dataEntry.buildPoints = kvp.Key.MaxBuildPoints;
-                            dataEntry.gPart.GhostToOriginalPatch.Run( _refMap );
-                            dataEntry.state = 1;
-                            CompletedCount++;
+                            data.accumulatedBuildPoints = constructible.MaxBuildPoints;
+                            data.patchSet.GhostToOriginalPatch.Run( _referenceMap );
+                            data.state = ConstructibleState.FinishedConstruction;
+                            CompletedPartCount++;
                         }
                     }
                 }
             }
-            if( CurrentMode == ConstructionMode.Deconstruction )
+            if( State == ConstructionState.Deconstructing )
             {
-                if( CompletedCount == TotalCount )
+                if( CompletedPartCount == TotalPartCount )
                 {
-                    foreach( var kvp in _constructionData )
-                    {
-                        Destroy( kvp.Key.gameObject );
-                    }
-                    Destroy( this );
+                    ForceFinish();
                     return;
                 }
-                foreach( var kvp in _constructionData )
+                foreach( (_, var data) in _constructionData )
                 {
-                    var dataEntry = kvp.Value;
-                    if( dataEntry.state != -1 )
+                    if( data.state != ConstructibleState.FinishedDeconstruction )
                     {
-                        dataEntry.buildPoints -= buildSpeedPerPart * TimeManager.DeltaTime;
-                        if( dataEntry.buildPoints < 0.0f )
+                        data.accumulatedBuildPoints -= buildSpeedPerPart * TimeManager.DeltaTime;
+                        if( data.accumulatedBuildPoints < 0.0f )
                         {
-                            dataEntry.buildPoints = 0.0f;
-                            dataEntry.gPart.OriginalToGhostPatch.Run( _refMap );
-                            dataEntry.state = -1;
-                            CompletedCount++;
+                            data.accumulatedBuildPoints = 0.0f;
+                            data.patchSet.OriginalToGhostPatch.Run( _referenceMap );
+                            data.state = ConstructibleState.FinishedDeconstruction;
+                            CompletedPartCount++;
                         }
                     }
                 }
             }
         }
 
-        public static (Transform root, Dictionary<FConstructible, DataEntry>, BidirectionalReferenceStore) SpawnGhost( string vesselId )
+        public void ForceFinish()
+        {
+            if( this.State.IsConstruction() )
+            {
+                // Stopping construction means that the things that are not fully built should be removed, and progress wasted.
+                foreach( var kvp in _constructionData )
+                {
+                    if( kvp.Value.state != ConstructibleState.FinishedConstruction )
+                    {
+                        Destroy( kvp.Key.gameObject );
+                    }
+                }
+            }
+            else if( this.State.IsDeconstruction() )
+            {
+                // Stopping deconstruction means that the things that were not fully deconstructed should remain (not entirely realistic, but hey gameplay).
+                foreach( var kvp in _constructionData )
+                {
+                    if( kvp.Value.state == ConstructibleState.FinishedDeconstruction )
+                    {
+                        Destroy( kvp.Key.gameObject );
+                    }
+                    // 2023/12/02 - Originals are only turned into ghosts only after fully deconstructed, so we can leave them.
+                }
+            }
+
+            Destroy( this );
+            return;
+        }
+
+        public static (Transform root, Dictionary<FConstructible, ConstructibleData>, BidirectionalReferenceStore) SpawnGhost( string vesselId )
         {
             // step 1. player clicks, and spawns ghost to place.
 
@@ -134,22 +236,21 @@ namespace KSS.GameplayScene
             GameObject rootGo = PartRegistry.Load( new Core.Mods.NamespacedIdentifier( "Vessels", vesselId ), refStore );
 
             Dictionary<FConstructible, List<Transform>> partMap = MapToAncestralComponent<FConstructible>( rootGo.transform );
-            FConstructible[] constructibles = rootGo.GetComponentsInChildren<FConstructible>();
-            Dictionary<FConstructible, DataEntry> ghostParts = new Dictionary<FConstructible, DataEntry>();
-            foreach( var con in constructibles )
+
+            Dictionary<FConstructible, ConstructibleData> ghostParts = new Dictionary<FConstructible, ConstructibleData>();
+            foreach( var con in partMap.Keys )
             {
-                GhostedPart gpart = GhostedPart.MakeGhostPatch( con, partMap, refStore );
+                GhostPatchSet gpart = GhostPatchSet.MakeGhostPatch( con, partMap, refStore );
                 gpart.OriginalToGhostPatch.Run( refStore );
-                ghostParts.Add( con, new DataEntry() { gPart = gpart, buildPoints = 0.0f } );
+                ghostParts.Add( con, new ConstructibleData() { patchSet = gpart, accumulatedBuildPoints = 0.0f } );
             }
 
             return (rootGo.transform, ghostParts, refStore);
         }
 
-        public static ConstructionSite PlaceGhost( Transform ghostRoot, Dictionary<FConstructible, DataEntry> ghostParts, Transform parent, BidirectionalReferenceStore refMap )
+        public static ConstructionSite AddGhostToConstruction( Transform ghostRoot, Dictionary<FConstructible, ConstructibleData> ghostParts, Transform parent, BidirectionalReferenceStore refMap )
         {
             // step 6. Player places the ghost.
-
             // assume the position is already set.
 
             if( parent == null )
@@ -178,19 +279,41 @@ namespace KSS.GameplayScene
                 cSite._constructionData.Add( kvp.Key, kvp.Value );
             }
 
-            cSite._refMap = cSite._refMap == null
-                ? refMap
-                : BidirectionalReferenceStore.Combine( cSite._refMap, refMap );
+            cSite._referenceMap.AddAll( refMap.GetAll() );
 
             ghostRoot.transform.SetParent( parent );
             return cSite;
         }
 
-        public void PickupGhost( Transform ghostRoot )
+        public void PickUpGhostFromConstruction( Transform ghostRoot )
         {
+            throw new NotImplementedException();
+
             // reverse of step 6. Player picks up the ghost.
 
-            // if parent's ancestral chain has a c-site - add to that c-site, otherwise - make new c-site.
+            if( this.State != ConstructionState.NotStarted )
+            {
+                // can't pickup once construction is started.
+                return;
+            }
+
+            Dictionary<FConstructible, List<Transform>> partMap = MapToAncestralComponent<FConstructible>( ghostRoot );
+
+            // Check if the hierarchy up from the specified ghost root is fully ghosted. Otherwise the ghost can't be picked up.
+            int containedCount = partMap.Count( kvp => _constructionData.ContainsKey( kvp.Key ) );
+            if( containedCount != partMap.Count )
+            {
+                return;
+            }
+
+            foreach( var constructible in partMap.Keys )
+            {
+                _constructionData.Remove( constructible );
+            }
+            if( _constructionData.Count == 0 )
+            {
+                Destroy( this );
+            }
         }
 
         /// <summary>

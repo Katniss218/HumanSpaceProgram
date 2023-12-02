@@ -13,25 +13,17 @@ using UnityPlus.Serialization.Patching;
 namespace KSS
 {
     /// <summary>
-    /// Represents a part/vessel that appears ghosted out.
+    /// Represents a single constructible object that can be transitioned between its normal, and ghosted-out states.
     /// </summary>
-    public class GhostedPart
+    public struct GhostPatchSet
     {
-        public IReverseReferenceMap RefMap { get; private set; }
+        public static string GhostMaterialAssetID = "builtin::Resources/Materials/ghost";
 
         public SetDataPatch OriginalToGhostPatch { get; private set; }
         public SetDataPatch GhostToOriginalPatch { get; private set; }
 
-        public static string GhostMaterialAssetID = "builtin::Resources/Materials/ghost";
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="root"></param>
-        /// <param name="partMap"></param>
         /// <param name="refMap">The reference map saved from when the objects were loaded.</param>
-        /// <returns></returns>
-        public static GhostedPart MakeGhostPatch( FConstructible root, Dictionary<FConstructible, List<Transform>> partMap, IReverseReferenceMap refMap )
+        public static GhostPatchSet MakeGhostPatch( FConstructible root, Dictionary<FConstructible, List<Transform>> partMap, IReverseReferenceMap refMap )
         {
             if( partMap.TryGetValue( root, out List<Transform> list ) )
             {
@@ -108,9 +100,8 @@ namespace KSS
                     }
                 }
 
-                return new GhostedPart()
+                return new GhostPatchSet()
                 {
-                    RefMap = refMap,
                     OriginalToGhostPatch = new SetDataPatch( forwardPatch ),
                     GhostToOriginalPatch = new SetDataPatch( reversePatch )
                 };

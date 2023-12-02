@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using UnityPlus.Serialization.ReferenceMaps;
 
 namespace UnityPlus.Serialization.Patching
@@ -22,8 +23,14 @@ namespace UnityPlus.Serialization.Patching
             foreach( var change in _changes )
             {
                 object obj = refMap.GetObj( change.objId );
-
-                obj.SetData( refMap, change.data );
+                try
+                {
+                    obj.SetData( refMap, change.data );
+                }
+                catch( Exception ex )
+                {
+                    Debug.LogWarning( $"An exception occurred while running a change for object '{change.objId}' in a patch." );
+                }
             }
         }
     }

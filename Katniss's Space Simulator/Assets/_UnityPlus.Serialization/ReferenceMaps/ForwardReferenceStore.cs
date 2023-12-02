@@ -15,6 +15,19 @@ namespace UnityPlus.Serialization.ReferenceMaps
     {
         private readonly Dictionary<Guid, object> _forward = new Dictionary<Guid, object>();
 
+        public IEnumerable<(Guid id, object val)> GetAll()
+        {
+            return _forward.Select( kvp => (kvp.Key, kvp.Value) );
+        }
+
+        public void AddAll( IEnumerable<(Guid id, object val)> data )
+        {
+            foreach( var kvp in data )
+            {
+                _forward.Add( kvp.id, kvp.val );
+            }
+        }
+
         //
         //  FORWARD
         //

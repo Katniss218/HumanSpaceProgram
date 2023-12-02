@@ -12,6 +12,16 @@ namespace UnityPlus.Serialization
     public interface IForwardReferenceMap
     {
         /// <summary>
+        /// Gets all entries in the reference map as a list of tuples.
+        /// </summary>
+        IEnumerable<(Guid id, object val)> GetAll();
+
+        /// <summary>
+        /// Adds entries to the reference map.
+        /// </summary>
+        void AddAll( IEnumerable<(Guid id, object val)> data );
+
+        /// <summary>
         /// Tries to return a previously registered object for a specific ID.
         /// </summary>
         /// <remarks>
@@ -38,6 +48,16 @@ namespace UnityPlus.Serialization
     /// </summary>
     public interface IReverseReferenceMap
     {
+        /// <summary>
+        /// Gets all entries in the reference map as a list of tuples.
+        /// </summary>
+        IEnumerable<(Guid id, object val)> GetAll();
+
+        /// <summary>
+        /// Adds entries to the reference map.
+        /// </summary>
+        void AddAll( IEnumerable<(Guid id, object val)> data );
+
         /// <summary>
         /// Tries to return the ID of a previously registered object.
         /// </summary>

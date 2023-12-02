@@ -15,6 +15,19 @@ namespace UnityPlus.Serialization.ReferenceMaps
     {
         private readonly Dictionary<object, Guid> _reverse = new Dictionary<object, Guid>();
 
+        public IEnumerable<(Guid id, object val)> GetAll()
+        {
+            return _reverse.Select( kvp => (kvp.Value, kvp.Key) );
+        }
+
+        public void AddAll( IEnumerable<(Guid id, object val)> data )
+        {
+            foreach( var kvp in data )
+            {
+                _reverse.Add( kvp.val, kvp.id );
+            }
+        }
+
         //
         //  REVERSE
         //

@@ -63,7 +63,7 @@
     <Compile Include="Assets\KSS\Components\FVesselSeparator.cs" />
     <Compile Include="Assets\KSS\GameplayScene\ConstructionSite.cs" />
     <Compile Include="Assets\KSS\Effects\Atmospheres\AtmosphereRenderer.cs" />
-    <Compile Include="Assets\KSS\GhostedPart.cs" />
+    <Compile Include="Assets\KSS\GhostPatchSet.cs" />
     <Compile Include="Assets\KSS\Components\FSequencer.cs" />
     <Compile Include="Assets\KSS\Components\FDryMass.cs" />
     <Compile Include="Assets\KSS\Cameras\GameplayCameraController.cs" />

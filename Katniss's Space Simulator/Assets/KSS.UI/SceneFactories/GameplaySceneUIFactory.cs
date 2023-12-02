@@ -167,9 +167,9 @@ namespace KSS.UI.SceneFactories
             {
                 CanvasManager.Get( CanvasName.WINDOWS ).AddTextSelectionWindow( "Vessel to create...", "id here", s =>
                 {
-                    (Transform root, Dictionary<FConstructible, ConstructionSite.DataEntry> de, BidirectionalReferenceStore refMap) = ConstructionSite.SpawnGhost( s );
+                    (Transform root, Dictionary<FConstructible, ConstructionSite.ConstructibleData> de, BidirectionalReferenceStore refMap) = ConstructionSite.SpawnGhost( s );
                     root.position = Cameras.GameplayCameraController.MainCamera.transform.position;
-                    ConstructionSite.PlaceGhost( root, de, VesselManager.GetLoadedVessels()[1].RootPart, refMap );
+                    ConstructionSite.AddGhostToConstruction( root, de, VesselManager.GetLoadedVessels()[1].RootPart, refMap );
                 } );
             } )
                 .WithText( UILayoutInfo.Fill(), "C", out _ );
