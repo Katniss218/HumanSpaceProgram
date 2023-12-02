@@ -811,6 +811,8 @@ MonoBehaviour:
     asset: {fileID: 4800000, guid: dd89cf5b9246416f84610a006f916af7, type: 3}
   - assetID: builtin::Resources/navball_RT
     asset: {fileID: 8400000, guid: dd5f8e490fc8a7d44a864be66c800b89, type: 2}
+  - assetID: builtin::Resources/Materials/ghost
+    asset: {fileID: 2100000, guid: fd5ae78e78ffe89408e5ee7d443b3d92, type: 2}
   - assetID: builtin::KSS.DevUtils/cube/Zp
     asset: {fileID: 2800000, guid: fd3d8acf88cd7b74ea2a0753768ce440, type: 3}
   - assetID: builtin::_TextMesh Pro/Shaders/TMP_Bitmap-Mobile

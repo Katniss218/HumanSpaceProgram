@@ -141,6 +141,7 @@ GameObject:
   - component: {fileID: 1411097584595625856}
   - component: {fileID: 647930471848486042}
   - component: {fileID: 6979030702901644941}
+  - component: {fileID: -8463795735707923941}
   m_Layer: 0
   m_Name: tank_long
   m_TagString: Untagged
@@ -228,6 +229,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <PartID>k__BackingField:
     _data: Vanilla::tank_long
+--- !u!114 &-8463795735707923941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4352668300827386821}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 202c94cb92f264245a4a47ba8a5e0a2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <MaxBuildPoints>k__BackingField: 150
 --- !u!1 &6112259470971288608
 GameObject:
   m_ObjectHideFlags: 0

@@ -47,7 +47,7 @@ namespace KSS.Core
                 // We could detach the parts from the vessel entirely, but that's not a legal state.
                 // We could create a new vessel with the specified part as its root.
 
-                if( part.IsRootOfVessel() )
+                if( part.IsRootOfPartObject() )
                 {
                     // create a new vessel, but the part is already the root of a new vessel. This is equivalent to recreating the original vessel and deleting the old one (i.e. a "do nothing").
                     return;
@@ -59,7 +59,7 @@ namespace KSS.Core
 
             if( part.GetVessel() == parentPart.GetVessel() )
             {
-                if( part.IsRootOfVessel() )
+                if( part.IsRootOfPartObject() )
                 {
                     SwapRoots( part, parentPart ); // Re-rooting as in KSP would be `Reparent( newRoot.Vessel.RootPart, newRoot )`
                 }
@@ -70,7 +70,7 @@ namespace KSS.Core
             }
             else
             {
-                if( part.IsRootOfVessel() )
+                if( part.IsRootOfPartObject() )
                 {
                     JoinVesselsRoot( part, parentPart );
                 }
@@ -81,6 +81,13 @@ namespace KSS.Core
             }
         }
 
+        public static void AttachLoose( Transform looseRoot, Transform parent )
+        {
+            Vessel v = parent.GetVessel();
+            looseRoot.SetParent( parent, true );
+            v.RecalculateParts();
+        }
+
         // The following helper methods must always produce a legal state or throw an exception.
 
         /// <summary>
@@ -89,8 +96,8 @@ namespace KSS.Core
         private static void SwapRoots( Transform oldRoot, Transform newRoot )
         {
             Contract.Assert( oldRoot.GetVessel() == newRoot.GetVessel() );
-            Contract.Assert( oldRoot.IsRootOfVessel() );
-            Contract.Assert( !newRoot.IsRootOfVessel() );
+            Contract.Assert( oldRoot.IsRootOfPartObject() );
+            Contract.Assert( !newRoot.IsRootOfPartObject() );
 
             newRoot.GetVessel().RootPart = newRoot;
             Reattach( oldRoot, newRoot );
@@ -102,7 +109,7 @@ namespace KSS.Core
         private static void Reattach( Transform part, Transform parent )
         {
             Contract.Assert( part.GetVessel() == parent.GetVessel() );
-            Contract.Assert( !part.IsRootOfVessel() );
+            Contract.Assert( !part.IsRootOfPartObject() );
 
             part.SetParent( parent );
         }
@@ -110,7 +117,7 @@ namespace KSS.Core
         private static void JoinVesselsRoot( Transform partToJoin, Transform parent )
         {
             Contract.Assert( partToJoin.GetVessel() != parent.GetVessel() );
-            Contract.Assert( partToJoin.IsRootOfVessel() );
+            Contract.Assert( partToJoin.IsRootOfPartObject() );
 
             Vessel oldVessel = partToJoin.GetVessel();
             oldVessel.RootPart = null; // needed for the assert in the next method.
@@ -127,7 +134,7 @@ namespace KSS.Core
         private static void JoinVesselsNotRoot( Transform partToJoin, Transform parent )
         {
             Contract.Assert( partToJoin.GetVessel() != parent.GetVessel() );
-            Contract.Assert( !partToJoin.IsRootOfVessel() );
+            Contract.Assert( !partToJoin.IsRootOfPartObject() );
             // Move partToJoin to parent's vessel.
             // Attach partToJoin to parent.
 
@@ -144,7 +151,7 @@ namespace KSS.Core
         /// </summary>
         private static void MakeNewVesselOrBuilding( Transform partToSplit )
         {
-            Contract.Assert( !partToSplit.IsRootOfVessel() );
+            Contract.Assert( !partToSplit.IsRootOfPartObject() );
 
             // Detach the parts from the old vessel.
             Vessel oldv = partToSplit.GetVessel();

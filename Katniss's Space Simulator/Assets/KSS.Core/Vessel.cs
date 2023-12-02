@@ -11,16 +11,6 @@ namespace KSS.Core
 {
     public static class VesselEx
     {
-        public static bool IsRootOfVessel( this Transform part )
-        {
-            if( part.root != part.parent )
-                return false;
-            Vessel v = part.parent.GetComponent<Vessel>();
-            if( v == null )
-                return false;
-            return v.RootPart == part;
-        }
-
         /// <summary>
         /// Gets the <see cref="Vessel"/> attached to this transform.
         /// </summary>
@@ -115,7 +105,7 @@ namespace KSS.Core
         /// <summary>
         /// Returns the local space center of mass, and the mass [kg] itself.
         /// </summary>
-        public (Vector3 localCenterOfMass, float mass) RecalculateMass()
+        private (Vector3 localCenterOfMass, float mass) RecalculateMass()
         {
             Vector3 centerOfMass = Vector3.zero;
             float mass = 0;

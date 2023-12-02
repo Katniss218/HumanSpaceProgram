@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 4782972237774635296}
   - component: {fileID: 4913429701061343767}
   - component: {fileID: 3681314192585619052}
+  - component: {fileID: -3393855845094403734}
   m_Layer: 0
   m_Name: engine
   m_TagString: Untagged
@@ -98,6 +99,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <PartID>k__BackingField:
     _data: Vanilla::engine
+--- !u!114 &-3393855845094403734
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1364953004931670300}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 202c94cb92f264245a4a47ba8a5e0a2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <MaxBuildPoints>k__BackingField: 500
 --- !u!1 &1886943661070902015
 GameObject:
   m_ObjectHideFlags: 0

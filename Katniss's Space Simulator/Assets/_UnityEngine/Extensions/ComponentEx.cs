@@ -51,7 +51,7 @@ namespace UnityEngine
         }
 
         /// <summary>
-        /// Checks if the component's gameobject has a component of a specified type, that is not the instance specified in the parameter
+        /// Checks if the component's gameobject has a component of a specified type, that is not the instance specified in the parameter.
         /// </summary>
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public static bool HasComponentOtherThan<T>( this Component comp, T otherThanThis )

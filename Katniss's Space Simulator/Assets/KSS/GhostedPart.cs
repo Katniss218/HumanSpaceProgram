@@ -22,6 +22,8 @@ namespace KSS
         public SetDataPatch OriginalToGhostPatch { get; private set; }
         public SetDataPatch GhostToOriginalPatch { get; private set; }
 
+        public static string GhostMaterialAssetID = "builtin::Resources/Materials/ghost";
+
         /// <summary>
         /// 
         /// </summary>
@@ -33,14 +35,17 @@ namespace KSS
         {
             if( partMap.TryGetValue( root, out List<Transform> list ) )
             {
+                Material ghostMat = AssetRegistry.Get<Material>( GhostMaterialAssetID );
+
                 List<(Guid id, SerializedData dataToApply)> forwardPatch = new List<(Guid id, SerializedData dataToApply)>();
                 List<(Guid id, SerializedData dataToApply)> reversePatch = new List<(Guid id, SerializedData dataToApply)>();
 
-                Material ghostMat = AssetRegistry.Get<Material>( "builtin::Resources/Materials/ghost" );
+                List<FDryMass> masses = new List<FDryMass>();
                 List<Collider> colliders = new List<Collider>();
                 List<Renderer> renderers = new List<Renderer>();
                 foreach( var transform in list )
                 {
+                    // TODO - this should be procedural, mods might define their own stuff that should be deactivated by a patch.
                     transform.GetComponents<Collider>( colliders );
                     foreach( var collider in colliders )
                     {
@@ -54,6 +59,8 @@ namespace KSS
                             {
                                 { "is_trigger", collider.isTrigger }
                             };
+                            forwardPatch.Add( (id, fwdObj) );
+                            reversePatch.Add( (id, revObj) );
                         }
                     }
                     transform.GetComponents<Renderer>( renderers );
@@ -78,6 +85,25 @@ namespace KSS
                             {
                                 { "shared_materials", origMats }
                             };
+                            forwardPatch.Add( (id, fwdObj) );
+                            reversePatch.Add( (id, revObj) );
+                        }
+                    }
+                    transform.GetComponents<FDryMass>( masses );
+                    foreach( var mass in masses )
+                    {
+                        if( refMap.TryGetID( mass, out Guid id ) )
+                        {
+                            SerializedObject fwdObj = new SerializedObject()
+                            {
+                                { "mass", 0.0f }
+                            };
+                            SerializedObject revObj = new SerializedObject()
+                            {
+                                { "mass", mass.Mass }
+                            };
+                            forwardPatch.Add( (id, fwdObj) );
+                            reversePatch.Add( (id, revObj) );
                         }
                     }
                 }

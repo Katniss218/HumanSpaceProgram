@@ -16,6 +16,22 @@ namespace UnityPlus.Serialization.ReferenceMaps
         private readonly Dictionary<Guid, object> _forward = new Dictionary<Guid, object>();
         private readonly Dictionary<object, Guid> _reverse = new Dictionary<object, Guid>();
 
+        public static BidirectionalReferenceStore Combine( BidirectionalReferenceStore s1, BidirectionalReferenceStore s2 )
+        {
+            BidirectionalReferenceStore sFinal = new BidirectionalReferenceStore();
+            foreach( var kvp in s1._forward )
+            {
+                sFinal._forward.Add( kvp.Key, kvp.Value );
+                sFinal._reverse.Add( kvp.Value, kvp.Key );
+            }
+            foreach( var kvp in s2._forward )
+            {
+                sFinal._forward.Add( kvp.Key, kvp.Value );
+                sFinal._reverse.Add( kvp.Value, kvp.Key );
+            }
+            return sFinal;
+        }
+
         //
         //  FORWARD
         //

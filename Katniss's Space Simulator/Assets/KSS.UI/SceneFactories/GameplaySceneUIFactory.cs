@@ -169,7 +169,7 @@ namespace KSS.UI.SceneFactories
                 {
                     (Transform root, Dictionary<FConstructible, ConstructionSite.DataEntry> de, BidirectionalReferenceStore refMap) = ConstructionSite.SpawnGhost( s );
                     root.position = Cameras.GameplayCameraController.MainCamera.transform.position;
-                    ConstructionSite.PlaceGhost( root, de, null, refMap );
+                    ConstructionSite.PlaceGhost( root, de, VesselManager.GetLoadedVessels()[1].RootPart, refMap );
                 } );
             } )
                 .WithText( UILayoutInfo.Fill(), "C", out _ );

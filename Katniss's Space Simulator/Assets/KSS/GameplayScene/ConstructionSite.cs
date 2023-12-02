@@ -51,15 +51,21 @@ namespace KSS.GameplayScene
         {
             public GhostedPart gPart;
             public float buildPoints;
+            public sbyte state = 0; // -1 = finished deconstructing, 0 = in-progress or not started yet, 1 = finished constructing.
         }
 
+        [field: SerializeField]
         public ConstructionMode CurrentMode { get; private set; } = ConstructionMode.Paused;
 
         BidirectionalReferenceStore _refMap;
 
-        Dictionary<FConstructible, DataEntry> _constructionData;
+        Dictionary<FConstructible, DataEntry> _constructionData = new Dictionary<FConstructible, DataEntry>();
 
-        public float BuildSpeedTotal { get; set; } // cumulative total build speed per second.
+        /// <summary>
+        /// Cumulative total build speed per second. This is divided by the number of child objects currently under construction.
+        /// </summary>
+        [field: SerializeField]
+        public float BuildSpeedTotal { get; set; }
 
         public int TotalCount { get => _constructionData.Count; }
 
@@ -77,12 +83,17 @@ namespace KSS.GameplayScene
                 }
                 foreach( var kvp in _constructionData )
                 {
-                    kvp.Value.buildPoints += buildSpeedPerPart * TimeManager.DeltaTime;
-                    if( kvp.Value.buildPoints >= kvp.Key.MaxBuildPoints )
+                    var dataEntry = kvp.Value;
+                    if( dataEntry.state != 1 )
                     {
-                        CompletedCount++;
-                        kvp.Value.buildPoints = kvp.Key.MaxBuildPoints;
-                        kvp.Value.gPart.GhostToOriginalPatch.Run( _refMap );
+                        dataEntry.buildPoints += buildSpeedPerPart * TimeManager.DeltaTime;
+                        if( dataEntry.buildPoints > kvp.Key.MaxBuildPoints )
+                        {
+                            dataEntry.buildPoints = kvp.Key.MaxBuildPoints;
+                            dataEntry.gPart.GhostToOriginalPatch.Run( _refMap );
+                            dataEntry.state = 1;
+                            CompletedCount++;
+                        }
                     }
                 }
             }
@@ -99,12 +110,17 @@ namespace KSS.GameplayScene
                 }
                 foreach( var kvp in _constructionData )
                 {
-                    kvp.Value.buildPoints -= buildSpeedPerPart * TimeManager.DeltaTime;
-                    if( kvp.Value.buildPoints <= 0 )
+                    var dataEntry = kvp.Value;
+                    if( dataEntry.state != -1 )
                     {
-                        CompletedCount++;
-                        kvp.Value.buildPoints = 0;
-                        kvp.Value.gPart.OriginalToGhostPatch.Run( _refMap );
+                        dataEntry.buildPoints -= buildSpeedPerPart * TimeManager.DeltaTime;
+                        if( dataEntry.buildPoints < 0.0f )
+                        {
+                            dataEntry.buildPoints = 0.0f;
+                            dataEntry.gPart.OriginalToGhostPatch.Run( _refMap );
+                            dataEntry.state = -1;
+                            CompletedCount++;
+                        }
                     }
                 }
             }
@@ -123,6 +139,7 @@ namespace KSS.GameplayScene
             foreach( var con in constructibles )
             {
                 GhostedPart gpart = GhostedPart.MakeGhostPatch( con, partMap, refStore );
+                gpart.OriginalToGhostPatch.Run( refStore );
                 ghostParts.Add( con, new DataEntry() { gPart = gpart, buildPoints = 0.0f } );
             }
 
@@ -144,10 +161,11 @@ namespace KSS.GameplayScene
                     Vector3.zero );
 
                 v.RootPart = ghostRoot;
+                parent = v.gameObject.transform;
             }
             else
             {
-                VesselHierarchyUtils.SetParent( ghostRoot, parent );
+                VesselHierarchyUtils.AttachLoose( ghostRoot, parent );
             }
 
             ConstructionSite cSite = parent.GetComponentInParent<ConstructionSite>();
@@ -155,11 +173,17 @@ namespace KSS.GameplayScene
             {
                 cSite = parent.gameObject.AddComponent<ConstructionSite>();
             }
+            foreach( var kvp in ghostParts )
+            {
+                cSite._constructionData.Add( kvp.Key, kvp.Value );
+            }
 
-            throw new NotImplementedException();
+            cSite._refMap = cSite._refMap == null
+                ? refMap
+                : BidirectionalReferenceStore.Combine( cSite._refMap, refMap );
 
             ghostRoot.transform.SetParent( parent );
-
+            return cSite;
         }
 
         public void PickupGhost( Transform ghostRoot )

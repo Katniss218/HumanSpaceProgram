@@ -11,6 +11,18 @@ namespace KSS.Core
 {
     public static class IPartObjectEx
     {
+        public static bool IsRootOfPartObject( this Transform part )
+        {
+            if( part.root != part.parent )
+                return false;
+
+            IPartObject v = part.parent.GetComponent<IPartObject>();
+            if( v == null )
+                return false;
+
+            return v.RootPart == part;
+        }
+
         /// <summary>
         /// Gets the <see cref="IPartObject"/> attached to this transform.
         /// </summary>
