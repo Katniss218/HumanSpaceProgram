@@ -149,7 +149,7 @@ namespace KSS.UI
                 throw new ArgumentOutOfRangeException( nameof( warpRates ), $"Every warp rate must be either positive, or zero (pause)." );
             }
 
-            UIPanel rootPanel = parent.AddPanel( UILayoutInfo.FillVertical( 2, 2, 0f, 150, 110 ), null );
+            UIPanel rootPanel = parent.AddPanel( layoutInfo, null );
 
             TimewarpSelectorUI timewarpSelectorUI = rootPanel.gameObject.AddComponent<TimewarpSelectorUI>();
             timewarpSelectorUI._root = rootPanel;

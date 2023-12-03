@@ -6,14 +6,14 @@ using UnityEngine;
 
 namespace KSS.GameplayScene
 {
+    /// <summary>
+    /// Manages the registered and active gameplay scene viewport tools.
+    /// </summary>
     public class GameplaySceneToolManager : SingletonMonoBehaviour<GameplaySceneToolManager>
     {
         private List<MonoBehaviour> _availableTools = new List<MonoBehaviour>();
         private MonoBehaviour _activeTool = null;
 
-        /// <summary>
-        /// This can return null if no tool is selected.
-        /// </summary>
         public static Type ActiveToolType { get => instance._activeTool.GetType(); }
 
         /// <summary>

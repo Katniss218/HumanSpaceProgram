@@ -10,16 +10,13 @@ using UnityEngine;
 namespace KSS.DesignScene
 {
     /// <summary>
-    /// Manages the available design scene viewport tools, and which is currently active.
+    /// Manages the registered and active design scene viewport tools.
     /// </summary>
     public class DesignSceneToolManager : SingletonMonoBehaviour<DesignSceneToolManager>
     {
         private List<MonoBehaviour> _availableTools = new List<MonoBehaviour>();
         private MonoBehaviour _activeTool = null;
 
-        /// <summary>
-        /// This can return null if no tool is selected.
-        /// </summary>
         public static Type ActiveToolType { get => instance._activeTool.GetType(); }
 
         /// <summary>

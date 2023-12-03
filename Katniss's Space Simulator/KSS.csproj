@@ -87,6 +87,9 @@
     <Compile Include="Assets\KSS\GameplayScene\GameplaySceneToolManager.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadTree_NodeUtils.cs" />
     <Compile Include="Assets\KSS\AssetLoaders\GameDataJsonVesselFactory.cs" />
+    <Compile Include="Assets\KSS\GameplayScene\Tools\ConstructTool.cs" />
+    <Compile Include="Assets\KSS\TranslationTransform.cs" />
+    <Compile Include="Assets\KSS\RotationTransform.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS\CelestialBodies\Surface\TerrainShader.shader" />

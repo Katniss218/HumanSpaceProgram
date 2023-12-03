@@ -139,7 +139,14 @@ namespace KSS.UI.SceneFactories
                 {
                 } );
 
-                TimewarpSelectorUI selector = TimewarpSelectorUI.Create( topPanel, UILayoutInfo.FillVertical( 0, 0, 0f, 150, 110 ), new float[] { 0, 1, 2, 4, 8, 16, 32, 64, 128, 256 } );
+                UIText utText = topPanel.AddText( new UILayoutInfo( Vector2.zero, new Vector2( 150, 0 ), new Vector2( 80, 30 ) ), "" )
+                    .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
+                    .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
+
+                UTReadoutUI ui2 = utText.gameObject.AddComponent<UTReadoutUI>();
+                ui2.Text = utText;
+
+                TimewarpSelectorUI selector = TimewarpSelectorUI.Create( topPanel, UILayoutInfo.FillVertical( 0, 0, 0f, 230, 110 ), new float[] { 0, 1, 2, 4, 8, 16, 32, 64, 128, 256 } );
             }
             else
             {
@@ -154,7 +161,14 @@ namespace KSS.UI.SceneFactories
                 {
                 } );
 
-                TimewarpSelectorUI selector = TimewarpSelectorUI.Create( topLeftPanel, UILayoutInfo.FillVertical( 0, 0, 0f, 150, 110 ), new float[] { 0, 1, 2, 4, 8, 16, 32, 64, 128, 256 } );
+                UIText utText = topLeftPanel.AddText( new UILayoutInfo( Vector2.zero, new Vector2( 150, 0 ), new Vector2( 80, 30 ) ), "" )
+                    .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
+                    .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
+
+                UTReadoutUI ui2 = utText.gameObject.AddComponent<UTReadoutUI>();
+                ui2.Text = utText;
+
+                TimewarpSelectorUI selector = TimewarpSelectorUI.Create( topLeftPanel, UILayoutInfo.FillVertical( 0, 0, 0f, 230, 110 ), new float[] { 0, 1, 2, 4, 8, 16, 32, 64, 128, 256 } );
 
                 UIPanel topRightPanel = _mainPanel.AddPanel( new UILayoutInfo( UILayoutInfo.TopRight, Vector2.zero, new Vector2( 70, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/top_panel_background" ) );
 
