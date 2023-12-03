@@ -1,6 +1,7 @@
 ﻿using KSS.Cameras;
 using KSS.Core;
 using KSS.Core.Components;
+using KSS.Core.Serialization;
 using KSS.UI.Windows;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,9 +49,15 @@ namespace KSS.UI
                     clickedPart = redirectComponent.Target.transform;
                 }
 
-                PartWindow.ExistsFor( clickedPart );
+                if( FPart.GetPart( clickedPart ) == null )
+                {
+                    return;
+                }
 
-                PartWindow window = PartWindow.Create( clickedPart );
+                if( !PartWindow.ExistsFor( clickedPart ) )
+                {
+                    PartWindow window = PartWindow.Create( clickedPart );
+                }
             }
         }
     }

@@ -50,6 +50,7 @@ namespace KSS.UI.SceneFactories
         public static void CreateUIActiveObjectNull()
         {
             CreateTopPanel();
+            CreateFPSPanel();
             CreateBottomPanelInactive();
 
             CreateToggleButtonList();
@@ -58,6 +59,7 @@ namespace KSS.UI.SceneFactories
         public static void CreateUIActiveObjectExists()
         {
             CreateTopPanel();
+            CreateFPSPanel();
 
             CreateToggleButtonList();
 
@@ -79,16 +81,6 @@ namespace KSS.UI.SceneFactories
 
             AltitudeReadoutUI ui3 = text.gameObject.AddComponent<AltitudeReadoutUI>();
             ui3.Text = text;
-
-
-            text = _mainPanel.AddPanel( new UILayoutInfo( Vector2.zero, new Vector2( 0, 50 ), new Vector2( 150, 25 ) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
-                .WithTint( Color.gray )
-                .AddText( UILayoutInfo.Fill(), "Warp Rate: <missing>" )
-                .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
-                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
-
-            TimewarpReadoutUI ui4 = text.gameObject.AddComponent<TimewarpReadoutUI>();
-            ui4.Text = text;
 
             UIPanel navball = _mainPanel.AddPanel( new UILayoutInfo( new Vector2( 0.5f, 0 ), Vector2.zero, new Vector2( 222, 202 ) ), null );
 
@@ -121,10 +113,8 @@ namespace KSS.UI.SceneFactories
             vel.Text = velText;
         }
 
-        private static void CreateTopPanel()
+        static void CreateFPSPanel()
         {
-            UIPanel topPanel = _mainPanel.AddPanel( UILayoutInfo.FillHorizontal( 0, 0, 1f, 0, 30 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/top_panel_background" ) );
-
             UIPanel fpsPanel = _mainPanel.AddPanel( new UILayoutInfo( UILayoutInfo.TopLeft, new Vector2( 5, -35 ), new Vector2( 80, 30 ) ), null );
             UIText fpsCounter = fpsPanel.AddText( UILayoutInfo.Fill(), "FPS: <missing>" )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Left )
@@ -132,58 +122,47 @@ namespace KSS.UI.SceneFactories
 
             FPSCounterUI ui5 = fpsCounter.gameObject.AddComponent<FPSCounterUI>();
             ui5.Text = fpsCounter;
+        }
 
+        private static void CreateTopPanel()
+        {
             if( ActiveObjectManager.ActiveObject == null )
             {
+                UIPanel topPanel = _mainPanel.AddPanel( UILayoutInfo.FillHorizontal( 0, 0, 1f, 0, 30 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/top_panel_background" ) );
 
+                UIPanel p1 = topPanel.AddPanel( UILayoutInfo.FillVertical( 0, 0, 0f, 20, 110 ), null );
+                UIButton newBtn = p1.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 0, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_new" ), null );
+                UIButton openBtn = p1.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 40, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_open" ), () =>
+                {
+                } );
+                UIButton saveBtn = p1.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 80, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_save" ), () =>
+                {
+                } );
+
+                TimewarpSelectorUI selector = TimewarpSelectorUI.Create( topPanel, UILayoutInfo.FillVertical( 0, 0, 0f, 150, 110 ), new float[] { 0, 1, 2, 4, 8, 16, 32, 64, 128, 256 } );
             }
             else
             {
-                UIPanel p4 = topPanel.AddPanel( UILayoutInfo.FillVertical( 0, 0, 1f, -20, 30 ), null );
+                UIPanel topLeftPanel = _mainPanel.AddPanel( new UILayoutInfo( UILayoutInfo.TopLeft, Vector2.zero, new Vector2( 400, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/top_panel_background" ) );
+
+                UIPanel p1 = topLeftPanel.AddPanel( UILayoutInfo.FillVertical( 0, 0, 0f, 20, 110 ), null );
+                UIButton newBtn = p1.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 0, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_new" ), null );
+                UIButton openBtn = p1.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 40, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_open" ), () =>
+                {
+                } );
+                UIButton saveBtn = p1.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 80, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_save" ), () =>
+                {
+                } );
+
+                TimewarpSelectorUI selector = TimewarpSelectorUI.Create( topLeftPanel, UILayoutInfo.FillVertical( 0, 0, 0f, 150, 110 ), new float[] { 0, 1, 2, 4, 8, 16, 32, 64, 128, 256 } );
+
+                UIPanel topRightPanel = _mainPanel.AddPanel( new UILayoutInfo( UILayoutInfo.TopRight, Vector2.zero, new Vector2( 70, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/top_panel_background" ) );
+
+                UIPanel p4 = topRightPanel.AddPanel( UILayoutInfo.FillVertical( 0, 0, 1f, -20, 30 ), null );
                 UIButton deselectActive = p4.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 0, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), () =>
                 {
                     ActiveObjectManager.ActiveObject = null;
                 } );
-            }
-
-            UIPanel p1 = topPanel.AddPanel( UILayoutInfo.FillVertical( 0, 0, 0f, 20, 110 ), null );
-            UIButton newBtn = p1.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 0, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_new" ), null );
-            UIButton openBtn = p1.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 40, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_open" ), () =>
-            {
-            } );
-            UIButton saveBtn = p1.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 80, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_save" ), () =>
-            {
-            } );
-
-            {
-                UIPanel p2 = topPanel.AddPanel( UILayoutInfo.FillVertical( 0, 0, 0f, 150, 110 ), null );
-                p2.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 0, 0 ), new Vector2( 20, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/timewarp_pause" ), () =>
-                {
-                    TimeManager.Pause();
-                } );
-                for( int i = 0; i < 7; i++ )
-                {
-                    p2.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 0, 0 ), new Vector2( 20, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/timewarp_forward" ), () =>
-                    {
-                        if( TimeManager.IsPaused )
-                        {
-                            TimeManager.SetTimeScale( 1f );
-                            return;
-                        }
-                        float newscale = (int)Math.Pow( 2, i );
-
-                        if( newscale > TimeManager.GetMaxTimescale() )
-                            return;
-                        TimeManager.SetTimeScale( newscale );
-                    } );
-                }
-                p2.LayoutDriver = new HorizontalLayoutDriver()
-                {
-                    Dir = HorizontalLayoutDriver.Direction.LeftToRight,
-                    Spacing = 0f,
-                    FitToSize = true
-                };
-                UILayout.BroadcastLayoutUpdate( p2 );
             }
         }
 

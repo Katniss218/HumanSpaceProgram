@@ -24,7 +24,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 200}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 5253
+  controlID: 13644
 --- !u!114 &2
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -150,7 +150,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 200}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 1
-  controlID: 5254
+  controlID: 13645
 --- !u!114 &4
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -175,7 +175,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 100}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 5255
+  controlID: 13646
 --- !u!114 &5
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -235,7 +235,7 @@ MonoBehaviour:
       scrollPos: {x: 0, y: 0}
       m_SelectedIDs: 70480000
       m_LastClickedID: 18544
-      m_ExpandedIDs: cedafeff90ddfeffc0fbfeff82fefeff9c27ffff5e2affff1a4affff824affff444dffff08fbffffec5300003655000078560000a4570000
+      m_ExpandedIDs: 5093fdffcedafeff90ddfeffc0fbfeff82fefeff9c27ffff5e2affff1a4affff824affff444dffff08fbffffec5300003655000078560000a4570000
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -1846,7 +1846,7 @@ MonoBehaviour:
   m_ListAreaState:
     m_SelectedInstanceIDs: 70480000
     m_LastClickedInstanceID: 18544
-    m_HadKeyboardFocusLastEvent: 1
+    m_HadKeyboardFocusLastEvent: 0
     m_ExpandedInstanceIDs: c6230000ea5b000076630000000000000c5c0000668b0000204c0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -1871,7 +1871,7 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
     m_NewAssetIndexInList: -1
-    m_ScrollPosition: {x: 0, y: 105}
+    m_ScrollPosition: {x: 0, y: 198}
     m_GridSize: 64
   m_SkipHiddenPackages: 0
   m_DirectoriesAreaWidth: 407
@@ -1922,8 +1922,8 @@ MonoBehaviour:
     y: 0
     width: 486
     height: 947
-  m_MinSize: {x: 276, y: 71}
-  m_MaxSize: {x: 4001, y: 4021}
+  m_MinSize: {x: 275, y: 50}
+  m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 14}
   m_Panes:
   - {fileID: 14}

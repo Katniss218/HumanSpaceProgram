@@ -21,6 +21,11 @@ namespace UnityPlus.UILib
         public static Vector2 Top = new Vector2( 0.5f, 1.0f );
         public static Vector2 Bottom = new Vector2( 0.5f, 0.0f );
 
+        public static float LeftF = 0.0f;
+        public static float RightF = 1.0f;
+        public static float TopF = 1.0f;
+        public static float BottomF = 0.0f;
+
         public Vector2 anchorMin;
         public Vector2 anchorMax;
         public Vector2 pivot;

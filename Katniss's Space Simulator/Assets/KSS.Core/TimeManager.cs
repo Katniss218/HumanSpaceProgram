@@ -64,9 +64,9 @@ namespace KSS.Core
         public static bool LockTimescale { get; set; } = false;
 
         /// <summary>
-        /// Invoked when the current time scale is changed successfully (including when <see cref="TimeScaleChangedData.Old"/> and <see cref="TimeScaleChangedData.New"/> are the same).
+        /// Invoked after the current time scale is changed successfully (including when <see cref="TimeScaleChangedData.Old"/> and <see cref="TimeScaleChangedData.New"/> are the same).
         /// </summary>
-        public static event Action<TimeScaleChangedData> OnTimescaleChanged;
+        public static event Action<TimeScaleChangedData> OnAfterTimescaleChanged;
 
         static float _maxTimeScale = 128.0f;
 
@@ -133,7 +133,7 @@ namespace KSS.Core
             _oldTimeScale = _timeScale;
             _timeScale = timeScale;
             UnityEngine.Time.timeScale = timeScale;
-            OnTimescaleChanged?.Invoke( new TimeScaleChangedData() { Old = _oldTimeScale, New = timeScale } );
+            OnAfterTimescaleChanged?.Invoke( new TimeScaleChangedData() { Old = _oldTimeScale, New = timeScale } );
         }
 
         /// <summary>
