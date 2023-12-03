@@ -33,7 +33,7 @@ namespace KSS.UI.SceneFactories
             CreatePartList( canvas );
             CreateTopPanel( canvas );
             CreateToolSelector( canvas );
-            CreateWindowToggleList( canvas );
+            CreateToggleButtonList( canvas );
         }
 
         const float PART_LIST_WIDTH = 285f;
@@ -151,21 +151,21 @@ namespace KSS.UI.SceneFactories
             }
         }
 
-        private static void CreateWindowToggleList( UICanvas canvas )
+        private static void CreateToggleButtonList( UICanvas canvas )
         {
-            UIPanel uiPanel = canvas.AddPanel( new UILayoutInfo( new Vector2( 1, 0 ), Vector2.zero, new Vector2( 100, 30 ) ), null );
-            uiPanel.LayoutDriver = new HorizontalLayoutDriver()
+            UIPanel buttonListPanel = canvas.AddPanel( new UILayoutInfo( new Vector2( 1, 0 ), Vector2.zero, new Vector2( 100, 30 ) ), null );
+            buttonListPanel.LayoutDriver = new HorizontalLayoutDriver()
             {
                 Dir = HorizontalLayoutDriver.Direction.RightToLeft,
                 Spacing = 2f,
                 FitToSize = true
             };
 
-            UIButton deltaVAnalysisWindow = uiPanel.AddButton( new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
-            UIButton controlSetupWindow = uiPanel.AddButton( new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
-            UIButton button3 = uiPanel.AddButton( new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
+            UIButton deltaVAnalysisWindow = buttonListPanel.AddButton( new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
+            UIButton controlSetupWindow = buttonListPanel.AddButton( new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
+            UIButton button3 = buttonListPanel.AddButton( new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
 
-            UILayout.BroadcastLayoutUpdate( uiPanel );
+            UILayout.BroadcastLayoutUpdate( buttonListPanel );
         }
     }
 }

@@ -19,7 +19,7 @@ MonoBehaviour:
     width: 1920
     height: 997
   m_ShowMode: 4
-  m_Title: Hierarchy
+  m_Title: Console
   m_RootView: {fileID: 2}
   m_MinSize: {x: 875, y: 300}
   m_MaxSize: {x: 10000, y: 10000}
@@ -119,7 +119,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 200}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 98
+  controlID: 86
 --- !u!114 &6
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -215,8 +215,8 @@ MonoBehaviour:
     y: 0
     width: 1124
     height: 591
-  m_MinSize: {x: 202, y: 221}
-  m_MaxSize: {x: 4002, y: 4021}
+  m_MinSize: {x: 200, y: 200}
+  m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 14}
   m_Panes:
   - {fileID: 14}
@@ -411,9 +411,9 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 36effbff
-      m_LastClickedID: -266442
-      m_ExpandedIDs: 36effbff7ef0fbff5211fcff9a12fcffd833fcff2035fcff9455fcffdc56fcffe076fcff2878fcffd29afcff1a9cfcff80e3fcffc8e4fcff1460fdff5c61fdff28acfdff40adfdffd607feff1e09feffa833feffba33fefff034feff0a5bfeff525cfeffe27dfeff2a7ffeff34a2feff50a2feff98a3feff1ac5feff62c6fefff8f2feff14f3feff5cf4feff5444ffff7244ffff8a45ffff8067ffffc0d4ffff2cd5fffff0f7ffff06fbffff
+      m_SelectedIDs: 
+      m_LastClickedID: 0
+      m_ExpandedIDs: 0c4affff544bffff1e92ffff08d5ffff94f6ffffdcf7ffff08fbffff
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -1899,22 +1899,22 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/___Scenes
+    - Assets/KSS/GameplayScene
     m_Globs: []
     m_OriginalText: 
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/___Scenes
+  - Assets/KSS/GameplayScene
   m_LastFoldersGridSize: -1
   m_LastProjectPath: E:\GIT\KatnisssSpaceSimulator\Katniss's Space Simulator
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: cc4b0000
-    m_LastClickedID: 19404
-    m_ExpandedIDs: 00000000844b0000864b0000884b00008a4b00008c4b00008e4b0000904b0000924b0000944b0000964b0000984b00009a4b00009c4b00009e4b0000a04b0000a24b0000a44b0000a64b0000a84b0000aa4b0000ac4b0000ae4b0000b04b0000b24b0000b44b0000b64b000000ca9a3b
+    scrollPos: {x: 0, y: 240}
+    m_SelectedIDs: f84b0000
+    m_LastClickedID: 19448
+    m_ExpandedIDs: 00000000844b0000864b0000884b00008a4b00008c4b00008e4b0000904b0000924b0000944b0000964b0000984b00009a4b00009c4b00009e4b0000a04b0000a24b0000a44b0000a64b0000a84b0000ac4b0000ae4b0000b04b0000b24b0000b64b000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1967,8 +1967,8 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: 
-    m_LastClickedInstanceID: 0
+    m_SelectedInstanceIDs: f84b0000
+    m_LastClickedInstanceID: 19448
     m_HadKeyboardFocusLastEvent: 1
     m_ExpandedInstanceIDs: c6230000ea5b000076630000000000000c5c0000668b0000204c0000
     m_RenameOverlay:

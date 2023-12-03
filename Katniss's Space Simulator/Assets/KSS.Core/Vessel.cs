@@ -62,6 +62,10 @@ namespace KSS.Core
 
         [field: SerializeField]
         int PartCount { get; set; } = 0;
+
+        // parts with xyz could be modified to be an array, and that array has its callbacks.
+        // on separation, parts are recalced fully, but when a part itself changes, that part updates the vessel via the delegate.
+
         [SerializeField]
         IHasMass[] _partsWithMass;
 
@@ -204,7 +208,7 @@ namespace KSS.Core
 
         void FixedUpdate()
         {
-            SetPhysicsObjectParameters();
+            SetPhysicsObjectParameters(); // this full recalc every frame should be replaced by update-based approach.
 
             Vector3Dbl airfGravityForce = GravityUtils.GetNBodyGravityForce( this.AIRFPosition, PhysicsObject.Mass );
 

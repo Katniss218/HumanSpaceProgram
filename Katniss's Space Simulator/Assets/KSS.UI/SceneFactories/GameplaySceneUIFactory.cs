@@ -52,26 +52,16 @@ namespace KSS.UI.SceneFactories
             CreateTopPanel();
             CreateBottomPanelInactive();
 
-            CreateWindowToggleList();
+            CreateToggleButtonList();
         }
 
         public static void CreateUIActiveObjectExists()
         {
             CreateTopPanel();
 
-            CreateWindowToggleList();
+            CreateToggleButtonList();
 
-            UIText text = _mainPanel.AddPanel( new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 150, 25 ) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
-                .WithTint( Color.gray )
-                .AddText( UILayoutInfo.Fill(), "Velocity: <missing>" )
-                .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
-                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
-
-            VelocityReadoutUI ui = text.gameObject.AddComponent<VelocityReadoutUI>();
-            ui.Text = text;
-
-
-            text = _mainPanel.AddPanel( new UILayoutInfo( Vector2.zero, new Vector2( 0, 25 ), new Vector2( 150, 25 ) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
+            var text = _mainPanel.AddPanel( new UILayoutInfo( Vector2.zero, new Vector2( 0, 0 ), new Vector2( 150, 25 ) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
                 .WithTint( Color.gray )
                 .AddText( UILayoutInfo.Fill(), "Acceleration: <missing>" )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
@@ -81,7 +71,7 @@ namespace KSS.UI.SceneFactories
             ui2.Text = text;
 
 
-            text = _mainPanel.AddPanel( new UILayoutInfo( Vector2.zero, new Vector2( 0, 50 ), new Vector2( 150, 25 ) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
+            text = _mainPanel.AddPanel( new UILayoutInfo( Vector2.zero, new Vector2( 0, 25 ), new Vector2( 150, 25 ) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
                 .WithTint( Color.gray )
                 .AddText( UILayoutInfo.Fill(), "Altitude: <missing>" )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
@@ -91,7 +81,7 @@ namespace KSS.UI.SceneFactories
             ui3.Text = text;
 
 
-            text = _mainPanel.AddPanel( new UILayoutInfo( Vector2.zero, new Vector2( 0, 75 ), new Vector2( 150, 25 ) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
+            text = _mainPanel.AddPanel( new UILayoutInfo( Vector2.zero, new Vector2( 0, 50 ), new Vector2( 150, 25 ) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
                 .WithTint( Color.gray )
                 .AddText( UILayoutInfo.Fill(), "Warp Rate: <missing>" )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
@@ -99,17 +89,6 @@ namespace KSS.UI.SceneFactories
 
             TimewarpReadoutUI ui4 = text.gameObject.AddComponent<TimewarpReadoutUI>();
             ui4.Text = text;
-
-
-            text = _mainPanel.AddPanel( new UILayoutInfo( Vector2.up, new Vector2( 0, 0 ), new Vector2( 150, 25 ) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
-                .WithTint( Color.gray )
-                .AddText( UILayoutInfo.Fill(), "FPS: <missing>" )
-                .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
-                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
-
-            FPSCounterUI ui5 = text.gameObject.AddComponent<FPSCounterUI>();
-            ui5.Text = text;
-
 
             UIPanel navball = _mainPanel.AddPanel( new UILayoutInfo( new Vector2( 0.5f, 0 ), Vector2.zero, new Vector2( 222, 202 ) ), null );
 
@@ -145,6 +124,15 @@ namespace KSS.UI.SceneFactories
         private static void CreateTopPanel()
         {
             UIPanel topPanel = _mainPanel.AddPanel( UILayoutInfo.FillHorizontal( 0, 0, 1f, 0, 30 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/top_panel_background" ) );
+
+            UIPanel fpsPanel = _mainPanel.AddPanel( new UILayoutInfo( UILayoutInfo.TopLeft, new Vector2( 5, -35 ), new Vector2( 80, 30 ) ), null );
+            UIText fpsCounter = fpsPanel.AddText( UILayoutInfo.Fill(), "FPS: <missing>" )
+                .WithAlignment( TMPro.HorizontalAlignmentOptions.Left )
+                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
+
+            FPSCounterUI ui5 = fpsCounter.gameObject.AddComponent<FPSCounterUI>();
+            ui5.Text = fpsCounter;
+
             if( ActiveObjectManager.ActiveObject == null )
             {
 
@@ -156,6 +144,46 @@ namespace KSS.UI.SceneFactories
                 {
                     ActiveObjectManager.ActiveObject = null;
                 } );
+            }
+
+            UIPanel p1 = topPanel.AddPanel( UILayoutInfo.FillVertical( 0, 0, 0f, 20, 110 ), null );
+            UIButton newBtn = p1.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 0, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_new" ), null );
+            UIButton openBtn = p1.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 40, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_open" ), () =>
+            {
+            } );
+            UIButton saveBtn = p1.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 80, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_save" ), () =>
+            {
+            } );
+
+            {
+                UIPanel p2 = topPanel.AddPanel( UILayoutInfo.FillVertical( 0, 0, 0f, 150, 110 ), null );
+                p2.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 0, 0 ), new Vector2( 20, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/timewarp_pause" ), () =>
+                {
+                    TimeManager.Pause();
+                } );
+                for( int i = 0; i < 7; i++ )
+                {
+                    p2.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 0, 0 ), new Vector2( 20, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/timewarp_forward" ), () =>
+                    {
+                        if( TimeManager.IsPaused )
+                        {
+                            TimeManager.SetTimeScale( 1f );
+                            return;
+                        }
+                        float newscale = (int)Math.Pow( 2, i );
+
+                        if( newscale > TimeManager.GetMaxTimescale() )
+                            return;
+                        TimeManager.SetTimeScale( newscale );
+                    } );
+                }
+                p2.LayoutDriver = new HorizontalLayoutDriver()
+                {
+                    Dir = HorizontalLayoutDriver.Direction.LeftToRight,
+                    Spacing = 0f,
+                    FitToSize = true
+                };
+                UILayout.BroadcastLayoutUpdate( p2 );
             }
         }
 
@@ -181,21 +209,21 @@ namespace KSS.UI.SceneFactories
                 .WithText( UILayoutInfo.Fill(), "D", out _ );
         }
 
-        private static void CreateWindowToggleList()
+        private static void CreateToggleButtonList()
         {
-            UIPanel uiPanel = _mainPanel.AddPanel( new UILayoutInfo( new Vector2( 1, 0 ), Vector2.zero, new Vector2( 100, 30 ) ), null );
-            uiPanel.LayoutDriver = new HorizontalLayoutDriver()
+            UIPanel buttonListPanel = _mainPanel.AddPanel( new UILayoutInfo( new Vector2( 1, 0 ), Vector2.zero, new Vector2( 100, 30 ) ), null );
+            buttonListPanel.LayoutDriver = new HorizontalLayoutDriver()
             {
                 Dir = HorizontalLayoutDriver.Direction.RightToLeft,
                 Spacing = 2f,
                 FitToSize = true
             };
 
-            UIButton deltaVAnalysisWindow = uiPanel.AddButton( new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
-            UIButton controlSetupWindow = uiPanel.AddButton( new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
-            UIButton button3 = uiPanel.AddButton( new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
+            UIButton deltaVAnalysisWindow = buttonListPanel.AddButton( new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
+            UIButton controlSetupWindow = buttonListPanel.AddButton( new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
+            UIButton button3 = buttonListPanel.AddButton( new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
 
-            UILayout.BroadcastLayoutUpdate( uiPanel );
+            UILayout.BroadcastLayoutUpdate( buttonListPanel );
         }
     }
 }
