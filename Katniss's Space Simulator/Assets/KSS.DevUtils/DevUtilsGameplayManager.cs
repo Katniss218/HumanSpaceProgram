@@ -110,6 +110,16 @@ namespace KSS.DevUtils
 
         private void Update()
         {
+            if( Input.GetKeyDown( KeyCode.Y ))
+            {
+                TranslationTransformHandle.Create3Handles( new GameObject().transform, GameplayCameraController.MainCamera, vessel.RootPart, Quaternion.identity );
+            }
+            
+            if( Input.GetKeyDown( KeyCode.U ))
+            {
+                RotationTransformHandle.Create3Handles( new GameObject().transform, GameplayCameraController.MainCamera, vessel.RootPart, Quaternion.identity );
+            }
+
             if( Input.GetKeyDown( KeyCode.F4 ) )
             {
                 JsonSeparateFileSerializedDataHandler _designObjDataHandler = new JsonSeparateFileSerializedDataHandler();

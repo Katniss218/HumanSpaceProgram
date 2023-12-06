@@ -62,6 +62,7 @@
     <Compile Include="Assets\KSS.UI\CanvasName.cs" />
     <Compile Include="Assets\KSS.UI\Windows\ConfirmationWindow_Ex.cs" />
     <Compile Include="Assets\KSS.UI\SceneFactories\GameplaySceneUIFactory.cs" />
+    <Compile Include="Assets\KSS.UI\TimewarpSelectorUI.cs" />
     <Compile Include="Assets\KSS.UI\VesselHUD.cs" />
     <Compile Include="Assets\KSS.UI\IResourceContainerUI.cs" />
     <Compile Include="Assets\KSS.UI\PartListEntryUI.cs" />
@@ -73,15 +74,14 @@
     <Compile Include="Assets\KSS.UI\GameplayClickInteractionManager.cs" />
     <Compile Include="Assets\KSS.UI\TimelineMetadataUI.cs" />
     <Compile Include="Assets\KSS.UI\VelocityReadoutUI.cs" />
+    <Compile Include="Assets\KSS.UI\UTReadoutUI.cs" />
     <Compile Include="Assets\KSS.UI\Windows\SaveWindow.cs" />
+    <Compile Include="Assets\KSS.UI\ElapsedUTReadoutUI.cs" />
     <Compile Include="Assets\KSS.UI\Windows\StartNewGameWindow.cs" />
     <Compile Include="Assets\KSS.UI\Windows\PartWindow.cs" />
     <Compile Include="Assets\KSS.UI\AccelerationReadoutUI.cs" />
     <Compile Include="Assets\KSS.UI\SceneFactories\DesignSceneUIFactory.cs" />
     <Compile Include="Assets\KSS.UI\FPSCounterUI.cs" />
-    <Compile Include="Assets\KSS.UI\TimewarpSelectorUI.cs" />
-    <Compile Include="Assets\KSS.UI\UTReadoutUI.cs" />
-    <Compile Include="Assets\KSS.UI\ElapsedUTReadoutUI.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.UI\___KSS.UI.asmdef" />
