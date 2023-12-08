@@ -67,7 +67,7 @@ namespace KSS.DevUtils
             AssetRegistry.Register( "substance.f", new Substance() { Density = 1000, DisplayName = "Fuel", UIColor = new Color( 1.0f, 0.3764706f, 0.2509804f ) } );
             AssetRegistry.Register( "substance.ox", new Substance() { Density = 1000, DisplayName = "Oxidizer", UIColor = new Color( 0.2509804f, 0.5607843f, 1.0f ) } );
         }
-        
+
         [HSPEventListener( HSPEvent.TIMELINE_AFTER_NEW, "devutils.timeline.new.after" )]
         static void OnAfterCreateDefault( object e )
         {
@@ -110,15 +110,31 @@ namespace KSS.DevUtils
 
         private void Update()
         {
-            if( Input.GetKeyDown( KeyCode.Y ))
+            if( Input.GetKeyDown( KeyCode.Y ) )
             {
-                GameObject go = new GameObject();
-                go.AddComponent<TransformHandleParent>();
-                TranslationTransformHandle.Create3Handles( go.transform, GameplayCameraController.MainCamera, vessel.RootPart, Quaternion.identity );
+                TransformHandleParent.Create3Handles<TranslationTransformHandle>( Vector3.zero, Quaternion.identity, vessel.RootPart, GameplayCameraController.MainCamera,
+                    AssetRegistry.Get<Mesh>( $"builtin::Resources/translate_handle_1d" ),
+                    AssetRegistry.Get<Material>( $"builtin::Resources/Materials/axis" ),
+                    go =>
+                    {
+                        CapsuleCollider c = go.AddComponent<CapsuleCollider>();
+                        c.radius = 0.375f;
+                        c.height = 2.75f;
+                        c.direction = 2;
+                        c.center = new Vector3( 0, 0, 1.375f );
+                    } );
             }
-            
-            if( Input.GetKeyDown( KeyCode.U ))
+
+            if( Input.GetKeyDown( KeyCode.U ) )
             {
+                TransformHandleParent.Create3Handles<TranslationTransformHandle>( Vector3.zero, Quaternion.identity, vessel.RootPart, GameplayCameraController.MainCamera,
+                       AssetRegistry.Get<Mesh>( $"builtin::Resources/rotate_handle_1d" ),
+                       AssetRegistry.Get<Material>( $"builtin::Resources/Materials/axis" ),
+                       go =>
+                       {
+                           BoxCollider c = go.AddComponent<BoxCollider>();
+                           c.size = new Vector3( 3f, 3f, 0.1f );
+                       } );
                 GameObject go = new GameObject();
                 go.AddComponent<TransformHandleParent>();
                 RotationTransformHandle.Create3Handles( go.transform, GameplayCameraController.MainCamera, vessel.RootPart, Quaternion.identity );
