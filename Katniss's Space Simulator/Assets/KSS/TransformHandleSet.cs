@@ -11,13 +11,31 @@ namespace KSS
     /// Controls an entire set of transform handles.
     /// </summary>
     [DisallowMultipleComponent]
-    public class TransformHandleParent : MonoBehaviour
+    public class TransformHandleSet : MonoBehaviour
     {
-        [field: SerializeField]
-        public Transform Target { get; private set; }
+        [SerializeField] Transform _target;
+        public Transform Target
+        {
+            get => _target;
+            set
+            {
+                _target = value;
+                foreach( var h in _handles )
+                    h.Target = value;
+            }
+        }
 
-        [field: SerializeField]
-        public Camera Camera { get; set; }
+        [SerializeField] Camera _camera;
+        public Camera Camera
+        {
+            get => _camera;
+            set
+            {
+                _camera = value;
+                foreach( var h in _handles )
+                    h.RaycastCamera = value;
+            }
+        }
 
         private List<TransformHandle> _handles = new List<TransformHandle>();
 
@@ -37,7 +55,7 @@ namespace KSS
         {
             GameObject go = new GameObject();
             go.transform.SetPositionAndRotation( position, rotation );
-            TransformHandleParent comp = go.AddComponent<TransformHandleParent>();
+            TransformHandleSet comp = go.AddComponent<TransformHandleSet>();
             comp.Target = target;
             comp.Camera = camera;
 

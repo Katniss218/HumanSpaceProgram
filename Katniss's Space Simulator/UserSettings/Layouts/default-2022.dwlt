@@ -119,7 +119,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 200}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 110
+  controlID: 39
 --- !u!114 &6
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -206,7 +206,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 1
   m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: GameView
+  m_Name: SceneView
   m_EditorClassIdentifier: 
   m_Children: []
   m_Position:
@@ -217,13 +217,13 @@ MonoBehaviour:
     height: 591
   m_MinSize: {x: 202, y: 221}
   m_MaxSize: {x: 4002, y: 4021}
-  m_ActualView: {fileID: 15}
+  m_ActualView: {fileID: 14}
   m_Panes:
   - {fileID: 14}
   - {fileID: 15}
   - {fileID: 16}
-  m_Selected: 1
-  m_LastSelected: 0
+  m_Selected: 0
+  m_LastSelected: 1
 --- !u!114 &10
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -234,7 +234,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 1
   m_Script: {fileID: 12006, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: ProjectBrowser
+  m_Name: ConsoleWindow
   m_EditorClassIdentifier: 
   m_Children: []
   m_Position:
@@ -243,14 +243,14 @@ MonoBehaviour:
     y: 591
     width: 1434
     height: 356
-  m_MinSize: {x: 231, y: 271}
-  m_MaxSize: {x: 10001, y: 10021}
-  m_ActualView: {fileID: 12}
+  m_MinSize: {x: 101, y: 121}
+  m_MaxSize: {x: 4001, y: 4021}
+  m_ActualView: {fileID: 17}
   m_Panes:
   - {fileID: 12}
   - {fileID: 17}
-  m_Selected: 0
-  m_LastSelected: 1
+  m_Selected: 1
+  m_LastSelected: 0
 --- !u!114 &11
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -320,21 +320,21 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/___Scenes
+    - Assets/KSS.DevUtils
     m_Globs: []
     m_OriginalText: 
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/___Scenes
+  - Assets/KSS.DevUtils
   m_LastFoldersGridSize: -1
   m_LastProjectPath: E:\GIT\KatnisssSpaceSimulator\Katniss's Space Simulator
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 064c0000
-    m_LastClickedID: 19462
+    scrollPos: {x: 0, y: 277}
+    m_SelectedIDs: 384c0000
+    m_LastClickedID: 19512
     m_ExpandedIDs: 00000000ba4b0000bc4b0000be4b0000c04b0000c24b0000c44b0000c64b0000c84b0000ca4b0000cc4b0000ce4b0000d04b0000d24b0000d44b0000d64b0000d84b0000da4b0000dc4b0000de4b0000e04b0000e24b0000e44b0000e64b0000e84b000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -390,7 +390,7 @@ MonoBehaviour:
   m_ListAreaState:
     m_SelectedInstanceIDs: 
     m_LastClickedInstanceID: 0
-    m_HadKeyboardFocusLastEvent: 0
+    m_HadKeyboardFocusLastEvent: 1
     m_ExpandedInstanceIDs: c6230000ea5b000076630000000000000c5c0000668b0000204c0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -452,7 +452,7 @@ MonoBehaviour:
       scrollPos: {x: 0, y: 0}
       m_SelectedIDs: 
       m_LastClickedID: 0
-      m_ExpandedIDs: 08fbffff
+      m_ExpandedIDs: 8e3efeff1442feffd096feff6c3fffffe661ffff08fbffff
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -784,7 +784,7 @@ MonoBehaviour:
   m_Rotation:
     m_Target: {x: 0.029234894, y: -0.80843526, z: 0.04030155, w: 0.5864833}
     speed: 2
-    m_Value: {x: -0.029234761, y: 0.8084316, z: -0.040301364, w: -0.5864806}
+    m_Value: {x: 0.029234761, y: -0.8084316, z: 0.040301368, w: 0.5864806}
   m_Size:
     m_Target: 4.3919754
     speed: 2
@@ -881,7 +881,7 @@ MonoBehaviour:
     m_HSlider: 0
     m_VSlider: 0
     m_IgnoreScrollWheelUntilClicked: 0
-    m_EnableMouseInput: 1
+    m_EnableMouseInput: 0
     m_EnableSliderZoomHorizontal: 0
     m_EnableSliderZoomVertical: 0
     m_UniformScale: 1
@@ -2087,16 +2087,16 @@ MonoBehaviour:
     m_Tooltip: 
   m_Pos:
     serializedVersion: 2
-    x: 1430
+    x: 1434
     y: 73
-    width: 489
+    width: 485
     height: 926
   m_ViewDataDictionary: {fileID: 0}
   m_OverlayCanvas:
     m_LastAppliedPresetName: Default
     m_SaveData: []
   m_Spl:
-    ID: 160
+    ID: 1268
     splitterInitialOffset: 0
     currentActiveSplitter: -1
     realSizes:
@@ -2290,11 +2290,11 @@ MonoBehaviour:
     m_Window: {fileID: 19}
     m_NewResultList:
     - id: 1000
-      uniqueId: '[Katniss''s Space Simulator][suite]'
-      name: Katniss's Space Simulator
-      fullName: Katniss's Space Simulator
-      resultStatus: 1
-      duration: 0.0998598
+      uniqueId: '[HumanSpaceProgram][suite]'
+      name: HumanSpaceProgram
+      fullName: HumanSpaceProgram
+      resultStatus: 0
+      duration: 0
       messages: 
       output: 
       stacktrace: 
@@ -2511,7 +2511,7 @@ MonoBehaviour:
       scrollPos: {x: 0, y: 0}
       m_SelectedIDs: 37d9d6db
       m_LastClickedID: -606676681
-      m_ExpandedIDs: 129ae69a0cd3249d6e0ce4a4e743d7a90ef5a0ae990804b6067943d42c391b0f9815a125989a6734aab8a93a07892d48d052df4c78e61357f9bc9161252f2765a842747143252379ffffff7f
+      m_ExpandedIDs: 129ae69a0cd3249d6e0ce4a4e743d7a90ef5a0ae990804b6ad405cc5067943d42c391b0f9815a125989a6734aab8a93a07892d48d052df4c78e61357f9bc9161252f2765a842747143252379ffffff7f
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 

@@ -20,7 +20,7 @@ namespace KSS
 
         Mode _mode;
 
-        Vector3 _lastTranslation;
+        Vector3 _lastCursorPos;
 
         protected override void StartTransformation()
         {
@@ -29,7 +29,7 @@ namespace KSS
             _startLocalToWorld = Matrix4x4.TRS( this.transform.position, this.transform.rotation, Vector3.one ); // Calculate ourselves, otherwise the scale of the handle would mess it up.
             _startWorldToLocal = _startLocalToWorld.inverse;
 
-            _lastTranslation = ProjectCursor( RaycastCamera, _mode );
+            _lastCursorPos = ProjectCursor( RaycastCamera, _mode );
             _isHeld = true;
         }
 
@@ -39,11 +39,11 @@ namespace KSS
 
             // If the handle is moved to a nan, abort that axis.
             if( float.IsNaN( cursorHitPoint.x ) )
-                cursorHitPoint.x = _lastTranslation.x;
+                cursorHitPoint.x = _lastCursorPos.x;
             if( float.IsNaN( cursorHitPoint.y ) )
-                cursorHitPoint.y = _lastTranslation.y;
+                cursorHitPoint.y = _lastCursorPos.y;
             if( float.IsNaN( cursorHitPoint.z ) )
-                cursorHitPoint.z = _lastTranslation.z;
+                cursorHitPoint.z = _lastCursorPos.z;
 
             if( Input.GetKey( KeyCode.LeftShift ) )
             {
@@ -63,12 +63,12 @@ namespace KSS
                     throw new InvalidOperationException( $"Unknown mode '{_mode}'." );
             }
 
-            Vector3 currentFrameDelta = cursorHitPoint - _lastTranslation;
+            Vector3 currentFrameDelta = cursorHitPoint - _lastCursorPos;
             currentFrameDelta = _startLocalToWorld * currentFrameDelta;
 
             Target.transform.position += currentFrameDelta;
 
-            _lastTranslation = cursorHitPoint;
+            _lastCursorPos = cursorHitPoint;
             OnAfterTranslate?.Invoke( currentFrameDelta );
         }
 
@@ -76,79 +76,6 @@ namespace KSS
         {
             ContinueTransformation(); // Makes sure the final position is correct.
             _isHeld = false;
-        }
-
-        public static void DestroyHandles( Transform parent )
-        {
-            foreach( Transform child in parent )
-            {
-                Destroy( child );
-            }
-        }
-
-        public static void Create3Handles( Transform parent, Camera camera, Transform target, Quaternion orientation )
-        {
-            parent.rotation = orientation;
-
-            GameObject goX = new GameObject( "X" );
-            goX.transform.SetParent( parent );
-            goX.transform.localRotation = Quaternion.Euler( 0, 90, 0 );
-
-            CapsuleCollider c = goX.AddComponent<CapsuleCollider>();
-            c.radius = 0.375f;
-            c.height = 2.75f;
-            c.direction = 2;
-            c.center = new Vector3( 0, 0, 1.375f );
-
-            MeshFilter mf = goX.AddComponent<MeshFilter>();
-            mf.sharedMesh = AssetRegistry.Get<Mesh>( $"builtin::Resources/translate_handle_1d" );
-
-            MeshRenderer mr = goX.AddComponent<MeshRenderer>();
-            mr.sharedMaterial = AssetRegistry.Get<Material>( $"builtin::Resources/Materials/axis_x" );
-
-            TranslationTransformHandle tt = goX.AddComponent<TranslationTransformHandle>();
-            tt.Target = target;
-            tt.RaycastCamera = camera;
-
-            GameObject goY = new GameObject( "Y" );
-            goY.transform.SetParent( parent );
-            goY.transform.localRotation = Quaternion.Euler( -90, 0, 0 );
-
-            c = goY.AddComponent<CapsuleCollider>();
-            c.radius = 0.375f;
-            c.height = 2.75f;
-            c.direction = 2;
-            c.center = new Vector3( 0, 0, 1.375f );
-
-            mf = goY.AddComponent<MeshFilter>();
-            mf.sharedMesh = AssetRegistry.Get<Mesh>( $"builtin::Resources/translate_handle_1d" );
-
-            mr = goY.AddComponent<MeshRenderer>();
-            mr.sharedMaterial = AssetRegistry.Get<Material>( $"builtin::Resources/Materials/axis_y" );
-
-            tt = goY.AddComponent<TranslationTransformHandle>();
-            tt.Target = target;
-            tt.RaycastCamera = camera;
-
-            GameObject goZ = new GameObject( "Z" );
-            goZ.transform.SetParent( parent );
-            goZ.transform.localRotation = Quaternion.Euler( 0, 0, 0 );
-
-            c = goZ.AddComponent<CapsuleCollider>();
-            c.radius = 0.375f;
-            c.height = 2.75f;
-            c.direction = 2;
-            c.center = new Vector3( 0, 0, 1.375f );
-
-            mf = goZ.AddComponent<MeshFilter>();
-            mf.sharedMesh = AssetRegistry.Get<Mesh>( $"builtin::Resources/translate_handle_1d" );
-
-            mr = goZ.AddComponent<MeshRenderer>();
-            mr.sharedMaterial = AssetRegistry.Get<Material>( $"builtin::Resources/Materials/axis_z" );
-
-            tt = goZ.AddComponent<TranslationTransformHandle>();
-            tt.Target = target;
-            tt.RaycastCamera = camera;
         }
     }
 }

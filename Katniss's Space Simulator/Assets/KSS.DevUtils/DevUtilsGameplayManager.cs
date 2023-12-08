@@ -112,7 +112,7 @@ namespace KSS.DevUtils
         {
             if( Input.GetKeyDown( KeyCode.Y ) )
             {
-                TransformHandleParent.Create3Handles<TranslationTransformHandle>( Vector3.zero, Quaternion.identity, vessel.RootPart, GameplayCameraController.MainCamera,
+                TransformHandleSet.Create3Handles<TranslationTransformHandle>( Vector3.zero, Quaternion.identity, vessel.RootPart, GameplayCameraController.MainCamera,
                     AssetRegistry.Get<Mesh>( $"builtin::Resources/translate_handle_1d" ),
                     AssetRegistry.Get<Material>( $"builtin::Resources/Materials/axis" ),
                     go =>
@@ -127,7 +127,7 @@ namespace KSS.DevUtils
 
             if( Input.GetKeyDown( KeyCode.U ) )
             {
-                TransformHandleParent.Create3Handles<TranslationTransformHandle>( Vector3.zero, Quaternion.identity, vessel.RootPart, GameplayCameraController.MainCamera,
+                TransformHandleSet.Create3Handles<TranslationTransformHandle>( Vector3.zero, Quaternion.identity, vessel.RootPart, GameplayCameraController.MainCamera,
                        AssetRegistry.Get<Mesh>( $"builtin::Resources/rotate_handle_1d" ),
                        AssetRegistry.Get<Material>( $"builtin::Resources/Materials/axis" ),
                        go =>
@@ -136,7 +136,7 @@ namespace KSS.DevUtils
                            c.size = new Vector3( 3f, 3f, 0.1f );
                        } );
                 GameObject go = new GameObject();
-                go.AddComponent<TransformHandleParent>();
+                go.AddComponent<TransformHandleSet>();
                 RotationTransformHandle.Create3Handles( go.transform, GameplayCameraController.MainCamera, vessel.RootPart, Quaternion.identity );
             }
 
