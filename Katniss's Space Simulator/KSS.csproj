@@ -60,10 +60,12 @@
     <Compile Include="Assets\KSS\DesignScene\Tools\PickTool.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\VanillaPlanetarySystemFactory.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadTree.cs" />
+    <Compile Include="Assets\KSS\TransformHandle.cs" />
     <Compile Include="Assets\KSS\DesignScene\DesignObjectManager.cs" />
     <Compile Include="Assets\KSS\RotationTransformHandle.cs" />
     <Compile Include="Assets\KSS\Components\FVesselSeparator.cs" />
     <Compile Include="Assets\KSS\GameplayScene\ConstructionSite.cs" />
+    <Compile Include="Assets\KSS\TransformHandleParent.cs" />
     <Compile Include="Assets\KSS\Effects\Atmospheres\AtmosphereRenderer.cs" />
     <Compile Include="Assets\KSS\GhostPatchSet.cs" />
     <Compile Include="Assets\KSS\Components\FSequencer.cs" />
@@ -90,8 +92,6 @@
     <Compile Include="Assets\KSS\GameplayScene\GameplaySceneToolManager.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadTree_NodeUtils.cs" />
     <Compile Include="Assets\KSS\AssetLoaders\GameDataJsonVesselFactory.cs" />
-    <Compile Include="Assets\KSS\TransformHandle.cs" />
-    <Compile Include="Assets\KSS\TransformHandleParent.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS\CelestialBodies\Surface\TerrainShader.shader" />

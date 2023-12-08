@@ -13,25 +13,19 @@ namespace KSS
     /// </summary>
     public class RotationTransformHandle : TransformHandle
     {
-        public Quaternion Delta { get; private set; }
+        Vector3 _lastClickOffset;
 
-        Quaternion _targetStartRotation;
-        /// <summary>
-        /// The offset between the initial click point and the origin of the handle (in local space).
-        /// </summary>
-        Vector3 _clickOffsetLocalSpace;
+        public event Action<Quaternion> OnAfterRotate;
 
         protected override void StartTransformation()
         {
             _handleStartPosition = this.transform.position;
             _handleStartForward = this.transform.forward;
-            _targetStartRotation = Target.transform.rotation;
             _startLocalToWorld = Matrix4x4.TRS( this.transform.position, this.transform.rotation, Vector3.one ); // Calculate ourselves, otherwise the scale of the handle would mess it up.
             _startWorldToLocal = _startLocalToWorld.inverse;
 
-            _clickOffsetLocalSpace = ProjectCursor( RaycastCamera, Mode.Planar );
+            _lastClickOffset = ProjectCursor( RaycastCamera, Mode.Planar );
             _isHeld = true;
-            Delta = Quaternion.identity;
         }
 
         protected override void ContinueTransformation()
@@ -40,18 +34,16 @@ namespace KSS
 
             // If the handle is moved to a nan, abort that axis.
             if( float.IsNaN( cursorHitPoint.x ) )
-                cursorHitPoint.x = _clickOffsetLocalSpace.x;
+                cursorHitPoint.x = _lastClickOffset.x;
             if( float.IsNaN( cursorHitPoint.y ) )
-                cursorHitPoint.y = _clickOffsetLocalSpace.y;
+                cursorHitPoint.y = _lastClickOffset.y;
             if( float.IsNaN( cursorHitPoint.z ) )
-                cursorHitPoint.z = _clickOffsetLocalSpace.z;
+                cursorHitPoint.z = _lastClickOffset.z;
 
-            Quaternion targetRotationBeforeUpdate = Target.transform.rotation;
-
-            float angle = Vector3.SignedAngle( _clickOffsetLocalSpace, cursorHitPoint, Vector3.forward );
+            float angle = Vector3.SignedAngle( _lastClickOffset, cursorHitPoint, Vector3.forward );
             if( angle < 0.0f )
             {
-                angle += 360.0f; // convert from [-180, 180] to [0, 360]
+                angle += 360.0f;
             }
 
             if( Input.GetKey( KeyCode.LeftShift ) )
@@ -59,18 +51,17 @@ namespace KSS
                 angle = RoundToMultiple( angle, 22.5f );
             }
 
-            Target.transform.rotation = _targetStartRotation; // this way we don't have to calculate the step in this frame, just reset it, and set the entire step.
-            Target.transform.Rotate( _handleStartForward, angle, UnityEngine.Space.World );
+            Quaternion currentFrameDelta = Quaternion.AngleAxis( angle, _handleStartForward );
+            Target.transform.rotation = currentFrameDelta * Target.transform.rotation;
 
-            Quaternion targetRotation = Target.transform.rotation;
-            Delta = targetRotationBeforeUpdate.Inverse() * targetRotation;
+            _lastClickOffset = cursorHitPoint;
+            OnAfterRotate?.Invoke( currentFrameDelta );
         }
 
         protected override void EndTransformation()
         {
             ContinueTransformation(); // Makes sure the final position is correct.
             _isHeld = false;
-            Delta = Quaternion.identity;
         }
 
         public static void DestroyHandles( Transform parent )

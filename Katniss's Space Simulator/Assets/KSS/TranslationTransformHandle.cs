@@ -13,27 +13,24 @@ namespace KSS
     /// </summary>
     public class TranslationTransformHandle : TransformHandle
     {
-        public Vector3 Delta { get; private set; }
+        /// <summary>
+        /// world space delta
+        /// </summary>
+        public event Action<Vector3> OnAfterTranslate;
 
         Mode _mode;
 
-        Vector3 _targetStartPosition;
-        /// <summary>
-        /// The offset between the initial click point and the origin of the handle (in local space).
-        /// </summary>
-        Vector3 _clickOffsetLocalSpace;
+        Vector3 _lastTranslation;
 
         protected override void StartTransformation()
         {
             _handleStartPosition = this.transform.position;
             _handleStartForward = this.transform.forward;
-            _targetStartPosition = Target.transform.position;
             _startLocalToWorld = Matrix4x4.TRS( this.transform.position, this.transform.rotation, Vector3.one ); // Calculate ourselves, otherwise the scale of the handle would mess it up.
             _startWorldToLocal = _startLocalToWorld.inverse;
 
-            _clickOffsetLocalSpace = ProjectCursor( RaycastCamera, _mode );
+            _lastTranslation = ProjectCursor( RaycastCamera, _mode );
             _isHeld = true;
-            Delta = Vector3.zero;
         }
 
         protected override void ContinueTransformation()
@@ -42,60 +39,43 @@ namespace KSS
 
             // If the handle is moved to a nan, abort that axis.
             if( float.IsNaN( cursorHitPoint.x ) )
-                cursorHitPoint.x = _clickOffsetLocalSpace.x;
+                cursorHitPoint.x = _lastTranslation.x;
             if( float.IsNaN( cursorHitPoint.y ) )
-                cursorHitPoint.y = _clickOffsetLocalSpace.y;
+                cursorHitPoint.y = _lastTranslation.y;
             if( float.IsNaN( cursorHitPoint.z ) )
-                cursorHitPoint.z = _clickOffsetLocalSpace.z;
+                cursorHitPoint.z = _lastTranslation.z;
 
-            Vector3 targetPositionBeforeUpdate = Target.transform.position;
-
-            if( _mode == Mode.Linear )
+            if( Input.GetKey( KeyCode.LeftShift ) )
             {
-                cursorHitPoint -= _clickOffsetLocalSpace;
-
-                if( Input.GetKey( KeyCode.LeftShift ) )
-                {
-                    cursorHitPoint = RoundToMultiple( cursorHitPoint, 0.25f );
-                }
-
-                cursorHitPoint.x = 0.0f;
-                cursorHitPoint.y = 0.0f;
-
-                Vector3 worldHitPoint = _startLocalToWorld * cursorHitPoint;
-
-                Vector3 targetPosition = _targetStartPosition + worldHitPoint;
-
-                Target.transform.position = _targetStartPosition + worldHitPoint; // Origin is at the arrow, but the transformation has to be relative to the origin of the transformee.
-                Delta = targetPosition - targetPositionBeforeUpdate;
-                return;
+                cursorHitPoint = RoundToMultiple( cursorHitPoint, 0.25f );
             }
-            if( _mode == Mode.Planar )
+
+            switch( _mode )
             {
-                cursorHitPoint -= _clickOffsetLocalSpace;
-
-                if( Input.GetKey( KeyCode.LeftShift ) )
-                {
-                    cursorHitPoint = RoundToMultiple( cursorHitPoint, 0.25f );
-                }
-
-                cursorHitPoint.z = 0.0f;
-
-                Vector3 worldHitPoint = _startLocalToWorld * cursorHitPoint;
-
-                Vector3 targetPosition = _targetStartPosition + worldHitPoint;
-
-                Target.transform.position = _targetStartPosition + worldHitPoint; // Origin is at the arrow, but the transformation has to be relative to the origin of the transformee.
-                Delta = targetPosition - targetPositionBeforeUpdate;
-                return;
+                case Mode.Linear:
+                    cursorHitPoint.x = 0.0f;
+                    cursorHitPoint.y = 0.0f;
+                    break;
+                case Mode.Planar:
+                    cursorHitPoint.z = 0.0f;
+                    break;
+                default:
+                    throw new InvalidOperationException( $"Unknown mode '{_mode}'." );
             }
+
+            Vector3 currentFrameDelta = cursorHitPoint - _lastTranslation;
+            currentFrameDelta = _startLocalToWorld * currentFrameDelta;
+
+            Target.transform.position += currentFrameDelta;
+
+            _lastTranslation = cursorHitPoint;
+            OnAfterTranslate?.Invoke( currentFrameDelta );
         }
 
         protected override void EndTransformation()
         {
             ContinueTransformation(); // Makes sure the final position is correct.
             _isHeld = false;
-            Delta = Vector3.zero;
         }
 
         public static void DestroyHandles( Transform parent )

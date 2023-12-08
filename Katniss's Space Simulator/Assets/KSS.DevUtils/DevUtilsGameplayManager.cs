@@ -112,12 +112,16 @@ namespace KSS.DevUtils
         {
             if( Input.GetKeyDown( KeyCode.Y ))
             {
-                TranslationTransformHandle.Create3Handles( new GameObject().transform, GameplayCameraController.MainCamera, vessel.RootPart, Quaternion.identity );
+                GameObject go = new GameObject();
+                go.AddComponent<TransformHandleParent>();
+                TranslationTransformHandle.Create3Handles( go.transform, GameplayCameraController.MainCamera, vessel.RootPart, Quaternion.identity );
             }
             
             if( Input.GetKeyDown( KeyCode.U ))
             {
-                RotationTransformHandle.Create3Handles( new GameObject().transform, GameplayCameraController.MainCamera, vessel.RootPart, Quaternion.identity );
+                GameObject go = new GameObject();
+                go.AddComponent<TransformHandleParent>();
+                RotationTransformHandle.Create3Handles( go.transform, GameplayCameraController.MainCamera, vessel.RootPart, Quaternion.identity );
             }
 
             if( Input.GetKeyDown( KeyCode.F4 ) )
