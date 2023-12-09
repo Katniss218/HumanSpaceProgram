@@ -8,61 +8,94 @@ using UnityPlus.Serialization;
 
 namespace KSS.Core.Components
 {
-    public class FAttachNode : MonoBehaviour, IPersistent
+    public sealed class FAttachNode : MonoBehaviour, IPersistent
     {
+        // An attachment node is supposed to be placed on its own gameobject. 
+
+        /// <summary>
+        /// The distance at which this node will snap with other nodes.
+        /// </summary>
+        /// <remarks>
+        /// Note that snapping takes the max(n1, n2).
+        /// </remarks>
         [field: SerializeField]
         public float Range { get; set; }
 
-        // nodes don't handle reparenting, or other. they only position things.
-
         const float SnapThresholdAngle = 45;
+
+        public struct SnappingCandidate
+        {
+            public FAttachNode snappedNode;
+            public FAttachNode targetNode;
+            public float distance;
+            public float angle;
+
+            public SnappingCandidate( FAttachNode snappedNode, FAttachNode targetNode, float distance, float angle )
+            {
+                this.snappedNode = snappedNode;
+                this.targetNode = targetNode;
+                this.distance = distance;
+                this.angle = angle;
+            }
+        }
 
         /// <summary>
         /// Tries to snap the node to any of the specified nodes. Takes the snapping rules into account.
         /// </summary>
-        public static (FAttachNode obj, FAttachNode tgt)? TrySnap( Transform obj, FAttachNode[] objNodes, FAttachNode[] targetNodes )
+        public static SnappingCandidate? GetSnappingNodePair( FAttachNode[] snappedNodes, FAttachNode[] targetNodes, Vector3 viewDirection )
         {
-            List<(FAttachNode obj, FAttachNode tgt)> nodePairs = new List<(FAttachNode, FAttachNode)>();
-            foreach( var objNode in objNodes )
+            List<SnappingCandidate> nodePairs = new List<SnappingCandidate>();
+            foreach( var objNode in snappedNodes )
             {
                 foreach( var targetNode in targetNodes )
                 {
-#warning TODO - incorporate view ray into the filtering.
-                    if( Vector3.Distance( objNode.transform.position, targetNode.transform.position ) > Mathf.Max( objNode.Range, targetNode.Range )
-                     || Vector3.Angle( -objNode.transform.forward, targetNode.transform.forward ) > SnapThresholdAngle )
+                    Vector3 projectedObjNode = Vector3.ProjectOnPlane( objNode.transform.position, viewDirection );
+                    Vector3 projectedTargetNode = Vector3.ProjectOnPlane( targetNode.transform.position, viewDirection );
+                    float distance = Vector3.Distance( projectedObjNode, projectedTargetNode );
+                    float angle = Vector3.Angle( -objNode.transform.forward, targetNode.transform.forward );
+
+                    if( distance > Mathf.Max( objNode.Range, targetNode.Range )
+                     || angle > SnapThresholdAngle )
                     {
                         continue;
                     }
 
-                    nodePairs.Add( (objNode, targetNode) );
+                    nodePairs.Add( new SnappingCandidate( objNode, targetNode, distance, angle ) );
                 }
             }
 
-            var orderedNodePairs = nodePairs.OrderBy( tuple => Vector3.Distance( tuple.obj.transform.position, tuple.tgt.transform.position ) ).ToList();
+            List<SnappingCandidate> orderedNodePairs = nodePairs.OrderBy( n => n.distance ).ToList();
 
-            var tuple = orderedNodePairs.FirstOrDefault();
-            if( tuple != default )
+            if( nodePairs.Count < 1 )
             {
-                SnapTo( obj, tuple.obj, tuple.tgt );
-                return tuple;
+                return null;
             }
 
-            return null;
+            return orderedNodePairs[0];
         }
 
-        public static void SnapTo( Transform obj, FAttachNode objNode, FAttachNode targetNode )
+        /// <summary>
+        /// Translates and rotates the <paramref name="snappedObject"/> to align the 2 nodes.
+        /// </summary>
+        /// <remarks>
+        /// After snapping: <br/>
+        /// - <paramref name="snappedNode"/>'s world position is equal to <paramref name="targetNode"/>'s world position. <br/>
+        /// - <paramref name="snappedNode"/>'s world rotation is opposite to <paramref name="targetNode"/>'s world rotation.
+        /// </remarks>
+        public static void SnapTo( Transform snappedObject, FAttachNode snappedNode, FAttachNode targetNode )
         {
-            Quaternion nodeRotation = Quaternion.FromToRotation( -objNode.transform.forward, targetNode.transform.forward );
-            obj.transform.rotation = nodeRotation * obj.transform.rotation;
+            // Align the 'up' directions.
+            Quaternion rotation = Quaternion.FromToRotation( snappedNode.transform.up, targetNode.transform.up );
+            snappedObject.transform.rotation = rotation * snappedObject.transform.rotation;
 
-            nodeRotation = Quaternion.FromToRotation( objNode.transform.up, targetNode.transform.up );
-            obj.transform.rotation = nodeRotation * obj.transform.rotation;
+            // Align the 'forward' directions. This should be the last rotation, to make absolute sure that forward is always matching.
+            rotation = Quaternion.FromToRotation( snappedNode.transform.forward, -targetNode.transform.forward );
+            snappedObject.transform.rotation = rotation * snappedObject.transform.rotation;
 
-            Vector3 offset = obj.transform.position - objNode.transform.position;
-            obj.position = targetNode.transform.position + offset;
+            // Match positions.
+            Vector3 offset = snappedObject.transform.position - snappedNode.transform.position;
+            snappedObject.position = targetNode.transform.position + offset;
         }
-
-        // A node is supposed to be placed on its own gameobject. the orientation of that 
 
         private void OnDrawGizmos()
         {

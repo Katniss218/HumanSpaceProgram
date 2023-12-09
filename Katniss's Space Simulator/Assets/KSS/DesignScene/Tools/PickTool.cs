@@ -32,6 +32,7 @@ namespace KSS.DesignScene.Tools
         }
 
         Vector3 _heldOffset;
+        Quaternion _heldRotation;
 
         FAttachNode[] _nodes;
 
@@ -107,6 +108,7 @@ namespace KSS.DesignScene.Tools
                     }
                     HeldPart = clickedObj;
                     _heldOffset = hitInfo.point - clickedObj.position;
+                    _heldRotation = clickedObj.rotation;
                 }
             }
         }
@@ -165,7 +167,7 @@ namespace KSS.DesignScene.Tools
         {
             // Held part is moved on a plane defined by the normal = camera forward, and through point = current position of picked up part.
 
-            Vector3 point = _heldPart.position + _heldOffset;
+            Vector3 mousePoint = _heldPart.position + _heldOffset;
 
             Ray ray = _camera.ScreenPointToRay( Input.mousePosition );
 
@@ -198,12 +200,13 @@ namespace KSS.DesignScene.Tools
                 }
             }
 
-            Plane p = new Plane( _camera.transform.forward, point );
-            if( p.Raycast( ray, out float intersectionDistance ) )
+            Plane viewPlane = new Plane( _camera.transform.forward, mousePoint );
+            if( viewPlane.Raycast( ray, out float intersectionDistance ) )
             {
                 Vector3 intersectionPoint = ray.GetPoint( intersectionDistance );
 
-                _heldPart.position = intersectionPoint - _heldOffset;
+                _heldPart.position = intersectionPoint - _heldOffset; // always reset before snapping, to un-snap, and prevent the snapped position taking different nodes.
+                _heldPart.rotation = _heldRotation;
 
                 if( DesignObjectManager.IsDesignObj( _heldPart ) )
                 {
@@ -212,14 +215,14 @@ namespace KSS.DesignScene.Tools
                 else
                 {
                     // snap to node, if available.
-#warning TODO - snapping sometimes snaps to the wrong node.
                     FAttachNode[] heldNodes = _heldPart.GetComponentsInChildren<FAttachNode>();
                     FAttachNode[] targetNodes = FindObjectsOfType<FAttachNode>().Where( n => n.transform.root != HeldPart ).ToArray();
 
-                    var tuple = FAttachNode.TrySnap( _heldPart, heldNodes, targetNodes );
-                    if( tuple != null )
+                    FAttachNode.SnappingCandidate? nodePair = FAttachNode.GetSnappingNodePair( heldNodes, targetNodes, viewPlane.normal );
+                    if( nodePair != null )
                     {
-                        snappedToNode = tuple.Value.tgt;
+                        FAttachNode.SnapTo( _heldPart, nodePair.Value.snappedNode, nodePair.Value.targetNode );
+                        snappedToNode = nodePair.Value.targetNode;
                     }
                     else
                     {
