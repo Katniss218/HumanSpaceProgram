@@ -8,6 +8,7 @@ using UnityPlus.Serialization;
 
 namespace KSS.Core.Components
 {
+    [DisallowMultipleComponent]
     public sealed class FAttachNode : MonoBehaviour, IPersistent
     {
         // An attachment node is supposed to be placed on its own gameobject. 

@@ -14,37 +14,30 @@ namespace KSS.DesignScene.Tools
     public class PickTool : MonoBehaviour
     {
         Transform _heldPart = null;
-        /// <summary>
-        /// Gets or sets the part that's currently "held" by the cursor.
-        /// </summary>
-        public Transform HeldPart
-        {
-            get => _heldPart;
-            set
-            {
-                if( _heldPart != null )
-                {
-                    Destroy( _heldPart.gameObject );
-                }
-                _heldPart = value;
-                _heldOffset = Vector3.zero;
-            }
-        }
 
-        Vector3 _heldOffset;
-        Quaternion _heldRotation;
-
-        FAttachNode[] _nodes;
-
-        public bool SnappingEnabled { get; set; }
-        public float SnapAngle { get; set; }
+        Vector3 _heldClickOffset;
+        Quaternion _heldPartStartRotation;
 
         Camera _camera;
-        FAttachNode snappedToNode = null;
+        FAttachNode _nodeTheHeldPartIsSnappedTo = null;
+
+        /// <summary>
+        /// Sets the held part, destroys the previously held part (if any).
+        /// </summary>
+        public void ResetHeldPart( Transform value, Vector3 clickOffset )
+        {
+            if( _heldPart == value )
+                return;
+            if( _heldPart != null )
+                Destroy( _heldPart.gameObject );
+            _heldPart = value;
+            _heldClickOffset = clickOffset;
+            _heldPartStartRotation = value.rotation;
+        }
 
         void Awake()
         {
-            _camera = GameObject.Find( "Near camera" ).GetComponent<Camera>();
+            _camera = GameObject.Find( "Near camera" ).GetComponent<Camera>(); // todo - change the GameObject.Find to something proper.
         }
 
         void Update()
@@ -56,7 +49,7 @@ namespace KSS.DesignScene.Tools
             {
                 if( Input.GetKeyUp( KeyCode.Mouse0 ) )
                 {
-                    TryGrabPart();
+                    TryPickUpPart();
 
                     if( _heldPart != null )
                     {
@@ -83,17 +76,16 @@ namespace KSS.DesignScene.Tools
             }
         }
 
-        private void TryGrabPart()
+        private void TryPickUpPart()
         {
             Ray ray = _camera.ScreenPointToRay( Input.mousePosition );
             if( UnityEngine.Physics.Raycast( ray, out RaycastHit hitInfo, 8192, int.MaxValue ) )
             {
                 Transform clickedObj = hitInfo.collider.transform;
 
-                FClickInteractionRedirect r = clickedObj.GetComponent<FClickInteractionRedirect>();
-                if( r != null && r.Target != null )
+                if( clickedObj.HasComponent<FClickInteractionRedirect>( out var redirect ) && redirect.Target != null )
                 {
-                    clickedObj = r.Target.transform;
+                    clickedObj = redirect.Target.transform;
                 }
 
                 if( DesignObjectManager.IsActionable( clickedObj ) )
@@ -106,23 +98,22 @@ namespace KSS.DesignScene.Tools
                     {
                         clickedObj = DesignObjectManager.DesignObject.transform;
                     }
-                    HeldPart = clickedObj;
-                    _heldOffset = hitInfo.point - clickedObj.position;
-                    _heldRotation = clickedObj.rotation;
+
+                    ResetHeldPart( clickedObj, hitInfo.point - clickedObj.position );
                 }
             }
         }
 
         private void PlacePart()
         {
-            if( snappedToNode != null )
+            if( _nodeTheHeldPartIsSnappedTo != null )
             {
                 if( !DesignObjectManager.IsDesignObj( _heldPart ) )
                 {
-                    DesignObjectManager.Place( _heldPart, snappedToNode.transform.parent );
+                    DesignObjectManager.Place( _heldPart, _nodeTheHeldPartIsSnappedTo.transform.parent );
                 }
                 _heldPart = null;
-                snappedToNode = null;
+                _nodeTheHeldPartIsSnappedTo = null;
 
                 return;
             }
@@ -134,41 +125,37 @@ namespace KSS.DesignScene.Tools
             {
                 Transform hitObj = hit.collider.transform;
 
-                FClickInteractionRedirect r = hitObj.GetComponent<FClickInteractionRedirect>();
-                if( r != null && r.Target != null )
-                {
-                    hitObj = r.Target.transform;
-                }
-
                 if( hitObj.root == _heldPart )
                     continue;
 
-                if( DesignObjectManager.IsAttachedToDesignObj( hitObj ) )
+                if( hitObj.HasComponent<FClickInteractionRedirect>( out var redirect ) && redirect.Target != null )
+                {
+                    hitObj = redirect.Target.transform;
+                }
+
+                if( DesignObjectManager.IsPartOfDesignObj( hitObj ) )
                 {
                     if( !DesignObjectManager.IsDesignObj( _heldPart ) )
                     {
                         DesignObjectManager.Place( _heldPart, hitObj );
                     }
                     _heldPart = null;
-                    // recalc vessel data.
+                    _nodeTheHeldPartIsSnappedTo = null;
                     return;
                 }
             }
 
             // KSP would place as ghost here
-            if( !DesignObjectManager.IsAttachedToDesignObj( _heldPart ) )
+            if( !DesignObjectManager.IsPartOfDesignObj( _heldPart ) )
             {
                 DesignObjectManager.Place( _heldPart, null );
             }
             _heldPart = null;
+            _nodeTheHeldPartIsSnappedTo = null;
         }
 
         private void PositionHeldPart()
         {
-            // Held part is moved on a plane defined by the normal = camera forward, and through point = current position of picked up part.
-
-            Vector3 mousePoint = _heldPart.position + _heldOffset;
-
             Ray ray = _camera.ScreenPointToRay( Input.mousePosition );
 
             // Snap to surface.
@@ -179,14 +166,13 @@ namespace KSS.DesignScene.Tools
                 {
                     Transform hitObj = hit.collider.transform;
 
-                    FClickInteractionRedirect r = hitObj.GetComponent<FClickInteractionRedirect>();
-                    if( r != null && r.Target != null )
-                    {
-                        hitObj = r.Target.transform;
-                    }
-
                     if( hitObj.root == _heldPart )
                         continue;
+
+                    if( hitObj.HasComponent<FClickInteractionRedirect>( out var redirect ) && redirect.Target != null )
+                    {
+                        hitObj = redirect.Target.transform;
+                    }
 
                     if( DesignObjectManager.IsActionable( hitObj ) )
                     {
@@ -200,34 +186,43 @@ namespace KSS.DesignScene.Tools
                 }
             }
 
-            Plane viewPlane = new Plane( _camera.transform.forward, mousePoint );
+            Vector3 planePoint = _heldPart.position + _heldClickOffset;
+
+            Plane viewPlane = new Plane( _camera.transform.forward, planePoint );
             if( viewPlane.Raycast( ray, out float intersectionDistance ) )
             {
                 Vector3 intersectionPoint = ray.GetPoint( intersectionDistance );
 
-                _heldPart.position = intersectionPoint - _heldOffset; // always reset before snapping, to un-snap, and prevent the snapped position taking different nodes.
-                _heldPart.rotation = _heldRotation;
+                // Reset the position/rotation before snapping to prevent the previous snapping from affecting what nodes will snap.
+                // It should always snap "as if the part is at the cursor", not wherever it was snapped to previously.
+                _heldPart.position = intersectionPoint - _heldClickOffset;
+                _heldPart.rotation = _heldPartStartRotation;
 
-                if( DesignObjectManager.IsDesignObj( _heldPart ) )
+                TrySnappingHeldPart( viewPlane.normal );
+            }
+        }
+
+        private void TrySnappingHeldPart( Vector3 viewDirection )
+        {
+            if( DesignObjectManager.IsDesignObj( _heldPart ) )
+            {
+                _nodeTheHeldPartIsSnappedTo = null;
+            }
+            else
+            {
+                // snap to node, if available.
+                FAttachNode[] heldNodes = _heldPart.GetComponentsInChildren<FAttachNode>();
+                FAttachNode[] targetNodes = FindObjectsOfType<FAttachNode>().Where( n => n.transform.root != _heldPart ).ToArray();
+
+                FAttachNode.SnappingCandidate? nodePair = FAttachNode.GetSnappingNodePair( heldNodes, targetNodes, viewDirection );
+                if( nodePair != null )
                 {
-                    snappedToNode = null;
+                    FAttachNode.SnapTo( _heldPart, nodePair.Value.snappedNode, nodePair.Value.targetNode );
+                    _nodeTheHeldPartIsSnappedTo = nodePair.Value.targetNode;
                 }
                 else
                 {
-                    // snap to node, if available.
-                    FAttachNode[] heldNodes = _heldPart.GetComponentsInChildren<FAttachNode>();
-                    FAttachNode[] targetNodes = FindObjectsOfType<FAttachNode>().Where( n => n.transform.root != HeldPart ).ToArray();
-
-                    FAttachNode.SnappingCandidate? nodePair = FAttachNode.GetSnappingNodePair( heldNodes, targetNodes, viewPlane.normal );
-                    if( nodePair != null )
-                    {
-                        FAttachNode.SnapTo( _heldPart, nodePair.Value.snappedNode, nodePair.Value.targetNode );
-                        snappedToNode = nodePair.Value.targetNode;
-                    }
-                    else
-                    {
-                        snappedToNode = null;
-                    }
+                    _nodeTheHeldPartIsSnappedTo = null;
                 }
             }
         }

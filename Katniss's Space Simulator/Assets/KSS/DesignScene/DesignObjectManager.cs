@@ -111,7 +111,7 @@ namespace KSS.DesignScene
         /// <summary>
         /// Checks whether the specified object is part of the design object.
         /// </summary>
-        public static bool IsAttachedToDesignObj( Transform obj )
+        public static bool IsPartOfDesignObj( Transform obj )
         {
             if( obj == null )
                 return false;
@@ -119,6 +119,9 @@ namespace KSS.DesignScene
             return obj.root == instance._designObj.transform;
         }
 
+        /// <summary>
+        /// Checks if the specified transform is the design object itself.
+        /// </summary>
         public static bool IsDesignObj( Transform obj )
         {
             if( obj == null )
