@@ -22,6 +22,9 @@ namespace KSS
 
         Vector3 _lastCursorPos;
 
+        public bool SnappingEnabled { get; set; } = false;
+        public float SnappingInterval { get; set; } = 0.25f;
+
         protected override void StartTransformation()
         {
             _handleStartPosition = this.transform.position;
@@ -30,26 +33,25 @@ namespace KSS
             _startWorldToLocal = _startLocalToWorld.inverse;
 
             _lastCursorPos = ProjectCursor( RaycastCamera, _mode );
+            switch( _mode )
+            {
+                case Mode.Linear:
+                    _lastCursorPos.x = 0.0f;
+                    _lastCursorPos.y = 0.0f;
+                    break;
+                case Mode.Planar:
+                    _lastCursorPos.z = 0.0f;
+                    break;
+                default:
+                    throw new InvalidOperationException( $"Unknown mode '{_mode}'." );
+            }
+
             _isHeld = true;
         }
 
         protected override void ContinueTransformation()
         {
             Vector3 cursorHitPoint = ProjectCursor( RaycastCamera, _mode );
-
-            // If the handle is moved to a nan, abort that axis.
-            if( float.IsNaN( cursorHitPoint.x ) )
-                cursorHitPoint.x = _lastCursorPos.x;
-            if( float.IsNaN( cursorHitPoint.y ) )
-                cursorHitPoint.y = _lastCursorPos.y;
-            if( float.IsNaN( cursorHitPoint.z ) )
-                cursorHitPoint.z = _lastCursorPos.z;
-
-            if( Input.GetKey( KeyCode.LeftShift ) )
-            {
-                cursorHitPoint = RoundToMultiple( cursorHitPoint, 0.25f );
-            }
-
             switch( _mode )
             {
                 case Mode.Linear:
@@ -63,13 +65,26 @@ namespace KSS
                     throw new InvalidOperationException( $"Unknown mode '{_mode}'." );
             }
 
-            Vector3 currentFrameDelta = cursorHitPoint - _lastCursorPos;
-            currentFrameDelta = _startLocalToWorld * currentFrameDelta;
+            // If the handle is moved to a nan, abort that axis.
+            if( float.IsNaN( cursorHitPoint.x ) )
+                cursorHitPoint.x = _lastCursorPos.x;
+            if( float.IsNaN( cursorHitPoint.y ) )
+                cursorHitPoint.y = _lastCursorPos.y;
+            if( float.IsNaN( cursorHitPoint.z ) )
+                cursorHitPoint.z = _lastCursorPos.z;
 
-            Target.transform.position += currentFrameDelta;
+            if( SnappingEnabled )
+            {
+                cursorHitPoint = RoundToMultiple( cursorHitPoint, SnappingInterval );
+            }
+
+            Vector3 positionDelta = cursorHitPoint - _lastCursorPos;
+            positionDelta = _startLocalToWorld * positionDelta;
+
+            Target.transform.position += positionDelta;
 
             _lastCursorPos = cursorHitPoint;
-            OnAfterTranslate?.Invoke( currentFrameDelta );
+            OnAfterTranslate?.Invoke( positionDelta );
         }
 
         protected override void EndTransformation()

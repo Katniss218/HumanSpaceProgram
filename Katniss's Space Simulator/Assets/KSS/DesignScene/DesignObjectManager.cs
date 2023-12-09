@@ -29,7 +29,7 @@ namespace KSS.DesignScene
         [SerializeField]
         private List<Transform> _looseParts = new List<Transform>();
 
-        public static GameObject DesignObject => instance._designObj.gameObject;
+        public static DesignObject DesignObject => instance._designObj;
 
         /// <summary>
         /// Picks up the specified object (removes it from the actionable objects).

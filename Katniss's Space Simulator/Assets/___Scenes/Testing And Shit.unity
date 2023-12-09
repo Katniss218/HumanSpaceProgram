@@ -283,7 +283,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4298a5610bd9d94f869f4cf69e24435, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _material: {fileID: 2028191409}
+  _material: {fileID: 1937356398}
   light: {fileID: 705507994}
   _rt: {fileID: 0}
 --- !u!20 &244583699
@@ -340,7 +340,7 @@ GameObject:
   - component: {fileID: 328583078}
   - component: {fileID: 328583079}
   m_Layer: 0
-  m_Name: UICamera
+  m_Name: UI Camera
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1594,7 +1594,7 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!21 &2028191409
+--- !u!21 &1937356398
 Material:
   serializedVersion: 8
   m_ObjectHideFlags: 0
@@ -1623,15 +1623,15 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _DensityFalloffPower: 13.7
-    - _InScatteringPointCount: 16
-    - _MaxRadius: 6500000
-    - _MinRadius: 6371000
-    - _OpticalDepthPointCount: 8
-    - _ScatteringStrength: 128
+    - _DensityFalloffPower: 1.77
+    - _InScatteringPointCount: 5
+    - _MaxRadius: 125
+    - _MinRadius: 0
+    - _OpticalDepthPointCount: 5
+    - _ScatteringStrength: 4
     - _TerminatorFalloff: 32
     m_Colors:
-    - _Center: {r: 0, g: 0, b: 0, a: 0}
-    - _ScatteringWavelengths: {r: 675, g: 530, b: 400, a: 0}
-    - _SunDirection: {r: 0.70710653, g: -0, b: 0.70710707, a: 0}
+    - _Center: {r: 0, g: 0, b: 0, a: 1}
+    - _ScatteringWavelengths: {r: 700, g: 530, b: 400, a: 1}
+    - _SunDirection: {r: 0, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace KSS
@@ -50,11 +51,15 @@ namespace KSS
         List<TransformHandle> _handles = new List<TransformHandle>();
 
         /// <summary>
-        /// Gets the underlying transform handles.
+        /// Gets the underlying transform handles of the specified type.
         /// </summary>
-        public IEnumerable<TransformHandle> GetHandles()
+        /// <remarks>
+        /// Returns an empty collection if there are no handles of the given type.
+        /// </remarks>
+        public IEnumerable<T> GetHandles<T>() where T : TransformHandle
         {
-            return _handles;
+            // NOTE: The handle set might contain handles of different types at once (e.g. both translation and rotation handles).
+            return _handles.Where( h => h is T ).Cast<T>();
         }
 
         /// <summary>
@@ -78,6 +83,14 @@ namespace KSS
         }
 
         /// <summary>
+        /// Destroys the transform handle set.
+        /// </summary>
+        public void Destroy()
+        {
+            Destroy( this.gameObject );
+        }
+
+        /// <summary>
         /// Creates a new set of 3 handles pointing along the local XYZ axes of the handle set.
         /// </summary>
         /// <typeparam name="T">The type of the handle to create.</typeparam>
@@ -97,10 +110,11 @@ namespace KSS
             foreach( var dir in XYZ_HANDLE_FORWARDS )
             {
                 T handle = CreateHandle<T>( dir, mesh, material, colliderConfigurator );
-                if( handle is TranslationTransformHandle tt1 )
+                if( handle is TranslationTransformHandle translationHandle )
                 {
-                    tt1.OnAfterTranslate += OnAfterTranslate;
+                    translationHandle.OnAfterTranslate += OnAfterTranslate;
                 }
+                _handles.Add( handle );
             }
         }
 

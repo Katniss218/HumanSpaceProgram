@@ -17,6 +17,9 @@ namespace KSS
 
         Vector3 _lastCursorPos;
 
+        public bool SnappingEnabled { get; set; } = false;
+        public float SnappingInterval { get; set; } = 22.5f;
+
         protected override void StartTransformation()
         {
             _handleStartPosition = this.transform.position;
@@ -40,22 +43,23 @@ namespace KSS
             if( float.IsNaN( cursorHitPoint.z ) )
                 cursorHitPoint.z = _lastCursorPos.z;
 
-            float angle = Vector3.SignedAngle( _lastCursorPos, cursorHitPoint, Vector3.forward );
-            if( angle < 0.0f )
+            float angleDelta = Vector3.SignedAngle( _lastCursorPos, cursorHitPoint, Vector3.forward );
+            if( angleDelta < 0.0f )
             {
-                angle += 360.0f;
+                angleDelta += 360.0f;
             }
 
-            if( Input.GetKey( KeyCode.LeftShift ) )
+            if( SnappingEnabled )
             {
-                angle = RoundToMultiple( angle, 22.5f );
+                // TODO - add snapping so that the angle between the axes of this handle, and the axes of the target is in multiples of x.
+                // snapping should work the same way as translation, allowing excess rotation caused by external forces.
             }
 
-            Quaternion currentFrameDelta = Quaternion.AngleAxis( angle, _handleStartForward );
-            Target.transform.rotation = currentFrameDelta * Target.transform.rotation;
+            Quaternion rotationDelta = Quaternion.AngleAxis( angleDelta, _handleStartForward );
+            Target.transform.rotation = rotationDelta * Target.transform.rotation;
 
             _lastCursorPos = cursorHitPoint;
-            OnAfterRotate?.Invoke( currentFrameDelta );
+            OnAfterRotate?.Invoke( rotationDelta );
         }
 
         protected override void EndTransformation()
