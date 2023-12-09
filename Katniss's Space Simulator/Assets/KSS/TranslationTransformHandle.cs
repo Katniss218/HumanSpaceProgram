@@ -11,7 +11,7 @@ namespace KSS
     /// <summary>
     /// Allows the user to move the object around
     /// </summary>
-    public class TranslationTransformHandle : TransformHandle
+    public sealed class TranslationTransformHandle : TransformHandle
     {
         /// <summary>
         /// world space delta

@@ -11,7 +11,7 @@ namespace KSS
     /// <summary>
     /// Allows the user to rotate the object around
     /// </summary>
-    public class RotationTransformHandle : TransformHandle
+    public sealed class RotationTransformHandle : TransformHandle
     {
         public event Action<Quaternion> OnAfterRotate;
 

@@ -583,7 +583,7 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: 03cee79809d597c45a34186a4ccb865e, type: 3}
   - assetID: builtin::Resources/Sprites/UI/button_up
     asset: {fileID: 21300000, guid: 132871611e02df84ca6f2856586f1d65, type: 3}
-  - assetID: builtin::Resources/Materials/axis_x
+  - assetID: builtin::Resources/Materials/axis
     asset: {fileID: 2100000, guid: 23c601bddaad4734f9422222865c47d1, type: 2}
   - assetID: builtin::Resources/New Material 2
     asset: {fileID: 2100000, guid: 23d92b14f1c3e2f4e983a19b15eb7596, type: 2}
@@ -765,8 +765,6 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: ca4e19b7df6ce1b45a09d4c07cd486ca, type: 3}
   - assetID: builtin::KSS.DevUtils/flameparticle9
     asset: {fileID: 2800000, guid: ea45e8d3a3571204b9b70b438f610f2f, type: 3}
-  - assetID: builtin::Resources/Materials/axis_y
-    asset: {fileID: 2100000, guid: ea57ff0bf7d1b934b988bcf03c0fcc79, type: 2}
   - assetID: builtin::Resources/navball_tex
     asset: {fileID: 2800000, guid: ea77c6bbb32de2546821543872b8968a, type: 3}
   - assetID: builtin::_TextMesh Pro/Resources/LineBreaking Following Characters
@@ -839,8 +837,6 @@ MonoBehaviour:
     asset: {fileID: -2432090755550338912, guid: 0e08ce73ad599c34babe3a9dad7e7131, type: 3}
   - assetID: builtin::_TextMesh Pro/Shaders/TMP_Bitmap-Mobile
     asset: {fileID: 4800000, guid: 1e3b057af24249748ff873be7fafee47, type: 3}
-  - assetID: builtin::Resources/Materials/axis_z
-    asset: {fileID: 2100000, guid: 2e84f980eab87d84f9b81546c3ede9a6, type: 2}
   - assetID: builtin::Resources/Fonts/liberation_sans_fallback
     asset: {fileID: 11400000, guid: 2e498d1c8094910479dc3e1b768306a4, type: 2}
   - assetID: builtin::KSS.DevUtils/smokeparticle3
