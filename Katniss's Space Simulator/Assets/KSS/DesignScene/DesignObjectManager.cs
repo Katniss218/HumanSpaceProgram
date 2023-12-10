@@ -31,48 +31,89 @@ namespace KSS.DesignScene
 
         public static DesignObject DesignObject => instance._designObj;
 
+        public static bool DesignObjectHasRootPart()
+        {
+            return instance._designObj.RootPart != null;
+        }
+
         /// <summary>
-        /// Picks up the specified object (removes it from the actionable objects).
+        /// True if the object can be interacted with (picked up, moved, rotated, etc).
         /// </summary>
-        public static void PickUp( Transform obj )
+        public static bool IsActionable( Transform obj )
+        {
+            if( obj == null )
+                return false;
+
+            return instance._looseParts.Contains( obj.root ) || obj.IsChildOf( instance._designObj.transform );
+        }
+
+        /// <summary>
+        /// Tries to pick up the specified object (unparents it, and removes from actionable objects).
+        /// </summary>
+        public static bool TryDetach( Transform obj )
         {
             if( !IsActionable( obj ) )
             {
-                throw new ArgumentException( $"object to pick up must be an actionable object.", nameof( obj ) );
+                return false;
             }
 
-            if( IsRootOfDesignObj( obj ) )
+            if( obj == instance._designObj.RootPart )
             {
                 instance._designObj.RootPart = null;
-                obj.SetParent( null );
+                return true;
             }
-            else
-            {
-                instance._looseParts.Remove( obj ); // sometimes will do nothing, since the part might not be a loose part.
-                obj.SetParent( null );
-            }
+
+            instance._looseParts.Remove( obj ); // sometimes will do nothing, since the part might not be a loose part.
+            obj.SetParent( null );
+            return true;
+        }
+
+        /// <summary>
+        /// Returns the root of every object that can have an object parented to it.
+        /// </summary>
+        public static IEnumerable<Transform> GetAttachableRoots()
+        {
+            return instance._designObj.RootPart == null
+                ? new Transform[] { }
+                : new Transform[] { instance._designObj.RootPart };
+        }
+
+        /// <summary>
+        /// Checks whether an object can be parented to the specified object.
+        /// </summary>
+        public static bool CanBeAttachedTo( Transform parent )
+        {
+            if( parent == null )
+                return true;
+
+            return parent.root == instance._designObj.transform;
         }
 
         /// <summary>
         /// Places the selected object as the child of the specified object (adds to the actionable parts).
         /// </summary>
         /// <param name="parent">The new parent, can be null, in which case, the part will be placed as a loose part.</param>
-        public static void Place( Transform obj, Transform parent )
+        public static bool TryAttach( Transform obj, Transform parent )
         {
-            if( IsActionable( obj ) )
+            if( !CanBeAttachedTo( parent ) )
             {
-                throw new ArgumentException( $"object to place must NOT be an actionable object.", nameof( obj ) );
-            }
-            if( parent != null && !IsActionable( parent ) )
-            {
-                throw new ArgumentException( $"Parent must be null or an actionable object.", nameof( parent ) );
+                return false;
             }
 
+            // Place as loose or as root of vessel.
             if( parent == null )
             {
+                if( instance._designObj.RootPart == null )
+                {
+                    instance._designObj.transform.SetPositionAndRotation( obj.position, obj.rotation );
+                    instance._designObj.RootPart = obj;
+                    return true;
+                }
                 instance._looseParts.Add( obj );
             }
+
             obj.SetParent( parent );
+            return true;
         }
 
         /// <summary>
@@ -97,56 +138,6 @@ namespace KSS.DesignScene
         }
 
         /// <summary>
-        /// True if the object can be interacted with (not part of the scenery, etc).
-        /// </summary>
-        public static bool IsActionable( Transform obj )
-        {
-            if( obj == null )
-                return false;
-
-            return instance._looseParts.Contains( obj.root )
-                || obj.root == instance._designObj.transform;
-        }
-
-        /// <summary>
-        /// Checks whether the specified object is part of the design object.
-        /// </summary>
-        public static bool IsPartOfDesignObj( Transform obj )
-        {
-            if( obj == null )
-                return false;
-
-            return obj.root == instance._designObj.transform;
-        }
-
-        /// <summary>
-        /// Checks if the specified transform is the design object itself.
-        /// </summary>
-        public static bool IsDesignObj( Transform obj )
-        {
-            if( obj == null )
-                return false;
-
-            return obj == instance._designObj.transform;
-        }
-        
-        /// <summary>
-        /// Checks whether the specified object is the root part of the design object.
-        /// </summary>
-        public static bool IsRootOfDesignObj( Transform obj )
-        {
-            if( obj == null )
-                return false;
-
-            return obj.parent == obj.root && obj.parent == instance._designObj.transform;
-        }
-
-        public static bool DesignObjectHasRootPart()
-        {
-            return instance._designObj.RootPart != null;
-        }
-
-        /// <summary>
         /// Checks if a vessel/building/etc is currently being either saved or loaded.
         /// </summary>
         public static bool IsSavingOrLoading =>
@@ -154,7 +145,7 @@ namespace KSS.DesignScene
              || (_loader != null && _loader.CurrentState != ILoader.State.Idle);
 
         /// <summary>
-        /// Modify this to point at a different craft file.
+        /// Specifies which craft file to save the vessel to.
         /// </summary>
         public static VesselMetadata CurrentVesselMetadata { get; set; }
 
@@ -179,7 +170,7 @@ namespace KSS.DesignScene
             }
             HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_AFTER_SAVE, null );
         }
-        
+
         public static void FinishLoadFunc()
         {
             TimeManager.LockTimescale = false;

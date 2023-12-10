@@ -28,7 +28,7 @@ namespace KSS.UI
             GameObject spawnedPart = PartRegistry.Load( _part.ID );
             if( DesignObjectManager.DesignObjectHasRootPart() )
             {
-                pickTool.ResetHeldPart( spawnedPart.transform, Vector3.zero );
+                pickTool.SetHeldPart( spawnedPart.transform, Vector3.zero );
             }
             else
             {
