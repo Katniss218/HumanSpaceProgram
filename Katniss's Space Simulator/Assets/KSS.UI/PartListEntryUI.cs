@@ -26,15 +26,15 @@ namespace KSS.UI
             PickTool pickTool = DesignSceneToolManager.UseTool<PickTool>();
 
             GameObject spawnedPart = PartRegistry.Load( _part.ID );
-            if( DesignObjectManager.DesignObjectHasRootPart() )
-            {
-                pickTool.SetHeldPart( spawnedPart.transform, Vector3.zero );
-            }
-            else
+            if( DesignObjectManager.DesignObject.RootPart == null )
             {
                 spawnedPart.transform.localPosition = Vector3.zero;
                 spawnedPart.transform.localRotation = Quaternion.identity;
-                DesignObjectManager.PlaceRoot( spawnedPart.transform );
+                DesignObjectManager.TryAttachRoot( spawnedPart.transform );
+            }
+            else
+            {
+                pickTool.SetHeldPart( spawnedPart.transform, Vector3.zero );
             }
         }
 

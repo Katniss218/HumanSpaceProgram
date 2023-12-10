@@ -73,7 +73,7 @@ namespace KSS.DesignScene.Tools
                         clickedObj = r.Target.transform;
                     }
 
-                    if( DesignObjectManager.IsActionable( clickedObj ) )
+                    if( DesignObjectManager.IsLooseOrPartOfDesignObject( clickedObj ) )
                     {
                         if( _handles == null )
                             CreateHandles();

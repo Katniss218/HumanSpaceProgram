@@ -23,23 +23,21 @@ namespace KSS.DesignScene
         static JsonSeparateFileSerializedDataHandler _designObjDataHandler = new JsonSeparateFileSerializedDataHandler();
         static SingleExplicitHierarchyStrategy _designObjStrategy = new SingleExplicitHierarchyStrategy( _designObjDataHandler, GetGameObject );
 
-        [SerializeField]
         private DesignObject _designObj;
-
-        [SerializeField]
-        private List<Transform> _looseParts = new List<Transform>();
-
+        /// <summary>
+        /// Returns the object currently being edited.
+        /// </summary>
         public static DesignObject DesignObject => instance._designObj;
 
-        public static bool DesignObjectHasRootPart()
-        {
-            return instance._designObj.RootPart != null;
-        }
+        /// <summary>
+        /// Parts that are loosely dropped in the design scene, ghosted out.
+        /// </summary>
+        private List<Transform> _looseParts = new List<Transform>();
 
         /// <summary>
         /// True if the object can be interacted with (picked up, moved, rotated, etc).
         /// </summary>
-        public static bool IsActionable( Transform obj )
+        public static bool IsLooseOrPartOfDesignObject( Transform obj )
         {
             if( obj == null )
                 return false;
@@ -52,7 +50,7 @@ namespace KSS.DesignScene
         /// </summary>
         public static bool TryDetach( Transform obj )
         {
-            if( !IsActionable( obj ) )
+            if( !IsLooseOrPartOfDesignObject( obj ) )
             {
                 return false;
             }
@@ -95,6 +93,10 @@ namespace KSS.DesignScene
         /// <param name="parent">The new parent, can be null, in which case, the part will be placed as a loose part.</param>
         public static bool TryAttach( Transform obj, Transform parent )
         {
+            if( IsLooseOrPartOfDesignObject( obj ) )
+            {
+                return false;
+            }
             if( !CanBeAttachedTo( parent ) )
             {
                 return false;
@@ -122,19 +124,19 @@ namespace KSS.DesignScene
         /// <remarks>
         /// This will destroy the already existing root part, if any.
         /// </remarks>
-        public static void PlaceRoot( Transform obj )
+        public static bool TryAttachRoot( Transform obj )
         {
-            if( IsActionable( obj ) )
+            if( IsLooseOrPartOfDesignObject( obj ) )
             {
-                throw new ArgumentException( $"object to place must NOT be an actionable object.", nameof( obj ) );
+                return false;
             }
 
-            if( DesignObjectHasRootPart() )
+            if( DesignObject.RootPart != null )
             {
-                Destroy( instance._designObj.RootPart );
+                Destroy( DesignObject.RootPart );
             }
-            obj.SetParent( instance._designObj.transform );
-            instance._designObj.RootPart = obj;
+            DesignObject.RootPart = obj;
+            return true;
         }
 
         /// <summary>
@@ -174,7 +176,7 @@ namespace KSS.DesignScene
         public static void FinishLoadFunc()
         {
             TimeManager.LockTimescale = false;
-            instance._designObj.RootPart = _designObjStrategy.LastSpawnedRoot.transform;
+            DesignObject.RootPart = _designObjStrategy.LastSpawnedRoot.transform;
             if( !_wasPausedBeforeSerializing )
             {
                 TimeManager.Unpause();
@@ -247,10 +249,10 @@ namespace KSS.DesignScene
 
         private static GameObject GetGameObject()
         {
-            if( !DesignObjectHasRootPart() )
+            if( DesignObject.RootPart == null )
                 throw new InvalidOperationException( $"Can't save, the design object is empty." );
 
-            return instance._designObj.RootPart.gameObject;
+            return DesignObject.RootPart.gameObject;
         }
     }
 }

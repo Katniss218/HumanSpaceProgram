@@ -35,7 +35,7 @@ namespace KSS.DesignScene.Tools
                 Destroy( _heldPart.gameObject );
             _heldPart = value;
             _heldClickOffset = clickOffset;
-            _heldPartStartRotation = value.rotation;
+            _heldPartStartRotation = value.rotation; // KSP takes into account whether the orientation was changed using the WASDQE keys.
         }
 
         void Awake()
