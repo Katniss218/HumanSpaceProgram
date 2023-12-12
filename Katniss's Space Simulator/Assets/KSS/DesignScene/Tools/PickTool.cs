@@ -102,8 +102,8 @@ namespace KSS.DesignScene.Tools
         {
             if( _nodeTheHeldPartIsSnappedTo != null )
             {
-                if( DesignObjectManager.TryAttach( _heldPart, _nodeTheHeldPartIsSnappedTo.transform.parent ) ) 
-                    // TODO - attaching should take into account which object the node belongs to, and re-root accordingly.
+                if( DesignObjectManager.TryAttach( _heldPart, _nodeTheHeldPartIsSnappedTo.transform.parent ) )
+                // TODO - attaching should take into account which object the node belongs to, and re-root accordingly.
                 {
                     _heldPart = null;
                     _nodeTheHeldPartIsSnappedTo = null;
@@ -152,6 +152,8 @@ namespace KSS.DesignScene.Tools
             if( !Input.GetKey( KeyCode.LeftAlt ) )
             {
                 // Snap to surface of other parts.
+                
+               // if( TryRaycastInteracted( ray, DesignObjectManager.CanBeAttachedTo, out RaycastHit hit, out Transform hitObj ) )
                 IEnumerable<RaycastHit> hits = UnityEngine.Physics.RaycastAll( ray, 8192, int.MaxValue ).OrderBy( h => h.distance );
                 foreach( var hit in hits )
                 {
@@ -219,6 +221,31 @@ namespace KSS.DesignScene.Tools
             {
                 _nodeTheHeldPartIsSnappedTo = null;
             }
+        }
+
+
+
+        private static bool TryRaycastInteracted( Ray ray, Func<Transform, bool> accept, out RaycastHit hit, out Transform hitObj )
+        {
+            // Something like this can be used in place of all these explicit loops.
+            foreach( var hitInner in Physics.RaycastAll( ray, 8192, int.MaxValue ).OrderBy( hit => hit.distance ) )
+            {
+                hitObj = hitInner.collider.transform;
+
+                if( hitObj.HasComponent<FClickInteractionRedirect>( out var redirect ) && redirect.Target != null )
+                {
+                    hitObj = redirect.Target.transform;
+                }
+
+                if( accept(hitObj) )
+                {
+                    hit = hitInner;
+                    return true;
+                }
+            }
+            hit = default;
+            hitObj = default;
+            return false;
         }
     }
 }
