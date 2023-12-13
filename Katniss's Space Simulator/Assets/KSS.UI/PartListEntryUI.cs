@@ -30,6 +30,7 @@ namespace KSS.UI
             {
                 spawnedPart.transform.localPosition = Vector3.zero;
                 spawnedPart.transform.localRotation = Quaternion.identity;
+                spawnedPart.SetLayer( (int)Layer.PART_OBJECT, true );
                 DesignObjectManager.TryAttachRoot( spawnedPart.transform );
             }
             else

@@ -16,7 +16,13 @@ namespace KSS.Core.Components
         /// </summary>
         public struct SnappingCandidate
         {
+            /// <summary>
+            /// The node that was snapped to the target.
+            /// </summary>
             public FAttachNode snappedNode;
+            /// <summary>
+            /// The node that the snapped node was snapped to.
+            /// </summary>
             public FAttachNode targetNode;
             public float distance;
             public float angle;

@@ -176,15 +176,15 @@ namespace KSS.Core
             else
             {
 #warning TODO - Fixing oldv's AIRF pos/rot shouldn't be required here. RE: RootObjectTransform airfpos is incorrect.
-               // oldv.AIRFPosition = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( oldv.RootPart.position );
-               // oldv.AIRFRotation = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( oldv.RootPart.rotation );
+                // oldv.AIRFPosition = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( oldv.RootPart.position );
+                // oldv.AIRFRotation = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( oldv.RootPart.rotation );
             }
         }
 
         /// <summary>
         /// Sets the root object in the hierarchy to the specified object.
         /// </summary>
-        public static void ReRoot( Transform newRoot )
+        public static Transform ReRoot( Transform newRoot )
         {
             // To set the root, means to set the parent chain to be a child chain.
             // This can be seen graphically on the following tree:
@@ -197,9 +197,26 @@ namespace KSS.Core
                            / \
                           6   7
             */
-            Transform parent = newRoot.parent;
-            parent.SetParent( newRoot, true ); // worldPositionStays *might* introduce precision issues if performed far away from origin.
-            ReRoot( parent );
+
+            Queue<Transform> originalParentChain = new Queue<Transform>();
+
+            Transform current = newRoot;
+            while( current != null ) // Store the original parent chain, because reparenting will fuck it up.
+            {
+                originalParentChain.Enqueue( current ); // child: 0, parent: 1, grandparent: 2, etc.
+                current = current.parent;
+            }
+
+            Transform newParent = originalParentChain.Dequeue();
+            newParent.SetParent( null ); // Without this, the main SetParent won't set the parent correctly.
+            while( originalParentChain.TryDequeue( out Transform newChild ) )
+            {
+                newChild.SetParent( newParent );
+
+                newParent = newChild;
+            }
+
+            return newRoot;
         }
 
         /// <summary>

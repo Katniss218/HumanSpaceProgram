@@ -1,4 +1,5 @@
-﻿using KSS.Core.Components;
+﻿using KSS.Core;
+using KSS.Core.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,10 +20,14 @@ namespace KSS.DesignScene.Tools
         Quaternion _heldPartStartRotation;
 
         Camera _camera;
-        FAttachNode _nodeTheHeldPartIsSnappedTo = null;
+        FAttachNode.SnappingCandidate? _currentSnap = null;
 
-        public bool AngleSnappingEnabled = false;
+        public bool AngleSnappingEnabled = true;
         public float AngleSnappingInterval = 22.5f;
+
+        private Ray _currentFrameCursorRay;
+        private Transform _currentFrameHitObject;
+        private RaycastHit _currentFrameHit;
 
         /// <summary>
         /// Sets the held part, destroys the previously held part (if any).
@@ -33,7 +38,10 @@ namespace KSS.DesignScene.Tools
                 return;
             if( _heldPart != null )
                 Destroy( _heldPart.gameObject );
+
             _heldPart = value;
+            _heldPart.gameObject.SetLayer( (int)Layer.VESSEL_DESIGN_HELD, true );
+
             _heldClickOffset = clickOffset;
             _heldPartStartRotation = value.rotation; // KSP takes into account whether the orientation was changed using the WASDQE keys.
         }
@@ -47,6 +55,17 @@ namespace KSS.DesignScene.Tools
         {
             if( UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() )
                 return;
+
+            _currentFrameCursorRay = _camera.ScreenPointToRay( Input.mousePosition );
+
+            if( Physics.Raycast( _currentFrameCursorRay, out _currentFrameHit, 8192, 1 << (int)Layer.PART_OBJECT ) )
+            {
+                _currentFrameHitObject = FClickInteractionRedirect.TryRedirect( _currentFrameHit.collider.transform );
+            }
+            else
+            {
+                _currentFrameHitObject = null;
+            }
 
             if( _heldPart == null )
             {
@@ -81,125 +100,94 @@ namespace KSS.DesignScene.Tools
 
         private void TryPickUpPart()
         {
-            Ray ray = _camera.ScreenPointToRay( Input.mousePosition );
-            if( UnityEngine.Physics.Raycast( ray, out RaycastHit hitInfo, 8192, int.MaxValue ) )
+            if( _currentFrameHitObject != null )
             {
-                Transform clickedObj = hitInfo.collider.transform;
-
-                if( clickedObj.HasComponent<FClickInteractionRedirect>( out var redirect ) && redirect.Target != null )
+                if( DesignObjectManager.TryDetach( _currentFrameHitObject ) )
                 {
-                    clickedObj = redirect.Target.transform;
-                }
-
-                if( DesignObjectManager.TryDetach( clickedObj ) )
-                {
-                    SetHeldPart( clickedObj, hitInfo.point - clickedObj.position );
+                    SetHeldPart( _currentFrameHitObject, _currentFrameHit.point - _currentFrameHitObject.position );
                 }
             }
         }
 
         private void PlacePart()
         {
-            if( _nodeTheHeldPartIsSnappedTo != null )
+            if( _currentSnap != null )
             {
-                if( DesignObjectManager.TryAttach( _heldPart, _nodeTheHeldPartIsSnappedTo.transform.parent ) )
+                Transform newRoot = VesselHierarchyUtils.ReRoot( _currentSnap.Value.snappedNode.transform.parent );
+                _heldPart = newRoot;
+                // Node-attach (object is already positioned).
+                if( DesignObjectManager.TryAttach( _heldPart, _currentSnap.Value.targetNode.transform.parent ) )
                 // TODO - attaching should take into account which object the node belongs to, and re-root accordingly.
                 {
+                    _heldPart.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
                     _heldPart = null;
-                    _nodeTheHeldPartIsSnappedTo = null;
+                    _currentSnap = null;
                 }
 
                 return;
             }
 
-            Ray ray = _camera.ScreenPointToRay( Input.mousePosition );
-
-            IEnumerable<RaycastHit> hits = UnityEngine.Physics.RaycastAll( ray, 8192, int.MaxValue ).OrderBy( h => h.distance );
-            foreach( var hit in hits )
+            // Surface-attach (object is already positioned).
+            if( _currentFrameHitObject != null )
             {
-                Transform hitObj = hit.collider.transform;
-
-                if( hitObj.root == _heldPart )
-                    continue;
-
-                if( hitObj.HasComponent<FClickInteractionRedirect>( out var redirect ) && redirect.Target != null )
+                if( DesignObjectManager.TryAttach( _heldPart, _currentFrameHitObject ) )
                 {
-                    hitObj = redirect.Target.transform;
-                }
-
-                // thing we clicked on is part of the rocket/rover/vessel.
-                // thing we are holding is not the design object itself.
-                if( DesignObjectManager.TryAttach( _heldPart, hitObj ) )
-                {
+                    _heldPart.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
                     _heldPart = null;
-                    _nodeTheHeldPartIsSnappedTo = null;
+                    _currentSnap = null;
                     return;
                 }
             }
 
-            // KSP would place as ghost here
+            // Place as a ghost loose part (object is already positioned).
             if( DesignObjectManager.TryAttach( _heldPart, null ) )
             {
+                _heldPart.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
                 _heldPart = null;
-                _nodeTheHeldPartIsSnappedTo = null;
+                _currentSnap = null;
             }
         }
 
         private void PositionHeldPart()
         {
-            Ray ray = _camera.ScreenPointToRay( Input.mousePosition );
-
             if( !Input.GetKey( KeyCode.LeftAlt ) )
             {
                 // Snap to surface of other parts.
-                
-               // if( TryRaycastInteracted( ray, DesignObjectManager.CanBeAttachedTo, out RaycastHit hit, out Transform hitObj ) )
-                IEnumerable<RaycastHit> hits = UnityEngine.Physics.RaycastAll( ray, 8192, int.MaxValue ).OrderBy( h => h.distance );
-                foreach( var hit in hits )
+
+                if( _currentFrameHitObject != null )
                 {
-                    Transform hitObj = hit.collider.transform;
-
-                    if( hitObj.root == _heldPart )
-                        continue;
-
-                    if( hitObj.HasComponent<FClickInteractionRedirect>( out var redirect ) && redirect.Target != null )
+                    if( DesignObjectManager.CanHaveChildren( _currentFrameHitObject ) )
                     {
-                        hitObj = redirect.Target.transform;
-                    }
-
-                    if( DesignObjectManager.CanBeAttachedTo( hitObj ) )
-                    {
-                        Vector3 newPos = hit.point;
+                        Vector3 newPos = _currentFrameHit.point;
                         if( AngleSnappingEnabled )
                         {
-                            // Find the angle between the 'up' direction of the collider, the 'right' direction, and the direction to the hit point.
-                            // Round that to nearest multiple of snappingangle, and rotate 'right' direction by that angle to get new point.
-                            float angle = Vector3.SignedAngle( hitObj.right, Vector3.ProjectOnPlane( (hitObj.position - hit.point), hitObj.up ).normalized, hitObj.up );
-                            if( angle < 0 )
-                                angle += 360;
+                            Vector3 projectedPoint = Vector3.ProjectOnPlane( (_currentFrameHitObject.position - _currentFrameHit.point), _currentFrameHitObject.up ).normalized;
+                            float angle = Vector3.SignedAngle( _currentFrameHitObject.right, projectedPoint, _currentFrameHitObject.up );
+
                             float roundedAngle = AngleSnappingInterval * Mathf.Round( angle / AngleSnappingInterval );
-                            Quaternion rotation = Quaternion.AngleAxis( roundedAngle + 180, hitObj.up ); // angle + 180 appears to be needed, for some reason.
-                            newPos = rotation * (hitObj.right * Vector3.Distance( hit.point, hitObj.position ));
+
+                            Quaternion rotation = Quaternion.AngleAxis( roundedAngle + 180, _currentFrameHitObject.up ); // angle + 180 appears to be needed, for some reason.
+
+                            newPos = rotation * (_currentFrameHitObject.right * Vector3.Distance( _currentFrameHit.point, _currentFrameHitObject.position )) // position relative to (0,0,0)
+                                + _currentFrameHitObject.position                                                                                            // translate from (0,0,0) to the part
+                                + new Vector3( 0, (_currentFrameHit.point.y - _currentFrameHitObject.position.y), 0 );                                       // translate vertically from the part to to the cursor
                         }
 
-                        _heldPart.rotation = Quaternion.LookRotation( hit.normal, hitObj.up );
-                        _heldPart.position = newPos; // todo - use surface attach node if available.
-
+                        _heldPart.rotation = Quaternion.LookRotation( _currentFrameHit.normal, _currentFrameHitObject.up );
+                        _heldPart.position = newPos; // todo - use surface attach node when available.
                         return;
                     }
                 }
             }
 
-            Vector3 planePoint = _heldPart.position + _heldClickOffset;
-
-            Plane viewPlane = new Plane( _camera.transform.forward, planePoint );
-            if( viewPlane.Raycast( ray, out float intersectionDistance ) )
+            Plane viewPlane = new Plane( _camera.transform.forward, (_heldPart.position + _heldClickOffset) );
+            if( viewPlane.Raycast( _currentFrameCursorRay, out float intersectionDistance ) )
             {
-                Vector3 intersectionPoint = ray.GetPoint( intersectionDistance );
+                Vector3 planePoint = _currentFrameCursorRay.GetPoint( intersectionDistance );
 
                 // Reset the position/rotation before snapping to prevent the previous snapping from affecting what nodes will snap.
                 // It should always snap "as if the part is at the cursor", not wherever it was snapped to previously.
-                _heldPart.position = intersectionPoint - _heldClickOffset;
+                _heldPart.position = planePoint - _heldClickOffset;
                 _heldPart.rotation = _heldPartStartRotation;
 
                 TrySnappingHeldPartToAttachmentNode( viewPlane.normal );
@@ -215,37 +203,12 @@ namespace KSS.DesignScene.Tools
             if( nodePair != null )
             {
                 FAttachNode.SnapTo( _heldPart, nodePair.Value.snappedNode, nodePair.Value.targetNode );
-                _nodeTheHeldPartIsSnappedTo = nodePair.Value.targetNode;
+                _currentSnap = nodePair;
             }
             else
             {
-                _nodeTheHeldPartIsSnappedTo = null;
+                _currentSnap = null;
             }
-        }
-
-
-
-        private static bool TryRaycastInteracted( Ray ray, Func<Transform, bool> accept, out RaycastHit hit, out Transform hitObj )
-        {
-            // Something like this can be used in place of all these explicit loops.
-            foreach( var hitInner in Physics.RaycastAll( ray, 8192, int.MaxValue ).OrderBy( hit => hit.distance ) )
-            {
-                hitObj = hitInner.collider.transform;
-
-                if( hitObj.HasComponent<FClickInteractionRedirect>( out var redirect ) && redirect.Target != null )
-                {
-                    hitObj = redirect.Target.transform;
-                }
-
-                if( accept(hitObj) )
-                {
-                    hit = hitInner;
-                    return true;
-                }
-            }
-            hit = default;
-            hitObj = default;
-            return false;
         }
     }
 }

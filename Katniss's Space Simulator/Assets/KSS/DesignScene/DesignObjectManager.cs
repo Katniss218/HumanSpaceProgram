@@ -79,7 +79,7 @@ namespace KSS.DesignScene
         /// <summary>
         /// Checks whether an object can be parented to the specified object.
         /// </summary>
-        public static bool CanBeAttachedTo( Transform parent )
+        public static bool CanHaveChildren( Transform parent )
         {
             if( parent == null )
                 return true;
@@ -97,7 +97,7 @@ namespace KSS.DesignScene
             {
                 return false;
             }
-            if( !CanBeAttachedTo( parent ) )
+            if( !CanHaveChildren( parent ) )
             {
                 return false;
             }

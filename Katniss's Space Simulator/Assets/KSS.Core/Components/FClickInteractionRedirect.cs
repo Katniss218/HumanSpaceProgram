@@ -20,6 +20,32 @@ namespace KSS.Core.Components
         [field: SerializeField]
         public GameObject Target { get; set; }
 
+
+        /// <summary>
+        /// If the object has an <see cref="FClickInteractionRedirect"/> component that has a target - returns its target, otherwise returns the input object.
+        /// </summary>
+        public static GameObject TryRedirect( GameObject gameObject )
+        {
+            if( gameObject.HasComponent<FClickInteractionRedirect>( out var redirect ) && redirect.Target != null )
+            {
+                return redirect.Target;
+            }
+            return gameObject;
+        }
+
+        /// <summary>
+        /// If the transform has an <see cref="FClickInteractionRedirect"/> component that has a target - returns its target, otherwise returns the input transform.
+        /// </summary>
+        public static Transform TryRedirect( Transform transform )
+        {
+            if( transform.HasComponent<FClickInteractionRedirect>( out var redirect ) && redirect.Target != null )
+            {
+                return redirect.Target.transform;
+            }
+            return transform;
+        }
+
+
         public SerializedData GetData( IReverseReferenceMap s )
         {
             return new SerializedObject()
