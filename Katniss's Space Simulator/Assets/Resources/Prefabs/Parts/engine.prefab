@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 4913429701061343767}
   - component: {fileID: 3681314192585619052}
   - component: {fileID: -3393855845094403734}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: engine
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -122,7 +122,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3122742904174562515}
   - component: {fileID: 2051341910331357422}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: airffix
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -166,7 +166,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2827709295952485419}
   - component: {fileID: 2134941327889410437}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: NODE
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -211,7 +211,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5100420367140992150}
   - component: {fileID: 6605933995845817150}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: NODE
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -257,7 +257,7 @@ GameObject:
   - component: {fileID: 6788691075548484274}
   - component: {fileID: 7609285694143438103}
   - component: {fileID: 5655793581763422685}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -338,7 +338,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7807464262065594331}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: plume
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -371,7 +371,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2836283960901704833}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: thrustTransform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -404,6 +404,10 @@ PrefabInstance:
     - target: {fileID: 8249851232874469722, guid: c92c375e3df22dd43a777a7cccf2c1e0, type: 3}
       propertyPath: m_Name
       value: plume
+      objectReference: {fileID: 0}
+    - target: {fileID: 8249851232874469722, guid: c92c375e3df22dd43a777a7cccf2c1e0, type: 3}
+      propertyPath: m_Layer
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 8249851232874469722, guid: c92c375e3df22dd43a777a7cccf2c1e0, type: 3}
       propertyPath: m_IsActive
@@ -452,6 +456,10 @@ PrefabInstance:
     - target: {fileID: 8249851232874469727, guid: c92c375e3df22dd43a777a7cccf2c1e0, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8249851232885877827, guid: c92c375e3df22dd43a777a7cccf2c1e0, type: 3}
+      propertyPath: m_Layer
+      value: 20
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_AddedGameObjects: []

@@ -173,6 +173,7 @@ namespace KSS.Core
         {
             this.RootObjTransform = this.GetComponent<RootObjectTransform>();
             this.PhysicsObject = this.GetComponent<IPhysicsObject>();
+            this.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
         }
 
         void SetPhysicsObjectParameters()

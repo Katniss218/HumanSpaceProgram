@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8758670627751108313}
   - component: {fileID: 2542640792718134248}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: NODE
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -56,7 +56,7 @@ GameObject:
   - component: {fileID: 1609274382744512581}
   - component: {fileID: 303862411286303112}
   - component: {fileID: 8173245928716808438}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: model_LOD1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -139,7 +139,7 @@ GameObject:
   - component: {fileID: 2487738353659475624}
   - component: {fileID: 1524999878792706317}
   - component: {fileID: 3660604091142442439}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -225,7 +225,7 @@ GameObject:
   - component: {fileID: 881548991537354002}
   - component: {fileID: 4847280572405610972}
   - component: {fileID: 2237606412665995627}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: intertank
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -340,7 +340,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1365322428947104169}
   - component: {fileID: 3649184911059352160}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: NODE
   m_TagString: Untagged
   m_Icon: {fileID: 0}

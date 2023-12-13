@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 6544856856546271155}
   - component: {fileID: 2831796584560580002}
   - component: {fileID: 1632188022149188359}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: tank
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -123,7 +123,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5565276089906677883}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: volumeTransform
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -155,7 +155,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2351184343629585722}
   - component: {fileID: 4188912153051089718}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: NODE
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -200,7 +200,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2578217552208006135}
   - component: {fileID: 2997356837308755540}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: NODE
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -246,7 +246,7 @@ GameObject:
   - component: {fileID: 7712550213412796183}
   - component: {fileID: 6676481010975783090}
   - component: {fileID: 8882038903205973112}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: tank
   m_TagString: Untagged
   m_Icon: {fileID: 0}

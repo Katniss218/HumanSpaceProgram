@@ -184,7 +184,7 @@ namespace KSS.Core
         /// <summary>
         /// Sets the root object in the hierarchy to the specified object.
         /// </summary>
-        public static Transform ReRoot( Transform newRoot )
+        public static Transform ReRoot( Transform newRoot, Transform stopAt = null )
         {
             // To set the root, means to set the parent chain to be a child chain.
             // This can be seen graphically on the following tree:
@@ -201,7 +201,7 @@ namespace KSS.Core
             Queue<Transform> originalParentChain = new Queue<Transform>();
 
             Transform current = newRoot;
-            while( current != null ) // Store the original parent chain, because reparenting will fuck it up.
+            while( current != null || current == stopAt ) // Store the original parent chain, because reparenting will fuck it up.
             {
                 originalParentChain.Enqueue( current ); // child: 0, parent: 1, grandparent: 2, etc.
                 current = current.parent;

@@ -801,7 +801,7 @@ Camera:
   m_Depth: 99
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 32
+    m_Bits: 96
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -1578,8 +1578,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48c023a308c7e6b44a424a849ad42c35, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _designObj: {fileID: 0}
-  _looseParts: []
 --- !u!1 &1911629632
 GameObject:
   m_ObjectHideFlags: 0
@@ -1863,7 +1861,7 @@ Camera:
   m_Depth: -22
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 51380247
+    m_Bits: 53477399
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
