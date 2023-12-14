@@ -92,6 +92,10 @@
     <Compile Include="Assets\KSS\GameplayScene\GameplaySceneToolManager.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadTree_NodeUtils.cs" />
     <Compile Include="Assets\KSS\AssetLoaders\GameDataJsonVesselFactory.cs" />
+    <Compile Include="Assets\KSS\GameplayScene\Tools\DefaultTool.cs" />
+    <Compile Include="Assets\KSS\GameplayScene\Tools\VanillaToolRegisterer.cs" />
+    <Compile Include="Assets\KSS\GameplayScene\GameplaySceneToolBase.cs" />
+    <Compile Include="Assets\KSS\DesignScene\DesignSceneToolBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS\CelestialBodies\Surface\TerrainShader.shader" />

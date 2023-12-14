@@ -14,15 +14,42 @@ namespace KSS.DesignScene
     /// </summary>
     public class DesignSceneToolManager : SingletonMonoBehaviour<DesignSceneToolManager>
     {
-        private List<MonoBehaviour> _availableTools = new List<MonoBehaviour>();
-        private MonoBehaviour _activeTool = null;
+        private List<DesignSceneToolBase> _availableTools = new List<DesignSceneToolBase>();
+        private DesignSceneToolBase _activeTool = null;
 
         public static Type ActiveToolType { get => instance._activeTool.GetType(); }
+
+        public static bool HasTool<T>() where T : DesignSceneToolBase
+        {
+            if( instance == null )
+            {
+                throw new InvalidOperationException( $"{nameof( DesignSceneToolManager )} is accessible only in the design scene." );
+            }
+
+            return HasTool( typeof( T ) );
+        }
+
+        public static bool HasTool( Type toolType )
+        {
+            if( instance == null )
+            {
+                throw new InvalidOperationException( $"{nameof( DesignSceneToolManager )} is accessible only in the design scene." );
+            }
+
+            foreach( var tool in instance._availableTools )
+            {
+                if( tool.GetType() == toolType )
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
 
         /// <summary>
         /// Registers a tool with the specified type for future use.
         /// </summary>
-        public static void RegisterTool<T>() where T : MonoBehaviour
+        public static void RegisterTool<T>() where T : DesignSceneToolBase
         {
             if( instance == null )
             {
@@ -37,10 +64,23 @@ namespace KSS.DesignScene
                 }
             }
 
-            MonoBehaviour comp = instance.gameObject.AddComponent<T>();
+            DesignSceneToolBase comp = instance.gameObject.AddComponent<T>();
             comp.enabled = false;
 
             instance._availableTools.Add( comp );
+        }
+
+        public static object UseDefaultTool()
+        {
+            try
+            {
+                return UseTool( instance._availableTools[0].GetType() );
+            }
+            catch
+            {
+                //
+                return null;
+            }
         }
 
         /// <summary>
@@ -50,7 +90,7 @@ namespace KSS.DesignScene
         /// Tool instances are persisted. Selecting a tool, and going back to a previous one keeps its data.
         /// </remarks>
         /// <returns>The instance of the tool that was enabled.</returns>
-        public static T UseTool<T>() where T : MonoBehaviour
+        public static T UseTool<T>() where T : DesignSceneToolBase
         {
             return (T)UseTool( typeof( T ) );
         }
@@ -69,13 +109,13 @@ namespace KSS.DesignScene
                 throw new InvalidOperationException( $"{nameof( DesignSceneToolManager )} is accessible only in the design scene." );
             }
 
-            Type baseToolType = typeof( MonoBehaviour );
+            Type baseToolType = typeof( DesignSceneToolBase );
             if( !(baseToolType.IsAssignableFrom( toolType )) )
             {
                 throw new ArgumentException( $"Can't register a tool that is not a {baseToolType.FullName}." );
             }
 
-            MonoBehaviour tool = null;
+            DesignSceneToolBase tool = null;
             foreach( var t in instance._availableTools )
             {
                 if( t.GetType() == toolType )

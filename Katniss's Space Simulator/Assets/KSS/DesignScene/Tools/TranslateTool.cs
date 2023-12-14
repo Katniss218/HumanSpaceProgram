@@ -12,7 +12,7 @@ namespace KSS.DesignScene.Tools
     /// <summary>
     /// Allows to move a selected part after placing.
     /// </summary>
-    public class TranslateTool : MonoBehaviour
+    public class TranslateTool : DesignSceneToolBase
     {
         private bool _snappingEnabled;
         public bool SnappingEnabled
@@ -63,6 +63,7 @@ namespace KSS.DesignScene.Tools
             Ray ray = _handles.RaycastCamera.ScreenPointToRay( Input.mousePosition );
             if( Input.GetKeyDown( KeyCode.Mouse0 ) )
             {
+#warning TODO - raycast priority for handles - if clicked on handle, don't try to reattach them to a different object, or click on anything else.
                 if( UnityEngine.Physics.Raycast( ray, out RaycastHit hitInfo, 8192, int.MaxValue ) )
                 {
                     Transform clickedObj = hitInfo.collider.transform;

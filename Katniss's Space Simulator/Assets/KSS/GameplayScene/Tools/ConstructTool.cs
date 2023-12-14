@@ -11,7 +11,7 @@ namespace KSS.GameplayScene.Tools
     /// <summary>
     /// Allows to detach and attach parts.
     /// </summary>
-    public class ConstructTool : MonoBehaviour
+    public class ConstructTool : GameplaySceneToolBase
     {
         Transform _heldPart = null;
         /// <summary>
@@ -56,15 +56,23 @@ namespace KSS.GameplayScene.Tools
 
             // placed ghost can be adjusted, this resets all build points (or can't be adjusted if it has any build points accumulated)
 
+            // adjustment is done by a different tool.
+
         }
 
-        void OnDisable() // if tool switched while action is performed.
+        void OnDisable() // if tool switched while trying to place new construction ghost
         {
             if( _heldPart != null )
             {
-
+                Destroy( _heldPart.gameObject );
             }
         }
 
+        void Place()
+        {
+            // place.
+
+            GameplaySceneToolManager.UseTool<DefaultTool>();
+        }
     }
 }

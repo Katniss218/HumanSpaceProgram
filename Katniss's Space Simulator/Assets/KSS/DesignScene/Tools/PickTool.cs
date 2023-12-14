@@ -12,7 +12,7 @@ namespace KSS.DesignScene.Tools
     /// <summary>
     /// Allows to detach and attach parts.
     /// </summary>
-    public class PickTool : MonoBehaviour
+    public class PickTool : DesignSceneToolBase
     {
         Transform _heldPart = null;
 

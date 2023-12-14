@@ -201,7 +201,7 @@ namespace KSS.Core
             Queue<Transform> originalParentChain = new Queue<Transform>();
 
             Transform current = newRoot;
-            while( current != null || current == stopAt ) // Store the original parent chain, because reparenting will fuck it up.
+            while( current != null || (stopAt != null && current == stopAt) ) // Store the original parent chain, because reparenting will fuck it up.
             {
                 originalParentChain.Enqueue( current ); // child: 0, parent: 1, grandparent: 2, etc.
                 current = current.parent;
