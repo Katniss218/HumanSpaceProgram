@@ -17,6 +17,7 @@ using UnityPlus.Serialization;
 using UnityPlus.Serialization.DataHandlers;
 using UnityPlus.Serialization.Strategies;
 using KSS.Components;
+using KSS.GameplayScene.Tools;
 
 namespace KSS.UI.SceneFactories
 {
@@ -131,15 +132,15 @@ namespace KSS.UI.SceneFactories
                 UIPanel topPanel = _mainPanel.AddPanel( UILayoutInfo.FillHorizontal( 0, 0, 1f, 0, 30 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/top_panel_background" ) );
 
                 UIPanel p1 = topPanel.AddPanel( UILayoutInfo.FillVertical( 0, 0, 0f, 20, 110 ), null );
-                UIButton newBtn = p1.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 0, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_new" ), null );
-                UIButton openBtn = p1.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 40, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_open" ), () =>
+                UIButton newBtn = p1.AddButton( new UILayoutInfo( UILayoutInfo.BottomLeft, new Vector2( 0, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_new" ), null );
+                UIButton openBtn = p1.AddButton( new UILayoutInfo( UILayoutInfo.BottomLeft, new Vector2( 40, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_open" ), () =>
                 {
                 } );
-                UIButton saveBtn = p1.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 80, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_save" ), () =>
+                UIButton saveBtn = p1.AddButton( new UILayoutInfo( UILayoutInfo.BottomLeft, new Vector2( 80, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_save" ), () =>
                 {
                 } );
 
-                UIText utText = topPanel.AddText( new UILayoutInfo( Vector2.zero, new Vector2( 150, 0 ), new Vector2( 80, 30 ) ), "" )
+                UIText utText = topPanel.AddText( new UILayoutInfo( UILayoutInfo.BottomLeft, new Vector2( 150, 0 ), new Vector2( 80, 30 ) ), "" )
                     .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
                     .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
@@ -153,15 +154,15 @@ namespace KSS.UI.SceneFactories
                 UIPanel topLeftPanel = _mainPanel.AddPanel( new UILayoutInfo( UILayoutInfo.TopLeft, Vector2.zero, new Vector2( 400, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/top_panel_background" ) );
 
                 UIPanel p1 = topLeftPanel.AddPanel( UILayoutInfo.FillVertical( 0, 0, 0f, 20, 110 ), null );
-                UIButton newBtn = p1.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 0, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_new" ), null );
-                UIButton openBtn = p1.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 40, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_open" ), () =>
+                UIButton newBtn = p1.AddButton( new UILayoutInfo( UILayoutInfo.BottomLeft, new Vector2( 0, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_new" ), null );
+                UIButton openBtn = p1.AddButton( new UILayoutInfo( UILayoutInfo.BottomLeft, new Vector2( 40, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_open" ), () =>
                 {
                 } );
-                UIButton saveBtn = p1.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 80, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_save" ), () =>
+                UIButton saveBtn = p1.AddButton( new UILayoutInfo( UILayoutInfo.BottomLeft, new Vector2( 80, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_save" ), () =>
                 {
                 } );
 
-                UIText utText = topLeftPanel.AddText( new UILayoutInfo( Vector2.zero, new Vector2( 150, 0 ), new Vector2( 80, 30 ) ), "" )
+                UIText utText = topLeftPanel.AddText( new UILayoutInfo( UILayoutInfo.BottomLeft, new Vector2( 150, 0 ), new Vector2( 80, 30 ) ), "" )
                     .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
                     .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
@@ -173,7 +174,7 @@ namespace KSS.UI.SceneFactories
                 UIPanel topRightPanel = _mainPanel.AddPanel( new UILayoutInfo( UILayoutInfo.TopRight, Vector2.zero, new Vector2( 70, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/top_panel_background" ) );
 
                 UIPanel p4 = topRightPanel.AddPanel( UILayoutInfo.FillVertical( 0, 0, 1f, -20, 30 ), null );
-                UIButton deselectActive = p4.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 0, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), () =>
+                UIButton deselectActive = p4.AddButton( new UILayoutInfo( UILayoutInfo.BottomLeft, new Vector2( 0, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), () =>
                 {
                     ActiveObjectManager.ActiveObject = null;
                 } );
@@ -184,18 +185,25 @@ namespace KSS.UI.SceneFactories
         {
             UIPanel bottomPanel = _mainPanel.AddPanel( UILayoutInfo.FillHorizontal( 0, 0, 0f, 0, 30 ), null );
 
-            UIButton constructButton = bottomPanel.AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( -16, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), () =>
+            UIButton defaultButton = bottomPanel.AddButton( new UILayoutInfo( UILayoutInfo.Middle, new Vector2( -48, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), () =>
+            {
+            } )
+                .WithText( UILayoutInfo.Fill(), "A", out _ );
+
+            UIButton constructButton = bottomPanel.AddButton( new UILayoutInfo( UILayoutInfo.Middle, new Vector2( -16, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), () =>
             {
                 CanvasManager.Get( CanvasName.WINDOWS ).AddTextSelectionWindow( "Vessel to create...", "id here", s =>
                 {
                     (Transform root, Dictionary<FConstructible, ConstructionSite.ConstructibleData> de, BidirectionalReferenceStore refMap) = ConstructionSite.SpawnGhost( s );
-                    root.position = Cameras.GameplayCameraController.MainCamera.transform.position;
-                    ConstructionSite.AddGhostToConstruction( root, de, VesselManager.GetLoadedVessels()[1].RootPart, refMap );
+
+                    ConstructTool tool = GameplaySceneToolManager.UseTool<ConstructTool>();
+                    tool.SetGhostPart( root, de, refMap, Vector3.zero );
+
                 } );
             } )
                 .WithText( UILayoutInfo.Fill(), "C", out _ );
 
-            UIButton deconstructButton = bottomPanel.AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 16, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), () =>
+            UIButton deconstructButton = bottomPanel.AddButton( new UILayoutInfo( UILayoutInfo.Middle, new Vector2( 16, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), () =>
             {
 
             } )
@@ -204,7 +212,7 @@ namespace KSS.UI.SceneFactories
 
         private static void CreateToggleButtonList()
         {
-            UIPanel buttonListPanel = _mainPanel.AddPanel( new UILayoutInfo( new Vector2( 1, 0 ), Vector2.zero, new Vector2( 100, 30 ) ), null );
+            UIPanel buttonListPanel = _mainPanel.AddPanel( new UILayoutInfo( UILayoutInfo.BottomRight, Vector2.zero, new Vector2( 100, 30 ) ), null );
             buttonListPanel.LayoutDriver = new HorizontalLayoutDriver()
             {
                 Dir = HorizontalLayoutDriver.Direction.RightToLeft,

@@ -117,7 +117,6 @@ namespace KSS.DesignScene.Tools
                 _heldPart = newRoot;
                 // Node-attach (object is already positioned).
                 if( DesignObjectManager.TryAttach( _heldPart, _currentSnap.Value.targetNode.transform.parent ) )
-                // TODO - attaching should take into account which object the node belongs to, and re-root accordingly.
                 {
                     _heldPart.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
                     _heldPart = null;

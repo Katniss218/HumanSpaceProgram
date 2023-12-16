@@ -57,12 +57,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\KSS\TranslationTransformHandle.cs" />
+    <Compile Include="Assets\KSS\DesignScene\DesignSceneToolBase.cs" />
     <Compile Include="Assets\KSS\DesignScene\Tools\PickTool.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\VanillaPlanetarySystemFactory.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadTree.cs" />
     <Compile Include="Assets\KSS\TransformHandle.cs" />
     <Compile Include="Assets\KSS\DesignScene\DesignObjectManager.cs" />
     <Compile Include="Assets\KSS\RotationTransformHandle.cs" />
+    <Compile Include="Assets\KSS\GameplayScene\Tools\DefaultTool.cs" />
+    <Compile Include="Assets\KSS\GameplayScene\Tools\VanillaToolRegisterer.cs" />
     <Compile Include="Assets\KSS\Components\FVesselSeparator.cs" />
     <Compile Include="Assets\KSS\GameplayScene\ConstructionSite.cs" />
     <Compile Include="Assets\KSS\TransformHandleSet.cs" />
@@ -89,13 +92,10 @@
     <Compile Include="Assets\KSS\DesignScene\Tools\TranslateTool.cs" />
     <Compile Include="Assets\KSS\AssetLoaders\GameDataJsonPartFactory.cs" />
     <Compile Include="Assets\KSS\DesignScene\Tools\RerootTool.cs" />
+    <Compile Include="Assets\KSS\GameplayScene\GameplaySceneToolBase.cs" />
     <Compile Include="Assets\KSS\GameplayScene\GameplaySceneToolManager.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadTree_NodeUtils.cs" />
     <Compile Include="Assets\KSS\AssetLoaders\GameDataJsonVesselFactory.cs" />
-    <Compile Include="Assets\KSS\GameplayScene\Tools\DefaultTool.cs" />
-    <Compile Include="Assets\KSS\GameplayScene\Tools\VanillaToolRegisterer.cs" />
-    <Compile Include="Assets\KSS\GameplayScene\GameplaySceneToolBase.cs" />
-    <Compile Include="Assets\KSS\DesignScene\DesignSceneToolBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS\CelestialBodies\Surface\TerrainShader.shader" />
@@ -747,6 +747,10 @@
     <ProjectReference Include="_UnityPlus.AssetManagement.csproj">
       <Project>{1082B390-7315-9D8E-BF58-53BE9AF2F68A}</Project>
       <Name>_UnityPlus.AssetManagement</Name>
+    </ProjectReference>
+    <ProjectReference Include="_UnityPlus.Input.csproj">
+      <Project>{0FEFE9C3-4AF2-CF9F-A1BD-710289E2AB20}</Project>
+      <Name>_UnityPlus.Input</Name>
     </ProjectReference>
     <ProjectReference Include="_UnityPlus.OverridableEvents.csproj">
       <Project>{D26EF55E-D30C-518A-2340-C096B47A9C02}</Project>

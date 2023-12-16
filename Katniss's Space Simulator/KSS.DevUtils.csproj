@@ -704,6 +704,10 @@
       <Project>{1082B390-7315-9D8E-BF58-53BE9AF2F68A}</Project>
       <Name>_UnityPlus.AssetManagement</Name>
     </ProjectReference>
+    <ProjectReference Include="_UnityPlus.Input.csproj">
+      <Project>{0FEFE9C3-4AF2-CF9F-A1BD-710289E2AB20}</Project>
+      <Name>_UnityPlus.Input</Name>
+    </ProjectReference>
     <ProjectReference Include="_UnityPlus.OverridableEvents.csproj">
       <Project>{D26EF55E-D30C-518A-2340-C096B47A9C02}</Project>
       <Name>_UnityPlus.OverridableEvents</Name>

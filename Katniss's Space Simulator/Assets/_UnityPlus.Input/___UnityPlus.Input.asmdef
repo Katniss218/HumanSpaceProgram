@@ -1,0 +1,16 @@
+{
+    "name": "_UnityPlus.Input",
+    "rootNamespace": "",
+    "references": [
+        "GUID:27d62e6e15e3fa24eabddedaa74a2424"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

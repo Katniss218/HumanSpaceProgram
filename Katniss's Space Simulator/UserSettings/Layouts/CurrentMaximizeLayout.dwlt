@@ -24,7 +24,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 200}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 24951
+  controlID: 39
 --- !u!114 &2
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -150,7 +150,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 200}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 1
-  controlID: 24952
+  controlID: 40
 --- !u!114 &4
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -175,7 +175,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 100}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 24953
+  controlID: 41
 --- !u!114 &5
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -232,10 +232,10 @@ MonoBehaviour:
     m_SaveData: []
   m_SceneHierarchy:
     m_TreeViewState:
-      scrollPos: {x: 0, y: 60}
-      m_SelectedIDs: b6b50000
-      m_LastClickedID: 46518
-      m_ExpandedIDs: a01af6ff241df6ff601df6ff981df6ff6425f6ff3443f6ff4044f6ff5c44f6ffe247f6ffb4e5fcffb0effcffa045fdffa445fdffca45fdff6246fdff8c46fdffa846fdff2e4afdfff873fdff207cfdff827dfdfff280fdfffc83fdff32bdfdff58c0fdff14e8fdffd8e8fdffa6e9fdff8aeafdff4aecfdff24edfdff50eefdffb6eefdff88f0fdff2411feffd86cfeff1077feff4a77feff4e7cfeff3cb4feff24b7feff74b7feff02bcfeff5ecdfeffecd1feff0cd7feff9adbfeff56e5feffe4e9feff42edfeffd0f1fefff602ffff2003ffffa803ffff8407ffff6e19fffff619ffffd21dffff4620ffff7020fffff820ffffd424ffff3c28ffff6628ffffee28ffffca2cffffde36ffff6037ffff3c3bffffa03cffffca3cffff523dffff2e41ffff1849ffffc251ffff2656ffff5056ffffde5affffec5cfffff061fffffc64ffff2665ffffae65ffff8a69ffffe67affff5293ffff2e97fffff29effff84c6ffffaec6ffff36c7ffff12cbffffd4ceffff5ccfffff38d3fffff4d6ffffd0daffff92deffffb8deffff40dfffff1ce3ffff52f6ffff08fbffffba900000cc9000008291000094910000629300007c9300001a9400002c940000309500004a9500004c9600007c960000e2970000f497000054990000669900006a9a0000849a0000bcb50000d2b50000e4b50000
+      scrollPos: {x: 0, y: 0}
+      m_SelectedIDs: 584d0000
+      m_LastClickedID: 0
+      m_ExpandedIDs: c4f6ffff08fbffff1a4d00002c4d0000
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -407,7 +407,7 @@ MonoBehaviour:
       containerId: overlay-container--right
       floating: 0
       collapsed: 0
-      displayed: 1
+      displayed: 0
       snapOffset: {x: 0, y: 0}
       snapOffsetDelta: {x: 0, y: 0}
       snapCorner: 0
@@ -1776,22 +1776,22 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Resources
+    - Assets/KSS/GameplayScene/Tools
     m_Globs: []
     m_OriginalText: 
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/Resources
+  - Assets/KSS/GameplayScene/Tools
   m_LastFoldersGridSize: -1
   m_LastProjectPath: E:\GIT\KatnisssSpaceSimulator\Katniss's Space Simulator
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 521}
-    m_SelectedIDs: e24b0000
-    m_LastClickedID: 19426
-    m_ExpandedIDs: 00000000bc4b0000be4b0000c04b0000c24b0000c44b0000c64b0000c84b0000ca4b0000cc4b0000ce4b0000d04b0000d24b0000d44b0000d64b0000d84b0000da4b0000dc4b0000de4b0000e04b0000e24b0000e44b0000e64b0000e84b0000ea4b000000ca9a3b
+    scrollPos: {x: 0, y: 240}
+    m_SelectedIDs: 224c0000
+    m_LastClickedID: 19490
+    m_ExpandedIDs: 00000000b44b0000b64b0000b84b0000ba4b0000bc4b0000be4b0000c04b0000c24b0000c44b0000c64b0000c84b0000ca4b0000cc4b0000ce4b0000d04b0000d24b0000d44b0000d64b0000d84b0000da4b0000dc4b0000de4b0000e04b0000e24b0000e44b000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1819,7 +1819,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 00000000bc4b0000be4b0000c04b0000c24b0000c44b0000c64b0000c84b0000ca4b0000cc4b0000ce4b0000d04b0000d24b0000d44b0000d64b0000d84b0000da4b0000dc4b0000de4b0000e04b0000e24b0000e44b0000e64b0000e84b0000ea4b000000ca9a3b
+    m_ExpandedIDs: 00000000b44b0000b64b0000b84b0000ba4b0000bc4b0000be4b0000c04b0000c24b0000c44b0000c64b0000c84b0000ca4b0000cc4b0000ce4b0000d04b0000d24b0000d44b0000d64b0000d84b0000da4b0000dc4b0000de4b0000e04b0000e24b0000e44b0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1844,8 +1844,8 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: b6b50000
-    m_LastClickedInstanceID: 46518
+    m_SelectedInstanceIDs: 584d0000
+    m_LastClickedInstanceID: 19800
     m_HadKeyboardFocusLastEvent: 0
     m_ExpandedInstanceIDs: c6230000ea5b000076630000000000000c5c0000668b0000204c0000
     m_RenameOverlay:
