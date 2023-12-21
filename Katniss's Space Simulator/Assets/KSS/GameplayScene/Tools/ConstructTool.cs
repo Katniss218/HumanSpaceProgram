@@ -98,6 +98,10 @@ namespace KSS.GameplayScene.Tools
             }
         }
 
+        // ksp - press AND release - pick up
+        // release - place
+        // release - select move/rotate
+
         private void PlacePart()
         {
             if( _currentSnap == null )

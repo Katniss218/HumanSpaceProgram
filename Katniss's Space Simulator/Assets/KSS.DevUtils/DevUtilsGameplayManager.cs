@@ -121,6 +121,7 @@ namespace KSS.DevUtils
                 Debug.Log( "20" );
                 return true;
             } );
+            HierarchicalInputManager.BindInput( HierarchicalInputID.LEFT_MOUSE_CLICK, state => state.OrderedKeyPresses)
             if( Input.GetKeyDown( KeyCode.F4 ) )
             {
                 JsonSeparateFileSerializedDataHandler _designObjDataHandler = new JsonSeparateFileSerializedDataHandler();

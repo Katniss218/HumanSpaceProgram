@@ -19,7 +19,7 @@ namespace UnityPlus.Input
 
         static Vector2 _previousMousePos;
 
-        public static void BindInput( Func<InputState, bool> input, string channelId )
+        public static void BindInput( string channelId, Func<InputState, bool> input )
         {
             _channelMap[channelId] = input;
             _isMapStale = true;
