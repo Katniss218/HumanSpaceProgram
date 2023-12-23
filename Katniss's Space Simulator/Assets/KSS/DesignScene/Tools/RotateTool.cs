@@ -1,4 +1,5 @@
 ﻿using KSS.Core.Components;
+using KSS.Core.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.AssetManagement;
+using UnityPlus.Input;
 
 namespace KSS.DesignScene.Tools
 {
@@ -59,34 +61,56 @@ namespace KSS.DesignScene.Tools
             {
                 SnappingEnabled = false;
             }
+        }
 
-            Ray ray = _handles.RaycastCamera.ScreenPointToRay( Input.mousePosition );
-            if( Input.GetKeyDown( KeyCode.Mouse0 ) )
+        void OnEnable()
+        {
+            HierarchicalInputManager.AddAction( HierarchicalInputChannel.VIEWPORT_LEFT_MOUSE_DOWN, HierarchicalInputPriority.MEDIUM, Input_MouseDown );
+            if( DesignObjectManager.DesignObject != null )
             {
-#warning TODO - raycast priority for handles - if clicked on handle, don't try to reattach them to a different object, or click on anything else.
-                if( UnityEngine.Physics.Raycast( ray, out RaycastHit hitInfo, 8192, int.MaxValue ) )
-                {
-                    Transform clickedObj = hitInfo.collider.transform;
-
-                    FClickInteractionRedirect r = clickedObj.GetComponent<FClickInteractionRedirect>();
-                    if( r != null && r.Target != null )
-                    {
-                        clickedObj = r.Target.transform;
-                    }
-
-                    if( DesignObjectManager.IsLooseOrPartOfDesignObject( clickedObj ) )
-                    {
-                        if( _handles == null )
-                            CreateHandles();
-
-                        _handles.Target = clickedObj;
-                        _handles.transform.position = clickedObj.position;
-                        return;
-                    }
-                }
+                CreateHandles();
+                var target = DesignObjectManager.DesignObject.RootPart;
+                _handles.Target = target;
+                _handles.transform.position = target.position;
             }
         }
 
+        void OnDisable()
+        {
+            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.VIEWPORT_LEFT_MOUSE_DOWN, Input_MouseDown );
+            if( _handles != null )
+            {
+                _handles.Destroy();
+                _handles = null;
+            }
+        }
+
+        private bool Input_MouseDown()
+        {
+            Ray ray = _handles.RaycastCamera.ScreenPointToRay( Input.mousePosition );
+            if( Physics.Raycast( ray, out RaycastHit hitInfo, 8192, int.MaxValue ) )
+            {
+                Transform clickedObj = hitInfo.collider.transform;
+
+                FClickInteractionRedirect r = clickedObj.GetComponent<FClickInteractionRedirect>();
+                if( r != null && r.Target != null )
+                {
+                    clickedObj = r.Target.transform;
+                }
+
+                if( DesignObjectManager.IsLooseOrPartOfDesignObject( clickedObj ) )
+                {
+                    if( _handles == null )
+                        CreateHandles();
+
+                    _handles.Target = clickedObj;
+                    _handles.transform.position = clickedObj.position;
+                    return true;
+                }
+            }
+            return false;
+        }
+           
         void CreateHandles()
         {
             _handles = TransformHandleSet.Create( Vector3.zero, Quaternion.identity, null, null );
@@ -99,26 +123,6 @@ namespace KSS.DesignScene.Tools
                     c.size = new Vector3( 3.5f, 3.5f, 0.1f );
                 } );
             _handles.RaycastCamera = GameObject.Find( "UI Camera" ).GetComponent<Camera>();
-        }
-
-        void OnEnable()
-        {
-            if( DesignObjectManager.DesignObject != null )
-            {
-                CreateHandles();
-                var target = DesignObjectManager.DesignObject.RootPart;
-                _handles.Target = target;
-                _handles.transform.position = target.position;
-            }
-        }
-
-        void OnDisable()
-        {
-            if( _handles != null )
-            {
-                _handles.Destroy();
-                _handles = null;
-            }
         }
     }
 }

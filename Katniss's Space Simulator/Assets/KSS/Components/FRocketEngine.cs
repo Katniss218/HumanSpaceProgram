@@ -1,7 +1,9 @@
 ﻿using KSS.Core;
+using KSS.Core.Input;
 using KSS.Core.ResourceFlowSystem;
 using System;
 using UnityEngine;
+using UnityPlus.Input;
 using UnityPlus.Serialization;
 
 namespace KSS.Components
@@ -56,12 +58,28 @@ namespace KSS.Components
             this.Throttle = value;
         }*/
 
-        void Update()
+        void OnEnable()
         {
-            if( Input.GetKeyDown( KeyCode.W ) )
-            {
-                Throttle = Throttle > 0.5f ? 0.0f : 1.0f;
-            }
+            HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MAX, HierarchicalInputPriority.MEDIUM, Input_FullThrottle );
+            HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MIN, HierarchicalInputPriority.MEDIUM, Input_CutThrottle );
+        }
+
+        void OnDisable()
+        {
+            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MAX, Input_FullThrottle );
+            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MIN, Input_CutThrottle );
+        }
+
+        private bool Input_FullThrottle()
+        {
+            Throttle = 1.0f;
+            return false;
+        }
+        
+        private bool Input_CutThrottle()
+        {
+            Throttle = 0.0f;
+            return false;
         }
 
         void FixedUpdate()

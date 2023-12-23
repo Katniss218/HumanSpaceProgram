@@ -20,6 +20,7 @@ using UnityPlus.Serialization.DataHandlers;
 using UnityPlus.Serialization.ReferenceMaps;
 using UnityPlus.Input;
 using UnityPlus.Input.Bindings;
+using KSS.Core.Input;
 
 namespace KSS.DevUtils
 {
@@ -108,12 +109,6 @@ namespace KSS.DevUtils
             shader.Dispatch( shader.FindKernel( "CalculateNormalMap" ), heightmap.width / 8, heightmap.height / 8, 1 );
 
             uiImage.texture = normalmap;*/
-                        
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.COMMON_LEFT_MOUSE_DOWN, HierarchicalInputPriority.VERY_HIGH, () =>
-            {
-                Debug.Log( "mouse is pressed" );
-                return false; // True stops lower priority actions from executing.
-            } );
         }
 
         void Update()

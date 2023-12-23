@@ -1,5 +1,6 @@
 ﻿using KSS.Core;
 using KSS.Core.Components;
+using KSS.Core.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,6 +66,7 @@ namespace KSS.DesignScene.Tools
 
         void OnEnable()
         {
+            HierarchicalInputManager.AddAction( HierarchicalInputChannel.VIEWPORT_LEFT_MOUSE_DOWN, HierarchicalInputPriority.MEDIUM, Input_MouseDown );
             if( DesignObjectManager.DesignObject != null )
             {
                 CreateHandles();
@@ -72,17 +74,16 @@ namespace KSS.DesignScene.Tools
                 _handles.Target = target;
                 _handles.transform.position = target.position;
             }
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.COMMON_LEFT_MOUSE_DOWN, HierarchicalInputPriority.MEDIUM, Input_MouseDown );
         }
 
         void OnDisable()
         {
+            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.VIEWPORT_LEFT_MOUSE_DOWN, Input_MouseDown );
             if( _handles != null )
             {
                 _handles.Destroy();
                 _handles = null;
             }
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.COMMON_LEFT_MOUSE_DOWN, Input_MouseDown );
         }
 
         private bool Input_MouseDown()

@@ -1,11 +1,13 @@
 ﻿using KSS.Core;
 using KSS.Core.Components;
+using KSS.Core.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityPlus.Input;
 
 namespace KSS.DesignScene.Tools
 {
@@ -67,35 +69,48 @@ namespace KSS.DesignScene.Tools
                 _currentFrameHitObject = null;
             }
 
+            if( _heldPart != null )
+            {
+                PositionHeldPart();
+            }
+        }
+
+        void OnEnable()
+        {
+            HierarchicalInputManager.AddAction( HierarchicalInputChannel.VIEWPORT_LEFT_MOUSE_UP, HierarchicalInputPriority.MEDIUM, Input_MouseClick );
+        }
+
+        void OnDisable() // if tool switched while action is performed.
+        {
+            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.VIEWPORT_LEFT_MOUSE_UP, Input_MouseClick );
+            if( _heldPart != null )
+            {
+                PlacePart();
+            }
+        }
+
+        private bool Input_MouseClick()
+        {
+            if( UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() )
+                return false;
+
             if( _heldPart == null )
             {
-                if( Input.GetKeyUp( KeyCode.Mouse0 ) )
-                {
-                    TryPickUpPart();
+                TryPickUpPart();
 
-                    if( _heldPart != null )
-                    {
-                        PositionHeldPart();
-                    }
+                if( _heldPart != null )
+                {
+                    PositionHeldPart();
+                    return true;
                 }
             }
             else
             {
                 PositionHeldPart();
-
-                if( Input.GetKeyUp( KeyCode.Mouse0 ) )
-                {
-                    PlacePart();
-                }
-            }
-        }
-
-        void OnDisable() // if tool switched while action is performed.
-        {
-            if( _heldPart != null )
-            {
                 PlacePart();
+                return true;
             }
+            return false;
         }
 
         private void TryPickUpPart()

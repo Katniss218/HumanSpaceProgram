@@ -1,4 +1,6 @@
+using KSS.Core.Input;
 using UnityEngine;
+using UnityPlus.Input;
 using UnityPlus.Serialization;
 
 namespace KSS.Core
@@ -19,12 +21,20 @@ namespace KSS.Core
             HSPEvent.EventManager.TryInvoke( HSPEvent.STARTUP_DESIGN );
         }
 
-        void Update()
+        void OnEnable()
         {
-            if( UnityEngine.Input.GetKeyDown( KeyCode.Escape ) )
-            {
-                HSPEvent.EventManager.TryInvoke( HSPEvent.ESCAPE_DESIGN, null );
-            }
+            HierarchicalInputManager.AddAction( HierarchicalInputChannel.COMMON_ESCAPE, HierarchicalInputPriority.MEDIUM, Input_Escape );
+        }
+
+        void OnDisable()
+        {
+            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.COMMON_ESCAPE, Input_Escape );
+        }
+
+        private bool Input_Escape()
+        {
+            HSPEvent.EventManager.TryInvoke( HSPEvent.ESCAPE_DESIGN, null );
+            return false;
         }
     }
 }

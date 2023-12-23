@@ -44,6 +44,9 @@ namespace KSS.Core.Input
 
         public const string GAMEPLAY_CONTROL_SEQUENCER_ADVANCE = "vanilla.gameplayc_sequencer_adv";
 
+        public const string GAMEPLAY_TIMESCALE_INCREASE = "vanilla.gameplay_timescale_up";
+        public const string GAMEPLAY_TIMESCALE_DECREASE = "vanilla.gameplay_timescale_down";
+
         public const string DESIGN_SAVE = "vanilla.design_save";
 
         [HSPEventListener( HSPEvent.STARTUP_IMMEDIATELY, HSPEvent.NAMESPACE_VANILLA + ".bind_input_channels" )]
@@ -60,6 +63,8 @@ namespace KSS.Core.Input
             HierarchicalInputManager.BindInput( HierarchicalInputChannel.VIEWPORT_MIDDLE_MOUSE_DOWN, new KeyDownBinding( KeyCode.Mouse2 ) );
             HierarchicalInputManager.BindInput( HierarchicalInputChannel.VIEWPORT_MIDDLE_MOUSE, new KeyHoldBinding( KeyCode.Mouse2 ) );
             HierarchicalInputManager.BindInput( HierarchicalInputChannel.VIEWPORT_MIDDLE_MOUSE_UP, new KeyUpBinding( KeyCode.Mouse2 ) );
+
+            HierarchicalInputManager.BindInput( HierarchicalInputChannel.COMMON_ESCAPE, new KeyUpBinding( KeyCode.Escape ) );
 
             HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MIN, new KeyDownBinding( KeyCode.X ) );
             HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MAX, new KeyDownBinding( KeyCode.Z ) );
@@ -81,6 +86,9 @@ namespace KSS.Core.Input
             HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_YAW_RIGHT, new KeyDownBinding( KeyCode.E ) );
 
             HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_SEQUENCER_ADVANCE, new KeyDownBinding( KeyCode.Space ) );
+
+            HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_TIMESCALE_INCREASE, new KeyDownBinding( KeyCode.Period ) );
+            HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_TIMESCALE_DECREASE, new KeyDownBinding( KeyCode.Comma ) );
 
             HierarchicalInputManager.BindInput( HierarchicalInputChannel.DESIGN_SAVE, new MultipleKeyDownBinding( KeyCode.LeftControl, KeyCode.S ) );
         }

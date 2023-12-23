@@ -1,4 +1,5 @@
 ﻿using KSS.Core;
+using KSS.Core.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -58,16 +59,16 @@ namespace KSS
 
         void OnEnable()
         {
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.COMMON_LEFT_MOUSE_DOWN, HierarchicalInputPriority.HIGH, Input_MouseDown );
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.COMMON_LEFT_MOUSE, HierarchicalInputPriority.HIGH, Input_MouseHeld );
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.COMMON_LEFT_MOUSE_UP, HierarchicalInputPriority.HIGH, Input_MouseUp );
+            HierarchicalInputManager.AddAction( HierarchicalInputChannel.VIEWPORT_LEFT_MOUSE_DOWN, HierarchicalInputPriority.HIGH, Input_MouseDown );
+            HierarchicalInputManager.AddAction( HierarchicalInputChannel.VIEWPORT_LEFT_MOUSE, HierarchicalInputPriority.HIGH, Input_MouseHeld );
+            HierarchicalInputManager.AddAction( HierarchicalInputChannel.VIEWPORT_LEFT_MOUSE_UP, HierarchicalInputPriority.HIGH, Input_MouseUp );
         }
 
         void OnDisable()
         {
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.COMMON_LEFT_MOUSE_DOWN, Input_MouseDown );
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.COMMON_LEFT_MOUSE, Input_MouseHeld );
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.COMMON_LEFT_MOUSE_UP, Input_MouseUp );
+            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.VIEWPORT_LEFT_MOUSE_DOWN, Input_MouseDown );
+            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.VIEWPORT_LEFT_MOUSE, Input_MouseHeld );
+            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.VIEWPORT_LEFT_MOUSE_UP, Input_MouseUp );
         }
 
         private bool Input_MouseDown()

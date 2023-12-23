@@ -14,7 +14,7 @@ namespace UnityPlus.Input.Bindings
 
         public bool IsValid { get; private set; }
 
-        bool _previousFrameWasPressed = true;
+        bool _previousFrameWasPressed = false;
 
         public KeyUpBinding( KeyCode key )
         {
