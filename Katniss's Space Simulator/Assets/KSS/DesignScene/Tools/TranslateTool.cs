@@ -1,4 +1,5 @@
-﻿using KSS.Core.Components;
+﻿using KSS.Core;
+using KSS.Core.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.AssetManagement;
+using UnityPlus.Input;
 
 namespace KSS.DesignScene.Tools
 {
@@ -59,32 +61,54 @@ namespace KSS.DesignScene.Tools
             {
                 SnappingEnabled = false;
             }
+        }
 
-            Ray ray = _handles.RaycastCamera.ScreenPointToRay( Input.mousePosition );
-            if( Input.GetKeyDown( KeyCode.Mouse0 ) )
+        void OnEnable()
+        {
+            if( DesignObjectManager.DesignObject != null )
             {
-#warning TODO - raycast priority for handles - if clicked on handle, don't try to reattach them to a different object, or click on anything else.
-                if( UnityEngine.Physics.Raycast( ray, out RaycastHit hitInfo, 8192, int.MaxValue ) )
+                CreateHandles();
+                var target = DesignObjectManager.DesignObject.RootPart;
+                _handles.Target = target;
+                _handles.transform.position = target.position;
+            }
+            HierarchicalInputManager.AddAction( HierarchicalInputChannel.COMMON_LEFT_MOUSE_DOWN, HierarchicalInputPriority.MEDIUM, Input_MouseDown );
+        }
+
+        void OnDisable()
+        {
+            if( _handles != null )
+            {
+                _handles.Destroy();
+                _handles = null;
+            }
+            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.COMMON_LEFT_MOUSE_DOWN, Input_MouseDown );
+        }
+
+        private bool Input_MouseDown()
+        {
+            Ray ray = _handles.RaycastCamera.ScreenPointToRay( Input.mousePosition );
+            if( Physics.Raycast( ray, out RaycastHit hitInfo, 8192, int.MaxValue ) )
+            {
+                Transform clickedObj = hitInfo.collider.transform;
+
+                FClickInteractionRedirect r = clickedObj.GetComponent<FClickInteractionRedirect>();
+                if( r != null && r.Target != null )
                 {
-                    Transform clickedObj = hitInfo.collider.transform;
+                    clickedObj = r.Target.transform;
+                }
 
-                    FClickInteractionRedirect r = clickedObj.GetComponent<FClickInteractionRedirect>();
-                    if( r != null && r.Target != null )
-                    {
-                        clickedObj = r.Target.transform;
-                    }
+                if( DesignObjectManager.IsLooseOrPartOfDesignObject( clickedObj ) )
+                {
+                    if( _handles == null )
+                        CreateHandles();
 
-                    if( DesignObjectManager.IsLooseOrPartOfDesignObject( clickedObj ) )
-                    {
-                        if( _handles == null )
-                            CreateHandles();
-
-                        _handles.Target = clickedObj;
-                        _handles.transform.position = clickedObj.position;
-                        return;
-                    }
+                    _handles.Target = clickedObj;
+                    _handles.transform.position = clickedObj.position;
+                    return true;
                 }
             }
+            return false;
         }
 
         void CreateHandles()
@@ -102,26 +126,6 @@ namespace KSS.DesignScene.Tools
                     c.center = new Vector3( 0, 0, c.height / 2 );
                 } );
             _handles.RaycastCamera = GameObject.Find( "UI Camera" ).GetComponent<Camera>();
-        }
-
-        void OnEnable()
-        {
-            if( DesignObjectManager.DesignObject != null )
-            {
-                CreateHandles();
-                var target = DesignObjectManager.DesignObject.RootPart;
-                _handles.Target = target;
-                _handles.transform.position = target.position;
-            }
-        }
-
-        void OnDisable()
-        {
-            if( _handles != null )
-            {
-                _handles.Destroy();
-                _handles = null;
-            }
         }
     }
 }
