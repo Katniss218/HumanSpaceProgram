@@ -151,19 +151,19 @@ namespace KSS.GameplayScene
 
         void Update()
         {
-            if( Input.GetKeyDown( KeyCode.G ) )
+            if( UnityEngine.Input.GetKeyDown( KeyCode.G ) )
             {
                 this.BuildSpeedTotal = 90f;
                 StartConstruction();
             }
             
-            if( Input.GetKeyDown( KeyCode.H ) )
+            if( UnityEngine.Input.GetKeyDown( KeyCode.H ) )
             {
                 this.BuildSpeedTotal = 90f;
                 StartDeconstruction();
             }
 
-            if( Input.GetKeyDown( KeyCode.J ) )
+            if( UnityEngine.Input.GetKeyDown( KeyCode.J ) )
             {
                 this.BuildSpeedTotal = 90f;
                 Pause();

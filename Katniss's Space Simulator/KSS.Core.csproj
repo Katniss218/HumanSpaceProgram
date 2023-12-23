@@ -93,7 +93,6 @@
     <Compile Include="Assets\KSS.Core\ReferenceFrames\ReferenceFrameUtils.cs" />
     <Compile Include="Assets\KSS.Core\Control\ControlOutAttribute.cs" />
     <Compile Include="Assets\KSS.Core\Serialization\SaveMetadata.cs" />
-    <Compile Include="Assets\KSS.Core\Input\HierarchicalInputChannel.cs" />
     <Compile Include="Assets\KSS.Core\ReferenceFrames\OrientedReferenceFrame.cs" />
     <Compile Include="Assets\KSS.Core\ReferenceFrames\IReferenceFrameSwitchResponder.cs" />
     <Compile Include="Assets\KSS.Core\VesselManager.cs" />
@@ -124,7 +123,6 @@
     <Compile Include="Assets\KSS.Core\ActiveObjectManager.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\SubstanceStateCollection.cs" />
     <Compile Include="Assets\KSS.Core\Physics\FreePhysicsObject.cs" />
-    <Compile Include="Assets\KSS.Core\Input\HierarchicalInputPriority.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.Core\___KSS.Core.asmdef" />
@@ -766,10 +764,6 @@
     <ProjectReference Include="_UnityPlus.AssetManagement.csproj">
       <Project>{1082B390-7315-9D8E-BF58-53BE9AF2F68A}</Project>
       <Name>_UnityPlus.AssetManagement</Name>
-    </ProjectReference>
-    <ProjectReference Include="_UnityPlus.Input.csproj">
-      <Project>{0FEFE9C3-4AF2-CF9F-A1BD-710289E2AB20}</Project>
-      <Name>_UnityPlus.Input</Name>
     </ProjectReference>
     <ProjectReference Include="_UnityPlus.OverridableEvents.csproj">
       <Project>{D26EF55E-D30C-518A-2340-C096B47A9C02}</Project>

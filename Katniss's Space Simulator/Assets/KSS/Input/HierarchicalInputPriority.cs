@@ -1,4 +1,4 @@
-﻿namespace KSS.Core.Input
+﻿namespace KSS.Input
 {
     public static class HierarchicalInputPriority
     {

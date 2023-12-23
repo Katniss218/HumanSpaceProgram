@@ -1,11 +1,9 @@
-﻿using KSS.Core.Input;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityPlus.Input;
 using UnityPlus.Serialization;
 
 namespace KSS.Core
@@ -176,46 +174,6 @@ namespace KSS.Core
         void FixedUpdate()
         {
             UT += FixedDeltaTime;
-        }
-
-        void OnEnable()
-        {
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_TIMESCALE_INCREASE, HierarchicalInputPriority.MEDIUM, Input_TimescaleIncrease );
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_TIMESCALE_DECREASE, HierarchicalInputPriority.MEDIUM, Input_TimescaleDecrease );
-        }
-
-        void OnDisable()
-        {
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_TIMESCALE_INCREASE, Input_TimescaleIncrease );
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_TIMESCALE_DECREASE, Input_TimescaleDecrease );
-        }
-
-        private bool Input_TimescaleIncrease()
-        {
-            if( LockTimescale ) // short-circuit exit before checking anything.
-                return false;
-
-            if( IsPaused )
-            {
-                SetTimeScale( 1f );
-                return false;
-            }
-
-            float newscale = _timeScale * 2f;
-            if( newscale <= GetMaxTimescale() )
-                SetTimeScale( newscale );
-
-            return false;
-        }
-        
-        private bool Input_TimescaleDecrease()
-        {
-            if( LockTimescale ) // short-circuit exit before checking anything.
-                return false;
-
-            SetTimeScale( _timeScale > 1f ? _timeScale / 2.0f : 0.0f );
-
-            return false;
         }
 
         public SerializedData GetData( IReverseReferenceMap s )

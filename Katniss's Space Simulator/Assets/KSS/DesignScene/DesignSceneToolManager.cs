@@ -169,7 +169,7 @@ namespace KSS.DesignScene
             if( UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() )
                 return;
 
-            if( Input.GetKeyDown( KeyCode.Alpha1 ) )
+            if( UnityEngine.Input.GetKeyDown( KeyCode.Alpha1 ) )
             {
                 try
                 {
@@ -177,7 +177,7 @@ namespace KSS.DesignScene
                 }
                 catch { }
             }
-            if( Input.GetKeyDown( KeyCode.Alpha2 ) )
+            if( UnityEngine.Input.GetKeyDown( KeyCode.Alpha2 ) )
             {
                 try
                 {
@@ -185,7 +185,7 @@ namespace KSS.DesignScene
                 }
                 catch { }
             }
-            if( Input.GetKeyDown( KeyCode.Alpha3 ) )
+            if( UnityEngine.Input.GetKeyDown( KeyCode.Alpha3 ) )
             {
                 try
                 {
@@ -193,7 +193,7 @@ namespace KSS.DesignScene
                 }
                 catch { }
             }
-            if( Input.GetKeyDown( KeyCode.Alpha4 ) )
+            if( UnityEngine.Input.GetKeyDown( KeyCode.Alpha4 ) )
             {
                 try
                 {
@@ -201,7 +201,7 @@ namespace KSS.DesignScene
                 }
                 catch { }
             }
-            if( Input.GetKeyDown( KeyCode.Alpha5 ) )
+            if( UnityEngine.Input.GetKeyDown( KeyCode.Alpha5 ) )
             {
                 try
                 {
@@ -209,7 +209,7 @@ namespace KSS.DesignScene
                 }
                 catch { }
             }
-            if( Input.GetKeyDown( KeyCode.Alpha6 ) )
+            if( UnityEngine.Input.GetKeyDown( KeyCode.Alpha6 ) )
             {
                 try
                 {
@@ -217,7 +217,7 @@ namespace KSS.DesignScene
                 }
                 catch { }
             }
-            if( Input.GetKeyDown( KeyCode.Alpha7 ) )
+            if( UnityEngine.Input.GetKeyDown( KeyCode.Alpha7 ) )
             {
                 try
                 {
@@ -225,7 +225,7 @@ namespace KSS.DesignScene
                 }
                 catch { }
             }
-            if( Input.GetKeyDown( KeyCode.Alpha8 ) )
+            if( UnityEngine.Input.GetKeyDown( KeyCode.Alpha8 ) )
             {
                 try
                 {
@@ -233,7 +233,7 @@ namespace KSS.DesignScene
                 }
                 catch { }
             }
-            if( Input.GetKeyDown( KeyCode.Alpha9 ) )
+            if( UnityEngine.Input.GetKeyDown( KeyCode.Alpha9 ) )
             {
                 try
                 {
@@ -241,7 +241,7 @@ namespace KSS.DesignScene
                 }
                 catch { }
             }
-            if( Input.GetKeyDown( KeyCode.Alpha0 ) )
+            if( UnityEngine.Input.GetKeyDown( KeyCode.Alpha0 ) )
             {
                 try
                 {

@@ -1,6 +1,6 @@
 ﻿using KSS.Core;
 using KSS.Core.Components;
-using KSS.Core.Input;
+using KSS.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,11 +54,11 @@ namespace KSS.DesignScene.Tools
                 return;
             }
 
-            if( Input.GetKeyDown( KeyCode.LeftShift ) )
+            if( UnityEngine.Input.GetKeyDown( KeyCode.LeftShift ) )
             {
                 SnappingEnabled = true;
             }
-            if( Input.GetKeyUp( KeyCode.LeftShift ) )
+            if( UnityEngine.Input.GetKeyUp( KeyCode.LeftShift ) )
             {
                 SnappingEnabled = false;
             }
@@ -88,7 +88,7 @@ namespace KSS.DesignScene.Tools
 
         private bool Input_MouseDown()
         {
-            Ray ray = _handles.RaycastCamera.ScreenPointToRay( Input.mousePosition );
+            Ray ray = _handles.RaycastCamera.ScreenPointToRay( UnityEngine.Input.mousePosition );
             if( Physics.Raycast( ray, out RaycastHit hitInfo, 8192, int.MaxValue ) )
             {
                 Transform clickedObj = hitInfo.collider.transform;

@@ -1,6 +1,6 @@
 ﻿using KSS.Core;
 using KSS.Core.Components;
-using KSS.Core.Input;
+using KSS.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -58,7 +58,7 @@ namespace KSS.DesignScene.Tools
             if( UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() )
                 return;
 
-            _currentFrameCursorRay = _camera.ScreenPointToRay( Input.mousePosition );
+            _currentFrameCursorRay = _camera.ScreenPointToRay( UnityEngine.Input.mousePosition );
 
             if( Physics.Raycast( _currentFrameCursorRay, out _currentFrameHit, 8192, 1 << (int)Layer.PART_OBJECT ) )
             {
@@ -164,7 +164,7 @@ namespace KSS.DesignScene.Tools
 
         private void PositionHeldPart()
         {
-            if( !Input.GetKey( KeyCode.LeftAlt ) )
+            if( !UnityEngine.Input.GetKey( KeyCode.LeftAlt ) )
             {
                 // Snap to surface of other parts.
 

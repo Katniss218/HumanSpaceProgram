@@ -11,6 +11,7 @@ namespace UnityPlus.Input
     /// </summary>
     public class HierarchicalActionChannel
     {
+#warning TODO - pass input state to the channels directly
         List<(int priority, Func<bool> func)> _actions = new List<(int priority, Func<bool> func)>();
 
         bool _isStale;

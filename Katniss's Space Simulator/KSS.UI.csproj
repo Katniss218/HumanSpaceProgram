@@ -71,7 +71,7 @@
     <Compile Include="Assets\KSS.UI\Windows\WindowRelationHighlight.cs" />
     <Compile Include="Assets\KSS.UI\SceneFactories\MainMenuSceneUIFactory.cs" />
     <Compile Include="Assets\KSS.UI\PartListUI.cs" />
-    <Compile Include="Assets\KSS.UI\GameplayClickInteractionManager.cs" />
+    <Compile Include="Assets\KSS.UI\GameplayViewportClickController.cs" />
     <Compile Include="Assets\KSS.UI\TimelineMetadataUI.cs" />
     <Compile Include="Assets\KSS.UI\VelocityReadoutUI.cs" />
     <Compile Include="Assets\KSS.UI\UTReadoutUI.cs" />
@@ -726,6 +726,10 @@
     <ProjectReference Include="_UnityPlus.AssetManagement.csproj">
       <Project>{1082B390-7315-9D8E-BF58-53BE9AF2F68A}</Project>
       <Name>_UnityPlus.AssetManagement</Name>
+    </ProjectReference>
+    <ProjectReference Include="_UnityPlus.Input.csproj">
+      <Project>{0FEFE9C3-4AF2-CF9F-A1BD-710289E2AB20}</Project>
+      <Name>_UnityPlus.Input</Name>
     </ProjectReference>
     <ProjectReference Include="_UnityPlus.Serialization.csproj">
       <Project>{53A4B44D-C587-1ED0-C944-834EA89508FD}</Project>

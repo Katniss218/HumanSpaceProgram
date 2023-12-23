@@ -84,6 +84,7 @@
     <Compile Include="Assets\KSS\DesignScene\DesignSceneToolManager.cs" />
     <Compile Include="Assets\KSS\Components\FRocketEngine.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuad.cs" />
+    <Compile Include="Assets\KSS\Input\HierarchicalInputChannel.cs" />
     <Compile Include="Assets\KSS\Components\FBulkContainer_Sphere.cs" />
     <Compile Include="Assets\KSS\DesignScene\DesignObject.cs" />
     <Compile Include="Assets\KSS\Components\FBulkConnection.cs" />
@@ -96,6 +97,12 @@
     <Compile Include="Assets\KSS\GameplayScene\GameplaySceneToolManager.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadTree_NodeUtils.cs" />
     <Compile Include="Assets\KSS\AssetLoaders\GameDataJsonVesselFactory.cs" />
+    <Compile Include="Assets\KSS\Input\HierarchicalInputPriority.cs" />
+    <Compile Include="Assets\KSS\GameplayScene\TimeScaleInputController.cs" />
+    <Compile Include="Assets\KSS\GameplayScene\GameplaySceneEscapeInputController.cs" />
+    <Compile Include="Assets\KSS\DesignScene\DesignSceneEscapeInputController.cs" />
+    <Compile Include="Assets\KSS\MainMenuScene\MainMenuEscapeInputController.cs" />
+    <Compile Include="Assets\KSS\EditorScene\EditorSceneEscapeInputController.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS\CelestialBodies\Surface\TerrainShader.shader" />

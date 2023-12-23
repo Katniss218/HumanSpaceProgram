@@ -24,7 +24,7 @@ namespace KSS.Components
             {
                 return;
             }
-            if( Input.GetKeyDown( KeyCode.Space ) )
+            if( UnityEngine.Input.GetKeyDown( KeyCode.Space ) )
             {
 #warning TODO - disconnect pipes, and stuff. Use 'OnVesselSeparate' and 'OnVesselJoin' events.
 

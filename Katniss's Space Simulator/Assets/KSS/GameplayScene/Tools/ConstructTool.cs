@@ -68,7 +68,7 @@ namespace KSS.GameplayScene.Tools
             if( UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() )
                 return;
 
-            _currentFrameCursorRay = _camera.ScreenPointToRay( Input.mousePosition );
+            _currentFrameCursorRay = _camera.ScreenPointToRay( UnityEngine.Input.mousePosition );
 
             if( Physics.Raycast( _currentFrameCursorRay, out _currentFrameHit, 8192, 1 << (int)Layer.PART_OBJECT ) )
             {
@@ -81,7 +81,7 @@ namespace KSS.GameplayScene.Tools
 
             PositionHeldPart();
 
-            if( Input.GetKeyUp( KeyCode.Mouse0 ) )
+            if( UnityEngine.Input.GetKeyUp( KeyCode.Mouse0 ) )
             {
                 PlacePart();
             }
@@ -146,7 +146,7 @@ namespace KSS.GameplayScene.Tools
 
         private void PositionHeldPart()
         {
-            if( !Input.GetKey( KeyCode.LeftAlt ) )
+            if( !UnityEngine.Input.GetKey( KeyCode.LeftAlt ) )
             {
                 // Snap to surface of other parts.
 

@@ -1,5 +1,5 @@
 ﻿using KSS.Core;
-using KSS.Core.Input;
+using KSS.Input;
 using KSS.Core.ResourceFlowSystem;
 using System;
 using UnityEngine;

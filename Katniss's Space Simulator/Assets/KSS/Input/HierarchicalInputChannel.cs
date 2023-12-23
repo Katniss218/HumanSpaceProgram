@@ -1,9 +1,10 @@
-﻿using System;
+﻿using KSS.Core;
+using System;
 using UnityEngine;
 using UnityPlus.Input;
 using UnityPlus.Input.Bindings;
 
-namespace KSS.Core.Input
+namespace KSS.Input
 {
     public static class HierarchicalInputChannel
     {

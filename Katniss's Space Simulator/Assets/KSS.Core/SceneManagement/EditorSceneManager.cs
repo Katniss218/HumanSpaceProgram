@@ -1,12 +1,10 @@
-using KSS.Core.Input;
 using UnityEngine;
-using UnityPlus.Input;
 using UnityPlus.Serialization;
 
 namespace KSS.Core
 {
     /// <summary>
-    /// A Manager that is active in the gameplay scene.
+    /// A Manager whose responsibility is to invoke the events relating to creation/destruction of the `editor` scene.
     /// </summary>
     [RequireComponent( typeof( PreexistingReference ) )]
     public class EditorSceneManager : SingletonMonoBehaviour<EditorSceneManager>
@@ -19,22 +17,6 @@ namespace KSS.Core
         void Awake()
         {
             HSPEvent.EventManager.TryInvoke( HSPEvent.STARTUP_DESIGN );
-        }
-
-        void OnEnable()
-        {
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.COMMON_ESCAPE, HierarchicalInputPriority.MEDIUM, Input_Escape );
-        }
-
-        void OnDisable()
-        {
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.COMMON_ESCAPE, Input_Escape );
-        }
-
-        private bool Input_Escape()
-        {
-            HSPEvent.EventManager.TryInvoke( HSPEvent.ESCAPE_DESIGN, null );
-            return false;
         }
     }
 }

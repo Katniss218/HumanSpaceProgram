@@ -4,7 +4,7 @@ using UnityPlus.Serialization;
 namespace KSS.Core
 {
     /// <summary>
-    /// A manager that is active in the main menu.
+    /// A Manager whose responsibility is to invoke the events relating to creation/destruction of the `main menu` scene.
     /// </summary>
     [RequireComponent( typeof( PreexistingReference ) )]
     public class MainMenuSceneManager : SingletonMonoBehaviour<MainMenuSceneManager>

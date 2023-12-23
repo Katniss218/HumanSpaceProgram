@@ -377,7 +377,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4298a5610bd9d94f869f4cf69e24435, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _material: {fileID: 1856831514}
+  _material: {fileID: 1741175737}
   light: {fileID: 705507994}
   _rt: {fileID: 0}
 --- !u!20 &244583699
@@ -1439,7 +1439,6 @@ GameObject:
   - component: {fileID: 1624596528}
   - component: {fileID: 1624596521}
   - component: {fileID: 1624596525}
-  - component: {fileID: 1624596527}
   - component: {fileID: 1624596532}
   - component: {fileID: 1624596533}
   m_Layer: 3
@@ -1498,18 +1497,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bfa40f5f308b89249a765586ee937e51, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1624596527
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1624596518}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9099720989581184bb3497d3d1f625e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &1624596528
@@ -1688,7 +1675,7 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!21 &1856831514
+--- !u!21 &1741175737
 Material:
   serializedVersion: 8
   m_ObjectHideFlags: 0

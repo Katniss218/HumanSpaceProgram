@@ -18,9 +18,6 @@ using System.Collections;
 using KSS.Core.Mods;
 using UnityPlus.Serialization.DataHandlers;
 using UnityPlus.Serialization.ReferenceMaps;
-using UnityPlus.Input;
-using UnityPlus.Input.Bindings;
-using KSS.Core.Input;
 
 namespace KSS.DevUtils
 {
@@ -113,7 +110,7 @@ namespace KSS.DevUtils
 
         void Update()
         {
-            if( Input.GetKeyDown( KeyCode.F4 ) )
+            if( UnityEngine.Input.GetKeyDown( KeyCode.F4 ) )
             {
                 JsonSeparateFileSerializedDataHandler _designObjDataHandler = new JsonSeparateFileSerializedDataHandler();
                 SingleExplicitHierarchyStrategy _designObjStrategy = new SingleExplicitHierarchyStrategy( _designObjDataHandler, () => null );
@@ -148,11 +145,11 @@ namespace KSS.DevUtils
                 Vector3Dbl airfPos = spawnerPosAirf + closestBoundToVesselAirf;
                 v2.AIRFPosition = airfPos;
             }
-            if( Input.GetKeyDown( KeyCode.F5 ) )
+            if( UnityEngine.Input.GetKeyDown( KeyCode.F5 ) )
             {
                 CreateVessel( launchSite );
             }
-            if( Input.GetKeyDown( KeyCode.F1 ) )
+            if( UnityEngine.Input.GetKeyDown( KeyCode.F1 ) )
             {
                 JsonSeparateFileSerializedDataHandler handler = new JsonSeparateFileSerializedDataHandler();
                 SingleExplicitHierarchyStrategy strat = new SingleExplicitHierarchyStrategy( handler, () => null );

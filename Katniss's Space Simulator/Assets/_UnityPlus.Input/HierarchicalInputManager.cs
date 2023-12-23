@@ -26,6 +26,8 @@ namespace UnityPlus.Input
 
         static bool _isChannelCacheStale = true;
 
+        public static InputState CurrentState { get; private set; }
+
         /// <summary>
         /// Registers a binding to the given channel ID.
         /// </summary>
@@ -143,14 +145,14 @@ namespace UnityPlus.Input
                 FixChannelCacheStaleness();
             }
 
-            InputState keyState = new InputState( GetHeldKeys( KEYS ), UnityEngine.Input.mousePosition, UnityEngine.Input.mouseScrollDelta );
+            CurrentState = new InputState( GetHeldKeys( KEYS ), UnityEngine.Input.mousePosition, UnityEngine.Input.mouseScrollDelta );
 
             _alreadyUpdatedBindings.Clear();
             foreach( var (binding, channel) in _channelCache )
             {
                 if( !_alreadyUpdatedBindings.Contains( binding ) )
                 {
-                    binding.Update( keyState );
+                    binding.Update( CurrentState );
                     _alreadyUpdatedBindings.Add( binding );
                 }
 

@@ -17,7 +17,7 @@ namespace KSS.Components
 
         public override bool CanInvoke()
         {
-            return Input.GetKey( Key );
+            return UnityEngine.Input.GetKey( Key );
         }
     }
 

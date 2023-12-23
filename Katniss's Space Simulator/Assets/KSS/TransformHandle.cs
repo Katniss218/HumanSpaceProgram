@@ -1,5 +1,5 @@
 ﻿using KSS.Core;
-using KSS.Core.Input;
+using KSS.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -76,7 +76,7 @@ namespace KSS
             if( _isHeld )
                 return false;
 
-            Ray ray = this.RaycastCamera.ScreenPointToRay( Input.mousePosition );
+            Ray ray = this.RaycastCamera.ScreenPointToRay( HierarchicalInputManager.CurrentState.MousePosition );
 
             // arrows get drawn on top of other objects.
             if( Physics.Raycast( ray, out RaycastHit hitInfo, float.MaxValue, 1 << HANDLE_COLLIDER_LAYER ) )
@@ -157,7 +157,7 @@ namespace KSS
         protected Vector3 ProjectCursor( Camera camera, Mode mode )
         {
             Plane plane = GetRaycastPlane( camera, mode );
-            Ray ray = camera.ScreenPointToRay( Input.mousePosition );
+            Ray ray = camera.ScreenPointToRay( HierarchicalInputManager.CurrentState.MousePosition );
 
             if( plane.Raycast( ray, out float hitDistance ) )
             {
