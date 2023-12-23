@@ -8,27 +8,26 @@ namespace UnityPlus.Input.Bindings
     /// <summary>
     /// Binds to a specific key being pressed (after being not pressed).
     /// </summary>
-    public class KeyDownBinding : InputBinding
+    public sealed class KeyDownBinding : IInputBinding
     {
-        public KeyCode Key { get; }
+        public KeyCode Key { get; set; }
+
+        public bool IsValid { get; private set; }
 
         bool _previousFrameWasReleased = true;
-        bool _currentFrameIsPressed = false;
 
         public KeyDownBinding( KeyCode key )
         {
             this.Key = key;
         }
 
-        public override void Update( InputState currentState )
+        public void Update( InputState currentState )
         {
-            _previousFrameWasReleased = !_currentFrameIsPressed;
-            _currentFrameIsPressed = currentState.CurrentHeldKeys.Contains( Key );
-        }
+            bool currentFrameIsPressed = currentState.CurrentHeldKeys.Contains( Key );
 
-        public override bool Check()
-        {
-            return _previousFrameWasReleased && _currentFrameIsPressed;
+            this.IsValid = _previousFrameWasReleased && currentFrameIsPressed;
+
+            _previousFrameWasReleased = !currentFrameIsPressed;
         }
     }
 }

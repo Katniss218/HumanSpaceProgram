@@ -8,25 +8,20 @@ namespace UnityPlus.Input.Bindings
     /// <summary>
     /// Binds to a specific key being currently held down, disregarding previous state.
     /// </summary>
-    public class KeyHoldBinding : InputBinding
+    public sealed class KeyHoldBinding : IInputBinding
     {
-        public KeyCode Key { get; }
+        public KeyCode Key { get; set; }
 
-        bool _isHeld = false;
+        public bool IsValid { get; private set; }
 
         public KeyHoldBinding( KeyCode key )
         {
             this.Key = key;
         }
 
-        public override void Update( InputState currentState )
+        public void Update( InputState currentState )
         {
-            _isHeld = currentState.CurrentHeldKeys.Contains( Key );
-        }
-
-        public override bool Check()
-        {
-            return _isHeld;
+            this.IsValid = currentState.CurrentHeldKeys.Contains( Key );
         }
     }
 }

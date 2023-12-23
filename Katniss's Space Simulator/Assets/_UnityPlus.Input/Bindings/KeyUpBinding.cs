@@ -8,9 +8,11 @@ namespace UnityPlus.Input.Bindings
     /// <summary>
     /// Binds to a specific key being released (after being pressed).
     /// </summary>
-    public class KeyUpBinding : InputBinding
+    public sealed class KeyUpBinding : IInputBinding
     {
-        public KeyCode Key { get; }
+        public KeyCode Key { get; set; }
+
+        public bool IsValid { get; private set; }
 
         bool _previousFrameWasPressed = true;
         bool _currentFrameIsReleased = true;
@@ -20,15 +22,13 @@ namespace UnityPlus.Input.Bindings
             this.Key = key;
         }
 
-        public override void Update( InputState currentState )
+        public void Update( InputState currentState )
         {
-            _previousFrameWasPressed = !_currentFrameIsReleased;
             _currentFrameIsReleased = !currentState.CurrentHeldKeys.Contains( Key );
-        }
 
-        public override bool Check()
-        {
-            return _previousFrameWasPressed && _currentFrameIsReleased;
+            this.IsValid = _previousFrameWasPressed && _currentFrameIsReleased;
+
+            _previousFrameWasPressed = !_currentFrameIsReleased;
         }
     }
 }

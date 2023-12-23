@@ -41,25 +41,6 @@ namespace KSS.DevUtils
         public ComputeShader shader;
         public RawImage uiImage;
 
-        void Awake()
-        {
-            LODQuadSphere.cbShader = this.cbShader;
-            LODQuadSphere.cbTex = this.cbTextures;
-        }
-
-        void Start()
-        {
-            /*normalmap = new RenderTexture( heightmap.width, heightmap.height, 8, RenderTextureFormat.ARGB32 );
-            normalmap.enableRandomWrite = true;
-
-            shader.SetTexture( shader.FindKernel( "CalculateNormalMap" ), Shader.PropertyToID( "heightMap" ), heightmap );
-            shader.SetTexture( shader.FindKernel( "CalculateNormalMap" ), Shader.PropertyToID( "normalMap" ), normalmap );
-            shader.SetFloat( Shader.PropertyToID( "strength" ), 5.0f );
-            shader.Dispatch( shader.FindKernel( "CalculateNormalMap" ), heightmap.width / 8, heightmap.height / 8, 1 );
-
-            uiImage.texture = normalmap;*/
-        }
-
         static Vessel launchSite;
         static Vessel vessel;
 
@@ -110,8 +91,24 @@ namespace KSS.DevUtils
             return v2;
         }
 
-        private void Update()
+        void Awake()
         {
+            LODQuadSphere.cbShader = this.cbShader;
+            LODQuadSphere.cbTex = this.cbTextures;
+        }
+
+        void Start()
+        {
+            /*normalmap = new RenderTexture( heightmap.width, heightmap.height, 8, RenderTextureFormat.ARGB32 );
+            normalmap.enableRandomWrite = true;
+
+            shader.SetTexture( shader.FindKernel( "CalculateNormalMap" ), Shader.PropertyToID( "heightMap" ), heightmap );
+            shader.SetTexture( shader.FindKernel( "CalculateNormalMap" ), Shader.PropertyToID( "normalMap" ), normalmap );
+            shader.SetFloat( Shader.PropertyToID( "strength" ), 5.0f );
+            shader.Dispatch( shader.FindKernel( "CalculateNormalMap" ), heightmap.width / 8, heightmap.height / 8, 1 );
+
+            uiImage.texture = normalmap;*/
+
             HierarchicalInputManager.AddAction( HierarchicalInputChannelID.LEFT_MOUSE_CLICK, 10, () =>
             {
                 Debug.Log( "action with priority 10" );
@@ -124,8 +121,11 @@ namespace KSS.DevUtils
                 return true; // Stops lower priority actions from executing.
             } );
 
-            HierarchicalInputManager.BindInput( HierarchicalInputChannelID.LEFT_MOUSE_CLICK, new KeyDownBinding( KeyCode.Space ) );
+            HierarchicalInputManager.BindInput( HierarchicalInputChannelID.LEFT_MOUSE_CLICK, new MultipleKeyDownBinding( KeyCode.LeftControl, KeyCode.W ) );
+        }
 
+        void Update()
+        {
             if( Input.GetKeyDown( KeyCode.F4 ) )
             {
                 JsonSeparateFileSerializedDataHandler _designObjDataHandler = new JsonSeparateFileSerializedDataHandler();

@@ -6,55 +6,50 @@ using UnityEngine;
 namespace UnityPlus.Input.Bindings
 {
     /// <summary>
-    /// Binds to a specific key being released after being pressed, restricting that the mouse must have moved between when the key was pressed and released.
+    /// Binds to a specific key being released after being pressed, restricting that the mouse must have moved a certain distance between when the key was pressed and released.
     /// </summary>
-    public class MouseDragBinding : InputBinding
+    public sealed class MouseDragBinding : IInputBinding
     {
         public const float MaxMouseDelta = 4.0f;
 
-        public KeyCode Key { get; }
+        public KeyCode Key { get; set; }
+
+        public bool IsValid { get; private set; }
 
         bool _previousFrameWasHeld = false;
-        Vector2 _originMousePosition = Vector2.zero;
+        bool _currentFrameIsHeld = false;
+        bool _deltaExceeded = false;
+
+        Vector2 _startPosition = Vector2.zero;
 
         public MouseDragBinding( KeyCode key )
         {
             this.Key = key;
         }
 
-        bool UpdateAndCheck( InputState currentState )
+        public void Update( InputState currentState )
         {
-            if( currentState.CurrentHeldKeys.Contains( Key ) )
+            Vector2 delta = _startPosition - currentState.MousePosition;
+
+            if( Mathf.Abs( delta.x ) > MaxMouseDelta
+             || Mathf.Abs( delta.y ) > MaxMouseDelta )
             {
-                if( !_previousFrameWasHeld )
-                {
-                    _originMousePosition = currentState.MousePosition;
-                    _previousFrameWasHeld = true; // now will be held.
-                }
-                return false;
+                _deltaExceeded = true;
             }
-            else
+
+            _currentFrameIsHeld = currentState.CurrentHeldKeys.Contains( Key );
+            if( _currentFrameIsHeld )
             {
-                if( _previousFrameWasHeld )
+                if( !_previousFrameWasHeld ) // pressed - start click.
                 {
-                    Vector2 clickDelta = _originMousePosition - currentState.MousePosition;
-                    _previousFrameWasHeld = false; // now won't be held.
-                    return Mathf.Abs( clickDelta.x ) > MaxMouseDelta || Mathf.Abs( clickDelta.y ) > MaxMouseDelta;
+                    _startPosition = currentState.MousePosition;
+                    _deltaExceeded = false;
                 }
-
-                // never pressed in the first place.
-                return false;
             }
-        }
 
-        public override void Update( InputState currentState )
-        {
-            throw new NotImplementedException();
-        }
+            this.IsValid = _previousFrameWasHeld && !_currentFrameIsHeld && _deltaExceeded;
 
-        public override bool Check()
-        {
-            throw new NotImplementedException();
+            _previousFrameWasHeld = _currentFrameIsHeld;
         }
     }
 }

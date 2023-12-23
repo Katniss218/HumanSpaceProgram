@@ -13,16 +13,16 @@ namespace UnityPlus.Input
             .ToArray();
 
         static Dictionary<string, HierarchicalActionChannel> _channels = new Dictionary<string, HierarchicalActionChannel>();
-        static Dictionary<string, InputBinding> _bindings = new Dictionary<string, InputBinding>();
+        static Dictionary<string, IInputBinding> _bindings = new Dictionary<string, IInputBinding>();
 
-        static (InputBinding, HierarchicalActionChannel)[] _channelCache;
-        static HashSet<InputBinding> _alreadyUpdatedBindings = new HashSet<InputBinding>(); // prevents update from being invoked twice if the same instance is registered for two channel IDs.
+        static (IInputBinding, HierarchicalActionChannel)[] _channelCache;
+        static HashSet<IInputBinding> _alreadyUpdatedBindings = new HashSet<IInputBinding>(); // prevents update from being invoked twice if the same instance is registered for two channel IDs.
 
         static bool _isChannelCacheStale = true;
 
         internal static List<KeyCode> _keys = new List<KeyCode>();
 
-        public static void BindInput( string channelId, InputBinding binding )
+        public static void BindInput( string channelId, IInputBinding binding )
         {
             _bindings[channelId] = binding;
             _isChannelCacheStale = true;
@@ -78,7 +78,7 @@ namespace UnityPlus.Input
 
         static void FixChannelCacheStaleness()
         {
-            List<(InputBinding, HierarchicalActionChannel)> newChannelCache = new List<(InputBinding, HierarchicalActionChannel)>( _channels.Count );
+            List<(IInputBinding, HierarchicalActionChannel)> newChannelCache = new List<(IInputBinding, HierarchicalActionChannel)>( _channels.Count );
 
             foreach( var kvp in _bindings )
             {
@@ -97,7 +97,7 @@ namespace UnityPlus.Input
         {
             _keys.Clear();
 
-            if( !UnityEngine.Input.anyKeyDown )
+            if( !UnityEngine.Input.anyKey )
                 return;
 
             foreach( var key in targetKeySet )
@@ -129,7 +129,7 @@ namespace UnityPlus.Input
                     _alreadyUpdatedBindings.Add( binding );
                 }
 
-                if( binding.Check() )
+                if( binding.IsValid )
                 {
                     channel.Invoke();
                 }
