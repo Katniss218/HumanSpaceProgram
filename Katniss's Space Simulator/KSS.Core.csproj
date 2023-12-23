@@ -93,7 +93,7 @@
     <Compile Include="Assets\KSS.Core\ReferenceFrames\ReferenceFrameUtils.cs" />
     <Compile Include="Assets\KSS.Core\Control\ControlOutAttribute.cs" />
     <Compile Include="Assets\KSS.Core\Serialization\SaveMetadata.cs" />
-    <Compile Include="Assets\KSS.Core\HierarchicalInputID.cs" />
+    <Compile Include="Assets\KSS.Core\HierarchicalInputChannelID.cs" />
     <Compile Include="Assets\KSS.Core\ReferenceFrames\OrientedReferenceFrame.cs" />
     <Compile Include="Assets\KSS.Core\ReferenceFrames\IReferenceFrameSwitchResponder.cs" />
     <Compile Include="Assets\KSS.Core\VesselManager.cs" />

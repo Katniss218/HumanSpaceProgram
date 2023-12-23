@@ -8,16 +8,20 @@ using UnityEngine;
 namespace UnityPlus.Input
 {
     /// <summary>
-    /// Describes the state of the input devices at a given time.
+    /// Describes the state of all input devices at a given frame. <br/>
+    /// Used by the <see cref="InputBinding"/>s to determine whether or not a given input is triggered.
     /// </summary>
     public class InputState
     {
         KeyCode[] _keysHeldDown;
 
+        /// <summary>
+        /// The keys being held down in this frmae.
+        /// </summary>
         public IEnumerable<KeyCode> CurrentHeldKeys { get => _keysHeldDown; }
 
         /// <summary>
-        /// The mouse position, in screen space.
+        /// The mouse position in this frmae, in screen space.
         /// </summary>
         public Vector2 MousePosition { get; }
 
@@ -26,43 +30,11 @@ namespace UnityPlus.Input
         /// </summary>
         public Vector2 ScrollDelta { get; }
 
-        // Max mouse movement to still be considered a click, in pixels.
-        
-
-        public bool IsLeftMouseClick()
+        public InputState( IEnumerable<KeyCode> keys, Vector2 mousePosition, Vector2 scrollDelta )
         {
-            Vector2 clickDelta = MousePosition - _clickMouse0;
-            return Mathf.Abs( clickDelta.x ) < MaxClickMouseDelta && Mathf.Abs( clickDelta.y ) < MaxClickMouseDelta && _keysPressed.Contains( KeyCode.Mouse0 );
+            this._keysHeldDown = keys.ToArray();
+            this.MousePosition = mousePosition;
+            this.ScrollDelta = scrollDelta;
         }
-
-        public bool IsRightMouseClick()
-        {
-            Vector2 clickDelta = MousePosition - _clickMouse1;
-            return Mathf.Abs( clickDelta.x ) < MaxClickMouseDelta && Mathf.Abs( clickDelta.y ) < MaxClickMouseDelta && _keysPressed.Contains( KeyCode.Mouse1 );
-        }
-
-        public bool IsMiddleMouseClick()
-        {
-            Vector2 clickDelta = MousePosition - _clickMouse2;
-            return Mathf.Abs( clickDelta.x ) < MaxClickMouseDelta && Mathf.Abs( clickDelta.y ) < MaxClickMouseDelta && _keysPressed.Contains( KeyCode.Mouse2 );
-        }
-
-        public Rect? GetLeftMouseRect()
-        {
-
-        }
-        
-        public Rect? GetRightMouseRect()
-        {
-
-        }
-        
-        public Rect? GetMiddleMouseRect()
-        {
-
-        }
-
-        // todo - invert this. instead of checking using a delegate, this sort of structure should be passed *into* the input system to perform optimizations e.g. only check keys that are being listened to.
-
     }
 }

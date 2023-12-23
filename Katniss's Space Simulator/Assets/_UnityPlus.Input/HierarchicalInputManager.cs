@@ -6,23 +6,25 @@ using UnityEngine;
 
 namespace UnityPlus.Input
 {
-    public static class HierarchicalInputManager
+    public class HierarchicalInputManager : SingletonMonoBehaviour<HierarchicalInputManager>
     {
-        static Dictionary<string, HierarchicalInputChannel> _channelSet = new Dictionary<string, HierarchicalInputChannel>();
-        static Dictionary<string, Func<InputState, bool>> _channelMap = new Dictionary<string, Func<InputState, bool>>();
+        static readonly KeyCode[] KEYS = Enum.GetValues( typeof( KeyCode ) )
+            .Cast<KeyCode>()
+            .ToArray();
 
-        static Dictionary<Func<InputState, bool>, HierarchicalInputChannel> _channelCache = new Dictionary<Func<InputState, bool>, HierarchicalInputChannel>();
+        static Dictionary<string, HierarchicalActionChannel> _channels = new Dictionary<string, HierarchicalActionChannel>();
+        static Dictionary<string, InputBinding> _bindings = new Dictionary<string, InputBinding>();
 
-        static bool _isMapStale = false;
+        static (InputBinding, HierarchicalActionChannel)[] _channelCache;
+
+        static bool _isChannelCacheStale = true;
 
         internal static List<KeyCode> _keys = new List<KeyCode>();
 
-        static Vector2 _previousMousePos;
-
-        public static void BindInput( string channelId, Func<InputState, bool> input )
+        public static void BindInput( string channelId, InputBinding binding )
         {
-            _channelMap[channelId] = input;
-            _isMapStale = true;
+            _bindings[channelId] = binding;
+            _isChannelCacheStale = true;
         }
 
         /// <remarks>
@@ -30,40 +32,98 @@ namespace UnityPlus.Input
         /// </remarks>
         public static void AddAction( string channelId, int priority, Func<bool> action )
         {
-            if( !_channelSet.TryGetValue( channelId, out var channel ) )
+            if( !_channels.TryGetValue( channelId, out var channel ) )
             {
-                channel = new HierarchicalInputChannel();
-                _channelSet[channelId] = channel;
+                channel = new HierarchicalActionChannel();
+                _channels[channelId] = channel;
+                _isChannelCacheStale = true;
             }
 
             channel.AddAction( priority, action );
+            // no need to mark as stale here because referenced instance is the same.
+        }
+        
+        /// <remarks>
+        /// The input actions are invoked according to their priorities (highest first) until an input action returns true.
+        /// </remarks>
+        public static void AddActions( string channelId, IEnumerable<(int priority, Func<bool>)> f )
+        {
+            if( !_channels.TryGetValue( channelId, out var channel ) )
+            {
+                channel = new HierarchicalActionChannel();
+                _channels[channelId] = channel;
+                _isChannelCacheStale = true;
+            }
+
+            channel.AddActions( f );
+            // no need to mark as stale here because referenced instance is the same.
         }
 
-
-        // channel set consists of all existing channels.
-        // channel map has all channels that are currently mapped to some input.
-
-        // 2 different types of events - continuous, and clicks
-        // continuous don't care if multiple are pressed
-        // clicks only fire individually.
-
-        internal static void Update()
+        public static void RemoveAction( string channelId, Func<bool> action )
         {
-            InputState keyState = new InputState()
+            if( _channels.TryGetValue( channelId, out var channel ) )
             {
-                OrderedKeyPresses = _keys.ToArray(),
-                MousePosition = (Vector2)UnityEngine.Input.mousePosition,
-                MouseDelta = (Vector2)UnityEngine.Input.mousePosition - _previousMousePos,
-                ScrollDelta = (Vector2)UnityEngine.Input.mouseScrollDelta
-            };
-
-            _previousMousePos = UnityEngine.Input.mousePosition;
-
-            foreach( var channelKvp in _channelCache )
+                channel.RemoveAction( action );
+            }
+        }
+        
+        public static void RemoveActions( string channelId, IEnumerable<Func<bool>> action )
+        {
+            if( _channels.TryGetValue( channelId, out var channel ) )
             {
-                if( channelKvp.Key.Invoke( keyState ) )
+                channel.RemoveActions( action );
+            }
+        }
+
+        static void FixChannelCacheStaleness()
+        {
+            List<(InputBinding, HierarchicalActionChannel)> newChannelCache = new List<(InputBinding, HierarchicalActionChannel)>( _channels.Count );
+
+            foreach( var kvp in _bindings )
+            {
+                if( _channels.TryGetValue( kvp.Key, out var channel ) )
                 {
-                    channelKvp.Value.Invoke();
+                    // It's important to use the same instance in the cache and the channel map.
+                    // Otherwise the cache would need to be recalculated every time an action is added to one of the *existing* channels.
+                    newChannelCache.Add( (kvp.Value, channel) );
+                }
+            }
+            _channelCache = newChannelCache.ToArray();
+            _isChannelCacheStale = false;
+        }
+
+        void UpdateHeldKeys( IEnumerable<KeyCode> targetKeySet )
+        {
+            _keys.Clear();
+
+            if( !UnityEngine.Input.anyKeyDown )
+                return;
+
+            foreach( var key in targetKeySet )
+            {
+                if( UnityEngine.Input.GetKey( key ) )
+                {
+                    _keys.Add( key );
+                }
+            }
+        }
+
+        void Update()
+        {
+            if( _isChannelCacheStale )
+            {
+                FixChannelCacheStaleness();
+            }
+
+            UpdateHeldKeys( KEYS );
+
+            InputState keyState = new InputState( _keys, (Vector2)UnityEngine.Input.mousePosition, (Vector2)UnityEngine.Input.mouseScrollDelta );
+
+            foreach( var (binding, channel) in _channelCache )
+            {
+                if( binding.CheckUpdate( keyState ) )
+                {
+                    channel.Invoke();
                 }
             }
         }

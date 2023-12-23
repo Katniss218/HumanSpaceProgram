@@ -111,17 +111,20 @@ namespace KSS.DevUtils
 
         private void Update()
         {
-            HierarchicalInputManager.AddAction( HierarchicalInputID.LEFT_MOUSE_CLICK, 10, () =>
+            HierarchicalInputManager.AddAction( HierarchicalInputChannelID.LEFT_MOUSE_CLICK, 10, () =>
             {
-                Debug.Log( "10" );
-                return true;
+                Debug.Log( "action with priority 10" );
+                return true; // Stops lower priority actions from executing.
             } );
-            HierarchicalInputManager.AddAction( HierarchicalInputID.LEFT_MOUSE_CLICK, 20, () =>
+
+            HierarchicalInputManager.AddAction( HierarchicalInputChannelID.LEFT_MOUSE_CLICK, 20, () =>
             {
-                Debug.Log( "20" );
-                return true;
+                Debug.Log( "action with priority 20" );
+                return true; // Stops lower priority actions from executing.
             } );
-            HierarchicalInputManager.BindInput( HierarchicalInputID.LEFT_MOUSE_CLICK, state => state.OrderedKeyPresses)
+
+            HierarchicalInputManager.BindInput( HierarchicalInputChannelID.LEFT_MOUSE_CLICK, new KeyDownBinding( KeyCode.Space ) );
+
             if( Input.GetKeyDown( KeyCode.F4 ) )
             {
                 JsonSeparateFileSerializedDataHandler _designObjDataHandler = new JsonSeparateFileSerializedDataHandler();

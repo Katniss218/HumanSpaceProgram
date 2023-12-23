@@ -83,29 +83,6 @@ namespace UnityPlus.Input
         }
     }
 
-    // we could do compound bindings, just pass the update to the inner children.
-
-    internal class CompoundBinding : InputBinding
-    {
-        InputBinding[] _bindings { get; }
-
-        public CompoundBinding( IEnumerable<InputBinding> bindings )
-        {
-            this._bindings = bindings.ToArray();
-        }
-
-        public override bool CheckUpdate( InputState currentState )
-        {
-            bool wasTrue = false;
-
-            foreach( var binding in _bindings )
-                if( binding.CheckUpdate( currentState ) )
-                    wasTrue = true;
-
-            return wasTrue;
-        }
-    }
-
     /// <summary>
     /// Binds to a specific key being released after being pressed, restricting that the mouse mustn't have moved between when the key was pressed and released.
     /// </summary>
@@ -191,6 +168,31 @@ namespace UnityPlus.Input
                 // never pressed in the first place.
                 return false;
             }
+        }
+    }
+
+
+
+    // we could do compound bindings, just pass the update to the inner children.
+    [Obsolete( "this is just for educational purposes, I don't want the users to have to mess with combining channels and stuff." )]
+    internal class CompoundBinding : InputBinding
+    {
+        InputBinding[] _bindings { get; }
+
+        public CompoundBinding( IEnumerable<InputBinding> bindings )
+        {
+            this._bindings = bindings.ToArray();
+        }
+
+        public override bool CheckUpdate( InputState currentState )
+        {
+            bool wasTrue = false;
+
+            foreach( var binding in _bindings )
+                if( binding.CheckUpdate( currentState ) )
+                    wasTrue = true;
+
+            return wasTrue;
         }
     }
 }
