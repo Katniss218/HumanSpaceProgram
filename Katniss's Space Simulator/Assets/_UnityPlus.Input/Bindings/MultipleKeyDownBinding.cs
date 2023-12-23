@@ -13,31 +13,37 @@ namespace UnityPlus.Input.Bindings
     /// </summary>
     public sealed class MultipleKeyDownBinding : IInputBinding
     {
-        public KeyCode[] KeysOrdered { get; set; }
+        public KeyCode[] KeysOrdered { get; private set; }
 
         public bool IsValid { get; private set; }
 
-        int _keyToPress;
+        int _indexOfKeyToPressNow;
         bool _previousFrameWasReleased = false;
 
         public MultipleKeyDownBinding( params KeyCode[] keysOrdered )
         {
+            if( keysOrdered.Length < 2 )
+                throw new ArgumentException( $"There must be at least 2 keys. For a single key binding use the {nameof( KeyDownBinding )}.", nameof( KeysOrdered ) );
+
             this.KeysOrdered = keysOrdered;
         }
 
         public MultipleKeyDownBinding( IEnumerable<KeyCode> keysOrdered )
         {
             this.KeysOrdered = keysOrdered.ToArray();
+
+            if( this.KeysOrdered.Length < 2 )
+                throw new ArgumentException( $"There must be at least 2 keys. For a single key binding use the {nameof( KeyDownBinding )}.", nameof( KeysOrdered ) );
         }
 
         public void Update( InputState currentState )
         {
             // Invalidate if any of the keys that were pressed was released.
-            for( int i = 0; i < _keyToPress; i++ )
+            for( int i = 0; i < _indexOfKeyToPressNow; i++ )
             {
                 if( !currentState.CurrentHeldKeys.Contains( KeysOrdered[i] ) )
                 {
-                    _keyToPress = i;
+                    _indexOfKeyToPressNow = i;
                     IsValid = false;
                     return;
                 }
@@ -48,10 +54,10 @@ namespace UnityPlus.Input.Bindings
             if( !IsValid )
             {
                 // Allows pressing the keys *simultaneously*, but not backwards.
-                while( _keyToPress < KeysOrdered.Length && currentState.CurrentHeldKeys.Contains( KeysOrdered[_keyToPress] ) )
+                while( _indexOfKeyToPressNow < KeysOrdered.Length && currentState.CurrentHeldKeys.Contains( KeysOrdered[_indexOfKeyToPressNow] ) )
                 {
-                    _keyToPress++;
-                    if( _keyToPress == KeysOrdered.Length )
+                    _indexOfKeyToPressNow++;
+                    if( _indexOfKeyToPressNow == KeysOrdered.Length )
                     {
                         IsValid = true;
                         break;
@@ -59,7 +65,7 @@ namespace UnityPlus.Input.Bindings
                 }
             }
 
-            if( !_previousFrameWasReleased )
+            if( !_previousFrameWasReleased ) // invalidate after the first valid frame, this is a key *down* binding, not key held.
                 IsValid = false;
 
             _previousFrameWasReleased = !currentFrameIsHeld;

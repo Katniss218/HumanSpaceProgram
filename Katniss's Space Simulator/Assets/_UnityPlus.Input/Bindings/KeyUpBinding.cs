@@ -15,7 +15,6 @@ namespace UnityPlus.Input.Bindings
         public bool IsValid { get; private set; }
 
         bool _previousFrameWasPressed = true;
-        bool _currentFrameIsReleased = true;
 
         public KeyUpBinding( KeyCode key )
         {
@@ -24,11 +23,11 @@ namespace UnityPlus.Input.Bindings
 
         public void Update( InputState currentState )
         {
-            _currentFrameIsReleased = !currentState.CurrentHeldKeys.Contains( Key );
+            bool currentFrameIsReleased = !currentState.CurrentHeldKeys.Contains( Key );
 
-            this.IsValid = _previousFrameWasPressed && _currentFrameIsReleased;
+            this.IsValid = _previousFrameWasPressed && currentFrameIsReleased;
 
-            _previousFrameWasPressed = !_currentFrameIsReleased;
+            _previousFrameWasPressed = !currentFrameIsReleased;
         }
     }
 }

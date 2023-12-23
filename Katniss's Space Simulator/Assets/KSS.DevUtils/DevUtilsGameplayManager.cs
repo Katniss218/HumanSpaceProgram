@@ -109,19 +109,19 @@ namespace KSS.DevUtils
 
             uiImage.texture = normalmap;*/
 
-            HierarchicalInputManager.AddAction( HierarchicalInputChannelID.LEFT_MOUSE_CLICK, 10, () =>
+            HierarchicalInputManager.AddAction( "dummy", 10, () =>
             {
                 Debug.Log( "action with priority 10" );
                 return true; // Stops lower priority actions from executing.
             } );
 
-            HierarchicalInputManager.AddAction( HierarchicalInputChannelID.LEFT_MOUSE_CLICK, 20, () =>
+            HierarchicalInputManager.AddAction( "dummy", 20, () =>
             {
                 Debug.Log( "action with priority 20" );
                 return true; // Stops lower priority actions from executing.
             } );
 
-            HierarchicalInputManager.BindInput( HierarchicalInputChannelID.LEFT_MOUSE_CLICK, new MultipleKeyDownBinding( KeyCode.LeftControl, KeyCode.W ) );
+            HierarchicalInputManager.BindInput( "dummy", new MultipleKeyDownBinding( KeyCode.LeftControl, KeyCode.W ) );
         }
 
         void Update()

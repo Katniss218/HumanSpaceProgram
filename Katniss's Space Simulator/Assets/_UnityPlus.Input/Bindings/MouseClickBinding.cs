@@ -17,7 +17,6 @@ namespace UnityPlus.Input.Bindings
         public bool IsValid { get; private set; }
 
         bool _previousFrameWasHeld = false;
-        bool _currentFrameIsHeld = false;
         bool _deltaExceeded = false;
 
         Vector2 _startPosition = Vector2.zero;
@@ -37,8 +36,8 @@ namespace UnityPlus.Input.Bindings
                 _deltaExceeded = true;
             }
 
-            _currentFrameIsHeld = currentState.CurrentHeldKeys.Contains( Key );
-            if( _currentFrameIsHeld )
+            bool currentFrameIsHeld = currentState.CurrentHeldKeys.Contains( Key );
+            if( currentFrameIsHeld )
             {
                 if( !_previousFrameWasHeld ) // pressed - start click.
                 {
@@ -47,9 +46,9 @@ namespace UnityPlus.Input.Bindings
                 }
             }
 
-            this.IsValid = _previousFrameWasHeld && !_currentFrameIsHeld && !_deltaExceeded;
+            this.IsValid = _previousFrameWasHeld && !currentFrameIsHeld && !_deltaExceeded;
 
-            _previousFrameWasHeld = _currentFrameIsHeld;
+            _previousFrameWasHeld = currentFrameIsHeld;
         }
     }
 }

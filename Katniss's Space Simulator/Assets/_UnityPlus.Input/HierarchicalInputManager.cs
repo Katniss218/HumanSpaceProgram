@@ -8,11 +8,17 @@ namespace UnityPlus.Input
 {
     public class HierarchicalInputManager : SingletonMonoBehaviour<HierarchicalInputManager>
     {
+        class ChannelData
+        {
+            public HierarchicalActionChannel channel;
+            public bool enabled;
+        }
+
         static readonly KeyCode[] KEYS = Enum.GetValues( typeof( KeyCode ) )
             .Cast<KeyCode>()
             .ToArray();
 
-        static Dictionary<string, HierarchicalActionChannel> _channels = new Dictionary<string, HierarchicalActionChannel>();
+        static Dictionary<string, ChannelData> _channels = new Dictionary<string, ChannelData>();
         static Dictionary<string, IInputBinding> _bindings = new Dictionary<string, IInputBinding>();
 
         static (IInputBinding, HierarchicalActionChannel)[] _channelCache;
@@ -28,6 +34,24 @@ namespace UnityPlus.Input
             _isChannelCacheStale = true;
         }
 
+        public static void EnableChannel( string channelId )
+        {
+            if( _channels.TryGetValue( channelId, out var channel ) )
+            {
+                channel.enabled = true;
+                _isChannelCacheStale = true;
+            }
+        }
+        
+        public static void DisableChannel( string channelId )
+        {
+            if( _channels.TryGetValue( channelId, out var channel ) )
+            {
+                channel.enabled = false;
+                _isChannelCacheStale = true;
+            }
+        }
+
         /// <remarks>
         /// The input actions are invoked according to their priorities (highest first) until an input action returns true.
         /// </remarks>
@@ -35,12 +59,12 @@ namespace UnityPlus.Input
         {
             if( !_channels.TryGetValue( channelId, out var channel ) )
             {
-                channel = new HierarchicalActionChannel();
+                channel = new ChannelData() { channel = new HierarchicalActionChannel(), enabled = true };
                 _channels[channelId] = channel;
                 _isChannelCacheStale = true;
             }
 
-            channel.AddAction( priority, action );
+            channel.channel.AddAction( priority, action );
             // no need to mark as stale here because referenced instance is the same.
         }
 
@@ -51,12 +75,12 @@ namespace UnityPlus.Input
         {
             if( !_channels.TryGetValue( channelId, out var channel ) )
             {
-                channel = new HierarchicalActionChannel();
+                channel = new ChannelData() { channel = new HierarchicalActionChannel(), enabled = true };
                 _channels[channelId] = channel;
                 _isChannelCacheStale = true;
             }
 
-            channel.AddActions( f );
+            channel.channel.AddActions( f );
             // no need to mark as stale here because referenced instance is the same.
         }
 
@@ -64,7 +88,7 @@ namespace UnityPlus.Input
         {
             if( _channels.TryGetValue( channelId, out var channel ) )
             {
-                channel.RemoveAction( action );
+                channel.channel.RemoveAction( action );
             }
         }
 
@@ -72,7 +96,7 @@ namespace UnityPlus.Input
         {
             if( _channels.TryGetValue( channelId, out var channel ) )
             {
-                channel.RemoveActions( action );
+                channel.channel.RemoveActions( action );
             }
         }
 
@@ -84,11 +108,15 @@ namespace UnityPlus.Input
             {
                 if( _channels.TryGetValue( kvp.Key, out var channel ) )
                 {
+                    if( !channel.enabled )
+                        continue;
+
                     // It's important to use the same instance in the cache and the channel map.
                     // Otherwise the cache would need to be recalculated every time an action is added to one of the *existing* channels.
-                    newChannelCache.Add( (kvp.Value, channel) );
+                    newChannelCache.Add( (kvp.Value, channel.channel) );
                 }
             }
+
             _channelCache = newChannelCache.ToArray();
             _isChannelCacheStale = false;
         }
