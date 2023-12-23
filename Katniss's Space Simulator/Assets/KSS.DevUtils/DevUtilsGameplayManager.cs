@@ -19,6 +19,7 @@ using KSS.Core.Mods;
 using UnityPlus.Serialization.DataHandlers;
 using UnityPlus.Serialization.ReferenceMaps;
 using UnityPlus.Input;
+using UnityPlus.Input.Bindings;
 
 namespace KSS.DevUtils
 {

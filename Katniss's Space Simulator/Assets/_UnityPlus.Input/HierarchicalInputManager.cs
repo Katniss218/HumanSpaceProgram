@@ -16,6 +16,7 @@ namespace UnityPlus.Input
         static Dictionary<string, InputBinding> _bindings = new Dictionary<string, InputBinding>();
 
         static (InputBinding, HierarchicalActionChannel)[] _channelCache;
+        static HashSet<InputBinding> _alreadyUpdatedBindings = new HashSet<InputBinding>(); // prevents update from being invoked twice if the same instance is registered for two channel IDs.
 
         static bool _isChannelCacheStale = true;
 
@@ -42,7 +43,7 @@ namespace UnityPlus.Input
             channel.AddAction( priority, action );
             // no need to mark as stale here because referenced instance is the same.
         }
-        
+
         /// <remarks>
         /// The input actions are invoked according to their priorities (highest first) until an input action returns true.
         /// </remarks>
@@ -66,7 +67,7 @@ namespace UnityPlus.Input
                 channel.RemoveAction( action );
             }
         }
-        
+
         public static void RemoveActions( string channelId, IEnumerable<Func<bool>> action )
         {
             if( _channels.TryGetValue( channelId, out var channel ) )
@@ -119,9 +120,16 @@ namespace UnityPlus.Input
 
             InputState keyState = new InputState( _keys, (Vector2)UnityEngine.Input.mousePosition, (Vector2)UnityEngine.Input.mouseScrollDelta );
 
+            _alreadyUpdatedBindings.Clear();
             foreach( var (binding, channel) in _channelCache )
             {
-                if( binding.CheckUpdate( keyState ) )
+                if( !_alreadyUpdatedBindings.Contains( binding ) )
+                {
+                    binding.Update( keyState );
+                    _alreadyUpdatedBindings.Add( binding );
+                }
+
+                if( binding.Check() )
                 {
                     channel.Invoke();
                 }

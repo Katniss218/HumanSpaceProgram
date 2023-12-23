@@ -11,5 +11,7 @@ namespace KSS.Core
         public const string LEFT_MOUSE_CLICK = "lmbclick";
         public const string RIGHT_MOUSE_CLICK = "rmbclick";
         public const string MIDDLE_MOUSE_CLICK = "mmbclick";
+        // they could use namespaced IDs 🤔
+        public const string PART_SELECT = "vanilla.partselect";
     }
 }
