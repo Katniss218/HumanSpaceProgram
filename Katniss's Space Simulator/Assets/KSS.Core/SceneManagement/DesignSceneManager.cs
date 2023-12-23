@@ -21,7 +21,7 @@ namespace KSS.Core
 
         void Update()
         {
-            if( Input.GetKeyDown( KeyCode.Escape ) )
+            if( UnityEngine.Input.GetKeyDown( KeyCode.Escape ) )
             {
                 HSPEvent.EventManager.TryInvoke( HSPEvent.ESCAPE_DESIGN, null );
             }

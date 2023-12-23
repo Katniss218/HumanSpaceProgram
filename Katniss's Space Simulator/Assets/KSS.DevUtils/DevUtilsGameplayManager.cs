@@ -108,20 +108,12 @@ namespace KSS.DevUtils
             shader.Dispatch( shader.FindKernel( "CalculateNormalMap" ), heightmap.width / 8, heightmap.height / 8, 1 );
 
             uiImage.texture = normalmap;*/
-
-            HierarchicalInputManager.AddAction( "dummy", 10, () =>
+                        
+            HierarchicalInputManager.AddAction( HierarchicalInputChannel.COMMON_LEFT_MOUSE_DOWN, HierarchicalInputPriority.VERY_HIGH, () =>
             {
-                Debug.Log( "action with priority 10" );
-                return true; // Stops lower priority actions from executing.
+                Debug.Log( "mouse is pressed" );
+                return false; // True stops lower priority actions from executing.
             } );
-
-            HierarchicalInputManager.AddAction( "dummy", 20, () =>
-            {
-                Debug.Log( "action with priority 20" );
-                return true; // Stops lower priority actions from executing.
-            } );
-
-            HierarchicalInputManager.BindInput( "dummy", new MultipleKeyDownBinding( KeyCode.LeftControl, KeyCode.W ) );
         }
 
         void Update()

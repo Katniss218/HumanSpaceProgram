@@ -10,6 +10,8 @@ namespace UnityPlus.Input.Bindings
     /// </summary>
     public sealed class KeyDownBinding : IInputBinding
     {
+#warning TODO - add "alternate key binding" (down/hold/up) with a number of different keys.
+
         public KeyCode Key { get; set; }
 
         public bool IsValid { get; private set; }

@@ -28,7 +28,6 @@ namespace KSS
             _startWorldToLocal = _startLocalToWorld.inverse;
 
             _lastCursorPos = ProjectCursor( RaycastCamera, Mode.Planar );
-            _isHeld = true;
         }
 
         protected override void ContinueTransformation()
@@ -65,7 +64,6 @@ namespace KSS
         protected override void EndTransformation()
         {
             ContinueTransformation(); // Makes sure the final position is correct.
-            _isHeld = false;
         }
     }
 }

@@ -8,7 +8,7 @@ namespace UnityPlus.Input
 {
     public class HierarchicalInputManager : SingletonMonoBehaviour<HierarchicalInputManager>
     {
-        class ChannelData
+        private class ChannelData
         {
             public HierarchicalActionChannel channel;
             public bool enabled;
@@ -26,14 +26,18 @@ namespace UnityPlus.Input
 
         static bool _isChannelCacheStale = true;
 
-        internal static List<KeyCode> _keys = new List<KeyCode>();
-
+        /// <summary>
+        /// Registers a binding to the given channel ID.
+        /// </summary>
         public static void BindInput( string channelId, IInputBinding binding )
         {
             _bindings[channelId] = binding;
             _isChannelCacheStale = true;
         }
 
+        /// <summary>
+        /// Enables the channel with the given channel ID.
+        /// </summary>
         public static void EnableChannel( string channelId )
         {
             if( _channels.TryGetValue( channelId, out var channel ) )
@@ -42,7 +46,10 @@ namespace UnityPlus.Input
                 _isChannelCacheStale = true;
             }
         }
-        
+
+        /// <summary>
+        /// Disables the channel with the given channel ID.
+        /// </summary>
         public static void DisableChannel( string channelId )
         {
             if( _channels.TryGetValue( channelId, out var channel ) )
@@ -121,20 +128,12 @@ namespace UnityPlus.Input
             _isChannelCacheStale = false;
         }
 
-        void UpdateHeldKeys( IEnumerable<KeyCode> targetKeySet )
+        IEnumerable<KeyCode> GetHeldKeys( IEnumerable<KeyCode> targetKeySet )
         {
-            _keys.Clear();
+            if( UnityEngine.Input.anyKey )
+                return targetKeySet.Where( k => UnityEngine.Input.GetKey( k ) );
 
-            if( !UnityEngine.Input.anyKey )
-                return;
-
-            foreach( var key in targetKeySet )
-            {
-                if( UnityEngine.Input.GetKey( key ) )
-                {
-                    _keys.Add( key );
-                }
-            }
+            return new KeyCode[] { };
         }
 
         void Update()
@@ -144,9 +143,7 @@ namespace UnityPlus.Input
                 FixChannelCacheStaleness();
             }
 
-            UpdateHeldKeys( KEYS );
-
-            InputState keyState = new InputState( _keys, (Vector2)UnityEngine.Input.mousePosition, (Vector2)UnityEngine.Input.mouseScrollDelta );
+            InputState keyState = new InputState( GetHeldKeys( KEYS ), UnityEngine.Input.mousePosition, UnityEngine.Input.mouseScrollDelta );
 
             _alreadyUpdatedBindings.Clear();
             foreach( var (binding, channel) in _channelCache )

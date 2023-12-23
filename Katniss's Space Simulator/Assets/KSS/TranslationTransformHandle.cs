@@ -46,7 +46,6 @@ namespace KSS
                     throw new InvalidOperationException( $"Unknown mode '{_mode}'." );
             }
 
-            _isHeld = true;
         }
 
         protected override void ContinueTransformation()
@@ -90,7 +89,6 @@ namespace KSS
         protected override void EndTransformation()
         {
             ContinueTransformation(); // Makes sure the final position is correct.
-            _isHeld = false;
         }
     }
 }

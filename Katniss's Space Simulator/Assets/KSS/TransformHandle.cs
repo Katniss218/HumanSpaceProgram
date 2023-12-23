@@ -1,9 +1,11 @@
-﻿using System;
+﻿using KSS.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityPlus.Input;
 
 namespace KSS
 {
@@ -31,7 +33,7 @@ namespace KSS
         [field: SerializeField]
         public Transform Target { get; set; }
 
-        protected bool _isHeld;
+        bool _isHeld;
 
         /// <summary>
         /// The position of the handle at the start of the transformation (in scene/world space).
@@ -54,34 +56,55 @@ namespace KSS
             _raycastCollider.isTrigger = true;
         }
 
-        void Update()
+        void OnEnable()
         {
-            if( Input.GetKeyDown( KeyCode.Mouse0 ) && !_isHeld )
-            {
-                Ray ray = this.RaycastCamera.ScreenPointToRay( Input.mousePosition );
+            HierarchicalInputManager.AddAction( HierarchicalInputChannel.COMMON_LEFT_MOUSE_DOWN, HierarchicalInputPriority.HIGH, Input_MouseDown );
+            HierarchicalInputManager.AddAction( HierarchicalInputChannel.COMMON_LEFT_MOUSE, HierarchicalInputPriority.HIGH, Input_MouseHeld );
+            HierarchicalInputManager.AddAction( HierarchicalInputChannel.COMMON_LEFT_MOUSE_UP, HierarchicalInputPriority.HIGH, Input_MouseUp );
+        }
 
-                // arrows get drawn on top of other objects.
-                if( Physics.Raycast( ray, out RaycastHit hitInfo, float.MaxValue, 1 << HANDLE_COLLIDER_LAYER ) )
+        void OnDisable()
+        {
+            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.COMMON_LEFT_MOUSE_DOWN, Input_MouseDown );
+            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.COMMON_LEFT_MOUSE, Input_MouseHeld );
+            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.COMMON_LEFT_MOUSE_UP, Input_MouseUp );
+        }
+
+        private bool Input_MouseDown()
+        {
+            if( _isHeld )
+                return false;
+
+            Ray ray = this.RaycastCamera.ScreenPointToRay( Input.mousePosition );
+
+            // arrows get drawn on top of other objects.
+            if( Physics.Raycast( ray, out RaycastHit hitInfo, float.MaxValue, 1 << HANDLE_COLLIDER_LAYER ) )
+            {
+                if( hitInfo.collider == _raycastCollider )
                 {
-                    if( hitInfo.collider == _raycastCollider )
-                    {
-                        StartTransformation();
-                    }
+                    StartTransformation();
+                    _isHeld = true;
+                    return true;
                 }
-                return;
             }
+            return false;
+        }
 
-            if( Input.GetKey( KeyCode.Mouse0 ) && _isHeld )
-            {
-                ContinueTransformation();
-                return;
-            }
+        private bool Input_MouseHeld()
+        {
+            if( !_isHeld ) return false;
 
-            if( Input.GetKeyUp( KeyCode.Mouse0 ) && _isHeld )
-            {
-                EndTransformation();
-                return;
-            }
+            ContinueTransformation();
+            return false;
+        }
+
+        private bool Input_MouseUp()
+        {
+            if( !_isHeld ) return false;
+
+            EndTransformation();
+            _isHeld = false;
+            return false;
         }
 
         protected abstract void StartTransformation();
