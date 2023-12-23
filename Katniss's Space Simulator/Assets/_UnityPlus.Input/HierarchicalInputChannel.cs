@@ -5,9 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace UnityPlus.Input
-{/// <summary>
- /// Contains an ordered list of actions that are possible to trigger for some defined user input action.
- /// </summary>
+{
+    /// <summary>
+    /// Contains an ordered list of actions that are possible to trigger for some defined user input action.
+    /// </summary>
     public class HierarchicalInputChannel
     {
         List<(int priority, Func<bool> func)> _registeredActions = new List<(int priority, Func<bool> func)>();

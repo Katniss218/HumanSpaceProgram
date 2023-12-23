@@ -12,13 +12,9 @@ namespace UnityPlus.Input
     /// </summary>
     public class InputState
     {
-        KeyCode[] _keysPressed;
-        KeyCode[] _keysReleased;
+        KeyCode[] _keysHeldDown;
 
-        /// <summary>
-        /// The difference between this frame's mouse position, and last frame's mouse position, in screen space.
-        /// </summary>
-        public Vector2 MouseDelta { get; }
+        public IEnumerable<KeyCode> CurrentHeldKeys { get => _keysHeldDown; }
 
         /// <summary>
         /// The mouse position, in screen space.
@@ -31,11 +27,7 @@ namespace UnityPlus.Input
         public Vector2 ScrollDelta { get; }
 
         // Max mouse movement to still be considered a click, in pixels.
-        static readonly float MaxClickMouseDelta = 4.0f;
-
-        static Vector2 _clickMouse0; // positions where the mouse was clicked.
-        static Vector2 _clickMouse1;
-        static Vector2 _clickMouse2;
+        
 
         public bool IsLeftMouseClick()
         {
@@ -72,31 +64,5 @@ namespace UnityPlus.Input
 
         // todo - invert this. instead of checking using a delegate, this sort of structure should be passed *into* the input system to perform optimizations e.g. only check keys that are being listened to.
 
-        /// <summary>
-        /// Checks whether the specified keys is being held in this frame.
-        /// </summary>
-        public bool KeysHeld( params KeyCode[] required )
-        { }
-        /// <summary>
-        /// Checks whether the specified keys was pressed in this frame.
-        /// </summary>
-        public bool KeysPressed( params KeyCode[] required )
-        { }
-        /// <summary>
-        /// Checks whether the specified keys was released in this frame.
-        /// </summary>
-        public bool KeysReleased( params KeyCode[] required )
-        { }
-
-        /// <summary>
-        /// Checks whether the specified keys were pressed and remained held in the specific order.
-        /// </summary>
-        public bool KeysPressedOrdered( params KeyCode[] required )
-        { }
-        /// <summary>
-        /// Checks whether the specified keys were pressed and remained held in the specific order, additionally no other key can be pressed, including mouse and joystick keys.
-        /// </summary>
-        public bool KeysPressedOrderedExclusive( params KeyCode[] required )
-        { }
     }
 }
