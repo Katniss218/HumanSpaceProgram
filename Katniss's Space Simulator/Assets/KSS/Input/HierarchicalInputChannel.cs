@@ -10,17 +10,13 @@ namespace KSS.Input
     {
         // they could use namespaced IDs 🤔
 
-        public const string VIEWPORT_LEFT_MOUSE_DOWN = "c.lmb_d";
-        public const string VIEWPORT_LEFT_MOUSE = "c.lmb";
-        public const string VIEWPORT_LEFT_MOUSE_UP = "c.lmb_u";
+        public const string VIEWPORT_PRIMARY_DOWN = "c.lmb_d";
+        public const string VIEWPORT_PRIMARY = "c.lmb";
+        public const string VIEWPORT_PRIMARY_UP = "c.lmb_u";
 
-        public const string VIEWPORT_RIGHT_MOUSE_DOWN = "c.rmb_d";
-        public const string VIEWPORT_RIGHT_MOUSE = "c.rmb";
-        public const string VIEWPORT_RIGHT_MOUSE_UP = "c.rmb_u";
-
-        public const string VIEWPORT_MIDDLE_MOUSE_DOWN = "c.mmb_d";
-        public const string VIEWPORT_MIDDLE_MOUSE = "c.mmb";
-        public const string VIEWPORT_MIDDLE_MOUSE_UP = "c.mmb_u";
+        public const string VIEWPORT_SECONDARY_DOWN = "c.rmb_d";
+        public const string VIEWPORT_SECONDARY = "c.rmb";
+        public const string VIEWPORT_SECONDARY_UP = "c.rmb_u";
 
         public const string COMMON_ESCAPE = "c.esc";
 
@@ -50,20 +46,23 @@ namespace KSS.Input
 
         public const string DESIGN_SAVE = "vanilla.design_save";
 
+        public const string DESIGN_PART_ROTATE_XP = "vanilla.gameplayc_rotate_xp";
+        public const string DESIGN_PART_ROTATE_XN = "vanilla.gameplayc_rotate_xn";
+        public const string DESIGN_PART_ROTATE_YP = "vanilla.gameplayc_rotate_yp";
+        public const string DESIGN_PART_ROTATE_YN = "vanilla.gameplayc_rotate_yn";
+        public const string DESIGN_PART_ROTATE_ZP = "vanilla.gameplayc_rotate_zp";
+        public const string DESIGN_PART_ROTATE_ZN = "vanilla.gameplayc_rotate_zn";
+
         [HSPEventListener( HSPEvent.STARTUP_IMMEDIATELY, HSPEvent.NAMESPACE_VANILLA + ".bind_input_channels" )]
         static void Event()
         {
-            HierarchicalInputManager.BindInput( HierarchicalInputChannel.VIEWPORT_LEFT_MOUSE_DOWN, new KeyDownBinding( KeyCode.Mouse0 ) );
-            HierarchicalInputManager.BindInput( HierarchicalInputChannel.VIEWPORT_LEFT_MOUSE, new KeyHoldBinding( KeyCode.Mouse0 ) );
-            HierarchicalInputManager.BindInput( HierarchicalInputChannel.VIEWPORT_LEFT_MOUSE_UP, new KeyUpBinding( KeyCode.Mouse0 ) );
+            HierarchicalInputManager.BindInput( HierarchicalInputChannel.VIEWPORT_PRIMARY_DOWN, new KeyDownBinding( KeyCode.Mouse0 ) );
+            HierarchicalInputManager.BindInput( HierarchicalInputChannel.VIEWPORT_PRIMARY, new KeyHoldBinding( KeyCode.Mouse0 ) );
+            HierarchicalInputManager.BindInput( HierarchicalInputChannel.VIEWPORT_PRIMARY_UP, new KeyUpBinding( KeyCode.Mouse0 ) );
 
-            HierarchicalInputManager.BindInput( HierarchicalInputChannel.VIEWPORT_RIGHT_MOUSE_DOWN, new KeyDownBinding( KeyCode.Mouse1 ) );
-            HierarchicalInputManager.BindInput( HierarchicalInputChannel.VIEWPORT_RIGHT_MOUSE, new KeyHoldBinding( KeyCode.Mouse1 ) );
-            HierarchicalInputManager.BindInput( HierarchicalInputChannel.VIEWPORT_RIGHT_MOUSE_UP, new KeyUpBinding( KeyCode.Mouse1 ) );
-
-            HierarchicalInputManager.BindInput( HierarchicalInputChannel.VIEWPORT_MIDDLE_MOUSE_DOWN, new KeyDownBinding( KeyCode.Mouse2 ) );
-            HierarchicalInputManager.BindInput( HierarchicalInputChannel.VIEWPORT_MIDDLE_MOUSE, new KeyHoldBinding( KeyCode.Mouse2 ) );
-            HierarchicalInputManager.BindInput( HierarchicalInputChannel.VIEWPORT_MIDDLE_MOUSE_UP, new KeyUpBinding( KeyCode.Mouse2 ) );
+            HierarchicalInputManager.BindInput( HierarchicalInputChannel.VIEWPORT_SECONDARY_DOWN, new KeyDownBinding( KeyCode.Mouse1 ) );
+            HierarchicalInputManager.BindInput( HierarchicalInputChannel.VIEWPORT_SECONDARY, new KeyHoldBinding( KeyCode.Mouse1 ) );
+            HierarchicalInputManager.BindInput( HierarchicalInputChannel.VIEWPORT_SECONDARY_UP, new KeyUpBinding( KeyCode.Mouse1 ) );
 
             HierarchicalInputManager.BindInput( HierarchicalInputChannel.COMMON_ESCAPE, new KeyUpBinding( KeyCode.Escape ) );
 
@@ -92,6 +91,13 @@ namespace KSS.Input
             HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_TIMESCALE_DECREASE, new KeyDownBinding( KeyCode.Comma ) );
 
             HierarchicalInputManager.BindInput( HierarchicalInputChannel.DESIGN_SAVE, new MultipleKeyDownBinding( KeyCode.LeftControl, KeyCode.S ) );
+
+            HierarchicalInputManager.BindInput( HierarchicalInputChannel.DESIGN_PART_ROTATE_XP, new KeyDownBinding( KeyCode.W ) );
+            HierarchicalInputManager.BindInput( HierarchicalInputChannel.DESIGN_PART_ROTATE_XN, new KeyDownBinding( KeyCode.S ) );
+            HierarchicalInputManager.BindInput( HierarchicalInputChannel.DESIGN_PART_ROTATE_YP, new KeyDownBinding( KeyCode.D ) );
+            HierarchicalInputManager.BindInput( HierarchicalInputChannel.DESIGN_PART_ROTATE_YN, new KeyDownBinding( KeyCode.A ) );
+            HierarchicalInputManager.BindInput( HierarchicalInputChannel.DESIGN_PART_ROTATE_ZP, new KeyDownBinding( KeyCode.Q ) );
+            HierarchicalInputManager.BindInput( HierarchicalInputChannel.DESIGN_PART_ROTATE_ZN, new KeyDownBinding( KeyCode.E ) );
         }
     }
 }

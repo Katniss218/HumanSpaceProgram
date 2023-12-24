@@ -26,12 +26,12 @@ namespace KSS.UI
 
         void OnEnable()
         {
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.VIEWPORT_LEFT_MOUSE_DOWN, HierarchicalInputPriority.MEDIUM, Input_MouseDown );
+            HierarchicalInputManager.AddAction( HierarchicalInputChannel.VIEWPORT_PRIMARY_DOWN, HierarchicalInputPriority.MEDIUM, Input_MouseDown );
         }
 
         void OnDisable()
         {
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.VIEWPORT_LEFT_MOUSE_DOWN, Input_MouseDown );
+            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.VIEWPORT_PRIMARY_DOWN, Input_MouseDown );
         }
 
         private bool Input_MouseDown()

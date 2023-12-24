@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace KSS.Core
 {
-    public static class VesselEx
+    public static class Vessel_Transform_Ex
     {
         /// <summary>
         /// Gets the <see cref="Vessel"/> attached to this transform.

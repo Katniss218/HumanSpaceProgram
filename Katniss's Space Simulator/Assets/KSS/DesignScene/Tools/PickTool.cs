@@ -19,7 +19,7 @@ namespace KSS.DesignScene.Tools
         Transform _heldPart = null;
 
         Vector3 _heldClickOffset;
-        Quaternion _heldPartStartRotation;
+        Quaternion _heldRotation;
 
         Camera _camera;
         FAttachNode.SnappingCandidate? _currentSnap = null;
@@ -45,7 +45,7 @@ namespace KSS.DesignScene.Tools
             _heldPart.gameObject.SetLayer( (int)Layer.VESSEL_DESIGN_HELD, true );
 
             _heldClickOffset = clickOffset;
-            _heldPartStartRotation = value.rotation; // KSP takes into account whether the orientation was changed using the WASDQE keys.
+            _heldRotation = value.rotation; // KSP takes into account whether the orientation was changed using the WASDQE keys.
         }
 
         void Awake()
@@ -77,12 +77,12 @@ namespace KSS.DesignScene.Tools
 
         void OnEnable()
         {
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.VIEWPORT_LEFT_MOUSE_UP, HierarchicalInputPriority.MEDIUM, Input_MouseClick );
+            HierarchicalInputManager.AddAction( HierarchicalInputChannel.VIEWPORT_PRIMARY_UP, HierarchicalInputPriority.MEDIUM, Input_MouseClick );
         }
 
         void OnDisable() // if tool switched while action is performed.
         {
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.VIEWPORT_LEFT_MOUSE_UP, Input_MouseClick );
+            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.VIEWPORT_PRIMARY_UP, Input_MouseClick );
             if( _heldPart != null )
             {
                 PlacePart();
@@ -187,7 +187,7 @@ namespace KSS.DesignScene.Tools
                                 + new Vector3( 0, (_currentFrameHit.point.y - _currentFrameHitObject.position.y), 0 );                                       // translate vertically from the part to to the cursor
                         }
 
-                        _heldPart.rotation = Quaternion.LookRotation( _currentFrameHit.normal, _currentFrameHitObject.up );
+                        _heldPart.rotation = Quaternion.LookRotation( _currentFrameHit.normal, _currentFrameHitObject.up ) * _heldRotation;
                         _heldPart.position = newPos; // todo - use surface attach node when available.
                         return;
                     }
@@ -202,7 +202,7 @@ namespace KSS.DesignScene.Tools
                 // Reset the position/rotation before snapping to prevent the previous snapping from affecting what nodes will snap.
                 // It should always snap "as if the part is at the cursor", not wherever it was snapped to previously.
                 _heldPart.position = planePoint - _heldClickOffset;
-                _heldPart.rotation = _heldPartStartRotation;
+                _heldPart.rotation = _heldRotation;
 
                 TrySnappingHeldPartToAttachmentNode( viewPlane.normal );
             }

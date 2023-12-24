@@ -1,12 +1,14 @@
 ﻿using KSS.Components;
 using KSS.Core;
 using KSS.Core.Components;
+using KSS.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityPlus.Input;
 using UnityPlus.Serialization.ReferenceMaps;
 
 namespace KSS.GameplayScene.Tools
@@ -17,10 +19,11 @@ namespace KSS.GameplayScene.Tools
     public class ConstructTool : GameplaySceneToolBase
     {
         Transform _heldPart = null;
-        Dictionary<FConstructible, ConstructionSite.ConstructibleData> _de;
-        BidirectionalReferenceStore _refMap;
 
-        public void SetGhostPart( Transform root, Dictionary<FConstructible, ConstructionSite.ConstructibleData> de, BidirectionalReferenceStore refMap, Vector3 heldOffset )
+        Dictionary<FConstructible, ReversibleGhostPatch> _hierarchyGhostPatches;
+        BidirectionalReferenceStore _hierarchyRefMap;
+
+        public void SetGhostPart( Transform root, Dictionary<FConstructible, ReversibleGhostPatch> ghostPatches, BidirectionalReferenceStore refMap, Vector3 heldOffset )
         {
             if( this._heldPart == root )
                 return;
@@ -32,12 +35,13 @@ namespace KSS.GameplayScene.Tools
 
             this._heldPart = root;
             this._heldPart.gameObject.SetLayer( (int)Layer.VESSEL_DESIGN_HELD, true );
-            this._de = de;
-            this._refMap = refMap;
+            this._hierarchyGhostPatches = ghostPatches;
+            this._hierarchyRefMap = refMap;
             this._heldOffset = heldOffset;
         }
 
         Vector3 _heldOffset;
+        Quaternion _heldRotation = Quaternion.identity;
 
         FAttachNode[] _nodes;
 
@@ -80,22 +84,83 @@ namespace KSS.GameplayScene.Tools
             }
 
             PositionHeldPart();
-
-            if( UnityEngine.Input.GetKeyUp( KeyCode.Mouse0 ) )
-            {
-                PlacePart();
-            }
+        }
+        void OnEnable()
+        {
+            HierarchicalInputManager.AddAction( HierarchicalInputChannel.VIEWPORT_PRIMARY_UP, HierarchicalInputPriority.MEDIUM, Input_MouseClick );
+            HierarchicalInputManager.AddAction( HierarchicalInputChannel.DESIGN_PART_ROTATE_XP, HierarchicalInputPriority.MEDIUM, Input_RotateXp );
+            HierarchicalInputManager.AddAction( HierarchicalInputChannel.DESIGN_PART_ROTATE_XN, HierarchicalInputPriority.MEDIUM, Input_RotateXn );
+            HierarchicalInputManager.AddAction( HierarchicalInputChannel.DESIGN_PART_ROTATE_YP, HierarchicalInputPriority.MEDIUM, Input_RotateYp );
+            HierarchicalInputManager.AddAction( HierarchicalInputChannel.DESIGN_PART_ROTATE_YN, HierarchicalInputPriority.MEDIUM, Input_RotateYn );
+            HierarchicalInputManager.AddAction( HierarchicalInputChannel.DESIGN_PART_ROTATE_ZP, HierarchicalInputPriority.MEDIUM, Input_RotateZp );
+            HierarchicalInputManager.AddAction( HierarchicalInputChannel.DESIGN_PART_ROTATE_ZN, HierarchicalInputPriority.MEDIUM, Input_RotateZn );
         }
 
-        void OnDisable() // if tool switched while trying to place new construction ghost
+        void OnDisable()
         {
+            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.VIEWPORT_PRIMARY_UP, Input_MouseClick );
+            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.DESIGN_PART_ROTATE_XP, Input_RotateXp );
+            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.DESIGN_PART_ROTATE_XN, Input_RotateXn );
+            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.DESIGN_PART_ROTATE_YP, Input_RotateYp );
+            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.DESIGN_PART_ROTATE_YN, Input_RotateYn );
+            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.DESIGN_PART_ROTATE_ZP, Input_RotateZp );
+            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.DESIGN_PART_ROTATE_ZN, Input_RotateZn );
             if( _heldPart != null )
             {
                 Destroy( _heldPart.gameObject );
                 _heldPart = null;
-                _refMap = null;
-                _de = null;
+                _hierarchyRefMap = null;
+                _hierarchyGhostPatches = null;
             }
+        }
+
+        private bool Input_MouseClick()
+        {
+            if( UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() )
+                return false;
+
+            PlacePart();
+            return true;
+        }
+
+        private bool RotateHeldPart( Vector3 worldAxis, float angle )
+        {
+            if( UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() )
+                return false;
+
+            Debug.Log( "rotated by " + worldAxis );
+            _heldRotation *= Quaternion.AngleAxis( angle, worldAxis );
+            return true;
+        }
+
+        private bool Input_RotateXp()
+        {
+            return RotateHeldPart( Vector3.right, 45f );
+        }
+
+        private bool Input_RotateXn()
+        {
+            return RotateHeldPart( Vector3.left, 45f );
+        }
+
+        private bool Input_RotateYp()
+        {
+            return RotateHeldPart( Vector3.up, 45f );
+        }
+
+        private bool Input_RotateYn()
+        {
+            return RotateHeldPart( Vector3.down, 45f );
+        }
+
+        private bool Input_RotateZp()
+        {
+            return RotateHeldPart( Vector3.forward, 45f );
+        }
+
+        private bool Input_RotateZn()
+        {
+            return RotateHeldPart( Vector3.back, 45f );
         }
 
         // ksp - press AND release - pick up
@@ -111,17 +176,18 @@ namespace KSS.GameplayScene.Tools
                     return;
                 }
 
+                if( UnityEngine.Input.GetKey( KeyCode.LeftAlt ) )
+                {
+                    return;
+                }
+
                 Vessel hitVessel = _currentFrameHitObject.GetVessel();
                 if( hitVessel == null )
                 {
                     return;
                 }
 
-                ConstructionSite.AddGhostToConstruction( _heldPart, _de, hitVessel.RootPart, _refMap );
-                _heldPart = null;
-                _refMap = null;
-                _de = null;
-                _currentSnap = null;
+                ConstructionSite.AddGhostToConstruction( _heldPart, hitVessel.RootPart, _hierarchyGhostPatches, _hierarchyRefMap );
             }
             else
             {
@@ -132,15 +198,15 @@ namespace KSS.GameplayScene.Tools
                     return;
                 }
 
-                Transform newRoot = VesselHierarchyUtils.ReRoot( parent );
+                Transform newRoot = VesselHierarchyUtils.ReRoot( _currentSnap.Value.snappedNode.transform.parent );
                 _heldPart = newRoot;
                 // Node-attach (object is already positioned).
-                ConstructionSite.AddGhostToConstruction( _heldPart, _de, parent, _refMap );
-                _heldPart = null;
-                _refMap = null;
-                _de = null;
-                _currentSnap = null;
+                ConstructionSite.AddGhostToConstruction( _heldPart, parent, _hierarchyGhostPatches, _hierarchyRefMap );
             }
+            _heldPart = null;
+            _hierarchyRefMap = null;
+            _hierarchyGhostPatches = null;
+            _currentSnap = null;
             GameplaySceneToolManager.UseTool<DefaultTool>();
         }
 
@@ -173,7 +239,7 @@ namespace KSS.GameplayScene.Tools
                             + new Vector3( 0, (_currentFrameHit.point.y - _currentFrameHitObject.position.y), 0 );                                       // translate vertically from the part to to the cursor
                     }
 
-                    _heldPart.rotation = Quaternion.LookRotation( _currentFrameHit.normal, _currentFrameHitObject.up );
+                    _heldPart.rotation = Quaternion.LookRotation( _currentFrameHit.normal, _currentFrameHitObject.up ) * _heldRotation;
                     _heldPart.position = newPos; // todo - use surface attach node when available.
                     return;
                 }
@@ -187,7 +253,7 @@ namespace KSS.GameplayScene.Tools
                 // Reset the position/rotation before snapping to prevent the previous snapping from affecting what nodes will snap.
                 // It should always snap "as if the part is at the cursor", not wherever it was snapped to previously.
                 _heldPart.position = planePoint - _heldOffset;
-                _heldPart.rotation = Quaternion.identity;
+                _heldPart.rotation = _heldRotation;
 
                 TrySnappingHeldPartToAttachmentNode( viewPlane.normal );
             }

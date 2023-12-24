@@ -15,7 +15,7 @@ namespace KSS
     /// <summary>
     /// Represents a single constructible object that can be transitioned between its normal, and ghosted-out states.
     /// </summary>
-    public struct GhostPatchSet
+    public struct ReversibleGhostPatch
     {
         public static string GhostMaterialAssetID = "builtin::Resources/Materials/ghost";
 
@@ -23,7 +23,7 @@ namespace KSS
         public SetDataPatch GhostToOriginalPatch { get; private set; }
 
         /// <param name="refMap">The reference map saved from when the objects were loaded.</param>
-        public static GhostPatchSet MakeGhostPatch( FConstructible root, Dictionary<FConstructible, List<Transform>> partMap, IReverseReferenceMap refMap )
+        public static ReversibleGhostPatch MakeGhostPatch( FConstructible root, Dictionary<FConstructible, List<Transform>> partMap, IReverseReferenceMap refMap )
         {
             if( partMap.TryGetValue( root, out List<Transform> list ) )
             {
@@ -100,7 +100,7 @@ namespace KSS
                     }
                 }
 
-                return new GhostPatchSet()
+                return new ReversibleGhostPatch()
                 {
                     OriginalToGhostPatch = new SetDataPatch( forwardPatch ),
                     GhostToOriginalPatch = new SetDataPatch( reversePatch )

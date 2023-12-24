@@ -56,6 +56,7 @@
     <Analyzer Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\KSS\EditorScene\EditorSceneEscapeInputController.cs" />
     <Compile Include="Assets\KSS\TranslationTransformHandle.cs" />
     <Compile Include="Assets\KSS\DesignScene\DesignSceneToolBase.cs" />
     <Compile Include="Assets\KSS\DesignScene\Tools\PickTool.cs" />
@@ -70,10 +71,10 @@
     <Compile Include="Assets\KSS\GameplayScene\ConstructionSite.cs" />
     <Compile Include="Assets\KSS\TransformHandleSet.cs" />
     <Compile Include="Assets\KSS\Effects\Atmospheres\AtmosphereRenderer.cs" />
-    <Compile Include="Assets\KSS\GhostPatchSet.cs" />
     <Compile Include="Assets\KSS\Components\FSequencer.cs" />
     <Compile Include="Assets\KSS\Components\FDryMass.cs" />
     <Compile Include="Assets\KSS\Cameras\GameplayCameraController.cs" />
+    <Compile Include="Assets\KSS\GameplayScene\GameplaySceneEscapeInputController.cs" />
     <Compile Include="Assets\KSS\GameplayScene\Tools\ConstructTool.cs" />
     <Compile Include="Assets\KSS\Components\FConstructible.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\MakeQuadMesh_Job.cs" />
@@ -81,6 +82,7 @@
     <Compile Include="Assets\KSS\Components\FController.cs" />
     <Compile Include="Assets\KSS\DesignScene\Tools\RotateTool.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadSphere.cs" />
+    <Compile Include="Assets\KSS\DesignScene\DesignSceneEscapeInputController.cs" />
     <Compile Include="Assets\KSS\DesignScene\DesignSceneToolManager.cs" />
     <Compile Include="Assets\KSS\Components\FRocketEngine.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuad.cs" />
@@ -92,17 +94,15 @@
     <Compile Include="Assets\KSS\Components\FActuatorXY.cs" />
     <Compile Include="Assets\KSS\DesignScene\Tools\TranslateTool.cs" />
     <Compile Include="Assets\KSS\AssetLoaders\GameDataJsonPartFactory.cs" />
+    <Compile Include="Assets\KSS\Input\HierarchicalInputPriority.cs" />
     <Compile Include="Assets\KSS\DesignScene\Tools\RerootTool.cs" />
+    <Compile Include="Assets\KSS\MainMenuScene\MainMenuEscapeInputController.cs" />
     <Compile Include="Assets\KSS\GameplayScene\GameplaySceneToolBase.cs" />
+    <Compile Include="Assets\KSS\GameplayScene\TimeScaleInputController.cs" />
     <Compile Include="Assets\KSS\GameplayScene\GameplaySceneToolManager.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadTree_NodeUtils.cs" />
     <Compile Include="Assets\KSS\AssetLoaders\GameDataJsonVesselFactory.cs" />
-    <Compile Include="Assets\KSS\Input\HierarchicalInputPriority.cs" />
-    <Compile Include="Assets\KSS\GameplayScene\TimeScaleInputController.cs" />
-    <Compile Include="Assets\KSS\GameplayScene\GameplaySceneEscapeInputController.cs" />
-    <Compile Include="Assets\KSS\DesignScene\DesignSceneEscapeInputController.cs" />
-    <Compile Include="Assets\KSS\MainMenuScene\MainMenuEscapeInputController.cs" />
-    <Compile Include="Assets\KSS\EditorScene\EditorSceneEscapeInputController.cs" />
+    <Compile Include="Assets\KSS\ReversibleGhostPatch.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS\CelestialBodies\Surface\TerrainShader.shader" />

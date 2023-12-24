@@ -34,35 +34,48 @@ namespace KSS.GameplayScene
         }
     }
 
+    public static class ConstructionSite_Transform_Ex
+    {
+        /// <summary>
+        /// Gets the <see cref="ConstructionSite"/> that is constructing this transform.
+        /// </summary>
+        /// <returns>The construction site. Null if the transform is not under construction/deconstruction.</returns>
+        public static ConstructionSite GetConstructionSite( this Transform part )
+        {
+            ConstructionSite site = part.GetComponent<ConstructionSite>();
+            while( site == null )
+            {
+                part = part.parent;
+                if( part == null )
+                    break;
+                site = part.GetComponent<ConstructionSite>();
+            }
+            return site;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="ConstructionSite"/> that is constructing this part.
+        /// </summary>
+        /// <returns>The construction site. Null if the transform is not under construction/deconstruction.</returns>
+        public static ConstructionSite GetConstructionSite( this FConstructible part )
+        {
+            return GetConstructionSite( part.transform );
+        }
+
+        public static bool IsUnderConstruction( this Transform part )
+        {
+            ConstructionSite site = part.GetConstructionSite();
+            if( site == null )
+                return false;
+
+            return site.State == ConstructionState.NotStarted;
+        }
+    }
+
     [RequireComponent( typeof( RootObjectTransform ) )]
     [DisallowMultipleComponent]
     public class ConstructionSite : MonoBehaviour
     {
-        /*
-        
-    1. The player clicks button, selects what to construct.
-       - Original is spawned.
-       - Patches that can transform the original into the ghost and vice versa are created.
-       - The forward (into-ghost) patches are ran.
-    6. The player places the ghost hierarchy.
-       - The ghost hierarchy is attached and a construction site is created.
-       - The parent part to where the construction is attached, and all its children become nonfunctional.
-    8. The player adjusts the ghost's position/rotation.
-       - Construction site updates the ghost's color to indicate if construction will be able to proceeed (nothing overlaps basically).
-    9. The player accepts the position/rotation of the construction site. 
-       - Construction starts progressing.
-    10. As parts of the ghost are constructed, construction site runs the reverse (into-original) patches for the specified part.
-    11. When construction finishes completely, the construction site is removed and everything becomes functional again.
-
-
-        deconstruction:
-
-        click to deconstruct
-        deconstruction starts progressing, making parts ghostly.
-        on finish, ghost parts are destroyed.
-
-        */
-
         public enum ConstructibleState : sbyte
         {
             FinishedDeconstruction = -1,
@@ -75,7 +88,7 @@ namespace KSS.GameplayScene
         /// </summary>
         public class ConstructibleData
         {
-            public GhostPatchSet patchSet;
+            public ReversibleGhostPatch patchSet;
             public float accumulatedBuildPoints;
             public ConstructibleState state = ConstructibleState.InProgress;
         }
@@ -156,7 +169,7 @@ namespace KSS.GameplayScene
                 this.BuildSpeedTotal = 90f;
                 StartConstruction();
             }
-            
+
             if( UnityEngine.Input.GetKeyDown( KeyCode.H ) )
             {
                 this.BuildSpeedTotal = 90f;
@@ -242,7 +255,7 @@ namespace KSS.GameplayScene
             Destroy( this );
         }
 
-        public static (Transform root, Dictionary<FConstructible, ConstructibleData>, BidirectionalReferenceStore) SpawnGhost( string vesselId )
+        public static (Transform root, Dictionary<FConstructible, ReversibleGhostPatch>, BidirectionalReferenceStore) SpawnGhost( string vesselId )
         {
             // step 1. player clicks, and spawns ghost to place.
 
@@ -255,18 +268,18 @@ namespace KSS.GameplayScene
 
             Dictionary<FConstructible, List<Transform>> partMap = MapToAncestralComponent<FConstructible>( rootGo.transform );
 
-            Dictionary<FConstructible, ConstructibleData> ghostParts = new Dictionary<FConstructible, ConstructibleData>();
+            Dictionary<FConstructible, ReversibleGhostPatch> ghostParts = new Dictionary<FConstructible, ReversibleGhostPatch>();
             foreach( var con in partMap.Keys )
             {
-                GhostPatchSet gpart = GhostPatchSet.MakeGhostPatch( con, partMap, remappedRefStore );
+                ReversibleGhostPatch gpart = ReversibleGhostPatch.MakeGhostPatch( con, partMap, remappedRefStore );
                 gpart.OriginalToGhostPatch.Run( remappedRefStore );
-                ghostParts.Add( con, new ConstructibleData() { patchSet = gpart, accumulatedBuildPoints = 0.0f } );
+                ghostParts.Add( con, gpart );
             }
 
             return (rootGo.transform, ghostParts, remappedRefStore);
         }
 
-        public static ConstructionSite AddGhostToConstruction( Transform ghostRoot, Dictionary<FConstructible, ConstructibleData> ghostParts, Transform parent, BidirectionalReferenceStore refMap )
+        public static ConstructionSite AddGhostToConstruction( Transform ghostRoot, Transform parent, Dictionary<FConstructible, ReversibleGhostPatch> ghostParts, BidirectionalReferenceStore refMap )
         {
             // step 6. Player places the ghost.
             // assume the position is already set.
@@ -304,10 +317,8 @@ namespace KSS.GameplayScene
             return cSite;
         }
 
-        public void PickUpGhostFromConstruction( Transform ghostRoot )
+        public (Dictionary<FConstructible, ReversibleGhostPatch> ghostParts, BidirectionalReferenceStore refMap) PickUpGhostFromConstruction( Transform ghostRoot )
         {
-            throw new NotImplementedException();
-
             // reverse of step 6. Player picks up the ghost.
 
             if( this.State != ConstructionState.NotStarted )

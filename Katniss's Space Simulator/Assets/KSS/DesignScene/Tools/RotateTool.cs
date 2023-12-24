@@ -65,7 +65,7 @@ namespace KSS.DesignScene.Tools
 
         void OnEnable()
         {
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.VIEWPORT_LEFT_MOUSE_DOWN, HierarchicalInputPriority.MEDIUM, Input_MouseDown );
+            HierarchicalInputManager.AddAction( HierarchicalInputChannel.VIEWPORT_PRIMARY_DOWN, HierarchicalInputPriority.MEDIUM, Input_MouseDown );
             if( DesignObjectManager.DesignObject != null )
             {
                 CreateHandles();
@@ -77,7 +77,7 @@ namespace KSS.DesignScene.Tools
 
         void OnDisable()
         {
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.VIEWPORT_LEFT_MOUSE_DOWN, Input_MouseDown );
+            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.VIEWPORT_PRIMARY_DOWN, Input_MouseDown );
             if( _handles != null )
             {
                 _handles.Destroy();
