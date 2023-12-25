@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
 
-namespace KSS
+namespace UnityEngine
 {
     /// <summary>
     /// Maps each transform in a hierarchy to its nearest ancestor component of type <typeparamref name="T"/>.

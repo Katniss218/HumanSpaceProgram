@@ -58,6 +58,9 @@ namespace KSS.Core.Components
         // These meshes should be separate from the node object itself, and can be pooled.
         // They can also be dynamically hidden/shown based on which nodes are enabled/used/etc.
 
+        // attach nodes have a separate global map that specifies which node types can connect to which types (as either a whitelist or a blacklist)
+        public string NodeType { get; set; }
+
         /// <summary>
         /// Figures out which node pair is the best candidate for snapping.
         /// </summary>

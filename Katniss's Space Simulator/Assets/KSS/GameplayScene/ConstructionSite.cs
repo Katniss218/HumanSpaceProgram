@@ -307,13 +307,20 @@ namespace KSS.GameplayScene
             // if you add something with `1` as parent, and then add `2` itself, then the only c-site should appear at `0`.
             // c-sites under construction don't split as the parents are constructed though.
 
-            // another consideration - whether or not the player should be able to add parts to sites already constructing, or only to sites that are not started.
+            // it's better to add the c-site to the ghost root itself.
+            // ghosts can only be placed as children of non-c-sites, or on c-sites that are not started yet.
 
+            // when the c-site is not started yet, you can pick up parts from it (inverse of placing).
 
-            ConstructionSite constructionSite = parent.GetComponentInParent<ConstructionSite>();
+            if( ghostRoot.IsUnderActiveConstruction() )
+            {
+                throw new InvalidOperationException( $"can't add while being constructed." );
+            }
+
+            ConstructionSite constructionSite = ghostRoot.GetConstructionSite();
             if( constructionSite == null )
             {
-                constructionSite = parent.gameObject.AddComponent<ConstructionSite>();
+                constructionSite = ghostRoot.gameObject.AddComponent<ConstructionSite>();
             }
             foreach( var ghostPart in ghostParts )
             {
