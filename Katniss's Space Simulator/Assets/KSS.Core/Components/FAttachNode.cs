@@ -41,7 +41,7 @@ namespace KSS.Core.Components
             }
         }
 
-        // An attachment node is supposed to be placed on its own gameobject. 
+        // An attachment node is supposed to be placed on its own empty gameobject.
 
         /// <summary>
         /// The distance at which this node will snap with other nodes.
@@ -53,6 +53,10 @@ namespace KSS.Core.Components
         public float Range { get; set; }
 
         const float SnapThresholdAngle = 45;
+
+        // attach nodes of different types could use different meshes.
+        // These meshes should be separate from the node object itself, and can be pooled.
+        // They can also be dynamically hidden/shown based on which nodes are enabled/used/etc.
 
         /// <summary>
         /// Figures out which node pair is the best candidate for snapping.

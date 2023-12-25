@@ -194,11 +194,10 @@ namespace KSS.UI.SceneFactories
             {
                 CanvasManager.Get( CanvasName.WINDOWS ).AddTextSelectionWindow( "Vessel to create...", "id here", s =>
                 {
-                    (Transform root, Dictionary<FConstructible, ConstructionSite.ConstructibleData> de, BidirectionalReferenceStore refMap) = ConstructionSite.SpawnGhost( s );
+                    (Transform root, (FConstructible, BidirectionalGhostPatch)[] ghostPatches, BidirectionalReferenceStore refMap) = ConstructionSite.SpawnGhost( s );
 
                     ConstructTool tool = GameplaySceneToolManager.UseTool<ConstructTool>();
-                    tool.SetGhostPart( root, de, refMap, Vector3.zero );
-
+                    tool.SetGhostPart( root, ghostPatches, refMap, Vector3.zero );
                 } );
             } )
                 .WithText( UILayoutInfo.Fill(), "C", out _ );

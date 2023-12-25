@@ -20,25 +20,9 @@ namespace KSS.GameplayScene.Tools
     {
         Transform _heldPart = null;
 
-        Dictionary<FConstructible, ReversibleGhostPatch> _hierarchyGhostPatches;
-        BidirectionalReferenceStore _hierarchyRefMap;
-
-        public void SetGhostPart( Transform root, Dictionary<FConstructible, ReversibleGhostPatch> ghostPatches, BidirectionalReferenceStore refMap, Vector3 heldOffset )
-        {
-            if( this._heldPart == root )
-                return;
-
-            if( this._heldPart != null )
-            {
-                Destroy( this._heldPart.gameObject );
-            }
-
-            this._heldPart = root;
-            this._heldPart.gameObject.SetLayer( (int)Layer.VESSEL_DESIGN_HELD, true );
-            this._hierarchyGhostPatches = ghostPatches;
-            this._hierarchyRefMap = refMap;
-            this._heldOffset = heldOffset;
-        }
+        // Additional data that needs to be passed to the c-site.
+        (FConstructible, BidirectionalGhostPatch)[] _ghostPatches;
+        BidirectionalReferenceStore _ghostRefMap;
 
         Vector3 _heldOffset;
         Quaternion _heldRotation = Quaternion.identity;
@@ -51,16 +35,33 @@ namespace KSS.GameplayScene.Tools
         Camera _camera;
         FAttachNode.SnappingCandidate? _currentSnap = null;
 
-        // construct tool gets assigned a ghost, and its job is to place it. So it's basically a "place ghost" tool.
-        // adjusting the placed ghost can be done by the move/rotate tools.
-
-        // placed ghost can be adjusted, this resets all build points (or can't be adjusted if it has any build points accumulated)
-
-        // adjustment is done by a different tool.
-
         private Ray _currentFrameCursorRay;
         private Transform _currentFrameHitObject;
         private RaycastHit _currentFrameHit;
+
+        /// <summary>
+        /// sets or resets the currently held ghost hierarchy.
+        /// </summary>
+        /// <param name="root">The root object of the hierarchy.</param>
+        /// <param name="ghostPatches">The patches applied to the hierarchy.</param>
+        /// <param name="refMap"></param>
+        /// <param name="heldOffset"></param>
+        public void SetGhostPart( Transform root, (FConstructible, BidirectionalGhostPatch)[] ghostPatches, BidirectionalReferenceStore refMap, Vector3 heldOffset )
+        {
+            if( this._heldPart == root )
+                return;
+
+            if( this._heldPart != null )
+            {
+                Destroy( this._heldPart.gameObject );
+            }
+
+            this._heldPart = root;
+            this._heldPart.gameObject.SetLayer( (int)Layer.VESSEL_DESIGN_HELD, true );
+            this._ghostPatches = ghostPatches;
+            this._ghostRefMap = refMap;
+            this._heldOffset = heldOffset;
+        }
 
         void Awake()
         {
@@ -109,8 +110,8 @@ namespace KSS.GameplayScene.Tools
             {
                 Destroy( _heldPart.gameObject );
                 _heldPart = null;
-                _hierarchyRefMap = null;
-                _hierarchyGhostPatches = null;
+                _ghostRefMap = null;
+                _ghostPatches = null;
             }
         }
 
@@ -187,7 +188,7 @@ namespace KSS.GameplayScene.Tools
                     return;
                 }
 
-                ConstructionSite.AddGhostToConstruction( _heldPart, hitVessel.RootPart, _hierarchyGhostPatches, _hierarchyRefMap );
+                ConstructionSite.TryAddPart( _heldPart, hitVessel.RootPart, _ghostPatches, _ghostRefMap );
             }
             else
             {
@@ -201,11 +202,11 @@ namespace KSS.GameplayScene.Tools
                 Transform newRoot = VesselHierarchyUtils.ReRoot( _currentSnap.Value.snappedNode.transform.parent );
                 _heldPart = newRoot;
                 // Node-attach (object is already positioned).
-                ConstructionSite.AddGhostToConstruction( _heldPart, parent, _hierarchyGhostPatches, _hierarchyRefMap );
+                ConstructionSite.TryAddPart( _heldPart, parent, _ghostPatches, _ghostRefMap );
             }
             _heldPart = null;
-            _hierarchyRefMap = null;
-            _hierarchyGhostPatches = null;
+            _ghostRefMap = null;
+            _ghostPatches = null;
             _currentSnap = null;
             GameplaySceneToolManager.UseTool<DefaultTool>();
         }

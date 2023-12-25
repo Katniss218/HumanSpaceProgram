@@ -62,13 +62,40 @@ namespace KSS.GameplayScene
             return GetConstructionSite( part.transform );
         }
 
+        /// <summary>
+        /// Checks whether a given transform belongs to a construction site.
+        /// </summary>
         public static bool IsUnderConstruction( this Transform part )
+        {
+            return part.GetConstructionSite() != null;
+        }
+
+        /// <summary>
+        /// Checks whether a given part belongs to a construction site.
+        /// </summary>
+        public static bool IsUnderConstruction( this FConstructible part )
+        {
+            return IsUnderConstruction( part.transform );
+        }
+
+        /// <summary>
+        /// Checks whether a given transform belongs to a construction site, and that the construction has started.
+        /// </summary>
+        public static bool IsUnderActiveConstruction( this Transform part )
         {
             ConstructionSite site = part.GetConstructionSite();
             if( site == null )
                 return false;
 
-            return site.State == ConstructionState.NotStarted;
+            return site.State != ConstructionState.NotStarted;
+        }
+
+        /// <summary>
+        /// Checks whether a given part belongs to a construction site, and that the construction has started.
+        /// </summary>
+        public static bool IsUnderActiveConstruction( this FConstructible part )
+        {
+            return IsUnderActiveConstruction( part.transform );
         }
     }
 
@@ -88,7 +115,7 @@ namespace KSS.GameplayScene
         /// </summary>
         public class ConstructibleData
         {
-            public ReversibleGhostPatch patchSet;
+            public BidirectionalGhostPatch patchSet;
             public float accumulatedBuildPoints;
             public ConstructibleState state = ConstructibleState.InProgress;
         }
@@ -148,18 +175,12 @@ namespace KSS.GameplayScene
         /// </summary>
         public void Pause()
         {
-            if( this.State == ConstructionState.Constructing )
+            this.State = this.State switch
             {
-                this.State = ConstructionState.PausedConstructing;
-                return;
-            }
-            if( this.State == ConstructionState.Deconstructing )
-            {
-                this.State = ConstructionState.PausedDeconstructing;
-                return;
-            }
-
-            throw new InvalidOperationException( $"Can't pause if there is no ongoing construction/deconstruction." );
+                ConstructionState.Constructing => ConstructionState.PausedConstructing,
+                ConstructionState.Deconstructing => ConstructionState.PausedDeconstructing,
+                _ => throw new InvalidOperationException( $"Can't pause if there is no ongoing construction/deconstruction." ),
+            };
         }
 
         void Update()
@@ -200,7 +221,7 @@ namespace KSS.GameplayScene
                         if( data.accumulatedBuildPoints >= constructible.MaxBuildPoints )
                         {
                             data.accumulatedBuildPoints = constructible.MaxBuildPoints;
-                            data.patchSet.GhostToOriginalPatch.Run( _referenceMap );
+                            data.patchSet.Reverse.Run( _referenceMap );
                             data.state = ConstructibleState.FinishedConstruction;
                             CompletedPartCount++;
                         }
@@ -217,7 +238,7 @@ namespace KSS.GameplayScene
                         if( data.accumulatedBuildPoints <= 0.0f )
                         {
                             data.accumulatedBuildPoints = 0.0f;
-                            data.patchSet.OriginalToGhostPatch.Run( _referenceMap );
+                            data.patchSet.Forward.Run( _referenceMap );
                             data.state = ConstructibleState.FinishedDeconstruction;
                             CompletedPartCount++;
                         }
@@ -255,139 +276,124 @@ namespace KSS.GameplayScene
             Destroy( this );
         }
 
-        public static (Transform root, Dictionary<FConstructible, ReversibleGhostPatch>, BidirectionalReferenceStore) SpawnGhost( string vesselId )
-        {
-            // step 1. player clicks, and spawns ghost to place.
-
-            BidirectionalReferenceStore refStore = new BidirectionalReferenceStore();
-            GameObject rootGo = PartRegistry.Load( new Core.Mods.NamespacedIdentifier( "Vessels", vesselId ), refStore );
-
-            // Loaded objects' guids need to be remapped randomly but 1-to-1 to allow the same object to be added again.
-            BidirectionalReferenceStore remappedRefStore = new BidirectionalReferenceStore();
-            remappedRefStore.AddAll( refStore.GetAll().Select( tuple => (Guid.NewGuid(), tuple.val) ) );
-
-            Dictionary<FConstructible, List<Transform>> partMap = MapToAncestralComponent<FConstructible>( rootGo.transform );
-
-            Dictionary<FConstructible, ReversibleGhostPatch> ghostParts = new Dictionary<FConstructible, ReversibleGhostPatch>();
-            foreach( var con in partMap.Keys )
-            {
-                ReversibleGhostPatch gpart = ReversibleGhostPatch.MakeGhostPatch( con, partMap, remappedRefStore );
-                gpart.OriginalToGhostPatch.Run( remappedRefStore );
-                ghostParts.Add( con, gpart );
-            }
-
-            return (rootGo.transform, ghostParts, remappedRefStore);
-        }
-
-        public static ConstructionSite AddGhostToConstruction( Transform ghostRoot, Transform parent, Dictionary<FConstructible, ReversibleGhostPatch> ghostParts, BidirectionalReferenceStore refMap )
+        public static ConstructionSite TryAddPart( Transform ghostRoot, Transform parent, (FConstructible k, BidirectionalGhostPatch v)[] ghostParts, BidirectionalReferenceStore refMap )
         {
             // step 6. Player places the ghost.
             // assume the position is already set.
 
             if( parent == null )
             {
-                Vessel v = VesselFactory.CreatePartless(
+                Vessel vessel = VesselFactory.CreatePartless(
                     SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( ghostRoot.position ),
                     SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( ghostRoot.rotation ),
                     Vector3.zero,
                     Vector3.zero );
 
-                v.RootPart = ghostRoot;
-                parent = v.gameObject.transform;
+                vessel.RootPart = ghostRoot;
+                parent = vessel.gameObject.transform;
             }
             else
             {
                 VesselHierarchyUtils.AttachLoose( ghostRoot, parent );
             }
 
-            ConstructionSite cSite = parent.GetComponentInParent<ConstructionSite>();
-            if( cSite == null )
+#warning  TODO - there should be only one construction site in the parent of the constructed objects. If you add a part to construct
+
+            //
+            //    0
+            //   /|\
+            //  1 2 3
+            //
+            // if you add something with `1` as parent, and then add `2` itself, then the only c-site should appear at `0`.
+            // c-sites under construction don't split as the parents are constructed though.
+
+            // another consideration - whether or not the player should be able to add parts to sites already constructing, or only to sites that are not started.
+
+
+            ConstructionSite constructionSite = parent.GetComponentInParent<ConstructionSite>();
+            if( constructionSite == null )
             {
-                cSite = parent.gameObject.AddComponent<ConstructionSite>();
+                constructionSite = parent.gameObject.AddComponent<ConstructionSite>();
             }
-            foreach( var kvp in ghostParts )
+            foreach( var ghostPart in ghostParts )
             {
-                cSite._constructionData.Add( kvp.Key, kvp.Value );
+#warning TODO - key may be null
+                constructionSite._constructionData.Add( ghostPart.k, new ConstructibleData() { patchSet = ghostPart.v, accumulatedBuildPoints = 0.0f } );
             }
 
-            cSite._referenceMap.AddAll( refMap.GetAll() );
+            constructionSite._referenceMap.AddAll( refMap.GetAll() );
 
             ghostRoot.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
             ghostRoot.transform.SetParent( parent );
-            return cSite;
+            return constructionSite;
         }
 
-        public (Dictionary<FConstructible, ReversibleGhostPatch> ghostParts, BidirectionalReferenceStore refMap) PickUpGhostFromConstruction( Transform ghostRoot )
+        public bool TryRemovePart( Transform ghostRoot, out Dictionary<FConstructible, BidirectionalGhostPatch> ghostParts, out BidirectionalReferenceStore refMap )
         {
             // reverse of step 6. Player picks up the ghost.
 
             if( this.State != ConstructionState.NotStarted )
             {
                 // can't pickup once construction is started.
-                return;
+                ghostParts = null;
+                refMap = null;
+                return false;
             }
 
-            Dictionary<FConstructible, List<Transform>> partMap = MapToAncestralComponent<FConstructible>( ghostRoot );
+            AncestralMap<FConstructible> partMap = AncestralMap<FConstructible>.Create( ghostRoot );
 
             // Check if the hierarchy up from the specified ghost root is fully ghosted. Otherwise the ghost can't be picked up.
-            int containedCount = partMap.Count( kvp => _constructionData.ContainsKey( kvp.Key ) );
+           /* int containedCount = partMap.Count( kvp => _constructionData.ContainsKey( kvp.Key ) );
             if( containedCount != partMap.Count )
             {
-                return;
+                ghostParts = null;
+                refMap = null;
+                return false;
             }
 
+            ghostParts = new Dictionary<FConstructible, BidirectionalGhostPatch>();
             foreach( var constructible in partMap.Keys )
             {
-                _constructionData.Remove( constructible );
+                if( _constructionData.TryGetValue( constructible, out var data ) )
+                {
+                    ghostParts.Add( constructible, data.patchSet );
+                    _constructionData.Remove( constructible );
+                }
             }
             if( _constructionData.Count == 0 )
             {
                 Destroy( this );
-            }
+            }*/
+            ghostParts = null;
+            refMap = null;
+            return false;
         }
 
         /// <summary>
-        /// This returns a map that maps each T component in the tree, starting at root, to the descendants that belong to it. <br />
-        /// Each descendant belongs to its closest ancestor that has the T component. <br />
-        /// Descendants that have the T component are mapped to their own component.
+        /// Spawns a ghosted vessel/part.
         /// </summary>
-        public static Dictionary<T, List<Transform>> MapToAncestralComponent<T>( Transform root ) where T : Component
+        public static (Transform root, (FConstructible k, BidirectionalGhostPatch v)[], BidirectionalReferenceStore) SpawnGhost( string vesselId )
         {
-            T rootsPart = root.GetComponent<T>();
-            if( rootsPart == null )
+            // step 1. player clicks, and spawns ghost to place.
+
+            BidirectionalReferenceStore refStore = new BidirectionalReferenceStore();
+            GameObject rootGo = PartRegistry.Load( new Core.Mods.NamespacedIdentifier( "Vessels", vesselId ), refStore );
+
+            BidirectionalReferenceStore remappedRefStore = refStore.RemapRandomly(); // remapping allows object with the same guids (the same object) to be loaded again.
+
+            AncestralMap<FConstructible> partMap = AncestralMap<FConstructible>.Create( rootGo.transform );
+
+            (FConstructible, BidirectionalGhostPatch)[] ghostParts = new (FConstructible, BidirectionalGhostPatch)[partMap.KeyCount];
+            int i = 0;
+            foreach( var kvp in partMap.AsEnumerable() )
             {
-                throw new ArgumentException( $"Root must contain {typeof( T ).FullName}." );
+                BidirectionalGhostPatch patch = BidirectionalGhostPatch.CreateGhostPatch( kvp.Value, remappedRefStore );
+                patch.Forward.Run( remappedRefStore );
+                ghostParts[i] = (kvp.Key, patch);
+                i++;
             }
 
-            Dictionary<T, List<Transform>> map = new Dictionary<T, List<Transform>>();
-            Stack<(Transform parent, T parentPart)> stack = new Stack<(Transform, T)>();
-
-            stack.Push( (root, rootsPart) ); // Initial entry with null parentPart
-
-            while( stack.Count > 0 )
-            {
-                (Transform current, T parentPart) = stack.Pop();
-
-                T currentPart = current.GetComponent<T>();
-                if( currentPart == null )
-                    currentPart = parentPart; // Inherit parent's part if the current doesn't have one
-
-                if( map.TryGetValue( currentPart, out var list ) )
-                {
-                    list.Add( current );
-                }
-                else
-                {
-                    map.Add( currentPart, new List<Transform>() { current } );
-                }
-
-                foreach( Transform child in current )
-                {
-                    stack.Push( (child, currentPart) );
-                }
-            }
-
-            return map;
+            return (rootGo.transform, ghostParts, remappedRefStore);
         }
     }
 }

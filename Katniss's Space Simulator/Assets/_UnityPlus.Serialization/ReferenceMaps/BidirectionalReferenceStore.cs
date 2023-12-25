@@ -16,6 +16,8 @@ namespace UnityPlus.Serialization.ReferenceMaps
         private readonly Dictionary<Guid, object> _forward = new Dictionary<Guid, object>();
         private readonly Dictionary<object, Guid> _reverse = new Dictionary<object, Guid>();
 
+        public BidirectionalReferenceStore() { }
+
         public IEnumerable<(Guid id, object val)> GetAll()
         {
             // We can choose one, since forward and reverse should always contain the exact same data (swapped key <-> value)...

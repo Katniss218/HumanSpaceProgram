@@ -15,6 +15,8 @@ namespace UnityPlus.Serialization.ReferenceMaps
     {
         private readonly Dictionary<Guid, object> _forward = new Dictionary<Guid, object>();
 
+        public ForwardReferenceStore() { }
+
         public IEnumerable<(Guid id, object val)> GetAll()
         {
             return _forward.Select( kvp => (kvp.Key, kvp.Value) );
