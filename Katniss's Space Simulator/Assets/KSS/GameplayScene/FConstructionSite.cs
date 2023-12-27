@@ -34,30 +34,30 @@ namespace KSS.GameplayScene
         }
     }
 
-    public static class ConstructionSite_Transform_Ex
+    public static class FConstructionSite_Transform_Ex
     {
         /// <summary>
-        /// Gets the <see cref="ConstructionSite"/> that is constructing this transform.
+        /// Gets the <see cref="FConstructionSite"/> that is constructing this transform.
         /// </summary>
         /// <returns>The construction site. Null if the transform is not under construction/deconstruction.</returns>
-        public static ConstructionSite GetConstructionSite( this Transform part )
+        public static FConstructionSite GetConstructionSite( this Transform part )
         {
-            ConstructionSite site = part.GetComponent<ConstructionSite>();
+            FConstructionSite site = part.GetComponent<FConstructionSite>();
             while( site == null )
             {
                 part = part.parent;
                 if( part == null )
                     break;
-                site = part.GetComponent<ConstructionSite>();
+                site = part.GetComponent<FConstructionSite>();
             }
             return site;
         }
 
         /// <summary>
-        /// Gets the <see cref="ConstructionSite"/> that is constructing this part.
+        /// Gets the <see cref="FConstructionSite"/> that is constructing this part.
         /// </summary>
         /// <returns>The construction site. Null if the transform is not under construction/deconstruction.</returns>
-        public static ConstructionSite GetConstructionSite( this FConstructible part )
+        public static FConstructionSite GetConstructionSite( this FConstructible part )
         {
             return GetConstructionSite( part.transform );
         }
@@ -67,6 +67,9 @@ namespace KSS.GameplayScene
         /// </summary>
         public static bool IsUnderConstruction( this Transform part )
         {
+            if( part == null )
+                return false;
+
             return part.GetConstructionSite() != null;
         }
 
@@ -83,7 +86,10 @@ namespace KSS.GameplayScene
         /// </summary>
         public static bool IsUnderActiveConstruction( this Transform part )
         {
-            ConstructionSite site = part.GetConstructionSite();
+            if( part == null )
+                return false;
+
+            FConstructionSite site = part.GetConstructionSite();
             if( site == null )
                 return false;
 
@@ -101,25 +107,8 @@ namespace KSS.GameplayScene
 
     [RequireComponent( typeof( RootObjectTransform ) )]
     [DisallowMultipleComponent]
-    public class ConstructionSite : MonoBehaviour
+    public class FConstructionSite : MonoBehaviour
     {
-        public enum ConstructibleState : sbyte
-        {
-            FinishedDeconstruction = -1,
-            InProgress = 0,
-            FinishedConstruction = 1
-        }
-
-        /// <summary>
-        /// Tracks progress of a single constructible.
-        /// </summary>
-        public class ConstructibleData
-        {
-            public BidirectionalGhostPatch patchSet;
-            public float accumulatedBuildPoints;
-            public ConstructibleState state = ConstructibleState.InProgress;
-        }
-
         public ConstructionState State { get; private set; } = ConstructionState.Waiting;
 
         /// <summary>
@@ -131,7 +120,7 @@ namespace KSS.GameplayScene
         /// <summary>
         /// The total number of parts (constructibles) belonging to this construction site.
         /// </summary>
-        public int TotalPartCount { get => _constructionData.Count; }
+        public int TotalPartCount { get => _constructibles.Count; }
 
         /// <summary>
         /// The sum of parts (constructibles) constructed (when constructing) or parts deconstructed (when deconstructing).
@@ -140,7 +129,7 @@ namespace KSS.GameplayScene
 
         BidirectionalReferenceStore _referenceMap = new BidirectionalReferenceStore();
 
-        Dictionary<FConstructible, ConstructibleData> _constructionData = new Dictionary<FConstructible, ConstructibleData>();
+        List<FConstructible> _constructibles = new List<FConstructible>();
 
         /// <remarks>
         /// Can be called while deconstructing to cancel, and start constructing instead.
@@ -150,8 +139,8 @@ namespace KSS.GameplayScene
             if( State == ConstructionState.Constructing )
                 throw new InvalidOperationException( $"Can't start construction when already constructing." );
 
-            this.CompletedPartCount = _constructionData.Values
-                .Where( v => v.state == ConstructibleState.FinishedConstruction )
+            this.CompletedPartCount = _constructibles
+                .Where( v => v.CurrentState == FConstructible.State.FinishedConstruction )
                 .Count();
             this.State = ConstructionState.Constructing;
         }
@@ -164,8 +153,8 @@ namespace KSS.GameplayScene
             if( State == ConstructionState.Deconstructing )
                 throw new InvalidOperationException( $"Can't start deconstruction when already deconstructing." );
 
-            this.CompletedPartCount = _constructionData.Values
-                .Where( v => v.state == ConstructibleState.FinishedDeconstruction )
+            this.CompletedPartCount = _constructibles
+                .Where( v => v.CurrentState == FConstructible.State.FinishedDeconstruction )
                 .Count();
             this.State = ConstructionState.Deconstructing;
         }
@@ -213,73 +202,39 @@ namespace KSS.GameplayScene
 
             if( State == ConstructionState.Constructing )
             {
-                foreach( (var constructible, var data) in _constructionData )
+                var inProgressConstructibles = _constructibles.Where( c => c.CurrentState != FConstructible.State.FinishedConstruction );
+                foreach( var constructible in inProgressConstructibles )
                 {
-                    if( data.state != ConstructibleState.FinishedConstruction )
+                    constructible.ChangeBuildPoints( buildSpeedPerPart * TimeManager.DeltaTime );
+                    if( constructible.CurrentState == FConstructible.State.FinishedConstruction )
                     {
-                        data.accumulatedBuildPoints += buildSpeedPerPart * TimeManager.DeltaTime;
-                        if( data.accumulatedBuildPoints >= constructible.MaxBuildPoints )
-                        {
-                            data.accumulatedBuildPoints = constructible.MaxBuildPoints;
-                            data.patchSet.Reverse.Run( _referenceMap );
-                            data.state = ConstructibleState.FinishedConstruction;
-                            CompletedPartCount++;
-                        }
+                        CompletedPartCount++;
                     }
                 }
             }
             if( State == ConstructionState.Deconstructing )
             {
-                foreach( (_, var data) in _constructionData )
+                var inProgressConstructibles = _constructibles.Where( c => c.CurrentState != FConstructible.State.FinishedDeconstruction );
+                foreach( var constructible in inProgressConstructibles )
                 {
-                    if( data.state != ConstructibleState.FinishedDeconstruction )
+                    constructible.ChangeBuildPoints( -buildSpeedPerPart * TimeManager.DeltaTime );
+                    if( constructible.CurrentState == FConstructible.State.FinishedDeconstruction )
                     {
-                        data.accumulatedBuildPoints -= buildSpeedPerPart * TimeManager.DeltaTime;
-                        if( data.accumulatedBuildPoints <= 0.0f )
-                        {
-                            data.accumulatedBuildPoints = 0.0f;
-                            data.patchSet.Forward.Run( _referenceMap );
-                            data.state = ConstructibleState.FinishedDeconstruction;
-                            CompletedPartCount++;
-                        }
+                        CompletedPartCount++;
                     }
                 }
             }
         }
 
-        public void ForceFinish()
-        {
-            if( this.State.IsConstruction() )
-            {
-                foreach( var kvp in _constructionData )
-                {
-                    if( kvp.Value.state != ConstructibleState.FinishedConstruction )
-                    {
-                        kvp.Key.transform.SetParent( null ); // needed because getcomponentsinchildren checks destroyed children (facepalm unity).
-                        Destroy( kvp.Key.gameObject );
-                    }
-                }
-            }
-            else if( this.State.IsDeconstruction() )
-            {
-                foreach( var kvp in _constructionData )
-                {
-                    if( kvp.Value.state == ConstructibleState.FinishedDeconstruction )
-                    {
-                        kvp.Key.transform.SetParent( null ); // needed because getcomponentsinchildren checks destroyed children (facepalm unity).
-                        Destroy( kvp.Key.gameObject );
-                    }
-                }
-            }
-
-            this.transform.GetVessel().RecalculateParts();
-            Destroy( this );
-        }
-
-        public static ConstructionSite TryAddPart( Transform ghostRoot, Transform parent, (FConstructible k, BidirectionalGhostPatch v)[] ghostParts, BidirectionalReferenceStore refMap )
+        public static FConstructionSite TryAddPart( Transform ghostRoot, Transform parent, (FConstructible k, BidirectionalGhostPatch v)[] ghostParts, BidirectionalReferenceStore refMap )
         {
             // step 6. Player places the ghost.
             // assume the position is already set.
+
+            if( ghostRoot.IsUnderActiveConstruction() )
+            {
+                throw new InvalidOperationException( $"can't add while being constructed." );
+            }
 
             if( parent == null )
             {
@@ -297,35 +252,15 @@ namespace KSS.GameplayScene
                 VesselHierarchyUtils.AttachLoose( ghostRoot, parent );
             }
 
-#warning  TODO - there should be only one construction site in the parent of the constructed objects. If you add a part to construct
-
-            //
-            //    0
-            //   /|\
-            //  1 2 3
-            //
-            // if you add something with `1` as parent, and then add `2` itself, then the only c-site should appear at `0`.
-            // c-sites under construction don't split as the parents are constructed though.
-
-            // it's better to add the c-site to the ghost root itself.
-            // ghosts can only be placed as children of non-c-sites, or on c-sites that are not started yet.
-
-            // when the c-site is not started yet, you can pick up parts from it (inverse of placing).
-
-            if( ghostRoot.IsUnderActiveConstruction() )
-            {
-                throw new InvalidOperationException( $"can't add while being constructed." );
-            }
-
-            ConstructionSite constructionSite = ghostRoot.GetConstructionSite();
+            FConstructionSite constructionSite = ghostRoot.GetConstructionSite();
             if( constructionSite == null )
             {
-                constructionSite = ghostRoot.gameObject.AddComponent<ConstructionSite>();
+                constructionSite = ghostRoot.gameObject.AddComponent<FConstructionSite>();
             }
+
             foreach( var ghostPart in ghostParts )
             {
-#warning TODO - key may be null
-                constructionSite._constructionData.Add( ghostPart.k, new ConstructibleData() { patchSet = ghostPart.v, accumulatedBuildPoints = 0.0f } );
+                constructionSite._constructibles.Add( ghostPart.k );
             }
 
             constructionSite._referenceMap.AddAll( refMap.GetAll() );
@@ -335,45 +270,13 @@ namespace KSS.GameplayScene
             return constructionSite;
         }
 
-        public bool TryRemovePart( Transform ghostRoot, out Dictionary<FConstructible, BidirectionalGhostPatch> ghostParts, out BidirectionalReferenceStore refMap )
+        /// <summary>
+        /// Tries to remove the specified part of the construction site from construction.
+        /// </summary>
+        /// <returns>True if the specified part was successfully unhooked.</returns>
+        public static bool TryRemovePart( Transform ghostRoot )
         {
-            // reverse of step 6. Player picks up the ghost.
 
-            if( this.State != ConstructionState.NotStarted )
-            {
-                // can't pickup once construction is started.
-                ghostParts = null;
-                refMap = null;
-                return false;
-            }
-
-            AncestralMap<FConstructible> partMap = AncestralMap<FConstructible>.Create( ghostRoot );
-
-            // Check if the hierarchy up from the specified ghost root is fully ghosted. Otherwise the ghost can't be picked up.
-           /* int containedCount = partMap.Count( kvp => _constructionData.ContainsKey( kvp.Key ) );
-            if( containedCount != partMap.Count )
-            {
-                ghostParts = null;
-                refMap = null;
-                return false;
-            }
-
-            ghostParts = new Dictionary<FConstructible, BidirectionalGhostPatch>();
-            foreach( var constructible in partMap.Keys )
-            {
-                if( _constructionData.TryGetValue( constructible, out var data ) )
-                {
-                    ghostParts.Add( constructible, data.patchSet );
-                    _constructionData.Remove( constructible );
-                }
-            }
-            if( _constructionData.Count == 0 )
-            {
-                Destroy( this );
-            }*/
-            ghostParts = null;
-            refMap = null;
-            return false;
         }
 
         /// <summary>
@@ -386,13 +289,13 @@ namespace KSS.GameplayScene
             BidirectionalReferenceStore refStore = new BidirectionalReferenceStore();
             GameObject rootGo = PartRegistry.Load( new Core.Mods.NamespacedIdentifier( "Vessels", vesselId ), refStore );
 
-            BidirectionalReferenceStore remappedRefStore = refStore.RemapRandomly(); // remapping allows object with the same guids (the same object) to be loaded again.
+            BidirectionalReferenceStore remappedRefStore = refStore.RemapRandomly(); // remapping allows multiple instances of the same objects (the same IDs) to be loaded at any given time.
 
             AncestralMap<FConstructible> partMap = AncestralMap<FConstructible>.Create( rootGo.transform );
 
             (FConstructible, BidirectionalGhostPatch)[] ghostParts = new (FConstructible, BidirectionalGhostPatch)[partMap.KeyCount];
             int i = 0;
-            foreach( var kvp in partMap.AsEnumerable() )
+            foreach( var kvp in partMap )
             {
                 BidirectionalGhostPatch patch = BidirectionalGhostPatch.CreateGhostPatch( kvp.Value, remappedRefStore );
                 patch.Forward.Run( remappedRefStore );

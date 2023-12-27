@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -8,7 +9,7 @@ namespace UnityEngine
     /// Maps each transform in a hierarchy to its nearest ancestor component of type <typeparamref name="T"/>.
     /// </summary>
     /// <typeparam name="T">The type of the component to map the transforms to.</typeparam>
-    public sealed class AncestralMap<T> where T : Component
+    public sealed class AncestralMap<T> : IEnumerable<KeyValuePair<T, List<Transform>>> where T : Component
     {
         Dictionary<T, List<Transform>> _bound;
         List<Transform> _unbound;
@@ -21,12 +22,41 @@ namespace UnityEngine
             this._unbound = unbound;
         }
 
-        public IEnumerable<KeyValuePair<T, List<Transform>>> AsEnumerable()
+        public IEnumerable<T> Keys
+        {
+            get
+            {
+                if( _unbound.Any() )
+                    return _bound.Keys.Prepend( null );
+
+                return _bound.Keys;
+            }
+        }
+        
+        public IEnumerable<List<Transform>> Values
+        {
+            get
+            {
+                if( _unbound.Any() )
+                    return _bound.Values.Prepend( _unbound );
+
+                return _bound.Values;
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public IEnumerator<KeyValuePair<T, List<Transform>>> GetEnumerator()
         {
             if( _unbound.Any() )
-                return ((IEnumerable<KeyValuePair<T, List<Transform>>>)_bound).Prepend( new KeyValuePair<T, List<Transform>>( null, _unbound ) );
+                return ((IEnumerable<KeyValuePair<T, List<Transform>>>)_bound)
+                    .Prepend( new KeyValuePair<T, List<Transform>>( null, _unbound ) )
+                    .GetEnumerator();
 
-            return _bound;
+            return _bound.GetEnumerator();
         }
 
         public bool TryGetValue( T key, out List<Transform> value )

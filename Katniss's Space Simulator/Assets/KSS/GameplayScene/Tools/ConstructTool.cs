@@ -188,7 +188,7 @@ namespace KSS.GameplayScene.Tools
                     return;
                 }
 
-                ConstructionSite.TryAddPart( _heldPart, hitVessel.RootPart, _ghostPatches, _ghostRefMap );
+                FConstructionSite.TryAddPart( _heldPart, hitVessel.RootPart, _ghostPatches, _ghostRefMap );
             }
             else
             {
@@ -202,7 +202,7 @@ namespace KSS.GameplayScene.Tools
                 Transform newRoot = VesselHierarchyUtils.ReRoot( _currentSnap.Value.snappedNode.transform.parent );
                 _heldPart = newRoot;
                 // Node-attach (object is already positioned).
-                ConstructionSite.TryAddPart( _heldPart, parent, _ghostPatches, _ghostRefMap );
+                FConstructionSite.TryAddPart( _heldPart, parent, _ghostPatches, _ghostRefMap );
             }
             _heldPart = null;
             _ghostRefMap = null;

@@ -49,13 +49,13 @@ namespace KSS
                     if( refMap.TryGetID( collider, out Guid id ) )
                     {
                         SerializedObject fwdObj = new SerializedObject()
-                            {
-                                { "is_trigger", true }
-                            };
+                        {
+                            { "is_trigger", true }
+                        };
                         SerializedObject revObj = new SerializedObject()
-                            {
-                                { "is_trigger", collider.isTrigger }
-                            };
+                        {
+                            { "is_trigger", collider.isTrigger }
+                        };
                         forwardPatch.Add( (id, fwdObj) );
                         reversePatch.Add( (id, revObj) );
                     }
@@ -75,13 +75,13 @@ namespace KSS
                             ghostMats.Add( refMap.WriteAssetReference( ghostMat ) );
 
                         SerializedObject fwdObj = new SerializedObject()
-                            {
-                                { "shared_materials", ghostMats }
-                            };
+                        {
+                            { "shared_materials", ghostMats }
+                        };
                         SerializedObject revObj = new SerializedObject()
-                            {
-                                { "shared_materials", origMats }
-                            };
+                        {
+                            { "shared_materials", origMats }
+                        };
                         forwardPatch.Add( (id, fwdObj) );
                         reversePatch.Add( (id, revObj) );
                     }
@@ -92,13 +92,13 @@ namespace KSS
                     if( refMap.TryGetID( mass, out Guid id ) )
                     {
                         SerializedObject fwdObj = new SerializedObject()
-                            {
-                                { "mass", 0.0f }
-                            };
+                        {
+                            { "mass", 0.0f }
+                        };
                         SerializedObject revObj = new SerializedObject()
-                            {
-                                { "mass", mass.Mass }
-                            };
+                        {
+                            { "mass", mass.Mass }
+                        };
                         forwardPatch.Add( (id, fwdObj) );
                         reversePatch.Add( (id, revObj) );
                     }

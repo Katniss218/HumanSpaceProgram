@@ -68,7 +68,7 @@
     <Compile Include="Assets\KSS\GameplayScene\Tools\DefaultTool.cs" />
     <Compile Include="Assets\KSS\GameplayScene\Tools\VanillaToolRegisterer.cs" />
     <Compile Include="Assets\KSS\Components\FVesselSeparator.cs" />
-    <Compile Include="Assets\KSS\GameplayScene\ConstructionSite.cs" />
+    <Compile Include="Assets\KSS\GameplayScene\FConstructionSite.cs" />
     <Compile Include="Assets\KSS\TransformHandleSet.cs" />
     <Compile Include="Assets\KSS\Effects\Atmospheres\AtmosphereRenderer.cs" />
     <Compile Include="Assets\KSS\Components\FSequencer.cs" />
@@ -94,6 +94,7 @@
     <Compile Include="Assets\KSS\Components\FActuatorXY.cs" />
     <Compile Include="Assets\KSS\DesignScene\Tools\TranslateTool.cs" />
     <Compile Include="Assets\KSS\AssetLoaders\GameDataJsonPartFactory.cs" />
+    <Compile Include="Assets\KSS\BidirectionalGhostPatch.cs" />
     <Compile Include="Assets\KSS\Input\HierarchicalInputPriority.cs" />
     <Compile Include="Assets\KSS\DesignScene\Tools\RerootTool.cs" />
     <Compile Include="Assets\KSS\MainMenuScene\MainMenuEscapeInputController.cs" />
@@ -102,7 +103,6 @@
     <Compile Include="Assets\KSS\GameplayScene\GameplaySceneToolManager.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadTree_NodeUtils.cs" />
     <Compile Include="Assets\KSS\AssetLoaders\GameDataJsonVesselFactory.cs" />
-    <Compile Include="Assets\KSS\BidirectionalGhostPatch.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS\CelestialBodies\Surface\TerrainShader.shader" />

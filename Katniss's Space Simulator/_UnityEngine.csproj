@@ -60,6 +60,7 @@
     <Compile Include="Assets\_UnityEngine\QuaternionDbl.cs" />
     <Compile Include="Assets\_UnityEngine\Vector3Curve.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\GameObjectEx.cs" />
+    <Compile Include="Assets\_UnityEngine\AncestralMap.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\Quaternion_Ex.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\RectTransform_Ex.cs" />
     <Compile Include="Assets\_UnityEngine\Direction3D.cs" />
@@ -79,7 +80,6 @@
     <Compile Include="Assets\_UnityEngine\Extensions\ComponentEx.cs" />
     <Compile Include="Assets\_UnityEngine\IComponent.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\Vector2_Ex.cs" />
-    <Compile Include="Assets\_UnityEngine\AncestralMap.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_UnityEngine\___UnityEngine.asmdef" />
