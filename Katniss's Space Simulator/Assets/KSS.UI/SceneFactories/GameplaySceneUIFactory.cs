@@ -192,12 +192,13 @@ namespace KSS.UI.SceneFactories
 
             UIButton constructButton = bottomPanel.AddButton( new UILayoutInfo( UILayoutInfo.Middle, new Vector2( -16, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), () =>
             {
-                CanvasManager.Get( CanvasName.WINDOWS ).AddTextSelectionWindow( "Vessel to create...", "id here", s =>
+                CanvasManager.Get( CanvasName.WINDOWS ).AddTextSelectionWindow( "Vessel to create...", "id here", vesselId =>
                 {
-                    (Transform root, (FConstructible, BidirectionalGhostPatch)[] ghostPatches, BidirectionalReferenceStore refMap) = FConstructionSite.SpawnGhost( s );
+
+                    Transform root = PartRegistry.Load( new Core.Mods.NamespacedIdentifier( "Vessels", vesselId ) ).transform;
 
                     ConstructTool tool = GameplaySceneToolManager.UseTool<ConstructTool>();
-                    tool.SetGhostPart( root, ghostPatches, refMap, Vector3.zero );
+                    tool.SetGhostPart( root, Vector3.zero );
                 } );
             } )
                 .WithText( UILayoutInfo.Fill(), "C", out _ );

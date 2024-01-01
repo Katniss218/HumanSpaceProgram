@@ -20,10 +20,6 @@ namespace KSS.GameplayScene.Tools
     {
         Transform _heldPart = null;
 
-        // Additional data that needs to be passed to the c-site.
-        (FConstructible, BidirectionalGhostPatch)[] _ghostPatches;
-        BidirectionalReferenceStore _ghostRefMap;
-
         Vector3 _heldOffset;
         Quaternion _heldRotation = Quaternion.identity;
 
@@ -43,10 +39,8 @@ namespace KSS.GameplayScene.Tools
         /// sets or resets the currently held ghost hierarchy.
         /// </summary>
         /// <param name="root">The root object of the hierarchy.</param>
-        /// <param name="ghostPatches">The patches applied to the hierarchy.</param>
-        /// <param name="refMap"></param>
         /// <param name="heldOffset"></param>
-        public void SetGhostPart( Transform root, (FConstructible, BidirectionalGhostPatch)[] ghostPatches, BidirectionalReferenceStore refMap, Vector3 heldOffset )
+        public void SetGhostPart( Transform root, Vector3 heldOffset )
         {
             if( this._heldPart == root )
                 return;
@@ -58,8 +52,6 @@ namespace KSS.GameplayScene.Tools
 
             this._heldPart = root;
             this._heldPart.gameObject.SetLayer( (int)Layer.VESSEL_DESIGN_HELD, true );
-            this._ghostPatches = ghostPatches;
-            this._ghostRefMap = refMap;
             this._heldOffset = heldOffset;
         }
 
@@ -110,8 +102,6 @@ namespace KSS.GameplayScene.Tools
             {
                 Destroy( _heldPart.gameObject );
                 _heldPart = null;
-                _ghostRefMap = null;
-                _ghostPatches = null;
             }
         }
 
@@ -188,7 +178,7 @@ namespace KSS.GameplayScene.Tools
                     return;
                 }
 
-                FConstructionSite.TryAddPart( _heldPart, hitVessel.RootPart, _ghostPatches, _ghostRefMap );
+                FConstructionSite.TryAddPart( _heldPart, hitVessel.RootPart );
             }
             else
             {
@@ -202,11 +192,9 @@ namespace KSS.GameplayScene.Tools
                 Transform newRoot = VesselHierarchyUtils.ReRoot( _currentSnap.Value.snappedNode.transform.parent );
                 _heldPart = newRoot;
                 // Node-attach (object is already positioned).
-                FConstructionSite.TryAddPart( _heldPart, parent, _ghostPatches, _ghostRefMap );
+                FConstructionSite.TryAddPart( _heldPart, parent );
             }
             _heldPart = null;
-            _ghostRefMap = null;
-            _ghostPatches = null;
             _currentSnap = null;
             GameplaySceneToolManager.UseTool<DefaultTool>();
         }

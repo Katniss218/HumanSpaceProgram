@@ -127,8 +127,6 @@ namespace KSS.GameplayScene
         /// </summary>
         public int CompletedPartCount { get; private set; } = 0;
 
-        BidirectionalReferenceStore _referenceMap = new BidirectionalReferenceStore();
-
         List<FConstructible> _constructibles = new List<FConstructible>();
 
         /// <remarks>
@@ -196,7 +194,8 @@ namespace KSS.GameplayScene
 
             if( CompletedPartCount == TotalPartCount )
             {
-                ForceFinish();
+                Destroy( this );
+               // ForceFinish();
                 return;
             }
 
@@ -226,7 +225,7 @@ namespace KSS.GameplayScene
             }
         }
 
-        public static FConstructionSite TryAddPart( Transform ghostRoot, Transform parent, (FConstructible k, BidirectionalGhostPatch v)[] ghostParts, BidirectionalReferenceStore refMap )
+        public static FConstructionSite TryAddPart( Transform ghostRoot, Transform parent )
         {
             // step 6. Player places the ghost.
             // assume the position is already set.
@@ -258,13 +257,6 @@ namespace KSS.GameplayScene
                 constructionSite = ghostRoot.gameObject.AddComponent<FConstructionSite>();
             }
 
-            foreach( var ghostPart in ghostParts )
-            {
-                constructionSite._constructibles.Add( ghostPart.k );
-            }
-
-            constructionSite._referenceMap.AddAll( refMap.GetAll() );
-
             ghostRoot.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
             ghostRoot.transform.SetParent( parent );
             return constructionSite;
@@ -276,34 +268,22 @@ namespace KSS.GameplayScene
         /// <returns>True if the specified part was successfully unhooked.</returns>
         public static bool TryRemovePart( Transform ghostRoot )
         {
-
+            return false;
         }
 
         /// <summary>
         /// Spawns a ghosted vessel/part.
         /// </summary>
-        public static (Transform root, (FConstructible k, BidirectionalGhostPatch v)[], BidirectionalReferenceStore) SpawnGhost( string vesselId )
+        /*public static Transform Spawn( string vesselId )
         {
             // step 1. player clicks, and spawns ghost to place.
 
-            BidirectionalReferenceStore refStore = new BidirectionalReferenceStore();
-            GameObject rootGo = PartRegistry.Load( new Core.Mods.NamespacedIdentifier( "Vessels", vesselId ), refStore );
+            //BidirectionalReferenceStore refStore = new BidirectionalReferenceStore();
+            GameObject rootGo = PartRegistry.Load( new Core.Mods.NamespacedIdentifier( "Vessels", vesselId ) );
 
-            BidirectionalReferenceStore remappedRefStore = refStore.RemapRandomly(); // remapping allows multiple instances of the same objects (the same IDs) to be loaded at any given time.
+            //BidirectionalReferenceStore remappedRefStore = refStore.RemapRandomly(); // remapping allows multiple instances of the same objects (the same IDs) to be loaded at any given time.
 
-            AncestralMap<FConstructible> partMap = AncestralMap<FConstructible>.Create( rootGo.transform );
-
-            (FConstructible, BidirectionalGhostPatch)[] ghostParts = new (FConstructible, BidirectionalGhostPatch)[partMap.KeyCount];
-            int i = 0;
-            foreach( var kvp in partMap )
-            {
-                BidirectionalGhostPatch patch = BidirectionalGhostPatch.CreateGhostPatch( kvp.Value, remappedRefStore );
-                patch.Forward.Run( remappedRefStore );
-                ghostParts[i] = (kvp.Key, patch);
-                i++;
-            }
-
-            return (rootGo.transform, ghostParts, remappedRefStore);
-        }
+            return rootGo.transform;
+        }*/
     }
 }
