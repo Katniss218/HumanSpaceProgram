@@ -47,7 +47,7 @@ namespace KSS.Core
                 _rootPart = value;
                 if( value != null )
                     value.SetParent( this.transform, true );
-                RecalculateParts();
+                RecalculatePartCache();
             }
         }
 
@@ -74,7 +74,7 @@ namespace KSS.Core
 
         public event Action OnAfterRecalculateParts;
 
-        public void RecalculateParts()
+        public void RecalculatePartCache()
         {
             if( RootPart == null )
             {
@@ -186,7 +186,7 @@ namespace KSS.Core
         void Start()
         {
             this.PhysicsObject = this.GetComponent<IPhysicsObject>(); // needs to be here for deserialization, because it might be added in any order and I can't use RequireComponent because it needs to be removed when pinning.
-            RecalculateParts();
+            RecalculatePartCache();
             //SetPhysicsObjectParameters();
         }
 

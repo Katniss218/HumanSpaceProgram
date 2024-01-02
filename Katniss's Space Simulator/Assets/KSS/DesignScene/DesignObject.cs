@@ -34,5 +34,10 @@ namespace KSS.DesignScene
         {
             this.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
         }
+
+        public void RecalculatePartCache()
+        {
+            // do nothing (for now)
+        }
     }
 }

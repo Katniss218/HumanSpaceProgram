@@ -85,7 +85,7 @@ namespace KSS.Core
         {
             Vessel v = parent.GetVessel();
             looseRoot.SetParent( parent, true );
-            v.RecalculateParts();
+            v.RecalculatePartCache();
         }
 
         // The following helper methods must always produce a legal state or throw an exception.
@@ -142,8 +142,8 @@ namespace KSS.Core
             Reattach( partToJoin, parent );
             partToJoin.SetParent( parent.GetVessel().transform );
 
-            oldv.RecalculateParts();
-            parent.GetVessel().RecalculateParts();
+            oldv.RecalculatePartCache();
+            parent.GetVessel().RecalculatePartCache();
         }
 
         /// <summary>
@@ -165,8 +165,8 @@ namespace KSS.Core
 
             partToSplit.SetParent( newVessel.transform );
             newVessel.RootPart = partToSplit;
-            oldv.RecalculateParts();
-            newVessel.RecalculateParts();
+            oldv.RecalculatePartCache();
+            newVessel.RecalculatePartCache();
 
             if( IsAnchored( partToSplit ) )
             {

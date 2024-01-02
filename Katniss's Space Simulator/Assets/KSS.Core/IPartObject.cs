@@ -33,10 +33,18 @@ namespace KSS.Core
         }
     }
 
+    /// <summary>
+    /// Represents an arbitrary type of part object.
+    /// </summary>
     public interface IPartObject : IComponent
     {
         Transform RootPart { get; }
         IPhysicsObject PhysicsObject { get; }
         RootObjectTransform RootObjTransform { get; }
+
+        /// <summary>
+        /// Call this to rebuild the part data cache.
+        /// </summary>
+        void RecalculatePartCache();
     }
 }

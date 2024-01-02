@@ -313,7 +313,7 @@ namespace UnityPlus.Serialization.Strategies
                     }
                     catch( Exception ex )
                     {
-                        Debug.LogError( $"Failed to deserialize data of component with ID: `{dataElement?[KeyNames.REF] ?? "<null>"}`." );
+                        Debug.LogError( $"Failed to deserialize data of component of type {comp.GetType()}, with ID: `{dataElement?[KeyNames.REF] ?? "<null>"}`." );
                         Debug.LogException( ex );
                     }
                     break;

@@ -54,43 +54,47 @@ namespace KSS.Components
     /// </summary>
     public class FConstructible : MonoBehaviour, IPersistent
     {
-        public enum State
-        {
-            FinishedDeconstruction = -1,
-            InProgress = 0,
-            FinishedConstruction = 1
-        }
-
-        // state can be more than just ghost. A ghost would be for things that are not built yet. there can be a separate state for in-progress, etc.
-        public State CurrentState { get; private set; }
-
+        [SerializeField]
+        private float _buildPoints;
         /// <summary>
         /// The current total build points the part has accumulated.
         /// </summary>
-        public float BuildPoints { get; private set; }
+        public float BuildPoints
+        {
+            get => _buildPoints;
+            set
+            {
+                float perc = BuildPercent;
+                _buildPoints = value;
+                float delta = BuildPercent - perc;
+                OnAfterBuildPointPercentChanged( delta );
+            }
+        }
 
+        [SerializeField]
+        private float _maxBuildPoints;
         /// <summary>
         /// The total number of build points required to complete the colstruction/deconstruction of this part.
         /// </summary>
         /// <remarks>
         /// One build point at 1x build speed takes 1 [s] to build.
         /// </remarks>
-        [field: SerializeField]
-        public float MaxBuildPoints { get; set; }
+        public float MaxBuildPoints
+        {
+            get => _maxBuildPoints;
+            set
+            {
+                float perc = BuildPercent;
+                _maxBuildPoints = value;
+                float delta = BuildPercent - perc;
+                OnAfterBuildPointPercentChanged( delta );
+            }
+        }
 
         /// <summary>
         /// The ratio of the current build points to the max build points, in [0..1].
         /// </summary>
         public float BuildPercent => BuildPoints / MaxBuildPoints;
-
-        /// <summary>
-        /// Changes the <see cref="BuildPoints"/> by a specified delta.
-        /// </summary>
-        public void ChangeBuildPoints( float delta )
-        {
-            this.BuildPoints += delta;
-            OnAfterBuildPointsChanged( delta );
-        }
 
         [field: SerializeField]
         public List<IConstructionCondition> Conditions { get; set; }
@@ -103,16 +107,25 @@ namespace KSS.Components
             return Conditions.Sum( c => c.GetBuildSpeedMultiplier( this.transform.position ) );
         }
 
-        void OnAfterBuildPointsChanged( float delta )
+        void OnAfterBuildPointPercentChanged( float delta )
         {
-            if( BuildPercent <= 0.0f || BuildPercent >= 1.0f )
-                this.transform.GetVessel().RecalculateParts();
+            // This method shouldn't handle the destroying of the part from the vessel after deconstruction is 'finished'.
 
-            // if previous build perc was below 1, and current is >= 1 -> run ghost to original patch.
-            // this doesn't handle the removal of the part from the vessel after deconstruction is finished.
+            if( this.BuildPercent <= 0.0f && (this.BuildPercent - delta) > 0.0f ) // 2nd part will be false on subsequent calls.
+            {
+                RunOriginalToGhost();
+                var vessel = this.transform.GetPartObject();
+                if( vessel != null )
+                    vessel.RecalculatePartCache();
+            }
+            if( this.BuildPercent >= 1.0f && (this.BuildPercent - delta) < 0.0f ) // 2nd part will be false on subsequent calls.
+            {
+                RunGhostToOriginal();
+                var vessel = this.transform.GetPartObject();
+                if( vessel != null )
+                    vessel.RecalculatePartCache();
+            }
         }
-
-        Dictionary<Component, (SerializedData fwd, SerializedData rev)> _twoWayPatch = new Dictionary<Component, (SerializedData fwd, SerializedData rev)>();
 
         private void RunOriginalToGhost()
         {
@@ -130,54 +143,43 @@ namespace KSS.Components
             }
         }
 
-        void OnEnable()
+        bool _patchDeserialized = false;
+        Dictionary<Component, (SerializedData fwd, SerializedData rev)> _twoWayPatch = new Dictionary<Component, (SerializedData fwd, SerializedData rev)>();
+
+        void Start()
         {
-            if( !this._twoWayPatch.Any() )
+            if( !_patchDeserialized )
             {
                 SaveState();
             }
-            RunOriginalToGhost();
         }
 
-        void OnDisable()
+        public static List<Func<Transform, IEnumerable<KeyValuePair<Component, (SerializedData fwd, SerializedData rev)>>>> PatchGetters { get; private set; } = new()
         {
-            RunGhostToOriginal();
-        }
+            GetColliderPatches,
+            GetRendererPatches,
+            GetFDryMassPatches
+        };
 
         private void SaveState()
         {
             _twoWayPatch.Clear();
+            _patchDeserialized = false;
 
             AncestralMap<FConstructible> partMap = AncestralMap<FConstructible>.Create( transform );
             if( partMap.TryGetValue( this, out var ourPartsTransforms ) )
             {
-#warning TODO - add custom patch getters.
-                List<FDryMass> massComponents = new List<FDryMass>();
-                List<Renderer> rendererComponents = new List<Renderer>();
-                List<Collider> colliderComponents = new List<Collider>();
                 foreach( var transform in ourPartsTransforms ) // this entire thing could be ran once per entire vessel and cached until something is added/removed from it.
                 {
-                    transform.GetComponents( colliderComponents );
-                    foreach( var collider in colliderComponents )
+                    foreach( var getter in PatchGetters )
                     {
-                        _twoWayPatch.Add( collider, GetColliderPatch( collider ) );
-                    }
-#error doesn't work somewhy
-                    transform.GetComponents( rendererComponents );
-                    foreach( var renderer in rendererComponents )
-                    {
-                        _twoWayPatch.Add( renderer, GetRendererPatch( renderer ) );
-                    }
-
-                    transform.GetComponents( massComponents );
-                    foreach( var mass in massComponents )
-                    {
-                        _twoWayPatch.Add( mass, GetFDryMassPatch( mass ) );
+                        foreach( var kvp in getter.Invoke( transform ) )
+                        {
+                            _twoWayPatch.Add( kvp.Key, kvp.Value );
+                        }
                     }
                 }
             }
-
-            // patches can be applied on the fly because the objects are already in memory, and we know what we want to do to them.
 
             // construction site would only manage the distribution of build points, etc.
         }
@@ -199,6 +201,7 @@ namespace KSS.Components
             }
             return new SerializedObject()
             {
+                { "build_points", this.BuildPoints },
                 { "max_build_points", this.MaxBuildPoints },
                 { "saved_patch", dict }
                 // todo - conditions.
@@ -207,12 +210,19 @@ namespace KSS.Components
 
         public void SetData( IForwardReferenceMap l, SerializedData data )
         {
-            if( data.TryGetValue( "max_build_points", out var maxbuildPoints ) )
-                this.MaxBuildPoints = (float)maxbuildPoints;
+            if( data.TryGetValue( "max_build_points", out var maxBuildPoints ) )
+                this.MaxBuildPoints = (float)maxBuildPoints;
+
+            if( data.TryGetValue( "build_points", out var buildPoints ) )
+            {
+                this.BuildPoints = (float)buildPoints;
+                OnAfterBuildPointPercentChanged( this.BuildPoints );
+            }
 
             if( data.TryGetValue( "saved_patch", out var savedPatch ) )
             {
-                this._twoWayPatch.Clear();
+                _twoWayPatch.Clear();
+                _patchDeserialized = true;
                 foreach( var kvp in (SerializedObject)savedPatch )
                 {
                     Component c = (Component)l.GetObj( Guid.ParseExact( kvp.Key, "D" ) );
@@ -224,60 +234,72 @@ namespace KSS.Components
         }
 
 
-        private static (SerializedData fwd, SerializedData rev) GetColliderPatch( Collider collider )
+        private static IEnumerable<KeyValuePair<Component, (SerializedData fwd, SerializedData rev)>> GetColliderPatches( Transform transform )
         {
-            SerializedObject fwdObj = new SerializedObject()
+            foreach( var collider in transform.GetComponents<Collider>() )
             {
-                { "is_trigger", true }
-            };
-            SerializedObject revObj = new SerializedObject()
-            {
-                { "is_trigger", collider.isTrigger }
-            };
-            return (fwdObj, revObj);
+                SerializedObject fwdObj = new SerializedObject()
+                {
+                    { "is_trigger", true }
+                };
+                SerializedObject revObj = new SerializedObject()
+                {
+                    { "is_trigger", collider.isTrigger }
+                };
+
+                yield return new( collider, (fwdObj, revObj) );
+            }
         }
 
         const string GhostMaterialAssetID = "builtin::Resources/Materials/ghost";
         static Material ghostMat = null;
 
-        private static (SerializedData fwd, SerializedData rev) GetRendererPatch( Renderer renderer )
+        private static IEnumerable<KeyValuePair<Component, (SerializedData fwd, SerializedData rev)>> GetRendererPatches( Transform transform )
         {
-            if( ghostMat == null )
+            foreach( var renderer in transform.GetComponents<Renderer>() )
             {
-                ghostMat = AssetRegistry.Get<Material>( GhostMaterialAssetID );
+                if( ghostMat == null )
+                {
+                    ghostMat = AssetRegistry.Get<Material>( GhostMaterialAssetID );
+                }
+
+                var sharedMaterials = renderer.sharedMaterials;
+
+                var mats = sharedMaterials.Select( mat => ((IReverseReferenceMap)null).WriteAssetReference( mat ) );
+                SerializedArray origMats = new SerializedArray( mats );
+
+                SerializedArray ghostMats = new SerializedArray();
+                for( int i = 0; i < sharedMaterials.Length; i++ )
+                    ghostMats.Add( ((IReverseReferenceMap)null).WriteAssetReference( ghostMat ) );
+
+                SerializedObject fwdObj = new SerializedObject()
+                {
+                    { "shared_materials", ghostMats }
+                };
+                SerializedObject revObj = new SerializedObject()
+                {
+                    { "shared_materials", origMats }
+                };
+
+                yield return new( renderer, (fwdObj, revObj) );
             }
-
-            var sharedMaterials = renderer.sharedMaterials;
-
-            var mats = sharedMaterials.Select( mat => ((IReverseReferenceMap)null).WriteAssetReference( mat ) );
-            SerializedArray origMats = new SerializedArray( mats );
-
-            SerializedArray ghostMats = new SerializedArray();
-            for( int i = 0; i < sharedMaterials.Length; i++ )
-                ghostMats.Add( ((IReverseReferenceMap)null).WriteAssetReference( ghostMat ) );
-
-            SerializedObject fwdObj = new SerializedObject()
-            {
-                { "shared_materials", ghostMats }
-            };
-            SerializedObject revObj = new SerializedObject()
-            {
-                { "shared_materials", origMats }
-            };
-            return (fwdObj, revObj);
         }
 
-        private static (SerializedData fwd, SerializedData rev) GetFDryMassPatch( FDryMass mass )
+        private static IEnumerable<KeyValuePair<Component, (SerializedData fwd, SerializedData rev)>> GetFDryMassPatches( Transform transform )
         {
-            SerializedObject fwdObj = new SerializedObject()
+            foreach( var mass in transform.GetComponents<FDryMass>() )
             {
-                { "mass", 0.0f }
-            };
-            SerializedObject revObj = new SerializedObject()
-            {
-                { "mass", mass.Mass }
-            };
-            return (fwdObj, revObj);
+                SerializedObject fwdObj = new SerializedObject()
+                {
+                    { "mass", 0.0f }
+                };
+                SerializedObject revObj = new SerializedObject()
+                {
+                    { "mass", mass.Mass }
+                };
+
+                yield return new( mass, (fwdObj, revObj) );
+            }
         }
     }
 }

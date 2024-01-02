@@ -13,6 +13,7 @@ namespace UnityPlus.Serialization
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public static SerializedData GetData( this Component c, IReverseReferenceMap s )
         {
+#warning TODO - store info about enabled/disabled.
             switch( c )
             {
                 case IPersistent comp:

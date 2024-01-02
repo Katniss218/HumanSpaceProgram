@@ -112,53 +112,44 @@ namespace KSS.GameplayScene
         public ConstructionState State { get; private set; } = ConstructionState.Waiting;
 
         /// <summary>
-        /// Cumulative total build speed per second. This is divided by the number of child objects currently under construction.
+        /// Cumulative total build speed in [build points per second]. <br/>
+        /// This is divided by the number of in-progress constructibles to obtain the delta.
         /// </summary>
         [field: SerializeField]
-        public float BuildSpeedTotal { get; set; }
-
-        /// <summary>
-        /// The total number of parts (constructibles) belonging to this construction site.
-        /// </summary>
-        public int TotalPartCount { get => _constructibles.Count; }
-
-        /// <summary>
-        /// The sum of parts (constructibles) constructed (when constructing) or parts deconstructed (when deconstructing).
-        /// </summary>
-        public int CompletedPartCount { get; private set; } = 0;
+        public float BuildSpeed { get; set; }
 
         List<FConstructible> _constructibles = new List<FConstructible>();
 
+        /// <summary>
+        /// Starts the process of construction.
+        /// </summary>
         /// <remarks>
-        /// Can be called while deconstructing to cancel, and start constructing instead.
+        /// If called while deconstructing, it will start constructing from where it got to.
         /// </remarks>
-        public void StartConstruction()
+        public void StartConstructing()
         {
             if( State == ConstructionState.Constructing )
                 throw new InvalidOperationException( $"Can't start construction when already constructing." );
 
-            this.CompletedPartCount = _constructibles
-                .Where( v => v.CurrentState == FConstructible.State.FinishedConstruction )
-                .Count();
             this.State = ConstructionState.Constructing;
         }
 
+        /// <summary>
+        /// Starts the process of deconstruction.
+        /// </summary>
         /// <remarks>
-        /// Can be called while constructing to cancel, and start deconstructing instead.
+        /// If called while constructing, it will start deconstructing from where it got to.
         /// </remarks>
-        public void StartDeconstruction()
+        public void StartDeconstructing()
         {
             if( State == ConstructionState.Deconstructing )
                 throw new InvalidOperationException( $"Can't start deconstruction when already deconstructing." );
 
-            this.CompletedPartCount = _constructibles
-                .Where( v => v.CurrentState == FConstructible.State.FinishedDeconstruction )
-                .Count();
             this.State = ConstructionState.Deconstructing;
         }
 
         /// <summary>
-        /// Pauses the construction/deconstruction.
+        /// Pauses the process of construction/deconstruction.
         /// </summary>
         public void Pause()
         {
@@ -169,58 +160,59 @@ namespace KSS.GameplayScene
                 _ => throw new InvalidOperationException( $"Can't pause if there is no ongoing construction/deconstruction." ),
             };
         }
+        
+        public void Unpause()
+        {
+            this.State = this.State switch
+            {
+                ConstructionState.PausedConstructing => ConstructionState.Constructing,
+                ConstructionState.PausedDeconstructing => ConstructionState.Deconstructing,
+                _ => throw new InvalidOperationException( $"Can't unpause if nothing is paused." ),
+            };
+        }
 
         void Update()
         {
             if( UnityEngine.Input.GetKeyDown( KeyCode.G ) )
             {
-                this.BuildSpeedTotal = 90f;
-                StartConstruction();
+                this.BuildSpeed = 90f;
+                StartConstructing();
             }
-
             if( UnityEngine.Input.GetKeyDown( KeyCode.H ) )
             {
-                this.BuildSpeedTotal = 90f;
-                StartDeconstruction();
+                this.BuildSpeed = 90f;
+                StartDeconstructing();
             }
-
             if( UnityEngine.Input.GetKeyDown( KeyCode.J ) )
             {
-                this.BuildSpeedTotal = 90f;
+                this.BuildSpeed = 90f;
                 Pause();
             }
 
-            float buildSpeedPerPart = BuildSpeedTotal / (TotalPartCount - CompletedPartCount);
-
-            if( CompletedPartCount == TotalPartCount )
-            {
-                Destroy( this );
-               // ForceFinish();
-                return;
-            }
+            FConstructible[] inProgressConstructibles = null;
+            float buildPointsDelta = 0.0f;
 
             if( State == ConstructionState.Constructing )
             {
-                var inProgressConstructibles = _constructibles.Where( c => c.CurrentState != FConstructible.State.FinishedConstruction );
-                foreach( var constructible in inProgressConstructibles )
-                {
-                    constructible.ChangeBuildPoints( buildSpeedPerPart * TimeManager.DeltaTime );
-                    if( constructible.CurrentState == FConstructible.State.FinishedConstruction )
-                    {
-                        CompletedPartCount++;
-                    }
-                }
+                inProgressConstructibles = _constructibles.Where( c => c.BuildPercent < 1.0f ).ToArray();
+                buildPointsDelta = (BuildSpeed / inProgressConstructibles.Length) * TimeManager.DeltaTime;
             }
-            if( State == ConstructionState.Deconstructing )
+            else if( State == ConstructionState.Deconstructing )
             {
-                var inProgressConstructibles = _constructibles.Where( c => c.CurrentState != FConstructible.State.FinishedDeconstruction );
+                inProgressConstructibles = _constructibles.Where( c => c.BuildPercent > 0.0f ).ToArray();
+                buildPointsDelta = (-BuildSpeed / inProgressConstructibles.Length) * TimeManager.DeltaTime;
+            }
+
+            if( inProgressConstructibles != null )
+            {
+                if( !inProgressConstructibles.Any() )
+                {
+                    Destroy( this );
+                    return;
+                }
                 foreach( var constructible in inProgressConstructibles )
                 {
-                    constructible.ChangeBuildPoints( -buildSpeedPerPart * TimeManager.DeltaTime );
-                    if( constructible.CurrentState == FConstructible.State.FinishedDeconstruction )
-                    {
-                        CompletedPartCount++;
-                    }
+                    constructible.BuildPoints += buildPointsDelta;
                 }
             }
         }
@@ -270,20 +262,5 @@ namespace KSS.GameplayScene
         {
             return false;
         }
-
-        /// <summary>
-        /// Spawns a ghosted vessel/part.
-        /// </summary>
-        /*public static Transform Spawn( string vesselId )
-        {
-            // step 1. player clicks, and spawns ghost to place.
-
-            //BidirectionalReferenceStore refStore = new BidirectionalReferenceStore();
-            GameObject rootGo = PartRegistry.Load( new Core.Mods.NamespacedIdentifier( "Vessels", vesselId ) );
-
-            //BidirectionalReferenceStore remappedRefStore = refStore.RemapRandomly(); // remapping allows multiple instances of the same objects (the same IDs) to be loaded at any given time.
-
-            return rootGo.transform;
-        }*/
     }
 }
