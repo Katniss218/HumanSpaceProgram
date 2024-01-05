@@ -23,11 +23,17 @@ namespace KSS.GameplayScene
 
     public static class ConstructionState_Ex
     {
+        /// <summary>
+        /// Does the state represents construction (either ongoing or paused)?
+        /// </summary>
         public static bool IsConstruction( this ConstructionState state )
         {
             return (int)state > 0;
         }
 
+        /// <summary>
+        /// Does the state represents deconstruction (either ongoing or paused)?
+        /// </summary>
         public static bool IsDeconstruction( this ConstructionState state )
         {
             return (int)state < 0;
@@ -84,7 +90,7 @@ namespace KSS.GameplayScene
         /// <summary>
         /// Checks whether a given transform belongs to a construction site, and that the construction has started.
         /// </summary>
-        public static bool IsUnderActiveConstruction( this Transform part )
+        public static bool IsUnderOngoingConstruction( this Transform part )
         {
             if( part == null )
                 return false;
@@ -99,13 +105,12 @@ namespace KSS.GameplayScene
         /// <summary>
         /// Checks whether a given part belongs to a construction site, and that the construction has started.
         /// </summary>
-        public static bool IsUnderActiveConstruction( this FConstructible part )
+        public static bool IsUnderOngoingConstruction( this FConstructible part )
         {
-            return IsUnderActiveConstruction( part.transform );
+            return IsUnderOngoingConstruction( part.transform );
         }
     }
 
-    [RequireComponent( typeof( RootObjectTransform ) )]
     [DisallowMultipleComponent]
     public class FConstructionSite : MonoBehaviour
     {
@@ -118,7 +123,7 @@ namespace KSS.GameplayScene
         [field: SerializeField]
         public float BuildSpeed { get; set; }
 
-        List<FConstructible> _constructibles = new List<FConstructible>();
+        FConstructible[] _constructibles = new FConstructible[] { };
 
         /// <summary>
         /// Starts the process of construction.
@@ -207,12 +212,24 @@ namespace KSS.GameplayScene
             {
                 if( !inProgressConstructibles.Any() )
                 {
+                    if( this.State.IsDeconstruction() )
+                    {
+                        foreach( var constructible in _constructibles.ToArray() )
+                        {
+                            Destroy( constructible.gameObject );
+                        }
+                    }
                     Destroy( this );
+                    var vessel = this.transform.GetPartObject();
+                    this.transform.SetParent( null ); // required, otherwise part object cache is rebuild with this object's children if deconstructing.
+                    if( vessel != null )
+                        vessel.RecalculatePartCache();
                     return;
                 }
+
                 foreach( var constructible in inProgressConstructibles )
                 {
-                    constructible.BuildPoints += buildPointsDelta;
+                    constructible.BuildPoints += Mathf.Clamp( buildPointsDelta, -constructible.BuildPoints, constructible.MaxBuildPoints - constructible.BuildPoints );
                 }
             }
         }
@@ -222,7 +239,7 @@ namespace KSS.GameplayScene
             // step 6. Player places the ghost.
             // assume the position is already set.
 
-            if( ghostRoot.IsUnderActiveConstruction() )
+            if( ghostRoot.IsUnderOngoingConstruction() )
             {
                 throw new InvalidOperationException( $"can't add while being constructed." );
             }
@@ -248,6 +265,7 @@ namespace KSS.GameplayScene
             {
                 constructionSite = ghostRoot.gameObject.AddComponent<FConstructionSite>();
             }
+            constructionSite._constructibles = AncestralMap<FConstructible>.Create( constructionSite.transform ).Keys.ToArray();
 
             ghostRoot.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
             ghostRoot.transform.SetParent( parent );

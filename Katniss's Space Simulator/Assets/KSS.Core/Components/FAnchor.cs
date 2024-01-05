@@ -10,6 +10,7 @@ namespace KSS.Core.Components
     /// <summary>
     /// Tells HSP that this object should be anchored to the ground.
     /// </summary>
+    [DisallowMultipleComponent]
     public class FAnchor : MonoBehaviour
     {
 

@@ -178,7 +178,7 @@ namespace KSS.GameplayScene.Tools
                     return;
                 }
 
-                FConstructionSite.TryAddPart( _heldPart, hitVessel.RootPart );
+                FConstructionSite.TryAddPart( _heldPart, _currentFrameHitObject );
             }
             else
             {

@@ -194,8 +194,10 @@ namespace KSS.UI.SceneFactories
             {
                 CanvasManager.Get( CanvasName.WINDOWS ).AddTextSelectionWindow( "Vessel to create...", "id here", vesselId =>
                 {
+                    Transform root = PartRegistry.Load( new NamespacedIdentifier( "Vessels", vesselId ) ).transform;
 
-                    Transform root = PartRegistry.Load( new Core.Mods.NamespacedIdentifier( "Vessels", vesselId ) ).transform;
+                    foreach( var fc in root.GetComponentsInChildren<FConstructible>() )
+                        fc.BuildPoints = 0.0f;
 
                     ConstructTool tool = GameplaySceneToolManager.UseTool<ConstructTool>();
                     tool.SetGhostPart( root, Vector3.zero );

@@ -111,14 +111,16 @@ namespace KSS.Components
         {
             // This method shouldn't handle the destroying of the part from the vessel after deconstruction is 'finished'.
 
-            if( this.BuildPercent <= 0.0f && (this.BuildPercent - delta) > 0.0f ) // 2nd part will be false on subsequent calls.
+            // This is inefficient, but we might want to continuously update the ghost's state.
+            if( this.BuildPercent < 1.0f )
             {
                 RunOriginalToGhost();
                 var vessel = this.transform.GetPartObject();
                 if( vessel != null )
                     vessel.RecalculatePartCache();
             }
-            if( this.BuildPercent >= 1.0f && (this.BuildPercent - delta) < 0.0f ) // 2nd part will be false on subsequent calls.
+
+            if( this.BuildPercent >= 1.0f )
             {
                 RunGhostToOriginal();
                 var vessel = this.transform.GetPartObject();
@@ -180,6 +182,7 @@ namespace KSS.Components
                     }
                 }
             }
+            OnAfterBuildPointPercentChanged( this.BuildPercent );
 
             // construction site would only manage the distribution of build points, etc.
         }
@@ -210,15 +213,6 @@ namespace KSS.Components
 
         public void SetData( IForwardReferenceMap l, SerializedData data )
         {
-            if( data.TryGetValue( "max_build_points", out var maxBuildPoints ) )
-                this.MaxBuildPoints = (float)maxBuildPoints;
-
-            if( data.TryGetValue( "build_points", out var buildPoints ) )
-            {
-                this.BuildPoints = (float)buildPoints;
-                OnAfterBuildPointPercentChanged( this.BuildPoints );
-            }
-
             if( data.TryGetValue( "saved_patch", out var savedPatch ) )
             {
                 _twoWayPatch.Clear();
@@ -228,6 +222,15 @@ namespace KSS.Components
                     Component c = (Component)l.GetObj( Guid.ParseExact( kvp.Key, "D" ) );
                     this._twoWayPatch.Add( c, (kvp.Value["fwd"], kvp.Value["rev"]) );
                 }
+            }
+
+            if( data.TryGetValue( "max_build_points", out var maxBuildPoints ) )
+                this._maxBuildPoints = (float)maxBuildPoints;
+
+            if( data.TryGetValue( "build_points", out var buildPoints ) )
+            {
+                this._buildPoints = (float)buildPoints;
+                OnAfterBuildPointPercentChanged( this.BuildPoints );
             }
 
             // todo - conditions.
