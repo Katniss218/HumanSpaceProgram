@@ -165,7 +165,7 @@ namespace KSS.GameplayScene
                 _ => throw new InvalidOperationException( $"Can't pause if there is no ongoing construction/deconstruction." ),
             };
         }
-        
+
         public void Unpause()
         {
             this.State = this.State switch
@@ -212,18 +212,28 @@ namespace KSS.GameplayScene
             {
                 if( !inProgressConstructibles.Any() )
                 {
-                    if( this.State.IsDeconstruction() )
+                    if( this.State == ConstructionState.Deconstructing )
                     {
                         foreach( var constructible in _constructibles.ToArray() )
                         {
                             Destroy( constructible.gameObject );
                         }
                     }
-                    Destroy( this );
+
                     var vessel = this.transform.GetPartObject();
-                    this.transform.SetParent( null ); // required, otherwise part object cache is rebuild with this object's children if deconstructing.
+
+                    if( this.State == ConstructionState.Deconstructing )
+                    {
+                        this.transform.SetParent( null ); // required, otherwise part object cache is rebuild with this object's children if deconstructing.
+                    }
+
+                    Destroy( this );
+
                     if( vessel != null )
+                    {
                         vessel.RecalculatePartCache();
+                    }
+
                     return;
                 }
 

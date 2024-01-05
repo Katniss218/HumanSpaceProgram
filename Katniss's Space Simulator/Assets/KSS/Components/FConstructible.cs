@@ -64,10 +64,9 @@ namespace KSS.Components
             get => _buildPoints;
             set
             {
-                float perc = BuildPercent;
+                float oldBuildPerc = BuildPercent;
                 _buildPoints = value;
-                float delta = BuildPercent - perc;
-                OnAfterBuildPointPercentChanged( delta );
+                OnAfterBuildPointPercentChanged( BuildPercent - oldBuildPerc );
             }
         }
 
@@ -84,10 +83,9 @@ namespace KSS.Components
             get => _maxBuildPoints;
             set
             {
-                float perc = BuildPercent;
+                float oldBuildPerc = BuildPercent;
                 _maxBuildPoints = value;
-                float delta = BuildPercent - perc;
-                OnAfterBuildPointPercentChanged( delta );
+                OnAfterBuildPointPercentChanged( BuildPercent - oldBuildPerc );
             }
         }
 
@@ -96,7 +94,6 @@ namespace KSS.Components
         /// </summary>
         public float BuildPercent => BuildPoints / MaxBuildPoints;
 
-        [field: SerializeField]
         public List<IConstructionCondition> Conditions { get; set; }
 
         /// <summary>
@@ -111,8 +108,8 @@ namespace KSS.Components
         {
             // This method shouldn't handle the destroying of the part from the vessel after deconstruction is 'finished'.
 
-            // This is inefficient, but we might want to continuously update the ghost's state.
-            if( this.BuildPercent < 1.0f )
+            if( (this.BuildPercent >= 0.0f && this.BuildPercent - delta <= 0.0f)  // start construction
+             || (this.BuildPercent < 1.0f && this.BuildPercent - delta >= 1.0f) ) // start deconstruction
             {
                 RunOriginalToGhost();
                 var vessel = this.transform.GetPartObject();
@@ -120,7 +117,7 @@ namespace KSS.Components
                     vessel.RecalculatePartCache();
             }
 
-            if( this.BuildPercent >= 1.0f )
+            if( this.BuildPercent >= 1.0f && this.BuildPercent - delta <= 1.0f ) // end construction
             {
                 RunGhostToOriginal();
                 var vessel = this.transform.GetPartObject();
@@ -145,15 +142,12 @@ namespace KSS.Components
             }
         }
 
-        bool _patchDeserialized = false;
         Dictionary<Component, (SerializedData fwd, SerializedData rev)> _twoWayPatch = new Dictionary<Component, (SerializedData fwd, SerializedData rev)>();
 
         void Start()
         {
-            if( !_patchDeserialized )
-            {
-                SaveState();
-            }
+            SaveState();
+            OnAfterBuildPointPercentChanged( this.BuildPercent );
         }
 
         public static List<Func<Transform, IEnumerable<KeyValuePair<Component, (SerializedData fwd, SerializedData rev)>>>> PatchGetters { get; private set; } = new()
@@ -166,7 +160,6 @@ namespace KSS.Components
         private void SaveState()
         {
             _twoWayPatch.Clear();
-            _patchDeserialized = false;
 
             AncestralMap<FConstructible> partMap = AncestralMap<FConstructible>.Create( transform );
             if( partMap.TryGetValue( this, out var ourPartsTransforms ) )
@@ -182,7 +175,6 @@ namespace KSS.Components
                     }
                 }
             }
-            OnAfterBuildPointPercentChanged( this.BuildPercent );
 
             // construction site would only manage the distribution of build points, etc.
         }
@@ -193,45 +185,21 @@ namespace KSS.Components
 
         public SerializedData GetData( IReverseReferenceMap s )
         {
-            SerializedObject dict = new SerializedObject();
-            foreach( var kvp in this._twoWayPatch )
-            {
-                dict.Add( s.GetID( kvp.Key ).ToString( "D" ), new SerializedObject()
-                {
-                    { "fwd", kvp.Value.fwd },
-                    { "rev", kvp.Value.rev }
-                } );
-            }
             return new SerializedObject()
             {
                 { "build_points", this.BuildPoints },
                 { "max_build_points", this.MaxBuildPoints },
-                { "saved_patch", dict }
                 // todo - conditions.
             };
         }
 
         public void SetData( IForwardReferenceMap l, SerializedData data )
         {
-            if( data.TryGetValue( "saved_patch", out var savedPatch ) )
-            {
-                _twoWayPatch.Clear();
-                _patchDeserialized = true;
-                foreach( var kvp in (SerializedObject)savedPatch )
-                {
-                    Component c = (Component)l.GetObj( Guid.ParseExact( kvp.Key, "D" ) );
-                    this._twoWayPatch.Add( c, (kvp.Value["fwd"], kvp.Value["rev"]) );
-                }
-            }
-
             if( data.TryGetValue( "max_build_points", out var maxBuildPoints ) )
                 this._maxBuildPoints = (float)maxBuildPoints;
 
             if( data.TryGetValue( "build_points", out var buildPoints ) )
-            {
                 this._buildPoints = (float)buildPoints;
-                OnAfterBuildPointPercentChanged( this.BuildPoints );
-            }
 
             // todo - conditions.
         }
