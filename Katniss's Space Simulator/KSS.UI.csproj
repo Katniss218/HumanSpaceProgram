@@ -58,12 +58,10 @@
   <ItemGroup>
     <Compile Include="Assets\KSS.UI\AltitudeReadoutUI.cs" />
     <Compile Include="Assets\KSS.UI\SaveMetadataUI.cs" />
-    <Compile Include="Assets\KSS.UI\VesselHUDManager.cs" />
     <Compile Include="Assets\KSS.UI\CanvasName.cs" />
     <Compile Include="Assets\KSS.UI\Windows\ConfirmationWindow_Ex.cs" />
     <Compile Include="Assets\KSS.UI\SceneFactories\GameplaySceneUIFactory.cs" />
     <Compile Include="Assets\KSS.UI\TimewarpSelectorUI.cs" />
-    <Compile Include="Assets\KSS.UI\VesselHUD.cs" />
     <Compile Include="Assets\KSS.UI\IResourceContainerUI.cs" />
     <Compile Include="Assets\KSS.UI\PartListEntryUI.cs" />
     <Compile Include="Assets\KSS.UI\Windows\LoadWindow.cs" />
@@ -82,6 +80,10 @@
     <Compile Include="Assets\KSS.UI\AccelerationReadoutUI.cs" />
     <Compile Include="Assets\KSS.UI\SceneFactories\DesignSceneUIFactory.cs" />
     <Compile Include="Assets\KSS.UI\FPSCounterUI.cs" />
+    <Compile Include="Assets\KSS.UI\HUDs\VesselHUDManager.cs" />
+    <Compile Include="Assets\KSS.UI\HUDs\VesselHUD.cs" />
+    <Compile Include="Assets\KSS.UI\HUDs\ConstructionSiteHUDManager.cs" />
+    <Compile Include="Assets\KSS.UI\HUDs\ConstructionSiteHUD.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.UI\___KSS.UI.asmdef" />

@@ -176,6 +176,16 @@ namespace KSS.GameplayScene
             };
         }
 
+        void OnEnable()
+        {
+            HSPEvent.EventManager.TryInvoke( HSPEventVanilla.GAMEPLAY_AFTER_CONSTRUCTION_SITE_CREATED, this );
+        }
+
+        void OnDisable()
+        {
+            HSPEvent.EventManager.TryInvoke( HSPEventVanilla.GAMEPLAY_AFTER_CONSTRUCTION_SITE_DESTROYED, this );
+        }
+
         void Update()
         {
             if( UnityEngine.Input.GetKeyDown( KeyCode.G ) )
@@ -224,7 +234,7 @@ namespace KSS.GameplayScene
 
                     if( this.State == ConstructionState.Deconstructing )
                     {
-                        this.transform.SetParent( null ); // required, otherwise part object cache is rebuild with this object's children if deconstructing.
+                        this.transform.SetParent( null ); // This stops the part object from including the deconstructed children when recalculating.
                     }
 
                     Destroy( this );

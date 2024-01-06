@@ -91,6 +91,12 @@ namespace UnityEngine
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static double Distance( Vector3Dbl v1, Vector3Dbl v2 )
+        {
+            return (v1 - v2).magnitude;
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public static Vector3Dbl Add( Vector3Dbl v1, Vector3Dbl v2 )
         {
             return new Vector3Dbl( v1.x + v2.x, v1.y + v2.y, v1.z + v2.z );

@@ -1,6 +1,8 @@
 ﻿using KSS.Components;
 using KSS.Core;
 using KSS.Core.Components;
+using KSS.Core.Physics;
+using KSS.Core.ReferenceFrames;
 using KSS.Input;
 using System;
 using System.Collections.Generic;
@@ -31,9 +33,9 @@ namespace KSS.GameplayScene.Tools
         Camera _camera;
         FAttachNode.SnappingCandidate? _currentSnap = null;
 
-        private Ray _currentFrameCursorRay;
-        private Transform _currentFrameHitObject;
-        private RaycastHit _currentFrameHit;
+        private Ray _cursorRay;
+        private Transform _hitObject;
+        private RaycastHit _hit;
 
         /// <summary>
         /// sets or resets the currently held ghost hierarchy.
@@ -65,15 +67,15 @@ namespace KSS.GameplayScene.Tools
             if( UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() )
                 return;
 
-            _currentFrameCursorRay = _camera.ScreenPointToRay( UnityEngine.Input.mousePosition );
+            _cursorRay = _camera.ScreenPointToRay( UnityEngine.Input.mousePosition );
 
-            if( Physics.Raycast( _currentFrameCursorRay, out _currentFrameHit, 8192, 1 << (int)Layer.PART_OBJECT ) )
+            if( Physics.Raycast( _cursorRay, out _hit, 8192, 1 << (int)Layer.PART_OBJECT ) )
             {
-                _currentFrameHitObject = FClickInteractionRedirect.TryRedirect( _currentFrameHit.collider.transform );
+                _hitObject = FClickInteractionRedirect.TryRedirect( _hit.collider.transform );
             }
             else
             {
-                _currentFrameHitObject = null;
+                _hitObject = null;
             }
 
             PositionHeldPart();
@@ -162,7 +164,7 @@ namespace KSS.GameplayScene.Tools
         {
             if( _currentSnap == null )
             {
-                if( _currentFrameHitObject == null )
+                if( _hitObject == null )
                 {
                     return;
                 }
@@ -172,13 +174,13 @@ namespace KSS.GameplayScene.Tools
                     return;
                 }
 
-                Vessel hitVessel = _currentFrameHitObject.GetVessel();
+                Vessel hitVessel = _hitObject.GetVessel();
                 if( hitVessel == null )
                 {
                     return;
                 }
 
-                FConstructionSite.TryAddPart( _heldPart, _currentFrameHitObject );
+                FConstructionSite.TryAddPart( _heldPart, _hitObject );
             }
             else
             {
@@ -201,48 +203,52 @@ namespace KSS.GameplayScene.Tools
 
         private void PositionHeldPart()
         {
+            // Surface attachment.
             if( !UnityEngine.Input.GetKey( KeyCode.LeftAlt ) )
             {
-                // Snap to surface of other parts.
-
-                if( _currentFrameHitObject != null )
+                if( _hitObject != null )
                 {
-                    Vessel hitVessel = _currentFrameHitObject.GetVessel();
+                    Vessel hitVessel = _hitObject.GetVessel();
                     if( hitVessel == null )
                     {
                         return;
                     }
 
-                    Vector3 newPos = _currentFrameHit.point;
+                    Vector3 newHeldPosition = _hit.point;
                     if( AngleSnappingEnabled )
                     {
-                        Vector3 projectedPoint = Vector3.ProjectOnPlane( (_currentFrameHitObject.position - _currentFrameHit.point), _currentFrameHitObject.up ).normalized;
-                        float angle = Vector3.SignedAngle( _currentFrameHitObject.right, projectedPoint, _currentFrameHitObject.up );
+                        Vector3 projectedPoint = Vector3.ProjectOnPlane( (_hitObject.position - _hit.point), _hitObject.up ).normalized;
+                        float angle = Vector3.SignedAngle( _hitObject.right, projectedPoint, _hitObject.up );
 
                         float roundedAngle = AngleSnappingInterval * Mathf.Round( angle / AngleSnappingInterval );
 
-                        Quaternion rotation = Quaternion.AngleAxis( roundedAngle + 180, _currentFrameHitObject.up ); // angle + 180 appears to be needed, for some reason.
+                        Quaternion rotation = Quaternion.AngleAxis( roundedAngle + 180, _hitObject.up ); // `angle + 180` appears to be needed, for some reason.
 
-                        newPos = rotation * (_currentFrameHitObject.right * Vector3.Distance( _currentFrameHit.point, _currentFrameHitObject.position )) // position relative to (0,0,0)
-                            + _currentFrameHitObject.position                                                                                            // translate from (0,0,0) to the part
-                            + new Vector3( 0, (_currentFrameHit.point.y - _currentFrameHitObject.position.y), 0 );                                       // translate vertically from the part to to the cursor
+                        newHeldPosition = rotation * (_hitObject.right * Vector3.Distance( _hit.point, _hitObject.position )) // Position relative to (0,0,0).
+                            + _hitObject.position                                                                             // Translate from (0,0,0) to the part.
+                            + new Vector3( 0, (_hit.point.y - _hitObject.position.y), 0 );                                    // Translate vertically from the part origin to to the cursor.
                     }
 
-                    _heldPart.rotation = Quaternion.LookRotation( _currentFrameHit.normal, _currentFrameHitObject.up ) * _heldRotation;
-                    _heldPart.position = newPos; // todo - use surface attach node when available.
+                    _heldPart.rotation = Quaternion.LookRotation( _hit.normal, _hitObject.up ) * _heldRotation;
+                    _heldPart.position = newHeldPosition; // TODO - Use surface attach node when available.
                     return;
                 }
             }
 
+            // Node attachment.
             Plane viewPlane = new Plane( _camera.transform.forward, (_heldPart.position + _heldOffset) );
-            if( viewPlane.Raycast( _currentFrameCursorRay, out float intersectionDistance ) )
+            if( viewPlane.Raycast( _cursorRay, out float intersectionDistance ) )
             {
-                Vector3 planePoint = _currentFrameCursorRay.GetPoint( intersectionDistance );
+                Vector3 planePoint = _cursorRay.GetPoint( intersectionDistance );
 
                 // Reset the position/rotation before snapping to prevent the previous snapping from affecting what nodes will snap.
                 // It should always snap "as if the part is at the cursor", not wherever it was snapped to previously.
                 _heldPart.position = planePoint - _heldOffset;
-                _heldPart.rotation = _heldRotation;
+
+                var closestVessel = VesselManager.LoadedVessels.OrderBy( v => Vector3.Distance( v.transform.position, planePoint ) ).First();
+
+                // Rotation should take into account the orientation of the vessel we are most likely trying to snap to.
+                _heldPart.rotation = closestVessel.transform.rotation * _heldRotation;
 
                 TrySnappingHeldPartToAttachmentNode( viewPlane.normal );
             }
@@ -251,7 +257,7 @@ namespace KSS.GameplayScene.Tools
         private void TrySnappingHeldPartToAttachmentNode( Vector3 viewDirection )
         {
             FAttachNode[] heldNodes = _heldPart.GetComponentsInChildren<FAttachNode>();
-            FAttachNode[] targetNodes = VesselManager.GetLoadedVessels().GetComponentsInChildren<FAttachNode>().ToArray();
+            FAttachNode[] targetNodes = VesselManager.LoadedVessels.GetComponentsInChildren<FAttachNode>().ToArray();
 
             FAttachNode.SnappingCandidate? nodePair = FAttachNode.GetBestSnappingNodePair( heldNodes, targetNodes, viewDirection );
             if( nodePair != null )

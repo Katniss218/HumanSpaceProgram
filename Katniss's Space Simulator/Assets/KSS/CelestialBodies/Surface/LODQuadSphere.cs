@@ -68,15 +68,9 @@ namespace KSS.CelestialBodies.Surface
 
         List<LODQuad> _activeQuads = new List<LODQuad>();
 
-        private static Vector3Dbl[] GetVesselPOIs()
+        private static IEnumerable<Vector3Dbl> GetVesselPOIs()
         {
-            Vessel[] vessels = VesselManager.GetLoadedVessels();
-            Vector3Dbl[] airfPOIs = new Vector3Dbl[vessels.Length];
-            for( int i = 0; i < vessels.Length; i++ )
-            {
-                airfPOIs[i] = vessels[i].AIRFPosition;
-            }
-            return airfPOIs;
+            return VesselManager.LoadedVessels.Select( v => v.AIRFPosition );
         }
 
         private static bool ApproximatelyDifferent( Vector3Dbl lhs, Vector3Dbl rhs )
@@ -116,7 +110,7 @@ namespace KSS.CelestialBodies.Surface
             List<LODQuad> newActiveQuads = new List<LODQuad>( _activeQuads );
             List<LODQuad> needRemeshing = new List<LODQuad>();
 
-            Vector3Dbl[] airfPOIs = GetVesselPOIs();
+            Vector3Dbl[] airfPOIs = GetVesselPOIs().ToArray();
 
             bool allPoisTheSame = NewPoisTheSameAsLastFrame( airfPOIs );
 
