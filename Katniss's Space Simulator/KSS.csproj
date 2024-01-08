@@ -84,6 +84,7 @@
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadSphere.cs" />
     <Compile Include="Assets\KSS\DesignScene\DesignSceneEscapeInputController.cs" />
     <Compile Include="Assets\KSS\DesignScene\DesignSceneToolManager.cs" />
+    <Compile Include="Assets\KSS\HSPEventVanilla.cs" />
     <Compile Include="Assets\KSS\Components\FRocketEngine.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuad.cs" />
     <Compile Include="Assets\KSS\Input\HierarchicalInputChannel.cs" />
@@ -102,7 +103,6 @@
     <Compile Include="Assets\KSS\GameplayScene\GameplaySceneToolManager.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadTree_NodeUtils.cs" />
     <Compile Include="Assets\KSS\AssetLoaders\GameDataJsonVesselFactory.cs" />
-    <Compile Include="Assets\KSS\HSPEventVanilla.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS\CelestialBodies\Surface\TerrainShader.shader" />
