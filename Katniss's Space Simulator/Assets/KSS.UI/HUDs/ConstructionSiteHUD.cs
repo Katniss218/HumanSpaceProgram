@@ -32,6 +32,13 @@ namespace KSS.UI.HUDs
 
         */
 
+        private UIIcon _statusIcon;
+
+        private UIIcon _progressBar;
+
+        private UIButton _pauseResumeButton;
+        private UIButton _reverseButton;
+
         public FConstructionSite ConstructionSite { get; private set; }
 
         void LateUpdate()
@@ -44,11 +51,19 @@ namespace KSS.UI.HUDs
             if( constructionSite == null )
                 throw new ArgumentNullException( nameof( constructionSite ) );
 
-            UIPanel panel = parent.AddPanel( new UILayoutInfo( UILayoutInfo.Middle, Vector2.zero, new Vector2( 50, 50 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_list_entry_background" ) );
-           // UIButton button = parent.AddButton( layoutInfo, background, null );
+            UIPanel panel = parent.AddPanel( new UILayoutInfo( UILayoutInfo.Middle, UILayoutInfo.Middle, UILayoutInfo.BottomLeft, Vector2.zero, new Vector2( 125, 55 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/csite_hud" ) );
+
+            UIIcon progressIcon = panel.AddIcon( new UILayoutInfo( UILayoutInfo.TopLeft, new Vector2( 21, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/csite_progress_bar" ) );
+            UIIcon statusicon = panel.AddIcon( new UILayoutInfo( UILayoutInfo.TopLeft, new Vector2( 26, -5 ), new Vector2( 20, 20 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/csite_status_in_progress" ) );
+            UIButton button = panel.AddButton( new UILayoutInfo( UILayoutInfo.TopLeft, new Vector2( 53, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_pause" ), null );
+            UIButton revB = panel.AddButton( new UILayoutInfo( UILayoutInfo.TopLeft, new Vector2( 85, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null )
+                .WithText( UILayoutInfo.Fill(), "rev.", out _ );
 
             ConstructionSiteHUD uiHUD = panel.gameObject.AddComponent<ConstructionSiteHUD>();
             uiHUD.ConstructionSite = constructionSite;
+            uiHUD._statusIcon = statusicon;
+            uiHUD._pauseResumeButton = button;
+            uiHUD._reverseButton = revB;
             return uiHUD;
         }
     }

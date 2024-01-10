@@ -129,14 +129,14 @@ namespace KSS.UI.SceneFactories
         {
             if( ActiveObjectManager.ActiveObject == null )
             {
-                UIPanel topPanel = _mainPanel.AddPanel( UILayoutInfo.FillHorizontal( 0, 0, 1f, 0, 30 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/top_panel_background" ) );
+                UIPanel topPanel = _mainPanel.AddPanel( UILayoutInfo.FillHorizontal( -15, -15, 1f, 0, 30 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/top_panel" ) );
 
-                UIPanel p1 = topPanel.AddPanel( UILayoutInfo.FillVertical( 0, 0, 0f, 20, 110 ), null );
-                UIButton newBtn = p1.AddButton( new UILayoutInfo( UILayoutInfo.BottomLeft, new Vector2( 0, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_new" ), null );
-                UIButton openBtn = p1.AddButton( new UILayoutInfo( UILayoutInfo.BottomLeft, new Vector2( 40, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_open" ), () =>
+                UIPanel p1 = topPanel.AddPanel( UILayoutInfo.FillVertical( 0, 0, 0f, 35, 110 ), null );
+                UIButton newBtn = p1.AddButton( new UILayoutInfo( UILayoutInfo.BottomLeft, new Vector2( 0, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_new" ), null );
+                UIButton openBtn = p1.AddButton( new UILayoutInfo( UILayoutInfo.BottomLeft, new Vector2( 40, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_open" ), () =>
                 {
                 } );
-                UIButton saveBtn = p1.AddButton( new UILayoutInfo( UILayoutInfo.BottomLeft, new Vector2( 80, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_save" ), () =>
+                UIButton saveBtn = p1.AddButton( new UILayoutInfo( UILayoutInfo.BottomLeft, new Vector2( 80, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_save" ), () =>
                 {
                 } );
 
@@ -151,14 +151,14 @@ namespace KSS.UI.SceneFactories
             }
             else
             {
-                UIPanel topLeftPanel = _mainPanel.AddPanel( new UILayoutInfo( UILayoutInfo.TopLeft, Vector2.zero, new Vector2( 400, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/top_panel_background" ) );
+                UIPanel topLeftPanel = _mainPanel.AddPanel( new UILayoutInfo( UILayoutInfo.TopLeft, new Vector2( -15, 0 ), new Vector2( 416, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/top_panel" ) );
 
-                UIPanel p1 = topLeftPanel.AddPanel( UILayoutInfo.FillVertical( 0, 0, 0f, 20, 110 ), null );
-                UIButton newBtn = p1.AddButton( new UILayoutInfo( UILayoutInfo.BottomLeft, new Vector2( 0, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_new" ), null );
-                UIButton openBtn = p1.AddButton( new UILayoutInfo( UILayoutInfo.BottomLeft, new Vector2( 40, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_open" ), () =>
+                UIPanel p1 = topLeftPanel.AddPanel( UILayoutInfo.FillVertical( 0, 0, 0f, 35, 110 ), null );
+                UIButton newBtn = p1.AddButton( new UILayoutInfo( UILayoutInfo.BottomLeft, new Vector2( 0, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_new" ), null );
+                UIButton openBtn = p1.AddButton( new UILayoutInfo( UILayoutInfo.BottomLeft, new Vector2( 40, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_open" ), () =>
                 {
                 } );
-                UIButton saveBtn = p1.AddButton( new UILayoutInfo( UILayoutInfo.BottomLeft, new Vector2( 80, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_save" ), () =>
+                UIButton saveBtn = p1.AddButton( new UILayoutInfo( UILayoutInfo.BottomLeft, new Vector2( 80, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_save" ), () =>
                 {
                 } );
 
@@ -171,10 +171,10 @@ namespace KSS.UI.SceneFactories
 
                 TimewarpSelectorUI selector = TimewarpSelectorUI.Create( topLeftPanel, UILayoutInfo.FillVertical( 0, 0, 0f, 230, 110 ), new float[] { 0, 1, 2, 4, 8, 16, 32, 64, 128, 256 } );
 
-                UIPanel topRightPanel = _mainPanel.AddPanel( new UILayoutInfo( UILayoutInfo.TopRight, Vector2.zero, new Vector2( 70, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/top_panel_background" ) );
+                UIPanel topRightPanel = _mainPanel.AddPanel( new UILayoutInfo( UILayoutInfo.TopRight, new Vector2( 15, 0 ), new Vector2( 100, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/top_panel" ) );
 
-                UIPanel p4 = topRightPanel.AddPanel( UILayoutInfo.FillVertical( 0, 0, 1f, -20, 30 ), null );
-                UIButton deselectActive = p4.AddButton( new UILayoutInfo( UILayoutInfo.BottomLeft, new Vector2( 0, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), () =>
+                UIPanel p4 = topRightPanel.AddPanel( UILayoutInfo.FillVertical( 0, 0, 1f, -35, 30 ), null );
+                UIButton deselectActive = p4.AddButton( new UILayoutInfo( UILayoutInfo.BottomLeft, new Vector2( 0, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_leave" ), () =>
                 {
                     ActiveObjectManager.ActiveObject = null;
                 } );

@@ -32,11 +32,11 @@ namespace KSS.UI.HUDs
         [HSPEventListener( HSPEventVanilla.GAMEPLAY_AFTER_CONSTRUCTION_SITE_DESTROYED, "vanilla.csite_huds" )]
         private static void OnConstructionSiteDestroyed( FConstructionSite constructionSite )
         {
+            if( !exists ) // Can be null if exiting a scene - it doesn't affect anything, but gives ugly warnings.
+                return;
+
             foreach( var hud in instance._huds.ToArray() )
             {
-                if( hud == null ) // hud can be null if exiting a scene - it doesn't affect anything, but gives ugly warnings.
-                    return;
-
                 if( hud.ConstructionSite == constructionSite )
                 {
                     Destroy( hud.gameObject );
