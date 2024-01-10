@@ -101,7 +101,7 @@ namespace KSS.Components
         /// </summary>
         public float GetBuildSpeedMultiplier()
         {
-            return Conditions.Sum( c => c.GetBuildSpeedMultiplier( this.transform.position ) );
+            return Conditions?.Sum( c => c.GetBuildSpeedMultiplier( this.transform.position ) ) ?? 1.0f;
         }
 
         void OnAfterBuildPointPercentChanged( float delta )

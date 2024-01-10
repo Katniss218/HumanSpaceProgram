@@ -563,6 +563,8 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: 010002d76dc7a0e48a9a6d050e87f443, type: 3}
   - assetID: builtin::___Scenes/Gameplay
     asset: {fileID: 102900000, guid: 0104d408cf7e4384dae23fbe2673980c, type: 3}
+  - assetID: builtin::Resources/Sprites/UI/csite_status_paused
+    asset: {fileID: 21300000, guid: 31f44c983170b6c4db077c2e54be6d6e, type: 3}
   - assetID: builtin::Resources/Prefabs/testlaunchsite
     asset: {fileID: 2889124796493493744, guid: 315f9171e8abb8347b411d9e90572b3c, type: 3}
   - assetID: builtin::KSS.DevUtils/cube/Zn
@@ -739,7 +741,7 @@ MonoBehaviour:
     asset: {fileID: 8249851232874469727, guid: c92c375e3df22dd43a777a7cccf2c1e0, type: 3}
   - assetID: builtin::_TextMesh Pro/Shaders/TMPro_Surface
     asset: {fileID: 10900000, guid: d930090c0cd643c7b55f19a38538c162, type: 3}
-  - assetID: builtin::Resources/Sprites/UI/csite_status_cant_progress
+  - assetID: builtin::Resources/Sprites/UI/csite_status_blocked
     asset: {fileID: 21300000, guid: d9b626481b0cb4545b8e10628a2516f4, type: 3}
   - assetID: builtin::_TextMesh Pro/Resources/Default Style Sheet
     asset: {fileID: 11400000, guid: f952c082cb03451daed3ee968ac6c63e, type: 2}
@@ -847,7 +849,7 @@ MonoBehaviour:
     asset: {fileID: 2100000, guid: 7e17c63d2327f624ab099cf586363d59, type: 2}
   - assetID: builtin::Resources/intertank_LOD1
     asset: {fileID: 2188999653438109397, guid: 8ee912a8ec4bcfe46963028a215051c8, type: 3}
-  - assetID: builtin::Resources/Sprites/UI/csite_status_in_progress
+  - assetID: builtin::Resources/Sprites/UI/csite_status_ongoing
     asset: {fileID: 21300000, guid: ce36775ad6f3cd745877e927c156cd5f, type: 3}
   - assetID: builtin::Resources/Sprites/UI/attitude_indicator
     asset: {fileID: 21300000, guid: ee19134100d09b54b92af6b7e83bc21b, type: 3}

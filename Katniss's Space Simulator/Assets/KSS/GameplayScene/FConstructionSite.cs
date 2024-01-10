@@ -11,14 +11,31 @@ using UnityPlus.Serialization.ReferenceMaps;
 
 namespace KSS.GameplayScene
 {
+    /// <summary>
+    /// Specifies the state of (de)construction.
+    /// </summary>
     public enum ConstructionState : sbyte
     {
+        /// <summary>
+        /// Indicates that the (de)construction is waiting for the player to approve (start) it.
+        /// </summary>
         NotStarted = 0,
+        /// <summary>
+        /// Construction is ongoing.
+        /// </summary>
         Constructing = 1,
+        /// <summary>
+        /// Construction is paused.
+        /// </summary>
         PausedConstructing = 2,
+        /// <summary>
+        /// Deconstruction is ongoing.
+        /// </summary>
         Deconstructing = -1,
-        PausedDeconstructing = -2,
-        Waiting = 8
+        /// <summary>
+        /// Deconstruction is paused.
+        /// </summary>
+        PausedDeconstructing = -2
     }
 
     public static class ConstructionState_Ex
@@ -114,16 +131,55 @@ namespace KSS.GameplayScene
     [DisallowMultipleComponent]
     public class FConstructionSite : MonoBehaviour
     {
-        public ConstructionState State { get; private set; } = ConstructionState.Waiting;
+        /// <summary>
+        /// The current state of (de)construction at this construction site.
+        /// </summary>
+        public ConstructionState State { get; private set; } = ConstructionState.NotStarted;
 
+        [SerializeField] float _buildSpeed;
         /// <summary>
         /// Cumulative total build speed in [build points per second]. <br/>
-        /// This is divided by the number of in-progress constructibles to obtain the delta.
+        /// This is then divided by the number of in-progress constructibles to obtain the delta for each constructible.
         /// </summary>
-        [field: SerializeField]
-        public float BuildSpeed { get; set; }
+        public float BuildSpeed
+        {
+            get => _buildSpeed;
+            set
+            {
+                if( value < 0 )
+                    throw new ArgumentOutOfRangeException( $"Build speed can't be negative." );
+                _buildSpeed = value;
+            }
+        }
 
         FConstructible[] _constructibles = new FConstructible[] { };
+
+        /// <summary>
+        /// Calculates the sum of current build points and max build points of all constructibles of this construction site.
+        /// </summary>
+        /// <returns>The calculated sum.</returns>
+        public (float current, float total) GetBuildPoints()
+        {
+            return (_constructibles.Sum( c => c.BuildPoints ), _constructibles.Sum( c => c.MaxBuildPoints ));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>The number of constructibles that are currently being built.</returns>
+        public int GetCountOfProgressing()
+        {
+            return _constructibles.Select( c => c.GetBuildSpeedMultiplier() == 0.0f ? 0 : 1 ).Sum();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>The number of constructibles that are currently not being built.</returns>
+        public int GetCountOfNotProgressing()
+        {
+            return _constructibles.Select( c => c.GetBuildSpeedMultiplier() != 0.0f ? 0 : 1 ).Sum();
+        }
 
         /// <summary>
         /// Starts the process of construction.
@@ -196,12 +252,12 @@ namespace KSS.GameplayScene
             if( UnityEngine.Input.GetKeyDown( KeyCode.H ) )
             {
                 this.BuildSpeed = 90f;
-                StartDeconstructing();
+                Pause();
             }
             if( UnityEngine.Input.GetKeyDown( KeyCode.J ) )
             {
                 this.BuildSpeed = 90f;
-                Pause();
+                StartDeconstructing();
             }
 
             FConstructible[] inProgressConstructibles = null;
@@ -249,6 +305,7 @@ namespace KSS.GameplayScene
 
                 foreach( var constructible in inProgressConstructibles )
                 {
+                    buildPointsDelta *= constructible.GetBuildSpeedMultiplier();
                     constructible.BuildPoints += Mathf.Clamp( buildPointsDelta, -constructible.BuildPoints, constructible.MaxBuildPoints - constructible.BuildPoints );
                 }
             }

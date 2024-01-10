@@ -24,7 +24,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 200}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 20958
+  controlID: 26459
 --- !u!114 &2
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -150,7 +150,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 200}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 1
-  controlID: 20959
+  controlID: 26460
 --- !u!114 &4
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -175,7 +175,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 100}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 20960
+  controlID: 26461
 --- !u!114 &5
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -195,8 +195,8 @@ MonoBehaviour:
     y: 0
     width: 311
     height: 591
-  m_MinSize: {x: 201, y: 221}
-  m_MaxSize: {x: 4001, y: 4021}
+  m_MinSize: {x: 200, y: 200}
+  m_MaxSize: {x: 4000, y: 4000}
   m_ActualView: {fileID: 6}
   m_Panes:
   - {fileID: 6}
@@ -233,9 +233,9 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 4e9afdff
-      m_LastClickedID: -157106
-      m_ExpandedIDs: 5a9afdffc6befdffa8c9fdff62edfdff50f2fdffbef5fdff4016feff7a5bffffcc5bffffd85bffffae60ffff84b0ffff7eb1ffff8ab1ffff60b6ffff18f3ffffeef7ffff08fbffff364d0000e6500000605b0000326a00004e6a0000e86b0000c26d0000
+      m_SelectedIDs: 
+      m_LastClickedID: 0
+      m_ExpandedIDs: c476fdff6077fdff7c77fdff2a7bfdff5a9afdffc6befdffa8c9fdff62edfdff50f2fdffbef5fdff4016feff7a5bffffcc5bffffd85bffffae60ffff84b0ffff7eb1ffff8ab1ffff60b6ffff18f3ffffeef7ffff08fbffff364d0000e6500000605b0000326a00004e6a0000e86b0000c26d0000
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -1844,9 +1844,9 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: 4e9afdff
-    m_LastClickedInstanceID: -157106
-    m_HadKeyboardFocusLastEvent: 0
+    m_SelectedInstanceIDs: 
+    m_LastClickedInstanceID: 0
+    m_HadKeyboardFocusLastEvent: 1
     m_ExpandedInstanceIDs: c6230000ea5b000076630000000000000c5c0000668b0000204c0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -1871,7 +1871,7 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
     m_NewAssetIndexInList: -1
-    m_ScrollPosition: {x: 0, y: 120}
+    m_ScrollPosition: {x: 0, y: 198}
     m_GridSize: 64
   m_SkipHiddenPackages: 0
   m_DirectoriesAreaWidth: 407
