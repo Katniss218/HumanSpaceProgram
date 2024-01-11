@@ -97,7 +97,7 @@ namespace KSS.Core.Physics
 
             _rb.useGravity = false;
             _rb.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
-            _rb.interpolation = RigidbodyInterpolation.Extrapolate;
+            _rb.interpolation = RigidbodyInterpolation.None; // DO NOT INTERPOLATE. Doing so will desync `rigidbody.position` and `transform.position`.
             _rb.isKinematic = false;
         }
 

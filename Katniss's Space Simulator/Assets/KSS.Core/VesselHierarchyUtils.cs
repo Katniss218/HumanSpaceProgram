@@ -154,30 +154,25 @@ namespace KSS.Core
             Contract.Assert( !partToSplit.IsRootOfPartObject() );
 
             // Detach the parts from the old vessel.
-            Vessel oldv = partToSplit.GetVessel();
+            Vessel oldVessel = partToSplit.GetVessel();
 
 #warning TODO - Use linear and angular velocities of part that works correctly for spinning vessels.
+
             Vessel newVessel = VesselFactory.CreatePartless(
                 SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( partToSplit.transform.position ),
                 SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( partToSplit.transform.rotation ),
-                oldv.PhysicsObject.Velocity,
-                oldv.PhysicsObject.AngularVelocity );
+                oldVessel.PhysicsObject.Velocity,
+                oldVessel.PhysicsObject.AngularVelocity );
 
             partToSplit.SetParent( newVessel.transform );
             newVessel.RootPart = partToSplit;
-            oldv.RecalculatePartCache();
+            oldVessel.RecalculatePartCache();
             newVessel.RecalculatePartCache();
 
             if( IsAnchored( partToSplit ) )
             {
-                PinnedPhysicsObject ppo = oldv.GetComponent<PinnedPhysicsObject>();
+                PinnedPhysicsObject ppo = oldVessel.GetComponent<PinnedPhysicsObject>();
                 newVessel.Pin( ppo.ReferenceBody, ppo.ReferencePosition, ppo.ReferenceRotation );
-            }
-            else
-            {
-#warning TODO - Fixing oldv's AIRF pos/rot shouldn't be required here. RE: RootObjectTransform airfpos is incorrect.
-                // oldv.AIRFPosition = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( oldv.RootPart.position );
-                // oldv.AIRFRotation = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( oldv.RootPart.rotation );
             }
         }
 

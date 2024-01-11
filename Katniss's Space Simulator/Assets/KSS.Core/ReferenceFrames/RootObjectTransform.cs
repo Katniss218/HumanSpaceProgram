@@ -24,8 +24,7 @@ namespace KSS.Core.ReferenceFrames
         // Root objects store their AIRF positions, children natively store their local coordinates, which as long as they're not obscenely large, will be fine.
         // - An object with a child at 0.00125f can be sent to 10e25 and brought back, and its child will remain at 0.00125f
 
-        [SerializeField]
-        Vector3Dbl _airfPosition;
+        [SerializeField] Vector3Dbl _airfPosition;
         /// <summary>
         /// Gets or sets the position of the object in Absolute Inertial Reference Frame coordinates. Units in [m].
         /// </summary>
@@ -39,8 +38,7 @@ namespace KSS.Core.ReferenceFrames
             }
         }
 
-        [SerializeField]
-        QuaternionDbl _airfRotation;
+        [SerializeField] QuaternionDbl _airfRotation;
         /// <summary>
         /// Gets or sets the rotation of the object in Absolute Inertial Reference Frame coordinates.
         /// </summary>
@@ -88,21 +86,31 @@ namespace KSS.Core.ReferenceFrames
             _rb = this.GetComponent<Rigidbody>();
         }
 
-        void FixedUpdate()
+        private void RecacheAirfPosRot()
         {
-            this._airfPosition = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.transform.position );
-            this._airfRotation = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( this.transform.rotation );
+            if( this._rb == null )
+            {
+                this._airfPosition = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.transform.position );
+                this._airfRotation = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( this.transform.rotation );
+            }
+            else
+            {
+                this._airfPosition = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this._rb.position );
+                this._airfRotation = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( this._rb.rotation );
+            }
         }
 
-#warning TODO - AIRFPosition seems to lag behind one frame, behind the correct position. 
-        // updating it in lateupdate doesn't change anything.
-        // updating it in the physicsobject also doesn't do anything.
+        void FixedUpdate()
+        {
+            RecacheAirfPosRot();
+        }
 
         /// <summary>
         /// Callback to the event.
         /// </summary>
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
+            RecacheAirfPosRot();
             UpdateScenePosition();
             UpdateSceneRotation();
         }

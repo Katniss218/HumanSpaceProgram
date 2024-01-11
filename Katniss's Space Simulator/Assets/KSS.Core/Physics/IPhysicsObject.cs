@@ -53,7 +53,8 @@ namespace KSS.Core.Physics
         void AddForce( Vector3 force );
 
         /// <summary>
-        /// Applies a force at the specified position, in [N].
+        /// Applies a force at the specified position, in [N]. <br/>
+        /// By extension, can organically apply torque.
         /// </summary>
         void AddForceAtPosition( Vector3 force, Vector3 position );
 

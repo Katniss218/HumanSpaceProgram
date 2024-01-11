@@ -7,16 +7,7 @@ namespace KSS.Components
 {
     public class FVesselSeparator : MonoBehaviour, IPersistent
     {
-        Vessel v;
-        Transform p;
-
         bool _hasSeparated = false;
-
-        void Start()
-        {
-            p = this.transform;
-            v = this.transform.GetVessel();
-        }
 
         void Update()
         {
@@ -24,11 +15,13 @@ namespace KSS.Components
             {
                 return;
             }
-            if( UnityEngine.Input.GetKeyDown( KeyCode.Space ) )
+
+            if( UnityEngine.Input.GetKeyDown( KeyCode.Space ) ) // todo - use control systems instead.
             {
 #warning TODO - disconnect pipes, and stuff. Use 'OnVesselSeparate' and 'OnVesselJoin' events.
 
-                VesselHierarchyUtils.SetParent( p, null );
+                VesselHierarchyUtils.SetParent( this.transform, null );
+                _hasSeparated = true;
             }
         }
 
