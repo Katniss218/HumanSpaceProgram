@@ -115,7 +115,7 @@ namespace KSS.DesignScene.Tools
         {
             _handles = TransformHandleSet.Create( Vector3.zero, Quaternion.identity, null, null );
             _handles.CreateXYZHandles<RotationTransformHandle>(
-                AssetRegistry.Get<Mesh>( $"builtin::Resources/rotate_handle_1d" ),
+                AssetRegistry.Get<Mesh>( $"builtin::Resources/Meshes/rotate_handle_1d" ),
                 AssetRegistry.Get<Material>( $"builtin::Resources/Materials/axis" ),
                 go =>
                 {

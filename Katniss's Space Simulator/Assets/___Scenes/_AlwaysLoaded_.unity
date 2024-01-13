@@ -569,8 +569,12 @@ MonoBehaviour:
     asset: {fileID: 2889124796493493744, guid: 315f9171e8abb8347b411d9e90572b3c, type: 3}
   - assetID: builtin::KSS.DevUtils/cube/Zn
     asset: {fileID: 2800000, guid: 817733ada2fab5940bf97a27e89c538d, type: 3}
+  - assetID: builtin::Resources/Textures/navball_color
+    asset: {fileID: 2800000, guid: 81bba99b705f9694fbd9e3bcc3752962, type: 3}
   - assetID: builtin::Resources/Sprites/std0/ui_percent_bar_L_bg
     asset: {fileID: 21300000, guid: 813c3b3ec38dd5449852743c0b33481c, type: 3}
+  - assetID: builtin::Resources/Meshes/attitude_indicator
+    asset: {fileID: -7163177602714537324, guid: c10a9c87b58aac9448bcab4f35f869df, type: 3}
   - assetID: builtin::KSS.DevUtils/cube/Xn
     asset: {fileID: 2800000, guid: d17090d9f818409458984d34346bcd0d, type: 3}
   - assetID: builtin::Resources/Sprites/UI/button_30x30_new
@@ -639,7 +643,7 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: e44b747185cc2874db45086d91d2ae93, type: 3}
   - assetID: builtin::Resources/Sprites/UI/top_panel_background
     asset: {fileID: 21300000, guid: f42d77e9a19ffc0438a43e3d10dc6140, type: 3}
-  - assetID: builtin::Resources/navball
+  - assetID: builtin::Resources/Materials/attitude_indicator
     asset: {fileID: 2100000, guid: 35d2f520ab42c974aa2816029d77aaad, type: 2}
   - assetID: builtin::KSS.DevUtils/flameparticle6
     asset: {fileID: 2800000, guid: 3566c19ea11fd3d49bb446379fef0227, type: 3}
@@ -763,8 +767,6 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: ba7b9b3e2ab14ba44ab7744ee7792f21, type: 3}
   - assetID: builtin::Resources/Sprites/UI/timewarp_forward_middle
     asset: {fileID: 21300000, guid: ca4e19b7df6ce1b45a09d4c07cd486ca, type: 3}
-  - assetID: builtin::Resources/navball_tex
-    asset: {fileID: 2800000, guid: ea77c6bbb32de2546821543872b8968a, type: 3}
   - assetID: builtin::_TextMesh Pro/Resources/LineBreaking Following Characters
     asset: {fileID: 4900000, guid: fade42e8bc714b018fac513c043d323b, type: 3}
   - assetID: builtin::Resources/Sprites/UI/top_panel
@@ -835,7 +837,7 @@ MonoBehaviour:
     asset: {fileID: 2100000, guid: fd5ae78e78ffe89408e5ee7d443b3d92, type: 2}
   - assetID: builtin::KSS.DevUtils/cube/Zp
     asset: {fileID: 2800000, guid: fd3d8acf88cd7b74ea2a0753768ce440, type: 3}
-  - assetID: builtin::Resources/translate_handle_1d
+  - assetID: builtin::Resources/Meshes/translate_handle_1d
     asset: {fileID: -2432090755550338912, guid: 0e08ce73ad599c34babe3a9dad7e7131, type: 3}
   - assetID: builtin::_TextMesh Pro/Shaders/TMP_Bitmap-Mobile
     asset: {fileID: 4800000, guid: 1e3b057af24249748ff873be7fafee47, type: 3}
@@ -883,7 +885,7 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: 9f189c0e658a7d34c92f8e4fde6ac38a, type: 3}
   - assetID: builtin::Resources/intertank
     asset: {fileID: -7059437284376451043, guid: afbf93c77d731b3439b9171b6885fec2, type: 3}
-  - assetID: builtin::Resources/rotate_handle_1d
+  - assetID: builtin::Resources/Meshes/rotate_handle_1d
     asset: {fileID: -2432090755550338912, guid: bf345a7cf22c19b4e879afd9a6b6fc17, type: 3}
   - assetID: builtin::KSS.DevUtils/old_CB_material
     asset: {fileID: 2100000, guid: cf90961ca5c5fc346a6f5f5b3bdefbcf, type: 2}

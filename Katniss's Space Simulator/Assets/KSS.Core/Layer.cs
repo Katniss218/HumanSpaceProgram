@@ -57,9 +57,9 @@ namespace KSS.Core
         VESSEL_DESIGN_HELD = 25,
         _26 = 26,
         _27 = 27,
-        _28 = 28,
-        _29 = 29,
-        _30 = 30,
+        HIDDEN_SPECIAL_1 = 28,
+        HIDDEN_SPECIAL_2 = 29,
+        HIDDEN_SPECIAL_3 = 30,
         POST_PROCESSING = 31,
     }
 }

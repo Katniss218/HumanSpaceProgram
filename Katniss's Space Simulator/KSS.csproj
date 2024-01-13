@@ -102,6 +102,7 @@
     <Compile Include="Assets\KSS\GameplayScene\TimeScaleInputController.cs" />
     <Compile Include="Assets\KSS\GameplayScene\GameplaySceneToolManager.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadTree_NodeUtils.cs" />
+    <Compile Include="Assets\KSS\GameplayScene\NavballManager.cs" />
     <Compile Include="Assets\KSS\AssetLoaders\GameDataJsonVesselFactory.cs" />
   </ItemGroup>
   <ItemGroup>

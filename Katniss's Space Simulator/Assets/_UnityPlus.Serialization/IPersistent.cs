@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,7 +20,8 @@ namespace UnityPlus.Serialization
         /// </remarks>
         /// <param name="s">The reference map to use to resolve object references.</param>
         /// <returns>The serialized structure that contains the data. Identical to what is read by <see cref="SetData"/>.</returns>
-        SerializedData GetData( IReverseReferenceMap s );
+        [return: NotNull]
+        SerializedData GetData( [AllowNull] IReverseReferenceMap s );
 
         /// <summary>
         /// Sets the persistent data after creating the object with default parameters.
@@ -30,6 +32,6 @@ namespace UnityPlus.Serialization
         /// </remarks>
         /// <param name="l">The reference map to use to resolve object references.</param>
         /// <param name="data">The serialized structure that contains the data. Identical to what is created by <see cref="GetData"/>.</param>
-        void SetData( IForwardReferenceMap l, SerializedData data );
+        void SetData( [AllowNull] IForwardReferenceMap l, [DisallowNull] SerializedData data );
     }
 }

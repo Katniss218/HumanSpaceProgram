@@ -109,6 +109,7 @@
     <Compile Include="Assets\_UnityPlus.Serialization\PersistentExtensions\IPersistent_Component.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\AsyncLoader.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\IReferenceMap.cs" />
+    <Compile Include="Assets\_UnityPlus.Serialization\SerializationUnit.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_UnityPlus.Serialization\___UnityPlus.Serialization.asmdef" />
