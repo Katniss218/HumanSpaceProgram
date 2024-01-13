@@ -7,7 +7,10 @@ using System.Threading.Tasks;
 
 namespace UnityEngine
 {
-    public struct QuaternionDbl
+    /// <summary>
+    /// A double-precision <see cref="Quaternion"/>.
+    /// </summary>
+    public struct QuaternionDbl : IEquatable<Quaternion>, IEquatable<QuaternionDbl>
     {
         const double radToDeg = 180.0 / Math.PI;
         const double degToRad = Math.PI / 180.0;
@@ -120,6 +123,35 @@ namespace UnityEngine
                 (lhs.w * rhs.y) + (lhs.y * rhs.w) + (lhs.z * rhs.x) - (lhs.x * rhs.z),
                 (lhs.w * rhs.z) + (lhs.z * rhs.w) + (lhs.x * rhs.y) - (lhs.y * rhs.x),
                 (lhs.w * rhs.w) - (lhs.x * rhs.x) - (lhs.y * rhs.y) - (lhs.z * rhs.z) ).normalized;
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public override bool Equals( object other )
+        {
+            if( other is QuaternionDbl q1 )
+                return Equals( q1 );
+            if( other is Quaternion q2 )
+                return Equals( q2 );
+
+            return false;
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public bool Equals( Quaternion other )
+        {
+            return x.Equals( other.x ) && y.Equals( other.y ) && z.Equals( other.z ) && w.Equals( other.w );
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public bool Equals( QuaternionDbl other )
+        {
+            return x.Equals( other.x ) && y.Equals( other.y ) && z.Equals( other.z ) && w.Equals( other.w );
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public override int GetHashCode()
+        {
+            return x.GetHashCode() ^ (y.GetHashCode() << 2) ^ (z.GetHashCode() >> 2) ^ (w.GetHashCode() >> 1);
         }
 
         public static Vector3Dbl operator *( QuaternionDbl rotation, Vector3Dbl point )

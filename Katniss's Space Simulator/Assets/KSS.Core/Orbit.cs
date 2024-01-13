@@ -211,7 +211,7 @@ namespace KSS.Core
         /// </summary>
         public Vector3 GetOrbitNormal()
         {
-            throw new NotImplementedException(); // which way?
+            throw new NotImplementedException(); // which way? right hand rule
         }
 
         public static double OrbitalSpeedAtRadius( double radius, double gravParameter, double semimajorAxis )

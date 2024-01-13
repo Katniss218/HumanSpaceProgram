@@ -95,8 +95,14 @@ namespace KSS.UI.SceneFactories
 
 
             UIIcon prograde = mask.AddIcon( new UILayoutInfo( UILayoutInfo.Middle, Vector2.zero, new Vector2( 34, 34 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_prograde" ) );
+            UIIcon retrograde = mask.AddIcon( new UILayoutInfo( UILayoutInfo.Middle, Vector2.zero, new Vector2( 34, 34 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_retrograde" ) );
             UIIcon normal = mask.AddIcon( new UILayoutInfo( UILayoutInfo.Middle, Vector2.zero, new Vector2( 34, 34 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_normal" ) );
+            UIIcon antinormal = mask.AddIcon( new UILayoutInfo( UILayoutInfo.Middle, Vector2.zero, new Vector2( 34, 34 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_antinormal" ) );
+            UIIcon antiradial = mask.AddIcon( new UILayoutInfo( UILayoutInfo.Middle, Vector2.zero, new Vector2( 34, 34 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_radial_out" ) );
             UIIcon radial = mask.AddIcon( new UILayoutInfo( UILayoutInfo.Middle, Vector2.zero, new Vector2( 34, 34 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_radial_in" ) );
+
+            NavballUI nui = navball.gameObject.AddComponent<NavballUI>();
+            nui.SetDirectionIcons( prograde, retrograde, normal, antinormal, antiradial, radial );
 
             UIIcon horizon = navball.AddIcon( new UILayoutInfo( UILayoutInfo.Middle, Vector2.zero, new Vector2( 90, 32 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_horizon" ) );
 

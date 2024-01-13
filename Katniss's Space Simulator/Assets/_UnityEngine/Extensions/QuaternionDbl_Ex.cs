@@ -19,6 +19,15 @@ namespace UnityEngine
         }
 
         /// <summary>
+        /// Returns the `back` direction for a given orientation.
+        /// </summary>
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static Vector3Dbl GetBackAxis( this QuaternionDbl q )
+        {
+            return q * Vector3Dbl.back;
+        }
+
+        /// <summary>
         /// Returns the `right` direction for a given orientation.
         /// </summary>
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
@@ -28,12 +37,30 @@ namespace UnityEngine
         }
 
         /// <summary>
+        /// Returns the `left` direction for a given orientation.
+        /// </summary>
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static Vector3Dbl GetLeftAxis( this QuaternionDbl q )
+        {
+            return q * Vector3Dbl.left;
+        }
+
+        /// <summary>
         /// Returns the `up` direction for a given orientation.
         /// </summary>
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public static Vector3Dbl GetUpAxis( this QuaternionDbl q )
         {
             return q * Vector3Dbl.up;
+        }
+
+        /// <summary>
+        /// Returns the `down` direction for a given orientation.
+        /// </summary>
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static Vector3Dbl GetDownAxis( this QuaternionDbl q )
+        {
+            return q * Vector3Dbl.down;
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]

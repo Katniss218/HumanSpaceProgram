@@ -49,6 +49,16 @@ namespace KSS.GameplayScene
             return renderTexture;
         }
 
+        [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, "vanilla.spawn_navball" )]
+        public static void OnGameplayEnter()
+        {
+            GameplaySceneManager.GameObject.AddComponent<NavballManager>();
+
+            ResetAttitudeIndicatorRT();
+            CreateNavball();
+            CreateNavballCamera();
+        }
+
         private static void CreateNavball()
         {
             GameObject navballObj = new GameObject( "navball" );
@@ -81,16 +91,6 @@ namespace KSS.GameplayScene
             camera.cullingMask = 1 << (int)Layer.HIDDEN_SPECIAL_1;
             camera.targetTexture = AttitudeIndicatorRT;
             instance._cameraPivot = pivotObj.transform;
-        }
-
-        [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, "vanilla.spawn_navball" )]
-        public static void OnGameplayEnter()
-        {
-            GameplaySceneManager.GameObject.AddComponent<NavballManager>();
-
-            ResetAttitudeIndicatorRT();
-            CreateNavball();
-            CreateNavballCamera();
         }
 
         void LateUpdate()
