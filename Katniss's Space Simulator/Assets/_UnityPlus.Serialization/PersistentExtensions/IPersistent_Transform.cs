@@ -11,7 +11,7 @@ namespace UnityPlus.Serialization
     public static class IPersistent_Transform
     {
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static SerializedData GetData( this Transform t, ISaver s )
+        public static SerializedData GetData( this Transform t, IReverseReferenceMap s )
         {
             return new SerializedObject()
             {
@@ -22,7 +22,7 @@ namespace UnityPlus.Serialization
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static void SetData( this Transform t, ILoader l, SerializedObject data )
+        public static void SetData( this Transform t, IForwardReferenceMap l, SerializedData data )
         {
             if( data.TryGetValue( "local_position", out var localPosition ) )
                 t.localPosition = l.ReadVector3( localPosition );

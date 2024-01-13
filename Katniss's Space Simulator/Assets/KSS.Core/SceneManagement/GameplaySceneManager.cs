@@ -4,7 +4,7 @@ using UnityPlus.Serialization;
 namespace KSS.Core
 {
     /// <summary>
-    /// A Manager that is active in the gameplay scene.
+    /// A Manager whose responsibility is to invoke the events relating to creation/destruction of the `gameplay` scene.
     /// </summary>
     [RequireComponent( typeof( PreexistingReference ) )]
     public class GameplaySceneManager : SingletonMonoBehaviour<GameplaySceneManager>
@@ -17,26 +17,6 @@ namespace KSS.Core
         void Awake()
         {
             HSPEvent.EventManager.TryInvoke( HSPEvent.STARTUP_GAMEPLAY );
-        }
-
-        void Update()
-        {
-            if( Input.GetKeyDown( KeyCode.Escape ) )
-            {
-                if( !TimeManager.LockTimescale )
-                {
-                    if( TimeManager.IsPaused )
-                    {
-                        TimeManager.Unpause();
-                        HSPEvent.EventManager.TryInvoke( HSPEvent.ESCAPE_GAMEPLAY, null );
-                    }
-                    else
-                    {
-                        TimeManager.Pause();
-                        HSPEvent.EventManager.TryInvoke( HSPEvent.ESCAPE_GAMEPLAY, null );
-                    }
-                }
-            }
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using KSS.Core.Physics;
+using KSS.Core.ReferenceFrames;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,10 +38,13 @@ namespace KSS.Core
         {
             GameObject gameObject = new GameObject( $"Vessel, '{name}'" );
 
+            RootObjectTransform ro = gameObject.AddComponent<RootObjectTransform>();
+            FreePhysicsObject fpo = gameObject.AddComponent<FreePhysicsObject>();
+
             Vessel vessel = gameObject.AddComponent<Vessel>();
             vessel.name = name;
-            vessel.AIRFPosition = airfPosition;
-            vessel.AIRFRotation = airfRotation;
+            ro.AIRFPosition = airfPosition;
+            ro.AIRFRotation = airfRotation;
 
             return vessel;
         }

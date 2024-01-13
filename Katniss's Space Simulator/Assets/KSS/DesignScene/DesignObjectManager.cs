@@ -9,6 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.DataHandlers;
+using UnityPlus.Serialization.ReferenceMaps;
 using UnityPlus.Serialization.Strategies;
 
 namespace KSS.DesignScene
@@ -19,58 +21,101 @@ namespace KSS.DesignScene
     public class DesignObjectManager : SingletonMonoBehaviour<DesignObjectManager>
     {
         static JsonSeparateFileSerializedDataHandler _designObjDataHandler = new JsonSeparateFileSerializedDataHandler();
-        static JsonSingleExplicitHierarchyStrategy _designObjStrategy = new JsonSingleExplicitHierarchyStrategy( _designObjDataHandler, GetGameObject );
+        static SingleExplicitHierarchyStrategy _designObjStrategy = new SingleExplicitHierarchyStrategy( _designObjDataHandler, GetGameObject );
 
-        [SerializeField]
         private DesignObject _designObj;
-
-        [SerializeField]
-        private List<Transform> _looseParts = new List<Transform>();
-
-        public static GameObject DesignObject => instance._designObj.gameObject;
+        /// <summary>
+        /// Returns the object currently being edited.
+        /// </summary>
+        public static DesignObject DesignObject => instance._designObj;
 
         /// <summary>
-        /// Picks up the specified object (removes it from the actionable objects).
+        /// Parts that are loosely dropped in the design scene, ghosted out.
         /// </summary>
-        public static void PickUp( Transform obj )
+        private List<Transform> _looseParts = new List<Transform>();
+
+        /// <summary>
+        /// True if the object can be interacted with (picked up, moved, rotated, etc).
+        /// </summary>
+        public static bool IsLooseOrPartOfDesignObject( Transform obj )
         {
-            if( !IsActionable( obj ) )
+            if( obj == null )
+                return false;
+
+            return instance._looseParts.Contains( obj.root ) || obj.IsChildOf( instance._designObj.transform );
+        }
+
+        /// <summary>
+        /// Tries to pick up the specified object (unparents it, and removes from actionable objects).
+        /// </summary>
+        public static bool TryDetach( Transform obj )
+        {
+            if( !IsLooseOrPartOfDesignObject( obj ) )
             {
-                throw new ArgumentException( $"object to pick up must be an actionable object.", nameof( obj ) );
+                return false;
             }
 
-            if( IsRootOfDesignObj( obj ) )
+            if( obj == instance._designObj.RootPart )
             {
                 instance._designObj.RootPart = null;
-                obj.SetParent( null );
+                return true;
             }
-            else
-            {
-                instance._looseParts.Remove( obj ); // sometimes will do nothing, since the part might not be a loose part.
-                obj.SetParent( null );
-            }
+
+            instance._looseParts.Remove( obj ); // sometimes will do nothing, since the part might not be a loose part.
+            obj.SetParent( null );
+            return true;
+        }
+
+        /// <summary>
+        /// Returns the root of every object that can have an object parented to it.
+        /// </summary>
+        public static IEnumerable<Transform> GetAttachableRoots()
+        {
+            return instance._designObj.RootPart == null
+                ? new Transform[] { }
+                : new Transform[] { instance._designObj.RootPart };
+        }
+
+        /// <summary>
+        /// Checks whether an object can be parented to the specified object.
+        /// </summary>
+        public static bool CanHaveChildren( Transform parent )
+        {
+            if( parent == null )
+                return true;
+
+            return parent.root == instance._designObj.transform;
         }
 
         /// <summary>
         /// Places the selected object as the child of the specified object (adds to the actionable parts).
         /// </summary>
         /// <param name="parent">The new parent, can be null, in which case, the part will be placed as a loose part.</param>
-        public static void Place( Transform obj, Transform parent )
+        public static bool TryAttach( Transform obj, Transform parent )
         {
-            if( IsActionable( obj ) )
+            if( IsLooseOrPartOfDesignObject( obj ) )
             {
-                throw new ArgumentException( $"object to place must NOT be an actionable object.", nameof( obj ) );
+                return false;
             }
-            if( parent != null && !IsActionable( parent ) )
+            if( !CanHaveChildren( parent ) )
             {
-                throw new ArgumentException( $"Parent must be null or an actionable object.", nameof( parent ) );
+                return false;
             }
 
+            // Place as loose or as root of vessel.
             if( parent == null )
             {
+                if( instance._designObj.RootPart == null )
+                {
+                    instance._designObj.transform.SetPositionAndRotation( obj.position, obj.rotation );
+                    instance._designObj.RootPart = obj;
+                    return true;
+                }
                 instance._looseParts.Add( obj );
             }
+
             obj.SetParent( parent );
+            return true;
         }
 
         /// <summary>
@@ -79,66 +124,19 @@ namespace KSS.DesignScene
         /// <remarks>
         /// This will destroy the already existing root part, if any.
         /// </remarks>
-        public static void PlaceRoot( Transform obj )
+        public static bool TryAttachRoot( Transform obj )
         {
-            if( IsActionable( obj ) )
+            if( IsLooseOrPartOfDesignObject( obj ) )
             {
-                throw new ArgumentException( $"object to place must NOT be an actionable object.", nameof( obj ) );
+                return false;
             }
 
-            if( DesignObjectHasRootPart() )
+            if( DesignObject.RootPart != null )
             {
-                Destroy( instance._designObj.RootPart );
+                Destroy( DesignObject.RootPart );
             }
-            obj.SetParent( instance._designObj.transform );
-            instance._designObj.RootPart = obj;
-        }
-
-        /// <summary>
-        /// True if the object can be interacted with (not part of the scenery, etc).
-        /// </summary>
-        public static bool IsActionable( Transform obj )
-        {
-            if( obj == null )
-                return false;
-
-            return instance._looseParts.Contains( obj.root )
-                || obj.root == instance._designObj.transform;
-        }
-
-        /// <summary>
-        /// Checks whether the specified object is part of the design object.
-        /// </summary>
-        public static bool IsAttachedToDesignObj( Transform obj )
-        {
-            if( obj == null )
-                return false;
-
-            return obj.root == instance._designObj.transform;
-        }
-
-        public static bool IsDesignObj( Transform obj )
-        {
-            if( obj == null )
-                return false;
-
-            return obj == instance._designObj.transform;
-        }
-        
-        /// <summary>
-        /// Checks whether the specified object is the root part of the design object.
-        /// </summary>
-        public static bool IsRootOfDesignObj( Transform obj )
-        {
-            if( obj == null )
-                return false;
-
-            return obj.parent == obj.root && obj.parent == instance._designObj.transform;
-        }
-
-        public static bool DesignObjectHasRootPart()
-        {
-            return instance._designObj.RootPart != null;
+            DesignObject.RootPart = obj;
+            return true;
         }
 
         /// <summary>
@@ -149,7 +147,7 @@ namespace KSS.DesignScene
              || (_loader != null && _loader.CurrentState != ILoader.State.Idle);
 
         /// <summary>
-        /// Modify this to point at a different craft file.
+        /// Specifies which craft file to save the vessel to.
         /// </summary>
         public static VesselMetadata CurrentVesselMetadata { get; set; }
 
@@ -174,26 +172,16 @@ namespace KSS.DesignScene
             }
             HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_AFTER_SAVE, null );
         }
-        
+
         public static void FinishLoadFunc()
         {
             TimeManager.LockTimescale = false;
-            instance._designObj.RootPart = _designObjStrategy.LastSpawnedRoot.transform;
+            DesignObject.RootPart = _designObjStrategy.LastSpawnedRoot.transform;
             if( !_wasPausedBeforeSerializing )
             {
                 TimeManager.Unpause();
             }
             HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_AFTER_LOAD, null );
-        }
-
-        private static void CreateSaver( IEnumerable<Func<ISaver, IEnumerator>> objectActions, IEnumerable<Func<ISaver, IEnumerator>> dataActions )
-        {
-            _saver = new AsyncSaver( StartFunc, FinishSaveFunc, objectActions, dataActions );
-        }
-
-        private static void CreateLoader( IEnumerable<Func<ILoader, IEnumerator>> objectActions, IEnumerable<Func<ILoader, IEnumerator>> dataActions )
-        {
-            _loader = new AsyncLoader( StartFunc, FinishLoadFunc, objectActions, dataActions );
         }
 
         // undos stored in files, preserved across sessions?
@@ -233,7 +221,7 @@ namespace KSS.DesignScene
 
             HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_BEFORE_SAVE, null );
 
-            CreateSaver( new Func<ISaver, IEnumerator>[] { _designObjStrategy.SaveAsync_Object }, new Func<ISaver, IEnumerator>[] { _designObjStrategy.SaveAsync_Data } );
+            _saver = new AsyncSaver( new ReverseReferenceStore(), StartFunc, FinishSaveFunc, _designObjStrategy.SaveAsync_Object, _designObjStrategy.SaveAsync_Data );
 
             _saver.SaveAsync( instance );
 
@@ -253,7 +241,7 @@ namespace KSS.DesignScene
             HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_BEFORE_LOAD, null );
             CurrentVesselMetadata = loadedVesselMetadata; // CurrentVesselMetadata should be set after invoking before load.
 
-            CreateLoader( new Func<ILoader, IEnumerator>[] { _designObjStrategy.LoadAsync_Object }, new Func<ILoader, IEnumerator>[] { _designObjStrategy.LoadAsync_Data } );
+            _loader = new AsyncLoader( new ForwardReferenceStore(), StartFunc, FinishLoadFunc, _designObjStrategy.LoadAsync_Object, _designObjStrategy.LoadAsync_Data );
             _loader.LoadAsync( instance );
         }
 
@@ -261,10 +249,10 @@ namespace KSS.DesignScene
 
         private static GameObject GetGameObject()
         {
-            if( !DesignObjectHasRootPart() )
+            if( DesignObject.RootPart == null )
                 throw new InvalidOperationException( $"Can't save, the design object is empty." );
 
-            return instance._designObj.RootPart.gameObject;
+            return DesignObject.RootPart.gameObject;
         }
     }
 }

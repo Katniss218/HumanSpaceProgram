@@ -150,21 +150,21 @@ namespace KSS.CelestialBodies.Surface
                     return false;
                 }
                 // Sibling node is still generating - don't unsubdivide.
-                // Not having this can lead to memory leaks with jobs due to destroyed job handles not freeing their stuff.
+                // Without this check - memory leaks due to destroyed Meshing Job handles not freeing their stuff.
                 if( siblingNode.Value != null && siblingNode.Value.CurrentState is State.Rebuild )
                 {
                     return false;
                 }
             }
 
-            // If the parent won't want to immediately subdivide again, unsubdivide.
             Vector3 originBodySpace = _quadSphereFace.GetSpherePoint( this.Node.Parent.Center ) * (float)CelestialBody.Radius;
             Vector3Dbl parentQuadOriginAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.CelestialBody.transform.TransformPoint( originBodySpace ) );
             foreach( var airfPOI in this.AirfPOIs )
             {
                 double distanceToPoi = (airfPOI - parentQuadOriginAirf).magnitude;
 
-                if( distanceToPoi <= this.SubdivisionDistance * 2 ) // times 2 because parent subdiv range is 2x more than its child.
+                // Multiply by 2 because parent subdiv range is 2x more than its child, and we don't want the parent to immediately subdivide again.
+                if( distanceToPoi <= this.SubdivisionDistance * 2 )
                 {
                     return false;
                 }

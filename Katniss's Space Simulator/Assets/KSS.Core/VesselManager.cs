@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.DataHandlers;
 using UnityPlus.Serialization.Strategies;
 
 namespace KSS.Core
@@ -20,12 +21,29 @@ namespace KSS.Core
     {
         private List<Vessel> _vessels = new List<Vessel>();
 
-        public static Vessel[] GetLoadedVessels()
+        /// <summary>
+        /// Gets all vessels that are currently loaded into memory.
+        /// </summary>
+        public static IEnumerable<Vessel> LoadedVessels
         {
-            if( !exists )
-                throw new InvalidSceneManagerException( $"{nameof( VesselManager )} is only available in the gameplay scene." );
+            get
+            {
+                if( !exists )
+                    throw new InvalidSceneManagerException( $"{nameof( VesselManager )} is only available in the gameplay scene." );
 
-            return instance._vessels.ToArray();
+                return instance._vessels;
+            }
+        }
+
+        public static int LoadedVesselCount
+        {
+            get
+            {
+                if( !exists )
+                    throw new InvalidSceneManagerException( $"{nameof( VesselManager )} is only available in the gameplay scene." );
+
+                return instance._vessels.Count;
+            }
         }
 
         internal static void Register( Vessel vessel )
@@ -35,7 +53,6 @@ namespace KSS.Core
 
             instance._vessels.Add( vessel );
             HSPEvent.EventManager.TryInvoke( HSPEvent.GAMEPLAY_AFTER_VESSEL_REGISTERED, vessel );
-            //OnAfterVesselCreated?.Invoke( vessel );
         }
 
         internal static void Unregister( Vessel vessel )
@@ -45,11 +62,7 @@ namespace KSS.Core
 
             instance._vessels.Remove( vessel );
             HSPEvent.EventManager.TryInvoke( HSPEvent.GAMEPLAY_AFTER_VESSEL_UNREGISTERED, vessel );
-            //OnAfterVesselDestroyed?.Invoke( vessel );
         }
-
-        //public static event Action<Vessel> OnAfterVesselCreated;
-        //public static event Action<Vessel> OnAfterVesselDestroyed;
 
         public SerializedData GetData( IReverseReferenceMap s )
         {
@@ -64,10 +77,8 @@ namespace KSS.Core
 
         }
 
-
-        // move below to separate class "BuildingSerializer" or something.
         private static readonly JsonSeparateFileSerializedDataHandler _vesselsDataHandler = new JsonSeparateFileSerializedDataHandler();
-        private static readonly JsonExplicitHierarchyGameObjectsStrategy _vesselsStrat = new JsonExplicitHierarchyGameObjectsStrategy( _vesselsDataHandler, GetAllRootGameObjects );
+        private static readonly ExplicitHierarchyGameObjectsStrategy _vesselsStrat = new ExplicitHierarchyGameObjectsStrategy( _vesselsDataHandler, GetAllRootGameObjects );
 
         private static GameObject[] GetAllRootGameObjects()
         {

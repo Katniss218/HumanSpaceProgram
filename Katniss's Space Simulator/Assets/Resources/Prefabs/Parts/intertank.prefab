@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8758670627751108313}
   - component: {fileID: 2542640792718134248}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: NODE
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -56,7 +56,7 @@ GameObject:
   - component: {fileID: 1609274382744512581}
   - component: {fileID: 303862411286303112}
   - component: {fileID: 8173245928716808438}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: model_LOD1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -139,7 +139,7 @@ GameObject:
   - component: {fileID: 2487738353659475624}
   - component: {fileID: 1524999878792706317}
   - component: {fileID: 3660604091142442439}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -224,7 +224,8 @@ GameObject:
   - component: {fileID: 5557714343821677624}
   - component: {fileID: 881548991537354002}
   - component: {fileID: 4847280572405610972}
-  m_Layer: 0
+  - component: {fileID: 2237606412665995627}
+  m_Layer: 20
   m_Name: intertank
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -316,6 +317,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <PartID>k__BackingField:
     _data: Vanilla::intertank
+--- !u!114 &2237606412665995627
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6352053399650574342}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 202c94cb92f264245a4a47ba8a5e0a2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <BuildPoints>k__BackingField: 70
+  <MaxBuildPoints>k__BackingField: 70
 --- !u!1 &8895903900501251924
 GameObject:
   m_ObjectHideFlags: 0
@@ -326,7 +341,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1365322428947104169}
   - component: {fileID: 3649184911059352160}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: NODE
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -340,14 +355,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8895903900501251924}
-  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: -0.7071068, w: 0}
   m_LocalPosition: {x: 0, y: -0.65, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5193809938905173626}
   m_RootOrder: -1
-  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 180, z: 0}
 --- !u!114 &3649184911059352160
 MonoBehaviour:
   m_ObjectHideFlags: 0

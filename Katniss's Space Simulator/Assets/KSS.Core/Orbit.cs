@@ -164,56 +164,6 @@ namespace KSS.Core
             return -( gravParameter / (2 * semiMajorAxis) );
         }
 
-        // pricipal directions at UT.
-
-        /// <summary>
-        /// Calculates the 'prograde' direction at a given universal time.
-        /// </summary>
-        /// <param name="UT">The universal time.</param>
-        /// <returns>A unit vector pointing prograde.</returns>
-        public Vector3 ProgradeAt( double UT )
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Calculates the 'retrograde' direction at a given universal time.
-        /// </summary>
-        /// <param name="UT">The universal time.</param>
-        /// <returns>A unit vector pointing retrograde.</returns>
-        public Vector3 RetrogradeAt( double UT )
-        {
-            throw new NotImplementedException();
-        }
-
-        public Vector3 NormalAt( double UT )
-        {
-            return GetOrbitNormal();
-        }
-        public Vector3 AntinormalAt( double UT )
-        {
-            return -GetOrbitNormal();
-        }
-
-        public Vector3 RadialAt( double UT )
-        {
-            throw new NotImplementedException();
-        }
-        public Vector3 AntiradialAt( double UT )
-        {
-            throw new NotImplementedException();
-        }
-
-        //
-
-        /// <summary>
-        /// Returns the vector normal to the plane of the orbit.
-        /// </summary>
-        public Vector3 GetOrbitNormal()
-        {
-            throw new NotImplementedException(); // which way?
-        }
-
         public static double OrbitalSpeedAtRadius( double radius, double gravParameter, double semimajorAxis )
         {
             return Math.Sqrt( gravParameter * ((2.0 / radius) - (1.0 / semimajorAxis)) ); // circular orbit.

@@ -9,7 +9,7 @@ namespace UnityPlus.UILib.Layout
 {
     public static class UILayout
     {
-        private static void BroadcastLayoutUpdateRecursive( HashSet<IUIElement> alreadyUpdated, IUIElement elem )
+        private static void BroadcastLayoutUpdateRecursive( HashSet<IUIElement> alreadyUpdated, IUIElement current )
         {
             // TODO - this can be optimized:
             // - Mark as stale when something changes and redraw only once in lateupdate.
@@ -20,35 +20,35 @@ namespace UnityPlus.UILib.Layout
 
             // Update the children first (because the other dimensions of the changed UI element might depend on them).
             // - E.g. if the width of a vertical layout elem is changed, the text in children might get taller or shorter to fit the new width.
-            if( elem is IUIElementContainer co )
+            if( current is IUIElementContainer elemContainer )
             {
-                foreach( var e in co.Children )
+                foreach( var child in elemContainer.Children )
                 {
-                    if( !alreadyUpdated.Contains( e ) )
+                    if( !alreadyUpdated.Contains( child ) )
                     {
-                        alreadyUpdated.Add( e );
-                        BroadcastLayoutUpdateRecursive( alreadyUpdated, e );
+                        alreadyUpdated.Add( child );
+                        BroadcastLayoutUpdateRecursive( alreadyUpdated, child );
                     }
                 }
             }
 
             // Update our element (self).
-            if( elem is IUILayoutDriven ld )
+            if( current is IUILayoutDriven ld )
             {
                 ld.LayoutDriver?.DoLayout( ld );
             }
-            else if( elem is IUILayoutSelf ls )
+            else if( current is IUILayoutSelf ls )
             {
                 ls.DoLayout();
             }
 
             // Notify the parent, so it can re-layout itself if the dimensions of our element have changed.
-            if( elem is IUIElementChild ci )
+            if( current is IUIElementChild elemChild )
             {
-                if( !alreadyUpdated.Contains( ci.Parent ) )
+                if( !alreadyUpdated.Contains( elemChild.Parent ) )
                 {
-                    alreadyUpdated.Add( ci.Parent );
-                    BroadcastLayoutUpdateRecursive( alreadyUpdated, ci.Parent );
+                    alreadyUpdated.Add( elemChild.Parent );
+                    BroadcastLayoutUpdateRecursive( alreadyUpdated, elemChild.Parent );
                 }
             }
         }

@@ -9,6 +9,9 @@ using UnityPlus.Serialization;
 
 namespace KSS.Components
 {
+    /// <summary>
+    /// Specifies that the gameobject has a specific resting mass on top of any other masses.
+    /// </summary>
     public class FDryMass : MonoBehaviour, IPersistent, IHasMass
     {
         [SerializeField]

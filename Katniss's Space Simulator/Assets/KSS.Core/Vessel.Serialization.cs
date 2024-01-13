@@ -24,8 +24,10 @@ namespace KSS.Core
         {
             if( data.TryGetValue( "display_name", out var displayName ) )
                 this.DisplayName = (string)displayName;
+
             if( data.TryGetValue( "root_part", out var rootPart ) )
                 this.RootPart = (Transform)l.ReadObjectReference( rootPart );
+
             if( data.TryGetValue( "on_after_recalculate_parts", out var onAfterRecalculateParts ) )
                 this.OnAfterRecalculateParts = (Action)l.ReadDelegate( onAfterRecalculateParts );
         }

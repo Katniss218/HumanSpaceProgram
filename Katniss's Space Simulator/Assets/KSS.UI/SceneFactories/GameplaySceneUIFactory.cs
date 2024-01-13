@@ -10,6 +10,14 @@ using UnityEngine.UI;
 using UnityPlus.UILib.UIElements;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib.Layout;
+using KSS.UI.Windows;
+using KSS.GameplayScene;
+using UnityPlus.Serialization.ReferenceMaps;
+using UnityPlus.Serialization;
+using UnityPlus.Serialization.DataHandlers;
+using UnityPlus.Serialization.Strategies;
+using KSS.Components;
+using KSS.GameplayScene.Tools;
 
 namespace KSS.UI.SceneFactories
 {
@@ -43,28 +51,20 @@ namespace KSS.UI.SceneFactories
         public static void CreateUIActiveObjectNull()
         {
             CreateTopPanel();
+            CreateFPSPanel();
             CreateBottomPanelInactive();
 
-            CreateWindowToggleList();
+            CreateToggleButtonList();
         }
 
         public static void CreateUIActiveObjectExists()
         {
             CreateTopPanel();
+            CreateFPSPanel();
 
-            CreateWindowToggleList();
+            CreateToggleButtonList();
 
-            UIText text = _mainPanel.AddPanel( new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 150, 25 ) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
-                .WithTint( Color.gray )
-                .AddText( UILayoutInfo.Fill(), "Velocity: <missing>" )
-                .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
-                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
-
-            VelocityReadoutUI ui = text.gameObject.AddComponent<VelocityReadoutUI>();
-            ui.Text = text;
-
-
-            text = _mainPanel.AddPanel( new UILayoutInfo( Vector2.zero, new Vector2( 0, 25 ), new Vector2( 150, 25 ) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
+            var text = _mainPanel.AddPanel( new UILayoutInfo( Vector2.zero, new Vector2( 0, 0 ), new Vector2( 150, 25 ) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
                 .WithTint( Color.gray )
                 .AddText( UILayoutInfo.Fill(), "Acceleration: <missing>" )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
@@ -74,7 +74,7 @@ namespace KSS.UI.SceneFactories
             ui2.Text = text;
 
 
-            text = _mainPanel.AddPanel( new UILayoutInfo( Vector2.zero, new Vector2( 0, 50 ), new Vector2( 150, 25 ) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
+            text = _mainPanel.AddPanel( new UILayoutInfo( Vector2.zero, new Vector2( 0, 25 ), new Vector2( 150, 25 ) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
                 .WithTint( Color.gray )
                 .AddText( UILayoutInfo.Fill(), "Altitude: <missing>" )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
@@ -83,45 +83,31 @@ namespace KSS.UI.SceneFactories
             AltitudeReadoutUI ui3 = text.gameObject.AddComponent<AltitudeReadoutUI>();
             ui3.Text = text;
 
-
-            text = _mainPanel.AddPanel( new UILayoutInfo( Vector2.zero, new Vector2( 0, 75 ), new Vector2( 150, 25 ) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
-                .WithTint( Color.gray )
-                .AddText( UILayoutInfo.Fill(), "Warp Rate: <missing>" )
-                .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
-                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
-
-            TimewarpReadoutUI ui4 = text.gameObject.AddComponent<TimewarpReadoutUI>();
-            ui4.Text = text;
-
-
-            text = _mainPanel.AddPanel( new UILayoutInfo( Vector2.up, new Vector2( 0, 0 ), new Vector2( 150, 25 ) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
-                .WithTint( Color.gray )
-                .AddText( UILayoutInfo.Fill(), "FPS: <missing>" )
-                .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
-                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
-
-            FPSCounterUI ui5 = text.gameObject.AddComponent<FPSCounterUI>();
-            ui5.Text = text;
-
-
             UIPanel navball = _mainPanel.AddPanel( new UILayoutInfo( new Vector2( 0.5f, 0 ), Vector2.zero, new Vector2( 222, 202 ) ), null );
 
-            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUIGameObject( navball.rectTransform, "mask", new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 190, 190 ) ) );
+            UIMask mask = navball.AddMask( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 190, 190 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/std0/ui_navball" ) );
 
-            Image imageComponent = rootGameObject.AddComponent<Image>();
-            imageComponent.raycastTarget = false;
-            imageComponent.maskable = true;
-            imageComponent.sprite = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/std0/ui_navball" );
-            imageComponent.type = Image.Type.Simple;
-
-            Mask mask = rootGameObject.AddComponent<Mask>();
-            mask.showMaskGraphic = false;
-
-            (GameObject rawGameObject, RectTransform rawTransform) = UIElement.CreateUIGameObject( rootTransform, "raw", UILayoutInfo.Fill() );
+            (GameObject rawGameObject, RectTransform rawTransform) = UIElement.CreateUIGameObject( mask.rectTransform, "raw", UILayoutInfo.Fill() );
             RawImage rawImage = rawGameObject.AddComponent<RawImage>();
-            rawImage.texture = null;
+            rawImage.texture = NavballManager.AttitudeIndicatorRT;
 
             UIIcon attitudeIndicator = navball.AddIcon( UILayoutInfo.Fill(), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/attitude_indicator" ) );
+
+
+            UIIcon prograde = mask.AddIcon( new UILayoutInfo( UILayoutInfo.Middle, Vector2.zero, new Vector2( 34, 34 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_prograde" ) );
+            UIIcon retrograde = mask.AddIcon( new UILayoutInfo( UILayoutInfo.Middle, Vector2.zero, new Vector2( 34, 34 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_retrograde" ) );
+            UIIcon normal = mask.AddIcon( new UILayoutInfo( UILayoutInfo.Middle, Vector2.zero, new Vector2( 34, 34 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_normal" ) );
+            UIIcon antinormal = mask.AddIcon( new UILayoutInfo( UILayoutInfo.Middle, Vector2.zero, new Vector2( 34, 34 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_antinormal" ) );
+            UIIcon antiradial = mask.AddIcon( new UILayoutInfo( UILayoutInfo.Middle, Vector2.zero, new Vector2( 34, 34 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_radial_out" ) );
+            UIIcon radial = mask.AddIcon( new UILayoutInfo( UILayoutInfo.Middle, Vector2.zero, new Vector2( 34, 34 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_radial_in" ) );
+            UIIcon maneuver = mask.AddIcon( new UILayoutInfo( UILayoutInfo.Middle, Vector2.zero, new Vector2( 34, 34 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_maneuver" ) );
+
+            NavballUI nui = navball.gameObject.AddComponent<NavballUI>();
+            nui.SetDirectionIcons( prograde, retrograde, normal, antinormal, antiradial, radial, maneuver );
+
+            UIIcon horizon = navball.AddIcon( new UILayoutInfo( UILayoutInfo.Middle, Vector2.zero, new Vector2( 90, 32 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_horizon" ) );
+
+
             UIPanel velocityIndicator = navball.AddPanel( new UILayoutInfo( new Vector2( 0.5f, 1f ), new Vector2( 0, 15 ), new Vector2( 167.5f, 40 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/velocity_indicator" ) );
 
             velocityIndicator.AddButton( new UILayoutInfo( new Vector2( 0, 0.5f ), new Vector2( 2, 0 ), new Vector2( 20, 20 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_list_gold" ), null );
@@ -135,17 +121,67 @@ namespace KSS.UI.SceneFactories
             vel.Text = velText;
         }
 
+        static void CreateFPSPanel()
+        {
+            UIPanel fpsPanel = _mainPanel.AddPanel( new UILayoutInfo( UILayoutInfo.TopLeft, new Vector2( 5, -35 ), new Vector2( 80, 30 ) ), null );
+            UIText fpsCounter = fpsPanel.AddText( UILayoutInfo.Fill(), "FPS: <missing>" )
+                .WithAlignment( TMPro.HorizontalAlignmentOptions.Left )
+                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
+
+            FPSCounterUI ui5 = fpsCounter.gameObject.AddComponent<FPSCounterUI>();
+            ui5.Text = fpsCounter;
+        }
+
         private static void CreateTopPanel()
         {
-            UIPanel topPanel = _mainPanel.AddPanel( UILayoutInfo.FillHorizontal( 0, 0, 1f, 0, 30 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/top_panel_background" ) );
             if( ActiveObjectManager.ActiveObject == null )
             {
+                UIPanel topPanel = _mainPanel.AddPanel( UILayoutInfo.FillHorizontal( -15, -15, 1f, 0, 30 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/top_panel" ) );
 
+                UIPanel p1 = topPanel.AddPanel( UILayoutInfo.FillVertical( 0, 0, 0f, 35, 110 ), null );
+                UIButton newBtn = p1.AddButton( new UILayoutInfo( UILayoutInfo.BottomLeft, new Vector2( 0, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_new" ), null );
+                UIButton openBtn = p1.AddButton( new UILayoutInfo( UILayoutInfo.BottomLeft, new Vector2( 40, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_open" ), () =>
+                {
+                } );
+                UIButton saveBtn = p1.AddButton( new UILayoutInfo( UILayoutInfo.BottomLeft, new Vector2( 80, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_save" ), () =>
+                {
+                } );
+
+                UIText utText = topPanel.AddText( new UILayoutInfo( UILayoutInfo.BottomLeft, new Vector2( 150, 0 ), new Vector2( 80, 30 ) ), "" )
+                    .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
+                    .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
+
+                UTReadoutUI ui2 = utText.gameObject.AddComponent<UTReadoutUI>();
+                ui2.Text = utText;
+
+                TimewarpSelectorUI selector = TimewarpSelectorUI.Create( topPanel, UILayoutInfo.FillVertical( 0, 0, 0f, 230, 110 ), new float[] { 0, 1, 2, 4, 8, 16, 32, 64, 128, 256 } );
             }
             else
             {
-                UIPanel p4 = topPanel.AddPanel( UILayoutInfo.FillVertical( 0, 0, 1f, -20, 30 ), null );
-                UIButton deselectActive = p4.AddButton( new UILayoutInfo( Vector2.zero, new Vector2( 0, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), () =>
+                UIPanel topLeftPanel = _mainPanel.AddPanel( new UILayoutInfo( UILayoutInfo.TopLeft, new Vector2( -15, 0 ), new Vector2( 416, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/top_panel" ) );
+
+                UIPanel p1 = topLeftPanel.AddPanel( UILayoutInfo.FillVertical( 0, 0, 0f, 35, 110 ), null );
+                UIButton newBtn = p1.AddButton( new UILayoutInfo( UILayoutInfo.BottomLeft, new Vector2( 0, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_new" ), null );
+                UIButton openBtn = p1.AddButton( new UILayoutInfo( UILayoutInfo.BottomLeft, new Vector2( 40, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_open" ), () =>
+                {
+                } );
+                UIButton saveBtn = p1.AddButton( new UILayoutInfo( UILayoutInfo.BottomLeft, new Vector2( 80, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_save" ), () =>
+                {
+                } );
+
+                UIText utText = topLeftPanel.AddText( new UILayoutInfo( UILayoutInfo.BottomLeft, new Vector2( 150, 0 ), new Vector2( 80, 30 ) ), "" )
+                    .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
+                    .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
+
+                UTReadoutUI ui2 = utText.gameObject.AddComponent<UTReadoutUI>();
+                ui2.Text = utText;
+
+                TimewarpSelectorUI selector = TimewarpSelectorUI.Create( topLeftPanel, UILayoutInfo.FillVertical( 0, 0, 0f, 230, 110 ), new float[] { 0, 1, 2, 4, 8, 16, 32, 64, 128, 256 } );
+
+                UIPanel topRightPanel = _mainPanel.AddPanel( new UILayoutInfo( UILayoutInfo.TopRight, new Vector2( 15, 0 ), new Vector2( 100, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/top_panel" ) );
+
+                UIPanel p4 = topRightPanel.AddPanel( UILayoutInfo.FillVertical( 0, 0, 1f, -35, 30 ), null );
+                UIButton deselectActive = p4.AddButton( new UILayoutInfo( UILayoutInfo.BottomLeft, new Vector2( 0, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_leave" ), () =>
                 {
                     ActiveObjectManager.ActiveObject = null;
                 } );
@@ -156,43 +192,48 @@ namespace KSS.UI.SceneFactories
         {
             UIPanel bottomPanel = _mainPanel.AddPanel( UILayoutInfo.FillHorizontal( 0, 0, 0f, 0, 30 ), null );
 
-            UIButton constructButton = bottomPanel.AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( -16, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), () =>
+            UIButton defaultButton = bottomPanel.AddButton( new UILayoutInfo( UILayoutInfo.Middle, new Vector2( -48, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), () =>
             {
-                // construct will spawn a construction site.
-                // the site can be placed anywhere where allowed.
-                // the site can NOT be moved after, but the player needs a way of finely positioning it.
-                // maybe place it temporarily first, and then finely adjust using move/rotate tools, before confirming?
-
-                // would be neat if there was a way of automating that.
-
-                // needs an easy one-call way of spawning a c-site.
-
-
-                // in KSP, the positioning is dictated by the position of the root in VAB
             } )
-            .WithText( UILayoutInfo.Fill(), "C", out _ );
-            UIButton deconstructButton = bottomPanel.AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 16, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), () =>
+                .WithText( UILayoutInfo.Fill(), "A", out _ );
+
+            UIButton constructButton = bottomPanel.AddButton( new UILayoutInfo( UILayoutInfo.Middle, new Vector2( -16, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), () =>
+            {
+                CanvasManager.Get( CanvasName.WINDOWS ).AddTextSelectionWindow( "Vessel to create...", "id here", vesselId =>
+                {
+                    Transform root = PartRegistry.Load( new NamespacedIdentifier( "Vessels", vesselId ) ).transform;
+
+                    foreach( var fc in root.GetComponentsInChildren<FConstructible>() )
+                        fc.BuildPoints = 0.0f;
+
+                    ConstructTool tool = GameplaySceneToolManager.UseTool<ConstructTool>();
+                    tool.SetGhostPart( root, Vector3.zero );
+                } );
+            } )
+                .WithText( UILayoutInfo.Fill(), "C", out _ );
+
+            UIButton deconstructButton = bottomPanel.AddButton( new UILayoutInfo( UILayoutInfo.Middle, new Vector2( 16, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), () =>
             {
 
             } )
                 .WithText( UILayoutInfo.Fill(), "D", out _ );
         }
 
-        private static void CreateWindowToggleList()
+        private static void CreateToggleButtonList()
         {
-            UIPanel uiPanel = _mainPanel.AddPanel( new UILayoutInfo( new Vector2( 1, 0 ), Vector2.zero, new Vector2( 100, 30 ) ), null );
-            uiPanel.LayoutDriver = new HorizontalLayoutDriver()
+            UIPanel buttonListPanel = _mainPanel.AddPanel( new UILayoutInfo( UILayoutInfo.BottomRight, Vector2.zero, new Vector2( 100, 30 ) ), null );
+            buttonListPanel.LayoutDriver = new HorizontalLayoutDriver()
             {
                 Dir = HorizontalLayoutDriver.Direction.RightToLeft,
                 Spacing = 2f,
                 FitToSize = true
             };
 
-            UIButton deltaVAnalysisWindow = uiPanel.AddButton( new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
-            UIButton controlSetupWindow = uiPanel.AddButton( new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
-            UIButton button3 = uiPanel.AddButton( new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
+            UIButton deltaVAnalysisWindow = buttonListPanel.AddButton( new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
+            UIButton controlSetupWindow = buttonListPanel.AddButton( new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
+            UIButton button3 = buttonListPanel.AddButton( new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
 
-            UILayout.BroadcastLayoutUpdate( uiPanel );
+            UILayout.BroadcastLayoutUpdate( buttonListPanel );
         }
     }
 }

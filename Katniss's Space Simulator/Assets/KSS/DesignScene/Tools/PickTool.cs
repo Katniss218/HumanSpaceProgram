@@ -1,49 +1,56 @@
-﻿using KSS.Core.Components;
+﻿using KSS.Core;
+using KSS.Core.Components;
+using KSS.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityPlus.Input;
 
 namespace KSS.DesignScene.Tools
 {
     /// <summary>
     /// Allows to detach and attach parts.
     /// </summary>
-    public class PickTool : MonoBehaviour
+    public class PickTool : DesignSceneToolBase
     {
         Transform _heldPart = null;
-        /// <summary>
-        /// Gets or sets the part that's currently "held" by the cursor.
-        /// </summary>
-        public Transform HeldPart
-        {
-            get => _heldPart;
-            set
-            {
-                if( _heldPart != null )
-                {
-                    Destroy( _heldPart.gameObject );
-                }
-                _heldPart = value;
-                _heldOffset = Vector3.zero;
-            }
-        }
 
-        Vector3 _heldOffset;
-
-        FAttachNode[] _nodes;
-
-        public bool SnappingEnabled { get; set; }
-        public float SnapAngle { get; set; }
+        Vector3 _heldClickOffset;
+        Quaternion _heldRotation;
 
         Camera _camera;
-        FAttachNode snappedToNode = null;
+        FAttachNode.SnappingCandidate? _currentSnap = null;
+
+        public bool AngleSnappingEnabled = true;
+        public float AngleSnappingInterval = 22.5f;
+
+        private Ray _currentFrameCursorRay;
+        private Transform _currentFrameHitObject;
+        private RaycastHit _currentFrameHit;
+
+        /// <summary>
+        /// Sets the held part, destroys the previously held part (if any).
+        /// </summary>
+        public void SetHeldPart( Transform value, Vector3 clickOffset )
+        {
+            if( _heldPart == value )
+                return;
+            if( _heldPart != null )
+                Destroy( _heldPart.gameObject );
+
+            _heldPart = value;
+            _heldPart.gameObject.SetLayer( (int)Layer.VESSEL_DESIGN_HELD, true );
+
+            _heldClickOffset = clickOffset;
+            _heldRotation = value.rotation; // KSP takes into account whether the orientation was changed using the WASDQE keys.
+        }
 
         void Awake()
         {
-            _camera = GameObject.Find( "Near camera" ).GetComponent<Camera>();
+            _camera = GameObject.Find( "Near camera" ).GetComponent<Camera>(); // todo - change the GameObject.Find to something proper.
         }
 
         void Update()
@@ -51,181 +58,170 @@ namespace KSS.DesignScene.Tools
             if( UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() )
                 return;
 
-            if( _heldPart == null )
-            {
-                if( Input.GetKeyUp( KeyCode.Mouse0 ) )
-                {
-                    TryGrabPart();
+            _currentFrameCursorRay = _camera.ScreenPointToRay( UnityEngine.Input.mousePosition );
 
-                    if( _heldPart != null )
-                    {
-                        PositionHeldPart();
-                    }
-                }
+            if( Physics.Raycast( _currentFrameCursorRay, out _currentFrameHit, 8192, 1 << (int)Layer.PART_OBJECT ) )
+            {
+                _currentFrameHitObject = FClickInteractionRedirect.TryRedirect( _currentFrameHit.collider.transform );
             }
             else
             {
-                PositionHeldPart();
-
-                if( Input.GetKeyUp( KeyCode.Mouse0 ) )
-                {
-                    PlacePart();
-                }
+                _currentFrameHitObject = null;
             }
+
+            if( _heldPart != null )
+            {
+                PositionHeldPart();
+            }
+        }
+
+        void OnEnable()
+        {
+            HierarchicalInputManager.AddAction( HierarchicalInputChannel.VIEWPORT_PRIMARY_UP, HierarchicalInputPriority.MEDIUM, Input_MouseClick );
         }
 
         void OnDisable() // if tool switched while action is performed.
         {
+            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.VIEWPORT_PRIMARY_UP, Input_MouseClick );
             if( _heldPart != null )
             {
                 PlacePart();
             }
         }
 
-        private void TryGrabPart()
+        private bool Input_MouseClick()
         {
-            Ray ray = _camera.ScreenPointToRay( Input.mousePosition );
-            if( UnityEngine.Physics.Raycast( ray, out RaycastHit hitInfo, 8192, int.MaxValue ) )
+            if( UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() )
+                return false;
+
+            if( _heldPart == null )
             {
-                Transform clickedObj = hitInfo.collider.transform;
+                TryPickUpPart();
 
-                FClickInteractionRedirect r = clickedObj.GetComponent<FClickInteractionRedirect>();
-                if( r != null && r.Target != null )
+                if( _heldPart != null )
                 {
-                    clickedObj = r.Target.transform;
+                    PositionHeldPart();
+                    return true;
                 }
+            }
+            else
+            {
+                PositionHeldPart();
+                PlacePart();
+                return true;
+            }
+            return false;
+        }
 
-                if( DesignObjectManager.IsActionable( clickedObj ) )
+        private void TryPickUpPart()
+        {
+            if( _currentFrameHitObject != null )
+            {
+                if( DesignObjectManager.TryDetach( _currentFrameHitObject ) )
                 {
-                    if( !DesignObjectManager.IsRootOfDesignObj( clickedObj ) )
-                    {
-                        DesignObjectManager.PickUp( clickedObj );
-                    }
-                    else
-                    {
-                        clickedObj = DesignObjectManager.DesignObject.transform;
-                    }
-                    HeldPart = clickedObj;
-                    _heldOffset = hitInfo.point - clickedObj.position;
+                    SetHeldPart( _currentFrameHitObject, _currentFrameHit.point - _currentFrameHitObject.position );
                 }
             }
         }
 
         private void PlacePart()
         {
-            if( snappedToNode != null )
+            if( _currentSnap != null )
             {
-                if( !DesignObjectManager.IsDesignObj( _heldPart ) )
+                Transform newRoot = VesselHierarchyUtils.ReRoot( _currentSnap.Value.snappedNode.transform.parent );
+                _heldPart = newRoot;
+                // Node-attach (object is already positioned).
+                if( DesignObjectManager.TryAttach( _heldPart, _currentSnap.Value.targetNode.transform.parent ) )
                 {
-                    DesignObjectManager.Place( _heldPart, snappedToNode.transform.parent );
+                    _heldPart.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
+                    _heldPart = null;
+                    _currentSnap = null;
                 }
-                _heldPart = null;
-                snappedToNode = null;
 
                 return;
             }
 
-            Ray ray = _camera.ScreenPointToRay( Input.mousePosition );
-
-            IEnumerable<RaycastHit> hits = UnityEngine.Physics.RaycastAll( ray, 8192, int.MaxValue ).OrderBy( h => h.distance );
-            foreach( var hit in hits )
+            // Surface-attach (object is already positioned).
+            if( _currentFrameHitObject != null )
             {
-                Transform hitObj = hit.collider.transform;
-
-                FClickInteractionRedirect r = hitObj.GetComponent<FClickInteractionRedirect>();
-                if( r != null && r.Target != null )
+                if( DesignObjectManager.TryAttach( _heldPart, _currentFrameHitObject ) )
                 {
-                    hitObj = r.Target.transform;
-                }
-
-                if( hitObj.root == _heldPart )
-                    continue;
-
-                if( DesignObjectManager.IsAttachedToDesignObj( hitObj ) )
-                {
-                    if( !DesignObjectManager.IsDesignObj( _heldPart ) )
-                    {
-                        DesignObjectManager.Place( _heldPart, hitObj );
-                    }
+                    _heldPart.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
                     _heldPart = null;
-                    // recalc vessel data.
+                    _currentSnap = null;
                     return;
                 }
             }
 
-            // KSP would place as ghost here
-            if( !DesignObjectManager.IsAttachedToDesignObj( _heldPart ) )
+            // Place as a ghost loose part (object is already positioned).
+            if( DesignObjectManager.TryAttach( _heldPart, null ) )
             {
-                DesignObjectManager.Place( _heldPart, null );
+                _heldPart.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
+                _heldPart = null;
+                _currentSnap = null;
             }
-            _heldPart = null;
         }
 
         private void PositionHeldPart()
         {
-            // Held part is moved on a plane defined by the normal = camera forward, and through point = current position of picked up part.
-
-            Vector3 point = _heldPart.position + _heldOffset;
-
-            Ray ray = _camera.ScreenPointToRay( Input.mousePosition );
-
-            // Snap to surface.
-            if( !Input.GetKey( KeyCode.LeftAlt ) )
+            if( !UnityEngine.Input.GetKey( KeyCode.LeftAlt ) )
             {
-                IEnumerable<RaycastHit> hits = UnityEngine.Physics.RaycastAll( ray, 8192, int.MaxValue ).OrderBy( h => h.distance );
-                foreach( var hit in hits )
+                // Snap to surface of other parts.
+
+                if( _currentFrameHitObject != null )
                 {
-                    Transform hitObj = hit.collider.transform;
-
-                    FClickInteractionRedirect r = hitObj.GetComponent<FClickInteractionRedirect>();
-                    if( r != null && r.Target != null )
+                    if( DesignObjectManager.CanHaveChildren( _currentFrameHitObject ) )
                     {
-                        hitObj = r.Target.transform;
-                    }
+                        Vector3 newPos = _currentFrameHit.point;
+                        if( AngleSnappingEnabled )
+                        {
+                            Vector3 projectedPoint = Vector3.ProjectOnPlane( (_currentFrameHitObject.position - _currentFrameHit.point), _currentFrameHitObject.up ).normalized;
+                            float angle = Vector3.SignedAngle( _currentFrameHitObject.right, projectedPoint, _currentFrameHitObject.up );
 
-                    if( hitObj.root == _heldPart )
-                        continue;
+                            float roundedAngle = AngleSnappingInterval * Mathf.Round( angle / AngleSnappingInterval );
 
-                    if( DesignObjectManager.IsActionable( hitObj ) )
-                    {
-                        // TODO - angle snap like in KSP.
+                            Quaternion rotation = Quaternion.AngleAxis( roundedAngle + 180, _currentFrameHitObject.up ); // angle + 180 appears to be needed, for some reason.
 
-                        _heldPart.rotation = Quaternion.LookRotation( hit.normal, Vector3.up );
-                        _heldPart.position = hit.point; // todo - use surface attach node if available.
+                            newPos = rotation * (_currentFrameHitObject.right * Vector3.Distance( _currentFrameHit.point, _currentFrameHitObject.position )) // position relative to (0,0,0)
+                                + _currentFrameHitObject.position                                                                                            // translate from (0,0,0) to the part
+                                + new Vector3( 0, (_currentFrameHit.point.y - _currentFrameHitObject.position.y), 0 );                                       // translate vertically from the part to to the cursor
+                        }
 
+                        _heldPart.rotation = Quaternion.LookRotation( _currentFrameHit.normal, _currentFrameHitObject.up ) * _heldRotation;
+                        _heldPart.position = newPos; // todo - use surface attach node when available.
                         return;
                     }
                 }
             }
 
-            Plane p = new Plane( _camera.transform.forward, point );
-            if( p.Raycast( ray, out float intersectionDistance ) )
+            Plane viewPlane = new Plane( _camera.transform.forward, (_heldPart.position + _heldClickOffset) );
+            if( viewPlane.Raycast( _currentFrameCursorRay, out float intersectionDistance ) )
             {
-                Vector3 intersectionPoint = ray.GetPoint( intersectionDistance );
+                Vector3 planePoint = _currentFrameCursorRay.GetPoint( intersectionDistance );
 
-                _heldPart.position = intersectionPoint - _heldOffset;
+                // Reset the position/rotation before snapping to prevent the previous snapping from affecting what nodes will snap.
+                // It should always snap "as if the part is at the cursor", not wherever it was snapped to previously.
+                _heldPart.position = planePoint - _heldClickOffset;
+                _heldPart.rotation = _heldRotation;
 
-                if( DesignObjectManager.IsDesignObj( _heldPart ) )
-                {
-                    snappedToNode = null;
-                }
-                else
-                {
-                    // snap to node, if available.
-#warning TODO - snapping sometimes snaps to the wrong node.
-                    FAttachNode[] heldNodes = _heldPart.GetComponentsInChildren<FAttachNode>();
-                    FAttachNode[] targetNodes = FindObjectsOfType<FAttachNode>().Where( n => n.transform.root != HeldPart ).ToArray();
+                TrySnappingHeldPartToAttachmentNode( viewPlane.normal );
+            }
+        }
 
-                    var tuple = FAttachNode.TrySnap( _heldPart, heldNodes, targetNodes );
-                    if( tuple != null )
-                    {
-                        snappedToNode = tuple.Value.tgt;
-                    }
-                    else
-                    {
-                        snappedToNode = null;
-                    }
-                }
+        private void TrySnappingHeldPartToAttachmentNode( Vector3 viewDirection )
+        {
+            FAttachNode[] heldNodes = _heldPart.GetComponentsInChildren<FAttachNode>();
+            FAttachNode[] targetNodes = DesignObjectManager.GetAttachableRoots().GetComponentsInChildren<FAttachNode>().Where( n => n.transform.root != _heldPart ).ToArray();
+
+            FAttachNode.SnappingCandidate? nodePair = FAttachNode.GetBestSnappingNodePair( heldNodes, targetNodes, viewDirection );
+            if( nodePair != null )
+            {
+                FAttachNode.SnapTo( _heldPart, nodePair.Value.snappedNode, nodePair.Value.targetNode );
+                _currentSnap = nodePair;
+            }
+            else
+            {
+                _currentSnap = null;
             }
         }
     }

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 151919236303037255}
   - component: {fileID: 3869825907320106210}
   - component: {fileID: 1319718935712225320}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: tank_long
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -93,7 +93,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5359026985622084880}
   - component: {fileID: 5465373501292227168}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: NODE
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -107,14 +107,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1794425402448725563}
-  m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: -0.7071068, w: 0}
   m_LocalPosition: {x: 0, y: -2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4053151552679614996}
   m_RootOrder: -1
-  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 180, z: 0}
 --- !u!114 &5465373501292227168
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -141,7 +141,8 @@ GameObject:
   - component: {fileID: 1411097584595625856}
   - component: {fileID: 647930471848486042}
   - component: {fileID: 6979030702901644941}
-  m_Layer: 0
+  - component: {fileID: -8463795735707923941}
+  m_Layer: 20
   m_Name: tank_long
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -228,6 +229,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <PartID>k__BackingField:
     _data: Vanilla::tank_long
+--- !u!114 &-8463795735707923941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4352668300827386821}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 202c94cb92f264245a4a47ba8a5e0a2c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <BuildPoints>k__BackingField: 150
+  <MaxBuildPoints>k__BackingField: 150
 --- !u!1 &6112259470971288608
 GameObject:
   m_ObjectHideFlags: 0
@@ -238,7 +253,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5077882880843873016}
   - component: {fileID: 5188058664250353853}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: NODE
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -282,7 +297,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5604564238733955003}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: volumeTransform
   m_TagString: Untagged
   m_Icon: {fileID: 0}

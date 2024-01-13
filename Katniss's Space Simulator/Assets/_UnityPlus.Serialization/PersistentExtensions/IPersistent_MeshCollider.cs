@@ -11,7 +11,7 @@ namespace UnityPlus.Serialization
 {
     public static class IPersistent_MeshCollider
     {
-        public static SerializedData GetData( this MeshCollider mc, ISaver s )
+        public static SerializedData GetData( this MeshCollider mc, IReverseReferenceMap s )
         {
             return new SerializedObject()
             {
@@ -21,7 +21,7 @@ namespace UnityPlus.Serialization
             };
         }
 
-        public static void SetData( this MeshCollider mc, ILoader l, SerializedObject data )
+        public static void SetData( this MeshCollider mc, IForwardReferenceMap l, SerializedData data )
         {
             if( data.TryGetValue( "shared_mesh", out var sharedMesh ) )
                 mc.sharedMesh = l.ReadAssetReference<Mesh>( sharedMesh );

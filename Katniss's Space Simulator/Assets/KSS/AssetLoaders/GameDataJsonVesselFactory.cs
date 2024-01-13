@@ -8,6 +8,7 @@ using System.Linq;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.DataHandlers;
 using UnityPlus.Serialization.Strategies;
 
 namespace KSS.AssetLoaders
@@ -18,10 +19,9 @@ namespace KSS.AssetLoaders
     public sealed class GameDataJsonVesselFactory : PartFactory
     {
         private static JsonSeparateFileSerializedDataHandler _handler = new JsonSeparateFileSerializedDataHandler();
-        private static JsonSingleExplicitHierarchyStrategy _strat = new JsonSingleExplicitHierarchyStrategy( _handler, () => throw new NotSupportedException( $"Tried to save something using a part *loader*" ) );
+        private static SingleExplicitHierarchyStrategy _strat = new SingleExplicitHierarchyStrategy( _handler, () => throw new NotSupportedException( $"Tried to save something using a part *loader*" ) );
 
-        private static Loader _loader = new Loader( null, null, _strat.Load_Object, _strat.Load_Data );
-
+        private static Loader _loader = new Loader( null, null, null, _strat.Load_Object, _strat.Load_Data );
 
         private string _vesselId;
 
@@ -35,12 +35,13 @@ namespace KSS.AssetLoaders
             return partMeta;
         }
 
-        public override GameObject Load()
+        public override GameObject Load( IForwardReferenceMap refMap )
         {
             string filePath = VesselMetadata.GetRootDirectory( _vesselId );
 
             _handler.ObjectsFilename = Path.Combine( filePath, "objects.json" );
             _handler.DataFilename = Path.Combine( filePath, "data.json" );
+            _loader.RefMap = refMap;
             _loader.Load();
             return _strat.LastSpawnedRoot;
         }

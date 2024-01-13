@@ -11,14 +11,10 @@ namespace UnityPlus.Serialization
 {
     public static class IPersistent_MeshRenderer
     {
-        public static SerializedData GetData( this MeshRenderer mr, ISaver s )
+        public static SerializedData GetData( this MeshRenderer mr, IReverseReferenceMap s )
         {
-            SerializedArray matsJson = new SerializedArray();
             var mats = mr.sharedMaterials.Select( mat => s.WriteAssetReference( mat ) );
-            foreach( var mat in mats )
-            {
-                matsJson.Add( mat );
-            }
+            SerializedArray matsJson = new SerializedArray( mats );
 
             return new SerializedObject()
             {
@@ -28,7 +24,7 @@ namespace UnityPlus.Serialization
             };
         }
 
-        public static void SetData( this MeshRenderer mr, ILoader l, SerializedObject data )
+        public static void SetData( this MeshRenderer mr, IForwardReferenceMap l, SerializedData data )
         {
             if( data.TryGetValue( "shared_materials", out var sharedMaterials ) )
             {

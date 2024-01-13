@@ -16,6 +16,9 @@ using UnityPlus.Serialization.Strategies;
 using System.IO;
 using System.Collections;
 using KSS.Core.Mods;
+using UnityPlus.Serialization.DataHandlers;
+using UnityPlus.Serialization.ReferenceMaps;
+using System.Linq;
 
 namespace KSS.DevUtils
 {
@@ -37,26 +40,7 @@ namespace KSS.DevUtils
         public ComputeShader shader;
         public RawImage uiImage;
 
-        void Awake()
-        {
-            LODQuadSphere.cbShader = this.cbShader;
-            LODQuadSphere.cbTex = this.cbTextures;
-        }
-
-        void Start()
-        {
-            /*normalmap = new RenderTexture( heightmap.width, heightmap.height, 8, RenderTextureFormat.ARGB32 );
-            normalmap.enableRandomWrite = true;
-
-            shader.SetTexture( shader.FindKernel( "CalculateNormalMap" ), Shader.PropertyToID( "heightMap" ), heightmap );
-            shader.SetTexture( shader.FindKernel( "CalculateNormalMap" ), Shader.PropertyToID( "normalMap" ), normalmap );
-            shader.SetFloat( Shader.PropertyToID( "strength" ), 5.0f );
-            shader.Dispatch( shader.FindKernel( "CalculateNormalMap" ), heightmap.width / 8, heightmap.height / 8, 1 );
-
-            uiImage.texture = normalmap;*/
-        }
-
-        static Building launchSite;
+        static Vessel launchSite;
         static Vessel vessel;
 
         [HSPEventListener( HSPEvent.STARTUP_IMMEDIATELY, "devutils.load_game_data" )]
@@ -65,24 +49,27 @@ namespace KSS.DevUtils
             AssetRegistry.Register( "substance.f", new Substance() { Density = 1000, DisplayName = "Fuel", UIColor = new Color( 1.0f, 0.3764706f, 0.2509804f ) } );
             AssetRegistry.Register( "substance.ox", new Substance() { Density = 1000, DisplayName = "Oxidizer", UIColor = new Color( 0.2509804f, 0.5607843f, 1.0f ) } );
         }
-        
+
         [HSPEventListener( HSPEvent.TIMELINE_AFTER_NEW, "devutils.timeline.new.after" )]
         static void OnAfterCreateDefault( object e )
         {
             CelestialBody body = CelestialBodyManager.Get( "main" );
             Vector3 localPos = CoordinateUtils.GeodeticToEuclidean( 28.5857702f, -80.6507262f, (float)(body.Radius + 1.0) );
 
-            launchSite = BuildingFactory.CreatePartless( body, localPos, Quaternion.FromToRotation( Vector3.up, localPos.normalized ) );
+            launchSite = VesselFactory.CreatePartless( Vector3Dbl.zero, QuaternionDbl.identity, Vector3.zero, Vector3.zero );
+            launchSite.gameObject.name = "launchsite";
+            launchSite.Pin( body, localPos, Quaternion.FromToRotation( Vector3.up, localPos.normalized ) );
 
             GameObject launchSitePrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/testlaunchsite" );
             GameObject root = InstantiateLocal( launchSitePrefab, launchSite.transform, Vector3.zero, Quaternion.identity );
+            launchSite.RootPart = root.transform;
 
             var v = CreateVessel( launchSite );
             ActiveObjectManager.ActiveObject = v.RootPart.GetVessel().gameObject;
             vessel = v;
         }
 
-        static Vessel CreateVessel( Building launchSite )
+        static Vessel CreateVessel( Vessel launchSite )
         {
             if( launchSite == null )
             {
@@ -103,12 +90,31 @@ namespace KSS.DevUtils
             return v2;
         }
 
-        private void Update()
+        void Awake()
         {
-            if( Input.GetKeyDown( KeyCode.F4 ) )
+            LODQuadSphere.cbShader = this.cbShader;
+            LODQuadSphere.cbTex = this.cbTextures;
+        }
+
+        void Start()
+        {
+            /*normalmap = new RenderTexture( heightmap.width, heightmap.height, 8, RenderTextureFormat.ARGB32 );
+            normalmap.enableRandomWrite = true;
+
+            shader.SetTexture( shader.FindKernel( "CalculateNormalMap" ), Shader.PropertyToID( "heightMap" ), heightmap );
+            shader.SetTexture( shader.FindKernel( "CalculateNormalMap" ), Shader.PropertyToID( "normalMap" ), normalmap );
+            shader.SetFloat( Shader.PropertyToID( "strength" ), 5.0f );
+            shader.Dispatch( shader.FindKernel( "CalculateNormalMap" ), heightmap.width / 8, heightmap.height / 8, 1 );
+
+            uiImage.texture = normalmap;*/
+        }
+
+        void Update()
+        {
+            if( UnityEngine.Input.GetKeyDown( KeyCode.F4 ) )
             {
                 JsonSeparateFileSerializedDataHandler _designObjDataHandler = new JsonSeparateFileSerializedDataHandler();
-                JsonSingleExplicitHierarchyStrategy _designObjStrategy = new JsonSingleExplicitHierarchyStrategy( _designObjDataHandler, () => null );
+                SingleExplicitHierarchyStrategy _designObjStrategy = new SingleExplicitHierarchyStrategy( _designObjDataHandler, () => null );
 
                 VesselMetadata loadedVesselMetadata = new VesselMetadata( "vessel2" );
                 loadedVesselMetadata.ReadDataFromDisk();
@@ -120,7 +126,7 @@ namespace KSS.DevUtils
 
                 HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_BEFORE_LOAD, null );
 
-                Loader _loader = new Loader( null, null, new Action<ILoader>[] { _designObjStrategy.Load_Object }, new Action<ILoader>[] { _designObjStrategy.Load_Data } );
+                Loader _loader = new Loader( new ForwardReferenceStore(), null, null, new ILoader.Action[] { _designObjStrategy.Load_Object }, new ILoader.Action[] { _designObjStrategy.Load_Data } );
 
                 _loader.Load();
 
@@ -140,15 +146,15 @@ namespace KSS.DevUtils
                 Vector3Dbl airfPos = spawnerPosAirf + closestBoundToVesselAirf;
                 v2.AIRFPosition = airfPos;
             }
-            if( Input.GetKeyDown( KeyCode.F5 ) )
+            if( UnityEngine.Input.GetKeyDown( KeyCode.F5 ) )
             {
                 CreateVessel( launchSite );
             }
-            if( Input.GetKeyDown( KeyCode.F1 ) )
+            if( UnityEngine.Input.GetKeyDown( KeyCode.F1 ) )
             {
                 JsonSeparateFileSerializedDataHandler handler = new JsonSeparateFileSerializedDataHandler();
-                JsonSingleExplicitHierarchyStrategy strat = new JsonSingleExplicitHierarchyStrategy( handler, () => null );
-                Saver saver = new Saver( null, null, strat.Save_Object, strat.Save_Data );
+                SingleExplicitHierarchyStrategy strat = new SingleExplicitHierarchyStrategy( handler, () => null );
+                Saver saver = new Saver( new ReverseReferenceStore(), null, null, strat.Save_Object, strat.Save_Data );
 
                 string gameDataPath = HumanSpaceProgramMods.GetModDirectoryPath();
                 string partDir;

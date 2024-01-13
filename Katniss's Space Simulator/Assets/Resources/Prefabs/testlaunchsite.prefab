@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 416732337057496344}
   - component: {fileID: 5566531975592965443}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: spawn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -57,7 +57,7 @@ GameObject:
   - component: {fileID: 3681912330346288165}
   - component: {fileID: 9158063864997904168}
   - component: {fileID: 5745205713316250692}
-  m_Layer: 0
+  m_Layer: 20
   m_Name: testlaunchsite
   m_TagString: Untagged
   m_Icon: {fileID: 0}

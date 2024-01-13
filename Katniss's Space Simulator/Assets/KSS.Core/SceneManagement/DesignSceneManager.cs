@@ -4,7 +4,7 @@ using UnityPlus.Serialization;
 namespace KSS.Core
 {
     /// <summary>
-    /// A Manager that is active in the gameplay scene.
+    /// A Manager whose responsibility is to invoke the events relating to creation/destruction of the `design` scene.
     /// </summary>
     [RequireComponent( typeof( PreexistingReference ) )]
     public class DesignSceneManager : SingletonMonoBehaviour<DesignSceneManager>
@@ -17,14 +17,6 @@ namespace KSS.Core
         void Awake()
         {
             HSPEvent.EventManager.TryInvoke( HSPEvent.STARTUP_DESIGN );
-        }
-
-        void Update()
-        {
-            if( Input.GetKeyDown( KeyCode.Escape ) )
-            {
-                HSPEvent.EventManager.TryInvoke( HSPEvent.ESCAPE_DESIGN, null );
-            }
         }
     }
 }

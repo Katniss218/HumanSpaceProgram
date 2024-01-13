@@ -17,6 +17,15 @@ namespace UnityEngine
         {
             return q * Vector3.forward;
         }
+        
+        /// <summary>
+        /// Returns the `back` direction for a given orientation.
+        /// </summary>
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static Vector3 GetBackAxis( this Quaternion q )
+        {
+            return q * Vector3.back;
+        }
 
         /// <summary>
         /// Returns the `right` direction for a given orientation.
@@ -26,6 +35,15 @@ namespace UnityEngine
         {
             return q * Vector3.right;
         }
+        
+        /// <summary>
+        /// Returns the `left` direction for a given orientation.
+        /// </summary>
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static Vector3 GetLeftAxis( this Quaternion q )
+        {
+            return q * Vector3.left;
+        }
 
         /// <summary>
         /// Returns the `up` direction for a given orientation.
@@ -34,6 +52,15 @@ namespace UnityEngine
         public static Vector3 GetUpAxis( this Quaternion q )
         {
             return q * Vector3.up;
+        }
+
+        /// <summary>
+        /// Returns the `down` direction for a given orientation.
+        /// </summary>
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static Vector3 GetDownAxis( this Quaternion q )
+        {
+            return q * Vector3.down;
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]

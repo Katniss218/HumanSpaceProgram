@@ -36,7 +36,7 @@ namespace KSS.Core
         public static float TimeScale { get => _timeScale; }
 
         /// <summary>
-        /// Returns the current universal time.
+        /// Returns the current universal time, in [s].
         /// </summary>
         public static double UT { get; private set; }
 
@@ -64,9 +64,9 @@ namespace KSS.Core
         public static bool LockTimescale { get; set; } = false;
 
         /// <summary>
-        /// Invoked when the current time scale is changed successfully (including when <see cref="TimeScaleChangedData.Old"/> and <see cref="TimeScaleChangedData.New"/> are the same).
+        /// Invoked after the current time scale is changed successfully (including when <see cref="TimeScaleChangedData.Old"/> and <see cref="TimeScaleChangedData.New"/> are the same).
         /// </summary>
-        public static event Action<TimeScaleChangedData> OnTimescaleChanged;
+        public static event Action<TimeScaleChangedData> OnAfterTimescaleChanged;
 
         static float _maxTimeScale = 128.0f;
 
@@ -133,7 +133,7 @@ namespace KSS.Core
             _oldTimeScale = _timeScale;
             _timeScale = timeScale;
             UnityEngine.Time.timeScale = timeScale;
-            OnTimescaleChanged?.Invoke( new TimeScaleChangedData() { Old = _oldTimeScale, New = timeScale } );
+            OnAfterTimescaleChanged?.Invoke( new TimeScaleChangedData() { Old = _oldTimeScale, New = timeScale } );
         }
 
         /// <summary>
@@ -171,39 +171,9 @@ namespace KSS.Core
             SetTimeScale( 1 );
         }
 
-        private void FixedUpdate()
+        void FixedUpdate()
         {
             UT += FixedDeltaTime;
-        }
-
-        void Update()
-        {
-            if( LockTimescale ) // short-circuit exit before checking anything.
-            {
-                return;
-            }
-
-            if( Input.GetKeyDown( KeyCode.Period ) )
-            {
-                if( IsPaused )
-                {
-                    SetTimeScale( 1f );
-                    return;
-                }
-                float newscale = _timeScale * 2f;
-
-                if( newscale > GetMaxTimescale() )
-                    return;
-                SetTimeScale( newscale );
-            }
-
-            if( Input.GetKeyDown( KeyCode.Comma ) )
-            {
-                if( _timeScale <= 1.0f )
-                    SetTimeScale( 0.0f );
-                else
-                    SetTimeScale( _timeScale / 2f );
-            }
         }
 
         public SerializedData GetData( IReverseReferenceMap s )

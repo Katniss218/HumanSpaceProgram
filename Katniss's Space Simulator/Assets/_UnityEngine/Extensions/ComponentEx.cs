@@ -51,6 +51,22 @@ namespace UnityEngine
         }
 
         /// <summary>
+        /// Checks if the component's gameobject has a component of a specified type, that is not the instance specified in the parameter.
+        /// </summary>
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static bool HasComponentOtherThan<T>( this Component comp, T otherThanThis )
+        {
+            foreach( var po in comp.GetComponents<T>() )
+            {
+                if( !object.ReferenceEquals( otherThanThis, po ) )
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Checks if the component's gameobject or any of its children (recursive) have a component of a specified type.
         /// </summary>
         /// <remarks>

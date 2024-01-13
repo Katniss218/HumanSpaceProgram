@@ -24,101 +24,44 @@ namespace UnityPlus.Serialization
 
         public ILoader.State CurrentState { get; private set; }
 
-        List<Func<ILoader, IEnumerator>> _objectActions = new List<Func<ILoader, IEnumerator>>();
-        List<Func<ILoader, IEnumerator>> _dataActions = new List<Func<ILoader, IEnumerator>>();
+        List<IAsyncLoader.Action> _objectActions;
+        List<IAsyncLoader.Action> _dataActions;
 
         Action _startFunc;
         Action _finishFunc;
 
-        Dictionary<Guid, object> _guidToObject = new Dictionary<Guid, object>();
+        public IForwardReferenceMap RefMap { get; set; }
 
         /// <param name="startFunc">A function delegate that can pause the game completely.</param>
         /// <param name="finishFunc">A function delegate that can unpause the game, and bring it to its previous state.</param>
-        public AsyncLoader( Action startFunc, Action finishFunc, Func<ILoader, IEnumerator> objectAction, Func<ILoader, IEnumerator> dataAction )
+        public AsyncLoader( IForwardReferenceMap refMap, Action startFunc, Action finishFunc, IAsyncLoader.Action objectAction, IAsyncLoader.Action dataAction )
         {
             if( startFunc == null )
                 throw new ArgumentNullException( nameof( startFunc ), $"Start delegate can't be null. {nameof( AsyncLoader )} requires the function to pause to serialize correctly." );
             if( finishFunc == null )
                 throw new ArgumentNullException( nameof( finishFunc ), $"Finish delegate can't be null. {nameof( AsyncLoader )} requires the function to unpause to serialize correctly." );
 
+            this.RefMap = refMap;
             this._startFunc = startFunc;
             this._finishFunc = finishFunc;
-
-            this._objectActions.Add( objectAction );
-            this._dataActions.Add( dataAction );
+            this._objectActions = new List<IAsyncLoader.Action>() { objectAction };
+            this._dataActions = new List<IAsyncLoader.Action>() { dataAction };
         }
 
         /// <param name="startFunc">A function delegate that can pause the game completely.</param>
         /// <param name="finishFunc">A function delegate that can unpause the game, and bring it to its previous state.</param>
-        public AsyncLoader( Action startFunc, Action finishFunc, IEnumerable<Func<ILoader, IEnumerator>> objectActions, IEnumerable<Func<ILoader, IEnumerator>> dataActions )
+        public AsyncLoader( IForwardReferenceMap refMap, Action startFunc, Action finishFunc, IEnumerable<IAsyncLoader.Action> objectActions, IEnumerable<IAsyncLoader.Action> dataActions )
         {
             if( startFunc == null )
                 throw new ArgumentNullException( nameof( startFunc ), $"Start delegate can't be null. {nameof( AsyncLoader )} requires the function to pause to serialize correctly." );
             if( finishFunc == null )
                 throw new ArgumentNullException( nameof( finishFunc ), $"Finish delegate can't be null. {nameof( AsyncLoader )} requires the function to unpause to serialize correctly." );
 
+            this.RefMap = refMap;
             this._startFunc = startFunc;
             this._finishFunc = finishFunc;
-
-            // Loader should load objects before data.
-            foreach( var action in objectActions )
-            {
-                this._objectActions.Add( action );
-            }
-            foreach( var action in dataActions )
-            {
-                this._dataActions.Add( action );
-            }
-        }
-
-        //
-        //  -- -- -- --
-        //
-
-        private void ClearReferenceRegistry()
-        {
-            _guidToObject.Clear();
-        }
-
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public bool TryGetObj( Guid id, out object obj )
-        {
-            if( id == Guid.Empty )
-            {
-                obj = null;
-                return false;
-            }
-            return _guidToObject.TryGetValue( id, out obj );
-        }
-
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public object GetObj( Guid id )
-        {
-            if( id == Guid.Empty )
-                return null;
-
-            if( _guidToObject.TryGetValue( id, out object obj ) )
-            {
-                return obj;
-            }
-#if DEBUG
-            Debug.Log( $"Tried to get a reference to object `{id:D}` before it was loaded." );
-#endif
-            return null;
-        }
-
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public void SetObj( Guid id, object obj )
-        {
-            if( CurrentState != ILoader.State.LoadingObjects )
-            {
-                throw new InvalidOperationException( $"You can only set an ID while creating the objects. Please move the functionality to an object action" );
-            }
-
-            if( id == Guid.Empty )
-                return;
-
-            _guidToObject.Add( id, obj );
+            this._objectActions = new List<IAsyncLoader.Action>( objectActions );
+            this._dataActions = new List<IAsyncLoader.Action>( dataActions );
         }
 
         //
@@ -131,14 +74,14 @@ namespace UnityPlus.Serialization
             Debug.Log( "Loading..." );
 #endif
             CurrentState = ILoader.State.LoadingObjects;
-            ClearReferenceRegistry();
+            //ClearReferenceRegistry();
             _startFunc();
             _completedActions = 0;
             CurrentActionPercentCompleted = 0.0f;
 
             foreach( var func in _objectActions )
             {
-                yield return coroutineContainer.StartCoroutine( func( this ) );
+                yield return coroutineContainer.StartCoroutine( func( this.RefMap ) );
                 _completedActions++;
             }
 
@@ -146,12 +89,12 @@ namespace UnityPlus.Serialization
 
             foreach( var func in _dataActions )
             {
-                yield return coroutineContainer.StartCoroutine( func( this ) );
+                yield return coroutineContainer.StartCoroutine( func( this.RefMap ) );
                 _completedActions++;
             }
 
             _finishFunc();
-            ClearReferenceRegistry();
+            //ClearReferenceRegistry();
             CurrentState = ILoader.State.Idle;
 #if DEBUG
             Debug.Log( "Finished Loading" );

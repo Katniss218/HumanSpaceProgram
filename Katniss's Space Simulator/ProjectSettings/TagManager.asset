@@ -11,14 +11,12 @@ TagManager:
   - Managers
   - Water
   - UI
+  - Scene UI
   - 
   - 
   - 
-  - 
-  - CelestialBody
-  - CelestialBodyLight
-  - 
-  - 
+  - Celestial Body
+  - Celestial Body Light
   - 
   - 
   - 
@@ -27,16 +25,18 @@ TagManager:
   - 
   - 
   - 
-  - 
-  - 
-  - VesselDesign
-  - VesselDesignHeld
-  - 
+  - Part Object
+  - Part Object Light
   - 
   - 
   - 
+  - Vessel Design Held
   - 
-  - PPP
+  - 
+  - Hidden Special 1
+  - Hidden Special 2
+  - Hidden Special 3
+  - Post Processing
   m_SortingLayers:
   - name: Default
     uniqueID: 0

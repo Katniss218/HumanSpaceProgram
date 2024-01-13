@@ -10,22 +10,46 @@ using UnityEngine;
 namespace KSS.DesignScene
 {
     /// <summary>
-    /// Manages the available design scene viewport tools, and which is currently active.
+    /// Manages the registered and active design scene viewport tools.
     /// </summary>
     public class DesignSceneToolManager : SingletonMonoBehaviour<DesignSceneToolManager>
     {
-        private List<MonoBehaviour> _availableTools = new List<MonoBehaviour>();
-        private MonoBehaviour _activeTool = null;
+        private List<DesignSceneToolBase> _availableTools = new List<DesignSceneToolBase>();
+        private DesignSceneToolBase _activeTool = null;
 
-        /// <summary>
-        /// This can return null if no tool is selected.
-        /// </summary>
-        public static Type ActiveToolType { get => instance?._activeTool?.GetType(); }
+        public static Type ActiveToolType { get => instance._activeTool.GetType(); }
+
+        public static bool HasTool<T>() where T : DesignSceneToolBase
+        {
+            if( instance == null )
+            {
+                throw new InvalidOperationException( $"{nameof( DesignSceneToolManager )} is accessible only in the design scene." );
+            }
+
+            return HasTool( typeof( T ) );
+        }
+
+        public static bool HasTool( Type toolType )
+        {
+            if( instance == null )
+            {
+                throw new InvalidOperationException( $"{nameof( DesignSceneToolManager )} is accessible only in the design scene." );
+            }
+
+            foreach( var tool in instance._availableTools )
+            {
+                if( tool.GetType() == toolType )
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
 
         /// <summary>
         /// Registers a tool with the specified type for future use.
         /// </summary>
-        public static void RegisterTool<T>() where T : MonoBehaviour
+        public static void RegisterTool<T>() where T : DesignSceneToolBase
         {
             if( instance == null )
             {
@@ -39,10 +63,24 @@ namespace KSS.DesignScene
                     throw new InvalidOperationException( $"The tool of type {typeof( T ).FullName} has already been registered." );
                 }
             }
-            MonoBehaviour comp = instance.gameObject.AddComponent<T>();
+
+            DesignSceneToolBase comp = instance.gameObject.AddComponent<T>();
             comp.enabled = false;
 
             instance._availableTools.Add( comp );
+        }
+
+        public static object UseDefaultTool()
+        {
+            try
+            {
+                return UseTool( instance._availableTools[0].GetType() );
+            }
+            catch
+            {
+                //
+                return null;
+            }
         }
 
         /// <summary>
@@ -52,7 +90,7 @@ namespace KSS.DesignScene
         /// Tool instances are persisted. Selecting a tool, and going back to a previous one keeps its data.
         /// </remarks>
         /// <returns>The instance of the tool that was enabled.</returns>
-        public static T UseTool<T>() where T : MonoBehaviour
+        public static T UseTool<T>() where T : DesignSceneToolBase
         {
             return (T)UseTool( typeof( T ) );
         }
@@ -70,13 +108,14 @@ namespace KSS.DesignScene
             {
                 throw new InvalidOperationException( $"{nameof( DesignSceneToolManager )} is accessible only in the design scene." );
             }
-            Type baseToolType = typeof( MonoBehaviour );
+
+            Type baseToolType = typeof( DesignSceneToolBase );
             if( !(baseToolType.IsAssignableFrom( toolType )) )
             {
                 throw new ArgumentException( $"Can't register a tool that is not a {baseToolType.FullName}." );
             }
 
-            MonoBehaviour tool = null;
+            DesignSceneToolBase tool = null;
             foreach( var t in instance._availableTools )
             {
                 if( t.GetType() == toolType )
@@ -101,9 +140,10 @@ namespace KSS.DesignScene
             {
                 instance._activeTool.enabled = false;
             }
+
             instance._activeTool = tool;
             instance._activeTool.enabled = true;
-            HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_TOOL_CHANGED );
+            HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_AFTER_TOOL_CHANGED );
             return instance._activeTool;
         }
 
@@ -129,7 +169,7 @@ namespace KSS.DesignScene
             if( UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() )
                 return;
 
-            if( Input.GetKeyDown( KeyCode.Alpha1 ) )
+            if( UnityEngine.Input.GetKeyDown( KeyCode.Alpha1 ) )
             {
                 try
                 {
@@ -137,7 +177,7 @@ namespace KSS.DesignScene
                 }
                 catch { }
             }
-            if( Input.GetKeyDown( KeyCode.Alpha2 ) )
+            if( UnityEngine.Input.GetKeyDown( KeyCode.Alpha2 ) )
             {
                 try
                 {
@@ -145,7 +185,7 @@ namespace KSS.DesignScene
                 }
                 catch { }
             }
-            if( Input.GetKeyDown( KeyCode.Alpha3 ) )
+            if( UnityEngine.Input.GetKeyDown( KeyCode.Alpha3 ) )
             {
                 try
                 {
@@ -153,7 +193,7 @@ namespace KSS.DesignScene
                 }
                 catch { }
             }
-            if( Input.GetKeyDown( KeyCode.Alpha4 ) )
+            if( UnityEngine.Input.GetKeyDown( KeyCode.Alpha4 ) )
             {
                 try
                 {
@@ -161,7 +201,7 @@ namespace KSS.DesignScene
                 }
                 catch { }
             }
-            if( Input.GetKeyDown( KeyCode.Alpha5 ) )
+            if( UnityEngine.Input.GetKeyDown( KeyCode.Alpha5 ) )
             {
                 try
                 {
@@ -169,7 +209,7 @@ namespace KSS.DesignScene
                 }
                 catch { }
             }
-            if( Input.GetKeyDown( KeyCode.Alpha6 ) )
+            if( UnityEngine.Input.GetKeyDown( KeyCode.Alpha6 ) )
             {
                 try
                 {
@@ -177,7 +217,7 @@ namespace KSS.DesignScene
                 }
                 catch { }
             }
-            if( Input.GetKeyDown( KeyCode.Alpha7 ) )
+            if( UnityEngine.Input.GetKeyDown( KeyCode.Alpha7 ) )
             {
                 try
                 {
@@ -185,7 +225,7 @@ namespace KSS.DesignScene
                 }
                 catch { }
             }
-            if( Input.GetKeyDown( KeyCode.Alpha8 ) )
+            if( UnityEngine.Input.GetKeyDown( KeyCode.Alpha8 ) )
             {
                 try
                 {
@@ -193,7 +233,7 @@ namespace KSS.DesignScene
                 }
                 catch { }
             }
-            if( Input.GetKeyDown( KeyCode.Alpha9 ) )
+            if( UnityEngine.Input.GetKeyDown( KeyCode.Alpha9 ) )
             {
                 try
                 {
@@ -201,7 +241,7 @@ namespace KSS.DesignScene
                 }
                 catch { }
             }
-            if( Input.GetKeyDown( KeyCode.Alpha0 ) )
+            if( UnityEngine.Input.GetKeyDown( KeyCode.Alpha0 ) )
             {
                 try
                 {

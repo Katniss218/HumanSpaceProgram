@@ -10,7 +10,6 @@ using UnityEngine;
 
 namespace KSS.DesignScene
 {
-    //[RequireComponent( typeof( RootObjectTransform ) )]
     public class DesignObject : MonoBehaviour, IPartObject
     {
         [SerializeField]
@@ -28,12 +27,17 @@ namespace KSS.DesignScene
             }
         }
 
-        public PhysicsObject PhysicsObject => throw new NotSupportedException( $"Design objects can't move using the physics system." );
+        public IPhysicsObject PhysicsObject => throw new NotSupportedException( $"Design objects can't move using the physics system." );
         public RootObjectTransform RootObjTransform => throw new NotSupportedException( $"Design objects can't use the reference frames." );
 
         void Awake()
         {
-           // this.RootObjTransform = this.GetComponent<RootObjectTransform>();
+            this.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
+        }
+
+        public void RecalculatePartCache()
+        {
+            // do nothing (for now)
         }
     }
 }

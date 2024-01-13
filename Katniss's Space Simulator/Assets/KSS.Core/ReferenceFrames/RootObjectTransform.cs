@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KSS.Core.Physics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -15,6 +16,7 @@ namespace KSS.Core.ReferenceFrames
     /// <remarks>
     /// Add this to any object that is supposed to be affected by the <see cref="SceneReferenceFrameManager"/>.
     /// </remarks>
+    [DisallowMultipleComponent]
     public class RootObjectTransform : MonoBehaviour, IPersistent, IReferenceFrameSwitchResponder
     {
         // Should to be added to any root object that is an actual [physical] object in the scene (not UI elements, empties, etc).
@@ -23,43 +25,34 @@ namespace KSS.Core.ReferenceFrames
         // - An object with a child at 0.00125f can be sent to 10e25 and brought back, and its child will remain at 0.00125f
 
         [SerializeField] Vector3Dbl _airfPosition;
-        [SerializeField] QuaternionDbl _airfRotation;
-
-        Rigidbody _rb;
-
         /// <summary>
         /// Gets or sets the position of the object in Absolute Inertial Reference Frame coordinates. Units in [m].
         /// </summary>
         public Vector3Dbl AIRFPosition
         {
-            get
-            {
-                return this._airfPosition;
-            }
+            get => this._airfPosition;
             set
             {
                 this._airfPosition = value;
-
                 UpdateScenePosition();
             }
         }
 
+        [SerializeField] QuaternionDbl _airfRotation;
         /// <summary>
         /// Gets or sets the rotation of the object in Absolute Inertial Reference Frame coordinates.
         /// </summary>
         public QuaternionDbl AIRFRotation
         {
-            get
-            {
-                return this._airfRotation;
-            }
+            get => this._airfRotation;
             set
             {
                 this._airfRotation = value;
-
                 UpdateSceneRotation();
             }
         }
+
+        Rigidbody _rb;
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         private void UpdateScenePosition()
@@ -67,11 +60,10 @@ namespace KSS.Core.ReferenceFrames
             Vector3 scenePos = (Vector3)SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformPosition( this._airfPosition );
             if( _rb != null )
             {
-                // THIS IS CRITICALLY IMPORTANT.
-                // Rigidbodies keep their own position/rotation and will overwrite the object's position/rotation sometimes.
+                // THIS IS CRITICALLY IMPORTANT. Rigidbodies keep their own position/rotation.
                 this._rb.position = scenePos;
             }
-            this.transform.position = scenePos; // This is also important to happen always.
+            this.transform.position = scenePos;
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
@@ -80,48 +72,45 @@ namespace KSS.Core.ReferenceFrames
             Quaternion sceneRotation = (Quaternion)SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformRotation( this._airfRotation );
             if( _rb != null )
             {
-                // THIS IS CRITICALLY IMPORTANT.
-                // Rigidbodies keep their own position/rotation and will overwrite the object's position/rotation sometimes.
+                // THIS IS CRITICALLY IMPORTANT. Rigidbodies keep their own position/rotation.
                 this._rb.rotation = sceneRotation;
             }
-            this.transform.rotation = sceneRotation; // This is also important to happen always.
+            this.transform.rotation = sceneRotation;
         }
 
-        void Awake()
+        /// <summary>
+        /// Call this after adding a rigidbody object.
+        /// </summary>
+        public void RefreshCachedRigidbody()
         {
-            // in case RB is added by requirecomponent.
             _rb = this.GetComponent<Rigidbody>();
         }
 
-        void Start()
+        private void RecacheAirfPosRot( IReferenceFrame referenceFrame )
         {
-            // In case RB is added later (I don't want to lazily check every time it's retrieved, RB is not required).
-            _rb = this.GetComponent<Rigidbody>();
+            if( this._rb == null )
+            {
+                this._airfPosition = referenceFrame.TransformPosition( this.transform.position );
+                this._airfRotation = referenceFrame.TransformRotation( this.transform.rotation );
+            }
+            else
+            {
+                this._airfPosition = referenceFrame.TransformPosition( this._rb.position );
+                this._airfRotation = referenceFrame.TransformRotation( this._rb.rotation );
+            }
         }
 
-        // we need to move the object if the reference frame is moving, and move/rotate it, if the reference frame is rotating.
         void FixedUpdate()
         {
-            this.AIRFPosition = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.transform.position );
-            this.AIRFRotation = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( this.transform.rotation );
+            RecacheAirfPosRot( SceneReferenceFrameManager.SceneReferenceFrame );
         }
-
-        //void LateUpdate()
-        //{
-#warning TODO - AIRFPosition seems to lag behind one frame, behind the correct position. 
-        // Transforming the scene position on demand instead of getting the AIRF value seems to work some of the time.
-        // Updating it also in lateupdate also seems to fix it, but it breaks loaded position, making the craft drop underground somewhat.
-
-        //    this.AIRFPosition = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.transform.position );
-        //    this.AIRFRotation = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( this.transform.rotation );
-        //}
-
 
         /// <summary>
         /// Callback to the event.
         /// </summary>
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
+            RecacheAirfPosRot( data.OldFrame );
             UpdateScenePosition();
             UpdateSceneRotation();
         }

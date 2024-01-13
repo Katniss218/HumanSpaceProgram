@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,9 +18,10 @@ namespace UnityPlus.Serialization
         /// <remarks>
         /// This should return the data required to reconstruct the full internal state of the object.
         /// </remarks>
-        /// <param name="s">The saver. Can be used to write references, etc.</param>
+        /// <param name="s">The reference map to use to resolve object references.</param>
         /// <returns>The serialized structure that contains the data. Identical to what is read by <see cref="SetData"/>.</returns>
-        SerializedData GetData( IReverseReferenceMap s );
+        [return: NotNull]
+        SerializedData GetData( [AllowNull] IReverseReferenceMap s );
 
         /// <summary>
         /// Sets the persistent data after creating the object with default parameters.
@@ -28,8 +30,8 @@ namespace UnityPlus.Serialization
         /// This should reconstruct the full internal state of the object from the given data. <br />
         /// *The data may be partial.*
         /// </remarks>
-        /// <param name="l">The loader. Can be used to read references, etc.</param>
+        /// <param name="l">The reference map to use to resolve object references.</param>
         /// <param name="data">The serialized structure that contains the data. Identical to what is created by <see cref="GetData"/>.</param>
-        void SetData( IForwardReferenceMap l, SerializedData data );
+        void SetData( [AllowNull] IForwardReferenceMap l, [DisallowNull] SerializedData data );
     }
 }

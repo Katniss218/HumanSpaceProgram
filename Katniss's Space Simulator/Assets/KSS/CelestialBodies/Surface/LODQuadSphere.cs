@@ -68,15 +68,9 @@ namespace KSS.CelestialBodies.Surface
 
         List<LODQuad> _activeQuads = new List<LODQuad>();
 
-        private static Vector3Dbl[] GetVesselPOIs()
+        private static IEnumerable<Vector3Dbl> GetVesselPOIs()
         {
-            Vessel[] vessels = VesselManager.GetLoadedVessels();
-            Vector3Dbl[] airfPOIs = new Vector3Dbl[vessels.Length];
-            for( int i = 0; i < vessels.Length; i++ )
-            {
-                airfPOIs[i] = vessels[i].AIRFPosition;
-            }
-            return airfPOIs;
+            return VesselManager.LoadedVessels.Select( v => v.AIRFPosition );
         }
 
         private static bool ApproximatelyDifferent( Vector3Dbl lhs, Vector3Dbl rhs )
@@ -116,13 +110,17 @@ namespace KSS.CelestialBodies.Surface
             List<LODQuad> newActiveQuads = new List<LODQuad>( _activeQuads );
             List<LODQuad> needRemeshing = new List<LODQuad>();
 
-            Vector3Dbl[] airfPOIs = GetVesselPOIs();
+            Vector3Dbl[] airfPOIs = GetVesselPOIs().ToArray();
 
             bool allPoisTheSame = NewPoisTheSameAsLastFrame( airfPOIs );
 
             bool wasChangedThisFrame = false;
             // Optimization is applied:
             // - The quads only need to be checked if they were changed in the last frame (potentially still not subdivided enough / too much), or if the pois changed by some threshold.
+
+            // TODO - Another optimization could be to not check every ~800 quads (for large set of objects), but check their virtual parents first - the number of parents is exponentially less.
+
+            // TODO - Another optimization could be to not subdivide further if there is no additional detail that would become visible.
             if( !allPoisTheSame || _wasChangedLastFrame )
             {
                 foreach( var quad in _activeQuads )

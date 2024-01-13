@@ -1,4 +1,5 @@
 ﻿using KSS.Core.Components;
+using KSS.Core.Physics;
 using KSS.Core.ReferenceFrames;
 using System;
 using System.Collections.Generic;
@@ -46,7 +47,7 @@ namespace KSS.Core
                 // We could detach the parts from the vessel entirely, but that's not a legal state.
                 // We could create a new vessel with the specified part as its root.
 
-                if( part.IsRootOfVessel() )
+                if( part.IsRootOfPartObject() )
                 {
                     // create a new vessel, but the part is already the root of a new vessel. This is equivalent to recreating the original vessel and deleting the old one (i.e. a "do nothing").
                     return;
@@ -58,7 +59,7 @@ namespace KSS.Core
 
             if( part.GetVessel() == parentPart.GetVessel() )
             {
-                if( part.IsRootOfVessel() )
+                if( part.IsRootOfPartObject() )
                 {
                     SwapRoots( part, parentPart ); // Re-rooting as in KSP would be `Reparent( newRoot.Vessel.RootPart, newRoot )`
                 }
@@ -69,7 +70,7 @@ namespace KSS.Core
             }
             else
             {
-                if( part.IsRootOfVessel() )
+                if( part.IsRootOfPartObject() )
                 {
                     JoinVesselsRoot( part, parentPart );
                 }
@@ -80,6 +81,13 @@ namespace KSS.Core
             }
         }
 
+        public static void AttachLoose( Transform looseRoot, Transform parent )
+        {
+            Vessel v = parent.GetVessel();
+            looseRoot.SetParent( parent, true );
+            v.RecalculatePartCache();
+        }
+
         // The following helper methods must always produce a legal state or throw an exception.
 
         /// <summary>
@@ -88,8 +96,8 @@ namespace KSS.Core
         private static void SwapRoots( Transform oldRoot, Transform newRoot )
         {
             Contract.Assert( oldRoot.GetVessel() == newRoot.GetVessel() );
-            Contract.Assert( oldRoot.IsRootOfVessel() );
-            Contract.Assert( !newRoot.IsRootOfVessel() );
+            Contract.Assert( oldRoot.IsRootOfPartObject() );
+            Contract.Assert( !newRoot.IsRootOfPartObject() );
 
             newRoot.GetVessel().RootPart = newRoot;
             Reattach( oldRoot, newRoot );
@@ -101,7 +109,7 @@ namespace KSS.Core
         private static void Reattach( Transform part, Transform parent )
         {
             Contract.Assert( part.GetVessel() == parent.GetVessel() );
-            Contract.Assert( !part.IsRootOfVessel() );
+            Contract.Assert( !part.IsRootOfPartObject() );
 
             part.SetParent( parent );
         }
@@ -109,7 +117,7 @@ namespace KSS.Core
         private static void JoinVesselsRoot( Transform partToJoin, Transform parent )
         {
             Contract.Assert( partToJoin.GetVessel() != parent.GetVessel() );
-            Contract.Assert( partToJoin.IsRootOfVessel() );
+            Contract.Assert( partToJoin.IsRootOfPartObject() );
 
             Vessel oldVessel = partToJoin.GetVessel();
             oldVessel.RootPart = null; // needed for the assert in the next method.
@@ -126,7 +134,7 @@ namespace KSS.Core
         private static void JoinVesselsNotRoot( Transform partToJoin, Transform parent )
         {
             Contract.Assert( partToJoin.GetVessel() != parent.GetVessel() );
-            Contract.Assert( !partToJoin.IsRootOfVessel() );
+            Contract.Assert( !partToJoin.IsRootOfPartObject() );
             // Move partToJoin to parent's vessel.
             // Attach partToJoin to parent.
 
@@ -134,8 +142,8 @@ namespace KSS.Core
             Reattach( partToJoin, parent );
             partToJoin.SetParent( parent.GetVessel().transform );
 
-            oldv.RecalculateParts();
-            parent.GetVessel().RecalculateParts();
+            oldv.RecalculatePartCache();
+            parent.GetVessel().RecalculatePartCache();
         }
 
         /// <summary>
@@ -143,52 +151,35 @@ namespace KSS.Core
         /// </summary>
         private static void MakeNewVesselOrBuilding( Transform partToSplit )
         {
-            Contract.Assert( !partToSplit.IsRootOfVessel() );
+            Contract.Assert( !partToSplit.IsRootOfPartObject() );
 
             // Detach the parts from the old vessel.
-            Vessel oldv = partToSplit.GetVessel();
+            Vessel oldVessel = partToSplit.GetVessel();
 
-            // Create the new vessel and add the parts to it.
-            bool isAnchored = IsAnchored( partToSplit );
-            IPartObject partObject = partToSplit.GetPartObject();
-            if( isAnchored )
-            {
-                Building bOrig = partToSplit.GetBuilding();
-                Building b = BuildingFactory.CreatePartless(
-                    bOrig.ReferenceBody,
-                    bOrig.ReferencePosition,
-                    bOrig.ReferenceRotation
-                    );
-
-                partToSplit.SetParent( b.transform );
-                b.RootPart = partToSplit;
-#warning TODO - after changing to RootPart = value, the recalculate parts might not be needed. also move recalculation if the root was already in a vessel
-                oldv.RecalculateParts();
-            }
-            else
-            {
 #warning TODO - Use linear and angular velocities of part that works correctly for spinning vessels.
-                Vessel v = VesselFactory.CreatePartless(
-                    SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( partToSplit.transform.position ),
-                    SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( partToSplit.transform.rotation ),
-                    partObject.PhysicsObject.Velocity,
-                    partObject.PhysicsObject.AngularVelocity );
 
-                partToSplit.SetParent( v.transform );
-                v.RootPart = partToSplit;
-                oldv.RecalculateParts();
-                v.RecalculateParts();
+            Vessel newVessel = VesselFactory.CreatePartless(
+                SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( partToSplit.transform.position ),
+                SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( partToSplit.transform.rotation ),
+                oldVessel.PhysicsObject.Velocity,
+                oldVessel.PhysicsObject.AngularVelocity );
 
-#warning TODO - Fixing oldv's AIRF pos/rot shouldn't be required here. RE: RootObjectTransform airfpos is incorrect.
-                oldv.AIRFPosition = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( oldv.RootPart.position );
-                oldv.AIRFRotation = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( oldv.RootPart.rotation );
+            partToSplit.SetParent( newVessel.transform );
+            newVessel.RootPart = partToSplit;
+            oldVessel.RecalculatePartCache();
+            newVessel.RecalculatePartCache();
+
+            if( IsAnchored( partToSplit ) )
+            {
+                PinnedPhysicsObject ppo = oldVessel.GetComponent<PinnedPhysicsObject>();
+                newVessel.Pin( ppo.ReferenceBody, ppo.ReferencePosition, ppo.ReferenceRotation );
             }
         }
 
         /// <summary>
         /// Sets the root object in the hierarchy to the specified object.
         /// </summary>
-        public static void ReRoot( Transform newRoot )
+        public static Transform ReRoot( Transform newRoot, Transform stopAt = null )
         {
             // To set the root, means to set the parent chain to be a child chain.
             // This can be seen graphically on the following tree:
@@ -201,9 +192,26 @@ namespace KSS.Core
                            / \
                           6   7
             */
-            Transform parent = newRoot.parent;
-            parent.SetParent( newRoot, true ); // worldPositionStays *might* introduce precision issues if performed far away from origin.
-            ReRoot( parent );
+
+            Queue<Transform> originalParentChain = new Queue<Transform>();
+
+            Transform current = newRoot;
+            while( current != null || (stopAt != null && current == stopAt) ) // Store the original parent chain, because reparenting will fuck it up.
+            {
+                originalParentChain.Enqueue( current ); // child: 0, parent: 1, grandparent: 2, etc.
+                current = current.parent;
+            }
+
+            Transform newParent = originalParentChain.Dequeue();
+            newParent.SetParent( null ); // Without this, the main SetParent won't set the parent correctly.
+            while( originalParentChain.TryDequeue( out Transform newChild ) )
+            {
+                newChild.SetParent( newParent );
+
+                newParent = newChild;
+            }
+
+            return newRoot;
         }
 
         /// <summary>

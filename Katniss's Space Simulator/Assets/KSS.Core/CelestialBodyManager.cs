@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.DataHandlers;
 using UnityPlus.Serialization.Strategies;
 
 namespace KSS.Core
@@ -30,12 +31,29 @@ namespace KSS.Core
             return null;
         }
 
-        public static CelestialBody[] GetAll()
+        /// <summary>
+        /// Gets all celestial bodies that are currently loaded into memory.
+        /// </summary>
+        public static IEnumerable<CelestialBody> CelestialBodies
         {
-            if( !exists )
-                throw new InvalidSceneManagerException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
+            get
+            {
+                if( !exists )
+                    throw new InvalidSceneManagerException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
 
-            return instance._celestialBodies.Values.ToArray();
+                return instance._celestialBodies.Values;
+            }
+        }
+
+        public static int CelestialBodyCount
+        {
+            get
+            {
+                if( !exists )
+                    throw new InvalidSceneManagerException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
+
+                return instance._celestialBodies.Count;
+            }
         }
 
         internal static void Register( CelestialBody celestialBody )
@@ -69,7 +87,7 @@ namespace KSS.Core
         }
 
         private static readonly JsonSeparateFileSerializedDataHandler _celestialBodiesDataHandler = new JsonSeparateFileSerializedDataHandler();
-        private static readonly JsonPreexistingGameObjectsStrategy _celestialBodiesStrat = new JsonPreexistingGameObjectsStrategy( _celestialBodiesDataHandler, GetAllRootGameObjects );
+        private static readonly PreexistingGameObjectsStrategy _celestialBodiesStrat = new PreexistingGameObjectsStrategy( _celestialBodiesDataHandler, GetAllRootGameObjects );
 
         private static GameObject[] GetAllRootGameObjects()
         {

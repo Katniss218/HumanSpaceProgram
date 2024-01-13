@@ -76,11 +76,11 @@ namespace KSS.Cameras
 
         void UpdateZoomLevel()
         {
-            if( Input.mouseScrollDelta.y > 0 )
+            if( UnityEngine.Input.mouseScrollDelta.y > 0 )
             {
                 ZoomDist -= ZoomDist * ZOOM_MULTIPLIER;
             }
-            else if( Input.mouseScrollDelta.y < 0 )
+            else if( UnityEngine.Input.mouseScrollDelta.y < 0 )
             {
                 ZoomDist += ZoomDist * ZOOM_MULTIPLIER;
             }
@@ -96,8 +96,8 @@ namespace KSS.Cameras
 
         void UpdateOrientation()
         {
-            float mouseX = Input.GetAxis( "Mouse X" );
-            float mouseY = Input.GetAxis( "Mouse Y" );
+            float mouseX = UnityEngine.Input.GetAxis( "Mouse X" );
+            float mouseY = UnityEngine.Input.GetAxis( "Mouse Y" );
 
             this.transform.rotation *= Quaternion.AngleAxis( mouseX * MOVE_MULTIPLIER, Vector3.up );
             this.transform.rotation *= Quaternion.AngleAxis( -mouseY * MOVE_MULTIPLIER, Vector3.right );
@@ -108,8 +108,8 @@ namespace KSS.Cameras
             if( ReferenceObject != null )
                 return;
 
-            float mouseX = Input.GetAxis( "Mouse X" );
-            float mouseY = Input.GetAxis( "Mouse Y" );
+            float mouseX = UnityEngine.Input.GetAxis( "Mouse X" );
+            float mouseY = UnityEngine.Input.GetAxis( "Mouse Y" );
 
             this.transform.position += mouseX * MOVE_MULTIPLIER * this.transform.right;
             this.transform.position += mouseY * MOVE_MULTIPLIER * this.transform.forward;
@@ -155,21 +155,21 @@ namespace KSS.Cameras
             {
                 UpdateZoomLevel();
 
-                if( Input.GetKeyDown( KeyCode.Mouse1 ) ) // Mouse1 = Right Mouse Button
+                if( UnityEngine.Input.GetKeyDown( KeyCode.Mouse1 ) ) // Mouse1 = Right Mouse Button
                 {
                     _isRotating = true;
                 }
-                if( Input.GetKeyDown( KeyCode.Mouse2 ) ) // Mouse2 = Middle Mouse Button
+                if( UnityEngine.Input.GetKeyDown( KeyCode.Mouse2 ) ) // Mouse2 = Middle Mouse Button
                 {
                     _isTranslating = true;
                 }
             }
 
-            if( _isRotating && Input.GetKeyUp( KeyCode.Mouse1 ) )
+            if( _isRotating && UnityEngine.Input.GetKeyUp( KeyCode.Mouse1 ) )
             {
                 _isRotating = false;
             }
-            if( _isTranslating && Input.GetKeyUp( KeyCode.Mouse2 ) )
+            if( _isTranslating && UnityEngine.Input.GetKeyUp( KeyCode.Mouse2 ) )
             {
                 _isTranslating = false;
             }

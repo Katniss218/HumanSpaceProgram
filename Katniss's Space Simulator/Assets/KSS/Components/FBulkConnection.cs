@@ -260,18 +260,21 @@ namespace KSS.Components
             }
 
             IPartObject vessel = this.transform.GetPartObject();
-            Vector3Dbl airfAcceleration = GravityUtils.GetNBodyGravityAcceleration( vessel.RootObjTransform.AIRFPosition );
-            Vector3 sceneAcceleration = SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformDirection( (Vector3)airfAcceleration );
-            Vector3 vesselAcceleration = vessel.PhysicsObject.Acceleration;
+            if( vessel != null ) 
+            {
+                Vector3Dbl airfAcceleration = GravityUtils.GetNBodyGravityAcceleration( vessel.RootObjTransform.AIRFPosition );
+                Vector3 sceneAcceleration = SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformDirection( (Vector3)airfAcceleration );
+                Vector3 vesselAcceleration = vessel.PhysicsObject.Acceleration;
 
-            // acceleration due to external forces (gravity) minus the acceleration of the vessel.
-            sceneAcceleration -= vesselAcceleration;
+                // acceleration due to external forces (gravity) minus the acceleration of the vessel.
+                sceneAcceleration -= vesselAcceleration;
 #warning TODO - Each part should have its own acceleration (which includes centrifugal acceleration due to spinning vessel), that way if the vessel is spinning, it'll work correctly.
 
-            // this averaging fixes a situation where the thrust is 1, but the flow is 0, then the thrust is 0, but flow is 1, and it alternated like that.
-            FixedUpdate_Flow( (sceneAcceleration + oldSceneAcceleration) / 2 );
+                // this averaging fixes a situation where the thrust is 1, but the flow is 0, then the thrust is 0, but flow is 1, and it alternated like that.
+                FixedUpdate_Flow( (sceneAcceleration + oldSceneAcceleration) / 2 );
 
-            oldSceneAcceleration = sceneAcceleration;
+                oldSceneAcceleration = sceneAcceleration;
+            }
         }
 
         public SerializedData GetData( IReverseReferenceMap s )

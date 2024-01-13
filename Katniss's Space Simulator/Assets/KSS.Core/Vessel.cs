@@ -9,18 +9,8 @@ using UnityEngine;
 
 namespace KSS.Core
 {
-    public static class VesselEx
+    public static class Vessel_Transform_Ex
     {
-        public static bool IsRootOfVessel( this Transform part )
-        {
-            if( part.root != part.parent )
-                return false;
-            Vessel v = part.parent.GetComponent<Vessel>();
-            if( v == null )
-                return false;
-            return v.RootPart == part;
-        }
-
         /// <summary>
         /// Gets the <see cref="Vessel"/> attached to this transform.
         /// </summary>
@@ -34,7 +24,6 @@ namespace KSS.Core
     /// <summary>
     /// A vessel is a moving object consisting of a hierarchy of "parts".
     /// </summary>
-    [RequireComponent( typeof( PhysicsObject ) )]
     [RequireComponent( typeof( RootObjectTransform ) )]
     public sealed partial class Vessel : MonoBehaviour, IPartObject
     {
@@ -54,15 +43,15 @@ namespace KSS.Core
             set
             {
                 if( _rootPart != null )
-                    _rootPart.SetParent( null );
+                    _rootPart.SetParent( null, true );
                 _rootPart = value;
                 if( value != null )
-                    value.SetParent( this.transform );
-                RecalculateParts();
+                    value.SetParent( this.transform, true );
+                RecalculatePartCache();
             }
         }
 
-        public PhysicsObject PhysicsObject { get; private set; }
+        public IPhysicsObject PhysicsObject { get; private set; }
         public RootObjectTransform RootObjTransform { get; private set; }
 
 #warning TODO - Vessels' position sometimes glitches out when far away from the origin. Setting the rigidbody to kinematic fixes the issue, which suggests that it is caused by a collision response.
@@ -73,6 +62,10 @@ namespace KSS.Core
 
         [field: SerializeField]
         int PartCount { get; set; } = 0;
+
+        // parts with xyz could be modified to be an array, and that array has its callbacks.
+        // on separation, parts are recalced fully, but when a part itself changes, that part updates the vessel via the delegate.
+
         [SerializeField]
         IHasMass[] _partsWithMass;
 
@@ -81,7 +74,7 @@ namespace KSS.Core
 
         public event Action OnAfterRecalculateParts;
 
-        public void RecalculateParts()
+        public void RecalculatePartCache()
         {
             if( RootPart == null )
             {
@@ -116,7 +109,7 @@ namespace KSS.Core
         /// <summary>
         /// Returns the local space center of mass, and the mass [kg] itself.
         /// </summary>
-        public (Vector3 localCenterOfMass, float mass) RecalculateMass()
+        private (Vector3 localCenterOfMass, float mass) RecalculateMass()
         {
             Vector3 centerOfMass = Vector3.zero;
             float mass = 0;
@@ -134,6 +127,26 @@ namespace KSS.Core
 
         public Vector3Dbl AIRFPosition { get => this.RootObjTransform.AIRFPosition; set => this.RootObjTransform.AIRFPosition = value; }
         public QuaternionDbl AIRFRotation { get => this.RootObjTransform.AIRFRotation; set => this.RootObjTransform.AIRFRotation = value; }
+
+        public bool IsPinned { get; private set; }
+
+        public void Pin( CelestialBody body, Vector3Dbl localPosition, QuaternionDbl localRotation )
+        {
+            DestroyImmediate( (Component)this.PhysicsObject );
+            PinnedPhysicsObject ppo = this.gameObject.AddComponent<PinnedPhysicsObject>();
+            ppo.ReferenceBody = body;
+            ppo.ReferencePosition = localPosition;
+            ppo.ReferenceRotation = localRotation;
+            this.PhysicsObject = ppo;
+            this.IsPinned = true;
+        }
+
+        public void Unpin()
+        {
+            DestroyImmediate( (Component)this.PhysicsObject );
+            this.PhysicsObject = this.gameObject.AddComponent<FreePhysicsObject>();
+            this.IsPinned = false;
+        }
 
         /// <summary>
         /// Calculates the scene world-space point at the very bottom of the vessel. Useful when placing it at launchsites and such.
@@ -159,7 +172,8 @@ namespace KSS.Core
         void Awake()
         {
             this.RootObjTransform = this.GetComponent<RootObjectTransform>();
-            this.PhysicsObject = this.GetComponent<PhysicsObject>();
+            this.PhysicsObject = this.GetComponent<IPhysicsObject>();
+            this.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
         }
 
         void SetPhysicsObjectParameters()
@@ -171,7 +185,8 @@ namespace KSS.Core
 
         void Start()
         {
-            RecalculateParts();
+            this.PhysicsObject = this.GetComponent<IPhysicsObject>(); // needs to be here for deserialization, because it might be added in any order and I can't use RequireComponent because it needs to be removed when pinning.
+            RecalculatePartCache();
             //SetPhysicsObjectParameters();
         }
 
@@ -194,7 +209,7 @@ namespace KSS.Core
 
         void FixedUpdate()
         {
-            SetPhysicsObjectParameters();
+            SetPhysicsObjectParameters(); // this full recalc every frame should be replaced by update-based approach.
 
             Vector3Dbl airfGravityForce = GravityUtils.GetNBodyGravityForce( this.AIRFPosition, PhysicsObject.Mass );
 

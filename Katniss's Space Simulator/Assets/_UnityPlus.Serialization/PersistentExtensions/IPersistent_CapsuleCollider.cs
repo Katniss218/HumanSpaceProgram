@@ -11,7 +11,7 @@ namespace UnityPlus.Serialization
 {
     public static class IPersistent_CapsuleCollider
     {
-        public static SerializedData GetData( this CapsuleCollider cc, ISaver s )
+        public static SerializedData GetData( this CapsuleCollider cc, IReverseReferenceMap s )
         {
             return new SerializedObject()
             {
@@ -23,7 +23,7 @@ namespace UnityPlus.Serialization
             };
         }
 
-        public static void SetData( this CapsuleCollider cc, ILoader l, SerializedObject data )
+        public static void SetData( this CapsuleCollider cc, IForwardReferenceMap l, SerializedData data )
         {
             if( data.TryGetValue( "radius", out var radius ) )
                 cc.radius = (float)radius;

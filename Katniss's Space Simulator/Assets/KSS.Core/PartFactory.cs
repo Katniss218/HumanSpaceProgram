@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace KSS.Core
 {
@@ -24,6 +25,6 @@ namespace KSS.Core
         /// Instantiates the gameobject hierarchy of this specific part from the original source.
         /// </summary>
         /// <returns>The root game object of the instantiated hierarchy.</returns>
-        public abstract GameObject Load();
+        public abstract GameObject Load( IForwardReferenceMap refMap );
     }
 }

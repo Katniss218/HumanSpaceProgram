@@ -10,7 +10,7 @@ namespace KSS.DesignScene.Tools
     public static class VanillaToolRegisterer
     {
         [HSPEventListener( HSPEvent.STARTUP_DESIGN, "designtools.vanilla.register" )]
-        private static void RegisterTool( object e )
+        private static void RegisterTool()
         {
             DesignSceneToolManager.RegisterTool<PickTool>();
             DesignSceneToolManager.RegisterTool<TranslateTool>();

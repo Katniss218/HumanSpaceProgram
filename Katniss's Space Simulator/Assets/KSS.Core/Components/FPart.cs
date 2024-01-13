@@ -11,7 +11,7 @@ using UnityPlus.Serialization;
 namespace KSS.Core.Components
 {
     /// <summary>
-    /// A marker component to track predefined parts.
+    /// A marker component to track parts.
     /// </summary>
     public class FPart : MonoBehaviour, IPersistent
     {

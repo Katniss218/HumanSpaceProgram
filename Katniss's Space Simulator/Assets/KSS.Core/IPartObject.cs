@@ -11,6 +11,18 @@ namespace KSS.Core
 {
     public static class IPartObjectEx
     {
+        public static bool IsRootOfPartObject( this Transform part )
+        {
+            if( part.root != part.parent )
+                return false;
+
+            IPartObject v = part.parent.GetComponent<IPartObject>();
+            if( v == null )
+                return false;
+
+            return v.RootPart == part;
+        }
+
         /// <summary>
         /// Gets the <see cref="IPartObject"/> attached to this transform.
         /// </summary>
@@ -21,10 +33,18 @@ namespace KSS.Core
         }
     }
 
+    /// <summary>
+    /// Represents an arbitrary type of part object.
+    /// </summary>
     public interface IPartObject : IComponent
     {
         Transform RootPart { get; }
-        PhysicsObject PhysicsObject { get; }
+        IPhysicsObject PhysicsObject { get; }
         RootObjectTransform RootObjTransform { get; }
+
+        /// <summary>
+        /// Call this to rebuild the part data cache.
+        /// </summary>
+        void RecalculatePartCache();
     }
 }

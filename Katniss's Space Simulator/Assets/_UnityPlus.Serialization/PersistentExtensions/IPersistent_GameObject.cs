@@ -15,7 +15,7 @@ namespace UnityPlus.Serialization
         /// </summary>
         /// <param name="objects">The serialized array to add the serialized data object to.</param>
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static SerializedData GetData( this GameObject gameObject, ISaver s )
+        public static SerializedData GetData( this GameObject gameObject, IReverseReferenceMap s )
         {
             return new SerializedObject()
             {
@@ -28,7 +28,7 @@ namespace UnityPlus.Serialization
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static void SetData( this GameObject gameObject, ILoader l, SerializedData data )
+        public static void SetData( this GameObject gameObject, IForwardReferenceMap l, SerializedData data )
         {
             if( data.TryGetValue( "name", out var name ) )
                 gameObject.name = (string)name;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -11,8 +12,10 @@ namespace UnityPlus.Serialization
     /// <summary>
     /// Represents an abstract functionality that can load a collection of objects while persisting their references.
     /// </summary>
-    public interface ILoader : IForwardReferenceMap
+    public interface ILoader
     {
+        public delegate void Action( IForwardReferenceMap l );
+
         /// <summary>
         /// The current state of the loader. <br />
         /// Loading is split into 2 stages - see the enum values.
@@ -42,6 +45,11 @@ namespace UnityPlus.Serialization
 
             // It lets us do that without hacking some system together, that loads objects as the references are resolved, and also allows circular referencing.
         }
+
+        /// <summary>
+        /// The reference map used to map object IDs to references when deserializing.
+        /// </summary>
+        IForwardReferenceMap RefMap { get; }
     }
 
     /// <summary>
@@ -49,6 +57,8 @@ namespace UnityPlus.Serialization
     /// </summary>
     public interface IAsyncLoader : ILoader
     {
+        new public delegate IEnumerator Action( IForwardReferenceMap l );
+
         /// <summary>
         /// The percentage (in [0..1]) of completion of the current action (0 = 0% completed, 1 = 100% completed).
         /// </summary>

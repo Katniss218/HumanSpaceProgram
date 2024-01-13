@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 namespace UnityEngine
 {
     /// <summary>
-    /// A double-precision Vector3.
+    /// A double-precision <see cref="Vector3"/>.
     /// </summary>
     [Serializable]
-    public struct Vector3Dbl
+    public struct Vector3Dbl : IEquatable<Vector3>, IEquatable<Vector3Dbl>
     {
         [SerializeField]
         public double x;
@@ -91,6 +91,12 @@ namespace UnityEngine
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static double Distance( Vector3Dbl v1, Vector3Dbl v2 )
+        {
+            return (v1 - v2).magnitude;
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public static Vector3Dbl Add( Vector3Dbl v1, Vector3Dbl v2 )
         {
             return new Vector3Dbl( v1.x + v2.x, v1.y + v2.y, v1.z + v2.z );
@@ -124,6 +130,35 @@ namespace UnityEngine
         public static Vector3Dbl Divide( Vector3Dbl v, double s )
         {
             return new Vector3Dbl( v.x / s, v.y / s, v.z / s );
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public override bool Equals( object other )
+        {
+            if( other is Vector3Dbl v1 ) 
+                return Equals( v1 );
+            if( other is Vector3 v2 )
+                return Equals( v2 );
+
+            return false;
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public bool Equals( Vector3 other )
+        {
+            return x == other.x && y == other.y && z == other.z;
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public bool Equals( Vector3Dbl other )
+        {
+            return x == other.x && y == other.y && z == other.z;
+        }
+        
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public override int GetHashCode()
+        {
+            return x.GetHashCode() ^ (y.GetHashCode() << 2) ^ (z.GetHashCode() >> 2);
         }
 
         public static Vector3Dbl operator +( Vector3Dbl v1, Vector3Dbl v2 )
