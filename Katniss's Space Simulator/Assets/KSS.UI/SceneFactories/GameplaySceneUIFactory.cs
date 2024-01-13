@@ -85,22 +85,22 @@ namespace KSS.UI.SceneFactories
 
             UIPanel navball = _mainPanel.AddPanel( new UILayoutInfo( new Vector2( 0.5f, 0 ), Vector2.zero, new Vector2( 222, 202 ) ), null );
 
-            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUIGameObject( navball.rectTransform, "mask", new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 190, 190 ) ) );
+            UIMask mask = navball.AddMask( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 190, 190 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/std0/ui_navball" ) );
 
-            Image imageComponent = rootGameObject.AddComponent<Image>();
-            imageComponent.raycastTarget = false;
-            imageComponent.maskable = true;
-            imageComponent.sprite = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/std0/ui_navball" );
-            imageComponent.type = Image.Type.Simple;
-
-            Mask mask = rootGameObject.AddComponent<Mask>();
-            mask.showMaskGraphic = false;
-
-            (GameObject rawGameObject, RectTransform rawTransform) = UIElement.CreateUIGameObject( rootTransform, "raw", UILayoutInfo.Fill() );
+            (GameObject rawGameObject, RectTransform rawTransform) = UIElement.CreateUIGameObject( mask.rectTransform, "raw", UILayoutInfo.Fill() );
             RawImage rawImage = rawGameObject.AddComponent<RawImage>();
-            rawImage.texture = null;
+            rawImage.texture = NavballManager.AttitudeIndicatorRT;
 
             UIIcon attitudeIndicator = navball.AddIcon( UILayoutInfo.Fill(), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/attitude_indicator" ) );
+
+
+            UIIcon prograde = mask.AddIcon( new UILayoutInfo( UILayoutInfo.Middle, Vector2.zero, new Vector2( 34, 34 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_prograde" ) );
+            UIIcon normal = mask.AddIcon( new UILayoutInfo( UILayoutInfo.Middle, Vector2.zero, new Vector2( 34, 34 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_normal" ) );
+            UIIcon radial = mask.AddIcon( new UILayoutInfo( UILayoutInfo.Middle, Vector2.zero, new Vector2( 34, 34 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_radial_in" ) );
+
+            UIIcon horizon = navball.AddIcon( new UILayoutInfo( UILayoutInfo.Middle, Vector2.zero, new Vector2( 90, 32 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_horizon" ) );
+
+
             UIPanel velocityIndicator = navball.AddPanel( new UILayoutInfo( new Vector2( 0.5f, 1f ), new Vector2( 0, 15 ), new Vector2( 167.5f, 40 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/velocity_indicator" ) );
 
             velocityIndicator.AddButton( new UILayoutInfo( new Vector2( 0, 0.5f ), new Vector2( 2, 0 ), new Vector2( 20, 20 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_list_gold" ), null );

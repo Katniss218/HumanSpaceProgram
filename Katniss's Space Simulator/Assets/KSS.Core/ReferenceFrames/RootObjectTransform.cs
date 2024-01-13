@@ -86,23 +86,23 @@ namespace KSS.Core.ReferenceFrames
             _rb = this.GetComponent<Rigidbody>();
         }
 
-        private void RecacheAirfPosRot()
+        private void RecacheAirfPosRot( IReferenceFrame referenceFrame )
         {
             if( this._rb == null )
             {
-                this._airfPosition = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.transform.position );
-                this._airfRotation = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( this.transform.rotation );
+                this._airfPosition = referenceFrame.TransformPosition( this.transform.position );
+                this._airfRotation = referenceFrame.TransformRotation( this.transform.rotation );
             }
             else
             {
-                this._airfPosition = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this._rb.position );
-                this._airfRotation = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( this._rb.rotation );
+                this._airfPosition = referenceFrame.TransformPosition( this._rb.position );
+                this._airfRotation = referenceFrame.TransformRotation( this._rb.rotation );
             }
         }
 
         void FixedUpdate()
         {
-            RecacheAirfPosRot();
+            RecacheAirfPosRot( SceneReferenceFrameManager.SceneReferenceFrame );
         }
 
         /// <summary>
@@ -110,7 +110,7 @@ namespace KSS.Core.ReferenceFrames
         /// </summary>
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
-            RecacheAirfPosRot();
+            RecacheAirfPosRot( data.OldFrame );
             UpdateScenePosition();
             UpdateSceneRotation();
         }

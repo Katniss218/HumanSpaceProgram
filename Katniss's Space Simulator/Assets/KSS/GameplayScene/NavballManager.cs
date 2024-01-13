@@ -1,4 +1,5 @@
 ﻿using KSS.Core;
+using KSS.Core.Physics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,16 +52,18 @@ namespace KSS.GameplayScene
         private static void CreateNavball()
         {
             GameObject navballObj = new GameObject( "navball" );
+            navballObj.transform.localScale = new Vector3( -1, 1, 1 );
 
             MeshFilter mf = navballObj.AddComponent<MeshFilter>();
-            mf.sharedMesh = AssetRegistry.Get<Mesh>( "internal::Resources/Meshes/attitude_indicator" );
+            mf.sharedMesh = AssetRegistry.Get<Mesh>( "builtin::Resources/Meshes/attitude_indicator2" );
 
             MeshRenderer mr = navballObj.AddComponent<MeshRenderer>();
-            mr.sharedMaterial = AssetRegistry.Get<Material>( "internal::Resources/Materials/attitude_indicator" );
+            mr.sharedMaterial = AssetRegistry.Get<Material>( "builtin::Resources/Materials/attitude_indicator" );
             mr.shadowCastingMode = ShadowCastingMode.Off;
             mr.receiveShadows = false;
 
             navballObj.SetLayer( (int)Layer.HIDDEN_SPECIAL_1 );
+            instance._navball = navballObj.transform;
         }
 
         private static void CreateNavballCamera()
@@ -69,7 +72,7 @@ namespace KSS.GameplayScene
 
             GameObject cameraObj = new GameObject( "navball camera" );
             cameraObj.transform.SetParent( pivotObj.transform );
-            cameraObj.transform.SetPositionAndRotation( new Vector3( 0, 0, 125f ), Quaternion.Euler( 0, 180f, 0 ) );
+            cameraObj.transform.SetPositionAndRotation( new Vector3( 0, 0, 0 ), Quaternion.Euler( 0, 0, 0 ) );
 
             Camera camera = cameraObj.AddComponent<Camera>();
             camera.orthographic = true;
@@ -77,9 +80,10 @@ namespace KSS.GameplayScene
             camera.farClipPlane = 125f;
             camera.cullingMask = 1 << (int)Layer.HIDDEN_SPECIAL_1;
             camera.targetTexture = AttitudeIndicatorRT;
+            instance._cameraPivot = pivotObj.transform;
         }
 
-        //[HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, "vanilla.spawn_navball" )]
+        [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, "vanilla.spawn_navball" )]
         public static void OnGameplayEnter()
         {
             GameplaySceneManager.GameObject.AddComponent<NavballManager>();
@@ -87,6 +91,19 @@ namespace KSS.GameplayScene
             ResetAttitudeIndicatorRT();
             CreateNavball();
             CreateNavballCamera();
+        }
+
+        void LateUpdate()
+        {
+            if( ActiveObjectManager.ActiveObject != null )
+            {
+                Vessel v = ActiveObjectManager.ActiveObject.transform.GetVessel();
+                Vector3 forward = (Vector3)CelestialBodyManager.CelestialBodies.First().AIRFRotation.GetForwardAxis();
+                Vector3 gravity = -GravityUtils.GetNBodyGravityAcceleration( v.AIRFPosition ).NormalizeToVector3();
+                forward = Vector3.ProjectOnPlane( forward, gravity );
+                NavballOrientation = Quaternion.LookRotation( forward, gravity );
+                VesselOrientation = (Quaternion)v.AIRFRotation;
+            }
         }
     }
 }

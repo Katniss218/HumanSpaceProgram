@@ -101,6 +101,8 @@
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIScrollViewEx.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UILayoutInfo.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIContextMenu.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIMaskEx.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIMask.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_UnityPlus.UILib\___UnityPlus.UILib.asmdef" />
