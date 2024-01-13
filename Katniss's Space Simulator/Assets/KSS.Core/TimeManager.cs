@@ -36,7 +36,7 @@ namespace KSS.Core
         public static float TimeScale { get => _timeScale; }
 
         /// <summary>
-        /// Returns the current universal time.
+        /// Returns the current universal time, in [s].
         /// </summary>
         public static double UT { get; private set; }
 

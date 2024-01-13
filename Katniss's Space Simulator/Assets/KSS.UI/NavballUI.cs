@@ -21,9 +21,13 @@ namespace KSS.UI
         private UIIcon _antiradial;
         private UIIcon _radial;
 
-        private UIIcon _maneuver; // maybe instead of that, add custom icons?
+        private UIIcon _maneuver; // maybe instead of that, add a list of custom icons?
 
-        public void SetDirectionIcons( UIIcon prograde, UIIcon retrograde, UIIcon normal, UIIcon antinormal, UIIcon antiradial, UIIcon radial )
+        public float NavballPixelRadius { get; set; } = 95f;
+
+        public Vector3? ManeuverAirfDirection { get; set; } = Vector3.one;
+
+        public void SetDirectionIcons( UIIcon prograde, UIIcon retrograde, UIIcon normal, UIIcon antinormal, UIIcon antiradial, UIIcon radial, UIIcon maneuver )
         {
             _prograde = prograde;
             _retrograde = retrograde;
@@ -31,40 +35,60 @@ namespace KSS.UI
             _antinormal = antinormal;
             _antiradial = antiradial;
             _radial = radial;
+            _maneuver = maneuver;
+        }
+
+        static Vector3 CulledByDepth( Vector3 pos )
+        {
+            return pos.z >= 0 ? pos : new Vector2( 9999, 9999 ); ;
         }
 
         void LateUpdate()
         {
             if( ActiveObjectManager.ActiveObject != null )
             {
-                // these directions can be mapped onto the navball plane by simply transforming them using the vessel space rotation matrix.
-                // - get world-to-local rotation matrix from airf orientation
-                // - get directions
-                // - multiply directions by the matrix
-                // - depth value indicates whether or not to fade and/or show the icon (behind the ball)
-
                 Vessel activeVessel = ActiveObjectManager.ActiveObject.transform.GetVessel();
-                Quaternion orbitalOrientation = NavballUtils.GetOrientation( SceneReferenceFrameManager.SceneReferenceFrame.TransformDirection( activeVessel.PhysicsObject.Velocity ), GravityUtils.GetNBodyGravityAcceleration( activeVessel.AIRFPosition ) );
 
-                Matrix4x4 rotation = Matrix4x4.Rotate( (Quaternion)activeVessel.AIRFRotation ).inverse;
+                Matrix4x4 airfToLocalMatrix = Matrix4x4.Rotate( (Quaternion)activeVessel.AIRFRotation ).inverse;
 
-                const float NAVBALL_SIZE = 95f;
+                Vector3Dbl airfVelocity = SceneReferenceFrameManager.SceneReferenceFrame.TransformDirection( activeVessel.PhysicsObject.Velocity );
+                if( airfVelocity.magnitude > 0.25f )
+                {
+                    OrbitalOrientation airfOrientation = OrbitalOrientation.FromNBody( airfVelocity, GravityUtils.GetNBodyGravityAcceleration( activeVessel.AIRFPosition ) );
 
-                Vector3 localPrograde = rotation.MultiplyVector( NavballUtils.GetPrograde( orbitalOrientation ) ) * NAVBALL_SIZE;
-                Vector3 localRetrograde = rotation.MultiplyVector( NavballUtils.GetRetrograde( orbitalOrientation ) ) * NAVBALL_SIZE;
-                Vector3 localNormal = rotation.MultiplyVector( NavballUtils.GetNormal( orbitalOrientation ) ) * NAVBALL_SIZE;
-                Vector3 localAntinormal = rotation.MultiplyVector( NavballUtils.GetAntinormal( orbitalOrientation ) ) * NAVBALL_SIZE;
-                Vector3 localAntiradial = rotation.MultiplyVector( NavballUtils.GetAntiradial( orbitalOrientation ) ) * NAVBALL_SIZE;
-                Vector3 localRadial = rotation.MultiplyVector( NavballUtils.GetRadial( orbitalOrientation ) ) * NAVBALL_SIZE;
+                    Vector3 localPrograde = airfToLocalMatrix.MultiplyVector( airfOrientation.GetPrograde() ) * NavballPixelRadius;
+                    Vector3 localRetrograde = airfToLocalMatrix.MultiplyVector( airfOrientation.GetRetrograde() ) * NavballPixelRadius;
+                    Vector3 localNormal = airfToLocalMatrix.MultiplyVector( airfOrientation.GetNormal() ) * NavballPixelRadius;
+                    Vector3 localAntinormal = airfToLocalMatrix.MultiplyVector( airfOrientation.GetAntinormal() ) * NavballPixelRadius;
+                    Vector3 localAntiradial = airfToLocalMatrix.MultiplyVector( airfOrientation.GetAntiradial() ) * NavballPixelRadius;
+                    Vector3 localRadial = airfToLocalMatrix.MultiplyVector( airfOrientation.GetRadial() ) * NavballPixelRadius;
 
-                _prograde.rectTransform.anchoredPosition = localPrograde.z >= 0 ? localPrograde : new Vector2( 9999, 9999 );
-                _retrograde.rectTransform.anchoredPosition = localRetrograde.z >= 0 ? localRetrograde : new Vector2( 9999, 9999 );
-                _normal.rectTransform.anchoredPosition = localNormal.z >= 0 ? localNormal : new Vector2( 9999, 9999 );
-                _antinormal.rectTransform.anchoredPosition = localAntinormal.z >= 0 ? localAntinormal : new Vector2( 9999, 9999 );
-                _antiradial.rectTransform.anchoredPosition = localAntiradial.z >= 0 ? localAntiradial : new Vector2( 9999, 9999 );
-                _radial.rectTransform.anchoredPosition = localRadial.z >= 0 ? localRadial : new Vector2( 9999, 9999 );
+                    _prograde.rectTransform.anchoredPosition = CulledByDepth( localPrograde );
+                    _retrograde.rectTransform.anchoredPosition = CulledByDepth( localRetrograde );
+                    _normal.rectTransform.anchoredPosition = CulledByDepth( localNormal );
+                    _antinormal.rectTransform.anchoredPosition = CulledByDepth( localAntinormal );
+                    _antiradial.rectTransform.anchoredPosition = CulledByDepth( localAntiradial );
+                    _radial.rectTransform.anchoredPosition = CulledByDepth( localRadial );
+                }
+                else
+                {
+                    _prograde.rectTransform.anchoredPosition = new Vector2( 9999, 9999 );
+                    _retrograde.rectTransform.anchoredPosition = new Vector2( 9999, 9999 );
+                    _normal.rectTransform.anchoredPosition = new Vector2( 9999, 9999 );
+                    _antinormal.rectTransform.anchoredPosition = new Vector2( 9999, 9999 );
+                    _antiradial.rectTransform.anchoredPosition = new Vector2( 9999, 9999 );
+                    _radial.rectTransform.anchoredPosition = new Vector2( 9999, 9999 );
+                }
 
-
+                if( ManeuverAirfDirection.HasValue )
+                {
+                    Vector3 localManeuver = airfToLocalMatrix.MultiplyVector( ManeuverAirfDirection.Value.normalized ) * NavballPixelRadius;
+                    _maneuver.rectTransform.anchoredPosition = CulledByDepth( localManeuver );
+                }
+                else
+                {
+                    _maneuver.rectTransform.anchoredPosition = new Vector2( 9999, 9999 );
+                }
             }
         }
     }

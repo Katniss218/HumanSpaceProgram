@@ -617,6 +617,8 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: 24701081e5f345447ab80e5dc8104580, type: 3}
   - assetID: builtin::Resources/Sprites/nodes/m_radial_in
     asset: {fileID: 21300000, guid: 24448dd11258ca34f8b94fb72bd83cc3, type: 3}
+  - assetID: builtin::Resources/Sprites/nodes/m_maneuver
+    asset: {fileID: 21300000, guid: 24be95f4de0b41446a3d2db584e8a2aa, type: 3}
   - assetID: builtin::Resources/Sprites/UI/button_x
     asset: {fileID: 21300000, guid: 44201c46f3fcaa84488125cc4456843a, type: 3}
   - assetID: builtin::___Scenes/Editor
