@@ -71,10 +71,12 @@
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIText.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIIcon.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\IUIElement.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIMaskEx.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\Layout\VerticalLayoutDriver.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIInputFieldEx.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\ValueBar.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\IUILayoutSelf.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIMask.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\CanvasManager.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIInputToggle.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIScrollView.cs" />
@@ -101,8 +103,6 @@
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIScrollViewEx.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UILayoutInfo.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIContextMenu.cs" />
-    <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIMaskEx.cs" />
-    <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIMask.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_UnityPlus.UILib\___UnityPlus.UILib.asmdef" />

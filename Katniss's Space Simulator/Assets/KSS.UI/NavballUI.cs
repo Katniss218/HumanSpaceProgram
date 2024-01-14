@@ -54,7 +54,7 @@ namespace KSS.UI
                 Vector3Dbl airfVelocity = SceneReferenceFrameManager.SceneReferenceFrame.TransformDirection( activeVessel.PhysicsObject.Velocity );
                 if( airfVelocity.magnitude > 0.25f )
                 {
-                    OrbitalOrientation airfOrientation = OrbitalOrientation.FromNBody( airfVelocity, GravityUtils.GetNBodyGravityAcceleration( activeVessel.AIRFPosition ) );
+                    OrbitalFrame airfOrientation = OrbitalFrame.FromNBody( airfVelocity, GravityUtils.GetNBodyGravityAcceleration( activeVessel.AIRFPosition ) );
 
                     Vector3 localPrograde = airfToLocalMatrix.MultiplyVector( airfOrientation.GetPrograde() ) * NavballPixelRadius;
                     Vector3 localRetrograde = airfToLocalMatrix.MultiplyVector( airfOrientation.GetRetrograde() ) * NavballPixelRadius;

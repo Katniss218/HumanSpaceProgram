@@ -61,6 +61,7 @@
     <Compile Include="Assets\KSS\DesignScene\DesignSceneToolBase.cs" />
     <Compile Include="Assets\KSS\DesignScene\Tools\PickTool.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\VanillaPlanetarySystemFactory.cs" />
+    <Compile Include="Assets\KSS\Components\FTestAvionics.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadTree.cs" />
     <Compile Include="Assets\KSS\TransformHandle.cs" />
     <Compile Include="Assets\KSS\DesignScene\DesignObjectManager.cs" />
@@ -92,7 +93,7 @@
     <Compile Include="Assets\KSS\DesignScene\DesignObject.cs" />
     <Compile Include="Assets\KSS\Components\FBulkConnection.cs" />
     <Compile Include="Assets\KSS\AssetLoaders\GameDataTextureLoader.cs" />
-    <Compile Include="Assets\KSS\Components\FActuatorXY.cs" />
+    <Compile Include="Assets\KSS\Components\F2AxisActuator.cs" />
     <Compile Include="Assets\KSS\DesignScene\Tools\TranslateTool.cs" />
     <Compile Include="Assets\KSS\AssetLoaders\GameDataJsonPartFactory.cs" />
     <Compile Include="Assets\KSS\Input\HierarchicalInputPriority.cs" />
@@ -104,6 +105,7 @@
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadTree_NodeUtils.cs" />
     <Compile Include="Assets\KSS\GameplayScene\NavballManager.cs" />
     <Compile Include="Assets\KSS\AssetLoaders\GameDataJsonVesselFactory.cs" />
+    <Compile Include="Assets\KSS\Components\FGimbalController.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS\CelestialBodies\Surface\TerrainShader.shader" />

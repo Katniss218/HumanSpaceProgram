@@ -5,6 +5,7 @@ using System;
 using UnityEngine;
 using UnityPlus.Input;
 using UnityPlus.Serialization;
+using KSS.Control;
 
 namespace KSS.Components
 {
@@ -35,6 +36,12 @@ namespace KSS.Components
         [field: SerializeField]
         public float Throttle { get; set; }
 
+        [ControlIn( "throttle", "Throttle", "Sets the throttle level, [0..1]." )]
+        private void SetThrottle( float value )
+        {
+            this.Throttle = value;
+        }
+
         /// <summary>
         /// Defines which way the engine thrusts (thrust is applied in its `forward` (Z+) direction).
         /// </summary>
@@ -57,30 +64,6 @@ namespace KSS.Components
         {
             this.Throttle = value;
         }*/
-
-        void OnEnable()
-        {
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MAX, HierarchicalInputPriority.MEDIUM, Input_FullThrottle );
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MIN, HierarchicalInputPriority.MEDIUM, Input_CutThrottle );
-        }
-
-        void OnDisable()
-        {
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MAX, Input_FullThrottle );
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MIN, Input_CutThrottle );
-        }
-
-        private bool Input_FullThrottle()
-        {
-            Throttle = 1.0f;
-            return false;
-        }
-        
-        private bool Input_CutThrottle()
-        {
-            Throttle = 0.0f;
-            return false;
-        }
 
         void FixedUpdate()
         {

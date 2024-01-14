@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 namespace KSS.Control
@@ -9,15 +11,31 @@ namespace KSS.Control
     /// Marks an event as an output for a control channel.
     /// </summary>
     [AttributeUsage( AttributeTargets.Event )]
-    public class ControlOutAttribute : Attribute
+    public sealed class ControlOutAttribute : Attribute
     {
-        public string ID { get; set; }
-        public string DisplayName { get; set; }
+        public ControlType ControlType { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
 
-        public ControlOutAttribute( string name, string displayName )
+        public ControlOutAttribute( ControlType controlType, string name )
         {
-            this.ID = name;
-            this.DisplayName = displayName;
+            this.ControlType = controlType;
+            this.Name = name;
+        }
+
+        public ControlOutAttribute( ControlType controlType, string name, string description )
+        {
+            this.ControlType = controlType;
+            this.Name = name;
+            this.Description = description;
+        }
+
+        public static IEnumerable<(EventInfo member, ControlOutAttribute attr)> GetControlOutputs( Component component )
+        {
+            // This is cacheable in a dict if needed.
+            EventInfo[] events = component.GetType().GetEvents( BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic );
+
+            return events.Select( e => (e, e.GetCustomAttribute<ControlOutAttribute>()) ).Where( e => e.Item2 != null );
         }
     }
 }
