@@ -98,6 +98,7 @@
     <Compile Include="Assets\KSS\AssetLoaders\GameDataJsonPartFactory.cs" />
     <Compile Include="Assets\KSS\Input\HierarchicalInputPriority.cs" />
     <Compile Include="Assets\KSS\DesignScene\Tools\RerootTool.cs" />
+    <Compile Include="Assets\KSS\Components\FGimbalController.cs" />
     <Compile Include="Assets\KSS\MainMenuScene\MainMenuEscapeInputController.cs" />
     <Compile Include="Assets\KSS\GameplayScene\GameplaySceneToolBase.cs" />
     <Compile Include="Assets\KSS\GameplayScene\TimeScaleInputController.cs" />
@@ -105,7 +106,6 @@
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadTree_NodeUtils.cs" />
     <Compile Include="Assets\KSS\GameplayScene\NavballManager.cs" />
     <Compile Include="Assets\KSS\AssetLoaders\GameDataJsonVesselFactory.cs" />
-    <Compile Include="Assets\KSS\Components\FGimbalController.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS\CelestialBodies\Surface\TerrainShader.shader" />

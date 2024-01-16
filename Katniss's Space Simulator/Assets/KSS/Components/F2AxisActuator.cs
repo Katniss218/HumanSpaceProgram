@@ -17,10 +17,10 @@ namespace KSS.Components
         [field: SerializeField]
         public Transform ReferenceTransform { get; set; }
 
-        [ControlIn( ControlType.Parameter, "Coordinate Space Transform" )]
+        [ControlParameterOut( "Coordinate Space Transform" )]
         public Transform GetTransform()
         {
-
+            return ReferenceTransform;
         }
 
         [field: SerializeField]
@@ -31,13 +31,13 @@ namespace KSS.Components
 
         // min/max ranges.
 
-        [ControlIn( ControlType.Action, "Set X" )]
+        [ControllerIn( "Set X" )]
         public void SetX( float x )
         {
             this._x = x;
         }
 
-        [ControlIn( ControlType.Action, "Set Y" )]
+        [ControllerIn( "Set Y" )]
         public void SetY( float y )
         {
             this._y = y;
