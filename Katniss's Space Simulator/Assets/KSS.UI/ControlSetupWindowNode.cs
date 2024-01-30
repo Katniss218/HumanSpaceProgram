@@ -31,18 +31,14 @@ namespace KSS.UI
         {
             // it is possible to force-show nodes for components outside of the target hierarchy of the window.
 
-            IEnumerable<(MethodInfo member, ControlInAttribute attr)> inputs = ControlInAttribute.GetControlInputs( component );
-            IEnumerable<(EventInfo member, ControlOutAttribute attr)> outputs = ControlOutAttribute.GetControlOutputs( component );
+            IEnumerable<(Control.Control member, NamedControlAttribute attr)> controls = ControlUtils.GetControls( component );
 
             UIPanel panel = window.window.AddPanel( new UILayoutInfo( UILayoutInfo.Middle, Vector2.zero, new Vector2( 50, 50 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_node" ) );
 
             ControlSetupWindowNode node = panel.gameObject.AddComponent<ControlSetupWindowNode>();
             node.panel = panel;
-            node._inputs = inputs.Select( (input, i) => ControlSetupWindowNodeInput.Create( node, i * 10, input.member, input.attr ) ).ToArray();
-            node._outputs = outputs.Select( (output, i) => ControlSetupWindowNodeOutput.Create( node, i * 10, output.member, output.attr ) ).ToArray();
-
-            // what if the node is connected to something?
-            // connections to the outputs are easy, but there is no way of knowing if something is connected to the inputs without additional information.
+            //node._inputs = inputs.Select( (input, i) => ControlSetupWindowNodeInput.Create( node, i * 10, input.member, input.attr ) ).ToArray();
+            //node._outputs = outputs.Select( (output, i) => ControlSetupWindowNodeOutput.Create( node, i * 10, output.member, output.attr ) ).ToArray();
 
             return node;
         }

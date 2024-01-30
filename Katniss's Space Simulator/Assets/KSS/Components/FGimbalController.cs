@@ -1,10 +1,8 @@
 ﻿using KSS.Control;
+using KSS.Control.Controls;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization;
 
@@ -12,7 +10,7 @@ namespace KSS.Components
 {
     public class FGimbalController : MonoBehaviour, IPersistent
     {
-        public class ControlGroup : Control.ControlGroup
+        public class ActuatorGroup : ControlGroup
         {
             // Control Parameters are kind of a "reverse" connection. it is on the left/input side, and is used to retrieve a value.
             // So it's really just a control input, but it should never get invoked.
@@ -25,24 +23,23 @@ namespace KSS.Components
         }
 
         [NamedControl( "Controlled Actuators" )]
-        private ControlGroup[] ControlledActuators = new ControlGroup[5];
+        private ActuatorGroup[] ControlledActuators = new ActuatorGroup[5];
 
-#warning FUCK - here doesn't work
         [NamedControl( "set_deflection", "Set Deflection" )]
-        private ControllerInput<Vector2> SetDeflection = new ControllerInput<Vector2>( OnSetDeflection );
+        private ControlleeInput<Vector2> SetDeflection;
         private void OnSetDeflection( Vector2 deflection )
         {
-            foreach( var con in ControlledActuators )
-            {
-
-            }
             // do stuff...
+        }
+
+        void Awake()
+        {
+            SetDeflection = new ControlleeInput<Vector2>( OnSetDeflection );
         }
 
         public SerializedData GetData( IReverseReferenceMap s )
         {
-#warning FUCK - here works
-            SetDeflection = new ControllerInput<Vector2>( OnSetDeflection );
+            SetDeflection = new ControlleeInput<Vector2>( OnSetDeflection );
 
             throw new NotImplementedException();
             // serialize the controlled array, otherwise the stuff is not gonna be set.

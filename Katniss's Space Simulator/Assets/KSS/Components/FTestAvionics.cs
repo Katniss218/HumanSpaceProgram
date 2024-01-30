@@ -1,4 +1,5 @@
 ﻿using KSS.Control;
+using KSS.Control.Controls;
 using KSS.Input;
 using System;
 using System.Collections.Generic;
@@ -26,8 +27,8 @@ namespace KSS.Components
         private float _pitchAxis; // channel representing the pitch control signal.
         private float Throttle;
 
-        [ControlOut( "throttle", "Throttle" )]
-        private event Action<float> OnSetThrottle;
+        [NamedControl( "Throttle" )]
+        private ControllerOutput<float> OnSetThrottle;
 
         void OnEnable()
         {

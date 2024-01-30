@@ -17,8 +17,8 @@ namespace KSS.UI
         ControlSetupWindowNode _node;
 
         // outputs are events, inputs are methods. connections are delegates.
-        MethodInfo _method;
-        ControlInAttribute _attr;
+        Control.Control _method;
+        NamedControlAttribute _attr;
 
         // input to a control channel
 
@@ -28,7 +28,7 @@ namespace KSS.UI
 
         // also when pressed if connected to something - disconnect and hook the end to the mouse until released. if released over nothing - delete connection
 
-        internal static ControlSetupWindowNodeInput Create( ControlSetupWindowNode node, float verticalOffset, MethodInfo member, ControlInAttribute attr )
+        internal static ControlSetupWindowNodeInput Create( ControlSetupWindowNode node, float verticalOffset, Control.Control member, NamedControlAttribute attr )
         {
             // create a circle "button", maybe with an arrow pointing right (inputs appear on the left side)
 

@@ -18,7 +18,7 @@ namespace KSS.UI
 
         // outputs are events, inputs are methods. connections are delegates.
         EventInfo _event;
-        ControlOutAttribute _attr;
+        NamedControlAttribute _attr;
 
         // output of a control channel
 
@@ -27,7 +27,7 @@ namespace KSS.UI
         // show the name/description of channel on mouseover.
         // also when pressed if connected to something - disconnect and hook the end to the mouse until released. if released over nothing - delete connection
 
-        internal static ControlSetupWindowNodeOutput Create( ControlSetupWindowNode node, float verticalOffset, EventInfo member, ControlOutAttribute attr )
+        internal static ControlSetupWindowNodeOutput Create( ControlSetupWindowNode node, float verticalOffset, EventInfo member, NamedControlAttribute attr )
         {
             UIIcon icon = node.panel.AddIcon( new UILayoutInfo( UILayoutInfo.TopRight, UILayoutInfo.TopRight, new Vector2( 0, verticalOffset ), new Vector2( 10, 10 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_output" ) );
 

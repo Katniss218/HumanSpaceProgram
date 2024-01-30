@@ -1,4 +1,5 @@
 ﻿using KSS.Control;
+using KSS.Control.Controls;
 using System;
 using UnityEngine;
 using UnityPlus.Serialization;
@@ -17,7 +18,8 @@ namespace KSS.Components
         [field: SerializeField]
         public Transform ReferenceTransform { get; set; }
 
-        [ControlParameterOut( "Coordinate Space Transform" )]
+        [NamedControl( "Coordinate Space Transform" )]
+        public ControlParameterOutput<Transform> GetReferenceTransform;
         public Transform GetTransform()
         {
             return ReferenceTransform;
@@ -31,16 +33,25 @@ namespace KSS.Components
 
         // min/max ranges.
 
-        [ControllerIn( "Set X" )]
-        public void SetX( float x )
+        [NamedControl( "Set X" )]
+        private ControlleeInput<float> SetX;
+        public void OnSetX( float x )
         {
             this._x = x;
         }
 
-        [ControllerIn( "Set Y" )]
-        public void SetY( float y )
+        [NamedControl( "Set Y" )]
+        private ControlleeInput<float> SetY;
+        public void OnSetY( float y )
         {
             this._y = y;
+        }
+
+        void Awake()
+        {
+            GetReferenceTransform = new ControlParameterOutput<Transform>( GetTransform );
+            SetX = new ControlleeInput<float>( OnSetX );
+            SetY = new ControlleeInput<float>( OnSetY );
         }
 
         void Update()

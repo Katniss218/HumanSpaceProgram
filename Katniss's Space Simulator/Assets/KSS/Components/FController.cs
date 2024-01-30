@@ -1,4 +1,5 @@
 ﻿using KSS.Control;
+using KSS.Control.Controls;
 using System;
 using UnityEngine;
 using UnityPlus.Serialization;
@@ -14,11 +15,11 @@ namespace KSS.Components
         // the signal will depend on the part being connected. for example if the RCS is connected, the signal should be different for RCS positioned in different directions, and in different ways.
 
         // something like this. these could then be further connected.
-        [ControlOut( "steer.x", "Steer X" )]
-        public event Action<float> SteerX;
+        [NamedControl( "steer.x", "Steer X" )]
+        public ControllerOutput<float> SteerX;
 
-        [ControlOut( "steer.y", "Steer Y" )]
-        public event Action<float> SteerY;
+        [NamedControl( "steer.y", "Steer Y" )]
+        public ControllerOutput<float> SteerY;
 
         public SerializedData GetData( IReverseReferenceMap s )
         {

@@ -99,6 +99,7 @@
     <Compile Include="Assets\KSS.Core\Components\FAttachNode.cs" />
     <Compile Include="Assets\KSS.Core\TimeManager.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\IResourceProducer.cs" />
+    <Compile Include="Assets\KSS.Core\Control\ControlUtils.cs" />
     <Compile Include="Assets\KSS.Core\SceneManagement\DesignSceneManager.cs" />
     <Compile Include="Assets\KSS.Core\ReferenceFrames\IReferenceFrame.cs" />
     <Compile Include="Assets\KSS.Core\HumanSpaceProgram.cs" />
@@ -122,7 +123,13 @@
     <Compile Include="Assets\KSS.Core\ActiveObjectManager.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\SubstanceStateCollection.cs" />
     <Compile Include="Assets\KSS.Core\Physics\FreePhysicsObject.cs" />
-    <Compile Include="Assets\KSS.Core\Control\ControlUtils.cs" />
+    <Compile Include="Assets\KSS.Core\Control\NamedControlAttribute.cs" />
+    <Compile Include="Assets\KSS.Core\Control\Control.cs" />
+    <Compile Include="Assets\KSS.Core\Control\ControlGroup.cs" />
+    <Compile Include="Assets\KSS.Core\Control\Controls\ControlParameterInput.cs" />
+    <Compile Include="Assets\KSS.Core\Control\Controls\ControllerOutput.cs" />
+    <Compile Include="Assets\KSS.Core\Control\Controls\ControlleeInput.cs" />
+    <Compile Include="Assets\KSS.Core\Control\Controls\ControlParameterOutput.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.Core\___KSS.Core.asmdef" />

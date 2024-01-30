@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityPlus.Input;
 using UnityPlus.Serialization;
 using KSS.Control;
+using KSS.Control.Controls;
 
 namespace KSS.Components
 {
@@ -36,8 +37,9 @@ namespace KSS.Components
         [field: SerializeField]
         public float Throttle { get; set; }
 
-        [ControlIn( "throttle", "Throttle", "Sets the throttle level, [0..1]." )]
-        private void SetThrottle( float value )
+        [NamedControl( "Throttle", "Sets the throttle level, [0..1]." )]
+        ControlleeInput<float> SetThrottle;
+        private void OnSetThrottle( float value )
         {
             this.Throttle = value;
         }
@@ -59,11 +61,10 @@ namespace KSS.Components
             return (this.Isp * g) * massFlow * Throttle;
         }
 
-        /*[ControlIn( "set.throttle", "Set Throttle" )]
-        public void SetThrottle( float value )
+        void Awake()
         {
-            this.Throttle = value;
-        }*/
+            SetThrottle = new ControlleeInput<float>( OnSetThrottle );
+        }
 
         void FixedUpdate()
         {
