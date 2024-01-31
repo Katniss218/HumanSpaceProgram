@@ -1,14 +1,17 @@
 ﻿using System;
 using UnityPlus.Serialization;
 using System.Runtime.CompilerServices;
+using System.Collections.Generic;
 
 namespace KSS.Control.Controls
 {
+    public abstract class ControllerOutput : Control { }
+
     /// <summary>
     /// Represents a control that generates a control signal. <br/>
     /// Used to control something by connecting it to the appropriate <see cref="ControlleeInput{T}"/>.
     /// </summary>
-    public sealed class ControllerOutput<T> : Control, IPersistent
+    public sealed class ControllerOutput<T> : ControllerOutput, IPersistent
     {
         public ControlleeInput<T> Input { get; internal set; }
 
@@ -21,9 +24,39 @@ namespace KSS.Control.Controls
             Input?.onInvoke.Invoke( signalValue );
         }
 
-        public override void Disconnect()
+        public override IEnumerable<Control> GetConnections()
         {
+            yield return Input;
+        }
+
+        public override bool TryConnect( Control other )
+        {
+            if( other is not ControlleeInput<T> input )
+                return false;
+
+            Connect( input, this );
+            return true;
+        }
+
+        public override bool TryDisconnect( Control other )
+        {
+            if( other is not ControlleeInput<T> input )
+                return false;
+
+            if( this.Input != input )
+                return false;
+
+            Disconnect( input, this );
+            return true;
+        }
+
+        public override bool TryDisconnectAll()
+        {
+            if( this.Input == null )
+                return false;
+
             Disconnect( this.Input, this );
+            return true;
         }
 
         public SerializedData GetData( IReverseReferenceMap s )

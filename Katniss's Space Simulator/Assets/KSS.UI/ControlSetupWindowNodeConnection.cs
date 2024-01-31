@@ -12,15 +12,15 @@ namespace KSS.UI
     {
         // connection is not a monobeh.
 
-        ControlSetupWindowNodeInput _from;
-        ControlSetupWindowNodeOutput _to;
+        ControlSetupControleeInput _from;
+        ControlSetupControlerOutput _to;
 
         // outputs are events, inputs are methods. connections are delegates.
         Delegate _delegate;
 
         // also which controlin is connected to which controlout.
 
-        internal static ControlSetupWindowNodeConnection Create( ControlSetupWindow window, ControlSetupWindowNodeInput input, ControlSetupWindowNodeOutput output )
+        internal static ControlSetupWindowNodeConnection Create( ControlSetupWindow window, ControlSetupControleeInput input, ControlSetupControlerOutput output )
         {
             // create
 

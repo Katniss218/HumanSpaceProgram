@@ -18,8 +18,26 @@ namespace KSS.Control
         internal Transform transform { get; set; }
 
         /// <summary>
-        /// Disconnects the connection leading to this control.
+        /// Gets the control(s) that this control is connected to.
         /// </summary>
-        public abstract void Disconnect();
+        public abstract IEnumerable<Control> GetConnections();
+
+        /// <summary>
+        /// Tries to connect this control to a given control.
+        /// </summary>
+        /// <returns>True if the connection was created successfully.</returns>
+        public abstract bool TryConnect( Control other );
+
+        /// <summary>
+        /// Tries to disconnect this control from the specific control.
+        /// </summary>
+        /// <returns>True if the connection was removed. False if the connection didn't exist or couldn't've been removed.</returns>
+        public abstract bool TryDisconnect( Control other );
+
+        /// <summary>
+        /// Tries to disconnect this control from every other control it is connected to.
+        /// </summary>
+        /// <returns>True if the connection was removed. False if the connection didn't exist or couldn't've been removed.</returns>
+        public abstract bool TryDisconnectAll();
     }
 }

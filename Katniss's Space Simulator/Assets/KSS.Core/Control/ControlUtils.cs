@@ -1,14 +1,7 @@
-﻿using KSS.Control;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using UnityPlus.Serialization;
 
 namespace KSS.Control
 {
@@ -21,38 +14,55 @@ namespace KSS.Control
 
         // arrays are supported on groups, and inputs/outputs. This will display as multiple of the entry right under each other. Possibly with a number for easier matching.
 
-        static Dictionary<Type, (FieldInfo fi, NamedControlAttribute attr)[]> _cache = new();
+        static Dictionary<Type, (FieldInfo field, NamedControlAttribute attr)[]> _cache = new();
 
-        public static IEnumerable<(Control member, NamedControlAttribute attr)> GetControls( Component component )
+        private static (FieldInfo field, NamedControlAttribute attr)[] GetControlsOrGroups<T>( object obj )
         {
-            Type type = component.GetType();
-            if( _cache.TryGetValue( type, out var controls ) )
+            Type objType = obj.GetType();
+            if( _cache.TryGetValue( objType, out var controls ) )
             {
-                controls.Select( m => ((Control)m.fi.GetValue( component ), m.attr) ); // Use compiled expression?
+                return controls;
             }
             else
             {
-                FieldInfo[] controls2 = component.GetType().GetFields( BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic );
+                FieldInfo[] controls2 = obj.GetType().GetFields( BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic );
 
-                // cache of any.
+                List<(FieldInfo fi, NamedControlAttribute attr)> list = new();
+                foreach( var control in controls2 )
+                {
+                    NamedControlAttribute attr = control.GetCustomAttribute<NamedControlAttribute>();
+                    if( attr == null )
+                        continue;
 
-               // return controls2.Select( m => (m, m.GetCustomAttribute<NamedControlAttribute>()) ).Where( m => m.Item2 != null );
+                    var member = control.FieldType( obj );
+                        continue;
+
+                    list.Add( (control, attr) );
+                }
+
+                controls = list.ToArray();
+                _cache.Add( objType, controls );
             }
-            throw new NotImplementedException();
+
+            return controls;
         }
 
-        public static IEnumerable<(ControlGroup controlGroup, NamedControlAttribute attr)> GetControlGroups( Component component )
+        public static IEnumerable<(object control, NamedControlAttribute attr)> GetControls( Component component )
         {
-            FieldInfo[] controlGroups = component.GetType().GetFields( BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic );
-
-            throw new NotImplementedException();
+            foreach( var (field, attr) in GetControlsOrGroups<Control>( component ) )
+            {
+                var member = field.GetValue( component );
+                yield return (member, attr);
+            }
         }
 
-        public static IEnumerable<(Control control, NamedControlAttribute attr)> GetControls( ControlGroup group )
+        public static IEnumerable<(object control, NamedControlAttribute attr)> GetControls( ControlGroup group )
         {
-            FieldInfo[] controls = group.GetType().GetFields( BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic );
-
-            throw new NotImplementedException();
+            foreach( var (field, attr) in GetControlsOrGroups<Control>( group ) )
+            {
+                var member = field.GetValue( group );
+                yield return (member, attr);
+            }
         }
     }
 }

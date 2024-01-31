@@ -80,9 +80,9 @@
     <Compile Include="Assets\KSS.UI\NavballUI.cs" />
     <Compile Include="Assets\KSS.UI\Windows\StartNewGameWindow.cs" />
     <Compile Include="Assets\KSS.UI\HUDs\ConstructionSiteHUDManager.cs" />
-    <Compile Include="Assets\KSS.UI\ControlSetupWindowNodeInput.cs" />
+    <Compile Include="Assets\KSS.UI\ControlSetupControleeInput.cs" />
     <Compile Include="Assets\KSS.UI\HUDs\VesselHUDManager.cs" />
-    <Compile Include="Assets\KSS.UI\ControlSetupWindowNodeOutput.cs" />
+    <Compile Include="Assets\KSS.UI\ControlSetupControlerOutput.cs" />
     <Compile Include="Assets\KSS.UI\ControlSetupWindowNode.cs" />
     <Compile Include="Assets\KSS.UI\Windows\PartWindow.cs" />
     <Compile Include="Assets\KSS.UI\AccelerationReadoutUI.cs" />
@@ -90,6 +90,9 @@
     <Compile Include="Assets\KSS.UI\SceneFactories\DesignSceneUIFactory.cs" />
     <Compile Include="Assets\KSS.UI\FPSCounterUI.cs" />
     <Compile Include="Assets\KSS.UI\Windows\ControlSetupWindow.cs" />
+    <Compile Include="Assets\KSS.UI\ControlSetupWindowNodeGroup.cs" />
+    <Compile Include="Assets\KSS.UI\ControlSetupParameterInput.cs" />
+    <Compile Include="Assets\KSS.UI\ControlSetupParameterOutput.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.UI\___KSS.UI.asmdef" />

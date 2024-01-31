@@ -8,10 +8,12 @@ using UnityPlus.Serialization;
 
 namespace KSS.Control.Controls
 {
+    public abstract class ControlParameterInput : Control { }
+
     /// <summary>
     /// Represents a control that is used to retrieve a parameter from the <see cref="ControlParameterOutput{T}"/> it's connected to.
     /// </summary>
-    public sealed class ControlParameterInput<T> : Control, IPersistent
+    public sealed class ControlParameterInput<T> : ControlParameterInput, IPersistent
     {
         public ControlParameterOutput<T> Output { get; internal set; }
 
@@ -36,9 +38,39 @@ namespace KSS.Control.Controls
             return true;
         }
 
-        public override void Disconnect()
+        public override IEnumerable<Control> GetConnections()
         {
+            yield return Output;
+        }
+
+        public override bool TryConnect( Control other )
+        {
+            if( other is not ControlParameterOutput<T> output )
+                return false;
+
+            Connect( this, output );
+            return true;
+        }
+
+        public override bool TryDisconnect( Control other )
+        {
+            if( other is not ControlParameterOutput<T> output )
+                return false;
+
+            if( this.Output != output )
+                return false;
+
+            Disconnect( this, output );
+            return true;
+        }
+
+        public override bool TryDisconnectAll()
+        {
+            if( this.Output == null )
+                return false;
+
             Disconnect( this, this.Output );
+            return true;
         }
 
         public SerializedData GetData( IReverseReferenceMap s )
