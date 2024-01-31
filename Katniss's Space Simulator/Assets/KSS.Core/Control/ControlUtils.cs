@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
@@ -34,33 +35,29 @@ namespace KSS.Control
                     if( attr == null )
                         continue;
 
-                    var member = control.FieldType( obj );
+                    Type fieldType = control.FieldType;
+                    if( !typeof( ControlGroup ).IsAssignableFrom( fieldType )
+                     && !typeof( Control ).IsAssignableFrom( fieldType ) )
                         continue;
 
                     list.Add( (control, attr) );
                 }
 
                 controls = list.ToArray();
-                _cache.Add( objType, controls );
+                if( controls.Any() )
+                {
+                    _cache.Add( objType, controls );
+                }
             }
 
             return controls;
         }
 
-        public static IEnumerable<(object control, NamedControlAttribute attr)> GetControls( Component component )
+        public static IEnumerable<(object control, NamedControlAttribute attr)> GetControls( object target )
         {
-            foreach( var (field, attr) in GetControlsOrGroups<Control>( component ) )
+            foreach( var (field, attr) in GetControlsOrGroups<Control>( target ) )
             {
-                var member = field.GetValue( component );
-                yield return (member, attr);
-            }
-        }
-
-        public static IEnumerable<(object control, NamedControlAttribute attr)> GetControls( ControlGroup group )
-        {
-            foreach( var (field, attr) in GetControlsOrGroups<Control>( group ) )
-            {
-                var member = field.GetValue( group );
+                var member = field.GetValue( target );
                 yield return (member, attr);
             }
         }

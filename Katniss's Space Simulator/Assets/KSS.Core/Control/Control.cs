@@ -23,9 +23,9 @@ namespace KSS.Control
         public abstract IEnumerable<Control> GetConnections();
 
         /// <summary>
-        /// Tries to connect this control to a given control.
+        /// Tries to connect this control to a given control. <br/>
         /// </summary>
-        /// <returns>True if the connection was created successfully.</returns>
+        /// <returns>True if the controls are compatible, and the connection was created successfully.</returns>
         public abstract bool TryConnect( Control other );
 
         /// <summary>

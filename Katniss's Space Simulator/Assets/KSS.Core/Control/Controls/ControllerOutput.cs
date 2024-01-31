@@ -81,7 +81,8 @@ namespace KSS.Control.Controls
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         internal static void Connect( ControlleeInput<T> input, ControllerOutput<T> output )
         {
-
+            input.Output = output;
+            output.Input = input;
         }
     }
 }

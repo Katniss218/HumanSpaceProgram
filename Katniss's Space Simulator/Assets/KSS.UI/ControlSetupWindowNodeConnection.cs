@@ -12,31 +12,26 @@ namespace KSS.UI
     {
         // connection is not a monobeh.
 
-        ControlSetupControleeInput _from;
-        ControlSetupControlerOutput _to;
-
-        // outputs are events, inputs are methods. connections are delegates.
-        Delegate _delegate;
+        ControlSetupControlUI _output; // from.
+        ControlSetupControlUI _input; // to.
 
         // also which controlin is connected to which controlout.
 
-        internal static ControlSetupWindowNodeConnection Create( ControlSetupWindow window, ControlSetupControleeInput input, ControlSetupControlerOutput output )
+        internal static bool TryCreate( ControlSetupWindow window, ControlSetupControlUI input, ControlSetupControlUI output, out ControlSetupWindowNodeConnection connection )
         {
-            // create
+            if( !output.Control.TryConnect( input.Control ) )
+            {
+                connection = null;
+                return false;
+            }
 
-#warning TODo - check parameter compatibility. parameter list needs to be the same.
+            connection = new ControlSetupWindowNodeConnection();
+            connection._input = input;
+            connection._output = output;
 
-            // get and create niputs/outputs.
+            window.AddConnection( connection );
 
-            ControlSetupWindowNodeConnection conn = new ControlSetupWindowNodeConnection();
-            conn._from = input;
-            conn._to = output;
-
-#warning TODO - delegate.
-
-            window.AddConnection( conn );
-
-            return conn;
+            return true;
         }
     }
 }
