@@ -18,6 +18,18 @@ namespace UnityEngine
             return component.GetComponents<Component>();
         }
 
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static void GetComponentsInChildren( this Component component, List<Component> results )
+        {
+            component.GetComponentsInChildren<Component>( results );
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static Component[] GetComponentsInChildren( this Component component )
+        {
+            return component.GetComponentsInChildren<Component>();
+        }
+
         /// <summary>
         /// Gets every component attached to the component's gameobject, including its <see cref="Transform"/>.
         /// </summary>

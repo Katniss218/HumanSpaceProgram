@@ -17,6 +17,11 @@ namespace KSS.UI
 
         // also which controlin is connected to which controlout.
 
+        public void Destroy()
+        {
+
+        }
+
         internal static bool TryCreate( ControlSetupWindow window, ControlSetupControlUI input, ControlSetupControlUI output, out ControlSetupWindowNodeConnection connection )
         {
             if( !output.Control.TryConnect( input.Control ) )
@@ -28,8 +33,6 @@ namespace KSS.UI
             connection = new ControlSetupWindowNodeConnection();
             connection._input = input;
             connection._output = output;
-
-            window.AddConnection( connection );
 
             return true;
         }

@@ -21,27 +21,35 @@ namespace KSS.UI.Windows
 
         Transform _target; // defines what will be displayed in the window.
         internal UIWindow window;
+        private UIScrollView _scrollView;
+        public IUIElementContainer Container => _scrollView;
 
         // node inputs/outputs might be connected to invisible (in the window) stuff, if it's outside of the hierarchy.
 
         List<ControlSetupWindowNode> _nodes = new List<ControlSetupWindowNode>();
         List<ControlSetupWindowNodeConnection> _connections = new List<ControlSetupWindowNodeConnection>();
 
-        internal void AddNode( ControlSetupWindowNode node )
+        private void RefreshNodesAndConnections()
         {
-            _nodes.Add( node );
-        }
+            foreach( var node in _nodes )
+            {
+                node.Destroy();
+            }
+            foreach( var connection in _connections )
+            {
+                connection.Destroy();
+            }
 
-        internal void AddConnection( ControlSetupWindowNodeConnection conn )
-        {
-            _connections.Add( conn );
-        }
+            Component[] components = _target.GetComponentsInChildren();
 
-        private void RefreshNodes()
-        {
-            // get all components that should be shown (have control in or out)
-            // remove nodes that don't exist in the list.
-            // add the new nodes.
+            foreach( var comp in components )
+            {
+                if( Control.ControlUtils.HasControls( comp ) )
+                {
+                    ControlSetupWindowNode node = ControlSetupWindowNode.Create( this, comp );
+                    _nodes.Add( node );
+                }
+            }
         }
 
         public static ControlSetupWindow Create( Transform target )
@@ -51,9 +59,12 @@ namespace KSS.UI.Windows
                 .Focusable()
                 .WithCloseButton( new UILayoutInfo( Vector2.one, new Vector2( -7, -5 ), new Vector2( 20, 20 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ );
 
+            UIScrollView scrollView = window.AddScrollView( UILayoutInfo.Fill(), new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 300, 300 ) ), true, true );
+
             ControlSetupWindow w = window.gameObject.AddComponent<ControlSetupWindow>();
             w._target = target;
             w.window = window;
+            w._scrollView = scrollView;
 
             return w;
         }

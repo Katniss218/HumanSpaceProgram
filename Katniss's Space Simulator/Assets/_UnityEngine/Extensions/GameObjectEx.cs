@@ -28,6 +28,18 @@ namespace UnityEngine
             gameObject.GetComponents( results );
         }
 
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static void GetComponentsInChildren( this GameObject gameObject, List<Component> results )
+        {
+            gameObject.GetComponentsInChildren<Component>( results );
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static Component[] GetComponentsInChildren( this GameObject gameObject )
+        {
+            return gameObject.GetComponentsInChildren<Component>();
+        }
+
         /// <summary>
         /// Checks if the gameobject has a component of a specified type.
         /// </summary>

@@ -33,6 +33,11 @@ namespace KSS.UI
 
         internal UIPanel panel; // this is ugly. UI should provide a way of creating new UI elements easily, without boilerplate, and with restrictions what can be a child, etc.
 
+        public void Destroy()
+        {
+            this.panel.Destroy();
+        }
+
         /// <summary>
         /// Creates a control setup node for a given component.
         /// </summary>
@@ -40,13 +45,18 @@ namespace KSS.UI
         {
             // it is possible to force-show nodes for components outside of the target hierarchy of the window.
 
-            UIPanel panel = window.window.AddPanel( new UILayoutInfo( UILayoutInfo.Middle, Vector2.zero, new Vector2( 50, 50 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_node" ) );
+            UIPanel panel = window.Container.AddPanel( new UILayoutInfo( UILayoutInfo.Middle, Vector2.zero, new Vector2( 50, 50 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_node" ) );
+
+            RectTransformDragger dragger = panel.gameObject.AddComponent<RectTransformDragger>();
+            dragger.UITransform = panel.rectTransform;
 
             ControlSetupWindowNode node = panel.gameObject.AddComponent<ControlSetupWindowNode>();
             node.panel = panel;
             node.Window = window;
 
             ControlSetupControlGroupUI groupUI = ControlSetupControlGroupUI.Create( node, 0, component, null );
+
+            panel.AddText( UILayoutInfo.Fill(), component.GetType().Name );
 
             return node;
         }

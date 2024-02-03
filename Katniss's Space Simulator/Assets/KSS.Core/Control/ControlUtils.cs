@@ -17,7 +17,7 @@ namespace KSS.Control
 
         static Dictionary<Type, (FieldInfo field, NamedControlAttribute attr)[]> _cache = new();
 
-        private static (FieldInfo field, NamedControlAttribute attr)[] GetControlsOrGroups<T>( object obj )
+        private static (FieldInfo field, NamedControlAttribute attr)[] GetControlsOrGroups( object obj )
         {
             Type objType = obj.GetType();
             if( _cache.TryGetValue( objType, out var controls ) )
@@ -28,7 +28,8 @@ namespace KSS.Control
             {
                 FieldInfo[] controls2 = obj.GetType().GetFields( BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic );
 
-                List<(FieldInfo fi, NamedControlAttribute attr)> list = new();
+                List<(FieldInfo fi, NamedControlAttribute attr)> controlsFoundOnTarget = new();
+
                 foreach( var control in controls2 )
                 {
                     NamedControlAttribute attr = control.GetCustomAttribute<NamedControlAttribute>();
@@ -40,10 +41,10 @@ namespace KSS.Control
                      && !typeof( Control ).IsAssignableFrom( fieldType ) )
                         continue;
 
-                    list.Add( (control, attr) );
+                    controlsFoundOnTarget.Add( (control, attr) );
                 }
 
-                controls = list.ToArray();
+                controls = controlsFoundOnTarget.ToArray();
                 if( controls.Any() )
                 {
                     _cache.Add( objType, controls );
@@ -55,11 +56,16 @@ namespace KSS.Control
 
         public static IEnumerable<(object control, NamedControlAttribute attr)> GetControls( object target )
         {
-            foreach( var (field, attr) in GetControlsOrGroups<Control>( target ) )
+            foreach( var (field, attr) in GetControlsOrGroups( target ) )
             {
                 var member = field.GetValue( target );
                 yield return (member, attr);
             }
+        }
+
+        public static bool HasControls( object target )
+        {
+            return GetControlsOrGroups( target ).Any(); // TODO - optimize - don't actually download the full array and cache when the array is empty.
         }
     }
 }

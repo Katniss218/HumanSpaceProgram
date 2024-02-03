@@ -175,8 +175,6 @@ namespace KSS.UI
 
             groupUI.RedrawControls();
 
-            group.Height
-
             return groupUI;
         }
     }

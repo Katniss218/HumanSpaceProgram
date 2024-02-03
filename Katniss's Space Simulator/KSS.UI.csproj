@@ -57,7 +57,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\KSS.UI\HUDs\ConstructionSiteHUD.cs" />
+    <Compile Include="Assets\KSS.UI\ControlSetupControlGroupUI.cs" />
     <Compile Include="Assets\KSS.UI\AltitudeReadoutUI.cs" />
+    <Compile Include="Assets\KSS.UI\ControlSetupControlUI.cs" />
     <Compile Include="Assets\KSS.UI\SaveMetadataUI.cs" />
     <Compile Include="Assets\KSS.UI\CanvasName.cs" />
     <Compile Include="Assets\KSS.UI\Windows\ConfirmationWindow_Ex.cs" />
@@ -88,8 +90,6 @@
     <Compile Include="Assets\KSS.UI\SceneFactories\DesignSceneUIFactory.cs" />
     <Compile Include="Assets\KSS.UI\FPSCounterUI.cs" />
     <Compile Include="Assets\KSS.UI\Windows\ControlSetupWindow.cs" />
-    <Compile Include="Assets\KSS.UI\ControlSetupControlUI.cs" />
-    <Compile Include="Assets\KSS.UI\ControlSetupControlGroupUI.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.UI\___KSS.UI.asmdef" />
