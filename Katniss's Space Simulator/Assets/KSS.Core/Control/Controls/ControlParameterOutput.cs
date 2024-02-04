@@ -9,7 +9,7 @@ namespace KSS.Control.Controls
     public abstract class ControlParameterOutput : Control { }
 
     /// <summary>
-    /// Represents a control that can directly get a specific parameter. <br/>
+    /// Represents a control that returns a parameter. Connect to an input to use it. <br/>
     /// Canonically, the parameter should relate to the same 'object' the control is located on.
     /// </summary>
     public sealed class ControlParameterOutput<T> : ControlParameterOutput

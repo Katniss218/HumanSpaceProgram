@@ -54,17 +54,21 @@ namespace KSS.UI.Windows
 
         public static ControlSetupWindow Create( Transform target )
         {
-            UIWindow window = CanvasManager.Get( CanvasName.WINDOWS ).AddWindow( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 350f, 400f ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_window" ) )
+            UIWindow window = CanvasManager.Get( CanvasName.WINDOWS ).AddWindow( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 750, 750 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_window" ) )
                 .Draggable()
                 .Focusable()
                 .WithCloseButton( new UILayoutInfo( Vector2.one, new Vector2( -7, -5 ), new Vector2( 20, 20 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ );
 
-            UIScrollView scrollView = window.AddScrollView( UILayoutInfo.Fill(), new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 300, 300 ) ), true, true );
+            // TODO - resizable windows.
+
+            UIScrollView scrollView = window.AddScrollView( UILayoutInfo.Fill( 5, 5, 30, 5 ), new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 750, 750 ) ), true, true );
 
             ControlSetupWindow w = window.gameObject.AddComponent<ControlSetupWindow>();
             w._target = target;
             w.window = window;
             w._scrollView = scrollView;
+
+            w.RefreshNodesAndConnections();
 
             return w;
         }

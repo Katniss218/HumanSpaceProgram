@@ -45,7 +45,11 @@ namespace KSS.UI
         {
             // it is possible to force-show nodes for components outside of the target hierarchy of the window.
 
-            UIPanel panel = window.Container.AddPanel( new UILayoutInfo( UILayoutInfo.Middle, Vector2.zero, new Vector2( 50, 50 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_node" ) );
+            UIPanel panel = window.Container.AddPanel( new UILayoutInfo( UILayoutInfo.Middle, Vector2.zero, new Vector2( 100, 150 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_node" ) );
+
+            panel.Raycastable( true );
+
+            UIText text = panel.AddText( UILayoutInfo.FillHorizontal( 5, 5, UILayoutInfo.TopF, 0, 20 ), component.GetType().Name );
 
             RectTransformDragger dragger = panel.gameObject.AddComponent<RectTransformDragger>();
             dragger.UITransform = panel.rectTransform;
@@ -54,9 +58,7 @@ namespace KSS.UI
             node.panel = panel;
             node.Window = window;
 
-            ControlSetupControlGroupUI groupUI = ControlSetupControlGroupUI.Create( node, 0, component, null );
-
-            panel.AddText( UILayoutInfo.Fill(), component.GetType().Name );
+            ControlSetupControlGroupUI groupUI = ControlSetupControlGroupUI.Create( node, component );
 
             return node;
         }

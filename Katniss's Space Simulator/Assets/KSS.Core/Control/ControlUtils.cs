@@ -8,11 +8,6 @@ namespace KSS.Control
 {
     public static class ControlUtils
     {
-        public static void CacheControlInOutTransforms( Transform root )
-        {
-
-        }
-
         // arrays are supported on groups, and inputs/outputs. This will display as multiple of the entry right under each other. Possibly with a number for easier matching.
 
         static Dictionary<Type, (FieldInfo field, NamedControlAttribute attr)[]> _cache = new();
@@ -26,22 +21,22 @@ namespace KSS.Control
             }
             else
             {
-                FieldInfo[] controls2 = obj.GetType().GetFields( BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic );
+                FieldInfo[] fields = obj.GetType().GetFields( BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic );
 
-                List<(FieldInfo fi, NamedControlAttribute attr)> controlsFoundOnTarget = new();
+                List<(FieldInfo, NamedControlAttribute)> controlsFoundOnTarget = new();
 
-                foreach( var control in controls2 )
+                foreach( var field in fields )
                 {
-                    NamedControlAttribute attr = control.GetCustomAttribute<NamedControlAttribute>();
+                    NamedControlAttribute attr = field.GetCustomAttribute<NamedControlAttribute>();
                     if( attr == null )
                         continue;
 
-                    Type fieldType = control.FieldType;
-                    if( !typeof( ControlGroup ).IsAssignableFrom( fieldType )
-                     && !typeof( Control ).IsAssignableFrom( fieldType ) )
+                    Type fieldType = field.FieldType;
+                    if( !typeof( ControlGroup ).IsAssignableFrom( fieldType ) && !typeof( ControlGroup[] ).IsAssignableFrom( fieldType )
+                     && !typeof( Control ).IsAssignableFrom( fieldType ) && !typeof( Control[] ).IsAssignableFrom( fieldType ) )
                         continue;
 
-                    controlsFoundOnTarget.Add( (control, attr) );
+                    controlsFoundOnTarget.Add( (field, attr) );
                 }
 
                 controls = controlsFoundOnTarget.ToArray();
@@ -59,6 +54,10 @@ namespace KSS.Control
             foreach( var (field, attr) in GetControlsOrGroups( target ) )
             {
                 var member = field.GetValue( target );
+
+                if( member.IsUnityNull() )
+                    continue;
+
                 yield return (member, attr);
             }
         }

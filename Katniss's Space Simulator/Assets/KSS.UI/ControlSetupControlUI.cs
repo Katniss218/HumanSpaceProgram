@@ -14,6 +14,8 @@ namespace KSS.UI
 {
     public class ControlSetupControlUI : MonoBehaviour
     {
+        public const float HEIGHT = 15.0f;
+
         ControlSetupControlGroupUI _group;
 
         ControlSetupControlUI _connectedTo;
@@ -30,7 +32,11 @@ namespace KSS.UI
 
         internal static ControlSetupControlUI Create( ControlSetupControlGroupUI group, float side, float verticalOffset, Control.Control control, NamedControlAttribute attr )
         {
-            UIIcon icon = group.panel.AddIcon( new UILayoutInfo( new Vector2( side, 1.0f ), new Vector2( 0, verticalOffset ), new Vector2( 10, 10 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_output" ) );
+            UIPanel panel = group.panel.AddPanel( UILayoutInfo.FillHorizontal( 0, 0, UILayoutInfo.TopF, -verticalOffset, HEIGHT ), null );
+            UIIcon icon = panel.AddIcon( new UILayoutInfo( new Vector2( side, 1.0f ), Vector2.zero, new Vector2( HEIGHT, HEIGHT ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_output" ) );
+
+            UIText name = panel.AddText( UILayoutInfo.FillHorizontal( (1 - side) * HEIGHT, (side) * HEIGHT, UILayoutInfo.TopF, 0, HEIGHT ), attr.Name )
+                .WithAlignment( side == 0 ? TMPro.HorizontalAlignmentOptions.Left : TMPro.HorizontalAlignmentOptions.Right );
 
             ControlSetupControlUI output = icon.gameObject.AddComponent<ControlSetupControlUI>();
             output._group = group;
