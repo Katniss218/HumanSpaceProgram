@@ -10,107 +10,100 @@ using KSS.Control.Controls;
 
 namespace KSS.Components
 {
-    [Serializable]
-    public class FRocketEngine : MonoBehaviour, IResourceConsumer, IPersistent
-    {
-        const float g = 9.80665f;
+	[Serializable]
+	public class FRocketEngine : MonoBehaviour, IThruster, IResourceConsumer, IPersistent
+	{
+		const float g = 9.80665f;
 
-        float _currentThrust;
+		public float Thrust { get; private set; }
 
-        /// <summary>
-        /// The maximum thrust of the engine, in [N].
-        /// </summary>
-        [field: SerializeField]
-        public float MaxThrust { get; set; } = 10000f;
+		/// <summary>
+		/// The maximum thrust, in [N].
+		/// </summary>
+		[field: SerializeField]
+		public float MaxThrust { get; set; } = 10000f;
 
-        /// <summary>
-        /// Specific impulse of the engine, in [s].
-        /// </summary>
-        [field: SerializeField]
-        public float Isp { get; set; } = 100f; // TODO - curve based on atmospheric pressure.
+		/// <summary>
+		/// The specific impulse, in [s].
+		/// </summary>
+		[field: SerializeField]
+		public float Isp { get; set; } = 100f; // TODO - curve based on atmospheric pressure.
 
-        /// <summary>
-        /// Maximum mass flow (at max thrust), in [kg/s]
-        /// </summary>
-        public float MaxMassFlow => MaxThrust / (Isp * g);
+		/// <summary>
+		/// The maximum mass flow (when thrust = max thrust), in [kg/s].
+		/// </summary>
+		public float MaxMassFlow => MaxThrust / (Isp * g);
 
-        [field: SerializeField]
-        public float Throttle { get; set; }
+		[field: SerializeField]
+		public float Throttle { get; set; }
 
-        [NamedControl( "Throttle", "Sets the throttle level, [0..1]." )]
-        ControlleeInput<float> SetThrottle;
-        private void OnSetThrottle( float value )
-        {
-            this.Throttle = value;
-        }
+		[NamedControl( "Throttle", "Sets the throttle level, [0..1]." )]
+		ControlleeInput<float> SetThrottle;
+		private void OnSetThrottle( float value )
+		{
+			this.Throttle = value;
+		}
 
-        /// <summary>
-        /// Defines which way the engine thrusts (thrust is applied in its `forward` (Z+) direction).
-        /// </summary>
-        [field: SerializeField]
-        public Transform ThrustTransform { get; set; }
+		[field: SerializeField]
+		public Transform ThrustTransform { get; set; }
 
-        [field: SerializeField]
-        public SubstanceStateCollection Inflow { get; private set; } = SubstanceStateCollection.Empty;
+		[field: SerializeField]
+		public SubstanceStateCollection Inflow { get; private set; } = SubstanceStateCollection.Empty;
 
-        /// <summary>
-        /// Returns the actual thrust produced by the engine at this moment in time.
-        /// </summary>
-        public float GetThrust( float massFlow )
-        {
-            return (this.Isp * g) * massFlow * Throttle;
-        }
+		private float GetThrust( float massFlow )
+		{
+			return (this.Isp * g) * massFlow * Throttle;
+		}
 
-        void Awake()
-        {
-            SetThrottle = new ControlleeInput<float>( OnSetThrottle );
-        }
+		void Awake()
+		{
+			SetThrottle = new ControlleeInput<float>( OnSetThrottle );
+		}
 
-        void FixedUpdate()
-        {
-            float thrust = GetThrust( Inflow.GetMass() );
-            if( this.Throttle > 0.0f )
-            {
-                Vessel vessel = this.transform.GetVessel();
-                if( vessel != null )
-                {
-                    vessel.PhysicsObject.AddForceAtPosition( this.ThrustTransform.forward * thrust, this.ThrustTransform.position );
-                }
-            }
-            _currentThrust = thrust;
-        }
+		void FixedUpdate()
+		{
+			this.Thrust = GetThrust( Inflow.GetMass() );
+			if( this.Throttle > 0.0f )
+			{
+				Vessel vessel = this.transform.GetVessel();
+				if( vessel != null )
+				{
+					vessel.PhysicsObject.AddForceAtPosition( this.ThrustTransform.forward * this.Thrust, this.ThrustTransform.position );
+				}
+			}
+		}
 
-        public void ClampIn( SubstanceStateCollection inflow, float dt )
-        {
-            FlowUtils.ClampMaxMassFlow( inflow, Inflow.GetMass(), MaxMassFlow * Throttle );
-        }
+		public void ClampIn( SubstanceStateCollection inflow, float dt )
+		{
+			FlowUtils.ClampMaxMassFlow( inflow, Inflow.GetMass(), MaxMassFlow * Throttle );
+		}
 
-        public FluidState Sample( Vector3 localPosition, Vector3 localAcceleration, float holeArea )
-        {
-            return FluidState.Vacuum; // temp, inlet condition (possible backflow, etc).
-        }
+		public FluidState Sample( Vector3 localPosition, Vector3 localAcceleration, float holeArea )
+		{
+			return FluidState.Vacuum; // temp, inlet condition (possible backflow, etc).
+		}
 
-        public SerializedData GetData( IReverseReferenceMap s )
-        {
-            return new SerializedObject()
-            {
-                { "max_thrust", this.MaxThrust },
-                { "isp", this.Isp },
-                { "throttle", this.Throttle },
-                { "thrust_transform", s.WriteObjectReference( this.ThrustTransform ) }
-            };
-        }
+		public SerializedData GetData( IReverseReferenceMap s )
+		{
+			return new SerializedObject()
+			{
+				{ "max_thrust", this.MaxThrust },
+				{ "isp", this.Isp },
+				{ "throttle", this.Throttle },
+				{ "thrust_transform", s.WriteObjectReference( this.ThrustTransform ) }
+			};
+		}
 
-        public void SetData( IForwardReferenceMap l, SerializedData data )
-        {
-            if( data.TryGetValue( "max_thrust", out var maxThrust ) )
-                this.MaxThrust = (float)maxThrust;
-            if( data.TryGetValue( "isp", out var isp ) )
-                this.Isp = (float)isp;
-            if( data.TryGetValue( "throttle", out var throttle ) )
-                this.Throttle = (float)throttle;
-            if( data.TryGetValue( "thrust_transform", out var thrustTransform ) )
-                this.ThrustTransform = (Transform)l.ReadObjectReference( thrustTransform );
-        }
-    }
+		public void SetData( IForwardReferenceMap l, SerializedData data )
+		{
+			if( data.TryGetValue( "max_thrust", out var maxThrust ) )
+				this.MaxThrust = (float)maxThrust;
+			if( data.TryGetValue( "isp", out var isp ) )
+				this.Isp = (float)isp;
+			if( data.TryGetValue( "throttle", out var throttle ) )
+				this.Throttle = (float)throttle;
+			if( data.TryGetValue( "thrust_transform", out var thrustTransform ) )
+				this.ThrustTransform = (Transform)l.ReadObjectReference( thrustTransform );
+		}
+	}
 }

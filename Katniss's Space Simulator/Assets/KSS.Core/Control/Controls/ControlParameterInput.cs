@@ -8,95 +8,101 @@ using UnityPlus.Serialization;
 
 namespace KSS.Control.Controls
 {
-    public abstract class ControlParameterInput : Control { }
+	public abstract class ControlParameterInput : Control { }
 
-    /// <summary>
-    /// Represents a control that is used to retrieve a parameter from the <see cref="ControlParameterOutput{T}"/> it's connected to.
-    /// </summary>
-    public sealed class ControlParameterInput<T> : ControlParameterInput, IPersistent
-    {
-        public ControlParameterOutput<T> Output { get; internal set; }
+	/// <summary>
+	/// Represents a control that is used to retrieve a parameter from the <see cref="ControlParameterOutput{T}"/> it's connected to.
+	/// </summary>
+	public sealed class ControlParameterInput<T> : ControlParameterInput, IPersistent
+	{
+		public ControlParameterOutput<T> Output { get; internal set; }
 
-        public ControlParameterInput()
-        {
-        }
+		public ControlParameterInput()
+		{
+		}
 
-        /// <summary>
-        /// Invokes the connected parameter getter to retrieve the parameter.
-        /// </summary>
-        /// <param name="value">If the returned value is `true`, contains the value of the connected parameter getter.</param>
-        /// <returns>True if the value was returned successfully (i.e. connection is connected and healthy), otherwise false.</returns>
-        public bool TryGet( out T value )
-        {
-            if( Output == null )
-            {
-                value = default;
-                return false;
-            }
+		/// <summary>
+		/// Invokes the connected parameter getter to retrieve the parameter.
+		/// </summary>
+		/// <param name="value">If the returned value is `true`, contains the value of the connected parameter getter.</param>
+		/// <returns>True if the value was returned successfully (i.e. connection is connected and healthy), otherwise false.</returns>
+		public bool TryGet( out T value )
+		{
+			if( Output == null )
+			{
+				value = default;
+				return false;
+			}
 
-            value = Output.getter.Invoke();
-            return true;
-        }
+			value = Output.getter.Invoke();
+			return true;
+		}
 
-        public override IEnumerable<Control> GetConnections()
-        {
-            yield return Output;
-        }
+		public override IEnumerable<Control> GetConnections()
+		{
+			yield return Output;
+		}
 
-        public override bool TryConnect( Control other )
-        {
-            if( other is not ControlParameterOutput<T> output )
-                return false;
+		public override bool TryConnect( Control other )
+		{
+			if( other is not ControlParameterOutput<T> output )
+				return false;
 
-            Connect( this, output );
-            return true;
-        }
+			if( Output == null )
+				return false;
 
-        public override bool TryDisconnect( Control other )
-        {
-            if( other is not ControlParameterOutput<T> output )
-                return false;
+			Connect( this, output );
+			return true;
+		}
 
-            if( this.Output != output )
-                return false;
+		public override bool TryDisconnect( Control other )
+		{
+			if( other is not ControlParameterOutput<T> output )
+				return false;
 
-            Disconnect( this, output );
-            return true;
-        }
+			if( this.Output != output )
+				return false;
 
-        public override bool TryDisconnectAll()
-        {
-            if( this.Output == null )
-                return false;
+			Disconnect( this );
+			return true;
+		}
 
-            Disconnect( this, this.Output );
-            return true;
-        }
+		public override bool TryDisconnectAll()
+		{
+			if( this.Output == null )
+				return false;
 
-        public SerializedData GetData( IReverseReferenceMap s )
-        {
-            // save what it is connected to.
-            throw new NotImplementedException();
-        }
+			Disconnect( this );
+			return true;
+		}
 
-        public void SetData( IForwardReferenceMap l, SerializedData data )
-        {
-            // load what it is connected to.
-            throw new NotImplementedException();
-        }
+		public SerializedData GetData( IReverseReferenceMap s )
+		{
+			// save what it is connected to.
+			throw new NotImplementedException();
+		}
 
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        internal static void Disconnect( ControlParameterInput<T> input, ControlParameterOutput<T> output )
-        {
-            input.Output = null;
-            output.Input = null;
-        }
+		public void SetData( IForwardReferenceMap l, SerializedData data )
+		{
+			// load what it is connected to.
+			throw new NotImplementedException();
+		}
 
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        internal static void Connect( ControlParameterInput<T> input, ControlParameterOutput<T> output )
-        {
-            input.Output = output;
-            output.Input = input;
-        }
-    }
+		[MethodImpl( MethodImplOptions.AggressiveInlining )]
+		internal static void Disconnect( ControlParameterInput<T> input )
+		{
+			input.Output = null;
+			input.Output.inputs.Remove( input );
+		}
+
+		[MethodImpl( MethodImplOptions.AggressiveInlining )]
+		internal static void Connect( ControlParameterInput<T> input, ControlParameterOutput<T> output )
+		{
+			// disconnect from previous, if connected.
+			Disconnect( input );
+
+			input.Output = output;
+			output.inputs.Add( input );
+		}
+	}
 }

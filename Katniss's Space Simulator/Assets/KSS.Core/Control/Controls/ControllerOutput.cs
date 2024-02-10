@@ -2,87 +2,102 @@
 using UnityPlus.Serialization;
 using System.Runtime.CompilerServices;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace KSS.Control.Controls
 {
-    public abstract class ControllerOutput : Control { }
+	public abstract class ControllerOutput : Control { }
 
-    /// <summary>
-    /// Represents a control that generates a control signal. <br/>
-    /// Used to control something by connecting it to the appropriate <see cref="ControlleeInput{T}"/>.
-    /// </summary>
-    public sealed class ControllerOutput<T> : ControllerOutput, IPersistent
-    {
-        public ControlleeInput<T> Input { get; internal set; }
+	/// <summary>
+	/// Represents a control that generates a control signal. <br/>
+	/// Used to control something by connecting it to the appropriate <see cref="ControlleeInput{T}"/>s.
+	/// </summary>
+	public sealed class ControllerOutput<T> : ControllerOutput, IPersistent
+	{
+		internal List<ControlleeInput<T>> inputs = new();
+		public IEnumerable<ControlleeInput<T>> Inputs { get => inputs; }
 
-        public ControllerOutput()
-        {
-        }
+		public ControllerOutput()
+		{
+		}
 
-        public void TrySendSignal( T signalValue )
-        {
-            Input?.onInvoke.Invoke( signalValue );
-        }
+		/// <summary>
+		/// Tries to send a control signal from this controller to its connected inputs.
+		/// </summary>
+		/// <param name="signalValue">The value of the signal that will be passed to the connected inputs.</param>
+		public void TrySendSignal( T signalValue )
+		{
+			foreach( var connection in inputs )
+			{
+				connection.onInvoke.Invoke( signalValue );
+			}
+		}
 
-        public override IEnumerable<Control> GetConnections()
-        {
-            yield return Input;
-        }
+		public override IEnumerable<Control> GetConnections()
+		{
+			return inputs;
+		}
 
-        public override bool TryConnect( Control other )
-        {
-            if( other is not ControlleeInput<T> input )
-                return false;
+		public override bool TryConnect( Control other )
+		{
+			if( other is not ControlleeInput<T> input )
+				return false;
 
-            Connect( input, this );
-            return true;
-        }
+			Connect( input, this );
+			return true;
+		}
 
-        public override bool TryDisconnect( Control other )
-        {
-            if( other is not ControlleeInput<T> input )
-                return false;
+		public override bool TryDisconnect( Control other )
+		{
+			if( other is not ControlleeInput<T> input )
+				return false;
 
-            if( this.Input != input )
-                return false;
+			if( !this.inputs.Contains( input ) )
+				return false;
 
-            Disconnect( input, this );
-            return true;
-        }
+			Disconnect( input );
+			return true;
+		}
 
-        public override bool TryDisconnectAll()
-        {
-            if( this.Input == null )
-                return false;
+		public override bool TryDisconnectAll()
+		{
+			if( this.inputs == null )
+				return false;
 
-            Disconnect( this.Input, this );
-            return true;
-        }
+			foreach( var connection in inputs.ToArray() )
+			{
+				Disconnect( connection );
+			}
+			return true;
+		}
 
-        public SerializedData GetData( IReverseReferenceMap s )
-        {
-            // save what it is connected to.
-            throw new NotImplementedException();
-        }
+		public SerializedData GetData( IReverseReferenceMap s )
+		{
+			// save what it is connected to.
+			throw new NotImplementedException();
+		}
 
-        public void SetData( IForwardReferenceMap l, SerializedData data )
-        {
-            // load what it is connected to.
-            throw new NotImplementedException();
-        }
+		public void SetData( IForwardReferenceMap l, SerializedData data )
+		{
+			// load what it is connected to.
+			throw new NotImplementedException();
+		}
 
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        internal static void Disconnect( ControlleeInput<T> input, ControllerOutput<T> output )
-        {
-            input.Output = null;
-            output.Input = null;
-        }
+		[MethodImpl( MethodImplOptions.AggressiveInlining )]
+		internal static void Disconnect( ControlleeInput<T> input )
+		{
+			input.Output = null;
+			input.Output.inputs.Remove( input );
+		}
 
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        internal static void Connect( ControlleeInput<T> input, ControllerOutput<T> output )
-        {
-            input.Output = output;
-            output.Input = input;
-        }
-    }
+		[MethodImpl( MethodImplOptions.AggressiveInlining )]
+		internal static void Connect( ControlleeInput<T> input, ControllerOutput<T> output )
+		{
+			// disconnect from previous, if connected.
+			Disconnect( input );
+
+			input.Output = output;
+			output.inputs.Add( input );
+		}
+	}
 }

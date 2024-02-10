@@ -28,23 +28,34 @@ namespace KSS.Components
         [field: SerializeField]
         public Transform ActuatorTransform { get; set; }
 
-        private float _x;
-        private float _y;
+        public float X { get; set; }
+        public float Y { get; set; }
 
-        // min/max ranges.
+        public float MinX { get; set; }
+        public float MaxX { get; set; }
+        public float MinY { get; set; }
+        public float MaxY { get; set; }
 
         [NamedControl( "Set X" )]
         private ControlleeInput<float> SetX;
         public void OnSetX( float x )
         {
-            this._x = x;
+            this.X = x;
         }
 
         [NamedControl( "Set Y" )]
         private ControlleeInput<float> SetY;
         public void OnSetY( float y )
         {
-            this._y = y;
+            this.Y = y;
+        }
+        
+        [NamedControl( "Set XY" )]
+        private ControlleeInput<Vector2> SetXY;
+        public void OnSetXY( Vector2 xy )
+        {
+            this.X = xy.x;
+            this.Y = xy.y;
         }
 
         void Awake()
@@ -54,9 +65,11 @@ namespace KSS.Components
             SetY = new ControlleeInput<float>( OnSetY );
         }
 
-        void Update()
+        void FixedUpdate()
         {
-            // todo.
+            this.X = Mathf.Clamp( X, MinX, MaxX );
+            this.Y = Mathf.Clamp( Y, MinY, MaxY );
+            ActuatorTransform.rotation = Quaternion.Euler( X, Y, 0 );
         }
 
         public SerializedData GetData( IReverseReferenceMap s )
