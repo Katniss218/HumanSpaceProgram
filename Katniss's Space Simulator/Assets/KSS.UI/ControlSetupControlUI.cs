@@ -18,7 +18,7 @@ namespace KSS.UI
 
         ControlSetupControlGroupUI _group;
 
-        ControlSetupControlUI _connectedTo;
+        List<ControlSetupControlUI> _connectedTo = new List<ControlSetupControlUI>();
 
         public Control.Control Control { get; private set; }
         NamedControlAttribute _attr;
@@ -29,6 +29,11 @@ namespace KSS.UI
 
         // show the name/description of channel on mouseover.
         // also when pressed if connected to something - disconnect and hook the end to the mouse until released. if released over nothing - delete connection
+        
+        public static void Connect( ControlSetupControlUI control1, ControlSetupControlUI control2 )
+        {
+
+        }
 
         internal static ControlSetupControlUI Create( ControlSetupControlGroupUI group, float side, float verticalOffset, Control.Control control, NamedControlAttribute attr )
         {

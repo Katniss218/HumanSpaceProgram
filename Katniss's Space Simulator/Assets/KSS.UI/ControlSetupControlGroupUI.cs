@@ -15,7 +15,7 @@ namespace KSS.UI
     public class ControlSetupControlGroupUI : MonoBehaviour
     {
         ControlSetupControlGroupUI _group;
-        ControlSetupWindowNode _node;
+        ControlSetupWindowNodeUI _node;
 
         object _target;
         NamedControlAttribute _attr;
@@ -157,7 +157,7 @@ namespace KSS.UI
         }
 
 
-        internal static ControlSetupControlGroupUI Create( ControlSetupWindowNode node, Component component )
+        internal static ControlSetupControlGroupUI Create( ControlSetupWindowNodeUI node, Component component )
         {
             UIPanel panel = node.panel.AddPanel( UILayoutInfo.Fill( 0, 0, 20, 5 ), null ); // AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_output" )
 

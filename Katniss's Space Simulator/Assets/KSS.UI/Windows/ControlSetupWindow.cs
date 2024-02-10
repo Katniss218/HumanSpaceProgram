@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KSS.Control;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,9 +26,15 @@ namespace KSS.UI.Windows
         public IUIElementContainer Container => _scrollView;
 
         // node inputs/outputs might be connected to invisible (in the window) stuff, if it's outside of the hierarchy.
+        // - that means we should show the connection at the visible input, and "cut it off" shortly after.
 
-        List<ControlSetupWindowNode> _nodes = new List<ControlSetupWindowNode>();
-        List<ControlSetupWindowNodeConnection> _connections = new List<ControlSetupWindowNodeConnection>();
+        Dictionary<Component, ControlSetupWindowNodeUI> _nodes = new();
+
+        Dictionary<Control.Control, ControlSetupControlUI> _endpoints = new();
+
+        List<ControlSetupControlConnectionUI> _connections = new();
+
+        // nodes may be connected while the window is open, we need to account for that.
 
         private void RefreshNodesAndConnections()
         {
@@ -46,7 +53,7 @@ namespace KSS.UI.Windows
             {
                 if( Control.ControlUtils.HasControls( comp ) )
                 {
-                    ControlSetupWindowNode node = ControlSetupWindowNode.Create( this, comp );
+                    ControlSetupWindowNodeUI node = ControlSetupWindowNodeUI.Create( this, comp );
                     _nodes.Add( node );
                 }
             }
@@ -69,6 +76,30 @@ namespace KSS.UI.Windows
             w._scrollView = scrollView;
 
             w.RefreshNodesAndConnections();
+
+            // window is created
+            // look up which components were visible before
+            // spawn uis for those components
+
+            // for each input/output 'circle', add it to the dict to lookup endpoint visibility later.
+
+            // after all visible component UIs are spawned
+            // spawn connections.
+
+            // for outputs (endpoints with multiple outgoing connections)
+            // - spawn all connections (connected if both are visible, "going to nothing" otherwise)
+
+            // for inputs
+            // - only spawn "going to nothing" connections (since the rest will be covered by the visible outputs).
+
+
+            // When adding or removing visibility of a component (has to be done when toggling AND WHEN COMP IS REMOVED FROM PHYSICAL VESSEL)
+            // take both inputs and outputs of the newly created component UI
+            // for each of them
+            // - remove "going to nothing" connections of their corresponding visible counterpart endpoints
+            // - create new connections for both inputs and outputs
+            // - - so we do have to have a capability to create connections "when going backwards" too.
+
 
             return w;
         }
