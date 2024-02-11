@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 
 namespace KSS.Control.Controls
 {
-	public abstract class ControlParameterOutput : Control { }
-
 	/// <summary>
-	/// Represents a control that returns a parameter. Connect to an input to use it. <br/>
-	/// Canonically, the parameter should relate to the same 'object' the control is located on.
+	/// Represents a control that produces a parameter.
+	/// </summary>
+	public abstract class ControlParameterOutput : Control { }
+	
+	/// <summary>
+	/// Represents a control that produces a parameter of type <typeparamref name="T"/>.
 	/// </summary>
 	public sealed class ControlParameterOutput<T> : ControlParameterOutput
 	{
@@ -28,7 +30,7 @@ namespace KSS.Control.Controls
 			this.getter = getter;
 		}
 
-		public override IEnumerable<Control> GetConnections()
+		public override IEnumerable<Control> GetConnectedControls()
 		{
 			return inputs;
 		}

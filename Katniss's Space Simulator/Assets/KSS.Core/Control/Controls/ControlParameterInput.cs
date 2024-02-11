@@ -8,10 +8,13 @@ using UnityPlus.Serialization;
 
 namespace KSS.Control.Controls
 {
+	/// <summary>
+	/// Represents a control that consumes a parameter.
+	/// </summary>
 	public abstract class ControlParameterInput : Control { }
 
 	/// <summary>
-	/// Represents a control that is used to retrieve a parameter from the <see cref="ControlParameterOutput{T}"/> it's connected to.
+	/// Represents a control that consumes a parameter of type <typeparamref name="T"/>.
 	/// </summary>
 	public sealed class ControlParameterInput<T> : ControlParameterInput, IPersistent
 	{
@@ -38,9 +41,13 @@ namespace KSS.Control.Controls
 			return true;
 		}
 
-		public override IEnumerable<Control> GetConnections()
+		public override IEnumerable<Control> GetConnectedControls()
 		{
-			yield return Output;
+			if( Output == null )
+			{
+				return Enumerable.Empty<Control>();
+			}
+			return new[] { Output };
 		}
 
 		public override bool TryConnect( Control other )

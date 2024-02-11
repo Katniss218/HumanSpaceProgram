@@ -20,7 +20,7 @@ namespace KSS.Control
         /// <summary>
         /// Gets the control(s) that this control is connected to.
         /// </summary>
-        public abstract IEnumerable<Control> GetConnections();
+        public abstract IEnumerable<Control> GetConnectedControls();
 
         /// <summary>
         /// Tries to connect this control to a given control. <br/>

@@ -76,6 +76,7 @@
     <Compile Include="Assets\KSS\Effects\Atmospheres\AtmosphereRenderer.cs" />
     <Compile Include="Assets\KSS\Components\FSequencer.cs" />
     <Compile Include="Assets\KSS\Components\FDryMass.cs" />
+    <Compile Include="Assets\KSS\Components\F3AxisActuator.cs" />
     <Compile Include="Assets\KSS\Cameras\GameplayCameraController.cs" />
     <Compile Include="Assets\KSS\GameplayScene\GameplaySceneEscapeInputController.cs" />
     <Compile Include="Assets\KSS\GameplayScene\Tools\ConstructTool.cs" />
@@ -89,6 +90,7 @@
     <Compile Include="Assets\KSS\DesignScene\DesignSceneToolManager.cs" />
     <Compile Include="Assets\KSS\HSPEventVanilla.cs" />
     <Compile Include="Assets\KSS\Components\FRocketEngine.cs" />
+    <Compile Include="Assets\KSS\Components\IThruster.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuad.cs" />
     <Compile Include="Assets\KSS\Input\HierarchicalInputChannel.cs" />
     <Compile Include="Assets\KSS\Components\FBulkContainer_Sphere.cs" />
@@ -107,11 +109,9 @@
     <Compile Include="Assets\KSS\GameplayScene\GameplaySceneToolManager.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadTree_NodeUtils.cs" />
     <Compile Include="Assets\KSS\GameplayScene\NavballManager.cs" />
-    <Compile Include="Assets\KSS\AssetLoaders\GameDataJsonVesselFactory.cs" />
     <Compile Include="Assets\KSS\Components\F1AxisActuator.cs" />
-    <Compile Include="Assets\KSS\Components\F3AxisActuator.cs" />
+    <Compile Include="Assets\KSS\AssetLoaders\GameDataJsonVesselFactory.cs" />
     <Compile Include="Assets\KSS\Components\FReactionControlController.cs" />
-    <Compile Include="Assets\KSS\Components\IThruster.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS\CelestialBodies\Surface\TerrainShader.shader" />

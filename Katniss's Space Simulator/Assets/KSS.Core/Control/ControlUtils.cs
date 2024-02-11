@@ -6,13 +6,13 @@ using UnityEngine;
 
 namespace KSS.Control
 {
-    public static class ControlUtils
+	public static class ControlUtils
     {
         // arrays are supported on groups, and inputs/outputs. This will display as multiple of the entry right under each other. Possibly with a number for easier matching.
 
         static Dictionary<Type, (FieldInfo field, NamedControlAttribute attr)[]> _cache = new();
 
-        private static (FieldInfo field, NamedControlAttribute attr)[] GetControlsOrGroups( object obj )
+        private static (FieldInfo field, NamedControlAttribute attr)[] GetControlsAndGroupsInternal( object obj )
         {
             Type objType = obj.GetType();
             if( _cache.TryGetValue( objType, out var controls ) )
@@ -49,9 +49,9 @@ namespace KSS.Control
             return controls;
         }
 
-        public static IEnumerable<(object control, NamedControlAttribute attr)> GetControls( object target )
+        public static IEnumerable<(object control, NamedControlAttribute attr)> GetControlsAndGroups( object target )
         {
-            foreach( var (field, attr) in GetControlsOrGroups( target ) )
+            foreach( var (field, attr) in GetControlsAndGroupsInternal( target ) )
             {
                 var member = field.GetValue( target );
 
@@ -62,9 +62,13 @@ namespace KSS.Control
             }
         }
 
-        public static bool HasControls( object target )
+        /// <summary>
+        /// Checks if the specified object has any fields that are marked as control inputs or outputs, <br/>
+        /// or any fields that are marked as control groups (and should contain inputs or outputs).
+        /// </summary>
+        public static bool HasControlsOrGroups( object target )
         {
-            return GetControlsOrGroups( target ).Any(); // TODO - optimize - don't actually download the full array and cache when the array is empty.
+            return GetControlsAndGroupsInternal( target ).Any(); // TODO - optimize - don't actually download the full array and cache when the array is empty.
         }
     }
 }

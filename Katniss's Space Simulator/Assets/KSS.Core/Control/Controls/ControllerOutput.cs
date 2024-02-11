@@ -6,11 +6,13 @@ using System.Linq;
 
 namespace KSS.Control.Controls
 {
+	/// <summary>
+	/// Represents a control that produces a control signal.
+	/// </summary>
 	public abstract class ControllerOutput : Control { }
 
 	/// <summary>
-	/// Represents a control that generates a control signal. <br/>
-	/// Used to control something by connecting it to the appropriate <see cref="ControlleeInput{T}"/>s.
+	/// Represents a control that produces a control signal of type <typeparamref name="T"/>.
 	/// </summary>
 	public sealed class ControllerOutput<T> : ControllerOutput, IPersistent
 	{
@@ -33,7 +35,7 @@ namespace KSS.Control.Controls
 			}
 		}
 
-		public override IEnumerable<Control> GetConnections()
+		public override IEnumerable<Control> GetConnectedControls()
 		{
 			return inputs;
 		}

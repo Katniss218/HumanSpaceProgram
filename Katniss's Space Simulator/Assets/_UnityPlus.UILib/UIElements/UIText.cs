@@ -63,6 +63,7 @@ namespace UnityPlus.UILib.UIElements
             textComponent.richText = false;
             textComponent.horizontalAlignment = TMPro.HorizontalAlignmentOptions.Left;
             textComponent.verticalAlignment = TMPro.VerticalAlignmentOptions.Middle;
+            textComponent.overflowMode = TMPro.TextOverflowModes.Truncate;
 
             textComponent.text = text;
 
