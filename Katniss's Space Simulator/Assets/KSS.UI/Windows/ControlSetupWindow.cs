@@ -72,22 +72,20 @@ namespace KSS.UI.Windows
 			}
 		}
 
-		internal void RegisterInput( Control.Control c, ControlSetupControlUI cui )
-		{
-			_inputs.Add( c, cui );
-		}
-
-		internal void RegisterOutput( Control.Control c, ControlSetupControlUI cui )
-		{
-			_outputs.Add( c, cui );
-		}
-
 		private bool TryCreateNode( Component componentToShow, out ControlSetupWindowComponentUI node )
 		{
 			if( ControlUtils.HasControlsOrGroups( componentToShow ) )
 			{
 				node = ControlSetupWindowComponentUI.Create( this, componentToShow );
 				_nodes.Add( componentToShow, node );
+				foreach( var input in node.GetInputs() )
+				{
+					_inputs.Add( input.Control, input );
+				}
+				foreach( var output in node.GetOutputs() )
+				{
+					_outputs.Add( output.Control, output );
+				}
 				return true;
 			}
 			node = null;
@@ -115,7 +113,7 @@ namespace KSS.UI.Windows
 		{
 			foreach( var conn in _connections )
 			{
-				conn.DestroyGraphic();
+				conn.Destroy();
 			}
 			_connections.Clear();
 		}
@@ -163,8 +161,8 @@ namespace KSS.UI.Windows
 			if( mouseConnection.GetClosedEnd().Control.TryConnect( otherEndpoint.Control ) )
 			{
 				ControlSetupControlConnectionUI otherEndpointsConnection = _connections.FirstOrDefault( c => c.IsOpenEnded && c.GetClosedEnd() == otherEndpoint );
-				otherEndpointsConnection.DestroyGraphic();
-				mouseConnection.DestroyGraphic();
+				otherEndpointsConnection.Destroy();
+				mouseConnection.Destroy();
 				_connections.Remove( otherEndpointsConnection );
 
 				if( mouseConnection.Input != null )

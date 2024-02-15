@@ -55,9 +55,6 @@ namespace KSS.Control.Controls
 			if( other is not ControlParameterOutput<T> output )
 				return false;
 
-			if( Output == null )
-				return false;
-
 			Connect( this, output );
 			return true;
 		}
@@ -98,8 +95,8 @@ namespace KSS.Control.Controls
 		[MethodImpl( MethodImplOptions.AggressiveInlining )]
 		internal static void Disconnect( ControlParameterInput<T> input )
 		{
+			input.Output?.inputs.Remove( input );
 			input.Output = null;
-			input.Output.inputs.Remove( input );
 		}
 
 		[MethodImpl( MethodImplOptions.AggressiveInlining )]

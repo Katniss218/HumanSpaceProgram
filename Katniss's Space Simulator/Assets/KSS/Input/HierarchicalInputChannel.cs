@@ -34,10 +34,10 @@ namespace KSS.Input
 
         public const string GAMEPLAY_CONTROL_PITCH_UP = "vanilla.gameplayc_rotate_xp";
         public const string GAMEPLAY_CONTROL_PITCH_DOWN = "vanilla.gameplayc_rotate_xn";
-        public const string GAMEPLAY_CONTROL_ROLL_LEFT = "vanilla.gameplayc_rotate_zn";
-        public const string GAMEPLAY_CONTROL_ROLL_RIGHT = "vanilla.gameplayc_rotate_zp";
         public const string GAMEPLAY_CONTROL_YAW_LEFT = "vanilla.gameplayc_rotate_yp";
         public const string GAMEPLAY_CONTROL_YAW_RIGHT = "vanilla.gameplayc_rotate_yn";
+        public const string GAMEPLAY_CONTROL_ROLL_LEFT = "vanilla.gameplayc_rotate_zn";
+        public const string GAMEPLAY_CONTROL_ROLL_RIGHT = "vanilla.gameplayc_rotate_zp";
 
         public const string GAMEPLAY_CONTROL_SEQUENCER_ADVANCE = "vanilla.gameplayc_sequencer_adv";
 
@@ -80,10 +80,10 @@ namespace KSS.Input
 
             HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_PITCH_UP, new KeyDownBinding( KeyCode.S ) );
             HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_PITCH_DOWN, new KeyDownBinding( KeyCode.W ) );
-            HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_ROLL_LEFT, new KeyDownBinding( KeyCode.A ) );
-            HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_ROLL_RIGHT, new KeyDownBinding( KeyCode.D ) );
-            HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_YAW_LEFT, new KeyDownBinding( KeyCode.Q ) );
-            HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_YAW_RIGHT, new KeyDownBinding( KeyCode.E ) );
+            HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_YAW_LEFT, new KeyDownBinding( KeyCode.A ) );
+            HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_YAW_RIGHT, new KeyDownBinding( KeyCode.D ) );
+            HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_ROLL_LEFT, new KeyDownBinding( KeyCode.Q ) );
+            HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_ROLL_RIGHT, new KeyDownBinding( KeyCode.E ) );
 
             HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_SEQUENCER_ADVANCE, new KeyDownBinding( KeyCode.Space ) );
 

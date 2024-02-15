@@ -63,7 +63,7 @@
     <Compile Include="Assets\KSS\DesignScene\DesignSceneToolBase.cs" />
     <Compile Include="Assets\KSS\DesignScene\Tools\PickTool.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\VanillaPlanetarySystemFactory.cs" />
-    <Compile Include="Assets\KSS\Components\FTestAvionics.cs" />
+    <Compile Include="Assets\KSS\Components\FPlayerInputAvionics.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadTree.cs" />
     <Compile Include="Assets\KSS\TransformHandle.cs" />
     <Compile Include="Assets\KSS\DesignScene\DesignObjectManager.cs" />

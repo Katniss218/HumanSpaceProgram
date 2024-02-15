@@ -88,8 +88,8 @@ namespace KSS.Control.Controls
 		[MethodImpl( MethodImplOptions.AggressiveInlining )]
 		internal static void Disconnect( ControlleeInput<T> input )
 		{
+			input.Output?.inputs.Remove( input );
 			input.Output = null;
-			input.Output.inputs.Remove( input );
 		}
 
 		[MethodImpl( MethodImplOptions.AggressiveInlining )]

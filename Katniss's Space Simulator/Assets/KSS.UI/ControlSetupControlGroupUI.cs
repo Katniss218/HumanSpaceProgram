@@ -20,12 +20,23 @@ namespace KSS.UI
 	public class ControlSetupControlGroupUI : MonoBehaviour
 	{
 		// Groups are what actually directly contain the inputs/outputs.
+		
+        public const float ROW_HEIGHT = 15.0f;
 
+		/// <summary>
+		/// The group that is the parent of this group. May be null.
+		/// </summary>
 		public ControlSetupControlGroupUI ParentGroup { get; private set; }
 
-		public ControlSetupWindowComponentUI Node { get; private set; }
+		/// <summary>
+		/// The component UI that this group belongs to. Every nested group belongs to the same node.
+		/// </summary>
+		public ControlSetupWindowComponentUI ComponentUI { get; private set; }
 
-		public int Height { get; private set; }
+		/// <summary>
+		/// The number of rows taken up by the inputs and outputs.
+		/// </summary>
+		public int TotalRows { get; private set; }
 
 		object _target; // control group instance or component instance.
 		NamedControlAttribute _attr;
@@ -71,34 +82,23 @@ namespace KSS.UI
 			List<ControlSetupControlUI> outputUIs = new();
 			List<ControlSetupControlGroupUI> childGroups = new();
 
-			int inputIndex = 0;
-			int outputIndex = 0;
+			int currentRow = 0;
 			foreach( var (member, attr) in controls )
 			{
 				if( member is ControlGroup group )
 				{
-					inputIndex = Mathf.Max( inputIndex, outputIndex );
-					outputIndex = inputIndex;
-
-					var groupUI = ControlSetupControlGroupUI.Create( this, inputIndex * ControlSetupControlUI.HEIGHT, group, attr );
+					var groupUI = ControlSetupControlGroupUI.Create( this, currentRow * ROW_HEIGHT, group, attr );
 					childGroups.Add( groupUI );
-
-					inputIndex += groupUI.Height;
-					outputIndex += groupUI.Height;
+					currentRow += groupUI.TotalRows;
 				}
 				if( member is ControlGroup[] groupArray )
 				{
-					inputIndex = Mathf.Max( inputIndex, outputIndex );
-					outputIndex = inputIndex;
-
 					for( int i = 0; i < groupArray.Length; i++ )
 					{
 #warning TODO - group arrays should be initialized
-						var groupUI = ControlSetupControlGroupUI.Create( this, (inputIndex + i) * ControlSetupControlUI.HEIGHT, groupArray[i], attr );
+						var groupUI = ControlSetupControlGroupUI.Create( this, (currentRow + i) * ROW_HEIGHT, groupArray[i], attr );
 						childGroups.Add( groupUI );
-
-						inputIndex += groupUI.Height;
-						outputIndex += groupUI.Height;
+						currentRow += groupUI.TotalRows;
 					}
 				}
 
@@ -106,99 +106,74 @@ namespace KSS.UI
 
 				if( member is ControlleeInput input )
 				{
-					inputUIs.Add( ControlSetupControlUI.Create( this, 0f, inputIndex * ControlSetupControlUI.HEIGHT, input, attr ) );
-
-					inputIndex += 1;
-					outputIndex += 1;
+					inputUIs.Add( ControlSetupControlUI.Create( this, 0f, currentRow * ROW_HEIGHT, input, attr ) );
+					currentRow++;
 				}
 				if( member is ControlleeInput[] inputArray )
 				{
 					for( int i = 0; i < inputArray.Length; i++ )
 					{
-						inputUIs.Add( ControlSetupControlUI.Create( this, 0f, (inputIndex + i) * ControlSetupControlUI.HEIGHT, inputArray[i], attr ) );
+						inputUIs.Add( ControlSetupControlUI.Create( this, 0f, currentRow * ROW_HEIGHT, inputArray[i], attr ) );
+						currentRow++;
 					}
 
-					inputIndex += inputArray.Length;
-					outputIndex += inputArray.Length;
 				}
 
 				//
 
 				if( member is ControllerOutput output )
 				{
-					outputUIs.Add( ControlSetupControlUI.Create( this, 1f, outputIndex * ControlSetupControlUI.HEIGHT, output, attr ) );
-
-					inputIndex += 1;
-					outputIndex += 1;
+					outputUIs.Add( ControlSetupControlUI.Create( this, 1f, currentRow * ROW_HEIGHT, output, attr ) );
+					currentRow++;
 				}
 				if( member is ControllerOutput[] outputArray )
 				{
 					for( int i = 0; i < outputArray.Length; i++ )
 					{
-						outputUIs.Add( ControlSetupControlUI.Create( this, 1f, (outputIndex + i) * ControlSetupControlUI.HEIGHT, outputArray[i], attr ) );
+						outputUIs.Add( ControlSetupControlUI.Create( this, 1f, currentRow * ROW_HEIGHT, outputArray[i], attr ) );
+						currentRow++;
 					}
-
-					inputIndex += outputArray.Length;
-					outputIndex += outputArray.Length;
 				}
 
 				//
 
 				if( member is ControlParameterInput paramInput )
 				{
-					inputUIs.Add( ControlSetupControlUI.Create( this, 0f, inputIndex * ControlSetupControlUI.HEIGHT, paramInput, attr ) );
-
-					inputIndex += 1;
-					outputIndex += 1;
+					inputUIs.Add( ControlSetupControlUI.Create( this, 0f, currentRow * ROW_HEIGHT, paramInput, attr ) );
+					currentRow++;
 				}
 				if( member is ControlParameterInput[] paramInputArray )
 				{
 					for( int i = 0; i < paramInputArray.Length; i++ )
 					{
-						inputUIs.Add( ControlSetupControlUI.Create( this, 0f, (inputIndex + i) * ControlSetupControlUI.HEIGHT, paramInputArray[i], attr ) );
+						inputUIs.Add( ControlSetupControlUI.Create( this, 0f, currentRow * ROW_HEIGHT, paramInputArray[i], attr ) );
+						currentRow++;
 					}
-
-					inputIndex += paramInputArray.Length;
-					outputIndex += paramInputArray.Length;
 				}
 
 				//
 
 				if( member is ControlParameterOutput paramOutput )
 				{
-					outputUIs.Add( ControlSetupControlUI.Create( this, 1f, outputIndex * ControlSetupControlUI.HEIGHT, paramOutput, attr ) );
-
-					inputIndex += 1;
-					outputIndex += 1;
+					outputUIs.Add( ControlSetupControlUI.Create( this, 1f, currentRow * ROW_HEIGHT, paramOutput, attr ) );
+					currentRow++;
 				}
 				if( member is ControlParameterOutput[] paramOutputArray )
 				{
 					for( int i = 0; i < paramOutputArray.Length; i++ )
 					{
-						outputUIs.Add( ControlSetupControlUI.Create( this, 1f, (outputIndex + i) * ControlSetupControlUI.HEIGHT, paramOutputArray[i], attr ) );
+						outputUIs.Add( ControlSetupControlUI.Create( this, 1f, currentRow * ROW_HEIGHT, paramOutputArray[i], attr ) );
+						currentRow++;
 					}
-
-					inputIndex += paramOutputArray.Length;
-					outputIndex += paramOutputArray.Length;
 				}
 			}
 
-			Height = Mathf.Max( inputIndex, outputIndex );
+			TotalRows = currentRow;
 
 			_inputUIs = inputUIs.ToArray();
 			_outputUIs = outputUIs.ToArray();
 			_childGroups = childGroups.ToArray();
-
-			foreach( var cui in this._inputUIs )
-			{
-				this.Node.Window.RegisterInput( cui.Control, cui );
-			}
-			foreach( var cui in this._outputUIs )
-			{
-				this.Node.Window.RegisterOutput( cui.Control, cui );
-			}
 		}
-
 
 		internal static ControlSetupControlGroupUI Create( ControlSetupWindowComponentUI node, Component component )
 		{
@@ -208,7 +183,7 @@ namespace KSS.UI
 			groupUI.panel = panel;
 			groupUI._target = component;
 			groupUI._attr = null;
-			groupUI.Node = node;
+			groupUI.ComponentUI = node;
 
 			groupUI.RedrawControls();
 
@@ -217,18 +192,18 @@ namespace KSS.UI
 
 		internal static ControlSetupControlGroupUI Create( ControlSetupControlGroupUI group, float verticalOffset, object target, NamedControlAttribute attr )
 		{
-			UIPanel panel = group.panel.AddPanel( UILayoutInfo.FillHorizontal( 0, 0, UILayoutInfo.TopF, -verticalOffset, ControlSetupControlUI.HEIGHT ), null );
+			UIPanel panel = group.panel.AddPanel( UILayoutInfo.FillHorizontal( 0, 0, UILayoutInfo.TopF, -verticalOffset, ROW_HEIGHT ), null );
 
 			ControlSetupControlGroupUI groupUI = panel.gameObject.AddComponent<ControlSetupControlGroupUI>();
 			groupUI.panel = panel;
 			groupUI._target = target;
 			groupUI._attr = attr;
 			groupUI.ParentGroup = group;
-			groupUI.Node = group.Node;
+			groupUI.ComponentUI = group.ComponentUI;
 
 			groupUI.RedrawControls();
 
-			panel.rectTransform.sizeDelta = new Vector2( panel.rectTransform.sizeDelta.y, groupUI.Height * ControlSetupControlUI.HEIGHT );
+			panel.rectTransform.sizeDelta = new Vector2( panel.rectTransform.sizeDelta.y, groupUI.TotalRows * ROW_HEIGHT );
 
 			return groupUI;
 		}

@@ -7,10 +7,12 @@ using System.Threading.Tasks;
 using UnityEditor.MemoryProfiler;
 using UnityEngine;
 using UnityEngine.Windows;
+using UnityPlus.UILib;
+using UnityPlus.UILib.UIElements;
 
 namespace KSS.UI
 {
-	public class ControlSetupControlConnectionUI
+	public class ControlSetupControlConnectionUI : MonoBehaviour
 	{
 		/// <summary>
 		/// The endpoint that the connection UI goes out of (i.e. a 'From'). <br/>
@@ -49,11 +51,14 @@ namespace KSS.UI
 		public Vector2 EndOffset { get; private set; } // This is used for connections that connect to components that aren't shown,
 													   // as well as for the connection that is being dragged out by the mouse.
 
-		RectTransform _graphic;
-
-		public void DestroyGraphic()
+		void Update()
 		{
-			throw new NotImplementedException();
+			// update positions based on node positions.
+		}
+
+		public void Destroy()
+		{
+			Destroy( this.gameObject );
 		}
 
 		internal static ControlSetupControlConnectionUI Create( ControlSetupWindow window, ControlSetupControlUI input, ControlSetupControlUI output )
@@ -63,7 +68,9 @@ namespace KSS.UI
 				throw new ArgumentException( $"Both input and output must be set for a non-open-ended connection." );
 			}
 
-			ControlSetupControlConnectionUI connection = new ControlSetupControlConnectionUI();
+			UIPanel panel = window.window.AddPanel( UILayoutInfo.Fill(), null );
+
+			ControlSetupControlConnectionUI connection = panel.gameObject.AddComponent<ControlSetupControlConnectionUI>();
 			connection.Output = output;
 			connection.Input = input;
 			connection.EndOffset = Vector2.zero;
@@ -82,7 +89,9 @@ namespace KSS.UI
 				throw new ArgumentException( $"Either output or input must be non-null. Specify which end is open-ended." );
 			}
 
-			ControlSetupControlConnectionUI connection = new ControlSetupControlConnectionUI();
+			UIPanel panel = window.window.AddPanel( UILayoutInfo.Fill(), null );
+			
+			ControlSetupControlConnectionUI connection = panel.gameObject.AddComponent<ControlSetupControlConnectionUI>();
 			connection.Output = output;
 			connection.Input = input;
 			connection.EndOffset = offset;

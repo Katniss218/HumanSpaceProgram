@@ -214,6 +214,16 @@ namespace KSS.DevUtils
                 handler.ObjectsFilename = partDir + "/objects.json";
                 handler.DataFilename = partDir + "/data.json";
                 saver.Save();
+
+                partDir = gameDataPath + "/Vanilla/Parts/capsule";
+                Directory.CreateDirectory( partDir );
+                pm = new PartMetadata( partDir );
+                pm.Name = "Gemini Capsule"; pm.Author = "Katniss"; pm.Categories = new string[] { "command" };
+                pm.WriteToDisk();
+                strat.RootObjectGetter = () => AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/capsule" );
+                handler.ObjectsFilename = partDir + "/objects.json";
+                handler.DataFilename = partDir + "/data.json";
+                saver.Save();
             }
         }
 
@@ -227,6 +237,7 @@ namespace KSS.DevUtils
 
         static Vessel CreateDummyVessel( Vector3Dbl airfPosition, QuaternionDbl rotation )
         {
+            GameObject capsulePrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/capsule" );
             GameObject intertankPrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/intertank" );
             GameObject tankPrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/tank" );
             GameObject tankLongPrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/tank_long" );
@@ -237,6 +248,7 @@ namespace KSS.DevUtils
 
             Transform tankP = InstantiateLocal( tankPrefab, root, new Vector3( 0, -1.625f, 0 ), Quaternion.identity ).transform;
             Transform tankL1 = InstantiateLocal( tankLongPrefab, root, new Vector3( 0, 2.625f, 0 ), Quaternion.identity ).transform;
+            Transform capsule = InstantiateLocal( capsulePrefab, tankL1, new Vector3( 0, 2.625f, 0 ), Quaternion.identity ).transform;
             Transform t1 = InstantiateLocal( tankLongPrefab, root, new Vector3( 2, 2.625f, 0 ), Quaternion.identity ).transform;
             Transform t2 = InstantiateLocal( tankLongPrefab, root, new Vector3( -2, 2.625f, 0 ), Quaternion.identity ).transform;
             Transform engineP = InstantiateLocal( enginePrefab, tankP, new Vector3( 0, -3.45533f, 0 ), Quaternion.identity ).transform;
@@ -276,6 +288,17 @@ namespace KSS.DevUtils
             curve.AddKey( 1, 2.5f );
             tr.widthCurve = curve;
             tr.minVertexDistance = 50f;
+
+            FPlayerInputAvionics av = capsule.GetComponent<FPlayerInputAvionics>();
+            FGimbalActuatorController gc = capsule.GetComponent<FGimbalActuatorController>();
+            FRocketEngine eng = engineP.GetComponent<FRocketEngine>();
+            F2AxisActuator ac = engineP.GetComponent<F2AxisActuator>();
+            av.OnSetThrottle.TryConnect( eng.SetThrottle );
+
+            av.OnSteer.TryConnect( gc.SetSteeringCommand );
+            gc.Actuators2D[0] = new FGimbalActuatorController.Actuator2DGroup();
+            gc.Actuators2D[0].GetReferenceTransform.TryConnect( ac.GetReferenceTransform );
+            gc.Actuators2D[0].OnSetXY.TryConnect( ac.SetXY );
 
             return v;
         }

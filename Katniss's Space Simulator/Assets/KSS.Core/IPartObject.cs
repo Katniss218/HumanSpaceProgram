@@ -38,6 +38,11 @@ namespace KSS.Core
     /// </summary>
     public interface IPartObject : IComponent
     {
+        /// <summary>
+        /// Returns the transform that defines the 'vessel space'.
+        /// </summary>
+        public Transform ReferenceTransform => transform;
+
         Transform RootPart { get; }
         IPhysicsObject PhysicsObject { get; }
         RootObjectTransform RootObjTransform { get; }

@@ -14,8 +14,6 @@ namespace KSS.UI
 {
     public class ControlSetupControlUI : MonoBehaviour
     {
-        public const float HEIGHT = 15.0f;
-
         public Control.Control Control { get; private set; }
         NamedControlAttribute _attr;
 
@@ -24,19 +22,24 @@ namespace KSS.UI
         // show the name/description of channel on mouseover.
         // also when pressed if connected to something - disconnect and hook the end to the mouse until released. if released over nothing - delete connection
         
+        void OnClick()
+        {
+
+        }
+
         internal static ControlSetupControlUI Create( ControlSetupControlGroupUI group, float side, float verticalOffset, Control.Control control, NamedControlAttribute attr )
         {
-            UIPanel panel = group.panel.AddPanel( UILayoutInfo.FillHorizontal( 0, 0, UILayoutInfo.TopF, -verticalOffset, HEIGHT ), null );
+            UIPanel panel = group.panel.AddPanel( UILayoutInfo.FillHorizontal( 0, 0, UILayoutInfo.TopF, -verticalOffset, ControlSetupControlGroupUI.ROW_HEIGHT ), null );
             
-            UIIcon icon = panel.AddIcon( new UILayoutInfo( new Vector2( side, 1.0f ), Vector2.zero, new Vector2( HEIGHT, HEIGHT ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_output" ) )
-                .Raycastable();
-
-            UIText name = panel.AddText( UILayoutInfo.FillHorizontal( (1 - side) * HEIGHT, (side) * HEIGHT, UILayoutInfo.TopF, 0, HEIGHT ), attr.Name )
-                .WithAlignment( side == 0 ? TMPro.HorizontalAlignmentOptions.Left : TMPro.HorizontalAlignmentOptions.Right );
-
-            ControlSetupControlUI controlUI = icon.gameObject.AddComponent<ControlSetupControlUI>();
+            ControlSetupControlUI controlUI = panel.gameObject.AddComponent<ControlSetupControlUI>();
             controlUI.Control = control;
             controlUI._attr = attr;
+
+            UIButton button = panel.AddButton( new UILayoutInfo( new Vector2( side, 1.0f ), Vector2.zero, new Vector2( ControlSetupControlGroupUI.ROW_HEIGHT, ControlSetupControlGroupUI.ROW_HEIGHT ) ), 
+                AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_output" ), controlUI.OnClick );
+
+            UIText name = panel.AddText( UILayoutInfo.FillHorizontal( (1 - side) * ControlSetupControlGroupUI.ROW_HEIGHT, (side) * ControlSetupControlGroupUI.ROW_HEIGHT, UILayoutInfo.TopF, 0, ControlSetupControlGroupUI.ROW_HEIGHT ), attr.Name )
+                .WithAlignment( side == 0 ? TMPro.HorizontalAlignmentOptions.Left : TMPro.HorizontalAlignmentOptions.Right );
 
             return controlUI;
         }

@@ -38,7 +38,7 @@ namespace KSS.Components
 		public float Throttle { get; set; }
 
 		[NamedControl( "Throttle", "Sets the throttle level, [0..1]." )]
-		ControlleeInput<float> SetThrottle;
+		public ControlleeInput<float> SetThrottle;
 		private void OnSetThrottle( float value )
 		{
 			this.Throttle = value;

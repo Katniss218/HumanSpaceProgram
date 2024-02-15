@@ -6,80 +6,92 @@ using UnityPlus.Serialization;
 
 namespace KSS.Components
 {
-    public class F2AxisActuator : MonoBehaviour, IPersistent
-    {
-        // 2-axis actuator.
+	public class F2AxisActuator : MonoBehaviour, IPersistent
+	{
+		// 2-axis actuator.
 
-        // reference direction = parent direction.
+		// reference direction = parent direction.
 
-        /// <summary>
-        /// The transform used as a reference (0,0) orientation.
-        /// </summary>
-        [field: SerializeField]
-        public Transform ReferenceTransform { get; set; }
+		/// <summary>
+		/// The transform used as a reference (0,0) orientation.
+		/// </summary>
+		[field: SerializeField]
+		public Transform ReferenceTransform { get; set; }
 
-        [NamedControl( "Coordinate Space Transform" )]
-        public ControlParameterOutput<Transform> GetReferenceTransform;
-        public Transform GetTransform()
-        {
-            return ReferenceTransform;
-        }
+		[NamedControl( "Coordinate Space Transform" )]
+		public ControlParameterOutput<Transform> GetReferenceTransform;
+		public Transform GetTransform()
+		{
+			return ReferenceTransform;
+		}
 
-        [field: SerializeField]
-        public Transform ActuatorTransform { get; set; }
+		[field: SerializeField]
+		public Transform XActuatorTransform { get; set; }
+		
+		[field: SerializeField]
+		public Transform YActuatorTransform { get; set; }
 
-        public float X { get; set; }
-        public float Y { get; set; }
+		public float X { get; set; }
+		public float Y { get; set; }
 
-        public float MinX { get; set; }
-        public float MaxX { get; set; }
-        public float MinY { get; set; }
-        public float MaxY { get; set; }
+		[field: SerializeField]
+		public float MinX { get; set; }
+		[field: SerializeField]
+		public float MaxX { get; set; }
+		[field: SerializeField]
+		public float MinY { get; set; }
+		[field: SerializeField]
+		public float MaxY { get; set; }
 
-        [NamedControl( "Set X" )]
-        private ControlleeInput<float> SetX;
-        public void OnSetX( float x )
-        {
-            this.X = x;
-        }
+		[NamedControl( "Deflection (X)" )]
+		public ControlleeInput<float> SetX;
+		public void OnSetX( float x )
+		{
+			this.X = x;
+		}
 
-        [NamedControl( "Set Y" )]
-        private ControlleeInput<float> SetY;
-        public void OnSetY( float y )
-        {
-            this.Y = y;
-        }
-        
-        [NamedControl( "Set XY" )]
-        private ControlleeInput<Vector2> SetXY;
-        public void OnSetXY( Vector2 xy )
-        {
-            this.X = xy.x;
-            this.Y = xy.y;
-        }
+		[NamedControl( "Deflection (Y)" )]
+		public ControlleeInput<float> SetY;
+		public void OnSetY( float y )
+		{
+			this.Y = y;
+		}
 
-        void Awake()
-        {
-            GetReferenceTransform = new ControlParameterOutput<Transform>( GetTransform );
-            SetX = new ControlleeInput<float>( OnSetX );
-            SetY = new ControlleeInput<float>( OnSetY );
-        }
+		[NamedControl( "Deflection (XY)" )]
+		public ControlleeInput<Vector2> SetXY;
+		public void OnSetXY( Vector2 xy )
+		{
+			this.X = xy.x;
+			this.Y = xy.y;
+		}
 
-        void FixedUpdate()
-        {
-            this.X = Mathf.Clamp( X, MinX, MaxX );
-            this.Y = Mathf.Clamp( Y, MinY, MaxY );
-            ActuatorTransform.rotation = Quaternion.Euler( X, Y, 0 );
-        }
+		void Awake()
+		{
+			GetReferenceTransform = new ControlParameterOutput<Transform>( GetTransform );
+			SetX = new ControlleeInput<float>( OnSetX );
+			SetY = new ControlleeInput<float>( OnSetY );
+			SetXY = new ControlleeInput<Vector2>( OnSetXY );
+		}
 
-        public SerializedData GetData( IReverseReferenceMap s )
-        {
-            throw new NotImplementedException();
-        }
+		void FixedUpdate()
+		{
+			float clampedX = Mathf.Clamp( X, MinX, MaxX );
+			float clampedY = Mathf.Clamp( Y, MinY, MaxY );
 
-        public void SetData( IForwardReferenceMap l, SerializedData data )
-        {
-            throw new NotImplementedException();
-        }
-    }
+			XActuatorTransform.localRotation = Quaternion.identity;
+			YActuatorTransform.localRotation = Quaternion.identity;
+			XActuatorTransform.localRotation = Quaternion.Euler( clampedX, 0, 0 ) * XActuatorTransform.localRotation;
+			YActuatorTransform.localRotation = Quaternion.Euler( 0, 0, clampedY ) * YActuatorTransform.localRotation;
+		}
+
+		public SerializedData GetData( IReverseReferenceMap s )
+		{
+			throw new NotImplementedException();
+		}
+
+		public void SetData( IForwardReferenceMap l, SerializedData data )
+		{
+			throw new NotImplementedException();
+		}
+	}
 }
