@@ -1,3 +1,4 @@
+using KSS.Core.Mods;
 using KSS.Core.Physics;
 using KSS.Core.ReferenceFrames;
 using KSS.Core.SceneManagement;
@@ -54,10 +55,6 @@ namespace KSS.Core
         public IPhysicsObject PhysicsObject { get; private set; }
         public RootObjectTransform RootObjTransform { get; private set; }
 
-#warning TODO - Vessels' position sometimes glitches out when far away from the origin. Setting the rigidbody to kinematic fixes the issue, which suggests that it is caused by a collision response.
-        // Possibly a response to newly unsubdivided planet LOD quad.
-
-
         // the active vessel has also glithed out and accelerated to the speed of light at least once after jettisonning the side tanks on the pad.
 
         [field: SerializeField]
@@ -74,6 +71,70 @@ namespace KSS.Core
 
         public event Action OnAfterRecalculateParts;
 
+#warning TODO - Accumulatable values - https://github.com/Katniss218/HumanSpaceProgram/issues/19
+        /*
+        private struct Entry
+        {
+            // something to recalculate from scratch.
+            // something to recalculate a single value (responds to messages sent by compatible components).
+            /// <summary>
+            /// True if the value can be adjusted and doesn't have to be recalculated from scratch every time.
+            /// </summary>
+            bool IsTweakable;
+        }
+
+        Dictionary<NamespacedIdentifier, object> _cache;
+        Dictionary<NamespacedIdentifier, Entry> _cachedProps;
+        */
+
+        // mass and colliders
+
+        void Awake()
+        {
+            this.RootObjTransform = this.GetComponent<RootObjectTransform>();
+            this.PhysicsObject = this.GetComponent<IPhysicsObject>();
+            this.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
+        }
+
+        void Start()
+        {
+            this.PhysicsObject = this.GetComponent<IPhysicsObject>(); // needs to be here for deserialization, because it might be added in any order and I can't use RequireComponent because it needs to be removed when pinning.
+            RecalculatePartCache();
+            //SetPhysicsObjectParameters();
+        }
+
+        void OnEnable()
+        {
+            VesselManager.Register( this );
+        }
+
+        void OnDisable()
+        {
+            try
+            {
+                VesselManager.Unregister( this );
+            }
+            catch( InvalidSceneManagerException )
+            {
+                // scene unloaded.
+            }
+        }
+
+        void FixedUpdate()
+        {
+            SetPhysicsObjectParameters(); // this full recalc every frame should be replaced by update-based approach.
+
+            Vector3Dbl airfGravityForce = GravityUtils.GetNBodyGravityForce( this.AIRFPosition, PhysicsObject.Mass );
+
+            PhysicsObject.AddForce( (Vector3)airfGravityForce );
+
+
+            // ---------------------
+
+            // There's also multi-scene physics, which apparently might be used to put the origin of the simulation at 2 different vessels, and have their positions accuratly updated???
+            // doesn't seem like that to me reading the docs tho, but idk.
+        }
+        
         public void RecalculatePartCache()
         {
             if( RootPart == null )
@@ -124,12 +185,22 @@ namespace KSS.Core
             }
             return (centerOfMass, mass);
         }
+        
+        void SetPhysicsObjectParameters()
+        {
+            (Vector3 comLocal, float mass) = this.RecalculateMass();
+            this.PhysicsObject.LocalCenterOfMass = comLocal;
+            this.PhysicsObject.Mass = mass;
+        }
 
         public Vector3Dbl AIRFPosition { get => this.RootObjTransform.AIRFPosition; set => this.RootObjTransform.AIRFPosition = value; }
         public QuaternionDbl AIRFRotation { get => this.RootObjTransform.AIRFRotation; set => this.RootObjTransform.AIRFRotation = value; }
 
         public bool IsPinned { get; private set; }
 
+        /// <summary>
+        /// Pins the vessel to the celestial body at the specified location.
+        /// </summary>
         public void Pin( CelestialBody body, Vector3Dbl localPosition, QuaternionDbl localRotation )
         {
             DestroyImmediate( (Component)this.PhysicsObject );
@@ -141,6 +212,9 @@ namespace KSS.Core
             this.IsPinned = true;
         }
 
+        /// <summary>
+        /// Unpins the vessel from a celestial body at its current location.
+        /// </summary>
         public void Unpin()
         {
             DestroyImmediate( (Component)this.PhysicsObject );
@@ -167,59 +241,6 @@ namespace KSS.Core
                 }
             }
             return min;
-        }
-
-        void Awake()
-        {
-            this.RootObjTransform = this.GetComponent<RootObjectTransform>();
-            this.PhysicsObject = this.GetComponent<IPhysicsObject>();
-            this.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
-        }
-
-        void SetPhysicsObjectParameters()
-        {
-            (Vector3 comLocal, float mass) = this.RecalculateMass();
-            this.PhysicsObject.LocalCenterOfMass = comLocal;
-            this.PhysicsObject.Mass = mass;
-        }
-
-        void Start()
-        {
-            this.PhysicsObject = this.GetComponent<IPhysicsObject>(); // needs to be here for deserialization, because it might be added in any order and I can't use RequireComponent because it needs to be removed when pinning.
-            RecalculatePartCache();
-            //SetPhysicsObjectParameters();
-        }
-
-        void OnEnable()
-        {
-            VesselManager.Register( this );
-        }
-
-        void OnDisable()
-        {
-            try
-            {
-                VesselManager.Unregister( this );
-            }
-            catch( InvalidSceneManagerException )
-            {
-                // scene unloaded.
-            }
-        }
-
-        void FixedUpdate()
-        {
-            SetPhysicsObjectParameters(); // this full recalc every frame should be replaced by update-based approach.
-
-            Vector3Dbl airfGravityForce = GravityUtils.GetNBodyGravityForce( this.AIRFPosition, PhysicsObject.Mass );
-
-            PhysicsObject.AddForce( (Vector3)airfGravityForce );
-
-
-            // ---------------------
-
-            // There's also multi-scene physics, which apparently might be used to put the origin of the simulation at 2 different vessels, and have their positions accuratly updated???
-            // doesn't seem like that to me reading the docs tho, but idk.
         }
 
 
