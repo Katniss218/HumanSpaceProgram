@@ -17,14 +17,14 @@ namespace KSS.UI
         public Control.Control Control { get; private set; }
         NamedControlAttribute _attr;
 
-        // on release on this, when dragging out a connection - connect.
-
-        // show the name/description of channel on mouseover.
-        // also when pressed if connected to something - disconnect and hook the end to the mouse until released. if released over nothing - delete connection
-        
         void OnClick()
         {
+            
+            // on release on this, when dragging out a connection - connect.
 
+            // show the name/description of channel on mouseover.
+            // also when pressed if connected to something - disconnect and hook the end to the mouse until released. if released over nothing - delete connection
+        
         }
 
         internal static ControlSetupControlUI Create( ControlSetupControlGroupUI group, float side, float verticalOffset, Control.Control control, NamedControlAttribute attr )

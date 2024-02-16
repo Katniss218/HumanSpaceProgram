@@ -4,14 +4,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UnityEditor.MemoryProfiler;
 using UnityEngine;
-using UnityEngine.Windows;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
 
 namespace KSS.UI
 {
+	/// <summary>
+	/// UI for connections between two <see cref="ControlSetupControlUI"/>s.
+	/// </summary>
 	public class ControlSetupControlConnectionUI : MonoBehaviour
 	{
 		/// <summary>

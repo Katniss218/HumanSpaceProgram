@@ -10,18 +10,19 @@ using UnityPlus.Serialization;
 
 namespace KSS.Components
 {
+    [Obsolete("Not implemented yet.")] // TODO - add actual functionality.
     public class F1AxisActuator : MonoBehaviour, IPersistent
     {
-        // TODO - add actual functionality.
-
         public float X { get; set; }
-
-        public float MinX { get; set; }
-        public float MaxX { get; set; }
         
-        [NamedControl( "Set X" )]
-        private ControlleeInput<float> SetX;
-        public void OnSetX( float x )
+		[field: SerializeField]
+        public float MinX { get; set; } = -5f;
+		[field: SerializeField]
+        public float MaxX { get; set; } = 5f;
+        
+        [NamedControl( "Deflection (X)" )]
+        public ControlleeInput<float> SetX;
+        private void SetXListener( float x )
         {
             this.X = x;
         }

@@ -258,7 +258,7 @@ namespace KSS.Components
 
         private static IEnumerable<KeyValuePair<Component, (SerializedData fwd, SerializedData rev)>> GetFDryMassPatches( Transform transform )
         {
-            foreach( var mass in transform.GetComponents<FDryMass>() )
+            foreach( var mass in transform.GetComponents<FPointMass>() )
             {
                 SerializedObject fwdObj = new SerializedObject()
                 {

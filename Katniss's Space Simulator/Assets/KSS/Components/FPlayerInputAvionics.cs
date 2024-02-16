@@ -29,12 +29,24 @@ namespace KSS.Components
         private float _yawSignal; // channel representing the yaw control signal.
         private float _rollSignal; // channel representing the roll control signal.
         private float _throttleSignal;
-
+        
+        /// <remarks>
+        /// Desired throttle level, in [0..1].
+        /// </remarks>
         [NamedControl( "Throttle" )]
         public ControllerOutput<float> OnSetThrottle = new();
+        
+        /// <remarks>
+        /// Desired vessel-space pitch, yaw, roll, in [-Inf..Inf].
+        /// </remarks>
+        [NamedControl( "Steering" )]
+        public ControllerOutput<Vector3> OnSetSteering = new();
 
-        [NamedControl( "Steering Command" )]
-        public ControllerOutput<Vector3> OnSteer = new(); // pitch, yaw, roll
+        /// <remarks>
+        /// Desired world-space X, Y, Z translation, in [-Inf..Inf].
+        /// </remarks>
+        [NamedControl( "Translation" )]
+        public ControllerOutput<Vector3> OnSetTranslation = new();
 
 		void OnEnable()
         {
@@ -79,13 +91,13 @@ namespace KSS.Components
         }
 
 
-#warning TODO - if not pressed - set to 0, figure out a good way of doing that. This should be done with control channels that can use multiple keys and invoke methods with a parameter (axes)
+#warning TODO - Do keyboard axes properly - if not pressed - set to 0, This should be done with control channels that can use multiple keys and invoke methods with a parameter (axes)
 
         bool Input_PitchUp()
         {
             _pitchSignal += 1.0f;
 
-            OnSteer.TrySendSignal( new Vector3( _pitchSignal, _yawSignal, _rollSignal ) );
+            OnSetSteering.TrySendSignal( new Vector3( _pitchSignal, _yawSignal, _rollSignal ) );
             return false;
         }
 
@@ -93,7 +105,7 @@ namespace KSS.Components
         {
             _pitchSignal -= 1.0f;
 
-            OnSteer.TrySendSignal( new Vector3(_pitchSignal, _yawSignal, _rollSignal ) );
+            OnSetSteering.TrySendSignal( new Vector3(_pitchSignal, _yawSignal, _rollSignal ) );
             return false;
         }
 
@@ -101,7 +113,7 @@ namespace KSS.Components
         {
             _yawSignal += 1.0f;
 
-            OnSteer.TrySendSignal( new Vector3( _pitchSignal, _yawSignal, _rollSignal ) );
+            OnSetSteering.TrySendSignal( new Vector3( _pitchSignal, _yawSignal, _rollSignal ) );
             return false;
         }
 
@@ -109,7 +121,7 @@ namespace KSS.Components
         {
             _yawSignal -= 1.0f;
 
-            OnSteer.TrySendSignal( new Vector3( _pitchSignal, _yawSignal, _rollSignal ) );
+            OnSetSteering.TrySendSignal( new Vector3( _pitchSignal, _yawSignal, _rollSignal ) );
             return false;
         }
 
@@ -117,7 +129,7 @@ namespace KSS.Components
         {
             _rollSignal += 1.0f;
 
-            OnSteer.TrySendSignal( new Vector3( _pitchSignal, _yawSignal, _rollSignal ) );
+            OnSetSteering.TrySendSignal( new Vector3( _pitchSignal, _yawSignal, _rollSignal ) );
             return false;
         }
 
@@ -125,7 +137,7 @@ namespace KSS.Components
         {
             _rollSignal -= 1.0f;
 
-            OnSteer.TrySendSignal( new Vector3( _pitchSignal, _yawSignal, _rollSignal ) );
+            OnSetSteering.TrySendSignal( new Vector3( _pitchSignal, _yawSignal, _rollSignal ) );
             return false;
         }
     }

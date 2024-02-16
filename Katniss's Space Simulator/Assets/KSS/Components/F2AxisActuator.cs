@@ -35,31 +35,31 @@ namespace KSS.Components
 		public float Y { get; set; }
 
 		[field: SerializeField]
-		public float MinX { get; set; }
+		public float MinX { get; set; } = -5f;
 		[field: SerializeField]
-		public float MaxX { get; set; }
+		public float MaxX { get; set; } = 5f;
 		[field: SerializeField]
-		public float MinY { get; set; }
+		public float MinY { get; set; } = -5f;
 		[field: SerializeField]
-		public float MaxY { get; set; }
+		public float MaxY { get; set; } = 5f;
 
 		[NamedControl( "Deflection (X)" )]
 		public ControlleeInput<float> SetX;
-		public void OnSetX( float x )
+		private void SetXListener( float x )
 		{
 			this.X = x;
 		}
 
 		[NamedControl( "Deflection (Y)" )]
 		public ControlleeInput<float> SetY;
-		public void OnSetY( float y )
+		private void SetYListener( float y )
 		{
 			this.Y = y;
 		}
 
 		[NamedControl( "Deflection (XY)" )]
 		public ControlleeInput<Vector2> SetXY;
-		public void OnSetXY( Vector2 xy )
+		private void SetXYListener( Vector2 xy )
 		{
 			this.X = xy.x;
 			this.Y = xy.y;
@@ -68,9 +68,9 @@ namespace KSS.Components
 		void Awake()
 		{
 			GetReferenceTransform = new ControlParameterOutput<Transform>( GetTransform );
-			SetX = new ControlleeInput<float>( OnSetX );
-			SetY = new ControlleeInput<float>( OnSetY );
-			SetXY = new ControlleeInput<Vector2>( OnSetXY );
+			SetX = new ControlleeInput<float>( SetXListener );
+			SetY = new ControlleeInput<float>( SetYListener );
+			SetXY = new ControlleeInput<Vector2>( SetXYListener );
 		}
 
 		void FixedUpdate()

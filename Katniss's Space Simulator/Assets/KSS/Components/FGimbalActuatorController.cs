@@ -10,7 +10,7 @@ using UnityPlus.Serialization;
 namespace KSS.Components
 {
 	/// <summary>
-	/// Tries to achieve the desired angular accelerations using gimbal actuators.
+	/// Controls a number of gimbal actuators.
 	/// </summary>
 	public class FGimbalActuatorController : MonoBehaviour, IPersistent
 	{
@@ -37,15 +37,15 @@ namespace KSS.Components
 		public Actuator2DGroup[] Actuators2D = new Actuator2DGroup[5];
 
 		[NamedControl( "Steering Command", "Connect to the avionics." )]
-		public ControlleeInput<Vector3> SetSteeringCommand;
-		private void OnSetSteeringCommand( Vector3 targetSteering )
+		public ControlleeInput<Vector3> SetSteering;
+		private void SetSteeringListener( Vector3 steeringCommand )
 		{
-			CurrentSteeringCommand = targetSteering;
+			CurrentSteeringCommand = steeringCommand;
 		}
 
 		void Awake()
 		{
-			SetSteeringCommand = new ControlleeInput<Vector3>( OnSetSteeringCommand );
+			SetSteering = new ControlleeInput<Vector3>( SetSteeringListener );
 		}
 
 		void FixedUpdate()

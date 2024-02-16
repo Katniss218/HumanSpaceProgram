@@ -14,13 +14,10 @@ using UnityPlus.UILib.UIElements;
 namespace KSS.UI
 {
 	/// <summary>
-	/// UI for <see cref="ControlGroup"/>-derived classes. <br/>
-	/// As well as that, every component UI has its implicit group to reduce code duplication.
+	/// UI for <see cref="ControlGroup"/>-derived classes.
 	/// </summary>
 	public class ControlSetupControlGroupUI : MonoBehaviour
-	{
-		// Groups are what actually directly contain the inputs/outputs.
-		
+	{		
         public const float ROW_HEIGHT = 15.0f;
 
 		/// <summary>

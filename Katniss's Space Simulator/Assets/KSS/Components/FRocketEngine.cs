@@ -11,7 +11,7 @@ using KSS.Control.Controls;
 namespace KSS.Components
 {
 	[Serializable]
-	public class FRocketEngine : MonoBehaviour, IThruster, IResourceConsumer, IPersistent
+	public class FRocketEngine : MonoBehaviour, IResourceConsumer, IPersistent
 	{
 		const float g = 9.80665f;
 
@@ -34,16 +34,22 @@ namespace KSS.Components
 		/// </summary>
 		public float MaxMassFlow => MaxThrust / (Isp * g);
 
+		/// <summary>
+		/// The current throttle level, in [0..1].
+		/// </summary>
 		[field: SerializeField]
 		public float Throttle { get; set; }
 
-		[NamedControl( "Throttle", "Sets the throttle level, [0..1]." )]
+		[NamedControl( "Throttle", "Sets the current throttle level, [0..1]." )]
 		public ControlleeInput<float> SetThrottle;
-		private void OnSetThrottle( float value )
+		private void SetThrottleListener( float value )
 		{
 			this.Throttle = value;
 		}
 
+		/// <summary>
+		/// The thrust will be aplied in the Z+ (`forward`) direction of this transform.
+		/// </summary>
 		[field: SerializeField]
 		public Transform ThrustTransform { get; set; }
 
@@ -57,7 +63,7 @@ namespace KSS.Components
 
 		void Awake()
 		{
-			SetThrottle = new ControlleeInput<float>( OnSetThrottle );
+			SetThrottle = new ControlleeInput<float>( SetThrottleListener );
 		}
 
 		void FixedUpdate()

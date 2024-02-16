@@ -39,13 +39,22 @@ namespace KSS.Core
     public interface IPartObject : IComponent
     {
         /// <summary>
-        /// Returns the transform that defines the 'vessel space'.
+        /// The root part of this part object (if any).
+        /// </summary>
+        Transform RootPart { get; }
+        /// <summary>
+        /// The physics object attached to this part object (if any).
+        /// </summary>
+        IPhysicsObject PhysicsObject { get; }
+        /// <summary>
+        /// The root object transform attached to this part object (if any).
+        /// </summary>
+        RootObjectTransform RootObjTransform { get; }
+        
+        /// <summary>
+        /// Returns the transform that defines the orientation (local space) of this part object.
         /// </summary>
         public Transform ReferenceTransform => transform;
-
-        Transform RootPart { get; }
-        IPhysicsObject PhysicsObject { get; }
-        RootObjectTransform RootObjTransform { get; }
 
         /// <summary>
         /// Call this to rebuild the part data cache.

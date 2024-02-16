@@ -11,45 +11,50 @@ using UnityPlus.Serialization;
 
 namespace Assets.KSS.Components
 {
+    [Obsolete("Not implemented yet.")] // TODO - add actual functionality.
 	public class F3AxisActuator : MonoBehaviour, IPersistent
 	{
-        // TODO - add actual functionality.
-
         public float X { get; set; }
         public float Y { get; set; }
         public float Z { get; set; }
+        
+		[field: SerializeField]
+        public float MinX { get; set; } = -5f;
+		[field: SerializeField]
+        public float MaxX { get; set; } = 5f;
+		[field: SerializeField]
+        public float MinY { get; set; } = -5f;
+		[field: SerializeField]
+        public float MaxY { get; set; } = 5f;
+		[field: SerializeField]
+        public float MinZ { get; set; } = -5f;
+		[field: SerializeField]
+        public float MaxZ { get; set; } = 5f;
 
-        public float MinX { get; set; }
-        public float MaxX { get; set; }
-        public float MinY { get; set; }
-        public float MaxY { get; set; }
-        public float MinZ { get; set; }
-        public float MaxZ { get; set; }
-
-        [NamedControl( "Set X" )]
-        private ControlleeInput<float> SetX;
-        public void OnSetX( float x )
+        [NamedControl( "Deflection (X)" )]
+        public ControlleeInput<float> SetX;
+        private void SetXListener( float x )
         {
             this.X = x;
         }
 
-        [NamedControl( "Set Y" )]
-        private ControlleeInput<float> SetY;
-        public void OnSetY( float y )
+        [NamedControl( "Deflection (Y)" )]
+        public ControlleeInput<float> SetY;
+        private void SetYListener( float y )
         {
             this.Y = y;
         }
         
-        [NamedControl( "Set Z" )]
-        private ControlleeInput<float> SetZ;
-        public void OnSetZ( float z )
+        [NamedControl( "Deflection (Z)" )]
+        public ControlleeInput<float> SetZ;
+        private void SetZListener( float z )
         {
             this.Z = z;
         }
         
-        [NamedControl( "Set XYZ" )]
-        private ControlleeInput<Vector3> SetXYZ;
-        public void OnSetXYZ( Vector3 xyz )
+        [NamedControl( "Deflection (XYZ)" )]
+        public ControlleeInput<Vector3> SetXYZ;
+        private void SetXYZListener( Vector3 xyz )
         {
             this.X = xyz.x;
             this.Y = xyz.y;

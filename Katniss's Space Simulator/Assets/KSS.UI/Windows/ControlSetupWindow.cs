@@ -24,9 +24,6 @@ namespace KSS.UI.Windows
 		private UIScrollView _scrollView;
 		internal IUIElementContainer Container => _scrollView;
 
-		// node inputs/outputs might be connected to invisible (in the window) stuff, if it's outside of the hierarchy.
-		// - that means we should show the connection at the visible input, and "cut it off" shortly after.
-
 		IEnumerable<Component> visibleComponents => _nodes.Keys;
 
 		Dictionary<Component, ControlSetupWindowComponentUI> _nodes = new();
@@ -41,9 +38,7 @@ namespace KSS.UI.Windows
 
 		ControlSetupControlConnectionUI _mouseDraggedConnection = null;
 		bool IsDragging => _mouseDraggedConnection != null;
-
-		// nodes may be connected while the window is open, we need to account for that.
-
+		
 		public void ShowComponent( Component component )
 		{
 			// When showing or hiding a component (has to be done when toggling AND WHEN COMP IS REMOVED FROM PHYSICAL VESSEL)
