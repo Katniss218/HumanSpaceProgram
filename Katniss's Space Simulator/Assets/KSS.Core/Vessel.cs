@@ -198,7 +198,9 @@ namespace KSS.Core
 			this.PhysicsObject.LocalCenterOfMass = comLocal;
 			this.PhysicsObject.Mass = mass;
 			//var x = this.PhysicsObject.MomentOfInertiaTensor;
-			this.PhysicsObject.MomentOfInertiaTensor = inertia; // this is around an order of magnitude too small in each direction, but that might be because we're assuming point masses.
+
+			// disabled for now. needs a better calculation of moments of inertia
+			//this.PhysicsObject.MomentOfInertiaTensor = inertia; // this is around an order of magnitude too small in each direction, but that might be because we're assuming point masses.
 		}
 
 		public Vector3Dbl AIRFPosition { get => this.RootObjTransform.AIRFPosition; set => this.RootObjTransform.AIRFPosition = value; }

@@ -31,28 +31,28 @@ namespace KSS.Components
 		/// The current steering command in vessel-space. The axes of this vector correspond to rotation around the axes of the vessel.
 		/// </summary>
 		[field: SerializeField]
-		public Vector3 CurrentSteeringCommand { get; set; }
+		public Vector3 AttitudeCommand { get; set; }
 
 		[NamedControl( "2D Actuators", "Connect to the actuators you want this gimbal controller to control." )]
 		public Actuator2DGroup[] Actuators2D = new Actuator2DGroup[5];
 
-		[NamedControl( "Steering Command", "Connect to the avionics." )]
-		public ControlleeInput<Vector3> SetSteering;
-		private void SetSteeringListener( Vector3 steeringCommand )
+		[NamedControl( "Attitude", "Connect to the avionics." )]
+		public ControlleeInput<Vector3> SetAttitude;
+		private void SetAttitudeListener( Vector3 attitude )
 		{
-			CurrentSteeringCommand = steeringCommand;
+			AttitudeCommand = attitude;
 		}
 
 		void Awake()
 		{
-			SetSteering = new ControlleeInput<Vector3>( SetSteeringListener );
+			SetAttitude = new ControlleeInput<Vector3>( SetAttitudeListener );
 		}
 
 		void FixedUpdate()
 		{
 			IPartObject partObject = this.transform.GetPartObject();
 
-			Vector3 worldSteering = partObject.ReferenceTransform.TransformDirection( CurrentSteeringCommand );
+			Vector3 worldSteering = partObject.ReferenceTransform.TransformDirection( AttitudeCommand );
 
 			foreach( var actuator in Actuators2D )
 			{
