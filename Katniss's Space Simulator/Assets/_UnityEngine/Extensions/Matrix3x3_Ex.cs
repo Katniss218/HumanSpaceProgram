@@ -1,65 +1,65 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace UnityEngine
 {
 	public static class Matrix3x3_Ex
 	{
-		public static (Vector3 eigenvector, float eigenvalue)[] QRAlgorithm( this Matrix3x3 A )
+		/// <summary>
+		/// Returns an (unordered) set of eigenvectors and eigenvalues for the specified matrix. <br/>
+		/// The returned eigenvectors are normalized.
+		/// </summary>
+		public static (Vector3 eigenvector, float eigenvalue)[] Diagonalize( this Matrix3x3 matrix )
 		{
-			throw new NotImplementedException();
-		}
-		public static float GetMagnitude( float[] vector )
-		{
-			float acc = 0;
-			for( int i = 0; i < vector.Length; i++ )
-			{
-				var val = vector[i];
-				acc += val * val;
-			}
-			return Mathf.Sqrt( acc );
-		}
+			// Adapted from here:
+			// https://github.com/thversfelt/SimpleQRAlgorithm/blob/main/QRAlgorithm.cs
 
-		static Matrix3x3 MultiplyRowAndCol( float[] rowVector, float[] colVector )
-		{
-			if( rowVector.Length != 3 || colVector.Length != 3 )
-			{
-				throw new ArgumentException( "Both vectors must have a length of 3." );
-			}
+			Matrix3x3 currentMatrix = matrix;
+			Matrix3x3 eigenMatrix = Matrix3x3.identity;
 
-			Matrix3x3 resultMatrix = Matrix3x3.zero;
-
-			for( int i = 0; i < 3; i++ )
+			// QR iterations.
+			for( int i = 0; i < 1000; i++ )
 			{
-				for( int j = 0; j < 3; j++ )
+				(Matrix3x3 Q, Matrix3x3 R) = QRDecomposition( currentMatrix );
+				currentMatrix = R * Q;
+				eigenMatrix = eigenMatrix * Q;
+
+				// Some eigenvalues sometimes switch sign, because the Q ends up with negative values.
+				// But when ignoring the sign, they are correct.
+				if( currentMatrix.IsDiagonal() )
 				{
-					resultMatrix[i, j] = rowVector[i] * colVector[j];
+					break;
 				}
 			}
 
-			return resultMatrix;
+			return new (Vector3 eigenvector, float eigenvalue)[]
+			{
+				(new Vector3( eigenMatrix.m00, eigenMatrix.m10, eigenMatrix.m20 ).normalized, currentMatrix.m00),
+				(new Vector3( eigenMatrix.m01, eigenMatrix.m11, eigenMatrix.m21 ).normalized, currentMatrix.m11),
+				(new Vector3( eigenMatrix.m02, eigenMatrix.m12, eigenMatrix.m22 ).normalized, currentMatrix.m22)
+			};
 		}
 
-		[Obsolete( "untested" )]
-		public static (Matrix3x3 Q, Matrix3x3 R) MatDecomposeQR( Matrix3x3 mat )
+		/// <summary>
+		/// Performs QR decomposition of the specified matrix.
+		/// </summary>
+		/// <param name="matrix"></param>
+		/// <returns></returns>
+		public static (Matrix3x3 Q, Matrix3x3 R) QRDecomposition( this Matrix3x3 matrix )
 		{
-			// https://visualstudiomagazine.com/Articles/2024/01/03/matrix-inverse.aspx
 			// QR decomposition, Householder algorithm.
+			// Adapted from here:
+			// https://visualstudiomagazine.com/Articles/2024/01/03/matrix-inverse.aspx
 
 			int rows = 3;
 			int cols = 3;
 
 			Matrix3x3 Q = Matrix3x3.identity;
-			Matrix3x3 R = Matrix3x3.zero;
+			Matrix3x3 R = matrix;
 
 			for( int currentCol = 0; currentCol < cols - 1; currentCol++ )
 			{
 				Matrix3x3 H = Matrix3x3.identity;
-				float[] a = new float[cols - currentCol];
+				MatrixMxN a = MatrixMxN.ColumnVector( cols - currentCol );
 				int k = 0;
 				for( int row = currentCol; row < cols; row++ )
 				{
@@ -67,42 +67,48 @@ namespace UnityEngine
 					k++;
 				}
 
-				float aMagnitude = GetMagnitude( a );
+				float aMagnitude = a.magnitude;
 				if( a[0] < 0.0 )
 				{
 					aMagnitude = -aMagnitude;
 				}
 
-				Vector3 v = Vector3.zero;
-				for( k = 0; k < 3; k++ )
+				MatrixMxN v = MatrixMxN.ColumnVector( a.Rows );
+				for( k = 0; k < v.Rows; k++ )
 				{
 					v[k] = a[k] / (a[0] + aMagnitude);
 				}
 				v[0] = 1;
 
-				float[] alphaRow = new float[] { v.x, v.y, v.z };
-				float[] betaCol = new float[] { v.x, v.y, v.z };
-				Matrix3x3 aMultB = MultiplyRowAndCol( alphaRow, betaCol ); // matrix-multiply lhs (row vector) with rhs (column vector)
+				MatrixMxN alphaCol = MatrixMxN.ColumnVector( a.Rows );
+				MatrixMxN betaRow = MatrixMxN.RowVector( a.Rows );
+				for( k = 0; k < v.Rows; k++ )
+				{
+					alphaCol[k] = v[k];
+					betaRow[k] = v[k];
+				}
 
-				float[,] h = new float[a.Length, a.Length];
-				for( int i = 0; i < a.Length; i++ )
+				MatrixMxN aMultB = MatrixMxN.Multiply( alphaCol, betaRow );
+
+				float[,] h = new float[a.Rows, a.Rows];
+				for( int i = 0; i < a.Rows; i++ )
 				{
 					h[i, i] = 1.0f;
 				}
 
-				for( int row = 0; row < 3; row++ )
+				for( int row = 0; row < a.Rows; row++ )
 				{
-					for( int col = 0; col < 3; col++ )
+					for( int col = 0; col < a.Rows; col++ )
 					{
 						h[row, col] -= (2f / v.sqrMagnitude) * aMultB[row, col];
 					}
 				}
 
 				// copy h into lower right of H
-				int d = cols - a.Length;
-				for( int row = 0; row < 3; row++ )
+				int d = cols - a.Rows;
+				for( int row = 0; row < a.Rows; row++ )
 				{
-					for( int col = 0; col < 3; col++ )
+					for( int col = 0; col < a.Rows; col++ )
 					{
 						H[row + d, col + d] = h[row, col];
 					}
@@ -113,6 +119,18 @@ namespace UnityEngine
 			}
 
 			return (Q, R);
+		}
+
+		public static bool IsDiagonal( this Matrix3x3 mat)
+		{
+			const float epsilon = 1e-6f;
+
+			return Mathf.Abs( mat.m01 ) < epsilon &&
+				   Mathf.Abs( mat.m02 ) < epsilon &&
+				   Mathf.Abs( mat.m10 ) < epsilon &&
+				   Mathf.Abs( mat.m12 ) < epsilon &&
+				   Mathf.Abs( mat.m20 ) < epsilon &&
+				   Mathf.Abs( mat.m21 ) < epsilon;
 		}
 	}
 }

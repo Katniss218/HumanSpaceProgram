@@ -22,83 +22,90 @@ using System.Linq;
 
 namespace KSS.DevUtils
 {
-    /// <summary>
-    /// Game manager for testing.
-    /// </summary>
-    public class DevUtilsGameplayManager : SingletonMonoBehaviour<DevUtilsGameplayManager>
-    {
-        public Shader cbShader;
-        public Texture2D[] cbTextures = new Texture2D[6];
+	/// <summary>
+	/// Game manager for testing.
+	/// </summary>
+	public class DevUtilsGameplayManager : SingletonMonoBehaviour<DevUtilsGameplayManager>
+	{
+		public Shader cbShader;
+		public Texture2D[] cbTextures = new Texture2D[6];
 
-        public Mesh Mesh;
-        public Material Material;
+		public Mesh Mesh;
+		public Material Material;
 
-        public GameObject TestLaunchSite;
+		public GameObject TestLaunchSite;
 
-        public Texture2D heightmap;
-        public RenderTexture normalmap;
-        public ComputeShader shader;
-        public RawImage uiImage;
+		public Texture2D heightmap;
+		public RenderTexture normalmap;
+		public ComputeShader shader;
+		public RawImage uiImage;
 
-        static Vessel launchSite;
-        static Vessel vessel;
+		static Vessel launchSite;
+		static Vessel vessel;
 
-        [HSPEventListener( HSPEvent.STARTUP_IMMEDIATELY, "devutils.load_game_data" )]
-        static void LoadGameData( object e )
-        {
-            AssetRegistry.Register( "substance.f", new Substance() { Density = 1000, DisplayName = "Fuel", UIColor = new Color( 1.0f, 0.3764706f, 0.2509804f ) } );
-            AssetRegistry.Register( "substance.ox", new Substance() { Density = 1000, DisplayName = "Oxidizer", UIColor = new Color( 0.2509804f, 0.5607843f, 1.0f ) } );
-        }
+		[HSPEventListener( HSPEvent.STARTUP_IMMEDIATELY, "devutils.load_game_data" )]
+		static void LoadGameData( object e )
+		{
+			AssetRegistry.Register( "substance.f", new Substance() { Density = 1000, DisplayName = "Fuel", UIColor = new Color( 1.0f, 0.3764706f, 0.2509804f ) } );
+			AssetRegistry.Register( "substance.ox", new Substance() { Density = 1000, DisplayName = "Oxidizer", UIColor = new Color( 0.2509804f, 0.5607843f, 1.0f ) } );
+		}
 
-        [HSPEventListener( HSPEvent.TIMELINE_AFTER_NEW, "devutils.timeline.new.after" )]
-        static void OnAfterCreateDefault( object e )
-        {
-            CelestialBody body = CelestialBodyManager.Get( "main" );
-            Vector3 localPos = CoordinateUtils.GeodeticToEuclidean( 28.5857702f, -80.6507262f, (float)(body.Radius + 1.0) );
+		[HSPEventListener( HSPEvent.TIMELINE_AFTER_NEW, "devutils.timeline.new.after" )]
+		static void OnAfterCreateDefault( object e )
+		{
+			CelestialBody body = CelestialBodyManager.Get( "main" );
+			Vector3 localPos = CoordinateUtils.GeodeticToEuclidean( 28.5857702f, -80.6507262f, (float)(body.Radius + 1.0) );
 
-            launchSite = VesselFactory.CreatePartless( Vector3Dbl.zero, QuaternionDbl.identity, Vector3.zero, Vector3.zero );
-            launchSite.gameObject.name = "launchsite";
-            launchSite.Pin( body, localPos, Quaternion.FromToRotation( Vector3.up, localPos.normalized ) );
+			launchSite = VesselFactory.CreatePartless( Vector3Dbl.zero, QuaternionDbl.identity, Vector3.zero, Vector3.zero );
+			launchSite.gameObject.name = "launchsite";
+			launchSite.Pin( body, localPos, Quaternion.FromToRotation( Vector3.up, localPos.normalized ) );
 
-            GameObject launchSitePrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/testlaunchsite" );
-            GameObject root = InstantiateLocal( launchSitePrefab, launchSite.transform, Vector3.zero, Quaternion.identity );
-            launchSite.RootPart = root.transform;
+			GameObject launchSitePrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/testlaunchsite" );
+			GameObject root = InstantiateLocal( launchSitePrefab, launchSite.transform, Vector3.zero, Quaternion.identity );
+			launchSite.RootPart = root.transform;
 
-            var v = CreateVessel( launchSite );
-            ActiveObjectManager.ActiveObject = v.RootPart.GetVessel().gameObject;
-            vessel = v;
-        }
+			var v = CreateVessel( launchSite );
+			ActiveObjectManager.ActiveObject = v.RootPart.GetVessel().gameObject;
+			vessel = v;
+		}
 
-        static Vessel CreateVessel( Vessel launchSite )
-        {
-            if( launchSite == null )
-            {
-                throw new ArgumentNullException( nameof( launchSite ), "launchSite is null" );
-            }
+		static Vessel CreateVessel( Vessel launchSite )
+		{
+			if( launchSite == null )
+			{
+				throw new ArgumentNullException( nameof( launchSite ), "launchSite is null" );
+			}
 
-            FLaunchSiteMarker launchSiteSpawner = launchSite.gameObject.GetComponentInChildren<FLaunchSiteMarker>();
-            Vector3Dbl spawnerPosAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( launchSiteSpawner.transform.position );
-            QuaternionDbl spawnerRotAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( launchSiteSpawner.transform.rotation );
+			FLaunchSiteMarker launchSiteSpawner = launchSite.gameObject.GetComponentInChildren<FLaunchSiteMarker>();
+			Vector3Dbl spawnerPosAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( launchSiteSpawner.transform.position );
+			QuaternionDbl spawnerRotAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( launchSiteSpawner.transform.rotation );
 
-            var v2 = CreateDummyVessel( spawnerPosAirf, spawnerRotAirf ); // position is temp.
+			var v2 = CreateDummyVessel( spawnerPosAirf, spawnerRotAirf ); // position is temp.
 
-            Vector3 bottomBoundPos = v2.GetBottomPosition();
-            Vector3Dbl closestBoundAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( bottomBoundPos );
-            Vector3Dbl closestBoundToVesselAirf = v2.AIRFPosition - closestBoundAirf;
-            Vector3Dbl airfPos = spawnerPosAirf + closestBoundToVesselAirf;
-            v2.AIRFPosition = airfPos;
-            return v2;
-        }
+			Vector3 bottomBoundPos = v2.GetBottomPosition();
+			Vector3Dbl closestBoundAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( bottomBoundPos );
+			Vector3Dbl closestBoundToVesselAirf = v2.AIRFPosition - closestBoundAirf;
+			Vector3Dbl airfPos = spawnerPosAirf + closestBoundToVesselAirf;
+			v2.AIRFPosition = airfPos;
+			return v2;
+		}
 
-        void Awake()
-        {
-            LODQuadSphere.cbShader = this.cbShader;
-            LODQuadSphere.cbTex = this.cbTextures;
-        }
+		void Awake()
+		{
+			LODQuadSphere.cbShader = this.cbShader;
+			LODQuadSphere.cbTex = this.cbTextures;
+		}
 
-        void Start()
-        {
-            /*normalmap = new RenderTexture( heightmap.width, heightmap.height, 8, RenderTextureFormat.ARGB32 );
+		void Start()
+		{
+			Matrix3x3 m = new Matrix3x3( 1, 1, 0, 1, 2, 0, 0, 0, 1 );
+			(Matrix3x3 q, Matrix3x3 r) = m.QRDecomposition();
+			Matrix3x3 mback = Matrix3x3.Multiply( q, r );
+			bool equal = m == mback;
+			
+			Matrix3x3 m2 = new Matrix3x3( 10000, 10000, 50, 10000, 2, 50, 50, 50, 10000 );
+			var eig = m.Diagonalize();
+			/*normalmap = new RenderTexture( heightmap.width, heightmap.height, 8, RenderTextureFormat.ARGB32 );
             normalmap.enableRandomWrite = true;
 
             shader.SetTexture( shader.FindKernel( "CalculateNormalMap" ), Shader.PropertyToID( "heightMap" ), heightmap );
@@ -107,200 +114,202 @@ namespace KSS.DevUtils
             shader.Dispatch( shader.FindKernel( "CalculateNormalMap" ), heightmap.width / 8, heightmap.height / 8, 1 );
 
             uiImage.texture = normalmap;*/
-        }
+			// (0.52549, 0.850798, 0)
+			// (0.52571, 0.850664, 0)
+		}
 
-        void Update()
-        {
-            if( UnityEngine.Input.GetKeyDown( KeyCode.F4 ) )
-            {
-                JsonSeparateFileSerializedDataHandler _designObjDataHandler = new JsonSeparateFileSerializedDataHandler();
-                SingleExplicitHierarchyStrategy _designObjStrategy = new SingleExplicitHierarchyStrategy( _designObjDataHandler, () => null );
+		void Update()
+		{
+			if( UnityEngine.Input.GetKeyDown( KeyCode.F4 ) )
+			{
+				JsonSeparateFileSerializedDataHandler _designObjDataHandler = new JsonSeparateFileSerializedDataHandler();
+				SingleExplicitHierarchyStrategy _designObjStrategy = new SingleExplicitHierarchyStrategy( _designObjDataHandler, () => null );
 
-                VesselMetadata loadedVesselMetadata = new VesselMetadata( "vessel2" );
-                loadedVesselMetadata.ReadDataFromDisk();
+				VesselMetadata loadedVesselMetadata = new VesselMetadata( "vessel2" );
+				loadedVesselMetadata.ReadDataFromDisk();
 
-                // load current vessel from the files defined by metadata's ID.
-                Directory.CreateDirectory( loadedVesselMetadata.GetRootDirectory() );
-                _designObjDataHandler.ObjectsFilename = Path.Combine( loadedVesselMetadata.GetRootDirectory(), "objects.json" );
-                _designObjDataHandler.DataFilename = Path.Combine( loadedVesselMetadata.GetRootDirectory(), "data.json" );
+				// load current vessel from the files defined by metadata's ID.
+				Directory.CreateDirectory( loadedVesselMetadata.GetRootDirectory() );
+				_designObjDataHandler.ObjectsFilename = Path.Combine( loadedVesselMetadata.GetRootDirectory(), "objects.json" );
+				_designObjDataHandler.DataFilename = Path.Combine( loadedVesselMetadata.GetRootDirectory(), "data.json" );
 
-                HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_BEFORE_LOAD, null );
+				HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_BEFORE_LOAD, null );
 
-                Loader _loader = new Loader( new ForwardReferenceStore(), null, null, new ILoader.Action[] { _designObjStrategy.Load_Object }, new ILoader.Action[] { _designObjStrategy.Load_Data } );
+				Loader _loader = new Loader( new ForwardReferenceStore(), null, null, new ILoader.Action[] { _designObjStrategy.Load_Object }, new ILoader.Action[] { _designObjStrategy.Load_Data } );
 
-                _loader.Load();
+				_loader.Load();
 
-                FLaunchSiteMarker launchSiteSpawner = launchSite.gameObject.GetComponentInChildren<FLaunchSiteMarker>();
-                Vector3Dbl spawnerPosAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( launchSiteSpawner.transform.position );
-                QuaternionDbl spawnerRotAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( launchSiteSpawner.transform.rotation );
+				FLaunchSiteMarker launchSiteSpawner = launchSite.gameObject.GetComponentInChildren<FLaunchSiteMarker>();
+				Vector3Dbl spawnerPosAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( launchSiteSpawner.transform.position );
+				QuaternionDbl spawnerRotAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( launchSiteSpawner.transform.rotation );
 
-                Vessel v2 = VesselFactory.CreatePartless( spawnerPosAirf, spawnerRotAirf, Vector3.zero, Vector3.zero );
+				Vessel v2 = VesselFactory.CreatePartless( spawnerPosAirf, spawnerRotAirf, Vector3.zero, Vector3.zero );
 
-                v2.RootPart = _designObjStrategy.LastSpawnedRoot.transform;
-                v2.RootPart.localPosition = Vector3.zero;
-                v2.RootPart.localRotation = Quaternion.identity;
+				v2.RootPart = _designObjStrategy.LastSpawnedRoot.transform;
+				v2.RootPart.localPosition = Vector3.zero;
+				v2.RootPart.localRotation = Quaternion.identity;
 
-                Vector3 bottomBoundPos = v2.GetBottomPosition();
-                Vector3Dbl closestBoundAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( bottomBoundPos );
-                Vector3Dbl closestBoundToVesselAirf = v2.AIRFPosition - closestBoundAirf;
-                Vector3Dbl airfPos = spawnerPosAirf + closestBoundToVesselAirf;
-                v2.AIRFPosition = airfPos;
-            }
-            if( UnityEngine.Input.GetKeyDown( KeyCode.F5 ) )
-            {
-                CreateVessel( launchSite );
-            }
-            if( UnityEngine.Input.GetKeyDown( KeyCode.F1 ) )
-            {
-                JsonSeparateFileSerializedDataHandler handler = new JsonSeparateFileSerializedDataHandler();
-                SingleExplicitHierarchyStrategy strat = new SingleExplicitHierarchyStrategy( handler, () => null );
-                Saver saver = new Saver( new ReverseReferenceStore(), null, null, strat.Save_Object, strat.Save_Data );
+				Vector3 bottomBoundPos = v2.GetBottomPosition();
+				Vector3Dbl closestBoundAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( bottomBoundPos );
+				Vector3Dbl closestBoundToVesselAirf = v2.AIRFPosition - closestBoundAirf;
+				Vector3Dbl airfPos = spawnerPosAirf + closestBoundToVesselAirf;
+				v2.AIRFPosition = airfPos;
+			}
+			if( UnityEngine.Input.GetKeyDown( KeyCode.F5 ) )
+			{
+				CreateVessel( launchSite );
+			}
+			if( UnityEngine.Input.GetKeyDown( KeyCode.F1 ) )
+			{
+				JsonSeparateFileSerializedDataHandler handler = new JsonSeparateFileSerializedDataHandler();
+				SingleExplicitHierarchyStrategy strat = new SingleExplicitHierarchyStrategy( handler, () => null );
+				Saver saver = new Saver( new ReverseReferenceStore(), null, null, strat.Save_Object, strat.Save_Data );
 
-                string gameDataPath = HumanSpaceProgramMods.GetModDirectoryPath();
-                string partDir;
+				string gameDataPath = HumanSpaceProgramMods.GetModDirectoryPath();
+				string partDir;
 
-                VesselMetadata vm;
-                partDir = HumanSpaceProgram.GetSavedVesselsDirectoryPath() + "/vessel";
-                Directory.CreateDirectory( partDir );
-                vm = new VesselMetadata( "vessel" );
-                vm.Name = "Engine"; vm.Description = "default"; vm.Author = "Katniss";
-                vm.WriteToDisk();
-                strat.RootObjectGetter = () => vessel.RootPart.gameObject;
-                handler.ObjectsFilename = partDir + "/objects.json";
-                handler.DataFilename = partDir + "/data.json";
-                saver.Save();
+				VesselMetadata vm;
+				partDir = HumanSpaceProgram.GetSavedVesselsDirectoryPath() + "/vessel";
+				Directory.CreateDirectory( partDir );
+				vm = new VesselMetadata( "vessel" );
+				vm.Name = "Engine"; vm.Description = "default"; vm.Author = "Katniss";
+				vm.WriteToDisk();
+				strat.RootObjectGetter = () => vessel.RootPart.gameObject;
+				handler.ObjectsFilename = partDir + "/objects.json";
+				handler.DataFilename = partDir + "/data.json";
+				saver.Save();
 
-                PartMetadata pm;
+				PartMetadata pm;
 
-                partDir = gameDataPath + "/Vanilla/Parts/engine";
-                Directory.CreateDirectory( partDir );
-                pm = new PartMetadata( partDir );
-                pm.Name = "Engine"; pm.Author = "Katniss"; pm.Categories = new string[] { "engine" };
-                pm.WriteToDisk();
-                strat.RootObjectGetter = () => AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/engine" );
-                handler.ObjectsFilename = partDir + "/objects.json";
-                handler.DataFilename = partDir + "/data.json";
-                saver.Save();
-
-
-                partDir = gameDataPath + "/Vanilla/Parts/intertank";
-                Directory.CreateDirectory( partDir );
-                pm = new PartMetadata( partDir );
-                pm.Name = "Intertank"; pm.Author = "Katniss"; pm.Categories = new string[] { "structural" };
-                pm.WriteToDisk();
-                strat.RootObjectGetter = () => AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/intertank" );
-                handler.ObjectsFilename = partDir + "/objects.json";
-                handler.DataFilename = partDir + "/data.json";
-                saver.Save();
+				partDir = gameDataPath + "/Vanilla/Parts/engine";
+				Directory.CreateDirectory( partDir );
+				pm = new PartMetadata( partDir );
+				pm.Name = "Engine"; pm.Author = "Katniss"; pm.Categories = new string[] { "engine" };
+				pm.WriteToDisk();
+				strat.RootObjectGetter = () => AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/engine" );
+				handler.ObjectsFilename = partDir + "/objects.json";
+				handler.DataFilename = partDir + "/data.json";
+				saver.Save();
 
 
-                partDir = gameDataPath + "/Vanilla/Parts/tank";
-                Directory.CreateDirectory( partDir );
-                pm = new PartMetadata( partDir );
-                pm.Name = "Tank"; pm.Author = "Katniss"; pm.Categories = new string[] { "fuel_tank" };
-                pm.WriteToDisk();
-                strat.RootObjectGetter = () => AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/tank" );
-                handler.ObjectsFilename = partDir + "/objects.json";
-                handler.DataFilename = partDir + "/data.json";
-                saver.Save();
+				partDir = gameDataPath + "/Vanilla/Parts/intertank";
+				Directory.CreateDirectory( partDir );
+				pm = new PartMetadata( partDir );
+				pm.Name = "Intertank"; pm.Author = "Katniss"; pm.Categories = new string[] { "structural" };
+				pm.WriteToDisk();
+				strat.RootObjectGetter = () => AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/intertank" );
+				handler.ObjectsFilename = partDir + "/objects.json";
+				handler.DataFilename = partDir + "/data.json";
+				saver.Save();
 
 
-                partDir = gameDataPath + "/Vanilla/Parts/tank_long";
-                Directory.CreateDirectory( partDir );
-                pm = new PartMetadata( partDir );
-                pm.Name = "Long Tank"; pm.Author = "Katniss"; pm.Categories = new string[] { "fuel_tank" };
-                pm.WriteToDisk();
-                strat.RootObjectGetter = () => AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/tank_long" );
-                handler.ObjectsFilename = partDir + "/objects.json";
-                handler.DataFilename = partDir + "/data.json";
-                saver.Save();
+				partDir = gameDataPath + "/Vanilla/Parts/tank";
+				Directory.CreateDirectory( partDir );
+				pm = new PartMetadata( partDir );
+				pm.Name = "Tank"; pm.Author = "Katniss"; pm.Categories = new string[] { "fuel_tank" };
+				pm.WriteToDisk();
+				strat.RootObjectGetter = () => AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/tank" );
+				handler.ObjectsFilename = partDir + "/objects.json";
+				handler.DataFilename = partDir + "/data.json";
+				saver.Save();
 
-                partDir = gameDataPath + "/Vanilla/Parts/capsule";
-                Directory.CreateDirectory( partDir );
-                pm = new PartMetadata( partDir );
-                pm.Name = "Gemini Capsule"; pm.Author = "Katniss"; pm.Categories = new string[] { "command" };
-                pm.WriteToDisk();
-                strat.RootObjectGetter = () => AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/capsule" );
-                handler.ObjectsFilename = partDir + "/objects.json";
-                handler.DataFilename = partDir + "/data.json";
-                saver.Save();
-            }
-        }
 
-        static GameObject InstantiateLocal( GameObject original, Transform parent, Vector3 pos, Quaternion rot )
-        {
-            GameObject go = Instantiate( original, parent );
-            go.transform.localPosition = pos;
-            go.transform.localRotation = rot;
-            return go;
-        }
+				partDir = gameDataPath + "/Vanilla/Parts/tank_long";
+				Directory.CreateDirectory( partDir );
+				pm = new PartMetadata( partDir );
+				pm.Name = "Long Tank"; pm.Author = "Katniss"; pm.Categories = new string[] { "fuel_tank" };
+				pm.WriteToDisk();
+				strat.RootObjectGetter = () => AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/tank_long" );
+				handler.ObjectsFilename = partDir + "/objects.json";
+				handler.DataFilename = partDir + "/data.json";
+				saver.Save();
 
-        static Vessel CreateDummyVessel( Vector3Dbl airfPosition, QuaternionDbl rotation )
-        {
-            GameObject capsulePrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/capsule" );
-            GameObject intertankPrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/intertank" );
-            GameObject tankPrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/tank" );
-            GameObject tankLongPrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/tank_long" );
-            GameObject enginePrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/engine" );
+				partDir = gameDataPath + "/Vanilla/Parts/capsule";
+				Directory.CreateDirectory( partDir );
+				pm = new PartMetadata( partDir );
+				pm.Name = "Gemini Capsule"; pm.Author = "Katniss"; pm.Categories = new string[] { "command" };
+				pm.WriteToDisk();
+				strat.RootObjectGetter = () => AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/capsule" );
+				handler.ObjectsFilename = partDir + "/objects.json";
+				handler.DataFilename = partDir + "/data.json";
+				saver.Save();
+			}
+		}
 
-            Vessel v = VesselFactory.CreatePartless( airfPosition, rotation, Vector3.zero, Vector3.zero );
-            Transform root = InstantiateLocal( intertankPrefab, v.transform, Vector3.zero, Quaternion.identity ).transform;
+		static GameObject InstantiateLocal( GameObject original, Transform parent, Vector3 pos, Quaternion rot )
+		{
+			GameObject go = Instantiate( original, parent );
+			go.transform.localPosition = pos;
+			go.transform.localRotation = rot;
+			return go;
+		}
 
-            Transform tankP = InstantiateLocal( tankPrefab, root, new Vector3( 0, -1.625f, 0 ), Quaternion.identity ).transform;
-            Transform tankL1 = InstantiateLocal( tankLongPrefab, root, new Vector3( 0, 2.625f, 0 ), Quaternion.identity ).transform;
-            Transform capsule = InstantiateLocal( capsulePrefab, tankL1, new Vector3( 0, 2.625f, 0 ), Quaternion.identity ).transform;
-            Transform t1 = InstantiateLocal( tankLongPrefab, root, new Vector3( 2, 2.625f, 0 ), Quaternion.identity ).transform;
-            Transform t2 = InstantiateLocal( tankLongPrefab, root, new Vector3( -2, 2.625f, 0 ), Quaternion.identity ).transform;
-            Transform engineP = InstantiateLocal( enginePrefab, tankP, new Vector3( 0, -3.45533f, 0 ), Quaternion.identity ).transform;
-            v.RootPart = root;
+		static Vessel CreateDummyVessel( Vector3Dbl airfPosition, QuaternionDbl rotation )
+		{
+			GameObject capsulePrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/capsule" );
+			GameObject intertankPrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/intertank" );
+			GameObject tankPrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/tank" );
+			GameObject tankLongPrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/tank_long" );
+			GameObject enginePrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/engine" );
 
-            FBulkConnection conn = tankP.gameObject.AddComponent<FBulkConnection>();
-            conn.End1.ConnectTo( tankL1.GetComponent<FBulkContainer_Sphere>() );
-            conn.End1.Position = new Vector3( 0.0f, -2.5f, 0.0f );
-            conn.End2.ConnectTo( tankP.GetComponent<FBulkContainer_Sphere>() );
-            conn.End2.Position = new Vector3( 0.0f, 1.5f, 0.0f );
-            conn.CrossSectionArea = 0.1f;
+			Vessel v = VesselFactory.CreatePartless( airfPosition, rotation, Vector3.zero, Vector3.zero );
+			Transform root = InstantiateLocal( intertankPrefab, v.transform, Vector3.zero, Quaternion.identity ).transform;
 
-            Substance sbsF = AssetRegistry.Get<Substance>( "substance.f" );
-            Substance sbsOX = AssetRegistry.Get<Substance>( "substance.ox" );
+			Transform tankP = InstantiateLocal( tankPrefab, root, new Vector3( 0, -1.625f, 0 ), Quaternion.identity ).transform;
+			Transform tankL1 = InstantiateLocal( tankLongPrefab, root, new Vector3( 0, 2.625f, 0 ), Quaternion.identity ).transform;
+			Transform capsule = InstantiateLocal( capsulePrefab, tankL1, new Vector3( 0, 2.625f, 0 ), Quaternion.identity ).transform;
+			Transform t1 = InstantiateLocal( tankLongPrefab, root, new Vector3( 2, 2.625f, 0 ), Quaternion.identity ).transform;
+			Transform t2 = InstantiateLocal( tankLongPrefab, root, new Vector3( -2, 2.625f, 0 ), Quaternion.identity ).transform;
+			Transform engineP = InstantiateLocal( enginePrefab, tankP, new Vector3( 0, -3.45533f, 0 ), Quaternion.identity ).transform;
+			v.RootPart = root;
 
-            var tankSmallTank = tankP.GetComponent<FBulkContainer_Sphere>();
-            tankSmallTank.Contents = new SubstanceStateCollection(
-                new SubstanceState[] {
-                    new SubstanceState( tankSmallTank.MaxVolume * ((sbsF.Density + sbsOX.Density) / 2f) / 2f, sbsF ),
-                    new SubstanceState( tankSmallTank.MaxVolume * ((sbsF.Density + sbsOX.Density) / 2f) / 2f, sbsOX )} );
+			FBulkConnection conn = tankP.gameObject.AddComponent<FBulkConnection>();
+			conn.End1.ConnectTo( tankL1.GetComponent<FBulkContainer_Sphere>() );
+			conn.End1.Position = new Vector3( 0.0f, -2.5f, 0.0f );
+			conn.End2.ConnectTo( tankP.GetComponent<FBulkContainer_Sphere>() );
+			conn.End2.Position = new Vector3( 0.0f, 1.5f, 0.0f );
+			conn.CrossSectionArea = 0.1f;
 
-            FBulkConnection conn2 = engineP.gameObject.AddComponent<FBulkConnection>();
-            conn2.End1.ConnectTo( tankP.GetComponent<FBulkContainer_Sphere>() );
-            conn2.End1.Position = new Vector3( 0.0f, -1.5f, 0.0f );
-            conn2.End2.ConnectTo( engineP.GetComponent<FRocketEngine>() );
-            conn2.End2.Position = new Vector3( 0.0f, 0.0f, 0.0f );
-            conn2.CrossSectionArea = 60f;
+			Substance sbsF = AssetRegistry.Get<Substance>( "substance.f" );
+			Substance sbsOX = AssetRegistry.Get<Substance>( "substance.ox" );
 
-            t1.gameObject.AddComponent<FVesselSeparator>();
-            t2.gameObject.AddComponent<FVesselSeparator>();
+			var tankSmallTank = tankP.GetComponent<FBulkContainer_Sphere>();
+			tankSmallTank.Contents = new SubstanceStateCollection(
+				new SubstanceState[] {
+					new SubstanceState( tankSmallTank.MaxVolume * ((sbsF.Density + sbsOX.Density) / 2f) / 2f, sbsF ),
+					new SubstanceState( tankSmallTank.MaxVolume * ((sbsF.Density + sbsOX.Density) / 2f) / 2f, sbsOX )} );
 
-            TrailRenderer tr = v.gameObject.AddComponent<TrailRenderer>();
-            tr.material = FindObjectOfType<DevUtilsGameplayManager>().Material;
-            tr.time = 250;
-            AnimationCurve curve = new AnimationCurve();
-            curve.AddKey( 0, 5.0f );
-            curve.AddKey( 1, 2.5f );
-            tr.widthCurve = curve;
-            tr.minVertexDistance = 50f;
+			FBulkConnection conn2 = engineP.gameObject.AddComponent<FBulkConnection>();
+			conn2.End1.ConnectTo( tankP.GetComponent<FBulkContainer_Sphere>() );
+			conn2.End1.Position = new Vector3( 0.0f, -1.5f, 0.0f );
+			conn2.End2.ConnectTo( engineP.GetComponent<FRocketEngine>() );
+			conn2.End2.Position = new Vector3( 0.0f, 0.0f, 0.0f );
+			conn2.CrossSectionArea = 60f;
 
-            FPlayerInputAvionics av = capsule.GetComponent<FPlayerInputAvionics>();
-            FGimbalActuatorController gc = capsule.GetComponent<FGimbalActuatorController>();
-            FRocketEngine eng = engineP.GetComponent<FRocketEngine>();
-            F2AxisActuator ac = engineP.GetComponent<F2AxisActuator>();
-            av.OnSetThrottle.TryConnect( eng.SetThrottle );
+			t1.gameObject.AddComponent<FVesselSeparator>();
+			t2.gameObject.AddComponent<FVesselSeparator>();
 
-            av.OnSetSteering.TryConnect( gc.SetSteering );
-            gc.Actuators2D[0] = new FGimbalActuatorController.Actuator2DGroup();
-            gc.Actuators2D[0].GetReferenceTransform.TryConnect( ac.GetReferenceTransform );
-            gc.Actuators2D[0].OnSetXY.TryConnect( ac.SetXY );
+			TrailRenderer tr = v.gameObject.AddComponent<TrailRenderer>();
+			tr.material = FindObjectOfType<DevUtilsGameplayManager>().Material;
+			tr.time = 250;
+			AnimationCurve curve = new AnimationCurve();
+			curve.AddKey( 0, 5.0f );
+			curve.AddKey( 1, 2.5f );
+			tr.widthCurve = curve;
+			tr.minVertexDistance = 50f;
 
-            return v;
-        }
-    }
+			FPlayerInputAvionics av = capsule.GetComponent<FPlayerInputAvionics>();
+			FGimbalActuatorController gc = capsule.GetComponent<FGimbalActuatorController>();
+			FRocketEngine eng = engineP.GetComponent<FRocketEngine>();
+			F2AxisActuator ac = engineP.GetComponent<F2AxisActuator>();
+			av.OnSetThrottle.TryConnect( eng.SetThrottle );
+
+			av.OnSetSteering.TryConnect( gc.SetSteering );
+			gc.Actuators2D[0] = new FGimbalActuatorController.Actuator2DGroup();
+			gc.Actuators2D[0].GetReferenceTransform.TryConnect( ac.GetReferenceTransform );
+			gc.Actuators2D[0].OnSetXY.TryConnect( ac.SetXY );
+
+			return v;
+		}
+	}
 }

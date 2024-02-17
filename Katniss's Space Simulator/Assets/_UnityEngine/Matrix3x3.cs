@@ -87,6 +87,7 @@ namespace UnityEngine
 				}
 			}
 		}
+
 		//public Matrix3x3 inverse;
 
 		public Matrix3x3 transpose => Transpose( this );
@@ -103,19 +104,87 @@ namespace UnityEngine
 		{
 			Matrix3x3 result = new Matrix3x3();
 
-			result.m00 = lhs.m00 * rhs.m00 + lhs.m01 * rhs.m10 + lhs.m02 * rhs.m20;
-			result.m01 = lhs.m00 * rhs.m01 + lhs.m01 * rhs.m11 + lhs.m02 * rhs.m21;
-			result.m02 = lhs.m00 * rhs.m02 + lhs.m01 * rhs.m12 + lhs.m02 * rhs.m22;
+			result.m00 = (lhs.m00 * rhs.m00) + (lhs.m01 * rhs.m10) + (lhs.m02 * rhs.m20);
+			result.m01 = (lhs.m00 * rhs.m01) + (lhs.m01 * rhs.m11) + (lhs.m02 * rhs.m21);
+			result.m02 = (lhs.m00 * rhs.m02) + (lhs.m01 * rhs.m12) + (lhs.m02 * rhs.m22);
 
-			result.m10 = lhs.m10 * rhs.m00 + lhs.m11 * rhs.m10 + lhs.m12 * rhs.m20;
-			result.m11 = lhs.m10 * rhs.m01 + lhs.m11 * rhs.m11 + lhs.m12 * rhs.m21;
-			result.m12 = lhs.m10 * rhs.m02 + lhs.m11 * rhs.m12 + lhs.m12 * rhs.m22;
+			result.m10 = (lhs.m10 * rhs.m00) + (lhs.m11 * rhs.m10) + (lhs.m12 * rhs.m20);
+			result.m11 = (lhs.m10 * rhs.m01) + (lhs.m11 * rhs.m11) + (lhs.m12 * rhs.m21);
+			result.m12 = (lhs.m10 * rhs.m02) + (lhs.m11 * rhs.m12) + (lhs.m12 * rhs.m22);
 
-			result.m20 = lhs.m20 * rhs.m00 + lhs.m21 * rhs.m10 + lhs.m22 * rhs.m20;
-			result.m21 = lhs.m20 * rhs.m01 + lhs.m21 * rhs.m11 + lhs.m22 * rhs.m21;
-			result.m22 = lhs.m20 * rhs.m02 + lhs.m21 * rhs.m12 + lhs.m22 * rhs.m22;
+			result.m20 = (lhs.m20 * rhs.m00) + (lhs.m21 * rhs.m10) + (lhs.m22 * rhs.m20);
+			result.m21 = (lhs.m20 * rhs.m01) + (lhs.m21 * rhs.m11) + (lhs.m22 * rhs.m21);
+			result.m22 = (lhs.m20 * rhs.m02) + (lhs.m21 * rhs.m12) + (lhs.m22 * rhs.m22);
 
 			return result;
+		}
+
+		public static Matrix3x3 Multiply( Matrix3x3 m, float s )
+		{
+			Matrix3x3 result = new Matrix3x3();
+
+			result.m00 = m.m00 * s;
+			result.m01 = m.m01 * s;
+			result.m02 = m.m02 * s;
+			result.m10 = m.m10 * s;
+			result.m11 = m.m11 * s;
+			result.m12 = m.m12 * s;
+			result.m20 = m.m20 * s;
+			result.m21 = m.m21 * s;
+			result.m22 = m.m22 * s;
+
+			return result;
+		}
+
+		public static Matrix3x3 operator *( Matrix3x3 m, float s )
+		{
+			return Multiply( m, s );
+		}
+		public static Matrix3x3 operator *( float s, Matrix3x3 m )
+		{
+			return Multiply( m, s );
+		}
+		
+		public static Matrix3x3 operator *( Matrix3x3 lhs, Matrix3x3 rhs)
+		{
+			return Multiply( lhs, rhs );
+		}
+
+		public static Matrix3x3 operator -( Matrix3x3 lhs, Matrix3x3 rhs )
+		{
+			Matrix3x3 result = new Matrix3x3();
+
+			result.m00 = lhs.m00 - rhs.m00;
+			result.m01 = lhs.m01 - rhs.m01;
+			result.m02 = lhs.m02 - rhs.m02;
+			result.m10 = lhs.m10 - rhs.m10;
+			result.m11 = lhs.m11 - rhs.m11;
+			result.m12 = lhs.m12 - rhs.m12;
+			result.m20 = lhs.m20 - rhs.m20;
+			result.m21 = lhs.m21 - rhs.m21;
+			result.m22 = lhs.m22 - rhs.m22;
+
+			return result;
+		}
+
+		public static bool operator ==( Matrix3x3 lhs, Matrix3x3 rhs )
+		{
+			float epsilon = 1e-6f;
+
+			return Mathf.Abs( lhs.m00 - rhs.m00 ) < epsilon &&
+				   Mathf.Abs( lhs.m01 - rhs.m01 ) < epsilon &&
+				   Mathf.Abs( lhs.m02 - rhs.m02 ) < epsilon &&
+				   Mathf.Abs( lhs.m10 - rhs.m10 ) < epsilon &&
+				   Mathf.Abs( lhs.m11 - rhs.m11 ) < epsilon &&
+				   Mathf.Abs( lhs.m12 - rhs.m12 ) < epsilon &&
+				   Mathf.Abs( lhs.m20 - rhs.m20 ) < epsilon &&
+				   Mathf.Abs( lhs.m21 - rhs.m21 ) < epsilon &&
+				   Mathf.Abs( lhs.m22 - rhs.m22 ) < epsilon;
+		}
+
+		public static bool operator !=( Matrix3x3 lhs, Matrix3x3 rhs )
+		{
+			return !(lhs == rhs);
 		}
 	}
 }

@@ -69,9 +69,11 @@
     <Compile Include="Assets\_UnityEngine\Direction2D.cs" />
     <Compile Include="Assets\_UnityEngine\CoroutineRunner.cs" />
     <Compile Include="Assets\_UnityEngine\Matrix4x4Dbl.cs" />
+    <Compile Include="Assets\_UnityEngine\Matrix3x3.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\Vector3_Ex.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\ObjectEx.cs" />
     <Compile Include="Assets\_UnityEngine\MathD.cs" />
+    <Compile Include="Assets\_UnityEngine\Extensions\Matrix3x3_Ex.cs" />
     <Compile Include="Assets\_UnityEngine\SingletonMonoBehaviour.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\QuaternionDbl_Ex.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\Transform_Ex.cs" />
@@ -82,8 +84,8 @@
     <Compile Include="Assets\_UnityEngine\Extensions\ComponentEx.cs" />
     <Compile Include="Assets\_UnityEngine\IComponent.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\Vector2_Ex.cs" />
-    <Compile Include="Assets\_UnityEngine\Matrix3x3.cs" />
-    <Compile Include="Assets\_UnityEngine\Extensions\Matrix3x3_Ex.cs" />
+    <Compile Include="Assets\_UnityEngine\MatrixMxN.cs" />
+    <Compile Include="Assets\_UnityEngine\MatrixMxN_Ex.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_UnityEngine\___UnityEngine.asmdef" />
