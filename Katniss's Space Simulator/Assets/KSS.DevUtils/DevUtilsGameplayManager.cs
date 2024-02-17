@@ -98,13 +98,6 @@ namespace KSS.DevUtils
 
 		void Start()
 		{
-			Matrix3x3 m = new Matrix3x3( 1, 1, 0, 1, 2, 0, 0, 0, 1 );
-			(Matrix3x3 q, Matrix3x3 r) = m.QRDecomposition();
-			Matrix3x3 mback = Matrix3x3.Multiply( q, r );
-			bool equal = m == mback;
-			
-			Matrix3x3 m2 = new Matrix3x3( 10000, 10000, 50, 10000, 2, 50, 50, 50, 10000 );
-			var eig = m.Diagonalize();
 			/*normalmap = new RenderTexture( heightmap.width, heightmap.height, 8, RenderTextureFormat.ARGB32 );
             normalmap.enableRandomWrite = true;
 
@@ -114,8 +107,6 @@ namespace KSS.DevUtils
             shader.Dispatch( shader.FindKernel( "CalculateNormalMap" ), heightmap.width / 8, heightmap.height / 8, 1 );
 
             uiImage.texture = normalmap;*/
-			// (0.52549, 0.850798, 0)
-			// (0.52571, 0.850664, 0)
 		}
 
 		void Update()

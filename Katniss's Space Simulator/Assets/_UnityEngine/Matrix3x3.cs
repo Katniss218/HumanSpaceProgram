@@ -144,8 +144,8 @@ namespace UnityEngine
 		{
 			return Multiply( m, s );
 		}
-		
-		public static Matrix3x3 operator *( Matrix3x3 lhs, Matrix3x3 rhs)
+
+		public static Matrix3x3 operator *( Matrix3x3 lhs, Matrix3x3 rhs )
 		{
 			return Multiply( lhs, rhs );
 		}
@@ -165,6 +165,77 @@ namespace UnityEngine
 			result.m22 = lhs.m22 - rhs.m22;
 
 			return result;
+		}
+
+		/// <summary>
+		/// Creates a rotation matrix.
+		/// </summary>
+		public static Matrix3x3 Rotate( Quaternion q )
+		{
+			float x2 = q.x * 2f;
+			float y2 = q.y * 2f;
+			float z2 = q.z * 2f;
+			float xx2 = q.x * x2;
+			float yy2 = q.y * y2;
+			float zz2 = q.z * z2;
+			float xy2 = q.x * y2;
+			float xz2 = q.x * z2;
+			float yz2 = q.y * z2;
+			float wx2 = q.w * x2;
+			float wy2 = q.w * y2;
+			float wz2 = q.w * z2;
+			Matrix3x3 result = new Matrix3x3( 1.0f - (yy2 + zz2),
+											  xy2 - wz2,
+											  xz2 + wy2,
+											  xy2 + wz2,
+											  1.0f - (xx2 + zz2),
+											  yz2 - wx2,
+											  xz2 - wy2,
+											  yz2 + wx2,
+											  1.0f - (xx2 + yy2) );
+			return result;
+		}
+
+		public Quaternion rotation => GetRotation();
+
+		private Quaternion GetRotation()
+		{
+			float trace = m00 + m11 + m22; // I removed + 1.0f; see discussion with Ethan
+			if( trace > 0 )
+			{
+				float s = 0.5f / Mathf.Sqrt( trace + 1.0f );
+				return new Quaternion( (m21 - m12) * s,
+									   (m02 - m20) * s,
+									   (m10 - m01) * s,
+									   0.25f / s );
+			}
+			else
+			{
+				if( m00 > m11 && m00 > m22 )
+				{
+					float s = 2.0f * Mathf.Sqrt( 1.0f + m00 - m11 - m22 );
+					return new Quaternion( 0.25f * s,
+										   (m01 + m10) / s,
+										   (m02 + m20) / s,
+										   (m21 - m12) / s );
+				}
+				else if( m11 > m22 )
+				{
+					float s = 2.0f * Mathf.Sqrt( 1.0f + m11 - m00 - m22 );
+					return new Quaternion( (m01 + m10) / s,
+										   0.25f * s,
+										   (m12 + m21) / s,
+										   (m02 - m20) / s );
+				}
+				else
+				{
+					float s = 2.0f * Mathf.Sqrt( 1.0f + m22 - m00 - m11 );
+					return new Quaternion( (m02 + m20) / s,
+										   (m12 + m21) / s,
+										   0.25f * s,
+										   (m10 - m01) / s );
+				}
+			}
 		}
 
 		public static bool operator ==( Matrix3x3 lhs, Matrix3x3 rhs )

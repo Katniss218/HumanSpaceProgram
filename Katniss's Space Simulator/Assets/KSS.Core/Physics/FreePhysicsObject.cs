@@ -44,6 +44,21 @@ namespace KSS.Core.Physics
         }
 
         public Vector3 AngularAcceleration { get; private set; }
+        
+		Matrix3x3 _inertiaTensor;
+		public Matrix3x3 MomentOfInertiaTensor
+		{
+			get => _inertiaTensor;
+			set
+			{
+				_inertiaTensor = value;
+
+				(Vector3 eigenvector, float eigenvalue)[] eigen = value.Diagonalize().OrderByDescending( m => m.eigenvalue ).ToArray();
+				this._rb.inertiaTensor = new Vector3( eigen[0].eigenvalue, eigen[1].eigenvalue, eigen[2].eigenvalue );
+				this._rb.inertiaTensorRotation = value.rotation;
+
+			}
+		}
 
         public bool IsColliding { get; private set; }
 
