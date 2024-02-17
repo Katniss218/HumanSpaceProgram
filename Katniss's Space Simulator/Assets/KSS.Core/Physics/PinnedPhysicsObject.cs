@@ -45,17 +45,22 @@ namespace KSS.Core.Physics
 
 		public Vector3 AngularAcceleration { get; private set; }
 
-		Matrix3x3 _inertiaTensor;
 		public Matrix3x3 MomentOfInertiaTensor
 		{
-			get => _inertiaTensor;
+			get
+			{
+				Matrix3x3 R = Matrix3x3.Rotate( this._rb.inertiaTensorRotation );
+				Matrix3x3 S = Matrix3x3.Scale( this._rb.inertiaTensor );
+				return R * S * R.transpose;
+			}
 			set
 			{
-				_inertiaTensor = value;
-
 				(Vector3 eigenvector, float eigenvalue)[] eigen = value.Diagonalize().OrderByDescending( m => m.eigenvalue ).ToArray();
 				this._rb.inertiaTensor = new Vector3( eigen[0].eigenvalue, eigen[1].eigenvalue, eigen[2].eigenvalue );
-				this._rb.inertiaTensorRotation = value.rotation;
+				Matrix3x3 m = new Matrix3x3( eigen[0].eigenvector.x, eigen[0].eigenvector.y, eigen[0].eigenvector.z,
+					eigen[1].eigenvector.x, eigen[1].eigenvector.y, eigen[1].eigenvector.z,
+					eigen[2].eigenvector.x, eigen[2].eigenvector.y, eigen[2].eigenvector.z );
+				this._rb.inertiaTensorRotation = m.rotation;
 
 			}
 		}

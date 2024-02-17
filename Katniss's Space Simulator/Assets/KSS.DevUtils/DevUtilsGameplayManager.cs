@@ -249,8 +249,8 @@ namespace KSS.DevUtils
 			Transform tankP = InstantiateLocal( tankPrefab, root, new Vector3( 0, -1.625f, 0 ), Quaternion.identity ).transform;
 			Transform tankL1 = InstantiateLocal( tankLongPrefab, root, new Vector3( 0, 2.625f, 0 ), Quaternion.identity ).transform;
 			Transform capsule = InstantiateLocal( capsulePrefab, tankL1, new Vector3( 0, 2.625f, 0 ), Quaternion.identity ).transform;
-			Transform t1 = InstantiateLocal( tankLongPrefab, root, new Vector3( 2, 2.625f, 0 ), Quaternion.identity ).transform;
-			Transform t2 = InstantiateLocal( tankLongPrefab, root, new Vector3( -2, 2.625f, 0 ), Quaternion.identity ).transform;
+			Transform t1 = InstantiateLocal( tankLongPrefab, root, new Vector3( 20, 2.625f, 0 ), Quaternion.identity ).transform;
+			Transform t2 = InstantiateLocal( tankLongPrefab, root, new Vector3( -20, 2.625f, 0 ), Quaternion.identity ).transform;
 			Transform engineP = InstantiateLocal( enginePrefab, tankP, new Vector3( 0, -3.45533f, 0 ), Quaternion.identity ).transform;
 			v.RootPart = root;
 

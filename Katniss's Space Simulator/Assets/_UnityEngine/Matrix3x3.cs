@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -194,6 +195,11 @@ namespace UnityEngine
 											  yz2 + wx2,
 											  1.0f - (xx2 + yy2) );
 			return result;
+		}
+
+		public static Matrix3x3 Scale( Vector3 vector )
+		{
+			return new Matrix3x3( vector.x, 0f, 0f, 0f, vector.y, 0f, 0f, 0f, vector.z );
 		}
 
 		public Quaternion rotation => GetRotation();
