@@ -23,8 +23,8 @@ namespace UnityEngine
 				currentMatrix = R * Q;
 				eigenMatrix = eigenMatrix * Q;
 
-				// Some eigenvalues sometimes switch sign, because the Q ends up with negative values.
-				// But when ignoring the sign, they are correct.
+				// Eigenvectors can switch sign every iteration, because the Q converges on having negative values.
+				// But when normalized, and ignoring the sign, they are correct.
 				if( currentMatrix.IsDiagonal() )
 				{
 					break;
