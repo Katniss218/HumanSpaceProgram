@@ -295,7 +295,6 @@ namespace KSS.DevUtils
 			F2AxisActuator ac = engineP.GetComponent<F2AxisActuator>();
 			av.OnSetThrottle.TryConnect( eng.SetThrottle );
 
-			av.OnSetSteering.TryConnect( gc.SetSteering );
 			av.OnSetAttitude.TryConnect( gc.SetAttitude );
 			gc.Actuators2D[0] = new FGimbalActuatorController.Actuator2DGroup();
 			gc.Actuators2D[0].GetReferenceTransform.TryConnect( ac.GetReferenceTransform );
