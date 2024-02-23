@@ -221,6 +221,11 @@ namespace UnityEngine
 		{
 			return Subtract( v1, v2 );
 		}
+		
+		public static Vector3Dbl operator -( Vector3Dbl a )
+		{
+			return new Vector3Dbl( 0f - a.x, 0f - a.y, 0f - a.z );
+		}
 
 		public static Vector3Dbl operator *( Vector3Dbl v, double s )
 		{
