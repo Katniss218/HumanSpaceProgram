@@ -11,134 +11,104 @@ using UnityPlus.Input;
 
 namespace KSS.Components
 {
-    /// <summary>
-    /// Sends steering and throttle signals based on player input.
-    /// </summary>
-    public class FPlayerInputAvionics : MonoBehaviour
-    {
-        // avionics will be a complicated and very broad system with many different subsystems, subcomponents, etc.
+	/// <summary>
+	/// Sends steering and throttle signals based on player input.
+	/// </summary>
+	public class FPlayerInputAvionics : MonoBehaviour
+	{
+		// avionics will be a complicated and very broad system with many different subsystems, subcomponents, etc.
 
-        // a control part (e.g. probe core) will have multiple control components (modules). One of those will almost always be a sequencer.
-
-
+		// a control part (e.g. probe core) will have multiple control components (modules). One of those will almost always be a sequencer.
 
 
-        // avionics will have internal channels that activate based on "things"
 
-        private float _pitchSignal; // channel representing the pitch control signal.
-        private float _yawSignal; // channel representing the yaw control signal.
-        private float _rollSignal; // channel representing the roll control signal.
-        private float _throttleSignal;
-        
-        /// <summary>
-        /// Desired throttle level, in [0..1].
-        /// </summary>
-        [NamedControl( "Throttle" )]
-        public ControllerOutput<float> OnSetThrottle = new();
-        
-        /// <summary>
-        /// Desired vessel-space pitch, yaw, roll, in [-Inf..Inf].
-        /// </summary>
-        [NamedControl( "Attitude" )]
-        public ControllerOutput<Vector3> OnSetAttitude = new();
 
-        /// <summary>
-        /// Desired world-space X, Y, Z translation, in [-Inf..Inf].
-        /// </summary>
-        [NamedControl( "Translation" )]
-        public ControllerOutput<Vector3> OnSetTranslation = new();
+		// avionics will have internal channels that activate based on "things"
+
+		private float _pitchSignal; // channel representing the pitch control signal.
+		private float _yawSignal; // channel representing the yaw control signal.
+		private float _rollSignal; // channel representing the roll control signal.
+		private float _throttleSignal;
+
+		/// <summary>
+		/// Desired throttle level, in [0..1].
+		/// </summary>
+		[NamedControl( "Throttle" )]
+		public ControllerOutput<float> OnSetThrottle = new();
+
+		/// <summary>
+		/// Desired vessel-space pitch, yaw, roll, in [-Inf..Inf].
+		/// </summary>
+		[NamedControl( "Attitude" )]
+		public ControllerOutput<Vector3> OnSetAttitude = new();
+
+		/// <summary>
+		/// Desired world-space X, Y, Z translation, in [-Inf..Inf].
+		/// </summary>
+		[NamedControl( "Translation" )]
+		public ControllerOutput<Vector3> OnSetTranslation = new();
 
 		void OnEnable()
-        {
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_PITCH_DOWN, HierarchicalInputPriority.MEDIUM, Input_PitchDown );
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_PITCH_UP, HierarchicalInputPriority.MEDIUM, Input_PitchUp );
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_YAW_LEFT, HierarchicalInputPriority.MEDIUM, Input_YawLeft );
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_YAW_RIGHT, HierarchicalInputPriority.MEDIUM, Input_YawRight );
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_ROLL_LEFT, HierarchicalInputPriority.MEDIUM, Input_RollLeft );
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_ROLL_RIGHT, HierarchicalInputPriority.MEDIUM, Input_RollRight );
+		{
+			HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_PITCH, HierarchicalInputPriority.MEDIUM, Input_Pitch );
+			HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_YAW, HierarchicalInputPriority.MEDIUM, Input_Yaw );
+			HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_ROLL, HierarchicalInputPriority.MEDIUM, Input_Roll );
 
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MAX, HierarchicalInputPriority.MEDIUM, Input_FullThrottle );
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MIN, HierarchicalInputPriority.MEDIUM, Input_CutThrottle );
-        }
+			HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MAX, HierarchicalInputPriority.MEDIUM, Input_FullThrottle );
+			HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MIN, HierarchicalInputPriority.MEDIUM, Input_CutThrottle );
+		}
 
-        void OnDisable()
-        {
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_PITCH_DOWN, Input_PitchDown );
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_PITCH_UP, Input_PitchUp );
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_YAW_LEFT, Input_YawLeft );
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_YAW_RIGHT, Input_YawRight );
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_ROLL_LEFT, Input_RollLeft );
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_ROLL_RIGHT, Input_RollRight );
+		void OnDisable()
+		{
+			HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_PITCH, Input_Pitch );
+			HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_YAW, Input_Yaw );
+			HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_ROLL, Input_Roll );
 
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MAX, Input_FullThrottle );
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MIN, Input_CutThrottle );
-        }
+			HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MAX, Input_FullThrottle );
+			HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MIN, Input_CutThrottle );
+		}
 
-        private bool Input_FullThrottle()
-        {
-            _throttleSignal = 1.0f;
+		private bool Input_FullThrottle( float value )
+		{
+			_throttleSignal = 1.0f;
 
-            OnSetThrottle.TrySendSignal( _throttleSignal );
-            return false;
-        }
+			OnSetThrottle.TrySendSignal( _throttleSignal );
+			return false;
+		}
 
-        private bool Input_CutThrottle()
-        {
-            _throttleSignal = 0.0f;
+		private bool Input_CutThrottle( float value )
+		{
+			_throttleSignal = 0.0f;
 
-            OnSetThrottle.TrySendSignal( _throttleSignal );
-            return false;
-        }
+			OnSetThrottle.TrySendSignal( _throttleSignal );
+			return false;
+		}
 
 
 #warning TODO - Do keyboard axes properly - if not pressed - set to 0, This should be done with control channels that can use multiple keys and invoke methods with a parameter (axes)
 
-        bool Input_PitchUp()
-        {
-            _pitchSignal += 1.0f;
+		bool Input_Pitch( float value )
+		{
+			_pitchSignal = value;
 
-            OnSetAttitude.TrySendSignal( new Vector3( _pitchSignal, _yawSignal, _rollSignal ) );
-            return false;
-        }
+			OnSetAttitude.TrySendSignal( new Vector3( _pitchSignal, _yawSignal, _rollSignal ) );
+			return false;
+		}
 
-        bool Input_PitchDown()
-        {
-            _pitchSignal -= 1.0f;
+		bool Input_Yaw( float value )
+		{
+			_yawSignal = value;
 
-            OnSetAttitude.TrySendSignal( new Vector3(_pitchSignal, _yawSignal, _rollSignal ) );
-            return false;
-        }
+			OnSetAttitude.TrySendSignal( new Vector3( _pitchSignal, _yawSignal, _rollSignal ) );
+			return false;
+		}
 
-        bool Input_YawRight()
-        {
-            _yawSignal += 1.0f;
+		bool Input_Roll( float value )
+		{
+			_rollSignal = value;
 
-            OnSetAttitude.TrySendSignal( new Vector3( _pitchSignal, _yawSignal, _rollSignal ) );
-            return false;
-        }
-
-        bool Input_YawLeft()
-        {
-            _yawSignal -= 1.0f;
-
-            OnSetAttitude.TrySendSignal( new Vector3( _pitchSignal, _yawSignal, _rollSignal ) );
-            return false;
-        }
-
-        bool Input_RollRight()
-        {
-            _rollSignal += 1.0f;
-
-            OnSetAttitude.TrySendSignal( new Vector3( _pitchSignal, _yawSignal, _rollSignal ) );
-            return false;
-        }
-
-        bool Input_RollLeft()
-        {
-            _rollSignal -= 1.0f;
-
-            OnSetAttitude.TrySendSignal( new Vector3( _pitchSignal, _yawSignal, _rollSignal ) );
-            return false;
-        }
-    }
+			OnSetAttitude.TrySendSignal( new Vector3( _pitchSignal, _yawSignal, _rollSignal ) );
+			return false;
+		}
+	}
 }

@@ -5,50 +5,53 @@ using UnityEngine;
 
 namespace UnityPlus.Input.Bindings
 {
-    /// <summary>
-    /// Binds to a specific key being released after being pressed, restricting that the mouse must have moved a certain distance between when the key was pressed and released.
-    /// </summary>
-    public sealed class MouseDragBinding : IInputBinding
-    {
-        public const float MaxMouseDelta = 4.0f;
+	/// <summary>
+	/// Binds to a specific key being released after being pressed, restricting that the mouse must have moved a certain distance between when the key was pressed and released.
+	/// </summary>
+	public sealed class MouseDragBinding : IInputBinding
+	{
+		public const float MaxMouseDelta = 4.0f;
 
-        public KeyCode Key { get; set; }
+		public bool IsValid { get; private set; }
 
-        public bool IsValid { get; private set; }
+		public float Value { get; }
 
-        bool _previousFrameWasHeld = false;
-        bool _deltaExceeded = false;
+		public KeyCode Key { get; set; }
 
-        Vector2 _startPosition = Vector2.zero;
+		bool _previousFrameWasHeld = false;
+		bool _deltaExceeded = false;
 
-        public MouseDragBinding( KeyCode key )
-        {
-            this.Key = key;
-        }
+		Vector2 _startPosition = Vector2.zero;
 
-        public void Update( InputState currentState )
-        {
-            Vector2 delta = _startPosition - currentState.MousePosition;
+		public MouseDragBinding( float value, KeyCode key )
+		{
+			this.Key = key;
+			this.Value = value;
+		}
 
-            if( Mathf.Abs( delta.x ) > MaxMouseDelta
-             || Mathf.Abs( delta.y ) > MaxMouseDelta )
-            {
-                _deltaExceeded = true;
-            }
+		public void Update( InputState currentState )
+		{
+			Vector2 delta = _startPosition - currentState.MousePosition;
 
-            bool currentFrameIsHeld = currentState.CurrentHeldKeys.Contains( Key );
-            if( currentFrameIsHeld )
-            {
-                if( !_previousFrameWasHeld ) // pressed - start click.
-                {
-                    _startPosition = currentState.MousePosition;
-                    _deltaExceeded = false;
-                }
-            }
+			if( Mathf.Abs( delta.x ) > MaxMouseDelta
+			 || Mathf.Abs( delta.y ) > MaxMouseDelta )
+			{
+				_deltaExceeded = true;
+			}
 
-            this.IsValid = _previousFrameWasHeld && !currentFrameIsHeld && _deltaExceeded;
+			bool currentFrameIsHeld = currentState.CurrentHeldKeys.Contains( Key );
+			if( currentFrameIsHeld )
+			{
+				if( !_previousFrameWasHeld ) // pressed - start click.
+				{
+					_startPosition = currentState.MousePosition;
+					_deltaExceeded = false;
+				}
+			}
 
-            _previousFrameWasHeld = currentFrameIsHeld;
-        }
-    }
+			this.IsValid = _previousFrameWasHeld && !currentFrameIsHeld && _deltaExceeded;
+
+			_previousFrameWasHeld = currentFrameIsHeld;
+		}
+	}
 }

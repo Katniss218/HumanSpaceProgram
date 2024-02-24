@@ -32,10 +32,13 @@ namespace KSS.Input
         public const string GAMEPLAY_CONTROL_TRANSLATE_UP = "vanilla.gameplayc_translate_yp";
         public const string GAMEPLAY_CONTROL_TRANSLATE_DOWN = "vanilla.gameplayc_translate_yn";
 
+        public const string GAMEPLAY_CONTROL_PITCH = "vanilla.gameplayc_rotate_x";
         public const string GAMEPLAY_CONTROL_PITCH_UP = "vanilla.gameplayc_rotate_xp";
         public const string GAMEPLAY_CONTROL_PITCH_DOWN = "vanilla.gameplayc_rotate_xn";
+        public const string GAMEPLAY_CONTROL_YAW = "vanilla.gameplayc_rotate_y";
         public const string GAMEPLAY_CONTROL_YAW_LEFT = "vanilla.gameplayc_rotate_yp";
         public const string GAMEPLAY_CONTROL_YAW_RIGHT = "vanilla.gameplayc_rotate_yn";
+        public const string GAMEPLAY_CONTROL_ROLL = "vanilla.gameplayc_rotate_z";
         public const string GAMEPLAY_CONTROL_ROLL_LEFT = "vanilla.gameplayc_rotate_zn";
         public const string GAMEPLAY_CONTROL_ROLL_RIGHT = "vanilla.gameplayc_rotate_zp";
 
