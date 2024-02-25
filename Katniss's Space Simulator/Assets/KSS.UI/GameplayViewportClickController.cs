@@ -34,7 +34,7 @@ namespace KSS.UI
             HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.VIEWPORT_PRIMARY_DOWN, Input_MouseDown );
         }
 
-        private bool Input_MouseDown()
+        private bool Input_MouseDown( float value )
         {
             if( UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() )
                 return false;

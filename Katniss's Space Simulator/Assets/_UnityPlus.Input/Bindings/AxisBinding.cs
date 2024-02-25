@@ -12,12 +12,12 @@ namespace UnityPlus.Input.Bindings
 	{
 		public bool IsValid
 		{
-			get => true;
+			get => true; // Force axes to be invoked every frame.
 		}
 
 		public float Value
 		{
-			get => _bindingTuples.Select( b => b.binding.Value * b.valueMultiplier ).Sum();
+			get => _bindingTuples.Select( b => (b.binding.IsValid ? b.binding.Value : 0) * b.valueMultiplier ).Sum();
 		}
 
 		private readonly (IInputBinding binding, float valueMultiplier)[] _bindingTuples;
@@ -30,6 +30,16 @@ namespace UnityPlus.Input.Bindings
 		public AxisBinding( params (IInputBinding binding, float valueMultiplier)[] bindingTuples )
 		{
 			this._bindingTuples = bindingTuples;
+		}
+
+		public AxisBinding( IEnumerable<IInputBinding> bindings )
+		{
+			this._bindingTuples = bindings.Select( b => (b, 1f) ).ToArray();
+		}
+
+		public AxisBinding( params IInputBinding[] bindings )
+		{
+			this._bindingTuples = bindings.Select( b => (b, 1f) ).ToArray();
 		}
 
 		public void Update( InputState currentState )

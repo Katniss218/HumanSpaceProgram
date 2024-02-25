@@ -71,7 +71,7 @@ namespace KSS
             HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.VIEWPORT_PRIMARY_UP, Input_MouseUp );
         }
 
-        private bool Input_MouseDown()
+        private bool Input_MouseDown( float value )
         {
             if( _isHeld )
                 return false;
@@ -91,7 +91,7 @@ namespace KSS
             return false;
         }
 
-        private bool Input_MouseHeld()
+        private bool Input_MouseHeld( float value )
         {
             if( !_isHeld ) return false;
 
@@ -99,7 +99,7 @@ namespace KSS
             return false;
         }
 
-        private bool Input_MouseUp()
+        private bool Input_MouseUp( float value )
         {
             if( !_isHeld ) return false;
 

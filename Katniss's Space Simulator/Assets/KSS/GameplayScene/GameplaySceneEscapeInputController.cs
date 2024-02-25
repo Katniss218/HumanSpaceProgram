@@ -32,7 +32,7 @@ namespace KSS.GameplayScene
             HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.COMMON_ESCAPE, Input_Escape );
         }
 
-        private bool Input_Escape()
+        private bool Input_Escape( float value )
         {
             if( !TimeManager.LockTimescale )
             {

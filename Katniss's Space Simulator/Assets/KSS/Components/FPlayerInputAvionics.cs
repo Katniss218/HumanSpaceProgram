@@ -30,6 +30,11 @@ namespace KSS.Components
 		private float _rollSignal; // channel representing the roll control signal.
 		private float _throttleSignal;
 
+		[field: SerializeField]
+		public Vector3 AttitudeSensitivity { get; set; } = Vector3.one;
+		[field: SerializeField]
+		public Vector3 TranslationSensitivity { get; set; } = Vector3.one;
+
 		/// <summary>
 		/// Desired throttle level, in [0..1].
 		/// </summary>
@@ -37,13 +42,13 @@ namespace KSS.Components
 		public ControllerOutput<float> OnSetThrottle = new();
 
 		/// <summary>
-		/// Desired vessel-space pitch, yaw, roll, in [-Inf..Inf].
+		/// Desired vessel-space (pitch, yaw, roll) attitude change, in [-Inf..Inf].
 		/// </summary>
 		[NamedControl( "Attitude" )]
 		public ControllerOutput<Vector3> OnSetAttitude = new();
 
 		/// <summary>
-		/// Desired world-space X, Y, Z translation, in [-Inf..Inf].
+		/// Desired scene-space (X, Y, Z) position change, in [-Inf..Inf].
 		/// </summary>
 		[NamedControl( "Translation" )]
 		public ControllerOutput<Vector3> OnSetTranslation = new();
@@ -84,12 +89,9 @@ namespace KSS.Components
 			return false;
 		}
 
-
-#warning TODO - Do keyboard axes properly - if not pressed - set to 0, This should be done with control channels that can use multiple keys and invoke methods with a parameter (axes)
-
 		bool Input_Pitch( float value )
 		{
-			_pitchSignal = value;
+			_pitchSignal = value * AttitudeSensitivity.x;
 
 			OnSetAttitude.TrySendSignal( new Vector3( _pitchSignal, _yawSignal, _rollSignal ) );
 			return false;
@@ -97,7 +99,7 @@ namespace KSS.Components
 
 		bool Input_Yaw( float value )
 		{
-			_yawSignal = value;
+			_yawSignal = value * AttitudeSensitivity.y;
 
 			OnSetAttitude.TrySendSignal( new Vector3( _pitchSignal, _yawSignal, _rollSignal ) );
 			return false;
@@ -105,7 +107,7 @@ namespace KSS.Components
 
 		bool Input_Roll( float value )
 		{
-			_rollSignal = value;
+			_rollSignal = value * AttitudeSensitivity.z;
 
 			OnSetAttitude.TrySendSignal( new Vector3( _pitchSignal, _yawSignal, _rollSignal ) );
 			return false;

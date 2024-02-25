@@ -70,7 +70,7 @@ namespace KSS.Components
 					_actuation[i] = 0;
 				}
 			}
-			act = _actuation;
+			//act = _actuation;
 		}
 
 		static double ClampRadiansTwoPi( double angle )
@@ -97,7 +97,7 @@ namespace KSS.Components
 
 		private void UpdatePredictionPI()
 		{
-			_omega0 = vessel.PhysicsObject.AngularVelocity;
+			/*_omega0 = vessel.PhysicsObject.AngularVelocity;
 
 			UpdateError();
 
@@ -182,11 +182,16 @@ namespace KSS.Components
 					ResetPID( i );
 			}
 
-			_error1 = _error0;
+			_error1 = _error0;*/
 		}
 
 		private void UpdateError()
 		{
+			Quaternion RequestedAttitude = Quaternion.identity;
+			Vector3Dbl AxisControl = Vector3Dbl.one;
+
+
+
 			Transform vesselTransform = vessel.ReferenceTransform;
 
 			// 1. The Euler(-90) here is because the unity transform puts "up" as the pointy end, which is wrong.  The rotation means that

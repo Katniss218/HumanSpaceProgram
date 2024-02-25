@@ -32,7 +32,7 @@ namespace KSS.MainMenuScene
             HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.COMMON_ESCAPE, Input_Escape );
         }
 
-        private bool Input_Escape()
+        private bool Input_Escape( float value )
         {
             HSPEvent.EventManager.TryInvoke( HSPEvent.ESCAPE_MAINMENU, null );
             return false;

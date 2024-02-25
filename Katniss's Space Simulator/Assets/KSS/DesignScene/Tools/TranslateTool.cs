@@ -86,7 +86,7 @@ namespace KSS.DesignScene.Tools
             }
         }
 
-        private bool Input_MouseDown()
+        private bool Input_MouseDown( float value )
         {
             Ray ray = _handles.RaycastCamera.ScreenPointToRay( UnityEngine.Input.mousePosition );
             if( Physics.Raycast( ray, out RaycastHit hitInfo, 8192, int.MaxValue ) )
