@@ -20,29 +20,14 @@ namespace KSS.Components
 	/// </summary>
 	public class FAttitudeAvionics : MonoBehaviour
 	{
-		/// <summary>
-		/// Defines the coordinate frame for the attitude control hold.
-		/// </summary>
-		IReferenceFrame AttitudeReference; // todo - this will need to be updated/reset periodically.
-
-		Quaternion TargetOrientation; // this needs to be updated by the other control things.
-
-		/// <summary>
-		/// Desired vessel-space pitch, yaw, roll, in [-Inf..Inf].
-		/// </summary>
-		[NamedControl( "Attitude" )]
-		public ControllerOutput<Vector3> OnSetAttitude = new();
-
-		private IPartObject vessel;
-
-		private readonly PIDLoop[] _pid = { new PIDLoop(), new PIDLoop(), new PIDLoop() };
+		private IPartObject _vessel;
 
 		// error in pitch, roll, yaw, in [Rad]
 		private Vector3Dbl _error0 = Vector3Dbl.zero;
 		private Vector3Dbl _error1 = new Vector3Dbl( double.NaN, double.NaN, double.NaN );
 
 		// max angular acceleration
-		private Vector3Dbl _maxAlpha = Vector3Dbl.zero;
+		private Vector3 _maxAlpha = Vector3.zero;
 
 		// max angular rotation
 		private Vector3Dbl _maxOmega = Vector3Dbl.zero;
@@ -75,43 +60,28 @@ namespace KSS.Components
 		private bool UseStoppingTime = true;
 		private bool UseControlRange = true;
 		private bool UseFlipTime = true;
+		
+		private readonly PIDLoop[] _pid = { new PIDLoop(), new PIDLoop(), new PIDLoop() };
 
 		private Vector3 Ac_torque = Vector3.one;
+		private Vector3 Ac_AxisControl = Vector3.one;
 		private Vector3 Ac_ActuationControl = Vector3.one;
 		private Vector3 Ac_OmegaTarget = new Vector3( float.NaN, float.NaN, float.NaN );
 
 		[field: SerializeField]
-		private Vector3Dbl deltaEuler;
+		private Vector3Dbl outDeltaEuler;
 		[field: SerializeField]
-		private Vector3Dbl act;
+		private Vector3Dbl outActuation;
 
-		private	Quaternion RequestedAttitude = Quaternion.identity;
+		/// <summary>
+		/// Desired vessel-space pitch, yaw, roll, in [-Inf..Inf].
+		/// </summary>
+		[NamedControl( "Attitude" )]
+		public ControllerOutput<Vector3> OnSetAttitude = new();
 
-		private void OnEnable()
-		{
-			vessel = this.transform.GetPartObject();
-			RequestedAttitude = vessel.ReferenceTransform.rotation;
-		}
+		public Quaternion TargetOrientation { get; set; } = Quaternion.identity; // this needs to be updated by the other control things.
 
-		void FixedUpdate()
-		{
-			UpdatePredictionPI();
-
-			deltaEuler = -_error0;
-
-			for( int i = 0; i < 3; i++ )
-			{
-				if( Math.Abs( _actuation[i] ) < EPS || double.IsNaN( _actuation[i] ) )
-				{
-					_actuation[i] = 0;
-				}
-			}
-			act = _actuation;
-
-			OnSetAttitude.TrySendSignal( (Vector3)act );
-		}
-
-		static double ClampRadiansTwoPi( double angle )
+		private static double ClampRadiansTwoPi( double angle )
 		{
 			angle %= (2 * Math.PI);
 			if( angle < 0 )
@@ -119,7 +89,7 @@ namespace KSS.Components
 			return angle;
 		}
 
-		static double ClampRadiansPi( double angle )
+		private static double ClampRadiansPi( double angle )
 		{
 			angle = ClampRadiansTwoPi( angle );
 			if( angle > Math.PI )
@@ -143,19 +113,45 @@ namespace KSS.Components
 			&& !float.IsNaN( vec.y ) && !float.IsInfinity( vec.y )
 			&& !float.IsNaN( vec.z ) && !float.IsInfinity( vec.z );
 
+		void OnEnable()
+		{
+			_vessel = this.transform.GetPartObject();
+			TargetOrientation = _vessel.ReferenceTransform.rotation;
+		}
+
+		void FixedUpdate()
+		{
+			UpdatePredictionPI();
+
+			outDeltaEuler = -_error0;
+
+			for( int i = 0; i < 3; i++ )
+			{
+				if( Math.Abs( _actuation[i] ) < EPS || double.IsNaN( _actuation[i] ) )
+				{
+					_actuation[i] = 0;
+				}
+			}
+			outActuation = _actuation;
+
+			OnSetAttitude.TrySendSignal( (Vector3)outActuation );
+		}
+
 		private void UpdatePredictionPI()
 		{
-			_omega0 = vessel.PhysicsObject.AngularVelocity;
+			_omega0 = _vessel.PhysicsObject.AngularVelocity;
 
 			UpdateError();
 
 			// lowpass filter on the error input
-			_error0 = IsFinite( _error1 ) ? _error1 + PosSmoothIn * (_error0 - _error1) : _error0;
+			_error0 = IsFinite( _error1 )
+				? _error1 + PosSmoothIn * (_error0 - _error1)
+				: _error0;
 
-			Vector3Dbl controlTorque = Ac_torque;
+			Vector3 controlTorque = Ac_torque;
 
 			// needed to stop wiggling at higher phys warp
-			double warpFactor = TimeStepManager.FixedDeltaTime / /* 0.02 */ TimeStepManager.FixedUnscaledDeltaTime;
+			float timeScale = TimeStepManager.TimeScale;
 
 			// see https://archive.is/NqoUm and the "Alt Hold Controller", the acceleration PID is not implemented so we only
 			// have the first two PIDs in the cascade.
@@ -168,7 +164,7 @@ namespace KSS.Components
 				else
 					error -= Math.Sign( error ) * PosDeadband;
 
-				_maxAlpha[i] = controlTorque[i] / vessel.PhysicsObject.MomentsOfInertia[i];
+				_maxAlpha[i] = controlTorque[i] / _vessel.PhysicsObject.MomentsOfInertia[i];
 
 				if( _maxAlpha[i] == 0 )
 					_maxAlpha[i] = 1;
@@ -179,7 +175,7 @@ namespace KSS.Components
 				}
 				else
 				{
-					double posKp = PosKp / warpFactor;
+					double posKp = PosKp / timeScale;
 					double effLD = _maxAlpha[i] / (2 * posKp * posKp);
 
 					if( Math.Abs( error ) <= 2 * effLD )
@@ -196,16 +192,21 @@ namespace KSS.Components
 					if( UseStoppingTime )
 					{
 						_maxOmega[i] = _maxAlpha[i] * MaxStoppingTime;
-						if( UseFlipTime ) _maxOmega[i] = Math.Max( _maxOmega[i], Math.PI / MinFlipTime );
+						if( UseFlipTime )
+						{
+							_maxOmega[i] = Math.Max( _maxOmega[i], Math.PI / MinFlipTime );
+						}
 						_targetOmega[i] = Math.Clamp( _targetOmega[i], -_maxOmega[i], _maxOmega[i] );
 					}
 
 					if( UseControlRange && _errorTotal * Mathf.Rad2Deg > RollControlRange )
+					{
 						_targetOmega[1] = 0;
+					}
 				}
 
-				_pid[i].Kp = VelKp / (_maxAlpha[i] * warpFactor);
-				_pid[i].Ki = VelKi / (_maxAlpha[i] * warpFactor * warpFactor);
+				_pid[i].Kp = VelKp / (_maxAlpha[i] * timeScale);
+				_pid[i].Ki = VelKi / (_maxAlpha[i] * timeScale * timeScale);
 				_pid[i].Kd = VelKd / _maxAlpha[i];
 				_pid[i].N = VelN;
 				_pid[i].B = VelB;
@@ -222,12 +223,16 @@ namespace KSS.Components
 				_actuation[i] = -_pid[i].Update( _targetOmega[i], _omega0[i] );
 
 				if( Math.Abs( _actuation[i] ) < EPS || double.IsNaN( _actuation[i] ) )
+				{
 					_actuation[i] = 0;
+				}
 
 				_targetTorque[i] = _actuation[i] * Ac_torque[i];
 
 				if( Ac_ActuationControl[i] == 0 )
+				{
 					ResetPID( i );
+				}
 			}
 
 			_error1 = _error0;
@@ -235,14 +240,13 @@ namespace KSS.Components
 
 		private void UpdateError()
 		{
-			Vector3Dbl AxisControl = Vector3Dbl.one;
 
 
 			// 1. The Euler(-90) here is because the unity transform puts "up" as the pointy end, which is wrong.  The rotation means that
 			// "forward" becomes the pointy end, and "up" and "right" correctly define e.g. AoA/pitch and AoS/yaw.  This is just KSP being KSP.
 			// 2. We then use the inverse ship rotation to transform the requested attitude into the ship frame (we do everything in the ship frame
 			// first, and then negate the error to get the error in the target reference frame at the end).
-			Quaternion deltaRotation = Quaternion.Inverse( vessel.ReferenceTransform.rotation * Quaternion.Euler( -90, 0, 0 ) ) * RequestedAttitude;
+			Quaternion deltaRotation = Quaternion.Inverse( _vessel.ReferenceTransform.rotation * Quaternion.Euler( -90, 0, 0 ) ) * TargetOrientation;
 
 			Vector3 deltaRotationEuler = deltaRotation.eulerAngles * Mathf.Deg2Rad;
 
@@ -267,7 +271,7 @@ namespace KSS.Components
 				ClampRadiansPi( greatCircleDir[1] ) ); // yaw distance around the geodesic
 
 			// apply the axis control from the parent controller
-			phi.Scale( AxisControl );
+			phi.Scale( Ac_AxisControl );
 
 			// the error in the ship's position is the negative of the reference position in the ship frame
 			_error0 = -phi;

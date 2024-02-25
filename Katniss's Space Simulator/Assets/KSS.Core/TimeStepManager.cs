@@ -70,8 +70,8 @@ namespace KSS.Core
 
         static float _maxTimeScale = 128.0f;
 
-        private static float _timeScale;
-        private static float _oldTimeScale = 0;
+        private static float _timeScale = 1;
+        private static float _oldTimeScale = 1;
 
         /// <summary>
         /// Gets the current maximum time scale.

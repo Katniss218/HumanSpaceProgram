@@ -9,7 +9,6 @@ namespace KSS.Core.Physics
 {
 	public static class InertiaUtils
 	{
-		[Obsolete( "untested" )]
 		public static Matrix3x3 CalculateInertiaTensor( IEnumerable<(float, Vector3)> pointMasses )
 		{
 			float totalMass = 0.0f;
