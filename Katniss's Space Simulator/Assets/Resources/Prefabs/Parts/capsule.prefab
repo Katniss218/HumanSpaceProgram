@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 1632188022149188359}
   - component: {fileID: 5606559972367796650}
   - component: {fileID: -2862525060937437958}
+  - component: {fileID: 2602736616198537999}
   m_Layer: 20
   m_Name: capsule
   m_TagString: Untagged
@@ -106,6 +107,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e0eea4ff995c24429780c80f32f37f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <AttitudeSensitivity>k__BackingField: {x: 1, y: 1, z: 1}
+  <TranslationSensitivity>k__BackingField: {x: 1, y: 1, z: 1}
 --- !u!114 &-2862525060937437958
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -118,7 +121,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 07f8c392ff0f8e4419bf70ed43a1e07b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <CurrentSteeringCommand>k__BackingField: {x: 0, y: 0, z: 0}
+  <AttitudeCommand>k__BackingField: {x: 0, y: 0, z: 0}
+--- !u!114 &2602736616198537999
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1175757436153444479}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1fda97f7786faaf4698608a6ae78ad27, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  deltaEuler:
+    x: 0
+    y: 0
+    z: 0
+  act:
+    x: 0
+    y: 0
+    z: 0
 --- !u!1 &3341932022344392191
 GameObject:
   m_ObjectHideFlags: 0

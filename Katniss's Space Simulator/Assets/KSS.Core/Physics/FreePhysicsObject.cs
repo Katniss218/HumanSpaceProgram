@@ -44,7 +44,9 @@ namespace KSS.Core.Physics
         }
 
         public Vector3 AngularAcceleration { get; private set; }
-        
+
+        public Vector3 MomentsOfInertia => this._rb.inertiaTensor;
+
 		public Matrix3x3 MomentOfInertiaTensor
 		{
             get
@@ -127,8 +129,8 @@ namespace KSS.Core.Physics
 
             if( IsColliding )
             {
-                this.Acceleration = (Velocity - _oldVelocity) / TimeManager.FixedDeltaTime;
-                this.AngularAcceleration = (AngularVelocity - _oldAngularVelocity) / TimeManager.FixedDeltaTime;
+                this.Acceleration = (Velocity - _oldVelocity) / TimeStepManager.FixedDeltaTime;
+                this.AngularAcceleration = (AngularVelocity - _oldAngularVelocity) / TimeStepManager.FixedDeltaTime;
             }
             else
             {

@@ -243,9 +243,9 @@ namespace KSS.Components
                 return;
             }
 
-            (SubstanceStateCollection flow, _) = inletProducer.SampleFlow( inletEnd.Position, inletProducer.transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea, TimeManager.FixedDeltaTime, endSamples[outlet] );
+            (SubstanceStateCollection flow, _) = inletProducer.SampleFlow( inletEnd.Position, inletProducer.transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea, TimeStepManager.FixedDeltaTime, endSamples[outlet] );
 
-            outletConsumer.ClampIn( flow, TimeManager.FixedDeltaTime );
+            outletConsumer.ClampIn( flow, TimeStepManager.FixedDeltaTime );
 
             SetFlowAcrossConnection( flow, inlet, outlet );
         }

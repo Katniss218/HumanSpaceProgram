@@ -22,28 +22,28 @@ namespace KSS.UI
 
         private static void OnClick0()
         {
-            TimeManager.Pause();
+            TimeStepManager.Pause();
         }
 
         private static void OnClickNon0( float rate )
         {
-            if( TimeManager.IsPaused )
+            if( TimeStepManager.IsPaused )
             {
-                TimeManager.SetTimeScale( 1f );
+                TimeStepManager.SetTimeScale( 1f );
                 return;
             }
 
             float newscale = rate;
 
-            if( newscale > TimeManager.GetMaxTimescale() )
+            if( newscale > TimeStepManager.GetMaxTimescale() )
                 return;
 
-            TimeManager.SetTimeScale( newscale );
+            TimeStepManager.SetTimeScale( newscale );
         }
 
         void OnEnable()
         {
-            TimeManager.OnAfterTimescaleChanged += OnTimescaleChanged_Listener;
+            TimeStepManager.OnAfterTimescaleChanged += OnTimescaleChanged_Listener;
         }
 
         void Start()
@@ -53,10 +53,10 @@ namespace KSS.UI
 
         void OnDisable()
         {
-            TimeManager.OnAfterTimescaleChanged -= OnTimescaleChanged_Listener;
+            TimeStepManager.OnAfterTimescaleChanged -= OnTimescaleChanged_Listener;
         }
 
-        void OnTimescaleChanged_Listener( TimeManager.TimeScaleChangedData data )
+        void OnTimescaleChanged_Listener( TimeStepManager.TimeScaleChangedData data )
         {
             Refresh();
         }
@@ -92,7 +92,7 @@ namespace KSS.UI
 
         private void Refresh()
         {
-            float currentWarpRate = TimeManager.TimeScale;
+            float currentWarpRate = TimeStepManager.TimeScale;
 
             Array.Sort( _warpRates );
             if( _warpButtons != null )

@@ -106,7 +106,6 @@
     <Compile Include="Assets\KSS.Core\VesselManager.cs" />
     <Compile Include="Assets\KSS.Core\Components\FAnchor.cs" />
     <Compile Include="Assets\KSS.Core\Components\FAttachNode.cs" />
-    <Compile Include="Assets\KSS.Core\TimeManager.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\IResourceProducer.cs" />
     <Compile Include="Assets\KSS.Core\Control\ControlUtils.cs" />
     <Compile Include="Assets\KSS.Core\SceneManagement\DesignSceneManager.cs" />
@@ -133,6 +132,7 @@
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\SubstanceStateCollection.cs" />
     <Compile Include="Assets\KSS.Core\Physics\FreePhysicsObject.cs" />
     <Compile Include="Assets\KSS.Core\Control\Control.cs" />
+    <Compile Include="Assets\KSS.Core\TimeStepManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.Core\___KSS.Core.asmdef" />

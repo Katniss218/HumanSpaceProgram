@@ -21,7 +21,7 @@ namespace KSS.UI.SceneFactories
         [HSPEventListener( HSPEvent.ESCAPE_GAMEPLAY, HSPEvent.NAMESPACE_VANILLA + ".escape_menu_ui" )]
         private static void OnGameplayEscape()
         {
-            if( TimeManager.IsPaused && TimeManager.LockTimescale )
+            if( TimeStepManager.IsPaused && TimeStepManager.LockTimescale )
             {
                 return;
             }
@@ -31,7 +31,7 @@ namespace KSS.UI.SceneFactories
                 escapeMenuWindow.Destroy();
             }
 
-            if( TimeManager.IsPaused )
+            if( TimeStepManager.IsPaused )
             {
                 UICanvas canvas = CanvasManager.Get( CanvasName.WINDOWS );
 
@@ -42,10 +42,10 @@ namespace KSS.UI.SceneFactories
 
                 closebutton.onClick = () =>
                 {
-                    if( !TimeManager.LockTimescale )
+                    if( !TimeStepManager.LockTimescale )
                     {
-                        if( !TimeManager.LockTimescale )
-                            TimeManager.Unpause();
+                        if( !TimeStepManager.LockTimescale )
+                            TimeStepManager.Unpause();
                         escapeMenuWindow.Destroy();
                     }
                 };

@@ -20,7 +20,7 @@ namespace KSS.UI
 
         void LateUpdate()
         {
-            Text.Text = $"{(TimeManager.UT - ReferenceUT):#0} s";
+            Text.Text = $"{(TimeStepManager.UT - ReferenceUT):#0} s";
         }
     }
 }

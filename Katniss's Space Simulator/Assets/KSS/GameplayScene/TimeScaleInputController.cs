@@ -36,28 +36,28 @@ namespace KSS.GameplayScene
 
 		private bool Input_TimescaleIncrease( float value )
 		{
-			if( TimeManager.LockTimescale ) // short-circuit exit before checking anything.
+			if( TimeStepManager.LockTimescale ) // short-circuit exit before checking anything.
 				return false;
 
-			if( TimeManager.IsPaused )
+			if( TimeStepManager.IsPaused )
 			{
-				TimeManager.SetTimeScale( 1f );
+				TimeStepManager.SetTimeScale( 1f );
 				return false;
 			}
 
-			float newscale = TimeManager.TimeScale * 2f;
-			if( newscale <= TimeManager.GetMaxTimescale() )
-				TimeManager.SetTimeScale( newscale );
+			float newscale = TimeStepManager.TimeScale * 2f;
+			if( newscale <= TimeStepManager.GetMaxTimescale() )
+				TimeStepManager.SetTimeScale( newscale );
 
 			return false;
 		}
 
 		private bool Input_TimescaleDecrease( float value )
 		{
-			if( TimeManager.LockTimescale ) // short-circuit exit before checking anything.
+			if( TimeStepManager.LockTimescale ) // short-circuit exit before checking anything.
 				return false;
 
-			TimeManager.SetTimeScale( TimeManager.TimeScale > 1f ? TimeManager.TimeScale / 2.0f : 0.0f );
+			TimeStepManager.SetTimeScale( TimeStepManager.TimeScale > 1f ? TimeStepManager.TimeScale / 2.0f : 0.0f );
 
 			return false;
 		}

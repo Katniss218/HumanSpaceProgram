@@ -12,7 +12,7 @@ namespace KSS.Core
     /// Manages the speed at which the time flows.
     /// </summary>
     [RequireComponent( typeof( PreexistingReference ) )]
-    public class TimeManager : SingletonMonoBehaviour<TimeManager>, IPersistent
+    public class TimeStepManager : SingletonMonoBehaviour<TimeStepManager>, IPersistent
     {
         public struct TimeScaleChangedData
         {

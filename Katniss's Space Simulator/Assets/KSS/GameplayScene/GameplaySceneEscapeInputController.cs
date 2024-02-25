@@ -34,16 +34,16 @@ namespace KSS.GameplayScene
 
         private bool Input_Escape( float value )
         {
-            if( !TimeManager.LockTimescale )
+            if( !TimeStepManager.LockTimescale )
             {
-                if( TimeManager.IsPaused )
+                if( TimeStepManager.IsPaused )
                 {
-                    TimeManager.Unpause();
+                    TimeStepManager.Unpause();
                     HSPEvent.EventManager.TryInvoke( HSPEvent.ESCAPE_GAMEPLAY, null );
                 }
                 else
                 {
-                    TimeManager.Pause();
+                    TimeStepManager.Pause();
                     HSPEvent.EventManager.TryInvoke( HSPEvent.ESCAPE_GAMEPLAY, null );
                 }
             }

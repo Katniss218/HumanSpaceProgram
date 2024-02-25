@@ -290,12 +290,14 @@ namespace KSS.DevUtils
 			tr.minVertexDistance = 50f;
 
 			FPlayerInputAvionics av = capsule.GetComponent<FPlayerInputAvionics>();
+			FAttitudeAvionics atv = capsule.GetComponent<FAttitudeAvionics>();
 			FGimbalActuatorController gc = capsule.GetComponent<FGimbalActuatorController>();
 			FRocketEngine eng = engineP.GetComponent<FRocketEngine>();
 			F2AxisActuator ac = engineP.GetComponent<F2AxisActuator>();
 			av.OnSetThrottle.TryConnect( eng.SetThrottle );
 
 			av.OnSetAttitude.TryConnect( gc.SetAttitude );
+			atv.OnSetAttitude.TryConnect( gc.SetAttitude );
 			gc.Actuators2D[0] = new FGimbalActuatorController.Actuator2DGroup();
 			gc.Actuators2D[0].GetReferenceTransform.TryConnect( ac.GetReferenceTransform );
 			gc.Actuators2D[0].OnSetXY.TryConnect( ac.SetXY );
