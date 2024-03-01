@@ -68,6 +68,7 @@
     <Compile Include="Assets\KSS.UI\Windows\ConfirmationWindow_Ex.cs" />
     <Compile Include="Assets\KSS.UI\SceneFactories\GameplaySceneUIFactory.cs" />
     <Compile Include="Assets\KSS.UI\TimewarpSelectorUI.cs" />
+    <Compile Include="Assets\KSS.UI\UILineRenderer.cs" />
     <Compile Include="Assets\KSS.UI\IResourceContainerUI.cs" />
     <Compile Include="Assets\KSS.UI\PartListEntryUI.cs" />
     <Compile Include="Assets\KSS.UI\Windows\LoadWindow.cs" />
