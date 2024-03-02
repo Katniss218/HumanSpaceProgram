@@ -50,11 +50,16 @@ namespace KSS.UI
         {
             this.panel.Destroy();
         }
+        
+		private void OnDragged()
+		{
+            Window.RefreshConnections();
+		}
 
-        /// <summary>
-        /// Creates a control setup node for a given component.
-        /// </summary>
-        internal static ControlSetupWindowComponentUI Create( ControlSetupWindow window, Component component )
+		/// <summary>
+		/// Creates a control setup node for a given component.
+		/// </summary>
+		internal static ControlSetupWindowComponentUI Create( ControlSetupWindow window, Component component )
         {
             // it is possible to force-show nodes for components outside of the target hierarchy of the window.
 
@@ -73,6 +78,7 @@ namespace KSS.UI
 
             ControlSetupControlGroupUI groupUI = ControlSetupControlGroupUI.Create( node, component );
             node.Group = groupUI;
+            dragger.OnDragging = node.OnDragged;
 
             return node;
         }

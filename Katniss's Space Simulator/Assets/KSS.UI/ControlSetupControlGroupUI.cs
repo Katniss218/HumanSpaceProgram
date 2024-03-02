@@ -66,7 +66,7 @@ namespace KSS.UI
 
 			foreach( var group in _childGroups )
 			{
-				outputs.AddRange( group.GetInputsRecursive() );
+				outputs.AddRange( group.GetOutputsRecursive() );
 			}
 			return outputs;
 		}
@@ -86,15 +86,21 @@ namespace KSS.UI
 				{
 					var groupUI = ControlSetupControlGroupUI.Create( this, currentRow * ROW_HEIGHT, group, attr );
 					childGroups.Add( groupUI );
+
 					currentRow += groupUI.TotalRows;
 				}
 				if( member is ControlGroup[] groupArray )
 				{
 					for( int i = 0; i < groupArray.Length; i++ )
 					{
-#warning TODO - group arrays should be initialized
-						var groupUI = ControlSetupControlGroupUI.Create( this, (currentRow + i) * ROW_HEIGHT, groupArray[i], attr );
+						if( groupArray[i] == null )
+						{
+							groupArray[i] = (ControlGroup)Activator.CreateInstance( groupArray.GetType().GetElementType() );
+						}
+
+						var groupUI = ControlSetupControlGroupUI.Create( this, currentRow * ROW_HEIGHT, groupArray[i], attr );
 						childGroups.Add( groupUI );
+
 						currentRow += groupUI.TotalRows;
 					}
 				}
@@ -174,7 +180,7 @@ namespace KSS.UI
 
 		internal static ControlSetupControlGroupUI Create( ControlSetupWindowComponentUI node, Component component )
 		{
-			UIPanel panel = node.panel.AddPanel( UILayoutInfo.Fill( 0, 0, 20, 5 ), null ); // AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_output" )
+			UIPanel panel = node.panel.AddPanel( UILayoutInfo.FillHorizontal( 0, 0, UILayoutInfo.TopF, -20, ROW_HEIGHT ), null ); // AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_output" )
 
 			ControlSetupControlGroupUI groupUI = panel.gameObject.AddComponent<ControlSetupControlGroupUI>();
 			groupUI.panel = panel;
@@ -183,6 +189,8 @@ namespace KSS.UI
 			groupUI.ComponentUI = node;
 
 			groupUI.RedrawControls();
+
+			panel.rectTransform.sizeDelta = new Vector2( panel.rectTransform.sizeDelta.x, groupUI.TotalRows * ROW_HEIGHT );
 
 			return groupUI;
 		}
@@ -200,7 +208,7 @@ namespace KSS.UI
 
 			groupUI.RedrawControls();
 
-			panel.rectTransform.sizeDelta = new Vector2( panel.rectTransform.sizeDelta.y, groupUI.TotalRows * ROW_HEIGHT );
+			panel.rectTransform.sizeDelta = new Vector2( panel.rectTransform.sizeDelta.x, groupUI.TotalRows * ROW_HEIGHT );
 
 			return groupUI;
 		}

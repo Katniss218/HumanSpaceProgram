@@ -116,11 +116,16 @@ namespace KSS.Components
 		void OnEnable()
 		{
 			_vessel = this.transform.GetPartObject();
+			if( _vessel == null )
+				return;
 			TargetOrientation = _vessel.ReferenceTransform.rotation;
 		}
 
 		void FixedUpdate()
 		{
+			if( _vessel == null )
+				return;
+
 			UpdatePredictionPI();
 
 			outDeltaEuler = -_error0;

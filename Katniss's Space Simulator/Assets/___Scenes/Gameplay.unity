@@ -585,7 +585,7 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!21 &669587635
+--- !u!21 &617549943
 Material:
   serializedVersion: 8
   m_ObjectHideFlags: 0
@@ -1143,7 +1143,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4298a5610bd9d94f869f4cf69e24435, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _material: {fileID: 669587635}
+  _material: {fileID: 617549943}
   light: {fileID: 0}
   _rt: {fileID: 0}
 --- !u!1 &1690102431
@@ -1157,7 +1157,6 @@ GameObject:
   - component: {fileID: 1690102437}
   - component: {fileID: 1690102440}
   - component: {fileID: 1690102439}
-  - component: {fileID: 1690102438}
   - component: {fileID: 1690102435}
   - component: {fileID: 1690102434}
   - component: {fileID: 1690102433}
@@ -1221,18 +1220,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1690102438
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1690102431}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 293423baa5d467041a4015c2d1e2885c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1690102439
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -7,6 +7,6 @@ namespace KSS.Control
     /// </summary>
     public abstract class ControlGroup
     {
-
+        protected ControlGroup() { }
     }
 }

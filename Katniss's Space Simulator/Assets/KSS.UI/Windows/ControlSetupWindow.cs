@@ -93,12 +93,12 @@ namespace KSS.UI.Windows
 			{
 				if( ControlUtils.HasControlsOrGroups( comp ) )
 				{
-					_nodes.Add( comp, ControlSetupWindowComponentUI.Create( this, comp ) );
+					TryCreateNode(comp, out _ );
 				}
 			}
 		}
 
-		private void RefreshConnections()
+		internal void RefreshConnections()
 		{
 			ClearConnections();
 			CreateConnections();
@@ -155,21 +155,22 @@ namespace KSS.UI.Windows
 
 			if( mouseConnection.GetClosedEnd().Control.TryConnect( otherEndpoint.Control ) )
 			{
-				ControlSetupControlConnectionUI otherEndpointsConnection = _connections.FirstOrDefault( c => c.IsOpenEnded && c.GetClosedEnd() == otherEndpoint );
-				otherEndpointsConnection.Destroy();
-				mouseConnection.Destroy();
-				_connections.Remove( otherEndpointsConnection );
+				RefreshConnections();
 
-				if( mouseConnection.Input != null )
-				{
-					ControlSetupControlConnectionUI connectionUI = ControlSetupControlConnectionUI.Create( this, mouseConnection.Input, otherEndpoint );
-					_connections.Add( connectionUI );
-				}
-				else
-				{
-					ControlSetupControlConnectionUI connectionUI = ControlSetupControlConnectionUI.Create( this, otherEndpoint, mouseConnection.Output );
-					_connections.Add( connectionUI );
-				}
+				return true;
+			}
+
+			return false;
+		}
+		
+		internal bool TryConnectWithMouse( ControlSetupControlUI firstEndpoint, ControlSetupControlUI otherEndpoint )
+		{
+			if( firstEndpoint == otherEndpoint )
+				return false;
+
+			if( firstEndpoint.Control.TryConnect( otherEndpoint.Control ) )
+			{
+				RefreshConnections();
 
 				return true;
 			}
@@ -204,16 +205,8 @@ namespace KSS.UI.Windows
 				_lastVisibleComponents = target.GetComponentsInChildren();
 			}
 
-			// window is created
-			// look up which components were visible before
-			// spawn uis for those components
 			w.CreateNodes( _lastVisibleComponents );
-			// for each input/output 'circle', add it to the dict to lookup endpoint visibility later.
-			// -# this is done in the group class.
-
-			// after all visible component UIs are spawned
-			// spawn connections.
-			w.CreateConnections();
+			w.CreateConnections(); // COnnections should be created after the component nodes are created. This ensures that all inputs/outputs are created.
 
 			return w;
 		}

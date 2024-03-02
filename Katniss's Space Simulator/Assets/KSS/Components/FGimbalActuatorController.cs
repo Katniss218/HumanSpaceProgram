@@ -21,6 +21,9 @@ namespace KSS.Components
 
 			[NamedControl( "Deflection (XY)" )]
 			public ControllerOutput<Vector2> OnSetXY = new();
+
+			public Actuator2DGroup() : base() 
+			{ }
 		}
 
 		// TODO - make work for both 1-axis, 2-axis, and 3-axis actuators.

@@ -86,12 +86,36 @@ namespace KSS.Components
 
 		public SerializedData GetData( IReverseReferenceMap s )
 		{
-			throw new NotImplementedException();
+			return new SerializedObject()
+			{
+				{ "reference_transform", s.WriteObjectReference( this.ReferenceTransform ) },
+				{ "x_actuator_transform", s.WriteObjectReference( this.XActuatorTransform ) },
+				{ "y_actuator_transform", s.WriteObjectReference( this.YActuatorTransform ) },
+				{ "min_x", this.MinX },
+				{ "min_y", this.MinY },
+				{ "max_x", this.MaxX },
+				{ "max_y", this.MaxY }
+			};
 		}
 
 		public void SetData( IForwardReferenceMap l, SerializedData data )
 		{
-			throw new NotImplementedException();
+			if( data.TryGetValue("reference_transform", out var referenceTransform ) )
+				this.ReferenceTransform = l.ReadObjectReference( referenceTransform ) as Transform;
+
+			if( data.TryGetValue("x_actuator_transform", out var xActuatorTransform ) )
+				this.XActuatorTransform = l.ReadObjectReference( xActuatorTransform ) as Transform;
+			if( data.TryGetValue("y_actuator_transform", out var yActuatorTransform ) )
+				this.YActuatorTransform = l.ReadObjectReference( yActuatorTransform ) as Transform;
+
+			if( data.TryGetValue( "min_x", out var minX ) )
+				this.MinX = (float)minX;
+			if( data.TryGetValue( "min_y", out var minY ) )
+				this.MinY = (float)minY;
+			if( data.TryGetValue( "max_x", out var maxX ) )
+				this.MaxX = (float)maxX;
+			if( data.TryGetValue( "max_y", out var maxY ) )
+				this.MaxY = (float)maxY;
 		}
 	}
 }

@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
 
@@ -52,11 +54,6 @@ namespace KSS.UI
 		public Vector2 EndOffset { get; private set; } // This is used for connections that connect to components that aren't shown,
 													   // as well as for the connection that is being dragged out by the mouse.
 
-		void Update()
-		{
-			// update positions based on node positions.
-		}
-
 		public void Destroy()
 		{
 			Destroy( this.gameObject );
@@ -70,6 +67,16 @@ namespace KSS.UI
 			}
 
 			UIPanel panel = window.window.AddPanel( UILayoutInfo.Fill(), null );
+
+			DestroyImmediate( panel.gameObject.GetComponent<Image>() );
+			UILineRenderer lineRenderer = panel.gameObject.AddComponent<UILineRenderer>();
+			lineRenderer.raycastTarget = false;
+			lineRenderer.Thickness = 5f;
+			lineRenderer.Points = new[]
+			{
+				RectTransform_Ex.SwitchToRectTransform( (RectTransform)input.transform, (RectTransform)window.transform ),
+				RectTransform_Ex.SwitchToRectTransform( (RectTransform)output.transform, (RectTransform)window.transform )
+			};
 
 			ControlSetupControlConnectionUI connection = panel.gameObject.AddComponent<ControlSetupControlConnectionUI>();
 			connection.Output = output;
@@ -91,11 +98,32 @@ namespace KSS.UI
 			}
 
 			UIPanel panel = window.window.AddPanel( UILayoutInfo.Fill(), null );
-			
+
+			DestroyImmediate( panel.gameObject.GetComponent<Image>() );
 			ControlSetupControlConnectionUI connection = panel.gameObject.AddComponent<ControlSetupControlConnectionUI>();
 			connection.Output = output;
 			connection.Input = input;
 			connection.EndOffset = offset;
+
+			UILineRenderer lineRenderer = panel.gameObject.AddComponent<UILineRenderer>();
+			lineRenderer.raycastTarget = false;
+			lineRenderer.Thickness = 5f;
+			if( input != null )
+			{
+				lineRenderer.Points = new[]
+				{
+					RectTransform_Ex.SwitchToRectTransform( (RectTransform)input.transform, (RectTransform)window.transform ),
+					RectTransform_Ex.SwitchToRectTransform( (RectTransform)input.transform, (RectTransform)window.transform ) + offset
+				};
+			}
+			else
+			{
+				lineRenderer.Points = new[]
+				{
+					RectTransform_Ex.SwitchToRectTransform( (RectTransform)output.transform, (RectTransform)window.transform ),
+					RectTransform_Ex.SwitchToRectTransform( (RectTransform)output.transform, (RectTransform)window.transform ) + offset
+				};
+			}
 
 			return connection;
 		}
