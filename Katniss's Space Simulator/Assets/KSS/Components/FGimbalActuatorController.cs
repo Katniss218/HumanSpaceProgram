@@ -73,14 +73,38 @@ namespace KSS.Components
 
 		public SerializedData GetData( IReverseReferenceMap s )
 		{
-			throw new NotImplementedException();
-			// serialize the controlled array, otherwise the stuff is not gonna be set.
+			SerializedArray array = new SerializedArray();
+			foreach( var act in Actuators2D )
+			{
+				SerializedObject elemData = new SerializedObject()
+				{
+					{ "on_set_xy", act.OnSetXY.GetData( s ) },
+					{ "get_reference_transform", act.GetReferenceTransform.GetData( s ) }
+				};
+				array.Add( elemData );
+			}
+
+			return new SerializedObject()
+			{
+				{ "actuators_2d", array }
+			};
 		}
 
 		public void SetData( IForwardReferenceMap l, SerializedData data )
 		{
-			throw new NotImplementedException();
-			// serialize the controlled array, otherwise the stuff is not gonna be set.
+			if( data.TryGetValue("actuators_2d", out var actuators2D ))
+			{
+				// This is a bit too verbose imo.
+				// needs an extension method to make serializing/deserializing arrays/lists of any type cleaner.
+				this.Actuators2D = new Actuator2DGroup[((SerializedArray)actuators2D).Count];
+				int i = 0;
+				foreach( var elemData in (SerializedArray)actuators2D )
+				{
+					this.Actuators2D[i] = new Actuator2DGroup();
+					this.Actuators2D[i].SetData( l, elemData );
+					i++;
+				}
+			}
 		}
 	}
 }

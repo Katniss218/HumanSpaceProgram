@@ -14,6 +14,8 @@ namespace KSS.UI
 {
 	public class ControlSetupControlUI : MonoBehaviour
 	{
+		public RectTransform Circle { get; private set; }
+
 		public ControlSetupControlGroupUI Group { get; private set; }
 		public Control.Control Control { get; private set; }
 
@@ -54,6 +56,8 @@ namespace KSS.UI
 
 			UIText name = panel.AddText( UILayoutInfo.FillHorizontal( (1 - side) * ControlSetupControlGroupUI.ROW_HEIGHT, (side) * ControlSetupControlGroupUI.ROW_HEIGHT, UILayoutInfo.TopF, 0, ControlSetupControlGroupUI.ROW_HEIGHT ), attr.Name )
 				.WithAlignment( side == 0 ? TMPro.HorizontalAlignmentOptions.Left : TMPro.HorizontalAlignmentOptions.Right );
+
+			controlUI.Circle = button.rectTransform;
 
 			return controlUI;
 		}

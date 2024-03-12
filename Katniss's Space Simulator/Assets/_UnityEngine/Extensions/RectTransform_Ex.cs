@@ -8,19 +8,25 @@ namespace UnityEngine
 {
 	public static class RectTransform_Ex
 	{
-		public static Vector2 SwitchToRectTransform( RectTransform from, RectTransform to )
+		/// <summary>
+		/// Gets the center point of the rect transform.
+		/// </summary>
+		public static Vector2 GetLocalCenter( this RectTransform rectTransform )
 		{
-			Vector2 localPoint;
-			Vector2 fromPivotDerivedOffset = new Vector2( from.rect.width * from.pivot.x + from.rect.xMin, from.rect.height * from.pivot.y + from.rect.yMin );
-			Vector2 screenP = RectTransformUtility.WorldToScreenPoint( null, from.position );
-			screenP += fromPivotDerivedOffset;
-			RectTransformUtility.ScreenPointToLocalPointInRectangle( to, screenP, null, out localPoint );
-			Vector2 pivotDerivedOffset = new Vector2( to.rect.width * to.pivot.x + to.rect.xMin, to.rect.height * to.pivot.y + to.rect.yMin );
-			return to.anchoredPosition + localPoint - pivotDerivedOffset;
+			return rectTransform.rect.center;
 		}
 
 		/// <summary>
-		/// Calculates the actual size of a rect transform.
+		/// Transforms a position in the local space of one rect transform to the local space of another.
+		/// </summary>
+		public static Vector2 TransformPointTo( this RectTransform from, Vector2 position, RectTransform to )
+		{
+			Vector2 canvasSpacePos = from.TransformPoint( position ); // this transforms from/to pivot space.
+			return to.InverseTransformPoint( canvasSpacePos );
+		}
+
+		/// <summary>
+		/// Calculates the actual size of a rect transform in canvas space.
 		/// </summary>
 		public static Vector2 GetActualSize( this RectTransform rt )
 		{
@@ -33,7 +39,9 @@ namespace UnityEngine
 			{
 				rt = (RectTransform)rt.parent;
 				if( rt.anchorMax != rt.anchorMin ) // if the anchors are equal, then the actual size is always equal to sizeDelta.
+				{
 					hierarchyDeltas.Push( (rt.sizeDelta, rt.anchorMax - rt.anchorMin) );
+				}
 			}
 
 			// Calculate the actual size.

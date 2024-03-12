@@ -74,8 +74,8 @@ namespace KSS.UI
 			lineRenderer.Thickness = 5f;
 			lineRenderer.Points = new[]
 			{
-				RectTransform_Ex.SwitchToRectTransform( (RectTransform)input.transform, (RectTransform)window.transform ),
-				RectTransform_Ex.SwitchToRectTransform( (RectTransform)output.transform, (RectTransform)window.transform )
+				input.Circle.TransformPointTo( input.Circle.GetLocalCenter(), (RectTransform)window.transform ),
+				output.Circle.TransformPointTo( output.Circle.GetLocalCenter(), (RectTransform)window.transform ),
 			};
 
 			ControlSetupControlConnectionUI connection = panel.gameObject.AddComponent<ControlSetupControlConnectionUI>();
@@ -112,16 +112,16 @@ namespace KSS.UI
 			{
 				lineRenderer.Points = new[]
 				{
-					RectTransform_Ex.SwitchToRectTransform( (RectTransform)input.transform, (RectTransform)window.transform ),
-					RectTransform_Ex.SwitchToRectTransform( (RectTransform)input.transform, (RectTransform)window.transform ) + offset
+					input.Circle.TransformPointTo( input.Circle.GetLocalCenter(), (RectTransform)window.transform ),
+					input.Circle.TransformPointTo( input.Circle.GetLocalCenter(), (RectTransform)window.transform ) + offset,
 				};
 			}
 			else
 			{
 				lineRenderer.Points = new[]
 				{
-					RectTransform_Ex.SwitchToRectTransform( (RectTransform)output.transform, (RectTransform)window.transform ),
-					RectTransform_Ex.SwitchToRectTransform( (RectTransform)output.transform, (RectTransform)window.transform ) + offset
+					output.Circle.TransformPointTo( output.Circle.GetLocalCenter(), (RectTransform)window.transform ),
+					output.Circle.TransformPointTo( output.Circle.GetLocalCenter(), (RectTransform)window.transform ) + offset,
 				};
 			}
 
