@@ -13,7 +13,7 @@ namespace KSS.Core.Components
     /// <summary>
     /// A marker component to track parts.
     /// </summary>
-    public class FPart : MonoBehaviour, IPersistent
+    public class FPart : MonoBehaviour, IPersistsData
     {
         [field: SerializeField]
         public NamespacedIdentifier PartID { get; set; }

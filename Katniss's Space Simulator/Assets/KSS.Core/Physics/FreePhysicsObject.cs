@@ -15,7 +15,7 @@ namespace KSS.Core.Physics
     [RequireComponent( typeof( RootObjectTransform ) )]
     [RequireComponent( typeof( Rigidbody ) )]
     [DisallowMultipleComponent]
-    public class FreePhysicsObject : MonoBehaviour, IPhysicsObject, IPersistent
+    public class FreePhysicsObject : MonoBehaviour, IPhysicsObject, IPersistsData
     {
         public float Mass
         {

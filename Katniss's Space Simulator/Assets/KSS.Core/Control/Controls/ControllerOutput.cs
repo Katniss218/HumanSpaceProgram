@@ -14,7 +14,7 @@ namespace KSS.Control.Controls
 	/// <summary>
 	/// Represents a control that produces a control signal of type <typeparamref name="T"/>.
 	/// </summary>
-	public sealed class ControllerOutput<T> : ControllerOutput, IPersistent
+	public sealed class ControllerOutput<T> : ControllerOutput, IPersistsData
 	{
 		internal List<ControlleeInput<T>> inputs = new();
 		public IEnumerable<ControlleeInput<T>> Inputs { get => inputs; }
@@ -75,14 +75,28 @@ namespace KSS.Control.Controls
 
 		public SerializedData GetData( IReverseReferenceMap s )
 		{
-			// save what it is connected to.
-			throw new NotImplementedException();
+			SerializedArray sa = new SerializedArray();
+			foreach( var conn in inputs )
+			{
+				sa.Add( s.WriteObjectReference( conn ) );
+			}
+			return new SerializedObject()
+			{
+				{ "connects_to", sa }
+			};
 		}
 
 		public void SetData( IForwardReferenceMap l, SerializedData data )
 		{
-			// load what it is connected to.
-			throw new NotImplementedException();
+			if( data.TryGetValue( "connects_to", out var connectsTo ) )
+			{
+				this.inputs.Clear();
+				foreach( var conn in (SerializedArray)connectsTo )
+				{
+					var c = (ControlleeInput<T>)l.ReadObjectReference( conn );
+					Connect( c, this );
+				}
+			}
 		}
 
 		[MethodImpl( MethodImplOptions.AggressiveInlining )]

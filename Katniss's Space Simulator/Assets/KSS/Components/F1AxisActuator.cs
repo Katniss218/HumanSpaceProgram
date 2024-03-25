@@ -11,7 +11,7 @@ using UnityPlus.Serialization;
 namespace KSS.Components
 {
     [Obsolete("Not implemented yet.")] // TODO - add actual functionality.
-    public class F1AxisActuator : MonoBehaviour, IPersistent
+    public class F1AxisActuator : MonoBehaviour, IPersistsData
     {
         public float X { get; set; }
         

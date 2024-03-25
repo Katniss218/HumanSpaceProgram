@@ -12,7 +12,7 @@ namespace KSS.Core.ResourceFlowSystem
     /// State information about a single resource.
     /// </summary>
     [Serializable]
-    public struct SubstanceState : IPersistent
+    public struct SubstanceState : IPersistsData
     {
         /// <summary>
         /// The physical/chemical data about the specific resource.

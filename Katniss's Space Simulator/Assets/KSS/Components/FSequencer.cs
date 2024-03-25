@@ -155,7 +155,7 @@ namespace KSS.Components
     /// <summary>
     /// Represents a controller that can invoke an arbitrary control action from a queue.
     /// </summary>
-    public class FSequencer : MonoBehaviour, IPersistent
+    public class FSequencer : MonoBehaviour, IPersistsData
     {
         // sequencer is a type of avionics, related to the control system.
 

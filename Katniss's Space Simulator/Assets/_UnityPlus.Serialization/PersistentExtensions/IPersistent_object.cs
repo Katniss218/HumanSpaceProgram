@@ -13,7 +13,7 @@ namespace UnityPlus.Serialization
         {
             switch( obj )
             {
-                case IPersistent o:
+                case IPersistsData o:
                     return o.GetData( s );
                 case Component o:
                     return IPersistent_Component.GetData( o, s );
@@ -25,7 +25,7 @@ namespace UnityPlus.Serialization
         {
             switch( obj )
             {
-                case IPersistent o:
+                case IPersistsData o:
                     o.SetData( l, data ); break;
                 case Component o:
                     IPersistent_Component.SetData( o, l, data ); break;

@@ -11,7 +11,7 @@ namespace KSS.Core
     /// <summary>
     /// Manages the currently active object.
     /// </summary>
-    public class ActiveObjectManager : SingletonMonoBehaviour<ActiveObjectManager>, IPersistent
+    public class ActiveObjectManager : SingletonMonoBehaviour<ActiveObjectManager>, IPersistsData
     {
         private GameObject _activeObject;
         /// <summary>

@@ -12,7 +12,7 @@ namespace KSS.Core
 {
     [RequireComponent( typeof( UnityPlus.Serialization.PreexistingReference ) )]
     [RequireComponent( typeof( RootObjectTransform ) )]
-    public class CelestialBody : MonoBehaviour, IPersistent
+    public class CelestialBody : MonoBehaviour, IPersistsData
     {
         /// <summary>
         /// Gets the current global position of the celestial body.

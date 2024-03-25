@@ -16,7 +16,7 @@ namespace KSS.Control.Controls
 	/// <summary>
 	/// Represents a control that consumes a parameter of type <typeparamref name="T"/>.
 	/// </summary>
-	public sealed class ControlParameterInput<T> : ControlParameterInput, IPersistent
+	public sealed class ControlParameterInput<T> : ControlParameterInput
 	{
 		public ControlParameterOutput<T> Output { get; internal set; }
 
@@ -78,18 +78,6 @@ namespace KSS.Control.Controls
 
 			Disconnect( this );
 			return true;
-		}
-
-		public SerializedData GetData( IReverseReferenceMap s )
-		{
-			// save what it is connected to.
-			throw new NotImplementedException();
-		}
-
-		public void SetData( IForwardReferenceMap l, SerializedData data )
-		{
-			// load what it is connected to.
-			throw new NotImplementedException();
 		}
 
 		[MethodImpl( MethodImplOptions.AggressiveInlining )]

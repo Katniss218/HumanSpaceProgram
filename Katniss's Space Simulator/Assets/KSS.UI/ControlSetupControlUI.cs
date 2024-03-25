@@ -25,7 +25,6 @@ namespace KSS.UI
 
 		void OnClick()
 		{
-
 			// on release on this, when dragging out a connection - connect.
 
 			// show the name/description of channel on mouseover.

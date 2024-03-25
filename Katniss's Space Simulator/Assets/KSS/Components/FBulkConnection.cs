@@ -11,13 +11,13 @@ namespace KSS.Components
     /// <summary>
     /// An object that connects two containers and calculates the resource flow between them.
     /// </summary>
-    public class FBulkConnection : MonoBehaviour, IPersistent
+    public class FBulkConnection : MonoBehaviour, IPersistsData
     {
         /// <summary>
         /// Represents an inlet or outlet.
         /// </summary>
         [Serializable]
-        public class Port : IPersistent
+        public class Port : IPersistsData
         {
             // idk if SerializeField works with interfaces. probably better to save over in json.
             [SerializeField]

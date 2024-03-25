@@ -8,7 +8,7 @@ using UnityPlus.Serialization;
 
 namespace KSS.Core
 {
-    public sealed partial class Vessel : IPersistent
+    public sealed partial class Vessel : IPersistsData
     {
         public SerializedData GetData( IReverseReferenceMap s )
         {

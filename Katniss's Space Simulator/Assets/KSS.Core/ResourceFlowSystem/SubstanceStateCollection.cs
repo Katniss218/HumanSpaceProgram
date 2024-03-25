@@ -12,7 +12,7 @@ namespace KSS.Core.ResourceFlowSystem
     /// Contains state information about multiple resources, and methods to combine them.
     /// </summary>
     [Serializable]
-    public class SubstanceStateCollection : IPersistent
+    public class SubstanceStateCollection : IPersistsData
     {
         [field: SerializeField]
         List<SubstanceState> _substances = new List<SubstanceState>();

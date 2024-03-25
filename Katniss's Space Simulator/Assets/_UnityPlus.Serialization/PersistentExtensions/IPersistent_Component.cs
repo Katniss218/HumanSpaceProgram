@@ -16,7 +16,7 @@ namespace UnityPlus.Serialization
 #warning TODO - store info about enabled/disabled.
             switch( c )
             {
-                case IPersistent comp:
+                case IPersistsData comp:
                     return comp.GetData( s );
                 case Transform comp:
                     return comp.GetData( s );
@@ -55,7 +55,7 @@ namespace UnityPlus.Serialization
 
             switch( component )
             {
-                case IPersistent comp:
+                case IPersistsData comp:
                     comp.SetData( l, data ); break;
                 case Transform comp:
                     comp.SetData( l, data ); break;

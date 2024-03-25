@@ -11,7 +11,7 @@ using KSS.Control.Controls;
 namespace KSS.Components
 {
 	[Serializable]
-	public class FRocketEngine : MonoBehaviour, IResourceConsumer, IPersistent
+	public class FRocketEngine : MonoBehaviour, IResourceConsumer, IPersistsData
 	{
 		const float g = 9.80665f;
 

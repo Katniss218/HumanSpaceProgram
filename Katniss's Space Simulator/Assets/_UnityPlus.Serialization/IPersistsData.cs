@@ -8,9 +8,12 @@ using System.Threading.Tasks;
 namespace UnityPlus.Serialization
 {
     /// <summary>
-    /// Inherit from this interface to specify that your class handles persisting its data by itself.
+    /// Inherit from this interface to specify that your component handles persisting its data by itself.
     /// </summary>
-    public interface IPersistent
+    /// <remarks>
+    /// Invocation is not strictly enforced, and up to the serialization strategy.
+    /// </remarks>
+    public interface IPersistsData
     {
         /// <summary>
         /// Gets the persistent data from an object.
@@ -33,5 +36,17 @@ namespace UnityPlus.Serialization
         /// <param name="l">The reference map to use to resolve object references.</param>
         /// <param name="data">The serialized structure that contains the data. Identical to what is created by <see cref="GetData"/>.</param>
         void SetData( [AllowNull] IForwardReferenceMap l, [DisallowNull] SerializedData data );
+    }
+
+    /// <summary>
+    /// Inherit from this interface to specify that this component handles creation of objects during (de)serialization.
+    /// </summary>
+    /// <remarks>
+    /// Invocation is not strictly enforced, and up to the serialization strategy.
+    /// </remarks>
+    public interface IPersistsObjects
+    {
+        SerializedData GetObjects( [AllowNull] IReverseReferenceMap s );
+        void SetObjects( [AllowNull] IForwardReferenceMap l, [DisallowNull] SerializedData data );
     }
 }

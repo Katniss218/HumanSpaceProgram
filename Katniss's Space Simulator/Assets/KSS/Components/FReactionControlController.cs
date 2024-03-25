@@ -10,7 +10,7 @@ using UnityPlus.Serialization;
 namespace KSS.Components
 {
     [Obsolete("Not implemented yet.")] // TODO - add actual functionality.
-	public class FReactionControlController : MonoBehaviour, IPersistent
+	public class FReactionControlController : MonoBehaviour, IPersistsData
 	{
 
 

@@ -12,7 +12,7 @@ namespace KSS.Components
     /// <summary>
     /// Adds a point mass of the specified mass to the object.
     /// </summary>
-    public class FPointMass : MonoBehaviour, IPersistent, IHasMass
+    public class FPointMass : MonoBehaviour, IPersistsData, IHasMass
     {
         [SerializeField]
         private float _mass;

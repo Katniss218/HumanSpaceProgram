@@ -10,7 +10,7 @@ using UnityPlus.Serialization;
 
 namespace KSS.Components
 {
-    public interface IConstructionCondition : IPersistent
+    public interface IConstructionCondition : IPersistsData
     {
         /// <summary>
         /// Checks what the build speed multiplier for a constructible at a given position would be.
@@ -52,7 +52,7 @@ namespace KSS.Components
     /// <summary>
     /// Represents a "part" (hierarchy of gameobjects) that can be in various stages of construction.
     /// </summary>
-    public class FConstructible : MonoBehaviour, IPersistent
+    public class FConstructible : MonoBehaviour, IPersistsData
     {
         [SerializeField]
         private float _buildPoints;

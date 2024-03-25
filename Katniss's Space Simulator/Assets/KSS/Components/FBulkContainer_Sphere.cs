@@ -10,7 +10,7 @@ namespace KSS.Components
     /// <summary>
     /// A container for a <see cref="Substance"/>.
     /// </summary>
-    public class FBulkContainer_Sphere : MonoBehaviour, IResourceConsumer, IResourceProducer, IResourceContainer, IPersistent
+    public class FBulkContainer_Sphere : MonoBehaviour, IResourceConsumer, IResourceProducer, IResourceContainer, IPersistsData
     {
         /// <summary>
         /// Determines the center position of the container.

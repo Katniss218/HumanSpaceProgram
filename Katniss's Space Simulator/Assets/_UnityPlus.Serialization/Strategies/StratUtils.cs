@@ -63,10 +63,10 @@ namespace UnityPlus.Serialization.Strategies
                 if( s.TryGetID( go, out Guid id ) )
                 {
                     sArr.Add( new SerializedObject()
-                {
-                    { KeyNames.ID, s.WriteGuid( id ) },
-                    { "path", $"{parentPath}" }
-                } );
+                    {
+                        { KeyNames.ID, s.WriteGuid( id ) },
+                        { "path", $"{parentPath}" }
+                    } );
                 }
             }
 
@@ -146,9 +146,15 @@ namespace UnityPlus.Serialization.Strategies
                 Guid id = s.GetID( comp );
                 SerializedObject compObj = new SerializedObject()
                 {
-                    { KeyNames.ID, s.WriteGuid(id) },
-                    { KeyNames.TYPE, s.WriteType(comp.GetType()) }
+                    { KeyNames.ID, s.WriteGuid( id ) },
+                    { KeyNames.TYPE, s.WriteType( comp.GetType() ) }
                 };
+
+                if( comp is IPersistsObjects po )
+                {
+                    var sData = po.GetObjects( s );
+                    compObj.Add( "objects", sData );
+                }
 
                 components.Add( compObj );
             }
@@ -183,6 +189,7 @@ namespace UnityPlus.Serialization.Strategies
             foreach( Transform child in go.transform )
             {
                 SaveGameObjectHierarchy_Objects( child.gameObject, s, includedObjectsMask, children );
+
             }
 
             SerializedArray components = SaveComponents_Objects( go, s );
@@ -267,6 +274,13 @@ namespace UnityPlus.Serialization.Strategies
                         behsUGLYDONTDOTHIS?.Add( b );
                     }
                     l.SetObj( compID, co );
+                    
+                    if( co is IPersistsObjects po )
+                    {
+                        var objData = compData["objects"];
+                        po.SetObjects( l, objData );
+                    }
+
                 }
                 catch( Exception ex )
                 {

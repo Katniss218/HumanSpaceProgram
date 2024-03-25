@@ -12,7 +12,7 @@ namespace KSS.Core.Components
     /// Redirects click interactions to a different <see cref="GameObject"/>.
     /// </summary>
     [RequireComponent( typeof( Collider ) )]
-    public class FClickInteractionRedirect : MonoBehaviour, IPersistent
+    public class FClickInteractionRedirect : MonoBehaviour, IPersistsData
     {
         /// <summary>
         /// The click action on the object of this component will be redirected to this target.

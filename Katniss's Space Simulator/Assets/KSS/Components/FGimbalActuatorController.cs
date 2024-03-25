@@ -3,6 +3,7 @@ using KSS.Control.Controls;
 using KSS.Core;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
@@ -12,7 +13,7 @@ namespace KSS.Components
 	/// <summary>
 	/// Controls a number of gimbal actuators.
 	/// </summary>
-	public class FGimbalActuatorController : MonoBehaviour, IPersistent
+	public class FGimbalActuatorController : MonoBehaviour, IPersistsObjects, IPersistsData
 	{
 		public class Actuator2DGroup : ControlGroup
 		{
@@ -22,7 +23,7 @@ namespace KSS.Components
 			[NamedControl( "Deflection (XY)" )]
 			public ControllerOutput<Vector2> OnSetXY = new();
 
-			public Actuator2DGroup() : base() 
+			public Actuator2DGroup() : base()
 			{ }
 		}
 
@@ -71,6 +72,30 @@ namespace KSS.Components
 			}
 		}
 
+		public SerializedData GetObjects( IReverseReferenceMap s )
+		{
+			SerializedArray array = new SerializedArray();
+			foreach( var act in Actuators2D )
+			{
+				SerializedObject elemData = new SerializedObject()
+				{
+					{ KeyNames.ID, s.WriteGuid( s.GetID( act.OnSetXY ) ) },
+					{ KeyNames.ID, s.WriteGuid( s.GetID( act.GetReferenceTransform ) ) }
+				};
+				array.Add( elemData );
+			}
+
+			return new SerializedObject()
+			{
+				{ "actuators_2d", array },
+			};
+		}
+
+		public void SetObjects( IForwardReferenceMap l, SerializedData data )
+		{
+			throw new NotImplementedException();
+		}
+
 		public SerializedData GetData( IReverseReferenceMap s )
 		{
 			SerializedArray array = new SerializedArray();
@@ -92,7 +117,7 @@ namespace KSS.Components
 
 		public void SetData( IForwardReferenceMap l, SerializedData data )
 		{
-			if( data.TryGetValue("actuators_2d", out var actuators2D ))
+			if( data.TryGetValue( "actuators_2d", out var actuators2D ) )
 			{
 				// This is a bit too verbose imo.
 				// needs an extension method to make serializing/deserializing arrays/lists of any type cleaner.

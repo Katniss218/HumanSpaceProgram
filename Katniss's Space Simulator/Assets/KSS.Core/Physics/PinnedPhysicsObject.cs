@@ -15,7 +15,7 @@ namespace KSS.Core.Physics
 	[RequireComponent( typeof( RootObjectTransform ) )]
 	[RequireComponent( typeof( Rigidbody ) )]
 	[DisallowMultipleComponent]
-	public class PinnedPhysicsObject : MonoBehaviour, IPhysicsObject, IPersistent
+	public class PinnedPhysicsObject : MonoBehaviour, IPhysicsObject, IPersistsData
 	{
 		public float Mass
 		{

@@ -17,7 +17,7 @@ namespace KSS.Core.ReferenceFrames
     /// Add this to any object that is supposed to be affected by the <see cref="SceneReferenceFrameManager"/>.
     /// </remarks>
     [DisallowMultipleComponent]
-    public class RootObjectTransform : MonoBehaviour, IPersistent, IReferenceFrameSwitchResponder
+    public class RootObjectTransform : MonoBehaviour, IPersistsData, IReferenceFrameSwitchResponder
     {
         // Should to be added to any root object that is an actual [physical] object in the scene (not UI elements, empties, etc).
 

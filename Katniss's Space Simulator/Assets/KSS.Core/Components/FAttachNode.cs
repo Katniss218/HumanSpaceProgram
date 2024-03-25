@@ -9,7 +9,7 @@ using UnityPlus.Serialization;
 namespace KSS.Core.Components
 {
     [DisallowMultipleComponent]
-    public sealed class FAttachNode : MonoBehaviour, IPersistent
+    public sealed class FAttachNode : MonoBehaviour, IPersistsData
     {
         /// <summary>
         /// A struct representing a candidate node pair that can be used for snapping.

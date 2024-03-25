@@ -14,7 +14,7 @@ using UnityPlus.Serialization.Strategies;
 namespace KSS.Core
 {
     [RequireComponent( typeof( PreexistingReference ) )]
-    public class CelestialBodyManager : SingletonMonoBehaviour<CelestialBodyManager>, IPersistent
+    public class CelestialBodyManager : SingletonMonoBehaviour<CelestialBodyManager>, IPersistsData
     {
         private Dictionary<string, CelestialBody> _celestialBodies = new Dictionary<string, CelestialBody>();
 

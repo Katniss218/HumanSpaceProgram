@@ -5,7 +5,7 @@ using UnityPlus.Serialization;
 
 namespace KSS.Components
 {
-    public class FVesselSeparator : MonoBehaviour, IPersistent
+    public class FVesselSeparator : MonoBehaviour, IPersistsData
     {
         bool _hasSeparated = false;
 

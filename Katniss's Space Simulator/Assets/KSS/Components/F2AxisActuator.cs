@@ -6,7 +6,7 @@ using UnityPlus.Serialization;
 
 namespace KSS.Components
 {
-	public class F2AxisActuator : MonoBehaviour, IPersistent
+	public class F2AxisActuator : MonoBehaviour, IPersistsData
 	{
 		// 2-axis actuator.
 
