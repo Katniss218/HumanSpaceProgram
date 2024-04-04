@@ -152,13 +152,7 @@ namespace UnityPlus.Serialization.Strategies
 
 			foreach( var comp in go.GetComponents() )
 			{
-				SerializedObject compObj = WriteObjectInstance( s, comp );
-
-				if( comp is IPersistsObjects po )
-				{
-					var sData = po.GetObjects( s );
-					compObj.Add( "objects", sData );
-				}
+				SerializedObject compObj = comp.GetObjects( s );
 
 				components.Add( compObj );
 			}
@@ -270,7 +264,7 @@ namespace UnityPlus.Serialization.Strategies
 					Guid compID = compData[KeyNames.ID].ToGuid();
 					Type compType = compData[KeyNames.TYPE].ToType();
 
-					Component co = go.GetTransformOrAddComponent( compType );
+					Component co = go.GetTransformOrAddComponent( compType ); // factory.
 
 					if( co is Behaviour b ) // disable to prevent 'start' firing prematurely if async.
 					{
@@ -279,12 +273,7 @@ namespace UnityPlus.Serialization.Strategies
 					}
 					l.SetObj( compID, co );
 
-					if( co is IPersistsObjects po )
-					{
-						var objData = compData["objects"];
-						po.SetObjects( (SerializedObject)objData, l );
-					}
-
+					co.SetObjects( (SerializedObject)compData, l );
 				}
 				catch( Exception ex )
 				{

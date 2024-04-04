@@ -81,7 +81,7 @@ namespace UnityPlus.Serialization
                                 continue;
 
                             Type methodType = typeof( Action<,,> ).MakeGenericType( methodParams[0].ParameterType, typeof( SerializedObject ), typeof( IForwardReferenceMap ) );
-                            //var del = (Action<object, IForwardReferenceMap, SerializedObject>)Delegate.CreateDelegate( methodType, method );
+                            //var del = (Action<object, SerializedObject, IForwardReferenceMap>)Delegate.CreateDelegate( methodType, method );
                             var del = Delegate.CreateDelegate( methodType, method );
 
                             _extensionSetObjects.Add( methodParams[0].ParameterType, del );
@@ -120,7 +120,7 @@ namespace UnityPlus.Serialization
                                 continue;
 
                             Type methodType = typeof( Action<,,> ).MakeGenericType( methodParams[0].ParameterType, typeof( SerializedData ), typeof( IForwardReferenceMap ) );
-                            //var del = (Action<object, IForwardReferenceMap, SerializedData>)Delegate.CreateDelegate( methodType, method );
+                            //var del = (Action<object, SerializedData, IForwardReferenceMap>)Delegate.CreateDelegate( methodType, method );
                             var del = Delegate.CreateDelegate( methodType, method );
 
                             _extensionSetDatas.Add( methodParams[0].ParameterType, del );

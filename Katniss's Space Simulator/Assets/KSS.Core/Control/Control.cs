@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace KSS.Control
 {
@@ -21,7 +22,6 @@ namespace KSS.Control
         /// Gets the control(s) that this control is connected to.
         /// </summary>
         public abstract IEnumerable<Control> GetConnectedControls();
-
         /// <summary>
         /// Tries to connect this control to a given control. <br/>
         /// </summary>

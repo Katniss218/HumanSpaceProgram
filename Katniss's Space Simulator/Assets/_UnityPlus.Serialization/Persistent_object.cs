@@ -31,19 +31,23 @@ namespace UnityPlus.Serialization
             if( obj is IPersistsObjects p )
             {
                 SerializedObject ownsMap = p.GetObjects( s ); // this can override auto-serialized members
-
-                foreach( var kvp in ownsMap )
+                if( ownsMap != null )
                 {
-                    data.Add( kvp.Key, kvp.Value );
+                    foreach( var kvp in ownsMap )
+                    {
+                        data.Add( kvp.Key, kvp.Value );
+                    }
                 }
             }
             else
             {
                 SerializedObject ownsMap = PersistWithExtension.GetObjects( obj, type, s );
-
-                foreach( var kvp in ownsMap )
+                if( ownsMap != null )
                 {
-                    data.Add( kvp.Key, kvp.Value );
+                    foreach( var kvp in ownsMap )
+                    {
+                        data.Add( kvp.Key, kvp.Value );
+                    }
                 }
             }
 

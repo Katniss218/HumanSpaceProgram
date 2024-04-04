@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
 using UnityPlus.Serialization;
 
 namespace KSS.Core
@@ -70,6 +71,7 @@ namespace KSS.Core
 
         static float _maxTimeScale = 128.0f;
 
+#warning TODO - when pausing the game to enter main menu (displaying screen pauses), it doesn't unpause after the main menu is loaded. this can cause desyncs.
         private static float _timeScale = 1;
         private static float _oldTimeScale = 1;
 
@@ -161,9 +163,9 @@ namespace KSS.Core
 
         void Awake()
         {
-            Time.fixedDeltaTime = 0.02f;
-            Time.maximumDeltaTime = 0.06f;
-            Time.maximumParticleDeltaTime = 0.03f;
+            UnityEngine.Time.fixedDeltaTime = 0.02f;
+            UnityEngine.Time.maximumDeltaTime = 0.06f;
+            UnityEngine.Time.maximumParticleDeltaTime = 0.03f;
         }
 
         void Start()

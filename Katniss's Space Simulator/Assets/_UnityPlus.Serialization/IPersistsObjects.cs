@@ -15,7 +15,7 @@ namespace UnityPlus.Serialization
     /// <remarks>
     /// Invocation is not strictly enforced, and up to the serialization strategy.
     /// </remarks>
-    public interface IPersistsObjects : IComponent
+    public interface IPersistsObjects
     {
         SerializedObject GetObjects( IReverseReferenceMap s );
         void SetObjects( SerializedObject data, IForwardReferenceMap l );
