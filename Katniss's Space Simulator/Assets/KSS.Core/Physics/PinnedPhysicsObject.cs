@@ -203,38 +203,41 @@ namespace KSS.Core.Physics
 			return new SerializedObject()
 			{
 				{ "mass", this.Mass },
-				{ "local_center_of_mass", s.WriteVector3( this.LocalCenterOfMass ) },
-				{ "velocity", s.WriteVector3( this.Velocity ) },
-				{ "angular_velocity", s.WriteVector3( this.AngularVelocity ) },
+				{ "local_center_of_mass", this.LocalCenterOfMass.GetData() },
+				{ "velocity",  this.Velocity.GetData() },
+				{ "angular_velocity", this.AngularVelocity.GetData() },
 				{ "reference_body", s.WriteObjectReference( this.ReferenceBody ) },
-				{ "reference_position", s.WriteVector3Dbl( this.ReferencePosition ) },
-				{ "reference_rotation", s.WriteQuaternionDbl( this.ReferenceRotation ) }
+				{ "reference_position", this.ReferencePosition.GetData() },
+				{ "reference_rotation", this.ReferenceRotation.GetData() }
 			};
 		}
 
-		public void SetData( IForwardReferenceMap l, SerializedData data )
-		{
-			if( data.TryGetValue( "mass", out var mass ) )
+		public void SetData( SerializedData data, IForwardReferenceMap l )
+        {
+            if( data.TryGetValue( "mass", out var mass ) )
 				this.Mass = (float)mass;
 
 			if( data.TryGetValue( "local_center_of_mass", out var localCenterOfMass ) )
-				this.LocalCenterOfMass = l.ReadVector3( localCenterOfMass );
+				this.LocalCenterOfMass = localCenterOfMass.ToVector3();
 
-			if( data.TryGetValue( "velocity", out var velocity ) )
-				this.Velocity = l.ReadVector3( velocity );
+            _rb.isKinematic = true; // PinnedPhysicsObject is always kinematic. This is needed because it may be called first.
 
-			if( data.TryGetValue( "angular_velocity", out var angularVelocity ) )
-				this.AngularVelocity = l.ReadVector3( angularVelocity );
+            /* if( data.TryGetValue( "velocity", out var velocity ) ) this can't be assigned with kinematic anyway.
+                 this.Velocity =  velocity.ToVector3();
 
-			// this is the culprit
-			if( data.TryGetValue( "reference_body", out var referenceBody ) )
+             if( data.TryGetValue( "angular_velocity", out var angularVelocity ) )
+                 this.AngularVelocity = angularVelocity.ToVector3();
+            */
+
+            // this is the culprit
+            if( data.TryGetValue( "reference_body", out var referenceBody ) )
 				this.ReferenceBody = (CelestialBody)l.ReadObjectReference( referenceBody );
 
 			if( data.TryGetValue( "reference_position", out var referencePosition ) )
-				this.ReferencePosition = l.ReadVector3Dbl( referencePosition );
+				this.ReferencePosition = referencePosition.ToVector3Dbl();
 
 			if( data.TryGetValue( "reference_rotation", out var referenceRotation ) )
-				this.ReferenceRotation = l.ReadQuaternionDbl( referenceRotation );
+				this.ReferenceRotation = referenceRotation.ToQuaternionDbl();
 		}
 	}
 }

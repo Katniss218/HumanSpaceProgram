@@ -68,21 +68,24 @@ namespace KSS.Components
                 {
                     { "obj_c", s.WriteObjectReference( this._objC ) },
                     { "obj_p", s.WriteObjectReference( this._objP ) },
-                    { "position", s.WriteVector3( this.Position ) },
-                    { "forward", s.WriteVector3( this.Forward ) }
+                    { "position", this.Position.GetData() },
+                    { "forward", this.Forward.GetData() }
                 };
             }
 
-            public void SetData( IForwardReferenceMap l, SerializedData data )
+            public void SetData( SerializedData data, IForwardReferenceMap l )
             {
                 if( data.TryGetValue( "obj_c", out var objC ) )
                     this._objC = (IResourceConsumer)l.ReadObjectReference( objC );
+
                 if( data.TryGetValue( "obj_p", out var objP ) )
                     this._objP = (IResourceProducer)l.ReadObjectReference( objP );
+
                 if( data.TryGetValue( "position", out var position ) )
-                    this.Position = l.ReadVector3( position );
+                    this.Position = position.ToVector3();
+
                 if( data.TryGetValue( "forward", out var forward ) )
-                    this.Forward = l.ReadVector3( forward );
+                    this.Forward = forward.ToVector3();
             }
         }
 
@@ -287,12 +290,12 @@ namespace KSS.Components
             };
         }
 
-        public void SetData( IForwardReferenceMap l, SerializedData data )
+        public void SetData( SerializedData data, IForwardReferenceMap l )
         {
             if( data.TryGetValue( "end1", out var end1 ) )
-                this.End1.SetData( l, end1 );
+                this.End1.SetData( end1, l );
             if( data.TryGetValue( "end2", out var end2 ) )
-                this.End2.SetData( l, end2 );
+                this.End2.SetData( end2, l );
             if( data.TryGetValue( "cross_section_area", out var crossSectionArea ) )
                 this.CrossSectionArea = (float)crossSectionArea;
         }

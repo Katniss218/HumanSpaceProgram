@@ -86,7 +86,7 @@ namespace KSS.Control.Controls
 			};
 		}
 
-		public void SetData( IForwardReferenceMap l, SerializedData data )
+		public void SetData( SerializedData data, IForwardReferenceMap l )
 		{
 			if( data.TryGetValue( "connects_to", out var connectsTo ) )
 			{

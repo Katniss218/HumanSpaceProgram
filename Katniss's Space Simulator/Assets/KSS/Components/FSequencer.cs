@@ -182,7 +182,7 @@ namespace KSS.Components
             throw new NotImplementedException();
         }
 
-        public void SetData( IForwardReferenceMap l, SerializedData data )
+        public void SetData( SerializedData data, IForwardReferenceMap l )
         {
             throw new NotImplementedException();
         }

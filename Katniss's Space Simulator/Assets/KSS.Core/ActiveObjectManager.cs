@@ -13,6 +13,7 @@ namespace KSS.Core
     /// </summary>
     public class ActiveObjectManager : SingletonMonoBehaviour<ActiveObjectManager>, IPersistsData
     {
+        [SerializeField]
         private GameObject _activeObject;
         /// <summary>
         /// Gets or sets the object that is currently being 'controlled' or viewed by the player.
@@ -37,7 +38,7 @@ namespace KSS.Core
             };
         }
 
-        public void SetData( IForwardReferenceMap l, SerializedData data )
+        public void SetData( SerializedData data, IForwardReferenceMap l )
         {
             if( data.TryGetValue( "active_object", out var activeObject ) )
                 ActiveObject = (GameObject)l.ReadObjectReference( activeObject );

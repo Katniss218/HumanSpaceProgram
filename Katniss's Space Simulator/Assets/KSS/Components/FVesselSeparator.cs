@@ -33,7 +33,7 @@ namespace KSS.Components
             };
         }
 
-        public void SetData( IForwardReferenceMap l, SerializedData data )
+        public void SetData( SerializedData data, IForwardReferenceMap l )
         {
             if( data.TryGetValue( "has_separated", out var hasSeparated ) )
                 this._hasSeparated = (bool)hasSeparated;

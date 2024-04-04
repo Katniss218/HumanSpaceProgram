@@ -100,7 +100,7 @@ namespace KSS.Components
 			};
 		}
 
-		public void SetData( IForwardReferenceMap l, SerializedData data )
+		public void SetData( SerializedData data, IForwardReferenceMap l )
 		{
 			if( data.TryGetValue( "max_thrust", out var maxThrust ) )
 				this.MaxThrust = (float)maxThrust;

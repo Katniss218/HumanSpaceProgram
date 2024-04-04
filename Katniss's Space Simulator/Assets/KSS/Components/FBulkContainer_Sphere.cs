@@ -127,16 +127,19 @@ namespace KSS.Components
             };
         }
 
-        public void SetData( IForwardReferenceMap l, SerializedData data )
+        public void SetData( SerializedData data, IForwardReferenceMap l )
         {
             if( data.TryGetValue( "volume_transform", out var volumeTransform ) )
                 this.VolumeTransform = (Transform)l.ReadObjectReference( volumeTransform );
+
             if( data.TryGetValue( "max_volume", out var maxVolume ) )
                 this.MaxVolume = (float)maxVolume;
+
             if( data.TryGetValue( "radius", out var radius ) )
                 this.Radius = (float)radius;
+
             if( data.TryGetValue( "contents", out var contents ) )
-                this.Contents.SetData( l, contents );
+                this.Contents.SetData( contents, l );
         }
 
         /// <summary>

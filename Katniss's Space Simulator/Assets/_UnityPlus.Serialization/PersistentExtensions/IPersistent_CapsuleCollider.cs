@@ -18,12 +18,12 @@ namespace UnityPlus.Serialization
                 { "radius", cc.radius },
                 { "height", cc.height },
                 { "direction", cc.direction },
-                { "center", s.WriteVector3( cc.center ) },
+                { "center", cc.center.GetData() },
                 { "is_trigger", cc.isTrigger }
             };
         }
 
-        public static void SetData( this CapsuleCollider cc, IForwardReferenceMap l, SerializedData data )
+        public static void SetData( this CapsuleCollider cc, SerializedData data, IForwardReferenceMap l )
         {
             if( data.TryGetValue( "radius", out var radius ) )
                 cc.radius = (float)radius;
@@ -35,7 +35,7 @@ namespace UnityPlus.Serialization
                 cc.direction = (int)direction;
 
             if( data.TryGetValue( "center", out var center ) )
-                cc.center = l.ReadVector3( center );
+                cc.center = center.ToVector3();
 
             if( data.TryGetValue( "is_trigger", out var isTrigger ) )
                 cc.isTrigger = (bool)isTrigger;

@@ -36,7 +36,7 @@ namespace KSS.Components
             };
         }
 
-        public void SetData( IForwardReferenceMap l, SerializedData data )
+        public void SetData( SerializedData data, IForwardReferenceMap l )
         {
             if( data.TryGetValue( "min_lift_capacity", out var minLiftCapacity ) )
                 this.minLiftCapacity = (float)minLiftCapacity;
@@ -130,7 +130,7 @@ namespace KSS.Components
         {
             foreach( var kvp in _twoWayPatch )
             {
-                kvp.Key.SetData( null, kvp.Value.fwd );
+                kvp.Key.SetData( kvp.Value.fwd, null );
             }
         }
 
@@ -138,7 +138,7 @@ namespace KSS.Components
         {
             foreach( var kvp in _twoWayPatch )
             {
-                kvp.Key.SetData( null, kvp.Value.rev );
+                kvp.Key.SetData( kvp.Value.rev, null );
             }
         }
 
@@ -193,7 +193,7 @@ namespace KSS.Components
             };
         }
 
-        public void SetData( IForwardReferenceMap l, SerializedData data )
+        public void SetData( SerializedData data, IForwardReferenceMap l )
         {
             if( data.TryGetValue( "max_build_points", out var maxBuildPoints ) )
                 this._maxBuildPoints = (float)maxBuildPoints;

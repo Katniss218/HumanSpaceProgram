@@ -135,7 +135,7 @@ namespace KSS.Core.Components
             };
         }
 
-        public void SetData( IForwardReferenceMap l, SerializedData data )
+        public void SetData( SerializedData data, IForwardReferenceMap l )
         {
             if( data.TryGetValue( "range", out var range ) )
                 this.Range = (float)range;

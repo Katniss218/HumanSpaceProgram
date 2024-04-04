@@ -54,7 +54,7 @@ namespace KSS.Core.Components
             };
         }
 
-        public void SetData( IForwardReferenceMap l, SerializedData data )
+        public void SetData( SerializedData data, IForwardReferenceMap l )
         {
             if( data.TryGetValue( "target", out var target ) )
                 this.Target = (GameObject)l.ReadObjectReference( target );

@@ -179,25 +179,27 @@ namespace KSS.Core.Physics
             return new SerializedObject()
             {
                 { "mass", this.Mass },
-                { "local_center_of_mass", s.WriteVector3( this.LocalCenterOfMass ) },
-                { "velocity", s.WriteVector3( this.Velocity ) },
-                { "angular_velocity", s.WriteVector3( this.AngularVelocity ) }
+                { "local_center_of_mass", this.LocalCenterOfMass.GetData() },
+                { "velocity", this.Velocity.GetData() },
+                { "angular_velocity", this.AngularVelocity.GetData() }
             };
         }
 
-        public void SetData( IForwardReferenceMap l, SerializedData data )
+        public void SetData( SerializedData data, IForwardReferenceMap l )
         {
+            _rb.isKinematic = false; // FreePhysicsObject is never kinematic. This is needed because it may be called first.
+
             if( data.TryGetValue( "mass", out var mass ) )
                 this.Mass = (float)mass;
 
             if( data.TryGetValue( "local_center_of_mass", out var localCenterOfMass ) )
-                this.LocalCenterOfMass = l.ReadVector3( localCenterOfMass );
+                this.LocalCenterOfMass = localCenterOfMass.ToVector3();
 
             if( data.TryGetValue( "velocity", out var velocity ) )
-                this.Velocity = l.ReadVector3( velocity );
+                this.Velocity = velocity.ToVector3();
 
             if( data.TryGetValue( "angular_velocity", out var angularVelocity ) )
-                this.AngularVelocity = l.ReadVector3( angularVelocity );
+                this.AngularVelocity = angularVelocity.ToVector3();
         }
     }
 }

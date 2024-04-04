@@ -24,7 +24,7 @@ namespace UnityPlus.Serialization
             };
         }
 
-        public static void SetData( this MeshRenderer mr, IForwardReferenceMap l, SerializedData data )
+        public static void SetData( this MeshRenderer mr, SerializedData data, IForwardReferenceMap l )
         {
             if( data.TryGetValue( "shared_materials", out var sharedMaterials ) )
             {

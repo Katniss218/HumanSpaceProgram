@@ -184,7 +184,7 @@ namespace KSS.Core
             };
         }
 
-        public void SetData( IForwardReferenceMap l, SerializedData data )
+        public void SetData( SerializedData data, IForwardReferenceMap l )
         {
             if( data.TryGetValue( "ut", out var ut ) )
                 UT = ut;

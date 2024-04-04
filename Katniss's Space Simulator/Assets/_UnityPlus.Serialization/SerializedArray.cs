@@ -41,6 +41,11 @@ namespace UnityPlus.Serialization
         {
             throw new NotSupportedException( $"Tried to invoke {nameof( TryGetValue )}, which is not supported on {nameof( SerializedArray )}." );
         }
+        
+        public override bool TryGetValue<T>( string name, out T value )
+        {
+            throw new NotSupportedException( $"Tried to invoke {nameof( TryGetValue )}<T>, which is not supported on {nameof( SerializedArray )}." );
+        }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public void Add( SerializedData item )

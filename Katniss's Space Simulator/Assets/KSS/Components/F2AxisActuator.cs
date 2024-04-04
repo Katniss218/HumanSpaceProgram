@@ -98,7 +98,7 @@ namespace KSS.Components
 			};
 		}
 
-		public void SetData( IForwardReferenceMap l, SerializedData data )
+		public void SetData( SerializedData data, IForwardReferenceMap l )
 		{
 			if( data.TryGetValue("reference_transform", out var referenceTransform ) )
 				this.ReferenceTransform = l.ReadObjectReference( referenceTransform ) as Transform;

@@ -15,23 +15,23 @@ namespace UnityPlus.Serialization
         {
             return new SerializedObject()
             {
-                { "local_position", s.WriteVector3( t.localPosition ) },
-                { "local_rotation", s.WriteQuaternion( t.localRotation ) },
-                { "local_scale", s.WriteVector3( t.localScale ) }
+                { "local_position", t.localPosition.GetData() },
+                { "local_rotation", t.localRotation.GetData() },
+                { "local_scale", t.localScale.GetData() }
             };
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static void SetData( this Transform t, IForwardReferenceMap l, SerializedData data )
+        public static void SetData( this Transform t, SerializedData data, IForwardReferenceMap l )
         {
             if( data.TryGetValue( "local_position", out var localPosition ) )
-                t.localPosition = l.ReadVector3( localPosition );
+                t.localPosition = localPosition.ToVector3();
 
             if( data.TryGetValue( "local_rotation", out var localRotation ) )
-                t.localRotation = l.ReadQuaternion( localRotation );
+                t.localRotation = localRotation.ToQuaternion();
 
             if( data.TryGetValue( "local_scale", out var localScale ) )
-                t.localScale = l.ReadVector3( localScale );
+                t.localScale = localScale.ToVector3();
         }
     }
 }

@@ -106,6 +106,19 @@ namespace UnityPlus.Serialization
         {
             return _children.TryGetValue( key, out value );
         }
+        
+        /// <returns>True if the value was found, and matches the specified type.</returns>
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public override bool TryGetValue<T>( string key, out T value )
+        {
+            if( _children.TryGetValue( key, out var tempValue ) && tempValue is T tempValueOfType )
+            {
+                value = tempValueOfType;
+                return true;
+            }
+            value = default;
+            return false;
+        }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         IEnumerator IEnumerable.GetEnumerator()

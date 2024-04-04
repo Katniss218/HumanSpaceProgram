@@ -37,7 +37,7 @@ namespace UnityPlus.Serialization
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static void SetData( this LODGroup lg, IForwardReferenceMap l, SerializedData data )
+        public static void SetData( this LODGroup lg, SerializedData data, IForwardReferenceMap l )
         {
             if( data.TryGetValue( "lods", out var lods1 ) )
             {

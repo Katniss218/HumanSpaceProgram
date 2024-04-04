@@ -19,7 +19,7 @@ namespace UnityPlus.Serialization
             };
         }
 
-        public static void SetData( this Rigidbody rb, IForwardReferenceMap l, SerializedData data )
+        public static void SetData( this Rigidbody rb, SerializedData data, IForwardReferenceMap l )
         {
             if( data.TryGetValue( "is_kinematic", out var isKinematic ) )
                 rb.isKinematic = (bool)isKinematic;

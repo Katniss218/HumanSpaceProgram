@@ -61,7 +61,7 @@ namespace KSS.Core
             throw new System.NotImplementedException();
         }
 
-        public void SetData( IForwardReferenceMap l, SerializedData data )
+        public void SetData( SerializedData data, IForwardReferenceMap l )
         {
             throw new System.NotImplementedException();
         }

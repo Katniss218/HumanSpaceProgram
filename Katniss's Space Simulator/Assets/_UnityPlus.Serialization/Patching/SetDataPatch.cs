@@ -25,7 +25,7 @@ namespace UnityPlus.Serialization.Patching
                 object obj = refMap.GetObj( change.objId );
                 try
                 {
-                    obj.SetData( refMap, change.data );
+                    obj.SetData( change.data, refMap );
                 }
                 catch( Exception ex )
                 {

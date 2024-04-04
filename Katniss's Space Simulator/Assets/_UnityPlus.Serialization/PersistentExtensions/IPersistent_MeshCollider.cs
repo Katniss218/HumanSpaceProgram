@@ -21,7 +21,7 @@ namespace UnityPlus.Serialization
             };
         }
 
-        public static void SetData( this MeshCollider mc, IForwardReferenceMap l, SerializedData data )
+        public static void SetData( this MeshCollider mc, SerializedData data, IForwardReferenceMap l )
         {
             if( data.TryGetValue( "shared_mesh", out var sharedMesh ) )
                 mc.sharedMesh = l.ReadAssetReference<Mesh>( sharedMesh );

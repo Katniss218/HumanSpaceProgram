@@ -20,7 +20,7 @@ namespace KSS.Core
             };
         }
 
-        public void SetData( IForwardReferenceMap l, SerializedData data )
+        public void SetData( SerializedData data, IForwardReferenceMap l )
         {
             if( data.TryGetValue( "display_name", out var displayName ) )
                 this.DisplayName = (string)displayName;

@@ -72,15 +72,15 @@ namespace KSS.Components
 			}
 		}
 
-		public SerializedData GetObjects( IReverseReferenceMap s )
+		public SerializedObject GetObjects( IReverseReferenceMap s )
 		{
-			SerializedArray array = new SerializedArray();
+			/*SerializedArray array = new SerializedArray();
 			foreach( var act in Actuators2D )
 			{
 				SerializedObject elemData = new SerializedObject()
 				{
-					{ KeyNames.ID, s.WriteGuid( s.GetID( act.OnSetXY ) ) },
-					{ KeyNames.ID, s.WriteGuid( s.GetID( act.GetReferenceTransform ) ) }
+					{ "on_set_xy", s.GetID( act.OnSetXY ).GetData() },
+					{ "get_reference_transform", s.GetID( act.GetReferenceTransform ).GetData() }
 				};
 				array.Add( elemData );
 			}
@@ -88,17 +88,18 @@ namespace KSS.Components
 			return new SerializedObject()
 			{
 				{ "actuators_2d", array },
-			};
+			};*/
+			return new SerializedObject();
 		}
 
-		public void SetObjects( IForwardReferenceMap l, SerializedData data )
+		public void SetObjects( SerializedObject data, IForwardReferenceMap l )
 		{
-			throw new NotImplementedException();
+
 		}
 
 		public SerializedData GetData( IReverseReferenceMap s )
 		{
-			SerializedArray array = new SerializedArray();
+			/*SerializedArray array = new SerializedArray();
 			foreach( var act in Actuators2D )
 			{
 				SerializedObject elemData = new SerializedObject()
@@ -112,10 +113,11 @@ namespace KSS.Components
 			return new SerializedObject()
 			{
 				{ "actuators_2d", array }
-			};
+			};*/
+			return new SerializedObject();
 		}
 
-		public void SetData( IForwardReferenceMap l, SerializedData data )
+		public void SetData( SerializedData data, IForwardReferenceMap l )
 		{
 			if( data.TryGetValue( "actuators_2d", out var actuators2D ) )
 			{
@@ -126,7 +128,7 @@ namespace KSS.Components
 				foreach( var elemData in (SerializedArray)actuators2D )
 				{
 					this.Actuators2D[i] = new Actuator2DGroup();
-					this.Actuators2D[i].SetData( l, elemData );
+					this.Actuators2D[i].SetData( elemData, l );
 					i++;
 				}
 			}

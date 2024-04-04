@@ -47,7 +47,7 @@ namespace KSS.Core.ResourceFlowSystem
             };
         }
 
-        public void SetData( IForwardReferenceMap l, SerializedData data )
+        public void SetData( SerializedData data, IForwardReferenceMap l )
         {
             Substance = l.ReadAssetReference<Substance>( data["substance"] );
             MassAmount = (float)data["mass_amount"];
