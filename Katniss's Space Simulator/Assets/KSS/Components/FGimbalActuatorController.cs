@@ -94,6 +94,10 @@ namespace KSS.Components
         void FixedUpdate()
         {
             IPartObject partObject = this.transform.GetPartObject();
+            if( partObject == null )
+            {
+                return;
+            }
 
             Vector3 worldSteering = partObject.ReferenceTransform.TransformDirection( AttitudeCommand );
 

@@ -80,6 +80,8 @@ namespace KSS.UI
             node.Group = groupUI;
             dragger.OnDragging = node.OnDragged;
 
+            panel.rectTransform.sizeDelta = new Vector2( panel.rectTransform.sizeDelta.x, ((RectTransform)groupUI.transform).sizeDelta.y + 20f );
+
             return node;
         }
     }
