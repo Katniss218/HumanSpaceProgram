@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace UnityPlus.Serialization
 {
-    public static class Persistent_Renderer
+    public static class IPersistent_Renderer
     {
         public static SerializedData GetData( this Renderer r, IReverseReferenceMap s )
         {

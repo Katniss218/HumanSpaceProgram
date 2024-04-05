@@ -14,25 +14,22 @@ namespace UnityPlus.Serialization
             // this should also handle immutables.
         }
 
-        public static object Create( SerializedObject data, IForwardReferenceMap l )
+        public static object ToObject( this SerializedObject data, IForwardReferenceMap l )
         {
-            // this just instantiates.
-            // call object.SetObjects( ... ) to deserialize the object parts.
-
             Type type = data[KeyNames.TYPE].ToType();
             Guid id = data[KeyNames.ID].ToGuid();
 
             object obj = null;
             if( _cache.TryGetClosest( type, out var factoryFunc ) )
             {
+                // Factory func should add everything it creates to the reference map.
                 obj = factoryFunc.Invoke( type, l );
             }
             else
             {
                 obj = Activator.CreateInstance( type );
+                l.SetObj( id, obj );
             }
-
-            l.SetObj( id, obj );
 
             return obj;
         }

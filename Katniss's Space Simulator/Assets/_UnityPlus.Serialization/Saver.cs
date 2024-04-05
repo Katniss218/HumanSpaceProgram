@@ -41,6 +41,15 @@ namespace UnityPlus.Serialization
             this._dataActions = new List<ISaver.Action>() { dataAction };
         }
 
+        public Saver( IReverseReferenceMap refMap, IEnumerable<ISaver.Action> objectActions, IEnumerable<ISaver.Action> dataActions )
+        {
+            this.RefMap = refMap;
+            this._startFunc = null;
+            this._finishFunc = null;
+            this._objectActions = new List<ISaver.Action>( objectActions );
+            this._dataActions = new List<ISaver.Action>( dataActions );
+        }
+
         public Saver( IReverseReferenceMap refMap, Action startFunc, Action finishFunc, IEnumerable<ISaver.Action> objectActions, IEnumerable<ISaver.Action> dataActions )
         {
             this.RefMap = refMap;

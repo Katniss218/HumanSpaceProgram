@@ -39,6 +39,16 @@ namespace KSS.Core.Serialization
         /// </summary>
         public string Author { get; set; }
 
+        /// <summary>
+        /// The version of the vessel file.
+        /// </summary>
+        public Version FileVersion { get; set; }
+
+        /// <summary>
+        /// The versions of all the mods used when the vessel file was created.
+        /// </summary>
+        public Dictionary<string, Version> ModVersions { get; set; } = new Dictionary<string, Version>();
+
         public VesselMetadata( string id )
         {
             this.ID = id;
@@ -93,11 +103,18 @@ namespace KSS.Core.Serialization
 
         public SerializedData GetData()
         {
+            SerializedObject modVersions = new SerializedObject();
+            foreach( var elemKvp in this.ModVersions )
+            {
+                modVersions.Add( elemKvp.Key, elemKvp.Value.ToString() );
+            }
             return new SerializedObject()
             {
                 { "name", this.Name },
                 { "description", this.Description },
                 { "author", this.Author },
+                { "file_version", this.FileVersion.ToString() },
+                { "mod_versions", modVersions }
             };
         }
 
@@ -114,6 +131,19 @@ namespace KSS.Core.Serialization
             if( data.TryGetValue( "author", out var author ) )
             {
                 this.Author = (string)author;
+            }
+            if( data.TryGetValue( "file_version", out var saveVersion ) )
+            {
+                this.FileVersion = Version.Parse( (string)saveVersion );
+            }
+
+            if( data.TryGetValue( "mod_versions", out var modVersions ) )
+            {
+                this.ModVersions = new Dictionary<string, Version>();
+                foreach( var elemKvp in (SerializedObject)modVersions )
+                {
+                    this.ModVersions.Add( elemKvp.Key, Version.Parse( (string)elemKvp.Value ) );
+                }
             }
         }
     }

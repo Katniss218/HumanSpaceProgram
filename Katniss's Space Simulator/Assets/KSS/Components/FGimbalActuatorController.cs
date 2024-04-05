@@ -144,7 +144,7 @@ namespace KSS.Components
 
         public SerializedData GetData( IReverseReferenceMap s )
         {
-            SerializedObject ret = (SerializedObject)Persistent_Behaviour.GetData( this, s );
+            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
 
             SerializedArray array = new SerializedArray();
             foreach( var act in Actuators2D )
@@ -168,7 +168,7 @@ namespace KSS.Components
 
         public void SetData( SerializedData data, IForwardReferenceMap l )
         {
-            Persistent_Behaviour.SetData( this, data, l );
+            IPersistent_Behaviour.SetData( this, data, l );
 
             if( data.TryGetValue( "actuators_2d", out var actuators2D ) )
             {

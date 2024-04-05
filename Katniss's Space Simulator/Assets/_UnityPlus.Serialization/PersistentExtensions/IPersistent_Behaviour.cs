@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace UnityPlus.Serialization
 {
-    public static class Persistent_Behaviour
+    public static class IPersistent_Behaviour
     {
         public static SerializedData GetData( this Behaviour bc, IReverseReferenceMap s )
         {

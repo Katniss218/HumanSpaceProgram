@@ -22,7 +22,7 @@ namespace UnityPlus.Serialization
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
 		public static DateTime ToDateTime( this SerializedData data, IForwardReferenceMap l = null ) 
 		{
-			return DateTime.Parse( (string)data, CultureInfo.InvariantCulture );
+			return DateTime.ParseExact( (string)data, "s", CultureInfo.InvariantCulture );
 		}
 	}
 }

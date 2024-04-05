@@ -233,6 +233,8 @@ namespace KSS.DesignScene
             VesselMetadata loadedVesselMetadata = new VesselMetadata( vesselId );
             loadedVesselMetadata.ReadDataFromDisk();
 
+#warning TODO - add an event and update the UI when a vessel is loaded.
+
             // load current vessel from the files defined by metadata's ID.
             Directory.CreateDirectory( loadedVesselMetadata.GetRootDirectory() );
             _designObjDataHandler.ObjectsFilename = Path.Combine( loadedVesselMetadata.GetRootDirectory(), "objects.json" );

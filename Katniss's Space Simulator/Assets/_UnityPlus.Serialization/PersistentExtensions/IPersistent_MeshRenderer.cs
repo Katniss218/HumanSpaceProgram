@@ -13,7 +13,7 @@ namespace UnityPlus.Serialization
     {
         public static SerializedData GetData( this MeshRenderer mr, IReverseReferenceMap s )
         {
-            SerializedObject ret = (SerializedObject)Persistent_Renderer.GetData( mr, s );
+            SerializedObject ret = (SerializedObject)IPersistent_Renderer.GetData( mr, s );
 
             ret.AddAll( new SerializedObject()
             {
@@ -27,7 +27,7 @@ namespace UnityPlus.Serialization
 
         public static void SetData( this MeshRenderer mr, SerializedData data, IForwardReferenceMap l )
         {
-            Persistent_Renderer.SetData( mr, data, l );
+            IPersistent_Renderer.SetData( mr, data, l );
 
             if( data.TryGetValue( "shared_materials", out var sharedMaterials ) )
             {

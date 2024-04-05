@@ -8,6 +8,8 @@ namespace UnityPlus.Serialization
 {
     public static class Persistent_object
     {
+        // In practice, this isn't really needed anymore. Since auto-serialization is out the window now, all binding is done at compile time now.
+
         public static SerializedObject GetObjects( this object obj, IReverseReferenceMap s )
         {
             Type type = obj.GetType();
@@ -17,16 +19,6 @@ namespace UnityPlus.Serialization
                 { KeyNames.ID, s.GetID( obj ).GetData() },
                 { KeyNames.TYPE, type.GetData() }
             };
-
-            /*if( obj is IAutoPersistsObjects )
-            {
-                SerializedObject ownsMap = PersistsAutomatic.GetObjects( obj, type, s );
-
-                foreach( var kvp in ownsMap )
-                {
-                    data.Add( kvp.Key, kvp.Value );
-                }
-            }*/
 
             if( obj is IPersistsObjects p )
             {
@@ -56,11 +48,6 @@ namespace UnityPlus.Serialization
 
         public static void SetObjects( this object obj, SerializedObject data, IForwardReferenceMap l )
         {
-            /*if( obj is IAutoPersistsObjects )
-            {
-                PersistsAutomatic.SetObjects( obj, obj.GetType(), data, l );
-            }*/
-
             if( obj is IPersistsObjects p )
             {
                 p.SetObjects( data, l ); // this can override auto-serialized members
@@ -73,13 +60,6 @@ namespace UnityPlus.Serialization
 
         public static SerializedData GetData( this object obj, IReverseReferenceMap s )
         {
-            /*if( obj is IAutoPersistsData )
-            {
-                var rootSO = PersistsAutomatic.GetData( obj, obj.GetType(), s );
-
-                return rootSO; // TODO - combine with rest.
-            }*/
-
             switch( obj )
             {
                 case IPersistsData o:
@@ -91,11 +71,6 @@ namespace UnityPlus.Serialization
 
         public static void SetData( this object obj, SerializedData data, IForwardReferenceMap l )
         {
-            /*if( obj is IAutoPersistsData )
-            {
-                PersistsAutomatic.SetData( obj, obj.GetType(), l, data );
-            }*/
-
             switch( obj )
             {
                 case IPersistsData o:

@@ -31,12 +31,12 @@ namespace KSS.Components
 
         public SerializedData GetData( IReverseReferenceMap s )
         {
-            SerializedObject ret = (SerializedObject)Persistent_Behaviour.GetData( this, s );
+            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
 
             ret.AddAll( new SerializedObject()
             {
                 { "mass", this._mass },
-                { "on_after_mass_changed", s.WriteDelegate( this.OnAfterMassChanged ) }
+                { "on_after_mass_changed", this.OnAfterMassChanged.GetData( s ) }
             } );
 
             return ret;
@@ -44,13 +44,13 @@ namespace KSS.Components
 
         public void SetData( SerializedData data, IForwardReferenceMap l )
         {
-            Persistent_Behaviour.SetData( this, data, l );
+            IPersistent_Behaviour.SetData( this, data, l );
 
             if( data.TryGetValue( "mass", out var mass ) )
                 this._mass = (float)mass;
 
             if( data.TryGetValue( "on_after_mass_changed", out var onAfterMassChanged ) )
-                this.OnAfterMassChanged = (IHasMass.MassChange)l.ReadDelegate( onAfterMassChanged );
+                this.OnAfterMassChanged = (IHasMass.MassChange)onAfterMassChanged.ToDelegate( l );
         }
     }
 }

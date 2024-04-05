@@ -75,7 +75,7 @@ namespace KSS.Core
 
         public SerializedData GetData( IReverseReferenceMap s )
         {
-            SerializedObject ret = (SerializedObject)Persistent_Behaviour.GetData( this, s );
+            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
 
             //ret.AddAll( new SerializedObject()
 
@@ -84,7 +84,7 @@ namespace KSS.Core
 
         public void SetData( SerializedData data, IForwardReferenceMap l )
         {
-            Persistent_Behaviour.SetData( this, data, l );
+            IPersistent_Behaviour.SetData( this, data, l );
 
             //
         }
