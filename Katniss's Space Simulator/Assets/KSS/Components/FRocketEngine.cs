@@ -11,7 +11,7 @@ using KSS.Control.Controls;
 namespace KSS.Components
 {
 	[Serializable]
-	public class FRocketEngine : MonoBehaviour, IResourceConsumer, IPersistsData
+	public class FRocketEngine : MonoBehaviour, IResourceConsumer, IPersistsObjects, IPersistsData
 	{
 		const float g = 9.80665f;
 
@@ -89,7 +89,24 @@ namespace KSS.Components
 			return FluidState.Vacuum; // temp, inlet condition (possible backflow, etc).
 		}
 
-		public SerializedData GetData( IReverseReferenceMap s )
+        public SerializedObject GetObjects( IReverseReferenceMap s )
+        {
+            return new SerializedObject()
+            {
+                { "set_throttle", s.GetID( SetThrottle ).GetData() },
+            };
+        }
+
+        public void SetObjects( SerializedObject data, IForwardReferenceMap l )
+        {
+            if( data.TryGetValue( "set_throttle", out var setThrottle ) )
+            {
+                SetThrottle = new( SetThrottleListener );
+                l.SetObj( setThrottle.ToGuid(), SetThrottle );
+            }
+        }
+
+        public SerializedData GetData( IReverseReferenceMap s )
         {
             SerializedObject ret = (SerializedObject)Persistent_Behaviour.GetData( this, s );
 

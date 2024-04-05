@@ -71,7 +71,8 @@ namespace KSS.Core
 
         static float _maxTimeScale = 128.0f;
 
-#warning TODO - when pausing the game to enter main menu (displaying screen pauses), it doesn't unpause after the main menu is loaded. this can cause desyncs.
+#warning TODO - split off the keyboard `<` `>` controller from this manager.
+
         private static float _timeScale = 1;
         private static float _oldTimeScale = 1;
 

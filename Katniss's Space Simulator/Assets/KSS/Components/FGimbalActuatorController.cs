@@ -15,7 +15,7 @@ namespace KSS.Components
     /// </summary>
     public class FGimbalActuatorController : MonoBehaviour, IPersistsObjects, IPersistsData
     {
-        public class Actuator2DGroup : ControlGroup, IPersistsObjects
+        public class Actuator2DGroup : ControlGroup, IPersistsObjects, IPersistsData
         {
             [NamedControl( "Transform", "The object to use as the coordinate frame of the actuator." )]
             public ControlParameterInput<Transform> GetReferenceTransform = new();
@@ -46,6 +46,22 @@ namespace KSS.Components
                 {
                     OnSetXY = new();
                     l.SetObj( onSetXY.ToGuid(), OnSetXY );
+                }
+            }
+
+            public SerializedData GetData( IReverseReferenceMap s )
+            {
+                return new SerializedObject()
+                {
+                    { "on_set_xy", OnSetXY.GetData( s ) }
+                };
+            }
+
+            public void SetData( SerializedData data, IForwardReferenceMap l )
+            {
+                if( data.TryGetValue( "on_set_xy", out var onSetXY ) )
+                {
+                    this.OnSetXY.SetData( onSetXY, l );
                 }
             }
         }
@@ -111,7 +127,7 @@ namespace KSS.Components
 
         public void SetObjects( SerializedObject data, IForwardReferenceMap l )
         {
-            if( data.TryGetValue<SerializedArray>("actuators_2d", out var actuators2D ) )
+            if( data.TryGetValue<SerializedArray>( "actuators_2d", out var actuators2D ) )
             {
                 Actuators2D = actuators2D.Cast<SerializedObject>().Select( act =>
                 {
@@ -130,21 +146,22 @@ namespace KSS.Components
         {
             SerializedObject ret = (SerializedObject)Persistent_Behaviour.GetData( this, s );
 
-            /*SerializedArray array = new SerializedArray();
-			foreach( var act in Actuators2D )
-			{
-				SerializedObject elemData = new SerializedObject()
-				{
-					{ "on_set_xy", act.OnSetXY.GetData( s ) },
-					{ "get_reference_transform", act.GetReferenceTransform.GetData( s ) }
-				};
-				array.Add( elemData );
-			}
+            SerializedArray array = new SerializedArray();
+            foreach( var act in Actuators2D )
+            {
+                SerializedObject elemData = act == null
+                    ? null
+                    : new SerializedObject()
+                {
+                    { "on_set_xy", act.OnSetXY.GetData( s ) },
+                };
+                array.Add( elemData );
+            }
 
-			return new SerializedObject()
-			{
-				{ "actuators_2d", array }
-			};*/
+            ret.AddAll( new SerializedObject()
+            {
+                { "actuators_2d", array }
+            } );
 
             return ret;
         }
@@ -157,12 +174,13 @@ namespace KSS.Components
             {
                 // This is a bit too verbose imo.
                 // needs an extension method to make serializing/deserializing arrays/lists of any type cleaner.
-                this.Actuators2D = new Actuator2DGroup[((SerializedArray)actuators2D).Count];
                 int i = 0;
                 foreach( var elemData in (SerializedArray)actuators2D )
                 {
-                    this.Actuators2D[i] = new Actuator2DGroup();
-                    this.Actuators2D[i].SetData( elemData, l );
+                    if( elemData != null )
+                    {
+                        this.Actuators2D[i]?.SetData( elemData, l );
+                    }
                     i++;
                 }
             }

@@ -116,27 +116,67 @@ namespace KSS.Components
 
         public SerializedObject GetObjects( IReverseReferenceMap s )
         {
-			return null;
+			return new SerializedObject()
+			{
+				{ "on_set_throttle", s.GetID( OnSetThrottle ).GetData() },
+				{ "on_set_attitude", s.GetID( OnSetAttitude ).GetData() },
+				{ "on_set_translation", s.GetID( OnSetTranslation ).GetData() }
+			};
         }
 
         public void SetObjects( SerializedObject data, IForwardReferenceMap l )
         {
+			if( data.TryGetValue( "on_set_throttle", out var onSetThrottle ) )
+            {
+                OnSetThrottle = new();
+                l.SetObj( onSetThrottle.ToGuid(), OnSetThrottle );
+            }
+
+			if( data.TryGetValue( "on_set_attitude", out var onSetAttitude ) )
+            {
+                OnSetAttitude = new();
+                l.SetObj( onSetAttitude.ToGuid(), OnSetAttitude );
+            }
+
+			if( data.TryGetValue( "on_set_translation", out var onSetTranslation ) )
+            {
+                OnSetTranslation = new();
+                l.SetObj( onSetTranslation.ToGuid(), OnSetTranslation );
+            }
         }
 
         public SerializedData GetData( IReverseReferenceMap s )
         {
             SerializedObject ret = (SerializedObject)Persistent_Behaviour.GetData( this, s );
 
-            //ret.AddAll( new SerializedObject()
+            ret.AddAll( new SerializedObject()
+            {
+                { "on_set_throttle", OnSetThrottle.GetData( s ) },
+                { "on_set_attitude", OnSetAttitude.GetData( s ) },
+                { "on_set_translation", OnSetTranslation.GetData( s ) }
+            } );
 
-			return ret;
+            return ret;
         }
 
         public void SetData( SerializedData data, IForwardReferenceMap l )
         {
 			Persistent_Behaviour.SetData( this, data, l );
 
-			//
+            if( data.TryGetValue( "on_set_throttle", out var onSetThrottle ) )
+            {
+                this.OnSetThrottle.SetData( onSetThrottle, l );
+            }
+
+            if( data.TryGetValue( "on_set_attitude", out var onSetAttitude ) )
+            {
+                this.OnSetAttitude.SetData( onSetAttitude, l );
+            }
+
+            if( data.TryGetValue( "on_set_translation", out var onSetTranslation ) )
+            {
+                this.OnSetTranslation.SetData( onSetTranslation, l );
+            }
         }
     }
 }

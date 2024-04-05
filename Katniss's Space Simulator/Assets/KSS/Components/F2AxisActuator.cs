@@ -6,7 +6,7 @@ using UnityPlus.Serialization;
 
 namespace KSS.Components
 {
-	public class F2AxisActuator : MonoBehaviour, IPersistsData
+	public class F2AxisActuator : MonoBehaviour, IPersistsObjects, IPersistsData
 	{
 		// 2-axis actuator.
 
@@ -84,7 +84,38 @@ namespace KSS.Components
 			YActuatorTransform.localRotation = Quaternion.Euler( 0, 0, clampedY ) * YActuatorTransform.localRotation;
 		}
 
-		public SerializedData GetData( IReverseReferenceMap s )
+        public SerializedObject GetObjects( IReverseReferenceMap s )
+        {
+            return new SerializedObject()
+            {
+                { "set_x", s.GetID( SetX ).GetData() },
+                { "set_y", s.GetID( SetY ).GetData() },
+                { "set_xy", s.GetID( SetXY ).GetData() },
+            };
+        }
+
+        public void SetObjects( SerializedObject data, IForwardReferenceMap l )
+        {
+            if( data.TryGetValue( "set_x", out var setX ) )
+            {
+                SetX = new( SetXListener );
+                l.SetObj( setX.ToGuid(), SetX );
+            }
+
+            if( data.TryGetValue( "set_y", out var setY ) )
+            {
+                SetY = new( SetYListener );
+                l.SetObj( setY.ToGuid(), SetY );
+            }
+
+            if( data.TryGetValue( "set_xy", out var setXY ) )
+            {
+                SetXY = new( SetXYListener );
+                l.SetObj( setXY.ToGuid(), SetXY );
+            }
+        }
+
+        public SerializedData GetData( IReverseReferenceMap s )
         {
             SerializedObject ret = (SerializedObject)Persistent_Behaviour.GetData( this, s );
 
