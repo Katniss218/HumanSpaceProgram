@@ -8,10 +8,6 @@ namespace KSS.Components
 {
 	public class F2AxisActuator : MonoBehaviour, IPersistsObjects, IPersistsData
 	{
-		// 2-axis actuator.
-
-		// reference direction = parent direction.
-
 		/// <summary>
 		/// The transform used as a reference (0,0) orientation.
 		/// </summary>
@@ -91,6 +87,7 @@ namespace KSS.Components
                 { "set_x", s.GetID( SetX ).GetData() },
                 { "set_y", s.GetID( SetY ).GetData() },
                 { "set_xy", s.GetID( SetXY ).GetData() },
+                { "get_reference_transform", s.GetID( GetReferenceTransform ).GetData() }
             };
         }
 
@@ -113,6 +110,12 @@ namespace KSS.Components
                 SetXY = new( SetXYListener );
                 l.SetObj( setXY.ToGuid(), SetXY );
             }
+
+            if( data.TryGetValue( "get_reference_transform", out var getReferenceTransform ) )
+            {
+                GetReferenceTransform = new( GetTransform );
+                l.SetObj( getReferenceTransform.ToGuid(), GetReferenceTransform );
+            }
         }
 
         public SerializedData GetData( IReverseReferenceMap s )
@@ -127,7 +130,8 @@ namespace KSS.Components
 				{ "min_x", this.MinX },
 				{ "min_y", this.MinY },
 				{ "max_x", this.MaxX },
-				{ "max_y", this.MaxY }
+				{ "max_y", this.MaxY },
+				{ "get_reference_transform", this.GetReferenceTransform.GetData( s ) }
 			} );
 
 			return ret;
@@ -153,6 +157,9 @@ namespace KSS.Components
 				this.MaxX = (float)maxX;
 			if( data.TryGetValue( "max_y", out var maxY ) )
 				this.MaxY = (float)maxY;
+
+			if( data.TryGetValue( "get_reference_transform", out var getReferenceTransform ) )
+				this.GetReferenceTransform.SetData( getReferenceTransform, l );
 		}
 	}
 }

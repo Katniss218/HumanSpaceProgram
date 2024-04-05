@@ -10,9 +10,24 @@ using UnityPlus.Serialization;
 
 namespace KSS.Components
 {
-    [Obsolete("Not implemented yet.")] // TODO - add actual functionality.
-    public class F1AxisActuator : MonoBehaviour, IPersistsData
+    public class F1AxisActuator : MonoBehaviour, IPersistsObjects, IPersistsData
     {
+        /// <summary>
+        /// The transform used as a reference (0) orientation.
+        /// </summary>
+        [field: SerializeField]
+        public Transform ReferenceTransform { get; set; }
+
+        [NamedControl( "Coordinate Space Transform" )]
+        public ControlParameterOutput<Transform> GetReferenceTransform;
+        public Transform GetTransform()
+        {
+            return ReferenceTransform;
+        }
+
+        [field: SerializeField]
+        public Transform XActuatorTransform { get; set; }
+
         public float X { get; set; }
         
 		[field: SerializeField]
@@ -27,11 +42,56 @@ namespace KSS.Components
             this.X = x;
         }
 
+        void Awake()
+        {
+            GetReferenceTransform = new ControlParameterOutput<Transform>( GetTransform );
+            SetX = new ControlleeInput<float>( SetXListener );
+        }
+
+        void FixedUpdate()
+        {
+            float clampedX = Mathf.Clamp( X, MinX, MaxX );
+
+            XActuatorTransform.localRotation = Quaternion.identity;
+            XActuatorTransform.localRotation = Quaternion.Euler( clampedX, 0, 0 ) * XActuatorTransform.localRotation;
+        }
+
+        public SerializedObject GetObjects( IReverseReferenceMap s )
+        {
+            return new SerializedObject()
+            {
+                { "set_x", s.GetID( SetX ).GetData() },
+                { "get_reference_transform", s.GetID( GetReferenceTransform ).GetData() }
+            };
+        }
+
+        public void SetObjects( SerializedObject data, IForwardReferenceMap l )
+        {
+            if( data.TryGetValue( "set_x", out var setX ) )
+            {
+                SetX = new( SetXListener );
+                l.SetObj( setX.ToGuid(), SetX );
+            }
+
+            if( data.TryGetValue( "get_reference_transform", out var getReferenceTransform ) )
+            {
+                GetReferenceTransform = new( GetTransform );
+                l.SetObj( getReferenceTransform.ToGuid(), GetReferenceTransform );
+            }
+        }
+
         public SerializedData GetData( IReverseReferenceMap s )
         {
             SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
 
-            //ret.AddAll( new SerializedObject()
+            ret.AddAll( new SerializedObject()
+            {
+                { "reference_transform", s.WriteObjectReference( this.ReferenceTransform ) },
+                { "x_actuator_transform", s.WriteObjectReference( this.XActuatorTransform ) },
+                { "min_x", this.MinX },
+                { "max_x", this.MaxX },
+                { "get_reference_transform", this.GetReferenceTransform.GetData( s ) }
+            } );
 
             return ret;
         }
@@ -40,7 +100,19 @@ namespace KSS.Components
         {
             IPersistent_Behaviour.SetData( this, data, l );
 
-            //
+            if( data.TryGetValue( "reference_transform", out var referenceTransform ) )
+                this.ReferenceTransform = l.ReadObjectReference( referenceTransform ) as Transform;
+
+            if( data.TryGetValue( "x_actuator_transform", out var xActuatorTransform ) )
+                this.XActuatorTransform = l.ReadObjectReference( xActuatorTransform ) as Transform;
+
+            if( data.TryGetValue( "min_x", out var minX ) )
+                this.MinX = (float)minX;
+            if( data.TryGetValue( "max_x", out var maxX ) )
+                this.MaxX = (float)maxX;
+
+            if( data.TryGetValue( "get_reference_transform", out var getReferenceTransform ) )
+                this.GetReferenceTransform.SetData( getReferenceTransform, l );
         }
 	}
 }

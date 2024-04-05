@@ -122,6 +122,7 @@ namespace KSS.Components
             return new SerializedObject()
             {
                 { "actuators_2d", array },
+                { "set_attitude", s.GetID( SetAttitude ).GetData() }
             };
         }
 
@@ -139,6 +140,12 @@ namespace KSS.Components
                     return ret;
 
                 } ).ToArray();
+            }
+
+            if( data.TryGetValue( "set_attitude", out var setAttitude ) )
+            {
+                SetAttitude = new( SetAttitudeListener );
+                l.SetObj( setAttitude.ToGuid(), SetAttitude );
             }
         }
 
@@ -160,7 +167,7 @@ namespace KSS.Components
 
             ret.AddAll( new SerializedObject()
             {
-                { "actuators_2d", array }
+                { "actuators_2d", array },
             } );
 
             return ret;
