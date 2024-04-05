@@ -15,14 +15,7 @@ namespace UnityPlus.Serialization
 		{
 			return (SerializedPrimitive)value;
 		}
-		
-		// Immutable - can't do.
-        /*[MethodImpl( MethodImplOptions.AggressiveInlining )]
-		public static void SetData( this ref string value, IForwardReferenceMap l, SerializedData data )
-		{
-			value = (string)data;
-		}*/
-		
+				
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
 		public static string ToString( this SerializedData data, IForwardReferenceMap l = null ) 
 		{

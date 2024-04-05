@@ -13,19 +13,22 @@ namespace UnityPlus.Serialization
     {
         public static SerializedData GetData( this MeshRenderer mr, IReverseReferenceMap s )
         {
-            var mats = mr.sharedMaterials.Select( mat => s.WriteAssetReference( mat ) );
-            SerializedArray matsJson = new SerializedArray( mats );
+            SerializedObject ret = (SerializedObject)Persistent_Renderer.GetData( mr, s );
 
-            return new SerializedObject()
+            ret.AddAll( new SerializedObject()
             {
-                { "shared_materials", matsJson },
+                { "shared_materials", new SerializedArray( mr.sharedMaterials.Select( mat => s.WriteAssetReference( mat ) ) ) },
                 { "shadow_casting_mode", mr.shadowCastingMode.ToString() },
                 { "receive_shadows", mr.receiveShadows }
-            };
+            } );
+
+            return ret;
         }
 
         public static void SetData( this MeshRenderer mr, SerializedData data, IForwardReferenceMap l )
         {
+            Persistent_Renderer.SetData( mr, data, l );
+
             if( data.TryGetValue( "shared_materials", out var sharedMaterials ) )
             {
                 List<Material> mats = new List<Material>();

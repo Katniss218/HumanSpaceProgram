@@ -20,14 +20,20 @@ namespace KSS.Core.Components
 
         public SerializedData GetData( IReverseReferenceMap s )
         {
-            return new SerializedObject()
+            SerializedObject ret = (SerializedObject)Persistent_Behaviour.GetData( this, s );
+
+            ret.AddAll( new SerializedObject()
             {
                 { "part_id", s.WriteNamespacedIdentifier( this.PartID ) }
-            };
+            } );
+
+            return ret;
         }
 
         public void SetData( SerializedData data, IForwardReferenceMap l )
         {
+            Persistent_Behaviour.SetData( this, data, l );
+
             if( data.TryGetValue( "part_id", out var partId ) )
                 this.PartID = l.ReadNamespacedIdentifier( partId );
         }

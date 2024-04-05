@@ -8,13 +8,14 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Input;
+using UnityPlus.Serialization;
 
 namespace KSS.Components
 {
 	/// <summary>
 	/// Sends steering and throttle signals based on player input.
 	/// </summary>
-	public class FPlayerInputAvionics : MonoBehaviour
+	public class FPlayerInputAvionics : MonoBehaviour, IPersistsObjects, IPersistsData
 	{
 		// avionics will be a complicated and very broad system with many different subsystems, subcomponents, etc.
 
@@ -112,5 +113,30 @@ namespace KSS.Components
 			OnSetAttitude.TrySendSignal( new Vector3( _pitchSignal, _yawSignal, _rollSignal ) );
 			return false;
 		}
-	}
+
+        public SerializedObject GetObjects( IReverseReferenceMap s )
+        {
+			return null;
+        }
+
+        public void SetObjects( SerializedObject data, IForwardReferenceMap l )
+        {
+        }
+
+        public SerializedData GetData( IReverseReferenceMap s )
+        {
+            SerializedObject ret = (SerializedObject)Persistent_Behaviour.GetData( this, s );
+
+            //ret.AddAll( new SerializedObject()
+
+			return ret;
+        }
+
+        public void SetData( SerializedData data, IForwardReferenceMap l )
+        {
+			Persistent_Behaviour.SetData( this, data, l );
+
+			//
+        }
+    }
 }

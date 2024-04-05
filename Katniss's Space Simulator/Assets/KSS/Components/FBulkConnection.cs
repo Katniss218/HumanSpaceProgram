@@ -282,16 +282,22 @@ namespace KSS.Components
 
         public SerializedData GetData( IReverseReferenceMap s )
         {
-            return new SerializedObject()
+            SerializedObject ret = (SerializedObject)Persistent_Behaviour.GetData( this, s );
+
+            ret.AddAll( new SerializedObject()
             {
                 { "end1", this.End1.GetData( s ) },
                 { "end2", this.End2.GetData( s ) },
                 { "cross_section_area", this.CrossSectionArea }
-            };
+            } );
+
+            return ret;
         }
 
         public void SetData( SerializedData data, IForwardReferenceMap l )
         {
+            Persistent_Behaviour.SetData( this, data, l );
+
             if( data.TryGetValue( "end1", out var end1 ) )
                 this.End1.SetData( end1, l );
             if( data.TryGetValue( "end2", out var end2 ) )

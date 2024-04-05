@@ -58,12 +58,18 @@ namespace KSS.Core
 
         public SerializedData GetData( IReverseReferenceMap s )
         {
-            throw new System.NotImplementedException();
+            SerializedObject ret = (SerializedObject)Persistent_Behaviour.GetData( this, s );
+
+            //ret.AddAll( new SerializedObject()
+
+            return ret;
         }
 
         public void SetData( SerializedData data, IForwardReferenceMap l )
         {
-            throw new System.NotImplementedException();
+            Persistent_Behaviour.SetData( this, data, l );
+
+            //
         }
     }
 }

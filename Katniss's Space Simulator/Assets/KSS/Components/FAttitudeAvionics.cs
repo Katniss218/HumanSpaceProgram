@@ -6,19 +6,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEditor.PackageManager;
 using KSS.Core;
-using UnityEngine.Diagnostics;
-using UnityEditor;
 using KSS.Core.ReferenceFrames;
 using System.Runtime.CompilerServices;
+using UnityPlus.Serialization;
 
 namespace KSS.Components
 {
 	/// <summary>
 	/// Stability Assist (SAS) module.
 	/// </summary>
-	public class FAttitudeAvionics : MonoBehaviour
+	public class FAttitudeAvionics : MonoBehaviour, IPersistsData
 	{
 		private IPartObject _vessel;
 
@@ -289,5 +287,21 @@ namespace KSS.Components
 			_error0[i] = double.NaN;
 			_error1[i] = double.NaN;
 		}
-	}
+
+        public SerializedData GetData( IReverseReferenceMap s )
+        {
+            SerializedObject ret = (SerializedObject)Persistent_Behaviour.GetData( this, s );
+
+            //ret.AddAll( new SerializedObject()
+
+			return ret;
+        }
+
+        public void SetData( SerializedData data, IForwardReferenceMap l )
+        {
+			Persistent_Behaviour.SetData( this, data, l );
+
+			//
+        }
+    }
 }

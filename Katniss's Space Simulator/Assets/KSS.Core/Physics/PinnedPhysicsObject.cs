@@ -199,8 +199,10 @@ namespace KSS.Core.Physics
 		}
 
 		public SerializedData GetData( IReverseReferenceMap s )
-		{
-			return new SerializedObject()
+        {
+            SerializedObject ret = (SerializedObject)Persistent_Behaviour.GetData( this, s );
+
+            ret.AddAll( new SerializedObject()
 			{
 				{ "mass", this.Mass },
 				{ "local_center_of_mass", this.LocalCenterOfMass.GetData() },
@@ -209,11 +211,15 @@ namespace KSS.Core.Physics
 				{ "reference_body", s.WriteObjectReference( this.ReferenceBody ) },
 				{ "reference_position", this.ReferencePosition.GetData() },
 				{ "reference_rotation", this.ReferenceRotation.GetData() }
-			};
+			} );
+
+			return ret;
 		}
 
 		public void SetData( SerializedData data, IForwardReferenceMap l )
         {
+			Persistent_Behaviour.SetData( this, data, l );
+
             if( data.TryGetValue( "mass", out var mass ) )
 				this.Mass = (float)mass;
 

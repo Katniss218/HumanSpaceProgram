@@ -15,16 +15,7 @@ namespace UnityPlus.Serialization
 		{
 			return new SerializedArray() { (SerializedPrimitive)q.x, (SerializedPrimitive)q.y, (SerializedPrimitive)q.z, (SerializedPrimitive)q.w };
 		}
-		
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-		public static void SetData( this ref Quaternion q, SerializedData data, IForwardReferenceMap l = null )
-		{
-			q.x = (float)data[0];
-			q.y = (float)data[1];
-			q.z = (float)data[2];
-			q.w = (float)data[3];
-		}
-		
+
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
 		public static Quaternion ToQuaternion( this SerializedData data, IForwardReferenceMap l = null ) 
 		{

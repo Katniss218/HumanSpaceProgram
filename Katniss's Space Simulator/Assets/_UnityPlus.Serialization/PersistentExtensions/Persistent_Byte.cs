@@ -8,18 +8,18 @@ using UnityPlus.Serialization;
 
 namespace UnityPlus.Serialization
 {
-    public static class Persistent_Int32
+    public static class Persistent_Byte
     {
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static SerializedData GetData( this int value, IReverseReferenceMap s = null )
+        public static SerializedData GetData( this byte value, IReverseReferenceMap s = null )
         {
             return (SerializedPrimitive)value;
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static int ToInt32( this SerializedData data, IForwardReferenceMap l = null )
+        public static byte ToByte( this SerializedData data, IForwardReferenceMap l = null )
         {
-            return (int)data;
+            return (byte)data;
         }
     }
 }

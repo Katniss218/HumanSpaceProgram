@@ -71,11 +71,6 @@ namespace UnityPlus.Serialization
             }
         }
 
-        // TODO - For get/setdata of derived objects, we actually want to call the get/setdata of every base type as well. Including if that type is not "ours".
-               // The use case is to enable serialization of base fields/properties without having access to the base type (e.g. for `enabled` from UnityEngine.Behaviour).
-
-        // hmm, since when overriding, we're using 'base.X()', maybe just call to serialize/deserialize the base thing.
-
         public static SerializedData GetData( this object obj, IReverseReferenceMap s )
         {
             /*if( obj is IAutoPersistsData )

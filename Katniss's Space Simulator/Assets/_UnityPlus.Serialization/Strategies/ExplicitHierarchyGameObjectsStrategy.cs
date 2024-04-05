@@ -119,8 +119,6 @@ namespace UnityPlus.Serialization.Strategies
             this._data = null;
         }
 
-        List<Behaviour> behsToReenable = new List<Behaviour>();
-
         public void Load_Object( IForwardReferenceMap l )
         {
             (_objects, _data) = DataHandler.ReadObjectsAndData();
@@ -130,7 +128,7 @@ namespace UnityPlus.Serialization.Strategies
             {
                 try
                 {
-                    GameObject root = StratUtils.InstantiateHierarchyObjects( l, goJson, null, this.behsToReenable );
+                    GameObject root = StratUtils.InstantiateHierarchyObjects( l, goJson, null );
                     this.LastSpawnedRoots.Add( root );
                 }
                 catch( Exception ex )
@@ -150,7 +148,7 @@ namespace UnityPlus.Serialization.Strategies
             {
                 try
                 {
-                    GameObject root = StratUtils.InstantiateHierarchyObjects( l, goJson, null, this.behsToReenable );
+                    GameObject root = StratUtils.InstantiateHierarchyObjects( l, goJson, null );
                     this.LastSpawnedRoots.Add( root );
                 }
                 catch( Exception ex )
@@ -172,9 +170,6 @@ namespace UnityPlus.Serialization.Strategies
 
             // Cleanup Stage. \/
 
-            foreach( var beh in this.behsToReenable )
-                beh.enabled = true;
-            this.behsToReenable = new List<Behaviour>();
             this._objects = null;
             this._data = null;
         }
@@ -192,9 +187,6 @@ namespace UnityPlus.Serialization.Strategies
 
             // Cleanup Stage. \/
 
-            foreach( var beh in this.behsToReenable )
-                beh.enabled = true;
-            this.behsToReenable = new List<Behaviour>();
             this._objects = null;
             this._data = null;
         }

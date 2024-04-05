@@ -180,14 +180,20 @@ namespace KSS.Core
 
         public SerializedData GetData( IReverseReferenceMap s )
         {
-            return new SerializedObject()
+            SerializedObject ret = (SerializedObject)Persistent_Behaviour.GetData( this, s );
+
+            ret.AddAll( new SerializedObject()
             {
                 { "ut", UT }
-            };
+            } );
+
+            return ret;
         }
 
         public void SetData( SerializedData data, IForwardReferenceMap l )
         {
+            Persistent_Behaviour.SetData( this, data, l );
+
             if( data.TryGetValue( "ut", out var ut ) )
                 UT = ut;
         }

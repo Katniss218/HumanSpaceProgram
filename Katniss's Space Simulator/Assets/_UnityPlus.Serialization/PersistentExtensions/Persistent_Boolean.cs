@@ -17,12 +17,6 @@ namespace UnityPlus.Serialization
 		}
 		
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-		public static void SetData( this ref bool value, SerializedData data, IForwardReferenceMap l = null )
-		{
-			value = (bool)data;
-		}
-		
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
 		public static bool ToBoolean( this SerializedData data, IForwardReferenceMap l = null ) 
 		{
             return (bool)data;

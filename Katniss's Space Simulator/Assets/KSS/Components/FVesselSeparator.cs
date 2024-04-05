@@ -27,14 +27,20 @@ namespace KSS.Components
 
         public SerializedData GetData( IReverseReferenceMap s )
         {
-            return new SerializedObject()
+            SerializedObject ret = (SerializedObject)Persistent_Behaviour.GetData( this, s );
+
+            ret.AddAll( new SerializedObject()
             {
                 { "has_separated", this._hasSeparated }
-            };
+            } );
+
+            return ret;
         }
 
         public void SetData( SerializedData data, IForwardReferenceMap l )
         {
+            Persistent_Behaviour.SetData( this, data, l );
+
             if( data.TryGetValue( "has_separated", out var hasSeparated ) )
                 this._hasSeparated = (bool)hasSeparated;
         }

@@ -15,14 +15,7 @@ namespace UnityPlus.Serialization
 		{
 			return new SerializedArray() { (SerializedPrimitive)v.x, (SerializedPrimitive)v.y };
 		}
-		
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-		public static void SetData( this ref Vector2 v, SerializedData data, IForwardReferenceMap l = null )
-		{
-			v.x = (float)data[0];
-			v.y = (float)data[1];
-		}
-		
+
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
 		public static Vector2 ToVector2( this SerializedData data, IForwardReferenceMap l = null ) 
 		{

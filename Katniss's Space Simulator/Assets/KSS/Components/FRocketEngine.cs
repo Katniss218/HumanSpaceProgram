@@ -90,18 +90,24 @@ namespace KSS.Components
 		}
 
 		public SerializedData GetData( IReverseReferenceMap s )
-		{
-			return new SerializedObject()
-			{
+        {
+            SerializedObject ret = (SerializedObject)Persistent_Behaviour.GetData( this, s );
+
+            ret.AddAll( new SerializedObject()
+            {
 				{ "max_thrust", this.MaxThrust },
 				{ "isp", this.Isp },
 				{ "throttle", this.Throttle },
 				{ "thrust_transform", s.WriteObjectReference( this.ThrustTransform ) }
-			};
+			} );
+
+			return ret;
 		}
 
 		public void SetData( SerializedData data, IForwardReferenceMap l )
 		{
+			Persistent_Behaviour.SetData( this, data, l );
+
 			if( data.TryGetValue( "max_thrust", out var maxThrust ) )
 				this.MaxThrust = (float)maxThrust;
 			if( data.TryGetValue( "isp", out var isp ) )

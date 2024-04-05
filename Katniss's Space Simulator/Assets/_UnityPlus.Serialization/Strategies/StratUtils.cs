@@ -244,7 +244,7 @@ namespace UnityPlus.Serialization.Strategies
 		/// Loads (instantiates) a hierarchy of gameobjects from saved data (object pass).
 		/// </summary>
 		[MethodImpl( MethodImplOptions.AggressiveInlining )]
-		public static GameObject InstantiateHierarchyObjects( IForwardReferenceMap l, SerializedData goData, GameObject parent, List<Behaviour> behsUGLYDONTDOTHIS )
+		public static GameObject InstantiateHierarchyObjects( IForwardReferenceMap l, SerializedData goData, GameObject parent )
 		{
 			Guid objectGuid = goData[KeyNames.ID].ToGuid();
 
@@ -269,7 +269,6 @@ namespace UnityPlus.Serialization.Strategies
 					if( co is Behaviour b ) // disable to prevent 'start' firing prematurely if async.
 					{
 						b.enabled = false;
-						behsUGLYDONTDOTHIS?.Add( b );
 					}
 					l.SetObj( compID, co );
 
@@ -287,7 +286,7 @@ namespace UnityPlus.Serialization.Strategies
 			{
 				try
 				{
-					InstantiateHierarchyObjects( l, childData, go, behsUGLYDONTDOTHIS );
+					InstantiateHierarchyObjects( l, childData, go );
 				}
 				catch( Exception ex )
 				{

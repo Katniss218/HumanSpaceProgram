@@ -31,15 +31,21 @@ namespace KSS.Components
 
         public SerializedData GetData( IReverseReferenceMap s )
         {
-            return new SerializedObject()
+            SerializedObject ret = (SerializedObject)Persistent_Behaviour.GetData( this, s );
+
+            ret.AddAll( new SerializedObject()
             {
                 { "mass", this._mass },
                 { "on_after_mass_changed", s.WriteDelegate( this.OnAfterMassChanged ) }
-            };
+            } );
+
+            return ret;
         }
 
         public void SetData( SerializedData data, IForwardReferenceMap l )
         {
+            Persistent_Behaviour.SetData( this, data, l );
+
             if( data.TryGetValue( "mass", out var mass ) )
                 this._mass = (float)mass;
 

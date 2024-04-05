@@ -66,15 +66,18 @@ namespace KSS.Core
 
         public SerializedData GetData( IReverseReferenceMap s )
         {
-            return new SerializedObject()
-            {
+            SerializedObject ret = (SerializedObject)Persistent_Behaviour.GetData( this, s );
 
-            };
+            //ret.AddAll( new SerializedObject()
+
+            return ret;
         }
 
         public void SetData( SerializedData data, IForwardReferenceMap l )
         {
+            Persistent_Behaviour.SetData( this, data, l );
 
+            //
         }
 
         private static readonly JsonSeparateFileSerializedDataHandler _vesselsDataHandler = new JsonSeparateFileSerializedDataHandler();

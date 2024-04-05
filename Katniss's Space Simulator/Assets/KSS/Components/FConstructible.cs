@@ -185,16 +185,22 @@ namespace KSS.Components
 
         public SerializedData GetData( IReverseReferenceMap s )
         {
-            return new SerializedObject()
+            SerializedObject ret = (SerializedObject)Persistent_Behaviour.GetData( this, s );
+
+            ret.AddAll( new SerializedObject()
             {
                 { "build_points", this.BuildPoints },
                 { "max_build_points", this.MaxBuildPoints },
                 // todo - conditions.
-            };
+            } );
+
+            return ret;
         }
 
         public void SetData( SerializedData data, IForwardReferenceMap l )
         {
+            Persistent_Behaviour.SetData( this, data, l );
+
             if( data.TryGetValue( "max_build_points", out var maxBuildPoints ) )
                 this._maxBuildPoints = (float)maxBuildPoints;
 

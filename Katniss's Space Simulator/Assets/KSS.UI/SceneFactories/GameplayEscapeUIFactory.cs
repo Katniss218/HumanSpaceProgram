@@ -10,7 +10,6 @@ using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
-using Object = UnityEngine.Object;
 
 namespace KSS.UI.SceneFactories
 {
@@ -30,6 +29,8 @@ namespace KSS.UI.SceneFactories
             {
                 escapeMenuWindow.Destroy();
             }
+
+#warning TODO - Add conditional unpause to the 'ondestroy' of the escapeMenuWindow. (conditional = unless timescale has changed since displaying window).
 
             if( TimeStepManager.IsPaused )
             {

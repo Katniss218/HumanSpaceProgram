@@ -118,17 +118,23 @@ namespace KSS.Components
 
         public SerializedData GetData( IReverseReferenceMap s )
         {
-            return new SerializedObject()
+            SerializedObject ret = (SerializedObject)Persistent_Behaviour.GetData( this, s );
+
+            ret.AddAll( new SerializedObject()
             {
                 { "volume_transform", s.WriteObjectReference( this.VolumeTransform ) },
                 { "max_volume", this.MaxVolume },
                 { "radius", this.Radius },
                 { "contents", this.Contents.GetData( s ) }
-            };
+            } );
+
+            return ret;
         }
 
         public void SetData( SerializedData data, IForwardReferenceMap l )
         {
+            Persistent_Behaviour.SetData( this, data, l );
+
             if( data.TryGetValue( "volume_transform", out var volumeTransform ) )
                 this.VolumeTransform = (Transform)l.ReadObjectReference( volumeTransform );
 

@@ -32,14 +32,20 @@ namespace KSS.Core
 
         public SerializedData GetData( IReverseReferenceMap s )
         {
-            return new SerializedObject()
+            SerializedObject ret = (SerializedObject)Persistent_Behaviour.GetData( this, s );
+
+            ret.AddAll( new SerializedObject()
             {
                 { "active_object", s.WriteObjectReference( ActiveObject ) }
-            };
+            } );
+
+            return ret;
         }
 
         public void SetData( SerializedData data, IForwardReferenceMap l )
         {
+            Persistent_Behaviour.SetData( this, data, l );
+
             if( data.TryGetValue( "active_object", out var activeObject ) )
                 ActiveObject = (GameObject)l.ReadObjectReference( activeObject );
         }

@@ -19,12 +19,6 @@ namespace UnityPlus.Serialization
 		}
 		
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-		public static void SetData( this ref Guid guid, SerializedData data, IForwardReferenceMap l = null )
-		{
-			guid = Guid.ParseExact( (string)data, "D" );
-		}
-		
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
 		public static Guid ToGuid( this SerializedData data, IForwardReferenceMap l = null ) 
 		{
 			return Guid.ParseExact( (string)data, "D" );

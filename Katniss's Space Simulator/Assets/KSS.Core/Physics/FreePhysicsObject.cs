@@ -176,17 +176,23 @@ namespace KSS.Core.Physics
 
         public SerializedData GetData( IReverseReferenceMap s )
         {
-            return new SerializedObject()
+            SerializedObject ret = (SerializedObject)Persistent_Behaviour.GetData( this, s );
+
+            ret.AddAll( new SerializedObject()
             {
                 { "mass", this.Mass },
                 { "local_center_of_mass", this.LocalCenterOfMass.GetData() },
                 { "velocity", this.Velocity.GetData() },
                 { "angular_velocity", this.AngularVelocity.GetData() }
-            };
+            } );
+
+            return ret;
         }
 
         public void SetData( SerializedData data, IForwardReferenceMap l )
         {
+            Persistent_Behaviour.SetData( this, data, l );
+
             _rb.isKinematic = false; // FreePhysicsObject is never kinematic. This is needed because it may be called first.
 
             if( data.TryGetValue( "mass", out var mass ) )

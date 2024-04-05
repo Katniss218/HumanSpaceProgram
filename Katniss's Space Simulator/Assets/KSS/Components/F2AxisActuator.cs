@@ -85,9 +85,11 @@ namespace KSS.Components
 		}
 
 		public SerializedData GetData( IReverseReferenceMap s )
-		{
-			return new SerializedObject()
-			{
+        {
+            SerializedObject ret = (SerializedObject)Persistent_Behaviour.GetData( this, s );
+
+            ret.AddAll( new SerializedObject()
+            {
 				{ "reference_transform", s.WriteObjectReference( this.ReferenceTransform ) },
 				{ "x_actuator_transform", s.WriteObjectReference( this.XActuatorTransform ) },
 				{ "y_actuator_transform", s.WriteObjectReference( this.YActuatorTransform ) },
@@ -95,11 +97,15 @@ namespace KSS.Components
 				{ "min_y", this.MinY },
 				{ "max_x", this.MaxX },
 				{ "max_y", this.MaxY }
-			};
+			} );
+
+			return ret;
 		}
 
 		public void SetData( SerializedData data, IForwardReferenceMap l )
 		{
+			Persistent_Behaviour.SetData( this, data, l );
+
 			if( data.TryGetValue("reference_transform", out var referenceTransform ) )
 				this.ReferenceTransform = l.ReadObjectReference( referenceTransform ) as Transform;
 

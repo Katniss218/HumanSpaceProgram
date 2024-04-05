@@ -84,8 +84,8 @@
     <Compile Include="Assets\KSS.Core\Control\Controls\ControlParameterInput.cs" />
     <Compile Include="Assets\KSS.Core\Control\ControlGroup.cs" />
     <Compile Include="Assets\KSS.Core\Control\Controls\ControlParameterOutput.cs" />
-    <Compile Include="Assets\KSS.Core\HSPEventListenerAttribute.cs" />
     <Compile Include="Assets\KSS.Core\SymmetryDataContainer.cs" />
+    <Compile Include="Assets\KSS.Core\HSPEventListenerAttribute.cs" />
     <Compile Include="Assets\KSS.Core\CoordinateUtils.cs" />
     <Compile Include="Assets\KSS.Core\IHasMass.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\IResourceContainer.cs" />
@@ -116,8 +116,8 @@
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\SubstanceState.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\FlowUtils.cs" />
     <Compile Include="Assets\KSS.Core\SceneManagement\AlwaysLoadedManager.cs" />
-    <Compile Include="Assets\KSS.Core\Components\FClickInteractionRedirect.cs" />
     <Compile Include="Assets\KSS.Core\Mods\HumanSpaceProgramMods.cs" />
+    <Compile Include="Assets\KSS.Core\Components\FClickInteractionRedirect.cs" />
     <Compile Include="Assets\KSS.Core\CelestialBodySurface.cs" />
     <Compile Include="Assets\KSS.Core\PartFactory.cs" />
     <Compile Include="Assets\KSS.Core\VesselHierarchyUtils.cs" />

@@ -96,16 +96,18 @@ namespace KSS.Core
 
         public SerializedData GetData( IReverseReferenceMap s )
         {
-            // save cb data itself.
-            return new SerializedObject()
-            {
+            SerializedObject ret = (SerializedObject)Persistent_Behaviour.GetData( this, s );
 
-            };
+           // ret.AddAll( new SerializedObject()
+
+            return ret;
         }
 
         public void SetData( SerializedData data, IForwardReferenceMap l )
         {
+            Persistent_Behaviour.SetData( this, data, l );
 
+            //
         }
     }
 }
