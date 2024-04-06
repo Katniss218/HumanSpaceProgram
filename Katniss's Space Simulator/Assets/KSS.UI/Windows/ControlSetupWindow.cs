@@ -242,12 +242,15 @@ namespace KSS.UI.Windows
             UIScrollView scrollView = window.AddScrollView( UILayoutInfo.Fill( 5, 5, 30, 5 ), new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 750, 750 ) ), true, true );
 
             UIPanel topPanel = window.AddPanel( UILayoutInfo.FillHorizontal( 45, 45, UILayoutInfo.TopF, 0, 30 ), null );
-            topPanel.AddButton( new UILayoutInfo( UILayoutInfo.Left, Vector2.zero, new Vector2( 15, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_list_gold" ), () =>
+            UIButton btn = topPanel.AddButton( new UILayoutInfo( UILayoutInfo.Left, Vector2.zero, new Vector2( 15, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_list_gold" ), null );
+
+            btn.onClick = () =>
             {
+                UIContextMenu cm = btn.rectTransform.CreateContextMenu( CanvasManager.Get( CanvasName.CONTEXT_MENUS ), new UILayoutInfo( UILayoutInfo.TopLeft, Vector2.zero, new Vector2( 200, 400 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_list_gold" ) );
                 // create context menu with the elements.
                 // - each component: name and whether already shown. if not shown, click to show.
                 // leaving hover hides the context menu.
-            } );
+            };
 
             UIPanel nodeLayerPanel = scrollView.AddPanel( UILayoutInfo.Fill(), null );
             UIPanel connectionLayerPanel = scrollView.AddPanel( UILayoutInfo.Fill(), null );

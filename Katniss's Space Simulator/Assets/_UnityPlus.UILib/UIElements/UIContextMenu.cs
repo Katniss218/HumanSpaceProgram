@@ -27,7 +27,7 @@ namespace UnityPlus.UILib.UIElements
             (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUIGameObject( contextMenuCanvas.contents, "uilib-contextmenu", layoutInfo );
 
             Image backgroundComponent = rootGameObject.AddComponent<Image>();
-            backgroundComponent.raycastTarget = false;
+            backgroundComponent.raycastTarget = true;
             backgroundComponent.sprite = background;
             backgroundComponent.type = Image.Type.Sliced;
 
