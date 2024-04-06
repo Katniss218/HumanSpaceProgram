@@ -42,9 +42,8 @@ namespace UnityPlus.UILib.UIElements
             scrollRect.verticalScrollbarSpacing = 0.0f;
 
             scrollRect.movementType = ScrollRect.MovementType.Clamped;
-            scrollRect.inertia = true;
+            scrollRect.inertia = false;
             scrollRect.scrollSensitivity = 30f;
-            scrollRect.decelerationRate = 0.5f;
 
             uiScrollView.scrollRectComponent = scrollRect;
             uiScrollView.scrollbarHorizontal = null;

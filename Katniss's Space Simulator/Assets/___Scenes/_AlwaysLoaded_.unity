@@ -587,6 +587,8 @@ MonoBehaviour:
     asset: {fileID: 4800000, guid: 128e987d567d4e2c824d754223b3f3b0, type: 3}
   - assetID: builtin::Resources/Sprites/std0/ui_part_module_panel
     asset: {fileID: 21300000, guid: 3262eb4434fc1e54eaef01a574f93f68, type: 3}
+  - assetID: builtin::Resources/Sprites/UI/control_parameter_input
+    asset: {fileID: 21300000, guid: 42faea828151cc44689e3d0c65f77843, type: 3}
   - assetID: builtin::Resources/Sprites/UI/bar
     asset: {fileID: 21300000, guid: 82b082588549d3f40b568b3ea0021bdd, type: 3}
   - assetID: builtin::Resources/Sprites/UI/button_biaxial
@@ -781,6 +783,8 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: ba7b9b3e2ab14ba44ab7744ee7792f21, type: 3}
   - assetID: builtin::Resources/Sprites/UI/timewarp_forward_middle
     asset: {fileID: 21300000, guid: ca4e19b7df6ce1b45a09d4c07cd486ca, type: 3}
+  - assetID: builtin::Resources/Sprites/UI/control_group
+    asset: {fileID: 21300000, guid: eaff2b7b8f424b340a64c4834b08937c, type: 3}
   - assetID: builtin::_TextMesh Pro/Resources/LineBreaking Following Characters
     asset: {fileID: 4900000, guid: fade42e8bc714b018fac513c043d323b, type: 3}
   - assetID: builtin::Resources/Sprites/UI/control_output
@@ -897,6 +901,8 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: 8f9514c9f1dc10841aee00277ba07500, type: 3}
   - assetID: builtin::Resources/Fonts/liberation_sans
     asset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  - assetID: builtin::Resources/Sprites/UI/control_parameter_output
+    asset: {fileID: 21300000, guid: 8f6d10100e42c194a91b10a459c61517, type: 3}
   - assetID: builtin::___Scenes/Testing And Shit
     asset: {fileID: 102900000, guid: 9fc0d4010bbf28b4594072e72b8655ab, type: 3}
   - assetID: builtin::Resources/Sprites/UI/csite_status_waiting

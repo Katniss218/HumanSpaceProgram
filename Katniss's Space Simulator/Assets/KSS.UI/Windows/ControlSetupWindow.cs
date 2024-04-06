@@ -15,6 +15,12 @@ namespace KSS.UI.Windows
 {
     public class ControlSetupWindow : MonoBehaviour
     {
+        private struct LastVisibleEntry
+        {
+            public Component component;
+            public Vector2 lastAnchoredPosition;
+        }
+
         /// <summary>
         /// Defines the possible components that can be displayed in the window.
         /// </summary>
@@ -22,22 +28,17 @@ namespace KSS.UI.Windows
 
         internal UIWindow window;
         private UIScrollView _scrollView;
-        internal IUIElementContainer Container => _scrollView;
+        internal IUIElementContainer ComponentContainer { get; private set; }
+        internal IUIElementContainer ConnectionContainer { get; private set; }
 
-        IEnumerable<Component> visibleComponents => _nodes.Keys;
-
-        Dictionary<Component, ControlSetupWindowComponentUI> _nodes = new();
+        Dictionary<Component, ControlSetupWindowComponentUI> _visibleComponents = new();
 
         Dictionary<Control.Control, ControlSetupControlUI> _inputs = new();
         Dictionary<Control.Control, ControlSetupControlUI> _outputs = new();
 
-        List<ControlSetupControlConnectionUI> _connections = new();
+        List<ControlSetupControlConnectionUI> _visibleConnections = new();
 
-        private static Component[] _lastVisibleComponents = new Component[] { };
-
-
-        ControlSetupControlConnectionUI _mouseDraggedConnection = null;
-        bool IsDragging => _mouseDraggedConnection != null;
+        private static LastVisibleEntry[] _lastVisibleComponents = new LastVisibleEntry[] { };
 
         public void ShowComponent( Component component )
         {
@@ -49,30 +50,32 @@ namespace KSS.UI.Windows
 
             if( Target.IsAncestorOf( component.transform ) )
             {
-                if( TryCreateNode( component, out _ ) )
+                if( TryCreateNode( new LastVisibleEntry() { component = component }, out _ ) )
                 {
-                    RefreshConnections(); // much easier and actually works.
+                    RefreshConnections();
                 }
             }
         }
 
         public void HideComponent( Component component )
         {
-            if( _nodes.TryGetValue( component, out var componentUI ) )
+            if( _visibleComponents.TryGetValue( component, out var componentUI ) )
             {
                 componentUI.Destroy();
-                _nodes.Remove( component );
+                _visibleComponents.Remove( component );
 
                 RefreshConnections();
             }
         }
 
-        private bool TryCreateNode( Component componentToShow, out ControlSetupWindowComponentUI node )
+        private bool TryCreateNode( LastVisibleEntry entryToShow, out ControlSetupWindowComponentUI node )
         {
-            if( ControlUtils.HasControlsOrGroups( componentToShow ) )
+            if( ControlUtils.HasControlsOrGroups( entryToShow.component ) )
             {
-                node = ControlSetupWindowComponentUI.Create( this, componentToShow );
-                _nodes.Add( componentToShow, node );
+                node = ControlSetupWindowComponentUI.Create( this, entryToShow.component );
+                _visibleComponents.Add( entryToShow.component, node );
+                ((RectTransform)node.transform).anchoredPosition = entryToShow.lastAnchoredPosition;
+
                 foreach( var input in node.GetInputs() )
                 {
                     _inputs.Add( input.Control, input );
@@ -87,14 +90,19 @@ namespace KSS.UI.Windows
             return false;
         }
 
-        private void CreateNodes( IEnumerable<Component> componentsToShow )
+        private void CreateNodes( IEnumerable<LastVisibleEntry> entriesToShow )
         {
-            foreach( var comp in componentsToShow )
+            foreach( var comp in entriesToShow )
             {
-                if( ControlUtils.HasControlsOrGroups( comp ) )
-                {
-                    TryCreateNode( comp, out _ );
-                }
+                TryCreateNode( comp, out _ );
+            }
+        }
+
+        internal void RefreshConnectionPositions()
+        {
+            foreach( var conn in _visibleConnections )
+            {
+                conn.RecalculateEndPositions();
             }
         }
 
@@ -106,27 +114,22 @@ namespace KSS.UI.Windows
 
         private void ClearConnections()
         {
-            foreach( var conn in _connections )
+            foreach( var conn in _visibleConnections )
             {
                 conn.Destroy();
             }
-            _connections.Clear();
+            _visibleConnections.Clear();
         }
 
         private void CreateConnections()
         {
-            // for outputs (endpoints with multiple outgoing connections)
-            // - spawn all connections (connected if both are visible, "going to nothing" otherwise)
-            // for inputs
-            // - only spawn "going to nothing" connections (since the rest will be covered by the visible outputs).
-
             foreach( var outputUI in _outputs.Values )
             {
 #warning TODO - if nothing is connected - don't draw connection. If something is, but is
                 if( !outputUI.Control.GetConnectedControls().Any( c => _inputs.ContainsKey( c ) ) )
                 {
                     ControlSetupControlConnectionUI connectionUI = ControlSetupControlConnectionUI.CreateOpenEnded( this, null, outputUI, new Vector2( outputUI.Side > 0.5f ? 20f : -20f, 0 ) );
-                    _connections.Add( connectionUI );
+                    _visibleConnections.Add( connectionUI );
                 }
                 else
                 {
@@ -135,7 +138,7 @@ namespace KSS.UI.Windows
                         if( _inputs.TryGetValue( other, out var inputUI ) )
                         {
                             ControlSetupControlConnectionUI connectionUI = ControlSetupControlConnectionUI.Create( this, inputUI, outputUI );
-                            _connections.Add( connectionUI );
+                            _visibleConnections.Add( connectionUI );
                         }
                     }
                 }
@@ -145,7 +148,7 @@ namespace KSS.UI.Windows
                 if( !inputUI.Control.GetConnectedControls().Any( c => _outputs.ContainsKey( c ) ) )
                 {
                     ControlSetupControlConnectionUI connectionUI = ControlSetupControlConnectionUI.CreateOpenEnded( this, inputUI, null, new Vector2( inputUI.Side > 0.5f ? 20f : -20f, 0 ) );
-                    _connections.Add( connectionUI );
+                    _visibleConnections.Add( connectionUI );
                 }
             }
         }
@@ -182,10 +185,13 @@ namespace KSS.UI.Windows
             return false;
         }
 
-        public void Destroy()
+        void OnDestroy()
         {
-            // not called
-            _lastVisibleComponents = this.visibleComponents.ToArray();
+            _lastVisibleComponents = this._visibleComponents.Select( c => new LastVisibleEntry()
+            {
+                component = c.Key,
+                lastAnchoredPosition = ((RectTransform)c.Value.transform).anchoredPosition
+            } ).ToArray();
             window.Destroy();
         }
 
@@ -200,15 +206,22 @@ namespace KSS.UI.Windows
 
             UIScrollView scrollView = window.AddScrollView( UILayoutInfo.Fill( 5, 5, 30, 5 ), new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 750, 750 ) ), true, true );
 
+            UIPanel nodeLayerPanel = scrollView.AddPanel( UILayoutInfo.Fill(), null );
+            UIPanel connectionLayerPanel = scrollView.AddPanel( UILayoutInfo.Fill(), null );
+
             ControlSetupWindow w = window.gameObject.AddComponent<ControlSetupWindow>();
             w.Target = target;
             w.window = window;
             w._scrollView = scrollView;
+            w.ComponentContainer = nodeLayerPanel;
+            w.ConnectionContainer = connectionLayerPanel;
 
-            _lastVisibleComponents = _lastVisibleComponents.Where( x => x != null ).ToArray(); // Removes components that were destroyed.
+            _lastVisibleComponents = _lastVisibleComponents.Where( x => x.component != null ).ToArray(); // Removes components that were destroyed.
             if( !_lastVisibleComponents.Any() )
             {
-                _lastVisibleComponents = target.GetComponentsInChildren();
+                _lastVisibleComponents = target.GetComponentsInChildren()
+                    .Where( c => ControlUtils.HasControlsOrGroups( c ) )
+                    .Select( c => new LastVisibleEntry() { component = c } ).ToArray();
             }
 
             w.CreateNodes( _lastVisibleComponents );

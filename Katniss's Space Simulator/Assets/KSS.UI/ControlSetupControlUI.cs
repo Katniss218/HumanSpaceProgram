@@ -46,10 +46,8 @@ namespace KSS.UI
 			}
 		}
 
-		internal static ControlSetupControlUI Create( ControlSetupControlGroupUI group, float side, float verticalOffset, Control.Control control, NamedControlAttribute attr )
+		internal static ControlSetupControlUI Create( ControlSetupControlGroupUI group, float verticalOffset, Control.Control control, NamedControlAttribute attr )
 		{
-			side = side > 0.5f ? 1f : 0f;
-
 			UIPanel panel = group.panel.AddPanel( UILayoutInfo.FillHorizontal( 0, 0, UILayoutInfo.TopF, -verticalOffset, ControlSetupControlGroupUI.ROW_HEIGHT ), null );
 
 			ControlSetupControlUI controlUI = panel.gameObject.AddComponent<ControlSetupControlUI>();
@@ -57,10 +55,28 @@ namespace KSS.UI
 			controlUI.Control = control;
 			controlUI._attr = attr;
 
-			UIButton button = panel.AddButton( new UILayoutInfo( new Vector2( side, 1.0f ), Vector2.zero, new Vector2( ControlSetupControlGroupUI.ROW_HEIGHT, ControlSetupControlGroupUI.ROW_HEIGHT ) ),
-				AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_output" ), controlUI.OnClick );
+			float side;
+			Sprite sprite;
+			switch( control )
+			{
+				case KSS.Control.Controls.ControlleeInput:
+					sprite = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_input" ); side = 0f; break;
+				case KSS.Control.Controls.ControllerOutput:
+					sprite = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_output" ); side = 1f; break;
+				case KSS.Control.Controls.ControlParameterInput:
+					sprite = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_parameter_input" ); side = 1f; break;
+				case KSS.Control.Controls.ControlParameterOutput:
+					sprite = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_parameter_output" ); side = 0f; break;
+				default:
+					sprite = null;
+					side = 0f;
+					break;
+            }
 
-			UIText name = panel.AddText( UILayoutInfo.FillHorizontal( (1 - side) * ControlSetupControlGroupUI.ROW_HEIGHT, (side) * ControlSetupControlGroupUI.ROW_HEIGHT, UILayoutInfo.TopF, 0, ControlSetupControlGroupUI.ROW_HEIGHT ), attr.Name )
+			UIButton button = panel.AddButton( new UILayoutInfo( new Vector2( side, 1.0f ), Vector2.zero, new Vector2( ControlSetupControlGroupUI.ROW_HEIGHT, ControlSetupControlGroupUI.ROW_HEIGHT ) ),
+                sprite, controlUI.OnClick );
+
+			UIText name = panel.AddText( UILayoutInfo.FillHorizontal( (1 - side) * ControlSetupControlGroupUI.ROW_HEIGHT, side * ControlSetupControlGroupUI.ROW_HEIGHT, UILayoutInfo.TopF, 0, ControlSetupControlGroupUI.ROW_HEIGHT ), attr.Name )
 				.WithAlignment( side == 0 ? TMPro.HorizontalAlignmentOptions.Left : TMPro.HorizontalAlignmentOptions.Right );
 
 			controlUI.Circle = button.rectTransform;

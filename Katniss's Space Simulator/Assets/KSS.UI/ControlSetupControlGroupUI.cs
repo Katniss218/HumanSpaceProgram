@@ -110,14 +110,14 @@ namespace KSS.UI
 
                 if( member is ControlleeInput input )
                 {
-                    inputUIs.Add( ControlSetupControlUI.Create( this, 0f, currentY, input, attr ) );
+                    inputUIs.Add( ControlSetupControlUI.Create( this, currentY, input, attr ) );
                     currentY += ROW_HEIGHT;
                 }
                 if( member is ControlleeInput[] inputArray )
                 {
                     for( int i = 0; i < inputArray.Length; i++ )
                     {
-                        inputUIs.Add( ControlSetupControlUI.Create( this, 0f, currentY, inputArray[i], attr ) );
+                        inputUIs.Add( ControlSetupControlUI.Create( this, currentY, inputArray[i], attr ) );
                         currentY += ROW_HEIGHT;
                     }
 
@@ -127,14 +127,14 @@ namespace KSS.UI
 
                 if( member is ControllerOutput output )
                 {
-                    outputUIs.Add( ControlSetupControlUI.Create( this, 1f, currentY, output, attr ) );
+                    outputUIs.Add( ControlSetupControlUI.Create( this, currentY, output, attr ) );
                     currentY += ROW_HEIGHT;
                 }
                 if( member is ControllerOutput[] outputArray )
                 {
                     for( int i = 0; i < outputArray.Length; i++ )
                     {
-                        outputUIs.Add( ControlSetupControlUI.Create( this, 1f, currentY, outputArray[i], attr ) );
+                        outputUIs.Add( ControlSetupControlUI.Create( this, currentY, outputArray[i], attr ) );
                         currentY += ROW_HEIGHT;
                     }
                 }
@@ -143,14 +143,14 @@ namespace KSS.UI
 
                 if( member is ControlParameterInput paramInput )
                 {
-                    inputUIs.Add( ControlSetupControlUI.Create( this, 1f, currentY, paramInput, attr ) );
+                    inputUIs.Add( ControlSetupControlUI.Create( this, currentY, paramInput, attr ) );
                     currentY += ROW_HEIGHT;
                 }
                 if( member is ControlParameterInput[] paramInputArray )
                 {
                     for( int i = 0; i < paramInputArray.Length; i++ )
                     {
-                        inputUIs.Add( ControlSetupControlUI.Create( this, 1f, currentY, paramInputArray[i], attr ) );
+                        inputUIs.Add( ControlSetupControlUI.Create( this, currentY, paramInputArray[i], attr ) );
                         currentY += ROW_HEIGHT;
                     }
                 }
@@ -159,14 +159,14 @@ namespace KSS.UI
 
                 if( member is ControlParameterOutput paramOutput )
                 {
-                    outputUIs.Add( ControlSetupControlUI.Create( this, 0f, currentY, paramOutput, attr ) );
+                    outputUIs.Add( ControlSetupControlUI.Create( this, currentY, paramOutput, attr ) );
                     currentY += ROW_HEIGHT;
                 }
                 if( member is ControlParameterOutput[] paramOutputArray )
                 {
                     for( int i = 0; i < paramOutputArray.Length; i++ )
                     {
-                        outputUIs.Add( ControlSetupControlUI.Create( this, 0f, currentY, paramOutputArray[i], attr ) );
+                        outputUIs.Add( ControlSetupControlUI.Create( this, currentY, paramOutputArray[i], attr ) );
                         currentY += ROW_HEIGHT;
                     }
                 }
@@ -181,7 +181,7 @@ namespace KSS.UI
 
         internal static ControlSetupControlGroupUI Create( ControlSetupWindowComponentUI node, Component component )
         {
-            UIPanel panel = node.panel.AddPanel( UILayoutInfo.FillHorizontal( 0, 0, UILayoutInfo.TopF, -20, ROW_HEIGHT ), null ); // AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_output" )
+            UIPanel panel = node.panel.AddPanel( UILayoutInfo.FillHorizontal( 0, 0, UILayoutInfo.TopF, -20, ROW_HEIGHT ), null );
 
             ControlSetupControlGroupUI groupUI = panel.gameObject.AddComponent<ControlSetupControlGroupUI>();
             groupUI.panel = panel;
@@ -198,7 +198,7 @@ namespace KSS.UI
 
         internal static ControlSetupControlGroupUI Create( ControlSetupControlGroupUI group, float verticalOffset, object target, NamedControlAttribute attr )
         {
-            UIPanel panel = group.panel.AddPanel( UILayoutInfo.FillHorizontal( 0, 0, UILayoutInfo.TopF, -verticalOffset, ROW_HEIGHT ), null );
+            UIPanel panel = group.panel.AddPanel( UILayoutInfo.FillHorizontal( 0, 0, UILayoutInfo.TopF, -verticalOffset, ROW_HEIGHT ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_group" ) );
 
             ControlSetupControlGroupUI groupUI = panel.gameObject.AddComponent<ControlSetupControlGroupUI>();
             groupUI.panel = panel;

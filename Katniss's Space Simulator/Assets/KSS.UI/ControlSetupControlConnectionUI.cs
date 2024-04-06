@@ -4,128 +4,126 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEditor.PackageManager.UI;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Windows;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
 
 namespace KSS.UI
 {
-	/// <summary>
-	/// UI for connections between two <see cref="ControlSetupControlUI"/>s.
-	/// </summary>
-	public class ControlSetupControlConnectionUI : MonoBehaviour
-	{
-		/// <summary>
-		/// The endpoint that the connection UI goes out of (i.e. a 'From'). <br/>
-		/// May be null.
-		/// </summary>
-		public ControlSetupControlUI Output { get; private set; } = null;
+    /// <summary>
+    /// UI for connections between two <see cref="ControlSetupControlUI"/>s.
+    /// </summary>
+    public class ControlSetupControlConnectionUI : MonoBehaviour
+    {
+        public const float THICKNESS = 3f;
 
-		/// <summary>
-		/// The endpoint that the connection UI goes into (i.e. a 'To'). <br/>
-		/// May be null.
-		/// </summary>
-		public ControlSetupControlUI Input { get; private set; } = null;
+        /// <summary>
+        /// The endpoint that the connection UI goes out of (i.e. a 'From'). <br/>
+        /// May be null.
+        /// </summary>
+        public ControlSetupControlUI Output { get; private set; } = null;
 
-		/// <summary>
-		/// Describes whether or not the connnection UI has a free endpoint.
-		/// </summary>
-		public bool IsOpenEnded => Output == null || Input == null;
+        /// <summary>
+        /// The endpoint that the connection UI goes into (i.e. a 'To'). <br/>
+        /// May be null.
+        /// </summary>
+        public ControlSetupControlUI Input { get; private set; } = null;
 
-		/// <summary>
-		/// Returns the closed end of an open ended connection.
-		/// </summary>
-		/// <exception cref="InvalidOperationException">Thrown when the connection is not open-ended.</exception>
-		public ControlSetupControlUI GetClosedEnd()
-		{
-			if( Output == null )
-				return Input;
-			if( Input == null )
-				return Output;
+        /// <summary>
+        /// Describes whether or not the connnection UI has a free endpoint.
+        /// </summary>
+        public bool IsOpenEnded => Output == null || Input == null;
 
-			throw new InvalidOperationException( $"Can't get the closed end of a connection that is not open-ended. Both endpoints are set." );
-		}
+        private UILineRenderer _lineRenderer;
+        private ControlSetupWindow _window;
 
-		/// <summary>
-		/// If one of the endpoints is not set, the end offset describes the offset of the unset endpoint in reference to the set endpoint's position.
-		/// </summary>
-		public Vector2 EndOffset { get; private set; } // This is used for connections that connect to components that aren't shown,
-													   // as well as for the connection that is being dragged out by the mouse.
+        /// <summary>
+        /// Returns the closed end of an open ended connection.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown when the connection is not open-ended.</exception>
+        public ControlSetupControlUI GetClosedEnd()
+        {
+            if( Output == null )
+                return Input;
+            if( Input == null )
+                return Output;
 
-		public void Destroy()
-		{
-			Destroy( this.gameObject );
-		}
+            throw new InvalidOperationException( $"Can't get the closed end of a connection that is not open-ended. Both endpoints are set." );
+        }
 
-		internal static ControlSetupControlConnectionUI Create( ControlSetupWindow window, ControlSetupControlUI input, ControlSetupControlUI output )
-		{
-			if( output == null || input == null )
-			{
-				throw new ArgumentException( $"Both input and output must be set for a non-open-ended connection." );
-			}
+        /// <summary>
+        /// For open-ended connections, this is the offset of the open end relative to the closed end.
+        /// </summary>
+        public Vector2 EndOffset { get; private set; }
 
-			UIPanel panel = window.window.AddPanel( UILayoutInfo.Fill(), null );
+        public void Destroy()
+        {
+            Destroy( this.gameObject );
+        }
 
-			DestroyImmediate( panel.gameObject.GetComponent<Image>() );
-			UILineRenderer lineRenderer = panel.gameObject.AddComponent<UILineRenderer>();
-			lineRenderer.raycastTarget = false;
-			lineRenderer.Thickness = 5f;
-			lineRenderer.Points = new[]
-			{
-				input.Circle.TransformPointTo( input.Circle.GetLocalCenter(), (RectTransform)window.transform ),
-				output.Circle.TransformPointTo( output.Circle.GetLocalCenter(), (RectTransform)window.transform ),
-			};
+        internal void RecalculateEndPositions()
+        {
+            if( IsOpenEnded )
+            {
+                ControlSetupControlUI closedEndpoint = GetClosedEnd();
 
-			ControlSetupControlConnectionUI connection = panel.gameObject.AddComponent<ControlSetupControlConnectionUI>();
-			connection.Output = output;
-			connection.Input = input;
-			connection.EndOffset = Vector2.zero;
+                _lineRenderer.Points = new[]
+                {
+                    closedEndpoint.Circle.TransformPointTo( closedEndpoint.Circle.GetLocalCenter(), (RectTransform)_window.ConnectionContainer.transform ),
+                    closedEndpoint.Circle.TransformPointTo( closedEndpoint.Circle.GetLocalCenter(), (RectTransform)_window.ConnectionContainer.transform ) + EndOffset,
+                };
+            }
+            else
+            {
+                _lineRenderer.Points = new[]
+                {
+                    Input.Circle.TransformPointTo( Input.Circle.GetLocalCenter(), (RectTransform)_window.ConnectionContainer.transform ),
+                    Output.Circle.TransformPointTo( Output.Circle.GetLocalCenter(), (RectTransform)_window.ConnectionContainer.transform ),
+                };
+            }
+        }
 
-			return connection;
-		}
+        internal static ControlSetupControlConnectionUI Create( ControlSetupWindow window, ControlSetupControlUI input, ControlSetupControlUI output )
+        {
+            if( output == null || input == null )
+                throw new ArgumentException( $"Both input and output must be set for a non-open-ended connection." );
 
-		internal static ControlSetupControlConnectionUI CreateOpenEnded( ControlSetupWindow window, ControlSetupControlUI input, ControlSetupControlUI output, Vector2 offset )
-		{
-			if( output != null && input != null )
-			{
-				throw new ArgumentException( $"Either output or input must be null. Specify which end is open-ended." );
-			}
-			if( output == null && input == null )
-			{
-				throw new ArgumentException( $"Either output or input must be non-null. Specify which end is open-ended." );
-			}
+            return Internal_Create( window, input, output, Vector2.zero );
+        }
 
-			UIPanel panel = window.window.AddPanel( UILayoutInfo.Fill(), null );
+        internal static ControlSetupControlConnectionUI CreateOpenEnded( ControlSetupWindow window, ControlSetupControlUI input, ControlSetupControlUI output, Vector2 offset )
+        {
+            if( output != null && input != null )
+                throw new ArgumentException( $"Either output or input must be null. Specify which end is open-ended." );
+            if( output == null && input == null )
+                throw new ArgumentException( $"Either output or input must be non-null. Specify which end is open-ended." );
 
-			DestroyImmediate( panel.gameObject.GetComponent<Image>() );
-			ControlSetupControlConnectionUI connection = panel.gameObject.AddComponent<ControlSetupControlConnectionUI>();
-			connection.Output = output;
-			connection.Input = input;
-			connection.EndOffset = offset;
+            return Internal_Create( window, input, output, offset );
+        }
 
-			UILineRenderer lineRenderer = panel.gameObject.AddComponent<UILineRenderer>();
-			lineRenderer.raycastTarget = false;
-			lineRenderer.Thickness = 5f;
-			if( input != null )
-			{
-				lineRenderer.Points = new[]
-				{
-					input.Circle.TransformPointTo( input.Circle.GetLocalCenter(), (RectTransform)window.transform ),
-					input.Circle.TransformPointTo( input.Circle.GetLocalCenter(), (RectTransform)window.transform ) + offset,
-				};
-			}
-			else
-			{
-				lineRenderer.Points = new[]
-				{
-					output.Circle.TransformPointTo( output.Circle.GetLocalCenter(), (RectTransform)window.transform ),
-					output.Circle.TransformPointTo( output.Circle.GetLocalCenter(), (RectTransform)window.transform ) + offset,
-				};
-			}
+        private static ControlSetupControlConnectionUI Internal_Create( ControlSetupWindow window, ControlSetupControlUI input, ControlSetupControlUI output, Vector2 offset )
+        {
+            UIPanel connectionPanel = window.ConnectionContainer.AddPanel( UILayoutInfo.Fill(), null );
 
-			return connection;
-		}
-	}
+            DestroyImmediate( connectionPanel.gameObject.GetComponent<Image>() );
+            UILineRenderer lineRenderer = connectionPanel.gameObject.AddComponent<UILineRenderer>();
+            lineRenderer.raycastTarget = false;
+            lineRenderer.Thickness = THICKNESS;
+
+            ControlSetupControlConnectionUI connection = connectionPanel.gameObject.AddComponent<ControlSetupControlConnectionUI>();
+            connection._lineRenderer = lineRenderer;
+            connection._window = window;
+            connection.Output = output;
+            connection.Input = input;
+            connection.EndOffset = offset;
+
+            connection.RecalculateEndPositions();
+
+            return connection;
+        }
+    }
 }

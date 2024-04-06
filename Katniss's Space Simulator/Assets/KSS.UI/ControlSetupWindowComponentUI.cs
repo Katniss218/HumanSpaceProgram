@@ -53,8 +53,8 @@ namespace KSS.UI
         
 		private void OnDragged()
 		{
-            Window.RefreshConnections();
-		}
+            Window.RefreshConnectionPositions();
+        }
 
 		/// <summary>
 		/// Creates a control setup node for a given component.
@@ -63,7 +63,7 @@ namespace KSS.UI
         {
             // it is possible to force-show nodes for components outside of the target hierarchy of the window.
 
-            UIPanel panel = window.Container.AddPanel( new UILayoutInfo( UILayoutInfo.Middle, Vector2.zero, new Vector2( 100, 150 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_node" ) );
+            UIPanel panel = window.ComponentContainer.AddPanel( new UILayoutInfo( UILayoutInfo.Middle, Vector2.zero, new Vector2( 100, 150 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_node" ) );
 
             panel.Raycastable( true );
 
