@@ -14,7 +14,7 @@ namespace KSS.Components
 		[field: SerializeField]
 		public Transform ReferenceTransform { get; set; }
 
-		[NamedControl( "Coordinate Space Transform" )]
+		[NamedControl( "Ref. Transform" )]
 		public ControlParameterOutput<Transform> GetReferenceTransform;
 		public Transform GetTransform()
 		{

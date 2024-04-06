@@ -63,24 +63,30 @@ namespace KSS.UI
         {
             // it is possible to force-show nodes for components outside of the target hierarchy of the window.
 
-            UIPanel panel = window.ComponentContainer.AddPanel( new UILayoutInfo( UILayoutInfo.Middle, Vector2.zero, new Vector2( 100, 150 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_node" ) );
+            UIPanel panel = window.ComponentContainer.AddPanel( new UILayoutInfo( UILayoutInfo.Middle, Vector2.zero, new Vector2( 150, 150 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_node" ) );
 
             panel.Raycastable( true );
 
-            UIText text = panel.AddText( UILayoutInfo.FillHorizontal( 5, 5, UILayoutInfo.TopF, 0, 20 ), component.GetType().Name );
-
-            RectTransformDragger dragger = panel.gameObject.AddComponent<RectTransformDragger>();
-            dragger.UITransform = panel.rectTransform;
-            
             ControlSetupWindowComponentUI node = panel.gameObject.AddComponent<ControlSetupWindowComponentUI>();
             node.panel = panel;
             node.Window = window;
 
             ControlSetupControlGroupUI groupUI = ControlSetupControlGroupUI.Create( node, component );
             node.Group = groupUI;
-            dragger.OnDragging = node.OnDragged;
+            node.Component = component;
 
             panel.rectTransform.sizeDelta = new Vector2( panel.rectTransform.sizeDelta.x, ((RectTransform)groupUI.transform).sizeDelta.y + 20f );
+
+            RectTransformDragger dragger = panel.gameObject.AddComponent<RectTransformDragger>();
+            dragger.UITransform = panel.rectTransform;
+            dragger.OnDragging = node.OnDragged;
+
+            UIText text = panel.AddText( UILayoutInfo.FillHorizontal( 5, 5, UILayoutInfo.TopF, 0, 20 ), component.GetType().Name );
+
+            panel.AddButton( new UILayoutInfo( UILayoutInfo.TopRight, Vector2.zero, new Vector2( 20, 20 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_node_close" ), () =>
+            {
+                window.HideComponent( component );
+            } );
 
             return node;
         }

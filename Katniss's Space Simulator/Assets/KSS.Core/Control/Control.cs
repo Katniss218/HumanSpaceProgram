@@ -9,19 +9,20 @@ using UnityPlus.Serialization;
 namespace KSS.Control
 {
     /// <summary>
-    /// Represents an arbitrary type of "socket" that some form of a control connection can be routed to or from.
+    /// Represents an arbitrary type of "socket / endpoint" that some form of a control connection can be routed to or from.
     /// </summary>
     public abstract class Control
     {
         /// <summary>
-        /// The transform that this "plug/socket" belongs (i.e. is attached) to.
+        /// The transform that this control belongs (i.e. is attached) to.
         /// </summary>
         internal Transform transform { get; set; }
 
         /// <summary>
-        /// Gets the control(s) that this control is connected to.
+        /// Gets the controls that this control is connected to.
         /// </summary>
         public abstract IEnumerable<Control> GetConnectedControls();
+
         /// <summary>
         /// Tries to connect this control to a given control. <br/>
         /// </summary>

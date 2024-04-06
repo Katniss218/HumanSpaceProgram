@@ -17,7 +17,7 @@ namespace KSS.Components
     {
         public class Actuator2DGroup : ControlGroup, IPersistsObjects
         {
-            [NamedControl( "Transform", "The object to use as the coordinate frame of the actuator." )]
+            [NamedControl( "Ref. Transform", "The object to use as the coordinate frame of the actuator." )]
             public ControlParameterInput<Transform> GetReferenceTransform = new();
 
             [NamedControl( "Deflection (XY)" )]

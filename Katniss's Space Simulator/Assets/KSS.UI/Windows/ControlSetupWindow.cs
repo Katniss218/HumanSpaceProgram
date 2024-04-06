@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using UnityEditor.PackageManager.UI;
 using UnityEngine;
 using UnityEngine.Extensions;
+using UnityEngine.Windows;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
@@ -33,8 +34,8 @@ namespace KSS.UI.Windows
 
         Dictionary<Component, ControlSetupWindowComponentUI> _visibleComponents = new();
 
-        Dictionary<Control.Control, ControlSetupControlUI> _inputs = new();
-        Dictionary<Control.Control, ControlSetupControlUI> _outputs = new();
+        Dictionary<Control.Control, ControlSetupControlUI> _visibleInputs = new();
+        Dictionary<Control.Control, ControlSetupControlUI> _visibleOutputs = new();
 
         List<ControlSetupControlConnectionUI> _visibleConnections = new();
 
@@ -42,12 +43,6 @@ namespace KSS.UI.Windows
 
         public void ShowComponent( Component component )
         {
-            // When showing or hiding a component (has to be done when toggling AND WHEN COMP IS REMOVED FROM PHYSICAL VESSEL)
-            // take both inputs and outputs of the newly created component UI
-            // for each of them
-            // - remove "going to nothing" connections of their corresponding visible counterpart endpoints
-            // - if added: create new connections for both inputs and outputs
-
             if( Target.IsAncestorOf( component.transform ) )
             {
                 if( TryCreateNode( new LastVisibleEntry() { component = component }, out _ ) )
@@ -64,29 +59,38 @@ namespace KSS.UI.Windows
                 componentUI.Destroy();
                 _visibleComponents.Remove( component );
 
+                foreach( var input in componentUI.GetInputs() )
+                {
+                    _visibleInputs.Remove( input.Control );
+                }
+                foreach( var output in componentUI.GetOutputs() )
+                {
+                    _visibleOutputs.Remove( output.Control );
+                }
+
                 RefreshConnections();
             }
         }
 
-        private bool TryCreateNode( LastVisibleEntry entryToShow, out ControlSetupWindowComponentUI node )
+        private bool TryCreateNode( LastVisibleEntry entryToShow, out ControlSetupWindowComponentUI componentUI )
         {
             if( ControlUtils.HasControlsOrGroups( entryToShow.component ) )
             {
-                node = ControlSetupWindowComponentUI.Create( this, entryToShow.component );
-                _visibleComponents.Add( entryToShow.component, node );
-                ((RectTransform)node.transform).anchoredPosition = entryToShow.lastAnchoredPosition;
+                componentUI = ControlSetupWindowComponentUI.Create( this, entryToShow.component );
+                _visibleComponents.Add( entryToShow.component, componentUI );
+                ((RectTransform)componentUI.transform).anchoredPosition = entryToShow.lastAnchoredPosition;
 
-                foreach( var input in node.GetInputs() )
+                foreach( var input in componentUI.GetInputs() )
                 {
-                    _inputs.Add( input.Control, input );
+                    _visibleInputs.Add( input.Control, input );
                 }
-                foreach( var output in node.GetOutputs() )
+                foreach( var output in componentUI.GetOutputs() )
                 {
-                    _outputs.Add( output.Control, output );
+                    _visibleOutputs.Add( output.Control, output );
                 }
                 return true;
             }
-            node = null;
+            componentUI = null;
             return false;
         }
 
@@ -137,32 +141,49 @@ namespace KSS.UI.Windows
 
         private void CreateConnections()
         {
-            foreach( var outputUI in _outputs.Values )
+            // (achieved/2024-04-06): Intended to support many-to-many connections on both inputs and outputs.
+
+            HashSet<(Control.Control input, Control.Control output)> connected = new HashSet<(Control.Control input, Control.Control output)>();
+
+            foreach( var (input, inputUI) in _visibleInputs )
             {
-#warning TODO - if nothing is connected - don't draw connection. If something is, but is
-                if( !outputUI.Control.GetConnectedControls().Any( c => _inputs.ContainsKey( c ) ) )
+                var connectedOutputs = input.GetConnectedControls();
+                foreach( var output in connectedOutputs )
                 {
-                    ControlSetupControlConnectionUI connectionUI = ControlSetupControlConnectionUI.CreateOpenEnded( this, null, outputUI, new Vector2( outputUI.Side > 0.5f ? 20f : -20f, 0 ) );
-                    _visibleConnections.Add( connectionUI );
-                }
-                else
-                {
-                    foreach( var other in outputUI.Control.GetConnectedControls() )
+                    if( connected.Contains( (input, output) ) )
+                        continue;
+
+                    if( _visibleOutputs.TryGetValue( output, out var outputUI ) )
                     {
-                        if( _inputs.TryGetValue( other, out var inputUI ) )
-                        {
-                            ControlSetupControlConnectionUI connectionUI = ControlSetupControlConnectionUI.Create( this, inputUI, outputUI );
-                            _visibleConnections.Add( connectionUI );
-                        }
+                        ControlSetupControlConnectionUI connectionUI = ControlSetupControlConnectionUI.Create( this, inputUI, outputUI );
+                        _visibleConnections.Add( connectionUI );
+                    }
+                    else
+                    {
+                        ControlSetupControlConnectionUI connectionUI = ControlSetupControlConnectionUI.CreateOpenEnded( this, inputUI, null, new Vector2( inputUI.Side > 0.5f ? 20f : -20f, 0 ) );
+                        _visibleConnections.Add( connectionUI );
                     }
                 }
             }
-            foreach( var inputUI in _inputs.Values )
+
+            foreach( var (output, outputUI) in _visibleOutputs )
             {
-                if( !inputUI.Control.GetConnectedControls().Any( c => _outputs.ContainsKey( c ) ) )
+                var connectedInputs = output.GetConnectedControls();
+                foreach( var input in connectedInputs )
                 {
-                    ControlSetupControlConnectionUI connectionUI = ControlSetupControlConnectionUI.CreateOpenEnded( this, inputUI, null, new Vector2( inputUI.Side > 0.5f ? 20f : -20f, 0 ) );
-                    _visibleConnections.Add( connectionUI );
+                    if( connected.Contains( (input, output) ) )
+                        continue;
+
+                    if( _visibleInputs.TryGetValue( input, out var inputUI ) )
+                    {
+                        ControlSetupControlConnectionUI connectionUI = ControlSetupControlConnectionUI.Create( this, inputUI, outputUI );
+                        _visibleConnections.Add( connectionUI );
+                    }
+                    else
+                    {
+                        ControlSetupControlConnectionUI connectionUI = ControlSetupControlConnectionUI.CreateOpenEnded( this, null, outputUI, new Vector2( outputUI.Side > 0.5f ? 20f : -20f, 0 ) );
+                        _visibleConnections.Add( connectionUI );
+                    }
                 }
             }
         }
@@ -219,6 +240,14 @@ namespace KSS.UI.Windows
             // TODO - resizable windows.
 
             UIScrollView scrollView = window.AddScrollView( UILayoutInfo.Fill( 5, 5, 30, 5 ), new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 750, 750 ) ), true, true );
+
+            UIPanel topPanel = window.AddPanel( UILayoutInfo.FillHorizontal( 45, 45, UILayoutInfo.TopF, 0, 30 ), null );
+            topPanel.AddButton( new UILayoutInfo( UILayoutInfo.Left, Vector2.zero, new Vector2( 15, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_list_gold" ), () =>
+            {
+                // create context menu with the elements.
+                // - each component: name and whether already shown. if not shown, click to show.
+                // leaving hover hides the context menu.
+            } );
 
             UIPanel nodeLayerPanel = scrollView.AddPanel( UILayoutInfo.Fill(), null );
             UIPanel connectionLayerPanel = scrollView.AddPanel( UILayoutInfo.Fill(), null );
