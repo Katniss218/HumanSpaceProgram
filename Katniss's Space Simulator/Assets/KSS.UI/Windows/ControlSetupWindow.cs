@@ -122,17 +122,22 @@ namespace KSS.UI.Windows
 
             foreach( var outputUI in _outputs.Values )
             {
-                foreach( var other in outputUI.Control.GetConnectedControls() )
+#warning TODO - offset based on side.
+#warning TODO - if nothing is connected - don't draw connection. If something is, but is
+                if( !outputUI.Control.GetConnectedControls().Any( c => _inputs.ContainsKey( c ) ) )
                 {
-                    if( _inputs.TryGetValue( other, out var inputUI ) )
+                    ControlSetupControlConnectionUI connectionUI = ControlSetupControlConnectionUI.CreateOpenEnded( this, null, outputUI, new Vector2( 20, 0 ) );
+                    _connections.Add( connectionUI );
+                }
+                else
+                {
+                    foreach( var other in outputUI.Control.GetConnectedControls() )
                     {
-                        ControlSetupControlConnectionUI connectionUI = ControlSetupControlConnectionUI.Create( this, inputUI, outputUI );
-                        _connections.Add( connectionUI );
-                    }
-                    else
-                    {
-                        ControlSetupControlConnectionUI connectionUI = ControlSetupControlConnectionUI.CreateOpenEnded( this, null, outputUI, new Vector2( 20, 0 ) );
-                        _connections.Add( connectionUI );
+                        if( _inputs.TryGetValue( other, out var inputUI ) )
+                        {
+                            ControlSetupControlConnectionUI connectionUI = ControlSetupControlConnectionUI.Create( this, inputUI, outputUI );
+                            _connections.Add( connectionUI );
+                        }
                     }
                 }
             }
