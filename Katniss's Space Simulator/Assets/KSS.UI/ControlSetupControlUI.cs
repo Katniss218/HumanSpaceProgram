@@ -19,6 +19,11 @@ namespace KSS.UI
 		public ControlSetupControlGroupUI Group { get; private set; }
 		public Control.Control Control { get; private set; }
 
+		/// <summary>
+		/// 0 or 1, depending on which side the endpoint is drawn on.
+		/// </summary>
+		public float Side { get; private set; }
+
 		NamedControlAttribute _attr;
 
 		static ControlSetupControlUI _startedConnection;
@@ -43,6 +48,8 @@ namespace KSS.UI
 
 		internal static ControlSetupControlUI Create( ControlSetupControlGroupUI group, float side, float verticalOffset, Control.Control control, NamedControlAttribute attr )
 		{
+			side = side > 0.5f ? 1f : 0f;
+
 			UIPanel panel = group.panel.AddPanel( UILayoutInfo.FillHorizontal( 0, 0, UILayoutInfo.TopF, -verticalOffset, ControlSetupControlGroupUI.ROW_HEIGHT ), null );
 
 			ControlSetupControlUI controlUI = panel.gameObject.AddComponent<ControlSetupControlUI>();
@@ -57,6 +64,7 @@ namespace KSS.UI
 				.WithAlignment( side == 0 ? TMPro.HorizontalAlignmentOptions.Left : TMPro.HorizontalAlignmentOptions.Right );
 
 			controlUI.Circle = button.rectTransform;
+			controlUI.Side = side;
 
 			return controlUI;
 		}

@@ -122,11 +122,10 @@ namespace KSS.UI.Windows
 
             foreach( var outputUI in _outputs.Values )
             {
-#warning TODO - offset based on side.
 #warning TODO - if nothing is connected - don't draw connection. If something is, but is
                 if( !outputUI.Control.GetConnectedControls().Any( c => _inputs.ContainsKey( c ) ) )
                 {
-                    ControlSetupControlConnectionUI connectionUI = ControlSetupControlConnectionUI.CreateOpenEnded( this, null, outputUI, new Vector2( 20, 0 ) );
+                    ControlSetupControlConnectionUI connectionUI = ControlSetupControlConnectionUI.CreateOpenEnded( this, null, outputUI, new Vector2( outputUI.Side > 0.5f ? 20f : -20f, 0 ) );
                     _connections.Add( connectionUI );
                 }
                 else
@@ -145,7 +144,7 @@ namespace KSS.UI.Windows
             {
                 if( !inputUI.Control.GetConnectedControls().Any( c => _outputs.ContainsKey( c ) ) )
                 {
-                    ControlSetupControlConnectionUI connectionUI = ControlSetupControlConnectionUI.CreateOpenEnded( this, inputUI, null, new Vector2( -20, 0 ) );
+                    ControlSetupControlConnectionUI connectionUI = ControlSetupControlConnectionUI.CreateOpenEnded( this, inputUI, null, new Vector2( inputUI.Side > 0.5f ? 20f : -20f, 0 ) );
                     _connections.Add( connectionUI );
                 }
             }
