@@ -2,12 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEditor.PackageManager.UI;
 using UnityEngine;
 using UnityEngine.Extensions;
-using UnityEngine.Windows;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
@@ -43,6 +39,9 @@ namespace KSS.UI.Windows
 
         public void ShowComponent( Component component )
         {
+            if( _visibleComponents.ContainsKey( component ) )
+                return;
+
             if( Target.IsAncestorOf( component.transform ) )
             {
                 if( TryCreateNode( new LastVisibleEntry() { component = component }, out _ ) )
@@ -160,7 +159,7 @@ namespace KSS.UI.Windows
                     }
                     else
                     {
-                        ControlSetupControlConnectionUI connectionUI = ControlSetupControlConnectionUI.CreateOpenEnded( this, inputUI, null, new Vector2( inputUI.Side > 0.5f ? 20f : -20f, 0 ) );
+                        ControlSetupControlConnectionUI connectionUI = ControlSetupControlConnectionUI.CreateOpenEnded( this, inputUI, null, new Vector2( inputUI.Side > 0.5f ? ControlSetupControlConnectionUI.OPEN_ENDED_OFFSET : -ControlSetupControlConnectionUI.OPEN_ENDED_OFFSET, 0 ) );
                         _visibleConnections.Add( connectionUI );
                     }
                 }
@@ -181,28 +180,11 @@ namespace KSS.UI.Windows
                     }
                     else
                     {
-                        ControlSetupControlConnectionUI connectionUI = ControlSetupControlConnectionUI.CreateOpenEnded( this, null, outputUI, new Vector2( outputUI.Side > 0.5f ? 20f : -20f, 0 ) );
+                        ControlSetupControlConnectionUI connectionUI = ControlSetupControlConnectionUI.CreateOpenEnded( this, null, outputUI, new Vector2( outputUI.Side > 0.5f ? ControlSetupControlConnectionUI.OPEN_ENDED_OFFSET : -ControlSetupControlConnectionUI.OPEN_ENDED_OFFSET, 0 ) );
                         _visibleConnections.Add( connectionUI );
                     }
                 }
             }
-        }
-
-        internal bool TryConnectWithMouse( ControlSetupControlConnectionUI mouseConnection, ControlSetupControlUI otherEndpoint )
-        {
-            if( !mouseConnection.IsOpenEnded )
-            {
-                return false;
-            }
-
-            if( mouseConnection.GetClosedEnd().Control.TryConnect( otherEndpoint.Control ) )
-            {
-                RefreshConnections();
-
-                return true;
-            }
-
-            return false;
         }
 
         internal bool TryConnectWithMouse( ControlSetupControlUI firstEndpoint, ControlSetupControlUI otherEndpoint )
@@ -232,6 +214,16 @@ namespace KSS.UI.Windows
 
         public static ControlSetupWindow Create( Transform target )
         {
+            _lastVisibleComponents = _lastVisibleComponents.Where( x => x.component != null ).ToArray(); // Removes components that were destroyed.
+
+            if( !_lastVisibleComponents.Any() )
+            {
+                _lastVisibleComponents = target.GetComponentsInChildren()
+                    .Where( c => ControlUtils.HasControlsOrGroups( c ) )
+                    .Select( c => new LastVisibleEntry() { component = c } )
+                    .ToArray();
+            }
+
             UIWindow window = CanvasManager.Get( CanvasName.WINDOWS ).AddWindow( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 750, 750 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_window" ) )
                 .Draggable()
                 .Focusable()
@@ -244,14 +236,6 @@ namespace KSS.UI.Windows
             UIPanel topPanel = window.AddPanel( UILayoutInfo.FillHorizontal( 45, 45, UILayoutInfo.TopF, 0, 30 ), null );
             UIButton btn = topPanel.AddButton( new UILayoutInfo( UILayoutInfo.Left, Vector2.zero, new Vector2( 15, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_list_gold" ), null );
 
-            btn.onClick = () =>
-            {
-                UIContextMenu cm = btn.rectTransform.CreateContextMenu( CanvasManager.Get( CanvasName.CONTEXT_MENUS ), new UILayoutInfo( UILayoutInfo.TopLeft, Vector2.zero, new Vector2( 200, 400 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_list_gold" ) );
-                // create context menu with the elements.
-                // - each component: name and whether already shown. if not shown, click to show.
-                // leaving hover hides the context menu.
-            };
-
             UIPanel nodeLayerPanel = scrollView.AddPanel( UILayoutInfo.Fill(), null );
             UIPanel connectionLayerPanel = scrollView.AddPanel( UILayoutInfo.Fill(), null );
 
@@ -262,18 +246,44 @@ namespace KSS.UI.Windows
             w.ComponentContainer = nodeLayerPanel;
             w.ConnectionContainer = connectionLayerPanel;
 
-            _lastVisibleComponents = _lastVisibleComponents.Where( x => x.component != null ).ToArray(); // Removes components that were destroyed.
-            if( !_lastVisibleComponents.Any() )
+            btn.onClick = () =>
             {
-                _lastVisibleComponents = target.GetComponentsInChildren()
+                CreateAllComponentsContextMenu( w, btn, target.GetComponentsInChildren()
                     .Where( c => ControlUtils.HasControlsOrGroups( c ) )
-                    .Select( c => new LastVisibleEntry() { component = c } ).ToArray();
-            }
+                    .ToArray() );
+            };
 
             w.CreateNodes( _lastVisibleComponents );
             w.CreateConnections(); // Connections should be created after the component nodes are created. This ensures that all inputs/outputs are created.
 
             return w;
+        }
+
+        private static UIContextMenu CreateAllComponentsContextMenu( ControlSetupWindow window, UIButton targetButton, Component[] componentsWithControls )
+        {
+            UIContextMenu cm = targetButton.rectTransform.CreateContextMenu( CanvasManager.Get( CanvasName.CONTEXT_MENUS ), new UILayoutInfo( UILayoutInfo.TopLeft, Vector2.zero, new Vector2( 200, 400 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_list_entry_background" ) );
+            // create context menu with the elements.
+            // - each component: name and whether already shown. if not shown, click to show.
+
+            UIScrollView sv = cm.AddVerticalScrollView( UILayoutInfo.Fill(), 1000 );
+
+            float currentY = 0f;
+            foreach( var comp in componentsWithControls )
+            {
+                sv.AddButton( UILayoutInfo.FillHorizontal( 0, 0, UILayoutInfo.TopF, currentY, 15f ), null, () =>
+                {
+                    if( !window._visibleComponents.ContainsKey( comp ) )
+                    {
+                        window.ShowComponent( comp );
+                    }
+                } )
+                    .AddText( UILayoutInfo.Fill(), comp.GetType().Name )
+                    .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, window._visibleComponents.ContainsKey(comp) ? Color.white : Color.green );
+
+                currentY -= 15f;
+            }
+
+            return cm;
         }
     }
 }

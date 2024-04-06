@@ -20,6 +20,7 @@ namespace KSS.UI
     public class ControlSetupControlConnectionUI : MonoBehaviour
     {
         public const float THICKNESS = 3f;
+        public const float OPEN_ENDED_OFFSET = 40f;
 
         /// <summary>
         /// The endpoint that the connection UI goes out of (i.e. a 'From'). <br/>

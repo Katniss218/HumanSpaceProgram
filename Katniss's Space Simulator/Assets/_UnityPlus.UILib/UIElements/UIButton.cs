@@ -36,14 +36,19 @@ namespace UnityPlus.UILib.UIElements
             }
         }
 
-        public static UIButton Create( IUIElementContainer parent, UILayoutInfo layout, Sprite sprite, Action onClick )
+        public static UIButton Create( IUIElementContainer parent, UILayoutInfo layout, Sprite background, Action onClick )
         {
             (GameObject rootGameObject, RectTransform rootTransform, UIButton uiButton) = UIElement.CreateUIGameObject<UIButton>( parent, "uilib-button", layout );
 
             Image backgroundComponent = rootGameObject.AddComponent<Image>();
             backgroundComponent.raycastTarget = true;
-            backgroundComponent.sprite = sprite;
+            backgroundComponent.sprite = background;
             backgroundComponent.type = Image.Type.Sliced;
+
+            if( background == null )
+            {
+                backgroundComponent.color = new Color( 0, 0, 0, 0 );
+            }
 
             Button buttonComponent = rootGameObject.AddComponent<Button>();
             buttonComponent.targetGraphic = backgroundComponent;
