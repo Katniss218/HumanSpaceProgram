@@ -149,34 +149,12 @@ namespace KSS.Components
         {
             SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
 
-            ret.AddAll( new SerializedObject()
-            {
-                { "on_set_throttle", OnSetThrottle.GetData( s ) },
-                { "on_set_attitude", OnSetAttitude.GetData( s ) },
-                { "on_set_translation", OnSetTranslation.GetData( s ) }
-            } );
-
             return ret;
         }
 
         public void SetData( SerializedData data, IForwardReferenceMap l )
         {
 			IPersistent_Behaviour.SetData( this, data, l );
-
-            if( data.TryGetValue( "on_set_throttle", out var onSetThrottle ) )
-            {
-                this.OnSetThrottle.SetData( onSetThrottle, l );
-            }
-
-            if( data.TryGetValue( "on_set_attitude", out var onSetAttitude ) )
-            {
-                this.OnSetAttitude.SetData( onSetAttitude, l );
-            }
-
-            if( data.TryGetValue( "on_set_translation", out var onSetTranslation ) )
-            {
-                this.OnSetTranslation.SetData( onSetTranslation, l );
-            }
         }
     }
 }

@@ -113,12 +113,15 @@ namespace KSS.Components
         {
             SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
 
+            SetThrottle ??= new ControlleeInput<float>( SetThrottleListener );
+
             ret.AddAll( new SerializedObject()
             {
                 { "max_thrust", this.MaxThrust },
                 { "isp", this.Isp },
                 { "throttle", this.Throttle },
-                { "thrust_transform", s.WriteObjectReference( this.ThrustTransform ) }
+                { "thrust_transform", s.WriteObjectReference( this.ThrustTransform ) },
+                { "set_throttle", this.SetThrottle.GetData( s ) }
             } );
 
             return ret;
@@ -136,6 +139,9 @@ namespace KSS.Components
                 this.Throttle = (float)throttle;
             if( data.TryGetValue( "thrust_transform", out var thrustTransform ) )
                 this.ThrustTransform = (Transform)l.ReadObjectReference( thrustTransform );
+
+            if( data.TryGetValue( "set_throttle", out var setThrottle ) )
+                this.SetThrottle.SetData( setThrottle, l );
         }
     }
 }

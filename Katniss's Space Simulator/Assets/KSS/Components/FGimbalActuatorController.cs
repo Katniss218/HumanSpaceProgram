@@ -15,7 +15,7 @@ namespace KSS.Components
     /// </summary>
     public class FGimbalActuatorController : MonoBehaviour, IPersistsObjects, IPersistsData
     {
-        public class Actuator2DGroup : ControlGroup, IPersistsObjects, IPersistsData
+        public class Actuator2DGroup : ControlGroup, IPersistsObjects
         {
             [NamedControl( "Transform", "The object to use as the coordinate frame of the actuator." )]
             public ControlParameterInput<Transform> GetReferenceTransform = new();
@@ -46,22 +46,6 @@ namespace KSS.Components
                 {
                     OnSetXY = new();
                     l.SetObj( onSetXY.ToGuid(), OnSetXY );
-                }
-            }
-
-            public SerializedData GetData( IReverseReferenceMap s )
-            {
-                return new SerializedObject()
-                {
-                    { "on_set_xy", OnSetXY.GetData( s ) }
-                };
-            }
-
-            public void SetData( SerializedData data, IForwardReferenceMap l )
-            {
-                if( data.TryGetValue( "on_set_xy", out var onSetXY ) )
-                {
-                    this.OnSetXY.SetData( onSetXY, l );
                 }
             }
         }
@@ -157,21 +141,11 @@ namespace KSS.Components
         {
             SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
 
-            SerializedArray array = new SerializedArray();
-            foreach( var act in Actuators2D )
-            {
-                SerializedObject elemData = act == null
-                    ? null
-                    : new SerializedObject()
-                {
-                    { "on_set_xy", act.OnSetXY.GetData( s ) },
-                };
-                array.Add( elemData );
-            }
+            SetAttitude ??= new ControlleeInput<Vector3>( SetAttitudeListener );
 
             ret.AddAll( new SerializedObject()
             {
-                { "actuators_2d", array },
+                { "set_attitude", this.SetAttitude.GetData( s ) }
             } );
 
             return ret;
@@ -181,20 +155,8 @@ namespace KSS.Components
         {
             IPersistent_Behaviour.SetData( this, data, l );
 
-            if( data.TryGetValue( "actuators_2d", out var actuators2D ) )
-            {
-                // This is a bit too verbose imo.
-                // needs an extension method to make serializing/deserializing arrays/lists of any type cleaner.
-                int i = 0;
-                foreach( var elemData in (SerializedArray)actuators2D )
-                {
-                    if( elemData != null )
-                    {
-                        this.Actuators2D[i]?.SetData( elemData, l );
-                    }
-                    i++;
-                }
-            }
+            if( data.TryGetValue( "set_attitude", out var setAttitude ) )
+                this.SetAttitude.SetData( setAttitude, l );
         }
     }
 }

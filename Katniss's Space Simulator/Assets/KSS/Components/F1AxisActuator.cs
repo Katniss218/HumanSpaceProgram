@@ -84,13 +84,16 @@ namespace KSS.Components
         {
             SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
 
+            SetX ??= new ControlleeInput<float>( SetXListener );
+
             ret.AddAll( new SerializedObject()
             {
                 { "reference_transform", s.WriteObjectReference( this.ReferenceTransform ) },
                 { "x_actuator_transform", s.WriteObjectReference( this.XActuatorTransform ) },
                 { "min_x", this.MinX },
                 { "max_x", this.MaxX },
-                { "get_reference_transform", this.GetReferenceTransform.GetData( s ) }
+                { "get_reference_transform", this.GetReferenceTransform.GetData( s ) },
+                { "set_x", this.SetX.GetData( s ) }
             } );
 
             return ret;
@@ -113,6 +116,9 @@ namespace KSS.Components
 
             if( data.TryGetValue( "get_reference_transform", out var getReferenceTransform ) )
                 this.GetReferenceTransform.SetData( getReferenceTransform, l );
+
+            if( data.TryGetValue( "set_x", out var setX ) )
+                this.SetX.SetData( setX, l );
         }
 	}
 }

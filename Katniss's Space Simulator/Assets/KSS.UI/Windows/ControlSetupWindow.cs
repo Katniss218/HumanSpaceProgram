@@ -98,15 +98,29 @@ namespace KSS.UI.Windows
             }
         }
 
-        internal void RefreshConnectionPositions()
+        /// <summary>
+        /// Updates the endpoint positions of all visible connection UIs without re-creating each connection.
+        /// </summary>
+        public void RefreshConnectionPositions()
         {
-            foreach( var conn in _visibleConnections )
+            RefreshConnectionPositions( _visibleConnections );
+        }
+
+        /// <summary>
+        /// Updates the endpoint positions of the specified connection UIs without re-creating each connection.
+        /// </summary>
+        public void RefreshConnectionPositions( IEnumerable<ControlSetupControlConnectionUI> connectionsToRefresh )
+        {
+            foreach( var conn in connectionsToRefresh )
             {
                 conn.RecalculateEndPositions();
             }
         }
 
-        internal void RefreshConnections()
+        /// <summary>
+        /// Removes every existing connection UI, and re-creates the connections that should be visible.
+        /// </summary>
+        public void RefreshConnections()
         {
             ClearConnections();
             CreateConnections();

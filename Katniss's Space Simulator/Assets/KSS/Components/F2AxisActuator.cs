@@ -122,6 +122,11 @@ namespace KSS.Components
         {
             SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
 
+            GetReferenceTransform ??= new ControlParameterOutput<Transform>( GetTransform );
+            SetX ??= new ControlleeInput<float>( SetXListener );
+            SetY ??= new ControlleeInput<float>( SetYListener );
+            SetXY ??= new ControlleeInput<Vector2>( SetXYListener );
+
             ret.AddAll( new SerializedObject()
             {
 				{ "reference_transform", s.WriteObjectReference( this.ReferenceTransform ) },
@@ -131,8 +136,11 @@ namespace KSS.Components
 				{ "min_y", this.MinY },
 				{ "max_x", this.MaxX },
 				{ "max_y", this.MaxY },
-				{ "get_reference_transform", this.GetReferenceTransform.GetData( s ) }
-			} );
+				{ "get_reference_transform", this.GetReferenceTransform.GetData( s ) },
+                { "set_x", this.SetX.GetData( s ) },
+                { "set_y", this.SetY.GetData( s ) },
+                { "set_xy", this.SetXY.GetData( s ) }
+            } );
 
 			return ret;
 		}
@@ -160,6 +168,13 @@ namespace KSS.Components
 
 			if( data.TryGetValue( "get_reference_transform", out var getReferenceTransform ) )
 				this.GetReferenceTransform.SetData( getReferenceTransform, l );
-		}
+
+            if( data.TryGetValue( "set_x", out var setX ) )
+                this.SetX.SetData( setX, l );
+            if( data.TryGetValue( "set_y", out var setY ) )
+                this.SetY.SetData( setY, l );
+            if( data.TryGetValue( "set_xy", out var setXY ) )
+                this.SetXY.SetData( setXY, l );
+        }
 	}
 }
