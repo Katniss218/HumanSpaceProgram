@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KSS.Control.Controls;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
@@ -6,7 +7,6 @@ using UnityPlus.Serialization;
 
 namespace KSS.Components
 {
-    [Obsolete( "It's a prototype" )]
     public class KeyboardSequenceElement : Sequence.Element
     {
         public KeyCode Key { get; set; } = KeyCode.Space;
@@ -21,7 +21,6 @@ namespace KSS.Components
         }
     }
 
-    [Obsolete( "It's a prototype" )]
     public class TimedSequenceElement : Sequence.Element
     {
         /// <summary>
@@ -43,35 +42,45 @@ namespace KSS.Components
         }
     }
 
-    [Obsolete( "It's a prototype" )]
+    public abstract class SequencerOutput //: ControllerOutput
+    {
+        public abstract void TryInvoke();
+    }
+
+    public class SequencerOutput<T> : SequencerOutput
+    {
+        // sequencer action *holds* the parameters that will be used when invoking. It is in principle very simple.
+
+        // should be able to be connected to the controlleeinput<T>
+
+        ControlleeInput<T> _input;
+
+        public MethodInfo varargMethod;
+        public object target;
+        public object[] parameters;
+
+        public override void TryInvoke()
+        {
+            try
+            {
+                varargMethod.Invoke( target, parameters );
+            }
+            catch( Exception ex )
+            {
+                Debug.LogError( $"Tried to invoke a sequence element." );
+                Debug.LogException( ex );
+            }
+        }
+    }
+
     public class Sequence
     {
-        [Obsolete( "It's a prototype" )]
         public abstract class Element
         {
-            public struct Action // sequencer uses its own parameters to call an arbitrary input action on the target.
-            {
-                public MethodInfo varargMethod;
-                public object target;
-                public object[] parameters;
-
-                public void TryInvoke()
-                {
-                    try
-                    {
-                        varargMethod.Invoke( target, parameters );
-                    }
-                    catch( Exception ex )
-                    {
-                        Debug.LogException( ex );
-                    }
-                }
-            }
-
             /// <summary>
             /// The actions that this sequence element will call when it's fired.
             /// </summary>
-            public List<Action> Actions { get; private set; } = new List<Action>();
+            public List<SequencerOutput> Actions { get; private set; } = new List<SequencerOutput>();
 
             /// <summary>
             /// Called when the previous action is triggerred, or on load (the first element).
@@ -155,7 +164,7 @@ namespace KSS.Components
     /// <summary>
     /// Represents a controller that can invoke an arbitrary control action from a queue.
     /// </summary>
-    public class FSequencer : MonoBehaviour, IPersistsData
+    public class FSequencer : MonoBehaviour, IPersistsObjects, IPersistsData
     {
         // sequencer is a type of avionics, related to the control system.
 
@@ -175,6 +184,19 @@ namespace KSS.Components
             {
                 seq.TryInvoke();
             }
+        }
+
+        public SerializedObject GetObjects( IReverseReferenceMap s )
+        {
+            return new SerializedObject()
+            {
+
+            };
+        }
+
+        public void SetObjects( SerializedObject data, IForwardReferenceMap l )
+        {
+
         }
 
         public SerializedData GetData( IReverseReferenceMap s )

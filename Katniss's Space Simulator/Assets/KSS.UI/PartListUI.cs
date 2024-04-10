@@ -60,11 +60,11 @@ namespace KSS.UI
         public static PartListUI Create( IUIElementContainer parent, UILayoutInfo layout )
         {
             UIPanel uiPanel = parent.AddPanel( layout, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_list_background" ) );
-            UIInputField filterIF = uiPanel.AddInputField( new UILayoutInfo( UIFill.Horizontal( 2, 2 ), UIAnchor.Top, -2, 20 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field_ha" ) )
+            UIInputField filterIF = uiPanel.AddInputField( new UILayoutInfo( UIFill.Horizontal( 2, 2 ), UIAnchor.Top, -2, 20 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) )
                 .WithMargins( 15, 15, 0, 0 )
                 .WithPlaceholder( "search..." );
             UIScrollView uiPartList = uiPanel.AddVerticalScrollView( new UILayoutInfo( UIFill.Fill( 42, 2, 24, 100 ) ), 200 )
-                .WithVerticalScrollbar( new UILayoutInfo( UIAnchor.Right, UIFill.Vertical(), 0, 10 ), null, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_handle" ), out _ );
+                .WithVerticalScrollbar( new UILayoutInfo( UIAnchor.Right, UIFill.Vertical(), 0, 10 ), null, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_vertical" ), out _ );
 
             uiPartList.LayoutDriver = new BidirectionalLayoutDriver()
             {
