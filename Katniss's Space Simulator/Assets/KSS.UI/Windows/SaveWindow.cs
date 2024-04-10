@@ -40,7 +40,7 @@ namespace KSS.UI
             _selectedTimelineSaves = new SaveMetadataUI[saves.Length];
             for( int i = 0; i < _selectedTimelineSaves.Length; i++ )
             {
-                _selectedTimelineSaves[i] = SaveMetadataUI.Create( _saveListUI, UILayoutInfo.FillHorizontal( 0, 0, 0, 0, 40 ), saves[i], ( ui ) =>
+                _selectedTimelineSaves[i] = SaveMetadataUI.Create( _saveListUI, new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Bottom, 0, 40 ), saves[i], ( ui ) =>
                 {
                     _selectedSave = ui;
                 } );
@@ -64,24 +64,24 @@ namespace KSS.UI
         /// </summary>
         public static SaveWindow Create()
         {
-            UIWindow window = CanvasManager.Get( CanvasName.WINDOWS ).AddWindow( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 250f, 100f ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_window" ) )
+            UIWindow window = CanvasManager.Get( CanvasName.WINDOWS ).AddWindow( new UILayoutInfo( UIAnchor.Center, (0, 0), (250f, 100f) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_window" ) )
                 .Draggable()
                 .Focusable()
-                .WithCloseButton( new UILayoutInfo( Vector2.one, new Vector2( -7, -5 ), new Vector2( 20, 20 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ );
+                .WithCloseButton( new UILayoutInfo( UIAnchor.TopRight, (-7, -5), (20, 20) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ );
 
             SaveWindow saveWindow = window.gameObject.AddComponent<SaveWindow>();
 
-            UIScrollView saveScrollView = window.AddVerticalScrollView( UILayoutInfo.Fill( 2, 2, 30, 22 ), 75 )
-                .WithVerticalScrollbar( UILayoutInfo.FillVertical( 2, 2, 1f, 0, 10 ), null, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_handle" ), out UIScrollBar scrollbar );
+            UIScrollView saveScrollView = window.AddVerticalScrollView( new UILayoutInfo( UIFill.Fill( 2, 2, 30, 22 ) ), 75 )
+                .WithVerticalScrollbar( new UILayoutInfo( UIAnchor.Right, UIFill.Vertical( 2, 2 ), 0, 10 ), null, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_handle" ), out UIScrollBar scrollbar );
 
 
-            UIButton saveBtn = window.AddButton( new UILayoutInfo( Vector2.right, new Vector2( -2, 5 ), new Vector2( 95, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), saveWindow.OnSave );
+            UIButton saveBtn = window.AddButton( new UILayoutInfo( UIAnchor.BottomRight, (-2, 5), (95, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), saveWindow.OnSave );
 
-            saveBtn.AddText( UILayoutInfo.Fill(), "Save" )
+            saveBtn.AddText( new UILayoutInfo( UIFill.Fill() ), "Save" )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
-            UIInputField inputField = window.AddInputField( UILayoutInfo.FillHorizontal( 2, 99, 0f, 5, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
+            UIInputField inputField = window.AddInputField( new UILayoutInfo( UIFill.Horizontal( 2, 99 ), UIAnchor.Bottom, 5, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
 
             saveWindow._nameInputField = inputField;
             saveWindow._descriptionInputField = inputField;

@@ -42,7 +42,7 @@ namespace KSS.UI
         public static PartListEntryUI Create( IUIElementContainer parent, UILayoutInfo layout, PartMetadata part )
         {
             UIButton uiButton = parent.AddButton( layout, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_list_entry_background" ), null )
-                .WithText( UILayoutInfo.Fill(), part.Name, out var text );
+                .WithText( new UILayoutInfo( UIFill.Fill() ), part.Name, out var text );
             text.WithAlignment( TMPro.HorizontalAlignmentOptions.Center, TMPro.VerticalAlignmentOptions.Middle );
 
             PartListEntryUI partListEntryUI = uiButton.gameObject.AddComponent<PartListEntryUI>();

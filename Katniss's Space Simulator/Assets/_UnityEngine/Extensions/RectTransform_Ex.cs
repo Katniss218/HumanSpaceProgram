@@ -8,10 +8,20 @@ namespace UnityEngine
 {
 	public static class RectTransform_Ex
 	{
-		/// <summary>
-		/// Gets the center point of the rect transform.
-		/// </summary>
-		public static Vector2 GetLocalCenter( this RectTransform rectTransform )
+        /// <summary>
+        /// True if the rect transform is set to fill the width of its parent.
+        /// </summary>
+        public static bool FillsWidth( this RectTransform rt ) => (rt.anchorMin.x != rt.anchorMax.x);
+
+        /// <summary>
+        /// True if the rect transform is set to fill the height of its parent.
+        /// </summary>
+        public static bool FillsHeight( this RectTransform rt ) => (rt.anchorMin.y != rt.anchorMax.y);
+
+        /// <summary>
+        /// Gets the center point of the rect transform.
+        /// </summary>
+        public static Vector2 GetLocalCenter( this RectTransform rectTransform )
 		{
 			return rectTransform.rect.center;
 		}

@@ -3,29 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine;
 
 namespace UnityPlus.UILib
 {
-    public class ContextMenu : EventTrigger
+    public class RectTransformDestroyOnLeave : EventTrigger
     {
-        /// <summary>
-        /// The context menu will track this RectTransform.
-        /// </summary>
-        public RectTransform Target { get; set; }
-
-        /// <summary>
-        /// The offset to apply to the position of this context menu.
-        /// </summary>
-        public Vector2 Offset { get; set; }
-
-        void LateUpdate()
-        {
-            Vector2 pos = Target.TransformPoint( Vector2.zero );
-            this.transform.position = pos + Offset;
-        }
-
         public override void OnPointerExit( PointerEventData eventData )
         {
             // PointerEventData.fullyExited is false when pointer has exited to enter a child object.

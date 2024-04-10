@@ -108,7 +108,7 @@ namespace KSS.UI
 
         private static ControlSetupControlConnectionUI Internal_Create( ControlSetupWindow window, ControlSetupControlUI input, ControlSetupControlUI output, Vector2 offset )
         {
-            UIPanel connectionPanel = window.ConnectionContainer.AddPanel( UILayoutInfo.Fill(), null );
+            UIPanel connectionPanel = window.ConnectionContainer.AddPanel( new UILayoutInfo( UIFill.Fill() ), null );
 
             DestroyImmediate( connectionPanel.gameObject.GetComponent<Image>() );
             UILineRenderer lineRenderer = connectionPanel.gameObject.AddComponent<UILineRenderer>();

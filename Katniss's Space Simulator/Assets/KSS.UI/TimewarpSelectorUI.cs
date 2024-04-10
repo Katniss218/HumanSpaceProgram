@@ -114,7 +114,7 @@ namespace KSS.UI
 
                 if( warpRate == 0.0f )
                 {
-                    _warpButtons[i] = _root.AddButton( new UILayoutInfo( UILayoutInfo.Left, Vector2.zero, new Vector2( 16, 26 ) ),
+                    _warpButtons[i] = _root.AddButton( new UILayoutInfo( UIAnchor.Left, (0, 0), ( 16, 26 ) ),
                         currentWarpRate == 0
                         ? AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/timewarp_pause_active" )
                         : AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/timewarp_pause" ), OnClick0 );
@@ -122,9 +122,9 @@ namespace KSS.UI
                 else
                 {
                     if( currentWarpRate == 0 )
-                        _warpButtons[i] = _root.AddButton( new UILayoutInfo( UILayoutInfo.Left, Vector2.zero, Choose3Way( _sizes, _warpRates.Length, i ) ), Choose3Way( _sprites, _warpRates.Length, i ), () => OnClickNon0( warpRate ) );
+                        _warpButtons[i] = _root.AddButton( new UILayoutInfo( UIAnchor.Left, (0,0), (UISize)Choose3Way( _sizes, _warpRates.Length, i ) ), Choose3Way( _sprites, _warpRates.Length, i ), () => OnClickNon0( warpRate ) );
                     else
-                        _warpButtons[i] = _root.AddButton( new UILayoutInfo( UILayoutInfo.Left, Vector2.zero, Choose3Way( _sizes, _warpRates.Length, i ) ),
+                        _warpButtons[i] = _root.AddButton( new UILayoutInfo( UIAnchor.Left, (0, 0), (UISize)Choose3Way( _sizes, _warpRates.Length, i ) ),
                             currentWarpRate >= warpRate
                             ? Choose3Way( _spritesActive, _warpRates.Length, i )
                             : Choose3Way( _sprites, _warpRates.Length, i ), () => OnClickNon0( warpRate ) );
@@ -135,11 +135,11 @@ namespace KSS.UI
                 ? $"Paused"
                 : $"{currentWarpRate}x";
 
-            _text = _root.AddText( UILayoutInfo.FillVertical( 0, 0, UILayoutInfo.LeftF, 0, 50f ), rateText )
+            _text = _root.AddText( new UILayoutInfo( UIAnchor.Left, UIFill.Vertical(), 0, 50f ), rateText )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Left )
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
-            UILayout.BroadcastLayoutUpdate( _root );
+            UILayoutManager.BroadcastLayoutUpdate( _root );
         }
 
         public static TimewarpSelectorUI Create( IUIElementContainer parent, UILayoutInfo layoutInfo, IEnumerable<float> warpRates )

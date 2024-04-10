@@ -4,12 +4,12 @@ using UnityEngine.UI;
 
 namespace UnityPlus.UILib.UIElements
 {
-    public sealed class UIInputField : UIElement, IUIElementChild
+    public partial class UIInputField : UIElement, IUIElementChild
     {
-        internal TMPro.TMP_InputField inputFieldComponent;
-        internal TMPro.TextMeshProUGUI textComponent;
-        internal TMPro.TextMeshProUGUI placeholderComponent;
-        internal Image backgroundComponent;
+        protected TMPro.TMP_InputField inputFieldComponent;
+        protected TMPro.TextMeshProUGUI textComponent;
+        protected TMPro.TextMeshProUGUI placeholderComponent;
+        protected Image backgroundComponent;
 
         public IUIElementContainer Parent { get; set; }
 
@@ -19,25 +19,25 @@ namespace UnityPlus.UILib.UIElements
             inputFieldComponent.onValueChanged.AddListener( ( s ) => onTextChange( inputFieldComponent.text ) );
         }
 
-        public string Text { get => inputFieldComponent.text; set => inputFieldComponent.text = value; }
+        public virtual string Text { get => inputFieldComponent.text; set => inputFieldComponent.text = value; }
 
-        public Sprite Background { get => backgroundComponent.sprite; set => backgroundComponent.sprite = value; }
+        public virtual Sprite Background { get => backgroundComponent.sprite; set => backgroundComponent.sprite = value; }
 
-        public static UIInputField Create( IUIElementContainer parent, UILayoutInfo layout, Sprite background )
+        protected internal static T Create<T>( IUIElementContainer parent, UILayoutInfo layout, Sprite background ) where T : UIInputField
         {
-            (GameObject rootGameObject, RectTransform rootTransform, UIInputField uiInputField) = UIElement.CreateUIGameObject<UIInputField>( parent, "uilib-inputfield", layout );
+            (GameObject rootGameObject, RectTransform rootTransform, T uiInputField) = UIElement.CreateUIGameObject<T>( parent, $"uilib-{nameof( T )}", layout );
 
             Image imageComponent = rootGameObject.AddComponent<Image>();
             imageComponent.raycastTarget = true;
             imageComponent.sprite = background;
             imageComponent.type = Image.Type.Sliced;
 
-            (GameObject textareaGameObject, RectTransform textareaTransform) = UIElement.CreateUIGameObject( rootTransform, "uilib-inputfieldtextarea", new UILayoutInfo( Vector2.zero, Vector2.one, Vector2.zero, new Vector2( -10, -10 ) ) );
+            (GameObject textareaGameObject, RectTransform textareaTransform) = UIElement.CreateUIGameObject( rootTransform, $"uilib-{nameof( T )}-textarea", new UILayoutInfo( UIFill.Fill( 5, 5, 5, 5 ) ) );
 
             RectMask2D mask = textareaGameObject.AddComponent<RectMask2D>();
             mask.padding = new Vector4( -5, -5, -5, -5 );
 
-            (GameObject placeholderGameObject, _) = UIElement.CreateUIGameObject( textareaTransform, "uilib-inputfieldplaceholder", UILayoutInfo.Fill() );
+            (GameObject placeholderGameObject, _) = UIElement.CreateUIGameObject( textareaTransform, $"uilib-{nameof( T )}-placeholder", new UILayoutInfo( UIFill.Fill() ) );
 
             TMPro.TextMeshProUGUI placeholderText = placeholderGameObject.AddComponent<TMPro.TextMeshProUGUI>();
             placeholderText.raycastTarget = false;
@@ -45,7 +45,7 @@ namespace UnityPlus.UILib.UIElements
             placeholderText.horizontalAlignment = TMPro.HorizontalAlignmentOptions.Left;
             placeholderText.fontStyle = TMPro.FontStyles.Italic;
 
-            (GameObject textGameObject, _) = UIElement.CreateUIGameObject( textareaTransform, "uilib-inputfieldtext", UILayoutInfo.Fill() );
+            (GameObject textGameObject, _) = UIElement.CreateUIGameObject( textareaTransform, $"uilib-{nameof( T )}-text", new UILayoutInfo( UIFill.Fill() ) );
 
             TMPro.TextMeshProUGUI realText = textGameObject.AddComponent<TMPro.TextMeshProUGUI>();
             realText.raycastTarget = false;

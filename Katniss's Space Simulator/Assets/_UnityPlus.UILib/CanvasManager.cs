@@ -8,24 +8,42 @@ using Object = UnityEngine.Object;
 namespace UnityPlus.UILib
 {
     /// <summary>
-    /// Manages the various canvases used by the game.
+    /// Manages the various UI canvases used by the game.
     /// </summary>
     public static class CanvasManager
     {
-        static Dictionary<string, UICanvas> _canvasDict = new Dictionary<string, UICanvas>();
+        private static Dictionary<string, UICanvas> _canvasDict = new();
 
         /// <summary>
-        /// Registers a canvas under a specified ID.
+        /// Retrieves a canvas with the specified ID.
         /// </summary>
-        /// <exception cref="InvalidOperationException"/>
-        public static void Register( string id, UICanvas canvas )
+        /// <remarks>
+        /// Tries to find the canvas is it isn't cached yet.
+        /// </remarks>
+        public static UICanvas Get( string id )
         {
-            if( _canvasDict.ContainsKey( id ) )
+            if( _canvasDict.TryGetValue( id, out UICanvas canvas ) )
             {
-                throw new InvalidOperationException( $"Can't register a canvas under the name `{id}`. A canvas with this name is already registered." );
+                if( !canvas.IsNullOrDestroyed() )
+                {
+                    return canvas;
+                }
             }
 
-            _canvasDict[id] = canvas;
+            // If no canvas is found, we should try to find it, because it might've been loaded/created after the previous invocation of this method.
+            TryRegisterUnknownCanvases();
+
+            if( _canvasDict.TryGetValue( id, out canvas ) )
+            {
+                if( canvas == null )
+                {
+                    _canvasDict.Remove( id );
+                    throw new ArgumentException( $"A canvas with the ID `{id}` doesn't exist." );
+                }
+                return canvas;
+            }
+
+            throw new ArgumentException( $"A canvas with the ID `{id}` doesn't exist." );
         }
 
         private static void TryRegisterUnknownCanvases()
@@ -64,35 +82,17 @@ namespace UnityPlus.UILib
         }
 
         /// <summary>
-        /// Retrieves a canvas with the specified ID.
+        /// Registers a canvas under a specified ID.
         /// </summary>
-        /// <remarks>
-        /// Tries to find the canvas is it isn't cached yet.
-        /// </remarks>
-        public static UICanvas Get( string id )
+        /// <exception cref="InvalidOperationException"/>
+        public static void Register( string id, UICanvas canvas )
         {
-            if( _canvasDict.TryGetValue( id, out UICanvas canvas ) )
+            if( _canvasDict.ContainsKey( id ) )
             {
-                if( !canvas.IsNullOrDestroyed() )
-                {
-                    return canvas;
-                }
+                throw new InvalidOperationException( $"Can't register a canvas under the name `{id}`. A canvas with this name is already registered." );
             }
 
-            // If no canvas is found, we should try to find it, because it might've been loaded/created after the previous invocation of this method.
-            TryRegisterUnknownCanvases();
-
-            if( _canvasDict.TryGetValue( id, out canvas ) )
-            {
-                if( canvas == null )
-                {
-                    _canvasDict.Remove( id );
-                    throw new ArgumentException( $"A canvas with the ID `{id}` doesn't exist." );
-                }
-                return canvas;
-            }
-
-            throw new ArgumentException( $"A canvas with the ID `{id}` doesn't exist." );
+            _canvasDict[id] = canvas;
         }
     }
 }

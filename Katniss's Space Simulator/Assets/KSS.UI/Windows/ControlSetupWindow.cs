@@ -23,10 +23,12 @@ namespace KSS.UI.Windows
         /// </summary>
         public Transform Target { get; private set; }
 
-        internal UIWindow window;
-        private UIScrollView _scrollView;
+        private UIContextMenu _componentList;
+
         internal IUIElementContainer ComponentContainer { get; private set; }
         internal IUIElementContainer ConnectionContainer { get; private set; }
+
+        internal UIWindow window;
 
         Dictionary<Component, ControlSetupWindowComponentUI> _visibleComponents = new();
 
@@ -37,6 +39,10 @@ namespace KSS.UI.Windows
 
         private static LastVisibleEntry[] _lastVisibleComponents = new LastVisibleEntry[] { };
 
+        /// <summary>
+        /// Creates a component UI for the specified component, if not already visible. <br/>
+        /// Updates the connections to keep synced.
+        /// </summary>
         public void ShowComponent( Component component )
         {
             if( _visibleComponents.ContainsKey( component ) )
@@ -51,6 +57,10 @@ namespace KSS.UI.Windows
             }
         }
 
+        /// <summary>
+        /// Destroys the component UI for the specified component. <br/>
+        /// Updates the connections to keep synced.
+        /// </summary>
         public void HideComponent( Component component )
         {
             if( _visibleComponents.TryGetValue( component, out var componentUI ) )
@@ -87,8 +97,10 @@ namespace KSS.UI.Windows
                 {
                     _visibleOutputs.Add( output.Control, output );
                 }
+
                 return true;
             }
+
             componentUI = null;
             return false;
         }
@@ -209,6 +221,7 @@ namespace KSS.UI.Windows
                 component = c.Key,
                 lastAnchoredPosition = ((RectTransform)c.Value.transform).anchoredPosition
             } ).ToArray();
+
             window.Destroy();
         }
 
@@ -224,66 +237,66 @@ namespace KSS.UI.Windows
                     .ToArray();
             }
 
-            UIWindow window = CanvasManager.Get( CanvasName.WINDOWS ).AddWindow( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 750, 750 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_window" ) )
+            UIWindow window = CanvasManager.Get( CanvasName.WINDOWS ).AddWindow( new UILayoutInfo( UIAnchor.Center, (0, 0), (750, 750) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_window" ) )
                 .Draggable()
                 .Focusable()
-                .WithCloseButton( new UILayoutInfo( Vector2.one, new Vector2( -7, -5 ), new Vector2( 20, 20 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ );
+                .WithCloseButton( new UILayoutInfo( UIAnchor.TopRight, (-7, -5), (20, 20) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ );
 
             // TODO - resizable windows.
 
-            UIScrollView scrollView = window.AddScrollView( UILayoutInfo.Fill( 5, 5, 30, 5 ), new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 750, 750 ) ), true, true );
+            UIScrollView scrollView = window.AddScrollView( new UILayoutInfo( UIFill.Fill( 5, 5, 30, 5 ) ), new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (750, 750) ), true, true );
 
-            UIPanel topPanel = window.AddPanel( UILayoutInfo.FillHorizontal( 45, 45, UILayoutInfo.TopF, 0, 30 ), null );
-            UIButton btn = topPanel.AddButton( new UILayoutInfo( UILayoutInfo.Left, Vector2.zero, new Vector2( 15, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_list_gold" ), null );
+            UIPanel topPanel = window.AddPanel( new UILayoutInfo( UIFill.Horizontal( 45, 45 ), UIAnchor.Top, 0, 30 ), null );
+            UIButton componentListButton = topPanel.AddButton( new UILayoutInfo( UIAnchor.Left, (0, 0), (15, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_list_gold" ), null );
 
-            UIPanel nodeLayerPanel = scrollView.AddPanel( UILayoutInfo.Fill(), null );
-            UIPanel connectionLayerPanel = scrollView.AddPanel( UILayoutInfo.Fill(), null );
+            UIPanel nodeLayerPanel = scrollView.AddPanel( new UILayoutInfo( UIFill.Fill() ), null );
+            UIPanel connectionLayerPanel = scrollView.AddPanel( new UILayoutInfo( UIFill.Fill() ), null );
 
-            ControlSetupWindow w = window.gameObject.AddComponent<ControlSetupWindow>();
-            w.Target = target;
-            w.window = window;
-            w._scrollView = scrollView;
-            w.ComponentContainer = nodeLayerPanel;
-            w.ConnectionContainer = connectionLayerPanel;
+            ControlSetupWindow controlWindow = window.gameObject.AddComponent<ControlSetupWindow>();
+            controlWindow.Target = target;
+            controlWindow.window = window;
+            controlWindow.ComponentContainer = nodeLayerPanel;
+            controlWindow.ConnectionContainer = connectionLayerPanel;
 
-            btn.onClick = () =>
+            componentListButton.onClick = () =>
             {
-                CreateAllComponentsContextMenu( w, btn, target.GetComponentsInChildren()
+                if( !controlWindow._componentList.IsNullOrDestroyed() )
+                    return;
+
+                controlWindow._componentList = CreateAllComponentsContextMenu( controlWindow, componentListButton, target.GetComponentsInChildren()
                     .Where( c => ControlUtils.HasControlsOrGroups( c ) )
                     .ToArray() );
             };
 
-            w.CreateNodes( _lastVisibleComponents );
-            w.CreateConnections(); // Connections should be created after the component nodes are created. This ensures that all inputs/outputs are created.
+            controlWindow.CreateNodes( _lastVisibleComponents );
+            controlWindow.CreateConnections(); // All connections after the nodes, runs faster.
 
-            return w;
+            return controlWindow;
         }
 
         private static UIContextMenu CreateAllComponentsContextMenu( ControlSetupWindow window, UIButton targetButton, Component[] componentsWithControls )
         {
-            UIContextMenu cm = targetButton.rectTransform.CreateContextMenu( CanvasManager.Get( CanvasName.CONTEXT_MENUS ), new UILayoutInfo( UILayoutInfo.TopLeft, Vector2.zero, new Vector2( 200, 400 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_list_entry_background" ) );
-            // create context menu with the elements.
-            // - each component: name and whether already shown. if not shown, click to show.
+            UIContextMenu contextMenu = targetButton.rectTransform.CreateContextMenu( CanvasManager.Get( CanvasName.CONTEXT_MENUS ), new UILayoutInfo( UIAnchor.TopLeft, (0, 0), (200, 400) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_list_entry_background" ) );
 
-            UIScrollView sv = cm.AddVerticalScrollView( UILayoutInfo.Fill(), 1000 );
+            UIScrollView scrollView = contextMenu.AddVerticalScrollView( new UILayoutInfo( UIFill.Fill() ), 1000 );
 
             float currentY = 0f;
-            foreach( var comp in componentsWithControls )
+            foreach( var component in componentsWithControls )
             {
-                sv.AddButton( UILayoutInfo.FillHorizontal( 0, 0, UILayoutInfo.TopF, currentY, 15f ), null, () =>
+                scrollView.AddButton( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Top, currentY, 15f ), null, () =>
                 {
-                    if( !window._visibleComponents.ContainsKey( comp ) )
+                    if( !window._visibleComponents.ContainsKey( component ) )
                     {
-                        window.ShowComponent( comp );
+                        window.ShowComponent( component );
                     }
                 } )
-                    .AddText( UILayoutInfo.Fill(), comp.GetType().Name )
-                    .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, window._visibleComponents.ContainsKey(comp) ? Color.white : Color.green );
+                    .AddText( new UILayoutInfo( UIFill.Fill() ), component.GetType().Name )
+                    .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, window._visibleComponents.ContainsKey( component ) ? Color.white : Color.green );
 
                 currentY -= 15f;
             }
 
-            return cm;
+            return contextMenu;
         }
     }
 }

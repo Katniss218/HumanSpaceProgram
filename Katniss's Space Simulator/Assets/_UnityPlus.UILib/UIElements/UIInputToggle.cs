@@ -5,17 +5,15 @@ using UnityEngine;
 
 namespace UnityPlus.UILib.UIElements
 {
-    public sealed class UIInputToggle : UIElement
+    public partial class UIInputToggle : UIElement, IUIElementChild
     {
         // Toggle has 2 sprites, one for inactive, and other for active.
 
-        internal readonly IUIElementContainer _parent;
-        public IUIElementContainer parent { get => _parent; }
+        public IUIElementContainer Parent { get; set; }
 
-        public static UIInputToggle Create()
+        protected internal static T Create<T>() where T : UIInputToggle
         {
             throw new NotImplementedException();
-            // uiInputToggle._parent = parent;
         }
     }
 }

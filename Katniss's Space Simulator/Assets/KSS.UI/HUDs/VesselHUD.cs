@@ -28,7 +28,7 @@ namespace KSS.UI.HUDs
             if( vessel == null )
                 throw new ArgumentNullException( nameof( vessel ) );
 
-            UIButton button = parent.AddButton( new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_new" ), null );
+            UIButton button = parent.AddButton( new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
 
             VesselHUD uiHUD = button.gameObject.AddComponent<VesselHUD>();
             button.onClick = uiHUD.OnClick;

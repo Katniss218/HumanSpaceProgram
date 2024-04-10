@@ -26,24 +26,24 @@ namespace KSS.UI
 
         public static StartNewGameWindow Create()
         {
-            UIWindow window = CanvasManager.Get( CanvasName.WINDOWS ).AddWindow( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 400f, 400f ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_window" ) )
+            UIWindow window = CanvasManager.Get( CanvasName.WINDOWS ).AddWindow( new UILayoutInfo( UIAnchor.Center, (0, 0), (400f, 400f) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_window" ) )
                 .Draggable()
                 .Focusable()
-                .WithCloseButton( new UILayoutInfo( Vector2.one, new Vector2( -7, -5 ), new Vector2( 20, 20 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ );
+                .WithCloseButton( new UILayoutInfo( UIAnchor.TopRight, (-7, -5), (20, 20) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ );
 
-            window.AddText( new UILayoutInfo( new Vector2( 0.5f, 1 ), new Vector2( -100, -32 ), new Vector2( 100, 15 ) ), "Timeline Name" )
+            window.AddText( new UILayoutInfo( UIAnchor.Top, (-100, -32), (100, 15) ), "Timeline Name" )
                 .WithFont( AssetRegistry.Get<TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
                 .WithAlignment( HorizontalAlignmentOptions.Right );
 
-            UIInputField inputField = window.AddInputField( new UILayoutInfo( new Vector2( 0.5f, 1 ), new Vector2( 100, -32 ), new Vector2( 200, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
+            UIInputField inputField = window.AddInputField( new UILayoutInfo( UIAnchor.Top, (100, -32), (200, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
 
             StartNewGameWindow windowComponent = window.gameObject.AddComponent<StartNewGameWindow>();
 
-            window.AddButton( new UILayoutInfo( new Vector2( 0.5f, 0 ), new Vector2( 0, 2 ), new Vector2( 200, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
+            window.AddButton( new UILayoutInfo( UIAnchor.Bottom, (0, 2), (200, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
             {
                 windowComponent.StartGame();
             } )
-                .AddText( UILayoutInfo.Fill(), "Start" )
+                .AddText( new UILayoutInfo( UIFill.Fill() ), "Start" )
                 .WithFont( AssetRegistry.Get<TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
                 .WithAlignment( HorizontalAlignmentOptions.Center );
 

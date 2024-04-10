@@ -7,7 +7,7 @@ using UnityPlus.UILib.Layout;
 
 namespace UnityPlus.UILib.UIElements
 {
-    public static class UIElementEx
+    public static class UIElement_Ex
     {
         /// <summary>
         /// Checks whether or not the specified UI element has been destroyed.
@@ -37,7 +37,7 @@ namespace UnityPlus.UILib.UIElements
             parent.Children.Add( child );
             child.rectTransform.SetParent( parent.contents );
 
-            UILayout.BroadcastLayoutUpdate( child );
+            UILayoutManager.BroadcastLayoutUpdate( child );
         }
 
         public static void MoveBefore( this IUIElementChild child, IUIElementChild anotherChild )
@@ -52,7 +52,7 @@ namespace UnityPlus.UILib.UIElements
 
             child.rectTransform.SetSiblingIndex( anotherChild.rectTransform.GetSiblingIndex() - 1 );
 
-            UILayout.BroadcastLayoutUpdate( child );
+            UILayoutManager.BroadcastLayoutUpdate( child );
         }
 
         public static void MoveAfter( this IUIElementChild child, IUIElementChild anotherChild )
@@ -67,7 +67,7 @@ namespace UnityPlus.UILib.UIElements
 
             child.rectTransform.SetSiblingIndex( anotherChild.rectTransform.GetSiblingIndex() );
 
-            UILayout.BroadcastLayoutUpdate( child );
+            UILayoutManager.BroadcastLayoutUpdate( child );
         }
 
         public static void MoveToStart( this IUIElementChild child )
@@ -77,7 +77,7 @@ namespace UnityPlus.UILib.UIElements
 
             child.rectTransform.SetAsFirstSibling();
 
-            UILayout.BroadcastLayoutUpdate( child );
+            UILayoutManager.BroadcastLayoutUpdate( child );
         }
 
         public static void MoveToEnd( this IUIElementChild child )
@@ -87,7 +87,7 @@ namespace UnityPlus.UILib.UIElements
 
             child.rectTransform.SetAsLastSibling();
 
-            UILayout.BroadcastLayoutUpdate( child );
+            UILayoutManager.BroadcastLayoutUpdate( child );
         }
     }
 }

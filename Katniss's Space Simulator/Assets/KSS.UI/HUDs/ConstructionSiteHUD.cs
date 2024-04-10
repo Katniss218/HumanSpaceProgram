@@ -45,7 +45,7 @@ namespace KSS.UI.HUDs
         {
             if( ConstructionSite.BuildSpeed == 0.0f )
                 return AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/csite_status_blocked" );
-            
+
             if( ConstructionSite.GetCountOfProgressing() == 0 )
                 return AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/csite_status_blocked" );
 
@@ -79,13 +79,13 @@ namespace KSS.UI.HUDs
             if( constructionSite == null )
                 throw new ArgumentNullException( nameof( constructionSite ) );
 
-            UIPanel panel = parent.AddPanel( new UILayoutInfo( UILayoutInfo.Middle, UILayoutInfo.Middle, UILayoutInfo.BottomLeft, Vector2.zero, new Vector2( 125, 55 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/csite_hud" ) );
+            UIPanel panel = parent.AddPanel( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0.5f, 0.5f ), Vector2.zero, Vector2.zero, new Vector2( 125, 55 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/csite_hud" ) );
 
-            UIIcon statucIcon = panel.AddIcon( new UILayoutInfo( UILayoutInfo.TopLeft, new Vector2( 26, -5 ), new Vector2( 20, 20 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/csite_status_in_progress" ) );
-            UIIcon progressIcon = panel.AddIcon( new UILayoutInfo( UILayoutInfo.TopLeft, new Vector2( 21, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/csite_progress_bar" ) );
-            UIButton pauseResumeButton = panel.AddButton( new UILayoutInfo( UILayoutInfo.TopLeft, new Vector2( 53, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_pause" ), null );
-            UIButton reverseButton = panel.AddButton( new UILayoutInfo( UILayoutInfo.TopLeft, new Vector2( 85, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null )
-                .WithText( UILayoutInfo.Fill(), "rev.", out _ );
+            UIIcon statucIcon = panel.AddIcon( new UILayoutInfo( UIAnchor.TopLeft, (26, -5), (20, 20) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/csite_status_in_progress" ) );
+            UIIcon progressIcon = panel.AddIcon( new UILayoutInfo( UIAnchor.TopLeft, (21, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/csite_progress_bar" ) );
+            UIButton pauseResumeButton = panel.AddButton( new UILayoutInfo( UIAnchor.TopLeft, (53, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_pause" ), null );
+            UIButton reverseButton = panel.AddButton( new UILayoutInfo( UIAnchor.TopLeft, (85, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null )
+                .WithText( new UILayoutInfo( UIFill.Fill() ), "rev.", out _ );
 
             ConstructionSiteHUD uiHUD = panel.gameObject.AddComponent<ConstructionSiteHUD>();
             uiHUD.ConstructionSite = constructionSite;

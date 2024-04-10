@@ -8,17 +8,17 @@ namespace UnityPlus.UILib.UIElements
     /// <summary>
     /// Represents a simple icon UI element.
     /// </summary>
-    public sealed class UIIcon : UIElement, IUIElementChild
+    public partial class UIIcon : UIElement, IUIElementChild
     {
-        internal Image imageComponent;
+        protected Image imageComponent;
 
         public IUIElementContainer Parent { get; set; }
 
-        public Sprite Sprite { get => imageComponent.sprite; set => imageComponent.sprite = value; }
+        public virtual Sprite Sprite { get => imageComponent.sprite; set => imageComponent.sprite = value; }
 
-        public static UIIcon Create( IUIElementContainer parent, UILayoutInfo layoutInfo, Sprite icon )
+        protected internal static T Create<T>( IUIElementContainer parent, UILayoutInfo layoutInfo, Sprite icon ) where T : UIIcon
         {
-            (GameObject rootGameObject, RectTransform rootTransform, UIIcon uiIcon) = UIElement.CreateUIGameObject<UIIcon>( parent, "uilib-icon", layoutInfo );
+            (GameObject rootGameObject, RectTransform rootTransform, T uiIcon) = UIElement.CreateUIGameObject<T>( parent, $"uilib-{nameof( T )}", layoutInfo );
 
             Image imageComponent = rootGameObject.AddComponent<Image>();
             imageComponent.raycastTarget = false;

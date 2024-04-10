@@ -38,12 +38,12 @@ namespace KSS.UI
             component.Save = save;
             component.onClick = onClick;
 
-            UIText t = panel.AddText( UILayoutInfo.FillHorizontal( 0, 0, 0f, 0, 0.5f ), save.Name );
+            UIText t = panel.AddText( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Bottom, 0, 0.5f ), save.Name );
             t.FitToContents = true;
-            t = panel.AddText( UILayoutInfo.FillHorizontal( 0, 0, 0f, 0.5f, 0f ), save.Description );
+            t = panel.AddText( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Bottom, 0.5f, 0f ), save.Description );
             t.FitToContents = true;
 
-            UILayout.BroadcastLayoutUpdate( panel );
+            UILayoutManager.BroadcastLayoutUpdate( panel );
 
             return component;
         }

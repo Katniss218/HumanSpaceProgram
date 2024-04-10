@@ -34,9 +34,9 @@ namespace KSS.UI
 
         public static IResourceContainerUI Create( IUIElementContainer parent, IResourceContainer referenceObj )
         {
-            UIPanel panel = parent.AddPanel( new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 250, 15 ) ), null );
+            UIPanel panel = parent.AddPanel( new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (250, 15) ), null );
 
-            UIValueBar bar = panel.AddHorizontalValueBar(new UILayoutInfo( Vector2.zero, Vector2.one, new Vector2( 0.5f, 0.5f ), Vector2.zero, Vector2.zero ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/bar_background" ) )
+            UIValueBar bar = panel.AddHorizontalValueBar( new UILayoutInfo( UIFill.Fill() ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/bar_background" ) )
                 .WithPadding( 5, 5, 1 );
 
             IResourceContainerUI ui = panel.gameObject.AddComponent<IResourceContainerUI>();

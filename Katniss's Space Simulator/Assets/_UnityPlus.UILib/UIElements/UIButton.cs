@@ -8,18 +8,18 @@ using UnityPlus.UILib.Layout;
 
 namespace UnityPlus.UILib.UIElements
 {
-    public sealed class UIButton : UIElement, IUIElementContainer, IUIElementChild, IUILayoutDriven
+    public partial class UIButton : UIElement, IUIElementContainer, IUIElementChild, IUILayoutDriven
     {
-        internal Button buttonComponent;
-        internal Image backgroundComponent;
-        public RectTransform contents => base.rectTransform;
+        protected Button buttonComponent;
+        protected Image backgroundComponent;
+        public virtual RectTransform contents => base.rectTransform;
 
         public IUIElementContainer Parent { get; set; }
         public List<IUIElementChild> Children { get; } = new List<IUIElementChild>();
 
         public LayoutDriver LayoutDriver { get; set; }
 
-        public Sprite Background { get => backgroundComponent.sprite; set => backgroundComponent.sprite = value; }
+        public virtual Sprite Background { get => backgroundComponent.sprite; set => backgroundComponent.sprite = value; }
 
         Action _onClick;
         public Action onClick
@@ -36,9 +36,9 @@ namespace UnityPlus.UILib.UIElements
             }
         }
 
-        public static UIButton Create( IUIElementContainer parent, UILayoutInfo layout, Sprite background, Action onClick )
+        protected internal static T Create<T>( IUIElementContainer parent, UILayoutInfo layout, Sprite background, Action onClick ) where T : UIButton
         {
-            (GameObject rootGameObject, RectTransform rootTransform, UIButton uiButton) = UIElement.CreateUIGameObject<UIButton>( parent, "uilib-button", layout );
+            (GameObject rootGameObject, RectTransform rootTransform, T uiButton) = UIElement.CreateUIGameObject<T>( parent, $"uilib-{nameof( T )}", layout );
 
             Image backgroundComponent = rootGameObject.AddComponent<Image>();
             backgroundComponent.raycastTarget = true;

@@ -5,16 +5,15 @@ using UnityEngine;
 
 namespace UnityPlus.UILib.UIElements
 {
-    public sealed class UIInputSlider : UIElement, IUIElementChild
+    public partial class UIInputSlider : UIElement, IUIElementChild
     {
         // A slider produces float values, between a and b, with rounding to the nearest multiple of x.
 
         public IUIElementContainer Parent { get; set; }
 
-        public static UIInputSlider Create()
+        protected internal static T Create<T>() where T : UIInputSlider
         {
             throw new NotImplementedException();
-            // uiInputSlider._parent = parent;
         }
     }
 }

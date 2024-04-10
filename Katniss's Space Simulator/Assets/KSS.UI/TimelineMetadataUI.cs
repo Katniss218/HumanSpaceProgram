@@ -37,12 +37,12 @@ namespace KSS.UI
             component.Timeline = timeline;
             component.onClick = onClick;
 
-            UIText t = panel.AddText( UILayoutInfo.FillHorizontal( 0, 0, 0f, 0, 0.5f ), timeline.Name );
+            UIText t = panel.AddText( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Bottom, 0, 0.5f ), timeline.Name );
             t.FitToContents = true;
-            t = panel.AddText( UILayoutInfo.FillHorizontal( 0, 0, 0f, 0.5f, 0f ), timeline.Description );
+            t = panel.AddText( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Bottom, 0.5f, 0f ), timeline.Description );
             t.FitToContents = true;
 
-            UILayout.BroadcastLayoutUpdate( panel );
+            UILayoutManager.BroadcastLayoutUpdate( panel );
 
             return component;
         }

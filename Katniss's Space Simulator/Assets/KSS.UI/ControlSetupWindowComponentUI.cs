@@ -28,20 +28,20 @@ namespace KSS.UI
         /// The component that this node represents.
         /// </summary>
         public Component Component { get; private set; }
-        
+
         /// <summary>
         /// The 'root' group of this component UI. Every node has one.
         /// </summary>
         public ControlSetupControlGroupUI Group { get; private set; }
-        
+
         internal UIPanel panel; // this is ugly. UI should provide a way of creating new UI elements easily, without boilerplate, and with restrictions what can be a child, etc.
 
-		public IEnumerable<ControlSetupControlUI> GetInputs()
+        public IEnumerable<ControlSetupControlUI> GetInputs()
         {
             return Group.GetInputsRecursive();
         }
-        
-		public IEnumerable<ControlSetupControlUI> GetOutputs()
+
+        public IEnumerable<ControlSetupControlUI> GetOutputs()
         {
             return Group.GetOutputsRecursive();
         }
@@ -50,20 +50,20 @@ namespace KSS.UI
         {
             this.panel.Destroy();
         }
-        
-		private void OnDragged()
-		{
+
+        private void OnDragged()
+        {
             Window.RefreshConnectionPositions();
         }
 
-		/// <summary>
-		/// Creates a control setup node for a given component.
-		/// </summary>
-		internal static ControlSetupWindowComponentUI Create( ControlSetupWindow window, Component component )
+        /// <summary>
+        /// Creates a control setup node for a given component.
+        /// </summary>
+        internal static ControlSetupWindowComponentUI Create( ControlSetupWindow window, Component component )
         {
             // it is possible to force-show nodes for components outside of the target hierarchy of the window.
 
-            UIPanel panel = window.ComponentContainer.AddPanel( new UILayoutInfo( UILayoutInfo.Middle, Vector2.zero, new Vector2( 150, 150 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_node" ) );
+            UIPanel panel = window.ComponentContainer.AddPanel( new UILayoutInfo( UIAnchor.Center, (0, 0), (150, 150) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_node" ) );
 
             panel.Raycastable( true );
 
@@ -81,9 +81,9 @@ namespace KSS.UI
             dragger.UITransform = panel.rectTransform;
             dragger.OnDragging = node.OnDragged;
 
-            UIText text = panel.AddText( UILayoutInfo.FillHorizontal( 5, 5, UILayoutInfo.TopF, 0, 20 ), component.GetType().Name );
+            UIText text = panel.AddText( new UILayoutInfo( UIFill.Horizontal( 5, 5 ), UIAnchor.Top, 0, 20 ), component.GetType().Name );
 
-            panel.AddButton( new UILayoutInfo( UILayoutInfo.TopRight, Vector2.zero, new Vector2( 20, 20 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_node_close" ), () =>
+            panel.AddButton( new UILayoutInfo( UIAnchor.TopRight, (0, 0), (20, 20) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_node_close" ), () =>
             {
                 window.HideComponent( component );
             } );

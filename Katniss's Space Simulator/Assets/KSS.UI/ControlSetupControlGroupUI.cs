@@ -181,7 +181,7 @@ namespace KSS.UI
 
         internal static ControlSetupControlGroupUI Create( ControlSetupWindowComponentUI node, Component component )
         {
-            UIPanel panel = node.panel.AddPanel( UILayoutInfo.FillHorizontal( 0, 0, UILayoutInfo.TopF, -20, ROW_HEIGHT ), null );
+            UIPanel panel = node.panel.AddPanel( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Top, -20, ROW_HEIGHT ), null );
 
             ControlSetupControlGroupUI groupUI = panel.gameObject.AddComponent<ControlSetupControlGroupUI>();
             groupUI.panel = panel;
@@ -198,7 +198,7 @@ namespace KSS.UI
 
         internal static ControlSetupControlGroupUI Create( ControlSetupControlGroupUI group, float verticalOffset, object target, NamedControlAttribute attr )
         {
-            UIPanel panel = group.panel.AddPanel( UILayoutInfo.FillHorizontal( 0, 0, UILayoutInfo.TopF, -verticalOffset, ROW_HEIGHT ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_group" ) );
+            UIPanel panel = group.panel.AddPanel( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Top, -verticalOffset, ROW_HEIGHT ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_group" ) );
 
             ControlSetupControlGroupUI groupUI = panel.gameObject.AddComponent<ControlSetupControlGroupUI>();
             groupUI.panel = panel;

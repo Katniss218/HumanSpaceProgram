@@ -65,7 +65,7 @@
     <Compile Include="Assets\KSS.UI\SaveMetadataUI.cs" />
     <Compile Include="Assets\KSS.UI\ControlSetupWindowComponentUI.cs" />
     <Compile Include="Assets\KSS.UI\CanvasName.cs" />
-    <Compile Include="Assets\KSS.UI\Windows\ConfirmationWindow_Ex.cs" />
+    <Compile Include="Assets\KSS.UI\Windows\UIConfirmationWindow.cs" />
     <Compile Include="Assets\KSS.UI\SceneFactories\GameplaySceneUIFactory.cs" />
     <Compile Include="Assets\KSS.UI\TimewarpSelectorUI.cs" />
     <Compile Include="Assets\KSS.UI\UILineRenderer.cs" />
@@ -93,6 +93,7 @@
     <Compile Include="Assets\KSS.UI\SceneFactories\DesignSceneUIFactory.cs" />
     <Compile Include="Assets\KSS.UI\FPSCounterUI.cs" />
     <Compile Include="Assets\KSS.UI\Windows\ControlSetupWindow.cs" />
+    <Compile Include="Assets\KSS.UI\Windows\UIPromptWindow.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.UI\___KSS.UI.asmdef" />

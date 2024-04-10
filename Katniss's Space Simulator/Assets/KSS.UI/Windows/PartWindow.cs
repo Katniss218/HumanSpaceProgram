@@ -109,19 +109,19 @@ namespace KSS.UI.Windows
                 throw new ArgumentNullException( nameof( referencePart ), $"Can't create a part window for an object that can't be mapped to a {nameof( PartMetadata )}." );
             }
 
-            UIWindow window = CanvasManager.Get( CanvasName.WINDOWS ).AddWindow( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 300f, 300f ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_window" ) )
+            UIWindow window = CanvasManager.Get( CanvasName.WINDOWS ).AddWindow( new UILayoutInfo( UIAnchor.Center, (0, 0), (300f, 300f) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_window" ) )
                 .Draggable()
                 .Focusable()
-                .WithCloseButton( new UILayoutInfo( Vector2.one, new Vector2( -7, -5 ), new Vector2( 20, 20 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ )
+                .WithCloseButton( new UILayoutInfo( UIAnchor.TopRight, (-7, -5), (20, 20) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ )
                 .WithRelationHightlight( out WindowRelationHighlight relationHighlight );
 
             // masses/etc can be summed up from components in children of reference part.
 
-            window.AddText( UILayoutInfo.FillHorizontal( 0, 0, 1f, 0, 30 ), part.Name )
+            window.AddText( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Top, 0, 30 ), part.Name )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
-            UIScrollView scrollView = window.AddVerticalScrollView( UILayoutInfo.Fill( 2, 2, 75, 15 ), 200 );
+            UIScrollView scrollView = window.AddVerticalScrollView( new UILayoutInfo( UIFill.Fill( 2, 2, 75, 15 ) ), 200 );
 
             PartWindow partWindow = window.gameObject.AddComponent<PartWindow>();
             partWindow._list = scrollView;

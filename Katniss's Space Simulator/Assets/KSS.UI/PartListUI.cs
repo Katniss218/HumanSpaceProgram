@@ -34,32 +34,37 @@ namespace KSS.UI
 
             foreach( var id in PartMetadata.Filtered( _parts, _category, _filter ) )
             {
-                PartListEntryUI.Create( _list, new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 75, 75 ) ), id );
+                PartListEntryUI.Create( _list, new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (75, 75) ), id );
             }
-            UILayout.BroadcastLayoutUpdate( _list );
+            UILayoutManager.BroadcastLayoutUpdate( _list );
 
             foreach( var cat in _categories )
             {
-                string label = cat == null ? "ALL" : cat.Length < 4 ? cat : cat.Substring( 0, 4 );
-                _categoryList.AddButton( new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 40, 34 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/category_background" ), () =>
+                string label = cat == null
+                    ? "ALL"
+                    : cat.Length < 4
+                        ? cat
+                        : cat[..4];
+
+                _categoryList.AddButton( new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (40, 34) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/category_background" ), () =>
                  {
                      this._category = cat;
                      this.Refresh();
                  } )
-                    .WithText( UILayoutInfo.Fill(), label ?? "all", out var text );
+                    .WithText( new UILayoutInfo( UIFill.Fill() ), label ?? "all", out var text );
                 text.WithAlignment( TMPro.HorizontalAlignmentOptions.Center, TMPro.VerticalAlignmentOptions.Middle );
             }
-            UILayout.BroadcastLayoutUpdate( _categoryList );
+            UILayoutManager.BroadcastLayoutUpdate( _categoryList );
         }
 
         public static PartListUI Create( IUIElementContainer parent, UILayoutInfo layout )
         {
             UIPanel uiPanel = parent.AddPanel( layout, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_list_background" ) );
-            UIInputField filterIF = uiPanel.AddInputField( UILayoutInfo.FillHorizontal( 2, 2, 1f, -2, 20 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field_ha" ) )
+            UIInputField filterIF = uiPanel.AddInputField( new UILayoutInfo( UIFill.Horizontal( 2, 2 ), UIAnchor.Top, -2, 20 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field_ha" ) )
                 .WithMargins( 15, 15, 0, 0 )
                 .WithPlaceholder( "search..." );
-            UIScrollView uiPartList = uiPanel.AddVerticalScrollView( UILayoutInfo.Fill( 42, 2, 24, 100 ), 200 )
-                .WithVerticalScrollbar( UILayoutInfo.FillVertical( 0, 0, 1f, 0, 10 ), null, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_handle" ), out _ );
+            UIScrollView uiPartList = uiPanel.AddVerticalScrollView( new UILayoutInfo( UIFill.Fill( 42, 2, 24, 100 ) ), 200 )
+                .WithVerticalScrollbar( new UILayoutInfo( UIAnchor.Right, UIFill.Vertical(), 0, 10 ), null, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_handle" ), out _ );
 
             uiPartList.LayoutDriver = new BidirectionalLayoutDriver()
             {
@@ -68,7 +73,7 @@ namespace KSS.UI
                 FitToSize = true
             };
 
-            UIScrollView categoryScroll = uiPanel.AddVerticalScrollView( UILayoutInfo.FillVertical( 24, 100, 0f, 0, 40 ), 200 );
+            UIScrollView categoryScroll = uiPanel.AddVerticalScrollView( new UILayoutInfo( UIAnchor.Left, UIFill.Vertical( 24, 100 ), 0, 40 ), 200 );
 
             categoryScroll.LayoutDriver = new VerticalLayoutDriver()
             {

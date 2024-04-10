@@ -60,7 +60,7 @@ namespace KSS.UI
             _selectedTimelineSaves = new SaveMetadataUI[saves.Length];
             for( int i = 0; i < _selectedTimelineSaves.Length; i++ )
             {
-                _selectedTimelineSaves[i] = SaveMetadataUI.Create( _saveListUI, UILayoutInfo.FillHorizontal( 0, 0, 0, 0, 40 ), saves[i], ( ui ) =>
+                _selectedTimelineSaves[i] = SaveMetadataUI.Create( _saveListUI, new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Bottom, 0, 40 ), saves[i], ( ui ) =>
                 {
                     _selectedSave = ui;
                 } );
@@ -83,7 +83,7 @@ namespace KSS.UI
             _timelines = new TimelineMetadataUI[timelines.Length];
             for( int i = 0; i < _timelines.Length; i++ )
             {
-                _timelines[i] = TimelineMetadataUI.Create( _timelineListUI, UILayoutInfo.FillHorizontal( 0, 0, 0, 0, 40 ), timelines[i], ( ui ) =>
+                _timelines[i] = TimelineMetadataUI.Create( _timelineListUI, new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Bottom, 0, 40 ), timelines[i], ( ui ) =>
                 {
                     _selectedTimeline = ui;
                     RefreshSaveList();
@@ -98,24 +98,24 @@ namespace KSS.UI
 
         public static LoadWindow Create()
         {
-            UIWindow window = CanvasManager.Get( CanvasName.WINDOWS ).AddWindow( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), Vector2.zero, new Vector2( 350f, 400f ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_window" ) )
+            UIWindow window = CanvasManager.Get( CanvasName.WINDOWS ).AddWindow( new UILayoutInfo( UIAnchor.Center, (0, 0), (350f, 400f) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_window" ) )
                 .Draggable()
                 .Focusable()
-                .WithCloseButton( new UILayoutInfo( Vector2.one, new Vector2( -7, -5 ), new Vector2( 20, 20 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ );
+                .WithCloseButton( new UILayoutInfo( UIAnchor.TopRight, (-7, -5), (20, 20) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ );
 
             LoadWindow loadWindow = window.gameObject.AddComponent<LoadWindow>();
 
-            UIScrollView timelineList = window.AddVerticalScrollView( UILayoutInfo.FillVertical( 30, 30, 0f, 0, 100 ), 100 )
-                .WithVerticalScrollbar( UILayoutInfo.FillVertical( 0, 0, 1f, 0, 10 ), null, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_handle" ), out _ );
+            UIScrollView timelineList = window.AddVerticalScrollView( new UILayoutInfo( UIAnchor.Left, UIFill.Vertical( 30, 30 ), 0, 100 ), 100 )
+                .WithVerticalScrollbar( new UILayoutInfo( UIAnchor.Right, UIFill.Vertical(), 0, 10 ), null, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_handle" ), out _ );
 
             timelineList.LayoutDriver = new VerticalLayoutDriver() { FitToSize = true };
 
-            UIScrollView saveList = window.AddVerticalScrollView( UILayoutInfo.FillVertical( 30, 30, 1f, 0, 250 ), 100 )
-                .WithVerticalScrollbar( UILayoutInfo.FillVertical( 0, 0, 1f, 0, 10 ), null, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_handle" ), out _ );
+            UIScrollView saveList = window.AddVerticalScrollView( new UILayoutInfo( UIAnchor.Right, UIFill.Vertical( 30, 30 ), 0, 250 ), 100 )
+                .WithVerticalScrollbar( new UILayoutInfo( UIAnchor.Right, UIFill.Vertical(), 0, 10 ), null, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_handle" ), out _ );
 
             saveList.LayoutDriver = new VerticalLayoutDriver() { FitToSize = true };
 
-            UIButton loadButton = window.AddButton( UILayoutInfo.FillHorizontal( 5, 5, 0, 0, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ), loadWindow.OnLoad );
+            UIButton loadButton = window.AddButton( new UILayoutInfo( UIFill.Horizontal( 5, 5 ), UIAnchor.Bottom, 0, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ), loadWindow.OnLoad );
 
             loadWindow._timelineListUI = timelineList;
             loadWindow._saveListUI = saveList;

@@ -5,15 +5,15 @@ using UnityEngine.UI;
 
 namespace UnityPlus.UILib.UIElements
 {
-    public sealed class UIScrollBar : UIElement
+    public class UIScrollBar : UIElement
     {
-        internal Scrollbar scrollbarComponent;
+        protected Scrollbar scrollbarComponent;
 
-        UIScrollView _parent;
+        protected UIScrollView parent;
 
-        public static UIScrollBar Create( UIScrollView scrollView, UILayoutInfo layout, Sprite background, Sprite foreground, bool isVertical )
+        protected internal static T Create<T>( UIScrollView scrollView, UILayoutInfo layout, Sprite background, Sprite foreground, bool isVertical ) where T : UIScrollBar
         {
-            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUIGameObject( scrollView.rectTransform, isVertical ? "uilib-scrollbar-vertical" : "uilib-scrollbar-horizontal", layout );
+            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUIGameObject( scrollView.rectTransform, isVertical ? $"uilib-{nameof( T )}-vertical" : $"uilib-{nameof( T )}-horizontal", layout );
 
             if( background != null )
             {
@@ -23,8 +23,8 @@ namespace UnityPlus.UILib.UIElements
                 bg.raycastTarget = true;
             }
 
-            (GameObject slidingAreaGameObject, RectTransform slidingAreaTransform) = UIElement.CreateUIGameObject( rootTransform, "uilib-scrollbar-slidingarea", UILayoutInfo.Fill() );
-            (GameObject handleGameObject, RectTransform handleTransform) = UIElement.CreateUIGameObject( slidingAreaTransform, "uilib-scrollbar-handle", UILayoutInfo.Fill() );
+            (GameObject slidingAreaGameObject, RectTransform slidingAreaTransform) = UIElement.CreateUIGameObject( rootTransform, $"uilib-{nameof( T )}-slidingarea", new UILayoutInfo( UIFill.Fill() ) );
+            (GameObject handleGameObject, RectTransform handleTransform) = UIElement.CreateUIGameObject( slidingAreaTransform, $"uilib-{nameof( T )}-handle", new UILayoutInfo( UIFill.Fill() ) );
 
             Image handleImage = handleGameObject.AddComponent<Image>();
             handleImage.sprite = foreground;
@@ -51,8 +51,8 @@ namespace UnityPlus.UILib.UIElements
             else
                 scrollView.scrollRectComponent.horizontalScrollbar = scrollbarComponent;
 
-            UIScrollBar uiScrollBar = rootGameObject.AddComponent<UIScrollBar>();
-            uiScrollBar._parent = scrollView;
+            T uiScrollBar = rootGameObject.AddComponent<T>();
+            uiScrollBar.parent = scrollView;
             uiScrollBar.scrollbarComponent = scrollbarComponent;
 
             scrollView.scrollbarHorizontal = uiScrollBar;

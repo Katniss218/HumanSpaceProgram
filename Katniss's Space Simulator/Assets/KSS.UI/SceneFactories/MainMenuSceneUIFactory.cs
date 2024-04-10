@@ -34,7 +34,7 @@ namespace KSS.UI.SceneFactories
             CreateSettingsButton( canvas );
             CreateExitButton( canvas );
 
-            UIValueBar bar = UIValueBarEx.AddHorizontalValueBar( canvas, new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, 35 ), new Vector2( 200, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/bar_background" ) )
+            UIValueBar bar = canvas.AddHorizontalValueBar( new UILayoutInfo( UIAnchor.Center, (0, 35), (200, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/bar_background" ) )
                 .WithPadding( 5, 5, 1 );
 
             var seg = bar.AddSegment( 0.25f );
@@ -50,63 +50,63 @@ namespace KSS.UI.SceneFactories
 
         private static void CreateStartNewGameButton( IUIElementContainer parent )
         {
-            parent.AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, 0 ), new Vector2( 200, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
+            parent.AddButton( new UILayoutInfo( UIAnchor.Center, (0, 0), (200, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
             {
                 if( _startNewGameWindow == null )
                     _startNewGameWindow = StartNewGameWindow.Create().gameObject;
             } )
-                .AddText( UILayoutInfo.Fill(), "Start New Game" )
+                .AddText( new UILayoutInfo( UIFill.Fill() ), "Start New Game" )
                 .WithFont( AssetRegistry.Get<TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
                 .WithAlignment( HorizontalAlignmentOptions.Center );
         }
 
         private static void CreateLoadButton( IUIElementContainer parent )
         {
-            parent.AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, -20 ), new Vector2( 200, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
+            parent.AddButton( new UILayoutInfo( UIAnchor.Center, (0, -20), (200, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
             {
                 if( _loadWindow == null )
                     _loadWindow = LoadWindow.Create().gameObject;
             } )
-                .AddText( UILayoutInfo.Fill(), "Load Game" )
+                .AddText( new UILayoutInfo( UIFill.Fill() ), "Load Game" )
                 .WithFont( AssetRegistry.Get<TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
                 .WithAlignment( HorizontalAlignmentOptions.Center );
         }
 
         private static void CreateDesignARocketButton( IUIElementContainer parent )
         {
-            parent.AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, -100 ), new Vector2( 200, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
+            parent.AddButton( new UILayoutInfo( UIAnchor.Center, (0, -100), (200, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
             {
                 SceneLoader.UnloadActiveSceneAsync( () => SceneLoader.LoadSceneAsync( DesignSceneManager.SCENE_NAME, true, false, null ) );
             } )
-                .AddText( UILayoutInfo.Fill(), "Design a Rocket" )
+                .AddText( new UILayoutInfo( UIFill.Fill() ), "Design a Rocket" )
                 .WithFont( AssetRegistry.Get<TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
                 .WithAlignment( HorizontalAlignmentOptions.Center );
         }
 
         private static void CreateDesignAPartButton( IUIElementContainer parent )
         {
-            parent.AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, -120 ), new Vector2( 200, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
+            parent.AddButton( new UILayoutInfo( UIAnchor.Center, (0, -120), (200, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
             {
                 SceneLoader.UnloadActiveSceneAsync( () => SceneLoader.LoadSceneAsync( EditorSceneManager.SCENE_NAME, true, false, null ) );
             } )
                 .Disabled()
-                .AddText( UILayoutInfo.Fill(), "Part Editor" )
+                .AddText( new UILayoutInfo( UIFill.Fill() ), "Part Editor" )
                 .WithFont( AssetRegistry.Get<TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
                 .WithAlignment( HorizontalAlignmentOptions.Center );
         }
 
         private static void CreateSettingsButton( IUIElementContainer parent )
         {
-            parent.AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, -200 ), new Vector2( 200, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), null )
+            parent.AddButton( new UILayoutInfo( UIAnchor.Center, (0, -200), (200, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), null )
                 .Disabled()
-                .AddText( UILayoutInfo.Fill(), "Settings" )
+                .AddText( new UILayoutInfo( UIFill.Fill() ), "Settings" )
                 .WithFont( AssetRegistry.Get<TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
                 .WithAlignment( HorizontalAlignmentOptions.Center );
         }
 
         private static void CreateExitButton( IUIElementContainer parent )
         {
-            parent.AddButton( new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0, -300 ), new Vector2( 150, 15 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
+            parent.AddButton( new UILayoutInfo( UIAnchor.Center, (0, -300), (150, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
             {
 #if UNITY_EDITOR
                 UnityEditor.EditorApplication.isPlaying = false;
@@ -114,7 +114,7 @@ namespace KSS.UI.SceneFactories
                 Application.Quit();
 #endif
             } )
-                .AddText( UILayoutInfo.Fill(), "Exit" )
+                .AddText( new UILayoutInfo( UIFill.Fill() ), "Exit" )
                 .WithFont( AssetRegistry.Get<TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
                 .WithAlignment( HorizontalAlignmentOptions.Center );
         }

@@ -115,7 +115,7 @@ namespace UnityPlus.UILib
         /// </remarks>
         internal static ValueBarSegment Create( RectTransform parent, float totalWidth )
         {
-            (GameObject maskGO, RectTransform maskT) = UIElement.CreateUIGameObject( parent, "mask", new UILayoutInfo( new Vector2( 0, 0 ), new Vector2( 0, 1 ), Vector2.zero, new Vector2( parent.rect.width, 0 ) ) );
+            (GameObject maskGO, RectTransform maskT) = UIElement.CreateUIGameObject( parent, "mask", new UILayoutInfo( UIAnchor.Left, UIFill.Vertical(), 0, parent.rect.width ) );
 
             Image maskImage = maskGO.AddComponent<Image>();
             maskImage.raycastTarget = false;
@@ -124,7 +124,7 @@ namespace UnityPlus.UILib
             Mask mask = maskGO.AddComponent<Mask>();
             mask.showMaskGraphic = false;
 
-            (GameObject imgGO, RectTransform imgT) = UIElement.CreateUIGameObject( maskT, "foreground", new UILayoutInfo( new Vector2( 0, 0 ), new Vector2( 0, 1 ), Vector2.zero, new Vector2( parent.rect.width, 0 ) ) );
+            (GameObject imgGO, RectTransform imgT) = UIElement.CreateUIGameObject( maskT, "foreground", new UILayoutInfo( UIAnchor.Left, UIFill.Vertical(), 0, parent.rect.width ) );
 
             Image foregroundImage = imgGO.AddComponent<Image>();
             foregroundImage.raycastTarget = false;

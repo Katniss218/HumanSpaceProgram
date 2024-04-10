@@ -5,10 +5,9 @@ using UnityEngine.UI;
 
 namespace UnityPlus.UILib.UIElements
 {
-    public sealed class UIValueBar : UIElement, IUIElementChild
+    public partial class UIValueBar : UIElement, IUIElementChild
     {
-        // TODO - Merge UIValueBar with ValueBar?
-        internal ValueBar valueBarComponent;
+        protected ValueBar valueBarComponent;
 
         public IUIElementContainer Parent { get; set; }
 
@@ -27,9 +26,9 @@ namespace UnityPlus.UILib.UIElements
             return valueBarComponent.InsertSegment( index, width );
         }
 
-        public static UIValueBar Create( IUIElementContainer parent, UILayoutInfo layout, Sprite background )
+        protected internal static T Create<T>( IUIElementContainer parent, UILayoutInfo layout, Sprite background ) where T : UIValueBar
         {
-            (GameObject rootGameObject, RectTransform rootTransform, UIValueBar uiValueBar) = UIElement.CreateUIGameObject<UIValueBar>( parent, "uilib-valuebar", layout );
+            (GameObject rootGameObject, RectTransform rootTransform, T uiValueBar) = UIElement.CreateUIGameObject<T>( parent, $"uilib-{nameof( T )}", layout );
 
             Image imageComponent = rootGameObject.AddComponent<Image>();
             imageComponent.raycastTarget = false;

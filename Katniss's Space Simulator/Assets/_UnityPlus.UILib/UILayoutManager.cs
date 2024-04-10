@@ -3,12 +3,45 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 using UnityPlus.UILib.UIElements;
 
-namespace UnityPlus.UILib.Layout
+namespace UnityPlus.UILib
 {
-    public static class UILayout
+    /// <summary>
+    /// Performs UI layout updates.
+    /// </summary>
+    public sealed class UILayoutManager : SingletonMonoBehaviour<UILayoutManager>
     {
+        private UILayoutManager GetInstanceWithErrorMessage()
+        {
+            // An instance is *REQUIRED* to exist.
+            try
+            {
+                return instance;
+            }
+            catch( InvalidOperationException ex )
+            {
+                throw new InvalidOperationException( $"A {nameof( UILayoutManager )} is required for UILib layout updates. Make sure that exactly 1 {nameof( UILayoutManager )} exists in the scene." );
+            }
+            catch( Exception ex )
+            {
+                throw ex;
+            }
+        }
+
+        static bool _isLayoutStale = false;
+
+        void LateUpdate()
+        {
+            if( _isLayoutStale )
+            {
+                // TODO - rebuild.
+
+                _isLayoutStale = false;
+            }
+        }
+
         private static void BroadcastLayoutUpdateRecursive( HashSet<IUIElement> alreadyUpdated, IUIElement current )
         {
             // TODO - this can be optimized:

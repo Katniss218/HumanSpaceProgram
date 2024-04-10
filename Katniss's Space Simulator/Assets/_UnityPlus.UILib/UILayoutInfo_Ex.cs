@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityPlus.UILib;
 
 namespace UnityPlus.UILib
 {
-    public static class UILayoutInfoEx
+    public static class UILayoutInfo_Ex
     {
         /// <summary>
         /// Sets the layout properties of this Rect Transform to the specified values.
