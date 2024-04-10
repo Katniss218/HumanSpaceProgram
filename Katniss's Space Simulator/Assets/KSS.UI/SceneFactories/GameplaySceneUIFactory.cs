@@ -64,24 +64,18 @@ namespace KSS.UI.SceneFactories
 
             CreateToggleButtonList();
 
-            var text = _mainPanel.AddPanel( new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (150, 25) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
+            _mainPanel.AddPanel( new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (150, 25) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
                 .WithTint( Color.gray )
-                .AddText( new UILayoutInfo( UIFill.Fill() ), "Acceleration: <missing>" )
+                .AddTextReadout_Acceleration( new UILayoutInfo( UIFill.Fill() ) )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
-            AccelerationReadoutUI ui2 = text.gameObject.AddComponent<AccelerationReadoutUI>();
-            ui2.Text = text;
-
-
-            text = _mainPanel.AddPanel( new UILayoutInfo( UIAnchor.BottomLeft, (0, 25), (150, 25) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
+            _mainPanel.AddPanel( new UILayoutInfo( UIAnchor.BottomLeft, (0, 25), (150, 25) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
                 .WithTint( Color.gray )
-                .AddText( new UILayoutInfo( UIFill.Fill() ), "Altitude: <missing>" )
+                .AddTextReadout_Altitude( new UILayoutInfo( UIFill.Fill() ) )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
-            AltitudeReadoutUI ui3 = text.gameObject.AddComponent<AltitudeReadoutUI>();
-            ui3.Text = text;
 
             UIPanel navball = _mainPanel.AddPanel( new UILayoutInfo( UIAnchor.Bottom, (0, 0), (222, 202) ), null );
 
@@ -113,23 +107,18 @@ namespace KSS.UI.SceneFactories
             velocityIndicator.AddButton( new UILayoutInfo( UIAnchor.Left, (2, 0), (20, 20) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_list_gold" ), null );
             velocityIndicator.AddButton( new UILayoutInfo( UIAnchor.Right, (-2, 0), (20, 20) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_down_gold" ), null );
 
-            UIText velText = velocityIndicator.AddText( new UILayoutInfo( UIFill.Fill( 31.5f, 31.5f, 0, 0 ) ), "Velocity" )
+            velocityIndicator.AddTextReadout_Velocity( new UILayoutInfo( UIFill.Fill( 31.5f, 31.5f, 0, 0 ) ) )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
-
-            VelocityReadoutUI vel = velocityIndicator.gameObject.AddComponent<VelocityReadoutUI>();
-            vel.Text = velText;
         }
 
         static void CreateFPSPanel()
         {
             UIPanel fpsPanel = _mainPanel.AddPanel( new UILayoutInfo( UIAnchor.TopLeft, (5, -35), (80, 30) ), null );
-            UIText fpsCounter = fpsPanel.AddText( new UILayoutInfo( UIFill.Fill() ), "FPS: <missing>" )
+            
+            fpsPanel.AddTextReadout_FPS( new UILayoutInfo( UIFill.Fill() ) )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Left )
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
-
-            FPSCounterUI ui5 = fpsCounter.gameObject.AddComponent<FPSCounterUI>();
-            ui5.Text = fpsCounter;
         }
 
         private static void CreateTopPanel()
@@ -147,12 +136,9 @@ namespace KSS.UI.SceneFactories
                 {
                 } );
 
-                UIText utText = topPanel.AddText( new UILayoutInfo( UIAnchor.BottomLeft, (150, 0), (80, 30) ), "" )
+                topPanel.AddTextReadout_ElapsedUT( new UILayoutInfo( UIAnchor.BottomLeft, (150, 0), (80, 30) ) )
                     .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
                     .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
-
-                UTReadoutUI ui2 = utText.gameObject.AddComponent<UTReadoutUI>();
-                ui2.Text = utText;
 
                 TimewarpSelectorUI selector = TimewarpSelectorUI.Create( topPanel, new UILayoutInfo( UIAnchor.Left, UIFill.Vertical(), 230, 110 ), new float[] { 0, 1, 2, 4, 8, 16, 32, 64, 128, 256 } );
             }
@@ -169,12 +155,9 @@ namespace KSS.UI.SceneFactories
                 {
                 } );
 
-                UIText utText = topLeftPanel.AddText( new UILayoutInfo( UIAnchor.BottomLeft, (150, 0), (80, 30) ), "" )
+                topLeftPanel.AddTextReadout_ElapsedUT( new UILayoutInfo( UIAnchor.BottomLeft, (150, 0), (80, 30) ) )
                     .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
                     .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
-
-                UTReadoutUI ui2 = utText.gameObject.AddComponent<UTReadoutUI>();
-                ui2.Text = utText;
 
                 TimewarpSelectorUI selector = TimewarpSelectorUI.Create( topLeftPanel, new UILayoutInfo( UIAnchor.Left, UIFill.Vertical(), 230, 110 ), new float[] { 0, 1, 2, 4, 8, 16, 32, 64, 128, 256 } );
 

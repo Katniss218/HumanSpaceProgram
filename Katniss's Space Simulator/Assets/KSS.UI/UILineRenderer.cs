@@ -9,7 +9,7 @@ using UnityEngine.UI;
 namespace KSS.UI
 {
 	/// <summary>
-	/// Draws a polyline in the UI system.
+	/// Draws a polyline using the Unity the UI system.
 	/// </summary>
 	[RequireComponent( typeof( CanvasRenderer ) )]
 	public class UILineRenderer : MaskableGraphic

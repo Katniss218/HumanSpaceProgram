@@ -60,7 +60,7 @@
   <ItemGroup>
     <Compile Include="Assets\KSS.UI\HUDs\ConstructionSiteHUD.cs" />
     <Compile Include="Assets\KSS.UI\ControlSetupControlGroupUI.cs" />
-    <Compile Include="Assets\KSS.UI\AltitudeReadoutUI.cs" />
+    <Compile Include="Assets\KSS.UI\UITextReadout_Altitude.cs" />
     <Compile Include="Assets\KSS.UI\ControlSetupControlUI.cs" />
     <Compile Include="Assets\KSS.UI\SaveMetadataUI.cs" />
     <Compile Include="Assets\KSS.UI\ControlSetupWindowComponentUI.cs" />
@@ -78,22 +78,21 @@
     <Compile Include="Assets\KSS.UI\PartListUI.cs" />
     <Compile Include="Assets\KSS.UI\GameplayViewportClickController.cs" />
     <Compile Include="Assets\KSS.UI\TimelineMetadataUI.cs" />
-    <Compile Include="Assets\KSS.UI\VelocityReadoutUI.cs" />
     <Compile Include="Assets\KSS.UI\ControlSetupControlConnectionUI.cs" />
-    <Compile Include="Assets\KSS.UI\UTReadoutUI.cs" />
     <Compile Include="Assets\KSS.UI\Windows\SaveWindow.cs" />
-    <Compile Include="Assets\KSS.UI\ElapsedUTReadoutUI.cs" />
+    <Compile Include="Assets\KSS.UI\UITextReadout_ElapsedUT.cs" />
     <Compile Include="Assets\KSS.UI\NavballUI.cs" />
     <Compile Include="Assets\KSS.UI\Windows\StartNewGameWindow.cs" />
     <Compile Include="Assets\KSS.UI\HUDs\ConstructionSiteHUDManager.cs" />
     <Compile Include="Assets\KSS.UI\HUDs\VesselHUDManager.cs" />
     <Compile Include="Assets\KSS.UI\Windows\PartWindow.cs" />
-    <Compile Include="Assets\KSS.UI\AccelerationReadoutUI.cs" />
+    <Compile Include="Assets\KSS.UI\UITextReadout_Acceleration.cs" />
     <Compile Include="Assets\KSS.UI\HUDs\VesselHUD.cs" />
     <Compile Include="Assets\KSS.UI\SceneFactories\DesignSceneUIFactory.cs" />
-    <Compile Include="Assets\KSS.UI\FPSCounterUI.cs" />
+    <Compile Include="Assets\KSS.UI\UITextReadout_FPS.cs" />
     <Compile Include="Assets\KSS.UI\Windows\ControlSetupWindow.cs" />
     <Compile Include="Assets\KSS.UI\Windows\UIPromptWindow.cs" />
+    <Compile Include="Assets\KSS.UI\UITextReadout_Velocity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.UI\___KSS.UI.asmdef" />
