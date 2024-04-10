@@ -1,13 +1,15 @@
-﻿using KSS.Control.Controls;
+﻿using KSS.Control;
+using KSS.Control.Controls;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using UnityPlus.Serialization;
 
 namespace KSS.Components
 {
-    public class KeyboardSequenceElement : Sequence.Element
+    public class KeyboardSequenceElement : SequenceElement
     {
         public KeyCode Key { get; set; } = KeyCode.Space;
 
@@ -21,7 +23,7 @@ namespace KSS.Components
         }
     }
 
-    public class TimedSequenceElement : Sequence.Element
+    public class TimedSequenceElement : SequenceElement
     {
         /// <summary>
         /// The delay from the firing of the previous element, after which the sequence element should fire.
@@ -42,69 +44,96 @@ namespace KSS.Components
         }
     }
 
-    public abstract class SequencerOutput //: ControllerOutput
+    public abstract class SequencerControlGroup : ControlGroup // pass-through group with a single element. Required to be drawn.
     {
         public abstract void TryInvoke();
     }
 
-    public class SequencerOutput<T> : SequencerOutput
+    public class SequencerOutput<T> : SequencerControlGroup, IPersistsObjects
     {
         // sequencer action *holds* the parameters that will be used when invoking. It is in principle very simple.
 
         // should be able to be connected to the controlleeinput<T>
 
-        ControlleeInput<T> _input;
+        [NamedControl( "x" )]
+        public ControllerOutput<T> OnInvoke;
 
-        public MethodInfo varargMethod;
-        public object target;
-        public object[] parameters;
+        public T SignalValue { get; set; }
 
         public override void TryInvoke()
         {
-            try
+            OnInvoke.TrySendSignal( SignalValue );
+        }
+
+        public SerializedObject GetObjects( IReverseReferenceMap s )
+        {
+            return new SerializedObject()
             {
-                varargMethod.Invoke( target, parameters );
-            }
-            catch( Exception ex )
-            {
-                Debug.LogError( $"Tried to invoke a sequence element." );
-                Debug.LogException( ex );
-            }
+
+            };
+        }
+
+        public void SetObjects( SerializedObject data, IForwardReferenceMap l )
+        {
+            OnInvoke = new ControllerOutput<T>();
         }
     }
 
-    public class Sequence
+    public abstract class SequenceElement : ControlGroup, IPersistsObjects
     {
-        public abstract class Element
+        // [NamedControlArray( ValidCount = 0..5 )]
+        [NamedControl( "Actions", "this is an 'array' of control groups" )]
+        /// <summary>
+        /// The actions that this sequence element will call when it's fired.
+        /// </summary>
+        public List<SequencerControlGroup> Actions = new();
+
+        /// <summary>
+        /// Called when the previous action is triggerred, or on load (the first element).
+        /// </summary>
+        public abstract void Initialize();
+
+        /// <summary>
+        /// Called to check if the sequence element can fire in this frame.
+        /// </summary>
+        public abstract bool CanInvoke();
+
+        /// <summary>
+        /// Called to fire the sequence element.
+        /// </summary>
+        public void Invoke()
         {
-            /// <summary>
-            /// The actions that this sequence element will call when it's fired.
-            /// </summary>
-            public List<SequencerOutput> Actions { get; private set; } = new List<SequencerOutput>();
-
-            /// <summary>
-            /// Called when the previous action is triggerred, or on load (the first element).
-            /// </summary>
-            public abstract void Initialize();
-
-            /// <summary>
-            /// Called to check if the sequence element can fire in this frame.
-            /// </summary>
-            public abstract bool CanInvoke();
-
-            /// <summary>
-            /// Called to fire the sequence element.
-            /// </summary>
-            public void Invoke()
+            foreach( var action in Actions )
             {
-                foreach( var action in Actions )
-                {
-                    action.TryInvoke();
-                }
+                action.TryInvoke();
             }
         }
 
-        public List<Element> Elements { get; private set; } = new List<Element>();
+        public SerializedObject GetObjects( IReverseReferenceMap s )
+        {
+            return new SerializedObject()
+            {
+
+            };
+        }
+
+        public void SetObjects( SerializedObject data, IForwardReferenceMap l )
+        {
+            Actions = new List<SequencerControlGroup>()
+            {
+                new SequencerOutput<float>(),
+                new SequencerOutput<Vector2>()
+            };
+
+            Actions[0].SetObjects( null, l );
+            Actions[1].SetObjects( null, l );
+        }
+    }
+
+    public class Sequence : ControlGroup, IPersistsObjects
+    {
+        [NamedControl( "Elements" )]
+        public List<SequenceElement> Elements = new();
 
         public int Current { get; private set; } = 0;
 
@@ -127,6 +156,7 @@ namespace KSS.Components
             {
                 Debug.LogException( ex );
             }
+
             return false;
         }
 
@@ -140,7 +170,7 @@ namespace KSS.Components
                 return false;
             }
 
-            Element elem = Elements[Current];
+            SequenceElement elem = Elements[Current];
 
             try
             {
@@ -157,33 +187,8 @@ namespace KSS.Components
             {
                 Debug.LogException( ex );
             }
+
             return false;
-        }
-    }
-
-    /// <summary>
-    /// Represents a controller that can invoke an arbitrary control action from a queue.
-    /// </summary>
-    public class FSequencer : MonoBehaviour, IPersistsObjects, IPersistsData
-    {
-        // sequencer is a type of avionics, related to the control system.
-
-        public List<Sequence> Sequences { get; private set; } = new List<Sequence>();
-
-        void Start()
-        {
-            foreach( var seq in Sequences )
-            {
-                seq.TryInitialize();
-            }
-        }
-
-        void Update()
-        {
-            foreach( var seq in Sequences )
-            {
-                seq.TryInvoke();
-            }
         }
 
         public SerializedObject GetObjects( IReverseReferenceMap s )
@@ -196,7 +201,63 @@ namespace KSS.Components
 
         public void SetObjects( SerializedObject data, IForwardReferenceMap l )
         {
+            Elements = new List<SequenceElement>()
+            {
+                new KeyboardSequenceElement()
+            };
 
+            Elements[0].SetObjects( null, l );
+        }
+    }
+
+    /// <summary>
+    /// Represents a controller that can invoke an arbitrary control action from a queue.
+    /// </summary>
+    public class FSequencer : MonoBehaviour, IPersistsObjects, IPersistsData
+    {
+        // sequencer is a type of avionics, related to the control system.
+
+        [NamedControl( "Sequence" )]
+        public Sequence Sequence = new Sequence();
+
+        // control group nest structure:
+
+        // sequence
+        // - element
+        // - - action
+        // - - - output*
+        // - - action
+        // - - - output*
+        // - - ...
+        // - element
+        // - - action
+        // - - - output*
+        // - - action
+        // - - - output*
+        // - - ...
+        // - ...
+
+        void Start()
+        {
+            Sequence.TryInitialize();
+        }
+
+        void Update()
+        {
+            Sequence.TryInvoke();
+        }
+
+        public SerializedObject GetObjects( IReverseReferenceMap s )
+        {
+            return new SerializedObject()
+            {
+
+            };
+        }
+
+        public void SetObjects( SerializedObject data, IForwardReferenceMap l )
+        {
+            Sequence.SetData( null, l );
         }
 
         public SerializedData GetData( IReverseReferenceMap s )
