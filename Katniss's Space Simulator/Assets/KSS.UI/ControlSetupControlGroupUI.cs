@@ -90,14 +90,12 @@ namespace KSS.UI
 
                     currentY += groupUI.Height;
                 }
-                if( member is ControlGroup[] groupArray )
+                else if( member is ControlGroup[] groupArray )
                 {
                     for( int i = 0; i < groupArray.Length; i++ )
                     {
-                        if( groupArray[i] == null )
-                        {
-                            groupArray[i] = (ControlGroup)Activator.CreateInstance( groupArray.GetType().GetElementType() );
-                        }
+                        // Do we want this 'create on null' behaviour? seems kinda like it's not the responsibility of this class.
+                        groupArray[i] ??= (ControlGroup)Activator.CreateInstance( groupArray.GetType().GetElementType() );
 
                         var groupUI = ControlSetupControlGroupUI.Create( this, currentY, groupArray[i], attr );
                         childGroups.Add( groupUI );
@@ -105,7 +103,20 @@ namespace KSS.UI
                         currentY += groupUI.Height;
                     }
                 }
+                else if( ControlUtils.IsSubtypeOf( member.GetType(), typeof( List<> ), typeof( ControlGroup ) ) )
+                {
+                    System.Collections.IList groupList = (System.Collections.IList)member;
 
+                    for( int i = 0; i < groupList.Count; i++ )
+                    {
+                        groupList[i] ??= (ControlGroup)Activator.CreateInstance( groupList.GetType().GetGenericArguments()[0] );
+
+                        var groupUI = ControlSetupControlGroupUI.Create( this, currentY, groupList[i], attr );
+                        childGroups.Add( groupUI );
+
+                        currentY += groupUI.Height;
+                    }
+                }
                 //
 
                 if( member is ControlleeInput input )
@@ -113,7 +124,7 @@ namespace KSS.UI
                     inputUIs.Add( ControlSetupControlUI.Create( this, currentY, input, attr ) );
                     currentY += ROW_HEIGHT;
                 }
-                if( member is ControlleeInput[] inputArray )
+                else if( member is ControlleeInput[] inputArray )
                 {
                     for( int i = 0; i < inputArray.Length; i++ )
                     {
@@ -125,12 +136,12 @@ namespace KSS.UI
 
                 //
 
-                if( member is ControllerOutput output )
+                else if( member is ControllerOutput output )
                 {
                     outputUIs.Add( ControlSetupControlUI.Create( this, currentY, output, attr ) );
                     currentY += ROW_HEIGHT;
                 }
-                if( member is ControllerOutput[] outputArray )
+                else if( member is ControllerOutput[] outputArray )
                 {
                     for( int i = 0; i < outputArray.Length; i++ )
                     {
@@ -141,12 +152,12 @@ namespace KSS.UI
 
                 //
 
-                if( member is ControlParameterInput paramInput )
+                else if( member is ControlParameterInput paramInput )
                 {
                     inputUIs.Add( ControlSetupControlUI.Create( this, currentY, paramInput, attr ) );
                     currentY += ROW_HEIGHT;
                 }
-                if( member is ControlParameterInput[] paramInputArray )
+                else if( member is ControlParameterInput[] paramInputArray )
                 {
                     for( int i = 0; i < paramInputArray.Length; i++ )
                     {
@@ -157,12 +168,12 @@ namespace KSS.UI
 
                 //
 
-                if( member is ControlParameterOutput paramOutput )
+                else if( member is ControlParameterOutput paramOutput )
                 {
                     outputUIs.Add( ControlSetupControlUI.Create( this, currentY, paramOutput, attr ) );
                     currentY += ROW_HEIGHT;
                 }
-                if( member is ControlParameterOutput[] paramOutputArray )
+                else if( member is ControlParameterOutput[] paramOutputArray )
                 {
                     for( int i = 0; i < paramOutputArray.Length; i++ )
                     {

@@ -122,7 +122,7 @@ namespace KSS.Components
             Actions = new List<SequencerControlGroup>()
             {
                 new SequencerOutput<float>(),
-                new SequencerOutput<Vector2>()
+                new SequencerOutput<Vector3>()
             };
 
             Actions[0].SetObjects( null, l );
@@ -203,10 +203,14 @@ namespace KSS.Components
         {
             Elements = new List<SequenceElement>()
             {
+                new KeyboardSequenceElement(),
+                new KeyboardSequenceElement(),
                 new KeyboardSequenceElement()
             };
 
             Elements[0].SetObjects( null, l );
+            Elements[1].SetObjects( null, l );
+            Elements[2].SetObjects( null, l );
         }
     }
 
@@ -257,7 +261,7 @@ namespace KSS.Components
 
         public void SetObjects( SerializedObject data, IForwardReferenceMap l )
         {
-            Sequence.SetData( null, l );
+            Sequence.SetObjects( null, l );
         }
 
         public SerializedData GetData( IReverseReferenceMap s )

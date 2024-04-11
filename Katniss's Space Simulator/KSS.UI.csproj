@@ -58,6 +58,8 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\KSS.UI\UITextReadout_Velocity.cs" />
+    <Compile Include="Assets\KSS.UI\Windows\UIPromptWindow.cs" />
     <Compile Include="Assets\KSS.UI\HUDs\ConstructionSiteHUD.cs" />
     <Compile Include="Assets\KSS.UI\ControlSetupControlGroupUI.cs" />
     <Compile Include="Assets\KSS.UI\UITextReadout_Altitude.cs" />
@@ -91,8 +93,6 @@
     <Compile Include="Assets\KSS.UI\SceneFactories\DesignSceneUIFactory.cs" />
     <Compile Include="Assets\KSS.UI\UITextReadout_FPS.cs" />
     <Compile Include="Assets\KSS.UI\Windows\ControlSetupWindow.cs" />
-    <Compile Include="Assets\KSS.UI\Windows\UIPromptWindow.cs" />
-    <Compile Include="Assets\KSS.UI\UITextReadout_Velocity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.UI\___KSS.UI.asmdef" />

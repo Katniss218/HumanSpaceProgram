@@ -13,6 +13,11 @@ namespace KSS.Control
     {
         private static Dictionary<Type, (FieldInfo field, NamedControlAttribute attr)[]> _cache = new();
 
+        public static bool IsSubtypeOf( Type fieldType, Type baseUnconstructedType, Type typeParameter )
+        {
+            return fieldType.IsGenericType && fieldType.GetGenericTypeDefinition() == baseUnconstructedType && typeParameter.IsAssignableFrom( fieldType.GetGenericArguments()[0] );
+        }
+
         private static (FieldInfo field, NamedControlAttribute attr)[] GetControlsAndGroupsInternal( object obj )
         {
             Type objType = obj.GetType();
@@ -37,12 +42,13 @@ namespace KSS.Control
                     Type fieldType = field.FieldType;
                     if( !typeof( ControlGroup ).IsAssignableFrom( fieldType )
                      && !typeof( ControlGroup[] ).IsAssignableFrom( fieldType )
-                    // && !typeof( List<ControlGroup> ).IsAssignableFrom( fieldType ) // doesn't work, we need to extract the type of the list element from the angle brackets.
+                     && !IsSubtypeOf( fieldType, typeof( List<> ), typeof( ControlGroup ) )
                      && !typeof( Control ).IsAssignableFrom( fieldType )
                      && !typeof( Control[] ).IsAssignableFrom( fieldType )
-                    // && !typeof( List<Control> ).IsAssignableFrom( fieldType )
+                     && !IsSubtypeOf( fieldType, typeof( List<> ), typeof( Control ) )
                      )
-					{
+                    {
+                        Debug.LogWarning( $"GetControlGroupsAndControls - {objType.Name} - {nameof( NamedControlAttribute )} attribute found on incompatible field `{fieldType.AssemblyQualifiedName}`." );
                         continue;
                     }
 
