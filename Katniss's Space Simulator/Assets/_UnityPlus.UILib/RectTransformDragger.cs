@@ -11,8 +11,8 @@ namespace UnityPlus.UILib
 	/// <summary>
 	/// Enables a <see cref="RectTransform"/> to be dragged around by the mouse.
 	/// </summary>
-	public class RectTransformDragger : EventTrigger
-	{
+	public class RectTransformDragger : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+    {
 		[field: SerializeField]
 		public RectTransform UITransform { get; set; }
 
@@ -26,55 +26,51 @@ namespace UnityPlus.UILib
 		public Action OnDragging { get; set; }
 		public Action OnEndDragging { get; set; }
 
-		void Update()
-		{
-			if( UITransform == null )
-			{
-				return;
-			}
+        public void OnBeginDrag( PointerEventData eventData )
+        {
+            if( UITransform == null )
+            {
+                return;
+            }
 
-			if( _isDragging )
-			{
-				UITransform.position = new Vector2( Input.mousePosition.x, Input.mousePosition.y ) + _cursorOffset;
-				OnDragging?.Invoke();
-			}
-		}
+            if( eventData.button != MouseButton )
+            {
+                return;
+            }
 
-		public override void OnPointerDown( PointerEventData eventData )
-		{
-			if( UITransform == null )
-			{
-				return;
-			}
+            _cursorOffset = new Vector2( UITransform.position.x, UITransform.position.y ) - new Vector2( Input.mousePosition.x, Input.mousePosition.y );
+            _isDragging = true;
+            OnBeginDragging?.Invoke();
+        }
 
-			if( eventData.button != MouseButton )
-			{
-				return;
-			}
+        public void OnDrag( PointerEventData eventData )
+        {
+            if( UITransform == null )
+            {
+                return;
+            }
 
-			_cursorOffset = new Vector2( UITransform.position.x, UITransform.position.y ) - new Vector2( Input.mousePosition.x, Input.mousePosition.y );
-			_isDragging = true;
-			OnBeginDragging?.Invoke();
+            if( _isDragging )
+            {
+                UITransform.position = new Vector2( Input.mousePosition.x, Input.mousePosition.y ) + _cursorOffset;
+                OnDragging?.Invoke();
+            }
+        }
 
-			base.OnPointerDown( eventData );
-		}
+        public void OnEndDrag( PointerEventData eventData )
+        {
+            if( UITransform == null )
+            {
+                return;
+            }
 
-		public override void OnPointerUp( PointerEventData eventData )
-		{
-			if( UITransform == null )
-			{
-				return;
-			}
+            if( eventData.button != MouseButton )
+            {
+                return;
+            }
 
-			if( eventData.button != MouseButton )
-			{
-				return;
-			}
-
-			_isDragging = false;
-			OnEndDragging?.Invoke();
-
-			base.OnPointerUp( eventData );
-		}
+            _isDragging = false;
+            OnEndDragging?.Invoke();
+        }
 	}
 }
