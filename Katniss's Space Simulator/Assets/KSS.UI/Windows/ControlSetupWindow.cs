@@ -199,12 +199,24 @@ namespace KSS.UI.Windows
             }
         }
 
-        internal bool TryConnectWithMouse( ControlSetupControlUI firstEndpoint, ControlSetupControlUI otherEndpoint )
+        internal bool TryConnectWithMouse( ControlSetupControlUI endpoint, ControlSetupControlUI otherEndpoint )
         {
-            if( firstEndpoint == otherEndpoint )
+            if( endpoint == otherEndpoint )
                 return false;
 
-            if( firstEndpoint.Control.TryConnect( otherEndpoint.Control ) )
+            if( endpoint.Control.TryConnect( otherEndpoint.Control ) )
+            {
+                RefreshConnections();
+
+                return true;
+            }
+
+            return false;
+        }
+        
+        internal bool TryDisconnectWithMouse( ControlSetupControlUI endpoint )
+        {
+            if( endpoint.Control.TryDisconnectAll() )
             {
                 RefreshConnections();
 
