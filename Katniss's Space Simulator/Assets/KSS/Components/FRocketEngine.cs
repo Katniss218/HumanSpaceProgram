@@ -40,7 +40,7 @@ namespace KSS.Components
         [field: SerializeField]
         public float Throttle { get; set; }
 
-        [NamedControl( "Throttle", "Sets the current throttle level, [0..1]." )]
+        [NamedControl( "Throttle", "Connect this to the controller's throttle output." )]
         public ControlleeInput<float> SetThrottle;
         private void SetThrottleListener( float value )
         {

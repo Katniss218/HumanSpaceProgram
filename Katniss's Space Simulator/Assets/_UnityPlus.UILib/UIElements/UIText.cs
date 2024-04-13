@@ -50,7 +50,7 @@ namespace UnityPlus.UILib.UIElements
 
         protected internal static T Create<T>( IUIElementContainer parent, UILayoutInfo layoutInfo, string text ) where T : UIText
         {
-            (GameObject rootGameObject, RectTransform rootTransform, T uiText) = UIElement.CreateUIGameObject<T>( parent, $"uilib-{nameof( T )}", layoutInfo );
+            (GameObject rootGameObject, RectTransform rootTransform, T uiText) = UIElement.CreateUIGameObject<T>( parent, $"uilib-{typeof( T ).Name}", layoutInfo );
 
             TMPro.TextMeshProUGUI textComponent = rootGameObject.AddComponent<TMPro.TextMeshProUGUI>();
             textComponent.raycastTarget = false;

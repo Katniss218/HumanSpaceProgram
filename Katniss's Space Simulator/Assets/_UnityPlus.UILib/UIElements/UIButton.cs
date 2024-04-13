@@ -38,7 +38,7 @@ namespace UnityPlus.UILib.UIElements
 
         protected internal static T Create<T>( IUIElementContainer parent, UILayoutInfo layout, Sprite background, Action onClick ) where T : UIButton
         {
-            (GameObject rootGameObject, RectTransform rootTransform, T uiButton) = UIElement.CreateUIGameObject<T>( parent, $"uilib-{nameof( T )}", layout );
+            (GameObject rootGameObject, RectTransform rootTransform, T uiButton) = UIElement.CreateUIGameObject<T>( parent, $"uilib-{typeof( T ).Name}", layout );
 
             Image backgroundComponent = rootGameObject.AddComponent<Image>();
             backgroundComponent.raycastTarget = true;

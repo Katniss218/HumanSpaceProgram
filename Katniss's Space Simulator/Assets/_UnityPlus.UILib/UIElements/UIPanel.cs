@@ -23,7 +23,7 @@ namespace UnityPlus.UILib.UIElements
 
         protected internal static T Create<T>( IUIElementContainer parent, UILayoutInfo layoutInfo, Sprite background ) where T : UIPanel
         {
-            (GameObject rootGameObject, RectTransform rootTransform, T uiPanel) = UIElement.CreateUIGameObject<T>( parent, $"uilib-{nameof( T )}", layoutInfo );
+            (GameObject rootGameObject, RectTransform rootTransform, T uiPanel) = UIElement.CreateUIGameObject<T>( parent, $"uilib-{typeof( T ).Name}", layoutInfo );
 
             Image backgroundComponent = rootGameObject.AddComponent<Image>();
             backgroundComponent.raycastTarget = false;
@@ -36,7 +36,6 @@ namespace UnityPlus.UILib.UIElements
             }
 
             uiPanel.backgroundComponent = backgroundComponent;
-
             return uiPanel;
         }
     }

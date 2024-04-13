@@ -51,11 +51,7 @@ namespace KSS.Components
 
     public class SequencerOutput<T> : SequencerControlGroup, IPersistsObjects
     {
-        // sequencer action *holds* the parameters that will be used when invoking. It is in principle very simple.
-
-        // should be able to be connected to the controlleeinput<T>
-
-        [NamedControl( "x" )]
+        [NamedControl( "x", Editable = false )]
         public ControllerOutput<T> OnInvoke;
 
         public T SignalValue { get; set; }
@@ -82,7 +78,7 @@ namespace KSS.Components
     public abstract class SequenceElement : ControlGroup, IPersistsObjects
     {
         // [NamedControlArray( ValidCount = 0..5 )]
-        [NamedControl( "Actions", "this is an 'array' of control groups" )]
+        [NamedControl( "Actions", "this is an 'array' of control groups", Editable = false )]
         /// <summary>
         /// The actions that this sequence element will call when it's fired.
         /// </summary>
@@ -132,7 +128,7 @@ namespace KSS.Components
 
     public class Sequence : ControlGroup, IPersistsObjects
     {
-        [NamedControl( "Elements" )]
+        [NamedControl( "Elements", Editable = false )]
         public List<SequenceElement> Elements = new();
 
         public int Current { get; private set; } = 0;
@@ -221,7 +217,7 @@ namespace KSS.Components
     {
         // sequencer is a type of avionics, related to the control system.
 
-        [NamedControl( "Sequence" )]
+        [NamedControl( "Sequence", Editable = false )]
         public Sequence Sequence = new Sequence();
 
         // control group nest structure:

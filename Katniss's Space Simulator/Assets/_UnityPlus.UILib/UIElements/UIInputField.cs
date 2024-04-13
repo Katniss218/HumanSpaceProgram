@@ -25,19 +25,19 @@ namespace UnityPlus.UILib.UIElements
 
         protected internal static T Create<T>( IUIElementContainer parent, UILayoutInfo layout, Sprite background ) where T : UIInputField
         {
-            (GameObject rootGameObject, RectTransform rootTransform, T uiInputField) = UIElement.CreateUIGameObject<T>( parent, $"uilib-{nameof( T )}", layout );
+            (GameObject rootGameObject, RectTransform rootTransform, T uiInputField) = UIElement.CreateUIGameObject<T>( parent, $"uilib-{typeof( T ).Name}", layout );
 
             Image imageComponent = rootGameObject.AddComponent<Image>();
             imageComponent.raycastTarget = true;
             imageComponent.sprite = background;
             imageComponent.type = Image.Type.Sliced;
 
-            (GameObject textareaGameObject, RectTransform textareaTransform) = UIElement.CreateUIGameObject( rootTransform, $"uilib-{nameof( T )}-textarea", new UILayoutInfo( UIFill.Fill( 5, 5, 5, 5 ) ) );
+            (GameObject textareaGameObject, RectTransform textareaTransform) = UIElement.CreateUIGameObject( rootTransform, $"uilib-{typeof( T ).Name}-textarea", new UILayoutInfo( UIFill.Fill( 5, 5, 5, 5 ) ) );
 
             RectMask2D mask = textareaGameObject.AddComponent<RectMask2D>();
             mask.padding = new Vector4( -5, -5, -5, -5 );
 
-            (GameObject placeholderGameObject, _) = UIElement.CreateUIGameObject( textareaTransform, $"uilib-{nameof( T )}-placeholder", new UILayoutInfo( UIFill.Fill() ) );
+            (GameObject placeholderGameObject, _) = UIElement.CreateUIGameObject( textareaTransform, $"uilib-{typeof( T ).Name}-placeholder", new UILayoutInfo( UIFill.Fill() ) );
 
             TMPro.TextMeshProUGUI placeholderText = placeholderGameObject.AddComponent<TMPro.TextMeshProUGUI>();
             placeholderText.raycastTarget = false;
@@ -45,7 +45,7 @@ namespace UnityPlus.UILib.UIElements
             placeholderText.horizontalAlignment = TMPro.HorizontalAlignmentOptions.Left;
             placeholderText.fontStyle = TMPro.FontStyles.Italic;
 
-            (GameObject textGameObject, _) = UIElement.CreateUIGameObject( textareaTransform, $"uilib-{nameof( T )}-text", new UILayoutInfo( UIFill.Fill() ) );
+            (GameObject textGameObject, _) = UIElement.CreateUIGameObject( textareaTransform, $"uilib-{typeof( T ).Name}-text", new UILayoutInfo( UIFill.Fill() ) );
 
             TMPro.TextMeshProUGUI realText = textGameObject.AddComponent<TMPro.TextMeshProUGUI>();
             realText.raycastTarget = false;

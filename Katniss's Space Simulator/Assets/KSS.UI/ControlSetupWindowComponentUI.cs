@@ -22,7 +22,7 @@ namespace KSS.UI
         /// <summary>
         /// The window that this node belongs to.
         /// </summary>
-        public ControlSetupWindow Window { get; private set; }
+        public UIControlSetupWindow Window { get; private set; }
 
         /// <summary>
         /// The component that this node represents.
@@ -59,7 +59,7 @@ namespace KSS.UI
         /// <summary>
         /// Creates a control setup node for a given component.
         /// </summary>
-        internal static ControlSetupWindowComponentUI Create( ControlSetupWindow window, Component component )
+        internal static ControlSetupWindowComponentUI Create( UIControlSetupWindow window, Component component )
         {
             // it is possible to force-show nodes for components outside of the target hierarchy of the window.
 

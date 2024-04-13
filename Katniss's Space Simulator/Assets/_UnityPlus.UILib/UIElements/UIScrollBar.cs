@@ -13,7 +13,7 @@ namespace UnityPlus.UILib.UIElements
 
         protected internal static T Create<T>( UIScrollView scrollView, UILayoutInfo layout, Sprite background, Sprite foreground, bool isVertical ) where T : UIScrollBar
         {
-            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUIGameObject( scrollView.rectTransform, isVertical ? $"uilib-{nameof( T )}-vertical" : $"uilib-{nameof( T )}-horizontal", layout );
+            (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUIGameObject( scrollView.rectTransform, isVertical ? $"uilib-{typeof( T ).Name}-vertical" : $"uilib-{typeof( T ).Name}-horizontal", layout );
 
             if( background != null )
             {
@@ -23,8 +23,8 @@ namespace UnityPlus.UILib.UIElements
                 bg.raycastTarget = true;
             }
 
-            (GameObject slidingAreaGameObject, RectTransform slidingAreaTransform) = UIElement.CreateUIGameObject( rootTransform, $"uilib-{nameof( T )}-slidingarea", new UILayoutInfo( UIFill.Fill() ) );
-            (GameObject handleGameObject, RectTransform handleTransform) = UIElement.CreateUIGameObject( slidingAreaTransform, $"uilib-{nameof( T )}-handle", new UILayoutInfo( UIFill.Fill() ) );
+            (GameObject slidingAreaGameObject, RectTransform slidingAreaTransform) = UIElement.CreateUIGameObject( rootTransform, $"uilib-{typeof( T ).Name}-slidingarea", new UILayoutInfo( UIFill.Fill() ) );
+            (GameObject handleGameObject, RectTransform handleTransform) = UIElement.CreateUIGameObject( slidingAreaTransform, $"uilib-{typeof( T ).Name}-handle", new UILayoutInfo( UIFill.Fill() ) );
 
             Image handleImage = handleGameObject.AddComponent<Image>();
             handleImage.sprite = foreground;

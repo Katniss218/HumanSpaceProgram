@@ -11,7 +11,7 @@ using UnityPlus.UILib.UIElements;
 
 namespace KSS.UI
 {
-    public class ControlSetupControlUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+    public class ControlSetupControlUI : MonoBehaviour, IPointerEnterHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
     {
         public RectTransform Circle { get; private set; }
 
@@ -23,17 +23,65 @@ namespace KSS.UI
         /// </summary>
         public float Side { get; private set; }
 
+        public bool Editable { get; private set; }
+
         private NamedControlAttribute _attr;
 
-        private static ControlSetupControlUI _startedConnection;
-
-        void OnClick()
+        public void OnBeginDrag( PointerEventData eventData )
         {
-            // on release on this, when dragging out a connection - connect.
+            // Called when the drag *starts on this object*
+            if( eventData.button != PointerEventData.InputButton.Left )
+                return;
 
-            // show the name/description of channel on mouseover.
-            // also when pressed if connected to something - disconnect and hook the end to the mouse until released. if released over nothing - delete connection
+            if( !Editable )
+                return;
 
+
+        }
+
+        public void OnDrag( PointerEventData eventData )
+        {
+            // Called if drag was started on this object.
+            if( eventData.button != PointerEventData.InputButton.Left )
+                return;
+
+            if( !Editable )
+                return;
+
+
+        }
+
+        public void OnEndDrag( PointerEventData eventData )
+        {
+            // Called if drag that was started on this object ends. Regardless of where it ends.
+            if( eventData.button != PointerEventData.InputButton.Left )
+                return;
+
+            if( !Editable )
+                return;
+
+            ControlSetupControlUI targetControl = eventData.pointerCurrentRaycast.gameObject.GetComponent<ControlSetupControlUI>();
+            if( targetControl == null )
+            {
+                Group.ComponentUI.Window.TryDisconnectWithMouse( this );
+                return;
+            }
+            if( targetControl == this )
+            {
+                return;
+            }
+
+            Group.ComponentUI.Window.TryConnectWithMouse( this, targetControl );
+        }
+
+        public void OnPointerEnter( PointerEventData eventData )
+        {
+            UITooltip contextMenu = ((RectTransform)this.transform).CreateTooltip( CanvasManager.Get( CanvasName.CURSOR ), new UILayoutInfo( UIAnchor.TopLeft, (0, 0), (250, 60) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/panel_tooltip" ) );
+
+            contextMenu.AddText( new UILayoutInfo( UIFill.Horizontal( 5, 5 ), UIAnchor.Top, 0, 30 ), this._attr.Name )
+                    .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 16, Color.white );
+            contextMenu.AddText( new UILayoutInfo( UIFill.Horizontal( 5, 5 ), UIAnchor.Top, -30, 30 ), this._attr.Description )
+                    .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
         }
 
         internal static ControlSetupControlUI Create( ControlSetupControlGroupUI group, float verticalOffset, Control.Control control, NamedControlAttribute attr )
@@ -58,68 +106,22 @@ namespace KSS.UI
                     break;
             }
 
-            // UIButton button = panel.AddButton( new UILayoutInfo( (side, 1.0f), (0, 0), (ControlSetupControlGroupUI.ROW_HEIGHT, ControlSetupControlGroupUI.ROW_HEIGHT) ), sprite, controlUI.OnClick );
-
-            UIIcon button = panel.AddIcon( new UILayoutInfo( (side, 1.0f), (0, 0), (ControlSetupControlGroupUI.ROW_HEIGHT, ControlSetupControlGroupUI.ROW_HEIGHT) ), sprite )
+            UIIcon icon = panel.AddIcon( new UILayoutInfo( (side, 1.0f), (0, 0), (ControlSetupControlGroupUI.ROW_HEIGHT, ControlSetupControlGroupUI.ROW_HEIGHT) ), sprite )
                 .Raycastable(true);
 
             UIText name = panel.AddText( new UILayoutInfo( UIFill.Horizontal( (1 - side) * ControlSetupControlGroupUI.ROW_HEIGHT, side * ControlSetupControlGroupUI.ROW_HEIGHT ), UIAnchor.Top, 0, ControlSetupControlGroupUI.ROW_HEIGHT ), attr.Name )
                 .WithAlignment( side == 0 ? TMPro.HorizontalAlignmentOptions.Left : TMPro.HorizontalAlignmentOptions.Right );
 
-            ControlSetupControlUI controlUI = button.gameObject.AddComponent<ControlSetupControlUI>();
+            ControlSetupControlUI controlUI = icon.gameObject.AddComponent<ControlSetupControlUI>();
             controlUI.Group = group;
             controlUI.Control = control;
             controlUI._attr = attr;
 
-            controlUI.Circle = button.rectTransform;
+            controlUI.Circle = icon.rectTransform;
             controlUI.Side = side;
+            controlUI.Editable = attr.Editable;
 
             return controlUI;
-        }
-
-        public void OnBeginDrag( PointerEventData eventData )
-        {
-            // Called when the drag *starts on this object*
-            if( eventData.button != PointerEventData.InputButton.Left )
-            {
-                return;
-            }
-
-            _startedConnection = this;
-        }
-
-        public void OnDrag( PointerEventData eventData )
-        {
-            // Called if drag was started on this object.
-            if( eventData.button != PointerEventData.InputButton.Left )
-            {
-                return;
-            }
-
-        }
-
-        public void OnEndDrag( PointerEventData eventData )
-        {
-            // Called if drag that was started on this object ends. Regardless of where it ends.
-            if( eventData.button != PointerEventData.InputButton.Left )
-            {
-                return;
-            }
-
-            ControlSetupControlUI targetControl = eventData.pointerCurrentRaycast.gameObject.GetComponent<ControlSetupControlUI>();
-            if( targetControl == null )
-            {
-                Group.ComponentUI.Window.TryDisconnectWithMouse( this );
-                return;
-            }
-            if( targetControl == this )
-            {
-                return;
-            }
-
-            Group.ComponentUI.Window.TryConnectWithMouse( this, targetControl );
-
-            _startedConnection = null;
         }
     }
 }

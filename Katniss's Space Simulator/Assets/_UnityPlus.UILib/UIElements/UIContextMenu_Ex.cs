@@ -11,18 +11,20 @@ namespace UnityPlus.UILib.UIElements
         {
             return UIContextMenu.Create<UIContextMenu>( track, contextMenuCanvas, layoutInfo, background );
         }
+    }
 
-        public static UIContextMenu WithTint( this UIContextMenu contextMenu, Color tint )
+    public partial class UIContextMenu
+    {
+        public UIContextMenu WithTint( Color tint )
         {
-            contextMenu.backgroundComponent.color = tint;
-            return contextMenu;
+            this.backgroundComponent.color = tint;
+            return this;
         }
 
-        public static UIContextMenu Raycastable( this UIContextMenu contextMenu, bool raycastable = true )
+        public UIContextMenu Raycastable( bool raycastable = true )
         {
-            contextMenu.backgroundComponent.raycastTarget = raycastable;
-
-            return contextMenu;
+            this.backgroundComponent.raycastTarget = raycastable;
+            return this;
         }
     }
 }

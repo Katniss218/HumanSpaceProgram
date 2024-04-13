@@ -23,7 +23,7 @@ namespace UnityPlus.UILib.UIElements
 
         protected internal static T Create<T>( UICanvas parent, UILayoutInfo layoutInfo, Sprite background ) where T : UIWindow
         {
-            (GameObject rootGameObject, RectTransform rootTransform, T uiWindow) = UIElement.CreateUIGameObject<T>( parent, $"uilib-{nameof( T )}", layoutInfo );
+            (GameObject rootGameObject, RectTransform rootTransform, T uiWindow) = UIElement.CreateUIGameObject<T>( parent, $"uilib-{typeof( T ).Name}", layoutInfo );
 
             Image backgroundComponent = rootGameObject.AddComponent<Image>();
             backgroundComponent.raycastTarget = true;

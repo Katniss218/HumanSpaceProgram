@@ -17,7 +17,7 @@ namespace KSS.Components
     {
         public class Actuator2DGroup : ControlGroup, IPersistsObjects
         {
-            [NamedControl( "Ref. Transform", "The object to use as the coordinate frame of the actuator." )]
+            [NamedControl( "Ref. Transform", "Connect this to the actuator's reference transform parameter." )]
             public ControlParameterInput<Transform> GetReferenceTransform = new();
 
             [NamedControl( "Deflection (XY)" )]
@@ -63,7 +63,7 @@ namespace KSS.Components
         [NamedControl( "2D Actuators", "Connect to the actuators you want this gimbal controller to control." )]
         public Actuator2DGroup[] Actuators2D = new Actuator2DGroup[5];
 
-        [NamedControl( "Attitude", "Connect to the avionics." )]
+        [NamedControl( "Attitude", "Connect to the controller's attitude output." )]
         public ControlleeInput<Vector3> SetAttitude;
         private void SetAttitudeListener( Vector3 attitude )
         {

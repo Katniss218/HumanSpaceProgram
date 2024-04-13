@@ -18,7 +18,7 @@ namespace UnityPlus.UILib.UIElements
 
         protected internal static T Create<T>( IUIElementContainer parent, UILayoutInfo layoutInfo, Sprite icon ) where T : UIIcon
         {
-            (GameObject rootGameObject, RectTransform rootTransform, T uiIcon) = UIElement.CreateUIGameObject<T>( parent, $"uilib-{nameof( T )}", layoutInfo );
+            (GameObject rootGameObject, RectTransform rootTransform, T uiIcon) = UIElement.CreateUIGameObject<T>( parent, $"uilib-{typeof( T ).Name}", layoutInfo );
 
             Image imageComponent = rootGameObject.AddComponent<Image>();
             imageComponent.raycastTarget = false;

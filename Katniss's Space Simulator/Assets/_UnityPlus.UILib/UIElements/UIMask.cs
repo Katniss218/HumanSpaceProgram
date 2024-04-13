@@ -29,7 +29,7 @@ namespace UnityPlus.UILib.UIElements
                 throw new ArgumentNullException( nameof( mask ), $"Mask can't be null." );
             }
 
-            (GameObject rootGameObject, RectTransform rootTransform, T uiMask) = UIElement.CreateUIGameObject<T>( parent, $"uilib-{nameof( T )}", layoutInfo );
+            (GameObject rootGameObject, RectTransform rootTransform, T uiMask) = UIElement.CreateUIGameObject<T>( parent, $"uilib-{typeof( T ).Name}", layoutInfo );
 
             Image backgroundComponent = rootGameObject.AddComponent<Image>();
             backgroundComponent.raycastTarget = false;

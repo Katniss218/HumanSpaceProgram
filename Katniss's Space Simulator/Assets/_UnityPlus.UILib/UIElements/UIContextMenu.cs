@@ -9,11 +9,11 @@ namespace UnityPlus.UILib.UIElements
     /// <summary>
     /// A context menu contains a list of items.
     /// </summary>
-    public class UIContextMenu : UIElement, IUIElementContainer, IUIElementChild, IUILayoutDriven
+    public partial class UIContextMenu : UIElement, IUIElementContainer, IUIElementChild, IUILayoutDriven
     {
-        protected internal RectTransformTracker trackerComponent;
-        protected internal RectTransformDestroyOnLeave destroyOnLeaveComponent;
-        protected internal Image backgroundComponent;
+        protected RectTransformTrackRectTransform trackerComponent;
+        protected RectTransformDestroyOnLeave destroyOnLeaveComponent;
+        protected Image backgroundComponent;
         public virtual RectTransform contents => base.rectTransform;
 
         public IUIElementContainer Parent { get; set; }
@@ -25,7 +25,7 @@ namespace UnityPlus.UILib.UIElements
 
         protected internal static T Create<T>( RectTransform track, UICanvas contextMenuCanvas, UILayoutInfo layoutInfo, Sprite background ) where T : UIContextMenu
         {
-            (GameObject rootGameObject, RectTransform rootTransform, T uiContextMenu) = UIElement.CreateUIGameObject<T>( contextMenuCanvas, $"uilib-{nameof( T )}", layoutInfo );
+            (GameObject rootGameObject, RectTransform rootTransform, T uiContextMenu) = UIElement.CreateUIGameObject<T>( contextMenuCanvas, $"uilib-{typeof( T ).Name}", layoutInfo );
 
             Image backgroundComponent = rootGameObject.AddComponent<Image>();
             backgroundComponent.raycastTarget = false;
@@ -37,7 +37,7 @@ namespace UnityPlus.UILib.UIElements
                 backgroundComponent.color = new Color( 0, 0, 0, 0 );
             }
 
-            RectTransformTracker trackerComponent = rootGameObject.AddComponent<RectTransformTracker>();
+            RectTransformTrackRectTransform trackerComponent = rootGameObject.AddComponent<RectTransformTrackRectTransform>();
             trackerComponent.Target = track;
             
             RectTransformDestroyOnLeave destroyOnLeaveComponent = rootGameObject.AddComponent<RectTransformDestroyOnLeave>();

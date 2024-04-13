@@ -28,7 +28,7 @@ namespace UnityPlus.UILib.UIElements
 
         protected internal static T Create<T>( IUIElementContainer parent, UILayoutInfo layout, Sprite background ) where T : UIValueBar
         {
-            (GameObject rootGameObject, RectTransform rootTransform, T uiValueBar) = UIElement.CreateUIGameObject<T>( parent, $"uilib-{nameof( T )}", layout );
+            (GameObject rootGameObject, RectTransform rootTransform, T uiValueBar) = UIElement.CreateUIGameObject<T>( parent, $"uilib-{typeof( T ).Name}", layout );
 
             Image imageComponent = rootGameObject.AddComponent<Image>();
             imageComponent.raycastTarget = false;

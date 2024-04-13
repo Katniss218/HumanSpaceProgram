@@ -19,7 +19,6 @@ namespace UnityPlus.UILib
 		[field: SerializeField]
 		public PointerEventData.InputButton MouseButton { get; set; } = PointerEventData.InputButton.Left;
 
-		bool _isDragging = false;
 		Vector2 _cursorOffset = Vector2.zero;
 
 		public Action OnBeginDragging { get; set; }
@@ -38,8 +37,7 @@ namespace UnityPlus.UILib
                 return;
             }
 
-            _cursorOffset = new Vector2( UITransform.position.x, UITransform.position.y ) - new Vector2( Input.mousePosition.x, Input.mousePosition.y );
-            _isDragging = true;
+            _cursorOffset = new Vector2( UITransform.position.x, UITransform.position.y ) - eventData.position + (eventData.position - eventData.pressPosition);
             OnBeginDragging?.Invoke();
         }
 
@@ -50,11 +48,8 @@ namespace UnityPlus.UILib
                 return;
             }
 
-            if( _isDragging )
-            {
                 UITransform.position = new Vector2( Input.mousePosition.x, Input.mousePosition.y ) + _cursorOffset;
                 OnDragging?.Invoke();
-            }
         }
 
         public void OnEndDrag( PointerEventData eventData )
@@ -69,7 +64,6 @@ namespace UnityPlus.UILib
                 return;
             }
 
-            _isDragging = false;
             OnEndDragging?.Invoke();
         }
 	}

@@ -37,7 +37,7 @@ namespace KSS.UI
         public bool IsOpenEnded => Output == null || Input == null;
 
         private UILineRenderer _lineRenderer;
-        private ControlSetupWindow _window;
+        private UIControlSetupWindow _window;
 
         /// <summary>
         /// Returns the closed end of an open ended connection.
@@ -85,7 +85,7 @@ namespace KSS.UI
             }
         }
 
-        internal static ControlSetupControlConnectionUI Create( ControlSetupWindow window, ControlSetupControlUI input, ControlSetupControlUI output )
+        internal static ControlSetupControlConnectionUI Create( UIControlSetupWindow window, ControlSetupControlUI input, ControlSetupControlUI output )
         {
             if( output == null || input == null )
                 throw new ArgumentException( $"Both input and output must be set for a non-open-ended connection." );
@@ -93,7 +93,7 @@ namespace KSS.UI
             return Internal_Create( window, input, output, Vector2.zero );
         }
 
-        internal static ControlSetupControlConnectionUI CreateOpenEnded( ControlSetupWindow window, ControlSetupControlUI input, ControlSetupControlUI output, Vector2 offset )
+        internal static ControlSetupControlConnectionUI CreateOpenEnded( UIControlSetupWindow window, ControlSetupControlUI input, ControlSetupControlUI output, Vector2 offset )
         {
             if( output != null && input != null )
                 throw new ArgumentException( $"Either output or input must be null. Specify which end is open-ended." );
@@ -103,7 +103,7 @@ namespace KSS.UI
             return Internal_Create( window, input, output, offset );
         }
 
-        private static ControlSetupControlConnectionUI Internal_Create( ControlSetupWindow window, ControlSetupControlUI input, ControlSetupControlUI output, Vector2 offset )
+        private static ControlSetupControlConnectionUI Internal_Create( UIControlSetupWindow window, ControlSetupControlUI input, ControlSetupControlUI output, Vector2 offset )
         {
             UIPanel connectionPanel = window.ConnectionContainer.AddPanel( new UILayoutInfo( UIFill.Fill() ), null );
 
