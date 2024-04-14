@@ -10,7 +10,7 @@ using UnityPlus.UILib.UIElements;
 
 namespace KSS.UI
 {
-    public class PartListUI : MonoBehaviour
+    public class UIPartList : UIPanel
     {
         private PartMetadata[] _parts;
         private string[] _categories;
@@ -34,7 +34,7 @@ namespace KSS.UI
 
             foreach( var id in PartMetadata.Filtered( _parts, _category, _filter ) )
             {
-                PartListEntryUI.Create( _list, new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (75, 75) ), id );
+                _list.AddPartListEntry( new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (75, 75) ), id );
             }
             UILayoutManager.BroadcastLayoutUpdate( _list );
 
@@ -57,13 +57,14 @@ namespace KSS.UI
             UILayoutManager.BroadcastLayoutUpdate( _categoryList );
         }
 
-        public static PartListUI Create( IUIElementContainer parent, UILayoutInfo layout )
+        protected internal static T Create<T>( IUIElementContainer parent, UILayoutInfo layout ) where T : UIPartList
         {
-            UIPanel uiPanel = parent.AddPanel( layout, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_list_background" ) );
-            UIInputField filterIF = uiPanel.AddInputField( new UILayoutInfo( UIFill.Horizontal( 2, 2 ), UIAnchor.Top, -2, 20 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) )
+            T partListUI = UIPanel.Create<T>( parent, layout, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_list_background" ) );
+
+            UIInputField filterIF = partListUI.AddInputField( new UILayoutInfo( UIFill.Horizontal( 2, 2 ), UIAnchor.Top, -2, 20 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) )
                 .WithMargins( 15, 15, 0, 0 )
                 .WithPlaceholder( "search..." );
-            UIScrollView uiPartList = uiPanel.AddVerticalScrollView( new UILayoutInfo( UIFill.Fill( 42, 2, 24, 100 ) ), 200 )
+            UIScrollView uiPartList = partListUI.AddVerticalScrollView( new UILayoutInfo( UIFill.Fill( 42, 2, 24, 100 ) ), 200 )
                 .WithVerticalScrollbar( new UILayoutInfo( UIAnchor.Right, UIFill.Vertical(), 0, 10 ), null, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_vertical" ), out _ );
 
             uiPartList.LayoutDriver = new BidirectionalLayoutDriver()
@@ -73,15 +74,13 @@ namespace KSS.UI
                 FitToSize = true
             };
 
-            UIScrollView categoryScroll = uiPanel.AddVerticalScrollView( new UILayoutInfo( UIAnchor.Left, UIFill.Vertical( 24, 100 ), 0, 40 ), 200 );
+            UIScrollView categoryScroll = partListUI.AddVerticalScrollView( new UILayoutInfo( UIAnchor.Left, UIFill.Vertical( 24, 100 ), 0, 40 ), 200 );
 
             categoryScroll.LayoutDriver = new VerticalLayoutDriver()
             {
                 Spacing = -2f,
                 FitToSize = true
             };
-
-            PartListUI partListUI = uiPanel.gameObject.AddComponent<PartListUI>();
 
             // update part IDs from *somewhere*
             partListUI._parts = PartRegistry.LoadAllMetadata();
@@ -97,6 +96,14 @@ namespace KSS.UI
             partListUI.Refresh();
 
             return partListUI;
+        }
+    }
+
+    public static class UIPartList_Ex
+    {
+        public static UIPartList AddPartList( this IUIElementContainer parent, UILayoutInfo layout )
+        {
+            return UIPartList.Create<UIPartList>( parent, layout );
         }
     }
 }

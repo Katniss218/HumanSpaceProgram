@@ -1,4 +1,5 @@
 ﻿using KSS.Core;
+using KSS.Core.ResourceFlowSystem;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,9 +13,8 @@ using UnityPlus.UILib.UIElements;
 
 namespace KSS.UI
 {
-    public class TimewarpSelectorUI : MonoBehaviour // : ui element addition to "panel" element type
+    public class UITimewarpSelector : UIPanel
     {
-        private IUIElementContainer _root;
         private UIButton[] _warpButtons;
         private UIText _text;
 
@@ -114,7 +114,7 @@ namespace KSS.UI
 
                 if( warpRate == 0.0f )
                 {
-                    _warpButtons[i] = _root.AddButton( new UILayoutInfo( UIAnchor.Left, (0, 0), ( 16, 26 ) ),
+                    _warpButtons[i] = this.AddButton( new UILayoutInfo( UIAnchor.Left, (0, 0), ( 16, 26 ) ),
                         currentWarpRate == 0
                         ? AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/timewarp_pause_active" )
                         : AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/timewarp_pause" ), OnClick0 );
@@ -122,9 +122,9 @@ namespace KSS.UI
                 else
                 {
                     if( currentWarpRate == 0 )
-                        _warpButtons[i] = _root.AddButton( new UILayoutInfo( UIAnchor.Left, (0,0), (UISize)Choose3Way( _sizes, _warpRates.Length, i ) ), Choose3Way( _sprites, _warpRates.Length, i ), () => OnClickNon0( warpRate ) );
+                        _warpButtons[i] = this.AddButton( new UILayoutInfo( UIAnchor.Left, (0,0), (UISize)Choose3Way( _sizes, _warpRates.Length, i ) ), Choose3Way( _sprites, _warpRates.Length, i ), () => OnClickNon0( warpRate ) );
                     else
-                        _warpButtons[i] = _root.AddButton( new UILayoutInfo( UIAnchor.Left, (0, 0), (UISize)Choose3Way( _sizes, _warpRates.Length, i ) ),
+                        _warpButtons[i] = this.AddButton( new UILayoutInfo( UIAnchor.Left, (0, 0), (UISize)Choose3Way( _sizes, _warpRates.Length, i ) ),
                             currentWarpRate >= warpRate
                             ? Choose3Way( _spritesActive, _warpRates.Length, i )
                             : Choose3Way( _sprites, _warpRates.Length, i ), () => OnClickNon0( warpRate ) );
@@ -135,27 +135,25 @@ namespace KSS.UI
                 ? $"Paused"
                 : $"{currentWarpRate}x";
 
-            _text = _root.AddText( new UILayoutInfo( UIAnchor.Left, UIFill.Vertical(), 0, 50f ), rateText )
+            _text = this.AddText( new UILayoutInfo( UIAnchor.Left, UIFill.Vertical(), 0, 50f ), rateText )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Left )
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
-            UILayoutManager.BroadcastLayoutUpdate( _root );
+            UILayoutManager.BroadcastLayoutUpdate( this );
         }
 
-        public static TimewarpSelectorUI Create( IUIElementContainer parent, UILayoutInfo layoutInfo, IEnumerable<float> warpRates )
+        protected internal static T Create<T>( IUIElementContainer parent, UILayoutInfo layout, IEnumerable<float> warpRates ) where T : UITimewarpSelector
         {
             if( warpRates.Any( rate => rate < 0.0f ) )
             {
                 throw new ArgumentOutOfRangeException( nameof( warpRates ), $"Every warp rate must be either positive, or zero (pause)." );
             }
 
-            UIPanel rootPanel = parent.AddPanel( layoutInfo, null );
+            T timewarpSelectorUI = UIPanel.Create<T>( parent, layout, null );
 
-            TimewarpSelectorUI timewarpSelectorUI = rootPanel.gameObject.AddComponent<TimewarpSelectorUI>();
-            timewarpSelectorUI._root = rootPanel;
             timewarpSelectorUI._warpRates = warpRates.ToArray();
 
-            rootPanel.LayoutDriver = new HorizontalLayoutDriver()
+            timewarpSelectorUI.LayoutDriver = new HorizontalLayoutDriver()
             {
                 Dir = HorizontalLayoutDriver.Direction.LeftToRight,
                 Spacing = 0f,
@@ -165,6 +163,14 @@ namespace KSS.UI
             timewarpSelectorUI.Refresh();
 
             return timewarpSelectorUI;
+        }
+    }
+
+    public static class UITimewarpSelector_Ex
+    {
+        public static UITimewarpSelector AddTimewarpSelector( this IUIElementContainer parent, UILayoutInfo layout, IEnumerable<float> warpRates )
+        {
+            return UITimewarpSelector.Create<UITimewarpSelector>( parent, layout, warpRates );
         }
     }
 }

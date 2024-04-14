@@ -10,16 +10,11 @@ using UnityPlus.AssetManagement;
 
 namespace KSS.GameplayScene
 {
-	public class NavballManager : SingletonMonoBehaviour<NavballManager>
+	/// <summary>
+	/// Manages the creation of the Navball's render texture.
+	/// </summary>
+	public class NavballRenderTextureManager : SingletonMonoBehaviour<NavballRenderTextureManager>
 	{
-		// navball needs to be spawned (from code)
-		// navball camera (and pivots and shit) need to be created (from code).
-		// rendertexture needs to be created and assigned to the camera.
-
-		// then something needs to hook into the UI to render the thing.
-
-		// NavballManager manages the navball render texture (and by extension, the navball and navball camera).
-
 		RenderTexture _attitudeIndicatorRT;
 		Transform _navball;
 		Transform _cameraPivot;
@@ -52,7 +47,7 @@ namespace KSS.GameplayScene
 		[HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, "vanilla.spawn_navball" )]
 		public static void OnGameplayEnter()
 		{
-			GameplaySceneManager.GameObject.AddComponent<NavballManager>();
+			GameplaySceneManager.GameObject.AddComponent<NavballRenderTextureManager>();
 
 			ResetAttitudeIndicatorRT();
 			CreateNavball();

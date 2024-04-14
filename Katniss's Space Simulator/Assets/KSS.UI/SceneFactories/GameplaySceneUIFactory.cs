@@ -76,40 +76,7 @@ namespace KSS.UI.SceneFactories
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
-
-            UIPanel navball = _mainPanel.AddPanel( new UILayoutInfo( UIAnchor.Bottom, (0, 0), (222, 202) ), null );
-
-            UIMask mask = navball.AddMask( new UILayoutInfo( UIAnchor.Center, (0, 0), (190, 190) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/std0/ui_navball" ) );
-
-            (GameObject rawGameObject, RectTransform rawTransform) = UIElement.CreateUIGameObject( mask.rectTransform, "raw", new UILayoutInfo( UIFill.Fill() ) );
-            RawImage rawImage = rawGameObject.AddComponent<RawImage>();
-            rawImage.texture = NavballManager.AttitudeIndicatorRT;
-
-            UIIcon attitudeIndicator = navball.AddIcon( new UILayoutInfo( UIFill.Fill() ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/attitude_indicator" ) );
-
-
-            UIIcon prograde = mask.AddIcon( new UILayoutInfo( UIAnchor.Center, (0, 0), (34, 34) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_prograde" ) );
-            UIIcon retrograde = mask.AddIcon( new UILayoutInfo( UIAnchor.Center, (0, 0), (34, 34) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_retrograde" ) );
-            UIIcon normal = mask.AddIcon( new UILayoutInfo( UIAnchor.Center, (0, 0), (34, 34) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_normal" ) );
-            UIIcon antinormal = mask.AddIcon( new UILayoutInfo( UIAnchor.Center, (0, 0), (34, 34) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_antinormal" ) );
-            UIIcon antiradial = mask.AddIcon( new UILayoutInfo( UIAnchor.Center, (0, 0), (34, 34) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_radial_out" ) );
-            UIIcon radial = mask.AddIcon( new UILayoutInfo( UIAnchor.Center, (0, 0), (34, 34) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_radial_in" ) );
-            UIIcon maneuver = mask.AddIcon( new UILayoutInfo( UIAnchor.Center, (0, 0), (34, 34) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_maneuver" ) );
-
-            NavballUI nui = navball.gameObject.AddComponent<NavballUI>();
-            nui.SetDirectionIcons( prograde, retrograde, normal, antinormal, antiradial, radial, maneuver );
-
-            UIIcon horizon = navball.AddIcon( new UILayoutInfo( UIAnchor.Center, (0, 0), (90, 32) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_horizon" ) );
-
-
-            UIPanel velocityIndicator = navball.AddPanel( new UILayoutInfo( UIAnchor.Top, (0, 15), (167.5f, 40) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/velocity_indicator" ) );
-
-            velocityIndicator.AddButton( new UILayoutInfo( UIAnchor.Left, (2, 0), (20, 20) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_list_gold" ), null );
-            velocityIndicator.AddButton( new UILayoutInfo( UIAnchor.Right, (-2, 0), (20, 20) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_down_gold" ), null );
-
-            velocityIndicator.AddTextReadout_Velocity( new UILayoutInfo( UIFill.Fill( 31.5f, 31.5f, 0, 0 ) ) )
-                .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
-                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
+            _mainPanel.AddNavball( new UILayoutInfo( UIAnchor.Bottom, (0, 0), (222, 202) ) );
         }
 
         static void CreateFPSPanel()
@@ -140,7 +107,7 @@ namespace KSS.UI.SceneFactories
                     .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
                     .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
-                TimewarpSelectorUI selector = TimewarpSelectorUI.Create( topPanel, new UILayoutInfo( UIAnchor.Left, UIFill.Vertical(), 230, 110 ), new float[] { 0, 1, 2, 4, 8, 16, 32, 64, 128, 256 } );
+                UITimewarpSelector selector = topPanel.AddTimewarpSelector( new UILayoutInfo( UIAnchor.Left, UIFill.Vertical(), 230, 110 ), new float[] { 0, 1, 2, 4, 8, 16, 32, 64, 128, 256 } );
             }
             else
             {
@@ -159,7 +126,7 @@ namespace KSS.UI.SceneFactories
                     .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
                     .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
-                TimewarpSelectorUI selector = TimewarpSelectorUI.Create( topLeftPanel, new UILayoutInfo( UIAnchor.Left, UIFill.Vertical(), 230, 110 ), new float[] { 0, 1, 2, 4, 8, 16, 32, 64, 128, 256 } );
+                UITimewarpSelector selector = topLeftPanel.AddTimewarpSelector( new UILayoutInfo( UIAnchor.Left, UIFill.Vertical(), 230, 110 ), new float[] { 0, 1, 2, 4, 8, 16, 32, 64, 128, 256 } );
 
                 UIPanel topRightPanel = _mainPanel.AddPanel( new UILayoutInfo( UIAnchor.TopRight, (15, 0), (100, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/top_panel" ) );
 

@@ -1,6 +1,7 @@
 ﻿using KSS.Core;
 using KSS.Core.Physics;
 using KSS.Core.ReferenceFrames;
+using KSS.Core.Serialization;
 using KSS.GameplayScene;
 using System;
 using System.Collections.Generic;
@@ -8,11 +9,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityPlus.AssetManagement;
+using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
 
 namespace KSS.UI
 {
-    public class NavballUI : MonoBehaviour
+    public class UINavball : UIPanel
     {
         private UIIcon _prograde;
         private UIIcon _retrograde;
@@ -90,6 +94,52 @@ namespace KSS.UI
                     _maneuver.rectTransform.anchoredPosition = new Vector2( 9999, 9999 );
                 }
             }
+        }
+
+        public static T Create<T>( IUIElementContainer parent, UILayoutInfo layout ) where T : UINavball
+        {
+            T navball = UIPanel.Create<T>( parent, layout, null );
+
+            UIMask mask = navball.AddMask( new UILayoutInfo( UIAnchor.Center, (0, 0), (190, 190) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/std0/ui_navball" ) );
+
+            (GameObject rawGameObject, RectTransform rawTransform) = UIElement.CreateUIGameObject( mask.rectTransform, "raw", new UILayoutInfo( UIFill.Fill() ) );
+            RawImage rawImage = rawGameObject.AddComponent<RawImage>();
+            rawImage.texture = NavballRenderTextureManager.AttitudeIndicatorRT;
+
+            UIIcon attitudeIndicator = navball.AddIcon( new UILayoutInfo( UIFill.Fill() ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/attitude_indicator" ) );
+
+
+            UIIcon prograde = mask.AddIcon( new UILayoutInfo( UIAnchor.Center, (0, 0), (34, 34) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_prograde" ) );
+            UIIcon retrograde = mask.AddIcon( new UILayoutInfo( UIAnchor.Center, (0, 0), (34, 34) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_retrograde" ) );
+            UIIcon normal = mask.AddIcon( new UILayoutInfo( UIAnchor.Center, (0, 0), (34, 34) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_normal" ) );
+            UIIcon antinormal = mask.AddIcon( new UILayoutInfo( UIAnchor.Center, (0, 0), (34, 34) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_antinormal" ) );
+            UIIcon antiradial = mask.AddIcon( new UILayoutInfo( UIAnchor.Center, (0, 0), (34, 34) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_radial_out" ) );
+            UIIcon radial = mask.AddIcon( new UILayoutInfo( UIAnchor.Center, (0, 0), (34, 34) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_radial_in" ) );
+            UIIcon maneuver = mask.AddIcon( new UILayoutInfo( UIAnchor.Center, (0, 0), (34, 34) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_maneuver" ) );
+
+            navball.SetDirectionIcons( prograde, retrograde, normal, antinormal, antiradial, radial, maneuver );
+
+            UIIcon horizon = navball.AddIcon( new UILayoutInfo( UIAnchor.Center, (0, 0), (90, 32) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_horizon" ) );
+
+
+            UIPanel velocityIndicator = navball.AddPanel( new UILayoutInfo( UIAnchor.Top, (0, 15), (167.5f, 40) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/velocity_indicator" ) );
+
+            velocityIndicator.AddButton( new UILayoutInfo( UIAnchor.Left, (2, 0), (20, 20) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_list_gold" ), null );
+            velocityIndicator.AddButton( new UILayoutInfo( UIAnchor.Right, (-2, 0), (20, 20) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_down_gold" ), null );
+
+            velocityIndicator.AddTextReadout_Velocity( new UILayoutInfo( UIFill.Fill( 31.5f, 31.5f, 0, 0 ) ) )
+                .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
+                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
+
+            return navball;
+        }
+    }
+
+    public static class UINavball_Ex
+    {
+        public static UINavball AddNavball( this IUIElementContainer parent, UILayoutInfo layout )
+        {
+            return UINavball.Create<UINavball>( parent, layout );
         }
     }
 }

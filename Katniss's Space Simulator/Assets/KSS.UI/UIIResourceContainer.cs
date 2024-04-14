@@ -4,10 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib.UIElements;
+using KSS.Core.Serialization;
+using System;
 
 namespace KSS.UI
 {
-    public class IResourceContainerUI : MonoBehaviour
+    public class UIIResourceContainer : UIPanel
     {
         /// <summary>
         /// The object that is referenced by this UI element.
@@ -32,18 +34,25 @@ namespace KSS.UI
             }
         }
 
-        public static IResourceContainerUI Create( IUIElementContainer parent, IResourceContainer referenceObj )
+        protected internal static T Create<T>( IUIElementContainer parent, IResourceContainer referenceObj ) where T : UIIResourceContainer
         {
-            UIPanel panel = parent.AddPanel( new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (250, 15) ), null );
+            T uiIResourceContainer = UIPanel.Create<T>( parent, new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (250, 15) ), null );
 
-            UIValueBar bar = panel.AddHorizontalValueBar( new UILayoutInfo( UIFill.Fill() ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/bar_background" ) )
+            UIValueBar uiValueBar = uiIResourceContainer.AddHorizontalValueBar( new UILayoutInfo( UIFill.Fill() ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/bar_background" ) )
                 .WithPadding( 5, 5, 1 );
 
-            IResourceContainerUI ui = panel.gameObject.AddComponent<IResourceContainerUI>();
-            ui._bar = bar;
-            ui.ReferenceObject = referenceObj;
+            uiIResourceContainer.ReferenceObject = referenceObj;
+            uiIResourceContainer._bar = uiValueBar;
 
-            return ui;
+            return uiIResourceContainer;
+        }
+    }
+
+    public static class UIIResourceContainer_Ex
+    {
+        public static UIIResourceContainer AddIResourceContainer( this IUIElementContainer parent, IResourceContainer referenceObj )
+        {
+            return UIIResourceContainer.Create<UIIResourceContainer>( parent, referenceObj );
         }
     }
 }

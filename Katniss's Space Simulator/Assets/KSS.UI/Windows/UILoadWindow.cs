@@ -1,5 +1,7 @@
 using KSS.Core.SceneManagement;
 using KSS.Core.Serialization;
+using KSS.UI.Windows;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -11,12 +13,12 @@ using UnityPlus.UILib.UIElements;
 
 namespace KSS.UI
 {
-    public class LoadWindow : MonoBehaviour
+    public class UILoadWindow : UIWindow
     {
-        TimelineMetadataUI[] _timelines;
-        TimelineMetadataUI _selectedTimeline;
-        SaveMetadataUI[] _selectedTimelineSaves;
-        SaveMetadataUI _selectedSave;
+        UITimelineMetadata[] _timelines;
+        UITimelineMetadata _selectedTimeline;
+        UISaveMetadata[] _selectedTimelineSaves;
+        UISaveMetadata _selectedSave;
 
         IUIElementContainer _saveListUI;
         IUIElementContainer _timelineListUI;
@@ -57,10 +59,10 @@ namespace KSS.UI
             }
 
             SaveMetadata[] saves = SaveMetadata.ReadAllSaves( _selectedTimeline.Timeline.TimelineID ).ToArray();
-            _selectedTimelineSaves = new SaveMetadataUI[saves.Length];
+            _selectedTimelineSaves = new UISaveMetadata[saves.Length];
             for( int i = 0; i < _selectedTimelineSaves.Length; i++ )
             {
-                _selectedTimelineSaves[i] = SaveMetadataUI.Create( _saveListUI, new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Bottom, 0, 40 ), saves[i], ( ui ) =>
+                _selectedTimelineSaves[i] = _saveListUI.AddSaveMetadata( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Bottom, 0, 40 ), saves[i], ( ui ) =>
                 {
                     _selectedSave = ui;
                 } );
@@ -80,10 +82,10 @@ namespace KSS.UI
             }
 
             var timelines = TimelineMetadata.ReadAllTimelines().ToArray();
-            _timelines = new TimelineMetadataUI[timelines.Length];
+            _timelines = new UITimelineMetadata[timelines.Length];
             for( int i = 0; i < _timelines.Length; i++ )
             {
-                _timelines[i] = TimelineMetadataUI.Create( _timelineListUI, new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Bottom, 0, 40 ), timelines[i], ( ui ) =>
+                _timelines[i] = _timelineListUI.AddTimelineMetadata( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Bottom, 0, 40 ), timelines[i], ( ui ) =>
                 {
                     _selectedTimeline = ui;
                     RefreshSaveList();
@@ -96,33 +98,40 @@ namespace KSS.UI
             _selectedSave.Save.LoadAsync();
         }
 
-        public static LoadWindow Create()
+        public static T Create<T>( UICanvas parent, UILayoutInfo layout ) where T : UILoadWindow
         {
-            UIWindow window = CanvasManager.Get( CanvasName.WINDOWS ).AddWindow( new UILayoutInfo( UIAnchor.Center, (0, 0), (350f, 400f) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/window" ) )
+            //UIWindow window = CanvasManager.Get( CanvasName.WINDOWS ).AddWindow( new UILayoutInfo( UIAnchor.Center, (0, 0), (350f, 400f) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/window" ) )
+            T uiWindow = (T)UIWindow.Create<T>( parent, layout, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/window" ) )
                 .Draggable()
                 .Focusable()
                 .WithCloseButton( new UILayoutInfo( UIAnchor.TopRight, (-7, -5), (20, 20) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ );
 
-            LoadWindow loadWindow = window.gameObject.AddComponent<LoadWindow>();
-
-            UIScrollView timelineList = window.AddVerticalScrollView( new UILayoutInfo( UIAnchor.Left, UIFill.Vertical( 30, 30 ), 0, 100 ), 100 )
+            UIScrollView timelineList = uiWindow.AddVerticalScrollView( new UILayoutInfo( UIAnchor.Left, UIFill.Vertical( 30, 30 ), 0, 100 ), 100 )
                 .WithVerticalScrollbar( new UILayoutInfo( UIAnchor.Right, UIFill.Vertical(), 0, 10 ), null, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_handle" ), out _ );
 
             timelineList.LayoutDriver = new VerticalLayoutDriver() { FitToSize = true };
 
-            UIScrollView saveList = window.AddVerticalScrollView( new UILayoutInfo( UIAnchor.Right, UIFill.Vertical( 30, 30 ), 0, 250 ), 100 )
+            UIScrollView saveList = uiWindow.AddVerticalScrollView( new UILayoutInfo( UIAnchor.Right, UIFill.Vertical( 30, 30 ), 0, 250 ), 100 )
                 .WithVerticalScrollbar( new UILayoutInfo( UIAnchor.Right, UIFill.Vertical(), 0, 10 ), null, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_handle" ), out _ );
 
             saveList.LayoutDriver = new VerticalLayoutDriver() { FitToSize = true };
 
-            UIButton loadButton = window.AddButton( new UILayoutInfo( UIFill.Horizontal( 5, 5 ), UIAnchor.Bottom, 0, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ), loadWindow.OnLoad );
+            UIButton loadButton = uiWindow.AddButton( new UILayoutInfo( UIFill.Horizontal( 5, 5 ), UIAnchor.Bottom, 0, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ), uiWindow.OnLoad );
 
-            loadWindow._timelineListUI = timelineList;
-            loadWindow._saveListUI = saveList;
+            uiWindow._timelineListUI = timelineList;
+            uiWindow._saveListUI = saveList;
 
-            loadWindow.RefreshTimelineList();
+            uiWindow.RefreshTimelineList();
 
-            return loadWindow;
+            return uiWindow;
+        }
+    }
+
+    public static class UILoadWindow_Ex
+    {
+        public static UILoadWindow AddLoadWindow( this UICanvas parent, UILayoutInfo layout )
+        {
+            return UILoadWindow.Create<UILoadWindow>( parent, layout );
         }
     }
 }

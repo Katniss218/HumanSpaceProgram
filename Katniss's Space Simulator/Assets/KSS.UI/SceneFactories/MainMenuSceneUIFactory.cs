@@ -19,8 +19,8 @@ namespace KSS.UI.SceneFactories
     /// </summary>
     public static class MainMenuSceneUIFactory
     {
-        static GameObject _startNewGameWindow; // singleton window
-        static GameObject _loadWindow; // singleton window
+        static UIStartNewGameWindow _startNewGameWindow; // singleton window
+        static UILoadWindow _loadWindow; // singleton window
 
         [HSPEventListener( HSPEvent.STARTUP_MAINMENU, HSPEvent.NAMESPACE_VANILLA + ".mainmenu_ui" )]
         public static void Create( object e )
@@ -53,7 +53,7 @@ namespace KSS.UI.SceneFactories
             parent.AddButton( new UILayoutInfo( UIAnchor.Center, (0, 0), (200, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
             {
                 if( _startNewGameWindow == null )
-                    _startNewGameWindow = StartNewGameWindow.Create().gameObject;
+                    _startNewGameWindow = CanvasManager.Get( CanvasName.WINDOWS ).AddStartNewGameWindow( new UILayoutInfo( UIAnchor.Center, (0, 0), (400f, 400f) ) );
             } )
                 .AddText( new UILayoutInfo( UIFill.Fill() ), "Start New Game" )
                 .WithFont( AssetRegistry.Get<TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
@@ -65,7 +65,7 @@ namespace KSS.UI.SceneFactories
             parent.AddButton( new UILayoutInfo( UIAnchor.Center, (0, -20), (200, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
             {
                 if( _loadWindow == null )
-                    _loadWindow = LoadWindow.Create().gameObject;
+                    _loadWindow = CanvasManager.Get( CanvasName.WINDOWS ).AddLoadWindow( new UILayoutInfo( UIAnchor.Center, (0, 0), (350f, 400f) ) );
             } )
                 .AddText( new UILayoutInfo( UIFill.Fill() ), "Load Game" )
                 .WithFont( AssetRegistry.Get<TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )

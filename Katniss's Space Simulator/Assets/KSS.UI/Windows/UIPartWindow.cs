@@ -20,9 +20,9 @@ namespace KSS.UI.Windows
     /// <summary>
     /// A pop-up window containing the information about some part of a vessel.
     /// </summary>
-    public class PartWindow : EventTrigger
+    public class UIPartWindow : UIWindow
     {
-        static List<PartWindow> _activePartWindows = new List<PartWindow>();
+        static List<UIPartWindow> _activePartWindows = new List<UIPartWindow>();
 
         /// <summary>
         /// The part that is currently referenced by this part window.
@@ -58,7 +58,7 @@ namespace KSS.UI.Windows
             {
                 if( comp is IResourceContainer r )
                 {
-                    IResourceContainerUI.Create( _list, r );
+                    _list.AddIResourceContainer( r );
                 }
             }
         }
@@ -95,7 +95,7 @@ namespace KSS.UI.Windows
         }
 
         /// <param name="referencePart">The transform that will serve as the root for the part window.</param>
-        public static PartWindow Create( Transform referencePart )
+        public static T Create<T>( UICanvas parent, UILayoutInfo layout, Transform referencePart ) where T : UIPartWindow
         {
             // Note that this method shouldn't handle any redirecting,
             // so if you invoke it with the transform of a collider that doesn't have any functionalities attached, it will not show anything.
@@ -109,27 +109,35 @@ namespace KSS.UI.Windows
                 throw new ArgumentNullException( nameof( referencePart ), $"Can't create a part window for an object that can't be mapped to a {nameof( PartMetadata )}." );
             }
 
-            UIWindow window = CanvasManager.Get( CanvasName.WINDOWS ).AddWindow( new UILayoutInfo( UIAnchor.Center, (0, 0), (300f, 300f) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/window" ) )
+            T partWindow = (T)UIWindow.Create<T>( parent, layout, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/window" ) )
                 .Draggable()
                 .Focusable()
+                .Resizeable()
                 .WithCloseButton( new UILayoutInfo( UIAnchor.TopRight, (-7, -5), (20, 20) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ )
                 .WithRelationHightlight( out WindowRelationHighlight relationHighlight );
 
             // masses/etc can be summed up from components in children of reference part.
 
-            window.AddText( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Top, 0, 30 ), part.Name )
+            partWindow.AddText( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Top, 0, 30 ), part.Name )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
-            UIScrollView scrollView = window.AddVerticalScrollView( new UILayoutInfo( UIFill.Fill( 2, 2, 75, 15 ) ), 200 );
+            UIScrollView scrollView = partWindow.AddVerticalScrollView( new UILayoutInfo( UIFill.Fill( 2, 2, 75, 15 ) ), 200 );
 
-            PartWindow partWindow = window.gameObject.AddComponent<PartWindow>();
             partWindow._list = scrollView;
             partWindow._relationHighlighter = relationHighlight;
             partWindow.SetPart( referencePart );
             _activePartWindows.Add( partWindow );
 
             return partWindow;
+        }
+    }
+
+    public static class UIPartWindow_Ex
+    {
+        public static UIPartWindow AddPartWindow( this UICanvas parent, UILayoutInfo layout, Transform referencePart )
+        {
+            return UIPartWindow.Create<UIPartWindow>( parent, layout, referencePart );
         }
     }
 }

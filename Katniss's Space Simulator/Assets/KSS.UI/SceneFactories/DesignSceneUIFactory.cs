@@ -40,7 +40,7 @@ namespace KSS.UI.SceneFactories
 
         private static void CreatePartList( UICanvas canvas )
         {
-            PartListUI partListUI = PartListUI.Create( canvas, new UILayoutInfo( UIAnchor.Left, UIFill.Vertical( 30, 0 ), 0, PART_LIST_WIDTH ) );
+            UIPartList partListUI = canvas.AddPartList( new UILayoutInfo( UIAnchor.Left, UIFill.Vertical( 30, 0 ), 0, PART_LIST_WIDTH ) );
         }
 
         [HSPEventListener( HSPEvent.DESIGN_AFTER_LOAD, HSPEvent.NAMESPACE_VANILLA + ".update_current" )]

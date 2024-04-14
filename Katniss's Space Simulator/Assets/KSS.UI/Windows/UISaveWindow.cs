@@ -9,10 +9,10 @@ using System.Linq;
 
 namespace KSS.UI
 {
-    public class SaveWindow : MonoBehaviour
+    public class UISaveWindow : UIWindow
     {
-        SaveMetadataUI[] _selectedTimelineSaves;
-        SaveMetadataUI _selectedSave;
+        UISaveMetadata[] _selectedTimelineSaves;
+        UISaveMetadata _selectedSave;
 
         IUIElementContainer _saveListUI;
 
@@ -37,10 +37,10 @@ namespace KSS.UI
             }
 
             SaveMetadata[] saves = SaveMetadata.ReadAllSaves( TimelineManager.CurrentTimeline.TimelineID ).ToArray();
-            _selectedTimelineSaves = new SaveMetadataUI[saves.Length];
+            _selectedTimelineSaves = new UISaveMetadata[saves.Length];
             for( int i = 0; i < _selectedTimelineSaves.Length; i++ )
             {
-                _selectedTimelineSaves[i] = SaveMetadataUI.Create( _saveListUI, new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Bottom, 0, 40 ), saves[i], ( ui ) =>
+                _selectedTimelineSaves[i] = _saveListUI.AddSaveMetadata( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Bottom, 0, 40 ), saves[i], ( ui ) =>
                 {
                     _selectedSave = ui;
                 } );
@@ -62,34 +62,40 @@ namespace KSS.UI
         /// <summary>
         /// Creates a save window with the current context.
         /// </summary>
-        public static SaveWindow Create()
+        public static T Create<T>( UICanvas parent, UILayoutInfo layout ) where T : UISaveWindow
         {
-            UIWindow window = CanvasManager.Get( CanvasName.WINDOWS ).AddWindow( new UILayoutInfo( UIAnchor.Center, (0, 0), (250f, 100f) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/window" ) )
+            T uiWindow = (T)UIWindow.Create<T>( parent, layout, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/window" ) )
                 .Draggable()
                 .Focusable()
                 .WithCloseButton( new UILayoutInfo( UIAnchor.TopRight, (-7, -5), (20, 20) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ );
 
-            SaveWindow saveWindow = window.gameObject.AddComponent<SaveWindow>();
-
-            UIScrollView saveScrollView = window.AddVerticalScrollView( new UILayoutInfo( UIFill.Fill( 2, 2, 30, 22 ) ), 75 )
+            UIScrollView saveScrollView = uiWindow.AddVerticalScrollView( new UILayoutInfo( UIFill.Fill( 2, 2, 30, 22 ) ), 75 )
                 .WithVerticalScrollbar( new UILayoutInfo( UIAnchor.Right, UIFill.Vertical( 2, 2 ), 0, 10 ), null, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_handle" ), out UIScrollBar scrollbar );
 
 
-            UIButton saveBtn = window.AddButton( new UILayoutInfo( UIAnchor.BottomRight, (-2, 5), (95, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), saveWindow.OnSave );
+            UIButton saveBtn = uiWindow.AddButton( new UILayoutInfo( UIAnchor.BottomRight, (-2, 5), (95, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), uiWindow.OnSave );
 
             saveBtn.AddText( new UILayoutInfo( UIFill.Fill() ), "Save" )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
-            UIInputField inputField = window.AddInputField( new UILayoutInfo( UIFill.Horizontal( 2, 99 ), UIAnchor.Bottom, 5, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
+            UIInputField inputField = uiWindow.AddInputField( new UILayoutInfo( UIFill.Horizontal( 2, 99 ), UIAnchor.Bottom, 5, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
 
-            saveWindow._nameInputField = inputField;
-            saveWindow._descriptionInputField = inputField;
-            saveWindow._saveListUI = saveScrollView;
+            uiWindow._nameInputField = inputField;
+            uiWindow._descriptionInputField = inputField;
+            uiWindow._saveListUI = saveScrollView;
 
-            saveWindow.RefreshSaveList();
+            uiWindow.RefreshSaveList();
 
-            return saveWindow;
+            return uiWindow;
+        }
+    }
+
+    public static class UISaveWindow_Ex
+    {
+        public static UISaveWindow AddSaveWindow( this UICanvas parent, UILayoutInfo layout )
+        {
+            return UISaveWindow.Create<UISaveWindow>( parent, layout );
         }
     }
 }
