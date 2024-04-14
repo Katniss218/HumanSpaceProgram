@@ -77,18 +77,22 @@
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\IUIElement.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIMask_Ex.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\Layout\VerticalLayoutDriver.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\CursorManager.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIInputField_Ex.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\ValueBar.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\IUILayoutSelf.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIMask.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\CanvasManager.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIInputToggle.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\UIElements\UITooltip_Ex.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIScrollView.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIValueBar.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\RectTransformTrackRectTransform.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UILayoutInfo.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\Layout\BidirectionalLayoutDriver.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\UIElements\UITooltip.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIButton_Ex.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\RectTransformDragResize.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIPanel_Ex.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\RectTransformFocuser.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIButton.cs" />
@@ -96,7 +100,7 @@
     <Compile Include="Assets\_UnityPlus.UILib\Layout\LayoutDriver.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIScrollBar.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIElement.cs" />
-    <Compile Include="Assets\_UnityPlus.UILib\RectTransformDragger.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\RectTransformDragMove.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIWindow.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIPanel.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIElement_Ex.cs" />
@@ -104,10 +108,8 @@
     <Compile Include="Assets\_UnityPlus.UILib\ValueBarSegment.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UILayoutInfo_Ex.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIScrollView_Ex.cs" />
-    <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIContextMenu.cs" />
-    <Compile Include="Assets\_UnityPlus.UILib\UIElements\UITooltip.cs" />
-    <Compile Include="Assets\_UnityPlus.UILib\UIElements\UITooltip_Ex.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\RectTransformTrackCursor.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIContextMenu.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_UnityPlus.UILib\___UnityPlus.UILib.asmdef" />

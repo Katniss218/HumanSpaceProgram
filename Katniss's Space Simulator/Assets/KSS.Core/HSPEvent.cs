@@ -30,6 +30,11 @@ namespace KSS.Core
         /// Invoked at the immediate start of the game. This event is always invoked first.
         /// </summary>
         public const string STARTUP_IMMEDIATELY = NAMESPACE_VANILLA + ".startup.immediately";
+        
+        /// <summary>
+        /// Invoked just before loading the main menu scene, after the immediate startup.
+        /// </summary>
+        public const string STARTUP_EARLY = NAMESPACE_VANILLA + ".startup.early";
 
         /// <summary>
         /// Invoked immediately after loading the main menu scene.

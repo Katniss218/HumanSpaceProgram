@@ -77,7 +77,7 @@ namespace KSS.UI
 
             panel.rectTransform.sizeDelta = new Vector2( panel.rectTransform.sizeDelta.x, ((RectTransform)groupUI.transform).sizeDelta.y + 20f );
 
-            RectTransformDragger dragger = panel.gameObject.AddComponent<RectTransformDragger>();
+            RectTransformDragMove dragger = panel.gameObject.AddComponent<RectTransformDragMove>();
             dragger.UITransform = panel.rectTransform;
             dragger.OnDragging = node.OnDragged;
 

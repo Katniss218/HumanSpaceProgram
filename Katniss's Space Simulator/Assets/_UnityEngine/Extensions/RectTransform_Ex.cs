@@ -27,7 +27,7 @@ namespace UnityEngine
 		}
 
 		/// <summary>
-		/// Transforms a position in the local space of one rect transform to the local space of another.
+		/// Transforms a point from the local space of <paramref name="from"/>, to the local space of <paramref name="to"/>.
 		/// </summary>
 		public static Vector2 TransformPointTo( this RectTransform from, Vector2 position, RectTransform to )
 		{

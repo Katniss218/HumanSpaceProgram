@@ -21,7 +21,7 @@ namespace UnityPlus.UILib.UIElements
 
         public LayoutDriver LayoutDriver { get; set; }
 
-        public virtual void SetContentsSize( float left, float right, float top, float bottom )
+        /*public virtual void SetContentsSize( float left, float right, float top, float bottom )
         {
             Vector2 containerSize = this.rectTransform.rect.size;
 
@@ -33,7 +33,7 @@ namespace UnityPlus.UILib.UIElements
 
             _contentsTransform.sizeDelta = new Vector2( (right - left), (top - bottom) );
             scrollRectComponent.normalizedPosition = contentsCenter / containerSize;
-        }
+        }*/
 
         private static void FixPositionRecursive( RectTransform rectTransform )
         {

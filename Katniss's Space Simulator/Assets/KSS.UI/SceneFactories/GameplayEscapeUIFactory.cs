@@ -36,7 +36,7 @@ namespace KSS.UI.SceneFactories
             {
                 UICanvas canvas = CanvasManager.Get( CanvasName.WINDOWS );
 
-                escapeMenuWindow = canvas.AddWindow( new UILayoutInfo( UIAnchor.Center, (0, 0), (300, 300) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/part_window" ) )
+                escapeMenuWindow = canvas.AddWindow( new UILayoutInfo( UIAnchor.Center, (0, 0), (300, 300) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/window" ) )
                     .Draggable()
                     .Focusable()
                     .WithButton( new UILayoutInfo( UIAnchor.TopRight, (-7, -5), (20, 20) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), null, out UIButton closebutton );

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,6 +21,13 @@ namespace UnityPlus.UILib.UIElements
         public LayoutDriver LayoutDriver { get; set; }
 
         public virtual Sprite Background { get => backgroundComponent.sprite; set => backgroundComponent.sprite = value; }
+
+        protected Action OnDestroyListener;
+
+        void OnDestroy()
+        {
+            OnDestroyListener?.Invoke();
+        }
 
         protected internal static T Create<T>( UICanvas parent, UILayoutInfo layoutInfo, Sprite background ) where T : UIWindow
         {

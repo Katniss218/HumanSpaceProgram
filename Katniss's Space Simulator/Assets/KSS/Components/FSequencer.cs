@@ -26,21 +26,20 @@ namespace KSS.Components
     public class TimedSequenceElement : SequenceElement
     {
         /// <summary>
-        /// The delay from the firing of the previous element, after which the sequence element should fire.
+        /// The delay, in [s], from the firing of the previous element, after which the sequence element should fire.
         /// </summary>
         public float Delay { get; set; }
 
         float _startTimestamp;
-        float _timeSinceStart => _startTimestamp - Time.time;
 
         public override void Initialize()
         {
-            _startTimestamp = Time.time;
+            _startTimestamp = Time.unscaledTime;
         }
 
         public override bool CanInvoke()
         {
-            return _timeSinceStart >= Delay;
+            return Time.unscaledTime >= _startTimestamp + Delay;
         }
     }
 

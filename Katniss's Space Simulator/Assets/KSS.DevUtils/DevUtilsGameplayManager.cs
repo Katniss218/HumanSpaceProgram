@@ -10,7 +10,6 @@ using KSS.Core.Serialization;
 using KSS.Core.Components;
 using System;
 using UnityPlus.AssetManagement;
-using KSS.AssetLoaders;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.Strategies;
 using System.IO;
@@ -19,6 +18,7 @@ using KSS.Core.Mods;
 using UnityPlus.Serialization.DataHandlers;
 using UnityPlus.Serialization.ReferenceMaps;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace KSS.DevUtils
 {
@@ -277,8 +277,8 @@ namespace KSS.DevUtils
 			conn2.End2.Position = new Vector3( 0.0f, 0.0f, 0.0f );
 			conn2.CrossSectionArea = 60f;
 
-			t1.gameObject.AddComponent<FVesselSeparator>();
-			t2.gameObject.AddComponent<FVesselSeparator>();
+            FVesselSeparator t1Sep = t1.gameObject.AddComponent<FVesselSeparator>();
+            FVesselSeparator t2Sep = t2.gameObject.AddComponent<FVesselSeparator>();
 
 			TrailRenderer tr = v.gameObject.AddComponent<TrailRenderer>();
 			tr.material = FindObjectOfType<DevUtilsGameplayManager>().Material;
@@ -302,6 +302,40 @@ namespace KSS.DevUtils
 			gc.Actuators2D[0] = new FGimbalActuatorController.Actuator2DGroup();
 			gc.Actuators2D[0].GetReferenceTransform.TryConnect( ac.GetReferenceTransform );
 			gc.Actuators2D[0].OnSetXY.TryConnect( ac.SetXY );
+
+			FSequencer seq = capsule.GetComponent<FSequencer>();
+
+			seq.Sequence = new()
+			{
+				Elements = new List<SequenceElement>()
+				{
+					new KeyboardSequenceElement()
+					{
+						Actions = new List<SequencerControlGroup>()
+						{
+							new SequencerOutput<byte>()
+							{
+								OnInvoke = new Control.Controls.ControllerOutput<byte>() 
+							}
+                        },
+						Key = KeyCode.Space
+					},
+					new TimedSequenceElement()
+					{
+						Actions = new List<SequencerControlGroup>()
+						{
+							new SequencerOutput<byte>()
+							{
+								OnInvoke = new Control.Controls.ControllerOutput<byte>() 
+							}
+                        },
+						Delay = 1f
+					}
+				}
+			};
+
+			((SequencerOutput<byte>)seq.Sequence.Elements[0].Actions[0]).OnInvoke.TryConnect( t1Sep.Separate );
+			((SequencerOutput<byte>)seq.Sequence.Elements[1].Actions[0]).OnInvoke.TryConnect( t2Sep.Separate );
 
 			return v;
 		}

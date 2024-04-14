@@ -24,6 +24,11 @@ namespace KSS.Components
             _hasSeparated = true;
         }
 
+        void Awake()
+        {
+            Separate = new ControlleeInput<byte>( SeparateListener );
+        }
+
         public SerializedObject GetObjects( IReverseReferenceMap s )
         {
             return new SerializedObject()

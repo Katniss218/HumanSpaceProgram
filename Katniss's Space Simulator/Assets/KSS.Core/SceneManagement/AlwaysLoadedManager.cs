@@ -31,11 +31,14 @@ namespace KSS.Core
 
             HSPEventListenerAttribute.CreateEventsForAutorunningMethods( AppDomain.CurrentDomain.GetAssemblies() );
 
+            // Invoke after mods are loaded (because mods may want use it).
             HSPEvent.EventManager.TryInvoke( HSPEvent.STARTUP_IMMEDIATELY );
         }
 
         void Start()
         {
+            HSPEvent.EventManager.TryInvoke( HSPEvent.STARTUP_EARLY );
+
             SceneLoader.LoadSceneAsync( MainMenuSceneManager.SCENE_NAME, true, false, null );
         }
 

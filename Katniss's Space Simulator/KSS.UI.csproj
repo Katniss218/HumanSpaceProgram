@@ -60,6 +60,7 @@
   <ItemGroup>
     <Compile Include="Assets\KSS.UI\UITextReadout_Velocity.cs" />
     <Compile Include="Assets\KSS.UI\Windows\UIPromptWindow.cs" />
+    <Compile Include="Assets\KSS.UI\Windows\UIControlSetupWindow.cs" />
     <Compile Include="Assets\KSS.UI\HUDs\ConstructionSiteHUD.cs" />
     <Compile Include="Assets\KSS.UI\ControlSetupControlGroupUI.cs" />
     <Compile Include="Assets\KSS.UI\UITextReadout_Altitude.cs" />
@@ -92,7 +93,6 @@
     <Compile Include="Assets\KSS.UI\HUDs\VesselHUD.cs" />
     <Compile Include="Assets\KSS.UI\SceneFactories\DesignSceneUIFactory.cs" />
     <Compile Include="Assets\KSS.UI\UITextReadout_FPS.cs" />
-    <Compile Include="Assets\KSS.UI\Windows\UIControlSetupWindow.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.UI\___KSS.UI.asmdef" />

@@ -114,7 +114,7 @@ namespace KSS.UI.Windows
             }
         }
 
-        [Obsolete( "doesn't quite work yet" )]
+        /*[Obsolete( "doesn't quite work yet" )]
         private void RefreshContainerSize()
         {
             // This is janky but I have no idea how to do it properly. Seems like it would need updating like 100 different things.
@@ -137,7 +137,7 @@ namespace KSS.UI.Windows
             }
 
             scrollView.SetContentsSize( xMin, xMax, yMax, yMin );
-        }
+        }*/
 
         /// <summary>
         /// Updates the endpoint positions of all visible connection UIs without re-creating each connection.
@@ -156,7 +156,7 @@ namespace KSS.UI.Windows
             {
                 conn.RecalculateEndPositions();
             }
-            // RefreshContainerSize();
+            //RefreshContainerSize();
         }
 
         /// <summary>
@@ -277,16 +277,15 @@ namespace KSS.UI.Windows
             UIControlSetupWindow controlWindow = (UIControlSetupWindow)UIWindow.Create<UIControlSetupWindow>( CanvasManager.Get( CanvasName.WINDOWS ), new UILayoutInfo( UIAnchor.Center, (0, 0), (750, 750) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/window" ) )
                 .Draggable()
                 .Focusable()
+                .Resizeable()
                 .WithCloseButton( new UILayoutInfo( UIAnchor.TopRight, (-7, -5), (20, 20) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ );
 
-            // TODO - resizable windows.
-
-            UIScrollView scrollView = controlWindow.AddScrollView( new UILayoutInfo( UIFill.Fill( 5, 5, 30, 5 ) ), (750, 750), true, true );
+            UIScrollView scrollView = controlWindow.AddScrollView( new UILayoutInfo( UIFill.Fill( 5, 5, 30, 5 ) ), (5000, 5000), true, true );
 
             UIPanel topPanel = controlWindow.AddPanel( new UILayoutInfo( UIFill.Horizontal( 45, 45 ), UIAnchor.Top, 0, 30 ), null );
             UIButton componentListButton = topPanel.AddButton( new UILayoutInfo( UIAnchor.Left, (0, 0), (15, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_list_gold" ), null );
 
-            UIPanel nodeLayerPanel = scrollView.AddPanel( new UILayoutInfo( UIFill.Fill() ), null );
+            UIPanel nodeLayerPanel = scrollView.AddPanel( new UILayoutInfo( UIAnchor.Center, 0, (0, 0) ), null );
             UIPanel connectionLayerPanel = scrollView.AddPanel( new UILayoutInfo( UIFill.Fill() ), null );
 
             controlWindow.Target = target;
