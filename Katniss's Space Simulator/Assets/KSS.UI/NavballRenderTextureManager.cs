@@ -8,7 +8,7 @@ using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 using UnityPlus.AssetManagement;
 
-namespace KSS.GameplayScene
+namespace KSS.UI
 {
 	/// <summary>
 	/// Manages the creation of the Navball's render texture.
