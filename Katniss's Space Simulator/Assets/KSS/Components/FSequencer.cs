@@ -1,5 +1,6 @@
 ﻿using KSS.Control;
 using KSS.Control.Controls;
+using KSS.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,34 +31,37 @@ namespace KSS.Components
         /// </summary>
         public float Delay { get; set; }
 
-        float _startTimestamp;
+        private double _startUT;
 
         public override void Initialize()
         {
-            _startTimestamp = Time.unscaledTime;
+            _startUT = TimeStepManager.UT;
         }
 
         public override bool CanInvoke()
         {
-            return Time.unscaledTime >= _startTimestamp + Delay;
+            return TimeStepManager.UT >= _startUT + Delay;
         }
     }
 
-    public abstract class SequencerControlGroup : ControlGroup // pass-through group with a single element. Required to be drawn.
+    public abstract class SequenceAction : ControlGroup // pass-through group with a single element. Required to be drawn.
     {
+        public abstract ControllerOutput OnInvoke { get; }
         public abstract void TryInvoke();
     }
 
-    public class SequencerOutput<T> : SequencerControlGroup, IPersistsObjects
+    public class SequenceAction<T> : SequenceAction, IPersistsObjects
     {
+        public override ControllerOutput OnInvoke => OnInvokeTyped;
+
         [NamedControl( "x", Editable = false )]
-        public ControllerOutput<T> OnInvoke;
+        public ControllerOutput<T> OnInvokeTyped;
 
         public T SignalValue { get; set; }
 
         public override void TryInvoke()
         {
-            OnInvoke.TrySendSignal( SignalValue );
+            OnInvokeTyped.TrySendSignal( SignalValue );
         }
 
         public SerializedObject GetObjects( IReverseReferenceMap s )
@@ -70,7 +74,7 @@ namespace KSS.Components
 
         public void SetObjects( SerializedObject data, IForwardReferenceMap l )
         {
-            OnInvoke = new ControllerOutput<T>();
+            OnInvokeTyped = new ControllerOutput<T>();
         }
     }
 
@@ -81,7 +85,7 @@ namespace KSS.Components
         /// <summary>
         /// The actions that this sequence element will call when it's fired.
         /// </summary>
-        public List<SequencerControlGroup> Actions = new();
+        public List<SequenceAction> Actions = new();
 
         /// <summary>
         /// Called when the previous action is triggerred, or on load (the first element).
@@ -114,10 +118,10 @@ namespace KSS.Components
 
         public void SetObjects( SerializedObject data, IForwardReferenceMap l )
         {
-            Actions = new List<SequencerControlGroup>()
+            Actions = new List<SequenceAction>()
             {
-                new SequencerOutput<float>(),
-                new SequencerOutput<Vector3>()
+                new SequenceAction<float>(),
+                new SequenceAction<Vector3>()
             };
 
             Actions[0].SetObjects( null, l );
@@ -129,6 +133,10 @@ namespace KSS.Components
     {
         [NamedControl( "Elements", Editable = false )]
         public List<SequenceElement> Elements = new();
+
+        public IEnumerable<SequenceElement> InvokedElements => Elements.Take( Current );
+        
+        public IEnumerable<SequenceElement> RemainingElements => Elements.Skip( Current );
 
         public int Current { get; private set; } = 0;
 
@@ -219,6 +227,8 @@ namespace KSS.Components
         [NamedControl( "Sequence", Editable = false )]
         public Sequence Sequence = new Sequence();
 
+        public Action OnAfterInvoked;
+
         // control group nest structure:
 
         // sequence
@@ -243,7 +253,10 @@ namespace KSS.Components
 
         void Update()
         {
-            Sequence.TryInvoke();
+            if( Sequence.TryInvoke() )
+            {
+                OnAfterInvoked?.Invoke();
+            }
         }
 
         public SerializedObject GetObjects( IReverseReferenceMap s )

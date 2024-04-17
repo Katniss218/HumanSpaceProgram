@@ -29,7 +29,7 @@ namespace KSS.UI
                 double magn = (posV - posCB).magnitude;
                 double alt = magn - body.Radius;
 
-                this.Text = $"Altitude: {(alt / 1000.0):#0} km";
+                this.Text = $"{(alt / 1000.0):#0.#} km";
             }
         }
 

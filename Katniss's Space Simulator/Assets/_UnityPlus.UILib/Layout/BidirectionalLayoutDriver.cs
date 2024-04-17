@@ -100,7 +100,7 @@ namespace UnityPlus.UILib.Layout
                 }
                 if( FreeAxis == Axis2D.X )
                 {
-                    if( (rowSum + layoutInfo.sizeDelta.y + Spacing.y) > rowLength && currentRowHasElement )
+                    if( (rowSum + layoutInfo.sizeDelta.y) > rowLength && currentRowHasElement )
                     {
                         if( DirX == DirectionX.LeftToRight )
                             currentRowPosition += currentRowSize + Spacing.y;
@@ -120,6 +120,7 @@ namespace UnityPlus.UILib.Layout
                     {
                         layoutInfo.anchoredPosition.y = rowSum;
                     }
+
                     if( currentRowSize < layoutInfo.sizeDelta.x )
                         currentRowSize = layoutInfo.sizeDelta.x;
 
@@ -132,8 +133,9 @@ namespace UnityPlus.UILib.Layout
                 }
                 else
                 {
-                    if( (rowSum + layoutInfo.sizeDelta.x + Spacing.x) > rowLength && currentRowHasElement )
+                    if( (rowSum + layoutInfo.sizeDelta.x) > rowLength && currentRowHasElement )
                     {
+                        Vector2 vaa = c.contents.GetActualSize();
                         if( DirY == DirectionY.TopToBottom )
                             currentRowPosition -= currentRowSize + Spacing.x;
                         else
@@ -152,6 +154,7 @@ namespace UnityPlus.UILib.Layout
                     {
                         layoutInfo.anchoredPosition.x = -rowSum;
                     }
+
                     if( currentRowSize < layoutInfo.sizeDelta.y )
                         currentRowSize = layoutInfo.sizeDelta.y;
 

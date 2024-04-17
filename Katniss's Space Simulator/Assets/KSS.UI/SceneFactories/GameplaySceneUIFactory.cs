@@ -23,11 +23,11 @@ namespace KSS.UI.SceneFactories
 {
     public static class GameplaySceneUIFactory
     {
-        static UIPanel _mainPanel;
+        static UIPanel _mainPanel; // TODO - replace this with individual elements
 
         [HSPEventListener( HSPEvent.GAMEPLAY_AFTER_ACTIVE_OBJECT_CHANGE, HSPEvent.NAMESPACE_VANILLA + ".gameplay_ui" )]
         [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, HSPEvent.NAMESPACE_VANILLA + ".gameplay_ui" )]
-        public static void CreateUI( object e )
+        public static void CreateUI()
         {
             UICanvas canvas = CanvasManager.Get( CanvasName.STATIC );
 
@@ -64,15 +64,9 @@ namespace KSS.UI.SceneFactories
 
             CreateToggleButtonList();
 
-            _mainPanel.AddPanel( new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (150, 25) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
+            _mainPanel.AddPanel( new UILayoutInfo( UIAnchor.BottomLeft, (75, 0), (150, 25) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
                 .WithTint( Color.gray )
                 .AddTextReadout_Acceleration( new UILayoutInfo( UIFill.Fill() ) )
-                .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
-                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
-
-            _mainPanel.AddPanel( new UILayoutInfo( UIAnchor.BottomLeft, (0, 25), (150, 25) ), AssetRegistry.Get<Sprite>( "builtin::Background" ) )
-                .WithTint( Color.gray )
-                .AddTextReadout_Altitude( new UILayoutInfo( UIFill.Fill() ) )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 

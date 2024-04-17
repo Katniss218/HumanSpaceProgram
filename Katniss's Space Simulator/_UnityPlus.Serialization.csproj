@@ -80,8 +80,8 @@
     <Compile Include="Assets\_UnityPlus.Serialization\Patching\IPatch.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\IPersistsObjects.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\PersistentExtensions\IPersistent_MeshRenderer.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\Patching\DestroyGameObjectsPatch.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\PersistentExtensions\Persistent_Quaternion.cs" />
+    <Compile Include="Assets\_UnityPlus.Serialization\Patching\DestroyGameObjectsPatch.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\PersistentExtensions\Persistent_TimeSpan.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Patching\SetDataPatch.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Json\JsonStreamWriter.cs" />

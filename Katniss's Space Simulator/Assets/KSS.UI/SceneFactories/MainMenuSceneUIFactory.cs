@@ -23,7 +23,7 @@ namespace KSS.UI.SceneFactories
         static UILoadWindow _loadWindow; // singleton window
 
         [HSPEventListener( HSPEvent.STARTUP_MAINMENU, HSPEvent.NAMESPACE_VANILLA + ".mainmenu_ui" )]
-        public static void Create( object e )
+        public static void Create()
         {
             UICanvas canvas = CanvasManager.Get( CanvasName.STATIC );
 

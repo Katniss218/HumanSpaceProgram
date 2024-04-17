@@ -26,7 +26,7 @@ namespace KSS.UI.SceneFactories
         public static UIInputField _vesselNameIF;
 
         [HSPEventListener( HSPEvent.STARTUP_DESIGN, HSPEvent.NAMESPACE_VANILLA + ".design_scene_ui" )]
-        public static void Create( object e )
+        public static void Create()
         {
             UICanvas canvas = CanvasManager.Get( CanvasName.STATIC );
 

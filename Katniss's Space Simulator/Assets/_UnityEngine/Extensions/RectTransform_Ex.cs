@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace UnityEngine
 {
-	public static class RectTransform_Ex
-	{
+    public static class RectTransform_Ex
+    {
         /// <summary>
         /// True if the rect transform is set to fill the width of its parent.
         /// </summary>
@@ -22,67 +22,70 @@ namespace UnityEngine
         /// Gets the center point of the rect transform.
         /// </summary>
         public static Vector2 GetLocalCenter( this RectTransform rectTransform )
-		{
-			return rectTransform.rect.center;
-		}
+        {
+            return rectTransform.rect.center;
+        }
 
-		/// <summary>
-		/// Transforms a point from the local space of <paramref name="from"/>, to the local space of <paramref name="to"/>.
-		/// </summary>
-		public static Vector2 TransformPointTo( this RectTransform from, Vector2 position, RectTransform to )
-		{
-			Vector2 canvasSpacePos = from.TransformPoint( position ); // this transforms from/to pivot space.
-			return to.InverseTransformPoint( canvasSpacePos );
-		}
+        /// <summary>
+        /// Transforms a point from the local space of <paramref name="from"/>, to the local space of <paramref name="to"/>.
+        /// </summary>
+        public static Vector2 TransformPointTo( this RectTransform from, Vector2 position, RectTransform to )
+        {
+            Vector2 canvasSpacePos = from.TransformPoint( position ); // this transforms from/to pivot space.
+            return to.InverseTransformPoint( canvasSpacePos );
+        }
 
-		/// <summary>
-		/// Calculates the actual size of a rect transform in canvas space.
-		/// </summary>
-		public static Vector2 GetActualSize( this RectTransform rt )
-		{
-			Stack<(Vector2 size, Vector2 anchor)> hierarchyDeltas = new Stack<(Vector2, Vector2)>();
+        /// <summary>
+        /// Calculates the actual size of a rect transform in canvas space.
+        /// </summary>
+        public static Vector2 GetActualSize( this RectTransform rectTransform )
+        {
+            Stack<(Vector2 size, Vector2 anchor)> contributingElements = new();
 
-			hierarchyDeltas.Push( (rt.sizeDelta, rt.anchorMax - rt.anchorMin) );
+            contributingElements.Push( (rectTransform.sizeDelta, (rectTransform.anchorMax - rectTransform.anchorMin)) );
 
-			// Figure out which objects contribute to the actual size and reverse their order (to 'parent then child').
-			while( rt.parent != null )
-			{
-				rt = (RectTransform)rt.parent;
-				if( rt.anchorMax != rt.anchorMin ) // if the anchors are equal, then the actual size is always equal to sizeDelta.
-				{
-					hierarchyDeltas.Push( (rt.sizeDelta, rt.anchorMax - rt.anchorMin) );
-				}
-			}
+            // Loop over the parent chain until we find something that has absolute size (if anchorMax == anchorMax, then actual_size == sizeDelta).
+            while( rectTransform.parent != null )
+            {
+                rectTransform = (RectTransform)rectTransform.parent;
 
-			// Calculate the actual size.
-			Vector2 currentSize = Vector2.zero;
-			foreach( var delta in hierarchyDeltas )
-			{
-				currentSize = (currentSize * delta.anchor) + delta.size;
-			}
+                contributingElements.Push( (rectTransform.sizeDelta, (rectTransform.anchorMax - rectTransform.anchorMin)) );
 
-			return currentSize;
-		}
+                if( rectTransform.anchorMax == rectTransform.anchorMin )
+                {
+                    break;
+                }
+            }
 
-		/// <summary>
-		/// Sets the screen space position to the value provided by using <see cref="Camera.WorldToScreenPoint(Vector3)"/>.
-		/// </summary>
-		public static void SetScreenPosition( this RectTransform rt, Vector3 screenSpacePosition, bool hideWhenBehindCamera = true )
-		{
-			if( screenSpacePosition.z < 0 && hideWhenBehindCamera )
-				screenSpacePosition = new Vector3( float.MaxValue, 0.0f, float.MaxValue );
-			else
-				screenSpacePosition.z = 0.0f; // reset depth.
-			rt.position = screenSpacePosition;
-		}
+            // Stack flips the order here, which is needed to get the correct result.
+            Vector2 currentSize = Vector2.zero;
+            foreach( var element in contributingElements )
+            {
+                currentSize = (currentSize * element.anchor) + element.size;
+            }
 
-		/// <summary>
-		/// Sets the screen space position to the world space position viewed by the given camera.
-		/// </summary>
-		public static void SetScreenPosition( this RectTransform rt, Camera camera, Vector3 worldSpacePosition, bool hideWhenBehindCamera = true )
-		{
-			Vector3 screenSpacePosition = camera.WorldToScreenPoint( worldSpacePosition, camera.stereoActiveEye );
-			SetScreenPosition( rt, screenSpacePosition, hideWhenBehindCamera );
-		}
-	}
+            return currentSize;
+        }
+
+        /// <summary>
+        /// Sets the screen space position to the value provided by using <see cref="Camera.WorldToScreenPoint(Vector3)"/>.
+        /// </summary>
+        public static void SetScreenPosition( this RectTransform rt, Vector3 screenSpacePosition, bool hideWhenBehindCamera = true )
+        {
+            if( screenSpacePosition.z < 0 && hideWhenBehindCamera )
+                screenSpacePosition = new Vector3( float.MaxValue, 0.0f, float.MaxValue );
+            else
+                screenSpacePosition.z = 0.0f; // reset depth.
+            rt.position = screenSpacePosition;
+        }
+
+        /// <summary>
+        /// Sets the screen space position to the world space position viewed by the given camera.
+        /// </summary>
+        public static void SetScreenPosition( this RectTransform rt, Camera camera, Vector3 worldSpacePosition, bool hideWhenBehindCamera = true )
+        {
+            Vector3 screenSpacePosition = camera.WorldToScreenPoint( worldSpacePosition, camera.stereoActiveEye );
+            SetScreenPosition( rt, screenSpacePosition, hideWhenBehindCamera );
+        }
+    }
 }

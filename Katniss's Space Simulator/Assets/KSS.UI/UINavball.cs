@@ -53,19 +53,21 @@ namespace KSS.UI
             {
                 Vessel activeVessel = ActiveObjectManager.ActiveObject.transform.GetVessel();
 
+#warning TODO - Vessel attitude frame should be customizable ('control from here'). - this matrix is what will do that
                 Matrix4x4 airfToLocalMatrix = Matrix4x4.Rotate( (Quaternion)activeVessel.AIRFRotation ).inverse;
 
                 Vector3Dbl airfVelocity = SceneReferenceFrameManager.SceneReferenceFrame.TransformDirection( activeVessel.PhysicsObject.Velocity );
                 if( airfVelocity.magnitude > 0.25f )
                 {
-                    OrbitalFrame airfOrientation = OrbitalFrame.FromNBody( airfVelocity, GravityUtils.GetNBodyGravityAcceleration( activeVessel.AIRFPosition ) );
 
-                    Vector3 localPrograde = airfToLocalMatrix.MultiplyVector( airfOrientation.GetPrograde() ) * NavballPixelRadius;
-                    Vector3 localRetrograde = airfToLocalMatrix.MultiplyVector( airfOrientation.GetRetrograde() ) * NavballPixelRadius;
-                    Vector3 localNormal = airfToLocalMatrix.MultiplyVector( airfOrientation.GetNormal() ) * NavballPixelRadius;
-                    Vector3 localAntinormal = airfToLocalMatrix.MultiplyVector( airfOrientation.GetAntinormal() ) * NavballPixelRadius;
-                    Vector3 localAntiradial = airfToLocalMatrix.MultiplyVector( airfOrientation.GetAntiradial() ) * NavballPixelRadius;
-                    Vector3 localRadial = airfToLocalMatrix.MultiplyVector( airfOrientation.GetRadial() ) * NavballPixelRadius;
+                    OrbitalFrame orbitalFrame = OrbitalFrame.FromNBody( airfVelocity, GravityUtils.GetNBodyGravityAcceleration( activeVessel.AIRFPosition ) );
+
+                    Vector3 localPrograde = airfToLocalMatrix.MultiplyVector( orbitalFrame.GetPrograde() ) * NavballPixelRadius;
+                    Vector3 localRetrograde = airfToLocalMatrix.MultiplyVector( orbitalFrame.GetRetrograde() ) * NavballPixelRadius;
+                    Vector3 localNormal = airfToLocalMatrix.MultiplyVector( orbitalFrame.GetNormal() ) * NavballPixelRadius;
+                    Vector3 localAntinormal = airfToLocalMatrix.MultiplyVector( orbitalFrame.GetAntinormal() ) * NavballPixelRadius;
+                    Vector3 localAntiradial = airfToLocalMatrix.MultiplyVector( orbitalFrame.GetAntiradial() ) * NavballPixelRadius;
+                    Vector3 localRadial = airfToLocalMatrix.MultiplyVector( orbitalFrame.GetRadial() ) * NavballPixelRadius;
 
                     _prograde.rectTransform.anchoredPosition = CulledByDepth( localPrograde );
                     _retrograde.rectTransform.anchoredPosition = CulledByDepth( localRetrograde );
@@ -127,7 +129,11 @@ namespace KSS.UI
             velocityIndicator.AddButton( new UILayoutInfo( UIAnchor.Left, (2, 0), (20, 20) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_list_gold" ), null );
             velocityIndicator.AddButton( new UILayoutInfo( UIAnchor.Right, (-2, 0), (20, 20) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_down_gold" ), null );
 
-            velocityIndicator.AddTextReadout_Velocity( new UILayoutInfo( UIFill.Fill( 31.5f, 31.5f, 0, 0 ) ) )
+            velocityIndicator.AddTextReadout_Velocity( new UILayoutInfo( UIFill.Fill( 31.5f, 31.5f, 0, 20 ) ) )
+                .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
+                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
+            
+            velocityIndicator.AddTextReadout_Altitude( new UILayoutInfo( UIFill.Fill( 31.5f, 31.5f, 20, 0 ) ) )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
