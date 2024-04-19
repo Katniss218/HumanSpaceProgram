@@ -48,8 +48,7 @@ namespace KSS.UI
             UIText headerText = uiSequenceElement.AddText( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Top, 0, 20 ), header )
                     .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
-            UIPanel list = uiSequenceElement.AddPanel( new UILayoutInfo( UIFill.Horizontal( 3, 3 ), UIAnchor.Top, -22, 20 ), null ); // GetActualSize is wrong
-            //UIPanel list = uiSequenceElement.AddPanel( new UILayoutInfo( UIAnchor.TopLeft, (3, -22), (44, 20) ), null );
+            UIPanel list = uiSequenceElement.AddPanel( new UILayoutInfo( UIFill.Horizontal( 3, 3 ), UIAnchor.Top, -22, 20 ), null );
 
             list.LayoutDriver = new BidirectionalLayoutDriver()
             {

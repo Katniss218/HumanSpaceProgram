@@ -119,12 +119,12 @@ namespace KSS.UI
                 }
                 //
 
-                if( member is ControlleeInput input )
+                if( member is ControlleeInputBase input )
                 {
                     inputUIs.Add( ControlSetupControlUI.Create( this, currentY, input, attr ) );
                     currentY += ROW_HEIGHT;
                 }
-                else if( member is ControlleeInput[] inputArray )
+                else if( member is ControlleeInputBase[] inputArray )
                 {
                     for( int i = 0; i < inputArray.Length; i++ )
                     {
@@ -136,12 +136,12 @@ namespace KSS.UI
 
                 //
 
-                else if( member is ControllerOutput output )
+                else if( member is ControllerOutputBase output )
                 {
                     outputUIs.Add( ControlSetupControlUI.Create( this, currentY, output, attr ) );
                     currentY += ROW_HEIGHT;
                 }
-                else if( member is ControllerOutput[] outputArray )
+                else if( member is ControllerOutputBase[] outputArray )
                 {
                     for( int i = 0; i < outputArray.Length; i++ )
                     {
@@ -152,12 +152,12 @@ namespace KSS.UI
 
                 //
 
-                else if( member is ControlParameterInput paramInput )
+                else if( member is ControlParameterInputBase paramInput )
                 {
                     inputUIs.Add( ControlSetupControlUI.Create( this, currentY, paramInput, attr ) );
                     currentY += ROW_HEIGHT;
                 }
-                else if( member is ControlParameterInput[] paramInputArray )
+                else if( member is ControlParameterInputBase[] paramInputArray )
                 {
                     for( int i = 0; i < paramInputArray.Length; i++ )
                     {
@@ -168,12 +168,12 @@ namespace KSS.UI
 
                 //
 
-                else if( member is ControlParameterOutput paramOutput )
+                else if( member is ControlParameterOutputBase paramOutput )
                 {
                     outputUIs.Add( ControlSetupControlUI.Create( this, currentY, paramOutput, attr ) );
                     currentY += ROW_HEIGHT;
                 }
-                else if( member is ControlParameterOutput[] paramOutputArray )
+                else if( member is ControlParameterOutputBase[] paramOutputArray )
                 {
                     for( int i = 0; i < paramOutputArray.Length; i++ )
                     {

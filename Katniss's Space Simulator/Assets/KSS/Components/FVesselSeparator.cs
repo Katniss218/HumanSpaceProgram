@@ -12,8 +12,8 @@ namespace KSS.Components
         bool _hasSeparated = false;
 
         [NamedControl( "Separate", "Connect this to the sequencer, or a controller's separation output." )]
-        public ControlleeInput<byte> Separate;
-        private void SeparateListener( byte _ )
+        public ControlleeInput Separate;
+        private void SeparateListener()
         {
             if( _hasSeparated )
             {
@@ -26,7 +26,7 @@ namespace KSS.Components
 
         void Awake()
         {
-            Separate = new ControlleeInput<byte>( SeparateListener );
+            Separate = new ControlleeInput( SeparateListener );
         }
 
         public SerializedObject GetObjects( IReverseReferenceMap s )

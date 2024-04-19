@@ -9,9 +9,9 @@ namespace KSS.Control.Controls
     /// <summary>
     /// Represents a control that produces a control signal of type <typeparamref name="T"/>.
     /// </summary>
-    public sealed class ControllerOutput : ControllerOutputBase
+    public sealed class ControllerOutput<T> : ControllerOutputBase
     {
-        public ControlleeInput Input { get; internal set; }
+        public ControlleeInput<T> Input { get; internal set; }
 
         public ControllerOutput()
         {
@@ -20,9 +20,10 @@ namespace KSS.Control.Controls
         /// <summary>
         /// Tries to send a control signal from this controller to its connected inputs.
         /// </summary>
-        public void TrySendSignal()
+        /// <param name="signalValue">The value of the signal that will be passed to the connected inputs.</param>
+        public void TrySendSignal( T signalValue )
         {
-            Input?.onInvoke.Invoke();
+            Input?.onInvoke.Invoke( signalValue );
         }
 
         public override IEnumerable<Control> GetConnectedControls()
@@ -36,22 +37,22 @@ namespace KSS.Control.Controls
 
         public override bool TryConnect( Control other )
         {
-            if( other is not ControlleeInput input )
+            if( other is not ControlleeInput<T> input )
                 return false;
 
-            ControlleeInput.Connect( input, this );
+            ControlleeInput<T>.Connect( input, this );
             return true;
         }
 
         public override bool TryDisconnect( Control other )
         {
-            if( other is not ControlleeInput input )
+            if( other is not ControlleeInput<T> input )
                 return false;
 
             if( this.Input != input )
                 return false;
 
-            ControlleeInput.Disconnect( this );
+            ControlleeInput<T>.Disconnect( this );
             return true;
         }
 
@@ -60,7 +61,7 @@ namespace KSS.Control.Controls
             if( this.Input == null )
                 return false;
 
-            ControlleeInput.Disconnect( this );
+            ControlleeInput<T>.Disconnect( this );
             return true;
         }
     }

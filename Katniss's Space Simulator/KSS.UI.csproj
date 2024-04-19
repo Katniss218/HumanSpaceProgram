@@ -71,10 +71,13 @@
     <Compile Include="Assets\KSS.UI\UISaveMetadata.cs" />
     <Compile Include="Assets\KSS.UI\CanvasName.cs" />
     <Compile Include="Assets\KSS.UI\Windows\UIConfirmationWindow.cs" />
+    <Compile Include="Assets\KSS.UI\UISequenceElement.cs" />
     <Compile Include="Assets\KSS.UI\SceneFactories\GameplaySceneUIFactory.cs" />
+    <Compile Include="Assets\KSS.UI\UISequenceAction.cs" />
     <Compile Include="Assets\KSS.UI\UILineRenderer.cs" />
     <Compile Include="Assets\KSS.UI\UIPartListEntry.cs" />
     <Compile Include="Assets\KSS.UI\UISequencerPanel.cs" />
+    <Compile Include="Assets\KSS.UI\SceneFactories\SequencerPanelFactory.cs" />
     <Compile Include="Assets\KSS.UI\SceneFactories\GameplayEscapeUIFactory.cs" />
     <Compile Include="Assets\KSS.UI\Windows\WindowRelationHighlight.cs" />
     <Compile Include="Assets\KSS.UI\SceneFactories\MainMenuSceneUIFactory.cs" />
@@ -95,9 +98,6 @@
     <Compile Include="Assets\KSS.UI\HUDs\VesselHUD.cs" />
     <Compile Include="Assets\KSS.UI\SceneFactories\DesignSceneUIFactory.cs" />
     <Compile Include="Assets\KSS.UI\UITextReadout_FPS.cs" />
-    <Compile Include="Assets\KSS.UI\UISequenceElement.cs" />
-    <Compile Include="Assets\KSS.UI\UISequenceAction.cs" />
-    <Compile Include="Assets\KSS.UI\SceneFactories\SequencerPanelFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.UI\___KSS.UI.asmdef" />

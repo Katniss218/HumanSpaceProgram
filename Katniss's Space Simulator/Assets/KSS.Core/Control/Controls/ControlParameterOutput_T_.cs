@@ -8,14 +8,9 @@ using UnityPlus.Serialization;
 namespace KSS.Control.Controls
 {
 	/// <summary>
-	/// Represents a control that produces a parameter.
-	/// </summary>
-	public abstract class ControlParameterOutput : Control { }
-
-	/// <summary>
 	/// Represents a control that produces a parameter of type <typeparamref name="T"/>.
 	/// </summary>
-	public sealed class ControlParameterOutput<T> : ControlParameterOutput, IPersistsData
+	public sealed class ControlParameterOutput<T> : ControlParameterOutputBase, IPersistsData
 	{
 		internal Func<T> getter;
 

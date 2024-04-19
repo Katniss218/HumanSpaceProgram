@@ -11,15 +11,15 @@ namespace KSS.Control.Controls
 	/// <summary>
 	/// Represents a control that consumes a control signal of type <typeparamref name="T"/>.
 	/// </summary>
-	public sealed class ControlleeInput : ControlleeInputBase, IPersistsData
+	public sealed class ControlleeInput<T> : ControlleeInputBase, IPersistsData
     {
-		internal Action onInvoke;
+		internal Action<T> onInvoke;
 
-        internal List<ControllerOutput> outputs = new();
-        public IEnumerable<ControllerOutput> Outputs { get => outputs; }
+        internal List<ControllerOutput<T>> outputs = new();
+        public IEnumerable<ControllerOutput<T>> Outputs { get => outputs; }
 
 		/// <param name="signalResponse">The action to perform when a control signal is sent to this input.</param>
-		public ControlleeInput( Action signalResponse )
+		public ControlleeInput( Action<T> signalResponse )
 		{
 			this.onInvoke = signalResponse;
 		}
@@ -31,7 +31,7 @@ namespace KSS.Control.Controls
 
         public override bool TryConnect( Control other )
         {
-            if( other is not ControllerOutput output )
+            if( other is not ControllerOutput<T> output )
                 return false;
 
             Connect( this, output );
@@ -40,7 +40,7 @@ namespace KSS.Control.Controls
 
         public override bool TryDisconnect( Control other )
         {
-            if( other is not ControllerOutput output )
+            if( other is not ControllerOutput<T> output )
                 return false;
 
             if( !this.outputs.Contains( output ) )
@@ -82,21 +82,21 @@ namespace KSS.Control.Controls
                 this.outputs.Clear();
                 foreach( var conn in (SerializedArray)connectsTo )
                 {
-                    var c = (ControllerOutput)l.ReadObjectReference( conn );
+                    var c = (ControllerOutput<T>)l.ReadObjectReference( conn );
                     Connect( this, c );
                 }
             }
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        internal static void Disconnect( ControllerOutput output )
+        internal static void Disconnect( ControllerOutput<T> output )
         {
             output.Input?.outputs.Remove( output );
             output.Input = null;
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        internal static void Connect( ControlleeInput input, ControllerOutput output )
+        internal static void Connect( ControlleeInput<T> input, ControllerOutput<T> output )
         {
             // disconnect from previous, if connected.
             Disconnect( output );

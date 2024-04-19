@@ -9,14 +9,9 @@ using UnityPlus.Serialization;
 namespace KSS.Control.Controls
 {
 	/// <summary>
-	/// Represents a control that consumes a parameter.
-	/// </summary>
-	public abstract class ControlParameterInput : Control { }
-
-	/// <summary>
 	/// Represents a control that consumes a parameter of type <typeparamref name="T"/>.
 	/// </summary>
-	public sealed class ControlParameterInput<T> : ControlParameterInput
+	public sealed class ControlParameterInput<T> : ControlParameterInputBase
 	{
 		public ControlParameterOutput<T> Output { get; internal set; }
 

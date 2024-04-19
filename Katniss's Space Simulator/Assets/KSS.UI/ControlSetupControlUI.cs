@@ -92,13 +92,13 @@ namespace KSS.UI
             Sprite sprite;
             switch( control )
             {
-                case KSS.Control.Controls.ControlleeInput:
+                case KSS.Control.Controls.ControlleeInputBase:
                     sprite = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_input" ); side = 0f; break;
-                case KSS.Control.Controls.ControllerOutput:
+                case KSS.Control.Controls.ControllerOutputBase:
                     sprite = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_output" ); side = 1f; break;
-                case KSS.Control.Controls.ControlParameterInput:
+                case KSS.Control.Controls.ControlParameterInputBase:
                     sprite = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_parameter_input" ); side = 1f; break;
-                case KSS.Control.Controls.ControlParameterOutput:
+                case KSS.Control.Controls.ControlParameterOutputBase:
                     sprite = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_parameter_output" ); side = 0f; break;
                 default:
                     sprite = null;

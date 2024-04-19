@@ -36,35 +36,11 @@ namespace UnityEngine
         }
 
         /// <summary>
-        /// Calculates the actual size of a rect transform in canvas space.
+        /// Gets the actual size of a rect transform in canvas space.
         /// </summary>
         public static Vector2 GetActualSize( this RectTransform rectTransform )
         {
-            Stack<(Vector2 size, Vector2 anchor)> contributingElements = new();
-
-            contributingElements.Push( (rectTransform.sizeDelta, (rectTransform.anchorMax - rectTransform.anchorMin)) );
-
-            // Loop over the parent chain until we find something that has absolute size (if anchorMax == anchorMax, then actual_size == sizeDelta).
-            while( rectTransform.parent != null )
-            {
-                rectTransform = (RectTransform)rectTransform.parent;
-
-                contributingElements.Push( (rectTransform.sizeDelta, (rectTransform.anchorMax - rectTransform.anchorMin)) );
-
-                if( rectTransform.anchorMax == rectTransform.anchorMin )
-                {
-                    break;
-                }
-            }
-
-            // Stack flips the order here, which is needed to get the correct result.
-            Vector2 currentSize = Vector2.zero;
-            foreach( var element in contributingElements )
-            {
-                currentSize = (currentSize * element.anchor) + element.size;
-            }
-
-            return currentSize;
+            return rectTransform.rect.size;
         }
 
         /// <summary>

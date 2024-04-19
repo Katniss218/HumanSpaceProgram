@@ -311,7 +311,7 @@ namespace KSS.DevUtils
 				{
 					new KeyboardSequenceElement()
 					{
-						Actions = new List<SequenceAction>()
+						Actions = new List<SequenceActionBase>()
 						{
 							new SequenceAction<float>()
 							{
@@ -323,15 +323,15 @@ namespace KSS.DevUtils
 					},
 					new TimedSequenceElement()
 					{
-						Actions = new List<SequenceAction>()
+						Actions = new List<SequenceActionBase>()
 						{
-							new SequenceAction<byte>()
+							new SequenceAction()
 							{
-								OnInvokeTyped = new Control.Controls.ControllerOutput<byte>() 
+								OnInvokeTyped = new Control.Controls.ControllerOutput() 
 							},
-							new SequenceAction<byte>()
+							new SequenceAction()
 							{
-								OnInvokeTyped = new Control.Controls.ControllerOutput<byte>() 
+								OnInvokeTyped = new Control.Controls.ControllerOutput() 
 							}
                         },
 						Delay = 5f
@@ -340,8 +340,8 @@ namespace KSS.DevUtils
 			};
 
 			((SequenceAction<float>)seq.Sequence.Elements[0].Actions[0]).OnInvoke.TryConnect( eng.SetThrottle );
-			((SequenceAction<byte>)seq.Sequence.Elements[1].Actions[0]).OnInvoke.TryConnect( t1Sep.Separate );
-			((SequenceAction<byte>)seq.Sequence.Elements[1].Actions[1]).OnInvoke.TryConnect( t2Sep.Separate );
+			((SequenceAction)seq.Sequence.Elements[1].Actions[0]).OnInvoke.TryConnect( t1Sep.Separate );
+			((SequenceAction)seq.Sequence.Elements[1].Actions[1]).OnInvoke.TryConnect( t2Sep.Separate );
 
 			return v;
 		}

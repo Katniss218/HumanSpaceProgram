@@ -44,15 +44,47 @@ namespace KSS.Components
         }
     }
 
-    public abstract class SequenceAction : ControlGroup // pass-through group with a single element. Required to be drawn.
+    public abstract class SequenceActionBase : ControlGroup // pass-through group with a single element. Required to be drawn.
     {
-        public abstract ControllerOutput OnInvoke { get; }
+        public abstract ControllerOutputBase OnInvoke { get; }
         public abstract void TryInvoke();
     }
 
-    public class SequenceAction<T> : SequenceAction, IPersistsObjects
+    /// <summary>
+    /// The sequence action without a parameter.
+    /// </summary>
+    public class SequenceAction : SequenceActionBase, IPersistsObjects
     {
-        public override ControllerOutput OnInvoke => OnInvokeTyped;
+        public override ControllerOutputBase OnInvoke => OnInvokeTyped;
+
+        [NamedControl( "x", Editable = false )]
+        public ControllerOutput OnInvokeTyped;
+
+        public override void TryInvoke()
+        {
+            OnInvokeTyped.TrySendSignal();
+        }
+
+        public SerializedObject GetObjects( IReverseReferenceMap s )
+        {
+            return new SerializedObject()
+            {
+
+            };
+        }
+
+        public void SetObjects( SerializedObject data, IForwardReferenceMap l )
+        {
+            OnInvokeTyped = new ControllerOutput();
+        }
+    }
+
+    /// <summary>
+    /// The sequence action with a parameter of type T.
+    /// </summary>
+    public class SequenceAction<T> : SequenceActionBase, IPersistsObjects
+    {
+        public override ControllerOutputBase OnInvoke => OnInvokeTyped;
 
         [NamedControl( "x", Editable = false )]
         public ControllerOutput<T> OnInvokeTyped;
@@ -80,12 +112,11 @@ namespace KSS.Components
 
     public abstract class SequenceElement : ControlGroup, IPersistsObjects
     {
-        // [NamedControlArray( ValidCount = 0..5 )]
-        [NamedControl( "Actions", "this is an 'array' of control groups", Editable = false )]
+        [NamedControl( "Actions", "", Editable = false )]
         /// <summary>
         /// The actions that this sequence element will call when it's fired.
         /// </summary>
-        public List<SequenceAction> Actions = new();
+        public List<SequenceActionBase> Actions = new();
 
         /// <summary>
         /// Called when the previous action is triggerred, or on load (the first element).
@@ -118,7 +149,7 @@ namespace KSS.Components
 
         public void SetObjects( SerializedObject data, IForwardReferenceMap l )
         {
-            Actions = new List<SequenceAction>()
+            Actions = new List<SequenceActionBase>()
             {
                 new SequenceAction<float>(),
                 new SequenceAction<Vector3>()
