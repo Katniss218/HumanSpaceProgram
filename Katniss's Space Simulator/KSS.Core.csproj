@@ -139,6 +139,8 @@
     <Compile Include="Assets\KSS.Core\Control\Controls\ControllerOutputBase.cs" />
     <Compile Include="Assets\KSS.Core\Control\Controls\ControlParameterInputBase.cs" />
     <Compile Include="Assets\KSS.Core\Control\Controls\ControlParameterOutputBase.cs" />
+    <Compile Include="Assets\KSS.Core\Components\FControlFrame.cs" />
+    <Compile Include="Assets\KSS.Core\ReferenceFrames\IReferenceTransform.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.Core\___KSS.Core.asmdef" />

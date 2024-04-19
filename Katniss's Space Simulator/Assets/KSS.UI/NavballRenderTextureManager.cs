@@ -1,4 +1,5 @@
 ﻿using KSS.Core;
+using KSS.Core.Components;
 using KSS.Core.Physics;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ using UnityPlus.AssetManagement;
 namespace KSS.UI
 {
     /// <summary>
-    /// Manages the creation of the Navball's render texture.
+    /// Manages the Navball's render texture and orientation.
     /// </summary>
     public class NavballRenderTextureManager : SingletonMonoBehaviour<NavballRenderTextureManager>
     {
@@ -97,10 +98,9 @@ namespace KSS.UI
                 Vector3 gravity = -GravityUtils.GetNBodyGravityAcceleration( v.AIRFPosition ).NormalizeToVector3();
                 forward = Vector3.ProjectOnPlane( forward, gravity );
                 NavballOrientation = Quaternion.LookRotation( forward, gravity );
-                VesselOrientation = (Quaternion)v.AIRFRotation;
-
-#warning TODO - Vessel attitude frame should be customizable ('control from here').
+                VesselOrientation = (Quaternion)FControlFrame.GetAIRFRotation( FControlFrame.VesselControlFrame, v );
             }
+#warning TODO - the orientation doesn't seem right. Might be related to how Im rendering it inside out.
         }
     }
 }

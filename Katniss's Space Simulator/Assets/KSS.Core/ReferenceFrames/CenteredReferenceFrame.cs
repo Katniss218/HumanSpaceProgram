@@ -12,30 +12,26 @@ namespace KSS.Core.ReferenceFrames
     /// </summary>
     public sealed class CenteredReferenceFrame : IReferenceFrame
     {
-        Vector3Dbl _center;
+        private Vector3Dbl _position;
 
-        /// <summary>
-        /// Creates a new instance of the <see cref="CenteredReferenceFrame"/> with the specified offset.
-        /// </summary>
-        /// <param name="center">The AIRF coordinates that will be mapped to (0,0,0) in the new frame.</param>
         public CenteredReferenceFrame( Vector3Dbl center )
         {
-            this._center = center;
+            this._position = center;
         }
 
         public IReferenceFrame Shift( Vector3Dbl airfDistanceDelta )
         {
-            return new CenteredReferenceFrame( this._center + airfDistanceDelta );
+            return new CenteredReferenceFrame( this._position + airfDistanceDelta );
         }
 
         public Vector3Dbl InverseTransformPosition( Vector3Dbl airfPosition )
         {
-            return Vector3Dbl.Subtract( airfPosition, _center );
+            return Vector3Dbl.Subtract( airfPosition, _position );
         }
 
         public Vector3Dbl TransformPosition( Vector3Dbl localPosition )
         {
-            return Vector3Dbl.Add( _center, localPosition );
+            return Vector3Dbl.Add( _position, localPosition );
         }
 
         public Vector3 InverseTransformDirection( Vector3 airfDirection )

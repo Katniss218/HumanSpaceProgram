@@ -1,4 +1,5 @@
 ﻿using KSS.Core;
+using KSS.Core.Components;
 using KSS.Core.Physics;
 using KSS.Core.ReferenceFrames;
 using KSS.Core.Serialization;
@@ -53,13 +54,12 @@ namespace KSS.UI
             {
                 Vessel activeVessel = ActiveObjectManager.ActiveObject.transform.GetVessel();
 
-#warning TODO - Vessel attitude frame should be customizable ('control from here'). - this matrix is what will do that
-                Matrix4x4 airfToLocalMatrix = Matrix4x4.Rotate( (Quaternion)activeVessel.AIRFRotation ).inverse;
+                Quaternion airfRotation = (Quaternion)FControlFrame.GetAIRFRotation( FControlFrame.VesselControlFrame, activeVessel );
+                Matrix4x4 airfToLocalMatrix = Matrix4x4.Rotate( airfRotation ).inverse;
 
                 Vector3Dbl airfVelocity = SceneReferenceFrameManager.SceneReferenceFrame.TransformDirection( activeVessel.PhysicsObject.Velocity );
                 if( airfVelocity.magnitude > 0.25f )
                 {
-
                     OrbitalFrame orbitalFrame = OrbitalFrame.FromNBody( airfVelocity, GravityUtils.GetNBodyGravityAcceleration( activeVessel.AIRFPosition ) );
 
                     Vector3 localPrograde = airfToLocalMatrix.MultiplyVector( orbitalFrame.GetPrograde() ) * NavballPixelRadius;
@@ -132,7 +132,7 @@ namespace KSS.UI
             velocityIndicator.AddTextReadout_Velocity( new UILayoutInfo( UIFill.Fill( 31.5f, 31.5f, 0, 20 ) ) )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
-            
+
             velocityIndicator.AddTextReadout_Altitude( new UILayoutInfo( UIFill.Fill( 31.5f, 31.5f, 20, 0 ) ) )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );

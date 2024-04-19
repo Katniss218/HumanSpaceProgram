@@ -1,5 +1,6 @@
 ﻿using KSS.Control;
 using KSS.Control.Controls;
+using KSS.Core.Components;
 using KSS.Input;
 using System;
 using System.Collections.Generic;
@@ -17,18 +18,11 @@ namespace KSS.Components
 	/// </summary>
 	public class FPlayerInputAvionics : MonoBehaviour, IPersistsObjects, IPersistsData
 	{
-		// avionics will be a complicated and very broad system with many different subsystems, subcomponents, etc.
+        public FControlFrame ControlFrame { get; set; }
 
-		// a control part (e.g. probe core) will have multiple control components (modules). One of those will almost always be a sequencer.
-
-
-
-
-		// avionics will have internal channels that activate based on "things"
-
-		private float _pitchSignal; // channel representing the pitch control signal.
-		private float _yawSignal; // channel representing the yaw control signal.
-		private float _rollSignal; // channel representing the roll control signal.
+		private float _pitchSignal;
+		private float _yawSignal;
+		private float _rollSignal;
 		private float _throttleSignal;
 
 		[field: SerializeField]
@@ -118,6 +112,7 @@ namespace KSS.Components
         {
 			return new SerializedObject()
 			{
+				{ "control_frame", s.WriteObjectReference( this.ControlFrame ) },
 				{ "on_set_throttle", s.GetID( OnSetThrottle ).GetData() },
 				{ "on_set_attitude", s.GetID( OnSetAttitude ).GetData() },
 				{ "on_set_translation", s.GetID( OnSetTranslation ).GetData() }
@@ -126,6 +121,9 @@ namespace KSS.Components
 
         public void SetObjects( SerializedObject data, IForwardReferenceMap l )
         {
+			if( data.TryGetValue( "control_frame", out var controlFrame ) )
+                this.ControlFrame = (FControlFrame)l.ReadObjectReference( controlFrame );
+			
 			if( data.TryGetValue( "on_set_throttle", out var onSetThrottle ) )
             {
                 OnSetThrottle = new();

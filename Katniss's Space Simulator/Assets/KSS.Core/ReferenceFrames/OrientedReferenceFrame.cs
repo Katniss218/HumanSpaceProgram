@@ -12,14 +12,10 @@ namespace KSS.Core.ReferenceFrames
     /// </summary>
     public sealed class OrientedReferenceFrame : IReferenceFrame
     {
-        Vector3Dbl _position;
-        QuaternionDbl _rotation;
-        QuaternionDbl _inverseRotation;
+        private Vector3Dbl _position;
+        private QuaternionDbl _rotation;
+        private QuaternionDbl _inverseRotation;
 
-        /// <summary>
-        /// Creates a new instance of the <see cref="CenteredReferenceFrame"/> with the specified offset.
-        /// </summary>
-        /// <param name="offset">The AIRF coordinates that will be mapped to (0,0,0) in the new frame.</param>
         public OrientedReferenceFrame( Vector3Dbl center, QuaternionDbl rotation )
         {
             this._position = center;

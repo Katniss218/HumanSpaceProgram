@@ -54,7 +54,7 @@ namespace KSS.Core
         /// <summary>
         /// Returns the transform that defines the orientation (local space) of this part object.
         /// </summary>
-        public Transform ReferenceTransform => transform;
+        public Transform ReferenceTransform { get; }
 
         /// <summary>
         /// Call this to rebuild the part data cache.

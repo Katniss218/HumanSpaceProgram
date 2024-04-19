@@ -55,6 +55,8 @@ namespace KSS.Core
 		public IPhysicsObject PhysicsObject { get; private set; }
 		public RootObjectTransform RootObjTransform { get; private set; }
 
+		public Transform ReferenceTransform => this.transform;
+
 		// the active vessel has also glithed out and accelerated to the speed of light at least once after jettisonning the side tanks on the pad.
 
 		[field: SerializeField]
