@@ -63,5 +63,18 @@ namespace UnityEngine
             Vector3 screenSpacePosition = camera.WorldToScreenPoint( worldSpacePosition, camera.stereoActiveEye );
             SetScreenPosition( rt, screenSpacePosition, hideWhenBehindCamera );
         }
+
+        public static void SetVerticalMargins( this RectTransform rectTransform, float top, float bottom )
+        {
+            rectTransform.sizeDelta = new Vector2( rectTransform.sizeDelta.x, -(top + bottom) );
+            rectTransform.anchoredPosition = new Vector2( rectTransform.anchoredPosition.x, (bottom - top) / 2f );
+        }
+
+        public static void SetHorizontalMargins( this RectTransform rectTransform, float left, float right )
+        {
+            rectTransform.sizeDelta = new Vector2( -(left + right), rectTransform.sizeDelta.y );
+            rectTransform.anchoredPosition = new Vector2( (left - right) / 2f, rectTransform.anchoredPosition.y );
+        }
+
     }
 }

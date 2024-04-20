@@ -65,7 +65,7 @@ namespace KSS.UI
                 .WithMargins( 15, 15, 0, 0 )
                 .WithPlaceholder( "search..." );
             UIScrollView uiPartList = partListUI.AddVerticalScrollView( new UILayoutInfo( UIFill.Fill( 42, 2, 24, 100 ) ), 200 )
-                .WithVerticalScrollbar( new UILayoutInfo( UIAnchor.Right, UIFill.Vertical(), 0, 10 ), null, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_vertical" ), out _ );
+                .WithVerticalScrollbar( UIAnchor.Right, 10, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_vertical_background" ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_vertical" ), out _ );
 
             uiPartList.LayoutDriver = new BidirectionalLayoutDriver()
             {

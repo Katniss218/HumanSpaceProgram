@@ -107,12 +107,12 @@ namespace KSS.UI
                 .WithCloseButton( new UILayoutInfo( UIAnchor.TopRight, (-7, -5), (20, 20) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ );
 
             UIScrollView timelineList = uiWindow.AddVerticalScrollView( new UILayoutInfo( UIAnchor.Left, UIFill.Vertical( 30, 30 ), 0, 100 ), 100 )
-                .WithVerticalScrollbar( new UILayoutInfo( UIAnchor.Right, UIFill.Vertical(), 0, 10 ), null, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_handle" ), out _ );
+                .WithVerticalScrollbar( UIAnchor.Right, 10, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_vertical_background" ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_vertical" ), out _ );
 
             timelineList.LayoutDriver = new VerticalLayoutDriver() { FitToSize = true };
 
             UIScrollView saveList = uiWindow.AddVerticalScrollView( new UILayoutInfo( UIAnchor.Right, UIFill.Vertical( 30, 30 ), 0, 250 ), 100 )
-                .WithVerticalScrollbar( new UILayoutInfo( UIAnchor.Right, UIFill.Vertical(), 0, 10 ), null, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_handle" ), out _ );
+                .WithVerticalScrollbar( UIAnchor.Right, 10, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_vertical_background" ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_vertical" ), out _ );
 
             saveList.LayoutDriver = new VerticalLayoutDriver() { FitToSize = true };
 

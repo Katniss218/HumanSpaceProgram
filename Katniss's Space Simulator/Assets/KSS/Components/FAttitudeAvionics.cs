@@ -18,7 +18,7 @@ namespace KSS.Components
 	/// </summary>
 	public class FAttitudeAvionics : MonoBehaviour, IPersistsObjects
 	{
-		private IPartObject _vessel;
+		private Vessel _vessel;
 
 		// error in pitch, roll, yaw, in [Rad]
 		private Vector3Dbl _error0 = Vector3Dbl.zero;
@@ -113,7 +113,7 @@ namespace KSS.Components
 
 		void OnEnable()
 		{
-			_vessel = this.transform.GetPartObject();
+			_vessel = this.transform.GetVessel();
 			if( _vessel == null )
 				return;
 			TargetOrientation = _vessel.ReferenceTransform.rotation;

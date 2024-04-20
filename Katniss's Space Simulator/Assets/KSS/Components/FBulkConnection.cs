@@ -262,7 +262,7 @@ namespace KSS.Components
                 throw new InvalidOperationException( $"Both ends must exist" );
             }
 
-            IPartObject vessel = this.transform.GetPartObject();
+            Vessel vessel = this.transform.GetVessel();
             if( vessel != null ) 
             {
                 Vector3Dbl airfAcceleration = GravityUtils.GetNBodyGravityAcceleration( vessel.RootObjTransform.AIRFPosition );

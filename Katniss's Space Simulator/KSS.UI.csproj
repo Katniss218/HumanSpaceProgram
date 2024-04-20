@@ -94,10 +94,11 @@
     <Compile Include="Assets\KSS.UI\HUDs\VesselHUDManager.cs" />
     <Compile Include="Assets\KSS.UI\NavballRenderTextureManager.cs" />
     <Compile Include="Assets\KSS.UI\UITextReadout_Acceleration.cs" />
-    <Compile Include="Assets\KSS.UI\UIIResourceContainer.cs" />
+    <Compile Include="Assets\KSS.UI\Windows\PartWindowComponents\UIIResourceContainer.cs" />
     <Compile Include="Assets\KSS.UI\HUDs\VesselHUD.cs" />
     <Compile Include="Assets\KSS.UI\SceneFactories\DesignSceneUIFactory.cs" />
     <Compile Include="Assets\KSS.UI\UITextReadout_FPS.cs" />
+    <Compile Include="Assets\KSS.UI\Windows\PartWindowComponents\UIPartWindowComponent.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.UI\___KSS.UI.asmdef" />

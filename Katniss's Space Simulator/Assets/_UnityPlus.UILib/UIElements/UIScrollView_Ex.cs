@@ -31,17 +31,15 @@ namespace UnityPlus.UILib.UIElements
             return this;
         }
 
-        public UIScrollView WithHorizontalScrollbar( UILayoutInfo layout, Sprite background, Sprite foreground, out UIScrollBar scrollBar )
+        public UIScrollView WithHorizontalScrollbar( UIAnchorVertical anchor, float width, Sprite background, Sprite foreground, out UIScrollBar scrollBar )
         {
-#warning TODO - the contents should take the margin around the scrollbars. Also, the scrollbars should be more restricted in size. only the "free" axis is allowed to be set, and bottom/top margin depends on the presence and the size of the other scrollbar.
-            scrollBar = this.AddScrollbar( layout, background, foreground, false );
-
+            scrollBar = UIScrollBar.Create<UIScrollBar>( this, anchor, (width, 0), background, foreground, false );
             return this;
         }
 
-        public UIScrollView WithVerticalScrollbar( UILayoutInfo layout, Sprite background, Sprite foreground, out UIScrollBar scrollBar )
+        public UIScrollView WithVerticalScrollbar( UIAnchorHorizontal anchor, float height, Sprite background, Sprite foreground, out UIScrollBar scrollBar )
         {
-            scrollBar = this.AddScrollbar( layout, background, foreground, true );
+            scrollBar = UIScrollBar.Create<UIScrollBar>( this, anchor, (0, height), background, foreground, true );
             return this;
         }
     }

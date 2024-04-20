@@ -11,8 +11,42 @@ namespace UnityPlus.UILib.UIElements
 
         protected UIScrollView parent;
 
-        protected internal static T Create<T>( UIScrollView scrollView, UILayoutInfo layout, Sprite background, Sprite foreground, bool isVertical ) where T : UIScrollBar
+        protected internal static T Create<T>( UIScrollView scrollView, UIAnchor anchor, UISize size, Sprite background, Sprite foreground, bool isVertical ) where T : UIScrollBar
         {
+            UILayoutInfo layout;
+            if( isVertical )
+            {
+                float rightAndBottom = anchor.x == UIAnchor.Left.x ? 0 : size.y;
+                float leftAndTop = anchor.x == UIAnchor.Right.x ? 0 : size.y;
+
+                scrollView.viewport.SetHorizontalMargins( leftAndTop, rightAndBottom );
+                if( scrollView.scrollbarHorizontal != null )
+                {
+                    scrollView.scrollbarHorizontal.rectTransform.SetHorizontalMargins( leftAndTop, rightAndBottom );
+                    layout = new UILayoutInfo( (UIAnchorHorizontal)anchor, UIFill.Vertical( leftAndTop, rightAndBottom ), 0, size.y );
+                }
+                else
+                {
+                    layout = new UILayoutInfo( (UIAnchorHorizontal)anchor, UIFill.Vertical(), 0, size.y );
+                }
+            }
+            else
+            {
+                float rightAndBottom = anchor.y == UIAnchor.Top.y ? 0 : size.x;
+                float leftAndTop = anchor.y == UIAnchor.Bottom.y ? 0 : size.x;
+
+                scrollView.viewport.SetVerticalMargins( leftAndTop, rightAndBottom );
+                if( scrollView.scrollbarVertical != null )
+                {
+                    scrollView.scrollbarVertical.rectTransform.SetVerticalMargins( leftAndTop, rightAndBottom );
+                    layout = new UILayoutInfo( UIFill.Horizontal( leftAndTop, rightAndBottom ), (UIAnchorVertical)anchor, 0, size.x );
+                }
+                else
+                {
+                    layout = new UILayoutInfo( UIFill.Horizontal(), (UIAnchorVertical)anchor, 0, size.x );
+                }
+            }
+
             (GameObject rootGameObject, RectTransform rootTransform) = UIElement.CreateUIGameObject( scrollView.rectTransform, isVertical ? $"uilib-{typeof( T ).Name}-vertical" : $"uilib-{typeof( T ).Name}-horizontal", layout );
 
             if( background != null )
@@ -46,16 +80,21 @@ namespace UnityPlus.UILib.UIElements
             scrollbarComponent.direction = isVertical ? Scrollbar.Direction.BottomToTop : Scrollbar.Direction.LeftToRight;
             scrollbarComponent.targetGraphic = handleImage;
 
-            if( isVertical )
-                scrollView.scrollRectComponent.verticalScrollbar = scrollbarComponent;
-            else
-                scrollView.scrollRectComponent.horizontalScrollbar = scrollbarComponent;
-
             T uiScrollBar = rootGameObject.AddComponent<T>();
             uiScrollBar.parent = scrollView;
             uiScrollBar.scrollbarComponent = scrollbarComponent;
 
-            scrollView.scrollbarHorizontal = uiScrollBar;
+            if( isVertical )
+            {
+                scrollView.scrollbarVertical = uiScrollBar;
+                scrollView.scrollRectComponent.verticalScrollbar = scrollbarComponent;
+            }
+            else
+            {
+                scrollView.scrollbarHorizontal = uiScrollBar;
+                scrollView.scrollRectComponent.horizontalScrollbar = scrollbarComponent;
+            }
+
             return uiScrollBar;
         }
     }

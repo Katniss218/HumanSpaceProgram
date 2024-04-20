@@ -280,7 +280,9 @@ namespace KSS.UI.Windows
                 .Resizeable()
                 .WithCloseButton( new UILayoutInfo( UIAnchor.TopRight, (-7, -5), (20, 20) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ );
 
-            UIScrollView scrollView = controlWindow.AddScrollView( new UILayoutInfo( UIFill.Fill( 5, 5, 30, 5 ) ), (5000, 5000), true, true );
+            UIScrollView scrollView = controlWindow.AddScrollView( new UILayoutInfo( UIFill.Fill( 5, 5, 30, 5 ) ), (5000, 5000), true, true )
+                .WithHorizontalScrollbar( UIAnchor.Bottom, 10, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_horizontal_background" ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_horizontal" ), out _ )
+                .WithVerticalScrollbar( UIAnchor.Right, 10, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_vertical_background" ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_vertical" ), out _ );
 
             UIPanel topPanel = controlWindow.AddPanel( new UILayoutInfo( UIFill.Horizontal( 45, 45 ), UIAnchor.Top, 0, 30 ), null );
             UIButton componentListButton = topPanel.AddButton( new UILayoutInfo( UIAnchor.Left, (0, 0), (15, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_list_gold" ), null );

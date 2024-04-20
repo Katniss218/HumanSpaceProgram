@@ -22,10 +22,13 @@ namespace KSS.Core
 		}
 	}
 
-	/// <summary>
-	/// A vessel is a moving object consisting of a hierarchy of "parts".
-	/// </summary>
-	[RequireComponent( typeof( RootObjectTransform ) )]
+    /// <summary>
+    /// A vessel is a moving object consisting of a hierarchy of "parts".
+    /// </summary>
+    /// <remarks>
+    /// Vessels exist only in the gameplay scene.
+    /// </remarks>
+    [RequireComponent( typeof( RootObjectTransform ) )]
 	public sealed partial class Vessel : MonoBehaviour, IPartObject
 	{
 		[SerializeField]

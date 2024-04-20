@@ -42,14 +42,6 @@ namespace KSS.Core
         /// The root part of this part object (if any).
         /// </summary>
         Transform RootPart { get; }
-        /// <summary>
-        /// The physics object attached to this part object (if any).
-        /// </summary>
-        IPhysicsObject PhysicsObject { get; }
-        /// <summary>
-        /// The root object transform attached to this part object (if any).
-        /// </summary>
-        RootObjectTransform RootObjTransform { get; }
         
         /// <summary>
         /// Returns the transform that defines the orientation (local space) of this part object.

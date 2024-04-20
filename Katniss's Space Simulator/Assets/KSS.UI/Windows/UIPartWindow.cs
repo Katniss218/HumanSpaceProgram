@@ -1,19 +1,15 @@
-﻿using KSS.Cameras;
-using KSS.Core;
-using KSS.Core.ResourceFlowSystem;
+﻿using KSS.Core.ResourceFlowSystem;
 using UnityPlus.UILib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
 using UnityPlus.UILib.UIElements;
 using UnityPlus.AssetManagement;
 using KSS.Core.Serialization;
 using KSS.Core.Components;
+using KSS.UI.Windows.PartWindowComponents;
+using UnityPlus.UILib.Layout;
 
 namespace KSS.UI.Windows
 {
@@ -122,7 +118,15 @@ namespace KSS.UI.Windows
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
-            UIScrollView scrollView = partWindow.AddVerticalScrollView( new UILayoutInfo( UIFill.Fill( 2, 2, 75, 15 ) ), 200 );
+            UIScrollView scrollView = partWindow.AddVerticalScrollView( new UILayoutInfo( UIFill.Fill( 2, 2, 75, 15 ) ), 200 )
+                .WithVerticalScrollbar( UIAnchor.Right, 10, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_vertical_background" ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_vertical" ), out _ );
+
+            scrollView.LayoutDriver = new VerticalLayoutDriver()
+            {
+                Dir = VerticalLayoutDriver.Direction.TopToBottom,
+                Spacing = 2f,
+                FitToSize = true
+            };
 
             partWindow._list = scrollView;
             partWindow._relationHighlighter = relationHighlight;

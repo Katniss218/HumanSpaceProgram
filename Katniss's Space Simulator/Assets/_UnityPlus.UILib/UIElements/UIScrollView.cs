@@ -8,12 +8,13 @@ namespace UnityPlus.UILib.UIElements
 {
     public partial class UIScrollView : UIElement, IUIElementContainer, IUIElementChild, IUILayoutDriven
     {
+        protected internal RectTransform viewport;
         protected internal ScrollRect scrollRectComponent;
 
-        public UIScrollBar scrollbarHorizontal;
-        public UIScrollBar scrollbarVertical;
+        protected internal UIScrollBar scrollbarHorizontal;
+        protected internal UIScrollBar scrollbarVertical;
 
-        RectTransform _contentsTransform;
+        private RectTransform _contentsTransform;
         public virtual RectTransform contents { get => _contentsTransform; }
 
         public IUIElementContainer Parent { get; set; }
@@ -34,11 +35,6 @@ namespace UnityPlus.UILib.UIElements
             _contentsTransform.sizeDelta = new Vector2( (right - left), (top - bottom) );
             scrollRectComponent.normalizedPosition = contentsCenter / containerSize;
         }*/
-
-        private static void FixPositionRecursive( RectTransform rectTransform )
-        {
-
-        }
 
         protected internal static T Create<T>( IUIElementContainer parent, UILayoutInfo layout, UILayoutInfo contentsLayout, bool horizontal, bool vertical ) where T : UIScrollView
         {
@@ -65,6 +61,7 @@ namespace UnityPlus.UILib.UIElements
             scrollRect.inertia = false;
             scrollRect.scrollSensitivity = 30f;
 
+            uiScrollView.viewport = viewportTransform;
             uiScrollView.scrollRectComponent = scrollRect;
             uiScrollView.scrollbarHorizontal = null;
             uiScrollView.scrollbarVertical = null;

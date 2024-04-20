@@ -1,15 +1,12 @@
 using KSS.Core.ResourceFlowSystem;
 using UnityPlus.UILib;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib.UIElements;
-using KSS.Core.Serialization;
-using System;
 
-namespace KSS.UI
+namespace KSS.UI.Windows.PartWindowComponents
 {
-    public class UIIResourceContainer : UIPanel
+    public class UIIResourceContainer : UIPartWindowComponent
     {
         /// <summary>
         /// The object that is referenced by this UI element.
@@ -36,13 +33,18 @@ namespace KSS.UI
 
         protected internal static T Create<T>( IUIElementContainer parent, IResourceContainer referenceObj ) where T : UIIResourceContainer
         {
-            T uiIResourceContainer = UIPanel.Create<T>( parent, new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (250, 15) ), null );
+            T uiIResourceContainer = UIPartWindowComponent.Create<T>( parent );
 
-            UIValueBar uiValueBar = uiIResourceContainer.AddHorizontalValueBar( new UILayoutInfo( UIFill.Fill() ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/bar_background" ) )
+            uiIResourceContainer.Title = "Tank";
+            uiIResourceContainer.OpenHeight = 15f;
+
+            UIValueBar uiValueBar = uiIResourceContainer.contentPanel.AddHorizontalValueBar( new UILayoutInfo( UIFill.Fill() ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/bar_background" ) )
                 .WithPadding( 5, 5, 1 );
 
             uiIResourceContainer.ReferenceObject = referenceObj;
             uiIResourceContainer._bar = uiValueBar;
+
+            UILayoutManager.BroadcastLayoutUpdate( uiIResourceContainer );
 
             return uiIResourceContainer;
         }

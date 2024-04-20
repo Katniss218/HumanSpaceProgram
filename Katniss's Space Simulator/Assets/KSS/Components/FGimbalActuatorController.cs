@@ -73,13 +73,13 @@ namespace KSS.Components
 
         void FixedUpdate()
         {
-            IPartObject partObject = this.transform.GetPartObject();
-            if( partObject == null )
+            Vessel vessel = this.transform.GetVessel();
+            if( vessel == null )
             {
                 return;
             }
 
-            Vector3 worldSteering = partObject.ReferenceTransform.TransformDirection( AttitudeCommand );
+            Vector3 worldSteering = vessel.ReferenceTransform.TransformDirection( AttitudeCommand );
 
             foreach( var actuator in Actuators2D )
             {
@@ -95,7 +95,7 @@ namespace KSS.Components
 
                     Vector3 engineSpaceSteeringCmd = engineReferenceTransform.InverseTransformDirection( worldSteering );
 
-                    Vector3 engineSpaceCoM = engineReferenceTransform.InverseTransformPoint( partObject.ReferenceTransform.TransformPoint( partObject.PhysicsObject.LocalCenterOfMass ) );
+                    Vector3 engineSpaceCoM = engineReferenceTransform.InverseTransformPoint( vessel.ReferenceTransform.TransformPoint( vessel.PhysicsObject.LocalCenterOfMass ) );
 
                     Vector2 rollDeflectionDir = new Vector2( engineSpaceCoM.x, engineSpaceCoM.y ).normalized;
                     rollDeflectionDir *= engineSpaceSteeringCmd.y;

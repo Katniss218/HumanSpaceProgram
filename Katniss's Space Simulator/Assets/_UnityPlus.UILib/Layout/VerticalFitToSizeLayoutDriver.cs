@@ -17,9 +17,9 @@ namespace UnityPlus.UILib.Layout
 
         public override void DoLayout( IUIElementContainer c )
         {
-            if( c.contents.anchorMin.x != c.contents.anchorMax.x )
+            if( c.contents.anchorMin.y != c.contents.anchorMax.y )
             {
-                throw new InvalidOperationException( $"Can't fit to size, the container element {c.gameObject.name} fills width." );
+                throw new InvalidOperationException( $"Can't fit to size, the container element {c.gameObject.name} fills height." );
             }
 
             Vector2 size = TargetElement.rectTransform.GetActualSize();
