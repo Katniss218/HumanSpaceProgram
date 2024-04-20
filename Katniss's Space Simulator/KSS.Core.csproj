@@ -58,21 +58,29 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\KSS.Core\Control\Controls\ControllerOutput_T_.cs" />
     <Compile Include="Assets\KSS.Core\Serialization\SaveMetadataEx.cs" />
     <Compile Include="Assets\KSS.Core\Vessel.cs" />
     <Compile Include="Assets\KSS.Core\Physics\InertiaUtils.cs" />
+    <Compile Include="Assets\KSS.Core\Control\Controls\ControlParameterOutputBase.cs" />
     <Compile Include="Assets\KSS.Core\Orbit.cs" />
     <Compile Include="Assets\KSS.Core\PartRegistry.cs" />
     <Compile Include="Assets\KSS.Core\TimeStepManager.cs" />
+    <Compile Include="Assets\KSS.Core\Control\Controls\ControlParameterOutput_T_.cs" />
+    <Compile Include="Assets\KSS.Core\Control\Controls\ControlParameterInputBase.cs" />
     <Compile Include="Assets\KSS.Core\Vessel.Serialization.cs" />
     <Compile Include="Assets\KSS.Core\SceneManagement\EditorSceneManager.cs" />
     <Compile Include="Assets\KSS.Core\Control\NamedControlAttribute.cs" />
     <Compile Include="Assets\KSS.Core\Mods\IReferenceMap_Ex_NamespacedIdentifier.cs" />
     <Compile Include="Assets\KSS.Core\Serialization\TimelineMetadata.cs" />
+    <Compile Include="Assets\KSS.Core\Control\Controls\ControlleeInputBase.cs" />
     <Compile Include="Assets\KSS.Core\HSPEvent.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\FluidState.cs" />
     <Compile Include="Assets\KSS.Core\CelestialBodyManager.cs" />
     <Compile Include="Assets\KSS.Core\Mods\NamespacedIdentifier.cs" />
+    <Compile Include="Assets\KSS.Core\Control\Controls\ControlleeInput_T_.cs" />
+    <Compile Include="Assets\KSS.Core\Control\Controls\ControlParameterInput_T_.cs" />
+    <Compile Include="Assets\KSS.Core\Control\Controls\ControlleeInput.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\IResourceConsumer.cs" />
     <Compile Include="Assets\KSS.Core\Physics\PinnedPhysicsObject.cs" />
     <Compile Include="Assets\KSS.Core\SceneManagement\GameplaySceneManager.cs" />
@@ -105,8 +113,10 @@
     <Compile Include="Assets\KSS.Core\Components\FAttachNode.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\IResourceProducer.cs" />
     <Compile Include="Assets\KSS.Core\Control\ControlUtils.cs" />
+    <Compile Include="Assets\KSS.Core\Control\Controls\ControllerOutput.cs" />
     <Compile Include="Assets\KSS.Core\SceneManagement\DesignSceneManager.cs" />
     <Compile Include="Assets\KSS.Core\ReferenceFrames\IReferenceFrame.cs" />
+    <Compile Include="Assets\KSS.Core\ReferenceFrames\IReferenceTransform.cs" />
     <Compile Include="Assets\KSS.Core\HumanSpaceProgram.cs" />
     <Compile Include="Assets\KSS.Core\SceneManagement\MainMenuSceneManager.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\SubstanceState.cs" />
@@ -122,6 +132,7 @@
     <Compile Include="Assets\KSS.Core\CelestialBody.cs" />
     <Compile Include="Assets\KSS.Core\Serialization\IOHelper.cs" />
     <Compile Include="Assets\KSS.Core\IPartObject.cs" />
+    <Compile Include="Assets\KSS.Core\Control\Controls\ControllerOutputBase.cs" />
     <Compile Include="Assets\KSS.Core\SceneManagement\InvalidSceneManagerException.cs" />
     <Compile Include="Assets\KSS.Core\Components\FLaunchSiteMarker.cs" />
     <Compile Include="Assets\KSS.Core\Physics\IPhysicsObject.cs" />
@@ -129,18 +140,7 @@
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\SubstanceStateCollection.cs" />
     <Compile Include="Assets\KSS.Core\Physics\FreePhysicsObject.cs" />
     <Compile Include="Assets\KSS.Core\Control\Control.cs" />
-    <Compile Include="Assets\KSS.Core\Control\Controls\ControlleeInput.cs" />
-    <Compile Include="Assets\KSS.Core\Control\Controls\ControllerOutput.cs" />
-    <Compile Include="Assets\KSS.Core\Control\Controls\ControlParameterInput_T_.cs" />
-    <Compile Include="Assets\KSS.Core\Control\Controls\ControlParameterOutput_T_.cs" />
-    <Compile Include="Assets\KSS.Core\Control\Controls\ControlleeInput_T_.cs" />
-    <Compile Include="Assets\KSS.Core\Control\Controls\ControlleeInputBase.cs" />
-    <Compile Include="Assets\KSS.Core\Control\Controls\ControllerOutput_T_.cs" />
-    <Compile Include="Assets\KSS.Core\Control\Controls\ControllerOutputBase.cs" />
-    <Compile Include="Assets\KSS.Core\Control\Controls\ControlParameterInputBase.cs" />
-    <Compile Include="Assets\KSS.Core\Control\Controls\ControlParameterOutputBase.cs" />
     <Compile Include="Assets\KSS.Core\Components\FControlFrame.cs" />
-    <Compile Include="Assets\KSS.Core\ReferenceFrames\IReferenceTransform.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.Core\___KSS.Core.asmdef" />
