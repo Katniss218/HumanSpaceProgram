@@ -81,9 +81,10 @@ namespace KSS.Input
 			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_TRANSLATE_UP, new KeyDownBinding( -1, KeyCode.K ) );
 			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_TRANSLATE_DOWN, new KeyDownBinding( 1, KeyCode.I ) );
 
-			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_PITCH, new AxisBinding( new KeyHoldBinding( 1, KeyCode.S ), new KeyHoldBinding( -1, KeyCode.W ) ) );
-			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_PITCH_UP, new KeyDownBinding( 1, KeyCode.S ) );
-			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_PITCH_DOWN, new KeyDownBinding( -1, KeyCode.W ) );
+			// When looking from positive towards negative (along the axis), `1` is counterclockwise, `-1` is clockwise.
+			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_PITCH, new AxisBinding( new KeyHoldBinding( -1, KeyCode.S ), new KeyHoldBinding( 1, KeyCode.W ) ) );
+			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_PITCH_UP, new KeyDownBinding( -1, KeyCode.S ) );
+			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_PITCH_DOWN, new KeyDownBinding( 1, KeyCode.W ) );
 			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_YAW, new AxisBinding( new KeyHoldBinding( 1, KeyCode.A ), new KeyHoldBinding( -1, KeyCode.D ) ) );
 			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_YAW_LEFT, new KeyDownBinding( 1, KeyCode.A ) );
 			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_YAW_RIGHT, new KeyDownBinding( -1, KeyCode.D ) );

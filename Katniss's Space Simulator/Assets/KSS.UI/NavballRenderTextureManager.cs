@@ -100,7 +100,6 @@ namespace KSS.UI
                 NavballOrientation = Quaternion.LookRotation( forward, gravity );
                 VesselOrientation = (Quaternion)FControlFrame.GetAIRFRotation( FControlFrame.VesselControlFrame, v );
             }
-#warning TODO - the orientation doesn't seem right. Might be related to how Im rendering it inside out.
         }
     }
 }

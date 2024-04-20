@@ -50,10 +50,6 @@ namespace KSS.Components
             }
         }
 
-        // TODO - make work for both 1-axis, 2-axis, and 3-axis actuators.
-
-        // TODO - certain controllers should be able to be disabled (stop responding to signals)
-
         /// <summary>
         /// The current steering command in vessel-space. The axes of this vector correspond to rotation around the axes of the vessel.
         /// </summary>
@@ -90,10 +86,25 @@ namespace KSS.Components
                 if( actuator == null )
                     continue;
 
-                if( actuator.GetReferenceTransform.TryGet( out Transform transform ) )
+                if( actuator.GetReferenceTransform.TryGet( out Transform engineReferenceTransform ) )
                 {
-                    Vector3 steeringLocal = transform.InverseTransformDirection( worldSteering );
-                    Vector2 localDeflection = new Vector2( steeringLocal.x /* pitch */, steeringLocal.z /* yaw */ ); // TODO - support roll in the future.
+                    // Pitch and Yaw in engine's local space directly correspond to the x and y axes of the steering command in engine's local space.
+                    // Roll is a bit more difficult.
+                    // - For roll, take a vector towards the vessel's CoM in engine's local space, and discard the axial component
+                    //   (in this case z because reference transform's axes are deflection axes).
+
+                    Vector3 engineSpaceSteeringCmd = engineReferenceTransform.InverseTransformDirection( worldSteering );
+
+                    Vector3 engineSpaceCoM = engineReferenceTransform.InverseTransformPoint( partObject.ReferenceTransform.TransformPoint( partObject.PhysicsObject.LocalCenterOfMass ) );
+
+                    Vector2 rollDeflectionDir = new Vector2( engineSpaceCoM.x, engineSpaceCoM.y ).normalized;
+                    rollDeflectionDir *= engineSpaceSteeringCmd.y;
+
+                    // Combine the pitch/yaw and roll steering commands.
+                    Vector2 localDeflection = new Vector2(
+                        engineSpaceSteeringCmd.x /* pitch */ + rollDeflectionDir.x /* roll */,
+                        engineSpaceSteeringCmd.z /* yaw   */ + rollDeflectionDir.y /* roll */ );
+
                     actuator.OnSetXY.TrySendSignal( localDeflection );
                 }
             }
