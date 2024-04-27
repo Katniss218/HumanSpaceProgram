@@ -1,7 +1,7 @@
 using KSS.Core;
 using KSS.Core.SceneManagement;
 using KSS.Core.Serialization;
-using TMPro;
+using UnityEditor.PackageManager.UI;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
@@ -22,38 +22,48 @@ namespace KSS.UI
             } ) );
         }
 
-        public static T Create<T>( UICanvas parent, UILayoutInfo layout ) where T : UIStartNewGameWindow
+        public static T Create<T>( UICanvas parent ) where T : UIStartNewGameWindow
         {
-            // CanvasManager.Get( CanvasName.WINDOWS ).AddWindow( new UILayoutInfo( UIAnchor.Center, (0, 0), (400f, 400f) )
-            T window = (T)UIWindow.Create<T>( parent, layout, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/window" ) )
+            T uiWindow = (T)UIWindow.Create<T>( parent, new UILayoutInfo( UIAnchor.Center, (0, 0), (300f, 200f) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/window" ) )
                 .Draggable()
                 .Focusable()
                 .WithCloseButton( new UILayoutInfo( UIAnchor.TopRight, (-7, -5), (20, 20) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ );
 
-            window.AddText( new UILayoutInfo( UIAnchor.Top, (-100, -32), (100, 15) ), "Timeline Name" )
-                .WithFont( AssetRegistry.Get<TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
-                .WithAlignment( HorizontalAlignmentOptions.Right );
+            uiWindow.AddText( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Top, 0, 30 ), "Start New Game..." )
+                .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
+                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
-            UIInputField inputField = window.AddInputField( new UILayoutInfo( UIAnchor.Top, (100, -32), (200, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
 
-            window.AddButton( new UILayoutInfo( UIAnchor.Bottom, (0, 2), (200, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), window.StartGame )
+            uiWindow.AddText( new UILayoutInfo( UIAnchor.TopLeft, (2, -32), (150, 15) ), "Timeline Name" )
+                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
+                .WithAlignment( TMPro.HorizontalAlignmentOptions.Right );
+
+            UIInputField inputField = uiWindow.AddInputField( new UILayoutInfo( UIFill.Horizontal( 154, 2 ), UIAnchor.Top, -32, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
+
+            uiWindow.AddText( new UILayoutInfo( UIAnchor.TopLeft, (2, -32 - 17), (150, 15) ), "Timeline Description" )
+                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
+                .WithAlignment( TMPro.HorizontalAlignmentOptions.Right );
+
+            UIInputField inputField2 = uiWindow.AddInputField( new UILayoutInfo( UIFill.Horizontal( 154, 2 ), UIAnchor.Top, -32 - 17, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
+
+
+            uiWindow.AddButton( new UILayoutInfo( UIAnchor.Bottom, (0, 2), (100, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), uiWindow.StartGame )
                 .AddText( new UILayoutInfo( UIFill.Fill() ), "Start" )
-                .WithFont( AssetRegistry.Get<TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
-                .WithAlignment( HorizontalAlignmentOptions.Center );
+                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
+                .WithAlignment( TMPro.HorizontalAlignmentOptions.Center );
 
-            window._nameInputField = inputField;
-#warning TODO - add a description box.
-            window._descriptionInputField = inputField;
+            uiWindow._nameInputField = inputField;
+            uiWindow._descriptionInputField = inputField2;
 
-            return window;
+            return uiWindow;
         }
     }
 
     public static class UIStartNewGameWindow_Ex
     {
-        public static UIStartNewGameWindow AddStartNewGameWindow( this UICanvas parent, UILayoutInfo layout )
+        public static UIStartNewGameWindow AddStartNewGameWindow( this UICanvas parent )
         {
-            return UIStartNewGameWindow.Create<UIStartNewGameWindow>( parent, layout );
+            return UIStartNewGameWindow.Create<UIStartNewGameWindow>( parent );
         }
     }
 }

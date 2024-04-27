@@ -73,6 +73,7 @@
     <Compile Include="Assets\KSS.UI\Windows\UIConfirmationWindow.cs" />
     <Compile Include="Assets\KSS.UI\UISequenceElement.cs" />
     <Compile Include="Assets\KSS.UI\SceneFactories\GameplaySceneUIFactory.cs" />
+    <Compile Include="Assets\KSS.UI\Windows\PartWindowComponents\UIPartWindowComponent.cs" />
     <Compile Include="Assets\KSS.UI\UISequenceAction.cs" />
     <Compile Include="Assets\KSS.UI\UILineRenderer.cs" />
     <Compile Include="Assets\KSS.UI\UIPartListEntry.cs" />
@@ -98,7 +99,6 @@
     <Compile Include="Assets\KSS.UI\HUDs\VesselHUD.cs" />
     <Compile Include="Assets\KSS.UI\SceneFactories\DesignSceneUIFactory.cs" />
     <Compile Include="Assets\KSS.UI\UITextReadout_FPS.cs" />
-    <Compile Include="Assets\KSS.UI\Windows\PartWindowComponents\UIPartWindowComponent.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.UI\___KSS.UI.asmdef" />

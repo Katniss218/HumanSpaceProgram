@@ -103,6 +103,7 @@
     <Compile Include="Assets\KSS.Core\Components\FPart.cs" />
     <Compile Include="Assets\KSS.Core\SceneManagement\SceneLoader.cs" />
     <Compile Include="Assets\KSS.Core\ReferenceFrames\IAcceleratingReferenceFrame.cs" />
+    <Compile Include="Assets\KSS.Core\IPartObject.cs" />
     <Compile Include="Assets\KSS.Core\Serialization\Version.cs" />
     <Compile Include="Assets\KSS.Core\ReferenceFrames\ReferenceFrameUtils.cs" />
     <Compile Include="Assets\KSS.Core\Serialization\SaveMetadata.cs" />
@@ -140,7 +141,6 @@
     <Compile Include="Assets\KSS.Core\Physics\FreePhysicsObject.cs" />
     <Compile Include="Assets\KSS.Core\Control\Control.cs" />
     <Compile Include="Assets\KSS.Core\Components\FControlFrame.cs" />
-    <Compile Include="Assets\KSS.Core\IPartObject.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.Core\___KSS.Core.asmdef" />

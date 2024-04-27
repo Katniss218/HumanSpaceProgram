@@ -53,7 +53,7 @@ namespace KSS.UI.SceneFactories
             parent.AddButton( new UILayoutInfo( UIAnchor.Center, (0, 0), (200, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
             {
                 if( _startNewGameWindow == null )
-                    _startNewGameWindow = CanvasManager.Get( CanvasName.WINDOWS ).AddStartNewGameWindow( new UILayoutInfo( UIAnchor.Center, (0, 0), (400f, 400f) ) );
+                    _startNewGameWindow = CanvasManager.Get( CanvasName.WINDOWS ).AddStartNewGameWindow();
             } )
                 .AddText( new UILayoutInfo( UIFill.Fill() ), "Start New Game" )
                 .WithFont( AssetRegistry.Get<TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
