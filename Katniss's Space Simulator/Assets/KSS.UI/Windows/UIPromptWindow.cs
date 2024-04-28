@@ -23,13 +23,13 @@ namespace KSS.UI.Windows
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center );
 
-            UIInputField input = uiWindow.AddInputField( new UILayoutInfo( UIFill.Horizontal( 2, 2 ), UIAnchor.Top, -32, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) )
+            UIInputField<string> input = uiWindow.AddStringInputField( new UILayoutInfo( UIFill.Horizontal( 2, 2 ), UIAnchor.Top, -32, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) )
                 .WithPlaceholder( placeholder )
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
             uiWindow.AddButton( new UILayoutInfo( UIAnchor.BottomRight, (-2, 2), (60, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ), () =>
             {
-                onSubmit?.Invoke( input.Text );
+                onSubmit?.Invoke( input.GetOrDefault( "" ) );
                 uiWindow.Destroy();
             } )
                 .AddText( new UILayoutInfo( UIFill.Fill() ), "Confirm" )

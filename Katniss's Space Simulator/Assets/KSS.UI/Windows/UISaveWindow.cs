@@ -16,8 +16,8 @@ namespace KSS.UI
 
         IUIElementContainer _saveListUI;
 
-        UIInputField _nameInputField;
-        UIInputField _descriptionInputField;
+        UIInputField<string> _nameInputField;
+        UIInputField<string> _descriptionInputField;
 
         void RefreshSaveList()
         {
@@ -49,9 +49,10 @@ namespace KSS.UI
 
         void OnSave()
         {
-            if( _nameInputField.Text != null )
+            if( _nameInputField.TryGetValue( out string Text ) )
             {
-                TimelineManager.BeginSaveAsync( TimelineManager.CurrentTimeline.TimelineID, IOHelper.SanitizeFileName( _nameInputField.Text ), _nameInputField.Text, _descriptionInputField.Text );
+                _descriptionInputField.TryGetValue( out string Description );
+                TimelineManager.BeginSaveAsync( TimelineManager.CurrentTimeline.TimelineID, IOHelper.SanitizeFileName( Text ), Text, Description );
             }
             else
             {
@@ -83,7 +84,7 @@ namespace KSS.UI
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
-            UIInputField inputField = uiWindow.AddInputField( new UILayoutInfo( UIFill.Horizontal( 2, 99 ), UIAnchor.Bottom, 5, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
+            UIInputField<string> inputField = uiWindow.AddStringInputField( new UILayoutInfo( UIFill.Horizontal( 2, 99 ), UIAnchor.Bottom, 5, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
 
             uiWindow._nameInputField = inputField;
             uiWindow._descriptionInputField = inputField;

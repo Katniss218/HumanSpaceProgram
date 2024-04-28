@@ -15,18 +15,21 @@ namespace UnityPlus.UILib.Layout
         public float MarginTop { get; set; }
         public float MarginBottom { get; set; }
 
-        public override void DoLayout( IUIElementContainer c )
+        public override void DoLayout( IUILayoutDriven c )
         {
-            if( c.contents.anchorMin.y != c.contents.anchorMax.y )
+            if( c is IUIElementContainer container )
             {
-                throw new InvalidOperationException( $"Can't fit to size, the container element {c.gameObject.name} fills height." );
+                if( container.contents.anchorMin.y != container.contents.anchorMax.y )
+                {
+                    throw new InvalidOperationException( $"Can't fit to size, the container element {c.gameObject.name} fills height." );
+                }
+
+                Vector2 size = TargetElement.rectTransform.GetActualSize();
+
+                size.y += MarginTop + MarginBottom;
+
+                container.contents.SetSizeWithCurrentAnchors( RectTransform.Axis.Vertical, size.y );
             }
-
-            Vector2 size = TargetElement.rectTransform.GetActualSize();
-
-            size.y += MarginTop + MarginBottom;
-
-            c.contents.SetSizeWithCurrentAnchors( RectTransform.Axis.Vertical, size.y );
         }
     }
 }

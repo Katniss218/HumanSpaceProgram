@@ -44,6 +44,11 @@ namespace KSS.UI.SceneFactories
             seg = bar.InsertSegment( 0, 0.5f );
             seg.Sprite = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/bar" );
             seg.Color = Color.red;
+
+
+            canvas.AddStringInputDropdown( CanvasManager.Get( CanvasName.CONTEXT_MENUS ), new UILayoutInfo( UIAnchor.Center, (0, -300), (200, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ), null, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), null )
+                .WithOptions( new[] { "hello", "hi", "foo", "bar", "baz" } )
+                .WithFont( AssetRegistry.Get<TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
         }
 
         // #-#-#-#-#-#-#-#-#-#

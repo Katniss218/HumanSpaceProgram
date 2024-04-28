@@ -44,7 +44,7 @@ namespace KSS.UI.Windows.PartWindowComponents
             uiIResourceContainer.ReferenceObject = referenceObj;
             uiIResourceContainer._bar = uiValueBar;
 
-            UILayoutManager.BroadcastLayoutUpdate( uiIResourceContainer );
+            UILayoutManager.ForceLayoutUpdate( uiIResourceContainer );
 
             return uiIResourceContainer;
         }

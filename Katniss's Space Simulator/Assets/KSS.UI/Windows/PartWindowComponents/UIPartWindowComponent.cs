@@ -41,7 +41,7 @@ namespace KSS.UI.Windows.PartWindowComponents
             }
             contentPanel.rectTransform.sizeDelta = size;
             _isOpen = !_isOpen;
-            UILayoutManager.BroadcastLayoutUpdate( contentPanel );
+            UILayoutManager.ForceLayoutUpdate( contentPanel );
         }
 
         /// <summary>

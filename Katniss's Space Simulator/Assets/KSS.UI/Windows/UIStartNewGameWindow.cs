@@ -11,14 +11,14 @@ namespace KSS.UI
 {
     public class UIStartNewGameWindow : UIWindow
     {
-        UIInputField _nameInputField;
-        UIInputField _descriptionInputField;
+        UIInputField<string> _nameInputField;
+        UIInputField<string> _descriptionInputField;
 
         public void StartGame()
         {
             SceneLoader.UnloadActiveSceneAsync( () => SceneLoader.LoadSceneAsync( GameplaySceneManager.SCENE_NAME, true, false, () =>
             {
-                TimelineManager.CreateNew( IOHelper.SanitizeFileName( _nameInputField.Text ), SaveMetadata.PERSISTENT_SAVE_ID, _nameInputField.Text, _descriptionInputField.Text );
+                TimelineManager.CreateNew( IOHelper.SanitizeFileName( _nameInputField.GetOrDefault( "" ) ), SaveMetadata.PERSISTENT_SAVE_ID, _nameInputField.GetOrDefault( "" ), _descriptionInputField.GetOrDefault( "" ) );
             } ) );
         }
 
@@ -38,13 +38,13 @@ namespace KSS.UI
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Right );
 
-            UIInputField inputField = uiWindow.AddInputField( new UILayoutInfo( UIFill.Horizontal( 154, 2 ), UIAnchor.Top, -32, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
+            UIInputField<string> inputField = uiWindow.AddStringInputField( new UILayoutInfo( UIFill.Horizontal( 154, 2 ), UIAnchor.Top, -32, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
 
             uiWindow.AddText( new UILayoutInfo( UIAnchor.TopLeft, (2, -32 - 17), (150, 15) ), "Timeline Description" )
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Right );
 
-            UIInputField inputField2 = uiWindow.AddInputField( new UILayoutInfo( UIFill.Horizontal( 154, 2 ), UIAnchor.Top, -32 - 17, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
+            UIInputField<string> inputField2 = uiWindow.AddStringInputField( new UILayoutInfo( UIFill.Horizontal( 154, 2 ), UIAnchor.Top, -32 - 17, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
 
 
             uiWindow.AddButton( new UILayoutInfo( UIAnchor.Bottom, (0, 2), (100, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), uiWindow.StartGame )

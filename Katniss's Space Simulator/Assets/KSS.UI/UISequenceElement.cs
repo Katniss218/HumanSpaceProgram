@@ -38,7 +38,7 @@ namespace KSS.UI
                 _list.AddSequenceAction( new UILayoutInfo( UIAnchor.TopLeft, 0, (20, 20) ) );
             }
 
-            UILayoutManager.BroadcastLayoutUpdate( this );
+            UILayoutManager.ForceLayoutUpdate( this );
         }
 
         protected internal static T Create<T>( IUIElementContainer parent, UILayoutInfo layout, SequenceElement element, string header ) where T : UISequenceElement

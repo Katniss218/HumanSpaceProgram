@@ -37,6 +37,7 @@ namespace UnityPlus.UILib
             if( _isLayoutStale )
             {
                 // TODO - rebuild.
+                // Cascade the rebuild from all UICanvases.
 
                 _isLayoutStale = false;
             }
@@ -86,9 +87,13 @@ namespace UnityPlus.UILib
             }
         }
 
-        public static void BroadcastLayoutUpdate( IUIElement elem )
+        /// <summary>
+        /// Forces an immediate layout update starting with the specified element.
+        /// </summary>
+        /// <param name="startingElement">The element that'll update first. The update will cascade from there.</param>
+        public static void ForceLayoutUpdate( IUIElement startingElement )
         {
-            BroadcastLayoutUpdateRecursive( new HashSet<IUIElement>(), elem );
+            BroadcastLayoutUpdateRecursive( new HashSet<IUIElement>(), startingElement );
         }
     }
 }

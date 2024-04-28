@@ -177,7 +177,7 @@ namespace KSS.UI.SceneFactories
             UIButton controlSetupWindow = buttonListPanel.AddButton( new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
             UIButton button3 = buttonListPanel.AddButton( new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
 
-            UILayoutManager.BroadcastLayoutUpdate( buttonListPanel );
+            UILayoutManager.ForceLayoutUpdate( buttonListPanel );
         }
     }
 }

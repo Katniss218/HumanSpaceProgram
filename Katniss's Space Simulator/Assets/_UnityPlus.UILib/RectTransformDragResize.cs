@@ -185,6 +185,12 @@ namespace UnityPlus.UILib
                 }
             }
 
+            float min = 2 * Padding;
+            Vector2 size = rectTransform.sizeDelta;
+            size.x = size.x < min ? min : size.x;
+            size.y = size.y < min ? min : size.y;
+            rectTransform.sizeDelta = size;
+
             if( _dragState != ResizeDragMode.None )
             {
                 OnDragging?.Invoke();

@@ -7,8 +7,12 @@ using UnityEngine;
 
 namespace UnityPlus.UILib.UIElements
 {
-    public interface IUIElement : IComponent
+    public interface IUIElement
     {
+        Transform transform { get; }
+
+        GameObject gameObject { get; }
+
         /// <summary>
         /// The 'root' transform of this UI element.
         /// </summary>

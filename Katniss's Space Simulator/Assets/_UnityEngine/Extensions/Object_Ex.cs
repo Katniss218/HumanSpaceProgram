@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace UnityEngine
 {
-    public static class ObjectEx
+    public static class Object_Ex
     {
         /// <summary>
-        /// Checks whether an object should be treated as if it's null.
+        /// Checks whether an object is a <see cref="UnityEngine.Object"/> that has been destroyed.
         /// </summary>
         /// <remarks>
         /// Unassigned Unity objects are not truly null, UnityEngine.Object overrides the `==` operator to make empty references equal to null.

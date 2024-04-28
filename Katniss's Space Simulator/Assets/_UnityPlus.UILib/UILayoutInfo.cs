@@ -336,5 +336,23 @@ namespace UnityPlus.UILib
             anchoredPosition = new Vector2( 0.0f, posY );
             sizeDelta = new Vector2( 0.0f, height );
         }
+
+        public UILayoutInfo( UIFillHorizontal fillHorizontal, UIFillPercentVertical fillVertical )
+        {
+            anchorMin = new Vector2( 0.0f, fillVertical.bottom );
+            anchorMax = new Vector2( 1.0f, 1.0f - fillVertical.top ); // since we want to input percent from each edge, we need to invert the max anchor.
+            pivot = new Vector2( 0.5f, 0.5f );
+            anchoredPosition = new Vector2( (fillHorizontal.left - fillHorizontal.right) / 2, 0.0f );
+            sizeDelta = new Vector2( -(fillHorizontal.left + fillHorizontal.right), 0.0f );
+        }
+
+        public UILayoutInfo( UIFillPercentHorizontal fillHorizontal, UIFillVertical fillVertical )
+        {
+            anchorMin = new Vector2( fillHorizontal.left, 0.0f );
+            anchorMax = new Vector2( 1.0f - fillHorizontal.right, 1.0f ); // since we want to input percent from each edge, we need to invert the max anchor.
+            pivot = new Vector2( 0.5f, 0.5f );
+            anchoredPosition = new Vector2( 0.0f, (fillVertical.bottom - fillVertical.top) / 2 );
+            sizeDelta = new Vector2( 0.0f, -(fillVertical.top + fillVertical.bottom) );
+        }
     }
 }

@@ -23,7 +23,7 @@ namespace UnityPlus.UILib.UIElements
             set
             {
                 textComponent.text = value;
-                UILayoutManager.BroadcastLayoutUpdate( this );
+                UILayoutManager.ForceLayoutUpdate( this );
             }
         }
 

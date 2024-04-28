@@ -23,7 +23,7 @@ namespace KSS.UI.SceneFactories
     public static class DesignSceneUIFactory
     {
         public static UIPanel _toolOptionsPanel;
-        public static UIInputField _vesselNameIF;
+        public static UIInputField<string> _vesselNameIF;
 
         [HSPEventListener( HSPEvent.STARTUP_DESIGN, HSPEvent.NAMESPACE_VANILLA + ".design_scene_ui" )]
         public static void Create()
@@ -46,7 +46,7 @@ namespace KSS.UI.SceneFactories
         [HSPEventListener( HSPEvent.DESIGN_AFTER_LOAD, HSPEvent.NAMESPACE_VANILLA + ".update_current" )]
         private static void OnAfterVesselLoad( object e )
         {
-            _vesselNameIF.Text = DesignObjectManager.CurrentVesselMetadata.Name;
+            _vesselNameIF.SetValue( DesignObjectManager.CurrentVesselMetadata.Name );
         }
 
         private static void CreateTopPanel( UICanvas canvas )
@@ -73,18 +73,18 @@ namespace KSS.UI.SceneFactories
                 } );
             } );
             UIPanel p2 = topPanel.AddPanel( new UILayoutInfo( UIAnchor.Center, UIFill.Vertical(), 0, 300 ), null );
-            _vesselNameIF = p2.AddInputField( new UILayoutInfo( UIAnchor.Center, UIFill.Vertical(), 0, 300 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) )
+            _vesselNameIF = p2.AddStringInputField( new UILayoutInfo( UIAnchor.Center, UIFill.Vertical(), 0, 300 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) )
                 .WithMargins( 5, 5, 5, 5 )
                 .WithPlaceholder( "vessel's name..." );
-            _vesselNameIF.SetOnTextChange( s =>
+            _vesselNameIF.OnValueChanged += e =>
             {
-                DesignObjectManager.CurrentVesselMetadata = new VesselMetadata( IOHelper.SanitizeFileName( s ) )
+                DesignObjectManager.CurrentVesselMetadata = new VesselMetadata( IOHelper.SanitizeFileName( e.NewValue ) )
                 {
-                    Name = s,
+                    Name = e.NewValue,
                     Description = DesignObjectManager.CurrentVesselMetadata?.Description,
                     Author = DesignObjectManager.CurrentVesselMetadata?.Author
                 };
-            } );
+            };
             UIPanel p3 = topPanel.AddPanel( new UILayoutInfo( UIAnchor.Center, UIFill.Vertical(), 190, 60 ), null );
             UIButton undoBtn = p3.AddButton( new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_undo" ), null );
             UIButton redoBtn = p3.AddButton( new UILayoutInfo( UIAnchor.BottomLeft, (32, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_redo" ), null );
@@ -168,7 +168,7 @@ namespace KSS.UI.SceneFactories
             } );
             UIButton button3 = buttonListPanel.AddButton( new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
 
-            UILayoutManager.BroadcastLayoutUpdate( buttonListPanel );
+            UILayoutManager.ForceLayoutUpdate( buttonListPanel );
         }
     }
 }

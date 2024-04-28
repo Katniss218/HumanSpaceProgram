@@ -10,8 +10,6 @@ namespace UnityEngine
 
         GameObject gameObject { get; }
 
-        string tag { get; set; }
-
         // The rest of the methods and fields defined by Unity can be added too, but I didn't bother.
 
         // NOTES TO IMPLEMENTERS:

@@ -42,7 +42,7 @@ namespace KSS.UI
 
             descriptionText.FitToContents = true;
 
-            UILayoutManager.BroadcastLayoutUpdate( uiSaveMetadata );
+            UILayoutManager.ForceLayoutUpdate( uiSaveMetadata );
 
             return uiSaveMetadata;
         }

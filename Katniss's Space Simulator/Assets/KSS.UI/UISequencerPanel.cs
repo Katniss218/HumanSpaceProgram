@@ -47,7 +47,7 @@ namespace KSS.UI
                 num++;
             }
 
-            UILayoutManager.BroadcastLayoutUpdate( this );
+            UILayoutManager.ForceLayoutUpdate( this );
         }
 
         private void OnDestroy()

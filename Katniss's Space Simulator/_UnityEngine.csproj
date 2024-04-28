@@ -71,8 +71,9 @@
     <Compile Include="Assets\_UnityEngine\Matrix4x4Dbl.cs" />
     <Compile Include="Assets\_UnityEngine\Matrix3x3.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\Vector3_Ex.cs" />
-    <Compile Include="Assets\_UnityEngine\Extensions\ObjectEx.cs" />
+    <Compile Include="Assets\_UnityEngine\Extensions\Object_Ex.cs" />
     <Compile Include="Assets\_UnityEngine\MathD.cs" />
+    <Compile Include="Assets\_UnityEngine\MonoBehaviourProxy.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\Matrix3x3_Ex.cs" />
     <Compile Include="Assets\_UnityEngine\SingletonMonoBehaviour.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\QuaternionDbl_Ex.cs" />

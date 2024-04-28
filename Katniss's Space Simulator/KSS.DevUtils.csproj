@@ -62,7 +62,11 @@
     <Compile Include="Assets\KSS.DevUtils\AIRFRotationFixer.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\KSS.DevUtils\WireframeSimpleQuad.shader" />
     <None Include="Assets\KSS.DevUtils\___KSS.DevUtils.asmdef" />
+    <None Include="Assets\KSS.DevUtils\Wireframe.shader" />
+    <None Include="Assets\KSS.DevUtils\WireframeQuad.shader" />
+    <None Include="Assets\KSS.DevUtils\WireframeSimple.shader" />
     <None Include="Assets\KSS.DevUtils\ComputeNormalMap.compute" />
   </ItemGroup>
   <ItemGroup>

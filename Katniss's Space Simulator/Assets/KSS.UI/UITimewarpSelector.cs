@@ -139,7 +139,7 @@ namespace KSS.UI
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Left )
                 .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
 
-            UILayoutManager.BroadcastLayoutUpdate( this );
+            UILayoutManager.ForceLayoutUpdate( this );
         }
 
         protected internal static T Create<T>( IUIElementContainer parent, UILayoutInfo layout, IEnumerable<float> warpRates ) where T : UITimewarpSelector
