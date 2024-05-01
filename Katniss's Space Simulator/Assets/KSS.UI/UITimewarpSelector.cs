@@ -135,9 +135,8 @@ namespace KSS.UI
                 ? $"Paused"
                 : $"{currentWarpRate}x";
 
-            _text = this.AddText( new UILayoutInfo( UIAnchor.Left, UIFill.Vertical(), 0, 50f ), rateText )
-                .WithAlignment( TMPro.HorizontalAlignmentOptions.Left )
-                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
+            _text = this.AddStdText( new UILayoutInfo( UIAnchor.Left, UIFill.Vertical(), 0, 50f ), rateText )
+                .WithAlignment( TMPro.HorizontalAlignmentOptions.Left );
 
             UILayoutManager.ForceLayoutUpdate( this );
         }

@@ -138,15 +138,15 @@ namespace KSS.UI.SceneFactories
                 }
                 if( toolType == typeof( TranslateTool ) )
                 {
-                    UIText t = _toolOptionsPanel.AddText( new UILayoutInfo( UIFill.Fill() ), "translate" );
+                    UIText t = _toolOptionsPanel.AddStdText( new UILayoutInfo( UIFill.Fill() ), "translate" );
                 }
                 if( toolType == typeof( RotateTool ) )
                 {
-                    UIText t = _toolOptionsPanel.AddText( new UILayoutInfo( UIFill.Fill() ), "rotate" );
+                    UIText t = _toolOptionsPanel.AddStdText( new UILayoutInfo( UIFill.Fill() ), "rotate" );
                 }
                 if( toolType == typeof( RerootTool ) )
                 {
-                    UIText t = _toolOptionsPanel.AddText( new UILayoutInfo( UIFill.Fill() ), "reroot" );
+                    UIText t = _toolOptionsPanel.AddStdText( new UILayoutInfo( UIFill.Fill() ), "reroot" );
                 }
             }
         }

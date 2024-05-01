@@ -9,7 +9,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <ProjectGuid>{43C42401-C6C3-28EB-5BC7-32F0B5CC16C2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -65,6 +66,7 @@
     <Compile Include="Assets\KSS.UI\UITimelineMetadata.cs" />
     <Compile Include="Assets\KSS.UI\ControlSetupControlGroupUI.cs" />
     <Compile Include="Assets\KSS.UI\UITextReadout_Altitude.cs" />
+    <Compile Include="Assets\KSS.UI\Extensions\UIText_Ex.cs" />
     <Compile Include="Assets\KSS.UI\Windows\UIPartWindow.cs" />
     <Compile Include="Assets\KSS.UI\ControlSetupControlUI.cs" />
     <Compile Include="Assets\KSS.UI\ControlSetupWindowComponentUI.cs" />
@@ -74,6 +76,7 @@
     <Compile Include="Assets\KSS.UI\UISequenceElement.cs" />
     <Compile Include="Assets\KSS.UI\SceneFactories\GameplaySceneUIFactory.cs" />
     <Compile Include="Assets\KSS.UI\Windows\PartWindowComponents\UIPartWindowComponent.cs" />
+    <Compile Include="Assets\KSS.UI\Extensions\UIDefaults.cs" />
     <Compile Include="Assets\KSS.UI\UISequenceAction.cs" />
     <Compile Include="Assets\KSS.UI\UILineRenderer.cs" />
     <Compile Include="Assets\KSS.UI\UIPartListEntry.cs" />

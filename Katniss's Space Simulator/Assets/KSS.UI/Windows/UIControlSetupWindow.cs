@@ -327,8 +327,8 @@ namespace KSS.UI.Windows
                         window.ShowComponent( component );
                     }
                 } )
-                    .AddText( new UILayoutInfo( UIFill.Fill() ), component.GetType().Name )
-                    .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, window._visibleComponents.ContainsKey( component ) ? Color.white : Color.green );
+                    .AddStdText( new UILayoutInfo( UIFill.Fill() ), component.GetType().Name )
+                    .WithFontColor( window._visibleComponents.ContainsKey( component ) ? Color.white : Color.green );
 
                 currentY -= 15f;
             }

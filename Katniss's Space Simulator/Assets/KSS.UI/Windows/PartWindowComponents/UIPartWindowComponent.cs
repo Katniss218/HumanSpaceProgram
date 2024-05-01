@@ -51,7 +51,7 @@ namespace KSS.UI.Windows.PartWindowComponents
         {
             T uiPaw = UIPanel.Create<T>( parent, new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Top, 0, default ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/functionality_panel" ) );
 
-            UIText title = uiPaw.AddText( new UILayoutInfo( UIFill.Horizontal( 25, 60 ), UIAnchor.Top, 0, 15 ), "" );
+            UIText title = uiPaw.AddStdText( new UILayoutInfo( UIFill.Horizontal( 25, 60 ), UIAnchor.Top, 0, 15 ), "" );
 
             UIButton collapseToggleButton = uiPaw.AddButton( new UILayoutInfo( UIAnchor.TopRight, (-20, 0), (15, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_up" ), uiPaw.ToggleOpen );
             

@@ -19,8 +19,7 @@ namespace KSS.UI.Windows
                 .Focusable()
             .WithCloseButton( new UILayoutInfo( UIAnchor.TopRight, (-7, -5), (20, 20) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ );
 
-            uiWindow.AddText( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Top, 0, 30 ), title )
-                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
+            uiWindow.AddStdText( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Top, 0, 30 ), title )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center );
 
             UIInputField<string> input = uiWindow.AddStringInputField( new UILayoutInfo( UIFill.Horizontal( 2, 2 ), UIAnchor.Top, -32, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) )
@@ -32,8 +31,7 @@ namespace KSS.UI.Windows
                 onSubmit?.Invoke( input.GetOrDefault( "" ) );
                 uiWindow.Destroy();
             } )
-                .AddText( new UILayoutInfo( UIFill.Fill() ), "Confirm" )
-                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
+                .AddStdText( new UILayoutInfo( UIFill.Fill() ), "Confirm" )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center, TMPro.VerticalAlignmentOptions.Middle );
 
             return uiWindow;

@@ -44,11 +44,6 @@ namespace KSS.UI.SceneFactories
             seg = bar.InsertSegment( 0, 0.5f );
             seg.Sprite = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/bar" );
             seg.Color = Color.red;
-
-
-            canvas.AddStringInputDropdown( CanvasManager.Get( CanvasName.CONTEXT_MENUS ), new UILayoutInfo( UIAnchor.Center, (0, -300), (200, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ), null, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), null )
-                .WithOptions( new[] { "hello", "hi", "foo", "bar", "baz" } )
-                .WithFont( AssetRegistry.Get<TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
         }
 
         // #-#-#-#-#-#-#-#-#-#
@@ -60,8 +55,7 @@ namespace KSS.UI.SceneFactories
                 if( _startNewGameWindow == null )
                     _startNewGameWindow = CanvasManager.Get( CanvasName.WINDOWS ).AddStartNewGameWindow();
             } )
-                .AddText( new UILayoutInfo( UIFill.Fill() ), "Start New Game" )
-                .WithFont( AssetRegistry.Get<TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
+                .AddStdText( new UILayoutInfo( UIFill.Fill() ), "Start New Game" )
                 .WithAlignment( HorizontalAlignmentOptions.Center );
         }
 
@@ -72,8 +66,7 @@ namespace KSS.UI.SceneFactories
                 if( _loadWindow == null )
                     _loadWindow = CanvasManager.Get( CanvasName.WINDOWS ).AddLoadWindow( new UILayoutInfo( UIAnchor.Center, (0, 0), (350f, 400f) ) );
             } )
-                .AddText( new UILayoutInfo( UIFill.Fill() ), "Load Game" )
-                .WithFont( AssetRegistry.Get<TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
+                .AddStdText( new UILayoutInfo( UIFill.Fill() ), "Load Game" )
                 .WithAlignment( HorizontalAlignmentOptions.Center );
         }
 
@@ -83,8 +76,7 @@ namespace KSS.UI.SceneFactories
             {
                 SceneLoader.UnloadActiveSceneAsync( () => SceneLoader.LoadSceneAsync( DesignSceneManager.SCENE_NAME, true, false, null ) );
             } )
-                .AddText( new UILayoutInfo( UIFill.Fill() ), "Design a Rocket" )
-                .WithFont( AssetRegistry.Get<TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
+                .AddStdText( new UILayoutInfo( UIFill.Fill() ), "Design a Rocket" )
                 .WithAlignment( HorizontalAlignmentOptions.Center );
         }
 
@@ -95,8 +87,7 @@ namespace KSS.UI.SceneFactories
                 SceneLoader.UnloadActiveSceneAsync( () => SceneLoader.LoadSceneAsync( EditorSceneManager.SCENE_NAME, true, false, null ) );
             } )
                 .Disabled()
-                .AddText( new UILayoutInfo( UIFill.Fill() ), "Part Editor" )
-                .WithFont( AssetRegistry.Get<TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
+                .AddStdText( new UILayoutInfo( UIFill.Fill() ), "Part Editor" )
                 .WithAlignment( HorizontalAlignmentOptions.Center );
         }
 
@@ -104,8 +95,7 @@ namespace KSS.UI.SceneFactories
         {
             parent.AddButton( new UILayoutInfo( UIAnchor.Center, (0, -200), (200, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), null )
                 .Disabled()
-                .AddText( new UILayoutInfo( UIFill.Fill() ), "Settings" )
-                .WithFont( AssetRegistry.Get<TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
+                .AddStdText( new UILayoutInfo( UIFill.Fill() ), "Settings" )
                 .WithAlignment( HorizontalAlignmentOptions.Center );
         }
 
@@ -119,8 +109,7 @@ namespace KSS.UI.SceneFactories
                 Application.Quit();
 #endif
             } )
-                .AddText( new UILayoutInfo( UIFill.Fill() ), "Exit" )
-                .WithFont( AssetRegistry.Get<TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
+                .AddStdText( new UILayoutInfo( UIFill.Fill() ), "Exit" )
                 .WithAlignment( HorizontalAlignmentOptions.Center );
         }
     }

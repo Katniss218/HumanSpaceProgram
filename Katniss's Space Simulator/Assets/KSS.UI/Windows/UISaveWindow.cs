@@ -71,18 +71,16 @@ namespace KSS.UI
                 .Resizeable()
                 .WithCloseButton( new UILayoutInfo( UIAnchor.TopRight, (-7, -5), (20, 20) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ );
 
-            uiWindow.AddText( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Top, 0, 30 ), "Save..." )
-                .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
-                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
+            uiWindow.AddStdText( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Top, 0, 30 ), "Save..." )
+                .WithAlignment( TMPro.HorizontalAlignmentOptions.Center );
 
             UIScrollView saveScrollView = uiWindow.AddVerticalScrollView( new UILayoutInfo( UIFill.Fill( 2, 2, 30, 22 ) ), 75 )
                 .WithVerticalScrollbar( UIAnchor.Right, 10, null, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_handle" ), out UIScrollBar scrollbar );
 
             UIButton saveBtn = uiWindow.AddButton( new UILayoutInfo( UIAnchor.BottomRight, (-2, 5), (95, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), uiWindow.OnSave );
 
-            saveBtn.AddText( new UILayoutInfo( UIFill.Fill() ), "Save" )
-                .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
-                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
+            saveBtn.AddStdText( new UILayoutInfo( UIFill.Fill() ), "Save" )
+                .WithAlignment( TMPro.HorizontalAlignmentOptions.Center );
 
             UIInputField<string> inputField = uiWindow.AddStringInputField( new UILayoutInfo( UIFill.Horizontal( 2, 99 ), UIAnchor.Bottom, 5, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
 

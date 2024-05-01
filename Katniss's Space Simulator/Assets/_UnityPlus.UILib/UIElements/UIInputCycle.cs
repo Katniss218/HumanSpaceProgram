@@ -94,7 +94,7 @@ namespace UnityPlus.UILib.UIElements
             }
         }
 
-        protected internal static T Create<T>( IUIElementContainer parent, UILayoutInfo layout, (TValue v, Sprite sprite)[] options ) where T : UIInputCycle<TValue>
+        protected internal static T Create<T>( IUIElementContainer parent, UILayoutInfo layout, Sprite background ) where T : UIInputCycle<TValue>
         {
             (GameObject rootGameObject, RectTransform rootTransform, T uiInputCycle) = UIElementNonMonobehaviour.CreateUIGameObject<T>( parent, $"uilib-{typeof( T ).Name}", layout );
 
@@ -113,7 +113,7 @@ namespace UnityPlus.UILib.UIElements
                 disabledColor = Color.gray
             };
 
-            uiInputCycle.options = options;
+            uiInputCycle.options = new (TValue v, Sprite sprite)[] { (default, background) };
             uiInputCycle.current = 0;
 
             return uiInputCycle;

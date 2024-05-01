@@ -81,7 +81,7 @@ namespace KSS.UI
             dragger.UITransform = panel.rectTransform;
             dragger.OnDragging = node.OnDragged;
 
-            UIText text = panel.AddText( new UILayoutInfo( UIFill.Horizontal( 5, 5 ), UIAnchor.Top, 0, 20 ), component.GetType().Name );
+            UIText text = panel.AddStdText( new UILayoutInfo( UIFill.Horizontal( 5, 5 ), UIAnchor.Top, 0, 20 ), component.GetType().Name );
 
             panel.AddButton( new UILayoutInfo( UIAnchor.TopRight, (0, 0), (20, 20) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_node_close" ), () =>
             {

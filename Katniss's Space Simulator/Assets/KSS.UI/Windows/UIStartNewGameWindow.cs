@@ -29,27 +29,23 @@ namespace KSS.UI
                 .Focusable()
                 .WithCloseButton( new UILayoutInfo( UIAnchor.TopRight, (-7, -5), (20, 20) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ );
 
-            uiWindow.AddText( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Top, 0, 30 ), "Start New Game..." )
-                .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
-                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
+            uiWindow.AddStdText( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Top, 0, 30 ), "Start New Game..." )
+                .WithAlignment( TMPro.HorizontalAlignmentOptions.Center );
 
 
-            uiWindow.AddText( new UILayoutInfo( UIAnchor.TopLeft, (2, -32), (150, 15) ), "Timeline Name" )
-                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
+            uiWindow.AddStdText( new UILayoutInfo( UIAnchor.TopLeft, (2, -32), (150, 15) ), "Timeline Name" )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Right );
 
             UIInputField<string> inputField = uiWindow.AddStringInputField( new UILayoutInfo( UIFill.Horizontal( 154, 2 ), UIAnchor.Top, -32, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
 
-            uiWindow.AddText( new UILayoutInfo( UIAnchor.TopLeft, (2, -32 - 17), (150, 15) ), "Timeline Description" )
-                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
+            uiWindow.AddStdText( new UILayoutInfo( UIAnchor.TopLeft, (2, -32 - 17), (150, 15) ), "Timeline Description" )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Right );
 
             UIInputField<string> inputField2 = uiWindow.AddStringInputField( new UILayoutInfo( UIFill.Horizontal( 154, 2 ), UIAnchor.Top, -32 - 17, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
 
 
             uiWindow.AddButton( new UILayoutInfo( UIAnchor.Bottom, (0, 2), (100, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), uiWindow.StartGame )
-                .AddText( new UILayoutInfo( UIFill.Fill() ), "Start" )
-                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white )
+                .AddStdText( new UILayoutInfo( UIFill.Fill() ), "Start" )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center );
 
             uiWindow._nameInputField = inputField;

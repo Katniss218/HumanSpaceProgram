@@ -106,9 +106,8 @@ namespace KSS.UI
                 .Resizeable()
                 .WithCloseButton( new UILayoutInfo( UIAnchor.TopRight, (-7, -5), (20, 20) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_x_gold_large" ), out _ );
 
-            uiWindow.AddText( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Top, 0, 30 ), "Load..." )
-                .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
-                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
+            uiWindow.AddStdText( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Top, 0, 30 ), "Load..." )
+                .WithAlignment( TMPro.HorizontalAlignmentOptions.Center );
 
             UIScrollView timelineList = uiWindow.AddVerticalScrollView( new UILayoutInfo( UIFill.HorizontalPercent( 0, 0.6667f ), UIFill.Vertical( 32, 19 ) ), 100 )
                 .WithVerticalScrollbar( UIAnchor.Right, 10, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_vertical_background" ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_vertical" ), out _ );
@@ -122,9 +121,8 @@ namespace KSS.UI
 
             UIButton loadButton = uiWindow.AddButton( new UILayoutInfo( UIAnchor.Bottom, (0, 2), (100, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ), uiWindow.OnLoad );
 
-            loadButton.AddText( new UILayoutInfo( UIFill.Fill() ), "Load" )
-                .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
-                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
+            loadButton.AddStdText( new UILayoutInfo( UIFill.Fill() ), "Load" )
+                .WithAlignment( TMPro.HorizontalAlignmentOptions.Center );
 
             uiWindow._timelineListUI = timelineList;
             uiWindow._saveListUI = saveList;

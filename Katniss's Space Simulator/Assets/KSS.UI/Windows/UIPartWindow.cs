@@ -114,9 +114,8 @@ namespace KSS.UI.Windows
 
             // masses/etc can be summed up from components in children of reference part.
 
-            partWindow.AddText( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Top, 0, 30 ), part.Name )
-                .WithAlignment( TMPro.HorizontalAlignmentOptions.Center )
-                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
+            partWindow.AddStdText( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Top, 0, 30 ), part.Name )
+                .WithAlignment( TMPro.HorizontalAlignmentOptions.Center );
 
             UIScrollView scrollView = partWindow.AddVerticalScrollView( new UILayoutInfo( UIFill.Fill( 2, 2, 75, 15 ) ), 200 )
                 .WithVerticalScrollbar( UIAnchor.Right, 10, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_vertical_background" ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_vertical" ), out _ );

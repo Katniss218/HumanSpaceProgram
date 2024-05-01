@@ -78,10 +78,8 @@ namespace KSS.UI
         {
             UITooltip contextMenu = ((RectTransform)this.transform).CreateTooltip( CanvasManager.Get( CanvasName.CURSOR ), new UILayoutInfo( UIAnchor.TopLeft, (0, 0), (250, 60) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/panel_tooltip" ) );
 
-            contextMenu.AddText( new UILayoutInfo( UIFill.Horizontal( 5, 5 ), UIAnchor.Top, 0, 30 ), this._attr.Name )
-                    .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 16, Color.white );
-            contextMenu.AddText( new UILayoutInfo( UIFill.Horizontal( 5, 5 ), UIAnchor.Top, -30, 30 ), this._attr.Description )
-                    .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
+            contextMenu.AddStdText( new UILayoutInfo( UIFill.Horizontal( 5, 5 ), UIAnchor.Top, 0, 30 ), this._attr.Name );
+            contextMenu.AddStdText( new UILayoutInfo( UIFill.Horizontal( 5, 5 ), UIAnchor.Top, -30, 30 ), this._attr.Description );
         }
 
         internal static ControlSetupControlUI Create( ControlSetupControlGroupUI group, float verticalOffset, Control.Control control, NamedControlAttribute attr )
@@ -109,7 +107,7 @@ namespace KSS.UI
             UIIcon icon = panel.AddIcon( new UILayoutInfo( (side, 1.0f), (0, 0), (ControlSetupControlGroupUI.ROW_HEIGHT, ControlSetupControlGroupUI.ROW_HEIGHT) ), sprite )
                 .Raycastable(true);
 
-            UIText name = panel.AddText( new UILayoutInfo( UIFill.Horizontal( (1 - side) * ControlSetupControlGroupUI.ROW_HEIGHT, side * ControlSetupControlGroupUI.ROW_HEIGHT ), UIAnchor.Top, 0, ControlSetupControlGroupUI.ROW_HEIGHT ), attr.Name )
+            UIText name = panel.AddStdText( new UILayoutInfo( UIFill.Horizontal( (1 - side) * ControlSetupControlGroupUI.ROW_HEIGHT, side * ControlSetupControlGroupUI.ROW_HEIGHT ), UIAnchor.Top, 0, ControlSetupControlGroupUI.ROW_HEIGHT ), attr.Name )
                 .WithAlignment( side == 0 ? TMPro.HorizontalAlignmentOptions.Left : TMPro.HorizontalAlignmentOptions.Right );
 
             ControlSetupControlUI controlUI = icon.gameObject.AddComponent<ControlSetupControlUI>();

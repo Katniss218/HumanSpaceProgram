@@ -32,13 +32,11 @@ namespace KSS.UI
             uiSaveMetadata.Save = save;
             uiSaveMetadata.onClick = onClick;
 
-            UIText nameText = uiSaveMetadata.AddText( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Bottom, 0, 0.5f ), save.Name )
-                    .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
+            UIText nameText = uiSaveMetadata.AddStdText( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Bottom, 0, 0.5f ), save.Name );
 
             nameText.FitToContents = true;
 
-            UIText descriptionText = uiSaveMetadata.AddText( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Bottom, 0.5f, 0f ), save.Description )
-                    .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
+            UIText descriptionText = uiSaveMetadata.AddStdText( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Bottom, 0.5f, 0f ), save.Description );
 
             descriptionText.FitToContents = true;
 

@@ -28,13 +28,14 @@ namespace UnityPlus.UILib.UIElements
 
         public Vector2 Offset { get => trackerComponent.Offset; set => trackerComponent.Offset = value; }
 
+        public bool AllowClickDestroy { get; set; }
+
+        private bool _isPointerExited = true;
+
         void OnDestroy()
         {
             OnHide?.Invoke();
         }
-
-        private bool _isPointerExited = true;
-        public bool AllowClickDestroy { get; set; }
 
         void LateUpdate()
         {

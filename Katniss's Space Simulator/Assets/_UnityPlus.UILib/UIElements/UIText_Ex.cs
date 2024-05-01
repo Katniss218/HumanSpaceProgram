@@ -30,6 +30,30 @@ namespace UnityPlus.UILib.UIElements
             return this;
         }
 
+        public UIText WithFont( TMPro.TMP_FontAsset font )
+        {
+            var textComponent = this.textComponent;
+            textComponent.font = font;
+
+            return this;
+        }
+        
+        public UIText WithFontSize( float fontSize )
+        {
+            var textComponent = this.textComponent;
+            textComponent.fontSize = fontSize;
+
+            return this;
+        }
+        
+        public UIText WithFontColor( Color color )
+        {
+            var textComponent = this.textComponent;
+            textComponent.color = color;
+
+            return this;
+        }
+
         public UIText WithAlignment( TMPro.HorizontalAlignmentOptions horizontalAlignment )
         {
             this.textComponent.horizontalAlignment = horizontalAlignment;

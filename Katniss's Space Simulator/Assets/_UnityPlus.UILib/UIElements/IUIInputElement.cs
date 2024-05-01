@@ -10,6 +10,9 @@ namespace UnityPlus.UILib.UIElements
     {
         public class ValueChangedEventData
         {
+            /// <summary>
+            /// True if the new value exists.
+            /// </summary>
             public bool HasValue { get; set; }
             public TValue NewValue { get; set; }
 
@@ -33,7 +36,7 @@ namespace UnityPlus.UILib.UIElements
         }
 
         /// <summary>
-        /// Called when the value returned by calling <see cref="TryGetValue(out TValue)"/> changes.
+        /// Called when the current value of the input element changes (e.g. because the user selected a different value).
         /// </summary>
         event Action<ValueChangedEventData> OnValueChanged;
 
@@ -44,6 +47,11 @@ namespace UnityPlus.UILib.UIElements
         /// <returns>False if the input element currently doesn't have a value, or the value couldn't be retrieved. Otherwise true.</returns>
         bool TryGetValue( out TValue value );
 
+        /// <summary>
+        /// Gets the current value of the input element (if any), or the specified default value.
+        /// </summary>
+        /// <param name="defaultValue">The default value to return if the input element doesn't have a set value at the current time.</param>
+        /// <returns>The current value of the input element, or the specified default value.</returns>
         TValue GetOrDefault( TValue defaultValue );
     }
 }

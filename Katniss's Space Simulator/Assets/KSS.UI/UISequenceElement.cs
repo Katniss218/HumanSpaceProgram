@@ -45,8 +45,7 @@ namespace KSS.UI
         {
             T uiSequenceElement = UIPanel.Create<T>( parent, layout, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/sequencer_element" ) );
 
-            UIText headerText = uiSequenceElement.AddText( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Top, 0, 20 ), header )
-                    .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
+            UIText headerText = uiSequenceElement.AddStdText( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Top, 0, 20 ), header );
 
             UIPanel list = uiSequenceElement.AddPanel( new UILayoutInfo( UIFill.Horizontal( 3, 3 ), UIAnchor.Top, -22, 20 ), null );
 

@@ -59,6 +59,10 @@ namespace UnityPlus.UILib.UIElements
             return selectedValue.HasValue ? this.options[selectedValue.Value] : defaultValue;
         }
 
+        /// <summary>
+        /// Tries to select the current value from the list of options.
+        /// </summary>
+        /// <param name="index">The index of the option to select.</param>
         public void TrySelect( int index )
         {
             if( index < 0 || index >= options.Length )
@@ -71,7 +75,10 @@ namespace UnityPlus.UILib.UIElements
             OnValueChanged?.Invoke( IUIInputElement<TValue>.ValueChangedEventData.Value( options[selectedValue.Value] ) );
         }
 
-        public void ClearValue()
+        /// <summary>
+        /// Resets the current value.
+        /// </summary>
+        public void ResetValue()
         {
             if( options == null )
                 return;
@@ -99,8 +106,6 @@ namespace UnityPlus.UILib.UIElements
             }
         }
 
-        // TODO - The context menu could alternatively 'stay' until the player clicks somewhere else (input.getkeydown on all possible mouse keys) with any mouse button - instead of disappearing when the mouse exits.
-
         public void OnPointerClick()
         {
             if( this.contextMenu.IsNullOrDestroyed() )
@@ -116,6 +121,7 @@ namespace UnityPlus.UILib.UIElements
                 {
                     if( this.textComponent != null && this.placeholderComponent != null && this.backgroundComponent != null ) // prevents being invoked when scene is destroyed.
                     {
+                        // Set the correct sprite for inactive context menu.
                         this.SyncVisual();
                     }
                 };
