@@ -11,41 +11,66 @@ namespace UnityPlus.Serialization
     /// An arbitrary supported primitive value stored in the tree structure.
     /// </summary>
     public sealed class SerializedPrimitive : SerializedData
-    // any value:
-    // - boolean `true`
-    // - number `123.456`
-    // - string `"string"`
-    // - object `{ serializedObject }`
-    // - array `[ serializedArray ]`
     {
+        /// <summary>
+        /// Stores the actual data of the primitive.
+        /// </summary>
         [StructLayout( LayoutKind.Explicit )]
         internal struct DataContainer
         {
+            // Used to compare different primitives...
             [FieldOffset( 0 )] public Guid equalityValue;
             [FieldOffset( 16 )] public object equalityReference;
 
+            // Used to store the actual value...
+            // We overlap the fields, since the data container can only store a single value at a time.
             [FieldOffset( 0 )] public bool boolean;
             [FieldOffset( 0 )] public long @int;
             [FieldOffset( 0 )] public ulong @uint;
             [FieldOffset( 0 )] public double @float;
             [FieldOffset( 0 )] public decimal @decimal;
-            [FieldOffset( 16 )] public string str; // decimal is a big boi, 16 bytes offset.
+            [FieldOffset( 16 )] public string str; // Reference types can't be overlapped with value types :(, 16 bytes is the size of decimal.
         }
 
+        /// <summary>
+        /// Determines how to access the data inside the <see cref="DataContainer"/>.
+        /// </summary>
         internal enum DataType : byte
         {
-            // 16-byte value types.
-            Invalid = 0,
+            // 16-byte value types below (grouped for equality checking).
 
+            /// <summary>
+            /// The type information is missing or the primitive is malformed.
+            /// </summary>
+            Invalid = 0,
+            /// <summary>
+            /// Either 'true' or 'false'.
+            /// </summary>
             Boolean,
 
+            /// <summary>
+            /// A 64-bit signed integer.
+            /// </summary>
             Int,
+            /// <summary>
+            /// A 64-bit unsigned integer.
+            /// </summary>
             UInt,
 
+            /// <summary>
+            /// A 64-bit IEEE754 floating-point.
+            /// </summary>
             Float,
+            /// <summary>
+            /// An 80-bit floating point with a base-10 exponent.
+            /// </summary>
             Decimal,
 
-            // reference-holding types below, starting at 128.
+            // reference-holding types below (grouped for equality checking).
+
+            /// <summary>
+            /// A sequence of characters of known length.
+            /// </summary>
             String = 128
         }
 
@@ -73,6 +98,11 @@ namespace UnityPlus.Serialization
         public override bool TryGetValue( string name, out SerializedData value )
         {
             throw new NotSupportedException( $"Tried to invoke {nameof( TryGetValue )}, which is not supported on {nameof( SerializedPrimitive )}." );
+        }
+        
+        public override bool TryGetValue<T>( string name, out T value )
+        {
+            throw new NotSupportedException( $"Tried to invoke {nameof( TryGetValue )}<T>, which is not supported on {nameof( SerializedPrimitive )}." );
         }
 
         public override bool Equals( object obj )
@@ -213,8 +243,10 @@ namespace UnityPlus.Serialization
 
         public static bool operator ==( SerializedPrimitive v1, SerializedPrimitive v2 )
         {
-            if( (object)v1 == null ) return (object)v2 == null;
-            if( (object)v2 == null ) return (object)v1 == null;
+            if( (object)v1 == null ) 
+                return (object)v2 == null;
+            if( (object)v2 == null )
+                return (object)v1 == null;
 
             if( v1._type >= DataType.String ) // reference types > 128
             {

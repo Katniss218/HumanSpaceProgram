@@ -15,7 +15,7 @@ namespace KSS.Core.Physics
     [RequireComponent( typeof( RootObjectTransform ) )]
     [RequireComponent( typeof( Rigidbody ) )]
     [DisallowMultipleComponent]
-    public class FreePhysicsObject : MonoBehaviour, IPhysicsObject, IPersistent
+    public class FreePhysicsObject : MonoBehaviour, IPhysicsObject, IPersistsData
     {
         public float Mass
         {
@@ -44,6 +44,27 @@ namespace KSS.Core.Physics
         }
 
         public Vector3 AngularAcceleration { get; private set; }
+
+        public Vector3 MomentsOfInertia => this._rb.inertiaTensor;
+
+		public Matrix3x3 MomentOfInertiaTensor
+		{
+            get
+            {
+                Matrix3x3 R = Matrix3x3.Rotate( this._rb.inertiaTensorRotation );
+                Matrix3x3 S = Matrix3x3.Scale( this._rb.inertiaTensor );
+                return R * S * R.transpose;
+            }
+			set
+			{
+				(Vector3 eigenvector, float eigenvalue)[] eigen = value.Diagonalize().OrderByDescending( m => m.eigenvalue ).ToArray();
+				this._rb.inertiaTensor = new Vector3( eigen[0].eigenvalue, eigen[1].eigenvalue, eigen[2].eigenvalue );
+                Matrix3x3 m = new Matrix3x3( eigen[0].eigenvector.x, eigen[0].eigenvector.y, eigen[0].eigenvector.z,
+                    eigen[1].eigenvector.x, eigen[1].eigenvector.y, eigen[1].eigenvector.z,
+                    eigen[2].eigenvector.x, eigen[2].eigenvector.y, eigen[2].eigenvector.z );
+				this._rb.inertiaTensorRotation = m.rotation;
+			}
+		}
 
         public bool IsColliding { get; private set; }
 
@@ -108,8 +129,8 @@ namespace KSS.Core.Physics
 
             if( IsColliding )
             {
-                this.Acceleration = (Velocity - _oldVelocity) / TimeManager.FixedDeltaTime;
-                this.AngularAcceleration = (AngularVelocity - _oldAngularVelocity) / TimeManager.FixedDeltaTime;
+                this.Acceleration = (Velocity - _oldVelocity) / TimeStepManager.FixedDeltaTime;
+                this.AngularAcceleration = (AngularVelocity - _oldAngularVelocity) / TimeStepManager.FixedDeltaTime;
             }
             else
             {
@@ -155,28 +176,36 @@ namespace KSS.Core.Physics
 
         public SerializedData GetData( IReverseReferenceMap s )
         {
-            return new SerializedObject()
+            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
+
+            ret.AddAll( new SerializedObject()
             {
                 { "mass", this.Mass },
-                { "local_center_of_mass", s.WriteVector3( this.LocalCenterOfMass ) },
-                { "velocity", s.WriteVector3( this.Velocity ) },
-                { "angular_velocity", s.WriteVector3( this.AngularVelocity ) }
-            };
+                { "local_center_of_mass", this.LocalCenterOfMass.GetData() },
+                { "velocity", this.Velocity.GetData() },
+                { "angular_velocity", this.AngularVelocity.GetData() }
+            } );
+
+            return ret;
         }
 
-        public void SetData( IForwardReferenceMap l, SerializedData data )
+        public void SetData( SerializedData data, IForwardReferenceMap l )
         {
+            IPersistent_Behaviour.SetData( this, data, l );
+
+            _rb.isKinematic = false; // FreePhysicsObject is never kinematic. This is needed because it may be called first.
+
             if( data.TryGetValue( "mass", out var mass ) )
                 this.Mass = (float)mass;
 
             if( data.TryGetValue( "local_center_of_mass", out var localCenterOfMass ) )
-                this.LocalCenterOfMass = l.ReadVector3( localCenterOfMass );
+                this.LocalCenterOfMass = localCenterOfMass.ToVector3();
 
             if( data.TryGetValue( "velocity", out var velocity ) )
-                this.Velocity = l.ReadVector3( velocity );
+                this.Velocity = velocity.ToVector3();
 
             if( data.TryGetValue( "angular_velocity", out var angularVelocity ) )
-                this.AngularVelocity = l.ReadVector3( angularVelocity );
+                this.AngularVelocity = angularVelocity.ToVector3();
         }
     }
 }

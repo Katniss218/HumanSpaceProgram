@@ -3,6 +3,7 @@
 [Oo]bj/
 [Bb]uild/
 [Bb]uilds/
+[Bb]in/
 [Uu]ser[Ss]ettings/
 Assets/AssetStoreTools*
 Executable/
@@ -17,6 +18,7 @@ ProfilerExports/
 
 # Recordings can get excessive in size
 [Rr]ecordings/
+**/[Uu]ser[Ss]ettings/
 
 # Visual Studio cache directory
 .vs/

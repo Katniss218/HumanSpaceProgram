@@ -12,13 +12,20 @@ namespace KSS.Core
     /// </summary>
     public interface IHasMass : IComponent
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="massDelta">The difference between the old mass and the new mass, in [kg]. Positive if the mass was increased, negative otherwise.</param>
         public delegate void MassChange( float massDelta );
 
         /// <summary>
-        /// The total mass of the component.
+        /// The mass of the component, in [kg].
         /// </summary>
         float Mass { get; }
 
+        /// <summary>
+        /// Invoked after the mass of the component is changed.
+        /// </summary>
         event MassChange OnAfterMassChanged;
     }
 }

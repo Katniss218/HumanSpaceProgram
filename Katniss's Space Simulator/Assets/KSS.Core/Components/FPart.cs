@@ -13,21 +13,27 @@ namespace KSS.Core.Components
     /// <summary>
     /// A marker component to track parts.
     /// </summary>
-    public class FPart : MonoBehaviour, IPersistent
+    public class FPart : MonoBehaviour, IPersistsData
     {
         [field: SerializeField]
         public NamespacedIdentifier PartID { get; set; }
 
         public SerializedData GetData( IReverseReferenceMap s )
         {
-            return new SerializedObject()
+            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
+
+            ret.AddAll( new SerializedObject()
             {
                 { "part_id", s.WriteNamespacedIdentifier( this.PartID ) }
-            };
+            } );
+
+            return ret;
         }
 
-        public void SetData( IForwardReferenceMap l, SerializedData data )
+        public void SetData( SerializedData data, IForwardReferenceMap l )
         {
+            IPersistent_Behaviour.SetData( this, data, l );
+
             if( data.TryGetValue( "part_id", out var partId ) )
                 this.PartID = l.ReadNamespacedIdentifier( partId );
         }

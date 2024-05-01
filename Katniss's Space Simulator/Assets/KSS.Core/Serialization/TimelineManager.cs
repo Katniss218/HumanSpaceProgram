@@ -75,27 +75,27 @@ namespace KSS.Core.Serialization
 
         public static void SaveLoadStartFunc()
         {
-            _wasPausedBeforeSerializing = TimeManager.IsPaused;
-            TimeManager.Pause();
-            TimeManager.LockTimescale = true;
+            _wasPausedBeforeSerializing = TimeStepManager.IsPaused;
+            TimeStepManager.Pause();
+            TimeStepManager.LockTimescale = true;
         }
 
         public static void SaveFinishFunc()
         {
-            TimeManager.LockTimescale = false;
+            TimeStepManager.LockTimescale = false;
             if( !_wasPausedBeforeSerializing )
             {
-                TimeManager.Unpause();
+                TimeStepManager.Unpause();
             }
             HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_SAVE, _eSave ); // invoke here because otherwise the invoking method finishes before the coroutine.
         }
 
         public static void LoadFinishFunc()
         {
-            TimeManager.LockTimescale = false;
+            TimeStepManager.LockTimescale = false;
             if( !_wasPausedBeforeSerializing )
             {
-                TimeManager.Unpause();
+                TimeStepManager.Unpause();
             }
             HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_LOAD, _eLoad ); // invoke here because otherwise the invoking method finishes before the coroutine.
         }

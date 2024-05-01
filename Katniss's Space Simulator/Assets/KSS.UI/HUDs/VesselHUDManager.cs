@@ -23,7 +23,7 @@ namespace KSS.UI.HUDs
         {
             if( ActiveObjectManager.ActiveObject == null )
             {
-                var hud = VesselHUD.Create( CanvasManager.Get( CanvasName.BACKGROUND ), vessel );
+                var hud = CanvasManager.Get( CanvasName.BACKGROUND ).AddVesselHUD( vessel );
                 instance._huds.Add( hud );
             }
         }
@@ -51,7 +51,7 @@ namespace KSS.UI.HUDs
             {
                 foreach( var vessel in VesselManager.LoadedVessels )
                 {
-                    var hud = VesselHUD.Create( CanvasManager.Get( CanvasName.BACKGROUND ), vessel );
+                    var hud = CanvasManager.Get( CanvasName.BACKGROUND ).AddVesselHUD( vessel );
                     instance._huds.Add( hud );
                 }
             }

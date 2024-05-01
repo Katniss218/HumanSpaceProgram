@@ -7,9 +7,13 @@ namespace UnityEngine
     public interface IComponent
     {
         Transform transform { get; }
+
         GameObject gameObject { get; }
-        string tag { get; set; }
 
         // The rest of the methods and fields defined by Unity can be added too, but I didn't bother.
+
+        // NOTES TO IMPLEMENTERS:
+        // - It's technically possible to implement this interface on classes that do not derive from `UnityEngine.Component`,
+        //   but it goes against the convention, and is forbidden.
     }
 }

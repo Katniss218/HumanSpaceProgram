@@ -5,31 +5,32 @@ using UnityEngine;
 
 namespace UnityPlus.Input.Bindings
 {
-    /// <summary>
-    /// Binds to a specific key being pressed (after being not pressed).
-    /// </summary>
-    public sealed class KeyDownBinding : IInputBinding
-    {
-#warning TODO - add "alternate key binding" (down/hold/up) with a number of different keys.
+	/// <summary>
+	/// Binds to a specific key being pressed (after being not pressed).
+	/// </summary>
+	public sealed class KeyDownBinding : IInputBinding
+	{
+		public bool IsValid { get; private set; }
 
-        public KeyCode Key { get; set; }
+		public float Value { get; }
 
-        public bool IsValid { get; private set; }
+		public KeyCode Key { get; set; }
 
-        bool _previousFrameWasReleased = true;
+		bool _previousFrameWasReleased = true;
 
-        public KeyDownBinding( KeyCode key )
-        {
-            this.Key = key;
-        }
+		public KeyDownBinding( float value, KeyCode key )
+		{
+			this.Key = key;
+			this.Value = value;
+		}
 
-        public void Update( InputState currentState )
-        {
-            bool currentFrameIsPressed = currentState.CurrentHeldKeys.Contains( Key );
+		public void Update( InputState currentState )
+		{
+			bool currentFrameIsPressed = currentState.CurrentHeldKeys.Contains( Key );
 
-            this.IsValid = _previousFrameWasReleased && currentFrameIsPressed;
+			this.IsValid = _previousFrameWasReleased && currentFrameIsPressed;
 
-            _previousFrameWasReleased = !currentFrameIsPressed;
-        }
-    }
+			_previousFrameWasReleased = !currentFrameIsPressed;
+		}
+	}
 }

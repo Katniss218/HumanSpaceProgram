@@ -38,9 +38,15 @@ namespace KSS.Core
     /// </summary>
     public interface IPartObject : IComponent
     {
+        /// <summary>
+        /// The root part of this part object (if any).
+        /// </summary>
         Transform RootPart { get; }
-        IPhysicsObject PhysicsObject { get; }
-        RootObjectTransform RootObjTransform { get; }
+        
+        /// <summary>
+        /// Returns the transform that defines the orientation (local space) of this part object.
+        /// </summary>
+        public Transform ReferenceTransform { get; }
 
         /// <summary>
         /// Call this to rebuild the part data cache.

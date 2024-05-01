@@ -11,7 +11,7 @@ using UnityPlus.UILib.UIElements;
 
 namespace KSS.UI.HUDs
 {
-    public class ConstructionSiteHUD : MonoBehaviour
+    public class ConstructionSiteHUD : UIPanel
     {
         // construction site hud design doc:
 
@@ -45,7 +45,7 @@ namespace KSS.UI.HUDs
         {
             if( ConstructionSite.BuildSpeed == 0.0f )
                 return AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/csite_status_blocked" );
-            
+
             if( ConstructionSite.GetCountOfProgressing() == 0 )
                 return AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/csite_status_blocked" );
 
@@ -74,20 +74,19 @@ namespace KSS.UI.HUDs
             ((RectTransform)this.transform).SetScreenPosition( Cameras.GameplayCameraController.MainCamera, ConstructionSite.transform.position );
         }
 
-        public static ConstructionSiteHUD Create( IUIElementContainer parent, FConstructionSite constructionSite )
+        protected internal static T Create<T>( IUIElementContainer parent, FConstructionSite constructionSite ) where T : ConstructionSiteHUD
         {
             if( constructionSite == null )
                 throw new ArgumentNullException( nameof( constructionSite ) );
 
-            UIPanel panel = parent.AddPanel( new UILayoutInfo( UILayoutInfo.Middle, UILayoutInfo.Middle, UILayoutInfo.BottomLeft, Vector2.zero, new Vector2( 125, 55 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/csite_hud" ) );
+            T uiHUD = UIPanel.Create<T>( parent, new UILayoutInfo( new Vector2( 0.5f, 0.5f ), new Vector2( 0.5f, 0.5f ), Vector2.zero, Vector2.zero, new Vector2( 125, 55 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/csite_hud" ) );
 
-            UIIcon statucIcon = panel.AddIcon( new UILayoutInfo( UILayoutInfo.TopLeft, new Vector2( 26, -5 ), new Vector2( 20, 20 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/csite_status_in_progress" ) );
-            UIIcon progressIcon = panel.AddIcon( new UILayoutInfo( UILayoutInfo.TopLeft, new Vector2( 21, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/csite_progress_bar" ) );
-            UIButton pauseResumeButton = panel.AddButton( new UILayoutInfo( UILayoutInfo.TopLeft, new Vector2( 53, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_pause" ), null );
-            UIButton reverseButton = panel.AddButton( new UILayoutInfo( UILayoutInfo.TopLeft, new Vector2( 85, 0 ), new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null )
-                .WithText( UILayoutInfo.Fill(), "rev.", out _ );
+            UIIcon statucIcon = uiHUD.AddIcon( new UILayoutInfo( UIAnchor.TopLeft, (26, -5), (20, 20) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/csite_status_in_progress" ) );
+            UIIcon progressIcon = uiHUD.AddIcon( new UILayoutInfo( UIAnchor.TopLeft, (21, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/csite_progress_bar" ) );
+            UIButton pauseResumeButton = uiHUD.AddButton( new UILayoutInfo( UIAnchor.TopLeft, (53, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_pause" ), null );
+            UIButton reverseButton = uiHUD.AddButton( new UILayoutInfo( UIAnchor.TopLeft, (85, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null )
+                .WithText( new UILayoutInfo( UIFill.Fill() ), "rev.", out _ );
 
-            ConstructionSiteHUD uiHUD = panel.gameObject.AddComponent<ConstructionSiteHUD>();
             uiHUD.ConstructionSite = constructionSite;
             uiHUD._statusIcon = statucIcon;
             uiHUD._pauseResumeButton = pauseResumeButton;
@@ -98,6 +97,14 @@ namespace KSS.UI.HUDs
             uiHUD._progressImage.fillMethod = Image.FillMethod.Radial360;
             uiHUD._progressImage.fillOrigin = 2;
             return uiHUD;
+        }
+    }
+
+    public static class ConstructionSiteHUD_Ex
+    {
+        public static ConstructionSiteHUD AddConstructionSiteHUD( this IUIElementContainer parent, FConstructionSite vessel )
+        {
+            return ConstructionSiteHUD.Create<ConstructionSiteHUD>( parent, vessel );
         }
     }
 }

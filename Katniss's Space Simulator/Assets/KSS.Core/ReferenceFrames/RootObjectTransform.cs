@@ -17,7 +17,7 @@ namespace KSS.Core.ReferenceFrames
     /// Add this to any object that is supposed to be affected by the <see cref="SceneReferenceFrameManager"/>.
     /// </remarks>
     [DisallowMultipleComponent]
-    public class RootObjectTransform : MonoBehaviour, IPersistent, IReferenceFrameSwitchResponder
+    public class RootObjectTransform : MonoBehaviour, IPersistsData, IReferenceFrameSwitchResponder
     {
         // Should to be added to any root object that is an actual [physical] object in the scene (not UI elements, empties, etc).
 
@@ -119,18 +119,18 @@ namespace KSS.Core.ReferenceFrames
         {
             return new SerializedObject()
             {
-                { "airf_position", s.WriteVector3Dbl( this.AIRFPosition ) },
-                { "airf_rotation", s.WriteQuaternionDbl( this.AIRFRotation ) }
+                { "airf_position", this.AIRFPosition.GetData() },
+                { "airf_rotation", this.AIRFRotation.GetData() }
             };
         }
 
-        public void SetData( IForwardReferenceMap l, SerializedData data )
+        public void SetData( SerializedData data, IForwardReferenceMap l )
         {
             if( data.TryGetValue( "airf_position", out var airfPosition ) )
-                this.AIRFPosition = l.ReadVector3Dbl( airfPosition );
+                this.AIRFPosition = airfPosition.ToVector3Dbl();
 
             if( data.TryGetValue( "airf_rotation", out var airfRotation ) )
-                this.AIRFRotation = l.ReadQuaternionDbl( airfRotation );
+                this.AIRFRotation = airfRotation.ToQuaternionDbl();
         }
     }
 }

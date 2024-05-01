@@ -12,7 +12,7 @@ namespace KSS.Core.ResourceFlowSystem
     /// State information about a single resource.
     /// </summary>
     [Serializable]
-    public struct SubstanceState : IPersistent
+    public struct SubstanceState : IPersistsData
     {
         /// <summary>
         /// The physical/chemical data about the specific resource.
@@ -47,7 +47,7 @@ namespace KSS.Core.ResourceFlowSystem
             };
         }
 
-        public void SetData( IForwardReferenceMap l, SerializedData data )
+        public void SetData( SerializedData data, IForwardReferenceMap l )
         {
             Substance = l.ReadAssetReference<Substance>( data["substance"] );
             MassAmount = (float)data["mass_amount"];

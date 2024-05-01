@@ -24,7 +24,7 @@ namespace KSS.UI.HUDs
         {
             if( ActiveObjectManager.ActiveObject == null )
             {
-                var hud = ConstructionSiteHUD.Create( CanvasManager.Get( CanvasName.BACKGROUND ), constructionSite );
+                var hud = CanvasManager.Get( CanvasName.BACKGROUND ).AddConstructionSiteHUD( constructionSite );
                 instance._huds.Add( hud );
             }
         }

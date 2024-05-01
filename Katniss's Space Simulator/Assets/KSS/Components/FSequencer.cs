@@ -1,13 +1,16 @@
-﻿using System;
+﻿using KSS.Control;
+using KSS.Control.Controls;
+using KSS.Core;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using UnityPlus.Serialization;
 
 namespace KSS.Components
 {
-    [Obsolete( "It's a prototype" )]
-    public class KeyboardSequenceElement : Sequence.Element
+    public class KeyboardSequenceElement : SequenceElement
     {
         public KeyCode Key { get; set; } = KeyCode.Space;
 
@@ -21,81 +24,150 @@ namespace KSS.Components
         }
     }
 
-    [Obsolete( "It's a prototype" )]
-    public class TimedSequenceElement : Sequence.Element
+    public class TimedSequenceElement : SequenceElement
     {
         /// <summary>
-        /// The delay from the firing of the previous element, after which the sequence element should fire.
+        /// The delay, in [s], from the firing of the previous element, after which the sequence element should fire.
         /// </summary>
         public float Delay { get; set; }
 
-        float _startTimestamp;
-        float _timeSinceStart => _startTimestamp - Time.time;
+        private double _startUT;
 
         public override void Initialize()
         {
-            _startTimestamp = Time.time;
+            _startUT = TimeStepManager.UT;
         }
 
         public override bool CanInvoke()
         {
-            return _timeSinceStart >= Delay;
+            return TimeStepManager.UT >= _startUT + Delay;
         }
     }
 
-    [Obsolete( "It's a prototype" )]
-    public class Sequence
+    public abstract class SequenceActionBase : ControlGroup // pass-through group with a single element. Required to be drawn.
     {
-        [Obsolete( "It's a prototype" )]
-        public abstract class Element
+        public abstract ControllerOutputBase OnInvoke { get; }
+        public abstract void TryInvoke();
+    }
+
+    /// <summary>
+    /// The sequence action without a parameter.
+    /// </summary>
+    public class SequenceAction : SequenceActionBase, IPersistsObjects
+    {
+        public override ControllerOutputBase OnInvoke => OnInvokeTyped;
+
+        [NamedControl( "x", Editable = false )]
+        public ControllerOutput OnInvokeTyped;
+
+        public override void TryInvoke()
         {
-            public struct Action // sequencer uses its own parameters to call an arbitrary input action on the target.
+            OnInvokeTyped.TrySendSignal();
+        }
+
+        public SerializedObject GetObjects( IReverseReferenceMap s )
+        {
+            return new SerializedObject()
             {
-                public MethodInfo varargMethod;
-                public object target;
-                public object[] parameters;
 
-                public void TryInvoke()
-                {
-                    try
-                    {
-                        varargMethod.Invoke( target, parameters );
-                    }
-                    catch( Exception ex )
-                    {
-                        Debug.LogException( ex );
-                    }
-                }
-            }
+            };
+        }
 
-            /// <summary>
-            /// The actions that this sequence element will call when it's fired.
-            /// </summary>
-            public List<Action> Actions { get; private set; } = new List<Action>();
+        public void SetObjects( SerializedObject data, IForwardReferenceMap l )
+        {
+            OnInvokeTyped = new ControllerOutput();
+        }
+    }
 
-            /// <summary>
-            /// Called when the previous action is triggerred, or on load (the first element).
-            /// </summary>
-            public abstract void Initialize();
+    /// <summary>
+    /// The sequence action with a parameter of type T.
+    /// </summary>
+    public class SequenceAction<T> : SequenceActionBase, IPersistsObjects
+    {
+        public override ControllerOutputBase OnInvoke => OnInvokeTyped;
 
-            /// <summary>
-            /// Called to check if the sequence element can fire in this frame.
-            /// </summary>
-            public abstract bool CanInvoke();
+        [NamedControl( "x", Editable = false )]
+        public ControllerOutput<T> OnInvokeTyped;
 
-            /// <summary>
-            /// Called to fire the sequence element.
-            /// </summary>
-            public void Invoke()
+        public T SignalValue { get; set; }
+
+        public override void TryInvoke()
+        {
+            OnInvokeTyped.TrySendSignal( SignalValue );
+        }
+
+        public SerializedObject GetObjects( IReverseReferenceMap s )
+        {
+            return new SerializedObject()
             {
-                foreach( var action in Actions )
-                {
-                    action.TryInvoke();
-                }
+
+            };
+        }
+
+        public void SetObjects( SerializedObject data, IForwardReferenceMap l )
+        {
+            OnInvokeTyped = new ControllerOutput<T>();
+        }
+    }
+
+    public abstract class SequenceElement : ControlGroup, IPersistsObjects
+    {
+        [NamedControl( "Actions", "", Editable = false )]
+        /// <summary>
+        /// The actions that this sequence element will call when it's fired.
+        /// </summary>
+        public List<SequenceActionBase> Actions = new();
+
+        /// <summary>
+        /// Called when the previous action is triggerred, or on load (the first element).
+        /// </summary>
+        public abstract void Initialize();
+
+        /// <summary>
+        /// Called to check if the sequence element can fire in this frame.
+        /// </summary>
+        public abstract bool CanInvoke();
+
+        /// <summary>
+        /// Called to fire the sequence element.
+        /// </summary>
+        public void Invoke()
+        {
+            foreach( var action in Actions )
+            {
+                action.TryInvoke();
             }
         }
 
-        public List<Element> Elements { get; private set; } = new List<Element>();
+        public SerializedObject GetObjects( IReverseReferenceMap s )
+        {
+            return new SerializedObject()
+            {
+
+            };
+        }
+
+        public void SetObjects( SerializedObject data, IForwardReferenceMap l )
+        {
+            Actions = new List<SequenceActionBase>()
+            {
+                new SequenceAction<float>(),
+                new SequenceAction<Vector3>()
+            };
+
+            Actions[0].SetObjects( null, l );
+            Actions[1].SetObjects( null, l );
+        }
+    }
+
+    public class Sequence : ControlGroup, IPersistsObjects
+    {
+        [NamedControl( "Elements", Editable = false )]
+        public List<SequenceElement> Elements = new();
+
+        public IEnumerable<SequenceElement> InvokedElements => Elements.Take( Current );
+        
+        public IEnumerable<SequenceElement> RemainingElements => Elements.Skip( Current );
 
         public int Current { get; private set; } = 0;
 
@@ -118,6 +190,7 @@ namespace KSS.Components
             {
                 Debug.LogException( ex );
             }
+
             return false;
         }
 
@@ -131,7 +204,7 @@ namespace KSS.Components
                 return false;
             }
 
-            Element elem = Elements[Current];
+            SequenceElement elem = Elements[Current];
 
             try
             {
@@ -148,42 +221,102 @@ namespace KSS.Components
             {
                 Debug.LogException( ex );
             }
+
             return false;
+        }
+
+        public SerializedObject GetObjects( IReverseReferenceMap s )
+        {
+            return new SerializedObject()
+            {
+
+            };
+        }
+
+        public void SetObjects( SerializedObject data, IForwardReferenceMap l )
+        {
+            Elements = new List<SequenceElement>()
+            {
+                new KeyboardSequenceElement(),
+                new KeyboardSequenceElement(),
+                new KeyboardSequenceElement()
+            };
+
+            Elements[0].SetObjects( null, l );
+            Elements[1].SetObjects( null, l );
+            Elements[2].SetObjects( null, l );
         }
     }
 
     /// <summary>
     /// Represents a controller that can invoke an arbitrary control action from a queue.
     /// </summary>
-    [Obsolete( "It's a prototype" )]
-    public class FSequencer : MonoBehaviour, IPersistent
+    public class FSequencer : MonoBehaviour, IPersistsObjects, IPersistsData
     {
-        public List<Sequence> Sequences { get; private set; } = new List<Sequence>();
+        // sequencer is a type of avionics, related to the control system.
+
+        [NamedControl( "Sequence", Editable = false )]
+        public Sequence Sequence = new Sequence();
+
+        public Action OnAfterInvoked;
+
+        // control group nest structure:
+
+        // sequence
+        // - element
+        // - - action
+        // - - - output*
+        // - - action
+        // - - - output*
+        // - - ...
+        // - element
+        // - - action
+        // - - - output*
+        // - - action
+        // - - - output*
+        // - - ...
+        // - ...
 
         void Start()
         {
-            foreach( var seq in Sequences )
-            {
-                seq.TryInitialize();
-            }
+            Sequence.TryInitialize();
         }
 
         void Update()
         {
-            foreach( var seq in Sequences )
+            if( Sequence.TryInvoke() )
             {
-                seq.TryInvoke();
+                OnAfterInvoked?.Invoke();
             }
+        }
+
+        public SerializedObject GetObjects( IReverseReferenceMap s )
+        {
+            return new SerializedObject()
+            {
+
+            };
+        }
+
+        public void SetObjects( SerializedObject data, IForwardReferenceMap l )
+        {
+            Sequence.SetObjects( null, l );
         }
 
         public SerializedData GetData( IReverseReferenceMap s )
         {
-            throw new NotImplementedException();
+            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
+
+            //ret.AddAll( new SerializedObject()
+
+            return ret;
         }
 
-        public void SetData( IForwardReferenceMap l, SerializedData data )
+        public void SetData( SerializedData data, IForwardReferenceMap l )
         {
-            throw new NotImplementedException();
+            IPersistent_Behaviour.SetData( this, data, l );
+
+            //
         }
     }
 }

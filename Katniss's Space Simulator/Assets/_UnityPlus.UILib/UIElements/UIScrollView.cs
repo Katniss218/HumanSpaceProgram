@@ -6,35 +6,51 @@ using UnityPlus.UILib.Layout;
 
 namespace UnityPlus.UILib.UIElements
 {
-    public sealed class UIScrollView : UIElement, IUIElementContainer, IUIElementChild, IUILayoutDriven
+    public partial class UIScrollView : UIElement, IUIElementContainer, IUIElementChild, IUILayoutDriven
     {
-        internal ScrollRect scrollRectComponent;
+        protected internal RectTransform viewport;
+        protected internal ScrollRect scrollRectComponent;
 
-        public UIScrollBar scrollbarHorizontal;
-        public UIScrollBar scrollbarVertical;
-        RectTransform _contents;
-        public RectTransform contents { get => _contents; }
+        protected internal UIScrollBar scrollbarHorizontal;
+        protected internal UIScrollBar scrollbarVertical;
+
+        private RectTransform _contentsTransform;
+        public virtual RectTransform contents { get => _contentsTransform; }
 
         public IUIElementContainer Parent { get; set; }
         public List<IUIElementChild> Children { get; } = new List<IUIElementChild>();
 
         public LayoutDriver LayoutDriver { get; set; }
 
-        public static UIScrollView Create( IUIElementContainer parent, UILayoutInfo layout, UILayoutInfo contentLayout, bool horizontal, bool vertical )
+        /*public virtual void SetContentsSize( float left, float right, float top, float bottom )
         {
-            (GameObject rootGameObject, RectTransform rootTransform, UIScrollView uiScrollView) = UIElement.CreateUIGameObject<UIScrollView>( parent, "uilib-scrollview", layout );
+            Vector2 containerSize = this.rectTransform.rect.size;
 
-            (GameObject viewport, RectTransform viewportTransform) = UIElement.CreateUIGameObject( rootTransform, "uilib-scrollviewviewport", UILayoutInfo.Fill() );
+            Vector2 contentsCenter = new Vector2( (left + right) / 2, (top + bottom) / 2 ); // center relative to pivot
+
+            // TODO - The children are offset from the container, but the container size is correct. I don't know why.
+            // we have to update the xy anchor of each child because the anchor doesn't match up with where it was.
+            // we essentially want to keep the anchor where the center was, but extend the bounds asymmetrically
+
+            _contentsTransform.sizeDelta = new Vector2( (right - left), (top - bottom) );
+            scrollRectComponent.normalizedPosition = contentsCenter / containerSize;
+        }*/
+
+        protected internal static T Create<T>( IUIElementContainer parent, UILayoutInfo layout, UILayoutInfo contentsLayout, bool horizontal, bool vertical ) where T : UIScrollView
+        {
+            (GameObject rootGameObject, RectTransform rootTransform, T uiScrollView) = UIElement.CreateUIGameObject<T>( parent, $"uilib-{typeof( T ).Name}", layout );
+
+            (GameObject viewport, RectTransform viewportTransform) = UIElement.CreateUIGameObject( rootTransform, $"uilib-{typeof( T ).Name}-viewport", new UILayoutInfo( UIFill.Fill() ) );
 
             Image maskImage = viewport.AddComponent<Image>();
             maskImage.maskable = true;
             Mask mask = viewport.AddComponent<Mask>();
             mask.showMaskGraphic = false;
 
-            (GameObject content, RectTransform contentTransform) = UIElement.CreateUIGameObject( viewportTransform, "uilib-scrollviewcontent", contentLayout );
+            (GameObject contents, RectTransform contentsTransform) = UIElement.CreateUIGameObject( viewportTransform, $"uilib-{typeof( T ).Name}-content", contentsLayout );
 
             ScrollRect scrollRect = rootGameObject.AddComponent<ScrollRect>();
-            scrollRect.content = (RectTransform)content.transform;
+            scrollRect.content = (RectTransform)contents.transform;
             scrollRect.horizontal = horizontal;
             scrollRect.vertical = vertical;
             scrollRect.viewport = (RectTransform)viewport.transform;
@@ -42,14 +58,14 @@ namespace UnityPlus.UILib.UIElements
             scrollRect.verticalScrollbarSpacing = 0.0f;
 
             scrollRect.movementType = ScrollRect.MovementType.Clamped;
-            scrollRect.inertia = true;
+            scrollRect.inertia = false;
             scrollRect.scrollSensitivity = 30f;
-            scrollRect.decelerationRate = 0.5f;
 
+            uiScrollView.viewport = viewportTransform;
             uiScrollView.scrollRectComponent = scrollRect;
             uiScrollView.scrollbarHorizontal = null;
             uiScrollView.scrollbarVertical = null;
-            uiScrollView._contents = contentTransform;
+            uiScrollView._contentsTransform = contentsTransform;
             return uiScrollView;
         }
     }

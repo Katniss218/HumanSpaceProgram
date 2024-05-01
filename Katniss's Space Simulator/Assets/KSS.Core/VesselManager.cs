@@ -17,7 +17,7 @@ namespace KSS.Core
     /// Manages loading, unloading, switching, etc of vessels.
     /// </summary>
     [RequireComponent( typeof( PreexistingReference ) )]
-    public class VesselManager : SingletonMonoBehaviour<VesselManager>, IPersistent
+    public class VesselManager : SingletonMonoBehaviour<VesselManager>, IPersistsData
     {
         private List<Vessel> _vessels = new List<Vessel>();
 
@@ -66,15 +66,18 @@ namespace KSS.Core
 
         public SerializedData GetData( IReverseReferenceMap s )
         {
-            return new SerializedObject()
-            {
+            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
 
-            };
+            //ret.AddAll( new SerializedObject()
+
+            return ret;
         }
 
-        public void SetData( IForwardReferenceMap l, SerializedData data )
+        public void SetData( SerializedData data, IForwardReferenceMap l )
         {
+            IPersistent_Behaviour.SetData( this, data, l );
 
+            //
         }
 
         private static readonly JsonSeparateFileSerializedDataHandler _vesselsDataHandler = new JsonSeparateFileSerializedDataHandler();

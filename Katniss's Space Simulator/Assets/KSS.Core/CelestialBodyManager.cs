@@ -14,7 +14,7 @@ using UnityPlus.Serialization.Strategies;
 namespace KSS.Core
 {
     [RequireComponent( typeof( PreexistingReference ) )]
-    public class CelestialBodyManager : SingletonMonoBehaviour<CelestialBodyManager>, IPersistent
+    public class CelestialBodyManager : SingletonMonoBehaviour<CelestialBodyManager>, IPersistsData
     {
         private Dictionary<string, CelestialBody> _celestialBodies = new Dictionary<string, CelestialBody>();
 
@@ -75,15 +75,18 @@ namespace KSS.Core
 
         public SerializedData GetData( IReverseReferenceMap s )
         {
-            return new SerializedObject()
-            {
+            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
 
-            };
+            //ret.AddAll( new SerializedObject()
+
+            return ret;
         }
 
-        public void SetData( IForwardReferenceMap l, SerializedData data )
+        public void SetData( SerializedData data, IForwardReferenceMap l )
         {
-            // nothing yet.
+            IPersistent_Behaviour.SetData( this, data, l );
+
+            //
         }
 
         private static readonly JsonSeparateFileSerializedDataHandler _celestialBodiesDataHandler = new JsonSeparateFileSerializedDataHandler();

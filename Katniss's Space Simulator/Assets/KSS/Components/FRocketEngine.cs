@@ -5,38 +5,50 @@ using System;
 using UnityEngine;
 using UnityPlus.Input;
 using UnityPlus.Serialization;
+using KSS.Control;
+using KSS.Control.Controls;
 
 namespace KSS.Components
 {
     [Serializable]
-    public class FRocketEngine : MonoBehaviour, IResourceConsumer, IPersistent
+    public class FRocketEngine : MonoBehaviour, IResourceConsumer, IPersistsObjects, IPersistsData
     {
         const float g = 9.80665f;
 
-        float _currentThrust;
+        public float Thrust { get; private set; }
 
         /// <summary>
-        /// The maximum thrust of the engine, in [N].
+        /// The maximum thrust, in [N].
         /// </summary>
         [field: SerializeField]
         public float MaxThrust { get; set; } = 10000f;
 
         /// <summary>
-        /// Specific impulse of the engine, in [s].
+        /// The specific impulse, in [s].
         /// </summary>
         [field: SerializeField]
         public float Isp { get; set; } = 100f; // TODO - curve based on atmospheric pressure.
 
         /// <summary>
-        /// Maximum mass flow (at max thrust), in [kg/s]
+        /// The maximum mass flow (when thrust = max thrust), in [kg/s].
         /// </summary>
         public float MaxMassFlow => MaxThrust / (Isp * g);
 
+        /// <summary>
+        /// The current throttle level, in [0..1].
+        /// </summary>
         [field: SerializeField]
         public float Throttle { get; set; }
 
+        [NamedControl( "Throttle", "Connect this to the controller's throttle output." )]
+        public ControlleeInput<float> SetThrottle;
+        private void SetThrottleListener( float value )
+        {
+            this.Throttle = value;
+        }
+
         /// <summary>
-        /// Defines which way the engine thrusts (thrust is applied in its `forward` (Z+) direction).
+        /// The thrust will be aplied in the Z+ (`forward`) direction of this transform.
         /// </summary>
         [field: SerializeField]
         public Transform ThrustTransform { get; set; }
@@ -44,56 +56,30 @@ namespace KSS.Components
         [field: SerializeField]
         public SubstanceStateCollection Inflow { get; private set; } = SubstanceStateCollection.Empty;
 
-        /// <summary>
-        /// Returns the actual thrust produced by the engine at this moment in time.
-        /// </summary>
-        public float GetThrust( float massFlow )
+        private float GetThrust( float massFlow )
         {
             return (this.Isp * g) * massFlow * Throttle;
         }
 
-        /*[ControlIn( "set.throttle", "Set Throttle" )]
-        public void SetThrottle( float value )
+        void Awake()
         {
-            this.Throttle = value;
-        }*/
-
-        void OnEnable()
-        {
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MAX, HierarchicalInputPriority.MEDIUM, Input_FullThrottle );
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MIN, HierarchicalInputPriority.MEDIUM, Input_CutThrottle );
-        }
-
-        void OnDisable()
-        {
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MAX, Input_FullThrottle );
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MIN, Input_CutThrottle );
-        }
-
-        private bool Input_FullThrottle()
-        {
-            Throttle = 1.0f;
-            return false;
-        }
-        
-        private bool Input_CutThrottle()
-        {
-            Throttle = 0.0f;
-            return false;
+            SetThrottle = new ControlleeInput<float>( SetThrottleListener );
         }
 
         void FixedUpdate()
         {
-            float thrust = GetThrust( Inflow.GetMass() );
-            if( this.Throttle > 0.0f )
+            this.Thrust = GetThrust( Inflow.GetMass() );
+
+            if( this.Throttle <= 0.0f )
             {
-                Vessel vessel = this.transform.GetVessel();
-                if( vessel != null )
-                {
-                    vessel.PhysicsObject.AddForceAtPosition( this.ThrustTransform.forward * thrust, this.ThrustTransform.position );
-                }
+                return;
             }
-            _currentThrust = thrust;
+
+            Vessel vessel = this.transform.GetVessel();
+            if( vessel != null )
+            {
+                vessel.PhysicsObject.AddForceAtPosition( this.ThrustTransform.forward * this.Thrust, this.ThrustTransform.position );
+            }
         }
 
         public void ClampIn( SubstanceStateCollection inflow, float dt )
@@ -106,19 +92,45 @@ namespace KSS.Components
             return FluidState.Vacuum; // temp, inlet condition (possible backflow, etc).
         }
 
-        public SerializedData GetData( IReverseReferenceMap s )
+        public SerializedObject GetObjects( IReverseReferenceMap s )
         {
             return new SerializedObject()
+            {
+                { "set_throttle", s.GetID( SetThrottle ).GetData() },
+            };
+        }
+
+        public void SetObjects( SerializedObject data, IForwardReferenceMap l )
+        {
+            if( data.TryGetValue( "set_throttle", out var setThrottle ) )
+            {
+                SetThrottle = new( SetThrottleListener );
+                l.SetObj( setThrottle.ToGuid(), SetThrottle );
+            }
+        }
+
+        public SerializedData GetData( IReverseReferenceMap s )
+        {
+            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
+
+            SetThrottle ??= new ControlleeInput<float>( SetThrottleListener );
+
+            ret.AddAll( new SerializedObject()
             {
                 { "max_thrust", this.MaxThrust },
                 { "isp", this.Isp },
                 { "throttle", this.Throttle },
-                { "thrust_transform", s.WriteObjectReference( this.ThrustTransform ) }
-            };
+                { "thrust_transform", s.WriteObjectReference( this.ThrustTransform ) },
+                { "set_throttle", this.SetThrottle.GetData( s ) }
+            } );
+
+            return ret;
         }
 
-        public void SetData( IForwardReferenceMap l, SerializedData data )
+        public void SetData( SerializedData data, IForwardReferenceMap l )
         {
+            IPersistent_Behaviour.SetData( this, data, l );
+
             if( data.TryGetValue( "max_thrust", out var maxThrust ) )
                 this.MaxThrust = (float)maxThrust;
             if( data.TryGetValue( "isp", out var isp ) )
@@ -127,6 +139,9 @@ namespace KSS.Components
                 this.Throttle = (float)throttle;
             if( data.TryGetValue( "thrust_transform", out var thrustTransform ) )
                 this.ThrustTransform = (Transform)l.ReadObjectReference( thrustTransform );
+
+            if( data.TryGetValue( "set_throttle", out var setThrottle ) )
+                this.SetThrottle.SetData( setThrottle, l );
         }
     }
 }

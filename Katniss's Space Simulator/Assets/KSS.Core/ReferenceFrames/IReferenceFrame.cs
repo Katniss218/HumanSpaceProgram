@@ -34,37 +34,37 @@ namespace KSS.Core.ReferenceFrames
         // - - This can be done by applying forces/changing positions manually.
 
         /// <summary>
-        /// Returns a new reference frame that is shifted by a given amount in the Absolute Inertial Reference Frame (AIRF) space.
+        /// Returns a new reference frame that is shifted (translated) by a given distance in the Absolute Inertial Reference Frame (AIRF) space.
         /// </summary>
         IReferenceFrame Shift( Vector3Dbl airfDistanceDelta );
 
         /// <summary>
-        /// Transforms a point in the reference frame's space to the Absolute Inertial Reference Frame (AIRF) space.
+        /// Transforms a point in the frame's local space to the Absolute (AIRF) space.
         /// </summary>
         Vector3Dbl TransformPosition( Vector3Dbl localPosition );
 
         /// <summary>
-        /// Transforms a point in the Absolute Inertial Reference Frame (AIRF) space to the reference frame's space.
+        /// Transforms a point in the Absolute (AIRF) space to the frame's space.
         /// </summary>
         Vector3Dbl InverseTransformPosition( Vector3Dbl globalPosition );
 
         /// <summary>
-        /// Transforms a direction vector in the reference frame's space to the Absolute Inertial Reference Frame (AIRF) space.
+        /// Transforms a direction vector in the frame's local space to the Absolute (AIRF) space.
         /// </summary>
         Vector3 TransformDirection( Vector3 localDirection );
 
         /// <summary>
-        /// Transforms a direction vector in the Absolute Inertial Reference Frame (AIRF) space to the reference frame's space.
+        /// Transforms a direction vector in the Absolute (AIRF) space to the frame's space.
         /// </summary>
         Vector3 InverseTransformDirection( Vector3 globalDirection );
 
         /// <summary>
-        /// Transforms a rotation/orientation in the reference frame's space to the Absolute Inertial Reference Frame (AIRF) space.
+        /// Transforms a rotation/orientation in the frame's local space to the Absolute (AIRF) space.
         /// </summary>
         QuaternionDbl TransformRotation( QuaternionDbl localRotation );
 
         /// <summary>
-        /// Transforms a rotation/orientation in the Absolute Inertial Reference Frame (AIRF) space to the reference frame's space.
+        /// Transforms a rotation/orientation in the Absolute (AIRF) space to the frame's space.
         /// </summary>
         QuaternionDbl InverseTransformRotation( QuaternionDbl globalRotation );
     }

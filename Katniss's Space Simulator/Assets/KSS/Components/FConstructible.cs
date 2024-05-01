@@ -10,7 +10,7 @@ using UnityPlus.Serialization;
 
 namespace KSS.Components
 {
-    public interface IConstructionCondition : IPersistent
+    public interface IConstructionCondition : IPersistsData
     {
         /// <summary>
         /// Checks what the build speed multiplier for a constructible at a given position would be.
@@ -36,7 +36,7 @@ namespace KSS.Components
             };
         }
 
-        public void SetData( IForwardReferenceMap l, SerializedData data )
+        public void SetData( SerializedData data, IForwardReferenceMap l )
         {
             if( data.TryGetValue( "min_lift_capacity", out var minLiftCapacity ) )
                 this.minLiftCapacity = (float)minLiftCapacity;
@@ -52,7 +52,7 @@ namespace KSS.Components
     /// <summary>
     /// Represents a "part" (hierarchy of gameobjects) that can be in various stages of construction.
     /// </summary>
-    public class FConstructible : MonoBehaviour, IPersistent
+    public class FConstructible : MonoBehaviour, IPersistsData
     {
         [SerializeField]
         private float _buildPoints;
@@ -130,7 +130,7 @@ namespace KSS.Components
         {
             foreach( var kvp in _twoWayPatch )
             {
-                kvp.Key.SetData( null, kvp.Value.fwd );
+                kvp.Key.SetData( kvp.Value.fwd, null );
             }
         }
 
@@ -138,7 +138,7 @@ namespace KSS.Components
         {
             foreach( var kvp in _twoWayPatch )
             {
-                kvp.Key.SetData( null, kvp.Value.rev );
+                kvp.Key.SetData( kvp.Value.rev, null );
             }
         }
 
@@ -185,16 +185,22 @@ namespace KSS.Components
 
         public SerializedData GetData( IReverseReferenceMap s )
         {
-            return new SerializedObject()
+            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
+
+            ret.AddAll( new SerializedObject()
             {
                 { "build_points", this.BuildPoints },
                 { "max_build_points", this.MaxBuildPoints },
                 // todo - conditions.
-            };
+            } );
+
+            return ret;
         }
 
-        public void SetData( IForwardReferenceMap l, SerializedData data )
+        public void SetData( SerializedData data, IForwardReferenceMap l )
         {
+            IPersistent_Behaviour.SetData( this, data, l );
+
             if( data.TryGetValue( "max_build_points", out var maxBuildPoints ) )
                 this._maxBuildPoints = (float)maxBuildPoints;
 
@@ -258,7 +264,7 @@ namespace KSS.Components
 
         private static IEnumerable<KeyValuePair<Component, (SerializedData fwd, SerializedData rev)>> GetFDryMassPatches( Transform transform )
         {
-            foreach( var mass in transform.GetComponents<FDryMass>() )
+            foreach( var mass in transform.GetComponents<FPointMass>() )
             {
                 SerializedObject fwdObj = new SerializedObject()
                 {

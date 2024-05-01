@@ -9,30 +9,38 @@ namespace UnityEngine
     public static class RectTransform_Ex
     {
         /// <summary>
-        /// Calculates the actual size of a rect transform.
+        /// True if the rect transform is set to fill the width of its parent.
         /// </summary>
-        public static Vector2 GetActualSize( this RectTransform rt )
+        public static bool FillsWidth( this RectTransform rt ) => (rt.anchorMin.x != rt.anchorMax.x);
+
+        /// <summary>
+        /// True if the rect transform is set to fill the height of its parent.
+        /// </summary>
+        public static bool FillsHeight( this RectTransform rt ) => (rt.anchorMin.y != rt.anchorMax.y);
+
+        /// <summary>
+        /// Gets the center point of the rect transform.
+        /// </summary>
+        public static Vector2 GetLocalCenter( this RectTransform rectTransform )
         {
-            Stack<(Vector2 size, Vector2 anchor)> hierarchyDeltas = new Stack<(Vector2, Vector2)>();
+            return rectTransform.rect.center;
+        }
 
-            hierarchyDeltas.Push( (rt.sizeDelta, rt.anchorMax - rt.anchorMin) );
+        /// <summary>
+        /// Transforms a point from the local space of <paramref name="from"/>, to the local space of <paramref name="to"/>.
+        /// </summary>
+        public static Vector2 TransformPointTo( this RectTransform from, Vector2 position, RectTransform to )
+        {
+            Vector2 canvasSpacePos = from.TransformPoint( position ); // this transforms from/to pivot space.
+            return to.InverseTransformPoint( canvasSpacePos );
+        }
 
-            // Figure out which objects contribute to the actual size and reverse their order (to 'parent then child').
-            while( rt.parent != null )
-            {
-                rt = (RectTransform)rt.parent;
-                if( rt.anchorMax != rt.anchorMin ) // if the anchors are equal, then the actual size is always equal to sizeDelta.
-                    hierarchyDeltas.Push( (rt.sizeDelta, rt.anchorMax - rt.anchorMin) );
-            }
-
-            // Calculate the actual size.
-            Vector2 currentSize = Vector2.zero;
-            foreach( var delta in hierarchyDeltas )
-            {
-                currentSize = (currentSize * delta.anchor) + delta.size;
-            }
-
-            return currentSize;
+        /// <summary>
+        /// Gets the actual size of a rect transform in canvas space.
+        /// </summary>
+        public static Vector2 GetActualSize( this RectTransform rectTransform )
+        {
+            return rectTransform.rect.size;
         }
 
         /// <summary>
@@ -55,5 +63,18 @@ namespace UnityEngine
             Vector3 screenSpacePosition = camera.WorldToScreenPoint( worldSpacePosition, camera.stereoActiveEye );
             SetScreenPosition( rt, screenSpacePosition, hideWhenBehindCamera );
         }
+
+        public static void SetVerticalMargins( this RectTransform rectTransform, float top, float bottom )
+        {
+            rectTransform.sizeDelta = new Vector2( rectTransform.sizeDelta.x, -(top + bottom) );
+            rectTransform.anchoredPosition = new Vector2( rectTransform.anchoredPosition.x, (bottom - top) / 2f );
+        }
+
+        public static void SetHorizontalMargins( this RectTransform rectTransform, float left, float right )
+        {
+            rectTransform.sizeDelta = new Vector2( -(left + right), rectTransform.sizeDelta.y );
+            rectTransform.anchoredPosition = new Vector2( (left - right) / 2f, rectTransform.anchoredPosition.y );
+        }
+
     }
 }

@@ -9,7 +9,7 @@ using UnityPlus.Serialization;
 namespace KSS.Core.Components
 {
     [DisallowMultipleComponent]
-    public sealed class FAttachNode : MonoBehaviour, IPersistent
+    public sealed class FAttachNode : MonoBehaviour, IPersistsData
     {
         /// <summary>
         /// A struct representing a candidate node pair that can be used for snapping.
@@ -129,14 +129,20 @@ namespace KSS.Core.Components
         
         public SerializedData GetData( IReverseReferenceMap s )
         {
-            return new SerializedObject()
+            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
+
+            ret.AddAll( new SerializedObject()
             {
                 { "range", this.Range }
-            };
+            } );
+
+            return ret;
         }
 
-        public void SetData( IForwardReferenceMap l, SerializedData data )
+        public void SetData( SerializedData data, IForwardReferenceMap l )
         {
+            IPersistent_Behaviour.SetData( this, data, l );
+
             if( data.TryGetValue( "range", out var range ) )
                 this.Range = (float)range;
         }

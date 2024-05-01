@@ -16,18 +16,18 @@ namespace UnityPlus.Serialization
             return new SerializedObject()
             {
                 { "radius", sc.radius },
-                { "center", s.WriteVector3( sc.center ) },
+                { "center", sc.center.GetData() },
                 { "is_trigger", sc.isTrigger }
             };
         }
 
-        public static void SetData( this SphereCollider sc, IForwardReferenceMap l, SerializedData data )
+        public static void SetData( this SphereCollider sc, SerializedData data, IForwardReferenceMap l )
         {
             if( data.TryGetValue( "radius", out var radius ) )
                 sc.radius = (float)radius;
 
             if( data.TryGetValue( "center", out var center ) )
-                sc.center = l.ReadVector3( center );
+                sc.center = center.ToVector3();
 
             if( data.TryGetValue( "is_trigger", out var isTrigger ) )
                 sc.isTrigger = (bool)isTrigger;

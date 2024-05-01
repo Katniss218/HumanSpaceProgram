@@ -57,6 +57,7 @@ GameObject:
   - component: {fileID: 3681912330346288165}
   - component: {fileID: 9158063864997904168}
   - component: {fileID: 5745205713316250692}
+  - component: {fileID: -9005798929817025327}
   m_Layer: 20
   m_Name: testlaunchsite
   m_TagString: Untagged
@@ -158,3 +159,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <PartID>k__BackingField:
     _data: Vanilla::testlaunchsite
+--- !u!114 &-9005798929817025327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2889124796493493744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1858aa7f4234f7241a13904bac31eaae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mass: 500000

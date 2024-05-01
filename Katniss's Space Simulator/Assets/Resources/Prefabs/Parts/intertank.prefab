@@ -275,7 +275,7 @@ LODGroup:
   m_LocalReferencePoint: {x: 0, y: 0, z: 0}
   m_Size: 2.075
   m_FadeMode: 0
-  m_AnimateCrossFading: 1
+  m_AnimateCrossFading: 0
   m_LastLODIsBillboard: 0
   m_LODs:
   - screenRelativeHeight: 0.28915665
@@ -329,8 +329,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 202c94cb92f264245a4a47ba8a5e0a2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <BuildPoints>k__BackingField: 70
-  <MaxBuildPoints>k__BackingField: 70
+  _buildPoints: 0
+  _maxBuildPoints: 0
 --- !u!1 &8895903900501251924
 GameObject:
   m_ObjectHideFlags: 0

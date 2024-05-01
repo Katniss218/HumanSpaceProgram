@@ -10,7 +10,7 @@ namespace KSS.Components
     /// <summary>
     /// A container for a <see cref="Substance"/>.
     /// </summary>
-    public class FBulkContainer_Sphere : MonoBehaviour, IResourceConsumer, IResourceProducer, IResourceContainer, IPersistent
+    public class FBulkContainer_Sphere : MonoBehaviour, IResourceConsumer, IResourceProducer, IResourceContainer, IPersistsData
     {
         /// <summary>
         /// Determines the center position of the container.
@@ -111,32 +111,41 @@ namespace KSS.Components
             Contract.Assert( Contents != null, $"[{nameof( FBulkContainer_Sphere )}.{nameof( Sample )}] '{nameof( Contents )}' can't be null." );
 
             float oldMass = this.Mass;
-            Contents.Add( Outflow, -TimeManager.FixedDeltaTime );
-            Contents.Add( Inflow, TimeManager.FixedDeltaTime );
+            Contents.Add( Outflow, -TimeStepManager.FixedDeltaTime );
+            Contents.Add( Inflow, TimeStepManager.FixedDeltaTime );
             OnAfterMassChanged?.Invoke( this.Mass - oldMass );
         }
 
         public SerializedData GetData( IReverseReferenceMap s )
         {
-            return new SerializedObject()
+            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
+
+            ret.AddAll( new SerializedObject()
             {
                 { "volume_transform", s.WriteObjectReference( this.VolumeTransform ) },
                 { "max_volume", this.MaxVolume },
                 { "radius", this.Radius },
                 { "contents", this.Contents.GetData( s ) }
-            };
+            } );
+
+            return ret;
         }
 
-        public void SetData( IForwardReferenceMap l, SerializedData data )
+        public void SetData( SerializedData data, IForwardReferenceMap l )
         {
+            IPersistent_Behaviour.SetData( this, data, l );
+
             if( data.TryGetValue( "volume_transform", out var volumeTransform ) )
                 this.VolumeTransform = (Transform)l.ReadObjectReference( volumeTransform );
+
             if( data.TryGetValue( "max_volume", out var maxVolume ) )
                 this.MaxVolume = (float)maxVolume;
+
             if( data.TryGetValue( "radius", out var radius ) )
                 this.Radius = (float)radius;
+
             if( data.TryGetValue( "contents", out var contents ) )
-                this.Contents.SetData( l, contents );
+                this.Contents.SetData( contents, l );
         }
 
         /// <summary>

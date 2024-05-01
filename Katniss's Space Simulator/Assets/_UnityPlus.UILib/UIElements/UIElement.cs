@@ -9,16 +9,8 @@ namespace UnityPlus.UILib.UIElements
     /// <summary>
     /// Represents a generic UI element.
     /// </summary>
-    public class UIElement : MonoBehaviour
+    public class UIElement : MonoBehaviour, IUIElement
     {
-        // PURPOSE:
-        // - This class (and its subclasses) is a wrapper around hierarchies of Unity components / gameobjects.
-        // - This wrapper is itself a monobehaviour to eliminate the state where the underlying component has been destroyed, but the wrapper is still alive.
-
-        // REASON:
-        // - Many UI elements consist of multiple objects.
-        // - Their initialization is an annoying ordeal and they can end up with an invalid or non-standard state easily.
-
         /// <summary>
         /// Don't directly modify the fields/state of the rectTransform unless you know what you're doing. You can produce invalid state.
         /// </summary>
@@ -30,7 +22,7 @@ namespace UnityPlus.UILib.UIElements
             Destroy( this.gameObject );
         }
 
-        void DestroyFixChildren() // UI elements should be attached to the root GameObject of their subtree.
+        private void DestroyFixChildren() // UI elements should be attached to the root GameObject of their subtree.
         {
             if( this is IUIElementChild child )
                 child.Parent.Children.Remove( child ); // Removing with OnDestroy lags one frame behind, making destroying and recreating elements (refreshing) layout act as if the old items were still there.
@@ -56,7 +48,8 @@ namespace UnityPlus.UILib.UIElements
         }
 
         /// <summary>
-        /// A wrapper to create a UI gameobject with a UI element properly initialized. Use this to create the root gameobject for a custom UI element.
+        /// A wrapper to create a UI gameobject with a UI element properly initialized. <br/>
+        /// Use this to create the root gameobject for a custom UI element that doesn't inherit from any other element.
         /// </summary>
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public static (GameObject go, RectTransform t, T uiElement) CreateUIGameObject<T>( IUIElementContainer parent, string name, UILayoutInfo layout ) where T : Component, IUIElementChild

@@ -59,7 +59,7 @@ namespace UnityPlus.Serialization.Strategies
 
             SerializedObject goJson = new SerializedObject()
             {
-                { KeyNames.ID, s.WriteGuid(objectGuid) },
+                { KeyNames.ID, objectGuid.GetData() },
                 { "prefab", s.WriteAssetReference(cbf.OriginalAsset) },
                 { "children_ids", sArr }
             };
@@ -69,7 +69,7 @@ namespace UnityPlus.Serialization.Strategies
 
         private static GameObject ReadAssetGameObject( IForwardReferenceMap l, SerializedData goJson )
         {
-            Guid objectGuid = l.ReadGuid( goJson[KeyNames.ID] );
+            Guid objectGuid = goJson[KeyNames.ID].ToGuid();
 
             GameObject prefab = l.ReadAssetReference<GameObject>( goJson["prefab"] );
 

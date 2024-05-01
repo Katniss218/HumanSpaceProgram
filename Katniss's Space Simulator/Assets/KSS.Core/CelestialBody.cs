@@ -12,7 +12,7 @@ namespace KSS.Core
 {
     [RequireComponent( typeof( UnityPlus.Serialization.PreexistingReference ) )]
     [RequireComponent( typeof( RootObjectTransform ) )]
-    public class CelestialBody : MonoBehaviour, IPersistent
+    public class CelestialBody : MonoBehaviour, IPersistsData
     {
         /// <summary>
         /// Gets the current global position of the celestial body.
@@ -96,16 +96,18 @@ namespace KSS.Core
 
         public SerializedData GetData( IReverseReferenceMap s )
         {
-            // save cb data itself.
-            return new SerializedObject()
-            {
+            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
 
-            };
+           // ret.AddAll( new SerializedObject()
+
+            return ret;
         }
 
-        public void SetData( IForwardReferenceMap l, SerializedData data )
+        public void SetData( SerializedData data, IForwardReferenceMap l )
         {
+            IPersistent_Behaviour.SetData( this, data, l );
 
+            //
         }
     }
 }

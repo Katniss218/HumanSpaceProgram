@@ -23,6 +23,15 @@ namespace UnityPlus.Serialization
 
         public IForwardReferenceMap RefMap { get; set; }
 
+        public Loader( IForwardReferenceMap refMap, ILoader.Action objectAction, ILoader.Action dataAction )
+        {
+            this.RefMap = refMap;
+            this._startFunc = null;
+            this._finishFunc = null;
+            this._objectActions = new List<ILoader.Action>() { objectAction };
+            this._dataActions = new List<ILoader.Action>() { dataAction };
+        }
+        
         public Loader( IForwardReferenceMap refMap, Action startFunc, Action finishFunc, ILoader.Action objectAction, ILoader.Action dataAction )
         {
             this.RefMap = refMap;
@@ -32,6 +41,15 @@ namespace UnityPlus.Serialization
             this._dataActions = new List<ILoader.Action>() { dataAction };
         }
 
+        public Loader( IForwardReferenceMap refMap, IEnumerable<ILoader.Action> objectActions, IEnumerable<ILoader.Action> dataActions )
+        {
+            this.RefMap = refMap;
+            this._startFunc = null;
+            this._finishFunc = null;
+            this._objectActions = new List<ILoader.Action>( objectActions );
+            this._dataActions = new List<ILoader.Action>( dataActions );
+        }
+        
         public Loader( IForwardReferenceMap refMap, Action startFunc, Action finishFunc, IEnumerable<ILoader.Action> objectActions, IEnumerable<ILoader.Action> dataActions )
         {
             this.RefMap = refMap;

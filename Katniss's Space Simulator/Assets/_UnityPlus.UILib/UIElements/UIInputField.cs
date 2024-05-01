@@ -1,43 +1,109 @@
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityPlus.UILib.Layout;
 
 namespace UnityPlus.UILib.UIElements
 {
-    public sealed class UIInputField : UIElement, IUIElementChild
+    /// <summary>
+    /// 
+    /// </summary>
+    public partial class UIInputField<TValue> : UIElementNonMonobehaviour, IUIInputElement<TValue>, IUIElementChild
     {
-        internal TMPro.TMP_InputField inputFieldComponent;
-        internal TMPro.TextMeshProUGUI textComponent;
-        internal TMPro.TextMeshProUGUI placeholderComponent;
-        internal Image backgroundComponent;
+        protected TMPro.TMP_InputField inputFieldComponent;
+        protected TMPro.TextMeshProUGUI textComponent;
+        protected TMPro.TextMeshProUGUI placeholderComponent;
+        protected Image backgroundComponent;
 
         public IUIElementContainer Parent { get; set; }
 
-        public void SetOnTextChange( Action<string> onTextChange )
+        public virtual string Placeholder { get => placeholderComponent.text; set => placeholderComponent.text = value; }
+
+        public virtual Sprite Background { get => backgroundComponent.sprite; set => backgroundComponent.sprite = value; }
+
+        public event Action<IUIInputElement<TValue>.ValueChangedEventData> OnValueChanged;
+
+        protected Func<string, bool> validator;
+        protected Func<string, TValue> stringToValue;
+        protected Func<TValue, string> valueToString;
+
+        protected bool hasValue;
+        protected TValue value;
+
+        public bool TryGetValue( out TValue value )
         {
-            inputFieldComponent.onValueChanged.RemoveAllListeners();
-            inputFieldComponent.onValueChanged.AddListener( ( s ) => onTextChange( inputFieldComponent.text ) );
+            value = this.value;
+            return this.hasValue;
         }
 
-        public string Text { get => inputFieldComponent.text; set => inputFieldComponent.text = value; }
-
-        public Sprite Background { get => backgroundComponent.sprite; set => backgroundComponent.sprite = value; }
-
-        public static UIInputField Create( IUIElementContainer parent, UILayoutInfo layout, Sprite background )
+        public TValue GetOrDefault( TValue defaultValue )
         {
-            (GameObject rootGameObject, RectTransform rootTransform, UIInputField uiInputField) = UIElement.CreateUIGameObject<UIInputField>( parent, "uilib-inputfield", layout );
+            return hasValue ? this.value : defaultValue;
+        }
+
+        public void ResetValue()
+        {
+            hasValue = false;
+            value = default;
+            SyncVisual();
+
+            try
+            {
+                OnValueChanged?.Invoke( IUIInputElement<TValue>.ValueChangedEventData.Value( value ) );
+            }
+            catch
+            {
+            }
+        }
+
+        public void SetValue( TValue value )
+        {
+            hasValue = true;
+            this.value = value;
+            SyncVisual();
+
+            try
+            {
+                OnValueChanged?.Invoke( IUIInputElement<TValue>.ValueChangedEventData.Value( value ) );
+            }
+            catch
+            {
+            }
+        }
+
+        protected virtual void SyncVisual()
+        {
+            if( !hasValue )
+            {
+                this.inputFieldComponent.text = "";
+                return;
+            }
+
+            try
+            {
+                this.inputFieldComponent.text = this.valueToString.Invoke( value );
+            }
+            catch
+            {
+                this.inputFieldComponent.text = $"$errorvalue$"; // valueToString should never throw, but just in case...
+            }
+        }
+
+        protected internal static T Create<T>( IUIElementContainer parent, UILayoutInfo layout, Sprite background, Func<string, bool> validator, Func<string, TValue> stringToValue, Func<TValue, string> valueToString ) where T : UIInputField<TValue>
+        {
+            (GameObject rootGameObject, RectTransform rootTransform, T uiInputField) = UIElementNonMonobehaviour.CreateUIGameObject<T>( parent, $"uilib-{typeof( T ).Name}", layout );
 
             Image imageComponent = rootGameObject.AddComponent<Image>();
             imageComponent.raycastTarget = true;
             imageComponent.sprite = background;
             imageComponent.type = Image.Type.Sliced;
 
-            (GameObject textareaGameObject, RectTransform textareaTransform) = UIElement.CreateUIGameObject( rootTransform, "uilib-inputfieldtextarea", new UILayoutInfo( Vector2.zero, Vector2.one, Vector2.zero, new Vector2( -10, -10 ) ) );
+            (GameObject textareaGameObject, RectTransform textareaTransform) = UIElement.CreateUIGameObject( rootTransform, $"uilib-{typeof( T ).Name}-textarea", new UILayoutInfo( UIFill.Fill( 5, 5, 5, 5 ) ) );
 
             RectMask2D mask = textareaGameObject.AddComponent<RectMask2D>();
             mask.padding = new Vector4( -5, -5, -5, -5 );
 
-            (GameObject placeholderGameObject, _) = UIElement.CreateUIGameObject( textareaTransform, "uilib-inputfieldplaceholder", UILayoutInfo.Fill() );
+            (GameObject placeholderGameObject, _) = UIElement.CreateUIGameObject( textareaTransform, $"uilib-{typeof( T ).Name}-placeholder", new UILayoutInfo( UIFill.Fill() ) );
 
             TMPro.TextMeshProUGUI placeholderText = placeholderGameObject.AddComponent<TMPro.TextMeshProUGUI>();
             placeholderText.raycastTarget = false;
@@ -45,7 +111,7 @@ namespace UnityPlus.UILib.UIElements
             placeholderText.horizontalAlignment = TMPro.HorizontalAlignmentOptions.Left;
             placeholderText.fontStyle = TMPro.FontStyles.Italic;
 
-            (GameObject textGameObject, _) = UIElement.CreateUIGameObject( textareaTransform, "uilib-inputfieldtext", UILayoutInfo.Fill() );
+            (GameObject textGameObject, _) = UIElement.CreateUIGameObject( textareaTransform, $"uilib-{typeof( T ).Name}-text", new UILayoutInfo( UIFill.Fill() ) );
 
             TMPro.TextMeshProUGUI realText = textGameObject.AddComponent<TMPro.TextMeshProUGUI>();
             realText.raycastTarget = false;
@@ -75,6 +141,22 @@ namespace UnityPlus.UILib.UIElements
             uiInputField.inputFieldComponent = inputFieldComponent;
             uiInputField.textComponent = realText;
             uiInputField.placeholderComponent = placeholderText;
+            uiInputField.validator = validator;
+            uiInputField.stringToValue = stringToValue;
+            uiInputField.valueToString = valueToString;
+
+            inputFieldComponent.onValueChanged.AddListener( s =>
+            {
+                if( uiInputField.validator.Invoke( s ) )
+                {
+                    uiInputField.SetValue( uiInputField.stringToValue( s ) );
+                }
+                else
+                {
+                    uiInputField.SyncVisual(); // Reset the text to the previous value.
+                }
+            } );
+
             return uiInputField;
         }
     }

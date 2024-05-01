@@ -8,20 +8,26 @@ using UnityPlus.Serialization;
 
 namespace KSS.Core
 {
-    public sealed partial class Vessel : IPersistent
+    public sealed partial class Vessel : IPersistsData
     {
         public SerializedData GetData( IReverseReferenceMap s )
         {
-            return new SerializedObject()
+            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
+
+            ret.AddAll( new SerializedObject()
             {
                 { "display_name", this.DisplayName },
                 { "root_part", s.WriteObjectReference( this.RootPart ) },
-                { "on_after_recalculate_parts", s.WriteDelegate( this.OnAfterRecalculateParts ) }
-            };
+                { "on_after_recalculate_parts", this.OnAfterRecalculateParts.GetData( s ) }
+            } );
+
+            return ret;
         }
 
-        public void SetData( IForwardReferenceMap l, SerializedData data )
+        public void SetData( SerializedData data, IForwardReferenceMap l )
         {
+            IPersistent_Behaviour.SetData( this, data, l );
+
             if( data.TryGetValue( "display_name", out var displayName ) )
                 this.DisplayName = (string)displayName;
 
@@ -29,7 +35,7 @@ namespace KSS.Core
                 this.RootPart = (Transform)l.ReadObjectReference( rootPart );
 
             if( data.TryGetValue( "on_after_recalculate_parts", out var onAfterRecalculateParts ) )
-                this.OnAfterRecalculateParts = (Action)l.ReadDelegate( onAfterRecalculateParts );
+                this.OnAfterRecalculateParts = (Action)onAfterRecalculateParts.ToDelegate( l );
         }
     }
 }

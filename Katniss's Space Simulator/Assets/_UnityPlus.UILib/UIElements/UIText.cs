@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,23 +9,21 @@ namespace UnityPlus.UILib.UIElements
     /// <summary>
     /// A UI element that is a container for text.
     /// </summary>
-    public sealed class UIText : UIElement, IUIElementChild, IUILayoutSelf
+    public partial class UIText : UIElement, IUIElementChild, IUILayoutSelf
     {
-        // possibly we could have different types of text elements that format themselves in different ways. Headers, paragraphs, etc.
-
-        internal TMPro.TextMeshProUGUI textComponent;
+        protected TMPro.TextMeshProUGUI textComponent;
 
         public IUIElementContainer Parent { get; set; }
 
         public bool FitToContents { get; set; } = false;
 
-        public string Text
+        public virtual string Text
         {
             get => textComponent.text;
             set
             {
                 textComponent.text = value;
-                UILayout.BroadcastLayoutUpdate( this );
+                UILayoutManager.ForceLayoutUpdate( this );
             }
         }
 
@@ -34,35 +33,31 @@ namespace UnityPlus.UILib.UIElements
             {
                 return;
             }
-            if( this.rectTransform == null )
-            {
-
-            }
-            UILayoutInfo layout = this.rectTransform.GetLayoutInfo();
 
             // Preferred size depends on how many line breaks exist in the text after wrapping to the size of the container.
             // `textComponent.GetPreferredValues` seems to use the current anchors and size when computing the preferred size of the text container.
-            if( layout.FillsWidth && !layout.FillsHeight )
+            if( this.rectTransform.FillsWidth() && !this.rectTransform.FillsHeight() )
             {
                 this.rectTransform.sizeDelta = new Vector2( this.rectTransform.sizeDelta.x, textComponent.GetPreferredValues().y );
                 return;
             }
-            if( layout.FillsHeight && !layout.FillsWidth )
+            if( !this.rectTransform.FillsWidth() && this.rectTransform.FillsHeight() )
             {
                 this.rectTransform.sizeDelta = new Vector2( textComponent.GetPreferredValues().x, this.rectTransform.GetActualSize().y );
                 return;
             }
         }
 
-        public static UIText Create( IUIElementContainer parent, UILayoutInfo layoutInfo, string text )
+        protected internal static T Create<T>( IUIElementContainer parent, UILayoutInfo layoutInfo, string text ) where T : UIText
         {
-            (GameObject rootGameObject, RectTransform rootTransform, UIText uiText) = UIElement.CreateUIGameObject<UIText>( parent, "uilib-text", layoutInfo );
+            (GameObject rootGameObject, RectTransform rootTransform, T uiText) = UIElement.CreateUIGameObject<T>( parent, $"uilib-{typeof( T ).Name}", layoutInfo );
 
             TMPro.TextMeshProUGUI textComponent = rootGameObject.AddComponent<TMPro.TextMeshProUGUI>();
             textComponent.raycastTarget = false;
             textComponent.richText = false;
             textComponent.horizontalAlignment = TMPro.HorizontalAlignmentOptions.Left;
             textComponent.verticalAlignment = TMPro.VerticalAlignmentOptions.Middle;
+            textComponent.overflowMode = TMPro.TextOverflowModes.Truncate;
 
             textComponent.text = text;
 

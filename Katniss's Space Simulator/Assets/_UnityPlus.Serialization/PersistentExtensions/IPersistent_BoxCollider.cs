@@ -9,28 +9,28 @@ using UnityEngine.Rendering;
 
 namespace UnityPlus.Serialization
 {
-    public static class IPersistent_BoxCollider
-    {
-        public static SerializedData GetData( this BoxCollider bc, IReverseReferenceMap s )
-        {
-            return new SerializedObject()
-            {
-                { "size", s.WriteVector3( bc.size ) },
-                { "center", s.WriteVector3( bc.center ) },
-                { "is_trigger", bc.isTrigger }
-            };
-        }
+	public static class IPersistent_BoxCollider
+	{
+		public static SerializedData GetData( this BoxCollider bc, IReverseReferenceMap s )
+		{
+			return new SerializedObject()
+			{
+				{ "size", bc.size.GetData() },
+				{ "center", bc.center.GetData() },
+				{ "is_trigger", bc.isTrigger }
+			};
+		}
 
-        public static void SetData( this BoxCollider bc, IForwardReferenceMap l, SerializedData data )
-        {
-            if( data.TryGetValue( "size", out var size ) )
-                bc.size = l.ReadVector3( size );
+		public static void SetData( this BoxCollider bc, SerializedData data, IForwardReferenceMap l )
+		{
+			if( data.TryGetValue( "size", out var size ) )
+				bc.size = size.ToVector3();
 
-            if( data.TryGetValue( "center", out var center ) )
-                bc.center = l.ReadVector3( center );
+			if( data.TryGetValue( "center", out var center ) )
+				bc.center = center.ToVector3();
 
-            if( data.TryGetValue( "is_trigger", out var isTrigger ) )
-                bc.isTrigger = (bool)isTrigger;
-        }
-    }
+			if( data.TryGetValue( "is_trigger", out var isTrigger ) )
+				bc.isTrigger = (bool)isTrigger;
+		}
+	}
 }

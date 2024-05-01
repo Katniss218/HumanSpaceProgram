@@ -41,6 +41,16 @@ namespace KSS.Core.Physics
         /// Gets the angular acceleration that this physics object is under at this instant, in [Rad/s^2].
         /// </summary>
         Vector3 AngularAcceleration { get; }
+        
+        /// <summary>
+        /// Gets the principal moments of inertia.
+        /// </summary>
+        Vector3 MomentsOfInertia { get; }
+        
+        /// <summary>
+        /// Gets or sets the moment of inertia tensor.
+        /// </summary>
+        Matrix3x3 MomentOfInertiaTensor { get; set; }
 
         /// <summary>
         /// True if the physics object is colliding with any other objects in the current frame, false otherwise.

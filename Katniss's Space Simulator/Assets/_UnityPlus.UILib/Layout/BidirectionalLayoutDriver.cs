@@ -44,141 +44,146 @@ namespace UnityPlus.UILib.Layout
         /// </summary>
         public bool FitToSize { get; set; } // fit to size is only applied on the axis different from primary.
 
-        public override void DoLayout( IUIElementContainer c )
+        public override void DoLayout( IUILayoutDriven c )
         {
             // lays out the children in a vertical list.
             // doesn't care about the horizontal dimensions at all, just aligns everything to line up.
-
-            foreach( var child in c.Children )
+            if( c is IUIElementContainer container )
             {
-                if( child.rectTransform.anchorMin.x != child.rectTransform.anchorMax.x )
+                foreach( var child in container.Children )
                 {
-                    throw new InvalidOperationException( $"Can't layout in a grid, the child element {c.gameObject.name} fills width." );
-                }
-                if( child.rectTransform.anchorMin.y != child.rectTransform.anchorMax.y )
-                {
-                    throw new InvalidOperationException( $"Can't layout in a grid, the child element {c.gameObject.name} fills height." );
-                }
-            }
-
-            // Bidirectional layout uses the sizes of child elements. Tracks the maximum size in the current row because that is the width/height of the row.
-
-
-            float rowSum = 0.0f;
-            Vector2 contentsSize = c.contents.GetActualSize();
-            float rowLength = FreeAxis == Axis2D.X ? contentsSize.y : contentsSize.x;
-            float currentRowPosition = 0.0f;
-            float currentRowSize = 0.0f; // width (freeaxis=x) or height (freeaxis=y) of the current row.
-            bool currentRowHasElement = false; // true if something was placed in the current row.
-            foreach( var child in c.Children )
-            {
-                UILayoutInfo layoutInfo = child.rectTransform.GetLayoutInfo();
-
-                if( DirY == DirectionY.TopToBottom && DirX == DirectionX.LeftToRight )
-                {
-                    layoutInfo.anchorMin = Vector2.up;
-                    layoutInfo.anchorMax = Vector2.up;
-                    layoutInfo.pivot = Vector2.up;
-                }
-                else if( DirY == DirectionY.BottomToTop && DirX == DirectionX.LeftToRight )
-                {
-                    layoutInfo.anchorMin = Vector2.zero;
-                    layoutInfo.anchorMax = Vector2.zero;
-                    layoutInfo.pivot = Vector2.zero;
-                }
-                else if( DirY == DirectionY.TopToBottom && DirX == DirectionX.RightToLeft )
-                {
-                    layoutInfo.anchorMin = Vector2.one;
-                    layoutInfo.anchorMax = Vector2.one;
-                    layoutInfo.pivot = Vector2.one;
-                }
-                else if( DirY == DirectionY.BottomToTop && DirX == DirectionX.RightToLeft )
-                {
-                    layoutInfo.anchorMin = Vector2.right;
-                    layoutInfo.anchorMax = Vector2.right;
-                    layoutInfo.pivot = Vector2.right;
-                }
-                if( FreeAxis == Axis2D.X )
-                {
-                    if( (rowSum + layoutInfo.sizeDelta.y + Spacing.y) > rowLength && currentRowHasElement )
+                    if( child.rectTransform.anchorMin.x != child.rectTransform.anchorMax.x )
                     {
-                        if( DirX == DirectionX.LeftToRight )
-                            currentRowPosition += currentRowSize + Spacing.y;
-                        else
-                            currentRowPosition -= currentRowSize + Spacing.y;
-
-                        currentRowSize = 0.0f;
-                        rowSum = 0.0f;
-                        currentRowHasElement = false;
+                        throw new InvalidOperationException( $"Can't layout in a grid, the child element {c.gameObject.name} fills width." );
                     }
-
-                    if( DirY == DirectionY.TopToBottom )
+                    if( child.rectTransform.anchorMin.y != child.rectTransform.anchorMax.y )
                     {
-                        layoutInfo.anchoredPosition.y = -rowSum;
+                        throw new InvalidOperationException( $"Can't layout in a grid, the child element {c.gameObject.name} fills height." );
                     }
-                    else if( DirY == DirectionY.BottomToTop )
-                    {
-                        layoutInfo.anchoredPosition.y = rowSum;
-                    }
-                    if( currentRowSize < layoutInfo.sizeDelta.x )
-                        currentRowSize = layoutInfo.sizeDelta.x;
-
-                    layoutInfo.anchoredPosition.x = currentRowPosition;
-
-                    currentRowHasElement = true;
-                    child.rectTransform.SetLayoutInfo( layoutInfo );
-
-                    rowSum += layoutInfo.sizeDelta.y + Spacing.y; // Y+ towards the top.
                 }
-                else
+
+                // Bidirectional layout uses the sizes of child elements. Tracks the maximum size in the current row because that is the width/height of the row.
+
+
+                float rowSum = 0.0f;
+                Vector2 contentsSize = container.contents.GetActualSize();
+                float rowLength = FreeAxis == Axis2D.X ? contentsSize.y : contentsSize.x;
+                float currentRowPosition = 0.0f;
+                float currentRowSize = 0.0f; // width (freeaxis=x) or height (freeaxis=y) of the current row.
+                bool currentRowHasElement = false; // true if something was placed in the current row.
+                foreach( var child in container.Children )
                 {
-                    if( (rowSum + layoutInfo.sizeDelta.x + Spacing.x) > rowLength && currentRowHasElement )
+                    UILayoutInfo layoutInfo = child.rectTransform.GetLayoutInfo();
+
+                    if( DirY == DirectionY.TopToBottom && DirX == DirectionX.LeftToRight )
                     {
+                        layoutInfo.anchorMin = Vector2.up;
+                        layoutInfo.anchorMax = Vector2.up;
+                        layoutInfo.pivot = Vector2.up;
+                    }
+                    else if( DirY == DirectionY.BottomToTop && DirX == DirectionX.LeftToRight )
+                    {
+                        layoutInfo.anchorMin = Vector2.zero;
+                        layoutInfo.anchorMax = Vector2.zero;
+                        layoutInfo.pivot = Vector2.zero;
+                    }
+                    else if( DirY == DirectionY.TopToBottom && DirX == DirectionX.RightToLeft )
+                    {
+                        layoutInfo.anchorMin = Vector2.one;
+                        layoutInfo.anchorMax = Vector2.one;
+                        layoutInfo.pivot = Vector2.one;
+                    }
+                    else if( DirY == DirectionY.BottomToTop && DirX == DirectionX.RightToLeft )
+                    {
+                        layoutInfo.anchorMin = Vector2.right;
+                        layoutInfo.anchorMax = Vector2.right;
+                        layoutInfo.pivot = Vector2.right;
+                    }
+                    if( FreeAxis == Axis2D.X )
+                    {
+                        if( (rowSum + layoutInfo.sizeDelta.y) > rowLength && currentRowHasElement )
+                        {
+                            if( DirX == DirectionX.LeftToRight )
+                                currentRowPosition += currentRowSize + Spacing.y;
+                            else
+                                currentRowPosition -= currentRowSize + Spacing.y;
+
+                            currentRowSize = 0.0f;
+                            rowSum = 0.0f;
+                            currentRowHasElement = false;
+                        }
+
                         if( DirY == DirectionY.TopToBottom )
-                            currentRowPosition -= currentRowSize + Spacing.x;
-                        else
-                            currentRowPosition += currentRowSize + Spacing.x;
+                        {
+                            layoutInfo.anchoredPosition.y = -rowSum;
+                        }
+                        else if( DirY == DirectionY.BottomToTop )
+                        {
+                            layoutInfo.anchoredPosition.y = rowSum;
+                        }
 
-                        currentRowSize = 0.0f;
-                        rowSum = 0.0f;
-                        currentRowHasElement = false;
+                        if( currentRowSize < layoutInfo.sizeDelta.x )
+                            currentRowSize = layoutInfo.sizeDelta.x;
+
+                        layoutInfo.anchoredPosition.x = currentRowPosition;
+
+                        currentRowHasElement = true;
+                        child.rectTransform.SetLayoutInfo( layoutInfo );
+
+                        rowSum += layoutInfo.sizeDelta.y + Spacing.y; // Y+ towards the top.
                     }
-
-                    if( DirX == DirectionX.LeftToRight )
+                    else
                     {
-                        layoutInfo.anchoredPosition.x = rowSum;
+                        if( (rowSum + layoutInfo.sizeDelta.x) > rowLength && currentRowHasElement )
+                        {
+                            Vector2 vaa = container.contents.GetActualSize();
+                            if( DirY == DirectionY.TopToBottom )
+                                currentRowPosition -= currentRowSize + Spacing.x;
+                            else
+                                currentRowPosition += currentRowSize + Spacing.x;
+
+                            currentRowSize = 0.0f;
+                            rowSum = 0.0f;
+                            currentRowHasElement = false;
+                        }
+
+                        if( DirX == DirectionX.LeftToRight )
+                        {
+                            layoutInfo.anchoredPosition.x = rowSum;
+                        }
+                        else if( DirX == DirectionX.RightToLeft )
+                        {
+                            layoutInfo.anchoredPosition.x = -rowSum;
+                        }
+
+                        if( currentRowSize < layoutInfo.sizeDelta.y )
+                            currentRowSize = layoutInfo.sizeDelta.y;
+
+                        layoutInfo.anchoredPosition.y = currentRowPosition;
+
+                        currentRowHasElement = true;
+                        child.rectTransform.SetLayoutInfo( layoutInfo );
+
+                        rowSum += layoutInfo.sizeDelta.x + Spacing.x; // Y+ towards the top.
                     }
-                    else if( DirX == DirectionX.RightToLeft )
+                }
+
+                if( FitToSize )
+                {
+                    if( FreeAxis == Axis2D.X && container.contents.anchorMin.x != container.contents.anchorMax.x )
                     {
-                        layoutInfo.anchoredPosition.x = -rowSum;
+                        throw new InvalidOperationException( $"Can't fit to size horzontally, the container element {c.gameObject.name} fills width." );
                     }
-                    if( currentRowSize < layoutInfo.sizeDelta.y )
-                        currentRowSize = layoutInfo.sizeDelta.y;
+                    if( FreeAxis == Axis2D.Y && container.contents.anchorMin.y != container.contents.anchorMax.y )
+                    {
+                        throw new InvalidOperationException( $"Can't fit to size vertically, the container element {c.gameObject.name} fills height." );
+                    }
 
-                    layoutInfo.anchoredPosition.y = currentRowPosition;
+                    if( currentRowPosition != 0 )
+                        currentRowPosition = Mathf.Abs( currentRowPosition );
 
-                    currentRowHasElement = true;
-                    child.rectTransform.SetLayoutInfo( layoutInfo );
-
-                    rowSum += layoutInfo.sizeDelta.x + Spacing.x; // Y+ towards the top.
+                    container.contents.SetSizeWithCurrentAnchors( (RectTransform.Axis)FreeAxis, currentRowPosition + currentRowSize );
                 }
-            }
-
-            if( FitToSize )
-            {
-                if( FreeAxis == Axis2D.X && c.contents.anchorMin.x != c.contents.anchorMax.x )
-                {
-                    throw new InvalidOperationException( $"Can't fit to size horzontally, the container element {c.gameObject.name} fills width." );
-                }
-                if( FreeAxis == Axis2D.Y && c.contents.anchorMin.y != c.contents.anchorMax.y )
-                {
-                    throw new InvalidOperationException( $"Can't fit to size vertically, the container element {c.gameObject.name} fills height." );
-                }
-
-                if( currentRowPosition != 0 )
-                    currentRowPosition = Mathf.Abs( currentRowPosition );
-
-                c.contents.SetSizeWithCurrentAnchors( (RectTransform.Axis)FreeAxis, currentRowPosition + currentRowSize );
             }
         }
     }

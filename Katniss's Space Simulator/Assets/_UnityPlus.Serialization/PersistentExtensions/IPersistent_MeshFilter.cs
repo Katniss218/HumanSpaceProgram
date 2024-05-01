@@ -21,7 +21,7 @@ namespace UnityPlus.Serialization
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static void SetData( this MeshFilter mf, IForwardReferenceMap l, SerializedData data )
+        public static void SetData( this MeshFilter mf, SerializedData data, IForwardReferenceMap l )
         {
             if( data.TryGetValue( "shared_mesh", out var sharedMesh ) )
                 mf.sharedMesh = l.ReadAssetReference<Mesh>( sharedMesh );

@@ -7,7 +7,10 @@ using UnityPlus.UILib.Layout;
 
 namespace UnityPlus.UILib.UIElements
 {
-    public interface IUILayoutDriven : IUIElementContainer
+    /// <summary>
+    /// Use this to specify that the UI element will respond to layout updates using a <see cref="Layout.LayoutDriver"/>.
+    /// </summary>
+    public interface IUILayoutDriven : IUIElement
     {
         LayoutDriver LayoutDriver { get; set; }
     }

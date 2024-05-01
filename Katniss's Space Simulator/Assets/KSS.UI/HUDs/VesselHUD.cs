@@ -9,7 +9,7 @@ using UnityPlus.UILib.UIElements;
 
 namespace KSS.UI.HUDs
 {
-    public class VesselHUD : MonoBehaviour
+    public class VesselHUD : UIPanel
     {
         public Vessel Vessel { get; private set; }
 
@@ -23,17 +23,26 @@ namespace KSS.UI.HUDs
             ((RectTransform)this.transform).SetScreenPosition( Cameras.GameplayCameraController.MainCamera, Vessel.transform.position );
         }
 
-        public static VesselHUD Create( IUIElementContainer parent, Vessel vessel )
+        protected internal static T Create<T>( IUIElementContainer parent, Vessel vessel ) where T : VesselHUD
         {
             if( vessel == null )
                 throw new ArgumentNullException( nameof( vessel ) );
 
-            UIButton button = parent.AddButton( new UILayoutInfo( Vector2.zero, Vector2.zero, new Vector2( 30, 30 ) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_large_new" ), null );
+            T uiPanel = UIPanel.Create<T>( parent, new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (30, 30) ), null );
 
-            VesselHUD uiHUD = button.gameObject.AddComponent<VesselHUD>();
-            button.onClick = uiHUD.OnClick;
-            uiHUD.Vessel = vessel;
-            return uiHUD;
+            UIButton button = uiPanel.AddButton( new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
+
+            button.onClick = uiPanel.OnClick;
+            uiPanel.Vessel = vessel;
+            return uiPanel;
+        }
+    }
+
+    public static class VesselHUD_Ex
+    {
+        public static VesselHUD AddVesselHUD( this IUIElementContainer parent, Vessel vessel )
+        {
+            return VesselHUD.Create<VesselHUD>( parent, vessel );
         }
     }
 }

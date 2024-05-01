@@ -10,7 +10,6 @@ using KSS.Core.Serialization;
 using KSS.Core.Components;
 using System;
 using UnityPlus.AssetManagement;
-using KSS.AssetLoaders;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.Strategies;
 using System.IO;
@@ -19,6 +18,7 @@ using KSS.Core.Mods;
 using UnityPlus.Serialization.DataHandlers;
 using UnityPlus.Serialization.ReferenceMaps;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace KSS.DevUtils
 {
@@ -214,6 +214,16 @@ namespace KSS.DevUtils
                 handler.ObjectsFilename = partDir + "/objects.json";
                 handler.DataFilename = partDir + "/data.json";
                 saver.Save();
+
+                partDir = gameDataPath + "/Vanilla/Parts/capsule";
+                Directory.CreateDirectory( partDir );
+                pm = new PartMetadata( partDir );
+                pm.Name = "Gemini Capsule"; pm.Author = "Katniss"; pm.Categories = new string[] { "command" };
+                pm.WriteToDisk();
+                strat.RootObjectGetter = () => AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/capsule" );
+                handler.ObjectsFilename = partDir + "/objects.json";
+                handler.DataFilename = partDir + "/data.json";
+                saver.Save();
             }
         }
 
@@ -227,6 +237,7 @@ namespace KSS.DevUtils
 
         static Vessel CreateDummyVessel( Vector3Dbl airfPosition, QuaternionDbl rotation )
         {
+            GameObject capsulePrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/capsule" );
             GameObject intertankPrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/intertank" );
             GameObject tankPrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/tank" );
             GameObject tankLongPrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/tank_long" );
@@ -237,9 +248,11 @@ namespace KSS.DevUtils
 
             Transform tankP = InstantiateLocal( tankPrefab, root, new Vector3( 0, -1.625f, 0 ), Quaternion.identity ).transform;
             Transform tankL1 = InstantiateLocal( tankLongPrefab, root, new Vector3( 0, 2.625f, 0 ), Quaternion.identity ).transform;
-            Transform t1 = InstantiateLocal( tankLongPrefab, root, new Vector3( 2, 2.625f, 0 ), Quaternion.identity ).transform;
-            Transform t2 = InstantiateLocal( tankLongPrefab, root, new Vector3( -2, 2.625f, 0 ), Quaternion.identity ).transform;
-            Transform engineP = InstantiateLocal( enginePrefab, tankP, new Vector3( 0, -3.45533f, 0 ), Quaternion.identity ).transform;
+            Transform capsule = InstantiateLocal( capsulePrefab, tankL1, new Vector3( 0, 2.625f, 0 ), Quaternion.identity ).transform;
+            Transform t1 = InstantiateLocal( tankLongPrefab, root, new Vector3( 20, 2.625f, 0 ), Quaternion.identity ).transform;
+            Transform t2 = InstantiateLocal( tankLongPrefab, root, new Vector3( -20, 2.625f, 0 ), Quaternion.identity ).transform;
+            Transform engineP1 = InstantiateLocal( enginePrefab, tankP, new Vector3( 2, -3.45533f, 0 ), Quaternion.identity ).transform;
+            Transform engineP2 = InstantiateLocal( enginePrefab, tankP, new Vector3( -2, -3.45533f, 0 ), Quaternion.identity ).transform;
             v.RootPart = root;
 
             FBulkConnection conn = tankP.gameObject.AddComponent<FBulkConnection>();
@@ -258,15 +271,22 @@ namespace KSS.DevUtils
                     new SubstanceState( tankSmallTank.MaxVolume * ((sbsF.Density + sbsOX.Density) / 2f) / 2f, sbsF ),
                     new SubstanceState( tankSmallTank.MaxVolume * ((sbsF.Density + sbsOX.Density) / 2f) / 2f, sbsOX )} );
 
-            FBulkConnection conn2 = engineP.gameObject.AddComponent<FBulkConnection>();
-            conn2.End1.ConnectTo( tankP.GetComponent<FBulkContainer_Sphere>() );
-            conn2.End1.Position = new Vector3( 0.0f, -1.5f, 0.0f );
-            conn2.End2.ConnectTo( engineP.GetComponent<FRocketEngine>() );
-            conn2.End2.Position = new Vector3( 0.0f, 0.0f, 0.0f );
-            conn2.CrossSectionArea = 60f;
+            FBulkConnection conn21 = engineP1.gameObject.AddComponent<FBulkConnection>();
+            conn21.End1.ConnectTo( tankP.GetComponent<FBulkContainer_Sphere>() );
+            conn21.End1.Position = new Vector3( 0.0f, -1.5f, 0.0f );
+            conn21.End2.ConnectTo( engineP1.GetComponent<FRocketEngine>() );
+            conn21.End2.Position = new Vector3( 0.0f, 0.0f, 0.0f );
+            conn21.CrossSectionArea = 60f;
+            
+            FBulkConnection conn22 = engineP2.gameObject.AddComponent<FBulkConnection>();
+            conn22.End1.ConnectTo( tankP.GetComponent<FBulkContainer_Sphere>() );
+            conn22.End1.Position = new Vector3( 0.0f, -1.5f, 0.0f );
+            conn22.End2.ConnectTo( engineP2.GetComponent<FRocketEngine>() );
+            conn22.End2.Position = new Vector3( 0.0f, 0.0f, 0.0f );
+            conn22.CrossSectionArea = 60f;
 
-            t1.gameObject.AddComponent<FVesselSeparator>();
-            t2.gameObject.AddComponent<FVesselSeparator>();
+            FVesselSeparator t1Sep = t1.gameObject.AddComponent<FVesselSeparator>();
+            FVesselSeparator t2Sep = t2.gameObject.AddComponent<FVesselSeparator>();
 
             TrailRenderer tr = v.gameObject.AddComponent<TrailRenderer>();
             tr.material = FindObjectOfType<DevUtilsGameplayManager>().Material;
@@ -276,6 +296,76 @@ namespace KSS.DevUtils
             curve.AddKey( 1, 2.5f );
             tr.widthCurve = curve;
             tr.minVertexDistance = 50f;
+
+            FPlayerInputAvionics av = capsule.GetComponent<FPlayerInputAvionics>();
+            FAttitudeAvionics atv = capsule.GetComponent<FAttitudeAvionics>();
+            FGimbalActuatorController gc = capsule.GetComponent<FGimbalActuatorController>();
+            FRocketEngine eng1 = engineP1.GetComponent<FRocketEngine>();
+            F2AxisActuator ac1 = engineP1.GetComponent<F2AxisActuator>();
+            FRocketEngine eng2 = engineP2.GetComponent<FRocketEngine>();
+            F2AxisActuator ac2 = engineP2.GetComponent<F2AxisActuator>();
+            av.OnSetThrottle.TryConnect( eng1.SetThrottle );
+           // av.OnSetThrottle.TryConnect( eng2.SetThrottle );
+           // only 1 output is allowed. This is annoying.
+
+            av.OnSetAttitude.TryConnect( gc.SetAttitude );
+            //atv.OnSetAttitude.TryConnect( gc.SetAttitude );
+
+            gc.Actuators2D[0] = new FGimbalActuatorController.Actuator2DGroup();
+            gc.Actuators2D[0].GetReferenceTransform.TryConnect( ac1.GetReferenceTransform );
+            gc.Actuators2D[0].OnSetXY.TryConnect( ac1.SetXY );
+            gc.Actuators2D[1] = new FGimbalActuatorController.Actuator2DGroup();
+            gc.Actuators2D[1].GetReferenceTransform.TryConnect( ac2.GetReferenceTransform );
+            gc.Actuators2D[1].OnSetXY.TryConnect( ac2.SetXY );
+
+            FSequencer seq = capsule.GetComponent<FSequencer>();
+
+            seq.Sequence = new()
+            {
+                Elements = new List<SequenceElement>()
+                {
+                    new KeyboardSequenceElement()
+                    {
+                        Actions = new List<SequenceActionBase>()
+                        {
+                            new SequenceAction<float>()
+                            {
+                                OnInvokeTyped = new Control.Controls.ControllerOutput<float>(),
+                                SignalValue = 1f
+                            },
+                            new SequenceAction<float>()
+                            {
+                                OnInvokeTyped = new Control.Controls.ControllerOutput<float>(),
+                                SignalValue = 1f
+                            }
+                        },
+                        Key = KeyCode.Space
+                    },
+                    new TimedSequenceElement()
+                    {
+                        Actions = new List<SequenceActionBase>()
+                        {
+                            new SequenceAction()
+                            {
+                                OnInvokeTyped = new Control.Controls.ControllerOutput()
+                            },
+                            new SequenceAction()
+                            {
+                                OnInvokeTyped = new Control.Controls.ControllerOutput()
+                            }
+                        },
+                        Delay = 5f
+                    }
+                }
+            };
+
+            ((SequenceAction<float>)seq.Sequence.Elements[0].Actions[0]).OnInvoke.TryConnect( eng1.SetThrottle );
+            ((SequenceAction<float>)seq.Sequence.Elements[0].Actions[1]).OnInvoke.TryConnect( eng2.SetThrottle );
+            ((SequenceAction)seq.Sequence.Elements[1].Actions[0]).OnInvoke.TryConnect( t1Sep.Separate );
+            ((SequenceAction)seq.Sequence.Elements[1].Actions[1]).OnInvoke.TryConnect( t2Sep.Separate );
+
+            FControlFrame fc = capsule.gameObject.GetComponent<FControlFrame>();
+            FControlFrame.VesselControlFrame = fc;
 
             return v;
         }

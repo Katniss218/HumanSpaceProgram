@@ -9,7 +9,7 @@ namespace UnityPlus.Serialization.ReferenceMaps
     public static class ReferenceMap_Ex
     {
         /// <summary>
-        /// Remaps the reference store 1-to-1, with a random identifier for each existing identifier.
+        /// Remaps the reference store 1-to-1, with a new random identifier for each existing identifier.
         /// </summary>
         public static BidirectionalReferenceStore RemapRandomly( this BidirectionalReferenceStore refStore )
         {
@@ -21,7 +21,7 @@ namespace UnityPlus.Serialization.ReferenceMaps
         }
 
         /// <summary>
-        /// Remaps the reference store 1-to-1, with a random identifier for each existing identifier.
+        /// Remaps the reference store 1-to-1, with a new random identifier for each existing identifier.
         /// </summary>
         public static ReverseReferenceStore RemapRandomly( this ReverseReferenceStore refStore )
         {
@@ -33,7 +33,7 @@ namespace UnityPlus.Serialization.ReferenceMaps
         }
 
         /// <summary>
-        /// Remaps the reference store 1-to-1, with a random identifier for each existing identifier.
+        /// Remaps the reference store 1-to-1, with a new random identifier for each existing identifier.
         /// </summary>
         public static ForwardReferenceStore RemapRandomly( this ForwardReferenceStore refStore )
         {

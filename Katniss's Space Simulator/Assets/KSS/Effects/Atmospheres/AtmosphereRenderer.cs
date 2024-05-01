@@ -22,7 +22,7 @@ namespace KSS.CelestialBodies
 
         Vector3 _center = Vector3.zero;
         [SerializeField]
-        Light light;
+        new Light light;
 
         [SerializeField]
         RenderTexture _rt;

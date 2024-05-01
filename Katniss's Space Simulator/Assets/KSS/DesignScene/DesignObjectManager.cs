@@ -158,28 +158,28 @@ namespace KSS.DesignScene
 
         public static void StartFunc()
         {
-            _wasPausedBeforeSerializing = TimeManager.IsPaused;
-            TimeManager.Pause();
-            TimeManager.LockTimescale = true;
+            _wasPausedBeforeSerializing = TimeStepManager.IsPaused;
+            TimeStepManager.Pause();
+            TimeStepManager.LockTimescale = true;
         }
 
         public static void FinishSaveFunc()
         {
-            TimeManager.LockTimescale = false;
+            TimeStepManager.LockTimescale = false;
             if( !_wasPausedBeforeSerializing )
             {
-                TimeManager.Unpause();
+                TimeStepManager.Unpause();
             }
             HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_AFTER_SAVE, null );
         }
 
         public static void FinishLoadFunc()
         {
-            TimeManager.LockTimescale = false;
+            TimeStepManager.LockTimescale = false;
             DesignObject.RootPart = _designObjStrategy.LastSpawnedRoot.transform;
             if( !_wasPausedBeforeSerializing )
             {
-                TimeManager.Unpause();
+                TimeStepManager.Unpause();
             }
             HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_AFTER_LOAD, null );
         }
@@ -232,6 +232,8 @@ namespace KSS.DesignScene
         {
             VesselMetadata loadedVesselMetadata = new VesselMetadata( vesselId );
             loadedVesselMetadata.ReadDataFromDisk();
+
+#warning TODO - add an event and update the UI when a vessel is loaded.
 
             // load current vessel from the files defined by metadata's ID.
             Directory.CreateDirectory( loadedVesselMetadata.GetRootDirectory() );

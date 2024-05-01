@@ -11,8 +11,9 @@ namespace KSS.Core
     /// <summary>
     /// Manages the currently active object.
     /// </summary>
-    public class ActiveObjectManager : SingletonMonoBehaviour<ActiveObjectManager>, IPersistent
+    public class ActiveObjectManager : SingletonMonoBehaviour<ActiveObjectManager>, IPersistsData
     {
+        [SerializeField]
         private GameObject _activeObject;
         /// <summary>
         /// Gets or sets the object that is currently being 'controlled' or viewed by the player.
@@ -31,14 +32,20 @@ namespace KSS.Core
 
         public SerializedData GetData( IReverseReferenceMap s )
         {
-            return new SerializedObject()
+            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
+
+            ret.AddAll( new SerializedObject()
             {
                 { "active_object", s.WriteObjectReference( ActiveObject ) }
-            };
+            } );
+
+            return ret;
         }
 
-        public void SetData( IForwardReferenceMap l, SerializedData data )
+        public void SetData( SerializedData data, IForwardReferenceMap l )
         {
+            IPersistent_Behaviour.SetData( this, data, l );
+
             if( data.TryGetValue( "active_object", out var activeObject ) )
                 ActiveObject = (GameObject)l.ReadObjectReference( activeObject );
         }

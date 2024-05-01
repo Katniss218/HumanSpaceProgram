@@ -13,27 +13,32 @@ namespace UnityPlus.Input.Bindings
     /// </summary>
     public sealed class MultipleKeyDownBinding : IInputBinding
     {
-        public KeyCode[] KeysOrdered { get; private set; }
-
         public bool IsValid { get; private set; }
+
+        public float Value { get; }
+        
+        public KeyCode[] KeysOrdered { get; private set; }
 
         int _indexOfKeyToPressNow;
         bool _previousFrameWasReleased = false;
-
-        public MultipleKeyDownBinding( params KeyCode[] keysOrdered )
-        {
-            if( keysOrdered.Length < 2 )
-                throw new ArgumentException( $"There must be at least 2 keys. For a single key binding use the {nameof( KeyDownBinding )}.", nameof( KeysOrdered ) );
-
-            this.KeysOrdered = keysOrdered;
-        }
-
-        public MultipleKeyDownBinding( IEnumerable<KeyCode> keysOrdered )
+        
+        public MultipleKeyDownBinding( float value, IEnumerable<KeyCode> keysOrdered )
         {
             this.KeysOrdered = keysOrdered.ToArray();
 
             if( this.KeysOrdered.Length < 2 )
                 throw new ArgumentException( $"There must be at least 2 keys. For a single key binding use the {nameof( KeyDownBinding )}.", nameof( KeysOrdered ) );
+            
+            this.Value = value;
+        }
+
+        public MultipleKeyDownBinding( float value, params KeyCode[] keysOrdered )
+        {
+            if( keysOrdered.Length < 2 )
+                throw new ArgumentException( $"There must be at least 2 keys. For a single key binding use the {nameof( KeyDownBinding )}.", nameof( KeysOrdered ) );
+
+            this.KeysOrdered = keysOrdered;
+            this.Value = value;
         }
 
         public void Update( InputState currentState )

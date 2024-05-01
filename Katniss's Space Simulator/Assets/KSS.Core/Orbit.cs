@@ -393,7 +393,7 @@ namespace KSS.Core
             double meanAnomaly = eccentricAnomaly - eccentricity * Math.Sin( eccentricAnomaly );
             double semiMajorAxis = 1 / ((2 / position.magnitude) - (velocity.sqrMagnitude / gravParameter));
 
-            return new Orbit( semiMajorAxis, eccentricity, inclination, longitudeOfAscendingNode, argumentOfPeriapsis, meanAnomaly, TimeManager.UT );
+            return new Orbit( semiMajorAxis, eccentricity, inclination, longitudeOfAscendingNode, argumentOfPeriapsis, meanAnomaly, TimeStepManager.UT );
 
             // Mechjeb version (uses right handed vectors/quaternions)
             /*double positionMagn = position.magnitude;

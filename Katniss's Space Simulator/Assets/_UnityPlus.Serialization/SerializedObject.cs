@@ -106,6 +106,31 @@ namespace UnityPlus.Serialization
         {
             return _children.TryGetValue( key, out value );
         }
+        
+        /// <returns>True if the value was found, and matches the specified type.</returns>
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public override bool TryGetValue<T>( string key, out T value )
+        {
+            if( _children.TryGetValue( key, out var tempValue ) && tempValue is T tempValueOfType )
+            {
+                value = tempValueOfType;
+                return true;
+            }
+            value = default;
+            return false;
+        }
+
+        /// <summary>
+        /// Combines the two <see cref="SerializedObject"/>s, replacing the values already present in the instance with <paramref name="other"/>'s values.
+        /// </summary>
+        /// <param name="other">The SerializedObject to combine with.</param>
+        public void AddAll( SerializedObject other )
+        {
+            foreach( var kvp in other )
+            {
+                this._children[kvp.Key] = kvp.Value;
+            }
+        }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         IEnumerator IEnumerable.GetEnumerator()

@@ -12,18 +12,21 @@ namespace UnityPlus.Input.Bindings
     {
         public const float MaxMouseDelta = 4.0f;
 
-        public KeyCode Key { get; set; }
-
         public bool IsValid { get; private set; }
+
+        public float Value { get; }
+        
+        public KeyCode Key { get; set; }
 
         bool _previousFrameWasHeld = false;
         bool _deltaExceeded = false;
 
         Vector2 _startPosition = Vector2.zero;
 
-        public MouseClickBinding( KeyCode key )
+        public MouseClickBinding( float value, KeyCode key )
         {
             this.Key = key;
+            this.Value = value;
         }
 
         public void Update( InputState currentState )

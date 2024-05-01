@@ -266,12 +266,12 @@ namespace KSS.GameplayScene
             if( State == ConstructionState.Constructing )
             {
                 inProgressConstructibles = _constructibles.Where( c => c.BuildPercent < 1.0f ).ToArray();
-                buildPointsDelta = (BuildSpeed / inProgressConstructibles.Length) * TimeManager.DeltaTime;
+                buildPointsDelta = (BuildSpeed / inProgressConstructibles.Length) * TimeStepManager.DeltaTime;
             }
             else if( State == ConstructionState.Deconstructing )
             {
                 inProgressConstructibles = _constructibles.Where( c => c.BuildPercent > 0.0f ).ToArray();
-                buildPointsDelta = (-BuildSpeed / inProgressConstructibles.Length) * TimeManager.DeltaTime;
+                buildPointsDelta = (-BuildSpeed / inProgressConstructibles.Length) * TimeStepManager.DeltaTime;
             }
 
             if( inProgressConstructibles != null )

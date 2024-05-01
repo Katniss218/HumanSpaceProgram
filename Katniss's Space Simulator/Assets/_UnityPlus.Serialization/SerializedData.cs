@@ -25,6 +25,7 @@ namespace UnityPlus.Serialization
         public abstract SerializedData this[string name] { get; set; }
 
         public abstract bool TryGetValue( string name, out SerializedData value );
+        public abstract bool TryGetValue<T>( string name, out T value ) where T : SerializedData;
 
         public static implicit operator SerializedData( bool v ) => (SerializedPrimitive)v;
         public static implicit operator SerializedData( sbyte v ) => (SerializedPrimitive)v;

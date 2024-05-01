@@ -9,6 +9,7 @@ using System.Linq;
 using UnityEngine;
 using UnityPlus.Input;
 using UnityPlus.Serialization;
+using UnityPlus.UILib;
 
 namespace KSS.UI
 {
@@ -34,7 +35,7 @@ namespace KSS.UI
             HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.VIEWPORT_PRIMARY_DOWN, Input_MouseDown );
         }
 
-        private bool Input_MouseDown()
+        private bool Input_MouseDown( float value )
         {
             if( UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() )
                 return false;
@@ -61,9 +62,9 @@ namespace KSS.UI
                 return false;
             }
 
-            if( !PartWindow.ExistsFor( clickedPart ) )
+            if( !UIPartWindow.ExistsFor( clickedPart ) )
             {
-                PartWindow window = PartWindow.Create( clickedPart );
+                UIPartWindow partWindow = CanvasManager.Get( CanvasName.WINDOWS ).AddPartWindow( new UILayoutInfo( UIAnchor.Center, (0, 0), (300f, 300f) ), clickedPart );
                 return true;
             }
             return false;
