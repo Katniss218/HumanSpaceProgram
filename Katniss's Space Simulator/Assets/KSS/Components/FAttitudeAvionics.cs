@@ -165,7 +165,7 @@ namespace KSS.Components
 				if( Math.Abs( error ) < PosDeadband )
 					error = 0;
 				else
-					error -= Math.Sign( error ) * PosDeadband;
+					error -= Math.Sign( error ) * PosDeadband; // Subtract the deadband (shifts the error by the deadband amount).
 
 				_maxAlpha[i] = controlTorque[i] / _vessel.PhysicsObject.MomentsOfInertia[i];
 
