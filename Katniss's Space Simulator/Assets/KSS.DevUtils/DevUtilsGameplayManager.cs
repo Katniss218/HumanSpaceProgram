@@ -310,7 +310,7 @@ namespace KSS.DevUtils
 
             av.OnSetAttitude.TryConnect( gc.SetAttitude );
             //atv.OnSetAttitude.TryConnect( gc.SetAttitude );
-            av.OnSetAttitude.TryConnect( gc.SetAttitude );
+
             gc.Actuators2D[0] = new FGimbalActuatorController.Actuator2DGroup();
             gc.Actuators2D[0].GetReferenceTransform.TryConnect( ac1.GetReferenceTransform );
             gc.Actuators2D[0].OnSetXY.TryConnect( ac1.SetXY );

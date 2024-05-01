@@ -20,8 +20,9 @@ namespace KSS.Components
 	{
 		private Vessel _vessel;
 
-		// error in pitch, roll, yaw, in [Rad]
-		private Vector3Dbl _error0 = Vector3Dbl.zero;
+        // error in pitch, roll, yaw, in [Rad]
+        [field: SerializeField]
+        private Vector3Dbl _error0 = Vector3Dbl.zero;
 		private Vector3Dbl _error1 = new Vector3Dbl( double.NaN, double.NaN, double.NaN );
 
 		// max angular acceleration
@@ -66,9 +67,8 @@ namespace KSS.Components
 		private Vector3 Ac_ActuationControl = Vector3.one;
 		private Vector3 Ac_OmegaTarget = new Vector3( float.NaN, float.NaN, float.NaN );
 
-		[field: SerializeField]
-		private Vector3Dbl outDeltaEuler;
-		[field: SerializeField]
+        [field: SerializeField]
+        private Vector3Dbl outDeltaEuler;
 		private Vector3Dbl outActuation;
 
 		/// <summary>
@@ -137,7 +137,7 @@ namespace KSS.Components
 			}
 			outActuation = _actuation;
 
-			OnSetAttitude.TrySendSignal( (Vector3)outActuation );
+			OnSetAttitude.TrySendSignal( (Vector3)outActuation * 5f );
 		}
 
 		private void UpdatePredictionPI()
@@ -243,8 +243,6 @@ namespace KSS.Components
 
 		private void UpdateError()
 		{
-
-
 			// 1. The Euler(-90) here is because the unity transform puts "up" as the pointy end, which is wrong.  The rotation means that
 			// "forward" becomes the pointy end, and "up" and "right" correctly define e.g. AoA/pitch and AoS/yaw.  This is just KSP being KSP.
 			// 2. We then use the inverse ship rotation to transform the requested attitude into the ship frame (we do everything in the ship frame
@@ -277,6 +275,7 @@ namespace KSS.Components
 			phi.Scale( Ac_AxisControl );
 
 			// the error in the ship's position is the negative of the reference position in the ship frame
+#warning TODO - something somewhere here is broken, because the error doesn't correlate with the vessel angular rotation whatsoever.
 			_error0 = -phi;
 		}
 

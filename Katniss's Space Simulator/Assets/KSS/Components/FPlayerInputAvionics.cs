@@ -88,7 +88,10 @@ namespace KSS.Components
 		{
 			_pitchSignal = value * AttitudeSensitivity.x;
 
-			OnSetAttitude.TrySendSignal( new Vector3( _pitchSignal, _yawSignal, _rollSignal ) );
+			if( Mathf.Abs( _pitchSignal ) > 0.01f )
+			{
+				OnSetAttitude.TrySendSignal( new Vector3( _pitchSignal, _yawSignal, _rollSignal ) );
+			}
 			return false;
 		}
 
@@ -96,16 +99,22 @@ namespace KSS.Components
 		{
 			_yawSignal = value * AttitudeSensitivity.y;
 
-			OnSetAttitude.TrySendSignal( new Vector3( _pitchSignal, _yawSignal, _rollSignal ) );
-			return false;
+            if( Mathf.Abs( _yawSignal ) > 0.01f )
+            {
+                OnSetAttitude.TrySendSignal( new Vector3( _pitchSignal, _yawSignal, _rollSignal ) );
+            }
+            return false;
 		}
 
 		bool Input_Roll( float value )
 		{
 			_rollSignal = value * AttitudeSensitivity.z;
 
-			OnSetAttitude.TrySendSignal( new Vector3( _pitchSignal, _yawSignal, _rollSignal ) );
-			return false;
+            if( Mathf.Abs( _rollSignal ) > 0.01f )
+            {
+                OnSetAttitude.TrySendSignal( new Vector3( _pitchSignal, _yawSignal, _rollSignal ) );
+            }
+            return false;
 		}
 
         public SerializedObject GetObjects( IReverseReferenceMap s )
