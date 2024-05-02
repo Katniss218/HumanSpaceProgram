@@ -315,6 +315,9 @@ namespace KSS.UI.Windows
         {
             UIContextMenu contextMenu = targetButton.rectTransform.CreateContextMenu( CanvasManager.Get( CanvasName.CONTEXT_MENUS ), new UILayoutInfo( UIAnchor.TopLeft, (0, 0), (200, 400) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/panel_light" ) );
 
+            contextMenu.TargetCorner = new Vector2( 0, 0 );
+            contextMenu.SelfCorner = new Vector2( 0, 1 );
+
             UIScrollView scrollView = contextMenu.AddVerticalScrollView( new UILayoutInfo( UIFill.Fill() ), 1000 );
 
             float currentY = 0f;

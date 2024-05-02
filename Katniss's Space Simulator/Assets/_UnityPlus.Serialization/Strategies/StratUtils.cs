@@ -133,15 +133,6 @@ namespace UnityPlus.Serialization.Strategies
 		//  explicit hierarchy writing.
 		//
 
-		public static SerializedObject WriteObjectInstance( this IReverseReferenceMap s, object obj )
-		{
-			return new SerializedObject()
-			{
-				{ KeyNames.ID, s.GetID( obj ).GetData() },
-				{ KeyNames.TYPE, obj.GetType().GetData() }
-			};
-		}
-		
 		/// <summary>
 		/// Saves the components a gameobject (object pass).
 		/// </summary>

@@ -41,10 +41,13 @@ namespace KSS.UI
             }
 
             int num = 0;
-            foreach( var element in _activeSequencer.Sequence.RemainingElements )
+            if( _activeSequencer != null )
             {
-                this.AddSequenceElement( new UILayoutInfo( UIAnchor.BottomLeft, 0, (50, 100) ), element, $" #{num} " );
-                num++;
+                foreach( var element in _activeSequencer.Sequence.RemainingElements )
+                {
+                    this.AddSequenceElement( new UILayoutInfo( UIAnchor.BottomLeft, 0, (50, 100) ), element, $" #{num} " );
+                    num++;
+                }
             }
 
             UILayoutManager.ForceLayoutUpdate( this );

@@ -14,6 +14,23 @@ namespace UnityPlus.Serialization
             // this should also handle immutables.
         }
 
+        public static SerializedObject WriteObjectStub( object obj, IReverseReferenceMap s )
+        {
+            return new SerializedObject()
+            {
+                { KeyNames.REF, s.GetID( obj ).GetData() },
+            };
+        }
+
+        public static SerializedObject WriteObjectStubTyped( object obj, Type objType, IReverseReferenceMap s )
+        {
+            return new SerializedObject()
+            {
+                { KeyNames.ID, s.GetID( obj ).GetData() },
+                { KeyNames.TYPE, objType.GetData() }
+            };
+        }
+
         public static object ToObject( this SerializedObject data, IForwardReferenceMap l )
         {
             Type type = data[KeyNames.TYPE].ToType();

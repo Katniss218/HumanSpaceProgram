@@ -8,12 +8,11 @@ namespace UnityPlus.Serialization
 {
     public static class Persistent_object
     {
-        // In practice, this isn't really needed anymore. Since auto-serialization is out the window now, all binding is done at compile time now.
-
         public static SerializedObject GetObjects( this object obj, IReverseReferenceMap s )
         {
             Type type = obj.GetType();
 
+#warning TODO - move this stub from here to somewhere else.
             SerializedObject data = new SerializedObject()
             {
                 { KeyNames.ID, s.GetID( obj ).GetData() },

@@ -7,7 +7,7 @@ using System.Linq;
 namespace KSS.Control.Controls
 {
     /// <summary>
-    /// Represents a control that produces a control signal of type <typeparamref name="T"/>.
+    /// Represents a control that produces an empty control signal.
     /// </summary>
     public sealed class ControllerOutput : ControllerOutputBase
     {

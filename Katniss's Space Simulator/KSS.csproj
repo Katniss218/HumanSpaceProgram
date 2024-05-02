@@ -117,6 +117,9 @@
     <Compile Include="Assets\KSS\GhostableExtensions\IGhostable_Ex.cs" />
     <Compile Include="Assets\KSS\Ghostable_object.cs" />
     <Compile Include="Assets\KSS\IGhostable.cs" />
+    <Compile Include="Assets\KSS\Components\FSequencer.SequenceElement.cs" />
+    <Compile Include="Assets\KSS\Components\FSequencer.Sequence.cs" />
+    <Compile Include="Assets\KSS\Components\FSequencer.SequenceAction.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS\CelestialBodies\Surface\TerrainShader.shader" />

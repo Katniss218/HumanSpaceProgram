@@ -9,7 +9,7 @@ using UnityPlus.Serialization;
 namespace KSS.Control.Controls
 {
 	/// <summary>
-	/// Represents a control that consumes a control signal of type <typeparamref name="T"/>.
+	/// Represents a control that consumes an empty control signal.
 	/// </summary>
 	public sealed class ControlleeInput : ControlleeInputBase, IPersistsData
     {

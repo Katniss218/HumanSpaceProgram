@@ -24,7 +24,7 @@ namespace UnityEngine
 			_map[typeof(object)] = defaultValue;
 		}
 
-		public bool TryGet( Type type, out T value )
+        public bool TryGet( Type type, out T value )
 		{
 			if( type == null )
 			{

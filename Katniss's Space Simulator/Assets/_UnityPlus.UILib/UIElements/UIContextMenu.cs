@@ -27,8 +27,10 @@ namespace UnityPlus.UILib.UIElements
         public Action OnHide;
 
         public Vector2 Offset { get => trackerComponent.Offset; set => trackerComponent.Offset = value; }
+        public Vector2 TargetCorner { get => trackerComponent.TargetCorner; set => trackerComponent.TargetCorner = value; }
+        public Vector2 SelfCorner { get => trackerComponent.SelfCorner; set => trackerComponent.SelfCorner = value; }
 
-        public bool AllowClickDestroy { get; set; }
+        public bool AllowClickDestroy { get; set; } = true;
 
         private bool _isPointerExited = true;
 

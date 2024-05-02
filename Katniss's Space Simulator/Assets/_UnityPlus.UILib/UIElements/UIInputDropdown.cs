@@ -125,9 +125,8 @@ namespace UnityPlus.UILib.UIElements
                         this.SyncVisual();
                     }
                 };
-                var TEMP_TRACKER_DO_IT_PROPERLY = this.contextMenu.GetComponent<RectTransformTrackRectTransform>();
-                TEMP_TRACKER_DO_IT_PROPERLY.SelfCorner = new Vector2( 0, 1 );
-                TEMP_TRACKER_DO_IT_PROPERLY.TargetCorner = new Vector2( 0, 0 );
+                this.contextMenu.TargetCorner = new Vector2( 0, 0 );
+                this.contextMenu.SelfCorner = new Vector2( 0, 1 );
 
                 UIScrollView uiScrollView = this.contextMenu.AddVerticalScrollView( new UILayoutInfo( UIFill.Fill() ), step * this.options.Length );
 
