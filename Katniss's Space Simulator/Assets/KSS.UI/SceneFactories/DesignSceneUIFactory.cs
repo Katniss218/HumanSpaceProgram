@@ -67,6 +67,12 @@ namespace KSS.UI.SceneFactories
             } );
             UIButton saveBtn = p1.AddButton( new UILayoutInfo( UIAnchor.BottomLeft, (80, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_save" ), () =>
             {
+                if( DesignObjectManager.CurrentVesselMetadata == null )
+                {
+                    CanvasManager.Get( CanvasName.WINDOWS ).AddAlertWindow( "Specify the name of the vessel before saving." );
+                    return;
+                }
+
                 CanvasManager.Get( CanvasName.WINDOWS ).AddConfirmWindow( "Save ...", $"Confirm saving '{DesignObjectManager.CurrentVesselMetadata.ID}'.", () =>
                 {
                     DesignObjectManager.SaveVessel();

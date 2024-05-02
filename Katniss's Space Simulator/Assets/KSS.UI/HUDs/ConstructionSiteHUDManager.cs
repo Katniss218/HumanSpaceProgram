@@ -37,6 +37,9 @@ namespace KSS.UI.HUDs
 
             foreach( var hud in instance._huds.ToArray() )
             {
+                if( hud == null ) // if was destroyed by scene change.
+                    continue;
+
                 if( hud.ConstructionSite == constructionSite )
                 {
                     Destroy( hud.gameObject );

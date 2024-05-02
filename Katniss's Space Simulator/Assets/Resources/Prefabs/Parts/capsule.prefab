@@ -86,7 +86,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <PartID>k__BackingField:
-    _data: Vanilla::tank
+    _data: Vanilla::capsule
 --- !u!114 &1632188022149188359
 MonoBehaviour:
   m_ObjectHideFlags: 0

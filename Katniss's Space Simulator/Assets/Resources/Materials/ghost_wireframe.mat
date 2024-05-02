@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Unlit_Wireframe
+  m_Name: ghost_wireframe
   m_Shader: {fileID: 4800000, guid: a0b096a58f58b234bb1abbd515466938, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -29,9 +29,10 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _FillAlpha: 0.3333
     - _WireframeAliasing: 1.5
     - _WireframeWidth: 0.1
     m_Colors:
-    - _WireframeBackColour: {r: 0.32280168, g: 0.5849056, b: 0.41933644, a: 1}
-    - _WireframeFrontColour: {r: 0.6208528, g: 1, b: 0.5707547, a: 1}
+    - _WireframeBackColour: {r: 0.3137255, g: 0.5882353, b: 0.5019608, a: 1}
+    - _WireframeFrontColour: {r: 0.6862745, g: 1, b: 0.6862745, a: 1}
   m_BuildTextureStacks: []

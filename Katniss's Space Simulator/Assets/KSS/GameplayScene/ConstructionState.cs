@@ -51,5 +51,27 @@ namespace KSS.GameplayScene
         {
             return (int)state < 0;
         }
+
+        /// <summary>
+        /// Does the state represents deconstruction (either ongoing or paused)?
+        /// </summary>
+        public static bool IsPaused( this ConstructionState state )
+        {
+            if( state == ConstructionState.NotStarted )
+                return false;
+
+            return ((int)state % 2) == 0;
+        }
+
+        /// <summary>
+        /// Does the state represents deconstruction (either ongoing or paused)?
+        /// </summary>
+        public static bool IsInProgress( this ConstructionState state )
+        {
+            if( state == ConstructionState.NotStarted )
+                return false;
+
+            return ((int)state % 2) == 1;
+        }
     }
 }

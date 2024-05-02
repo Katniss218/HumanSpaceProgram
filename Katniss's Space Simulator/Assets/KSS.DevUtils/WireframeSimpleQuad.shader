@@ -5,6 +5,7 @@ Shader "Unlit/WireframeSimpleQuad"
         _MainTex("Texture", 2D) = "white" {}
         _WireframeFrontColour("Wireframe front colour", color) = (1.0, 1.0, 1.0, 1.0)
         _WireframeBackColour("Wireframe back colour", color) = (0.5, 0.5, 0.5, 1.0)
+        _FillAlpha("Face fill alpha", float) = 0.3333
         _WireframeWidth("Wireframe width threshold", float) = 0.05
     }
     SubShader
@@ -92,6 +93,7 @@ Shader "Unlit/WireframeSimpleQuad"
 
             fixed4 _WireframeBackColour;
             float _WireframeWidth;
+            float _FillAlpha;
 
             fixed4 frag(g2f i) : SV_Target
             {
@@ -99,6 +101,9 @@ Shader "Unlit/WireframeSimpleQuad"
                 float closest = min(i.barycentric.x, min(i.barycentric.y, i.barycentric.z));
                 // Set alpha to 1 if within the threshold, else 0.
                 float alpha = step(closest, _WireframeWidth);
+
+                alpha = alpha == 0.0 ? _FillAlpha : 1.0;
+
                 // Set to our backwards facing wireframe colour.
                 return fixed4(_WireframeBackColour.r, _WireframeBackColour.g, _WireframeBackColour.b, alpha);
             }
@@ -184,6 +189,7 @@ Shader "Unlit/WireframeSimpleQuad"
 
             fixed4 _WireframeFrontColour;
             float _WireframeWidth;
+            float _FillAlpha;
 
             fixed4 frag(g2f i) : SV_Target
             {
@@ -191,6 +197,9 @@ Shader "Unlit/WireframeSimpleQuad"
                 float closest = min(i.barycentric.x, min(i.barycentric.y, i.barycentric.z));
                 // Set alpha to 1 if within the threshold, else 0.
                 float alpha = step(closest, _WireframeWidth);
+                
+                alpha = alpha == 0.0 ? _FillAlpha : 1.0;
+
                 // Set to our forwards facing wireframe colour.
                 return fixed4(_WireframeFrontColour.r, _WireframeFrontColour.g, _WireframeFrontColour.b, alpha);
             }

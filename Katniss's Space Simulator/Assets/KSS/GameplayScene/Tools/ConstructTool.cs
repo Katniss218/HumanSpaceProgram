@@ -4,6 +4,7 @@ using KSS.Core.Components;
 using KSS.Core.Mods;
 using KSS.Core.Physics;
 using KSS.Core.ReferenceFrames;
+using KSS.DesignScene;
 using KSS.Input;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,7 @@ using UnityEngine;
 using UnityPlus.Input;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.ReferenceMaps;
+using UnityPlus.UILib;
 
 namespace KSS.GameplayScene.Tools
 {

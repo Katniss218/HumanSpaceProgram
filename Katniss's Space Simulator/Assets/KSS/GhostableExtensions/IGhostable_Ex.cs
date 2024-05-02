@@ -14,7 +14,7 @@ namespace KSS
     {
         public static SerializedData GetGhostData( this Renderer renderer, IReverseReferenceMap s )
         {
-            var ghostMat = AssetRegistry.Get<Material>( "builtin::Resources/Materials/ghost" );
+            var ghostMat = AssetRegistry.Get<Material>( "builtin::Resources/Materials/ghost_wireframe" );
 
             SerializedArray ghostMats = new SerializedArray();
             for( int i = 0; i < renderer.sharedMaterials.Length; i++ )

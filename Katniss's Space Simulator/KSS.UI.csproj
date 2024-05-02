@@ -71,7 +71,7 @@
     <Compile Include="Assets\KSS.UI\ControlSetupWindowComponentUI.cs" />
     <Compile Include="Assets\KSS.UI\UISaveMetadata.cs" />
     <Compile Include="Assets\KSS.UI\CanvasName.cs" />
-    <Compile Include="Assets\KSS.UI\Windows\UIConfirmationWindow.cs" />
+    <Compile Include="Assets\KSS.UI\Windows\UIConfirmWindow.cs" />
     <Compile Include="Assets\KSS.UI\UISequenceElement.cs" />
     <Compile Include="Assets\KSS.UI\SceneFactories\GameplaySceneUIFactory.cs" />
     <Compile Include="Assets\KSS.UI\Windows\PartWindowComponents\UIPartWindowComponent.cs" />
@@ -101,6 +101,7 @@
     <Compile Include="Assets\KSS.UI\HUDs\VesselHUD.cs" />
     <Compile Include="Assets\KSS.UI\SceneFactories\DesignSceneUIFactory.cs" />
     <Compile Include="Assets\KSS.UI\UITextReadout_FPS.cs" />
+    <Compile Include="Assets\KSS.UI\Windows\UIAlertWindow.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.UI\___KSS.UI.asmdef" />

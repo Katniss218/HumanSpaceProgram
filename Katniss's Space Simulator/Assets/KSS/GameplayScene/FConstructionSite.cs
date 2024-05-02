@@ -199,7 +199,7 @@ namespace KSS.GameplayScene
 
         void Update()
         {
-            if( UnityEngine.Input.GetKeyDown( KeyCode.G ) )
+            /*if( UnityEngine.Input.GetKeyDown( KeyCode.G ) )
             {
                 this.BuildSpeed = 90f;
                 StartConstructing();
@@ -213,7 +213,7 @@ namespace KSS.GameplayScene
             {
                 this.BuildSpeed = 90f;
                 StartDeconstructing();
-            }
+            }*/
 
             FConstructible[] inProgressConstructibles = null;
             float buildPointsDelta = 0.0f;

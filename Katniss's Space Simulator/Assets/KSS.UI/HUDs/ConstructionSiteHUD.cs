@@ -63,6 +63,42 @@ namespace KSS.UI.HUDs
             throw new InvalidOperationException( $"Can't get sprite - unknown state of construction." );
         }
 
+        private void PauseResume()
+        {
+            if( ConstructionSite.State == ConstructionState.NotStarted )
+            {
+                ConstructionSite.BuildSpeed = 90f; // TODO - remove this once proper build speed (due to nearby cranes) is implemented.
+                ConstructionSite.StartConstructing();
+                _pauseResumeButton.Background = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_pause" );
+                return;
+            }
+
+            if( ConstructionSite.State.IsPaused() )
+            {
+                ConstructionSite.Unpause();
+                _pauseResumeButton.Background = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_pause" );
+            }
+            else
+            {
+                ConstructionSite.Pause();
+                _pauseResumeButton.Background = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_resume" );
+            }
+        }
+
+        private void Reverse()
+        {
+            if( ConstructionSite.State.IsConstruction() )
+            {
+                ConstructionSite.StartDeconstructing();
+                _reverseButton.Background = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_redo" );
+            }
+            else if( ConstructionSite.State.IsDeconstruction() )
+            {
+                ConstructionSite.StartConstructing();
+                _reverseButton.Background = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_undo" );
+            }
+        }
+
         void LateUpdate()
         {
             (float current, float total) = ConstructionSite.GetBuildPoints();
@@ -83,8 +119,10 @@ namespace KSS.UI.HUDs
 
             UIIcon statucIcon = uiHUD.AddIcon( new UILayoutInfo( UIAnchor.TopLeft, (26, -5), (20, 20) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/csite_status_in_progress" ) );
             UIIcon progressIcon = uiHUD.AddIcon( new UILayoutInfo( UIAnchor.TopLeft, (21, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/csite_progress_bar" ) );
-            UIButton pauseResumeButton = uiHUD.AddButton( new UILayoutInfo( UIAnchor.TopLeft, (53, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_pause" ), null );
-            UIButton reverseButton = uiHUD.AddButton( new UILayoutInfo( UIAnchor.TopLeft, (85, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null )
+
+            UIButton pauseResumeButton = uiHUD.AddButton( new UILayoutInfo( UIAnchor.TopLeft, (53, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_resume" ), uiHUD.PauseResume );
+
+            UIButton reverseButton = uiHUD.AddButton( new UILayoutInfo( UIAnchor.TopLeft, (85, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_undo" ), uiHUD.Reverse )
                 .WithText( new UILayoutInfo( UIFill.Fill() ), "rev.", out _ );
 
             uiHUD.ConstructionSite = constructionSite;
