@@ -12,7 +12,7 @@ namespace UnityEngine
 	/// </summary>
 	public class TypeMap<T>
 	{
-		private readonly Dictionary<Type, T> _map = new(); // pass in the target type, and creation data.
+		private readonly Dictionary<Type, T> _map = new();
 
 		public TypeMap()
 		{
@@ -22,26 +22,6 @@ namespace UnityEngine
 		public TypeMap( T defaultValue )
 		{
 			_map[typeof(object)] = defaultValue;
-		}
-
-		/// <summary>
-		/// Sets the value for the corresponding type.
-		/// </summary>
-		/// <typeparam name="TType">The type to set the value for.</typeparam>
-		/// <param name="value">The value to set.</param>
-		public void Set<TType>( T value )
-		{
-			Set( typeof( TType ), value );
-		}
-
-		/// <summary>
-		/// Sets the value for the corresponding type.
-		/// </summary>
-		/// <param name="type">The type to set the value for.</param>
-		/// <param name="value">The value to set.</param>
-		public void Set( Type type, T value )
-		{
-			_map[type] = value;
 		}
 
 		public bool TryGet( Type type, out T value )
@@ -161,5 +141,31 @@ namespace UnityEngine
 
 			return value;
 		}
-	}
+
+
+        /// <summary>
+        /// Sets the value for the corresponding type.
+        /// </summary>
+        /// <typeparam name="TType">The type to set the value for.</typeparam>
+        /// <param name="value">The value to set.</param>
+        public void Set<TType>( T value )
+        {
+            Set( typeof( TType ), value );
+        }
+
+        /// <summary>
+        /// Sets the value for the corresponding type.
+        /// </summary>
+        /// <param name="type">The type to set the value for.</param>
+        /// <param name="value">The value to set.</param>
+        public void Set( Type type, T value )
+        {
+            _map[type] = value;
+        }
+
+		public void Clear()
+		{
+			_map.Clear();
+		}
+    }
 }

@@ -329,8 +329,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 202c94cb92f264245a4a47ba8a5e0a2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _buildPoints: 0
-  _maxBuildPoints: 0
+  _buildPoints: 90
+  _maxBuildPoints: 90
 --- !u!1 &8895903900501251924
 GameObject:
   m_ObjectHideFlags: 0

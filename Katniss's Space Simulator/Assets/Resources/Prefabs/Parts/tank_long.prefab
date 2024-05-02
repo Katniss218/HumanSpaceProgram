@@ -241,8 +241,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 202c94cb92f264245a4a47ba8a5e0a2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <BuildPoints>k__BackingField: 150
-  <MaxBuildPoints>k__BackingField: 150
+  _buildPoints: 90
+  _maxBuildPoints: 90
 --- !u!1 &6112259470971288608
 GameObject:
   m_ObjectHideFlags: 0

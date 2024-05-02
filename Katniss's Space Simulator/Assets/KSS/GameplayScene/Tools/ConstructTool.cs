@@ -1,6 +1,7 @@
 ﻿using KSS.Components;
 using KSS.Core;
 using KSS.Core.Components;
+using KSS.Core.Mods;
 using KSS.Core.Physics;
 using KSS.Core.ReferenceFrames;
 using KSS.Input;
@@ -11,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Input;
+using UnityPlus.Serialization;
 using UnityPlus.Serialization.ReferenceMaps;
 
 namespace KSS.GameplayScene.Tools
@@ -37,25 +39,28 @@ namespace KSS.GameplayScene.Tools
 		private Transform _hitObject;
 		private RaycastHit _hit;
 
-		/// <summary>
-		/// sets or resets the currently held ghost hierarchy.
-		/// </summary>
-		/// <param name="root">The root object of the hierarchy.</param>
-		/// <param name="heldOffset"></param>
-		public void SetGhostPart( Transform root, Vector3 heldOffset )
-		{
-			if( this._heldPart == root )
-				return;
+		IForwardReferenceMap refMap; // ref map used to spawn the object.
 
-			if( this._heldPart != null )
-			{
-				Destroy( this._heldPart.gameObject );
+		public void SpawnVesselAndSetGhost( string vesselId )
+		{
+            ForwardReferenceStore refStore = new ForwardReferenceStore();
+			GameObject spawnedGameObject = PartRegistry.Load( new NamespacedIdentifier( "Vessels", vesselId ), refStore );
+			if( spawnedGameObject == null )
+            {
+                GameplaySceneToolManager.UseTool<DefaultTool>();
+                return;
 			}
 
-			this._heldPart = root;
-			this._heldPart.gameObject.SetLayer( (int)Layer.VESSEL_DESIGN_HELD, true );
-			this._heldOffset = heldOffset;
-		}
+			foreach( var fc in spawnedGameObject.GetComponentsInChildren<FConstructible>() )
+			{
+				fc.BuildPoints = 0.0f; // This ghosts the new object.
+			}
+
+			this.refMap = refStore;
+            this._heldPart = spawnedGameObject.transform;
+            this._heldPart.gameObject.SetLayer( (int)Layer.VESSEL_DESIGN_HELD, true );
+            this._heldOffset = Vector3.zero;
+        }
 
 		void Awake()
 		{
@@ -180,7 +185,7 @@ namespace KSS.GameplayScene.Tools
 					return;
 				}
 
-				FConstructionSite.TryAddPart( _heldPart, _hitObject );
+				FConstructionSite.CreateOrAppend( _heldPart, _hitObject );
 			}
 			else
 			{
@@ -194,7 +199,7 @@ namespace KSS.GameplayScene.Tools
 				Transform newRoot = VesselHierarchyUtils.ReRoot( _currentSnap.Value.snappedNode.transform.parent );
 				_heldPart = newRoot;
 				// Node-attach (object is already positioned).
-				FConstructionSite.TryAddPart( _heldPart, parent );
+				FConstructionSite.CreateOrAppend( _heldPart, parent );
 			}
 			_heldPart = null;
 			_currentSnap = null;

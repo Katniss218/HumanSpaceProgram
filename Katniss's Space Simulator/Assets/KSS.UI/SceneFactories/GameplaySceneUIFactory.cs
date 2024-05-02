@@ -145,13 +145,8 @@ namespace KSS.UI.SceneFactories
             {
                 CanvasManager.Get( CanvasName.WINDOWS ).AddPromptWindow( "Vessel to create...", "id here", vesselId =>
                 {
-                    Transform root = PartRegistry.Load( new NamespacedIdentifier( "Vessels", vesselId ) ).transform;
-
-                    foreach( var fc in root.GetComponentsInChildren<FConstructible>() )
-                        fc.BuildPoints = 0.0f;
-
                     ConstructTool tool = GameplaySceneToolManager.UseTool<ConstructTool>();
-                    tool.SetGhostPart( root, Vector3.zero );
+                    tool.SpawnVesselAndSetGhost( vesselId );
                 } );
             } )
                 .WithText( new UILayoutInfo( UIFill.Fill() ), "C", out _ );

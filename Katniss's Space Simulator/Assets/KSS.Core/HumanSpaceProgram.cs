@@ -14,16 +14,6 @@ namespace KSS.Core
     public static class HumanSpaceProgram
     {
         /// <summary>
-        /// The name of the `Saves` directory.
-        /// </summary>
-        public const string SavesDirectoryName = "Saves";
-        
-        /// <summary>
-        /// The name of the `Vessels` directory.
-        /// </summary>
-        public const string VesselsDirectoryName = "Vessels";
-
-        /// <summary>
         /// Computes the path to the base directory where Human Space Program is installed.
         /// </summary>
         public static string GetBaseDirectoryPath()
@@ -50,12 +40,23 @@ namespace KSS.Core
         }
 
         /// <summary>
+        /// The name of the `Saves` directory.
+        /// </summary>
+        public const string SavesDirectoryName = "Saves";
+
+        /// <summary>
         /// Figures out and returns the path to the `Saves` directory.
         /// </summary>
         public static string GetSaveDirectoryPath()
         {
             return Path.Combine( GetBaseDirectoryPath(), SavesDirectoryName );
         }
+
+        /// <summary>
+        /// The name of the `Vessels` directory.
+        /// </summary>
+        public const string VesselsDirectoryName = "Vessels";
+
         /// <summary>
         /// Figures out and returns the path to the `Saves` directory.
         /// </summary>

@@ -30,6 +30,11 @@ namespace UnityPlus.Serialization.ReferenceMaps
             }
         }
 
+        public void Clear()
+        {
+            _forward.Clear();
+        }
+
         //
         //  FORWARD
         //

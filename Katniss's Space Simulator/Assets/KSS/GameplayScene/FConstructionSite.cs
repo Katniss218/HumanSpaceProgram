@@ -11,52 +11,6 @@ using UnityPlus.Serialization.ReferenceMaps;
 
 namespace KSS.GameplayScene
 {
-    /// <summary>
-    /// Specifies the state of (de)construction.
-    /// </summary>
-    public enum ConstructionState : sbyte
-    {
-        /// <summary>
-        /// Indicates that the (de)construction is waiting for the player to approve (start) it.
-        /// </summary>
-        NotStarted = 0,
-        /// <summary>
-        /// Construction is ongoing.
-        /// </summary>
-        Constructing = 1,
-        /// <summary>
-        /// Construction is paused.
-        /// </summary>
-        PausedConstructing = 2,
-        /// <summary>
-        /// Deconstruction is ongoing.
-        /// </summary>
-        Deconstructing = -1,
-        /// <summary>
-        /// Deconstruction is paused.
-        /// </summary>
-        PausedDeconstructing = -2
-    }
-
-    public static class ConstructionState_Ex
-    {
-        /// <summary>
-        /// Does the state represents construction (either ongoing or paused)?
-        /// </summary>
-        public static bool IsConstruction( this ConstructionState state )
-        {
-            return (int)state > 0;
-        }
-
-        /// <summary>
-        /// Does the state represents deconstruction (either ongoing or paused)?
-        /// </summary>
-        public static bool IsDeconstruction( this ConstructionState state )
-        {
-            return (int)state < 0;
-        }
-    }
-
     public static class FConstructionSite_Transform_Ex
     {
         /// <summary>
@@ -77,16 +31,16 @@ namespace KSS.GameplayScene
         }
 
         /// <summary>
-        /// Gets the <see cref="FConstructionSite"/> that is constructing this part.
+        /// Gets the <see cref="FConstructionSite"/> that is constructing this constructible.
         /// </summary>
-        /// <returns>The construction site. Null if the transform is not under construction/deconstruction.</returns>
+        /// <returns>The construction site corresponding to this constructible. Null if the transform is not under construction/deconstruction.</returns>
         public static FConstructionSite GetConstructionSite( this FConstructible part )
         {
             return GetConstructionSite( part.transform );
         }
 
         /// <summary>
-        /// Checks whether a given transform belongs to a construction site.
+        /// Checks whether a given transform is a descendant of a construction site.
         /// </summary>
         public static bool IsUnderConstruction( this Transform part )
         {
@@ -97,7 +51,7 @@ namespace KSS.GameplayScene
         }
 
         /// <summary>
-        /// Checks whether a given part belongs to a construction site.
+        /// Checks whether a given constructible belongs to a construction site.
         /// </summary>
         public static bool IsUnderConstruction( this FConstructible part )
         {
@@ -105,7 +59,7 @@ namespace KSS.GameplayScene
         }
 
         /// <summary>
-        /// Checks whether a given transform belongs to a construction site, and that the construction has started.
+        /// Checks whether a given transform belongs to a construction site, and that the construction/deconstruction has started.
         /// </summary>
         public static bool IsUnderOngoingConstruction( this Transform part )
         {
@@ -128,6 +82,9 @@ namespace KSS.GameplayScene
         }
     }
 
+    /// <summary>
+    /// Manages the construction of its descendant <see cref="FConstructible"/>s.
+    /// </summary>
     [DisallowMultipleComponent]
     public class FConstructionSite : MonoBehaviour
     {
@@ -164,18 +121,16 @@ namespace KSS.GameplayScene
         }
 
         /// <summary>
-        /// 
+        /// Gets the number of <see cref="FConstructible"/>s that are currently being built (build speed != 0).
         /// </summary>
-        /// <returns>The number of constructibles that are currently being built.</returns>
         public int GetCountOfProgressing()
         {
             return _constructibles.Select( c => c.GetBuildSpeedMultiplier() == 0.0f ? 0 : 1 ).Sum();
         }
 
         /// <summary>
-        /// 
+        /// Gets the number of <see cref="FConstructible"/>s that are currently not being built (build speed = 0).
         /// </summary>
-        /// <returns>The number of constructibles that are currently not being built.</returns>
         public int GetCountOfNotProgressing()
         {
             return _constructibles.Select( c => c.GetBuildSpeedMultiplier() != 0.0f ? 0 : 1 ).Sum();
@@ -185,7 +140,7 @@ namespace KSS.GameplayScene
         /// Starts the process of construction.
         /// </summary>
         /// <remarks>
-        /// If called while deconstructing, it will start constructing from where it got to.
+        /// If called while deconstructing, it will start constructing again from the current point.
         /// </remarks>
         public void StartConstructing()
         {
@@ -199,7 +154,7 @@ namespace KSS.GameplayScene
         /// Starts the process of deconstruction.
         /// </summary>
         /// <remarks>
-        /// If called while constructing, it will start deconstructing from where it got to.
+        /// If called while constructing, it will start deconstructing from the current point.
         /// </remarks>
         public void StartDeconstructing()
         {
@@ -311,14 +266,21 @@ namespace KSS.GameplayScene
             }
         }
 
-        public static FConstructionSite TryAddPart( Transform ghostRoot, Transform parent )
+        /// <summary>
+        /// Creates a new construction site with the specified vessel, or appends it to the specified parent
+        /// </summary>
+        /// <param name="ghostRoot"></param>
+        /// <param name="parent"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public static FConstructionSite CreateOrAppend( Transform ghostRoot, Transform parent )
         {
             // step 6. Player places the ghost.
             // assume the position is already set.
 
             if( ghostRoot.IsUnderOngoingConstruction() )
             {
-                throw new InvalidOperationException( $"can't add while being constructed." );
+                throw new InvalidOperationException( $"Can't add something that is under ongoing construction - it should be/have been already added." );
             }
 
             if( parent == null )

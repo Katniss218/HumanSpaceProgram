@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace UnityEngine
 {
+    /// <summary>
+    /// Allows calling monobehaviour callback method remotely, as events.
+    /// </summary>
     public class MonoBehaviourProxy : MonoBehaviour
     {
         public Action onStart;

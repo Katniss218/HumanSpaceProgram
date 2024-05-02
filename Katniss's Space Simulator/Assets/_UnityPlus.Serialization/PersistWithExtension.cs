@@ -17,117 +17,26 @@ namespace UnityPlus.Serialization
 
         */
 
-        //private static readonly Dictionary<Type, Func<object, IReverseReferenceMap, SerializedObject>> _extensionGetObjects = new();
-        //private static readonly Dictionary<Type, Action<object, SerializedObject, IForwardReferenceMap>> _extensionSetObjects = new();
-
-        //private static readonly Dictionary<Type, Func<object, IReverseReferenceMap, SerializedData>> _extensionGetDatas = new();
-        //private static readonly Dictionary<Type, Action<object, SerializedData, IForwardReferenceMap>> _extensionSetDatas = new();
-        private static readonly Dictionary<Type, Delegate> _extensionGetObjects = new();
-        private static readonly Dictionary<Type, Delegate> _extensionSetObjects = new();
-
-        private static readonly Dictionary<Type, Delegate> _extensionGetDatas = new();
-        private static readonly Dictionary<Type, Delegate> _extensionSetDatas = new();
+        private static readonly ExtensionMap _extensionGetObjects = new ExtensionMap( nameof( IPersistsObjects.GetObjects ), typeof( SerializedObject ), typeof( IReverseReferenceMap ) );
+        private static readonly ExtensionMap _extensionSetObjects = new ExtensionMap( nameof( IPersistsObjects.SetObjects ), typeof( void ), typeof( SerializedObject ), typeof( IForwardReferenceMap ) );
+        private static readonly ExtensionMap _extensionGetDatas = new ExtensionMap( nameof( IPersistsData.GetData ), typeof( SerializedData ), typeof( IReverseReferenceMap ) );
+        private static readonly ExtensionMap _extensionSetDatas = new ExtensionMap( nameof( IPersistsData.SetData ), typeof( void ), typeof( SerializedData ), typeof( IForwardReferenceMap ) );
 
         private static bool _isInitialized = false;
 
+        private static IEnumerable<Type> GetStaticTypes()
+        {
+            return AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany( a => a.GetTypes() )
+                .Where( dt => dt.IsSealed && !dt.IsGenericType );
+        }
+
         public static void ReloadExtensionMethods()
         {
-            _extensionGetObjects.Clear();
-            _extensionSetObjects.Clear();
-
-            _extensionGetDatas.Clear();
-            _extensionSetDatas.Clear();
-
-            List<Type> availableContainingClasses = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany( a => a.GetTypes() )
-                .Where( dt => dt.IsSealed && !dt.IsGenericType )
-                .ToList();
-
-            foreach( var cls in availableContainingClasses )
-            {
-                MethodInfo[] methods = cls.GetMethods( BindingFlags.Public | BindingFlags.Static );
-
-                foreach( var method in methods )
-                {
-                    // Objects
-
-                    if( method.Name == nameof( IPersistsObjects.GetObjects ) )
-                    {
-                        ParameterInfo retParam = method.ReturnParameter;
-                        ParameterInfo[] methodParams = method.GetParameters();
-
-                        if( retParam.ParameterType == typeof( SerializedObject )
-                         && methodParams.Length == 2
-                         && methodParams[1].ParameterType == typeof( IReverseReferenceMap ) )
-                        {
-                            Type methodType = typeof( Func<,,> ).MakeGenericType( methodParams[0].ParameterType, typeof( IReverseReferenceMap ), typeof( SerializedObject ) );
-                            //var del = (Func<object, IReverseReferenceMap, SerializedObject>)Delegate.CreateDelegate( methodType, method );
-                            var del = Delegate.CreateDelegate( methodType, method );
-
-                            _extensionGetObjects.Add( methodParams[0].ParameterType, del );
-                        }
-                    }
-                    else if( method.Name == nameof( IPersistsObjects.SetObjects ) )
-                    {
-                        ParameterInfo retParam = method.ReturnParameter;
-                        ParameterInfo[] methodParams = method.GetParameters();
-
-                        if( retParam.ParameterType == typeof( void )
-                         && methodParams.Length == 3
-                         && methodParams[1].ParameterType == typeof( SerializedObject )
-                         && methodParams[2].ParameterType == typeof( IForwardReferenceMap ) )
-                        {
-                            if( methodParams[0].ParameterType.IsByRef )
-                                continue;
-
-                            Type methodType = typeof( Action<,,> ).MakeGenericType( methodParams[0].ParameterType, typeof( SerializedObject ), typeof( IForwardReferenceMap ) );
-                            //var del = (Action<object, SerializedObject, IForwardReferenceMap>)Delegate.CreateDelegate( methodType, method );
-                            var del = Delegate.CreateDelegate( methodType, method );
-
-                            _extensionSetObjects.Add( methodParams[0].ParameterType, del );
-                        }
-                    }
-
-                    // Data
-
-                    else if( method.Name == nameof( IPersistsData.GetData ) )
-                    {
-                        ParameterInfo retParam = method.ReturnParameter;
-                        ParameterInfo[] methodParams = method.GetParameters();
-
-                        if( retParam.ParameterType == typeof( SerializedData )
-                         && methodParams.Length == 2
-                         && methodParams[1].ParameterType == typeof( IReverseReferenceMap ) )
-                        {
-                            Type methodType = typeof( Func<,,> ).MakeGenericType( methodParams[0].ParameterType, typeof( IReverseReferenceMap ), typeof( SerializedData ) );
-                            //var del = (Func<object, IReverseReferenceMap, SerializedData>)Delegate.CreateDelegate( methodType, method );
-                            var del = Delegate.CreateDelegate( methodType, method );
-
-                            _extensionGetDatas.Add( methodParams[0].ParameterType, del );
-                        }
-                    }
-                    else if( method.Name == nameof( IPersistsData.SetData ) )
-                    {
-                        ParameterInfo retParam = method.ReturnParameter;
-                        ParameterInfo[] methodParams = method.GetParameters();
-
-                        if( retParam.ParameterType == typeof( void )
-                         && methodParams.Length == 3
-                         && methodParams[1].ParameterType == typeof( SerializedData )
-                         && methodParams[2].ParameterType == typeof( IForwardReferenceMap ) )
-                        {
-                            if( methodParams[0].ParameterType.IsByRef )
-                                continue;
-
-                            Type methodType = typeof( Action<,,> ).MakeGenericType( methodParams[0].ParameterType, typeof( SerializedData ), typeof( IForwardReferenceMap ) );
-                            //var del = (Action<object, SerializedData, IForwardReferenceMap>)Delegate.CreateDelegate( methodType, method );
-                            var del = Delegate.CreateDelegate( methodType, method );
-
-                            _extensionSetDatas.Add( methodParams[0].ParameterType, del );
-                        }
-                    }
-                }
-            }
+            _extensionGetObjects.Reload();
+            _extensionSetObjects.Reload();
+            _extensionGetDatas.Reload();
+            _extensionSetDatas.Reload();
 
             _isInitialized = true;
         }

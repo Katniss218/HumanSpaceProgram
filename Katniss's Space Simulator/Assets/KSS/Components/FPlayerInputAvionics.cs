@@ -13,139 +13,151 @@ using UnityPlus.Serialization;
 
 namespace KSS.Components
 {
-	/// <summary>
-	/// Sends steering and throttle signals based on player input.
-	/// </summary>
-	public class FPlayerInputAvionics : MonoBehaviour, IPersistsObjects, IPersistsData
-	{
+    /// <summary>
+    /// Sends steering and throttle signals based on player input.
+    /// </summary>
+    public class FPlayerInputAvionics : MonoBehaviour, IPersistsObjects, IPersistsData
+    {
         public FControlFrame ControlFrame { get; set; }
 
-		private float _pitchSignal;
-		private float _yawSignal;
-		private float _rollSignal;
-		private float _throttleSignal;
+        private float _pitchSignal;
+        private float _yawSignal;
+        private float _rollSignal;
+        private float _throttleSignal;
 
-		[field: SerializeField]
-		public Vector3 AttitudeSensitivity { get; set; } = Vector3.one;
-		[field: SerializeField]
-		public Vector3 TranslationSensitivity { get; set; } = Vector3.one;
+        private Vector3 _lastControlSignal;
 
-		/// <summary>
-		/// Desired throttle level, in [0..1].
-		/// </summary>
-		[NamedControl( "Throttle" )]
-		public ControllerOutput<float> OnSetThrottle = new();
+        [field: SerializeField]
+        public Vector3 AttitudeSensitivity { get; set; } = Vector3.one;
+        [field: SerializeField]
+        public Vector3 TranslationSensitivity { get; set; } = Vector3.one;
 
-		/// <summary>
-		/// Desired vessel-space (pitch, yaw, roll) attitude change, in [-Inf..Inf].
-		/// </summary>
-		[NamedControl( "Attitude" )]
-		public ControllerOutput<Vector3> OnSetAttitude = new();
+        /// <summary>
+        /// Desired throttle level, in [0..1].
+        /// </summary>
+        [NamedControl( "Throttle" )]
+        public ControllerOutput<float> OnSetThrottle = new();
 
-		/// <summary>
-		/// Desired scene-space (X, Y, Z) position change, in [-Inf..Inf].
-		/// </summary>
-		[NamedControl( "Translation" )]
-		public ControllerOutput<Vector3> OnSetTranslation = new();
+        /// <summary>
+        /// Desired vessel-space (pitch, yaw, roll) attitude change, in [-Inf..Inf].
+        /// </summary>
+        [NamedControl( "Attitude" )]
+        public ControllerOutput<Vector3> OnSetAttitude = new();
 
-		void OnEnable()
-		{
-			HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_PITCH, HierarchicalInputPriority.MEDIUM, Input_Pitch );
-			HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_YAW, HierarchicalInputPriority.MEDIUM, Input_Yaw );
-			HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_ROLL, HierarchicalInputPriority.MEDIUM, Input_Roll );
+        /// <summary>
+        /// Desired scene-space (X, Y, Z) position change, in [-Inf..Inf].
+        /// </summary>
+        [NamedControl( "Translation" )]
+        public ControllerOutput<Vector3> OnSetTranslation = new();
 
-			HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MAX, HierarchicalInputPriority.MEDIUM, Input_FullThrottle );
-			HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MIN, HierarchicalInputPriority.MEDIUM, Input_CutThrottle );
-		}
+        void OnEnable()
+        {
+            HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_PITCH, HierarchicalInputPriority.MEDIUM, Input_Pitch );
+            HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_YAW, HierarchicalInputPriority.MEDIUM, Input_Yaw );
+            HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_ROLL, HierarchicalInputPriority.MEDIUM, Input_Roll );
 
-		void OnDisable()
-		{
-			HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_PITCH, Input_Pitch );
-			HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_YAW, Input_Yaw );
-			HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_ROLL, Input_Roll );
+            HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MAX, HierarchicalInputPriority.MEDIUM, Input_FullThrottle );
+            HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MIN, HierarchicalInputPriority.MEDIUM, Input_CutThrottle );
+        }
 
-			HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MAX, Input_FullThrottle );
-			HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MIN, Input_CutThrottle );
-		}
+        void OnDisable()
+        {
+            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_PITCH, Input_Pitch );
+            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_YAW, Input_Yaw );
+            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_ROLL, Input_Roll );
 
-		private bool Input_FullThrottle( float value )
-		{
-			_throttleSignal = 1.0f;
+            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MAX, Input_FullThrottle );
+            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MIN, Input_CutThrottle );
+        }
 
-			OnSetThrottle.TrySendSignal( _throttleSignal );
-			return false;
-		}
+        private bool Input_FullThrottle( float value )
+        {
+            _throttleSignal = 1.0f;
 
-		private bool Input_CutThrottle( float value )
-		{
-			_throttleSignal = 0.0f;
+            OnSetThrottle.TrySendSignal( _throttleSignal );
+            return false;
+        }
 
-			OnSetThrottle.TrySendSignal( _throttleSignal );
-			return false;
-		}
+        private bool Input_CutThrottle( float value )
+        {
+            _throttleSignal = 0.0f;
 
-		bool Input_Pitch( float value )
-		{
-			_pitchSignal = value * AttitudeSensitivity.x;
+            OnSetThrottle.TrySendSignal( _throttleSignal );
+            return false;
+        }
 
-			if( Mathf.Abs( _pitchSignal ) > 0.01f )
-			{
-				OnSetAttitude.TrySendSignal( new Vector3( _pitchSignal, _yawSignal, _rollSignal ) );
-			}
-			return false;
-		}
+        bool Input_Pitch( float value )
+        {
+            _pitchSignal = value * AttitudeSensitivity.x;
 
-		bool Input_Yaw( float value )
-		{
-			_yawSignal = value * AttitudeSensitivity.y;
+            Vector3 controlSignal = new Vector3( _pitchSignal, _yawSignal, _rollSignal );
 
-            if( Mathf.Abs( _yawSignal ) > 0.01f )
+            if( Mathf.Abs( _pitchSignal ) > 0.01f || controlSignal != _lastControlSignal )
             {
-                OnSetAttitude.TrySendSignal( new Vector3( _pitchSignal, _yawSignal, _rollSignal ) );
+                OnSetAttitude.TrySendSignal( controlSignal );
+                _lastControlSignal = controlSignal;
+            }
+
+            return false;
+        }
+
+        bool Input_Yaw( float value )
+        {
+            _yawSignal = value * AttitudeSensitivity.y;
+
+            Vector3 controlSignal = new Vector3( _pitchSignal, _yawSignal, _rollSignal );
+
+            if( Mathf.Abs( _yawSignal ) > 0.01f || controlSignal != _lastControlSignal )
+            {
+                OnSetAttitude.TrySendSignal( controlSignal );
+                _lastControlSignal = controlSignal;
             }
             return false;
-		}
+        }
 
-		bool Input_Roll( float value )
-		{
-			_rollSignal = value * AttitudeSensitivity.z;
+        bool Input_Roll( float value )
+        {
+            _rollSignal = value * AttitudeSensitivity.z;
 
-            if( Mathf.Abs( _rollSignal ) > 0.01f )
+            Vector3 controlSignal = new Vector3( _pitchSignal, _yawSignal, _rollSignal );
+
+            if( Mathf.Abs( _rollSignal ) > 0.01f || controlSignal != _lastControlSignal )
             {
-                OnSetAttitude.TrySendSignal( new Vector3( _pitchSignal, _yawSignal, _rollSignal ) );
+                OnSetAttitude.TrySendSignal( controlSignal );
+                _lastControlSignal = controlSignal;
             }
             return false;
-		}
+        }
 
         public SerializedObject GetObjects( IReverseReferenceMap s )
         {
-			return new SerializedObject()
-			{
-				{ "control_frame", s.WriteObjectReference( this.ControlFrame ) },
-				{ "on_set_throttle", s.GetID( OnSetThrottle ).GetData() },
-				{ "on_set_attitude", s.GetID( OnSetAttitude ).GetData() },
-				{ "on_set_translation", s.GetID( OnSetTranslation ).GetData() }
-			};
+            return new SerializedObject()
+            {
+                { "control_frame", s.WriteObjectReference( this.ControlFrame ) },
+                { "on_set_throttle", s.GetID( OnSetThrottle ).GetData() },
+                { "on_set_attitude", s.GetID( OnSetAttitude ).GetData() },
+                { "on_set_translation", s.GetID( OnSetTranslation ).GetData() }
+            };
         }
 
         public void SetObjects( SerializedObject data, IForwardReferenceMap l )
         {
-			if( data.TryGetValue( "control_frame", out var controlFrame ) )
+            if( data.TryGetValue( "control_frame", out var controlFrame ) )
                 this.ControlFrame = (FControlFrame)l.ReadObjectReference( controlFrame );
-			
-			if( data.TryGetValue( "on_set_throttle", out var onSetThrottle ) )
+
+            if( data.TryGetValue( "on_set_throttle", out var onSetThrottle ) )
             {
                 OnSetThrottle = new();
                 l.SetObj( onSetThrottle.ToGuid(), OnSetThrottle );
             }
 
-			if( data.TryGetValue( "on_set_attitude", out var onSetAttitude ) )
+            if( data.TryGetValue( "on_set_attitude", out var onSetAttitude ) )
             {
                 OnSetAttitude = new();
                 l.SetObj( onSetAttitude.ToGuid(), OnSetAttitude );
             }
 
-			if( data.TryGetValue( "on_set_translation", out var onSetTranslation ) )
+            if( data.TryGetValue( "on_set_translation", out var onSetTranslation ) )
             {
                 OnSetTranslation = new();
                 l.SetObj( onSetTranslation.ToGuid(), OnSetTranslation );
@@ -161,7 +173,7 @@ namespace KSS.Components
 
         public void SetData( SerializedData data, IForwardReferenceMap l )
         {
-			IPersistent_Behaviour.SetData( this, data, l );
+            IPersistent_Behaviour.SetData( this, data, l );
         }
     }
 }

@@ -105,7 +105,8 @@ namespace KSS.Components
                         engineSpaceSteeringCmd.x /* pitch */ + rollDeflectionDir.x /* roll */,
                         engineSpaceSteeringCmd.z /* yaw   */ + rollDeflectionDir.y /* roll */ );
 
-                    actuator.OnSetXY.TrySendSignal( localDeflection );
+                    // Sign flip to make attitude commands have a left-handed screw (positive attitude command rotates in positive direction along its axis).
+                    actuator.OnSetXY.TrySendSignal( -localDeflection );
                 }
             }
         }

@@ -74,6 +74,7 @@
     <Compile Include="Assets\KSS\GameplayScene\FConstructionSite.cs" />
     <Compile Include="Assets\KSS\TransformHandleSet.cs" />
     <Compile Include="Assets\KSS\Effects\Atmospheres\AtmosphereRenderer.cs" />
+    <Compile Include="Assets\KSS\ScreenshotManager.cs" />
     <Compile Include="Assets\KSS\Components\FAttitudeAvionics.cs" />
     <Compile Include="Assets\KSS\Components\FSequencer.cs" />
     <Compile Include="Assets\KSS\Components\FPointMass.cs" />
@@ -107,10 +108,15 @@
     <Compile Include="Assets\KSS\GameplayScene\TimeScaleInputController.cs" />
     <Compile Include="Assets\KSS\GameplayScene\GameplaySceneToolManager.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadTree_NodeUtils.cs" />
+    <Compile Include="Assets\KSS\GameplayScene\ConstructionState.cs" />
     <Compile Include="Assets\KSS\Components\F1AxisActuator.cs" />
     <Compile Include="Assets\KSS\PIDLoop.cs" />
     <Compile Include="Assets\KSS\AssetLoaders\GameDataJsonVesselFactory.cs" />
     <Compile Include="Assets\KSS\Components\FReactionControlController.cs" />
+    <Compile Include="Assets\KSS\GhostableWithExtension.cs" />
+    <Compile Include="Assets\KSS\GhostableExtensions\IGhostable_Ex.cs" />
+    <Compile Include="Assets\KSS\Ghostable_object.cs" />
+    <Compile Include="Assets\KSS\IGhostable.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS\CelestialBodies\Surface\TerrainShader.shader" />

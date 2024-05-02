@@ -19,8 +19,10 @@ namespace KSS.Input
 		public const string VIEWPORT_SECONDARY_UP = "c.rmb_u";
 
 		public const string COMMON_ESCAPE = "c.esc";
+        public const string COMMON_TOGGLE_UI = "c.toggle_ui";
+        public const string COMMON_SCREENSHOT = "c.screenshot";
 
-		public const string GAMEPLAY_CONTROL_THROTTLE_MIN = "vanilla.gameplayc_throttle_min";
+        public const string GAMEPLAY_CONTROL_THROTTLE_MIN = "vanilla.gameplayc_throttle_min";
 		public const string GAMEPLAY_CONTROL_THROTTLE_MAX = "vanilla.gameplayc_throttle_max";
 		public const string GAMEPLAY_CONTROL_THROTTLE_UP = "vanilla.gameplayc_throttle_up";
 		public const string GAMEPLAY_CONTROL_THROTTLE_DOWN = "vanilla.gameplayc_throttle_down";
@@ -68,6 +70,8 @@ namespace KSS.Input
 			HierarchicalInputManager.BindInput( HierarchicalInputChannel.VIEWPORT_SECONDARY_UP, new KeyUpBinding( 0, KeyCode.Mouse1 ) );
 
 			HierarchicalInputManager.BindInput( HierarchicalInputChannel.COMMON_ESCAPE, new KeyUpBinding( 0, KeyCode.Escape ) );
+			HierarchicalInputManager.BindInput( HierarchicalInputChannel.COMMON_TOGGLE_UI, new KeyUpBinding( 0, KeyCode.F1 ) );
+			HierarchicalInputManager.BindInput( HierarchicalInputChannel.COMMON_SCREENSHOT, new KeyUpBinding( 0, KeyCode.F2 ) );
 
 			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MIN, new KeyDownBinding( 0, KeyCode.X ) );
 			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MAX, new KeyDownBinding( 0, KeyCode.Z ) );
@@ -81,16 +85,16 @@ namespace KSS.Input
 			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_TRANSLATE_UP, new KeyDownBinding( -1, KeyCode.K ) );
 			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_TRANSLATE_DOWN, new KeyDownBinding( 1, KeyCode.I ) );
 
-			// When looking from positive towards negative (along the axis), `1` is counterclockwise, `-1` is clockwise.
-			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_PITCH, new AxisBinding( new KeyHoldBinding( -1, KeyCode.S ), new KeyHoldBinding( 1, KeyCode.W ) ) );
-			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_PITCH_UP, new KeyDownBinding( -1, KeyCode.S ) );
-			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_PITCH_DOWN, new KeyDownBinding( 1, KeyCode.W ) );
-			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_YAW, new AxisBinding( new KeyHoldBinding( 1, KeyCode.A ), new KeyHoldBinding( -1, KeyCode.D ) ) );
-			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_YAW_LEFT, new KeyDownBinding( 1, KeyCode.A ) );
-			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_YAW_RIGHT, new KeyDownBinding( -1, KeyCode.D ) );
-			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_ROLL, new AxisBinding( new KeyHoldBinding( -1, KeyCode.Q ), new KeyHoldBinding( 1, KeyCode.E ) ) );
-			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_ROLL_LEFT, new KeyDownBinding( -1, KeyCode.Q ) );
-			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_ROLL_RIGHT, new KeyDownBinding( 1, KeyCode.E ) );
+			// Left-handed screw for attitude rotation (positive attitude command rotates in positive direction along its axis).
+			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_PITCH, new AxisBinding( new KeyHoldBinding( 1, KeyCode.S ), new KeyHoldBinding( -1, KeyCode.W ) ) );
+			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_PITCH_UP, new KeyDownBinding( 1, KeyCode.S ) );
+			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_PITCH_DOWN, new KeyDownBinding( -1, KeyCode.W ) );
+			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_YAW, new AxisBinding( new KeyHoldBinding( -1, KeyCode.A ), new KeyHoldBinding( 1, KeyCode.D ) ) );
+			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_YAW_LEFT, new KeyDownBinding( -1, KeyCode.A ) );
+			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_YAW_RIGHT, new KeyDownBinding( 1, KeyCode.D ) );
+			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_ROLL, new AxisBinding( new KeyHoldBinding( 1, KeyCode.Q ), new KeyHoldBinding( -1, KeyCode.E ) ) );
+			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_ROLL_LEFT, new KeyDownBinding( 1, KeyCode.Q ) );
+			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_ROLL_RIGHT, new KeyDownBinding( -1, KeyCode.E ) );
 
 			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_SEQUENCER_ADVANCE, new KeyDownBinding( 0, KeyCode.Space ) );
 
