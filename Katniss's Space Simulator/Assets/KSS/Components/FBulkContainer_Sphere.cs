@@ -123,8 +123,8 @@ namespace KSS.Components
             ret.AddAll( new SerializedObject()
             {
                 { "volume_transform", s.WriteObjectReference( this.VolumeTransform ) },
-                { "max_volume", this.MaxVolume },
-                { "radius", this.Radius },
+                { "max_volume", this.MaxVolume.GetData() },
+                { "radius", this.Radius.GetData() },
                 { "contents", this.Contents.GetData( s ) }
             } );
 
@@ -139,10 +139,10 @@ namespace KSS.Components
                 this.VolumeTransform = (Transform)l.ReadObjectReference( volumeTransform );
 
             if( data.TryGetValue( "max_volume", out var maxVolume ) )
-                this.MaxVolume = (float)maxVolume;
+                this.MaxVolume = maxVolume.AsFloat();
 
             if( data.TryGetValue( "radius", out var radius ) )
-                this.Radius = (float)radius;
+                this.Radius = radius.AsFloat();
 
             if( data.TryGetValue( "contents", out var contents ) )
                 this.Contents.SetData( contents, l );

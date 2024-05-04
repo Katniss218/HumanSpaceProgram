@@ -24,7 +24,7 @@ namespace KSS.Core.Components
 
             ret.AddAll( new SerializedObject()
             {
-                { "part_id", s.WriteNamespacedIdentifier( this.PartID ) }
+                { "part_id", this.PartID.GetData() }
             } );
 
             return ret;
@@ -35,7 +35,7 @@ namespace KSS.Core.Components
             IPersistent_Behaviour.SetData( this, data, l );
 
             if( data.TryGetValue( "part_id", out var partId ) )
-                this.PartID = l.ReadNamespacedIdentifier( partId );
+                this.PartID = partId.AsNamespacedIdentifier();
         }
 
         public static PartMetadata GetPart( Transform obj )

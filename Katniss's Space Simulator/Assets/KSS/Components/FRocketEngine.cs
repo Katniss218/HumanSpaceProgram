@@ -105,7 +105,7 @@ namespace KSS.Components
             if( data.TryGetValue( "set_throttle", out var setThrottle ) )
             {
                 SetThrottle = new( SetThrottleListener );
-                l.SetObj( setThrottle.ToGuid(), SetThrottle );
+                l.SetObj( setThrottle.AsGuid(), SetThrottle );
             }
         }
 
@@ -117,9 +117,9 @@ namespace KSS.Components
 
             ret.AddAll( new SerializedObject()
             {
-                { "max_thrust", this.MaxThrust },
-                { "isp", this.Isp },
-                { "throttle", this.Throttle },
+                { "max_thrust", this.MaxThrust.GetData() },
+                { "isp", this.Isp.GetData() },
+                { "throttle", this.Throttle.GetData() },
                 { "thrust_transform", s.WriteObjectReference( this.ThrustTransform ) },
                 { "set_throttle", this.SetThrottle.GetData( s ) }
             } );
@@ -132,11 +132,14 @@ namespace KSS.Components
             IPersistent_Behaviour.SetData( this, data, l );
 
             if( data.TryGetValue( "max_thrust", out var maxThrust ) )
-                this.MaxThrust = (float)maxThrust;
+                this.MaxThrust = maxThrust.AsFloat();
+
             if( data.TryGetValue( "isp", out var isp ) )
-                this.Isp = (float)isp;
+                this.Isp = isp.AsFloat();
+
             if( data.TryGetValue( "throttle", out var throttle ) )
-                this.Throttle = (float)throttle;
+                this.Throttle = throttle.AsFloat();
+
             if( data.TryGetValue( "thrust_transform", out var thrustTransform ) )
                 this.ThrustTransform = (Transform)l.ReadObjectReference( thrustTransform );
 

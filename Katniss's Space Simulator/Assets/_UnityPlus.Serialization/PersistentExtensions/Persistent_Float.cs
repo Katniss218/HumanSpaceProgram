@@ -17,9 +17,9 @@ namespace UnityPlus.Serialization
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static float ToFloat( this SerializedData data, IForwardReferenceMap l = null )
+        public static float AsFloat( this SerializedData data, IForwardReferenceMap l = null )
         {
-            return (float)data;
+            return (float)(SerializedPrimitive)data;
         }
     }
 }

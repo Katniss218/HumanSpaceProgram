@@ -15,11 +15,11 @@ namespace UnityPlus.Serialization
 		{
 			return (SerializedPrimitive)value;
 		}
-				
+		
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-		public static string ToString( this SerializedData data, IForwardReferenceMap l = null ) 
+		public static string AsString( this SerializedData data, IForwardReferenceMap l = null ) 
 		{
-            return (string)data;
+            return (string)(SerializedPrimitive)data;
 		}
 	}
 }

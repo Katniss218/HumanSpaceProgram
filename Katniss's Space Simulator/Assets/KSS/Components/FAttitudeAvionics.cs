@@ -300,7 +300,7 @@ namespace KSS.Components
             if( data.TryGetValue( "on_set_attitude", out var onSetAttitude ) )
             {
                 OnSetAttitude = new();
-                l.SetObj( onSetAttitude.ToGuid(), OnSetAttitude );
+                l.SetObj( onSetAttitude.AsGuid(), OnSetAttitude );
             }
         }
     }

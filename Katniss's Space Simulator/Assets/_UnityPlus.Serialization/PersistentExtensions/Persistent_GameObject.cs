@@ -20,11 +20,11 @@ namespace UnityPlus.Serialization
 		{
 			return new SerializedObject()
 			{
-				{ "name", gameObject.name },
-				{ "layer", gameObject.layer },
-				{ "is_active", gameObject.activeSelf },
-				{ "is_static", gameObject.isStatic },
-				{ "tag", gameObject.tag }
+				{ "name", gameObject.name.GetData() },
+				{ "layer", gameObject.layer.GetData() },
+				{ "is_active", gameObject.activeSelf.GetData() },
+				{ "is_static", gameObject.isStatic.GetData() },
+				{ "tag", gameObject.tag.GetData() }
 			};
 		}
 
@@ -32,27 +32,27 @@ namespace UnityPlus.Serialization
 		public static void SetData( this GameObject gameObject, SerializedData data, IForwardReferenceMap l )
 		{
 			if( data.TryGetValue( "name", out var name ) )
-				gameObject.name = (string)name;
+				gameObject.name = name.AsString();
 
 			if( data.TryGetValue( "layer", out var layer ) )
-				gameObject.layer = (int)layer;
+				gameObject.layer = layer.AsInt32();
 
 			if( data.TryGetValue( "is_active", out var isActive ) )
-				gameObject.SetActive( (bool)isActive );
+				gameObject.SetActive( isActive.AsBoolean() );
 
 			if( data.TryGetValue( "is_static", out var isStatic ) )
-				gameObject.isStatic = (bool)isStatic;
+				gameObject.isStatic = isStatic.AsBoolean();
 
 			if( data.TryGetValue( "tag", out var tag ) )
-				gameObject.tag = (string)tag;
+				gameObject.tag = tag.AsString();
 		}
 
 		// persistent objects (factory).
 
-		public static Component ToComponent( this SerializedObject data, GameObject gameObject, IForwardReferenceMap l )
+		public static Component AsComponent( this SerializedObject data, GameObject gameObject, IForwardReferenceMap l )
 		{
-			Type type = data[KeyNames.TYPE].ToType();
-			Guid id = data[KeyNames.ID].ToGuid();
+			Type type = data[KeyNames.TYPE].AsType();
+			Guid id = data[KeyNames.ID].AsGuid();
 
 			Component component = gameObject.GetTransformOrAddComponent( type );
 			if( component is Behaviour behaviour )
@@ -69,11 +69,11 @@ namespace UnityPlus.Serialization
 			return component;
 		}
 
-		public static GameObject ToGameObject( this SerializedObject data, IForwardReferenceMap l )
+		public static GameObject AsGameObject( this SerializedObject data, IForwardReferenceMap l )
 		{
-			// assume that data["$type"] is equal to typeof(GameObject), or missing (since this method is called recursively).
+            // assume that data[KeyNames.TYPE] is equal to typeof(GameObject), or not present (since this method is called recursively, and child gameobjects won't have it anyway).
 
-			Guid objectGuid = data[KeyNames.ID].ToGuid();
+            Guid objectGuid = data[KeyNames.ID].AsGuid();
 
 			GameObject gameObject = new GameObject();
 			l.SetObj( objectGuid, gameObject );
@@ -87,12 +87,12 @@ namespace UnityPlus.Serialization
 					// Then all components will be created, from top to bottom.
 					try
 					{
-						GameObject childGameObject = ToGameObject( childData, l );
+						GameObject childGameObject = AsGameObject( childData, l );
 						childGameObject.transform.SetParent( transform, false );
 					}
 					catch( Exception ex )
 					{
-						Debug.LogError( $"Failed to deserialize a gameobject with ID: `{(string)childData?[KeyNames.ID] ?? "<null>"}`." );
+						Debug.LogError( $"Failed to deserialize a gameobject with ID: `{childData?[KeyNames.ID].AsString() ?? "<null>"}`." );
 						Debug.LogException( ex );
 					}
 				}
@@ -104,11 +104,11 @@ namespace UnityPlus.Serialization
 				{
 					try
 					{
-						Component component = compData.ToComponent( gameObject, l );
+						Component component = compData.AsComponent( gameObject, l );
 					}
 					catch( Exception ex )
 					{
-						Debug.LogError( $"Failed to deserialize a component with ID: `{(string)compData?[KeyNames.ID] ?? "<null>"}`." );
+						Debug.LogError( $"Failed to deserialize a component with ID: `{compData?[KeyNames.ID].AsString() ?? "<null>"}`." );
 						Debug.LogException( ex );
 					}
 				}

@@ -20,7 +20,7 @@ namespace KSS.Core
 
         public static CelestialBody Get( string id )
         {
-            if( !exists )
+            if( !instanceExists )
                 throw new InvalidSceneManagerException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
 
             if( instance._celestialBodies.TryGetValue( id, out CelestialBody body ) )
@@ -38,7 +38,7 @@ namespace KSS.Core
         {
             get
             {
-                if( !exists )
+                if( !instanceExists )
                     throw new InvalidSceneManagerException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
 
                 return instance._celestialBodies.Values;
@@ -49,7 +49,7 @@ namespace KSS.Core
         {
             get
             {
-                if( !exists )
+                if( !instanceExists )
                     throw new InvalidSceneManagerException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
 
                 return instance._celestialBodies.Count;
@@ -58,7 +58,7 @@ namespace KSS.Core
 
         internal static void Register( CelestialBody celestialBody )
         {
-            if( !exists )
+            if( !instanceExists )
                 throw new InvalidSceneManagerException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
 
             instance._celestialBodies[celestialBody.ID] = celestialBody;
@@ -66,7 +66,7 @@ namespace KSS.Core
 
         internal static void Unregister( string id )
         {
-            if( !exists )
+            if( !instanceExists )
                 throw new InvalidSceneManagerException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
 
             instance._celestialBodies.Remove( id );

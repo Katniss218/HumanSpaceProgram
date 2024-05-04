@@ -48,7 +48,7 @@ namespace UnityEngine
         /// <summary>
         /// Checks if exactly 1 instance of this behaviour exists.
         /// </summary>
-        protected static bool exists
+        protected static bool instanceExists
         {
             get
             {

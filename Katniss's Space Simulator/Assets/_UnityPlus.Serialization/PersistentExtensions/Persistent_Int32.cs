@@ -17,9 +17,9 @@ namespace UnityPlus.Serialization
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static int ToInt32( this SerializedData data, IForwardReferenceMap l = null )
+        public static int AsInt32( this SerializedData data, IForwardReferenceMap l = null )
         {
-            return (int)data;
+            return (int)(SerializedPrimitive)data;
         }
     }
 }

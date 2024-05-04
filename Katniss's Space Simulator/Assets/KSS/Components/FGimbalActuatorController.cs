@@ -40,12 +40,12 @@ namespace KSS.Components
                 if( data.TryGetValue( "get_reference_transform", out var getReferenceTransform ) )
                 {
                     GetReferenceTransform = new();
-                    l.SetObj( getReferenceTransform.ToGuid(), GetReferenceTransform );
+                    l.SetObj( getReferenceTransform.AsGuid(), GetReferenceTransform );
                 }
                 if( data.TryGetValue( "on_set_xy", out var onSetXY ) )
                 {
                     OnSetXY = new();
-                    l.SetObj( onSetXY.ToGuid(), OnSetXY );
+                    l.SetObj( onSetXY.AsGuid(), OnSetXY );
                 }
             }
         }
@@ -145,7 +145,7 @@ namespace KSS.Components
             if( data.TryGetValue( "set_attitude", out var setAttitude ) )
             {
                 SetAttitude = new( SetAttitudeListener );
-                l.SetObj( setAttitude.ToGuid(), SetAttitude );
+                l.SetObj( setAttitude.AsGuid(), SetAttitude );
             }
         }
 

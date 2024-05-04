@@ -28,7 +28,7 @@ namespace KSS.Core
         {
             get
             {
-                if( !exists )
+                if( !instanceExists )
                     throw new InvalidSceneManagerException( $"{nameof( VesselManager )} is only available in the gameplay scene." );
 
                 return instance._vessels;
@@ -39,7 +39,7 @@ namespace KSS.Core
         {
             get
             {
-                if( !exists )
+                if( !instanceExists )
                     throw new InvalidSceneManagerException( $"{nameof( VesselManager )} is only available in the gameplay scene." );
 
                 return instance._vessels.Count;
@@ -48,7 +48,7 @@ namespace KSS.Core
 
         internal static void Register( Vessel vessel )
         {
-            if( !exists )
+            if( !instanceExists )
                 throw new InvalidSceneManagerException( $"{nameof( VesselManager )} is only available in the gameplay scene." );
 
             instance._vessels.Add( vessel );
@@ -57,7 +57,7 @@ namespace KSS.Core
 
         internal static void Unregister( Vessel vessel )
         {
-            if( !exists )
+            if( !instanceExists )
                 throw new InvalidSceneManagerException( $"{nameof( VesselManager )} is only available in the gameplay scene." );
 
             instance._vessels.Remove( vessel );

@@ -17,9 +17,9 @@ namespace UnityPlus.Serialization
 		}
 		
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-		public static Vector3 ToVector3( this SerializedData data, IForwardReferenceMap l = null ) 
+		public static Vector3 AsVector3( this SerializedData data, IForwardReferenceMap l = null ) 
 		{
-            return new Vector3( (float)data[0], (float)data[1], (float)data[2] );
+            return new Vector3( data[0].AsFloat(), data[1].AsFloat(), data[2].AsFloat() );
 		}
 	}
 }

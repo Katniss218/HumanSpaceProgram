@@ -69,7 +69,7 @@ namespace UnityPlus.Serialization.Strategies
 
         private static GameObject ReadAssetGameObject( IForwardReferenceMap l, SerializedData goJson )
         {
-            Guid objectGuid = goJson[KeyNames.ID].ToGuid();
+            Guid objectGuid = goJson[KeyNames.ID].AsGuid();
 
             GameObject prefab = l.ReadAssetReference<GameObject>( goJson["prefab"] );
 

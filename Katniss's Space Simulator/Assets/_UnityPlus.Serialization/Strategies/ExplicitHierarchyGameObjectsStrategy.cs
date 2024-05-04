@@ -133,7 +133,7 @@ namespace UnityPlus.Serialization.Strategies
                 }
                 catch( Exception ex )
                 {
-                    Debug.LogError( $"[{nameof( ExplicitHierarchyGameObjectsStrategy )}] Failed to deserialize a root GameObject with ID: `{goJson?[KeyNames.ID] ?? "<null>"}`." );
+                    Debug.LogError( $"[{nameof( ExplicitHierarchyGameObjectsStrategy )}] Failed to deserialize a root GameObject with ID: `{goJson?[KeyNames.ID].AsString() ?? "<null>"}`." );
                     Debug.LogException( ex );
                 }
             }
@@ -153,7 +153,7 @@ namespace UnityPlus.Serialization.Strategies
                 }
                 catch( Exception ex )
                 {
-                    Debug.LogError( $"[{nameof( ExplicitHierarchyGameObjectsStrategy )}] Failed to deserialize a root GameObject with ID: `{goJson?[KeyNames.ID] ?? "<null>"}`." );
+                    Debug.LogError( $"[{nameof( ExplicitHierarchyGameObjectsStrategy )}] Failed to deserialize a root GameObject with ID: `{goJson?[KeyNames.ID].AsString() ?? "<null>"}`." );
                     Debug.LogException( ex );
                 }
 

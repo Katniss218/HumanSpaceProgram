@@ -8,16 +8,29 @@ namespace UnityPlus.Serialization
 {
     public static class Persistent_object
     {
+        public static SerializedObject WriteObjectStub( object obj, IReverseReferenceMap s )
+        {
+            return new SerializedObject()
+            {
+                { KeyNames.ID, s.GetID( obj ).GetData() },
+            };
+        }
+
+        public static SerializedObject WriteObjectStub( object obj, Type objType, IReverseReferenceMap s )
+        {
+            return new SerializedObject()
+            {
+                { KeyNames.ID, s.GetID( obj ).GetData() },
+                { KeyNames.TYPE, objType.GetData() }
+            };
+        }
+
         public static SerializedObject GetObjects( this object obj, IReverseReferenceMap s )
         {
             Type type = obj.GetType();
 
-#warning TODO - move this stub from here to somewhere else.
-            SerializedObject data = new SerializedObject()
-            {
-                { KeyNames.ID, s.GetID( obj ).GetData() },
-                { KeyNames.TYPE, type.GetData() }
-            };
+#warning TODO - getObjects should only create the object fields, without the object stub.
+            SerializedObject data = Persistent_object.WriteObjectStub( obj, obj.GetType(), s );
 
             if( obj is IPersistsObjects p )
             {

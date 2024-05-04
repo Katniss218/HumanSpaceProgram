@@ -25,14 +25,14 @@ namespace UnityPlus.Serialization
 
                 lodsArray.Add( new SerializedObject()
                 {
-                    { "percent", lod.screenRelativeTransitionHeight },
+                    { "percent", lod.screenRelativeTransitionHeight.GetData() },
                     { "renderers", renderersArray }
                 } );
             }
             return new SerializedObject()
             {
                 { "lods", lodsArray },
-                { "size", lg.size }
+                { "size", lg.size.GetData() }
             };
         }
 
@@ -49,7 +49,7 @@ namespace UnityPlus.Serialization
                     lods[i] = new LOD();
 
                     if( lod.TryGetValue( "percent", out var percent ) )
-                        lods[i].screenRelativeTransitionHeight = (float)percent;
+                        lods[i].screenRelativeTransitionHeight = percent.AsFloat();
 
                     if( lod.TryGetValue( "renderers", out var renderers1 ) )
                     {
@@ -67,7 +67,7 @@ namespace UnityPlus.Serialization
             }
 
             if( data.TryGetValue( "size", out var size ) )
-                lg.size = (float)size;
+                lg.size = size.AsFloat();
         }
     }
 }

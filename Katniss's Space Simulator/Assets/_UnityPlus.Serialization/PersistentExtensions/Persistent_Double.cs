@@ -17,9 +17,9 @@ namespace UnityPlus.Serialization
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static double ToDouble( this SerializedData data, IForwardReferenceMap l = null )
+        public static double AsDouble( this SerializedData data, IForwardReferenceMap l = null )
         {
-            return (double)data;
+            return (double)(SerializedPrimitive)data;
         }
     }
 }

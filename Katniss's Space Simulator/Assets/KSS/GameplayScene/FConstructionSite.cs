@@ -1,4 +1,5 @@
 ﻿using KSS.Components;
+using KSS.Control.Controls;
 using KSS.Core;
 using KSS.Core.Components;
 using KSS.Core.ReferenceFrames;
@@ -86,7 +87,7 @@ namespace KSS.GameplayScene
     /// Manages the construction of its descendant <see cref="FConstructible"/>s.
     /// </summary>
     [DisallowMultipleComponent]
-    public class FConstructionSite : MonoBehaviour
+    public class FConstructionSite : MonoBehaviour, IPersistsData
     {
         /// <summary>
         /// The current state of (de)construction at this construction site.
@@ -318,6 +319,32 @@ namespace KSS.GameplayScene
         public static bool TryRemovePart( Transform ghostRoot )
         {
             return false;
+        }
+
+        public SerializedData GetData( IReverseReferenceMap s )
+        {
+            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
+
+            ret.AddAll( new SerializedObject()
+            {
+                { "state", this.State.GetData() },
+                { "build_speed", this.BuildSpeed.GetData() }
+            } );
+
+            return ret;
+        }
+
+        public void SetData( SerializedData data, IForwardReferenceMap l )
+        {
+            IPersistent_Behaviour.SetData( this, data, l );
+
+            this._constructibles = AncestralMap<FConstructible>.Create( this.transform ).Keys.ToArray();
+
+            if( data.TryGetValue( "state", out var state ) )
+                this.State = state.AsEnum<ConstructionState>();
+
+            if( data.TryGetValue( "build_speed", out var buildSpeed ) )
+                this.BuildSpeed = buildSpeed.AsFloat();
         }
     }
 }

@@ -96,25 +96,25 @@ namespace KSS.Components
             if( data.TryGetValue( "set_x", out var setX ) )
             {
                 SetX = new( SetXListener );
-                l.SetObj( setX.ToGuid(), SetX );
+                l.SetObj( setX.AsGuid(), SetX );
             }
 
             if( data.TryGetValue( "set_y", out var setY ) )
             {
                 SetY = new( SetYListener );
-                l.SetObj( setY.ToGuid(), SetY );
+                l.SetObj( setY.AsGuid(), SetY );
             }
 
             if( data.TryGetValue( "set_xy", out var setXY ) )
             {
                 SetXY = new( SetXYListener );
-                l.SetObj( setXY.ToGuid(), SetXY );
+                l.SetObj( setXY.AsGuid(), SetXY );
             }
 
             if( data.TryGetValue( "get_reference_transform", out var getReferenceTransform ) )
             {
                 GetReferenceTransform = new( GetTransform );
-                l.SetObj( getReferenceTransform.ToGuid(), GetReferenceTransform );
+                l.SetObj( getReferenceTransform.AsGuid(), GetReferenceTransform );
             }
         }
 
@@ -132,10 +132,10 @@ namespace KSS.Components
 				{ "reference_transform", s.WriteObjectReference( this.ReferenceTransform ) },
 				{ "x_actuator_transform", s.WriteObjectReference( this.XActuatorTransform ) },
 				{ "y_actuator_transform", s.WriteObjectReference( this.YActuatorTransform ) },
-				{ "min_x", this.MinX },
-				{ "min_y", this.MinY },
-				{ "max_x", this.MaxX },
-				{ "max_y", this.MaxY },
+				{ "min_x", this.MinX.GetData() },
+				{ "min_y", this.MinY.GetData() },
+				{ "max_x", this.MaxX.GetData() },
+				{ "max_y", this.MaxY.GetData() },
 				{ "get_reference_transform", this.GetReferenceTransform.GetData( s ) },
                 { "set_x", this.SetX.GetData( s ) },
                 { "set_y", this.SetY.GetData( s ) },
@@ -158,13 +158,13 @@ namespace KSS.Components
 				this.YActuatorTransform = l.ReadObjectReference( yActuatorTransform ) as Transform;
 
 			if( data.TryGetValue( "min_x", out var minX ) )
-				this.MinX = (float)minX;
+				this.MinX = minX.AsFloat();
 			if( data.TryGetValue( "min_y", out var minY ) )
-				this.MinY = (float)minY;
+				this.MinY = minY.AsFloat();
 			if( data.TryGetValue( "max_x", out var maxX ) )
-				this.MaxX = (float)maxX;
+				this.MaxX = maxX.AsFloat();
 			if( data.TryGetValue( "max_y", out var maxY ) )
-				this.MaxY = (float)maxY;
+				this.MaxY = maxY.AsFloat();
 
 			if( data.TryGetValue( "get_reference_transform", out var getReferenceTransform ) )
 				this.GetReferenceTransform.SetData( getReferenceTransform, l );

@@ -148,19 +148,19 @@ namespace KSS.Components
             if( data.TryGetValue( "on_set_throttle", out var onSetThrottle ) )
             {
                 OnSetThrottle = new();
-                l.SetObj( onSetThrottle.ToGuid(), OnSetThrottle );
+                l.SetObj( onSetThrottle.AsGuid(), OnSetThrottle );
             }
 
             if( data.TryGetValue( "on_set_attitude", out var onSetAttitude ) )
             {
                 OnSetAttitude = new();
-                l.SetObj( onSetAttitude.ToGuid(), OnSetAttitude );
+                l.SetObj( onSetAttitude.AsGuid(), OnSetAttitude );
             }
 
             if( data.TryGetValue( "on_set_translation", out var onSetTranslation ) )
             {
                 OnSetTranslation = new();
-                l.SetObj( onSetTranslation.ToGuid(), OnSetTranslation );
+                l.SetObj( onSetTranslation.AsGuid(), OnSetTranslation );
             }
         }
 

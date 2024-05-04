@@ -31,9 +31,9 @@ namespace UnityPlus.Serialization
 		}
 
 		[MethodImpl( MethodImplOptions.AggressiveInlining )]
-		public static Type ToType( this SerializedData data, IForwardReferenceMap l = null )
+		public static Type AsType( this SerializedData data, IForwardReferenceMap l = null )
 		{
-			string assemblyQualifiedName = (string)data;
+			string assemblyQualifiedName = data.AsString();
 			if( _stringToType.TryGetValue( assemblyQualifiedName, out Type type ) )
 			{
 				return type;

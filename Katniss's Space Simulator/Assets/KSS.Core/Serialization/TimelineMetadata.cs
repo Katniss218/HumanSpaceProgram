@@ -131,22 +131,18 @@ namespace KSS.Core.Serialization
         {
             return new SerializedObject()
             {
-                { "name", this.Name },
-                { "description", this.Description }
+                { "name", this.Name.GetData() },
+                { "description", this.Description.GetData() }
             };
         }
 
         public void SetData( SerializedData data )
         {
             if( data.TryGetValue( "name", out var name ) )
-            {
-                this.Name = (string)name;
-            }
+                this.Name = name.AsString();
 
             if( data.TryGetValue( "description", out var description ) )
-            {
-                this.Description = (string)description;
-            }
+                this.Description = description.AsString();
         }
     }
 }

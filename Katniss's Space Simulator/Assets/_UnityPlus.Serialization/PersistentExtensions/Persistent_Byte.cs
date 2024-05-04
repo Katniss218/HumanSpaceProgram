@@ -17,9 +17,9 @@ namespace UnityPlus.Serialization
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static byte ToByte( this SerializedData data, IForwardReferenceMap l = null )
+        public static byte AsByte( this SerializedData data, IForwardReferenceMap l = null )
         {
-            return (byte)data;
+            return (byte)(SerializedPrimitive)data;
         }
     }
 }

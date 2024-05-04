@@ -17,20 +17,20 @@ namespace UnityPlus.Serialization
 			{
 				{ "size", bc.size.GetData() },
 				{ "center", bc.center.GetData() },
-				{ "is_trigger", bc.isTrigger }
+				{ "is_trigger", bc.isTrigger.GetData() }
 			};
 		}
 
 		public static void SetData( this BoxCollider bc, SerializedData data, IForwardReferenceMap l )
 		{
 			if( data.TryGetValue( "size", out var size ) )
-				bc.size = size.ToVector3();
+				bc.size = size.AsVector3();
 
 			if( data.TryGetValue( "center", out var center ) )
-				bc.center = center.ToVector3();
+				bc.center = center.AsVector3();
 
 			if( data.TryGetValue( "is_trigger", out var isTrigger ) )
-				bc.isTrigger = (bool)isTrigger;
+				bc.isTrigger = isTrigger.AsBoolean();
 		}
 	}
 }

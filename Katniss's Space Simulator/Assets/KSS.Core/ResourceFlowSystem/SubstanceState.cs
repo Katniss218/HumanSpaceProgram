@@ -43,14 +43,14 @@ namespace KSS.Core.ResourceFlowSystem
             return new SerializedObject()
             {
                 { "substance", s.WriteAssetReference( Substance ) },
-                { "mass_amount", MassAmount }
+                { "mass_amount", MassAmount.GetData() }
             };
         }
 
         public void SetData( SerializedData data, IForwardReferenceMap l )
         {
             Substance = l.ReadAssetReference<Substance>( data["substance"] );
-            MassAmount = (float)data["mass_amount"];
+            MassAmount = data["mass_amount"].AsFloat();
         }
     }
 }

@@ -204,7 +204,7 @@ namespace KSS.Core.Physics
 
             ret.AddAll( new SerializedObject()
 			{
-				{ "mass", this.Mass },
+				{ "mass", this.Mass.GetData() },
 				{ "local_center_of_mass", this.LocalCenterOfMass.GetData() },
 				{ "velocity",  this.Velocity.GetData() },
 				{ "angular_velocity", this.AngularVelocity.GetData() },
@@ -221,10 +221,10 @@ namespace KSS.Core.Physics
 			IPersistent_Behaviour.SetData( this, data, l );
 
             if( data.TryGetValue( "mass", out var mass ) )
-				this.Mass = (float)mass;
+				this.Mass = mass.AsFloat();
 
 			if( data.TryGetValue( "local_center_of_mass", out var localCenterOfMass ) )
-				this.LocalCenterOfMass = localCenterOfMass.ToVector3();
+				this.LocalCenterOfMass = localCenterOfMass.AsVector3();
 
             _rb.isKinematic = true; // PinnedPhysicsObject is always kinematic. This is needed because it may be called first.
 
@@ -240,10 +240,10 @@ namespace KSS.Core.Physics
 				this.ReferenceBody = (CelestialBody)l.ReadObjectReference( referenceBody );
 
 			if( data.TryGetValue( "reference_position", out var referencePosition ) )
-				this.ReferencePosition = referencePosition.ToVector3Dbl();
+				this.ReferencePosition = referencePosition.AsVector3Dbl();
 
 			if( data.TryGetValue( "reference_rotation", out var referenceRotation ) )
-				this.ReferenceRotation = referenceRotation.ToQuaternionDbl();
+				this.ReferenceRotation = referenceRotation.AsQuaternionDbl();
 		}
 	}
 }

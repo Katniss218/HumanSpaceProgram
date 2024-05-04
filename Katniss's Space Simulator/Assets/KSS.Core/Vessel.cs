@@ -20,6 +20,15 @@ namespace KSS.Core
 		{
 			return part.root.GetComponent<Vessel>();
 		}
+
+        /// <summary>
+        /// Gets the <see cref="Vessel"/> attached to this gameobject.
+        /// </summary>
+        /// <returns>The vessel. Null if the gameobject is not part of a vessel.</returns>
+        public static Vessel GetVessel( this GameObject part )
+		{
+			return GetVessel( part.transform );
+		}
 	}
 
     /// <summary>

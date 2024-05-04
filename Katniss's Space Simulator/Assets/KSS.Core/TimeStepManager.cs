@@ -185,7 +185,7 @@ namespace KSS.Core
 
             ret.AddAll( new SerializedObject()
             {
-                { "ut", UT }
+                { "ut", UT.GetData() }
             } );
 
             return ret;
@@ -196,7 +196,7 @@ namespace KSS.Core
             IPersistent_Behaviour.SetData( this, data, l );
 
             if( data.TryGetValue( "ut", out var ut ) )
-                UT = ut;
+                UT = ut.AsDouble();
         }
     }
 }

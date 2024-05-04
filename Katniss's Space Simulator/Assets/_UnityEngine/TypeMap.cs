@@ -84,21 +84,21 @@ namespace UnityEngine
 				if( currentTypeToCheck.IsGenericType && currentTypeToCheck.IsConstructedGenericType )
 				{
 					if( _map.TryGetValue( currentTypeToCheck.GetGenericTypeDefinition(), out value ) )
-					{
-						return true;
+                    {
+                        _map[type] = value;
+                        return true;
 					}
 				}
 
 				currentTypeToCheck = currentTypeToCheck.BaseType;
 				if( currentTypeToCheck == null )
-				{
-					return false;
+                {
+                    _map[type] = value;
+                    return false;
 				}
 			}
 
-			_map[type] = value;
-
-			return true;
+			return value != null;
 		}
 
 		public T GetClosestOrDefault( Type type )

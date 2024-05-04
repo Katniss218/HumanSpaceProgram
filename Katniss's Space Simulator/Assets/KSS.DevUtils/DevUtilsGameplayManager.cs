@@ -163,9 +163,9 @@ namespace KSS.DevUtils
                 partDir = HumanSpaceProgram.GetSavedVesselsDirectoryPath() + "/vessel";
                 Directory.CreateDirectory( partDir );
                 vm = new VesselMetadata( "vessel" );
-                vm.Name = "Engine"; vm.Description = "default"; vm.Author = "Katniss";
+                vm.Name = "Vessel"; vm.Description = "default"; vm.Author = "Katniss";
                 vm.WriteToDisk();
-                strat.RootObjectGetter = () => vessel.RootPart.gameObject;
+                strat.RootObjectGetter = () => ActiveObjectManager.ActiveObject.GetVessel().RootPart.gameObject;
                 handler.ObjectsFilename = partDir + "/objects.json";
                 handler.DataFilename = partDir + "/data.json";
                 saver.Save();

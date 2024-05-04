@@ -18,8 +18,8 @@ namespace UnityPlus.Serialization
             ret.AddAll( new SerializedObject()
             {
                 { "shared_materials", new SerializedArray( mr.sharedMaterials.Select( mat => s.WriteAssetReference( mat ) ) ) },
-                { "shadow_casting_mode", mr.shadowCastingMode.ToString() },
-                { "receive_shadows", mr.receiveShadows }
+                { "shadow_casting_mode", mr.shadowCastingMode.ToString().GetData() },
+                { "receive_shadows", mr.receiveShadows.GetData() }
             } );
 
             return ret;
@@ -42,10 +42,10 @@ namespace UnityPlus.Serialization
             }
 
             if( data.TryGetValue( "shadow_casting_mode", out var shadowCastingMode ) )
-                mr.shadowCastingMode = Enum.Parse<ShadowCastingMode>( (string)shadowCastingMode );
+                mr.shadowCastingMode = Enum.Parse<ShadowCastingMode>( shadowCastingMode.AsString() );
 
             if( data.TryGetValue( "receive_shadows", out var receiveShadows ) )
-                mr.receiveShadows = (bool)receiveShadows;
+                mr.receiveShadows = receiveShadows.AsBoolean();
         }
     }
 }

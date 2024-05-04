@@ -17,9 +17,9 @@ namespace UnityPlus.Serialization
 		}
 		
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-		public static Vector2Int Vector2Int( this SerializedData data, IForwardReferenceMap l = null ) 
+		public static Vector2Int AsVector2Int( this SerializedData data, IForwardReferenceMap l = null ) 
 		{
-            return new Vector2Int( (int)data[0], (int)data[1] );
+            return new Vector2Int( (int)(SerializedPrimitive)data[0], (int)(SerializedPrimitive)data[1] );
 		}
 	}
 }

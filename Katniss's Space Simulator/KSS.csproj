@@ -58,8 +58,10 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\KSS\GhostableExtensions\IGhostable_Ex.cs" />
     <Compile Include="Assets\KSS\EditorScene\EditorSceneEscapeInputController.cs" />
     <Compile Include="Assets\KSS\TranslationTransformHandle.cs" />
+    <Compile Include="Assets\KSS\Ghostable_object.cs" />
     <Compile Include="Assets\KSS\DesignScene\DesignSceneToolBase.cs" />
     <Compile Include="Assets\KSS\DesignScene\Tools\PickTool.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\VanillaPlanetarySystemFactory.cs" />
@@ -72,6 +74,7 @@
     <Compile Include="Assets\KSS\GameplayScene\Tools\VanillaToolRegisterer.cs" />
     <Compile Include="Assets\KSS\Components\FVesselSeparator.cs" />
     <Compile Include="Assets\KSS\GameplayScene\FConstructionSite.cs" />
+    <Compile Include="Assets\KSS\Components\FSequencer.Sequence.cs" />
     <Compile Include="Assets\KSS\TransformHandleSet.cs" />
     <Compile Include="Assets\KSS\Effects\Atmospheres\AtmosphereRenderer.cs" />
     <Compile Include="Assets\KSS\ScreenshotManager.cs" />
@@ -82,10 +85,12 @@
     <Compile Include="Assets\KSS\Cameras\GameplayCameraController.cs" />
     <Compile Include="Assets\KSS\GameplayScene\GameplaySceneEscapeInputController.cs" />
     <Compile Include="Assets\KSS\GameplayScene\Tools\ConstructTool.cs" />
+    <Compile Include="Assets\KSS\Components\FSequencer.SequenceAction.cs" />
     <Compile Include="Assets\KSS\Components\FConstructible.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\MakeQuadMesh_Job.cs" />
     <Compile Include="Assets\KSS\DesignScene\Tools\VanillaToolRegisterer.cs" />
     <Compile Include="Assets\KSS\DesignScene\Tools\RotateTool.cs" />
+    <Compile Include="Assets\KSS\Components\FSequencer.SequenceElement.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\Surface\LODQuadSphere.cs" />
     <Compile Include="Assets\KSS\DesignScene\DesignSceneEscapeInputController.cs" />
     <Compile Include="Assets\KSS\DesignScene\DesignSceneToolManager.cs" />
@@ -101,6 +106,7 @@
     <Compile Include="Assets\KSS\DesignScene\Tools\TranslateTool.cs" />
     <Compile Include="Assets\KSS\AssetLoaders\GameDataJsonPartFactory.cs" />
     <Compile Include="Assets\KSS\Input\HierarchicalInputPriority.cs" />
+    <Compile Include="Assets\KSS\GhostableWithExtension.cs" />
     <Compile Include="Assets\KSS\DesignScene\Tools\RerootTool.cs" />
     <Compile Include="Assets\KSS\Components\FGimbalActuatorController.cs" />
     <Compile Include="Assets\KSS\MainMenuScene\MainMenuEscapeInputController.cs" />
@@ -111,15 +117,9 @@
     <Compile Include="Assets\KSS\GameplayScene\ConstructionState.cs" />
     <Compile Include="Assets\KSS\Components\F1AxisActuator.cs" />
     <Compile Include="Assets\KSS\PIDLoop.cs" />
+    <Compile Include="Assets\KSS\IGhostable.cs" />
     <Compile Include="Assets\KSS\AssetLoaders\GameDataJsonVesselFactory.cs" />
     <Compile Include="Assets\KSS\Components\FReactionControlController.cs" />
-    <Compile Include="Assets\KSS\GhostableWithExtension.cs" />
-    <Compile Include="Assets\KSS\GhostableExtensions\IGhostable_Ex.cs" />
-    <Compile Include="Assets\KSS\Ghostable_object.cs" />
-    <Compile Include="Assets\KSS\IGhostable.cs" />
-    <Compile Include="Assets\KSS\Components\FSequencer.SequenceElement.cs" />
-    <Compile Include="Assets\KSS\Components\FSequencer.Sequence.cs" />
-    <Compile Include="Assets\KSS\Components\FSequencer.SequenceAction.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS\CelestialBodies\Surface\TerrainShader.shader" />

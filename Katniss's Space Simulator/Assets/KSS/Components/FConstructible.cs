@@ -35,14 +35,14 @@ namespace KSS.Components
         {
             return new SerializedObject()
             {
-                { "min_lift_capacity", this.minLiftCapacity }
+                { "min_lift_capacity", this.minLiftCapacity.GetData() }
             };
         }
 
         public void SetData( SerializedData data, IForwardReferenceMap l )
         {
             if( data.TryGetValue( "min_lift_capacity", out var minLiftCapacity ) )
-                this.minLiftCapacity = (float)minLiftCapacity;
+                this.minLiftCapacity = minLiftCapacity.AsFloat();
         }
     }
 
@@ -147,23 +147,27 @@ namespace KSS.Components
             }
         }
 
-        Dictionary<Component, (SerializedData fwd, SerializedData rev)> _cachedData = new();
+        Dictionary<Component, (SerializedData fwd, SerializedData rev)> _cachedData;
         BidirectionalReferenceStore _cachedRefStore = new BidirectionalReferenceStore();
 
         void Start()
         {
-            CacheGhostAndUnghostData();
+            RecalculateGhostAndUnghostData();
+
             OnAfterBuildPointPercentChanged( this.BuildPercent );
         }
 
         /// <summary>
         /// Caches the current state of the vessel.
         /// </summary>
-        private void CacheGhostAndUnghostData()
+        private void RecalculateGhostAndUnghostData()
         {
-            _cachedData.Clear();
-            _cachedRefStore.Clear(); // This needs to be recalculated whenever the vessel changes (i..e when the part/component instances become invalidated).
-                                     // this method should be recalculated whenever any value of the component changes tbh.
+            bool wasNull = _cachedData == null;
+            if( wasNull )
+            {
+                _cachedData = new();
+            }
+            _cachedRefStore.Clear();
 
             AncestralMap<FConstructible> partMap = AncestralMap<FConstructible>.Create( transform );
             if( partMap.TryGetValue( this, out var ourPartsTransforms ) )
@@ -173,18 +177,20 @@ namespace KSS.Components
                     foreach( var comp in transform.GetComponents() )
                     {
                         SerializedData originalToGhost = comp.GetGhostData( _cachedRefStore );
+
                         // Only cache things that are ghostable. This should probably be something else than null, but it works for now.
                         if( originalToGhost != null )
                         {
                             SerializedData ghostToOriginal = comp.GetData( _cachedRefStore );
 
-                            _cachedData.Add( comp, (originalToGhost, ghostToOriginal) );
+                            if( wasNull )
+                            {
+                                _cachedData.Add( comp, (originalToGhost, ghostToOriginal) );
+                            }
                         }
                     }
                 }
             }
-
-            // construction site would only manage the distribution of build points, etc.
         }
 
         //
@@ -195,10 +201,22 @@ namespace KSS.Components
         {
             SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
 
+            SerializedArray arr = new SerializedArray();
+            foreach( var kvp in _cachedData )
+            {
+                arr.Add( new SerializedObject()
+                {
+                    { "$id", s.WriteObjectReference( kvp.Key ) },
+                    { "forward", kvp.Value.fwd },
+                    { "reverse", kvp.Value.rev }
+                } );
+            }
+
             ret.AddAll( new SerializedObject()
             {
-                { "build_points", this.BuildPoints },
-                { "max_build_points", this.MaxBuildPoints },
+                { "cached_data", arr },
+                { "build_points", BuildPoints.GetData() },
+                { "max_build_points", MaxBuildPoints.GetData() },
                 // todo - conditions.
             } );
 
@@ -209,11 +227,22 @@ namespace KSS.Components
         {
             IPersistent_Behaviour.SetData( this, data, l );
 
+            if( data.TryGetValue<SerializedArray>( "cached_data", out var cachedData ) )
+            {
+                _cachedData = new();
+                foreach( var obj in cachedData.Cast<SerializedObject>() )
+                {
+                    Component comp = (Component)l.ReadObjectReference( obj["$id"] );
+                    _cachedData.Add( comp, (obj["forward"], obj["reverse"]) );
+                }
+            }
+
+            // Set the underlying values to not trigger anything.
             if( data.TryGetValue( "max_build_points", out var maxBuildPoints ) )
-                this._maxBuildPoints = (float)maxBuildPoints;
+                _maxBuildPoints = maxBuildPoints.AsFloat();
 
             if( data.TryGetValue( "build_points", out var buildPoints ) )
-                this._buildPoints = (float)buildPoints;
+                _buildPoints = buildPoints.AsFloat();
 
             // todo - conditions.
         }

@@ -31,6 +31,15 @@ namespace KSS.Core
         {
             return part.root.GetComponent<IPartObject>();
         }
+
+        /// <summary>
+        /// Gets the <see cref="IPartObject"/> attached to this gameobject.
+        /// </summary>
+        /// <returns>The part object. Null if the gameobject is not part of a part object.</returns>
+        public static IPartObject GetPartObject( this GameObject part )
+        {
+            return GetPartObject( part.transform );
+        }
     }
 
     /// <summary>

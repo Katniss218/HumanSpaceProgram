@@ -17,9 +17,9 @@ namespace UnityPlus.Serialization
 		}
 		
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-		public static bool ToBoolean( this SerializedData data, IForwardReferenceMap l = null ) 
+		public static bool AsBoolean( this SerializedData data, IForwardReferenceMap l = null ) 
 		{
-            return (bool)data;
+            return (bool)(SerializedPrimitive)data;
 		}
 	}
 }

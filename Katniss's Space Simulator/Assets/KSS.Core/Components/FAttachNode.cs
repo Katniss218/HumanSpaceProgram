@@ -133,7 +133,7 @@ namespace KSS.Core.Components
 
             ret.AddAll( new SerializedObject()
             {
-                { "range", this.Range }
+                { "range", this.Range.GetData() }
             } );
 
             return ret;
@@ -144,7 +144,7 @@ namespace KSS.Core.Components
             IPersistent_Behaviour.SetData( this, data, l );
 
             if( data.TryGetValue( "range", out var range ) )
-                this.Range = (float)range;
+                this.Range = range.AsFloat();
         }
 
         void OnDrawGizmos()

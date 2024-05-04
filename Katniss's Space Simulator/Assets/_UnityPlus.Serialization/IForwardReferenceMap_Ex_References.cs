@@ -15,7 +15,7 @@ namespace UnityPlus.Serialization
 
 			if( ((SerializedObject)data).TryGetValue( KeyNames.REF, out SerializedData refData ) )
 			{
-				Guid guid = refData.ToGuid();
+				Guid guid = refData.AsGuid();
 
 				return l.GetObj( guid );
 			}
@@ -27,7 +27,7 @@ namespace UnityPlus.Serialization
 		{
 			if( ((SerializedObject)data).TryGetValue( KeyNames.ASSETREF, out SerializedData refData ) )
 			{
-				string assetID = (string)refData;
+				string assetID = refData.AsString();
 
 				return AssetRegistry.Get<T>( assetID );
 			}

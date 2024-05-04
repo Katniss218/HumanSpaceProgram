@@ -25,13 +25,13 @@ namespace UnityPlus.Serialization
         public static void SetData( this Transform t, SerializedData data, IForwardReferenceMap l )
         {
             if( data.TryGetValue( "local_position", out var localPosition ) )
-                t.localPosition = localPosition.ToVector3();
+                t.localPosition = localPosition.AsVector3();
 
             if( data.TryGetValue( "local_rotation", out var localRotation ) )
-                t.localRotation = localRotation.ToQuaternion();
+                t.localRotation = localRotation.AsQuaternion();
 
             if( data.TryGetValue( "local_scale", out var localScale ) )
-                t.localScale = localScale.ToVector3();
+                t.localScale = localScale.AsVector3();
         }
     }
 }

@@ -13,16 +13,16 @@ namespace UnityPlus.Serialization
 	public static class Persistent_TimeSpan
 	{
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-		public static SerializedPrimitive GetData( this TimeSpan dateTime, IReverseReferenceMap l = null )
+		public static SerializedData GetData( this TimeSpan dateTime, IReverseReferenceMap l = null )
 		{
             // TimeSpan is saved as `[-][d'.']hh':'mm':'ss['.'fffffff]`.
             return (SerializedPrimitive)dateTime.ToString( "c", CultureInfo.InvariantCulture );
 		}
 		
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-		public static TimeSpan ToTimeSpan( this SerializedData data, IForwardReferenceMap l = null ) 
+		public static TimeSpan AsTimeSpan( this SerializedData data, IForwardReferenceMap l = null ) 
 		{
-			return TimeSpan.ParseExact( (string)data, "c", CultureInfo.InvariantCulture );
+			return TimeSpan.ParseExact( (string)(SerializedPrimitive)data, "c", CultureInfo.InvariantCulture );
 		}
 	}
 }

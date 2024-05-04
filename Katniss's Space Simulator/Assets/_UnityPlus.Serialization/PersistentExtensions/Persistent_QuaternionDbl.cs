@@ -17,9 +17,9 @@ namespace UnityPlus.Serialization
 		}
 		
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-		public static QuaternionDbl ToQuaternionDbl( this SerializedData data, IForwardReferenceMap l = null ) 
+		public static QuaternionDbl AsQuaternionDbl( this SerializedData data, IForwardReferenceMap l = null ) 
 		{
-            return new QuaternionDbl( (double)data[0], (double)data[1], (double)data[2], (double)data[3] );
+            return new QuaternionDbl( data[0].AsDouble(), data[1].AsDouble(), data[2].AsDouble(), data[3].AsDouble() );
 		}
 	}
 }

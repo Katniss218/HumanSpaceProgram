@@ -106,14 +106,14 @@ namespace KSS.Core.Serialization
             SerializedObject modVersions = new SerializedObject();
             foreach( var elemKvp in this.ModVersions )
             {
-                modVersions.Add( elemKvp.Key, elemKvp.Value.ToString() );
+                modVersions.Add( elemKvp.Key, elemKvp.Value.GetData() );
             }
             return new SerializedObject()
             {
-                { "name", this.Name },
-                { "description", this.Description },
-                { "author", this.Author },
-                { "file_version", this.FileVersion.ToString() },
+                { "name", this.Name.GetData() },
+                { "description", this.Description.GetData() },
+                { "author", this.Author.GetData() },
+                { "file_version", this.FileVersion.GetData() },
                 { "mod_versions", modVersions }
             };
         }
@@ -121,28 +121,23 @@ namespace KSS.Core.Serialization
         public void SetData( SerializedData data )
         {
             if( data.TryGetValue( "name", out var name ) )
-            {
-                this.Name = (string)name;
-            }
+                this.Name = name.AsString();
+
             if( data.TryGetValue( "description", out var description ) )
-            {
-                this.Description = (string)description;
-            }
+                this.Description = description.AsString();
+
             if( data.TryGetValue( "author", out var author ) )
-            {
-                this.Author = (string)author;
-            }
+                this.Author = author.AsString();
+
             if( data.TryGetValue( "file_version", out var saveVersion ) )
-            {
-                this.FileVersion = Version.Parse( (string)saveVersion );
-            }
+                this.FileVersion = saveVersion.AsVersion();
 
             if( data.TryGetValue( "mod_versions", out var modVersions ) )
             {
                 this.ModVersions = new Dictionary<string, Version>();
                 foreach( var elemKvp in (SerializedObject)modVersions )
                 {
-                    this.ModVersions.Add( elemKvp.Key, Version.Parse( (string)elemKvp.Value ) );
+                    this.ModVersions.Add( elemKvp.Key, elemKvp.Value.AsVersion() );
                 }
             }
         }

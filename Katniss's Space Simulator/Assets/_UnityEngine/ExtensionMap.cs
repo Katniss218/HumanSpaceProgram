@@ -88,8 +88,6 @@ namespace UnityEngine
 
         public bool TryGetValue( Type type, out Delegate del )
         {
-            bool b = type.IsInterface;
-
             return _map.TryGetClosest( type, out del );
         }
 

@@ -15,14 +15,14 @@ namespace UnityPlus.Serialization
         {
             return new SerializedObject()
             {
-                { "is_kinematic", rb.isKinematic }
+                { "is_kinematic", rb.isKinematic.GetData() }
             };
         }
 
         public static void SetData( this Rigidbody rb, SerializedData data, IForwardReferenceMap l )
         {
             if( data.TryGetValue( "is_kinematic", out var isKinematic ) )
-                rb.isKinematic = (bool)isKinematic;
+                rb.isKinematic = isKinematic.AsBoolean();
         }
     }
 }

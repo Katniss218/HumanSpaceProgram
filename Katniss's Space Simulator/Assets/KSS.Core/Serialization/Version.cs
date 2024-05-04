@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using UnityPlus.Serialization;
 
 namespace KSS.Core.Serialization
 {
@@ -88,6 +90,21 @@ namespace KSS.Core.Serialization
             int major = int.Parse( strings[0] );
             int minor = int.Parse( strings[1] );
             return new Version( major, minor );
+        }
+    }
+
+    public static class Persistent_Version
+    {
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static SerializedData GetData( this Version version, IReverseReferenceMap l = null )
+        {
+            return (SerializedPrimitive)version.ToString();
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static Version AsVersion( this SerializedData data, IForwardReferenceMap l = null )
+        {
+            return Version.Parse( data.AsString() );
         }
     }
 }

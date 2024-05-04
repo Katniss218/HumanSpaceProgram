@@ -70,13 +70,13 @@ namespace KSS.Components
             if( data.TryGetValue( "set_x", out var setX ) )
             {
                 SetX = new( SetXListener );
-                l.SetObj( setX.ToGuid(), SetX );
+                l.SetObj( setX.AsGuid(), SetX );
             }
 
             if( data.TryGetValue( "get_reference_transform", out var getReferenceTransform ) )
             {
                 GetReferenceTransform = new( GetTransform );
-                l.SetObj( getReferenceTransform.ToGuid(), GetReferenceTransform );
+                l.SetObj( getReferenceTransform.AsGuid(), GetReferenceTransform );
             }
         }
 
@@ -90,8 +90,8 @@ namespace KSS.Components
             {
                 { "reference_transform", s.WriteObjectReference( this.ReferenceTransform ) },
                 { "x_actuator_transform", s.WriteObjectReference( this.XActuatorTransform ) },
-                { "min_x", this.MinX },
-                { "max_x", this.MaxX },
+                { "min_x", this.MinX.GetData() },
+                { "max_x", this.MaxX.GetData() },
                 { "get_reference_transform", this.GetReferenceTransform.GetData( s ) },
                 { "set_x", this.SetX.GetData( s ) }
             } );
@@ -110,9 +110,9 @@ namespace KSS.Components
                 this.XActuatorTransform = l.ReadObjectReference( xActuatorTransform ) as Transform;
 
             if( data.TryGetValue( "min_x", out var minX ) )
-                this.MinX = (float)minX;
+                this.MinX = minX.AsFloat();
             if( data.TryGetValue( "max_x", out var maxX ) )
-                this.MaxX = (float)maxX;
+                this.MaxX = maxX.AsFloat();
 
             if( data.TryGetValue( "get_reference_transform", out var getReferenceTransform ) )
                 this.GetReferenceTransform.SetData( getReferenceTransform, l );

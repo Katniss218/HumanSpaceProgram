@@ -42,7 +42,7 @@ namespace KSS.Components
             if( data.TryGetValue( "separate", out var separate ) )
             {
                 Separate = new( SeparateListener );
-                l.SetObj( separate.ToGuid(), Separate );
+                l.SetObj( separate.AsGuid(), Separate );
             }
         }
 
@@ -52,8 +52,8 @@ namespace KSS.Components
 
             ret.AddAll( new SerializedObject()
             {
-                { "has_separated", this._hasSeparated },
-                { "separate", this.Separate.GetData( s ) }
+                { "has_separated", _hasSeparated.GetData() },
+                { "separate", Separate.GetData( s ) }
             } );
 
             return ret;
@@ -64,10 +64,10 @@ namespace KSS.Components
             IPersistent_Behaviour.SetData( this, data, l );
 
             if( data.TryGetValue( "has_separated", out var hasSeparated ) )
-                this._hasSeparated = (bool)hasSeparated;
+                _hasSeparated = hasSeparated.AsBoolean();
 
             if( data.TryGetValue( "separate", out var separate ) )
-                this.Separate.SetData( separate, l );
+                Separate.SetData( separate, l );
         }
     }
 }

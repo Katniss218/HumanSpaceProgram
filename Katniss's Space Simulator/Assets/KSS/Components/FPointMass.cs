@@ -35,8 +35,8 @@ namespace KSS.Components
 
             ret.AddAll( new SerializedObject()
             {
-                { "mass", this._mass },
-                { "on_after_mass_changed", this.OnAfterMassChanged.GetData( s ) }
+                { "mass", _mass.GetData() },
+                { "on_after_mass_changed", OnAfterMassChanged.GetData( s ) }
             } );
 
             return ret;
@@ -47,10 +47,10 @@ namespace KSS.Components
             IPersistent_Behaviour.SetData( this, data, l );
 
             if( data.TryGetValue( "mass", out var mass ) )
-                this._mass = (float)mass;
+                _mass = mass.AsFloat();
 
             if( data.TryGetValue( "on_after_mass_changed", out var onAfterMassChanged ) )
-                this.OnAfterMassChanged = (IHasMass.MassChange)onAfterMassChanged.ToDelegate( l );
+                OnAfterMassChanged = (IHasMass.MassChange)onAfterMassChanged.AsDelegate( l );
         }
     }
 }

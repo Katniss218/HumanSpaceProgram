@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using UnityPlus.Serialization;
+﻿using System.Runtime.CompilerServices;
 
 namespace UnityPlus.Serialization
 {
@@ -17,9 +11,9 @@ namespace UnityPlus.Serialization
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static ushort ToUInt16( this SerializedData data, IForwardReferenceMap l = null )
+        public static ushort AsUInt16( this SerializedData data, IForwardReferenceMap l = null )
         {
-            return (ushort)data;
+            return (ushort)(SerializedPrimitive)data;
         }
     }
 }

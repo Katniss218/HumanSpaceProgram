@@ -82,10 +82,10 @@ namespace KSS.Components
                     this._objP = (IResourceProducer)l.ReadObjectReference( objP );
 
                 if( data.TryGetValue( "position", out var position ) )
-                    this.Position = position.ToVector3();
+                    this.Position = position.AsVector3();
 
                 if( data.TryGetValue( "forward", out var forward ) )
-                    this.Forward = forward.ToVector3();
+                    this.Forward = forward.AsVector3();
             }
         }
 
@@ -288,7 +288,7 @@ namespace KSS.Components
             {
                 { "end1", this.End1.GetData( s ) },
                 { "end2", this.End2.GetData( s ) },
-                { "cross_section_area", this.CrossSectionArea }
+                { "cross_section_area", this.CrossSectionArea.GetData() }
             } );
 
             return ret;
@@ -303,7 +303,7 @@ namespace KSS.Components
             if( data.TryGetValue( "end2", out var end2 ) )
                 this.End2.SetData( end2, l );
             if( data.TryGetValue( "cross_section_area", out var crossSectionArea ) )
-                this.CrossSectionArea = (float)crossSectionArea;
+                this.CrossSectionArea = crossSectionArea.AsFloat();
         }
     }
 }

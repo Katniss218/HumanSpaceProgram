@@ -17,9 +17,9 @@ namespace UnityPlus.Serialization
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static ulong ToUInt64( this SerializedData data, IForwardReferenceMap l = null )
+        public static ulong AsUInt64( this SerializedData data, IForwardReferenceMap l = null )
         {
-            return (ulong)data;
+            return (ulong)(SerializedPrimitive)data;
         }
     }
 }

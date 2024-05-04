@@ -180,7 +180,7 @@ namespace KSS.Core.Physics
 
             ret.AddAll( new SerializedObject()
             {
-                { "mass", this.Mass },
+                { "mass", this.Mass.GetData() },
                 { "local_center_of_mass", this.LocalCenterOfMass.GetData() },
                 { "velocity", this.Velocity.GetData() },
                 { "angular_velocity", this.AngularVelocity.GetData() }
@@ -196,16 +196,16 @@ namespace KSS.Core.Physics
             _rb.isKinematic = false; // FreePhysicsObject is never kinematic. This is needed because it may be called first.
 
             if( data.TryGetValue( "mass", out var mass ) )
-                this.Mass = (float)mass;
+                this.Mass = mass.AsFloat();
 
             if( data.TryGetValue( "local_center_of_mass", out var localCenterOfMass ) )
-                this.LocalCenterOfMass = localCenterOfMass.ToVector3();
+                this.LocalCenterOfMass = localCenterOfMass.AsVector3();
 
             if( data.TryGetValue( "velocity", out var velocity ) )
-                this.Velocity = velocity.ToVector3();
+                this.Velocity = velocity.AsVector3();
 
             if( data.TryGetValue( "angular_velocity", out var angularVelocity ) )
-                this.AngularVelocity = angularVelocity.ToVector3();
+                this.AngularVelocity = angularVelocity.AsVector3();
         }
     }
 }

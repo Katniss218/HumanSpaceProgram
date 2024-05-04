@@ -20,7 +20,7 @@ namespace UnityPlus.Serialization
         public static void SetData( this Behaviour bc, SerializedData data, IForwardReferenceMap l )
         {
             if( data.TryGetValue( "is_enabled", out var isEnabled ) )
-                bc.enabled = isEnabled.ToBoolean();
+                bc.enabled = isEnabled.AsBoolean();
         }
     }
 }

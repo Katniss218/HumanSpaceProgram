@@ -17,9 +17,9 @@ namespace UnityPlus.Serialization
 		}
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-		public static Quaternion ToQuaternion( this SerializedData data, IForwardReferenceMap l = null ) 
+		public static Quaternion AsQuaternion( this SerializedData data, IForwardReferenceMap l = null ) 
 		{
-            return new Quaternion( (float)data[0], (float)data[1], (float)data[2], (float)data[3] );
+            return new Quaternion(data[0].AsFloat(), data[1].AsFloat(), data[2].AsFloat(), data[3].AsFloat() );
 		}
 	}
 }

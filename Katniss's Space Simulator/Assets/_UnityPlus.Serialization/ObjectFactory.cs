@@ -14,41 +14,48 @@ namespace UnityPlus.Serialization
             // this should also handle immutables.
         }
 
-        public static SerializedObject WriteObjectStub( object obj, IReverseReferenceMap s )
+        /// <summary>
+        /// Instantiates an object.
+        /// </summary>
+        /// <typeparam name="T">The base type that the serialized instance must be compatible with.</typeparam>
+        /// <returns>The instantiated object.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when the saved type ("$type") can't be assigned to type <typeparamref name="T"/>.</exception>
+        /// <exception cref="Exception">Other exceptions may be thrown by the factory method. Proceed with caution.</exception>
+        public static T AsObject<T>( this SerializedObject data, IForwardReferenceMap l )
         {
-            return new SerializedObject()
-            {
-                { KeyNames.REF, s.GetID( obj ).GetData() },
-            };
-        }
+            Guid id = data[KeyNames.ID].AsGuid();
 
-        public static SerializedObject WriteObjectStubTyped( object obj, Type objType, IReverseReferenceMap s )
-        {
-            return new SerializedObject()
-            {
-                { KeyNames.ID, s.GetID( obj ).GetData() },
-                { KeyNames.TYPE, objType.GetData() }
-            };
-        }
+            Type type;
 
-        public static object ToObject( this SerializedObject data, IForwardReferenceMap l )
-        {
-            Type type = data[KeyNames.TYPE].ToType();
-            Guid id = data[KeyNames.ID].ToGuid();
+            if( data.TryGetValue( KeyNames.TYPE, out var t ) )
+            {
+                type = t.AsType();
+
+                if( !typeof( T ).IsAssignableFrom( type ) )
+                {
+                    throw new InvalidOperationException( $"Tried to create an instance of `{type.FullName}` that can't be assigned to `{typeof( T ).FullName}`." );
+                }
+            }
+            else
+            {
+                type = typeof( T );
+            }
 
             object obj = null;
             if( _cache.TryGetClosest( type, out var factoryFunc ) )
             {
-                // Factory func should add everything it creates to the reference map.
                 obj = factoryFunc.Invoke( type, l );
+                // Every factory method should add its created instances to the IForwardReferenceMap.
+                // Thus, we don't register it here.
             }
             else
             {
+                // Default factory.
                 obj = Activator.CreateInstance( type );
                 l.SetObj( id, obj );
             }
 
-            return obj;
+            return (T)obj;
         }
     }
 }

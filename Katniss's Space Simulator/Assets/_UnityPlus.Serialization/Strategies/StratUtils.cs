@@ -43,8 +43,8 @@ namespace UnityPlus.Serialization.Strategies
 			// Set the IDs of all objects in the array.
 			foreach( var s in sArr )
 			{
-				Guid id = s[KeyNames.ID].ToGuid();
-				string path = s["path"];
+				Guid id = s[KeyNames.ID].AsGuid();
+				string path = s["path"].AsString();
 
 				var refObj = go.GetComponentOrGameObject( path );
 
@@ -65,7 +65,7 @@ namespace UnityPlus.Serialization.Strategies
 					sArr.Add( new SerializedObject()
 					{
 						{ KeyNames.ID, id.GetData() },
-						{ "path", $"{parentPath}" }
+						{ "path", $"{parentPath}".GetData() }
 					} );
 				}
 			}
@@ -78,7 +78,7 @@ namespace UnityPlus.Serialization.Strategies
 					sArr.Add( new SerializedObject()
 					{
 						{ KeyNames.ID, id.GetData() },
-						{ "path", $"{parentPath}*{i:#########0}" }
+						{ "path", $"{parentPath}*{i:#########0}".GetData() }
 					} );
 				}
 				i++;
@@ -237,7 +237,7 @@ namespace UnityPlus.Serialization.Strategies
 		[MethodImpl( MethodImplOptions.AggressiveInlining )]
 		public static GameObject InstantiateHierarchyObjects( IForwardReferenceMap l, SerializedData goData, GameObject parent )
 		{
-			Guid objectGuid = goData[KeyNames.ID].ToGuid();
+			Guid objectGuid = goData[KeyNames.ID].AsGuid();
 
 			GameObject go = new GameObject();
 			l.SetObj( objectGuid, go );
@@ -252,8 +252,8 @@ namespace UnityPlus.Serialization.Strategies
 			{
 				try
 				{
-					Guid compID = compData[KeyNames.ID].ToGuid();
-					Type compType = compData[KeyNames.TYPE].ToType();
+					Guid compID = compData[KeyNames.ID].AsGuid();
+					Type compType = compData[KeyNames.TYPE].AsType();
 
 					Component co = go.GetTransformOrAddComponent( compType ); // factory.
 
@@ -267,7 +267,7 @@ namespace UnityPlus.Serialization.Strategies
 				}
 				catch( Exception ex )
 				{
-					Debug.LogError( $"Failed to deserialize a component with ID: `{compData?[KeyNames.ID] ?? "<null>"}`." );
+					Debug.LogError( $"Failed to deserialize a component with ID: `{compData?[KeyNames.ID].AsString() ?? "<null>"}`." );
 					Debug.LogException( ex );
 				}
 			}
@@ -281,7 +281,7 @@ namespace UnityPlus.Serialization.Strategies
 				}
 				catch( Exception ex )
 				{
-					Debug.LogError( $"Failed to deserialize a child GameObject with ID: `{childData?[KeyNames.ID] ?? "<null>"}`." );
+					Debug.LogError( $"Failed to deserialize a child GameObject with ID: `{childData?[KeyNames.ID].AsString() ?? "<null>"}`." );
 					Debug.LogException( ex );
 				}
 			}
@@ -294,7 +294,7 @@ namespace UnityPlus.Serialization.Strategies
 			// Get whatever the data is pointing to.
 			// If it's a gameobject or a component on a gameobject, apply the data to it.
 
-			Guid id = dataElement[KeyNames.REF].ToGuid();
+			Guid id = dataElement[KeyNames.REF].AsGuid();
 			object obj = l.GetObj( id );
 
 			switch( obj )
@@ -310,7 +310,7 @@ namespace UnityPlus.Serialization.Strategies
 					}
 					catch( Exception ex )
 					{
-						Debug.LogError( $"Failed to deserialize data of component of type {comp.GetType()}, with ID: `{dataElement?[KeyNames.REF] ?? "<null>"}`." );
+						Debug.LogError( $"Failed to deserialize data of component of type {comp.GetType()}, with ID: `{dataElement?[KeyNames.REF].AsString() ?? "<null>"}`." );
 						Debug.LogException( ex );
 					}
 					break;

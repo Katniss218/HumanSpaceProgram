@@ -17,9 +17,9 @@ namespace UnityPlus.Serialization
 		}
 		
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-		public static Vector3Dbl ToVector3Dbl( this SerializedData data, IForwardReferenceMap l = null ) 
+		public static Vector3Dbl AsVector3Dbl( this SerializedData data, IForwardReferenceMap l = null ) 
 		{
-            return new Vector3Dbl( (double)data[0], (double)data[1], (double)data[2] );
+            return new Vector3Dbl( data[0].AsDouble(), data[1].AsDouble(), data[2].AsDouble() );
 		}
 	}
 }

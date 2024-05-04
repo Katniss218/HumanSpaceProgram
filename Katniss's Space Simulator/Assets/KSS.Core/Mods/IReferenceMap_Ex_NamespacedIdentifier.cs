@@ -9,15 +9,15 @@ namespace KSS.Core.Mods
     public static class IReferenceMap_Ex_NamespacedIdentifier
     {
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static SerializedData WriteNamespacedIdentifier( this IReverseReferenceMap _, NamespacedIdentifier nid )
+        public static SerializedData GetData( this NamespacedIdentifier identifier, IReverseReferenceMap l = null )
         {
-            return (SerializedPrimitive)nid.ToString();
+            return (SerializedPrimitive)identifier.ToString();
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static NamespacedIdentifier ReadNamespacedIdentifier( this IForwardReferenceMap _, SerializedData data )
+        public static NamespacedIdentifier AsNamespacedIdentifier( this SerializedData data, IForwardReferenceMap l = null )
         {
-            return NamespacedIdentifier.Parse( (string)data );
+            return NamespacedIdentifier.Parse( data.AsString() );
         }
     }
 }

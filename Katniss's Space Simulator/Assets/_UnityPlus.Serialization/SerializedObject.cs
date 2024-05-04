@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace UnityPlus.Serialization
 {
+    /// <summary>
+    /// A key-value pair node.
+    /// </summary>
     public sealed class SerializedObject : SerializedData, IDictionary<string, SerializedData>
     {
         readonly Dictionary<string, SerializedData> _children;
@@ -121,9 +124,8 @@ namespace UnityPlus.Serialization
         }
 
         /// <summary>
-        /// Combines the two <see cref="SerializedObject"/>s, replacing the values already present in the instance with <paramref name="other"/>'s values.
+        /// Combines the two <see cref="SerializedObject"/>s, replacing already existing values with <paramref name="other"/>'s values.
         /// </summary>
-        /// <param name="other">The SerializedObject to combine with.</param>
         public void AddAll( SerializedObject other )
         {
             foreach( var kvp in other )

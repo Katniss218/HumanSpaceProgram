@@ -40,7 +40,7 @@ namespace UnityPlus.Serialization
 
 			return new SerializedObject()
 			{
-				{ KeyNames.ASSETREF, assetID }
+				{ KeyNames.ASSETREF, assetID.GetData() }
 			};
 		}
 	}

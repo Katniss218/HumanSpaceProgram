@@ -32,7 +32,7 @@ namespace KSS
         {
             return new SerializedObject()
             {
-                { "is_trigger", true }
+                { "is_trigger", (true).GetData() }
             };
         }
 
@@ -40,7 +40,7 @@ namespace KSS
         {
             return new SerializedObject()
             {
-                { "mass", 0.0f }
+                { "mass", (0.0f).GetData() }
             };
         }
     }

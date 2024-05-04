@@ -16,8 +16,8 @@ namespace UnityPlus.Serialization
             return new SerializedObject()
             {
                 { "shared_mesh", s.WriteAssetReference( mc.sharedMesh ) },
-                { "is_convex", mc.convex },
-                { "is_trigger", mc.isTrigger }
+                { "is_convex", mc.convex.GetData() },
+                { "is_trigger", mc.isTrigger.GetData() }
             };
         }
 
@@ -27,10 +27,10 @@ namespace UnityPlus.Serialization
                 mc.sharedMesh = l.ReadAssetReference<Mesh>( sharedMesh );
 
             if( data.TryGetValue( "is_convex", out var isConvex ) )
-                mc.convex = (bool)isConvex;
+                mc.convex = isConvex.AsBoolean();
 
             if( data.TryGetValue( "is_trigger", out var isTrigger ) )
-                mc.isTrigger = (bool)isTrigger;
+                mc.isTrigger = isTrigger.AsBoolean();
         }
     }
 }

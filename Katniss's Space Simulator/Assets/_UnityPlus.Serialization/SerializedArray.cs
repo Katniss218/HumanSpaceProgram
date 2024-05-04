@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace UnityPlus.Serialization
 {
+    /// <summary>
+    /// A list of values node.
+    /// </summary>
     public sealed class SerializedArray : SerializedData, IList<SerializedData>
     {
         readonly List<SerializedData> _children;
@@ -41,7 +44,7 @@ namespace UnityPlus.Serialization
         {
             throw new NotSupportedException( $"Tried to invoke {nameof( TryGetValue )}, which is not supported on {nameof( SerializedArray )}." );
         }
-        
+
         public override bool TryGetValue<T>( string name, out T value )
         {
             throw new NotSupportedException( $"Tried to invoke {nameof( TryGetValue )}<T>, which is not supported on {nameof( SerializedArray )}." );
@@ -112,6 +115,17 @@ namespace UnityPlus.Serialization
         public void RemoveAt( int index )
         {
             _children.RemoveAt( index );
+        }
+
+        /// <summary>
+        /// Combines the two <see cref="SerializedArray"/>s, replacing already existing values with <paramref name="other"/>'s values.
+        /// </summary>
+        public void AddAll( SerializedArray other )
+        {
+            foreach( var data in other )
+            {
+                this._children.Add( data );
+            }
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]

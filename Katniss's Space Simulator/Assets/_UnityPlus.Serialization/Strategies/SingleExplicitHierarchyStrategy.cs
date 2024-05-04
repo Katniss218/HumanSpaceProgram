@@ -103,7 +103,7 @@ namespace UnityPlus.Serialization.Strategies
             }
             catch( Exception ex )
             {
-                Debug.LogError( $"Failed to deserialize a root GameObject with ID: `{obj?["$id"] ?? "<null>"}`." );
+                Debug.LogError( $"Failed to deserialize a root GameObject with ID: `{obj?["$id"].AsString() ?? "<null>"}`." );
                 Debug.LogException( ex );
             }
         }
@@ -120,7 +120,7 @@ namespace UnityPlus.Serialization.Strategies
             }
             catch( Exception ex )
             {
-                Debug.LogError( $"Failed to deserialize a root GameObject with ID: `{obj?["$id"] ?? "<null>"}`." );
+                Debug.LogError( $"Failed to deserialize a root GameObject with ID: `{obj?["$id"].AsString() ?? "<null>"}`." );
                 Debug.LogException( ex );
             }
 

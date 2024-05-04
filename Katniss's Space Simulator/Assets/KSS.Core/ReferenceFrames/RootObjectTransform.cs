@@ -127,10 +127,10 @@ namespace KSS.Core.ReferenceFrames
         public void SetData( SerializedData data, IForwardReferenceMap l )
         {
             if( data.TryGetValue( "airf_position", out var airfPosition ) )
-                this.AIRFPosition = airfPosition.ToVector3Dbl();
+                this.AIRFPosition = airfPosition.AsVector3Dbl();
 
             if( data.TryGetValue( "airf_rotation", out var airfRotation ) )
-                this.AIRFRotation = airfRotation.ToQuaternionDbl();
+                this.AIRFRotation = airfRotation.AsQuaternionDbl();
         }
     }
 }

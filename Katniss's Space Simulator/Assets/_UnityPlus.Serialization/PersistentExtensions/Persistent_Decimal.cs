@@ -17,9 +17,9 @@ namespace UnityPlus.Serialization
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static decimal ToDecimal( this SerializedData data, IForwardReferenceMap l = null )
+        public static decimal AsDecimal( this SerializedData data, IForwardReferenceMap l = null )
         {
-            return (decimal)data;
+            return (decimal)(SerializedPrimitive)data;
         }
     }
 }

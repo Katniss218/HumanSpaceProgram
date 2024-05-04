@@ -135,17 +135,17 @@ namespace UnityPlus.Serialization.Json
             if( SeekCompare( "false" ) )
             {
                 Advance( "false".Length );
-                return false;
+                return (SerializedPrimitive)false;
             }
             if( SeekCompare( "true" ) )
             {
                 Advance( "true".Length );
-                return true;
+                return (SerializedPrimitive)true;
             }
             if( SeekCompare( "null" ) )
             {
                 Advance( "null".Length );
-                return null;
+                return (SerializedPrimitive)null;
             }
             if( _currentChar == '[' )
             {
@@ -257,7 +257,7 @@ namespace UnityPlus.Serialization.Json
             return arr;
         }
 
-        public string EatString()
+        public SerializedPrimitive EatString()
         {
             Contract.Assert( _currentChar == '"' );
             Advance();
@@ -333,7 +333,7 @@ namespace UnityPlus.Serialization.Json
             Contract.Assert( _currentChar == '"' );
             Advance();
 
-            return val;
+            return (SerializedPrimitive)val;
         }
 
         public SerializedPrimitive EatNumber()

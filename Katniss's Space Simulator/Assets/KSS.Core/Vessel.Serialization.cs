@@ -16,7 +16,7 @@ namespace KSS.Core
 
             ret.AddAll( new SerializedObject()
             {
-                { "display_name", this.DisplayName },
+                { "display_name", this.DisplayName.GetData() },
                 { "root_part", s.WriteObjectReference( this.RootPart ) },
                 { "on_after_recalculate_parts", this.OnAfterRecalculateParts.GetData( s ) }
             } );
@@ -29,13 +29,13 @@ namespace KSS.Core
             IPersistent_Behaviour.SetData( this, data, l );
 
             if( data.TryGetValue( "display_name", out var displayName ) )
-                this.DisplayName = (string)displayName;
+                this.DisplayName = displayName.AsString();
 
             if( data.TryGetValue( "root_part", out var rootPart ) )
                 this.RootPart = (Transform)l.ReadObjectReference( rootPart );
 
             if( data.TryGetValue( "on_after_recalculate_parts", out var onAfterRecalculateParts ) )
-                this.OnAfterRecalculateParts = (Action)onAfterRecalculateParts.ToDelegate( l );
+                this.OnAfterRecalculateParts = (Action)onAfterRecalculateParts.AsDelegate( l );
         }
     }
 }

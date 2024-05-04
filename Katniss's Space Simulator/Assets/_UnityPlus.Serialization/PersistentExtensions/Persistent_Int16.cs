@@ -17,9 +17,9 @@ namespace UnityPlus.Serialization
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static short ToInt16( this SerializedData data, IForwardReferenceMap l = null )
+        public static short AsInt16( this SerializedData data, IForwardReferenceMap l = null )
         {
-            return (short)data;
+            return (short)(SerializedPrimitive)data;
         }
     }
 }

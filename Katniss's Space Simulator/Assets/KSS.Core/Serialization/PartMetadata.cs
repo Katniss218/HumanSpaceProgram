@@ -142,56 +142,44 @@ namespace KSS.Core.Serialization
 
         public SerializedData GetData()
         {
-            SerializedArray categories = new SerializedArray();
-            foreach( var category in this.Categories )
-            {
-                categories.Add( category );
-            }
             return new SerializedObject()
             {
-                { "name", this.Name },
-                { "description", this.Description },
-                { "author", this.Author },
-                { "categories", categories },
-                { "filter", this.Filter },
-                { "group", this.Group }
+                { "name", this.Name.GetData() },
+                { "description", this.Description.GetData() },
+                { "author", this.Author.GetData() },
+                { "categories", new SerializedArray( this.Categories.Select( c=>c.GetData()) ) },
+                { "filter", this.Filter.GetData() },
+                { "group", this.Group.GetData() }
             };
         }
 
         public void SetData( SerializedData data )
         {
             if( data.TryGetValue( "name", out var name ) )
-            {
-                this.Name = (string)name;
-            }
-            if( data.TryGetValue( "description", out var description ) )
-            {
-                this.Description = (string)description;
-            }
-            if( data.TryGetValue( "author", out var author ) )
-            {
-                this.Author = (string)author;
-            }
+                this.Name = name.AsString();
 
-            if( data.TryGetValue( "categories", out var cat ) )
+            if( data.TryGetValue( "description", out var description ) )
+                this.Description = description.AsString();
+
+            if( data.TryGetValue( "author", out var author ) )
+                this.Author = author.AsString();
+
+            if( data.TryGetValue<SerializedArray>( "categories", out var categories ) )
             {
-                SerializedArray categories = (SerializedArray)cat;
                 this.Categories = new string[categories.Count];
                 int i = 0;
-                foreach( var elemKvp in (SerializedArray)categories )
+                foreach( var elemKvp in categories )
                 {
-                    this.Categories[i] = (string)elemKvp;
+                    this.Categories[i] = elemKvp.AsString();
                     i++;
                 }
             }
+
             if( data.TryGetValue( "filter", out var filter ) )
-            {
-                this.Filter = (string)filter;
-            }
+                this.Filter = filter.AsString();
+
             if( data.TryGetValue( "group", out var group ) )
-            {
-                this.Group = (string)group;
-            }
+                this.Group = group.AsString();
         }
     }
 }
