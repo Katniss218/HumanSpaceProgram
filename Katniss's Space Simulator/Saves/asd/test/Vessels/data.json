@@ -1,1 +1,4383 @@
-﻿[{"$ref":"6c109d9a-2878-400e-ad94-f476b09cf842","data":{"local_position":[0.5625,-4.34875535964966,-7.16790294647217],"local_rotation":[-0.471883714199066,-0.195163637399673,-0.195163637399673,-0.837345838546753],"local_scale":[1,1,1]}},{"$ref":"4427df98-3e65-4f95-8568-7ead62e21536","data":{"airf_position":[-908822.1875,3048358.15124459,5520074.33209707],"airf_rotation":[-0.471883727609022,-0.195163639007822,-0.195163639007822,-0.837345839922946]}},{"$ref":"48c26e27-0d83-46bf-9470-7f72014bad74","data":{"is_kinematic":true}},{"$ref":"308e2d78-f5bf-4ec7-b730-604c262bfd55","data":{"is_enabled":true,"display_name":null,"root_part":{"$ref":"cd0851ba-0fc2-4147-bab1-e790447beca2"},"on_after_recalculate_parts":null}},{"$ref":"f96801ee-3c37-4a07-9b0a-d35da3cbe6ac","data":{"is_enabled":true,"mass":500000,"local_center_of_mass":[0,0,0],"velocity":[0,0,0],"angular_velocity":[0,0,0],"reference_body":{"$ref":"82bbd001-fc64-4bdc-9d93-5205f83ab994"},"reference_position":[-908822.1875,-5520074,3048357],"reference_rotation":[0.925765097141266,0,0.276003062725067,0.25842073559761]}},{"$ref":"d73e3130-d03b-4724-b39a-d9ada74aacf9","data":{"name":"launchsite","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"cd0851ba-0fc2-4147-bab1-e790447beca2","data":{"local_position":[0,0,0],"local_rotation":[0,0,0,1],"local_scale":[50,1,50]}},{"$ref":"072497b5-873d-4c0b-a290-36fecb65789c","data":{"shared_mesh":{"$assetref":"builtin::KSS.DevUtils/_untitled"}}},{"$ref":"76367241-de02-4864-ac9a-721473d09ac5","data":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::Resources/New Material 2"}],"shadow_casting_mode":"On","receive_shadows":true}},{"$ref":"1bc9ed44-87ec-4a59-afd2-9126d44267ea","data":{"shared_mesh":{"$assetref":"builtin::KSS.DevUtils/_untitled"},"is_convex":false,"is_trigger":false}},{"$ref":"000401f8-c9e4-4fc8-b24e-e1eaa4754773","data":{"is_enabled":true,"part_id":"Vanilla::testlaunchsite"}},{"$ref":"4a5b95ca-d24b-4708-be95-81ae93be35e7","data":{"is_enabled":true,"mass":500000,"on_after_mass_changed":null}},{"$ref":"6e8dae18-c40d-4d3f-9b1f-4fc89f771b62","data":{"name":"testlaunchsite(Clone)","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"cf0abc0e-245d-4e60-994b-13743403f960","data":{"local_position":[0,1,0],"local_rotation":[0,0,0,1],"local_scale":[0.0199999995529652,1,0.0199999995529652]}},{"$ref":"996353c1-7693-4804-8edd-da91772528d6","data":{"is_enabled":true}},{"$ref":"727967ef-2e96-4962-837d-686ec2b9875a","data":{"name":"spawn","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"ac9afb1a-3ef0-42ac-98aa-3e1374c13d0f","data":{"local_position":[0.0909179449081421,-0.302932024002075,-0.548782885074615],"local_rotation":[-0.471865624189377,-0.19523386657238,-0.1952044069767,-0.837330162525177],"local_scale":[1,1,1]}},{"$ref":"a0c1eea9-a73b-4a74-9324-e08b400d8768","data":{"airf_position":[-908822.659086585,3048362.19706479,5520080.9512192],"airf_rotation":[-0.471865803003311,-0.19523361325264,-0.19520466029644,-0.837330102920532]}},{"$ref":"25c0a5e3-3388-4714-b828-91943386b8f1","data":{"is_kinematic":false}},{"$ref":"67ec4971-1fb1-458e-90e6-81a45b567390","data":{"is_enabled":true,"mass":9200.001953125,"local_center_of_mass":[0,-0.840060830116272,8.03366759782875E-08],"velocity":[0.00614940002560616,-0.00392264779657125,0.000856788305100054],"angular_velocity":[0.000645353109575808,0.000891336821950972,-0.000441965385107324]}},{"$ref":"3f49ee33-d5ec-4148-aa39-e3488254a97b","data":{"is_enabled":true,"display_name":null,"root_part":{"$ref":"0b9f46de-1ace-4103-bdd1-8b00011067dd"},"on_after_recalculate_parts":null}},{"$ref":"e3812727-1e4d-4726-84bb-d78121177a4b","data":{"is_enabled":true}},{"$ref":"322a0270-79a2-405b-918b-752ed055487f","data":{"name":"tempname_vessel","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"0b9f46de-1ace-4103-bdd1-8b00011067dd","data":{"local_position":[0,0,0],"local_rotation":[0,0,0,1],"local_scale":[1,1,1]}},{"$ref":"814f6727-f223-43ae-82d7-ef3c1e30f93e","data":{"size":[2,1.25,2],"center":[0,0,0],"is_trigger":false}},{"$ref":"ae34c674-1db9-4ab0-a75c-5f298f3e1484","data":{"lods":[{"percent":0.289156645536423,"renderers":[{"$ref":"5856374a-b83d-4832-a55b-0b4477c01263"}]},{"percent":0,"renderers":[{"$ref":"d5d7f3ab-dfb1-47b2-b33a-dfcc487d42de"}]},{"percent":0,"renderers":[]}],"size":2.07500004768372}},{"$ref":"d12bc047-dc03-4ce2-830c-8da6a429df94","data":{"is_enabled":true,"mass":100,"on_after_mass_changed":null}},{"$ref":"309c5e53-ff6b-4896-a7b2-fe7bfcd4baac","data":{"is_enabled":true,"part_id":"Vanilla::intertank"}},{"$ref":"d0794a23-6df1-478f-a4ae-b4fa3d865db7","data":{"is_enabled":true,"cached_data":[{"$id":{"$ref":"814f6727-f223-43ae-82d7-ef3c1e30f93e"},"forward":{"is_trigger":true},"reverse":{"size":[2,1.25,2],"center":[0,0,0],"is_trigger":false}},{"$id":{"$ref":"d12bc047-dc03-4ce2-830c-8da6a429df94"},"forward":{"mass":0},"reverse":{"is_enabled":true,"mass":100,"on_after_mass_changed":null}},{"$id":{"$ref":"d5d7f3ab-dfb1-47b2-b33a-dfcc487d42de"},"forward":{"shared_materials":[{"$assetref":"builtin::Resources/Materials/ghost_wireframe"}]},"reverse":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::Resources/New Material 1"}],"shadow_casting_mode":"On","receive_shadows":true}},{"$id":{"$ref":"5856374a-b83d-4832-a55b-0b4477c01263"},"forward":{"shared_materials":[{"$assetref":"builtin::Resources/Materials/ghost_wireframe"}]},"reverse":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::Resources/New Material 1"}],"shadow_casting_mode":"On","receive_shadows":true}}],"build_points":90,"max_build_points":90}},{"$ref":"617fe1c8-a295-4f0f-abde-0b1495a9562c","data":{"name":"intertank(Clone)","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"a340ef82-cebb-469c-8f7e-ee7b2d166e05","data":{"local_position":[0,0,0],"local_rotation":[0,0,0,1],"local_scale":[1,1,1]}},{"$ref":"edd51ef9-185f-45f2-9477-74236b396467","data":{"shared_mesh":{"$assetref":"builtin::Resources/intertank"}}},{"$ref":"5856374a-b83d-4832-a55b-0b4477c01263","data":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::Resources/New Material 1"}],"shadow_casting_mode":"On","receive_shadows":true}},{"$ref":"213ca2c1-d567-4d24-90c2-82cdd13d0de5","data":{"name":"model","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"635f25a1-95da-4443-969d-328f5bd8a3b7","data":{"local_position":[0,0,0],"local_rotation":[0,0,0,1],"local_scale":[1,1,1]}},{"$ref":"e44d29cd-391a-4dea-8b52-2d4db0ec9163","data":{"shared_mesh":{"$assetref":"builtin::Resources/intertank_LOD1"}}},{"$ref":"d5d7f3ab-dfb1-47b2-b33a-dfcc487d42de","data":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::Resources/New Material 1"}],"shadow_casting_mode":"On","receive_shadows":true}},{"$ref":"1d2bceff-9cfa-4ff5-be4b-d527188c48e6","data":{"name":"model_LOD1","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"a07d3c1d-5e53-4d29-8d55-32c0f7a6300a","data":{"local_position":[0,0.649999976158142,0],"local_rotation":[-0.707106828689575,0,0,0.707106828689575],"local_scale":[1,1,1]}},{"$ref":"3a88d276-8d62-47b4-b43c-6e6788dd8465","data":{"is_enabled":true,"range":1}},{"$ref":"75b85ee9-36a6-4945-a9d3-3206d01f5f50","data":{"name":"NODE","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"eab620a5-9ee5-4975-8325-24e193ad2021","data":{"local_position":[0,-0.649999976158142,0],"local_rotation":[0,0.707106828689575,-0.707106828689575,0],"local_scale":[1,1,1]}},{"$ref":"66e21136-99b3-4e56-a6a4-974ec84c469b","data":{"is_enabled":true,"range":1}},{"$ref":"7fe5caa6-a85d-43ef-845f-774f54194b45","data":{"name":"NODE","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"a4dd4be1-b0d8-4a05-a1d0-eda74003d1d0","data":{"local_position":[0,-1.625,0],"local_rotation":[0,0,0,1],"local_scale":[1,1,1]}},{"$ref":"f00856e2-34f6-48e9-95eb-94ef4c728f38","data":{"size":[2,3,2],"center":[0,0,0],"is_trigger":false}},{"$ref":"833b03e2-1127-4c94-94cf-24c0f96bdb48","data":{"is_enabled":true,"mass":200,"on_after_mass_changed":null}},{"$ref":"34f25fc2-455e-4649-b778-1a447efa589d","data":{"is_enabled":true,"volume_transform":{"$ref":"89b8e52b-e843-4003-8a19-f01462e44818"},"max_volume":7,"radius":1.5,"contents":[{"substance":{"$assetref":"substance.f"},"mass_amount":3500},{"substance":{"$assetref":"substance.ox"},"mass_amount":3500}]}},{"$ref":"3a500abb-17e8-4bbd-a899-2421a941112b","data":{"is_enabled":true,"part_id":"Vanilla::tank"}},{"$ref":"07b6890e-3a40-409c-a621-ea9725280717","data":{"is_enabled":true,"cached_data":[{"$id":{"$ref":"f00856e2-34f6-48e9-95eb-94ef4c728f38"},"forward":{"is_trigger":true},"reverse":{"size":[2,3,2],"center":[0,0,0],"is_trigger":false}},{"$id":{"$ref":"833b03e2-1127-4c94-94cf-24c0f96bdb48"},"forward":{"mass":0},"reverse":{"is_enabled":true,"mass":200,"on_after_mass_changed":null}},{"$id":{"$ref":"26daafd6-3fae-4449-9f1e-8d9e6f6309cd"},"forward":{"shared_materials":[{"$assetref":"builtin::Resources/Materials/ghost_wireframe"}]},"reverse":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::Resources/New Material 1"}],"shadow_casting_mode":"On","receive_shadows":true}}],"build_points":90,"max_build_points":90}},{"$ref":"13469fb7-0992-410b-a6d5-330ee810b44c","data":{"is_enabled":true,"end1":{"obj_c":{"$ref":"d43c5a03-e944-4c1b-a65e-dafd685fd4ac"},"obj_p":{"$ref":"d43c5a03-e944-4c1b-a65e-dafd685fd4ac"},"position":[0,-2.5,0],"forward":[0,0,0]},"end2":{"obj_c":{"$ref":"34f25fc2-455e-4649-b778-1a447efa589d"},"obj_p":{"$ref":"34f25fc2-455e-4649-b778-1a447efa589d"},"position":[0,1.5,0],"forward":[0,0,0]},"cross_section_area":0.100000001490116}},{"$ref":"3e301f05-7a2d-43e4-b218-bb9634e642a3","data":{"name":"tank(Clone)","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"ecda58e0-fcfe-4b08-a08e-a682c8e6e3b2","data":{"local_position":[0,0,0],"local_rotation":[0,0,0,1],"local_scale":[1,1,1]}},{"$ref":"5686f556-419b-4d8f-a28b-b4836e6f7b70","data":{"shared_mesh":{"$assetref":"builtin::Resources/tank"}}},{"$ref":"26daafd6-3fae-4449-9f1e-8d9e6f6309cd","data":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::Resources/New Material 1"}],"shadow_casting_mode":"On","receive_shadows":true}},{"$ref":"cf8fdf42-b271-403a-924d-aa422d26e7b4","data":{"name":"tank","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"89b8e52b-e843-4003-8a19-f01462e44818","data":{"local_position":[0,0,0],"local_rotation":[0,0,0,1],"local_scale":[1,1,1]}},{"$ref":"1a983bd2-f008-4f07-a981-742e6591463e","data":{"name":"volumeTransform","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"8728fb14-2b81-4fcd-b67b-e577a7a716a7","data":{"local_position":[0,1,0],"local_rotation":[-0.707106828689575,0,0,0.707106828689575],"local_scale":[1,1,1]}},{"$ref":"92ad6877-caf3-413f-92b3-f0b2feb1d789","data":{"is_enabled":true,"range":2}},{"$ref":"7fc2a6ce-1228-4cf7-871e-e5f1f72bb6e4","data":{"name":"NODE","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"037e967a-8950-4f89-942b-783a90a8213a","data":{"local_position":[0,-1,0],"local_rotation":[0,0.707106828689575,-0.707106828689575,0],"local_scale":[1,1,1]}},{"$ref":"ab3a3a34-f0f2-47a0-a1a8-7c158a66ba2c","data":{"is_enabled":true,"range":2}},{"$ref":"c7679113-b348-4ebb-9b91-1876664427d8","data":{"name":"NODE","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"2aa4125a-ae15-4566-a7c2-78a42d892898","data":{"local_position":[2,-3.45532989501953,0],"local_rotation":[0,0,0,1],"local_scale":[1,1,1]}},{"$ref":"56a78a5b-3e47-4989-a1c3-f1380b5d1053","data":{"is_enabled":true,"max_thrust":223000,"isp":3000,"throttle":0,"thrust_transform":{"$ref":"6dd01ad4-1aca-4a09-bf1a-7a22308a2580"},"set_throttle":{"connects_to":[{"$ref":"5541225a-8a96-44a7-8f97-7b5bc1e3155b"},{"$ref":"240f8637-f483-485c-a3ac-2c9014aaab35"}]}}},{"$ref":"fbe6da7d-062f-4799-9af6-8816d39abc33","data":{"is_enabled":true,"mass":100,"on_after_mass_changed":null}},{"$ref":"88ab8615-12fa-4382-9ccf-e0284b6d32fb","data":{"size":[1.4095858335495,1.9923312664032,1.4095858335495],"center":[0,-0.661643087863922,0],"is_trigger":false}},{"$ref":"0acf62f7-5989-4952-a8ff-46c3dc9cd504","data":{"is_enabled":true,"part_id":"Vanilla::engine"}},{"$ref":"e4bcb5f5-a7d2-4cbd-b596-6cd77a4fde63","data":{"is_enabled":true,"cached_data":[{"$id":{"$ref":"fbe6da7d-062f-4799-9af6-8816d39abc33"},"forward":{"mass":0},"reverse":{"is_enabled":true,"mass":100,"on_after_mass_changed":null}},{"$id":{"$ref":"88ab8615-12fa-4382-9ccf-e0284b6d32fb"},"forward":{"is_trigger":true},"reverse":{"size":[1.4095858335495,1.9923312664032,1.4095858335495],"center":[0,-0.661643087863922,0],"is_trigger":false}},{"$id":{"$ref":"f08f348f-3075-4e72-a645-09abba81bb5a"},"forward":{"shared_materials":[{"$assetref":"builtin::Resources/Materials/ghost_wireframe"}]},"reverse":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::Resources/New Material 1"}],"shadow_casting_mode":"On","receive_shadows":true}}],"build_points":90,"max_build_points":90}},{"$ref":"3d6acc81-432f-427b-9a3e-4c9c0a4d1afc","data":{"is_enabled":true,"reference_transform":{"$ref":"7060fa7e-2ee9-425e-9cea-ce084dfcc01b"},"x_actuator_transform":{"$ref":"63e6392f-5a5c-4ca2-936f-5461d755fc96"},"y_actuator_transform":{"$ref":"63e6392f-5a5c-4ca2-936f-5461d755fc96"},"min_x":-5,"min_y":-5,"max_x":5,"max_y":5,"get_reference_transform":{"connects_to":[{"$ref":"ad513076-6cb7-41dd-88a1-6752a2a0f397"}]},"set_x":{"connects_to":[]},"set_y":{"connects_to":[]},"set_xy":{"connects_to":[{"$ref":"132c6efe-eb09-43b0-b582-0018c47cb4fd"}]}}},{"$ref":"aff6bd41-710c-4140-b5fa-e6550faa9151","data":{"is_enabled":true,"end1":{"obj_c":{"$ref":"34f25fc2-455e-4649-b778-1a447efa589d"},"obj_p":{"$ref":"34f25fc2-455e-4649-b778-1a447efa589d"},"position":[0,-1.5,0],"forward":[0,0,0]},"end2":{"obj_c":{"$ref":"56a78a5b-3e47-4989-a1c3-f1380b5d1053"},"obj_p":{},"position":[0,0,0],"forward":[0,0,0]},"cross_section_area":60}},{"$ref":"d03b3238-e267-41cb-b026-8eef8aabe048","data":{"name":"engine(Clone)","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"63e6392f-5a5c-4ca2-936f-5461d755fc96","data":{"local_position":[0,0,0],"local_rotation":[0,0,0,1],"local_scale":[1,1,1]}},{"$ref":"776f4b00-274b-4beb-9150-5ae55881a2a0","data":{"name":"gimbal","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"d533e390-9cc3-44ab-aa9f-f6eaad5f051b","data":{"local_position":[0,0,0],"local_rotation":[0,0,0,1],"local_scale":[1,1,1]}},{"$ref":"573c8c89-7221-4358-803b-17d9d7bcda50","data":{"shared_mesh":{"$assetref":"builtin::Resources/engine"}}},{"$ref":"f08f348f-3075-4e72-a645-09abba81bb5a","data":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::Resources/New Material 1"}],"shadow_casting_mode":"On","receive_shadows":true}},{"$ref":"55acf982-de3a-41b5-bc79-1bc791e7d993","data":{"name":"model","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"6dd01ad4-1aca-4a09-bf1a-7a22308a2580","data":{"local_position":[0,-1.65780997276306,0],"local_rotation":[-0.707106828689575,0,0,0.707106828689575],"local_scale":[1,1,1]}},{"$ref":"78b43cdc-fa2b-48e6-9fad-55806f095763","data":{"name":"thrustTransform","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"7060fa7e-2ee9-425e-9cea-ce084dfcc01b","data":{"local_position":[0,0,0],"local_rotation":[-0.707106828689575,0,0,0.707106828689575],"local_scale":[1,1,1]}},{"$ref":"44acfe90-eef4-494a-bc08-6f8b4ef7647d","data":{"name":"gimbalReference","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"2b57d89f-6154-4631-8224-f6f4d487253b","data":{"local_position":[0,0.324999988079071,0],"local_rotation":[-0.707106828689575,0,0,0.707106828689575],"local_scale":[1,1,1]}},{"$ref":"e07637c1-ba52-4982-b9ca-d169708f9b1d","data":{"is_enabled":true,"range":1}},{"$ref":"f3782fb0-365b-4004-a7c3-5ea68ab4fe89","data":{"name":"NODE","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"5fb056ad-8b81-4083-b73d-39cf64e506ac","data":{"local_position":[0,-1.64999997615814,0],"local_rotation":[0,0.707106828689575,-0.707106828689575,0],"local_scale":[1,1,1]}},{"$ref":"7a9715b1-12e1-4a54-8a00-b2ec6ed81bb3","data":{"is_enabled":true,"range":1}},{"$ref":"52cb0a87-c692-4d60-a324-1fa092c6422b","data":{"name":"NODE","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"cc3c9e1b-a519-44d8-865e-a096fa115ef4","data":{"local_position":[-2,-3.45532989501953,0],"local_rotation":[0,0,0,1],"local_scale":[1,1,1]}},{"$ref":"5e98ac08-5aa3-4726-a991-8d4753aa6a7e","data":{"is_enabled":true,"max_thrust":223000,"isp":3000,"throttle":0,"thrust_transform":{"$ref":"174eae1f-dafa-493c-b552-42885891df97"},"set_throttle":{"connects_to":[{"$ref":"d66a3444-157e-41d2-bbb5-1744fa424ecf"}]}}},{"$ref":"ae24d63a-fdcb-43cc-adb8-9246d4dc90de","data":{"is_enabled":true,"mass":100,"on_after_mass_changed":null}},{"$ref":"0912da85-deeb-4a5d-bb3f-25af40be179a","data":{"size":[1.4095858335495,1.9923312664032,1.4095858335495],"center":[0,-0.661643087863922,0],"is_trigger":false}},{"$ref":"04e7d971-8802-400a-a8dd-a0ab55ee257c","data":{"is_enabled":true,"part_id":"Vanilla::engine"}},{"$ref":"075d8767-1e7a-41f7-83cc-09c844b88703","data":{"is_enabled":true,"cached_data":[{"$id":{"$ref":"ae24d63a-fdcb-43cc-adb8-9246d4dc90de"},"forward":{"mass":0},"reverse":{"is_enabled":true,"mass":100,"on_after_mass_changed":null}},{"$id":{"$ref":"0912da85-deeb-4a5d-bb3f-25af40be179a"},"forward":{"is_trigger":true},"reverse":{"size":[1.4095858335495,1.9923312664032,1.4095858335495],"center":[0,-0.661643087863922,0],"is_trigger":false}},{"$id":{"$ref":"fea43d4c-713f-4557-8b8d-9db55d12bd36"},"forward":{"shared_materials":[{"$assetref":"builtin::Resources/Materials/ghost_wireframe"}]},"reverse":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::Resources/New Material 1"}],"shadow_casting_mode":"On","receive_shadows":true}}],"build_points":90,"max_build_points":90}},{"$ref":"b3410dab-eb60-4936-80f7-a4d38b2bf046","data":{"is_enabled":true,"reference_transform":{"$ref":"c659c6e9-bed9-4c66-946f-00e56d7a34ef"},"x_actuator_transform":{"$ref":"c0bd10b6-e8ef-4148-a7f6-2c6b16b282d3"},"y_actuator_transform":{"$ref":"c0bd10b6-e8ef-4148-a7f6-2c6b16b282d3"},"min_x":-5,"min_y":-5,"max_x":5,"max_y":5,"get_reference_transform":{"connects_to":[{"$ref":"6393b6d2-cf33-4429-bec8-eec7fbb01884"}]},"set_x":{"connects_to":[]},"set_y":{"connects_to":[]},"set_xy":{"connects_to":[{"$ref":"ceb1a306-bf9e-4c4c-ba92-0479dfb1046a"}]}}},{"$ref":"29b813c1-6477-4c10-bd7c-9a59c14c4910","data":{"is_enabled":true,"end1":{"obj_c":{"$ref":"34f25fc2-455e-4649-b778-1a447efa589d"},"obj_p":{"$ref":"34f25fc2-455e-4649-b778-1a447efa589d"},"position":[0,-1.5,0],"forward":[0,0,0]},"end2":{"obj_c":{"$ref":"5e98ac08-5aa3-4726-a991-8d4753aa6a7e"},"obj_p":{},"position":[0,0,0],"forward":[0,0,0]},"cross_section_area":60}},{"$ref":"e921bc13-a6df-49fa-9fc1-60818c63753c","data":{"name":"engine(Clone)","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"c0bd10b6-e8ef-4148-a7f6-2c6b16b282d3","data":{"local_position":[0,0,0],"local_rotation":[0,0,0,1],"local_scale":[1,1,1]}},{"$ref":"455913e5-9dbb-4049-9b40-13d01f3eafce","data":{"name":"gimbal","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"2a1f6efb-e9e1-4625-9641-42489bc821c2","data":{"local_position":[0,0,0],"local_rotation":[0,0,0,1],"local_scale":[1,1,1]}},{"$ref":"044b5f7b-53bb-433d-9a85-8d1bb64adf19","data":{"shared_mesh":{"$assetref":"builtin::Resources/engine"}}},{"$ref":"fea43d4c-713f-4557-8b8d-9db55d12bd36","data":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::Resources/New Material 1"}],"shadow_casting_mode":"On","receive_shadows":true}},{"$ref":"4070c502-d2c2-4ed1-90f5-7385ee2d5eee","data":{"name":"model","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"174eae1f-dafa-493c-b552-42885891df97","data":{"local_position":[0,-1.65780997276306,0],"local_rotation":[-0.707106828689575,0,0,0.707106828689575],"local_scale":[1,1,1]}},{"$ref":"16c0f44d-6558-4b45-a695-1af1cfebe882","data":{"name":"thrustTransform","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"c659c6e9-bed9-4c66-946f-00e56d7a34ef","data":{"local_position":[0,0,0],"local_rotation":[-0.707106828689575,0,0,0.707106828689575],"local_scale":[1,1,1]}},{"$ref":"f9900655-18ac-4bbc-9e96-3267a9db4e65","data":{"name":"gimbalReference","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"f53444a7-2aad-4cc4-8e2b-35993280a9cf","data":{"local_position":[0,0.324999988079071,0],"local_rotation":[-0.707106828689575,0,0,0.707106828689575],"local_scale":[1,1,1]}},{"$ref":"4baee6fc-5496-4585-b1c8-c57c25aa0058","data":{"is_enabled":true,"range":1}},{"$ref":"92a0a2e8-6f41-4518-a697-ecb82ff4ce8e","data":{"name":"NODE","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"fbaf8328-5355-442b-a095-2a8318473356","data":{"local_position":[0,-1.64999997615814,0],"local_rotation":[0,0.707106828689575,-0.707106828689575,0],"local_scale":[1,1,1]}},{"$ref":"31e2342f-6c6a-4abd-83a2-a16c3e12c0f3","data":{"is_enabled":true,"range":1}},{"$ref":"0847e3b8-8e83-4afd-bf75-0cd13ac0e226","data":{"name":"NODE","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"a23baf9d-1922-4179-b756-9426cfec1547","data":{"local_position":[0,2.625,0],"local_rotation":[0,0,0,1],"local_scale":[1,1,1]}},{"$ref":"5392b304-e4a8-4653-a67c-8fad3625f6db","data":{"size":[2,5,2],"center":[0,0,0],"is_trigger":false}},{"$ref":"b881fee0-cf63-4da1-9a93-c85a1e5031a0","data":{"is_enabled":true,"mass":500,"on_after_mass_changed":null}},{"$ref":"d43c5a03-e944-4c1b-a65e-dafd685fd4ac","data":{"is_enabled":true,"volume_transform":{"$ref":"2b935848-1acb-4eed-8cb7-8223fb6f9e35"},"max_volume":14,"radius":2.5,"contents":[{"substance":{"$assetref":"substance.f"},"mass_amount":0.000979893375188112},{"substance":{"$assetref":"substance.ox"},"mass_amount":0.000979893375188112}]}},{"$ref":"d4696f5d-81c4-4324-b0d4-11c4215d6707","data":{"is_enabled":true,"part_id":"Vanilla::tank_long"}},{"$ref":"5ddf295d-6c09-41e8-8422-7e39bcb6dc36","data":{"is_enabled":true,"cached_data":[{"$id":{"$ref":"5392b304-e4a8-4653-a67c-8fad3625f6db"},"forward":{"is_trigger":true},"reverse":{"size":[2,5,2],"center":[0,0,0],"is_trigger":false}},{"$id":{"$ref":"b881fee0-cf63-4da1-9a93-c85a1e5031a0"},"forward":{"mass":0},"reverse":{"is_enabled":true,"mass":500,"on_after_mass_changed":null}},{"$id":{"$ref":"3dd78987-b5e9-4476-9553-8266b1ab2c23"},"forward":{"shared_materials":[{"$assetref":"builtin::Resources/Materials/ghost_wireframe"}]},"reverse":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::Resources/New Material 1"}],"shadow_casting_mode":"On","receive_shadows":true}}],"build_points":90,"max_build_points":90}},{"$ref":"4e3661fd-4afb-4491-a379-af70f855f180","data":{"name":"tank_long(Clone)","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"587d8341-188f-444b-920b-fefe7d4b9724","data":{"local_position":[0,0,0],"local_rotation":[0,0,0,1],"local_scale":[1,1,1]}},{"$ref":"4fbaf981-1088-4bb1-b0ee-5adae84c569b","data":{"shared_mesh":{"$assetref":"builtin::Resources/tank_long"}}},{"$ref":"3dd78987-b5e9-4476-9553-8266b1ab2c23","data":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::Resources/New Material 1"}],"shadow_casting_mode":"On","receive_shadows":true}},{"$ref":"65887674-5c46-432d-93d5-62303b1fa567","data":{"name":"tank_long","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"2b935848-1acb-4eed-8cb7-8223fb6f9e35","data":{"local_position":[0,0,0],"local_rotation":[0,0,0,1],"local_scale":[1,1,1]}},{"$ref":"aa430dde-d6e9-4a77-a532-bee93a82b3c8","data":{"name":"volumeTransform","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"b91a1257-c9c7-45e8-a711-1f19e7d2e54b","data":{"local_position":[0,2,0],"local_rotation":[-0.707106828689575,0,0,0.707106828689575],"local_scale":[1,1,1]}},{"$ref":"d806735c-f29a-4619-8074-53984937a5f2","data":{"is_enabled":true,"range":2}},{"$ref":"a4d1432c-43de-4dc8-bec2-0146c5bed04c","data":{"name":"NODE","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"bf7bb6bb-264c-4d53-b51f-61754e405d64","data":{"local_position":[0,-2,0],"local_rotation":[0,0.707106828689575,-0.707106828689575,0],"local_scale":[1,1,1]}},{"$ref":"bf14690b-aaa5-4dc5-93ce-13c3e4523eaa","data":{"is_enabled":true,"range":2}},{"$ref":"6e0d7860-6dbe-4795-8c6f-9d510ce496ab","data":{"name":"NODE","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"f0df24e8-1711-4d8e-86d8-dfeb42f46e64","data":{"local_position":[0,2.625,0],"local_rotation":[0,0,0,1],"local_scale":[1,1,1]}},{"$ref":"9f596b11-035f-4878-9bd8-7cdefbe14b30","data":{"size":[2,3,2],"center":[0,0,0],"is_trigger":false}},{"$ref":"d27447ab-81e9-427a-a9a4-94ae0d98efd9","data":{"is_enabled":true,"mass":200,"on_after_mass_changed":null}},{"$ref":"1e8c012e-b0a5-407c-be92-d625781237f9","data":{"is_enabled":true,"part_id":"Vanilla::capsule"}},{"$ref":"5ab622ec-1bb7-4163-8d9a-cff46b2c4c22","data":{"is_enabled":true,"cached_data":[{"$id":{"$ref":"9f596b11-035f-4878-9bd8-7cdefbe14b30"},"forward":{"is_trigger":true},"reverse":{"size":[2,3,2],"center":[0,0,0],"is_trigger":false}},{"$id":{"$ref":"d27447ab-81e9-427a-a9a4-94ae0d98efd9"},"forward":{"mass":0},"reverse":{"is_enabled":true,"mass":200,"on_after_mass_changed":null}},{"$id":{"$ref":"3470f017-858f-4d8f-a38d-4d10ccb093ff"},"forward":{"shared_materials":[{"$assetref":"builtin::Resources/Materials/ghost_wireframe"}]},"reverse":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::KSS.DevUtils/axis_y"}],"shadow_casting_mode":"On","receive_shadows":true}},{"$id":{"$ref":"732b7fc1-eff8-45f2-9405-5e9a0086c11d"},"forward":{"shared_materials":[{"$assetref":"builtin::Resources/Materials/ghost_wireframe"}]},"reverse":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::KSS.DevUtils/axis_x"}],"shadow_casting_mode":"On","receive_shadows":true}},{"$id":{"$ref":"ebfd070b-7a89-4532-b1c3-8bb40bf73fa4"},"forward":{"shared_materials":[{"$assetref":"builtin::Resources/Materials/ghost_wireframe"}]},"reverse":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::KSS.DevUtils/axis_z"}],"shadow_casting_mode":"On","receive_shadows":true}},{"$id":{"$ref":"f1a24c83-b251-441a-a92b-a17abd7f895d"},"forward":{"shared_materials":[{"$assetref":"builtin::Resources/Materials/ghost_wireframe"}]},"reverse":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::Resources/New Material 1"}],"shadow_casting_mode":"On","receive_shadows":true}}],"build_points":90,"max_build_points":90}},{"$ref":"1681a00a-187f-404d-bbf9-e332dba31b6a","data":{"is_enabled":true}},{"$ref":"db169cee-d32d-4dd3-af8c-bf6964918d4a","data":{"is_enabled":true,"set_attitude":{"connects_to":[{"$ref":"21ab6a6e-db61-45a2-9895-40cb352e5dae"}]}}},{"$ref":"ec2b201c-8be3-42f1-8242-8c2aaefb88b6","data":{"is_enabled":true}},{"$ref":"9b65fe61-14b3-42cb-ae86-7ecc55b9be50","data":{"is_enabled":true,"sequence":{"current":0}}},{"$ref":"d928359f-4d23-42fe-b195-f06381e1478b","data":{"reference_transform":{"$ref":"4ba03c23-b561-421f-be41-0a36fdc7b99b"}}},{"$ref":"7299ee4a-f1fb-4bd5-8ac0-d80c926743ac","data":{"name":"capsule(Clone)","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"a79583fb-37e1-40d3-a0d3-e9d393ef542d","data":{"local_position":[0,0,0],"local_rotation":[0,0,0,1],"local_scale":[1,1,1]}},{"$ref":"62ca98fe-6ea1-4c78-8b46-bb5e6f6ce9bd","data":{"shared_mesh":{"$assetref":"builtin::Resources/gemini_capsule"}}},{"$ref":"f1a24c83-b251-441a-a92b-a17abd7f895d","data":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::Resources/New Material 1"}],"shadow_casting_mode":"On","receive_shadows":true}},{"$ref":"b931ac97-3b35-46e6-8923-e36f30fff5ce","data":{"name":"mesh","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"fe04fc76-dee2-460b-9191-ca699f33ac85","data":{"local_position":[0,1,0],"local_rotation":[-0.707106828689575,0,0,0.707106828689575],"local_scale":[1,1,1]}},{"$ref":"b7ccd0fb-87f0-42bd-803c-3e9535bfdcca","data":{"is_enabled":true,"range":2}},{"$ref":"c8ed7b1a-f303-4d84-8254-bb9f42d0e87c","data":{"name":"NODE","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"a4d39923-6fdf-4f93-bedb-34fde106b726","data":{"local_position":[0,-1,0],"local_rotation":[0,0.707106828689575,-0.707106828689575,0],"local_scale":[1,1,1]}},{"$ref":"c7e119db-828e-498f-9e79-c34fbd0d14e7","data":{"is_enabled":true,"range":2}},{"$ref":"02c499e1-8373-4ef5-b26d-a9a36dabe0d7","data":{"name":"NODE","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"4ba03c23-b561-421f-be41-0a36fdc7b99b","data":{"local_position":[0,0,0],"local_rotation":[0,0.707106828689575,0.707106828689575,0],"local_scale":[1,1,1]}},{"$ref":"eb2788fa-d4a9-4f0d-8cfb-8230f7766cb6","data":{"name":"controlFrameTransform","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"b12a7a9c-563f-414b-bf1d-c3248d9d24a6","data":{"local_position":[0,0,0],"local_rotation":[0,0,0,1],"local_scale":[1,1,1]}},{"$ref":"2fbca79c-37d8-4bb4-b996-929f91175ceb","data":{"shared_mesh":{"$assetref":"builtin::Resources/Meshes/translate_handle_1d"}}},{"$ref":"ebfd070b-7a89-4532-b1c3-8bb40bf73fa4","data":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::KSS.DevUtils/axis_z"}],"shadow_casting_mode":"On","receive_shadows":true}},{"$ref":"97811757-2168-4653-a186-85282330f2fd","data":{"name":"mesh (1)","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"19702d32-6f25-460a-bbd8-41bc0580112c","data":{"local_position":[0,0,0],"local_rotation":[0,0.707106828689575,0,0.707106828689575],"local_scale":[1,1,1]}},{"$ref":"db3d7d7c-1dfc-4f15-b98a-5e0276c84f7f","data":{"shared_mesh":{"$assetref":"builtin::Resources/Meshes/translate_handle_1d"}}},{"$ref":"732b7fc1-eff8-45f2-9405-5e9a0086c11d","data":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::KSS.DevUtils/axis_x"}],"shadow_casting_mode":"On","receive_shadows":true}},{"$ref":"22cea78a-1afe-4011-899f-975f546325d8","data":{"name":"mesh (2)","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"c52b2244-39d3-440c-8bc7-70f16ae6cc3f","data":{"local_position":[0,0,0],"local_rotation":[-0.707106828689575,0,0,0.707106828689575],"local_scale":[1,1,1]}},{"$ref":"1af9aca4-d7d7-413f-8c59-f651189cce9e","data":{"shared_mesh":{"$assetref":"builtin::Resources/Meshes/translate_handle_1d"}}},{"$ref":"3470f017-858f-4d8f-a38d-4d10ccb093ff","data":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::KSS.DevUtils/axis_y"}],"shadow_casting_mode":"On","receive_shadows":true}},{"$ref":"85cebafd-864b-4929-9931-88b0d96339d2","data":{"name":"mesh (3)","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"1e87bd39-cf90-48aa-8705-916d3a4fa74c","data":{"local_position":[-7.15255737304688E-07,2.65000104904175,0],"local_rotation":[0,0,-7.45057970874541E-09,1],"local_scale":[1,1.00000011920929,1.00000011920929]}},{"$ref":"d5a3d9ba-20ec-44a2-ac28-74add953bb6c","data":{"is_enabled":true,"max_thrust":223000,"isp":3000,"throttle":0,"thrust_transform":{"$ref":"088f3004-adde-4d8c-ac18-153f5f6df2d4"},"set_throttle":{"connects_to":[]}}},{"$ref":"f9ed3cad-c422-4f42-b71b-03447874f9ae","data":{"is_enabled":true,"mass":0,"on_after_mass_changed":null}},{"$ref":"3c483a1c-eb79-4bd4-b379-155623eb6f72","data":{"size":[1.4095858335495,1.9923312664032,1.4095858335495],"center":[0,-0.661643087863922,0],"is_trigger":true}},{"$ref":"8e182211-8a23-431f-9151-c5cbfa7ed490","data":{"is_enabled":true,"part_id":"Vanilla::engine"}},{"$ref":"7a59aec9-c57c-4df3-942b-20ab19743233","data":{"is_enabled":true,"cached_data":[{"$id":{"$ref":"f9ed3cad-c422-4f42-b71b-03447874f9ae"},"forward":{"mass":0},"reverse":{"is_enabled":true,"mass":100,"on_after_mass_changed":null}},{"$id":{"$ref":"3c483a1c-eb79-4bd4-b379-155623eb6f72"},"forward":{"is_trigger":true},"reverse":{"size":[1.4095858335495,1.9923312664032,1.4095858335495],"center":[0,-0.661643087863922,0],"is_trigger":false}},{"$id":{"$ref":"0ffab3db-6a5b-421d-8dee-24792ef4ad28"},"forward":{"shared_materials":[{"$assetref":"builtin::Resources/Materials/ghost_wireframe"}]},"reverse":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::Resources/New Material 1"}],"shadow_casting_mode":"On","receive_shadows":true}}],"build_points":27.3832912445068,"max_build_points":90}},{"$ref":"51645cf3-8efe-47b6-8b14-f52cb85970b0","data":{"is_enabled":true,"reference_transform":{"$ref":"2fdee026-9773-408f-9f73-465646c3ebb8"},"x_actuator_transform":{"$ref":"872c1234-1a83-4a23-8ed5-5a848197db9c"},"y_actuator_transform":{"$ref":"872c1234-1a83-4a23-8ed5-5a848197db9c"},"min_x":-5,"min_y":-5,"max_x":5,"max_y":5,"get_reference_transform":{"connects_to":[]},"set_x":{"connects_to":[]},"set_y":{"connects_to":[]},"set_xy":{"connects_to":[]}}},{"$ref":"eec0c578-c34f-44dd-835b-c9ddf61df21c","data":{"is_enabled":true,"state":"PausedConstructing","build_speed":90}},{"$ref":"5dce609b-cc34-49be-a088-fe3f8ee3ebec","data":{"name":"engine","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"872c1234-1a83-4a23-8ed5-5a848197db9c","data":{"local_position":[0,0,0],"local_rotation":[0,0,0,1],"local_scale":[1,1,1]}},{"$ref":"8a5af774-7a0d-4415-81ef-5a7ffe79428a","data":{"name":"gimbal","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"0954ab21-67e6-4bf1-8e9e-a6ce1d4b2afa","data":{"local_position":[0,0,0],"local_rotation":[0,0,0,1],"local_scale":[1,1,1]}},{"$ref":"4e9b2888-f5f1-43ea-b5f8-0778b3c7f3f0","data":{"shared_mesh":{"$assetref":"builtin::Resources/engine"}}},{"$ref":"0ffab3db-6a5b-421d-8dee-24792ef4ad28","data":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::Resources/Materials/ghost_wireframe"}],"shadow_casting_mode":"On","receive_shadows":true}},{"$ref":"fb23a99c-0031-45c9-9a2b-a63d40616f13","data":{"name":"model","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"088f3004-adde-4d8c-ac18-153f5f6df2d4","data":{"local_position":[0,-1.65780997276306,0],"local_rotation":[-0.707106828689575,0,0,0.707106828689575],"local_scale":[1,1,1]}},{"$ref":"1bf5b13f-cbe0-4a0b-bba8-a77b75736827","data":{"name":"thrustTransform","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"2fdee026-9773-408f-9f73-465646c3ebb8","data":{"local_position":[0,0,0],"local_rotation":[-0.707106828689575,0,0,0.707106828689575],"local_scale":[1,1,1]}},{"$ref":"0d0e7a87-45d7-464b-a4b1-75c5b77201ce","data":{"name":"gimbalReference","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"5c9b8357-2cb0-4bc1-a3e6-66caa57e6593","data":{"local_position":[0,0.324999988079071,0],"local_rotation":[-0.707106828689575,0,0,0.707106828689575],"local_scale":[1,1,1]}},{"$ref":"59fdf18a-1769-4777-9c4d-7f879cb3c1b9","data":{"is_enabled":true,"range":1}},{"$ref":"a5be296d-65b6-4eea-a5f4-4e705e8356cf","data":{"name":"NODE","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"53935cb6-5161-409b-8aa1-d012abfcdfc6","data":{"local_position":[0,-1.64999997615814,0],"local_rotation":[0,0.707106828689575,-0.707106828689575,0],"local_scale":[1,1,1]}},{"$ref":"92b01c64-df89-4314-814f-8d0e17e8f7e0","data":{"is_enabled":true,"range":1}},{"$ref":"f21e7d47-6754-4e62-99eb-d08d0b43630f","data":{"name":"NODE","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"f223db05-2654-428e-805b-d2c88d633e52","data":{"local_position":[-2.98023223876953E-08,1.32499992847443,0],"local_rotation":[0,0,-7.45057970874541E-09,1],"local_scale":[1,0.99999988079071,0.99999988079071]}},{"$ref":"b4777f70-a15f-49fe-ba2d-a5bdc35fe3a5","data":{"size":[2,3,2],"center":[0,0,0],"is_trigger":true}},{"$ref":"c797c3fe-86f0-4d3f-970d-67d4a0d5bdf0","data":{"is_enabled":true,"mass":0,"on_after_mass_changed":null}},{"$ref":"a515dd4f-8383-4fc8-abbe-693530790ddc","data":{"is_enabled":true,"part_id":"Vanilla::capsule"}},{"$ref":"dc4775e9-9212-40fe-899e-7161d2b305b1","data":{"is_enabled":true,"cached_data":[{"$id":{"$ref":"b4777f70-a15f-49fe-ba2d-a5bdc35fe3a5"},"forward":{"is_trigger":true},"reverse":{"size":[2,3,2],"center":[0,0,0],"is_trigger":false}},{"$id":{"$ref":"c797c3fe-86f0-4d3f-970d-67d4a0d5bdf0"},"forward":{"mass":0},"reverse":{"is_enabled":true,"mass":200,"on_after_mass_changed":null}},{"$id":{"$ref":"ffc0c179-6483-4d78-90c5-8bfa6f404b1d"},"forward":{"shared_materials":[{"$assetref":"builtin::Resources/Materials/ghost_wireframe"}]},"reverse":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::KSS.DevUtils/axis_y"}],"shadow_casting_mode":"On","receive_shadows":true}},{"$id":{"$ref":"92d6c9ed-4533-472c-8163-e6868076cbdc"},"forward":{"shared_materials":[{"$assetref":"builtin::Resources/Materials/ghost_wireframe"}]},"reverse":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::KSS.DevUtils/axis_x"}],"shadow_casting_mode":"On","receive_shadows":true}},{"$id":{"$ref":"da539f80-71ec-454c-8dd5-83c072d0175b"},"forward":{"shared_materials":[{"$assetref":"builtin::Resources/Materials/ghost_wireframe"}]},"reverse":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::KSS.DevUtils/axis_z"}],"shadow_casting_mode":"On","receive_shadows":true}},{"$id":{"$ref":"421e19d9-6df0-4332-8de9-8479b117a4b6"},"forward":{"shared_materials":[{"$assetref":"builtin::Resources/Materials/ghost_wireframe"}]},"reverse":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::Resources/New Material 1"}],"shadow_casting_mode":"On","receive_shadows":true}}],"build_points":27.3832912445068,"max_build_points":90}},{"$ref":"32ce7d45-d839-4de6-bf7a-7adfeb36fd91","data":{"is_enabled":true}},{"$ref":"a297d284-b491-47e8-b24e-b6429503973e","data":{"is_enabled":true,"set_attitude":{"connects_to":[]}}},{"$ref":"24137eee-0e80-419c-bb8b-6aff9cb9825a","data":{"is_enabled":true}},{"$ref":"a0d402b8-eb8c-454e-a722-5b2bf75f6e5b","data":{"is_enabled":true,"sequence":{"current":0}}},{"$ref":"72320902-ff82-4178-b356-402375617748","data":{"reference_transform":{"$ref":"54fb93b5-d199-4224-8d38-035349512170"}}},{"$ref":"c94df218-7fee-44f4-8604-f9b44c9bb04e","data":{"name":"capsule","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"53e2267e-fbd3-401c-92d6-6b294ea0b1a5","data":{"local_position":[0,0,0],"local_rotation":[0,0,0,1],"local_scale":[1,1,1]}},{"$ref":"aa554678-28c8-4a22-b58a-d1ed42eef654","data":{"shared_mesh":{"$assetref":"builtin::Resources/gemini_capsule"}}},{"$ref":"421e19d9-6df0-4332-8de9-8479b117a4b6","data":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::Resources/Materials/ghost_wireframe"}],"shadow_casting_mode":"On","receive_shadows":true}},{"$ref":"6cc389cf-c61f-4354-8a2c-5429b526ca14","data":{"name":"mesh","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"0e6c5ca4-5216-4c24-9e7c-fb14d2abb771","data":{"local_position":[0,1,0],"local_rotation":[-0.707106828689575,0,0,0.707106828689575],"local_scale":[1,1,1]}},{"$ref":"24330828-5b4f-44bd-ac29-0d2a09882db4","data":{"is_enabled":true,"range":2}},{"$ref":"d3db91e5-a564-4e05-b928-962f4093a1d1","data":{"name":"NODE","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"e83e560e-a624-42e1-ae9f-5e5ed85bfe42","data":{"local_position":[0,-1,0],"local_rotation":[0,0.707106828689575,-0.707106828689575,0],"local_scale":[1,1,1]}},{"$ref":"d19b2867-bdbc-41a2-a888-31b3be777a5b","data":{"is_enabled":true,"range":2}},{"$ref":"6e15c15d-0fad-4a08-aaf8-f2cd06e54f84","data":{"name":"NODE","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"54fb93b5-d199-4224-8d38-035349512170","data":{"local_position":[0,0,0],"local_rotation":[0,0.707106828689575,0.707106828689575,0],"local_scale":[1,1,1]}},{"$ref":"0b790e98-49f2-4582-8db7-ae725a40ce82","data":{"name":"controlFrameTransform","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"a71fe6b1-5b8a-4644-ba7b-57b77a9d432e","data":{"local_position":[0,0,0],"local_rotation":[0,0,0,1],"local_scale":[1,1,1]}},{"$ref":"08840abf-59b1-4ded-bb96-ff742a8b0917","data":{"shared_mesh":{"$assetref":"builtin::Resources/Meshes/translate_handle_1d"}}},{"$ref":"da539f80-71ec-454c-8dd5-83c072d0175b","data":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::Resources/Materials/ghost_wireframe"}],"shadow_casting_mode":"On","receive_shadows":true}},{"$ref":"48927f38-310d-4c28-ab80-c6eda48902b1","data":{"name":"mesh (1)","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"e37e9619-e82f-4980-b293-f83367d54a65","data":{"local_position":[0,0,0],"local_rotation":[0,0.707106828689575,0,0.707106828689575],"local_scale":[1,1,1]}},{"$ref":"6802fd51-39b5-4337-a0f2-8e2fd5b72076","data":{"shared_mesh":{"$assetref":"builtin::Resources/Meshes/translate_handle_1d"}}},{"$ref":"92d6c9ed-4533-472c-8163-e6868076cbdc","data":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::Resources/Materials/ghost_wireframe"}],"shadow_casting_mode":"On","receive_shadows":true}},{"$ref":"bb627584-3d61-4024-abca-a713ae4a46d6","data":{"name":"mesh (2)","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"2e777064-5510-478e-9ce7-9f42a8d94c28","data":{"local_position":[0,0,0],"local_rotation":[-0.707106828689575,0,0,0.707106828689575],"local_scale":[1,1,1]}},{"$ref":"34da1f4e-cfac-4c40-9267-89a63b36a9b4","data":{"shared_mesh":{"$assetref":"builtin::Resources/Meshes/translate_handle_1d"}}},{"$ref":"ffc0c179-6483-4d78-90c5-8bfa6f404b1d","data":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::Resources/Materials/ghost_wireframe"}],"shadow_casting_mode":"On","receive_shadows":true}},{"$ref":"619ccc54-7d7f-43e5-b6b5-5bb0097f0931","data":{"name":"mesh (3)","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"acbdcb46-a6e1-4d94-bf9c-ad48200e0a54","data":{"local_position":[20,2.625,0],"local_rotation":[0,0,0,1],"local_scale":[1,1,1]}},{"$ref":"5a71f4c6-1533-4f4d-ac70-137e180c86cd","data":{"size":[2,5,2],"center":[0,0,0],"is_trigger":false}},{"$ref":"5250c600-64f5-4b71-ad9a-4af2125bebd2","data":{"is_enabled":true,"mass":500,"on_after_mass_changed":null}},{"$ref":"7ffd3916-cfbc-42da-9212-e125edfc44e1","data":{"is_enabled":true,"volume_transform":{"$ref":"0e6badfe-303a-411d-a84c-c7888a8a711a"},"max_volume":14,"radius":2.5,"contents":[]}},{"$ref":"38dc95f7-2fc4-4f35-aa6b-f5f78ea78c04","data":{"is_enabled":true,"part_id":"Vanilla::tank_long"}},{"$ref":"b20bde3e-2e3e-46cf-a30f-82356b2fb294","data":{"is_enabled":true,"cached_data":[{"$id":{"$ref":"5a71f4c6-1533-4f4d-ac70-137e180c86cd"},"forward":{"is_trigger":true},"reverse":{"size":[2,5,2],"center":[0,0,0],"is_trigger":false}},{"$id":{"$ref":"5250c600-64f5-4b71-ad9a-4af2125bebd2"},"forward":{"mass":0},"reverse":{"is_enabled":true,"mass":500,"on_after_mass_changed":null}},{"$id":{"$ref":"53a26d52-b8e9-42be-a1d4-2ca8e6785ef1"},"forward":{"shared_materials":[{"$assetref":"builtin::Resources/Materials/ghost_wireframe"}]},"reverse":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::Resources/New Material 1"}],"shadow_casting_mode":"On","receive_shadows":true}}],"build_points":90,"max_build_points":90}},{"$ref":"6966a2d8-71e2-4b2b-83da-5c2cbc9178f4","data":{"is_enabled":true,"has_separated":false,"separate":{"connects_to":[{"$ref":"b6de2b9e-8adc-4f77-9dd6-508c0025f8c8"}]}}},{"$ref":"0889392f-a732-4c83-a8a5-c2fbe6e2d6d0","data":{"name":"tank_long(Clone)","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"dde8b18f-b83e-4382-b65b-efd33ec54bc2","data":{"local_position":[0,0,0],"local_rotation":[0,0,0,1],"local_scale":[1,1,1]}},{"$ref":"77fab187-004b-405b-9e62-00a0ef8270cf","data":{"shared_mesh":{"$assetref":"builtin::Resources/tank_long"}}},{"$ref":"53a26d52-b8e9-42be-a1d4-2ca8e6785ef1","data":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::Resources/New Material 1"}],"shadow_casting_mode":"On","receive_shadows":true}},{"$ref":"a6f20130-0c8f-4d6f-87a7-9ba07189096a","data":{"name":"tank_long","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"0e6badfe-303a-411d-a84c-c7888a8a711a","data":{"local_position":[0,0,0],"local_rotation":[0,0,0,1],"local_scale":[1,1,1]}},{"$ref":"0b18a914-4781-4f6e-9675-0677dc82f05e","data":{"name":"volumeTransform","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"cecc799e-bed4-49f1-9261-5087e26ed64a","data":{"local_position":[0,2,0],"local_rotation":[-0.707106828689575,0,0,0.707106828689575],"local_scale":[1,1,1]}},{"$ref":"bc3b74b9-8c1f-4300-9707-e1da2c7f770f","data":{"is_enabled":true,"range":2}},{"$ref":"fac28afe-f976-46a3-bbad-8c92d63b8a9d","data":{"name":"NODE","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"d92a9975-d663-4d11-b2e6-4ced8e62cbdf","data":{"local_position":[0,-2,0],"local_rotation":[0,0.707106828689575,-0.707106828689575,0],"local_scale":[1,1,1]}},{"$ref":"6d89db9b-c523-4b72-8777-71c1f5af5eb2","data":{"is_enabled":true,"range":2}},{"$ref":"bcaabfbe-0f4c-4aba-8e4d-57eaae5f6bf6","data":{"name":"NODE","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"d917adbe-a345-4162-a2b6-4792d2ef9767","data":{"local_position":[-20,2.625,0],"local_rotation":[0,0,0,1],"local_scale":[1,1,1]}},{"$ref":"b8b1627f-36b4-4d06-9025-36991ec9fa31","data":{"size":[2,5,2],"center":[0,0,0],"is_trigger":false}},{"$ref":"cefe59a6-e548-4635-974c-90e607211839","data":{"is_enabled":true,"mass":500,"on_after_mass_changed":null}},{"$ref":"7193e1ae-c6ec-469e-85aa-e6d38ea02954","data":{"is_enabled":true,"volume_transform":{"$ref":"cf154be0-ccb3-44f4-ba38-b74a698c104d"},"max_volume":14,"radius":2.5,"contents":[]}},{"$ref":"010b3fb2-833e-4aa9-80cc-c47730051c34","data":{"is_enabled":true,"part_id":"Vanilla::tank_long"}},{"$ref":"ff327b9f-9ea1-4f7f-a06d-68816347e639","data":{"is_enabled":true,"cached_data":[{"$id":{"$ref":"b8b1627f-36b4-4d06-9025-36991ec9fa31"},"forward":{"is_trigger":true},"reverse":{"size":[2,5,2],"center":[0,0,0],"is_trigger":false}},{"$id":{"$ref":"cefe59a6-e548-4635-974c-90e607211839"},"forward":{"mass":0},"reverse":{"is_enabled":true,"mass":500,"on_after_mass_changed":null}},{"$id":{"$ref":"6acb10a8-ca45-460c-8e76-79063f1076b6"},"forward":{"shared_materials":[{"$assetref":"builtin::Resources/Materials/ghost_wireframe"}]},"reverse":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::Resources/New Material 1"}],"shadow_casting_mode":"On","receive_shadows":true}}],"build_points":90,"max_build_points":90}},{"$ref":"0f7099ce-334d-49f2-8ed1-663be486e061","data":{"is_enabled":true,"has_separated":false,"separate":{"connects_to":[{"$ref":"9aeebf59-278b-4b72-ac63-b1f6e4610dd8"}]}}},{"$ref":"0e23daa0-2870-4b33-9032-2c23408a8031","data":{"name":"tank_long(Clone)","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"0b97e008-4aec-4ffb-9bff-29b5d0ac2999","data":{"local_position":[0,0,0],"local_rotation":[0,0,0,1],"local_scale":[1,1,1]}},{"$ref":"20441fc0-9160-4dc3-a2b0-9efb85dcbf1e","data":{"shared_mesh":{"$assetref":"builtin::Resources/tank_long"}}},{"$ref":"6acb10a8-ca45-460c-8e76-79063f1076b6","data":{"is_enabled":true,"shared_materials":[{"$assetref":"builtin::Resources/New Material 1"}],"shadow_casting_mode":"On","receive_shadows":true}},{"$ref":"f8f2ec2b-675f-4373-8ff4-131ebc894dae","data":{"name":"tank_long","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"cf154be0-ccb3-44f4-ba38-b74a698c104d","data":{"local_position":[0,0,0],"local_rotation":[0,0,0,1],"local_scale":[1,1,1]}},{"$ref":"8e11aed4-09ab-455f-b82a-1350a937f1a0","data":{"name":"volumeTransform","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"a6f6880e-26ae-44c9-9a6b-6bc72ea973ef","data":{"local_position":[0,2,0],"local_rotation":[-0.707106828689575,0,0,0.707106828689575],"local_scale":[1,1,1]}},{"$ref":"54aba69e-964e-4853-acf5-a2e5dab6d4ad","data":{"is_enabled":true,"range":2}},{"$ref":"10b1290b-91b1-4af2-9941-b272a53854d2","data":{"name":"NODE","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}},{"$ref":"110d032d-4c4e-49ee-8984-b4a6bafb9fbf","data":{"local_position":[0,-2,0],"local_rotation":[0,0.707106828689575,-0.707106828689575,0],"local_scale":[1,1,1]}},{"$ref":"a5c8a175-ed0a-412a-a9ac-c1000d025acd","data":{"is_enabled":true,"range":2}},{"$ref":"6d0fe215-3120-4c43-bee6-ed69d35f463d","data":{"name":"NODE","layer":20,"is_active":true,"is_static":false,"tag":"Untagged"}}]
+﻿[
+  {
+    "$ref": "d2e217b7-69e3-4847-9ffd-a07da8cae03b",
+    "data": {
+      "local_position": [
+        0.5625,
+        -4.34875535964966,
+        -7.16790294647217
+      ],
+      "local_rotation": [
+        -0.471883714199066,
+        -0.195163637399673,
+        -0.195163637399673,
+        -0.837345838546753
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "88713303-22c2-4f13-8569-5ef41670c85a",
+    "data": {
+      "is_enabled": true,
+      "airf_position": [
+        -908822.1875,
+        3048358.15124459,
+        5520074.33209707
+      ],
+      "airf_rotation": [
+        -0.471883727609022,
+        -0.195163639007822,
+        -0.195163639007822,
+        -0.837345839922946
+      ]
+    }
+  },
+  {
+    "$ref": "3bf0dec6-b128-44e2-acad-f6c51deb5841",
+    "data": {
+      "is_kinematic": true
+    }
+  },
+  {
+    "$ref": "0b7c3a14-08c1-4f28-b4cc-a1ac366178e8",
+    "data": {
+      "is_enabled": true,
+      "display_name": null,
+      "root_part": {
+        "$ref": "8fd2eb1a-4b93-4638-9049-729f41ec9a42"
+      },
+      "on_after_recalculate_parts": null
+    }
+  },
+  {
+    "$ref": "fc3016b1-2f15-43f8-ad84-d114f1cdef4b",
+    "data": {
+      "is_enabled": true,
+      "mass": 500000,
+      "local_center_of_mass": [
+        0,
+        0,
+        0
+      ],
+      "velocity": [
+        0,
+        0,
+        0
+      ],
+      "angular_velocity": [
+        0,
+        0,
+        0
+      ],
+      "reference_body": {
+        "$ref": "db3b04bd-4fdc-49e1-9e22-75023d652874"
+      },
+      "reference_position": [
+        -908822.1875,
+        -5520074,
+        3048357
+      ],
+      "reference_rotation": [
+        0.925765097141266,
+        0,
+        0.276003062725067,
+        0.25842073559761
+      ]
+    }
+  },
+  {
+    "$ref": "4af6e25f-ee5f-460e-80ce-646061cc4465",
+    "data": {
+      "name": "launchsite",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "8fd2eb1a-4b93-4638-9049-729f41ec9a42",
+    "data": {
+      "local_position": [
+        0,
+        0,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "local_scale": [
+        50,
+        1,
+        50
+      ]
+    }
+  },
+  {
+    "$ref": "af2c814b-afff-4182-88a5-e3afe58f2fb1",
+    "data": {
+      "shared_mesh": {
+        "$assetref": "builtin::KSS.DevUtils/_untitled"
+      }
+    }
+  },
+  {
+    "$ref": "ee093596-0d3c-4f10-8e4b-5584ea14b97c",
+    "data": {
+      "is_enabled": true,
+      "shared_materials": [
+        {
+          "$assetref": "builtin::Resources/New Material 2"
+        }
+      ],
+      "shadow_casting_mode": "On",
+      "receive_shadows": true
+    }
+  },
+  {
+    "$ref": "82996695-1dbb-4aff-b750-6d5b8aaf2c32",
+    "data": {
+      "shared_mesh": {
+        "$assetref": "builtin::KSS.DevUtils/_untitled"
+      },
+      "is_convex": false,
+      "is_trigger": false
+    }
+  },
+  {
+    "$ref": "3f8234dc-3edf-48e0-9a0e-64c76fa3f543",
+    "data": {
+      "is_enabled": true,
+      "part_id": "Vanilla::testlaunchsite"
+    }
+  },
+  {
+    "$ref": "142d3fa4-fe76-455f-ad8b-4c09de216123",
+    "data": {
+      "is_enabled": true,
+      "mass": 500000,
+      "on_after_mass_changed": null
+    }
+  },
+  {
+    "$ref": "9a01cdc2-bfc2-4f31-b6b7-89c9c7cbd69c",
+    "data": {
+      "name": "testlaunchsite(Clone)",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "3b3c60cc-2442-40ee-bdf0-123de5cfc32d",
+    "data": {
+      "local_position": [
+        0,
+        1,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "local_scale": [
+        0.0199999995529652,
+        1,
+        0.0199999995529652
+      ]
+    }
+  },
+  {
+    "$ref": "36386526-12e5-47fc-9542-4602cd3d5405",
+    "data": {
+      "is_enabled": true
+    }
+  },
+  {
+    "$ref": "8543e124-ccc1-450f-8138-e0459c2a1329",
+    "data": {
+      "name": "spawn",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "85e15c66-b913-44f2-a5ff-d325543896d1",
+    "data": {
+      "local_position": [
+        0.0908497720956802,
+        -0.302947402000427,
+        -0.548785448074341
+      ],
+      "local_rotation": [
+        -0.471868485212326,
+        -0.195221781730652,
+        -0.195197731256485,
+        -0.837332904338837
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "a2cc54a9-80ff-4b87-8a79-236e65f9d940",
+    "data": {
+      "is_enabled": true,
+      "airf_position": [
+        -908822.659152135,
+        3048362.19705155,
+        5520080.95121473
+      ],
+      "airf_rotation": [
+        -0.471868485212326,
+        -0.195221602916718,
+        -0.19519779086113,
+        -0.837332963943481
+      ]
+    }
+  },
+  {
+    "$ref": "a1249a06-5aac-4bf8-a037-ca01ee2ab6b0",
+    "data": {
+      "is_kinematic": false
+    }
+  },
+  {
+    "$ref": "72fea127-e460-4a60-8762-8e229fe36c25",
+    "data": {
+      "is_enabled": true,
+      "mass": 9200.001953125,
+      "local_center_of_mass": [
+        1.06148078771184e-7,
+        -0.840060830116272,
+        1.39941306542823e-7
+      ],
+      "velocity": [
+        0.00616622809320688,
+        -0.00400924030691385,
+        0.000776789791416377
+      ],
+      "angular_velocity": [
+        0.000652443501166999,
+        0.000895268167369068,
+        -0.000436780508607626
+      ]
+    }
+  },
+  {
+    "$ref": "d3587a98-edef-4fb9-bf28-dd0c78ac530d",
+    "data": {
+      "is_enabled": true,
+      "display_name": null,
+      "root_part": {
+        "$ref": "290a1161-3cdf-4e11-890c-f67742f51c97"
+      },
+      "on_after_recalculate_parts": null
+    }
+  },
+  {
+    "$ref": "2025a619-a0e7-4b52-8d8b-3800305b9abb",
+    "data": {
+      "is_enabled": true
+    }
+  },
+  {
+    "$ref": "9452c013-a4bd-4015-8c50-e8b5207291a8",
+    "data": {
+      "name": "tempname_vessel",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "290a1161-3cdf-4e11-890c-f67742f51c97",
+    "data": {
+      "local_position": [
+        0,
+        0,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "9fa35430-58e1-4f21-8022-ca54e3e0266d",
+    "data": {
+      "size": [
+        2,
+        1.25,
+        2
+      ],
+      "center": [
+        0,
+        0,
+        0
+      ],
+      "is_trigger": false
+    }
+  },
+  {
+    "$ref": "cd556a06-d074-4455-8334-0ac8d47043e3",
+    "data": {
+      "lods": [
+        {
+          "percent": 0.289156645536423,
+          "renderers": [
+            {
+              "$ref": "1d472d25-6a7e-4b3a-8fae-ec9bfe92270c"
+            }
+          ]
+        },
+        {
+          "percent": 0,
+          "renderers": [
+            {
+              "$ref": "3f1d770f-4252-4d50-99cc-4444c88d69c0"
+            }
+          ]
+        },
+        {
+          "percent": 0,
+          "renderers": []
+        }
+      ],
+      "size": 2.07500004768372
+    }
+  },
+  {
+    "$ref": "c2b2dc43-c2ee-4c03-b112-1922404456d0",
+    "data": {
+      "is_enabled": true,
+      "mass": 100,
+      "on_after_mass_changed": null
+    }
+  },
+  {
+    "$ref": "f1b891b1-5141-4153-8ce5-d62eebe68f80",
+    "data": {
+      "is_enabled": true,
+      "part_id": "Vanilla::intertank"
+    }
+  },
+  {
+    "$ref": "096181fe-9a4b-495c-b5c7-5b15d0714de2",
+    "data": {
+      "is_enabled": true,
+      "cached_data": [
+        {
+          "object": {
+            "$ref": "9fa35430-58e1-4f21-8022-ca54e3e0266d"
+          },
+          "forward": {
+            "is_trigger": true
+          },
+          "reverse": {
+            "size": [
+              2,
+              1.25,
+              2
+            ],
+            "center": [
+              0,
+              0,
+              0
+            ],
+            "is_trigger": false
+          }
+        },
+        {
+          "object": {
+            "$ref": "c2b2dc43-c2ee-4c03-b112-1922404456d0"
+          },
+          "forward": {
+            "mass": 0
+          },
+          "reverse": {
+            "is_enabled": true,
+            "mass": 100,
+            "on_after_mass_changed": null
+          }
+        },
+        {
+          "object": {
+            "$ref": "3f1d770f-4252-4d50-99cc-4444c88d69c0"
+          },
+          "forward": {
+            "shared_materials": [
+              {
+                "$assetref": "builtin::Resources/Materials/ghost_wireframe"
+              }
+            ]
+          },
+          "reverse": {
+            "is_enabled": true,
+            "shared_materials": [
+              {
+                "$assetref": "builtin::Resources/New Material 1"
+              }
+            ],
+            "shadow_casting_mode": "On",
+            "receive_shadows": true
+          }
+        },
+        {
+          "object": {
+            "$ref": "1d472d25-6a7e-4b3a-8fae-ec9bfe92270c"
+          },
+          "forward": {
+            "shared_materials": [
+              {
+                "$assetref": "builtin::Resources/Materials/ghost_wireframe"
+              }
+            ]
+          },
+          "reverse": {
+            "is_enabled": true,
+            "shared_materials": [
+              {
+                "$assetref": "builtin::Resources/New Material 1"
+              }
+            ],
+            "shadow_casting_mode": "On",
+            "receive_shadows": true
+          }
+        }
+      ],
+      "build_points": 90,
+      "max_build_points": 90
+    }
+  },
+  {
+    "$ref": "a9e943d9-ae71-4cd3-a44e-fc292a26327f",
+    "data": {
+      "name": "intertank(Clone)",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "b757423b-3a9d-4477-8d0b-540a0805ffc7",
+    "data": {
+      "local_position": [
+        0,
+        0,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "243e5342-26c1-46b0-9b69-a3cdac0679c9",
+    "data": {
+      "shared_mesh": {
+        "$assetref": "builtin::Resources/intertank"
+      }
+    }
+  },
+  {
+    "$ref": "1d472d25-6a7e-4b3a-8fae-ec9bfe92270c",
+    "data": {
+      "is_enabled": true,
+      "shared_materials": [
+        {
+          "$assetref": "builtin::Resources/New Material 1"
+        }
+      ],
+      "shadow_casting_mode": "On",
+      "receive_shadows": true
+    }
+  },
+  {
+    "$ref": "b8ee9c53-2c3b-4457-92fd-41da6f8e20a3",
+    "data": {
+      "name": "model",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "24e938cd-8505-480d-a0b7-db11adaff189",
+    "data": {
+      "local_position": [
+        0,
+        0,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "f904952a-8271-4b9e-b399-3ea08963e25a",
+    "data": {
+      "shared_mesh": {
+        "$assetref": "builtin::Resources/intertank_LOD1"
+      }
+    }
+  },
+  {
+    "$ref": "3f1d770f-4252-4d50-99cc-4444c88d69c0",
+    "data": {
+      "is_enabled": true,
+      "shared_materials": [
+        {
+          "$assetref": "builtin::Resources/New Material 1"
+        }
+      ],
+      "shadow_casting_mode": "On",
+      "receive_shadows": true
+    }
+  },
+  {
+    "$ref": "7db28bb6-0c2d-43b1-87f8-b114e27132ca",
+    "data": {
+      "name": "model_LOD1",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "c1473cf4-28f7-4fdd-b9b0-05a830398adb",
+    "data": {
+      "local_position": [
+        0,
+        0.649999976158142,
+        0
+      ],
+      "local_rotation": [
+        -0.707106828689575,
+        0,
+        0,
+        0.707106828689575
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "63e61d81-237b-4192-a80e-69f435139915",
+    "data": {
+      "is_enabled": true,
+      "range": 1
+    }
+  },
+  {
+    "$ref": "a118f263-80c9-4cc7-8dcf-778207f6ccbe",
+    "data": {
+      "name": "NODE",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "7842c49f-063a-456f-9a68-fd3e6a5061bb",
+    "data": {
+      "local_position": [
+        0,
+        -0.649999976158142,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0.707106828689575,
+        -0.707106828689575,
+        0
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "451a9929-7c01-4cd0-a995-1252b92a5081",
+    "data": {
+      "is_enabled": true,
+      "range": 1
+    }
+  },
+  {
+    "$ref": "7753c79e-26b0-4d3e-9132-8ac9c4d590da",
+    "data": {
+      "name": "NODE",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "d902bc6c-4ede-4788-a4a1-45c015cd22b7",
+    "data": {
+      "local_position": [
+        0,
+        -1.625,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "28a1e4cb-0535-46b7-bcfd-3a89dbea5d24",
+    "data": {
+      "size": [
+        2,
+        3,
+        2
+      ],
+      "center": [
+        0,
+        0,
+        0
+      ],
+      "is_trigger": false
+    }
+  },
+  {
+    "$ref": "2038c930-98fb-4fe1-8b73-43ed07b17c30",
+    "data": {
+      "is_enabled": true,
+      "mass": 200,
+      "on_after_mass_changed": null
+    }
+  },
+  {
+    "$ref": "caf820b6-a58e-4fd9-8397-352dae94a027",
+    "data": {
+      "is_enabled": true,
+      "volume_transform": {
+        "$ref": "8e7da64a-3582-4867-b4ef-66bdb560fd94"
+      },
+      "max_volume": 7,
+      "radius": 1.5,
+      "contents": [
+        {
+          "substance": {
+            "$assetref": "substance.f"
+          },
+          "mass_amount": 3500
+        },
+        {
+          "substance": {
+            "$assetref": "substance.ox"
+          },
+          "mass_amount": 3500
+        }
+      ]
+    }
+  },
+  {
+    "$ref": "ead1a955-e13a-4761-b0d4-594a218b7750",
+    "data": {
+      "is_enabled": true,
+      "part_id": "Vanilla::tank"
+    }
+  },
+  {
+    "$ref": "e5be1a44-c7ac-4e94-8d25-a263c098ea71",
+    "data": {
+      "is_enabled": true,
+      "cached_data": [
+        {
+          "object": {
+            "$ref": "28a1e4cb-0535-46b7-bcfd-3a89dbea5d24"
+          },
+          "forward": {
+            "is_trigger": true
+          },
+          "reverse": {
+            "size": [
+              2,
+              3,
+              2
+            ],
+            "center": [
+              0,
+              0,
+              0
+            ],
+            "is_trigger": false
+          }
+        },
+        {
+          "object": {
+            "$ref": "2038c930-98fb-4fe1-8b73-43ed07b17c30"
+          },
+          "forward": {
+            "mass": 0
+          },
+          "reverse": {
+            "is_enabled": true,
+            "mass": 200,
+            "on_after_mass_changed": null
+          }
+        },
+        {
+          "object": {
+            "$ref": "04322e21-f75a-476a-84b6-1c4ab96f6fb8"
+          },
+          "forward": {
+            "shared_materials": [
+              {
+                "$assetref": "builtin::Resources/Materials/ghost_wireframe"
+              }
+            ]
+          },
+          "reverse": {
+            "is_enabled": true,
+            "shared_materials": [
+              {
+                "$assetref": "builtin::Resources/New Material 1"
+              }
+            ],
+            "shadow_casting_mode": "On",
+            "receive_shadows": true
+          }
+        }
+      ],
+      "build_points": 90,
+      "max_build_points": 90
+    }
+  },
+  {
+    "$ref": "788be557-6bd5-46a8-8e2f-240441a1121c",
+    "data": {
+      "is_enabled": true,
+      "end1": {
+        "obj_c": {
+          "$ref": "0114d391-cb61-4882-9d26-f5effa4e9929"
+        },
+        "obj_p": {
+          "$ref": "0114d391-cb61-4882-9d26-f5effa4e9929"
+        },
+        "position": [
+          0,
+          -2.5,
+          0
+        ],
+        "forward": [
+          0,
+          0,
+          0
+        ]
+      },
+      "end2": {
+        "obj_c": {
+          "$ref": "caf820b6-a58e-4fd9-8397-352dae94a027"
+        },
+        "obj_p": {
+          "$ref": "caf820b6-a58e-4fd9-8397-352dae94a027"
+        },
+        "position": [
+          0,
+          1.5,
+          0
+        ],
+        "forward": [
+          0,
+          0,
+          0
+        ]
+      },
+      "cross_section_area": 0.100000001490116
+    }
+  },
+  {
+    "$ref": "c6cc00ca-4c94-407c-afd2-9fd7680dc73c",
+    "data": {
+      "name": "tank(Clone)",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "33dee0fa-1527-4347-8d2a-d336385a8a04",
+    "data": {
+      "local_position": [
+        0,
+        0,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "c09f6a0d-fa55-4c70-a197-898ac1f33a53",
+    "data": {
+      "shared_mesh": {
+        "$assetref": "builtin::Resources/tank"
+      }
+    }
+  },
+  {
+    "$ref": "04322e21-f75a-476a-84b6-1c4ab96f6fb8",
+    "data": {
+      "is_enabled": true,
+      "shared_materials": [
+        {
+          "$assetref": "builtin::Resources/New Material 1"
+        }
+      ],
+      "shadow_casting_mode": "On",
+      "receive_shadows": true
+    }
+  },
+  {
+    "$ref": "5c974cae-bab7-4cf4-9ccc-a9403e2c18db",
+    "data": {
+      "name": "tank",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "8e7da64a-3582-4867-b4ef-66bdb560fd94",
+    "data": {
+      "local_position": [
+        0,
+        0,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "b653c0f9-a66a-4629-8b89-916398513f0c",
+    "data": {
+      "name": "volumeTransform",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "c4ce9cb8-97bb-4755-b583-f0caa98568cd",
+    "data": {
+      "local_position": [
+        0,
+        1,
+        0
+      ],
+      "local_rotation": [
+        -0.707106828689575,
+        0,
+        0,
+        0.707106828689575
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "4b356451-0f9d-4874-8737-e7ee35726166",
+    "data": {
+      "is_enabled": true,
+      "range": 2
+    }
+  },
+  {
+    "$ref": "70a4cefb-e14a-4c27-968d-2de79145f2f7",
+    "data": {
+      "name": "NODE",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "ed7b1178-ec98-431c-b0b6-c002b256a982",
+    "data": {
+      "local_position": [
+        0,
+        -1,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0.707106828689575,
+        -0.707106828689575,
+        0
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "61512053-adfa-427c-97fd-b014fb21300b",
+    "data": {
+      "is_enabled": true,
+      "range": 2
+    }
+  },
+  {
+    "$ref": "7a82c42d-8b57-46f4-a19e-e44608c51707",
+    "data": {
+      "name": "NODE",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "389392d2-6c26-4439-944f-63ab1b4dc8de",
+    "data": {
+      "local_position": [
+        2,
+        -3.45532989501953,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "c9fea9fb-5afc-4786-a152-107f670a90e7",
+    "data": {
+      "is_enabled": true,
+      "max_thrust": 223000,
+      "isp": 3000,
+      "throttle": 0,
+      "thrust_transform": {
+        "$ref": "09b5c1b2-33b2-45f7-98f5-5535030b72e2"
+      },
+      "set_throttle": {
+        "connects_to": [
+          {
+            "$ref": "f30f7cff-cedb-4416-be94-a26e28b37717"
+          },
+          {
+            "$ref": "b6c9a39b-bc1b-4bb9-a2a0-7a45630680ab"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "$ref": "92b06dca-53ca-46a6-8a65-94cc912785ad",
+    "data": {
+      "is_enabled": true,
+      "mass": 100,
+      "on_after_mass_changed": null
+    }
+  },
+  {
+    "$ref": "6d9f8aa0-99c7-49fb-8c1d-2ef040dee861",
+    "data": {
+      "size": [
+        1.4095858335495,
+        1.9923312664032,
+        1.4095858335495
+      ],
+      "center": [
+        0,
+        -0.661643087863922,
+        0
+      ],
+      "is_trigger": false
+    }
+  },
+  {
+    "$ref": "e041dec3-2f13-4932-9489-f8a57a43fead",
+    "data": {
+      "is_enabled": true,
+      "part_id": "Vanilla::engine"
+    }
+  },
+  {
+    "$ref": "e7f0ddac-1f00-4fa5-a5d3-9f06b1dd1cca",
+    "data": {
+      "is_enabled": true,
+      "cached_data": [
+        {
+          "object": {
+            "$ref": "92b06dca-53ca-46a6-8a65-94cc912785ad"
+          },
+          "forward": {
+            "mass": 0
+          },
+          "reverse": {
+            "is_enabled": true,
+            "mass": 100,
+            "on_after_mass_changed": null
+          }
+        },
+        {
+          "object": {
+            "$ref": "6d9f8aa0-99c7-49fb-8c1d-2ef040dee861"
+          },
+          "forward": {
+            "is_trigger": true
+          },
+          "reverse": {
+            "size": [
+              1.4095858335495,
+              1.9923312664032,
+              1.4095858335495
+            ],
+            "center": [
+              0,
+              -0.661643087863922,
+              0
+            ],
+            "is_trigger": false
+          }
+        },
+        {
+          "object": {
+            "$ref": "9630ca4e-9a1a-412a-8caf-a809abcdb0cf"
+          },
+          "forward": {
+            "shared_materials": [
+              {
+                "$assetref": "builtin::Resources/Materials/ghost_wireframe"
+              }
+            ]
+          },
+          "reverse": {
+            "is_enabled": true,
+            "shared_materials": [
+              {
+                "$assetref": "builtin::Resources/New Material 1"
+              }
+            ],
+            "shadow_casting_mode": "On",
+            "receive_shadows": true
+          }
+        }
+      ],
+      "build_points": 90,
+      "max_build_points": 90
+    }
+  },
+  {
+    "$ref": "69a266dd-edfb-4962-9382-4d2f9d367268",
+    "data": {
+      "is_enabled": true,
+      "reference_transform": {
+        "$ref": "f6d99e5d-bea8-47c6-bb32-f17f0a32e54c"
+      },
+      "x_actuator_transform": {
+        "$ref": "944411de-eb32-471b-b063-7481328e8f51"
+      },
+      "y_actuator_transform": {
+        "$ref": "944411de-eb32-471b-b063-7481328e8f51"
+      },
+      "min_x": -5,
+      "min_y": -5,
+      "max_x": 5,
+      "max_y": 5,
+      "get_reference_transform": {
+        "connects_to": [
+          {
+            "$ref": "1b73497b-4020-43bf-abab-a639e8691f0e"
+          }
+        ]
+      },
+      "set_x": {
+        "connects_to": []
+      },
+      "set_y": {
+        "connects_to": []
+      },
+      "set_xy": {
+        "connects_to": [
+          {
+            "$ref": "9ae9a0e5-e397-400a-8a83-6629f6b89a62"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "$ref": "73c91455-edc9-472d-b187-8465e7c15a9a",
+    "data": {
+      "is_enabled": true,
+      "end1": {
+        "obj_c": {
+          "$ref": "caf820b6-a58e-4fd9-8397-352dae94a027"
+        },
+        "obj_p": {
+          "$ref": "caf820b6-a58e-4fd9-8397-352dae94a027"
+        },
+        "position": [
+          0,
+          -1.5,
+          0
+        ],
+        "forward": [
+          0,
+          0,
+          0
+        ]
+      },
+      "end2": {
+        "obj_c": {
+          "$ref": "c9fea9fb-5afc-4786-a152-107f670a90e7"
+        },
+        "obj_p": {},
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "forward": [
+          0,
+          0,
+          0
+        ]
+      },
+      "cross_section_area": 60
+    }
+  },
+  {
+    "$ref": "3a501bd5-714a-48c1-8ee7-d2a265f43fe5",
+    "data": {
+      "name": "engine(Clone)",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "944411de-eb32-471b-b063-7481328e8f51",
+    "data": {
+      "local_position": [
+        0,
+        0,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "3998d6a5-1d0f-4d65-8ae9-951c89b2a22a",
+    "data": {
+      "name": "gimbal",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "a680d2d1-78c0-4a51-8354-ff6228690f32",
+    "data": {
+      "local_position": [
+        0,
+        0,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "91ec9912-86b1-4f4d-9ddd-835ee94d9378",
+    "data": {
+      "shared_mesh": {
+        "$assetref": "builtin::Resources/engine"
+      }
+    }
+  },
+  {
+    "$ref": "9630ca4e-9a1a-412a-8caf-a809abcdb0cf",
+    "data": {
+      "is_enabled": true,
+      "shared_materials": [
+        {
+          "$assetref": "builtin::Resources/New Material 1"
+        }
+      ],
+      "shadow_casting_mode": "On",
+      "receive_shadows": true
+    }
+  },
+  {
+    "$ref": "55c4fccb-8a03-4f6c-9c07-17074c9f92df",
+    "data": {
+      "name": "model",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "09b5c1b2-33b2-45f7-98f5-5535030b72e2",
+    "data": {
+      "local_position": [
+        0,
+        -1.65780997276306,
+        0
+      ],
+      "local_rotation": [
+        -0.707106828689575,
+        0,
+        0,
+        0.707106828689575
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "b8b0736f-262b-426a-b9ed-b48513deeb2f",
+    "data": {
+      "name": "thrustTransform",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "f6d99e5d-bea8-47c6-bb32-f17f0a32e54c",
+    "data": {
+      "local_position": [
+        0,
+        0,
+        0
+      ],
+      "local_rotation": [
+        -0.707106828689575,
+        0,
+        0,
+        0.707106828689575
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "01c9a494-eacb-4c7c-8a5e-0393a16afa24",
+    "data": {
+      "name": "gimbalReference",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "f0167cd8-9170-417f-af51-e1fb36477fef",
+    "data": {
+      "local_position": [
+        0,
+        0.324999988079071,
+        0
+      ],
+      "local_rotation": [
+        -0.707106828689575,
+        0,
+        0,
+        0.707106828689575
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "7e18beb2-ad9a-43d8-836d-ef4f70618eb9",
+    "data": {
+      "is_enabled": true,
+      "range": 1
+    }
+  },
+  {
+    "$ref": "35a3fd8a-d7d2-411d-99dd-7abc6782efaf",
+    "data": {
+      "name": "NODE",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "c1fd1604-2805-4ba3-9b73-1b8e3176b5ef",
+    "data": {
+      "local_position": [
+        0,
+        -1.64999997615814,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0.707106828689575,
+        -0.707106828689575,
+        0
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "932b1fc3-5119-4599-966f-6e98d3689772",
+    "data": {
+      "is_enabled": true,
+      "range": 1
+    }
+  },
+  {
+    "$ref": "989d3bce-fb83-4c9c-82d2-23b781fd0871",
+    "data": {
+      "name": "NODE",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "c998d78b-7377-4210-adfb-cd4e4e3c8c61",
+    "data": {
+      "local_position": [
+        -2,
+        -3.45532989501953,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "cfcfc216-e636-4df6-82e7-610bf1217faf",
+    "data": {
+      "is_enabled": true,
+      "max_thrust": 223000,
+      "isp": 3000,
+      "throttle": 0,
+      "thrust_transform": {
+        "$ref": "72eda807-d851-4d4d-b10c-5dd11462e659"
+      },
+      "set_throttle": {
+        "connects_to": [
+          {
+            "$ref": "268d86fa-c852-41fe-9556-a06b9c47412a"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "$ref": "70ed5520-ea24-4b41-bb32-0d64de6563a7",
+    "data": {
+      "is_enabled": true,
+      "mass": 100,
+      "on_after_mass_changed": null
+    }
+  },
+  {
+    "$ref": "9d1651eb-e66c-43dd-ac34-8ae172cd0cc7",
+    "data": {
+      "size": [
+        1.4095858335495,
+        1.9923312664032,
+        1.4095858335495
+      ],
+      "center": [
+        0,
+        -0.661643087863922,
+        0
+      ],
+      "is_trigger": false
+    }
+  },
+  {
+    "$ref": "a563eb9a-f8d7-41d5-a535-f83a6856d040",
+    "data": {
+      "is_enabled": true,
+      "part_id": "Vanilla::engine"
+    }
+  },
+  {
+    "$ref": "f84b7015-6f03-4a61-b82d-3c540ac929c8",
+    "data": {
+      "is_enabled": true,
+      "cached_data": [
+        {
+          "object": {
+            "$ref": "70ed5520-ea24-4b41-bb32-0d64de6563a7"
+          },
+          "forward": {
+            "mass": 0
+          },
+          "reverse": {
+            "is_enabled": true,
+            "mass": 100,
+            "on_after_mass_changed": null
+          }
+        },
+        {
+          "object": {
+            "$ref": "9d1651eb-e66c-43dd-ac34-8ae172cd0cc7"
+          },
+          "forward": {
+            "is_trigger": true
+          },
+          "reverse": {
+            "size": [
+              1.4095858335495,
+              1.9923312664032,
+              1.4095858335495
+            ],
+            "center": [
+              0,
+              -0.661643087863922,
+              0
+            ],
+            "is_trigger": false
+          }
+        },
+        {
+          "object": {
+            "$ref": "3d47ce92-189d-48a3-91de-670c461289de"
+          },
+          "forward": {
+            "shared_materials": [
+              {
+                "$assetref": "builtin::Resources/Materials/ghost_wireframe"
+              }
+            ]
+          },
+          "reverse": {
+            "is_enabled": true,
+            "shared_materials": [
+              {
+                "$assetref": "builtin::Resources/New Material 1"
+              }
+            ],
+            "shadow_casting_mode": "On",
+            "receive_shadows": true
+          }
+        }
+      ],
+      "build_points": 90,
+      "max_build_points": 90
+    }
+  },
+  {
+    "$ref": "e8abfda1-020f-48ad-8405-5b5eaf2ba62c",
+    "data": {
+      "is_enabled": true,
+      "reference_transform": {
+        "$ref": "a062075d-cc66-403e-8952-fe22e0dec18e"
+      },
+      "x_actuator_transform": {
+        "$ref": "8543af37-3d73-4aac-933e-260151c69518"
+      },
+      "y_actuator_transform": {
+        "$ref": "8543af37-3d73-4aac-933e-260151c69518"
+      },
+      "min_x": -5,
+      "min_y": -5,
+      "max_x": 5,
+      "max_y": 5,
+      "get_reference_transform": {
+        "connects_to": [
+          {
+            "$ref": "6e7d499c-cc23-4fba-96ad-55a6f42c352c"
+          }
+        ]
+      },
+      "set_x": {
+        "connects_to": []
+      },
+      "set_y": {
+        "connects_to": []
+      },
+      "set_xy": {
+        "connects_to": [
+          {
+            "$ref": "38556ac3-bb41-403f-b95a-7bb6c338f287"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "$ref": "532b4102-72e2-41fa-b629-18ca498872a1",
+    "data": {
+      "is_enabled": true,
+      "end1": {
+        "obj_c": {
+          "$ref": "caf820b6-a58e-4fd9-8397-352dae94a027"
+        },
+        "obj_p": {
+          "$ref": "caf820b6-a58e-4fd9-8397-352dae94a027"
+        },
+        "position": [
+          0,
+          -1.5,
+          0
+        ],
+        "forward": [
+          0,
+          0,
+          0
+        ]
+      },
+      "end2": {
+        "obj_c": {
+          "$ref": "cfcfc216-e636-4df6-82e7-610bf1217faf"
+        },
+        "obj_p": {},
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "forward": [
+          0,
+          0,
+          0
+        ]
+      },
+      "cross_section_area": 60
+    }
+  },
+  {
+    "$ref": "a22d98e0-02ac-4e43-9745-c13c6f911dd5",
+    "data": {
+      "name": "engine(Clone)",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "8543af37-3d73-4aac-933e-260151c69518",
+    "data": {
+      "local_position": [
+        0,
+        0,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "be294732-2d8b-4004-a897-2e576a59a73c",
+    "data": {
+      "name": "gimbal",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "8b699520-680a-462b-be0e-6a18c9177c80",
+    "data": {
+      "local_position": [
+        0,
+        0,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "d1b60011-3910-458c-a1ec-3469b249ca2d",
+    "data": {
+      "shared_mesh": {
+        "$assetref": "builtin::Resources/engine"
+      }
+    }
+  },
+  {
+    "$ref": "3d47ce92-189d-48a3-91de-670c461289de",
+    "data": {
+      "is_enabled": true,
+      "shared_materials": [
+        {
+          "$assetref": "builtin::Resources/New Material 1"
+        }
+      ],
+      "shadow_casting_mode": "On",
+      "receive_shadows": true
+    }
+  },
+  {
+    "$ref": "d061a153-1e08-48ba-b676-be78097e8fbf",
+    "data": {
+      "name": "model",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "72eda807-d851-4d4d-b10c-5dd11462e659",
+    "data": {
+      "local_position": [
+        0,
+        -1.65780997276306,
+        0
+      ],
+      "local_rotation": [
+        -0.707106828689575,
+        0,
+        0,
+        0.707106828689575
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "7770deb9-36a7-4c28-b623-1051df4e7aac",
+    "data": {
+      "name": "thrustTransform",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "a062075d-cc66-403e-8952-fe22e0dec18e",
+    "data": {
+      "local_position": [
+        0,
+        0,
+        0
+      ],
+      "local_rotation": [
+        -0.707106828689575,
+        0,
+        0,
+        0.707106828689575
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "ccde2082-bb4a-45e3-a287-44f84d956070",
+    "data": {
+      "name": "gimbalReference",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "d10560e5-c91f-46c2-91cc-4fa6b442946a",
+    "data": {
+      "local_position": [
+        0,
+        0.324999988079071,
+        0
+      ],
+      "local_rotation": [
+        -0.707106828689575,
+        0,
+        0,
+        0.707106828689575
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "0dc8b821-3c00-406d-9ffa-e4c9d45b1635",
+    "data": {
+      "is_enabled": true,
+      "range": 1
+    }
+  },
+  {
+    "$ref": "6667efe5-d5df-43aa-b435-b7c4d81bbb30",
+    "data": {
+      "name": "NODE",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "caf300e4-be39-4ca7-b139-534e51d534ec",
+    "data": {
+      "local_position": [
+        0,
+        -1.64999997615814,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0.707106828689575,
+        -0.707106828689575,
+        0
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "a1ac3ce3-071e-43d7-94a3-617e351bda5e",
+    "data": {
+      "is_enabled": true,
+      "range": 1
+    }
+  },
+  {
+    "$ref": "9bff413b-556c-4bf4-b64b-a5ec3227ea2b",
+    "data": {
+      "name": "NODE",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "6d253ccf-3a5e-48f6-8b0f-fe180567b103",
+    "data": {
+      "local_position": [
+        0,
+        2.625,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "67bf3235-dd56-478d-a8c5-c3692c803b6a",
+    "data": {
+      "size": [
+        2,
+        5,
+        2
+      ],
+      "center": [
+        0,
+        0,
+        0
+      ],
+      "is_trigger": false
+    }
+  },
+  {
+    "$ref": "5022b64a-24a7-4bad-89ea-28b7c1a05ab7",
+    "data": {
+      "is_enabled": true,
+      "mass": 500,
+      "on_after_mass_changed": null
+    }
+  },
+  {
+    "$ref": "0114d391-cb61-4882-9d26-f5effa4e9929",
+    "data": {
+      "is_enabled": true,
+      "volume_transform": {
+        "$ref": "87a33fea-cd1b-4535-bd67-46c99dd6764f"
+      },
+      "max_volume": 14,
+      "radius": 2.5,
+      "contents": [
+        {
+          "substance": {
+            "$assetref": "substance.f"
+          },
+          "mass_amount": 0.000979893375188112
+        },
+        {
+          "substance": {
+            "$assetref": "substance.ox"
+          },
+          "mass_amount": 0.000979893375188112
+        }
+      ]
+    }
+  },
+  {
+    "$ref": "d191d60c-61d7-4bf5-954d-479a7091bdd4",
+    "data": {
+      "is_enabled": true,
+      "part_id": "Vanilla::tank_long"
+    }
+  },
+  {
+    "$ref": "7e5775a4-fc28-4593-98a1-ee2954dc258e",
+    "data": {
+      "is_enabled": true,
+      "cached_data": [
+        {
+          "object": {
+            "$ref": "67bf3235-dd56-478d-a8c5-c3692c803b6a"
+          },
+          "forward": {
+            "is_trigger": true
+          },
+          "reverse": {
+            "size": [
+              2,
+              5,
+              2
+            ],
+            "center": [
+              0,
+              0,
+              0
+            ],
+            "is_trigger": false
+          }
+        },
+        {
+          "object": {
+            "$ref": "5022b64a-24a7-4bad-89ea-28b7c1a05ab7"
+          },
+          "forward": {
+            "mass": 0
+          },
+          "reverse": {
+            "is_enabled": true,
+            "mass": 500,
+            "on_after_mass_changed": null
+          }
+        },
+        {
+          "object": {
+            "$ref": "baf2ea5b-f6d8-40b3-a442-1a05706cef98"
+          },
+          "forward": {
+            "shared_materials": [
+              {
+                "$assetref": "builtin::Resources/Materials/ghost_wireframe"
+              }
+            ]
+          },
+          "reverse": {
+            "is_enabled": true,
+            "shared_materials": [
+              {
+                "$assetref": "builtin::Resources/New Material 1"
+              }
+            ],
+            "shadow_casting_mode": "On",
+            "receive_shadows": true
+          }
+        }
+      ],
+      "build_points": 90,
+      "max_build_points": 90
+    }
+  },
+  {
+    "$ref": "d41fe4d6-469a-4ef7-9357-74f98520fa43",
+    "data": {
+      "name": "tank_long(Clone)",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "f714abf0-06e0-421c-a182-7b4d1c264ed3",
+    "data": {
+      "local_position": [
+        0,
+        0,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "2588de78-3fee-4f50-8aaf-059214f5ae98",
+    "data": {
+      "shared_mesh": {
+        "$assetref": "builtin::Resources/tank_long"
+      }
+    }
+  },
+  {
+    "$ref": "baf2ea5b-f6d8-40b3-a442-1a05706cef98",
+    "data": {
+      "is_enabled": true,
+      "shared_materials": [
+        {
+          "$assetref": "builtin::Resources/New Material 1"
+        }
+      ],
+      "shadow_casting_mode": "On",
+      "receive_shadows": true
+    }
+  },
+  {
+    "$ref": "0f2ca394-a5bc-4b70-8754-dee2bee7c7d6",
+    "data": {
+      "name": "tank_long",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "87a33fea-cd1b-4535-bd67-46c99dd6764f",
+    "data": {
+      "local_position": [
+        0,
+        0,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "336bebed-688f-4939-af53-6125b4ce2cb9",
+    "data": {
+      "name": "volumeTransform",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "22888921-bce6-42f5-a155-9522f3a207a5",
+    "data": {
+      "local_position": [
+        0,
+        2,
+        0
+      ],
+      "local_rotation": [
+        -0.707106828689575,
+        0,
+        0,
+        0.707106828689575
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "8ccc37b8-e97e-49d2-b070-62818bd6e906",
+    "data": {
+      "is_enabled": true,
+      "range": 2
+    }
+  },
+  {
+    "$ref": "170cd4d8-c3f6-4e7d-98d2-54950bd55d36",
+    "data": {
+      "name": "NODE",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "a8416aae-c01e-44b2-b2dc-31cc10147585",
+    "data": {
+      "local_position": [
+        0,
+        -2,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0.707106828689575,
+        -0.707106828689575,
+        0
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "c663ac40-df9c-45b9-b2ca-78bf09e63d4d",
+    "data": {
+      "is_enabled": true,
+      "range": 2
+    }
+  },
+  {
+    "$ref": "4a8148c7-37ed-49e7-a8e9-e1ce5e909d5f",
+    "data": {
+      "name": "NODE",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "0172f253-4bd3-40a7-ad86-2e5d6e97af6a",
+    "data": {
+      "local_position": [
+        0,
+        2.625,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "fd5ce2e6-87ce-4743-973a-c90cef45d485",
+    "data": {
+      "size": [
+        2,
+        3,
+        2
+      ],
+      "center": [
+        0,
+        0,
+        0
+      ],
+      "is_trigger": false
+    }
+  },
+  {
+    "$ref": "86b7b209-ef9f-42d2-9b01-aaa574147d9d",
+    "data": {
+      "is_enabled": true,
+      "mass": 200,
+      "on_after_mass_changed": null
+    }
+  },
+  {
+    "$ref": "4756b52d-79ad-4349-aea4-69f442a06a37",
+    "data": {
+      "is_enabled": true,
+      "part_id": "Vanilla::capsule"
+    }
+  },
+  {
+    "$ref": "f24aca9d-0ae4-47fe-b6c6-e34bdd224a18",
+    "data": {
+      "is_enabled": true,
+      "cached_data": [
+        {
+          "object": {
+            "$ref": "fd5ce2e6-87ce-4743-973a-c90cef45d485"
+          },
+          "forward": {
+            "is_trigger": true
+          },
+          "reverse": {
+            "size": [
+              2,
+              3,
+              2
+            ],
+            "center": [
+              0,
+              0,
+              0
+            ],
+            "is_trigger": false
+          }
+        },
+        {
+          "object": {
+            "$ref": "86b7b209-ef9f-42d2-9b01-aaa574147d9d"
+          },
+          "forward": {
+            "mass": 0
+          },
+          "reverse": {
+            "is_enabled": true,
+            "mass": 200,
+            "on_after_mass_changed": null
+          }
+        },
+        {
+          "object": {
+            "$ref": "2483853a-27fb-471e-89e9-f1025fa52d77"
+          },
+          "forward": {
+            "shared_materials": [
+              {
+                "$assetref": "builtin::Resources/Materials/ghost_wireframe"
+              }
+            ]
+          },
+          "reverse": {
+            "is_enabled": true,
+            "shared_materials": [
+              {
+                "$assetref": "builtin::KSS.DevUtils/axis_y"
+              }
+            ],
+            "shadow_casting_mode": "On",
+            "receive_shadows": true
+          }
+        },
+        {
+          "object": {
+            "$ref": "ce6193bf-e4fe-4a08-b634-a8ea8b6a0053"
+          },
+          "forward": {
+            "shared_materials": [
+              {
+                "$assetref": "builtin::Resources/Materials/ghost_wireframe"
+              }
+            ]
+          },
+          "reverse": {
+            "is_enabled": true,
+            "shared_materials": [
+              {
+                "$assetref": "builtin::KSS.DevUtils/axis_x"
+              }
+            ],
+            "shadow_casting_mode": "On",
+            "receive_shadows": true
+          }
+        },
+        {
+          "object": {
+            "$ref": "d95e5b59-7310-47de-b21b-2c4ddbfbbda2"
+          },
+          "forward": {
+            "shared_materials": [
+              {
+                "$assetref": "builtin::Resources/Materials/ghost_wireframe"
+              }
+            ]
+          },
+          "reverse": {
+            "is_enabled": true,
+            "shared_materials": [
+              {
+                "$assetref": "builtin::KSS.DevUtils/axis_z"
+              }
+            ],
+            "shadow_casting_mode": "On",
+            "receive_shadows": true
+          }
+        },
+        {
+          "object": {
+            "$ref": "5451f164-83da-4e32-929f-126130bb929e"
+          },
+          "forward": {
+            "shared_materials": [
+              {
+                "$assetref": "builtin::Resources/Materials/ghost_wireframe"
+              }
+            ]
+          },
+          "reverse": {
+            "is_enabled": true,
+            "shared_materials": [
+              {
+                "$assetref": "builtin::Resources/New Material 1"
+              }
+            ],
+            "shadow_casting_mode": "On",
+            "receive_shadows": true
+          }
+        }
+      ],
+      "build_points": 90,
+      "max_build_points": 90
+    }
+  },
+  {
+    "$ref": "b96d242f-164f-49e6-984b-8845179e478e",
+    "data": {
+      "is_enabled": true
+    }
+  },
+  {
+    "$ref": "cb2b7f0a-43f7-4221-94c2-1c05e834b6fa",
+    "data": {
+      "is_enabled": true,
+      "set_attitude": {
+        "connects_to": [
+          {
+            "$ref": "eb4dc350-9788-4c60-b2d0-48a9ca369b6f"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "$ref": "7960b53b-af1c-4c8b-8baf-dec156906274",
+    "data": {
+      "is_enabled": true
+    }
+  },
+  {
+    "$ref": "5cb09ce3-5c6f-4ed1-bb28-fba130772b84",
+    "data": {
+      "is_enabled": true,
+      "sequence": {
+        "current": 0,
+        "elements": [
+          {
+            "actions": [
+              {
+                "signal_value": 1
+              },
+              {
+                "signal_value": 1
+              }
+            ],
+            "key": "Space"
+          },
+          {
+            "actions": [
+              {},
+              {}
+            ],
+            "delay": 5,
+            "start_ut": 0
+          }
+        ]
+      }
+    }
+  },
+  {
+    "$ref": "41d2efd3-9b0e-41c4-9d05-efc7cbb16e22",
+    "data": {
+      "reference_transform": {
+        "$ref": "2a9e315c-d9ba-4cdc-913c-6ada01ca71ba"
+      }
+    }
+  },
+  {
+    "$ref": "12c7bd43-51bc-4410-9099-c579dbd8a0af",
+    "data": {
+      "name": "capsule(Clone)",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "975db8cd-c381-4578-81f6-86c75fd363d5",
+    "data": {
+      "local_position": [
+        0,
+        0,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "534f2e2d-476e-4580-a4d3-b7ef8afc947e",
+    "data": {
+      "shared_mesh": {
+        "$assetref": "builtin::Resources/gemini_capsule"
+      }
+    }
+  },
+  {
+    "$ref": "5451f164-83da-4e32-929f-126130bb929e",
+    "data": {
+      "is_enabled": true,
+      "shared_materials": [
+        {
+          "$assetref": "builtin::Resources/New Material 1"
+        }
+      ],
+      "shadow_casting_mode": "On",
+      "receive_shadows": true
+    }
+  },
+  {
+    "$ref": "3fd3a6a5-ed71-4ad3-b9ec-8b336c9e4741",
+    "data": {
+      "name": "mesh",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "31c5daab-c1af-46da-80e9-2a7430975da5",
+    "data": {
+      "local_position": [
+        0,
+        1,
+        0
+      ],
+      "local_rotation": [
+        -0.707106828689575,
+        0,
+        0,
+        0.707106828689575
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "e5b5ec16-5f04-4a1c-b5dc-8e8c0e364d8b",
+    "data": {
+      "is_enabled": true,
+      "range": 2
+    }
+  },
+  {
+    "$ref": "cb9836bb-3bb4-427b-8d04-db7afd3e4bc9",
+    "data": {
+      "name": "NODE",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "20b1a3ee-2ce6-4c0d-8fc2-ff7168e458c1",
+    "data": {
+      "local_position": [
+        0,
+        -1,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0.707106828689575,
+        -0.707106828689575,
+        0
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "9c82820a-f269-4705-a162-0f082e0230e4",
+    "data": {
+      "is_enabled": true,
+      "range": 2
+    }
+  },
+  {
+    "$ref": "9448eb4f-76b4-4cad-8371-6cd99ce55207",
+    "data": {
+      "name": "NODE",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "2a9e315c-d9ba-4cdc-913c-6ada01ca71ba",
+    "data": {
+      "local_position": [
+        0,
+        0,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0.707106828689575,
+        0.707106828689575,
+        0
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "9f62f2df-91e0-4c30-8225-3bf780c59d36",
+    "data": {
+      "name": "controlFrameTransform",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "85969828-55f5-47fe-b5d0-5b06cc81bfbd",
+    "data": {
+      "local_position": [
+        0,
+        0,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "4aeebd8b-5be4-403b-82cb-9399d7d9ecec",
+    "data": {
+      "shared_mesh": {
+        "$assetref": "builtin::Resources/Meshes/translate_handle_1d"
+      }
+    }
+  },
+  {
+    "$ref": "d95e5b59-7310-47de-b21b-2c4ddbfbbda2",
+    "data": {
+      "is_enabled": true,
+      "shared_materials": [
+        {
+          "$assetref": "builtin::KSS.DevUtils/axis_z"
+        }
+      ],
+      "shadow_casting_mode": "On",
+      "receive_shadows": true
+    }
+  },
+  {
+    "$ref": "e5384d5a-05d8-4844-8c66-0f0a77733826",
+    "data": {
+      "name": "mesh (1)",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "bab5105e-c8f9-492d-bb05-440e7d7c9bd9",
+    "data": {
+      "local_position": [
+        0,
+        0,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0.707106828689575,
+        0,
+        0.707106828689575
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "480a17d4-aeb5-4fd1-9ce8-b51f14af293f",
+    "data": {
+      "shared_mesh": {
+        "$assetref": "builtin::Resources/Meshes/translate_handle_1d"
+      }
+    }
+  },
+  {
+    "$ref": "ce6193bf-e4fe-4a08-b634-a8ea8b6a0053",
+    "data": {
+      "is_enabled": true,
+      "shared_materials": [
+        {
+          "$assetref": "builtin::KSS.DevUtils/axis_x"
+        }
+      ],
+      "shadow_casting_mode": "On",
+      "receive_shadows": true
+    }
+  },
+  {
+    "$ref": "12e0e2a6-1a65-4718-8818-e81ff6f85549",
+    "data": {
+      "name": "mesh (2)",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "23ecd9b8-7917-4728-86c8-506d8bdbf962",
+    "data": {
+      "local_position": [
+        0,
+        0,
+        0
+      ],
+      "local_rotation": [
+        -0.707106828689575,
+        0,
+        0,
+        0.707106828689575
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "04580f62-0c33-4890-a912-5853078e217f",
+    "data": {
+      "shared_mesh": {
+        "$assetref": "builtin::Resources/Meshes/translate_handle_1d"
+      }
+    }
+  },
+  {
+    "$ref": "2483853a-27fb-471e-89e9-f1025fa52d77",
+    "data": {
+      "is_enabled": true,
+      "shared_materials": [
+        {
+          "$assetref": "builtin::KSS.DevUtils/axis_y"
+        }
+      ],
+      "shadow_casting_mode": "On",
+      "receive_shadows": true
+    }
+  },
+  {
+    "$ref": "72396749-73d8-4937-8664-ad3e77e1502d",
+    "data": {
+      "name": "mesh (3)",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "868c31f8-580b-46e7-948c-a09be5bb9f5a",
+    "data": {
+      "local_position": [
+        -4.17232513427734e-7,
+        2.65000057220459,
+        -4.76837158203125e-7
+      ],
+      "local_rotation": [
+        0,
+        0,
+        -7.45057970874541e-9,
+        1
+      ],
+      "local_scale": [
+        1,
+        1.00000011920929,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "277bf02d-6ff8-4570-9601-c04e00f30d86",
+    "data": {
+      "is_enabled": true,
+      "max_thrust": 223000,
+      "isp": 3000,
+      "throttle": 0,
+      "thrust_transform": {
+        "$ref": "7124b821-181b-4764-8e0e-4a32f58fb512"
+      },
+      "set_throttle": {
+        "connects_to": []
+      }
+    }
+  },
+  {
+    "$ref": "b1b085ac-aab5-4194-88a2-052e1f5146b9",
+    "data": {
+      "is_enabled": true,
+      "mass": 0,
+      "on_after_mass_changed": null
+    }
+  },
+  {
+    "$ref": "83d23d54-d358-43aa-a091-6f157ca7531e",
+    "data": {
+      "size": [
+        1.4095858335495,
+        1.9923312664032,
+        1.4095858335495
+      ],
+      "center": [
+        0,
+        -0.661643087863922,
+        0
+      ],
+      "is_trigger": true
+    }
+  },
+  {
+    "$ref": "01b46de2-ba51-43eb-99b3-687bd95f018b",
+    "data": {
+      "is_enabled": true,
+      "part_id": "Vanilla::engine"
+    }
+  },
+  {
+    "$ref": "e58d1b7f-b253-45b2-a815-060c5049898d",
+    "data": {
+      "is_enabled": true,
+      "cached_data": [
+        {
+          "object": {
+            "$ref": "b1b085ac-aab5-4194-88a2-052e1f5146b9"
+          },
+          "forward": {
+            "mass": 0
+          },
+          "reverse": {
+            "is_enabled": true,
+            "mass": 100,
+            "on_after_mass_changed": null
+          }
+        },
+        {
+          "object": {
+            "$ref": "83d23d54-d358-43aa-a091-6f157ca7531e"
+          },
+          "forward": {
+            "is_trigger": true
+          },
+          "reverse": {
+            "size": [
+              1.4095858335495,
+              1.9923312664032,
+              1.4095858335495
+            ],
+            "center": [
+              0,
+              -0.661643087863922,
+              0
+            ],
+            "is_trigger": false
+          }
+        },
+        {
+          "object": {
+            "$ref": "d281b694-c8c3-442a-bb4d-032b17281013"
+          },
+          "forward": {
+            "shared_materials": [
+              {
+                "$assetref": "builtin::Resources/Materials/ghost_wireframe"
+              }
+            ]
+          },
+          "reverse": {
+            "is_enabled": true,
+            "shared_materials": [
+              {
+                "$assetref": "builtin::Resources/New Material 1"
+              }
+            ],
+            "shadow_casting_mode": "On",
+            "receive_shadows": true
+          }
+        }
+      ],
+      "build_points": 30.5759887695313,
+      "max_build_points": 90
+    }
+  },
+  {
+    "$ref": "50fa6f28-4b5d-4d64-ad82-9bf0d11124c4",
+    "data": {
+      "is_enabled": true,
+      "reference_transform": {
+        "$ref": "0fd8dd22-dd48-406e-9acd-219275246e8b"
+      },
+      "x_actuator_transform": {
+        "$ref": "e4146662-19f3-4b15-96b0-c578de7d9974"
+      },
+      "y_actuator_transform": {
+        "$ref": "e4146662-19f3-4b15-96b0-c578de7d9974"
+      },
+      "min_x": -5,
+      "min_y": -5,
+      "max_x": 5,
+      "max_y": 5,
+      "get_reference_transform": {
+        "connects_to": []
+      },
+      "set_x": {
+        "connects_to": []
+      },
+      "set_y": {
+        "connects_to": []
+      },
+      "set_xy": {
+        "connects_to": []
+      }
+    }
+  },
+  {
+    "$ref": "dc61b88b-6337-4c99-ae5b-bb9ea78f2a2d",
+    "data": {
+      "is_enabled": true,
+      "state": "PausedConstructing",
+      "build_speed": 90
+    }
+  },
+  {
+    "$ref": "be6eab19-9ed1-40c1-a298-9a1e58699286",
+    "data": {
+      "name": "engine",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "e4146662-19f3-4b15-96b0-c578de7d9974",
+    "data": {
+      "local_position": [
+        0,
+        0,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "e970fac3-909a-4120-b481-1ca3ac843f26",
+    "data": {
+      "name": "gimbal",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "a1233d52-763f-455b-a01f-b3871f6bc61d",
+    "data": {
+      "local_position": [
+        0,
+        0,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "1dd26642-19b3-4bbf-8cdb-185342c412df",
+    "data": {
+      "shared_mesh": {
+        "$assetref": "builtin::Resources/engine"
+      }
+    }
+  },
+  {
+    "$ref": "d281b694-c8c3-442a-bb4d-032b17281013",
+    "data": {
+      "is_enabled": true,
+      "shared_materials": [
+        {
+          "$assetref": "builtin::Resources/Materials/ghost_wireframe"
+        }
+      ],
+      "shadow_casting_mode": "On",
+      "receive_shadows": true
+    }
+  },
+  {
+    "$ref": "23fed99e-85b1-41d1-a4a1-04b5425de48f",
+    "data": {
+      "name": "model",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "7124b821-181b-4764-8e0e-4a32f58fb512",
+    "data": {
+      "local_position": [
+        0,
+        -1.65780997276306,
+        0
+      ],
+      "local_rotation": [
+        -0.707106828689575,
+        0,
+        0,
+        0.707106828689575
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "1553b8e2-4d7c-4ef3-8db4-910a3b5ad010",
+    "data": {
+      "name": "thrustTransform",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "0fd8dd22-dd48-406e-9acd-219275246e8b",
+    "data": {
+      "local_position": [
+        0,
+        0,
+        0
+      ],
+      "local_rotation": [
+        -0.707106828689575,
+        0,
+        0,
+        0.707106828689575
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "c4db0d0e-fe02-4b80-b97c-5cf42fd28db7",
+    "data": {
+      "name": "gimbalReference",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "1b796bf9-00e7-4a56-b9a9-064f74fe00fb",
+    "data": {
+      "local_position": [
+        0,
+        0.324999988079071,
+        0
+      ],
+      "local_rotation": [
+        -0.707106828689575,
+        0,
+        0,
+        0.707106828689575
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "8a6c47c0-d647-4e66-8502-fc242ea49679",
+    "data": {
+      "is_enabled": true,
+      "range": 1
+    }
+  },
+  {
+    "$ref": "4a397760-1850-463b-a652-16ea43ada301",
+    "data": {
+      "name": "NODE",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "cf69e6ce-6864-425f-8985-780aaba62c25",
+    "data": {
+      "local_position": [
+        0,
+        -1.64999997615814,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0.707106828689575,
+        -0.707106828689575,
+        0
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "4f279d7c-5f22-4c08-9664-3c86e8c92405",
+    "data": {
+      "is_enabled": true,
+      "range": 1
+    }
+  },
+  {
+    "$ref": "d739d884-2306-4f51-8d82-c8a5c0e2f2c3",
+    "data": {
+      "name": "NODE",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "fd633523-13f7-4558-a35e-3d97b9db0337",
+    "data": {
+      "local_position": [
+        2.98023223876953e-8,
+        1.32500004768372,
+        -1.19209289550781e-7
+      ],
+      "local_rotation": [
+        0,
+        0,
+        -7.45057970874541e-9,
+        1
+      ],
+      "local_scale": [
+        1,
+        0.99999988079071,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "c8e59fe5-59d8-4370-8627-7755691a95e9",
+    "data": {
+      "size": [
+        2,
+        3,
+        2
+      ],
+      "center": [
+        0,
+        0,
+        0
+      ],
+      "is_trigger": true
+    }
+  },
+  {
+    "$ref": "3a7ab851-ba24-4da0-9816-d5e18afe14cd",
+    "data": {
+      "is_enabled": true,
+      "mass": 0,
+      "on_after_mass_changed": null
+    }
+  },
+  {
+    "$ref": "5e947f96-1dad-4990-af78-9c64af0e454d",
+    "data": {
+      "is_enabled": true,
+      "part_id": "Vanilla::capsule"
+    }
+  },
+  {
+    "$ref": "931d3944-10ed-4347-9463-c6361b3d10d9",
+    "data": {
+      "is_enabled": true,
+      "cached_data": [
+        {
+          "object": {
+            "$ref": "c8e59fe5-59d8-4370-8627-7755691a95e9"
+          },
+          "forward": {
+            "is_trigger": true
+          },
+          "reverse": {
+            "size": [
+              2,
+              3,
+              2
+            ],
+            "center": [
+              0,
+              0,
+              0
+            ],
+            "is_trigger": false
+          }
+        },
+        {
+          "object": {
+            "$ref": "3a7ab851-ba24-4da0-9816-d5e18afe14cd"
+          },
+          "forward": {
+            "mass": 0
+          },
+          "reverse": {
+            "is_enabled": true,
+            "mass": 200,
+            "on_after_mass_changed": null
+          }
+        },
+        {
+          "object": {
+            "$ref": "466aed6c-cc59-4625-8922-675ef44a23c1"
+          },
+          "forward": {
+            "shared_materials": [
+              {
+                "$assetref": "builtin::Resources/Materials/ghost_wireframe"
+              }
+            ]
+          },
+          "reverse": {
+            "is_enabled": true,
+            "shared_materials": [
+              {
+                "$assetref": "builtin::KSS.DevUtils/axis_y"
+              }
+            ],
+            "shadow_casting_mode": "On",
+            "receive_shadows": true
+          }
+        },
+        {
+          "object": {
+            "$ref": "cfaf6f36-092e-4b91-b5d2-85aa732a8999"
+          },
+          "forward": {
+            "shared_materials": [
+              {
+                "$assetref": "builtin::Resources/Materials/ghost_wireframe"
+              }
+            ]
+          },
+          "reverse": {
+            "is_enabled": true,
+            "shared_materials": [
+              {
+                "$assetref": "builtin::KSS.DevUtils/axis_x"
+              }
+            ],
+            "shadow_casting_mode": "On",
+            "receive_shadows": true
+          }
+        },
+        {
+          "object": {
+            "$ref": "41d289cd-8390-4ae2-82b7-d52d38814ab5"
+          },
+          "forward": {
+            "shared_materials": [
+              {
+                "$assetref": "builtin::Resources/Materials/ghost_wireframe"
+              }
+            ]
+          },
+          "reverse": {
+            "is_enabled": true,
+            "shared_materials": [
+              {
+                "$assetref": "builtin::KSS.DevUtils/axis_z"
+              }
+            ],
+            "shadow_casting_mode": "On",
+            "receive_shadows": true
+          }
+        },
+        {
+          "object": {
+            "$ref": "5a0424c3-d175-4f6d-b4be-0d756beac472"
+          },
+          "forward": {
+            "shared_materials": [
+              {
+                "$assetref": "builtin::Resources/Materials/ghost_wireframe"
+              }
+            ]
+          },
+          "reverse": {
+            "is_enabled": true,
+            "shared_materials": [
+              {
+                "$assetref": "builtin::Resources/New Material 1"
+              }
+            ],
+            "shadow_casting_mode": "On",
+            "receive_shadows": true
+          }
+        }
+      ],
+      "build_points": 30.5759887695313,
+      "max_build_points": 90
+    }
+  },
+  {
+    "$ref": "b55c9a6b-8988-4205-857a-125ff6b64e44",
+    "data": {
+      "is_enabled": true
+    }
+  },
+  {
+    "$ref": "6d1298cd-90c1-473a-a7f0-50904a7a7c83",
+    "data": {
+      "is_enabled": true,
+      "set_attitude": {
+        "connects_to": []
+      }
+    }
+  },
+  {
+    "$ref": "9c5a4c19-d140-4edf-87ec-caecb4b5ca20",
+    "data": {
+      "is_enabled": true
+    }
+  },
+  {
+    "$ref": "d715deec-574b-4ffc-b99a-02cd3fb300bb",
+    "data": {
+      "is_enabled": true,
+      "sequence": {
+        "current": 0,
+        "elements": []
+      }
+    }
+  },
+  {
+    "$ref": "35d172e8-84d4-4ac5-8039-f49a6f44c937",
+    "data": {
+      "reference_transform": {
+        "$ref": "6d660e79-c3e3-4c9b-9f23-0a239e1bf60c"
+      }
+    }
+  },
+  {
+    "$ref": "50f642e2-920d-4c5e-a95b-a1512f171257",
+    "data": {
+      "name": "capsule",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "66aaaeb6-f091-4097-9eff-6df9a865a9d2",
+    "data": {
+      "local_position": [
+        0,
+        0,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "a2cf2d3a-da2b-46f4-bd1e-4b74b44fbc1d",
+    "data": {
+      "shared_mesh": {
+        "$assetref": "builtin::Resources/gemini_capsule"
+      }
+    }
+  },
+  {
+    "$ref": "5a0424c3-d175-4f6d-b4be-0d756beac472",
+    "data": {
+      "is_enabled": true,
+      "shared_materials": [
+        {
+          "$assetref": "builtin::Resources/Materials/ghost_wireframe"
+        }
+      ],
+      "shadow_casting_mode": "On",
+      "receive_shadows": true
+    }
+  },
+  {
+    "$ref": "9de3a6bb-15ec-4672-b839-f16f2f539c65",
+    "data": {
+      "name": "mesh",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "5288d71e-28ef-4db3-8b6b-c05801f6ed8a",
+    "data": {
+      "local_position": [
+        0,
+        1,
+        0
+      ],
+      "local_rotation": [
+        -0.707106828689575,
+        0,
+        0,
+        0.707106828689575
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "74b9fe18-288a-4b41-ac70-d0fcd4a7c14a",
+    "data": {
+      "is_enabled": true,
+      "range": 2
+    }
+  },
+  {
+    "$ref": "e14dc83f-6ee5-4d01-8b0b-1ca9bc84d413",
+    "data": {
+      "name": "NODE",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "de6bf62a-6ad5-496a-85d8-e6735f27a2c5",
+    "data": {
+      "local_position": [
+        0,
+        -1,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0.707106828689575,
+        -0.707106828689575,
+        0
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "59b325a9-eeff-4175-853c-35ffe64a485f",
+    "data": {
+      "is_enabled": true,
+      "range": 2
+    }
+  },
+  {
+    "$ref": "9d7390fe-c02b-41bb-96d2-f0c1dccb6539",
+    "data": {
+      "name": "NODE",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "6d660e79-c3e3-4c9b-9f23-0a239e1bf60c",
+    "data": {
+      "local_position": [
+        0,
+        0,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0.707106828689575,
+        0.707106828689575,
+        0
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "9e7b920b-dfb3-41de-9e84-ae8731f85a3a",
+    "data": {
+      "name": "controlFrameTransform",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "fe13c558-4ff6-46ba-986c-9898230afaec",
+    "data": {
+      "local_position": [
+        0,
+        0,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "07aac6e9-c04f-44ce-a35e-7ae2d909e775",
+    "data": {
+      "shared_mesh": {
+        "$assetref": "builtin::Resources/Meshes/translate_handle_1d"
+      }
+    }
+  },
+  {
+    "$ref": "41d289cd-8390-4ae2-82b7-d52d38814ab5",
+    "data": {
+      "is_enabled": true,
+      "shared_materials": [
+        {
+          "$assetref": "builtin::Resources/Materials/ghost_wireframe"
+        }
+      ],
+      "shadow_casting_mode": "On",
+      "receive_shadows": true
+    }
+  },
+  {
+    "$ref": "4c909d55-91f9-45f3-b733-257f9c8e69e2",
+    "data": {
+      "name": "mesh (1)",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "02e46c50-53bf-42c3-b33d-89d12b2e2356",
+    "data": {
+      "local_position": [
+        0,
+        0,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0.707106828689575,
+        0,
+        0.707106828689575
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "8ba83ab9-01c8-426c-a4ae-ee02b463068d",
+    "data": {
+      "shared_mesh": {
+        "$assetref": "builtin::Resources/Meshes/translate_handle_1d"
+      }
+    }
+  },
+  {
+    "$ref": "cfaf6f36-092e-4b91-b5d2-85aa732a8999",
+    "data": {
+      "is_enabled": true,
+      "shared_materials": [
+        {
+          "$assetref": "builtin::Resources/Materials/ghost_wireframe"
+        }
+      ],
+      "shadow_casting_mode": "On",
+      "receive_shadows": true
+    }
+  },
+  {
+    "$ref": "5eb2ccc8-5ecf-44ba-a646-083f842e8282",
+    "data": {
+      "name": "mesh (2)",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "393d7000-35cd-4881-97c3-025beb12fd6c",
+    "data": {
+      "local_position": [
+        0,
+        0,
+        0
+      ],
+      "local_rotation": [
+        -0.707106828689575,
+        0,
+        0,
+        0.707106828689575
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "6def7e9b-5973-4c11-83c7-13f21f363271",
+    "data": {
+      "shared_mesh": {
+        "$assetref": "builtin::Resources/Meshes/translate_handle_1d"
+      }
+    }
+  },
+  {
+    "$ref": "466aed6c-cc59-4625-8922-675ef44a23c1",
+    "data": {
+      "is_enabled": true,
+      "shared_materials": [
+        {
+          "$assetref": "builtin::Resources/Materials/ghost_wireframe"
+        }
+      ],
+      "shadow_casting_mode": "On",
+      "receive_shadows": true
+    }
+  },
+  {
+    "$ref": "e8a976a1-1a8c-4ea9-b0a2-83463d979e26",
+    "data": {
+      "name": "mesh (3)",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "2b07546e-322b-45e6-b2f4-078c0fc70f6a",
+    "data": {
+      "local_position": [
+        20,
+        2.625,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "bb64e767-c792-45cc-8e7c-e949d738f725",
+    "data": {
+      "size": [
+        2,
+        5,
+        2
+      ],
+      "center": [
+        0,
+        0,
+        0
+      ],
+      "is_trigger": false
+    }
+  },
+  {
+    "$ref": "3c31b2a0-718e-4258-9047-24f176ec1639",
+    "data": {
+      "is_enabled": true,
+      "mass": 500,
+      "on_after_mass_changed": null
+    }
+  },
+  {
+    "$ref": "99b63352-99f4-43ed-9078-542f2a2e61dd",
+    "data": {
+      "is_enabled": true,
+      "volume_transform": {
+        "$ref": "b1471b32-6e14-4f74-8adf-0a425302793d"
+      },
+      "max_volume": 14,
+      "radius": 2.5,
+      "contents": []
+    }
+  },
+  {
+    "$ref": "3d9f3c96-8aa2-460a-8152-9f7a30f1964d",
+    "data": {
+      "is_enabled": true,
+      "part_id": "Vanilla::tank_long"
+    }
+  },
+  {
+    "$ref": "9e29f683-101a-486e-b220-b7c969092367",
+    "data": {
+      "is_enabled": true,
+      "cached_data": [
+        {
+          "object": {
+            "$ref": "bb64e767-c792-45cc-8e7c-e949d738f725"
+          },
+          "forward": {
+            "is_trigger": true
+          },
+          "reverse": {
+            "size": [
+              2,
+              5,
+              2
+            ],
+            "center": [
+              0,
+              0,
+              0
+            ],
+            "is_trigger": false
+          }
+        },
+        {
+          "object": {
+            "$ref": "3c31b2a0-718e-4258-9047-24f176ec1639"
+          },
+          "forward": {
+            "mass": 0
+          },
+          "reverse": {
+            "is_enabled": true,
+            "mass": 500,
+            "on_after_mass_changed": null
+          }
+        },
+        {
+          "object": {
+            "$ref": "07343102-701f-45ce-b699-7edf46a15346"
+          },
+          "forward": {
+            "shared_materials": [
+              {
+                "$assetref": "builtin::Resources/Materials/ghost_wireframe"
+              }
+            ]
+          },
+          "reverse": {
+            "is_enabled": true,
+            "shared_materials": [
+              {
+                "$assetref": "builtin::Resources/New Material 1"
+              }
+            ],
+            "shadow_casting_mode": "On",
+            "receive_shadows": true
+          }
+        }
+      ],
+      "build_points": 90,
+      "max_build_points": 90
+    }
+  },
+  {
+    "$ref": "af8b05a9-68c3-4787-904e-1355909a3b7d",
+    "data": {
+      "is_enabled": true,
+      "has_separated": false,
+      "separate": {
+        "connects_to": [
+          {
+            "$ref": "4b9464b9-3018-416a-9ee6-2b1b240a1fcc"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "$ref": "ddaeb9f5-c783-4a56-9537-20a9c7c7c0f3",
+    "data": {
+      "name": "tank_long(Clone)",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "05bb081a-fcbc-4afd-b216-0ff3786bd2c4",
+    "data": {
+      "local_position": [
+        0,
+        0,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "d0754b1a-f094-4a91-a097-67ca3543c4ff",
+    "data": {
+      "shared_mesh": {
+        "$assetref": "builtin::Resources/tank_long"
+      }
+    }
+  },
+  {
+    "$ref": "07343102-701f-45ce-b699-7edf46a15346",
+    "data": {
+      "is_enabled": true,
+      "shared_materials": [
+        {
+          "$assetref": "builtin::Resources/New Material 1"
+        }
+      ],
+      "shadow_casting_mode": "On",
+      "receive_shadows": true
+    }
+  },
+  {
+    "$ref": "924ce640-0c05-4d22-a5a2-4d4b0d46a8b5",
+    "data": {
+      "name": "tank_long",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "b1471b32-6e14-4f74-8adf-0a425302793d",
+    "data": {
+      "local_position": [
+        0,
+        0,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "b1b56692-2252-4992-800d-86ec642afef9",
+    "data": {
+      "name": "volumeTransform",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "96486858-4ff1-453a-9304-79356b18287b",
+    "data": {
+      "local_position": [
+        0,
+        2,
+        0
+      ],
+      "local_rotation": [
+        -0.707106828689575,
+        0,
+        0,
+        0.707106828689575
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "1ce636d9-d983-4d6f-a5b1-564a6b79a11f",
+    "data": {
+      "is_enabled": true,
+      "range": 2
+    }
+  },
+  {
+    "$ref": "9f4942a3-cdc9-4574-95f6-44b301192367",
+    "data": {
+      "name": "NODE",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "ab0729be-e6a6-48a9-a8e4-0ee852fb720b",
+    "data": {
+      "local_position": [
+        0,
+        -2,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0.707106828689575,
+        -0.707106828689575,
+        0
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "256c4bbd-af23-48e5-87ec-d8a6a0d8bd80",
+    "data": {
+      "is_enabled": true,
+      "range": 2
+    }
+  },
+  {
+    "$ref": "ccd56f21-da11-4a1f-95fa-c90a7af38c8f",
+    "data": {
+      "name": "NODE",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "e514f8e1-adba-4e62-ae47-f88f3e86345f",
+    "data": {
+      "local_position": [
+        -20,
+        2.625,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "fc682d09-362e-40f3-bdaf-69605196bacb",
+    "data": {
+      "size": [
+        2,
+        5,
+        2
+      ],
+      "center": [
+        0,
+        0,
+        0
+      ],
+      "is_trigger": false
+    }
+  },
+  {
+    "$ref": "75d2c268-61f1-484c-bcf1-b5be0b43e8cc",
+    "data": {
+      "is_enabled": true,
+      "mass": 500,
+      "on_after_mass_changed": null
+    }
+  },
+  {
+    "$ref": "d6701b47-c17e-4052-86d6-40979770beb1",
+    "data": {
+      "is_enabled": true,
+      "volume_transform": {
+        "$ref": "2e879725-37e9-4f30-900f-8f4d43fd243c"
+      },
+      "max_volume": 14,
+      "radius": 2.5,
+      "contents": []
+    }
+  },
+  {
+    "$ref": "7d563efe-bf6e-40e9-a408-3f861baf18e6",
+    "data": {
+      "is_enabled": true,
+      "part_id": "Vanilla::tank_long"
+    }
+  },
+  {
+    "$ref": "5a6f05ae-facf-4fa1-b652-d90fd1fd0436",
+    "data": {
+      "is_enabled": true,
+      "cached_data": [
+        {
+          "object": {
+            "$ref": "fc682d09-362e-40f3-bdaf-69605196bacb"
+          },
+          "forward": {
+            "is_trigger": true
+          },
+          "reverse": {
+            "size": [
+              2,
+              5,
+              2
+            ],
+            "center": [
+              0,
+              0,
+              0
+            ],
+            "is_trigger": false
+          }
+        },
+        {
+          "object": {
+            "$ref": "75d2c268-61f1-484c-bcf1-b5be0b43e8cc"
+          },
+          "forward": {
+            "mass": 0
+          },
+          "reverse": {
+            "is_enabled": true,
+            "mass": 500,
+            "on_after_mass_changed": null
+          }
+        },
+        {
+          "object": {
+            "$ref": "1c0705aa-aef4-47d3-ac54-29b6d2b84185"
+          },
+          "forward": {
+            "shared_materials": [
+              {
+                "$assetref": "builtin::Resources/Materials/ghost_wireframe"
+              }
+            ]
+          },
+          "reverse": {
+            "is_enabled": true,
+            "shared_materials": [
+              {
+                "$assetref": "builtin::Resources/New Material 1"
+              }
+            ],
+            "shadow_casting_mode": "On",
+            "receive_shadows": true
+          }
+        }
+      ],
+      "build_points": 90,
+      "max_build_points": 90
+    }
+  },
+  {
+    "$ref": "1516a15e-6e37-4f3a-8286-2485a15bc840",
+    "data": {
+      "is_enabled": true,
+      "has_separated": false,
+      "separate": {
+        "connects_to": [
+          {
+            "$ref": "cc63f318-761c-482d-a4a2-8abb0de3557d"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "$ref": "76fff186-456a-4849-b940-fd1af284ea3c",
+    "data": {
+      "name": "tank_long(Clone)",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "3b08af52-9ce4-45b5-8ae5-f737a6fe3cac",
+    "data": {
+      "local_position": [
+        0,
+        0,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "70884131-bff8-4255-8bec-eecf63c2f564",
+    "data": {
+      "shared_mesh": {
+        "$assetref": "builtin::Resources/tank_long"
+      }
+    }
+  },
+  {
+    "$ref": "1c0705aa-aef4-47d3-ac54-29b6d2b84185",
+    "data": {
+      "is_enabled": true,
+      "shared_materials": [
+        {
+          "$assetref": "builtin::Resources/New Material 1"
+        }
+      ],
+      "shadow_casting_mode": "On",
+      "receive_shadows": true
+    }
+  },
+  {
+    "$ref": "edfeceea-e2b7-48f2-9759-bac4eef33b76",
+    "data": {
+      "name": "tank_long",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "2e879725-37e9-4f30-900f-8f4d43fd243c",
+    "data": {
+      "local_position": [
+        0,
+        0,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "09517951-ee1b-4069-9da0-d7e321c916ec",
+    "data": {
+      "name": "volumeTransform",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "b178b9ec-e389-46a4-b666-6bca85f4057e",
+    "data": {
+      "local_position": [
+        0,
+        2,
+        0
+      ],
+      "local_rotation": [
+        -0.707106828689575,
+        0,
+        0,
+        0.707106828689575
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "591db7e2-81a8-42a6-82e4-77086e606e33",
+    "data": {
+      "is_enabled": true,
+      "range": 2
+    }
+  },
+  {
+    "$ref": "b8cee74e-7879-4264-904e-a4893af6ef2f",
+    "data": {
+      "name": "NODE",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  },
+  {
+    "$ref": "00de9f69-a5b6-4f1b-a657-d188b7909f9d",
+    "data": {
+      "local_position": [
+        0,
+        -2,
+        0
+      ],
+      "local_rotation": [
+        0,
+        0.707106828689575,
+        -0.707106828689575,
+        0
+      ],
+      "local_scale": [
+        1,
+        1,
+        1
+      ]
+    }
+  },
+  {
+    "$ref": "11c144d0-5b90-41fb-b192-aa7be16c5809",
+    "data": {
+      "is_enabled": true,
+      "range": 2
+    }
+  },
+  {
+    "$ref": "8a1870a5-aedd-4f25-a94b-a9f90dc86edb",
+    "data": {
+      "name": "NODE",
+      "layer": 20,
+      "is_active": true,
+      "is_static": false,
+      "tag": "Untagged"
+    }
+  }
+]

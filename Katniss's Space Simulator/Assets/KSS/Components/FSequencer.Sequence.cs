@@ -106,9 +106,12 @@ namespace KSS.Components
 
         public SerializedData GetData( IReverseReferenceMap s )
         {
+            SerializedArray array = new SerializedArray( Elements.Select( e => e.GetData( s ) ) );
+
             return new SerializedObject()
             {
-                { "current", Current.GetData() }
+                { "current", Current.GetData() },
+                { "elements", array }
             };
         }
 
@@ -116,6 +119,17 @@ namespace KSS.Components
         {
             if( data.TryGetValue( "current", out var current ) )
                 Current = current.AsInt32();
+
+            if( data.TryGetValue<SerializedArray>( "elements", out var elements ) )
+            {
+                int i = 0;
+                foreach( var serElem in elements.Cast<SerializedObject>() )
+                {
+                    Elements[i].SetData( serElem, l );
+
+                    i++;
+                }
+            }
         }
     }
 }

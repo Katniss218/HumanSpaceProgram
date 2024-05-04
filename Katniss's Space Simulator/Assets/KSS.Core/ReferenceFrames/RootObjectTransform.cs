@@ -117,15 +117,21 @@ namespace KSS.Core.ReferenceFrames
 
         public SerializedData GetData( IReverseReferenceMap s )
         {
-            return new SerializedObject()
+            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
+
+            ret.AddAll( new SerializedObject()
             {
                 { "airf_position", this.AIRFPosition.GetData() },
                 { "airf_rotation", this.AIRFRotation.GetData() }
-            };
+            } );
+
+            return ret;
         }
 
         public void SetData( SerializedData data, IForwardReferenceMap l )
         {
+            IPersistent_Behaviour.SetData( this, data, l );
+
             if( data.TryGetValue( "airf_position", out var airfPosition ) )
                 this.AIRFPosition = airfPosition.AsVector3Dbl();
 

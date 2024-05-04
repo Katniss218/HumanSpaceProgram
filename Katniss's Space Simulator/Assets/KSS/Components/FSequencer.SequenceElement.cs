@@ -73,12 +73,23 @@ namespace KSS.Components
 
         public virtual SerializedData GetData( IReverseReferenceMap s )
         {
-            return null;
+            return new SerializedObject()
+            {
+                { "actions", new SerializedArray( Actions.Select( a => a.GetData( s ) ) ) }
+            };
         }
 
         public virtual void SetData( SerializedData data, IForwardReferenceMap l )
         {
-
+            if( data.TryGetValue<SerializedArray>( "actions", out var actions ) )
+            {
+                int i = 0;
+                foreach( var act in actions )
+                {
+                    Actions[i].SetData( act, l );
+                    i++;
+                }
+            }
         }
     }
 
@@ -97,14 +108,20 @@ namespace KSS.Components
 
         public override SerializedData GetData( IReverseReferenceMap s )
         {
-            return new SerializedObject()
+            SerializedObject ret = (SerializedObject)base.GetData( s );
+
+            ret.AddAll( new SerializedObject()
             {
                 { "key", this.Key.GetData() }
-            };
+            } );
+
+            return ret;
         }
 
         public override void SetData( SerializedData data, IForwardReferenceMap l )
         {
+            base.SetData( data, l );
+
             if( data.TryGetValue( "key", out var key ) )
                 Key = key.AsKeyCode();
         }
@@ -131,15 +148,21 @@ namespace KSS.Components
 
         public override SerializedData GetData( IReverseReferenceMap s )
         {
-            return new SerializedObject()
+            SerializedObject ret = (SerializedObject)base.GetData( s );
+
+            ret.AddAll( new SerializedObject()
             {
                 { "delay", this.Delay.GetData() },
                 { "start_ut", this._startUT.GetData() }
-            };
+            } );
+
+            return ret;
         }
 
         public override void SetData( SerializedData data, IForwardReferenceMap l )
         {
+            base.SetData( data, l );
+
             if( data.TryGetValue( "delay", out var delay ) )
                 Delay = delay.AsFloat();
 

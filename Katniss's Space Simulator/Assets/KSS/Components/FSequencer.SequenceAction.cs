@@ -16,13 +16,15 @@ namespace KSS.Components
 	/// <remarks>
 	/// This class exists solely to allow polymorphism between the empty and T-typed sequence actions.
 	/// </remarks>
-    public abstract class SequenceActionBase : ControlGroup, IPersistsObjects // pass-through group with a single element. Required to be drawn.
+    public abstract class SequenceActionBase : ControlGroup, IPersistsObjects, IPersistsData // pass-through group with a single element. Required to be drawn.
     {
         public abstract ControllerOutputBase OnInvoke { get; }
         public abstract void TryInvoke();
 
         public abstract SerializedObject GetObjects( IReverseReferenceMap s );
         public abstract void SetObjects( SerializedObject data, IForwardReferenceMap l );
+        public abstract SerializedData GetData( IReverseReferenceMap s );
+        public abstract void SetData( SerializedData data, IForwardReferenceMap l );
     }
 
     /// <summary>
@@ -60,6 +62,15 @@ namespace KSS.Components
                 //OnInvokeTyped = new();
                 //l.SetObj( onInvokeTyped.ToGuid(), OnInvokeTyped );
             }
+        }
+
+        public override SerializedData GetData( IReverseReferenceMap s )
+        {
+            return new SerializedObject() { };
+        }
+
+        public override void SetData( SerializedData data, IForwardReferenceMap l )
+        {
         }
     }
 
@@ -100,7 +111,7 @@ namespace KSS.Components
             }
         }
 
-        public SerializedData GetData( IReverseReferenceMap s )
+        public override SerializedData GetData( IReverseReferenceMap s )
         {
             return new SerializedObject()
             {
@@ -108,7 +119,7 @@ namespace KSS.Components
             };
         }
 
-        public void SetData( SerializedData data, IForwardReferenceMap l )
+        public override void SetData( SerializedData data, IForwardReferenceMap l )
         {
             if( data.TryGetValue( "signal_value", out var signalValue ) )
             {

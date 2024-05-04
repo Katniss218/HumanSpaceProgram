@@ -162,6 +162,7 @@ namespace KSS.Components
         /// </summary>
         private void RecalculateGhostAndUnghostData()
         {
+#warning TODO - this runs in the VAB scene too, and saves the entire data twice, even if the current state is equal.
             bool wasNull = _cachedData == null;
             if( wasNull )
             {
@@ -178,10 +179,17 @@ namespace KSS.Components
                     {
                         SerializedData originalToGhost = comp.GetGhostData( _cachedRefStore );
 
-                        // Only cache things that are ghostable. This should probably be something else than null, but it works for now.
+                        // Only cache things that are ghostable.
+                        // This should probably be signified differently than by a null, but it works for now.
                         if( originalToGhost != null )
                         {
                             SerializedData ghostToOriginal = comp.GetData( _cachedRefStore );
+
+                            // TODO - remove keys from revObj, that aren't present in forwardObj.
+                            /*if( originalToGhost is SerializedObject forwardObj && ghostToOriginal is SerializedObject revObj )
+                            {
+                                
+                            }*/
 
                             if( wasNull )
                             {
@@ -206,7 +214,7 @@ namespace KSS.Components
             {
                 arr.Add( new SerializedObject()
                 {
-                    { "$id", s.WriteObjectReference( kvp.Key ) },
+                    { "object", s.WriteObjectReference( kvp.Key ) },
                     { "forward", kvp.Value.fwd },
                     { "reverse", kvp.Value.rev }
                 } );
@@ -232,12 +240,13 @@ namespace KSS.Components
                 _cachedData = new();
                 foreach( var obj in cachedData.Cast<SerializedObject>() )
                 {
-                    Component comp = (Component)l.ReadObjectReference( obj["$id"] );
+                    Component comp = (Component)l.ReadObjectReference( obj["object"] );
                     _cachedData.Add( comp, (obj["forward"], obj["reverse"]) );
                 }
             }
 
-            // Set the underlying values to not trigger anything.
+            // Set the underlying private fields as to not trigger ghosting prematurely.
+            // The ghosting will be called anyway, in `Start()`.
             if( data.TryGetValue( "max_build_points", out var maxBuildPoints ) )
                 _maxBuildPoints = maxBuildPoints.AsFloat();
 
