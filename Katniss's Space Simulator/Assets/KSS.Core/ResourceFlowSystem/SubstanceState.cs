@@ -43,7 +43,7 @@ namespace KSS.Core.ResourceFlowSystem
             return new SerializedObject()
             {
                 { "substance", s.WriteAssetReference( Substance ) },
-                { "mass_amount", MassAmount.GetData() }
+                { "mass_amount", MassAmount.AsSerialized() }
             };
         }
 

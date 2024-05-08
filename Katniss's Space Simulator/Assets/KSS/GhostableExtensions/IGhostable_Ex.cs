@@ -40,7 +40,7 @@ namespace KSS
         {
             return new SerializedObject()
             {
-                { "mass", (0.0f).GetData() }
+                { "mass", (0.0f).AsSerialized() }
             };
         }
     }

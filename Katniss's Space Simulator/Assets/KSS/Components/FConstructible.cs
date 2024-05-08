@@ -35,7 +35,7 @@ namespace KSS.Components
         {
             return new SerializedObject()
             {
-                { "min_lift_capacity", this.minLiftCapacity.GetData() }
+                { "min_lift_capacity", this.minLiftCapacity.AsSerialized() }
             };
         }
 
@@ -223,8 +223,8 @@ namespace KSS.Components
             ret.AddAll( new SerializedObject()
             {
                 { "cached_data", arr },
-                { "build_points", BuildPoints.GetData() },
-                { "max_build_points", MaxBuildPoints.GetData() },
+                { "build_points", BuildPoints.AsSerialized() },
+                { "max_build_points", MaxBuildPoints.AsSerialized() },
                 // todo - conditions.
             } );
 

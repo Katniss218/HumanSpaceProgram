@@ -117,9 +117,9 @@ namespace KSS.Components
 
             ret.AddAll( new SerializedObject()
             {
-                { "max_thrust", this.MaxThrust.GetData() },
-                { "isp", this.Isp.GetData() },
-                { "throttle", this.Throttle.GetData() },
+                { "max_thrust", this.MaxThrust.AsSerialized() },
+                { "isp", this.Isp.AsSerialized() },
+                { "throttle", this.Throttle.AsSerialized() },
                 { "thrust_transform", s.WriteObjectReference( this.ThrustTransform ) },
                 { "set_throttle", this.SetThrottle.GetData( s ) }
             } );

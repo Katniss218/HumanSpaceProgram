@@ -76,7 +76,7 @@ namespace UnityPlus.Serialization
             return null;
         }
 
-        public static void SetData( object obj, Type objType, IForwardReferenceMap l, SerializedData data )
+        public static void SetData( object obj, Type objType, SerializedData data, IForwardReferenceMap l )
         {
             if( !_isInitialized )
                 ReloadExtensionMethods();

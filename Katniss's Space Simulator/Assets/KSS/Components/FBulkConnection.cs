@@ -288,7 +288,7 @@ namespace KSS.Components
             {
                 { "end1", this.End1.GetData( s ) },
                 { "end2", this.End2.GetData( s ) },
-                { "cross_section_area", this.CrossSectionArea.GetData() }
+                { "cross_section_area", this.CrossSectionArea.AsSerialized() }
             } );
 
             return ret;

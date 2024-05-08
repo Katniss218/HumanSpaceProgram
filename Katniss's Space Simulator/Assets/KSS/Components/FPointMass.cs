@@ -35,7 +35,7 @@ namespace KSS.Components
 
             ret.AddAll( new SerializedObject()
             {
-                { "mass", _mass.GetData() },
+                { "mass", _mass.AsSerialized() },
                 { "on_after_mass_changed", OnAfterMassChanged.GetData( s ) }
             } );
 

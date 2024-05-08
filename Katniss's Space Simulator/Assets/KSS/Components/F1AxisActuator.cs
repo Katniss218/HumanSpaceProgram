@@ -90,8 +90,8 @@ namespace KSS.Components
             {
                 { "reference_transform", s.WriteObjectReference( this.ReferenceTransform ) },
                 { "x_actuator_transform", s.WriteObjectReference( this.XActuatorTransform ) },
-                { "min_x", this.MinX.GetData() },
-                { "max_x", this.MaxX.GetData() },
+                { "min_x", this.MinX.AsSerialized() },
+                { "max_x", this.MaxX.AsSerialized() },
                 { "get_reference_transform", this.GetReferenceTransform.GetData( s ) },
                 { "set_x", this.SetX.GetData( s ) }
             } );

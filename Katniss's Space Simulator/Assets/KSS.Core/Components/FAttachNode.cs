@@ -133,7 +133,7 @@ namespace KSS.Core.Components
 
             ret.AddAll( new SerializedObject()
             {
-                { "range", this.Range.GetData() }
+                { "range", this.Range.AsSerialized() }
             } );
 
             return ret;

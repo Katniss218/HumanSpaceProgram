@@ -123,8 +123,8 @@ namespace KSS.Components
             ret.AddAll( new SerializedObject()
             {
                 { "volume_transform", s.WriteObjectReference( this.VolumeTransform ) },
-                { "max_volume", this.MaxVolume.GetData() },
-                { "radius", this.Radius.GetData() },
+                { "max_volume", this.MaxVolume.AsSerialized() },
+                { "radius", this.Radius.AsSerialized() },
                 { "contents", this.Contents.GetData( s ) }
             } );
 

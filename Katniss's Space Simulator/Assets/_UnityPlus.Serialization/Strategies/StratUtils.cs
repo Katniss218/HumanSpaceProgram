@@ -19,6 +19,7 @@ namespace UnityPlus.Serialization.Strategies
 				{
 					{ KeyNames.REF, s.GetID( obj ).GetData() },
 					{ "data", data }
+#warning TODO - move this to use the new AsSerialized
 				} );
 			}
 		}

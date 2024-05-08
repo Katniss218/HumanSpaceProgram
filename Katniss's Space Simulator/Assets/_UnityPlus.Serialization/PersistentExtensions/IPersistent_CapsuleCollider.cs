@@ -15,8 +15,8 @@ namespace UnityPlus.Serialization
         {
             return new SerializedObject()
             {
-                { "radius", cc.radius.GetData() },
-                { "height", cc.height.GetData() },
+                { "radius", cc.radius.AsSerialized() },
+                { "height", cc.height.AsSerialized() },
                 { "direction", cc.direction.GetData() },
                 { "center", cc.center.GetData() },
                 { "is_trigger", cc.isTrigger.GetData() }

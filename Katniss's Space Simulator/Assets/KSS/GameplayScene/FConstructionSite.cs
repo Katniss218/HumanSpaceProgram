@@ -328,7 +328,7 @@ namespace KSS.GameplayScene
             ret.AddAll( new SerializedObject()
             {
                 { "state", this.State.GetData() },
-                { "build_speed", this.BuildSpeed.GetData() }
+                { "build_speed", this.BuildSpeed.AsSerialized() }
             } );
 
             return ret;

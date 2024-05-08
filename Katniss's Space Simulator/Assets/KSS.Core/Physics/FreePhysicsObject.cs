@@ -180,7 +180,7 @@ namespace KSS.Core.Physics
 
             ret.AddAll( new SerializedObject()
             {
-                { "mass", this.Mass.GetData() },
+                { "mass", this.Mass.AsSerialized() },
                 { "local_center_of_mass", this.LocalCenterOfMass.GetData() },
                 { "velocity", this.Velocity.GetData() },
                 { "angular_velocity", this.AngularVelocity.GetData() }

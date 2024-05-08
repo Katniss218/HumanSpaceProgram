@@ -15,7 +15,7 @@ namespace UnityPlus.Serialization
         {
             return new SerializedObject()
             {
-                { "radius", sc.radius.GetData() },
+                { "radius", sc.radius.AsSerialized() },
                 { "center", sc.center.GetData() },
                 { "is_trigger", sc.isTrigger.GetData() }
             };

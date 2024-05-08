@@ -1,11 +1,19 @@
 ﻿using System;
+using System.Reflection;
 using UnityEngine;
 
 namespace UnityPlus.Serialization
 {
     public static class ObjectFactory
     {
-        private static readonly TypeMap<Func<Type, IForwardReferenceMap, object>> _cache = new();
+        public struct Info
+        {
+            public Delegate factory;
+            public bool isConstructedGeneric;
+            public bool isPrimitiveLike;
+        }
+
+        private static readonly TypeMap<Info> _cache = new();
 
         public static void ReloadFactoryMethods()
         {
@@ -21,12 +29,11 @@ namespace UnityPlus.Serialization
         /// <returns>The instantiated object.</returns>
         /// <exception cref="InvalidOperationException">Thrown when the saved type ("$type") can't be assigned to type <typeparamref name="T"/>.</exception>
         /// <exception cref="Exception">Other exceptions may be thrown by the factory method. Proceed with caution.</exception>
-        public static T AsObject<T>( this SerializedObject data, IForwardReferenceMap l )
+        internal static T CreateObject<T>( SerializedData data, IForwardReferenceMap l )
         {
-            Guid id = data[KeyNames.ID].AsGuid();
-
             Type type;
 
+#warning TODO - this probably shouldn't be here.
             if( data.TryGetValue( KeyNames.TYPE, out var t ) )
             {
                 type = t.AsType();
@@ -41,21 +48,35 @@ namespace UnityPlus.Serialization
                 type = typeof( T );
             }
 
-            object obj = null;
             if( _cache.TryGetClosest( type, out var factoryFunc ) )
             {
-                obj = factoryFunc.Invoke( type, l );
+                if( type.IsConstructedGenericType && !factoryFunc.isConstructedGeneric )
+                {
+                    Type[] genericArguments = type.GetGenericArguments();
+
+                    // cache will initially return you the unconstructed method (because constructed ones don't exist).
+                    MethodInfo method = factoryFunc.factory.Method;
+                    MethodInfo genericMethod = method.MakeGenericMethod( genericArguments );
+
+                    factoryFunc.factory = Delegate.CreateDelegate( ..., genericMethod );
+                    factoryFunc.isConstructedGeneric = true;
+
+                    _cache.Set( type, factoryFunc );
+                }
+
                 // Every factory method should add its created instances to the IForwardReferenceMap.
                 // Thus, we don't register it here.
-            }
-            else
-            {
-                // Default factory.
-                obj = Activator.CreateInstance( type );
-                l.SetObj( id, obj );
+                return (T)factoryFunc.factory.DynamicInvoke( data, l );
             }
 
-            return (T)obj;
+            T obj = (T)Activator.CreateInstance( type );
+
+            if( data.TryGetValue( KeyNames.ID, out var id ) )
+            {
+                l.SetObj( id.AsGuid(), obj );
+            }
+
+            return obj;
         }
     }
 }

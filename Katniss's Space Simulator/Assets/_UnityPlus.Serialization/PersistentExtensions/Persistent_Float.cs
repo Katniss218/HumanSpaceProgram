@@ -11,7 +11,7 @@ namespace UnityPlus.Serialization
     public static class Persistent_Float
     {
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static SerializedData GetData( this float value, IReverseReferenceMap s = null )
+        public static SerializedData AsSerialized( this float value, IReverseReferenceMap s = null )
         {
             return (SerializedPrimitive)value;
         }

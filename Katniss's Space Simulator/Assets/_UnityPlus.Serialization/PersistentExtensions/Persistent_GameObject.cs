@@ -71,7 +71,8 @@ namespace UnityPlus.Serialization
 
 		public static GameObject AsGameObject( this SerializedObject data, IForwardReferenceMap l )
 		{
-            // assume that data[KeyNames.TYPE] is equal to typeof(GameObject), or not present (since this method is called recursively, and child gameobjects won't have it anyway).
+            // Assume that data[KeyNames.TYPE] is equal to typeof(GameObject), or not present.
+			// There's nothing that derives from GameObject anyway, so we don't have to create some other child class anyway.
 
             Guid objectGuid = data[KeyNames.ID].AsGuid();
 

@@ -45,14 +45,10 @@ namespace KSS.Components
 
         public virtual SerializedObject GetObjects( IReverseReferenceMap s )
         {
-            SerializedObject data = Persistent_object.WriteObjectStub( this, this.GetType(), s );
-
-            data.AddAll( new SerializedObject()
+            return new SerializedObject()
             {
-                { "actions", new SerializedArray( Actions.Select( a => a.GetObjects( s ) ) ) }
-            } );
-
-            return data;
+                { "actions", new SerializedArray( Actions.Select( a => a.AsSerializedTyped( s ) ) ) }
+            };
         }
 
         public virtual void SetObjects( SerializedObject data, IForwardReferenceMap l )
@@ -60,11 +56,11 @@ namespace KSS.Components
             if( data.TryGetValue<SerializedArray>( "actions", out var actions ) )
             {
                 Actions = new();
-                foreach( var act in actions.Cast<SerializedObject>() )
+                foreach( var serializedAction in actions.Cast<SerializedObject>() )
                 {
-                    SequenceActionBase action = act.AsObject<SequenceActionBase>( l );
+                    SequenceActionBase action = serializedAction.AsObjectTyped<SequenceActionBase>( l );
 
-                    action.SetObjects( act, l );
+                    action.SetObjects( serializedAction, l );
 
                     Actions.Add( action );
                 }
@@ -152,7 +148,7 @@ namespace KSS.Components
 
             ret.AddAll( new SerializedObject()
             {
-                { "delay", this.Delay.GetData() },
+                { "delay", this.Delay.AsSerialized() },
                 { "start_ut", this._startUT.GetData() }
             } );
 

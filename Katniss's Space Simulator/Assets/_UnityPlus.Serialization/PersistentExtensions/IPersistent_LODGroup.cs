@@ -25,14 +25,14 @@ namespace UnityPlus.Serialization
 
                 lodsArray.Add( new SerializedObject()
                 {
-                    { "percent", lod.screenRelativeTransitionHeight.GetData() },
+                    { "percent", lod.screenRelativeTransitionHeight.AsSerialized() },
                     { "renderers", renderersArray }
                 } );
             }
             return new SerializedObject()
             {
                 { "lods", lodsArray },
-                { "size", lg.size.GetData() }
+                { "size", lg.size.AsSerialized() }
             };
         }
 

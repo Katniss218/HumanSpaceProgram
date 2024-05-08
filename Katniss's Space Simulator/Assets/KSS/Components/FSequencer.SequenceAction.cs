@@ -44,7 +44,7 @@ namespace KSS.Components
 
         public override SerializedObject GetObjects( IReverseReferenceMap s )
         {
-            SerializedObject data = Persistent_object.WriteObjectStub( this, this.GetType(), s );
+            SerializedObject data = Persistent_object.WriteObjectTyped( this, this.GetType(), s );
 
             data.AddAll( new SerializedObject()
             {
@@ -93,7 +93,7 @@ namespace KSS.Components
 
         public override SerializedObject GetObjects( IReverseReferenceMap s )
         {
-            SerializedObject data = Persistent_object.WriteObjectStub( this, this.GetType(), s );
+            SerializedObject data = Persistent_object.WriteObjectTyped( this, this.GetType(), s );
 
             data.AddAll( new SerializedObject()
             {
@@ -123,8 +123,10 @@ namespace KSS.Components
         {
             if( data.TryGetValue( "signal_value", out var signalValue ) )
             {
-                SignalValue = Activator.CreateInstance<T>(); // TODO - Provide a way of inline serialization. Maybe via 'new()' constraint.
-                SignalValue.SetData( signalValue, l );
+#warning TODO - support value type instantiation from inline data.
+                SignalValue = ObjectFactory.AsObject<T>( signalValue, l );
+
+                //SignalValue.SetData( signalValue, l );
             }
         }
     }
