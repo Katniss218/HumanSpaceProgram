@@ -209,24 +209,30 @@ namespace KSS.Components
         {
             SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
 
-            SerializedArray arr = new SerializedArray();
-            foreach( var kvp in _cachedData )
-            {
-                arr.Add( new SerializedObject()
-                {
-                    { "object", s.WriteObjectReference( kvp.Key ) },
-                    { "forward", kvp.Value.fwd },
-                    { "reverse", kvp.Value.rev }
-                } );
-            }
-
             ret.AddAll( new SerializedObject()
             {
-                { "cached_data", arr },
                 { "build_points", BuildPoints.GetData() },
                 { "max_build_points", MaxBuildPoints.GetData() },
                 // todo - conditions.
             } );
+
+            SerializedArray arr = new SerializedArray();
+            if( _cachedData != null )
+            {
+                foreach( var kvp in _cachedData )
+                {
+                    arr.Add( new SerializedObject()
+                    {
+                        { "object", s.WriteObjectReference( kvp.Key ) },
+                        { "forward", kvp.Value.fwd },
+                        { "reverse", kvp.Value.rev }
+                    } );
+                }
+                ret.AddAll( new SerializedObject()
+                {
+                    { "cached_data", arr },
+                } );
+            }
 
             return ret;
         }

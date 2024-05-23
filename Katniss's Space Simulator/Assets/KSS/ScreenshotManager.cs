@@ -18,7 +18,12 @@ namespace KSS
         /// </summary>
         public static string GetScreenshotDirectoryPath()
         {
-            return Path.Combine( HumanSpaceProgram.GetBaseDirectoryPath(), ScreenshotsDirectoryName );
+            string path = Path.Combine( HumanSpaceProgram.GetBaseDirectoryPath(), ScreenshotsDirectoryName );
+
+            if( !Directory.Exists( path ) )
+                Directory.CreateDirectory( path );
+
+            return path;
         }
 
         void OnEnable()

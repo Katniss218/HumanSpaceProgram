@@ -49,7 +49,12 @@ namespace KSS.Core
         /// </summary>
         public static string GetSaveDirectoryPath()
         {
-            return Path.Combine( GetBaseDirectoryPath(), SavesDirectoryName );
+            string path = Path.Combine( GetBaseDirectoryPath(), SavesDirectoryName );
+
+            if( !Directory.Exists( path ) )
+                Directory.CreateDirectory( path );
+
+            return path;
         }
 
         /// <summary>
@@ -62,7 +67,12 @@ namespace KSS.Core
         /// </summary>
         public static string GetSavedVesselsDirectoryPath()
         {
-            return Path.Combine( GetBaseDirectoryPath(), VesselsDirectoryName );
+            string path = Path.Combine( GetBaseDirectoryPath(), VesselsDirectoryName );
+
+            if( !Directory.Exists( path ) )
+                Directory.CreateDirectory( path );
+
+            return path;
         }
     }
 }

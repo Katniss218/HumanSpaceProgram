@@ -128,6 +128,7 @@
     <Compile Include="Assets\_UnityPlus.Serialization\Json\JsonStringWriter.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\ReferenceMaps\ReferenceMap_Ex.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\SerializedObject.cs" />
+    <Compile Include="Assets\_UnityPlus.Serialization\PersistentExtensions\Persistent_Enum.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\PersistentExtensions\Persistent_Vector2Int.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\PreexistingReference.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Strategies\AssetGameObjectsStrategy.cs" />
@@ -142,7 +143,6 @@
     <Compile Include="Assets\_UnityPlus.Serialization\IReferenceMap.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Persistent_object.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\PersistentExtensions\IPersistent_Renderer.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\PersistentExtensions\Persistent_Enum.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_UnityPlus.Serialization\___UnityPlus.Serialization.asmdef" />

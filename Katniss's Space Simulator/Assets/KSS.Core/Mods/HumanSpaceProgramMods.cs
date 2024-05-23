@@ -24,7 +24,12 @@ namespace KSS.Core.Mods
         /// </summary>
         public static string GetModDirectoryPath()
         {
-            return Path.Combine( HumanSpaceProgram.GetBaseDirectoryPath(), GameDataDirectoryName );
+            string path = Path.Combine( HumanSpaceProgram.GetBaseDirectoryPath(), GameDataDirectoryName );
+
+            if( !Directory.Exists( path ) )
+                Directory.CreateDirectory( path );
+
+            return path;
         }
 
         private static void LoadAssembliesRecursive( string path )
