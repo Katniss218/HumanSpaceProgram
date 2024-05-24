@@ -31,17 +31,7 @@ namespace UnityPlus.Serialization
             ///    Loop through every object and save its persistent data.
             ///    When serializing a reference, ask what the ID of that object is by passing the object to the `RegisterOrGet` method.
             /// </summary>
-            SavingData,
-
-            /// <summary>
-            /// 2. Save object instances (references).
-            ///    Loop through these objects again, and save them, along with their IDs (if referenced by anything).
-            ///    Use the object registry to get the IDs of objects that have been assigned to them in step 1.
-            /// </summary>
-            SavingObjects
-
-            // This setup lets us know what objects are referenced by something before we start saving those potentially-referenced objects.
-            // It also lets us decouple the instances from their data.
+            Saving,
         }
 
         /// <summary>

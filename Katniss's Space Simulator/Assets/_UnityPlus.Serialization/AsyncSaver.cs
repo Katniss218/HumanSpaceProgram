@@ -18,14 +18,13 @@ namespace UnityPlus.Serialization
     public sealed class AsyncSaver : IAsyncSaver
     {
         public float CurrentActionPercentCompleted { get; set; }
-        public float TotalPercentCompleted => (_completedActions + CurrentActionPercentCompleted) / (_objectActions.Count + _dataActions.Count);
+        public float TotalPercentCompleted => (_completedActions + CurrentActionPercentCompleted) / _passes.Count;
 
         int _completedActions;
 
         public ISaver.State CurrentState { get; private set; }
 
-        List<IAsyncSaver.Action> _dataActions;
-        List<IAsyncSaver.Action> _objectActions;
+        List<IAsyncSaver.Action> _passes;
 
         Action _startFunc;
         Action _finishFunc;
@@ -34,7 +33,7 @@ namespace UnityPlus.Serialization
 
         /// <param name="startFunc">A function delegate that can pause the game completely.</param>
         /// <param name="finishFunc">A function delegate that can unpause the game, and bring it to its previous state.</param>
-        public AsyncSaver( IReverseReferenceMap refMap, Action startFunc, Action finishFunc, IAsyncSaver.Action objectAction, IAsyncSaver.Action dataAction )
+        public AsyncSaver( IReverseReferenceMap refMap, Action startFunc, Action finishFunc, IAsyncSaver.Action passes )
         {
             if( startFunc == null )
                 throw new ArgumentNullException( nameof( startFunc ), $"Start delegate can't be null. {nameof( AsyncSaver )} requires the function to pause to deserialize correctly." );
@@ -44,13 +43,12 @@ namespace UnityPlus.Serialization
             this.RefMap = refMap;
             this._startFunc = startFunc;
             this._finishFunc = finishFunc;
-            this._objectActions = new List<IAsyncSaver.Action>() { objectAction };
-            this._dataActions = new List<IAsyncSaver.Action>() { dataAction };
+            this._passes = new List<IAsyncSaver.Action>() { passes };
         }
 
         /// <param name="startFunc">A function delegate that can pause the game completely.</param>
         /// <param name="finishFunc">A function delegate that can unpause the game, and bring it to its previous state.</param>
-        public AsyncSaver( IReverseReferenceMap refMap, Action startFunc, Action finishFunc, IEnumerable<IAsyncSaver.Action> objectActions, IEnumerable<IAsyncSaver.Action> dataActions )
+        public AsyncSaver( IReverseReferenceMap refMap, Action startFunc, Action finishFunc, IEnumerable<IAsyncSaver.Action> passes )
         {
             if( startFunc == null )
                 throw new ArgumentNullException( nameof( startFunc ), $"Start delegate can't be null. {nameof( AsyncSaver )} requires the function to pause to deserialize correctly." );
@@ -60,8 +58,7 @@ namespace UnityPlus.Serialization
             this.RefMap = refMap;
             this._startFunc = startFunc;
             this._finishFunc = finishFunc;
-            this._objectActions = new List<IAsyncSaver.Action>( objectActions );
-            this._dataActions = new List<IAsyncSaver.Action>( dataActions );
+            this._passes = new List<IAsyncSaver.Action>( passes );
         }
 
         //
@@ -76,29 +73,19 @@ namespace UnityPlus.Serialization
 #if DEBUG
             Debug.Log( "Saving..." );
 #endif
-            CurrentState = ISaver.State.SavingData;
-            //ClearReferenceRegistry();
+            CurrentState = ISaver.State.Saving;
             _startFunc?.Invoke();
             _completedActions = 0;
             CurrentActionPercentCompleted = 0.0f;
 
             // Should save data before objects, because data will add the objects that are referenced to the registry.
-            foreach( var func in _dataActions )
-            {
-                yield return coroutineContainer.StartCoroutine( func( this.RefMap ) );
-                _completedActions++;
-            }
-
-            CurrentState = ISaver.State.SavingObjects;
-
-            foreach( var func in _objectActions )
+            foreach( var func in _passes )
             {
                 yield return coroutineContainer.StartCoroutine( func( this.RefMap ) );
                 _completedActions++;
             }
 
             _finishFunc?.Invoke();
-            //ClearReferenceRegistry();
             CurrentState = ISaver.State.Idle;
 #if DEBUG
             Debug.Log( "Finished Saving" );

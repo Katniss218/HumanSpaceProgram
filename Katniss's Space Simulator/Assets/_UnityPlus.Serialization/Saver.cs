@@ -15,48 +15,43 @@ namespace UnityPlus.Serialization
     {
         ISaver.State _currentState;
 
-        List<ISaver.Action> _dataActions;
-        List<ISaver.Action> _objectActions;
+        List<ISaver.Action> _passes;
 
         Action _startFunc;
         Action _finishFunc;
 
         public IReverseReferenceMap RefMap { get; set; }
 
-        public Saver( IReverseReferenceMap refMap, ISaver.Action objectAction, ISaver.Action dataAction )
+        public Saver( IReverseReferenceMap refMap, ISaver.Action pass )
         {
             this.RefMap = refMap;
             this._startFunc = null;
             this._finishFunc = null;
-            this._objectActions = new List<ISaver.Action>() { objectAction };
-            this._dataActions = new List<ISaver.Action>() { dataAction };
+            this._passes = new List<ISaver.Action>() { pass };
         }
         
-        public Saver( IReverseReferenceMap refMap, Action startFunc, Action finishFunc, ISaver.Action objectAction, ISaver.Action dataAction )
+        public Saver( IReverseReferenceMap refMap, Action startFunc, Action finishFunc, ISaver.Action pass )
         {
             this.RefMap = refMap;
             this._startFunc = startFunc;
             this._finishFunc = finishFunc;
-            this._objectActions = new List<ISaver.Action>() { objectAction };
-            this._dataActions = new List<ISaver.Action>() { dataAction };
+            this._passes = new List<ISaver.Action>() { pass };
         }
 
-        public Saver( IReverseReferenceMap refMap, IEnumerable<ISaver.Action> objectActions, IEnumerable<ISaver.Action> dataActions )
+        public Saver( IReverseReferenceMap refMap, IEnumerable<ISaver.Action> passes )
         {
             this.RefMap = refMap;
             this._startFunc = null;
             this._finishFunc = null;
-            this._objectActions = new List<ISaver.Action>( objectActions );
-            this._dataActions = new List<ISaver.Action>( dataActions );
+            this._passes = new List<ISaver.Action>( passes );
         }
 
-        public Saver( IReverseReferenceMap refMap, Action startFunc, Action finishFunc, IEnumerable<ISaver.Action> objectActions, IEnumerable<ISaver.Action> dataActions )
+        public Saver( IReverseReferenceMap refMap, Action startFunc, Action finishFunc, IEnumerable<ISaver.Action> passes )
         {
             this.RefMap = refMap;
             this._startFunc = startFunc;
             this._finishFunc = finishFunc;
-            this._objectActions = new List<ISaver.Action>( objectActions );
-            this._dataActions = new List<ISaver.Action>( dataActions );
+            this._passes = new List<ISaver.Action>( passes );
         }
 
         //
@@ -71,24 +66,15 @@ namespace UnityPlus.Serialization
 #if DEBUG
             Debug.Log( "Saving..." );
 #endif
-            _currentState = ISaver.State.SavingData;
-            //ClearReferenceRegistry();
+            _currentState = ISaver.State.Saving;
             _startFunc?.Invoke();
 
-            foreach( var action in _dataActions )
-            {
-                action?.Invoke( this.RefMap );
-            }
-
-            _currentState = ISaver.State.SavingObjects;
-
-            foreach( var action in _objectActions )
+            foreach( var action in _passes )
             {
                 action?.Invoke( this.RefMap );
             }
 
             _finishFunc?.Invoke();
-            //ClearReferenceRegistry();
             _currentState = ISaver.State.Idle;
 #if DEBUG
             Debug.Log( "Finished Saving" );

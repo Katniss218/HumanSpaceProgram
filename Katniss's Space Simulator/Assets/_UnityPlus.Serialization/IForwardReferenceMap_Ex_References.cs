@@ -7,27 +7,29 @@ namespace UnityPlus.Serialization
 	public static class IForwardReferenceMap_Ex_References
 	{
 		[MethodImpl( MethodImplOptions.AggressiveInlining )]
-		public static object ReadObjectReference( this IForwardReferenceMap l, SerializedData data )
-		{
-			// should only be called in data actions.
+		public static T ReadObjectReference<T>( this IForwardReferenceMap l, SerializedData data ) where T : class
+        {
+			if( data == null )
+				return null;
 
-			// A missing '$ref' node means the reference couldn't save properly.
-
-			if( ((SerializedObject)data).TryGetValue( KeyNames.REF, out SerializedData refData ) )
+			if( data.TryGetValue( KeyNames.REF, out SerializedData refData ) )
 			{
-				Guid guid = refData.AsGuid();
+				Guid guid = refData.DeserializeGuid();
 
-				return l.GetObj( guid );
+				return l.GetObj( guid ) as T;
 			}
 			return null;
 		}
 
 		[MethodImpl( MethodImplOptions.AggressiveInlining )]
 		public static T ReadAssetReference<T>( this IForwardReferenceMap l, SerializedData data ) where T : class
-		{
-			if( ((SerializedObject)data).TryGetValue( KeyNames.ASSETREF, out SerializedData refData ) )
+        {
+            if( data == null )
+                return null;
+
+            if( data.TryGetValue( KeyNames.ASSETREF, out SerializedData refData ) )
 			{
-				string assetID = refData.AsString();
+				string assetID = (string)refData;
 
 				return AssetRegistry.Get<T>( assetID );
 			}

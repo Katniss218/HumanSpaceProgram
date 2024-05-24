@@ -66,7 +66,7 @@ namespace UnityPlus.Serialization.ReferenceMaps
             if( obj.IsUnityNull() || id == Guid.Empty )
                 return;
 
-            _reverse.Add( obj, id );
+            _reverse[obj] = id;
         }
     }
 }

@@ -38,7 +38,7 @@ namespace UnityPlus.Serialization
             /// 2. Applying data to the created objects.  <br />
             ///    After every referencable object has been created, we can load the things that reference them. In practice, this means we apply *all* data after everything has been created.
             /// </summary>
-            LoadingData
+            LoadingReferences
 
             // This setup disallows reading references while the objects are being created,
             // but lets us be sure that when we start reading them later, every reference that can be referenced will exist.

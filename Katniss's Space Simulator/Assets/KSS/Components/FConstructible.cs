@@ -183,7 +183,8 @@ namespace KSS.Components
                         // This should probably be signified differently than by a null, but it works for now.
                         if( originalToGhost != null )
                         {
-                            SerializedData ghostToOriginal = comp.GetData( _cachedRefStore );
+                            var mapping = SerializationMappingRegistry.GetMappingOrDefault<Component>( comp );
+                            SerializedData ghostToOriginal = mapping.Save( comp, _cachedRefStore );
 
                             // TODO - remove keys from revObj, that aren't present in forwardObj.
                             /*if( originalToGhost is SerializedObject forwardObj && ghostToOriginal is SerializedObject revObj )

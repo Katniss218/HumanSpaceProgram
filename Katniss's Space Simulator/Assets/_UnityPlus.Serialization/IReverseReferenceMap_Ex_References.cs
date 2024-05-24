@@ -7,40 +7,40 @@ namespace UnityPlus.Serialization
 	public static class IReverseReferenceMap_Ex_References
 	{
 		[MethodImpl( MethodImplOptions.AggressiveInlining )]
-		public static SerializedData WriteObjectReference( this IReverseReferenceMap s, object value )
+		public static SerializedData WriteObjectReference<T>( this IReverseReferenceMap s, T value ) where T : class
 		{
 			// A missing '$ref' node means the reference is broken.
 
 			if( value == null )
-			{
-				return new SerializedObject();
-			}
+            {
+                return null;
+            }
 
 			Guid guid = s.GetID( value );
 
 			return new SerializedObject()
 			{
-				{ KeyNames.REF, guid.GetData() }
+				{ KeyNames.REF, guid.SerializeGuid() }
 			};
 		}
 
 		[MethodImpl( MethodImplOptions.AggressiveInlining )]
-		public static SerializedObject WriteAssetReference( this IReverseReferenceMap s, object assetRef )
-		{
+		public static SerializedObject WriteAssetReference<T>( this IReverseReferenceMap s, T assetRef ) where T : class
+        {
 			if( assetRef == null )
 			{
-				return new SerializedObject();
+				return null;
 			}
 
 			string assetID = AssetRegistry.GetAssetID( assetRef );
 			if( assetID == null )
-			{
-				return new SerializedObject();
-			}
+            {
+				return null;
+            }
 
 			return new SerializedObject()
 			{
-				{ KeyNames.ASSETREF, assetID.GetData() }
+				{ KeyNames.ASSETREF, assetID }
 			};
 		}
 	}

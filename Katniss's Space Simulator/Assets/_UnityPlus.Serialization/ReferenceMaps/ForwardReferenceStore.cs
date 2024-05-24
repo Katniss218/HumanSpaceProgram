@@ -60,7 +60,7 @@ namespace UnityPlus.Serialization.ReferenceMaps
             if( id == Guid.Empty || obj.IsUnityNull() )
                 return;
 
-            _forward.Add( id, obj );
+            _forward[id] = obj;
         }
     }
 }

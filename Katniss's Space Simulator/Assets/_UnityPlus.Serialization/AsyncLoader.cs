@@ -18,14 +18,14 @@ namespace UnityPlus.Serialization
     public sealed class AsyncLoader : IAsyncLoader
     {
         public float CurrentActionPercentCompleted { get; set; }
-        public float TotalPercentCompleted => (_completedActions + CurrentActionPercentCompleted) / (_objectActions.Count + _dataActions.Count);
+        public float TotalPercentCompleted => (_completedActions + CurrentActionPercentCompleted) / (_objectPasses.Count + _referencePasses.Count);
 
         int _completedActions;
 
         public ILoader.State CurrentState { get; private set; }
 
-        List<IAsyncLoader.Action> _objectActions;
-        List<IAsyncLoader.Action> _dataActions;
+        List<IAsyncLoader.Action> _objectPasses;
+        List<IAsyncLoader.Action> _referencePasses;
 
         Action _startFunc;
         Action _finishFunc;
@@ -34,7 +34,7 @@ namespace UnityPlus.Serialization
 
         /// <param name="startFunc">A function delegate that can pause the game completely.</param>
         /// <param name="finishFunc">A function delegate that can unpause the game, and bring it to its previous state.</param>
-        public AsyncLoader( IForwardReferenceMap refMap, Action startFunc, Action finishFunc, IAsyncLoader.Action objectAction, IAsyncLoader.Action dataAction )
+        public AsyncLoader( IForwardReferenceMap refMap, Action startFunc, Action finishFunc, IAsyncLoader.Action objectPass, IAsyncLoader.Action referencePass )
         {
             if( startFunc == null )
                 throw new ArgumentNullException( nameof( startFunc ), $"Start delegate can't be null. {nameof( AsyncLoader )} requires the function to pause to serialize correctly." );
@@ -44,13 +44,13 @@ namespace UnityPlus.Serialization
             this.RefMap = refMap;
             this._startFunc = startFunc;
             this._finishFunc = finishFunc;
-            this._objectActions = new List<IAsyncLoader.Action>() { objectAction };
-            this._dataActions = new List<IAsyncLoader.Action>() { dataAction };
+            this._objectPasses = new List<IAsyncLoader.Action>() { objectPass };
+            this._referencePasses = new List<IAsyncLoader.Action>() { referencePass };
         }
 
         /// <param name="startFunc">A function delegate that can pause the game completely.</param>
         /// <param name="finishFunc">A function delegate that can unpause the game, and bring it to its previous state.</param>
-        public AsyncLoader( IForwardReferenceMap refMap, Action startFunc, Action finishFunc, IEnumerable<IAsyncLoader.Action> objectActions, IEnumerable<IAsyncLoader.Action> dataActions )
+        public AsyncLoader( IForwardReferenceMap refMap, Action startFunc, Action finishFunc, IEnumerable<IAsyncLoader.Action> objectPasses, IEnumerable<IAsyncLoader.Action> referencePasses )
         {
             if( startFunc == null )
                 throw new ArgumentNullException( nameof( startFunc ), $"Start delegate can't be null. {nameof( AsyncLoader )} requires the function to pause to serialize correctly." );
@@ -60,8 +60,8 @@ namespace UnityPlus.Serialization
             this.RefMap = refMap;
             this._startFunc = startFunc;
             this._finishFunc = finishFunc;
-            this._objectActions = new List<IAsyncLoader.Action>( objectActions );
-            this._dataActions = new List<IAsyncLoader.Action>( dataActions );
+            this._objectPasses = new List<IAsyncLoader.Action>( objectPasses );
+            this._referencePasses = new List<IAsyncLoader.Action>( referencePasses );
         }
 
         //
@@ -74,27 +74,25 @@ namespace UnityPlus.Serialization
             Debug.Log( "Loading..." );
 #endif
             CurrentState = ILoader.State.LoadingObjects;
-            //ClearReferenceRegistry();
             _startFunc();
             _completedActions = 0;
             CurrentActionPercentCompleted = 0.0f;
 
-            foreach( var func in _objectActions )
+            foreach( var func in _objectPasses )
             {
                 yield return coroutineContainer.StartCoroutine( func( this.RefMap ) );
                 _completedActions++;
             }
 
-            CurrentState = ILoader.State.LoadingData;
+            CurrentState = ILoader.State.LoadingReferences;
 
-            foreach( var func in _dataActions )
+            foreach( var func in _referencePasses )
             {
                 yield return coroutineContainer.StartCoroutine( func( this.RefMap ) );
                 _completedActions++;
             }
 
             _finishFunc();
-            //ClearReferenceRegistry();
             CurrentState = ILoader.State.Idle;
 #if DEBUG
             Debug.Log( "Finished Loading" );
