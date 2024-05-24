@@ -41,6 +41,8 @@ namespace KSS.Core.Serialization
         {
             public string timelineId;
             public string saveId;
+
+#warning TODO - replace with something else. Possibly just calling a deserialize directly, right?
             /// <summary>
             /// Use these to add load actions of the object stage.
             /// </summary>

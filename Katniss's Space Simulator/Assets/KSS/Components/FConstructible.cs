@@ -13,7 +13,7 @@ using UnityPlus.Serialization.ReferenceMaps;
 
 namespace KSS.Components
 {
-    public interface IConstructionCondition : IPersistsData
+    public interface IConstructionCondition
     {
         /// <summary>
         /// Checks what the build speed multiplier for a constructible at a given position would be.
@@ -30,19 +30,17 @@ namespace KSS.Components
             // get all cranes which range and position overlaps with the scene position.
             throw new NotImplementedException();
         }
+    }
 
-        public SerializedData GetData( IReverseReferenceMap s )
+    public static class CraneBuildCondition_Mapping
+    {
+        [SerializationMappingProvider( typeof( CraneBuildCondition ) )]
+        public static SerializationMapping CraneBuildConditionMapping()
         {
-            return new SerializedObject()
+            return new CompoundSerializationMapping<CraneBuildCondition>()
             {
-                { "min_lift_capacity", this.minLiftCapacity.AsSerialized() }
+                ("min_lift_capacity", new Member<CraneBuildCondition, float>( o => o.minLiftCapacity ))
             };
-        }
-
-        public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            if( data.TryGetValue( "min_lift_capacity", out var minLiftCapacity ) )
-                this.minLiftCapacity = minLiftCapacity.AsFloat();
         }
     }
 
@@ -55,7 +53,7 @@ namespace KSS.Components
     /// <summary>
     /// Represents a "part" (hierarchy of gameobjects) that can be in various stages of construction.
     /// </summary>
-    public class FConstructible : MonoBehaviour, IPersistsData
+    public class FConstructible : MonoBehaviour
     {
         [SerializeField]
         private float _buildPoints;
@@ -135,7 +133,8 @@ namespace KSS.Components
         {
             foreach( var kvp in _cachedData )
             {
-                kvp.Key.SetData( kvp.Value.fwd, _cachedRefStore );
+#warning TODO - finish here
+               // kvp.Key.SetData( kvp.Value.fwd, _cachedRefStore );
             }
         }
 
@@ -143,7 +142,8 @@ namespace KSS.Components
         {
             foreach( var (component, data) in _cachedData )
             {
-                component.SetData( data.rev, _cachedRefStore );
+#warning TODO - finish here
+                // component.SetData( data.rev, _cachedRefStore );
             }
         }
 
@@ -205,7 +205,7 @@ namespace KSS.Components
         //
         //
         //
-
+        /*
         public SerializedData GetData( IReverseReferenceMap s )
         {
             SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
@@ -231,8 +231,6 @@ namespace KSS.Components
             ret.AddAll( new SerializedObject()
             {
                 { "cached_data", arr },
-                { "build_points", BuildPoints.AsSerialized() },
-                { "max_build_points", MaxBuildPoints.AsSerialized() },
                 // todo - conditions.
             } );
 
@@ -261,7 +259,20 @@ namespace KSS.Components
             if( data.TryGetValue( "build_points", out var buildPoints ) )
                 _buildPoints = buildPoints.AsFloat();
 
-            // todo - conditions.
+        }
+        */
+        [SerializationMappingProvider( typeof( FConstructible ) )]
+        public static SerializationMapping FConstructibleMapping()
+        {
+            return new CompoundSerializationMapping<FConstructible>()
+            {
+                ("cached_data", new Member<FConstructible, Dictionary<Component, (SerializedData fwd, SerializedData rev)>>( o => o._cachedData )),
+                ("max_build_points", new Member<FConstructible, float>( o => o._maxBuildPoints )),
+                ("build_points", new Member<FConstructible, float>( o => o._buildPoints ))
+                // todo - conditions.
+            }
+            .UseBaseTypeFactory()
+            .IncludeMembers<Behaviour>();
         }
     }
 }

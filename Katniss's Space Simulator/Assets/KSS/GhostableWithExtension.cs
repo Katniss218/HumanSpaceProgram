@@ -6,6 +6,7 @@ namespace KSS
 {
     public static class GhostableWithExtension
     {
+#warning TODO - replace with serialization contexts.
         private static readonly ExtensionMap _extensionGetGhostDatas = new ExtensionMap( nameof( IGhostable.GetGhostData ), typeof( SerializedData ), typeof( IReverseReferenceMap ) );
 
         private static bool _isInitialized = false;

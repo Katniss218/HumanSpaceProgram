@@ -8,7 +8,6 @@ using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.DataHandlers;
-using UnityPlus.Serialization.Strategies;
 
 namespace KSS.Core
 {
@@ -46,6 +45,7 @@ namespace KSS.Core
         //      SERIALIZATION OF MANAGERS - this can be moved to its own class.
         //
 
+#warning TODO - change.
         private static readonly JsonSeparateFileSerializedDataHandler _managersDataHandler = new JsonSeparateFileSerializedDataHandler();
         private static readonly PreexistingGameObjectsStrategy _managersStrat = new PreexistingGameObjectsStrategy( _managersDataHandler, GetAllManagerGameObjects );
 

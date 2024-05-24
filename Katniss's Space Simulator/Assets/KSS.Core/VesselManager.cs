@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.DataHandlers;
-using UnityPlus.Serialization.Strategies;
 
 namespace KSS.Core
 {
@@ -17,7 +16,7 @@ namespace KSS.Core
     /// Manages loading, unloading, switching, etc of vessels.
     /// </summary>
     [RequireComponent( typeof( PreexistingReference ) )]
-    public class VesselManager : SingletonMonoBehaviour<VesselManager>, IPersistsData
+    public class VesselManager : SingletonMonoBehaviour<VesselManager>
     {
         private List<Vessel> _vessels = new List<Vessel>();
 
@@ -64,25 +63,6 @@ namespace KSS.Core
             HSPEvent.EventManager.TryInvoke( HSPEvent.GAMEPLAY_AFTER_VESSEL_UNREGISTERED, vessel );
         }
 
-        public SerializedData GetData( IReverseReferenceMap s )
-        {
-            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
-
-            //ret.AddAll( new SerializedObject()
-
-            return ret;
-        }
-
-        public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            IPersistent_Behaviour.SetData( this, data, l );
-
-            //
-        }
-
-        private static readonly JsonSeparateFileSerializedDataHandler _vesselsDataHandler = new JsonSeparateFileSerializedDataHandler();
-        private static readonly ExplicitHierarchyGameObjectsStrategy _vesselsStrat = new ExplicitHierarchyGameObjectsStrategy( _vesselsDataHandler, GetAllRootGameObjects );
-
         private static GameObject[] GetAllRootGameObjects()
         {
             GameObject[] gos = new GameObject[instance._vessels.Count];
@@ -96,9 +76,13 @@ namespace KSS.Core
         [HSPEventListener( HSPEvent.TIMELINE_BEFORE_SAVE, HSPEvent.NAMESPACE_VANILLA + ".serialize_vessels" )]
         private static void OnBeforeSave( TimelineManager.SaveEventData e )
         {
+            JsonSerializedDataHandler _vesselsDataHandler = new JsonSerializedDataHandler();
+
             Directory.CreateDirectory( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels" ) );
             _vesselsDataHandler.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels", "objects.json" );
             _vesselsDataHandler.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels", "data.json" );
+
+            SerializationUnit _vesselsStrat = SerializationUnit.FromObjects( _vesselsDataHandler, GetAllRootGameObjects() );
             e.objectActions.Add( _vesselsStrat.SaveAsync_Object );
             e.dataActions.Add( _vesselsStrat.SaveAsync_Data );
         }
@@ -106,9 +90,13 @@ namespace KSS.Core
         [HSPEventListener( HSPEvent.TIMELINE_BEFORE_LOAD, HSPEvent.NAMESPACE_VANILLA + ".deserialize_vessels" )]
         private static void OnBeforeLoad( TimelineManager.LoadEventData e )
         {
+            JsonSerializedDataHandler _vesselsDataHandler = new JsonSerializedDataHandler();
+
             Directory.CreateDirectory( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels" ) );
             _vesselsDataHandler.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels", "objects.json" );
             _vesselsDataHandler.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels", "data.json" );
+
+            SerializationUnit _vesselsStrat = SerializationUnit.FromData( _vesselsDataHandler, GetAllRootGameObjects );
             e.objectActions.Add( _vesselsStrat.LoadAsync_Object );
             e.dataActions.Add( _vesselsStrat.LoadAsync_Data );
         }
