@@ -14,32 +14,6 @@ namespace KSS.Core
     public static class HumanSpaceProgram
     {
         /// <summary>
-        /// Computes the path to the base directory where Human Space Program is installed.
-        /// </summary>
-        public static string GetBaseDirectoryPath()
-        {
-            string dataPath = Application.dataPath;
-
-            switch( Application.platform )
-            {
-                case RuntimePlatform.WindowsEditor:
-                case RuntimePlatform.LinuxEditor:
-                case RuntimePlatform.OSXEditor:
-                    dataPath = Directory.GetParent( dataPath ).FullName; // "/../";
-                    break;
-                case RuntimePlatform.WindowsPlayer:
-                case RuntimePlatform.LinuxPlayer:
-                    dataPath = Directory.GetParent( dataPath ).FullName; // "/../";
-                    break;
-                case RuntimePlatform.OSXPlayer:
-                    dataPath = Directory.GetParent( dataPath ).Parent.FullName; // "/../../";
-                    break;
-            }
-
-            return dataPath;
-        }
-
-        /// <summary>
         /// The name of the `Saves` directory.
         /// </summary>
         public const string SavesDirectoryName = "Saves";
@@ -49,7 +23,12 @@ namespace KSS.Core
         /// </summary>
         public static string GetSaveDirectoryPath()
         {
-            return Path.Combine( GetBaseDirectoryPath(), SavesDirectoryName );
+            string path = Path.Combine( ApplicationUtils.GetBaseDirectoryPath(), SavesDirectoryName );
+
+            if( !Directory.Exists( path ) )
+                Directory.CreateDirectory( path );
+
+            return path;
         }
 
         /// <summary>
@@ -62,7 +41,12 @@ namespace KSS.Core
         /// </summary>
         public static string GetSavedVesselsDirectoryPath()
         {
-            return Path.Combine( GetBaseDirectoryPath(), VesselsDirectoryName );
+            string path = Path.Combine( ApplicationUtils.GetBaseDirectoryPath(), VesselsDirectoryName );
+
+            if( !Directory.Exists( path ) )
+                Directory.CreateDirectory( path );
+
+            return path;
         }
     }
 }

@@ -209,6 +209,13 @@ namespace KSS.Components
         {
             SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
 
+            ret.AddAll( new SerializedObject()
+            {
+                { "build_points", BuildPoints.GetData() },
+                { "max_build_points", MaxBuildPoints.GetData() },
+                // todo - conditions.
+            } );
+
             SerializedArray arr = new SerializedArray();
             foreach( var kvp in _cachedData )
             {

@@ -10,10 +10,10 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{53A4B44D-C587-1ED0-C944-834EA89508FD}</ProjectGuid>
+    <ProjectGuid>{F4820F2A-92EA-3024-D79A-655F89535A88}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <AssemblyName>_UnityPlus.Serialization</AssemblyName>
+    <AssemblyName>_UnityPlus.Logging</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <BaseDirectory>.</BaseDirectory>
@@ -58,53 +58,11 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\_UnityPlus.Serialization\ReferenceMaps\ForwardReferenceStore.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\IReverseReferenceMap_Ex_References.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\AsyncSaver.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\ISerializedDataHandler.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\ILoader.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\IForwardReferenceMap_Ex_References.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\SerializedPrimitive.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\Loader.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\Json\JsonStreamWriter.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\SerializedData.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\ISaver.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\Mappings\Persistent_Delegate.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\SerializedArray.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\DataHandlers\JsonSerializedDataHandler.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\Json\JsonStringReader.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\ReferenceMaps\BidirectionalReferenceStore.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\ReferenceMaps\ReverseReferenceStore.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\Json\JsonStringWriter.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\ReferenceMaps\ReferenceMap_Ex.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\SerializedObject.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\PreexistingReference.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\Saver.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\KeyNames.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\AsyncLoader.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\IReverseReferenceMap.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\SerializationUnit.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\Mappings\MemberBase.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\Mappings\Persistent_Type.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\Mappings\EmptySerializationMapping.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\Mappings\MemberAsset.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\Mappings\MemberReference.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\Mappings\Persistent_Guid.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\Mappings\DirectSerializationMapping.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\Mappings\SerializationMapping.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\Mappings\AccessorUtils.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\Mappings\PassthroughMember.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\IForwardReferenceMap.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\Mappings\IMappedMember.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\Mappings\SerializationMappingRegistry.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\Mappings\SerializationMappingProviderAttribute.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\Mappings\CompoundSerializationMapping.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\Mappings\Mappings.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\Mappings\IMappedReferenceMember.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\Mappings\Member.cs" />
+    <Compile Include="Assets\_UnityPlus.Logging\LogFileOutput.cs" />
+    <Compile Include="Assets\_UnityPlus.Logging\LogUIOutput.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\_UnityPlus.Serialization\___UnityPlus.Serialization.asmdef" />
+    <None Include="Assets\_UnityPlus.Logging\___UnityPlus.Logging.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -956,10 +914,6 @@
     <ProjectReference Include="_UnityEngine.csproj">
       <Project>{AA320F23-E273-CF3D-ECC5-E3B3EE38E655}</Project>
       <Name>_UnityEngine</Name>
-    </ProjectReference>
-    <ProjectReference Include="_UnityPlus.AssetManagement.csproj">
-      <Project>{1082B390-7315-9D8E-BF58-53BE9AF2F68A}</Project>
-      <Name>_UnityPlus.AssetManagement</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
