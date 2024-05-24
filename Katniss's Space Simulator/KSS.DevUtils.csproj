@@ -60,7 +60,6 @@
   <ItemGroup>
     <Compile Include="Assets\KSS.DevUtils\DevUtilsGameplayManager.cs" />
     <Compile Include="Assets\KSS.DevUtils\AIRFRotationFixer.cs" />
-    <Compile Include="Assets\KSS.DevUtils\FileLogOutput.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.DevUtils\WireframeSimpleQuad.shader" />

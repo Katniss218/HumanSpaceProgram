@@ -1,20 +1,31 @@
-using KSS.Core;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Numerics;
 using UnityEngine;
 
-namespace UnityPlus.Console
+namespace UnityPlus.Logging
 {
     [DisallowMultipleComponent]
-    public class FileLogOutput : MonoBehaviour
+    public sealed class LogFileOutput : MonoBehaviour
     {
-        [SerializeField]
+        [field: SerializeField]
+        public string LogFilePath { get; set; } = "log.txt";
+
         private StreamWriter _output = null;
 
-        [SerializeField]
-        private string _defaultText = "Console:\n\n";
+        private void Initialize()
+        {
+            _output = File.CreateText( Path.Combine( ApplicationUtils.GetBaseDirectoryPath(), LogFilePath ) );
+
+            _output.WriteLine( "Operating System: " + SystemInfo.operatingSystem );
+            _output.WriteLine( $"CPU: {SystemInfo.processorType} ({(float)SystemInfo.processorFrequency / 1000f} GHz)" );
+            _output.WriteLine( $"Memory: {(float)SystemInfo.systemMemorySize / 1024f} GB" );
+            _output.WriteLine( $"GPU: {SystemInfo.graphicsDeviceName} ({(float)SystemInfo.graphicsMemorySize / 1024f} GB)" );
+            _output.WriteLine( "SIMD: " + (Vector.IsHardwareAccelerated ? $"Yes ({Vector<byte>.Count * 8} bytes)" : "No") );
+            _output.WriteLine( "\n-- Log Starts Here -------------------------------------------------------\n" );
+        }
 
         /// <summary>
         /// Prints a string out to the console.
@@ -22,7 +33,8 @@ namespace UnityPlus.Console
         public void Print( string message )
         {
             if( _output == null )
-                _output = File.AppendText( Path.Combine( HumanSpaceProgram.GetBaseDirectoryPath(), "log.txt" ) );
+                Initialize();
+
             _output.Write( message );
             _output.Flush();
         }
@@ -32,6 +44,9 @@ namespace UnityPlus.Console
         /// </summary>
         public void PrintLine( string message )
         {
+            if( _output == null )
+                Initialize();
+
             _output.Write( $"{message}\n" );
             _output.Flush();
         }
@@ -40,7 +55,7 @@ namespace UnityPlus.Console
         {
             switch( logType )
             {
-                case LogType.Log:
+                default:
                     PrintLine( $"[{DateTime.Now.ToLongTimeString()}](___) - {message}" );
                     break;
 
@@ -56,11 +71,6 @@ namespace UnityPlus.Console
                     PrintLine( $"[{DateTime.Now.ToLongTimeString()}](EXC) - {message}\n  at\n" + stackTrace + "" );
                     break;
             }
-        }
-
-        void Awake()
-        {
-            _output = File.CreateText( Path.Combine( HumanSpaceProgram.GetBaseDirectoryPath(), "log.txt" ) );
         }
 
         void OnEnable()

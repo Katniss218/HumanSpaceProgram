@@ -24,7 +24,7 @@ namespace KSS.Core.Mods
         /// </summary>
         public static string GetModDirectoryPath()
         {
-            string path = Path.Combine( HumanSpaceProgram.GetBaseDirectoryPath(), GameDataDirectoryName );
+            string path = Path.Combine( ApplicationUtils.GetBaseDirectoryPath(), GameDataDirectoryName );
 
             if( !Directory.Exists( path ) )
                 Directory.CreateDirectory( path );
