@@ -15,6 +15,11 @@ namespace UnityPlus.Serialization.DataHandlers
     {
         public string Filename { get; set; }
 
+        public JsonSerializedDataHandler( string filename )
+        {
+            this.Filename = filename;
+        }
+
         public SerializedData Read()
         {
             string oContents = File.ReadAllText( Filename, Encoding.UTF8 );

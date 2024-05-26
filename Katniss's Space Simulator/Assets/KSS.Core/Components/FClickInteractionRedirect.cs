@@ -12,7 +12,7 @@ namespace KSS.Core.Components
     /// Redirects click interactions to a different <see cref="GameObject"/>.
     /// </summary>
     [RequireComponent( typeof( Collider ) )]
-    public class FClickInteractionRedirect : MonoBehaviour, IPersistsData
+    public class FClickInteractionRedirect : MonoBehaviour
     {
         /// <summary>
         /// The click action on the object of this component will be redirected to this target.
@@ -46,6 +46,17 @@ namespace KSS.Core.Components
         }
 
 
+        [SerializationMappingProvider( typeof( FClickInteractionRedirect ) )]
+        public static SerializationMapping FClickInteractionRedirectMapping()
+        {
+            return new CompoundSerializationMapping<FClickInteractionRedirect>()
+            {
+                ("target", new MemberReference<FClickInteractionRedirect, GameObject>( o => o.Target ))
+            }
+            .IncludeMembers<Behaviour>()
+            .UseBaseTypeFactory();
+        }
+        /*
         public SerializedData GetData( IReverseReferenceMap s )
         {
             SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
@@ -64,6 +75,6 @@ namespace KSS.Core.Components
 
             if( data.TryGetValue( "target", out var target ) )
                 this.Target = (GameObject)l.ReadObjectReference( target );
-        }
+        }*/
     }
 }

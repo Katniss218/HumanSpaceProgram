@@ -14,140 +14,140 @@ namespace UnityPlus.Serialization.Mappings
         [SerializationMappingProvider( typeof( bool ) )]
         public static SerializationMapping BooleanMapping()
         {
-            return new DirectSerializationMapping<bool>()
+            return new PrimitiveStructSerializationMapping<bool>()
             {
-                SaveFunc = ( o, s ) => (SerializedPrimitive)o,
-                LoadFunc = ( data, l ) => (bool)data
+                OnSave = ( o, s ) => (SerializedPrimitive)o,
+                OnInstantiate = ( data, l ) => (bool)data
             };
         }
 
         [SerializationMappingProvider( typeof( byte ) )]
         public static SerializationMapping ByteMapping()
         {
-            return new DirectSerializationMapping<byte>()
+            return new PrimitiveStructSerializationMapping<byte>()
             {
-                SaveFunc = ( o, s ) => (SerializedPrimitive)o,
-                LoadFunc = ( data, l ) => (byte)data
+                OnSave = ( o, s ) => (SerializedPrimitive)o,
+                OnInstantiate = ( data, l ) => (byte)data
             };
         }
 
         [SerializationMappingProvider( typeof( sbyte ) )]
         public static SerializationMapping SByteMapping()
         {
-            return new DirectSerializationMapping<sbyte>()
+            return new PrimitiveStructSerializationMapping<sbyte>()
             {
-                SaveFunc = ( o, s ) => (SerializedPrimitive)o,
-                LoadFunc = ( data, l ) => (sbyte)data
+                OnSave = ( o, s ) => (SerializedPrimitive)o,
+                OnInstantiate = ( data, l ) => (sbyte)data
             };
         }
 
         [SerializationMappingProvider( typeof( short ) )]
         public static SerializationMapping Int16Mapping()
         {
-            return new DirectSerializationMapping<short>()
+            return new PrimitiveStructSerializationMapping<short>()
             {
-                SaveFunc = ( o, s ) => (SerializedPrimitive)o,
-                LoadFunc = ( data, l ) => (short)data
+                OnSave = ( o, s ) => (SerializedPrimitive)o,
+                OnInstantiate = ( data, l ) => (short)data
             };
         }
 
         [SerializationMappingProvider( typeof( ushort ) )]
         public static SerializationMapping UInt16Mapping()
         {
-            return new DirectSerializationMapping<ushort>()
+            return new PrimitiveStructSerializationMapping<ushort>()
             {
-                SaveFunc = ( o, s ) => (SerializedPrimitive)o,
-                LoadFunc = ( data, l ) => (ushort)data
+                OnSave = ( o, s ) => (SerializedPrimitive)o,
+                OnInstantiate = ( data, l ) => (ushort)data
             };
         }
 
         [SerializationMappingProvider( typeof( int ) )]
         public static SerializationMapping Int32Mapping()
         {
-            return new DirectSerializationMapping<int>()
+            return new PrimitiveStructSerializationMapping<int>()
             {
-                SaveFunc = ( o, s ) => (SerializedPrimitive)o,
-                LoadFunc = ( data, l ) => (int)data
+                OnSave = ( o, s ) => (SerializedPrimitive)o,
+                OnInstantiate = ( data, l ) => (int)data
             };
         }
 
         [SerializationMappingProvider( typeof( uint ) )]
         public static SerializationMapping UInt32Mapping()
         {
-            return new DirectSerializationMapping<uint>()
+            return new PrimitiveStructSerializationMapping<uint>()
             {
-                SaveFunc = ( o, s ) => (SerializedPrimitive)o,
-                LoadFunc = ( data, l ) => (uint)data
+                OnSave = ( o, s ) => (SerializedPrimitive)o,
+                OnInstantiate = ( data, l ) => (uint)data
             };
         }
 
         [SerializationMappingProvider( typeof( long ) )]
         public static SerializationMapping Int64Mapping()
         {
-            return new DirectSerializationMapping<long>()
+            return new PrimitiveStructSerializationMapping<long>()
             {
-                SaveFunc = ( o, s ) => (SerializedPrimitive)o,
-                LoadFunc = ( data, l ) => (long)data
+                OnSave = ( o, s ) => (SerializedPrimitive)o,
+                OnInstantiate = ( data, l ) => (long)data
             };
         }
 
         [SerializationMappingProvider( typeof( ulong ) )]
         public static SerializationMapping UInt64Mapping()
         {
-            return new DirectSerializationMapping<ulong>()
+            return new PrimitiveStructSerializationMapping<ulong>()
             {
-                SaveFunc = ( o, s ) => (SerializedPrimitive)o,
-                LoadFunc = ( data, l ) => (ulong)data
+                OnSave = ( o, s ) => (SerializedPrimitive)o,
+                OnInstantiate = ( data, l ) => (ulong)data
             };
         }
 
         [SerializationMappingProvider( typeof( float ) )]
         public static SerializationMapping FloatMapping()
         {
-            return new DirectSerializationMapping<float>()
+            return new PrimitiveStructSerializationMapping<float>()
             {
-                SaveFunc = ( o, s ) => (SerializedPrimitive)o,
-                LoadFunc = ( data, l ) => (float)data
+                OnSave = ( o, s ) => (SerializedPrimitive)o,
+                OnInstantiate = ( data, l ) => (float)data
             };
         }
 
         [SerializationMappingProvider( typeof( double ) )]
         public static SerializationMapping DoubleMapping()
         {
-            return new DirectSerializationMapping<double>()
+            return new PrimitiveStructSerializationMapping<double>()
             {
-                SaveFunc = ( o, s ) => (SerializedPrimitive)o,
-                LoadFunc = ( data, l ) => (double)data
+                OnSave = ( o, s ) => (SerializedPrimitive)o,
+                OnInstantiate = ( data, l ) => (double)data
             };
         }
 
         [SerializationMappingProvider( typeof( decimal ) )]
         public static SerializationMapping DecimalMapping()
         {
-            return new DirectSerializationMapping<decimal>()
+            return new PrimitiveStructSerializationMapping<decimal>()
             {
-                SaveFunc = ( o, s ) => (SerializedPrimitive)o,
-                LoadFunc = ( data, l ) => (decimal)data
+                OnSave = ( o, s ) => (SerializedPrimitive)o,
+                OnInstantiate = ( data, l ) => (decimal)data
             };
         }
 
         [SerializationMappingProvider( typeof( char ) )]
         public static SerializationMapping CharMapping()
         {
-            return new DirectSerializationMapping<char>()
+            return new PrimitiveStructSerializationMapping<char>()
             {
-                SaveFunc = ( o, s ) => (SerializedPrimitive)(o.ToString()),
-                LoadFunc = ( data, l ) => ((string)data)[0]
+                OnSave = ( o, s ) => (SerializedPrimitive)(o.ToString()),
+                OnInstantiate = ( data, l ) => ((string)data)[0]
             };
         }
 
         [SerializationMappingProvider( typeof( string ) )]
         public static SerializationMapping StringMapping()
         {
-            return new DirectSerializationMapping<string>()
+            return new PrimitiveStructSerializationMapping<string>()
             {
-                SaveFunc = ( o, s ) => (SerializedPrimitive)o,
-                LoadFunc = ( data, l ) => (string)data
+                OnSave = ( o, s ) => (SerializedPrimitive)o,
+                OnInstantiate = ( data, l ) => (string)data
             };
         }
 
@@ -155,10 +155,10 @@ namespace UnityPlus.Serialization.Mappings
         public static SerializationMapping DateTimeMapping()
         {
             // DateTime is saved as an ISO-8601 string.
-            return new DirectSerializationMapping<DateTime>()
+            return new PrimitiveStructSerializationMapping<DateTime>()
             {
-                SaveFunc = ( o, s ) => (SerializedPrimitive)o.ToString( "s", CultureInfo.InvariantCulture ),
-                LoadFunc = ( data, l ) => DateTime.ParseExact( (string)data, "s", CultureInfo.InvariantCulture )
+                OnSave = ( o, s ) => (SerializedPrimitive)o.ToString( "s", CultureInfo.InvariantCulture ),
+                OnInstantiate = ( data, l ) => DateTime.ParseExact( (string)data, "s", CultureInfo.InvariantCulture )
             };
         }
 
@@ -166,10 +166,10 @@ namespace UnityPlus.Serialization.Mappings
         public static SerializationMapping TimeSpanMapping()
         {
             // TimeSpan is saved as `[-][d'.']hh':'mm':'ss['.'fffffff]`.
-            return new DirectSerializationMapping<TimeSpan>()
+            return new PrimitiveStructSerializationMapping<TimeSpan>()
             {
-                SaveFunc = ( o, s ) => (SerializedPrimitive)o.ToString( "c", CultureInfo.InvariantCulture ),
-                LoadFunc = ( data, l ) => TimeSpan.ParseExact( (string)data, "c", CultureInfo.InvariantCulture )
+                OnSave = ( o, s ) => (SerializedPrimitive)o.ToString( "c", CultureInfo.InvariantCulture ),
+                OnInstantiate = ( data, l ) => TimeSpan.ParseExact( (string)data, "c", CultureInfo.InvariantCulture )
             };
         }
 
@@ -178,90 +178,90 @@ namespace UnityPlus.Serialization.Mappings
         [SerializationMappingProvider( typeof( Vector2 ) )]
         public static SerializationMapping Vector2Mapping()
         {
-            return new DirectSerializationMapping<Vector2>()
+            return new PrimitiveStructSerializationMapping<Vector2>()
             {
-                SaveFunc = ( o, s ) => new SerializedArray() { (SerializedPrimitive)o.x, (SerializedPrimitive)o.y },
-                LoadFunc = ( data, l ) => new Vector2( (float)data[0], (float)data[1] )
+                OnSave = ( o, s ) => new SerializedArray() { (SerializedPrimitive)o.x, (SerializedPrimitive)o.y },
+                OnInstantiate = ( data, l ) => new Vector2( (float)data[0], (float)data[1] )
             };
         }
-        
+
         [SerializationMappingProvider( typeof( Vector2Int ) )]
         public static SerializationMapping Vector2IntMapping()
         {
-            return new DirectSerializationMapping<Vector2Int>()
+            return new PrimitiveStructSerializationMapping<Vector2Int>()
             {
-                SaveFunc = ( o, s ) => new SerializedArray() { (SerializedPrimitive)o.x, (SerializedPrimitive)o.y },
-                LoadFunc = ( data, l ) => new Vector2Int( (int)data[0], (int)data[1] )
+                OnSave = ( o, s ) => new SerializedArray() { (SerializedPrimitive)o.x, (SerializedPrimitive)o.y },
+                OnInstantiate = ( data, l ) => new Vector2Int( (int)data[0], (int)data[1] )
             };
         }
 
         [SerializationMappingProvider( typeof( Vector3 ) )]
         public static SerializationMapping Vector3Mapping()
         {
-            return new DirectSerializationMapping<Vector3>()
+            return new PrimitiveStructSerializationMapping<Vector3>()
             {
-                SaveFunc = ( o, s ) => new SerializedArray() { (SerializedPrimitive)o.x, (SerializedPrimitive)o.y, (SerializedPrimitive)o.z },
-                LoadFunc = ( data, l ) => new Vector3( (float)data[0], (float)data[1], (float)data[2] )
+                OnSave = ( o, s ) => new SerializedArray() { (SerializedPrimitive)o.x, (SerializedPrimitive)o.y, (SerializedPrimitive)o.z },
+                OnInstantiate = ( data, l ) => new Vector3( (float)data[0], (float)data[1], (float)data[2] )
             };
         }
-        
+
         [SerializationMappingProvider( typeof( Vector3Int ) )]
         public static SerializationMapping Vector3IntMapping()
         {
-            return new DirectSerializationMapping<Vector3Int>()
+            return new PrimitiveStructSerializationMapping<Vector3Int>()
             {
-                SaveFunc = ( o, s ) => new SerializedArray() { (SerializedPrimitive)o.x, (SerializedPrimitive)o.y, (SerializedPrimitive)o.z },
-                LoadFunc = ( data, l ) => new Vector3Int( (int)data[0], (int)data[1], (int)data[2] )
+                OnSave = ( o, s ) => new SerializedArray() { (SerializedPrimitive)o.x, (SerializedPrimitive)o.y, (SerializedPrimitive)o.z },
+                OnInstantiate = ( data, l ) => new Vector3Int( (int)data[0], (int)data[1], (int)data[2] )
             };
         }
 
         [SerializationMappingProvider( typeof( Vector3Dbl ) )]
         public static SerializationMapping Vector3DblMapping()
         {
-            return new DirectSerializationMapping<Vector3Dbl>()
+            return new PrimitiveStructSerializationMapping<Vector3Dbl>()
             {
-                SaveFunc = ( o, s ) => new SerializedArray() { (SerializedPrimitive)o.x, (SerializedPrimitive)o.y, (SerializedPrimitive)o.z },
-                LoadFunc = ( data, l ) => new Vector3Dbl( (double)data[0], (double)data[1], (double)data[2] )
+                OnSave = ( o, s ) => new SerializedArray() { (SerializedPrimitive)o.x, (SerializedPrimitive)o.y, (SerializedPrimitive)o.z },
+                OnInstantiate = ( data, l ) => new Vector3Dbl( (double)data[0], (double)data[1], (double)data[2] )
             };
         }
 
         [SerializationMappingProvider( typeof( Vector4 ) )]
         public static SerializationMapping Vector4Mapping()
         {
-            return new DirectSerializationMapping<Vector4>()
+            return new PrimitiveStructSerializationMapping<Vector4>()
             {
-                SaveFunc = ( o, s ) => new SerializedArray() { (SerializedPrimitive)o.x, (SerializedPrimitive)o.y, (SerializedPrimitive)o.z, (SerializedPrimitive)o.w },
-                LoadFunc = ( data, l ) => new Vector4( (float)data[0], (float)data[1], (float)data[2], (float)data[3] )
+                OnSave = ( o, s ) => new SerializedArray() { (SerializedPrimitive)o.x, (SerializedPrimitive)o.y, (SerializedPrimitive)o.z, (SerializedPrimitive)o.w },
+                OnInstantiate = ( data, l ) => new Vector4( (float)data[0], (float)data[1], (float)data[2], (float)data[3] )
             };
         }
 
         [SerializationMappingProvider( typeof( Quaternion ) )]
         public static SerializationMapping QuaternionMapping()
         {
-            return new DirectSerializationMapping<Quaternion>()
+            return new PrimitiveStructSerializationMapping<Quaternion>()
             {
-                SaveFunc = ( o, s ) => new SerializedArray() { (SerializedPrimitive)o.x, (SerializedPrimitive)o.y, (SerializedPrimitive)o.z, (SerializedPrimitive)o.w },
-                LoadFunc = ( data, l ) => new Quaternion( (float)data[0], (float)data[1], (float)data[2], (float)data[3] )
+                OnSave = ( o, s ) => new SerializedArray() { (SerializedPrimitive)o.x, (SerializedPrimitive)o.y, (SerializedPrimitive)o.z, (SerializedPrimitive)o.w },
+                OnInstantiate = ( data, l ) => new Quaternion( (float)data[0], (float)data[1], (float)data[2], (float)data[3] )
             };
         }
 
         [SerializationMappingProvider( typeof( QuaternionDbl ) )]
         public static SerializationMapping QuaternionDblMapping()
         {
-            return new DirectSerializationMapping<QuaternionDbl>()
+            return new PrimitiveStructSerializationMapping<QuaternionDbl>()
             {
-                SaveFunc = ( o, s ) => new SerializedArray() { (SerializedPrimitive)o.x, (SerializedPrimitive)o.y, (SerializedPrimitive)o.z, (SerializedPrimitive)o.w },
-                LoadFunc = ( data, l ) => new QuaternionDbl( (double)data[0], (double)data[1], (double)data[2], (double)data[3] )
+                OnSave = ( o, s ) => new SerializedArray() { (SerializedPrimitive)o.x, (SerializedPrimitive)o.y, (SerializedPrimitive)o.z, (SerializedPrimitive)o.w },
+                OnInstantiate = ( data, l ) => new QuaternionDbl( (double)data[0], (double)data[1], (double)data[2], (double)data[3] )
             };
         }
 
         [SerializationMappingProvider( typeof( Enum ) )]
         public static SerializationMapping EnumMapping<T>() where T : struct, Enum
         {
-            return new DirectSerializationMapping<T>()
+            return new PrimitiveStructSerializationMapping<T>()
             {
-                SaveFunc = ( o, s ) => (SerializedPrimitive)o.ToString( "G" ),
-                LoadFunc = ( data, l ) => Enum.Parse<T>( (string)data )
+                OnSave = ( o, s ) => (SerializedPrimitive)o.ToString( "G" ),
+                OnInstantiate = ( data, l ) => Enum.Parse<T>( (string)data )
             };
         }
 
@@ -269,9 +269,9 @@ namespace UnityPlus.Serialization.Mappings
         public static SerializationMapping ArrayMapping<T>()
         {
 #warning TODO - multidimensional arrays?
-            return new DirectSerializationMapping<T[]>()
+            return new NonPrimitiveSerializationMapping<T[]>()
             {
-                SaveFunc = ( o, s ) =>
+                OnSave = ( o, s ) =>
                 {
                     SerializedArray serializedArray = new SerializedArray();
                     for( int i = 0; i < o.Length; i++ )
@@ -287,12 +287,17 @@ namespace UnityPlus.Serialization.Mappings
 
                     return serializedArray;
                 },
-                LoadFunc = ( data, l ) =>
+                OnInstantiate = ( data, l ) =>
                 {
                     if( data is not SerializedArray serializedArray )
                         return new T[] { };
 
-                    T[] o = new T[serializedArray.Count];
+                    return new T[serializedArray.Count];
+                },
+                OnLoad = ( ref T[] o, SerializedData data, IForwardReferenceMap l ) =>
+                {
+                    if( data is not SerializedArray serializedArray )
+                        return;
 
                     for( int i = 0; i < serializedArray.Count; i++ )
                     {
@@ -306,14 +311,28 @@ namespace UnityPlus.Serialization.Mappings
 
                         var mapping = SerializationMappingRegistry.GetMappingOrDefault<T>( elementType );
 
-                        var element = (T)mapping.Load( elementData, l );
+                        // Parity with Member.
+                        T element;
+                        switch( mapping.SerializationStyle )
+                        {
+                            default:
+                                continue;
+                            case SerializationStyle.PrimitiveStruct:
+                                element = (T)mapping.Instantiate( elementData, l );
+                                break;
+                            case SerializationStyle.NonPrimitive:
+                                object refmember = (T)mapping.Instantiate( elementData, l );
+                                mapping.Load( ref refmember, elementData, l );
+                                element = (T)refmember;
+                                break;
+                        }
+
                         o[i] = element;
                     }
 
-                    return o;
+                    //return o;
                 },
-                // LoadReferencesFunc is for pass-through to the elements. Not needed otherwise.
-                LoadReferencesFunc = ( ref T[] o, SerializedData data, IForwardReferenceMap l ) =>
+                OnLoadReferences = ( ref T[] o, SerializedData data, IForwardReferenceMap l ) =>
                 {
                     if( data is not SerializedArray serializedArray )
                         return;
@@ -322,7 +341,7 @@ namespace UnityPlus.Serialization.Mappings
                     {
                         T element = o[i];
                         SerializedData elementData = serializedArray[i];
-
+                        /*
                         Type elementType = typeof( T );
                         if( elementData.TryGetValue( KeyNames.TYPE, out var elementType2 ) )
                         {
@@ -330,11 +349,25 @@ namespace UnityPlus.Serialization.Mappings
                         }
 
                         var mapping = SerializationMappingRegistry.GetMappingOrDefault<T>( elementType );
+                        */
+                        var mapping = SerializationMappingRegistry.GetMappingOrDefault<T>( element );
 
-                        object elem = element;
-                        mapping.LoadReferences( ref elem, elementData, l );
+                        // Parity with Member.
+                        switch( mapping.SerializationStyle )
+                        {
+                            default:
+                                continue;
+                            case SerializationStyle.PrimitiveObject:
+                                element = (T)mapping.Instantiate( elementData, l );
+                                break;
+                            case SerializationStyle.NonPrimitive:
+                                object refmember = element;
+                                mapping.LoadReferences( ref refmember, elementData, l );
+                                element = (T)refmember;
+                                break;
+                        }
 
-                        o[i] = (T)elem;
+                        o[i] = element;
                     }
                 }
             };
@@ -347,9 +380,9 @@ namespace UnityPlus.Serialization.Mappings
 
 #warning TODO - we might want to save the dict as a mapping from references to references.
 
-            return new DirectSerializationMapping<Dictionary<TKey, TValue>>()
+            return new NonPrimitiveSerializationMapping<Dictionary<TKey, TValue>>()
             {
-                SaveFunc = ( o, s ) =>
+                OnSave = ( o, s ) =>
                 {
                     SerializedObject obj = new SerializedObject();
 
@@ -365,11 +398,12 @@ namespace UnityPlus.Serialization.Mappings
 
                     return obj;
                 },
-                LoadFunc = ( data, l ) =>
+                OnInstantiate = ( data, l ) =>
                 {
                     return new Dictionary<TKey, TValue>();
                 },
-                LoadReferencesFunc = ( ref Dictionary<TKey, TValue> o, SerializedData data, IForwardReferenceMap l ) =>
+                OnLoad = null,
+                OnLoadReferences = ( ref Dictionary<TKey, TValue> o, SerializedData data, IForwardReferenceMap l ) =>
                 {
                     if( data is not SerializedObject dataObj )
                         return;
@@ -386,8 +420,11 @@ namespace UnityPlus.Serialization.Mappings
 
                         var mapping = SerializationMappingRegistry.GetMappingOrDefault<TValue>( elementType );
 
-                        object elem = mapping.Load( elementData, l );
+#warning TODO - fix this mess.
+                        // Calling `mapping.Load` inside LoadReferences makes the objects inside the dict unable to be referenced by other external objects.
+                        object elem = mapping.Instantiate( elementData, l );
 
+                        mapping.Load( ref elem, elementData, l );
                         mapping.LoadReferences( ref elem, elementData, l );
 
                         TKey keyObj = (TKey)l.GetObj( key.DeserializeGuidAsKey() );
@@ -621,16 +658,16 @@ namespace UnityPlus.Serialization.Mappings
         [SerializationMappingProvider( typeof( Delegate ) )]
         public static SerializationMapping DelegateMapping()
         {
-            return new DirectSerializationMapping<Delegate>()
+            return new PrimitiveObjectSerializationMapping<Delegate>()
             {
-                SaveFunc = ( o, s ) =>
+                OnSave = ( o, s ) =>
                 {
                     return Persistent_Delegate.GetData( o, s );
                 },
-                LoadReferencesFunc = ( ref Delegate o, SerializedData data, IForwardReferenceMap l ) =>
+                OnInstantiate = ( SerializedData data, IForwardReferenceMap l ) =>
                 {
                     // This is kinda non-standard, but since we need the reference to the `target` to even create the delegate, we can only create it here.
-                    o = Persistent_Delegate.ToDelegate( data, l );
+                    return Persistent_Delegate.ToDelegate( data, l );
                 }
             };
         }

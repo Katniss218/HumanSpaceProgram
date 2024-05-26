@@ -23,6 +23,8 @@ namespace UnityPlus.Serialization
 				return (SerializedPrimitive)assemblyQualifiedName;
 			}
 			
+			// assemblyQualifiedName = $"{type.FullName}, {type.Assembly.GetName().Name}"; // This is ~2x faster to lookup in the dict (it's shorter), but potentially ambiguous.
+
 			// 'AssemblyQualifiedName' is guaranteed to always uniquely identify a type.
 			assemblyQualifiedName = type.AssemblyQualifiedName;
 			_typeToString.Add( type, assemblyQualifiedName );

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 using UnityPlus.Serialization;
 
 namespace KSS.Control.Controls
@@ -10,7 +11,7 @@ namespace KSS.Control.Controls
 	/// <summary>
 	/// Represents a control that produces a parameter of type <typeparamref name="T"/>.
 	/// </summary>
-	public sealed class ControlParameterOutput<T> : ControlParameterOutputBase, IPersistsData
+	public sealed class ControlParameterOutput<T> : ControlParameterOutputBase
 	{
 		internal Func<T> getter;
 
@@ -64,7 +65,22 @@ namespace KSS.Control.Controls
 			return true;
 		}
 
-		public SerializedData GetData( IReverseReferenceMap s )
+        [SerializationMappingProvider( typeof( ControlParameterOutput<> ) )]
+        public static SerializationMapping ControlParameterOutputMapping<Tt>()
+        {
+			return new CompoundSerializationMapping<ControlParameterOutput<Tt>>()
+			{
+				("connects_to", new MemberReferenceArray<ControlParameterOutput<Tt>, ControlParameterInput<Tt>>( o => o.inputs.ToArray(), (o, value) =>
+				{
+					foreach( var c in value )
+					{
+						ControlParameterInput<Tt>.Connect( c, o );
+					}
+				} ))
+			};
+        }
+		/*
+        public SerializedData GetData( IReverseReferenceMap s )
 		{
 			SerializedArray sa = new SerializedArray();
 			foreach( var conn in inputs )
@@ -88,6 +104,6 @@ namespace KSS.Control.Controls
 					ControlParameterInput<T>.Connect( c, this );
 				}
 			}
-		}
+		}*/
 	}
 }

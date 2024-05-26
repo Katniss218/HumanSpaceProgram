@@ -78,6 +78,19 @@ namespace KSS.Core.Serialization
             return GetRootDirectory( this.ID );
         }
 
+        public static VesselMetadata LoadFromDisk( string id )
+        {
+            VesselMetadata vesselMetadata = new VesselMetadata( id );
+            // load data
+            return vesselMetadata;
+        }
+
+        public void SaveToDisk()
+        {
+
+        }
+
+        /*
         public void WriteToDisk()
         {
             string savePath = GetRootDirectory();
@@ -140,6 +153,6 @@ namespace KSS.Core.Serialization
                     this.ModVersions.Add( elemKvp.Key, elemKvp.Value.AsVersion() );
                 }
             }
-        }
+        }*/
     }
 }

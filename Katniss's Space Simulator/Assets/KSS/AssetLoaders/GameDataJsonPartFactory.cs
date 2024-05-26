@@ -9,7 +9,6 @@ using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.DataHandlers;
-using UnityPlus.Serialization.Strategies;
 
 namespace KSS.AssetLoaders
 {
@@ -27,8 +26,7 @@ namespace KSS.AssetLoaders
 
         public override PartMetadata LoadMetadata()
         {
-            PartMetadata partMeta = new PartMetadata( _filePath );
-            partMeta.ReadDataFromDisk();
+            PartMetadata partMeta = PartMetadata.LoadFromDisk( _filePath );
             return partMeta;
         }
 
@@ -40,8 +38,6 @@ namespace KSS.AssetLoaders
             _loader.Load();
             return _strat.LastSpawnedRoot;
         }
-
-        // TODO - This can also be used to load saved vessels - saved vessels serialize as their root parts.
 
         [HSPEventListener( HSPEvent.STARTUP_IMMEDIATELY, HSPEvent.NAMESPACE_VANILLA + ".load_parts" )]
         private static void OnStartup()

@@ -66,7 +66,7 @@ namespace UnityPlus.Serialization
         public void Load()
         {
 #if DEBUG
-            Debug.Log( "Loading..." );
+     //       Debug.Log( "Loading..." );
 #endif
             _currentState = ILoader.State.LoadingObjects;
             _startFunc?.Invoke();
@@ -87,7 +87,7 @@ namespace UnityPlus.Serialization
             _finishFunc?.Invoke();
             _currentState = ILoader.State.Idle;
 #if DEBUG
-            Debug.Log( "Finished Loading" );
+      //      Debug.Log( "Finished Loading" );
 #endif
         }
     }

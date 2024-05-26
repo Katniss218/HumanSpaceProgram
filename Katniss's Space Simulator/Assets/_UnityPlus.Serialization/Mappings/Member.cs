@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq.Expressions;
+using System.Reflection;
 using UnityEngine;
+using UnityPlus.Serialization.Mappings;
 
 namespace UnityPlus.Serialization
 {
@@ -15,11 +17,25 @@ namespace UnityPlus.Serialization
         private readonly Setter<TSource, TMember> _setter;
         private readonly RefSetter<TSource, TMember> _structSetter;
 
+        private bool _isCacheable;
+        private SerializationMapping _cachedMapping;
 #warning TODO - caching of member mappings is possible for field/property types that don't have any types deriving from them (e.g. member of type `float`, GameObject, etc).
+
+        private void TryCacheMemberMapping()
+        {
+            Type type = typeof( TMember );
+            if( type.IsValueType
+             || (!type.IsInterface && type.BaseType == null) )
+            {
+                _isCacheable = true;
+                _cachedMapping = SerializationMappingRegistry.GetMappingOrEmpty( typeof( TMember ) );
+            }
+        }
 
         /// <param name="member">Example: `o => o.position`.</param>
         public Member( Expression<Func<TSource, TMember>> member )
         {
+            TryCacheMemberMapping();
             _getter = AccessorUtils.CreateGetter( member );
 
             if( typeof( TSource ).IsValueType )
@@ -33,6 +49,7 @@ namespace UnityPlus.Serialization
             if( typeof( TSource ).IsValueType )
                 throw new InvalidOperationException( $"[{typeof( TSource ).FullName}] Use the constructor with the value type setter." );
 
+            TryCacheMemberMapping();
             _getter = getter;
             _setter = setter;
         }
@@ -42,6 +59,7 @@ namespace UnityPlus.Serialization
             if( !typeof( TSource ).IsValueType )
                 throw new InvalidOperationException( $"[{typeof( TSource ).FullName}] Use the constructor with the reference type setter." );
 
+            TryCacheMemberMapping();
             _getter = getter;
             _structSetter = setter;
         }
@@ -52,8 +70,13 @@ namespace UnityPlus.Serialization
 
             var mapping = SerializationMappingRegistry.GetMappingOrDefault<TMember>( member );
 
-            return mapping.Save( member, s );
+            if( mapping.SerializationStyle != SerializationStyle.None )
+                return mapping.Save( member, s );
+            return (SerializedData)null;
         }
+
+        // The public-facing methods on the SerializationUnit are like a member,
+        //   but the member itself can't be populated, only the end user may choose to do that on the root object(s).
 
         public void Load( ref TSource source, SerializedData data, IForwardReferenceMap l )
         {
@@ -63,9 +86,22 @@ namespace UnityPlus.Serialization
                 memberType = type.DeserializeType();
             }
 
-            var mapping = SerializationMappingRegistry.GetMappingOrDefault<TMember>( memberType );
+            var mapping = _isCacheable ? _cachedMapping : SerializationMappingRegistry.GetMappingOrDefault<TMember>( memberType );
 
-            var member = (TMember)mapping.Load( data, l );
+            TMember member;
+            switch( mapping.SerializationStyle )
+            {
+                default:
+                    return;
+                case SerializationStyle.PrimitiveStruct:
+                    member = (TMember)mapping.Instantiate( data, l );
+                    break;
+                case SerializationStyle.NonPrimitive:
+                    object refmember = mapping.Instantiate( data, l );
+                    mapping.Load( ref refmember, data, l );
+                    member = (TMember)refmember;
+                    break;
+            }
 
             if( _structSetter == null )
                 _setter.Invoke( source, member );
@@ -77,12 +113,22 @@ namespace UnityPlus.Serialization
         {
             var member = _getter.Invoke( source );
 
-            // This is needed to reach the references nested inside objects that themselves don't contain any references.
+            // This is needed, to reach the references nested inside objects that themselves don't contain any references.
             var mapping = SerializationMappingRegistry.GetMappingOrDefault<TMember>( member );
 
-            object refmember = member;
-            mapping.LoadReferences( ref refmember, data, l );
-            member = (TMember)refmember; // this is needed to re-assign the member to the variable.
+            switch( mapping.SerializationStyle )
+            {
+                default:
+                    return;
+                case SerializationStyle.PrimitiveObject:
+                    member = (TMember)mapping.Instantiate( data, l );
+                    break;
+                case SerializationStyle.NonPrimitive:
+                    object refmember = member;
+                    mapping.LoadReferences( ref refmember, data, l );
+                    member = (TMember)refmember;
+                    break;
+            }
 
             // This is needed, if the setter is custom (not auto-generated from field access (but NOT property access)) (look at LODGroup and its LOD[])
             // Basically, we don't have the guarantee that the class we have referenceequals the private state.

@@ -12,7 +12,7 @@ namespace KSS.Core.Components
     /// <summary>
     /// Represents a coordinate system that can be used as the control frame for avionics.
     /// </summary>
-    public sealed class FControlFrame : MonoBehaviour, IPersistsData
+    public sealed class FControlFrame : MonoBehaviour
     {
         public static FControlFrame VesselControlFrame { get; set; }
 
@@ -36,6 +36,17 @@ namespace KSS.Core.Components
                 : SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( frame._referenceTransform.rotation );
         }
 
+        [SerializationMappingProvider( typeof( FControlFrame ) )]
+        public static SerializationMapping FControlFrameMapping()
+        {
+            return new CompoundSerializationMapping<FControlFrame>()
+            {
+                ("reference_transform", new MemberReference<FControlFrame, Transform>( o => o._referenceTransform ))
+            }
+            .IncludeMembers<Behaviour>()
+            .UseBaseTypeFactory();
+        }
+        /*
         public SerializedData GetData( IReverseReferenceMap s )
         {
             return new SerializedObject()
@@ -48,6 +59,6 @@ namespace KSS.Core.Components
         {
             if( data.TryGetValue( "reference_transform", out var referenceTransform ) )
                 _referenceTransform = (Transform)l.ReadObjectReference( referenceTransform );
-        }
+        }*/
     }
 }

@@ -15,7 +15,7 @@ namespace KSS.Core.Physics
     [RequireComponent( typeof( RootObjectTransform ) )]
     [RequireComponent( typeof( Rigidbody ) )]
     [DisallowMultipleComponent]
-    public class FreePhysicsObject : MonoBehaviour, IPhysicsObject, IPersistsData
+    public class FreePhysicsObject : MonoBehaviour, IPhysicsObject
     {
         public float Mass
         {
@@ -174,6 +174,24 @@ namespace KSS.Core.Physics
             _rb.isKinematic = true; // Can't do `enabled = false` (doesn't exist) for a rigidbody, so we set it to kinematic instead.
         }
 
+
+        [SerializationMappingProvider( typeof( FreePhysicsObject ) )]
+        public static SerializationMapping FreePhysicsObjectMapping()
+        {
+            return new CompoundSerializationMapping<FreePhysicsObject>()
+            {
+                ("mass", new Member<FreePhysicsObject, float>( o => o.Mass )),
+                ("local_center_of_mass", new Member<FreePhysicsObject, Vector3>( o => o.LocalCenterOfMass )),
+
+                ("is_kinematic", new Member<FreePhysicsObject, bool>( o => false, (o, value) => o._rb.isKinematic = false)), // TODO - isKinematic member is a hack.
+
+                ("velocity", new Member<FreePhysicsObject, Vector3>( o => o.Velocity )),
+                ("angular_velocity", new Member<FreePhysicsObject, Vector3>( o => o.AngularVelocity ))
+            }
+            .IncludeMembers<Behaviour>()
+            .UseBaseTypeFactory();
+        }
+        /*
         public SerializedData GetData( IReverseReferenceMap s )
         {
             SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
@@ -206,6 +224,6 @@ namespace KSS.Core.Physics
 
             if( data.TryGetValue( "angular_velocity", out var angularVelocity ) )
                 this.AngularVelocity = angularVelocity.AsVector3();
-        }
+        }*/
     }
 }

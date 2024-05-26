@@ -76,7 +76,7 @@ namespace KSS.Core
         {
             return instance._celestialBodies.Values.Select( cb => cb.gameObject ).ToArray();
         }
-
+        /*
         [HSPEventListener( HSPEvent.TIMELINE_BEFORE_SAVE, HSPEvent.NAMESPACE_VANILLA + ".serialize_celestial_bodies" )]
         private static void OnBeforeSave( TimelineManager.SaveEventData e )
         {
@@ -101,6 +101,6 @@ namespace KSS.Core
             SerializationUnit _vesselsStrat = SerializationUnit.FromData( GetAllRootGameObjects );
             e.objectActions.Add( _celestialBodiesStrat.LoadAsync_Object );
             e.dataActions.Add( _celestialBodiesStrat.LoadAsync_Data );
-        }
+        }*/
     }
 }

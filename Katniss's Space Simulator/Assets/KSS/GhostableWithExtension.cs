@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityPlus.Serialization;
 
 namespace KSS
-{
+{/*
     public static class GhostableWithExtension
     {
 #warning TODO - replace with serialization contexts.
@@ -29,5 +29,5 @@ namespace KSS
             }
             return null;
         }
-    }
+    }*/
 }

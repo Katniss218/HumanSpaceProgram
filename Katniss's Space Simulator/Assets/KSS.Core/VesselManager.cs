@@ -72,7 +72,7 @@ namespace KSS.Core
             }
             return gos;
         }
-
+        /*
         [HSPEventListener( HSPEvent.TIMELINE_BEFORE_SAVE, HSPEvent.NAMESPACE_VANILLA + ".serialize_vessels" )]
         private static void OnBeforeSave( TimelineManager.SaveEventData e )
         {
@@ -99,6 +99,6 @@ namespace KSS.Core
             SerializationUnit _vesselsStrat = SerializationUnit.FromData( _vesselsDataHandler, GetAllRootGameObjects );
             e.objectActions.Add( _vesselsStrat.LoadAsync_Object );
             e.dataActions.Add( _vesselsStrat.LoadAsync_Data );
-        }
+        }*/
     }
 }

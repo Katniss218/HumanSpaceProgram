@@ -1,9 +1,11 @@
-﻿using System;
+﻿using KSS.Core.Physics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 using UnityPlus.Serialization;
 
 namespace KSS.Control.Controls
@@ -11,7 +13,7 @@ namespace KSS.Control.Controls
 	/// <summary>
 	/// Represents a control that consumes a control signal of type <typeparamref name="T"/>.
 	/// </summary>
-	public sealed class ControlleeInput<T> : ControlleeInputBase, IPersistsData
+	public sealed class ControlleeInput<T> : ControlleeInputBase
     {
 		internal Action<T> onInvoke;
 
@@ -62,6 +64,22 @@ namespace KSS.Control.Controls
             return true;
         }
 
+
+        [SerializationMappingProvider( typeof( ControlleeInput<> ) )]
+        public static SerializationMapping FreePhysicsObjectMapping<Tt>()
+        {
+            return new CompoundSerializationMapping<ControlleeInput<Tt>>()
+            {
+                ("connects_to", new MemberReferenceArray<ControlleeInput<Tt>, ControllerOutput<Tt>>( o => o.outputs.ToArray(), (o, value) =>
+                {
+                    foreach( var c in value )
+                    {
+                        ControlleeInput<Tt>.Connect( o, c );
+                    }
+                } ))
+            };
+        }
+        /*
         public SerializedData GetData( IReverseReferenceMap s )
         {
             SerializedArray sa = new SerializedArray();
@@ -87,7 +105,7 @@ namespace KSS.Control.Controls
                 }
             }
         }
-
+        */
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         internal static void Disconnect( ControllerOutput<T> output )
         {

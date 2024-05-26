@@ -72,8 +72,8 @@
     <Compile Include="Assets\KSS\RotationTransformHandle.cs" />
     <Compile Include="Assets\KSS\GameplayScene\Tools\DefaultTool.cs" />
     <Compile Include="Assets\KSS\GameplayScene\Tools\VanillaToolRegisterer.cs" />
-    <Compile Include="Assets\KSS\Components\FVesselSeparator.cs" />
     <Compile Include="Assets\KSS\GameplayScene\FConstructionSite.cs" />
+    <Compile Include="Assets\KSS\Components\FVesselSeparator.cs" />
     <Compile Include="Assets\KSS\Components\FSequencer.Sequence.cs" />
     <Compile Include="Assets\KSS\TransformHandleSet.cs" />
     <Compile Include="Assets\KSS\Effects\Atmospheres\AtmosphereRenderer.cs" />
@@ -117,7 +117,6 @@
     <Compile Include="Assets\KSS\GameplayScene\ConstructionState.cs" />
     <Compile Include="Assets\KSS\Components\F1AxisActuator.cs" />
     <Compile Include="Assets\KSS\PIDLoop.cs" />
-    <Compile Include="Assets\KSS\IGhostable.cs" />
     <Compile Include="Assets\KSS\AssetLoaders\GameDataJsonVesselFactory.cs" />
     <Compile Include="Assets\KSS\Components\FReactionControlController.cs" />
   </ItemGroup>

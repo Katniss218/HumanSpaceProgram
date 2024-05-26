@@ -10,9 +10,9 @@ using UnityPlus.Serialization;
 
 namespace KSS.Core
 {
-    [RequireComponent( typeof( UnityPlus.Serialization.PreexistingReference ) )]
+    [RequireComponent( typeof( PreexistingReference ) )]
     [RequireComponent( typeof( RootObjectTransform ) )]
-    public class CelestialBody : MonoBehaviour, IPersistsData
+    public class CelestialBody : MonoBehaviour
     {
         /// <summary>
         /// Gets the current global position of the celestial body.
@@ -94,6 +94,7 @@ namespace KSS.Core
         /// </summary>
         public IReferenceFrame OrientedReferenceFrame => new OrientedReferenceFrame( this.AIRFPosition, this.AIRFRotation );
 
+        /*
         public SerializedData GetData( IReverseReferenceMap s )
         {
             SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
@@ -108,6 +109,6 @@ namespace KSS.Core
             IPersistent_Behaviour.SetData( this, data, l );
 
             //
-        }
+        }*/
     }
 }

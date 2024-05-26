@@ -9,7 +9,7 @@ using UnityPlus.Serialization;
 namespace KSS.Core.Components
 {
     [DisallowMultipleComponent]
-    public sealed class FAttachNode : MonoBehaviour, IPersistsData
+    public sealed class FAttachNode : MonoBehaviour
     {
         /// <summary>
         /// A struct representing a candidate node pair that can be used for snapping.
@@ -126,7 +126,18 @@ namespace KSS.Core.Components
             Vector3 offset = snappedObject.transform.position - snappedNode.transform.position;
             snappedObject.position = targetNode.transform.position + offset;
         }
-        
+
+        [SerializationMappingProvider( typeof( FAttachNode ) )]
+        public static SerializationMapping FAttachNodeMapping()
+        {
+            return new CompoundSerializationMapping<FAttachNode>()
+            {
+                ("range", new Member<FAttachNode, float>( o => o.Range ))
+            }
+            .IncludeMembers<Behaviour>()
+            .UseBaseTypeFactory();
+        }
+        /*
         public SerializedData GetData( IReverseReferenceMap s )
         {
             SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
@@ -145,7 +156,7 @@ namespace KSS.Core.Components
 
             if( data.TryGetValue( "range", out var range ) )
                 this.Range = range.AsFloat();
-        }
+        }*/
 
         void OnDrawGizmos()
         {

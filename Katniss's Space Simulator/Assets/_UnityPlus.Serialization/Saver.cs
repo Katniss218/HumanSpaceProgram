@@ -64,7 +64,7 @@ namespace UnityPlus.Serialization
         public void Save()
         {
 #if DEBUG
-            Debug.Log( "Saving..." );
+  //          Debug.Log( "Saving..." );
 #endif
             _currentState = ISaver.State.Saving;
             _startFunc?.Invoke();
@@ -77,7 +77,7 @@ namespace UnityPlus.Serialization
             _finishFunc?.Invoke();
             _currentState = ISaver.State.Idle;
 #if DEBUG
-            Debug.Log( "Finished Saving" );
+    //        Debug.Log( "Finished Saving" );
 #endif
         }
     }

@@ -8,7 +8,7 @@ namespace KSS.Core
     /// <summary>
     /// Contains the data about symmetry in vessels/buildings.
     /// </summary>
-    public class SymmetryDataContainer : MonoBehaviour, IPersistsData
+    public class SymmetryDataContainer : MonoBehaviour
     {
         private Dictionary<GameObject, List<GameObject>> _groups = new Dictionary<GameObject, List<GameObject>>();
 
@@ -56,6 +56,7 @@ namespace KSS.Core
             _groups.Remove(existing);
         }
 
+        /*
         public SerializedData GetData( IReverseReferenceMap s )
         {
             SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
@@ -70,6 +71,6 @@ namespace KSS.Core
             IPersistent_Behaviour.SetData( this, data, l );
 
             //
-        }
+        }*/
     }
 }

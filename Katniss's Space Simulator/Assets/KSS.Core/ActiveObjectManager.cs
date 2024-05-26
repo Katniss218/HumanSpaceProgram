@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KSS.Core.Components;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,7 +12,7 @@ namespace KSS.Core
     /// <summary>
     /// Manages the currently active object.
     /// </summary>
-    public class ActiveObjectManager : SingletonMonoBehaviour<ActiveObjectManager>, IPersistsData
+    public class ActiveObjectManager : SingletonMonoBehaviour<ActiveObjectManager>
     {
         [SerializeField]
         private GameObject _activeObject;
@@ -30,6 +31,17 @@ namespace KSS.Core
             }
         }
 
+        [SerializationMappingProvider( typeof( ActiveObjectManager ) )]
+        public static SerializationMapping ActiveObjectManagerMapping()
+        {
+            return new CompoundSerializationMapping<ActiveObjectManager>()
+            {
+                ("active_object", new MemberReference<ActiveObjectManager, GameObject>( o => ActiveObjectManager.ActiveObject, (o, value) => ActiveObjectManager.ActiveObject = value ))
+            }
+            .IncludeMembers<Behaviour>()
+            .UseBaseTypeFactory();
+        }
+        /*
         public SerializedData GetData( IReverseReferenceMap s )
         {
             SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
@@ -48,6 +60,6 @@ namespace KSS.Core
 
             if( data.TryGetValue( "active_object", out var activeObject ) )
                 ActiveObject = (GameObject)l.ReadObjectReference( activeObject );
-        }
+        }*/
     }
 }

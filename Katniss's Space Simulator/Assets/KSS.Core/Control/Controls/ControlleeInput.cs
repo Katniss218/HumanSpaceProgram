@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 using UnityPlus.Serialization;
 
 namespace KSS.Control.Controls
@@ -11,7 +12,7 @@ namespace KSS.Control.Controls
 	/// <summary>
 	/// Represents a control that consumes an empty control signal.
 	/// </summary>
-	public sealed class ControlleeInput : ControlleeInputBase, IPersistsData
+	public sealed class ControlleeInput : ControlleeInputBase
     {
 		internal Action onInvoke;
 
@@ -62,6 +63,22 @@ namespace KSS.Control.Controls
             return true;
         }
 
+
+        [SerializationMappingProvider( typeof( ControlleeInput ) )]
+        public static SerializationMapping FreePhysicsObjectMapping()
+        {
+            return new CompoundSerializationMapping<ControlleeInput>()
+            {
+                ("connects_to", new MemberReferenceArray<ControlleeInput, ControllerOutput>( o => o.outputs.ToArray(), (o, value) =>
+                {
+                    foreach( var c in value )
+                    {
+                        ControlleeInput.Connect( o, c );
+                    }
+                } ))
+            };
+        }
+        /*
         public SerializedData GetData( IReverseReferenceMap s )
         {
             SerializedArray sa = new SerializedArray();
@@ -87,7 +104,7 @@ namespace KSS.Control.Controls
                 }
             }
         }
-
+        */
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         internal static void Disconnect( ControllerOutput output )
         {

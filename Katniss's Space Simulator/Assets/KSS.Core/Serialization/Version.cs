@@ -95,16 +95,14 @@ namespace KSS.Core.Serialization
 
     public static class Persistent_Version
     {
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static SerializedData GetData( this Version version, IReverseReferenceMap l = null )
+        [SerializationMappingProvider( typeof( Version ) )]
+        public static SerializationMapping VersionMapping()
         {
-            return (SerializedPrimitive)version.ToString();
-        }
-
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static Version AsVersion( this SerializedData data, IForwardReferenceMap l = null )
-        {
-            return Version.Parse( data.AsString() );
+            return new PrimitiveStructSerializationMapping<Version>()
+            {
+                OnSave = ( o, s ) => (SerializedPrimitive)o.ToString(),
+                OnInstantiate = ( data, l ) => Version.Parse( (string)data )
+            };
         }
     }
 }

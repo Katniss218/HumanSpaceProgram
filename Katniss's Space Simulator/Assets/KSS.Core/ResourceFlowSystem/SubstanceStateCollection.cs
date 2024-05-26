@@ -12,7 +12,7 @@ namespace KSS.Core.ResourceFlowSystem
     /// Contains state information about multiple resources, and methods to combine them.
     /// </summary>
     [Serializable]
-    public class SubstanceStateCollection : IPersistsData
+    public class SubstanceStateCollection
     {
         [field: SerializeField]
         List<SubstanceState> _substances = new List<SubstanceState>();
@@ -187,6 +187,15 @@ namespace KSS.Core.ResourceFlowSystem
             return new SubstanceStateCollection( _substances?.ToArray() );
         }
 
+        [SerializationMappingProvider( typeof( SubstanceStateCollection ) )]
+        public static SerializationMapping SubstanceStateCollectionMapping()
+        {
+            return new CompoundSerializationMapping<SubstanceStateCollection>()
+            {
+                ("substances", new Member<SubstanceStateCollection, SubstanceState[]>( o => o._substances.ToArray(), (o, value) => o._substances = value.ToList() ))
+            };
+        }
+        /*
         public SerializedData GetData( IReverseReferenceMap s )
         {
             SerializedArray arr = new SerializedArray();
@@ -206,6 +215,6 @@ namespace KSS.Core.ResourceFlowSystem
                 sbs.SetData( sbsD, l );
                 this._substances.Add( sbs );
             }
-        }
+        }*/
     }
 }

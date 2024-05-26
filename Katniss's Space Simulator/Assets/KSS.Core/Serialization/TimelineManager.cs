@@ -2,11 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityPlus.OverridableEvents;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.ReferenceMaps;
-using UnityPlus.Serialization.Strategies;
 
 namespace KSS.Core.Serialization
 {
@@ -102,9 +102,9 @@ namespace KSS.Core.Serialization
             HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_LOAD, _eLoad ); // invoke here because otherwise the invoking method finishes before the coroutine.
         }
 
-        private static void CreateSaver( IEnumerable<IAsyncSaver.Action> objectActions, IEnumerable<IAsyncSaver.Action> dataActions )
+        private static void CreateSaver( IEnumerable<IAsyncSaver.Action> actions )
         {
-            _saver = new AsyncSaver( null, SaveLoadStartFunc, SaveFinishFunc, objectActions, dataActions );
+            _saver = new AsyncSaver( null, SaveLoadStartFunc, SaveFinishFunc, actions );
         }
 
         private static void CreateLoader( IEnumerable<IAsyncLoader.Action> objectActions, IEnumerable<IAsyncLoader.Action> dataActions )
@@ -134,17 +134,17 @@ namespace KSS.Core.Serialization
 
             _eSave = new SaveEventData( timelineId, saveId );
             HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_SAVE, _eSave );
-            CreateSaver( _eSave.objectActions, _eSave.dataActions );
+            CreateSaver( _eSave.objectActions.Union( _eSave.dataActions ) );
 
             _saver.RefMap = new ReverseReferenceStore();
             _saver.SaveAsync( instance );
 
-            CurrentTimeline.WriteToDisk();
+            CurrentTimeline.SaveToDisk();
             SaveMetadata savedSave = new SaveMetadata( timelineId, saveId );
             savedSave.Name = saveName;
             savedSave.Description = saveDescription;
             savedSave.FileVersion = SaveMetadata.CURRENT_SAVE_FILE_VERSION;
-            savedSave.WriteToDisk();
+            savedSave.SaveToDisk();
         }
 
         /// <summary>
@@ -164,10 +164,8 @@ namespace KSS.Core.Serialization
 
             Directory.CreateDirectory( SaveMetadata.GetRootDirectory( timelineId, saveId ) );
 
-            TimelineMetadata loadedTimeline = new TimelineMetadata( timelineId );
-            loadedTimeline.ReadDataFromDisk();
-            SaveMetadata loadedSave = new SaveMetadata( timelineId, saveId );
-            loadedSave.ReadDataFromDisk();
+            TimelineMetadata loadedTimeline = TimelineMetadata.LoadFromDisk( timelineId );
+            SaveMetadata loadedSave = SaveMetadata.LoadFromDisk( timelineId, saveId );
 
             _eLoad = new LoadEventData( timelineId, saveId );
             HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_LOAD, _eLoad );

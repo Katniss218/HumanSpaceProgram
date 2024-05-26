@@ -131,10 +131,9 @@ namespace KSS.Components
 
         private void RunOriginalToGhost()
         {
-            foreach( var kvp in _cachedData )
+            foreach( var (component, data) in _cachedData )
             {
-#warning TODO - finish here
-               // kvp.Key.SetData( kvp.Value.fwd, _cachedRefStore );
+                SerializationUnit.Populate<Component>( component, data.fwd );
             }
         }
 
@@ -142,8 +141,7 @@ namespace KSS.Components
         {
             foreach( var (component, data) in _cachedData )
             {
-#warning TODO - finish here
-                // component.SetData( data.rev, _cachedRefStore );
+                SerializationUnit.Populate<Component>( component, data.rev );
             }
         }
 

@@ -117,6 +117,19 @@ namespace KSS.Core.Serialization
             return uniqueCategories.ToArray();
         }
 
+        public static PartMetadata LoadFromDisk( string path )
+        {
+            PartMetadata partMetadata = new PartMetadata( path );
+            // load data
+            return partMetadata;
+        }
+
+        public void SaveToDisk()
+        {
+
+        }
+
+        /*
         public void WriteToDisk()
         {
             string savePath = GetRootDirectory();
@@ -180,6 +193,6 @@ namespace KSS.Core.Serialization
 
             if( data.TryGetValue( "group", out var group ) )
                 this.Group = group.AsString();
-        }
+        }*/
     }
 }

@@ -8,8 +8,21 @@ using UnityPlus.Serialization;
 
 namespace KSS.Core
 {
-    public sealed partial class Vessel : IPersistsData
+    public static class Vessel_SerializationMappings
     {
+        [SerializationMappingProvider( typeof( Vessel ) )]
+        public static SerializationMapping VesselMapping()
+        {
+            return new CompoundSerializationMapping<Vessel>()
+            {
+                ("display_name", new Member<Vessel, bool>( o => o.enabled )),
+                ("root_part", new MemberReference<Vessel, Transform>( o => o.RootPart )),
+                ("on_after_recalculate_parts", new Member<Vessel, Action>( o => o.OnAfterRecalculateParts ))
+            }
+            .IncludeMembers<Behaviour>()
+            .UseBaseTypeFactory();
+        }
+        /*
         public SerializedData GetData( IReverseReferenceMap s )
         {
             SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
@@ -36,6 +49,6 @@ namespace KSS.Core
 
             if( data.TryGetValue( "on_after_recalculate_parts", out var onAfterRecalculateParts ) )
                 this.OnAfterRecalculateParts = (Action)onAfterRecalculateParts.AsDelegate( l );
-        }
+        }*/
     }
 }

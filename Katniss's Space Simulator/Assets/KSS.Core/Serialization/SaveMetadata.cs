@@ -1,4 +1,6 @@
-﻿using System;
+﻿using KSS.Core.Components;
+using KSS.Core.Mods;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -115,8 +117,7 @@ namespace KSS.Core.Serialization
             {
                 try
                 {
-                    SaveMetadata saveMetadata = new SaveMetadata( timelineId, saveDirPath );
-                    saveMetadata.ReadDataFromDisk();
+                    SaveMetadata saveMetadata = SaveMetadata.LoadFromDisk( timelineId, saveDirPath );
                     saves.Add( saveMetadata );
                 }
                 catch( Exception ex )
@@ -129,6 +130,19 @@ namespace KSS.Core.Serialization
             return saves;
         }
 
+        public static SaveMetadata LoadFromDisk( string timelineId, string saveId )
+        {
+            SaveMetadata saveMetadata = new SaveMetadata( timelineId, saveId );
+           // saveMetadata.LoadFromDisk();
+            return saveMetadata;
+        }
+
+        public void SaveToDisk()
+        {
+
+        }
+
+        /*
         public void WriteToDisk()
         {
             string savePath = GetRootDirectory();
@@ -138,14 +152,6 @@ namespace KSS.Core.Serialization
             new JsonStringWriter( this.GetData(), sb ).Write();
 
             File.WriteAllText( saveFilePath, sb.ToString(), Encoding.UTF8 );
-            /*Saver saver = new Saver( null, null, null, ( s ) =>
-            {
-                StringBuilder sb = new StringBuilder();
-                new JsonStringWriter( this.GetData( s ), sb ).Write();
-
-                File.WriteAllText( saveFilePath, sb.ToString(), Encoding.UTF8 );
-            } );
-            saver.Save();*/
         }
 
         public void ReadDataFromDisk()
@@ -158,11 +164,6 @@ namespace KSS.Core.Serialization
             SerializedData data = new JsonStringReader( saveJson ).Read();
 
             this.SetData( data );
-            /*Loader loader = new Loader( null, null, null, ( l ) =>
-            {
-                this.SetData( l, data );
-            } );
-            loader.Load();*/
         }
 
         public SerializedData GetData()
@@ -200,6 +201,6 @@ namespace KSS.Core.Serialization
                     this.ModVersions.Add( elemKvp.Key, elemKvp.Value.AsVersion() );
                 }
             }
-        }
+        }*/
     }
 }

@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace UnityPlus.Serialization
 {
-    internal interface ISerializationMappingWithCustomFactory
+    public interface ISerializationMappingWithCustomFactory
     {
         Func<SerializedData, IForwardReferenceMap, object> CustomFactory { get; }
     }
@@ -20,6 +20,8 @@ namespace UnityPlus.Serialization
     {
         private readonly List<(string, MemberBase<TSource>)> _items = new();
         public Func<SerializedData, IForwardReferenceMap, object> CustomFactory { get; private set; } = null;
+
+        public override SerializationStyle SerializationStyle => SerializationStyle.NonPrimitive;
 
         public CompoundSerializationMapping()
         {
@@ -137,7 +139,7 @@ namespace UnityPlus.Serialization
             return root;
         }
 
-        public override object Load( SerializedData data, IForwardReferenceMap l )
+        public override object Instantiate( SerializedData data, IForwardReferenceMap l )
         {
             TSource obj;
             if( CustomFactory == null )
@@ -153,18 +155,23 @@ namespace UnityPlus.Serialization
                 obj = (TSource)CustomFactory.Invoke( data, l );
             }
 
+            return obj;
+        }
+
+        public override void Load( ref object obj, SerializedData data, IForwardReferenceMap l )
+        {
+            TSource obj2 = (TSource)obj;
             foreach( var item in _items )
             {
                 if( item.Item2 is IMappedMember<TSource> member )
                 {
                     if( data.TryGetValue( item.Item1, out var memberData ) )
                     {
-                        member.Load( ref obj, memberData, l );
+                        member.Load( ref obj2, memberData, l );
                     }
                 }
             }
-
-            return obj;
+            obj = obj2;
         }
 
         public override void LoadReferences( ref object obj, SerializedData data, IForwardReferenceMap l )

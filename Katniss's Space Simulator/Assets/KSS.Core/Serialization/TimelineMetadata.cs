@@ -90,8 +90,7 @@ namespace KSS.Core.Serialization
             {
                 try
                 {
-                    TimelineMetadata timelineMetadata = new TimelineMetadata( timelineDirName );
-                    timelineMetadata.ReadDataFromDisk();
+                    TimelineMetadata timelineMetadata = TimelineMetadata.LoadFromDisk( timelineDirName );
                     timelines.Add( timelineMetadata );
                 }
                 catch( Exception ex )
@@ -104,6 +103,19 @@ namespace KSS.Core.Serialization
             return timelines;
         }
 
+        public static TimelineMetadata LoadFromDisk( string timelineId )
+        {
+            TimelineMetadata timelineMetadata = new TimelineMetadata( timelineId );
+           // timelineMetadata.LoadFromDisk();
+            return timelineMetadata;
+        }
+
+        public void SaveToDisk()
+        {
+
+        }
+
+        /*
         public void WriteToDisk()
         {
             string savePath = GetRootDirectory();
@@ -143,6 +155,6 @@ namespace KSS.Core.Serialization
 
             if( data.TryGetValue( "description", out var description ) )
                 this.Description = description.AsString();
-        }
+        }*/
     }
 }
