@@ -1,4 +1,5 @@
 ﻿using KSS.Core;
+using KSS.Core.Physics;
 using KSS.Core.ResourceFlowSystem;
 using System;
 using System.Diagnostics.Contracts;
@@ -10,7 +11,7 @@ namespace KSS.Components
     /// <summary>
     /// A container for a <see cref="Substance"/>.
     /// </summary>
-    public class FBulkContainer_Sphere : MonoBehaviour, IResourceConsumer, IResourceProducer, IResourceContainer, IPersistsData
+    public class FBulkContainer_Sphere : MonoBehaviour, IResourceConsumer, IResourceProducer, IResourceContainer
     {
         /// <summary>
         /// Determines the center position of the container.
@@ -116,6 +117,20 @@ namespace KSS.Components
             OnAfterMassChanged?.Invoke( this.Mass - oldMass );
         }
 
+        [SerializationMappingProvider( typeof( FBulkContainer_Sphere ) )]
+        public static SerializationMapping FBulkContainer_SphereMapping()
+        {
+            return new CompoundSerializationMapping<FBulkContainer_Sphere>()
+            {
+                ("volume_transform", new MemberReference<FBulkContainer_Sphere, Transform>( o => o.VolumeTransform )),
+                ("max_volume", new Member<FBulkContainer_Sphere, float>( o => o.MaxVolume )),
+                ("radius", new Member<FBulkContainer_Sphere, float>( o => o.Radius )),
+                ("contents", new Member<FBulkContainer_Sphere, SubstanceStateCollection>( o => o.Contents ))
+            }
+            .IncludeMembers<Behaviour>()
+            .UseBaseTypeFactory();
+        }
+        /*
         public SerializedData GetData( IReverseReferenceMap s )
         {
             SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
@@ -147,7 +162,7 @@ namespace KSS.Components
             if( data.TryGetValue( "contents", out var contents ) )
                 this.Contents.SetData( contents, l );
         }
-
+        */
         /// <summary>
         /// Calculates the height of a truncated unit sphere with the given volume as a [0..1] percentage of the unit sphere's volume.
         /// </summary>

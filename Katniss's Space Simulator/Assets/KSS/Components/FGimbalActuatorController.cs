@@ -1,6 +1,7 @@
 ﻿using KSS.Control;
 using KSS.Control.Controls;
 using KSS.Core;
+using KSS.Core.ResourceFlowSystem;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -13,9 +14,9 @@ namespace KSS.Components
     /// <summary>
     /// Controls a number of gimbal actuators.
     /// </summary>
-    public class FGimbalActuatorController : MonoBehaviour, IPersistsObjects, IPersistsData
+    public class FGimbalActuatorController : MonoBehaviour
     {
-        public class Actuator2DGroup : ControlGroup, IPersistsObjects
+        public class Actuator2DGroup : ControlGroup
         {
             [NamedControl( "Ref. Transform", "Connect this to the actuator's reference transform parameter." )]
             public ControlParameterInput<Transform> GetReferenceTransform = new();
@@ -26,6 +27,18 @@ namespace KSS.Components
             public Actuator2DGroup() : base()
             { }
 
+
+            [SerializationMappingProvider( typeof( Actuator2DGroup ) )]
+            public static SerializationMapping Actuator2DGroupMapping()
+            {
+                return new CompoundSerializationMapping<Actuator2DGroup>()
+                {
+                    ("get_reference_transform", new MemberReference<Actuator2DGroup, ControlParameterInput<Transform>>( o => o.GetReferenceTransform )),
+                    ("on_set_xy", new Member<Actuator2DGroup, ControllerOutput<Vector2>>( o => o.OnSetXY ))
+                }
+                .WithFactory( ( data, l ) => new Actuator2DGroup() );
+            }
+            /*
             public SerializedObject GetObjects( IReverseReferenceMap s )
             {
                 return new SerializedObject()
@@ -47,7 +60,7 @@ namespace KSS.Components
                     OnSetXY = new();
                     l.SetObj( onSetXY.AsGuid(), OnSetXY );
                 }
-            }
+            }*/
         }
 
         /// <summary>
@@ -111,6 +124,18 @@ namespace KSS.Components
             }
         }
 
+        [SerializationMappingProvider( typeof( FGimbalActuatorController ) )]
+        public static SerializationMapping FGimbalActuatorControllerMapping()
+        {
+            return new CompoundSerializationMapping<FGimbalActuatorController>()
+            {
+                ("actuators_2d", new Member<FGimbalActuatorController, Actuator2DGroup[]>( o => o.Actuators2D )),
+                ("set_attitude", new Member<FGimbalActuatorController, ControlleeInput<Vector3>>( o => o.SetAttitude ))
+            }
+            .IncludeMembers<Behaviour>()
+            .UseBaseTypeFactory();
+        }
+        /*
         public SerializedObject GetObjects( IReverseReferenceMap s )
         {
             SerializedArray array = new SerializedArray();
@@ -169,6 +194,6 @@ namespace KSS.Components
 
             if( data.TryGetValue( "set_attitude", out var setAttitude ) )
                 this.SetAttitude.SetData( setAttitude, l );
-        }
+        }*/
     }
 }

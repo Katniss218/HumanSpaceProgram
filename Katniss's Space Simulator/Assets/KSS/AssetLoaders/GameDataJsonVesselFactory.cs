@@ -16,12 +16,7 @@ namespace KSS.AssetLoaders
     /// Finds and registers json parts in GameData.
     /// </summary>
     public sealed class GameDataJsonVesselFactory : PartFactory
-    {
-        private static JsonSerializedDataHandler _handler = new JsonSerializedDataHandler();
-        private static SingleExplicitHierarchyStrategy _strat = new SingleExplicitHierarchyStrategy( _handler, () => throw new NotSupportedException( $"Tried to save something using a part *loader*" ) );
-
-        private static Loader _loader = new Loader( null, null, null, _strat.Load_Object, _strat.Load_Data );
-
+    {        
         private string _vesselId;
 
         public override PartMetadata LoadMetadata()
@@ -37,11 +32,10 @@ namespace KSS.AssetLoaders
         {
             string filePath = VesselMetadata.GetRootDirectory( _vesselId );
 
-            _handler.ObjectsFilename = Path.Combine( filePath, "objects.json" );
-            _handler.DataFilename = Path.Combine( filePath, "data.json" );
-            _loader.RefMap = refMap;
-            _loader.Load();
-            return _strat.LastSpawnedRoot;
+            var data = new JsonSerializedDataHandler( Path.Combine( filePath, "gameobjects.json" ) )
+                .Read();
+
+            return SerializationUnit.Deserialize<GameObject>( data );
         }
 
         [HSPEventListener( HSPEvent.STARTUP_IMMEDIATELY, HSPEvent.NAMESPACE_VANILLA + ".load_vessels" )]

@@ -11,7 +11,6 @@ using UnityEngine;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.DataHandlers;
 using UnityPlus.Serialization.ReferenceMaps;
-using UnityPlus.Serialization.Strategies;
 
 namespace KSS.DesignScene
 {
@@ -20,9 +19,6 @@ namespace KSS.DesignScene
     /// </summary>
     public class DesignObjectManager : SingletonMonoBehaviour<DesignObjectManager>
     {
-        static JsonSeparateFileSerializedDataHandler _designObjDataHandler = new JsonSeparateFileSerializedDataHandler();
-        static SingleExplicitHierarchyStrategy _designObjStrategy = new SingleExplicitHierarchyStrategy( _designObjDataHandler, GetGameObject );
-
         private DesignObject _designObj;
         /// <summary>
         /// Returns the object currently being edited.
@@ -163,6 +159,7 @@ namespace KSS.DesignScene
             TimeStepManager.LockTimescale = true;
         }
 
+#warning TODO - finish
         public static void FinishSaveFunc()
         {
             TimeStepManager.LockTimescale = false;
@@ -176,7 +173,7 @@ namespace KSS.DesignScene
         public static void FinishLoadFunc()
         {
             TimeStepManager.LockTimescale = false;
-            DesignObject.RootPart = _designObjStrategy.LastSpawnedRoot.transform;
+           // DesignObject.RootPart = _designObjStrategy.LastSpawnedRoot.transform;
             if( !_wasPausedBeforeSerializing )
             {
                 TimeStepManager.Unpause();
@@ -211,7 +208,7 @@ namespace KSS.DesignScene
         }
 
 
-
+        /*
         public static void SaveVessel()
         {
             // save current vessel to the files defined by metadata's ID.
@@ -246,7 +243,7 @@ namespace KSS.DesignScene
             _loader = new AsyncLoader( new ForwardReferenceStore(), StartFunc, FinishLoadFunc, _designObjStrategy.LoadAsync_Object, _designObjStrategy.LoadAsync_Data );
             _loader.LoadAsync( instance );
         }
-
+        */
         // ------
 
         private static GameObject GetGameObject()

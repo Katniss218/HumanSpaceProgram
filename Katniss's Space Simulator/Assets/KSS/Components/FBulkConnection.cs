@@ -3,6 +3,7 @@ using KSS.Core.Physics;
 using KSS.Core.ReferenceFrames;
 using KSS.Core.ResourceFlowSystem;
 using System;
+using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
 
@@ -11,13 +12,13 @@ namespace KSS.Components
     /// <summary>
     /// An object that connects two containers and calculates the resource flow between them.
     /// </summary>
-    public class FBulkConnection : MonoBehaviour, IPersistsData
+    public class FBulkConnection : MonoBehaviour
     {
         /// <summary>
         /// Represents an inlet or outlet.
         /// </summary>
         [Serializable]
-        public class Port : IPersistsData
+        public class Port
         {
             // idk if SerializeField works with interfaces. probably better to save over in json.
             [SerializeField]
@@ -62,6 +63,20 @@ namespace KSS.Components
                 return (this._objC, this._objP);
             }
 
+
+            [SerializationMappingProvider( typeof( Port ) )]
+            public static SerializationMapping PortMapping()
+            {
+                return new CompoundSerializationMapping<Port>()
+                {
+                    ("obj_c", new MemberReference<Port, IResourceConsumer>( o => o._objC )),
+                    ("obj_p", new MemberReference<Port, IResourceProducer>( o => o._objP )),
+                    ("position", new Member<Port, Vector3>( o => o.Position )),
+                    ("forward", new Member<Port, Vector3>( o => o.Forward ))
+                }
+                .WithFactory( ( data, l ) => new Sequence() );
+            }
+            /*
             public SerializedData GetData( IReverseReferenceMap s )
             {
                 return new SerializedObject()
@@ -86,7 +101,7 @@ namespace KSS.Components
 
                 if( data.TryGetValue( "forward", out var forward ) )
                     this.Forward = forward.AsVector3();
-            }
+            }*/
         }
 
         /// <summary>
@@ -280,6 +295,19 @@ namespace KSS.Components
             }
         }
 
+        [SerializationMappingProvider( typeof( FBulkConnection ) )]
+        public static SerializationMapping FBulkConnectionMapping()
+        {
+            return new CompoundSerializationMapping<FBulkConnection>()
+            {
+                ("end1", new MemberReference<FBulkConnection, Port>( o => o.End1 )),
+                ("end2", new MemberReference<FBulkConnection, Port>( o => o.End2 )),
+                ("cross_section_area", new Member<FBulkConnection, float>( o => o.CrossSectionArea ))
+            }
+            .IncludeMembers<Behaviour>()
+            .UseBaseTypeFactory();
+        }
+        /*
         public SerializedData GetData( IReverseReferenceMap s )
         {
             SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
@@ -304,6 +332,6 @@ namespace KSS.Components
                 this.End2.SetData( end2, l );
             if( data.TryGetValue( "cross_section_area", out var crossSectionArea ) )
                 this.CrossSectionArea = crossSectionArea.AsFloat();
-        }
+        }*/
     }
 }

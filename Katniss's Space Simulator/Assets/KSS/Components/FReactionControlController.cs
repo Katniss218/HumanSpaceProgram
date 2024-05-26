@@ -10,7 +10,7 @@ using UnityPlus.Serialization;
 namespace KSS.Components
 {
     [Obsolete("Not implemented yet.")] // TODO - add actual functionality.
-	public class FReactionControlController : MonoBehaviour, IPersistsData
+	public class FReactionControlController : MonoBehaviour
 	{
 
 
@@ -21,9 +21,19 @@ namespace KSS.Components
 
 
 
-		// RCS controllers can either control for desired angular accelerations, or linear accelerations.
-		// There should be *one* controller active at any given time, or something else to sync them if two are needed.
+        // RCS controllers can either control for desired angular accelerations, or linear accelerations.
+        // There should be *one* controller active at any given time, or something else to sync them if two are needed.
 
+        [SerializationMappingProvider( typeof( FReactionControlController ) )]
+        public static SerializationMapping FReactionControlControllerMapping()
+        {
+            return new CompoundSerializationMapping<FReactionControlController>()
+            {
+            }
+            .IncludeMembers<Behaviour>()
+            .UseBaseTypeFactory();
+        }
+        /*
 		public SerializedData GetData( IReverseReferenceMap s )
 		{
 
@@ -37,6 +47,6 @@ namespace KSS.Components
 		public void SetData( SerializedData data, IForwardReferenceMap l )
 		{
 			IPersistent_Behaviour.SetData( this, data, l );
-		}
-	}
+		}*/
+    }
 }

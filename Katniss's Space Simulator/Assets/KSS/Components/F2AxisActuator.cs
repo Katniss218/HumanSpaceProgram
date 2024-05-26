@@ -6,7 +6,7 @@ using UnityPlus.Serialization;
 
 namespace KSS.Components
 {
-	public class F2AxisActuator : MonoBehaviour, IPersistsObjects, IPersistsData
+	public class F2AxisActuator : MonoBehaviour
 	{
 		/// <summary>
 		/// The transform used as a reference (0,0) orientation.
@@ -80,6 +80,8 @@ namespace KSS.Components
 			YActuatorTransform.localRotation = Quaternion.Euler( 0, 0, clampedY ) * YActuatorTransform.localRotation;
 		}
 
+#warning TODO - finish.
+		/*
         public SerializedObject GetObjects( IReverseReferenceMap s )
         {
             return new SerializedObject()
@@ -175,6 +177,6 @@ namespace KSS.Components
                 this.SetY.SetData( setY, l );
             if( data.TryGetValue( "set_xy", out var setXY ) )
                 this.SetXY.SetData( setXY, l );
-        }
+        }*/
 	}
 }

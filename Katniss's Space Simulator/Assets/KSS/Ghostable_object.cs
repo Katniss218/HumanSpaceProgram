@@ -1,4 +1,5 @@
-﻿using UnityPlus.Serialization;
+﻿using System;
+using UnityPlus.Serialization;
 
 namespace KSS
 {
@@ -6,13 +7,14 @@ namespace KSS
     {
         public static SerializedData GetGhostData( this object obj, IReverseReferenceMap s )
         {
-            switch( obj )
+            throw new NotImplementedException($"Implement ghosting as a different kind of serialization mapping (?)");
+           /* switch( obj )
             {
                 case IGhostable o:
                     return o.GetGhostData( s );
                 default:
                     return GhostableWithExtension.GetGhostData( obj, obj.GetType(), s );
-            }
+            }*/
         }
     }
 }

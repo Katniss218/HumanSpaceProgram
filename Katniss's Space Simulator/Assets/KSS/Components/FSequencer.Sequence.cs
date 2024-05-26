@@ -13,7 +13,7 @@ namespace KSS.Components
     /// <summary>
     /// A sequence contained within a <see cref="FSequencer"/>.
     /// </summary>
-    public class Sequence : ControlGroup, IPersistsObjects, IPersistsData
+    public class Sequence : ControlGroup
     {
         [NamedControl( "Elements", Editable = false )]
         public List<SequenceElement> Elements = new();
@@ -78,6 +78,17 @@ namespace KSS.Components
             return false;
         }
 
+        [SerializationMappingProvider( typeof( Sequence ) )]
+        public static SerializationMapping SequenceMapping()
+        {
+            return new CompoundSerializationMapping<Sequence>()
+            {
+                ("elements", new Member<Sequence, SequenceElement[]>( o => o.Elements.ToArray(), (o, value) => o.Elements = value.ToList() )),
+                ("current", new Member<Sequence, int>( o => o.Current ))
+            }
+            .WithFactory( ( data, l ) => new Sequence() );
+        }
+        /*
         public SerializedObject GetObjects( IReverseReferenceMap s )
         {
             SerializedArray array = new SerializedArray( Elements.Select( e => e.GetObjects( s ) ) );
@@ -130,6 +141,6 @@ namespace KSS.Components
                     i++;
                 }
             }
-        }
+        }*/
     }
 }

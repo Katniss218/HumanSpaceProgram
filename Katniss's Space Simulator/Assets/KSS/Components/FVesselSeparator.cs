@@ -7,7 +7,7 @@ using UnityPlus.Serialization;
 
 namespace KSS.Components
 {
-    public class FVesselSeparator : MonoBehaviour, IPersistsObjects, IPersistsData
+    public class FVesselSeparator : MonoBehaviour
     {
         bool _hasSeparated = false;
 
@@ -29,6 +29,18 @@ namespace KSS.Components
             Separate = new ControlleeInput( SeparateListener );
         }
 
+        [SerializationMappingProvider( typeof( FVesselSeparator ) )]
+        public static SerializationMapping FVesselSeparatorMapping()
+        {
+            return new CompoundSerializationMapping<FVesselSeparator>()
+            {
+                ("separate", new Member<FVesselSeparator, ControlleeInput>( o => o.Separate )),
+                ("has_separated", new Member<FVesselSeparator, bool>( o => o._hasSeparated ))
+            }
+            .IncludeMembers<Behaviour>()
+            .UseBaseTypeFactory();
+        }
+        /*
         public SerializedObject GetObjects( IReverseReferenceMap s )
         {
             return new SerializedObject()
@@ -68,6 +80,6 @@ namespace KSS.Components
 
             if( data.TryGetValue( "separate", out var separate ) )
                 Separate.SetData( separate, l );
-        }
+        }*/
     }
 }

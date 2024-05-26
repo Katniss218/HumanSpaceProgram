@@ -207,7 +207,7 @@ namespace KSS.Core.Physics
                 ("mass", new Member<PinnedPhysicsObject, float>( o => o.Mass )),
                 ("local_center_of_mass", new Member<PinnedPhysicsObject, Vector3>( o => o.LocalCenterOfMass )),
 
-                ("is_kinematic", new Member<PinnedPhysicsObject, bool>( o => true, (o, value) => o._rb.isKinematic = true)), // TODO - isKinematic member is a hack.
+                ("DO_NOT_TOUCH", new Member<PinnedPhysicsObject, bool>( o => true, (o, value) => o._rb.isKinematic = true)), // TODO - isKinematic member is a hack.
 
                 ("velocity", new Member<PinnedPhysicsObject, Vector3>( o => o.Velocity )),
                 ("angular_velocity", new Member<PinnedPhysicsObject, Vector3>( o => o.AngularVelocity )),

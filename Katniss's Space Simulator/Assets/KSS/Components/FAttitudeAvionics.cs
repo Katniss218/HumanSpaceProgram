@@ -16,7 +16,7 @@ namespace KSS.Components
 	/// <summary>
 	/// Stability Assist (SAS) module.
 	/// </summary>
-	public class FAttitudeAvionics : MonoBehaviour, IPersistsObjects
+	public class FAttitudeAvionics : MonoBehaviour
 	{
 		private Vessel _vessel;
 
@@ -287,6 +287,17 @@ namespace KSS.Components
 			_error1[i] = double.NaN;
         }
 
+        [SerializationMappingProvider( typeof( FAttitudeAvionics ) )]
+        public static SerializationMapping FAttitudeAvionicsMapping()
+        {
+            return new CompoundSerializationMapping<FAttitudeAvionics>()
+            {
+                ("on_set_attitude", new Member<FAttitudeAvionics, ControllerOutput<Vector3>>( o => o.OnSetAttitude ))
+            }
+            .IncludeMembers<Behaviour>()
+            .UseBaseTypeFactory();
+        }
+		/*
         public SerializedObject GetObjects( IReverseReferenceMap s )
         {
             return new SerializedObject()
@@ -302,6 +313,6 @@ namespace KSS.Components
                 OnSetAttitude = new();
                 l.SetObj( onSetAttitude.AsGuid(), OnSetAttitude );
             }
-        }
+        }*/
     }
 }

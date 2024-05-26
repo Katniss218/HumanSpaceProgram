@@ -11,7 +11,7 @@ using UnityPlus.Serialization;
 
 namespace Assets.KSS.Components
 {
-	public class F3AxisActuator : MonoBehaviour, IPersistsObjects, IPersistsData
+	public class F3AxisActuator : MonoBehaviour
     {
         /// <summary>
         /// The transform used as a reference (0,0,0) orientation.
@@ -105,6 +105,8 @@ namespace Assets.KSS.Components
             ZActuatorTransform.localRotation = Quaternion.Euler( 0, clampedZ, 0 ) * ZActuatorTransform.localRotation;
         }
 
+#warning TODO - finish.
+        /*
         public SerializedObject GetObjects( IReverseReferenceMap s )
         {
             return new SerializedObject()
@@ -219,6 +221,6 @@ namespace Assets.KSS.Components
                 this.SetZ.SetData( setZ, l );
             if( data.TryGetValue( "set_xyz", out var setXYZ ) )
                 this.SetXYZ.SetData( setXYZ, l );
-        }
+        }*/
 	}
 }

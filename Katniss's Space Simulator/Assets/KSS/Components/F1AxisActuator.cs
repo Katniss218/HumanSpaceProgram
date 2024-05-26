@@ -10,7 +10,7 @@ using UnityPlus.Serialization;
 
 namespace KSS.Components
 {
-    public class F1AxisActuator : MonoBehaviour, IPersistsObjects, IPersistsData
+    public class F1AxisActuator : MonoBehaviour
     {
         /// <summary>
         /// The transform used as a reference (0) orientation.
@@ -56,6 +56,8 @@ namespace KSS.Components
             XActuatorTransform.localRotation = Quaternion.Euler( clampedX, 0, 0 ) * XActuatorTransform.localRotation;
         }
 
+#warning TODO - finish.
+        /*
         public SerializedObject GetObjects( IReverseReferenceMap s )
         {
             return new SerializedObject()
@@ -119,6 +121,6 @@ namespace KSS.Components
 
             if( data.TryGetValue( "set_x", out var setX ) )
                 this.SetX.SetData( setX, l );
-        }
-	}
+        }*/
+    }
 }

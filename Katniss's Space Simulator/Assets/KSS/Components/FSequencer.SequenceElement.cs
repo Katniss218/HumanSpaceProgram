@@ -1,5 +1,6 @@
 ﻿using KSS.Components;
 using KSS.Control;
+using KSS.Control.Controls;
 using KSS.Core;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ namespace KSS.Components
     /// <summary>
     /// Represents an invokable element of a <see cref="FSequencer"/>'s sequence.
     /// </summary>
-    public abstract class SequenceElement : ControlGroup, IPersistsObjects, IPersistsData
+    public abstract class SequenceElement : ControlGroup
     {
         [NamedControl( "Actions", "", Editable = false )]
         /// <summary>
@@ -43,6 +44,15 @@ namespace KSS.Components
             }
         }
 
+        [SerializationMappingProvider( typeof( SequenceElement ) )]
+        public static SerializationMapping SequenceElementMapping()
+        {
+            return new CompoundSerializationMapping<SequenceElement>()
+            {
+                ("actions", new Member<SequenceElement, SequenceActionBase[]>( o => o.Actions.ToArray(), (o, value) => o.Actions = value.ToList() ))
+            };
+        }
+        /*
         public virtual SerializedObject GetObjects( IReverseReferenceMap s )
         {
             return new SerializedObject()
@@ -86,7 +96,7 @@ namespace KSS.Components
                     i++;
                 }
             }
-        }
+        }*/
     }
 
     public class KeyboardSequenceElement : SequenceElement
@@ -102,6 +112,17 @@ namespace KSS.Components
             return UnityEngine.Input.GetKey( Key );
         }
 
+        [SerializationMappingProvider( typeof( KeyboardSequenceElement ) )]
+        public static SerializationMapping KeyboardSequenceElementMapping()
+        {
+            return new CompoundSerializationMapping<KeyboardSequenceElement>()
+            {
+                ("key", new Member<KeyboardSequenceElement, KeyCode>( o => o.Key ))
+            }
+            .IncludeMembers<SequenceElement>()
+            .WithFactory( ( data, l ) => new KeyboardSequenceElement() );
+        }
+        /*
         public override SerializedData GetData( IReverseReferenceMap s )
         {
             SerializedObject ret = (SerializedObject)base.GetData( s );
@@ -120,7 +141,7 @@ namespace KSS.Components
 
             if( data.TryGetValue( "key", out var key ) )
                 Key = key.AsKeyCode();
-        }
+        }*/
     }
 
     public class TimedSequenceElement : SequenceElement
@@ -142,6 +163,18 @@ namespace KSS.Components
             return TimeStepManager.UT >= _startUT + Delay;
         }
 
+        [SerializationMappingProvider( typeof( TimedSequenceElement ) )]
+        public static SerializationMapping TimedSequenceElementMapping()
+        {
+            return new CompoundSerializationMapping<TimedSequenceElement>()
+            {
+                ("delay", new Member<TimedSequenceElement, float>( o => o.Delay )),
+                ("start_ut", new Member<TimedSequenceElement, double>( o => o._startUT ))
+            }
+            .IncludeMembers<SequenceElement>()
+            .WithFactory( ( data, l ) => new TimedSequenceElement() );
+        }
+        /*
         public override SerializedData GetData( IReverseReferenceMap s )
         {
             SerializedObject ret = (SerializedObject)base.GetData( s );
@@ -164,6 +197,6 @@ namespace KSS.Components
 
             if( data.TryGetValue( "start_ut", out var startUt ) )
                 _startUT = startUt.AsDouble();
-        }
+        }*/
     }
 }

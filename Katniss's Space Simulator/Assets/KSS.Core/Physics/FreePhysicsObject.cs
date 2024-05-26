@@ -183,7 +183,7 @@ namespace KSS.Core.Physics
                 ("mass", new Member<FreePhysicsObject, float>( o => o.Mass )),
                 ("local_center_of_mass", new Member<FreePhysicsObject, Vector3>( o => o.LocalCenterOfMass )),
 
-                ("is_kinematic", new Member<FreePhysicsObject, bool>( o => false, (o, value) => o._rb.isKinematic = false)), // TODO - isKinematic member is a hack.
+                ("DO_NOT_TOUCH", new Member<FreePhysicsObject, bool>( o => false, (o, value) => o._rb.isKinematic = false)), // TODO - isKinematic member is a hack.
 
                 ("velocity", new Member<FreePhysicsObject, Vector3>( o => o.Velocity )),
                 ("angular_velocity", new Member<FreePhysicsObject, Vector3>( o => o.AngularVelocity ))

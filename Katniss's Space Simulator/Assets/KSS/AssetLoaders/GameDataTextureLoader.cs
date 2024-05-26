@@ -9,7 +9,6 @@ using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityPlus.AssetManagement;
 using UnityPlus.Serialization;
-using UnityPlus.Serialization.Strategies;
 
 namespace KSS.AssetLoaders
 {

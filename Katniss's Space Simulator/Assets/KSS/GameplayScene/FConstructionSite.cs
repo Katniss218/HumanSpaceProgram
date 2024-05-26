@@ -2,6 +2,7 @@
 using KSS.Control.Controls;
 using KSS.Core;
 using KSS.Core.Components;
+using KSS.Core.Physics;
 using KSS.Core.ReferenceFrames;
 using System;
 using System.Collections.Generic;
@@ -87,7 +88,7 @@ namespace KSS.GameplayScene
     /// Manages the construction of its descendant <see cref="FConstructible"/>s.
     /// </summary>
     [DisallowMultipleComponent]
-    public class FConstructionSite : MonoBehaviour, IPersistsData
+    public class FConstructionSite : MonoBehaviour
     {
         /// <summary>
         /// The current state of (de)construction at this construction site.
@@ -321,6 +322,21 @@ namespace KSS.GameplayScene
             return false;
         }
 
+        [SerializationMappingProvider( typeof( FConstructionSite ) )]
+        public static SerializationMapping FConstructionSiteMapping()
+        {
+            return new CompoundSerializationMapping<FConstructionSite>()
+            {
+                ("state", new Member<FConstructionSite, ConstructionState>( o => o.State )),
+
+                ("DO_NOT_TOUCH", new Member<FConstructionSite, object>( o => null, (o, value) => o._constructibles = AncestralMap<FConstructible>.Create( o.transform ).Keys.ToArray() )), // TODO - isKinematic member is a hack.
+
+                ("build_speed", new Member<FConstructionSite, float>( o => o.BuildSpeed ))
+            }
+            .IncludeMembers<Behaviour>()
+            .UseBaseTypeFactory();
+        }
+        /*
         public SerializedData GetData( IReverseReferenceMap s )
         {
             SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
@@ -345,6 +361,6 @@ namespace KSS.GameplayScene
 
             if( data.TryGetValue( "build_speed", out var buildSpeed ) )
                 this.BuildSpeed = buildSpeed.AsFloat();
-        }
+        }*/
     }
 }

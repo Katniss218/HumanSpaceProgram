@@ -1,6 +1,7 @@
 ﻿using KSS.Control;
 using KSS.Control.Controls;
 using KSS.Core;
+using KSS.Core.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace KSS.Components
     /// <summary>
     /// Represents a controller that can invoke an arbitrary control action from a queue.
     /// </summary>
-    public class FSequencer : MonoBehaviour, IPersistsObjects, IPersistsData
+    public class FSequencer : MonoBehaviour
     {
         [NamedControl( "Sequence", Editable = false )]
         public Sequence Sequence = new Sequence();
@@ -33,6 +34,17 @@ namespace KSS.Components
             }
         }
 
+        [SerializationMappingProvider( typeof( FSequencer ) )]
+        public static SerializationMapping FSequencerMapping()
+        {
+            return new CompoundSerializationMapping<FSequencer>()
+            {
+                ("sequence", new MemberReference<FSequencer, Sequence>( o => o.Sequence ))
+            }
+            .IncludeMembers<Behaviour>()
+            .UseBaseTypeFactory();
+        }
+        /*
         public SerializedObject GetObjects( IReverseReferenceMap s )
         {
             return new SerializedObject()
@@ -68,6 +80,6 @@ namespace KSS.Components
 
             if( data.TryGetValue( "sequence", out var sequence ) )
                 Sequence.SetData( sequence, l );
-        }
+        }*/
     }
 }

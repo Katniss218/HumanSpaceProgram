@@ -7,11 +7,12 @@ using UnityPlus.Input;
 using UnityPlus.Serialization;
 using KSS.Control;
 using KSS.Control.Controls;
+using static KSS.Components.FGimbalActuatorController;
 
 namespace KSS.Components
 {
     [Serializable]
-    public class FRocketEngine : MonoBehaviour, IResourceConsumer, IPersistsObjects, IPersistsData
+    public class FRocketEngine : MonoBehaviour, IResourceConsumer
     {
         const float g = 9.80665f;
 
@@ -92,6 +93,22 @@ namespace KSS.Components
             return FluidState.Vacuum; // temp, inlet condition (possible backflow, etc).
         }
 
+
+        [SerializationMappingProvider( typeof( FRocketEngine ) )]
+        public static SerializationMapping FRocketEngineMapping()
+        {
+            return new CompoundSerializationMapping<FRocketEngine>()
+            {
+#warning TODO - needs to specify listener when creating `SetThrottle`.
+                ("set_throttle", new Member<FRocketEngine, ControlleeInput<float>>( o => o.SetThrottle )),
+                ("isp", new Member<FRocketEngine, float>( o => o.Isp )),
+                ("throttle", new Member<FRocketEngine, float>( o => o.Throttle )),
+                ("thrust_transform", new MemberReference<FRocketEngine, Transform>( o => o.ThrustTransform ))
+            }
+            .IncludeMembers<Behaviour>()
+            .UseBaseTypeFactory();
+        }
+        /*
         public SerializedObject GetObjects( IReverseReferenceMap s )
         {
             return new SerializedObject()
@@ -145,6 +162,6 @@ namespace KSS.Components
 
             if( data.TryGetValue( "set_throttle", out var setThrottle ) )
                 this.SetThrottle.SetData( setThrottle, l );
-        }
+        }*/
     }
 }

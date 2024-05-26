@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityPlus.Serialization;
+using UnityEngine;
 
 namespace KSS.Components
 {
@@ -16,15 +17,15 @@ namespace KSS.Components
 	/// <remarks>
 	/// This class exists solely to allow polymorphism between the empty and T-typed sequence actions.
 	/// </remarks>
-    public abstract class SequenceActionBase : ControlGroup, IPersistsObjects, IPersistsData // pass-through group with a single element. Required to be drawn.
+    public abstract class SequenceActionBase : ControlGroup // pass-through group with a single element. Required to be drawn.
     {
         public abstract ControllerOutputBase OnInvoke { get; }
         public abstract void TryInvoke();
 
-        public abstract SerializedObject GetObjects( IReverseReferenceMap s );
-        public abstract void SetObjects( SerializedObject data, IForwardReferenceMap l );
-        public abstract SerializedData GetData( IReverseReferenceMap s );
-        public abstract void SetData( SerializedData data, IForwardReferenceMap l );
+       // public abstract SerializedObject GetObjects( IReverseReferenceMap s );
+       // public abstract void SetObjects( SerializedObject data, IForwardReferenceMap l );
+       // public abstract SerializedData GetData( IReverseReferenceMap s );
+       // public abstract void SetData( SerializedData data, IForwardReferenceMap l );
     }
 
     /// <summary>
@@ -42,6 +43,16 @@ namespace KSS.Components
             OnInvokeTyped.TrySendSignal();
         }
 
+
+        [SerializationMappingProvider( typeof( SequenceAction ) )]
+        public static SerializationMapping SequenceActionMapping()
+        {
+            return new CompoundSerializationMapping<SequenceAction>()
+            {
+                ("on_invoke", new MemberReference<SequenceAction, ControllerOutput>( o => o.OnInvokeTyped ))
+            };
+        }
+        /*
         public override SerializedObject GetObjects( IReverseReferenceMap s )
         {
             SerializedObject data = Persistent_object.WriteObjectTyped( this, this.GetType(), s );
@@ -71,13 +82,13 @@ namespace KSS.Components
 
         public override void SetData( SerializedData data, IForwardReferenceMap l )
         {
-        }
+        }*/
     }
 
     /// <summary>
     /// Represents a sequence action that sends a signal of type T.
     /// </summary>
-    public class SequenceAction<T> : SequenceActionBase, IPersistsObjects, IPersistsData
+    public class SequenceAction<T> : SequenceActionBase
     {
         public override ControllerOutputBase OnInvoke => OnInvokeTyped;
 
@@ -91,6 +102,16 @@ namespace KSS.Components
             OnInvokeTyped.TrySendSignal( SignalValue );
         }
 
+        [SerializationMappingProvider( typeof( SequenceAction ) )]
+        public static SerializationMapping SequenceActionMapping<Tt>()
+        {
+#warning TODO - I think it needs to be in a non-generic class
+            return new CompoundSerializationMapping<SequenceAction<Tt>>()
+            {
+                ("on_invoke", new MemberReference<SequenceAction<Tt>, ControllerOutput<Tt>>( o => o.OnInvokeTyped ))
+            };
+        }
+        /*
         public override SerializedObject GetObjects( IReverseReferenceMap s )
         {
             SerializedObject data = Persistent_object.WriteObjectTyped( this, this.GetType(), s );
@@ -128,6 +149,6 @@ namespace KSS.Components
 
                 //SignalValue.SetData( signalValue, l );
             }
-        }
+        }*/
     }
 }

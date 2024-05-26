@@ -16,7 +16,7 @@ namespace KSS.Components
     /// <summary>
     /// Sends steering and throttle signals based on player input.
     /// </summary>
-    public class FPlayerInputAvionics : MonoBehaviour, IPersistsObjects, IPersistsData
+    public class FPlayerInputAvionics : MonoBehaviour
     {
         public FControlFrame ControlFrame { get; set; }
 
@@ -129,6 +129,21 @@ namespace KSS.Components
             return false;
         }
 
+
+        [SerializationMappingProvider( typeof( FPlayerInputAvionics ) )]
+        public static SerializationMapping FPlayerInputAvionicsMapping()
+        {
+            return new CompoundSerializationMapping<FPlayerInputAvionics>()
+            {
+                ("control_frame", new MemberReference<FPlayerInputAvionics, FControlFrame>( o => o.ControlFrame )),
+                ("on_set_throttle", new Member<FPlayerInputAvionics, ControllerOutput<float>>( o => o.OnSetThrottle )),
+                ("on_set_attitude", new Member<FPlayerInputAvionics, ControllerOutput<Vector3>>( o => o.OnSetAttitude )),
+                ("on_set_translation", new MemberReference<FPlayerInputAvionics, ControllerOutput<Vector3>>( o => o.OnSetTranslation ))
+            }
+            .IncludeMembers<Behaviour>()
+            .UseBaseTypeFactory();
+        }
+        /*
         public SerializedObject GetObjects( IReverseReferenceMap s )
         {
             return new SerializedObject()
@@ -174,6 +189,6 @@ namespace KSS.Components
         public void SetData( SerializedData data, IForwardReferenceMap l )
         {
             IPersistent_Behaviour.SetData( this, data, l );
-        }
+        }*/
     }
 }

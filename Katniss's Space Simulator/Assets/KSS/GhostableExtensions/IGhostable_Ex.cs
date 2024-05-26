@@ -12,6 +12,7 @@ namespace KSS
 {
     public static class IGhostable_Ex
     {
+#warning TODO - finish.
         public static SerializedData GetGhostData( this Renderer renderer, IReverseReferenceMap s )
         {
             var ghostMat = AssetRegistry.Get<Material>( "builtin::Resources/Materials/ghost_wireframe" );
@@ -32,7 +33,7 @@ namespace KSS
         {
             return new SerializedObject()
             {
-                { "is_trigger", (true).GetData() }
+                { "is_trigger", (SerializedPrimitive)true }
             };
         }
 
@@ -40,7 +41,7 @@ namespace KSS
         {
             return new SerializedObject()
             {
-                { "mass", (0.0f).AsSerialized() }
+                { "mass", (SerializedPrimitive)0.0f }
             };
         }
     }

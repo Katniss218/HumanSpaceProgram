@@ -68,7 +68,8 @@ namespace KSS.Control.Controls
         [SerializationMappingProvider( typeof( ControlParameterOutput<> ) )]
         public static SerializationMapping ControlParameterOutputMapping<Tt>()
         {
-			return new CompoundSerializationMapping<ControlParameterOutput<Tt>>()
+#warning TODO - I think it needs to be in a non-generic class
+            return new CompoundSerializationMapping<ControlParameterOutput<Tt>>()
 			{
 				("connects_to", new MemberReferenceArray<ControlParameterOutput<Tt>, ControlParameterInput<Tt>>( o => o.inputs.ToArray(), (o, value) =>
 				{

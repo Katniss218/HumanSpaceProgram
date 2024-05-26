@@ -17,11 +17,7 @@ namespace KSS.AssetLoaders
     /// </summary>
     public sealed class GameDataJsonPartFactory : PartFactory
     {
-        private static JsonSeparateFileSerializedDataHandler _handler = new JsonSeparateFileSerializedDataHandler();
-        private static SingleExplicitHierarchyStrategy _strat = new SingleExplicitHierarchyStrategy( _handler, () => throw new NotSupportedException( $"Tried to save something using a part *loader*" ) );
-
-        private static Loader _loader = new Loader( null, null, null, _strat.Load_Object, _strat.Load_Data );
-
+#warning TODO - change to namespaced mod-global ID
         private string _filePath;
 
         public override PartMetadata LoadMetadata()
@@ -32,11 +28,10 @@ namespace KSS.AssetLoaders
 
         public override GameObject Load( IForwardReferenceMap refMap )
         {
-            _handler.ObjectsFilename = Path.Combine( _filePath, "objects.json" );
-            _handler.DataFilename = Path.Combine( _filePath, "data.json" );
-            _loader.RefMap = refMap;
-            _loader.Load();
-            return _strat.LastSpawnedRoot;
+            var data = new JsonSerializedDataHandler( Path.Combine( _filePath, "gameobjects.json" ) )
+                .Read();
+
+            return SerializationUnit.Deserialize<GameObject>( data );
         }
 
         [HSPEventListener( HSPEvent.STARTUP_IMMEDIATELY, HSPEvent.NAMESPACE_VANILLA + ".load_parts" )]
