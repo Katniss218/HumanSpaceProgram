@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.DataHandlers;
 using UnityPlus.Serialization.Json;
 
 namespace KSS.Core.Serialization
@@ -132,8 +133,13 @@ namespace KSS.Core.Serialization
 
         public static SaveMetadata LoadFromDisk( string timelineId, string saveId )
         {
+            string saveFilePath = Path.Combine( GetRootDirectory( timelineId, saveId ), SAVE_FILENAME );
+
             SaveMetadata saveMetadata = new SaveMetadata( timelineId, saveId );
-           // saveMetadata.LoadFromDisk();
+
+            JsonSerializedDataHandler handler = new JsonSerializedDataHandler( saveFilePath );
+            var data = handler.Read();
+            SerializationUnit.Populate( saveMetadata, data );
             return saveMetadata;
         }
 
@@ -142,6 +148,17 @@ namespace KSS.Core.Serialization
 
         }
 
+        [SerializationMappingProvider( typeof( SaveMetadata ) )]
+        public static SerializationMapping SaveMetadataMapping()
+        {
+            return new CompoundSerializationMapping<SaveMetadata>()
+            {
+                ("name", new Member<SaveMetadata, string>( o => o.Name )),
+                ("description", new Member<SaveMetadata, string>( o => o.Description )),
+                ("file_version", new Member<SaveMetadata, Version>( o => o.FileVersion )),
+                ("mod_versions", new Member<SaveMetadata, Dictionary<string, Version>>( o => o.ModVersions ))
+            };
+        }
         /*
         public void WriteToDisk()
         {

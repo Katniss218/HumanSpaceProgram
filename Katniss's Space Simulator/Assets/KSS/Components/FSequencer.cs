@@ -39,7 +39,7 @@ namespace KSS.Components
         {
             return new CompoundSerializationMapping<FSequencer>()
             {
-                ("sequence", new MemberReference<FSequencer, Sequence>( o => o.Sequence ))
+                ("sequence", new Member<FSequencer, Sequence>( o => o.Sequence ))
             }
             .IncludeMembers<Behaviour>()
             .UseBaseTypeFactory();

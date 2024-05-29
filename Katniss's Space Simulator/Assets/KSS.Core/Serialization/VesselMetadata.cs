@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.DataHandlers;
 using UnityPlus.Serialization.Json;
 
 namespace KSS.Core.Serialization
@@ -71,7 +72,7 @@ namespace KSS.Core.Serialization
         }
 
         /// <summary>
-        /// Returns the path to the (root) directory of the timeline.
+        /// Root directory is the directory that contains the _vessel.json file.
         /// </summary>
         public string GetRootDirectory()
         {
@@ -80,8 +81,13 @@ namespace KSS.Core.Serialization
 
         public static VesselMetadata LoadFromDisk( string id )
         {
+            string saveFilePath = Path.Combine( GetRootDirectory( id ), VESSEL_METADATA_FILENAME );
+
             VesselMetadata vesselMetadata = new VesselMetadata( id );
-            // load data
+
+            JsonSerializedDataHandler handler = new JsonSerializedDataHandler( saveFilePath );
+            var data = handler.Read();
+            SerializationUnit.Populate( vesselMetadata, data );
             return vesselMetadata;
         }
 
@@ -90,6 +96,21 @@ namespace KSS.Core.Serialization
 
         }
 
+        [SerializationMappingProvider( typeof( VesselMetadata ) )]
+        public static SerializationMapping VesselMetadataMapping()
+        {
+            return new CompoundSerializationMapping<VesselMetadata>()
+            {
+                ("name", new Member<VesselMetadata, string>( o => o.Name )),
+                ("description", new Member<VesselMetadata, string>( o => o.Description )),
+                ("author", new Member<VesselMetadata, string>( o => o.Author )),
+               // ("categories", new Member<VesselMetadata, string[]>( o => o.Categories )),
+               // ("filter", new Member<VesselMetadata, string>( o => o.Filter )),
+               // ("group", new Member<VesselMetadata, string>( o => o.Group )),
+                ("file_version", new Member<VesselMetadata, Version>( o => o.FileVersion )),
+                ("mod_versions", new Member<VesselMetadata, Dictionary<string, Version>>( o => o.ModVersions ))
+            };
+        }
         /*
         public void WriteToDisk()
         {

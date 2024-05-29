@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.DataHandlers;
 using UnityPlus.Serialization.Json;
 
 namespace KSS.Core.Serialization
@@ -105,8 +106,13 @@ namespace KSS.Core.Serialization
 
         public static TimelineMetadata LoadFromDisk( string timelineId )
         {
+            string saveFilePath = Path.Combine( GetRootDirectory( timelineId ), TIMELINE_FILENAME );
+
             TimelineMetadata timelineMetadata = new TimelineMetadata( timelineId );
-           // timelineMetadata.LoadFromDisk();
+
+            JsonSerializedDataHandler handler = new JsonSerializedDataHandler( saveFilePath );
+            var data = handler.Read();
+            SerializationUnit.Populate( timelineMetadata, data );
             return timelineMetadata;
         }
 
@@ -115,6 +121,15 @@ namespace KSS.Core.Serialization
 
         }
 
+        [SerializationMappingProvider( typeof( TimelineMetadata ) )]
+        public static SerializationMapping TimelineMetadataMapping()
+        {
+            return new CompoundSerializationMapping<TimelineMetadata>()
+            {
+                ("name", new Member<TimelineMetadata, string>( o => o.Name )),
+                ("description", new Member<TimelineMetadata, string>( o => o.Description ))
+            };
+        }
         /*
         public void WriteToDisk()
         {

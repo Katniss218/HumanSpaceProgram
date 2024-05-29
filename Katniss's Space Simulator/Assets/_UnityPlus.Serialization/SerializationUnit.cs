@@ -140,7 +140,11 @@ namespace UnityPlus.Serialization
 
                 var mapping = _mappingCache[i];
 
+                if( mapping == null )
+                    continue; // error.
+
                 object member = _objects[i];
+
                 switch( mapping.SerializationStyle )
                 {
                     default:

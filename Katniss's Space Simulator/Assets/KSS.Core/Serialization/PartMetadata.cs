@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.DataHandlers;
 using UnityPlus.Serialization.Json;
 
 namespace KSS.Core.Serialization
@@ -77,11 +78,19 @@ namespace KSS.Core.Serialization
         }
 
         /// <summary>
-        /// Returns the path to the (root) directory of the timeline.
+        /// Root directory is the directory that contains the _part.json file.
+        /// </summary>
+        public static string GetRootDirectory( string path )
+        {
+            return path;
+        }
+
+        /// <summary>
+        /// Root directory is the directory that contains the _part.json file.
         /// </summary>
         public string GetRootDirectory()
         {
-            return this.Filepath;
+            return GetRootDirectory( this.Filepath );
         }
 
         public static IEnumerable<PartMetadata> Filtered( IEnumerable<PartMetadata> parts, string category, string filter )
@@ -119,8 +128,13 @@ namespace KSS.Core.Serialization
 
         public static PartMetadata LoadFromDisk( string path )
         {
+            string saveFilePath = Path.Combine( GetRootDirectory( path ), PART_METADATA_FILENAME );
+
             PartMetadata partMetadata = new PartMetadata( path );
-            // load data
+
+            JsonSerializedDataHandler handler = new JsonSerializedDataHandler( saveFilePath );
+            var data = handler.Read();
+            SerializationUnit.Populate( partMetadata, data );
             return partMetadata;
         }
 
@@ -129,6 +143,21 @@ namespace KSS.Core.Serialization
 
         }
 
+        [SerializationMappingProvider( typeof( PartMetadata ) )]
+        public static SerializationMapping PartMetadataMapping()
+        {
+            return new CompoundSerializationMapping<PartMetadata>()
+            {
+                ("name", new Member<PartMetadata, string>( o => o.Name )),
+                ("description", new Member<PartMetadata, string>( o => o.Description )),
+                ("author", new Member<PartMetadata, string>( o => o.Author )),
+                ("categories", new Member<PartMetadata, string[]>( o => o.Categories )),
+                ("filter", new Member<PartMetadata, string>( o => o.Filter )),
+                ("group", new Member<PartMetadata, string>( o => o.Group )),
+               // ("file_version", new Member<PartMetadata, Version>( o => o.FileVersion )),
+               // ("mod_versions", new Member<PartMetadata, Dictionary<string, Version>>( o => o.ModVersions ))
+            };
+        }
         /*
         public void WriteToDisk()
         {
