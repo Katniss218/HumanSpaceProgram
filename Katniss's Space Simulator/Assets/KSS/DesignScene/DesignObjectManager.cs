@@ -138,17 +138,12 @@ namespace KSS.DesignScene
         /// <summary>
         /// Checks if a vessel/building/etc is currently being either saved or loaded.
         /// </summary>
-        public static bool IsSavingOrLoading =>
-                (_saver != null && _saver.CurrentState != ISaver.State.Idle)
-             || (_loader != null && _loader.CurrentState != ILoader.State.Idle);
+        public static bool IsSavingOrLoading { get; private set; }
 
         /// <summary>
         /// Specifies which craft file to save the vessel to.
         /// </summary>
         public static VesselMetadata CurrentVesselMetadata { get; set; }
-
-        private static AsyncSaver _saver;
-        private static AsyncLoader _loader;
 
         private static bool _wasPausedBeforeSerializing = false;
 
@@ -159,26 +154,14 @@ namespace KSS.DesignScene
             TimeStepManager.LockTimescale = true;
         }
 
-#warning TODO - finish
-        public static void FinishSaveFunc()
+        public static void FinishFunc()
         {
             TimeStepManager.LockTimescale = false;
             if( !_wasPausedBeforeSerializing )
             {
                 TimeStepManager.Unpause();
             }
-            HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_AFTER_SAVE, null );
-        }
-
-        public static void FinishLoadFunc()
-        {
-            TimeStepManager.LockTimescale = false;
-           // DesignObject.RootPart = _designObjStrategy.LastSpawnedRoot.transform;
-            if( !_wasPausedBeforeSerializing )
-            {
-                TimeStepManager.Unpause();
-            }
-            HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_AFTER_LOAD, null );
+            //HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_AFTER_SAVE, null );
         }
 
         // undos stored in files, preserved across sessions?

@@ -13,10 +13,10 @@ namespace KSS.Core
         [SerializationMappingProvider( typeof( Vessel ) )]
         public static SerializationMapping VesselMapping()
         {
-            return new CompoundSerializationMapping<Vessel>()
+            return new MemberwiseSerializationMapping<Vessel>()
             {
                 ("display_name", new Member<Vessel, bool>( o => o.enabled )),
-                ("root_part", new MemberReference<Vessel, Transform>( o => o.RootPart )),
+                ("root_part", new Member<Vessel, Transform>( ObjectContext.Ref, o => o.RootPart )),
                 ("on_after_recalculate_parts", new Member<Vessel, Action>( o => o.OnAfterRecalculateParts ))
             }
             .IncludeMembers<Behaviour>()

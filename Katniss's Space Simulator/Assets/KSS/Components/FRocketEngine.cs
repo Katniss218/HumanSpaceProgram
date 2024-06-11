@@ -97,13 +97,13 @@ namespace KSS.Components
         [SerializationMappingProvider( typeof( FRocketEngine ) )]
         public static SerializationMapping FRocketEngineMapping()
         {
-            return new CompoundSerializationMapping<FRocketEngine>()
+            return new MemberwiseSerializationMapping<FRocketEngine>()
             {
 #warning TODO - needs to specify listener when creating `SetThrottle`.
                 ("set_throttle", new Member<FRocketEngine, ControlleeInput<float>>( o => o.SetThrottle )),
                 ("isp", new Member<FRocketEngine, float>( o => o.Isp )),
                 ("throttle", new Member<FRocketEngine, float>( o => o.Throttle )),
-                ("thrust_transform", new MemberReference<FRocketEngine, Transform>( o => o.ThrustTransform ))
+                ("thrust_transform", new Member<FRocketEngine, Transform>( ObjectContext.Ref, o => o.ThrustTransform ))
             }
             .IncludeMembers<Behaviour>()
             .UseBaseTypeFactory();

@@ -4,44 +4,44 @@ using UnityPlus.AssetManagement;
 
 namespace UnityPlus.Serialization
 {
-	public static class IReverseReferenceMap_Ex_References
-	{
-		[MethodImpl( MethodImplOptions.AggressiveInlining )]
-		public static SerializedData WriteObjectReference<T>( this IReverseReferenceMap s, T value ) where T : class
-		{
-			// A missing '$ref' node means the reference is broken.
+    public static class IReverseReferenceMap_Ex_References
+    {
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static SerializedData WriteObjectReference<T>( this IReverseReferenceMap s, T value ) where T : class
+        {
+            // A missing '$ref' node means the reference is broken.
 
-			if( value == null )
+            if( value == null )
             {
                 return null;
             }
 
-			Guid guid = s.GetID( value );
+            Guid guid = s.GetID( value );
 
-			return new SerializedObject()
-			{
-				{ KeyNames.REF, guid.SerializeGuid() }
-			};
-		}
-
-		[MethodImpl( MethodImplOptions.AggressiveInlining )]
-		public static SerializedObject WriteAssetReference<T>( this IReverseReferenceMap s, T assetRef ) where T : class
-        {
-			if( assetRef == null )
-			{
-				return null;
-			}
-
-			string assetID = AssetRegistry.GetAssetID( assetRef );
-			if( assetID == null )
+            return new SerializedObject()
             {
-				return null;
+                { KeyNames.REF, guid.SerializeGuid() }
+            };
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static SerializedObject WriteAssetReference<T>( this IReverseReferenceMap s, T assetRef ) where T : class
+        {
+            if( assetRef == null )
+            {
+                return null;
             }
 
-			return new SerializedObject()
-			{
-				{ KeyNames.ASSETREF, assetID }
-			};
-		}
-	}
+            string assetID = AssetRegistry.GetAssetID( assetRef );
+            if( assetID == null )
+            {
+                return null;
+            }
+
+            return new SerializedObject()
+            {
+                { KeyNames.ASSETREF, assetID }
+            };
+        }
+    }
 }

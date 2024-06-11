@@ -10,12 +10,13 @@ namespace UnityPlus.Serialization
     {
         private struct Entry
         {
+            public Type targetType;
             public SerializationMapping mapping;
             public MethodInfo method;
             public bool isReady;
         }
 
-        private static readonly TypeMap<Entry> _mappings = new();
+        private static readonly TypeMap<int, Entry> _mappings = new();
 
         private static bool _isInitialized = false;
 
@@ -47,28 +48,35 @@ namespace UnityPlus.Serialization
 
                     var entry = new Entry()
                     {
+                        targetType = attr.TargetType,
                         mapping = null,
                         method = method,
                         isReady = false
                     };
 
-                    _mappings.Set( attr.TargetType, entry );
+                    foreach( var context in attr.Contexts )
+                    {
+                        _mappings.Set( context, attr.TargetType, entry );
+                    }
                 }
             }
 
             _isInitialized = true;
         }
 
-        private static Entry MakeReady( Entry entry, Type objType )
+        private static Entry MakeReady( int context, Entry entry, Type objType )
         {
-            // Get the mapping using the previously found method.
-            // If the method is generic, we can fill in the generic parameters using the generic parameters of the type we want to save/load.
             MethodInfo method = entry.method;
 
             if( method.ContainsGenericParameters )
             {
+                // Allows mappings for type 'object' to be genericized with the member type.
+                if( entry.targetType == typeof( object ) )
+                {
+                    method = method.MakeGenericMethod( objType );
+                }
                 // Arrays need a generic special-case (they technically don't, but it's faster and safer if they have it).
-                if( objType.IsArray )
+                else if( objType.IsArray )
                 {
                     method = method.MakeGenericMethod( objType.GetElementType() );
                 }
@@ -81,35 +89,43 @@ namespace UnityPlus.Serialization
                 // Only call it if special-cases don't match the type.
                 else
                 {
+                    // This may throw an exception if the method is decorated improperly.
                     method = method.MakeGenericMethod( objType.GetGenericArguments() );
                 }
             }
 
+            // Get the mapping using the previously found method.
             var mapping = (SerializationMapping)method.Invoke( null, null );
-            entry.method = method; // Update with generic definition.
+            mapping.context = context;
+
+            // Update everything in the cache.
+            entry.method = method;
             entry.isReady = true;
             entry.mapping = mapping;
 
-            _mappings.Set( objType, entry );
+            _mappings.Set( context, objType, entry );
+
             return entry;
         }
 
         /// <summary>
-        /// Retrieves a serialization mapping for the given member type.
+        /// Retrieves a serialization mapping for the given member/variable type.
         /// </summary>
-        /// <typeparam name="TMember">The type of the member ("variable") that the object is/will be assigned to.</typeparam>
-        /// <param name="memberObj">The object.</param>
-        /// <returns>The correct serialization mapping for the given object.</returns>
-        internal static SerializationMapping GetMappingOrEmpty( Type memberType )
+        /// <remarks>
+        /// This is useful for mapping manipulation / custom mappings.
+        /// </remarks>
+        /// <param name="memberType">The type of the member "variable" that the object is/will be assigned to.</param>
+        /// <returns>The correct serialization mapping for the given variable type.</returns>
+        internal static SerializationMapping GetMappingOrEmpty( int context, Type memberType )
         {
             if( !_isInitialized )
                 Initialize();
 
-            if( _mappings.TryGetClosest( memberType, out var entry ) )
+            if( _mappings.TryGetClosest( context, memberType, out var entry ) )
             {
                 if( !entry.isReady )
                 {
-                    entry = MakeReady( entry, memberType );
+                    entry = MakeReady( context, entry, memberType );
                     return entry.mapping;
                 }
 
@@ -120,12 +136,15 @@ namespace UnityPlus.Serialization
         }
 
         /// <summary>
-        /// Retrieves a serialization mapping for the given member type.
+        /// Retrieves a serialization mapping for the given object.
         /// </summary>
+        /// <remarks>
+        /// This is useful when serializing.
+        /// </remarks>
         /// <typeparam name="TMember">The type of the member ("variable") that the object is/will be assigned to.</typeparam>
         /// <param name="memberObj">The object.</param>
         /// <returns>The correct serialization mapping for the given object.</returns>
-        public static SerializationMapping GetMappingOrDefault<TMember>( TMember memberObj )
+        public static SerializationMapping GetMappingOrDefault<TMember>( int context, TMember memberObj )
         {
             if( !_isInitialized )
                 Initialize();
@@ -134,11 +153,11 @@ namespace UnityPlus.Serialization
             if( memberObj != null )
                 objType = memberObj.GetType();
 
-            if( _mappings.TryGetClosest( objType, out var entry ) )
+            if( _mappings.TryGetClosest( context, objType, out var entry ) )
             {
                 if( !entry.isReady )
                 {
-                    entry = MakeReady( entry, objType );
+                    entry = MakeReady( context, entry, objType );
                     return entry.mapping;
                 }
 
@@ -148,18 +167,24 @@ namespace UnityPlus.Serialization
             return SerializationMapping.Empty<TMember>();
         }
 
-        public static SerializationMapping GetMappingOrDefault<TMember>( Type memberType )
+        /// <summary>
+        /// Retrieves a serialization mapping for the given object.
+        /// </summary>
+        /// <remarks>
+        /// This is useful when deserializing / creating a new object.
+        /// </remarks>
+        public static SerializationMapping GetMappingOrDefault<TMember>( int context, Type memberType )
         {
             if( !_isInitialized )
                 Initialize();
 
             if( typeof( TMember ).IsAssignableFrom( memberType ) ) // `IsAssignableFrom` doesn't appear to be much of a slow point, surprisingly.
             {
-                if( _mappings.TryGetClosest( memberType, out var entry ) )
+                if( _mappings.TryGetClosest( context, memberType, out var entry ) )
                 {
                     if( !entry.isReady )
                     {
-                        entry = MakeReady( entry, memberType );
+                        entry = MakeReady( context, entry, memberType );
                         return entry.mapping;
                     }
 

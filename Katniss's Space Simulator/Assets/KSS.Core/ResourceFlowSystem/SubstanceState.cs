@@ -43,9 +43,9 @@ namespace KSS.Core.ResourceFlowSystem
         [SerializationMappingProvider( typeof( SubstanceState ) )]
         public static SerializationMapping SubstanceStateMapping()
         {
-            return new CompoundSerializationMapping<SubstanceState>()
+            return new MemberwiseSerializationMapping<SubstanceState>()
             {
-                ("substance", new MemberAsset<SubstanceState, Substance>( o => o.Substance )),
+                ("substance", new Member<SubstanceState, Substance>( ObjectContext.Asset, o => o.Substance )),
                 ("mass_amount", new Member<SubstanceState, float>( o => o.MassAmount ))
             };
         }

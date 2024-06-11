@@ -118,7 +118,7 @@ namespace KSS.Core.ReferenceFrames
         [SerializationMappingProvider( typeof( RootObjectTransform ) )]
         public static SerializationMapping RootObjectTransformMapping()
         {
-            return new CompoundSerializationMapping<RootObjectTransform>()
+            return new MemberwiseSerializationMapping<RootObjectTransform>()
             {
                 ("airf_position", new Member<RootObjectTransform, Vector3Dbl>( o => o.AIRFPosition )),
                 ("airf_rotation", new Member<RootObjectTransform, QuaternionDbl>( o => o.AIRFRotation )),

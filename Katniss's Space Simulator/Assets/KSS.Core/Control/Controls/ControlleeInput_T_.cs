@@ -69,9 +69,9 @@ namespace KSS.Control.Controls
         public static SerializationMapping FreePhysicsObjectMapping<Tt>()
         {
 #warning TODO - I think it needs to be in a non-generic class
-            return new CompoundSerializationMapping<ControlleeInput<Tt>>()
+            return new MemberwiseSerializationMapping<ControlleeInput<Tt>>()
             {
-                ("connects_to", new MemberReferenceArray<ControlleeInput<Tt>, ControllerOutput<Tt>>( o => o.outputs.ToArray(), (o, value) =>
+                ("connects_to", new Member<ControlleeInput<Tt>, ControllerOutput<Tt>[]>( ArrayContext.Refs, o => o.outputs.ToArray(), (o, value) =>
                 {
                     foreach( var c in value )
                     {

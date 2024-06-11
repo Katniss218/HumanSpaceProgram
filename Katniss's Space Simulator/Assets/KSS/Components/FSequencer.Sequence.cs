@@ -81,7 +81,7 @@ namespace KSS.Components
         [SerializationMappingProvider( typeof( Sequence ) )]
         public static SerializationMapping SequenceMapping()
         {
-            return new CompoundSerializationMapping<Sequence>()
+            return new MemberwiseSerializationMapping<Sequence>()
             {
                 ("elements", new Member<Sequence, SequenceElement[]>( o => o.Elements.ToArray(), (o, value) => o.Elements = value.ToList() )),
                 ("current", new Member<Sequence, int>( o => o.Current ))

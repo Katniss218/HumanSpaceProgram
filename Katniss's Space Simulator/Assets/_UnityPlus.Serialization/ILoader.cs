@@ -14,7 +14,7 @@ namespace UnityPlus.Serialization
     /// </summary>
     public interface ILoader
     {
-        public delegate void Action( IForwardReferenceMap l );
+        //public delegate void Action( IForwardReferenceMap l );
 
         /// <summary>
         /// The current state of the loader. <br />
@@ -57,7 +57,7 @@ namespace UnityPlus.Serialization
     /// </summary>
     public interface IAsyncLoader : ILoader
     {
-        new public delegate IEnumerator Action( IForwardReferenceMap l );
+       // new public delegate IEnumerator Action( IForwardReferenceMap l );
 
         /// <summary>
         /// The percentage (in [0..1]) of completion of the current action (0 = 0% completed, 1 = 100% completed).

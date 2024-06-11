@@ -31,9 +31,9 @@ namespace KSS.Components
             [SerializationMappingProvider( typeof( Actuator2DGroup ) )]
             public static SerializationMapping Actuator2DGroupMapping()
             {
-                return new CompoundSerializationMapping<Actuator2DGroup>()
+                return new MemberwiseSerializationMapping<Actuator2DGroup>()
                 {
-                    ("get_reference_transform", new MemberReference<Actuator2DGroup, ControlParameterInput<Transform>>( o => o.GetReferenceTransform )),
+                    ("get_reference_transform", new Member<Actuator2DGroup, ControlParameterInput<Transform>>( ObjectContext.Ref, o => o.GetReferenceTransform )),
                     ("on_set_xy", new Member<Actuator2DGroup, ControllerOutput<Vector2>>( o => o.OnSetXY ))
                 }
                 .WithFactory( ( data, l ) => new Actuator2DGroup() );
@@ -127,7 +127,7 @@ namespace KSS.Components
         [SerializationMappingProvider( typeof( FGimbalActuatorController ) )]
         public static SerializationMapping FGimbalActuatorControllerMapping()
         {
-            return new CompoundSerializationMapping<FGimbalActuatorController>()
+            return new MemberwiseSerializationMapping<FGimbalActuatorController>()
             {
                 ("actuators_2d", new Member<FGimbalActuatorController, Actuator2DGroup[]>( o => o.Actuators2D )),
                 ("set_attitude", new Member<FGimbalActuatorController, ControlleeInput<Vector3>>( o => o.SetAttitude ))

@@ -1,29 +1,29 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Reflection;
 using UnityEngine;
 
 namespace UnityPlus.Serialization
 {
-    public interface ISerializationMappingWithCustomFactory
+    public interface IInstantiableSerializationMapping
     {
-        Func<SerializedData, IForwardReferenceMap, object> CustomFactory { get; }
+        Func<SerializedData, ILoader, object> OnInstantiate { get; }
     }
 
     /// <summary>
     /// Creates a <see cref="SerializedObject"/> from the child mappings.
     /// </summary>
     /// <typeparam name="TSource">The type of the object being mapped.</typeparam>
-    public class CompoundSerializationMapping<TSource> : SerializationMapping, IEnumerable<(string, MemberBase<TSource>)>, ISerializationMappingWithCustomFactory
+    public class MemberwiseSerializationMapping<TSource> : SerializationMapping, IInstantiableSerializationMapping, IEnumerable<(string, MemberBase<TSource>)>
     {
+#warning TODO - allow members to keep static values instead of saving them (i.e. force isKinematic to true on every deserialization).
+
         private readonly List<(string, MemberBase<TSource>)> _items = new();
-        public Func<SerializedData, IForwardReferenceMap, object> CustomFactory { get; private set; } = null;
+        public Func<SerializedData, ILoader, object> OnInstantiate { get; private set; } = null;
 
         public override SerializationStyle SerializationStyle => SerializationStyle.NonPrimitive;
 
-        public CompoundSerializationMapping()
+        public MemberwiseSerializationMapping()
         {
 
         }
@@ -35,16 +35,16 @@ namespace UnityPlus.Serialization
         /// The factory is only needed to create an instance, not to set its internal state. The state should be set using the members.
         /// </remarks>
         /// <param name="customFactory">The method used to create an instance of <typeparamref name="TSource"/> from its serialized representation.</param>
-        public CompoundSerializationMapping<TSource> WithFactory( Func<SerializedData, IForwardReferenceMap, object> customFactory )
+        public MemberwiseSerializationMapping<TSource> WithFactory( Func<SerializedData, ILoader, object> customFactory )
         {
-            this.CustomFactory = customFactory;
+            this.OnInstantiate = customFactory;
             return this;
         }
 
         /// <summary>
         /// Makes this type include the members of the specified base type in its serialization.
         /// </summary>
-        public CompoundSerializationMapping<TSource> IncludeMembers<TSourceBase>() where TSourceBase : class
+        public MemberwiseSerializationMapping<TSource> IncludeMembers<TSourceBase>() where TSourceBase : class
         {
             Type baseType = typeof( TSourceBase );
             if( !baseType.IsAssignableFrom( typeof( TSource ) ) )
@@ -54,12 +54,12 @@ namespace UnityPlus.Serialization
             }
 
 #warning TODO - do this by default (somehow), without passing the IncludeMembers<TSourceBase> type parameter for every passthroughmember.
-            SerializationMapping mapping = SerializationMappingRegistry.GetMappingOrEmpty( baseType );
+            SerializationMapping mapping = SerializationMappingRegistry.GetMappingOrEmpty( this.context, baseType );
 
             if( ReferenceEquals( mapping, this ) ) // mapping for `this` is a cached mapping of base type.
                 return this;
 
-            if( mapping is CompoundSerializationMapping<TSourceBase> baseMapping )
+            if( mapping is MemberwiseSerializationMapping<TSourceBase> baseMapping )
             {
                 foreach( var item in baseMapping._items )
                 {
@@ -73,11 +73,40 @@ namespace UnityPlus.Serialization
 
             return this;
         }
+        /*
+        /// <summary>
+        /// Makes this type include the members of the specified base type in its serialization.
+        /// </summary>
+        private MemberwiseSerializationMapping<TSource> IncludeBaseMembersRecursive()
+        {
+            Type baseType = typeof( TSource ).BaseType;
+            if( baseType == null )
+                return this;
 
+            SerializationMapping mapping = SerializationMappingRegistry.GetMappingOrEmpty( this.context, baseType );
+
+            if( ReferenceEquals( mapping, this ) ) // mapping for `this` is a cached mapping of base type.
+                return this;
+
+            if( mapping is MemberwiseSerializationMapping<TSourceBase> baseMapping )
+            {
+                foreach( var item in baseMapping._items )
+                {
+                    var member = item.Item2;
+
+                    MemberBase<TSource> m = PassthroughMember<TSource, TSourceBase>.Create( member );
+
+                    this._items.Add( (item.Item1, m) );
+                }
+            }
+
+            return this;
+        }
+        */
         /// <summary>
         /// Makes the deserialization use the factory of the nearest base type of <typeparamref name="TSource"/>.
         /// </summary>
-        public CompoundSerializationMapping<TSource> UseBaseTypeFactory()
+        public MemberwiseSerializationMapping<TSource> UseBaseTypeFactory()
         {
             do
             {
@@ -85,21 +114,24 @@ namespace UnityPlus.Serialization
                 if( baseType == null )
                     return this;
 
-                SerializationMapping mapping = SerializationMappingRegistry.GetMappingOrEmpty( baseType );
+                SerializationMapping mapping = SerializationMappingRegistry.GetMappingOrEmpty( this.context, baseType );
 
-                if( mapping is ISerializationMappingWithCustomFactory m )
+                if( mapping is IInstantiableSerializationMapping m )
                 {
-                    this.CustomFactory = m.CustomFactory;
+                    this.OnInstantiate = m.OnInstantiate;
                     return this;
                 }
 
-            } while( this.CustomFactory == null );
+            } while( this.OnInstantiate == null );
 
             return this;
         }
 
         public void Add( (string, MemberBase<TSource>) item )
         {
+            if( item.Item1 == null )
+                throw new Exception( $"The member name can't be null" );
+
             _items.Add( item );
         }
 
@@ -113,79 +145,65 @@ namespace UnityPlus.Serialization
             return _items.GetEnumerator();
         }
 
-        public override SerializedData Save( object obj, IReverseReferenceMap s )
+        public override SerializedData Save( object obj, ISaver s )
         {
             SerializedObject root = new SerializedObject();
 
             TSource sourceObj = (TSource)obj;
 
-            root[KeyNames.ID] = s.GetID( sourceObj ).SerializeGuid();
+            root[KeyNames.ID] = s.RefMap.GetID( sourceObj ).SerializeGuid();
             root[KeyNames.TYPE] = obj.GetType().SerializeType();
 
             foreach( var item in _items )
             {
-                if( item.Item2 is IMappedMember<TSource> member )
-                {
-                    SerializedData data = member.Save( sourceObj, s );
-                    root[item.Item1] = data;
-                }
-                else if( item.Item2 is IMappedReferenceMember<TSource> memberRef )
-                {
-                    SerializedData data = memberRef.Save( sourceObj, s );
-                    root[item.Item1] = data;
-                }
+                SerializedData data = item.Item2.Save( sourceObj, s );
+                root[item.Item1] = data;
             }
 
             return root;
         }
 
-        public override object Instantiate( SerializedData data, IForwardReferenceMap l )
+        public override object Instantiate( SerializedData data, ILoader l )
         {
             TSource obj;
-            if( CustomFactory == null )
+            if( OnInstantiate == null )
             {
                 obj = Activator.CreateInstance<TSource>();
                 if( data.TryGetValue( KeyNames.ID, out var id ) )
                 {
-                    l.SetObj( id.DeserializeGuid(), obj );
+                    l.RefMap.SetObj( id.DeserializeGuid(), obj );
                 }
             }
             else
             {
-                obj = (TSource)CustomFactory.Invoke( data, l );
+                obj = (TSource)OnInstantiate.Invoke( data, l );
             }
 
             return obj;
         }
 
-        public override void Load( ref object obj, SerializedData data, IForwardReferenceMap l )
+        public override void Load( ref object obj, SerializedData data, ILoader l )
         {
             TSource obj2 = (TSource)obj;
             foreach( var item in _items )
             {
-                if( item.Item2 is IMappedMember<TSource> member )
+                if( data.TryGetValue( item.Item1, out var memberData ) )
                 {
-                    if( data.TryGetValue( item.Item1, out var memberData ) )
-                    {
-                        member.Load( ref obj2, memberData, l );
-                    }
+                    item.Item2.Load( ref obj2, memberData, l );
                 }
             }
             obj = obj2;
         }
 
-        public override void LoadReferences( ref object obj, SerializedData data, IForwardReferenceMap l )
+        public override void LoadReferences( ref object obj, SerializedData data, ILoader l )
         {
             var objM = (TSource)obj;
 
             foreach( var item in _items )
             {
-                if( item.Item2 is IMappedReferenceMember<TSource> member )
+                if( data.TryGetValue( item.Item1, out var memberData ) )
                 {
-                    if( data.TryGetValue( item.Item1, out var memberData ) )
-                    {
-                        member.LoadReferences( ref objM, memberData, l );
-                    }
+                    item.Item2.LoadReferences( ref objM, memberData, l );
                 }
             }
 

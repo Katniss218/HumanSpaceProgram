@@ -178,7 +178,7 @@ namespace KSS.Core.Physics
         [SerializationMappingProvider( typeof( FreePhysicsObject ) )]
         public static SerializationMapping FreePhysicsObjectMapping()
         {
-            return new CompoundSerializationMapping<FreePhysicsObject>()
+            return new MemberwiseSerializationMapping<FreePhysicsObject>()
             {
                 ("mass", new Member<FreePhysicsObject, float>( o => o.Mass )),
                 ("local_center_of_mass", new Member<FreePhysicsObject, Vector3>( o => o.LocalCenterOfMass )),

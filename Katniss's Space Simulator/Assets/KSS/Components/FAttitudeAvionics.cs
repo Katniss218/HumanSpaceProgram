@@ -290,7 +290,7 @@ namespace KSS.Components
         [SerializationMappingProvider( typeof( FAttitudeAvionics ) )]
         public static SerializationMapping FAttitudeAvionicsMapping()
         {
-            return new CompoundSerializationMapping<FAttitudeAvionics>()
+            return new MemberwiseSerializationMapping<FAttitudeAvionics>()
             {
                 ("on_set_attitude", new Member<FAttitudeAvionics, ControllerOutput<Vector3>>( o => o.OnSetAttitude ))
             }

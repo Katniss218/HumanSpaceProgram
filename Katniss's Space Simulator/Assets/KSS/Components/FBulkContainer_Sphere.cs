@@ -120,9 +120,9 @@ namespace KSS.Components
         [SerializationMappingProvider( typeof( FBulkContainer_Sphere ) )]
         public static SerializationMapping FBulkContainer_SphereMapping()
         {
-            return new CompoundSerializationMapping<FBulkContainer_Sphere>()
+            return new MemberwiseSerializationMapping<FBulkContainer_Sphere>()
             {
-                ("volume_transform", new MemberReference<FBulkContainer_Sphere, Transform>( o => o.VolumeTransform )),
+                ("volume_transform", new Member<FBulkContainer_Sphere, Transform>( ObjectContext.Ref, o => o.VolumeTransform )),
                 ("max_volume", new Member<FBulkContainer_Sphere, float>( o => o.MaxVolume )),
                 ("radius", new Member<FBulkContainer_Sphere, float>( o => o.Radius )),
                 ("contents", new Member<FBulkContainer_Sphere, SubstanceStateCollection>( o => o.Contents ))

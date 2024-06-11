@@ -11,7 +11,7 @@ namespace UnityPlus.Serialization
     /// <summary>
     /// A list of values node.
     /// </summary>
-    public sealed class SerializedArray : SerializedData, IList<SerializedData>
+    public sealed class SerializedArray : SerializedData, IList<SerializedData>, IEquatable<SerializedArray>
     {
         readonly List<SerializedData> _children;
 
@@ -57,19 +57,6 @@ namespace UnityPlus.Serialization
         {
             _children.Add( item );
         }
-
-        /*[MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public void Add( SerializedData item )
-        {
-            if( item is SerializedObject o ) // idk why, but the values must be first cast to their actual type.
-                _children.Add( (SerializedData)o );
-            else if( item is SerializedArray a )
-                _children.Add( (SerializedData)a );
-            else if( item is SerializedData v )
-                _children.Add( v );
-            else
-                throw new ArgumentException( $"The value must be either object, array, or value." );
-        }*/
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public void Clear()
@@ -134,6 +121,24 @@ namespace UnityPlus.Serialization
         IEnumerator IEnumerable.GetEnumerator()
         {
             return ((IEnumerable)_children).GetEnumerator();
+        }
+
+        public override int GetHashCode()
+        {
+            return _children.GetHashCode();
+        }
+
+        public override bool Equals( object obj )
+        {
+            if( obj is SerializedObject other )
+                return this.Equals( other );
+
+            return false;
+        }
+
+        public bool Equals( SerializedArray other )
+        {
+            return _children.Equals( other._children );
         }
     }
 }

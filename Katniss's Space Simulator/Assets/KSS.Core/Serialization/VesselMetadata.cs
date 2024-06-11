@@ -99,7 +99,7 @@ namespace KSS.Core.Serialization
         [SerializationMappingProvider( typeof( VesselMetadata ) )]
         public static SerializationMapping VesselMetadataMapping()
         {
-            return new CompoundSerializationMapping<VesselMetadata>()
+            return new MemberwiseSerializationMapping<VesselMetadata>()
             {
                 ("name", new Member<VesselMetadata, string>( o => o.Name )),
                 ("description", new Member<VesselMetadata, string>( o => o.Description )),

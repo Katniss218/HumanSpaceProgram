@@ -61,7 +61,6 @@
     <Compile Include="Assets\KSS\GhostableExtensions\IGhostable_Ex.cs" />
     <Compile Include="Assets\KSS\EditorScene\EditorSceneEscapeInputController.cs" />
     <Compile Include="Assets\KSS\TranslationTransformHandle.cs" />
-    <Compile Include="Assets\KSS\Ghostable_object.cs" />
     <Compile Include="Assets\KSS\DesignScene\DesignSceneToolBase.cs" />
     <Compile Include="Assets\KSS\DesignScene\Tools\PickTool.cs" />
     <Compile Include="Assets\KSS\CelestialBodies\VanillaPlanetarySystemFactory.cs" />
@@ -106,7 +105,6 @@
     <Compile Include="Assets\KSS\DesignScene\Tools\TranslateTool.cs" />
     <Compile Include="Assets\KSS\AssetLoaders\GameDataJsonPartFactory.cs" />
     <Compile Include="Assets\KSS\Input\HierarchicalInputPriority.cs" />
-    <Compile Include="Assets\KSS\GhostableWithExtension.cs" />
     <Compile Include="Assets\KSS\DesignScene\Tools\RerootTool.cs" />
     <Compile Include="Assets\KSS\Components\FGimbalActuatorController.cs" />
     <Compile Include="Assets\KSS\MainMenuScene\MainMenuEscapeInputController.cs" />

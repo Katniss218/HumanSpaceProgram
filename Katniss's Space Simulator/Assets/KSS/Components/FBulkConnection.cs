@@ -67,10 +67,10 @@ namespace KSS.Components
             [SerializationMappingProvider( typeof( Port ) )]
             public static SerializationMapping PortMapping()
             {
-                return new CompoundSerializationMapping<Port>()
+                return new MemberwiseSerializationMapping<Port>()
                 {
-                    ("obj_c", new MemberReference<Port, IResourceConsumer>( o => o._objC )),
-                    ("obj_p", new MemberReference<Port, IResourceProducer>( o => o._objP )),
+                    ("obj_c", new Member<Port, IResourceConsumer>( ObjectContext.Ref, o => o._objC )),
+                    ("obj_p", new Member<Port, IResourceProducer>( ObjectContext.Ref, o => o._objP )),
                     ("position", new Member<Port, Vector3>( o => o.Position )),
                     ("forward", new Member<Port, Vector3>( o => o.Forward ))
                 }
@@ -298,10 +298,10 @@ namespace KSS.Components
         [SerializationMappingProvider( typeof( FBulkConnection ) )]
         public static SerializationMapping FBulkConnectionMapping()
         {
-            return new CompoundSerializationMapping<FBulkConnection>()
+            return new MemberwiseSerializationMapping<FBulkConnection>()
             {
-                ("end1", new MemberReference<FBulkConnection, Port>( o => o.End1 )),
-                ("end2", new MemberReference<FBulkConnection, Port>( o => o.End2 )),
+                ("end1", new Member<FBulkConnection, Port>( ObjectContext.Ref, o => o.End1 )),
+                ("end2", new Member<FBulkConnection, Port>( ObjectContext.Ref, o => o.End2 )),
                 ("cross_section_area", new Member<FBulkConnection, float>( o => o.CrossSectionArea ))
             }
             .IncludeMembers<Behaviour>()

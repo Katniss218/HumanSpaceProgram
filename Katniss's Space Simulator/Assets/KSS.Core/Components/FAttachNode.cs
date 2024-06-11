@@ -130,7 +130,7 @@ namespace KSS.Core.Components
         [SerializationMappingProvider( typeof( FAttachNode ) )]
         public static SerializationMapping FAttachNodeMapping()
         {
-            return new CompoundSerializationMapping<FAttachNode>()
+            return new MemberwiseSerializationMapping<FAttachNode>()
             {
                 ("range", new Member<FAttachNode, float>( o => o.Range ))
             }

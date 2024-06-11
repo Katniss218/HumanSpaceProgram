@@ -33,7 +33,7 @@ namespace KSS.Components
         [SerializationMappingProvider( typeof( FPointMass ) )]
         public static SerializationMapping FPointMassMapping()
         {
-            return new CompoundSerializationMapping<FPointMass>()
+            return new MemberwiseSerializationMapping<FPointMass>()
             {
                 ("mass", new Member<FPointMass, float>( o => o.Mass )),
                 ("on_after_mass_changed", new Member<FPointMass, IHasMass.MassChange>( o => o.OnAfterMassChanged ))

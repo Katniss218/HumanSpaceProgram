@@ -15,22 +15,22 @@ namespace UnityPlus.Serialization
 
         }
 
-        public override SerializedData Save( object obj, IReverseReferenceMap s )
+        public override SerializedData Save( object obj, ISaver s )
         {
             throw new InvalidOperationException( $"Save is not supported on `{nameof( EmptySerializationMapping<TSource> )}`." );
         }
 
-        public override object Instantiate( SerializedData data, IForwardReferenceMap l )
+        public override object Instantiate( SerializedData data, ILoader l )
         {
             throw new InvalidOperationException( $"Instantiate is not supported on `{nameof( EmptySerializationMapping<TSource> )}`." );
         }
 
-        public override void Load( ref object obj, SerializedData data, IForwardReferenceMap l )
+        public override void Load( ref object obj, SerializedData data, ILoader l )
         {
             throw new InvalidOperationException( $"Load is not supported on `{nameof( EmptySerializationMapping<TSource> )}`." );
         }
 
-        public override void LoadReferences( ref object obj, SerializedData data, IForwardReferenceMap l )
+        public override void LoadReferences( ref object obj, SerializedData data, ILoader l )
         {
             throw new InvalidOperationException( $"LoadReferences is not supported on `{nameof( EmptySerializationMapping<TSource> )}`." );
         }

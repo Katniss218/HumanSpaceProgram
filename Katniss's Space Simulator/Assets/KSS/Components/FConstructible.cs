@@ -37,7 +37,7 @@ namespace KSS.Components
         [SerializationMappingProvider( typeof( CraneBuildCondition ) )]
         public static SerializationMapping CraneBuildConditionMapping()
         {
-            return new CompoundSerializationMapping<CraneBuildCondition>()
+            return new MemberwiseSerializationMapping<CraneBuildCondition>()
             {
                 ("min_lift_capacity", new Member<CraneBuildCondition, float>( o => o.minLiftCapacity ))
             };
@@ -165,36 +165,38 @@ namespace KSS.Components
             if( wasNull )
             {
                 _cachedData = new();
-            }
-            _cachedRefStore.Clear();
 
-            AncestralMap<FConstructible> partMap = AncestralMap<FConstructible>.Create( transform );
-            if( partMap.TryGetValue( this, out var ourPartsTransforms ) )
-            {
-                foreach( var transform in ourPartsTransforms ) // this entire thing could be ran once per entire vessel and cached until something is added/removed from it.
+                _cachedRefStore.Clear();
+
+                // this entire thing could be ran once per entire vessel and cached until something is added/removed from it.
+                AncestralMap<FConstructible> partMap = AncestralMap<FConstructible>.Create( transform );
+                if( partMap.TryGetValue( this, out var ourPartsTransforms ) )
                 {
-                    foreach( var comp in transform.GetComponents() )
-                    {
-                        SerializedData originalToGhost = comp.GetGhostData( _cachedRefStore );
+                    IEnumerable<Component> comps = ourPartsTransforms.SelectMany( t => t.GetComponents() );
 
+                    var su = SerializationUnit.FromObjects<Component>( -2137, comps );
+
+                    su.Serialize( _cachedRefStore );
+
+                    foreach( var originalToGhost in su.GetData().Where( d => d != null ) )
+                    {
                         // Only cache things that are ghostable.
                         // This should probably be signified differently than by a null, but it works for now.
-                        if( originalToGhost != null )
+
+                        Component comp = (Component)_cachedRefStore.GetObj( originalToGhost[KeyNames.ID].DeserializeGuid() );
+                        su = SerializationUnit.FromObjects<Component>( ObjectContext.Value, comp );
+
+                        su.Serialize( _cachedRefStore );
+
+                        var ghostToOriginal = su.GetData().First();
+
+                        // TODO - remove keys from revObj, that aren't present in forwardObj.
+                        /*if( originalToGhost is SerializedObject forwardObj && ghostToOriginal is SerializedObject revObj )
                         {
-                            var mapping = SerializationMappingRegistry.GetMappingOrDefault<Component>( comp );
-                            SerializedData ghostToOriginal = mapping.Save( comp, _cachedRefStore );
 
-                            // TODO - remove keys from revObj, that aren't present in forwardObj.
-                            /*if( originalToGhost is SerializedObject forwardObj && ghostToOriginal is SerializedObject revObj )
-                            {
-                                
-                            }*/
+                        }*/
 
-                            if( wasNull )
-                            {
-                                _cachedData.Add( comp, (originalToGhost, ghostToOriginal) );
-                            }
-                        }
+                        _cachedData.Add( comp, (originalToGhost, ghostToOriginal) );
                     }
                 }
             }
@@ -262,7 +264,7 @@ namespace KSS.Components
         [SerializationMappingProvider( typeof( FConstructible ) )]
         public static SerializationMapping FConstructibleMapping()
         {
-            return new CompoundSerializationMapping<FConstructible>()
+            return new MemberwiseSerializationMapping<FConstructible>()
             {
                 ("cached_data", new Member<FConstructible, Dictionary<Component, (SerializedData fwd, SerializedData rev)>>( o => o._cachedData )),
                 ("max_build_points", new Member<FConstructible, float>( o => o._maxBuildPoints )),

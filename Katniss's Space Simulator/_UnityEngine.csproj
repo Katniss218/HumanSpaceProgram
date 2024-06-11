@@ -89,6 +89,7 @@
     <Compile Include="Assets\_UnityEngine\IComponent.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\Vector2_Ex.cs" />
     <Compile Include="Assets\_UnityEngine\MatrixMxN.cs" />
+    <Compile Include="Assets\_UnityEngine\TypeMap_TContext.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_UnityEngine\___UnityEngine.asmdef" />

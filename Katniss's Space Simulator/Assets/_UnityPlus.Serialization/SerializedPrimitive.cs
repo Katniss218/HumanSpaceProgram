@@ -10,7 +10,7 @@ namespace UnityPlus.Serialization
     /// <summary>
     /// An arbitrary supported primitive value stored in the tree structure.
     /// </summary>
-    public sealed class SerializedPrimitive : SerializedData
+    public sealed class SerializedPrimitive : SerializedData, IEquatable<SerializedPrimitive>
     {
         /// <summary>
         /// Stores the actual data of the primitive.
@@ -115,6 +115,11 @@ namespace UnityPlus.Serialization
             }
 
             return false;
+        }
+
+        public bool Equals( SerializedPrimitive other )
+        {
+            return this == other; // overriden equality op
         }
 
         public override int GetHashCode()

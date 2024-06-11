@@ -325,7 +325,7 @@ namespace KSS.GameplayScene
         [SerializationMappingProvider( typeof( FConstructionSite ) )]
         public static SerializationMapping FConstructionSiteMapping()
         {
-            return new CompoundSerializationMapping<FConstructionSite>()
+            return new MemberwiseSerializationMapping<FConstructionSite>()
             {
                 ("state", new Member<FConstructionSite, ConstructionState>( o => o.State )),
 

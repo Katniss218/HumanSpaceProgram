@@ -39,9 +39,9 @@ namespace KSS.Core.Components
         [SerializationMappingProvider( typeof( FControlFrame ) )]
         public static SerializationMapping FControlFrameMapping()
         {
-            return new CompoundSerializationMapping<FControlFrame>()
+            return new MemberwiseSerializationMapping<FControlFrame>()
             {
-                ("reference_transform", new MemberReference<FControlFrame, Transform>( o => o._referenceTransform ))
+                ("reference_transform", new Member<FControlFrame, Transform>( ObjectContext.Ref, o => o._referenceTransform ))
             }
             .IncludeMembers<Behaviour>()
             .UseBaseTypeFactory();

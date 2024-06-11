@@ -9,6 +9,7 @@ using UnityEngine;
 
 namespace UnityPlus.Serialization
 {
+    /*
     /// <summary>
     /// An asynchronous saver.
     /// </summary>
@@ -104,5 +105,5 @@ namespace UnityPlus.Serialization
 
             coroutineContainer.StartCoroutine( SaveCoroutine( coroutineContainer ) );
         }
-    }
+    }*/
 }

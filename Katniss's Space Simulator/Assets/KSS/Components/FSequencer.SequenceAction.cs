@@ -47,9 +47,9 @@ namespace KSS.Components
         [SerializationMappingProvider( typeof( SequenceAction ) )]
         public static SerializationMapping SequenceActionMapping()
         {
-            return new CompoundSerializationMapping<SequenceAction>()
+            return new MemberwiseSerializationMapping<SequenceAction>()
             {
-                ("on_invoke", new MemberReference<SequenceAction, ControllerOutput>( o => o.OnInvokeTyped ))
+                ("on_invoke", new Member<SequenceAction, ControllerOutput>( ObjectContext.Ref, o => o.OnInvokeTyped ))
             };
         }
         /*
@@ -106,9 +106,9 @@ namespace KSS.Components
         public static SerializationMapping SequenceActionMapping<Tt>()
         {
 #warning TODO - I think it needs to be in a non-generic class
-            return new CompoundSerializationMapping<SequenceAction<Tt>>()
+            return new MemberwiseSerializationMapping<SequenceAction<Tt>>()
             {
-                ("on_invoke", new MemberReference<SequenceAction<Tt>, ControllerOutput<Tt>>( o => o.OnInvokeTyped ))
+                ("on_invoke", new Member<SequenceAction<Tt>, ControllerOutput<Tt>>( ObjectContext.Ref, o => o.OnInvokeTyped ))
             };
         }
         /*

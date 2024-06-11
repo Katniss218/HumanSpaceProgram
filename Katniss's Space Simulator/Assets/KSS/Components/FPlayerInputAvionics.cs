@@ -133,12 +133,12 @@ namespace KSS.Components
         [SerializationMappingProvider( typeof( FPlayerInputAvionics ) )]
         public static SerializationMapping FPlayerInputAvionicsMapping()
         {
-            return new CompoundSerializationMapping<FPlayerInputAvionics>()
+            return new MemberwiseSerializationMapping<FPlayerInputAvionics>()
             {
-                ("control_frame", new MemberReference<FPlayerInputAvionics, FControlFrame>( o => o.ControlFrame )),
+                ("control_frame", new Member<FPlayerInputAvionics, FControlFrame>( ObjectContext.Ref, o => o.ControlFrame )),
                 ("on_set_throttle", new Member<FPlayerInputAvionics, ControllerOutput<float>>( o => o.OnSetThrottle )),
                 ("on_set_attitude", new Member<FPlayerInputAvionics, ControllerOutput<Vector3>>( o => o.OnSetAttitude )),
-                ("on_set_translation", new MemberReference<FPlayerInputAvionics, ControllerOutput<Vector3>>( o => o.OnSetTranslation ))
+                ("on_set_translation", new Member<FPlayerInputAvionics, ControllerOutput<Vector3>>( ObjectContext.Ref, o => o.OnSetTranslation ))
             }
             .IncludeMembers<Behaviour>()
             .UseBaseTypeFactory();

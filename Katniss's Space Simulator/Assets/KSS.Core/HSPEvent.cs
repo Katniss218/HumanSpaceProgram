@@ -86,6 +86,11 @@ namespace KSS.Core
         public const string TIMELINE_BEFORE_LOAD = NAMESPACE_VANILLA + ".timeline.load.before";
 
         /// <summary>
+        /// Invoked to load a new game state (timeline + save).
+        /// </summary>
+        public const string TIMELINE_LOAD = NAMESPACE_VANILLA + ".timeline.load";
+
+        /// <summary>
         /// Invoked after loading a new game state (timeline + save).
         /// </summary>
         public const string TIMELINE_AFTER_LOAD = NAMESPACE_VANILLA + ".timeline.load.after";
@@ -101,6 +106,11 @@ namespace KSS.Core
         public const string TIMELINE_AFTER_SAVE = NAMESPACE_VANILLA + ".timeline.save.after";
 
         /// <summary>
+        /// Invoked to save the current game state (timeline + save).
+        /// </summary>
+        public const string TIMELINE_SAVE = NAMESPACE_VANILLA + ".timeline.save";
+
+        /// <summary>
         /// Invoked before creating a new game state (timeline + default save).
         /// </summary>
         public const string TIMELINE_BEFORE_NEW = NAMESPACE_VANILLA + ".timeline.new.before";
@@ -109,6 +119,11 @@ namespace KSS.Core
         /// Invoked after creating a new game state (timeline + default save).
         /// </summary>
         public const string TIMELINE_AFTER_NEW = NAMESPACE_VANILLA + ".timeline.new.after";
+
+        /// <summary>
+        /// Invoked to create a new game state (timeline + default save).
+        /// </summary>
+        public const string TIMELINE_NEW = NAMESPACE_VANILLA + ".timeline.new";
 
         // design scene runtime events.
 

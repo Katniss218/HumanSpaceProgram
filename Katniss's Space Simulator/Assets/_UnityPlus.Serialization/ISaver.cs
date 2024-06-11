@@ -13,7 +13,7 @@ namespace UnityPlus.Serialization
     /// </summary>
     public interface ISaver
     {
-        public delegate void Action( IReverseReferenceMap s );
+        //public delegate void Action( IReverseReferenceMap s );
 
         /// <summary>
         /// The current state of the saver. <br />
@@ -45,7 +45,7 @@ namespace UnityPlus.Serialization
     /// </summary>
     public interface IAsyncSaver : ISaver
     {
-        new public delegate IEnumerator Action( IReverseReferenceMap s );
+        //new public delegate IEnumerator Action( IReverseReferenceMap s );
 
         /// <summary>
         /// The percentage (in [0..1]) of completion of the current action (0 = 0% completed, 1 = 100% completed).

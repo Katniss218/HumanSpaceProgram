@@ -32,7 +32,7 @@ namespace KSS.Components
         [SerializationMappingProvider( typeof( FVesselSeparator ) )]
         public static SerializationMapping FVesselSeparatorMapping()
         {
-            return new CompoundSerializationMapping<FVesselSeparator>()
+            return new MemberwiseSerializationMapping<FVesselSeparator>()
             {
                 ("separate", new Member<FVesselSeparator, ControlleeInput>( o => o.Separate )),
                 ("has_separated", new Member<FVesselSeparator, bool>( o => o._hasSeparated ))

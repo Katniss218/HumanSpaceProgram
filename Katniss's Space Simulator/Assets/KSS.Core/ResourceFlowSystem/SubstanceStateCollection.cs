@@ -190,7 +190,7 @@ namespace KSS.Core.ResourceFlowSystem
         [SerializationMappingProvider( typeof( SubstanceStateCollection ) )]
         public static SerializationMapping SubstanceStateCollectionMapping()
         {
-            return new CompoundSerializationMapping<SubstanceStateCollection>()
+            return new MemberwiseSerializationMapping<SubstanceStateCollection>()
             {
                 ("substances", new Member<SubstanceStateCollection, SubstanceState[]>( o => o._substances.ToArray(), (o, value) => o._substances = value.ToList() ))
             };

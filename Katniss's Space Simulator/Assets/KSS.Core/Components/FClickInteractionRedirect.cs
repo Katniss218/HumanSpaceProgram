@@ -49,9 +49,9 @@ namespace KSS.Core.Components
         [SerializationMappingProvider( typeof( FClickInteractionRedirect ) )]
         public static SerializationMapping FClickInteractionRedirectMapping()
         {
-            return new CompoundSerializationMapping<FClickInteractionRedirect>()
+            return new MemberwiseSerializationMapping<FClickInteractionRedirect>()
             {
-                ("target", new MemberReference<FClickInteractionRedirect, GameObject>( o => o.Target ))
+                ("target", new Member<FClickInteractionRedirect, GameObject>( ObjectContext.Ref, o => o.Target ))
             }
             .IncludeMembers<Behaviour>()
             .UseBaseTypeFactory();

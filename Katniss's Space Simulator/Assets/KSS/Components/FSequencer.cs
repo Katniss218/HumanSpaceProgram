@@ -37,7 +37,7 @@ namespace KSS.Components
         [SerializationMappingProvider( typeof( FSequencer ) )]
         public static SerializationMapping FSequencerMapping()
         {
-            return new CompoundSerializationMapping<FSequencer>()
+            return new MemberwiseSerializationMapping<FSequencer>()
             {
                 ("sequence", new Member<FSequencer, Sequence>( o => o.Sequence ))
             }

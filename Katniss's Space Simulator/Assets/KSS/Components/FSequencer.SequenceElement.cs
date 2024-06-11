@@ -47,7 +47,7 @@ namespace KSS.Components
         [SerializationMappingProvider( typeof( SequenceElement ) )]
         public static SerializationMapping SequenceElementMapping()
         {
-            return new CompoundSerializationMapping<SequenceElement>()
+            return new MemberwiseSerializationMapping<SequenceElement>()
             {
                 ("actions", new Member<SequenceElement, SequenceActionBase[]>( o => o.Actions.ToArray(), (o, value) => o.Actions = value.ToList() ))
             };
@@ -115,7 +115,7 @@ namespace KSS.Components
         [SerializationMappingProvider( typeof( KeyboardSequenceElement ) )]
         public static SerializationMapping KeyboardSequenceElementMapping()
         {
-            return new CompoundSerializationMapping<KeyboardSequenceElement>()
+            return new MemberwiseSerializationMapping<KeyboardSequenceElement>()
             {
                 ("key", new Member<KeyboardSequenceElement, KeyCode>( o => o.Key ))
             }
@@ -166,7 +166,7 @@ namespace KSS.Components
         [SerializationMappingProvider( typeof( TimedSequenceElement ) )]
         public static SerializationMapping TimedSequenceElementMapping()
         {
-            return new CompoundSerializationMapping<TimedSequenceElement>()
+            return new MemberwiseSerializationMapping<TimedSequenceElement>()
             {
                 ("delay", new Member<TimedSequenceElement, float>( o => o.Delay )),
                 ("start_ut", new Member<TimedSequenceElement, double>( o => o._startUT ))

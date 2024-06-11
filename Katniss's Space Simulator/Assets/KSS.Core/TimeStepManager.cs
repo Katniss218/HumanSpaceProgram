@@ -184,7 +184,7 @@ namespace KSS.Core
         [SerializationMappingProvider( typeof( TimeStepManager ) )]
         public static SerializationMapping TimeStepManagerMapping()
         {
-            return new CompoundSerializationMapping<TimeStepManager>()
+            return new MemberwiseSerializationMapping<TimeStepManager>()
             {
                 ("ut", new Member<TimeStepManager, double>( o => TimeStepManager.UT, (o, value) => TimeStepManager.UT = value ))
             }

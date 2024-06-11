@@ -202,7 +202,7 @@ namespace KSS.Core.Physics
         [SerializationMappingProvider( typeof( PinnedPhysicsObject ) )]
         public static SerializationMapping PinnedPhysicsObjectMapping()
         {
-            return new CompoundSerializationMapping<PinnedPhysicsObject>()
+            return new MemberwiseSerializationMapping<PinnedPhysicsObject>()
             {
                 ("mass", new Member<PinnedPhysicsObject, float>( o => o.Mass )),
                 ("local_center_of_mass", new Member<PinnedPhysicsObject, Vector3>( o => o.LocalCenterOfMass )),
@@ -211,7 +211,7 @@ namespace KSS.Core.Physics
 
                 ("velocity", new Member<PinnedPhysicsObject, Vector3>( o => o.Velocity )),
                 ("angular_velocity", new Member<PinnedPhysicsObject, Vector3>( o => o.AngularVelocity )),
-                ("reference_body", new MemberReference<PinnedPhysicsObject, CelestialBody>( o => o.ReferenceBody )),
+                ("reference_body", new Member<PinnedPhysicsObject, CelestialBody>( ObjectContext.Ref, o => o.ReferenceBody )),
                 ("reference_position", new Member<PinnedPhysicsObject, Vector3Dbl>( o => o.ReferencePosition )),
                 ("reference_rotation", new Member<PinnedPhysicsObject, QuaternionDbl>( o => o.ReferenceRotation ))
             }

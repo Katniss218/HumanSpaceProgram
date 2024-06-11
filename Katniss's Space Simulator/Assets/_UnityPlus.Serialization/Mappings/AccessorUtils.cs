@@ -4,25 +4,13 @@ using System.Linq.Expressions;
 namespace UnityPlus.Serialization
 {
     /// <summary>
-    /// A method that returns a TMember that is a member of TSource.
-    /// </summary>
-    public delegate TMember Getter<TSource, TMember>( TSource item );
-
-    /// <summary>
-    /// A method that sets a TMember that is a member of TSource.
-    /// </summary>
-    public delegate void Setter<TSource, TMember>( TSource item, TMember member );
-
-    /// <summary>
-    /// A method that sets a TMember that is a member of TSource.
-    /// </summary>
-    public delegate void RefSetter<TSource, TMember>( ref TSource item, TMember member );
-
-    /// <summary>
     /// Contains static helper methods that create getter/setter lambdas from expressions.
     /// </summary>
     public static class AccessorUtils
     {
+        // TODO - Add a method to create member accesses for inherited members (TSource is `DerivedClass`, and TMember is declared inside `BaseClass`).
+        // This can then be used to convert members from base mapping into members of derived mapping.
+
         /// <summary>
         /// Creates a getter method from the member access expression.
         /// </summary>

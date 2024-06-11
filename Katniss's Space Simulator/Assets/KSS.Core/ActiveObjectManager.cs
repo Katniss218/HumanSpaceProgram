@@ -34,9 +34,9 @@ namespace KSS.Core
         [SerializationMappingProvider( typeof( ActiveObjectManager ) )]
         public static SerializationMapping ActiveObjectManagerMapping()
         {
-            return new CompoundSerializationMapping<ActiveObjectManager>()
+            return new MemberwiseSerializationMapping<ActiveObjectManager>()
             {
-                ("active_object", new MemberReference<ActiveObjectManager, GameObject>( o => ActiveObjectManager.ActiveObject, (o, value) => ActiveObjectManager.ActiveObject = value ))
+                ("active_object", new Member<ActiveObjectManager, GameObject>( ObjectContext.Ref, o => ActiveObjectManager.ActiveObject, (o, value) => ActiveObjectManager.ActiveObject = value ))
             }
             .IncludeMembers<Behaviour>()
             .UseBaseTypeFactory();

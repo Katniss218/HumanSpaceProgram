@@ -27,7 +27,7 @@ namespace KSS.Components
         [SerializationMappingProvider( typeof( FReactionControlController ) )]
         public static SerializationMapping FReactionControlControllerMapping()
         {
-            return new CompoundSerializationMapping<FReactionControlController>()
+            return new MemberwiseSerializationMapping<FReactionControlController>()
             {
             }
             .IncludeMembers<Behaviour>()

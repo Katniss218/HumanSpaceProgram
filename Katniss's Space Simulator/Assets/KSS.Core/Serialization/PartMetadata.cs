@@ -146,7 +146,7 @@ namespace KSS.Core.Serialization
         [SerializationMappingProvider( typeof( PartMetadata ) )]
         public static SerializationMapping PartMetadataMapping()
         {
-            return new CompoundSerializationMapping<PartMetadata>()
+            return new MemberwiseSerializationMapping<PartMetadata>()
             {
                 ("name", new Member<PartMetadata, string>( o => o.Name )),
                 ("description", new Member<PartMetadata, string>( o => o.Description )),

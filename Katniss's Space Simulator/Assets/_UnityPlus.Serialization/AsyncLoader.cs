@@ -9,6 +9,7 @@ using UnityEngine;
 
 namespace UnityPlus.Serialization
 {
+    /*
     /// <summary>
     /// An asynchronous loader.
     /// </summary>
@@ -110,5 +111,5 @@ namespace UnityPlus.Serialization
             }
             coroutineContainer.StartCoroutine( LoadCoroutine( coroutineContainer ) );
         }
-    }
+    }*/
 }

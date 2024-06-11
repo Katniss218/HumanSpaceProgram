@@ -124,7 +124,7 @@ namespace KSS.Core.Serialization
         [SerializationMappingProvider( typeof( TimelineMetadata ) )]
         public static SerializationMapping TimelineMetadataMapping()
         {
-            return new CompoundSerializationMapping<TimelineMetadata>()
+            return new MemberwiseSerializationMapping<TimelineMetadata>()
             {
                 ("name", new Member<TimelineMetadata, string>( o => o.Name )),
                 ("description", new Member<TimelineMetadata, string>( o => o.Description ))

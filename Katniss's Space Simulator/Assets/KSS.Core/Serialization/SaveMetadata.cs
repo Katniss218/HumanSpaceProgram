@@ -151,7 +151,7 @@ namespace KSS.Core.Serialization
         [SerializationMappingProvider( typeof( SaveMetadata ) )]
         public static SerializationMapping SaveMetadataMapping()
         {
-            return new CompoundSerializationMapping<SaveMetadata>()
+            return new MemberwiseSerializationMapping<SaveMetadata>()
             {
                 ("name", new Member<SaveMetadata, string>( o => o.Name )),
                 ("description", new Member<SaveMetadata, string>( o => o.Description )),

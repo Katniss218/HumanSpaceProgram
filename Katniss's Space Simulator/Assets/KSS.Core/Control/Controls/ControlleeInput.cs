@@ -67,9 +67,9 @@ namespace KSS.Control.Controls
         [SerializationMappingProvider( typeof( ControlleeInput ) )]
         public static SerializationMapping FreePhysicsObjectMapping()
         {
-            return new CompoundSerializationMapping<ControlleeInput>()
+            return new MemberwiseSerializationMapping<ControlleeInput>()
             {
-                ("connects_to", new MemberReferenceArray<ControlleeInput, ControllerOutput>( o => o.outputs.ToArray(), (o, value) =>
+                ("connects_to", new Member<ControlleeInput, ControllerOutput[]>( ArrayContext.Refs, o => o.outputs.ToArray(), (o, value) =>
                 {
                     foreach( var c in value )
                     {

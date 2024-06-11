@@ -11,7 +11,7 @@ namespace UnityPlus.Serialization
     /// <summary>
     /// A key-value pair node.
     /// </summary>
-    public sealed class SerializedObject : SerializedData, IDictionary<string, SerializedData>
+    public sealed class SerializedObject : SerializedData, IDictionary<string, SerializedData>, IEquatable<SerializedObject>
     {
         readonly Dictionary<string, SerializedData> _children;
 
@@ -138,6 +138,24 @@ namespace UnityPlus.Serialization
         IEnumerator IEnumerable.GetEnumerator()
         {
             return ((IEnumerable)_children).GetEnumerator();
+        }
+
+        public override int GetHashCode()
+        {
+            return _children.GetHashCode();
+        }
+
+        public override bool Equals( object obj )
+        {
+            if( obj is SerializedObject other )
+                return this.Equals( other );
+
+            return false;
+        }
+
+        public bool Equals( SerializedObject other )
+        {
+            return _children.Equals( other._children );
         }
     }
 }

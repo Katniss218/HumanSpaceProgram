@@ -35,7 +35,7 @@ namespace KSS.Core.Components
         [SerializationMappingProvider( typeof( FPart ) )]
         public static SerializationMapping FPartMapping()
         {
-            return new CompoundSerializationMapping<FPart>()
+            return new MemberwiseSerializationMapping<FPart>()
             {
                 ("part_id", new Member<FPart, NamespacedIdentifier>( o => o.PartID ))
                 // todo - conditions.

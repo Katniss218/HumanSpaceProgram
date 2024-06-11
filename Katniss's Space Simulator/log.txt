@@ -6,26 +6,75 @@ SIMD: No
 
 -- Log Starts Here -------------------------------------------------------
 
-[18:33:34](EXC) - FileNotFoundException: Could not find file "E:\GIT\HumanSpaceProgram\Katniss's Space Simulator\GameData\Vanilla\Parts\engine\gameobjects.json"
+[19:05:09](EXC) - InvalidOperationException: Save is not supported on `EmptySerializationMapping`.
   at
-System.IO.FileStream..ctor (System.String path, System.IO.FileMode mode, System.IO.FileAccess access, System.IO.FileShare share, System.Int32 bufferSize, System.Boolean anonymous, System.IO.FileOptions options) (at <40c82fbb8a9645d5a6c0bfc1e0fa6dfd>:0)
-System.IO.FileStream..ctor (System.String path, System.IO.FileMode mode, System.IO.FileAccess access, System.IO.FileShare share, System.Int32 bufferSize, System.IO.FileOptions options) (at <40c82fbb8a9645d5a6c0bfc1e0fa6dfd>:0)
-(wrapper remoting-invoke-with-check) System.IO.FileStream..ctor(string,System.IO.FileMode,System.IO.FileAccess,System.IO.FileShare,int,System.IO.FileOptions)
-System.IO.StreamReader..ctor (System.String path, System.Text.Encoding encoding, System.Boolean detectEncodingFromByteOrderMarks, System.Int32 bufferSize) (at <40c82fbb8a9645d5a6c0bfc1e0fa6dfd>:0)
-System.IO.StreamReader..ctor (System.String path, System.Text.Encoding encoding, System.Boolean detectEncodingFromByteOrderMarks) (at <40c82fbb8a9645d5a6c0bfc1e0fa6dfd>:0)
-(wrapper remoting-invoke-with-check) System.IO.StreamReader..ctor(string,System.Text.Encoding,bool)
-System.IO.File.InternalReadAllText (System.String path, System.Text.Encoding encoding) (at <40c82fbb8a9645d5a6c0bfc1e0fa6dfd>:0)
-System.IO.File.ReadAllText (System.String path, System.Text.Encoding encoding) (at <40c82fbb8a9645d5a6c0bfc1e0fa6dfd>:0)
-UnityPlus.Serialization.DataHandlers.JsonSerializedDataHandler.Read () (at Assets/_UnityPlus.Serialization/DataHandlers/JsonSerializedDataHandler.cs:25)
-KSS.AssetLoaders.GameDataJsonPartFactory.Load (UnityPlus.Serialization.IForwardReferenceMap refMap) (at Assets/KSS/AssetLoaders/GameDataJsonPartFactory.cs:31)
-KSS.Core.PartRegistry.Load (KSS.Core.Mods.NamespacedIdentifier namespacedPartId) (at Assets/KSS.Core/PartRegistry.cs:95)
-KSS.UI.UIPartListEntry.OnClick () (at Assets/KSS.UI/UIPartListEntry.cs:28)
-UnityPlus.UILib.UIElements.UIButton.<set_onClick>b__21_0 () (at Assets/_UnityPlus.UILib/UIElements/UIButton.cs:34)
-UnityEngine.Events.InvokableCall.Invoke () (at <08e97795506846d2b49f430c361fcdf7>:0)
-UnityEngine.Events.UnityEvent.Invoke () (at <08e97795506846d2b49f430c361fcdf7>:0)
-UnityEngine.UI.Button.Press () (at Library/PackageCache/com.unity.ugui@1.0.0/Runtime/UI/Core/Button.cs:70)
-UnityEngine.UI.Button.OnPointerClick (UnityEngine.EventSystems.PointerEventData eventData) (at Library/PackageCache/com.unity.ugui@1.0.0/Runtime/UI/Core/Button.cs:114)
-UnityEngine.EventSystems.ExecuteEvents.Execute (UnityEngine.EventSystems.IPointerClickHandler handler, UnityEngine.EventSystems.BaseEventData eventData) (at Library/PackageCache/com.unity.ugui@1.0.0/Runtime/EventSystem/ExecuteEvents.cs:57)
-UnityEngine.EventSystems.ExecuteEvents.Execute[T] (UnityEngine.GameObject target, UnityEngine.EventSystems.BaseEventData eventData, UnityEngine.EventSystems.ExecuteEvents+EventFunction`1[T1] functor) (at Library/PackageCache/com.unity.ugui@1.0.0/Runtime/EventSystem/ExecuteEvents.cs:272)
-UnityEngine.EventSystems.EventSystem:Update() (at Library/PackageCache/com.unity.ugui@1.0.0/Runtime/EventSystem/EventSystem.cs:517)
+UnityPlus.Serialization.EmptySerializationMapping`1[TSource].Save (System.Object obj, UnityPlus.Serialization.ISaver s) (at Assets/_UnityPlus.Serialization/MappingTypes/EmptySerializationMapping.cs:20)
+UnityPlus.Serialization.SerializationUnitSaver`1[T].SaveCallback () (at Assets/_UnityPlus.Serialization/SerializationUnitSaver.cs:83)
+UnityPlus.Serialization.SerializationUnitSaver`1[T].Serialize (UnityPlus.Serialization.IReverseReferenceMap s) (at Assets/_UnityPlus.Serialization/SerializationUnitSaver.cs:44)
+KSS.Components.FConstructible.RecalculateGhostAndUnghostData () (at Assets/KSS/Components/FConstructible.cs:179)
+KSS.Components.FConstructible.Start () (at Assets/KSS/Components/FConstructible.cs:153)
 
+[19:05:09](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+UnityPlus.Serialization.SerializationMappingRegistry.MakeReady (System.Int32 context, UnityPlus.Serialization.SerializationMappingRegistry+Entry entry, System.Type objType) (at Assets/_UnityPlus.Serialization/Mappings/SerializationMappingRegistry.cs:71)
+UnityPlus.Serialization.SerializationMappingRegistry.GetMappingOrDefault[TMember] (System.Int32 context, TMember memberObj) (at Assets/_UnityPlus.Serialization/Mappings/SerializationMappingRegistry.cs:160)
+UnityPlus.Serialization.SerializationUnitSaver`1[T].SaveCallback () (at Assets/_UnityPlus.Serialization/SerializationUnitSaver.cs:81)
+UnityPlus.Serialization.SerializationUnitSaver`1[T].Serialize (UnityPlus.Serialization.IReverseReferenceMap s) (at Assets/_UnityPlus.Serialization/SerializationUnitSaver.cs:44)
+KSS.Components.FConstructible.RecalculateGhostAndUnghostData () (at Assets/KSS/Components/FConstructible.cs:179)
+KSS.Components.FConstructible.Start () (at Assets/KSS/Components/FConstructible.cs:153)
+
+[19:05:09](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+UnityPlus.Serialization.SerializationMappingRegistry.MakeReady (System.Int32 context, UnityPlus.Serialization.SerializationMappingRegistry+Entry entry, System.Type objType) (at Assets/_UnityPlus.Serialization/Mappings/SerializationMappingRegistry.cs:71)
+UnityPlus.Serialization.SerializationMappingRegistry.GetMappingOrDefault[TMember] (System.Int32 context, TMember memberObj) (at Assets/_UnityPlus.Serialization/Mappings/SerializationMappingRegistry.cs:160)
+UnityPlus.Serialization.SerializationUnitSaver`1[T].SaveCallback () (at Assets/_UnityPlus.Serialization/SerializationUnitSaver.cs:81)
+UnityPlus.Serialization.SerializationUnitSaver`1[T].Serialize (UnityPlus.Serialization.IReverseReferenceMap s) (at Assets/_UnityPlus.Serialization/SerializationUnitSaver.cs:44)
+KSS.Components.FConstructible.RecalculateGhostAndUnghostData () (at Assets/KSS/Components/FConstructible.cs:179)
+KSS.Components.FConstructible.Start () (at Assets/KSS/Components/FConstructible.cs:153)
+
+[19:05:09](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+UnityPlus.Serialization.SerializationMappingRegistry.MakeReady (System.Int32 context, UnityPlus.Serialization.SerializationMappingRegistry+Entry entry, System.Type objType) (at Assets/_UnityPlus.Serialization/Mappings/SerializationMappingRegistry.cs:71)
+UnityPlus.Serialization.SerializationMappingRegistry.GetMappingOrDefault[TMember] (System.Int32 context, TMember memberObj) (at Assets/_UnityPlus.Serialization/Mappings/SerializationMappingRegistry.cs:160)
+UnityPlus.Serialization.SerializationUnitSaver`1[T].SaveCallback () (at Assets/_UnityPlus.Serialization/SerializationUnitSaver.cs:81)
+UnityPlus.Serialization.SerializationUnitSaver`1[T].Serialize (UnityPlus.Serialization.IReverseReferenceMap s) (at Assets/_UnityPlus.Serialization/SerializationUnitSaver.cs:44)
+KSS.Components.FConstructible.RecalculateGhostAndUnghostData () (at Assets/KSS/Components/FConstructible.cs:179)
+KSS.Components.FConstructible.Start () (at Assets/KSS/Components/FConstructible.cs:153)
+
+[19:05:09](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+UnityPlus.Serialization.SerializationMappingRegistry.MakeReady (System.Int32 context, UnityPlus.Serialization.SerializationMappingRegistry+Entry entry, System.Type objType) (at Assets/_UnityPlus.Serialization/Mappings/SerializationMappingRegistry.cs:71)
+UnityPlus.Serialization.SerializationMappingRegistry.GetMappingOrDefault[TMember] (System.Int32 context, TMember memberObj) (at Assets/_UnityPlus.Serialization/Mappings/SerializationMappingRegistry.cs:160)
+UnityPlus.Serialization.SerializationUnitSaver`1[T].SaveCallback () (at Assets/_UnityPlus.Serialization/SerializationUnitSaver.cs:81)
+UnityPlus.Serialization.SerializationUnitSaver`1[T].Serialize (UnityPlus.Serialization.IReverseReferenceMap s) (at Assets/_UnityPlus.Serialization/SerializationUnitSaver.cs:44)
+KSS.Components.FConstructible.RecalculateGhostAndUnghostData () (at Assets/KSS/Components/FConstructible.cs:179)
+KSS.Components.FConstructible.Start () (at Assets/KSS/Components/FConstructible.cs:153)
+
+[19:05:09](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+UnityPlus.Serialization.SerializationMappingRegistry.MakeReady (System.Int32 context, UnityPlus.Serialization.SerializationMappingRegistry+Entry entry, System.Type objType) (at Assets/_UnityPlus.Serialization/Mappings/SerializationMappingRegistry.cs:71)
+UnityPlus.Serialization.SerializationMappingRegistry.GetMappingOrDefault[TMember] (System.Int32 context, TMember memberObj) (at Assets/_UnityPlus.Serialization/Mappings/SerializationMappingRegistry.cs:160)
+UnityPlus.Serialization.SerializationUnitSaver`1[T].SaveCallback () (at Assets/_UnityPlus.Serialization/SerializationUnitSaver.cs:81)
+UnityPlus.Serialization.SerializationUnitSaver`1[T].Serialize (UnityPlus.Serialization.IReverseReferenceMap s) (at Assets/_UnityPlus.Serialization/SerializationUnitSaver.cs:44)
+KSS.Components.FConstructible.RecalculateGhostAndUnghostData () (at Assets/KSS/Components/FConstructible.cs:179)
+KSS.Components.FConstructible.Start () (at Assets/KSS/Components/FConstructible.cs:153)
+
+[19:05:09](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+UnityPlus.Serialization.SerializationMappingRegistry.MakeReady (System.Int32 context, UnityPlus.Serialization.SerializationMappingRegistry+Entry entry, System.Type objType) (at Assets/_UnityPlus.Serialization/Mappings/SerializationMappingRegistry.cs:71)
+UnityPlus.Serialization.SerializationMappingRegistry.GetMappingOrDefault[TMember] (System.Int32 context, TMember memberObj) (at Assets/_UnityPlus.Serialization/Mappings/SerializationMappingRegistry.cs:160)
+UnityPlus.Serialization.SerializationUnitSaver`1[T].SaveCallback () (at Assets/_UnityPlus.Serialization/SerializationUnitSaver.cs:81)
+UnityPlus.Serialization.SerializationUnitSaver`1[T].Serialize (UnityPlus.Serialization.IReverseReferenceMap s) (at Assets/_UnityPlus.Serialization/SerializationUnitSaver.cs:44)
+KSS.Components.FConstructible.RecalculateGhostAndUnghostData () (at Assets/KSS/Components/FConstructible.cs:179)
+KSS.Components.FConstructible.Start () (at Assets/KSS/Components/FConstructible.cs:153)
+
+[19:05:09](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+UnityPlus.Serialization.SerializationMappingRegistry.MakeReady (System.Int32 context, UnityPlus.Serialization.SerializationMappingRegistry+Entry entry, System.Type objType) (at Assets/_UnityPlus.Serialization/Mappings/SerializationMappingRegistry.cs:71)
+UnityPlus.Serialization.SerializationMappingRegistry.GetMappingOrDefault[TMember] (System.Int32 context, TMember memberObj) (at Assets/_UnityPlus.Serialization/Mappings/SerializationMappingRegistry.cs:160)
+UnityPlus.Serialization.SerializationUnitSaver`1[T].SaveCallback () (at Assets/_UnityPlus.Serialization/SerializationUnitSaver.cs:81)
+UnityPlus.Serialization.SerializationUnitSaver`1[T].Serialize (UnityPlus.Serialization.IReverseReferenceMap s) (at Assets/_UnityPlus.Serialization/SerializationUnitSaver.cs:44)
+KSS.Components.FConstructible.RecalculateGhostAndUnghostData () (at Assets/KSS/Components/FConstructible.cs:179)
+KSS.Components.FConstructible.Start () (at Assets/KSS/Components/FConstructible.cs:153)
+
+[19:05:14](WRN) - Should not be capturing when there is a hotcontrol
