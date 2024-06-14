@@ -9,59 +9,57 @@ namespace UnityPlus.Serialization
 
 #warning TODO - these can be moved into the SerializationMapping
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static void DoPopulate<T>( SerializationMapping mapping, ref T obj, SerializedData data, ILoader l )
+        public static bool DoPopulate<T>( SerializationMapping mapping, ref T obj, SerializedData data, ILoader l )
         {
-            object obj2;
             switch( mapping.SerializationStyle )
             {
                 default:
-                    return;
+                    return false;
                 case SerializationStyle.PrimitiveStruct:
-                    obj2 = mapping.Instantiate( data, l );
-                    break;
+                    obj = (T)mapping.Instantiate( data, l );
+                    return true;
                 case SerializationStyle.NonPrimitive:
-                    obj2 = obj; // Don't instantiate when populating, object should already be created.
+                    object obj2 = obj; // Don't instantiate when populating, object should already be created.
                     mapping.Load( ref obj2, data, l );
-                    break;
+                    obj = (T)obj2;
+                    return true;
             }
-            obj = (T)obj2;
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static void DoLoad<T>( SerializationMapping mapping, ref T obj, SerializedData data, ILoader l )
+        public static bool DoLoad<T>( SerializationMapping mapping, ref T obj, SerializedData data, ILoader l )
         {
-            object obj2;
             switch( mapping.SerializationStyle )
             {
                 default:
-                    return;
+                    return false;
                 case SerializationStyle.PrimitiveStruct:
-                    obj2 = mapping.Instantiate( data, l );
-                    break;
+                    obj = (T)mapping.Instantiate( data, l );
+                    return true;
                 case SerializationStyle.NonPrimitive:
-                    obj2 = mapping.Instantiate( data, l );
+                    object obj2 = mapping.Instantiate( data, l );
                     mapping.Load( ref obj2, data, l );
-                    break;
+                    obj = (T)obj2;
+                    return true;
             }
-            obj = (T)obj2;
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static void DoLoadReferences<T>( SerializationMapping mapping, ref T obj, SerializedData data, ILoader l )
+        public static bool DoLoadReferences<T>( SerializationMapping mapping, ref T obj, SerializedData data, ILoader l )
         {
-            object obj2 = obj;
             switch( mapping.SerializationStyle )
             {
                 default:
-                    return;
+                    return false;
                 case SerializationStyle.PrimitiveObject:
-                    obj2 = mapping.Instantiate( data, l );
-                    break;
+                    obj =  (T)mapping.Instantiate( data, l );
+                    return true;
                 case SerializationStyle.NonPrimitive:
+                    object obj2 = obj;
                     mapping.LoadReferences( ref obj2, data, l );
-                    break;
+                    obj = (T)obj2;
+                    return true;
             }
-            obj = (T)obj2;
         }
     }
 }

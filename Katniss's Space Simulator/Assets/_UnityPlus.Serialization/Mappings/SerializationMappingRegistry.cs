@@ -126,10 +126,10 @@ namespace UnityPlus.Serialization
                 if( !entry.isReady )
                 {
                     entry = MakeReady( context, entry, memberType );
-                    return entry.mapping;
+                    return entry.mapping.GetWorkingInstance();
                 }
 
-                return entry.mapping;
+                return entry.mapping.GetWorkingInstance();
             }
 
             return SerializationMapping.Empty( memberType );
@@ -158,10 +158,10 @@ namespace UnityPlus.Serialization
                 if( !entry.isReady )
                 {
                     entry = MakeReady( context, entry, objType );
-                    return entry.mapping;
+                    return entry.mapping.GetWorkingInstance();
                 }
 
-                return entry.mapping;
+                return entry.mapping.GetWorkingInstance();
             }
 
             return SerializationMapping.Empty<TMember>();
@@ -185,10 +185,10 @@ namespace UnityPlus.Serialization
                     if( !entry.isReady )
                     {
                         entry = MakeReady( context, entry, memberType );
-                        return entry.mapping;
+                        return entry.mapping.GetWorkingInstance();
                     }
 
-                    return entry.mapping;
+                    return entry.mapping.GetWorkingInstance();
                 }
             }
 

@@ -72,33 +72,36 @@ namespace KSS.Core
             }
             return gos;
         }
-        /*
-        [HSPEventListener( HSPEvent.TIMELINE_BEFORE_SAVE, HSPEvent.NAMESPACE_VANILLA + ".serialize_vessels" )]
+        
+        [HSPEventListener( HSPEvent.TIMELINE_SAVE, HSPEvent.NAMESPACE_VANILLA + ".serialize_vessels" )]
         private static void OnBeforeSave( TimelineManager.SaveEventData e )
         {
-            JsonSerializedDataHandler _vesselsDataHandler = new JsonSerializedDataHandler();
-
             Directory.CreateDirectory( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels" ) );
-            _vesselsDataHandler.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels", "objects.json" );
-            _vesselsDataHandler.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels", "data.json" );
 
-            SerializationUnit _vesselsStrat = SerializationUnit.FromObjects( _vesselsDataHandler, GetAllRootGameObjects() );
-            e.objectActions.Add( _vesselsStrat.SaveAsync_Object );
-            e.dataActions.Add( _vesselsStrat.SaveAsync_Data );
+            int i = 0;
+            foreach( var vessel in GetAllRootGameObjects() )
+            {
+                JsonSerializedDataHandler _vesselsDataHandler = new JsonSerializedDataHandler( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels", $"{i}", "gameobjects.json" ) );
+
+                var data = SerializationUnit.Serialize( vessel );
+                _vesselsDataHandler.Write( data );
+                i++;
+            }
         }
 
-        [HSPEventListener( HSPEvent.TIMELINE_BEFORE_LOAD, HSPEvent.NAMESPACE_VANILLA + ".deserialize_vessels" )]
-        private static void OnBeforeLoad( TimelineManager.LoadEventData e )
+        [HSPEventListener( HSPEvent.TIMELINE_LOAD, HSPEvent.NAMESPACE_VANILLA + ".deserialize_vessels" )]
+        private static void OnLoad( TimelineManager.LoadEventData e )
         {
-            JsonSerializedDataHandler _vesselsDataHandler = new JsonSerializedDataHandler();
+            string path = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels" );
+            Directory.CreateDirectory( path );
 
-            Directory.CreateDirectory( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels" ) );
-            _vesselsDataHandler.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels", "objects.json" );
-            _vesselsDataHandler.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels", "data.json" );
+            foreach( var dir in Directory.GetDirectories( path ) )
+            {
+                JsonSerializedDataHandler _vesselsDataHandler = new JsonSerializedDataHandler( Path.Combine( dir, "gameobjects.json" ) );
 
-            SerializationUnit _vesselsStrat = SerializationUnit.FromData( _vesselsDataHandler, GetAllRootGameObjects );
-            e.objectActions.Add( _vesselsStrat.LoadAsync_Object );
-            e.dataActions.Add( _vesselsStrat.LoadAsync_Data );
-        }*/
+                var data = _vesselsDataHandler.Read();
+                var go = SerializationUnit.Deserialize<GameObject>( data );
+            }
+        }
     }
 }

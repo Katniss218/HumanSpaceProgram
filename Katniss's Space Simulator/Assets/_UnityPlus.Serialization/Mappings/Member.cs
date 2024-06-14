@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
+using UnityEngine;
 
 namespace UnityPlus.Serialization
 {
@@ -147,12 +148,15 @@ namespace UnityPlus.Serialization
             var mapping = _hasCachedMapping ? _cachedMapping : SerializationMappingRegistry.GetMappingOrDefault<TMember>( _context, memberType );
 
             TMember member = default;
-            MappingHelper.DoLoad( mapping, ref member, data, l );
-
-            if( _structSetter == null )
-                _setter.Invoke( source, member );
-            else
-                _structSetter.Invoke( ref source, member );
+            if( MappingHelper.DoLoad( mapping, ref member, data, l ) )
+            {
+                if( _structSetter == null )
+                {
+                    _setter.Invoke( source, member );
+                }
+                else
+                    _structSetter.Invoke( ref source, member );
+            }
         }
 
         public override void LoadReferences( ref TSource source, SerializedData data, ILoader l )
@@ -162,14 +166,15 @@ namespace UnityPlus.Serialization
             // This is needed, to reach the references nested inside objects that themselves don't contain any references.
             var mapping = SerializationMappingRegistry.GetMappingOrDefault<TMember>( _context, member );
 
-            MappingHelper.DoLoadReferences( mapping, ref member, data, l );
-
-            // This is needed, if the setter is custom (not auto-generated from field access (but NOT property access)) (look at LODGroup and its LOD[])
-            // Basically, we don't have the guarantee that the class we have referenceequals the private state.
-            if( _structSetter == null )
-                _setter.Invoke( source, member );
-            else
-                _structSetter.Invoke( ref source, member );
+            if( MappingHelper.DoLoadReferences( mapping, ref member, data, l ) )
+            {
+                // This is needed, if the setter is custom (not auto-generated from field access (but NOT property access)) (look at LODGroup and its LOD[])
+                // Basically, we don't have the guarantee that the class we have referenceequals the private state.
+                if( _structSetter == null )
+                    _setter.Invoke( source, member );
+                else
+                    _structSetter.Invoke( ref source, member );
+            }
         }
     }
 }

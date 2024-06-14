@@ -1,112 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace UnityPlus.Serialization.Mappings
 {
     public static class Mappings_Dictionary
     {
-#warning TODO - transform the 'dict' into an array of key-value pairs.
         
-        [SerializationMappingProvider( typeof( Dictionary<,> ), Context = KeyValueContext.ValueToValue )]
-        public static SerializationMapping Dictionary_ValueToValue_Mapping<TKey, TValue>()
+        [SerializationMappingProvider( typeof( ValueTuple<,> ) )]
+        public static SerializationMapping ValueTupleMapping<T1, T2>()
         {
-            return new NonPrimitiveSerializationMapping<Dictionary<TKey, TValue>>()
+            return new MemberwiseSerializationMapping<(T1, T2)>()
             {
-                OnSave = ( o, s ) =>
-                {
-                    SerializedArray arr = new SerializedArray();
-
-                    foreach( var kvp in o )
-                    {
-                        var mapping = SerializationMappingRegistry.GetMappingOrDefault<TKey>( ObjectContext.Default, kvp.Key );
-                        var keyData = mapping.Save( kvp.Key, s );
-
-                        mapping = SerializationMappingRegistry.GetMappingOrDefault<TValue>( ObjectContext.Default, kvp.Value );
-                        var valueData = mapping.Save( kvp.Value, s );
-
-                        SerializedObject kvpData = new SerializedObject()
-                        {
-                            { "key", keyData },
-                            { "value", valueData }
-                        };
-
-                        arr.Add( kvpData );
-                    }
-
-                    return arr;
-                },
-                OnInstantiate = ( data, l ) =>
-                {
-                    return new Dictionary<TKey, TValue>();
-                },
-                OnLoad = ( ref Dictionary<TKey, TValue> o, SerializedData data, ILoader l ) =>
-                {
-                    if( data is not SerializedArray dataObj )
-                        return;
-
-                    foreach( var dataKvp in dataObj )
-                    {
-                        SerializedData keyData = dataKvp["key"];
-                        SerializedData valueData = dataKvp["value"];
-
-                        Type keyType = keyData.TryGetValue( KeyNames.TYPE, out var elementType2 )
-                            ? elementType2.DeserializeType()
-                            : typeof( TKey );
-
-                        Type valueType = valueData.TryGetValue( KeyNames.TYPE, out elementType2 )
-                            ? elementType2.DeserializeType()
-                            : typeof( TKey );
-
-                        TKey key = default;
-                        var mapping = SerializationMappingRegistry.GetMappingOrDefault<TKey>( ObjectContext.Default, keyType );
-                        MappingHelper.DoLoad( mapping, ref key, keyData, l );
-
-                        TValue value = default;
-                        mapping = SerializationMappingRegistry.GetMappingOrDefault<TValue>( ObjectContext.Default, valueType );
-                        MappingHelper.DoLoad( mapping, ref value, valueData, l );
-
-                        if( key == null )
-                            continue;
-
-                        o[key] = value;
-                    }
-                },
-                OnLoadReferences = ( ref Dictionary<TKey, TValue> o, SerializedData data, ILoader l ) =>
-                {
-                    if( data is not SerializedArray dataObj )
-                        return;
-
-                    int current = 0;
-                    foreach( var (key, value) in o )
-#warning TODO - if key / value is struct - instantiate. otherwise retrieve from the refMap and set internal fields.
-                    {
-                        SerializedData dataKvp = dataObj[current];
-
-                        SerializedData keyData = dataKvp["key"];
-                        SerializedData valueData = dataKvp["value"];
-
-                        Type elementType = typeof( TValue );
-                        if( dataKvp.TryGetValue( KeyNames.TYPE, out var elementType2 ) )
-                        {
-                            elementType = elementType2.DeserializeType();
-                        }
-
-                        TKey key2 = key;
-                        var mapping = SerializationMappingRegistry.GetMappingOrDefault<TKey>( ObjectContext.Default, key2 );
-                        MappingHelper.DoLoadReferences( mapping, ref key2, keyData, l );
-
-                        TValue value2 = value;
-                        mapping = SerializationMappingRegistry.GetMappingOrDefault<TValue>( ObjectContext.Default, value2 );
-                        MappingHelper.DoLoadReferences( mapping, ref value2, valueData, l );
-
-#warning TODO - this is forbidden. This should serialize an array of key-value pairs instead of a dict directly.
-                        o[key2] = value2;
-                        current++;
-                    }
-                }
+                ("1", new Member<(T1, T2), T1>( o => o.Item1 )),
+                ("2", new Member<(T1, T2), T2>( o => o.Item2 ))
             };
         }
-        
+
 
         [SerializationMappingProvider( typeof( KeyValuePair<,> ), Context = KeyValueContext.ValueToValue )]
         public static SerializationMapping KeyValuePair_ValueToValue_Mapping<TKey, TValue>()
@@ -171,6 +81,116 @@ namespace UnityPlus.Serialization.Mappings
                     MappingHelper.DoLoadReferences( mapping, ref value, valueData, l );
 
                     o = new KeyValuePair<TKey, TValue>( key, value );
+                }
+            };
+        }
+
+        [SerializationMappingProvider( typeof( Dictionary<,> ), Context = KeyValueContext.ValueToValue )]
+        public static SerializationMapping Dictionary_ValueToValue_Mapping<TKey, TValue>()
+        {
+            return new NonPrimitiveSerializationMapping2<(TKey, TValue)[], Dictionary<TKey, TValue>>()
+            {
+                OnSave = ( o, s ) =>
+                {
+#warning TODO - add some way of automatically adding type and id. (also, objects should be objects not arrays)
+                    SerializedArray arr = new SerializedArray();
+
+                    foreach( var kvp in o )
+                    {
+                        var mapping = SerializationMappingRegistry.GetMappingOrDefault<TKey>( ObjectContext.Default, kvp.Key );
+                        var keyData = mapping.Save( kvp.Key, s );
+
+                        mapping = SerializationMappingRegistry.GetMappingOrDefault<TValue>( ObjectContext.Default, kvp.Value );
+                        var valueData = mapping.Save( kvp.Value, s );
+
+                        SerializedObject kvpData = new SerializedObject()
+                        {
+                            { "key", keyData },
+                            { "value", valueData }
+                        };
+
+                        arr.Add( kvpData );
+                    }
+
+                    return arr;
+                },
+                OnInstantiate = ( data, l ) =>
+                {
+                    return new Dictionary<TKey, TValue>();
+                },
+                OnInstantiateTemp = ( data, l ) =>
+                {
+                    if( data is not SerializedArray dataObj )
+                        return null;
+
+                    return new (TKey, TValue)[dataObj.Count];
+                },
+                OnLoad = ( NonPrimitiveSerializationMapping2<(TKey, TValue)[], Dictionary<TKey, TValue>> self, ref Dictionary<TKey, TValue> o, SerializedData data, ILoader l ) =>
+                {
+                    if( data is not SerializedArray dataObj )
+                        return;
+
+                    int i = 0;
+                    foreach( var dataKvp in dataObj )
+                    {
+                        SerializedData keyData = dataKvp["key"];
+                        SerializedData valueData = dataKvp["value"];
+
+                        Type keyType = keyData.TryGetValue( KeyNames.TYPE, out var elementType2 )
+                            ? elementType2.DeserializeType()
+                            : typeof( TKey );
+
+                        Type valueType = valueData.TryGetValue( KeyNames.TYPE, out elementType2 )
+                            ? elementType2.DeserializeType()
+                            : typeof( TKey );
+
+                        TKey key = default;
+                        var mapping = SerializationMappingRegistry.GetMappingOrDefault<TKey>( ObjectContext.Default, keyType );
+                        MappingHelper.DoLoad( mapping, ref key, keyData, l );
+
+                        TValue value = default;
+                        mapping = SerializationMappingRegistry.GetMappingOrDefault<TValue>( ObjectContext.Default, valueType );
+                        MappingHelper.DoLoad( mapping, ref value, valueData, l );
+
+                        if( key == null )
+                            continue;
+
+                        self.temp[i] = (key, value);
+                        i++;
+                    }
+                },
+                OnLoadReferences = ( NonPrimitiveSerializationMapping2<(TKey, TValue)[], Dictionary<TKey, TValue>> self, ref Dictionary<TKey, TValue> o, SerializedData data, ILoader l ) =>
+                {
+                    if( data is not SerializedArray dataObj )
+                        return;
+
+                    int i = 0;
+                    foreach( var (key, value) in self.temp )
+                    {
+                        SerializedData dataKvp = dataObj[i];
+
+                        SerializedData keyData = dataKvp["key"];
+                        SerializedData valueData = dataKvp["value"];
+
+                        Type elementType = typeof( TValue );
+                        if( dataKvp.TryGetValue( KeyNames.TYPE, out var elementType2 ) )
+                        {
+                            elementType = elementType2.DeserializeType();
+                        }
+
+                        TKey key2 = key;
+                        var mapping = SerializationMappingRegistry.GetMappingOrDefault<TKey>( ObjectContext.Default, key2 );
+                        MappingHelper.DoLoadReferences( mapping, ref key2, keyData, l );
+
+                        TValue value2 = value;
+                        mapping = SerializationMappingRegistry.GetMappingOrDefault<TValue>( ObjectContext.Default, value2 );
+                        MappingHelper.DoLoadReferences( mapping, ref value2, valueData, l );
+
+                        if( key2 != null )
+                            o[key2] = value2;
+
+                        i++;
+                    }
                 }
             };
         }

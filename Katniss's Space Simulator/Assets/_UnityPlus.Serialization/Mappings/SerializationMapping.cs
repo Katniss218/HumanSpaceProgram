@@ -44,6 +44,11 @@ namespace UnityPlus.Serialization
         /// </summary>
         public abstract void LoadReferences( ref object obj, SerializedData data, ILoader l );
 
+        public virtual SerializationMapping GetWorkingInstance()
+        {
+            return this;
+        }
+
         public static SerializationMapping Empty( Type sourceType )
         {
             return (SerializationMapping)Activator.CreateInstance( typeof( EmptySerializationMapping<> ).MakeGenericType( sourceType ) );

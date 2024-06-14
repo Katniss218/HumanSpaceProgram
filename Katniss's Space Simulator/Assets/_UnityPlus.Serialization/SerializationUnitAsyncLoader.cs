@@ -124,9 +124,10 @@ namespace UnityPlus.Serialization
 
                 // Parity with Member (mostly).
                 object member = _objects[i];
-                MappingHelper.DoPopulate( mapping, ref member, data, this );
-
-                _objects[i] = member;
+                if( MappingHelper.DoPopulate( mapping, ref member, data, this ) )
+                {
+                    _objects[i] = member;
+                }
             }
         }
 
@@ -153,8 +154,10 @@ namespace UnityPlus.Serialization
                 _mappingCache[i] = mapping;
 
                 object member = default;
-                MappingHelper.DoLoad( mapping, ref member, data, this );
-                _objects[i] = member;
+                if( MappingHelper.DoLoad( mapping, ref member, data, this ) )
+                {
+                    _objects[i] = member;
+                }
             }
         }
 
@@ -175,8 +178,10 @@ namespace UnityPlus.Serialization
                     continue; // error.
 
                 object member = _objects[i];
-                MappingHelper.DoLoadReferences( mapping, ref member, data, this );
-                _objects[i] = member;
+                if( MappingHelper.DoLoadReferences( mapping, ref member, data, this ) )
+                {
+                    _objects[i] = member;
+                }
             }
         }
     }
