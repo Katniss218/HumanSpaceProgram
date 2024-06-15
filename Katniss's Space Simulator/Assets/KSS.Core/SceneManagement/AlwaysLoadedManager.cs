@@ -14,7 +14,6 @@ namespace KSS.Core
     /// <summary>
     /// A manager that is loaded immediately and remains loaded until the game is exited.
     /// </summary>
-    [RequireComponent( typeof( PreexistingReference ) )]
     public class AlwaysLoadedManager : SingletonMonoBehaviour<AlwaysLoadedManager>
     {
         public const string ALWAYS_LOADED_SCENE_NAME = "_AlwaysLoaded";
@@ -46,7 +45,7 @@ namespace KSS.Core
         //
 
 
-        private static GameObject[] GetAllManagerGameObjects()
+        /*private static GameObject[] GetAllManagerGameObjects()
         {
             PreexistingReference[] managers = FindObjectsOfType<PreexistingReference>();
             HashSet<GameObject> gameObjects = new HashSet<GameObject>();
@@ -63,7 +62,7 @@ namespace KSS.Core
 
             return gameObjects.ToArray();
         }
-        /*
+        
         [HSPEventListener( HSPEvent.TIMELINE_BEFORE_SAVE, HSPEvent.NAMESPACE_VANILLA + ".serialize_managers" )]
         private static void OnBeforeSave( TimelineManager.SaveEventData e )
         {

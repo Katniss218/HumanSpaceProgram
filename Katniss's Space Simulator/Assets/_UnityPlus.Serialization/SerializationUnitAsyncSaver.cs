@@ -93,14 +93,14 @@ namespace UnityPlus.Serialization
 
             for( int i = 0; i < _objects.Length; i++ )
             {
-                object obj = _objects[i];
+                T obj = _objects[i];
 
                 if( obj == null )
                     continue;
 
                 var mapping = SerializationMappingRegistry.GetMappingOrDefault( _context, obj );
 
-                _data[i] = mapping.Save( obj, this );
+                _data[i] = MappingHelper.DoSave<T>( mapping, obj, this );
             }
         }
 

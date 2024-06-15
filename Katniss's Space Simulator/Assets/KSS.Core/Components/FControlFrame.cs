@@ -42,9 +42,7 @@ namespace KSS.Core.Components
             return new MemberwiseSerializationMapping<FControlFrame>()
             {
                 ("reference_transform", new Member<FControlFrame, Transform>( ObjectContext.Ref, o => o._referenceTransform ))
-            }
-            .IncludeMembers<Behaviour>()
-            .UseBaseTypeFactory();
+            };
         }
         /*
         public SerializedData GetData( IReverseReferenceMap s )

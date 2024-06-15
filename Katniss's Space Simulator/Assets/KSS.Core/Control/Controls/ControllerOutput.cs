@@ -63,5 +63,11 @@ namespace KSS.Control.Controls
             ControlleeInput.Disconnect( this );
             return true;
         }
+
+        [SerializationMappingProvider( typeof( ControllerOutput ) )]
+        public static SerializationMapping ControllerOutputMapping()
+        {
+            return new MemberwiseSerializationMapping<ControllerOutput>(); // empty dummy referencable thing.
+        }
     }
 }

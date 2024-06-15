@@ -40,9 +40,7 @@ namespace KSS.Components
             return new MemberwiseSerializationMapping<FSequencer>()
             {
                 ("sequence", new Member<FSequencer, Sequence>( o => o.Sequence ))
-            }
-            .IncludeMembers<Behaviour>()
-            .UseBaseTypeFactory();
+            };
         }
         /*
         public SerializedObject GetObjects( IReverseReferenceMap s )

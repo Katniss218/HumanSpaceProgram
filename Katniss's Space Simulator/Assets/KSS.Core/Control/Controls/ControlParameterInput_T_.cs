@@ -91,5 +91,14 @@ namespace KSS.Control.Controls
 			input.Output = output;
 			output.inputs.Add( input );
 		}
-	}
+    }
+
+    public static class Mappings_ControlParameterInput_T_
+    {
+        [SerializationMappingProvider( typeof( ControlParameterInput<> ) )]
+        public static SerializationMapping ControlParameterInputMapping<T>()
+        {
+            return new MemberwiseSerializationMapping<ControlParameterInput<T>>(); // empty dummy referencable thing.
+        }
+    }
 }

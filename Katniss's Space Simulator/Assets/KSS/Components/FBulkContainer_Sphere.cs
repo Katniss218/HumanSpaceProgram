@@ -126,9 +126,7 @@ namespace KSS.Components
                 ("max_volume", new Member<FBulkContainer_Sphere, float>( o => o.MaxVolume )),
                 ("radius", new Member<FBulkContainer_Sphere, float>( o => o.Radius )),
                 ("contents", new Member<FBulkContainer_Sphere, SubstanceStateCollection>( o => o.Contents ))
-            }
-            .IncludeMembers<Behaviour>()
-            .UseBaseTypeFactory();
+            };
         }
         /*
         public SerializedData GetData( IReverseReferenceMap s )

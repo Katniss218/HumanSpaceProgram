@@ -37,24 +37,21 @@ namespace UnityPlus.Serialization
             _children = new Dictionary<string, SerializedData>();
         }
 
+        public SerializedObject( int capacity )
+        {
+            _children = new Dictionary<string, SerializedData>( capacity );
+        }
+
+        public SerializedObject( IEnumerable<KeyValuePair<string, SerializedData>> collection )
+        {
+            _children = new Dictionary<string, SerializedData>( collection );
+        }
+
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public void Add( string name, SerializedData value )
         {
             _children.Add( name, value );
         }
-
-        /*[MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public void Add( string name, SerializedData value )
-        {
-            if( value is SerializedObject o ) // idk why, but the values must be first cast to their actual type.
-                _children.Add( name, (SerializedData)o );
-            else if( value is SerializedArray a )
-                _children.Add( name, (SerializedData)a );
-            else if( value is SerializedData v )
-                _children.Add( name, v );
-            else
-                throw new ArgumentException( $"The value must be either object, array, or value." );
-        }*/
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public void Add( KeyValuePair<string, SerializedData> item )

@@ -73,8 +73,7 @@ namespace KSS.Components
                     ("obj_p", new Member<Port, IResourceProducer>( ObjectContext.Ref, o => o._objP )),
                     ("position", new Member<Port, Vector3>( o => o.Position )),
                     ("forward", new Member<Port, Vector3>( o => o.Forward ))
-                }
-                .WithFactory( ( data, l ) => new Sequence() );
+                };
             }
             /*
             public SerializedData GetData( IReverseReferenceMap s )
@@ -300,12 +299,10 @@ namespace KSS.Components
         {
             return new MemberwiseSerializationMapping<FBulkConnection>()
             {
-                ("end1", new Member<FBulkConnection, Port>( ObjectContext.Ref, o => o.End1 )),
-                ("end2", new Member<FBulkConnection, Port>( ObjectContext.Ref, o => o.End2 )),
+                ("end1", new Member<FBulkConnection, Port>( o => o.End1 )),
+                ("end2", new Member<FBulkConnection, Port>( o => o.End2 )),
                 ("cross_section_area", new Member<FBulkConnection, float>( o => o.CrossSectionArea ))
-            }
-            .IncludeMembers<Behaviour>()
-            .UseBaseTypeFactory();
+            };
         }
         /*
         public SerializedData GetData( IReverseReferenceMap s )

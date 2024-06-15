@@ -56,7 +56,14 @@ namespace KSS.Core.Serialization
         /// </summary>
         public static bool IsSavingOrLoading { get; private set; }
 
+        /// <summary>
+        /// Gets the currently active timeline.
+        /// </summary>
         public static TimelineMetadata CurrentTimeline { get; private set; }
+
+        /// <summary>
+        /// Gets the currently active save (if any).
+        /// </summary>
         public static SaveMetadata CurrentSave { get; private set; }
 
         private static bool _wasPausedBeforeSerializing = false;

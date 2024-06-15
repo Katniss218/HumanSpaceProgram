@@ -39,9 +39,7 @@ namespace KSS.Core.Components
             {
                 ("part_id", new Member<FPart, NamespacedIdentifier>( o => o.PartID ))
                 // todo - conditions.
-            }
-            .UseBaseTypeFactory()
-            .IncludeMembers<Behaviour>();
+            };
         }
     }
 }

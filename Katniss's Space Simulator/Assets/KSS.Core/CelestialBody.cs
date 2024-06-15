@@ -10,7 +10,6 @@ using UnityPlus.Serialization;
 
 namespace KSS.Core
 {
-    [RequireComponent( typeof( PreexistingReference ) )]
     [RequireComponent( typeof( RootObjectTransform ) )]
     public class CelestialBody : MonoBehaviour
     {
@@ -55,12 +54,10 @@ namespace KSS.Core
         public double Radius { get; internal set; }
 
         RootObjectTransform _rootTransform;
-        PreexistingReference _ref;
 
         void Awake()
         {
             _rootTransform = this.GetComponent<RootObjectTransform>();
-            _ref = this.GetComponent<PreexistingReference>();
         }
 
         void Start()

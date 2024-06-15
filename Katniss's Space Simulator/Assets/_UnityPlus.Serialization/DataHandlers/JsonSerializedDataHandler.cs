@@ -1,30 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using UnityPlus.Serialization.Json;
 
 namespace UnityPlus.Serialization.DataHandlers
 {
     /// <summary>
-    /// A serialized data handler that reads and writes objects and data to and from a common json file.
+    /// Reads and writes serialized data from a json file on disk.
     /// </summary>
     public class JsonSerializedDataHandler : ISerializedDataHandler
     {
-        public string Filename { get; set; }
+        /// <summary>
+        /// The path to the json file.
+        /// </summary>
+        public string Filepath { get; set; }
 
-        public JsonSerializedDataHandler( string filename )
+        public JsonSerializedDataHandler( string filepath )
         {
-            this.Filename = filename;
+            this.Filepath = filepath;
         }
 
         public SerializedData Read()
         {
-            string oContents = File.ReadAllText( Filename, Encoding.UTF8 );
+            string fileContents = File.ReadAllText( Filepath, Encoding.UTF8 );
 
-            SerializedData s = new JsonStringReader( oContents ).Read();
+            SerializedData s = new JsonStringReader( fileContents ).Read();
 
             return s;
         }
@@ -35,13 +35,13 @@ namespace UnityPlus.Serialization.DataHandlers
 
             new JsonStringWriter( data, stringBuilder ).Write();
 
-            string dirPath = Path.GetDirectoryName( Filename );
+            string dirPath = Path.GetDirectoryName( Filepath );
 
             if( !Directory.Exists( dirPath ) )
             {
                 Directory.CreateDirectory( dirPath );
             }
-            File.WriteAllText( Filename, stringBuilder.ToString(), Encoding.UTF8 );
+            File.WriteAllText( Filepath, stringBuilder.ToString(), Encoding.UTF8 );
         }
     }
 }

@@ -35,9 +35,6 @@ namespace KSS.Core
 
             //SphereCollider c = cbGO.AddComponent<SphereCollider>();
 
-            PreexistingReference pr = gameObject.AddComponent<PreexistingReference>();
-            pr.SetPersistentGuid( GuidFromHash( Encoding.ASCII.GetBytes( ID ) ) );
-
             CelestialBody body = gameObject.AddComponent<CelestialBody>();
             body.ID = this.ID;
             body.AIRFPosition = airfPosition;

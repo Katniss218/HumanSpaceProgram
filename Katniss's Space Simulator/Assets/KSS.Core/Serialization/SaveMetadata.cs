@@ -133,6 +133,7 @@ namespace KSS.Core.Serialization
 
         public static SaveMetadata LoadFromDisk( string timelineId, string saveId )
         {
+#warning TODO - guard against files that might've been deleted.
             string saveFilePath = Path.Combine( GetRootDirectory( timelineId, saveId ), SAVE_FILENAME );
 
             SaveMetadata saveMetadata = new SaveMetadata( timelineId, saveId );
@@ -145,7 +146,12 @@ namespace KSS.Core.Serialization
 
         public void SaveToDisk()
         {
+            string saveFilePath = Path.Combine( GetRootDirectory(), SAVE_FILENAME );
 
+            var data = SerializationUnit.Serialize( this );
+
+            JsonSerializedDataHandler handler = new JsonSerializedDataHandler( saveFilePath );
+            handler.Write( data );
         }
 
         [SerializationMappingProvider( typeof( SaveMetadata ) )]
@@ -160,29 +166,6 @@ namespace KSS.Core.Serialization
             };
         }
         /*
-        public void WriteToDisk()
-        {
-            string savePath = GetRootDirectory();
-            string saveFilePath = Path.Combine( savePath, SAVE_FILENAME );
-
-            StringBuilder sb = new StringBuilder();
-            new JsonStringWriter( this.GetData(), sb ).Write();
-
-            File.WriteAllText( saveFilePath, sb.ToString(), Encoding.UTF8 );
-        }
-
-        public void ReadDataFromDisk()
-        {
-            string savePath = GetRootDirectory();
-            string saveFilePath = Path.Combine( savePath, SAVE_FILENAME );
-
-            string saveJson = File.ReadAllText( saveFilePath, Encoding.UTF8 );
-
-            SerializedData data = new JsonStringReader( saveJson ).Read();
-
-            this.SetData( data );
-        }
-
         public SerializedData GetData()
         {
             SerializedObject modVersions = new SerializedObject();

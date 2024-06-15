@@ -187,9 +187,7 @@ namespace KSS.Core.Physics
 
                 ("velocity", new Member<FreePhysicsObject, Vector3>( o => o.Velocity )),
                 ("angular_velocity", new Member<FreePhysicsObject, Vector3>( o => o.AngularVelocity ))
-            }
-            .IncludeMembers<Behaviour>()
-            .UseBaseTypeFactory();
+            };
         }
         /*
         public SerializedData GetData( IReverseReferenceMap s )

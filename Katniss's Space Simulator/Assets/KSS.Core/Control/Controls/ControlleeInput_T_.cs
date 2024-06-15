@@ -65,21 +65,6 @@ namespace KSS.Control.Controls
         }
 
 
-        [SerializationMappingProvider( typeof( ControlleeInput<> ) )]
-        public static SerializationMapping FreePhysicsObjectMapping<Tt>()
-        {
-#warning TODO - I think it needs to be in a non-generic class
-            return new MemberwiseSerializationMapping<ControlleeInput<Tt>>()
-            {
-                ("connects_to", new Member<ControlleeInput<Tt>, ControllerOutput<Tt>[]>( ArrayContext.Refs, o => o.outputs.ToArray(), (o, value) =>
-                {
-                    foreach( var c in value )
-                    {
-                        ControlleeInput<Tt>.Connect( o, c );
-                    }
-                } ))
-            };
-        }
         /*
         public SerializedData GetData( IReverseReferenceMap s )
         {
@@ -122,6 +107,31 @@ namespace KSS.Control.Controls
 
             output.Input = input;
             input.outputs.Add( output );
+        }
+    }
+
+    public static class Mappings_ControlleeInput_T_
+    {
+        [SerializationMappingProvider( typeof( ControlleeInput<> ) )]
+        public static SerializationMapping ControlleeInputMapping<T>()
+        {
+            return new MemberwiseSerializationMapping<ControlleeInput<T>>()
+            {
+                ("on_invoke", new Member<ControlleeInput<T>, Action<T>>( o => o.onInvoke )),
+                ("connects_to", new Member<ControlleeInput<T>, ControllerOutput<T>[]>( ArrayContext.Refs, o => o.outputs.ToArray(), (o, value) =>
+                {
+                    foreach( var c in value )
+                    {
+                        ControlleeInput<T>.Connect( o, c );
+                    }
+                } ))
+            }
+            .WithFactory( ( data, l ) => // Either this, or use mapping that instantiates on reference pass.
+            {
+                Action<T> onInvoke = (Action<T>)Persistent_Delegate.ToDelegate( data["on_invoke"], l.RefMap );
+
+                return new ControlleeInput<T>( onInvoke );
+            } );
         }
     }
 }

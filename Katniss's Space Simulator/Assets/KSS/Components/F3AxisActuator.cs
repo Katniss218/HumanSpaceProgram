@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization;
+using KSS.Components;
 
 namespace Assets.KSS.Components
 {
@@ -93,16 +94,51 @@ namespace Assets.KSS.Components
 
         void FixedUpdate()
         {
-            float clampedX = Mathf.Clamp( X, MinX, MaxX );
-            float clampedY = Mathf.Clamp( Y, MinY, MaxY );
-            float clampedZ = Mathf.Clamp( Z, MinZ, MaxZ );
+            if( XActuatorTransform != null )
+            {
+                float clampedX = Mathf.Clamp( X, MinX, MaxX );
+                XActuatorTransform.localRotation = Quaternion.identity;
+                XActuatorTransform.localRotation = Quaternion.Euler( clampedX, 0, 0 ) * XActuatorTransform.localRotation;
+            }
+            if( YActuatorTransform != null )
+            {
+                float clampedY = Mathf.Clamp( Y, MinY, MaxY );
+                YActuatorTransform.localRotation = Quaternion.identity;
+                YActuatorTransform.localRotation = Quaternion.Euler( 0, 0, clampedY ) * YActuatorTransform.localRotation;
+            }
+            if( ZActuatorTransform != null )
+            {
+                float clampedZ = Mathf.Clamp( Z, MinZ, MaxZ );
+                ZActuatorTransform.localRotation = Quaternion.identity;
+                ZActuatorTransform.localRotation = Quaternion.Euler( 0, clampedZ, 0 ) * ZActuatorTransform.localRotation;
+            }
+        }
 
-            XActuatorTransform.localRotation = Quaternion.identity;
-            YActuatorTransform.localRotation = Quaternion.identity;
-            ZActuatorTransform.localRotation = Quaternion.identity;
-            XActuatorTransform.localRotation = Quaternion.Euler( clampedX, 0, 0 ) * XActuatorTransform.localRotation;
-            YActuatorTransform.localRotation = Quaternion.Euler( 0, 0, clampedY ) * YActuatorTransform.localRotation;
-            ZActuatorTransform.localRotation = Quaternion.Euler( 0, clampedZ, 0 ) * ZActuatorTransform.localRotation;
+        [SerializationMappingProvider( typeof( F3AxisActuator ) )]
+        public static SerializationMapping F3AxisActuatorMapping()
+        {
+            return new MemberwiseSerializationMapping<F3AxisActuator>()
+            {
+                ("reference_transform", new Member<F3AxisActuator, Transform>( ObjectContext.Ref, o => o.ReferenceTransform )),
+                ("x_actuator_transform", new Member<F3AxisActuator, Transform>( ObjectContext.Ref, o => o.XActuatorTransform )),
+                ("y_actuator_transform", new Member<F3AxisActuator, Transform>( ObjectContext.Ref, o => o.YActuatorTransform )),
+                ("z_actuator_transform", new Member<F3AxisActuator, Transform>( ObjectContext.Ref, o => o.ZActuatorTransform )),
+
+                ("x", new Member<F3AxisActuator, float>( o => o.X )),
+                ("y", new Member<F3AxisActuator, float>( o => o.Y )),
+                ("z", new Member<F3AxisActuator, float>( o => o.Z )),
+                ("min_x", new Member<F3AxisActuator, float>( o => o.MinX )),
+                ("max_x", new Member<F3AxisActuator, float>( o => o.MaxX )),
+                ("min_y", new Member<F3AxisActuator, float>( o => o.MinY )),
+                ("max_y", new Member<F3AxisActuator, float>( o => o.MaxY )),
+                ("min_z", new Member<F3AxisActuator, float>( o => o.MinZ )),
+                ("max_z", new Member<F3AxisActuator, float>( o => o.MaxZ )),
+
+                ("set_x", new Member<F3AxisActuator, ControlleeInput<float>>( o => o.SetX )),
+                ("set_y", new Member<F3AxisActuator, ControlleeInput<float>>( o => o.SetY )),
+                ("set_z", new Member<F3AxisActuator, ControlleeInput<float>>( o => o.SetZ )),
+                ("set_xyz", new Member<F3AxisActuator, ControlleeInput<Vector3>>( o => o.SetXYZ ))
+            };
         }
 
 #warning TODO - finish.
@@ -222,5 +258,5 @@ namespace Assets.KSS.Components
             if( data.TryGetValue( "set_xyz", out var setXYZ ) )
                 this.SetXYZ.SetData( setXYZ, l );
         }*/
-	}
+    }
 }

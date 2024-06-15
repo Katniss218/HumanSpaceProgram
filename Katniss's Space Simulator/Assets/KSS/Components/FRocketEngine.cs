@@ -99,14 +99,11 @@ namespace KSS.Components
         {
             return new MemberwiseSerializationMapping<FRocketEngine>()
             {
-#warning TODO - needs to specify listener when creating `SetThrottle`.
                 ("set_throttle", new Member<FRocketEngine, ControlleeInput<float>>( o => o.SetThrottle )),
                 ("isp", new Member<FRocketEngine, float>( o => o.Isp )),
                 ("throttle", new Member<FRocketEngine, float>( o => o.Throttle )),
                 ("thrust_transform", new Member<FRocketEngine, Transform>( ObjectContext.Ref, o => o.ThrustTransform ))
-            }
-            .IncludeMembers<Behaviour>()
-            .UseBaseTypeFactory();
+            };
         }
         /*
         public SerializedObject GetObjects( IReverseReferenceMap s )

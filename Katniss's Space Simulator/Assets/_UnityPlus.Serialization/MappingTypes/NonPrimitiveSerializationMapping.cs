@@ -6,7 +6,7 @@ namespace UnityPlus.Serialization
     /// Maps an object that can both be referenced by other objects, and contain references to other objects.
     /// </summary>
     /// <typeparam name="TSource">The type of the object being mapped.</typeparam>
-    public class NonPrimitiveSerializationMapping<TSource> : SerializationMapping, IInstantiableSerializationMapping
+    public sealed class NonPrimitiveSerializationMapping<TSource> : SerializationMapping, IInstantiableSerializationMapping
     {
         /// <summary>
         /// The function invoked to convert the C# object into its serialized representation.

@@ -52,9 +52,7 @@ namespace KSS.Core.Components
             return new MemberwiseSerializationMapping<FClickInteractionRedirect>()
             {
                 ("target", new Member<FClickInteractionRedirect, GameObject>( ObjectContext.Ref, o => o.Target ))
-            }
-            .IncludeMembers<Behaviour>()
-            .UseBaseTypeFactory();
+            };
         }
         /*
         public SerializedData GetData( IReverseReferenceMap s )

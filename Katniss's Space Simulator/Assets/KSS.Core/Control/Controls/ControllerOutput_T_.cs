@@ -65,4 +65,13 @@ namespace KSS.Control.Controls
             return true;
         }
     }
+
+    public static class Mappings_ControllerOutput_T_
+    {
+        [SerializationMappingProvider( typeof( ControllerOutput<> ) )]
+        public static SerializationMapping ControllerOutputMapping<T>()
+        {
+            return new MemberwiseSerializationMapping<ControllerOutput<T>>(); // empty dummy referencable thing.
+        }
+    }
 }

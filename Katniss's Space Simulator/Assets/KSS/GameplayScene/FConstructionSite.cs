@@ -332,9 +332,7 @@ namespace KSS.GameplayScene
                 ("DO_NOT_TOUCH", new Member<FConstructionSite, object>( o => null, (o, value) => o._constructibles = AncestralMap<FConstructible>.Create( o.transform ).Keys.ToArray() )), // TODO - isKinematic member is a hack.
 
                 ("build_speed", new Member<FConstructionSite, float>( o => o.BuildSpeed ))
-            }
-            .IncludeMembers<Behaviour>()
-            .UseBaseTypeFactory();
+            };
         }
         /*
         public SerializedData GetData( IReverseReferenceMap s )

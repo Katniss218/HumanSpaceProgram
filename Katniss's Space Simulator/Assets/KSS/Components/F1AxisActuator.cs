@@ -50,10 +50,28 @@ namespace KSS.Components
 
         void FixedUpdate()
         {
-            float clampedX = Mathf.Clamp( X, MinX, MaxX );
+            if( XActuatorTransform != null )
+            {
+                float clampedX = Mathf.Clamp( X, MinX, MaxX );
+                XActuatorTransform.localRotation = Quaternion.identity;
+                XActuatorTransform.localRotation = Quaternion.Euler( clampedX, 0, 0 ) * XActuatorTransform.localRotation;
+            }
+        }
 
-            XActuatorTransform.localRotation = Quaternion.identity;
-            XActuatorTransform.localRotation = Quaternion.Euler( clampedX, 0, 0 ) * XActuatorTransform.localRotation;
+        [SerializationMappingProvider( typeof( F1AxisActuator ) )]
+        public static SerializationMapping F1AxisActuatorMapping()
+        {
+            return new MemberwiseSerializationMapping<F1AxisActuator>()
+            {
+                ("reference_transform", new Member<F1AxisActuator, Transform>( ObjectContext.Ref, o => o.ReferenceTransform )),
+                ("x_actuator_transform", new Member<F1AxisActuator, Transform>( ObjectContext.Ref, o => o.XActuatorTransform )),
+
+                ("x", new Member<F1AxisActuator, float>( o => o.X )),
+                ("min_x", new Member<F1AxisActuator, float>( o => o.MinX )),
+                ("max_x", new Member<F1AxisActuator, float>( o => o.MaxX )),
+
+                ("set_x", new Member<F1AxisActuator, ControlleeInput<float>>( o => o.SetX ))
+            };
         }
 
 #warning TODO - finish.

@@ -1,20 +1,17 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 namespace UnityPlus.Serialization
 {
-    public interface IInstantiableSerializationMapping
-    {
-        Func<SerializedData, ILoader, object> OnInstantiate { get; }
-    }
-
     /// <summary>
     /// Creates a <see cref="SerializedObject"/> from the child mappings.
     /// </summary>
     /// <typeparam name="TSource">The type of the object being mapped.</typeparam>
-    public class MemberwiseSerializationMapping<TSource> : SerializationMapping, IInstantiableSerializationMapping, IEnumerable<(string, MemberBase<TSource>)>
+    public sealed class MemberwiseSerializationMapping<TSource> : SerializationMapping, IInstantiableSerializationMapping, IEnumerable<(string, MemberBase<TSource>)>
     {
 #warning TODO - allow members to keep static values instead of saving them (i.e. force isKinematic to true on every deserialization).
 
@@ -25,7 +22,9 @@ namespace UnityPlus.Serialization
 
         public MemberwiseSerializationMapping()
         {
-
+            //
+            UseBaseTypeFactoryRecursive();
+            IncludeBaseMembersRecursive();
         }
 
         /// <summary>
@@ -44,39 +43,6 @@ namespace UnityPlus.Serialization
         /// <summary>
         /// Makes this type include the members of the specified base type in its serialization.
         /// </summary>
-        public MemberwiseSerializationMapping<TSource> IncludeMembers<TSourceBase>() where TSourceBase : class
-        {
-            Type baseType = typeof( TSourceBase );
-            if( !baseType.IsAssignableFrom( typeof( TSource ) ) )
-            {
-                Debug.LogWarning( $"Tried to include members of `{baseType.FullName}` into `{typeof( TSource ).FullName}`, which is not derived from `{baseType.FullName}`." );
-                return this;
-            }
-
-#warning TODO - do this by default (somehow), without passing the IncludeMembers<TSourceBase> type parameter for every passthroughmember.
-            SerializationMapping mapping = SerializationMappingRegistry.GetMappingOrEmpty( this.context, baseType );
-
-            if( ReferenceEquals( mapping, this ) ) // mapping for `this` is a cached mapping of base type.
-                return this;
-
-            if( mapping is MemberwiseSerializationMapping<TSourceBase> baseMapping )
-            {
-                foreach( var item in baseMapping._items )
-                {
-                    var member = item.Item2;
-
-                    MemberBase<TSource> m = PassthroughMember<TSource, TSourceBase>.Create( member );
-
-                    this._items.Add( (item.Item1, m) );
-                }
-            }
-
-            return this;
-        }
-        /*
-        /// <summary>
-        /// Makes this type include the members of the specified base type in its serialization.
-        /// </summary>
         private MemberwiseSerializationMapping<TSource> IncludeBaseMembersRecursive()
         {
             Type baseType = typeof( TSource ).BaseType;
@@ -85,44 +51,66 @@ namespace UnityPlus.Serialization
 
             SerializationMapping mapping = SerializationMappingRegistry.GetMappingOrEmpty( this.context, baseType );
 
+            if( mapping.SerializationStyle == SerializationStyle.None ) // empty
+                return this;
+
             if( ReferenceEquals( mapping, this ) ) // mapping for `this` is a cached mapping of base type.
                 return this;
 
-            if( mapping is MemberwiseSerializationMapping<TSourceBase> baseMapping )
+            Type mappingType = mapping.GetType();
+
+            if( mappingType.IsConstructedGenericType
+             && mappingType.GetGenericTypeDefinition() == typeof( MemberwiseSerializationMapping<> ) )
             {
-                foreach( var item in baseMapping._items )
+                Type mappedType = mappingType.GetGenericArguments().First();
+
+                if( !mappedType.IsAssignableFrom( baseType ) )
+                    return this;
+
+                FieldInfo listField = mappingType.GetField( "_items", BindingFlags.Instance | BindingFlags.NonPublic );
+
+                IList mapping__items = listField.GetValue( mapping ) as IList;
+
+                Type valueTupleType = typeof( ValueTuple<,> )
+                    .MakeGenericType( typeof( string ), typeof( MemberBase<> ).MakeGenericType( mappedType ) );
+
+                FieldInfo item1Field = valueTupleType.GetField( "Item1", BindingFlags.Instance | BindingFlags.Public );
+                FieldInfo item2Field = valueTupleType.GetField( "Item2", BindingFlags.Instance | BindingFlags.Public );
+
+                foreach( var item in mapping__items )
                 {
-                    var member = item.Item2;
+                    string name = (string)item1Field.GetValue( item );
+                    object member = item2Field.GetValue( item );
 
-                    MemberBase<TSource> m = PassthroughMember<TSource, TSourceBase>.Create( member );
+                    MethodInfo method = typeof( PassthroughMember<,> )
+                        .MakeGenericType( typeof( TSource ), mappedType )
+                        .GetMethod( "Create", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic );
 
-                    this._items.Add( (item.Item1, m) );
+                    MemberBase<TSource> m = (MemberBase<TSource>)method.Invoke( null, new object[] { member } );
+
+                    this._items.Add( (name, m) );
                 }
             }
 
             return this;
         }
-        */
+
         /// <summary>
         /// Makes the deserialization use the factory of the nearest base type of <typeparamref name="TSource"/>.
         /// </summary>
-        public MemberwiseSerializationMapping<TSource> UseBaseTypeFactory()
+        private MemberwiseSerializationMapping<TSource> UseBaseTypeFactoryRecursive()
         {
-            do
+            Type baseType = typeof( TSource ).BaseType;
+            if( baseType == null )
+                return this;
+
+            SerializationMapping mapping = SerializationMappingRegistry.GetMappingOrEmpty( this.context, baseType );
+
+            if( mapping is IInstantiableSerializationMapping m )
             {
-                Type baseType = typeof( TSource ).BaseType;
-                if( baseType == null )
-                    return this;
-
-                SerializationMapping mapping = SerializationMappingRegistry.GetMappingOrEmpty( this.context, baseType );
-
-                if( mapping is IInstantiableSerializationMapping m )
-                {
-                    this.OnInstantiate = m.OnInstantiate;
-                    return this;
-                }
-
-            } while( this.OnInstantiate == null );
+                this.OnInstantiate = m.OnInstantiate;
+                return this;
+            }
 
             return this;
         }
@@ -145,8 +133,15 @@ namespace UnityPlus.Serialization
             return _items.GetEnumerator();
         }
 
+        //
+        //  Mapping methods:
+        //
+
         public override SerializedData Save( object obj, ISaver s )
         {
+            if( obj == null )
+                return null;
+
             SerializedObject root = new SerializedObject();
 
             TSource sourceObj = (TSource)obj;
@@ -168,6 +163,9 @@ namespace UnityPlus.Serialization
             TSource obj;
             if( OnInstantiate == null )
             {
+                if( data == null )
+                    return null;
+
                 obj = Activator.CreateInstance<TSource>();
                 if( data.TryGetValue( KeyNames.ID, out var id ) )
                 {
@@ -184,6 +182,11 @@ namespace UnityPlus.Serialization
 
         public override void Load( ref object obj, SerializedData data, ILoader l )
         {
+            if( obj == null )
+                return;
+            if( data == null )
+                return;
+
             TSource obj2 = (TSource)obj;
             foreach( var item in _items )
             {
@@ -197,17 +200,22 @@ namespace UnityPlus.Serialization
 
         public override void LoadReferences( ref object obj, SerializedData data, ILoader l )
         {
-            var objM = (TSource)obj;
+            if( obj == null )
+                return;
+            if( data == null )
+                return;
+
+            TSource obj2 = (TSource)obj;
 
             foreach( var item in _items )
             {
                 if( data.TryGetValue( item.Item1, out var memberData ) )
                 {
-                    item.Item2.LoadReferences( ref objM, memberData, l );
+                    item.Item2.LoadReferences( ref obj2, memberData, l );
                 }
             }
 
-            obj = objM;
+            obj = obj2;
         }
     }
 }

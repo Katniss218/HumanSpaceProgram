@@ -270,9 +270,7 @@ namespace KSS.Components
                 ("max_build_points", new Member<FConstructible, float>( o => o._maxBuildPoints )),
                 ("build_points", new Member<FConstructible, float>( o => o._buildPoints ))
                 // todo - conditions.
-            }
-            .UseBaseTypeFactory()
-            .IncludeMembers<Behaviour>();
+            };
         }
     }
 }

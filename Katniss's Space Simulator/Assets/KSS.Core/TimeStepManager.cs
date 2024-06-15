@@ -13,7 +13,6 @@ namespace KSS.Core
     /// <summary>
     /// Manages the speed at which the time flows.
     /// </summary>
-    [RequireComponent( typeof( PreexistingReference ) )]
     public class TimeStepManager : SingletonMonoBehaviour<TimeStepManager>
     {
         public struct TimeScaleChangedData
@@ -187,9 +186,7 @@ namespace KSS.Core
             return new MemberwiseSerializationMapping<TimeStepManager>()
             {
                 ("ut", new Member<TimeStepManager, double>( o => TimeStepManager.UT, (o, value) => TimeStepManager.UT = value ))
-            }
-            .IncludeMembers<Behaviour>()
-            .UseBaseTypeFactory();
+            };
         }
         /*
         public SerializedData GetData( IReverseReferenceMap s )

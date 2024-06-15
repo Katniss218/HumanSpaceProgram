@@ -93,7 +93,12 @@ namespace KSS.Core.Serialization
 
         public void SaveToDisk()
         {
+            string saveFilePath = Path.Combine( GetRootDirectory(), VESSEL_METADATA_FILENAME );
 
+            var data = SerializationUnit.Serialize( this );
+
+            JsonSerializedDataHandler handler = new JsonSerializedDataHandler( saveFilePath );
+            handler.Write( data );
         }
 
         [SerializationMappingProvider( typeof( VesselMetadata ) )]

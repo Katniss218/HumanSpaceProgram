@@ -133,9 +133,7 @@ namespace KSS.Core.Components
             return new MemberwiseSerializationMapping<FAttachNode>()
             {
                 ("range", new Member<FAttachNode, float>( o => o.Range ))
-            }
-            .IncludeMembers<Behaviour>()
-            .UseBaseTypeFactory();
+            };
         }
         /*
         public SerializedData GetData( IReverseReferenceMap s )

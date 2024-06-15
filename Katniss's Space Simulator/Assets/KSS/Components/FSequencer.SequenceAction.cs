@@ -43,13 +43,12 @@ namespace KSS.Components
             OnInvokeTyped.TrySendSignal();
         }
 
-
         [SerializationMappingProvider( typeof( SequenceAction ) )]
         public static SerializationMapping SequenceActionMapping()
         {
             return new MemberwiseSerializationMapping<SequenceAction>()
             {
-                ("on_invoke", new Member<SequenceAction, ControllerOutput>( ObjectContext.Ref, o => o.OnInvokeTyped ))
+                ("on_invoke", new Member<SequenceAction, ControllerOutput>( o => o.OnInvokeTyped ))
             };
         }
         /*
@@ -102,15 +101,6 @@ namespace KSS.Components
             OnInvokeTyped.TrySendSignal( SignalValue );
         }
 
-        [SerializationMappingProvider( typeof( SequenceAction ) )]
-        public static SerializationMapping SequenceActionMapping<Tt>()
-        {
-#warning TODO - I think it needs to be in a non-generic class
-            return new MemberwiseSerializationMapping<SequenceAction<Tt>>()
-            {
-                ("on_invoke", new Member<SequenceAction<Tt>, ControllerOutput<Tt>>( ObjectContext.Ref, o => o.OnInvokeTyped ))
-            };
-        }
         /*
         public override SerializedObject GetObjects( IReverseReferenceMap s )
         {
@@ -150,5 +140,17 @@ namespace KSS.Components
                 //SignalValue.SetData( signalValue, l );
             }
         }*/
+    }
+
+    public static class Mappings_SequenceAction_T_
+    {
+        [SerializationMappingProvider( typeof( SequenceAction<> ) )]
+        public static SerializationMapping SequenceActionMapping<T>()
+        {
+            return new MemberwiseSerializationMapping<SequenceAction<T>>()
+            {
+                ("on_invoke", new Member<SequenceAction<T>, ControllerOutput<T>>( o => o.OnInvokeTyped ))
+            };
+        }
     }
 }

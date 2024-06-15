@@ -65,21 +65,6 @@ namespace KSS.Control.Controls
 			return true;
 		}
 
-        [SerializationMappingProvider( typeof( ControlParameterOutput<> ) )]
-        public static SerializationMapping ControlParameterOutputMapping<Tt>()
-        {
-#warning TODO - I think it needs to be in a non-generic class
-            return new MemberwiseSerializationMapping<ControlParameterOutput<Tt>>()
-			{
-				("connects_to", new Member<ControlParameterOutput<Tt>, ControlParameterInput<Tt>[]>( ArrayContext.Refs, o => o.inputs.ToArray(), (o, value) =>
-				{
-					foreach( var c in value )
-					{
-						ControlParameterInput<Tt>.Connect( c, o );
-					}
-				} ))
-			};
-        }
 		/*
         public SerializedData GetData( IReverseReferenceMap s )
 		{
@@ -107,4 +92,29 @@ namespace KSS.Control.Controls
 			}
 		}*/
 	}
+
+	public static class Mappings_ControlParameterOutput_T_
+	{
+        [SerializationMappingProvider( typeof( ControlParameterOutput<> ) )]
+        public static SerializationMapping ControlParameterOutputMapping<T>()
+        {
+            return new MemberwiseSerializationMapping<ControlParameterOutput<T>>()
+            {
+                ("getter", new Member<ControlParameterOutput<T>, Func<T>>( o => o.getter )),
+                ("connects_to", new Member<ControlParameterOutput<T>, ControlParameterInput<T>[]>( ArrayContext.Refs, o => o.inputs.ToArray(), (o, value) =>
+                {
+                    foreach( var c in value )
+                    {
+                        ControlParameterInput<T>.Connect( c, o );
+                    }
+                } ))
+            }
+			.WithFactory( ( data, l ) => // Either this, or use mapping that instantiates on reference pass.
+            {
+                Func<T> onInvoke = (Func<T>)Persistent_Delegate.ToDelegate( data["getter"], l.RefMap );
+
+                return new ControlParameterOutput<T>( onInvoke );
+            } );
+        }
+    }
 }

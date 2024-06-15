@@ -909,7 +909,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1870219037}
-  - component: {fileID: 1870219039}
   - component: {fileID: 1870219038}
   m_Layer: 3
   m_Name: _ EDITOR MANAGER _
@@ -945,19 +944,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 881458cf114676b40bbedf5066018366, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &1870219039
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1870219029}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da99e03421c20d24e9eef7ddba33dc92, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _guidData: d6ddf19842b26c00210183e18efaefc6
 --- !u!1 &1884333348
 GameObject:
   m_ObjectHideFlags: 0

@@ -12,12 +12,12 @@ namespace UnityPlus.Serialization.Mappings
     public static class Mappings
     {
         [SerializationMappingProvider( typeof( object ), Context = ObjectContext.Ref )]
-        public static SerializationMapping ObjectRefMapping()
+        public static SerializationMapping ObjectRefMapping<T>() where T : class
         {
-            return new PrimitiveObjectSerializationMapping<object>()
+            return new PrimitiveObjectSerializationMapping<T>()
             {
-                OnSave = ( o, s ) => s.RefMap.WriteObjectReference( o ),
-                OnInstantiate = ( data, l ) => (bool)data
+                OnSave = ( o, s ) => s.RefMap.WriteObjectReference<T>( o ),
+                OnInstantiate = ( data, l ) => l.ReadObjectReference<T>( data )
             };
         }
 
@@ -31,7 +31,7 @@ namespace UnityPlus.Serialization.Mappings
                     SerializedArray serializedArray = new SerializedArray();
                     for( int i = 0; i < o.Length; i++ )
                     {
-                        var data = s.RefMap.WriteObjectReference( o[i] );
+                        var data = s.RefMap.WriteObjectReference<T>( o[i] );
 
                         serializedArray.Add( data );
                     }
@@ -237,7 +237,7 @@ namespace UnityPlus.Serialization.Mappings
 
         [SerializationMappingProvider( typeof( string ) )]
         public static SerializationMapping StringMapping()
-        {
+        { 
             return new PrimitiveObjectSerializationMapping<string>()
             {
                 OnSave = ( o, s ) => (SerializedPrimitive)o,
@@ -291,7 +291,7 @@ namespace UnityPlus.Serialization.Mappings
         {
             return new PrimitiveObjectSerializationMapping<Vector2>()
             {
-                OnSave = ( o, s ) => new SerializedArray() { (SerializedPrimitive)o.x, (SerializedPrimitive)o.y },
+                OnSave = ( o, s ) => new SerializedArray( 2 ) { (SerializedPrimitive)o.x, (SerializedPrimitive)o.y },
                 OnInstantiate = ( data, l ) => new Vector2( (float)data[0], (float)data[1] )
             };
         }
@@ -301,7 +301,7 @@ namespace UnityPlus.Serialization.Mappings
         {
             return new PrimitiveObjectSerializationMapping<Vector2Int>()
             {
-                OnSave = ( o, s ) => new SerializedArray() { (SerializedPrimitive)o.x, (SerializedPrimitive)o.y },
+                OnSave = ( o, s ) => new SerializedArray( 2 ) { (SerializedPrimitive)o.x, (SerializedPrimitive)o.y },
                 OnInstantiate = ( data, l ) => new Vector2Int( (int)data[0], (int)data[1] )
             };
         }
@@ -311,7 +311,7 @@ namespace UnityPlus.Serialization.Mappings
         {
             return new PrimitiveObjectSerializationMapping<Vector3>()
             {
-                OnSave = ( o, s ) => new SerializedArray() { (SerializedPrimitive)o.x, (SerializedPrimitive)o.y, (SerializedPrimitive)o.z },
+                OnSave = ( o, s ) => new SerializedArray( 3 ) { (SerializedPrimitive)o.x, (SerializedPrimitive)o.y, (SerializedPrimitive)o.z },
                 OnInstantiate = ( data, l ) => new Vector3( (float)data[0], (float)data[1], (float)data[2] )
             };
         }
@@ -321,7 +321,7 @@ namespace UnityPlus.Serialization.Mappings
         {
             return new PrimitiveObjectSerializationMapping<Vector3Int>()
             {
-                OnSave = ( o, s ) => new SerializedArray() { (SerializedPrimitive)o.x, (SerializedPrimitive)o.y, (SerializedPrimitive)o.z },
+                OnSave = ( o, s ) => new SerializedArray( 3 ) { (SerializedPrimitive)o.x, (SerializedPrimitive)o.y, (SerializedPrimitive)o.z },
                 OnInstantiate = ( data, l ) => new Vector3Int( (int)data[0], (int)data[1], (int)data[2] )
             };
         }
@@ -331,7 +331,7 @@ namespace UnityPlus.Serialization.Mappings
         {
             return new PrimitiveObjectSerializationMapping<Vector3Dbl>()
             {
-                OnSave = ( o, s ) => new SerializedArray() { (SerializedPrimitive)o.x, (SerializedPrimitive)o.y, (SerializedPrimitive)o.z },
+                OnSave = ( o, s ) => new SerializedArray( 3 ) { (SerializedPrimitive)o.x, (SerializedPrimitive)o.y, (SerializedPrimitive)o.z },
                 OnInstantiate = ( data, l ) => new Vector3Dbl( (double)data[0], (double)data[1], (double)data[2] )
             };
         }
@@ -341,7 +341,7 @@ namespace UnityPlus.Serialization.Mappings
         {
             return new PrimitiveObjectSerializationMapping<Vector4>()
             {
-                OnSave = ( o, s ) => new SerializedArray() { (SerializedPrimitive)o.x, (SerializedPrimitive)o.y, (SerializedPrimitive)o.z, (SerializedPrimitive)o.w },
+                OnSave = ( o, s ) => new SerializedArray( 4 ) { (SerializedPrimitive)o.x, (SerializedPrimitive)o.y, (SerializedPrimitive)o.z, (SerializedPrimitive)o.w },
                 OnInstantiate = ( data, l ) => new Vector4( (float)data[0], (float)data[1], (float)data[2], (float)data[3] )
             };
         }
@@ -351,7 +351,7 @@ namespace UnityPlus.Serialization.Mappings
         {
             return new PrimitiveObjectSerializationMapping<Quaternion>()
             {
-                OnSave = ( o, s ) => new SerializedArray() { (SerializedPrimitive)o.x, (SerializedPrimitive)o.y, (SerializedPrimitive)o.z, (SerializedPrimitive)o.w },
+                OnSave = ( o, s ) => new SerializedArray( 4 ) { (SerializedPrimitive)o.x, (SerializedPrimitive)o.y, (SerializedPrimitive)o.z, (SerializedPrimitive)o.w },
                 OnInstantiate = ( data, l ) => new Quaternion( (float)data[0], (float)data[1], (float)data[2], (float)data[3] )
             };
         }
@@ -361,7 +361,7 @@ namespace UnityPlus.Serialization.Mappings
         {
             return new PrimitiveObjectSerializationMapping<QuaternionDbl>()
             {
-                OnSave = ( o, s ) => new SerializedArray() { (SerializedPrimitive)o.x, (SerializedPrimitive)o.y, (SerializedPrimitive)o.z, (SerializedPrimitive)o.w },
+                OnSave = ( o, s ) => new SerializedArray( 4 ) { (SerializedPrimitive)o.x, (SerializedPrimitive)o.y, (SerializedPrimitive)o.z, (SerializedPrimitive)o.w },
                 OnInstantiate = ( data, l ) => new QuaternionDbl( (double)data[0], (double)data[1], (double)data[2], (double)data[3] )
             };
         }
@@ -386,14 +386,14 @@ namespace UnityPlus.Serialization.Mappings
             {
                 OnSave = ( o, s ) =>
                 {
-                    SerializedArray serializedArray = new SerializedArray();
+                    SerializedArray serializedArray = new SerializedArray( o.Length );
                     for( int i = 0; i < o.Length; i++ )
                     {
                         T value = o[i];
 
                         var mapping = SerializationMappingRegistry.GetMappingOrDefault<T>( ObjectContext.Default, value );
 
-                        var data = mapping.Save( value, s );
+                        var data = MappingHelper.DoSave<T>( mapping, value, s );
 
                         serializedArray.Add( data );
                     }
@@ -405,7 +405,7 @@ namespace UnityPlus.Serialization.Mappings
                     if( data is not SerializedArray serializedArray )
                         return new T[] { };
 
-                    return new T[serializedArray.Count];
+                    return data == null ? default : new T[serializedArray.Count];
                 },
                 OnLoad = ( ref T[] o, SerializedData data, ILoader l ) =>
                 {
@@ -416,11 +416,9 @@ namespace UnityPlus.Serialization.Mappings
                     {
                         SerializedData elementData = serializedArray[i];
 
-                        Type elementType = typeof( T );
-                        if( elementData.TryGetValue( KeyNames.TYPE, out var elementType2 ) )
-                        {
-                            elementType = elementType2.DeserializeType();
-                        }
+                        Type elementType = elementData != null && elementData.TryGetValue( KeyNames.TYPE, out var elementType2 )
+                            ? elementType2.DeserializeType()
+                            : typeof( T );
 
                         T element = default;
                         var mapping = SerializationMappingRegistry.GetMappingOrDefault<T>( ObjectContext.Default, elementType );
@@ -469,8 +467,7 @@ namespace UnityPlus.Serialization.Mappings
             return new MemberwiseSerializationMapping<Behaviour>()
             {
                 ("is_enabled", new Member<Behaviour, bool>( o => o.enabled ))
-            }
-            .UseBaseTypeFactory();
+            };
         }
 
         [SerializationMappingProvider( typeof( Component ) )]
@@ -559,8 +556,7 @@ namespace UnityPlus.Serialization.Mappings
             return new MemberwiseSerializationMapping<Renderer>()
             {
                 ("is_enabled", new Member<Renderer, bool>( o => o.enabled ))
-            }
-            .UseBaseTypeFactory();
+            };
         }
 
         [SerializationMappingProvider( typeof( Transform ) )]
@@ -571,8 +567,7 @@ namespace UnityPlus.Serialization.Mappings
                 ("local_position", new Member<Transform, Vector3>( o => o.localPosition )),
                 ("local_rotation", new Member<Transform, Quaternion>( o => o.localRotation )),
                 ("local_scale", new Member<Transform, Vector3>( o => o.localScale ))
-            }
-            .UseBaseTypeFactory();
+            };
         }
 
         [SerializationMappingProvider( typeof( MeshFilter ) )]
@@ -581,8 +576,7 @@ namespace UnityPlus.Serialization.Mappings
             return new MemberwiseSerializationMapping<MeshFilter>()
             {
                 ("shared_mesh", new Member<MeshFilter, Mesh>( ObjectContext.Asset, o => o.sharedMesh ))
-            }
-            .UseBaseTypeFactory();
+            };
         }
 
         [SerializationMappingProvider( typeof( MeshRenderer ) )]
@@ -593,9 +587,7 @@ namespace UnityPlus.Serialization.Mappings
                 ("shared_materials", new Member<MeshRenderer, Material[]>( ArrayContext.Assets, o => o.sharedMaterials )),
                 ("shadow_casting_mode", new Member<MeshRenderer, ShadowCastingMode>( o => o.shadowCastingMode )),
                 ("receive_shadows", new Member<MeshRenderer, bool>( o => o.receiveShadows ))
-            }
-            .UseBaseTypeFactory()
-            .IncludeMembers<Renderer>();
+            };
         }
 
         [SerializationMappingProvider( typeof( Rigidbody ) )]
@@ -604,8 +596,17 @@ namespace UnityPlus.Serialization.Mappings
             return new MemberwiseSerializationMapping<Rigidbody>()
             {
                 ("is_kinematic", new Member<Rigidbody, bool>( o => o.isKinematic ))
-            }
-            .UseBaseTypeFactory();
+            };
+        }
+
+        [SerializationMappingProvider( typeof( Collider ) )]
+        public static SerializationMapping ColliderMapping()
+        {
+            return new MemberwiseSerializationMapping<Collider>()
+            {
+                ("is_enabled", new Member<Collider, bool>( o => o.enabled )),
+                ("is_trigger", new Member<Collider, bool>( o => o.isTrigger ))
+            };
         }
 
         [SerializationMappingProvider( typeof( BoxCollider ) )]
@@ -614,10 +615,8 @@ namespace UnityPlus.Serialization.Mappings
             return new MemberwiseSerializationMapping<BoxCollider>()
             {
                 ("size", new Member<BoxCollider, Vector3>( o => o.size )),
-                ("center", new Member<BoxCollider, Vector3>( o => o.center )),
-                ("is_trigger", new Member<BoxCollider, bool>( o => o.isTrigger ))
-            }
-            .UseBaseTypeFactory();
+                ("center", new Member<BoxCollider, Vector3>( o => o.center ))
+            };
         }
 
         [SerializationMappingProvider( typeof( SphereCollider ) )]
@@ -626,10 +625,8 @@ namespace UnityPlus.Serialization.Mappings
             return new MemberwiseSerializationMapping<SphereCollider>()
             {
                 ("radius", new Member<SphereCollider, float>( o => o.radius )),
-                ("center", new Member<SphereCollider, Vector3>( o => o.center )),
-                ("is_trigger", new Member<SphereCollider, bool>( o => o.isTrigger ))
-            }
-            .UseBaseTypeFactory();
+                ("center", new Member<SphereCollider, Vector3>( o => o.center ))
+            };
         }
 
         [SerializationMappingProvider( typeof( CapsuleCollider ) )]
@@ -640,10 +637,8 @@ namespace UnityPlus.Serialization.Mappings
                 ("radius", new Member<CapsuleCollider, float>( o => o.radius )),
                 ("height", new Member<CapsuleCollider, float>( o => o.height )),
                 ("direction", new Member<CapsuleCollider, int>( o => o.direction )),
-                ("center", new Member<CapsuleCollider, Vector3>( o => o.center )),
-                ("is_trigger", new Member<CapsuleCollider, bool>( o => o.isTrigger ))
-            }
-            .UseBaseTypeFactory();
+                ("center", new Member<CapsuleCollider, Vector3>( o => o.center ))
+            };
         }
 
         [SerializationMappingProvider( typeof( MeshCollider ) )]
@@ -652,10 +647,8 @@ namespace UnityPlus.Serialization.Mappings
             return new MemberwiseSerializationMapping<MeshCollider>()
             {
                 ("shared_mesh", new Member<MeshCollider, Mesh>( ObjectContext.Asset, o => o.sharedMesh )),
-                ("is_convex", new Member<MeshCollider, bool>( o => o.convex )),
-                ("is_trigger", new Member<MeshCollider, bool>( o => o.isTrigger ))
-            }
-            .UseBaseTypeFactory();
+                ("is_convex", new Member<MeshCollider, bool>( o => o.convex ))
+            };
         }
 
         [SerializationMappingProvider( typeof( LOD ) )]
@@ -676,8 +669,7 @@ namespace UnityPlus.Serialization.Mappings
             {
                 ("size", new Member<LODGroup, float>( o => o.size )),
                 ("lods", new Member<LODGroup, LOD[]>( o => o.GetLODs(), (o, value) => o.SetLODs( value ) ))
-            }
-            .UseBaseTypeFactory();
+            };
         }
 
         [SerializationMappingProvider( typeof( Delegate ) )]

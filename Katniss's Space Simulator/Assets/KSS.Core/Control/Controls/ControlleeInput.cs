@@ -65,10 +65,11 @@ namespace KSS.Control.Controls
 
 
         [SerializationMappingProvider( typeof( ControlleeInput ) )]
-        public static SerializationMapping FreePhysicsObjectMapping()
+        public static SerializationMapping ControlleeInputMapping()
         {
             return new MemberwiseSerializationMapping<ControlleeInput>()
             {
+                ("on_invoke", new Member<ControlleeInput, Action>( o => o.onInvoke )),
                 ("connects_to", new Member<ControlleeInput, ControllerOutput[]>( ArrayContext.Refs, o => o.outputs.ToArray(), (o, value) =>
                 {
                     foreach( var c in value )
@@ -76,7 +77,13 @@ namespace KSS.Control.Controls
                         ControlleeInput.Connect( o, c );
                     }
                 } ))
-            };
+            }
+            .WithFactory( ( data, l ) => // Either this, or use mapping that instantiates on reference pass.
+            {
+                Action onInvoke = (Action)Persistent_Delegate.ToDelegate( data["on_invoke"], l.RefMap );
+
+                return new ControlleeInput( onInvoke );
+            } );
         }
         /*
         public SerializedData GetData( IReverseReferenceMap s )

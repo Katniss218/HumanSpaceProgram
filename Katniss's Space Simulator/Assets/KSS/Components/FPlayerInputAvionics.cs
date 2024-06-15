@@ -138,10 +138,8 @@ namespace KSS.Components
                 ("control_frame", new Member<FPlayerInputAvionics, FControlFrame>( ObjectContext.Ref, o => o.ControlFrame )),
                 ("on_set_throttle", new Member<FPlayerInputAvionics, ControllerOutput<float>>( o => o.OnSetThrottle )),
                 ("on_set_attitude", new Member<FPlayerInputAvionics, ControllerOutput<Vector3>>( o => o.OnSetAttitude )),
-                ("on_set_translation", new Member<FPlayerInputAvionics, ControllerOutput<Vector3>>( ObjectContext.Ref, o => o.OnSetTranslation ))
-            }
-            .IncludeMembers<Behaviour>()
-            .UseBaseTypeFactory();
+                ("on_set_translation", new Member<FPlayerInputAvionics, ControllerOutput<Vector3>>( o => o.OnSetTranslation ))
+            };
         }
         /*
         public SerializedObject GetObjects( IReverseReferenceMap s )

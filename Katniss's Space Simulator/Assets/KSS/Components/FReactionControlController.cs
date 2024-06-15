@@ -29,9 +29,7 @@ namespace KSS.Components
         {
             return new MemberwiseSerializationMapping<FReactionControlController>()
             {
-            }
-            .IncludeMembers<Behaviour>()
-            .UseBaseTypeFactory();
+            };
         }
         /*
 		public SerializedData GetData( IReverseReferenceMap s )

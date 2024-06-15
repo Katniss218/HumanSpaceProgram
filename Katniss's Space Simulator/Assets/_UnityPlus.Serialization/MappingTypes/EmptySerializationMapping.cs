@@ -10,7 +10,7 @@ namespace UnityPlus.Serialization
     {
         public override SerializationStyle SerializationStyle => SerializationStyle.None;
 
-        internal EmptySerializationMapping() 
+        public EmptySerializationMapping()
         {
 
         }

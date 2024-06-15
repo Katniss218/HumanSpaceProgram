@@ -15,7 +15,7 @@ namespace KSS.Core.ResourceFlowSystem
     public class SubstanceStateCollection
     {
         [field: SerializeField]
-        List<SubstanceState> _substances = new List<SubstanceState>();
+        List<SubstanceState> _substances;
 
         public int SubstanceCount => _substances?.Count ?? 0;
 
@@ -34,22 +34,25 @@ namespace KSS.Core.ResourceFlowSystem
         /// <summary>
         /// Returns a <see cref="SubstanceStateCollection"/> that represents no flow. Nominally <see cref="null"/>.
         /// </summary>
-        public static SubstanceStateCollection Empty => new SubstanceStateCollection( null );
+        public static SubstanceStateCollection Empty => new SubstanceStateCollection();
+
+        public SubstanceStateCollection()
+        {
+            this._substances = new List<SubstanceState>();
+        }
 
         public SubstanceStateCollection( IEnumerable<SubstanceState> substances )
         {
-            if( substances != null )
-            {
-                this._substances = substances.ToList();
-            }
+            this._substances = substances == null
+                ? new List<SubstanceState>()
+                : substances.ToList();
         }
 
         public SubstanceStateCollection( params SubstanceState[] substances )
         {
-            if( substances != null )
-            {
-                this._substances = substances.ToList();
-            }
+            this._substances = substances == null
+                ? new List<SubstanceState>()
+                : substances.ToList();
         }
 
         /// <summary>

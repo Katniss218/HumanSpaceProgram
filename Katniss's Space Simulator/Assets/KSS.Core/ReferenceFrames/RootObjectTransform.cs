@@ -122,9 +122,7 @@ namespace KSS.Core.ReferenceFrames
             {
                 ("airf_position", new Member<RootObjectTransform, Vector3Dbl>( o => o.AIRFPosition )),
                 ("airf_rotation", new Member<RootObjectTransform, QuaternionDbl>( o => o.AIRFRotation )),
-            }
-            .IncludeMembers<Behaviour>()
-            .UseBaseTypeFactory();
+            };
         }
         /*
         public SerializedData GetData( IReverseReferenceMap s )

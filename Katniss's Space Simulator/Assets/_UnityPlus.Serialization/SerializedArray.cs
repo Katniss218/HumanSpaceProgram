@@ -23,6 +23,11 @@ namespace UnityPlus.Serialization
             _children = new List<SerializedData>();
         }
 
+        public SerializedArray( int capacity )
+        {
+            _children = new List<SerializedData>( capacity );
+        }
+
         public SerializedArray( IEnumerable<SerializedData> children )
         {
             _children = new List<SerializedData>( children );

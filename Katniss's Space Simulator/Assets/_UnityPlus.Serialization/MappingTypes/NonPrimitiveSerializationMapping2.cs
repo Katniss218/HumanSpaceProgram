@@ -9,7 +9,7 @@ namespace UnityPlus.Serialization
     /// Maps an object that can both be referenced by other objects, and contain references to other objects.
     /// </summary>
     /// <typeparam name="TSource">The type of the object being mapped.</typeparam>
-    public class NonPrimitiveSerializationMapping2<TTemp, TSource> : SerializationMapping, IInstantiableSerializationMapping where TTemp : class
+    public sealed class NonPrimitiveSerializationMapping2<TTemp, TSource> : SerializationMapping, IInstantiableSerializationMapping where TTemp : class
     {
         public TTemp temp;
 

@@ -118,9 +118,7 @@ namespace KSS.Components
             return new MemberwiseSerializationMapping<KeyboardSequenceElement>()
             {
                 ("key", new Member<KeyboardSequenceElement, KeyCode>( o => o.Key ))
-            }
-            .IncludeMembers<SequenceElement>()
-            .WithFactory( ( data, l ) => new KeyboardSequenceElement() );
+            };
         }
         /*
         public override SerializedData GetData( IReverseReferenceMap s )
@@ -170,9 +168,7 @@ namespace KSS.Components
             {
                 ("delay", new Member<TimedSequenceElement, float>( o => o.Delay )),
                 ("start_ut", new Member<TimedSequenceElement, double>( o => o._startUT ))
-            }
-            .IncludeMembers<SequenceElement>()
-            .WithFactory( ( data, l ) => new TimedSequenceElement() );
+            };
         }
         /*
         public override SerializedData GetData( IReverseReferenceMap s )

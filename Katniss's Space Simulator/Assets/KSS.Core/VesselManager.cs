@@ -15,7 +15,6 @@ namespace KSS.Core
     /// <summary>
     /// Manages loading, unloading, switching, etc of vessels.
     /// </summary>
-    [RequireComponent( typeof( PreexistingReference ) )]
     public class VesselManager : SingletonMonoBehaviour<VesselManager>
     {
         private List<Vessel> _vessels = new List<Vessel>();

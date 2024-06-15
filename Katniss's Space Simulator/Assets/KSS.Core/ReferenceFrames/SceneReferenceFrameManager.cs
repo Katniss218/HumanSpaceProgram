@@ -12,7 +12,6 @@ namespace KSS.Core.ReferenceFrames
     /// <remarks>
     /// This class manages a scene-wide Floating Origin / Krakensbane.
     /// </remarks>
-    [RequireComponent( typeof( PreexistingReference ) )]
     public class SceneReferenceFrameManager : SingletonMonoBehaviour<SceneReferenceFrameManager>
     {
         public struct ReferenceFrameSwitchData

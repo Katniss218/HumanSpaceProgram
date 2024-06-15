@@ -36,9 +36,7 @@ namespace KSS.Components
             {
                 ("separate", new Member<FVesselSeparator, ControlleeInput>( o => o.Separate )),
                 ("has_separated", new Member<FVesselSeparator, bool>( o => o._hasSeparated ))
-            }
-            .IncludeMembers<Behaviour>()
-            .UseBaseTypeFactory();
+            };
         }
         /*
         public SerializedObject GetObjects( IReverseReferenceMap s )

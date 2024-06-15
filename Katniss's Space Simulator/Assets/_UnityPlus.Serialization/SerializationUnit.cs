@@ -19,9 +19,29 @@ namespace UnityPlus.Serialization
         /// <summary>
         /// Helper method to serialize a single object easily.
         /// </summary>
+        public static SerializedData Serialize<T>( int context, T obj )
+        {
+            var su = FromObjects<T>( context, obj );
+            su.Serialize();
+            return su.GetData().First();
+        }
+
+        /// <summary>
+        /// Helper method to serialize a single object easily.
+        /// </summary>
         public static SerializedData Serialize<T>( T obj, IReverseReferenceMap s )
         {
             var su = FromObjects<T>( obj );
+            su.Serialize( s );
+            return su.GetData().First();
+        }
+        
+        /// <summary>
+        /// Helper method to serialize a single object easily.
+        /// </summary>
+        public static SerializedData Serialize<T>( int context, T obj, IReverseReferenceMap s )
+        {
+            var su = FromObjects<T>( context, obj );
             su.Serialize( s );
             return su.GetData().First();
         }
@@ -33,7 +53,17 @@ namespace UnityPlus.Serialization
         {
             var su = FromData<T>( data );
             su.Deserialize();
-            return su.GetObjectsOfType<T>().First();
+            return su.GetObjects().First();
+        }
+
+        /// <summary>
+        /// Helper method to deserialize a single object easily.
+        /// </summary>
+        public static T Deserialize<T>( int context, SerializedData data )
+        {
+            var su = FromData<T>( context, data );
+            su.Deserialize();
+            return su.GetObjects().First();
         }
 
         /// <summary>
@@ -43,7 +73,17 @@ namespace UnityPlus.Serialization
         {
             var su = FromData<T>( data );
             su.Deserialize( l );
-            return su.GetObjectsOfType<T>().First();
+            return su.GetObjects().First();
+        }
+
+        /// <summary>
+        /// Helper method to deserialize a single object easily.
+        /// </summary>
+        public static T Deserialize<T>( int context, SerializedData data, IForwardReferenceMap l )
+        {
+            var su = FromData<T>( context, data );
+            su.Deserialize( l );
+            return su.GetObjects().First();
         }
 
         /// <summary>
@@ -58,9 +98,27 @@ namespace UnityPlus.Serialization
         /// <summary>
         /// Helper method to populate the members of a single object easily.
         /// </summary>
+        public static void Populate<T>( int context, T obj, SerializedData data ) where T : class
+        {
+            var su = PopulateObject<T>( context, obj, data );
+            su.Populate();
+        }
+
+        /// <summary>
+        /// Helper method to populate the members of a single object easily.
+        /// </summary>
         public static void Populate<T>( T obj, SerializedData data, IForwardReferenceMap l ) where T : class
         {
             var su = PopulateObject<T>( obj, data );
+            su.Populate( l );
+        }
+
+        /// <summary>
+        /// Helper method to populate the members of a single object easily.
+        /// </summary>
+        public static void Populate<T>( int context, T obj, SerializedData data, IForwardReferenceMap l ) where T : class
+        {
+            var su = PopulateObject<T>( context, obj, data );
             su.Populate( l );
         }
 
@@ -71,7 +129,17 @@ namespace UnityPlus.Serialization
         {
             var su = PopulateObject<T>( obj, data );
             su.Populate();
-            obj = su.GetObjectsOfType<T>().First();
+            obj = su.GetObjects().First();
+        }
+
+        /// <summary>
+        /// Helper method to populate the members of a single struct object easily.
+        /// </summary>
+        public static void Populate<T>( int context, ref T obj, SerializedData data ) where T : struct
+        {
+            var su = PopulateObject<T>( context, obj, data );
+            su.Populate();
+            obj = su.GetObjects().First();
         }
 
         /// <summary>
@@ -81,7 +149,17 @@ namespace UnityPlus.Serialization
         {
             var su = PopulateObject<T>( obj, data );
             su.Populate( l );
-            obj = su.GetObjectsOfType<T>().First();
+            obj = su.GetObjects().First();
+        }
+
+        /// <summary>
+        /// Helper method to populate the members of a single struct object easily.
+        /// </summary>
+        public static void Populate<T>( int context, ref T obj, SerializedData data, IForwardReferenceMap l ) where T : struct
+        {
+            var su = PopulateObject<T>( context, obj, data );
+            su.Populate( l );
+            obj = su.GetObjects().First();
         }
 
         //

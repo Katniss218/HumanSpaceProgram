@@ -37,9 +37,7 @@ namespace KSS.Components
             {
                 ("mass", new Member<FPointMass, float>( o => o.Mass )),
                 ("on_after_mass_changed", new Member<FPointMass, IHasMass.MassChange>( o => o.OnAfterMassChanged ))
-            }
-            .IncludeMembers<Behaviour>()
-            .UseBaseTypeFactory();
+            };
         }
         /*
         public SerializedData GetData( IReverseReferenceMap s )

@@ -16,7 +16,6 @@ namespace KSS.UI
     /// <summary>
     /// Controls clicking in the physical world of the gameplay scene.
     /// </summary>
-    [RequireComponent( typeof( PreexistingReference ) )]
     public class GameplayViewportClickController : SingletonMonoBehaviour<GameplayViewportClickController>
     {
         [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, HSPEvent.NAMESPACE_VANILLA + ".add_click_controller" )]
