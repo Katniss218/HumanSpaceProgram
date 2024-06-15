@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KSS.Control.Controls;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -40,5 +41,15 @@ namespace KSS.Control
         /// </summary>
         /// <returns>True if the connection was removed. False if the connection didn't exist or couldn't've been removed.</returns>
         public abstract bool TryDisconnectAll();
+
+
+        [SerializationMappingProvider( typeof( Control ) )]
+        public static SerializationMapping ControlMapping()
+        {
+            return new MemberwiseSerializationMapping<Control>()
+            {
+                ("transform", new Member<Control, Transform>( ObjectContext.Ref, o => o.transform )),
+            };
+        }
     }
 }

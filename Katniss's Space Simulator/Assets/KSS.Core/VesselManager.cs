@@ -100,6 +100,8 @@ namespace KSS.Core
 
                 var data = _vesselsDataHandler.Read();
                 var go = SerializationUnit.Deserialize<GameObject>( data );
+
+                var x = go.GetComponentsInChildren();
             }
         }
     }

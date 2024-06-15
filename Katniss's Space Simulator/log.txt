@@ -6,5 +6,2243 @@ SIMD: No
 
 -- Log Starts Here -------------------------------------------------------
 
-[17:14:47](ERR) - SetLODs: Attempting to set LOD where the screen relative size is greater then or equal to a higher detail LOD level.
-[17:14:47](ERR) - SetLODs: Attempting to set LOD where the screen relative size is greater then or equal to a higher detail LOD level.
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:56](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+
+[21:32:57](EXC) - NullReferenceException: Object reference not set to an instance of an object
+  at
+KSS.Core.Vessel.OnDrawGizmos () (at Assets/KSS.Core/Vessel.cs:277)
+UnityEngine.GUIUtility:ProcessEvent(Int32, IntPtr, Boolean&)
+

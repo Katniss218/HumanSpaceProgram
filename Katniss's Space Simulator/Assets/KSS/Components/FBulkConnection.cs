@@ -69,8 +69,8 @@ namespace KSS.Components
             {
                 return new MemberwiseSerializationMapping<Port>()
                 {
-                    ("obj_c", new Member<Port, IResourceConsumer>( ObjectContext.Ref, o => o._objC )),
-                    ("obj_p", new Member<Port, IResourceProducer>( ObjectContext.Ref, o => o._objP )),
+                    ("obj_c", new Member<Port, object>( ObjectContext.Ref, o => (object)o._objC, (o, value) => o._objC = (IResourceConsumer)value )),
+                    ("obj_p", new Member<Port, object>( ObjectContext.Ref, o => (object)o._objP, (o, value) => o._objP = (IResourceProducer)value )),
                     ("position", new Member<Port, Vector3>( o => o.Position )),
                     ("forward", new Member<Port, Vector3>( o => o.Forward ))
                 };

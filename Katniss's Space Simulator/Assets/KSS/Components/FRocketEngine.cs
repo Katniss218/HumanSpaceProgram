@@ -99,6 +99,7 @@ namespace KSS.Components
         {
             return new MemberwiseSerializationMapping<FRocketEngine>()
             {
+                ("max_thrust", new Member<FRocketEngine, float>( o => o.MaxThrust )),
                 ("set_throttle", new Member<FRocketEngine, ControlleeInput<float>>( o => o.SetThrottle )),
                 ("isp", new Member<FRocketEngine, float>( o => o.Isp )),
                 ("throttle", new Member<FRocketEngine, float>( o => o.Throttle )),

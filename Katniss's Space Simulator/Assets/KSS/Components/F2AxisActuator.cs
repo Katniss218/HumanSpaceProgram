@@ -101,6 +101,7 @@ namespace KSS.Components
                 ("min_y", new Member<F2AxisActuator, float>( o => o.MinY )),
                 ("max_y", new Member<F2AxisActuator, float>( o => o.MaxY )),
 
+                ("get_reference_transform", new Member<F2AxisActuator, ControlParameterOutput<Transform>>( o => o.GetReferenceTransform )),
                 ("set_x", new Member<F2AxisActuator, ControlleeInput<float>>( o => o.SetX )),
                 ("set_y", new Member<F2AxisActuator, ControlleeInput<float>>( o => o.SetY )),
                 ("set_xy", new Member<F2AxisActuator, ControlleeInput<Vector2>>( o => o.SetXY ))

@@ -134,6 +134,7 @@ namespace Assets.KSS.Components
                 ("min_z", new Member<F3AxisActuator, float>( o => o.MinZ )),
                 ("max_z", new Member<F3AxisActuator, float>( o => o.MaxZ )),
 
+                ("get_reference_transform", new Member<F3AxisActuator, ControlParameterOutput<Transform>>( o => o.GetReferenceTransform )),
                 ("set_x", new Member<F3AxisActuator, ControlleeInput<float>>( o => o.SetX )),
                 ("set_y", new Member<F3AxisActuator, ControlleeInput<float>>( o => o.SetY )),
                 ("set_z", new Member<F3AxisActuator, ControlleeInput<float>>( o => o.SetZ )),

@@ -70,6 +70,7 @@ namespace KSS.Components
                 ("min_x", new Member<F1AxisActuator, float>( o => o.MinX )),
                 ("max_x", new Member<F1AxisActuator, float>( o => o.MaxX )),
 
+                ("get_reference_transform", new Member<F1AxisActuator, ControlParameterOutput<Transform>>( o => o.GetReferenceTransform )),
                 ("set_x", new Member<F1AxisActuator, ControlleeInput<float>>( o => o.SetX ))
             };
         }

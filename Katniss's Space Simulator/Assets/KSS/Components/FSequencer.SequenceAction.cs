@@ -149,7 +149,8 @@ namespace KSS.Components
         {
             return new MemberwiseSerializationMapping<SequenceAction<T>>()
             {
-                ("on_invoke", new Member<SequenceAction<T>, ControllerOutput<T>>( o => o.OnInvokeTyped ))
+                ("on_invoke", new Member<SequenceAction<T>, ControllerOutput<T>>( o => o.OnInvokeTyped )),
+                ("signal_value", new Member<SequenceAction<T>, T>( o => o.SignalValue ))
             };
         }
     }
