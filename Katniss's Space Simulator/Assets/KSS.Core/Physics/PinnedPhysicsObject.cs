@@ -216,53 +216,5 @@ namespace KSS.Core.Physics
 				("reference_rotation", new Member<PinnedPhysicsObject, QuaternionDbl>( o => o.ReferenceRotation ))
 			};
         }
-		/*
-        public SerializedData GetData( IReverseReferenceMap s )
-        {
-            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
-
-            ret.AddAll( new SerializedObject()
-			{
-				{ "mass", this.Mass.AsSerialized() },
-				{ "local_center_of_mass", this.LocalCenterOfMass.GetData() },
-				{ "velocity",  this.Velocity.GetData() },
-				{ "angular_velocity", this.AngularVelocity.GetData() },
-				{ "reference_body", s.WriteObjectReference( this.ReferenceBody ) },
-				{ "reference_position", this.ReferencePosition.GetData() },
-				{ "reference_rotation", this.ReferenceRotation.GetData() }
-			} );
-
-			return ret;
-		}
-
-		public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-			IPersistent_Behaviour.SetData( this, data, l );
-
-            if( data.TryGetValue( "mass", out var mass ) )
-				this.Mass = mass.AsFloat();
-
-			if( data.TryGetValue( "local_center_of_mass", out var localCenterOfMass ) )
-				this.LocalCenterOfMass = localCenterOfMass.AsVector3();
-
-            _rb.isKinematic = true; // PinnedPhysicsObject is always kinematic. This is needed because it may be called first.
-
-             //if( data.TryGetValue( "velocity", out var velocity ) ) this can't be assigned with kinematic anyway.
-             //    this.Velocity =  velocity.ToVector3();
-
-             //if( data.TryGetValue( "angular_velocity", out var angularVelocity ) )
-             //    this.AngularVelocity = angularVelocity.ToVector3();
-            
-
-            // this is the culprit
-            if( data.TryGetValue( "reference_body", out var referenceBody ) )
-				this.ReferenceBody = (CelestialBody)l.ReadObjectReference( referenceBody );
-
-			if( data.TryGetValue( "reference_position", out var referencePosition ) )
-				this.ReferencePosition = referencePosition.AsVector3Dbl();
-
-			if( data.TryGetValue( "reference_rotation", out var referenceRotation ) )
-				this.ReferenceRotation = referenceRotation.AsQuaternionDbl();
-		}*/
 	}
 }

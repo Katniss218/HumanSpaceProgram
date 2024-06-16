@@ -64,33 +64,6 @@ namespace KSS.Control.Controls
 			}
 			return true;
 		}
-
-		/*
-        public SerializedData GetData( IReverseReferenceMap s )
-		{
-			SerializedArray sa = new SerializedArray();
-			foreach( var conn in inputs )
-			{
-				sa.Add( s.WriteObjectReference( conn ) );
-			}
-			return new SerializedObject()
-			{
-				{ "connects_to", sa }
-			};
-		}
-
-		public void SetData( SerializedData data, IForwardReferenceMap l )
-		{
-			if( data.TryGetValue( "connects_to", out var connectsTo ) )
-			{
-				this.inputs.Clear();
-				foreach( var conn in (SerializedArray)connectsTo )
-				{
-					var c = (ControlParameterInput<T>)l.ReadObjectReference( conn );
-					ControlParameterInput<T>.Connect( c, this );
-				}
-			}
-		}*/
 	}
 
 	public static class Mappings_ControlParameterOutput_T_

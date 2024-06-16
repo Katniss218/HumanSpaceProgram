@@ -38,7 +38,6 @@ namespace KSS.Core.Components
             return new MemberwiseSerializationMapping<FPart>()
             {
                 ("part_id", new Member<FPart, NamespacedIdentifier>( o => o.PartID ))
-                // todo - conditions.
             };
         }
     }

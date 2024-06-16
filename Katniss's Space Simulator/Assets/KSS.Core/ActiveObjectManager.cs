@@ -1,11 +1,14 @@
 ﻿using KSS.Core.Components;
+using KSS.Core.Serialization;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.DataHandlers;
 
 namespace KSS.Core
 {
@@ -39,25 +42,30 @@ namespace KSS.Core
                 ("active_object", new Member<ActiveObjectManager, GameObject>( ObjectContext.Ref, o => ActiveObjectManager.ActiveObject, (o, value) => ActiveObjectManager.ActiveObject = value ))
             };
         }
-        /*
-        public SerializedData GetData( IReverseReferenceMap s )
+
+        [HSPEventListener( HSPEvent.TIMELINE_AFTER_SAVE, HSPEvent.NAMESPACE_VANILLA + ".serialize_managers.active_object_manager" )]
+        private static void OnBeforeSave( TimelineManager.SaveEventData e )
         {
-            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
+            string savePath = SaveMetadata.GetRootDirectory( e.timelineId, e.saveId );
+            Directory.CreateDirectory( savePath );
 
-            ret.AddAll( new SerializedObject()
-            {
-                { "active_object", s.WriteObjectReference( ActiveObject ) }
-            } );
+            JsonSerializedDataHandler _vesselsDataHandler = new JsonSerializedDataHandler( Path.Combine( savePath, $"{nameof( ActiveObjectManager )}.json" ) );
 
-            return ret;
+#warning TODO - this needs to share the refmap with the vessels.
+            var data = SerializationUnit.Serialize( FindObjectOfType<ActiveObjectManager>() );
+            _vesselsDataHandler.Write( data );
         }
 
-        public void SetData( SerializedData data, IForwardReferenceMap l )
+        [HSPEventListener( HSPEvent.TIMELINE_AFTER_LOAD, HSPEvent.NAMESPACE_VANILLA + ".deserialize_managers.active_object_manager" )]
+        private static void OnLoad( TimelineManager.LoadEventData e )
         {
-            IPersistent_Behaviour.SetData( this, data, l );
+            string savePath = SaveMetadata.GetRootDirectory( e.timelineId, e.saveId );
+            Directory.CreateDirectory( savePath );
 
-            if( data.TryGetValue( "active_object", out var activeObject ) )
-                ActiveObject = (GameObject)l.ReadObjectReference( activeObject );
-        }*/
+            JsonSerializedDataHandler _vesselsDataHandler = new JsonSerializedDataHandler( Path.Combine( savePath, $"{nameof( ActiveObjectManager )}.json" ) );
+
+            var data = _vesselsDataHandler.Read();
+            SerializationUnit.Populate( FindObjectOfType<ActiveObjectManager>(), data );
+        }
     }
 }

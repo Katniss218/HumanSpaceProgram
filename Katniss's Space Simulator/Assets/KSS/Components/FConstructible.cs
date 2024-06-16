@@ -205,62 +205,7 @@ namespace KSS.Components
         //
         //
         //
-        /*
-        public SerializedData GetData( IReverseReferenceMap s )
-        {
-            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
 
-            ret.AddAll( new SerializedObject()
-            {
-                { "build_points", BuildPoints.GetData() },
-                { "max_build_points", MaxBuildPoints.GetData() },
-                // todo - conditions.
-            } );
-
-            SerializedArray arr = new SerializedArray();
-            foreach( var kvp in _cachedData )
-            {
-                arr.Add( new SerializedObject()
-                {
-                    { "object", s.WriteObjectReference( kvp.Key ) },
-                    { "forward", kvp.Value.fwd },
-                    { "reverse", kvp.Value.rev }
-                } );
-            }
-
-            ret.AddAll( new SerializedObject()
-            {
-                { "cached_data", arr },
-                // todo - conditions.
-            } );
-
-            return ret;
-        }
-
-        public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            IPersistent_Behaviour.SetData( this, data, l );
-
-            if( data.TryGetValue<SerializedArray>( "cached_data", out var cachedData ) )
-            {
-                _cachedData = new();
-                foreach( var obj in cachedData.Cast<SerializedObject>() )
-                {
-                    Component comp = (Component)l.ReadObjectReference( obj["object"] );
-                    _cachedData.Add( comp, (obj["forward"], obj["reverse"]) );
-                }
-            }
-
-            // Set the underlying private fields as to not trigger ghosting prematurely.
-            // The ghosting will be called anyway, in `Start()`.
-            if( data.TryGetValue( "max_build_points", out var maxBuildPoints ) )
-                _maxBuildPoints = maxBuildPoints.AsFloat();
-
-            if( data.TryGetValue( "build_points", out var buildPoints ) )
-                _buildPoints = buildPoints.AsFloat();
-
-        }
-        */
         [SerializationMappingProvider( typeof( FConstructible ) )]
         public static SerializationMapping FConstructibleMapping()
         {

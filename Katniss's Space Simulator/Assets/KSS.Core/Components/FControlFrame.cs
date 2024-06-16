@@ -44,19 +44,5 @@ namespace KSS.Core.Components
                 ("reference_transform", new Member<FControlFrame, Transform>( ObjectContext.Ref, o => o._referenceTransform ))
             };
         }
-        /*
-        public SerializedData GetData( IReverseReferenceMap s )
-        {
-            return new SerializedObject()
-            {
-                { "reference_transform", s.WriteObjectReference( _referenceTransform ) }
-            };
-        }
-
-        public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            if( data.TryGetValue( "reference_transform", out var referenceTransform ) )
-                _referenceTransform = (Transform)l.ReadObjectReference( referenceTransform );
-        }*/
     }
 }

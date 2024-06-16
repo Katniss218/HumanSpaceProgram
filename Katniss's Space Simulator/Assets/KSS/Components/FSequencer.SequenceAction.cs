@@ -21,11 +21,6 @@ namespace KSS.Components
     {
         public abstract ControllerOutputBase OnInvoke { get; }
         public abstract void TryInvoke();
-
-       // public abstract SerializedObject GetObjects( IReverseReferenceMap s );
-       // public abstract void SetObjects( SerializedObject data, IForwardReferenceMap l );
-       // public abstract SerializedData GetData( IReverseReferenceMap s );
-       // public abstract void SetData( SerializedData data, IForwardReferenceMap l );
     }
 
     /// <summary>
@@ -51,37 +46,6 @@ namespace KSS.Components
                 ("on_invoke", new Member<SequenceAction, ControllerOutput>( o => o.OnInvokeTyped ))
             };
         }
-        /*
-        public override SerializedObject GetObjects( IReverseReferenceMap s )
-        {
-            SerializedObject data = Persistent_object.WriteObjectTyped( this, this.GetType(), s );
-
-            data.AddAll( new SerializedObject()
-            {
-                { "on_invoke", Persistent_object.WriteObjectStub( OnInvokeTyped, s ) }
-            } );
-
-            return data;
-        }
-
-        public override void SetObjects( SerializedObject data, IForwardReferenceMap l )
-        {
-            if( data.TryGetValue<SerializedObject>( "on_invoke", out var onInvokeTyped ) )
-            {
-                OnInvokeTyped = ObjectFactory.AsObject<ControllerOutput>( onInvokeTyped, l );
-                //OnInvokeTyped = new();
-                //l.SetObj( onInvokeTyped.ToGuid(), OnInvokeTyped );
-            }
-        }
-
-        public override SerializedData GetData( IReverseReferenceMap s )
-        {
-            return new SerializedObject() { };
-        }
-
-        public override void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-        }*/
     }
 
     /// <summary>
@@ -100,46 +64,6 @@ namespace KSS.Components
         {
             OnInvokeTyped.TrySendSignal( SignalValue );
         }
-
-        /*
-        public override SerializedObject GetObjects( IReverseReferenceMap s )
-        {
-            SerializedObject data = Persistent_object.WriteObjectTyped( this, this.GetType(), s );
-
-            data.AddAll( new SerializedObject()
-            {
-                { "on_invoke", Persistent_object.WriteObjectStub( OnInvokeTyped, s ) }
-            } );
-
-            return data;
-        }
-
-        public override void SetObjects( SerializedObject data, IForwardReferenceMap l )
-        {
-            if( data.TryGetValue<SerializedObject>( "on_invoke", out var onInvokeTyped ) )
-            {
-                OnInvokeTyped = ObjectFactory.AsObject<ControllerOutput<T>>( onInvokeTyped, l );
-            }
-        }
-
-        public override SerializedData GetData( IReverseReferenceMap s )
-        {
-            return new SerializedObject()
-            {
-                { "signal_value", this.SignalValue.GetData( s ) }
-            };
-        }
-
-        public override void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            if( data.TryGetValue( "signal_value", out var signalValue ) )
-            {
-#warning TODO - support value type instantiation from inline data.
-                SignalValue = ObjectFactory.AsObject<T>( signalValue, l );
-
-                //SignalValue.SetData( signalValue, l );
-            }
-        }*/
     }
 
     public static class Mappings_SequenceAction_T_

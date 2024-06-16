@@ -135,23 +135,5 @@ namespace KSS.Core.Serialization
                 ("description", new Member<TimelineMetadata, string>( o => o.Description ))
             };
         }
-        /*
-        public SerializedData GetData()
-        {
-            return new SerializedObject()
-            {
-                { "name", this.Name.GetData() },
-                { "description", this.Description.GetData() }
-            };
-        }
-
-        public void SetData( SerializedData data )
-        {
-            if( data.TryGetValue( "name", out var name ) )
-                this.Name = name.AsString();
-
-            if( data.TryGetValue( "description", out var description ) )
-                this.Description = description.AsString();
-        }*/
     }
 }

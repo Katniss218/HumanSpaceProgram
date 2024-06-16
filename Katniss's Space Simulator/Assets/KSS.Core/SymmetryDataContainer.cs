@@ -56,21 +56,12 @@ namespace KSS.Core
             _groups.Remove(existing);
         }
 
-        /*
-        public SerializedData GetData( IReverseReferenceMap s )
+        [SerializationMappingProvider( typeof( SymmetryDataContainer ) )]
+        public static SerializationMapping SymmetryDataContainerMapping()
         {
-            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
-
-            //ret.AddAll( new SerializedObject()
-
-            return ret;
+            return new MemberwiseSerializationMapping<SymmetryDataContainer>()
+            {
+            };
         }
-
-        public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            IPersistent_Behaviour.SetData( this, data, l );
-
-            //
-        }*/
     }
 }

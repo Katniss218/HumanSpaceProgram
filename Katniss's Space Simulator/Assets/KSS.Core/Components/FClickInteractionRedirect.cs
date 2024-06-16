@@ -54,25 +54,5 @@ namespace KSS.Core.Components
                 ("target", new Member<FClickInteractionRedirect, GameObject>( ObjectContext.Ref, o => o.Target ))
             };
         }
-        /*
-        public SerializedData GetData( IReverseReferenceMap s )
-        {
-            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
-
-            ret.AddAll( new SerializedObject()
-            {
-                { "target", s.WriteObjectReference( this.Target ) }
-            } );
-
-            return ret;
-        }
-
-        public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            IPersistent_Behaviour.SetData( this, data, l );
-
-            if( data.TryGetValue( "target", out var target ) )
-                this.Target = (GameObject)l.ReadObjectReference( target );
-        }*/
     }
 }

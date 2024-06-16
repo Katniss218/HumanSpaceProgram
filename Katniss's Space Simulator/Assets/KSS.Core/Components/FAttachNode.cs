@@ -135,26 +135,6 @@ namespace KSS.Core.Components
                 ("range", new Member<FAttachNode, float>( o => o.Range ))
             };
         }
-        /*
-        public SerializedData GetData( IReverseReferenceMap s )
-        {
-            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
-
-            ret.AddAll( new SerializedObject()
-            {
-                { "range", this.Range.AsSerialized() }
-            } );
-
-            return ret;
-        }
-
-        public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            IPersistent_Behaviour.SetData( this, data, l );
-
-            if( data.TryGetValue( "range", out var range ) )
-                this.Range = range.AsFloat();
-        }*/
 
         void OnDrawGizmos()
         {

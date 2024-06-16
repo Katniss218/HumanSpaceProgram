@@ -141,52 +141,5 @@ namespace KSS.Components
                 ("on_set_translation", new Member<FPlayerInputAvionics, ControllerOutput<Vector3>>( o => o.OnSetTranslation ))
             };
         }
-        /*
-        public SerializedObject GetObjects( IReverseReferenceMap s )
-        {
-            return new SerializedObject()
-            {
-                { "control_frame", s.WriteObjectReference( this.ControlFrame ) },
-                { "on_set_throttle", s.GetID( OnSetThrottle ).GetData() },
-                { "on_set_attitude", s.GetID( OnSetAttitude ).GetData() },
-                { "on_set_translation", s.GetID( OnSetTranslation ).GetData() }
-            };
-        }
-
-        public void SetObjects( SerializedObject data, IForwardReferenceMap l )
-        {
-            if( data.TryGetValue( "control_frame", out var controlFrame ) )
-                this.ControlFrame = (FControlFrame)l.ReadObjectReference( controlFrame );
-
-            if( data.TryGetValue( "on_set_throttle", out var onSetThrottle ) )
-            {
-                OnSetThrottle = new();
-                l.SetObj( onSetThrottle.AsGuid(), OnSetThrottle );
-            }
-
-            if( data.TryGetValue( "on_set_attitude", out var onSetAttitude ) )
-            {
-                OnSetAttitude = new();
-                l.SetObj( onSetAttitude.AsGuid(), OnSetAttitude );
-            }
-
-            if( data.TryGetValue( "on_set_translation", out var onSetTranslation ) )
-            {
-                OnSetTranslation = new();
-                l.SetObj( onSetTranslation.AsGuid(), OnSetTranslation );
-            }
-        }
-
-        public SerializedData GetData( IReverseReferenceMap s )
-        {
-            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
-
-            return ret;
-        }
-
-        public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            IPersistent_Behaviour.SetData( this, data, l );
-        }*/
     }
 }

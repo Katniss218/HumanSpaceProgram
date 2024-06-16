@@ -39,29 +39,5 @@ namespace KSS.Components
                 ("on_after_mass_changed", new Member<FPointMass, IHasMass.MassChange>( o => o.OnAfterMassChanged ))
             };
         }
-        /*
-        public SerializedData GetData( IReverseReferenceMap s )
-        {
-            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
-
-            ret.AddAll( new SerializedObject()
-            {
-                { "mass", _mass.AsSerialized() },
-                { "on_after_mass_changed", OnAfterMassChanged.GetData( s ) }
-            } );
-
-            return ret;
-        }
-
-        public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            IPersistent_Behaviour.SetData( this, data, l );
-
-            if( data.TryGetValue( "mass", out var mass ) )
-                _mass = mass.AsFloat();
-
-            if( data.TryGetValue( "on_after_mass_changed", out var onAfterMassChanged ) )
-                OnAfterMassChanged = (IHasMass.MassChange)onAfterMassChanged.AsDelegate( l );
-        }*/
     }
 }

@@ -124,29 +124,5 @@ namespace KSS.Core.ReferenceFrames
                 ("airf_rotation", new Member<RootObjectTransform, QuaternionDbl>( o => o.AIRFRotation )),
             };
         }
-        /*
-        public SerializedData GetData( IReverseReferenceMap s )
-        {
-            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
-
-            ret.AddAll( new SerializedObject()
-            {
-                { "airf_position", this.AIRFPosition.GetData() },
-                { "airf_rotation", this.AIRFRotation.GetData() }
-            } );
-
-            return ret;
-        }
-
-        public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            IPersistent_Behaviour.SetData( this, data, l );
-
-            if( data.TryGetValue( "airf_position", out var airfPosition ) )
-                this.AIRFPosition = airfPosition.AsVector3Dbl();
-
-            if( data.TryGetValue( "airf_rotation", out var airfRotation ) )
-                this.AIRFRotation = airfRotation.AsQuaternionDbl();
-        }*/
     }
 }

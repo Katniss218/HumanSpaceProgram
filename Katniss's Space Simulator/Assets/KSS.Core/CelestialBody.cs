@@ -1,5 +1,6 @@
 ﻿using KSS.Core.ReferenceFrames;
 using KSS.Core.SceneManagement;
+using KSS.Core.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -91,21 +92,12 @@ namespace KSS.Core
         /// </summary>
         public IReferenceFrame OrientedReferenceFrame => new OrientedReferenceFrame( this.AIRFPosition, this.AIRFRotation );
 
-        /*
-        public SerializedData GetData( IReverseReferenceMap s )
+        [SerializationMappingProvider( typeof( CelestialBody ) )]
+        public static SerializationMapping CelestialBodyMapping()
         {
-            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
-
-           // ret.AddAll( new SerializedObject()
-
-            return ret;
+            return new MemberwiseSerializationMapping<CelestialBody>()
+            {
+            };
         }
-
-        public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            IPersistent_Behaviour.SetData( this, data, l );
-
-            //
-        }*/
     }
 }

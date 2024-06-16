@@ -128,39 +128,7 @@ namespace KSS.Components
                 ("contents", new Member<FBulkContainer_Sphere, SubstanceStateCollection>( o => o.Contents ))
             };
         }
-        /*
-        public SerializedData GetData( IReverseReferenceMap s )
-        {
-            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
 
-            ret.AddAll( new SerializedObject()
-            {
-                { "volume_transform", s.WriteObjectReference( this.VolumeTransform ) },
-                { "max_volume", this.MaxVolume.AsSerialized() },
-                { "radius", this.Radius.AsSerialized() },
-                { "contents", this.Contents.GetData( s ) }
-            } );
-
-            return ret;
-        }
-
-        public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            IPersistent_Behaviour.SetData( this, data, l );
-
-            if( data.TryGetValue( "volume_transform", out var volumeTransform ) )
-                this.VolumeTransform = (Transform)l.ReadObjectReference( volumeTransform );
-
-            if( data.TryGetValue( "max_volume", out var maxVolume ) )
-                this.MaxVolume = maxVolume.AsFloat();
-
-            if( data.TryGetValue( "radius", out var radius ) )
-                this.Radius = radius.AsFloat();
-
-            if( data.TryGetValue( "contents", out var contents ) )
-                this.Contents.SetData( contents, l );
-        }
-        */
         /// <summary>
         /// Calculates the height of a truncated unit sphere with the given volume as a [0..1] percentage of the unit sphere's volume.
         /// </summary>

@@ -295,22 +295,5 @@ namespace KSS.Components
 				("on_set_attitude", new Member<FAttitudeAvionics, ControllerOutput<Vector3>>( o => o.OnSetAttitude ))
 			};
         }
-		/*
-        public SerializedObject GetObjects( IReverseReferenceMap s )
-        {
-            return new SerializedObject()
-            {
-                { "on_set_attitude", s.GetID( OnSetAttitude ).GetData() }
-            };
-        }
-
-        public void SetObjects( SerializedObject data, IForwardReferenceMap l )
-        {
-            if( data.TryGetValue( "on_set_attitude", out var onSetAttitude ) )
-            {
-                OnSetAttitude = new();
-                l.SetObj( onSetAttitude.AsGuid(), OnSetAttitude );
-            }
-        }*/
     }
 }

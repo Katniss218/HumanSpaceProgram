@@ -63,6 +63,22 @@ namespace KSS.Control.Controls
             return true;
         }
 
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        internal static void Disconnect( ControllerOutput output )
+        {
+            output.Input?.outputs.Remove( output );
+            output.Input = null;
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        internal static void Connect( ControlleeInput input, ControllerOutput output )
+        {
+            // disconnect from previous, if connected.
+            Disconnect( output );
+
+            output.Input = input;
+            input.outputs.Add( output );
+        }
 
         [SerializationMappingProvider( typeof( ControlleeInput ) )]
         public static SerializationMapping ControlleeInputMapping()
@@ -85,48 +101,6 @@ namespace KSS.Control.Controls
                 return new ControlleeInput( onInvoke );
             } );
         }
-        /*
-        public SerializedData GetData( IReverseReferenceMap s )
-        {
-            SerializedArray sa = new SerializedArray();
-            foreach( var conn in outputs )
-            {
-                sa.Add( s.WriteObjectReference( conn ) );
-            }
-            return new SerializedObject()
-            {
-                { "connects_to", sa }
-            };
-        }
 
-        public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            if( data.TryGetValue( "connects_to", out var connectsTo ) )
-            {
-                this.outputs.Clear();
-                foreach( var conn in (SerializedArray)connectsTo )
-                {
-                    var c = (ControllerOutput)l.ReadObjectReference( conn );
-                    Connect( this, c );
-                }
-            }
-        }
-        */
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        internal static void Disconnect( ControllerOutput output )
-        {
-            output.Input?.outputs.Remove( output );
-            output.Input = null;
-        }
-
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        internal static void Connect( ControlleeInput input, ControllerOutput output )
-        {
-            // disconnect from previous, if connected.
-            Disconnect( output );
-
-            output.Input = input;
-            input.outputs.Add( output );
-        }
     }
 }

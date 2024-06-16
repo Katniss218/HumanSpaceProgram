@@ -42,42 +42,5 @@ namespace KSS.Components
                 ("sequence", new Member<FSequencer, Sequence>( o => o.Sequence ))
             };
         }
-        /*
-        public SerializedObject GetObjects( IReverseReferenceMap s )
-        {
-            return new SerializedObject()
-            {
-                { "sequence", Sequence.GetObjects( s ) }
-            };
-        }
-
-        public void SetObjects( SerializedObject data, IForwardReferenceMap l )
-        {
-            if( data.TryGetValue<SerializedObject>( "sequence", out var sequence ) )
-            {
-                Sequence = new Sequence();
-                Sequence.SetObjects( sequence, l );
-            }
-        }
-
-        public SerializedData GetData( IReverseReferenceMap s )
-        {
-            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
-
-            ret.AddAll( new SerializedObject()
-            {
-                { "sequence", Sequence.GetData( s ) }
-            } );
-
-            return ret;
-        }
-
-        public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            IPersistent_Behaviour.SetData( this, data, l );
-
-            if( data.TryGetValue( "sequence", out var sequence ) )
-                Sequence.SetData( sequence, l );
-        }*/
     }
 }

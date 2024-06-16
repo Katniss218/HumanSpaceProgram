@@ -198,26 +198,5 @@ namespace KSS.Core.ResourceFlowSystem
                 ("substances", new Member<SubstanceStateCollection, SubstanceState[]>( o => o._substances.ToArray(), (o, value) => o._substances = value.ToList() ))
             };
         }
-        /*
-        public SerializedData GetData( IReverseReferenceMap s )
-        {
-            SerializedArray arr = new SerializedArray();
-
-            foreach( var sbs in this._substances )
-                arr.Add( sbs.GetData( s ) );
-
-            return arr;
-        }
-
-        public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            this._substances.Clear();
-            foreach( var sbsD in (SerializedArray)data )
-            {
-                var sbs = new SubstanceState();
-                sbs.SetData( sbsD, l );
-                this._substances.Add( sbs );
-            }
-        }*/
     }
 }

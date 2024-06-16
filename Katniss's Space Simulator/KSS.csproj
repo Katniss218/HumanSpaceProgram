@@ -71,8 +71,8 @@
     <Compile Include="Assets\KSS\RotationTransformHandle.cs" />
     <Compile Include="Assets\KSS\GameplayScene\Tools\DefaultTool.cs" />
     <Compile Include="Assets\KSS\GameplayScene\Tools\VanillaToolRegisterer.cs" />
-    <Compile Include="Assets\KSS\Components\FVesselSeparator.cs" />
     <Compile Include="Assets\KSS\GameplayScene\FConstructionSite.cs" />
+    <Compile Include="Assets\KSS\Components\FVesselSeparator.cs" />
     <Compile Include="Assets\KSS\Components\FSequencer.Sequence.cs" />
     <Compile Include="Assets\KSS\TransformHandleSet.cs" />
     <Compile Include="Assets\KSS\Effects\Atmospheres\AtmosphereRenderer.cs" />

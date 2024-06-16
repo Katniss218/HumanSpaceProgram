@@ -2,7 +2,7 @@
 
 namespace KSS.Core.Mods
 {
-    public static class NamespacedIdentifier_Serialization
+    public static class Mappings_NamespacedIdentifier
     {
         [SerializationMappingProvider( typeof( NamespacedIdentifier ) )]
         public static SerializationMapping NamespacedIdentifierMapping()
