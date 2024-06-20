@@ -85,8 +85,7 @@ namespace KSS.Components
             {
                 ("elements", new Member<Sequence, SequenceElement[]>( o => o.Elements.ToArray(), (o, value) => o.Elements = value.ToList() )),
                 ("current", new Member<Sequence, int>( o => o.Current ))
-            }
-            .WithFactory( ( data, l ) => new Sequence() );
+            };
         }
     }
 }

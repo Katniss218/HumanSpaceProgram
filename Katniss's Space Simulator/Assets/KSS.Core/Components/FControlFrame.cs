@@ -1,11 +1,14 @@
 ﻿using KSS.Core.ReferenceFrames;
+using KSS.Core.Serialization;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.DataHandlers;
 
 namespace KSS.Core.Components
 {
@@ -14,6 +17,8 @@ namespace KSS.Core.Components
     /// </summary>
     public sealed class FControlFrame : MonoBehaviour
     {
+#warning TODO - save this (and in general handle this properly, with a selector in the UI where the player can click "control from here").
+#warning TODO - handle this appropriately (and per-control system)
         public static FControlFrame VesselControlFrame { get; set; }
 
         /// <summary>

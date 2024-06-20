@@ -58,8 +58,7 @@ namespace KSS.UI.SceneFactories
             {
                 CanvasManager.Get( CanvasName.WINDOWS ).AddPromptWindow( "Load ...", "vessel name/ID", ( text ) =>
                 {
-#warning TODO - finish.
-                    //DesignObjectManager.LoadVessel( IOHelper.SanitizeFileName( text ) );
+                    DesignObjectManager.LoadVessel( IOHelper.SanitizeFileName( text ) );
                 } );
             } );
             UIButton saveBtn = p1.AddButton( new UILayoutInfo( UIAnchor.BottomLeft, (80, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_save" ), () =>
@@ -72,8 +71,7 @@ namespace KSS.UI.SceneFactories
 
                 CanvasManager.Get( CanvasName.WINDOWS ).AddConfirmWindow( "Save ...", $"Confirm saving '{DesignObjectManager.CurrentVesselMetadata.ID}'.", () =>
                 {
-#warning TODO - finish.
-                    //DesignObjectManager.SaveVessel();
+                    DesignObjectManager.SaveVessel();
                 } );
             } );
             UIPanel p2 = topPanel.AddPanel( new UILayoutInfo( UIAnchor.Center, UIFill.Vertical(), 0, 300 ), null );

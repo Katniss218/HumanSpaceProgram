@@ -161,7 +161,6 @@ namespace KSS.DesignScene
             {
                 TimeStepManager.Unpause();
             }
-            //HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_AFTER_SAVE, null );
         }
 
         // undos stored in files, preserved across sessions?
@@ -191,42 +190,39 @@ namespace KSS.DesignScene
         }
 
 
-        /*
+
         public static void SaveVessel()
         {
             // save current vessel to the files defined by metadata's ID.
             Directory.CreateDirectory( CurrentVesselMetadata.GetRootDirectory() );
-            _designObjDataHandler.ObjectsFilename = Path.Combine( CurrentVesselMetadata.GetRootDirectory(), "objects.json" );
-            _designObjDataHandler.DataFilename = Path.Combine( CurrentVesselMetadata.GetRootDirectory(), "data.json" );
+            JsonSerializedDataHandler _designObjDataHandler = new JsonSerializedDataHandler( Path.Combine( CurrentVesselMetadata.GetRootDirectory(), "gameobjects.json" ) );
 
             HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_BEFORE_SAVE, null );
 
-            _saver = new AsyncSaver( new ReverseReferenceStore(), StartFunc, FinishSaveFunc, _designObjStrategy.SaveAsync_Object, _designObjStrategy.SaveAsync_Data );
+            var data = SerializationUnit.Serialize( GetGameObject() );
 
-            _saver.SaveAsync( instance );
-
-            CurrentVesselMetadata.WriteToDisk();
+            CurrentVesselMetadata.SaveToDisk();
+            _designObjDataHandler.Write( data );
+            HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_AFTER_SAVE, null );
         }
 
         public static void LoadVessel( string vesselId )
         {
-            VesselMetadata loadedVesselMetadata = new VesselMetadata( vesselId );
-            loadedVesselMetadata.ReadDataFromDisk();
-
-#warning TODO - add an event and update the UI when a vessel is loaded.
+            VesselMetadata loadedVesselMetadata = VesselMetadata.LoadFromDisk( vesselId );
 
             // load current vessel from the files defined by metadata's ID.
             Directory.CreateDirectory( loadedVesselMetadata.GetRootDirectory() );
-            _designObjDataHandler.ObjectsFilename = Path.Combine( loadedVesselMetadata.GetRootDirectory(), "objects.json" );
-            _designObjDataHandler.DataFilename = Path.Combine( loadedVesselMetadata.GetRootDirectory(), "data.json" );
+            JsonSerializedDataHandler _designObjDataHandler = new JsonSerializedDataHandler( Path.Combine( loadedVesselMetadata.GetRootDirectory(), "gameobjects.json" ) );
 
             HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_BEFORE_LOAD, null );
             CurrentVesselMetadata = loadedVesselMetadata; // CurrentVesselMetadata should be set after invoking before load.
 
-            _loader = new AsyncLoader( new ForwardReferenceStore(), StartFunc, FinishLoadFunc, _designObjStrategy.LoadAsync_Object, _designObjStrategy.LoadAsync_Data );
-            _loader.LoadAsync( instance );
+            GameObject go = SerializationUnit.Deserialize<GameObject>( _designObjDataHandler.Read() );
+
+            DesignObject.RootPart = go.transform;
+            HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_AFTER_LOAD, null );
         }
-        */
+
         // ------
 
         private static GameObject GetGameObject()

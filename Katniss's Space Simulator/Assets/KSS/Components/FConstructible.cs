@@ -174,7 +174,7 @@ namespace KSS.Components
                 {
                     IEnumerable<Component> comps = ourPartsTransforms.SelectMany( t => t.GetComponents() );
 
-                    var su = SerializationUnit.FromObjects<Component>( -2137, comps );
+                    var su = SerializationUnit.FromObjects<Component>( GhostableContext.Ghost, comps );
 
                     su.Serialize( _cachedRefStore );
 
@@ -211,10 +211,11 @@ namespace KSS.Components
         {
             return new MemberwiseSerializationMapping<FConstructible>()
             {
-                ("cached_data", new Member<FConstructible, Dictionary<Component, (SerializedData fwd, SerializedData rev)>>( o => o._cachedData )),
                 ("max_build_points", new Member<FConstructible, float>( o => o._maxBuildPoints )),
-                ("build_points", new Member<FConstructible, float>( o => o._buildPoints ))
+                ("build_points", new Member<FConstructible, float>( o => o._buildPoints )),
                 // todo - conditions.
+#warning TODO - the dict RefToValue doesn't load properly.
+                ("cached_data", new Member<FConstructible, Dictionary<Component, (SerializedData fwd, SerializedData rev)>>( KeyValueContext.RefToValue, o => o._cachedData ))
             };
         }
     }

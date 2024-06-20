@@ -68,6 +68,8 @@ namespace KSS.Core.Serialization
 
         private static bool _wasPausedBeforeSerializing = false;
 
+        public static BidirectionalReferenceStore RefStore { get; private set; }
+
         public static void SaveLoadStartFunc()
         {
             IsSavingOrLoading = true;
@@ -104,6 +106,7 @@ namespace KSS.Core.Serialization
             Directory.CreateDirectory( SaveMetadata.GetRootDirectory( timelineId, saveId ) );
 
             var eSave = new SaveEventData( timelineId, saveId );
+            RefStore = new BidirectionalReferenceStore();
 
             HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_SAVE, eSave );
             SaveLoadStartFunc();
@@ -141,6 +144,7 @@ namespace KSS.Core.Serialization
             SaveMetadata loadedSave = SaveMetadata.LoadFromDisk( timelineId, saveId );
 
             var eLoad = new LoadEventData( timelineId, saveId );
+            RefStore = new BidirectionalReferenceStore();
 
             HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_LOAD, eLoad );
             SaveLoadStartFunc();
@@ -171,6 +175,7 @@ namespace KSS.Core.Serialization
             newTimeline.Description = timelineDescription;
 
             var eNew = new NewEventData( timelineId, saveId );
+            RefStore = new BidirectionalReferenceStore();
 
             HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_NEW, eNew );
             SaveLoadStartFunc();

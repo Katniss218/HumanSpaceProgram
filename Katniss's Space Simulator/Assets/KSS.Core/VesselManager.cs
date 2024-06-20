@@ -82,7 +82,7 @@ namespace KSS.Core
             {
                 JsonSerializedDataHandler _vesselsDataHandler = new JsonSerializedDataHandler( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels", $"{i}", "gameobjects.json" ) );
 
-                var data = SerializationUnit.Serialize( vessel );
+                var data = SerializationUnit.Serialize( vessel, TimelineManager.RefStore );
                 _vesselsDataHandler.Write( data );
                 i++;
             }
@@ -99,7 +99,7 @@ namespace KSS.Core
                 JsonSerializedDataHandler _vesselsDataHandler = new JsonSerializedDataHandler( Path.Combine( dir, "gameobjects.json" ) );
 
                 var data = _vesselsDataHandler.Read();
-                var go = SerializationUnit.Deserialize<GameObject>( data );
+                var go = SerializationUnit.Deserialize<GameObject>( data, TimelineManager.RefStore );
             }
         }
     }

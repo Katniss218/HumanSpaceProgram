@@ -51,8 +51,7 @@ namespace KSS.Core
 
             JsonSerializedDataHandler _vesselsDataHandler = new JsonSerializedDataHandler( Path.Combine( savePath, $"{nameof( ActiveObjectManager )}.json" ) );
 
-#warning TODO - this needs to share the refmap with the vessels.
-            var data = SerializationUnit.Serialize( FindObjectOfType<ActiveObjectManager>() );
+            var data = SerializationUnit.Serialize( FindObjectOfType<ActiveObjectManager>(), TimelineManager.RefStore );
             _vesselsDataHandler.Write( data );
         }
 
@@ -65,7 +64,7 @@ namespace KSS.Core
             JsonSerializedDataHandler _vesselsDataHandler = new JsonSerializedDataHandler( Path.Combine( savePath, $"{nameof( ActiveObjectManager )}.json" ) );
 
             var data = _vesselsDataHandler.Read();
-            SerializationUnit.Populate( FindObjectOfType<ActiveObjectManager>(), data );
+            SerializationUnit.Populate( FindObjectOfType<ActiveObjectManager>(), data, TimelineManager.RefStore );
         }
     }
 }

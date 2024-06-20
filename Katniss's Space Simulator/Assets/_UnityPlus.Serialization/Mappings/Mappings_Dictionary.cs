@@ -79,6 +79,9 @@ namespace UnityPlus.Serialization.Mappings
             {
                 OnSave = ( o, s ) =>
                 {
+                    if( o == null )
+                        return null;
+
 #warning TODO - add some way of automatically adding type and id. (also, objects should be objects not arrays)
                     SerializedArray arr = new SerializedArray();
 
@@ -139,9 +142,6 @@ namespace UnityPlus.Serialization.Mappings
                         mapping = SerializationMappingRegistry.GetMappingOrDefault<TValue>( ObjectContext.Default, valueType );
                         MappingHelper.DoLoad( mapping, ref value, valueData, l );
 
-                        if( key == null )
-                            continue;
-
                         self.temp[i] = (key, value);
                         i++;
                     }
@@ -151,6 +151,7 @@ namespace UnityPlus.Serialization.Mappings
                     if( data is not SerializedArray dataObj )
                         return;
 
+#warning TODO - this 'temp' thing will not work, because the mapping is retrieved again for the reference pass.
                     if( self.temp == null )
                         return;
 
@@ -186,6 +187,9 @@ namespace UnityPlus.Serialization.Mappings
             {
                 OnSave = ( o, s ) =>
                 {
+                    if( o == null )
+                        return null;
+
                     SerializedObject obj = new SerializedObject();
 
                     foreach( var (key, value) in o )
@@ -220,16 +224,14 @@ namespace UnityPlus.Serialization.Mappings
 
                         var mapping = SerializationMappingRegistry.GetMappingOrDefault<TValue>( ObjectContext.Default, elementType );
 
-#warning TODO - fix this mess.
-                        // Calling `mapping.Load` inside LoadReferences makes the objects inside the dict unable to be referenced by other external objects.
-                        object elem = mapping.Instantiate( elementData, l );
-
-                        mapping.Load( ref elem, elementData, l );
-                        mapping.LoadReferences( ref elem, elementData, l );
-
                         TKey keyObj = (TKey)l.RefMap.GetObj( key.DeserializeGuidAsKey() );
 
-                        o[keyObj] = (TValue)elem;
+#warning TODO - fix this mess.
+                        TValue valueObj = default;
+                        MappingHelper.DoLoad( mapping, ref valueObj, elementData, l );
+                        MappingHelper.DoLoadReferences( mapping, ref valueObj, elementData, l );
+
+                        o[keyObj] = valueObj;
                     }
                 }
             };

@@ -372,7 +372,6 @@ namespace KSS.DevUtils
             ((SequenceAction)seq.Sequence.Elements[1].Actions[1]).OnInvoke.TryConnect( t2Sep.Separate );
 
             FControlFrame fc = capsule.gameObject.GetComponent<FControlFrame>();
-#warning TODO - save this (and in general handle this properly, with a selector in the UI where the player can click "control from here").
             FControlFrame.VesselControlFrame = fc;
 
             return v;

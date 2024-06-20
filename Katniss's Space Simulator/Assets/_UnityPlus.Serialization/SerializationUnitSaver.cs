@@ -40,6 +40,9 @@ namespace UnityPlus.Serialization
         /// </summary>
         public void Serialize( IReverseReferenceMap s )
         {
+            if( s == null )
+                throw new ArgumentNullException( nameof( s ), $"The reference map to use can't be null." );
+
             this.RefMap = s;
             this.SaveCallback();
         }

@@ -1,4 +1,5 @@
 ﻿using KSS.Components;
+using KSS.Core.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,38 +11,40 @@ using UnityPlus.Serialization;
 
 namespace KSS
 {
+    public static class GhostableContext
+    {
+        public const int Ghost = -2137042352;
+    }
+
     public static class IGhostable_Ex
     {
-#warning TODO - finish.
-        public static SerializedData GetGhostData( this Renderer renderer, IReverseReferenceMap s )
+
+        [SerializationMappingProvider( typeof( Renderer ), Context = GhostableContext.Ghost )]
+        public static SerializationMapping RendererMapping()
         {
-            var ghostMat = AssetRegistry.Get<Material>( "builtin::Resources/Materials/ghost_wireframe" );
-
-            SerializedArray ghostMats = new SerializedArray();
-            for( int i = 0; i < renderer.sharedMaterials.Length; i++ )
+            return new MemberwiseSerializationMapping<Renderer>()
             {
-                ghostMats.Add( s.WriteAssetReference( ghostMat ) );
-            }
-
-            return new SerializedObject()
-            {
-                { "shared_materials", ghostMats }
+                ("shared_materials", new Member<Renderer, Material[]>( ArrayContext.Assets,
+                    o => o.sharedMaterials.Select( m => AssetRegistry.Get<Material>( "builtin::Resources/Materials/ghost_wireframe" ) ).ToArray(),
+                   (o, value) => o.sharedMaterials = value )),
             };
         }
 
-        public static SerializedData GetGhostData( this Collider collider, IReverseReferenceMap s )
+        [SerializationMappingProvider( typeof( Collider ), Context = GhostableContext.Ghost )]
+        public static SerializationMapping ColliderMapping()
         {
-            return new SerializedObject()
+            return new MemberwiseSerializationMapping<Collider>()
             {
-                { "is_trigger", (SerializedPrimitive)true }
+                ("is_trigger", new Member<Collider, bool>( o => true, (o, value) => o.isTrigger = value ))
             };
         }
 
-        public static SerializedData GetGhostData( this FPointMass mass, IReverseReferenceMap s )
+        [SerializationMappingProvider( typeof( FPointMass ), Context = GhostableContext.Ghost )]
+        public static SerializationMapping FPointMassMapping()
         {
-            return new SerializedObject()
+            return new MemberwiseSerializationMapping<FPointMass>()
             {
-                { "mass", (SerializedPrimitive)0.0f }
+                ("mass", new Member<FPointMass, float>( o => 0.0f, (o, value) => o.Mass = value ))
             };
         }
     }

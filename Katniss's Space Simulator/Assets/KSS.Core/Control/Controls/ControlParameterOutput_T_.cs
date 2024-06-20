@@ -84,6 +84,9 @@ namespace KSS.Control.Controls
             }
 			.WithFactory( ( data, l ) => // Either this, or use mapping that instantiates on reference pass.
             {
+                if( data == null )
+                    return null;
+
                 Func<T> onInvoke = (Func<T>)Persistent_Delegate.ToDelegate( data["getter"], l.RefMap );
 
                 return new ControlParameterOutput<T>( onInvoke );

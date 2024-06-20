@@ -31,7 +31,7 @@ namespace KSS.AssetLoaders
             var data = new JsonSerializedDataHandler( Path.Combine( _filePath, "gameobjects.json" ) )
                 .Read();
 
-            return SerializationUnit.Deserialize<GameObject>( data );
+            return SerializationUnit.Deserialize<GameObject>( data, refMap );
         }
 
         [HSPEventListener( HSPEvent.STARTUP_IMMEDIATELY, HSPEvent.NAMESPACE_VANILLA + ".load_parts" )]

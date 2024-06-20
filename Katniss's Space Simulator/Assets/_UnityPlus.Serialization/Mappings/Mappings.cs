@@ -58,7 +58,7 @@ namespace UnityPlus.Serialization.Mappings
         }
 
 #warning TODO - generic mappings might want to be used on different types of things, kind of like the generic constraints. This method here is currently not safe because it can be invoked on a struct.
-        
+
         [SerializationMappingProvider( typeof( object ), Context = ObjectContext.Asset )]
         public static SerializationMapping ObjectAssetMapping<T>() where T : class
         {
@@ -102,6 +102,36 @@ namespace UnityPlus.Serialization.Mappings
 
                     return array;
                 }
+            };
+        }
+
+        [SerializationMappingProvider( typeof( SerializedPrimitive ) )]
+        public static SerializationMapping SerializedPrimitiveMapping()
+        {
+            return new PrimitiveObjectSerializationMapping<SerializedPrimitive>()
+            {
+                OnSave = ( o, s ) => o,
+                OnInstantiate = ( data, l ) => data as SerializedPrimitive
+            };
+        }
+
+        [SerializationMappingProvider( typeof( SerializedObject ) )]
+        public static SerializationMapping SerializedObjectMapping()
+        {
+            return new PrimitiveObjectSerializationMapping<SerializedObject>()
+            {
+                OnSave = ( o, s ) => o,
+                OnInstantiate = ( data, l ) => data as SerializedObject
+            };
+        }
+
+        [SerializationMappingProvider( typeof( SerializedArray ) )]
+        public static SerializationMapping SerializedArrayMapping()
+        {
+            return new PrimitiveObjectSerializationMapping<SerializedArray>()
+            {
+                OnSave = ( o, s ) => o,
+                OnInstantiate = ( data, l ) => data as SerializedArray
             };
         }
 
@@ -237,7 +267,7 @@ namespace UnityPlus.Serialization.Mappings
 
         [SerializationMappingProvider( typeof( string ) )]
         public static SerializationMapping StringMapping()
-        { 
+        {
             return new PrimitiveObjectSerializationMapping<string>()
             {
                 OnSave = ( o, s ) => (SerializedPrimitive)o,

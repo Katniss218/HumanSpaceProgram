@@ -76,6 +76,7 @@
     <Compile Include="Assets\KSS.Core\Control\Controls\ControlleeInputBase.cs" />
     <Compile Include="Assets\KSS.Core\HSPEvent.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\FluidState.cs" />
+    <Compile Include="Assets\KSS.Core\Mods\NamespacedIdentifier.cs" />
     <Compile Include="Assets\KSS.Core\CelestialBodyManager.cs" />
     <Compile Include="Assets\KSS.Core\Control\Controls\ControlleeInput_T_.cs" />
     <Compile Include="Assets\KSS.Core\Control\Controls\ControlParameterInput_T_.cs" />
@@ -140,7 +141,6 @@
     <Compile Include="Assets\KSS.Core\Physics\FreePhysicsObject.cs" />
     <Compile Include="Assets\KSS.Core\Control\Control.cs" />
     <Compile Include="Assets\KSS.Core\Components\FControlFrame.cs" />
-    <Compile Include="Assets\KSS.Core\Mods\NamespacedIdentifier.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.Core\___KSS.Core.asmdef" />

@@ -56,6 +56,9 @@ namespace UnityPlus.Serialization
         /// </summary>
         public void Deserialize( IForwardReferenceMap l )
         {
+            if( l == null )
+                throw new ArgumentNullException( nameof( l ), $"The reference map to use can't be null." );
+
             this.RefMap = l;
             this.LoadCallback();
             this.LoadReferencesCallback();
@@ -75,6 +78,9 @@ namespace UnityPlus.Serialization
         /// </summary>
         public void Populate( IForwardReferenceMap l )
         {
+            if( l == null )
+                throw new ArgumentNullException( nameof( l ), $"The reference map to use can't be null." );
+
             this.RefMap = l;
             this.PopulateCallback();
             this.LoadReferencesCallback();
