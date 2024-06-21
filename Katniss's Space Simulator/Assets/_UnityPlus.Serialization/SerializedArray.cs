@@ -135,7 +135,7 @@ namespace UnityPlus.Serialization
 
         public override bool Equals( object obj )
         {
-            if( obj is SerializedObject other )
+            if( obj is SerializedArray other )
                 return this.Equals( other );
 
             return false;

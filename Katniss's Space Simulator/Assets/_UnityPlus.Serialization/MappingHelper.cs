@@ -10,6 +10,9 @@ namespace UnityPlus.Serialization
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public static SerializedData DoSave<T>( SerializationMapping mapping, T obj, ISaver s )
         {
+            if( mapping == null )
+                return null;
+
             switch( mapping.SerializationStyle )
             {
                 default:
@@ -24,6 +27,9 @@ namespace UnityPlus.Serialization
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public static bool DoPopulate<T>( SerializationMapping mapping, ref T obj, SerializedData data, ILoader l )
         {
+            if( mapping == null )
+                return false;
+
             switch( mapping.SerializationStyle )
             {
                 default:
@@ -42,6 +48,9 @@ namespace UnityPlus.Serialization
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public static bool DoLoad<T>( SerializationMapping mapping, ref T obj, SerializedData data, ILoader l )
         {
+            if( mapping == null )
+                return false;
+
             switch( mapping.SerializationStyle )
             {
                 default:
@@ -60,6 +69,9 @@ namespace UnityPlus.Serialization
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public static bool DoLoadReferences<T>( SerializationMapping mapping, ref T obj, SerializedData data, ILoader l )
         {
+            if( mapping == null )
+                return false;
+
             switch( mapping.SerializationStyle )
             {
                 default:

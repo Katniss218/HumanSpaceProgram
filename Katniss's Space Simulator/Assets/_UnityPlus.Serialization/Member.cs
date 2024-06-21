@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
+using System.Reflection;
 using UnityEngine;
 
 namespace UnityPlus.Serialization
@@ -38,7 +39,7 @@ namespace UnityPlus.Serialization
             if( type.IsValueType || (!type.IsInterface && type.BaseType == null) )
             {
                 _hasCachedMapping = true;
-                _cachedMapping = SerializationMappingRegistry.GetMappingOrEmpty( _context, typeof( TMember ) );
+                _cachedMapping = SerializationMappingRegistry.GetMappingOrNull( _context, typeof( TMember ) );
             }
         }
 
@@ -127,7 +128,7 @@ namespace UnityPlus.Serialization
         {
             TMember member = _getter.Invoke( source );
 
-            var mapping = SerializationMappingRegistry.GetMappingOrDefault<TMember>( _context, member );
+            var mapping = SerializationMappingRegistry.GetMapping<TMember>( _context, member );
 
             return MappingHelper.DoSave<TMember>( mapping, member, s );
         }
@@ -143,7 +144,11 @@ namespace UnityPlus.Serialization
                 memberType = type.DeserializeType();
             }
 
-            var mapping = _hasCachedMapping ? _cachedMapping : SerializationMappingRegistry.GetMappingOrDefault<TMember>( _context, memberType );
+            var mapping = _hasCachedMapping ? _cachedMapping : SerializationMappingRegistry.GetMapping<TMember>( _context, memberType );
+            if( data != null )
+            {
+                l.MappingCache[data] = mapping;
+            }
 
             TMember member = default;
             if( MappingHelper.DoLoad( mapping, ref member, data, l ) )
@@ -161,8 +166,18 @@ namespace UnityPlus.Serialization
         {
             TMember member = _getter.Invoke( source );
 
-            // This is needed, to reach the references nested inside objects that themselves don't contain any references.
-            var mapping = SerializationMappingRegistry.GetMappingOrDefault<TMember>( _context, member );
+            SerializationMapping mapping = null;
+            if( _hasCachedMapping )
+                mapping = _cachedMapping;
+            else
+            {
+                if( data == null )
+                    SerializationMappingRegistry.GetMapping<TMember>( _context, member );
+                else if( !l.MappingCache.TryGetValue( data, out mapping ) )
+                {
+                    SerializationMappingRegistry.GetMapping<TMember>( _context, member );
+                }
+            }
 
             if( MappingHelper.DoLoadReferences( mapping, ref member, data, l ) )
             {

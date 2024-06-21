@@ -100,7 +100,6 @@
     <Compile Include="Assets\_UnityPlus.Serialization\ReferenceMaps\ReferenceMap_Ex.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\SerializedObject.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\SerializationMappingRegistry.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\MappingTypes\EmptySerializationMapping.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\MappingTypes\PrimitiveStructSerializationMapping.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\SerializationUnitAsyncLoader.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\MappingTypes\PrimitiveReferencingSerializationMapping.cs" />

@@ -70,7 +70,7 @@ namespace UnityPlus.Serialization
             _isInitialized = true;
         }
 
-        private static RegistryEntry MakeReady( int context, RegistryEntry entry, Type objType )
+        private static RegistryEntry MakeReadyAndRegister( int context, RegistryEntry entry, Type objType )
         {
             MethodInfo method = entry.method;
 
@@ -127,7 +127,7 @@ namespace UnityPlus.Serialization
         /// </remarks>
         /// <param name="memberType">The type of the member "variable" that the object is/will be assigned to.</param>
         /// <returns>The correct serialization mapping for the given member type.</returns>
-        public static SerializationMapping GetMappingOrEmpty( int context, Type memberType )
+        public static SerializationMapping GetMappingOrNull( int context, Type memberType )
         {
             if( memberType == null )
             {
@@ -141,9 +141,11 @@ namespace UnityPlus.Serialization
             {
                 if( !entry.isReady )
                 {
-                    entry = MakeReady( context, entry, memberType );
-                    return entry.mapping.GetWorkingInstance();
+                    entry = MakeReadyAndRegister( context, entry, memberType );
                 }
+
+                if( entry.mapping == null )
+                    return null;
 
                 return entry.mapping.GetWorkingInstance();
             }
@@ -151,14 +153,14 @@ namespace UnityPlus.Serialization
             entry = new RegistryEntry()
             {
                 isReady = true,
+                mappedType = memberType,
                 method = null,
-                mapping = SerializationMapping.Empty( memberType ),
-                mappedType = memberType
+                mapping = null
             };
 
             _mappings.Set( context, memberType, entry );
 
-            return entry.mapping;
+            return null;
         }
 
         /// <summary>
@@ -170,7 +172,7 @@ namespace UnityPlus.Serialization
         /// <typeparam name="TMember">The type of the member ("variable") that the object is/will be assigned to.</typeparam>
         /// <param name="memberObj">The object.</param>
         /// <returns>The correct serialization mapping for the given member+object pair.</returns>
-        public static SerializationMapping GetMappingOrDefault<TMember>( int context, TMember memberObj )
+        public static SerializationMapping GetMapping<TMember>( int context, TMember memberObj )
         {
             if( !_isInitialized )
                 Initialize();
@@ -183,9 +185,11 @@ namespace UnityPlus.Serialization
             {
                 if( !entry.isReady )
                 {
-                    entry = MakeReady( context, entry, objType );
-                    return entry.mapping.GetWorkingInstance();
+                    entry = MakeReadyAndRegister( context, entry, objType );
                 }
+
+                if( entry.mapping == null )
+                    return null;
 
                 return entry.mapping.GetWorkingInstance();
             }
@@ -193,14 +197,14 @@ namespace UnityPlus.Serialization
             entry = new RegistryEntry()
             {
                 isReady = true,
+                mappedType = objType,
                 method = null,
-                mapping = SerializationMapping.Empty( objType ),
-                mappedType = objType
+                mapping = null
             };
 
             _mappings.Set( context, objType, entry );
 
-            return entry.mapping;
+            return null;
         }
 
         /// <summary>
@@ -212,7 +216,7 @@ namespace UnityPlus.Serialization
         /// <typeparam name="TMember">The type of the member ("variable") that the object is/will be assigned to.</typeparam>
         /// <param name="objType">The actual type of the object in question.</param>
         /// <returns>The correct serialization mapping for the given member+object pair.</returns>
-        public static SerializationMapping GetMappingOrDefault<TMember>( int context, Type objType )
+        public static SerializationMapping GetMapping<TMember>( int context, Type objType )
         {
             if( !_isInitialized )
                 Initialize();
@@ -226,9 +230,11 @@ namespace UnityPlus.Serialization
                 {
                     if( !entry.isReady )
                     {
-                        entry = MakeReady( context, entry, objType );
-                        return entry.mapping.GetWorkingInstance();
+                        entry = MakeReadyAndRegister( context, entry, objType );
                     }
+
+                    if( entry.mapping == null )
+                        return null;
 
                     return entry.mapping.GetWorkingInstance();
                 }
@@ -236,17 +242,15 @@ namespace UnityPlus.Serialization
                 entry = new RegistryEntry()
                 {
                     isReady = true,
+                    mappedType = objType,
                     method = null,
-                    mapping = SerializationMapping.Empty( objType ),
-                    mappedType = objType
+                    mapping = null
                 };
 
                 _mappings.Set( context, objType, entry );
-
-                return entry.mapping;
             }
 
-            return SerializationMapping.Empty<TMember>();
+            return null;
         }
     }
 }

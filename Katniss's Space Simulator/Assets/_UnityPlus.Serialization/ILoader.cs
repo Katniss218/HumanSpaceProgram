@@ -50,6 +50,8 @@ namespace UnityPlus.Serialization
         /// The reference map used to map object IDs to references when deserializing.
         /// </summary>
         IForwardReferenceMap RefMap { get; }
+
+        Dictionary<SerializedData, SerializationMapping> MappingCache { get; }
     }
 
     /// <summary>

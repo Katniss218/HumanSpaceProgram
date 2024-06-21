@@ -58,7 +58,7 @@ namespace UnityPlus.Serialization.Mappings
         }
 
 #warning TODO - generic mappings might want to be used on different types of things, kind of like the generic constraints. This method here is currently not safe because it can be invoked on a struct.
-
+        
         [SerializationMappingProvider( typeof( object ), Context = ObjectContext.Asset )]
         public static SerializationMapping ObjectAssetMapping<T>() where T : class
         {
@@ -134,7 +134,7 @@ namespace UnityPlus.Serialization.Mappings
                 OnInstantiate = ( data, l ) => data as SerializedArray
             };
         }
-
+        
         [SerializationMappingProvider( typeof( bool ) )]
         public static SerializationMapping BooleanMapping()
         {
@@ -267,7 +267,7 @@ namespace UnityPlus.Serialization.Mappings
 
         [SerializationMappingProvider( typeof( string ) )]
         public static SerializationMapping StringMapping()
-        {
+        { 
             return new PrimitiveObjectSerializationMapping<string>()
             {
                 OnSave = ( o, s ) => (SerializedPrimitive)o,
@@ -421,7 +421,7 @@ namespace UnityPlus.Serialization.Mappings
                     {
                         T value = o[i];
 
-                        var mapping = SerializationMappingRegistry.GetMappingOrDefault<T>( ObjectContext.Default, value );
+                        var mapping = SerializationMappingRegistry.GetMapping<T>( ObjectContext.Default, value );
 
                         var data = MappingHelper.DoSave<T>( mapping, value, s );
 
@@ -451,7 +451,7 @@ namespace UnityPlus.Serialization.Mappings
                             : typeof( T );
 
                         T element = default;
-                        var mapping = SerializationMappingRegistry.GetMappingOrDefault<T>( ObjectContext.Default, elementType );
+                        var mapping = SerializationMappingRegistry.GetMapping<T>( ObjectContext.Default, elementType );
                         if( MappingHelper.DoLoad( mapping, ref element, elementData, l ) )
                         {
                             o[i] = element;
@@ -475,11 +475,11 @@ namespace UnityPlus.Serialization.Mappings
                             elementType = elementType2.DeserializeType();
                         }
 
-                        var mapping = SerializationMappingRegistry.GetMappingOrDefault<T>( elementType );
+                        var mapping = SerializationMappingRegistry.GetMapping<T>( elementType );
                         */
 
                         T element = o[i];
-                        var mapping = SerializationMappingRegistry.GetMappingOrDefault<T>( ObjectContext.Default, element );
+                        var mapping = SerializationMappingRegistry.GetMapping<T>( ObjectContext.Default, element );
                         if( MappingHelper.DoLoadReferences( mapping, ref element, elementData, l ) )
                         {
                             o[i] = element;

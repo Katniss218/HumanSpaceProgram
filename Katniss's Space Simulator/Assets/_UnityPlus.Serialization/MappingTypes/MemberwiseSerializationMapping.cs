@@ -49,9 +49,9 @@ namespace UnityPlus.Serialization
             if( baseType == null )
                 return this;
 
-            SerializationMapping mapping = SerializationMappingRegistry.GetMappingOrEmpty( this.context, baseType );
+            SerializationMapping mapping = SerializationMappingRegistry.GetMappingOrNull( this.context, baseType );
 
-            if( mapping.SerializationStyle == SerializationStyle.None ) // empty
+            if( mapping == null )
                 return this;
 
             if( ReferenceEquals( mapping, this ) ) // mapping for `this` is a cached mapping of base type.
@@ -104,7 +104,7 @@ namespace UnityPlus.Serialization
             if( baseType == null )
                 return this;
 
-            SerializationMapping mapping = SerializationMappingRegistry.GetMappingOrEmpty( this.context, baseType );
+            SerializationMapping mapping = SerializationMappingRegistry.GetMappingOrNull( this.context, baseType );
 
             if( mapping is IInstantiableSerializationMapping m )
             {

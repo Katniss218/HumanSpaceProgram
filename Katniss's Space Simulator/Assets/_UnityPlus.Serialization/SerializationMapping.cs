@@ -6,7 +6,6 @@ namespace UnityPlus.Serialization
 {
     public enum SerializationStyle
     {
-        None = 0,
         PrimitiveStruct, // save -=- instantiate (called in load)
         PrimitiveObject, // save -=- instantiate (called in loadreferences)
         NonPrimitive     // save -=- instantiate + load, loadreferences
@@ -48,16 +47,6 @@ namespace UnityPlus.Serialization
         public virtual SerializationMapping GetWorkingInstance()
         {
             return this;
-        }
-
-        public static SerializationMapping Empty( Type sourceType )
-        {
-            return (SerializationMapping)Activator.CreateInstance( typeof( EmptySerializationMapping<> ).MakeGenericType( sourceType ) );
-        }
-
-        public static SerializationMapping Empty<TSource>()
-        {
-            return new EmptySerializationMapping<TSource>();
         }
     }
 }
