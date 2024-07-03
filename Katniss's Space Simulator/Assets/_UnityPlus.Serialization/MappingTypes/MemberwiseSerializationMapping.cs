@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace UnityPlus.Serialization
@@ -17,8 +18,6 @@ namespace UnityPlus.Serialization
 
         private readonly List<(string, MemberBase<TSource>)> _items = new();
         public Func<SerializedData, ILoader, object> OnInstantiate { get; private set; } = null;
-
-        public override SerializationStyle SerializationStyle => SerializationStyle.NonPrimitive;
 
         public MemberwiseSerializationMapping()
         {
@@ -137,34 +136,67 @@ namespace UnityPlus.Serialization
         //  Mapping methods:
         //
 
-        public override SerializedData Save( object obj, ISaver s )
+        protected override bool Save<T>( T obj, ref SerializedData data, ISaver s )
         {
             if( obj == null )
-                return null;
+                return false;
 
-            SerializedObject root = new SerializedObject();
+            TSource sourceObj = (TSource)(object)obj;
 
-            TSource sourceObj = (TSource)obj;
+            if( data == null )
+                data = new SerializedObject();
 
-            root[KeyNames.ID] = s.RefMap.GetID( sourceObj ).SerializeGuid();
-            root[KeyNames.TYPE] = obj.GetType().SerializeType();
+            data[KeyNames.ID] = s.RefMap.GetID( sourceObj ).SerializeGuid();
+            data[KeyNames.TYPE] = obj.GetType().SerializeType();
 
             foreach( var item in _items )
             {
-                SerializedData data = item.Item2.Save( sourceObj, s );
-                root[item.Item1] = data;
+                SerializedData memberData = item.Item2.Save( sourceObj, s );
+                data[item.Item1] = memberData;
             }
 
-            return root;
+            return true;
         }
 
-        public override object Instantiate( SerializedData data, ILoader l )
+
+        protected override bool TryPopulate<T>( ref T obj, SerializedData data, ILoader l )
+        {
+            // obj can be null here, this is normal.
+            TSource obj2 = (TSource)(object)obj;
+            Load( ref obj2, data, l );
+            obj = (T)(object)obj2;
+
+            return true;
+        }
+
+        protected override bool TryLoad<T>( ref T obj, SerializedData data, ILoader l )
+        {
+            // obj can be null here, this is normal.
+            TSource obj2 = Instantiate( data, l );
+            Load( ref obj2, data, l );
+            obj = (T)(object)obj2;
+
+            return true;
+        }
+
+        protected override bool TryLoadReferences<T>( ref T obj, SerializedData data, ILoader l )
+        {
+            // obj can be null here, this is normal.
+            var obj2 = (TSource)(object)obj;
+            LoadReferences( ref obj2, data, l );
+            obj = (T)(object)obj2;
+
+            return true;
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        TSource Instantiate( SerializedData data, ILoader l )
         {
             TSource obj;
             if( OnInstantiate == null )
             {
                 if( data == null )
-                    return null;
+                    return default;
 
                 obj = Activator.CreateInstance<TSource>();
                 if( data.TryGetValue( KeyNames.ID, out var id ) )
@@ -180,42 +212,38 @@ namespace UnityPlus.Serialization
             return obj;
         }
 
-        public override void Load( ref object obj, SerializedData data, ILoader l )
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        void Load( ref TSource obj, SerializedData data, ILoader l )
         {
             if( obj == null )
                 return;
             if( data == null )
                 return;
 
-            TSource obj2 = (TSource)obj;
             foreach( var item in _items )
             {
                 if( data.TryGetValue( item.Item1, out var memberData ) )
                 {
-                    item.Item2.Load( ref obj2, memberData, l );
+                    item.Item2.Load( ref obj, memberData, l );
                 }
             }
-            obj = obj2;
         }
 
-        public override void LoadReferences( ref object obj, SerializedData data, ILoader l )
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        void LoadReferences( ref TSource obj, SerializedData data, ILoader l )
         {
             if( obj == null )
                 return;
             if( data == null )
                 return;
 
-            TSource obj2 = (TSource)obj;
-
             foreach( var item in _items )
             {
                 if( data.TryGetValue( item.Item1, out var memberData ) )
                 {
-                    item.Item2.LoadReferences( ref obj2, memberData, l );
+                    item.Item2.LoadReferences( ref obj, memberData, l );
                 }
             }
-
-            obj = obj2;
         }
     }
 }

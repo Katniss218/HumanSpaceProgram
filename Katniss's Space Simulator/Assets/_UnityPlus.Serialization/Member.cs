@@ -40,6 +40,7 @@ namespace UnityPlus.Serialization
             {
                 _hasCachedMapping = true;
                 _cachedMapping = SerializationMappingRegistry.GetMappingOrNull( _context, typeof( TMember ) );
+#warning TODO - mapping itself might not be cacheable.
             }
         }
 
@@ -130,11 +131,8 @@ namespace UnityPlus.Serialization
 
             var mapping = SerializationMappingRegistry.GetMapping<TMember>( _context, member );
 
-            return MappingHelper.DoSave<TMember>( mapping, member, s );
+            return mapping.SafeSave<TMember>( member, s );
         }
-
-        // The public-facing methods on the SerializationUnit are like a member,
-        //   but the member itself can't be populated, only the end user may choose to do that on the root object(s).
 
         public override void Load( ref TSource source, SerializedData data, ILoader l )
         {
@@ -144,19 +142,25 @@ namespace UnityPlus.Serialization
                 memberType = type.DeserializeType();
             }
 
-            var mapping = _hasCachedMapping ? _cachedMapping : SerializationMappingRegistry.GetMapping<TMember>( _context, memberType );
-            if( data != null )
+            SerializationMapping mapping;
+            if( _hasCachedMapping )
             {
-                l.MappingCache[data] = mapping;
+                mapping = _cachedMapping;
+                if( data != null )
+                {
+                    l.MappingCache[data] = mapping;
+                }
+            }
+            else
+            {
+                mapping = MappingHelper.GetMapping_Load<TMember>( _context, memberType, data, l );
             }
 
             TMember member = default;
-            if( MappingHelper.DoLoad( mapping, ref member, data, l ) )
+            if( mapping.SafeLoad( ref member, data, l ) )
             {
                 if( _structSetter == null )
-                {
                     _setter.Invoke( source, member );
-                }
                 else
                     _structSetter.Invoke( ref source, member );
             }
@@ -166,20 +170,11 @@ namespace UnityPlus.Serialization
         {
             TMember member = _getter.Invoke( source );
 
-            SerializationMapping mapping = null;
-            if( _hasCachedMapping )
-                mapping = _cachedMapping;
-            else
-            {
-                if( data == null )
-                    SerializationMappingRegistry.GetMapping<TMember>( _context, member );
-                else if( !l.MappingCache.TryGetValue( data, out mapping ) )
-                {
-                    SerializationMappingRegistry.GetMapping<TMember>( _context, member );
-                }
-            }
+            SerializationMapping mapping = _hasCachedMapping
+                ? _cachedMapping
+                : MappingHelper.GetMapping_LoadReferences<TMember>( _context, member, data, l );
 
-            if( MappingHelper.DoLoadReferences( mapping, ref member, data, l ) )
+            if( mapping.SafeLoadReferences( ref member, data, l ) )
             {
                 // This is needed, if the setter is custom (not auto-generated from field access (but NOT property access)) (look at LODGroup and its LOD[])
                 // Basically, we don't have the guarantee that the class we have referenceequals the private state.

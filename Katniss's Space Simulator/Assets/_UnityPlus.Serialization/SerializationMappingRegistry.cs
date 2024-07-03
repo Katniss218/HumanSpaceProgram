@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace UnityPlus.Serialization
 {
+    /// <summary>
+    /// Manages the mappings defined in the program.
+    /// </summary>
     public static class SerializationMappingRegistry
     {
         private struct RegistryEntry
@@ -21,17 +24,17 @@ namespace UnityPlus.Serialization
 
         private static bool _isInitialized = false;
 
-        private static IEnumerable<Type> GetTypes()
+        private static IEnumerable<Type> GetTypes( IEnumerable<Assembly> assemblies )
         {
-            return AppDomain.CurrentDomain.GetAssemblies()
+            return assemblies
                 .SelectMany( a => a.GetTypes() )
                 .Where( t => !t.IsGenericType ); // Menetic types don't work in this context, so we skip them when searching for methods returning mappings.
                                                  // The method itself can still be generic.
         }
 
-        private static void Initialize()
+        private static void Initialize( IEnumerable<Assembly> assemblies )
         {
-            foreach( var containingType in GetTypes() )
+            foreach( var containingType in GetTypes( assemblies ) )
             {
                 MethodInfo[] methods = containingType.GetMethods( BindingFlags.Public | BindingFlags.Static );
                 foreach( var method in methods )
@@ -68,6 +71,28 @@ namespace UnityPlus.Serialization
             }
 
             _isInitialized = true;
+        }
+
+        /// <summary>
+        /// Forces the registry to reload all its mappings.
+        /// </summary>
+        /// <remarks>
+        /// Mappings for unloaded types will not be removed from the registry.
+        /// </remarks>
+        public static void ForceReload()
+        {
+            Initialize( AppDomain.CurrentDomain.GetAssemblies() );
+        }
+
+        /// <summary>
+        /// Forces the registry to discard and reload all its mappings.
+        /// </summary>
+        /// <remarks>
+        /// Mappings for unloaded types will not be removed from the registry.
+        /// </remarks>
+        public static void ForceReload( Assembly assembly )
+        {
+            Initialize( new Assembly[] { assembly } );
         }
 
         private static RegistryEntry MakeReadyAndRegister( int context, RegistryEntry entry, Type objType )
@@ -135,7 +160,7 @@ namespace UnityPlus.Serialization
             }
 
             if( !_isInitialized )
-                Initialize();
+                Initialize( AppDomain.CurrentDomain.GetAssemblies() );
 
             if( _mappings.TryGetClosest( context, memberType, out var entry ) )
             {
@@ -147,7 +172,7 @@ namespace UnityPlus.Serialization
                 if( entry.mapping == null )
                     return null;
 
-                return entry.mapping.GetWorkingInstance();
+                return entry.mapping.GetInstance();
             }
 
             entry = new RegistryEntry()
@@ -175,7 +200,7 @@ namespace UnityPlus.Serialization
         public static SerializationMapping GetMapping<TMember>( int context, TMember memberObj )
         {
             if( !_isInitialized )
-                Initialize();
+                Initialize( AppDomain.CurrentDomain.GetAssemblies() );
 
             Type objType = typeof( TMember );
             if( memberObj != null )
@@ -191,7 +216,7 @@ namespace UnityPlus.Serialization
                 if( entry.mapping == null )
                     return null;
 
-                return entry.mapping.GetWorkingInstance();
+                return entry.mapping.GetInstance();
             }
 
             entry = new RegistryEntry()
@@ -219,7 +244,7 @@ namespace UnityPlus.Serialization
         public static SerializationMapping GetMapping<TMember>( int context, Type objType )
         {
             if( !_isInitialized )
-                Initialize();
+                Initialize( AppDomain.CurrentDomain.GetAssemblies() );
 
             if( objType == null )
                 objType = typeof( TMember );
@@ -236,7 +261,7 @@ namespace UnityPlus.Serialization
                     if( entry.mapping == null )
                         return null;
 
-                    return entry.mapping.GetWorkingInstance();
+                    return entry.mapping.GetInstance();
                 }
 
                 entry = new RegistryEntry()

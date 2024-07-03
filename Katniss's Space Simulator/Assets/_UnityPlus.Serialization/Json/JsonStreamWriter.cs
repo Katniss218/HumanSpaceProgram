@@ -102,12 +102,12 @@ namespace UnityPlus.Serialization.Json
             {
                 case SerializedPrimitive.DataType.Boolean:
                     s = value._value.boolean ? "true" : "false"; break;
-                case SerializedPrimitive.DataType.Int:
-                    s = value._value.@int.ToString( CultureInfo.InvariantCulture ); break;
-                case SerializedPrimitive.DataType.UInt:
-                    s = value._value.@uint.ToString( CultureInfo.InvariantCulture ); break;
-                case SerializedPrimitive.DataType.Float:
-                    s = value._value.@float.ToString( CultureInfo.InvariantCulture ); break;
+                case SerializedPrimitive.DataType.Int64:
+                    s = value._value.int64.ToString( CultureInfo.InvariantCulture ); break;
+                case SerializedPrimitive.DataType.UInt64:
+                    s = value._value.uint64.ToString( CultureInfo.InvariantCulture ); break;
+                case SerializedPrimitive.DataType.Float64:
+                    s = value._value.float64.ToString( CultureInfo.InvariantCulture ); break;
                 case SerializedPrimitive.DataType.Decimal:
                     s = value._value.@decimal.ToString( CultureInfo.InvariantCulture ); break;
                 case SerializedPrimitive.DataType.String:

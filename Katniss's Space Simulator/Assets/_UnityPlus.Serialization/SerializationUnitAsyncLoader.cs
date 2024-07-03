@@ -7,10 +7,11 @@ using UnityPlus.Serialization.ReferenceMaps;
 
 namespace UnityPlus.Serialization
 {
-    public class SerializationUnitAsyncLoader : ILoader
+    [Obsolete( "Not finished yet" )]
+    public class SerializationUnitAsyncLoader<T> : ILoader
     {
         private SerializedData[] _data;
-        private object[] _objects;
+        private T[] _objects;
 
         private Type _memberType; // Specifies the type that all serialized/deserialized objects will derive from. May be `typeof(object)`
         private int _context = default;
@@ -30,7 +31,7 @@ namespace UnityPlus.Serialization
             this._context = context;
         }
 
-        internal SerializationUnitAsyncLoader( object[] objects, SerializedData[] data, Type memberType, int context )
+        internal SerializationUnitAsyncLoader( T[] objects, SerializedData[] data, Type memberType, int context )
         {
             this.RefMap = new BidirectionalReferenceStore();
             this.MappingCache = new Dictionary<SerializedData, SerializationMapping>( new SerializedDataReferenceComparer() );
@@ -95,7 +96,7 @@ namespace UnityPlus.Serialization
         /// <summary>
         /// Returns the objects that were deserialized or populated.
         /// </summary>
-        public IEnumerable<object> GetObjects()
+        public IEnumerable<T> GetObjects()
         {
             return _objects;
         }
@@ -103,11 +104,10 @@ namespace UnityPlus.Serialization
         /// <summary>
         /// Returns the objects that were deserialized or populated, but only those that are of the specified type.
         /// </summary>
-        public IEnumerable<T> GetObjectsOfType<T>()
+        public IEnumerable<TDerived> GetObjectsOfType<TDerived>()
         {
-            return _objects.OfType<T>();
+            return _objects.OfType<TDerived>();
         }
-
 
         private void PopulateCallback()
         {
@@ -117,20 +117,11 @@ namespace UnityPlus.Serialization
             {
                 SerializedData data = _data[i];
 
-                if( data == null )
-                    continue;
-
-                if( !data.TryGetValue( KeyNames.TYPE, out var type ) )
-                    continue;
-
-                Type type2 = type.DeserializeType();
-
-                var mapping = SerializationMappingRegistry.GetMappingOrNull( _context, type2 );
-                MappingCache[data] = mapping;
+                var mapping = MappingHelper.GetMapping_Load<T>( _context, MappingHelper.GetSerializedType<T>( data ), data, this );
 
                 // Parity with Member (mostly).
-                object member = _objects[i];
-                if( MappingHelper.DoPopulate( mapping, ref member, data, this ) )
+                T member = _objects[i];
+                if( mapping.SafePopulate( ref member, data, this ) )
                 {
                     _objects[i] = member;
                 }
@@ -141,25 +132,16 @@ namespace UnityPlus.Serialization
         {
             // Called by the loader.
 
-            _objects = new object[_data.Length];
+            _objects = new T[_data.Length];
 
             for( int i = 0; i < _data.Length; i++ )
             {
                 SerializedData data = _data[i];
 
-                if( data == null )
-                    continue;
+                var mapping = MappingHelper.GetMapping_Load<T>( _context, MappingHelper.GetSerializedType<T>( data ), data, this );
 
-                Type typeToAssignTo = _memberType;
-
-                if( data.TryGetValue( KeyNames.TYPE, out var type ) )
-                    typeToAssignTo = type.DeserializeType();
-
-                var mapping = SerializationMappingRegistry.GetMappingOrNull( _context, typeToAssignTo );
-                MappingCache[data] = mapping;
-
-                object member = default;
-                if( MappingHelper.DoLoad( mapping, ref member, data, this ) )
+                T member = default;
+                if( mapping.SafeLoad( ref member, data, this ) )
                 {
                     _objects[i] = member;
                 }
@@ -174,16 +156,11 @@ namespace UnityPlus.Serialization
             {
                 SerializedData data = _data[i];
 
-                if( data == null )
-                    continue;
+                T member = _objects[i];
 
-                var mapping = MappingCache[data];
+                var mapping = MappingHelper.GetMapping_LoadReferences<T>( _context, member, data, this );
 
-                if( mapping == null )
-                    continue; // error.
-
-                object member = _objects[i];
-                if( MappingHelper.DoLoadReferences( mapping, ref member, data, this ) )
+                if( mapping.SafeLoadReferences( ref member, data, this ) )
                 {
                     _objects[i] = member;
                 }

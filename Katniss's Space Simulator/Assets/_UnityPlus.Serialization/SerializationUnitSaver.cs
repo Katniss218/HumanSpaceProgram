@@ -62,11 +62,11 @@ namespace UnityPlus.Serialization
         /// <summary>
         /// Returns the data that was serialized, but only of objects that are of the specified type.
         /// </summary>
-        public IEnumerable<SerializedData> GetDataOfType<T>()
+        public IEnumerable<SerializedData> GetDataOfType<TDerived>()
         {
             return _data.Where( d =>
             {
-                return d.TryGetValue( KeyNames.TYPE, out var type ) && typeof( T ).IsAssignableFrom( type.DeserializeType() );
+                return d.TryGetValue( KeyNames.TYPE, out var type ) && typeof( TDerived ).IsAssignableFrom( type.DeserializeType() );
             } );
         }
 
@@ -78,12 +78,9 @@ namespace UnityPlus.Serialization
             {
                 T obj = _objects[i];
 
-                if( obj == null )
-                    continue;
-
                 var mapping = SerializationMappingRegistry.GetMapping<T>( _context, obj );
 
-                _data[i] = MappingHelper.DoSave<T>( mapping, obj, this );
+                _data[i] = mapping.SafeSave<T>( obj, this );
             }
         }
     }
