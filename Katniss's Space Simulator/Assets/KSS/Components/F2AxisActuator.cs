@@ -80,7 +80,8 @@ namespace KSS.Components
             if( YActuatorTransform != null )
             {
                 float clampedY = Mathf.Clamp( Y, MinY, MaxY );
-                YActuatorTransform.localRotation = Quaternion.identity;
+                if( XActuatorTransform != YActuatorTransform )
+                    YActuatorTransform.localRotation = Quaternion.identity;
                 YActuatorTransform.localRotation = Quaternion.Euler( 0, 0, clampedY ) * YActuatorTransform.localRotation;
             }
         }

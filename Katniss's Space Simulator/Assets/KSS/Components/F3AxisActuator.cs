@@ -12,7 +12,7 @@ using KSS.Components;
 
 namespace Assets.KSS.Components
 {
-	public class F3AxisActuator : MonoBehaviour
+    public class F3AxisActuator : MonoBehaviour
     {
         /// <summary>
         /// The transform used as a reference (0,0,0) orientation.
@@ -32,25 +32,25 @@ namespace Assets.KSS.Components
 
         [field: SerializeField]
         public Transform YActuatorTransform { get; set; }
-        
+
         [field: SerializeField]
         public Transform ZActuatorTransform { get; set; }
 
         public float X { get; set; }
         public float Y { get; set; }
         public float Z { get; set; }
-        
-		[field: SerializeField]
+
+        [field: SerializeField]
         public float MinX { get; set; } = -5f;
-		[field: SerializeField]
+        [field: SerializeField]
         public float MaxX { get; set; } = 5f;
-		[field: SerializeField]
+        [field: SerializeField]
         public float MinY { get; set; } = -5f;
-		[field: SerializeField]
+        [field: SerializeField]
         public float MaxY { get; set; } = 5f;
-		[field: SerializeField]
+        [field: SerializeField]
         public float MinZ { get; set; } = -5f;
-		[field: SerializeField]
+        [field: SerializeField]
         public float MaxZ { get; set; } = 5f;
 
         [NamedControl( "Deflection (X)" )]
@@ -66,14 +66,14 @@ namespace Assets.KSS.Components
         {
             this.Y = y;
         }
-        
+
         [NamedControl( "Deflection (Z)" )]
         public ControlleeInput<float> SetZ;
         private void SetZListener( float z )
         {
             this.Z = z;
         }
-        
+
         [NamedControl( "Deflection (XYZ)" )]
         public ControlleeInput<Vector3> SetXYZ;
         private void SetXYZListener( Vector3 xyz )
@@ -103,13 +103,15 @@ namespace Assets.KSS.Components
             if( YActuatorTransform != null )
             {
                 float clampedY = Mathf.Clamp( Y, MinY, MaxY );
-                YActuatorTransform.localRotation = Quaternion.identity;
+                if( YActuatorTransform != XActuatorTransform )
+                    YActuatorTransform.localRotation = Quaternion.identity;
                 YActuatorTransform.localRotation = Quaternion.Euler( 0, 0, clampedY ) * YActuatorTransform.localRotation;
             }
             if( ZActuatorTransform != null )
             {
                 float clampedZ = Mathf.Clamp( Z, MinZ, MaxZ );
-                ZActuatorTransform.localRotation = Quaternion.identity;
+                if( ZActuatorTransform != YActuatorTransform && ZActuatorTransform != XActuatorTransform )
+                    ZActuatorTransform.localRotation = Quaternion.identity;
                 ZActuatorTransform.localRotation = Quaternion.Euler( 0, clampedZ, 0 ) * ZActuatorTransform.localRotation;
             }
         }
