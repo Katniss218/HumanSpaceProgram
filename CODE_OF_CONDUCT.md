@@ -6,15 +6,15 @@ The purpose of Human Space Program's Code of Conduct is to ensure a safe, kind, 
 
 ## Scope:
 
-This Code of Conduct applies to all project spaces, including but not limited to the github repository, discord server, and any future communication spaces not listed here.
+This Code of Conduct applies to all project spaces, including but not limited to the GitHub repository, discord server, and any future communication spaces not listed here.
 It also applies to people representing the project in public spaces. Don't be an ass. ;)
 
 ## Expected Behavior:
 
 All participants are expected to:
 
-- Be considerate, especially towards newcomers - consider the impact your actions might have on others.
-- Be collaborative. Work together to resolve conflicts and promote overall kindness.
+- **Be considerate, especially towards newcomers** - consider the impact your actions might have on others.
+- **Be collaborative** - Work together to resolve conflicts and promote overall kindness.
 
 ## Unacceptable Behavior:
 
