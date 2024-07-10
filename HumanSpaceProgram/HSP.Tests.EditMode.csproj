@@ -9,8 +9,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace>
-    </RootNamespace>
+    <RootNamespace></RootNamespace>
     <ProjectGuid>{04895474-C969-6D06-414D-33AF6BBD5578}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -63,7 +62,6 @@
     <Compile Include="Assets\Tests\EditMode\Core\Substances\SubstanceStateCollectionTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include=".editorconfig" />
     <None Include="Assets\Tests\EditMode\Tests.EditMode.asmdef" />
   </ItemGroup>
   <ItemGroup>

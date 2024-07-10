@@ -9,8 +9,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace>
-    </RootNamespace>
+    <RootNamespace></RootNamespace>
     <ProjectGuid>{C9E9530A-E4D2-A27F-5034-F7DEF1E2B040}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -144,7 +143,6 @@
     <Compile Include="Assets\HSP.Core\Components\FControlFrame.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include=".editorconfig" />
     <None Include="Assets\HSP.Core\___HSP.Core.asmdef" />
   </ItemGroup>
   <ItemGroup>

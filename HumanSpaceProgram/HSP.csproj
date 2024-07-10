@@ -9,8 +9,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace>
-    </RootNamespace>
+    <RootNamespace></RootNamespace>
     <ProjectGuid>{5294BE79-15AB-2AAE-E8C3-9E735E001D6D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -82,7 +81,7 @@
     <Compile Include="Assets\HSP\Components\FSequencer.cs" />
     <Compile Include="Assets\HSP\Components\FPointMass.cs" />
     <Compile Include="Assets\HSP\Components\F3AxisActuator.cs" />
-    <Compile Include="Assets\HSP\Cameras\GameplayCameraController.cs" />
+    <Compile Include="Assets\HSP\Cameras\OrbitingCameraController.cs" />
     <Compile Include="Assets\HSP\GameplayScene\GameplaySceneEscapeInputController.cs" />
     <Compile Include="Assets\HSP\GameplayScene\Tools\ConstructTool.cs" />
     <Compile Include="Assets\HSP\Components\FSequencer.SequenceAction.cs" />
@@ -118,9 +117,9 @@
     <Compile Include="Assets\HSP\PIDLoop.cs" />
     <Compile Include="Assets\HSP\AssetLoaders\GameDataJsonVesselFactory.cs" />
     <Compile Include="Assets\HSP\Components\FReactionControlController.cs" />
+    <Compile Include="Assets\HSP\Cameras\GameplaySceneCamera.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include=".editorconfig" />
     <None Include="Assets\HSP\CelestialBodies\Surface\TerrainShader.shader" />
     <None Include="Assets\HSP\Effects\Atmospheres\Atmosphere.shader" />
     <None Include="Assets\HSP\___HSP.asmdef" />
