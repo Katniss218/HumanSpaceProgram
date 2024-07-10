@@ -1,19 +1,24 @@
 ﻿using KSS.Core.ReferenceFrames;
+using KSS.Core.Serialization;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.DataHandlers;
 
 namespace KSS.Core.Components
 {
     /// <summary>
     /// Represents a coordinate system that can be used as the control frame for avionics.
     /// </summary>
-    public sealed class FControlFrame : MonoBehaviour, IPersistsData
+    public sealed class FControlFrame : MonoBehaviour
     {
+#warning TODO - save this (and in general handle this properly, with a selector in the UI where the player can click "control from here").
+#warning TODO - handle this appropriately (and per-control system)
         public static FControlFrame VesselControlFrame { get; set; }
 
         /// <summary>
@@ -36,18 +41,13 @@ namespace KSS.Core.Components
                 : SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( frame._referenceTransform.rotation );
         }
 
-        public SerializedData GetData( IReverseReferenceMap s )
+        [MapsInheritingFrom( typeof( FControlFrame ) )]
+        public static SerializationMapping FControlFrameMapping()
         {
-            return new SerializedObject()
+            return new MemberwiseSerializationMapping<FControlFrame>()
             {
-                { "reference_transform", s.WriteObjectReference( _referenceTransform ) }
+                ("reference_transform", new Member<FControlFrame, Transform>( ObjectContext.Ref, o => o._referenceTransform ))
             };
-        }
-
-        public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            if( data.TryGetValue( "reference_transform", out var referenceTransform ) )
-                _referenceTransform = (Transform)l.ReadObjectReference( referenceTransform );
         }
     }
 }

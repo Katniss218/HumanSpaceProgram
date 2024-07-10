@@ -2,6 +2,7 @@
 using KSS.Control.Controls;
 using KSS.Core;
 using KSS.Core.Components;
+using KSS.Core.Physics;
 using KSS.Core.ReferenceFrames;
 using System;
 using System.Collections.Generic;
@@ -87,7 +88,7 @@ namespace KSS.GameplayScene
     /// Manages the construction of its descendant <see cref="FConstructible"/>s.
     /// </summary>
     [DisallowMultipleComponent]
-    public class FConstructionSite : MonoBehaviour, IPersistsData
+    public class FConstructionSite : MonoBehaviour
     {
         /// <summary>
         /// The current state of (de)construction at this construction site.
@@ -321,30 +322,17 @@ namespace KSS.GameplayScene
             return false;
         }
 
-        public SerializedData GetData( IReverseReferenceMap s )
+        [MapsInheritingFrom( typeof( FConstructionSite ) )]
+        public static SerializationMapping FConstructionSiteMapping()
         {
-            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
-
-            ret.AddAll( new SerializedObject()
+            return new MemberwiseSerializationMapping<FConstructionSite>()
             {
-                { "state", this.State.GetData() },
-                { "build_speed", this.BuildSpeed.GetData() }
-            } );
+                ("state", new Member<FConstructionSite, ConstructionState>( o => o.State )),
 
-            return ret;
-        }
+                ("constructibles", new Member<FConstructionSite, object>( o => null, (o, value) => o._constructibles = AncestralMap<FConstructible>.Create( o.transform ).Keys.ToArray() )),
 
-        public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            IPersistent_Behaviour.SetData( this, data, l );
-
-            this._constructibles = AncestralMap<FConstructible>.Create( this.transform ).Keys.ToArray();
-
-            if( data.TryGetValue( "state", out var state ) )
-                this.State = state.AsEnum<ConstructionState>();
-
-            if( data.TryGetValue( "build_speed", out var buildSpeed ) )
-                this.BuildSpeed = buildSpeed.AsFloat();
+                ("build_speed", new Member<FConstructionSite, float>( o => o.BuildSpeed ))
+            };
         }
     }
 }

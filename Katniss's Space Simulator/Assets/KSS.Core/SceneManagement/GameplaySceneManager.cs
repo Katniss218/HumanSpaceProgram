@@ -6,7 +6,6 @@ namespace KSS.Core
     /// <summary>
     /// A Manager whose responsibility is to invoke the events relating to creation/destruction of the `gameplay` scene.
     /// </summary>
-    [RequireComponent( typeof( PreexistingReference ) )]
     public class GameplaySceneManager : SingletonMonoBehaviour<GameplaySceneManager>
     {
         public const string SCENE_NAME = "Testing And Shit"; // TODO - swap out for "Gameplay" when the part with creating and loading rockets is done.

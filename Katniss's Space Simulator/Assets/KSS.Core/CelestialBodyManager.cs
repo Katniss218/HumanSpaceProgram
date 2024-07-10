@@ -9,12 +9,10 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.DataHandlers;
-using UnityPlus.Serialization.Strategies;
 
 namespace KSS.Core
 {
-    [RequireComponent( typeof( PreexistingReference ) )]
-    public class CelestialBodyManager : SingletonMonoBehaviour<CelestialBodyManager>, IPersistsData
+    public class CelestialBodyManager : SingletonMonoBehaviour<CelestialBodyManager>
     {
         private Dictionary<string, CelestialBody> _celestialBodies = new Dictionary<string, CelestialBody>();
 
@@ -73,36 +71,21 @@ namespace KSS.Core
         }
 
 
-        public SerializedData GetData( IReverseReferenceMap s )
-        {
-            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
-
-            //ret.AddAll( new SerializedObject()
-
-            return ret;
-        }
-
-        public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            IPersistent_Behaviour.SetData( this, data, l );
-
-            //
-        }
-
-        private static readonly JsonSeparateFileSerializedDataHandler _celestialBodiesDataHandler = new JsonSeparateFileSerializedDataHandler();
-        private static readonly PreexistingGameObjectsStrategy _celestialBodiesStrat = new PreexistingGameObjectsStrategy( _celestialBodiesDataHandler, GetAllRootGameObjects );
-
         private static GameObject[] GetAllRootGameObjects()
         {
             return instance._celestialBodies.Values.Select( cb => cb.gameObject ).ToArray();
         }
-
+        /*
         [HSPEventListener( HSPEvent.TIMELINE_BEFORE_SAVE, HSPEvent.NAMESPACE_VANILLA + ".serialize_celestial_bodies" )]
         private static void OnBeforeSave( TimelineManager.SaveEventData e )
         {
+            JsonSerializedDataHandler _celestialBodiesDataHandler = new JsonSerializedDataHandler();
+
             Directory.CreateDirectory( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies" ) );
             _celestialBodiesDataHandler.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies", "object.json" );
             _celestialBodiesDataHandler.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies", "data.json" );
+
+            SerializationUnit _celestialBodiesStrat = SerializationUnit.FromObjects( GetAllRootGameObjects() );
             e.objectActions.Add( _celestialBodiesStrat.SaveAsync_Object );
             e.dataActions.Add( _celestialBodiesStrat.SaveAsync_Data );
         }
@@ -113,8 +96,10 @@ namespace KSS.Core
             Directory.CreateDirectory( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies" ) );
             _celestialBodiesDataHandler.ObjectsFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies", "object.json" );
             _celestialBodiesDataHandler.DataFilename = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "CelestialBodies", "data.json" );
+
+            SerializationUnit _vesselsStrat = SerializationUnit.FromData( GetAllRootGameObjects );
             e.objectActions.Add( _celestialBodiesStrat.LoadAsync_Object );
             e.dataActions.Add( _celestialBodiesStrat.LoadAsync_Data );
-        }
+        }*/
     }
 }

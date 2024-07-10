@@ -64,8 +64,8 @@ namespace UnityPlus.Serialization.ReferenceMaps
             if( id == Guid.Empty || obj.IsUnityNull() )
                 return;
 
-            _forward.Add( id, obj ); // same as setid
-            _reverse.Add( obj, id );
+            _forward[id] = obj; // same as setid
+            _reverse[obj] = id;
         }
 
         //
@@ -100,8 +100,8 @@ namespace UnityPlus.Serialization.ReferenceMaps
             if( obj.IsUnityNull() || id == Guid.Empty )
                 return;
 
-            _forward.Add( id, obj ); // same as setobj
-            _reverse.Add( obj, id );
+            _forward[id] = obj; // same as setobj
+            _reverse[obj] = id;
         }
     }
 }

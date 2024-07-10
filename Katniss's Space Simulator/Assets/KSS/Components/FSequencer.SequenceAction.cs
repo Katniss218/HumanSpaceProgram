@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityPlus.Serialization;
+using UnityEngine;
 
 namespace KSS.Components
 {
@@ -16,15 +17,10 @@ namespace KSS.Components
 	/// <remarks>
 	/// This class exists solely to allow polymorphism between the empty and T-typed sequence actions.
 	/// </remarks>
-    public abstract class SequenceActionBase : ControlGroup, IPersistsObjects, IPersistsData // pass-through group with a single element. Required to be drawn.
+    public abstract class SequenceActionBase : ControlGroup // pass-through group with a single element. Required to be drawn.
     {
         public abstract ControllerOutputBase OnInvoke { get; }
         public abstract void TryInvoke();
-
-        public abstract SerializedObject GetObjects( IReverseReferenceMap s );
-        public abstract void SetObjects( SerializedObject data, IForwardReferenceMap l );
-        public abstract SerializedData GetData( IReverseReferenceMap s );
-        public abstract void SetData( SerializedData data, IForwardReferenceMap l );
     }
 
     /// <summary>
@@ -42,42 +38,20 @@ namespace KSS.Components
             OnInvokeTyped.TrySendSignal();
         }
 
-        public override SerializedObject GetObjects( IReverseReferenceMap s )
+        [MapsInheritingFrom( typeof( SequenceAction ) )]
+        public static SerializationMapping SequenceActionMapping()
         {
-            SerializedObject data = Persistent_object.WriteObjectStub( this, this.GetType(), s );
-
-            data.AddAll( new SerializedObject()
+            return new MemberwiseSerializationMapping<SequenceAction>()
             {
-                { "on_invoke", Persistent_object.WriteObjectStub( OnInvokeTyped, s ) }
-            } );
-
-            return data;
-        }
-
-        public override void SetObjects( SerializedObject data, IForwardReferenceMap l )
-        {
-            if( data.TryGetValue<SerializedObject>( "on_invoke", out var onInvokeTyped ) )
-            {
-                OnInvokeTyped = ObjectFactory.AsObject<ControllerOutput>( onInvokeTyped, l );
-                //OnInvokeTyped = new();
-                //l.SetObj( onInvokeTyped.ToGuid(), OnInvokeTyped );
-            }
-        }
-
-        public override SerializedData GetData( IReverseReferenceMap s )
-        {
-            return new SerializedObject() { };
-        }
-
-        public override void SetData( SerializedData data, IForwardReferenceMap l )
-        {
+                ("on_invoke", new Member<SequenceAction, ControllerOutput>( o => o.OnInvokeTyped ))
+            };
         }
     }
 
     /// <summary>
     /// Represents a sequence action that sends a signal of type T.
     /// </summary>
-    public class SequenceAction<T> : SequenceActionBase, IPersistsObjects, IPersistsData
+    public class SequenceAction<T> : SequenceActionBase
     {
         public override ControllerOutputBase OnInvoke => OnInvokeTyped;
 
@@ -90,42 +64,18 @@ namespace KSS.Components
         {
             OnInvokeTyped.TrySendSignal( SignalValue );
         }
+    }
 
-        public override SerializedObject GetObjects( IReverseReferenceMap s )
+    public static class Mappings_SequenceAction_T_
+    {
+        [MapsInheritingFrom( typeof( SequenceAction<> ) )]
+        public static SerializationMapping SequenceActionMapping<T>()
         {
-            SerializedObject data = Persistent_object.WriteObjectStub( this, this.GetType(), s );
-
-            data.AddAll( new SerializedObject()
+            return new MemberwiseSerializationMapping<SequenceAction<T>>()
             {
-                { "on_invoke", Persistent_object.WriteObjectStub( OnInvokeTyped, s ) }
-            } );
-
-            return data;
-        }
-
-        public override void SetObjects( SerializedObject data, IForwardReferenceMap l )
-        {
-            if( data.TryGetValue<SerializedObject>( "on_invoke", out var onInvokeTyped ) )
-            {
-                OnInvokeTyped = ObjectFactory.AsObject<ControllerOutput<T>>( onInvokeTyped, l );
-            }
-        }
-
-        public override SerializedData GetData( IReverseReferenceMap s )
-        {
-            return new SerializedObject()
-            {
-                { "signal_value", this.SignalValue.GetData( s ) }
+                ("on_invoke", new Member<SequenceAction<T>, ControllerOutput<T>>( o => o.OnInvokeTyped )),
+                ("signal_value", new Member<SequenceAction<T>, T>( o => o.SignalValue ))
             };
-        }
-
-        public override void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            if( data.TryGetValue( "signal_value", out var signalValue ) )
-            {
-                SignalValue = Activator.CreateInstance<T>(); // TODO - Provide a way of inline serialization. Maybe via 'new()' constraint.
-                SignalValue.SetData( signalValue, l );
-            }
         }
     }
 }

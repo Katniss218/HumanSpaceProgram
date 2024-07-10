@@ -83,7 +83,7 @@ namespace KSS.Core
 		[SerializeField]
 		Collider[] _partsWithCollider; // TODO - this probably should be a dictionary with type as input, for modding support.
 
-		public event Action OnAfterRecalculateParts;
+		public Action OnAfterRecalculateParts;
 
 #warning TODO - Accumulatable values - https://github.com/Katniss218/HumanSpaceProgram/issues/19
 		/*

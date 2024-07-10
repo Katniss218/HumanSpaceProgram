@@ -17,7 +17,7 @@ namespace KSS.Core.ReferenceFrames
     /// Add this to any object that is supposed to be affected by the <see cref="SceneReferenceFrameManager"/>.
     /// </remarks>
     [DisallowMultipleComponent]
-    public class RootObjectTransform : MonoBehaviour, IPersistsData, IReferenceFrameSwitchResponder
+    public class RootObjectTransform : MonoBehaviour, IReferenceFrameSwitchResponder
     {
         // Should to be added to any root object that is an actual [physical] object in the scene (not UI elements, empties, etc).
 
@@ -115,28 +115,14 @@ namespace KSS.Core.ReferenceFrames
             UpdateSceneRotation();
         }
 
-        public SerializedData GetData( IReverseReferenceMap s )
+        [MapsInheritingFrom( typeof( RootObjectTransform ) )]
+        public static SerializationMapping RootObjectTransformMapping()
         {
-            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
-
-            ret.AddAll( new SerializedObject()
+            return new MemberwiseSerializationMapping<RootObjectTransform>()
             {
-                { "airf_position", this.AIRFPosition.GetData() },
-                { "airf_rotation", this.AIRFRotation.GetData() }
-            } );
-
-            return ret;
-        }
-
-        public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            IPersistent_Behaviour.SetData( this, data, l );
-
-            if( data.TryGetValue( "airf_position", out var airfPosition ) )
-                this.AIRFPosition = airfPosition.AsVector3Dbl();
-
-            if( data.TryGetValue( "airf_rotation", out var airfRotation ) )
-                this.AIRFRotation = airfRotation.AsQuaternionDbl();
+                ("airf_position", new Member<RootObjectTransform, Vector3Dbl>( o => o.AIRFPosition )),
+                ("airf_rotation", new Member<RootObjectTransform, QuaternionDbl>( o => o.AIRFRotation )),
+            };
         }
     }
 }

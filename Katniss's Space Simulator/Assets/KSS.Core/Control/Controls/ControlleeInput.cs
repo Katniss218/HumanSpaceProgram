@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 using UnityPlus.Serialization;
 
 namespace KSS.Control.Controls
@@ -11,7 +12,7 @@ namespace KSS.Control.Controls
 	/// <summary>
 	/// Represents a control that consumes an empty control signal.
 	/// </summary>
-	public sealed class ControlleeInput : ControlleeInputBase, IPersistsData
+	public sealed class ControlleeInput : ControlleeInputBase
     {
 		internal Action onInvoke;
 
@@ -62,32 +63,6 @@ namespace KSS.Control.Controls
             return true;
         }
 
-        public SerializedData GetData( IReverseReferenceMap s )
-        {
-            SerializedArray sa = new SerializedArray();
-            foreach( var conn in outputs )
-            {
-                sa.Add( s.WriteObjectReference( conn ) );
-            }
-            return new SerializedObject()
-            {
-                { "connects_to", sa }
-            };
-        }
-
-        public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            if( data.TryGetValue( "connects_to", out var connectsTo ) )
-            {
-                this.outputs.Clear();
-                foreach( var conn in (SerializedArray)connectsTo )
-                {
-                    var c = (ControllerOutput)l.ReadObjectReference( conn );
-                    Connect( this, c );
-                }
-            }
-        }
-
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         internal static void Disconnect( ControllerOutput output )
         {
@@ -104,5 +79,31 @@ namespace KSS.Control.Controls
             output.Input = input;
             input.outputs.Add( output );
         }
+
+        [MapsInheritingFrom( typeof( ControlleeInput ) )]
+        public static SerializationMapping ControlleeInputMapping()
+        {
+            return new MemberwiseSerializationMapping<ControlleeInput>()
+            {
+                ("on_invoke", new Member<ControlleeInput, Action>( o => o.onInvoke )),
+                ("connects_to", new Member<ControlleeInput, ControllerOutput[]>( ArrayContext.Refs, o => o.outputs.ToArray(), (o, value) =>
+                {
+                    foreach( var c in value )
+                    {
+                        ControlleeInput.Connect( o, c );
+                    }
+                } ))
+            }
+            .WithFactory( ( data, l ) => // Either this, or use mapping that instantiates on reference pass.
+            {
+                if( data == null )
+                    return null;
+
+                Action onInvoke = (Action)Persistent_Delegate.ToDelegate( data["on_invoke"], l.RefMap );
+
+                return new ControlleeInput( onInvoke );
+            } );
+        }
+
     }
 }

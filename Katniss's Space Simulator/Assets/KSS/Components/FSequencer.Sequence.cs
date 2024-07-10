@@ -13,7 +13,7 @@ namespace KSS.Components
     /// <summary>
     /// A sequence contained within a <see cref="FSequencer"/>.
     /// </summary>
-    public class Sequence : ControlGroup, IPersistsObjects, IPersistsData
+    public class Sequence : ControlGroup
     {
         [NamedControl( "Elements", Editable = false )]
         public List<SequenceElement> Elements = new();
@@ -78,58 +78,14 @@ namespace KSS.Components
             return false;
         }
 
-        public SerializedObject GetObjects( IReverseReferenceMap s )
+        [MapsInheritingFrom( typeof( Sequence ) )]
+        public static SerializationMapping SequenceMapping()
         {
-            SerializedArray array = new SerializedArray( Elements.Select( e => e.GetObjects( s ) ) );
-
-            return new SerializedObject()
+            return new MemberwiseSerializationMapping<Sequence>()
             {
-                { "elements", array }
+                ("elements", new Member<Sequence, SequenceElement[]>( o => o.Elements.ToArray(), (o, value) => o.Elements = value.ToList() )),
+                ("current", new Member<Sequence, int>( o => o.Current ))
             };
-        }
-
-        public void SetObjects( SerializedObject data, IForwardReferenceMap l )
-        {
-            if( data.TryGetValue<SerializedArray>( "elements", out var elements ) )
-            {
-                Elements = new();
-                foreach( var serElem in elements.Cast<SerializedObject>() )
-                {
-                    SequenceElement elem = serElem.AsObject<SequenceElement>( l );
-
-                    elem.SetObjects( serElem, l );
-
-                    Elements.Add( elem );
-                }
-            }
-        }
-
-        public SerializedData GetData( IReverseReferenceMap s )
-        {
-            SerializedArray array = new SerializedArray( Elements.Select( e => e.GetData( s ) ) );
-
-            return new SerializedObject()
-            {
-                { "current", Current.GetData() },
-                { "elements", array }
-            };
-        }
-
-        public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            if( data.TryGetValue( "current", out var current ) )
-                Current = current.AsInt32();
-
-            if( data.TryGetValue<SerializedArray>( "elements", out var elements ) )
-            {
-                int i = 0;
-                foreach( var serElem in elements.Cast<SerializedObject>() )
-                {
-                    Elements[i].SetData( serElem, l );
-
-                    i++;
-                }
-            }
         }
     }
 }

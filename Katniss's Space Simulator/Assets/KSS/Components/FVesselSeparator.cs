@@ -7,7 +7,7 @@ using UnityPlus.Serialization;
 
 namespace KSS.Components
 {
-    public class FVesselSeparator : MonoBehaviour, IPersistsObjects, IPersistsData
+    public class FVesselSeparator : MonoBehaviour
     {
         bool _hasSeparated = false;
 
@@ -29,45 +29,14 @@ namespace KSS.Components
             Separate = new ControlleeInput( SeparateListener );
         }
 
-        public SerializedObject GetObjects( IReverseReferenceMap s )
+        [MapsInheritingFrom( typeof( FVesselSeparator ) )]
+        public static SerializationMapping FVesselSeparatorMapping()
         {
-            return new SerializedObject()
+            return new MemberwiseSerializationMapping<FVesselSeparator>()
             {
-                { "separate", s.GetID( Separate ).GetData() },
+                ("separate", new Member<FVesselSeparator, ControlleeInput>( o => o.Separate )),
+                ("has_separated", new Member<FVesselSeparator, bool>( o => o._hasSeparated ))
             };
-        }
-
-        public void SetObjects( SerializedObject data, IForwardReferenceMap l )
-        {
-            if( data.TryGetValue( "separate", out var separate ) )
-            {
-                Separate = new( SeparateListener );
-                l.SetObj( separate.AsGuid(), Separate );
-            }
-        }
-
-        public SerializedData GetData( IReverseReferenceMap s )
-        {
-            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
-
-            ret.AddAll( new SerializedObject()
-            {
-                { "has_separated", _hasSeparated.GetData() },
-                { "separate", Separate.GetData( s ) }
-            } );
-
-            return ret;
-        }
-
-        public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            IPersistent_Behaviour.SetData( this, data, l );
-
-            if( data.TryGetValue( "has_separated", out var hasSeparated ) )
-                _hasSeparated = hasSeparated.AsBoolean();
-
-            if( data.TryGetValue( "separate", out var separate ) )
-                Separate.SetData( separate, l );
         }
     }
 }

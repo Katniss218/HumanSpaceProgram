@@ -135,17 +135,17 @@ namespace UnityPlus.Serialization.Json
             if( SeekCompare( "false" ) )
             {
                 Advance( "false".Length );
-                return (SerializedPrimitive)false;
+                return (SerializedData)false;
             }
             if( SeekCompare( "true" ) )
             {
                 Advance( "true".Length );
-                return (SerializedPrimitive)true;
+                return (SerializedData)true;
             }
             if( SeekCompare( "null" ) )
             {
                 Advance( "null".Length );
-                return (SerializedPrimitive)null;
+                return (SerializedData)null;
             }
             if( _currentChar == '[' )
             {
@@ -324,11 +324,12 @@ namespace UnityPlus.Serialization.Json
             }
 
             int len2 = _pos - start - 1;
-            //string val = _s[start.._pos];
             if( sb != null && len2 > 0 ) // append last section, if not empty
                 sb.Append( _s.Substring( start + 1, len2 ) );
 
-            string val = sb == null ? _s.Substring( start, _pos - start ) : sb.ToString();
+            string val = sb == null
+                ? _s.Substring( start, _pos - start )
+                : sb.ToString();
 
             Contract.Assert( _currentChar == '"' );
             Advance();

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KSS.Core.ResourceFlowSystem;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,8 +13,7 @@ namespace KSS.Core
     /// <summary>
     /// Manages the speed at which the time flows.
     /// </summary>
-    [RequireComponent( typeof( PreexistingReference ) )]
-    public class TimeStepManager : SingletonMonoBehaviour<TimeStepManager>, IPersistsData
+    public class TimeStepManager : SingletonMonoBehaviour<TimeStepManager>
     {
         public struct TimeScaleChangedData
         {
@@ -179,24 +179,14 @@ namespace KSS.Core
             UT += FixedDeltaTime;
         }
 
-        public SerializedData GetData( IReverseReferenceMap s )
-        {
-            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
 
-            ret.AddAll( new SerializedObject()
+        [MapsInheritingFrom( typeof( TimeStepManager ) )]
+        public static SerializationMapping TimeStepManagerMapping()
+        {
+            return new MemberwiseSerializationMapping<TimeStepManager>()
             {
-                { "ut", UT.GetData() }
-            } );
-
-            return ret;
-        }
-
-        public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            IPersistent_Behaviour.SetData( this, data, l );
-
-            if( data.TryGetValue( "ut", out var ut ) )
-                UT = ut.AsDouble();
+                ("ut", new Member<TimeStepManager, double>( o => TimeStepManager.UT, (o, value) => TimeStepManager.UT = value ))
+            };
         }
     }
 }

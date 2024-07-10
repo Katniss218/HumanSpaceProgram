@@ -13,30 +13,10 @@ namespace KSS.Core.Components
     /// <summary>
     /// A marker component to track parts.
     /// </summary>
-    public class FPart : MonoBehaviour, IPersistsData
+    public class FPart : MonoBehaviour
     {
         [field: SerializeField]
         public NamespacedIdentifier PartID { get; set; }
-
-        public SerializedData GetData( IReverseReferenceMap s )
-        {
-            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
-
-            ret.AddAll( new SerializedObject()
-            {
-                { "part_id", this.PartID.GetData() }
-            } );
-
-            return ret;
-        }
-
-        public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            IPersistent_Behaviour.SetData( this, data, l );
-
-            if( data.TryGetValue( "part_id", out var partId ) )
-                this.PartID = partId.AsNamespacedIdentifier();
-        }
 
         public static PartMetadata GetPart( Transform obj )
         {
@@ -50,6 +30,15 @@ namespace KSS.Core.Components
                 obj = obj.parent;
             }
             return null;
+        }
+
+        [MapsInheritingFrom( typeof( FPart ) )]
+        public static SerializationMapping FPartMapping()
+        {
+            return new MemberwiseSerializationMapping<FPart>()
+            {
+                ("part_id", new Member<FPart, NamespacedIdentifier>( o => o.PartID ))
+            };
         }
     }
 }

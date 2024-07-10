@@ -7,11 +7,12 @@ using UnityPlus.Input;
 using UnityPlus.Serialization;
 using KSS.Control;
 using KSS.Control.Controls;
+using static KSS.Components.FGimbalActuatorController;
 
 namespace KSS.Components
 {
     [Serializable]
-    public class FRocketEngine : MonoBehaviour, IResourceConsumer, IPersistsObjects, IPersistsData
+    public class FRocketEngine : MonoBehaviour, IResourceConsumer
     {
         const float g = 9.80665f;
 
@@ -92,59 +93,18 @@ namespace KSS.Components
             return FluidState.Vacuum; // temp, inlet condition (possible backflow, etc).
         }
 
-        public SerializedObject GetObjects( IReverseReferenceMap s )
+
+        [MapsInheritingFrom( typeof( FRocketEngine ) )]
+        public static SerializationMapping FRocketEngineMapping()
         {
-            return new SerializedObject()
+            return new MemberwiseSerializationMapping<FRocketEngine>()
             {
-                { "set_throttle", s.GetID( SetThrottle ).GetData() },
+                ("max_thrust", new Member<FRocketEngine, float>( o => o.MaxThrust )),
+                ("set_throttle", new Member<FRocketEngine, ControlleeInput<float>>( o => o.SetThrottle )),
+                ("isp", new Member<FRocketEngine, float>( o => o.Isp )),
+                ("throttle", new Member<FRocketEngine, float>( o => o.Throttle )),
+                ("thrust_transform", new Member<FRocketEngine, Transform>( ObjectContext.Ref, o => o.ThrustTransform ))
             };
-        }
-
-        public void SetObjects( SerializedObject data, IForwardReferenceMap l )
-        {
-            if( data.TryGetValue( "set_throttle", out var setThrottle ) )
-            {
-                SetThrottle = new( SetThrottleListener );
-                l.SetObj( setThrottle.AsGuid(), SetThrottle );
-            }
-        }
-
-        public SerializedData GetData( IReverseReferenceMap s )
-        {
-            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
-
-            SetThrottle ??= new ControlleeInput<float>( SetThrottleListener );
-
-            ret.AddAll( new SerializedObject()
-            {
-                { "max_thrust", this.MaxThrust.GetData() },
-                { "isp", this.Isp.GetData() },
-                { "throttle", this.Throttle.GetData() },
-                { "thrust_transform", s.WriteObjectReference( this.ThrustTransform ) },
-                { "set_throttle", this.SetThrottle.GetData( s ) }
-            } );
-
-            return ret;
-        }
-
-        public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            IPersistent_Behaviour.SetData( this, data, l );
-
-            if( data.TryGetValue( "max_thrust", out var maxThrust ) )
-                this.MaxThrust = maxThrust.AsFloat();
-
-            if( data.TryGetValue( "isp", out var isp ) )
-                this.Isp = isp.AsFloat();
-
-            if( data.TryGetValue( "throttle", out var throttle ) )
-                this.Throttle = throttle.AsFloat();
-
-            if( data.TryGetValue( "thrust_transform", out var thrustTransform ) )
-                this.ThrustTransform = (Transform)l.ReadObjectReference( thrustTransform );
-
-            if( data.TryGetValue( "set_throttle", out var setThrottle ) )
-                this.SetThrottle.SetData( setThrottle, l );
         }
     }
 }

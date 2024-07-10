@@ -9,7 +9,6 @@ using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.DataHandlers;
-using UnityPlus.Serialization.Strategies;
 
 namespace KSS.AssetLoaders
 {
@@ -17,20 +16,14 @@ namespace KSS.AssetLoaders
     /// Finds and registers json parts in GameData.
     /// </summary>
     public sealed class GameDataJsonVesselFactory : PartFactory
-    {
-        private static JsonSeparateFileSerializedDataHandler _handler = new JsonSeparateFileSerializedDataHandler();
-        private static SingleExplicitHierarchyStrategy _strat = new SingleExplicitHierarchyStrategy( _handler, () => throw new NotSupportedException( $"Tried to save something using a part *loader*" ) );
-
-        private static Loader _loader = new Loader( null, null, null, _strat.Load_Object, _strat.Load_Data );
-
+    {        
         private string _vesselId;
 
         public override PartMetadata LoadMetadata()
         {
-            VesselMetadata vesselMetadata = new VesselMetadata( _vesselId );
-            vesselMetadata.ReadDataFromDisk();
+            VesselMetadata vesselMetadata = VesselMetadata.LoadFromDisk( _vesselId );
 
-            PartMetadata partMeta = new PartMetadata( vesselMetadata.GetRootDirectory() + "/" + _vesselId );
+            PartMetadata partMeta = new PartMetadata( Path.Combine( vesselMetadata.GetRootDirectory(), _vesselId ) );
             partMeta.Name = vesselMetadata.Name;
             return partMeta;
         }
@@ -39,11 +32,10 @@ namespace KSS.AssetLoaders
         {
             string filePath = VesselMetadata.GetRootDirectory( _vesselId );
 
-            _handler.ObjectsFilename = Path.Combine( filePath, "objects.json" );
-            _handler.DataFilename = Path.Combine( filePath, "data.json" );
-            _loader.RefMap = refMap;
-            _loader.Load();
-            return _strat.LastSpawnedRoot;
+            var data = new JsonSerializedDataHandler( Path.Combine( filePath, "gameobjects.json" ) )
+                .Read();
+
+            return SerializationUnit.Deserialize<GameObject>( data, refMap );
         }
 
         [HSPEventListener( HSPEvent.STARTUP_IMMEDIATELY, HSPEvent.NAMESPACE_VANILLA + ".load_vessels" )]

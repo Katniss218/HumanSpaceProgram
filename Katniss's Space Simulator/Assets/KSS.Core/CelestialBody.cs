@@ -1,5 +1,6 @@
 ﻿using KSS.Core.ReferenceFrames;
 using KSS.Core.SceneManagement;
+using KSS.Core.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,9 +11,8 @@ using UnityPlus.Serialization;
 
 namespace KSS.Core
 {
-    [RequireComponent( typeof( UnityPlus.Serialization.PreexistingReference ) )]
     [RequireComponent( typeof( RootObjectTransform ) )]
-    public class CelestialBody : MonoBehaviour, IPersistsData
+    public class CelestialBody : MonoBehaviour
     {
         /// <summary>
         /// Gets the current global position of the celestial body.
@@ -55,12 +55,10 @@ namespace KSS.Core
         public double Radius { get; internal set; }
 
         RootObjectTransform _rootTransform;
-        PreexistingReference _ref;
 
         void Awake()
         {
             _rootTransform = this.GetComponent<RootObjectTransform>();
-            _ref = this.GetComponent<PreexistingReference>();
         }
 
         void Start()
@@ -94,20 +92,12 @@ namespace KSS.Core
         /// </summary>
         public IReferenceFrame OrientedReferenceFrame => new OrientedReferenceFrame( this.AIRFPosition, this.AIRFRotation );
 
-        public SerializedData GetData( IReverseReferenceMap s )
+        [MapsInheritingFrom( typeof( CelestialBody ) )]
+        public static SerializationMapping CelestialBodyMapping()
         {
-            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
-
-           // ret.AddAll( new SerializedObject()
-
-            return ret;
-        }
-
-        public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            IPersistent_Behaviour.SetData( this, data, l );
-
-            //
+            return new MemberwiseSerializationMapping<CelestialBody>()
+            {
+            };
         }
     }
 }

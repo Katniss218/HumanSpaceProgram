@@ -2,11 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityPlus.OverridableEvents;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.ReferenceMaps;
-using UnityPlus.Serialization.Strategies;
 
 namespace KSS.Core.Serialization
 {
@@ -15,25 +15,27 @@ namespace KSS.Core.Serialization
     /// </summary>
     public class TimelineManager : SingletonMonoBehaviour<TimelineManager>
     {
+        public struct NewEventData
+        {
+            public string timelineId;
+            public string saveId;
+
+            public NewEventData( string timelineId, string saveId )
+            {
+                this.timelineId = timelineId;
+                this.saveId = saveId;
+            }
+        }
+
         public struct SaveEventData
         {
             public string timelineId;
             public string saveId;
-            /// <summary>
-            /// Use these to add save actions of the object stage.
-            /// </summary>
-            public List<IAsyncSaver.Action> objectActions;
-            /// <summary>
-            /// Use these to add save actions of the data stage.
-            /// </summary>
-            public List<IAsyncSaver.Action> dataActions;
 
             public SaveEventData( string timelineId, string saveId )
             {
                 this.timelineId = timelineId;
                 this.saveId = saveId;
-                this.objectActions = new List<IAsyncSaver.Action>();
-                this.dataActions = new List<IAsyncSaver.Action>();
             }
         }
 
@@ -41,77 +43,50 @@ namespace KSS.Core.Serialization
         {
             public string timelineId;
             public string saveId;
-            /// <summary>
-            /// Use these to add load actions of the object stage.
-            /// </summary>
-            public List<IAsyncLoader.Action> objectActions;
-            /// <summary>
-            /// Use these to add load actions of the data stage.
-            /// </summary>
-            public List<IAsyncLoader.Action> dataActions;
 
             public LoadEventData( string timelineId, string saveId )
             {
                 this.timelineId = timelineId;
                 this.saveId = saveId;
-                this.objectActions = new List<IAsyncLoader.Action>();
-                this.dataActions = new List<IAsyncLoader.Action>();
             }
         }
 
         /// <summary>
         /// Checks if a timeline is currently being either saved or loaded.
         /// </summary>
-        public static bool IsSavingOrLoading =>
-                (_saver != null && _saver.CurrentState != ISaver.State.Idle)
-             || (_loader != null && _loader.CurrentState != ILoader.State.Idle);
+        public static bool IsSavingOrLoading { get; private set; }
 
+        /// <summary>
+        /// Gets the currently active timeline.
+        /// </summary>
         public static TimelineMetadata CurrentTimeline { get; private set; }
 
-        private static AsyncSaver _saver;
-        private static AsyncLoader _loader;
+        /// <summary>
+        /// Gets the currently active save (if any).
+        /// </summary>
+        public static SaveMetadata CurrentSave { get; private set; }
 
         private static bool _wasPausedBeforeSerializing = false;
 
+        public static BidirectionalReferenceStore RefStore { get; private set; }
+
         public static void SaveLoadStartFunc()
         {
+            IsSavingOrLoading = true;
             _wasPausedBeforeSerializing = TimeStepManager.IsPaused;
             TimeStepManager.Pause();
             TimeStepManager.LockTimescale = true;
         }
 
-        public static void SaveFinishFunc()
+        public static void SaveLoadFinishFunc()
         {
             TimeStepManager.LockTimescale = false;
             if( !_wasPausedBeforeSerializing )
             {
                 TimeStepManager.Unpause();
             }
-            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_SAVE, _eSave ); // invoke here because otherwise the invoking method finishes before the coroutine.
+            IsSavingOrLoading = false;
         }
-
-        public static void LoadFinishFunc()
-        {
-            TimeStepManager.LockTimescale = false;
-            if( !_wasPausedBeforeSerializing )
-            {
-                TimeStepManager.Unpause();
-            }
-            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_LOAD, _eLoad ); // invoke here because otherwise the invoking method finishes before the coroutine.
-        }
-
-        private static void CreateSaver( IEnumerable<IAsyncSaver.Action> objectActions, IEnumerable<IAsyncSaver.Action> dataActions )
-        {
-            _saver = new AsyncSaver( null, SaveLoadStartFunc, SaveFinishFunc, objectActions, dataActions );
-        }
-
-        private static void CreateLoader( IEnumerable<IAsyncLoader.Action> objectActions, IEnumerable<IAsyncLoader.Action> dataActions )
-        {
-            _loader = new AsyncLoader( null, SaveLoadStartFunc, LoadFinishFunc, objectActions, dataActions );
-        }
-
-        private static SaveEventData _eSave;
-        private static LoadEventData _eLoad;
 
         /// <summary>
         /// Asynchronously saves the current game state over multiple frames. <br/>
@@ -130,19 +105,22 @@ namespace KSS.Core.Serialization
 
             Directory.CreateDirectory( SaveMetadata.GetRootDirectory( timelineId, saveId ) );
 
-            _eSave = new SaveEventData( timelineId, saveId );
-            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_SAVE, _eSave );
-            CreateSaver( _eSave.objectActions, _eSave.dataActions );
+            var eSave = new SaveEventData( timelineId, saveId );
+            RefStore = new BidirectionalReferenceStore();
 
-            _saver.RefMap = new ReverseReferenceStore();
-            _saver.SaveAsync( instance );
+            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_SAVE, eSave );
+            SaveLoadStartFunc();
+            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_SAVE, eSave );
+            SaveLoadFinishFunc();
+            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_SAVE, eSave );
 
-            CurrentTimeline.WriteToDisk();
+            CurrentTimeline.SaveToDisk();
             SaveMetadata savedSave = new SaveMetadata( timelineId, saveId );
             savedSave.Name = saveName;
             savedSave.Description = saveDescription;
             savedSave.FileVersion = SaveMetadata.CURRENT_SAVE_FILE_VERSION;
-            savedSave.WriteToDisk();
+            savedSave.SaveToDisk();
+            CurrentSave = savedSave;
         }
 
         /// <summary>
@@ -162,18 +140,20 @@ namespace KSS.Core.Serialization
 
             Directory.CreateDirectory( SaveMetadata.GetRootDirectory( timelineId, saveId ) );
 
-            TimelineMetadata loadedTimeline = new TimelineMetadata( timelineId );
-            loadedTimeline.ReadDataFromDisk();
-            SaveMetadata loadedSave = new SaveMetadata( timelineId, saveId );
-            loadedSave.ReadDataFromDisk();
+            TimelineMetadata loadedTimeline = TimelineMetadata.LoadFromDisk( timelineId );
+            SaveMetadata loadedSave = SaveMetadata.LoadFromDisk( timelineId, saveId );
 
-            _eLoad = new LoadEventData( timelineId, saveId );
-            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_LOAD, _eLoad );
-            CreateLoader( _eLoad.objectActions, _eLoad.dataActions );
+            var eLoad = new LoadEventData( timelineId, saveId );
+            RefStore = new BidirectionalReferenceStore();
 
-            _loader.RefMap = new ForwardReferenceStore();
-            _loader.LoadAsync( instance );
+            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_LOAD, eLoad );
+            SaveLoadStartFunc();
+            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_LOAD, eLoad );
+            SaveLoadFinishFunc();
+            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_LOAD, eLoad );
+
             CurrentTimeline = loadedTimeline;
+            CurrentSave = loadedSave;
         }
 
         /// <summary>
@@ -194,10 +174,16 @@ namespace KSS.Core.Serialization
             newTimeline.Name = timelineName;
             newTimeline.Description = timelineDescription;
 
-            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_NEW );
+            var eNew = new NewEventData( timelineId, saveId );
+            RefStore = new BidirectionalReferenceStore();
 
+            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_BEFORE_NEW, eNew );
+            SaveLoadStartFunc();
+            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_NEW, eNew );
+            SaveLoadFinishFunc();
+            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_NEW, eNew );
             CurrentTimeline = newTimeline;
-            HSPEvent.EventManager.TryInvoke( HSPEvent.TIMELINE_AFTER_NEW );
+            CurrentSave = null;
         }
     }
 }

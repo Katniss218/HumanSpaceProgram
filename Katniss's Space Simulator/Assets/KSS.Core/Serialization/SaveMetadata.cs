@@ -1,4 +1,6 @@
-﻿using System;
+﻿using KSS.Core.Components;
+using KSS.Core.Mods;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.DataHandlers;
 using UnityPlus.Serialization.Json;
 
 namespace KSS.Core.Serialization
@@ -115,8 +118,7 @@ namespace KSS.Core.Serialization
             {
                 try
                 {
-                    SaveMetadata saveMetadata = new SaveMetadata( timelineId, saveDirPath );
-                    saveMetadata.ReadDataFromDisk();
+                    SaveMetadata saveMetadata = SaveMetadata.LoadFromDisk( timelineId, saveDirPath );
                     saves.Add( saveMetadata );
                 }
                 catch( Exception ex )
@@ -129,77 +131,39 @@ namespace KSS.Core.Serialization
             return saves;
         }
 
-        public void WriteToDisk()
+        public static SaveMetadata LoadFromDisk( string timelineId, string saveId )
         {
-            string savePath = GetRootDirectory();
-            string saveFilePath = Path.Combine( savePath, SAVE_FILENAME );
+#warning TODO - guard against files that might've been deleted.
+            string saveFilePath = Path.Combine( GetRootDirectory( timelineId, saveId ), SAVE_FILENAME );
 
-            StringBuilder sb = new StringBuilder();
-            new JsonStringWriter( this.GetData(), sb ).Write();
+            SaveMetadata saveMetadata = new SaveMetadata( timelineId, saveId );
 
-            File.WriteAllText( saveFilePath, sb.ToString(), Encoding.UTF8 );
-            /*Saver saver = new Saver( null, null, null, ( s ) =>
-            {
-                StringBuilder sb = new StringBuilder();
-                new JsonStringWriter( this.GetData( s ), sb ).Write();
-
-                File.WriteAllText( saveFilePath, sb.ToString(), Encoding.UTF8 );
-            } );
-            saver.Save();*/
+            JsonSerializedDataHandler handler = new JsonSerializedDataHandler( saveFilePath );
+            var data = handler.Read();
+            SerializationUnit.Populate( saveMetadata, data );
+            return saveMetadata;
         }
 
-        public void ReadDataFromDisk()
+        public void SaveToDisk()
         {
-            string savePath = GetRootDirectory();
-            string saveFilePath = Path.Combine( savePath, SAVE_FILENAME );
+            string saveFilePath = Path.Combine( GetRootDirectory(), SAVE_FILENAME );
 
-            string saveJson = File.ReadAllText( saveFilePath, Encoding.UTF8 );
+            var data = SerializationUnit.Serialize( this );
 
-            SerializedData data = new JsonStringReader( saveJson ).Read();
-
-            this.SetData( data );
-            /*Loader loader = new Loader( null, null, null, ( l ) =>
-            {
-                this.SetData( l, data );
-            } );
-            loader.Load();*/
+            JsonSerializedDataHandler handler = new JsonSerializedDataHandler( saveFilePath );
+            handler.Write( data );
         }
 
-        public SerializedData GetData()
+        [MapsInheritingFrom( typeof( SaveMetadata ) )]
+        public static SerializationMapping SaveMetadataMapping()
         {
-            SerializedObject modVersions = new SerializedObject();
-            foreach( var elemKvp in this.ModVersions )
+            return new MemberwiseSerializationMapping<SaveMetadata>()
             {
-                modVersions.Add( elemKvp.Key, elemKvp.Value.GetData() );
-            }
-            return new SerializedObject()
-            {
-                { "name", this.Name.GetData() },
-                { "description", this.Description.GetData() },
-                { "file_version", this.FileVersion.GetData() },
-                { "mod_versions", modVersions }
+                ("name", new Member<SaveMetadata, string>( o => o.Name )),
+                ("description", new Member<SaveMetadata, string>( o => o.Description )),
+                ("file_version", new Member<SaveMetadata, Version>( o => o.FileVersion )),
+                ("mod_versions", new Member<SaveMetadata, Dictionary<string, Version>>( o => o.ModVersions ))
             };
-        }
-
-        public void SetData( SerializedData data )
-        {
-            if( data.TryGetValue( "name", out var name ) )
-                this.Name = name.AsString();
-
-            if( data.TryGetValue( "description", out var description ) )
-                this.Description = description.AsString();
-
-            if( data.TryGetValue( "file_version", out var saveVersion ) )
-                this.FileVersion = saveVersion.AsVersion();
-
-            if( data.TryGetValue( "mod_versions", out var modVersions ) )
-            {
-                this.ModVersions = new Dictionary<string, Version>();
-                foreach( var elemKvp in (SerializedObject)modVersions )
-                {
-                    this.ModVersions.Add( elemKvp.Key, elemKvp.Value.AsVersion() );
-                }
-            }
         }
     }
 }

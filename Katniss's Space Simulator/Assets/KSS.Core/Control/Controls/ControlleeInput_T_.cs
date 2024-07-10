@@ -1,9 +1,11 @@
-﻿using System;
+﻿using KSS.Core.Physics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 using UnityPlus.Serialization;
 
 namespace KSS.Control.Controls
@@ -11,7 +13,7 @@ namespace KSS.Control.Controls
 	/// <summary>
 	/// Represents a control that consumes a control signal of type <typeparamref name="T"/>.
 	/// </summary>
-	public sealed class ControlleeInput<T> : ControlleeInputBase, IPersistsData
+	public sealed class ControlleeInput<T> : ControlleeInputBase
     {
 		internal Action<T> onInvoke;
 
@@ -62,32 +64,6 @@ namespace KSS.Control.Controls
             return true;
         }
 
-        public SerializedData GetData( IReverseReferenceMap s )
-        {
-            SerializedArray sa = new SerializedArray();
-            foreach( var conn in outputs )
-            {
-                sa.Add( s.WriteObjectReference( conn ) );
-            }
-            return new SerializedObject()
-            {
-                { "connects_to", sa }
-            };
-        }
-
-        public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            if( data.TryGetValue( "connects_to", out var connectsTo ) )
-            {
-                this.outputs.Clear();
-                foreach( var conn in (SerializedArray)connectsTo )
-                {
-                    var c = (ControllerOutput<T>)l.ReadObjectReference( conn );
-                    Connect( this, c );
-                }
-            }
-        }
-
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         internal static void Disconnect( ControllerOutput<T> output )
         {
@@ -103,6 +79,37 @@ namespace KSS.Control.Controls
 
             output.Input = input;
             input.outputs.Add( output );
+        }
+    }
+
+    public static class Mappings_ControlleeInput_T_
+    {
+        [MapsInheritingFrom( typeof( ControlleeInput<> ) )]
+        public static SerializationMapping ControlleeInputMapping<T>()
+        {
+            return new MemberwiseSerializationMapping<ControlleeInput<T>>()
+            {
+                ("on_invoke", new Member<ControlleeInput<T>, Action<T>>( o => o.onInvoke )),
+                ("connects_to", new Member<ControlleeInput<T>, ControllerOutput<T>[]>( ArrayContext.Refs, o => o.outputs.ToArray(), (o, value) =>
+                {
+                    foreach( var c in value )
+                    {
+                        ControlleeInput<T>.Connect( o, c );
+                    }
+                } ))
+            }
+            .WithFactory( ( data, l ) => // Either this, or use mapping that instantiates on reference pass.
+            {
+                if( data == null )
+                    return null;
+
+#warning TODO - is this even needed now? I think so, because the delegate mapping creates the delegate in reference pass (because object must be present)
+                // this could be resolved by having 2 contexts for the delegate - one creating it in Load and one in LoadReferences.
+
+                Action<T> onInvoke = (Action<T>)Persistent_Delegate.ToDelegate( data["on_invoke"], l.RefMap );
+
+                return new ControlleeInput<T>( onInvoke );
+            } );
         }
     }
 }

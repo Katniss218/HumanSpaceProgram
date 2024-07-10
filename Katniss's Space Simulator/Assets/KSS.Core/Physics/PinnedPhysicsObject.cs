@@ -1,4 +1,5 @@
-﻿using KSS.Core.ReferenceFrames;
+﻿using KSS.Core.Components;
+using KSS.Core.ReferenceFrames;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,7 @@ namespace KSS.Core.Physics
 	[RequireComponent( typeof( RootObjectTransform ) )]
 	[RequireComponent( typeof( Rigidbody ) )]
 	[DisallowMultipleComponent]
-	public class PinnedPhysicsObject : MonoBehaviour, IPhysicsObject, IPersistsData
+	public class PinnedPhysicsObject : MonoBehaviour, IPhysicsObject
 	{
 		public float Mass
 		{
@@ -198,52 +199,22 @@ namespace KSS.Core.Physics
 			IsColliding = false;
 		}
 
-		public SerializedData GetData( IReverseReferenceMap s )
+        [MapsInheritingFrom( typeof( PinnedPhysicsObject ) )]
+        public static SerializationMapping PinnedPhysicsObjectMapping()
         {
-            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
-
-            ret.AddAll( new SerializedObject()
+			return new MemberwiseSerializationMapping<PinnedPhysicsObject>()
 			{
-				{ "mass", this.Mass.GetData() },
-				{ "local_center_of_mass", this.LocalCenterOfMass.GetData() },
-				{ "velocity",  this.Velocity.GetData() },
-				{ "angular_velocity", this.AngularVelocity.GetData() },
-				{ "reference_body", s.WriteObjectReference( this.ReferenceBody ) },
-				{ "reference_position", this.ReferencePosition.GetData() },
-				{ "reference_rotation", this.ReferenceRotation.GetData() }
-			} );
+				("mass", new Member<PinnedPhysicsObject, float>( o => o.Mass )),
+				("local_center_of_mass", new Member<PinnedPhysicsObject, Vector3>( o => o.LocalCenterOfMass )),
 
-			return ret;
-		}
+				("DO_NOT_TOUCH", new Member<PinnedPhysicsObject, bool>( o => true, (o, value) => o._rb.isKinematic = true)), // TODO - isKinematic member is a hack.
 
-		public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-			IPersistent_Behaviour.SetData( this, data, l );
-
-            if( data.TryGetValue( "mass", out var mass ) )
-				this.Mass = mass.AsFloat();
-
-			if( data.TryGetValue( "local_center_of_mass", out var localCenterOfMass ) )
-				this.LocalCenterOfMass = localCenterOfMass.AsVector3();
-
-            _rb.isKinematic = true; // PinnedPhysicsObject is always kinematic. This is needed because it may be called first.
-
-            /* if( data.TryGetValue( "velocity", out var velocity ) ) this can't be assigned with kinematic anyway.
-                 this.Velocity =  velocity.ToVector3();
-
-             if( data.TryGetValue( "angular_velocity", out var angularVelocity ) )
-                 this.AngularVelocity = angularVelocity.ToVector3();
-            */
-
-            // this is the culprit
-            if( data.TryGetValue( "reference_body", out var referenceBody ) )
-				this.ReferenceBody = (CelestialBody)l.ReadObjectReference( referenceBody );
-
-			if( data.TryGetValue( "reference_position", out var referencePosition ) )
-				this.ReferencePosition = referencePosition.AsVector3Dbl();
-
-			if( data.TryGetValue( "reference_rotation", out var referenceRotation ) )
-				this.ReferenceRotation = referenceRotation.AsQuaternionDbl();
-		}
+                ("velocity", new Member<PinnedPhysicsObject, Vector3>( o => o.Velocity, (o, value) => { } )),
+				("angular_velocity", new Member<PinnedPhysicsObject, Vector3>( o => o.AngularVelocity, (o, value) => { } )),
+				("reference_body", new Member<PinnedPhysicsObject, CelestialBody>( ObjectContext.Ref, o => o.ReferenceBody )),
+				("reference_position", new Member<PinnedPhysicsObject, Vector3Dbl>( o => o.ReferencePosition )),
+				("reference_rotation", new Member<PinnedPhysicsObject, QuaternionDbl>( o => o.ReferenceRotation ))
+			};
+        }
 	}
 }

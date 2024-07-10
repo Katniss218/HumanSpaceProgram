@@ -11,7 +11,7 @@ namespace UnityPlus.Serialization
     /// <summary>
     /// A key-value pair node.
     /// </summary>
-    public sealed class SerializedObject : SerializedData, IDictionary<string, SerializedData>
+    public sealed class SerializedObject : SerializedData, IDictionary<string, SerializedData>, IEquatable<SerializedObject>
     {
         readonly Dictionary<string, SerializedData> _children;
 
@@ -37,24 +37,21 @@ namespace UnityPlus.Serialization
             _children = new Dictionary<string, SerializedData>();
         }
 
+        public SerializedObject( int capacity )
+        {
+            _children = new Dictionary<string, SerializedData>( capacity );
+        }
+
+        public SerializedObject( IEnumerable<KeyValuePair<string, SerializedData>> collection )
+        {
+            _children = new Dictionary<string, SerializedData>( collection );
+        }
+
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public void Add( string name, SerializedData value )
         {
             _children.Add( name, value );
         }
-
-        /*[MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public void Add( string name, SerializedData value )
-        {
-            if( value is SerializedObject o ) // idk why, but the values must be first cast to their actual type.
-                _children.Add( name, (SerializedData)o );
-            else if( value is SerializedArray a )
-                _children.Add( name, (SerializedData)a );
-            else if( value is SerializedData v )
-                _children.Add( name, v );
-            else
-                throw new ArgumentException( $"The value must be either object, array, or value." );
-        }*/
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public void Add( KeyValuePair<string, SerializedData> item )
@@ -109,7 +106,7 @@ namespace UnityPlus.Serialization
         {
             return _children.TryGetValue( key, out value );
         }
-        
+
         /// <returns>True if the value was found, and matches the specified type.</returns>
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public override bool TryGetValue<T>( string key, out T value )
@@ -138,6 +135,38 @@ namespace UnityPlus.Serialization
         IEnumerator IEnumerable.GetEnumerator()
         {
             return ((IEnumerable)_children).GetEnumerator();
+        }
+
+        public override int GetHashCode()
+        {
+            return _children.GetHashCode();
+        }
+
+        public override bool Equals( object obj )
+        {
+            if( obj is SerializedObject other )
+                return this.Equals( other );
+
+            return false;
+        }
+
+        public bool Equals( SerializedObject other )
+        {
+            return this._children.Count == other._children.Count
+                && this._children.All( ( thisKvp ) =>
+                {
+                    if( !other._children.TryGetValue( thisKvp.Key, out var otherVal ) )
+                        return false;
+
+                    if( ReferenceEquals( thisKvp.Value, otherVal ) )
+                        return true;
+
+                    if( thisKvp.Value != null && thisKvp.Value.Equals( otherVal ) )
+                        return true;
+
+                    return false;
+                }
+            );
         }
     }
 }

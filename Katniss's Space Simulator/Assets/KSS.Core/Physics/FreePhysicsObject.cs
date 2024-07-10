@@ -15,7 +15,7 @@ namespace KSS.Core.Physics
     [RequireComponent( typeof( RootObjectTransform ) )]
     [RequireComponent( typeof( Rigidbody ) )]
     [DisallowMultipleComponent]
-    public class FreePhysicsObject : MonoBehaviour, IPhysicsObject, IPersistsData
+    public class FreePhysicsObject : MonoBehaviour, IPhysicsObject
     {
         public float Mass
         {
@@ -174,38 +174,20 @@ namespace KSS.Core.Physics
             _rb.isKinematic = true; // Can't do `enabled = false` (doesn't exist) for a rigidbody, so we set it to kinematic instead.
         }
 
-        public SerializedData GetData( IReverseReferenceMap s )
-        {
-            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
 
-            ret.AddAll( new SerializedObject()
+        [MapsInheritingFrom( typeof( FreePhysicsObject ) )]
+        public static SerializationMapping FreePhysicsObjectMapping()
+        {
+            return new MemberwiseSerializationMapping<FreePhysicsObject>()
             {
-                { "mass", this.Mass.GetData() },
-                { "local_center_of_mass", this.LocalCenterOfMass.GetData() },
-                { "velocity", this.Velocity.GetData() },
-                { "angular_velocity", this.AngularVelocity.GetData() }
-            } );
+                ("mass", new Member<FreePhysicsObject, float>( o => o.Mass )),
+                ("local_center_of_mass", new Member<FreePhysicsObject, Vector3>( o => o.LocalCenterOfMass )),
 
-            return ret;
-        }
+                ("DO_NOT_TOUCH", new Member<FreePhysicsObject, bool>( o => false, (o, value) => o._rb.isKinematic = false)), // TODO - isKinematic member is a hack.
 
-        public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            IPersistent_Behaviour.SetData( this, data, l );
-
-            _rb.isKinematic = false; // FreePhysicsObject is never kinematic. This is needed because it may be called first.
-
-            if( data.TryGetValue( "mass", out var mass ) )
-                this.Mass = mass.AsFloat();
-
-            if( data.TryGetValue( "local_center_of_mass", out var localCenterOfMass ) )
-                this.LocalCenterOfMass = localCenterOfMass.AsVector3();
-
-            if( data.TryGetValue( "velocity", out var velocity ) )
-                this.Velocity = velocity.AsVector3();
-
-            if( data.TryGetValue( "angular_velocity", out var angularVelocity ) )
-                this.AngularVelocity = angularVelocity.AsVector3();
+                ("velocity", new Member<FreePhysicsObject, Vector3>( o => o.Velocity )),
+                ("angular_velocity", new Member<FreePhysicsObject, Vector3>( o => o.AngularVelocity ))
+            };
         }
     }
 }

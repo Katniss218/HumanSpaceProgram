@@ -78,10 +78,10 @@
     <Compile Include="Assets\_UnityEngine\SingletonMonoBehaviour.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\QuaternionDbl_Ex.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\Transform_Ex.cs" />
+    <Compile Include="Assets\_UnityEngine\UnityApplication.cs" />
     <Compile Include="Assets\_UnityEngine\MeshUtils.cs" />
     <Compile Include="Assets\_UnityEngine\Vector3Dbl.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\MatrixMxN_Ex.cs" />
-    <Compile Include="Assets\_UnityEngine\ExtensionMap.cs" />
     <Compile Include="Assets\_UnityEngine\QuaternionCurve.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\IEnumerable_Component__Ex.cs" />
     <Compile Include="Assets\_UnityEngine\TypeMap.cs" />
@@ -89,7 +89,6 @@
     <Compile Include="Assets\_UnityEngine\IComponent.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\Vector2_Ex.cs" />
     <Compile Include="Assets\_UnityEngine\MatrixMxN.cs" />
-    <Compile Include="Assets\_UnityEngine\UnityApplication.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_UnityEngine\___UnityEngine.asmdef" />

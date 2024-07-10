@@ -14,7 +14,7 @@ namespace UnityPlus.Serialization
     /// </summary>
     public interface ILoader
     {
-        public delegate void Action( IForwardReferenceMap l );
+        //public delegate void Action( IForwardReferenceMap l );
 
         /// <summary>
         /// The current state of the loader. <br />
@@ -38,7 +38,7 @@ namespace UnityPlus.Serialization
             /// 2. Applying data to the created objects.  <br />
             ///    After every referencable object has been created, we can load the things that reference them. In practice, this means we apply *all* data after everything has been created.
             /// </summary>
-            LoadingData
+            LoadingReferences
 
             // This setup disallows reading references while the objects are being created,
             // but lets us be sure that when we start reading them later, every reference that can be referenced will exist.
@@ -50,6 +50,8 @@ namespace UnityPlus.Serialization
         /// The reference map used to map object IDs to references when deserializing.
         /// </summary>
         IForwardReferenceMap RefMap { get; }
+
+        Dictionary<SerializedData, SerializationMapping> MappingCache { get; }
     }
 
     /// <summary>
@@ -57,7 +59,7 @@ namespace UnityPlus.Serialization
     /// </summary>
     public interface IAsyncLoader : ILoader
     {
-        new public delegate IEnumerator Action( IForwardReferenceMap l );
+       // new public delegate IEnumerator Action( IForwardReferenceMap l );
 
         /// <summary>
         /// The percentage (in [0..1]) of completion of the current action (0 = 0% completed, 1 = 100% completed).

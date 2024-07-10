@@ -9,7 +9,6 @@ using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.DataHandlers;
-using UnityPlus.Serialization.Strategies;
 
 namespace KSS.AssetLoaders
 {
@@ -18,30 +17,22 @@ namespace KSS.AssetLoaders
     /// </summary>
     public sealed class GameDataJsonPartFactory : PartFactory
     {
-        private static JsonSeparateFileSerializedDataHandler _handler = new JsonSeparateFileSerializedDataHandler();
-        private static SingleExplicitHierarchyStrategy _strat = new SingleExplicitHierarchyStrategy( _handler, () => throw new NotSupportedException( $"Tried to save something using a part *loader*" ) );
-
-        private static Loader _loader = new Loader( null, null, null, _strat.Load_Object, _strat.Load_Data );
-
+#warning TODO - change to namespaced mod-global ID
         private string _filePath;
 
         public override PartMetadata LoadMetadata()
         {
-            PartMetadata partMeta = new PartMetadata( _filePath );
-            partMeta.ReadDataFromDisk();
+            PartMetadata partMeta = PartMetadata.LoadFromDisk( _filePath );
             return partMeta;
         }
 
         public override GameObject Load( IForwardReferenceMap refMap )
         {
-            _handler.ObjectsFilename = Path.Combine( _filePath, "objects.json" );
-            _handler.DataFilename = Path.Combine( _filePath, "data.json" );
-            _loader.RefMap = refMap;
-            _loader.Load();
-            return _strat.LastSpawnedRoot;
-        }
+            var data = new JsonSerializedDataHandler( Path.Combine( _filePath, "gameobjects.json" ) )
+                .Read();
 
-        // TODO - This can also be used to load saved vessels - saved vessels serialize as their root parts.
+            return SerializationUnit.Deserialize<GameObject>( data, refMap );
+        }
 
         [HSPEventListener( HSPEvent.STARTUP_IMMEDIATELY, HSPEvent.NAMESPACE_VANILLA + ".load_parts" )]
         private static void OnStartup()

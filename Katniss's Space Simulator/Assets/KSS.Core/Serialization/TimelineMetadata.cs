@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.DataHandlers;
 using UnityPlus.Serialization.Json;
 
 namespace KSS.Core.Serialization
@@ -90,8 +91,7 @@ namespace KSS.Core.Serialization
             {
                 try
                 {
-                    TimelineMetadata timelineMetadata = new TimelineMetadata( timelineDirName );
-                    timelineMetadata.ReadDataFromDisk();
+                    TimelineMetadata timelineMetadata = TimelineMetadata.LoadFromDisk( timelineDirName );
                     timelines.Add( timelineMetadata );
                 }
                 catch( Exception ex )
@@ -104,45 +104,36 @@ namespace KSS.Core.Serialization
             return timelines;
         }
 
-        public void WriteToDisk()
+        public static TimelineMetadata LoadFromDisk( string timelineId )
         {
-            string savePath = GetRootDirectory();
-            string saveFilePath = Path.Combine( savePath, TIMELINE_FILENAME );
+            string saveFilePath = Path.Combine( GetRootDirectory( timelineId ), TIMELINE_FILENAME );
 
-            StringBuilder sb = new StringBuilder();
-            new JsonStringWriter( this.GetData(), sb ).Write();
+            TimelineMetadata timelineMetadata = new TimelineMetadata( timelineId );
 
-            File.WriteAllText( saveFilePath, sb.ToString(), Encoding.UTF8 );
+            JsonSerializedDataHandler handler = new JsonSerializedDataHandler( saveFilePath );
+            var data = handler.Read();
+            SerializationUnit.Populate( timelineMetadata, data );
+            return timelineMetadata;
         }
 
-        public void ReadDataFromDisk()
+        public void SaveToDisk()
         {
-            string savePath = GetRootDirectory();
-            string saveFilePath = Path.Combine( savePath, TIMELINE_FILENAME );
+            string saveFilePath = Path.Combine( GetRootDirectory(), TIMELINE_FILENAME );
 
-            string saveJson = File.ReadAllText( saveFilePath, Encoding.UTF8 );
+            var data = SerializationUnit.Serialize( this );
 
-            SerializedData data = new JsonStringReader( saveJson ).Read();
-
-            this.SetData( data );
+            JsonSerializedDataHandler handler = new JsonSerializedDataHandler( saveFilePath );
+            handler.Write( data );
         }
 
-        public SerializedData GetData()
+        [MapsInheritingFrom( typeof( TimelineMetadata ) )]
+        public static SerializationMapping TimelineMetadataMapping()
         {
-            return new SerializedObject()
+            return new MemberwiseSerializationMapping<TimelineMetadata>()
             {
-                { "name", this.Name.GetData() },
-                { "description", this.Description.GetData() }
+                ("name", new Member<TimelineMetadata, string>( o => o.Name )),
+                ("description", new Member<TimelineMetadata, string>( o => o.Description ))
             };
-        }
-
-        public void SetData( SerializedData data )
-        {
-            if( data.TryGetValue( "name", out var name ) )
-                this.Name = name.AsString();
-
-            if( data.TryGetValue( "description", out var description ) )
-                this.Description = description.AsString();
         }
     }
 }

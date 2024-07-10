@@ -12,10 +12,10 @@ namespace KSS.Core.ResourceFlowSystem
     /// Contains state information about multiple resources, and methods to combine them.
     /// </summary>
     [Serializable]
-    public class SubstanceStateCollection : IPersistsData
+    public class SubstanceStateCollection
     {
         [field: SerializeField]
-        List<SubstanceState> _substances = new List<SubstanceState>();
+        List<SubstanceState> _substances;
 
         public int SubstanceCount => _substances?.Count ?? 0;
 
@@ -34,22 +34,25 @@ namespace KSS.Core.ResourceFlowSystem
         /// <summary>
         /// Returns a <see cref="SubstanceStateCollection"/> that represents no flow. Nominally <see cref="null"/>.
         /// </summary>
-        public static SubstanceStateCollection Empty => new SubstanceStateCollection( null );
+        public static SubstanceStateCollection Empty => new SubstanceStateCollection();
+
+        public SubstanceStateCollection()
+        {
+            this._substances = new List<SubstanceState>();
+        }
 
         public SubstanceStateCollection( IEnumerable<SubstanceState> substances )
         {
-            if( substances != null )
-            {
-                this._substances = substances.ToList();
-            }
+            this._substances = substances == null
+                ? new List<SubstanceState>()
+                : substances.ToList();
         }
 
         public SubstanceStateCollection( params SubstanceState[] substances )
         {
-            if( substances != null )
-            {
-                this._substances = substances.ToList();
-            }
+            this._substances = substances == null
+                ? new List<SubstanceState>()
+                : substances.ToList();
         }
 
         /// <summary>
@@ -187,25 +190,13 @@ namespace KSS.Core.ResourceFlowSystem
             return new SubstanceStateCollection( _substances?.ToArray() );
         }
 
-        public SerializedData GetData( IReverseReferenceMap s )
+        [MapsInheritingFrom( typeof( SubstanceStateCollection ) )]
+        public static SerializationMapping SubstanceStateCollectionMapping()
         {
-            SerializedArray arr = new SerializedArray();
-
-            foreach( var sbs in this._substances )
-                arr.Add( sbs.GetData( s ) );
-
-            return arr;
-        }
-
-        public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            this._substances.Clear();
-            foreach( var sbsD in (SerializedArray)data )
+            return new MemberwiseSerializationMapping<SubstanceStateCollection>()
             {
-                var sbs = new SubstanceState();
-                sbs.SetData( sbsD, l );
-                this._substances.Add( sbs );
-            }
+                ("substances", new Member<SubstanceStateCollection, SubstanceState[]>( o => o._substances.ToArray(), (o, value) => o._substances = value.ToList() ))
+            };
         }
     }
 }

@@ -1,22 +1,11 @@
 ﻿using KSS.Core;
-using KSS.Core.Mods;
-using KSS.Core.SceneManagement;
-using KSS.UI;
-using System;
-using System.Collections.Generic;
 using UnityPlus.UILib;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityPlus.UILib.UIElements;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib.Layout;
 using KSS.UI.Windows;
 using KSS.GameplayScene;
-using UnityPlus.Serialization.ReferenceMaps;
-using UnityPlus.Serialization;
-using UnityPlus.Serialization.DataHandlers;
-using UnityPlus.Serialization.Strategies;
-using KSS.Components;
 using KSS.GameplayScene.Tools;
 
 namespace KSS.UI.SceneFactories

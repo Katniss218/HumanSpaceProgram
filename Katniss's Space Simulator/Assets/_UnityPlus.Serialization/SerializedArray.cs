@@ -11,7 +11,7 @@ namespace UnityPlus.Serialization
     /// <summary>
     /// A list of values node.
     /// </summary>
-    public sealed class SerializedArray : SerializedData, IList<SerializedData>
+    public sealed class SerializedArray : SerializedData, IList<SerializedData>, IEquatable<SerializedArray>
     {
         readonly List<SerializedData> _children;
 
@@ -21,6 +21,11 @@ namespace UnityPlus.Serialization
         public SerializedArray()
         {
             _children = new List<SerializedData>();
+        }
+
+        public SerializedArray( int capacity )
+        {
+            _children = new List<SerializedData>( capacity );
         }
 
         public SerializedArray( IEnumerable<SerializedData> children )
@@ -42,12 +47,14 @@ namespace UnityPlus.Serialization
 
         public override bool TryGetValue( string name, out SerializedData value )
         {
-            throw new NotSupportedException( $"Tried to invoke {nameof( TryGetValue )}, which is not supported on {nameof( SerializedArray )}." );
+            value = default;
+            return false;
         }
 
         public override bool TryGetValue<T>( string name, out T value )
         {
-            throw new NotSupportedException( $"Tried to invoke {nameof( TryGetValue )}<T>, which is not supported on {nameof( SerializedArray )}." );
+            value = default;
+            return false;
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
@@ -55,19 +62,6 @@ namespace UnityPlus.Serialization
         {
             _children.Add( item );
         }
-
-        /*[MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public void Add( SerializedData item )
-        {
-            if( item is SerializedObject o ) // idk why, but the values must be first cast to their actual type.
-                _children.Add( (SerializedData)o );
-            else if( item is SerializedArray a )
-                _children.Add( (SerializedData)a );
-            else if( item is SerializedData v )
-                _children.Add( v );
-            else
-                throw new ArgumentException( $"The value must be either object, array, or value." );
-        }*/
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         public void Clear()
@@ -132,6 +126,24 @@ namespace UnityPlus.Serialization
         IEnumerator IEnumerable.GetEnumerator()
         {
             return ((IEnumerable)_children).GetEnumerator();
+        }
+
+        public override int GetHashCode()
+        {
+            return _children.GetHashCode();
+        }
+
+        public override bool Equals( object obj )
+        {
+            if( obj is SerializedArray other )
+                return this.Equals( other );
+
+            return false;
+        }
+
+        public bool Equals( SerializedArray other )
+        {
+            return _children.SequenceEqual( other._children );
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.DataHandlers;
 using UnityPlus.Serialization.Json;
 
 namespace KSS.Core.Serialization
@@ -71,75 +72,49 @@ namespace KSS.Core.Serialization
         }
 
         /// <summary>
-        /// Returns the path to the (root) directory of the timeline.
+        /// Root directory is the directory that contains the _vessel.json file.
         /// </summary>
         public string GetRootDirectory()
         {
             return GetRootDirectory( this.ID );
         }
 
-        public void WriteToDisk()
+        public static VesselMetadata LoadFromDisk( string id )
         {
-            string savePath = GetRootDirectory();
-            string saveFilePath = Path.Combine( savePath, VESSEL_METADATA_FILENAME );
+            string saveFilePath = Path.Combine( GetRootDirectory( id ), VESSEL_METADATA_FILENAME );
 
-            StringBuilder sb = new StringBuilder();
-            new JsonStringWriter( this.GetData(), sb ).Write();
+            VesselMetadata vesselMetadata = new VesselMetadata( id );
 
-            File.WriteAllText( saveFilePath, sb.ToString(), Encoding.UTF8 );
+            JsonSerializedDataHandler handler = new JsonSerializedDataHandler( saveFilePath );
+            var data = handler.Read();
+            SerializationUnit.Populate( vesselMetadata, data );
+            return vesselMetadata;
         }
 
-        public void ReadDataFromDisk()
+        public void SaveToDisk()
         {
-            string savePath = GetRootDirectory();
-            string saveFilePath = Path.Combine( savePath, VESSEL_METADATA_FILENAME );
+            string saveFilePath = Path.Combine( GetRootDirectory(), VESSEL_METADATA_FILENAME );
 
-            string saveJson = File.ReadAllText( saveFilePath, Encoding.UTF8 );
+            var data = SerializationUnit.Serialize( this );
 
-            SerializedData data = new JsonStringReader( saveJson ).Read();
-
-            this.SetData( data );
+            JsonSerializedDataHandler handler = new JsonSerializedDataHandler( saveFilePath );
+            handler.Write( data );
         }
 
-        public SerializedData GetData()
+        [MapsInheritingFrom( typeof( VesselMetadata ) )]
+        public static SerializationMapping VesselMetadataMapping()
         {
-            SerializedObject modVersions = new SerializedObject();
-            foreach( var elemKvp in this.ModVersions )
+            return new MemberwiseSerializationMapping<VesselMetadata>()
             {
-                modVersions.Add( elemKvp.Key, elemKvp.Value.GetData() );
-            }
-            return new SerializedObject()
-            {
-                { "name", this.Name.GetData() },
-                { "description", this.Description.GetData() },
-                { "author", this.Author.GetData() },
-                { "file_version", this.FileVersion.GetData() },
-                { "mod_versions", modVersions }
+                ("name", new Member<VesselMetadata, string>( o => o.Name )),
+                ("description", new Member<VesselMetadata, string>( o => o.Description )),
+                ("author", new Member<VesselMetadata, string>( o => o.Author )),
+               // ("categories", new Member<VesselMetadata, string[]>( o => o.Categories )),
+               // ("filter", new Member<VesselMetadata, string>( o => o.Filter )),
+               // ("group", new Member<VesselMetadata, string>( o => o.Group )),
+                ("file_version", new Member<VesselMetadata, Version>( o => o.FileVersion )),
+                ("mod_versions", new Member<VesselMetadata, Dictionary<string, Version>>( o => o.ModVersions ))
             };
-        }
-
-        public void SetData( SerializedData data )
-        {
-            if( data.TryGetValue( "name", out var name ) )
-                this.Name = name.AsString();
-
-            if( data.TryGetValue( "description", out var description ) )
-                this.Description = description.AsString();
-
-            if( data.TryGetValue( "author", out var author ) )
-                this.Author = author.AsString();
-
-            if( data.TryGetValue( "file_version", out var saveVersion ) )
-                this.FileVersion = saveVersion.AsVersion();
-
-            if( data.TryGetValue( "mod_versions", out var modVersions ) )
-            {
-                this.ModVersions = new Dictionary<string, Version>();
-                foreach( var elemKvp in (SerializedObject)modVersions )
-                {
-                    this.ModVersions.Add( elemKvp.Key, elemKvp.Value.AsVersion() );
-                }
-            }
         }
     }
 }

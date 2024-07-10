@@ -12,7 +12,7 @@ namespace KSS.Components
     /// <summary>
     /// Adds a point mass of the specified mass to the object.
     /// </summary>
-    public class FPointMass : MonoBehaviour, IPersistsData, IHasMass
+    public class FPointMass : MonoBehaviour, IHasMass
     {
         [SerializeField]
         private float _mass;
@@ -29,28 +29,15 @@ namespace KSS.Components
 
         public event IHasMass.MassChange OnAfterMassChanged = null;
 
-        public SerializedData GetData( IReverseReferenceMap s )
-        {
-            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
 
-            ret.AddAll( new SerializedObject()
+        [MapsInheritingFrom( typeof( FPointMass ) )]
+        public static SerializationMapping FPointMassMapping()
+        {
+            return new MemberwiseSerializationMapping<FPointMass>()
             {
-                { "mass", _mass.GetData() },
-                { "on_after_mass_changed", OnAfterMassChanged.GetData( s ) }
-            } );
-
-            return ret;
-        }
-
-        public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            IPersistent_Behaviour.SetData( this, data, l );
-
-            if( data.TryGetValue( "mass", out var mass ) )
-                _mass = mass.AsFloat();
-
-            if( data.TryGetValue( "on_after_mass_changed", out var onAfterMassChanged ) )
-                OnAfterMassChanged = (IHasMass.MassChange)onAfterMassChanged.AsDelegate( l );
+                ("mass", new Member<FPointMass, float>( o => o.Mass )),
+                ("on_after_mass_changed", new Member<FPointMass, IHasMass.MassChange>( o => o.OnAfterMassChanged ))
+            };
         }
     }
 }

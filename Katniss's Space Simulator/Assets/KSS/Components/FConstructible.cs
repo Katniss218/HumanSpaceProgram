@@ -13,7 +13,7 @@ using UnityPlus.Serialization.ReferenceMaps;
 
 namespace KSS.Components
 {
-    public interface IConstructionCondition : IPersistsData
+    public interface IConstructionCondition
     {
         /// <summary>
         /// Checks what the build speed multiplier for a constructible at a given position would be.
@@ -30,19 +30,17 @@ namespace KSS.Components
             // get all cranes which range and position overlaps with the scene position.
             throw new NotImplementedException();
         }
+    }
 
-        public SerializedData GetData( IReverseReferenceMap s )
+    public static class CraneBuildCondition_Mapping
+    {
+        [MapsInheritingFrom( typeof( CraneBuildCondition ) )]
+        public static SerializationMapping CraneBuildConditionMapping()
         {
-            return new SerializedObject()
+            return new MemberwiseSerializationMapping<CraneBuildCondition>()
             {
-                { "min_lift_capacity", this.minLiftCapacity.GetData() }
+                ("min_lift_capacity", new Member<CraneBuildCondition, float>( o => o.minLiftCapacity ))
             };
-        }
-
-        public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            if( data.TryGetValue( "min_lift_capacity", out var minLiftCapacity ) )
-                this.minLiftCapacity = minLiftCapacity.AsFloat();
         }
     }
 
@@ -55,7 +53,7 @@ namespace KSS.Components
     /// <summary>
     /// Represents a "part" (hierarchy of gameobjects) that can be in various stages of construction.
     /// </summary>
-    public class FConstructible : MonoBehaviour, IPersistsData
+    public class FConstructible : MonoBehaviour
     {
         [SerializeField]
         private float _buildPoints;
@@ -133,9 +131,9 @@ namespace KSS.Components
 
         private void RunOriginalToGhost()
         {
-            foreach( var kvp in _cachedData )
+            foreach( var (component, data) in _cachedData )
             {
-                kvp.Key.SetData( kvp.Value.fwd, _cachedRefStore );
+                SerializationUnit.Populate<Component>( component, data.fwd );
             }
         }
 
@@ -143,7 +141,7 @@ namespace KSS.Components
         {
             foreach( var (component, data) in _cachedData )
             {
-                component.SetData( data.rev, _cachedRefStore );
+                SerializationUnit.Populate<Component>( component, data.rev );
             }
         }
 
@@ -167,35 +165,38 @@ namespace KSS.Components
             if( wasNull )
             {
                 _cachedData = new();
-            }
-            _cachedRefStore.Clear();
 
-            AncestralMap<FConstructible> partMap = AncestralMap<FConstructible>.Create( transform );
-            if( partMap.TryGetValue( this, out var ourPartsTransforms ) )
-            {
-                foreach( var transform in ourPartsTransforms ) // this entire thing could be ran once per entire vessel and cached until something is added/removed from it.
+                _cachedRefStore.Clear();
+
+                // this entire thing could be ran once per entire vessel and cached until something is added/removed from it.
+                AncestralMap<FConstructible> partMap = AncestralMap<FConstructible>.Create( transform );
+                if( partMap.TryGetValue( this, out var ourPartsTransforms ) )
                 {
-                    foreach( var comp in transform.GetComponents() )
-                    {
-                        SerializedData originalToGhost = comp.GetGhostData( _cachedRefStore );
+                    IEnumerable<Component> comps = ourPartsTransforms.SelectMany( t => t.GetComponents() );
 
+                    var su = SerializationUnit.FromObjects<Component>( GhostableContext.Ghost, comps );
+
+                    su.Serialize( _cachedRefStore );
+
+                    foreach( var originalToGhost in su.GetData().Where( d => d != null ) )
+                    {
                         // Only cache things that are ghostable.
                         // This should probably be signified differently than by a null, but it works for now.
-                        if( originalToGhost != null )
+
+                        Component comp = (Component)_cachedRefStore.GetObj( originalToGhost[KeyNames.ID].DeserializeGuid() );
+                        su = SerializationUnit.FromObjects<Component>( ObjectContext.Value, comp );
+
+                        su.Serialize( _cachedRefStore );
+
+                        var ghostToOriginal = su.GetData().First();
+
+                        // TODO - remove keys from revObj, that aren't present in forwardObj.
+                        /*if( originalToGhost is SerializedObject forwardObj && ghostToOriginal is SerializedObject revObj )
                         {
-                            SerializedData ghostToOriginal = comp.GetData( _cachedRefStore );
 
-                            // TODO - remove keys from revObj, that aren't present in forwardObj.
-                            /*if( originalToGhost is SerializedObject forwardObj && ghostToOriginal is SerializedObject revObj )
-                            {
-                                
-                            }*/
+                        }*/
 
-                            if( wasNull )
-                            {
-                                _cachedData.Add( comp, (originalToGhost, ghostToOriginal) );
-                            }
-                        }
+                        _cachedData.Add( comp, (originalToGhost, ghostToOriginal) );
                     }
                 }
             }
@@ -205,61 +206,17 @@ namespace KSS.Components
         //
         //
 
-        public SerializedData GetData( IReverseReferenceMap s )
+        [MapsInheritingFrom( typeof( FConstructible ) )]
+        public static SerializationMapping FConstructibleMapping()
         {
-            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
-
-            ret.AddAll( new SerializedObject()
+            return new MemberwiseSerializationMapping<FConstructible>()
             {
-                { "build_points", BuildPoints.GetData() },
-                { "max_build_points", MaxBuildPoints.GetData() },
+                ("max_build_points", new Member<FConstructible, float>( o => o._maxBuildPoints )),
+                ("build_points", new Member<FConstructible, float>( o => o._buildPoints )),
                 // todo - conditions.
-            } );
-
-            SerializedArray arr = new SerializedArray();
-            if( _cachedData != null )
-            {
-                foreach( var kvp in _cachedData )
-                {
-                    arr.Add( new SerializedObject()
-                    {
-                        { "object", s.WriteObjectReference( kvp.Key ) },
-                        { "forward", kvp.Value.fwd },
-                        { "reverse", kvp.Value.rev }
-                    } );
-                }
-                ret.AddAll( new SerializedObject()
-                {
-                    { "cached_data", arr },
-                } );
-            }
-
-            return ret;
-        }
-
-        public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            IPersistent_Behaviour.SetData( this, data, l );
-
-            if( data.TryGetValue<SerializedArray>( "cached_data", out var cachedData ) )
-            {
-                _cachedData = new();
-                foreach( var obj in cachedData.Cast<SerializedObject>() )
-                {
-                    Component comp = (Component)l.ReadObjectReference( obj["object"] );
-                    _cachedData.Add( comp, (obj["forward"], obj["reverse"]) );
-                }
-            }
-
-            // Set the underlying private fields as to not trigger ghosting prematurely.
-            // The ghosting will be called anyway, in `Start()`.
-            if( data.TryGetValue( "max_build_points", out var maxBuildPoints ) )
-                _maxBuildPoints = maxBuildPoints.AsFloat();
-
-            if( data.TryGetValue( "build_points", out var buildPoints ) )
-                _buildPoints = buildPoints.AsFloat();
-
-            // todo - conditions.
+#warning TODO - the dict RefToValue doesn't load properly.
+                ("cached_data", new Member<FConstructible, Dictionary<Component, (SerializedData fwd, SerializedData rev)>>( KeyValueContext.RefToValue, o => o._cachedData ))
+            };
         }
     }
 }

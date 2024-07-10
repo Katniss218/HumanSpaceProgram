@@ -11,14 +11,12 @@ using KSS.Core.Components;
 using System;
 using UnityPlus.AssetManagement;
 using UnityPlus.Serialization;
-using UnityPlus.Serialization.Strategies;
 using System.IO;
-using System.Collections;
 using KSS.Core.Mods;
-using UnityPlus.Serialization.DataHandlers;
 using UnityPlus.Serialization.ReferenceMaps;
 using System.Linq;
 using System.Collections.Generic;
+using UnityPlus.Serialization.DataHandlers;
 
 namespace KSS.DevUtils
 {
@@ -113,30 +111,24 @@ namespace KSS.DevUtils
         {
             if( UnityEngine.Input.GetKeyDown( KeyCode.F4 ) )
             {
-                JsonSeparateFileSerializedDataHandler _designObjDataHandler = new JsonSeparateFileSerializedDataHandler();
-                SingleExplicitHierarchyStrategy _designObjStrategy = new SingleExplicitHierarchyStrategy( _designObjDataHandler, () => null );
-
-                VesselMetadata loadedVesselMetadata = new VesselMetadata( "vessel2" );
-                loadedVesselMetadata.ReadDataFromDisk();
+                VesselMetadata loadedVesselMetadata = VesselMetadata.LoadFromDisk( "vessel2" );
 
                 // load current vessel from the files defined by metadata's ID.
                 Directory.CreateDirectory( loadedVesselMetadata.GetRootDirectory() );
-                _designObjDataHandler.ObjectsFilename = Path.Combine( loadedVesselMetadata.GetRootDirectory(), "objects.json" );
-                _designObjDataHandler.DataFilename = Path.Combine( loadedVesselMetadata.GetRootDirectory(), "data.json" );
+                JsonSerializedDataHandler _designObjDataHandler = new JsonSerializedDataHandler( Path.Combine( loadedVesselMetadata.GetRootDirectory(), "gameobjects.json" ) );
+                var data = _designObjDataHandler.Read();
 
                 HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_BEFORE_LOAD, null );
 
-                Loader _loader = new Loader( new ForwardReferenceStore(), null, null, new ILoader.Action[] { _designObjStrategy.Load_Object }, new ILoader.Action[] { _designObjStrategy.Load_Data } );
-
-                _loader.Load();
-
+                GameObject loadedObj = SerializationUnit.Deserialize<GameObject>( data );
+               
                 FLaunchSiteMarker launchSiteSpawner = launchSite.gameObject.GetComponentInChildren<FLaunchSiteMarker>();
                 Vector3Dbl spawnerPosAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( launchSiteSpawner.transform.position );
                 QuaternionDbl spawnerRotAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( launchSiteSpawner.transform.rotation );
 
                 Vessel v2 = VesselFactory.CreatePartless( spawnerPosAirf, spawnerRotAirf, Vector3.zero, Vector3.zero );
 
-                v2.RootPart = _designObjStrategy.LastSpawnedRoot.transform;
+                v2.RootPart = loadedObj.transform;
                 v2.RootPart.localPosition = Vector3.zero;
                 v2.RootPart.localRotation = Quaternion.identity;
 
@@ -152,9 +144,7 @@ namespace KSS.DevUtils
             }
             if( UnityEngine.Input.GetKeyDown( KeyCode.F1 ) )
             {
-                JsonSeparateFileSerializedDataHandler handler = new JsonSeparateFileSerializedDataHandler();
-                SingleExplicitHierarchyStrategy strat = new SingleExplicitHierarchyStrategy( handler, () => null );
-                Saver saver = new Saver( new ReverseReferenceStore(), null, null, strat.Save_Object, strat.Save_Data );
+                JsonSerializedDataHandler handler;
 
                 string gameDataPath = HumanSpaceProgramMods.GetModDirectoryPath();
                 string partDir;
@@ -162,68 +152,85 @@ namespace KSS.DevUtils
                 VesselMetadata vm;
                 partDir = HumanSpaceProgram.GetSavedVesselsDirectoryPath() + "/vessel";
                 Directory.CreateDirectory( partDir );
-                vm = new VesselMetadata( "vessel" );
-                vm.Name = "Vessel"; vm.Description = "default"; vm.Author = "Katniss";
-                vm.WriteToDisk();
-                strat.RootObjectGetter = () => ActiveObjectManager.ActiveObject.GetVessel().RootPart.gameObject;
-                handler.ObjectsFilename = partDir + "/objects.json";
-                handler.DataFilename = partDir + "/data.json";
-                saver.Save();
+                vm = new VesselMetadata( "vessel" )
+                {
+                    Name = "Vessel",
+                    Description = "default",
+                    Author = "Katniss"
+                };
+                vm.SaveToDisk();
+                var data = SerializationUnit.Serialize( ActiveObjectManager.ActiveObject.GetVessel().RootPart.gameObject );
+                handler = new JsonSerializedDataHandler( partDir + "/gameobjects.json" );
+                handler.Write( data );
 
                 PartMetadata pm;
 
                 partDir = gameDataPath + "/Vanilla/Parts/engine";
                 Directory.CreateDirectory( partDir );
-                pm = new PartMetadata( partDir );
-                pm.Name = "Engine"; pm.Author = "Katniss"; pm.Categories = new string[] { "engine" };
-                pm.WriteToDisk();
-                strat.RootObjectGetter = () => AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/engine" );
-                handler.ObjectsFilename = partDir + "/objects.json";
-                handler.DataFilename = partDir + "/data.json";
-                saver.Save();
+                pm = new PartMetadata( partDir )
+                {
+                    Name = "Engine",
+                    Author = "Katniss",
+                    Categories = new string[] { "engine" }
+                };
+                pm.SaveToDisk();
+                data = SerializationUnit.Serialize( AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/engine" ) );
+                handler = new JsonSerializedDataHandler( partDir + "/gameobjects.json" );
+                handler.Write( data );
 
 
                 partDir = gameDataPath + "/Vanilla/Parts/intertank";
                 Directory.CreateDirectory( partDir );
-                pm = new PartMetadata( partDir );
-                pm.Name = "Intertank"; pm.Author = "Katniss"; pm.Categories = new string[] { "structural" };
-                pm.WriteToDisk();
-                strat.RootObjectGetter = () => AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/intertank" );
-                handler.ObjectsFilename = partDir + "/objects.json";
-                handler.DataFilename = partDir + "/data.json";
-                saver.Save();
-
+                pm = new PartMetadata( partDir )
+                {
+                    Name = "Intertank",
+                    Author = "Katniss",
+                    Categories = new string[] { "structural" }
+                };
+                pm.SaveToDisk();
+                data = SerializationUnit.Serialize( AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/intertank" ) );
+                handler = new JsonSerializedDataHandler( partDir + "/gameobjects.json" );
+                handler.Write( data );
 
                 partDir = gameDataPath + "/Vanilla/Parts/tank";
-                Directory.CreateDirectory( partDir );
-                pm = new PartMetadata( partDir );
-                pm.Name = "Tank"; pm.Author = "Katniss"; pm.Categories = new string[] { "fuel_tank" };
-                pm.WriteToDisk();
-                strat.RootObjectGetter = () => AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/tank" );
-                handler.ObjectsFilename = partDir + "/objects.json";
-                handler.DataFilename = partDir + "/data.json";
-                saver.Save();
+                Directory.CreateDirectory( partDir ); 
+                pm = new PartMetadata( partDir )
+                {
+                    Name = "Tank",
+                    Author = "Katniss",
+                    Categories = new string[] { "fuel_tank" }
+                };
+                pm.SaveToDisk();
+                data = SerializationUnit.Serialize( AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/tank" ) );
+                handler = new JsonSerializedDataHandler( partDir + "/gameobjects.json" );
+                handler.Write( data );
 
 
                 partDir = gameDataPath + "/Vanilla/Parts/tank_long";
                 Directory.CreateDirectory( partDir );
-                pm = new PartMetadata( partDir );
-                pm.Name = "Long Tank"; pm.Author = "Katniss"; pm.Categories = new string[] { "fuel_tank" };
-                pm.WriteToDisk();
-                strat.RootObjectGetter = () => AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/tank_long" );
-                handler.ObjectsFilename = partDir + "/objects.json";
-                handler.DataFilename = partDir + "/data.json";
-                saver.Save();
+                pm = new PartMetadata( partDir )
+                {
+                    Name = "Long Tank",
+                    Author = "Katniss",
+                    Categories = new string[] { "fuel_tank" }
+                };
+                pm.SaveToDisk();
+                data = SerializationUnit.Serialize( AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/tank_long" ) );
+                handler = new JsonSerializedDataHandler( partDir + "/gameobjects.json" );
+                handler.Write( data );
 
                 partDir = gameDataPath + "/Vanilla/Parts/capsule";
                 Directory.CreateDirectory( partDir );
-                pm = new PartMetadata( partDir );
-                pm.Name = "Gemini Capsule"; pm.Author = "Katniss"; pm.Categories = new string[] { "command" };
-                pm.WriteToDisk();
-                strat.RootObjectGetter = () => AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/capsule" );
-                handler.ObjectsFilename = partDir + "/objects.json";
-                handler.DataFilename = partDir + "/data.json";
-                saver.Save();
+                pm = new PartMetadata( partDir )
+                {
+                    Name = "Gemini Capsule",
+                    Author = "Katniss",
+                    Categories = new string[] { "command" }
+                };
+                pm.SaveToDisk();
+                data = SerializationUnit.Serialize( AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/capsule" ) );
+                handler = new JsonSerializedDataHandler( partDir + "/gameobjects.json" );
+                handler.Write( data );
             }
         }
 

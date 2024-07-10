@@ -1,5 +1,6 @@
 ﻿using KSS.Components;
 using KSS.Control;
+using KSS.Control.Controls;
 using KSS.Core;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ namespace KSS.Components
     /// <summary>
     /// Represents an invokable element of a <see cref="FSequencer"/>'s sequence.
     /// </summary>
-    public abstract class SequenceElement : ControlGroup, IPersistsObjects, IPersistsData
+    public abstract class SequenceElement : ControlGroup
     {
         [NamedControl( "Actions", "", Editable = false )]
         /// <summary>
@@ -43,53 +44,13 @@ namespace KSS.Components
             }
         }
 
-        public virtual SerializedObject GetObjects( IReverseReferenceMap s )
+        [MapsInheritingFrom( typeof( SequenceElement ) )]
+        public static SerializationMapping SequenceElementMapping()
         {
-            SerializedObject data = Persistent_object.WriteObjectStub( this, this.GetType(), s );
-
-            data.AddAll( new SerializedObject()
+            return new MemberwiseSerializationMapping<SequenceElement>()
             {
-                { "actions", new SerializedArray( Actions.Select( a => a.GetObjects( s ) ) ) }
-            } );
-
-            return data;
-        }
-
-        public virtual void SetObjects( SerializedObject data, IForwardReferenceMap l )
-        {
-            if( data.TryGetValue<SerializedArray>( "actions", out var actions ) )
-            {
-                Actions = new();
-                foreach( var act in actions.Cast<SerializedObject>() )
-                {
-                    SequenceActionBase action = act.AsObject<SequenceActionBase>( l );
-
-                    action.SetObjects( act, l );
-
-                    Actions.Add( action );
-                }
-            }
-        }
-
-        public virtual SerializedData GetData( IReverseReferenceMap s )
-        {
-            return new SerializedObject()
-            {
-                { "actions", new SerializedArray( Actions.Select( a => a.GetData( s ) ) ) }
+                ("actions", new Member<SequenceElement, SequenceActionBase[]>( o => o.Actions.ToArray(), (o, value) => o.Actions = value.ToList() ))
             };
-        }
-
-        public virtual void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            if( data.TryGetValue<SerializedArray>( "actions", out var actions ) )
-            {
-                int i = 0;
-                foreach( var act in actions )
-                {
-                    Actions[i].SetData( act, l );
-                    i++;
-                }
-            }
         }
     }
 
@@ -106,24 +67,13 @@ namespace KSS.Components
             return UnityEngine.Input.GetKey( Key );
         }
 
-        public override SerializedData GetData( IReverseReferenceMap s )
+        [MapsInheritingFrom( typeof( KeyboardSequenceElement ) )]
+        public static SerializationMapping KeyboardSequenceElementMapping()
         {
-            SerializedObject ret = (SerializedObject)base.GetData( s );
-
-            ret.AddAll( new SerializedObject()
+            return new MemberwiseSerializationMapping<KeyboardSequenceElement>()
             {
-                { "key", this.Key.GetData() }
-            } );
-
-            return ret;
-        }
-
-        public override void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            base.SetData( data, l );
-
-            if( data.TryGetValue( "key", out var key ) )
-                Key = key.AsKeyCode();
+                ("key", new Member<KeyboardSequenceElement, KeyCode>( o => o.Key ))
+            };
         }
     }
 
@@ -146,28 +96,14 @@ namespace KSS.Components
             return TimeStepManager.UT >= _startUT + Delay;
         }
 
-        public override SerializedData GetData( IReverseReferenceMap s )
+        [MapsInheritingFrom( typeof( TimedSequenceElement ) )]
+        public static SerializationMapping TimedSequenceElementMapping()
         {
-            SerializedObject ret = (SerializedObject)base.GetData( s );
-
-            ret.AddAll( new SerializedObject()
+            return new MemberwiseSerializationMapping<TimedSequenceElement>()
             {
-                { "delay", this.Delay.GetData() },
-                { "start_ut", this._startUT.GetData() }
-            } );
-
-            return ret;
-        }
-
-        public override void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            base.SetData( data, l );
-
-            if( data.TryGetValue( "delay", out var delay ) )
-                Delay = delay.AsFloat();
-
-            if( data.TryGetValue( "start_ut", out var startUt ) )
-                _startUT = startUt.AsDouble();
+                ("delay", new Member<TimedSequenceElement, float>( o => o.Delay )),
+                ("start_ut", new Member<TimedSequenceElement, double>( o => o._startUT ))
+            };
         }
     }
 }

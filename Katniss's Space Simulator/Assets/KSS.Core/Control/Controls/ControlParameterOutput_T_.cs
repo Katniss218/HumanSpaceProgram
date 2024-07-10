@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 using UnityPlus.Serialization;
 
 namespace KSS.Control.Controls
@@ -10,7 +11,7 @@ namespace KSS.Control.Controls
 	/// <summary>
 	/// Represents a control that produces a parameter of type <typeparamref name="T"/>.
 	/// </summary>
-	public sealed class ControlParameterOutput<T> : ControlParameterOutputBase, IPersistsData
+	public sealed class ControlParameterOutput<T> : ControlParameterOutputBase
 	{
 		internal Func<T> getter;
 
@@ -63,31 +64,33 @@ namespace KSS.Control.Controls
 			}
 			return true;
 		}
-
-		public SerializedData GetData( IReverseReferenceMap s )
-		{
-			SerializedArray sa = new SerializedArray();
-			foreach( var conn in inputs )
-			{
-				sa.Add( s.WriteObjectReference( conn ) );
-			}
-			return new SerializedObject()
-			{
-				{ "connects_to", sa }
-			};
-		}
-
-		public void SetData( SerializedData data, IForwardReferenceMap l )
-		{
-			if( data.TryGetValue( "connects_to", out var connectsTo ) )
-			{
-				this.inputs.Clear();
-				foreach( var conn in (SerializedArray)connectsTo )
-				{
-					var c = (ControlParameterInput<T>)l.ReadObjectReference( conn );
-					ControlParameterInput<T>.Connect( c, this );
-				}
-			}
-		}
 	}
+
+	public static class Mappings_ControlParameterOutput_T_
+	{
+        [MapsInheritingFrom( typeof( ControlParameterOutput<> ) )]
+        public static SerializationMapping ControlParameterOutputMapping<T>()
+        {
+            return new MemberwiseSerializationMapping<ControlParameterOutput<T>>()
+            {
+                ("getter", new Member<ControlParameterOutput<T>, Func<T>>( o => o.getter )),
+                ("connects_to", new Member<ControlParameterOutput<T>, ControlParameterInput<T>[]>( ArrayContext.Refs, o => o.inputs.ToArray(), (o, value) =>
+                {
+                    foreach( var c in value )
+                    {
+                        ControlParameterInput<T>.Connect( c, o );
+                    }
+                } ))
+            }
+			.WithFactory( ( data, l ) => // Either this, or use mapping that instantiates on reference pass.
+            {
+                if( data == null )
+                    return null;
+
+                Func<T> onInvoke = (Func<T>)Persistent_Delegate.ToDelegate( data["getter"], l.RefMap );
+
+                return new ControlParameterOutput<T>( onInvoke );
+            } );
+        }
+    }
 }

@@ -1,4 +1,5 @@
 ﻿using KSS.Core;
+using KSS.Core.Physics;
 using KSS.Core.ResourceFlowSystem;
 using System;
 using System.Diagnostics.Contracts;
@@ -10,7 +11,7 @@ namespace KSS.Components
     /// <summary>
     /// A container for a <see cref="Substance"/>.
     /// </summary>
-    public class FBulkContainer_Sphere : MonoBehaviour, IResourceConsumer, IResourceProducer, IResourceContainer, IPersistsData
+    public class FBulkContainer_Sphere : MonoBehaviour, IResourceConsumer, IResourceProducer, IResourceContainer
     {
         /// <summary>
         /// Determines the center position of the container.
@@ -116,36 +117,16 @@ namespace KSS.Components
             OnAfterMassChanged?.Invoke( this.Mass - oldMass );
         }
 
-        public SerializedData GetData( IReverseReferenceMap s )
+        [MapsInheritingFrom( typeof( FBulkContainer_Sphere ) )]
+        public static SerializationMapping FBulkContainer_SphereMapping()
         {
-            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
-
-            ret.AddAll( new SerializedObject()
+            return new MemberwiseSerializationMapping<FBulkContainer_Sphere>()
             {
-                { "volume_transform", s.WriteObjectReference( this.VolumeTransform ) },
-                { "max_volume", this.MaxVolume.GetData() },
-                { "radius", this.Radius.GetData() },
-                { "contents", this.Contents.GetData( s ) }
-            } );
-
-            return ret;
-        }
-
-        public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            IPersistent_Behaviour.SetData( this, data, l );
-
-            if( data.TryGetValue( "volume_transform", out var volumeTransform ) )
-                this.VolumeTransform = (Transform)l.ReadObjectReference( volumeTransform );
-
-            if( data.TryGetValue( "max_volume", out var maxVolume ) )
-                this.MaxVolume = maxVolume.AsFloat();
-
-            if( data.TryGetValue( "radius", out var radius ) )
-                this.Radius = radius.AsFloat();
-
-            if( data.TryGetValue( "contents", out var contents ) )
-                this.Contents.SetData( contents, l );
+                ("volume_transform", new Member<FBulkContainer_Sphere, Transform>( ObjectContext.Ref, o => o.VolumeTransform )),
+                ("max_volume", new Member<FBulkContainer_Sphere, float>( o => o.MaxVolume )),
+                ("radius", new Member<FBulkContainer_Sphere, float>( o => o.Radius )),
+                ("contents", new Member<FBulkContainer_Sphere, SubstanceStateCollection>( o => o.Contents ))
+            };
         }
 
         /// <summary>

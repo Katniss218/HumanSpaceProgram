@@ -6,7 +6,6 @@ namespace KSS.Core
     /// <summary>
     /// A Manager whose responsibility is to invoke the events relating to creation/destruction of the `editor` scene.
     /// </summary>
-    [RequireComponent( typeof( PreexistingReference ) )]
     public class EditorSceneManager : SingletonMonoBehaviour<EditorSceneManager>
     {
         public const string SCENE_NAME = "Editor";

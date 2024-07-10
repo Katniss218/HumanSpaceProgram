@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.DataHandlers;
 using UnityPlus.Serialization.Json;
 
 namespace KSS.Core.Serialization
@@ -77,11 +78,19 @@ namespace KSS.Core.Serialization
         }
 
         /// <summary>
-        /// Returns the path to the (root) directory of the timeline.
+        /// Root directory is the directory that contains the _part.json file.
+        /// </summary>
+        public static string GetRootDirectory( string path )
+        {
+            return path;
+        }
+
+        /// <summary>
+        /// Root directory is the directory that contains the _part.json file.
         /// </summary>
         public string GetRootDirectory()
         {
-            return this.Filepath;
+            return GetRootDirectory( this.Filepath );
         }
 
         public static IEnumerable<PartMetadata> Filtered( IEnumerable<PartMetadata> parts, string category, string filter )
@@ -117,69 +126,42 @@ namespace KSS.Core.Serialization
             return uniqueCategories.ToArray();
         }
 
-        public void WriteToDisk()
+        public static PartMetadata LoadFromDisk( string path )
         {
-            string savePath = GetRootDirectory();
-            string saveFilePath = Path.Combine( savePath, PART_METADATA_FILENAME );
+            string saveFilePath = Path.Combine( GetRootDirectory( path ), PART_METADATA_FILENAME );
 
-            StringBuilder sb = new StringBuilder();
-            new JsonStringWriter( this.GetData(), sb ).Write();
+            PartMetadata partMetadata = new PartMetadata( path );
 
-            File.WriteAllText( saveFilePath, sb.ToString(), Encoding.UTF8 );
+            JsonSerializedDataHandler handler = new JsonSerializedDataHandler( saveFilePath );
+            var data = handler.Read();
+            SerializationUnit.Populate( partMetadata, data );
+            return partMetadata;
         }
 
-        public void ReadDataFromDisk()
+        public void SaveToDisk()
         {
-            string savePath = GetRootDirectory();
-            string saveFilePath = Path.Combine( savePath, PART_METADATA_FILENAME );
+            string saveFilePath = Path.Combine( GetRootDirectory(), PART_METADATA_FILENAME );
 
-            string saveJson = File.ReadAllText( saveFilePath, Encoding.UTF8 );
+            var data = SerializationUnit.Serialize( this );
 
-            SerializedData data = new JsonStringReader( saveJson ).Read();
-
-            this.SetData( data );
+            JsonSerializedDataHandler handler = new JsonSerializedDataHandler( saveFilePath );
+            handler.Write( data );
         }
 
-        public SerializedData GetData()
+        [MapsInheritingFrom( typeof( PartMetadata ) )]
+        public static SerializationMapping PartMetadataMapping()
         {
-            return new SerializedObject()
+            return new MemberwiseSerializationMapping<PartMetadata>()
             {
-                { "name", this.Name.GetData() },
-                { "description", this.Description.GetData() },
-                { "author", this.Author.GetData() },
-                { "categories", new SerializedArray( this.Categories.Select( c=>c.GetData()) ) },
-                { "filter", this.Filter.GetData() },
-                { "group", this.Group.GetData() }
+                ("name", new Member<PartMetadata, string>( o => o.Name )),
+                ("description", new Member<PartMetadata, string>( o => o.Description )),
+                ("author", new Member<PartMetadata, string>( o => o.Author )),
+                ("categories", new Member<PartMetadata, string[]>( o => o.Categories )),
+                ("filter", new Member<PartMetadata, string>( o => o.Filter )),
+                ("group", new Member<PartMetadata, string>( o => o.Group )),
+               // ("file_version", new Member<PartMetadata, Version>( o => o.FileVersion )),
+               // ("mod_versions", new Member<PartMetadata, Dictionary<string, Version>>( o => o.ModVersions ))
             };
-        }
-
-        public void SetData( SerializedData data )
-        {
-            if( data.TryGetValue( "name", out var name ) )
-                this.Name = name.AsString();
-
-            if( data.TryGetValue( "description", out var description ) )
-                this.Description = description.AsString();
-
-            if( data.TryGetValue( "author", out var author ) )
-                this.Author = author.AsString();
-
-            if( data.TryGetValue<SerializedArray>( "categories", out var categories ) )
-            {
-                this.Categories = new string[categories.Count];
-                int i = 0;
-                foreach( var elemKvp in categories )
-                {
-                    this.Categories[i] = elemKvp.AsString();
-                    i++;
-                }
-            }
-
-            if( data.TryGetValue( "filter", out var filter ) )
-                this.Filter = filter.AsString();
-
-            if( data.TryGetValue( "group", out var group ) )
-                this.Group = group.AsString();
         }
     }
 }

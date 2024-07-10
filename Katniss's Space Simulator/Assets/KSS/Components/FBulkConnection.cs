@@ -3,6 +3,7 @@ using KSS.Core.Physics;
 using KSS.Core.ReferenceFrames;
 using KSS.Core.ResourceFlowSystem;
 using System;
+using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
 
@@ -11,13 +12,13 @@ namespace KSS.Components
     /// <summary>
     /// An object that connects two containers and calculates the resource flow between them.
     /// </summary>
-    public class FBulkConnection : MonoBehaviour, IPersistsData
+    public class FBulkConnection : MonoBehaviour
     {
         /// <summary>
         /// Represents an inlet or outlet.
         /// </summary>
         [Serializable]
-        public class Port : IPersistsData
+        public class Port
         {
             // idk if SerializeField works with interfaces. probably better to save over in json.
             [SerializeField]
@@ -62,30 +63,17 @@ namespace KSS.Components
                 return (this._objC, this._objP);
             }
 
-            public SerializedData GetData( IReverseReferenceMap s )
+
+            [MapsInheritingFrom( typeof( Port ) )]
+            public static SerializationMapping PortMapping()
             {
-                return new SerializedObject()
+                return new MemberwiseSerializationMapping<Port>()
                 {
-                    { "obj_c", s.WriteObjectReference( this._objC ) },
-                    { "obj_p", s.WriteObjectReference( this._objP ) },
-                    { "position", this.Position.GetData() },
-                    { "forward", this.Forward.GetData() }
+                    ("obj_c", new Member<Port, object>( ObjectContext.Ref, o => (object)o._objC, (o, value) => o._objC = (IResourceConsumer)value )),
+                    ("obj_p", new Member<Port, object>( ObjectContext.Ref, o => (object)o._objP, (o, value) => o._objP = (IResourceProducer)value )),
+                    ("position", new Member<Port, Vector3>( o => o.Position )),
+                    ("forward", new Member<Port, Vector3>( o => o.Forward ))
                 };
-            }
-
-            public void SetData( SerializedData data, IForwardReferenceMap l )
-            {
-                if( data.TryGetValue( "obj_c", out var objC ) )
-                    this._objC = (IResourceConsumer)l.ReadObjectReference( objC );
-
-                if( data.TryGetValue( "obj_p", out var objP ) )
-                    this._objP = (IResourceProducer)l.ReadObjectReference( objP );
-
-                if( data.TryGetValue( "position", out var position ) )
-                    this.Position = position.AsVector3();
-
-                if( data.TryGetValue( "forward", out var forward ) )
-                    this.Forward = forward.AsVector3();
             }
         }
 
@@ -280,30 +268,15 @@ namespace KSS.Components
             }
         }
 
-        public SerializedData GetData( IReverseReferenceMap s )
+        [MapsInheritingFrom( typeof( FBulkConnection ) )]
+        public static SerializationMapping FBulkConnectionMapping()
         {
-            SerializedObject ret = (SerializedObject)IPersistent_Behaviour.GetData( this, s );
-
-            ret.AddAll( new SerializedObject()
+            return new MemberwiseSerializationMapping<FBulkConnection>()
             {
-                { "end1", this.End1.GetData( s ) },
-                { "end2", this.End2.GetData( s ) },
-                { "cross_section_area", this.CrossSectionArea.GetData() }
-            } );
-
-            return ret;
-        }
-
-        public void SetData( SerializedData data, IForwardReferenceMap l )
-        {
-            IPersistent_Behaviour.SetData( this, data, l );
-
-            if( data.TryGetValue( "end1", out var end1 ) )
-                this.End1.SetData( end1, l );
-            if( data.TryGetValue( "end2", out var end2 ) )
-                this.End2.SetData( end2, l );
-            if( data.TryGetValue( "cross_section_area", out var crossSectionArea ) )
-                this.CrossSectionArea = crossSectionArea.AsFloat();
+                ("end1", new Member<FBulkConnection, Port>( o => o.End1 )),
+                ("end2", new Member<FBulkConnection, Port>( o => o.End2 )),
+                ("cross_section_area", new Member<FBulkConnection, float>( o => o.CrossSectionArea ))
+            };
         }
     }
 }

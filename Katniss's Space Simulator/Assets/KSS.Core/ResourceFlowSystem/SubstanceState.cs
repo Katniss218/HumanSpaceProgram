@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KSS.Control.Controls;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +13,7 @@ namespace KSS.Core.ResourceFlowSystem
     /// State information about a single resource.
     /// </summary>
     [Serializable]
-    public struct SubstanceState : IPersistsData
+    public struct SubstanceState
     {
         /// <summary>
         /// The physical/chemical data about the specific resource.
@@ -38,12 +39,23 @@ namespace KSS.Core.ResourceFlowSystem
             this.MassAmount = massAmount;
         }
 
+
+        [MapsInheritingFrom( typeof( SubstanceState ) )]
+        public static SerializationMapping SubstanceStateMapping()
+        {
+            return new MemberwiseSerializationMapping<SubstanceState>()
+            {
+                ("substance", new Member<SubstanceState, Substance>( ObjectContext.Asset, o => o.Substance )),
+                ("mass_amount", new Member<SubstanceState, float>( o => o.MassAmount ))
+            };
+        }
+        /*
         public SerializedData GetData( IReverseReferenceMap s )
         {
             return new SerializedObject()
             {
                 { "substance", s.WriteAssetReference( Substance ) },
-                { "mass_amount", MassAmount.GetData() }
+                { "mass_amount", MassAmount.AsSerialized() }
             };
         }
 
@@ -51,6 +63,6 @@ namespace KSS.Core.ResourceFlowSystem
         {
             Substance = l.ReadAssetReference<Substance>( data["substance"] );
             MassAmount = data["mass_amount"].AsFloat();
-        }
+        }*/
     }
 }
