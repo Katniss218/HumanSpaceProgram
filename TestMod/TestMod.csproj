@@ -6,25 +6,25 @@
 
   <ItemGroup>
     <Reference Include="KSS.Core">
-      <HintPath>..\Katniss's Space Simulator\Library\ScriptAssemblies\KSS.Core.dll</HintPath>
+      <HintPath>..\HumanSpaceProgram\Library\ScriptAssemblies\HSP.Core.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>..\Katniss's Space Simulator\Build\Katniss's Space Simulator_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>..\HumanSpaceProgram\bin\HumanSpaceProgram_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\Katniss's Space Simulator\Build\Katniss's Space Simulator_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>..\HumanSpaceProgram\bin\HumanSpaceProgram_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
     <Reference Include="_UnityEngine">
-      <HintPath>..\Katniss's Space Simulator\Library\ScriptAssemblies\_UnityEngine.dll</HintPath>
+      <HintPath>..\HumanSpaceProgram\Library\ScriptAssemblies\_UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="_UnityPlus.AssetManagement">
-      <HintPath>..\Katniss's Space Simulator\Library\ScriptAssemblies\_UnityPlus.AssetManagement.dll</HintPath>
+      <HintPath>..\HumanSpaceProgram\Library\ScriptAssemblies\_UnityPlus.AssetManagement.dll</HintPath>
     </Reference>
     <Reference Include="_UnityPlus.Serialization">
-      <HintPath>..\Katniss's Space Simulator\Library\ScriptAssemblies\_UnityPlus.Serialization.dll</HintPath>
+      <HintPath>..\HumanSpaceProgram\Library\ScriptAssemblies\_UnityPlus.Serialization.dll</HintPath>
     </Reference>
     <Reference Include="_UnityPlus.UILib">
-      <HintPath>..\Katniss's Space Simulator\Library\ScriptAssemblies\_UnityPlus.UILib.dll</HintPath>
+      <HintPath>..\HumanSpaceProgram\Library\ScriptAssemblies\_UnityPlus.UILib.dll</HintPath>
     </Reference>
   </ItemGroup>
 
