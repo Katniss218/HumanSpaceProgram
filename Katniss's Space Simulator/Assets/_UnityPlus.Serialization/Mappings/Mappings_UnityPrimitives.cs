@@ -9,7 +9,7 @@ namespace UnityPlus.Serialization.Mappings
 {
     public static class Mappings_UnityPrimitives
     {
-        [SerializationMappingProvider( typeof( Vector2 ) )]
+        [MapsInheritingFrom( typeof( Vector2 ) )]
         public static SerializationMapping Vector2Mapping()
         {
             return new PrimitiveStructSerializationMapping<Vector2>()
@@ -19,7 +19,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( Vector2Int ) )]
+        [MapsInheritingFrom( typeof( Vector2Int ) )]
         public static SerializationMapping Vector2IntMapping()
         {
             return new PrimitiveStructSerializationMapping<Vector2Int>()
@@ -29,7 +29,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( Vector3 ) )]
+        [MapsInheritingFrom( typeof( Vector3 ) )]
         public static SerializationMapping Vector3Mapping()
         {
             return new PrimitiveStructSerializationMapping<Vector3>()
@@ -39,7 +39,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( Vector3Int ) )]
+        [MapsInheritingFrom( typeof( Vector3Int ) )]
         public static SerializationMapping Vector3IntMapping()
         {
             return new PrimitiveStructSerializationMapping<Vector3Int>()
@@ -49,7 +49,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( Vector4 ) )]
+        [MapsInheritingFrom( typeof( Vector4 ) )]
         public static SerializationMapping Vector4Mapping()
         {
             return new PrimitiveStructSerializationMapping<Vector4>()
@@ -59,7 +59,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( Quaternion ) )]
+        [MapsInheritingFrom( typeof( Quaternion ) )]
         public static SerializationMapping QuaternionMapping()
         {
             return new PrimitiveStructSerializationMapping<Quaternion>()

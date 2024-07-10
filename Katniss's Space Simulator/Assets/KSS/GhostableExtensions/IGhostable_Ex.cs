@@ -19,7 +19,7 @@ namespace KSS
     public static class IGhostable_Ex
     {
 
-        [SerializationMappingProvider( typeof( Renderer ), Context = GhostableContext.Ghost )]
+        [MapsInheritingFrom( typeof( Renderer ), Context = GhostableContext.Ghost )]
         public static SerializationMapping RendererMapping()
         {
             return new MemberwiseSerializationMapping<Renderer>()
@@ -30,7 +30,7 @@ namespace KSS
             };
         }
 
-        [SerializationMappingProvider( typeof( Collider ), Context = GhostableContext.Ghost )]
+        [MapsInheritingFrom( typeof( Collider ), Context = GhostableContext.Ghost )]
         public static SerializationMapping ColliderMapping()
         {
             return new MemberwiseSerializationMapping<Collider>()
@@ -39,7 +39,7 @@ namespace KSS
             };
         }
 
-        [SerializationMappingProvider( typeof( FPointMass ), Context = GhostableContext.Ghost )]
+        [MapsInheritingFrom( typeof( FPointMass ), Context = GhostableContext.Ghost )]
         public static SerializationMapping FPointMassMapping()
         {
             return new MemberwiseSerializationMapping<FPointMass>()

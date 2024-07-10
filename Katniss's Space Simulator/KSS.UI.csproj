@@ -94,8 +94,8 @@
     <Compile Include="Assets\KSS.UI\Windows\UIStartNewGameWindow.cs" />
     <Compile Include="Assets\KSS.UI\Windows\UILoadWindow.cs" />
     <Compile Include="Assets\KSS.UI\HUDs\ConstructionSiteHUDManager.cs" />
-    <Compile Include="Assets\KSS.UI\NavballRenderTextureManager.cs" />
     <Compile Include="Assets\KSS.UI\HUDs\VesselHUDManager.cs" />
+    <Compile Include="Assets\KSS.UI\NavballRenderTextureManager.cs" />
     <Compile Include="Assets\KSS.UI\UITextReadout_Acceleration.cs" />
     <Compile Include="Assets\KSS.UI\Windows\PartWindowComponents\UIIResourceContainer.cs" />
     <Compile Include="Assets\KSS.UI\HUDs\VesselHUD.cs" />

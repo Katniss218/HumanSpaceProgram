@@ -46,9 +46,9 @@ namespace UnityPlus.Serialization
         protected abstract bool TryLoadReferences<T>( ref T obj, SerializedData data, ILoader l );
 
         /// <summary>
-        /// Override this if your mapping contains any additional data (and return copy of the mapping in the overloaded method, but with those additional data fields cleared).
+        /// Override this if your mapping contains any additional data (and return copy of the mapping, but with those additional data fields cleared).
         /// </summary>
-        /// <returns>Either itself, or a clone (depending on if the mapping needs to persist data between Load and LoadReferences).</returns>
+        /// <returns>Either "this", or a clone (depending on if the mapping needs to persist data between Load and LoadReferences).</returns>
         public virtual SerializationMapping GetInstance()
         {
             return this;

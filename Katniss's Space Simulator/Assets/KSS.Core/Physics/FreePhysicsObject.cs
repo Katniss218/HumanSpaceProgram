@@ -175,7 +175,7 @@ namespace KSS.Core.Physics
         }
 
 
-        [SerializationMappingProvider( typeof( FreePhysicsObject ) )]
+        [MapsInheritingFrom( typeof( FreePhysicsObject ) )]
         public static SerializationMapping FreePhysicsObjectMapping()
         {
             return new MemberwiseSerializationMapping<FreePhysicsObject>()

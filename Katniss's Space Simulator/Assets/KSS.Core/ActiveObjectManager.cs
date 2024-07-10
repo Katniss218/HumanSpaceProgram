@@ -34,7 +34,7 @@ namespace KSS.Core
             }
         }
 
-        [SerializationMappingProvider( typeof( ActiveObjectManager ) )]
+        [MapsInheritingFrom( typeof( ActiveObjectManager ) )]
         public static SerializationMapping ActiveObjectManagerMapping()
         {
             return new MemberwiseSerializationMapping<ActiveObjectManager>()

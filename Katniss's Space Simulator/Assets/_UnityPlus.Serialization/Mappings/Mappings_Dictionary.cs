@@ -5,7 +5,7 @@ namespace UnityPlus.Serialization.Mappings
 {
     public static class Mappings_Dictionary
     {
-        [SerializationMappingProvider( typeof( KeyValuePair<,> ), Context = KeyValueContext.ValueToValue )]
+        [MapsInheritingFrom( typeof( KeyValuePair<,> ), Context = KeyValueContext.ValueToValue )]
         public static SerializationMapping KeyValuePair_ValueToValue_Mapping<TKey, TValue>()
         {
             return new NonPrimitiveSerializationMapping<KeyValuePair<TKey, TValue>>()
@@ -63,7 +63,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( Dictionary<,> ), Context = KeyValueContext.ValueToValue )]
+        [MapsInheritingFrom( typeof( Dictionary<,> ), Context = KeyValueContext.ValueToValue )]
         public static SerializationMapping Dictionary_ValueToValue_Mapping<TKey, TValue>()
         {
             return new NonPrimitiveSerializationMappingWithTemp<(TKey, TValue)[], Dictionary<TKey, TValue>>()
@@ -73,7 +73,6 @@ namespace UnityPlus.Serialization.Mappings
                     if( o == null )
                         return null;
 
-#warning TODO - add some way of automatically adding type and id. (also, objects should be objects not arrays)
                     SerializedArray arr = new SerializedArray();
 
                     foreach( var kvp in o )
@@ -162,7 +161,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( Dictionary<,> ), Context = KeyValueContext.RefToValue )]
+        [MapsInheritingFrom( typeof( Dictionary<,> ), Context = KeyValueContext.RefToValue )]
         public static SerializationMapping Dictionary_TKey_TValue_Mapping<TKey, TValue>()
         {
             return new NonPrimitiveSerializationMappingWithTemp<(TKey, TValue)[], Dictionary<TKey, TValue>>()
@@ -172,7 +171,6 @@ namespace UnityPlus.Serialization.Mappings
                     if( o == null )
                         return null;
 
-#warning TODO - add some way of automatically adding type and id. (also, objects should be objects not arrays)
                     SerializedArray arr = new SerializedArray();
 
                     foreach( var kvp in o )

@@ -117,7 +117,7 @@ namespace KSS.Components
             OnAfterMassChanged?.Invoke( this.Mass - oldMass );
         }
 
-        [SerializationMappingProvider( typeof( FBulkContainer_Sphere ) )]
+        [MapsInheritingFrom( typeof( FBulkContainer_Sphere ) )]
         public static SerializationMapping FBulkContainer_SphereMapping()
         {
             return new MemberwiseSerializationMapping<FBulkContainer_Sphere>()

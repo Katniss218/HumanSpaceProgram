@@ -148,7 +148,7 @@ namespace KSS.Core.Serialization
             handler.Write( data );
         }
 
-        [SerializationMappingProvider( typeof( PartMetadata ) )]
+        [MapsInheritingFrom( typeof( PartMetadata ) )]
         public static SerializationMapping PartMetadataMapping()
         {
             return new MemberwiseSerializationMapping<PartMetadata>()

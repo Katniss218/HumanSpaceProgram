@@ -28,7 +28,7 @@ namespace KSS.Components
             { }
 
 
-            [SerializationMappingProvider( typeof( Actuator2DGroup ) )]
+            [MapsInheritingFrom( typeof( Actuator2DGroup ) )]
             public static SerializationMapping Actuator2DGroupMapping()
             {
                 return new MemberwiseSerializationMapping<Actuator2DGroup>()
@@ -100,7 +100,7 @@ namespace KSS.Components
             }
         }
 
-        [SerializationMappingProvider( typeof( FGimbalActuatorController ) )]
+        [MapsInheritingFrom( typeof( FGimbalActuatorController ) )]
         public static SerializationMapping FGimbalActuatorControllerMapping()
         {
             return new MemberwiseSerializationMapping<FGimbalActuatorController>()

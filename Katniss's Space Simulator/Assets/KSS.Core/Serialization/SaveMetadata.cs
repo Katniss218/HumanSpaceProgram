@@ -154,7 +154,7 @@ namespace KSS.Core.Serialization
             handler.Write( data );
         }
 
-        [SerializationMappingProvider( typeof( SaveMetadata ) )]
+        [MapsInheritingFrom( typeof( SaveMetadata ) )]
         public static SerializationMapping SaveMetadataMapping()
         {
             return new MemberwiseSerializationMapping<SaveMetadata>()

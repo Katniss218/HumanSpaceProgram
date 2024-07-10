@@ -64,7 +64,7 @@ namespace KSS.Control.Controls
             return true;
         }
 
-        [SerializationMappingProvider( typeof( ControllerOutput ) )]
+        [MapsInheritingFrom( typeof( ControllerOutput ) )]
         public static SerializationMapping ControllerOutputMapping()
         {
             return new MemberwiseSerializationMapping<ControllerOutput>(); // empty dummy referencable thing.

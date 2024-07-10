@@ -4,7 +4,7 @@ namespace KSS.Core.Mods
 {
     public static class Mappings_NamespacedIdentifier
     {
-        [SerializationMappingProvider( typeof( NamespacedIdentifier ) )]
+        [MapsInheritingFrom( typeof( NamespacedIdentifier ) )]
         public static SerializationMapping NamespacedIdentifierMapping()
         {
             return new PrimitiveStructSerializationMapping<NamespacedIdentifier>()

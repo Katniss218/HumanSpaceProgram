@@ -45,7 +45,7 @@ namespace UnityPlus.Serialization
 
         protected override bool Save<TMember>( TMember obj, ref SerializedData data, ISaver s )
         {
-            if( obj != null && !((typeof( TMember ).IsValueType || typeof( TMember ).IsSealed) && !typeof( TMember ).IsGenericType) )
+            if( obj != null && MappingHelper.IsNonNullEligibleForTypeHeader<TMember>() )
             {
                 data = new SerializedObject();
                 data[KeyNames.ID] = s.RefMap.GetID( obj ).SerializeGuid(); // doesn't make sense for structs.
@@ -66,6 +66,11 @@ namespace UnityPlus.Serialization
             if( OnLoad == null )
                 return false;
 
+            if( data != null && MappingHelper.IsNonNullEligibleForTypeHeader<TMember>() )
+            {
+                data = data["value"];
+            }
+
             if( OnInstantiateTemp != null )
                 temp = OnInstantiateTemp.Invoke( data, l );
 
@@ -84,7 +89,7 @@ namespace UnityPlus.Serialization
             if( OnLoad == null )
                 return false;
 
-            if( data != null && !((typeof( TMember ).IsValueType || typeof( TMember ).IsSealed) && !typeof( TMember ).IsGenericType) )
+            if( data != null && MappingHelper.IsNonNullEligibleForTypeHeader<TMember>() )
             {
                 data = data["value"];
             }
@@ -105,7 +110,7 @@ namespace UnityPlus.Serialization
             if( OnLoadReferences == null )
                 return false;
 
-            if( data != null && !((typeof( TMember ).IsValueType || typeof( TMember ).IsSealed) && !typeof( TMember ).IsGenericType) )
+            if( data != null && MappingHelper.IsNonNullEligibleForTypeHeader<TMember>() )
             {
                 data = data["value"];
             }

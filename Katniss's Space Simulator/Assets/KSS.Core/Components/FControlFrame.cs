@@ -41,7 +41,7 @@ namespace KSS.Core.Components
                 : SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( frame._referenceTransform.rotation );
         }
 
-        [SerializationMappingProvider( typeof( FControlFrame ) )]
+        [MapsInheritingFrom( typeof( FControlFrame ) )]
         public static SerializationMapping FControlFrameMapping()
         {
             return new MemberwiseSerializationMapping<FControlFrame>()

@@ -9,7 +9,7 @@ namespace UnityPlus.Serialization.Mappings
 {
     public static class Mappings_SystemPrimitives
     {
-        [SerializationMappingProvider( typeof( bool ) )]
+        [MapsInheritingFrom( typeof( bool ) )]
         public static SerializationMapping BooleanMapping()
         {
             return new PrimitiveStructSerializationMapping<bool>()
@@ -19,7 +19,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( byte ) )]
+        [MapsInheritingFrom( typeof( byte ) )]
         public static SerializationMapping ByteMapping()
         {
             return new PrimitiveStructSerializationMapping<byte>()
@@ -29,7 +29,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( sbyte ) )]
+        [MapsInheritingFrom( typeof( sbyte ) )]
         public static SerializationMapping SByteMapping()
         {
             return new PrimitiveStructSerializationMapping<sbyte>()
@@ -39,7 +39,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( short ) )]
+        [MapsInheritingFrom( typeof( short ) )]
         public static SerializationMapping Int16Mapping()
         {
             return new PrimitiveStructSerializationMapping<short>()
@@ -49,7 +49,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( ushort ) )]
+        [MapsInheritingFrom( typeof( ushort ) )]
         public static SerializationMapping UInt16Mapping()
         {
             return new PrimitiveStructSerializationMapping<ushort>()
@@ -59,7 +59,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( int ) )]
+        [MapsInheritingFrom( typeof( int ) )]
         public static SerializationMapping Int32Mapping()
         {
             return new PrimitiveStructSerializationMapping<int>()
@@ -69,7 +69,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( uint ) )]
+        [MapsInheritingFrom( typeof( uint ) )]
         public static SerializationMapping UInt32Mapping()
         {
             return new PrimitiveStructSerializationMapping<uint>()
@@ -79,7 +79,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( long ) )]
+        [MapsInheritingFrom( typeof( long ) )]
         public static SerializationMapping Int64Mapping()
         {
             return new PrimitiveStructSerializationMapping<long>()
@@ -89,7 +89,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( ulong ) )]
+        [MapsInheritingFrom( typeof( ulong ) )]
         public static SerializationMapping UInt64Mapping()
         {
             return new PrimitiveStructSerializationMapping<ulong>()
@@ -99,7 +99,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( float ) )]
+        [MapsInheritingFrom( typeof( float ) )]
         public static SerializationMapping FloatMapping()
         {
             return new PrimitiveStructSerializationMapping<float>()
@@ -109,7 +109,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( double ) )]
+        [MapsInheritingFrom( typeof( double ) )]
         public static SerializationMapping DoubleMapping()
         {
             return new PrimitiveStructSerializationMapping<double>()
@@ -119,7 +119,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( decimal ) )]
+        [MapsInheritingFrom( typeof( decimal ) )]
         public static SerializationMapping DecimalMapping()
         {
             return new PrimitiveStructSerializationMapping<decimal>()
@@ -129,7 +129,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( char ) )]
+        [MapsInheritingFrom( typeof( char ) )]
         public static SerializationMapping CharMapping()
         {
             return new PrimitiveStructSerializationMapping<char>()
@@ -139,7 +139,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( string ) )]
+        [MapsInheritingFrom( typeof( string ) )]
         public static SerializationMapping StringMapping()
         {
             return new PrimitiveStructSerializationMapping<string>()
@@ -149,7 +149,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( DateTime ) )]
+        [MapsInheritingFrom( typeof( DateTime ) )]
         public static SerializationMapping DateTimeMapping()
         {
             // DateTime is saved as an ISO-8601 string.
@@ -162,7 +162,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( DateTimeOffset ) )]
+        [MapsInheritingFrom( typeof( DateTimeOffset ) )]
         public static SerializationMapping DateTimeOffsetMapping()
         {
             // DateTimeOffset is saved as an ISO-8601 string.
@@ -175,7 +175,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( TimeSpan ) )]
+        [MapsInheritingFrom( typeof( TimeSpan ) )]
         public static SerializationMapping TimeSpanMapping()
         {
             // TimeSpan is saved as `[-][dd'.']hh':'mm':'ss['.'fffffff]`.
@@ -188,7 +188,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( Enum ) )]
+        [MapsInheritingFrom( typeof( Enum ) )]
         public static SerializationMapping EnumMapping<T>() where T : struct, Enum
         {
             return new PrimitiveStructSerializationMapping<T>()
@@ -198,7 +198,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( Delegate ) )]
+        [MapsInheritingFrom( typeof( Delegate ) )]
         public static SerializationMapping DelegateMapping()
         {
             return new PrimitiveStructSerializationMapping<Delegate>()

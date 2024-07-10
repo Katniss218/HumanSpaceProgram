@@ -34,7 +34,7 @@ namespace KSS.Components
             }
         }
 
-        [SerializationMappingProvider( typeof( FSequencer ) )]
+        [MapsInheritingFrom( typeof( FSequencer ) )]
         public static SerializationMapping FSequencerMapping()
         {
             return new MemberwiseSerializationMapping<FSequencer>()

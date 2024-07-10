@@ -44,7 +44,7 @@ namespace KSS.Components
             }
         }
 
-        [SerializationMappingProvider( typeof( SequenceElement ) )]
+        [MapsInheritingFrom( typeof( SequenceElement ) )]
         public static SerializationMapping SequenceElementMapping()
         {
             return new MemberwiseSerializationMapping<SequenceElement>()
@@ -67,7 +67,7 @@ namespace KSS.Components
             return UnityEngine.Input.GetKey( Key );
         }
 
-        [SerializationMappingProvider( typeof( KeyboardSequenceElement ) )]
+        [MapsInheritingFrom( typeof( KeyboardSequenceElement ) )]
         public static SerializationMapping KeyboardSequenceElementMapping()
         {
             return new MemberwiseSerializationMapping<KeyboardSequenceElement>()
@@ -96,7 +96,7 @@ namespace KSS.Components
             return TimeStepManager.UT >= _startUT + Delay;
         }
 
-        [SerializationMappingProvider( typeof( TimedSequenceElement ) )]
+        [MapsInheritingFrom( typeof( TimedSequenceElement ) )]
         public static SerializationMapping TimedSequenceElementMapping()
         {
             return new MemberwiseSerializationMapping<TimedSequenceElement>()

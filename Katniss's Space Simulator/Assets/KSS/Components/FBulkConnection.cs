@@ -64,7 +64,7 @@ namespace KSS.Components
             }
 
 
-            [SerializationMappingProvider( typeof( Port ) )]
+            [MapsInheritingFrom( typeof( Port ) )]
             public static SerializationMapping PortMapping()
             {
                 return new MemberwiseSerializationMapping<Port>()
@@ -268,7 +268,7 @@ namespace KSS.Components
             }
         }
 
-        [SerializationMappingProvider( typeof( FBulkConnection ) )]
+        [MapsInheritingFrom( typeof( FBulkConnection ) )]
         public static SerializationMapping FBulkConnectionMapping()
         {
             return new MemberwiseSerializationMapping<FBulkConnection>()

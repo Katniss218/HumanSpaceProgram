@@ -9,7 +9,7 @@ namespace UnityPlus.Serialization.Mappings
 {
     public static class Mappings_Assets
     {
-        [SerializationMappingProvider( typeof( object ), Context = ObjectContext.Asset )]
+        [MapsInheritingFrom( typeof( object ), Context = ObjectContext.Asset )]
         public static SerializationMapping ObjectAssetMapping<T>() where T : class
         {
             return new PrimitiveStructSerializationMapping<T>()
@@ -19,7 +19,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( Array ), Context = ObjectContext.Asset )]
+        [MapsInheritingFrom( typeof( Array ), Context = ArrayContext.Assets )]
         public static SerializationMapping ArrayAssetMapping<T>() where T : class
         {
             return new PrimitiveStructSerializationMapping<T[]>()

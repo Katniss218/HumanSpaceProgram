@@ -38,7 +38,7 @@ namespace KSS.Components
             OnInvokeTyped.TrySendSignal();
         }
 
-        [SerializationMappingProvider( typeof( SequenceAction ) )]
+        [MapsInheritingFrom( typeof( SequenceAction ) )]
         public static SerializationMapping SequenceActionMapping()
         {
             return new MemberwiseSerializationMapping<SequenceAction>()
@@ -68,7 +68,7 @@ namespace KSS.Components
 
     public static class Mappings_SequenceAction_T_
     {
-        [SerializationMappingProvider( typeof( SequenceAction<> ) )]
+        [MapsInheritingFrom( typeof( SequenceAction<> ) )]
         public static SerializationMapping SequenceActionMapping<T>()
         {
             return new MemberwiseSerializationMapping<SequenceAction<T>>()

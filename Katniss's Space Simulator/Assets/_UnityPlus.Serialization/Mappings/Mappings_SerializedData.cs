@@ -9,7 +9,7 @@ namespace UnityPlus.Serialization.Mappings
 {
     public static class Mappings_SerializedData
     {
-        [SerializationMappingProvider( typeof( SerializedPrimitive ) )]
+        [MapsInheritingFrom( typeof( SerializedPrimitive ) )]
         public static SerializationMapping SerializedPrimitiveMapping()
         {
             return new PrimitiveStructSerializationMapping<SerializedPrimitive>()
@@ -19,7 +19,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( SerializedObject ) )]
+        [MapsInheritingFrom( typeof( SerializedObject ) )]
         public static SerializationMapping SerializedObjectMapping()
         {
             return new PrimitiveStructSerializationMapping<SerializedObject>()
@@ -29,7 +29,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( SerializedArray ) )]
+        [MapsInheritingFrom( typeof( SerializedArray ) )]
         public static SerializationMapping SerializedArrayMapping()
         {
             return new PrimitiveStructSerializationMapping<SerializedArray>()

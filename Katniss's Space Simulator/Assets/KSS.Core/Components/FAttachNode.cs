@@ -127,7 +127,7 @@ namespace KSS.Core.Components
             snappedObject.position = targetNode.transform.position + offset;
         }
 
-        [SerializationMappingProvider( typeof( FAttachNode ) )]
+        [MapsInheritingFrom( typeof( FAttachNode ) )]
         public static SerializationMapping FAttachNodeMapping()
         {
             return new MemberwiseSerializationMapping<FAttachNode>()

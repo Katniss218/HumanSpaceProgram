@@ -92,7 +92,7 @@ namespace KSS.Core
         /// </summary>
         public IReferenceFrame OrientedReferenceFrame => new OrientedReferenceFrame( this.AIRFPosition, this.AIRFRotation );
 
-        [SerializationMappingProvider( typeof( CelestialBody ) )]
+        [MapsInheritingFrom( typeof( CelestialBody ) )]
         public static SerializationMapping CelestialBodyMapping()
         {
             return new MemberwiseSerializationMapping<CelestialBody>()

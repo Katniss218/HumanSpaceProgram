@@ -68,7 +68,7 @@ namespace KSS.Control.Controls
 
 	public static class Mappings_ControlParameterOutput_T_
 	{
-        [SerializationMappingProvider( typeof( ControlParameterOutput<> ) )]
+        [MapsInheritingFrom( typeof( ControlParameterOutput<> ) )]
         public static SerializationMapping ControlParameterOutputMapping<T>()
         {
             return new MemberwiseSerializationMapping<ControlParameterOutput<T>>()

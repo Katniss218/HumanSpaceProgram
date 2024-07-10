@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace UnityPlus.Serialization
@@ -11,16 +12,21 @@ namespace UnityPlus.Serialization
     /// </summary>
     public static class SerializationMappingRegistry
     {
-        private struct RegistryEntry
+        private struct MappingGetterMethod
         {
-            public bool isReady;
-
             public Type mappedType;
             public MethodInfo method;
-            public SerializationMapping mapping;
+            public MappingProviderAttribute providerAttribute;
         }
 
-        private static readonly TypeMap<int, RegistryEntry> _mappings = new();
+        private static readonly Dictionary<(int, Type), SerializationMapping> _directCache = new();
+
+        private static readonly MapsInheritingFromSearcher<int, MappingGetterMethod> _inheritedMappings = new();
+        private static readonly MapsImplementingSearcher<int, MappingGetterMethod> _implementingMappings = new();
+        private static readonly MapsAnyClassSearcher<int, MappingGetterMethod> _classMappings = new();
+        private static readonly MapsAnyStructSearcher<int, MappingGetterMethod> _structMappings = new();
+        private static readonly MapsAnyInterfaceSearcher<int, MappingGetterMethod> _interfaceMappings = new();
+        private static readonly MapsAnySearcher<int, MappingGetterMethod> _anyMappings = new();
 
         private static bool _isInitialized = false;
 
@@ -39,9 +45,9 @@ namespace UnityPlus.Serialization
                 MethodInfo[] methods = containingType.GetMethods( BindingFlags.Public | BindingFlags.Static );
                 foreach( var method in methods )
                 {
-                    SerializationMappingProviderAttribute attr = method.GetCustomAttribute<SerializationMappingProviderAttribute>();
-                    if( attr == null )
-                        continue;
+                    // Find every method that returns a mapping, and cache *that method*.
+                    // The invocation is deferred to when the type parameters are known (that is, when the mapping is retrieved).
+                    //   This allows for having generic mapping getter methods.
 
                     if( method.ReturnParameter.ParameterType != typeof( SerializationMapping ) )
                         continue;
@@ -49,23 +55,67 @@ namespace UnityPlus.Serialization
                     if( method.GetParameters().Length != 0 )
                         continue;
 
-                    // Find every method that returns a mapping, and cache it.
-                    // In case the mapping (and method) is generic, the call is deferred to when the type parameters are known.
+                    IEnumerable<MappingProviderAttribute> attrs = method.GetCustomAttributes<MappingProviderAttribute>();
+                    if( attrs == null )
+                        continue;
 
-                    var entry = new RegistryEntry()
+                    foreach( var attr in attrs )
                     {
-                        mappedType = attr.MappedType,
-                        mapping = null,
-                        method = method,
-                        isReady = false
-                    };
+                        var entry = new MappingGetterMethod()
+                        {
+                            mappedType = attr.MappedType,
+                            method = method,
+                            providerAttribute = attr,
+                        };
 
-                    foreach( var context in attr.Contexts )
-                    {
-                        if( _mappings.TryGet( context, attr.MappedType, out _ ) )
-                            Debug.LogWarning( $"Multiple mappings found for type `{attr.MappedType.AssemblyQualifiedName}`." );
+                        foreach( var context in attr.Contexts )
+                        {
+                            switch( attr )
+                            {
+                                case MapsInheritingFromAttribute:
 
-                        _mappings.Set( context, attr.MappedType, entry );
+                                    if( !_inheritedMappings.TrySet( context, attr.MappedType, entry ) )
+                                    {
+                                        Debug.LogWarning( $"Multiple '{nameof(MapsInheritingFromAttribute)}' mappings found for type `{attr.MappedType.AssemblyQualifiedName}`." );
+                                    }
+                                    break;
+                                case MapsImplementingAttribute:
+
+                                    if( !_implementingMappings.TrySet( context, attr.MappedType, entry ) )
+                                    {
+                                        Debug.LogWarning( $"Multiple '{nameof( MapsImplementingAttribute )}' mappings found for type `{attr.MappedType.AssemblyQualifiedName}`." );
+                                    }
+                                    break;
+                                case MapsAnyClassAttribute:
+
+                                    if( !_classMappings.TrySet( context, attr.MappedType, entry ) )
+                                    {
+                                        Debug.LogWarning( $"Multiple '{nameof( MapsAnyClassAttribute )}' mappings found for type `{attr.MappedType.AssemblyQualifiedName}`." );
+                                    }
+                                    break;
+                                case MapsAnyStructAttribute:
+
+                                    if( !_structMappings.TrySet( context, attr.MappedType, entry ) )
+                                    {
+                                        Debug.LogWarning( $"Multiple '{nameof( MapsAnyStructAttribute )}' mappings found for type `{attr.MappedType.AssemblyQualifiedName}`." );
+                                    }
+                                    break;
+                                case MapsAnyInterfaceAttribute:
+
+                                    if( !_inheritedMappings.TrySet( context, attr.MappedType, entry ) )
+                                    {
+                                        Debug.LogWarning( $"Multiple '{nameof( MapsAnyInterfaceAttribute )}' mappings found for type `{attr.MappedType.AssemblyQualifiedName}`." );
+                                    }
+                                    break;
+                                case MapsAnyAttribute:
+
+                                    if( !_anyMappings.TrySet( context, attr.MappedType, entry ) )
+                                    {
+                                        Debug.LogWarning( $"Multiple '{nameof( MapsAnyAttribute )}' mappings found for type `{attr.MappedType.AssemblyQualifiedName}`." );
+                                    }
+                                    break;
+                            }
+                        }
                     }
                 }
             }
@@ -95,14 +145,31 @@ namespace UnityPlus.Serialization
             Initialize( new Assembly[] { assembly } );
         }
 
-        private static RegistryEntry MakeReadyAndRegister( int context, RegistryEntry entry, Type objType )
+        private static SerializationMapping MakeReadyAndRegister( int context, MappingGetterMethod entry, Type objType )
         {
             MethodInfo method = entry.method;
 
             if( method.ContainsGenericParameters )
             {
+                if( entry.providerAttribute is MapsAnyClassAttribute )
+                {
+                    method = method.MakeGenericMethod( objType );
+                }
+                else if( entry.providerAttribute is MapsAnyStructAttribute )
+                {
+                    method = method.MakeGenericMethod( objType );
+                }
+                else if( entry.providerAttribute is MapsAnyInterfaceAttribute )
+                {
+                    method = method.MakeGenericMethod( objType );
+                }
+                else if( entry.providerAttribute is MapsAnyAttribute )
+                {
+                    method = method.MakeGenericMethod( objType );
+                }
+
                 // Allows mappings for type 'object' to be genericized with the member type.
-                if( entry.mappedType == typeof( object ) )
+                else if( entry.mappedType == typeof( object ) )
                 {
                     method = method.MakeGenericMethod( objType );
                 }
@@ -134,14 +201,40 @@ namespace UnityPlus.Serialization
             var mapping = (SerializationMapping)method.Invoke( null, null );
             mapping.context = context;
 
-            // Update everything in the cache.
-            entry.method = method;
-            entry.isReady = true;
-            entry.mapping = mapping;
+            _directCache[(context, objType)] = mapping;
 
-            _mappings.Set( context, objType, entry );
+            return mapping;
+        }
 
-            return entry;
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        private static SerializationMapping GetMappingInternal( int context, Type type )
+        {
+            if( _directCache.TryGetValue( (context, type), out var mapping ) )
+            {
+                if( mapping == null )
+                    return null;
+
+                return mapping.GetInstance();
+            }
+
+            if( _inheritedMappings.TryGet( context, type, out var entry )
+             || _implementingMappings.TryGet( context, type, out entry )
+             || _interfaceMappings.TryGet( context, type, out entry )
+             || _classMappings.TryGet( context, type, out entry )
+             || _structMappings.TryGet( context, type, out entry )
+             || _anyMappings.TryGet( context, type, out entry ) )
+            {
+                mapping = MakeReadyAndRegister( context, entry, type );
+
+                if( mapping == null )
+                    return null;
+
+                return mapping.GetInstance();
+            }
+
+            _directCache[(context, type)] = null;
+
+            return null;
         }
 
         /// <summary>
@@ -162,30 +255,7 @@ namespace UnityPlus.Serialization
             if( !_isInitialized )
                 Initialize( AppDomain.CurrentDomain.GetAssemblies() );
 
-            if( _mappings.TryGetClosest( context, memberType, out var entry ) )
-            {
-                if( !entry.isReady )
-                {
-                    entry = MakeReadyAndRegister( context, entry, memberType );
-                }
-
-                if( entry.mapping == null )
-                    return null;
-
-                return entry.mapping.GetInstance();
-            }
-
-            entry = new RegistryEntry()
-            {
-                isReady = true,
-                mappedType = memberType,
-                method = null,
-                mapping = null
-            };
-
-            _mappings.Set( context, memberType, entry );
-
-            return null;
+            return GetMappingInternal( context, memberType );
         }
 
         /// <summary>
@@ -202,34 +272,11 @@ namespace UnityPlus.Serialization
             if( !_isInitialized )
                 Initialize( AppDomain.CurrentDomain.GetAssemblies() );
 
-            Type objType = typeof( TMember );
-            if( memberObj != null )
-                objType = memberObj.GetType();
+            Type objType = memberObj == null
+                ? typeof( TMember )
+                : memberObj.GetType();
 
-            if( _mappings.TryGetClosest( context, objType, out var entry ) )
-            {
-                if( !entry.isReady )
-                {
-                    entry = MakeReadyAndRegister( context, entry, objType );
-                }
-
-                if( entry.mapping == null )
-                    return null;
-
-                return entry.mapping.GetInstance();
-            }
-
-            entry = new RegistryEntry()
-            {
-                isReady = true,
-                mappedType = objType,
-                method = null,
-                mapping = null
-            };
-
-            _mappings.Set( context, objType, entry );
-
-            return null;
+            return GetMappingInternal( context, objType );
         }
 
         /// <summary>
@@ -251,28 +298,7 @@ namespace UnityPlus.Serialization
 
             if( typeof( TMember ).IsAssignableFrom( objType ) ) // `IsAssignableFrom` appears to be quite fast, surprisingly.
             {
-                if( _mappings.TryGetClosest( context, objType, out var entry ) )
-                {
-                    if( !entry.isReady )
-                    {
-                        entry = MakeReadyAndRegister( context, entry, objType );
-                    }
-
-                    if( entry.mapping == null )
-                        return null;
-
-                    return entry.mapping.GetInstance();
-                }
-
-                entry = new RegistryEntry()
-                {
-                    isReady = true,
-                    mappedType = objType,
-                    method = null,
-                    mapping = null
-                };
-
-                _mappings.Set( context, objType, entry );
+                return GetMappingInternal( context, objType );
             }
 
             return null;

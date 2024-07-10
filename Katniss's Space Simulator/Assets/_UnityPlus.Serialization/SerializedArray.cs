@@ -143,7 +143,7 @@ namespace UnityPlus.Serialization
 
         public bool Equals( SerializedArray other )
         {
-            return _children.Equals( other._children );
+            return _children.SequenceEqual( other._children );
         }
     }
 }

@@ -4,7 +4,7 @@ namespace UnityPlus.Serialization.Mappings
 {
     public static class Mappings_Array
     {
-        [SerializationMappingProvider( typeof( Array ), Context = ArrayContext.Values )]
+        [MapsInheritingFrom( typeof( Array ), Context = ArrayContext.Values )]
         public static SerializationMapping ArrayMapping<T>()
         {
 #warning TODO - multidimensional arrays?

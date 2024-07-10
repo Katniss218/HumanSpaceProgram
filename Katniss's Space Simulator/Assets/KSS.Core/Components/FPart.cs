@@ -32,7 +32,7 @@ namespace KSS.Core.Components
             return null;
         }
 
-        [SerializationMappingProvider( typeof( FPart ) )]
+        [MapsInheritingFrom( typeof( FPart ) )]
         public static SerializationMapping FPartMapping()
         {
             return new MemberwiseSerializationMapping<FPart>()

@@ -43,7 +43,7 @@ namespace KSS.Control
         public abstract bool TryDisconnectAll();
 
 
-        [SerializationMappingProvider( typeof( Control ) )]
+        [MapsInheritingFrom( typeof( Control ) )]
         public static SerializationMapping ControlMapping()
         {
             return new MemberwiseSerializationMapping<Control>()

@@ -76,7 +76,6 @@
     <Compile Include="Assets\KSS.Core\Control\Controls\ControlleeInputBase.cs" />
     <Compile Include="Assets\KSS.Core\HSPEvent.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\FluidState.cs" />
-    <Compile Include="Assets\KSS.Core\Mods\NamespacedIdentifier.cs" />
     <Compile Include="Assets\KSS.Core\CelestialBodyManager.cs" />
     <Compile Include="Assets\KSS.Core\Control\Controls\ControlleeInput_T_.cs" />
     <Compile Include="Assets\KSS.Core\Control\Controls\ControlParameterInput_T_.cs" />
@@ -89,8 +88,8 @@
     <Compile Include="Assets\KSS.Core\Layer.cs" />
     <Compile Include="Assets\KSS.Core\Serialization\TimelineManager.cs" />
     <Compile Include="Assets\KSS.Core\Control\ControlGroup.cs" />
-    <Compile Include="Assets\KSS.Core\HSPEventListenerAttribute.cs" />
     <Compile Include="Assets\KSS.Core\SymmetryDataContainer.cs" />
+    <Compile Include="Assets\KSS.Core\HSPEventListenerAttribute.cs" />
     <Compile Include="Assets\KSS.Core\CoordinateUtils.cs" />
     <Compile Include="Assets\KSS.Core\IHasMass.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\IResourceContainer.cs" />
@@ -123,8 +122,8 @@
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\SubstanceState.cs" />
     <Compile Include="Assets\KSS.Core\ResourceFlowSystem\FlowUtils.cs" />
     <Compile Include="Assets\KSS.Core\SceneManagement\AlwaysLoadedManager.cs" />
-    <Compile Include="Assets\KSS.Core\Components\FClickInteractionRedirect.cs" />
     <Compile Include="Assets\KSS.Core\Mods\HumanSpaceProgramMods.cs" />
+    <Compile Include="Assets\KSS.Core\Components\FClickInteractionRedirect.cs" />
     <Compile Include="Assets\KSS.Core\CelestialBodySurface.cs" />
     <Compile Include="Assets\KSS.Core\PartFactory.cs" />
     <Compile Include="Assets\KSS.Core\VesselHierarchyUtils.cs" />
@@ -141,6 +140,7 @@
     <Compile Include="Assets\KSS.Core\Physics\FreePhysicsObject.cs" />
     <Compile Include="Assets\KSS.Core\Control\Control.cs" />
     <Compile Include="Assets\KSS.Core\Components\FControlFrame.cs" />
+    <Compile Include="Assets\KSS.Core\Mods\NamespacedIdentifier.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\KSS.Core\___KSS.Core.asmdef" />

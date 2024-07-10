@@ -29,7 +29,7 @@ namespace KSS.Components
             Separate = new ControlleeInput( SeparateListener );
         }
 
-        [SerializationMappingProvider( typeof( FVesselSeparator ) )]
+        [MapsInheritingFrom( typeof( FVesselSeparator ) )]
         public static SerializationMapping FVesselSeparatorMapping()
         {
             return new MemberwiseSerializationMapping<FVesselSeparator>()

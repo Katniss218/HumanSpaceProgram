@@ -126,7 +126,7 @@ namespace KSS.Core.Serialization
             handler.Write( data );
         }
 
-        [SerializationMappingProvider( typeof( TimelineMetadata ) )]
+        [MapsInheritingFrom( typeof( TimelineMetadata ) )]
         public static SerializationMapping TimelineMetadataMapping()
         {
             return new MemberwiseSerializationMapping<TimelineMetadata>()

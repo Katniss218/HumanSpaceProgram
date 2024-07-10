@@ -95,7 +95,7 @@ namespace KSS.Core.Serialization
 
     public static class Persistent_Version
     {
-        [SerializationMappingProvider( typeof( Version ) )]
+        [MapsInheritingFrom( typeof( Version ) )]
         public static SerializationMapping VersionMapping()
         {
             return new PrimitiveStructSerializationMapping<Version>()

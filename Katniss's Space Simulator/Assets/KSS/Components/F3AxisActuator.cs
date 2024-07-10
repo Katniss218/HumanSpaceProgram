@@ -116,7 +116,7 @@ namespace Assets.KSS.Components
             }
         }
 
-        [SerializationMappingProvider( typeof( F3AxisActuator ) )]
+        [MapsInheritingFrom( typeof( F3AxisActuator ) )]
         public static SerializationMapping F3AxisActuatorMapping()
         {
             return new MemberwiseSerializationMapping<F3AxisActuator>()

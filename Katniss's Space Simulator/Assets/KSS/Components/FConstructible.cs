@@ -34,7 +34,7 @@ namespace KSS.Components
 
     public static class CraneBuildCondition_Mapping
     {
-        [SerializationMappingProvider( typeof( CraneBuildCondition ) )]
+        [MapsInheritingFrom( typeof( CraneBuildCondition ) )]
         public static SerializationMapping CraneBuildConditionMapping()
         {
             return new MemberwiseSerializationMapping<CraneBuildCondition>()
@@ -206,7 +206,7 @@ namespace KSS.Components
         //
         //
 
-        [SerializationMappingProvider( typeof( FConstructible ) )]
+        [MapsInheritingFrom( typeof( FConstructible ) )]
         public static SerializationMapping FConstructibleMapping()
         {
             return new MemberwiseSerializationMapping<FConstructible>()

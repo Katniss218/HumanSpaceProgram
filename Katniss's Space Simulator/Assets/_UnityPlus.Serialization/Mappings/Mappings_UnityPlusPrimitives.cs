@@ -10,7 +10,7 @@ namespace UnityPlus.Serialization.Mappings
 {
     public static class Mappings_UnityPlusPrimitives
     {
-        [SerializationMappingProvider( typeof( Vector3Dbl ) )]
+        [MapsInheritingFrom( typeof( Vector3Dbl ) )]
         public static SerializationMapping Vector3DblMapping()
         {
             return new PrimitiveStructSerializationMapping<Vector3Dbl>()
@@ -20,7 +20,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( QuaternionDbl ) )]
+        [MapsInheritingFrom( typeof( QuaternionDbl ) )]
         public static SerializationMapping QuaternionDblMapping()
         {
             return new PrimitiveStructSerializationMapping<QuaternionDbl>()

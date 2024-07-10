@@ -4,7 +4,7 @@ namespace UnityPlus.Serialization.Mappings
 {
     public static class Mappings_ValueTuple
     {
-        [SerializationMappingProvider( typeof( ValueTuple<,> ) )]
+        [MapsInheritingFrom( typeof( ValueTuple<,> ) )]
         public static SerializationMapping ValueTupleMapping<T1, T2>()
         {
             return new MemberwiseSerializationMapping<(T1, T2)>()
@@ -14,7 +14,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( ValueTuple<,,> ) )]
+        [MapsInheritingFrom( typeof( ValueTuple<,,> ) )]
         public static SerializationMapping ValueTupleMapping<T1, T2, T3>()
         {
             return new MemberwiseSerializationMapping<(T1, T2, T3)>()
@@ -25,7 +25,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( ValueTuple<,,,> ) )]
+        [MapsInheritingFrom( typeof( ValueTuple<,,,> ) )]
         public static SerializationMapping ValueTupleMapping<T1, T2, T3, T4>()
         {
             return new MemberwiseSerializationMapping<(T1, T2, T3, T4)>()
@@ -37,7 +37,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( ValueTuple<,,,,> ) )]
+        [MapsInheritingFrom( typeof( ValueTuple<,,,,> ) )]
         public static SerializationMapping ValueTupleMapping<T1, T2, T3, T4, T5>()
         {
             return new MemberwiseSerializationMapping<(T1, T2, T3, T4, T5)>()
@@ -50,7 +50,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( ValueTuple<,,,,,> ) )]
+        [MapsInheritingFrom( typeof( ValueTuple<,,,,,> ) )]
         public static SerializationMapping ValueTupleMapping<T1, T2, T3, T4, T5, T6>()
         {
             return new MemberwiseSerializationMapping<(T1, T2, T3, T4, T5, T6)>()
@@ -64,7 +64,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( ValueTuple<,,,,,,> ) )]
+        [MapsInheritingFrom( typeof( ValueTuple<,,,,,,> ) )]
         public static SerializationMapping ValueTupleMapping<T1, T2, T3, T4, T5, T6, T7>()
         {
             return new MemberwiseSerializationMapping<(T1, T2, T3, T4, T5, T6, T7)>()

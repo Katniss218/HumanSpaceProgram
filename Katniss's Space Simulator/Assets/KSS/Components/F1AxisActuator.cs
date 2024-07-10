@@ -58,7 +58,7 @@ namespace KSS.Components
             }
         }
 
-        [SerializationMappingProvider( typeof( F1AxisActuator ) )]
+        [MapsInheritingFrom( typeof( F1AxisActuator ) )]
         public static SerializationMapping F1AxisActuatorMapping()
         {
             return new MemberwiseSerializationMapping<F1AxisActuator>()

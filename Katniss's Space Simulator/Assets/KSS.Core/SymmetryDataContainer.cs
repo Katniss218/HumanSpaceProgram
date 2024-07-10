@@ -56,7 +56,7 @@ namespace KSS.Core
             _groups.Remove(existing);
         }
 
-        [SerializationMappingProvider( typeof( SymmetryDataContainer ) )]
+        [MapsInheritingFrom( typeof( SymmetryDataContainer ) )]
         public static SerializationMapping SymmetryDataContainerMapping()
         {
             return new MemberwiseSerializationMapping<SymmetryDataContainer>()

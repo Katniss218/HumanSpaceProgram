@@ -115,7 +115,7 @@ namespace KSS.Core.ReferenceFrames
             UpdateSceneRotation();
         }
 
-        [SerializationMappingProvider( typeof( RootObjectTransform ) )]
+        [MapsInheritingFrom( typeof( RootObjectTransform ) )]
         public static SerializationMapping RootObjectTransformMapping()
         {
             return new MemberwiseSerializationMapping<RootObjectTransform>()

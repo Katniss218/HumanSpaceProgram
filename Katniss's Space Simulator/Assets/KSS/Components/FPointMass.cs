@@ -30,7 +30,7 @@ namespace KSS.Components
         public event IHasMass.MassChange OnAfterMassChanged = null;
 
 
-        [SerializationMappingProvider( typeof( FPointMass ) )]
+        [MapsInheritingFrom( typeof( FPointMass ) )]
         public static SerializationMapping FPointMassMapping()
         {
             return new MemberwiseSerializationMapping<FPointMass>()

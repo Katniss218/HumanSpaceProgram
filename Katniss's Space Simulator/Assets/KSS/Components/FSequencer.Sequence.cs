@@ -78,7 +78,7 @@ namespace KSS.Components
             return false;
         }
 
-        [SerializationMappingProvider( typeof( Sequence ) )]
+        [MapsInheritingFrom( typeof( Sequence ) )]
         public static SerializationMapping SequenceMapping()
         {
             return new MemberwiseSerializationMapping<Sequence>()

@@ -130,7 +130,7 @@ namespace KSS.Components
         }
 
 
-        [SerializationMappingProvider( typeof( FPlayerInputAvionics ) )]
+        [MapsInheritingFrom( typeof( FPlayerInputAvionics ) )]
         public static SerializationMapping FPlayerInputAvionicsMapping()
         {
             return new MemberwiseSerializationMapping<FPlayerInputAvionics>()

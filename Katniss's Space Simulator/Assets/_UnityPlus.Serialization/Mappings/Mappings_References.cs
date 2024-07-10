@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace UnityPlus.Serialization.Mappings
 {
     public static class Mappings_References
     {
-        [SerializationMappingProvider( typeof( object ), Context = ObjectContext.Ref )]
+        [MapsAnyInterface( Context = ObjectContext.Ref )]
+        [MapsAnyClass( Context = ObjectContext.Ref )]
         public static SerializationMapping ObjectRefMapping<T>() where T : class
         {
             return new PrimitiveStructSerializationMapping<T>()
@@ -14,7 +16,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( Array ), Context = ObjectContext.Ref )]
+        [MapsInheritingFrom( typeof( Array ), Context = ArrayContext.Refs )]
         public static SerializationMapping ArrayReferenceMapping<T>() where T : class
         {
             return new PrimitiveStructSerializationMapping<T[]>()
@@ -49,8 +51,5 @@ namespace UnityPlus.Serialization.Mappings
                 }
             };
         }
-
-#warning TODO - generic mappings might want to be used on different types of things, kind of like the generic constraints. This method here is currently not safe because it can be invoked on a struct.
-
     }
 }

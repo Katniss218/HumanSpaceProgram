@@ -101,7 +101,7 @@ namespace KSS.Core.Serialization
             handler.Write( data );
         }
 
-        [SerializationMappingProvider( typeof( VesselMetadata ) )]
+        [MapsInheritingFrom( typeof( VesselMetadata ) )]
         public static SerializationMapping VesselMetadataMapping()
         {
             return new MemberwiseSerializationMapping<VesselMetadata>()

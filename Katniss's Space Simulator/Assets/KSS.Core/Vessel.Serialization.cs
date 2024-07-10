@@ -10,7 +10,7 @@ namespace KSS.Core
 {
     public static class Vessel_SerializationMappings
     {
-        [SerializationMappingProvider( typeof( Vessel ) )]
+        [MapsInheritingFrom( typeof( Vessel ) )]
         public static SerializationMapping VesselMapping()
         {
             return new MemberwiseSerializationMapping<Vessel>()

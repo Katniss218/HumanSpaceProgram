@@ -199,7 +199,7 @@ namespace KSS.Core.Physics
 			IsColliding = false;
 		}
 
-        [SerializationMappingProvider( typeof( PinnedPhysicsObject ) )]
+        [MapsInheritingFrom( typeof( PinnedPhysicsObject ) )]
         public static SerializationMapping PinnedPhysicsObjectMapping()
         {
 			return new MemberwiseSerializationMapping<PinnedPhysicsObject>()

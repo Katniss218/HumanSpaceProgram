@@ -8,7 +8,7 @@ namespace UnityPlus.Serialization.Mappings
 {
     public static class Mappings_UnityComponents
     {
-        [SerializationMappingProvider( typeof( Behaviour ) )]
+        [MapsInheritingFrom( typeof( Behaviour ) )]
         public static SerializationMapping BehaviourMapping()
         {
             return new MemberwiseSerializationMapping<Behaviour>()
@@ -17,7 +17,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( Component ) )]
+        [MapsInheritingFrom( typeof( Component ) )]
         public static SerializationMapping ComponentMapping()
         {
             return new MemberwiseSerializationMapping<Component>()
@@ -31,7 +31,7 @@ namespace UnityPlus.Serialization.Mappings
                 } );
         }
 
-        [SerializationMappingProvider( typeof( GameObject ) )]
+        [MapsInheritingFrom( typeof( GameObject ) )]
         public static SerializationMapping GameObjectMapping()
         {
             return new MemberwiseSerializationMapping<GameObject>()
@@ -97,7 +97,7 @@ namespace UnityPlus.Serialization.Mappings
             } );
         }
 
-        [SerializationMappingProvider( typeof( Renderer ) )]
+        [MapsInheritingFrom( typeof( Renderer ) )]
         public static SerializationMapping RendererMapping()
         {
             return new MemberwiseSerializationMapping<Renderer>()
@@ -106,7 +106,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( Transform ) )]
+        [MapsInheritingFrom( typeof( Transform ) )]
         public static SerializationMapping TransformMapping()
         {
             return new MemberwiseSerializationMapping<Transform>()
@@ -117,7 +117,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( MeshFilter ) )]
+        [MapsInheritingFrom( typeof( MeshFilter ) )]
         public static SerializationMapping MeshFilterMapping()
         {
             return new MemberwiseSerializationMapping<MeshFilter>()
@@ -126,7 +126,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( MeshRenderer ) )]
+        [MapsInheritingFrom( typeof( MeshRenderer ) )]
         public static SerializationMapping MeshRendererMapping()
         {
             return new MemberwiseSerializationMapping<MeshRenderer>()
@@ -137,7 +137,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( Rigidbody ) )]
+        [MapsInheritingFrom( typeof( Rigidbody ) )]
         public static SerializationMapping RigidbodyMapping()
         {
             return new MemberwiseSerializationMapping<Rigidbody>()
@@ -146,7 +146,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( Collider ) )]
+        [MapsInheritingFrom( typeof( Collider ) )]
         public static SerializationMapping ColliderMapping()
         {
             return new MemberwiseSerializationMapping<Collider>()
@@ -156,7 +156,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( BoxCollider ) )]
+        [MapsInheritingFrom( typeof( BoxCollider ) )]
         public static SerializationMapping BoxColliderMapping()
         {
             return new MemberwiseSerializationMapping<BoxCollider>()
@@ -166,7 +166,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( SphereCollider ) )]
+        [MapsInheritingFrom( typeof( SphereCollider ) )]
         public static SerializationMapping SphereColliderMapping()
         {
             return new MemberwiseSerializationMapping<SphereCollider>()
@@ -176,7 +176,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( CapsuleCollider ) )]
+        [MapsInheritingFrom( typeof( CapsuleCollider ) )]
         public static SerializationMapping CapsuleColliderMapping()
         {
             return new MemberwiseSerializationMapping<CapsuleCollider>()
@@ -188,7 +188,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( MeshCollider ) )]
+        [MapsInheritingFrom( typeof( MeshCollider ) )]
         public static SerializationMapping MeshColliderMapping()
         {
             return new MemberwiseSerializationMapping<MeshCollider>()
@@ -198,7 +198,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( LOD ) )]
+        [MapsInheritingFrom( typeof( LOD ) )]
         public static SerializationMapping LODMapping()
         {
             return new MemberwiseSerializationMapping<LOD>()
@@ -209,7 +209,7 @@ namespace UnityPlus.Serialization.Mappings
             };
         }
 
-        [SerializationMappingProvider( typeof( LODGroup ) )]
+        [MapsInheritingFrom( typeof( LODGroup ) )]
         public static SerializationMapping LODGroupMapping()
         {
             return new MemberwiseSerializationMapping<LODGroup>()

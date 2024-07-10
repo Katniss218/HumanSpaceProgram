@@ -94,7 +94,7 @@ namespace KSS.Components
         }
 
 
-        [SerializationMappingProvider( typeof( FRocketEngine ) )]
+        [MapsInheritingFrom( typeof( FRocketEngine ) )]
         public static SerializationMapping FRocketEngineMapping()
         {
             return new MemberwiseSerializationMapping<FRocketEngine>()

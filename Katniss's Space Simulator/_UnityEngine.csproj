@@ -63,7 +63,6 @@
     <Compile Include="Assets\_UnityEngine\Vector3Curve.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\GameObjectEx.cs" />
     <Compile Include="Assets\_UnityEngine\AncestralMap.cs" />
-    <Compile Include="Assets\_UnityEngine\TypeMap_TContext.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\Quaternion_Ex.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\RectTransform_Ex.cs" />
     <Compile Include="Assets\_UnityEngine\Direction3D.cs" />

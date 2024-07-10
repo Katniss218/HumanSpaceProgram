@@ -6,31 +6,5 @@ SIMD: No
 
 -- Log Starts Here -------------------------------------------------------
 
-[20:15:16](EXC) - NotSupportedException: Tried to invoke string indexer, which is not supported on SerializedArray.
-  at
-UnityPlus.Serialization.SerializedArray.get_Item (System.String name) (at Assets/_UnityPlus.Serialization/SerializedArray.cs:44)
-UnityPlus.Serialization.NonPrimitiveSerializationMappingWithTemp`2[TTemp,TSource].TryLoad[TMember] (TMember& obj, UnityPlus.Serialization.SerializedData data, UnityPlus.Serialization.ILoader l) (at Assets/_UnityPlus.Serialization/MappingTypes/NonPrimitiveSerializationMappingWithTemp.cs:89)
-UnityPlus.Serialization.SerializationMapping.___passthroughLoad[T] (T& obj, UnityPlus.Serialization.SerializedData data, UnityPlus.Serialization.ILoader l) (at Assets/_UnityPlus.Serialization/SerializationMapping.cs:64)
-UnityPlus.Serialization.SerializationMapping_Ex.SafeLoad[TMember] (UnityPlus.Serialization.SerializationMapping mapping, TMember& obj, UnityPlus.Serialization.SerializedData data, UnityPlus.Serialization.ILoader l) (at Assets/_UnityPlus.Serialization/SerializationMapping_Ex.cs:58)
-UnityPlus.Serialization.Member`2[TSource,TMember].Load (TSource& source, UnityPlus.Serialization.SerializedData data, UnityPlus.Serialization.ILoader l) (at Assets/_UnityPlus.Serialization/Member.cs:160)
-UnityPlus.Serialization.MemberwiseSerializationMapping`1[TSource].Load (TSource& obj, UnityPlus.Serialization.SerializedData data, UnityPlus.Serialization.ILoader l) (at Assets/_UnityPlus.Serialization/MappingTypes/MemberwiseSerializationMapping.cs:227)
-UnityPlus.Serialization.MemberwiseSerializationMapping`1[TSource].TryPopulate[T] (T& obj, UnityPlus.Serialization.SerializedData data, UnityPlus.Serialization.ILoader l) (at Assets/_UnityPlus.Serialization/MappingTypes/MemberwiseSerializationMapping.cs:166)
-UnityPlus.Serialization.SerializationMapping.___passthroughPopulate[T] (T& obj, UnityPlus.Serialization.SerializedData data, UnityPlus.Serialization.ILoader l) (at Assets/_UnityPlus.Serialization/SerializationMapping.cs:61)
-UnityPlus.Serialization.SerializationMapping_Ex.SafePopulate[TMember] (UnityPlus.Serialization.SerializationMapping mapping, TMember& obj, UnityPlus.Serialization.SerializedData data, UnityPlus.Serialization.ILoader l) (at Assets/_UnityPlus.Serialization/SerializationMapping_Ex.cs:43)
-UnityPlus.Serialization.SerializationUnitLoader`1[T].PopulateCallback () (at Assets/_UnityPlus.Serialization/SerializationUnitLoader.cs:132)
-UnityPlus.Serialization.SerializationUnitLoader`1[T].Populate () (at Assets/_UnityPlus.Serialization/SerializationUnitLoader.cs:83)
-UnityPlus.Serialization.SerializationUnit.Populate[T] (T obj, UnityPlus.Serialization.SerializedData data) (at Assets/_UnityPlus.Serialization/SerializationUnit.cs:95)
-KSS.Core.Serialization.VesselMetadata.LoadFromDisk (System.String id) (at Assets/KSS.Core/Serialization/VesselMetadata.cs:90)
-KSS.AssetLoaders.GameDataJsonVesselFactory.LoadMetadata () (at Assets/KSS/AssetLoaders/GameDataJsonVesselFactory.cs:24)
-KSS.Core.PartRegistry.LoadAllMetadata () (at Assets/KSS.Core/PartRegistry.cs:51)
-KSS.UI.UIPartList.Create[T] (UnityPlus.UILib.UIElements.IUIElementContainer parent, UnityPlus.UILib.UILayoutInfo layout) (at Assets/KSS.UI/UIPartList.cs:86)
-KSS.UI.UIPartList_Ex.AddPartList (UnityPlus.UILib.UIElements.IUIElementContainer parent, UnityPlus.UILib.UILayoutInfo layout) (at Assets/KSS.UI/UIPartList.cs:106)
-KSS.UI.SceneFactories.DesignSceneUIFactory.CreatePartList (UnityPlus.UILib.UIElements.UICanvas canvas) (at Assets/KSS.UI/SceneFactories/DesignSceneUIFactory.cs:39)
-KSS.UI.SceneFactories.DesignSceneUIFactory.Create () (at Assets/KSS.UI/SceneFactories/DesignSceneUIFactory.cs:29)
-(wrapper dynamic-method) System.Object.lambda_method(System.Runtime.CompilerServices.Closure,object)
-UnityPlus.OverridableEvents.OverridableEvent`1[T].Invoke (T obj) (at Assets/_UnityPlus.OverridableEvents/OverridableEvent.cs:98)
-UnityEngine.Debug:LogException(Exception)
-UnityPlus.OverridableEvents.OverridableEvent`1:Invoke(Object) (at Assets/_UnityPlus.OverridableEvents/OverridableEvent.cs:102)
-UnityPlus.OverridableEvents.OverridableEventManager`1:TryInvoke(String, Object) (at Assets/_UnityPlus.OverridableEvents/OverridableEventManager.cs:85)
-KSS.Core.DesignSceneManager:Awake() (at Assets/KSS.Core/SceneManagement/DesignSceneManager.cs:18)
-
+[11:01:14](ERR) - SetLODs: Attempting to set LOD where the screen relative size is greater then or equal to a higher detail LOD level.
+[11:01:14](ERR) - SetLODs: Attempting to set LOD where the screen relative size is greater then or equal to a higher detail LOD level.

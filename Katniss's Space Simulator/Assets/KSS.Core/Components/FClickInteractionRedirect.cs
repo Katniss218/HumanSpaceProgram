@@ -46,7 +46,7 @@ namespace KSS.Core.Components
         }
 
 
-        [SerializationMappingProvider( typeof( FClickInteractionRedirect ) )]
+        [MapsInheritingFrom( typeof( FClickInteractionRedirect ) )]
         public static SerializationMapping FClickInteractionRedirectMapping()
         {
             return new MemberwiseSerializationMapping<FClickInteractionRedirect>()

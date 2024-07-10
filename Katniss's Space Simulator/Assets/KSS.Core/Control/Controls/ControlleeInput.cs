@@ -80,7 +80,7 @@ namespace KSS.Control.Controls
             input.outputs.Add( output );
         }
 
-        [SerializationMappingProvider( typeof( ControlleeInput ) )]
+        [MapsInheritingFrom( typeof( ControlleeInput ) )]
         public static SerializationMapping ControlleeInputMapping()
         {
             return new MemberwiseSerializationMapping<ControlleeInput>()

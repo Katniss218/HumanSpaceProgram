@@ -27,8 +27,10 @@ namespace UnityPlus.Serialization
 
         protected override bool Save<TMember>( TMember obj, ref SerializedData data, ISaver s )
         {
+#warning TODO - delegates should be able to be omitted from having the header as well.
+
             // Omit the header only for member types that are non-generic structs/sealed classes (non-generic and non-inheritable).
-            if( obj != null && !((typeof( TMember ).IsValueType || typeof( TMember ).IsSealed) && !typeof( TMember ).IsGenericType) ) // This doesn't appear to slow the system down much at all when benchbarked.
+            if( obj != null && MappingHelper.IsNonNullEligibleForTypeHeader<TMember>() ) // This doesn't appear to slow the system down much at all when benchbarked.
             {
                 data = new SerializedObject();
                 data[KeyNames.ID] = s.RefMap.GetID( obj ).SerializeGuid(); // doesn't make sense for structs.
@@ -62,7 +64,7 @@ namespace UnityPlus.Serialization
                 return false;
 
             // Instantiating in LoadReferences means that every object that can be referenced should have already been added to the ILoader's RefMap.
-            if( data != null && !((typeof( TMember ).IsValueType || typeof( TMember ).IsSealed) && !typeof( TMember ).IsGenericType) ) // This doesn't appear to slow the system down much at all when benchbarked.
+            if( data != null && MappingHelper.IsNonNullEligibleForTypeHeader<TMember>() ) // This doesn't appear to slow the system down much at all when benchbarked.
             {
                 TSource obj2 = OnInstantiate.Invoke( data["value"], l.RefMap );
                 obj = (TMember)(object)obj2;

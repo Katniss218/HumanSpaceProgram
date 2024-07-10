@@ -322,7 +322,7 @@ namespace KSS.GameplayScene
             return false;
         }
 
-        [SerializationMappingProvider( typeof( FConstructionSite ) )]
+        [MapsInheritingFrom( typeof( FConstructionSite ) )]
         public static SerializationMapping FConstructionSiteMapping()
         {
             return new MemberwiseSerializationMapping<FConstructionSite>()

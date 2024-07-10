@@ -95,7 +95,7 @@ namespace KSS.Control.Controls
 
     public static class Mappings_ControlParameterInput_T_
     {
-        [SerializationMappingProvider( typeof( ControlParameterInput<> ) )]
+        [MapsInheritingFrom( typeof( ControlParameterInput<> ) )]
         public static SerializationMapping ControlParameterInputMapping<T>()
         {
             return new MemberwiseSerializationMapping<ControlParameterInput<T>>(); // empty dummy referencable thing.

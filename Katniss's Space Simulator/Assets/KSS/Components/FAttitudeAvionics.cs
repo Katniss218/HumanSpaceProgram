@@ -287,7 +287,7 @@ namespace KSS.Components
 			_error1[i] = double.NaN;
         }
 
-        [SerializationMappingProvider( typeof( FAttitudeAvionics ) )]
+        [MapsInheritingFrom( typeof( FAttitudeAvionics ) )]
         public static SerializationMapping FAttitudeAvionicsMapping()
         {
 			return new MemberwiseSerializationMapping<FAttitudeAvionics>()

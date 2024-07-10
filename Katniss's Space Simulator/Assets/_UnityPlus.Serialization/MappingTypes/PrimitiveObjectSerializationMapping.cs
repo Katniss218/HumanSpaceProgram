@@ -25,7 +25,7 @@ namespace UnityPlus.Serialization
 
         protected override bool Save<TMember>( TMember obj, ref SerializedData data, ISaver s )
         {
-            if( obj != null && !((typeof( TMember ).IsValueType || typeof( TMember ).IsSealed) && !typeof( TMember ).IsGenericType) ) // This doesn't appear to slow the system down much at all when benchbarked.
+            if( obj != null && MappingHelper.IsNonNullEligibleForTypeHeader<TMember>() ) // This doesn't appear to slow the system down much at all when benchbarked.
             {
                 data = new SerializedObject();
                 data[KeyNames.ID] = s.RefMap.GetID( obj ).SerializeGuid(); // doesn't make sense for structs.
@@ -48,7 +48,7 @@ namespace UnityPlus.Serialization
 
             // Instantiating in Load/Populate means that this object can be added to the ILoader's RefMap
             //   (and later referenced by other objects).
-            if( data != null && !((typeof( TMember ).IsValueType || typeof( TMember ).IsSealed) && !typeof( TMember ).IsGenericType) ) // This doesn't appear to slow the system down much at all when benchbarked.
+            if( data != null && MappingHelper.IsNonNullEligibleForTypeHeader<TMember>() ) // This doesn't appear to slow the system down much at all when benchbarked.
             {
                 TSource obj2 = OnInstantiate.Invoke( data["value"], l.RefMap );
                 obj = (TMember)(object)obj2;
@@ -68,7 +68,7 @@ namespace UnityPlus.Serialization
 
             // Instantiating in Load/Populate means that this object can be added to the ILoader's RefMap
             //   (and later referenced by other objects).
-            if( data != null && !((typeof( TMember ).IsValueType || typeof( TMember ).IsSealed) && !typeof( TMember ).IsGenericType) ) // This doesn't appear to slow the system down much at all when benchbarked.
+            if( data != null && MappingHelper.IsNonNullEligibleForTypeHeader<TMember>() ) // This doesn't appear to slow the system down much at all when benchbarked.
             {
                 TSource obj2 = OnInstantiate.Invoke( data["value"], l.RefMap );
                 obj = (TMember)(object)obj2;

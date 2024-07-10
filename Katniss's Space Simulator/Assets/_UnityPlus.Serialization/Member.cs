@@ -38,9 +38,13 @@ namespace UnityPlus.Serialization
             Type type = typeof( TMember );
             if( type.IsValueType || (!type.IsInterface && type.BaseType == null) )
             {
-                _hasCachedMapping = true;
-                _cachedMapping = SerializationMappingRegistry.GetMappingOrNull( _context, typeof( TMember ) );
-#warning TODO - mapping itself might not be cacheable.
+                var mapping1 = SerializationMappingRegistry.GetMappingOrNull( _context, typeof( TMember ) );
+                var mapping2 = mapping1.GetInstance();
+                if( object.ReferenceEquals( mapping1, mapping2 ) ) // This is needed due to GetInstance and mappings that can hold state (like the dict mapping).
+                {
+                    _hasCachedMapping = true;
+                    _cachedMapping = mapping1;
+                }
             }
         }
 

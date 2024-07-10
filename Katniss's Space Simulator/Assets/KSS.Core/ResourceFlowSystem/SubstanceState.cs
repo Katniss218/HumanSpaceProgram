@@ -40,7 +40,7 @@ namespace KSS.Core.ResourceFlowSystem
         }
 
 
-        [SerializationMappingProvider( typeof( SubstanceState ) )]
+        [MapsInheritingFrom( typeof( SubstanceState ) )]
         public static SerializationMapping SubstanceStateMapping()
         {
             return new MemberwiseSerializationMapping<SubstanceState>()

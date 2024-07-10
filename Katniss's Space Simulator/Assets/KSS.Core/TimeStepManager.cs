@@ -180,7 +180,7 @@ namespace KSS.Core
         }
 
 
-        [SerializationMappingProvider( typeof( TimeStepManager ) )]
+        [MapsInheritingFrom( typeof( TimeStepManager ) )]
         public static SerializationMapping TimeStepManagerMapping()
         {
             return new MemberwiseSerializationMapping<TimeStepManager>()

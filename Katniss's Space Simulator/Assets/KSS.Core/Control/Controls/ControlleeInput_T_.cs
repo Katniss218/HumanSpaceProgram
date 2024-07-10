@@ -84,7 +84,7 @@ namespace KSS.Control.Controls
 
     public static class Mappings_ControlleeInput_T_
     {
-        [SerializationMappingProvider( typeof( ControlleeInput<> ) )]
+        [MapsInheritingFrom( typeof( ControlleeInput<> ) )]
         public static SerializationMapping ControlleeInputMapping<T>()
         {
             return new MemberwiseSerializationMapping<ControlleeInput<T>>()
@@ -102,6 +102,9 @@ namespace KSS.Control.Controls
             {
                 if( data == null )
                     return null;
+
+#warning TODO - is this even needed now? I think so, because the delegate mapping creates the delegate in reference pass (because object must be present)
+                // this could be resolved by having 2 contexts for the delegate - one creating it in Load and one in LoadReferences.
 
                 Action<T> onInvoke = (Action<T>)Persistent_Delegate.ToDelegate( data["on_invoke"], l.RefMap );
 

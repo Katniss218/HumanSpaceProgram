@@ -24,7 +24,7 @@ namespace KSS.Components
         // RCS controllers can either control for desired angular accelerations, or linear accelerations.
         // There should be *one* controller active at any given time, or something else to sync them if two are needed.
 
-        [SerializationMappingProvider( typeof( FReactionControlController ) )]
+        [MapsInheritingFrom( typeof( FReactionControlController ) )]
         public static SerializationMapping FReactionControlControllerMapping()
         {
             return new MemberwiseSerializationMapping<FReactionControlController>()
