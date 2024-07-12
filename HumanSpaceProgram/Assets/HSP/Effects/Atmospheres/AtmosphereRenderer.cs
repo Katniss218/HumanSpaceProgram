@@ -33,7 +33,7 @@ namespace HSP.CelestialBodies
 
         [SerializeField]
         RenderTexture _rt;
-        
+
         [SerializeField]
         Material _mergeDepthMat;
 
@@ -45,7 +45,7 @@ namespace HSP.CelestialBodies
 
         [SerializeField]
         RenderTexture _cam2DepthRT;
-        
+
         [SerializeField]
         RenderTexture _dstColorRT;
 
@@ -99,9 +99,11 @@ namespace HSP.CelestialBodies
 
         private void Update()
         {
-            _srcCam1.depthTextureMode |= DepthTextureMode.Depth;
-            _srcCam2.depthTextureMode |= DepthTextureMode.Depth;
-            
+            //_srcCam1.depthTextureMode &= ~DepthTextureMode.Depth;
+            // _srcCam2.depthTextureMode &= ~DepthTextureMode.Depth;
+
+            _srcCam1.clearFlags = CameraClearFlags.Skybox;
+            _srcCam2.clearFlags = CameraClearFlags.Depth;
             _camera.depthTextureMode &= ~DepthTextureMode.Depth; // NO DEPTH. this breaks (for now?).
         }
 
@@ -118,13 +120,12 @@ namespace HSP.CelestialBodies
             _material.SetFloat( Shader.PropertyToID( "_OpticalDepthPointCount" ), 8 );
             _material.SetFloat( Shader.PropertyToID( "_DensityFalloffPower" ), 13.7f );
 
+            this._srcCam2.RemoveCommandBuffer( CameraEvent.AfterForwardOpaque, _cmdMergeDepth );
             this._camera.RemoveCommandBuffer( CameraEvent.AfterForwardOpaque, _cmdAtmospheres );
             this._camera.RemoveCommandBuffer( CameraEvent.AfterForwardOpaque, _cmdComposition );
 
-            this._srcCam2.RemoveCommandBuffer( CameraEvent.AfterForwardOpaque, _cmdMergeDepth );
-
             //this._cam1ColorRT = RenderTexture.GetTemporary( Screen.width, Screen.height/*_camera.pixelWidth, _camera.pixelHeight*/, 0, RenderTextureFormat.ARGB32 );
-           // this._cam1DepthRT = RenderTexture.GetTemporary( Screen.width, Screen.height/*_camera.pixelWidth, _camera.pixelHeight*/, 24, RenderTextureFormat.Depth );
+            // this._cam1DepthRT = RenderTexture.GetTemporary( Screen.width, Screen.height/*_camera.pixelWidth, _camera.pixelHeight*/, 24, RenderTextureFormat.Depth );
             //this._cam2ColorRT = RenderTexture.GetTemporary( Screen.width, Screen.height/*_camera.pixelWidth, _camera.pixelHeight*/, 0, RenderTextureFormat.ARGB32 );
             //this._cam2DepthRT = RenderTexture.GetTemporary( Screen.width, Screen.height/*_camera.pixelWidth, _camera.pixelHeight*/, 24, RenderTextureFormat.Depth );
             this._rt = RenderTexture.GetTemporary( Screen.width, Screen.height/*_camera.pixelWidth, _camera.pixelHeight*/, 0, RenderTextureFormat.ARGB32 );
@@ -170,25 +171,25 @@ namespace HSP.CelestialBodies
         private void UpdateCommandBuffers()
         {
             _cmdMergeDepth.Clear();
-            _cmdMergeDepth.SetGlobalTexture( "_Input1Depth", this._cam1DepthRT );
-            _cmdMergeDepth.SetGlobalTexture( "_Input2Depth", this._cam2DepthRT );
-            _cmdMergeDepth.SetGlobalFloat( Shader.PropertyToID( "_Input1Near" ), _srcCam1.nearClipPlane );
-            _cmdMergeDepth.SetGlobalFloat( Shader.PropertyToID( "_Input1Far" ), _srcCam1.farClipPlane );
-            _cmdMergeDepth.SetGlobalFloat( Shader.PropertyToID( "_Input2Near" ), _srcCam2.nearClipPlane );
-            _cmdMergeDepth.SetGlobalFloat( Shader.PropertyToID( "_Input2Far" ), _srcCam2.farClipPlane );
-            _cmdMergeDepth.SetGlobalFloat( Shader.PropertyToID( "_DstNear" ), _camera.nearClipPlane );
-            _cmdMergeDepth.SetGlobalFloat( Shader.PropertyToID( "_DstFar" ), _camera.farClipPlane );
+            _mergeDepthMat.SetTexture( Shader.PropertyToID( "_Input1Depth" ), this._cam1DepthRT, RenderTextureSubElement.Depth );
+            _mergeDepthMat.SetTexture( Shader.PropertyToID( "_Input2Depth" ), this._cam2DepthRT, RenderTextureSubElement.Depth );
+            _mergeDepthMat.SetFloat( Shader.PropertyToID( "_Input1Near" ), _srcCam1.nearClipPlane );
+            _mergeDepthMat.SetFloat( Shader.PropertyToID( "_Input1Far" ), _srcCam1.farClipPlane );
+            _mergeDepthMat.SetFloat( Shader.PropertyToID( "_Input2Near" ), _srcCam2.nearClipPlane );
+            _mergeDepthMat.SetFloat( Shader.PropertyToID( "_Input2Far" ), _srcCam2.farClipPlane );
+            _mergeDepthMat.SetFloat( Shader.PropertyToID( "_DstNear" ), _camera.nearClipPlane );
+            _mergeDepthMat.SetFloat( Shader.PropertyToID( "_DstFar" ), _camera.farClipPlane );
             _cmdMergeDepth.SetRenderTarget( _dstColorRT, _dstDepthRT );
             _cmdMergeDepth.Blit( null, BuiltinRenderTextureType.CurrentActive, _mergeDepthMat, 0 );
 
             _cmdAtmospheres.Clear();
-            _cmdAtmospheres.SetGlobalTexture( Shader.PropertyToID( "_Texture" ), _dstColorRT ); // `_Texture` gets overriden by something else... Unity... >:{
-            _cmdAtmospheres.SetGlobalTexture( Shader.PropertyToID( "_texgsfs" ), BuiltinRenderTextureType.CurrentActive ); // `_Texture` gets overriden by something else... Unity... >:{
+            _material.SetTexture( Shader.PropertyToID( "_texgsfs" ), _mainColorRT ); // `_Texture` gets overriden by something else... Unity... >:{
+            _material.SetTexture( Shader.PropertyToID( "_DepthBuffer" ), _dstDepthRT, RenderTextureSubElement.Depth );
             _cmdAtmospheres.SetRenderTarget( _rt );
             _cmdAtmospheres.Blit( null, _rt, _material, 0 );
 
             _cmdComposition.Clear();
-            _cmdComposition.Blit( _rt, BuiltinRenderTextureType.CurrentActive );
+            _cmdComposition.Blit( _rt, (RenderTexture)null );
         }
     }
 }

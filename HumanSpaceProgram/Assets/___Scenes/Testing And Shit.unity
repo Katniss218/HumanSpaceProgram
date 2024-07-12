@@ -123,47 +123,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!21 &59235104
-Material:
-  serializedVersion: 8
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Hidden/Atmosphere
-  m_Shader: {fileID: 4800000, guid: 2ae1634ae2ad45844b4e5a0087a6833b, type: 3}
-  m_Parent: {fileID: 0}
-  m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
-  m_InvalidKeywords: []
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_LockedProperties: 
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _Texture:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Ints: []
-    m_Floats:
-    - _DensityFalloffPower: 1.77
-    - _InScatteringPointCount: 5
-    - _MaxRadius: 125
-    - _MinRadius: 0
-    - _OpticalDepthPointCount: 5
-    - _ScatteringStrength: 4
-    - _TerminatorFalloff: 32
-    m_Colors:
-    - _Center: {r: 0, g: 0, b: 0, a: 1}
-    - _ScatteringWavelengths: {r: 700, g: 530, b: 400, a: 1}
-    - _SunDirection: {r: 0, g: 0, b: 0, a: 1}
-  m_BuildTextureStacks: []
 --- !u!1 &172758752
 GameObject:
   m_ObjectHideFlags: 0
@@ -279,6 +238,47 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!21 &204938450
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Hidden/Atmosphere
+  m_Shader: {fileID: 4800000, guid: 2ae1634ae2ad45844b4e5a0087a6833b, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _Texture:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _DensityFalloffPower: 13.7
+    - _InScatteringPointCount: 16
+    - _MaxRadius: 6500000
+    - _MinRadius: 6371000
+    - _OpticalDepthPointCount: 8
+    - _ScatteringStrength: 128
+    - _TerminatorFalloff: 32
+    m_Colors:
+    - _Center: {r: 0, g: 0, b: 0, a: 0}
+    - _ScatteringWavelengths: {r: 675, g: 530, b: 400, a: 0}
+    - _SunDirection: {r: 0.70710653, g: -0, b: 0.70710707, a: 0}
+  m_BuildTextureStacks: []
 --- !u!1 &222079935
 GameObject:
   m_ObjectHideFlags: 0
@@ -413,12 +413,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 244583696}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4298a5610bd9d94f869f4cf69e24435, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _material: {fileID: 59235104}
+  _material: {fileID: 204938450}
   _srcCam1: {fileID: 1203930313}
   _srcCam2: {fileID: 1447923077}
   light: {fileID: 705507994}
@@ -1424,7 +1424,7 @@ Camera:
   m_GameObject: {fileID: 1447923074}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
+  m_ClearFlags: 3
   m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2

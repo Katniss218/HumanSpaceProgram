@@ -24,20 +24,20 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _Input1Depth:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 8400000, guid: 1dc6b80035aa55c4c9827b239b6bc669, type: 2}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Input2Depth:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 8400000, guid: 22d3ca271b5541e4ba52dbdbbe8c2940, type: 2}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _DstFar: 1000
-    - _DstNear: 0.03
-    - _Input1Far: 1000
-    - _Input1Near: 0.03
-    - _Input2Far: 1000
-    - _Input2Near: 0.03
+    - _DstFar: 1e+15
+    - _DstNear: 10.000001
+    - _Input1Far: 1e+18
+    - _Input1Near: 90000
+    - _Input2Far: 100000
+    - _Input2Near: 0.10154823
     m_Colors: []
   m_BuildTextureStacks: []
