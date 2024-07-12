@@ -79,7 +79,7 @@ namespace HSP.UI.Windows
 
             if( _highlightedObject != null )
             {
-                Vector3 targetScreenPos = GameplaySceneCamera.MainCamera.WorldToScreenPoint( ReferenceTransform.position );
+                Vector3 targetScreenPos = GameplaySceneCameraSystem.MainCamera.WorldToScreenPoint( ReferenceTransform.position );
                 targetScreenPos.z = 0.0f;
 
                 _highlightedObject.position = targetScreenPos;

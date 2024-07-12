@@ -6,4 +6,51 @@ SIMD: No
 
 -- Log Starts Here -------------------------------------------------------
 
-[16:41:32](WRN) - OnRenderImage() possibly didn't write anything to the destination texture!
+[21:25:13](EXC) - UnassignedReferenceException: The variable <ReferenceObject>k__BackingField of OrbitingCameraController has not been assigned.
+You probably need to assign the <ReferenceObject>k__BackingField variable of the OrbitingCameraController script in the inspector.
+  at
+UnityEngine.Transform.get_position () (at <08e97795506846d2b49f430c361fcdf7>:0)
+HSP.Cameras.OrbitingCameraController.GetUpDir () (at Assets/HSP/Cameras/OrbitingCameraController.cs:51)
+HSP.Cameras.OrbitingCameraController.Update () (at Assets/HSP/Cameras/OrbitingCameraController.cs:87)
+
+[21:25:13](WRN) - OnRenderImage() possibly didn't write anything to the destination texture!
+[21:25:21](ERR) - Screen position out of view frustum (screen pos 1138.000000, 603.000000) (Camera rect 0 0 1920 907)
+[21:25:21](ERR) - Screen position out of view frustum (screen pos 1138.000000, 602.000000) (Camera rect 0 0 1920 907)
+[21:25:21](ERR) - Screen position out of view frustum (screen pos 1138.000000, 602.000000) (Camera rect 0 0 1920 907)
+[21:25:21](ERR) - Screen position out of view frustum (screen pos 1138.000000, 602.000000) (Camera rect 0 0 1920 907)
+[21:25:21](ERR) - Screen position out of view frustum (screen pos 1138.000000, 602.000000) (Camera rect 0 0 1920 907)
+[21:25:21](ERR) - Screen position out of view frustum (screen pos 1137.000000, 590.000000) (Camera rect 0 0 1920 907)
+[21:25:21](ERR) - Screen position out of view frustum (screen pos 1136.000000, 576.000000) (Camera rect 0 0 1920 907)
+[21:25:21](ERR) - Screen position out of view frustum (screen pos 1136.000000, 571.000000) (Camera rect 0 0 1920 907)
+[21:25:21](ERR) - Screen position out of view frustum (screen pos 1136.000000, 571.000000) (Camera rect 0 0 1920 907)
+[21:25:21](ERR) - Screen position out of view frustum (screen pos 1136.000000, 568.000000) (Camera rect 0 0 1920 907)
+[21:25:21](ERR) - Screen position out of view frustum (screen pos 1136.000000, 567.000000) (Camera rect 0 0 1920 907)
+[21:25:21](ERR) - Screen position out of view frustum (screen pos 1136.000000, 567.000000) (Camera rect 0 0 1920 907)
+[21:25:21](ERR) - Screen position out of view frustum (screen pos 1135.000000, 565.000000) (Camera rect 0 0 1920 907)
+[21:25:21](ERR) - Screen position out of view frustum (screen pos 1135.000000, 564.000000) (Camera rect 0 0 1920 907)
+[21:25:21](ERR) - Screen position out of view frustum (screen pos 1135.000000, 564.000000) (Camera rect 0 0 1920 907)
+[21:25:21](ERR) - Screen position out of view frustum (screen pos 1135.000000, 555.000000) (Camera rect 0 0 1920 907)
+[21:25:21](ERR) - Screen position out of view frustum (screen pos 1135.000000, 550.000000) (Camera rect 0 0 1920 907)
+[21:25:21](ERR) - Screen position out of view frustum (screen pos 1136.000000, 550.000000) (Camera rect 0 0 1920 907)
+[21:25:21](ERR) - Screen position out of view frustum (screen pos 1136.000000, 550.000000) (Camera rect 0 0 1920 907)
+[21:25:21](ERR) - Screen position out of view frustum (screen pos 1136.000000, 550.000000) (Camera rect 0 0 1920 907)
+[21:25:21](ERR) - Screen position out of view frustum (screen pos 1136.000000, 550.000000) (Camera rect 0 0 1920 907)
+[21:25:21](ERR) - Screen position out of view frustum (screen pos 1136.000000, 550.000000) (Camera rect 0 0 1920 907)
+[21:25:21](ERR) - Screen position out of view frustum (screen pos 1136.000000, 550.000000) (Camera rect 0 0 1920 907)
+[21:25:21](ERR) - Screen position out of view frustum (screen pos 1136.000000, 550.000000) (Camera rect 0 0 1920 907)
+[21:25:21](ERR) - Screen position out of view frustum (screen pos 1136.000000, 550.000000) (Camera rect 0 0 1920 907)
+[21:25:21](ERR) - Screen position out of view frustum (screen pos 1136.000000, 549.000000) (Camera rect 0 0 1920 907)
+[21:25:22](ERR) - Screen position out of view frustum (screen pos 1136.000000, 548.000000) (Camera rect 0 0 1920 907)
+[21:25:22](ERR) - Screen position out of view frustum (screen pos 1136.000000, 548.000000) (Camera rect 0 0 1920 907)
+[21:25:22](ERR) - Screen position out of view frustum (screen pos 1136.000000, 548.000000) (Camera rect 0 0 1920 907)
+[21:25:22](ERR) - Screen position out of view frustum (screen pos 1136.000000, 548.000000) (Camera rect 0 0 1920 907)
+[21:25:22](ERR) - Screen position out of view frustum (screen pos 1136.000000, 548.000000) (Camera rect 0 0 1920 907)
+[21:25:22](ERR) - Screen position out of view frustum (screen pos 1136.000000, 548.000000) (Camera rect 0 0 1920 907)
+[21:25:22](ERR) - Screen position out of view frustum (screen pos 1136.000000, 548.000000) (Camera rect 0 0 1920 907)
+[21:25:22](ERR) - Screen position out of view frustum (screen pos 1136.000000, 548.000000) (Camera rect 0 0 1920 907)
+[21:25:22](ERR) - Screen position out of view frustum (screen pos 1136.000000, 547.000000) (Camera rect 0 0 1920 907)
+[21:25:22](ERR) - Screen position out of view frustum (screen pos 1137.000000, 547.000000) (Camera rect 0 0 1920 907)
+[21:25:22](ERR) - Screen position out of view frustum (screen pos 1137.000000, 547.000000) (Camera rect 0 0 1920 907)
+[21:25:22](ERR) - Screen position out of view frustum (screen pos 1138.000000, 547.000000) (Camera rect 0 0 1920 907)
+[21:25:22](ERR) - Screen position out of view frustum (screen pos 1138.000000, 547.000000) (Camera rect 0 0 1920 907)
+[21:25:22](ERR) - Screen position out of view frustum (screen pos 1138.000000, 546.000000) (Camera rect 0 0 1920 907)

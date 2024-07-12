@@ -126,11 +126,13 @@ Shader "Hidden/CopyDepth"
 				float outputRawDepth = LinearDepthToRawDepth(minLinearDepth, _DstZBufferParams);
 
 				o.depth = outputRawDepth;
-				//o.color = fixed4(input1LinearDepth / 5e6, 0, 0, 0); // Use for debugging, displays the depth as yellow in the background of the front.
+				o.color = fixed4(0, 0, 0, 0); // Use for debugging, displays the depth as yellow in the background of the front.
 				
 				//
-				//if( minLinearDepth > 1000000 )
-				//	o.color.g = 1;
+				if( input1LinearDepth > 19909999 )
+					o.color.g = 1;
+				if( input2LinearDepth > 10000000 )
+					o.color.r = 1;
 				//
 
 				return o;

@@ -107,7 +107,7 @@ namespace HSP.UI.HUDs
             _progressImage.fillAmount = percent;
             _statusIcon.Sprite = GetStatusSprite();
 
-            ((RectTransform)this.transform).SetScreenPosition( Cameras.GameplaySceneCamera.MainCamera, ConstructionSite.transform.position );
+            ((RectTransform)this.transform).SetScreenPosition( Cameras.GameplaySceneCameraSystem.MainCamera, ConstructionSite.transform.position );
         }
 
         protected internal static T Create<T>( IUIElementContainer parent, FConstructionSite constructionSite ) where T : ConstructionSiteHUD
