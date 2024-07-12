@@ -108,28 +108,29 @@ Shader "Hidden/CopyDepth"
 				float4 _DstZBufferParams = GetZBufferParams(_DstNear, _DstFar, UNITY_REVERSED_Z);
 
 				//float input1RawDepth = tex2D(_Input1Depth, i.uv).r;
-				//float input2RawDepth = tex2D(_Input2Depth, i.uv).r;
 				float input1RawDepth = SAMPLE_DEPTH_TEXTURE(_Input1Depth, i.uv);
+				//float input2RawDepth = tex2D(_Input2Depth, i.uv).r;
 				float input2RawDepth = SAMPLE_DEPTH_TEXTURE(_Input2Depth, i.uv);
+				
+				// camera depth buffer in linear distance is always in range [near..far]
 
 				float input1LinearDepth = RawDepthToLinearDepth(input1RawDepth, _Input1ZBufferParams);
 				float input2LinearDepth = RawDepthToLinearDepth(input2RawDepth, _Input2ZBufferParams);
 
-				if( input2LinearDepth > 99999 )
+				// Assumes that '2's far plane is closer than '1's far plane
+				if( input2LinearDepth > (_Input2Far - 0.1) )
 					input2LinearDepth = _Input1Far;
 				
-				// camera depth buffer in linear distance is always in range [near..far]
-
-				float minLinearDepth = min(input1LinearDepth, input2LinearDepth); // min is bad because near depth is clamped to be at most 100000, even if nothing was hit.
+				float minLinearDepth = min(input1LinearDepth, input2LinearDepth);
 				
-				float rawDepthOut = LinearDepthToRawDepth(minLinearDepth, _DstZBufferParams);
+				float outputRawDepth = LinearDepthToRawDepth(minLinearDepth, _DstZBufferParams);
 
-				o.depth = rawDepthOut;
-				o.color = fixed4(input1LinearDepth / 5e6, 0, 0, 0); // Use for debugging, displays the depth as yellow in the background of the front.
+				o.depth = outputRawDepth;
+				//o.color = fixed4(input1LinearDepth / 5e6, 0, 0, 0); // Use for debugging, displays the depth as yellow in the background of the front.
 				
 				//
-				if( minLinearDepth > 1000000 )
-					o.color.g = 1;
+				//if( minLinearDepth > 1000000 )
+				//	o.color.g = 1;
 				//
 
 				return o;

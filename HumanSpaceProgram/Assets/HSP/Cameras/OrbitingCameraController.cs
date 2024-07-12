@@ -55,9 +55,8 @@ namespace HSP.Cameras
             return upDir;
         }
 
-        void UpdateOrientation()
+        void UpdateOrientation( Vector3 upDir )
         {
-            Vector3 upDir = GetUpDir();
             Vector3 rightDir = Vector3.ProjectOnPlane( this.transform.right, upDir ).normalized;
 
             float mouseX = UnityEngine.Input.GetAxis( "Mouse X" );
@@ -85,9 +84,15 @@ namespace HSP.Cameras
                 _isRotating = false;
             }
 
+            Vector3 upDir = GetUpDir();
+
             if( _isRotating )
             {
-                UpdateOrientation();
+                UpdateOrientation( upDir );
+            }
+            else
+            {
+                this.transform.rotation = Quaternion.LookRotation( this.transform.forward, upDir );
             }
         }
 
