@@ -62,6 +62,7 @@
     <Compile Include="Assets\HSP\EditorScene\EditorSceneEscapeInputController.cs" />
     <Compile Include="Assets\HSP\TranslationTransformHandle.cs" />
     <Compile Include="Assets\HSP\DesignScene\DesignSceneToolBase.cs" />
+    <Compile Include="Assets\HSP\Cameras\GameplaySceneCamera.cs" />
     <Compile Include="Assets\HSP\DesignScene\Tools\PickTool.cs" />
     <Compile Include="Assets\HSP\CelestialBodies\VanillaPlanetarySystemFactory.cs" />
     <Compile Include="Assets\HSP\Components\FPlayerInputAvionics.cs" />
@@ -117,9 +118,9 @@
     <Compile Include="Assets\HSP\PIDLoop.cs" />
     <Compile Include="Assets\HSP\AssetLoaders\GameDataJsonVesselFactory.cs" />
     <Compile Include="Assets\HSP\Components\FReactionControlController.cs" />
-    <Compile Include="Assets\HSP\Cameras\GameplaySceneCamera.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\HSP\Effects\Atmospheres\MergeDepth.shader" />
     <None Include="Assets\HSP\CelestialBodies\Surface\TerrainShader.shader" />
     <None Include="Assets\HSP\Effects\Atmospheres\Atmosphere.shader" />
     <None Include="Assets\HSP\___HSP.asmdef" />

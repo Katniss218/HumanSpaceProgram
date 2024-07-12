@@ -92,7 +92,7 @@ namespace HSP.Cameras
         void LateUpdate()
         {
             // After modifying position/rotation/zoom.
-            TryToggleNearCamera();
+           // TryToggleNearCamera();
 
             float zoomDist = this.transform.localPosition.magnitude;
 
