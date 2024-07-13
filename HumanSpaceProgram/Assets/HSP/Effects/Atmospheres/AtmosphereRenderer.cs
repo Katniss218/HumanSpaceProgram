@@ -1,10 +1,6 @@
 using HSP.GameplayScene.Cameras;
-using HSP.Core;
 using HSP.Core.ReferenceFrames;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 
 namespace HSP.CelestialBodies

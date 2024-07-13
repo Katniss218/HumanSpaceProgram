@@ -3,8 +3,6 @@ using HSP.Core.Physics;
 using HSP.Core.ReferenceFrames;
 using HSP.Input;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityPlus.Input;
 

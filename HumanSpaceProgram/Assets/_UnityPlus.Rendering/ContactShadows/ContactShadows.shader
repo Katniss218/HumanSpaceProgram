@@ -47,42 +47,74 @@ Shader "Hidden/ContactShadows"
 				o.uv = v.uv;
 				return o;
 			}
-
+			
 			float3 ViewSpaceToClipSpace(float3 viewPos)
 			{
 				float4 clipPos = mul(unity_CameraProjection, float4(viewPos, 1));
 				return clipPos.xyz;
 			}
 
-			float CalculateShadows(float2 uv)
+			fixed4 CalculateShadows(float2 uv)
 			{
 				float mask = tex2D(_ShadowMask, uv).r;
-				if (mask < 0.01)
-					return mask; // if already in shadow, return that.
+				//if (mask < 0.01)
+				//	return mask; // if already in shadow, return that.
 
-				float depth = LinearEyeDepth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, uv)); // depth value is in view space.
+				float rawDepth = SAMPLE_DEPTH_TEXTURE( _CameraDepthTexture, uv );
+				float linearDepth = LinearEyeDepth( rawDepth );
 
-				if (depth > _ShadowDistance)
+				if (linearDepth > _ShadowDistance)
 					return mask; // Background.
 
-				float2 lightDirUV = ViewSpaceToClipSpace(_LightDir * _RayLength).xy; // original _LightDir is in view space (aligned with camera, meter units).
-				float2 uvStep = lightDirUV / _SampleCount;
+				float2 uvChangeRayTotal = ViewSpaceToClipSpace( _LightDir * _RayLength ).xy; // original _LightDir is in view space (aligned with camera, meter units).
+				
+				float2 uvStep = uvChangeRayTotal / _SampleCount;
+
+	//	THE UV STEP APPEARS TO BE WRONG, IT'S NOT IN CORRECT METERS AT GIVEN DEPTH FOR SURE. THE AXES AND DIRECTIONS SEEM ALRIGHT THOUGH.
+
+			// I might need to project 2 points, one at origin, one at (origin + ray), and subtract one from the other
+
 
 				// invert light dir depth since Z+ points into the screen in view space.
-				float depthChangeRayTotal = -_LightDir.z * _RayLength; // total depth change from the start to the end of the ray (ray is in view space already, so we take the component pointing towards the screen).
+				float depthChangeRayTotal = _LightDir.z * _RayLength; // total depth change from the start to the end of the ray (ray is in view space already, so we take the component pointing towards the screen).
 				float depthStep = depthChangeRayTotal / _SampleCount; // So this is also in view space.
 				
-				UNITY_LOOP for (int i = 0; i < _SampleCount; i++)
+				//return float4(uvChangeRayTotal.x, uvChangeRayTotal.y, 0, 0);
+				//return float4(0, uvChangeRayTotal.y, 0, 0);
+				//return float4(uvChangeRayTotal.x, 0, 0, 0);
+
+				//return float4(depthChangeRayTotal, 0, 0, 0);
+
+				UNITY_LOOP for (int i = 1; i < _SampleCount + 1; i++)
 				{
-					float depth2 = LinearEyeDepth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, uv + (uvStep * i))) + (depthStep * i);
+					float rawDepthAtRaySample = SAMPLE_DEPTH_TEXTURE( _CameraDepthTexture, uv + (uvStep * i) );
+					float linearDepthAtRaySample = LinearEyeDepth( rawDepthAtRaySample );
+
+					float distanceToRaySample = linearDepth + (depthStep * i);
+
+					float diff = (distanceToRaySample - _Bias) - linearDepthAtRaySample;
+
+					return float4( diff, diff, 0.0, 0.0);
+
+		// PIXELS NEAR THE EDGES WILL OVERFLOW AND SAMPLE WRONG DEPTH UVs.
 
 					// there's still something wrong here, it makes too much stuff dark.
 
-					float diff = depth - depth2;
-					if (diff > _Bias && diff < _Thickness) // depth2 can't be too close to, or too much in front of depth.
-						return 1 - _ShadowStrength;
+					float biasedSampleDepth = distanceToRaySample - _Bias;
+
+					if( biasedSampleDepth > linearDepthAtRaySample )
+					{
+						//return 1 - _ShadowStrength;
+					}
+					//float raySampleDepth = LinearEyeDepth( SAMPLE_DEPTH_TEXTURE( _CameraDepthTexture, uv + (uvStep * i)) ) + (depthStep * i);
+
+					//float diff = linearDepth - depthAtRaySample;
+					//if (diff > _Bias && diff < _Thickness) // depthAtRaySample can't be too close to, or too much in front of depth.
+					//	return 1 - _ShadowStrength;
+						//return num / 32.0;
 				}
-				return mask;
+
+				return float4(mask, 0, 0, 0);
 			}
 
 			fixed4 frag(v2f i) : SV_Target
@@ -92,6 +124,17 @@ Shader "Hidden/ContactShadows"
 
 			ENDHLSL
 		}
+
+
+		//
+
+		// Below is not used.
+		// Below is not used.
+		// Below is not used.
+		// Below is not used.
+		//
+		//
+
 		Pass
 		{
 			// adapted from https://github.com/keijiro/ContactShadows

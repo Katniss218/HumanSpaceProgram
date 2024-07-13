@@ -113,9 +113,7 @@ Shader "Hidden/CopyDepth"
 				float4 _Input2ZBufferParams = GetZBufferParams(_Input2Near, _Input2Far, UNITY_REVERSED_Z);
 				float4 _DstZBufferParams = GetZBufferParams(_DstNear, _DstFar, UNITY_REVERSED_Z);
 
-				//float input1RawDepth = tex2D(_Input1Depth, i.uv).r;
 				float input1RawDepth = SAMPLE_DEPTH_TEXTURE(_Input1Depth, i.uv);
-				//float input2RawDepth = tex2D(_Input2Depth, i.uv).r;
 				float input2RawDepth = SAMPLE_DEPTH_TEXTURE(_Input2Depth, i.uv);
 				
 				// camera depth buffer in linear distance is always in range [near..far]
