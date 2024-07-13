@@ -525,13 +525,15 @@ MonoBehaviour:
     asset: {fileID: 15302, guid: 0000000000000000f000000000000000, type: 0}
   - assetID: builtin::SpatialMappingWireframe
     asset: {fileID: 15303, guid: 0000000000000000f000000000000000, type: 0}
+  - assetID: builtin::Resources/hspicon_old
+    asset: {fileID: 21300000, guid: 00158703c0731e24a9559a7faefe4610, type: 3}
   - assetID: builtin::Resources/Sprites/UI/csite_progress_bar
     asset: {fileID: 21300000, guid: 006c1ccc4bb55e54ea4e7537f7a5535f, type: 3}
   - assetID: builtin::_UnityPlus.Rendering/ContactShadows/ContactShadows
     asset: {fileID: 4800000, guid: 1076f13f6020e4f45b4c4657258d2e75, type: 3}
   - assetID: builtin::Resources/Sprites/UI/timewarp_forward_active_middle
     asset: {fileID: 21300000, guid: 2057894501d32be4f83972159c8930ed, type: 3}
-  - assetID: builtin::KSS.DevUtils/cube/Xp
+  - assetID: builtin::HSP.DevUtils/cube/Xp
     asset: {fileID: 2800000, guid: 305ae7eb94909c644a2f1a85d8e03dab, type: 3}
   - assetID: builtin::_TextMesh Pro/Shaders/TMPro
     asset: {fileID: 10900000, guid: 407bc68d299748449bbf7f48ee690f8d, type: 3}
@@ -539,19 +541,21 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: 50efd038fddeadf4abde841f91139ac1, type: 3}
   - assetID: builtin::Resources/Sprites/UI/part_list_entry_background
     asset: {fileID: 21300000, guid: 7099b0c3ab08cbc4c9257ebf49c24b1d, type: 3}
+  - assetID: builtin::HSP/Effects/Atmospheres/MergeDepth
+    asset: {fileID: 4800000, guid: 80a4b299d615fad43aa00c9b2b9942dd, type: 3}
   - assetID: builtin::Resources/Sprites/UI/category_background
     asset: {fileID: 21300000, guid: 80ca6d8af4c830041b7842e6323e7e0c, type: 3}
   - assetID: builtin::Resources/Prefabs/Parts/tank
     asset: {fileID: 1175757436153444479, guid: 90c1928201a9f4745b5556dbfcb4d2f7, type: 3}
-  - assetID: builtin::KSS.DevUtils/cube/Yn
+  - assetID: builtin::HSP.DevUtils/cube/Yn
     asset: {fileID: 2800000, guid: 90277dd122cd8f141ada4071bccb6a6e, type: 3}
   - assetID: builtin::Resources/Sprites/UI/button_30x30_open
     asset: {fileID: 21300000, guid: 90db8b30936c5cf4ab0a587573da8a60, type: 3}
-  - assetID: builtin::KSS.DevUtils/WireframeSimpleQuad
+  - assetID: builtin::HSP.DevUtils/WireframeSimpleQuad
     asset: {fileID: 4800000, guid: a0b096a58f58b234bb1abbd515466938, type: 3}
   - assetID: builtin::_TextMesh Pro/Shaders/TMP_SDF-Mobile Overlay
     asset: {fileID: 4800000, guid: a02a7d8c237544f1962732b55a9aebf1, type: 3}
-  - assetID: builtin::KSS.DevUtils/Saturn
+  - assetID: builtin::HSP.DevUtils/Saturn
     asset: {fileID: -9177143647925862078, guid: c0a78ddf700b39549b6e98cacf2a9e3f, type: 3}
   - assetID: builtin::Resources/Materials/ghost_wireframe
     asset: {fileID: 2100000, guid: d0468dcc56597964899782bc9d22f43d, type: 2}
@@ -559,13 +563,11 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: d07658eff0ec0084a914680234151f2c, type: 3}
   - assetID: builtin::Resources/Sprites/std0/ui_percent_bar_L_fg
     asset: {fileID: 21300000, guid: d0de82cb22c4d81479ccc54061760a9f, type: 3}
-  - assetID: builtin::KSS/Effects/Atmospheres/New Material 2
-    asset: {fileID: 2100000, guid: f0f3531bf26fe524f8b4ddb414a94734, type: 2}
   - assetID: builtin::Resources/Sprites/UI/seqicon_separator_vertical
     asset: {fileID: 21300000, guid: 010002d76dc7a0e48a9a6d050e87f443, type: 3}
   - assetID: builtin::___Scenes/Gameplay
     asset: {fileID: 102900000, guid: 0104d408cf7e4384dae23fbe2673980c, type: 3}
-  - assetID: builtin::KSS.DevUtils/axis_x
+  - assetID: builtin::HSP.DevUtils/axis_x
     asset: {fileID: 2100000, guid: 217209dc2b71bd449be652a520f08423, type: 2}
   - assetID: builtin::Resources/gemini_capsule
     asset: {fileID: -5188267583213058109, guid: 218e62cdb4702294887324ccb051df1f, type: 3}
@@ -577,7 +579,7 @@ MonoBehaviour:
     asset: {fileID: 2889124796493493744, guid: 315f9171e8abb8347b411d9e90572b3c, type: 3}
   - assetID: builtin::Resources/Sprites/UI/slider
     asset: {fileID: 21300000, guid: 61f5d1f4f7b0c8c48b71dab9832e45a2, type: 3}
-  - assetID: builtin::KSS.DevUtils/cube/Zn
+  - assetID: builtin::HSP.DevUtils/cube/Zn
     asset: {fileID: 2800000, guid: 817733ada2fab5940bf97a27e89c538d, type: 3}
   - assetID: builtin::Resources/Textures/navball_color
     asset: {fileID: 2800000, guid: 81bba99b705f9694fbd9e3bcc3752962, type: 3}
@@ -587,9 +589,9 @@ MonoBehaviour:
     asset: {fileID: 1175757436153444479, guid: b1a35d216412591489790b82c952e01a, type: 3}
   - assetID: builtin::Resources/Meshes/attitude_indicator
     asset: {fileID: -7163177602714537324, guid: c10a9c87b58aac9448bcab4f35f869df, type: 3}
-  - assetID: builtin::KSS.DevUtils/cube/Xn
+  - assetID: builtin::HSP.DevUtils/cube/Xn
     asset: {fileID: 2800000, guid: d17090d9f818409458984d34346bcd0d, type: 3}
-  - assetID: builtin::KSS.DevUtils/Wireframe
+  - assetID: builtin::HSP.DevUtils/Wireframe
     asset: {fileID: 4800000, guid: f1df184c254f8794abe3486d926034b1, type: 3}
   - assetID: builtin::Resources/Sprites/UI/button_30x30_new
     asset: {fileID: 21300000, guid: 0259fe815d290b74eb497477eba0e1a9, type: 3}
@@ -637,7 +639,7 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: d333c4de13ab35746a0f92e8c9569bac, type: 3}
   - assetID: builtin::_TextMesh Pro/Fonts/LiberationSans
     asset: {fileID: 12800000, guid: e3265ab4bf004d28a9537516768c1c75, type: 3}
-  - assetID: builtin::KSS/CelestialBodies/Surface/TerrainShader
+  - assetID: builtin::HSP/CelestialBodies/Surface/TerrainShader
     asset: {fileID: 4800000, guid: e3f72d5ef871243408ac05fea5ed9243, type: 3}
   - assetID: builtin::Resources/Sprites/std0/ui_percent_bar_bg
     asset: {fileID: 21300000, guid: f329ac740530a7640993d6c7647d30b6, type: 3}
@@ -657,7 +659,7 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: 44201c46f3fcaa84488125cc4456843a, type: 3}
   - assetID: builtin::___Scenes/Editor
     asset: {fileID: 102900000, guid: 44a7ee5459bdbbe4da580ddd94f5b3dd, type: 3}
-  - assetID: builtin::KSS.DevUtils/flameparticle14
+  - assetID: builtin::HSP.DevUtils/flameparticle14
     asset: {fileID: 2800000, guid: 54801f02942d0ca4786b6bfc27fa1efb, type: 3}
   - assetID: builtin::___Scenes/RT
     asset: {fileID: 8400000, guid: 645c91fbcb5e2d64089483fbcea12416, type: 2}
@@ -667,7 +669,7 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: 74a80d605d76de94689ed9a4ac418567, type: 3}
   - assetID: builtin::Resources/Sprites/std0/ui_percent_bar_R_bg
     asset: {fileID: 21300000, guid: 94e06069a322b62489cea5cc0be1e1e1, type: 3}
-  - assetID: builtin::KSS.DevUtils/vab
+  - assetID: builtin::HSP.DevUtils/vab
     asset: {fileID: 4416803039647088028, guid: a4405d36089eda445b6e5e8a3a9565e9, type: 3}
   - assetID: builtin::Resources/Sprites/UI/timewarp_pause_active
     asset: {fileID: 21300000, guid: a416d5e6ecf953649bd2c0040c4d721b, type: 3}
@@ -681,7 +683,7 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: f42d77e9a19ffc0438a43e3d10dc6140, type: 3}
   - assetID: builtin::Resources/Materials/attitude_indicator
     asset: {fileID: 2100000, guid: 35d2f520ab42c974aa2816029d77aaad, type: 2}
-  - assetID: builtin::KSS.DevUtils/flameparticle6
+  - assetID: builtin::HSP.DevUtils/flameparticle6
     asset: {fileID: 2800000, guid: 3566c19ea11fd3d49bb446379fef0227, type: 3}
   - assetID: builtin::Resources/Sprites/UI/checkbox_active
     asset: {fileID: 21300000, guid: 352ae8ecb94709f4c92c9251cd16aea9, type: 3}
@@ -697,7 +699,7 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: 65aeec31173c1cf4995c142f483eaac8, type: 3}
   - assetID: builtin::_TextMesh Pro/Shaders/TMP_SDF-Surface-Mobile
     asset: {fileID: 4800000, guid: 85187c2149c549c5b33f0cdb02836b17, type: 3}
-  - assetID: builtin::KSS.DevUtils/blueflameparticle2
+  - assetID: builtin::HSP.DevUtils/blueflameparticle2
     asset: {fileID: 2800000, guid: b5eb64e5af8edad4bb4001b7d8d0e8bd, type: 3}
   - assetID: builtin::Resources/Sprites/UI/button_down
     asset: {fileID: 21300000, guid: b58c6794019cfb3408fa347e4da7952e, type: 3}
@@ -711,7 +713,7 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: 162ae6dbea1fd634fbcd4cf5a986e017, type: 3}
   - assetID: builtin::Resources/Sprites/UI/panel_dark
     asset: {fileID: 21300000, guid: 169a70e5c0087134c8626c4860d41e28, type: 3}
-  - assetID: builtin::KSS.DevUtils/skybox
+  - assetID: builtin::HSP.DevUtils/skybox
     asset: {fileID: 2100000, guid: 160bf2fe69d7f344f904939601e96160, type: 2}
   - assetID: builtin::Resources/Sprites/UI/button_down_gold
     asset: {fileID: 21300000, guid: 163e65f48c58aa144b4a35216167e123, type: 3}
@@ -721,9 +723,7 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: 2606db97e3012174880af29285f3b56f, type: 3}
   - assetID: builtin::_UnityPlus.Rendering/Compositing/CopyDepth
     asset: {fileID: 4800000, guid: 3652ae74f7446ea4cb2c7a40ab28adb5, type: 3}
-  - assetID: builtin::KSS/Effects/Atmospheres/New Material 1
-    asset: {fileID: 2100000, guid: 36ee735b35af6d547b69f8843c690673, type: 2}
-  - assetID: builtin::KSS.DevUtils/plumevac
+  - assetID: builtin::HSP.DevUtils/plumevac
     asset: {fileID: 200879084381103697, guid: 36eee53044c7284479b90439b6b87c47, type: 3}
   - assetID: builtin::Resources/Sprites/cursors/cursor_default
     asset: {fileID: 2800000, guid: 663c7927a17cadc46ad8b702f1c90c91, type: 3}
@@ -731,7 +731,7 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: 7638698479b464b4984939774397981a, type: 3}
   - assetID: builtin::Resources/engine
     asset: {fileID: -3534920711011820904, guid: 96227cebe98f0b4409158980bcfbd5a1, type: 3}
-  - assetID: builtin::KSS.DevUtils/S-IC-ThrustStructure
+  - assetID: builtin::HSP.DevUtils/S-IC-ThrustStructure
     asset: {fileID: -7621046423043655963, guid: 965ee988c0e48fb47896c37deaaac11c, type: 3}
   - assetID: builtin::Resources/Sprites/UI/slider_handle
     asset: {fileID: 21300000, guid: b65d568f1ce8e0844b4d02815d82b2a0, type: 3}
@@ -741,7 +741,7 @@ MonoBehaviour:
     asset: {fileID: 4900000, guid: d6087065e6258a6439efa8a9bf82fac6, type: 3}
   - assetID: builtin::Resources/Sprites/cursors/cursor_leftright
     asset: {fileID: 2800000, guid: d67af8e0cdb581045a67e1a4135a12a3, type: 3}
-  - assetID: builtin::KSS.DevUtils/WireframeQuad
+  - assetID: builtin::HSP.DevUtils/WireframeQuad
     asset: {fileID: 4800000, guid: f6e566cdd17f708469e7d72c9245079c, type: 3}
   - assetID: builtin::Resources/Sprites/UI/timewarp_forward_active_right
     asset: {fileID: 21300000, guid: 97dc5be07b67fb044ae52e77e4544498, type: 3}
@@ -749,7 +749,7 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: b7e7d139434dac94f905d3227d3bc8ad, type: 3}
   - assetID: builtin::___Scenes/_AlwaysLoaded_
     asset: {fileID: 102900000, guid: c7a3cb11faa75aa4caf1c4baa7da50ab, type: 3}
-  - assetID: builtin::KSS.DevUtils/axis_y
+  - assetID: builtin::HSP.DevUtils/axis_y
     asset: {fileID: 2100000, guid: c7b4cbc936fcc654b864c266bb609ce6, type: 2}
   - assetID: builtin::Resources/Fonts/liberation_sans - Drop Shadow
     asset: {fileID: 2100000, guid: e73a58f6e2794ae7b1b7e50b7fb811b0, type: 2}
@@ -757,7 +757,7 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: f7ac2ba1b2123b041910adda38e06ebc, type: 3}
   - assetID: builtin::_TextMesh Pro/Shaders/TMP_SDF-Surface
     asset: {fileID: 4800000, guid: f7ada0af4f174f0694ca6a487b8f543d, type: 3}
-  - assetID: builtin::KSS.DevUtils/_untitled
+  - assetID: builtin::HSP.DevUtils/_untitled
     asset: {fileID: -5495902117074765545, guid: 08c7c20484f02a847b27b65fc2349dce, type: 3}
   - assetID: builtin::Resources/Sprites/UI/control_node
     asset: {fileID: 21300000, guid: 18ccb9a0a3e01104f8d80c0efc794caa, type: 3}
@@ -777,17 +777,15 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: 882dc041b5e078542bbb35672d455345, type: 3}
   - assetID: builtin::Resources/Sprites/UI/button_vertical
     asset: {fileID: 21300000, guid: 9824aa2ac9104804fbeec9c9d1fca2e3, type: 3}
-  - assetID: builtin::KSS/Effects/Atmospheres/New Material
-    asset: {fileID: 2100000, guid: a8f938b9453f4084ab607816cbcc130f, type: 2}
   - assetID: builtin::_TextMesh Pro/Shaders/TMP_SDF-Mobile SSD
     asset: {fileID: 4800000, guid: c8d12adcee749c344b8117cf7c7eb912, type: 3}
   - assetID: builtin::_TextMesh Pro/Resources/LineBreaking Leading Characters
     asset: {fileID: 4900000, guid: d82c1b31c7e74239bff1220585707d2b, type: 3}
-  - assetID: builtin::KSS.DevUtils/WireframeSimple
+  - assetID: builtin::HSP.DevUtils/WireframeSimple
     asset: {fileID: 4800000, guid: f8a4c90f917f13841bfc43ae76ff1db5, type: 3}
   - assetID: builtin::Resources/Meshes/attitude_indicator2
     asset: {fileID: -7163177602714537324, guid: 39e43d31482ec33419af8b27ebe27caa, type: 3}
-  - assetID: builtin::KSS.DevUtils/Moon_NRM
+  - assetID: builtin::HSP.DevUtils/Moon_NRM
     asset: {fileID: 2800000, guid: 39f68ee7435c4ce41876eda985365625, type: 3}
   - assetID: builtin::_TextMesh Pro/Shaders/TMPro_Properties
     asset: {fileID: 10900000, guid: 3997e2241185407d80309a82f9148466, type: 3}
@@ -797,7 +795,7 @@ MonoBehaviour:
     asset: {fileID: 2100000, guid: 79459efec17a4d00a321bdcc27bbc385, type: 2}
   - assetID: builtin::Resources/Sprites/UI/button_30x30_redo
     asset: {fileID: 21300000, guid: 7959e8ccaf90edc4c8161e14929e34c4, type: 3}
-  - assetID: builtin::KSS.DevUtils/plume
+  - assetID: builtin::HSP.DevUtils/plume
     asset: {fileID: 8249851232874469727, guid: c92c375e3df22dd43a777a7cccf2c1e0, type: 3}
   - assetID: builtin::_TextMesh Pro/Shaders/TMPro_Surface
     asset: {fileID: 10900000, guid: d930090c0cd643c7b55f19a38538c162, type: 3}
@@ -809,13 +807,13 @@ MonoBehaviour:
     asset: {fileID: 11400000, guid: f952c082cb03451daed3ee968ac6c63e, type: 2}
   - assetID: builtin::Resources/Sprites/UI/scrollbar_vertical
     asset: {fileID: 21300000, guid: f9656aa411a50ce40814f0d82705aa91, type: 3}
-  - assetID: builtin::KSS.DevUtils/untitled 1
+  - assetID: builtin::HSP.DevUtils/untitled 1
     asset: {fileID: 6239881831769578202, guid: f9eaf569e8e8f9b4e976a3fb0fdf85c8, type: 3}
   - assetID: builtin::Resources/Sprites/UI/icon_snap
     asset: {fileID: 21300000, guid: 0aaedc3b6c55cd34f8e7dd710d94ed84, type: 3}
   - assetID: builtin::Resources/Sprites/std0/ui_sequencer_item
     asset: {fileID: 21300000, guid: 1a42060aa0081994c83857d0dbf0d8bb, type: 3}
-  - assetID: builtin::KSS/Effects/Atmospheres/Atmosphere
+  - assetID: builtin::HSP/Effects/Atmospheres/Atmosphere
     asset: {fileID: 4800000, guid: 2ae1634ae2ad45844b4e5a0087a6833b, type: 3}
   - assetID: builtin::Resources/Sprites/UI/scrollbar_horizontal_gold
     asset: {fileID: 21300000, guid: 3a4d3b8d226b7d9418c771e56991bafa, type: 3}
@@ -827,7 +825,7 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: 5a067c8406ea66d499253092b0c1ccd9, type: 3}
   - assetID: builtin::Resources/Sprites/UI/scrollbar_vertical_background
     asset: {fileID: 21300000, guid: 6a24a01d02e958d45bee2937ab10a21e, type: 3}
-  - assetID: builtin::KSS.DevUtils/particlesmoke
+  - assetID: builtin::HSP.DevUtils/particlesmoke
     asset: {fileID: 2100000, guid: ba08d84ffcfa66044a7326f871502810, type: 2}
   - assetID: builtin::Resources/Sprites/UI/button_x_gold
     asset: {fileID: 21300000, guid: ba7b9b3e2ab14ba44ab7744ee7792f21, type: 3}
@@ -849,7 +847,7 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: 2b71c70cc8db42443b96c5d238a4cbdf, type: 3}
   - assetID: builtin::Resources/Sprites/UI/top_panel
     asset: {fileID: 21300000, guid: 4b35a3093a1f22241bab72505cf3b095, type: 3}
-  - assetID: builtin::KSS.DevUtils/particleflame
+  - assetID: builtin::HSP.DevUtils/particleflame
     asset: {fileID: 2100000, guid: 7b5664855a3d03a4e8814088f54c6327, type: 2}
   - assetID: builtin::Resources/Sprites/UI/panel_light
     asset: {fileID: 21300000, guid: 7b881413ce933ad45afffe5077870afa, type: 3}
@@ -859,7 +857,7 @@ MonoBehaviour:
     asset: {fileID: 6352053399650574342, guid: 7b4f3db04e45017419dd70eb8c043cae, type: 3}
   - assetID: builtin::Resources/Prefabs/Parts/engine
     asset: {fileID: 1364953004931670300, guid: 8bea1bbd189d59f49affc43660b4bdf3, type: 3}
-  - assetID: builtin::KSS.DevUtils/particleblue
+  - assetID: builtin::HSP.DevUtils/particleblue
     asset: {fileID: 2100000, guid: ab0c6672d9c654f42a5e9c7a2772bb71, type: 2}
   - assetID: builtin::Resources/Sprites/UI/scrollbar_horizontal_background
     asset: {fileID: 21300000, guid: dbdaca8f5451e4841970fdae21181e08, type: 3}
@@ -870,14 +868,14 @@ MonoBehaviour:
   - assetID: builtin::Resources/1mil_sphere
     asset: {fileID: 4711208715938537054, guid: 0cccc6ea3eaab75469e0c61245c20874, type: 3}
   - assetID: builtin::Resources/hspicon
-    asset: {fileID: 2800000, guid: 2ce68a128b7b51a45af4879cf17bff90, type: 3}
+    asset: {fileID: 21300000, guid: 2ce68a128b7b51a45af4879cf17bff90, type: 3}
   - assetID: builtin::___Scenes/UI Prototyping
     asset: {fileID: 102900000, guid: 3ce3257fcb4019144a2d08a849ea10bd, type: 3}
   - assetID: builtin::Resources/Sprites/UI/button_vertical_gold
     asset: {fileID: 21300000, guid: 3cf7fd5881053e34b949d63744b8daa3, type: 3}
   - assetID: builtin::___Scenes/Design
     asset: {fileID: 102900000, guid: 5caa233315e78dd41b4e84e78aaa336b, type: 3}
-  - assetID: builtin::KSS.DevUtils/flameparticle
+  - assetID: builtin::HSP.DevUtils/flameparticle
     asset: {fileID: 2800000, guid: 6c667588d18599449b3379de20ba3010, type: 3}
   - assetID: builtin::Resources/Sprites/UI/button_list
     asset: {fileID: 21300000, guid: 6ca76087579315445add0a2333ee1986, type: 3}
@@ -887,7 +885,7 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: 8ce16ffe586c9774ba38ecdd86dc5996, type: 3}
   - assetID: builtin::Resources/Sprites/nodes/m_prograde
     asset: {fileID: 21300000, guid: 8ce61a6ed15160e499b0fe1266a4ffa4, type: 3}
-  - assetID: builtin::KSS.DevUtils/untitled
+  - assetID: builtin::HSP.DevUtils/untitled
     asset: {fileID: 2534964839176971238, guid: ac9253b94eb783048a42e2b95dff51d7, type: 3}
   - assetID: builtin::Resources/Sprites/UI/button_30x30_undo
     asset: {fileID: 21300000, guid: acfbb3e88a5d4dc438b977a930cde17d, type: 3}
@@ -895,7 +893,7 @@ MonoBehaviour:
     asset: {fileID: 4800000, guid: bc1ede39bf3643ee8e493720e4259791, type: 3}
   - assetID: builtin::Resources/Sprites/UI/button_gold_biaxial
     asset: {fileID: 21300000, guid: cc04a420da54af6489d38e4203cffd84, type: 3}
-  - assetID: builtin::KSS/CelestialBodies/AtmosphereRes/Math
+  - assetID: builtin::HSP/CelestialBodies/AtmosphereRes/Math
     asset: {fileID: 10900000, guid: 0d481f556eeb5fc43a052aa93f138bc3, type: 3}
   - assetID: builtin::Resources/Sprites/std0/ui_part_window_background
     asset: {fileID: 21300000, guid: 0d0a0c1f1ce27594da9118ec38f781bb, type: 3}
@@ -903,7 +901,7 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: 4da0797a7a069154cbd1020ac7a812cd, type: 3}
   - assetID: builtin::Resources/Sprites/UI/button
     asset: {fileID: 21300000, guid: 4d0232bbefabf9a4aaa5bf74d24f105e, type: 3}
-  - assetID: builtin::KSS.DevUtils/ComputeNormalMap
+  - assetID: builtin::HSP.DevUtils/ComputeNormalMap
     asset: {fileID: 7200000, guid: 4d84a3051c8260143acab627c99eddb3, type: 3}
   - assetID: builtin::Resources/New Material 1
     asset: {fileID: 2100000, guid: 5d5eb27ce3d34fc4895579332f962090, type: 2}
@@ -917,9 +915,11 @@ MonoBehaviour:
     asset: {fileID: 8446142441694250609, guid: 9d5e81916336ac74e97b9db47fd00789, type: 3}
   - assetID: builtin::Resources/Sprites/nodes/m_antinormal
     asset: {fileID: 21300000, guid: bd2f82d882e296d4696e972329c0ea3a, type: 3}
-  - assetID: builtin::KSS/CelestialBodies/AtmosphereRes/Triplanar
+  - assetID: builtin::HSP/Effects/Atmospheres/MergeDepth
+    asset: {fileID: 2100000, guid: cdb6b9c69be4225448cbbd151e0f7e3c, type: 2}
+  - assetID: builtin::HSP/CelestialBodies/AtmosphereRes/Triplanar
     asset: {fileID: 10900000, guid: cdfd21473d20e4543bff254c94b034f5, type: 3}
-  - assetID: builtin::KSS.DevUtils/MoonColor
+  - assetID: builtin::HSP.DevUtils/MoonColor
     asset: {fileID: 2800000, guid: cdde2fc7eeb3a214f9d38dd56cfb5470, type: 3}
   - assetID: builtin::_TextMesh Pro/Shaders/TMP_SDF Overlay
     asset: {fileID: 4800000, guid: dd89cf5b9246416f84610a006f916af7, type: 3}
@@ -929,7 +929,7 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: fdb78474263e16f4f90cce47db9ae614, type: 3}
   - assetID: builtin::Resources/Materials/ghost
     asset: {fileID: 2100000, guid: fd5ae78e78ffe89408e5ee7d443b3d92, type: 2}
-  - assetID: builtin::KSS.DevUtils/cube/Zp
+  - assetID: builtin::HSP.DevUtils/cube/Zp
     asset: {fileID: 2800000, guid: fd3d8acf88cd7b74ea2a0753768ce440, type: 3}
   - assetID: builtin::Resources/Meshes/translate_handle_1d
     asset: {fileID: -2432090755550338912, guid: 0e08ce73ad599c34babe3a9dad7e7131, type: 3}
@@ -939,7 +939,7 @@ MonoBehaviour:
     asset: {fileID: 11400000, guid: 2e498d1c8094910479dc3e1b768306a4, type: 2}
   - assetID: builtin::Resources/Sprites/UI/control_node_close
     asset: {fileID: 21300000, guid: 3e65f21fcc9b1b844bfb057255f3f3d5, type: 3}
-  - assetID: builtin::KSS.DevUtils/smokeparticle3
+  - assetID: builtin::HSP.DevUtils/smokeparticle3
     asset: {fileID: 2800000, guid: 4ef50cb3c0213444fade783ba22be522, type: 3}
   - assetID: builtin::Resources/Sprites/UI/button_up_gold
     asset: {fileID: 21300000, guid: 6e732583f0e58d44b94a96b1d55550fd, type: 3}
@@ -957,17 +957,17 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: ee5637e56d8f4e34c8e12b39890f2f1d, type: 3}
   - assetID: builtin::Resources/Sprites/UI/attitude_indicator
     asset: {fileID: 21300000, guid: ee19134100d09b54b92af6b7e83bc21b, type: 3}
-  - assetID: builtin::KSS.DevUtils/blueflameparticle3
+  - assetID: builtin::HSP.DevUtils/blueflameparticle3
     asset: {fileID: 2800000, guid: ee4f9c72a44ab5949b5481e05785a3fe, type: 3}
   - assetID: builtin::_TextMesh Pro/Shaders/TMP_SDF-Mobile
     asset: {fileID: 4800000, guid: fe393ace9b354375a9cb14cdbbc28be4, type: 3}
   - assetID: builtin::Resources/Sprites/UI/dropdown_active
     asset: {fileID: 21300000, guid: 0fc27294b6d7acf47a53310f87eb9819, type: 3}
-  - assetID: builtin::KSS.DevUtils/cube/Yp
+  - assetID: builtin::HSP.DevUtils/cube/Yp
     asset: {fileID: 2800000, guid: 0fbed77b25a64944a844b8a46204b031, type: 3}
-  - assetID: builtin::KSS.DevUtils/MoonNrm_RT
+  - assetID: builtin::HSP.DevUtils/MoonNrm_RT
     asset: {fileID: 8400000, guid: 2fdada8e1127fbe478fb4808954eb395, type: 2}
-  - assetID: builtin::KSS.DevUtils/flameparticle14_2
+  - assetID: builtin::HSP.DevUtils/flameparticle14_2
     asset: {fileID: 2800000, guid: 3f75562a249bfd94dbb0b91fc0544e4b, type: 3}
   - assetID: builtin::_TextMesh Pro/Resources/TMP Settings
     asset: {fileID: 11400000, guid: 3f5b5dff67a942289a9defa416b206f3, type: 2}
@@ -995,21 +995,21 @@ MonoBehaviour:
     asset: {fileID: -2432090755550338912, guid: bf345a7cf22c19b4e879afd9a6b6fc17, type: 3}
   - assetID: builtin::Resources/Sprites/UI/dropdown_item
     asset: {fileID: 21300000, guid: bf2da9b1632faf647816203e5a6aebb7, type: 3}
-  - assetID: builtin::KSS.DevUtils/old_CB_material
+  - assetID: builtin::HSP.DevUtils/old_CB_material
     asset: {fileID: 2100000, guid: cf90961ca5c5fc346a6f5f5b3bdefbcf, type: 2}
   - assetID: builtin::_TextMesh Pro/Shaders/TMP_Sprite
     asset: {fileID: 4800000, guid: cf81c85f95fe47e1a27f6ae460cf182c, type: 3}
-  - assetID: builtin::KSS.DevUtils/sv
+  - assetID: builtin::HSP.DevUtils/sv
     asset: {fileID: -2124705421725058983, guid: df49b77668743fb41ad8028805e8e722, type: 3}
-  - assetID: builtin::KSS.DevUtils/skybox
+  - assetID: builtin::HSP.DevUtils/skybox
     asset: {fileID: 8900000, guid: dfbd7da3b669e154ba52e80cadb0ee69, type: 3}
   - assetID: builtin::_TextMesh Pro/Sprites/EmojiOne
     asset: {fileID: 2800000, guid: dffef66376be4fa480fb02b19edbe903, type: 3}
   - assetID: builtin::Resources/tank
     asset: {fileID: 1454477885105016247, guid: ff41ce40e17dd454cacb22f004c6bae7, type: 3}
-  - assetID: builtin::___Scenes/PPP
+  - assetID: builtin::Resources/PPP
     asset: {fileID: 11400000, guid: ff73d90665a086142b2905f01db7174a, type: 2}
-  - assetID: builtin::KSS.DevUtils/axis_z
+  - assetID: builtin::HSP.DevUtils/axis_z
     asset: {fileID: 2100000, guid: ff3453c493c02574398e3c003865d4f5, type: 2}
   - assetID: builtin::Resources/Sprites/nodes/m_radial_out
     asset: {fileID: 21300000, guid: ff7cfc8dd1c732c4587a9eea5a1c54f6, type: 3}

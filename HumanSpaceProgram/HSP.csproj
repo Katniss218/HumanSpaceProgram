@@ -81,7 +81,6 @@
     <Compile Include="Assets\HSP\Components\FSequencer.cs" />
     <Compile Include="Assets\HSP\Components\FPointMass.cs" />
     <Compile Include="Assets\HSP\Components\F3AxisActuator.cs" />
-    <Compile Include="Assets\HSP\Cameras\OrbitingCameraController.cs" />
     <Compile Include="Assets\HSP\GameplayScene\GameplaySceneEscapeInputController.cs" />
     <Compile Include="Assets\HSP\GameplayScene\Tools\ConstructTool.cs" />
     <Compile Include="Assets\HSP\Components\FSequencer.SequenceAction.cs" />
@@ -106,7 +105,6 @@
     <Compile Include="Assets\HSP\AssetLoaders\GameDataJsonPartFactory.cs" />
     <Compile Include="Assets\HSP\Input\HierarchicalInputPriority.cs" />
     <Compile Include="Assets\HSP\DesignScene\Tools\RerootTool.cs" />
-    <Compile Include="Assets\HSP\Cameras\GameplaySceneCameraManager.cs" />
     <Compile Include="Assets\HSP\Components\FGimbalActuatorController.cs" />
     <Compile Include="Assets\HSP\MainMenuScene\MainMenuEscapeInputController.cs" />
     <Compile Include="Assets\HSP\GameplayScene\GameplaySceneToolBase.cs" />
@@ -118,7 +116,11 @@
     <Compile Include="Assets\HSP\PIDLoop.cs" />
     <Compile Include="Assets\HSP\AssetLoaders\GameDataJsonVesselFactory.cs" />
     <Compile Include="Assets\HSP\Components\FReactionControlController.cs" />
-    <Compile Include="Assets\HSP\Cameras\GameplaySceneDepthBufferCombiner.cs" />
+    <Compile Include="Assets\HSP\DesignScene\Cameras\DesignSceneOrbitingCameraController.cs" />
+    <Compile Include="Assets\HSP\GameplayScene\Cameras\GameplaySceneCameraManager.cs" />
+    <Compile Include="Assets\HSP\GameplayScene\Cameras\GameplaySceneDepthBufferCombiner.cs" />
+    <Compile Include="Assets\HSP\GameplayScene\Cameras\GameplaySceneOrbitingCameraController.cs" />
+    <Compile Include="Assets\HSP\EditorScene\Cameras\EditorSceneOrbitingCameraController.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP\Effects\Atmospheres\MergeDepth.shader" />

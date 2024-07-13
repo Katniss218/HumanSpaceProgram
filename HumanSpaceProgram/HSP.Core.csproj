@@ -141,6 +141,7 @@
     <Compile Include="Assets\HSP.Core\Physics\FreePhysicsObject.cs" />
     <Compile Include="Assets\HSP.Core\Control\Control.cs" />
     <Compile Include="Assets\HSP.Core\Components\FControlFrame.cs" />
+    <Compile Include="Assets\HSP.Core\SceneCamera.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Core\___HSP.Core.asmdef" />

@@ -1,10 +1,7 @@
-using HSP.CelestialBodies;
 using HSP.Core;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.Rendering.PostProcessing;
 
-namespace HSP.Cameras
+namespace HSP.GameplayScene.Cameras
 {
     /// <summary>
     /// Manages the multi-camera setup of the gameplay scene.
@@ -88,13 +85,8 @@ namespace HSP.Cameras
         [SerializeField]
         Camera _uiCamera;
 
-        [SerializeField]
         RenderTexture _colorRT;
-
-        [SerializeField]
         RenderTexture _farDepthRT;
-
-        [SerializeField]
         RenderTexture _nearDepthRT;
 
         BeforeRenderEventCaller _textureCreator;
@@ -105,14 +97,6 @@ namespace HSP.Cameras
         public static RenderTexture NearDepthRenderTexture => instance._nearDepthRT;
 
         float _effectCameraNearPlane;
-
-        /// <summary>
-        /// Use this for raycasts and other methods that use a camera to calculate screen space positions, etc.
-        /// </summary>
-        /// <remarks>
-        /// Do not manually modify the fields of this camera.
-        /// </remarks>
-        public static Camera MainCamera { get => instance._nearCamera; }
 
         private void AdjustCameras()
         {

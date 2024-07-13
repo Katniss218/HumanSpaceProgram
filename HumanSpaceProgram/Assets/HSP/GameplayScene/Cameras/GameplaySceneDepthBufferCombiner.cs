@@ -3,7 +3,7 @@ using System;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace HSP.Cameras
+namespace HSP.GameplayScene.Cameras
 {
     [ExecuteInEditMode, ImageEffectAllowedInSceneView]
     [RequireComponent( typeof( Camera ) )]
@@ -21,10 +21,7 @@ namespace HSP.Cameras
 
         CommandBuffer _cmdMergeDepth;
 
-        [SerializeField]
         RenderTexture _dstColorRT;
-
-        [SerializeField]
         RenderTexture _dstDepthRT;
 
         public static RenderTexture CombinedDepthRenderTexture => instance._dstDepthRT;

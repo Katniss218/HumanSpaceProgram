@@ -53,7 +53,8 @@ namespace HSP.UI.SceneFactories
             }
             UIPanel topPanel = canvas.AddPanel( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Top, 0, 30 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/top_panel_background" ) );
             UIPanel p1 = topPanel.AddPanel( new UILayoutInfo( UIAnchor.Left, UIFill.Vertical(), 20, 110 ), null );
-            UIButton newBtn = p1.AddButton( new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_new" ), null );
+            UIButton newBtn = p1.AddButton( new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_new" ), null )
+                .Disabled();
             UIButton openBtn = p1.AddButton( new UILayoutInfo( UIAnchor.BottomLeft, (40, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_open" ), () =>
             {
                 CanvasManager.Get( CanvasName.WINDOWS ).AddPromptWindow( "Load ...", "vessel name/ID", ( text ) =>
@@ -88,8 +89,10 @@ namespace HSP.UI.SceneFactories
                 };
             };
             UIPanel p3 = topPanel.AddPanel( new UILayoutInfo( UIAnchor.Center, UIFill.Vertical(), 190, 60 ), null );
-            UIButton undoBtn = p3.AddButton( new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_undo" ), null );
-            UIButton redoBtn = p3.AddButton( new UILayoutInfo( UIAnchor.BottomLeft, (32, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_redo" ), null );
+            UIButton undoBtn = p3.AddButton( new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_undo" ), null )
+                .Disabled();
+            UIButton redoBtn = p3.AddButton( new UILayoutInfo( UIAnchor.BottomLeft, (32, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_redo" ), null )
+                .Disabled();
             UIPanel p4 = topPanel.AddPanel( new UILayoutInfo( UIAnchor.Right, UIFill.Vertical(), -20, 30 ), null );
             UIButton exitBtn = p4.AddButton( new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_leave" ), () =>
             {

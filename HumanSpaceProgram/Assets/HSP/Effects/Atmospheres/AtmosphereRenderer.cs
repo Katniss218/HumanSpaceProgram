@@ -1,4 +1,4 @@
-using HSP.Cameras;
+using HSP.GameplayScene.Cameras;
 using HSP.Core;
 using HSP.Core.ReferenceFrames;
 using System.Collections;

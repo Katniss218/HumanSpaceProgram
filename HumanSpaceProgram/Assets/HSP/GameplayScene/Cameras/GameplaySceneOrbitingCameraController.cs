@@ -1,25 +1,27 @@
 using HSP.Core;
 using HSP.Core.Physics;
 using HSP.Core.ReferenceFrames;
+using HSP.Input;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityPlus.Input;
 
-namespace HSP.Cameras
+namespace HSP.GameplayScene.Cameras
 {
-    public class OrbitingCameraController : SingletonMonoBehaviour<OrbitingCameraController>
+    public class GameplaySceneOrbitingCameraController : SingletonMonoBehaviour<GameplaySceneOrbitingCameraController>
     {
         /// <summary>
         /// The camera will focus on this object.
         /// </summary>
+        public Transform ReferenceObject { get; private set; }
+
         [field: SerializeField]
-        public Transform ReferenceObject { get; set; }
+        public Transform CameraParent { get; set; }
 
         [field: SerializeField]
         public float ZoomDist { get; private set; } = 5;
-
-        [field: SerializeField]
-        GameplaySceneCameraManager _camera;
 
         const float MOVE_MULTIPLIER = 3.0f;
         const float ZOOM_MULTIPLIER = 0.15f;
@@ -29,7 +31,7 @@ namespace HSP.Cameras
 
         bool _isRotating;
 
-        void UpdateZoomLevel()
+        private void UpdateZoomLevel()
         {
             if( UnityEngine.Input.mouseScrollDelta.y > 0 )
             {
@@ -43,7 +45,7 @@ namespace HSP.Cameras
             ZoomDist = Mathf.Clamp( ZoomDist, MIN_ZOOM_DISTANCE, MAX_ZOOM_DISTANCE );
 
             // ---
-            _camera.transform.localPosition = Vector3.back * ZoomDist;
+            this.CameraParent.localPosition = Vector3.back * ZoomDist;
         }
 
         private Vector3 GetUpDir()
@@ -59,7 +61,7 @@ namespace HSP.Cameras
             return upDir;
         }
 
-        void UpdateOrientation( Vector3 upDir )
+        private void UpdateOrientation( Vector3 upDir )
         {
             Vector3 rightDir = Vector3.ProjectOnPlane( this.transform.right, upDir ).normalized;
 
@@ -71,21 +73,22 @@ namespace HSP.Cameras
             this.transform.rotation = Quaternion.AngleAxis( mouseX * MOVE_MULTIPLIER, upDir ) * this.transform.rotation;
         }
 
+        void Start()
+        {
+            if( ReferenceObject == null )
+            {
+                if( ActiveObjectManager.ActiveObject == null )
+                    return;
+
+                ReferenceObject = ActiveObjectManager.ActiveObject.transform;
+            }
+        }
+
         void Update()
         {
             if( !UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() )
             {
                 UpdateZoomLevel();
-
-                if( UnityEngine.Input.GetKeyDown( KeyCode.Mouse1 ) ) // Mouse1 = Right Mouse Button
-                {
-                    _isRotating = true;
-                }
-            }
-
-            if( _isRotating && UnityEngine.Input.GetKeyUp( KeyCode.Mouse1 ) )
-            {
-                _isRotating = false;
             }
 
             Vector3 upDir = GetUpDir();
@@ -106,6 +109,33 @@ namespace HSP.Cameras
             {
                 this.transform.position = ReferenceObject.transform.position;
             }
+        }
+
+        void OnEnable()
+        {
+            HierarchicalInputManager.AddAction( HierarchicalInputChannel.VIEWPORT_SECONDARY_DOWN, HierarchicalInputPriority.HIGH, Input_MouseDown );
+            HierarchicalInputManager.AddAction( HierarchicalInputChannel.VIEWPORT_SECONDARY_UP, HierarchicalInputPriority.HIGH, Input_MouseUp );
+        }
+
+        void OnDisable()
+        {
+            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.VIEWPORT_SECONDARY_DOWN, Input_MouseDown );
+            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.VIEWPORT_SECONDARY_UP, Input_MouseUp );
+        }
+
+        private bool Input_MouseDown( float val )
+        {
+            if( UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() )
+                return false;
+
+            _isRotating = true;
+            return true;
+        }
+
+        private bool Input_MouseUp( float val )
+        {
+            _isRotating = false;
+            return true;
         }
 
         [HSPEventListener( HSPEvent.GAMEPLAY_AFTER_ACTIVE_OBJECT_CHANGE, HSPEvent.NAMESPACE_VANILLA + "camera.snap_to_vessel" )]

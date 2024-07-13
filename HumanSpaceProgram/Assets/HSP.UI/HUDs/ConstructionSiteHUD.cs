@@ -1,5 +1,6 @@
 ﻿using HSP.Core;
 using HSP.GameplayScene;
+using HSP.GameplayScene.Cameras;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -107,7 +108,7 @@ namespace HSP.UI.HUDs
             _progressImage.fillAmount = percent;
             _statusIcon.Sprite = GetStatusSprite();
 
-            ((RectTransform)this.transform).SetScreenPosition( Cameras.GameplaySceneCameraManager.MainCamera, ConstructionSite.transform.position );
+            ((RectTransform)this.transform).SetScreenPosition( SceneCamera.Camera, ConstructionSite.transform.position );
         }
 
         protected internal static T Create<T>( IUIElementContainer parent, FConstructionSite constructionSite ) where T : ConstructionSiteHUD
