@@ -20,7 +20,7 @@ namespace HSP.Core
         MANAGERS = 3,
         Unity_Water = 4,
         Unity_UI = 5,
-        _6 = 6,
+        SCENE_UI = 6,
         _7 = 7,
         _8 = 8,
         _9 = 9,
@@ -61,5 +61,16 @@ namespace HSP.Core
         HIDDEN_SPECIAL_2 = 29,
         HIDDEN_SPECIAL_3 = 30,
         POST_PROCESSING = 31,
+    }
+
+    public static class Layer_Ex
+    {
+        /// <summary>
+        /// Gets a mask value for the layer.
+        /// </summary>
+        public static int ToMask( this Layer layer )
+        {
+            return 1 << (int)layer;
+        }
     }
 }

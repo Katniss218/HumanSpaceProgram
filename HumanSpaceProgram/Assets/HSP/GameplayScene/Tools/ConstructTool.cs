@@ -34,7 +34,6 @@ namespace HSP.GameplayScene.Tools
         public bool AngleSnappingEnabled { get; set; }
         public float AngleSnappingInterval { get; set; }
 
-        Camera _camera;
         FAttachNode.SnappingCandidate? _currentSnap = null;
 
         private Ray _cursorRay;
@@ -64,11 +63,6 @@ namespace HSP.GameplayScene.Tools
             this._heldOffset = Vector3.zero;
         }
 
-        void Awake()
-        {
-            _camera = GameObject.Find( "Near Camera" ).GetComponent<Camera>();
-        }
-
         void Update()
         {
             if( _heldPart == null )
@@ -80,7 +74,7 @@ namespace HSP.GameplayScene.Tools
             if( UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() )
                 return;
 
-            _cursorRay = _camera.ScreenPointToRay( UnityEngine.Input.mousePosition );
+            _cursorRay = SceneCamera.Camera.ScreenPointToRay( UnityEngine.Input.mousePosition );
 
             if( Physics.Raycast( _cursorRay, out _hit, 8192, 1 << (int)Layer.PART_OBJECT ) )
             {
@@ -250,7 +244,7 @@ namespace HSP.GameplayScene.Tools
             }
 
             // Node attachment.
-            Plane viewPlane = new Plane( _camera.transform.forward, (_heldPart.position + _heldOffset) );
+            Plane viewPlane = new Plane( SceneCamera.Camera.transform.forward, (_heldPart.position + _heldOffset) );
             if( viewPlane.Raycast( _cursorRay, out float intersectionDistance ) )
             {
                 Vector3 planePoint = _cursorRay.GetPoint( intersectionDistance );

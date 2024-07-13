@@ -9,15 +9,15 @@ namespace HSP.GameplayScene.Cameras
     [RequireComponent( typeof( Camera ) )]
     public sealed class GameplaySceneDepthBufferCombiner : SingletonMonoBehaviour<GameplaySceneDepthBufferCombiner>
     {
-        [SerializeField]
-        Material _mergeDepthMat;
+        [field: SerializeField]
+        public Material MergeDepthMat { get; set; }
 
-        [SerializeField]
-        Camera _farCamera;
-        [SerializeField]
-        Camera _nearCamera;
-        [SerializeField]
-        Camera _effectCamera;
+        [field: SerializeField]
+        public Camera FarCamera { get; set; }
+        [field: SerializeField]
+        public Camera NearCamera { get; set; }
+        [field: SerializeField]
+        public Camera EffectCamera { get; set; }
 
         CommandBuffer _cmdMergeDepth;
 
@@ -42,19 +42,19 @@ namespace HSP.GameplayScene.Cameras
         private void UpdateMergeDepthCommandBuffer()
         {
             _cmdMergeDepth.Clear();
-            _mergeDepthMat.SetTexture( Shader.PropertyToID( "_Input1Depth" ), GameplaySceneCameraManager.FarDepthRenderTexture, RenderTextureSubElement.Depth );
-            _mergeDepthMat.SetTexture( Shader.PropertyToID( "_Input2Depth" ), GameplaySceneCameraManager.NearDepthRenderTexture, RenderTextureSubElement.Depth );
-            _mergeDepthMat.SetFloat( Shader.PropertyToID( "_Input1Near" ), _farCamera.nearClipPlane );
-            _mergeDepthMat.SetFloat( Shader.PropertyToID( "_Input1Far" ), _farCamera.farClipPlane );
-            _mergeDepthMat.SetFloat( Shader.PropertyToID( "_Input2Near" ), _nearCamera.nearClipPlane );
-            _mergeDepthMat.SetFloat( Shader.PropertyToID( "_Input2Far" ), _nearCamera.farClipPlane );
-            _mergeDepthMat.SetFloat( Shader.PropertyToID( "_DstNear" ), _effectCamera.nearClipPlane );
-            _mergeDepthMat.SetFloat( Shader.PropertyToID( "_DstFar" ), _effectCamera.farClipPlane );
+            MergeDepthMat.SetTexture( Shader.PropertyToID( "_Input1Depth" ), GameplaySceneCameraManager.FarDepthRenderTexture, RenderTextureSubElement.Depth );
+            MergeDepthMat.SetTexture( Shader.PropertyToID( "_Input2Depth" ), GameplaySceneCameraManager.NearDepthRenderTexture, RenderTextureSubElement.Depth );
+            MergeDepthMat.SetFloat( Shader.PropertyToID( "_Input1Near" ), FarCamera.nearClipPlane );
+            MergeDepthMat.SetFloat( Shader.PropertyToID( "_Input1Far" ), FarCamera.farClipPlane );
+            MergeDepthMat.SetFloat( Shader.PropertyToID( "_Input2Near" ), NearCamera.nearClipPlane );
+            MergeDepthMat.SetFloat( Shader.PropertyToID( "_Input2Far" ), NearCamera.farClipPlane );
+            MergeDepthMat.SetFloat( Shader.PropertyToID( "_DstNear" ), EffectCamera.nearClipPlane );
+            MergeDepthMat.SetFloat( Shader.PropertyToID( "_DstFar" ), EffectCamera.farClipPlane );
             _cmdMergeDepth.SetRenderTarget( _dstColorRT, _dstDepthRT );
-            if( instance._nearCamera.enabled )
-                _cmdMergeDepth.Blit( null, BuiltinRenderTextureType.CurrentActive, _mergeDepthMat, 0 );
+            if( instance.NearCamera.enabled )
+                _cmdMergeDepth.Blit( null, BuiltinRenderTextureType.CurrentActive, MergeDepthMat, 0 );
             else
-                _cmdMergeDepth.Blit( null, BuiltinRenderTextureType.CurrentActive, _mergeDepthMat, 1 );
+                _cmdMergeDepth.Blit( null, BuiltinRenderTextureType.CurrentActive, MergeDepthMat, 1 );
         }
 
         [HSPEventListener( HSPEvent.GAMEPLAY_BEFORE_RENDERING, "merge_depth" )]
@@ -63,14 +63,14 @@ namespace HSP.GameplayScene.Cameras
             // tex used as output for depth merging.
             instance._dstColorRT = RenderTexture.GetTemporary( Screen.width, Screen.height, 0, RenderTextureFormat.ARGB32 );
             instance._dstDepthRT = RenderTexture.GetTemporary( Screen.width, Screen.height, 32, RenderTextureFormat.Depth );
-            instance._effectCamera.SetTargetBuffers( instance._dstColorRT.colorBuffer, instance._dstDepthRT.depthBuffer );
+            instance.EffectCamera.SetTargetBuffers( instance._dstColorRT.colorBuffer, instance._dstDepthRT.depthBuffer );
 
-            instance._effectCamera.RemoveCommandBuffer( CameraEvent.BeforeForwardOpaque, instance._cmdMergeDepth );
+            instance.EffectCamera.RemoveCommandBuffer( CameraEvent.BeforeForwardOpaque, instance._cmdMergeDepth );
 
             instance.UpdateMergeDepthCommandBuffer(); // This needs to happen *before* near camera renders, otherwise it tries to use textures that have been released.\
                                                       // that is, if the buffer is set up after the nearcam renders, it will be used on the next frame,
                                                       //   and the textures are reallocated between frames.
-            instance._effectCamera.AddCommandBuffer( CameraEvent.BeforeForwardOpaque, instance._cmdMergeDepth );
+            instance.EffectCamera.AddCommandBuffer( CameraEvent.BeforeForwardOpaque, instance._cmdMergeDepth );
         }
 
         [HSPEventListener( HSPEvent.GAMEPLAY_AFTER_RENDERING, "merge_depth" )]

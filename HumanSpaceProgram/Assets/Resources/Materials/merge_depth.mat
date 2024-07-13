@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: MergeDepth
+  m_Name: merge_depth
   m_Shader: {fileID: 4800000, guid: 80a4b299d615fad43aa00c9b2b9942dd, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -34,10 +34,10 @@ Material:
     m_Ints: []
     m_Floats:
     - _DstFar: 1e+15
-    - _DstNear: 10
+    - _DstNear: 10.000003
     - _Input1Far: 1e+18
     - _Input1Near: 90000
     - _Input2Far: 100000
-    - _Input2Near: 0.09992672
+    - _Input2Near: 0.105938934
     m_Colors: []
   m_BuildTextureStacks: []

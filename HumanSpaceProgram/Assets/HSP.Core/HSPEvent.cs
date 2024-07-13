@@ -184,6 +184,7 @@ namespace HSP.Core
         /// </summary>
         public const string GAMEPLAY_AFTER_RENDERING = NAMESPACE_VANILLA + ".gameplayscene.rendering.after";
 
+        //public const string GAMEPLAY_CREATE_CAMERA = NAMESPACE_VANILLA + ".gameplayscene.create_camera_system";
 
         // ---
     }

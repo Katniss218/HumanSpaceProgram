@@ -915,7 +915,7 @@ MonoBehaviour:
     asset: {fileID: 8446142441694250609, guid: 9d5e81916336ac74e97b9db47fd00789, type: 3}
   - assetID: builtin::Resources/Sprites/nodes/m_antinormal
     asset: {fileID: 21300000, guid: bd2f82d882e296d4696e972329c0ea3a, type: 3}
-  - assetID: builtin::HSP/Effects/Atmospheres/MergeDepth
+  - assetID: builtin::Resources/Materials/merge_depth
     asset: {fileID: 2100000, guid: cdb6b9c69be4225448cbbd151e0f7e3c, type: 2}
   - assetID: builtin::HSP/CelestialBodies/AtmosphereRes/Triplanar
     asset: {fileID: 10900000, guid: cdfd21473d20e4543bff254c94b034f5, type: 3}

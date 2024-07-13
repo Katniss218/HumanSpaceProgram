@@ -20,7 +20,7 @@ namespace HSP.CelestialBodies
 
         Vector3 _center = Vector3.zero;
         [SerializeField]
-        new Light light;
+        new public Light light { get; set; }
 
         [SerializeField]
         RenderTexture _rt;

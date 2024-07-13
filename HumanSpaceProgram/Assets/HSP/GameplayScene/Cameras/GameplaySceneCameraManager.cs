@@ -1,5 +1,8 @@
+using HSP.CelestialBodies;
 using HSP.Core;
 using UnityEngine;
+using UnityEngine.Rendering.PostProcessing;
+using UnityPlus.AssetManagement;
 
 namespace HSP.GameplayScene.Cameras
 {
@@ -61,6 +64,9 @@ namespace HSP.GameplayScene.Cameras
 
         // Two-camera setup because the shadow distance is permanently tied to the far plane distance.
 
+        [field: SerializeField]
+        public Transform CameraParent { get; private set; }
+
         /// <summary>
         /// Used for rendering the planets mostly.
         /// </summary>
@@ -100,7 +106,7 @@ namespace HSP.GameplayScene.Cameras
 
         private void AdjustCameras()
         {
-            float zoomDist = this.transform.position.magnitude;
+            float zoomDist = this.CameraParent.position.magnitude;
 
             // helps to make the shadow look nicer.
             QualitySettings.shadowDistance = 2550.0f + 1.3f * zoomDist;
@@ -129,26 +135,146 @@ namespace HSP.GameplayScene.Cameras
             }
         }
 
-        void Awake()
+        void Start()
         {
+            _farCamera.clearFlags = CameraClearFlags.Skybox;
+            _farCamera.nearClipPlane = 90_000f;
+            _farCamera.farClipPlane = 1e18f;
+            _farCamera.fieldOfView = 60f;
+            _farCamera.depth = -25f;
+
+            _nearCamera.clearFlags = CameraClearFlags.Depth;
+            _nearCamera.nearClipPlane = 0.1f;
+            _nearCamera.farClipPlane = 100_000f;
+            _nearCamera.fieldOfView = 60f;
+            _nearCamera.depth = -22f;
+
+            _effectCamera.clearFlags = CameraClearFlags.Nothing;
+            _effectCamera.nearClipPlane = 10f;
+            _effectCamera.farClipPlane = 1e15f;
+            _effectCamera.fieldOfView = 60f;
+            _effectCamera.depth = 90;
+
+            _uiCamera.clearFlags = CameraClearFlags.Nothing;
+            _uiCamera.nearClipPlane = 0.5f;
+            _uiCamera.farClipPlane = 5000f;
+            _uiCamera.fieldOfView = 60f;
+            _uiCamera.depth = 99;
+
+            _farCamera.cullingMask =
+                  Layer.DEFAULT.ToMask()
+                | Layer.Unity_TransparentFx.ToMask()
+                | Layer.Unity_IgnoreRaycast.ToMask()
+                | Layer.Unity_Water.ToMask()
+                | Layer.CELESTIAL_BODY.ToMask()
+                | Layer.CELESTIAL_BODY_LIGHT.ToMask();
+
+            _nearCamera.cullingMask =
+                  Layer.DEFAULT.ToMask()
+                | Layer.Unity_TransparentFx.ToMask()
+                | Layer.Unity_IgnoreRaycast.ToMask()
+                | Layer.Unity_Water.ToMask()
+                | Layer.PART_OBJECT.ToMask()
+                | Layer.PART_OBJECT_LIGHT.ToMask()
+                | Layer.VESSEL_DESIGN_HELD.ToMask();
+
+            _effectCamera.cullingMask = 0;
+
+            _uiCamera.cullingMask =
+                  Layer.Unity_UI.ToMask()
+                | Layer.SCENE_UI.ToMask();
+
             _effectCameraNearPlane = this._effectCamera.nearClipPlane;
+
+            if( _textureCreator == null && this._farCamera != null )
+                _textureCreator = this._farCamera.gameObject.AddComponent<BeforeRenderEventCaller>();
+            if( _textureReleaser == null && this._uiCamera != null )
+                _textureReleaser = this._uiCamera.gameObject.AddComponent<AfterRenderEventCaller>();
         }
 
-        private void OnEnable()
+        void OnEnable()
         {
-            _textureCreator = this._farCamera.gameObject.AddComponent<BeforeRenderEventCaller>();
-            _textureReleaser = this._uiCamera.gameObject.AddComponent<AfterRenderEventCaller>();
+            if( _textureCreator == null && this._farCamera != null )
+                _textureCreator = this._farCamera.gameObject.AddComponent<BeforeRenderEventCaller>();
+            if( _textureReleaser == null && this._uiCamera != null )
+                _textureReleaser = this._uiCamera.gameObject.AddComponent<AfterRenderEventCaller>();
         }
 
-        private void OnDisable()
+        void OnDisable()
         {
-            Destroy( _textureCreator );
-            Destroy( _textureReleaser );
+            if( _textureCreator != null )
+                Destroy( _textureCreator );
+            if( _textureReleaser != null )
+                Destroy( _textureReleaser );
         }
 
         void LateUpdate()
         {
             AdjustCameras();
+        }
+
+        [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, "vanilla.gameplayscene_camera" )]
+        private static void OnGameplaySceneLoad()
+        {
+            GameObject cameraPivotGameObject = new GameObject( "Camera Pivot" );
+
+            SceneCamera sceneCamera = cameraPivotGameObject.AddComponent<SceneCamera>();
+            GameplaySceneCameraManager cameraManager = cameraPivotGameObject.AddComponent<GameplaySceneCameraManager>();
+            GameplaySceneOrbitingCameraController cameraController = cameraPivotGameObject.AddComponent<GameplaySceneOrbitingCameraController>();
+
+            GameObject cameraParentGameObject = new GameObject( "Camera Parent" );
+            cameraParentGameObject.transform.SetParent( cameraPivotGameObject.transform );
+
+            AudioListener audioListener = cameraParentGameObject.AddComponent<AudioListener>();
+
+#warning TODO - it'd be very good to add events for all these tbh. make them overridable, etc.
+            // event for post processing.
+            // event for controller.
+
+            // events calling events shouldn't be some sort of taboo, it makes a lot of sense imo. Makes it a bit harder to trace/debug, but it should be well worth it.
+            // could also be done with a topologically sortable event listeners.
+
+            GameObject farCameraGameObject = new GameObject( "Far camera" );
+            farCameraGameObject.transform.SetParent( cameraParentGameObject.transform );
+            Camera farCamera = farCameraGameObject.AddComponent<Camera>();
+
+            GameObject nearCameraGameObject = new GameObject( "Near camera" );
+            nearCameraGameObject.transform.SetParent( cameraParentGameObject.transform );
+            Camera nearCamera = nearCameraGameObject.AddComponent<Camera>();
+
+            GameObject effectCameraGameObject = new GameObject( "Effect camera" );
+            effectCameraGameObject.transform.SetParent( cameraParentGameObject.transform );
+            Camera effectCamera = effectCameraGameObject.AddComponent<Camera>();
+
+            GameObject uiCameraGameObject = new GameObject( "UI camera" );
+            uiCameraGameObject.transform.SetParent( cameraParentGameObject.transform );
+            Camera uiCamera = uiCameraGameObject.AddComponent<Camera>();
+
+            sceneCamera.camera = nearCamera;
+            cameraManager.CameraParent = cameraParentGameObject.transform;
+            cameraManager._farCamera = farCamera;
+            cameraManager._nearCamera = nearCamera;
+            cameraManager._effectCamera = effectCamera;
+            cameraManager._uiCamera = uiCamera;
+
+#warning TODO - PPP as a separate subsystem, maybe a bundled mod.
+            //PostProcessLayer farPPL = farCameraGameObject.AddComponent<PostProcessLayer>();
+
+            //PostProcessLayer nearPPL = nearCameraGameObject.AddComponent<PostProcessLayer>();
+
+            //PostProcessLayer uiPPL = uiCameraGameObject.AddComponent<PostProcessLayer>();
+
+            cameraController.CameraParent = cameraParentGameObject.transform;
+            cameraController.ZoomDist = 5f;
+
+            GameplaySceneDepthBufferCombiner bufferCombiner = nearCameraGameObject.AddComponent<GameplaySceneDepthBufferCombiner>();
+            bufferCombiner.FarCamera = farCamera;
+            bufferCombiner.NearCamera = nearCamera;
+            bufferCombiner.EffectCamera = effectCamera;
+            bufferCombiner.MergeDepthMat = AssetRegistry.Get<Material>( "builtin::Resources/Materials/merge_depth" );
+
+            AtmosphereRenderer atmosphereRenderer = effectCameraGameObject.AddComponent<AtmosphereRenderer>();
+            atmosphereRenderer.light = GameObject.Find( "CBLight" ).GetComponent<Light>();
         }
     }
 }
