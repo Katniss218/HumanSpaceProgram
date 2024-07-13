@@ -5,7 +5,10 @@ using UnityEngine.Rendering.PostProcessing;
 
 namespace HSP.Cameras
 {
-    public class GameplaySceneCameraSystem : SingletonMonoBehaviour<GameplaySceneCameraSystem>
+    /// <summary>
+    /// Manages the multi-camera setup of the gameplay scene.
+    /// </summary>
+    public class GameplaySceneCameraManager : SingletonMonoBehaviour<GameplaySceneCameraManager>
     {
         public class RenderTextureCreator : MonoBehaviour
         {
@@ -26,12 +29,12 @@ namespace HSP.Cameras
                 AtmosphereRenderer.instance._dstDepthRT = RenderTexture.GetTemporary( Screen.width, Screen.height, 32, RenderTextureFormat.Depth );
                 instance._effectCamera.SetTargetBuffers( AtmosphereRenderer.instance._dstColorRT.colorBuffer, AtmosphereRenderer.instance._dstDepthRT.depthBuffer );
 
-                GameplaySceneCameraSystem.NearCamera.RemoveCommandBuffer( CameraEvent.AfterForwardOpaque, AtmosphereRenderer.instance._cmdMergeDepth );
+                GameplaySceneCameraManager.NearCamera.RemoveCommandBuffer( CameraEvent.AfterForwardOpaque, AtmosphereRenderer.instance._cmdMergeDepth );
 
                 AtmosphereRenderer.instance.UpdateMergeDepthCommandBuffer(); // This needs to happen *before* near camera renders, otherwise it tries to use textures that have been released.\
                                                                     // that is, if the buffer is set up after the nearcam renders, it will be used on the next frame,
                                                                     //   and the textures are reallocated between frames.
-                GameplaySceneCameraSystem.NearCamera.AddCommandBuffer( CameraEvent.AfterForwardOpaque, AtmosphereRenderer.instance._cmdMergeDepth );
+                GameplaySceneCameraManager.NearCamera.AddCommandBuffer( CameraEvent.AfterForwardOpaque, AtmosphereRenderer.instance._cmdMergeDepth );
             }
         }
 
@@ -39,12 +42,7 @@ namespace HSP.Cameras
         {
             void OnPostRender()
             {
-                /*if( AtmosphereRenderer.instance._rt != null )
-                {
-                    RenderTexture.ReleaseTemporary( AtmosphereRenderer.instance._rt );
-                    AtmosphereRenderer.instance._rt = null;
-                }*/
-
+                // tex used as output for depth merging.
                 if( AtmosphereRenderer.instance._dstColorRT != null )
                 {
                     RenderTexture.ReleaseTemporary( AtmosphereRenderer.instance._dstColorRT );
@@ -55,6 +53,7 @@ namespace HSP.Cameras
                     RenderTexture.ReleaseTemporary( AtmosphereRenderer.instance._dstDepthRT );
                     AtmosphereRenderer.instance._dstDepthRT = null;
                 }
+
                 if( instance._colorRT != null )
                 {
                     RenderTexture.ReleaseTemporary( instance._colorRT );
@@ -140,7 +139,7 @@ namespace HSP.Cameras
         public static Camera NearCamera { get => instance._nearCamera; }
         public static Camera FarCamera { get => instance._farCamera; }
 
-        public static GameplaySceneCameraSystem Instance => instance;
+        public static GameplaySceneCameraManager Instance => instance;
 
         void TryToggleNearCamera()
         {
@@ -176,10 +175,6 @@ namespace HSP.Cameras
             _effectCameraNearPlane = this._effectCamera.nearClipPlane;
             _nearPPLayer = this._nearCamera.GetComponent<PostProcessLayer>();
             _farPPLayer = this._farCamera.GetComponent<PostProcessLayer>();
-
-#warning TODO - for some reason, using temporaries fucks with something. maybe causes it to be desynchronized or something? idk...
-            _farCamera.SetTargetBuffers( _colorRT.colorBuffer, _farDepthRT.depthBuffer );
-            _nearCamera.SetTargetBuffers( _colorRT.colorBuffer, _nearDepthRT.depthBuffer );
         }
 
         private void OnEnable()

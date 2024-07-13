@@ -34,10 +34,10 @@ Material:
     m_Ints: []
     m_Floats:
     - _DstFar: 1e+15
-    - _DstNear: 10.000014
+    - _DstNear: 10.000002
     - _Input1Far: 1e+18
     - _Input1Near: 90000
     - _Input2Far: 100000
-    - _Input2Near: 0.12772813
+    - _Input2Near: 0.104202434
     m_Colors: []
   m_BuildTextureStacks: []

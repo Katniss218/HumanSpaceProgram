@@ -39,7 +39,7 @@ namespace HSP.UI
             if( UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() )
                 return false;
 
-            if( !Physics.Raycast( GameplaySceneCameraSystem.MainCamera.ScreenPointToRay( HierarchicalInputManager.CurrentState.MousePosition ), out RaycastHit hit ) )
+            if( !Physics.Raycast( GameplaySceneCameraManager.MainCamera.ScreenPointToRay( HierarchicalInputManager.CurrentState.MousePosition ), out RaycastHit hit ) )
             {
                 return false;
             }

@@ -19,7 +19,7 @@ namespace HSP.Cameras
         public float ZoomDist { get; private set; } = 5;
 
         [field: SerializeField]
-        GameplaySceneCameraSystem _camera;
+        GameplaySceneCameraManager _camera;
 
         const float MOVE_MULTIPLIER = 3.0f;
         const float ZOOM_MULTIPLIER = 0.15f;

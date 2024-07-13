@@ -20,7 +20,7 @@ namespace HSP.UI.HUDs
 
         void LateUpdate()
         {
-            ((RectTransform)this.transform).SetScreenPosition( Cameras.GameplaySceneCameraSystem.MainCamera, Vessel.transform.position );
+            ((RectTransform)this.transform).SetScreenPosition( Cameras.GameplaySceneCameraManager.MainCamera, Vessel.transform.position );
         }
 
         protected internal static T Create<T>( IUIElementContainer parent, Vessel vessel ) where T : VesselHUD
