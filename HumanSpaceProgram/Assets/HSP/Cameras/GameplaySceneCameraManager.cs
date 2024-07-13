@@ -104,9 +104,6 @@ namespace HSP.Cameras
         public static RenderTexture FarDepthRenderTexture => instance._farDepthRT;
         public static RenderTexture NearDepthRenderTexture => instance._nearDepthRT;
 
-        PostProcessLayer _farPPLayer;
-        PostProcessLayer _nearPPLayer;
-
         float _effectCameraNearPlane;
 
         /// <summary>
@@ -117,40 +114,40 @@ namespace HSP.Cameras
         /// </remarks>
         public static Camera MainCamera { get => instance._nearCamera; }
 
-        void TryToggleNearCamera()
+        private void AdjustCameras()
         {
-            // For some reason, at the distance of around Earth's radius, having the near camera enabled throws "position our of view frustum" exceptions.
+            float zoomDist = this.transform.position.magnitude;
+
+            // helps to make the shadow look nicer.
+            QualitySettings.shadowDistance = 2550.0f + 1.3f * zoomDist;
+
+            //
+            // When a camera is far away from scene origin, it needs to have appropriately scaled near and far plane values (roughly in the ballpark of how far away it currently is),
+            //   otherwise the camera starts throwing "position out of view frustum" exceptions.
+            //
+            // This can be mitigated either by increasing the clipping planes when highly zoomed out, or by turning the camera off.
+            //
+
+            _nearCamera.nearClipPlane = (float)MathD.Map( zoomDist, MIN_ZOOM_DISTANCE, NEAR_CUTOFF_DISTANCE, NEAR_MIN, NEAR_MAX );
+
+            _effectCamera.nearClipPlane = _effectCameraNearPlane * (1 + (zoomDist * ZOOM_NEAR_PLANE_MULT));
+
+            _uiCamera.nearClipPlane = (float)MathD.Map( zoomDist, MIN_ZOOM_DISTANCE, NEAR_CUTOFF_DISTANCE, 0.5f, 100f );
+            _uiCamera.farClipPlane = (float)MathD.Map( zoomDist, MIN_ZOOM_DISTANCE, NEAR_CUTOFF_DISTANCE, 0.5f * 10000f, 100f * 10000f );
+
             if( this.transform.position.magnitude > NEAR_CUTOFF_DISTANCE )
             {
-                this._nearCamera.cullingMask -= 1 << 31;
-                this._farCamera.cullingMask -= 1 << 31;
-                this._effectCamera.cullingMask = 1 << 31; // for some reason, this makes it draw properly, also has the effect of drawing PPP on top of everything.
-
-                // instead of disabling, it's possible that we can increase the near clipping plane instead, the further the camera is zoomed out (up to ~30k at very far zooms).
-                // Map view could work by constructing a virtual environment (planets at l0 subdivs) with the camera always in the center.
-                // the camera would toggle to only render that view (like scaled space, but real size)
-                // vessels and buildings would be invisible in map view.
                 this._nearCamera.enabled = false;
-                this._nearPPLayer.enabled = false;
-                this._farPPLayer.enabled = true;
             }
             else
             {
-                this._nearCamera.cullingMask += 1 << 31;
-                this._farCamera.cullingMask += 1 << 31;
-                this._effectCamera.cullingMask = 0; // Prevents the atmosphere drawing over the geometry, somehow.
-
                 this._nearCamera.enabled = true;
-                this._nearPPLayer.enabled = true;
-                this._farPPLayer.enabled = false;
             }
         }
 
         void Awake()
         {
             _effectCameraNearPlane = this._effectCamera.nearClipPlane;
-            _nearPPLayer = this._nearCamera.GetComponent<PostProcessLayer>();
-            _farPPLayer = this._farCamera.GetComponent<PostProcessLayer>();
         }
 
         private void OnEnable()
@@ -167,17 +164,7 @@ namespace HSP.Cameras
 
         void LateUpdate()
         {
-            // After modifying position/rotation/zoom.
-            // TryToggleNearCamera();
-
-            float zoomDist = this.transform.position.magnitude;
-
-            // helps to make the shadow look nicer.
-            QualitySettings.shadowDistance = 2550.0f + 1.3f * zoomDist;
-
-            // Helps to prevent exceptions being thrown at medium zoom levels (due to something with precision of the view frustum).
-            _effectCamera.nearClipPlane = _effectCameraNearPlane * (1 + (zoomDist * ZOOM_NEAR_PLANE_MULT));
-            _nearCamera.nearClipPlane = (float)MathD.Map( zoomDist, MIN_ZOOM_DISTANCE, NEAR_CUTOFF_DISTANCE, NEAR_MIN, NEAR_MAX );
+            AdjustCameras();
         }
     }
 }

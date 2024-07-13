@@ -54,7 +54,10 @@ namespace HSP.Cameras
             _mergeDepthMat.SetFloat( Shader.PropertyToID( "_DstNear" ), _effectCamera.nearClipPlane );
             _mergeDepthMat.SetFloat( Shader.PropertyToID( "_DstFar" ), _effectCamera.farClipPlane );
             _cmdMergeDepth.SetRenderTarget( _dstColorRT, _dstDepthRT );
-            _cmdMergeDepth.Blit( null, BuiltinRenderTextureType.CurrentActive, _mergeDepthMat, 0 );
+            if( instance._nearCamera.enabled )
+                _cmdMergeDepth.Blit( null, BuiltinRenderTextureType.CurrentActive, _mergeDepthMat, 0 );
+            else
+                _cmdMergeDepth.Blit( null, BuiltinRenderTextureType.CurrentActive, _mergeDepthMat, 1 );
         }
 
         [HSPEventListener( HSPEvent.GAMEPLAY_BEFORE_RENDERING, "merge_depth" )]
@@ -65,12 +68,12 @@ namespace HSP.Cameras
             instance._dstDepthRT = RenderTexture.GetTemporary( Screen.width, Screen.height, 32, RenderTextureFormat.Depth );
             instance._effectCamera.SetTargetBuffers( instance._dstColorRT.colorBuffer, instance._dstDepthRT.depthBuffer );
 
-            instance._nearCamera.RemoveCommandBuffer( CameraEvent.AfterForwardOpaque, instance._cmdMergeDepth );
+            instance._effectCamera.RemoveCommandBuffer( CameraEvent.BeforeForwardOpaque, instance._cmdMergeDepth );
 
             instance.UpdateMergeDepthCommandBuffer(); // This needs to happen *before* near camera renders, otherwise it tries to use textures that have been released.\
                                                       // that is, if the buffer is set up after the nearcam renders, it will be used on the next frame,
                                                       //   and the textures are reallocated between frames.
-            instance._nearCamera.AddCommandBuffer( CameraEvent.AfterForwardOpaque, instance._cmdMergeDepth );
+            instance._effectCamera.AddCommandBuffer( CameraEvent.BeforeForwardOpaque, instance._cmdMergeDepth );
         }
 
         [HSPEventListener( HSPEvent.GAMEPLAY_AFTER_RENDERING, "merge_depth" )]
