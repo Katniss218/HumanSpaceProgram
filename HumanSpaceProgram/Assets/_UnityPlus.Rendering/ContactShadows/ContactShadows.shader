@@ -66,33 +66,44 @@ Shader "Hidden/ContactShadows"
 				if (linearDepth > _ShadowDistance)
 					return mask; // Background.
 
-				float2 uvChangeRayTotal = ViewSpaceToClipSpace( _LightDir * _RayLength ).xy; // original _LightDir is in view space (aligned with camera, meter units).
+				float2 uvChangeRayTotal = ViewSpaceToClipSpace( _LightDir * _RayLength ).xy; // _LightDir is in view space (local space of camera).
 				
 				float2 uvStep = uvChangeRayTotal / _SampleCount;
 
 	//	THE UV STEP APPEARS TO BE WRONG, IT'S NOT IN CORRECT METERS AT GIVEN DEPTH FOR SURE. THE AXES AND DIRECTIONS SEEM ALRIGHT THOUGH.
 
-			// I might need to project 2 points, one at origin, one at (origin + ray), and subtract one from the other
+			// Needs to project 2 points, one at origin, one at (origin + ray), and subtract one from the other to account for perspective.
 
 
-				// invert light dir depth since Z+ points into the screen in view space.
-				float depthChangeRayTotal = _LightDir.z * _RayLength; // total depth change from the start to the end of the ray (ray is in view space already, so we take the component pointing towards the screen).
-				float depthStep = depthChangeRayTotal / _SampleCount; // So this is also in view space.
+
+				// Linear depth increases further from camera (i.e. it's a distance from camera pixel).
+				// `_LightDir.z * _RayLength` decreases when the light is behind the camera (the distance at the tip of the ray is smaller than the base)
+
+				float depthChangeRayTotal = _LightDir.z * _RayLength; // _LightDir is in view space (local space of camera).
+				float depthStep = depthChangeRayTotal / _SampleCount;
 				
+			// THE HORIZONTAL UV STEP SOMEHOW DEPENDS ON THE VERTICAL ANGLE OF THE CAMERA. EVEN THOUGH uvChangeRayTotal DOESN'T CHANGE, 
+			//	 AND ONLY WHEN THE LIGHT IS NOT AT RIGHT ANGLE TO THE CAMERA
+
 				//return float4(uvChangeRayTotal.x, uvChangeRayTotal.y, 0, 0);
 				//return float4(0, uvChangeRayTotal.y, 0, 0);
-				//return float4(uvChangeRayTotal.x, 0, 0, 0);
+				//return float4(-uvChangeRayTotal.x, 0, 0, 0);
 
 				//return float4(depthChangeRayTotal, 0, 0, 0);
 
-				UNITY_LOOP for (int i = 1; i < _SampleCount + 1; i++)
+				UNITY_LOOP for (int i = 1; i < _SampleCount + 1; i++) // loop starts at 1 instead of 0 since it makes no sense to sample our own pixel.
 				{
-					float rawDepthAtRaySample = SAMPLE_DEPTH_TEXTURE( _CameraDepthTexture, uv + (uvStep * i) );
+					//float rawDepthAtRaySample = SAMPLE_DEPTH_TEXTURE( _CameraDepthTexture, uv + (uvStep * i) );
+					float sampleU = clamp( uv.x + uvStep.x * i, 0, 1 );
+					float sampleV = clamp( uv.y + uvStep.y * i, 0, 1 );
+
+					float rawDepthAtRaySample = SAMPLE_DEPTH_TEXTURE( _CameraDepthTexture, float2(sampleU, sampleV) );
 					float linearDepthAtRaySample = LinearEyeDepth( rawDepthAtRaySample );
 
 					float distanceToRaySample = linearDepth + (depthStep * i);
 
-					float diff = (distanceToRaySample - _Bias) - linearDepthAtRaySample;
+					//float diff = (distanceToRaySample - _Bias) - linearDepthAtRaySample;
+					float diff = (distanceToRaySample - 0) - linearDepthAtRaySample;
 
 					return float4( diff, diff, 0.0, 0.0);
 
@@ -104,14 +115,8 @@ Shader "Hidden/ContactShadows"
 
 					if( biasedSampleDepth > linearDepthAtRaySample )
 					{
-						//return 1 - _ShadowStrength;
+						return 1 - _ShadowStrength;
 					}
-					//float raySampleDepth = LinearEyeDepth( SAMPLE_DEPTH_TEXTURE( _CameraDepthTexture, uv + (uvStep * i)) ) + (depthStep * i);
-
-					//float diff = linearDepth - depthAtRaySample;
-					//if (diff > _Bias && diff < _Thickness) // depthAtRaySample can't be too close to, or too much in front of depth.
-					//	return 1 - _ShadowStrength;
-						//return num / 32.0;
 				}
 
 				return float4(mask, 0, 0, 0);
@@ -202,6 +207,8 @@ Shader "Hidden/ContactShadows"
 
 			float CalculateShadows(float2 uv)
 			{
+				// the idea here is to calculate the texture UV march space, and the distance is marched in real meter units for accuracy.
+
 				float mask = tex2D(_ShadowMask, uv).r;
 				if (mask < 0.01)
 					return mask; // if already in shadow, return that.
