@@ -191,7 +191,8 @@ Shader "Hidden/Atmosphere"
 					float distToSurface = sceneDepth;
 
 					// raycast against the inner edge (surface of the planet)
-					// Replaced by the depth buffer.
+					// Ideally should be replaced by just the depth buffer.
+					// - 2024/07/13 - Still here because the edges of the PQS system flicker with pixels sometimes.
 					//float2 hitSurface = raySphere(rayOrigin, rayDir, _Center, _MinRadius);
 					//distToSurface = min(hitSurface.x, distToSurface);
 

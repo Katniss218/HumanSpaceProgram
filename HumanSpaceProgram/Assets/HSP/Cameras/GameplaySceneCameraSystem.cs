@@ -1,4 +1,6 @@
+using HSP.CelestialBodies;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.Rendering.PostProcessing;
 
 namespace HSP.Cameras
@@ -7,7 +9,7 @@ namespace HSP.Cameras
     {
         public class RenderTextureCreator : MonoBehaviour
         {
-            /*void OnPreCull()
+            void OnPreRender()
             {
                 instance._farCamera.clearFlags = CameraClearFlags.Skybox;
                 instance._nearCamera.clearFlags = CameraClearFlags.Depth;
@@ -18,13 +20,41 @@ namespace HSP.Cameras
 
                 instance._farCamera.SetTargetBuffers( instance._colorRT.colorBuffer, instance._farDepthRT.depthBuffer );
                 instance._nearCamera.SetTargetBuffers( instance._colorRT.colorBuffer, instance._nearDepthRT.depthBuffer );
-            }*/
+
+                // tex used as output for depth merging.
+                AtmosphereRenderer.instance._dstColorRT = RenderTexture.GetTemporary( Screen.width, Screen.height, 0, RenderTextureFormat.ARGB32 );
+                AtmosphereRenderer.instance._dstDepthRT = RenderTexture.GetTemporary( Screen.width, Screen.height, 32, RenderTextureFormat.Depth );
+                instance._effectCamera.SetTargetBuffers( AtmosphereRenderer.instance._dstColorRT.colorBuffer, AtmosphereRenderer.instance._dstDepthRT.depthBuffer );
+
+                GameplaySceneCameraSystem.NearCamera.RemoveCommandBuffer( CameraEvent.AfterForwardOpaque, AtmosphereRenderer.instance._cmdMergeDepth );
+
+                AtmosphereRenderer.instance.UpdateMergeDepthCommandBuffer(); // This needs to happen *before* near camera renders, otherwise it tries to use textures that have been released.\
+                                                                    // that is, if the buffer is set up after the nearcam renders, it will be used on the next frame,
+                                                                    //   and the textures are reallocated between frames.
+                GameplaySceneCameraSystem.NearCamera.AddCommandBuffer( CameraEvent.AfterForwardOpaque, AtmosphereRenderer.instance._cmdMergeDepth );
+            }
         }
 
         public class RenderTextureReleaser : MonoBehaviour
         {
-            /*void OnPostRender()
+            void OnPostRender()
             {
+                /*if( AtmosphereRenderer.instance._rt != null )
+                {
+                    RenderTexture.ReleaseTemporary( AtmosphereRenderer.instance._rt );
+                    AtmosphereRenderer.instance._rt = null;
+                }*/
+
+                if( AtmosphereRenderer.instance._dstColorRT != null )
+                {
+                    RenderTexture.ReleaseTemporary( AtmosphereRenderer.instance._dstColorRT );
+                    AtmosphereRenderer.instance._dstColorRT = null;
+                }
+                if( AtmosphereRenderer.instance._dstDepthRT != null )
+                {
+                    RenderTexture.ReleaseTemporary( AtmosphereRenderer.instance._dstDepthRT );
+                    AtmosphereRenderer.instance._dstDepthRT = null;
+                }
                 if( instance._colorRT != null )
                 {
                     RenderTexture.ReleaseTemporary( instance._colorRT );
@@ -40,7 +70,7 @@ namespace HSP.Cameras
                     RenderTexture.ReleaseTemporary( instance._nearDepthRT );
                     instance._nearDepthRT = null;
                 }
-            }*/
+            }
         }
 
         const float ZOOM_NEAR_PLANE_MULT = 1e-8f;
@@ -79,13 +109,13 @@ namespace HSP.Cameras
         Camera _uiCamera;
 
         [SerializeField]
-        RenderTexture _colorRT;
+        public RenderTexture _colorRT;
 
         [SerializeField]
-        RenderTexture _farDepthRT;
+        public RenderTexture _farDepthRT;
 
         [SerializeField]
-        RenderTexture _nearDepthRT;
+        public RenderTexture _nearDepthRT;
 
         RenderTextureCreator _textureCreator;
         RenderTextureReleaser _textureReleaser;
@@ -109,6 +139,8 @@ namespace HSP.Cameras
 
         public static Camera NearCamera { get => instance._nearCamera; }
         public static Camera FarCamera { get => instance._farCamera; }
+
+        public static GameplaySceneCameraSystem Instance => instance;
 
         void TryToggleNearCamera()
         {

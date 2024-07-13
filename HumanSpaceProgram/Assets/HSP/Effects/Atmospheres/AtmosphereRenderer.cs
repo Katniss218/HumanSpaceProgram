@@ -10,33 +10,33 @@ namespace HSP.CelestialBodies
 {
     [ExecuteInEditMode, ImageEffectAllowedInSceneView]
     [RequireComponent( typeof( Camera ) )]
-    public class AtmosphereRenderer : MonoBehaviour
+    public class AtmosphereRenderer : SingletonMonoBehaviour<AtmosphereRenderer>
     {
         Shader _shader;
 
         [SerializeField]
-        Material _material;
+        public Material _material;
 
         Camera _camera;
-        CommandBuffer _cmdAtmospheres;
-        CommandBuffer _cmdComposition;
-        CommandBuffer _cmdMergeDepth;
+        public CommandBuffer _cmdAtmospheres;
+        public CommandBuffer _cmdComposition;
+        public CommandBuffer _cmdMergeDepth;
 
-        Vector3 _center = Vector3.zero;
+       public Vector3 _center = Vector3.zero;
         [SerializeField]
-        new Light light;
+        public new Light light;
 
         [SerializeField]
-        RenderTexture _rt;
+        public RenderTexture _rt;
 
         [SerializeField]
         Material _mergeDepthMat;
 
         [SerializeField]
-        RenderTexture _dstColorRT;
+        public RenderTexture _dstColorRT;
 
         [SerializeField]
-        RenderTexture _dstDepthRT;
+        public RenderTexture _dstDepthRT;
 
         void OnReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
@@ -59,6 +59,7 @@ namespace HSP.CelestialBodies
             {
                 name = "Atmospheres - Composition"
             };
+#warning TODO - move the merge depth somewhere else?
             _cmdMergeDepth = new CommandBuffer()
             {
                 name = "Atmospheres - Merge Depth"
@@ -88,6 +89,10 @@ namespace HSP.CelestialBodies
 
         void OnPreRender()
         {
+            this._rt = RenderTexture.GetTemporary( Screen.width, Screen.height, 0, RenderTextureFormat.ARGB32 );
+
+            
+
             _material.SetVector( Shader.PropertyToID( "_Center" ), _center );
             _material.SetVector( Shader.PropertyToID( "_SunDirection" ), -light.transform.forward );
             _material.SetVector( Shader.PropertyToID( "_ScatteringWavelengths" ), new Vector3( 675, 530, 400 ) );
@@ -99,17 +104,10 @@ namespace HSP.CelestialBodies
             _material.SetFloat( Shader.PropertyToID( "_OpticalDepthPointCount" ), 8 );
             _material.SetFloat( Shader.PropertyToID( "_DensityFalloffPower" ), 13.7f );
 
-            GameplaySceneCameraSystem.NearCamera.RemoveCommandBuffer( CameraEvent.AfterForwardOpaque, _cmdMergeDepth );
             this._camera.RemoveCommandBuffer( CameraEvent.AfterForwardOpaque, _cmdAtmospheres );
             this._camera.RemoveCommandBuffer( CameraEvent.AfterForwardOpaque, _cmdComposition );
 
-            //this._dstColorRT = RenderTexture.GetTemporary( Screen.width, Screen.height, 0, RenderTextureFormat.ARGB32 );
-           // this._dstDepthRT = RenderTexture.GetTemporary( Screen.width, Screen.height, 24, RenderTextureFormat.Depth );
-            this._rt = RenderTexture.GetTemporary( Screen.width, Screen.height, 0, RenderTextureFormat.ARGB32 );
-            //_camera.SetTargetBuffers( _dstColorRT.colorBuffer, _dstDepthRT.depthBuffer );
-
             UpdateCommandBuffers();
-            GameplaySceneCameraSystem.NearCamera.AddCommandBuffer( CameraEvent.AfterForwardOpaque, _cmdMergeDepth );
             this._camera.AddCommandBuffer( CameraEvent.AfterForwardOpaque, _cmdAtmospheres );
             this._camera.AddCommandBuffer( CameraEvent.AfterForwardOpaque, _cmdComposition );
         }
@@ -122,20 +120,9 @@ namespace HSP.CelestialBodies
                 RenderTexture.ReleaseTemporary( _rt );
                 _rt = null;
             }
-
-            /*if( _dstColorRT != null )
-            {
-                RenderTexture.ReleaseTemporary( _dstColorRT );
-                _dstColorRT = null;
-            }*/
-            /*if( _dstDepthRT != null )
-            {
-                RenderTexture.ReleaseTemporary( _dstDepthRT );
-                _dstDepthRT = null;
-            }*/
         }
 
-        private void UpdateCommandBuffers()
+        public void UpdateMergeDepthCommandBuffer()
         {
             _cmdMergeDepth.Clear();
             _mergeDepthMat.SetTexture( Shader.PropertyToID( "_Input1Depth" ), GameplaySceneCameraSystem.FarDepthRenderTexture, RenderTextureSubElement.Depth );
@@ -148,7 +135,9 @@ namespace HSP.CelestialBodies
             _mergeDepthMat.SetFloat( Shader.PropertyToID( "_DstFar" ), _camera.farClipPlane );
             _cmdMergeDepth.SetRenderTarget( _dstColorRT, _dstDepthRT );
             _cmdMergeDepth.Blit( null, BuiltinRenderTextureType.CurrentActive, _mergeDepthMat, 0 );
-
+        }
+        public void UpdateCommandBuffers()
+        {
             _cmdAtmospheres.Clear();
             //                                     The `_Texture` property name gets overriden by something else... Unity... >:{
             _material.SetTexture( Shader.PropertyToID( "_texgsfs" ), GameplaySceneCameraSystem.ColorRenderTexture );

@@ -48,7 +48,11 @@ namespace HSP.Cameras
 
         private Vector3 GetUpDir()
         {
-            Vector3Dbl airfGravVec = GravityUtils.GetNBodyGravityAcceleration( SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( ReferenceObject.position ) );
+            Vector3 referencePosition = (this.ReferenceObject == null)
+                ? this.transform.position
+                : this.ReferenceObject.position;
+
+            Vector3Dbl airfGravVec = GravityUtils.GetNBodyGravityAcceleration( SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( referencePosition ) );
 
             Vector3 upDir = -SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformDirection( airfGravVec.NormalizeToVector3() );
 
