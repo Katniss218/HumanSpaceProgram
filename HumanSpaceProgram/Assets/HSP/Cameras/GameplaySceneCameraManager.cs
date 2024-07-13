@@ -1,4 +1,5 @@
 using HSP.CelestialBodies;
+using HSP.Core;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.PostProcessing;
@@ -10,7 +11,7 @@ namespace HSP.Cameras
     /// </summary>
     public class GameplaySceneCameraManager : SingletonMonoBehaviour<GameplaySceneCameraManager>
     {
-        public class RenderTextureCreator : MonoBehaviour
+        public class BeforeRenderEventCaller : MonoBehaviour
         {
             void OnPreRender()
             {
@@ -24,35 +25,15 @@ namespace HSP.Cameras
                 instance._farCamera.SetTargetBuffers( instance._colorRT.colorBuffer, instance._farDepthRT.depthBuffer );
                 instance._nearCamera.SetTargetBuffers( instance._colorRT.colorBuffer, instance._nearDepthRT.depthBuffer );
 
-                // tex used as output for depth merging.
-                AtmosphereRenderer.instance._dstColorRT = RenderTexture.GetTemporary( Screen.width, Screen.height, 0, RenderTextureFormat.ARGB32 );
-                AtmosphereRenderer.instance._dstDepthRT = RenderTexture.GetTemporary( Screen.width, Screen.height, 32, RenderTextureFormat.Depth );
-                instance._effectCamera.SetTargetBuffers( AtmosphereRenderer.instance._dstColorRT.colorBuffer, AtmosphereRenderer.instance._dstDepthRT.depthBuffer );
-
-                GameplaySceneCameraManager.NearCamera.RemoveCommandBuffer( CameraEvent.AfterForwardOpaque, AtmosphereRenderer.instance._cmdMergeDepth );
-
-                AtmosphereRenderer.instance.UpdateMergeDepthCommandBuffer(); // This needs to happen *before* near camera renders, otherwise it tries to use textures that have been released.\
-                                                                    // that is, if the buffer is set up after the nearcam renders, it will be used on the next frame,
-                                                                    //   and the textures are reallocated between frames.
-                GameplaySceneCameraManager.NearCamera.AddCommandBuffer( CameraEvent.AfterForwardOpaque, AtmosphereRenderer.instance._cmdMergeDepth );
+                HSPEvent.EventManager.TryInvoke( HSPEvent.GAMEPLAY_BEFORE_RENDERING );
             }
         }
 
-        public class RenderTextureReleaser : MonoBehaviour
+        public class AfterRenderEventCaller : MonoBehaviour
         {
             void OnPostRender()
             {
-                // tex used as output for depth merging.
-                if( AtmosphereRenderer.instance._dstColorRT != null )
-                {
-                    RenderTexture.ReleaseTemporary( AtmosphereRenderer.instance._dstColorRT );
-                    AtmosphereRenderer.instance._dstColorRT = null;
-                }
-                if( AtmosphereRenderer.instance._dstDepthRT != null )
-                {
-                    RenderTexture.ReleaseTemporary( AtmosphereRenderer.instance._dstDepthRT );
-                    AtmosphereRenderer.instance._dstDepthRT = null;
-                }
+                HSPEvent.EventManager.TryInvoke( HSPEvent.GAMEPLAY_AFTER_RENDERING );
 
                 if( instance._colorRT != null )
                 {
@@ -86,38 +67,38 @@ namespace HSP.Cameras
         /// <summary>
         /// Used for rendering the planets mostly.
         /// </summary>
-        [field: SerializeField]
+        [SerializeField]
         Camera _farCamera;
 
         /// <summary>
         /// Used for rendering the vessels and other close / small objects, as well as shadows.
         /// </summary>
-        [field: SerializeField]
+        [SerializeField]
         Camera _nearCamera;
 
         /// <summary>
         /// Used for rendering screen space effects, like atmospheres.
         /// </summary>
-        [field: SerializeField]
+        [SerializeField]
         Camera _effectCamera;
 
         /// <summary>
         /// Used for rendering screen space effects, like atmospheres.
         /// </summary>
-        [field: SerializeField]
+        [SerializeField]
         Camera _uiCamera;
 
         [SerializeField]
-        public RenderTexture _colorRT;
+        RenderTexture _colorRT;
 
         [SerializeField]
-        public RenderTexture _farDepthRT;
+        RenderTexture _farDepthRT;
 
         [SerializeField]
-        public RenderTexture _nearDepthRT;
+        RenderTexture _nearDepthRT;
 
-        RenderTextureCreator _textureCreator;
-        RenderTextureReleaser _textureReleaser;
+        BeforeRenderEventCaller _textureCreator;
+        AfterRenderEventCaller _textureReleaser;
 
         public static RenderTexture ColorRenderTexture => instance._colorRT;
         public static RenderTexture FarDepthRenderTexture => instance._farDepthRT;
@@ -135,11 +116,6 @@ namespace HSP.Cameras
         /// Do not manually modify the fields of this camera.
         /// </remarks>
         public static Camera MainCamera { get => instance._nearCamera; }
-
-        public static Camera NearCamera { get => instance._nearCamera; }
-        public static Camera FarCamera { get => instance._farCamera; }
-
-        public static GameplaySceneCameraManager Instance => instance;
 
         void TryToggleNearCamera()
         {
@@ -179,8 +155,8 @@ namespace HSP.Cameras
 
         private void OnEnable()
         {
-            _textureCreator = this._farCamera.gameObject.AddComponent<RenderTextureCreator>();
-            _textureReleaser = this._uiCamera.gameObject.AddComponent<RenderTextureReleaser>();
+            _textureCreator = this._farCamera.gameObject.AddComponent<BeforeRenderEventCaller>();
+            _textureReleaser = this._uiCamera.gameObject.AddComponent<AfterRenderEventCaller>();
         }
 
         private void OnDisable()

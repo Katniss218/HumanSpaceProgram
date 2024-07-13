@@ -173,6 +173,18 @@ namespace HSP.Core
         /// Invoked after a vessel is destroyed and unregistered.
         /// </summary>
         public const string GAMEPLAY_AFTER_VESSEL_UNREGISTERED = NAMESPACE_VANILLA + ".gameplayscene.after_vessel_destroyed";
+
+        /// <summary>
+        /// Invoked before the first camera starts rendering.
+        /// </summary>
+        public const string GAMEPLAY_BEFORE_RENDERING = NAMESPACE_VANILLA + ".gameplayscene.rendering.before";
+        
+        /// <summary>
+        /// Invoked after the last camera has finished rendering.
+        /// </summary>
+        public const string GAMEPLAY_AFTER_RENDERING = NAMESPACE_VANILLA + ".gameplayscene.rendering.after";
+
+
         // ---
     }
 }
