@@ -49,7 +49,7 @@ namespace HSP.GameplayScene.Cameras
 
         void OnEnable()
         {
-            if( _mergeDepthMaterial == null )
+            if( _mergeDepthMaterial == null && MergeDepthShader != null )
                 _mergeDepthMaterial = new Material( MergeDepthShader );
         }
 
@@ -79,6 +79,9 @@ namespace HSP.GameplayScene.Cameras
         [HSPEventListener( HSPEvent.GAMEPLAY_BEFORE_RENDERING, "merge_depth" )]
         private static void OnBeforeRendering()
         {
+            if( instance._mergeDepthMaterial == null )
+                return;
+
             // tex used as output for depth merging.
             instance._dstColorRT = RenderTexture.GetTemporary( Screen.width, Screen.height, 0, RenderTextureFormat.ARGB32 );
             instance._dstDepthRT = RenderTexture.GetTemporary( Screen.width, Screen.height, 32, RenderTextureFormat.Depth );

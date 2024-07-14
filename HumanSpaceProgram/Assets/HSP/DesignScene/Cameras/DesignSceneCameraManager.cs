@@ -1,5 +1,6 @@
 using HSP.CelestialBodies;
 using HSP.Core;
+using HSP.DesignScene.Cameras;
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
 using UnityPlus.AssetManagement;
@@ -9,50 +10,8 @@ namespace HSP.GameplayScene.Cameras
     /// <summary>
     /// Manages the multi-camera setup of the gameplay scene.
     /// </summary>
-    public class GameplaySceneCameraManager : SingletonMonoBehaviour<GameplaySceneCameraManager>
+    public class DesignSceneCameraManager : SingletonMonoBehaviour<DesignSceneCameraManager>
     {
-        public class BeforeRenderEventCaller : MonoBehaviour
-        {
-            void OnPreRender()
-            {
-                instance._farCamera.clearFlags = CameraClearFlags.Skybox;
-                instance._nearCamera.clearFlags = CameraClearFlags.Depth;
-
-                instance._colorRT = RenderTexture.GetTemporary( Screen.width, Screen.height, 0, RenderTextureFormat.ARGB32 );
-                instance._farDepthRT = RenderTexture.GetTemporary( Screen.width, Screen.height, 24, RenderTextureFormat.Depth );
-                instance._nearDepthRT = RenderTexture.GetTemporary( Screen.width, Screen.height, 24, RenderTextureFormat.Depth );
-
-                instance._farCamera.SetTargetBuffers( instance._colorRT.colorBuffer, instance._farDepthRT.depthBuffer );
-                instance._nearCamera.SetTargetBuffers( instance._colorRT.colorBuffer, instance._nearDepthRT.depthBuffer );
-
-                HSPEvent.EventManager.TryInvoke( HSPEvent.GAMEPLAY_BEFORE_RENDERING );
-            }
-        }
-
-        public class AfterRenderEventCaller : MonoBehaviour
-        {
-            void OnPostRender()
-            {
-                HSPEvent.EventManager.TryInvoke( HSPEvent.GAMEPLAY_AFTER_RENDERING );
-
-                if( instance._colorRT != null )
-                {
-                    RenderTexture.ReleaseTemporary( instance._colorRT );
-                    instance._colorRT = null;
-                }
-                if( instance._farDepthRT != null )
-                {
-                    RenderTexture.ReleaseTemporary( instance._farDepthRT );
-                    instance._farDepthRT = null;
-                }
-                if( instance._nearDepthRT != null )
-                {
-                    RenderTexture.ReleaseTemporary( instance._nearDepthRT );
-                    instance._nearDepthRT = null;
-                }
-            }
-        }
-
         const float ZOOM_NEAR_PLANE_MULT = 1e-8f;
 
         const float MIN_ZOOM_DISTANCE = 1f;
@@ -66,12 +25,6 @@ namespace HSP.GameplayScene.Cameras
 
         [field: SerializeField]
         public Transform CameraParent { get; private set; }
-
-        /// <summary>
-        /// Used for rendering the planets mostly.
-        /// </summary>
-        [SerializeField]
-        Camera _farCamera;
 
         /// <summary>
         /// Used for rendering the vessels and other close / small objects, as well as shadows.
@@ -90,17 +43,6 @@ namespace HSP.GameplayScene.Cameras
         /// </summary>
         [SerializeField]
         Camera _uiCamera;
-
-        RenderTexture _colorRT;
-        RenderTexture _farDepthRT;
-        RenderTexture _nearDepthRT;
-
-        BeforeRenderEventCaller _textureCreator;
-        AfterRenderEventCaller _textureReleaser;
-
-        public static RenderTexture ColorRenderTexture => instance._colorRT;
-        public static RenderTexture FarDepthRenderTexture => instance._farDepthRT;
-        public static RenderTexture NearDepthRenderTexture => instance._nearDepthRT;
 
         float _effectCameraNearPlane;
 
@@ -137,13 +79,7 @@ namespace HSP.GameplayScene.Cameras
 
         void Start()
         {
-            _farCamera.clearFlags = CameraClearFlags.Skybox;
-            _farCamera.nearClipPlane = 90_000f;
-            _farCamera.farClipPlane = 1e18f;
-            _farCamera.fieldOfView = 60f;
-            _farCamera.depth = -25f;
-
-            _nearCamera.clearFlags = CameraClearFlags.Depth;
+            _nearCamera.clearFlags = CameraClearFlags.Skybox;
             _nearCamera.nearClipPlane = 0.1f;
             _nearCamera.farClipPlane = 100_000f;
             _nearCamera.fieldOfView = 60f;
@@ -161,14 +97,6 @@ namespace HSP.GameplayScene.Cameras
             _uiCamera.fieldOfView = 60f;
             _uiCamera.depth = 99;
 
-            _farCamera.cullingMask =
-                  Layer.DEFAULT.ToMask()
-                | Layer.Unity_TransparentFx.ToMask()
-                | Layer.Unity_IgnoreRaycast.ToMask()
-                | Layer.Unity_Water.ToMask()
-                | Layer.CELESTIAL_BODY.ToMask()
-                | Layer.CELESTIAL_BODY_LIGHT.ToMask();
-
             _nearCamera.cullingMask =
                   Layer.DEFAULT.ToMask()
                 | Layer.Unity_TransparentFx.ToMask()
@@ -185,27 +113,6 @@ namespace HSP.GameplayScene.Cameras
                 | Layer.SCENE_UI.ToMask();
 
             _effectCameraNearPlane = this._effectCamera.nearClipPlane;
-
-            if( _textureCreator == null && this._farCamera != null )
-                _textureCreator = this._farCamera.gameObject.AddComponent<BeforeRenderEventCaller>();
-            if( _textureReleaser == null && this._uiCamera != null )
-                _textureReleaser = this._uiCamera.gameObject.AddComponent<AfterRenderEventCaller>();
-        }
-
-        void OnEnable()
-        {
-            if( _textureCreator == null && this._farCamera != null )
-                _textureCreator = this._farCamera.gameObject.AddComponent<BeforeRenderEventCaller>();
-            if( _textureReleaser == null && this._uiCamera != null )
-                _textureReleaser = this._uiCamera.gameObject.AddComponent<AfterRenderEventCaller>();
-        }
-
-        void OnDisable()
-        {
-            if( _textureCreator != null )
-                Destroy( _textureCreator );
-            if( _textureReleaser != null )
-                Destroy( _textureReleaser );
         }
 
         void LateUpdate()
@@ -213,23 +120,19 @@ namespace HSP.GameplayScene.Cameras
             AdjustCameras();
         }
 
-        [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, "vanilla.gameplayscene_camera" )]
+        [HSPEventListener( HSPEvent.STARTUP_DESIGN, "vanilla.designscene_camera" )]
         private static void OnGameplaySceneLoad()
         {
             GameObject cameraPivotGameObject = new GameObject( "Camera Pivot" );
 
             SceneCamera sceneCamera = cameraPivotGameObject.AddComponent<SceneCamera>();
-            GameplaySceneCameraManager cameraManager = cameraPivotGameObject.AddComponent<GameplaySceneCameraManager>();
-            GameplaySceneOrbitingCameraController cameraController = cameraPivotGameObject.AddComponent<GameplaySceneOrbitingCameraController>();
+            DesignSceneCameraManager cameraManager = cameraPivotGameObject.AddComponent<DesignSceneCameraManager>();
+            DesignSceneOrbitingCameraController cameraController = cameraPivotGameObject.AddComponent<DesignSceneOrbitingCameraController>();
 
             GameObject cameraParentGameObject = new GameObject( "Camera Parent" );
             cameraParentGameObject.transform.SetParent( cameraPivotGameObject.transform );
 
             AudioListener audioListener = cameraParentGameObject.AddComponent<AudioListener>();
-
-            GameObject farCameraGameObject = new GameObject( "Far camera" );
-            farCameraGameObject.transform.SetParent( cameraParentGameObject.transform );
-            Camera farCamera = farCameraGameObject.AddComponent<Camera>();
 
             GameObject nearCameraGameObject = new GameObject( "Near camera" );
             nearCameraGameObject.transform.SetParent( cameraParentGameObject.transform );
@@ -245,25 +148,15 @@ namespace HSP.GameplayScene.Cameras
 
             sceneCamera.camera = nearCamera;
             cameraManager.CameraParent = cameraParentGameObject.transform;
-            cameraManager._farCamera = farCamera;
             cameraManager._nearCamera = nearCamera;
             cameraManager._effectCamera = effectCamera;
             cameraManager._uiCamera = uiCamera;
 
             cameraController.CameraParent = cameraParentGameObject.transform;
             cameraController.ZoomDist = 5f;
-
-            GameplaySceneDepthBufferCombiner bufferCombiner = nearCameraGameObject.AddComponent<GameplaySceneDepthBufferCombiner>();
-            bufferCombiner.FarCamera = farCamera;
-            bufferCombiner.NearCamera = nearCamera;
-            bufferCombiner.EffectCamera = effectCamera;
-            bufferCombiner.MergeDepthShader = AssetRegistry.Get<Shader>( "builtin::Resources/Shaders/merge_depth" );
-
-            AtmosphereRenderer atmosphereRenderer = effectCameraGameObject.AddComponent<AtmosphereRenderer>();
-            atmosphereRenderer.light = GameObject.Find( "CBLight" ).GetComponent<Light>();
         }
 
-        [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, "vanilla.gameplayscene_postprocessing", After = new[] { "vanilla.gameplayscene_camera" } )]
+        [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, "vanilla.designscene_postprocessing", After = new[] { "vanilla.designscene_camera" } )]
         private static void CreatePostProcessingLayers()
         {
             void SetupPPL( PostProcessLayer layer )
@@ -282,9 +175,6 @@ namespace HSP.GameplayScene.Cameras
                 layer.Init( postProcessResources );
                 layer.InitBundles();
             }
-
-            PostProcessLayer farPPL = instance._farCamera.gameObject.AddComponent<PostProcessLayer>();
-            SetupPPL( farPPL );
 
             PostProcessLayer nearPPL = instance._nearCamera.gameObject.AddComponent<PostProcessLayer>();
             SetupPPL( nearPPL );

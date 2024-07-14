@@ -110,7 +110,6 @@
     <Compile Include="Assets\HSP\Input\HierarchicalInputPriority.cs" />
     <Compile Include="Assets\HSP\DesignScene\Tools\RerootTool.cs" />
     <Compile Include="Assets\HSP\Components\FGimbalActuatorController.cs" />
-    <Compile Include="Assets\HSP\EditorScene\Cameras\EditorSceneOrbitingCameraController.cs" />
     <Compile Include="Assets\HSP\MainMenuScene\MainMenuEscapeInputController.cs" />
     <Compile Include="Assets\HSP\GameplayScene\GameplaySceneToolBase.cs" />
     <Compile Include="Assets\HSP\GameplayScene\TimeScaleInputController.cs" />
@@ -121,6 +120,8 @@
     <Compile Include="Assets\HSP\PIDLoop.cs" />
     <Compile Include="Assets\HSP\AssetLoaders\GameDataJsonVesselFactory.cs" />
     <Compile Include="Assets\HSP\Components\FReactionControlController.cs" />
+    <Compile Include="Assets\HSP\DesignScene\Cameras\DesignSceneCameraManager.cs" />
+    <Compile Include="Assets\HSP\MainMenuScene\Cameras\MainMenuSceneCameraManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP\CelestialBodies\Surface\TerrainShader.shader" />

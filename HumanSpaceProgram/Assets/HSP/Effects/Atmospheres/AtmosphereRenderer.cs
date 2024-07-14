@@ -83,6 +83,9 @@ namespace HSP.CelestialBodies
 
         void OnPreRender()
         {
+            if( instance._atmosphereMaterial == null )
+                return;
+
             this._rt = RenderTexture.GetTemporary( Screen.width, Screen.height, 0, RenderTextureFormat.ARGB32 );
 
             //                                     The `_Texture` property name gets overriden by something else... Unity... >:{

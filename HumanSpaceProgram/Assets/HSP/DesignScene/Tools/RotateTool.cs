@@ -1,4 +1,5 @@
-﻿using HSP.Core.Components;
+﻿using HSP.Core;
+using HSP.Core.Components;
 using HSP.Input;
 using System;
 using System.Collections.Generic;
@@ -122,7 +123,7 @@ namespace HSP.DesignScene.Tools
 					BoxCollider c = go.AddComponent<BoxCollider>();
 					c.size = new Vector3( 3.5f, 3.5f, 0.1f );
 				} );
-			_handles.RaycastCamera = GameObject.Find( "UI Camera" ).GetComponent<Camera>();
+			_handles.RaycastCamera = SceneCamera.Camera.GetComponent<Camera>();
 		}
 	}
 }

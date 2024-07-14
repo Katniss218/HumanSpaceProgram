@@ -12,14 +12,6 @@ namespace HSP.DesignScene.Tools
     /// </summary>
     public class RerootTool : DesignSceneToolBase
     {
-        [SerializeField]
-        Camera _camera;
-
-        void Awake()
-        {
-            _camera = GameObject.Find( "Near camera" ).GetComponent<Camera>();
-        }
-
         void Update()
         {
             // click on part to set root.

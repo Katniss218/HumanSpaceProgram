@@ -10,8 +10,17 @@ namespace HSP.DesignScene.Cameras
         [field: SerializeField]
         public Transform CameraParent { get; set; }
 
-        [field: SerializeField]
-        public float ZoomDist { get; private set; } = 5;
+        [SerializeField]
+        float _zoomDist = 5;
+        public float ZoomDist
+        {
+            get => _zoomDist;
+            set
+            {
+                _zoomDist = value;
+                SyncZoomDist();
+            }
+        }
 
         const float MOVE_MULTIPLIER = 3.0f;
         const float ZOOM_MULTIPLIER = 0.15f;
@@ -24,18 +33,19 @@ namespace HSP.DesignScene.Cameras
         private void UpdateZoomLevel()
         {
             if( UnityEngine.Input.mouseScrollDelta.y > 0 )
-            {
-                ZoomDist -= ZoomDist * ZOOM_MULTIPLIER;
-            }
+                _zoomDist -= _zoomDist * ZOOM_MULTIPLIER;
             else if( UnityEngine.Input.mouseScrollDelta.y < 0 )
-            {
-                ZoomDist += ZoomDist * ZOOM_MULTIPLIER;
-            }
+                _zoomDist += _zoomDist * ZOOM_MULTIPLIER;
 
-            ZoomDist = Mathf.Clamp( ZoomDist, MIN_ZOOM_DISTANCE, MAX_ZOOM_DISTANCE );
+            SyncZoomDist();
+        }
+
+        private void SyncZoomDist()
+        {
+            _zoomDist = Mathf.Clamp( _zoomDist, MIN_ZOOM_DISTANCE, MAX_ZOOM_DISTANCE );
 
             // ---
-            this.CameraParent.localPosition = Vector3.back * ZoomDist;
+            this.CameraParent.localPosition = Vector3.back * _zoomDist;
         }
 
         private void UpdateOrientation( Vector3 upDir )
@@ -95,5 +105,7 @@ namespace HSP.DesignScene.Cameras
             _isRotating = false;
             return true;
         }
+
+        // TODO - add an ortho camera, blender-style.
     }
 }

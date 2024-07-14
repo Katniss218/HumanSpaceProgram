@@ -698,7 +698,7 @@ GameObject:
   - component: {fileID: 1184999533}
   - component: {fileID: 1184999532}
   m_Layer: 0
-  m_Name: zzz ___test
+  m_Name: DevUtilsManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

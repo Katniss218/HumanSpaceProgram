@@ -21,7 +21,6 @@ namespace HSP.DesignScene.Tools
 		Vector3 _heldClickOffset;
 		Quaternion _heldRotation;
 
-		Camera _camera;
 		FAttachNode.SnappingCandidate? _currentSnap = null;
 
 		public bool AngleSnappingEnabled = true;
@@ -48,17 +47,12 @@ namespace HSP.DesignScene.Tools
 			_heldRotation = value.rotation; // KSP takes into account whether the orientation was changed using the WASDQE keys.
 		}
 
-		void Awake()
-		{
-			_camera = GameObject.Find( "Near camera" ).GetComponent<Camera>(); // todo - change the GameObject.Find to something proper.
-		}
-
 		void Update()
 		{
 			if( UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() )
 				return;
 
-			_currentFrameCursorRay = _camera.ScreenPointToRay( UnityEngine.Input.mousePosition );
+			_currentFrameCursorRay = SceneCamera.Camera.ScreenPointToRay( UnityEngine.Input.mousePosition );
 
 			if( Physics.Raycast( _currentFrameCursorRay, out _currentFrameHit, 8192, 1 << (int)Layer.PART_OBJECT ) )
 			{
@@ -194,7 +188,7 @@ namespace HSP.DesignScene.Tools
 				}
 			}
 
-			Plane viewPlane = new Plane( _camera.transform.forward, (_heldPart.position + _heldClickOffset) );
+			Plane viewPlane = new Plane( SceneCamera.Camera.transform.forward, (_heldPart.position + _heldClickOffset) );
 			if( viewPlane.Raycast( _currentFrameCursorRay, out float intersectionDistance ) )
 			{
 				Vector3 planePoint = _currentFrameCursorRay.GetPoint( intersectionDistance );
