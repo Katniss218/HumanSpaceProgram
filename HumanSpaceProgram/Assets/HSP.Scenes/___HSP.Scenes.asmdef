@@ -1,0 +1,19 @@
+{
+    "name": "HSP.Scenes",
+    "rootNamespace": "",
+    "references": [
+        "GUID:27d62e6e15e3fa24eabddedaa74a2424",
+        "GUID:3f85132a81c90724483587ec215e1407",
+        "GUID:9511fd24fc492724aa0a1416a4ef03d2",
+        "GUID:f00983dade8147042b611005c376fd7e"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -58,90 +58,14 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.Core\Control\Controls\ControllerOutput_T_.cs" />
-    <Compile Include="Assets\HSP.Core\Serialization\SaveMetadataEx.cs" />
-    <Compile Include="Assets\HSP.Core\Vessel.cs" />
-    <Compile Include="Assets\HSP.Core\Physics\InertiaUtils.cs" />
-    <Compile Include="Assets\HSP.Core\Control\Controls\ControlParameterOutputBase.cs" />
-    <Compile Include="Assets\HSP.Core\Orbit.cs" />
-    <Compile Include="Assets\HSP.Core\PartRegistry.cs" />
-    <Compile Include="Assets\HSP.Core\TimeStepManager.cs" />
-    <Compile Include="Assets\HSP.Core\Control\Controls\ControlParameterOutput_T_.cs" />
-    <Compile Include="Assets\HSP.Core\Control\Controls\ControlParameterInputBase.cs" />
-    <Compile Include="Assets\HSP.Core\Vessel.Serialization.cs" />
-    <Compile Include="Assets\HSP.Core\SceneManagement\EditorSceneManager.cs" />
-    <Compile Include="Assets\HSP.Core\Control\NamedControlAttribute.cs" />
-    <Compile Include="Assets\HSP.Core\Mods\Mappings_NamespacedIdentifier.cs" />
-    <Compile Include="Assets\HSP.Core\Control\Controls\ControlleeInputBase.cs" />
     <Compile Include="Assets\HSP.Core\HSPEvent.cs" />
-    <Compile Include="Assets\HSP.Core\ResourceFlowSystem\FluidState.cs" />
-    <Compile Include="Assets\HSP.Core\Mods\NamespacedIdentifier.cs" />
-    <Compile Include="Assets\HSP.Core\Serialization\TimelineMetadata.cs" />
-    <Compile Include="Assets\HSP.Core\CelestialBodyManager.cs" />
-    <Compile Include="Assets\HSP.Core\Control\Controls\ControlleeInput_T_.cs" />
-    <Compile Include="Assets\HSP.Core\Control\Controls\ControlParameterInput_T_.cs" />
-    <Compile Include="Assets\HSP.Core\Control\Controls\ControlleeInput.cs" />
-    <Compile Include="Assets\HSP.Core\ResourceFlowSystem\IResourceConsumer.cs" />
-    <Compile Include="Assets\HSP.Core\Physics\PinnedPhysicsObject.cs" />
-    <Compile Include="Assets\HSP.Core\SceneManagement\GameplaySceneManager.cs" />
-    <Compile Include="Assets\HSP.Core\Serialization\PartMetadata.cs" />
-    <Compile Include="Assets\HSP.Core\CelestialBodyFactory.cs" />
+    <Compile Include="Assets\HSP.Core\NamespacedIdentifier.cs" />
     <Compile Include="Assets\HSP.Core\Layer.cs" />
-    <Compile Include="Assets\HSP.Core\Serialization\TimelineManager.cs" />
-    <Compile Include="Assets\HSP.Core\Control\ControlGroup.cs" />
     <Compile Include="Assets\HSP.Core\HSPEventListenerAttribute.cs" />
-    <Compile Include="Assets\HSP.Core\SymmetryDataContainer.cs" />
     <Compile Include="Assets\HSP.Core\CoordinateUtils.cs" />
-    <Compile Include="Assets\HSP.Core\IHasMass.cs" />
-    <Compile Include="Assets\HSP.Core\ResourceFlowSystem\IResourceContainer.cs" />
-    <Compile Include="Assets\HSP.Core\ReferenceFrames\CenteredReferenceFrame.cs" />
-    <Compile Include="Assets\HSP.Core\Serialization\VesselMetadata.cs" />
-    <Compile Include="Assets\HSP.Core\Physics\GravityUtils.cs" />
-    <Compile Include="Assets\HSP.Core\ReferenceFrames\RootObjectTransform.cs" />
-    <Compile Include="Assets\HSP.Core\OrbitalFrame.cs" />
-    <Compile Include="Assets\HSP.Core\VesselFactory.cs" />
-    <Compile Include="Assets\HSP.Core\Components\FPart.cs" />
-    <Compile Include="Assets\HSP.Core\SceneManagement\SceneLoader.cs" />
-    <Compile Include="Assets\HSP.Core\ReferenceFrames\IAcceleratingReferenceFrame.cs" />
-    <Compile Include="Assets\HSP.Core\IPartObject.cs" />
-    <Compile Include="Assets\HSP.Core\Serialization\Version.cs" />
-    <Compile Include="Assets\HSP.Core\ReferenceFrames\ReferenceFrameUtils.cs" />
-    <Compile Include="Assets\HSP.Core\Serialization\SaveMetadata.cs" />
-    <Compile Include="Assets\HSP.Core\ReferenceFrames\OrientedReferenceFrame.cs" />
-    <Compile Include="Assets\HSP.Core\ReferenceFrames\IReferenceFrameSwitchResponder.cs" />
-    <Compile Include="Assets\HSP.Core\VesselManager.cs" />
-    <Compile Include="Assets\HSP.Core\Components\FAnchor.cs" />
-    <Compile Include="Assets\HSP.Core\SceneCamera.cs" />
-    <Compile Include="Assets\HSP.Core\Components\FAttachNode.cs" />
-    <Compile Include="Assets\HSP.Core\ResourceFlowSystem\IResourceProducer.cs" />
-    <Compile Include="Assets\HSP.Core\Control\ControlUtils.cs" />
-    <Compile Include="Assets\HSP.Core\Control\Controls\ControllerOutput.cs" />
-    <Compile Include="Assets\HSP.Core\SceneManagement\DesignSceneManager.cs" />
-    <Compile Include="Assets\HSP.Core\ReferenceFrames\IReferenceFrame.cs" />
-    <Compile Include="Assets\HSP.Core\ReferenceFrames\IReferenceTransform.cs" />
+    <Compile Include="Assets\HSP.Core\Version.cs" />
     <Compile Include="Assets\HSP.Core\HumanSpaceProgram.cs" />
-    <Compile Include="Assets\HSP.Core\SceneManagement\MainMenuSceneManager.cs" />
-    <Compile Include="Assets\HSP.Core\ResourceFlowSystem\SubstanceState.cs" />
-    <Compile Include="Assets\HSP.Core\ResourceFlowSystem\FlowUtils.cs" />
-    <Compile Include="Assets\HSP.Core\SceneManagement\AlwaysLoadedManager.cs" />
-    <Compile Include="Assets\HSP.Core\Components\FClickInteractionRedirect.cs" />
-    <Compile Include="Assets\HSP.Core\Mods\HumanSpaceProgramMods.cs" />
-    <Compile Include="Assets\HSP.Core\CelestialBodySurface.cs" />
-    <Compile Include="Assets\HSP.Core\PartFactory.cs" />
-    <Compile Include="Assets\HSP.Core\VesselHierarchyUtils.cs" />
-    <Compile Include="Assets\HSP.Core\ReferenceFrames\SceneReferenceFrameManager.cs" />
-    <Compile Include="Assets\HSP.Core\Substance.cs" />
-    <Compile Include="Assets\HSP.Core\CelestialBody.cs" />
-    <Compile Include="Assets\HSP.Core\Serialization\IOHelper.cs" />
-    <Compile Include="Assets\HSP.Core\Control\Controls\ControllerOutputBase.cs" />
-    <Compile Include="Assets\HSP.Core\SceneManagement\InvalidSceneManagerException.cs" />
-    <Compile Include="Assets\HSP.Core\Components\FLaunchSiteMarker.cs" />
-    <Compile Include="Assets\HSP.Core\Physics\IPhysicsObject.cs" />
-    <Compile Include="Assets\HSP.Core\ActiveObjectManager.cs" />
-    <Compile Include="Assets\HSP.Core\ResourceFlowSystem\SubstanceStateCollection.cs" />
-    <Compile Include="Assets\HSP.Core\Physics\FreePhysicsObject.cs" />
-    <Compile Include="Assets\HSP.Core\Control\Control.cs" />
-    <Compile Include="Assets\HSP.Core\Components\FControlFrame.cs" />
+    <Compile Include="Assets\HSP.Core\IPhysicsObject.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Core\___HSP.Core.asmdef" />
@@ -1004,10 +928,6 @@
     <ProjectReference Include="_UnityPlus.Serialization.csproj">
       <Project>{FED3C19A-E743-9E19-D660-957D0801811E}</Project>
       <Name>_UnityPlus.Serialization</Name>
-    </ProjectReference>
-    <ProjectReference Include="_UnityPlus.UILib.csproj">
-      <Project>{3A5E96D9-C189-180D-1672-7BEFFDEBCE5F}</Project>
-      <Name>_UnityPlus.UILib</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

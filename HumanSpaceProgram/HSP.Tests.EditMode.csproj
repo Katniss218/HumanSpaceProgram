@@ -943,14 +943,6 @@
       <Project>{5294BE79-15AB-2AAE-E8C3-9E735E001D6D}</Project>
       <Name>HSP</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.Core.csproj">
-      <Project>{C9E9530A-E4D2-A27F-5034-F7DEF1E2B040}</Project>
-      <Name>HSP.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="HSP.DevUtils.csproj">
-      <Project>{3F4DBB0E-2EBF-6E20-50D8-3483C901FF0A}</Project>
-      <Name>HSP.DevUtils</Name>
-    </ProjectReference>
     <ProjectReference Include="HSP.UI.csproj">
       <Project>{05A5E85F-FD04-4199-F86F-3A6E38B383FB}</Project>
       <Name>HSP.UI</Name>

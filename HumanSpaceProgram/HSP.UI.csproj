@@ -58,48 +58,12 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.UI\UITextReadout_Velocity.cs" />
     <Compile Include="Assets\HSP.UI\Windows\UIPromptWindow.cs" />
-    <Compile Include="Assets\HSP.UI\Windows\UIControlSetupWindow.cs" />
-    <Compile Include="Assets\HSP.UI\HUDs\ConstructionSiteHUD.cs" />
-    <Compile Include="Assets\HSP.UI\UITimelineMetadata.cs" />
-    <Compile Include="Assets\HSP.UI\ControlSetupControlGroupUI.cs" />
-    <Compile Include="Assets\HSP.UI\UITextReadout_Altitude.cs" />
-    <Compile Include="Assets\HSP.UI\Extensions\UIText_Ex.cs" />
-    <Compile Include="Assets\HSP.UI\Windows\UIPartWindow.cs" />
-    <Compile Include="Assets\HSP.UI\ControlSetupControlUI.cs" />
-    <Compile Include="Assets\HSP.UI\ControlSetupWindowComponentUI.cs" />
-    <Compile Include="Assets\HSP.UI\UISaveMetadata.cs" />
+    <Compile Include="Assets\HSP.UI\Defaults\UIText_Ex.cs" />
     <Compile Include="Assets\HSP.UI\CanvasName.cs" />
     <Compile Include="Assets\HSP.UI\Windows\UIConfirmWindow.cs" />
-    <Compile Include="Assets\HSP.UI\UISequenceElement.cs" />
-    <Compile Include="Assets\HSP.UI\SceneFactories\GameplaySceneUIFactory.cs" />
-    <Compile Include="Assets\HSP.UI\Windows\PartWindowComponents\UIPartWindowComponent.cs" />
-    <Compile Include="Assets\HSP.UI\Extensions\UIDefaults.cs" />
-    <Compile Include="Assets\HSP.UI\UISequenceAction.cs" />
+    <Compile Include="Assets\HSP.UI\Defaults\UIDefaults.cs" />
     <Compile Include="Assets\HSP.UI\UILineRenderer.cs" />
-    <Compile Include="Assets\HSP.UI\UIPartListEntry.cs" />
-    <Compile Include="Assets\HSP.UI\UISequencerPanel.cs" />
-    <Compile Include="Assets\HSP.UI\SceneFactories\SequencerPanelFactory.cs" />
-    <Compile Include="Assets\HSP.UI\SceneFactories\GameplayEscapeUIFactory.cs" />
-    <Compile Include="Assets\HSP.UI\Windows\WindowRelationHighlight.cs" />
-    <Compile Include="Assets\HSP.UI\SceneFactories\MainMenuSceneUIFactory.cs" />
-    <Compile Include="Assets\HSP.UI\GameplayViewportClickController.cs" />
-    <Compile Include="Assets\HSP.UI\UITimewarpSelector.cs" />
-    <Compile Include="Assets\HSP.UI\ControlSetupControlConnectionUI.cs" />
-    <Compile Include="Assets\HSP.UI\Windows\UISaveWindow.cs" />
-    <Compile Include="Assets\HSP.UI\UIPartList.cs" />
-    <Compile Include="Assets\HSP.UI\UITextReadout_ElapsedUT.cs" />
-    <Compile Include="Assets\HSP.UI\UINavball.cs" />
-    <Compile Include="Assets\HSP.UI\Windows\UIStartNewGameWindow.cs" />
-    <Compile Include="Assets\HSP.UI\Windows\UILoadWindow.cs" />
-    <Compile Include="Assets\HSP.UI\HUDs\ConstructionSiteHUDManager.cs" />
-    <Compile Include="Assets\HSP.UI\NavballRenderTextureManager.cs" />
-    <Compile Include="Assets\HSP.UI\HUDs\VesselHUDManager.cs" />
-    <Compile Include="Assets\HSP.UI\UITextReadout_Acceleration.cs" />
-    <Compile Include="Assets\HSP.UI\Windows\PartWindowComponents\UIIResourceContainer.cs" />
-    <Compile Include="Assets\HSP.UI\HUDs\VesselHUD.cs" />
-    <Compile Include="Assets\HSP.UI\SceneFactories\DesignSceneUIFactory.cs" />
     <Compile Include="Assets\HSP.UI\UITextReadout_FPS.cs" />
     <Compile Include="Assets\HSP.UI\Windows\UIAlertWindow.cs" />
   </ItemGroup>
@@ -976,10 +940,6 @@
     <ProjectReference Include="HSP.csproj">
       <Project>{5294BE79-15AB-2AAE-E8C3-9E735E001D6D}</Project>
       <Name>HSP</Name>
-    </ProjectReference>
-    <ProjectReference Include="HSP.Core.csproj">
-      <Project>{C9E9530A-E4D2-A27F-5034-F7DEF1E2B040}</Project>
-      <Name>HSP.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
