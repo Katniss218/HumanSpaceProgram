@@ -111,6 +111,7 @@
     <Compile Include="Assets\HSP.Core\ReferenceFrames\IReferenceFrameSwitchResponder.cs" />
     <Compile Include="Assets\HSP.Core\VesselManager.cs" />
     <Compile Include="Assets\HSP.Core\Components\FAnchor.cs" />
+    <Compile Include="Assets\HSP.Core\SceneCamera.cs" />
     <Compile Include="Assets\HSP.Core\Components\FAttachNode.cs" />
     <Compile Include="Assets\HSP.Core\ResourceFlowSystem\IResourceProducer.cs" />
     <Compile Include="Assets\HSP.Core\Control\ControlUtils.cs" />
@@ -141,7 +142,6 @@
     <Compile Include="Assets\HSP.Core\Physics\FreePhysicsObject.cs" />
     <Compile Include="Assets\HSP.Core\Control\Control.cs" />
     <Compile Include="Assets\HSP.Core\Components\FControlFrame.cs" />
-    <Compile Include="Assets\HSP.Core\SceneCamera.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Core\___HSP.Core.asmdef" />

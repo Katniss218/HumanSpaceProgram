@@ -257,13 +257,6 @@ namespace HSP.GameplayScene.Cameras
             cameraManager._effectCamera = effectCamera;
             cameraManager._uiCamera = uiCamera;
 
-#warning TODO - PPP as a separate subsystem, maybe a bundled mod.
-            //PostProcessLayer farPPL = farCameraGameObject.AddComponent<PostProcessLayer>();
-
-            //PostProcessLayer nearPPL = nearCameraGameObject.AddComponent<PostProcessLayer>();
-
-            //PostProcessLayer uiPPL = uiCameraGameObject.AddComponent<PostProcessLayer>();
-
             cameraController.CameraParent = cameraParentGameObject.transform;
             cameraController.ZoomDist = 5f;
 
@@ -275,6 +268,42 @@ namespace HSP.GameplayScene.Cameras
 
             AtmosphereRenderer atmosphereRenderer = effectCameraGameObject.AddComponent<AtmosphereRenderer>();
             atmosphereRenderer.light = GameObject.Find( "CBLight" ).GetComponent<Light>();
+        }
+
+        [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, "vanilla.gameplayscene_postprocessing", After = new[] { "vanilla.gameplayscene_camera" } )]
+        private static void CreatePostProcessingLayers()
+        {
+            void SetupPPL( PostProcessLayer layer )
+            {
+                layer.antialiasingMode = PostProcessLayer.Antialiasing.TemporalAntialiasing;
+                layer.temporalAntialiasing.jitterSpread = 0.65f;
+                layer.temporalAntialiasing.stationaryBlending = 0.99f;
+                layer.temporalAntialiasing.motionBlending = 0.25f;
+                layer.temporalAntialiasing.sharpness = 0.1f;
+                layer.volumeLayer = Layer.POST_PROCESSING.ToMask();
+                layer.volumeTrigger = layer.transform;
+                layer.stopNaNPropagation = true;
+
+                // This is required, for some stupid reason.
+                // I had to copy the PostProcessResources.asset file from the `\HumanSpaceProgram\Library\PackageCache\com.unity.postprocessing@3.2.2\PostProcessing` directory.
+                //   It could maybe be addressed from there directly though (tho it needs a modification of the AssetRegistererAssetSource class to be able to handle it).
+                //   It can be enumerated with AssetDatabase.
+                //var postProcessResources = AssetRegistry.Get<PostProcessResources>( "builtin::Resources/com.unity.postprocessing/PostProcessResources" );
+                var postProcessResources = AssetRegistry.Get<PostProcessResources>( "builtin::com.unity.postprocessing/PostProcessing/PostProcessResources" );
+                layer.Init( postProcessResources );
+                layer.InitBundles();
+            }
+
+#warning TODO - PPP as a separate subsystem, maybe a bundled mod.
+
+            PostProcessLayer farPPL = GameplaySceneCameraManager.instance._farCamera.gameObject.AddComponent<PostProcessLayer>();
+            SetupPPL( farPPL );
+
+            PostProcessLayer nearPPL = GameplaySceneCameraManager.instance._nearCamera.gameObject.AddComponent<PostProcessLayer>();
+            SetupPPL( nearPPL );
+
+            PostProcessLayer uiPPL = GameplaySceneCameraManager.instance._uiCamera.gameObject.AddComponent<PostProcessLayer>();
+            SetupPPL( uiPPL );
         }
     }
 }

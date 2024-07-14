@@ -757,7 +757,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 533bc8d498a7a2d4686edc8c965460e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _camera: {fileID: 1971509467}
 --- !u!114 &1765752112
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1010,7 +1009,7 @@ MonoBehaviour:
     m_Bits: 2147483648
   stopNaNPropagation: 1
   finalBlitToCameraTarget: 0
-  antialiasingMode: 2
+  antialiasingMode: 3
   temporalAntialiasing:
     jitterSpread: 0.75
     sharpness: 0.25

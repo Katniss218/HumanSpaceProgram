@@ -182,7 +182,9 @@ GameObject:
   m_Component:
   - component: {fileID: 911430596}
   - component: {fileID: 911430595}
-  - component: {fileID: 911430594}
+  - component: {fileID: 911430599}
+  - component: {fileID: 911430598}
+  - component: {fileID: 911430597}
   m_Layer: 0
   m_Name: _ DefaultAssetLoader
   m_TagString: Untagged
@@ -190,22 +192,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &911430594
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 911430593}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bfbad14e977fcbc4c8edf15ea507789d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _registerer: {fileID: 911430595}
-  _autoUpdate: 0
-  _constrainPath: Assets/
-  _assetPrefix: 'builtin::'
 --- !u!114 &911430595
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -287,8 +273,6 @@ MonoBehaviour:
     asset: {fileID: 10414, guid: 0000000000000000e000000000000000, type: 0}
   - assetID: builtin::UnitySplash-cube
     asset: {fileID: 10403, guid: 0000000000000000e000000000000000, type: 0}
-  - assetID: builtin::UnitySplash-cube
-    asset: {fileID: 10404, guid: 0000000000000000e000000000000000, type: 0}
   - assetID: builtin::FrameDebuggerRenderTargetDisplay
     asset: {fileID: 10756, guid: 0000000000000000e000000000000000, type: 0}
   - assetID: builtin::GameSkin
@@ -467,8 +451,6 @@ MonoBehaviour:
     asset: {fileID: 10758, guid: 0000000000000000f000000000000000, type: 0}
   - assetID: builtin::Default-Particle
     asset: {fileID: 10300, guid: 0000000000000000f000000000000000, type: 0}
-  - assetID: builtin::Default-Particle
-    asset: {fileID: 10301, guid: 0000000000000000f000000000000000, type: 0}
   - assetID: builtin::Default-Diffuse
     asset: {fileID: 10302, guid: 0000000000000000f000000000000000, type: 0}
   - assetID: builtin::Default-Material
@@ -481,38 +463,22 @@ MonoBehaviour:
     asset: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
   - assetID: builtin::Default-ParticleSystem
     asset: {fileID: 10307, guid: 0000000000000000f000000000000000, type: 0}
-  - assetID: builtin::Default-ParticleSystem
-    asset: {fileID: 10308, guid: 0000000000000000f000000000000000, type: 0}
   - assetID: builtin::Default-Checker-Gray
     asset: {fileID: 10309, guid: 0000000000000000f000000000000000, type: 0}
   - assetID: builtin::Checkmark
     asset: {fileID: 10900, guid: 0000000000000000f000000000000000, type: 0}
-  - assetID: builtin::Checkmark
-    asset: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
   - assetID: builtin::UISprite
     asset: {fileID: 10904, guid: 0000000000000000f000000000000000, type: 0}
-  - assetID: builtin::UISprite
-    asset: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   - assetID: builtin::Background
     asset: {fileID: 10906, guid: 0000000000000000f000000000000000, type: 0}
-  - assetID: builtin::Background
-    asset: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
   - assetID: builtin::InputFieldBackground
     asset: {fileID: 10910, guid: 0000000000000000f000000000000000, type: 0}
-  - assetID: builtin::InputFieldBackground
-    asset: {fileID: 10911, guid: 0000000000000000f000000000000000, type: 0}
   - assetID: builtin::Knob
     asset: {fileID: 10912, guid: 0000000000000000f000000000000000, type: 0}
-  - assetID: builtin::Knob
-    asset: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
   - assetID: builtin::DropdownArrow
     asset: {fileID: 10914, guid: 0000000000000000f000000000000000, type: 0}
-  - assetID: builtin::DropdownArrow
-    asset: {fileID: 10915, guid: 0000000000000000f000000000000000, type: 0}
   - assetID: builtin::UIMask
     asset: {fileID: 10916, guid: 0000000000000000f000000000000000, type: 0}
-  - assetID: builtin::UIMask
-    asset: {fileID: 10917, guid: 0000000000000000f000000000000000, type: 0}
   - assetID: builtin::Default-HighResolution
     asset: {fileID: 15200, guid: 0000000000000000f000000000000000, type: 0}
   - assetID: builtin::Default-LowResolution
@@ -681,6 +647,8 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: e44b747185cc2874db45086d91d2ae93, type: 3}
   - assetID: builtin::Resources/Sprites/UI/top_panel_background
     asset: {fileID: 21300000, guid: f42d77e9a19ffc0438a43e3d10dc6140, type: 3}
+  - assetID: builtin::Resources/com.unity.postprocessing/PostProcessResources
+    asset: {fileID: 11400000, guid: 15b14ae39e5b2794d95855a85012e20e, type: 2}
   - assetID: builtin::Resources/Materials/attitude_indicator
     asset: {fileID: 2100000, guid: 35d2f520ab42c974aa2816029d77aaad, type: 2}
   - assetID: builtin::HSP.DevUtils/flameparticle6
@@ -1001,18 +969,617 @@ MonoBehaviour:
     asset: {fileID: 4800000, guid: cf81c85f95fe47e1a27f6ae460cf182c, type: 3}
   - assetID: builtin::HSP.DevUtils/sv
     asset: {fileID: -2124705421725058983, guid: df49b77668743fb41ad8028805e8e722, type: 3}
-  - assetID: builtin::HSP.DevUtils/skybox
-    asset: {fileID: 8900000, guid: dfbd7da3b669e154ba52e80cadb0ee69, type: 3}
-  - assetID: builtin::_TextMesh Pro/Sprites/EmojiOne
-    asset: {fileID: 2800000, guid: dffef66376be4fa480fb02b19edbe903, type: 3}
   - assetID: builtin::Resources/tank
     asset: {fileID: 1454477885105016247, guid: ff41ce40e17dd454cacb22f004c6bae7, type: 3}
   - assetID: builtin::Resources/PPP
-    asset: {fileID: 11400000, guid: ff73d90665a086142b2905f01db7174a, type: 2}
+    asset: {fileID: 6672436556516274257, guid: ff73d90665a086142b2905f01db7174a, type: 2}
   - assetID: builtin::HSP.DevUtils/axis_z
     asset: {fileID: 2100000, guid: ff3453c493c02574398e3c003865d4f5, type: 2}
   - assetID: builtin::Resources/Sprites/nodes/m_radial_out
     asset: {fileID: 21300000, guid: ff7cfc8dd1c732c4587a9eea5a1c54f6, type: 3}
+  - assetID: builtin::com.unity.2d.sprite/Editor/ObjectMenuCreation/DefaultAssets/Textures/v2/Capsule
+    asset: {fileID: -9095717837082945937, guid: 207ee8102dd4143d288186ef0be518ee, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/StdLib
+    asset: {fileID: 10900000, guid: 20aeae489f6be6a48aec52447f49169c, type: 3}
+  - assetID: builtin::com.unity.2d.sprite/LICENSE
+    asset: {fileID: 4900000, guid: 20ef7441e2dc7954c9ba3a12ffbac4d9, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Debug/Waveform
+    asset: {fileID: 4800000, guid: 3020ac7ece79a7f4eb789a236f8bd6c5, type: 3}
+  - assetID: builtin::com.unity.settings-manager/package
+    asset: {fileID: 8385607101436470782, guid: 3001f7491ac66e34a9694543d9f8b1ee, type: 3}
+  - assetID: builtin::com.unity.modules.subsystems/package
+    asset: {fileID: 8385607101436470782, guid: 30b312a167534621b316172253b08723, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_60
+    asset: {fileID: 2800000, guid: 404fa8def46b1c447817e1ebdaa7144e, type: 3}
+  - assetID: builtin::com.unity.modules.jsonserialize/package
+    asset: {fileID: 8385607101436470782, guid: 40bf3cec17fa0b49fe04443c8332d638, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_0
+    asset: {fileID: 2800000, guid: 50b54341495978843a6f85583ed4417d, type: 3}
+  - assetID: builtin::com.unity.ide.visualstudio/CHANGELOG
+    asset: {fileID: 4900000, guid: 6022bdd5b2896a54f94123b812705321, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise256px/LDR_LLL1_0
+    asset: {fileID: 2800000, guid: 6017f374382d64245a0a4aab668e6f38, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/MultiScaleVOUpsample
+    asset: {fileID: 7200000, guid: 600d6212b59bb40409d19d750b5fd1e9, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise256px/LDR_LLL1_7
+    asset: {fileID: 2800000, guid: 70d0a1182b29d6347ac70374c3593bba, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_56
+    asset: {fileID: 2800000, guid: 70f23eaf7d8ae9147aa542d20e93733b, type: 3}
+  - assetID: builtin::com.unity.modules.screencapture/package
+    asset: {fileID: 8385607101436470782, guid: 80beef77cb19e713c7c2d481b65ed485, type: 3}
+  - assetID: builtin::com.unity.modules.cloth/package
+    asset: {fileID: 8385607101436470782, guid: 906c12bc9cd95d3963c6d58f62522c78, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_62
+    asset: {fileID: 2800000, guid: a03c400b0e3959f428ee99dfc6cfc263, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise256px/LDR_LLL1_3
+    asset: {fileID: 2800000, guid: c072b653e98a06e40857d76ca8c7eecd, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/Distortion
+    asset: {fileID: 10900000, guid: c053166c69db5b943a5e70ec28113a24, type: 3}
+  - assetID: builtin::com.unity.modules.unitywebrequesttexture/package
+    asset: {fileID: 8385607101436470782, guid: d0e3ad91972c66f5238f5b9b7d5ae58a, type: 3}
+  - assetID: builtin::com.unity.2d.sprite/Editor/UI/SpriteEditor/SpriteFrameModuleInspector
+    asset: {fileID: 11400000, guid: d02b5650e6e0b4c45ab18d5a1d1fce97, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/ExposureHistogram
+    asset: {fileID: 10900000, guid: e02724c54d545ad439d7a5fa991ae924, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/Editor Resources/Textures/btn_AlignRight_Light
+    asset: {fileID: 2800000, guid: e05ace3bd15740cda0bad60d89092a5b, type: 3}
+  - assetID: builtin::com.unity.ugui/README
+    asset: {fileID: 4900000, guid: e0ae6629cc70b514889df37fccb76832, type: 3}
+  - assetID: builtin::com.unity.modules.ai/package
+    asset: {fileID: 8385607101436470782, guid: f0f13f2ab3d6d13cfc6e4656824bfca8, type: 3}
+  - assetID: builtin::com.unity.performance.profile-analyzer/LICENSE
+    asset: {fileID: 4900000, guid: 1122c571e35634d4aba967c658ce3720, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_61
+    asset: {fileID: 2800000, guid: 119591e0bb084e848835d237546b3882, type: 3}
+  - assetID: builtin::com.unity.2d.sprite/Editor/ObjectMenuCreation/DefaultAssets/Textures/v2/Square
+    asset: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/Texture3DLerp
+    asset: {fileID: 7200000, guid: 31e9175024adfd44aba2530ff9b77494, type: 3}
+  - assetID: builtin::com.unity.ugui/package
+    asset: {fileID: 8385607101436470782, guid: 319b8889f363f5947acf209c17a94149, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_34
+    asset: {fileID: 2800000, guid: 319b8e66db3faa4438cf6982e9c89b2f, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/SpectralLUTs/SpectralLut_BlueRed
+    asset: {fileID: 2800000, guid: 318cbcd94840f1d48aca4d86234dc2e7, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/DeferredFog
+    asset: {fileID: 4800000, guid: 4117fce9491711c4094d33a048e36e73, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/Editor Resources/Textures/btn_AlignMiddle
+    asset: {fileID: 2800000, guid: 41b96614b2e6494ba995ddcd252d11ae, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/TemporalAntialiasing
+    asset: {fileID: 4800000, guid: 51bcf79c50dc92e47ba87821b61100c3, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_9
+    asset: {fileID: 2800000, guid: 71583cfd8899717428d5b1a95fa39cda, type: 3}
+  - assetID: builtin::com.unity.2d.sprite/Editor/ObjectMenuCreation/DefaultAssets/Textures/9-Sliced
+    asset: {fileID: -5177388603050735206, guid: 71ebafeef3c03457483266a33ab2b270, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_43
+    asset: {fileID: 2800000, guid: 71bc1b6b66e8b784b972199b7e90204e, type: 3}
+  - assetID: builtin::com.unity.ext.nunit/package
+    asset: {fileID: 8385607101436470782, guid: 8143d3a8390f2c64685e3bc272bd9e90, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/FastApproximateAntialiasing
+    asset: {fileID: 10900000, guid: 817a98c8f709269458e50b65910ed4bc, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/Editor Resources/Textures/btn_AlignCenter
+    asset: {fileID: 2800000, guid: 81ed8c76d2bc4a4c95d092c98af4e58f, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/SubpixelMorphologicalAntialiasing
+    asset: {fileID: 4800000, guid: 81af42a93ade3dd46a9b583d4eec76d6, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_5
+    asset: {fileID: 2800000, guid: a1ae041906217ae44a774d4ca139af50, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/Dithering
+    asset: {fileID: 10900000, guid: b17c8e94a77f9a24d80deb0464a28ddd, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/Bloom
+    asset: {fileID: 4800000, guid: c1e1d3119c6fd4646aea0b4b74cacc1a, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_57
+    asset: {fileID: 2800000, guid: e138166e7a7c70f49943be7edda35d35, type: 3}
+  - assetID: builtin::com.unity.modules.assetbundle/package
+    asset: {fileID: 8385607101436470782, guid: e1ef8466c8fd01a549f10baa4d51fa17, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Debug/Vectorscope
+    asset: {fileID: 7200000, guid: e1efca7c36fd01840aae0dd10378de5c, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Sampling
+    asset: {fileID: 10900000, guid: f16ad9ee5ff13554b98568aa655d6bda, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_28
+    asset: {fileID: 2800000, guid: 02c0a84bd64c6f044954d8bde9b46ec8, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/CopyStdFromTexArray
+    asset: {fileID: 4800000, guid: 02d2da9bc88d25c4d878c1ed4e0b3854, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/Editor Resources/Textures/btn_AlignLeft_Light
+    asset: {fileID: 2800000, guid: 12736c98af174f91827a26b66d2b01b9, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/CHANGELOG
+    asset: {fileID: 4900000, guid: 22464cf7ab0243a6bf9c79851183b002, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/package
+    asset: {fileID: 8385607101436470782, guid: 220e9325710f4235a43492dd1ee4980d, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_24
+    asset: {fileID: 2800000, guid: 32c6a5f7143b86c44bd5cdee2ff3f8ad, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/SpectralLUTs/SpectralLut_PurpleGreen
+    asset: {fileID: 2800000, guid: 42183971d24cfe443a346e7ec6e83bbb, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/Lut3DBaker
+    asset: {fileID: 7200000, guid: 42496b74c071f5749950ca1abe33e945, type: 3}
+  - assetID: builtin::com.unity.modules.imgui/package
+    asset: {fileID: 8385607101436470782, guid: 42fe78c8fe682715a2cb531422e6ccb3, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_19
+    asset: {fileID: 2800000, guid: 729a3ae164bcb3b4380459386adcf331, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/Editor Resources/Textures/btn_AlignJustified
+    asset: {fileID: 2800000, guid: 92027f7f8cfc4feaa477da0dc38d3d46, type: 3}
+  - assetID: builtin::com.unity.modules.tilemap/package
+    asset: {fileID: 8385607101436470782, guid: 92a378669877c05c6071d0fed687bb95, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/Editor Resources/Textures/btn_AlignLeft
+    asset: {fileID: 2800000, guid: 9288066c33474b94b6ee5465f4df1cc0, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/LensDirt/LensDirt02
+    asset: {fileID: 2800000, guid: a2960ffde020f27409e070d92fb2e00b, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_42
+    asset: {fileID: 2800000, guid: b266511438fae724f9d3ce6bd26583e8, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/Editor Resources/Textures/btn_AlignMidLine
+    asset: {fileID: 2800000, guid: c2f7f6a88b4c4f20a53deb72f3d9144c, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_52
+    asset: {fileID: 2800000, guid: d2e8e90fac2e6a341a38e1c3963c218d, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_47
+    asset: {fileID: 2800000, guid: 1378a33cdd085d64c9da863d2484ff21, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/API/PSSL
+    asset: {fileID: 10900000, guid: 2399c8729aaf8344e8f9cf4721c5803a, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/SMAA/AreaTex
+    asset: {fileID: 2800000, guid: 73ec4ae984a0a0f44a2be737e41a6f2f, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_54
+    asset: {fileID: 2800000, guid: 936dea238abb0864ab3985a995e16a29, type: 3}
+  - assetID: builtin::com.unity.ide.visualstudio/ValidationConfig
+    asset: {fileID: 4900000, guid: a3f71b076c36a204a864f8c44142b3a9, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Debug/LightMeter
+    asset: {fileID: 4800000, guid: b34a29e523cb9d545881e193a079f2df, type: 3}
+  - assetID: builtin::com.unity.modules.terrainphysics/package
+    asset: {fileID: 8385607101436470782, guid: d3cbe921f7b3d9a3257e7c61a5761796, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/Editor Resources/Textures/SectionHeader_Light
+    asset: {fileID: 2800000, guid: e3b0f810fdea84e40ab4ba20f256f7e8, type: 3}
+  - assetID: builtin::com.unity.2d.sprite/README
+    asset: {fileID: 4900000, guid: e31c136ab48c1194184380e435f3936d, type: 3}
+  - assetID: builtin::com.unity.2d.sprite/Editor/ObjectMenuCreation/DefaultAssets/Textures/IsometricDiamond
+    asset: {fileID: 3625043607559282579, guid: 045b15ec09bba42448d89db77fa6f20a, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/AutoExposure
+    asset: {fileID: 7200000, guid: 34845e0ca016b7448842e965db5890a5, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/MultiScaleVORender
+    asset: {fileID: 7200000, guid: 34a460e8a2e66c243a9c12024e5a798d, type: 3}
+  - assetID: builtin::com.unity.2d.sprite/Editor/ObjectMenuCreation/DefaultAssets/Textures/CapsuleWithBorder
+    asset: {fileID: -9095717837082945937, guid: 34587324d412940a79d530020c957dc0, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/Texture2DLerp
+    asset: {fileID: 4800000, guid: 34a819c9e33402547a81619693adc8d5, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/Editor Resources/Textures/btn_AlignRight
+    asset: {fileID: 2800000, guid: 342a0f8aca7f4f0691338912faec0494, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/SubpixelMorphologicalAntialiasingBridge
+    asset: {fileID: 10900000, guid: 4484ba9c9f221894bad091ea59c4b9c0, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_39
+    asset: {fileID: 2800000, guid: 547dbd5f858c74047ba3f213e4408307, type: 3}
+  - assetID: builtin::com.unity.editorcoroutines/package
+    asset: {fileID: 8385607101436470782, guid: 6428ca6f30e71ee4dbea7e1d0787cb07, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/Editor Resources/Textures/btn_AlignFlush_Light
+    asset: {fileID: 2800000, guid: 64b9fad609434c489c32b1cdf2004a1c, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_18
+    asset: {fileID: 2800000, guid: 74aca53eb7273624baffc2bf5e5cc173, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/DiskKernels
+    asset: {fileID: 10900000, guid: a4811657005cf0a439cbc4a989ce9083, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_2
+    asset: {fileID: 2800000, guid: a469f920b21fc7c4fb5b950917ce2fb2, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/API/D3D11
+    asset: {fileID: 10900000, guid: d4e61b1eb5c3ac248add7bb738198560, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/MultiScaleVODownsample2
+    asset: {fileID: 7200000, guid: e4d3e4779e48a374f91d48d4c0aedb7b, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/ScalableAO
+    asset: {fileID: 10900000, guid: e4b5af8727f8b8e49aa97c2e8e5d1a3d, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_25
+    asset: {fileID: 2800000, guid: f4b8ab78b57749d4e96d36f6d8a395d0, type: 3}
+  - assetID: builtin::com.unity.editorcoroutines/CHANGELOG
+    asset: {fileID: 4900000, guid: f4e822a0337b6cf4aade8abffaf819a8, type: 3}
+  - assetID: builtin::com.unity.ext.nunit/CHANGELOG
+    asset: {fileID: 4900000, guid: f49bbe06ffa5ae24abe32abdab430c24, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/PackageConversionData
+    asset: {fileID: 4900000, guid: 05f5bfd584002f948982a1498890f9a9, type: 3}
+  - assetID: builtin::com.unity.modules.unitywebrequestassetbundle/package
+    asset: {fileID: 8385607101436470782, guid: 05f7f519769978b79b31d063a7fc6fa1, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_44
+    asset: {fileID: 2800000, guid: 15e54aa23a938444389469d53765d741, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_16
+    asset: {fileID: 2800000, guid: 153f7d6dfbe713d4884df0f1e243ba92, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_36
+    asset: {fileID: 2800000, guid: 351e95d0e20a54849bd4ce5f9b498934, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/Editor Resources/Textures/btn_AlignCenterGeo_Light
+    asset: {fileID: 2800000, guid: 35ff0937876540d3bd4b6a941df62a92, type: 3}
+  - assetID: builtin::com.unity.ide.rider/LICENSE
+    asset: {fileID: 4900000, guid: 5598b14661b5f4c43bed757f34b6d172, type: 3}
+  - assetID: builtin::com.unity.ide.visualstudio/package
+    asset: {fileID: 8385607101436470782, guid: 656f74f6edaa396458412b9e3903d8cd, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_58
+    asset: {fileID: 2800000, guid: 85a45a6d8b2ffb84987d2b028ecfb220, type: 3}
+  - assetID: builtin::com.unity.modules.imageconversion/package
+    asset: {fileID: 8385607101436470782, guid: 953fab16d15d5885b3600fcd6388b2ad, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise256px/LDR_LLL1_4
+    asset: {fileID: 2800000, guid: b52d5033b68309943a2386c270a90f44, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_8
+    asset: {fileID: 2800000, guid: c55042318a938344ab23cd7f09dd0076, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/ValidationExceptions
+    asset: {fileID: 4900000, guid: c5aeade3b36c0b246936762b3673d9bf, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_51
+    asset: {fileID: 2800000, guid: d5a51525b27e3ee4aadbeb39cbcf0750, type: 3}
+  - assetID: builtin::com.unity.feature.development/package
+    asset: {fileID: 8385607101436470782, guid: e5e1f94b4e224941bec175143967961f, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/Editor Resources/Textures/btn_AlignMiddle_Light
+    asset: {fileID: 2800000, guid: 066619c9c9c84f89acb1b48c11a7efe2, type: 3}
+  - assetID: builtin::com.unity.2d.sprite/Editor/ObjectMenuCreation/DefaultAssets/Textures/HexagonFlat-Top
+    asset: {fileID: 2747690628134850419, guid: 16037dbd798344f57a526d53d48f5ead, type: 3}
+  - assetID: builtin::com.unity.modules.unityanalytics/package
+    asset: {fileID: 8385607101436470782, guid: 26a4f29db434fd79025c91f6126382cc, type: 3}
+  - assetID: builtin::com.unity.settings-manager/README
+    asset: {fileID: 4900000, guid: 561e43493ab773746acefbe0f624795e, type: 3}
+  - assetID: builtin::com.unity.ide.rider/package
+    asset: {fileID: 8385607101436470782, guid: 66c95bb3c74257f41bae2622511dc02d, type: 3}
+  - assetID: builtin::com.unity.postprocessing/CHANGELOG
+    asset: {fileID: 4900000, guid: 76eb0b51417a8442180aa67edda7d01a, type: 3}
+  - assetID: builtin::com.unity.ide.rider/CHANGELOG
+    asset: {fileID: 4900000, guid: 8645aa9c3c74fb34ba9499e14fb332b5, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_38
+    asset: {fileID: 2800000, guid: 9660a4ca1ca8425408ac25c641932977, type: 3}
+  - assetID: builtin::com.unity.modules.video/package
+    asset: {fileID: 8385607101436470782, guid: 96d14b71b907bb52333b2886e665aba6, type: 3}
+  - assetID: builtin::com.unity.testtools.codecoverage/CHANGELOG
+    asset: {fileID: 4900000, guid: a6351153cf5e1af468cae5dbc72d1a04, type: 3}
+  - assetID: builtin::com.unity.2d.sprite/Editor/ObjectMenuCreation/DefaultAssets/Textures/v2/HexagonFlatTop
+    asset: {fileID: 2747690628134850419, guid: b670ab75dde984907b8570040daa08c5, type: 3}
+  - assetID: builtin::com.unity.test-framework/CHANGELOG
+    asset: {fileID: 4900000, guid: d691174143fd3774ba63d7c493633b99, type: 3}
+  - assetID: builtin::com.unity.test-framework/package
+    asset: {fileID: 8385607101436470782, guid: d6a2e6e4803de7b43baacdc355fc144d, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_14
+    asset: {fileID: 2800000, guid: f6439b54b28f3884eb67579dec0b6f21, type: 3}
+  - assetID: builtin::com.unity.postprocessing/package
+    asset: {fileID: 8385607101436470782, guid: 2705889b3a9580a47b334f039bfdcb00, type: 3}
+  - assetID: builtin::com.unity.settings-manager/LICENSE
+    asset: {fileID: 4900000, guid: 27264456a8bbc094d9479c5d5f9b0aa5, type: 3}
+  - assetID: builtin::com.unity.performance.profile-analyzer/CHANGELOG
+    asset: {fileID: 4900000, guid: 379ad77c12d5940bb8254d679e69d4ce, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_3
+    asset: {fileID: 2800000, guid: 373f9bf6b0841af4ebf26d25e4a3f4e2, type: 3}
+  - assetID: builtin::com.unity.settings-manager/CHANGELOG
+    asset: {fileID: 4900000, guid: 4774b2f29b63d2844915d86afff02b47, type: 3}
+  - assetID: builtin::com.unity.performance.profile-analyzer/package
+    asset: {fileID: 8385607101436470782, guid: 478e38cbe30254f8c868840b4e2f32e1, type: 3}
+  - assetID: builtin::com.unity.test-framework/CONTRIBUTING
+    asset: {fileID: 4900000, guid: 57d2ac5c7d5786e499d4794973fe0d4e, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/MultiScaleVO
+    asset: {fileID: 4800000, guid: 67f9497810829eb4791ec19e95781e51, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_11
+    asset: {fileID: 2800000, guid: 771903fe7b4674445829e52e91cff019, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_32
+    asset: {fileID: 2800000, guid: 87a5e40cc271ea648b583616f6ebe7fe, type: 3}
+  - assetID: builtin::com.unity.modules.particlesystem/package
+    asset: {fileID: 8385607101436470782, guid: 87d720faa37005c08600090e04d8c739, type: 3}
+  - assetID: builtin::com.unity.2d.sprite/Editor/ObjectMenuCreation/DefaultAssets/Textures/CircleMask
+    asset: {fileID: 8177471321811730583, guid: 87aaca0a643d54397ba969dab4fc8875, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/API/D3D9
+    asset: {fileID: 10900000, guid: a741cbbb27e6ad747a354440a9132a66, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/Editor Resources/Gizmos/TMP - Dropdown
+      Icon
+    asset: {fileID: 2800000, guid: a7ec9e7ad8b847b7ae4510af83c5d868, type: 3}
+  - assetID: builtin::com.unity.2d.sprite/CHANGELOG
+    asset: {fileID: 4900000, guid: b7007d815829e7644bb81d1f8004a340, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_21
+    asset: {fileID: 2800000, guid: b7f000750830ddb4bbc80065b9314ce9, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_33
+    asset: {fileID: 2800000, guid: b71bb466b71fd13449dd736f63caeb67, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/Editor Resources/Textures/btn_AlignCenterGeo
+    asset: {fileID: 2800000, guid: c76700ea0062413d9f69409b4e9e151b, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/ACES
+    asset: {fileID: 10900000, guid: d7de89b714449b04391f3a2fb53a9022, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/FinalPass
+    asset: {fileID: 4800000, guid: f75014305794b3948a3c6d5ccd550e05, type: 3}
+  - assetID: builtin::com.unity.modules.physics2d/package
+    asset: {fileID: 8385607101436470782, guid: f7a8357347c80dc69c08d0b1a05e2122, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Debug/Histogram
+    asset: {fileID: 4800000, guid: f7ea35cfb33fcad4ab8f2429ec103bef, type: 3}
+  - assetID: builtin::com.unity.modules.vr/package
+    asset: {fileID: 8385607101436470782, guid: 18a4fadfef534684d5af39ca8dc48fe9, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/Editor Resources/Textures/btn_AlignBaseLine_Light
+    asset: {fileID: 2800000, guid: 18775b51e3bd42299fd30bd036ea982f, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/API/Switch
+    asset: {fileID: 10900000, guid: 18095202690616846a484e633db69455, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/API/Metal
+    asset: {fileID: 10900000, guid: 38502e5cb7782364ba3db59850a9a8ad, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/Uber
+    asset: {fileID: 4800000, guid: 382151503e2a43a4ebb7366d1632731d, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/LensDirt/LensDirt01
+    asset: {fileID: 2800000, guid: 3884f7a2d04ffe8409ad9200b275896f, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/Editor Resources/Textures/btn_AlignTop
+    asset: {fileID: 2800000, guid: 48d034c499ee4697af9dd6e327110249, type: 3}
+  - assetID: builtin::com.unity.2d.sprite/Editor/ObjectMenuCreation/DefaultAssets/Textures/Square
+    asset: {fileID: 7482667652216324306, guid: 48e93eef0688c4a259cb0eddcd8661f7, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/Editor Resources/Textures/btn_AlignBottom_Light
+    asset: {fileID: 2800000, guid: 585b70cb75dd43efbfead809c30a1731, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_13
+    asset: {fileID: 2800000, guid: 68613e6a221be1a4b9f31d7fa1c2d1bf, type: 3}
+  - assetID: builtin::com.unity.ide.visualstudio/ThirdPartyNotices
+    asset: {fileID: 4900000, guid: 7809f42f64c877f4b90ac233e5ec2372, type: 3}
+  - assetID: builtin::com.unity.ide.visualstudio/ValidationExceptions
+    asset: {fileID: 4900000, guid: 788fbcfc0abc6c54b9504cfee3176c22, type: 3}
+  - assetID: builtin::com.unity.2d.sprite/Editor/ObjectMenuCreation/DefaultAssets/Textures/v2/9Sliced
+    asset: {fileID: -5177388603050735206, guid: 8884154dfe85442a3a3578be807dbcdf, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_12
+    asset: {fileID: 2800000, guid: 980acadb960f8424c94307ec0e585b4e, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/xRLib
+    asset: {fileID: 10900000, guid: 981a66a12fced7a45b3c106b67167ab5, type: 3}
+  - assetID: builtin::com.unity.2d.sprite/Editor/ObjectMenuCreation/DefaultAssets/Textures/v2/Circle
+    asset: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
+  - assetID: builtin::com.unity.modules.wind/package
+    asset: {fileID: 8385607101436470782, guid: b83f06ac0c0696e9563230865ca72b81, type: 3}
+  - assetID: builtin::com.unity.ugui/CHANGELOG
+    asset: {fileID: 4900000, guid: c851bee4305bddf438cc6ffc515991ce, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_50
+    asset: {fileID: 2800000, guid: d8c290e38ff0425409d0ae6a98c95e41, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/PostProcessResources
+    asset: {fileID: 11400000, guid: d82512f9c8e5d4a4d938b575d47f88d4, type: 2}
+  - assetID: builtin::com.unity.modules.umbra/package
+    asset: {fileID: 8385607101436470782, guid: d85e5eeaf8f135aeaaebdc8aa3cff6c3, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/CopyStdFromDoubleWide
+    asset: {fileID: 4800000, guid: e8ce9961912f3214586fe8709b9012c1, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_26
+    asset: {fileID: 2800000, guid: 09f6c01f98a3ded4daf1afc52a3c260f, type: 3}
+  - assetID: builtin::com.unity.postprocessing/LICENSE
+    asset: {fileID: 4900000, guid: 19d205ceab90d42038ad1d376affc356, type: 3}
+  - assetID: builtin::com.unity.2d.sprite/Editor/ObjectMenuCreation/DefaultAssets/Textures/v2/IsometricDiamond
+    asset: {fileID: 3625043607559282579, guid: 19fb86013d8c24d6cb8410c0aadf30fa, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/Editor Resources/Textures/btn_AlignCapLine_Light
+    asset: {fileID: 2800000, guid: 49679f302ac6408697f6b9314a38985c, type: 3}
+  - assetID: builtin::com.unity.performance.profile-analyzer/Editor/ProfileAnalyzerShader
+    asset: {fileID: 4800000, guid: 493b79ea9c9be44ed8b702014d3ac49c, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/Editor Resources/Textures/btn_AlignFlush
+    asset: {fileID: 2800000, guid: 691475c57a824010be0c6f474caeb7e1, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/LensDirt/LensDirt00
+    asset: {fileID: 2800000, guid: 69e847bbff1cf5449a4ee0bbd045dbc9, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_6
+    asset: {fileID: 2800000, guid: 79b86f3419b87f3429164a956da8cfab, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise256px/LDR_LLL1_6
+    asset: {fileID: 2800000, guid: 999434725cbc2be4eb54043b36efd4a8, type: 3}
+  - assetID: builtin::com.unity.2d.sprite/Editor/ObjectMenuCreation/DefaultAssets/Textures/HexagonFlat-TopWithBorder
+    asset: {fileID: 2747690628134850419, guid: a9716c16a44a94eed9b5c90fbf4d9bdd, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_45
+    asset: {fileID: 2800000, guid: b9960364038cbfa4aa49d7b2032d3110, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Debug/Overlays
+    asset: {fileID: 4800000, guid: b958ad1c92bd3d64c9e61318b8681dab, type: 3}
+  - assetID: builtin::com.unity.ide.vscode/LICENSE
+    asset: {fileID: 4900000, guid: c9aabac5924106d4790d7b3a924ca34d, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_53
+    asset: {fileID: 2800000, guid: c94b57b5a32a22d43ade66e09f6a4bd2, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/API/PSP2
+    asset: {fileID: 10900000, guid: d916afaf5049bb24989e8e823280e99c, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/SMAA/SearchTex
+    asset: {fileID: 2800000, guid: d99701099481a2f489610e977df6dcbc, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_59
+    asset: {fileID: 2800000, guid: d96974690c77f50489eb60ec84bd8dac, type: 3}
+  - assetID: builtin::com.unity.modules.audio/package
+    asset: {fileID: 8385607101436470782, guid: e9df95f53f1c1d0c9199e235d6c42b50, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/ScreenSpaceReflections
+    asset: {fileID: 4800000, guid: f997a3dc9254c44459323cced085150c, type: 3}
+  - assetID: builtin::com.unity.ext.nunit/LICENSE
+    asset: {fileID: 4900000, guid: f91a00d2dca52b843b2d50ccf750737d, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_35
+    asset: {fileID: 2800000, guid: 0a79c155edf9b2d429d4736abee5acdb, type: 3}
+  - assetID: builtin::com.unity.modules.physics/package
+    asset: {fileID: 8385607101436470782, guid: 1a4266815e998967becf686f9c71f0a6, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_40
+    asset: {fileID: 2800000, guid: 1a9ce5640cde5934aae0022f020464a6, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise256px/LDR_LLL1_2
+    asset: {fileID: 2800000, guid: 1abfe0e165ca1e9428b455ffc9a2d9ef, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_7
+    asset: {fileID: 2800000, guid: 3ac02e7e783571c468f9c086d2384ba7, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_63
+    asset: {fileID: 2800000, guid: 4a11d65ce13d5f542a0ff136cc2f3fba, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/DepthOfField
+    asset: {fileID: 10900000, guid: 4ae2d18891fcdd2408b0c1f3f2038c62, type: 3}
+  - assetID: builtin::com.unity.2d.sprite/Editor/ObjectMenuCreation/DefaultAssets/Textures/CircleWithBorder
+    asset: {fileID: -2413806693520163455, guid: 4adeaf2d2b1c7417e89f026626d8264f, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/SpectralLUTs/SpectralLut_GreenPurple
+    asset: {fileID: 2800000, guid: 4a8f054acfbd08043a931cd22760758d, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/DiscardAlpha
+    asset: {fileID: 4800000, guid: 5ab0816423f0dfe45841cab3b05ec9ef, type: 3}
+  - assetID: builtin::com.unity.2d.sprite/Editor/ObjectMenuCreation/DefaultAssets/Textures/v2/HexagonPointedTop
+    asset: {fileID: -2135585597343286014, guid: 5aa8b770bc43046bc8d993d0d5b7f4a5, type: 3}
+  - assetID: builtin::com.unity.modules.vehicles/package
+    asset: {fileID: 8385607101436470782, guid: 6afb166a156df2d20433d981f4bb2832, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/API/OpenGL
+    asset: {fileID: 10900000, guid: 6a0c0086cde60e74e9ad1fce57eab9f1, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/Editor Resources/Textures/btn_AlignCenter_Light
+    asset: {fileID: 2800000, guid: 6ace62d30f494c948b71d5594afce11d, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/Lut2DBaker
+    asset: {fileID: 4800000, guid: 7ad194cbe7d006f4bace915156972026, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/LensDirt/LensDirt03
+    asset: {fileID: 2800000, guid: 7a051dbda2d7bc447bee412427cd311e, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_29
+    asset: {fileID: 2800000, guid: aa80dc44aa4fe4c43bb9d51d90cf2958, type: 3}
+  - assetID: builtin::com.unity.testtools.codecoverage/package
+    asset: {fileID: 8385607101436470782, guid: ba7d60725b0ec604698819352642be89, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/Editor Resources/Textures/btn_AlignBottom
+    asset: {fileID: 2800000, guid: ca51b19024094d1b87f3e07edb0a75fb, type: 3}
+  - assetID: builtin::com.unity.modules.uielementsnative/package
+    asset: {fileID: 8385607101436470782, guid: da7579d20d3b64d1eb70eb84ca9a401f, type: 3}
+  - assetID: builtin::com.unity.modules.unitywebrequestwww/package
+    asset: {fileID: 8385607101436470782, guid: fa27413e9edb06a6058d6c894eca0338, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/Editor Resources/Textures/btn_AlignJustified_Light
+    asset: {fileID: 2800000, guid: fa6bd40a216346b783a4cce741d277a5, type: 3}
+  - assetID: builtin::com.unity.modules.unitywebrequestaudio/package
+    asset: {fileID: 8385607101436470782, guid: 4b518b37798c97b0f860962cbf615533, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/CopyStd
+    asset: {fileID: 4800000, guid: 4bf4cff0d0bac3d43894e2e8839feb40, type: 3}
+  - assetID: builtin::com.unity.2d.sprite/Editor/ObjectMenuCreation/DefaultAssets/Textures/HexagonPointed-TopWithBorder
+    asset: {fileID: -2135585597343286014, guid: 4b2a04fdbe0ef4d8da8f90eaca817cd1, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Editor/CurveGrid
+    asset: {fileID: 4800000, guid: 5bb6ef6f3e1b20348b4fdb01e4c404e2, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_31
+    asset: {fileID: 2800000, guid: 6b0a189df0bd4d5448eaefb4e673ace8, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/Editor Resources/Textures/btn_AlignBaseLine
+    asset: {fileID: 2800000, guid: 8bc445bb79654bf496c92d0407840a92, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/Editor Resources/Shaders/TMP_SDF_SSD
+    asset: {fileID: 10900000, guid: abe6991365a27d341a10580f3b7c0f44, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/Editor Resources/Textures/btn_AlignMidline_Light
+    asset: {fileID: 2800000, guid: bb42b2d967d6427983c901a4ffc8ecd9, type: 3}
+  - assetID: builtin::com.unity.2d.sprite/Editor/ObjectMenuCreation/DefaultAssets/Textures/SquareWithBorder
+    asset: {fileID: 7482667652216324306, guid: db750325989564987a34393247d883b4, type: 3}
+  - assetID: builtin::com.unity.2d.sprite/Editor/ObjectMenuCreation/DefaultAssets/Textures/Circle
+    asset: {fileID: -2413806693520163455, guid: ebe73ca9363db456bacf42c025bb4847, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/Editor Resources/Textures/SectionHeader_Dark
+    asset: {fileID: 2800000, guid: fb5730e24283d0c489e5c7d0bee023d9, type: 3}
+  - assetID: builtin::com.unity.modules.xr/package
+    asset: {fileID: 8385607101436470782, guid: 2c814623cb42764d304be0c5ddd03ceb, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/MotionBlur
+    asset: {fileID: 4800000, guid: 2c459b89a7c8b1a4fbefe0d81341651c, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/Editor Resources/Shaders/TMP_Properties
+    asset: {fileID: 10900000, guid: 3c6c403084eacec478a1129ce20061ea, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_1
+    asset: {fileID: 2800000, guid: 3c2f1fb7e4b66e74191b7c328ada52d9, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/MultiScaleVODownsample1
+    asset: {fileID: 7200000, guid: 4c63bc487e6c29a4a99f85a6c47b292b, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/Fog
+    asset: {fileID: 10900000, guid: 6c5a4cd8abc6e204985ac645b8dad78e, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/Editor Resources/Shaders/TMP_SDF Internal
+      Editor
+    asset: {fileID: 4800000, guid: 9c442dc870b456e48b615cd8add0e9ef, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise256px/LDR_LLL1_5
+    asset: {fileID: 2800000, guid: acde5141d5f4f7a4188394bd52c4dc38, type: 3}
+  - assetID: builtin::com.unity.2d.sprite/Editor/ObjectMenuCreation/DefaultAssets/Textures/9-SlicedWithBorder
+    asset: {fileID: -5177388603050735206, guid: cc35afd292fc349128b36a291fb3a165, type: 3}
+  - assetID: builtin::com.unity.modules.director/package
+    asset: {fileID: 8385607101436470782, guid: ec02776fe29df900b897106d61977735, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/Editor Resources/Gizmos/TMP - Sprite
+      Asset Icon
+    asset: {fileID: 2800000, guid: ec7c645d93308c04d8840982af12101e, type: 3}
+  - assetID: builtin::com.unity.ide.vscode/ValidationExceptions
+    asset: {fileID: 4900000, guid: fc368c32d6432ff4bb374d520000749c, type: 3}
+  - assetID: builtin::com.unity.ide.vscode/CONTRIBUTING
+    asset: {fileID: 4900000, guid: fcb9be00baf924c4183fc0313e6185c5, type: 3}
+  - assetID: builtin::com.unity.performance.profile-analyzer/README
+    asset: {fileID: 4900000, guid: 0d920e84785e4472aab610f3f203b389, type: 3}
+  - assetID: builtin::com.unity.2d.sprite/Editor/ObjectMenuCreation/DefaultAssets/Textures/IsometricDiamondWithBorder
+    asset: {fileID: 3625043607559282579, guid: 0d267bc78a0864eb48358689b29ed20a, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/GrainBaker
+    asset: {fileID: 4800000, guid: 0d8afcb51cc9f0349a6d190da929b838, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/Editor Resources/Textures/btn_AlignCapLine
+    asset: {fileID: 2800000, guid: 0d9a36012a224080966c7b55896aa0f9, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/LICENSE
+    asset: {fileID: 4900000, guid: 0d2d0f36e67d4518a07df76235e91f9a, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_37
+    asset: {fileID: 2800000, guid: 1d6958e30e40a254dbe5a54c573eeb3c, type: 3}
+  - assetID: builtin::com.unity.ide.vscode/CHANGELOG
+    asset: {fileID: 4900000, guid: 4ddcdc3816429494a8bea67e973875f7, type: 3}
+  - assetID: builtin::com.unity.ugui/LICENSE
+    asset: {fileID: 4900000, guid: 4d3d51749e989f747b2674e0b4d9b3d7, type: 3}
+  - assetID: builtin::com.unity.ext.nunit/README
+    asset: {fileID: 4900000, guid: 5da62a0c1c5218c4aa16b74546a7822d, type: 3}
+  - assetID: builtin::com.unity.modules.terrain/package
+    asset: {fileID: 8385607101436470782, guid: 6d56244f8c39a851975d3c0bd432c66f, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/GaussianDownsample
+    asset: {fileID: 7200000, guid: 6dba4103d23a7904fbc49099355aff3e, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_20
+    asset: {fileID: 2800000, guid: 6dda07f1420a968449cf4c6620c44d9f, type: 3}
+  - assetID: builtin::com.unity.2d.sprite/package
+    asset: {fileID: 8385607101436470782, guid: 7dc5f1e5d04ac8549ac21802071e983b, type: 3}
+  - assetID: builtin::com.unity.testtools.codecoverage/Third Party Notices
+    asset: {fileID: 4900000, guid: 9d40ee9d855163e44bc925c1480d8731, type: 3}
+  - assetID: builtin::com.unity.2d.sprite/Editor/UI/SpriteEditor/PolygonChangeShapeWindow
+    asset: {fileID: 11400000, guid: ad9baf3ac3e35c948bf6a50e91e91473, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_27
+    asset: {fileID: 2800000, guid: bdd06fb88ef36ed4a85dd506352c2d80, type: 3}
+  - assetID: builtin::com.unity.modules.androidjni/package
+    asset: {fileID: 8385607101436470782, guid: bd1af0a6633ee94ae21c7d1d702cdc12, type: 3}
+  - assetID: builtin::com.unity.2d.sprite/Editor/ObjectMenuCreation/DefaultAssets/Textures/Capsule
+    asset: {fileID: -9095717837082945937, guid: bd3cb4af8406d4436a2ae8c2aafe1f8d, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_41
+    asset: {fileID: 2800000, guid: cd9006dc442cc244e89b3f492384d46a, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/API/XboxOne
+    asset: {fileID: 10900000, guid: cd7292cede5bbe44cb888e1e40efac1e, type: 3}
+  - assetID: builtin::com.unity.ide.visualstudio/CONTRIBUTING
+    asset: {fileID: 4900000, guid: cd78ce5b75b8be84d8b94cd99903161f, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Builtins/Copy
+    asset: {fileID: 4800000, guid: cdbdb71de5f9c454b980f6d0e87f0afb, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/Editor Resources/Textures/btn_AlignTop_Light
+    asset: {fileID: 2800000, guid: ed041e68439749a69d0efa0e3d896c2e, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/API/D3D12
+    asset: {fileID: 10900000, guid: ed6416461734f3a4d97b2475252d5f6c, type: 3}
+  - assetID: builtin::com.unity.2d.sprite/Editor/UI/SpriteEditor/SpriteEditor
+    asset: {fileID: 11400000, guid: fd3d7c275a0958b4fa0f26a0ee9b8481, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/PackageConversionData_Assets
+    asset: {fileID: 4900000, guid: 0e0afa652c0031c48896a97b424d027b, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_15
+    asset: {fileID: 2800000, guid: 2ee161d8945169243b5698fec114e1b7, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/Editor Resources/Gizmos/TMP - Input Field
+      Icon
+    asset: {fileID: 2800000, guid: 3ee40aa79cd242a5b53b0b0ca4f13f0f, type: 3}
+  - assetID: builtin::com.unity.test-framework/LICENSE
+    asset: {fileID: 4900000, guid: 3ec7596410385054a9e0bc90377fbe63, type: 3}
+  - assetID: builtin::com.unity.ide.rider/CONTRIBUTING
+    asset: {fileID: 4900000, guid: 5e83f8baac96eaa47bdd9ca781cd2002, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_55
+    asset: {fileID: 2800000, guid: 5e542d0126a2c7848b66bffc428905fd, type: 3}
+  - assetID: builtin::com.unity.modules.animation/package
+    asset: {fileID: 8385607101436470782, guid: 7ef8348b8ea834d7e1bc214b07f7fb87, type: 3}
+  - assetID: builtin::com.unity.testtools.codecoverage/README
+    asset: {fileID: 4900000, guid: 7e9cc6a8fbcda654f9b318a716a79b57, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_46
+    asset: {fileID: 2800000, guid: 8ecbbcae4cc747a4abbc4adce795d25e, type: 3}
+  - assetID: builtin::com.unity.settings-manager/Content/Options
+    asset: {fileID: 2800000, guid: 9eff477e4332346818c96745043dae9e, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Editor/Trackball
+    asset: {fileID: 4800000, guid: de7f3ac52268a194383c7d62c2a343c1, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/Editor Resources/Gizmos/TMP - Font Asset
+      Icon
+    asset: {fileID: 2800000, guid: ee148e281f3c41c5b4ff5f8a5afe5a6c, type: 3}
+  - assetID: builtin::com.unity.2d.sprite/Editor/ObjectMenuCreation/DefaultAssets/Textures/HexagonPointed-Top
+    asset: {fileID: -2135585597343286014, guid: eed45a33cd08446c8b88325cf82fc52f, type: 3}
+  - assetID: builtin::com.unity.editorcoroutines/README
+    asset: {fileID: 4900000, guid: ee9ad019452796e46945e4870e3717e4, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Editor/ConvertToLog
+    asset: {fileID: 4800000, guid: fe144c7e314047f4bb779d555c5405ac, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_30
+    asset: {fileID: 2800000, guid: 0fa10b21877c61b4db40ba5708815f81, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise256px/LDR_LLL1_1
+    asset: {fileID: 2800000, guid: 0f8fa14b3731cda4e947062e734d5e1e, type: 3}
+  - assetID: builtin::com.unity.ide.visualstudio/LICENSE
+    asset: {fileID: 4900000, guid: 1fe9e6e1ae93cf64bbdfbd29300752e1, type: 3}
+  - assetID: builtin::com.unity.textmeshpro/Editor Resources/Gizmos/TMP - Text Component
+      Icon
+    asset: {fileID: 2800000, guid: 2fd6421f253b4ef1a19526541f9ffc0c, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_49
+    asset: {fileID: 2800000, guid: 3f7c3687170b90e4a8d2ee6b142670f4, type: 3}
+  - assetID: builtin::com.unity.modules.unitywebrequest/package
+    asset: {fileID: 8385607101436470782, guid: 3fdd83b151eb8d25c5e2f82fc39dcb04, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/LUTs/NeutralLdrLut
+    asset: {fileID: 2800000, guid: 4f98e9c96c8a48541b5eb704e92d99b8, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/API/Vulkan
+    asset: {fileID: 10900000, guid: 4f2b019548c499944923c5da221047a6, type: 3}
+  - assetID: builtin::com.unity.modules.uielements/package
+    asset: {fileID: 8385607101436470782, guid: 4f0f9b9f3ed97ad2b9ba8f1a8e4666c2, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Gizmos/PostProcessLayer
+    asset: {fileID: 2800000, guid: 5f51e0b22aa8cb84b9f422576ce87ff9, type: 3}
+  - assetID: builtin::com.unity.feature.development/CHANGELOG
+    asset: {fileID: 4900000, guid: 5f2f5f9622f1e424c8e6cda71ab1c9e8, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_4
+    asset: {fileID: 2800000, guid: 6fa5cf178eaaa5f42b820f636bb6e0bd, type: 3}
+  - assetID: builtin::com.unity.editorcoroutines/LICENSE
+    asset: {fileID: 4900000, guid: 7fd8423f910d2394b8580e2705aa247a, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Shaders/Colors
+    asset: {fileID: 10900000, guid: 7fa986a4042ff154093d3772d2dc4fc9, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_10
+    asset: {fileID: 2800000, guid: afe1e502240079342a0a980484b6da8b, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_48
+    asset: {fileID: 2800000, guid: aff59c63d25d43f4c938f248837c30fb, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_17
+    asset: {fileID: 2800000, guid: bf95b6fdc179b0e4f890c841406193fc, type: 3}
+  - assetID: builtin::com.unity.modules.ui/package
+    asset: {fileID: 8385607101436470782, guid: bfd567a3d1631a761bca9e99fa53d86d, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_23
+    asset: {fileID: 2800000, guid: bfe953600e8fb1849a804ee08ace7b4c, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/BlueNoise64px/LDR_LLL1_22
+    asset: {fileID: 2800000, guid: df01d03f056c6f445b4b8a0ae054207c, type: 3}
+  - assetID: builtin::com.unity.testtools.codecoverage/LICENSE
+    asset: {fileID: 4900000, guid: df3aedd5e490bca44b693f5da1e4d2d5, type: 3}
+  - assetID: builtin::com.unity.ide.vscode/package
+    asset: {fileID: 8385607101436470782, guid: ffc6271f08270b64ca0aae9c49235d81, type: 3}
+  - assetID: builtin::com.unity.postprocessing/PostProcessing/Textures/SpectralLUTs/SpectralLut_RedBlue
+    asset: {fileID: 2800000, guid: ff5f3317371838d4fa16ac6c2acf2040, type: 3}
+  assetSources:
+  - {fileID: 911430599}
+  - {fileID: 911430598}
+  - {fileID: 911430597}
+  <AutoUpdate>k__BackingField: 0
 --- !u!4 &911430596
 Transform:
   m_ObjectHideFlags: 0
@@ -1028,6 +1595,47 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &911430597
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 911430593}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1cec510eb5c825340a5928c831628bc9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <ConstrainPath>k__BackingField: Packages/
+  <AssetPrefix>k__BackingField: 'builtin::'
+--- !u!114 &911430598
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 911430593}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1cec510eb5c825340a5928c831628bc9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <ConstrainPath>k__BackingField: Assets/
+  <AssetPrefix>k__BackingField: 'builtin::'
+--- !u!114 &911430599
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 911430593}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ec2c2bbae2114f4cadb60e52184284e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <AssetPrefix>k__BackingField: 'builtin::'
 --- !u!1 &1057024939
 GameObject:
   m_ObjectHideFlags: 0

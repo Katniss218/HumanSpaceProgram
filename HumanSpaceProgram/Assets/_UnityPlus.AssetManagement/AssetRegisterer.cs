@@ -4,8 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+
 #if UNITY_EDITOR
 using UnityEditor;
+using UnityEditor.SceneManagement;
 #endif
 
 namespace UnityPlus.AssetManagement
@@ -36,6 +38,32 @@ namespace UnityPlus.AssetManagement
             EditorGUI.EndProperty();
         }
     }
+
+    [CustomEditor( typeof( AssetRegisterer ) )]
+    public class AssetRegistererEditor : Editor
+    {
+        public override void OnInspectorGUI()
+        {
+            AssetRegisterer assetRegisterer = (AssetRegisterer)target;
+
+            // Display the default inspector GUI elements
+            DrawDefaultInspector();
+
+            // Add a button to call a method
+            if( GUILayout.Button( "Refresh Assets" ) )
+            {
+                assetRegisterer.UpdateEntries();
+                EditorSceneManager.MarkSceneDirty( assetRegisterer.gameObject.scene );
+            }
+
+            // Add a button to call a method
+            if( GUILayout.Button( "Clear Assets" ) )
+            {
+                assetRegisterer.ClearEntries();
+                EditorSceneManager.MarkSceneDirty( assetRegisterer.gameObject.scene );
+            }
+        }
+    }
 #endif
 
     /// <summary>
@@ -59,22 +87,22 @@ namespace UnityPlus.AssetManagement
             /// The asset to register.
             /// </summary>
             public UnityEngine.Object asset;
+
+            public Entry( string assetId, UnityEngine.Object asset )
+            {
+                this.assetID = assetId;
+                this.asset = asset;
+            }
         }
 
         [SerializeField]
         private Entry[] _assetsToRegister;
 
-        public void TrySetAssetsToRegister( Entry[] assetsToRegister )
-        {
-#if UNITY_EDITOR
-            if( !Application.isPlaying )
-            {
-                _assetsToRegister = assetsToRegister;
-                return;
-            }
-#endif
-            Debug.LogWarning( $"{nameof( AssetRegisterer )} - Tried to set `{nameof( _assetsToRegister )}` while in play mode." );
-        }
+        [SerializeField]
+        public AssetSource[] assetSources;
+
+        [field: SerializeField]
+        public bool AutoUpdate { get; set; } = false;
 
         void Awake()
         {
@@ -101,5 +129,57 @@ namespace UnityPlus.AssetManagement
             // Allows to garbage collect them later, if unloaded from the registry.
             _assetsToRegister = null;
         }
+
+#if UNITY_EDITOR
+
+        internal void UpdateEntries()
+        {
+            if( assetSources == null )
+            {
+                _assetsToRegister = null;
+                return;
+            }
+
+            List<Entry> entries = new();
+
+            foreach( var assetSource in assetSources )
+            {
+                if( assetSource == null )
+                    continue;
+
+                var e = assetSource.GetEntries();
+
+                foreach( var entry in e )
+                {
+                    if( entries.Any( e => e.assetID == entry.assetID ) )
+                        continue;
+
+                    entries.Add(entry);
+                }
+            }
+
+            _assetsToRegister = entries.ToArray();
+        }
+
+        internal void ClearEntries()
+        {
+            _assetsToRegister = null;
+        }
+
+        void OnValidate()
+        {
+            if( !AutoUpdate )
+            {
+                return;
+            }
+
+            if( Application.isPlaying )
+            {
+                return;
+            }
+
+            UpdateEntries();
+        }
+#endif
     }
 }
