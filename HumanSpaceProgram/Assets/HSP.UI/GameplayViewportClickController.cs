@@ -1,4 +1,4 @@
-﻿using HSP.Cameras;
+﻿using HSP.GameplayScene.Cameras;
 using HSP.Core;
 using HSP.Core.Components;
 using HSP.Core.Serialization;
@@ -39,7 +39,7 @@ namespace HSP.UI
             if( UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() )
                 return false;
 
-            if( !Physics.Raycast( GameplayCameraController.MainCamera.ScreenPointToRay( HierarchicalInputManager.CurrentState.MousePosition ), out RaycastHit hit ) )
+            if( !Physics.Raycast( SceneCamera.Camera.ScreenPointToRay( HierarchicalInputManager.CurrentState.MousePosition ), out RaycastHit hit ) )
             {
                 return false;
             }

@@ -126,7 +126,7 @@ namespace HSP.DesignScene.Tools
                     c.direction = 2;
                     c.center = new Vector3( 0, 0, c.height / 2 );
                 } );
-            _handles.RaycastCamera = GameObject.Find( "UI Camera" ).GetComponent<Camera>();
+            _handles.RaycastCamera = SceneCamera.Camera.GetComponent<Camera>();
         }
     }
 }

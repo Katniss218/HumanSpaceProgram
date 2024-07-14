@@ -108,7 +108,7 @@ namespace UnityPlus.Rendering.ContactShadows
                 return;
             }
 
-            _shadowRT = RenderTexture.GetTemporary( _camera.pixelWidth, _camera.pixelHeight, 0, RenderTextureFormat.R8 );
+            _shadowRT = RenderTexture.GetTemporary( _camera.pixelWidth, _camera.pixelHeight, 0, RenderTextureFormat.ARGB32 );
 
             _material.SetVector( Shader.PropertyToID( "_LightDir" ), this.transform.InverseTransformDirection( -this._light.transform.forward ) );
 

@@ -3,7 +3,8 @@ Shader "Hidden/Atmosphere"
 {
 	Properties
 	{
-		_Texture("Texture", 2D) = "white" {}
+		_texgsfs("Combined Color Texture From Main Cameras", 2D) = "white" {}
+		_DepthBuffer("Combined Depth Buffer From Main Cameras", 2D) = "white" {}
 		_Center("Center", Vector) = (0, 0, 0)
 		_SunDirection("SunDirection", Vector) = (0, 0, 0)
 			// _ScatteringCoefficients("ScatteringCoefficients", Vector) = (0.213244481466, 0.648883128925, 1.36602691073) // 700, 530, 440, mul 2
@@ -33,7 +34,7 @@ Shader "Hidden/Atmosphere"
 				#include "../../CelestialBodies/AtmosphereRes/Math.cginc"
 
 				sampler2D _texgsfs;
-				sampler2D _CameraDepthTexture;
+				sampler2D _DepthBuffer;
 				float3 _Center;
 				float3 _SunDirection;
 				float3 _ScatteringCoefficients;
@@ -152,34 +153,34 @@ Shader "Hidden/Atmosphere"
 					return originalColor * originalColorTransmittance + inScatteredLight;
 				}
 
-				fixed4 calculateSphere(v2f i)
-				{
-					float sceneDepthNonLinear = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv);
-					float sceneDepth = LinearEyeDepth(sceneDepthNonLinear) * length(i.viewVector);
+				// fixed4 calculateSphere(v2f i)
+				// {
+				// 	float sceneDepthNonLinear = SAMPLE_DEPTH_TEXTURE(_DepthBuffer, i.uv);
+				// 	float sceneDepth = LinearEyeDepth(sceneDepthNonLinear) * length(i.viewVector);
 
-					float3 rayOrigin = _WorldSpaceCameraPos;
-					float3 rayDir = normalize(i.viewVector);
+				// 	float3 rayOrigin = _WorldSpaceCameraPos;
+				// 	float3 rayDir = normalize(i.viewVector);
 
-					float2 hitInfo = raySphere(rayOrigin, rayDir, _Center, _MaxRadius);
-					float distToSurface = sceneDepth;
+				// 	float2 hitInfo = raySphere(rayOrigin, rayDir, _Center, _MaxRadius);
+				// 	float distToSurface = sceneDepth;
 
-					float2 minSphere = raySphere(rayOrigin, rayDir, _Center, _MinRadius);
-					distToSurface = min(minSphere.x, distToSurface);
+				// 	float2 minSphere = raySphere(rayOrigin, rayDir, _Center, _MinRadius);
+				// 	distToSurface = min(minSphere.x, distToSurface);
 
-					float toAtmosphere = hitInfo.x;
-					float inAtmosphere = min(hitInfo.y, distToSurface - toAtmosphere);
+				// 	float toAtmosphere = hitInfo.x;
+				// 	float inAtmosphere = min(hitInfo.y, distToSurface - toAtmosphere);
 
-					if (toAtmosphere == maxFloat)
-					{
-						fixed4 col = tex2D(_texgsfs, i.uv);
-						return col;
-					}
-					return inAtmosphere / (_MaxRadius * 2);
-				}
+				// 	if (toAtmosphere == maxFloat)
+				// 	{
+				// 		fixed4 col = tex2D(_texgsfs, i.uv);
+				// 		return col;
+				// 	}
+				// 	return inAtmosphere / (_MaxRadius * 2);
+				// }
 
 				fixed4 calculateSphere2(v2f i)
 				{
-					float sceneDepthNonLinear = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv);
+					float sceneDepthNonLinear = SAMPLE_DEPTH_TEXTURE(_DepthBuffer, i.uv);
 					float sceneDepth = LinearEyeDepth(sceneDepthNonLinear) * length(i.viewVector);
 
 					float3 rayOrigin = _WorldSpaceCameraPos;
@@ -189,7 +190,9 @@ Shader "Hidden/Atmosphere"
 					float2 hitTop = raySphere(rayOrigin, rayDir, _Center, _MaxRadius);
 					float distToSurface = sceneDepth;
 
-					// and the inner edge (surface of the planet)
+					// raycast against the inner edge (surface of the planet)
+					// Ideally should be replaced by just the depth buffer.
+					// - 2024/07/13 - Still here because the edges of the PQS system flicker with pixels sometimes.
 					float2 hitSurface = raySphere(rayOrigin, rayDir, _Center, _MinRadius);
 					distToSurface = min(hitSurface.x, distToSurface);
 

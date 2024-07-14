@@ -1,4 +1,4 @@
-﻿using HSP.Cameras;
+﻿using HSP.GameplayScene.Cameras;
 using UnityPlus.UILib;
 using System;
 using System.Collections.Generic;
@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UnityPlus.UILib.UIElements;
+using HSP.Core;
 
 namespace HSP.UI.Windows
 {
@@ -79,7 +80,7 @@ namespace HSP.UI.Windows
 
             if( _highlightedObject != null )
             {
-                Vector3 targetScreenPos = GameplayCameraController.MainCamera.WorldToScreenPoint( ReferenceTransform.position );
+                Vector3 targetScreenPos = SceneCamera.Camera.WorldToScreenPoint( ReferenceTransform.position );
                 targetScreenPos.z = 0.0f;
 
                 _highlightedObject.position = targetScreenPos;

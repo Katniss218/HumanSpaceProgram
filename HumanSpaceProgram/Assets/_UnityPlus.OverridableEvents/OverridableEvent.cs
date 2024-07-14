@@ -12,41 +12,17 @@ namespace UnityPlus.OverridableEvents
     /// </summary>
     public class OverridableEvent<T>
     {
-        private struct Listener // cache struct.
-        {
-            public Action<T> Func;
-            public string[] BlockList;
-        }
+        Dictionary<string, OverridableEventListener<T>> _allListeners = new Dictionary<string, OverridableEventListener<T>>();
 
-        Dictionary<string, Listener> _allListeners = new Dictionary<string, Listener>();
         Action<T>[] _cachedListeners = null;
 
-        private void RecacheNotBlockedListeners()
+        private void RecacheAndSortListeners()
         {
-            // Purpose:
-            // - Figure out which listeners are not blocked, and cache them so this doesn't have to be done on every invoke.
+            _cachedListeners = _allListeners.Values
+                .GetNonBlacklistedListeners()
+                .SortDependencies()
 
-            HashSet<string> blockList = new HashSet<string>();
-            foreach( var listener in _allListeners.Values )
-            {
-                if( listener.BlockList == null )
-                    continue;
-                foreach( var block in listener.BlockList )
-                {
-                    blockList.Add( block );
-                }
-            }
-
-            List<Action<T>> notBlockedListeners = new List<Action<T>>( _allListeners.Count ); // Limits resizes.
-            foreach( var (listenerId, listener) in _allListeners )
-            {
-                if( !blockList.Contains( listenerId ) )
-                {
-                    notBlockedListeners.Add( listener.Func );
-                }
-            }
-
-            _cachedListeners = notBlockedListeners.ToArray();
+                .Select( l => l.OnInvoke ).ToArray();
         }
 
         /// <summary>
@@ -55,14 +31,13 @@ namespace UnityPlus.OverridableEvents
         /// <returns>False if a listener with the specified ID is already present in the listener list.</returns>
         public bool TryAddListener( OverridableEventListener<T> listener )
         {
-            if( _allListeners.ContainsKey( listener.id ) )
+            if( _allListeners.TryAdd( listener.ID, listener ) )
             {
-                return false;
+                _cachedListeners = null;
+                return true;
             }
 
-            _allListeners.Add( listener.id, new Listener() { Func = listener.func, BlockList = listener.blacklist } );
-            _cachedListeners = null;
-            return true;
+            return false;
         }
 
         /// <summary>
@@ -71,14 +46,13 @@ namespace UnityPlus.OverridableEvents
         /// <returns>False if a listener with the specified ID isn't present in the listener list.</returns>
         public bool TryRemoveListener( string id )
         {
-            if( !_allListeners.ContainsKey( id ) )
+            if( _allListeners.Remove( id ) )
             {
-                return false;
+                _cachedListeners = null;
+                return true;
             }
 
-            _allListeners.Remove( id );
-            _cachedListeners = null;
-            return true;
+            return false;
         }
 
         /// <summary>
@@ -88,7 +62,7 @@ namespace UnityPlus.OverridableEvents
         {
             if( _cachedListeners == null )
             {
-                RecacheNotBlockedListeners();
+                RecacheAndSortListeners();
             }
 
             foreach( var listenerFunc in _cachedListeners )

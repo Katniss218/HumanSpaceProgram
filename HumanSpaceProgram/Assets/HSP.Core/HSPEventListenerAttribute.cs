@@ -23,6 +23,9 @@ namespace HSP.Core
         public string ID { get; set; }
         public string[] Blacklist { get; set; }
 
+        public string[] Before { get; set; }
+        public string[] After { get; set; }
+
         public HSPEventListenerAttribute( string eventId, string id )
         {
             this.EventID = eventId;
@@ -123,7 +126,7 @@ namespace HSP.Core
             foreach( var attr in attrs )
             {
                 HSPEvent.EventManager.TryCreate( attr.EventID );
-                HSPEvent.EventManager.TryAddListener( attr.EventID, new OverridableEventListener<object>() { id = attr.ID, blacklist = attr.Blacklist, func = methodDelegate } );
+                HSPEvent.EventManager.TryAddListener( attr.EventID, new OverridableEventListener<object>( attr.ID, attr.Blacklist, attr.Before, attr.After, methodDelegate ) );
             }
         }
 

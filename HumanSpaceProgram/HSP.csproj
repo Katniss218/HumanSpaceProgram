@@ -9,8 +9,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace>
-    </RootNamespace>
+    <RootNamespace></RootNamespace>
     <ProjectGuid>{5294BE79-15AB-2AAE-E8C3-9E735E001D6D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -63,8 +62,10 @@
     <Compile Include="Assets\HSP\EditorScene\EditorSceneEscapeInputController.cs" />
     <Compile Include="Assets\HSP\TranslationTransformHandle.cs" />
     <Compile Include="Assets\HSP\DesignScene\DesignSceneToolBase.cs" />
+    <Compile Include="Assets\HSP\DesignScene\Cameras\DesignSceneOrbitingCameraController.cs" />
     <Compile Include="Assets\HSP\DesignScene\Tools\PickTool.cs" />
     <Compile Include="Assets\HSP\CelestialBodies\VanillaPlanetarySystemFactory.cs" />
+    <Compile Include="Assets\HSP\GameplayScene\Cameras\GameplaySceneCameraManager.cs" />
     <Compile Include="Assets\HSP\Components\FPlayerInputAvionics.cs" />
     <Compile Include="Assets\HSP\CelestialBodies\Surface\LODQuadTree.cs" />
     <Compile Include="Assets\HSP\TransformHandle.cs" />
@@ -82,8 +83,8 @@
     <Compile Include="Assets\HSP\Components\FSequencer.cs" />
     <Compile Include="Assets\HSP\Components\FPointMass.cs" />
     <Compile Include="Assets\HSP\Components\F3AxisActuator.cs" />
-    <Compile Include="Assets\HSP\Cameras\GameplayCameraController.cs" />
     <Compile Include="Assets\HSP\GameplayScene\GameplaySceneEscapeInputController.cs" />
+    <Compile Include="Assets\HSP\GameplayScene\Cameras\GameplaySceneOrbitingCameraController.cs" />
     <Compile Include="Assets\HSP\GameplayScene\Tools\ConstructTool.cs" />
     <Compile Include="Assets\HSP\Components\FSequencer.SequenceAction.cs" />
     <Compile Include="Assets\HSP\Components\FConstructible.cs" />
@@ -101,6 +102,7 @@
     <Compile Include="Assets\HSP\Components\FBulkContainer_Sphere.cs" />
     <Compile Include="Assets\HSP\DesignScene\DesignObject.cs" />
     <Compile Include="Assets\HSP\Components\FBulkConnection.cs" />
+    <Compile Include="Assets\HSP\GameplayScene\Cameras\GameplaySceneDepthBufferCombiner.cs" />
     <Compile Include="Assets\HSP\AssetLoaders\GameDataTextureLoader.cs" />
     <Compile Include="Assets\HSP\Components\F2AxisActuator.cs" />
     <Compile Include="Assets\HSP\DesignScene\Tools\TranslateTool.cs" />
@@ -118,9 +120,10 @@
     <Compile Include="Assets\HSP\PIDLoop.cs" />
     <Compile Include="Assets\HSP\AssetLoaders\GameDataJsonVesselFactory.cs" />
     <Compile Include="Assets\HSP\Components\FReactionControlController.cs" />
+    <Compile Include="Assets\HSP\DesignScene\Cameras\DesignSceneCameraManager.cs" />
+    <Compile Include="Assets\HSP\MainMenuScene\Cameras\MainMenuSceneCameraManager.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include=".editorconfig" />
     <None Include="Assets\HSP\CelestialBodies\Surface\TerrainShader.shader" />
     <None Include="Assets\HSP\Effects\Atmospheres\Atmosphere.shader" />
     <None Include="Assets\HSP\___HSP.asmdef" />
