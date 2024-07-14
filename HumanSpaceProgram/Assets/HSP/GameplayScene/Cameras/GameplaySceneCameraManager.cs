@@ -264,7 +264,7 @@ namespace HSP.GameplayScene.Cameras
             bufferCombiner.FarCamera = farCamera;
             bufferCombiner.NearCamera = nearCamera;
             bufferCombiner.EffectCamera = effectCamera;
-            bufferCombiner.MergeDepthMat = AssetRegistry.Get<Material>( "builtin::Resources/Materials/merge_depth" );
+            bufferCombiner.MergeDepthShader = AssetRegistry.Get<Shader>( "builtin::Resources/Shaders/merge_depth" );
 
             AtmosphereRenderer atmosphereRenderer = effectCameraGameObject.AddComponent<AtmosphereRenderer>();
             atmosphereRenderer.light = GameObject.Find( "CBLight" ).GetComponent<Light>();

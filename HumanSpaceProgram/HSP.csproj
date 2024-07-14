@@ -123,7 +123,6 @@
     <Compile Include="Assets\HSP\Components\FReactionControlController.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\HSP\Effects\Atmospheres\MergeDepth.shader" />
     <None Include="Assets\HSP\CelestialBodies\Surface\TerrainShader.shader" />
     <None Include="Assets\HSP\Effects\Atmospheres\Atmosphere.shader" />
     <None Include="Assets\HSP\___HSP.asmdef" />

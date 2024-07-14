@@ -9,15 +9,28 @@ namespace HSP.GameplayScene.Cameras
     [RequireComponent( typeof( Camera ) )]
     public sealed class GameplaySceneDepthBufferCombiner : SingletonMonoBehaviour<GameplaySceneDepthBufferCombiner>
     {
-        [field: SerializeField]
-        public Material MergeDepthMat { get; set; }
+        [SerializeField]
+        Shader _mergeDepthShader;
+        public Shader MergeDepthShader
+        {
+            get => _mergeDepthShader;
+            set
+            {
+                _mergeDepthShader = value;
+                _mergeDepthMaterial = new Material( _mergeDepthShader );
+            }
+        }
 
         [field: SerializeField]
         public Camera FarCamera { get; set; }
+
         [field: SerializeField]
         public Camera NearCamera { get; set; }
+
         [field: SerializeField]
         public Camera EffectCamera { get; set; }
+
+        Material _mergeDepthMaterial;
 
         CommandBuffer _cmdMergeDepth;
 
@@ -34,6 +47,12 @@ namespace HSP.GameplayScene.Cameras
             };
         }
 
+        void OnEnable()
+        {
+            if( _mergeDepthMaterial == null )
+                _mergeDepthMaterial = new Material( MergeDepthShader );
+        }
+
         void OnDestroy()
         {
             _cmdMergeDepth?.Release();
@@ -42,19 +61,19 @@ namespace HSP.GameplayScene.Cameras
         private void UpdateMergeDepthCommandBuffer()
         {
             _cmdMergeDepth.Clear();
-            MergeDepthMat.SetTexture( Shader.PropertyToID( "_Input1Depth" ), GameplaySceneCameraManager.FarDepthRenderTexture, RenderTextureSubElement.Depth );
-            MergeDepthMat.SetTexture( Shader.PropertyToID( "_Input2Depth" ), GameplaySceneCameraManager.NearDepthRenderTexture, RenderTextureSubElement.Depth );
-            MergeDepthMat.SetFloat( Shader.PropertyToID( "_Input1Near" ), FarCamera.nearClipPlane );
-            MergeDepthMat.SetFloat( Shader.PropertyToID( "_Input1Far" ), FarCamera.farClipPlane );
-            MergeDepthMat.SetFloat( Shader.PropertyToID( "_Input2Near" ), NearCamera.nearClipPlane );
-            MergeDepthMat.SetFloat( Shader.PropertyToID( "_Input2Far" ), NearCamera.farClipPlane );
-            MergeDepthMat.SetFloat( Shader.PropertyToID( "_DstNear" ), EffectCamera.nearClipPlane );
-            MergeDepthMat.SetFloat( Shader.PropertyToID( "_DstFar" ), EffectCamera.farClipPlane );
+            _mergeDepthMaterial.SetTexture( Shader.PropertyToID( "_Input1Depth" ), GameplaySceneCameraManager.FarDepthRenderTexture, RenderTextureSubElement.Depth );
+            _mergeDepthMaterial.SetTexture( Shader.PropertyToID( "_Input2Depth" ), GameplaySceneCameraManager.NearDepthRenderTexture, RenderTextureSubElement.Depth );
+            _mergeDepthMaterial.SetFloat( Shader.PropertyToID( "_Input1Near" ), FarCamera.nearClipPlane );
+            _mergeDepthMaterial.SetFloat( Shader.PropertyToID( "_Input1Far" ), FarCamera.farClipPlane );
+            _mergeDepthMaterial.SetFloat( Shader.PropertyToID( "_Input2Near" ), NearCamera.nearClipPlane );
+            _mergeDepthMaterial.SetFloat( Shader.PropertyToID( "_Input2Far" ), NearCamera.farClipPlane );
+            _mergeDepthMaterial.SetFloat( Shader.PropertyToID( "_DstNear" ), EffectCamera.nearClipPlane );
+            _mergeDepthMaterial.SetFloat( Shader.PropertyToID( "_DstFar" ), EffectCamera.farClipPlane );
             _cmdMergeDepth.SetRenderTarget( _dstColorRT, _dstDepthRT );
             if( instance.NearCamera.enabled )
-                _cmdMergeDepth.Blit( null, BuiltinRenderTextureType.CurrentActive, MergeDepthMat, 0 );
+                _cmdMergeDepth.Blit( null, BuiltinRenderTextureType.CurrentActive, _mergeDepthMaterial, 0 );
             else
-                _cmdMergeDepth.Blit( null, BuiltinRenderTextureType.CurrentActive, MergeDepthMat, 1 );
+                _cmdMergeDepth.Blit( null, BuiltinRenderTextureType.CurrentActive, _mergeDepthMaterial, 1 );
         }
 
         [HSPEventListener( HSPEvent.GAMEPLAY_BEFORE_RENDERING, "merge_depth" )]

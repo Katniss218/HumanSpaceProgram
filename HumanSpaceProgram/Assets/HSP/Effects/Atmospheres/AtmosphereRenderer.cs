@@ -9,10 +9,19 @@ namespace HSP.CelestialBodies
     [RequireComponent( typeof( Camera ) )]
     public class AtmosphereRenderer : SingletonMonoBehaviour<AtmosphereRenderer>
     {
-        Shader _shader;
-
         [SerializeField]
-        Material _material;
+        Shader _atmosphereShader;
+        public Shader AtmosphereShader
+        {
+            get => _atmosphereShader;
+            set
+            {
+                _atmosphereShader = value;
+                _atmosphereMaterial = new Material( _atmosphereShader );
+            }
+        }
+
+        Material _atmosphereMaterial;
 
         Camera _camera;
         CommandBuffer _cmdAtmospheres;
@@ -35,9 +44,6 @@ namespace HSP.CelestialBodies
         {
             _camera = this.GetComponent<Camera>();
 
-            _shader = Shader.Find( "Hidden/Atmosphere" );
-            _material = new Material( _shader );
-
             _cmdAtmospheres = new CommandBuffer()
             {
                 name = "HSP - Atmospheres - Render"
@@ -48,6 +54,15 @@ namespace HSP.CelestialBodies
             };
 
             SceneReferenceFrameManager.OnAfterReferenceFrameSwitch += OnReferenceFrameSwitch;
+        }
+
+        void OnEnable()
+        {
+            if( _atmosphereShader == null )
+                _atmosphereShader = Shader.Find( "Hidden/Atmosphere" );
+
+            if( _atmosphereMaterial == null )
+                _atmosphereMaterial = new Material( AtmosphereShader );
         }
 
         void OnDestroy()
@@ -70,16 +85,20 @@ namespace HSP.CelestialBodies
         {
             this._rt = RenderTexture.GetTemporary( Screen.width, Screen.height, 0, RenderTextureFormat.ARGB32 );
 
-            _material.SetVector( Shader.PropertyToID( "_Center" ), _center );
-            _material.SetVector( Shader.PropertyToID( "_SunDirection" ), -light.transform.forward );
-            _material.SetVector( Shader.PropertyToID( "_ScatteringWavelengths" ), new Vector3( 675, 530, 400 ) );
-            _material.SetFloat( Shader.PropertyToID( "_ScatteringStrength" ), 128 );
-            _material.SetFloat( Shader.PropertyToID( "_TerminatorFalloff" ), 32 );
-            _material.SetFloat( Shader.PropertyToID( "_MinRadius" ), 6371000f );
-            _material.SetFloat( Shader.PropertyToID( "_MaxRadius" ), 6500000f );
-            _material.SetFloat( Shader.PropertyToID( "_InScatteringPointCount" ), 16 );
-            _material.SetFloat( Shader.PropertyToID( "_OpticalDepthPointCount" ), 8 );
-            _material.SetFloat( Shader.PropertyToID( "_DensityFalloffPower" ), 13.7f );
+            //                                     The `_Texture` property name gets overriden by something else... Unity... >:{
+            _atmosphereMaterial.SetTexture( Shader.PropertyToID( "_texgsfs" ), GameplaySceneCameraManager.ColorRenderTexture );
+            _atmosphereMaterial.SetTexture( Shader.PropertyToID( "_DepthBuffer" ), GameplaySceneDepthBufferCombiner.CombinedDepthRenderTexture, RenderTextureSubElement.Depth );
+
+            _atmosphereMaterial.SetVector( Shader.PropertyToID( "_Center" ), _center );
+            _atmosphereMaterial.SetVector( Shader.PropertyToID( "_SunDirection" ), -light.transform.forward );
+            _atmosphereMaterial.SetVector( Shader.PropertyToID( "_ScatteringWavelengths" ), new Vector3( 675, 530, 400 ) );
+            _atmosphereMaterial.SetFloat( Shader.PropertyToID( "_ScatteringStrength" ), 128 );
+            _atmosphereMaterial.SetFloat( Shader.PropertyToID( "_TerminatorFalloff" ), 32 );
+            _atmosphereMaterial.SetFloat( Shader.PropertyToID( "_MinRadius" ), 6371000f );
+            _atmosphereMaterial.SetFloat( Shader.PropertyToID( "_MaxRadius" ), 6500000f );
+            _atmosphereMaterial.SetFloat( Shader.PropertyToID( "_InScatteringPointCount" ), 16 );
+            _atmosphereMaterial.SetFloat( Shader.PropertyToID( "_OpticalDepthPointCount" ), 8 );
+            _atmosphereMaterial.SetFloat( Shader.PropertyToID( "_DensityFalloffPower" ), 13.7f );
 
             this._camera.RemoveCommandBuffer( CameraEvent.AfterForwardOpaque, _cmdAtmospheres );
             this._camera.RemoveCommandBuffer( CameraEvent.AfterForwardOpaque, _cmdComposition );
@@ -102,11 +121,8 @@ namespace HSP.CelestialBodies
         public void UpdateCommandBuffers()
         {
             _cmdAtmospheres.Clear();
-            //                                     The `_Texture` property name gets overriden by something else... Unity... >:{
-            _material.SetTexture( Shader.PropertyToID( "_texgsfs" ), GameplaySceneCameraManager.ColorRenderTexture );
-            _material.SetTexture( Shader.PropertyToID( "_DepthBuffer" ), GameplaySceneDepthBufferCombiner.CombinedDepthRenderTexture, RenderTextureSubElement.Depth );
             _cmdAtmospheres.SetRenderTarget( _rt );
-            _cmdAtmospheres.Blit( null, _rt, _material, 0 );
+            _cmdAtmospheres.Blit( null, _rt, _atmosphereMaterial, 0 );
 
             _cmdComposition.Clear();
             _cmdComposition.Blit( _rt, (RenderTexture)null );
