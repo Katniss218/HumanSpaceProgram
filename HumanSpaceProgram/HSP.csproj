@@ -58,23 +58,15 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP\TranslationTransformHandle.cs" />
-    <Compile Include="Assets\HSP\Physics\InertiaUtils.cs" />
-    <Compile Include="Assets\HSP\TransformHandle.cs" />
+    <Compile Include="Assets\HSP\InertiaUtils.cs" />
+    <Compile Include="Assets\HSP\NamespacedIdentifier.Serialization.cs" />
     <Compile Include="Assets\HSP\HSPEvent.cs" />
     <Compile Include="Assets\HSP\NamespacedIdentifier.cs" />
-    <Compile Include="Assets\HSP\RotationTransformHandle.cs" />
-    <Compile Include="Assets\HSP\TransformHandleSet.cs" />
-    <Compile Include="Assets\HSP\Components\FPointMass.cs" />
     <Compile Include="Assets\HSP\Layer.cs" />
     <Compile Include="Assets\HSP\HSPEventListenerAttribute.cs" />
     <Compile Include="Assets\HSP\CoordinateUtils.cs" />
-    <Compile Include="Assets\HSP\Physics\GravityUtils.cs" />
     <Compile Include="Assets\HSP\Version.cs" />
-    <Compile Include="Assets\HSP\Components\FRocketEngine.cs" />
-    <Compile Include="Assets\HSP\Components\FAttachNode.cs" />
     <Compile Include="Assets\HSP\HumanSpaceProgram.cs" />
-    <Compile Include="Assets\HSP\Components\FLaunchSiteMarker.cs" />
     <Compile Include="Assets\HSP\IPhysicsObject.cs" />
   </ItemGroup>
   <ItemGroup>

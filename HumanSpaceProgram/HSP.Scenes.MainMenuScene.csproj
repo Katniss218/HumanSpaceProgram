@@ -58,12 +58,12 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.Scenes\MainMenuScene\Cameras\MainMenuSceneCameraManager.cs" />
-    <Compile Include="Assets\HSP.Scenes\MainMenuScene\MainMenuSceneManager.cs" />
-    <Compile Include="Assets\HSP.Scenes\MainMenuScene\MainMenuEscapeInputController.cs" />
+    <Compile Include="Assets\HSP.Scenes.MainMenuScene\Cameras\MainMenuSceneCameraManager.cs" />
+    <Compile Include="Assets\HSP.Scenes.MainMenuScene\MainMenuSceneManager.cs" />
+    <Compile Include="Assets\HSP.Scenes.MainMenuScene\MainMenuEscapeInputController.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\HSP.Scenes\MainMenuScene\___HSP.Scenes.MainMenuScene.asmdef" />
+    <None Include="Assets\HSP.Scenes.MainMenuScene\___HSP.Scenes.MainMenuScene.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -898,6 +898,10 @@
       <HintPath>F:\Unity\Editors\2022.1.8f1\Editor\Data\NetStandard\compat\2.1.0\shims\netfx\System.Xml.Serialization.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.Postprocessing.Runtime">
+      <HintPath>Library\ScriptAssemblies\Unity.Postprocessing.Runtime.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEditor.UI">
       <HintPath>Library\ScriptAssemblies\UnityEditor.UI.dll</HintPath>
       <Private>False</Private>
@@ -916,6 +920,10 @@
       <Project>{7122B491-FD2B-2B59-D391-006CB0AE788B}</Project>
       <Name>_UnityPlus.AssetManagement</Name>
     </ProjectReference>
+    <ProjectReference Include="_UnityPlus.Input.csproj">
+      <Project>{1B7EDF60-A4D7-21D6-6511-CFB4286999D1}</Project>
+      <Name>_UnityPlus.Input</Name>
+    </ProjectReference>
     <ProjectReference Include="_UnityPlus.OverridableEvents.csproj">
       <Project>{049D3356-CD2A-DFB0-C50D-8CFE5B092848}</Project>
       <Name>_UnityPlus.OverridableEvents</Name>
@@ -923,6 +931,22 @@
     <ProjectReference Include="_UnityPlus.Serialization.csproj">
       <Project>{FED3C19A-E743-9E19-D660-957D0801811E}</Project>
       <Name>_UnityPlus.Serialization</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.csproj">
+      <Project>{5294BE79-15AB-2AAE-E8C3-9E735E001D6D}</Project>
+      <Name>HSP</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Input.csproj">
+      <Project>{27123301-09AF-37AC-2FCA-FF7B2CC75C42}</Project>
+      <Name>HSP.Input</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.SceneManagement.csproj">
+      <Project>{5B21ACE1-5E92-EEB2-818D-AF6D6AE9F824}</Project>
+      <Name>HSP.SceneManagement</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Scenes.csproj">
+      <Project>{0FF6884C-8D4A-7AB7-5D8A-5FBF5FCF8190}</Project>
+      <Name>HSP.Scenes</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

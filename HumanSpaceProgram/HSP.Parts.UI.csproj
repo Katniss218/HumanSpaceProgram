@@ -58,14 +58,14 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.Parts\UI\UIPartWindow.cs" />
-    <Compile Include="Assets\HSP.Parts\UI\UIPartWindowComponent.cs" />
-    <Compile Include="Assets\HSP.Parts\UI\UIPartListEntry.cs" />
-    <Compile Include="Assets\HSP.Parts\UI\WindowRelationHighlight.cs" />
-    <Compile Include="Assets\HSP.Parts\UI\UIPartList.cs" />
+    <Compile Include="Assets\HSP.Parts.UI\UIPartWindow.cs" />
+    <Compile Include="Assets\HSP.Parts.UI\UIPartWindowComponent.cs" />
+    <Compile Include="Assets\HSP.Parts.UI\UIPartListEntry.cs" />
+    <Compile Include="Assets\HSP.Parts.UI\WindowRelationHighlight.cs" />
+    <Compile Include="Assets\HSP.Parts.UI\UIPartList.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\HSP.Parts\UI\___HSP.Parts.UI.asmdef" />
+    <None Include="Assets\HSP.Parts.UI\___HSP.Parts.UI.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

@@ -58,19 +58,19 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.ResourceFlowSystems\FluidState.cs" />
-    <Compile Include="Assets\HSP.ResourceFlowSystems\IResourceConsumer.cs" />
-    <Compile Include="Assets\HSP.ResourceFlowSystems\IResourceContainer.cs" />
-    <Compile Include="Assets\HSP.ResourceFlowSystems\Components\FBulkContainer_Sphere.cs" />
-    <Compile Include="Assets\HSP.ResourceFlowSystems\Components\FBulkConnection.cs" />
-    <Compile Include="Assets\HSP.ResourceFlowSystems\IResourceProducer.cs" />
-    <Compile Include="Assets\HSP.ResourceFlowSystems\SubstanceState.cs" />
-    <Compile Include="Assets\HSP.ResourceFlowSystems\FlowUtils.cs" />
-    <Compile Include="Assets\HSP.ResourceFlowSystems\Substance.cs" />
-    <Compile Include="Assets\HSP.ResourceFlowSystems\SubstanceStateCollection.cs" />
+    <Compile Include="Assets\HSP.ResourceFlow\FluidState.cs" />
+    <Compile Include="Assets\HSP.ResourceFlow\IResourceConsumer.cs" />
+    <Compile Include="Assets\HSP.ResourceFlow\IResourceContainer.cs" />
+    <Compile Include="Assets\HSP.ResourceFlow\Components\FBulkContainer_Sphere.cs" />
+    <Compile Include="Assets\HSP.ResourceFlow\Components\FBulkConnection.cs" />
+    <Compile Include="Assets\HSP.ResourceFlow\IResourceProducer.cs" />
+    <Compile Include="Assets\HSP.ResourceFlow\SubstanceState.cs" />
+    <Compile Include="Assets\HSP.ResourceFlow\FlowUtils.cs" />
+    <Compile Include="Assets\HSP.ResourceFlow\Substance.cs" />
+    <Compile Include="Assets\HSP.ResourceFlow\SubstanceStateCollection.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\HSP.ResourceFlowSystems\___HSP.ResourceFlowSystems.asmdef" />
+    <None Include="Assets\HSP.ResourceFlow\___HSP.ResourceFlow.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

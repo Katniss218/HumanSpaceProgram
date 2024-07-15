@@ -58,7 +58,6 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.Mods\Mappings_NamespacedIdentifier.cs" />
     <Compile Include="Assets\HSP.Mods\HumanSpaceProgramMods.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -922,6 +921,14 @@
     <ProjectReference Include="_UnityPlus.Serialization.csproj">
       <Project>{FED3C19A-E743-9E19-D660-957D0801811E}</Project>
       <Name>_UnityPlus.Serialization</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.csproj">
+      <Project>{5294BE79-15AB-2AAE-E8C3-9E735E001D6D}</Project>
+      <Name>HSP</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Content.csproj">
+      <Project>{642CD5D5-9E37-E1CA-969F-267B97A7FC25}</Project>
+      <Name>HSP.Content</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

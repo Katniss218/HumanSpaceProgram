@@ -7,9 +7,8 @@
         "_UnityPlus.UILib",
         "_UnityPlus.Serialization",
         "HSP",
-        "HSP.Core",
-        "HSP.DevUtils",
-        "HSP.UI"
+        "HSP.UI",
+        "HSP.ResourceFlow"
     ],
     "includePlatforms": [
         "Editor"

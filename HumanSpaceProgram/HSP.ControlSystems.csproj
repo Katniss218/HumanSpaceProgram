@@ -76,6 +76,7 @@
     <Compile Include="Assets\HSP.ControlSystems\Components\FSequencer.SequenceAction.cs" />
     <Compile Include="Assets\HSP.ControlSystems\ControlGroup.cs" />
     <Compile Include="Assets\HSP.ControlSystems\Components\FSequencer.SequenceElement.cs" />
+    <Compile Include="Assets\HSP.ControlSystems\Components\FRocketEngine.cs" />
     <Compile Include="Assets\HSP.ControlSystems\Components\F2AxisActuator.cs" />
     <Compile Include="Assets\HSP.ControlSystems\ControlUtils.cs" />
     <Compile Include="Assets\HSP.ControlSystems\Controls\ControllerOutput.cs" />
@@ -948,6 +949,18 @@
     <ProjectReference Include="_UnityPlus.Serialization.csproj">
       <Project>{FED3C19A-E743-9E19-D660-957D0801811E}</Project>
       <Name>_UnityPlus.Serialization</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.csproj">
+      <Project>{5294BE79-15AB-2AAE-E8C3-9E735E001D6D}</Project>
+      <Name>HSP</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Vessels.csproj">
+      <Project>{46E8105E-3165-8157-383E-59E6654156AA}</Project>
+      <Name>HSP.Vessels</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.ReferenceFrames.csproj">
+      <Project>{D8846B96-55B1-C32C-F90A-52C14F5C8043}</Project>
+      <Name>HSP.ReferenceFrames</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

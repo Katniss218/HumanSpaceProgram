@@ -58,12 +58,12 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.Scenes\GameplayScene\UI\GameplaySceneUIFactory.cs" />
-    <Compile Include="Assets\HSP.Scenes\GameplayScene\UI\GameplayEscapeUIFactory.cs" />
-    <Compile Include="Assets\HSP.Scenes\GameplayScene\UI\GameplayViewportClickController.cs" />
+    <Compile Include="Assets\HSP.Scenes.GameplayScene.UI\GameplaySceneUIFactory.cs" />
+    <Compile Include="Assets\HSP.Scenes.GameplayScene.UI\GameplayEscapeUIFactory.cs" />
+    <Compile Include="Assets\HSP.Scenes.GameplayScene.UI\GameplayViewportClickController.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\HSP.Scenes\GameplayScene\UI\___HSP.Scenes.GameplayScene.UI.asmdef" />
+    <None Include="Assets\HSP.Scenes.GameplayScene.UI\___HSP.Scenes.GameplayScene.UI.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -927,6 +927,10 @@
     <ProjectReference Include="_UnityPlus.UILib.csproj">
       <Project>{3A5E96D9-C189-180D-1672-7BEFFDEBCE5F}</Project>
       <Name>_UnityPlus.UILib</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Scenes.GameplayScene.csproj">
+      <Project>{E0701DD8-A95B-E8D7-32D3-2A9F5E63B7C1}</Project>
+      <Name>HSP.Scenes.GameplayScene</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

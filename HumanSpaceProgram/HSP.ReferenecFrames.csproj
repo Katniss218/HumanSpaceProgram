@@ -67,6 +67,7 @@
     <Compile Include="Assets\HSP.ReferenceFrames\IReferenceFrame.cs" />
     <Compile Include="Assets\HSP.ReferenceFrames\IReferenceTransform.cs" />
     <Compile Include="Assets\HSP.ReferenceFrames\SceneReferenceFrameManager.cs" />
+    <Compile Include="Assets\HSP.ReferenceFrames\ActiveObjectManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.ReferenceFrames\___HSP.ReferenceFrames.asmdef" />
@@ -929,6 +930,10 @@
     <ProjectReference Include="_UnityPlus.Serialization.csproj">
       <Project>{FED3C19A-E743-9E19-D660-957D0801811E}</Project>
       <Name>_UnityPlus.Serialization</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.csproj">
+      <Project>{5294BE79-15AB-2AAE-E8C3-9E735E001D6D}</Project>
+      <Name>HSP</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

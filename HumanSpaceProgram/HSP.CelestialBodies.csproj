@@ -64,6 +64,7 @@
     <Compile Include="Assets\HSP.CelestialBodies\CelestialBodyFactory.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\Surfaces\MakeQuadMesh_Job.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\Surfaces\LODQuadSphere.cs" />
+    <Compile Include="Assets\HSP.CelestialBodies\GravityUtils.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\Surfaces\LODQuad.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\CelestialBodySurface.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\CelestialBody.cs" />
@@ -934,6 +935,14 @@
     <ProjectReference Include="_UnityPlus.Serialization.csproj">
       <Project>{FED3C19A-E743-9E19-D660-957D0801811E}</Project>
       <Name>_UnityPlus.Serialization</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.csproj">
+      <Project>{5294BE79-15AB-2AAE-E8C3-9E735E001D6D}</Project>
+      <Name>HSP</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.ReferenceFrames.csproj">
+      <Project>{D8846B96-55B1-C32C-F90A-52C14F5C8043}</Project>
+      <Name>HSP.ReferenceFrames</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -58,10 +58,10 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.Scenes\DesignScene\UI\DesignSceneUIFactory.cs" />
+    <Compile Include="Assets\HSP.Scenes.DesignScene.UI\DesignSceneUIFactory.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\HSP.Scenes\DesignScene\UI\___HSP.Scenes.DesignScene.UI.asmdef" />
+    <None Include="Assets\HSP.Scenes.DesignScene.UI\___HSP.Scenes.DesignScene.UI.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -914,6 +914,10 @@
       <Project>{7122B491-FD2B-2B59-D391-006CB0AE788B}</Project>
       <Name>_UnityPlus.AssetManagement</Name>
     </ProjectReference>
+    <ProjectReference Include="_UnityPlus.Input.csproj">
+      <Project>{1B7EDF60-A4D7-21D6-6511-CFB4286999D1}</Project>
+      <Name>_UnityPlus.Input</Name>
+    </ProjectReference>
     <ProjectReference Include="_UnityPlus.OverridableEvents.csproj">
       <Project>{049D3356-CD2A-DFB0-C50D-8CFE5B092848}</Project>
       <Name>_UnityPlus.OverridableEvents</Name>
@@ -925,6 +929,18 @@
     <ProjectReference Include="_UnityPlus.UILib.csproj">
       <Project>{3A5E96D9-C189-180D-1672-7BEFFDEBCE5F}</Project>
       <Name>_UnityPlus.UILib</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.csproj">
+      <Project>{5294BE79-15AB-2AAE-E8C3-9E735E001D6D}</Project>
+      <Name>HSP</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Input.csproj">
+      <Project>{27123301-09AF-37AC-2FCA-FF7B2CC75C42}</Project>
+      <Name>HSP.Input</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Scenes.DesignScene.csproj">
+      <Project>{EBE9303E-BBCA-7E74-9C99-30DB3592FFBF}</Project>
+      <Name>HSP.Scenes.DesignScene</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

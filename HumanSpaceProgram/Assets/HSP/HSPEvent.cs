@@ -7,6 +7,7 @@ namespace HSP.Core
     /// </summary>
     public static class HSPEvent
     {
+#warning TODO - split these from a main class so that each 'module' (assembly) contains events relevant to it.
         /// <summary>
         /// The event manager for Human Space Program game (global) events.
         /// </summary>

@@ -7,31 +7,13 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace HSP.Core.Mods
+namespace HSP.Mods
 {
     /// <summary>
     /// Constants regarding mods for HSP.
     /// </summary>
     public class HumanSpaceProgramMods
     {
-        /// <summary>
-        /// The name of the `GameData` directory.
-        /// </summary>
-        public const string GameDataDirectoryName = "GameData";
-
-        /// <summary>
-        /// Computes the path to the directory containing mods.
-        /// </summary>
-        public static string GetModDirectoryPath()
-        {
-            string path = Path.Combine( ApplicationUtils.GetBaseDirectoryPath(), GameDataDirectoryName );
-
-            if( !Directory.Exists( path ) )
-                Directory.CreateDirectory( path );
-
-            return path;
-        }
-
         private static void LoadAssembliesRecursive( string path )
         {
             foreach( var dllPath in Directory.GetFiles( path, "*.dll" ) )
@@ -51,7 +33,7 @@ namespace HSP.Core.Mods
         /// </summary>
         internal static void LoadModAssemblies()
         {
-            string modDirectory = HumanSpaceProgramMods.GetModDirectoryPath();
+            string modDirectory = HSP.Content.ContentUtils.GetModDirectoryPath();
 
             if( !Directory.Exists( modDirectory ) )
                 Directory.CreateDirectory( modDirectory );

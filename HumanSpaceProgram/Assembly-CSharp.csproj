@@ -9,7 +9,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace>KatnisssSpaceSimulator</RootNamespace>
+    <RootNamespace>HSP</RootNamespace>
     <ProjectGuid>{CF54FBD5-A9D7-31AF-EB64-B39E6F7AD5AF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -58,7 +58,7 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.Time\TimeStepManager.cs" />
+    <Compile Include="Assets\HSP.GameplayScene.CelestialBodies\AtmosphereRendererSceneIntegration.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro.cginc" />
@@ -77,11 +77,11 @@
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro_Surface.cginc" />
     <None Include="Assets\_TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Mobile Masking.shader" />
-    <None Include="Assets\HSP.Time\___HSP.Time.asmdef" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF Overlay.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_Bitmap-Mobile.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Mobile.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_Sprite.shader" />
+    <None Include="Assets\HSP.GameplayScene.CelestialBodies\___HSP.GameplayScene.CelestialBodies.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -908,10 +908,6 @@
       <HintPath>Library\ScriptAssemblies\Unity.VSCode.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Unity.Postprocessing.Runtime">
-      <HintPath>Library\ScriptAssemblies\Unity.Postprocessing.Runtime.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Unity.TextMeshPro.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.Editor.dll</HintPath>
       <Private>False</Private>
@@ -952,10 +948,6 @@
       <HintPath>Library\ScriptAssemblies\Unity.Rider.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Unity.TestTools.CodeCoverage.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.TestTools.CodeCoverage.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>Library\ScriptAssemblies\UnityEngine.UI.dll</HintPath>
       <Private>False</Private>
@@ -964,27 +956,39 @@
       <HintPath>Library\ScriptAssemblies\Unity.EditorCoroutines.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.Postprocessing.Runtime">
+      <HintPath>Library\ScriptAssemblies\Unity.Postprocessing.Runtime.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.TestTools.CodeCoverage.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.TestTools.CodeCoverage.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="_UnityPlus.Serialization.csproj">
       <Project>{FED3C19A-E743-9E19-D660-957D0801811E}</Project>
       <Name>_UnityPlus.Serialization</Name>
     </ProjectReference>
-    <ProjectReference Include="_UnityEngine.csproj">
-      <Project>{29A28F5C-31DD-0068-5BB5-61A0CFFA20FA}</Project>
-      <Name>_UnityEngine</Name>
+    <ProjectReference Include="_UnityPlus.Rendering.csproj">
+      <Project>{F3C1E0C7-BAE5-6DE0-84AD-9BB24DE559A4}</Project>
+      <Name>_UnityPlus.Rendering</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.UI.csproj">
       <Project>{05A5E85F-FD04-4199-F86F-3A6E38B383FB}</Project>
       <Name>HSP.UI</Name>
     </ProjectReference>
-    <ProjectReference Include="_UnityPlus.Rendering.csproj">
-      <Project>{F3C1E0C7-BAE5-6DE0-84AD-9BB24DE559A4}</Project>
-      <Name>_UnityPlus.Rendering</Name>
-    </ProjectReference>
     <ProjectReference Include="_UnityPlus.UILib.csproj">
       <Project>{3A5E96D9-C189-180D-1672-7BEFFDEBCE5F}</Project>
       <Name>_UnityPlus.UILib</Name>
+    </ProjectReference>
+    <ProjectReference Include="_UnityPlus.AssetManagement.csproj">
+      <Project>{7122B491-FD2B-2B59-D391-006CB0AE788B}</Project>
+      <Name>_UnityPlus.AssetManagement</Name>
+    </ProjectReference>
+    <ProjectReference Include="_UnityEngine.csproj">
+      <Project>{29A28F5C-31DD-0068-5BB5-61A0CFFA20FA}</Project>
+      <Name>_UnityEngine</Name>
     </ProjectReference>
     <ProjectReference Include="_UnityPlus.OverridableEvents.csproj">
       <Project>{049D3356-CD2A-DFB0-C50D-8CFE5B092848}</Project>
@@ -997,14 +1001,6 @@
     <ProjectReference Include="_UnityPlus.Input.csproj">
       <Project>{1B7EDF60-A4D7-21D6-6511-CFB4286999D1}</Project>
       <Name>_UnityPlus.Input</Name>
-    </ProjectReference>
-    <ProjectReference Include="_UnityPlus.AssetManagement.csproj">
-      <Project>{7122B491-FD2B-2B59-D391-006CB0AE788B}</Project>
-      <Name>_UnityPlus.AssetManagement</Name>
-    </ProjectReference>
-    <ProjectReference Include="HSP._DevUtils.csproj">
-      <Project>{D580E15E-BD0A-821F-5D34-45425A34B44A}</Project>
-      <Name>HSP._DevUtils</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

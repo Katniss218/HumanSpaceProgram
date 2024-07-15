@@ -58,14 +58,18 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.Vessels\UI\UITextReadout_Velocity.cs" />
-    <Compile Include="Assets\HSP.Vessels\UI\UITextReadout_Altitude.cs" />
-    <Compile Include="Assets\HSP.Vessels\UI\VesselHUDManager.cs" />
-    <Compile Include="Assets\HSP.Vessels\UI\UITextReadout_Acceleration.cs" />
-    <Compile Include="Assets\HSP.Vessels\UI\VesselHUD.cs" />
+    <Compile Include="Assets\HSP.Vessels.UI\UITextReadout_Velocity.cs" />
+    <Compile Include="Assets\HSP.Vessels.UI\UITextReadout_Altitude.cs" />
+    <Compile Include="Assets\HSP.Vessels.UI\UIPartWindow.cs" />
+    <Compile Include="Assets\HSP.Vessels.UI\UIPartWindowComponent.cs" />
+    <Compile Include="Assets\HSP.Vessels.UI\UIPartListEntry.cs" />
+    <Compile Include="Assets\HSP.Vessels.UI\UIPartList.cs" />
+    <Compile Include="Assets\HSP.Vessels.UI\VesselHUDManager.cs" />
+    <Compile Include="Assets\HSP.Vessels.UI\UITextReadout_Acceleration.cs" />
+    <Compile Include="Assets\HSP.Vessels.UI\VesselHUD.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\HSP.Vessels\UI\___HSP.Vessels.UI.asmdef" />
+    <None Include="Assets\HSP.Vessels.UI\___HSP.Vessels.UI.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -929,6 +933,10 @@
     <ProjectReference Include="_UnityPlus.UILib.csproj">
       <Project>{3A5E96D9-C189-180D-1672-7BEFFDEBCE5F}</Project>
       <Name>_UnityPlus.UILib</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Vessels.csproj">
+      <Project>{46E8105E-3165-8157-383E-59E6654156AA}</Project>
+      <Name>HSP.Vessels</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

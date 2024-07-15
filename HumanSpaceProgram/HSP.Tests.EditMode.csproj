@@ -947,6 +947,10 @@
       <Project>{05A5E85F-FD04-4199-F86F-3A6E38B383FB}</Project>
       <Name>HSP.UI</Name>
     </ProjectReference>
+    <ProjectReference Include="HSP.ResourceFlow.csproj">
+      <Project>{26023575-EB06-DAA2-C7B2-77FFBAED8CB8}</Project>
+      <Name>HSP.ResourceFlow</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

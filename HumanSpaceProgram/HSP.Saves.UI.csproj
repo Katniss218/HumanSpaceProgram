@@ -58,14 +58,14 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.GameSaves\UI\UITimelineMetadata.cs" />
-    <Compile Include="Assets\HSP.GameSaves\UI\UISaveMetadata.cs" />
-    <Compile Include="Assets\HSP.GameSaves\UI\UISaveWindow.cs" />
-    <Compile Include="Assets\HSP.GameSaves\UI\UIStartNewGameWindow.cs" />
-    <Compile Include="Assets\HSP.GameSaves\UI\UILoadWindow.cs" />
+    <Compile Include="Assets\HSP.Timelines.UI\UITimelineMetadata.cs" />
+    <Compile Include="Assets\HSP.Timelines.UI\UISaveMetadata.cs" />
+    <Compile Include="Assets\HSP.Timelines.UI\UISaveWindow.cs" />
+    <Compile Include="Assets\HSP.Timelines.UI\UIStartNewGameWindow.cs" />
+    <Compile Include="Assets\HSP.Timelines.UI\UILoadWindow.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\HSP.GameSaves\UI\___HSP.Saves.UI.asmdef" />
+    <None Include="Assets\HSP.Timelines.UI\___HSP.Timelines.UI.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

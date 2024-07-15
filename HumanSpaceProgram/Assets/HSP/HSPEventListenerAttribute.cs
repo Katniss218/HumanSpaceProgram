@@ -133,8 +133,9 @@ namespace HSP.Core
         /// <summary>
         /// Searches for "autorunning" methods (i.e. with the attribute) in the specified assemblies and registers them as listeners.
         /// </summary>
-        internal static void CreateEventsForAutorunningMethods( IEnumerable<Assembly> assemblies )
+        public static void CreateEventsForAutorunningMethods( IEnumerable<Assembly> assemblies )
         {
+#warning TODO - this is public because I made it public temporarily . FIX LATER
             foreach( var assembly in assemblies )
             {
                 Type[] assemblyTypes = assembly.GetTypes();
