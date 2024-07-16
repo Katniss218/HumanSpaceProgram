@@ -935,10 +935,6 @@
       <Project>{27123301-09AF-37AC-2FCA-FF7B2CC75C42}</Project>
       <Name>HSP.Input</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.Scenes.GameplayScene.csproj">
-      <Project>{E0701DD8-A95B-E8D7-32D3-2A9F5E63B7C1}</Project>
-      <Name>HSP.Scenes.GameplayScene</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

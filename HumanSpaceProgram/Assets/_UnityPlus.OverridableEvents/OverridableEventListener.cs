@@ -6,7 +6,7 @@ namespace UnityPlus.OverridableEvents
     /// Represents a generic event listener that can block other listeners from executing.
     /// </summary>
     /// <typeparam name="T">The delegate that this listener uses to respond to the event.</typeparam>
-    public class OverridableEventListener<T>
+    public class OverridableEventListener<T> : IOverridable<string>, ITopologicallySortable<string>
     {
         /// <summary>
         /// The ID of this listener.

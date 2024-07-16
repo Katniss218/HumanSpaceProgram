@@ -15,14 +15,19 @@ namespace UnityPlus.OverridableEvents
         Dictionary<string, OverridableEventListener<T>> _allListeners = new Dictionary<string, OverridableEventListener<T>>();
 
         Action<T>[] _cachedListeners = null;
+        bool _isStale = true;
 
         private void RecacheAndSortListeners()
         {
             _cachedListeners = _allListeners.Values
-                .GetNonBlacklistedListeners()
+                .GetNonBlacklisted()
+                .Cast<OverridableEventListener<T>>()
                 .SortDependencies()
+                .Cast<OverridableEventListener<T>>()
 
                 .Select( l => l.OnInvoke ).ToArray();
+
+            _isStale = false;
         }
 
         /// <summary>
@@ -33,7 +38,7 @@ namespace UnityPlus.OverridableEvents
         {
             if( _allListeners.TryAdd( listener.ID, listener ) )
             {
-                _cachedListeners = null;
+                _isStale = true;
                 return true;
             }
 
@@ -44,11 +49,11 @@ namespace UnityPlus.OverridableEvents
         /// Tries to remove a listener from the event.
         /// </summary>
         /// <returns>False if a listener with the specified ID isn't present in the listener list.</returns>
-        public bool TryRemoveListener( string id )
+        public bool TryRemoveListener( string listenerId )
         {
-            if( _allListeners.Remove( id ) )
+            if( _allListeners.Remove( listenerId ) )
             {
-                _cachedListeners = null;
+                _isStale = true;
                 return true;
             }
 
@@ -60,7 +65,7 @@ namespace UnityPlus.OverridableEvents
         /// </summary>
         public void Invoke( T obj )
         {
-            if( _cachedListeners == null )
+            if( _isStale )
             {
                 RecacheAndSortListeners();
             }

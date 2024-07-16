@@ -58,10 +58,10 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.ResourceFlow.UI\UIIResourceContainer.cs" />
+    <Compile Include="Assets\HSP.UI.ResourceFlow\UIIResourceContainer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\HSP.ResourceFlow.UI\___HSP.ResourceFlow.UI.asmdef" />
+    <None Include="Assets\HSP.UI.ResourceFlow\___HSP.UI.ResourceFlow.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

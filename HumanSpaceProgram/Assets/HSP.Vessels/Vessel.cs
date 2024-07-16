@@ -221,11 +221,11 @@ namespace HSP.Core
 		public QuaternionDbl AIRFRotation { get => this.RootObjTransform.AIRFRotation; set => this.RootObjTransform.AIRFRotation = value; }
 
 		public bool IsPinned { get; private set; }
-
-		/// <summary>
-		/// Pins the vessel to the celestial body at the specified location.
-		/// </summary>
-		public void Pin( CelestialBody body, Vector3Dbl localPosition, QuaternionDbl localRotation )
+#warning TODO - this pinning stuff should be an extension inside trajectories.
+        /// <summary>
+        /// Pins the vessel to the celestial body at the specified location.
+        /// </summary>
+        public void Pin( CelestialBody body, Vector3Dbl localPosition, QuaternionDbl localRotation )
 		{
 			DestroyImmediate( (Component)this.PhysicsObject );
 			PinnedPhysicsObject ppo = this.gameObject.AddComponent<PinnedPhysicsObject>();

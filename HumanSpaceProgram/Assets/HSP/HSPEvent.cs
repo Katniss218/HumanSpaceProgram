@@ -15,7 +15,7 @@ namespace HSP.Core
         /// Used for a variety of actions relating to the game, see the constants for an exhaustive list of vanilla events. <br/>
         /// TO MODDERS: Don't use it for events specific to some entity.
         /// </remarks>
-        public static OverridableEventManager<object> EventManager { get; private set; } = new OverridableEventManager<object>();
+        public static OverridableEventRegistry<object> EventManager { get; private set; } = new OverridableEventRegistry<object>();
 
         // TO DEVELOPERS:
         // - Every vanilla game event should have a public constant here.

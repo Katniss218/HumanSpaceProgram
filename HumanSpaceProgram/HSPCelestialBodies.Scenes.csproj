@@ -58,10 +58,10 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.CelestialBodies.Scenes\AtmosphereRendererSceneIntegration.cs" />
+    <Compile Include="Assets\HSP.Scenes.CelestialBodies\AtmosphereRendererSceneIntegration.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\HSP.CelestialBodies.Scenes\___HSP.CelestialBodies.Scenes.asmdef" />
+    <None Include="Assets\HSP.Scenes.CelestialBodies\___HSP.Scenes.CelestialBodies.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -929,10 +929,6 @@
     <ProjectReference Include="HSP.CelestialBodies.csproj">
       <Project>{83793330-5AED-C186-5E4B-AAD4BB463469}</Project>
       <Name>HSP.CelestialBodies</Name>
-    </ProjectReference>
-    <ProjectReference Include="HSP.Scenes.GameplayScene.csproj">
-      <Project>{E0701DD8-A95B-E8D7-32D3-2A9F5E63B7C1}</Project>
-      <Name>HSP.Scenes.GameplayScene</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

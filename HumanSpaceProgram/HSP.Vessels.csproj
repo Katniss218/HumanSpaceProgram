@@ -61,24 +61,16 @@
     <Compile Include="Assets\HSP.Vessels\Vessel.cs" />
     <Compile Include="Assets\HSP.Vessels\PartRegistry.cs" />
     <Compile Include="Assets\HSP.Vessels\Vessel.Serialization.cs" />
-    <Compile Include="Assets\HSP.Vessels\DesignSceneTools\PickTool.cs" />
     <Compile Include="Assets\HSP.Vessels\DesignObjectManager.cs" />
-    <Compile Include="Assets\HSP.Vessels\Components\FPointMass.cs" />
     <Compile Include="Assets\HSP.Vessels\PartMetadata.cs" />
-    <Compile Include="Assets\HSP.Vessels\DesignSceneTools\VanillaToolRegisterer.cs" />
-    <Compile Include="Assets\HSP.Vessels\DesignSceneTools\RotateTool.cs" />
     <Compile Include="Assets\HSP.Vessels\SymmetryDataContainer.cs" />
-    <Compile Include="Assets\HSP.Vessels\IHasMass.cs" />
     <Compile Include="Assets\HSP.Vessels\Serialization\VesselMetadata.cs" />
     <Compile Include="Assets\HSP.Vessels\VesselFactory.cs" />
     <Compile Include="Assets\HSP.Vessels\Components\FPart.cs" />
-    <Compile Include="Assets\HSP.Vessels\WindowRelationHighlight.cs" />
     <Compile Include="Assets\HSP.Vessels\IPartObject.cs" />
     <Compile Include="Assets\HSP.Vessels\VesselManager.cs" />
     <Compile Include="Assets\HSP.Vessels\DesignObject.cs" />
     <Compile Include="Assets\HSP.Vessels\Components\FAttachNode.cs" />
-    <Compile Include="Assets\HSP.Vessels\DesignSceneTools\TranslateTool.cs" />
-    <Compile Include="Assets\HSP.Vessels\DesignSceneTools\RerootTool.cs" />
     <Compile Include="Assets\HSP.Vessels\FClickInteractionRedirect.cs" />
     <Compile Include="Assets\HSP.Vessels\PartFactory.cs" />
     <Compile Include="Assets\HSP.Vessels\VesselHierarchyUtils.cs" />
@@ -938,6 +930,10 @@
       <Project>{7122B491-FD2B-2B59-D391-006CB0AE788B}</Project>
       <Name>_UnityPlus.AssetManagement</Name>
     </ProjectReference>
+    <ProjectReference Include="_UnityPlus.Input.csproj">
+      <Project>{1B7EDF60-A4D7-21D6-6511-CFB4286999D1}</Project>
+      <Name>_UnityPlus.Input</Name>
+    </ProjectReference>
     <ProjectReference Include="_UnityPlus.OverridableEvents.csproj">
       <Project>{049D3356-CD2A-DFB0-C50D-8CFE5B092848}</Project>
       <Name>_UnityPlus.OverridableEvents</Name>
@@ -961,6 +957,14 @@
     <ProjectReference Include="HSP.Timelines.csproj">
       <Project>{C443A3BB-4D58-3A1D-D085-E8AEA15B2BC0}</Project>
       <Name>HSP.Timelines</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Input.csproj">
+      <Project>{27123301-09AF-37AC-2FCA-FF7B2CC75C42}</Project>
+      <Name>HSP.Input</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.SceneManagement.csproj">
+      <Project>{5B21ACE1-5E92-EEB2-818D-AF6D6AE9F824}</Project>
+      <Name>HSP.SceneManagement</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

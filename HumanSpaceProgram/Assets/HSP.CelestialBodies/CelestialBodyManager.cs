@@ -1,14 +1,6 @@
-﻿using HSP.Core.SceneManagement;
-using HSP.Core.Serialization;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using UnityPlus.Serialization;
-using UnityPlus.Serialization.DataHandlers;
 
 namespace HSP.Core
 {
@@ -18,6 +10,7 @@ namespace HSP.Core
 
         public static CelestialBody Get( string id )
         {
+#warning TODO - ManagerNotFoundException? or SingletonMonoBehaviourNotFoundException?
             if( !instanceExists )
                 throw new InvalidSceneManagerException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
 

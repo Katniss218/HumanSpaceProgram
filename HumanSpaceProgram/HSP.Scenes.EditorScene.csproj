@@ -935,10 +935,6 @@
       <Project>{27123301-09AF-37AC-2FCA-FF7B2CC75C42}</Project>
       <Name>HSP.Input</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.SceneManagement.csproj">
-      <Project>{5B21ACE1-5E92-EEB2-818D-AF6D6AE9F824}</Project>
-      <Name>HSP.SceneManagement</Name>
-    </ProjectReference>
     <ProjectReference Include="HSP.Scenes.csproj">
       <Project>{0FF6884C-8D4A-7AB7-5D8A-5FBF5FCF8190}</Project>
       <Name>HSP.Scenes</Name>

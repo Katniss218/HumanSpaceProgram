@@ -58,10 +58,10 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.Scenes.DesignScene.UI\DesignSceneUIFactory.cs" />
+    <Compile Include="Assets\HSP.Scenes.UI\DesignSceneUIFactory.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\HSP.Scenes.DesignScene.UI\___HSP.Scenes.DesignScene.UI.asmdef" />
+    <None Include="Assets\HSP.Scenes.UI\___HSP.Scenes.UI.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -938,9 +938,13 @@
       <Project>{27123301-09AF-37AC-2FCA-FF7B2CC75C42}</Project>
       <Name>HSP.Input</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.Scenes.DesignScene.csproj">
-      <Project>{EBE9303E-BBCA-7E74-9C99-30DB3592FFBF}</Project>
-      <Name>HSP.Scenes.DesignScene</Name>
+    <ProjectReference Include="HSP.SceneManagement.csproj">
+      <Project>{5B21ACE1-5E92-EEB2-818D-AF6D6AE9F824}</Project>
+      <Name>HSP.SceneManagement</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.UI.csproj">
+      <Project>{05A5E85F-FD04-4199-F86F-3A6E38B383FB}</Project>
+      <Name>HSP.UI</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

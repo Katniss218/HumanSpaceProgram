@@ -58,7 +58,11 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.GameplayScene.CelestialBodies\AtmosphereRendererSceneIntegration.cs" />
+    <Compile Include="Assets\HSP.SceneManagement.Scenes\EditorSceneManager.cs" />
+    <Compile Include="Assets\HSP.SceneManagement.Scenes\GameplaySceneManager.cs" />
+    <Compile Include="Assets\HSP.SceneManagement.Scenes\DesignSceneManager.cs" />
+    <Compile Include="Assets\HSP.SceneManagement.Scenes\MainMenuSceneManager.cs" />
+    <Compile Include="Assets\HSP.SceneManagement.Scenes\AlwaysLoadedManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro.cginc" />
@@ -77,11 +81,11 @@
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro_Surface.cginc" />
     <None Include="Assets\_TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Mobile Masking.shader" />
+    <None Include="Assets\HSP.SceneManagement.Scenes\___HSP.SceneManagement.Scenes.asmdef" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF Overlay.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_Bitmap-Mobile.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Mobile.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_Sprite.shader" />
-    <None Include="Assets\HSP.GameplayScene.CelestialBodies\___HSP.GameplayScene.CelestialBodies.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -1001,6 +1005,14 @@
     <ProjectReference Include="_UnityPlus.Input.csproj">
       <Project>{1B7EDF60-A4D7-21D6-6511-CFB4286999D1}</Project>
       <Name>_UnityPlus.Input</Name>
+    </ProjectReference>
+    <ProjectReference Include="_UnityPlus.OverridableValueProviders.csproj">
+      <Project>{2FD51314-7711-BD56-25C5-0C8F36A30A82}</Project>
+      <Name>_UnityPlus.OverridableValueProviders</Name>
+    </ProjectReference>
+    <ProjectReference Include="_UnityPlus.csproj">
+      <Project>{49D4BC99-1C12-776F-CC5E-D6CE66E348FE}</Project>
+      <Name>_UnityPlus</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

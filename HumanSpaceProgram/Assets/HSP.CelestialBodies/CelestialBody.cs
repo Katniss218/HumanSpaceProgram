@@ -1,11 +1,5 @@
 ﻿using HSP.Core.ReferenceFrames;
-using HSP.Core.SceneManagement;
-using HSP.Core.Serialization;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization;
 

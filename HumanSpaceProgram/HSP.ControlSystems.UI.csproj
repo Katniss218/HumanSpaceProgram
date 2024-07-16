@@ -58,20 +58,20 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.ControlSystems.UI\UIControlSetupWindow.cs" />
-    <Compile Include="Assets\HSP.ControlSystems.UI\ControlSetupControlGroupUI.cs" />
-    <Compile Include="Assets\HSP.ControlSystems.UI\ControlSetupControlUI.cs" />
-    <Compile Include="Assets\HSP.ControlSystems.UI\ControlSetupWindowComponentUI.cs" />
-    <Compile Include="Assets\HSP.ControlSystems.UI\UISequenceElement.cs" />
-    <Compile Include="Assets\HSP.ControlSystems.UI\UISequenceAction.cs" />
-    <Compile Include="Assets\HSP.ControlSystems.UI\UISequencerPanel.cs" />
-    <Compile Include="Assets\HSP.ControlSystems.UI\SequencerPanelFactory.cs" />
-    <Compile Include="Assets\HSP.ControlSystems.UI\ControlSetupControlConnectionUI.cs" />
-    <Compile Include="Assets\HSP.ControlSystems.UI\UINavball.cs" />
-    <Compile Include="Assets\HSP.ControlSystems.UI\NavballRenderTextureManager.cs" />
+    <Compile Include="Assets\HSP.UI.ControlSystems\UIControlSetupWindow.cs" />
+    <Compile Include="Assets\HSP.UI.ControlSystems\ControlSetupControlGroupUI.cs" />
+    <Compile Include="Assets\HSP.UI.ControlSystems\ControlSetupControlUI.cs" />
+    <Compile Include="Assets\HSP.UI.ControlSystems\ControlSetupWindowComponentUI.cs" />
+    <Compile Include="Assets\HSP.UI.ControlSystems\UISequenceElement.cs" />
+    <Compile Include="Assets\HSP.UI.ControlSystems\UISequenceAction.cs" />
+    <Compile Include="Assets\HSP.UI.ControlSystems\UISequencerPanel.cs" />
+    <Compile Include="Assets\HSP.UI.ControlSystems\SequencerPanelFactory.cs" />
+    <Compile Include="Assets\HSP.UI.ControlSystems\ControlSetupControlConnectionUI.cs" />
+    <Compile Include="Assets\HSP.UI.ControlSystems\UINavball.cs" />
+    <Compile Include="Assets\HSP.UI.ControlSystems\NavballRenderTextureManager.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\HSP.ControlSystems.UI\___HSP.ControlSystems.UI.asmdef" />
+    <None Include="Assets\HSP.UI.ControlSystems\___HSP.UI.ControlSystems.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

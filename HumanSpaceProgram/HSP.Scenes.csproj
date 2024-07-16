@@ -58,7 +58,14 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.Scenes\SceneCamera.cs" />
+    <Compile Include="Assets\HSP.Scenes\DesignScene\DesignSceneToolBase.cs" />
+    <Compile Include="Assets\HSP.Scenes\EditorSceneManager.cs" />
+    <Compile Include="Assets\HSP.Scenes\GameplaySceneManager.cs" />
+    <Compile Include="Assets\HSP.Scenes\DesignScene\DesignSceneToolManager.cs" />
+    <Compile Include="Assets\HSP.Scenes\DesignSceneManager.cs" />
+    <Compile Include="Assets\HSP.Scenes\MainMenuSceneManager.cs" />
+    <Compile Include="Assets\HSP.Scenes\GameplayScene\GameplaySceneToolBase.cs" />
+    <Compile Include="Assets\HSP.Scenes\GameplayScene\GameplaySceneToolManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Scenes\___HSP.Scenes.asmdef" />
@@ -925,10 +932,6 @@
     <ProjectReference Include="HSP.csproj">
       <Project>{5294BE79-15AB-2AAE-E8C3-9E735E001D6D}</Project>
       <Name>HSP</Name>
-    </ProjectReference>
-    <ProjectReference Include="HSP.SceneManagement.csproj">
-      <Project>{5B21ACE1-5E92-EEB2-818D-AF6D6AE9F824}</Project>
-      <Name>HSP.SceneManagement</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

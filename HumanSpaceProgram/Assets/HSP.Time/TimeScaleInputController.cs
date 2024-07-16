@@ -16,12 +16,6 @@ namespace HSP.GameplayScene
 	[DisallowMultipleComponent]
 	public class TimeScaleInputController : MonoBehaviour
 	{
-		[HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, HSPEvent.NAMESPACE_VANILLA + ".add_timescale_icontroller" )]
-		private static void CreateInstanceInScene()
-		{
-			GameplaySceneManager.Instance.gameObject.AddComponent<TimeScaleInputController>();
-		}
-
 		void OnEnable()
 		{
 			HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_TIMESCALE_INCREASE, HierarchicalInputPriority.MEDIUM, Input_TimescaleIncrease );

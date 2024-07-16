@@ -1,7 +1,11 @@
 {
     "name": "_UnityPlus.OverridableEvents",
     "rootNamespace": "",
-    "references": [],
+    "references": [
+        "GUID:9ad8c4744ceb81b468efab84b331da30",
+        "GUID:27d62e6e15e3fa24eabddedaa74a2424",
+        "GUID:d728809217af3ae4db3ac3c77dc1c871"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

@@ -59,9 +59,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\_UnityPlus.OverridableEvents\OverridableEvent.cs" />
-    <Compile Include="Assets\_UnityPlus.OverridableEvents\OverridableEvent_Ex.cs" />
     <Compile Include="Assets\_UnityPlus.OverridableEvents\OverridableEventListener.cs" />
-    <Compile Include="Assets\_UnityPlus.OverridableEvents\OverridableEventManager.cs" />
+    <Compile Include="Assets\_UnityPlus.OverridableEvents\OverridableEventRegistry.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_UnityPlus.OverridableEvents\___UnityPlus.OverridableEvents.asmdef" />
@@ -909,6 +908,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="_UnityEngine.csproj">
+      <Project>{29A28F5C-31DD-0068-5BB5-61A0CFFA20FA}</Project>
+      <Name>_UnityEngine</Name>
+    </ProjectReference>
+    <ProjectReference Include="_UnityPlus.csproj">
+      <Project>{49D4BC99-1C12-776F-CC5E-D6CE66E348FE}</Project>
+      <Name>_UnityPlus</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />
