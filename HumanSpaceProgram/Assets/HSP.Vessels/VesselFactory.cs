@@ -39,7 +39,8 @@ namespace HSP.Core
             GameObject gameObject = new GameObject( $"Vessel, '{name}'" );
 
             RootObjectTransform ro = gameObject.AddComponent<RootObjectTransform>();
-            FreePhysicsObject fpo = gameObject.AddComponent<FreePhysicsObject>();
+            // FreePhysicsObject fpo = gameObject.AddComponent<FreePhysicsObject>();
+#warning TODO - when a vessel is created, there should be an event and this adding of free/pinned phys object should be hooked into that.
 
             Vessel vessel = gameObject.AddComponent<Vessel>();
             vessel.name = name;

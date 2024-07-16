@@ -926,6 +926,10 @@
       <Project>{3A5E96D9-C189-180D-1672-7BEFFDEBCE5F}</Project>
       <Name>_UnityPlus.UILib</Name>
     </ProjectReference>
+    <ProjectReference Include="HSP.csproj">
+      <Project>{5294BE79-15AB-2AAE-E8C3-9E735E001D6D}</Project>
+      <Name>HSP</Name>
+    </ProjectReference>
     <ProjectReference Include="HSP.ResourceFlow.csproj">
       <Project>{26023575-EB06-DAA2-C7B2-77FFBAED8CB8}</Project>
       <Name>HSP.ResourceFlow</Name>

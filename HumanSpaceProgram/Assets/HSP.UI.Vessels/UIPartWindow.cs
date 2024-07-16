@@ -1,5 +1,4 @@
-﻿using HSP.Core.ResourceFlowSystem;
-using UnityPlus.UILib;
+﻿using UnityPlus.UILib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,13 +49,13 @@ namespace HSP.UI.Windows
             // one slightly better way would be to put the object in the argument, but that will call every listener, most of which won't care about this specific object.
             // also, make the event type-safe, event creation specifies type, later assignments must use a delegate that equals the created type.
 
-            foreach( var comp in components )
+            /*foreach( var comp in components )
             {
                 if( comp is IResourceContainer r )
                 {
                     _list.AddIResourceContainer( r );
                 }
-            }
+            }*/
         }
 
         void LateUpdate()

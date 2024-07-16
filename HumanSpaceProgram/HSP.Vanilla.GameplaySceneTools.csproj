@@ -10,10 +10,10 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{8814F878-154C-0913-7A9D-C492D2124EEC}</ProjectGuid>
+    <ProjectGuid>{4A3C1EC2-1E7C-4451-D0B9-6D4D3F04A4C2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <AssemblyName>HSP.UI.Vessels</AssemblyName>
+    <AssemblyName>HSP.Vanilla.GameplaySceneTools</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <BaseDirectory>.</BaseDirectory>
@@ -58,17 +58,12 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.UI.Vessels\UITextReadout_Velocity.cs" />
-    <Compile Include="Assets\HSP.UI.Vessels\UITextReadout_Altitude.cs" />
-    <Compile Include="Assets\HSP.UI.Vessels\UIPartWindow.cs" />
-    <Compile Include="Assets\HSP.UI.Vessels\UIPartWindowComponent.cs" />
-    <Compile Include="Assets\HSP.UI.Vessels\WindowRelationHighlight.cs" />
-    <Compile Include="Assets\HSP.UI.Vessels\VesselHUDManager.cs" />
-    <Compile Include="Assets\HSP.UI.Vessels\UITextReadout_Acceleration.cs" />
-    <Compile Include="Assets\HSP.UI.Vessels\VesselHUD.cs" />
+    <Compile Include="Assets\HSP.Vanilla.GameplaySceneTools\DefaultTool.cs" />
+    <Compile Include="Assets\HSP.Vanilla.GameplaySceneTools\VanillaToolRegisterer.cs" />
+    <Compile Include="Assets\HSP.Vanilla.GameplaySceneTools\ConstructTool.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\HSP.UI.Vessels\___HSP.UI.Vessels.asmdef" />
+    <None Include="Assets\HSP.Vanilla.GameplaySceneTools\___HSP.Vanilla.GameplaySceneTools.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -903,10 +898,6 @@
       <HintPath>F:\Unity\Editors\2022.1.8f1\Editor\Data\NetStandard\compat\2.1.0\shims\netfx\System.Xml.Serialization.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Unity.TextMeshPro">
-      <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="UnityEditor.UI">
       <HintPath>Library\ScriptAssemblies\UnityEditor.UI.dll</HintPath>
       <Private>False</Private>
@@ -925,6 +916,10 @@
       <Project>{7122B491-FD2B-2B59-D391-006CB0AE788B}</Project>
       <Name>_UnityPlus.AssetManagement</Name>
     </ProjectReference>
+    <ProjectReference Include="_UnityPlus.Input.csproj">
+      <Project>{1B7EDF60-A4D7-21D6-6511-CFB4286999D1}</Project>
+      <Name>_UnityPlus.Input</Name>
+    </ProjectReference>
     <ProjectReference Include="_UnityPlus.OverridableEvents.csproj">
       <Project>{049D3356-CD2A-DFB0-C50D-8CFE5B092848}</Project>
       <Name>_UnityPlus.OverridableEvents</Name>
@@ -933,17 +928,17 @@
       <Project>{FED3C19A-E743-9E19-D660-957D0801811E}</Project>
       <Name>_UnityPlus.Serialization</Name>
     </ProjectReference>
-    <ProjectReference Include="_UnityPlus.UILib.csproj">
-      <Project>{3A5E96D9-C189-180D-1672-7BEFFDEBCE5F}</Project>
-      <Name>_UnityPlus.UILib</Name>
-    </ProjectReference>
     <ProjectReference Include="HSP.csproj">
       <Project>{5294BE79-15AB-2AAE-E8C3-9E735E001D6D}</Project>
       <Name>HSP</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.CelestialBodies.csproj">
-      <Project>{83793330-5AED-C186-5E4B-AAD4BB463469}</Project>
-      <Name>HSP.CelestialBodies</Name>
+    <ProjectReference Include="HSP.Construction.csproj">
+      <Project>{EBC6D9CF-7C4D-8C8F-E094-E9D859959A88}</Project>
+      <Name>HSP.Construction</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Input.csproj">
+      <Project>{27123301-09AF-37AC-2FCA-FF7B2CC75C42}</Project>
+      <Name>HSP.Input</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.ReferenceFrames.csproj">
       <Project>{D8846B96-55B1-C32C-F90A-52C14F5C8043}</Project>
@@ -953,17 +948,13 @@
       <Project>{0FF6884C-8D4A-7AB7-5D8A-5FBF5FCF8190}</Project>
       <Name>HSP.Scenes</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.Trajectories.csproj">
-      <Project>{57FA29CC-9026-83EE-F242-EA051DEA7649}</Project>
-      <Name>HSP.Trajectories</Name>
-    </ProjectReference>
-    <ProjectReference Include="HSP.UI.csproj">
-      <Project>{05A5E85F-FD04-4199-F86F-3A6E38B383FB}</Project>
-      <Name>HSP.UI</Name>
-    </ProjectReference>
     <ProjectReference Include="HSP.Vessels.csproj">
       <Project>{46E8105E-3165-8157-383E-59E6654156AA}</Project>
       <Name>HSP.Vessels</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.ViewportTools.csproj">
+      <Project>{86E65C59-E535-B902-539C-629C971164F3}</Project>
+      <Name>HSP.ViewportTools</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

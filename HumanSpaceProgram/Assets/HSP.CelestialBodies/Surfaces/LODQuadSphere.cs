@@ -68,10 +68,13 @@ namespace HSP.CelestialBodies.Surface
 
         List<LODQuad> _activeQuads = new List<LODQuad>();
 
-        private static IEnumerable<Vector3Dbl> GetVesselPOIs()
+        public Func<IEnumerable<Vector3Dbl>> PoIGetter { get; set; }
+
+#warning TODO - integrate a poi getter.
+        /*private static IEnumerable<Vector3Dbl> GetVesselPOIs()
         {
             return VesselManager.LoadedVessels.Select( v => v.AIRFPosition );
-        }
+        }*/
 
         private static bool ApproximatelyDifferent( Vector3Dbl lhs, Vector3Dbl rhs )
         {
@@ -110,7 +113,7 @@ namespace HSP.CelestialBodies.Surface
             List<LODQuad> newActiveQuads = new List<LODQuad>( _activeQuads );
             List<LODQuad> needRemeshing = new List<LODQuad>();
 
-            Vector3Dbl[] airfPOIs = GetVesselPOIs().ToArray();
+            Vector3Dbl[] airfPOIs = PoIGetter.Invoke().ToArray();
 
             bool allPoisTheSame = NewPoisTheSameAsLastFrame( airfPOIs );
 

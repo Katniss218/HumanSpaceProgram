@@ -62,6 +62,7 @@
     <Compile Include="Assets\HSP.Scenes\EditorSceneManager.cs" />
     <Compile Include="Assets\HSP.Scenes\GameplaySceneManager.cs" />
     <Compile Include="Assets\HSP.Scenes\DesignScene\DesignSceneToolManager.cs" />
+    <Compile Include="Assets\HSP.Scenes\SceneCamera.cs" />
     <Compile Include="Assets\HSP.Scenes\DesignSceneManager.cs" />
     <Compile Include="Assets\HSP.Scenes\MainMenuSceneManager.cs" />
     <Compile Include="Assets\HSP.Scenes\GameplayScene\GameplaySceneToolBase.cs" />

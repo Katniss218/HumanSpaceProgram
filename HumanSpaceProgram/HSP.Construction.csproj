@@ -59,10 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\HSP.Construction\IGhostable_Ex.cs" />
-    <Compile Include="Assets\HSP.Construction\GameplaySceneTools\DefaultTool.cs" />
-    <Compile Include="Assets\HSP.Construction\GameplaySceneTools\VanillaToolRegisterer.cs" />
     <Compile Include="Assets\HSP.Construction\FConstructionSite.cs" />
-    <Compile Include="Assets\HSP.Construction\GameplaySceneTools\ConstructTool.cs" />
     <Compile Include="Assets\HSP.Construction\FConstructible.cs" />
     <Compile Include="Assets\HSP.Construction\HSPEventVanilla.cs" />
     <Compile Include="Assets\HSP.Construction\ConstructionState.cs" />
@@ -940,6 +937,14 @@
     <ProjectReference Include="HSP.Input.csproj">
       <Project>{27123301-09AF-37AC-2FCA-FF7B2CC75C42}</Project>
       <Name>HSP.Input</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.ReferenceFrames.csproj">
+      <Project>{D8846B96-55B1-C32C-F90A-52C14F5C8043}</Project>
+      <Name>HSP.ReferenceFrames</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Time.csproj">
+      <Project>{04DC55C0-E02E-3069-7322-19B05EB71C21}</Project>
+      <Name>HSP.Time</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.Vessels.csproj">
       <Project>{46E8105E-3165-8157-383E-59E6654156AA}</Project>

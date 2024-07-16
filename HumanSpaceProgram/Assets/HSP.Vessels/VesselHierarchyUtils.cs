@@ -171,8 +171,9 @@ namespace HSP.Core
 
             if( IsAnchored( partToSplit ) )
             {
-                PinnedPhysicsObject ppo = oldVessel.GetComponent<PinnedPhysicsObject>();
-                newVessel.Pin( ppo.ReferenceBody, ppo.ReferencePosition, ppo.ReferenceRotation );
+#warning TODO - when the vessel is created, have an event and hook the pinning up to that.
+               // PinnedPhysicsObject ppo = oldVessel.GetComponent<PinnedPhysicsObject>();
+               // newVessel.Pin( ppo.ReferenceBody, ppo.ReferencePosition, ppo.ReferenceRotation );
             }
         }
 
@@ -219,7 +220,8 @@ namespace HSP.Core
         /// </summary>
         public static bool IsAnchored( Transform transform )
         {
-            return transform.gameObject.HasComponentInChildren<FAnchor>();
+            return false;
+           // return transform.gameObject.HasComponentInChildren<FAnchor>();
         }
 
         /// <summary>
@@ -227,7 +229,8 @@ namespace HSP.Core
         /// </summary>
         public static bool IsRootAnchored( Transform transform )
         {
-            return transform.root.gameObject.HasComponentInChildren<FAnchor>();
+            return false;
+            // return transform.root.gameObject.HasComponentInChildren<FAnchor>();
         }
     }
 }

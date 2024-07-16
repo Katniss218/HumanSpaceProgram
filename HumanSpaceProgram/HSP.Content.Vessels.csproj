@@ -927,6 +927,10 @@
       <Project>{5294BE79-15AB-2AAE-E8C3-9E735E001D6D}</Project>
       <Name>HSP</Name>
     </ProjectReference>
+    <ProjectReference Include="HSP.Content.csproj">
+      <Project>{642CD5D5-9E37-E1CA-969F-267B97A7FC25}</Project>
+      <Name>HSP.Content</Name>
+    </ProjectReference>
     <ProjectReference Include="HSP.Vessels.csproj">
       <Project>{46E8105E-3165-8157-383E-59E6654156AA}</Project>
       <Name>HSP.Vessels</Name>

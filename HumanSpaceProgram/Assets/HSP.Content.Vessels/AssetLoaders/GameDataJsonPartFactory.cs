@@ -1,6 +1,8 @@
-﻿using HSP.Core;
+﻿using HSP.Content;
+using HSP.Core;
 using HSP.Core.Mods;
 using HSP.Core.Serialization;
+using HSP.Mods;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -38,7 +40,7 @@ namespace HSP.AssetLoaders
         private static void OnStartup()
         {
             // <mod_folder>/Parts/<part_id>/objects.json, data.json, _part.json
-            string gameDataPath = HumanSpaceProgramMods.GetModDirectoryPath();
+            string gameDataPath = ContentUtils.GetModDirectoryPath();
             string[] modDirectories = Directory.GetDirectories( gameDataPath );
 
             foreach( var modPath in modDirectories )

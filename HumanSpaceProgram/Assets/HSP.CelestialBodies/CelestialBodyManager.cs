@@ -11,8 +11,8 @@ namespace HSP.Core
         public static CelestialBody Get( string id )
         {
 #warning TODO - ManagerNotFoundException? or SingletonMonoBehaviourNotFoundException?
-            if( !instanceExists )
-                throw new InvalidSceneManagerException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
+           // if( !instanceExists )
+           //     throw new InvalidSceneManagerException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
 
             if( instance._celestialBodies.TryGetValue( id, out CelestialBody body ) )
             {
@@ -29,8 +29,8 @@ namespace HSP.Core
         {
             get
             {
-                if( !instanceExists )
-                    throw new InvalidSceneManagerException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
+               // if( !instanceExists )
+               //     throw new InvalidSceneManagerException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
 
                 return instance._celestialBodies.Values;
             }
@@ -40,8 +40,8 @@ namespace HSP.Core
         {
             get
             {
-                if( !instanceExists )
-                    throw new InvalidSceneManagerException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
+               // if( !instanceExists )
+               //     throw new InvalidSceneManagerException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
 
                 return instance._celestialBodies.Count;
             }
@@ -49,16 +49,16 @@ namespace HSP.Core
 
         internal static void Register( CelestialBody celestialBody )
         {
-            if( !instanceExists )
-                throw new InvalidSceneManagerException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
+           // if( !instanceExists )
+           //     throw new InvalidSceneManagerException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
 
             instance._celestialBodies[celestialBody.ID] = celestialBody;
         }
 
         internal static void Unregister( string id )
         {
-            if( !instanceExists )
-                throw new InvalidSceneManagerException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
+           // if( !instanceExists )
+           //     throw new InvalidSceneManagerException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
 
             instance._celestialBodies.Remove( id );
         }

@@ -59,10 +59,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\HSP.Vessels\Vessel.cs" />
-    <Compile Include="Assets\HSP.Vessels\PartRegistry.cs" />
+    <Compile Include="Assets\HSP.Vessels\Serialization\PartRegistry.cs" />
     <Compile Include="Assets\HSP.Vessels\Vessel.Serialization.cs" />
     <Compile Include="Assets\HSP.Vessels\DesignObjectManager.cs" />
-    <Compile Include="Assets\HSP.Vessels\PartMetadata.cs" />
+    <Compile Include="Assets\HSP.Vessels\Serialization\PartMetadata.cs" />
     <Compile Include="Assets\HSP.Vessels\SymmetryDataContainer.cs" />
     <Compile Include="Assets\HSP.Vessels\Serialization\VesselMetadata.cs" />
     <Compile Include="Assets\HSP.Vessels\VesselFactory.cs" />

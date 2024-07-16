@@ -2,11 +2,17 @@
     "name": "HSP.UI.Vessels",
     "rootNamespace": "",
     "references": [
+        "GUID:6055be8ebefd69e48b49212b09b47b2f",
         "GUID:27d62e6e15e3fa24eabddedaa74a2424",
         "GUID:3f85132a81c90724483587ec215e1407",
         "GUID:9511fd24fc492724aa0a1416a4ef03d2",
         "GUID:f00983dade8147042b611005c376fd7e",
         "GUID:c82c696bae534834ea738d7d72110d7e",
+        "GUID:2a88aeff819575d4eb14afd4a2966bb9",
+        "GUID:8e5fb9bc9cdd4f44c8c20b44e9cc5765",
+        "GUID:a9e3f1d270ec62a48a372dfafa76077f",
+        "GUID:dd04dc5bf927f9e45b67998322663a61",
+        "GUID:bf6bc7305a2975848acef71667329432",
         "GUID:64477a42274923947ba88ace983948f2",
         "GUID:54759978dae76ac488999b2664cca804"
     ],

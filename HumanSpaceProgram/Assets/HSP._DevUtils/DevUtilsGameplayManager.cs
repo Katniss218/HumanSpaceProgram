@@ -10,12 +10,15 @@ using HSP.Core.Components;
 using System;
 using UnityPlus.AssetManagement;
 using UnityPlus.Serialization;
+using HSP.Trajectories;
 using System.IO;
 using HSP.Core.Mods;
 using UnityPlus.Serialization.ReferenceMaps;
 using System.Linq;
 using System.Collections.Generic;
 using UnityPlus.Serialization.DataHandlers;
+using HSP.Mods;
+using HSP.Content;
 
 namespace HSP.DevUtils
 {
@@ -145,7 +148,7 @@ namespace HSP.DevUtils
             {
                 JsonSerializedDataHandler handler;
 
-                string gameDataPath = HumanSpaceProgramMods.GetModDirectoryPath();
+                string gameDataPath = ContentUtils.GetModDirectoryPath();
                 string partDir;
 
                 VesselMetadata vm;

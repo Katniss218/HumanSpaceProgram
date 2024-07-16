@@ -60,6 +60,7 @@
   <ItemGroup>
     <Compile Include="Assets\HSP.Content\ContentUtils.cs" />
     <Compile Include="Assets\HSP.Content\AssetLoaders\GameDataTextureLoader.cs" />
+    <Compile Include="Assets\HSP.Content\Mods\HumanSpaceProgramMods.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Content\___HSP.Content.asmdef" />

@@ -58,14 +58,14 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.UI.Scenes\GameplayScene\GameplaySceneUIFactory.cs" />
-    <Compile Include="Assets\HSP.UI.Scenes\GameplayScene\GameplayEscapeUIFactory.cs" />
-    <Compile Include="Assets\HSP.UI.Scenes\MainMenuScene\MainMenuSceneUIFactory.cs" />
-    <Compile Include="Assets\HSP.UI.Scenes\GameplayScene\GameplayViewportClickController.cs" />
-    <Compile Include="Assets\HSP.UI.Scenes\DesignScene\DesignSceneUIFactory.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI.Scenes\GameplayScene\GameplaySceneUIFactory.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI.Scenes\GameplayScene\GameplayEscapeUIFactory.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI.Scenes\MainMenuScene\MainMenuSceneUIFactory.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI.Scenes\GameplayScene\GameplayViewportClickController.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI.Scenes\DesignScene\DesignSceneUIFactory.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\HSP.UI.Scenes\___HSP.UI.Scenes.asmdef" />
+    <None Include="Assets\HSP.Vanilla.UI.Scenes\___HSP.Vanilla.UI.Scenes.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -898,6 +898,10 @@
     </Reference>
     <Reference Include="System.Xml.Serialization">
       <HintPath>F:\Unity\Editors\2022.1.8f1\Editor\Data\NetStandard\compat\2.1.0\shims\netfx\System.Xml.Serialization.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEditor.UI">
