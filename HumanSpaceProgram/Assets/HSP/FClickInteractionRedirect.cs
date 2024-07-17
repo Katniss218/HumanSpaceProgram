@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace HSP.Core.Components
+namespace HSP
 {
     /// <summary>
     /// Redirects click interactions to a different <see cref="GameObject"/>.

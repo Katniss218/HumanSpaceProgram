@@ -67,10 +67,13 @@
     <Compile Include="Assets\HSP.Vanilla.Components\FSequencer.SequenceAction.cs" />
     <Compile Include="Assets\HSP.Vanilla.Components\FSequencer.SequenceElement.cs" />
     <Compile Include="Assets\HSP.Vanilla.Components\FRocketEngine.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Components\FBulkContainer_Sphere.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Components\FBulkConnection.cs" />
     <Compile Include="Assets\HSP.Vanilla.Components\F2AxisActuator.cs" />
     <Compile Include="Assets\HSP.Vanilla.Components\FGimbalActuatorController.cs" />
     <Compile Include="Assets\HSP.Vanilla.Components\F1AxisActuator.cs" />
     <Compile Include="Assets\HSP.Vanilla.Components\FReactionControlController.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Components\FControlFrame.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla.Components\___HSP.Vanilla.Components.asmdef" />
@@ -945,6 +948,10 @@
     <ProjectReference Include="HSP.csproj">
       <Project>{5294BE79-15AB-2AAE-E8C3-9E735E001D6D}</Project>
       <Name>HSP</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.CelestialBodies.csproj">
+      <Project>{83793330-5AED-C186-5E4B-AAD4BB463469}</Project>
+      <Name>HSP.CelestialBodies</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.ControlSystems.csproj">
       <Project>{5E371463-138D-D25A-49B8-DED13355C7DC}</Project>

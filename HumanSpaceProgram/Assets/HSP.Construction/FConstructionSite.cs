@@ -10,7 +10,7 @@ using UnityEngine;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.ReferenceMaps;
 
-namespace HSP.GameplayScene
+namespace HSP.Construction
 {
     public static class FConstructionSite_Transform_Ex
     {

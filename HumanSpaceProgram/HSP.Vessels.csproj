@@ -71,7 +71,6 @@
     <Compile Include="Assets\HSP.Vessels\VesselManager.cs" />
     <Compile Include="Assets\HSP.Vessels\DesignObject.cs" />
     <Compile Include="Assets\HSP.Vessels\Components\FAttachNode.cs" />
-    <Compile Include="Assets\HSP.Vessels\FClickInteractionRedirect.cs" />
     <Compile Include="Assets\HSP.Vessels\PartFactory.cs" />
     <Compile Include="Assets\HSP.Vessels\VesselHierarchyUtils.cs" />
     <Compile Include="Assets\HSP.Vessels\Components\FLaunchSiteMarker.cs" />

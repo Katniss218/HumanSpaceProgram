@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using UnityPlus.Serialization.DataHandlers;
 using HSP.Mods;
 using HSP.Content;
+using HSP.Core.Physics;
 
 namespace HSP.DevUtils
 {

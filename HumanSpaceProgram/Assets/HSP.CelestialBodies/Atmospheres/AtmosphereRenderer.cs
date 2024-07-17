@@ -1,4 +1,5 @@
 using HSP.Core.ReferenceFrames;
+using System;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -32,6 +33,9 @@ namespace HSP.CelestialBodies
 
         [SerializeField]
         RenderTexture _rt;
+
+        public Func<RenderTexture> ColorRenderTextureGetter { get; set; }
+        public Func<RenderTexture> DepthRenderTextureGetter { get; set; }
 
         void OnReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
@@ -89,8 +93,10 @@ namespace HSP.CelestialBodies
 
 #warning TODO - doesn't necessarily have to be in the gameplay scene. we want atmospheres to render correctly in main menu too.
             //                                     The `_Texture` property name gets overriden by something else... Unity... >:{
-            //_atmosphereMaterial.SetTexture( Shader.PropertyToID( "_texgsfs" ), GameplaySceneCameraManager.ColorRenderTexture );
-          //  _atmosphereMaterial.SetTexture( Shader.PropertyToID( "_DepthBuffer" ), GameplaySceneDepthBufferCombiner.CombinedDepthRenderTexture, RenderTextureSubElement.Depth );
+           // _atmosphereMaterial.SetTexture( Shader.PropertyToID( "_texgsfs" ), GameplaySceneCameraManager.ColorRenderTexture );
+            _atmosphereMaterial.SetTexture( Shader.PropertyToID( "_texgsfs" ), ColorRenderTextureGetter.Invoke() );
+           // _atmosphereMaterial.SetTexture( Shader.PropertyToID( "_DepthBuffer" ), GameplaySceneDepthBufferCombiner.CombinedDepthRenderTexture, RenderTextureSubElement.Depth );
+            _atmosphereMaterial.SetTexture( Shader.PropertyToID( "_DepthBuffer" ), DepthRenderTextureGetter.Invoke(), RenderTextureSubElement.Depth );
 
             _atmosphereMaterial.SetVector( Shader.PropertyToID( "_Center" ), _center );
             _atmosphereMaterial.SetVector( Shader.PropertyToID( "_SunDirection" ), -light.transform.forward );

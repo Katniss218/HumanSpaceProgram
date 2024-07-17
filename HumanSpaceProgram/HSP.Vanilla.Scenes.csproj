@@ -60,14 +60,23 @@
   <ItemGroup>
     <Compile Include="Assets\HSP.Vanilla.Scenes\EditorScene\EditorSceneEscapeInputController.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\Cameras\DesignSceneOrbitingCameraController.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\Tools\PickTool.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\Cameras\GameplaySceneCameraManager.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\TimeScaleInputControllerFactory.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\Tools\DefaultTool.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\Tools\VanillaToolRegisterer.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\Cameras\DesignSceneCameraManager.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\GameplaySceneEscapeInputController.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\Cameras\GameplaySceneOrbitingCameraController.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\Tools\ConstructTool.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\Tools\VanillaToolRegisterer.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\Tools\RotateTool.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\DesignSceneEscapeInputController.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\MainMenuScene\Cameras\MainMenuSceneCameraManager.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\Cameras\GameplaySceneDepthBufferCombiner.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\Tools\TranslateTool.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\Tools\RerootTool.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Scenes\AtmosphereRendererSceneIntegration.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\MainMenuScene\MainMenuEscapeInputController.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -944,6 +953,10 @@
       <Project>{5294BE79-15AB-2AAE-E8C3-9E735E001D6D}</Project>
       <Name>HSP</Name>
     </ProjectReference>
+    <ProjectReference Include="HSP.Construction.csproj">
+      <Project>{EBC6D9CF-7C4D-8C8F-E094-E9D859959A88}</Project>
+      <Name>HSP.Construction</Name>
+    </ProjectReference>
     <ProjectReference Include="HSP.CelestialBodies.csproj">
       <Project>{83793330-5AED-C186-5E4B-AAD4BB463469}</Project>
       <Name>HSP.CelestialBodies</Name>
@@ -956,6 +969,10 @@
       <Project>{D8846B96-55B1-C32C-F90A-52C14F5C8043}</Project>
       <Name>HSP.ReferenceFrames</Name>
     </ProjectReference>
+    <ProjectReference Include="HSP.SceneManagement.csproj">
+      <Project>{5B21ACE1-5E92-EEB2-818D-AF6D6AE9F824}</Project>
+      <Name>HSP.SceneManagement</Name>
+    </ProjectReference>
     <ProjectReference Include="HSP.Scenes.csproj">
       <Project>{0FF6884C-8D4A-7AB7-5D8A-5FBF5FCF8190}</Project>
       <Name>HSP.Scenes</Name>
@@ -964,9 +981,17 @@
       <Project>{04DC55C0-E02E-3069-7322-19B05EB71C21}</Project>
       <Name>HSP.Time</Name>
     </ProjectReference>
+    <ProjectReference Include="HSP.Vanilla.csproj">
+      <Project>{AE718BD5-B7C2-FF6D-CB3C-BD7A5FEC452C}</Project>
+      <Name>HSP.Vanilla</Name>
+    </ProjectReference>
     <ProjectReference Include="HSP.Vessels.csproj">
       <Project>{46E8105E-3165-8157-383E-59E6654156AA}</Project>
       <Name>HSP.Vessels</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.ViewportTools.csproj">
+      <Project>{86E65C59-E535-B902-539C-629C971164F3}</Project>
+      <Name>HSP.ViewportTools</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

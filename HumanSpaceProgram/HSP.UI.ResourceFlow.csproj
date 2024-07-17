@@ -938,6 +938,10 @@
       <Project>{05A5E85F-FD04-4199-F86F-3A6E38B383FB}</Project>
       <Name>HSP.UI</Name>
     </ProjectReference>
+    <ProjectReference Include="HSP.UI.Vessels.csproj">
+      <Project>{8814F878-154C-0913-7A9D-C492D2124EEC}</Project>
+      <Name>HSP.UI.Vessels</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

@@ -1,5 +1,4 @@
 ﻿using HSP.Core;
-using HSP.GameplayScene;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +10,7 @@ using UnityPlus.AssetManagement;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.ReferenceMaps;
 
-namespace HSP.Components
+namespace HSP.Construction
 {
     public interface IConstructionCondition
     {

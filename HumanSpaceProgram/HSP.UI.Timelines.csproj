@@ -58,14 +58,14 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.UI.Timelines\UITimelineMetadata.cs" />
-    <Compile Include="Assets\HSP.UI.Timelines\UISaveMetadata.cs" />
-    <Compile Include="Assets\HSP.UI.Timelines\UISaveWindow.cs" />
-    <Compile Include="Assets\HSP.UI.Timelines\UIStartNewGameWindow.cs" />
-    <Compile Include="Assets\HSP.UI.Timelines\UILoadWindow.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI.Timelines\UITimelineMetadata.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI.Timelines\UISaveMetadata.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI.Timelines\UISaveWindow.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI.Timelines\UIStartNewGameWindow.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI.Timelines\UILoadWindow.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\HSP.UI.Timelines\___HSP.UI.Timelines.asmdef" />
+    <None Include="Assets\HSP.Vanilla.UI.Timelines\___HSP.UI.Timelines.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -953,6 +953,10 @@
     <ProjectReference Include="HSP.UI.csproj">
       <Project>{05A5E85F-FD04-4199-F86F-3A6E38B383FB}</Project>
       <Name>HSP.UI</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Vanilla.csproj">
+      <Project>{AE718BD5-B7C2-FF6D-CB3C-BD7A5FEC452C}</Project>
+      <Name>HSP.Vanilla</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

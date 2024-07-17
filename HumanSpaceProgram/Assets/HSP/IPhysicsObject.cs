@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace HSP.Core.Physics
+namespace HSP
 {
     /// <summary>
     /// Any object that interacts with the collision/physics system.

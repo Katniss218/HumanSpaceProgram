@@ -47,6 +47,7 @@ namespace HSP.Core
     /// </summary>
     public interface IPartObject : IComponent
     {
+#warning TODO - rename to IVessel, rename Vessel to GameplayVessel, rename DesignObject to DesignVessel
         /// <summary>
         /// The root part of this part object (if any).
         /// </summary>

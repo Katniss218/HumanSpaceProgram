@@ -69,6 +69,7 @@
     <Compile Include="Assets\HSP.Vanilla.UI.Components\ControlSetupControlConnectionUI.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI.Components\UINavball.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI.Components\NavballRenderTextureManager.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI.Components\UIIResourceContainer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla.UI.Components\___HSP.Vanilla.UI.Components.asmdef" />
@@ -975,6 +976,10 @@
     <ProjectReference Include="HSP.Time.csproj">
       <Project>{04DC55C0-E02E-3069-7322-19B05EB71C21}</Project>
       <Name>HSP.Time</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Trajectories.csproj">
+      <Project>{57FA29CC-9026-83EE-F242-EA051DEA7649}</Project>
+      <Name>HSP.Trajectories</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.UI.csproj">
       <Project>{05A5E85F-FD04-4199-F86F-3A6E38B383FB}</Project>

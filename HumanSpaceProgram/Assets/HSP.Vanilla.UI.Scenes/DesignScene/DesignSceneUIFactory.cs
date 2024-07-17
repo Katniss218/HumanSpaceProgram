@@ -10,6 +10,7 @@ using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
 using UnityPlus.UILib.Layout;
 using UnityPlus.UILib.UIElements;
+using HSP.Vessels;
 
 namespace HSP.UI.SceneFactories
 {

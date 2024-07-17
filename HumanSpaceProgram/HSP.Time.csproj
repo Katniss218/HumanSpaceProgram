@@ -59,7 +59,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\HSP.Time\TimeStepManager.cs" />
-    <Compile Include="Assets\HSP.Time\TimeScaleInputController.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Time\___HSP.Time.asmdef" />

@@ -10,10 +10,10 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{26023575-EB06-DAA2-C7B2-77FFBAED8CB8}</ProjectGuid>
+    <ProjectGuid>{AE718BD5-B7C2-FF6D-CB3C-BD7A5FEC452C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <AssemblyName>HSP.ResourceFlow</AssemblyName>
+    <AssemblyName>HSP.Vanilla</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <BaseDirectory>.</BaseDirectory>
@@ -58,17 +58,12 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.ResourceFlow\FluidState.cs" />
-    <Compile Include="Assets\HSP.ResourceFlow\IResourceConsumer.cs" />
-    <Compile Include="Assets\HSP.ResourceFlow\IResourceContainer.cs" />
-    <Compile Include="Assets\HSP.ResourceFlow\IResourceProducer.cs" />
-    <Compile Include="Assets\HSP.ResourceFlow\SubstanceState.cs" />
-    <Compile Include="Assets\HSP.ResourceFlow\FlowUtils.cs" />
-    <Compile Include="Assets\HSP.ResourceFlow\Substance.cs" />
-    <Compile Include="Assets\HSP.ResourceFlow\SubstanceStateCollection.cs" />
+    <Compile Include="Assets\HSP.Vanilla\IGhostable_Ex.cs" />
+    <Compile Include="Assets\HSP.Vanilla\SaveMetadataEx.cs" />
+    <Compile Include="Assets\HSP.Vanilla\TimeScaleInputController.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\HSP.ResourceFlow\___HSP.ResourceFlow.asmdef" />
+    <None Include="Assets\HSP.Vanilla\___HSP.Vanilla.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -921,6 +916,10 @@
       <Project>{7122B491-FD2B-2B59-D391-006CB0AE788B}</Project>
       <Name>_UnityPlus.AssetManagement</Name>
     </ProjectReference>
+    <ProjectReference Include="_UnityPlus.Input.csproj">
+      <Project>{1B7EDF60-A4D7-21D6-6511-CFB4286999D1}</Project>
+      <Name>_UnityPlus.Input</Name>
+    </ProjectReference>
     <ProjectReference Include="_UnityPlus.OverridableEvents.csproj">
       <Project>{049D3356-CD2A-DFB0-C50D-8CFE5B092848}</Project>
       <Name>_UnityPlus.OverridableEvents</Name>
@@ -933,21 +932,25 @@
       <Project>{5294BE79-15AB-2AAE-E8C3-9E735E001D6D}</Project>
       <Name>HSP</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.CelestialBodies.csproj">
-      <Project>{83793330-5AED-C186-5E4B-AAD4BB463469}</Project>
-      <Name>HSP.CelestialBodies</Name>
+    <ProjectReference Include="HSP.Construction.csproj">
+      <Project>{EBC6D9CF-7C4D-8C8F-E094-E9D859959A88}</Project>
+      <Name>HSP.Construction</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.ReferenceFrames.csproj">
-      <Project>{D8846B96-55B1-C32C-F90A-52C14F5C8043}</Project>
-      <Name>HSP.ReferenceFrames</Name>
+    <ProjectReference Include="HSP.Input.csproj">
+      <Project>{27123301-09AF-37AC-2FCA-FF7B2CC75C42}</Project>
+      <Name>HSP.Input</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.SceneManagement.csproj">
+      <Project>{5B21ACE1-5E92-EEB2-818D-AF6D6AE9F824}</Project>
+      <Name>HSP.SceneManagement</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.Time.csproj">
       <Project>{04DC55C0-E02E-3069-7322-19B05EB71C21}</Project>
       <Name>HSP.Time</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.Vessels.csproj">
-      <Project>{46E8105E-3165-8157-383E-59E6654156AA}</Project>
-      <Name>HSP.Vessels</Name>
+    <ProjectReference Include="HSP.Timelines.csproj">
+      <Project>{C443A3BB-4D58-3A1D-D085-E8AEA15B2BC0}</Project>
+      <Name>HSP.Timelines</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

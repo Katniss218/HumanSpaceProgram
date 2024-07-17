@@ -60,8 +60,8 @@
   <ItemGroup>
     <Compile Include="Assets\HSP\InertiaUtils.cs" />
     <Compile Include="Assets\HSP\NamespacedIdentifier.Serialization.cs" />
-    <Compile Include="Assets\HSP\HSPEvent.cs" />
     <Compile Include="Assets\HSP\NamespacedIdentifier.cs" />
+    <Compile Include="Assets\HSP\HSPEvent.cs" />
     <Compile Include="Assets\HSP\FPointMass.cs" />
     <Compile Include="Assets\HSP\Layer.cs" />
     <Compile Include="Assets\HSP\HSPEventListenerAttribute.cs" />
@@ -69,6 +69,8 @@
     <Compile Include="Assets\HSP\IHasMass.cs" />
     <Compile Include="Assets\HSP\Version.cs" />
     <Compile Include="Assets\HSP\HumanSpaceProgram.cs" />
+    <Compile Include="Assets\HSP\FClickInteractionRedirect.cs" />
+    <Compile Include="Assets\HSP\PIDLoop.cs" />
     <Compile Include="Assets\HSP\IPhysicsObject.cs" />
   </ItemGroup>
   <ItemGroup>

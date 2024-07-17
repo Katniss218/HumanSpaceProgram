@@ -1,5 +1,5 @@
 ﻿using HSP.Components;
-using HSP.Core.Components;
+using HSP.Construction;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,11 +11,6 @@ using UnityPlus.Serialization;
 
 namespace HSP
 {
-    public static class GhostableContext
-    {
-        public const int Ghost = -2137042352;
-    }
-
     public static class IGhostable_Ex
     {
 

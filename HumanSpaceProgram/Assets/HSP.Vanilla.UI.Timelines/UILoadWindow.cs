@@ -1,5 +1,6 @@
 using HSP.Core.SceneManagement;
 using HSP.Core.Serialization;
+using HSP.Vanilla;
 using HSP.UI.Windows;
 using System;
 using System.Collections.Generic;

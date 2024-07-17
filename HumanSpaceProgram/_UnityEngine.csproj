@@ -80,8 +80,8 @@
     <Compile Include="Assets\_UnityEngine\Extensions\Transform_Ex.cs" />
     <Compile Include="Assets\_UnityEngine\UnityApplication.cs" />
     <Compile Include="Assets\_UnityEngine\MeshUtils.cs" />
-    <Compile Include="Assets\_UnityEngine\Vector3Dbl.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\MatrixMxN_Ex.cs" />
+    <Compile Include="Assets\_UnityEngine\Vector3Dbl.cs" />
     <Compile Include="Assets\_UnityEngine\QuaternionCurve.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\IEnumerable_Component__Ex.cs" />
     <Compile Include="Assets\_UnityEngine\TypeMap.cs" />
