@@ -30,7 +30,7 @@ namespace HSP.Core
         /// - joining vessels (<paramref name="part"/> = any, <paramref name="parentPart"/> = any, different vessel), 
         ///     if <paramref name="part"/> is a root, it will delete the <paramref name="part"/>'s vessel. <br/>
         /// - re-parenting parts (<paramref name="part"/> = any, <paramref name="parentPart"/> = any, same vessel). <br/>
-        /// - re-rooting the vessel (<paramref name="part"/> = <see cref="Vessel.RootPart"/>, <paramref name="parentPart"/> = any non-root, same vessel). <br/>
+        /// - re-rooting the vessel (<paramref name="part"/> = <see cref="GameplayVessel.RootPart"/>, <paramref name="parentPart"/> = any non-root, same vessel). <br/>
         /// </remarks>
         /// <param name="part">The part to set as a child of <paramref name="parentPart"/>.</param>
         /// <param name="parentPart">The part to set as the parent of <paramref name="part"/></param>
@@ -47,7 +47,7 @@ namespace HSP.Core
                 // We could detach the parts from the vessel entirely, but that's not a legal state.
                 // We could create a new vessel with the specified part as its root.
 
-                if( part.IsRootOfPartObject() )
+                if( part.IsRootOfVessel() )
                 {
                     // create a new vessel, but the part is already the root of a new vessel. This is equivalent to recreating the original vessel and deleting the old one (i.e. a "do nothing").
                     return;
@@ -59,7 +59,7 @@ namespace HSP.Core
 
             if( part.GetVessel() == parentPart.GetVessel() )
             {
-                if( part.IsRootOfPartObject() )
+                if( part.IsRootOfVessel() )
                 {
                     SwapRoots( part, parentPart ); // Re-rooting as in KSP would be `Reparent( newRoot.Vessel.RootPart, newRoot )`
                 }
@@ -70,7 +70,7 @@ namespace HSP.Core
             }
             else
             {
-                if( part.IsRootOfPartObject() )
+                if( part.IsRootOfVessel() )
                 {
                     JoinVesselsRoot( part, parentPart );
                 }
@@ -83,7 +83,7 @@ namespace HSP.Core
 
         public static void AttachLoose( Transform looseRoot, Transform parent )
         {
-            Vessel v = parent.GetVessel();
+            IVessel v = parent.GetVessel();
             looseRoot.SetParent( parent, true );
             v.RecalculatePartCache();
         }
@@ -96,8 +96,8 @@ namespace HSP.Core
         private static void SwapRoots( Transform oldRoot, Transform newRoot )
         {
             Contract.Assert( oldRoot.GetVessel() == newRoot.GetVessel() );
-            Contract.Assert( oldRoot.IsRootOfPartObject() );
-            Contract.Assert( !newRoot.IsRootOfPartObject() );
+            Contract.Assert( oldRoot.IsRootOfVessel() );
+            Contract.Assert( !newRoot.IsRootOfVessel() );
 
             newRoot.GetVessel().RootPart = newRoot;
             Reattach( oldRoot, newRoot );
@@ -109,7 +109,7 @@ namespace HSP.Core
         private static void Reattach( Transform part, Transform parent )
         {
             Contract.Assert( part.GetVessel() == parent.GetVessel() );
-            Contract.Assert( !part.IsRootOfPartObject() );
+            Contract.Assert( !part.IsRootOfVessel() );
 
             part.SetParent( parent );
         }
@@ -117,9 +117,9 @@ namespace HSP.Core
         private static void JoinVesselsRoot( Transform partToJoin, Transform parent )
         {
             Contract.Assert( partToJoin.GetVessel() != parent.GetVessel() );
-            Contract.Assert( partToJoin.IsRootOfPartObject() );
+            Contract.Assert( partToJoin.IsRootOfVessel() );
 
-            Vessel oldVessel = partToJoin.GetVessel();
+            IVessel oldVessel = partToJoin.GetVessel();
             oldVessel.RootPart = null; // needed for the assert in the next method.
 
             JoinVesselsNotRoot( partToJoin, parent );
@@ -134,11 +134,11 @@ namespace HSP.Core
         private static void JoinVesselsNotRoot( Transform partToJoin, Transform parent )
         {
             Contract.Assert( partToJoin.GetVessel() != parent.GetVessel() );
-            Contract.Assert( !partToJoin.IsRootOfPartObject() );
+            Contract.Assert( !partToJoin.IsRootOfVessel() );
             // Move partToJoin to parent's vessel.
             // Attach partToJoin to parent.
 
-            Vessel oldv = partToJoin.GetVessel();
+            IVessel oldv = partToJoin.GetVessel();
             Reattach( partToJoin, parent );
             partToJoin.SetParent( parent.GetVessel().transform );
 
@@ -151,14 +151,14 @@ namespace HSP.Core
         /// </summary>
         private static void MakeNewVesselOrBuilding( Transform partToSplit )
         {
-            Contract.Assert( !partToSplit.IsRootOfPartObject() );
+            Contract.Assert( !partToSplit.IsRootOfVessel() );
 
             // Detach the parts from the old vessel.
-            Vessel oldVessel = partToSplit.GetVessel();
+            IVessel oldVessel = partToSplit.GetVessel();
 
 #warning TODO - Use linear and angular velocities of part that works correctly for spinning vessels.
 
-            Vessel newVessel = VesselFactory.CreatePartless(
+            GameplayVessel newVessel = VesselFactory.CreatePartless(
                 SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( partToSplit.transform.position ),
                 SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( partToSplit.transform.rotation ),
                 oldVessel.PhysicsObject.Velocity,

@@ -114,7 +114,7 @@ namespace HSP.Construction
              || (this.BuildPercent < 1.0f && this.BuildPercent - delta >= 1.0f) ) // start deconstruction
             {
                 RunOriginalToGhost();
-                var vessel = this.transform.GetPartObject();
+                var vessel = this.transform.GetVessel();
                 if( vessel != null )
                     vessel.RecalculatePartCache();
             }
@@ -122,7 +122,7 @@ namespace HSP.Construction
             if( this.BuildPercent >= 1.0f && this.BuildPercent - delta <= 1.0f ) // end construction
             {
                 RunGhostToOriginal();
-                var vessel = this.transform.GetPartObject();
+                var vessel = this.transform.GetVessel();
                 if( vessel != null )
                     vessel.RecalculatePartCache();
             }

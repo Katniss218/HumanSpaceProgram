@@ -250,7 +250,7 @@ namespace HSP.Components
                 throw new InvalidOperationException( $"Both ends must exist" );
             }
 
-            Vessel vessel = this.transform.GetVessel();
+            IVessel vessel = this.transform.GetVessel();
             if( vessel != null ) 
             {
                 Vector3Dbl airfAcceleration = GravityUtils.GetNBodyGravityAcceleration( vessel.RootObjTransform.AIRFPosition );

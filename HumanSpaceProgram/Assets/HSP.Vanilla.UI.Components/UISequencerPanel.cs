@@ -18,7 +18,7 @@ namespace HSP.UI
 
         // dropdown position clamped to the top of the screen.
 
-        private IPartObject _activeVessel;
+        private IVessel _activeVessel;
 
         private FSequencer _activeSequencer;
 
@@ -63,7 +63,7 @@ namespace HSP.UI
         {
             T uiSequencerPanel = UIPanel.Create<T>( parent, layout, null );
 
-            uiSequencerPanel._activeVessel = ActiveObjectManager.ActiveObject.transform.GetPartObject();
+            uiSequencerPanel._activeVessel = ActiveObjectManager.ActiveObject.transform.GetVessel();
 
             uiSequencerPanel.LayoutDriver = new VerticalLayoutDriver()
             {

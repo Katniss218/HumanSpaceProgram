@@ -11,12 +11,12 @@ namespace HSP.Core
 {
     public static class IPartObjectEx
     {
-        public static bool IsRootOfPartObject( this Transform part )
+        public static bool IsRootOfVessel( this Transform part )
         {
             if( part.root != part.parent )
                 return false;
 
-            IPartObject v = part.parent.GetComponent<IPartObject>();
+            IVessel v = part.parent.GetComponent<IVessel>();
             if( v == null )
                 return false;
 
@@ -24,39 +24,43 @@ namespace HSP.Core
         }
 
         /// <summary>
-        /// Gets the <see cref="IPartObject"/> attached to this transform.
+        /// Gets the <see cref="IVessel"/> attached to this transform.
         /// </summary>
         /// <returns>The part object. Null if the transform is not part of a part object.</returns>
-        public static IPartObject GetPartObject( this Transform part )
+        public static IVessel GetVessel( this Transform part )
         {
-            return part.root.GetComponent<IPartObject>();
+            return part.root.GetComponent<IVessel>();
         }
 
         /// <summary>
-        /// Gets the <see cref="IPartObject"/> attached to this gameobject.
+        /// Gets the <see cref="IVessel"/> attached to this gameobject.
         /// </summary>
         /// <returns>The part object. Null if the gameobject is not part of a part object.</returns>
-        public static IPartObject GetPartObject( this GameObject part )
+        public static IVessel GetVessel( this GameObject part )
         {
-            return GetPartObject( part.transform );
+            return GetVessel( part.transform );
         }
     }
 
     /// <summary>
     /// Represents an arbitrary type of part object.
     /// </summary>
-    public interface IPartObject : IComponent
+    public interface IVessel : IComponent
     {
 #warning TODO - rename to IVessel, rename Vessel to GameplayVessel, rename DesignObject to DesignVessel
         /// <summary>
         /// The root part of this part object (if any).
         /// </summary>
-        Transform RootPart { get; }
+        Transform RootPart { get; set; }
         
         /// <summary>
         /// Returns the transform that defines the orientation (local space) of this part object.
         /// </summary>
-        public Transform ReferenceTransform { get; }
+        Transform ReferenceTransform { get; }
+
+        IPhysicsObject PhysicsObject { get; set; }
+
+        RootObjectTransform RootObjTransform { get; }
 
         /// <summary>
         /// Call this to rebuild the part data cache.

@@ -10,26 +10,26 @@ using UnityEngine;
 
 namespace HSP.Core
 {
-    public static class Vessel_Transform_Ex
+   /* public static class Vessel_Transform_Ex
     {
         /// <summary>
-        /// Gets the <see cref="Vessel"/> attached to this transform.
+        /// Gets the <see cref="GameplayVessel"/> attached to this transform.
         /// </summary>
         /// <returns>The vessel. Null if the transform is not part of a vessel.</returns>
-        public static Vessel GetVessel( this Transform part )
+        public static GameplayVessel GetVessel( this Transform part )
         {
-            return part.root.GetComponent<Vessel>();
+            return part.root.GetComponent<GameplayVessel>();
         }
 
         /// <summary>
-        /// Gets the <see cref="Vessel"/> attached to this gameobject.
+        /// Gets the <see cref="GameplayVessel"/> attached to this gameobject.
         /// </summary>
         /// <returns>The vessel. Null if the gameobject is not part of a vessel.</returns>
-        public static Vessel GetVessel( this GameObject part )
+        public static GameplayVessel GetVessel( this GameObject part )
         {
             return GetVessel( part.transform );
         }
-    }
+    }*/
 
     /// <summary>
     /// A vessel is a moving object consisting of a hierarchy of "parts".
@@ -38,7 +38,7 @@ namespace HSP.Core
     /// Vessels exist only in the gameplay scene.
     /// </remarks>
     [RequireComponent( typeof( RootObjectTransform ) )]
-    public sealed partial class Vessel : MonoBehaviour, IPartObject
+    public sealed partial class GameplayVessel : MonoBehaviour, IVessel
     {
         [SerializeField]
         private string _displayName;

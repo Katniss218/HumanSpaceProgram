@@ -1,9 +1,11 @@
 ﻿using HSP.Core;
+using HSP.Core.ReferenceFrames;
+using System;
 using UnityEngine;
 
 namespace HSP.Vessels
 {
-    public class DesignObject : MonoBehaviour, IPartObject
+    public class DesignVessel : MonoBehaviour, IVessel
     {
         [SerializeField]
         Transform _rootPart;
@@ -21,6 +23,10 @@ namespace HSP.Vessels
         }
 
         public Transform ReferenceTransform => this.transform;
+
+        public IPhysicsObject PhysicsObject { get => throw new NotImplementedException( "implement via a nonmoving phys object." ); set => throw new NotImplementedException( "implement via a nonmoving phys object." ); }
+
+        public RootObjectTransform RootObjTransform { get => throw new NotImplementedException( "implement via a nonmoving phys object." ); }
 
         void Awake()
         {

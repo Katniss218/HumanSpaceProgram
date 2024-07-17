@@ -76,7 +76,7 @@ namespace HSP.Components
                 return;
             }
 
-            Vessel vessel = this.transform.GetVessel();
+            IVessel vessel = this.transform.GetVessel();
             if( vessel != null )
             {
                 vessel.PhysicsObject.AddForceAtPosition( this.ThrustTransform.forward * this.Thrust, this.ThrustTransform.position );

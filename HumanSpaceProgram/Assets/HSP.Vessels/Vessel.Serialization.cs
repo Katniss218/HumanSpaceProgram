@@ -10,14 +10,14 @@ namespace HSP.Core
 {
     public static class Vessel_SerializationMappings
     {
-        [MapsInheritingFrom( typeof( Vessel ) )]
+        [MapsInheritingFrom( typeof( GameplayVessel ) )]
         public static SerializationMapping VesselMapping()
         {
-            return new MemberwiseSerializationMapping<Vessel>()
+            return new MemberwiseSerializationMapping<GameplayVessel>()
             {
-                ("display_name", new Member<Vessel, bool>( o => o.enabled )),
-                ("root_part", new Member<Vessel, Transform>( ObjectContext.Ref, o => o.RootPart )),
-                ("on_after_recalculate_parts", new Member<Vessel, Action>( o => o.OnAfterRecalculateParts ))
+                ("display_name", new Member<GameplayVessel, bool>( o => o.enabled )),
+                ("root_part", new Member<GameplayVessel, Transform>( ObjectContext.Ref, o => o.RootPart )),
+                ("on_after_recalculate_parts", new Member<GameplayVessel, Action>( o => o.OnAfterRecalculateParts ))
             };
         }
     }

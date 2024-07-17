@@ -18,7 +18,7 @@ namespace HSP.Components
 	/// </summary>
 	public class FAttitudeAvionics : MonoBehaviour
 	{
-		private Vessel _vessel;
+		private IVessel _vessel;
 
         // error in pitch, roll, yaw, in [Rad]
         [field: SerializeField]

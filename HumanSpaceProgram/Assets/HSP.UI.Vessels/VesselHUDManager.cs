@@ -19,7 +19,7 @@ namespace HSP.UI.HUDs
         }
 
         [HSPEventListener( HSPEvent.GAMEPLAY_AFTER_VESSEL_REGISTERED, "vanilla.vessel_huds" )]
-        private static void OnVesselRegistered( Vessel vessel )
+        private static void OnVesselRegistered( GameplayVessel vessel )
         {
             if( ActiveObjectManager.ActiveObject == null )
             {
@@ -29,7 +29,7 @@ namespace HSP.UI.HUDs
         }
 
         [HSPEventListener( HSPEvent.GAMEPLAY_AFTER_VESSEL_UNREGISTERED, "vanilla.vessel_huds" )]
-        private static void OnVesselUnregistered( Vessel vessel )
+        private static void OnVesselUnregistered( GameplayVessel vessel )
         {
             foreach( var hud in instance._huds.ToArray() )
             {

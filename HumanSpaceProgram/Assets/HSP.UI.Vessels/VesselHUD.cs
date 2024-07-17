@@ -11,7 +11,7 @@ namespace HSP.UI.HUDs
 {
     public class VesselHUD : UIPanel
     {
-        public Vessel Vessel { get; private set; }
+        public GameplayVessel Vessel { get; private set; }
 
         void OnClick()
         {
@@ -23,7 +23,7 @@ namespace HSP.UI.HUDs
             ((RectTransform)this.transform).SetScreenPosition( SceneCamera.Camera, Vessel.transform.position );
         }
 
-        protected internal static T Create<T>( IUIElementContainer parent, Vessel vessel ) where T : VesselHUD
+        protected internal static T Create<T>( IUIElementContainer parent, GameplayVessel vessel ) where T : VesselHUD
         {
             if( vessel == null )
                 throw new ArgumentNullException( nameof( vessel ) );
@@ -40,7 +40,7 @@ namespace HSP.UI.HUDs
 
     public static class VesselHUD_Ex
     {
-        public static VesselHUD AddVesselHUD( this IUIElementContainer parent, Vessel vessel )
+        public static VesselHUD AddVesselHUD( this IUIElementContainer parent, GameplayVessel vessel )
         {
             return VesselHUD.Create<VesselHUD>( parent, vessel );
         }

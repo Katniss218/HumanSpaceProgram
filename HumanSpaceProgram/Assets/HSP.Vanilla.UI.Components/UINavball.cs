@@ -52,7 +52,7 @@ namespace HSP.UI
         {
             if( ActiveObjectManager.ActiveObject != null )
             {
-                Vessel activeVessel = ActiveObjectManager.ActiveObject.transform.GetVessel();
+                IVessel activeVessel = ActiveObjectManager.ActiveObject.transform.GetVessel();
 
                 Quaternion airfRotation = (Quaternion)FControlFrame.GetAIRFRotation( FControlFrame.VesselControlFrame, activeVessel );
                 Matrix4x4 airfToLocalMatrix = Matrix4x4.Rotate( airfRotation ).inverse;
@@ -60,7 +60,7 @@ namespace HSP.UI
                 Vector3Dbl airfVelocity = SceneReferenceFrameManager.SceneReferenceFrame.TransformDirection( activeVessel.PhysicsObject.Velocity );
                 if( airfVelocity.magnitude > 0.25f )
                 {
-                    OrbitalFrame orbitalFrame = OrbitalFrame.FromNBody( airfVelocity, GravityUtils.GetNBodyGravityAcceleration( activeVessel.AIRFPosition ) );
+                    OrbitalFrame orbitalFrame = OrbitalFrame.FromNBody( airfVelocity, GravityUtils.GetNBodyGravityAcceleration( activeVessel.RootObjTransform.AIRFPosition ) );
 
                     Vector3 localPrograde = airfToLocalMatrix.MultiplyVector( orbitalFrame.GetPrograde() ) * NavballPixelRadius;
                     Vector3 localRetrograde = airfToLocalMatrix.MultiplyVector( orbitalFrame.GetRetrograde() ) * NavballPixelRadius;

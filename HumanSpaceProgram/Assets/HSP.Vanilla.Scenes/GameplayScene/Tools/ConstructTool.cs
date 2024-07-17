@@ -182,7 +182,7 @@ namespace HSP.GameplayScene.Tools
                     return;
                 }
 
-                Vessel hitVessel = _hitObject.GetVessel();
+                IVessel hitVessel = _hitObject.GetVessel();
                 if( hitVessel == null )
                 {
                     return;
@@ -193,7 +193,7 @@ namespace HSP.GameplayScene.Tools
             else
             {
                 Transform parent = _currentSnap.Value.targetNode.transform.parent;
-                Vessel hitVessel = parent.GetVessel();
+                IVessel hitVessel = parent.GetVessel();
                 if( hitVessel == null )
                 {
                     return;
@@ -216,7 +216,7 @@ namespace HSP.GameplayScene.Tools
             {
                 if( _hitObject != null )
                 {
-                    Vessel hitVessel = _hitObject.GetVessel();
+                    IVessel hitVessel = _hitObject.GetVessel();
                     if( hitVessel == null )
                     {
                         return;

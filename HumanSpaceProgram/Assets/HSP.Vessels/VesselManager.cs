@@ -17,12 +17,12 @@ namespace HSP.Core
     /// </summary>
     public class VesselManager : SingletonMonoBehaviour<VesselManager>
     {
-        private List<Vessel> _vessels = new List<Vessel>();
+        private List<GameplayVessel> _vessels = new List<GameplayVessel>();
 
         /// <summary>
         /// Gets all vessels that are currently loaded into memory.
         /// </summary>
-        public static IEnumerable<Vessel> LoadedVessels
+        public static IEnumerable<GameplayVessel> LoadedVessels
         {
             get
             {
@@ -44,7 +44,7 @@ namespace HSP.Core
             }
         }
 
-        internal static void Register( Vessel vessel )
+        internal static void Register( GameplayVessel vessel )
         {
             if( !instanceExists )
                 throw new InvalidSceneManagerException( $"{nameof( VesselManager )} is only available in the gameplay scene." );
@@ -53,7 +53,7 @@ namespace HSP.Core
             HSPEvent.EventManager.TryInvoke( HSPEvent.GAMEPLAY_AFTER_VESSEL_REGISTERED, vessel );
         }
 
-        internal static void Unregister( Vessel vessel )
+        internal static void Unregister( GameplayVessel vessel )
         {
             if( !instanceExists )
                 throw new InvalidSceneManagerException( $"{nameof( VesselManager )} is only available in the gameplay scene." );

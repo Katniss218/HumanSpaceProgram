@@ -62,7 +62,7 @@ namespace HSP.Components
 
         void FixedUpdate()
         {
-            Vessel vessel = this.transform.GetVessel();
+            IVessel vessel = this.transform.GetVessel();
             if( vessel == null )
             {
                 return;

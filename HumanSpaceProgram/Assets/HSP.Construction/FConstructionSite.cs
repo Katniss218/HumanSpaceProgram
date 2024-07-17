@@ -242,7 +242,7 @@ namespace HSP.Construction
                         }
                     }
 
-                    var vessel = this.transform.GetPartObject();
+                    var vessel = this.transform.GetVessel();
 
                     if( this.State == ConstructionState.Deconstructing )
                     {
@@ -286,7 +286,7 @@ namespace HSP.Construction
 
             if( parent == null )
             {
-                Vessel vessel = VesselFactory.CreatePartless(
+                GameplayVessel vessel = VesselFactory.CreatePartless(
                     SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( ghostRoot.position ),
                     SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( ghostRoot.rotation ),
                     Vector3.zero,

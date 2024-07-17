@@ -24,9 +24,9 @@ namespace HSP.Core
         /// <param name="airfPosition">The `Absolute Inertial Reference Frame` position of the vessel to create.</param>
         /// <param name="airfRotation">Rotation of the vessel in the `Absolute Inertial Reference Frame`</param>
         /// <returns>The created partless vessel.</returns>
-        public static Vessel CreatePartless( Vector3Dbl airfPosition, QuaternionDbl airfRotation, Vector3 sceneVelocity, Vector3 sceneAngularVelocity )
+        public static GameplayVessel CreatePartless( Vector3Dbl airfPosition, QuaternionDbl airfRotation, Vector3 sceneVelocity, Vector3 sceneAngularVelocity )
         {
-            Vessel vessel = CreateGO( airfPosition, airfRotation );
+            GameplayVessel vessel = CreateGO( airfPosition, airfRotation );
 
            // vessel.PhysicsObject.Velocity = sceneVelocity;
            // vessel.PhysicsObject.AngularVelocity = sceneAngularVelocity;
@@ -34,7 +34,7 @@ namespace HSP.Core
             return vessel;
         }
 
-        private static Vessel CreateGO( Vector3Dbl airfPosition, QuaternionDbl airfRotation )
+        private static GameplayVessel CreateGO( Vector3Dbl airfPosition, QuaternionDbl airfRotation )
         {
             GameObject gameObject = new GameObject( $"Vessel, '{name}'" );
 
@@ -42,7 +42,7 @@ namespace HSP.Core
             //FreePhysicsObject fpo = gameObject.AddComponent<FreePhysicsObject>();
 #warning TODO - when a vessel is created, there should be an event and this adding of free/pinned phys object should be hooked into that.
 
-            Vessel vessel = gameObject.AddComponent<Vessel>();
+            GameplayVessel vessel = gameObject.AddComponent<GameplayVessel>();
             vessel.name = name;
             ro.AIRFPosition = airfPosition;
             ro.AIRFRotation = airfRotation;
@@ -53,7 +53,7 @@ namespace HSP.Core
         /// <summary>
         /// Completely deletes a vessel and cleans up after it.
         /// </summary>
-        public static void Destroy( Vessel vessel )
+        public static void Destroy( IVessel vessel )
         {
             UnityEngine.Object.Destroy( vessel.gameObject );
         }

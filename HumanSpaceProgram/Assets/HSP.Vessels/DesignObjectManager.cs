@@ -14,11 +14,11 @@ namespace HSP.Vessels
     /// </summary>
     public class DesignObjectManager : SingletonMonoBehaviour<DesignObjectManager>
     {
-        private DesignObject _designObj;
+        private DesignVessel _designObj;
         /// <summary>
         /// Returns the object currently being edited.
         /// </summary>
-        public static DesignObject DesignObject => instance._designObj;
+        public static DesignVessel DesignObject => instance._designObj;
 
         /// <summary>
         /// Parts that are loosely dropped in the design scene, ghosted out.
@@ -180,7 +180,7 @@ namespace HSP.Vessels
         {
             GameObject gameObject = new GameObject( $"DesignObject" );
 
-            _designObj = gameObject.AddComponent<DesignObject>();
+            _designObj = gameObject.AddComponent<DesignVessel>();
             _designObj.transform.SetPositionAndRotation( Vector3.zero, Quaternion.identity );
         }
 

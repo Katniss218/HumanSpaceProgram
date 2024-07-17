@@ -27,14 +27,14 @@ namespace HSP.Core.Components
         [SerializeField]
         private Transform _referenceTransform;
 
-        public static Quaternion GetSceneRotation( FControlFrame frame, Vessel fallback )
+        public static Quaternion GetSceneRotation( FControlFrame frame, IVessel fallback )
         {
             return frame == null
                 ? fallback.ReferenceTransform.rotation
                 : frame._referenceTransform.rotation;
         }
 
-        public static QuaternionDbl GetAIRFRotation( FControlFrame frame, Vessel fallback )
+        public static QuaternionDbl GetAIRFRotation( FControlFrame frame, IVessel fallback )
         {
             return frame == null
                 ? SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( fallback.ReferenceTransform.rotation )

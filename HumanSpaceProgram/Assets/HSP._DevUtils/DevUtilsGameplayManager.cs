@@ -41,8 +41,8 @@ namespace HSP.DevUtils
         public ComputeShader shader;
         public RawImage uiImage;
 
-        static Vessel launchSite;
-        static Vessel vessel;
+        static GameplayVessel launchSite;
+        static GameplayVessel vessel;
 
         [HSPEventListener( HSPEvent.STARTUP_IMMEDIATELY, "devutils.load_game_data" )]
         static void LoadGameData( object e )
@@ -70,7 +70,7 @@ namespace HSP.DevUtils
             vessel = v;
         }
 
-        static Vessel CreateVessel( Vessel launchSite )
+        static GameplayVessel CreateVessel( GameplayVessel launchSite )
         {
             if( launchSite == null )
             {
@@ -129,7 +129,7 @@ namespace HSP.DevUtils
                 Vector3Dbl spawnerPosAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( launchSiteSpawner.transform.position );
                 QuaternionDbl spawnerRotAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( launchSiteSpawner.transform.rotation );
 
-                Vessel v2 = VesselFactory.CreatePartless( spawnerPosAirf, spawnerRotAirf, Vector3.zero, Vector3.zero );
+                GameplayVessel v2 = VesselFactory.CreatePartless( spawnerPosAirf, spawnerRotAirf, Vector3.zero, Vector3.zero );
 
                 v2.RootPart = loadedObj.transform;
                 v2.RootPart.localPosition = Vector3.zero;
@@ -245,7 +245,7 @@ namespace HSP.DevUtils
             return go;
         }
 
-        static Vessel CreateDummyVessel( Vector3Dbl airfPosition, QuaternionDbl rotation )
+        static GameplayVessel CreateDummyVessel( Vector3Dbl airfPosition, QuaternionDbl rotation )
         {
             GameObject capsulePrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/capsule" );
             GameObject intertankPrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/intertank" );
@@ -253,7 +253,7 @@ namespace HSP.DevUtils
             GameObject tankLongPrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/tank_long" );
             GameObject enginePrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/engine" );
 
-            Vessel v = VesselFactory.CreatePartless( airfPosition, rotation, Vector3.zero, Vector3.zero );
+            GameplayVessel v = VesselFactory.CreatePartless( airfPosition, rotation, Vector3.zero, Vector3.zero );
             Transform root = InstantiateLocal( intertankPrefab, v.transform, Vector3.zero, Quaternion.identity ).transform;
 
             Transform tankP = InstantiateLocal( tankPrefab, root, new Vector3( 0, -1.625f, 0 ), Quaternion.identity ).transform;

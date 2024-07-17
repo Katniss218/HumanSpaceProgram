@@ -58,7 +58,6 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.Vessels\Vessel.cs" />
     <Compile Include="Assets\HSP.Vessels\Serialization\PartRegistry.cs" />
     <Compile Include="Assets\HSP.Vessels\Vessel.Serialization.cs" />
     <Compile Include="Assets\HSP.Vessels\DesignObjectManager.cs" />
@@ -67,13 +66,14 @@
     <Compile Include="Assets\HSP.Vessels\Serialization\VesselMetadata.cs" />
     <Compile Include="Assets\HSP.Vessels\VesselFactory.cs" />
     <Compile Include="Assets\HSP.Vessels\Components\FPart.cs" />
-    <Compile Include="Assets\HSP.Vessels\IPartObject.cs" />
     <Compile Include="Assets\HSP.Vessels\VesselManager.cs" />
-    <Compile Include="Assets\HSP.Vessels\DesignObject.cs" />
     <Compile Include="Assets\HSP.Vessels\Components\FAttachNode.cs" />
     <Compile Include="Assets\HSP.Vessels\PartFactory.cs" />
     <Compile Include="Assets\HSP.Vessels\VesselHierarchyUtils.cs" />
     <Compile Include="Assets\HSP.Vessels\Components\FLaunchSiteMarker.cs" />
+    <Compile Include="Assets\HSP.Vessels\IVessel.cs" />
+    <Compile Include="Assets\HSP.Vessels\GameplayVessel.cs" />
+    <Compile Include="Assets\HSP.Vessels\DesignVessel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vessels\___HSP.Vessels.asmdef" />
