@@ -9,8 +9,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace>
-    </RootNamespace>
+    <RootNamespace></RootNamespace>
     <ProjectGuid>{D5499601-10D8-5232-C86B-417A1DBAB2A9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -69,7 +68,6 @@
     <Compile Include="Assets\HSP.Vanilla.UI.Scenes\GameplayScene\OnStartup.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include=".editorconfig" />
     <None Include="Assets\HSP.Vanilla.UI.Scenes\___HSP.Vanilla.UI.Scenes.asmdef" />
   </ItemGroup>
   <ItemGroup>
@@ -971,6 +969,10 @@
       <Project>{05A5E85F-FD04-4199-F86F-3A6E38B383FB}</Project>
       <Name>HSP.UI</Name>
     </ProjectReference>
+    <ProjectReference Include="HSP.Vanilla.Scenes.csproj">
+      <Project>{5BA07627-23D0-078E-8FD5-791CF795CD60}</Project>
+      <Name>HSP.Vanilla.Scenes</Name>
+    </ProjectReference>
     <ProjectReference Include="HSP.Vanilla.UI.Time.csproj">
       <Project>{F24B1196-F385-43EE-AAB5-971DC99C6174}</Project>
       <Name>HSP.Vanilla.UI.Time</Name>
@@ -978,10 +980,6 @@
     <ProjectReference Include="HSP.Vanilla.UI.Vessels.csproj">
       <Project>{3CA21801-D573-73FC-585D-691DDF1E6A9B}</Project>
       <Name>HSP.Vanilla.UI.Vessels</Name>
-    </ProjectReference>
-    <ProjectReference Include="HSP.Vanilla.Scenes.csproj">
-      <Project>{5BA07627-23D0-078E-8FD5-791CF795CD60}</Project>
-      <Name>HSP.Vanilla.Scenes</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.Vanilla.UI.Components.csproj">
       <Project>{FFD77CE1-030A-7905-618A-BF767836F6ED}</Project>

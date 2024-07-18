@@ -9,8 +9,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace>
-    </RootNamespace>
+    <RootNamespace></RootNamespace>
     <ProjectGuid>{D8846B96-55B1-C32C-F90A-52C14F5C8043}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -69,7 +68,6 @@
     <Compile Include="Assets\HSP.ReferenceFrames\ActiveObjectManager.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include=".editorconfig" />
     <None Include="Assets\HSP.ReferenceFrames\___HSP.ReferenceFrames.asmdef" />
   </ItemGroup>
   <ItemGroup>
@@ -934,10 +932,6 @@
     <ProjectReference Include="HSP.csproj">
       <Project>{5294BE79-15AB-2AAE-E8C3-9E735E001D6D}</Project>
       <Name>HSP</Name>
-    </ProjectReference>
-    <ProjectReference Include="HSP.Timelines.csproj">
-      <Project>{C443A3BB-4D58-3A1D-D085-E8AEA15B2BC0}</Project>
-      <Name>HSP.Timelines</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

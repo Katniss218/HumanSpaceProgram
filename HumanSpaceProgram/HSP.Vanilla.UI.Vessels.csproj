@@ -9,8 +9,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace>
-    </RootNamespace>
+    <RootNamespace></RootNamespace>
     <ProjectGuid>{3CA21801-D573-73FC-585D-691DDF1E6A9B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -65,7 +64,6 @@
     <Compile Include="Assets\HSP.Vanilla.UI.Vessels\VesselHUD.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include=".editorconfig" />
     <None Include="Assets\HSP.Vanilla.UI.Vessels\___HSP.Vanilla.UI.Vessels.asmdef" />
   </ItemGroup>
   <ItemGroup>

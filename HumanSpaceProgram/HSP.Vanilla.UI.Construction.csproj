@@ -9,8 +9,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace>
-    </RootNamespace>
+    <RootNamespace></RootNamespace>
     <ProjectGuid>{5958E0F1-8E8D-8984-0C66-BCF58DD2FE91}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -63,7 +62,6 @@
     <Compile Include="Assets\HSP.Vanilla.UI.Construction\ConstructionSiteHUDManager.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include=".editorconfig" />
     <None Include="Assets\HSP.Vanilla.UI.Construction\___HSP.Vanilla.UI.Construction.asmdef" />
   </ItemGroup>
   <ItemGroup>

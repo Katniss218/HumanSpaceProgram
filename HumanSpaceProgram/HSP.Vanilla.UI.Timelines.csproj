@@ -9,8 +9,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace>
-    </RootNamespace>
+    <RootNamespace></RootNamespace>
     <ProjectGuid>{426EC70C-729C-F20E-2722-D105402F2F55}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -66,7 +65,6 @@
     <Compile Include="Assets\HSP.Vanilla.UI.Timelines\UILoadWindow.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include=".editorconfig" />
     <None Include="Assets\HSP.Vanilla.UI.Timelines\___HSP.UI.Timelines.asmdef" />
   </ItemGroup>
   <ItemGroup>
@@ -955,6 +953,10 @@
     <ProjectReference Include="HSP.Vanilla.Scenes.csproj">
       <Project>{5BA07627-23D0-078E-8FD5-791CF795CD60}</Project>
       <Name>HSP.Vanilla.Scenes</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Vanilla.UI.csproj">
+      <Project>{6C8F7BA3-CBB1-7E26-D57A-944E3A2E5099}</Project>
+      <Name>HSP.Vanilla.UI</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

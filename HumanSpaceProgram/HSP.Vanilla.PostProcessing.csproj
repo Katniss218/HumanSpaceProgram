@@ -9,8 +9,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace>
-    </RootNamespace>
+    <RootNamespace></RootNamespace>
     <ProjectGuid>{C83ABF19-5ADE-CBC1-DAD8-228B8F85934B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -62,7 +61,6 @@
     <Compile Include="Assets\HSP.Vanilla.PostProcessing\AddPostProcessing.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include=".editorconfig" />
     <None Include="Assets\HSP.Vanilla.PostProcessing\___HSP.Vanilla.PostProcessing.asmdef" />
   </ItemGroup>
   <ItemGroup>

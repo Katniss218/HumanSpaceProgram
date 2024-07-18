@@ -9,8 +9,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace>
-    </RootNamespace>
+    <RootNamespace></RootNamespace>
     <ProjectGuid>{5BA07627-23D0-078E-8FD5-791CF795CD60}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -96,7 +95,6 @@
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\GameplaySceneToolManager.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include=".editorconfig" />
     <None Include="Assets\HSP.Vanilla.Scenes\___HSP.Vanilla.Scenes.asmdef" />
   </ItemGroup>
   <ItemGroup>
@@ -982,6 +980,10 @@
       <Project>{642CD5D5-9E37-E1CA-969F-267B97A7FC25}</Project>
       <Name>HSP.Content</Name>
     </ProjectReference>
+    <ProjectReference Include="HSP.ControlSystems.csproj">
+      <Project>{5E371463-138D-D25A-49B8-DED13355C7DC}</Project>
+      <Name>HSP.ControlSystems</Name>
+    </ProjectReference>
     <ProjectReference Include="HSP.Input.csproj">
       <Project>{27123301-09AF-37AC-2FCA-FF7B2CC75C42}</Project>
       <Name>HSP.Input</Name>
@@ -1005,6 +1007,10 @@
     <ProjectReference Include="HSP.Timelines.csproj">
       <Project>{C443A3BB-4D58-3A1D-D085-E8AEA15B2BC0}</Project>
       <Name>HSP.Timelines</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Trajectories.csproj">
+      <Project>{57FA29CC-9026-83EE-F242-EA051DEA7649}</Project>
+      <Name>HSP.Trajectories</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.Vessels.csproj">
       <Project>{46E8105E-3165-8157-383E-59E6654156AA}</Project>
