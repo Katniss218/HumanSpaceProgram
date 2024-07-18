@@ -62,6 +62,7 @@
     <Compile Include="Assets\HSP.Trajectories\Trajectories\Orbit.cs" />
     <Compile Include="Assets\HSP.Trajectories\Trajectories\PinnedPhysicsObject.cs" />
     <Compile Include="Assets\HSP.Trajectories\Trajectories\OrbitalFrame.cs" />
+    <Compile Include="Assets\HSP.Trajectories\Components\FAnchor.cs" />
     <Compile Include="Assets\HSP.Trajectories\Trajectories\FreePhysicsObject.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -941,10 +942,6 @@
     <ProjectReference Include="HSP.ReferenceFrames.csproj">
       <Project>{D8846B96-55B1-C32C-F90A-52C14F5C8043}</Project>
       <Name>HSP.ReferenceFrames</Name>
-    </ProjectReference>
-    <ProjectReference Include="HSP.Time.csproj">
-      <Project>{04DC55C0-E02E-3069-7322-19B05EB71C21}</Project>
-      <Name>HSP.Time</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.Vessels.csproj">
       <Project>{46E8105E-3165-8157-383E-59E6654156AA}</Project>

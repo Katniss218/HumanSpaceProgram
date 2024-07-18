@@ -1,5 +1,5 @@
 ﻿
-namespace HSP.Construction
+namespace HSP.Vessels.Construction
 {
     public static class HSPEvent_ConstructionSiteCreated
     {

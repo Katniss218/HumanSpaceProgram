@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.ReferenceMaps;
 
-namespace HSP.Construction
+namespace HSP.Vessels.Construction
 {
     public interface IConstructionCondition
     {

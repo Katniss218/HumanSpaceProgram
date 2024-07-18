@@ -4,7 +4,7 @@ using UnityEngine;
 namespace HSP.ReferenceFrames
 {
     /// <remarks>
-    /// This class manages a scene-wide Floating Origin / Krakensbane.
+    /// This is basically a scene-wide Floating Origin / Krakensbane, based on reference frames that follow the <see cref="ActiveObjectManager.ActiveObject"/>.
     /// </remarks>
     public class SceneReferenceFrameManager : SingletonMonoBehaviour<SceneReferenceFrameManager>
     {

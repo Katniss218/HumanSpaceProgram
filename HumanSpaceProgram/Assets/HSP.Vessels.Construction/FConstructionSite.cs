@@ -6,7 +6,7 @@ using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace HSP.Construction
+namespace HSP.Vessels.Construction
 {
     public static class FConstructionSite_Transform_Ex
     {

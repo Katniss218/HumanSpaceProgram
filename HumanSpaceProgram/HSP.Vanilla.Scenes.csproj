@@ -93,6 +93,8 @@
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\GameplaySceneToolBase.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\TimeScaleInputController.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\GameplaySceneToolManager.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\OnStartup.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\OnActiveObjectChange.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla.Scenes\___HSP.Vanilla.Scenes.asmdef" />
@@ -972,9 +974,9 @@
       <Project>{83793330-5AED-C186-5E4B-AAD4BB463469}</Project>
       <Name>HSP.CelestialBodies</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.Construction.csproj">
-      <Project>{EBC6D9CF-7C4D-8C8F-E094-E9D859959A88}</Project>
-      <Name>HSP.Construction</Name>
+    <ProjectReference Include="HSP.Vessels.Construction.csproj">
+      <Project>{973ADF42-28BF-171E-CCCB-558E6DFC2896}</Project>
+      <Name>HSP.Vessels.Construction</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.Content.csproj">
       <Project>{642CD5D5-9E37-E1CA-969F-267B97A7FC25}</Project>
@@ -999,10 +1001,6 @@
     <ProjectReference Include="HSP.ScreenCapturing.csproj">
       <Project>{A72CC48E-46C1-25C7-DFC0-DDA669184CFD}</Project>
       <Name>HSP.ScreenCapturing</Name>
-    </ProjectReference>
-    <ProjectReference Include="HSP.Time.csproj">
-      <Project>{04DC55C0-E02E-3069-7322-19B05EB71C21}</Project>
-      <Name>HSP.Time</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.Timelines.csproj">
       <Project>{C443A3BB-4D58-3A1D-D085-E8AEA15B2BC0}</Project>

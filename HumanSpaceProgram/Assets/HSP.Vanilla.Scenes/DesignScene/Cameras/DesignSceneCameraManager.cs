@@ -125,6 +125,7 @@ namespace HSP.Vanilla.Scenes.DesignScene.Cameras
             GameObject cameraPivotGameObject = new GameObject( "Camera Pivot" );
 
             SceneCamera sceneCamera = cameraPivotGameObject.AddComponent<SceneCamera>();
+
             DesignSceneCameraManager cameraManager = cameraPivotGameObject.AddComponent<DesignSceneCameraManager>();
             DesignSceneOrbitingCameraController cameraController = cameraPivotGameObject.AddComponent<DesignSceneOrbitingCameraController>();
 

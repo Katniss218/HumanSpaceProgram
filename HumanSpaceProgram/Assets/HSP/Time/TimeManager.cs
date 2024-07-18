@@ -65,8 +65,6 @@ namespace HSP.Time
 
         static float _maxTimeScale = 128.0f;
 
-#warning TODO - split off the keyboard `<` `>` controller from this manager.
-
         private static float _timeScale = 1;
         private static float _oldTimeScale = 1;
 

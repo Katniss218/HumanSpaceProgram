@@ -58,21 +58,20 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP\InertiaUtils.cs" />
-    <Compile Include="Assets\HSP\NamespacedIdentifier.Serialization.cs" />
+    <Compile Include="Assets\HSP\Utils\InertiaUtils.cs" />
     <Compile Include="Assets\HSP\NamespacedIdentifier.cs" />
     <Compile Include="Assets\HSP\HSPEvent.cs" />
     <Compile Include="Assets\HSP\Layer.cs" />
     <Compile Include="Assets\HSP\HSPEventListenerAttribute.cs" />
-    <Compile Include="Assets\HSP\CoordinateUtils.cs" />
+    <Compile Include="Assets\HSP\Utils\CoordinateUtils.cs" />
     <Compile Include="Assets\HSP\IHasMass.cs" />
-    <Compile Include="Assets\HSP\RollingStatistics.cs" />
+    <Compile Include="Assets\HSP\Time\TimeManager.cs" />
+    <Compile Include="Assets\HSP\Utils\RollingStatistics.cs" />
     <Compile Include="Assets\HSP\Version.cs" />
-    <Compile Include="Assets\HSP\FAnchor.cs" />
     <Compile Include="Assets\HSP\SceneCamera.cs" />
     <Compile Include="Assets\HSP\HumanSpaceProgram.cs" />
     <Compile Include="Assets\HSP\TransformRedirect.cs" />
-    <Compile Include="Assets\HSP\IOHelper.cs" />
+    <Compile Include="Assets\HSP\Utils\IOHelper.cs" />
     <Compile Include="Assets\HSP\PIDLoop.cs" />
     <Compile Include="Assets\HSP\IPhysicsObject.cs" />
   </ItemGroup>

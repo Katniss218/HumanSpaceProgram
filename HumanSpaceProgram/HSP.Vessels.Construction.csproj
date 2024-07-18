@@ -10,10 +10,10 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{5958E0F1-8E8D-8984-0C66-BCF58DD2FE91}</ProjectGuid>
+    <ProjectGuid>{973ADF42-28BF-171E-CCCB-558E6DFC2896}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <AssemblyName>HSP.Vanilla.UI.Construction</AssemblyName>
+    <AssemblyName>HSP.Vessels.Construction</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <BaseDirectory>.</BaseDirectory>
@@ -58,11 +58,14 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.Vanilla.UI.Construction\ConstructionSiteHUD.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI.Construction\ConstructionSiteHUDManager.cs" />
+    <Compile Include="Assets\HSP.Vessels.Construction\FConstructionSite.cs" />
+    <Compile Include="Assets\HSP.Vessels.Construction\FConstructible.cs" />
+    <Compile Include="Assets\HSP.Vessels.Construction\_HSPEvents.cs" />
+    <Compile Include="Assets\HSP.Vessels.Construction\GhostableContext.cs" />
+    <Compile Include="Assets\HSP.Vessels.Construction\ConstructionState.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\HSP.Vanilla.UI.Construction\___HSP.Vanilla.UI.Construction.asmdef" />
+    <None Include="Assets\HSP.Vessels.Construction\___HSP.Vessels.Construction.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -915,6 +918,10 @@
       <Project>{7122B491-FD2B-2B59-D391-006CB0AE788B}</Project>
       <Name>_UnityPlus.AssetManagement</Name>
     </ProjectReference>
+    <ProjectReference Include="_UnityPlus.Input.csproj">
+      <Project>{1B7EDF60-A4D7-21D6-6511-CFB4286999D1}</Project>
+      <Name>_UnityPlus.Input</Name>
+    </ProjectReference>
     <ProjectReference Include="_UnityPlus.OverridableEvents.csproj">
       <Project>{049D3356-CD2A-DFB0-C50D-8CFE5B092848}</Project>
       <Name>_UnityPlus.OverridableEvents</Name>
@@ -923,21 +930,21 @@
       <Project>{FED3C19A-E743-9E19-D660-957D0801811E}</Project>
       <Name>_UnityPlus.Serialization</Name>
     </ProjectReference>
-    <ProjectReference Include="_UnityPlus.UILib.csproj">
-      <Project>{3A5E96D9-C189-180D-1672-7BEFFDEBCE5F}</Project>
-      <Name>_UnityPlus.UILib</Name>
-    </ProjectReference>
     <ProjectReference Include="HSP.csproj">
       <Project>{5294BE79-15AB-2AAE-E8C3-9E735E001D6D}</Project>
       <Name>HSP</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.Vessels.Construction.csproj">
-      <Project>{973ADF42-28BF-171E-CCCB-558E6DFC2896}</Project>
-      <Name>HSP.Vessels.Construction</Name>
+    <ProjectReference Include="HSP.Input.csproj">
+      <Project>{27123301-09AF-37AC-2FCA-FF7B2CC75C42}</Project>
+      <Name>HSP.Input</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.UI.csproj">
-      <Project>{05A5E85F-FD04-4199-F86F-3A6E38B383FB}</Project>
-      <Name>HSP.UI</Name>
+    <ProjectReference Include="HSP.ReferenceFrames.csproj">
+      <Project>{D8846B96-55B1-C32C-F90A-52C14F5C8043}</Project>
+      <Name>HSP.ReferenceFrames</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Vessels.csproj">
+      <Project>{46E8105E-3165-8157-383E-59E6654156AA}</Project>
+      <Name>HSP.Vessels</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace HSP
 {
@@ -66,6 +67,16 @@ namespace HSP
             return new NamespacedIdentifier()
             {
                 _data = str
+            };
+        }
+
+        [MapsInheritingFrom( typeof( NamespacedIdentifier ) )]
+        public static SerializationMapping NamespacedIdentifierMapping()
+        {
+            return new PrimitiveStructSerializationMapping<NamespacedIdentifier>()
+            {
+                OnSave = ( o, s ) => (SerializedPrimitive)o.ToString(),
+                OnInstantiate = ( data, l ) => NamespacedIdentifier.Parse( (string)data )
             };
         }
     }

@@ -18,7 +18,7 @@ namespace HSP.Vanilla.UI.Scenes.GameplayScene
         static UIPanel _mainPanel; // TODO - replace this with individual elements
 
         [HSPEventListener( HSPEvent.GAMEPLAY_AFTER_ACTIVE_OBJECT_CHANGE, HSPEvent.NAMESPACE_HSP + ".gameplay_ui" )]
-        [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, HSPEvent.NAMESPACE_HSP + ".gameplay_ui" )]
+        [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, HSPEvent.NAMESPACE_HSP + ".gameplay_ui", After = new[] { "add_active_object_manager" } )]
         public static void CreateUI()
         {
             UICanvas canvas = CanvasManager.Get( CanvasName.STATIC );

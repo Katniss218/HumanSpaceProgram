@@ -10,14 +10,14 @@ namespace HSP.Trajectories
 {
     public static class Vessel_Ex
     {
-        [HSPEventListener( HSPEvent_VesselCreated.EventID, "add_physicsobject" )]
-        public static void OnVesselCreated( Vessel v )
+        [HSPEventListener( HSPEvent_VesselCreated.EventID, "add_physics_object" )]
+        private static void AddPhysicsObject( Vessel v )
         {
             v.PhysicsObject = v.gameObject.AddComponent<FreePhysicsObject>();
         }
 
-        [HSPEventListener( HSPEvent_VesselHierarchyChanged.EventID, "try_pin_physicsobject" )]
-        public static void OnVesselCreated( (Vessel v, Transform oldRootPart, Transform newRootPart) e )
+        [HSPEventListener( HSPEvent_VesselHierarchyChanged.EventID, "try_pin_physics_object" )]
+        private static void TryPinPhysicsObject( (Vessel v, Transform oldRootPart, Transform newRootPart) e )
         {
             if( e.oldRootPart == null )
                 return;

@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 
-namespace HSP
+namespace HSP.Trajectories
 {
     /// <summary>
-    /// Tells HSP that this object should be anchored to the ground.
+    /// Specifies that this object should be anchored to the ground, instead of following its own trajectory in the world.
     /// </summary>
     [DisallowMultipleComponent]
     public class FAnchor : MonoBehaviour

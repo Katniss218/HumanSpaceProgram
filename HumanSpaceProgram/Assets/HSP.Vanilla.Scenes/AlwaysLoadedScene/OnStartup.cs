@@ -2,6 +2,7 @@ using HSP.Core;
 using HSP.Input;
 using HSP.ScreenCapturing;
 using HSP.Time;
+using HSP.Timelines;
 using UnityPlus.Input;
 
 namespace HSP.Vanilla.Scenes.AlwaysLoadedScene
@@ -12,6 +13,12 @@ namespace HSP.Vanilla.Scenes.AlwaysLoadedScene
         private static void AddTimeManager()
         {
             AlwaysLoadedManager.Instance.gameObject.AddComponent<TimeManager>();
+        }
+        
+        [HSPEventListener( HSPEvent.STARTUP_IMMEDIATELY, HSPEvent.NAMESPACE_HSP + ".add_timeline_manager" )]
+        private static void AddTimelineManager()
+        {
+            AlwaysLoadedManager.Instance.gameObject.AddComponent<TimelineManager>();
         }
 
         [HSPEventListener( HSPEvent.STARTUP_IMMEDIATELY, HSPEvent.NAMESPACE_HSP + ".add_screenshot_manager" )]

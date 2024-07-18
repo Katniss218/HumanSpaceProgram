@@ -972,10 +972,6 @@
       <Project>{26023575-EB06-DAA2-C7B2-77FFBAED8CB8}</Project>
       <Name>HSP.ResourceFlow</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.Time.csproj">
-      <Project>{04DC55C0-E02E-3069-7322-19B05EB71C21}</Project>
-      <Name>HSP.Time</Name>
-    </ProjectReference>
     <ProjectReference Include="HSP.Trajectories.csproj">
       <Project>{57FA29CC-9026-83EE-F242-EA051DEA7649}</Project>
       <Name>HSP.Trajectories</Name>
