@@ -10,6 +10,12 @@ namespace HSP.Trajectories
 {
     public static class Vessel_Ex
     {
+        [HSPEventListener( HSPEvent_VesselCreated.EventID, "add_physicsobject" )]
+        public static void OnVesselCreated( Vessel v )
+        {
+            v.PhysicsObject = v.gameObject.AddComponent<FreePhysicsObject>();
+        }
+
         public static bool IsPinned( this Vessel vessel )
         {
             return vessel.PhysicsObject is PinnedPhysicsObject;

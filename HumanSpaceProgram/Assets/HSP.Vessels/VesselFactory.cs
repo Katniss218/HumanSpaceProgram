@@ -3,6 +3,16 @@ using UnityEngine;
 
 namespace HSP.Vessels
 {
+    public static class HSPEvent_VesselCreated
+    {
+        public const string EventID = HSPEvent.NAMESPACE_VANILLA + ".vessel_created";
+    }
+
+    public static class HSPEvent_VesselDestroyed
+    {
+        public const string EventID = HSPEvent.NAMESPACE_VANILLA + ".vessel_destroyed";
+    }
+
     /// <summary>
     /// A class responsible for instantiating a vessel from a source (save file, on launch, etc).
     /// </summary>
@@ -22,6 +32,8 @@ namespace HSP.Vessels
         {
             Vessel vessel = CreateGO( airfPosition, airfRotation );
 
+            HSPEvent.EventManager.TryInvoke( HSPEvent_VesselCreated.EventID, vessel );
+
             vessel.PhysicsObject.Velocity = sceneVelocity;
             vessel.PhysicsObject.AngularVelocity = sceneAngularVelocity;
 
@@ -34,7 +46,7 @@ namespace HSP.Vessels
 
             ReferenceFrameTransform ro = gameObject.AddComponent<ReferenceFrameTransform>();
             //FreePhysicsObject fpo = gameObject.AddComponent<FreePhysicsObject>();
-#warning TODO - when a vessel is created, there should be an event and this adding of free/pinned phys object should be hooked into that.
+#warning TODO - Hook the free/pinned physobj into the event.
             // it also registers the vessel with an appropriate manager?
 
             Vessel vessel = gameObject.AddComponent<Vessel>();
@@ -51,7 +63,8 @@ namespace HSP.Vessels
         public static void Destroy( Vessel vessel )
         {
             UnityEngine.Object.Destroy( vessel.gameObject );
-#warning TODO - when a vessel is destroyed, there should be an event.
+
+            HSPEvent.EventManager.TryInvoke( HSPEvent_VesselDestroyed.EventID, vessel );
         }
     }
 }

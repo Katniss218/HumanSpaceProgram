@@ -31,7 +31,7 @@ Shader "Hidden/Atmosphere"
 				#pragma fragment frag
 
 				#include "UnityCG.cginc"
-				#include "../../CelestialBodies/AtmosphereRes/Math.cginc"
+				#include "Math.cginc"
 
 				sampler2D _texgsfs;
 				sampler2D _DepthBuffer;

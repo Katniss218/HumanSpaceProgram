@@ -220,6 +220,7 @@ namespace HSP.GameplayScene.Cameras
         [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, "vanilla.gameplayscene_camera" )]
         private static void OnGameplaySceneLoad()
         {
+            Debug.Log( "Abefore" );
             GameObject cameraPivotGameObject = new GameObject( "Camera Pivot" );
 
             SceneCamera sceneCamera = cameraPivotGameObject.AddComponent<SceneCamera>();

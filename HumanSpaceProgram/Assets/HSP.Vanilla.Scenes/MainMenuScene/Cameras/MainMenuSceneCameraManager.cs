@@ -150,7 +150,7 @@ namespace HSP.GameplayScene.Cameras
             cameraManager._uiCamera = uiCamera;
         }
 
-        [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, "vanilla.mainmenuscene_postprocessing", After = new[] { "vanilla.mainmenuscene_camera" } )]
+        [HSPEventListener( HSPEvent.STARTUP_MAINMENU, "vanilla.mainmenuscene_postprocessing", After = new[] { "vanilla.mainmenuscene_camera" } )]
         private static void CreatePostProcessingLayers()
         {
             void SetupPPL( PostProcessLayer layer )

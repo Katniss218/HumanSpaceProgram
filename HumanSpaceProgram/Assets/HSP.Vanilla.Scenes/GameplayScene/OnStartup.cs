@@ -1,6 +1,9 @@
+using HSP.CelestialBodies;
 using HSP.Core;
 using HSP.GameplayScene;
+using HSP.GameplayScene.Cameras;
 using HSP.ReferenceFrames;
+using HSP.Vessels;
 using UnityEngine;
 
 namespace HSP.Vanilla.Scenes.GameplayScene
@@ -17,6 +20,29 @@ namespace HSP.Vanilla.Scenes.GameplayScene
         private static void CreateInstanceInScene()
         {
             GameplaySceneManager.Instance.gameObject.AddComponent<TimeScaleInputController>();
+        }
+
+        [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, HSPEvent.NAMESPACE_VANILLA + ".add_vessel_manager" )]
+        [HSPEventListener( HSPEvent.STARTUP_DESIGN, HSPEvent.NAMESPACE_VANILLA + ".add_vessel_manager" )]
+        private static void VesselManager()
+        {
+            GameplaySceneManager.Instance.gameObject.AddComponent<VesselManager>();
+        }
+
+        [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, HSPEvent.NAMESPACE_VANILLA + ".add_celestial_body_manager" )]
+        private static void CelestialBodyManagerManager()
+        {
+            GameplaySceneManager.Instance.gameObject.AddComponent<CelestialBodyManager>();
+        }
+
+        [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, "vanilla.gameplayscene_atmospheres", After = new[] { "vanilla.gameplayscene_camera" } )]
+        private static void CreateAtmosphereRenderer()
+        {
+            Debug.Log( "A" );
+            AtmosphereRenderer atmosphereRenderer = GameplaySceneCameraManager.EffectCamera.gameObject.AddComponent<AtmosphereRenderer>();
+            atmosphereRenderer.light = GameObject.Find( "CBLight" ).GetComponent<Light>();
+            atmosphereRenderer.ColorRenderTextureGetter = () => GameplaySceneCameraManager.ColorRenderTexture;
+            atmosphereRenderer.DepthRenderTextureGetter = () => GameplaySceneDepthBufferCombiner.CombinedDepthRenderTexture;
         }
     }
 }

@@ -171,8 +171,8 @@ namespace HSP.Vessels
             if( IsAnchored( partToSplit ) )
             {
 #warning TODO - when the vessel is created, have an event and hook the pinning up to that.
-                //PinnedPhysicsObject ppo = oldVessel.GetComponent<PinnedPhysicsObject>();
-                //newVessel.Pin( ppo.ReferenceBody, ppo.ReferencePosition, ppo.ReferenceRotation );
+               // PinnedPhysicsObject ppo = oldVessel.GetComponent<PinnedPhysicsObject>();
+               // newVessel.Pin( ppo.ReferenceBody, ppo.ReferencePosition, ppo.ReferenceRotation );
             }
         }
 

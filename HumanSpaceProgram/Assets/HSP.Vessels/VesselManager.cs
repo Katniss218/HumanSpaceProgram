@@ -19,8 +19,8 @@ namespace HSP.Vessels
         {
             get
             {
-               // if( !instanceExists )
-               //     throw new InvalidSceneManagerException( $"{nameof( VesselManager )} is only available in the gameplay scene." );
+                // if( !instanceExists )
+                //     throw new InvalidSceneManagerException( $"{nameof( VesselManager )} is only available in the gameplay scene." );
 
                 return instance._vessels;
             }
@@ -30,8 +30,8 @@ namespace HSP.Vessels
         {
             get
             {
-               // if( !instanceExists )
-               //     throw new InvalidSceneManagerException( $"{nameof( VesselManager )} is only available in the gameplay scene." );
+                // if( !instanceExists )
+                //     throw new InvalidSceneManagerException( $"{nameof( VesselManager )} is only available in the gameplay scene." );
 
                 return instance._vessels.Count;
             }
@@ -39,8 +39,8 @@ namespace HSP.Vessels
 
         internal static void Register( Vessel vessel )
         {
-           // if( !instanceExists )
-           //     throw new InvalidSceneManagerException( $"{nameof( VesselManager )} is only available in the gameplay scene." );
+            // if( !instanceExists )
+            //     throw new InvalidSceneManagerException( $"{nameof( VesselManager )} is only available in the gameplay scene." );
 
             instance._vessels.Add( vessel );
             HSPEvent.EventManager.TryInvoke( HSPEvent.GAMEPLAY_AFTER_VESSEL_REGISTERED, vessel );
@@ -48,8 +48,8 @@ namespace HSP.Vessels
 
         internal static void Unregister( Vessel vessel )
         {
-           // if( !instanceExists )
-           //     throw new InvalidSceneManagerException( $"{nameof( VesselManager )} is only available in the gameplay scene." );
+            // if( !instanceExists )
+            //     throw new InvalidSceneManagerException( $"{nameof( VesselManager )} is only available in the gameplay scene." );
 
             instance._vessels.Remove( vessel );
             HSPEvent.EventManager.TryInvoke( HSPEvent.GAMEPLAY_AFTER_VESSEL_UNREGISTERED, vessel );

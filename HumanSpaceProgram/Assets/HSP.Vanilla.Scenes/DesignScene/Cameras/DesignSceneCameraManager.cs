@@ -155,7 +155,7 @@ namespace HSP.GameplayScene.Cameras
             cameraController.ZoomDist = 5f;
         }
 
-        [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, "vanilla.designscene_postprocessing", After = new[] { "vanilla.designscene_camera" } )]
+        [HSPEventListener( HSPEvent.STARTUP_DESIGN, "vanilla.designscene_postprocessing", After = new[] { "vanilla.designscene_camera" } )]
         private static void CreatePostProcessingLayers()
         {
             void SetupPPL( PostProcessLayer layer )

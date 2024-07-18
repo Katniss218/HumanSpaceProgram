@@ -1,34 +1,11 @@
 using HSP.Core.Physics;
 using HSP.ReferenceFrames;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace HSP.Vessels
 {
-    /* public static class Vessel_Transform_Ex
-     {
-         /// <summary>
-         /// Gets the <see cref="GameplayVessel"/> attached to this transform.
-         /// </summary>
-         /// <returns>The vessel. Null if the transform is not part of a vessel.</returns>
-         public static GameplayVessel GetVessel( this Transform part )
-         {
-             return part.root.GetComponent<GameplayVessel>();
-         }
-
-         /// <summary>
-         /// Gets the <see cref="GameplayVessel"/> attached to this gameobject.
-         /// </summary>
-         /// <returns>The vessel. Null if the gameobject is not part of a vessel.</returns>
-         public static GameplayVessel GetVessel( this GameObject part )
-         {
-             return GetVessel( part.transform );
-         }
-     }*/
-
     /// <summary>
     /// A vessel is a moving object consisting of a hierarchy of "parts".
     /// </summary>
@@ -122,7 +99,14 @@ namespace HSP.Vessels
 
         void OnDisable()
         {
-            VesselManager.Unregister( this );
+            try
+            {
+                VesselManager.Unregister( this );
+            }
+            catch( Exception e ) // TODO - should only catch missing manager / singleton exceptions, but that doesn't exist yet as of writing this comment.
+            {
+
+            }
         }
 
         void FixedUpdate()
