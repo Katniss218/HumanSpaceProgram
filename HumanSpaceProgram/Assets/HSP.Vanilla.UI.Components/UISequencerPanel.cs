@@ -1,11 +1,6 @@
 ﻿using HSP.Components;
-using HSP.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+using HSP.ReferenceFrames;
+using HSP.Vessels;
 using UnityPlus.UILib;
 using UnityPlus.UILib.Layout;
 using UnityPlus.UILib.UIElements;
@@ -18,7 +13,7 @@ namespace HSP.UI
 
         // dropdown position clamped to the top of the screen.
 
-        private IVessel _activeVessel;
+        private Vessel _activeVessel;
 
         private FSequencer _activeSequencer;
 

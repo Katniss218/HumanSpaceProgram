@@ -1,14 +1,12 @@
-using HSP.Core;
-using HSP.Input;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using UnityPlus.Input;
 
 namespace HSP
 {
+    /// <summary>
+    /// Takes and saves screenshots.
+    /// </summary>
     public class ScreenshotManager : SingletonMonoBehaviour<ScreenshotManager>
     {
         public const string ScreenshotsDirectoryName = "Screenshots";
@@ -26,17 +24,7 @@ namespace HSP
             return path;
         }
 
-        void OnEnable()
-        {
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.COMMON_SCREENSHOT, HierarchicalInputPriority.MEDIUM, Input_TakeScreenshot );
-        }
-
-        void OnDisable()
-        {
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.COMMON_SCREENSHOT, Input_TakeScreenshot );
-        }
-
-        private bool Input_TakeScreenshot( float _ )
+        public bool TakeScreenshot()
         {
             string dirPath = GetScreenshotDirectoryPath();
             if( !Directory.Exists( dirPath ) )

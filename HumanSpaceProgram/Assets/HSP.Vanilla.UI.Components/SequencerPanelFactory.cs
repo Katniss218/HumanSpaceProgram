@@ -1,11 +1,6 @@
-﻿using HSP.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityPlus.UILib.UIElements;
+﻿using HSP.ReferenceFrames;
 using UnityPlus.UILib;
+using UnityPlus.UILib.UIElements;
 
 namespace HSP.UI.SceneFactories
 {

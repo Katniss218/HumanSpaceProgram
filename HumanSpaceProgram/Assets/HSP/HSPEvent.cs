@@ -1,6 +1,6 @@
 ﻿using UnityPlus.OverridableEvents;
 
-namespace HSP.Core
+namespace HSP
 {
     /// <summary>
     /// A container for the overridable event manager and builtin (vanilla) event identifiers.

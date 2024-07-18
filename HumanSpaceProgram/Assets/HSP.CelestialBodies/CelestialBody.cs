@@ -1,11 +1,11 @@
-﻿using HSP.Core.ReferenceFrames;
+﻿using HSP.ReferenceFrames;
 using System;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace HSP.Core
+namespace HSP.CelestialBodies
 {
-    [RequireComponent( typeof( RootObjectTransform ) )]
+    [RequireComponent( typeof( ReferenceFrameTransform ) )]
     public class CelestialBody : MonoBehaviour
     {
         /// <summary>
@@ -48,11 +48,11 @@ namespace HSP.Core
         /// </summary>
         public double Radius { get; internal set; }
 
-        RootObjectTransform _rootTransform;
+        ReferenceFrameTransform _rootTransform;
 
         void Awake()
         {
-            _rootTransform = this.GetComponent<RootObjectTransform>();
+            _rootTransform = this.GetComponent<ReferenceFrameTransform>();
         }
 
         void Start()

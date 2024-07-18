@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityPlus.Serialization;
 
-namespace HSP.Control.Controls
+namespace HSP.ControlSystems.Controls
 {
     /// <summary>
     /// Represents a control that produces a parameter.

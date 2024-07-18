@@ -1,5 +1,4 @@
-﻿using HSP.Core;
-using UnityPlus.UILib;
+﻿using UnityPlus.UILib;
 using UnityEngine;
 using UnityPlus.UILib.UIElements;
 using UnityPlus.AssetManagement;
@@ -7,6 +6,7 @@ using UnityPlus.UILib.Layout;
 using HSP.UI.Windows;
 using HSP.GameplayScene;
 using HSP.GameplayScene.Tools;
+using HSP.ReferenceFrames;
 
 namespace HSP.UI.SceneFactories
 {

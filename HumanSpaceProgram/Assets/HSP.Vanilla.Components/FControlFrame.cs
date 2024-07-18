@@ -1,14 +1,7 @@
-﻿using HSP.Core.ReferenceFrames;
-using HSP.Core.Serialization;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using HSP.ReferenceFrames;
+using HSP.Vessels;
 using UnityEngine;
 using UnityPlus.Serialization;
-using UnityPlus.Serialization.DataHandlers;
 
 namespace HSP.Core.Components
 {
@@ -27,14 +20,14 @@ namespace HSP.Core.Components
         [SerializeField]
         private Transform _referenceTransform;
 
-        public static Quaternion GetSceneRotation( FControlFrame frame, IVessel fallback )
+        public static Quaternion GetSceneRotation( FControlFrame frame, Vessel fallback )
         {
             return frame == null
                 ? fallback.ReferenceTransform.rotation
                 : frame._referenceTransform.rotation;
         }
 
-        public static QuaternionDbl GetAIRFRotation( FControlFrame frame, IVessel fallback )
+        public static QuaternionDbl GetAIRFRotation( FControlFrame frame, Vessel fallback )
         {
             return frame == null
                 ? SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( fallback.ReferenceTransform.rotation )

@@ -62,15 +62,18 @@
     <Compile Include="Assets\HSP\NamespacedIdentifier.Serialization.cs" />
     <Compile Include="Assets\HSP\NamespacedIdentifier.cs" />
     <Compile Include="Assets\HSP\HSPEvent.cs" />
-    <Compile Include="Assets\HSP\FPointMass.cs" />
     <Compile Include="Assets\HSP\Layer.cs" />
     <Compile Include="Assets\HSP\HSPEventListenerAttribute.cs" />
     <Compile Include="Assets\HSP\CoordinateUtils.cs" />
     <Compile Include="Assets\HSP\IHasMass.cs" />
     <Compile Include="Assets\HSP\Version.cs" />
+    <Compile Include="Assets\HSP\FAnchor.cs" />
+    <Compile Include="Assets\HSP\SceneCamera.cs" />
     <Compile Include="Assets\HSP\HumanSpaceProgram.cs" />
-    <Compile Include="Assets\HSP\FClickInteractionRedirect.cs" />
+    <Compile Include="Assets\HSP\IOHelper.cs" />
     <Compile Include="Assets\HSP\PIDLoop.cs" />
+    <Compile Include="Assets\HSP\IPhysicsObject.cs" />
+    <Compile Include="Assets\HSP\TransformRedirect.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP\___HSP.asmdef" />

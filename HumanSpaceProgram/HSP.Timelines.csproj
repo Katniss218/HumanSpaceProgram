@@ -61,7 +61,6 @@
     <Compile Include="Assets\HSP.Timelines\Serialization\TimelineMetadata.cs" />
     <Compile Include="Assets\HSP.Timelines\TimelineManager.cs" />
     <Compile Include="Assets\HSP.Timelines\Serialization\SaveMetadata.cs" />
-    <Compile Include="Assets\HSP.Timelines\IOHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Timelines\___HSP.Timelines.asmdef" />

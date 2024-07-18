@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace HSP.Core.ReferenceFrames
+namespace HSP.ReferenceFrames
 {
     /// <summary>
     /// A reference frame aligned with the AIRF frame, and shifted (offset) by a certain amount. This class is immutable.

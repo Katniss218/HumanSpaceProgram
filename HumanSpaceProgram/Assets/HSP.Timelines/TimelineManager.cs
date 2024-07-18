@@ -1,14 +1,11 @@
+using HSP.Time;
+using HSP.Timelines.Serialization;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using UnityEngine;
-using UnityPlus.OverridableEvents;
-using UnityPlus.Serialization;
 using UnityPlus.Serialization.ReferenceMaps;
 
-namespace HSP.Core.Serialization
+namespace HSP.Timelines
 {
     /// <summary>
     /// Manages the currently loaded timeline (save/workspace). See <see cref="TimelineMetadata"/> and <see cref="SaveMetadata"/>.
@@ -73,17 +70,17 @@ namespace HSP.Core.Serialization
         public static void SaveLoadStartFunc()
         {
             IsSavingOrLoading = true;
-            _wasPausedBeforeSerializing = TimeStepManager.IsPaused;
-            TimeStepManager.Pause();
-            TimeStepManager.LockTimescale = true;
+            _wasPausedBeforeSerializing = TimeManager.IsPaused;
+            TimeManager.Pause();
+            TimeManager.LockTimescale = true;
         }
 
         public static void SaveLoadFinishFunc()
         {
-            TimeStepManager.LockTimescale = false;
+            TimeManager.LockTimescale = false;
             if( !_wasPausedBeforeSerializing )
             {
-                TimeStepManager.Unpause();
+                TimeManager.Unpause();
             }
             IsSavingOrLoading = false;
         }

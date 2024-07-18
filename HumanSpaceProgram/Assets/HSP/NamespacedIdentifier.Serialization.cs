@@ -1,6 +1,6 @@
 ﻿using UnityPlus.Serialization;
 
-namespace HSP.Core.Mods
+namespace HSP
 {
     public static class Mappings_NamespacedIdentifier
     {

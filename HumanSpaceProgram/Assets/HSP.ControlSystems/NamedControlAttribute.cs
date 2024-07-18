@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace HSP.Control
+namespace HSP.ControlSystems
 {
     /// <summary>
     /// Marks a field as a 'control' (an endpoint of the control system). <br/>

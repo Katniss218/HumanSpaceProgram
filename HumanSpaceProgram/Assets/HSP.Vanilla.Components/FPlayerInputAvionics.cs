@@ -1,5 +1,5 @@
-﻿using HSP.Control;
-using HSP.Control.Controls;
+﻿using HSP.ControlSystems;
+using HSP.ControlSystems.Controls;
 using HSP.Core.Components;
 using HSP.Input;
 using System;

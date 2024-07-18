@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.OverridableEvents;
 
-namespace HSP.Core
+namespace HSP
 {
     /// <summary>
     /// Specifies that a method should be run when a specified game event is fired.

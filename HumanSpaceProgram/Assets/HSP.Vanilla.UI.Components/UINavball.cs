@@ -1,14 +1,8 @@
-﻿using HSP.Core;
+﻿using HSP.CelestialBodies;
+using HSP.Core;
 using HSP.Core.Components;
-using HSP.Core.Physics;
-using HSP.Core.ReferenceFrames;
-using HSP.Core.Serialization;
-using HSP.GameplayScene;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using HSP.ReferenceFrames;
+using HSP.Vessels;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityPlus.AssetManagement;
@@ -52,7 +46,7 @@ namespace HSP.UI
         {
             if( ActiveObjectManager.ActiveObject != null )
             {
-                IVessel activeVessel = ActiveObjectManager.ActiveObject.transform.GetVessel();
+                Vessel activeVessel = ActiveObjectManager.ActiveObject.transform.GetVessel();
 
                 Quaternion airfRotation = (Quaternion)FControlFrame.GetAIRFRotation( FControlFrame.VesselControlFrame, activeVessel );
                 Matrix4x4 airfToLocalMatrix = Matrix4x4.Rotate( airfRotation ).inverse;

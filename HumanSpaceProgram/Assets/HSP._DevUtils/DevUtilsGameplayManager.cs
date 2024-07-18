@@ -1,25 +1,23 @@
-﻿using HSP.Core;
-using HSP.Core.ReferenceFrames;
-using HSP.Core.ResourceFlowSystem;
-using HSP.Components;
+﻿using HSP.CelestialBodies;
 using HSP.CelestialBodies.Surface;
+using HSP.Components;
+using HSP.Content;
+using HSP.Core;
+using HSP.Core.Components;
+using HSP.Core.ResourceFlowSystem;
+using HSP.ReferenceFrames;
+using HSP.Trajectories;
+using HSP.Vessels;
+using HSP.Vessels.Components;
+using HSP.Vessels.Serialization;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
-using HSP.Core.Serialization;
-using HSP.Core.Components;
-using System;
 using UnityPlus.AssetManagement;
 using UnityPlus.Serialization;
-using HSP.Trajectories;
-using System.IO;
-using HSP.Core.Mods;
-using UnityPlus.Serialization.ReferenceMaps;
-using System.Linq;
-using System.Collections.Generic;
 using UnityPlus.Serialization.DataHandlers;
-using HSP.Mods;
-using HSP.Content;
-using HSP.Core.Physics;
 
 namespace HSP.DevUtils
 {
@@ -41,8 +39,8 @@ namespace HSP.DevUtils
         public ComputeShader shader;
         public RawImage uiImage;
 
-        static GameplayVessel launchSite;
-        static GameplayVessel vessel;
+        static Vessel launchSite;
+        static Vessel vessel;
 
         [HSPEventListener( HSPEvent.STARTUP_IMMEDIATELY, "devutils.load_game_data" )]
         static void LoadGameData( object e )
@@ -57,7 +55,7 @@ namespace HSP.DevUtils
             CelestialBody body = CelestialBodyManager.Get( "main" );
             Vector3 localPos = CoordinateUtils.GeodeticToEuclidean( 28.5857702f, -80.6507262f, (float)(body.Radius + 1.0) );
 
-            launchSite = GameplayVesselFactory.CreatePartless( Vector3Dbl.zero, QuaternionDbl.identity, Vector3.zero, Vector3.zero );
+            launchSite = VesselFactory.CreatePartless( Vector3Dbl.zero, QuaternionDbl.identity, Vector3.zero, Vector3.zero );
             launchSite.gameObject.name = "launchsite";
             launchSite.Pin( body, localPos, Quaternion.FromToRotation( Vector3.up, localPos.normalized ) );
 
@@ -70,7 +68,7 @@ namespace HSP.DevUtils
             vessel = v;
         }
 
-        static GameplayVessel CreateVessel( GameplayVessel launchSite )
+        static Vessel CreateVessel( Vessel launchSite )
         {
             if( launchSite == null )
             {
@@ -129,7 +127,7 @@ namespace HSP.DevUtils
                 Vector3Dbl spawnerPosAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( launchSiteSpawner.transform.position );
                 QuaternionDbl spawnerRotAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( launchSiteSpawner.transform.rotation );
 
-                GameplayVessel v2 = GameplayVesselFactory.CreatePartless( spawnerPosAirf, spawnerRotAirf, Vector3.zero, Vector3.zero );
+                Vessel v2 = VesselFactory.CreatePartless( spawnerPosAirf, spawnerRotAirf, Vector3.zero, Vector3.zero );
 
                 v2.RootPart = loadedObj.transform;
                 v2.RootPart.localPosition = Vector3.zero;
@@ -245,7 +243,7 @@ namespace HSP.DevUtils
             return go;
         }
 
-        static GameplayVessel CreateDummyVessel( Vector3Dbl airfPosition, QuaternionDbl rotation )
+        static Vessel CreateDummyVessel( Vector3Dbl airfPosition, QuaternionDbl rotation )
         {
             GameObject capsulePrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/capsule" );
             GameObject intertankPrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/intertank" );
@@ -253,7 +251,7 @@ namespace HSP.DevUtils
             GameObject tankLongPrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/tank_long" );
             GameObject enginePrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/engine" );
 
-            GameplayVessel v = GameplayVesselFactory.CreatePartless( airfPosition, rotation, Vector3.zero, Vector3.zero );
+            Vessel v = VesselFactory.CreatePartless( airfPosition, rotation, Vector3.zero, Vector3.zero );
             Transform root = InstantiateLocal( intertankPrefab, v.transform, Vector3.zero, Quaternion.identity ).transform;
 
             Transform tankP = InstantiateLocal( tankPrefab, root, new Vector3( 0, -1.625f, 0 ), Quaternion.identity ).transform;
@@ -340,12 +338,12 @@ namespace HSP.DevUtils
                         {
                             new SequenceAction<float>()
                             {
-                                OnInvokeTyped = new Control.Controls.ControllerOutput<float>(),
+                                OnInvokeTyped = new ControlSystems.Controls.ControllerOutput<float>(),
                                 SignalValue = 1f
                             },
                             new SequenceAction<float>()
                             {
-                                OnInvokeTyped = new Control.Controls.ControllerOutput<float>(),
+                                OnInvokeTyped = new ControlSystems.Controls.ControllerOutput<float>(),
                                 SignalValue = 1f
                             }
                         },
@@ -357,11 +355,11 @@ namespace HSP.DevUtils
                         {
                             new SequenceAction()
                             {
-                                OnInvokeTyped = new Control.Controls.ControllerOutput()
+                                OnInvokeTyped = new ControlSystems.Controls.ControllerOutput()
                             },
                             new SequenceAction()
                             {
-                                OnInvokeTyped = new Control.Controls.ControllerOutput()
+                                OnInvokeTyped = new ControlSystems.Controls.ControllerOutput()
                             }
                         },
                         Delay = 5f

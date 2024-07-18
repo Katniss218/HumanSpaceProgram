@@ -1,5 +1,5 @@
-﻿using HSP.Core;
-using HSP.Core.Serialization;
+﻿using HSP.Time;
+using HSP.Vessels.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,11 +14,11 @@ namespace HSP.Vessels
     /// </summary>
     public class DesignVesselManager : SingletonMonoBehaviour<DesignVesselManager>
     {
-        private DesignVessel _designObj;
+        private Vessel _designObj;
         /// <summary>
         /// Returns the object currently being edited.
         /// </summary>
-        public static DesignVessel DesignObject => instance._designObj;
+        public static Vessel DesignObject => instance._designObj;
 
         /// <summary>
         /// Parts that are loosely dropped in the design scene, ghosted out.
@@ -144,17 +144,17 @@ namespace HSP.Vessels
 
         public static void StartFunc()
         {
-            _wasPausedBeforeSerializing = TimeStepManager.IsPaused;
-            TimeStepManager.Pause();
-            TimeStepManager.LockTimescale = true;
+            _wasPausedBeforeSerializing = TimeManager.IsPaused;
+            TimeManager.Pause();
+            TimeManager.LockTimescale = true;
         }
 
         public static void FinishFunc()
         {
-            TimeStepManager.LockTimescale = false;
+            TimeManager.LockTimescale = false;
             if( !_wasPausedBeforeSerializing )
             {
-                TimeStepManager.Unpause();
+                TimeManager.Unpause();
             }
         }
 
@@ -180,7 +180,7 @@ namespace HSP.Vessels
         {
             GameObject gameObject = new GameObject( $"DesignObject" );
 
-            _designObj = gameObject.AddComponent<DesignVessel>();
+            _designObj = gameObject.AddComponent<Vessel>();
             _designObj.transform.SetPositionAndRotation( Vector3.zero, Quaternion.identity );
         }
 

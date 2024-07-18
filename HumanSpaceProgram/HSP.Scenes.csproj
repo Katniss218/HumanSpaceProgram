@@ -60,7 +60,6 @@
   <ItemGroup>
     <Compile Include="Assets\HSP.Scenes\EditorSceneManager.cs" />
     <Compile Include="Assets\HSP.Scenes\GameplaySceneManager.cs" />
-    <Compile Include="Assets\HSP.Scenes\SceneCamera.cs" />
     <Compile Include="Assets\HSP.Scenes\DesignSceneManager.cs" />
     <Compile Include="Assets\HSP.Scenes\MainMenuSceneManager.cs" />
   </ItemGroup>

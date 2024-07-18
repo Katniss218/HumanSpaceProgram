@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
-namespace HSP.Mods
+namespace HSP.Content.Mods
 {
     /// <summary>
     /// Constants regarding mods for HSP.
@@ -33,7 +28,7 @@ namespace HSP.Mods
         /// </summary>
         internal static void LoadModAssemblies()
         {
-            string modDirectory = HSP.Content.ContentUtils.GetModDirectoryPath();
+            string modDirectory = ContentUtils.GetModDirectoryPath();
 
             if( !Directory.Exists( modDirectory ) )
                 Directory.CreateDirectory( modDirectory );

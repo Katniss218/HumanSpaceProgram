@@ -60,9 +60,9 @@
   <ItemGroup>
     <Compile Include="Assets\HSP.Construction\FConstructionSite.cs" />
     <Compile Include="Assets\HSP.Construction\FConstructible.cs" />
-    <Compile Include="Assets\HSP.Construction\HSPEventVanilla.cs" />
     <Compile Include="Assets\HSP.Construction\GhostableContext.cs" />
     <Compile Include="Assets\HSP.Construction\ConstructionState.cs" />
+    <Compile Include="Assets\HSP.Construction\HSPEvent_ConstructionSite.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Construction\___HSP.Construction.asmdef" />

@@ -1,6 +1,5 @@
 ﻿using HSP.Core.Components;
-using HSP.Core.Physics;
-using HSP.Core.ReferenceFrames;
+using HSP.ReferenceFrames;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
@@ -9,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace HSP.Core
+namespace HSP.Vessels
 {
     /// <summary>
     /// Helper class responsible for changing the state of a part or vessel.
@@ -30,7 +29,7 @@ namespace HSP.Core
         /// - joining vessels (<paramref name="part"/> = any, <paramref name="parentPart"/> = any, different vessel), 
         ///     if <paramref name="part"/> is a root, it will delete the <paramref name="part"/>'s vessel. <br/>
         /// - re-parenting parts (<paramref name="part"/> = any, <paramref name="parentPart"/> = any, same vessel). <br/>
-        /// - re-rooting the vessel (<paramref name="part"/> = <see cref="GameplayVessel.RootPart"/>, <paramref name="parentPart"/> = any non-root, same vessel). <br/>
+        /// - re-rooting the vessel (<paramref name="part"/> = <see cref="Vessel.RootPart"/>, <paramref name="parentPart"/> = any non-root, same vessel). <br/>
         /// </remarks>
         /// <param name="part">The part to set as a child of <paramref name="parentPart"/>.</param>
         /// <param name="parentPart">The part to set as the parent of <paramref name="part"/></param>
@@ -83,7 +82,7 @@ namespace HSP.Core
 
         public static void AttachLoose( Transform looseRoot, Transform parent )
         {
-            IVessel v = parent.GetVessel();
+            Vessel v = parent.GetVessel();
             looseRoot.SetParent( parent, true );
             v.RecalculatePartCache();
         }
@@ -119,13 +118,13 @@ namespace HSP.Core
             Contract.Assert( partToJoin.GetVessel() != parent.GetVessel() );
             Contract.Assert( partToJoin.IsRootOfVessel() );
 
-            IVessel oldVessel = partToJoin.GetVessel();
+            Vessel oldVessel = partToJoin.GetVessel();
             oldVessel.RootPart = null; // needed for the assert in the next method.
 
             JoinVesselsNotRoot( partToJoin, parent );
 
             // If part being joined is the root, we need to delete the vessel being joined, since it would become partless after joining.
-            GameplayVesselFactory.Destroy( oldVessel );
+            VesselFactory.Destroy( oldVessel );
         }
 
         /// <summary>
@@ -138,7 +137,7 @@ namespace HSP.Core
             // Move partToJoin to parent's vessel.
             // Attach partToJoin to parent.
 
-            IVessel oldv = partToJoin.GetVessel();
+            Vessel oldv = partToJoin.GetVessel();
             Reattach( partToJoin, parent );
             partToJoin.SetParent( parent.GetVessel().transform );
 
@@ -154,11 +153,11 @@ namespace HSP.Core
             Contract.Assert( !partToSplit.IsRootOfVessel() );
 
             // Detach the parts from the old vessel.
-            IVessel oldVessel = partToSplit.GetVessel();
+            Vessel oldVessel = partToSplit.GetVessel();
 
 #warning TODO - Use linear and angular velocities of part that works correctly for spinning vessels.
 
-            IVessel newVessel = GameplayVesselFactory.CreatePartless(
+            Vessel newVessel = VesselFactory.CreatePartless(
                 SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( partToSplit.transform.position ),
                 SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( partToSplit.transform.rotation ),
                 oldVessel.PhysicsObject.Velocity,
@@ -172,8 +171,8 @@ namespace HSP.Core
             if( IsAnchored( partToSplit ) )
             {
 #warning TODO - when the vessel is created, have an event and hook the pinning up to that.
-               // PinnedPhysicsObject ppo = oldVessel.GetComponent<PinnedPhysicsObject>();
-               // newVessel.Pin( ppo.ReferenceBody, ppo.ReferencePosition, ppo.ReferenceRotation );
+                //PinnedPhysicsObject ppo = oldVessel.GetComponent<PinnedPhysicsObject>();
+                //newVessel.Pin( ppo.ReferenceBody, ppo.ReferencePosition, ppo.ReferenceRotation );
             }
         }
 
@@ -220,8 +219,7 @@ namespace HSP.Core
         /// </summary>
         public static bool IsAnchored( Transform transform )
         {
-            return false;
-           // return transform.gameObject.HasComponentInChildren<FAnchor>();
+            return transform.gameObject.HasComponentInChildren<FAnchor>();
         }
 
         /// <summary>
@@ -229,8 +227,7 @@ namespace HSP.Core
         /// </summary>
         public static bool IsRootAnchored( Transform transform )
         {
-            return false;
-            // return transform.root.gameObject.HasComponentInChildren<FAnchor>();
+             return transform.root.gameObject.HasComponentInChildren<FAnchor>();
         }
     }
 }

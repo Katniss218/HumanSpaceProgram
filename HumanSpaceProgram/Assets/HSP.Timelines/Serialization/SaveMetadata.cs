@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.DataHandlers;
 
-namespace HSP.Core.Serialization
+namespace HSP.Timelines.Serialization
 {
     /// <summary>
     /// Serializable (meta)data of a specific timeline's save.

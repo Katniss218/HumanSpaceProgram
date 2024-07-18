@@ -1,13 +1,7 @@
-﻿using HSP.Core.ReferenceFrames;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 using UnityEngine;
-using UnityPlus.Serialization;
 
-namespace HSP.Core.ReferenceFrames
+namespace HSP.ReferenceFrames
 {
     /// <remarks>
     /// This class manages a scene-wide Floating Origin / Krakensbane.

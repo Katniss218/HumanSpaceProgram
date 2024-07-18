@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace HSP.Control.Controls
+namespace HSP.ControlSystems.Controls
 {
     /// <summary>
     /// Represents a control that produces a control signal.

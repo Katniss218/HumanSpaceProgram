@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace HSP.Core
+namespace HSP
 {
     /// <summary>
     /// A class grouping methods related specifically to coordinates that are relevant to the terrain system.

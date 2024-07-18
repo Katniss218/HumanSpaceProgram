@@ -1,14 +1,11 @@
-﻿using HSP.Components;
-using HSP.Core;
-using HSP.Core.Components;
-using HSP.Core.Physics;
-using HSP.Core.ReferenceFrames;
+﻿using HSP.Core;
+using HSP.ReferenceFrames;
+using HSP.Time;
+using HSP.Vessels;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
-using UnityPlus.Serialization.ReferenceMaps;
 
 namespace HSP.Construction
 {
@@ -190,44 +187,28 @@ namespace HSP.Construction
 
         void OnEnable()
         {
-            HSPEvent.EventManager.TryInvoke( HSPEventVanilla.GAMEPLAY_AFTER_CONSTRUCTION_SITE_CREATED, this );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_ConstructionSite.GAMEPLAY_AFTER_CONSTRUCTION_SITE_CREATED, this );
         }
 
         void OnDisable()
         {
-            HSPEvent.EventManager.TryInvoke( HSPEventVanilla.GAMEPLAY_AFTER_CONSTRUCTION_SITE_DESTROYED, this );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_ConstructionSite.GAMEPLAY_AFTER_CONSTRUCTION_SITE_DESTROYED, this );
         }
 
         void Update()
         {
-            /*if( UnityEngine.Input.GetKeyDown( KeyCode.G ) )
-            {
-                this.BuildSpeed = 90f;
-                StartConstructing();
-            }
-            if( UnityEngine.Input.GetKeyDown( KeyCode.H ) )
-            {
-                this.BuildSpeed = 90f;
-                Pause();
-            }
-            if( UnityEngine.Input.GetKeyDown( KeyCode.J ) )
-            {
-                this.BuildSpeed = 90f;
-                StartDeconstructing();
-            }*/
-
             FConstructible[] inProgressConstructibles = null;
             float buildPointsDelta = 0.0f;
 
             if( State == ConstructionState.Constructing )
             {
                 inProgressConstructibles = _constructibles.Where( c => c.BuildPercent < 1.0f ).ToArray();
-                buildPointsDelta = (BuildSpeed / inProgressConstructibles.Length) * TimeStepManager.DeltaTime;
+                buildPointsDelta = (BuildSpeed / inProgressConstructibles.Length) * TimeManager.DeltaTime;
             }
             else if( State == ConstructionState.Deconstructing )
             {
                 inProgressConstructibles = _constructibles.Where( c => c.BuildPercent > 0.0f ).ToArray();
-                buildPointsDelta = (-BuildSpeed / inProgressConstructibles.Length) * TimeStepManager.DeltaTime;
+                buildPointsDelta = (-BuildSpeed / inProgressConstructibles.Length) * TimeManager.DeltaTime;
             }
 
             if( inProgressConstructibles != null )
@@ -286,7 +267,7 @@ namespace HSP.Construction
 
             if( parent == null )
             {
-                IVessel vessel = GameplayVesselFactory.CreatePartless(
+                Vessel vessel = VesselFactory.CreatePartless(
                     SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( ghostRoot.position ),
                     SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( ghostRoot.rotation ),
                     Vector3.zero,

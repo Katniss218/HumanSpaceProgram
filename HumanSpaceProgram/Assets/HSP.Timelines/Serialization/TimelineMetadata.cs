@@ -9,7 +9,7 @@ using UnityPlus.Serialization;
 using UnityPlus.Serialization.DataHandlers;
 using UnityPlus.Serialization.Json;
 
-namespace HSP.Core.Serialization
+namespace HSP.Timelines.Serialization
 {
     /// <summary>
     /// Serializable (meta)data of a timeline.

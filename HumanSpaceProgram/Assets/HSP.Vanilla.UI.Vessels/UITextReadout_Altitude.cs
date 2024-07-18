@@ -1,10 +1,5 @@
-﻿using HSP.Core;
-using HSP.Core.ReferenceFrames;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using HSP.CelestialBodies;
+using HSP.ReferenceFrames;
 using UnityEngine;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
@@ -15,7 +10,7 @@ namespace HSP.UI
     {
         void LateUpdate()
         {
-            var activeObj = ActiveObjectManager.ActiveObject?.GetComponent<RootObjectTransform>();
+            var activeObj = ActiveObjectManager.ActiveObject?.GetComponent<ReferenceFrameTransform>();
             if( activeObj == null )
             {
                 this.Text = "";

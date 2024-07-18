@@ -1,8 +1,6 @@
-using HSP.Core;
-using HSP.Core.Physics;
-using HSP.Core.ReferenceFrames;
+using HSP.CelestialBodies;
 using HSP.Input;
-using System;
+using HSP.ReferenceFrames;
 using UnityEngine;
 using UnityPlus.Input;
 

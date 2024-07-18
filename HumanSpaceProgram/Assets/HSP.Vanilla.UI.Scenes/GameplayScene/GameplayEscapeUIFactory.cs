@@ -1,11 +1,6 @@
 ﻿using HSP.Core;
 using HSP.Core.SceneManagement;
-using HSP.Core.Serialization;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using HSP.Time;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
@@ -20,7 +15,7 @@ namespace HSP.UI.SceneFactories
         [HSPEventListener( HSPEvent.ESCAPE_GAMEPLAY, HSPEvent.NAMESPACE_VANILLA + ".escape_menu_ui" )]
         private static void OnGameplayEscape()
         {
-            if( TimeStepManager.IsPaused && TimeStepManager.LockTimescale )
+            if( TimeManager.IsPaused && TimeManager.LockTimescale )
             {
                 return;
             }
@@ -32,7 +27,7 @@ namespace HSP.UI.SceneFactories
 
 #warning TODO - Add conditional unpause to the 'ondestroy' of the escapeMenuWindow. (conditional = unless timescale has changed since displaying window).
 
-            if( TimeStepManager.IsPaused )
+            if( TimeManager.IsPaused )
             {
                 UICanvas canvas = CanvasManager.Get( CanvasName.WINDOWS );
 
@@ -43,10 +38,10 @@ namespace HSP.UI.SceneFactories
 
                 closebutton.onClick = () =>
                 {
-                    if( !TimeStepManager.LockTimescale )
+                    if( !TimeManager.LockTimescale )
                     {
-                        if( !TimeStepManager.LockTimescale )
-                            TimeStepManager.Unpause();
+                        if( !TimeManager.LockTimescale )
+                            TimeManager.Unpause();
                         escapeMenuWindow.Destroy();
                     }
                 };

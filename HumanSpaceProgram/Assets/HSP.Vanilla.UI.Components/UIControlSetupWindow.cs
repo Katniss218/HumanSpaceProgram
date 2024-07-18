@@ -1,4 +1,4 @@
-﻿using HSP.Control;
+﻿using HSP.ControlSystems;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,8 +33,8 @@ namespace HSP.UI.Windows
 
         Dictionary<Component, ControlSetupWindowComponentUI> _visibleComponents = new();
 
-        Dictionary<Control.Control, ControlSetupControlUI> _visibleInputs = new();
-        Dictionary<Control.Control, ControlSetupControlUI> _visibleOutputs = new();
+        Dictionary<ControlSystems.Control, ControlSetupControlUI> _visibleInputs = new();
+        Dictionary<ControlSystems.Control, ControlSetupControlUI> _visibleOutputs = new();
 
         List<ControlSetupControlConnectionUI> _visibleConnections = new();
 
@@ -181,7 +181,7 @@ namespace HSP.UI.Windows
         {
             // (achieved/2024-04-06): Intended to support many-to-many connections on both inputs and outputs.
 
-            HashSet<(Control.Control input, Control.Control output)> connected = new HashSet<(Control.Control input, Control.Control output)>();
+            HashSet<(ControlSystems.Control input, ControlSystems.Control output)> connected = new HashSet<(ControlSystems.Control input, ControlSystems.Control output)>();
 
             foreach( var (input, inputUI) in _visibleInputs )
             {

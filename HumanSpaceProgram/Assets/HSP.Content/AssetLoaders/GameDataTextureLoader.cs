@@ -1,13 +1,9 @@
-﻿using HSP.Content;
-using HSP.Core;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityPlus.AssetManagement;
 
-namespace HSP.AssetLoaders
+namespace HSP.Content.AssetLoaders
 {
     public static class GameDataTextureLoader
     {

@@ -1,14 +1,10 @@
-﻿using HSP.GameplayScene.Cameras;
-using HSP.Core;
-using HSP.Core.Components;
-using HSP.Core.Serialization;
+﻿using HSP.Core;
 using HSP.Input;
 using HSP.UI.Windows;
-using System.Collections.Generic;
-using System.Linq;
+using HSP.Vessels;
+using HSP.Vessels.Components;
 using UnityEngine;
 using UnityPlus.Input;
-using UnityPlus.Serialization;
 using UnityPlus.UILib;
 
 namespace HSP.UI
@@ -50,10 +46,10 @@ namespace HSP.UI
                 return false;
             }
 
-            FClickInteractionRedirect redirectComponent = clickedPart.GetComponent<FClickInteractionRedirect>();
+            TransformRedirect redirectComponent = clickedPart.GetComponent<TransformRedirect>();
             if( redirectComponent != null && redirectComponent.Target != null )
             {
-                clickedPart = redirectComponent.Target.transform;
+                clickedPart = redirectComponent.Target;
             }
 
             if( FPart.GetPart( clickedPart ) == null )

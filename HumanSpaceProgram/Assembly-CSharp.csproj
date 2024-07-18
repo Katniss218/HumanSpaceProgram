@@ -58,15 +58,11 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.Vanilla.Components\FPlayerInputAvionics.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Components\FVesselSeparator.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Components\FAttitudeAvionics.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Components\F3AxisActuator.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Components\FRocketEngine.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Components\F2AxisActuator.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Components\FGimbalActuatorController.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Components\F1AxisActuator.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Components\FReactionControlController.cs" />
+    <Compile Include="Assets\HSP.Trajectories\Trajectories\Vessel_Ex.cs" />
+    <Compile Include="Assets\HSP.Trajectories\Trajectories\Orbit.cs" />
+    <Compile Include="Assets\HSP.Trajectories\Trajectories\PinnedPhysicsObject.cs" />
+    <Compile Include="Assets\HSP.Trajectories\Trajectories\OrbitalFrame.cs" />
+    <Compile Include="Assets\HSP.Trajectories\Trajectories\FreePhysicsObject.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro.cginc" />
@@ -76,7 +72,6 @@
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro_Mobile.cginc" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF SSD.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Surface-Mobile.shader" />
-    <None Include="Assets\HSP.Vanilla.Components\___HSP.Vanilla.Components.asmdef" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Surface.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_Bitmap-Custom-Atlas.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF.shader" />
@@ -86,6 +81,7 @@
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro_Surface.cginc" />
     <None Include="Assets\_TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Mobile Masking.shader" />
+    <None Include="Assets\HSP.Trajectories\___HSP.Trajectories.asmdef" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF Overlay.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_Bitmap-Mobile.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Mobile.shader" />
@@ -936,12 +932,12 @@
       <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Unity.2D.Sprite.Editor">
-      <HintPath>Library\ScriptAssemblies\Unity.2D.Sprite.Editor.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Unity.TestTools.CodeCoverage.Editor.OpenCover.Mono.Reflection">
       <HintPath>Library\ScriptAssemblies\Unity.TestTools.CodeCoverage.Editor.OpenCover.Mono.Reflection.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.2D.Sprite.Editor">
+      <HintPath>Library\ScriptAssemblies\Unity.2D.Sprite.Editor.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Postprocessing.Editor">
@@ -1006,13 +1002,13 @@
       <Project>{71FF22E3-6491-7B94-7004-34ABCE1AC5F6}</Project>
       <Name>_UnityPlus.Logging</Name>
     </ProjectReference>
-    <ProjectReference Include="_UnityPlus.Input.csproj">
-      <Project>{1B7EDF60-A4D7-21D6-6511-CFB4286999D1}</Project>
-      <Name>_UnityPlus.Input</Name>
-    </ProjectReference>
     <ProjectReference Include="_UnityPlus.OverridableValueProviders.csproj">
       <Project>{2FD51314-7711-BD56-25C5-0C8F36A30A82}</Project>
       <Name>_UnityPlus.OverridableValueProviders</Name>
+    </ProjectReference>
+    <ProjectReference Include="_UnityPlus.Input.csproj">
+      <Project>{1B7EDF60-A4D7-21D6-6511-CFB4286999D1}</Project>
+      <Name>_UnityPlus.Input</Name>
     </ProjectReference>
     <ProjectReference Include="_UnityPlus.csproj">
       <Project>{49D4BC99-1C12-776F-CC5E-D6CE66E348FE}</Project>

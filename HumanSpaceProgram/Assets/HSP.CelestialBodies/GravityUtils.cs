@@ -2,7 +2,7 @@
 using System.Linq;
 using UnityEngine;
 
-namespace HSP.Core.Physics
+namespace HSP.CelestialBodies
 {
     public static class GravityUtils
     {

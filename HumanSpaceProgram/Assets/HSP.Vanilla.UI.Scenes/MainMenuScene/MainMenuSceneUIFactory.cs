@@ -1,5 +1,4 @@
 using HSP.Core;
-using HSP.Core.Mods;
 using HSP.Core.SceneManagement;
 using System;
 using System.Collections.Generic;
@@ -9,8 +8,6 @@ using UnityEngine.UI;
 using UnityPlus.UILib.UIElements;
 using UnityPlus.AssetManagement;
 using TMPro;
-using HSP.Core.Serialization;
-using UnityPlus.UILib.Layout;
 
 namespace HSP.UI.SceneFactories
 {

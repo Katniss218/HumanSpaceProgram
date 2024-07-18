@@ -58,11 +58,13 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\HSP.Vanilla.Components\IGhostable_Ex.cs" />
     <Compile Include="Assets\HSP.Vanilla.Components\FPlayerInputAvionics.cs" />
     <Compile Include="Assets\HSP.Vanilla.Components\FVesselSeparator.cs" />
     <Compile Include="Assets\HSP.Vanilla.Components\FSequencer.Sequence.cs" />
     <Compile Include="Assets\HSP.Vanilla.Components\FAttitudeAvionics.cs" />
     <Compile Include="Assets\HSP.Vanilla.Components\FSequencer.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Components\FPointMass.cs" />
     <Compile Include="Assets\HSP.Vanilla.Components\F3AxisActuator.cs" />
     <Compile Include="Assets\HSP.Vanilla.Components\FSequencer.SequenceAction.cs" />
     <Compile Include="Assets\HSP.Vanilla.Components\FSequencer.SequenceElement.cs" />
@@ -952,6 +954,10 @@
     <ProjectReference Include="HSP.CelestialBodies.csproj">
       <Project>{83793330-5AED-C186-5E4B-AAD4BB463469}</Project>
       <Name>HSP.CelestialBodies</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Construction.csproj">
+      <Project>{EBC6D9CF-7C4D-8C8F-E094-E9D859959A88}</Project>
+      <Name>HSP.Construction</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.ControlSystems.csproj">
       <Project>{5E371463-138D-D25A-49B8-DED13355C7DC}</Project>

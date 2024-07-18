@@ -59,13 +59,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\HSP.ReferenceFrames\CenteredReferenceFrame.cs" />
-    <Compile Include="Assets\HSP.ReferenceFrames\RootObjectTransform.cs" />
-    <Compile Include="Assets\HSP.ReferenceFrames\IAcceleratingReferenceFrame.cs" />
+    <Compile Include="Assets\HSP.ReferenceFrames\ReferenceFrameTransform.cs" />
     <Compile Include="Assets\HSP.ReferenceFrames\ReferenceFrameUtils.cs" />
     <Compile Include="Assets\HSP.ReferenceFrames\OrientedReferenceFrame.cs" />
     <Compile Include="Assets\HSP.ReferenceFrames\IReferenceFrameSwitchResponder.cs" />
     <Compile Include="Assets\HSP.ReferenceFrames\IReferenceFrame.cs" />
-    <Compile Include="Assets\HSP.ReferenceFrames\IReferenceTransform.cs" />
     <Compile Include="Assets\HSP.ReferenceFrames\SceneReferenceFrameManager.cs" />
     <Compile Include="Assets\HSP.ReferenceFrames\ActiveObjectManager.cs" />
   </ItemGroup>

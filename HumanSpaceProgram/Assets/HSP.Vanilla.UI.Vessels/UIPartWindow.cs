@@ -1,14 +1,13 @@
-﻿using UnityPlus.UILib;
+﻿using HSP.Vessels.Components;
+using HSP.Vessels.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityPlus.UILib.UIElements;
 using UnityPlus.AssetManagement;
-using HSP.Core.Serialization;
-using HSP.Core.Components;
-using HSP.UI.Windows.PartWindowComponents;
+using UnityPlus.UILib;
 using UnityPlus.UILib.Layout;
+using UnityPlus.UILib.UIElements;
 
 namespace HSP.UI.Windows
 {

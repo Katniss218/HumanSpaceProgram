@@ -1,13 +1,8 @@
-﻿using HSP.Control.Controls;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace HSP.Control
+namespace HSP.ControlSystems
 {
     /// <summary>
     /// Represents an arbitrary type of "socket / endpoint" that some form of a control connection can be routed to or from.

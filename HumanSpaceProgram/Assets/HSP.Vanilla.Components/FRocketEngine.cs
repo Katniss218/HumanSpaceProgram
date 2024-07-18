@@ -5,9 +5,10 @@ using System;
 using UnityEngine;
 using UnityPlus.Input;
 using UnityPlus.Serialization;
-using HSP.Control;
-using HSP.Control.Controls;
+using HSP.ControlSystems;
+using HSP.ControlSystems.Controls;
 using static HSP.Components.FGimbalActuatorController;
+using HSP.Vessels;
 
 namespace HSP.Components
 {
@@ -76,7 +77,7 @@ namespace HSP.Components
                 return;
             }
 
-            IVessel vessel = this.transform.GetVessel();
+            Vessel vessel = this.transform.GetVessel();
             if( vessel != null )
             {
                 vessel.PhysicsObject.AddForceAtPosition( this.ThrustTransform.forward * this.Thrust, this.ThrustTransform.position );

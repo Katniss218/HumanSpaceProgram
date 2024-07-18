@@ -1,4 +1,4 @@
-using HSP.Core.ReferenceFrames;
+using HSP.ReferenceFrames;
 using System;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -91,11 +91,8 @@ namespace HSP.CelestialBodies
 
             this._rt = RenderTexture.GetTemporary( Screen.width, Screen.height, 0, RenderTextureFormat.ARGB32 );
 
-#warning TODO - doesn't necessarily have to be in the gameplay scene. we want atmospheres to render correctly in main menu too.
             //                                     The `_Texture` property name gets overriden by something else... Unity... >:{
-           // _atmosphereMaterial.SetTexture( Shader.PropertyToID( "_texgsfs" ), GameplaySceneCameraManager.ColorRenderTexture );
             _atmosphereMaterial.SetTexture( Shader.PropertyToID( "_texgsfs" ), ColorRenderTextureGetter.Invoke() );
-           // _atmosphereMaterial.SetTexture( Shader.PropertyToID( "_DepthBuffer" ), GameplaySceneDepthBufferCombiner.CombinedDepthRenderTexture, RenderTextureSubElement.Depth );
             _atmosphereMaterial.SetTexture( Shader.PropertyToID( "_DepthBuffer" ), DepthRenderTextureGetter.Invoke(), RenderTextureSubElement.Depth );
 
             _atmosphereMaterial.SetVector( Shader.PropertyToID( "_Center" ), _center );

@@ -1,13 +1,8 @@
-﻿using HSP.Core.Serialization;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using HSP.Vessels.Serialization;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace HSP.Core
+namespace HSP.Vessels
 {
 
     /// <summary>

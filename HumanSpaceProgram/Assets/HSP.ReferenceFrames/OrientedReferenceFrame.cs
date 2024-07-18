@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace HSP.Core.ReferenceFrames
+namespace HSP.ReferenceFrames
 {
     /// <summary>
     /// A reference frame centered on a given point, and with a given orientation. This class is immutable.

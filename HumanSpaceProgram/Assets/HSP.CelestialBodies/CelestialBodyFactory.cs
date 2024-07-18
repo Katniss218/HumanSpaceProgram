@@ -1,14 +1,8 @@
-﻿using HSP.Core.ReferenceFrames;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
-using UnityPlus.Serialization;
 
-namespace HSP.Core
+namespace HSP.CelestialBodies
 {
     /// <summary>
     /// Creates celestial body instances (game objects).

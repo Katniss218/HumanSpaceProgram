@@ -1,5 +1,6 @@
 ﻿using HSP.Core;
 using HSP.Input;
+using HSP.Time;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,16 +35,16 @@ namespace HSP.GameplayScene
 
         private bool Input_Escape( float value )
         {
-            if( !TimeStepManager.LockTimescale )
+            if( !TimeManager.LockTimescale )
             {
-                if( TimeStepManager.IsPaused )
+                if( TimeManager.IsPaused )
                 {
-                    TimeStepManager.Unpause();
+                    TimeManager.Unpause();
                     HSPEvent.EventManager.TryInvoke( HSPEvent.ESCAPE_GAMEPLAY, null );
                 }
                 else
                 {
-                    TimeStepManager.Pause();
+                    TimeManager.Pause();
                     HSPEvent.EventManager.TryInvoke( HSPEvent.ESCAPE_GAMEPLAY, null );
                 }
             }

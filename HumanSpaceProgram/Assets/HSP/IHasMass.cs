@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace HSP.Core
+namespace HSP
 {
     /// <summary>
     /// Specifies that a component has mass.

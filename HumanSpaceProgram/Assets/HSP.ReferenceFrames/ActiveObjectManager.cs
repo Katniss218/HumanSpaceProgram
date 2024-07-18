@@ -1,15 +1,11 @@
-﻿using HSP.Core.Serialization;
-using System;
-using System.Collections.Generic;
+﻿using HSP.Timelines;
+using HSP.Timelines.Serialization;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.DataHandlers;
 
-namespace HSP.Core
+namespace HSP.ReferenceFrames
 {
     /// <summary>
     /// Manages the currently active object.

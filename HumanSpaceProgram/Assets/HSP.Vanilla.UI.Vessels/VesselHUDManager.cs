@@ -1,9 +1,8 @@
 ﻿using HSP.Core;
-using System;
+using HSP.ReferenceFrames;
+using HSP.Vessels;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
 
 namespace HSP.UI.HUDs
@@ -19,7 +18,7 @@ namespace HSP.UI.HUDs
         }
 
         [HSPEventListener( HSPEvent.GAMEPLAY_AFTER_VESSEL_REGISTERED, "vanilla.vessel_huds" )]
-        private static void OnVesselRegistered( GameplayVessel vessel )
+        private static void OnVesselRegistered( Vessel vessel )
         {
             if( ActiveObjectManager.ActiveObject == null )
             {
@@ -29,7 +28,7 @@ namespace HSP.UI.HUDs
         }
 
         [HSPEventListener( HSPEvent.GAMEPLAY_AFTER_VESSEL_UNREGISTERED, "vanilla.vessel_huds" )]
-        private static void OnVesselUnregistered( GameplayVessel vessel )
+        private static void OnVesselUnregistered( Vessel vessel )
         {
             foreach( var hud in instance._huds.ToArray() )
             {
@@ -49,7 +48,7 @@ namespace HSP.UI.HUDs
         {
             if( ActiveObjectManager.ActiveObject == null )
             {
-                foreach( var vessel in GameplayVesselManager.LoadedVessels )
+                foreach( var vessel in VesselManager.LoadedVessels )
                 {
                     var hud = CanvasManager.Get( CanvasName.BACKGROUND ).AddVesselHUD( vessel );
                     instance._huds.Add( hud );

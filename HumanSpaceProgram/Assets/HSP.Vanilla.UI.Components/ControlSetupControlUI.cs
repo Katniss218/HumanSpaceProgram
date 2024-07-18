@@ -1,4 +1,4 @@
-﻿using HSP.Control;
+﻿using HSP.ControlSystems;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +16,7 @@ namespace HSP.UI
         public RectTransform Circle { get; private set; }
 
         public ControlSetupControlGroupUI Group { get; private set; }
-        public Control.Control Control { get; private set; }
+        public ControlSystems.Control Control { get; private set; }
 
         /// <summary>
         /// 0 or 1, depending on which side the endpoint is drawn on.
@@ -82,7 +82,7 @@ namespace HSP.UI
             contextMenu.AddStdText( new UILayoutInfo( UIFill.Horizontal( 5, 5 ), UIAnchor.Top, -30, 30 ), this._attr.Description );
         }
 
-        internal static ControlSetupControlUI Create( ControlSetupControlGroupUI group, float verticalOffset, Control.Control control, NamedControlAttribute attr )
+        internal static ControlSetupControlUI Create( ControlSetupControlGroupUI group, float verticalOffset, ControlSystems.Control control, NamedControlAttribute attr )
         {
             UIPanel panel = group.panel.AddPanel( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Top, -verticalOffset, ControlSetupControlGroupUI.ROW_HEIGHT ), null );
 
@@ -90,13 +90,13 @@ namespace HSP.UI
             Sprite sprite;
             switch( control )
             {
-                case HSP.Control.Controls.ControlleeInputBase:
+                case HSP.ControlSystems.Controls.ControlleeInputBase:
                     sprite = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_input" ); side = 0f; break;
-                case HSP.Control.Controls.ControllerOutputBase:
+                case HSP.ControlSystems.Controls.ControllerOutputBase:
                     sprite = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_output" ); side = 1f; break;
-                case HSP.Control.Controls.ControlParameterInputBase:
+                case HSP.ControlSystems.Controls.ControlParameterInputBase:
                     sprite = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_parameter_input" ); side = 1f; break;
-                case HSP.Control.Controls.ControlParameterOutputBase:
+                case HSP.ControlSystems.Controls.ControlParameterOutputBase:
                     sprite = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_parameter_output" ); side = 0f; break;
                 default:
                     sprite = null;

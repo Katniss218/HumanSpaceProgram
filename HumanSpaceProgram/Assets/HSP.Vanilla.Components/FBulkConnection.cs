@@ -1,11 +1,12 @@
-﻿using HSP.Core;
-using HSP.Core.Physics;
-using HSP.Core.ReferenceFrames;
+﻿using HSP.CelestialBodies;
+using HSP.Core;
+using HSP.ReferenceFrames;
 using HSP.Core.ResourceFlowSystem;
+using HSP.Vessels;
 using System;
-using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
+using HSP.Time;
 
 namespace HSP.Components
 {
@@ -234,9 +235,9 @@ namespace HSP.Components
                 return;
             }
 
-            (SubstanceStateCollection flow, _) = inletProducer.SampleFlow( inletEnd.Position, inletProducer.transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea, TimeStepManager.FixedDeltaTime, endSamples[outlet] );
+            (SubstanceStateCollection flow, _) = inletProducer.SampleFlow( inletEnd.Position, inletProducer.transform.InverseTransformVector( fluidAccelerationSceneSpace ), CrossSectionArea, TimeManager.FixedDeltaTime, endSamples[outlet] );
 
-            outletConsumer.ClampIn( flow, TimeStepManager.FixedDeltaTime );
+            outletConsumer.ClampIn( flow, TimeManager.FixedDeltaTime );
 
             SetFlowAcrossConnection( flow, inlet, outlet );
         }
@@ -250,7 +251,7 @@ namespace HSP.Components
                 throw new InvalidOperationException( $"Both ends must exist" );
             }
 
-            IVessel vessel = this.transform.GetVessel();
+            Vessel vessel = this.transform.GetVessel();
             if( vessel != null ) 
             {
                 Vector3Dbl airfAcceleration = GravityUtils.GetNBodyGravityAcceleration( vessel.RootObjTransform.AIRFPosition );

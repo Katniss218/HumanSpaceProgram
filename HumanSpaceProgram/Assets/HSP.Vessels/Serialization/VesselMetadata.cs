@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.DataHandlers;
-using UnityPlus.Serialization.Json;
 
-namespace HSP.Core.Serialization
+namespace HSP.Vessels.Serialization
 {
     /// <summary>
     /// Represents additional metadata of a saved vessel.

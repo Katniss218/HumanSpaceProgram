@@ -1,15 +1,12 @@
-﻿using HSP.Control.Controls;
-using HSP.Control;
+﻿using HSP.ControlSystems.Controls;
+using HSP.ControlSystems;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using HSP.Core;
-using HSP.Core.ReferenceFrames;
 using System.Runtime.CompilerServices;
 using UnityPlus.Serialization;
+using HSP.Vessels;
+using HSP.Time;
 
 namespace HSP.Components
 {
@@ -18,7 +15,7 @@ namespace HSP.Components
 	/// </summary>
 	public class FAttitudeAvionics : MonoBehaviour
 	{
-		private IVessel _vessel;
+		private Vessel _vessel;
 
         // error in pitch, roll, yaw, in [Rad]
         [field: SerializeField]
@@ -154,7 +151,7 @@ namespace HSP.Components
 			Vector3 controlTorque = Ac_torque;
 
 			// needed to stop wiggling at higher phys warp
-			float timeScale = TimeStepManager.TimeScale;
+			float timeScale = TimeManager.TimeScale;
 
 			// see https://archive.is/NqoUm and the "Alt Hold Controller", the acceleration PID is not implemented so we only
 			// have the first two PIDs in the cascade.
@@ -214,7 +211,7 @@ namespace HSP.Components
 				_pid[i].N = VelN;
 				_pid[i].B = VelB;
 				_pid[i].C = VelC;
-				_pid[i].Ts = TimeStepManager.FixedDeltaTime;
+				_pid[i].Ts = TimeManager.FixedDeltaTime;
 				_pid[i].SmoothIn = Math.Clamp( VelSmoothIn, 0, 1 );
 				_pid[i].SmoothOut = Math.Clamp( VelSmoothOut, 0, 1 );
 				_pid[i].MinOutput = -1;

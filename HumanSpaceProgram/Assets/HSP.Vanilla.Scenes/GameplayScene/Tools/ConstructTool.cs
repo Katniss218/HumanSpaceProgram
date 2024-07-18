@@ -1,17 +1,8 @@
-﻿using HSP.Components;
-using HSP.Construction;
-using HSP.Core;
-using HSP.Core.Components;
-using HSP.Core.Mods;
-using HSP.Core.Physics;
-using HSP.Core.ReferenceFrames;
-using HSP.DesignScene;
+﻿using HSP.Construction;
 using HSP.Input;
-using System;
-using System.Collections.Generic;
+using HSP.Vessels;
+using HSP.Vessels.Components;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Input;
 using UnityPlus.Serialization;
@@ -78,7 +69,7 @@ namespace HSP.GameplayScene.Tools
 
             if( Physics.Raycast( _cursorRay, out _hit, 8192, 1 << (int)Layer.PART_OBJECT ) )
             {
-                _hitObject = FClickInteractionRedirect.TryRedirect( _hit.collider.transform );
+                _hitObject = TransformRedirect.TryRedirect( _hit.collider.transform );
             }
             else
             {
@@ -182,7 +173,7 @@ namespace HSP.GameplayScene.Tools
                     return;
                 }
 
-                IVessel hitVessel = _hitObject.GetVessel();
+                Vessel hitVessel = _hitObject.GetVessel();
                 if( hitVessel == null )
                 {
                     return;
@@ -193,7 +184,7 @@ namespace HSP.GameplayScene.Tools
             else
             {
                 Transform parent = _currentSnap.Value.targetNode.transform.parent;
-                IVessel hitVessel = parent.GetVessel();
+                Vessel hitVessel = parent.GetVessel();
                 if( hitVessel == null )
                 {
                     return;
@@ -216,7 +207,7 @@ namespace HSP.GameplayScene.Tools
             {
                 if( _hitObject != null )
                 {
-                    IVessel hitVessel = _hitObject.GetVessel();
+                    Vessel hitVessel = _hitObject.GetVessel();
                     if( hitVessel == null )
                     {
                         return;
@@ -253,7 +244,7 @@ namespace HSP.GameplayScene.Tools
                 // It should always snap "as if the part is at the cursor", not wherever it was snapped to previously.
                 _heldPart.position = planePoint - _heldOffset;
 
-                var closestVessel = GameplayVesselManager.LoadedVessels.OrderBy( v => Vector3.Distance( v.transform.position, planePoint ) ).First();
+                var closestVessel = VesselManager.LoadedVessels.OrderBy( v => Vector3.Distance( v.transform.position, planePoint ) ).First();
 
                 // Rotation should take into account the orientation of the vessel we are most likely trying to snap to.
                 _heldPart.rotation = closestVessel.transform.rotation * _heldRotation;
@@ -265,7 +256,7 @@ namespace HSP.GameplayScene.Tools
         private void TrySnappingHeldPartToAttachmentNode( Vector3 viewDirection )
         {
             FAttachNode[] heldNodes = _heldPart.GetComponentsInChildren<FAttachNode>();
-            FAttachNode[] targetNodes = GameplayVesselManager.LoadedVessels.GetComponentsInChildren<FAttachNode>().ToArray();
+            FAttachNode[] targetNodes = VesselManager.LoadedVessels.GetComponentsInChildren<FAttachNode>().ToArray();
 
             FAttachNode.SnappingCandidate? nodePair = FAttachNode.GetBestSnappingNodePair( heldNodes, targetNodes, viewDirection );
             if( nodePair != null )

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace HSP.Core
+namespace HSP.Vessels
 {
     /// <summary>
     /// Contains the data about symmetry in vessels/buildings.

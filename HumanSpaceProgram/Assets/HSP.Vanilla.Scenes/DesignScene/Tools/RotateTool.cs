@@ -94,10 +94,10 @@ namespace HSP.DesignScene.Tools
 			{
 				Transform clickedObj = hitInfo.collider.transform;
 
-				FClickInteractionRedirect r = clickedObj.GetComponent<FClickInteractionRedirect>();
+				TransformRedirect r = clickedObj.GetComponent<TransformRedirect>();
 				if( r != null && r.Target != null )
 				{
-					clickedObj = r.Target.transform;
+					clickedObj = r.Target;
 				}
 
 				if( DesignVesselManager.IsLooseOrPartOfDesignObject( clickedObj ) )

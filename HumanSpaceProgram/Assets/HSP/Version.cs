@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityPlus.Serialization;
 
-namespace HSP.Core.Serialization
+namespace HSP
 {
     /// <summary>
     /// Represents a version where the major number indicates breaking changes, and minor indicates non-breaking changes.

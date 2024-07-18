@@ -1,5 +1,6 @@
 ﻿using HSP.CelestialBodies.Surface;
 using HSP.Core;
+using HSP.Vessels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,13 +10,13 @@ using UnityEngine;
 
 namespace HSP.CelestialBodies
 {
-    class VanillaPlanetarySystemFactory
+    public static class VanillaPlanetarySystemFactory
     {
         static CelestialBody CreateCB( string id, Vector3Dbl airfPos, QuaternionDbl airfRot )
         {
             CelestialBody cb = new CelestialBodyFactory(id).Create( airfPos, airfRot );
             LODQuadSphere lqs = cb.gameObject.AddComponent<LODQuadSphere>();
-            lqs.PoIGetter = () => GameplayVesselManager.LoadedVessels.Select( v => v.AIRFPosition );
+            lqs.PoIGetter = () => VesselManager.LoadedVessels.Select( v => v.AIRFPosition );
             return cb;
         }
 

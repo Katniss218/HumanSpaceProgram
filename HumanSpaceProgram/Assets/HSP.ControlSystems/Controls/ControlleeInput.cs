@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace HSP.Control.Controls
+namespace HSP.ControlSystems.Controls
 {
 	/// <summary>
 	/// Represents a control that consumes an empty control signal.

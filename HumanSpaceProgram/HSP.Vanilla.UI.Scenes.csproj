@@ -65,6 +65,7 @@
     <Compile Include="Assets\HSP.Vanilla.UI.Scenes\GameplayScene\GameplayViewportClickController.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI.Scenes\DesignScene\UIPartList.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI.Scenes\DesignScene\DesignSceneUIFactory.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI.Scenes\GameplayScene\OnStartup.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla.UI.Scenes\___HSP.Vanilla.UI.Scenes.asmdef" />
@@ -972,9 +973,9 @@
       <Project>{05A5E85F-FD04-4199-F86F-3A6E38B383FB}</Project>
       <Name>HSP.UI</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.UI.Time.csproj">
-      <Project>{1C87C45B-15A4-009B-A73D-1B7302A450D5}</Project>
-      <Name>HSP.UI.Time</Name>
+    <ProjectReference Include="HSP.Vanilla.UI.Time.csproj">
+      <Project>{F24B1196-F385-43EE-AAB5-971DC99C6174}</Project>
+      <Name>HSP.Vanilla.UI.Time</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.Vanilla.UI.Vessels.csproj">
       <Project>{3CA21801-D573-73FC-585D-691DDF1E6A9B}</Project>
@@ -987,6 +988,10 @@
     <ProjectReference Include="HSP.Vanilla.UI.Components.csproj">
       <Project>{FFD77CE1-030A-7905-618A-BF767836F6ED}</Project>
       <Name>HSP.Vanilla.UI.Components</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Vanilla.UI.Construction.csproj">
+      <Project>{5958E0F1-8E8D-8984-0C66-BCF58DD2FE91}</Project>
+      <Name>HSP.Vanilla.UI.Construction</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.Vanilla.UI.Timelines.csproj">
       <Project>{426EC70C-729C-F20E-2722-D105402F2F55}</Project>

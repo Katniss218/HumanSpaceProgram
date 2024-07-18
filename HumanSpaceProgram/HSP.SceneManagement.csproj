@@ -60,7 +60,6 @@
   <ItemGroup>
     <Compile Include="Assets\HSP.SceneManagement\SceneLoader.cs" />
     <Compile Include="Assets\HSP.SceneManagement\AlwaysLoadedManager.cs" />
-    <Compile Include="Assets\HSP.SceneManagement\InvalidSceneManagerException.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.SceneManagement\___HSP.SceneManagement.asmdef" />

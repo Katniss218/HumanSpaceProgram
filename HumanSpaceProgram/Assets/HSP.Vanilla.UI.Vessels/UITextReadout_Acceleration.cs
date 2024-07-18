@@ -1,11 +1,5 @@
-﻿using HSP.Core;
-using HSP.Core.Physics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using HSP.Core.Physics;
+using HSP.ReferenceFrames;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
 

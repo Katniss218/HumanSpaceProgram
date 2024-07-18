@@ -1,14 +1,9 @@
-﻿using HSP.Core.Mods;
-using HSP.Core.Serialization;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using HSP.Vessels;
+using HSP.Vessels.Serialization;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace HSP.Core.Components
+namespace HSP.Vessels.Components
 {
     /// <summary>
     /// A marker component to track parts.

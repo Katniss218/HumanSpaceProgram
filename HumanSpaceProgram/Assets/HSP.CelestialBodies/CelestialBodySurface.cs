@@ -1,8 +1,9 @@
+using HSP.Core;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace HSP.Core
+namespace HSP.CelestialBodies
 {
     [RequireComponent( typeof( CelestialBody ) )]
     public class CelestialBodySurface : MonoBehaviour

@@ -1,7 +1,8 @@
-﻿using HSP.Control;
-using HSP.Control.Controls;
+﻿using HSP.ControlSystems;
+using HSP.ControlSystems.Controls;
 using HSP.Core;
 using HSP.Core.ResourceFlowSystem;
+using HSP.Vessels;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -62,7 +63,7 @@ namespace HSP.Components
 
         void FixedUpdate()
         {
-            IVessel vessel = this.transform.GetVessel();
+            Vessel vessel = this.transform.GetVessel();
             if( vessel == null )
             {
                 return;

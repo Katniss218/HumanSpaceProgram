@@ -1,7 +1,6 @@
-﻿using HSP.Core;
-using HSP.Core.Serialization;
+﻿using HSP.Vessels;
+using HSP.Vessels.Serialization;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib;

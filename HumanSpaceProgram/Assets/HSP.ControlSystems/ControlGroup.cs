@@ -1,5 +1,5 @@
 ﻿
-namespace HSP.Control
+namespace HSP.ControlSystems
 {
     /// <summary>
     /// Represents an abstract group of <see cref="Control"/>s. <br/>

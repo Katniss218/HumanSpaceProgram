@@ -1,8 +1,8 @@
-﻿using HSP.Core;
+﻿using HSP.CelestialBodies;
+using HSP.Core;
 using HSP.Core.Components;
-using HSP.Core.Physics;
-using System;
-using System.Collections.Generic;
+using HSP.ReferenceFrames;
+using HSP.Vessels;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
@@ -93,7 +93,7 @@ namespace HSP.UI
         {
             if( ActiveObjectManager.ActiveObject != null )
             {
-                IVessel v = ActiveObjectManager.ActiveObject.transform.GetVessel();
+                Vessel v = ActiveObjectManager.ActiveObject.transform.GetVessel();
                 Vector3 forward = (Vector3)CelestialBodyManager.CelestialBodies.First().AIRFRotation.GetForwardAxis();
                 Vector3 gravity = -GravityUtils.GetNBodyGravityAcceleration( v.RootObjTransform.AIRFPosition ).NormalizeToVector3();
                 forward = Vector3.ProjectOnPlane( forward, gravity );

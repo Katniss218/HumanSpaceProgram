@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace HSP.Core.Mods
+namespace HSP
 {
     /// <summary>
     /// An identifier that consists of a namespace and a name.

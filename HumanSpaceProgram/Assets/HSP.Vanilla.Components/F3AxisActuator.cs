@@ -1,5 +1,5 @@
-﻿using HSP.Control.Controls;
-using HSP.Control;
+﻿using HSP.ControlSystems.Controls;
+using HSP.ControlSystems;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;

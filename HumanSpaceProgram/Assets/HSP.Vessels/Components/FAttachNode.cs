@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace HSP.Core.Components
+namespace HSP.Vessels.Components
 {
     [DisallowMultipleComponent]
     public sealed class FAttachNode : MonoBehaviour

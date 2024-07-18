@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace HSP.Control.Controls
+namespace HSP.ControlSystems.Controls
 {
 	/// <summary>
 	/// Represents a control that consumes a control signal of type <typeparamref name="T"/>.

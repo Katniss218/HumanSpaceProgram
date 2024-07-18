@@ -1,7 +1,8 @@
 ﻿using HSP.Components;
-using HSP.Control;
-using HSP.Control.Controls;
+using HSP.ControlSystems;
+using HSP.ControlSystems.Controls;
 using HSP.Core;
+using HSP.Time;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -88,12 +89,12 @@ namespace HSP.Components
 
         public override void Initialize()
         {
-            _startUT = TimeStepManager.UT;
+            _startUT = TimeManager.UT;
         }
 
         public override bool CanInvoke()
         {
-            return TimeStepManager.UT >= _startUT + Delay;
+            return TimeManager.UT >= _startUT + Delay;
         }
 
         [MapsInheritingFrom( typeof( TimedSequenceElement ) )]

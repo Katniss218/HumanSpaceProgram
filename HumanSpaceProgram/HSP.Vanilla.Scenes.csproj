@@ -61,7 +61,6 @@
     <Compile Include="Assets\HSP.Vanilla.Scenes\EditorScene\EditorSceneEscapeInputController.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\DesignSceneToolBase.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\Cameras\DesignSceneOrbitingCameraController.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\GameplayVessel.Serialization.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\Tools\PickTool.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\Cameras\GameplaySceneCameraManager.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\TimeScaleInputControllerFactory.cs" />
@@ -76,18 +75,17 @@
     <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\Tools\RotateTool.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\DesignSceneEscapeInputController.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\DesignSceneToolManager.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\GameplayVesselFactory.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\MainMenuScene\Cameras\MainMenuSceneCameraManager.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\GameplayVessel.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\GameplayVesselManager.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\Cameras\GameplaySceneDepthBufferCombiner.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\Tools\TranslateTool.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\Tools\RerootTool.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\AtmosphereRendererSceneIntegration.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\MainMenuScene\MainMenuEscapeInputController.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\GameplaySceneToolBase.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\DesignVessel.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\GameplaySceneToolManager.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\CelestialBodyManager.Serialization.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\VesselManager.Serialization.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Scenes\AlwaysLoadedScene\OnStartup.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla.Scenes\___HSP.Vanilla.Scenes.asmdef" />
@@ -987,13 +985,17 @@
       <Project>{0FF6884C-8D4A-7AB7-5D8A-5FBF5FCF8190}</Project>
       <Name>HSP.Scenes</Name>
     </ProjectReference>
+    <ProjectReference Include="HSP.ScreenCapturing.csproj">
+      <Project>{A72CC48E-46C1-25C7-DFC0-DDA669184CFD}</Project>
+      <Name>HSP.ScreenCapturing</Name>
+    </ProjectReference>
     <ProjectReference Include="HSP.Time.csproj">
       <Project>{04DC55C0-E02E-3069-7322-19B05EB71C21}</Project>
       <Name>HSP.Time</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.Trajectories.csproj">
-      <Project>{57FA29CC-9026-83EE-F242-EA051DEA7649}</Project>
-      <Name>HSP.Trajectories</Name>
+    <ProjectReference Include="HSP.Timelines.csproj">
+      <Project>{C443A3BB-4D58-3A1D-D085-E8AEA15B2BC0}</Project>
+      <Name>HSP.Timelines</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.Vanilla.csproj">
       <Project>{AE718BD5-B7C2-FF6D-CB3C-BD7A5FEC452C}</Project>

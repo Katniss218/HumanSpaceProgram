@@ -1,21 +1,16 @@
-﻿using HSP.Core;
-using HSP.Core.Components;
-using HSP.Input;
+﻿using HSP.Input;
 using HSP.Vessels;
-using System;
-using System.Collections.Generic;
+using HSP.Vessels.Components;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Input;
 
 namespace HSP.DesignScene.Tools
 {
-	/// <summary>
-	/// Allows to detach and attach parts.
-	/// </summary>
-	public class PickTool : DesignSceneToolBase
+    /// <summary>
+    /// Allows to detach and attach parts.
+    /// </summary>
+    public class PickTool : DesignSceneToolBase
 	{
 		Transform _heldPart = null;
 
@@ -57,7 +52,7 @@ namespace HSP.DesignScene.Tools
 
 			if( Physics.Raycast( _currentFrameCursorRay, out _currentFrameHit, 8192, 1 << (int)Layer.PART_OBJECT ) )
 			{
-				_currentFrameHitObject = FClickInteractionRedirect.TryRedirect( _currentFrameHit.collider.transform );
+				_currentFrameHitObject = TransformRedirect.TryRedirect( _currentFrameHit.collider.transform );
 			}
 			else
 			{

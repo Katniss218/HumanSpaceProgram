@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
-namespace HSP.Control
+namespace HSP.ControlSystems
 {
     /// <summary>
     /// Contains a set of utility methods for getting control-related fields from objects.
