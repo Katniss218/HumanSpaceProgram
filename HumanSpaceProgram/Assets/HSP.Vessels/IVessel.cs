@@ -1,4 +1,5 @@
-﻿using HSP.Core.Physics;
+﻿using HSP.Core;
+using HSP.Core.Physics;
 using HSP.Core.ReferenceFrames;
 using System;
 using System.Collections.Generic;
@@ -6,10 +7,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityPlus.OverridableEvents;
+
+namespace HSP.Vessels
+{
+    public class AfterVesselCreatedEvent : OverridableEvent<IVessel>
+    {
+        public static AfterVesselCreatedEvent Instance { get; } = new AfterVesselCreatedEvent();
+    }
+}
 
 namespace HSP.Core
 {
-    public static class IPartObjectEx
+    public static class IVessel_Ex
     {
         public static bool IsRootOfVessel( this Transform part )
         {
@@ -47,12 +57,13 @@ namespace HSP.Core
     /// </summary>
     public interface IVessel : IComponent
     {
-#warning TODO - rename to IVessel, rename Vessel to GameplayVessel, rename DesignObject to DesignVessel
+        string DisplayName { get; set; }
+
         /// <summary>
         /// The root part of this part object (if any).
         /// </summary>
         Transform RootPart { get; set; }
-        
+
         /// <summary>
         /// Returns the transform that defines the orientation (local space) of this part object.
         /// </summary>

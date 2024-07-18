@@ -119,14 +119,14 @@ namespace HSP.Core
 
         void OnEnable()
         {
-            VesselManager.Register( this );
+            GameplayVesselManager.Register( this );
         }
 
         void OnDisable()
         {
             try
             {
-                VesselManager.Unregister( this );
+                GameplayVesselManager.Unregister( this );
             }
             catch( InvalidSceneManagerException )
             {
@@ -148,6 +148,33 @@ namespace HSP.Core
 
             // There's also multi-scene physics, which apparently might be used to put the origin of the simulation at 2 different vessels, and have their positions accuratly updated???
             // doesn't seem like that to me reading the docs tho, but idk.
+        }
+
+        public bool IsPinned()
+        {
+            return this.PhysicsObject is PinnedPhysicsObject;
+        }
+
+        /// <summary>
+        /// Pins the vessel to the celestial body at the specified location.
+        /// </summary>
+        public void Pin( CelestialBody body, Vector3Dbl localPosition, QuaternionDbl localRotation )
+        {
+            UnityEngine.Object.DestroyImmediate( (Component)this.PhysicsObject );
+            PinnedPhysicsObject ppo = this.gameObject.AddComponent<PinnedPhysicsObject>();
+            ppo.ReferenceBody = body;
+            ppo.ReferencePosition = localPosition;
+            ppo.ReferenceRotation = localRotation;
+            this.PhysicsObject = ppo;
+        }
+
+        /// <summary>
+        /// Unpins the vessel from a celestial body at its current location.
+        /// </summary>
+        public void Unpin()
+        {
+            UnityEngine.Object.DestroyImmediate( (Component)this.PhysicsObject );
+            this.PhysicsObject = this.gameObject.AddComponent<FreePhysicsObject>();
         }
 
         public void RecalculatePartCache()

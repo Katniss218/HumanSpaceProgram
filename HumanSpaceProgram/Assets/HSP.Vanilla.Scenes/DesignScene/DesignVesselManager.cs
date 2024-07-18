@@ -12,7 +12,7 @@ namespace HSP.Vessels
     /// <summary>
     /// Manages the object (vessel/building/etc) being built in the design scene.
     /// </summary>
-    public class DesignObjectManager : SingletonMonoBehaviour<DesignObjectManager>
+    public class DesignVesselManager : SingletonMonoBehaviour<DesignVesselManager>
     {
         private DesignVessel _designObj;
         /// <summary>

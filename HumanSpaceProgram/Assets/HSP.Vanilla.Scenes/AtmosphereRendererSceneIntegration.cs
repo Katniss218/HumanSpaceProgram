@@ -14,6 +14,8 @@ namespace HSP.CelestialBodies
         {
             AtmosphereRenderer atmosphereRenderer = GameplaySceneCameraManager.EffectCamera.gameObject.AddComponent<AtmosphereRenderer>();
             atmosphereRenderer.light = GameObject.Find( "CBLight" ).GetComponent<Light>();
+            atmosphereRenderer.ColorRenderTextureGetter = () => GameplaySceneCameraManager.ColorRenderTexture;
+            atmosphereRenderer.DepthRenderTextureGetter = () => GameplaySceneDepthBufferCombiner.CombinedDepthRenderTexture;
         }
     }
 }

@@ -112,7 +112,7 @@ namespace HSP.DesignScene.Tools
 		{
 			if( _currentFrameHitObject != null )
 			{
-				if( DesignObjectManager.TryDetach( _currentFrameHitObject ) )
+				if( DesignVesselManager.TryDetach( _currentFrameHitObject ) )
 				{
 					SetHeldPart( _currentFrameHitObject, _currentFrameHit.point - _currentFrameHitObject.position );
 				}
@@ -126,7 +126,7 @@ namespace HSP.DesignScene.Tools
 				Transform newRoot = VesselHierarchyUtils.ReRoot( _currentSnap.Value.snappedNode.transform.parent );
 				_heldPart = newRoot;
 				// Node-attach (object is already positioned).
-				if( DesignObjectManager.TryAttach( _heldPart, _currentSnap.Value.targetNode.transform.parent ) )
+				if( DesignVesselManager.TryAttach( _heldPart, _currentSnap.Value.targetNode.transform.parent ) )
 				{
 					_heldPart.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
 					_heldPart = null;
@@ -139,7 +139,7 @@ namespace HSP.DesignScene.Tools
 			// Surface-attach (object is already positioned).
 			if( _currentFrameHitObject != null )
 			{
-				if( DesignObjectManager.TryAttach( _heldPart, _currentFrameHitObject ) )
+				if( DesignVesselManager.TryAttach( _heldPart, _currentFrameHitObject ) )
 				{
 					_heldPart.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
 					_heldPart = null;
@@ -149,7 +149,7 @@ namespace HSP.DesignScene.Tools
 			}
 
 			// Place as a ghost loose part (object is already positioned).
-			if( DesignObjectManager.TryAttach( _heldPart, null ) )
+			if( DesignVesselManager.TryAttach( _heldPart, null ) )
 			{
 				_heldPart.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
 				_heldPart = null;
@@ -165,7 +165,7 @@ namespace HSP.DesignScene.Tools
 
 				if( _currentFrameHitObject != null )
 				{
-					if( DesignObjectManager.CanHaveChildren( _currentFrameHitObject ) )
+					if( DesignVesselManager.CanHaveChildren( _currentFrameHitObject ) )
 					{
 						Vector3 newPos = _currentFrameHit.point;
 						if( AngleSnappingEnabled )
@@ -206,7 +206,7 @@ namespace HSP.DesignScene.Tools
 		private void TrySnappingHeldPartToAttachmentNode( Vector3 viewDirection )
 		{
 			FAttachNode[] heldNodes = _heldPart.GetComponentsInChildren<FAttachNode>();
-			FAttachNode[] targetNodes = DesignObjectManager.GetAttachableRoots().GetComponentsInChildren<FAttachNode>().Where( n => n.transform.root != _heldPart ).ToArray();
+			FAttachNode[] targetNodes = DesignVesselManager.GetAttachableRoots().GetComponentsInChildren<FAttachNode>().Where( n => n.transform.root != _heldPart ).ToArray();
 
 			FAttachNode.SnappingCandidate? nodePair = FAttachNode.GetBestSnappingNodePair( heldNodes, targetNodes, viewDirection );
 			if( nodePair != null )

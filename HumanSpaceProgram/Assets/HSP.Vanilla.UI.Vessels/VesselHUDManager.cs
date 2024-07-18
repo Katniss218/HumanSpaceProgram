@@ -49,7 +49,7 @@ namespace HSP.UI.HUDs
         {
             if( ActiveObjectManager.ActiveObject == null )
             {
-                foreach( var vessel in VesselManager.LoadedVessels )
+                foreach( var vessel in GameplayVesselManager.LoadedVessels )
                 {
                     var hud = CanvasManager.Get( CanvasName.BACKGROUND ).AddVesselHUD( vessel );
                     instance._huds.Add( hud );

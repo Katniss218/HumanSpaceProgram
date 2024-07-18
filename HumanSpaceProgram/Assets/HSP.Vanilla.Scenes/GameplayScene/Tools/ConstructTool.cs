@@ -253,7 +253,7 @@ namespace HSP.GameplayScene.Tools
                 // It should always snap "as if the part is at the cursor", not wherever it was snapped to previously.
                 _heldPart.position = planePoint - _heldOffset;
 
-                var closestVessel = VesselManager.LoadedVessels.OrderBy( v => Vector3.Distance( v.transform.position, planePoint ) ).First();
+                var closestVessel = GameplayVesselManager.LoadedVessels.OrderBy( v => Vector3.Distance( v.transform.position, planePoint ) ).First();
 
                 // Rotation should take into account the orientation of the vessel we are most likely trying to snap to.
                 _heldPart.rotation = closestVessel.transform.rotation * _heldRotation;
@@ -265,7 +265,7 @@ namespace HSP.GameplayScene.Tools
         private void TrySnappingHeldPartToAttachmentNode( Vector3 viewDirection )
         {
             FAttachNode[] heldNodes = _heldPart.GetComponentsInChildren<FAttachNode>();
-            FAttachNode[] targetNodes = VesselManager.LoadedVessels.GetComponentsInChildren<FAttachNode>().ToArray();
+            FAttachNode[] targetNodes = GameplayVesselManager.LoadedVessels.GetComponentsInChildren<FAttachNode>().ToArray();
 
             FAttachNode.SnappingCandidate? nodePair = FAttachNode.GetBestSnappingNodePair( heldNodes, targetNodes, viewDirection );
             if( nodePair != null )

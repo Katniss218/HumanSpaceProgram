@@ -59,21 +59,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\HSP.Vessels\Serialization\PartRegistry.cs" />
-    <Compile Include="Assets\HSP.Vessels\Vessel.Serialization.cs" />
-    <Compile Include="Assets\HSP.Vessels\DesignObjectManager.cs" />
     <Compile Include="Assets\HSP.Vessels\Serialization\PartMetadata.cs" />
     <Compile Include="Assets\HSP.Vessels\SymmetryDataContainer.cs" />
     <Compile Include="Assets\HSP.Vessels\Serialization\VesselMetadata.cs" />
-    <Compile Include="Assets\HSP.Vessels\VesselFactory.cs" />
     <Compile Include="Assets\HSP.Vessels\Components\FPart.cs" />
-    <Compile Include="Assets\HSP.Vessels\VesselManager.cs" />
+    <Compile Include="Assets\HSP.Vessels\IVessel.cs" />
     <Compile Include="Assets\HSP.Vessels\Components\FAttachNode.cs" />
     <Compile Include="Assets\HSP.Vessels\PartFactory.cs" />
     <Compile Include="Assets\HSP.Vessels\VesselHierarchyUtils.cs" />
     <Compile Include="Assets\HSP.Vessels\Components\FLaunchSiteMarker.cs" />
-    <Compile Include="Assets\HSP.Vessels\IVessel.cs" />
-    <Compile Include="Assets\HSP.Vessels\GameplayVessel.cs" />
-    <Compile Include="Assets\HSP.Vessels\DesignVessel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vessels\___HSP.Vessels.asmdef" />
@@ -929,13 +923,13 @@
       <Project>{7122B491-FD2B-2B59-D391-006CB0AE788B}</Project>
       <Name>_UnityPlus.AssetManagement</Name>
     </ProjectReference>
-    <ProjectReference Include="_UnityPlus.Input.csproj">
-      <Project>{1B7EDF60-A4D7-21D6-6511-CFB4286999D1}</Project>
-      <Name>_UnityPlus.Input</Name>
-    </ProjectReference>
     <ProjectReference Include="_UnityPlus.OverridableEvents.csproj">
       <Project>{049D3356-CD2A-DFB0-C50D-8CFE5B092848}</Project>
       <Name>_UnityPlus.OverridableEvents</Name>
+    </ProjectReference>
+    <ProjectReference Include="_UnityPlus.OverridableValueProviders.csproj">
+      <Project>{2FD51314-7711-BD56-25C5-0C8F36A30A82}</Project>
+      <Name>_UnityPlus.OverridableValueProviders</Name>
     </ProjectReference>
     <ProjectReference Include="_UnityPlus.Serialization.csproj">
       <Project>{FED3C19A-E743-9E19-D660-957D0801811E}</Project>
@@ -945,6 +939,10 @@
       <Project>{5294BE79-15AB-2AAE-E8C3-9E735E001D6D}</Project>
       <Name>HSP</Name>
     </ProjectReference>
+    <ProjectReference Include="HSP.Physics.csproj">
+      <Project>{D0558452-65D1-0DC9-1108-C2AC6EEB4C88}</Project>
+      <Name>HSP.Physics</Name>
+    </ProjectReference>
     <ProjectReference Include="HSP.ReferenceFrames.csproj">
       <Project>{D8846B96-55B1-C32C-F90A-52C14F5C8043}</Project>
       <Name>HSP.ReferenceFrames</Name>
@@ -952,18 +950,6 @@
     <ProjectReference Include="HSP.Time.csproj">
       <Project>{04DC55C0-E02E-3069-7322-19B05EB71C21}</Project>
       <Name>HSP.Time</Name>
-    </ProjectReference>
-    <ProjectReference Include="HSP.Timelines.csproj">
-      <Project>{C443A3BB-4D58-3A1D-D085-E8AEA15B2BC0}</Project>
-      <Name>HSP.Timelines</Name>
-    </ProjectReference>
-    <ProjectReference Include="HSP.Input.csproj">
-      <Project>{27123301-09AF-37AC-2FCA-FF7B2CC75C42}</Project>
-      <Name>HSP.Input</Name>
-    </ProjectReference>
-    <ProjectReference Include="HSP.SceneManagement.csproj">
-      <Project>{5B21ACE1-5E92-EEB2-818D-AF6D6AE9F824}</Project>
-      <Name>HSP.SceneManagement</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -15,7 +15,7 @@ namespace HSP.Core
     /// <summary>
     /// Manages loading, unloading, switching, etc of vessels.
     /// </summary>
-    public class VesselManager : SingletonMonoBehaviour<VesselManager>
+    public class GameplayVesselManager : SingletonMonoBehaviour<GameplayVesselManager>
     {
         private List<GameplayVessel> _vessels = new List<GameplayVessel>();
 
@@ -27,7 +27,7 @@ namespace HSP.Core
             get
             {
                 if( !instanceExists )
-                    throw new InvalidSceneManagerException( $"{nameof( VesselManager )} is only available in the gameplay scene." );
+                    throw new InvalidSceneManagerException( $"{nameof( GameplayVesselManager )} is only available in the gameplay scene." );
 
                 return instance._vessels;
             }
@@ -38,7 +38,7 @@ namespace HSP.Core
             get
             {
                 if( !instanceExists )
-                    throw new InvalidSceneManagerException( $"{nameof( VesselManager )} is only available in the gameplay scene." );
+                    throw new InvalidSceneManagerException( $"{nameof( GameplayVesselManager )} is only available in the gameplay scene." );
 
                 return instance._vessels.Count;
             }
@@ -47,7 +47,7 @@ namespace HSP.Core
         internal static void Register( GameplayVessel vessel )
         {
             if( !instanceExists )
-                throw new InvalidSceneManagerException( $"{nameof( VesselManager )} is only available in the gameplay scene." );
+                throw new InvalidSceneManagerException( $"{nameof( GameplayVesselManager )} is only available in the gameplay scene." );
 
             instance._vessels.Add( vessel );
             HSPEvent.EventManager.TryInvoke( HSPEvent.GAMEPLAY_AFTER_VESSEL_REGISTERED, vessel );
@@ -56,7 +56,7 @@ namespace HSP.Core
         internal static void Unregister( GameplayVessel vessel )
         {
             if( !instanceExists )
-                throw new InvalidSceneManagerException( $"{nameof( VesselManager )} is only available in the gameplay scene." );
+                throw new InvalidSceneManagerException( $"{nameof( GameplayVesselManager )} is only available in the gameplay scene." );
 
             instance._vessels.Remove( vessel );
             HSPEvent.EventManager.TryInvoke( HSPEvent.GAMEPLAY_AFTER_VESSEL_UNREGISTERED, vessel );

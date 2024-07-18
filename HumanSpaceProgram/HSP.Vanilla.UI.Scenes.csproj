@@ -976,9 +976,9 @@
       <Project>{1C87C45B-15A4-009B-A73D-1B7302A450D5}</Project>
       <Name>HSP.UI.Time</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.UI.Vessels.csproj">
-      <Project>{8814F878-154C-0913-7A9D-C492D2124EEC}</Project>
-      <Name>HSP.UI.Vessels</Name>
+    <ProjectReference Include="HSP.Vanilla.UI.Vessels.csproj">
+      <Project>{3CA21801-D573-73FC-585D-691DDF1E6A9B}</Project>
+      <Name>HSP.Vanilla.UI.Vessels</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.Vanilla.Scenes.csproj">
       <Project>{5BA07627-23D0-078E-8FD5-791CF795CD60}</Project>

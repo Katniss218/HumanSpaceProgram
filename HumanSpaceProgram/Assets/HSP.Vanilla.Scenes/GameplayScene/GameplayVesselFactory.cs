@@ -12,7 +12,7 @@ namespace HSP.Core
     /// <summary>
     /// A class responsible for instantiating a vessel from a source (save file, on launch, etc).
     /// </summary>
-    public static class VesselFactory
+    public static class GameplayVesselFactory
     {
         // add source (save file / in memory scene change, etc).
 
@@ -24,17 +24,17 @@ namespace HSP.Core
         /// <param name="airfPosition">The `Absolute Inertial Reference Frame` position of the vessel to create.</param>
         /// <param name="airfRotation">Rotation of the vessel in the `Absolute Inertial Reference Frame`</param>
         /// <returns>The created partless vessel.</returns>
-        public static GameplayVessel CreatePartless( Vector3Dbl airfPosition, QuaternionDbl airfRotation, Vector3 sceneVelocity, Vector3 sceneAngularVelocity )
+        public static IVessel CreatePartless( Vector3Dbl airfPosition, QuaternionDbl airfRotation, Vector3 sceneVelocity, Vector3 sceneAngularVelocity )
         {
-            GameplayVessel vessel = CreateGO( airfPosition, airfRotation );
+            IVessel vessel = CreateGO( airfPosition, airfRotation );
 
-           // vessel.PhysicsObject.Velocity = sceneVelocity;
-           // vessel.PhysicsObject.AngularVelocity = sceneAngularVelocity;
+            vessel.PhysicsObject.Velocity = sceneVelocity;
+            vessel.PhysicsObject.AngularVelocity = sceneAngularVelocity;
 
             return vessel;
         }
 
-        private static GameplayVessel CreateGO( Vector3Dbl airfPosition, QuaternionDbl airfRotation )
+        private static IVessel CreateGO( Vector3Dbl airfPosition, QuaternionDbl airfRotation )
         {
             GameObject gameObject = new GameObject( $"Vessel, '{name}'" );
 
@@ -42,8 +42,8 @@ namespace HSP.Core
             //FreePhysicsObject fpo = gameObject.AddComponent<FreePhysicsObject>();
 #warning TODO - when a vessel is created, there should be an event and this adding of free/pinned phys object should be hooked into that.
 
-            GameplayVessel vessel = gameObject.AddComponent<GameplayVessel>();
-            vessel.name = name;
+            IVessel vessel = gameObject.AddComponent<GameplayVessel>();
+            vessel.DisplayName = name;
             ro.AIRFPosition = airfPosition;
             ro.AIRFRotation = airfRotation;
 

@@ -27,12 +27,12 @@ namespace HSP.UI
             PickTool pickTool = DesignSceneToolManager.UseTool<PickTool>();
 
             GameObject spawnedPart = PartRegistry.Load( _part.ID );
-            if( DesignObjectManager.DesignObject.RootPart == null )
+            if( DesignVesselManager.DesignObject.RootPart == null )
             {
                 spawnedPart.transform.localPosition = Vector3.zero;
                 spawnedPart.transform.localRotation = Quaternion.identity;
                 spawnedPart.SetLayer( (int)Layer.PART_OBJECT, true );
-                DesignObjectManager.TryAttachRoot( spawnedPart.transform );
+                DesignVesselManager.TryAttachRoot( spawnedPart.transform );
             }
             else
             {

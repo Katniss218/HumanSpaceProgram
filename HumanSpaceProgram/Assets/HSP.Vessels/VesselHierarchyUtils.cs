@@ -125,7 +125,7 @@ namespace HSP.Core
             JoinVesselsNotRoot( partToJoin, parent );
 
             // If part being joined is the root, we need to delete the vessel being joined, since it would become partless after joining.
-            VesselFactory.Destroy( oldVessel );
+            GameplayVesselFactory.Destroy( oldVessel );
         }
 
         /// <summary>
@@ -158,7 +158,7 @@ namespace HSP.Core
 
 #warning TODO - Use linear and angular velocities of part that works correctly for spinning vessels.
 
-            GameplayVessel newVessel = VesselFactory.CreatePartless(
+            IVessel newVessel = GameplayVesselFactory.CreatePartless(
                 SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( partToSplit.transform.position ),
                 SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( partToSplit.transform.rotation ),
                 oldVessel.PhysicsObject.Velocity,

@@ -43,7 +43,7 @@ namespace HSP.UI.SceneFactories
         [HSPEventListener( HSPEvent.DESIGN_AFTER_LOAD, HSPEvent.NAMESPACE_VANILLA + ".update_current" )]
         private static void OnAfterVesselLoad( object e )
         {
-            _vesselNameIF.SetValue( DesignObjectManager.CurrentVesselMetadata.Name );
+            _vesselNameIF.SetValue( DesignVesselManager.CurrentVesselMetadata.Name );
         }
 
         private static void CreateTopPanel( UICanvas canvas )
@@ -60,20 +60,20 @@ namespace HSP.UI.SceneFactories
             {
                 CanvasManager.Get( CanvasName.WINDOWS ).AddPromptWindow( "Load ...", "vessel name/ID", ( text ) =>
                 {
-                    DesignObjectManager.LoadVessel( IOHelper.SanitizeFileName( text ) );
+                    DesignVesselManager.LoadVessel( IOHelper.SanitizeFileName( text ) );
                 } );
             } );
             UIButton saveBtn = p1.AddButton( new UILayoutInfo( UIAnchor.BottomLeft, (80, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_save" ), () =>
             {
-                if( DesignObjectManager.CurrentVesselMetadata == null )
+                if( DesignVesselManager.CurrentVesselMetadata == null )
                 {
                     CanvasManager.Get( CanvasName.WINDOWS ).AddAlertWindow( "Specify the name of the vessel before saving." );
                     return;
                 }
 
-                CanvasManager.Get( CanvasName.WINDOWS ).AddConfirmWindow( "Save ...", $"Confirm saving '{DesignObjectManager.CurrentVesselMetadata.ID}'.", () =>
+                CanvasManager.Get( CanvasName.WINDOWS ).AddConfirmWindow( "Save ...", $"Confirm saving '{DesignVesselManager.CurrentVesselMetadata.ID}'.", () =>
                 {
-                    DesignObjectManager.SaveVessel();
+                    DesignVesselManager.SaveVessel();
                 } );
             } );
             UIPanel p2 = topPanel.AddPanel( new UILayoutInfo( UIAnchor.Center, UIFill.Vertical(), 0, 300 ), null );
@@ -82,11 +82,11 @@ namespace HSP.UI.SceneFactories
                 .WithPlaceholder( "vessel's name..." );
             _vesselNameIF.OnValueChanged += e =>
             {
-                DesignObjectManager.CurrentVesselMetadata = new VesselMetadata( IOHelper.SanitizeFileName( e.NewValue ) )
+                DesignVesselManager.CurrentVesselMetadata = new VesselMetadata( IOHelper.SanitizeFileName( e.NewValue ) )
                 {
                     Name = e.NewValue,
-                    Description = DesignObjectManager.CurrentVesselMetadata?.Description,
-                    Author = DesignObjectManager.CurrentVesselMetadata?.Author
+                    Description = DesignVesselManager.CurrentVesselMetadata?.Description,
+                    Author = DesignVesselManager.CurrentVesselMetadata?.Author
                 };
             };
             UIPanel p3 = topPanel.AddPanel( new UILayoutInfo( UIAnchor.Center, UIFill.Vertical(), 190, 60 ), null );
@@ -171,7 +171,7 @@ namespace HSP.UI.SceneFactories
             UIButton deltaVAnalysisWindow = buttonListPanel.AddButton( new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
             UIButton controlSetupWindow = buttonListPanel.AddButton( new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), () =>
             {
-                UIControlSetupWindow.Create( DesignObjectManager.DesignObject.transform );
+                UIControlSetupWindow.Create( DesignVesselManager.DesignObject.transform );
             } );
             UIButton button3 = buttonListPanel.AddButton( new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
 
