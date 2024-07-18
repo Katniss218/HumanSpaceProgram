@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace HSP.CelestialBodies.Surface
+namespace HSP.CelestialBodies.Surfaces
 {
     public class LODQuadTree
     {

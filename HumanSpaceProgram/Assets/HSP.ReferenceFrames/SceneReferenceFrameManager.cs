@@ -116,11 +116,5 @@ namespace HSP.ReferenceFrames
         {
             TryFixActiveObjectOutOfBounds();
         }
-
-        [HSPEventListener( HSPEvent.GAMEPLAY_AFTER_ACTIVE_OBJECT_CHANGE, HSPEvent.NAMESPACE_VANILLA + ".reframe_active" )]
-        private static void OnActiveObjectChanged()
-        {
-            TryFixActiveObjectOutOfBounds();
-        }
     }
 }

@@ -1,14 +1,9 @@
-﻿using HSP.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 
-namespace HSP.CelestialBodies.Surface
+namespace HSP.CelestialBodies.Surfaces
 {
     /// <summary>
     /// A job that constructs the base mesh for the terrain.

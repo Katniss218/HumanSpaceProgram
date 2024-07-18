@@ -1,9 +1,5 @@
-﻿using HSP.Timelines;
-using HSP.Timelines.Serialization;
-using System.IO;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityPlus.Serialization;
-using UnityPlus.Serialization.DataHandlers;
 
 namespace HSP.ReferenceFrames
 {
@@ -36,30 +32,6 @@ namespace HSP.ReferenceFrames
             {
                 ("active_object", new Member<ActiveObjectManager, GameObject>( ObjectContext.Ref, o => ActiveObjectManager.ActiveObject, (o, value) => ActiveObjectManager.ActiveObject = value ))
             };
-        }
-
-        [HSPEventListener( HSPEvent.TIMELINE_AFTER_SAVE, HSPEvent.NAMESPACE_VANILLA + ".serialize_managers.active_object_manager" )]
-        private static void OnBeforeSave( TimelineManager.SaveEventData e )
-        {
-            string savePath = SaveMetadata.GetRootDirectory( e.timelineId, e.saveId );
-            Directory.CreateDirectory( savePath );
-
-            JsonSerializedDataHandler _vesselsDataHandler = new JsonSerializedDataHandler( Path.Combine( savePath, $"{nameof( ActiveObjectManager )}.json" ) );
-
-            var data = SerializationUnit.Serialize( FindObjectOfType<ActiveObjectManager>(), TimelineManager.RefStore );
-            _vesselsDataHandler.Write( data );
-        }
-
-        [HSPEventListener( HSPEvent.TIMELINE_AFTER_LOAD, HSPEvent.NAMESPACE_VANILLA + ".deserialize_managers.active_object_manager" )]
-        private static void OnLoad( TimelineManager.LoadEventData e )
-        {
-            string savePath = SaveMetadata.GetRootDirectory( e.timelineId, e.saveId );
-            Directory.CreateDirectory( savePath );
-
-            JsonSerializedDataHandler _vesselsDataHandler = new JsonSerializedDataHandler( Path.Combine( savePath, $"{nameof( ActiveObjectManager )}.json" ) );
-
-            var data = _vesselsDataHandler.Read();
-            SerializationUnit.Populate( FindObjectOfType<ActiveObjectManager>(), data, TimelineManager.RefStore );
         }
     }
 }

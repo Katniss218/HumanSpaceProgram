@@ -1,3 +1,6 @@
+using HSP.Core;
+using HSP.Core.SceneManagement;
+using HSP.Timelines;
 using HSP.Timelines.Serialization;
 using HSP.Vanilla;
 using System.Linq;
@@ -89,9 +92,17 @@ namespace HSP.UI
             }
         }
 
+        public static void LoadAsync( SaveMetadata save )
+        {
+            SceneLoader.UnloadActiveSceneAsync( () => SceneLoader.LoadSceneAsync( GameplaySceneManager.SCENE_NAME, true, false, () =>
+            {
+                TimelineManager.BeginLoadAsync( save.TimelineID, save.SaveID );
+            } ) );
+        }
+
         void OnLoad()
         {
-            _selectedSave.Save.LoadAsync();
+            LoadAsync( _selectedSave.Save );
         }
 
         public static T Create<T>( UICanvas parent, UILayoutInfo layout ) where T : UILoadWindow

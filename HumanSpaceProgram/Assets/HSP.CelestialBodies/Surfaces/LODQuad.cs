@@ -5,7 +5,7 @@ using System.Linq;
 using Unity.Jobs;
 using UnityEngine;
 
-namespace HSP.CelestialBodies.Surface
+namespace HSP.CelestialBodies.Surfaces
 {
     /// <summary>
     /// A subdivisible inflated quad.

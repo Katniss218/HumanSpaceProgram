@@ -1,13 +1,10 @@
-﻿using HSP.Core;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
-namespace HSP.CelestialBodies.Surface
+namespace HSP.CelestialBodies.Surfaces
 {
     /// <summary>
     /// Wraps around 6 faces of a sphere.

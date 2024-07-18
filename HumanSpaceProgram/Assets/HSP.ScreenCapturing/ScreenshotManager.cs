@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using UnityEngine;
 
-namespace HSP
+namespace HSP.ScreenCapturing
 {
     /// <summary>
     /// Takes and saves screenshots.

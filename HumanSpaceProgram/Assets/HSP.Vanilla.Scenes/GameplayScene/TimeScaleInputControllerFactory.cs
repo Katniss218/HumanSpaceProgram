@@ -8,10 +8,5 @@ namespace HSP.Scenes.GameplayScene
 {
     public static class TimeScaleInputControllerFactory
     {
-        [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, HSPEvent.NAMESPACE_VANILLA + ".add_timescale_icontroller" )]
-        private static void CreateInstanceInScene()
-        {
-            GameplaySceneManager.Instance.gameObject.AddComponent<TimeScaleInputController>();
-        }
     }
 }

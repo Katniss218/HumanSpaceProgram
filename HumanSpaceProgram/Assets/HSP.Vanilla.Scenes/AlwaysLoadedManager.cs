@@ -1,13 +1,9 @@
+using HSP.Content.Mods;
 using HSP.Core.SceneManagement;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using UnityEngine;
-using UnityPlus.Serialization;
-using UnityPlus.Serialization.DataHandlers;
 
-namespace HSP.Core
+namespace HSP.Vanilla.Scenes
 {
     /// <summary>
     /// A manager that is loaded immediately and remains loaded until the game is exited.
@@ -24,7 +20,7 @@ namespace HSP.Core
 #warning TODO - finish here. !!!!!!!!!!!!!!!!!
             // Load mods before caching autorunning methods.
             // Because mods might (WILL and SHOULD) attach autorunning methods via the attributes.
-           // HumanSpaceProgramMods.LoadModAssemblies();
+            HumanSpaceProgramModLoader.LoadModAssemblies();
 
             HSPEventListenerAttribute.CreateEventsForAutorunningMethods( AppDomain.CurrentDomain.GetAssemblies() );
 

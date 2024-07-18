@@ -9,11 +9,11 @@ namespace HSP.Core.SceneManagement
     /// <summary>
     /// Can load and unload scenes easily.
     /// </summary>
-    public class SceneLoader
+    public class SceneLoader : SingletonMonoBehaviour<SceneLoader>
     {
         public static void UnloadActiveSceneAsync( Action onAfterUnloaded )
         {
-            AlwaysLoadedManager.Instance.StartCoroutine( UnloadCoroutine( SceneManager.GetActiveScene().name, onAfterUnloaded ) );
+            instance.StartCoroutine( UnloadCoroutine( SceneManager.GetActiveScene().name, onAfterUnloaded ) );
         }
 
         public static void UnloadSceneAsync( string scene, Action onAfterUnloaded )
@@ -23,7 +23,7 @@ namespace HSP.Core.SceneManagement
                 throw new ArgumentNullException( nameof( scene ), $"The scene to unload can't be null." );
             }
 
-            AlwaysLoadedManager.Instance.StartCoroutine( UnloadCoroutine( scene, onAfterUnloaded ) );
+            instance.StartCoroutine( UnloadCoroutine( scene, onAfterUnloaded ) );
         }
 
         public static void LoadSceneAsync( string scene, bool additive, bool hasLocalPhysics, Action onAfterLoaded )
@@ -33,7 +33,7 @@ namespace HSP.Core.SceneManagement
                 throw new ArgumentNullException( nameof( scene ), $"The scene to load can't be null." );
             }
 
-            AlwaysLoadedManager.Instance.StartCoroutine( LoadCoroutine( scene, additive, hasLocalPhysics, onAfterLoaded ) );
+            instance.StartCoroutine( LoadCoroutine( scene, additive, hasLocalPhysics, onAfterLoaded ) );
         }
 
         private static IEnumerator UnloadCoroutine( string sceneToUnload, Action onAfterUnloaded )

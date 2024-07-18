@@ -942,10 +942,6 @@
       <Project>{5B21ACE1-5E92-EEB2-818D-AF6D6AE9F824}</Project>
       <Name>HSP.SceneManagement</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.Scenes.csproj">
-      <Project>{0FF6884C-8D4A-7AB7-5D8A-5FBF5FCF8190}</Project>
-      <Name>HSP.Scenes</Name>
-    </ProjectReference>
     <ProjectReference Include="HSP.Timelines.csproj">
       <Project>{C443A3BB-4D58-3A1D-D085-E8AEA15B2BC0}</Project>
       <Name>HSP.Timelines</Name>
@@ -954,9 +950,9 @@
       <Project>{05A5E85F-FD04-4199-F86F-3A6E38B383FB}</Project>
       <Name>HSP.UI</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.Vanilla.csproj">
-      <Project>{AE718BD5-B7C2-FF6D-CB3C-BD7A5FEC452C}</Project>
-      <Name>HSP.Vanilla</Name>
+    <ProjectReference Include="HSP.Vanilla.Scenes.csproj">
+      <Project>{5BA07627-23D0-078E-8FD5-791CF795CD60}</Project>
+      <Name>HSP.Vanilla.Scenes</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

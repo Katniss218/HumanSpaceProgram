@@ -975,10 +975,6 @@
       <Project>{26023575-EB06-DAA2-C7B2-77FFBAED8CB8}</Project>
       <Name>HSP.ResourceFlow</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.Scenes.csproj">
-      <Project>{0FF6884C-8D4A-7AB7-5D8A-5FBF5FCF8190}</Project>
-      <Name>HSP.Scenes</Name>
-    </ProjectReference>
     <ProjectReference Include="HSP.Time.csproj">
       <Project>{04DC55C0-E02E-3069-7322-19B05EB71C21}</Project>
       <Name>HSP.Time</Name>

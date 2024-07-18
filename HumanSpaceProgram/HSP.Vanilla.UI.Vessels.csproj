@@ -949,10 +949,6 @@
       <Project>{D8846B96-55B1-C32C-F90A-52C14F5C8043}</Project>
       <Name>HSP.ReferenceFrames</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.Scenes.csproj">
-      <Project>{0FF6884C-8D4A-7AB7-5D8A-5FBF5FCF8190}</Project>
-      <Name>HSP.Scenes</Name>
-    </ProjectReference>
     <ProjectReference Include="HSP.Trajectories.csproj">
       <Project>{57FA29CC-9026-83EE-F242-EA051DEA7649}</Project>
       <Name>HSP.Trajectories</Name>

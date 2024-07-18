@@ -1,5 +1,5 @@
 ﻿using HSP.CelestialBodies;
-using HSP.CelestialBodies.Surface;
+using HSP.CelestialBodies.Surfaces;
 using HSP.Components;
 using HSP.Content;
 using HSP.Core;
@@ -147,7 +147,7 @@ namespace HSP.DevUtils
             {
                 JsonSerializedDataHandler handler;
 
-                string gameDataPath = ContentUtils.GetModDirectoryPath();
+                string gameDataPath = HumanSpaceProgramContent.GetContentDirectoryPath();
                 string partDir;
 
                 VesselMetadata vm;

@@ -33,7 +33,7 @@ namespace HSP.Content.AssetLoaders
         private static void OnStartup()
         {
             // <mod_folder>/Parts/<part_id>/objects.json, data.json, _part.json
-            string gameDataPath = ContentUtils.GetModDirectoryPath();
+            string gameDataPath = HumanSpaceProgramContent.GetContentDirectoryPath();
             string[] modDirectories = Directory.GetDirectories( gameDataPath );
 
             foreach( var modPath in modDirectories )

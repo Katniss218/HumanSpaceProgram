@@ -45,17 +45,7 @@ namespace HSP.UI
             return renderTexture;
         }
 
-        [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, "vanilla.spawn_navball" )]
-        public static void OnGameplayEnter()
-        {
-            GameplaySceneManager.GameObject.AddComponent<NavballRenderTextureManager>();
-
-            ResetAttitudeIndicatorRT();
-            CreateNavball();
-            CreateNavballCamera();
-        }
-
-        private static void CreateNavball()
+        public static GameObject CreateNavball()
         {
             GameObject navballObj = new GameObject( "navball" );
             navballObj.transform.localScale = new Vector3( -1, 1, 1 );
@@ -70,9 +60,11 @@ namespace HSP.UI
 
             navballObj.SetLayer( (int)Layer.HIDDEN_SPECIAL_1 );
             instance._navball = navballObj.transform;
+
+            return navballObj;
         }
 
-        private static void CreateNavballCamera()
+        public static GameObject CreateNavballCamera()
         {
             GameObject pivotObj = new GameObject( "navball camera pivot" );
 
@@ -87,6 +79,8 @@ namespace HSP.UI
             camera.cullingMask = 1 << (int)Layer.HIDDEN_SPECIAL_1;
             camera.targetTexture = AttitudeIndicatorRT;
             instance._cameraPivot = pivotObj.transform;
+
+            return pivotObj;
         }
 
         void LateUpdate()

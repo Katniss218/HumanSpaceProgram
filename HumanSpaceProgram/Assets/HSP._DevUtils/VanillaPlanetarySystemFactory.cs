@@ -1,4 +1,4 @@
-﻿using HSP.CelestialBodies.Surface;
+﻿using HSP.CelestialBodies.Surfaces;
 using HSP.Core;
 using HSP.Vessels;
 using System;
