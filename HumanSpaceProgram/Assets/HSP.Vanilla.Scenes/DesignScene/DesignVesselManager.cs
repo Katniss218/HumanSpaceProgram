@@ -1,4 +1,5 @@
 ﻿using HSP.Time;
+using HSP.Vessels;
 using HSP.Vessels.Serialization;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using UnityEngine;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.DataHandlers;
 
-namespace HSP.Vessels
+namespace HSP.Vanilla.Scenes.DesignScene
 {
     /// <summary>
     /// Manages the object (vessel/building/etc) being built in the design scene.

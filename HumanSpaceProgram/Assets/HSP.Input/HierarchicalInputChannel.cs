@@ -1,12 +1,10 @@
-﻿using HSP.Core;
-using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityPlus.Input;
 using UnityPlus.Input.Bindings;
 
 namespace HSP.Input
 {
-	public static class HierarchicalInputChannel
+    public static class HierarchicalInputChannel
 	{
 		// they could use namespaced IDs 🤔
 
@@ -58,7 +56,7 @@ namespace HSP.Input
 		public const string DESIGN_PART_ROTATE_ZP = "vanilla.gameplayc_rotate_zp";
 		public const string DESIGN_PART_ROTATE_ZN = "vanilla.gameplayc_rotate_zn";
 
-		[HSPEventListener( HSPEvent.STARTUP_IMMEDIATELY, HSPEvent.NAMESPACE_VANILLA + ".bind_input_channels" )]
+		[HSPEventListener( HSPEvent.STARTUP_IMMEDIATELY, HSPEvent.NAMESPACE_HSP + ".bind_input_channels" )]
 		static void Event()
 		{
 			HierarchicalInputManager.BindInput( HierarchicalInputChannel.VIEWPORT_PRIMARY_DOWN, new KeyDownBinding( 0, KeyCode.Mouse0 ) );

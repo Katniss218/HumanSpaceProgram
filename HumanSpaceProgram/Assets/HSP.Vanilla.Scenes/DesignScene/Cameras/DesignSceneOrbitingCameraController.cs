@@ -3,7 +3,7 @@ using System;
 using UnityEngine;
 using UnityPlus.Input;
 
-namespace HSP.DesignScene.Cameras
+namespace HSP.Vanilla.Scenes.DesignScene.Cameras
 {
     public class DesignSceneOrbitingCameraController : SingletonMonoBehaviour<DesignSceneOrbitingCameraController>
     {

@@ -29,7 +29,7 @@ namespace HSP.Content.AssetLoaders
             return SerializationUnit.Deserialize<GameObject>( data, refMap );
         }
 
-        [HSPEventListener( HSPEvent.STARTUP_IMMEDIATELY, HSPEvent.NAMESPACE_VANILLA + ".load_parts" )]
+        [HSPEventListener( HSPEvent.STARTUP_IMMEDIATELY, HSPEvent.NAMESPACE_HSP + ".load_parts" )]
         private static void OnStartup()
         {
             // <mod_folder>/Parts/<part_id>/objects.json, data.json, _part.json

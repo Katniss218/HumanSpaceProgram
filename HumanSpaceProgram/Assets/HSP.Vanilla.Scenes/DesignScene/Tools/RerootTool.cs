@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace HSP.DesignScene.Tools
+namespace HSP.Vanilla.Scenes.DesignScene.Tools
 {
     /// <summary>
     /// Allows to change the root of the design vessel.

@@ -1,15 +1,14 @@
 ﻿using HSP.ControlSystems;
-using System;
+using HSP.UI;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Extensions;
-using UnityEngine.UI;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
 
-namespace HSP.UI.Windows
+namespace HSP.Vanilla.UI.Components
 {
     public class UIControlSetupWindow : UIWindow
     {
@@ -33,8 +32,8 @@ namespace HSP.UI.Windows
 
         Dictionary<Component, ControlSetupWindowComponentUI> _visibleComponents = new();
 
-        Dictionary<ControlSystems.Control, ControlSetupControlUI> _visibleInputs = new();
-        Dictionary<ControlSystems.Control, ControlSetupControlUI> _visibleOutputs = new();
+        Dictionary<Control, ControlSetupControlUI> _visibleInputs = new();
+        Dictionary<Control, ControlSetupControlUI> _visibleOutputs = new();
 
         List<ControlSetupControlConnectionUI> _visibleConnections = new();
 

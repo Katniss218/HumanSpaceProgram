@@ -7,7 +7,7 @@ using UnityPlus.UILib;
 using UnityPlus.UILib.Layout;
 using UnityPlus.UILib.UIElements;
 
-namespace HSP.UI
+namespace HSP.Vanilla.UI.Scenes.DesignScene
 {
     public class UIPartList : UIPanel
     {

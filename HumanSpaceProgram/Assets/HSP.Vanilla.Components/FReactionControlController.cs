@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace HSP.Components
+namespace HSP.Vanilla.Components
 {
     [Obsolete("Not implemented yet.")] // TODO - add actual functionality.
 	public class FReactionControlController : MonoBehaviour

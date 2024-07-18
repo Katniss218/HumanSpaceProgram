@@ -1,15 +1,15 @@
-using HSP.Core;
 using HSP.Core.SceneManagement;
-using System;
-using System.Collections.Generic;
-using UnityPlus.UILib;
-using UnityEngine;
-using UnityEngine.UI;
-using UnityPlus.UILib.UIElements;
-using UnityPlus.AssetManagement;
+using HSP.UI;
+using HSP.Vanilla.Scenes.DesignScene;
+using HSP.Vanilla.Scenes.EditorScene;
+using HSP.Vanilla.UI.Timelines;
 using TMPro;
+using UnityEngine;
+using UnityPlus.AssetManagement;
+using UnityPlus.UILib;
+using UnityPlus.UILib.UIElements;
 
-namespace HSP.UI.SceneFactories
+namespace HSP.Vanilla.UI.Scenes.MainMenuScene
 {
     /// <summary>
     /// Creates the Main Menu UI elements.
@@ -19,7 +19,7 @@ namespace HSP.UI.SceneFactories
         static UIStartNewGameWindow _startNewGameWindow; // singleton window
         static UILoadWindow _loadWindow; // singleton window
 
-        [HSPEventListener( HSPEvent.STARTUP_MAINMENU, HSPEvent.NAMESPACE_VANILLA + ".mainmenu_ui" )]
+        [HSPEventListener( HSPEvent.STARTUP_MAINMENU, HSPEvent.NAMESPACE_HSP + ".mainmenu_ui" )]
         public static void Create()
         {
             UICanvas canvas = CanvasManager.Get( CanvasName.STATIC );

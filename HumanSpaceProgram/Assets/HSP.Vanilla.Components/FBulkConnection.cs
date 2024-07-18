@@ -1,14 +1,13 @@
 ﻿using HSP.CelestialBodies;
-using HSP.Core;
 using HSP.ReferenceFrames;
-using HSP.Core.ResourceFlowSystem;
+using HSP.ResourceFlow;
+using HSP.Time;
 using HSP.Vessels;
 using System;
 using UnityEngine;
 using UnityPlus.Serialization;
-using HSP.Time;
 
-namespace HSP.Components
+namespace HSP.Vanilla.Components
 {
     /// <summary>
     /// An object that connects two containers and calculates the resource flow between them.

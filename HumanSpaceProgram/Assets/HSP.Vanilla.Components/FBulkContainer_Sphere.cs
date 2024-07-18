@@ -1,13 +1,10 @@
-﻿using HSP.Core;
-using HSP.Core.Physics;
-using HSP.Core.ResourceFlowSystem;
+﻿using HSP.ResourceFlow;
 using HSP.Time;
-using System;
 using System.Diagnostics.Contracts;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace HSP.Components
+namespace HSP.Vanilla.Components
 {
     /// <summary>
     /// A container for a <see cref="Substance"/>.

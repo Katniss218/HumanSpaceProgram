@@ -9,7 +9,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <ProjectGuid>{26023575-EB06-DAA2-C7B2-77FFBAED8CB8}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -68,6 +69,7 @@
     <Compile Include="Assets\HSP.ResourceFlow\SubstanceStateCollection.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".editorconfig" />
     <None Include="Assets\HSP.ResourceFlow\___HSP.ResourceFlow.asmdef" />
   </ItemGroup>
   <ItemGroup>

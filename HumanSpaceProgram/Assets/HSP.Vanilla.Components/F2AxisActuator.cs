@@ -1,10 +1,9 @@
 ﻿using HSP.ControlSystems;
 using HSP.ControlSystems.Controls;
-using System;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace HSP.Components
+namespace HSP.Vanilla.Components
 {
     public class F2AxisActuator : MonoBehaviour
     {

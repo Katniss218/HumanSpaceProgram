@@ -1,11 +1,8 @@
-using HSP.Core;
-using HSP.UI;
-using HSP.UI.HUDs;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+using HSP.Vanilla.Scenes.GameplayScene;
+using HSP.Vanilla.UI.Components;
+using HSP.Vanilla.UI.Construction;
 
-namespace HSP.Vanilla.UI.Scenes
+namespace HSP.Vanilla.UI.Scenes.GameplayScene
 {
     public static class OnStartup
     {

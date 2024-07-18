@@ -3,7 +3,7 @@ using HSP.Vessels;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace HSP.Core.Components
+namespace HSP.Vanilla.Components
 {
     /// <summary>
     /// Represents a coordinate system that can be used as the control frame for avionics.

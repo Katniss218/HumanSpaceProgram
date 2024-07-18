@@ -1,12 +1,13 @@
 using HSP.Timelines;
 using HSP.Timelines.Serialization;
+using HSP.UI;
 using System.Linq;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
 
-namespace HSP.UI
+namespace HSP.Vanilla.UI.Timelines
 {
     public class UISaveWindow : UIWindow
     {

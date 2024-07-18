@@ -1,15 +1,12 @@
-﻿using HSP.Core;
-using HSP.Construction;
+﻿using HSP.Construction;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
 
-namespace HSP.UI.HUDs
+namespace HSP.Vanilla.UI.Construction
 {
     public class ConstructionSiteHUD : UIPanel
     {

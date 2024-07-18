@@ -8,7 +8,7 @@ using UnityPlus.Input;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.ReferenceMaps;
 
-namespace HSP.GameplayScene.Tools
+namespace HSP.Vanilla.Scenes.GameplayScene.Tools
 {
     /// <summary>
     /// Allows to detach and attach parts.

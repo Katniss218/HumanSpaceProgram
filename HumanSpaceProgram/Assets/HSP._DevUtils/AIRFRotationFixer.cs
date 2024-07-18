@@ -1,7 +1,7 @@
 ﻿using HSP.ReferenceFrames;
 using UnityEngine;
 
-namespace HSP.DevUtils
+namespace HSP._DevUtils
 {
     public class AIRFRotationFixer : MonoBehaviour
     {

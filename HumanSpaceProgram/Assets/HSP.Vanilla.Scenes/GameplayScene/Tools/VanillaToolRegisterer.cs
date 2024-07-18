@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HSP.GameplayScene.Tools
+namespace HSP.Vanilla.Scenes.GameplayScene.Tools
 {
     public static class VanillaToolRegisterer
     {

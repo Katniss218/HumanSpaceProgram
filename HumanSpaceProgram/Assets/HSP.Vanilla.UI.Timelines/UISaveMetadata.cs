@@ -1,4 +1,5 @@
 ﻿using HSP.Timelines.Serialization;
+using HSP.UI;
 using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -7,7 +8,7 @@ using UnityPlus.UILib;
 using UnityPlus.UILib.Layout;
 using UnityPlus.UILib.UIElements;
 
-namespace HSP.UI
+namespace HSP.Vanilla.UI.Timelines
 {
     public class UISaveMetadata : UIPanel, IPointerClickHandler
     {

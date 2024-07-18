@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
-namespace HSP.Core.Physics
+namespace HSP
 {
-	public static class InertiaUtils
+    public static class InertiaUtils
 	{
 		public static Matrix3x3 CalculateInertiaTensor( IEnumerable<(float, Vector3)> pointMasses )
 		{

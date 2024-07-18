@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using HSP.UI;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
 using UnityPlus.UILib.Layout;
 using UnityPlus.UILib.UIElements;
 
-namespace HSP.UI.Windows.PartWindowComponents
+namespace HSP.Vanilla.UI.Vessels
 {
     public abstract class UIPartWindowComponent : UIPanel
     {

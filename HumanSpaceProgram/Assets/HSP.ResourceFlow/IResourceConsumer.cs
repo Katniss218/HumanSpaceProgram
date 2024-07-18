@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace HSP.Core.ResourceFlowSystem
+namespace HSP.ResourceFlow
 {
     /// <summary>
     /// Anything that can consume resources. E.g. rocket engine, lightbulb (elec), vent, etc.

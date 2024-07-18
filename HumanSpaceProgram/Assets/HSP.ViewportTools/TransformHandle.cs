@@ -1,14 +1,9 @@
-﻿using HSP.Core;
-using HSP.Input;
+﻿using HSP.Input;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Input;
 
-namespace HSP
+namespace HSP.ViewportTools
 {
     [DisallowMultipleComponent]
     [RequireComponent( typeof( Collider ) )]

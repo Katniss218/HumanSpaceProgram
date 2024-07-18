@@ -3,16 +3,6 @@ using UnityEngine;
 
 namespace HSP.Vessels
 {
-    public static class HSPEvent_VesselCreated
-    {
-        public const string EventID = HSPEvent.NAMESPACE_VANILLA + ".vessel_created";
-    }
-
-    public static class HSPEvent_VesselDestroyed
-    {
-        public const string EventID = HSPEvent.NAMESPACE_VANILLA + ".vessel_destroyed";
-    }
-
     /// <summary>
     /// A class responsible for instantiating a vessel from a source (save file, on launch, etc).
     /// </summary>

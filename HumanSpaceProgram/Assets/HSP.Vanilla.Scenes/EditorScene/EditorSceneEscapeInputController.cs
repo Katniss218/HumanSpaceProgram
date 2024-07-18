@@ -1,14 +1,8 @@
-﻿using HSP.Core;
-using HSP.Input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using HSP.Input;
 using UnityEngine;
 using UnityPlus.Input;
 
-namespace HSP.EditorScene
+namespace HSP.Vanilla.Scenes.EditorScene
 {
     /// <summary>
     /// Controls the invocation of the `escape` / pause event in the `editor` scene.
@@ -16,7 +10,7 @@ namespace HSP.EditorScene
     [DisallowMultipleComponent]
     public class EditorSceneEscapeInputController : MonoBehaviour
     {
-        [HSPEventListener( HSPEvent.STARTUP_EDITOR, HSPEvent.NAMESPACE_VANILLA + ".add_escape_icontroller" )]
+        [HSPEventListener( HSPEvent.STARTUP_EDITOR, HSPEvent.NAMESPACE_HSP + ".add_escape_icontroller" )]
         private static void CreateInstanceInScene()
         {
             EditorSceneManager.Instance.gameObject.AddComponent<EditorSceneEscapeInputController>();

@@ -1,12 +1,10 @@
-﻿using HSP.ControlSystems.Controls;
-using HSP.ControlSystems;
-using HSP.Core;
-using System;
+﻿using HSP.ControlSystems;
+using HSP.ControlSystems.Controls;
+using HSP.Vessels;
 using UnityEngine;
 using UnityPlus.Serialization;
-using HSP.Vessels;
 
-namespace HSP.Components
+namespace HSP.Vanilla.Components
 {
     public class FVesselSeparator : MonoBehaviour
     {

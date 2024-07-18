@@ -1,11 +1,7 @@
-﻿using HSP.Core.Components;
-using HSP.ReferenceFrames;
+﻿using HSP.ReferenceFrames;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace HSP.Vessels
@@ -167,13 +163,6 @@ namespace HSP.Vessels
             newVessel.RootPart = partToSplit;
             oldVessel.RecalculatePartCache();
             newVessel.RecalculatePartCache();
-
-            if( IsAnchored( partToSplit ) )
-            {
-#warning TODO - when the vessel is created, have an event and hook the pinning up to that.
-               // PinnedPhysicsObject ppo = oldVessel.GetComponent<PinnedPhysicsObject>();
-               // newVessel.Pin( ppo.ReferenceBody, ppo.ReferencePosition, ppo.ReferenceRotation );
-            }
         }
 
         /// <summary>
@@ -212,22 +201,6 @@ namespace HSP.Vessels
             }
 
             return newRoot;
-        }
-
-        /// <summary>
-        /// Checks if the object should be anchored.
-        /// </summary>
-        public static bool IsAnchored( Transform transform )
-        {
-            return transform.gameObject.HasComponentInChildren<FAnchor>();
-        }
-
-        /// <summary>
-        /// Checks if the root of the object should be anchored.
-        /// </summary>
-        public static bool IsRootAnchored( Transform transform )
-        {
-             return transform.root.gameObject.HasComponentInChildren<FAnchor>();
         }
     }
 }

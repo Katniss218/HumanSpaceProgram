@@ -1,16 +1,12 @@
-﻿using HSP.Core;
-using HSP.Input;
-using HSP.Core.ResourceFlowSystem;
+﻿using HSP.ControlSystems;
+using HSP.ControlSystems.Controls;
+using HSP.ResourceFlow;
+using HSP.Vessels;
 using System;
 using UnityEngine;
-using UnityPlus.Input;
 using UnityPlus.Serialization;
-using HSP.ControlSystems;
-using HSP.ControlSystems.Controls;
-using static HSP.Components.FGimbalActuatorController;
-using HSP.Vessels;
 
-namespace HSP.Components
+namespace HSP.Vanilla.Components
 {
     [Serializable]
     public class FRocketEngine : MonoBehaviour, IResourceConsumer

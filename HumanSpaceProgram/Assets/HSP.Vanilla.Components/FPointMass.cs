@@ -1,13 +1,7 @@
-﻿using HSP.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace HSP.Components
+namespace HSP.Vanilla.Components
 {
     /// <summary>
     /// Adds a point mass of the specified mass to the object.

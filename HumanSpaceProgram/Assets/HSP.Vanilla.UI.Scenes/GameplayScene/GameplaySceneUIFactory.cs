@@ -1,21 +1,24 @@
-﻿using UnityPlus.UILib;
-using UnityEngine;
-using UnityPlus.UILib.UIElements;
-using UnityPlus.AssetManagement;
-using UnityPlus.UILib.Layout;
+﻿using HSP.ReferenceFrames;
+using HSP.UI;
 using HSP.UI.Windows;
-using HSP.GameplayScene;
-using HSP.GameplayScene.Tools;
-using HSP.ReferenceFrames;
+using HSP.Vanilla.Scenes.GameplayScene;
+using HSP.Vanilla.Scenes.GameplayScene.Tools;
+using HSP.Vanilla.UI.Components;
+using HSP.Vanilla.UI.Time;
+using UnityEngine;
+using UnityPlus.AssetManagement;
+using UnityPlus.UILib;
+using UnityPlus.UILib.Layout;
+using UnityPlus.UILib.UIElements;
 
-namespace HSP.UI.SceneFactories
+namespace HSP.Vanilla.UI.Scenes.GameplayScene
 {
     public static class GameplaySceneUIFactory
     {
         static UIPanel _mainPanel; // TODO - replace this with individual elements
 
-        [HSPEventListener( HSPEvent.GAMEPLAY_AFTER_ACTIVE_OBJECT_CHANGE, HSPEvent.NAMESPACE_VANILLA + ".gameplay_ui" )]
-        [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, HSPEvent.NAMESPACE_VANILLA + ".gameplay_ui" )]
+        [HSPEventListener( HSPEvent.GAMEPLAY_AFTER_ACTIVE_OBJECT_CHANGE, HSPEvent.NAMESPACE_HSP + ".gameplay_ui" )]
+        [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, HSPEvent.NAMESPACE_HSP + ".gameplay_ui" )]
         public static void CreateUI()
         {
             UICanvas canvas = CanvasManager.Get( CanvasName.STATIC );

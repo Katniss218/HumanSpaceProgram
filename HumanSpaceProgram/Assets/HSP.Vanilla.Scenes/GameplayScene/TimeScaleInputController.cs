@@ -1,20 +1,14 @@
-﻿using HSP.Core;
-using HSP.Input;
+﻿using HSP.Input;
 using HSP.Time;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Input;
 
-namespace HSP.GameplayScene
+namespace HSP.Vanilla.Scenes.GameplayScene
 {
-	/// <summary>
-	/// Controls the keyboard input for time scale control.
-	/// </summary>
-	[DisallowMultipleComponent]
+    /// <summary>
+    /// Controls the keyboard input for time scale control.
+    /// </summary>
+    [DisallowMultipleComponent]
 	public class TimeScaleInputController : MonoBehaviour
 	{
 		void OnEnable()

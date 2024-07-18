@@ -1,17 +1,15 @@
-﻿using HSP.Core;
-using HSP.Time;
+﻿using HSP.Time;
+using HSP.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
 using UnityPlus.UILib.Layout;
 using UnityPlus.UILib.UIElements;
 
-namespace HSP.UI
+namespace HSP.Vanilla.UI.Time
 {
     public class UITimewarpSelector : UIPanel
     {

@@ -1,15 +1,9 @@
 ﻿using HSP.ControlSystems;
-using HSP.ControlSystems.Controls;
-using HSP.Core;
-using HSP.Core.Components;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace HSP.Components
+namespace HSP.Vanilla.Components
 {
     /// <summary>
     /// Represents a controller that can invoke an arbitrary control action from a queue.

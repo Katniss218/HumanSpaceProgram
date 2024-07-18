@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace HSP.Core.ResourceFlowSystem
+namespace HSP.ResourceFlow
 {
     /// <summary>
     /// State information about a single resource.

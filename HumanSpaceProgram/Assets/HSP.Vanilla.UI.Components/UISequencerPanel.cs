@@ -1,11 +1,11 @@
-﻿using HSP.Components;
-using HSP.ReferenceFrames;
+﻿using HSP.ReferenceFrames;
+using HSP.Vanilla.Components;
 using HSP.Vessels;
 using UnityPlus.UILib;
 using UnityPlus.UILib.Layout;
 using UnityPlus.UILib.UIElements;
 
-namespace HSP.UI
+namespace HSP.Vanilla.UI.Components
 {
     public class UISequencerPanel : UIPanel
     {

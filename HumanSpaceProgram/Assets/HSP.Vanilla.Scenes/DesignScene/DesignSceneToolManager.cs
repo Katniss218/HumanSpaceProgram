@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace HSP.DesignScene
+namespace HSP.Vanilla.Scenes.DesignScene
 {
     /// <summary>
     /// Manages the registered and active design scene viewport tools.

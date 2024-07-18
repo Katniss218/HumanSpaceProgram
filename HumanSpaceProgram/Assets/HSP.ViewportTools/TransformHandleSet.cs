@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace HSP
+namespace HSP.ViewportTools
 {
     /// <summary>
     /// Controls an entire set of transform handles.

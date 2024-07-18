@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
-namespace HSP.Core
+namespace HSP.ResourceFlow
 {
     /// <summary>
     /// Contains the data about a bulk resource (one that can be held in e.g. a tank). <br/>

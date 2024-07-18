@@ -1,17 +1,11 @@
 ﻿using HSP.ControlSystems;
 using HSP.ControlSystems.Controls;
-using HSP.Core.Components;
 using HSP.Input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Input;
 using UnityPlus.Serialization;
 
-namespace HSP.Components
+namespace HSP.Vanilla.Components
 {
     /// <summary>
     /// Sends steering and throttle signals based on player input.

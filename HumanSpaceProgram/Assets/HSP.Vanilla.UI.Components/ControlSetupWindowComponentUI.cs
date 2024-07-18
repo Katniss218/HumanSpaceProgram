@@ -1,15 +1,11 @@
-﻿using HSP.ControlSystems;
-using HSP.ControlSystems.Controls;
-using HSP.UI.Windows;
-using System;
+﻿using HSP.UI;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
 
-namespace HSP.UI
+namespace HSP.Vanilla.UI.Components
 {
     /// <summary>
     /// UI for components that have inputs/outputs or groups with inputs/outputs.

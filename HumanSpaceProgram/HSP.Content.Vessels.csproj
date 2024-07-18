@@ -9,7 +9,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <ProjectGuid>{4BD8BF7E-0B20-3964-16BE-BCA50A80C566}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -62,6 +63,7 @@
     <Compile Include="Assets\HSP.Content.Vessels\AssetLoaders\GameDataJsonVesselFactory.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".editorconfig" />
     <None Include="Assets\HSP.Content.Vessels\___HSP.Content.Vessels.asmdef" />
   </ItemGroup>
   <ItemGroup>

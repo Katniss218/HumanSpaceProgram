@@ -1,15 +1,8 @@
-﻿using HSP.Core;
-using HSP.Time;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using HSP.Time;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
 
-namespace HSP.UI
+namespace HSP.Vanilla.UI.Time
 {
     /// <summary>
     /// A readout for the mission elapsed time.

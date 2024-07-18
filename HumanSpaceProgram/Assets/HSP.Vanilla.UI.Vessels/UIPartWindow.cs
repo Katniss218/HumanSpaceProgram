@@ -1,4 +1,5 @@
-﻿using HSP.Vessels.Components;
+﻿using HSP.UI;
+using HSP.Vessels.Components;
 using HSP.Vessels.Serialization;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using UnityPlus.UILib;
 using UnityPlus.UILib.Layout;
 using UnityPlus.UILib.UIElements;
 
-namespace HSP.UI.Windows
+namespace HSP.Vanilla.UI.Vessels
 {
     /// <summary>
     /// A pop-up window containing the information about some part of a vessel.

@@ -1,7 +1,7 @@
 ﻿using HSP.CelestialBodies;
 using HSP.Core;
-using HSP.Core.Components;
 using HSP.ReferenceFrames;
+using HSP.Vanilla.Components;
 using HSP.Vessels;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,7 +9,7 @@ using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
 
-namespace HSP.UI
+namespace HSP.Vanilla.UI.Components
 {
     public class UINavball : UIPanel
     {

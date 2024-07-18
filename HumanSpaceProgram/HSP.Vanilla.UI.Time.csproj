@@ -9,7 +9,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <ProjectGuid>{F24B1196-F385-43EE-AAB5-971DC99C6174}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -62,6 +63,7 @@
     <Compile Include="Assets\HSP.Vanilla.UI.Time\UITextReadout_ElapsedUT.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".editorconfig" />
     <None Include="Assets\HSP.Vanilla.UI.Time\___HSP.Vanilla.UI.Time.asmdef" />
   </ItemGroup>
   <ItemGroup>

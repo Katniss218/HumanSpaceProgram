@@ -1,16 +1,10 @@
 ﻿using HSP.ControlSystems;
 using HSP.ControlSystems.Controls;
-using HSP.Core;
-using HSP.Core.ResourceFlowSystem;
 using HSP.Vessels;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace HSP.Components
+namespace HSP.Vanilla.Components
 {
     /// <summary>
     /// Controls a number of gimbal actuators.

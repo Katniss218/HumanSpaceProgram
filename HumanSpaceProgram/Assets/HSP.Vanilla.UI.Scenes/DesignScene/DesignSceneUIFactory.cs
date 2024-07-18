@@ -1,9 +1,10 @@
-﻿using HSP.Core;
-using HSP.Core.SceneManagement;
-using HSP.DesignScene;
-using HSP.DesignScene.Tools;
+﻿using HSP.Core.SceneManagement;
+using HSP.UI;
 using HSP.UI.Windows;
-using HSP.Vessels;
+using HSP.Vanilla.Scenes.DesignScene;
+using HSP.Vanilla.Scenes.DesignScene.Tools;
+using HSP.Vanilla.Scenes.MainMenuScene;
+using HSP.Vanilla.UI.Components;
 using HSP.Vessels.Serialization;
 using System;
 using UnityEngine;
@@ -12,7 +13,7 @@ using UnityPlus.UILib;
 using UnityPlus.UILib.Layout;
 using UnityPlus.UILib.UIElements;
 
-namespace HSP.UI.SceneFactories
+namespace HSP.Vanilla.UI.Scenes.DesignScene
 {
     /// <summary>
     /// Creates Design Scene UI elements.
@@ -22,7 +23,7 @@ namespace HSP.UI.SceneFactories
         public static UIPanel _toolOptionsPanel;
         public static UIInputField<string> _vesselNameIF;
 
-        [HSPEventListener( HSPEvent.STARTUP_DESIGN, HSPEvent.NAMESPACE_VANILLA + ".design_scene_ui" )]
+        [HSPEventListener( HSPEvent.STARTUP_DESIGN, HSPEvent.NAMESPACE_HSP + ".design_scene_ui" )]
         public static void Create()
         {
             UICanvas canvas = CanvasManager.Get( CanvasName.STATIC );
@@ -40,7 +41,7 @@ namespace HSP.UI.SceneFactories
             UIPartList partListUI = canvas.AddPartList( new UILayoutInfo( UIAnchor.Left, UIFill.Vertical( 30, 0 ), 0, PART_LIST_WIDTH ) );
         }
 
-        [HSPEventListener( HSPEvent.DESIGN_AFTER_LOAD, HSPEvent.NAMESPACE_VANILLA + ".update_current" )]
+        [HSPEventListener( HSPEvent.DESIGN_AFTER_LOAD, HSPEvent.NAMESPACE_HSP + ".update_current" )]
         private static void OnAfterVesselLoad( object e )
         {
             _vesselNameIF.SetValue( DesignVesselManager.CurrentVesselMetadata.Name );
@@ -123,7 +124,7 @@ namespace HSP.UI.SceneFactories
             } );
         }
 
-        [HSPEventListener( HSPEvent.DESIGN_AFTER_TOOL_CHANGED, HSPEvent.NAMESPACE_VANILLA + ".tool_changed_ui" )]
+        [HSPEventListener( HSPEvent.DESIGN_AFTER_TOOL_CHANGED, HSPEvent.NAMESPACE_HSP + ".tool_changed_ui" )]
         private static void CreateCurrentToolOptions( object e )
         {
             if( !_toolOptionsPanel.IsNullOrDestroyed() )

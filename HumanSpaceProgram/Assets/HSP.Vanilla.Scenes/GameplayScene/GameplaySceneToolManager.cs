@@ -1,10 +1,8 @@
-using HSP.Core;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace HSP.GameplayScene
+namespace HSP.Vanilla.Scenes.GameplayScene
 {
     /// <summary>
     /// Manages the registered and active gameplay scene viewport tools.

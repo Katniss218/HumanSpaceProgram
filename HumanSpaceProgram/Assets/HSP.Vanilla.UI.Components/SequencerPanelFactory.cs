@@ -1,8 +1,9 @@
 ﻿using HSP.ReferenceFrames;
+using HSP.UI;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
 
-namespace HSP.UI.SceneFactories
+namespace HSP.Vanilla.UI.Components
 {
     /// <summary>
     /// Manages the HUD UI elements displayed for FSequencer in the gameplay scene.
@@ -11,8 +12,8 @@ namespace HSP.UI.SceneFactories
     {
         private static UISequencerPanel _sequencerPanel;
 
-        [HSPEventListener( HSPEvent.GAMEPLAY_AFTER_ACTIVE_OBJECT_CHANGE, HSPEvent.NAMESPACE_VANILLA + ".ui.fsequencer" )]
-        [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, HSPEvent.NAMESPACE_VANILLA + ".ui.fsequencer" )]
+        [HSPEventListener( HSPEvent.GAMEPLAY_AFTER_ACTIVE_OBJECT_CHANGE, HSPEvent.NAMESPACE_HSP + ".ui.fsequencer" )]
+        [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, HSPEvent.NAMESPACE_HSP + ".ui.fsequencer" )]
         public static void CreateUI()
         {
             UICanvas canvas = CanvasManager.Get( CanvasName.STATIC );

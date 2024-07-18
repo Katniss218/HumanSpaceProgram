@@ -3,7 +3,7 @@ using System;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace HSP.GameplayScene.Cameras
+namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
 {
     [ExecuteInEditMode, ImageEffectAllowedInSceneView]
     [RequireComponent( typeof( Camera ) )]

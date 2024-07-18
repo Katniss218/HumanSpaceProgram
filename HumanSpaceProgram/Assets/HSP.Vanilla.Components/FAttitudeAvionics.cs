@@ -1,19 +1,18 @@
-﻿using HSP.ControlSystems.Controls;
-using HSP.ControlSystems;
-using System;
-using UnityEngine;
-using HSP.Core;
-using System.Runtime.CompilerServices;
-using UnityPlus.Serialization;
-using HSP.Vessels;
+﻿using HSP.ControlSystems;
+using HSP.ControlSystems.Controls;
 using HSP.Time;
+using HSP.Vessels;
+using System;
+using System.Runtime.CompilerServices;
+using UnityEngine;
+using UnityPlus.Serialization;
 
-namespace HSP.Components
+namespace HSP.Vanilla.Components
 {
-	/// <summary>
-	/// Stability Assist (SAS) module.
-	/// </summary>
-	public class FAttitudeAvionics : MonoBehaviour
+    /// <summary>
+    /// Stability Assist (SAS) module.
+    /// </summary>
+    public class FAttitudeAvionics : MonoBehaviour
 	{
 		private Vessel _vessel;
 

@@ -9,7 +9,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <ProjectGuid>{FFD77CE1-030A-7905-618A-BF767836F6ED}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -58,8 +59,10 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\HSP.Vanilla.UI.Components\UITextReadout_Velocity.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI.Components\UIControlSetupWindow.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI.Components\ControlSetupControlGroupUI.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI.Components\UITextReadout_Altitude.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI.Components\ControlSetupControlUI.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI.Components\ControlSetupWindowComponentUI.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI.Components\UISequenceElement.cs" />
@@ -69,9 +72,11 @@
     <Compile Include="Assets\HSP.Vanilla.UI.Components\ControlSetupControlConnectionUI.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI.Components\UINavball.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI.Components\NavballRenderTextureManager.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI.Components\UITextReadout_Acceleration.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI.Components\UIIResourceContainer.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".editorconfig" />
     <None Include="Assets\HSP.Vanilla.UI.Components\___HSP.Vanilla.UI.Components.asmdef" />
   </ItemGroup>
   <ItemGroup>

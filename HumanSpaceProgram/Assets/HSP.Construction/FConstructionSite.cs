@@ -1,5 +1,4 @@
-﻿using HSP.Core;
-using HSP.ReferenceFrames;
+﻿using HSP.ReferenceFrames;
 using HSP.Time;
 using HSP.Vessels;
 using System;
@@ -187,12 +186,12 @@ namespace HSP.Construction
 
         void OnEnable()
         {
-            HSPEvent.EventManager.TryInvoke( HSPEvent_ConstructionSite.GAMEPLAY_AFTER_CONSTRUCTION_SITE_CREATED, this );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_ConstructionSiteCreated.EventID, this );
         }
 
         void OnDisable()
         {
-            HSPEvent.EventManager.TryInvoke( HSPEvent_ConstructionSite.GAMEPLAY_AFTER_CONSTRUCTION_SITE_DESTROYED, this );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_ConstructionSiteDestroyed.EventID, this );
         }
 
         void Update()

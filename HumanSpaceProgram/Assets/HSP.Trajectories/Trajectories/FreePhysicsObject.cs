@@ -1,4 +1,5 @@
-﻿using HSP.ReferenceFrames;
+﻿using HSP.CelestialBodies;
+using HSP.ReferenceFrames;
 using HSP.Time;
 using System.Linq;
 using UnityEngine;
@@ -121,9 +122,13 @@ namespace HSP.Core.Physics
 
         void FixedUpdate()
         {
+#warning TODO - this should act on the trajectory, vessel shouldn't care.
+            Vector3Dbl airfGravityForce = GravityUtils.GetNBodyGravityForce( this._rootObjTransform.AIRFPosition, this.Mass );
+            this.AddForce( (Vector3)airfGravityForce );
+
+
             // If the object is colliding, we will use its rigidbody accelerations, because we don't have access to the forces due to collisions.
             // Otherwise, we use our more precise method that relies on full encapsulation of the rigidbody.
-
             if( IsColliding )
             {
                 this.Acceleration = (Velocity - _oldVelocity) / TimeManager.FixedDeltaTime;

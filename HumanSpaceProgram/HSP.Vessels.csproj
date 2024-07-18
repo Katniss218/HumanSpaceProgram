@@ -9,7 +9,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <ProjectGuid>{46E8105E-3165-8157-383E-59E6654156AA}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -60,6 +61,9 @@
   <ItemGroup>
     <Compile Include="Assets\HSP.Vessels\PartRegistry.cs" />
     <Compile Include="Assets\HSP.Vessels\Vessel.Serialization.cs" />
+    <Compile Include="Assets\HSP.Vessels\VesselManager.cs" />
+    <Compile Include="Assets\HSP.Vessels\VesselFactory.cs" />
+    <Compile Include="Assets\HSP.Vessels\Vessel.cs" />
     <Compile Include="Assets\HSP.Vessels\Serialization\PartMetadata.cs" />
     <Compile Include="Assets\HSP.Vessels\SymmetryDataContainer.cs" />
     <Compile Include="Assets\HSP.Vessels\Serialization\VesselMetadata.cs" />
@@ -67,13 +71,12 @@
     <Compile Include="Assets\HSP.Vessels\Components\FAttachNode.cs" />
     <Compile Include="Assets\HSP.Vessels\PartFactory.cs" />
     <Compile Include="Assets\HSP.Vessels\VesselHierarchyUtils.cs" />
-    <Compile Include="Assets\HSP.Vessels\Components\FLaunchSiteMarker.cs" />
-    <Compile Include="Assets\HSP.Vessels\Vessel.cs" />
     <Compile Include="Assets\HSP.Vessels\Vessel_Ex.cs" />
-    <Compile Include="Assets\HSP.Vessels\VesselFactory.cs" />
-    <Compile Include="Assets\HSP.Vessels\VesselManager.cs" />
+    <Compile Include="Assets\HSP.Vessels\Components\FLaunchSiteMarker.cs" />
+    <Compile Include="Assets\HSP.Vessels\_HSPEvents.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".editorconfig" />
     <None Include="Assets\HSP.Vessels\___HSP.Vessels.asmdef" />
   </ItemGroup>
   <ItemGroup>

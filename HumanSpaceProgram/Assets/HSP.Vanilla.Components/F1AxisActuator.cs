@@ -1,14 +1,9 @@
-﻿using HSP.ControlSystems.Controls;
-using HSP.ControlSystems;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using HSP.ControlSystems;
+using HSP.ControlSystems.Controls;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace HSP.Components
+namespace HSP.Vanilla.Components
 {
     public class F1AxisActuator : MonoBehaviour
     {

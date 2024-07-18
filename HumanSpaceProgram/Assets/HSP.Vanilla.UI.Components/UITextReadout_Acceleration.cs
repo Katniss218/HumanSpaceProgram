@@ -3,7 +3,7 @@ using HSP.ReferenceFrames;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
 
-namespace HSP.UI
+namespace HSP.Vanilla.UI.Components
 {
     public class UITextReadout_Acceleration : UIText
     {

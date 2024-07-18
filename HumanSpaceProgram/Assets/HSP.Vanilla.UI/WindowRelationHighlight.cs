@@ -1,16 +1,10 @@
-﻿using UnityPlus.UILib;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
-using HSP.Core;
 
-namespace HSP.UI.Windows
+namespace HSP.Vanilla.UI
 {
     /// <summary>
     /// A script that draws a graphical relationship between a UI element, and a scene object, when the UI element is hovered over.

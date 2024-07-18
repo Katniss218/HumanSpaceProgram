@@ -1,5 +1,5 @@
-﻿using HSP.DesignScene;
-using HSP.DesignScene.Tools;
+﻿using HSP.Vanilla.Scenes.DesignScene;
+using HSP.Vanilla.Scenes.DesignScene.Tools;
 using HSP.Vessels;
 using HSP.Vessels.Serialization;
 using UnityEngine;
@@ -7,7 +7,7 @@ using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
 
-namespace HSP.UI
+namespace HSP.Vanilla.UI.Scenes.DesignScene
 {
     public class UIPartListEntry : UIButton
     {

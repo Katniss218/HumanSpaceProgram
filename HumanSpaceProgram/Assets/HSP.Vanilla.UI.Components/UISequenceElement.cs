@@ -1,17 +1,12 @@
-﻿using HSP.Components;
-using HSP.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using HSP.UI;
+using HSP.Vanilla.Components;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
 using UnityPlus.UILib.Layout;
 using UnityPlus.UILib.UIElements;
 
-namespace HSP.UI
+namespace HSP.Vanilla.UI.Components
 {
     public class UISequenceElement : UIPanel
     {

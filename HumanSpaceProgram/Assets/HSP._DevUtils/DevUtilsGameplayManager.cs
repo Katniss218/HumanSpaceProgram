@@ -1,12 +1,10 @@
 ﻿using HSP.CelestialBodies;
 using HSP.CelestialBodies.Surfaces;
-using HSP.Components;
 using HSP.Content;
-using HSP.Core;
-using HSP.Core.Components;
-using HSP.Core.ResourceFlowSystem;
 using HSP.ReferenceFrames;
+using HSP.ResourceFlow;
 using HSP.Trajectories;
+using HSP.Vanilla.Components;
 using HSP.Vessels;
 using HSP.Vessels.Components;
 using HSP.Vessels.Serialization;
@@ -19,7 +17,7 @@ using UnityPlus.AssetManagement;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.DataHandlers;
 
-namespace HSP.DevUtils
+namespace HSP._DevUtils
 {
     /// <summary>
     /// Game manager for testing.

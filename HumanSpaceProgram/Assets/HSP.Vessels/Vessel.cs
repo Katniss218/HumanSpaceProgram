@@ -1,4 +1,3 @@
-using HSP.Core.Physics;
 using HSP.ReferenceFrames;
 using System;
 using System.Collections.Generic;
@@ -30,11 +29,15 @@ namespace HSP.Vessels
             get => _rootPart;
             set
             {
+                var oldRootPart = _rootPart;
                 if( _rootPart != null )
                     _rootPart.SetParent( null, true );
                 _rootPart = value;
                 if( value != null )
                     value.SetParent( this.transform, true );
+
+                HSPEvent.EventManager.TryInvoke( HSPEvent_VesselHierarchyChanged.EventID, (this, oldRootPart, value) );
+
                 RecalculatePartCache();
             }
         }
@@ -112,11 +115,6 @@ namespace HSP.Vessels
         void FixedUpdate()
         {
             SetPhysicsObjectParameters(); // this full recalc every frame should be replaced by update-based approach.
-
-#warning TODO - this should act on the trajectory, vessel shouldn't care.
-            // Vector3Dbl airfGravityForce = GravityUtils.GetNBodyGravityForce( this.AIRFPosition, PhysicsObject.Mass );
-
-            // PhysicsObject.AddForce( (Vector3)airfGravityForce );
 
 
             // ---------------------

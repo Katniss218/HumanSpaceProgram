@@ -1,13 +1,14 @@
-using HSP.Core;
 using HSP.Core.SceneManagement;
 using HSP.Timelines;
 using HSP.Timelines.Serialization;
+using HSP.UI;
+using HSP.Vanilla.Scenes.GameplayScene;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
 
-namespace HSP.UI
+namespace HSP.Vanilla.UI.Timelines
 {
     public class UIStartNewGameWindow : UIWindow
     {

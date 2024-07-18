@@ -4,7 +4,7 @@ using HSP.ReferenceFrames;
 using UnityEngine;
 using UnityPlus.Input;
 
-namespace HSP.GameplayScene.Cameras
+namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
 {
     public class GameplaySceneOrbitingCameraController : SingletonMonoBehaviour<GameplaySceneOrbitingCameraController>
     {
@@ -146,7 +146,7 @@ namespace HSP.GameplayScene.Cameras
             return true;
         }
 
-        [HSPEventListener( HSPEvent.GAMEPLAY_AFTER_ACTIVE_OBJECT_CHANGE, HSPEvent.NAMESPACE_VANILLA + "camera.snap_to_vessel" )]
+        [HSPEventListener( HSPEvent.GAMEPLAY_AFTER_ACTIVE_OBJECT_CHANGE, HSPEvent.NAMESPACE_HSP + "camera.snap_to_vessel" )]
         private static void SnapToActiveObject( object e )
         {
             if( ActiveObjectManager.ActiveObject == null )

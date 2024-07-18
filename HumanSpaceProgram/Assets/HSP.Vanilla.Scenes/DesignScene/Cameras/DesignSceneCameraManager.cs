@@ -1,10 +1,6 @@
-using HSP.Core;
-using HSP.DesignScene.Cameras;
 using UnityEngine;
-using UnityEngine.Rendering.PostProcessing;
-using UnityPlus.AssetManagement;
 
-namespace HSP.GameplayScene.Cameras
+namespace HSP.Vanilla.Scenes.DesignScene.Cameras
 {
     /// <summary>
     /// Manages the multi-camera setup of the gameplay scene.
@@ -42,6 +38,10 @@ namespace HSP.GameplayScene.Cameras
         /// </summary>
         [SerializeField]
         Camera _uiCamera;
+
+        public static Camera NearCamera => instance._nearCamera;
+        public static Camera EffectCamera => instance._effectCamera;
+        public static Camera UICamera => instance._uiCamera;
 
         float _effectCameraNearPlane;
 
@@ -153,33 +153,6 @@ namespace HSP.GameplayScene.Cameras
 
             cameraController.CameraParent = cameraParentGameObject.transform;
             cameraController.ZoomDist = 5f;
-        }
-
-        [HSPEventListener( HSPEvent.STARTUP_DESIGN, "vanilla.designscene_postprocessing", After = new[] { "vanilla.designscene_camera" } )]
-        private static void CreatePostProcessingLayers()
-        {
-            void SetupPPL( PostProcessLayer layer )
-            {
-                layer.antialiasingMode = PostProcessLayer.Antialiasing.TemporalAntialiasing;
-                layer.temporalAntialiasing.jitterSpread = 0.65f;
-                layer.temporalAntialiasing.stationaryBlending = 0.99f;
-                layer.temporalAntialiasing.motionBlending = 0.25f;
-                layer.temporalAntialiasing.sharpness = 0.1f;
-                layer.volumeLayer = Layer.POST_PROCESSING.ToMask();
-                layer.volumeTrigger = layer.transform;
-                layer.stopNaNPropagation = true;
-
-                // This is required, for some stupid reason.
-                var postProcessResources = AssetRegistry.Get<PostProcessResources>( "builtin::com.unity.postprocessing/PostProcessing/PostProcessResources" );
-                layer.Init( postProcessResources );
-                layer.InitBundles();
-            }
-
-            PostProcessLayer nearPPL = instance._nearCamera.gameObject.AddComponent<PostProcessLayer>();
-            SetupPPL( nearPPL );
-
-            PostProcessLayer uiPPL = instance._uiCamera.gameObject.AddComponent<PostProcessLayer>();
-            SetupPPL( uiPPL );
         }
     }
 }

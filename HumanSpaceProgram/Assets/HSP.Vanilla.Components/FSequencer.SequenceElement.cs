@@ -1,17 +1,11 @@
-﻿using HSP.Components;
-using HSP.ControlSystems;
-using HSP.ControlSystems.Controls;
-using HSP.Core;
+﻿using HSP.ControlSystems;
 using HSP.Time;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace HSP.Components
+namespace HSP.Vanilla.Components
 {
     /// <summary>
     /// Represents an invokable element of a <see cref="FSequencer"/>'s sequence.

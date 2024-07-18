@@ -1,11 +1,12 @@
-﻿using HSP.Core;
-using HSP.ReferenceFrames;
+﻿using HSP.ReferenceFrames;
+using HSP.UI;
+using HSP.Vanilla.Scenes.GameplayScene;
 using HSP.Vessels;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityPlus.UILib;
 
-namespace HSP.UI.HUDs
+namespace HSP.Vanilla.UI.Vessels
 {
     public class VesselHUDManager : SingletonMonoBehaviour<VesselHUDManager>
     {

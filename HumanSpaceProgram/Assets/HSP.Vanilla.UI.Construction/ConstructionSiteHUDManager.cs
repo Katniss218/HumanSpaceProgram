@@ -1,19 +1,16 @@
-﻿using HSP.Core;
-using HSP.Construction;
-using System;
+﻿using HSP.Construction;
+using HSP.UI;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
 
-namespace HSP.UI.HUDs
+namespace HSP.Vanilla.UI.Construction
 {
     public class ConstructionSiteHUDManager : SingletonMonoBehaviour<ConstructionSiteHUDManager>
     {
         List<ConstructionSiteHUD> _huds = new List<ConstructionSiteHUD>();
 
-        [HSPEventListener( HSPEvent_ConstructionSite.GAMEPLAY_AFTER_CONSTRUCTION_SITE_CREATED, "vanilla.csite_huds" )]
+        [HSPEventListener( HSPEvent_ConstructionSiteCreated.EventID, "vanilla.csite_huds" )]
         private static void OnConstructionSiteCreated( FConstructionSite constructionSite )
         {
             //if( ActiveObjectManager.ActiveObject == null )
@@ -23,7 +20,7 @@ namespace HSP.UI.HUDs
             //}
         }
 
-        [HSPEventListener( HSPEvent_ConstructionSite.GAMEPLAY_AFTER_CONSTRUCTION_SITE_DESTROYED, "vanilla.csite_huds" )]
+        [HSPEventListener( HSPEvent_ConstructionSiteDestroyed.EventID, "vanilla.csite_huds" )]
         private static void OnConstructionSiteDestroyed( FConstructionSite constructionSite )
         {
             if( !instanceExists ) // Can be null if exiting a scene - it doesn't affect anything, but gives ugly warnings.

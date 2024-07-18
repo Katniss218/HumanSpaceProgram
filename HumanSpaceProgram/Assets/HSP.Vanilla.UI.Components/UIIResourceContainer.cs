@@ -1,10 +1,11 @@
-using HSP.Core.ResourceFlowSystem;
-using UnityPlus.UILib;
+using HSP.ResourceFlow;
+using HSP.Vanilla.UI.Vessels;
 using UnityEngine;
 using UnityPlus.AssetManagement;
+using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
 
-namespace HSP.UI.Windows.PartWindowComponents
+namespace HSP.Vanilla.UI.Components
 {
     public class UIIResourceContainer : UIPartWindowComponent
     {

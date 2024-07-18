@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityPlus.Input;
 
-namespace HSP.DesignScene.Tools
+namespace HSP.Vanilla.Scenes.DesignScene.Tools
 {
     /// <summary>
     /// Allows to detach and attach parts.

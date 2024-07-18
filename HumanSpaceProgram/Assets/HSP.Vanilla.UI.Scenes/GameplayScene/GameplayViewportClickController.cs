@@ -1,20 +1,21 @@
-﻿using HSP.Core;
-using HSP.Input;
-using HSP.UI.Windows;
+﻿using HSP.Input;
+using HSP.UI;
+using HSP.Vanilla.Scenes.GameplayScene;
+using HSP.Vanilla.UI.Vessels;
 using HSP.Vessels;
 using HSP.Vessels.Components;
 using UnityEngine;
 using UnityPlus.Input;
 using UnityPlus.UILib;
 
-namespace HSP.UI
+namespace HSP.Vanilla.UI.Scenes.GameplayScene
 {
     /// <summary>
     /// Controls clicking in the physical world of the gameplay scene.
     /// </summary>
     public class GameplayViewportClickController : SingletonMonoBehaviour<GameplayViewportClickController>
     {
-        [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, HSPEvent.NAMESPACE_VANILLA + ".add_click_controller" )]
+        [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, HSPEvent.NAMESPACE_HSP + ".add_click_controller" )]
         private static void CreateInstanceInScene()
         {
             GameplaySceneManager.Instance.gameObject.AddComponent<GameplayViewportClickController>();

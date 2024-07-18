@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace HSP.Core.ResourceFlowSystem
+﻿namespace HSP.ResourceFlow
 {
     /// <summary>
     /// Represents an object that can hold resources (substances).

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace HSP.DesignScene
+namespace HSP.Vanilla.Scenes.DesignScene
 {
     public class DesignSceneToolBase : MonoBehaviour
     {

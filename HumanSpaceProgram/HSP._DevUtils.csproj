@@ -9,7 +9,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <ProjectGuid>{D580E15E-BD0A-821F-5D34-45425A34B44A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -63,6 +64,7 @@
     <Compile Include="Assets\HSP._DevUtils\AIRFRotationFixer.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".editorconfig" />
     <None Include="Assets\HSP._DevUtils\WireframeSimpleQuad.shader" />
     <None Include="Assets\HSP._DevUtils\___HSP._DevUtils.asmdef" />
     <None Include="Assets\HSP._DevUtils\Wireframe.shader" />

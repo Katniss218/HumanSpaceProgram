@@ -1,14 +1,11 @@
-﻿using HSP.Components;
-using HSP.ControlSystems;
+﻿using HSP.ControlSystems;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace HSP.Components
+namespace HSP.Vanilla.Components
 {
     /// <summary>
     /// A sequence contained within a <see cref="FSequencer"/>.

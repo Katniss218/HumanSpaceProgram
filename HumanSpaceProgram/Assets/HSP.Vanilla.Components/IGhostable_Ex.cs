@@ -1,15 +1,10 @@
-﻿using HSP.Components;
-using HSP.Construction;
-using System;
-using System.Collections.Generic;
+﻿using HSP.Construction;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.Serialization;
 
-namespace HSP
+namespace HSP.Vanilla.Components
 {
     public static class IGhostable_Ex
     {

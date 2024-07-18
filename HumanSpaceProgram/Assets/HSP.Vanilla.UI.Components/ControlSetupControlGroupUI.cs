@@ -1,17 +1,13 @@
 ﻿using HSP.ControlSystems;
 using HSP.ControlSystems.Controls;
-using HSP.UI.Windows;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
 
-namespace HSP.UI
+namespace HSP.Vanilla.UI.Components
 {
     /// <summary>
     /// UI for <see cref="ControlGroup"/>-derived classes.

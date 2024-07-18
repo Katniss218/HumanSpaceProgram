@@ -1,17 +1,10 @@
-﻿using HSP.Core;
-using HSP.Core.Components;
-using HSP.Input;
-using HSP.Vessels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using HSP.Input;
+using HSP.ViewportTools;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.Input;
 
-namespace HSP.DesignScene.Tools
+namespace HSP.Vanilla.Scenes.DesignScene.Tools
 {
     /// <summary>
     /// Allows to move a selected part after placing.

@@ -1,10 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
-using HSP.Core;
-using HSP.Core.ResourceFlowSystem;
+using HSP.ResourceFlow;
 using NUnit.Framework;
-using UnityEngine;
-using UnityEngine.TestTools;
 
 namespace KSS_Tests_EditMode
 {

@@ -20,8 +20,8 @@ namespace HSP.CelestialBodies
             return cb;
         }
 
-        [HSPEventListener( HSPEvent.TIMELINE_BEFORE_NEW, HSPEvent.NAMESPACE_VANILLA + ".create.universe" )]
-        [HSPEventListener( HSPEvent.TIMELINE_BEFORE_LOAD, HSPEvent.NAMESPACE_VANILLA + ".create.universe" )]
+        [HSPEventListener( HSPEvent.TIMELINE_BEFORE_NEW, HSPEvent.NAMESPACE_HSP + ".create.universe" )]
+        [HSPEventListener( HSPEvent.TIMELINE_BEFORE_LOAD, HSPEvent.NAMESPACE_HSP + ".create.universe" )]
         public static void CreateDefaultPlanetarySystem( object e )
         {
             QuaternionDbl orientation = Quaternion.Euler( 270, 0, 0 );

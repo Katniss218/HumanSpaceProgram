@@ -1,18 +1,20 @@
-﻿using HSP.Core;
-using HSP.Core.SceneManagement;
+﻿using HSP.Core.SceneManagement;
 using HSP.Time;
+using HSP.UI;
+using HSP.Vanilla.Scenes.MainMenuScene;
+using HSP.Vanilla.UI.Timelines;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
 
-namespace HSP.UI.SceneFactories
+namespace HSP.Vanilla.UI.Scenes.GameplayScene
 {
     public static class GameplayEscapeUIFactory
     {
         static UIWindow escapeMenuWindow;
 
-        [HSPEventListener( HSPEvent.ESCAPE_GAMEPLAY, HSPEvent.NAMESPACE_VANILLA + ".escape_menu_ui" )]
+        [HSPEventListener( HSPEvent.ESCAPE_GAMEPLAY, HSPEvent.NAMESPACE_HSP + ".escape_menu_ui" )]
         private static void OnGameplayEscape()
         {
             if( TimeManager.IsPaused && TimeManager.LockTimescale )

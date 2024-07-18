@@ -9,7 +9,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <ProjectGuid>{83793330-5AED-C186-5E4B-AAD4BB463469}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -71,6 +72,7 @@
     <Compile Include="Assets\HSP.CelestialBodies\Surfaces\LODQuadTree_NodeUtils.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".editorconfig" />
     <None Include="Assets\HSP.CelestialBodies\Surfaces\TerrainShader.shader" />
     <None Include="Assets\HSP.CelestialBodies\Atmospheres\Atmosphere.shader" />
     <None Include="Assets\HSP.CelestialBodies\Atmospheres\Math.cginc" />

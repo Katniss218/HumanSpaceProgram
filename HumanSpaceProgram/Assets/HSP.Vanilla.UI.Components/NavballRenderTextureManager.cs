@@ -1,7 +1,6 @@
 ﻿using HSP.CelestialBodies;
-using HSP.Core;
-using HSP.Core.Components;
 using HSP.ReferenceFrames;
+using HSP.Vanilla.Components;
 using HSP.Vessels;
 using System.Linq;
 using UnityEngine;
@@ -9,7 +8,7 @@ using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 using UnityPlus.AssetManagement;
 
-namespace HSP.UI
+namespace HSP.Vanilla.UI.Components
 {
     /// <summary>
     /// Manages the Navball's render texture and orientation.

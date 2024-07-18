@@ -1,15 +1,13 @@
 ﻿using HSP.ControlSystems;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
+using HSP.ControlSystems.Controls;
+using HSP.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
 
-namespace HSP.UI
+namespace HSP.Vanilla.UI.Components
 {
     public class ControlSetupControlUI : MonoBehaviour, IPointerEnterHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
     {
@@ -90,13 +88,13 @@ namespace HSP.UI
             Sprite sprite;
             switch( control )
             {
-                case HSP.ControlSystems.Controls.ControlleeInputBase:
+                case ControlleeInputBase:
                     sprite = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_input" ); side = 0f; break;
-                case HSP.ControlSystems.Controls.ControllerOutputBase:
+                case ControllerOutputBase:
                     sprite = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_output" ); side = 1f; break;
-                case HSP.ControlSystems.Controls.ControlParameterInputBase:
+                case ControlParameterInputBase:
                     sprite = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_parameter_input" ); side = 1f; break;
-                case HSP.ControlSystems.Controls.ControlParameterOutputBase:
+                case ControlParameterOutputBase:
                     sprite = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/control_parameter_output" ); side = 0f; break;
                 default:
                     sprite = null;

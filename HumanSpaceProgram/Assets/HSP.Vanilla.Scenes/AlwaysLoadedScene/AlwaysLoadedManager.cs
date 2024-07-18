@@ -3,7 +3,7 @@ using HSP.Core.SceneManagement;
 using System;
 using UnityEngine;
 
-namespace HSP.Vanilla.Scenes
+namespace HSP.Vanilla.Scenes.AlwaysLoadedScene
 {
     /// <summary>
     /// A manager that is loaded immediately and remains loaded until the game is exited.

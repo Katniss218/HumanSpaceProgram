@@ -1,7 +1,6 @@
 using UnityEngine;
-using UnityPlus.Serialization;
 
-namespace HSP.Core
+namespace HSP.Vanilla.Scenes.MainMenuScene
 {
     /// <summary>
     /// A Manager whose responsibility is to invoke the events relating to creation/destruction of the `main menu` scene.

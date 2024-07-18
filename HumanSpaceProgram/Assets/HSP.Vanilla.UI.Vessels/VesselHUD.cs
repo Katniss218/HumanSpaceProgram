@@ -6,7 +6,7 @@ using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
 
-namespace HSP.UI.HUDs
+namespace HSP.Vanilla.UI.Vessels
 {
     public class VesselHUD : UIPanel
     {
