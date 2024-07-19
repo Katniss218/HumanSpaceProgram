@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace HSP.Core.Physics
+namespace HSP.Trajectories
 {
     /// <remarks>
     /// A physobj that is pinned to a fixed pos/rot in the local coordinate system of a celestial body.

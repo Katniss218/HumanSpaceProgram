@@ -1,5 +1,5 @@
 ﻿using HSP.Content.Vessels.Serialization;
-using HSP.Core.SceneManagement;
+using HSP.SceneManagement;
 using HSP.UI;
 using HSP.UI.Windows;
 using HSP.Vanilla.Scenes.DesignScene;

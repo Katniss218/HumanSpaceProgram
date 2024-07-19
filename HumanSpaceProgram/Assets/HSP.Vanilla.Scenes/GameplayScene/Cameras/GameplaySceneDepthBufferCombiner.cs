@@ -1,6 +1,4 @@
-﻿using HSP.Core;
-using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Rendering;
 
 namespace HSP.Vanilla.Scenes.GameplayScene.Cameras

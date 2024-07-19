@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
-namespace HSP.Core
+namespace HSP.Trajectories
 {
     /// <summary>
     /// Represents the orientation of a point in orbit. <br/>

@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace HSP.Core.Physics
+namespace HSP.Trajectories
 {
     /// <remarks>
     /// This is a wrapper for a rigidbody.

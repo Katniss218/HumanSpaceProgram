@@ -95,6 +95,7 @@
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\GameplaySceneToolManager.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\DesignSceneTool.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\GameplaySceneTool.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Scenes\OnVesselCreated.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla.Scenes\___HSP.Vanilla.Scenes.asmdef" />

@@ -4,36 +4,43 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace HSP.Core.SceneManagement
+namespace HSP.SceneManagement
 {
     /// <summary>
     /// Can load and unload scenes easily.
     /// </summary>
     public class SceneLoader : SingletonMonoBehaviour<SceneLoader>
     {
+        private static HashSet<string> _loadedScenes = new();
+
+        public static bool IsSceneLoaded( string sceneName )
+        {
+            return _loadedScenes.Contains( sceneName );
+        }
+
         public static void UnloadActiveSceneAsync( Action onAfterUnloaded )
         {
             instance.StartCoroutine( UnloadCoroutine( SceneManager.GetActiveScene().name, onAfterUnloaded ) );
         }
 
-        public static void UnloadSceneAsync( string scene, Action onAfterUnloaded )
+        public static void UnloadSceneAsync( string sceneName, Action onAfterUnloaded )
         {
-            if( string.IsNullOrEmpty( scene ) )
+            if( string.IsNullOrEmpty( sceneName ) )
             {
-                throw new ArgumentNullException( nameof( scene ), $"The scene to unload can't be null." );
+                throw new ArgumentNullException( nameof( sceneName ), $"The scene to unload can't be null." );
             }
 
-            instance.StartCoroutine( UnloadCoroutine( scene, onAfterUnloaded ) );
+            instance.StartCoroutine( UnloadCoroutine( sceneName, onAfterUnloaded ) );
         }
 
-        public static void LoadSceneAsync( string scene, bool additive, bool hasLocalPhysics, Action onAfterLoaded )
+        public static void LoadSceneAsync( string sceneName, bool additive, bool hasLocalPhysics, Action onAfterLoaded )
         {
-            if( string.IsNullOrEmpty( scene ) )
+            if( string.IsNullOrEmpty( sceneName ) )
             {
-                throw new ArgumentNullException( nameof( scene ), $"The scene to load can't be null." );
+                throw new ArgumentNullException( nameof( sceneName ), $"The scene to load can't be null." );
             }
 
-            instance.StartCoroutine( LoadCoroutine( scene, additive, hasLocalPhysics, onAfterLoaded ) );
+            instance.StartCoroutine( LoadCoroutine( sceneName, additive, hasLocalPhysics, onAfterLoaded ) );
         }
 
         private static IEnumerator UnloadCoroutine( string sceneToUnload, Action onAfterUnloaded )
@@ -46,6 +53,8 @@ namespace HSP.Core.SceneManagement
             {
                 yield return null;
             }
+
+            _loadedScenes.Remove( sceneToUnload );
 
             onAfterUnloaded?.Invoke();
         }
@@ -67,6 +76,10 @@ namespace HSP.Core.SceneManagement
             {
                 yield return null;
             }
+
+            if( !additive )
+                _loadedScenes.Clear();
+            _loadedScenes.Add( sceneToLoad );
 
             onAfterLoaded?.Invoke();
         }

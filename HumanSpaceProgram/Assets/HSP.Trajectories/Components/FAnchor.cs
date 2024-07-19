@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace HSP.Trajectories
+namespace HSP.Trajectories.Components
 {
     /// <summary>
     /// Specifies that this object should be anchored to the ground, instead of following its own trajectory in the world.

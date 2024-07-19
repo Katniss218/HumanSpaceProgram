@@ -1,4 +1,4 @@
-﻿using HSP.Core.SceneManagement;
+﻿using HSP.SceneManagement;
 using HSP.Time;
 using HSP.UI;
 using HSP.Vanilla.Scenes.MainMenuScene;

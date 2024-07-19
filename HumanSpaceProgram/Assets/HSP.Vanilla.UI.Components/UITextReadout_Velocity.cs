@@ -1,5 +1,5 @@
-﻿using HSP.Core.Physics;
-using HSP.ReferenceFrames;
+﻿using HSP.ReferenceFrames;
+using HSP.Trajectories;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
 

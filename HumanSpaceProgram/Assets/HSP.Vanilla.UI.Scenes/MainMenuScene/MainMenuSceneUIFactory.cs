@@ -1,4 +1,4 @@
-using HSP.Core.SceneManagement;
+using HSP.SceneManagement;
 using HSP.UI;
 using HSP.Vanilla.Scenes.DesignScene;
 using HSP.Vanilla.Scenes.EditorScene;

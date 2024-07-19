@@ -1,6 +1,6 @@
 ﻿using HSP.CelestialBodies;
-using HSP.Core;
 using HSP.ReferenceFrames;
+using HSP.Trajectories;
 using HSP.Vanilla.Components;
 using HSP.Vessels;
 using UnityEngine;

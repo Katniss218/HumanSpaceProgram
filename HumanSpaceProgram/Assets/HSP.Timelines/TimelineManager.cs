@@ -8,7 +8,7 @@ using UnityPlus.Serialization.ReferenceMaps;
 namespace HSP.Timelines
 {
     /// <summary>
-    /// Manages the currently loaded timeline (save/workspace). See <see cref="TimelineMetadata"/> and <see cref="SaveMetadata"/>.
+    /// Manages the currently loaded timeline (a.k.a. save/workspace). See <see cref="TimelineMetadata"/> and <see cref="SaveMetadata"/>.
     /// </summary>
     public class TimelineManager : SingletonMonoBehaviour<TimelineManager>
     {

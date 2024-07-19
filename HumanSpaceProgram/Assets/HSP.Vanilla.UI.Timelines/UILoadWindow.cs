@@ -1,5 +1,5 @@
 using HSP.Content.Timelines.Serialization;
-using HSP.Core.SceneManagement;
+using HSP.SceneManagement;
 using HSP.Timelines;
 using HSP.UI;
 using HSP.Vanilla.Scenes.GameplayScene;
