@@ -1,6 +1,5 @@
 ﻿using HSP.ReferenceFrames;
 using HSP.Time;
-using HSP.Vessels;
 using System;
 using System.Linq;
 using UnityEngine;
@@ -8,6 +7,15 @@ using UnityPlus.Serialization;
 
 namespace HSP.Vessels.Construction
 {
+    public static class HSPEvent_AFTER_CONSTRUCTION_SITE_CREATED
+    {
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".construction_site_created";
+    }
+
+    public static class HSPEvent_AFTER_CONSTRUCTION_SITE_DESTROYED
+    {
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".construction_site_destroyed";
+    }
     public static class FConstructionSite_Transform_Ex
     {
         /// <summary>
@@ -186,12 +194,12 @@ namespace HSP.Vessels.Construction
 
         void OnEnable()
         {
-            HSPEvent.EventManager.TryInvoke( HSPEvent_ConstructionSiteCreated.EventID, this );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_CONSTRUCTION_SITE_CREATED.ID, this );
         }
 
         void OnDisable()
         {
-            HSPEvent.EventManager.TryInvoke( HSPEvent_ConstructionSiteDestroyed.EventID, this );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_CONSTRUCTION_SITE_DESTROYED.ID, this );
         }
 
         void Update()

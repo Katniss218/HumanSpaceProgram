@@ -3,6 +3,14 @@ using UnityPlus.Serialization;
 
 namespace HSP.ReferenceFrames
 {
+    public static class HSPEvent_AFTER_ACTIVE_OBJECT_CHANGED
+    {
+        /// <summary>
+        /// Invoked after the active object changes.
+        /// </summary>
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".after_active_object_changed";
+    }
+
     /// <summary>
     /// Manages the currently active object.
     /// </summary>
@@ -21,7 +29,7 @@ namespace HSP.ReferenceFrames
                 if( value == instance._activeObject )
                     return;
                 instance._activeObject = value;
-                HSPEvent.EventManager.TryInvoke( HSPEvent.GAMEPLAY_AFTER_ACTIVE_OBJECT_CHANGE, null );
+                HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_ACTIVE_OBJECT_CHANGED.ID, null );
             }
         }
 

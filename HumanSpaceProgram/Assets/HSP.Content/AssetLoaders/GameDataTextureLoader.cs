@@ -7,8 +7,7 @@ namespace HSP.Content.AssetLoaders
 {
     public static class GameDataTextureLoader
     {
-        [HSPEventListener( HSPEvent.STARTUP_IMMEDIATELY, HSPEvent.NAMESPACE_HSP + ".load_textures" )]
-        private static void OnStartup()
+        public static void ReloadTextures()
         {
             string gameDataPath = HumanSpaceProgramContent.GetContentDirectoryPath();
             string[] modDirectories = Directory.GetDirectories( gameDataPath );

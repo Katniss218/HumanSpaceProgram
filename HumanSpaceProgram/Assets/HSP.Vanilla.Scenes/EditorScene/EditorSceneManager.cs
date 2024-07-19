@@ -3,6 +3,14 @@ using UnityEngine;
 namespace HSP.Vanilla.Scenes.EditorScene
 {
     /// <summary>
+    /// Invoked immediately after loading the design scene.
+    /// </summary>
+    public static class HSPEvent_STARTUP_EDITOR
+    {
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".startup.editor";
+    }
+
+    /// <summary>
     /// A Manager whose responsibility is to invoke the events relating to creation/destruction of the `editor` scene.
     /// </summary>
     public class EditorSceneManager : SingletonMonoBehaviour<EditorSceneManager>
@@ -14,7 +22,7 @@ namespace HSP.Vanilla.Scenes.EditorScene
 
         void Awake()
         {
-            HSPEvent.EventManager.TryInvoke( HSPEvent.STARTUP_DESIGN );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_STARTUP_EDITOR.ID );
         }
     }
 }

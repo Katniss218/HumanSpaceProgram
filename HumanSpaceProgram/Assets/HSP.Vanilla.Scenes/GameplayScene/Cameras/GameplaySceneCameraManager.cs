@@ -4,6 +4,22 @@ using UnityPlus.AssetManagement;
 namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
 {
     /// <summary>
+    /// Invoked before the first camera starts rendering.
+    /// </summary>
+    public static class HSPEvent_BEFORE_GAMEPLAY_SCENE_RENDERING
+    {
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".gameplayscene.rendering.before";
+    }
+
+    /// <summary>
+    /// Invoked after the last camera has finished rendering.
+    /// </summary>
+    public static class HSPEvent_AFTER_GAMEPLAY_SCENE_RENDERING
+    {
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".gameplayscene.rendering.after";
+    }
+
+    /// <summary>
     /// Manages the multi-camera setup of the gameplay scene.
     /// </summary>
     public class GameplaySceneCameraManager : SingletonMonoBehaviour<GameplaySceneCameraManager>
@@ -22,7 +38,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
                 instance._farCamera.SetTargetBuffers( instance._colorRT.colorBuffer, instance._farDepthRT.depthBuffer );
                 instance._nearCamera.SetTargetBuffers( instance._colorRT.colorBuffer, instance._nearDepthRT.depthBuffer );
 
-                HSPEvent.EventManager.TryInvoke( HSPEvent.GAMEPLAY_BEFORE_RENDERING );
+                HSPEvent.EventManager.TryInvoke( HSPEvent_BEFORE_GAMEPLAY_SCENE_RENDERING.ID );
             }
         }
 
@@ -30,7 +46,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
         {
             void OnPostRender()
             {
-                HSPEvent.EventManager.TryInvoke( HSPEvent.GAMEPLAY_AFTER_RENDERING );
+                HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_GAMEPLAY_SCENE_RENDERING.ID );
 
                 if( instance._colorRT != null )
                 {
@@ -215,7 +231,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
             AdjustCameras();
         }
 
-        [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, "vanilla.gameplayscene_camera" )]
+        [HSPEventListener( HSPEvent_STARTUP_GAMEPLAY.ID, "vanilla.gameplayscene_camera" )]
         private static void OnGameplaySceneLoad()
         {
             GameObject cameraPivotGameObject = new GameObject( "Camera Pivot" );

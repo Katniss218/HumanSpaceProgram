@@ -5,6 +5,14 @@ using UnityEngine;
 namespace HSP.Vanilla.Scenes.DesignScene
 {
     /// <summary>
+    /// Invoked after the currently active tool in the design scene has changed.
+    /// </summary>
+    public static class HSPEvent_AFTER_DESIGN_SCENE_TOOL_CHANGED
+    {
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".designscene.tool.changed";
+    }
+
+    /// <summary>
     /// Manages the registered and active design scene viewport tools.
     /// </summary>
     public class DesignSceneToolManager : SingletonMonoBehaviour<DesignSceneToolManager>
@@ -141,7 +149,7 @@ namespace HSP.Vanilla.Scenes.DesignScene
 
             instance._activeTool = tool;
             instance._activeTool.enabled = true;
-            HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_AFTER_TOOL_CHANGED );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_DESIGN_SCENE_TOOL_CHANGED.ID );
             return instance._activeTool;
         }
 

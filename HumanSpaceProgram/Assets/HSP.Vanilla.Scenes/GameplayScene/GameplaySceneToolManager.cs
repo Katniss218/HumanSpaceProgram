@@ -1,10 +1,17 @@
-using HSP.Vanilla.Scenes.DesignScene;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace HSP.Vanilla.Scenes.GameplayScene
 {
+    /// <summary>
+    /// Invoked after the currently active tool in the gameplay scene has changed.
+    /// </summary>
+    public static class HSPEvent_AFTER_GAMEPLAY_SCENE_TOOL_CHANGED
+    {
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".gameplayscene.tool.changed";
+    }
+
     /// <summary>
     /// Manages the registered and active gameplay scene viewport tools.
     /// </summary>
@@ -142,7 +149,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene
 
             instance._activeTool = tool;
             instance._activeTool.enabled = true;
-            HSPEvent.EventManager.TryInvoke( HSPEvent.GAMEPLAY_AFTER_TOOL_CHANGED );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_GAMEPLAY_SCENE_TOOL_CHANGED.ID );
             return instance._activeTool;
         }
     }

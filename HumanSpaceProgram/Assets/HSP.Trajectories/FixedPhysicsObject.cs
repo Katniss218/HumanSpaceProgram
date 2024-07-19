@@ -29,7 +29,7 @@ namespace HSP.Trajectories
         public Vector3 Velocity
         {
             get => Vector3.zero;
-            set => this._rb.velocity = Vector3.zero;
+            set { return; }
         }
 
         public Vector3 Acceleration { get; private set; }
@@ -37,7 +37,7 @@ namespace HSP.Trajectories
         public Vector3 AngularVelocity
         {
             get => Vector3.zero;
-            set => this._rb.angularVelocity = Vector3.zero;
+            set { return; }
         }
 
         public Vector3 AngularAcceleration { get; private set; }
@@ -99,11 +99,12 @@ namespace HSP.Trajectories
             _rb.useGravity = false;
             _rb.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
             _rb.interpolation = RigidbodyInterpolation.None; // DO NOT INTERPOLATE. Doing so will desync `rigidbody.position` and `transform.position`.
-            _rb.isKinematic = false;
+            _rb.isKinematic = true;
         }
 
         void FixedUpdate()
         {
+            _rb.isKinematic = true;
             this.Acceleration = Vector3.zero;
             this.AngularAcceleration = Vector3.zero;
         }
@@ -129,12 +130,12 @@ namespace HSP.Trajectories
 
         void OnEnable()
         {
-            _rb.isKinematic = false; // Can't do `enabled = false` (doesn't exist) for a rigidbody, so we set it to kinematic instead.
+            _rb.isKinematic = true;
         }
 
         void OnDisable()
         {
-            _rb.isKinematic = true; // Can't do `enabled = false` (doesn't exist) for a rigidbody, so we set it to kinematic instead.
+            _rb.isKinematic = true;
         }
 
 
@@ -146,7 +147,7 @@ namespace HSP.Trajectories
                 ("mass", new Member<FixedPhysicsObject, float>( o => o.Mass )),
                 ("local_center_of_mass", new Member<FixedPhysicsObject, Vector3>( o => o.LocalCenterOfMass )),
 
-                ("DO_NOT_TOUCH", new Member<FixedPhysicsObject, bool>( o => false, (o, value) => o._rb.isKinematic = false)), // TODO - isKinematic member is a hack.
+                ("DO_NOT_TOUCH", new Member<FixedPhysicsObject, bool>( o => true, (o, value) => o._rb.isKinematic = true)), // TODO - isKinematic member is a hack.
             };
         }
     }

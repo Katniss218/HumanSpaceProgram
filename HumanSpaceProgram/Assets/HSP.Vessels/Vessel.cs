@@ -5,6 +5,15 @@ using UnityEngine;
 
 namespace HSP.Vessels
 {
+    public static class HSPEvent_AFTER_VESSEL_HIERARCHY_CHANGED
+    {
+#warning TODO - maybe remove the dependency on hspevent.eventmanager and make this type-safe? 
+        // (by having a separate event for each... event. And getting rid of the eventmanager completely)
+        // It would also need some marker attribute on the events to tell the HSPEventListener attribute where to add the listeners.
+
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".vessel_hierachy_changed";
+    }
+
     /// <summary>
     /// A vessel is a moving object consisting of a hierarchy of "parts".
     /// </summary>
@@ -36,7 +45,7 @@ namespace HSP.Vessels
                 if( value != null )
                     value.SetParent( this.transform, true );
 
-                HSPEvent.EventManager.TryInvoke( HSPEvent_VesselHierarchyChanged.EventID, (this, oldRootPart, value) );
+                HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_VESSEL_HIERARCHY_CHANGED.ID, (this, oldRootPart, value) );
 
                 RecalculatePartCache();
             }

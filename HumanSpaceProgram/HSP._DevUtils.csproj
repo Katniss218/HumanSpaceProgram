@@ -981,6 +981,10 @@
       <Project>{5B21ACE1-5E92-EEB2-818D-AF6D6AE9F824}</Project>
       <Name>HSP.SceneManagement</Name>
     </ProjectReference>
+    <ProjectReference Include="HSP.Timelines.csproj">
+      <Project>{C443A3BB-4D58-3A1D-D085-E8AEA15B2BC0}</Project>
+      <Name>HSP.Timelines</Name>
+    </ProjectReference>
     <ProjectReference Include="HSP.Trajectories.csproj">
       <Project>{57FA29CC-9026-83EE-F242-EA051DEA7649}</Project>
       <Name>HSP.Trajectories</Name>

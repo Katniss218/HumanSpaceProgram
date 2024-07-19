@@ -32,8 +32,7 @@ namespace HSP.Content.Vessels.AssetLoaders
             return SerializationUnit.Deserialize<GameObject>( data, refMap );
         }
 
-        [HSPEventListener( HSPEvent.STARTUP_IMMEDIATELY, HSPEvent.NAMESPACE_HSP + ".load_vessels" )]
-        private static void OnStartup()
+        public static void ReloadVesselsAsParts()
         {
             string modsPath = HumanSpaceProgram.GetSavedVesselsDirectoryPath();
             string[] modDirectories = Directory.GetDirectories( modsPath );

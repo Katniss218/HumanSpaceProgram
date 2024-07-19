@@ -3,6 +3,14 @@ using UnityEngine;
 namespace HSP.Vanilla.Scenes.DesignScene
 {
     /// <summary>
+    /// Invoked immediately after loading the design scene.
+    /// </summary>
+    public static class HSPEvent_STARTUP_DESIGN
+    {
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".startup.design";
+    }
+
+    /// <summary>
     /// A Manager whose responsibility is to invoke the events relating to creation/destruction of the `design` scene.
     /// </summary>
     public class DesignSceneManager : SingletonMonoBehaviour<DesignSceneManager>
@@ -14,7 +22,7 @@ namespace HSP.Vanilla.Scenes.DesignScene
 
         void Awake()
         {
-            HSPEvent.EventManager.TryInvoke( HSPEvent.STARTUP_DESIGN );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_STARTUP_DESIGN.ID );
         }
     }
 }

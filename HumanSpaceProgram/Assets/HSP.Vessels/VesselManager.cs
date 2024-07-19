@@ -4,6 +4,22 @@ using UnityEngine;
 namespace HSP.Vessels
 {
     /// <summary>
+    /// Invoked after a vessel is first created and registered.
+    /// </summary>
+    public static class HSPEvent_AFTER_VESSEL_REGISTERED
+    {
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".vessel.registered.after";
+    }
+
+    /// <summary>
+    /// Invoked after a vessel is destroyed and unregistered.
+    /// </summary>
+    public static class HSPEvent_AFTER_VESSEL_UNREGISTERED
+    {
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".vessel.unregistered.after";
+    }
+
+    /// <summary>
     /// Manages loading, unloading, switching, etc of vessels.
     /// </summary>
     public class VesselManager : SingletonMonoBehaviour<VesselManager>
@@ -41,7 +57,7 @@ namespace HSP.Vessels
             //     throw new InvalidSceneManagerException( $"{nameof( VesselManager )} is only available in the gameplay scene." );
 
             instance._vessels.Add( vessel );
-            HSPEvent.EventManager.TryInvoke( HSPEvent.GAMEPLAY_AFTER_VESSEL_REGISTERED, vessel );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_VESSEL_REGISTERED.ID, vessel );
         }
 
         internal static void Unregister( Vessel vessel )
@@ -50,7 +66,7 @@ namespace HSP.Vessels
             //     throw new InvalidSceneManagerException( $"{nameof( VesselManager )} is only available in the gameplay scene." );
 
             instance._vessels.Remove( vessel );
-            HSPEvent.EventManager.TryInvoke( HSPEvent.GAMEPLAY_AFTER_VESSEL_UNREGISTERED, vessel );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_VESSEL_UNREGISTERED.ID, vessel );
         }
     }
 }

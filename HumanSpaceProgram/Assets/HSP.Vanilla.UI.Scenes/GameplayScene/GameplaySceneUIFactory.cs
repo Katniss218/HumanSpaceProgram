@@ -4,7 +4,6 @@ using HSP.UI.Windows;
 using HSP.Vanilla.Scenes.GameplayScene;
 using HSP.Vanilla.Scenes.GameplayScene.Tools;
 using HSP.Vanilla.UI.Components;
-using HSP.Vanilla.UI;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
@@ -17,8 +16,8 @@ namespace HSP.Vanilla.UI.Scenes.GameplayScene
     {
         static UIPanel _mainPanel; // TODO - replace this with individual elements
 
-        [HSPEventListener( HSPEvent.GAMEPLAY_AFTER_ACTIVE_OBJECT_CHANGE, HSPEvent.NAMESPACE_HSP + ".gameplay_ui" )]
-        [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, HSPEvent.NAMESPACE_HSP + ".gameplay_ui", After = new[] { "add_active_object_manager" } )]
+        [HSPEventListener( HSPEvent_AFTER_ACTIVE_OBJECT_CHANGED.ID, HSPEvent.NAMESPACE_HSP + ".gameplay_ui" )]
+        [HSPEventListener( HSPEvent_STARTUP_GAMEPLAY.ID, HSPEvent.NAMESPACE_HSP + ".gameplay_ui", After = new[] { "add_active_object_manager" } )]
         public static void CreateUI()
         {
             UICanvas canvas = CanvasManager.Get( CanvasName.STATIC );

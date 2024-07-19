@@ -119,7 +119,7 @@ namespace HSP.Vanilla.Scenes.MainMenuScene.Cameras
             AdjustCameras();
         }
 
-        [HSPEventListener( HSPEvent.STARTUP_MAINMENU, "vanilla.mainmenuscene_camera" )]
+        [HSPEventListener( HSPEvent_STARTUP_MAIN_MENU.ID, "vanilla.mainmenuscene_camera" )]
         private static void OnGameplaySceneLoad()
         {
             GameObject cameraPivotGameObject = new GameObject( "Camera Pivot" );

@@ -10,7 +10,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene
 {
     public static class VesselManager_Serialization
     {
-        [HSPEventListener( HSPEvent.TIMELINE_SAVE, HSPEvent.NAMESPACE_HSP + ".serialize_vessels" )]
+        [HSPEventListener( HSPEvent_ON_TIMELINE_SAVE.ID, HSPEvent.NAMESPACE_HSP + ".serialize_vessels" )]
         private static void OnBeforeSave( TimelineManager.SaveEventData e )
         {
             Directory.CreateDirectory( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels" ) );
@@ -28,7 +28,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene
             }
         }
 
-        [HSPEventListener( HSPEvent.TIMELINE_LOAD, HSPEvent.NAMESPACE_HSP + ".deserialize_vessels" )]
+        [HSPEventListener( HSPEvent_ON_TIMELINE_LOAD.ID, HSPEvent.NAMESPACE_HSP + ".deserialize_vessels" )]
         private static void OnLoad( TimelineManager.LoadEventData e )
         {
             string path = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels" );

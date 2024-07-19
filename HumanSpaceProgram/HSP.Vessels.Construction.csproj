@@ -60,7 +60,6 @@
   <ItemGroup>
     <Compile Include="Assets\HSP.Vessels.Construction\FConstructionSite.cs" />
     <Compile Include="Assets\HSP.Vessels.Construction\FConstructible.cs" />
-    <Compile Include="Assets\HSP.Vessels.Construction\_HSPEvents.cs" />
     <Compile Include="Assets\HSP.Vessels.Construction\GhostableContext.cs" />
     <Compile Include="Assets\HSP.Vessels.Construction\ConstructionState.cs" />
   </ItemGroup>

@@ -74,7 +74,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
                 _cmdMergeDepth.Blit( null, BuiltinRenderTextureType.CurrentActive, _mergeDepthMaterial, 1 );
         }
 
-        [HSPEventListener( HSPEvent.GAMEPLAY_BEFORE_RENDERING, "merge_depth" )]
+        [HSPEventListener( HSPEvent_BEFORE_GAMEPLAY_SCENE_RENDERING.ID, "merge_depth" )]
         private static void OnBeforeRendering()
         {
             if( instance._mergeDepthMaterial == null )
@@ -93,7 +93,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
             instance.EffectCamera.AddCommandBuffer( CameraEvent.BeforeForwardOpaque, instance._cmdMergeDepth );
         }
 
-        [HSPEventListener( HSPEvent.GAMEPLAY_AFTER_RENDERING, "merge_depth" )]
+        [HSPEventListener( HSPEvent_AFTER_GAMEPLAY_SCENE_RENDERING.ID, "merge_depth" )]
         private static void OnAfterRendering()
         {
             // tex used as output for depth merging.

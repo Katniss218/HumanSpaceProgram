@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace HSP.Vanilla.Scenes.GameplayScene
 {
-    public class OnSctiveObjectChange : MonoBehaviour
+    public class OnActiveObjectChangeListener : MonoBehaviour
     {
-        [HSPEventListener( HSPEvent.GAMEPLAY_AFTER_ACTIVE_OBJECT_CHANGE, HSPEvent.NAMESPACE_HSP + ".reframe_active" )]
+        [HSPEventListener( HSPEvent_AFTER_ACTIVE_OBJECT_CHANGED.ID, HSPEvent.NAMESPACE_HSP + ".try_set_scene_reference_frame" )]
         private static void OnActiveObjectChange()
         {
             SceneReferenceFrameManager.TryFixActiveObjectOutOfBounds();

@@ -1,4 +1,5 @@
 ﻿using HSP.Content.Vessels.Serialization;
+using HSP.ReferenceFrames;
 using HSP.Time;
 using HSP.Vessels;
 using System;
@@ -10,6 +11,38 @@ using UnityPlus.Serialization.DataHandlers;
 
 namespace HSP.Vanilla.Scenes.DesignScene
 {
+    /// <summary>
+    /// Invoked before the vessel is loaded in the design scene.
+    /// </summary>
+    public static class HSPEvent_BEFORE_DESIGN_SCENE_VESSEL_LOADED
+    {
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".designscene.load.before";
+    }
+
+    /// <summary>
+    /// Invoked after the vessel is loaded in the design scene.
+    /// </summary>
+    public static class HSPEvent_AFTER_DESIGN_SCENE_VESSEL_LOADED
+    {
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".designscene.load.after";
+    }
+
+    /// <summary>
+    /// Invoked before the vessel is saved in the design scene.
+    /// </summary>
+    public static class HSPEvent_BEFORE_DESIGN_SCENE_VESSEL_SAVED
+    {
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".designscene.save.before";
+    }
+
+    /// <summary>
+    /// Invoked after the vessel is saved in the design scene.
+    /// </summary>
+    public static class HSPEvent_AFTER_DESIGN_SCENE_VESSEL_SAVED
+    {
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".designscene.save.after";
+    }
+
     /// <summary>
     /// Manages the object (vessel/building/etc) being built in the design scene.
     /// </summary>
@@ -34,28 +67,13 @@ namespace HSP.Vanilla.Scenes.DesignScene
             if( obj == null )
                 return false;
 
-            return instance._looseParts.Contains( obj.root ) || obj.IsChildOf( instance._designObj.transform );
-        }
-
-        /// <summary>
-        /// Tries to pick up the specified object (unparents it, and removes from actionable objects).
-        /// </summary>
-        public static bool TryDetach( Transform obj )
-        {
-            if( !IsLooseOrPartOfDesignObject( obj ) )
-            {
-                return false;
-            }
-
-            if( obj == instance._designObj.RootPart )
-            {
-                instance._designObj.RootPart = null;
+            if( instance._looseParts.Contains( obj.root ) )
                 return true;
-            }
 
-            instance._looseParts.Remove( obj ); // sometimes will do nothing, since the part might not be a loose part.
-            obj.SetParent( null );
-            return true;
+            if( instance._designObj != null && obj.IsChildOf( instance._designObj.transform ) )
+                return true;
+
+            return false;
         }
 
         /// <summary>
@@ -123,11 +141,38 @@ namespace HSP.Vanilla.Scenes.DesignScene
                 return false;
             }
 
-            if( DesignObject.RootPart != null )
+            if( instance._designObj != null )
             {
-                Destroy( DesignObject.RootPart );
+                VesselFactory.Destroy( instance._designObj );
+                instance._designObj = null;
             }
-            DesignObject.RootPart = obj;
+            instance._designObj = VesselFactory.CreatePartless( Vector3Dbl.zero, QuaternionDbl.identity, Vector3.zero, Vector3.zero );
+            ActiveObjectManager.ActiveObject = instance._designObj.RootPart;
+            instance._designObj.RootPart = obj;
+            return true;
+        }
+
+        /// <summary>
+        /// Tries to pick up the specified object (unparents it, and removes from actionable objects).
+        /// </summary>
+        public static bool TryDetach( Transform obj )
+        {
+            if( !IsLooseOrPartOfDesignObject( obj ) )
+            {
+                return false;
+            }
+
+            if( obj == instance._designObj.RootPart )
+            {
+                instance._designObj.RootPart = null;
+                VesselFactory.Destroy( instance._designObj );
+                ActiveObjectManager.ActiveObject = null;
+                instance._designObj = null;
+                return true;
+            }
+
+            instance._looseParts.Remove( obj ); // sometimes will do nothing, since the part might not be a loose part.
+            obj.SetParent( null );
             return true;
         }
 
@@ -177,15 +222,6 @@ namespace HSP.Vanilla.Scenes.DesignScene
             5. Get the IDs to persist for later.
         */
 
-        void Awake()
-        {
-            GameObject gameObject = new GameObject( $"DesignObject" );
-
-            _designObj = gameObject.AddComponent<Vessel>();
-            _designObj.transform.SetPositionAndRotation( Vector3.zero, Quaternion.identity );
-        }
-
-
 
         public static void SaveVessel()
         {
@@ -193,13 +229,13 @@ namespace HSP.Vanilla.Scenes.DesignScene
             Directory.CreateDirectory( CurrentVesselMetadata.GetRootDirectory() );
             JsonSerializedDataHandler _designObjDataHandler = new JsonSerializedDataHandler( Path.Combine( CurrentVesselMetadata.GetRootDirectory(), "gameobjects.json" ) );
 
-            HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_BEFORE_SAVE, null );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_BEFORE_DESIGN_SCENE_VESSEL_SAVED.ID, null );
 
             var data = SerializationUnit.Serialize( GetGameObject() );
 
             CurrentVesselMetadata.SaveToDisk();
             _designObjDataHandler.Write( data );
-            HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_AFTER_SAVE, null );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_DESIGN_SCENE_VESSEL_SAVED.ID, null );
         }
 
         public static void LoadVessel( string vesselId )
@@ -210,13 +246,13 @@ namespace HSP.Vanilla.Scenes.DesignScene
             Directory.CreateDirectory( loadedVesselMetadata.GetRootDirectory() );
             JsonSerializedDataHandler _designObjDataHandler = new JsonSerializedDataHandler( Path.Combine( loadedVesselMetadata.GetRootDirectory(), "gameobjects.json" ) );
 
-            HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_BEFORE_LOAD, null );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_BEFORE_DESIGN_SCENE_VESSEL_LOADED.ID, null );
             CurrentVesselMetadata = loadedVesselMetadata; // CurrentVesselMetadata should be set after invoking before load.
 
             GameObject go = SerializationUnit.Deserialize<GameObject>( _designObjDataHandler.Read() );
 
             DesignObject.RootPart = go.transform;
-            HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_AFTER_LOAD, null );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_DESIGN_SCENE_VESSEL_LOADED.ID, null );
         }
 
         // ------

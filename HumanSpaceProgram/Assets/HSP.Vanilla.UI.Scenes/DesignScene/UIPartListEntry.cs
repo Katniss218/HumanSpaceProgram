@@ -21,7 +21,7 @@ namespace HSP.Vanilla.UI.Scenes.DesignScene
             PickTool pickTool = DesignSceneToolManager.UseTool<PickTool>();
 
             GameObject spawnedPart = PartRegistry.Load( _part.ID );
-            if( DesignVesselManager.DesignObject.RootPart == null )
+            if( DesignVesselManager.DesignObject == null )
             {
                 spawnedPart.transform.localPosition = Vector3.zero;
                 spawnedPart.transform.localRotation = Quaternion.identity;

@@ -1,6 +1,9 @@
-using HSP;
+using HSP.Vanilla.Scenes.AlwaysLoadedScene;
+using HSP.Vanilla.Scenes.DesignScene;
 using HSP.Vanilla.Scenes.DesignScene.Cameras;
+using HSP.Vanilla.Scenes.GameplayScene;
 using HSP.Vanilla.Scenes.GameplayScene.Cameras;
+using HSP.Vanilla.Scenes.MainMenuScene;
 using HSP.Vanilla.Scenes.MainMenuScene.Cameras;
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
@@ -10,7 +13,7 @@ namespace HSP.Vanilla.Scenes.PostProcessing
 {
     public class OnStartup : MonoBehaviour
     {
-        [HSPEventListener( HSPEvent.STARTUP_IMMEDIATELY, "vanilla.pppvolume" )]
+        [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, "vanilla.pppvolume" )]
         private static void AddPPPVolume()
         {
             GameObject ppp = new GameObject( "PPP" );
@@ -23,7 +26,7 @@ namespace HSP.Vanilla.Scenes.PostProcessing
             ppv.profile = AssetRegistry.Get<PostProcessProfile>( "builtin::Resources/PPP" );
         }
 
-        [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, "vanilla.gameplayscene_postprocessing", After = new[] { "vanilla.gameplayscene_camera" } )]
+        [HSPEventListener( HSPEvent_STARTUP_GAMEPLAY.ID, "vanilla.gameplayscene_postprocessing", After = new[] { "vanilla.gameplayscene_camera" } )]
         private static void CreatePostProcessingLayers()
         {
             void SetupPPL( PostProcessLayer layer )
@@ -53,7 +56,7 @@ namespace HSP.Vanilla.Scenes.PostProcessing
             SetupPPL( uiPPL );
         }
 
-        [HSPEventListener( HSPEvent.STARTUP_MAINMENU, "vanilla.mainmenuscene_postprocessing", After = new[] { "vanilla.mainmenuscene_camera" } )]
+        [HSPEventListener( HSPEvent_STARTUP_MAIN_MENU.ID, "vanilla.mainmenuscene_postprocessing", After = new[] { "vanilla.mainmenuscene_camera" } )]
         private static void CreatePostProcessingLayers2()
         {
             void SetupPPL( PostProcessLayer layer )
@@ -80,7 +83,7 @@ namespace HSP.Vanilla.Scenes.PostProcessing
             SetupPPL( uiPPL );
         }
 
-        [HSPEventListener( HSPEvent.STARTUP_DESIGN, "vanilla.designscene_postprocessing", After = new[] { "vanilla.designscene_camera" } )]
+        [HSPEventListener( HSPEvent_STARTUP_DESIGN.ID, "vanilla.designscene_postprocessing", After = new[] { "vanilla.designscene_camera" } )]
         private static void CreatePostProcessingLayers3()
         {
             void SetupPPL( PostProcessLayer layer )

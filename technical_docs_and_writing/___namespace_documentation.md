@@ -10,7 +10,8 @@ There is a "binder" layer (HSP.Vanilla, or more specifically HSP.Vanilla.Scenes)
 
 Reference rules:
 
-- Only `HSP.Vanilla.{subnamespace}` can reference `HSP.Vanilla` and `HSP.Vanilla.{subnamespace}`
+- Only `HSP.Vanilla.{subnamespace}` can reference `HSP.Vanilla` and `HSP.Vanilla.{other_subnamespace}`
+    I.e. you can't reference from a higher layer.
 
 If something doesn't reference anything other than `UnityPlus.{subnamespace}` or `HSP`, it shouldn't be made aware of anything else.
 
@@ -30,6 +31,95 @@ If something doesn't reference anything other than `UnityPlus.{subnamespace}` or
 
 
 
+
+## Existing Namespaces:
+
+#### Layer 1 ('library' layer):
+
+HSP
+HSP._DevUtils                           - Utilities for developers, temporary assets.
+HSP.CelestialBodies
+HSP.Content
+HSP.Content.Trajectories                - Metadata for timelines.
+HSP.Content.Vessels                     - Asset loaders and metadata for vessels/parts.
+HSP.ControlSystems                      - The core of the system for sending and receiving control signals.
+HSP.Input
+HSP.ReferenceFrames
+HSP.ResourceFlow
+HSP.SceneManagement                     - Scene management and loading.
+HSP.ScreenCapturing
+HSP.Timelines
+HSP.Trajectories                        - Orbital mechanics and related.
+HSP.UI                                  - Shared UI code. Possibly merge into UnityPlus.
+HSP.Vessels
+HSP.Vessels.Construction
+HSP.ViewportTools                       - Viewport gizmos for translating, rotating, and scaling. Possibly merge into UnityPlus.
+
+#### Layer 2 ('glue' layer):
+
+HSP.Vanilla                             - Shared vanilla code. Can only reference `HSP`. Referencees go into a subnamespace.
+HSP.Vanilla.Content
+HSP.Vanilla.Components                  - Vanilla implementations of most FComponents.
+HSP.Vanilla.Scenes                      - Defines how each scene is set up in vanilla.
+HSP.Vanilla.Scenes.PostProcessing       - Adds post processing to the vanilla scenes.
+HSP.Vanilla.UI                          - Shared vanilla UI code.
+HSP.Vanilla.UI.Components
+HSP.Vanilla.UI.Scenes
+HSP.Vanilla.UI.Timelines
+HSP.Vanilla.UI.Vessels
+HSP.Vanilla.UI.Vessels.Construction
+
+
+
+## Likely Future Namespaces:
+
+HSP.Audio
+HSP.Audio.<category>
+HSP.Audio.Music
+
+HSP.Settings
+HSP.Vanilla.UI.Settings
+> in-game settings ui
+
+HSP.Vanilla.Scenes
+- SettingsScene
+HSP.Vanilla.UI.Scenes
+- SettingsScene
+
+HSP.Vanilla.UI.Trajectories
+> orbit drawers, etc.
+
+HSP.Voxelization
+HSP.Voxelization.Vessels
+
+HSP.Aerodynamics
+> atmo and water drag
+
+HSP.Buoyancy
+> separate from drag, but will need to use the same voxel data
+
+HSP.VisualEffects
+> core function for plumes and shit, no specific implementations
+
+HSP.VisualEffects.ResourceFlow
+> integration with resflow
+
+
+HSP.DataFixer
+> upgrading old save files
+HSP.Vanilla.DataFixer
+> actual implementations of things to fix between versions.
+
+HSP.MapView
+
+HSP.Scenarios
+> tutorial goes here
+
+HSP.Terraforming
+> editing the heightmaps of planets, building spaceports, etc.
+
+
+UnityPlus.Localization
 
 
 

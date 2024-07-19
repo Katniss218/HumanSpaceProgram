@@ -1,9 +1,11 @@
 ﻿
+using HSP.Vanilla.Scenes.EditorScene;
+
 namespace HSP.Vanilla.Scenes.DesignScene.Tools
 {
     public static class VanillaToolRegisterer
     {
-        [HSPEventListener( HSPEvent.STARTUP_DESIGN, "designtools.vanilla.register" )]
+        [HSPEventListener( HSPEvent_STARTUP_DESIGN.ID, "designtools.vanilla.register" )]
         private static void RegisterTool()
         {
             DesignSceneToolManager.RegisterTool<PickTool>();

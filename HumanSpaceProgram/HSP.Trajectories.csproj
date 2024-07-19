@@ -61,10 +61,10 @@
     <Compile Include="Assets\HSP.Trajectories\Vessel_Ex.cs" />
     <Compile Include="Assets\HSP.Trajectories\Orbit.cs" />
     <Compile Include="Assets\HSP.Trajectories\PinnedPhysicsObject.cs" />
+    <Compile Include="Assets\HSP.Trajectories\FixedPhysicsObject.cs" />
     <Compile Include="Assets\HSP.Trajectories\OrbitalFrame.cs" />
     <Compile Include="Assets\HSP.Trajectories\Components\FAnchor.cs" />
     <Compile Include="Assets\HSP.Trajectories\FreePhysicsObject.cs" />
-    <Compile Include="Assets\HSP.Trajectories\FixedPhysicsObject.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Trajectories\___HSP.Trajectories.asmdef" />

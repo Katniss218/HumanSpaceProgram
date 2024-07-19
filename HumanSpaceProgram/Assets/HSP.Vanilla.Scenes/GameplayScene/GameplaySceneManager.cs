@@ -3,6 +3,14 @@ using UnityEngine;
 namespace HSP.Vanilla.Scenes.GameplayScene
 {
     /// <summary>
+    /// Invoked immediately after loading the gameplay scene.
+    /// </summary>
+    public static class HSPEvent_STARTUP_GAMEPLAY
+    {
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".startup.gameplay";
+    }
+
+    /// <summary>
     /// A Manager whose responsibility is to invoke the events relating to creation/destruction of the `gameplay` scene.
     /// </summary>
     public class GameplaySceneManager : SingletonMonoBehaviour<GameplaySceneManager>
@@ -14,7 +22,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene
 
         void Awake()
         {
-            HSPEvent.EventManager.TryInvoke( HSPEvent.STARTUP_GAMEPLAY );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_STARTUP_GAMEPLAY.ID );
         }
     }
 }

@@ -1,3 +1,4 @@
+using HSP.Vanilla.Scenes.EditorScene;
 using UnityEngine;
 
 namespace HSP.Vanilla.Scenes.DesignScene.Cameras
@@ -119,7 +120,7 @@ namespace HSP.Vanilla.Scenes.DesignScene.Cameras
             AdjustCameras();
         }
 
-        [HSPEventListener( HSPEvent.STARTUP_DESIGN, "vanilla.designscene_camera" )]
+        [HSPEventListener( HSPEvent_STARTUP_DESIGN.ID, HSPEvent.NAMESPACE_HSP + "designscene_camera" )]
         private static void OnGameplaySceneLoad()
         {
             GameObject cameraPivotGameObject = new GameObject( "Camera Pivot" );

@@ -1,9 +1,11 @@
-﻿using HSP.CelestialBodies.Surfaces;
+﻿using HSP.CelestialBodies;
+using HSP.CelestialBodies.Surfaces;
+using HSP.Timelines;
 using HSP.Vessels;
 using System.Linq;
 using UnityEngine;
 
-namespace HSP.CelestialBodies
+namespace HSP._DevUtils
 {
     public static class VanillaPlanetarySystemFactory
     {
@@ -15,8 +17,8 @@ namespace HSP.CelestialBodies
             return cb;
         }
 
-        [HSPEventListener( HSPEvent.TIMELINE_BEFORE_NEW, HSPEvent.NAMESPACE_HSP + ".create.universe" )]
-        [HSPEventListener( HSPEvent.TIMELINE_BEFORE_LOAD, HSPEvent.NAMESPACE_HSP + ".create.universe" )]
+        [HSPEventListener( HSPEvent_BEFORE_TIMELINE_NEW.ID, HSPEvent.NAMESPACE_HSP + ".create_universe" )]
+        [HSPEventListener( HSPEvent_BEFORE_TIMELINE_LOAD.ID, HSPEvent.NAMESPACE_HSP + ".create_universe" )]
         public static void CreateDefaultPlanetarySystem( object e )
         {
             QuaternionDbl orientation = Quaternion.Euler( 270, 0, 0 );

@@ -4,8 +4,11 @@ using HSP.Content;
 using HSP.Content.Vessels.Serialization;
 using HSP.ReferenceFrames;
 using HSP.ResourceFlow;
+using HSP.Timelines;
 using HSP.Trajectories;
 using HSP.Vanilla.Components;
+using HSP.Vanilla.Scenes.AlwaysLoadedScene;
+using HSP.Vanilla.Scenes.DesignScene;
 using HSP.Vessels;
 using System;
 using System.Collections.Generic;
@@ -39,14 +42,14 @@ namespace HSP._DevUtils
         static Vessel launchSite;
         static Vessel vessel;
 
-        [HSPEventListener( HSPEvent.STARTUP_IMMEDIATELY, "devutils.load_game_data" )]
+        [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, "devutils.load_game_data" )]
         static void LoadGameData( object e )
         {
             AssetRegistry.Register( "substance.f", new Substance() { Density = 1000, DisplayName = "Fuel", UIColor = new Color( 1.0f, 0.3764706f, 0.2509804f ) } );
             AssetRegistry.Register( "substance.ox", new Substance() { Density = 1000, DisplayName = "Oxidizer", UIColor = new Color( 0.2509804f, 0.5607843f, 1.0f ) } );
         }
 
-        [HSPEventListener( HSPEvent.TIMELINE_AFTER_NEW, "devutils.timeline.new.after" )]
+        [HSPEventListener( HSPEvent_AFTER_TIMELINE_NEW.ID, "devutils.timeline.new.after" )]
         static void OnAfterCreateDefault( object e )
         {
             CelestialBody body = CelestialBodyManager.Get( "main" );
@@ -115,8 +118,6 @@ namespace HSP._DevUtils
                 Directory.CreateDirectory( loadedVesselMetadata.GetRootDirectory() );
                 JsonSerializedDataHandler _designObjDataHandler = new JsonSerializedDataHandler( Path.Combine( loadedVesselMetadata.GetRootDirectory(), "gameobjects.json" ) );
                 var data = _designObjDataHandler.Read();
-
-                HSPEvent.EventManager.TryInvoke( HSPEvent.DESIGN_BEFORE_LOAD, null );
 
                 GameObject loadedObj = SerializationUnit.Deserialize<GameObject>( data );
                

@@ -1,5 +1,6 @@
 ﻿using HSP.ReferenceFrames;
 using HSP.UI;
+using HSP.Vanilla.Scenes.GameplayScene;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
 
@@ -12,8 +13,8 @@ namespace HSP.Vanilla.UI.Components
     {
         private static UISequencerPanel _sequencerPanel;
 
-        [HSPEventListener( HSPEvent.GAMEPLAY_AFTER_ACTIVE_OBJECT_CHANGE, HSPEvent.NAMESPACE_HSP + ".ui.fsequencer" )]
-        [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, HSPEvent.NAMESPACE_HSP + ".ui.fsequencer" )]
+        [HSPEventListener( HSPEvent_AFTER_ACTIVE_OBJECT_CHANGED.ID, HSPEvent.NAMESPACE_HSP + ".ui.fsequencer" )]
+        [HSPEventListener( HSPEvent_STARTUP_GAMEPLAY.ID, HSPEvent.NAMESPACE_HSP + ".ui.fsequencer" )]
         public static void CreateUI()
         {
             UICanvas canvas = CanvasManager.Get( CanvasName.STATIC );

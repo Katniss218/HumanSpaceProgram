@@ -56,10 +56,10 @@ namespace HSP.Input
 		public const string DESIGN_PART_ROTATE_ZP = "vanilla.gameplayc_rotate_zp";
 		public const string DESIGN_PART_ROTATE_ZN = "vanilla.gameplayc_rotate_zn";
 
-		[HSPEventListener( HSPEvent.STARTUP_IMMEDIATELY, HSPEvent.NAMESPACE_HSP + ".bind_input_channels" )]
-		static void Event()
+		public static void BindInputs()
 		{
-			HierarchicalInputManager.BindInput( HierarchicalInputChannel.VIEWPORT_PRIMARY_DOWN, new KeyDownBinding( 0, KeyCode.Mouse0 ) );
+#warning TODO - these input channels should be moved into the respective classes.
+            HierarchicalInputManager.BindInput( HierarchicalInputChannel.VIEWPORT_PRIMARY_DOWN, new KeyDownBinding( 0, KeyCode.Mouse0 ) );
 			HierarchicalInputManager.BindInput( HierarchicalInputChannel.VIEWPORT_PRIMARY, new KeyHoldBinding( 0, KeyCode.Mouse0 ) );
 			HierarchicalInputManager.BindInput( HierarchicalInputChannel.VIEWPORT_PRIMARY_UP, new KeyUpBinding( 0, KeyCode.Mouse0 ) );
 

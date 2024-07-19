@@ -58,7 +58,6 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.Vessels\_HSPEvents.cs" />
     <Compile Include="Assets\HSP.Vessels\Vessel.Serialization.cs" />
     <Compile Include="Assets\HSP.Vessels\VesselManager.cs" />
     <Compile Include="Assets\HSP.Vessels\VesselFactory.cs" />

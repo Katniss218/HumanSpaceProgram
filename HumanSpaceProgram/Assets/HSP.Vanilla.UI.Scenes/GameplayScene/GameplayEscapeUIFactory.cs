@@ -1,6 +1,7 @@
 ﻿using HSP.SceneManagement;
 using HSP.Time;
 using HSP.UI;
+using HSP.Vanilla.Scenes.GameplayScene;
 using HSP.Vanilla.Scenes.MainMenuScene;
 using HSP.Vanilla.UI.Timelines;
 using UnityEngine;
@@ -14,7 +15,7 @@ namespace HSP.Vanilla.UI.Scenes.GameplayScene
     {
         static UIWindow escapeMenuWindow;
 
-        [HSPEventListener( HSPEvent.ESCAPE_GAMEPLAY, HSPEvent.NAMESPACE_HSP + ".escape_menu_ui" )]
+        [HSPEventListener( HSPEvent_ON_ESCAPE_GAMEPLAY.ID, HSPEvent.NAMESPACE_HSP + ".escape_menu_ui" )]
         private static void OnGameplayEscape()
         {
             if( TimeManager.IsPaused && TimeManager.LockTimescale )

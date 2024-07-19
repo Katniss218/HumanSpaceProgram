@@ -5,12 +5,20 @@ using UnityPlus.Input;
 namespace HSP.Vanilla.Scenes.MainMenuScene
 {
     /// <summary>
+    /// Invoked when the player toggles the escape (pause) menu in the main menu scene.
+    /// </summary>
+    public static class HSPEvent_ON_ESCAPE_MAIN_MENU
+    {
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".escape.mainmenu";
+    }
+
+    /// <summary>
     /// Controls the invocation of the `escape` / pause event in the `main menu` scene.
     /// </summary>
     [DisallowMultipleComponent]
     public class MainMenuEscapeInputController : MonoBehaviour
     {
-        [HSPEventListener( HSPEvent.STARTUP_MAINMENU, HSPEvent.NAMESPACE_HSP + ".add_escape_icontroller" )]
+        [HSPEventListener( HSPEvent_STARTUP_MAIN_MENU.ID, HSPEvent.NAMESPACE_HSP + ".add_escape_icontroller" )]
         private static void CreateInstanceInScene()
         {
             MainMenuSceneManager.Instance.gameObject.AddComponent<MainMenuEscapeInputController>();
@@ -28,7 +36,7 @@ namespace HSP.Vanilla.Scenes.MainMenuScene
 
         private bool Input_Escape( float value )
         {
-            HSPEvent.EventManager.TryInvoke( HSPEvent.ESCAPE_MAINMENU, null );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_ON_ESCAPE_MAIN_MENU.ID, null );
             return false;
         }
     }

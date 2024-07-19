@@ -14,7 +14,7 @@ namespace HSP.Vanilla.UI.Scenes.GameplayScene
     /// </summary>
     public class GameplayViewportClickController : SingletonMonoBehaviour<GameplayViewportClickController>
     {
-        [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, HSPEvent.NAMESPACE_HSP + ".add_click_controller" )]
+        [HSPEventListener( HSPEvent_STARTUP_GAMEPLAY.ID, HSPEvent.NAMESPACE_HSP + ".add_click_controller" )]
         private static void CreateInstanceInScene()
         {
             GameplaySceneManager.Instance.gameObject.AddComponent<GameplayViewportClickController>();

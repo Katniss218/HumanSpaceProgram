@@ -2,6 +2,7 @@ using HSP.SceneManagement;
 using HSP.UI;
 using HSP.Vanilla.Scenes.DesignScene;
 using HSP.Vanilla.Scenes.EditorScene;
+using HSP.Vanilla.Scenes.MainMenuScene;
 using HSP.Vanilla.UI.Timelines;
 using TMPro;
 using UnityEngine;
@@ -19,7 +20,7 @@ namespace HSP.Vanilla.UI.Scenes.MainMenuScene
         static UIStartNewGameWindow _startNewGameWindow; // singleton window
         static UILoadWindow _loadWindow; // singleton window
 
-        [HSPEventListener( HSPEvent.STARTUP_MAINMENU, HSPEvent.NAMESPACE_HSP + ".mainmenu_ui" )]
+        [HSPEventListener( HSPEvent_STARTUP_MAIN_MENU.ID, HSPEvent.NAMESPACE_HSP + ".mainmenu_ui" )]
         public static void Create()
         {
             UICanvas canvas = CanvasManager.Get( CanvasName.STATIC );

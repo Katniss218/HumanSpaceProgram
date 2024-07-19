@@ -1,19 +1,15 @@
-using HSP.ReferenceFrames;
 using HSP.Content.Timelines.Serialization;
+using HSP.ReferenceFrames;
 using HSP.Timelines;
-using HSP;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
-using UnityEngine;
-using UnityPlus.Serialization.DataHandlers;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.DataHandlers;
 
 namespace HSP.Vanilla.Scenes.GameplayScene
 {
     public static class OnTimelineSave
     {
-        [HSPEventListener( HSPEvent.TIMELINE_AFTER_SAVE, HSPEvent.NAMESPACE_HSP + ".serialize_managers.active_object_manager" )]
+        [HSPEventListener( HSPEvent_AFTER_TIMELINE_SAVE.ID, HSPEvent.NAMESPACE_HSP + ".serialize_managers.active_object_manager" )]
         private static void OnBeforeSave( TimelineManager.SaveEventData e )
         {
             string savePath = SaveMetadata.GetRootDirectory( e.timelineId, e.saveId );
@@ -25,7 +21,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene
             _vesselsDataHandler.Write( data );
         }
 
-        [HSPEventListener( HSPEvent.TIMELINE_AFTER_LOAD, HSPEvent.NAMESPACE_HSP + ".deserialize_managers.active_object_manager" )]
+        [HSPEventListener( HSPEvent_AFTER_TIMELINE_LOAD.ID, HSPEvent.NAMESPACE_HSP + ".deserialize_managers.active_object_manager" )]
         private static void OnLoad( TimelineManager.LoadEventData e )
         {
             string savePath = SaveMetadata.GetRootDirectory( e.timelineId, e.saveId );

@@ -1,4 +1,5 @@
 ﻿using HSP.ReferenceFrames;
+using HSP.SceneManagement;
 using HSP.UI;
 using HSP.Vanilla.Scenes.GameplayScene;
 using HSP.Vessels;
@@ -12,15 +13,12 @@ namespace HSP.Vanilla.UI.Vessels
     {
         List<VesselHUD> _huds = new List<VesselHUD>();
 
-        [HSPEventListener( HSPEvent.STARTUP_GAMEPLAY, "vanilla.vessel_huds" )]
-        private static void OnStartup()
-        {
-            GameplaySceneManager.GameObject.AddComponent<VesselHUDManager>();
-        }
-
-        [HSPEventListener( HSPEvent.GAMEPLAY_AFTER_VESSEL_REGISTERED, "vanilla.vessel_huds" )]
+        [HSPEventListener( HSPEvent_AFTER_VESSEL_REGISTERED.ID, HSPEvent.NAMESPACE_HSP + ".vessel_hud_manager" )]
         private static void OnVesselRegistered( Vessel vessel )
         {
+            if( !instanceExists )
+                return;
+
             if( ActiveObjectManager.ActiveObject == null )
             {
                 var hud = CanvasManager.Get( CanvasName.BACKGROUND ).AddVesselHUD( vessel );
@@ -28,9 +26,12 @@ namespace HSP.Vanilla.UI.Vessels
             }
         }
 
-        [HSPEventListener( HSPEvent.GAMEPLAY_AFTER_VESSEL_UNREGISTERED, "vanilla.vessel_huds" )]
+        [HSPEventListener( HSPEvent_AFTER_VESSEL_UNREGISTERED.ID, HSPEvent.NAMESPACE_HSP + ".vessel_hud_manager" )]
         private static void OnVesselUnregistered( Vessel vessel )
         {
+            if( !instanceExists )
+                return;
+
             foreach( var hud in instance._huds.ToArray() )
             {
                 if( hud == null ) // hud can be null if exiting a scene - it doesn't affect anything, but gives ugly warnings.
@@ -44,9 +45,12 @@ namespace HSP.Vanilla.UI.Vessels
             }
         }
 
-        [HSPEventListener( HSPEvent.GAMEPLAY_AFTER_ACTIVE_OBJECT_CHANGE, "vanilla.vessel_huds" )]
+        [HSPEventListener( HSPEvent_AFTER_ACTIVE_OBJECT_CHANGED.ID, HSPEvent.NAMESPACE_HSP + ".vessel_hud_manager" )]
         private static void OnActiveObjectChanged()
         {
+            if( !instanceExists )
+                return;
+
             if( ActiveObjectManager.ActiveObject == null )
             {
                 foreach( var vessel in VesselManager.LoadedVessels )

@@ -86,16 +86,16 @@
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\Cameras\GameplaySceneDepthBufferCombiner.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\Tools\TranslateTool.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\OnTimelineSave.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Scenes\OnVesselCreated.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\GameplaySceneTool.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\Tools\RerootTool.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\DesignSceneManager.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\DesignSceneTool.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\MainMenuScene\MainMenuSceneManager.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\AlwaysLoadedScene\AlwaysLoadedManager.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\MainMenuScene\MainMenuEscapeInputController.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\TimeScaleInputController.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\GameplaySceneToolManager.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\DesignSceneTool.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\GameplaySceneTool.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Scenes\OnVesselCreated.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla.Scenes\___HSP.Vanilla.Scenes.asmdef" />
