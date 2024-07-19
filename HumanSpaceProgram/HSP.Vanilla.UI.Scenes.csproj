@@ -985,6 +985,10 @@
       <Project>{05A5E85F-FD04-4199-F86F-3A6E38B383FB}</Project>
       <Name>HSP.UI</Name>
     </ProjectReference>
+    <ProjectReference Include="HSP.Vanilla.Components.csproj">
+      <Project>{27D097A1-515F-B65C-51D6-BEBD9502EAFC}</Project>
+      <Name>HSP.Vanilla.Components</Name>
+    </ProjectReference>
     <ProjectReference Include="HSP.Vanilla.Scenes.csproj">
       <Project>{5BA07627-23D0-078E-8FD5-791CF795CD60}</Project>
       <Name>HSP.Vanilla.Scenes</Name>

@@ -31,6 +31,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
                 instance._farCamera.clearFlags = CameraClearFlags.Skybox;
                 instance._nearCamera.clearFlags = CameraClearFlags.Depth;
 
+                //instance._colorRT = RenderTexture.GetTemporary( Screen.width, Screen.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Default, 4 ); Doesn't work, adding MSAA for some reason turns it black.
                 instance._colorRT = RenderTexture.GetTemporary( Screen.width, Screen.height, 0, RenderTextureFormat.ARGB32 );
                 instance._farDepthRT = RenderTexture.GetTemporary( Screen.width, Screen.height, 24, RenderTextureFormat.Depth );
                 instance._nearDepthRT = RenderTexture.GetTemporary( Screen.width, Screen.height, 24, RenderTextureFormat.Depth );
@@ -231,7 +232,9 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
             AdjustCameras();
         }
 
-        [HSPEventListener( HSPEvent_STARTUP_GAMEPLAY.ID, "vanilla.gameplayscene_camera" )]
+        public const string CREATE_GAMEPLAY_CAMERA = HSPEvent.NAMESPACE_HSP + ".gameplayscene_camera";
+
+        [HSPEventListener( HSPEvent_STARTUP_GAMEPLAY.ID, CREATE_GAMEPLAY_CAMERA )]
         private static void OnGameplaySceneLoad()
         {
             GameObject cameraPivotGameObject = new GameObject( "Camera Pivot" );

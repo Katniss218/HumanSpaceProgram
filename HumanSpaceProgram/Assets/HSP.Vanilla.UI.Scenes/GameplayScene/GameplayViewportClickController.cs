@@ -1,8 +1,8 @@
 ﻿using HSP.Input;
 using HSP.UI;
-using HSP.Vanilla.Scenes.GameplayScene;
 using HSP.Vanilla.UI.Components;
 using HSP.Vessels;
+using HSP.Vessels.Components;
 using UnityEngine;
 using UnityPlus.Input;
 using UnityPlus.UILib;
@@ -14,12 +14,6 @@ namespace HSP.Vanilla.UI.Scenes.GameplayScene
     /// </summary>
     public class GameplayViewportClickController : SingletonMonoBehaviour<GameplayViewportClickController>
     {
-        [HSPEventListener( HSPEvent_STARTUP_GAMEPLAY.ID, HSPEvent.NAMESPACE_HSP + ".add_click_controller" )]
-        private static void CreateInstanceInScene()
-        {
-            GameplaySceneManager.Instance.gameObject.AddComponent<GameplayViewportClickController>();
-        }
-
         void OnEnable()
         {
             HierarchicalInputManager.AddAction( HierarchicalInputChannel.VIEWPORT_PRIMARY_DOWN, HierarchicalInputPriority.MEDIUM, Input_MouseDown );
@@ -52,8 +46,7 @@ namespace HSP.Vanilla.UI.Scenes.GameplayScene
                 clickedPart = redirectComponent.Target;
             }
 
-            //if( FPart.GetPart( clickedPart ) == null )
-            if( clickedPart.GetVessel() == null )
+            if( FPart.GetPart( clickedPart ) == null )
             {
                 return false;
             }

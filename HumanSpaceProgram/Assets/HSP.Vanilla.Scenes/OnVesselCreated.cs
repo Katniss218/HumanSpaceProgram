@@ -10,7 +10,10 @@ namespace HSP.Vanilla.Scenes
 {
     public static class Vessel_Ex
     {
-        [HSPEventListener( HSPEvent_ON_VESSEL_CREATED.ID, "add_physics_object" )]
+        public const string ADD_PHYSICS_OBJECT = HSPEvent.NAMESPACE_HSP + ".add_physics_object";
+        public const string TRY_PIN_PHYSICS_OBJECT = HSPEvent.NAMESPACE_HSP + ".try_pin_physics_object";
+
+        [HSPEventListener( HSPEvent_ON_VESSEL_CREATED.ID, ADD_PHYSICS_OBJECT )]
         private static void AddGameplayPhysicsObject( Vessel v )
         {
             if( SceneLoader.IsSceneLoaded( GameplaySceneManager.SCENE_NAME ) )
@@ -19,7 +22,7 @@ namespace HSP.Vanilla.Scenes
                 v.PhysicsObject = v.gameObject.AddComponent<FixedPhysicsObject>();
         }
 
-        [HSPEventListener( HSPEvent_AFTER_VESSEL_HIERARCHY_CHANGED.ID, "try_pin_physics_object" )]
+        [HSPEventListener( HSPEvent_AFTER_VESSEL_HIERARCHY_CHANGED.ID, TRY_PIN_PHYSICS_OBJECT )]
         private static void TryPinPhysicsObject( (Vessel v, Transform oldRootPart, Transform newRootPart) e )
         {
             if( SceneLoader.IsSceneLoaded( GameplaySceneManager.SCENE_NAME ) )

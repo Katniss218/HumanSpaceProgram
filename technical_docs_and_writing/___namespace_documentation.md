@@ -1,6 +1,8 @@
-Naming scheme broadly follows the idea of "what's more closely related".
+# Namespace Documentation, or 'How the HSP Unity project is laid out'
 
-## Structure overview.
+aming scheme broadly follows the idea of "what's more closely related".
+
+## Structure overview:
 
 HSP is divided into loosely independent building blocks, or modules.
 Each module is defined by an .asmdef
@@ -26,6 +28,9 @@ If something doesn't reference anything other than `UnityPlus.{subnamespace}` or
     The game should still compile and run if you remove everything inside `HSP.Vanilla.xyz`, and replace it by modded variants.
 
 3. If a component is not directly related to the core functionality of the namespace, but is an implementation of it, it should probably be moved to `HSP.Vanilla.Components`.
+
+4. if something builds directly on top of something else, you can include it like so:
+    `HSP.Vessels` --> `HSP.Vessels.Construction`
 
 
 

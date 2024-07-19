@@ -16,6 +16,7 @@ namespace HSP.Vessels.Construction
     {
         public const string ID = HSPEvent.NAMESPACE_HSP + ".construction_site_destroyed";
     }
+
     public static class FConstructionSite_Transform_Ex
     {
         /// <summary>

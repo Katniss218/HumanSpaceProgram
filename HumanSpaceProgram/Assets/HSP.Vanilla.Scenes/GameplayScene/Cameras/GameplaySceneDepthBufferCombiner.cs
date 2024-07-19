@@ -68,7 +68,8 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
             _mergeDepthMaterial.SetFloat( Shader.PropertyToID( "_DstNear" ), EffectCamera.nearClipPlane );
             _mergeDepthMaterial.SetFloat( Shader.PropertyToID( "_DstFar" ), EffectCamera.farClipPlane );
             _cmdMergeDepth.SetRenderTarget( _dstColorRT, _dstDepthRT );
-            if( instance.NearCamera.enabled )
+            
+            if( instance.NearCamera.gameObject.activeInHierarchy && instance.NearCamera.enabled )
                 _cmdMergeDepth.Blit( null, BuiltinRenderTextureType.CurrentActive, _mergeDepthMaterial, 0 );
             else
                 _cmdMergeDepth.Blit( null, BuiltinRenderTextureType.CurrentActive, _mergeDepthMaterial, 1 );

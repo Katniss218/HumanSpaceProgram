@@ -19,8 +19,14 @@ namespace HSP.Vanilla.UI.Scenes.GameplayScene
             GameplaySceneManager.GameObject.AddComponent<ConstructionSiteHUDManager>();
         }
 
+        [HSPEventListener( HSPEvent_STARTUP_GAMEPLAY.ID, HSPEvent.NAMESPACE_HSP + ".add_click_controller" )]
+        private static void AddViewportClickController()
+        {
+            GameplaySceneManager.Instance.gameObject.AddComponent<GameplayViewportClickController>();
+        }
+
         [HSPEventListener( HSPEvent_STARTUP_GAMEPLAY.ID, HSPEvent.NAMESPACE_HSP + ".add_navball_render_texture_manager" )]
-        private static void OnGameplayEnter()
+        private static void AddNavballRenderTextureManager()
         {
             var manager = GameplaySceneManager.GameObject.AddComponent<NavballRenderTextureManager>();
 

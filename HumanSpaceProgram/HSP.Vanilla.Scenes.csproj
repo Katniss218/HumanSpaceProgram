@@ -96,6 +96,8 @@
     <Compile Include="Assets\HSP.Vanilla.Scenes\MainMenuScene\MainMenuEscapeInputController.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\TimeScaleInputController.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\GameplaySceneToolManager.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Scenes\MainMenuScene\OnStartup.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Scenes\EditorScene\OnStartup.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla.Scenes\___HSP.Vanilla.Scenes.asmdef" />
