@@ -5,7 +5,7 @@ using UnityPlus.UILib;
 using UnityPlus.UILib.Layout;
 using UnityPlus.UILib.UIElements;
 
-namespace HSP.Vanilla.UI.Vessels
+namespace HSP.Vanilla.UI.Components
 {
     public abstract class UIPartWindowComponent : UIPanel
     {

@@ -1,3 +1,5 @@
+using HSP.ReferenceFrames;
+using HSP.Vanilla.Scenes.GameplayScene;
 using HSP.Vessels;
 using UnityEngine;
 
@@ -21,6 +23,12 @@ namespace HSP.Vanilla.Scenes.DesignScene
         private static void AddDesignVesselManager()
         {
             DesignSceneManager.Instance.gameObject.AddComponent<DesignVesselManager>();
+        }
+
+        [HSPEventListener( HSPEvent.STARTUP_DESIGN, HSPEvent.NAMESPACE_HSP + ".add_scene_reference_frame_manager" )]
+        private static void AddSceneReferenceFrameManager()
+        {
+            DesignSceneManager.Instance.gameObject.AddComponent<SceneReferenceFrameManager>();
         }
     }
 }

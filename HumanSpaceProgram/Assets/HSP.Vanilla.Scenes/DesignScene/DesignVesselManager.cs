@@ -1,6 +1,6 @@
-﻿using HSP.Time;
+﻿using HSP.Content.Vessels.Serialization;
+using HSP.Time;
 using HSP.Vessels;
-using HSP.Vessels.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;

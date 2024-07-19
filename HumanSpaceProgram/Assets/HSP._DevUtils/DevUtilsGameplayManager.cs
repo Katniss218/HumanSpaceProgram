@@ -1,13 +1,12 @@
 ﻿using HSP.CelestialBodies;
 using HSP.CelestialBodies.Surfaces;
 using HSP.Content;
+using HSP.Content.Vessels.Serialization;
 using HSP.ReferenceFrames;
 using HSP.ResourceFlow;
 using HSP.Trajectories;
 using HSP.Vanilla.Components;
 using HSP.Vessels;
-using HSP.Vessels.Components;
-using HSP.Vessels.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -62,7 +61,7 @@ namespace HSP._DevUtils
             launchSite.RootPart = root.transform;
 
             var v = CreateVessel( launchSite );
-            ActiveObjectManager.ActiveObject = v.RootPart.GetVessel().gameObject;
+            ActiveObjectManager.ActiveObject = v.RootPart.GetVessel().gameObject.transform;
             vessel = v;
         }
 

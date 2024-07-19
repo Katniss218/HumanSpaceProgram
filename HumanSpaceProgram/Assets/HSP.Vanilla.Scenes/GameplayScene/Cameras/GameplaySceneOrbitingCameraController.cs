@@ -86,7 +86,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
                 if( ActiveObjectManager.ActiveObject == null )
                     return;
 
-                ReferenceObject = ActiveObjectManager.ActiveObject.transform;
+                ReferenceObject = ActiveObjectManager.ActiveObject;
             }
 
             SyncZoomDist();
@@ -152,7 +152,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
             if( ActiveObjectManager.ActiveObject == null )
                 instance.ReferenceObject = null;
             else
-                instance.ReferenceObject = ActiveObjectManager.ActiveObject.transform;
+                instance.ReferenceObject = ActiveObjectManager.ActiveObject;
 
             instance.transform.rotation = Quaternion.LookRotation( instance.transform.forward, instance.GetUpDir() );
         }

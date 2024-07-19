@@ -9,7 +9,7 @@ using UnityPlus.UILib;
 using UnityPlus.UILib.Layout;
 using UnityPlus.UILib.UIElements;
 
-namespace HSP.Vanilla.UI.Time
+namespace HSP.Vanilla.UI
 {
     public class UITimewarpSelector : UIPanel
     {

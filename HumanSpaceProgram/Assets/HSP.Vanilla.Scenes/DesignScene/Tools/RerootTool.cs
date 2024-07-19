@@ -10,7 +10,7 @@ namespace HSP.Vanilla.Scenes.DesignScene.Tools
     /// <summary>
     /// Allows to change the root of the design vessel.
     /// </summary>
-    public class RerootTool : DesignSceneToolBase
+    public class RerootTool : DesignSceneTool
     {
         void Update()
         {

@@ -1,11 +1,10 @@
-﻿using HSP.Vessels;
-using HSP.Vessels.Serialization;
+﻿using HSP.Content.Vessels.Serialization;
 using System.IO;
 using UnityEngine;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.DataHandlers;
 
-namespace HSP.Content.AssetLoaders
+namespace HSP.Content.Vessels.AssetLoaders
 {
     /// <summary>
     /// Finds and registers json parts in GameData.

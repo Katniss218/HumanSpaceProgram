@@ -9,7 +9,7 @@ namespace HSP.Vanilla.Scenes.DesignScene.Tools
     /// <summary>
     /// Allows to move a selected part after placing.
     /// </summary>
-    public class TranslateTool : DesignSceneToolBase
+    public class TranslateTool : DesignSceneTool
     {
         private bool _snappingEnabled;
         public bool SnappingEnabled

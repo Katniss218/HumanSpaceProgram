@@ -9,11 +9,11 @@ namespace HSP.ReferenceFrames
     public class ActiveObjectManager : SingletonMonoBehaviour<ActiveObjectManager>
     {
         [SerializeField]
-        private GameObject _activeObject;
+        private Transform _activeObject;
         /// <summary>
         /// Gets or sets the object that is currently being 'controlled' or viewed by the player.
         /// </summary>
-        public static GameObject ActiveObject
+        public static Transform ActiveObject
         {
             get => instance._activeObject;
             set
@@ -30,7 +30,7 @@ namespace HSP.ReferenceFrames
         {
             return new MemberwiseSerializationMapping<ActiveObjectManager>()
             {
-                ("active_object", new Member<ActiveObjectManager, GameObject>( ObjectContext.Ref, o => ActiveObjectManager.ActiveObject, (o, value) => ActiveObjectManager.ActiveObject = value ))
+                ("active_object", new Member<ActiveObjectManager, Transform>( ObjectContext.Ref, o => ActiveObjectManager.ActiveObject, (o, value) => ActiveObjectManager.ActiveObject = value ))
             };
         }
     }

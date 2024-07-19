@@ -58,16 +58,14 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.Trajectories\Trajectories\Vessel_Ex.cs" />
-    <Compile Include="Assets\HSP.Trajectories\Trajectories\Orbit.cs" />
-    <Compile Include="Assets\HSP.Trajectories\Trajectories\PinnedPhysicsObject.cs" />
-    <Compile Include="Assets\HSP.Trajectories\Trajectories\OrbitalFrame.cs" />
-    <Compile Include="Assets\HSP.Trajectories\Trajectories\FreePhysicsObject.cs" />
+    <Compile Include="Assets\HSP.Content.Timelines\Serialization\TimelineMetadata.cs" />
+    <Compile Include="Assets\HSP.Content.Timelines\Serialization\SaveMetadata.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro.cginc" />
     <None Include="Assets\Resources\Shaders\merge_depth.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
+    <None Include="Assets\HSP.Content.Timelines\___HSP.Content.Timelines.asmdef" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_Bitmap.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro_Mobile.cginc" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF SSD.shader" />
@@ -81,7 +79,6 @@
     <None Include="Assets\_TextMesh Pro\Shaders\TMPro_Surface.cginc" />
     <None Include="Assets\_TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Mobile Masking.shader" />
-    <None Include="Assets\HSP.Trajectories\___HSP.Trajectories.asmdef" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF Overlay.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_Bitmap-Mobile.shader" />
     <None Include="Assets\_TextMesh Pro\Shaders\TMP_SDF-Mobile.shader" />
@@ -932,12 +929,12 @@
       <HintPath>Library\ScriptAssemblies\Unity.TextMeshPro.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Unity.TestTools.CodeCoverage.Editor.OpenCover.Mono.Reflection">
-      <HintPath>Library\ScriptAssemblies\Unity.TestTools.CodeCoverage.Editor.OpenCover.Mono.Reflection.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Unity.2D.Sprite.Editor">
       <HintPath>Library\ScriptAssemblies\Unity.2D.Sprite.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.TestTools.CodeCoverage.Editor.OpenCover.Mono.Reflection">
+      <HintPath>Library\ScriptAssemblies\Unity.TestTools.CodeCoverage.Editor.OpenCover.Mono.Reflection.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Postprocessing.Editor">

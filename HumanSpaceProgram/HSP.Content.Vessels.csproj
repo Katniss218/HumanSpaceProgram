@@ -58,7 +58,11 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\HSP.Content.Vessels\PartRegistry.cs" />
+    <Compile Include="Assets\HSP.Content.Vessels\Serialization\PartMetadata.cs" />
+    <Compile Include="Assets\HSP.Content.Vessels\Serialization\VesselMetadata.cs" />
     <Compile Include="Assets\HSP.Content.Vessels\AssetLoaders\GameDataJsonPartFactory.cs" />
+    <Compile Include="Assets\HSP.Content.Vessels\PartFactory.cs" />
     <Compile Include="Assets\HSP.Content.Vessels\AssetLoaders\GameDataJsonVesselFactory.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -930,10 +934,6 @@
     <ProjectReference Include="HSP.Content.csproj">
       <Project>{642CD5D5-9E37-E1CA-969F-267B97A7FC25}</Project>
       <Name>HSP.Content</Name>
-    </ProjectReference>
-    <ProjectReference Include="HSP.Vessels.csproj">
-      <Project>{46E8105E-3165-8157-383E-59E6654156AA}</Project>
-      <Name>HSP.Vessels</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

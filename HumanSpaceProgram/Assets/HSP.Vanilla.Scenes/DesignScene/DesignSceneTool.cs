@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace HSP.Vanilla.Scenes.DesignScene
 {
-    public class DesignSceneToolBase : MonoBehaviour
+    public class DesignSceneTool : MonoBehaviour
     {
 
     }

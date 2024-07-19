@@ -58,9 +58,7 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.Timelines\Serialization\TimelineMetadata.cs" />
     <Compile Include="Assets\HSP.Timelines\TimelineManager.cs" />
-    <Compile Include="Assets\HSP.Timelines\Serialization\SaveMetadata.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Timelines\___HSP.Timelines.asmdef" />
@@ -927,6 +925,10 @@
     <ProjectReference Include="HSP.csproj">
       <Project>{5294BE79-15AB-2AAE-E8C3-9E735E001D6D}</Project>
       <Name>HSP</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Content.Timelines.csproj">
+      <Project>{B3FA8387-6EDE-645C-5A2E-FDC64907D803}</Project>
+      <Name>HSP.Content.Timelines</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.SceneManagement.csproj">
       <Project>{5B21ACE1-5E92-EEB2-818D-AF6D6AE9F824}</Project>

@@ -9,7 +9,7 @@ namespace HSP.Vanilla.Scenes.DesignScene.Tools
     /// <summary>
     /// Allows to move a selected part after placing.
     /// </summary>
-    public class RotateTool : DesignSceneToolBase
+    public class RotateTool : DesignSceneTool
 	{
 		private bool _snappingEnabled;
 		public bool SnappingEnabled

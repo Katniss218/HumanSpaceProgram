@@ -59,7 +59,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\HSP.Vanilla.Scenes\EditorScene\EditorSceneEscapeInputController.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\DesignSceneToolBase.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\Cameras\DesignSceneOrbitingCameraController.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\Tools\PickTool.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\Cameras\GameplaySceneCameraManager.cs" />
@@ -72,11 +71,13 @@
     <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\Cameras\DesignSceneCameraManager.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\GameplaySceneManager.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\GameplaySceneEscapeInputController.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\OnStartup.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\VesselManager.Serialization.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\Cameras\GameplaySceneOrbitingCameraController.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\Tools\ConstructTool.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\Tools\VanillaToolRegisterer.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\Tools\RotateTool.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\OnActiveObjectChange.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\AlwaysLoadedScene\OnStartup.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\DesignSceneEscapeInputController.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\DesignSceneToolManager.cs" />
@@ -90,11 +91,10 @@
     <Compile Include="Assets\HSP.Vanilla.Scenes\MainMenuScene\MainMenuSceneManager.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\AlwaysLoadedScene\AlwaysLoadedManager.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\MainMenuScene\MainMenuEscapeInputController.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\GameplaySceneToolBase.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\TimeScaleInputController.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\GameplaySceneToolManager.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\OnStartup.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\OnActiveObjectChange.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\DesignSceneTool.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\GameplaySceneTool.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla.Scenes\___HSP.Vanilla.Scenes.asmdef" />
@@ -974,13 +974,17 @@
       <Project>{83793330-5AED-C186-5E4B-AAD4BB463469}</Project>
       <Name>HSP.CelestialBodies</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.Vessels.Construction.csproj">
-      <Project>{973ADF42-28BF-171E-CCCB-558E6DFC2896}</Project>
-      <Name>HSP.Vessels.Construction</Name>
-    </ProjectReference>
     <ProjectReference Include="HSP.Content.csproj">
       <Project>{642CD5D5-9E37-E1CA-969F-267B97A7FC25}</Project>
       <Name>HSP.Content</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Content.Timelines.csproj">
+      <Project>{B3FA8387-6EDE-645C-5A2E-FDC64907D803}</Project>
+      <Name>HSP.Content.Timelines</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Content.Vessels.csproj">
+      <Project>{4BD8BF7E-0B20-3964-16BE-BCA50A80C566}</Project>
+      <Name>HSP.Content.Vessels</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.ControlSystems.csproj">
       <Project>{5E371463-138D-D25A-49B8-DED13355C7DC}</Project>
@@ -1010,9 +1014,17 @@
       <Project>{57FA29CC-9026-83EE-F242-EA051DEA7649}</Project>
       <Name>HSP.Trajectories</Name>
     </ProjectReference>
+    <ProjectReference Include="HSP.Vanilla.Components.csproj">
+      <Project>{27D097A1-515F-B65C-51D6-BEBD9502EAFC}</Project>
+      <Name>HSP.Vanilla.Components</Name>
+    </ProjectReference>
     <ProjectReference Include="HSP.Vessels.csproj">
       <Project>{46E8105E-3165-8157-383E-59E6654156AA}</Project>
       <Name>HSP.Vessels</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Vessels.Construction.csproj">
+      <Project>{973ADF42-28BF-171E-CCCB-558E6DFC2896}</Project>
+      <Name>HSP.Vessels.Construction</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.ViewportTools.csproj">
       <Project>{86E65C59-E535-B902-539C-629C971164F3}</Project>

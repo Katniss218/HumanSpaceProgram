@@ -13,12 +13,12 @@ namespace HSP.Vanilla.Scenes.DesignScene
     /// </summary>
     public class DesignSceneToolManager : SingletonMonoBehaviour<DesignSceneToolManager>
     {
-        private List<DesignSceneToolBase> _availableTools = new List<DesignSceneToolBase>();
-        private DesignSceneToolBase _activeTool = null;
+        private List<DesignSceneTool> _availableTools = new List<DesignSceneTool>();
+        private DesignSceneTool _activeTool = null;
 
         public static Type ActiveToolType { get => instance._activeTool.GetType(); }
 
-        public static bool HasTool<T>() where T : DesignSceneToolBase
+        public static bool HasTool<T>() where T : DesignSceneTool
         {
             if( instance == null )
             {
@@ -48,7 +48,7 @@ namespace HSP.Vanilla.Scenes.DesignScene
         /// <summary>
         /// Registers a tool with the specified type for future use.
         /// </summary>
-        public static void RegisterTool<T>() where T : DesignSceneToolBase
+        public static void RegisterTool<T>() where T : DesignSceneTool
         {
             if( instance == null )
             {
@@ -63,8 +63,11 @@ namespace HSP.Vanilla.Scenes.DesignScene
                 }
             }
 
-            DesignSceneToolBase comp = instance.gameObject.AddComponent<T>();
+            bool wasActive = instance.gameObject.activeSelf;
+            instance.gameObject.SetActive( false );
+            T comp = instance.gameObject.AddComponent<T>();
             comp.enabled = false;
+            instance.gameObject.SetActive( wasActive );
 
             instance._availableTools.Add( comp );
         }
@@ -89,7 +92,7 @@ namespace HSP.Vanilla.Scenes.DesignScene
         /// Tool instances are persisted. Selecting a tool, and going back to a previous one keeps its data.
         /// </remarks>
         /// <returns>The instance of the tool that was enabled.</returns>
-        public static T UseTool<T>() where T : DesignSceneToolBase
+        public static T UseTool<T>() where T : DesignSceneTool
         {
             return (T)UseTool( typeof( T ) );
         }
@@ -108,13 +111,13 @@ namespace HSP.Vanilla.Scenes.DesignScene
                 throw new InvalidOperationException( $"{nameof( DesignSceneToolManager )} is accessible only in the design scene." );
             }
 
-            Type baseToolType = typeof( DesignSceneToolBase );
+            Type baseToolType = typeof( DesignSceneTool );
             if( !(baseToolType.IsAssignableFrom( toolType )) )
             {
                 throw new ArgumentException( $"Can't register a tool that is not a {baseToolType.FullName}." );
             }
 
-            DesignSceneToolBase tool = null;
+            DesignSceneTool tool = null;
             foreach( var t in instance._availableTools )
             {
                 if( t.GetType() == toolType )

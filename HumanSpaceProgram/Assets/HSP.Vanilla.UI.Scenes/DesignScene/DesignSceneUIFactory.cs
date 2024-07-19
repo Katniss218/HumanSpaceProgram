@@ -1,11 +1,11 @@
-﻿using HSP.Core.SceneManagement;
+﻿using HSP.Content.Vessels.Serialization;
+using HSP.Core.SceneManagement;
 using HSP.UI;
 using HSP.UI.Windows;
 using HSP.Vanilla.Scenes.DesignScene;
 using HSP.Vanilla.Scenes.DesignScene.Tools;
 using HSP.Vanilla.Scenes.MainMenuScene;
 using HSP.Vanilla.UI.Components;
-using HSP.Vessels.Serialization;
 using System;
 using UnityEngine;
 using UnityPlus.AssetManagement;

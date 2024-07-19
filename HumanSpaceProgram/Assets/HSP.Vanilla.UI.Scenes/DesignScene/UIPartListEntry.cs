@@ -1,7 +1,7 @@
-﻿using HSP.Vanilla.Scenes.DesignScene;
+﻿using HSP.Content.Vessels;
+using HSP.Content.Vessels.Serialization;
+using HSP.Vanilla.Scenes.DesignScene;
 using HSP.Vanilla.Scenes.DesignScene.Tools;
-using HSP.Vessels;
-using HSP.Vessels.Serialization;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib;

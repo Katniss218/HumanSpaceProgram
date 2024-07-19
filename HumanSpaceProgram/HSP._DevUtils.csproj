@@ -953,13 +953,13 @@
       <Project>{83793330-5AED-C186-5E4B-AAD4BB463469}</Project>
       <Name>HSP.CelestialBodies</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.Vessels.Construction.csproj">
-      <Project>{973ADF42-28BF-171E-CCCB-558E6DFC2896}</Project>
-      <Name>HSP.Vessels.Construction</Name>
-    </ProjectReference>
     <ProjectReference Include="HSP.Content.csproj">
       <Project>{642CD5D5-9E37-E1CA-969F-267B97A7FC25}</Project>
       <Name>HSP.Content</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Content.Vessels.csproj">
+      <Project>{4BD8BF7E-0B20-3964-16BE-BCA50A80C566}</Project>
+      <Name>HSP.Content.Vessels</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.ControlSystems.csproj">
       <Project>{5E371463-138D-D25A-49B8-DED13355C7DC}</Project>
@@ -977,6 +977,10 @@
       <Project>{26023575-EB06-DAA2-C7B2-77FFBAED8CB8}</Project>
       <Name>HSP.ResourceFlow</Name>
     </ProjectReference>
+    <ProjectReference Include="HSP.SceneManagement.csproj">
+      <Project>{5B21ACE1-5E92-EEB2-818D-AF6D6AE9F824}</Project>
+      <Name>HSP.SceneManagement</Name>
+    </ProjectReference>
     <ProjectReference Include="HSP.Trajectories.csproj">
       <Project>{57FA29CC-9026-83EE-F242-EA051DEA7649}</Project>
       <Name>HSP.Trajectories</Name>
@@ -992,6 +996,10 @@
     <ProjectReference Include="HSP.Vessels.csproj">
       <Project>{46E8105E-3165-8157-383E-59E6654156AA}</Project>
       <Name>HSP.Vessels</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Vessels.Construction.csproj">
+      <Project>{973ADF42-28BF-171E-CCCB-558E6DFC2896}</Project>
+      <Name>HSP.Vessels.Construction</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

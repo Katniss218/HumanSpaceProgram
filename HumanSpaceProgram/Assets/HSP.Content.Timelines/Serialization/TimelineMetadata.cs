@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.DataHandlers;
-using UnityPlus.Serialization.Json;
 
-namespace HSP.Timelines.Serialization
+namespace HSP.Content.Timelines.Serialization
 {
     /// <summary>
     /// Serializable (meta)data of a timeline.

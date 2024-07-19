@@ -2,7 +2,7 @@
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
 
-namespace HSP.Vanilla.UI.Time
+namespace HSP.Vanilla.UI
 {
     /// <summary>
     /// A readout for the mission elapsed time.

@@ -1,3 +1,4 @@
+using HSP.Vanilla.Scenes.DesignScene;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,12 +10,12 @@ namespace HSP.Vanilla.Scenes.GameplayScene
     /// </summary>
     public class GameplaySceneToolManager : SingletonMonoBehaviour<GameplaySceneToolManager>
     {
-        private List<GameplaySceneToolBase> _availableTools = new List<GameplaySceneToolBase>();
-        private GameplaySceneToolBase _activeTool = null;
+        private List<GameplaySceneTool> _availableTools = new List<GameplaySceneTool>();
+        private GameplaySceneTool _activeTool = null;
 
         public static Type ActiveToolType { get => instance._activeTool.GetType(); }
 
-        public static bool HasTool<T>() where T : GameplaySceneToolBase
+        public static bool HasTool<T>() where T : GameplaySceneTool
         {
             if( instance == null )
             {
@@ -44,7 +45,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene
         /// <summary>
         /// Registers a tool with the specified type for future use.
         /// </summary>
-        public static void RegisterTool<T>() where T : GameplaySceneToolBase
+        public static void RegisterTool<T>() where T : GameplaySceneTool
         {
             if( instance == null )
             {
@@ -59,8 +60,11 @@ namespace HSP.Vanilla.Scenes.GameplayScene
                 }
             }
 
-            GameplaySceneToolBase comp = instance.gameObject.AddComponent<T>();
+            bool wasActive = instance.gameObject.activeSelf;
+            instance.gameObject.SetActive( false );
+            T comp = instance.gameObject.AddComponent<T>();
             comp.enabled = false;
+            instance.gameObject.SetActive( wasActive );
 
             instance._availableTools.Add( comp );
         }
@@ -85,7 +89,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene
         /// Tool instances are persisted. Selecting a tool, and going back to a previous one keeps its data.
         /// </remarks>
         /// <returns>The instance of the tool that was enabled.</returns>
-        public static T UseTool<T>() where T : GameplaySceneToolBase
+        public static T UseTool<T>() where T : GameplaySceneTool
         {
             return (T)UseTool( typeof( T ) );
         }
@@ -104,13 +108,13 @@ namespace HSP.Vanilla.Scenes.GameplayScene
                 throw new InvalidOperationException( $"{nameof( GameplaySceneToolManager )} is accessible only in the gameplay scene." );
             }
 
-            Type baseToolType = typeof( GameplaySceneToolBase );
+            Type baseToolType = typeof( GameplaySceneTool );
             if( !(baseToolType.IsAssignableFrom( toolType )) )
             {
                 throw new ArgumentException( $"Can't register a tool that is not a {baseToolType.FullName}." );
             }
 
-            GameplaySceneToolBase tool = null;
+            GameplaySceneTool tool = null;
             foreach( var t in instance._availableTools )
             {
                 if( t.GetType() == toolType )

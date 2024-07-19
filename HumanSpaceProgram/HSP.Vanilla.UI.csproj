@@ -59,6 +59,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\HSP.Vanilla.UI\WindowRelationHighlight.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI\UITimewarpSelector.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI\UITextReadout_ElapsedUT.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla.UI\___HSP.Vanilla.UI.asmdef" />

@@ -2,7 +2,7 @@
 
 namespace HSP.Vanilla.Scenes.GameplayScene
 {
-    public class GameplaySceneToolBase : MonoBehaviour
+    public class GameplaySceneTool : MonoBehaviour
     {
 
     }

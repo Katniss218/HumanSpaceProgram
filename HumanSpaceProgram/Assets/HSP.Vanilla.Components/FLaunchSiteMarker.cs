@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace HSP.Vessels.Components
+namespace HSP.Vanilla.Components
 {
     [Obsolete("this is ugly")]
     public class FLaunchSiteMarker : MonoBehaviour

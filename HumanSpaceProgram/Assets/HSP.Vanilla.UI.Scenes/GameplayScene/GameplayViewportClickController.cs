@@ -1,9 +1,8 @@
 ﻿using HSP.Input;
 using HSP.UI;
 using HSP.Vanilla.Scenes.GameplayScene;
-using HSP.Vanilla.UI.Vessels;
+using HSP.Vanilla.UI.Components;
 using HSP.Vessels;
-using HSP.Vessels.Components;
 using UnityEngine;
 using UnityPlus.Input;
 using UnityPlus.UILib;
@@ -53,7 +52,8 @@ namespace HSP.Vanilla.UI.Scenes.GameplayScene
                 clickedPart = redirectComponent.Target;
             }
 
-            if( FPart.GetPart( clickedPart ) == null )
+            //if( FPart.GetPart( clickedPart ) == null )
+            if( clickedPart.GetVessel() == null )
             {
                 return false;
             }

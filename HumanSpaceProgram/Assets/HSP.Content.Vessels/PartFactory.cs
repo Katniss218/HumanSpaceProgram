@@ -1,8 +1,8 @@
-﻿using HSP.Vessels.Serialization;
+﻿using HSP.Content.Vessels.Serialization;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace HSP.Vessels
+namespace HSP.Content.Vessels
 {
 
     /// <summary>

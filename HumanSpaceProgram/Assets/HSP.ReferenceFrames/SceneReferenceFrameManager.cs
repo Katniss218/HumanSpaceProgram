@@ -93,7 +93,7 @@ namespace HSP.ReferenceFrames
                 return;
             }
 
-            Vector3 position = ActiveObjectManager.ActiveObject.transform.position;
+            Vector3 position = ActiveObjectManager.ActiveObject.position;
             if( position.magnitude > MaxFloatingOriginRange )
             {
                 ChangeSceneReferenceFrame( SceneReferenceFrame.Shift( position ) );

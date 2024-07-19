@@ -1,7 +1,8 @@
-﻿using HSP.Vessels.Construction;
+﻿using HSP.Content.Vessels;
 using HSP.Input;
+using HSP.Vanilla.Components;
 using HSP.Vessels;
-using HSP.Vessels.Components;
+using HSP.Vessels.Construction;
 using System.Linq;
 using UnityEngine;
 using UnityPlus.Input;
@@ -13,7 +14,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Tools
     /// <summary>
     /// Allows to detach and attach parts.
     /// </summary>
-    public class ConstructTool : GameplaySceneToolBase
+    public class ConstructTool : GameplaySceneTool
     {
         Transform _heldPart = null;
 

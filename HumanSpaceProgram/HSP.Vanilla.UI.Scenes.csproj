@@ -945,6 +945,22 @@
       <Project>{5294BE79-15AB-2AAE-E8C3-9E735E001D6D}</Project>
       <Name>HSP</Name>
     </ProjectReference>
+    <ProjectReference Include="HSP.CelestialBodies.csproj">
+      <Project>{83793330-5AED-C186-5E4B-AAD4BB463469}</Project>
+      <Name>HSP.CelestialBodies</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Content.csproj">
+      <Project>{642CD5D5-9E37-E1CA-969F-267B97A7FC25}</Project>
+      <Name>HSP.Content</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Content.Vessels.csproj">
+      <Project>{4BD8BF7E-0B20-3964-16BE-BCA50A80C566}</Project>
+      <Name>HSP.Content.Vessels</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.ControlSystems.csproj">
+      <Project>{5E371463-138D-D25A-49B8-DED13355C7DC}</Project>
+      <Name>HSP.ControlSystems</Name>
+    </ProjectReference>
     <ProjectReference Include="HSP.Input.csproj">
       <Project>{27123301-09AF-37AC-2FCA-FF7B2CC75C42}</Project>
       <Name>HSP.Input</Name>
@@ -952,6 +968,10 @@
     <ProjectReference Include="HSP.ReferenceFrames.csproj">
       <Project>{D8846B96-55B1-C32C-F90A-52C14F5C8043}</Project>
       <Name>HSP.ReferenceFrames</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.ResourceFlow.csproj">
+      <Project>{26023575-EB06-DAA2-C7B2-77FFBAED8CB8}</Project>
+      <Name>HSP.ResourceFlow</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.SceneManagement.csproj">
       <Project>{5B21ACE1-5E92-EEB2-818D-AF6D6AE9F824}</Project>
@@ -969,9 +989,9 @@
       <Project>{5BA07627-23D0-078E-8FD5-791CF795CD60}</Project>
       <Name>HSP.Vanilla.Scenes</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.Vanilla.UI.Time.csproj">
-      <Project>{F24B1196-F385-43EE-AAB5-971DC99C6174}</Project>
-      <Name>HSP.Vanilla.UI.Time</Name>
+    <ProjectReference Include="HSP.Vanilla.UI.csproj">
+      <Project>{6C8F7BA3-CBB1-7E26-D57A-944E3A2E5099}</Project>
+      <Name>HSP.Vanilla.UI</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.Vanilla.UI.Vessels.csproj">
       <Project>{3CA21801-D573-73FC-585D-691DDF1E6A9B}</Project>

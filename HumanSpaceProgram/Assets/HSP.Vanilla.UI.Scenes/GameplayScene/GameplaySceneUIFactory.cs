@@ -4,7 +4,7 @@ using HSP.UI.Windows;
 using HSP.Vanilla.Scenes.GameplayScene;
 using HSP.Vanilla.Scenes.GameplayScene.Tools;
 using HSP.Vanilla.UI.Components;
-using HSP.Vanilla.UI.Time;
+using HSP.Vanilla.UI;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib;

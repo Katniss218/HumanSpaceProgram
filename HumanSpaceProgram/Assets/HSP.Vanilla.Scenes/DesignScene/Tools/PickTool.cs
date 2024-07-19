@@ -1,6 +1,6 @@
 ﻿using HSP.Input;
+using HSP.Vanilla.Components;
 using HSP.Vessels;
-using HSP.Vessels.Components;
 using System.Linq;
 using UnityEngine;
 using UnityPlus.Input;
@@ -10,7 +10,7 @@ namespace HSP.Vanilla.Scenes.DesignScene.Tools
     /// <summary>
     /// Allows to detach and attach parts.
     /// </summary>
-    public class PickTool : DesignSceneToolBase
+    public class PickTool : DesignSceneTool
 	{
 		Transform _heldPart = null;
 

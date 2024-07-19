@@ -9,7 +9,9 @@ namespace HSP.Vanilla.UI.Components
     {
         void LateUpdate()
         {
-            var physObj = ActiveObjectManager.ActiveObject?.GetComponent<FreePhysicsObject>();
+            var physObj = ActiveObjectManager.ActiveObject == null
+                ? null
+                : ActiveObjectManager.ActiveObject.GetComponent<FreePhysicsObject>();
 
             this.Text = physObj == null ? "" : $"Acceleration: {physObj.Acceleration.magnitude:#0.0} m/s^2";
         }

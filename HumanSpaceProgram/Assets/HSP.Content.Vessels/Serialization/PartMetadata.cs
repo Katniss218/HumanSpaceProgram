@@ -5,7 +5,7 @@ using System.Linq;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.DataHandlers;
 
-namespace HSP.Vessels.Serialization
+namespace HSP.Content.Vessels.Serialization
 {
     /// <summary>
     /// Represents additional metadata of a saved part of a vessel/building.

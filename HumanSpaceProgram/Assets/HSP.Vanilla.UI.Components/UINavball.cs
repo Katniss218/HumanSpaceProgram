@@ -46,7 +46,7 @@ namespace HSP.Vanilla.UI.Components
         {
             if( ActiveObjectManager.ActiveObject != null )
             {
-                Vessel activeVessel = ActiveObjectManager.ActiveObject.transform.GetVessel();
+                Vessel activeVessel = ActiveObjectManager.ActiveObject.GetVessel();
 
                 Quaternion airfRotation = (Quaternion)FControlFrame.GetAIRFRotation( FControlFrame.VesselControlFrame, activeVessel );
                 Matrix4x4 airfToLocalMatrix = Matrix4x4.Rotate( airfRotation ).inverse;

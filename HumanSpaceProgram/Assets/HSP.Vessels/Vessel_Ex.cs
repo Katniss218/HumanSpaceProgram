@@ -26,12 +26,22 @@ namespace HSP.Vessels
         }
 
         /// <summary>
-        /// Gets the <see cref="Vessel"/> attached to this gameobject.
+        /// Gets the <see cref="Vessel"/> attached to this transform.
         /// </summary>
-        /// <returns>The part object. Null if the gameobject is not part of a part object.</returns>
-        public static Vessel GetVessel( this GameObject part )
+        /// <returns>The part object. Null if the transform is not part of a part object.</returns>
+        public static bool HasVessel( this Transform part )
         {
-            return GetVessel( part.transform );
+            return part.root.GetComponent<Vessel>() != null;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="Vessel"/> attached to this transform.
+        /// </summary>
+        /// <returns>The part object. Null if the transform is not part of a part object.</returns>
+        public static bool HasVessel( this Transform part, out Vessel vessel )
+        {
+            vessel = part.root.GetComponent<Vessel>();
+            return vessel != null;
         }
     }
 }
