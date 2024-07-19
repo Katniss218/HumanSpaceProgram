@@ -51,7 +51,7 @@ namespace HSP.Content.Vessels.AssetLoaders
                     {
                         _filePath = partPath
                     };
-                    PartRegistry.Register( new NamespacedIdentifier( Path.GetFileName( modPath ), Path.GetFileName( partPath ) ), fac );
+                    PartRegistry.Register( new NamespacedID( Path.GetFileName( modPath ), Path.GetFileName( partPath ) ), fac );
                 }
             }
         }

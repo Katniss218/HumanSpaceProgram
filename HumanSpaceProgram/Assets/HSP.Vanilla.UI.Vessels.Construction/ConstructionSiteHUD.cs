@@ -6,7 +6,7 @@ using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
 
-namespace HSP.Vanilla.UI.Construction
+namespace HSP.Vanilla.UI.Vessels.Construction
 {
     public class ConstructionSiteHUD : UIPanel
     {

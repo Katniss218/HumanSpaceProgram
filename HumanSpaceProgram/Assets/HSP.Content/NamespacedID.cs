@@ -8,14 +8,14 @@ namespace HSP
     /// An identifier that consists of a namespace and a name.
     /// </summary>
     [Serializable]
-    public struct NamespacedIdentifier
+    public struct NamespacedID
     {
         [SerializeField]
         string _data;
 
         const string SEPARATOR = "::";
 
-        public NamespacedIdentifier( string @namespace, string name )
+        public NamespacedID( string @namespace, string name )
         {
             if( string.IsNullOrEmpty( @namespace ) )
             {
@@ -41,7 +41,7 @@ namespace HSP
 
         public override bool Equals( object obj )
         {
-            if( obj is NamespacedIdentifier id )
+            if( obj is NamespacedID id )
                 return this._data.Equals( id._data );
 
             return false;
@@ -52,7 +52,7 @@ namespace HSP
             return _data.ToString();
         }
 
-        public static NamespacedIdentifier Parse( string str )
+        public static NamespacedID Parse( string str )
         {
             string[] parts = str.Split( "::" );
             if( parts.Length != 2 )
@@ -64,19 +64,19 @@ namespace HSP
                 throw new ArgumentException( $"Namespace and a name must both be a nonnull, nonzero length strings.", nameof( str ) );
             }
 
-            return new NamespacedIdentifier()
+            return new NamespacedID()
             {
                 _data = str
             };
         }
 
-        [MapsInheritingFrom( typeof( NamespacedIdentifier ) )]
+        [MapsInheritingFrom( typeof( NamespacedID ) )]
         public static SerializationMapping NamespacedIdentifierMapping()
         {
-            return new PrimitiveStructSerializationMapping<NamespacedIdentifier>()
+            return new PrimitiveStructSerializationMapping<NamespacedID>()
             {
                 OnSave = ( o, s ) => (SerializedPrimitive)o.ToString(),
-                OnInstantiate = ( data, l ) => NamespacedIdentifier.Parse( (string)data )
+                OnInstantiate = ( data, l ) => NamespacedID.Parse( (string)data )
             };
         }
     }

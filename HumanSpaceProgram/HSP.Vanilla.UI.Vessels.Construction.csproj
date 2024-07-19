@@ -10,10 +10,10 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{C443A3BB-4D58-3A1D-D085-E8AEA15B2BC0}</ProjectGuid>
+    <ProjectGuid>{7D24693B-B85E-470B-BA5C-3CD9B6E8D6E3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <AssemblyName>HSP.Timelines</AssemblyName>
+    <AssemblyName>HSP.Vanilla.UI.Vessels.Construction</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <BaseDirectory>.</BaseDirectory>
@@ -58,10 +58,11 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.Timelines\TimelineManager.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI.Vessels.Construction\ConstructionSiteHUD.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI.Vessels.Construction\ConstructionSiteHUDManager.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\HSP.Timelines\___HSP.Timelines.asmdef" />
+    <None Include="Assets\HSP.Vanilla.UI.Vessels.Construction\___HSP.Vanilla.UI.Vessels.Construction.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -922,21 +923,21 @@
       <Project>{FED3C19A-E743-9E19-D660-957D0801811E}</Project>
       <Name>_UnityPlus.Serialization</Name>
     </ProjectReference>
+    <ProjectReference Include="_UnityPlus.UILib.csproj">
+      <Project>{3A5E96D9-C189-180D-1672-7BEFFDEBCE5F}</Project>
+      <Name>_UnityPlus.UILib</Name>
+    </ProjectReference>
     <ProjectReference Include="HSP.csproj">
       <Project>{5294BE79-15AB-2AAE-E8C3-9E735E001D6D}</Project>
       <Name>HSP</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.Content.csproj">
-      <Project>{642CD5D5-9E37-E1CA-969F-267B97A7FC25}</Project>
-      <Name>HSP.Content</Name>
+    <ProjectReference Include="HSP.Vessels.Construction.csproj">
+      <Project>{973ADF42-28BF-171E-CCCB-558E6DFC2896}</Project>
+      <Name>HSP.Vessels.Construction</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.Content.Timelines.csproj">
-      <Project>{B3FA8387-6EDE-645C-5A2E-FDC64907D803}</Project>
-      <Name>HSP.Content.Timelines</Name>
-    </ProjectReference>
-    <ProjectReference Include="HSP.SceneManagement.csproj">
-      <Project>{5B21ACE1-5E92-EEB2-818D-AF6D6AE9F824}</Project>
-      <Name>HSP.SceneManagement</Name>
+    <ProjectReference Include="HSP.UI.csproj">
+      <Project>{05A5E85F-FD04-4199-F86F-3A6E38B383FB}</Project>
+      <Name>HSP.UI</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

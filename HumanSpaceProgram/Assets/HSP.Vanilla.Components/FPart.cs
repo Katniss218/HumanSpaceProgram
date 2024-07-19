@@ -11,7 +11,7 @@ namespace HSP.Vessels.Components
     public class FPart : MonoBehaviour
     {
         [field: SerializeField]
-        public NamespacedIdentifier PartID { get; set; }
+        public NamespacedID PartID { get; set; }
 
         public static PartMetadata GetPart( Transform obj )
         {
@@ -32,7 +32,7 @@ namespace HSP.Vessels.Components
         {
             return new MemberwiseSerializationMapping<FPart>()
             {
-                ("part_id", new Member<FPart, NamespacedIdentifier>( o => o.PartID ))
+                ("part_id", new Member<FPart, NamespacedID>( o => o.PartID ))
             };
         }
     }

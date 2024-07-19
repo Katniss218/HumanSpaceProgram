@@ -1001,9 +1001,9 @@
       <Project>{FFD77CE1-030A-7905-618A-BF767836F6ED}</Project>
       <Name>HSP.Vanilla.UI.Components</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.Vanilla.UI.Construction.csproj">
-      <Project>{5958E0F1-8E8D-8984-0C66-BCF58DD2FE91}</Project>
-      <Name>HSP.Vanilla.UI.Construction</Name>
+    <ProjectReference Include="HSP.Vanilla.UI.Vessels.Construction.csproj">
+      <Project>{7D24693B-B85E-470B-BA5C-3CD9B6E8D6E3}</Project>
+      <Name>HSP.Vanilla.UI.Vessels.Construction</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.Vanilla.UI.Timelines.csproj">
       <Project>{426EC70C-729C-F20E-2722-D105402F2F55}</Project>

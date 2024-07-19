@@ -59,8 +59,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\HSP.Content\HumanSpaceProgramContent.cs" />
+    <Compile Include="Assets\HSP.Content\Version.cs" />
     <Compile Include="Assets\HSP.Content\Mods\HumanSpaceProgramModLoader.cs" />
     <Compile Include="Assets\HSP.Content\AssetLoaders\GameDataTextureLoader.cs" />
+    <Compile Include="Assets\HSP.Content\NamespacedID.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Content\___HSP.Content.asmdef" />

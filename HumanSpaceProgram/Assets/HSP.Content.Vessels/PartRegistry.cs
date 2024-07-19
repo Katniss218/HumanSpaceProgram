@@ -12,12 +12,12 @@ namespace HSP.Content.Vessels
     /// </summary>
     public static class PartRegistry
     {
-        private static Dictionary<NamespacedIdentifier, PartFactory> _registry = new Dictionary<NamespacedIdentifier, PartFactory>();
+        private static Dictionary<NamespacedID, PartFactory> _registry = new Dictionary<NamespacedID, PartFactory>();
 
         /// <summary>
         /// Registers a Unity hierarchy factory under the specified mod and part IDs.
         /// </summary>
-        public static void Register( NamespacedIdentifier namespacedPartId, PartFactory factory )
+        public static void Register( NamespacedID namespacedPartId, PartFactory factory )
         {
             _registry.Add( namespacedPartId, factory );
         }
@@ -25,7 +25,7 @@ namespace HSP.Content.Vessels
         /// <summary>
         /// Unregisters a Unity hierarchy factory under the specified mod and part IDs.
         /// </summary>
-        public static void Unregister( NamespacedIdentifier namespacedPartId )
+        public static void Unregister( NamespacedID namespacedPartId )
         {
             _registry.Remove( namespacedPartId );
         }
@@ -71,7 +71,7 @@ namespace HSP.Content.Vessels
         /// <summary>
         /// Loads a specified registered part metadata from its source.
         /// </summary>
-        public static PartMetadata LoadMetadata( NamespacedIdentifier namespacedPartId )
+        public static PartMetadata LoadMetadata( NamespacedID namespacedPartId )
         {
             if( _registry.TryGetValue( namespacedPartId, out PartFactory factory ) )
             {
@@ -84,7 +84,7 @@ namespace HSP.Content.Vessels
         /// <summary>
         /// Loads a specified registered unity hierarchy from its source.
         /// </summary>
-        public static GameObject Load( NamespacedIdentifier namespacedPartId )
+        public static GameObject Load( NamespacedID namespacedPartId )
         {
             if( _registry.TryGetValue( namespacedPartId, out PartFactory factory ) )
             {
@@ -97,7 +97,7 @@ namespace HSP.Content.Vessels
         /// <summary>
         /// Loads a specified registered unity hierarchy from its source.
         /// </summary>
-        public static GameObject Load( NamespacedIdentifier namespacedPartId, IForwardReferenceMap refMap )
+        public static GameObject Load( NamespacedID namespacedPartId, IForwardReferenceMap refMap )
         {
             if( refMap == null )
             {

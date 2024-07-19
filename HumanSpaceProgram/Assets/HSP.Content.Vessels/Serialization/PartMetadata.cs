@@ -25,7 +25,7 @@ namespace HSP.Content.Vessels.Serialization
         /// <summary>
         /// The unique ID of this part.
         /// </summary>
-        public readonly NamespacedIdentifier ID;
+        public readonly NamespacedID ID;
 
         /// <summary>
         /// The display name shown in the GUI.
@@ -69,7 +69,7 @@ namespace HSP.Content.Vessels.Serialization
 
             string partId = Path.GetFileName( path );
             string modId = Path.GetFileName( Path.GetDirectoryName( Path.GetDirectoryName( path ) ) );
-            this.ID = new NamespacedIdentifier( modId, partId );
+            this.ID = new NamespacedID( modId, partId );
         }
 
         /// <summary>

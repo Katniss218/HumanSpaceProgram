@@ -46,7 +46,7 @@ namespace HSP.Content.Vessels.AssetLoaders
                 {
                     _vesselId = vId
                 };
-                PartRegistry.Register( new NamespacedIdentifier( "Vessels", vId ), fac );
+                PartRegistry.Register( new NamespacedID( "Vessels", vId ), fac );
             }
         }
     }

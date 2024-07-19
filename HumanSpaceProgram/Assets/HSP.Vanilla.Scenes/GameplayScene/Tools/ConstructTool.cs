@@ -37,7 +37,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Tools
         public void SpawnVesselAndSetGhost( string vesselId )
         {
             ForwardReferenceStore refStore = new ForwardReferenceStore();
-            GameObject spawnedGameObject = PartRegistry.Load( new NamespacedIdentifier( "Vessels", vesselId ), refStore );
+            GameObject spawnedGameObject = PartRegistry.Load( new NamespacedID( "Vessels", vesselId ), refStore );
             if( spawnedGameObject == null )
             {
                 GameplaySceneToolManager.UseTool<DefaultTool>();

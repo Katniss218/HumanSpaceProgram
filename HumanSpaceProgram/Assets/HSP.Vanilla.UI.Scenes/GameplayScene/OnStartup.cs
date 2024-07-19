@@ -1,6 +1,6 @@
 using HSP.Vanilla.Scenes.GameplayScene;
 using HSP.Vanilla.UI.Components;
-using HSP.Vanilla.UI.Construction;
+using HSP.Vanilla.UI.Vessels.Construction;
 
 namespace HSP.Vanilla.UI.Scenes.GameplayScene
 {

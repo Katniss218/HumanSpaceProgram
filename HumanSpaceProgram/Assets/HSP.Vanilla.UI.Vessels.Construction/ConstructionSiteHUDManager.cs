@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityPlus.UILib;
 
-namespace HSP.Vanilla.UI.Construction
+namespace HSP.Vanilla.UI.Vessels.Construction
 {
     public class ConstructionSiteHUDManager : SingletonMonoBehaviour<ConstructionSiteHUDManager>
     {
