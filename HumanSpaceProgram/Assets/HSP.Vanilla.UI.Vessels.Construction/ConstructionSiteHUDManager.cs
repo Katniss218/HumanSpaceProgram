@@ -10,7 +10,10 @@ namespace HSP.Vanilla.UI.Vessels.Construction
     {
         List<ConstructionSiteHUD> _huds = new List<ConstructionSiteHUD>();
 
-        [HSPEventListener( HSPEvent_AFTER_CONSTRUCTION_SITE_CREATED.ID, "vanilla.csite_huds" )]
+        public const string CREATE_CONSTRUCTION_SITE_HUD = HSPEvent.NAMESPACE_HSP + ".create_csite_hud";
+        public const string DESTROY_CONSTRUCTION_SITE_HUD = HSPEvent.NAMESPACE_HSP + ".destroy_csite_hud";
+
+        [HSPEventListener( HSPEvent_AFTER_CONSTRUCTION_SITE_CREATED.ID, CREATE_CONSTRUCTION_SITE_HUD )]
         private static void OnConstructionSiteCreated( FConstructionSite constructionSite )
         {
             //if( ActiveObjectManager.ActiveObject == null )
@@ -20,7 +23,7 @@ namespace HSP.Vanilla.UI.Vessels.Construction
             //}
         }
 
-        [HSPEventListener( HSPEvent_AFTER_CONSTRUCTION_SITE_DESTROYED.ID, "vanilla.csite_huds" )]
+        [HSPEventListener( HSPEvent_AFTER_CONSTRUCTION_SITE_DESTROYED.ID, DESTROY_CONSTRUCTION_SITE_HUD )]
         private static void OnConstructionSiteDestroyed( FConstructionSite constructionSite )
         {
             if( !instanceExists ) // Can be null if exiting a scene - it doesn't affect anything, but gives ugly warnings.

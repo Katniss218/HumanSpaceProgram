@@ -24,7 +24,11 @@ namespace HSP.Vanilla.UI.Scenes.DesignScene
         public static UIPanel _toolOptionsPanel;
         public static UIInputField<string> _vesselNameIF;
 
-        [HSPEventListener( HSPEvent_STARTUP_DESIGN.ID, HSPEvent.NAMESPACE_HSP + ".design_scene_ui" )]
+        public const string CREATE_DESIGN_SCENE_UI = HSPEvent.NAMESPACE_HSP + ".design_scene_ui";
+        public const string UPDATE_VESSEL_NAME = HSPEvent.NAMESPACE_HSP + ".update.vessel_name";
+        public const string UPDATE_SELECTED_TOOL = HSPEvent.NAMESPACE_HSP + ".update.tool";
+
+        [HSPEventListener( HSPEvent_STARTUP_DESIGN.ID, CREATE_DESIGN_SCENE_UI )]
         public static void Create()
         {
             UICanvas canvas = CanvasManager.Get( CanvasName.STATIC );
@@ -42,7 +46,7 @@ namespace HSP.Vanilla.UI.Scenes.DesignScene
             UIPartList partListUI = canvas.AddPartList( new UILayoutInfo( UIAnchor.Left, UIFill.Vertical( 30, 0 ), 0, PART_LIST_WIDTH ) );
         }
 
-        [HSPEventListener( HSPEvent_AFTER_DESIGN_SCENE_VESSEL_LOADED.ID, HSPEvent.NAMESPACE_HSP + ".update_current" )]
+        [HSPEventListener( HSPEvent_AFTER_DESIGN_SCENE_VESSEL_LOADED.ID, UPDATE_VESSEL_NAME )]
         private static void OnAfterVesselLoad( object e )
         {
             _vesselNameIF.SetValue( DesignVesselManager.CurrentVesselMetadata.Name );
@@ -125,7 +129,7 @@ namespace HSP.Vanilla.UI.Scenes.DesignScene
             } );
         }
 
-        [HSPEventListener( HSPEvent_AFTER_DESIGN_SCENE_TOOL_CHANGED.ID, HSPEvent.NAMESPACE_HSP + ".tool_changed_ui" )]
+        [HSPEventListener( HSPEvent_AFTER_DESIGN_SCENE_TOOL_CHANGED.ID, UPDATE_SELECTED_TOOL )]
         private static void CreateCurrentToolOptions( object e )
         {
             if( !_toolOptionsPanel.IsNullOrDestroyed() )

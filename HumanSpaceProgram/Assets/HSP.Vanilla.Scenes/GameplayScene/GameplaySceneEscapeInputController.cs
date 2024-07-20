@@ -19,12 +19,6 @@ namespace HSP.Vanilla.Scenes.GameplayScene
     [DisallowMultipleComponent]
     public class GameplaySceneEscapeInputController : MonoBehaviour
     {
-        [HSPEventListener( HSPEvent_STARTUP_GAMEPLAY.ID, HSPEvent.NAMESPACE_HSP + ".add_escape_icontroller" )]
-        private static void CreateInstanceInScene()
-        {
-            GameplaySceneManager.Instance.gameObject.AddComponent<GameplaySceneEscapeInputController>();
-        }
-
         void OnEnable()
         {
             HierarchicalInputManager.AddAction( HierarchicalInputChannel.COMMON_ESCAPE, HierarchicalInputPriority.MEDIUM, Input_Escape );

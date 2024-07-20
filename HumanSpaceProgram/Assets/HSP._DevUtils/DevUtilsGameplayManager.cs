@@ -42,15 +42,18 @@ namespace HSP._DevUtils
         static Vessel launchSite;
         static Vessel vessel;
 
-        [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, "devutils.load_game_data" )]
-        static void LoadGameData( object e )
+        public const string LOAD_PLACEHOLDER_CONTENT = "devutils.load_game_data";
+        public const string CREATE_PLACEHOLDER_UNIVERSE = "devutils.timeline.new.after";
+
+        [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, LOAD_PLACEHOLDER_CONTENT )]
+        private static void LoadGameData( object e )
         {
             AssetRegistry.Register( "substance.f", new Substance() { Density = 1000, DisplayName = "Fuel", UIColor = new Color( 1.0f, 0.3764706f, 0.2509804f ) } );
             AssetRegistry.Register( "substance.ox", new Substance() { Density = 1000, DisplayName = "Oxidizer", UIColor = new Color( 0.2509804f, 0.5607843f, 1.0f ) } );
         }
 
-        [HSPEventListener( HSPEvent_AFTER_TIMELINE_NEW.ID, "devutils.timeline.new.after" )]
-        static void OnAfterCreateDefault( object e )
+        [HSPEventListener( HSPEvent_AFTER_TIMELINE_NEW.ID, CREATE_PLACEHOLDER_UNIVERSE )]
+        private static void OnAfterCreateDefault( object e )
         {
             CelestialBody body = CelestialBodyManager.Get( "main" );
             Vector3 localPos = CoordinateUtils.GeodeticToEuclidean( 28.5857702f, -80.6507262f, (float)(body.Radius + 1.0) );
@@ -68,7 +71,7 @@ namespace HSP._DevUtils
             vessel = v;
         }
 
-        static Vessel CreateVessel( Vessel launchSite )
+        private static Vessel CreateVessel( Vessel launchSite )
         {
             if( launchSite == null )
             {
@@ -233,7 +236,7 @@ namespace HSP._DevUtils
             }
         }
 
-        static GameObject InstantiateLocal( GameObject original, Transform parent, Vector3 pos, Quaternion rot )
+        private static GameObject InstantiateLocal( GameObject original, Transform parent, Vector3 pos, Quaternion rot )
         {
             GameObject go = Instantiate( original, parent );
             go.transform.localPosition = pos;
@@ -241,7 +244,7 @@ namespace HSP._DevUtils
             return go;
         }
 
-        static Vessel CreateDummyVessel( Vector3Dbl airfPosition, QuaternionDbl rotation )
+        private static Vessel CreateDummyVessel( Vector3Dbl airfPosition, QuaternionDbl rotation )
         {
             GameObject capsulePrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/capsule" );
             GameObject intertankPrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/intertank" );

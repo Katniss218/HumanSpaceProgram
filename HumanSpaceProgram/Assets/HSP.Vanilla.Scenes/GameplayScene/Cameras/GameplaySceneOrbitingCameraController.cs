@@ -146,7 +146,9 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
             return true;
         }
 
-        [HSPEventListener( HSPEvent_AFTER_ACTIVE_OBJECT_CHANGED.ID, HSPEvent.NAMESPACE_HSP + "camera.snap_to_vessel" )]
+        public const string SNAP_CAMERA_TO_ACTIVE_OBJECT = HSPEvent.NAMESPACE_HSP + ".camera.snap_to_vessel";
+
+        [HSPEventListener( HSPEvent_AFTER_ACTIVE_OBJECT_CHANGED.ID, SNAP_CAMERA_TO_ACTIVE_OBJECT )]
         private static void SnapToActiveObject( object e )
         {
             if( ActiveObjectManager.ActiveObject == null )

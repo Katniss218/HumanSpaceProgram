@@ -16,8 +16,10 @@ namespace HSP.Vanilla.UI.Scenes.GameplayScene
     {
         static UIPanel _mainPanel; // TODO - replace this with individual elements
 
-        [HSPEventListener( HSPEvent_AFTER_ACTIVE_OBJECT_CHANGED.ID, HSPEvent.NAMESPACE_HSP + ".gameplay_ui" )]
-        [HSPEventListener( HSPEvent_STARTUP_GAMEPLAY.ID, HSPEvent.NAMESPACE_HSP + ".gameplay_ui", After = new[] { "add_active_object_manager" } )]
+        public const string CREATE_UI = HSPEvent.NAMESPACE_HSP + ".gameplay_ui";
+
+        [HSPEventListener( HSPEvent_AFTER_ACTIVE_OBJECT_CHANGED.ID, CREATE_UI )]
+        [HSPEventListener( HSPEvent_STARTUP_GAMEPLAY.ID, CREATE_UI, After = new[] { HSP.Vanilla.Scenes.GameplayScene.OnStartup.ADD_ACTIVE_OBJECT_MANAGER } )]
         public static void CreateUI()
         {
             UICanvas canvas = CanvasManager.Get( CanvasName.STATIC );

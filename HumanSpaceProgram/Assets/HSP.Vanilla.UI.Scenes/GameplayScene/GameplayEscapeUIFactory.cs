@@ -15,7 +15,9 @@ namespace HSP.Vanilla.UI.Scenes.GameplayScene
     {
         static UIWindow escapeMenuWindow;
 
-        [HSPEventListener( HSPEvent_ON_ESCAPE_GAMEPLAY.ID, HSPEvent.NAMESPACE_HSP + ".escape_menu_ui" )]
+        public const string CREATE_UI = HSPEvent.NAMESPACE_HSP + ".escape_menu_ui";
+
+        [HSPEventListener( HSPEvent_ON_ESCAPE_GAMEPLAY.ID, CREATE_UI )]
         private static void OnGameplayEscape()
         {
             if( TimeManager.IsPaused && TimeManager.LockTimescale )

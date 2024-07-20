@@ -9,7 +9,9 @@ namespace HSP._DevUtils
 {
     public static class VanillaPlanetarySystemFactory
     {
-        static CelestialBody CreateCB( string id, Vector3Dbl airfPos, QuaternionDbl airfRot )
+        public const string CREATE_UNIVERSE = HSPEvent.NAMESPACE_HSP + ".create_universe";
+
+        private static CelestialBody CreateCB( string id, Vector3Dbl airfPos, QuaternionDbl airfRot )
         {
             CelestialBody cb = new CelestialBodyFactory(id).Create( airfPos, airfRot );
             LODQuadSphere lqs = cb.gameObject.AddComponent<LODQuadSphere>();
@@ -17,8 +19,8 @@ namespace HSP._DevUtils
             return cb;
         }
 
-        [HSPEventListener( HSPEvent_BEFORE_TIMELINE_NEW.ID, HSPEvent.NAMESPACE_HSP + ".create_universe" )]
-        [HSPEventListener( HSPEvent_BEFORE_TIMELINE_LOAD.ID, HSPEvent.NAMESPACE_HSP + ".create_universe" )]
+        [HSPEventListener( HSPEvent_BEFORE_TIMELINE_NEW.ID, CREATE_UNIVERSE )]
+        [HSPEventListener( HSPEvent_BEFORE_TIMELINE_LOAD.ID, CREATE_UNIVERSE )]
         public static void CreateDefaultPlanetarySystem( object e )
         {
             QuaternionDbl orientation = Quaternion.Euler( 270, 0, 0 );

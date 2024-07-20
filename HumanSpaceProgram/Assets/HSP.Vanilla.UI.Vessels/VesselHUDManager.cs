@@ -1,7 +1,5 @@
 ﻿using HSP.ReferenceFrames;
-using HSP.SceneManagement;
 using HSP.UI;
-using HSP.Vanilla.Scenes.GameplayScene;
 using HSP.Vessels;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,7 +11,11 @@ namespace HSP.Vanilla.UI.Vessels
     {
         List<VesselHUD> _huds = new List<VesselHUD>();
 
-        [HSPEventListener( HSPEvent_AFTER_VESSEL_REGISTERED.ID, HSPEvent.NAMESPACE_HSP + ".vessel_hud_manager" )]
+        public const string CREATE_VESSEL_HUD = HSPEvent.NAMESPACE_HSP + ".create_vessel_hud";
+        public const string DESTROY_VESSEL_HUD = HSPEvent.NAMESPACE_HSP + ".destroy_vessel_hud";
+        public const string CREATE_OR_DESTROY_VESSEL_HUDS = HSPEvent.NAMESPACE_HSP + ".c_or_d_vessel_huds";
+
+        [HSPEventListener( HSPEvent_AFTER_VESSEL_REGISTERED.ID, CREATE_VESSEL_HUD )]
         private static void OnVesselRegistered( Vessel vessel )
         {
             if( !instanceExists )
@@ -26,7 +28,7 @@ namespace HSP.Vanilla.UI.Vessels
             }
         }
 
-        [HSPEventListener( HSPEvent_AFTER_VESSEL_UNREGISTERED.ID, HSPEvent.NAMESPACE_HSP + ".vessel_hud_manager" )]
+        [HSPEventListener( HSPEvent_AFTER_VESSEL_UNREGISTERED.ID, DESTROY_VESSEL_HUD )]
         private static void OnVesselUnregistered( Vessel vessel )
         {
             if( !instanceExists )
@@ -45,7 +47,7 @@ namespace HSP.Vanilla.UI.Vessels
             }
         }
 
-        [HSPEventListener( HSPEvent_AFTER_ACTIVE_OBJECT_CHANGED.ID, HSPEvent.NAMESPACE_HSP + ".vessel_hud_manager" )]
+        [HSPEventListener( HSPEvent_AFTER_ACTIVE_OBJECT_CHANGED.ID, CREATE_OR_DESTROY_VESSEL_HUDS )]
         private static void OnActiveObjectChanged()
         {
             if( !instanceExists )

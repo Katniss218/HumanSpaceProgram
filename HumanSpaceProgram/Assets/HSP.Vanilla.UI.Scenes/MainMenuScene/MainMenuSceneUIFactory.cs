@@ -20,7 +20,9 @@ namespace HSP.Vanilla.UI.Scenes.MainMenuScene
         static UIStartNewGameWindow _startNewGameWindow; // singleton window
         static UILoadWindow _loadWindow; // singleton window
 
-        [HSPEventListener( HSPEvent_STARTUP_MAIN_MENU.ID, HSPEvent.NAMESPACE_HSP + ".mainmenu_ui" )]
+        public const string CREATE_UI = HSPEvent.NAMESPACE_HSP + ".mainmenu_ui";
+
+        [HSPEventListener( HSPEvent_STARTUP_MAIN_MENU.ID, CREATE_UI )]
         public static void Create()
         {
             UICanvas canvas = CanvasManager.Get( CanvasName.STATIC );

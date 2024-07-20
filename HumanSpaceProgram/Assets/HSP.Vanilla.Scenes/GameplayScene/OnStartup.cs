@@ -1,6 +1,5 @@
 using HSP.CelestialBodies;
 using HSP.ReferenceFrames;
-using HSP.Vanilla.Scenes.EditorScene;
 using HSP.Vanilla.Scenes.GameplayScene.Cameras;
 using HSP.Vessels;
 using UnityEngine;

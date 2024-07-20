@@ -18,12 +18,6 @@ namespace HSP.Vanilla.Scenes.EditorScene
     [DisallowMultipleComponent]
     public class EditorSceneEscapeInputController : MonoBehaviour
     {
-        [HSPEventListener( HSPEvent_STARTUP_EDITOR.ID, HSPEvent.NAMESPACE_HSP + ".add_escape_icontroller" )]
-        private static void CreateInstanceInScene()
-        {
-            EditorSceneManager.Instance.gameObject.AddComponent<EditorSceneEscapeInputController>();
-        }
-
         void OnEnable()
         {
             HierarchicalInputManager.AddAction( HierarchicalInputChannel.COMMON_ESCAPE, HierarchicalInputPriority.MEDIUM, Input_Escape );
