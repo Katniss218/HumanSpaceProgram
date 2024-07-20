@@ -1,4 +1,5 @@
 using HSP.ReferenceFrames;
+using HSP.Time;
 using HSP.Vessels;
 using UnityEngine;
 
@@ -6,6 +7,14 @@ namespace HSP.Vanilla.Scenes.DesignScene
 {
     public class OnStartup : MonoBehaviour
     {
+        public const string UNPAUSE = HSPEvent.NAMESPACE_HSP + ".unpause";
+
+        [HSPEventListener( HSPEvent_STARTUP_DESIGN.ID, UNPAUSE )]
+        private static void Unpause()
+        {
+            TimeManager.Unpause();
+        }
+
         public const string ADD_VESSEL_MANAGER = HSPEvent.NAMESPACE_HSP + ".add_vessel_manager";
         public const string ADD_DESIGN_SCENE_TOOL_MANAGER = HSPEvent.NAMESPACE_HSP + ".add_design_scene_tool_manager";
         public const string ADD_DESIGN_VESSEL_MANAGER = HSPEvent.NAMESPACE_HSP + ".add_design_vessel_manager";

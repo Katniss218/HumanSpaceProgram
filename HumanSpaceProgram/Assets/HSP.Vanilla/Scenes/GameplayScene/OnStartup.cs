@@ -1,5 +1,6 @@
 using HSP.CelestialBodies;
 using HSP.ReferenceFrames;
+using HSP.Time;
 using HSP.Vanilla.Scenes.GameplayScene.Cameras;
 using HSP.Vessels;
 using UnityEngine;
@@ -8,6 +9,14 @@ namespace HSP.Vanilla.Scenes.GameplayScene
 {
     public class OnStartup : MonoBehaviour
     {
+        public const string UNPAUSE = HSPEvent.NAMESPACE_HSP + ".unpause";
+
+        [HSPEventListener( HSPEvent_STARTUP_GAMEPLAY.ID, UNPAUSE )]
+        private static void Unpause()
+        {
+            TimeManager.Unpause();
+        }
+
         public const string ADD_TIMESCALE_INPUT_CONTROLLER = HSPEvent.NAMESPACE_HSP + ".add_timescale_input_controller";
         public const string ADD_VESSEL_MANAGER = HSPEvent.NAMESPACE_HSP + ".add_vessel_manager";
         public const string ADD_CELESTIAL_BODY_MANAGER = HSPEvent.NAMESPACE_HSP + ".add_celestial_body_manager";
