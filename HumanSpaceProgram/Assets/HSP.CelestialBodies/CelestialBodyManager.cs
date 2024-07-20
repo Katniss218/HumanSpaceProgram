@@ -10,10 +10,6 @@ namespace HSP.CelestialBodies
 
         public static CelestialBody Get( string id )
         {
-#warning TODO - ManagerNotFoundException? or SingletonMonoBehaviourNotFoundException?
-           // if( !instanceExists )
-           //     throw new InvalidSceneManagerException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
-
             if( instance._celestialBodies.TryGetValue( id, out CelestialBody body ) )
             {
                 return body;
@@ -29,9 +25,6 @@ namespace HSP.CelestialBodies
         {
             get
             {
-               // if( !instanceExists )
-               //     throw new InvalidSceneManagerException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
-
                 return instance._celestialBodies.Values;
             }
         }
@@ -40,26 +33,17 @@ namespace HSP.CelestialBodies
         {
             get
             {
-               // if( !instanceExists )
-               //     throw new InvalidSceneManagerException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
-
                 return instance._celestialBodies.Count;
             }
         }
 
         internal static void Register( CelestialBody celestialBody )
         {
-           // if( !instanceExists )
-           //     throw new InvalidSceneManagerException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
-
             instance._celestialBodies[celestialBody.ID] = celestialBody;
         }
 
         internal static void Unregister( string id )
         {
-           // if( !instanceExists )
-           //     throw new InvalidSceneManagerException( $"{nameof( CelestialBodyManager )} is only available in the gameplay scene." );
-
             instance._celestialBodies.Remove( id );
         }
 

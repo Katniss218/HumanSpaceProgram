@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace UnityEngine
 {
     /// <summary>
@@ -32,11 +27,11 @@ namespace UnityEngine
                     T[] instances = FindObjectsOfType<T>( true );
                     if( instances.Length == 0 )
                     {
-                        throw new InvalidOperationException( $"Requested {nameof( MonoBehaviour )} {typeof( T ).Name} was not found." );
+                        throw new SingletonInstanceException( $"Requested {nameof( MonoBehaviour )} {typeof( T ).Name} was not found." );
                     }
                     if( instances.Length > 1 )
                     {
-                        throw new InvalidOperationException( $"Too many instances of {nameof( MonoBehaviour )} {typeof( T ).Name}." );
+                        throw new SingletonInstanceException( $"Too many instances of {nameof( MonoBehaviour )} {typeof( T ).Name}." );
                     }
 
                     __instance = instances[0];

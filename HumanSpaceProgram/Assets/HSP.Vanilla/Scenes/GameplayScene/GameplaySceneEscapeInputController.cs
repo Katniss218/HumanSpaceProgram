@@ -36,12 +36,12 @@ namespace HSP.Vanilla.Scenes.GameplayScene
                 if( TimeManager.IsPaused )
                 {
                     TimeManager.Unpause();
-                    HSPEvent.EventManager.TryInvoke( HSPEvent_ON_ESCAPE_GAMEPLAY.ID, null );
+                    HSPEvent.EventManager.TryInvoke( HSPEvent_ON_ESCAPE_GAMEPLAY.ID );
                 }
                 else
                 {
                     TimeManager.Pause();
-                    HSPEvent.EventManager.TryInvoke( HSPEvent_ON_ESCAPE_GAMEPLAY.ID, null );
+                    HSPEvent.EventManager.TryInvoke( HSPEvent_ON_ESCAPE_GAMEPLAY.ID );
                 }
             }
             return false;

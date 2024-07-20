@@ -1,5 +1,6 @@
 ﻿using HSP.Content.Vessels;
 using HSP.Content.Vessels.Serialization;
+using HSP.Vanilla.Scenes.AlwaysLoadedScene;
 using System.IO;
 using UnityEngine;
 using UnityPlus.Serialization;
@@ -11,7 +12,16 @@ namespace HSP.Vanilla.Content.AssetLoaders
     /// Finds and registers json parts in GameData.
     /// </summary>
     public sealed class GameDataJsonVesselFactory : PartFactory
-    {        
+    {
+        public const string RELOAD_VESSELS = HSPEvent.NAMESPACE_HSP + ".reload_vessels";
+
+        [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, RELOAD_VESSELS )]
+        public static void ReloadVessels2()
+        {
+            GameDataJsonVesselFactory.ReloadVesselsAsParts();
+        }
+
+
         private string _vesselId;
 
         public override PartMetadata LoadMetadata()

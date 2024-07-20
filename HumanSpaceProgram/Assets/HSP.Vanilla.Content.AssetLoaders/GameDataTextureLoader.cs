@@ -1,4 +1,5 @@
 ﻿using HSP.Content;
+using HSP.Vanilla.Scenes.AlwaysLoadedScene;
 using System.IO;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
@@ -8,6 +9,14 @@ namespace HSP.Vanilla.Content.AssetLoaders
 {
     public static class GameDataTextureLoader
     {
+        public const string RELOAD_TEXTURES = HSPEvent.NAMESPACE_HSP + ".reload_textures";
+
+        [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, RELOAD_TEXTURES )]
+        public static void ReloadTextures2()
+        {
+            GameDataTextureLoader.ReloadTextures();
+        }
+
         public static void ReloadTextures()
         {
             string gameDataPath = HumanSpaceProgramContent.GetContentDirectoryPath();

@@ -69,8 +69,7 @@ namespace HSP.CelestialBodies
                 {
                     CelestialBodyManager.Unregister( this.ID );
                 }
-               // catch( InvalidSceneManagerException )
-                catch( Exception )
+                catch( SingletonInstanceException )
                 {
                     // OnDisable was called when scene was unloaded, ignore.
                 }

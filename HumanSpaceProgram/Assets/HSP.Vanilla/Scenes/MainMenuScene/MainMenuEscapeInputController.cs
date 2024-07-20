@@ -1,4 +1,5 @@
 ﻿using HSP.Input;
+using HSP.Time;
 using UnityEngine;
 using UnityPlus.Input;
 
@@ -30,7 +31,19 @@ namespace HSP.Vanilla.Scenes.MainMenuScene
 
         private bool Input_Escape( float value )
         {
-            HSPEvent.EventManager.TryInvoke( HSPEvent_ON_ESCAPE_MAIN_MENU.ID, null );
+            if( !TimeManager.LockTimescale )
+            {
+                if( TimeManager.IsPaused )
+                {
+                    TimeManager.Unpause();
+                    HSPEvent.EventManager.TryInvoke( HSPEvent_ON_ESCAPE_MAIN_MENU.ID );
+                }
+                else
+                {
+                    TimeManager.Pause();
+                    HSPEvent.EventManager.TryInvoke( HSPEvent_ON_ESCAPE_MAIN_MENU.ID );
+                }
+            }
             return false;
         }
     }

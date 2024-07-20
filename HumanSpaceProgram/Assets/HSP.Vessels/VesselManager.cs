@@ -17,9 +17,6 @@ namespace HSP.Vessels
         {
             get
             {
-                // if( !instanceExists )
-                //     throw new InvalidSceneManagerException( $"{nameof( VesselManager )} is only available in the gameplay scene." );
-
                 return instance._vessels;
             }
         }
@@ -28,26 +25,17 @@ namespace HSP.Vessels
         {
             get
             {
-                // if( !instanceExists )
-                //     throw new InvalidSceneManagerException( $"{nameof( VesselManager )} is only available in the gameplay scene." );
-
                 return instance._vessels.Count;
             }
         }
 
         internal static void Register( Vessel vessel )
         {
-            // if( !instanceExists )
-            //     throw new InvalidSceneManagerException( $"{nameof( VesselManager )} is only available in the gameplay scene." );
-
             instance._vessels.Add( vessel );
         }
 
         internal static void Unregister( Vessel vessel )
         {
-            // if( !instanceExists )
-            //     throw new InvalidSceneManagerException( $"{nameof( VesselManager )} is only available in the gameplay scene." );
-
             instance._vessels.Remove( vessel );
         }
     }

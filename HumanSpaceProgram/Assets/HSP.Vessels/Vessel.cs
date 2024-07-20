@@ -127,9 +127,9 @@ namespace HSP.Vessels
             {
                 VesselManager.Unregister( this );
             }
-            catch( Exception e ) // TODO - should only catch missing manager / singleton exceptions, but that doesn't exist yet as of writing this comment.
+            catch( SingletonInstanceException )
             {
-
+                // OnDisable was called when scene was unloaded, ignore.
             }
         }
 

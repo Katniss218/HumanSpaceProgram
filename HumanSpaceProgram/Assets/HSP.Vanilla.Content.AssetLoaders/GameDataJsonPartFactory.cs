@@ -14,26 +14,12 @@ namespace HSP.Vanilla.Content.AssetLoaders
     /// </summary>
     public sealed class GameDataJsonPartFactory : PartFactory
     {
-        public const string RELOAD_TEXTURES = HSPEvent.NAMESPACE_HSP + ".reload_textures";
         public const string RELOAD_PARTS = HSPEvent.NAMESPACE_HSP + ".reload_parts";
-        public const string RELOAD_VESSELS = HSPEvent.NAMESPACE_HSP + ".reload_vessels";
-
-        [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, RELOAD_TEXTURES )]
-        public static void ReloadTextures2()
-        {
-            GameDataTextureLoader.ReloadTextures();
-        }
 
         [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, RELOAD_PARTS )]
         public static void ReloadParts2()
         {
             GameDataJsonPartFactory.ReloadParts();
-        }
-
-        [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, RELOAD_VESSELS )]
-        public static void ReloadVessels2()
-        {
-            GameDataJsonVesselFactory.ReloadVesselsAsParts();
         }
 
 #warning TODO - change to namespaced mod-global ID

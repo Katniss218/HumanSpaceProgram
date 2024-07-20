@@ -1,1 +1,1 @@
-﻿{"$id":"4eea871d-a5ef-4b25-a25c-7799dacd0922","$type":"HSP.Content.Vessels.Serialization.PartMetadata, HSP.Content.Vessels, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","name":"Tank","description":null,"author":"Katniss","categories":["fuel_tank"],"filter":null,"group":null}
+﻿{"$id":"0322ab91-3d58-4e0f-8a03-bd5ce57b39bb","$type":"HSP.Content.Vessels.Serialization.PartMetadata, HSP.Vessels, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","name":"Tank","description":null,"author":"Katniss","categories":["fuel_tank"],"filter":null,"group":null}
