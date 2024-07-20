@@ -7,13 +7,18 @@ using UnityPlus.UILib.UIElements;
 
 namespace HSP.Vanilla.UI.Components
 {
-    public abstract class UIPartWindowComponent : UIPanel
+    public abstract class UIPartWindowComponent<TComponent> : UIPanel
     {
         protected UIRectMask contentPanel;
 
         private UIText _title;
 
         private UIButton _toggleButton;
+
+        /// <summary>
+        /// The object that is referenced by this UI element.
+        /// </summary>
+        public TComponent ReferenceComponent { get; protected set; }
 
         public string Title { get => _title.Text; set => _title.Text = value; }
 
@@ -42,7 +47,7 @@ namespace HSP.Vanilla.UI.Components
         /// <summary>
         /// Creates the core/base of the functionality panel.
         /// </summary>
-        protected static T Create<T>( IUIElementContainer parent ) where T : UIPartWindowComponent
+        protected static T Create<T>( IUIElementContainer parent, TComponent referenceComponent ) where T : UIPartWindowComponent<TComponent>
         {
             T uiPaw = UIPanel.Create<T>( parent, new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Top, 0, default ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/functionality_panel" ) );
 
@@ -51,6 +56,7 @@ namespace HSP.Vanilla.UI.Components
             UIButton collapseToggleButton = uiPaw.AddButton( new UILayoutInfo( UIAnchor.TopRight, (-20, 0), (15, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_up" ), uiPaw.ToggleOpen );
             
             UIRectMask contentMask = uiPaw.AddRectMask( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Top, -20, 15 ) );
+            uiPaw.ReferenceComponent = referenceComponent;
             uiPaw.contentPanel = contentMask;
             uiPaw._title = title;
             uiPaw._toggleButton = collapseToggleButton;

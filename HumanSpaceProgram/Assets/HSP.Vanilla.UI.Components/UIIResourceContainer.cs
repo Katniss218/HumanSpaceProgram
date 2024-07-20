@@ -1,5 +1,4 @@
 using HSP.ResourceFlow;
-using HSP.Vanilla.UI.Vessels;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
@@ -7,13 +6,8 @@ using UnityPlus.UILib.UIElements;
 
 namespace HSP.Vanilla.UI.Components
 {
-    public class UIIResourceContainer : UIPartWindowComponent
+    public class UIIResourceContainer : UIPartWindowComponent<IResourceContainer>
     {
-        /// <summary>
-        /// The object that is referenced by this UI element.
-        /// </summary>
-        public IResourceContainer ReferenceObject { get; set; }
-
         UIValueBar _bar;
 
         void Update()
@@ -21,10 +15,10 @@ namespace HSP.Vanilla.UI.Components
 #warning TODO - Inefficient as fuck.
             _bar.ClearSegments();
 
-            for( int i = 0; i < this.ReferenceObject.Contents.SubstanceCount; i++ )
+            for( int i = 0; i < this.ReferenceComponent.Contents.SubstanceCount; i++ )
             {
-                var sbs = this.ReferenceObject.Contents[i];
-                float perc = (sbs.MassAmount / sbs.Substance.Density) / ReferenceObject.MaxVolume;
+                var sbs = this.ReferenceComponent.Contents[i];
+                float perc = (sbs.MassAmount / sbs.Substance.Density) / ReferenceComponent.MaxVolume;
 
                 var seg = _bar.AddSegment( perc );
                 seg.Sprite = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/bar" );
@@ -32,9 +26,9 @@ namespace HSP.Vanilla.UI.Components
             }
         }
 
-        protected internal static T Create<T>( IUIElementContainer parent, IResourceContainer referenceObj ) where T : UIIResourceContainer
+        protected internal static T Create<T>( IUIElementContainer parent, IResourceContainer referenceComponent ) where T : UIIResourceContainer
         {
-            T uiIResourceContainer = UIPartWindowComponent.Create<T>( parent );
+            T uiIResourceContainer = UIPartWindowComponent<IResourceContainer>.Create<T>( parent, referenceComponent );
 
             uiIResourceContainer.Title = "Tank";
             uiIResourceContainer.OpenHeight = 15f;
@@ -42,7 +36,6 @@ namespace HSP.Vanilla.UI.Components
             UIValueBar uiValueBar = uiIResourceContainer.contentPanel.AddHorizontalValueBar( new UILayoutInfo( UIFill.Fill() ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/bar_background" ) )
                 .WithPadding( 5, 5, 1 );
 
-            uiIResourceContainer.ReferenceObject = referenceObj;
             uiIResourceContainer._bar = uiValueBar;
 
             UILayoutManager.ForceLayoutUpdate( uiIResourceContainer );
@@ -56,6 +49,20 @@ namespace HSP.Vanilla.UI.Components
         public static UIIResourceContainer AddIResourceContainer( this IUIElementContainer parent, IResourceContainer referenceObj )
         {
             return UIIResourceContainer.Create<UIIResourceContainer>( parent, referenceObj );
+        }
+    }
+
+    public static class ON_PART_WINDOW_REDRAW_Listener
+    {
+        public const string ADD_UIIResourceContainer = HSPEvent.NAMESPACE_HSP + ".add_uiiresourcecontainer";
+
+        [HSPEventListener( HSPEvent_ON_PART_WINDOW_REDRAW.ID, ADD_UIIResourceContainer )]
+        public static void OnPartWindowRedraw( (IUIElementContainer parent, Component component) e )
+        {
+            if( e.component is not IResourceContainer res )
+                return;
+
+            e.parent.AddIResourceContainer( res );
         }
     }
 }

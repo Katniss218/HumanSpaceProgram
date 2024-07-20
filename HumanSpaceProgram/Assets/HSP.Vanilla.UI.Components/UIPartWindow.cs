@@ -13,6 +13,14 @@ using UnityPlus.UILib.UIElements;
 namespace HSP.Vanilla.UI.Components
 {
     /// <summary>
+    /// Invoked once for every component, every time the part window is redrawn. Use this event to create FComponent UI elements.
+    /// </summary>
+    public static class HSPEvent_ON_PART_WINDOW_REDRAW
+    {
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".part_window_redraw";
+    }
+
+    /// <summary>
     /// A pop-up window containing the information about some part of a vessel.
     /// </summary>
     public class UIPartWindow : UIWindow
@@ -42,20 +50,12 @@ namespace HSP.Vanilla.UI.Components
                 go.Destroy();
             }
 
-            Component[] components = ReferencePart.GetComponents<Component>();
+            IEnumerable<Component> components = ReferencePart.GetComponents<Component>().OrderBy( c => c.GetType().Name );
 
-#warning TODO - Find a better way to overridably bind components to their UI elements.
-            // one kinda ugly way would be to put the type in the path.
-            // one slightly better way would be to put the object in the argument, but that will call every listener, most of which won't care about this specific object.
-            // also, make the event type-safe, event creation specifies type, later assignments must use a delegate that equals the created type.
-
-            /*foreach( var comp in components )
+            foreach( var comp in components )
             {
-                if( comp is IResourceContainer r )
-                {
-                    _list.AddIResourceContainer( r );
-                }
-            }*/
+                HSPEvent.EventManager.TryInvoke( HSPEvent_ON_PART_WINDOW_REDRAW.ID, (this._list, comp) );
+            }
         }
 
         void LateUpdate()
