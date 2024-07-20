@@ -5,6 +5,16 @@ using UnityEngine;
 
 namespace HSP.Vessels
 {
+    public static class HSPEvent_AFTER_VESSEL_CREATED
+    {
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".vessel_created.after";
+    }
+
+    public static class HSPEvent_AFTER_VESSEL_DESTROYED
+    {
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".vessel_destroyed.after";
+    }
+
     public static class HSPEvent_AFTER_VESSEL_HIERARCHY_CHANGED
     {
 #warning TODO - maybe remove the dependency on hspevent.eventmanager and make this type-safe? 
@@ -102,6 +112,8 @@ namespace HSP.Vessels
             this.PhysicsObject = this.GetComponent<IPhysicsObject>(); // needs to be here for deserialization, because it might be added in any order and I can't use RequireComponent because it needs to be removed when pinning.
             RecalculatePartCache();
             //SetPhysicsObjectParameters();
+
+            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_VESSEL_CREATED.ID, this );
         }
 
         void OnEnable()
@@ -119,6 +131,11 @@ namespace HSP.Vessels
             {
 
             }
+        }
+
+        private void OnDestroy()
+        {
+            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_VESSEL_DESTROYED.ID, this );
         }
 
         void FixedUpdate()

@@ -7,12 +7,7 @@ namespace HSP.Vessels
     {
         public const string ID = HSPEvent.NAMESPACE_HSP + ".vessel_created";
     }
-
-    public static class HSPEvent_AFTER_VESSEL_DESTROYED
-    {
-        public const string ID = HSPEvent.NAMESPACE_HSP + ".vessel_destroyed";
-    }
-
+    
     /// <summary>
     /// A class responsible for instantiating a vessel from a source (save file, on launch, etc).
     /// </summary>
@@ -63,8 +58,6 @@ namespace HSP.Vessels
         public static void Destroy( Vessel vessel )
         {
             UnityEngine.Object.Destroy( vessel.gameObject );
-
-            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_VESSEL_DESTROYED.ID, vessel );
         }
     }
 }
