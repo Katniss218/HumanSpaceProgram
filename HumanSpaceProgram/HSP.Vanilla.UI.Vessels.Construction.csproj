@@ -60,6 +60,7 @@
   <ItemGroup>
     <Compile Include="Assets\HSP.Vanilla.UI.Vessels.Construction\ConstructionSiteHUD.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI.Vessels.Construction\ConstructionSiteHUDManager.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI.Vessels.Construction\OnStartup.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla.UI.Vessels.Construction\___HSP.Vanilla.UI.Vessels.Construction.asmdef" />
@@ -931,13 +932,21 @@
       <Project>{5294BE79-15AB-2AAE-E8C3-9E735E001D6D}</Project>
       <Name>HSP</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.Vessels.Construction.csproj">
-      <Project>{973ADF42-28BF-171E-CCCB-558E6DFC2896}</Project>
-      <Name>HSP.Vessels.Construction</Name>
-    </ProjectReference>
     <ProjectReference Include="HSP.UI.csproj">
       <Project>{05A5E85F-FD04-4199-F86F-3A6E38B383FB}</Project>
       <Name>HSP.UI</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Vanilla.csproj">
+      <Project>{AE718BD5-B7C2-FF6D-CB3C-BD7A5FEC452C}</Project>
+      <Name>HSP.Vanilla</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Vanilla.UI.csproj">
+      <Project>{6C8F7BA3-CBB1-7E26-D57A-944E3A2E5099}</Project>
+      <Name>HSP.Vanilla.UI</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Vessels.Construction.csproj">
+      <Project>{973ADF42-28BF-171E-CCCB-558E6DFC2896}</Project>
+      <Name>HSP.Vessels.Construction</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

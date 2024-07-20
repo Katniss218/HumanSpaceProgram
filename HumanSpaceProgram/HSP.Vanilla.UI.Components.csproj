@@ -58,26 +58,12 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.Vanilla.UI.Components\UITextReadout_Velocity.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI.Components\UIControlSetupWindow.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI.Components\ControlSetupControlGroupUI.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI.Components\UITextReadout_Altitude.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI.Components\UIPartWindow.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI.Components\ControlSetupControlUI.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI.Components\ControlSetupWindowComponentUI.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI.Components\UISequenceElement.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI.Components\UIPartWindowComponent.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI.Components\UISequenceAction.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI.Components\UISequencerPanel.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI.Components\SequencerPanelFactory.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI.Components\ControlSetupControlConnectionUI.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI.Components\UINavball.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI.Components\NavballRenderTextureManager.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI.Components\UITextReadout_Acceleration.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI.Components\UIIResourceContainer.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI\WindowRelationHighlight.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI\UITimewarpSelector.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI\UITextReadout_ElapsedUT.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\HSP.Vanilla.UI.Components\___HSP.Vanilla.UI.Components.asmdef" />
+    <None Include="Assets\HSP.Vanilla.UI\___HSP.Vanilla.UI.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -990,17 +976,9 @@
       <Project>{05A5E85F-FD04-4199-F86F-3A6E38B383FB}</Project>
       <Name>HSP.UI</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.Vanilla.Components.csproj">
-      <Project>{27D097A1-515F-B65C-51D6-BEBD9502EAFC}</Project>
-      <Name>HSP.Vanilla.Components</Name>
-    </ProjectReference>
-    <ProjectReference Include="HSP.Vanilla.Scenes.csproj">
-      <Project>{5BA07627-23D0-078E-8FD5-791CF795CD60}</Project>
-      <Name>HSP.Vanilla.Scenes</Name>
-    </ProjectReference>
-    <ProjectReference Include="HSP.Vanilla.UI.csproj">
-      <Project>{6C8F7BA3-CBB1-7E26-D57A-944E3A2E5099}</Project>
-      <Name>HSP.Vanilla.UI</Name>
+    <ProjectReference Include="HSP.Vanilla.csproj">
+      <Project>{AE718BD5-B7C2-FF6D-CB3C-BD7A5FEC452C}</Project>
+      <Name>HSP.Vanilla</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.Vanilla.UI.Vessels.csproj">
       <Project>{3CA21801-D573-73FC-585D-691DDF1E6A9B}</Project>

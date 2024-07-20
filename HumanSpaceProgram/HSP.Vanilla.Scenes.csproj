@@ -78,7 +78,6 @@
     <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\Tools\VanillaToolRegisterer.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\Tools\RotateTool.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\OnActiveObjectChange.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Scenes\AlwaysLoadedScene\OnStartup.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\DesignSceneEscapeInputController.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\DesignSceneToolManager.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\CelestialBodyManager.Serialization.cs" />
@@ -87,13 +86,11 @@
     <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\Tools\TranslateTool.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\OnTimelineSave.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\EditorScene\OnStartup.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Scenes\OnVesselCreated.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\GameplaySceneTool.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\Tools\RerootTool.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\DesignSceneManager.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\DesignScene\DesignSceneTool.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\MainMenuScene\MainMenuSceneManager.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Scenes\AlwaysLoadedScene\AlwaysLoadedManager.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\MainMenuScene\OnStartup.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\MainMenuScene\MainMenuEscapeInputController.cs" />
     <Compile Include="Assets\HSP.Vanilla.Scenes\GameplayScene\TimeScaleInputController.cs" />
@@ -1020,6 +1017,10 @@
     <ProjectReference Include="HSP.Vanilla.Components.csproj">
       <Project>{27D097A1-515F-B65C-51D6-BEBD9502EAFC}</Project>
       <Name>HSP.Vanilla.Components</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Vanilla.Content.csproj">
+      <Project>{931AE9DC-D8E1-D311-A20B-FEEAD3E76459}</Project>
+      <Name>HSP.Vanilla.Content</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.Vessels.csproj">
       <Project>{46E8105E-3165-8157-383E-59E6654156AA}</Project>

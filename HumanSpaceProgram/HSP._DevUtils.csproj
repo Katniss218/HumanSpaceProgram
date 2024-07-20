@@ -957,10 +957,6 @@
       <Project>{642CD5D5-9E37-E1CA-969F-267B97A7FC25}</Project>
       <Name>HSP.Content</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.Content.Vessels.csproj">
-      <Project>{4BD8BF7E-0B20-3964-16BE-BCA50A80C566}</Project>
-      <Name>HSP.Content.Vessels</Name>
-    </ProjectReference>
     <ProjectReference Include="HSP.ControlSystems.csproj">
       <Project>{5E371463-138D-D25A-49B8-DED13355C7DC}</Project>
       <Name>HSP.ControlSystems</Name>
@@ -989,13 +985,13 @@
       <Project>{57FA29CC-9026-83EE-F242-EA051DEA7649}</Project>
       <Name>HSP.Trajectories</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.Vanilla.Components.csproj">
-      <Project>{27D097A1-515F-B65C-51D6-BEBD9502EAFC}</Project>
-      <Name>HSP.Vanilla.Components</Name>
+    <ProjectReference Include="HSP.Trajectories.Vessels.csproj">
+      <Project>{CF7071BC-BDAE-FF30-281B-D56F30917D0A}</Project>
+      <Name>HSP.Trajectories.Vessels</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.Vanilla.Scenes.csproj">
-      <Project>{5BA07627-23D0-078E-8FD5-791CF795CD60}</Project>
-      <Name>HSP.Vanilla.Scenes</Name>
+    <ProjectReference Include="HSP.Vanilla.csproj">
+      <Project>{AE718BD5-B7C2-FF6D-CB3C-BD7A5FEC452C}</Project>
+      <Name>HSP.Vanilla</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.Vessels.csproj">
       <Project>{46E8105E-3165-8157-383E-59E6654156AA}</Project>

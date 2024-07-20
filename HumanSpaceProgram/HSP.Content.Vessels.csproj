@@ -58,12 +58,10 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.Content.Vessels\PartRegistry.cs" />
+    <Compile Include="Assets\HSP.Content.Vessels\Serialization\PartRegistry.cs" />
     <Compile Include="Assets\HSP.Content.Vessels\Serialization\PartMetadata.cs" />
     <Compile Include="Assets\HSP.Content.Vessels\Serialization\VesselMetadata.cs" />
-    <Compile Include="Assets\HSP.Content.Vessels\AssetLoaders\GameDataJsonPartFactory.cs" />
-    <Compile Include="Assets\HSP.Content.Vessels\PartFactory.cs" />
-    <Compile Include="Assets\HSP.Content.Vessels\AssetLoaders\GameDataJsonVesselFactory.cs" />
+    <Compile Include="Assets\HSP.Content.Vessels\Serialization\PartFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Content.Vessels\___HSP.Content.Vessels.asmdef" />

@@ -58,10 +58,12 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.Vanilla.Content\AssetLoaders\GameDataTextureLoader.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\GameDataTextureLoader.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\GameDataJsonPartFactory.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\GameDataJsonVesselFactory.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\HSP.Vanilla.Content\___HSP.Vanilla.Content.asmdef" />
+    <None Include="Assets\HSP.Vanilla.Content.AssetLoaders\___HSP.Vanilla.Content.AssetLoaders.asmdef" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -938,13 +940,13 @@
       <Project>{642CD5D5-9E37-E1CA-969F-267B97A7FC25}</Project>
       <Name>HSP.Content</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.Content.Timelines.csproj">
-      <Project>{B3FA8387-6EDE-645C-5A2E-FDC64907D803}</Project>
-      <Name>HSP.Content.Timelines</Name>
+    <ProjectReference Include="HSP.Vanilla.csproj">
+      <Project>{AE718BD5-B7C2-FF6D-CB3C-BD7A5FEC452C}</Project>
+      <Name>HSP.Vanilla</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.Content.Vessels.csproj">
-      <Project>{4BD8BF7E-0B20-3964-16BE-BCA50A80C566}</Project>
-      <Name>HSP.Content.Vessels</Name>
+    <ProjectReference Include="HSP.Vessels.csproj">
+      <Project>{46E8105E-3165-8157-383E-59E6654156AA}</Project>
+      <Name>HSP.Vessels</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

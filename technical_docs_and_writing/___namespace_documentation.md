@@ -44,33 +44,27 @@ If something doesn't reference anything other than `UnityPlus.{subnamespace}` or
 HSP
 HSP._DevUtils                           - Utilities for developers, temporary assets.
 HSP.CelestialBodies
-HSP.Content
-HSP.Content.Trajectories                - Metadata for timelines.
-HSP.Content.Vessels                     - Asset loaders and metadata for vessels/parts.
-HSP.ControlSystems                      - The core of the system for sending and receiving control signals.
+HSP.Content                             - The idea of content, files, and GameData.
+HSP.ControlSystems                      - The core of the system for sending and receiving control signals between different objects.
 HSP.Input
-HSP.ReferenceFrames
+HSP.ReferenceFrames                     - 'Floating Origin' and 'Krakensbane' implementation.
 HSP.ResourceFlow
-HSP.SceneManagement                     - Scene management and loading.
+HSP.SceneManagement
 HSP.ScreenCapturing
-HSP.Timelines
-HSP.Trajectories                        - Orbital mechanics and related.
-HSP.UI                                  - Shared UI code. Possibly merge into UnityPlus.
+HSP.Timelines                           - Game saves / "timelines".
+HSP.Trajectories                        - Orbital and not-so-orbital mechanics.
+HSP.Trajectories.Vessels                - Integration of trajectories with vessels for easy use. Could be moved inside HSP.Vanilla.
+HSP.UI                                  - Some shared UI code.
 HSP.Vessels
 HSP.Vessels.Construction
-HSP.ViewportTools                       - Viewport gizmos for translating, rotating, and scaling. Possibly merge into UnityPlus.
+HSP.ViewportTools                       - Viewport gizmos for translating, rotating, and scaling. Possibly move to UnityPlus.ViewportTools.
 
 #### Layer 2 ('glue' layer):
 
-HSP.Vanilla                             - Shared vanilla code. Can only reference `HSP`. Referencees go into a subnamespace.
-HSP.Vanilla.Content
-HSP.Vanilla.Components                  - Vanilla implementations of most FComponents.
-HSP.Vanilla.Scenes                      - Defines how each scene is set up in vanilla.
-HSP.Vanilla.Scenes.PostProcessing       - Adds post processing to the vanilla scenes.
-HSP.Vanilla.UI                          - Shared vanilla UI code.
-HSP.Vanilla.UI.Components
-HSP.Vanilla.UI.Scenes
-HSP.Vanilla.UI.Timelines
+HSP.Vanilla                             - Most of the vanilla "glue" code, also vanilla implementations of concepts from the lower layer.
+HSP.Vanilla.Content.AssetLoaders        - External file asset loaders.
+HSP.Vanilla.PostProcessing
+HSP.Vanilla.UI                          - Most of the vanilla UI elements.
 HSP.Vanilla.UI.Vessels
 HSP.Vanilla.UI.Vessels.Construction
 

@@ -60,6 +60,7 @@
   <ItemGroup>
     <Compile Include="Assets\HSP.Vanilla.UI.Vessels\VesselHUDManager.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI.Vessels\VesselHUD.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI.Vessels\OnStartup.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla.UI.Vessels\___HSP.Vanilla.UI.Vessels.asmdef" />
@@ -955,17 +956,17 @@
       <Project>{05A5E85F-FD04-4199-F86F-3A6E38B383FB}</Project>
       <Name>HSP.UI</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.Vessels.csproj">
-      <Project>{46E8105E-3165-8157-383E-59E6654156AA}</Project>
-      <Name>HSP.Vessels</Name>
-    </ProjectReference>
-    <ProjectReference Include="HSP.Vanilla.Scenes.csproj">
-      <Project>{5BA07627-23D0-078E-8FD5-791CF795CD60}</Project>
-      <Name>HSP.Vanilla.Scenes</Name>
+    <ProjectReference Include="HSP.Vanilla.csproj">
+      <Project>{AE718BD5-B7C2-FF6D-CB3C-BD7A5FEC452C}</Project>
+      <Name>HSP.Vanilla</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.Vanilla.UI.csproj">
       <Project>{6C8F7BA3-CBB1-7E26-D57A-944E3A2E5099}</Project>
       <Name>HSP.Vanilla.UI</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Vessels.csproj">
+      <Project>{46E8105E-3165-8157-383E-59E6654156AA}</Project>
+      <Name>HSP.Vessels</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
