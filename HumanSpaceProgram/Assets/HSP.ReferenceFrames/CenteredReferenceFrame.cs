@@ -7,7 +7,7 @@ namespace HSP.ReferenceFrames
     /// </summary>
     public sealed class CenteredReferenceFrame : IReferenceFrame
     {
-        private Vector3Dbl _position;
+        private readonly Vector3Dbl _position;
 
         public CenteredReferenceFrame( Vector3Dbl center )
         {

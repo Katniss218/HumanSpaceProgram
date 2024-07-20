@@ -7,9 +7,9 @@ namespace HSP.ReferenceFrames
     /// </summary>
     public sealed class OrientedReferenceFrame : IReferenceFrame
     {
-        private Vector3Dbl _position;
-        private QuaternionDbl _rotation;
-        private QuaternionDbl _inverseRotation;
+        private readonly Vector3Dbl _position;
+        private readonly QuaternionDbl _rotation;
+        private readonly QuaternionDbl _inverseRotation;
 
         public OrientedReferenceFrame( Vector3Dbl center, QuaternionDbl rotation )
         {

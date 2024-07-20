@@ -54,7 +54,9 @@ namespace HSP.Vanilla.UI.Components
                 Vector3Dbl airfVelocity = SceneReferenceFrameManager.SceneReferenceFrame.TransformDirection( activeVessel.PhysicsObject.Velocity );
                 if( airfVelocity.magnitude > 0.25f )
                 {
-                    OrbitalFrame orbitalFrame = OrbitalFrame.FromNBody( airfVelocity, GravityUtils.GetNBodyGravityAcceleration( activeVessel.RootObjTransform.AIRFPosition ) );
+                    Vector3Dbl gravityAcc = GravityUtils.GetNBodyGravityAcceleration( activeVessel.RootObjTransform.AIRFPosition );
+
+                    OrbitalFrame orbitalFrame = new OrbitalFrame( airfVelocity.NormalizeToVector3(), -gravityAcc.NormalizeToVector3() );
 
                     Vector3 localPrograde = airfToLocalMatrix.MultiplyVector( orbitalFrame.GetPrograde() ) * NavballPixelRadius;
                     Vector3 localRetrograde = airfToLocalMatrix.MultiplyVector( orbitalFrame.GetRetrograde() ) * NavballPixelRadius;
