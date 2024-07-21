@@ -48,5 +48,25 @@ namespace HSP.ReferenceFrames
         {
             return localRotation;
         }
+
+        public Vector3Dbl TransformVelocity( Vector3Dbl localVelocity )
+        {
+            return localVelocity;
+        }
+
+        public Vector3Dbl InverseTransformVelocity( Vector3Dbl absoluteVelocity )
+        {
+            return absoluteVelocity;
+        }
+
+        public Vector3Dbl TransformAngularVelocity( Vector3Dbl localAngularVelocity )
+        {
+            return localAngularVelocity;
+        }
+
+        public Vector3Dbl InverseTransformAngularVelocity( Vector3Dbl absoluteAngularVelocity )
+        {
+            return absoluteAngularVelocity;
+        }
     }
 }

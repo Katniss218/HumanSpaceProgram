@@ -59,8 +59,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\HSP.Vanilla.UI.Vessels.Construction\ConstructionSiteHUD.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI.Vessels.Construction\ConstructionSiteHUDManager.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI.Vessels.Construction\OnStartup.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI.Vessels.Construction\ConstructionSiteHUDManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla.UI.Vessels.Construction\___HSP.Vanilla.UI.Vessels.Construction.asmdef" />

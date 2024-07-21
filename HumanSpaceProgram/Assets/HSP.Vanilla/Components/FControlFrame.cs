@@ -30,8 +30,8 @@ namespace HSP.Vanilla.Components
         public static QuaternionDbl GetAIRFRotation( FControlFrame frame, Vessel fallback )
         {
             return frame == null
-                ? SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( fallback.ReferenceTransform.rotation )
-                : SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( frame._referenceTransform.rotation );
+                ? SceneReferenceFrameManager.ReferenceFrame.TransformRotation( fallback.ReferenceTransform.rotation )
+                : SceneReferenceFrameManager.ReferenceFrame.TransformRotation( frame._referenceTransform.rotation );
         }
 
         [MapsInheritingFrom( typeof( FControlFrame ) )]

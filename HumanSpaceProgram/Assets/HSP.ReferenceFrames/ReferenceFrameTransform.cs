@@ -11,7 +11,7 @@ namespace HSP.ReferenceFrames
     /// Add this to any object that is supposed to be affected by the <see cref="SceneReferenceFrameManager"/>.
     /// </remarks>
     [DisallowMultipleComponent]
-    public class ReferenceFrameTransform : MonoBehaviour, IReferenceFrameSwitchResponder
+    public class OldReferenceFrameTransform : MonoBehaviour, IReferenceFrameSwitchResponder
     {
         // Should to be added to any root object that is an actual [physical] object in the scene (not UI elements, empties, etc).
 
@@ -51,7 +51,7 @@ namespace HSP.ReferenceFrames
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         private void UpdateScenePosition()
         {
-            Vector3 scenePos = (Vector3)SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformPosition( this._airfPosition );
+            Vector3 scenePos = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformPosition( this._airfPosition );
             if( _rb != null )
             {
                 // THIS IS CRITICALLY IMPORTANT. Rigidbodies keep their own position/rotation.
@@ -63,7 +63,7 @@ namespace HSP.ReferenceFrames
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         private void UpdateSceneRotation()
         {
-            Quaternion sceneRotation = (Quaternion)SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformRotation( this._airfRotation );
+            Quaternion sceneRotation = (Quaternion)SceneReferenceFrameManager.ReferenceFrame.InverseTransformRotation( this._airfRotation );
             if( _rb != null )
             {
                 // THIS IS CRITICALLY IMPORTANT. Rigidbodies keep their own position/rotation.
@@ -96,7 +96,7 @@ namespace HSP.ReferenceFrames
 
         void FixedUpdate()
         {
-            RecacheAirfPosRot( SceneReferenceFrameManager.SceneReferenceFrame );
+            RecacheAirfPosRot( SceneReferenceFrameManager.ReferenceFrame );
         }
 
         /// <summary>

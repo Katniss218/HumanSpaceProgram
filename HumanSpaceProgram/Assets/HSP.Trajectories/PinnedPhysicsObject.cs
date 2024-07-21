@@ -10,10 +10,9 @@ namespace HSP.Trajectories
     /// <remarks>
     /// A physobj that is pinned to a fixed pos/rot in the local coordinate system of a celestial body.
     /// </remarks>
-    [RequireComponent( typeof( ReferenceFrameTransform ) )]
 	[RequireComponent( typeof( Rigidbody ) )]
 	[DisallowMultipleComponent]
-	public class PinnedPhysicsObject : MonoBehaviour, IPhysicsObject
+	public class PinnedPhysicsObject : MonoBehaviour, IPhysicsTransform
 	{
 		public float Mass
 		{
@@ -94,7 +93,6 @@ namespace HSP.Trajectories
 		Vector3 _accelerationSum = Vector3.zero;
 		Vector3 _angularAccelerationSum = Vector3.zero;
 
-		ReferenceFrameTransform _rootObjTransform;
 		Rigidbody _rb;
 
 		public void AddForce( Vector3 force )
@@ -135,16 +133,14 @@ namespace HSP.Trajectories
 
 		void Awake()
 		{
-			if( this.HasComponentOtherThan<IPhysicsObject>( this ) )
+			if( this.HasComponentOtherThan<IPhysicsTransform>( this ) )
 			{
-				Debug.LogWarning( $"Tried to add a {nameof( PinnedPhysicsObject )} to a game object that already has a {nameof( IPhysicsObject )}. This is not allowed. Remove the previous physics object first." );
+				Debug.LogWarning( $"Tried to add a {nameof( PinnedPhysicsObject )} to a game object that already has a {nameof( IPhysicsTransform )}. This is not allowed. Remove the previous physics object first." );
 				Destroy( this );
 				return;
 			}
 
 			_rb = this.GetComponent<Rigidbody>();
-			_rootObjTransform = this.gameObject.GetOrAddComponent<ReferenceFrameTransform>();
-			_rootObjTransform.RefreshCachedRigidbody();
 
 			_rb.useGravity = false;
 			_rb.collisionDetectionMode = CollisionDetectionMode.Discrete;

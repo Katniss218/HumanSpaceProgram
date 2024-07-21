@@ -276,8 +276,8 @@ namespace HSP.Vessels.Construction
             if( parent == null )
             {
                 Vessel vessel = VesselFactory.CreatePartless(
-                    SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( ghostRoot.position ),
-                    SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( ghostRoot.rotation ),
+                    SceneReferenceFrameManager.ReferenceFrame.TransformPosition( ghostRoot.position ),
+                    SceneReferenceFrameManager.ReferenceFrame.TransformRotation( ghostRoot.rotation ),
                     Vector3.zero,
                     Vector3.zero );
 

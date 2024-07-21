@@ -51,7 +51,7 @@ namespace HSP.Vanilla.UI.Components
                 Quaternion airfRotation = (Quaternion)FControlFrame.GetAIRFRotation( FControlFrame.VesselControlFrame, activeVessel );
                 Matrix4x4 airfToLocalMatrix = Matrix4x4.Rotate( airfRotation ).inverse;
 
-                Vector3Dbl airfVelocity = SceneReferenceFrameManager.SceneReferenceFrame.TransformDirection( activeVessel.PhysicsObject.Velocity );
+                Vector3Dbl airfVelocity = SceneReferenceFrameManager.ReferenceFrame.TransformDirection( activeVessel.PhysicsObject.Velocity );
                 if( airfVelocity.magnitude > 0.25f )
                 {
                     Vector3Dbl gravityAcc = GravityUtils.GetNBodyGravityAcceleration( activeVessel.RootObjTransform.AIRFPosition );

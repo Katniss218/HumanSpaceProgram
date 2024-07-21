@@ -7,7 +7,7 @@ namespace HSP.Trajectories
     /// <summary>
     /// A trajectory that follows a newtonian gravitational field.
     /// </summary>
-    public class NBodyOrbit : ITrajectory
+    public class NewtonianOrbit : ITrajectory
     {
         private double _cachedUpToUT;
 

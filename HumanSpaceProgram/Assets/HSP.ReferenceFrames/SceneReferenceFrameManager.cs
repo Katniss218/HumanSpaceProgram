@@ -23,14 +23,14 @@ namespace HSP.ReferenceFrames
         /// </summary>
         public static event Action<ReferenceFrameSwitchData> OnAfterReferenceFrameSwitch;
 
-        private IReferenceFrame _sceneReferenceFrame;
+        private IReferenceFrame _referenceFrame;
         /// <summary>
         /// The reference frame that describes how to convert between Absolute Inertial Reference Frame and the scene's world space.
         /// </summary>
-        public static IReferenceFrame SceneReferenceFrame
+        public static IReferenceFrame ReferenceFrame
         {
-            get => instance._sceneReferenceFrame;
-            set => instance._sceneReferenceFrame = value;
+            get => instance._referenceFrame;
+            set => instance._referenceFrame = value;
         }
 
         /// <summary>
@@ -38,8 +38,8 @@ namespace HSP.ReferenceFrames
         /// </summary>
         public static void ChangeSceneReferenceFrame( IReferenceFrame newFrame )
         {
-            IReferenceFrame old = SceneReferenceFrame;
-            SceneReferenceFrame = newFrame;
+            IReferenceFrame old = ReferenceFrame;
+            ReferenceFrame = newFrame;
 
             OnAfterReferenceFrameSwitch?.Invoke( new ReferenceFrameSwitchData() { OldFrame = old, NewFrame = newFrame } );
         }
@@ -96,7 +96,7 @@ namespace HSP.ReferenceFrames
             Vector3 position = ActiveObjectManager.ActiveObject.position;
             if( position.magnitude > MaxFloatingOriginRange )
             {
-                ChangeSceneReferenceFrame( SceneReferenceFrame.Shift( position ) );
+                ChangeSceneReferenceFrame( ReferenceFrame.Shift( position ) );
             }
         }
 
@@ -109,7 +109,7 @@ namespace HSP.ReferenceFrames
 
         void Awake()
         {
-            SceneReferenceFrame = new CenteredReferenceFrame( Vector3Dbl.zero );
+            ReferenceFrame = new CenteredReferenceFrame( Vector3Dbl.zero );
         }
 
         void FixedUpdate()

@@ -5,9 +5,9 @@ using UnityEngine;
 namespace HSP.ReferenceFrames
 {
     /// <summary>
-    /// A reference frame aligned with the AIRF frame, and shifted (offset) by a certain amount. The non-inertial terms are constant. This class is immutable.
+    /// A reference frame aligned with the AIRF frame, and shifted (offset) by a certain amount. The non-inertial terms are instantanous and constant. This class is immutable.
     /// </summary>
-    public sealed class CenteredInstantanousReferenceFrame : IReferenceFrame
+    public sealed class CenteredInstantanousReferenceFrame : INonInertialReferenceFrame
     {
         private readonly Vector3Dbl _position;
 
@@ -67,17 +67,24 @@ namespace HSP.ReferenceFrames
 
         public Vector3Dbl InverseTransformVelocity( Vector3Dbl globalVelocity )
         {
-            return globalVelocity - _velocity;
+            return Vector3Dbl.Subtract( globalVelocity, _velocity );
         }
 
         public Vector3Dbl InverseTransformAcceleration( Vector3Dbl globalAcceleration )
         {
-            return globalAcceleration - _acceleration;
+            return Vector3Dbl.Subtract( globalAcceleration, _acceleration );
         }
 
-        /// <summary>
-        /// Gets the net fictitious acceleration (not force) acting on an object.
-        /// </summary>
+        public Vector3Dbl InverseTransformAngularVelocity( Vector3Dbl globalAngularVelocity )
+        {
+            return Vector3Dbl.Subtract( globalAngularVelocity, _angularVelocity );
+        }
+
+        public Vector3Dbl InverseTransformAngularAcceleration( Vector3Dbl globalAngularAcceleration )
+        {
+            return Vector3Dbl.Subtract( globalAngularAcceleration, _angularAcceleration );
+        }
+
         public Vector3Dbl GetFicticiousAcceleration( Vector3Dbl localPosition, Vector3Dbl localVelocity )
         {
             // TODO - handle near-zeroes in the terms.
@@ -90,7 +97,15 @@ namespace HSP.ReferenceFrames
 
             var linearAcc = -_acceleration;
 
-            return centrifugalAcc + coriolisAcc + eulerAcc + linearAcc;
+            return (centrifugalAcc + coriolisAcc + eulerAcc + linearAcc);
+
+            // handle angular acceleration when the frame's angular velocity changes.
+        }
+
+        public Vector3Dbl GetFictitiousAngularAcceleration( Vector3Dbl localPosition, Vector3Dbl localAngularVelocity )
+        {
+            // If not accounted for, the object would pick up rotational velocity from the frame.
+            return (-_angularAcceleration);
         }
     }
 }

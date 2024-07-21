@@ -23,9 +23,10 @@ namespace HSP.ReferenceFrames
             return new OrientedReferenceFrame( this._position + airfDistanceDelta, this._rotation );
         }
 
-        public Vector3Dbl InverseTransformPosition( Vector3Dbl airfPosition )
+
+        public Vector3Dbl InverseTransformPosition( Vector3Dbl absolutePosition )
         {
-            return _inverseRotation * Vector3Dbl.Subtract( airfPosition, _position );
+            return _inverseRotation * Vector3Dbl.Subtract( absolutePosition, _position );
         }
 
         public Vector3Dbl TransformPosition( Vector3Dbl localPosition )
@@ -33,15 +34,17 @@ namespace HSP.ReferenceFrames
             return _rotation * Vector3Dbl.Subtract( localPosition, _position );
         }
 
-        public Vector3 InverseTransformDirection( Vector3 airfDirection )
+
+        public Vector3 InverseTransformDirection( Vector3 absoluteDirection )
         {
-            return (Vector3)(_inverseRotation * airfDirection);
+            return (Vector3)(_inverseRotation * absoluteDirection);
         }
 
         public Vector3 TransformDirection( Vector3 localDirection )
         {
             return (Vector3)(_rotation * localDirection);
         }
+
 
         public QuaternionDbl InverseTransformRotation( QuaternionDbl airfRotation )
         {
@@ -51,6 +54,26 @@ namespace HSP.ReferenceFrames
         public QuaternionDbl TransformRotation( QuaternionDbl localRotation )
         {
             return _rotation * localRotation;
+        }
+
+        public Vector3Dbl TransformVelocity( Vector3Dbl localVelocity )
+        {
+            return _rotation * localVelocity;
+        }
+
+        public Vector3Dbl InverseTransformVelocity( Vector3Dbl globalVelocity )
+        {
+            return _inverseRotation * globalVelocity;
+        }
+
+        public Vector3Dbl TransformAngularVelocity( Vector3Dbl localAngularVelocity )
+        {
+            return _rotation * localVelocity;
+        }
+
+        public Vector3Dbl InverseTransformAngularVelocity( Vector3Dbl globalAngularVelocity )
+        {
+            return _inverseRotation * globalVelocity;
         }
     }
 }

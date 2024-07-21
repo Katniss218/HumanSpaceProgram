@@ -9,11 +9,54 @@ namespace HSP.Trajectories
     /// <remarks>
     /// This is a wrapper for a rigidbody.
     /// </remarks>
-    [RequireComponent( typeof( ReferenceFrameTransform ) )]
     [RequireComponent( typeof( Rigidbody ) )]
     [DisallowMultipleComponent]
-    public class FixedPhysicsObject : MonoBehaviour, IPhysicsObject
+    public class FixedPhysicsObject : MonoBehaviour, IReferenceFrameTransform, IPhysicsTransform
     {
+        public Vector3 Position
+        {
+            get => this.transform.position;
+            set
+            {
+                this._rb.position = value;
+                this.transform.position = value;
+            }
+        }
+
+        public Vector3Dbl AbsolutePosition
+        {
+            get => _absolutePosition;
+            set
+            {
+                _absolutePosition = value;
+                ReferenceFrameTransformUtils.UpdateScenePositionFromAbsolute( transform, _rb, value );
+            }
+        }
+
+        public Quaternion Rotation
+        {
+            get => this.transform.rotation;
+            set
+            {
+                this._rb.rotation = value;
+                this.transform.rotation = value;
+            }
+        }
+
+        public QuaternionDbl AbsoluteRotation
+        {
+            get => _absoluteRotation;
+            set
+            {
+                _absoluteRotation = value;
+                ReferenceFrameTransformUtils.UpdateSceneRotationFromAbsolute( transform, _rb, value );
+            }
+        }
+
+        //
+        //
+        //
+
         public float Mass
         {
             get => this._rb.mass;
@@ -25,22 +68,6 @@ namespace HSP.Trajectories
             get => this._rb.centerOfMass;
             set => this._rb.centerOfMass = value;
         }
-
-        public Vector3 Velocity
-        {
-            get => Vector3.zero;
-            set { return; }
-        }
-
-        public Vector3 Acceleration { get; private set; }
-
-        public Vector3 AngularVelocity
-        {
-            get => Vector3.zero;
-            set { return; }
-        }
-
-        public Vector3 AngularAcceleration { get; private set; }
 
         public Vector3 MomentsOfInertia => this._rb.inertiaTensor;
 
@@ -65,7 +92,6 @@ namespace HSP.Trajectories
 
         public bool IsColliding { get; private set; }
 
-        ReferenceFrameTransform _rootObjTransform;
         Rigidbody _rb;
 
         public void AddForce( Vector3 force )
@@ -85,16 +111,14 @@ namespace HSP.Trajectories
 
         void Awake()
         {
-            if( this.HasComponentOtherThan<IPhysicsObject>( this ) )
+            if( this.HasComponentOtherThan<IPhysicsTransform>( this ) )
             {
-                Debug.LogWarning( $"Tried to add a {nameof( FixedPhysicsObject )} to a game object that already has a {nameof( IPhysicsObject )}. This is not allowed. Remove the previous physics object first." );
+                Debug.LogWarning( $"Tried to add a {nameof( FixedPhysicsObject )} to a game object that already has a {nameof( IPhysicsTransform )}. This is not allowed. Remove the previous physics object first." );
                 Destroy( this );
                 return;
             }
 
             _rb = this.GetComponent<Rigidbody>();
-            _rootObjTransform = this.gameObject.GetOrAddComponent<ReferenceFrameTransform>();
-            _rootObjTransform.RefreshCachedRigidbody();
 
             _rb.useGravity = false;
             _rb.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;

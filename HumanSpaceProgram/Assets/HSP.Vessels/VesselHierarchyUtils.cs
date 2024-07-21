@@ -154,8 +154,8 @@ namespace HSP.Vessels
 #warning TODO - Use linear and angular velocities of part that works correctly for spinning vessels.
 
             Vessel newVessel = VesselFactory.CreatePartless(
-                SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( partToSplit.transform.position ),
-                SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( partToSplit.transform.rotation ),
+                SceneReferenceFrameManager.ReferenceFrame.TransformPosition( partToSplit.transform.position ),
+                SceneReferenceFrameManager.ReferenceFrame.TransformRotation( partToSplit.transform.rotation ),
                 oldVessel.PhysicsObject.Velocity,
                 oldVessel.PhysicsObject.AngularVelocity );
 

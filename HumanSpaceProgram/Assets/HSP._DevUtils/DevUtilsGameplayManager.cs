@@ -79,13 +79,13 @@ namespace HSP._DevUtils
             }
 
             FLaunchSiteMarker launchSiteSpawner = launchSite.gameObject.GetComponentInChildren<FLaunchSiteMarker>();
-            Vector3Dbl spawnerPosAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( launchSiteSpawner.transform.position );
-            QuaternionDbl spawnerRotAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( launchSiteSpawner.transform.rotation );
+            Vector3Dbl spawnerPosAirf = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( launchSiteSpawner.transform.position );
+            QuaternionDbl spawnerRotAirf = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( launchSiteSpawner.transform.rotation );
 
             var v2 = CreateDummyVessel( spawnerPosAirf, spawnerRotAirf ); // position is temp.
 
             Vector3 bottomBoundPos = v2.GetBottomPosition();
-            Vector3Dbl closestBoundAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( bottomBoundPos );
+            Vector3Dbl closestBoundAirf = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( bottomBoundPos );
             Vector3Dbl closestBoundToVesselAirf = v2.AIRFPosition - closestBoundAirf;
             Vector3Dbl airfPos = spawnerPosAirf + closestBoundToVesselAirf;
             v2.AIRFPosition = airfPos;
@@ -125,8 +125,8 @@ namespace HSP._DevUtils
                 GameObject loadedObj = SerializationUnit.Deserialize<GameObject>( data );
                
                 FLaunchSiteMarker launchSiteSpawner = launchSite.gameObject.GetComponentInChildren<FLaunchSiteMarker>();
-                Vector3Dbl spawnerPosAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( launchSiteSpawner.transform.position );
-                QuaternionDbl spawnerRotAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( launchSiteSpawner.transform.rotation );
+                Vector3Dbl spawnerPosAirf = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( launchSiteSpawner.transform.position );
+                QuaternionDbl spawnerRotAirf = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( launchSiteSpawner.transform.rotation );
 
                 Vessel v2 = VesselFactory.CreatePartless( spawnerPosAirf, spawnerRotAirf, Vector3.zero, Vector3.zero );
 
@@ -135,7 +135,7 @@ namespace HSP._DevUtils
                 v2.RootPart.localRotation = Quaternion.identity;
 
                 Vector3 bottomBoundPos = v2.GetBottomPosition();
-                Vector3Dbl closestBoundAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( bottomBoundPos );
+                Vector3Dbl closestBoundAirf = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( bottomBoundPos );
                 Vector3Dbl closestBoundToVesselAirf = v2.AIRFPosition - closestBoundAirf;
                 Vector3Dbl airfPos = spawnerPosAirf + closestBoundToVesselAirf;
                 v2.AIRFPosition = airfPos;

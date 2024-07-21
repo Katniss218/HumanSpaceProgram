@@ -61,7 +61,7 @@ namespace HSP.Vessels
             }
         }
 
-        public IPhysicsObject PhysicsObject { get; set; }
+        public IPhysicsTransform PhysicsObject { get; set; }
         public ReferenceFrameTransform RootObjTransform { get; private set; }
 
         public Transform ReferenceTransform => this.transform;
@@ -103,13 +103,13 @@ namespace HSP.Vessels
         void Awake()
         {
             this.RootObjTransform = this.GetComponent<ReferenceFrameTransform>();
-            this.PhysicsObject = this.GetComponent<IPhysicsObject>();
+            this.PhysicsObject = this.GetComponent<IPhysicsTransform>();
             this.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
         }
 
         void Start()
         {
-            this.PhysicsObject = this.GetComponent<IPhysicsObject>(); // needs to be here for deserialization, because it might be added in any order and I can't use RequireComponent because it needs to be removed when pinning.
+            this.PhysicsObject = this.GetComponent<IPhysicsTransform>(); // needs to be here for deserialization, because it might be added in any order and I can't use RequireComponent because it needs to be removed when pinning.
             RecalculatePartCache();
             //SetPhysicsObjectParameters();
 

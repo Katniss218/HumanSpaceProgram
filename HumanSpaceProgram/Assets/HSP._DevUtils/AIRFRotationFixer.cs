@@ -7,8 +7,8 @@ namespace HSP._DevUtils
     {
         private void Update()
         {
-            if( SceneReferenceFrameManager.SceneReferenceFrame != null )
-                this.transform.rotation = (Quaternion)SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformRotation( QuaternionDbl.identity );
+            if( SceneReferenceFrameManager.ReferenceFrame != null )
+                this.transform.rotation = (Quaternion)SceneReferenceFrameManager.ReferenceFrame.InverseTransformRotation( QuaternionDbl.identity );
         }
     }
 }

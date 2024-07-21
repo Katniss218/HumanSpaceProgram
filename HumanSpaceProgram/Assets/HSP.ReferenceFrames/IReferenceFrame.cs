@@ -31,36 +31,42 @@ namespace HSP.ReferenceFrames
         /// <summary>
         /// Returns a new reference frame that is shifted (translated) by a given distance in the Absolute Inertial Reference Frame (AIRF) space.
         /// </summary>
-        IReferenceFrame Shift( Vector3Dbl airfDistanceDelta );
+        IReferenceFrame Shift( Vector3Dbl absoluteDistanceDelta );
+
 
         /// <summary>
         /// Transforms a point in the frame's local space to the Absolute (AIRF) space.
         /// </summary>
         Vector3Dbl TransformPosition( Vector3Dbl localPosition );
-
         /// <summary>
         /// Transforms a point in the Absolute (AIRF) space to the frame's space.
         /// </summary>
-        Vector3Dbl InverseTransformPosition( Vector3Dbl globalPosition );
+        Vector3Dbl InverseTransformPosition( Vector3Dbl absolutePosition );
+
 
         /// <summary>
         /// Transforms a direction vector in the frame's local space to the Absolute (AIRF) space.
         /// </summary>
         Vector3 TransformDirection( Vector3 localDirection );
-
         /// <summary>
         /// Transforms a direction vector in the Absolute (AIRF) space to the frame's space.
         /// </summary>
-        Vector3 InverseTransformDirection( Vector3 globalDirection );
+        Vector3 InverseTransformDirection( Vector3 absoluteDirection );
+
 
         /// <summary>
         /// Transforms a rotation/orientation in the frame's local space to the Absolute (AIRF) space.
         /// </summary>
         QuaternionDbl TransformRotation( QuaternionDbl localRotation );
-
         /// <summary>
         /// Transforms a rotation/orientation in the Absolute (AIRF) space to the frame's space.
         /// </summary>
-        QuaternionDbl InverseTransformRotation( QuaternionDbl globalRotation );
+        QuaternionDbl InverseTransformRotation( QuaternionDbl absoluteRotation );
+
+        Vector3Dbl TransformVelocity( Vector3Dbl localVelocity );
+        Vector3Dbl InverseTransformVelocity( Vector3Dbl absoluteVelocity );
+
+        Vector3Dbl TransformAngularVelocity( Vector3Dbl localAngularVelocity );
+        Vector3Dbl InverseTransformAngularVelocity( Vector3Dbl absoluteAngularVelocity );
     }
 }

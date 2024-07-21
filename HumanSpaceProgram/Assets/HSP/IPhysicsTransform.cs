@@ -5,7 +5,7 @@ namespace HSP
     /// <summary>
     /// Any object that interacts with the collision/physics system.
     /// </summary>
-    public interface IPhysicsObject : IComponent
+    public interface IPhysicsTransform : IComponent
     {
         /// <summary>
         /// Gets or sets the physics object's mass, in [kg].
@@ -17,7 +17,7 @@ namespace HSP
         /// </summary>
         Vector3 LocalCenterOfMass { get; set; }
 
-        /// <summary>
+       /* /// <summary>
         /// Gets or sets the physics object's velocity in scene space, in [m/s].
         /// </summary>
         Vector3 Velocity { get; set; }
@@ -35,7 +35,7 @@ namespace HSP
         /// <summary>
         /// Gets the angular acceleration that this physics object is under at this instant, in [Rad/s^2].
         /// </summary>
-        Vector3 AngularAcceleration { get; }
+        Vector3 AngularAcceleration { get; }*/
         
         /// <summary>
         /// Gets the principal moments of inertia.
