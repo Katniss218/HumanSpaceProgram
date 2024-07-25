@@ -5,18 +5,8 @@ using UnityPlus.Serialization;
 
 namespace HSP.CelestialBodies
 {
-    [RequireComponent( typeof( ReferenceFrameTransform ) )]
     public class CelestialBody : MonoBehaviour
     {
-        /// <summary>
-        /// Gets the current global position of the celestial body.
-        /// </summary>
-        public Vector3Dbl AIRFPosition { get => this._rootTransform.AIRFPosition; set => this._rootTransform.AIRFPosition = value; }
-        /// <summary>
-        /// Gets the current global rotation of the celestial body.
-        /// </summary>
-        public QuaternionDbl AIRFRotation { get => this._rootTransform.AIRFRotation; set => this._rootTransform.AIRFRotation = value; }
-
         public string _id;
         /// <summary>
         /// Gets the id of the celestial body.
@@ -39,20 +29,23 @@ namespace HSP.CelestialBodies
         /// Gets or sets the display name of the celestial body.
         /// </summary>
         public string DisplayName { get; set; }
+
         /// <summary>
         /// Gets the mass of the celestial body.
         /// </summary>
-        public double Mass { get; internal set; }
+        public double Mass { get; internal set; } // TODO - add setters that fire events.
+
         /// <summary>
         /// Gets the radius of the celestial body.
         /// </summary>
         public double Radius { get; internal set; }
 
-        ReferenceFrameTransform _rootTransform;
+        public IReferenceFrameTransform ReferenceFrameTransform { get; set; }
 
         void Awake()
         {
-            _rootTransform = this.GetComponent<ReferenceFrameTransform>();
+            this.ReferenceFrameTransform = this.GetComponent<IReferenceFrameTransform>();
+            //this.gameObject.SetLayer( (int)Layer.CELESTIAL_BODY, true );
         }
 
         void Start()
@@ -79,12 +72,12 @@ namespace HSP.CelestialBodies
         /// <summary>
         /// Constructs the reference frame centered on this body, with axes aligned with the AIRF frame.
         /// </summary>
-        public IReferenceFrame CenteredReferenceFrame => new CenteredReferenceFrame( this.AIRFPosition );
+        public IReferenceFrame CenteredReferenceFrame => new CenteredReferenceFrame( this.ReferenceFrameTransform.AbsolutePosition );
 
         /// <summary>
         /// Constructs the reference frame centered on this body, with axes aligned with the body (i.e. local body space).
         /// </summary>
-        public IReferenceFrame OrientedReferenceFrame => new OrientedReferenceFrame( this.AIRFPosition, this.AIRFRotation );
+        public IReferenceFrame OrientedReferenceFrame => new OrientedReferenceFrame( this.ReferenceFrameTransform.AbsolutePosition, this.ReferenceFrameTransform.AbsoluteRotation );
 
         [MapsInheritingFrom( typeof( CelestialBody ) )]
         public static SerializationMapping CelestialBodyMapping()

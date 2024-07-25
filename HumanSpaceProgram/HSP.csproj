@@ -9,8 +9,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace>
-    </RootNamespace>
+    <RootNamespace></RootNamespace>
     <ProjectGuid>{5294BE79-15AB-2AAE-E8C3-9E735E001D6D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -59,20 +58,20 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\HSP\Layer.cs" />
+    <Compile Include="Assets\HSP\Time\TimeManager.cs" />
+    <Compile Include="Assets\HSP\SceneCamera.cs" />
     <Compile Include="Assets\HSP\Utils\InertiaUtils.cs" />
     <Compile Include="Assets\HSP\HSPEvent.cs" />
-    <Compile Include="Assets\HSP\Layer.cs" />
     <Compile Include="Assets\HSP\HSPEventListenerAttribute.cs" />
     <Compile Include="Assets\HSP\Utils\CoordinateUtils.cs" />
     <Compile Include="Assets\HSP\IHasMass.cs" />
-    <Compile Include="Assets\HSP\Time\TimeManager.cs" />
     <Compile Include="Assets\HSP\Utils\RollingStatistics.cs" />
-    <Compile Include="Assets\HSP\SceneCamera.cs" />
     <Compile Include="Assets\HSP\HumanSpaceProgram.cs" />
     <Compile Include="Assets\HSP\TransformRedirect.cs" />
     <Compile Include="Assets\HSP\Utils\IOHelper.cs" />
-    <Compile Include="Assets\HSP\PIDLoop.cs" />
     <Compile Include="Assets\HSP\IPhysicsTransform.cs" />
+    <Compile Include="Assets\HSP\PIDLoop.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP\___HSP.asmdef" />

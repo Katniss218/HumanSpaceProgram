@@ -7,9 +7,6 @@ using UnityPlus.Serialization;
 
 namespace HSP.Trajectories
 {
-    /// <remarks>
-    /// This is a wrapper for a rigidbody.
-    /// </remarks>
     [RequireComponent( typeof( Rigidbody ) )]
     [DisallowMultipleComponent]
     public class FreePhysicsObject : MonoBehaviour, IReferenceFrameTransform, IPhysicsTransform
@@ -19,6 +16,7 @@ namespace HSP.Trajectories
             get => this.transform.position;
             set
             {
+#error update global position from scene frame.
                 this._rb.position = value;
                 this.transform.position = value;
             }
@@ -226,6 +224,8 @@ namespace HSP.Trajectories
             this._oldAngularVelocity = AngularVelocity;
             this._accelerationSum = Vector3.zero;
             this._angularAccelerationSum = Vector3.zero;
+
+#error TODO - if global pos was not changed, update the global pos from local pos.
         }
 
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )

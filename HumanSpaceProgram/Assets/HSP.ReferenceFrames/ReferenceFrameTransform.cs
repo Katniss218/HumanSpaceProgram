@@ -109,13 +109,13 @@ namespace HSP.ReferenceFrames
             UpdateSceneRotation();
         }
 
-        [MapsInheritingFrom( typeof( ReferenceFrameTransform ) )]
+        [MapsInheritingFrom( typeof( OldReferenceFrameTransform ) )]
         public static SerializationMapping RootObjectTransformMapping()
         {
-            return new MemberwiseSerializationMapping<ReferenceFrameTransform>()
+            return new MemberwiseSerializationMapping<OldReferenceFrameTransform>()
             {
-                ("airf_position", new Member<ReferenceFrameTransform, Vector3Dbl>( o => o.AIRFPosition )),
-                ("airf_rotation", new Member<ReferenceFrameTransform, QuaternionDbl>( o => o.AIRFRotation )),
+                ("airf_position", new Member<OldReferenceFrameTransform, Vector3Dbl>( o => o.AIRFPosition )),
+                ("airf_rotation", new Member<OldReferenceFrameTransform, QuaternionDbl>( o => o.AIRFRotation )),
             };
         }
     }

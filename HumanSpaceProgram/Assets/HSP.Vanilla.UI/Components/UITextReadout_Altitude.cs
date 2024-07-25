@@ -12,7 +12,7 @@ namespace HSP.Vanilla.UI.Components
         {
             var activeObj = ActiveObjectManager.ActiveObject == null
                 ? null
-                : ActiveObjectManager.ActiveObject.GetComponent<ReferenceFrameTransform>();
+                : ActiveObjectManager.ActiveObject.GetComponent<IReferenceFrameTransform>();
 
             if( activeObj == null )
             {
@@ -21,8 +21,8 @@ namespace HSP.Vanilla.UI.Components
             else
             {
                 CelestialBody body = CelestialBodyManager.Get( "main" );
-                Vector3Dbl posV = activeObj.AIRFPosition;
-                Vector3Dbl posCB = body.AIRFPosition;
+                Vector3Dbl posV = activeObj.AbsolutePosition;
+                Vector3Dbl posCB = body.ReferenceFrameTransform.AbsolutePosition;
 
                 double magn = (posV - posCB).magnitude;
                 double alt = magn - body.Radius;

@@ -68,12 +68,12 @@ namespace HSP.ReferenceFrames
 
         public Vector3Dbl TransformAngularVelocity( Vector3Dbl localAngularVelocity )
         {
-            return _rotation * localVelocity;
+            return _rotation * localAngularVelocity;
         }
 
         public Vector3Dbl InverseTransformAngularVelocity( Vector3Dbl globalAngularVelocity )
         {
-            return _inverseRotation * globalVelocity;
+            return _inverseRotation * globalAngularVelocity;
         }
     }
 }

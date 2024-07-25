@@ -19,7 +19,7 @@ namespace HSP.CelestialBodies
             Vector3Dbl accSum = Vector3Dbl.zero;
             foreach( var body in CelestialBodyManager.CelestialBodies )
             {
-                Vector3Dbl toBody = body.AIRFPosition - airfPosition;
+                Vector3Dbl toBody = body.ReferenceFrameTransform.AbsolutePosition - airfPosition;
 
                 double distanceSq = toBody.sqrMagnitude;
                 if( distanceSq == 0.0 )

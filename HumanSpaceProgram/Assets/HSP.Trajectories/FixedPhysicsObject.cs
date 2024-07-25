@@ -6,13 +6,13 @@ using UnityPlus.Serialization;
 
 namespace HSP.Trajectories
 {
-    /// <remarks>
-    /// This is a wrapper for a rigidbody.
-    /// </remarks>
     [RequireComponent( typeof( Rigidbody ) )]
     [DisallowMultipleComponent]
     public class FixedPhysicsObject : MonoBehaviour, IReferenceFrameTransform, IPhysicsTransform
     {
+        Vector3Dbl _absolutePosition;
+        QuaternionDbl _absoluteRotation;
+
         public Vector3 Position
         {
             get => this.transform.position;
@@ -52,6 +52,46 @@ namespace HSP.Trajectories
                 ReferenceFrameTransformUtils.UpdateSceneRotationFromAbsolute( transform, _rb, value );
             }
         }
+
+
+        public Vector3 Velocity
+        {
+            get => this._rb.velocity;
+            set => this._rb.velocity = value;
+        }
+
+        public Vector3Dbl AbsoluteVelocity
+        {
+            get => _absoluteVelocity;
+            set
+            {
+                this._absoluteVelocity = value;
+                ReferenceFrameTransformUtils.UpdateSceneVelocityFromAbsolute( _rb, value );
+            }
+        }
+
+        public Vector3 Acceleration { get; private set; }
+        public Vector3Dbl AbsoluteAcceleration { get; private set; }
+
+        public Vector3 AngularVelocity
+        {
+            get => this._rb.angularVelocity;
+            set => this._rb.angularVelocity = value;
+        }
+
+        public Vector3Dbl AbsoluteAngularVelocity
+        {
+            get => _absoluteAngularVelocity;
+            set
+            {
+                this._absoluteAngularVelocity = value;
+                ReferenceFrameTransformUtils.UpdateSceneAngularVelocityFromAbsolute( _rb, value );
+            }
+        }
+
+        public Vector3 AngularAcceleration { get; private set; }
+
+        public Vector3Dbl AbsoluteAngularAcceleration { get; private set; }
 
         //
         //
@@ -129,8 +169,11 @@ namespace HSP.Trajectories
         void FixedUpdate()
         {
             _rb.isKinematic = true;
-            this.Acceleration = Vector3.zero;
-            this.AngularAcceleration = Vector3.zero;
+            //this.Acceleration = Vector3.zero;
+            //this.AngularAcceleration = Vector3.zero;
+
+            ReferenceFrameTransformUtils.UpdateScenePositionFromAbsolute( transform, _rb, this._absolutePosition );
+            ReferenceFrameTransformUtils.UpdateSceneRotationFromAbsolute( transform, _rb, this._absoluteRotation );
         }
 
         void OnCollisionEnter( Collision collision )
@@ -173,6 +216,11 @@ namespace HSP.Trajectories
 
                 ("DO_NOT_TOUCH", new Member<FixedPhysicsObject, bool>( o => true, (o, value) => o._rb.isKinematic = true)), // TODO - isKinematic member is a hack.
             };
+        }
+
+        public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

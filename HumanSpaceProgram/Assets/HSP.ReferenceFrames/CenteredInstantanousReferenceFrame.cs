@@ -5,7 +5,7 @@ using UnityEngine;
 namespace HSP.ReferenceFrames
 {
     /// <summary>
-    /// A reference frame aligned with the AIRF frame, and shifted (offset) by a certain amount. The non-inertial terms are instantanous and constant. This class is immutable.
+    /// A reference frame aligned with the AIRF frame, and shifted (offset) by a set distance. The non-inertial terms are instantanous and constant. This class is immutable.
     /// </summary>
     public sealed class CenteredInstantanousReferenceFrame : INonInertialReferenceFrame
     {
@@ -65,19 +65,33 @@ namespace HSP.ReferenceFrames
 
         //  --
 
+        public Vector3Dbl TransformVelocity( Vector3Dbl localVelocity )
+        {
+            return localVelocity;
+        }
+
+        public Vector3Dbl TransformAngularVelocity( Vector3Dbl localAngularVelocity )
+        {
+            return localAngularVelocity;
+        }
+
+        //  --
+
         public Vector3Dbl InverseTransformVelocity( Vector3Dbl globalVelocity )
         {
             return Vector3Dbl.Subtract( globalVelocity, _velocity );
         }
 
-        public Vector3Dbl InverseTransformAcceleration( Vector3Dbl globalAcceleration )
-        {
-            return Vector3Dbl.Subtract( globalAcceleration, _acceleration );
-        }
-
         public Vector3Dbl InverseTransformAngularVelocity( Vector3Dbl globalAngularVelocity )
         {
             return Vector3Dbl.Subtract( globalAngularVelocity, _angularVelocity );
+        }
+
+        //  --
+
+        public Vector3Dbl InverseTransformAcceleration( Vector3Dbl globalAcceleration )
+        {
+            return Vector3Dbl.Subtract( globalAcceleration, _acceleration );
         }
 
         public Vector3Dbl InverseTransformAngularAcceleration( Vector3Dbl globalAngularAcceleration )

@@ -65,7 +65,7 @@ namespace HSP.ReferenceFrames
             {
                 for( int i = 0; i < trail.positionCount; i++ )
                 {
-                    trail.SetPosition( i, ReferenceFrameUtils.GetNewPosition( data.OldFrame, data.NewFrame, trail.GetPosition( i ) ) );
+                    trail.SetPosition( i, (Vector3)ReferenceFrameUtils.GetNewPosition( data.OldFrame, data.NewFrame, trail.GetPosition( i ) ) );
                 }
             }
         }

@@ -138,7 +138,7 @@ namespace HSP.Vanilla.Components
 
 		private void UpdatePredictionPI()
 		{
-			_omega0 = _vessel.PhysicsObject.AngularVelocity;
+			_omega0 = _vessel.ReferenceFrameTransform.AngularVelocity;
 
 			UpdateError();
 

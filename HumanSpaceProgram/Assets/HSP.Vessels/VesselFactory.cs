@@ -25,29 +25,24 @@ namespace HSP.Vessels
         /// <returns>The created partless vessel.</returns>
         public static Vessel CreatePartless( Vector3Dbl airfPosition, QuaternionDbl airfRotation, Vector3 sceneVelocity, Vector3 sceneAngularVelocity )
         {
-            Vessel vessel = CreateGO( airfPosition, airfRotation );
+            Vessel vessel = CreateGO();
 
             HSPEvent.EventManager.TryInvoke( HSPEvent_ON_VESSEL_CREATED.ID, vessel );
 
-            vessel.PhysicsObject.Velocity = sceneVelocity;
-            vessel.PhysicsObject.AngularVelocity = sceneAngularVelocity;
+            vessel.ReferenceFrameTransform.AbsolutePosition = airfPosition;
+            vessel.ReferenceFrameTransform.AbsoluteRotation = airfRotation;
+            vessel.ReferenceFrameTransform.Velocity = sceneVelocity;
+            vessel.ReferenceFrameTransform.AngularVelocity = sceneAngularVelocity;
 
             return vessel;
         }
 
-        private static Vessel CreateGO( Vector3Dbl airfPosition, QuaternionDbl airfRotation )
+        private static Vessel CreateGO()
         {
             GameObject gameObject = new GameObject( $"Vessel, '{name}'" );
 
-            ReferenceFrameTransform ro = gameObject.AddComponent<ReferenceFrameTransform>();
-            //FreePhysicsObject fpo = gameObject.AddComponent<FreePhysicsObject>();
-#warning TODO - Hook the free/pinned physobj into the event.
-            // it also registers the vessel with an appropriate manager?
-
             Vessel vessel = gameObject.AddComponent<Vessel>();
             vessel.DisplayName = name;
-            ro.AIRFPosition = airfPosition;
-            ro.AIRFRotation = airfRotation;
 
             return vessel;
         }

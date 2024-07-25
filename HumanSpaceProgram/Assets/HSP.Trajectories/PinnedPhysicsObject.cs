@@ -12,9 +12,114 @@ namespace HSP.Trajectories
     /// </remarks>
 	[RequireComponent( typeof( Rigidbody ) )]
 	[DisallowMultipleComponent]
-	public class PinnedPhysicsObject : MonoBehaviour, IPhysicsTransform
-	{
-		public float Mass
+	public class PinnedPhysicsObject : MonoBehaviour, IReferenceFrameTransform, IPhysicsTransform
+    {
+        CelestialBody _referenceBody = null;
+        public CelestialBody ReferenceBody
+        {
+            get => _referenceBody;
+            set { _referenceBody = value; UpdateAIRFPositionFromReference(); }
+        }
+
+        Vector3Dbl _referencePosition = Vector3.zero;
+        public Vector3Dbl ReferencePosition
+        {
+            get => _referencePosition;
+            set { _referencePosition = value; UpdateAIRFPositionFromReference(); }
+        }
+
+        QuaternionDbl _referenceRotation = QuaternionDbl.identity;
+        public QuaternionDbl ReferenceRotation
+        {
+            get => _referenceRotation;
+            set { _referenceRotation = value; UpdateAIRFPositionFromReference(); }
+        }
+
+
+        public Vector3 Position
+        {
+            get => this.transform.position;
+            set
+            {
+                this._rb.position = value;
+                this.transform.position = value;
+            }
+        }
+
+        public Vector3Dbl AbsolutePosition
+        {
+            get => _absolutePosition;
+            set
+            {
+                _absolutePosition = value;
+                ReferenceFrameTransformUtils.UpdateScenePositionFromAbsolute( transform, _rb, value );
+            }
+        }
+
+        public Quaternion Rotation
+        {
+            get => this.transform.rotation;
+            set
+            {
+                this._rb.rotation = value;
+                this.transform.rotation = value;
+            }
+        }
+
+        public QuaternionDbl AbsoluteRotation
+        {
+            get => _absoluteRotation;
+            set
+            {
+                _absoluteRotation = value;
+                ReferenceFrameTransformUtils.UpdateSceneRotationFromAbsolute( transform, _rb, value );
+            }
+        }
+
+
+        public Vector3 Velocity
+        {
+            get => this._rb.velocity;
+            set => this._rb.velocity = value;
+        }
+
+        public Vector3Dbl AbsoluteVelocity
+        {
+            get => _absoluteVelocity;
+            set
+            {
+                this._absoluteVelocity = value;
+                ReferenceFrameTransformUtils.UpdateSceneVelocityFromAbsolute( _rb, value );
+            }
+        }
+
+        public Vector3 Acceleration { get; private set; }
+        public Vector3Dbl AbsoluteAcceleration { get; private set; }
+
+        public Vector3 AngularVelocity
+        {
+            get => this._rb.angularVelocity;
+            set => this._rb.angularVelocity = value;
+        }
+
+        public Vector3Dbl AbsoluteAngularVelocity
+        {
+            get => _absoluteAngularVelocity;
+            set
+            {
+                this._absoluteAngularVelocity = value;
+                ReferenceFrameTransformUtils.UpdateSceneAngularVelocityFromAbsolute( _rb, value );
+            }
+        }
+
+        public Vector3 AngularAcceleration { get; private set; }
+
+        public Vector3Dbl AbsoluteAngularAcceleration { get; private set; }
+
+
+        //
+
+        public float Mass
 		{
 			get => this._rb.mass;
 			set => this._rb.mass = value;
@@ -26,22 +131,6 @@ namespace HSP.Trajectories
 			set => this._rb.centerOfMass = value;
 		}
 
-		public Vector3 Velocity
-		{
-			get => this._rb.velocity;
-			set => this._rb.velocity = value;
-		}
-
-		public Vector3 Acceleration { get; private set; }
-
-		public Vector3 AngularVelocity
-		{
-			get => this._rb.angularVelocity;
-			set => this._rb.angularVelocity = value;
-		}
-
-		public Vector3 AngularAcceleration { get; private set; }
-		
         public Vector3 MomentsOfInertia => this._rb.inertiaTensor;
 
 		public Matrix3x3 MomentOfInertiaTensor
@@ -64,30 +153,9 @@ namespace HSP.Trajectories
 			}
 		}
 
-		CelestialBody _referenceBody = null;
-		public CelestialBody ReferenceBody
-		{
-			get => _referenceBody;
-			set { _referenceBody = value; UpdateAIRFPositionFromReference(); }
-		}
-
-		Vector3Dbl _referencePosition = Vector3.zero;
-		public Vector3Dbl ReferencePosition
-		{
-			get => _referencePosition;
-			set { _referencePosition = value; UpdateAIRFPositionFromReference(); }
-		}
-
-		QuaternionDbl _referenceRotation = QuaternionDbl.identity;
-		public QuaternionDbl ReferenceRotation
-		{
-			get => _referenceRotation;
-			set { _referenceRotation = value; UpdateAIRFPositionFromReference(); }
-		}
-
 		public bool IsColliding { get; private set; }
 
-		Vector3 _oldVelocity;
+        Vector3 _oldVelocity;
 		Vector3 _oldAngularVelocity;
 
 		Vector3 _accelerationSum = Vector3.zero;
@@ -97,29 +165,18 @@ namespace HSP.Trajectories
 
 		public void AddForce( Vector3 force )
 		{
-			_accelerationSum += force / Mass;
-			//this._rb.AddForce( force, ForceMode.Force );
+            return;
 		}
 
 		public void AddForceAtPosition( Vector3 force, Vector3 position )
-		{
-			// I think force / mass is still correct for this,
-			// - because 2 consecutive impulses in the same direction, but opposite positions (so that the angular accelerations cancel out)
-			// - should still produce linear acceleration of 2 * force / mass.
-			_accelerationSum += force / Mass;
-
-			Vector3 leverArm = position - this._rb.worldCenterOfMass;
-			_angularAccelerationSum += Vector3.Cross( force, leverArm ) / Mass;
-
-			// TODO - possibly cache the values across a frame and apply it once instead of n-times.
-			//this._rb.AddForceAtPosition( force, position, ForceMode.Force );
-		}
+        {
+            return;
+        }
 
 		public void AddTorque( Vector3 force )
-		{
-			_angularAccelerationSum += force / Mass;
-			//this._rb.AddTorque( force, ForceMode.Force );
-		}
+        {
+            return;
+        }
 
 		internal void UpdateAIRFPositionFromReference()
 		{
@@ -127,8 +184,8 @@ namespace HSP.Trajectories
 				return;
 
 			var frame = ReferenceBody.OrientedReferenceFrame;
-			this._rootObjTransform.AIRFPosition = frame.TransformPosition( ReferencePosition );
-			this._rootObjTransform.AIRFRotation = frame.TransformRotation( ReferenceRotation );
+            this.AbsolutePosition = frame.TransformPosition( ReferencePosition );
+			this.AbsoluteRotation = frame.TransformRotation( ReferenceRotation );
 		}
 
 		void Awake()
@@ -209,5 +266,10 @@ namespace HSP.Trajectories
 				("reference_rotation", new Member<PinnedPhysicsObject, QuaternionDbl>( o => o.ReferenceRotation ))
 			};
         }
-	}
+
+        public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
+        {
+            throw new System.NotImplementedException();
+        }
+    }
 }

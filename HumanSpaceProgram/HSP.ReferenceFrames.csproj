@@ -59,17 +59,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\HSP.ReferenceFrames\CenteredInstantanousReferenceFrame.cs" />
-    <Compile Include="Assets\HSP.ReferenceFrames\CenteredReferenceFrame.cs" />
-    <Compile Include="Assets\HSP.ReferenceFrames\ReferenceFrameTransform.cs" />
+    <Compile Include="Assets\HSP.ReferenceFrames\INonInertialReferenceFrame.cs" />
     <Compile Include="Assets\HSP.ReferenceFrames\ReferenceFrameUtils.cs" />
     <Compile Include="Assets\HSP.ReferenceFrames\OrientedReferenceFrame.cs" />
-    <Compile Include="Assets\HSP.ReferenceFrames\IReferenceFrame.cs" />
-    <Compile Include="Assets\HSP.ReferenceFrames\SceneReferenceFrameManager.cs" />
-    <Compile Include="Assets\HSP.ReferenceFrames\ActiveObjectManager.cs" />
-    <Compile Include="Assets\HSP.ReferenceFrames\INonInertialReferenceFrame.cs" />
-    <Compile Include="Assets\HSP.ReferenceFrames\IReferenceFrameTransform.cs" />
     <Compile Include="Assets\HSP.ReferenceFrames\ReferenceFrameTransformUtils.cs" />
+    <Compile Include="Assets\HSP.ReferenceFrames\SceneReferenceFrameManager.cs" />
+    <Compile Include="Assets\HSP.ReferenceFrames\IReferenceFrameTransform.cs" />
+    <Compile Include="Assets\HSP.ReferenceFrames\CenteredReferenceFrame.cs" />
+    <Compile Include="Assets\HSP.ReferenceFrames\ReferenceFrameTransform.cs" />
+    <Compile Include="Assets\HSP.ReferenceFrames\IReferenceFrame.cs" />
     <Compile Include="Assets\HSP.ReferenceFrames\IReferenceFrameTransform_Ex.cs" />
+    <Compile Include="Assets\HSP.ReferenceFrames\ActiveObjectManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.ReferenceFrames\___HSP.ReferenceFrames.asmdef" />

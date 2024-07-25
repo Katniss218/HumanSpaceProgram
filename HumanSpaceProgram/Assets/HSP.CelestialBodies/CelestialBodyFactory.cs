@@ -31,8 +31,8 @@ namespace HSP.CelestialBodies
 
             CelestialBody body = gameObject.AddComponent<CelestialBody>();
             body.ID = this.ID;
-            body.AIRFPosition = airfPosition;
-            body.AIRFRotation = airfRotation;
+            body.ReferenceFrameTransform.AbsolutePosition = airfPosition;
+            body.ReferenceFrameTransform.AbsoluteRotation = airfRotation;
             body.Mass = mass;
             body.Radius = radius;
 

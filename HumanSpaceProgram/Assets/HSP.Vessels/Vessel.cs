@@ -30,7 +30,6 @@ namespace HSP.Vessels
     /// <remarks>
     /// Vessels exist only in the gameplay scene.
     /// </remarks>
-    [RequireComponent( typeof( ReferenceFrameTransform ) )]
     public sealed partial class Vessel : MonoBehaviour
     {
         [SerializeField]
@@ -62,7 +61,7 @@ namespace HSP.Vessels
         }
 
         public IPhysicsTransform PhysicsObject { get; set; }
-        public ReferenceFrameTransform RootObjTransform { get; private set; }
+        public IReferenceFrameTransform ReferenceFrameTransform { get; set; }
 
         public Transform ReferenceTransform => this.transform;
 
@@ -102,7 +101,7 @@ namespace HSP.Vessels
 
         void Awake()
         {
-            this.RootObjTransform = this.GetComponent<ReferenceFrameTransform>();
+            this.ReferenceFrameTransform = this.GetComponent<IReferenceFrameTransform>();
             this.PhysicsObject = this.GetComponent<IPhysicsTransform>();
             this.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
         }
@@ -217,8 +216,8 @@ namespace HSP.Vessels
             //this.PhysicsObject.MomentOfInertiaTensor = inertia; // this is around an order of magnitude too small in each direction, but that might be because we're assuming point masses.
         }
 
-        public Vector3Dbl AIRFPosition { get => this.RootObjTransform.AIRFPosition; set => this.RootObjTransform.AIRFPosition = value; }
-        public QuaternionDbl AIRFRotation { get => this.RootObjTransform.AIRFRotation; set => this.RootObjTransform.AIRFRotation = value; }
+        public Vector3Dbl AIRFPosition { get => this.ReferenceFrameTransform.AbsolutePosition; set => this.ReferenceFrameTransform.AbsolutePosition = value; }
+        public QuaternionDbl AIRFRotation { get => this.ReferenceFrameTransform.AbsoluteRotation; set => this.ReferenceFrameTransform.AbsoluteRotation = value; }
 
         /// <summary>
         /// Calculates the scene world-space point at the very bottom of the vessel. Useful when placing it at launchsites and such.
