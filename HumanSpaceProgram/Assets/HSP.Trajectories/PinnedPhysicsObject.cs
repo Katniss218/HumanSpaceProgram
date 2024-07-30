@@ -15,20 +15,21 @@ namespace HSP.Trajectories
 	public class PinnedPhysicsObject : MonoBehaviour, IReferenceFrameTransform, IPhysicsTransform
     {
         CelestialBody _referenceBody = null;
+        Vector3Dbl _referencePosition = Vector3.zero;
+        QuaternionDbl _referenceRotation = QuaternionDbl.identity;
+
         public CelestialBody ReferenceBody
         {
             get => _referenceBody;
             set { _referenceBody = value; UpdateAIRFPositionFromReference(); }
         }
 
-        Vector3Dbl _referencePosition = Vector3.zero;
         public Vector3Dbl ReferencePosition
         {
             get => _referencePosition;
             set { _referencePosition = value; UpdateAIRFPositionFromReference(); }
         }
 
-        QuaternionDbl _referenceRotation = QuaternionDbl.identity;
         public QuaternionDbl ReferenceRotation
         {
             get => _referenceRotation;
@@ -41,8 +42,7 @@ namespace HSP.Trajectories
             get => this.transform.position;
             set
             {
-                this._rb.position = value;
-                this.transform.position = value;
+
             }
         }
 

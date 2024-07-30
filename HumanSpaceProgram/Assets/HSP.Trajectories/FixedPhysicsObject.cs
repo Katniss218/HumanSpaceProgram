@@ -6,6 +6,9 @@ using UnityPlus.Serialization;
 
 namespace HSP.Trajectories
 {
+    /// <summary>
+    /// A physics transform that's fixed to a point in space and doesn't move (in the absolute frame).
+    /// </summary>
     [RequireComponent( typeof( Rigidbody ) )]
     [DisallowMultipleComponent]
     public class FixedPhysicsObject : MonoBehaviour, IReferenceFrameTransform, IPhysicsTransform
@@ -18,8 +21,8 @@ namespace HSP.Trajectories
             get => this.transform.position;
             set
             {
-                this._rb.position = value;
-                this.transform.position = value;
+                this._absolutePosition = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( value );
+                ReferenceFrameTransformUtils.UpdateScenePositionFromAbsolute( transform, _rb, _absolutePosition );
             }
         }
 
@@ -38,8 +41,8 @@ namespace HSP.Trajectories
             get => this.transform.rotation;
             set
             {
-                this._rb.rotation = value;
-                this.transform.rotation = value;
+                this._absoluteRotation = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( value );
+                ReferenceFrameTransformUtils.UpdateSceneRotationFromAbsolute( transform, _rb, _absoluteRotation );
             }
         }
 
@@ -62,36 +65,41 @@ namespace HSP.Trajectories
 
         public Vector3Dbl AbsoluteVelocity
         {
-            get => _absoluteVelocity;
-            set
-            {
-                this._absoluteVelocity = value;
-                ReferenceFrameTransformUtils.UpdateSceneVelocityFromAbsolute( _rb, value );
-            }
+            get => Vector3Dbl.zero;
+            set { }
         }
 
-        public Vector3 Acceleration { get; private set; }
-        public Vector3Dbl AbsoluteAcceleration { get; private set; }
+        public Vector3 Acceleration
+        {
+            get => SceneReferenceFrameManager.ReferenceFrame.InverseTransformAcceleration( Vector3Dbl.zero );
+        }
+
+        public Vector3Dbl AbsoluteAcceleration
+        {
+            get => Vector3Dbl.zero;
+        }
 
         public Vector3 AngularVelocity
         {
             get => this._rb.angularVelocity;
-            set => this._rb.angularVelocity = value;
+            set { }
         }
 
         public Vector3Dbl AbsoluteAngularVelocity
         {
-            get => _absoluteAngularVelocity;
-            set
-            {
-                this._absoluteAngularVelocity = value;
-                ReferenceFrameTransformUtils.UpdateSceneAngularVelocityFromAbsolute( _rb, value );
-            }
+            get => Vector3Dbl.zero;
+            set { }
         }
 
-        public Vector3 AngularAcceleration { get; private set; }
+        public Vector3 AngularAcceleration
+        {
+            get => SceneReferenceFrameManager.ReferenceFrame.InverseTransformAngularAcceleration( Vector3Dbl.zero );
+        }
 
-        public Vector3Dbl AbsoluteAngularAcceleration { get; private set; }
+        public Vector3Dbl AbsoluteAngularAcceleration
+        {
+            get => Vector3Dbl.zero;
+        }
 
         //
         //
@@ -149,6 +157,12 @@ namespace HSP.Trajectories
             return;
         }
 
+        private void RecacheAirfPosRot()
+        {
+            this._absolutePosition = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( this._rb.position );
+            this._absoluteRotation = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( this._rb.rotation );
+        }
+
         void Awake()
         {
             if( this.HasComponentOtherThan<IPhysicsTransform>( this ) )
@@ -171,6 +185,7 @@ namespace HSP.Trajectories
             _rb.isKinematic = true;
             //this.Acceleration = Vector3.zero;
             //this.AngularAcceleration = Vector3.zero;
+            this._rb.velocity = ReferenceFrameTransformUtils
 
             ReferenceFrameTransformUtils.UpdateScenePositionFromAbsolute( transform, _rb, this._absolutePosition );
             ReferenceFrameTransformUtils.UpdateSceneRotationFromAbsolute( transform, _rb, this._absoluteRotation );

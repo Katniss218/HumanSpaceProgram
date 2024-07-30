@@ -16,7 +16,6 @@ namespace HSP.Trajectories
             get => this.transform.position;
             set
             {
-#error update global position from scene frame.
                 this._rb.position = value;
                 this.transform.position = value;
             }
@@ -170,6 +169,12 @@ namespace HSP.Trajectories
             this._rb.AddTorque( force, ForceMode.Force );
         }
 
+        private void RecacheAirfPosRot()
+        {
+            this._absolutePosition = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( this._rb.position );
+            this._absoluteRotation = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( this._rb.rotation );
+        }
+
         void Awake()
         {
             if( this.HasComponentOtherThan<IPhysicsTransform>( this ) )
@@ -225,7 +230,7 @@ namespace HSP.Trajectories
             this._accelerationSum = Vector3.zero;
             this._angularAccelerationSum = Vector3.zero;
 
-#error TODO - if global pos was not changed, update the global pos from local pos.
+            RecacheAirfPosRot();
         }
 
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
