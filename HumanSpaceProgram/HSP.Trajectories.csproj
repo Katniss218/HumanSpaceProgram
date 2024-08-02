@@ -60,15 +60,15 @@
   <ItemGroup>
     <Compile Include="Assets\HSP.Trajectories\PinnedPhysicsObject.cs" />
     <Compile Include="Assets\HSP.Trajectories\FixedPhysicsObject.cs" />
-    <Compile Include="Assets\HSP.Trajectories\ITrajectory.cs" />
     <Compile Include="Assets\HSP.Trajectories\OrbitalFrame.cs" />
     <Compile Include="Assets\HSP.Trajectories\Components\FAnchor.cs" />
-    <Compile Include="Assets\HSP.Trajectories\NewtonianOrbit.cs" />
     <Compile Include="Assets\HSP.Trajectories\FreePhysicsObject.cs" />
-    <Compile Include="Assets\HSP.Trajectories\StateVector.cs" />
-    <Compile Include="Assets\HSP.Trajectories\FixedTrajectory.cs" />
     <Compile Include="Assets\HSP.Trajectories\TrajectorySimulator.cs" />
     <Compile Include="Assets\HSP.Trajectories\KeplerianOrbit.cs" />
+    <Compile Include="Assets\HSP.Trajectories\ITrajectory.cs" />
+    <Compile Include="Assets\HSP.Trajectories\StateVector.cs" />
+    <Compile Include="Assets\HSP.Trajectories\NewtonianOrbit.cs" />
+    <Compile Include="Assets\HSP.Trajectories\FixedTrajectory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Trajectories\___HSP.Trajectories.asmdef" />

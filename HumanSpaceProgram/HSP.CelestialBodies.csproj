@@ -61,13 +61,13 @@
     <Compile Include="Assets\HSP.CelestialBodies\Surfaces\LODQuadTree.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\CelestialBodyManager.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\Atmospheres\AtmosphereRenderer.cs" />
-    <Compile Include="Assets\HSP.CelestialBodies\CelestialBodySurface.cs" />
-    <Compile Include="Assets\HSP.CelestialBodies\CelestialBody.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\CelestialBodyFactory.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\Surfaces\MakeQuadMesh_Job.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\Surfaces\LODQuadSphere.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\GravityUtils.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\Surfaces\LODQuad.cs" />
+    <Compile Include="Assets\HSP.CelestialBodies\CelestialBodySurface.cs" />
+    <Compile Include="Assets\HSP.CelestialBodies\CelestialBody.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\Surfaces\LODQuadTree_NodeUtils.cs" />
   </ItemGroup>
   <ItemGroup>

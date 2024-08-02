@@ -58,8 +58,8 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\_UnityPlus.Rendering\Compositing\StackedCameraRenderer.cs" />
     <Compile Include="Assets\_UnityPlus.Rendering\ContactShadows\ContactShadowsRenderer.cs" />
+    <Compile Include="Assets\_UnityPlus.Rendering\Compositing\StackedCameraRenderer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_UnityPlus.Rendering\ContactShadows\ContactShadows.shader" />

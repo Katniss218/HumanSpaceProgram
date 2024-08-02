@@ -59,10 +59,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\_UnityPlus.AssetManagement\AssetSources\DefaultAssetSource.cs" />
+    <Compile Include="Assets\_UnityPlus.AssetManagement\AssetRegistry.cs" />
     <Compile Include="Assets\_UnityPlus.AssetManagement\AssetSource.cs" />
     <Compile Include="Assets\_UnityPlus.AssetManagement\ClonedGameObject.cs" />
     <Compile Include="Assets\_UnityPlus.AssetManagement\AssetSources\CustomAssetSource.cs" />
-    <Compile Include="Assets\_UnityPlus.AssetManagement\AssetRegistry.cs" />
     <Compile Include="Assets\_UnityPlus.AssetManagement\AssetRegisterer.cs" />
   </ItemGroup>
   <ItemGroup>

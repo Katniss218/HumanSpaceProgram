@@ -11,8 +11,8 @@ namespace HSP.Trajectories
     /// A physobj that is pinned to a fixed pos/rot in the local coordinate system of a celestial body.
     /// </remarks>
 	[RequireComponent( typeof( Rigidbody ) )]
-	[DisallowMultipleComponent]
-	public class PinnedPhysicsObject : MonoBehaviour, IReferenceFrameTransform, IPhysicsTransform
+    [DisallowMultipleComponent]
+    public class PinnedPhysicsObject : MonoBehaviour, IReferenceFrameTransform, IPhysicsTransform
     {
         CelestialBody _referenceBody = null;
         Vector3Dbl _referencePosition = Vector3.zero;
@@ -21,19 +21,19 @@ namespace HSP.Trajectories
         public CelestialBody ReferenceBody
         {
             get => _referenceBody;
-            set { _referenceBody = value; UpdateAIRFPositionFromReference(); }
+            set { _referenceBody = value; UpdateScenePositionAndRotation(); }
         }
 
         public Vector3Dbl ReferencePosition
         {
             get => _referencePosition;
-            set { _referencePosition = value; UpdateAIRFPositionFromReference(); }
+            set { _referencePosition = value; UpdateScenePositionAndRotation(); }
         }
 
         public QuaternionDbl ReferenceRotation
         {
             get => _referenceRotation;
-            set { _referenceRotation = value; UpdateAIRFPositionFromReference(); }
+            set { _referenceRotation = value; UpdateScenePositionAndRotation(); }
         }
 
 
@@ -42,17 +42,10 @@ namespace HSP.Trajectories
             get => this.transform.position;
             set
             {
+                Vector3Dbl airfPos = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( value );
+                _referencePosition = _referenceBody.OrientedReferenceFrame.InverseTransformPosition( airfPos );
 
-            }
-        }
-
-        public Vector3Dbl AbsolutePosition
-        {
-            get => _absolutePosition;
-            set
-            {
-                _absolutePosition = value;
-                ReferenceFrameTransformUtils.UpdateScenePositionFromAbsolute( transform, _rb, value );
+                UpdateScenePositionAndRotation();
             }
         }
 
@@ -61,18 +54,32 @@ namespace HSP.Trajectories
             get => this.transform.rotation;
             set
             {
-                this._rb.rotation = value;
-                this.transform.rotation = value;
+                QuaternionDbl airfRot = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( value );
+                _referenceRotation = _referenceBody.OrientedReferenceFrame.InverseTransformRotation( airfRot );
+
+                UpdateScenePositionAndRotation();
+            }
+        }
+
+        public Vector3Dbl AbsolutePosition
+        {
+            get => _referenceBody.OrientedReferenceFrame.TransformPosition( _referencePosition );
+            set
+            {
+                _referencePosition = _referenceBody.OrientedReferenceFrame.InverseTransformPosition( value );
+
+                UpdateScenePositionAndRotation();
             }
         }
 
         public QuaternionDbl AbsoluteRotation
         {
-            get => _absoluteRotation;
+            get => _referenceBody.OrientedReferenceFrame.TransformRotation( _referenceRotation );
             set
             {
-                _absoluteRotation = value;
-                ReferenceFrameTransformUtils.UpdateSceneRotationFromAbsolute( transform, _rb, value );
+                _referenceRotation = _referenceBody.OrientedReferenceFrame.InverseTransformRotation( value );
+
+                UpdateScenePositionAndRotation();
             }
         }
 
@@ -80,16 +87,18 @@ namespace HSP.Trajectories
         public Vector3 Velocity
         {
             get => this._rb.velocity;
-            set => this._rb.velocity = value;
+            set
+            {
+                return;
+            }
         }
 
         public Vector3Dbl AbsoluteVelocity
         {
-            get => _absoluteVelocity;
+            get => SceneReferenceFrameManager.ReferenceFrame.TransformVelocity( this._rb.velocity );
             set
             {
-                this._absoluteVelocity = value;
-                ReferenceFrameTransformUtils.UpdateSceneVelocityFromAbsolute( _rb, value );
+                return;
             }
         }
 
@@ -99,16 +108,18 @@ namespace HSP.Trajectories
         public Vector3 AngularVelocity
         {
             get => this._rb.angularVelocity;
-            set => this._rb.angularVelocity = value;
+            set
+            {
+                return;
+            }
         }
 
         public Vector3Dbl AbsoluteAngularVelocity
         {
-            get => _absoluteAngularVelocity;
+            get => SceneReferenceFrameManager.ReferenceFrame.TransformAngularVelocity( this._rb.angularVelocity );
             set
             {
-                this._absoluteAngularVelocity = value;
-                ReferenceFrameTransformUtils.UpdateSceneAngularVelocityFromAbsolute( _rb, value );
+                return;
             }
         }
 
@@ -120,151 +131,155 @@ namespace HSP.Trajectories
         //
 
         public float Mass
-		{
-			get => this._rb.mass;
-			set => this._rb.mass = value;
-		}
+        {
+            get => this._rb.mass;
+            set => this._rb.mass = value;
+        }
 
-		public Vector3 LocalCenterOfMass
-		{
-			get => this._rb.centerOfMass;
-			set => this._rb.centerOfMass = value;
-		}
+        public Vector3 LocalCenterOfMass
+        {
+            get => this._rb.centerOfMass;
+            set => this._rb.centerOfMass = value;
+        }
 
         public Vector3 MomentsOfInertia => this._rb.inertiaTensor;
 
-		public Matrix3x3 MomentOfInertiaTensor
-		{
-			get
-			{
-				Matrix3x3 R = Matrix3x3.Rotate( this._rb.inertiaTensorRotation );
-				Matrix3x3 S = Matrix3x3.Scale( this._rb.inertiaTensor );
-				return R * S * R.transpose;
-			}
-			set
-			{
-				(Vector3 eigenvector, float eigenvalue)[] eigen = value.Diagonalize().OrderByDescending( m => m.eigenvalue ).ToArray();
-				this._rb.inertiaTensor = new Vector3( eigen[0].eigenvalue, eigen[1].eigenvalue, eigen[2].eigenvalue );
-				Matrix3x3 m = new Matrix3x3( eigen[0].eigenvector.x, eigen[0].eigenvector.y, eigen[0].eigenvector.z,
-					eigen[1].eigenvector.x, eigen[1].eigenvector.y, eigen[1].eigenvector.z,
-					eigen[2].eigenvector.x, eigen[2].eigenvector.y, eigen[2].eigenvector.z );
-				this._rb.inertiaTensorRotation = m.rotation;
+        public Matrix3x3 MomentOfInertiaTensor
+        {
+            get
+            {
+                Matrix3x3 R = Matrix3x3.Rotate( this._rb.inertiaTensorRotation );
+                Matrix3x3 S = Matrix3x3.Scale( this._rb.inertiaTensor );
+                return R * S * R.transpose;
+            }
+            set
+            {
+                (Vector3 eigenvector, float eigenvalue)[] eigen = value.Diagonalize().OrderByDescending( m => m.eigenvalue ).ToArray();
+                this._rb.inertiaTensor = new Vector3( eigen[0].eigenvalue, eigen[1].eigenvalue, eigen[2].eigenvalue );
+                Matrix3x3 m = new Matrix3x3( eigen[0].eigenvector.x, eigen[0].eigenvector.y, eigen[0].eigenvector.z,
+                    eigen[1].eigenvector.x, eigen[1].eigenvector.y, eigen[1].eigenvector.z,
+                    eigen[2].eigenvector.x, eigen[2].eigenvector.y, eigen[2].eigenvector.z );
+                this._rb.inertiaTensorRotation = m.rotation;
 
-			}
-		}
+            }
+        }
 
-		public bool IsColliding { get; private set; }
+        public bool IsColliding { get; private set; }
 
         Vector3 _oldVelocity;
-		Vector3 _oldAngularVelocity;
+        Vector3 _oldAngularVelocity;
 
-		Vector3 _accelerationSum = Vector3.zero;
-		Vector3 _angularAccelerationSum = Vector3.zero;
+        Vector3 _accelerationSum = Vector3.zero;
+        Vector3 _angularAccelerationSum = Vector3.zero;
 
-		Rigidbody _rb;
+        Rigidbody _rb;
 
-		public void AddForce( Vector3 force )
-		{
-            return;
-		}
-
-		public void AddForceAtPosition( Vector3 force, Vector3 position )
+        public void AddForce( Vector3 force )
         {
             return;
         }
 
-		public void AddTorque( Vector3 force )
+        public void AddForceAtPosition( Vector3 force, Vector3 position )
         {
             return;
         }
 
-		internal void UpdateAIRFPositionFromReference()
-		{
-			if( ReferenceBody == null )
-				return;
+        public void AddTorque( Vector3 force )
+        {
+            return;
+        }
 
-			var frame = ReferenceBody.OrientedReferenceFrame;
-            this.AbsolutePosition = frame.TransformPosition( ReferencePosition );
-			this.AbsoluteRotation = frame.TransformRotation( ReferenceRotation );
-		}
+        private void UpdateScenePositionAndRotation()
+        {
+            if( ReferenceBody == null )
+                return;
 
-		void Awake()
-		{
-			if( this.HasComponentOtherThan<IPhysicsTransform>( this ) )
-			{
-				Debug.LogWarning( $"Tried to add a {nameof( PinnedPhysicsObject )} to a game object that already has a {nameof( IPhysicsTransform )}. This is not allowed. Remove the previous physics object first." );
-				Destroy( this );
-				return;
-			}
+            var frame = ReferenceBody.OrientedReferenceFrame;
+            var pos = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformPosition( frame.TransformPosition( _referencePosition ) );
+            var rot = (Quaternion)SceneReferenceFrameManager.ReferenceFrame.InverseTransformRotation( frame.TransformRotation( _referenceRotation ) );
+            this.transform.rotation = rot;
+            this._rb.rotation = rot;
+            this.transform.position = pos;
+            this._rb.position = pos;
+        }
 
-			_rb = this.GetComponent<Rigidbody>();
+        void Awake()
+        {
+            if( this.HasComponentOtherThan<IPhysicsTransform>( this ) )
+            {
+                Debug.LogWarning( $"Tried to add a {nameof( PinnedPhysicsObject )} to a game object that already has a {nameof( IPhysicsTransform )}. This is not allowed. Remove the previous physics object first." );
+                Destroy( this );
+                return;
+            }
 
-			_rb.useGravity = false;
-			_rb.collisionDetectionMode = CollisionDetectionMode.Discrete;
-			_rb.interpolation = RigidbodyInterpolation.None; // DO NOT INTERPOLATE. Doing so will desync `rigidbody.position` and `transform.position`.
-			_rb.isKinematic = true;
-		}
+            _rb = this.GetComponent<Rigidbody>();
 
-		void FixedUpdate()
-		{
-			// Reference can be moving, and we aren't parented (due to precision), thus we continuously update.
-			this.UpdateAIRFPositionFromReference();
+            _rb.useGravity = false;
+            _rb.collisionDetectionMode = CollisionDetectionMode.Discrete;
+            _rb.interpolation = RigidbodyInterpolation.None; // DO NOT INTERPOLATE. Doing so will desync `rigidbody.position` and `transform.position`.
+            _rb.isKinematic = true;
+        }
 
-			// If the object is colliding, we will use its rigidbody accelerations, because we don't have access to the forces due to collisions.
-			// Otherwise, we use our more precise method that relies on full encapsulation of the rigidbody.
-			if( IsColliding )
-			{
-				this.Acceleration = (Velocity - _oldVelocity) / TimeManager.FixedDeltaTime;
-				this.AngularAcceleration = (AngularVelocity - _oldAngularVelocity) / TimeManager.FixedDeltaTime;
-			}
-			else
-			{
-				// Acceleration sum will be whatever was accumulated between the previous frame (after it was zeroed out) and this frame. I think it should work fine.
-				this.Acceleration = _accelerationSum;
-				this.AngularAcceleration = _angularAccelerationSum;
-			}
+        void FixedUpdate()
+        {
+            // Reference can be moving, and we aren't parented (due to precision), thus we continuously update.
+            this.UpdateScenePositionAndRotation();
 
-			this._oldVelocity = Velocity;
-			this._oldAngularVelocity = AngularVelocity;
-			this._accelerationSum = Vector3.zero;
-			this._angularAccelerationSum = Vector3.zero;
-		}
+            // If the object is colliding, we will use its rigidbody accelerations, because we don't have access to the forces due to collisions.
+            // Otherwise, we use our more precise method that relies on full encapsulation of the rigidbody.
+            if( IsColliding )
+            {
+                this.Acceleration = (Velocity - _oldVelocity) / TimeManager.FixedDeltaTime;
+                this.AngularAcceleration = (AngularVelocity - _oldAngularVelocity) / TimeManager.FixedDeltaTime;
+            }
+            else
+            {
+                // Acceleration sum will be whatever was accumulated between the previous frame (after it was zeroed out) and this frame. I think it should work fine.
+                this.Acceleration = _accelerationSum;
+                this.AngularAcceleration = _angularAccelerationSum;
+            }
 
-		void OnCollisionEnter( Collision collision )
-		{
-			IsColliding = true;
-		}
+            this._oldVelocity = Velocity;
+            this._oldAngularVelocity = AngularVelocity;
+            this._accelerationSum = Vector3.zero;
+            this._angularAccelerationSum = Vector3.zero;
+        }
 
-		void OnCollisionStay( Collision collision )
-		{
-			// `OnCollisionEnter` / Exit are called for every collider.
-			// I've tried using an incrementing/decrementing int with enter/exit, but it wasn't updating correctly, and after some time, there were too many collisions.
-			// Using `OnCollisionStay` prevents desynchronization.
+        void OnCollisionEnter( Collision collision )
+        {
+            IsColliding = true;
+        }
 
-			IsColliding = true;
-		}
+        void OnCollisionStay( Collision collision )
+        {
+            // `OnCollisionEnter` / Exit are called for every collider.
+            // I've tried using an incrementing/decrementing int with enter/exit, but it wasn't updating correctly, and after some time, there were too many collisions.
+            // Using `OnCollisionStay` prevents desynchronization.
 
-		void OnCollisionExit( Collision collision )
-		{
-			IsColliding = false;
-		}
+            IsColliding = true;
+        }
+
+        void OnCollisionExit( Collision collision )
+        {
+            IsColliding = false;
+        }
 
         [MapsInheritingFrom( typeof( PinnedPhysicsObject ) )]
         public static SerializationMapping PinnedPhysicsObjectMapping()
         {
-			return new MemberwiseSerializationMapping<PinnedPhysicsObject>()
-			{
-				("mass", new Member<PinnedPhysicsObject, float>( o => o.Mass )),
-				("local_center_of_mass", new Member<PinnedPhysicsObject, Vector3>( o => o.LocalCenterOfMass )),
+            return new MemberwiseSerializationMapping<PinnedPhysicsObject>()
+            {
+                ("mass", new Member<PinnedPhysicsObject, float>( o => o.Mass )),
+                ("local_center_of_mass", new Member<PinnedPhysicsObject, Vector3>( o => o.LocalCenterOfMass )),
 
-				("DO_NOT_TOUCH", new Member<PinnedPhysicsObject, bool>( o => true, (o, value) => o._rb.isKinematic = true)), // TODO - isKinematic member is a hack.
+                ("DO_NOT_TOUCH", new Member<PinnedPhysicsObject, bool>( o => true, (o, value) => o._rb.isKinematic = true)), // TODO - isKinematic member is a hack.
 
                 ("velocity", new Member<PinnedPhysicsObject, Vector3>( o => o.Velocity, (o, value) => { } )),
-				("angular_velocity", new Member<PinnedPhysicsObject, Vector3>( o => o.AngularVelocity, (o, value) => { } )),
-				("reference_body", new Member<PinnedPhysicsObject, CelestialBody>( ObjectContext.Ref, o => o.ReferenceBody )),
-				("reference_position", new Member<PinnedPhysicsObject, Vector3Dbl>( o => o.ReferencePosition )),
-				("reference_rotation", new Member<PinnedPhysicsObject, QuaternionDbl>( o => o.ReferenceRotation ))
-			};
+                ("angular_velocity", new Member<PinnedPhysicsObject, Vector3>( o => o.AngularVelocity, (o, value) => { } )),
+                ("reference_body", new Member<PinnedPhysicsObject, CelestialBody>( ObjectContext.Ref, o => o.ReferenceBody )),
+                ("reference_position", new Member<PinnedPhysicsObject, Vector3Dbl>( o => o.ReferencePosition )),
+                ("reference_rotation", new Member<PinnedPhysicsObject, QuaternionDbl>( o => o.ReferenceRotation ))
+            };
         }
 
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )

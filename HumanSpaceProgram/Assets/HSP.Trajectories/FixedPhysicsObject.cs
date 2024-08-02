@@ -157,10 +157,14 @@ namespace HSP.Trajectories
             return;
         }
 
-        private void RecacheAirfPosRot()
+        private void UpdateScenePositionAndRotation()
         {
-            this._absolutePosition = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( this._rb.position );
-            this._absoluteRotation = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( this._rb.rotation );
+            var pos = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformPosition( _absolutePosition );
+            var rot = (Quaternion)SceneReferenceFrameManager.ReferenceFrame.InverseTransformRotation( _absoluteRotation );
+            this.transform.rotation = rot;
+            this._rb.rotation = rot;
+            this.transform.position = pos;
+            this._rb.position = pos;
         }
 
         void Awake()
@@ -183,9 +187,7 @@ namespace HSP.Trajectories
         void FixedUpdate()
         {
             _rb.isKinematic = true;
-            //this.Acceleration = Vector3.zero;
-            //this.AngularAcceleration = Vector3.zero;
-            this._rb.velocity = ReferenceFrameTransformUtils
+            UpdateScenePositionAndRotation();
 
             ReferenceFrameTransformUtils.UpdateScenePositionFromAbsolute( transform, _rb, this._absolutePosition );
             ReferenceFrameTransformUtils.UpdateSceneRotationFromAbsolute( transform, _rb, this._absoluteRotation );
