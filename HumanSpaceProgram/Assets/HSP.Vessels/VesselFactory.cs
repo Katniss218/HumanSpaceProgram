@@ -1,5 +1,4 @@
-﻿using HSP.ReferenceFrames;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace HSP.Vessels
 {
@@ -20,29 +19,22 @@ namespace HSP.Vessels
         /// <summary>
         /// Creates a new partless vessel at the specified global position.
         /// </summary>
-        /// <param name="airfPosition">The `Absolute Inertial Reference Frame` position of the vessel to create.</param>
-        /// <param name="airfRotation">Rotation of the vessel in the `Absolute Inertial Reference Frame`</param>
+        /// <param name="absolutePosition">The `Absolute Inertial Reference Frame` position of the vessel to create.</param>
+        /// <param name="absoluteRotation">Rotation of the vessel in the `Absolute Inertial Reference Frame`</param>
         /// <returns>The created partless vessel.</returns>
-        public static Vessel CreatePartless( Vector3Dbl airfPosition, QuaternionDbl airfRotation, Vector3 sceneVelocity, Vector3 sceneAngularVelocity )
-        {
-            Vessel vessel = CreateGO();
-
-            HSPEvent.EventManager.TryInvoke( HSPEvent_ON_VESSEL_CREATED.ID, vessel );
-
-            vessel.ReferenceFrameTransform.AbsolutePosition = airfPosition;
-            vessel.ReferenceFrameTransform.AbsoluteRotation = airfRotation;
-            vessel.ReferenceFrameTransform.Velocity = sceneVelocity;
-            vessel.ReferenceFrameTransform.AngularVelocity = sceneAngularVelocity;
-
-            return vessel;
-        }
-
-        private static Vessel CreateGO()
+        public static Vessel CreatePartless( Vector3Dbl absolutePosition, QuaternionDbl absoluteRotation, Vector3 sceneVelocity, Vector3 sceneAngularVelocity )
         {
             GameObject gameObject = new GameObject( $"Vessel, '{name}'" );
 
             Vessel vessel = gameObject.AddComponent<Vessel>();
             vessel.DisplayName = name;
+
+            HSPEvent.EventManager.TryInvoke( HSPEvent_ON_VESSEL_CREATED.ID, vessel );
+
+            vessel.ReferenceFrameTransform.AbsolutePosition = absolutePosition;
+            vessel.ReferenceFrameTransform.AbsoluteRotation = absoluteRotation;
+            vessel.ReferenceFrameTransform.Velocity = sceneVelocity;
+            vessel.ReferenceFrameTransform.AngularVelocity = sceneAngularVelocity;
 
             return vessel;
         }

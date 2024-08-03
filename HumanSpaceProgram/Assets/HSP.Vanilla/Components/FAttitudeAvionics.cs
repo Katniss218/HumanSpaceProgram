@@ -163,7 +163,7 @@ namespace HSP.Vanilla.Components
 				else
 					error -= Math.Sign( error ) * PosDeadband; // Subtract the deadband (shifts the error by the deadband amount).
 
-				_maxAlpha[i] = controlTorque[i] / _vessel.PhysicsObject.MomentsOfInertia[i];
+				_maxAlpha[i] = controlTorque[i] / _vessel.PhysicsTransform.MomentsOfInertia[i];
 
 				if( _maxAlpha[i] == 0 )
 					_maxAlpha[i] = 1;

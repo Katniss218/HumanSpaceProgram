@@ -4,12 +4,16 @@ using UnityEngine;
 
 namespace HSP.CelestialBodies
 {
+    public static class HSPEvent_ON_CELESTIAL_BODY_CREATED
+    {
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".celestial_body_created";
+    }
+
     /// <summary>
     /// Creates celestial body instances (game objects).
     /// </summary>
     public class CelestialBodyFactory
     {
-#warning TODO - celestial bodies are just serialized json gameobjects (prefabs).
         public string ID { get; }
 
         //const float radius = 1000; //6371000f; // m
@@ -23,22 +27,21 @@ namespace HSP.CelestialBodies
             this.ID = id;
         }
 
-        public CelestialBody Create( Vector3Dbl airfPosition, QuaternionDbl airfRotation )
+        public CelestialBody Create( Vector3Dbl absolutePosition, QuaternionDbl absoluteRotation )
         {
             GameObject gameObject = new GameObject( "celestialbody" );
 
-            //SphereCollider c = cbGO.AddComponent<SphereCollider>();
+            CelestialBody celestialBody = gameObject.AddComponent<CelestialBody>();
+            celestialBody.ID = this.ID;
+            celestialBody.Mass = mass;
+            celestialBody.Radius = radius;
 
-            CelestialBody body = gameObject.AddComponent<CelestialBody>();
-            body.ID = this.ID;
-            body.ReferenceFrameTransform.AbsolutePosition = airfPosition;
-            body.ReferenceFrameTransform.AbsoluteRotation = airfRotation;
-            body.Mass = mass;
-            body.Radius = radius;
+            HSPEvent.EventManager.TryInvoke( HSPEvent_ON_CELESTIAL_BODY_CREATED.ID, celestialBody );
 
-            CelestialBodySurface bodySurface = gameObject.AddComponent<CelestialBodySurface>();
+            celestialBody.ReferenceFrameTransform.AbsolutePosition = absolutePosition;
+            celestialBody.ReferenceFrameTransform.AbsoluteRotation = absoluteRotation;
 
-            return body;
+            return celestialBody;
         }
 
         public static Guid GuidFromHash( byte[] dataToHash )

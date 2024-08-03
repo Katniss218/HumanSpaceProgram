@@ -71,7 +71,7 @@ namespace HSP.Trajectories
 
         public Vector3 Acceleration
         {
-            get => SceneReferenceFrameManager.ReferenceFrame.InverseTransformAcceleration( Vector3Dbl.zero );
+            get => (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformAcceleration( Vector3Dbl.zero );
         }
 
         public Vector3Dbl AbsoluteAcceleration
@@ -93,7 +93,7 @@ namespace HSP.Trajectories
 
         public Vector3 AngularAcceleration
         {
-            get => SceneReferenceFrameManager.ReferenceFrame.InverseTransformAngularAcceleration( Vector3Dbl.zero );
+            get => (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformAngularAcceleration( Vector3Dbl.zero );
         }
 
         public Vector3Dbl AbsoluteAngularAcceleration
@@ -237,7 +237,8 @@ namespace HSP.Trajectories
 
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
-            throw new System.NotImplementedException();
+            ReferenceFrameTransformUtils.UpdateScenePositionFromAbsolute( transform, _rb, _absolutePosition );
+            ReferenceFrameTransformUtils.UpdateSceneRotationFromAbsolute( transform, _rb, _absoluteRotation );
         }
     }
 }

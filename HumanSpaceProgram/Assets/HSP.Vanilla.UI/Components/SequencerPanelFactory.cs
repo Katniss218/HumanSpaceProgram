@@ -1,6 +1,5 @@
 ﻿using HSP.ReferenceFrames;
 using HSP.UI;
-using HSP.Vanilla.Scenes.GameplayScene;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
 
@@ -16,7 +15,6 @@ namespace HSP.Vanilla.UI.Components
         public const string CREATE_SEQUENCER_PANEL = HSPEvent.NAMESPACE_HSP + ".ui.fsequencer";
 
         [HSPEventListener( HSPEvent_AFTER_ACTIVE_OBJECT_CHANGED.ID, CREATE_SEQUENCER_PANEL )]
-        [HSPEventListener( HSPEvent_STARTUP_GAMEPLAY.ID, CREATE_SEQUENCER_PANEL )]
         public static void CreateUI()
         {
             UICanvas canvas = CanvasManager.Get( CanvasName.STATIC );

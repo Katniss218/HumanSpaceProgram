@@ -5,6 +5,16 @@ using UnityPlus.Serialization;
 
 namespace HSP.CelestialBodies
 {
+    public static class HSPEvent_AFTER_CELESTIAL_BODY_CREATED
+    {
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".celestial_body_created.after";
+    }
+
+    public static class HSPEvent_AFTER_CELESTIAL_BODY_DESTROYED
+    {
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".celestial_body_destroyed.after";
+    }
+
     public class CelestialBody : MonoBehaviour
     {
         public string _id;
@@ -16,7 +26,8 @@ namespace HSP.CelestialBodies
             get => _id;
             set
             {
-                if( value == null ) throw new ArgumentNullException( "value", "Can't assign a null ID." );
+                if( value == null )
+                    throw new ArgumentNullException( "value", "Can't assign a null ID." );
 
                 if( _id != null )
                     CelestialBodyManager.Unregister( _id );
@@ -40,18 +51,31 @@ namespace HSP.CelestialBodies
         /// </summary>
         public double Radius { get; internal set; }
 
+        public IPhysicsTransform PhysicsTransform { get; set; }
         public IReferenceFrameTransform ReferenceFrameTransform { get; set; }
 
         void Awake()
         {
             this.ReferenceFrameTransform = this.GetComponent<IReferenceFrameTransform>();
-            //this.gameObject.SetLayer( (int)Layer.CELESTIAL_BODY, true );
+            this.PhysicsTransform = this.GetComponent<IPhysicsTransform>();
         }
 
         void Start()
         {
+            this.ReferenceFrameTransform = this.GetComponent<IReferenceFrameTransform>();
+            this.PhysicsTransform = this.GetComponent<IPhysicsTransform>();
+
             if( this.ID == null )
                 Debug.LogError( $"Celestial body '{this.gameObject.name}' has not been assigned an ID." );
+            //this.gameObject.SetLayer( (int)Layer.CELESTIAL_BODY, true );
+
+            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_CELESTIAL_BODY_CREATED.ID, this );
+            //this.gameObject.SetLayer( (int)Layer.CELESTIAL_BODY, true );
+        }
+
+        private void OnDestroy()
+        {
+            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_CELESTIAL_BODY_DESTROYED.ID, this );
         }
 
         void OnDisable()

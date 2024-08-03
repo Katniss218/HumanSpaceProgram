@@ -8,7 +8,7 @@ namespace HSP.Trajectories
     {
         public static bool IsPinned( this Vessel vessel )
         {
-            return vessel.PhysicsObject is PinnedPhysicsObject;
+            return vessel.PhysicsTransform is PinnedPhysicsObject;
         }
 
         /// <summary>
@@ -16,12 +16,12 @@ namespace HSP.Trajectories
         /// </summary>
         public static void Pin( this Vessel vessel, CelestialBody body, Vector3Dbl localPosition, QuaternionDbl localRotation )
         {
-            UnityEngine.Object.DestroyImmediate( (Component)vessel.PhysicsObject );
+            UnityEngine.Object.DestroyImmediate( (Component)vessel.PhysicsTransform );
             PinnedPhysicsObject ppo = vessel.gameObject.AddComponent<PinnedPhysicsObject>();
             ppo.ReferenceBody = body;
             ppo.ReferencePosition = localPosition;
             ppo.ReferenceRotation = localRotation;
-            vessel.PhysicsObject = ppo;
+            vessel.PhysicsTransform = ppo;
         }
 
         /// <summary>
@@ -29,8 +29,8 @@ namespace HSP.Trajectories
         /// </summary>
         public static void Unpin( this Vessel vessel )
         {
-            UnityEngine.Object.DestroyImmediate( (Component)vessel.PhysicsObject );
-            vessel.PhysicsObject = vessel.gameObject.AddComponent<FreePhysicsObject>();
+            UnityEngine.Object.DestroyImmediate( (Component)vessel.PhysicsTransform );
+            vessel.PhysicsTransform = vessel.gameObject.AddComponent<FreePhysicsObject>();
         }
 
     }

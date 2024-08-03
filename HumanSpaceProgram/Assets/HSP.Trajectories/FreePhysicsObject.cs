@@ -235,8 +235,6 @@ namespace HSP.Trajectories
 
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
-            // since we have the previous frame, we can just 
-            //RecacheAirfPosRot( data.OldFrame );
             ReferenceFrameTransformUtils.UpdateScenePositionFromAbsolute( transform, _rb, _absolutePosition );
             ReferenceFrameTransformUtils.UpdateSceneRotationFromAbsolute( transform, _rb, _absoluteRotation );
         }

@@ -19,54 +19,74 @@ namespace HSP.ReferenceFrames
             return new CenteredReferenceFrame( this._position + airfDistanceDelta );
         }
 
+
         public Vector3Dbl InverseTransformPosition( Vector3Dbl airfPosition )
         {
             return Vector3Dbl.Subtract( airfPosition, _position );
         }
-
         public Vector3Dbl TransformPosition( Vector3Dbl localPosition )
         {
             return Vector3Dbl.Add( _position, localPosition );
         }
 
+
         public Vector3 InverseTransformDirection( Vector3 airfDirection )
         {
             return airfDirection;
         }
-
         public Vector3 TransformDirection( Vector3 localDirection )
         {
             return localDirection;
         }
 
+
         public QuaternionDbl InverseTransformRotation( QuaternionDbl airfRotation )
         {
             return airfRotation;
         }
-
         public QuaternionDbl TransformRotation( QuaternionDbl localRotation )
         {
             return localRotation;
         }
 
+
         public Vector3Dbl TransformVelocity( Vector3Dbl localVelocity )
         {
             return localVelocity;
         }
-
         public Vector3Dbl InverseTransformVelocity( Vector3Dbl absoluteVelocity )
         {
             return absoluteVelocity;
         }
 
+
+        public Vector3Dbl TransformAcceleration( Vector3Dbl localAcceleration )
+        {
+            return localAcceleration;
+        }
+        public Vector3Dbl InverseTransformAcceleration( Vector3Dbl absoluteAcceleration )
+        {
+            return absoluteAcceleration;
+        }
+
+
         public Vector3Dbl TransformAngularVelocity( Vector3Dbl localAngularVelocity )
         {
             return localAngularVelocity;
         }
-
         public Vector3Dbl InverseTransformAngularVelocity( Vector3Dbl absoluteAngularVelocity )
         {
             return absoluteAngularVelocity;
+        }
+
+
+        public Vector3Dbl TransformAngularAcceleration( Vector3Dbl localAngularAcceleration )
+        {
+            return localAngularAcceleration;
+        }
+        public Vector3Dbl InverseTransformAngularAcceleration( Vector3Dbl absoluteAngularAcceleration )
+        {
+            return absoluteAngularAcceleration;
         }
     }
 }

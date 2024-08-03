@@ -45,28 +45,62 @@ namespace HSP.ReferenceFrames
 
 
         /// <summary>
-        /// Transforms a direction vector in the frame's local space to the Absolute (AIRF) space.
+        /// Transforms a direction in the frame's local space to the Absolute (AIRF) space.
         /// </summary>
         Vector3 TransformDirection( Vector3 localDirection );
         /// <summary>
-        /// Transforms a direction vector in the Absolute (AIRF) space to the frame's space.
+        /// Transforms a direction in the Absolute (AIRF) space to the frame's space.
         /// </summary>
         Vector3 InverseTransformDirection( Vector3 absoluteDirection );
 
 
         /// <summary>
-        /// Transforms a rotation/orientation in the frame's local space to the Absolute (AIRF) space.
+        /// Transforms rotation/orientation in the frame's local space to the Absolute (AIRF) space.
         /// </summary>
         QuaternionDbl TransformRotation( QuaternionDbl localRotation );
         /// <summary>
-        /// Transforms a rotation/orientation in the Absolute (AIRF) space to the frame's space.
+        /// Transforms rotation/orientation in the Absolute (AIRF) space to the frame's space.
         /// </summary>
         QuaternionDbl InverseTransformRotation( QuaternionDbl absoluteRotation );
 
+
+        /// <summary>
+        /// Transforms velocity in the frame's local space to the Absolute (AIRF) space.
+        /// </summary>
         Vector3Dbl TransformVelocity( Vector3Dbl localVelocity );
+        /// <summary>
+        /// Transforms velocity in the Absolute (AIRF) space to the frame's space.
+        /// </summary>
         Vector3Dbl InverseTransformVelocity( Vector3Dbl absoluteVelocity );
 
+
+        /// <summary>
+        /// Transforms acceleration in the frame's local space to the Absolute (AIRF) space.
+        /// </summary>
+        Vector3Dbl TransformAcceleration( Vector3Dbl localAcceleration );
+        /// <summary>
+        /// Transforms acceleration in the Absolute (AIRF) space to the frame's space.
+        /// </summary>
+        Vector3Dbl InverseTransformAcceleration( Vector3Dbl absoluteAcceleration );
+
+
+        /// <summary>
+        /// Transforms angular velocity in the frame's local space to the Absolute (AIRF) space.
+        /// </summary>
         Vector3Dbl TransformAngularVelocity( Vector3Dbl localAngularVelocity );
+        /// <summary>
+        /// Transforms angular velocity in the Absolute (AIRF) space to the frame's space.
+        /// </summary>
         Vector3Dbl InverseTransformAngularVelocity( Vector3Dbl absoluteAngularVelocity );
+
+
+        /// <summary>
+        /// Transforms angular acceleration in the frame's local space to the Absolute (AIRF) space.
+        /// </summary>
+        Vector3Dbl TransformAngularAcceleration( Vector3Dbl localAngularAcceleration );
+        /// <summary>
+        /// Transforms angular acceleration in the Absolute (AIRF) space to the frame's space.
+        /// </summary>
+        Vector3Dbl InverseTransformAngularAcceleration( Vector3Dbl absoluteAngularAcceleration );
     }
 }

@@ -18,6 +18,7 @@ namespace HSP.ReferenceFrames
     {
         [SerializeField]
         private Transform _activeObject;
+#warning TODO - move this / split it off from the reference frame center object and player control.
         /// <summary>
         /// Gets or sets the object that is currently being 'controlled' or viewed by the player.
         /// </summary>
@@ -28,8 +29,9 @@ namespace HSP.ReferenceFrames
             {
                 if( value == instance._activeObject )
                     return;
+
                 instance._activeObject = value;
-                HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_ACTIVE_OBJECT_CHANGED.ID, null );
+                HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_ACTIVE_OBJECT_CHANGED.ID );
             }
         }
 

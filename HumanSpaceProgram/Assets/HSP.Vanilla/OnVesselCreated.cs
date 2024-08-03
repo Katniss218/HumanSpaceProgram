@@ -6,7 +6,7 @@ using HSP.Vanilla.Scenes.GameplayScene;
 using HSP.Vessels;
 using UnityEngine;
 
-namespace HSP.Vanilla.Scenes
+namespace HSP.Vanilla
 {
     public static class Vessel_Ex
     {
@@ -17,9 +17,17 @@ namespace HSP.Vanilla.Scenes
         private static void AddGameplayPhysicsObject( Vessel v )
         {
             if( SceneLoader.IsSceneLoaded( GameplaySceneManager.SCENE_NAME ) )
-                v.PhysicsObject = v.gameObject.AddComponent<FreePhysicsObject>();
+            {
+                var comp = v.gameObject.AddComponent<FreePhysicsObject>();
+                v.PhysicsTransform = comp;
+                v.ReferenceFrameTransform = comp;
+            }
             else if( SceneLoader.IsSceneLoaded( DesignSceneManager.SCENE_NAME ) )
-                v.PhysicsObject = v.gameObject.AddComponent<FixedPhysicsObject>();
+            {
+                var comp = v.gameObject.AddComponent<FixedPhysicsObject>();
+                v.PhysicsTransform = comp;
+                v.ReferenceFrameTransform = comp;
+            }
         }
 
         [HSPEventListener( HSPEvent_AFTER_VESSEL_HIERARCHY_CHANGED.ID, TRY_PIN_PHYSICS_OBJECT )]

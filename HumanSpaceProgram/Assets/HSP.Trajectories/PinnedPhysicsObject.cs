@@ -284,7 +284,8 @@ namespace HSP.Trajectories
 
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
-            throw new System.NotImplementedException();
+            ReferenceFrameTransformUtils.UpdateScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
+            ReferenceFrameTransformUtils.UpdateSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );
         }
     }
 }

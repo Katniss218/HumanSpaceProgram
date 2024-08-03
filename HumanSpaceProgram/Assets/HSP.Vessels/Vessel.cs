@@ -60,9 +60,12 @@ namespace HSP.Vessels
             }
         }
 
-        public IPhysicsTransform PhysicsObject { get; set; }
+        public IPhysicsTransform PhysicsTransform { get; set; }
         public IReferenceFrameTransform ReferenceFrameTransform { get; set; }
 
+        /// <summary>
+        /// Returns the transform that is the local space of the vessel.
+        /// </summary>
         public Transform ReferenceTransform => this.transform;
 
         // the active vessel has also glithed out and accelerated to the speed of light at least once after jettisonning the side tanks on the pad.
@@ -102,17 +105,25 @@ namespace HSP.Vessels
         void Awake()
         {
             this.ReferenceFrameTransform = this.GetComponent<IReferenceFrameTransform>();
-            this.PhysicsObject = this.GetComponent<IPhysicsTransform>();
-            this.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
+            this.PhysicsTransform = this.GetComponent<IPhysicsTransform>();
         }
 
         void Start()
         {
-            this.PhysicsObject = this.GetComponent<IPhysicsTransform>(); // needs to be here for deserialization, because it might be added in any order and I can't use RequireComponent because it needs to be removed when pinning.
+            this.ReferenceFrameTransform = this.GetComponent<IReferenceFrameTransform>();
+            this.PhysicsTransform = this.GetComponent<IPhysicsTransform>(); // needs to be here for deserialization, because it might be added in any order and I can't use RequireComponent because it needs to be removed when pinning.
+            
             RecalculatePartCache();
             //SetPhysicsObjectParameters();
+            this.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
 
             HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_VESSEL_CREATED.ID, this );
+            this.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
+        }
+
+        private void OnDestroy()
+        {
+            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_VESSEL_DESTROYED.ID, this );
         }
 
         void OnEnable()
@@ -130,11 +141,6 @@ namespace HSP.Vessels
             {
                 // OnDisable was called when scene was unloaded, ignore.
             }
-        }
-
-        private void OnDestroy()
-        {
-            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_VESSEL_DESTROYED.ID, this );
         }
 
         void FixedUpdate()
@@ -208,8 +214,8 @@ namespace HSP.Vessels
         void SetPhysicsObjectParameters()
         {
             (Vector3 comLocal, float mass, Matrix3x3 inertia) = this.RecalculateMass();
-            this.PhysicsObject.LocalCenterOfMass = comLocal;
-            this.PhysicsObject.Mass = mass;
+            this.PhysicsTransform.LocalCenterOfMass = comLocal;
+            this.PhysicsTransform.Mass = mass;
             //var x = this.PhysicsObject.MomentOfInertiaTensor;
 
             // disabled for now. needs a better calculation of moments of inertia
@@ -247,7 +253,7 @@ namespace HSP.Vessels
         private void OnDrawGizmos()
         {
             Gizmos.color = Color.blue;
-            Gizmos.DrawWireCube( this.transform.TransformPoint( this.PhysicsObject.LocalCenterOfMass ), Vector3.one * 0.25f );
+            Gizmos.DrawWireCube( this.transform.TransformPoint( this.PhysicsTransform.LocalCenterOfMass ), Vector3.one * 0.25f );
         }
 
         public static double GetExhaustVelocity( (Vector3 thrust, float exhaustVelocity)[] thrusters )
