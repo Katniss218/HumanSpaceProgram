@@ -3,10 +3,13 @@
 namespace HSP.ReferenceFrames
 {
     /// <summary>
-    /// A reference frame aligned with the AIRF frame, and shifted (offset) by a certain amount. This class is immutable.
+    /// A reference frame aligned with the AIRF frame, and shifted (offset) by a certain amount. <br/>
+    /// The frame is at rest. This class is immutable.
     /// </summary>
     public sealed class CenteredReferenceFrame : IReferenceFrame
     {
+        public Vector3Dbl Position => _position;
+
         private readonly Vector3Dbl _position;
 
         public CenteredReferenceFrame( Vector3Dbl center )
@@ -14,39 +17,44 @@ namespace HSP.ReferenceFrames
             this._position = center;
         }
 
-        public IReferenceFrame Shift( Vector3Dbl airfDistanceDelta )
+        public IReferenceFrame Shift( Vector3Dbl absolutePositionDelta )
         {
-            return new CenteredReferenceFrame( this._position + airfDistanceDelta );
+            return new CenteredReferenceFrame( _position + absolutePositionDelta );
+        }
+
+        public IReferenceFrame AddUT( double ut )
+        {
+            return this; // Reference frames are immutable, so this is allowed.
         }
 
 
-        public Vector3Dbl InverseTransformPosition( Vector3Dbl airfPosition )
-        {
-            return Vector3Dbl.Subtract( airfPosition, _position );
-        }
         public Vector3Dbl TransformPosition( Vector3Dbl localPosition )
         {
             return Vector3Dbl.Add( _position, localPosition );
         }
-
-
-        public Vector3 InverseTransformDirection( Vector3 airfDirection )
+        public Vector3Dbl InverseTransformPosition( Vector3Dbl globalPosition )
         {
-            return airfDirection;
+            return Vector3Dbl.Subtract( globalPosition, _position );
         }
+
+
         public Vector3 TransformDirection( Vector3 localDirection )
         {
             return localDirection;
         }
-
-
-        public QuaternionDbl InverseTransformRotation( QuaternionDbl airfRotation )
+        public Vector3 InverseTransformDirection( Vector3 globalDirection )
         {
-            return airfRotation;
+            return globalDirection;
         }
+
+
         public QuaternionDbl TransformRotation( QuaternionDbl localRotation )
         {
             return localRotation;
+        }
+        public QuaternionDbl InverseTransformRotation( QuaternionDbl globalRotation )
+        {
+            return globalRotation;
         }
 
 
@@ -60,6 +68,16 @@ namespace HSP.ReferenceFrames
         }
 
 
+        public Vector3Dbl TransformAngularVelocity( Vector3Dbl localAngularVelocity )
+        {
+            return localAngularVelocity;
+        }
+        public Vector3Dbl InverseTransformAngularVelocity( Vector3Dbl globalAngularVelocity )
+        {
+            return globalAngularVelocity;
+        }
+
+
         public Vector3Dbl TransformAcceleration( Vector3Dbl localAcceleration )
         {
             return localAcceleration;
@@ -67,16 +85,6 @@ namespace HSP.ReferenceFrames
         public Vector3Dbl InverseTransformAcceleration( Vector3Dbl absoluteAcceleration )
         {
             return absoluteAcceleration;
-        }
-
-
-        public Vector3Dbl TransformAngularVelocity( Vector3Dbl localAngularVelocity )
-        {
-            return localAngularVelocity;
-        }
-        public Vector3Dbl InverseTransformAngularVelocity( Vector3Dbl absoluteAngularVelocity )
-        {
-            return absoluteAngularVelocity;
         }
 
 

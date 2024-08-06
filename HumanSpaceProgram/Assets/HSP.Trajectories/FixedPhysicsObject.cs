@@ -60,10 +60,22 @@ namespace HSP.Trajectories
         public Vector3 Velocity
         {
             get => this._rb.velocity;
-            set => this._rb.velocity = value;
+            set { }
         }
 
         public Vector3Dbl AbsoluteVelocity
+        {
+            get => Vector3Dbl.zero;
+            set { }
+        }
+
+        public Vector3 AngularVelocity
+        {
+            get => this._rb.angularVelocity;
+            set { }
+        }
+
+        public Vector3Dbl AbsoluteAngularVelocity
         {
             get => Vector3Dbl.zero;
             set { }
@@ -77,18 +89,6 @@ namespace HSP.Trajectories
         public Vector3Dbl AbsoluteAcceleration
         {
             get => Vector3Dbl.zero;
-        }
-
-        public Vector3 AngularVelocity
-        {
-            get => this._rb.angularVelocity;
-            set { }
-        }
-
-        public Vector3Dbl AbsoluteAngularVelocity
-        {
-            get => Vector3Dbl.zero;
-            set { }
         }
 
         public Vector3 AngularAcceleration
@@ -193,6 +193,12 @@ namespace HSP.Trajectories
             ReferenceFrameTransformUtils.UpdateSceneRotationFromAbsolute( transform, _rb, this._absoluteRotation );
         }
 
+        public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
+        {
+            ReferenceFrameTransformUtils.UpdateScenePositionFromAbsolute( transform, _rb, _absolutePosition );
+            ReferenceFrameTransformUtils.UpdateSceneRotationFromAbsolute( transform, _rb, _absoluteRotation );
+        }
+
         void OnCollisionEnter( Collision collision )
         {
             IsColliding = true;
@@ -212,16 +218,6 @@ namespace HSP.Trajectories
             IsColliding = false;
         }
 
-        void OnEnable()
-        {
-            _rb.isKinematic = true;
-        }
-
-        void OnDisable()
-        {
-            _rb.isKinematic = true;
-        }
-
 
         [MapsInheritingFrom( typeof( FixedPhysicsObject ) )]
         public static SerializationMapping FixedPhysicsObjectMapping()
@@ -233,12 +229,6 @@ namespace HSP.Trajectories
 
                 ("DO_NOT_TOUCH", new Member<FixedPhysicsObject, bool>( o => true, (o, value) => o._rb.isKinematic = true)), // TODO - isKinematic member is a hack.
             };
-        }
-
-        public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
-        {
-            ReferenceFrameTransformUtils.UpdateScenePositionFromAbsolute( transform, _rb, _absolutePosition );
-            ReferenceFrameTransformUtils.UpdateSceneRotationFromAbsolute( transform, _rb, _absoluteRotation );
         }
     }
 }

@@ -66,6 +66,6 @@ namespace HSP
         /// <summary>
         /// Applies a torque through the center of mass, in [N*m].
         /// </summary>
-        void AddTorque( Vector3 force );
+        void AddTorque( Vector3 torque );
     }
 }

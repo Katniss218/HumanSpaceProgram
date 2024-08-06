@@ -80,6 +80,7 @@
     <Compile Include="Assets\HSP.Vanilla\Components\FGimbalActuatorController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\MainMenuScene\OnStartup.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\MainMenuScene\MainMenuEscapeInputController.cs" />
+    <Compile Include="Assets\HSP.Vanilla\OnCelestialBodyCreated.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\IGhostable_Ex.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\EditorScene\EditorSceneEscapeInputController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\Tools\PickTool.cs" />
@@ -119,7 +120,6 @@
     <Compile Include="Assets\HSP.Vanilla\Components\FLaunchSiteMarker.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FReactionControlController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FControlFrame.cs" />
-    <Compile Include="Assets\HSP.Vanilla\OnCelestialBodyCreated.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla\___HSP.Vanilla.asmdef" />

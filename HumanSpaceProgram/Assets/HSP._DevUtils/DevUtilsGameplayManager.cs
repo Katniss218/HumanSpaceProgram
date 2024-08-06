@@ -56,7 +56,7 @@ namespace HSP._DevUtils
         private static void OnAfterCreateDefault( object e )
         {
             CelestialBody body = CelestialBodyManager.Get( "main" );
-            Vector3 localPos = CoordinateUtils.GeodeticToEuclidean( 28.5857702f, -80.6507262f, (float)(body.Radius + 1.0) );
+            Vector3 localPos = CoordinateUtils.GeodeticToEuclidean( 28.5857702f, -80.6507262f, (float)(body.Radius + 2.5) );
 
             launchSite = VesselFactory.CreatePartless( Vector3Dbl.zero, QuaternionDbl.identity, Vector3.zero, Vector3.zero );
             launchSite.gameObject.name = "launchsite";

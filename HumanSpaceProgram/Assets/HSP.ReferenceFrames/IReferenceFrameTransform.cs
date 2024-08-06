@@ -32,15 +32,6 @@ namespace HSP.ReferenceFrames
         Vector3Dbl AbsoluteVelocity { get; set; }
 
         /// <summary>
-        /// Gets the *scene-space* acceleration at this instant, in [m/s^2].
-        /// </summary>
-        Vector3 Acceleration { get; }
-        /// <summary>
-        /// Gets the acceleration at this instant, in [m/s^2].
-        /// </summary>
-        Vector3Dbl AbsoluteAcceleration { get; }
-
-        /// <summary>
         /// Gets or sets the *scene-space* angular velocity, in [Rad/s].
         /// </summary>
         Vector3 AngularVelocity { get; set; }
@@ -48,6 +39,15 @@ namespace HSP.ReferenceFrames
         /// Gets or sets the angular velocity, in [Rad/s].
         /// </summary>
         Vector3Dbl AbsoluteAngularVelocity { get; set; }
+
+        /// <summary>
+        /// Gets the *scene-space* acceleration at this instant, in [m/s^2].
+        /// </summary>
+        Vector3 Acceleration { get; }
+        /// <summary>
+        /// Gets the acceleration at this instant, in [m/s^2].
+        /// </summary>
+        Vector3Dbl AbsoluteAcceleration { get; }
 
         /// <summary>
         /// Gets the *scene-space* angular acceleration at this instant, in [Rad/s^2].

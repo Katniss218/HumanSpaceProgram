@@ -5,28 +5,39 @@ using UnityEngine;
 namespace HSP.ReferenceFrames
 {
     /// <summary>
-    /// A reference frame aligned with the AIRF frame, and shifted (offset) by a set distance. The non-inertial terms are instantanous and constant. This class is immutable.
+    /// A reference frame aligned with the AIRF frame, and shifted (offset) by a set distance. <br/>
+    /// The inertial and non-inertial terms are instantanous and constant. This class is immutable.
     /// </summary>
-    public sealed class CenteredInstantanousReferenceFrame : INonInertialReferenceFrame
+    public sealed class CenteredNonInertialReferenceFrame : INonInertialReferenceFrame
     {
+        public Vector3Dbl Position => _position;
+        public Vector3Dbl Velocity => _velocity;
+        public Vector3Dbl AngularVelocity => _angularVelocity;
+        public Vector3Dbl Acceleration => _acceleration;
+        public Vector3Dbl AngularAcceleration => _angularAcceleration;
+
         private readonly Vector3Dbl _position;
 
+        // Inertial terms
         private readonly Vector3Dbl _velocity;
-        private readonly Vector3Dbl _acceleration;
         private readonly Vector3Dbl _angularVelocity;
+
+        // Non-inertial terms
+        private readonly Vector3Dbl _acceleration;
         private readonly Vector3Dbl _angularAcceleration;
 
-        public CenteredInstantanousReferenceFrame( Vector3Dbl center, Vector3Dbl velocity, Vector3Dbl acceleration, Vector3Dbl angularVelocity, Vector3Dbl angularAcceleration )
+        public CenteredNonInertialReferenceFrame( Vector3Dbl center, Vector3Dbl velocity, Vector3Dbl angularVelocity, Vector3Dbl acceleration, Vector3Dbl angularAcceleration )
         {
             this._position = center;
 
             this._velocity = velocity;
-            this._acceleration = acceleration;
             this._angularVelocity = angularVelocity;
+
+            this._acceleration = acceleration;
             this._angularAcceleration = angularAcceleration;
         }
 
-        public IReferenceFrame Shift( Vector3Dbl airfDistanceDelta )
+        public IReferenceFrame Shift( Vector3Dbl absolutePositionDelta )
         {
             // calculate the new rotation/acceleration/etc terms for the new frame, so that the fictitious force is still correct.
 
@@ -34,39 +45,39 @@ namespace HSP.ReferenceFrames
         }
 
 
-        public Vector3Dbl InverseTransformPosition( Vector3Dbl airfPosition )
-        {
-            return Vector3Dbl.Subtract( airfPosition, _position );
-        }
         public Vector3Dbl TransformPosition( Vector3Dbl localPosition )
         {
             return Vector3Dbl.Add( localPosition, _position );
         }
-
-
-        public Vector3 InverseTransformDirection( Vector3 globalDirection )
+        public Vector3Dbl InverseTransformPosition( Vector3Dbl globalPosition )
         {
-            return globalDirection;
+            return Vector3Dbl.Subtract( globalPosition, _position );
         }
+
+
         public Vector3 TransformDirection( Vector3 localDirection )
         {
             return localDirection;
         }
-
-
-        public QuaternionDbl InverseTransformRotation( QuaternionDbl globalRotation )
+        public Vector3 InverseTransformDirection( Vector3 globalDirection )
         {
-            return globalRotation;
+            return globalDirection;
         }
+
+
         public QuaternionDbl TransformRotation( QuaternionDbl localRotation )
         {
             return localRotation;
+        }
+        public QuaternionDbl InverseTransformRotation( QuaternionDbl globalRotation )
+        {
+            return globalRotation;
         }
 
 
         public Vector3Dbl TransformVelocity( Vector3Dbl localVelocity )
         {
-            return localVelocity;
+            return Vector3Dbl.Add( localVelocity, _velocity );
         }
         public Vector3Dbl InverseTransformVelocity( Vector3Dbl globalVelocity )
         {
@@ -87,7 +98,7 @@ namespace HSP.ReferenceFrames
 
         public Vector3Dbl TransformAngularVelocity( Vector3Dbl localAngularVelocity )
         {
-            return localAngularVelocity;
+            return Vector3Dbl.Subtract( localAngularVelocity, _angularVelocity );
         }
         public Vector3Dbl InverseTransformAngularVelocity( Vector3Dbl globalAngularVelocity )
         {
@@ -118,8 +129,6 @@ namespace HSP.ReferenceFrames
             var linearAcc = -_acceleration;
 
             return (centrifugalAcc + coriolisAcc + eulerAcc + linearAcc);
-
-            // handle angular acceleration when the frame's angular velocity changes.
         }
 
         public Vector3Dbl GetFictitiousAngularAcceleration( Vector3Dbl localPosition, Vector3Dbl localAngularVelocity )

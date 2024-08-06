@@ -3,10 +3,14 @@
 namespace HSP.ReferenceFrames
 {
     /// <summary>
-    /// A reference frame centered on a given point, and with a given orientation. This class is immutable.
+    /// A reference frame centered on a given point, and with a given orientation. <br/>
+    /// The frame is at rest. This class is immutable.
     /// </summary>
     public sealed class OrientedReferenceFrame : IReferenceFrame
     {
+        public Vector3Dbl Position => _position;
+        public QuaternionDbl Rotation => _rotation;
+
         private readonly Vector3Dbl _position;
         private readonly QuaternionDbl _rotation;
         private readonly QuaternionDbl _inverseRotation;
@@ -18,39 +22,39 @@ namespace HSP.ReferenceFrames
             this._inverseRotation = QuaternionDbl.Inverse( rotation );
         }
 
-        public IReferenceFrame Shift( Vector3Dbl airfDistanceDelta )
+        public IReferenceFrame Shift( Vector3Dbl absolutePositionDelta )
         {
-            return new OrientedReferenceFrame( this._position + airfDistanceDelta, this._rotation );
+            return new OrientedReferenceFrame( this._position + absolutePositionDelta, this._rotation );
         }
 
 
+        public Vector3Dbl TransformPosition( Vector3Dbl localPosition )
+        {
+            return Vector3Dbl.Add( _rotation * localPosition, _position );
+        }
         public Vector3Dbl InverseTransformPosition( Vector3Dbl absolutePosition )
         {
             return _inverseRotation * Vector3Dbl.Subtract( absolutePosition, _position );
         }
-        public Vector3Dbl TransformPosition( Vector3Dbl localPosition )
-        {
-            return _rotation * Vector3Dbl.Subtract( localPosition, _position );
-        }
 
 
-        public Vector3 InverseTransformDirection( Vector3 absoluteDirection )
-        {
-            return (Vector3)(_inverseRotation * absoluteDirection);
-        }
         public Vector3 TransformDirection( Vector3 localDirection )
         {
             return (Vector3)(_rotation * localDirection);
         }
-
-
-        public QuaternionDbl InverseTransformRotation( QuaternionDbl airfRotation )
+        public Vector3 InverseTransformDirection( Vector3 absoluteDirection )
         {
-            return _inverseRotation * airfRotation;
+            return (Vector3)(_inverseRotation * absoluteDirection);
         }
+
+
         public QuaternionDbl TransformRotation( QuaternionDbl localRotation )
         {
             return _rotation * localRotation;
+        }
+        public QuaternionDbl InverseTransformRotation( QuaternionDbl airfRotation )
+        {
+            return _inverseRotation * airfRotation;
         }
 
 
@@ -64,16 +68,6 @@ namespace HSP.ReferenceFrames
         }
 
 
-        public Vector3Dbl TransformAcceleration( Vector3Dbl localAcceleration )
-        {
-            return _rotation * localAcceleration;
-        }
-        public Vector3Dbl InverseTransformAcceleration( Vector3Dbl absoluteAcceleration )
-        {
-            return _inverseRotation * absoluteAcceleration;
-        }
-
-
         public Vector3Dbl TransformAngularVelocity( Vector3Dbl localAngularVelocity )
         {
             return _rotation * localAngularVelocity;
@@ -81,6 +75,16 @@ namespace HSP.ReferenceFrames
         public Vector3Dbl InverseTransformAngularVelocity( Vector3Dbl globalAngularVelocity )
         {
             return _inverseRotation * globalAngularVelocity;
+        }
+
+
+        public Vector3Dbl TransformAcceleration( Vector3Dbl localAcceleration )
+        {
+            return _rotation * localAcceleration;
+        }
+        public Vector3Dbl InverseTransformAcceleration( Vector3Dbl absoluteAcceleration )
+        {
+            return _inverseRotation * absoluteAcceleration;
         }
 
 

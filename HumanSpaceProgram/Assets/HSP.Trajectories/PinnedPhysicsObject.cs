@@ -87,44 +87,31 @@ namespace HSP.Trajectories
         public Vector3 Velocity
         {
             get => this._rb.velocity;
-            set
-            {
-                return;
-            }
+            set { }
         }
 
         public Vector3Dbl AbsoluteVelocity
         {
             get => SceneReferenceFrameManager.ReferenceFrame.TransformVelocity( this._rb.velocity );
-            set
-            {
-                return;
-            }
+            set { }
         }
-
-        public Vector3 Acceleration { get; private set; }
-        public Vector3Dbl AbsoluteAcceleration { get; private set; }
 
         public Vector3 AngularVelocity
         {
             get => this._rb.angularVelocity;
-            set
-            {
-                return;
-            }
+            set { }
         }
 
         public Vector3Dbl AbsoluteAngularVelocity
         {
             get => SceneReferenceFrameManager.ReferenceFrame.TransformAngularVelocity( this._rb.angularVelocity );
-            set
-            {
-                return;
-            }
+            set { }
         }
 
-        public Vector3 AngularAcceleration { get; private set; }
+        public Vector3 Acceleration { get; private set; }
+        public Vector3Dbl AbsoluteAcceleration { get; private set; }
 
+        public Vector3 AngularAcceleration { get; private set; }
         public Vector3Dbl AbsoluteAngularAcceleration { get; private set; }
 
 
@@ -245,6 +232,12 @@ namespace HSP.Trajectories
             this._angularAccelerationSum = Vector3.zero;
         }
 
+        public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
+        {
+            ReferenceFrameTransformUtils.UpdateScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
+            ReferenceFrameTransformUtils.UpdateSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );
+        }
+
         void OnCollisionEnter( Collision collision )
         {
             IsColliding = true;
@@ -274,18 +267,10 @@ namespace HSP.Trajectories
 
                 ("DO_NOT_TOUCH", new Member<PinnedPhysicsObject, bool>( o => true, (o, value) => o._rb.isKinematic = true)), // TODO - isKinematic member is a hack.
 
-                ("velocity", new Member<PinnedPhysicsObject, Vector3>( o => o.Velocity, (o, value) => { } )),
-                ("angular_velocity", new Member<PinnedPhysicsObject, Vector3>( o => o.AngularVelocity, (o, value) => { } )),
-                ("reference_body", new Member<PinnedPhysicsObject, CelestialBody>( ObjectContext.Ref, o => o.ReferenceBody )),
+                ("reference_body", new Member<PinnedPhysicsObject, string>( o => o.ReferenceBody == null ? null : o.ReferenceBody.ID, (o, value) => o.ReferenceBody = value == null ? null : CelestialBodyManager.Get( value ) )),
                 ("reference_position", new Member<PinnedPhysicsObject, Vector3Dbl>( o => o.ReferencePosition )),
                 ("reference_rotation", new Member<PinnedPhysicsObject, QuaternionDbl>( o => o.ReferenceRotation ))
             };
-        }
-
-        public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
-        {
-            ReferenceFrameTransformUtils.UpdateScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
-            ReferenceFrameTransformUtils.UpdateSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );
         }
     }
 }

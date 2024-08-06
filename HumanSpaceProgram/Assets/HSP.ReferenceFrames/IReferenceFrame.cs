@@ -31,7 +31,7 @@ namespace HSP.ReferenceFrames
         /// <summary>
         /// Returns a new reference frame that is shifted (translated) by a given distance in the Absolute Inertial Reference Frame (AIRF) space.
         /// </summary>
-        IReferenceFrame Shift( Vector3Dbl absoluteDistanceDelta );
+        IReferenceFrame Shift( Vector3Dbl absolutePositionDelta );
 
 
         /// <summary>
@@ -75,16 +75,6 @@ namespace HSP.ReferenceFrames
 
 
         /// <summary>
-        /// Transforms acceleration in the frame's local space to the Absolute (AIRF) space.
-        /// </summary>
-        Vector3Dbl TransformAcceleration( Vector3Dbl localAcceleration );
-        /// <summary>
-        /// Transforms acceleration in the Absolute (AIRF) space to the frame's space.
-        /// </summary>
-        Vector3Dbl InverseTransformAcceleration( Vector3Dbl absoluteAcceleration );
-
-
-        /// <summary>
         /// Transforms angular velocity in the frame's local space to the Absolute (AIRF) space.
         /// </summary>
         Vector3Dbl TransformAngularVelocity( Vector3Dbl localAngularVelocity );
@@ -92,6 +82,16 @@ namespace HSP.ReferenceFrames
         /// Transforms angular velocity in the Absolute (AIRF) space to the frame's space.
         /// </summary>
         Vector3Dbl InverseTransformAngularVelocity( Vector3Dbl absoluteAngularVelocity );
+
+
+        /// <summary>
+        /// Transforms acceleration in the frame's local space to the Absolute (AIRF) space.
+        /// </summary>
+        Vector3Dbl TransformAcceleration( Vector3Dbl localAcceleration );
+        /// <summary>
+        /// Transforms acceleration in the Absolute (AIRF) space to the frame's space.
+        /// </summary>
+        Vector3Dbl InverseTransformAcceleration( Vector3Dbl absoluteAcceleration );
 
 
         /// <summary>

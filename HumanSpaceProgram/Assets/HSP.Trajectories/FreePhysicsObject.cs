@@ -16,6 +16,7 @@ namespace HSP.Trajectories
             get => this.transform.position;
             set
             {
+                this._absolutePosition = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( value );
                 this._rb.position = value;
                 this.transform.position = value;
             }
@@ -36,6 +37,7 @@ namespace HSP.Trajectories
             get => this.transform.rotation;
             set
             {
+                this._absoluteRotation = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( value );
                 this._rb.rotation = value;
                 this.transform.rotation = value;
             }
@@ -54,7 +56,11 @@ namespace HSP.Trajectories
         public Vector3 Velocity
         {
             get => this._rb.velocity;
-            set => this._rb.velocity = value;
+            set
+            {
+                this._absoluteVelocity = SceneReferenceFrameManager.ReferenceFrame.TransformVelocity( value );
+                this._rb.velocity = value;
+            }
         }
 
         public Vector3Dbl AbsoluteVelocity
@@ -67,13 +73,13 @@ namespace HSP.Trajectories
             }
         }
 
-        public Vector3 Acceleration { get; private set; }
-        public Vector3Dbl AbsoluteAcceleration { get; private set; }
-
         public Vector3 AngularVelocity
         {
             get => this._rb.angularVelocity;
-            set => this._rb.angularVelocity = value;
+            set
+            {
+                this._rb.angularVelocity = value;
+            }
         }
 
         public Vector3Dbl AbsoluteAngularVelocity
@@ -86,9 +92,14 @@ namespace HSP.Trajectories
             }
         }
 
-        public Vector3 AngularAcceleration { get; private set; }
+        public Vector3 Acceleration => (Vector3)_acceleration;
+        public Vector3Dbl AbsoluteAcceleration { get; private set; }
 
+        public Vector3 AngularAcceleration => (Vector3)_angularAcceleration;
         public Vector3Dbl AbsoluteAngularAcceleration { get; private set; }
+
+        [SerializeField] Vector3Dbl _acceleration;
+        [SerializeField] Vector3Dbl _angularAcceleration;
 
         [SerializeField] Vector3Dbl _absolutePosition;
         [SerializeField] QuaternionDbl _absoluteRotation;
@@ -99,8 +110,8 @@ namespace HSP.Trajectories
         Vector3 _oldVelocity;
         Vector3 _oldAngularVelocity;
 
-        Vector3 _accelerationSum = Vector3.zero;
-        Vector3 _angularAccelerationSum = Vector3.zero;
+        Vector3Dbl _absoluteAccelerationSum = Vector3.zero;
+        Vector3Dbl _absoluteAngularAccelerationSum = Vector3.zero;
 
         //
         //
@@ -145,34 +156,37 @@ namespace HSP.Trajectories
 
         public void AddForce( Vector3 force )
         {
-            _accelerationSum += force / Mass;
+            _absoluteAccelerationSum += SceneReferenceFrameManager.ReferenceFrame.TransformAcceleration( (Vector3Dbl)force / Mass );
+
             this._rb.AddForce( force, ForceMode.Force );
         }
 
         public void AddForceAtPosition( Vector3 force, Vector3 position )
         {
-            // I think force / mass is still correct for this,
-            // - because 2 consecutive impulses in the same direction, but opposite positions (so that the angular accelerations cancel out)
-            // - should still produce linear acceleration of 2 * force / mass.
-            _accelerationSum += force / Mass;
-
             Vector3 leverArm = position - this._rb.worldCenterOfMass;
-            _angularAccelerationSum += Vector3.Cross( force, leverArm ) / Mass;
+            _absoluteAccelerationSum += SceneReferenceFrameManager.ReferenceFrame.TransformAcceleration( (Vector3Dbl)force / Mass );
+            _absoluteAngularAccelerationSum += SceneReferenceFrameManager.ReferenceFrame.TransformAngularAcceleration( Vector3Dbl.Cross( force, leverArm ) / Mass );
 
             // TODO - possibly cache the values across a frame and apply it once instead of n-times.
             this._rb.AddForceAtPosition( force, position, ForceMode.Force );
         }
 
-        public void AddTorque( Vector3 force )
+        public void AddTorque( Vector3 torque )
         {
-            _accelerationSum += force / Mass;
-            this._rb.AddTorque( force, ForceMode.Force );
+            _absoluteAngularAccelerationSum += SceneReferenceFrameManager.ReferenceFrame.TransformAngularAcceleration( (Vector3Dbl)torque / Mass );
+
+            this._rb.AddTorque( torque, ForceMode.Force );
         }
 
-        private void RecacheAirfPosRot()
+        private void RecalculateAbsoluteValues()
         {
             this._absolutePosition = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( this._rb.position );
             this._absoluteRotation = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( this._rb.rotation );
+            this._absoluteVelocity = SceneReferenceFrameManager.ReferenceFrame.TransformVelocity( this._rb.velocity );
+            this._absoluteAngularVelocity = SceneReferenceFrameManager.ReferenceFrame.TransformAngularVelocity( this._rb.angularVelocity );
+
+            this.AbsoluteAcceleration = SceneReferenceFrameManager.ReferenceFrame.TransformAcceleration( this.Acceleration );
+            this.AbsoluteAngularAcceleration = SceneReferenceFrameManager.ReferenceFrame.TransformAcceleration( this.AngularAcceleration );
         }
 
         void Awake()
@@ -194,43 +208,44 @@ namespace HSP.Trajectories
 
         void FixedUpdate()
         {
-#warning TODO - this should act on the trajectory, vessel shouldn't care.
             Vector3Dbl airfGravityForce = GravityUtils.GetNBodyGravityForce( this.AbsolutePosition, this.Mass );
             this.AddForce( (Vector3)airfGravityForce );
 
-            /*if( SceneReferenceFrameManager.ReferenceFrame is INonInertialReferenceFrame frame )
+            if( SceneReferenceFrameManager.ReferenceFrame is INonInertialReferenceFrame frame )
             {
                 Vector3Dbl localPos = frame.InverseTransformPosition( this.AbsolutePosition );
                 Vector3Dbl localVel = this.Velocity;
                 Vector3Dbl localAngVel = this.AngularVelocity;
-                Vector3Dbl linAcc = frame.GetFicticiousAcceleration( localPos, localVel );
-                Vector3Dbl angAcc = frame.GetFictitiousAngularAcceleration( localPos, localAngVel );
+                Vector3 linAcc = (Vector3)frame.GetFicticiousAcceleration( localPos, localVel );
+                Vector3 angAcc = (Vector3)frame.GetFictitiousAngularAcceleration( localPos, localAngVel );
 
-                this.Acceleration += (Vector3)linAcc;
-                this.AngularAcceleration += (Vector3)angAcc;
-            }*/
+                this._acceleration += linAcc;
+                this._angularAcceleration += angAcc;
+                this._rb.AddForce( linAcc, ForceMode.Acceleration );
+                this._rb.AddTorque( angAcc, ForceMode.Acceleration );
+            }
 
 
             // If the object is colliding, we will use its rigidbody accelerations, because we don't have access to the forces due to collisions.
             // Otherwise, we use our more precise method that relies on full encapsulation of the rigidbody.
             if( IsColliding )
             {
-                this.Acceleration = (Velocity - _oldVelocity) / TimeManager.FixedDeltaTime;
-                this.AngularAcceleration = (AngularVelocity - _oldAngularVelocity) / TimeManager.FixedDeltaTime;
+                this._acceleration = ((Vector3Dbl)(Velocity - _oldVelocity)) / TimeManager.FixedDeltaTime;
+                this._angularAcceleration = ((Vector3Dbl)(AngularVelocity - _oldAngularVelocity)) / TimeManager.FixedDeltaTime;
             }
             else
             {
                 // Acceleration sum will be whatever was accumulated between the previous frame (after it was zeroed out) and this frame. I think it should work fine.
-                this.Acceleration = _accelerationSum;
-                this.AngularAcceleration = _angularAccelerationSum;
+                this._acceleration = _absoluteAccelerationSum;
+                this._angularAcceleration = _absoluteAngularAccelerationSum;
             }
+
+            RecalculateAbsoluteValues();
 
             this._oldVelocity = Velocity;
             this._oldAngularVelocity = AngularVelocity;
-            this._accelerationSum = Vector3.zero;
-            this._angularAccelerationSum = Vector3.zero;
-
-            RecacheAirfPosRot();
+            this._absoluteAccelerationSum = Vector3.zero;
+            this._absoluteAngularAccelerationSum = Vector3.zero;
         }
 
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )

@@ -1,0 +1,108 @@
+﻿using UnityEngine;
+
+namespace HSP.ReferenceFrames
+{
+    /// <summary>
+    /// A reference frame centered on a given point, and with a given orientation. The frame is at rest. This class is immutable.
+    /// </summary>
+    public sealed class OrientedInertialReferenceFrame : IReferenceFrame
+    {
+        public Vector3Dbl Position => _position;
+        public QuaternionDbl Rotation => _rotation;
+        public Vector3Dbl Velocity => _velocity;
+        public Vector3Dbl AngularVelocity => _angularVelocity;
+
+        private readonly Vector3Dbl _position;
+        private readonly QuaternionDbl _rotation;
+        private readonly QuaternionDbl _inverseRotation;
+
+        // Inertial terms
+        private readonly Vector3Dbl _velocity;
+        private readonly Vector3Dbl _angularVelocity;
+
+        public OrientedInertialReferenceFrame( Vector3Dbl center, QuaternionDbl rotation, Vector3Dbl velocity, Vector3Dbl angularVelocity )
+        {
+            this._position = center;
+            this._rotation = rotation;
+            this._inverseRotation = QuaternionDbl.Inverse( rotation );
+
+            this._velocity = velocity;
+            this._angularVelocity = angularVelocity;
+        }
+
+        public IReferenceFrame Shift( Vector3Dbl absolutePositionDelta )
+        {
+            return new OrientedInertialReferenceFrame( _position + absolutePositionDelta, _rotation, _velocity, _angularVelocity );
+        }
+
+
+        public Vector3Dbl TransformPosition( Vector3Dbl localPosition )
+        {
+            return Vector3Dbl.Add( _rotation * localPosition, _position );
+        }
+        public Vector3Dbl InverseTransformPosition( Vector3Dbl absolutePosition )
+        {
+            return _inverseRotation * Vector3Dbl.Subtract( absolutePosition, _position );
+        }
+
+
+        public Vector3 TransformDirection( Vector3 localDirection )
+        {
+            return (Vector3)(_rotation * localDirection);
+        }
+        public Vector3 InverseTransformDirection( Vector3 absoluteDirection )
+        {
+            return (Vector3)(_inverseRotation * absoluteDirection);
+        }
+
+
+        public QuaternionDbl TransformRotation( QuaternionDbl localRotation )
+        {
+            return _rotation * localRotation;
+        }
+        public QuaternionDbl InverseTransformRotation( QuaternionDbl airfRotation )
+        {
+            return _inverseRotation * airfRotation;
+        }
+
+
+        public Vector3Dbl TransformVelocity( Vector3Dbl localVelocity )
+        {
+            return Vector3Dbl.Add( _rotation * localVelocity, _velocity );
+        }
+        public Vector3Dbl InverseTransformVelocity( Vector3Dbl globalVelocity )
+        {
+            return _inverseRotation * Vector3Dbl.Subtract( globalVelocity, _velocity );
+        }
+
+
+        public Vector3Dbl TransformAngularVelocity( Vector3Dbl localAngularVelocity )
+        {
+            return Vector3Dbl.Add( _rotation * localAngularVelocity, _angularVelocity );
+        }
+        public Vector3Dbl InverseTransformAngularVelocity( Vector3Dbl globalAngularVelocity )
+        {
+            return _inverseRotation * Vector3Dbl.Subtract( globalAngularVelocity, _angularVelocity );
+        }
+
+
+        public Vector3Dbl TransformAcceleration( Vector3Dbl localAcceleration )
+        {
+            return _rotation * localAcceleration;
+        }
+        public Vector3Dbl InverseTransformAcceleration( Vector3Dbl absoluteAcceleration )
+        {
+            return _inverseRotation * absoluteAcceleration;
+        }
+
+
+        public Vector3Dbl TransformAngularAcceleration( Vector3Dbl localAngularAcceleration )
+        {
+            return _rotation * localAngularAcceleration;
+        }
+        public Vector3Dbl InverseTransformAngularAcceleration( Vector3Dbl absoluteAngularAcceleration )
+        {
+            return _inverseRotation * absoluteAngularAcceleration;
+        }
+    }
+}
