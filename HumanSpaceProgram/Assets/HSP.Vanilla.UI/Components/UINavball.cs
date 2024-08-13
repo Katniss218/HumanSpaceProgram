@@ -13,6 +13,8 @@ namespace HSP.Vanilla.UI.Components
 {
     public class UINavball : UIPanel
     {
+        public const float MIN_ABSOLUTE_VELOCITY_FOR_MARKERS = 0.25f;
+
         private UIIcon _prograde;
         private UIIcon _retrograde;
         private UIIcon _normal;
@@ -48,11 +50,14 @@ namespace HSP.Vanilla.UI.Components
             {
                 Vessel activeVessel = ActiveObjectManager.ActiveObject.GetVessel();
 
+                if( activeVessel.ReferenceFrameTransform == null )
+                    return;
+
                 Quaternion airfRotation = (Quaternion)FControlFrame.GetAIRFRotation( FControlFrame.VesselControlFrame, activeVessel );
                 Matrix4x4 airfToLocalMatrix = Matrix4x4.Rotate( airfRotation ).inverse;
 
                 Vector3Dbl airfVelocity = activeVessel.ReferenceFrameTransform.AbsoluteVelocity;
-                if( airfVelocity.magnitude > 0.25f )
+                if( airfVelocity.magnitude > MIN_ABSOLUTE_VELOCITY_FOR_MARKERS )
                 {
                     Vector3Dbl gravityAcc = GravityUtils.GetNBodyGravityAcceleration( activeVessel.ReferenceFrameTransform.AbsolutePosition );
 

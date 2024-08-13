@@ -26,22 +26,22 @@ namespace HSP.Trajectories
             throw new NotImplementedException();
         }
 
-        public StateVector GetCurrentStateVector()
+        public OrbitalStateVector GetCurrentStateVector()
         {
             throw new NotImplementedException();
         }
 
-        public void SetCurrentStateVector( StateVector stateVector )
+        public void SetCurrentStateVector( OrbitalStateVector stateVector )
         {
             throw new NotImplementedException();
         }
 
-        public StateVector GetStateVectorAtUT( double ut )
+        public OrbitalStateVector GetStateVectorAtUT( double ut )
         {
             throw new NotImplementedException();
         }
 
-        public StateVector GetStateVector( float t )
+        public OrbitalStateVector GetStateVector( float t )
         {
             throw new NotImplementedException();
         }
@@ -56,7 +56,7 @@ namespace HSP.Trajectories
             // Prograde -> towards velocity.
             // Antiradial -> "towards" gravity, but projected onto a plane whose normal is velocity, such that it's orthogonal to Prograde.
 
-            StateVector stateVector = GetStateVectorAtUT( ut );
+            OrbitalStateVector stateVector = GetStateVectorAtUT( ut );
 
             var forward = stateVector.Velocity.NormalizeToVector3();
             var up = Vector3Dbl.Cross( stateVector.GravityDir, stateVector.Velocity ).NormalizeToVector3();

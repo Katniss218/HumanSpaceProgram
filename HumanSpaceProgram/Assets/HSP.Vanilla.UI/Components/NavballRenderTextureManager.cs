@@ -86,12 +86,16 @@ namespace HSP.Vanilla.UI.Components
         {
             if( ActiveObjectManager.ActiveObject != null )
             {
-                Vessel v = ActiveObjectManager.ActiveObject.GetVessel();
+                Vessel activeVessel = ActiveObjectManager.ActiveObject.GetVessel();
+
+                if( activeVessel.ReferenceFrameTransform == null )
+                    return;
+
                 Vector3 forward = (Vector3)CelestialBodyManager.CelestialBodies.First().ReferenceFrameTransform.AbsoluteRotation.GetForwardAxis();
-                Vector3 gravity = -GravityUtils.GetNBodyGravityAcceleration( v.ReferenceFrameTransform.AbsolutePosition ).NormalizeToVector3();
+                Vector3 gravity = -GravityUtils.GetNBodyGravityAcceleration( activeVessel.ReferenceFrameTransform.AbsolutePosition ).NormalizeToVector3();
                 forward = Vector3.ProjectOnPlane( forward, gravity );
                 NavballOrientation = Quaternion.LookRotation( forward, gravity );
-                VesselOrientation = (Quaternion)FControlFrame.GetAIRFRotation( FControlFrame.VesselControlFrame, v );
+                VesselOrientation = (Quaternion)FControlFrame.GetAIRFRotation( FControlFrame.VesselControlFrame, activeVessel );
             }
         }
     }

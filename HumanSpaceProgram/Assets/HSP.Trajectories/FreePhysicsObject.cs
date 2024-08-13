@@ -283,7 +283,6 @@ namespace HSP.Trajectories
             IsColliding = false;
         }
 
-
         [MapsInheritingFrom( typeof( FreePhysicsObject ) )]
         public static SerializationMapping FreePhysicsObjectMapping()
         {
@@ -294,8 +293,10 @@ namespace HSP.Trajectories
 
                 ("DO_NOT_TOUCH", new Member<FreePhysicsObject, bool>( o => false, (o, value) => o._rb.isKinematic = false)), // TODO - isKinematic member is a hack.
 
-                ("velocity", new Member<FreePhysicsObject, Vector3>( o => o.Velocity )),
-                ("angular_velocity", new Member<FreePhysicsObject, Vector3>( o => o.AngularVelocity ))
+                ("absolute_position", new Member<FreePhysicsObject, Vector3Dbl>( o => o.AbsolutePosition )),
+                ("absolute_rotation", new Member<FreePhysicsObject, QuaternionDbl>( o => o.AbsoluteRotation )),
+                ("absolute_velocity", new Member<FreePhysicsObject, Vector3Dbl>( o => o.AbsoluteVelocity )),
+                ("absolute_angular_velocity", new Member<FreePhysicsObject, Vector3Dbl>( o => o.AbsoluteAngularVelocity ))
             };
         }
     }

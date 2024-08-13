@@ -185,22 +185,22 @@ namespace HSP.Core
             throw new NotImplementedException();
         }
 
-        public StateVector GetCurrentStateVector()
+        public OrbitalStateVector GetCurrentStateVector()
         {
             throw new NotImplementedException();
         }
 
-        public void SetCurrentStateVector( StateVector stateVector )
+        public void SetCurrentStateVector( OrbitalStateVector stateVector )
         {
             throw new NotImplementedException();
         }
 
-        public StateVector GetStateVectorAtUT( double ut )
+        public OrbitalStateVector GetStateVectorAtUT( double ut )
         {
             throw new NotImplementedException();
         }
 
-        public StateVector GetStateVector( float t )
+        public OrbitalStateVector GetStateVector( float t )
         {
             throw new NotImplementedException();
         }

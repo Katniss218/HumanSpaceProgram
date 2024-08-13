@@ -9,7 +9,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <ProjectGuid>{57FA29CC-9026-83EE-F242-EA051DEA7649}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -65,7 +66,7 @@
     <Compile Include="Assets\HSP.Trajectories\Components\FAnchor.cs" />
     <Compile Include="Assets\HSP.Trajectories\NewtonianOrbit.cs" />
     <Compile Include="Assets\HSP.Trajectories\FreePhysicsObject.cs" />
-    <Compile Include="Assets\HSP.Trajectories\StateVector.cs" />
+    <Compile Include="Assets\HSP.Trajectories\OrbitalStateVector.cs" />
     <Compile Include="Assets\HSP.Trajectories\FixedTrajectory.cs" />
     <Compile Include="Assets\HSP.Trajectories\TrajectorySimulator.cs" />
     <Compile Include="Assets\HSP.Trajectories\KeplerianOrbit.cs" />

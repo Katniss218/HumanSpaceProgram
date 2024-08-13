@@ -228,6 +228,9 @@ namespace HSP.Trajectories
                 ("local_center_of_mass", new Member<FixedPhysicsObject, Vector3>( o => o.LocalCenterOfMass )),
 
                 ("DO_NOT_TOUCH", new Member<FixedPhysicsObject, bool>( o => true, (o, value) => o._rb.isKinematic = true)), // TODO - isKinematic member is a hack.
+
+                ("absolute_position", new Member<FixedPhysicsObject, Vector3Dbl>( o => o.AbsolutePosition )),
+                ("absolute_rotation", new Member<FixedPhysicsObject, QuaternionDbl>( o => o.AbsoluteRotation ))
             };
         }
     }

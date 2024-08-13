@@ -6,7 +6,7 @@ namespace HSP.Trajectories
     /// <summary>
     /// Represents the position and velocity of an object in a gravitational field.
     /// </summary>
-    public struct StateVector
+    public struct OrbitalStateVector
     {
         private readonly Vector3Dbl _position;
         private readonly Vector3Dbl _velocity;
@@ -17,7 +17,7 @@ namespace HSP.Trajectories
         public Vector3Dbl Velocity => _velocity;
         public Vector3 GravityDir => _gravityDir;
 
-        public StateVector( Vector3Dbl position, Vector3Dbl velocity, Vector3 gravityDir )
+        public OrbitalStateVector( Vector3Dbl position, Vector3Dbl velocity, Vector3 gravityDir )
         {
             this._position = position;
             this._velocity = velocity;

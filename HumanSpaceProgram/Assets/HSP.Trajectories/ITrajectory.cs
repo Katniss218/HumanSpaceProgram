@@ -24,11 +24,11 @@ namespace HSP.Trajectories
         void AddAcceleration( Vector3Dbl acceleration );
         void AddAccelerationAtUT( Vector3Dbl acceleration, double ut );
 
-        StateVector GetCurrentStateVector();
-        void SetCurrentStateVector( StateVector stateVector );
-        StateVector GetStateVectorAtUT( double ut );
+        OrbitalStateVector GetCurrentStateVector();
+        void SetCurrentStateVector( OrbitalStateVector stateVector );
+        OrbitalStateVector GetStateVectorAtUT( double ut );
 
-        StateVector GetStateVector( float t );
+        OrbitalStateVector GetStateVector( float t );
 
         OrbitalFrame GetCurrentOrbitalFrame();
         OrbitalFrame GetOrbitalFrameAtUT( double ut );
