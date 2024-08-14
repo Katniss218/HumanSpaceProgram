@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace HSP.ReferenceFrames
 {
@@ -25,6 +26,11 @@ namespace HSP.ReferenceFrames
         public IReferenceFrame Shift( Vector3Dbl absolutePositionDelta )
         {
             return new OrientedReferenceFrame( this._position + absolutePositionDelta, this._rotation );
+        }
+
+        public IReferenceFrame AddUT( double ut )
+        {
+            return this; // Reference frames are immutable, so this is allowed.
         }
 
 

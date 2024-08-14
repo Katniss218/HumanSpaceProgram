@@ -1,5 +1,7 @@
-﻿using System;
+﻿using HSP.Time;
+using System;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace HSP.ReferenceFrames
 {
@@ -61,6 +63,8 @@ namespace HSP.ReferenceFrames
             // WARN: This is very expensive to run when the trail has a lot of vertices.
             // When moving fast, don't use the default trail parameters, it produces too many vertices.
 
+            // Trails don't work properly when the reference frame is moving anyway, they're in scene frame, not in any sort of useful frame.
+
             foreach( var trail in FindObjectsOfType<TrailRenderer>() ) // this is slow. It would be beneficial to keep a cache, or wrap this in a module.
             {
                 for( int i = 0; i < trail.positionCount; i++ )
@@ -81,7 +85,8 @@ namespace HSP.ReferenceFrames
         /// If the active vessel moves outside of this range, an origin shift will happen. <br/>
         /// Larger values of MaxFloatingOriginRange can make the vessel's parts appear spread apart (because of limited number of possible world positions to map to).
         /// </remarks>
-        public static float MaxFloatingOriginRange { get; set; } = 8192.0f;
+        public static float MaxRelativePosition { get; set; } = 512.0f;
+        public static float MaxRelativeVelocity { get; set; } = 32.0f;
 
         /// <summary>
         /// Checks whether the current active vessel is too far away from the scene's origin, and performs an origin shift if it is.
@@ -93,10 +98,22 @@ namespace HSP.ReferenceFrames
                 return;
             }
 
-            Vector3 position = ActiveObjectManager.ActiveObject.position;
-            if( position.magnitude > MaxFloatingOriginRange )
+#warning TODO - this needs to be a IReferenceFrameTransform, not active object. Which is related to the fact it should be split off.
+            Vector3 scenePosition = ActiveObjectManager.ActiveObject.position;
+            if( scenePosition.magnitude > MaxRelativePosition )
             {
-                ChangeSceneReferenceFrame( ReferenceFrame.Shift( position ) );
+#warning TODO - we might want to control the parameters more directly. Also, needs to switch based on object velocity as well (direction and magnitude) relative to frame velocity.
+
+                ChangeSceneReferenceFrame( ReferenceFrame.Shift( scenePosition ) );
+            }
+            IReferenceFrameTransform trans = ActiveObjectManager.ActiveObject.GetComponent<IReferenceFrameTransform>();
+            if( trans != null )
+            {
+                Vector3 sceneVelocity = trans.Velocity;
+                if( sceneVelocity.magnitude > MaxRelativeVelocity )
+                {
+                    //ChangeSceneReferenceFrame( new CenteredInertialReferenceFrame( ReferenceFrame.Position, (Vector3Dbl)sceneVelocity, Vector3Dbl.zero ) );
+                }
             }
         }
 
@@ -110,10 +127,16 @@ namespace HSP.ReferenceFrames
         void Awake()
         {
             ReferenceFrame = new CenteredReferenceFrame( Vector3Dbl.zero );
+
+            ChangeSceneReferenceFrame( new CenteredInertialReferenceFrame( Vector3Dbl.zero, new Vector3Dbl( 0, 25, 25 ).normalized * 500.0, Vector3Dbl.zero ) );
         }
 
         void FixedUpdate()
         {
+#warning TODO - non-rest reference frames need to be updated, and they will need to be continuous, not discrete. Able to be sampled at a given UT offset.
+            // to do this, non-rest reference frames need to know the UT at which they were created.
+            ReferenceFrame = ReferenceFrame.AddUT( TimeManager.FixedDeltaTime );
+
             TryFixActiveObjectOutOfBounds();
         }
     }

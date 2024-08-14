@@ -93,6 +93,7 @@ namespace HSP.CelestialBodies
             }
         }
 
+#warning TODO - add inertial and noninertial equivalents
         /// <summary>
         /// Constructs the reference frame centered on this body, with axes aligned with the AIRF frame.
         /// </summary>

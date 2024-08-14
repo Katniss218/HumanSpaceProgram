@@ -3,7 +3,7 @@
 namespace HSP.ReferenceFrames
 {
     /// <summary>
-    /// A reference frame aligned with the AIRF frame, and shifted (offset) by a certain amount. <br/>
+    /// A reference frame centered on a given point. <br/>
     /// The frame is at rest. This class is immutable.
     /// </summary>
     public sealed class CenteredReferenceFrame : IReferenceFrame

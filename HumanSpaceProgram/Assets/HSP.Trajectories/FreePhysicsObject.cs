@@ -28,7 +28,7 @@ namespace HSP.Trajectories
             set
             {
                 _absolutePosition = value;
-                ReferenceFrameTransformUtils.UpdateScenePositionFromAbsolute( transform, _rb, value );
+                ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, value );
             }
         }
 
@@ -49,7 +49,7 @@ namespace HSP.Trajectories
             set
             {
                 _absoluteRotation = value;
-                ReferenceFrameTransformUtils.UpdateSceneRotationFromAbsolute( transform, _rb, value );
+                ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, value );
             }
         }
 
@@ -69,7 +69,7 @@ namespace HSP.Trajectories
             set
             {
                 this._absoluteVelocity = value;
-                ReferenceFrameTransformUtils.UpdateSceneVelocityFromAbsolute( _rb, value );
+                ReferenceFrameTransformUtils.SetSceneVelocityFromAbsolute( _rb, value );
             }
         }
 
@@ -88,7 +88,7 @@ namespace HSP.Trajectories
             set
             {
                 this._absoluteAngularVelocity = value;
-                ReferenceFrameTransformUtils.UpdateSceneAngularVelocityFromAbsolute( _rb, value );
+                ReferenceFrameTransformUtils.SetSceneAngularVelocityFromAbsolute( _rb, value );
             }
         }
 
@@ -178,15 +178,27 @@ namespace HSP.Trajectories
             this._rb.AddTorque( torque, ForceMode.Force );
         }
 
-        private void RecalculateAbsoluteValues()
+        private void MoveScenePositionAndRotation( IReferenceFrame referenceFrame )
         {
-            this._absolutePosition = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( this._rb.position );
-            this._absoluteRotation = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( this._rb.rotation );
-            this._absoluteVelocity = SceneReferenceFrameManager.ReferenceFrame.TransformVelocity( this._rb.velocity );
-            this._absoluteAngularVelocity = SceneReferenceFrameManager.ReferenceFrame.TransformAngularVelocity( this._rb.angularVelocity );
+            var pos = (Vector3)referenceFrame.InverseTransformPosition( _absolutePosition );
+            var rot = (Quaternion)referenceFrame.InverseTransformRotation( _absoluteRotation );
+            this._rb.Move( pos, rot );
 
-            this.AbsoluteAcceleration = SceneReferenceFrameManager.ReferenceFrame.TransformAcceleration( this.Acceleration );
-            this.AbsoluteAngularAcceleration = SceneReferenceFrameManager.ReferenceFrame.TransformAcceleration( this.AngularAcceleration );
+            var vel = (Vector3)referenceFrame.InverseTransformVelocity( _absoluteVelocity );
+            var angVel = (Vector3)referenceFrame.InverseTransformAngularVelocity( _absoluteAngularVelocity );
+            this._rb.velocity = vel;
+            this._rb.angularVelocity = angVel;
+        }
+
+        private void RecalculateAbsoluteValues( IReferenceFrame referenceFrame )
+        {
+            this._absolutePosition = referenceFrame.TransformPosition( this._rb.position );
+            this._absoluteRotation = referenceFrame.TransformRotation( this._rb.rotation );
+            this._absoluteVelocity = referenceFrame.TransformVelocity( this._rb.velocity );
+            this._absoluteAngularVelocity = referenceFrame.TransformAngularVelocity( this._rb.angularVelocity );
+
+            this.AbsoluteAcceleration = referenceFrame.TransformAcceleration( this.Acceleration );
+            this.AbsoluteAngularAcceleration = referenceFrame.TransformAcceleration( this.AngularAcceleration );
         }
 
         void Awake()
@@ -201,13 +213,14 @@ namespace HSP.Trajectories
             _rb = this.GetComponent<Rigidbody>();
 
             _rb.useGravity = false;
-            _rb.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+            _rb.collisionDetectionMode = CollisionDetectionMode.Discrete; // Continuous (in any of its flavors) "jumps" when sitting on top of something when reference frame switches.
             _rb.interpolation = RigidbodyInterpolation.None; // DO NOT INTERPOLATE. Doing so will desync `rigidbody.position` and `transform.position`.
             _rb.isKinematic = false;
         }
 
         void FixedUpdate()
         {
+#warning TODO - gravity code doesn't belong here.
             Vector3Dbl airfGravityForce = GravityUtils.GetNBodyGravityForce( this.AbsolutePosition, this.Mass );
             this.AddForce( (Vector3)airfGravityForce );
 
@@ -240,7 +253,7 @@ namespace HSP.Trajectories
                 this._angularAcceleration = _absoluteAngularAccelerationSum;
             }
 
-            RecalculateAbsoluteValues();
+            RecalculateAbsoluteValues( SceneReferenceFrameManager.ReferenceFrame );
 
             this._oldVelocity = Velocity;
             this._oldAngularVelocity = AngularVelocity;
@@ -248,10 +261,24 @@ namespace HSP.Trajectories
             this._absoluteAngularAccelerationSum = Vector3.zero;
         }
 
+        // The faster something goes in scene space when colliding with another thing, it gets laggier for physics processing (contacts creation)
+
+        // when switching while resting on something, the object jumps. possibly due to pinned updating before the celestial frame it uses to transform has correct values or something?
+        // possibly the same or related to rovers in RSS/RO jumping while driving
+        // - only happens with continuous speculative collision (continuous and continuous dynamic don't jump).
+
+#warning TODO - needs something to enable continuous when a something in the scene is not resting and is moving fast relative to something else.
+
+#warning TODO - celestial bodies need something that will replace the buildin parenting of colliders with 64-bit parents and update their scene position at all times (fixedupdate + update + lateupdate).
+
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
-            ReferenceFrameTransformUtils.UpdateScenePositionFromAbsolute( transform, _rb, _absolutePosition );
-            ReferenceFrameTransformUtils.UpdateSceneRotationFromAbsolute( transform, _rb, _absoluteRotation );
+            RecalculateAbsoluteValues( data.OldFrame );
+
+            ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, _absolutePosition );
+            ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, _absoluteRotation );
+            ReferenceFrameTransformUtils.SetSceneVelocityFromAbsolute( _rb, _absoluteVelocity );
+            ReferenceFrameTransformUtils.SetSceneAngularVelocityFromAbsolute( _rb, _absoluteAngularVelocity );
         }
 
         void OnEnable()

@@ -22,7 +22,7 @@ namespace HSP.Trajectories
             set
             {
                 this._absolutePosition = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( value );
-                ReferenceFrameTransformUtils.UpdateScenePositionFromAbsolute( transform, _rb, _absolutePosition );
+                ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, _absolutePosition );
             }
         }
 
@@ -32,7 +32,7 @@ namespace HSP.Trajectories
             set
             {
                 _absolutePosition = value;
-                ReferenceFrameTransformUtils.UpdateScenePositionFromAbsolute( transform, _rb, value );
+                ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, value );
             }
         }
 
@@ -42,7 +42,7 @@ namespace HSP.Trajectories
             set
             {
                 this._absoluteRotation = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( value );
-                ReferenceFrameTransformUtils.UpdateSceneRotationFromAbsolute( transform, _rb, _absoluteRotation );
+                ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, _absoluteRotation );
             }
         }
 
@@ -52,14 +52,14 @@ namespace HSP.Trajectories
             set
             {
                 _absoluteRotation = value;
-                ReferenceFrameTransformUtils.UpdateSceneRotationFromAbsolute( transform, _rb, value );
+                ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, value );
             }
         }
 
 
         public Vector3 Velocity
         {
-            get => this._rb.velocity;
+            get => (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformVelocity( Vector3Dbl.zero );
             set { }
         }
 
@@ -71,7 +71,7 @@ namespace HSP.Trajectories
 
         public Vector3 AngularVelocity
         {
-            get => this._rb.angularVelocity;
+            get => (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformAngularVelocity( Vector3Dbl.zero );
             set { }
         }
 
@@ -157,14 +157,11 @@ namespace HSP.Trajectories
             return;
         }
 
-        private void UpdateScenePositionAndRotation()
+        private void MoveScenePositionAndRotation()
         {
             var pos = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformPosition( _absolutePosition );
             var rot = (Quaternion)SceneReferenceFrameManager.ReferenceFrame.InverseTransformRotation( _absoluteRotation );
-            this.transform.rotation = rot;
-            this._rb.rotation = rot;
-            this.transform.position = pos;
-            this._rb.position = pos;
+            this._rb.Move( pos, rot );
         }
 
         void Awake()
@@ -179,7 +176,7 @@ namespace HSP.Trajectories
             _rb = this.GetComponent<Rigidbody>();
 
             _rb.useGravity = false;
-            _rb.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+            _rb.collisionDetectionMode = CollisionDetectionMode.Discrete;
             _rb.interpolation = RigidbodyInterpolation.None; // DO NOT INTERPOLATE. Doing so will desync `rigidbody.position` and `transform.position`.
             _rb.isKinematic = true;
         }
@@ -187,16 +184,13 @@ namespace HSP.Trajectories
         void FixedUpdate()
         {
             _rb.isKinematic = true;
-            UpdateScenePositionAndRotation();
-
-            ReferenceFrameTransformUtils.UpdateScenePositionFromAbsolute( transform, _rb, this._absolutePosition );
-            ReferenceFrameTransformUtils.UpdateSceneRotationFromAbsolute( transform, _rb, this._absoluteRotation );
+            MoveScenePositionAndRotation();
         }
 
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
-            ReferenceFrameTransformUtils.UpdateScenePositionFromAbsolute( transform, _rb, _absolutePosition );
-            ReferenceFrameTransformUtils.UpdateSceneRotationFromAbsolute( transform, _rb, _absoluteRotation );
+            ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, _absolutePosition );
+            ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, _absoluteRotation );
         }
 
         void OnCollisionEnter( Collision collision )

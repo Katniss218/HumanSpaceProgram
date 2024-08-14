@@ -21,19 +21,27 @@ namespace HSP.Trajectories
         public CelestialBody ReferenceBody
         {
             get => _referenceBody;
-            set { _referenceBody = value; UpdateScenePositionAndRotation(); }
+            set
+            {
+                _referenceBody = value;
+                if( value != null )
+                {
+                    ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
+                    ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );
+                }
+            }
         }
 
         public Vector3Dbl ReferencePosition
         {
             get => _referencePosition;
-            set { _referencePosition = value; UpdateScenePositionAndRotation(); }
+            set { _referencePosition = value; ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, AbsolutePosition ); }
         }
 
         public QuaternionDbl ReferenceRotation
         {
             get => _referenceRotation;
-            set { _referenceRotation = value; UpdateScenePositionAndRotation(); }
+            set { _referenceRotation = value; ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation ); }
         }
 
 
@@ -45,7 +53,7 @@ namespace HSP.Trajectories
                 Vector3Dbl airfPos = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( value );
                 _referencePosition = _referenceBody.OrientedReferenceFrame.InverseTransformPosition( airfPos );
 
-                UpdateScenePositionAndRotation();
+                ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
             }
         }
 
@@ -57,7 +65,7 @@ namespace HSP.Trajectories
                 QuaternionDbl airfRot = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( value );
                 _referenceRotation = _referenceBody.OrientedReferenceFrame.InverseTransformRotation( airfRot );
 
-                UpdateScenePositionAndRotation();
+                ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );
             }
         }
 
@@ -67,8 +75,7 @@ namespace HSP.Trajectories
             set
             {
                 _referencePosition = _referenceBody.OrientedReferenceFrame.InverseTransformPosition( value );
-
-                UpdateScenePositionAndRotation();
+                ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, value );
             }
         }
 
@@ -79,7 +86,7 @@ namespace HSP.Trajectories
             {
                 _referenceRotation = _referenceBody.OrientedReferenceFrame.InverseTransformRotation( value );
 
-                UpdateScenePositionAndRotation();
+                ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, value );
             }
         }
 
@@ -176,7 +183,7 @@ namespace HSP.Trajectories
             return;
         }
 
-        private void UpdateScenePositionAndRotation()
+        private void MoveScenePositionAndRotation()
         {
             if( ReferenceBody == null )
                 return;
@@ -184,10 +191,7 @@ namespace HSP.Trajectories
             var frame = ReferenceBody.OrientedReferenceFrame;
             var pos = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformPosition( frame.TransformPosition( _referencePosition ) );
             var rot = (Quaternion)SceneReferenceFrameManager.ReferenceFrame.InverseTransformRotation( frame.TransformRotation( _referenceRotation ) );
-            this.transform.rotation = rot;
-            this._rb.rotation = rot;
-            this.transform.position = pos;
-            this._rb.position = pos;
+            this._rb.Move( pos, rot );
         }
 
         void Awake()
@@ -210,7 +214,7 @@ namespace HSP.Trajectories
         void FixedUpdate()
         {
             // Reference can be moving, and we aren't parented (due to precision), thus we continuously update.
-            this.UpdateScenePositionAndRotation();
+            this.MoveScenePositionAndRotation();
 
             // If the object is colliding, we will use its rigidbody accelerations, because we don't have access to the forces due to collisions.
             // Otherwise, we use our more precise method that relies on full encapsulation of the rigidbody.
@@ -234,8 +238,13 @@ namespace HSP.Trajectories
 
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
-            ReferenceFrameTransformUtils.UpdateScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
-            ReferenceFrameTransformUtils.UpdateSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );
+            // Guarantees that the reference body has up-to-date reference frame, regardless of update order.
+            // Simply calling `OnSceneReferenceFrameSwitch` on it should be safe,
+            //   it'll just set the position twice (both times to the same value) in the same frame.
+            _referenceBody.ReferenceFrameTransform.OnSceneReferenceFrameSwitch( data );
+
+            ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
+            ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );
         }
 
         void OnCollisionEnter( Collision collision )

@@ -22,7 +22,7 @@ namespace HSP.Vessels
         /// <param name="absolutePosition">The `Absolute Inertial Reference Frame` position of the vessel to create.</param>
         /// <param name="absoluteRotation">Rotation of the vessel in the `Absolute Inertial Reference Frame`</param>
         /// <returns>The created partless vessel.</returns>
-        public static Vessel CreatePartless( Vector3Dbl absolutePosition, QuaternionDbl absoluteRotation, Vector3 sceneVelocity, Vector3 sceneAngularVelocity )
+        public static Vessel CreatePartless( Vector3Dbl absolutePosition, QuaternionDbl absoluteRotation, Vector3Dbl absoluteVelocity, Vector3Dbl absoluteAngularVelocity )
         {
             GameObject gameObject = new GameObject( $"Vessel, '{name}'" );
 
@@ -33,8 +33,8 @@ namespace HSP.Vessels
 
             vessel.ReferenceFrameTransform.AbsolutePosition = absolutePosition;
             vessel.ReferenceFrameTransform.AbsoluteRotation = absoluteRotation;
-            vessel.ReferenceFrameTransform.Velocity = sceneVelocity;
-            vessel.ReferenceFrameTransform.AngularVelocity = sceneAngularVelocity;
+            vessel.ReferenceFrameTransform.AbsoluteVelocity = absoluteVelocity;
+            vessel.ReferenceFrameTransform.AbsoluteAngularVelocity = absoluteAngularVelocity;
 
             return vessel;
         }

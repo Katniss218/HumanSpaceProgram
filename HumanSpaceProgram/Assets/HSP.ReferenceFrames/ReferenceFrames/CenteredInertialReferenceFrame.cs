@@ -3,8 +3,8 @@
 namespace HSP.ReferenceFrames
 {
     /// <summary>
-    /// A reference frame aligned with the AIRF frame, and shifted (offset) by a certain amount. <br/>
-    /// The inertial terms are constant. This class is immutable.
+    /// A reference frame centered on a given point. <br/>
+    /// The inertial terms are instantanous and constant. This class is immutable.
     /// </summary>
     public sealed class CenteredInertialReferenceFrame : IReferenceFrame
     {

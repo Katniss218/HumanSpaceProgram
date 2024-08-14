@@ -5,7 +5,7 @@ using UnityEngine;
 namespace HSP.ReferenceFrames
 {
     /// <summary>
-    /// A reference frame aligned with the AIRF frame, and shifted (offset) by a set distance. <br/>
+    /// A reference frame centered on a given point. <br/>
     /// The inertial and non-inertial terms are instantanous and constant. This class is immutable.
     /// </summary>
     public sealed class CenteredNonInertialReferenceFrame : INonInertialReferenceFrame
@@ -41,6 +41,11 @@ namespace HSP.ReferenceFrames
         {
             // calculate the new rotation/acceleration/etc terms for the new frame, so that the fictitious force is still correct.
 
+            throw new NotImplementedException();
+        }
+
+        public IReferenceFrame AddUT( double ut )
+        {
             throw new NotImplementedException();
         }
 

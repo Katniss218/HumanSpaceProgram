@@ -278,8 +278,9 @@ namespace HSP.Vessels.Construction
                 Vessel vessel = VesselFactory.CreatePartless(
                     SceneReferenceFrameManager.ReferenceFrame.TransformPosition( ghostRoot.position ),
                     SceneReferenceFrameManager.ReferenceFrame.TransformRotation( ghostRoot.rotation ),
-                    Vector3.zero,
-                    Vector3.zero );
+                    Vector3Dbl.zero,
+                    Vector3Dbl.zero );
+#warning TODO - Vector3Dbl.zero will cause the vessel to not have correct velocity relative to where it's being placed.
 
                 vessel.RootPart = ghostRoot;
                 parent = vessel.gameObject.transform;

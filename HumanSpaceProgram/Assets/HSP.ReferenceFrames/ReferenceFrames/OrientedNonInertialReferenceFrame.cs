@@ -49,6 +49,11 @@ namespace HSP.ReferenceFrames
             throw new NotImplementedException();
         }
 
+        public IReferenceFrame AddUT( double ut )
+        {
+            throw new NotImplementedException();
+        }
+
 
         public Vector3Dbl TransformPosition( Vector3Dbl localPosition )
         {

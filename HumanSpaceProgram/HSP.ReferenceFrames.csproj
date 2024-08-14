@@ -68,7 +68,6 @@
     <Compile Include="Assets\HSP.ReferenceFrames\ReferenceFrames\CenteredInertialReferenceFrame.cs" />
     <Compile Include="Assets\HSP.ReferenceFrames\ReferenceFrames\OrientedInertialReferenceFrame.cs" />
     <Compile Include="Assets\HSP.ReferenceFrames\IReferenceFrameTransform.cs" />
-    <Compile Include="Assets\HSP.ReferenceFrames\ReferenceFrameTransform.cs" />
     <Compile Include="Assets\HSP.ReferenceFrames\ReferenceFrames\OrientedReferenceFrame.cs" />
     <Compile Include="Assets\HSP.ReferenceFrames\IReferenceFrame.cs" />
     <Compile Include="Assets\HSP.ReferenceFrames\IReferenceFrameTransform_Ex.cs" />

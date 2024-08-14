@@ -1,9 +1,11 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace HSP.ReferenceFrames
 {
     /// <summary>
-    /// A reference frame centered on a given point, and with a given orientation. The frame is at rest. This class is immutable.
+    /// A reference frame centered on a given point, and with a given orientation. <br/>
+    /// The inertial terms are instantanous and constant. This class is immutable.
     /// </summary>
     public sealed class OrientedInertialReferenceFrame : IReferenceFrame
     {
@@ -33,6 +35,13 @@ namespace HSP.ReferenceFrames
         public IReferenceFrame Shift( Vector3Dbl absolutePositionDelta )
         {
             return new OrientedInertialReferenceFrame( _position + absolutePositionDelta, _rotation, _velocity, _angularVelocity );
+        }
+
+        public IReferenceFrame AddUT( double ut )
+        {
+            var newPos = _position + (_velocity * ut);
+            var newRot = QuaternionDbl.AngleAxis( _angularVelocity.magnitude * ut, _angularVelocity ) * _rotation;
+            return new OrientedInertialReferenceFrame( newPos, newRot, _velocity, _angularVelocity );
         }
 
 

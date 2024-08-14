@@ -33,6 +33,7 @@ namespace HSP.ReferenceFrames
         /// </summary>
         IReferenceFrame Shift( Vector3Dbl absolutePositionDelta );
 
+        IReferenceFrame AddUT( double ut );
 
         /// <summary>
         /// Transforms a point in the frame's local space to the Absolute (AIRF) space.
