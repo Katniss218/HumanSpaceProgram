@@ -9,8 +9,8 @@ namespace HSP.ReferenceFrames
         public static void SetScenePositionFromAbsolute( Transform transform, Rigidbody rigidbody, Vector3Dbl absolutePosition )
         {
             Vector3 scenePos = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformPosition( absolutePosition );
-            transform.position = scenePos;
-            
+            transform.position = scenePos; // Setting the transform is still important for some cases.
+
             // THIS IS CRITICALLY IMPORTANT. Rigidbodies keep their own position/rotation.
             if( rigidbody != null )
                 rigidbody.position = scenePos;
@@ -21,7 +21,7 @@ namespace HSP.ReferenceFrames
         public static void SetSceneRotationFromAbsolute( Transform transform, Rigidbody rigidbody, QuaternionDbl absoluteRotation )
         {
             Quaternion sceneRotation = (Quaternion)SceneReferenceFrameManager.ReferenceFrame.InverseTransformRotation( absoluteRotation );
-            transform.rotation = sceneRotation;
+            transform.rotation = sceneRotation; // Setting the transform is still important for some cases.
 
             // THIS IS CRITICALLY IMPORTANT. Rigidbodies keep their own position/rotation.
             if( rigidbody != null )

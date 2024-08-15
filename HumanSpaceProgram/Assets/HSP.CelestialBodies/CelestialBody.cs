@@ -1,4 +1,5 @@
 ﻿using HSP.ReferenceFrames;
+using HSP.Time;
 using System;
 using UnityEngine;
 using UnityPlus.Serialization;
@@ -93,16 +94,16 @@ namespace HSP.CelestialBodies
             }
         }
 
-#warning TODO - add inertial and noninertial equivalents
+#warning TODO - add inertial and noninertial equivalents - requires trajectories and following them for correct conversion of values. requires caching/computation of the points along the trajectory.
         /// <summary>
         /// Constructs the reference frame centered on this body, with axes aligned with the AIRF frame.
         /// </summary>
-        public IReferenceFrame CenteredReferenceFrame => new CenteredReferenceFrame( this.ReferenceFrameTransform.AbsolutePosition );
+        public IReferenceFrame CenteredReferenceFrame => new CenteredReferenceFrame( TimeManager.UT, this.ReferenceFrameTransform.AbsolutePosition );
 
         /// <summary>
         /// Constructs the reference frame centered on this body, with axes aligned with the body (i.e. local body space).
         /// </summary>
-        public IReferenceFrame OrientedReferenceFrame => new OrientedReferenceFrame( this.ReferenceFrameTransform.AbsolutePosition, this.ReferenceFrameTransform.AbsoluteRotation );
+        public IReferenceFrame OrientedReferenceFrame => new OrientedReferenceFrame( TimeManager.UT, this.ReferenceFrameTransform.AbsolutePosition, this.ReferenceFrameTransform.AbsoluteRotation );
 
         [MapsInheritingFrom( typeof( CelestialBody ) )]
         public static SerializationMapping CelestialBodyMapping()

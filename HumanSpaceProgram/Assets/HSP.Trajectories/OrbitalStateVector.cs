@@ -4,39 +4,37 @@ using UnityEngine;
 namespace HSP.Trajectories
 {
     /// <summary>
-    /// Represents the position and velocity of an object in a gravitational field.
+    /// Represents the position and velocity of an object in a gravitational field. <br/>
+    /// This struct is immutable.
     /// </summary>
     public struct OrbitalStateVector
     {
-        private readonly Vector3Dbl _position;
-        private readonly Vector3Dbl _velocity;
+        public double UT { get; }
+        public Vector3Dbl Position { get; }
+        public Vector3Dbl Velocity { get; }
+        public Vector3 GravityDir { get; }
 
-        private readonly Vector3 _gravityDir;
-
-        public Vector3Dbl Position => _position;
-        public Vector3Dbl Velocity => _velocity;
-        public Vector3 GravityDir => _gravityDir;
-
-        public OrbitalStateVector( Vector3Dbl position, Vector3Dbl velocity, Vector3 gravityDir )
+        public OrbitalStateVector( double ut, Vector3Dbl position, Vector3Dbl velocity, Vector3 gravityDir )
         {
-            this._position = position;
-            this._velocity = velocity;
-            this._gravityDir = gravityDir.normalized;
+            this.UT = ut;
+            this.Position = position;
+            this.Velocity = velocity;
+            this.GravityDir = gravityDir.normalized;
         }
 
         public OrbitalFrame GetOrbitalFrame()
         {
-            Vector3 forward = _velocity.NormalizeToVector3();
-            Vector3 up = Vector3.ProjectOnPlane( -_gravityDir, forward );
+            Vector3 forward = Velocity.NormalizeToVector3();
+            Vector3 up = Vector3.ProjectOnPlane( -GravityDir, forward );
             return new OrbitalFrame( forward, up );
         }
 
         public IReferenceFrame GetReferenceFrame()
         {
-            Vector3 forward = _velocity.NormalizeToVector3();
-            Vector3 up = Vector3.ProjectOnPlane( -_gravityDir, forward );
+            Vector3 forward = Velocity.NormalizeToVector3();
+            Vector3 up = Vector3.ProjectOnPlane( -GravityDir, forward );
 
-            return new OrientedReferenceFrame( _position, Quaternion.LookRotation( forward, up ) );
+            return new OrientedReferenceFrame( UT, Position, Quaternion.LookRotation( forward, up ) );
         }
     }
 }

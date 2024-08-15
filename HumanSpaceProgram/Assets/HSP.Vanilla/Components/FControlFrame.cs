@@ -20,18 +20,26 @@ namespace HSP.Vanilla.Components
         [SerializeField]
         private Transform _referenceTransform;
 
-        public static Quaternion GetSceneRotation( FControlFrame frame, Vessel fallback )
+        /// <summary>
+        /// Tries to get the rotation of the control frame (in scene space). Falls back to the rotation of the vessel if unavailable.
+        /// </summary>
+        /// <returns>The rotation of the specified control frame, or the vessel.</returns>
+        public static Quaternion GetRotation( FControlFrame frame, Vessel fallback )
         {
-            return frame == null
-                ? fallback.ReferenceTransform.rotation
-                : frame._referenceTransform.rotation;
+            return (frame != null && frame._referenceTransform != null)
+                ? frame._referenceTransform.rotation
+                : fallback.ReferenceTransform.rotation;
         }
 
-        public static QuaternionDbl GetAIRFRotation( FControlFrame frame, Vessel fallback )
+        /// <summary>
+        /// Tries to get the rotation of the control frame (in absolute inertial space). Falls back to the rotation of the vessel if unavailable.
+        /// </summary>
+        /// <returns>The rotation of the specified control frame, or the vessel.</returns>
+        public static QuaternionDbl GetAbsoluteRotation( FControlFrame frame, Vessel fallback )
         {
-            return frame == null
-                ? SceneReferenceFrameManager.ReferenceFrame.TransformRotation( fallback.ReferenceTransform.rotation )
-                : SceneReferenceFrameManager.ReferenceFrame.TransformRotation( frame._referenceTransform.rotation );
+            return (frame != null && frame._referenceTransform != null)
+                ? SceneReferenceFrameManager.ReferenceFrame.TransformRotation( frame._referenceTransform.rotation )
+                : SceneReferenceFrameManager.ReferenceFrame.TransformRotation( fallback.ReferenceTransform.rotation );
         }
 
         [MapsInheritingFrom( typeof( FControlFrame ) )]

@@ -11,9 +11,10 @@ namespace HSP.Vanilla.UI.Components
         {
             var physObj = ActiveObjectManager.ActiveObject == null
                 ? null
-                : ActiveObjectManager.ActiveObject.GetComponent<FreePhysicsObject>();
+                : ActiveObjectManager.ActiveObject.GetComponent<IReferenceFrameTransform>();
 
-            this.Text = physObj == null ? "" : $"{physObj.Velocity.magnitude:#0} m/s";
+#warning TODO - absolute is not very useful.
+            this.Text = physObj == null ? "" : $"{physObj.AbsoluteVelocity.magnitude:#0} m/s";
         }
 
         protected internal static T Create<T>( IUIElementContainer parent, UILayoutInfo layout ) where T : UITextReadout_Velocity

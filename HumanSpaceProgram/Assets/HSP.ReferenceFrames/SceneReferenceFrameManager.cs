@@ -20,6 +20,17 @@ namespace HSP.ReferenceFrames
 
         // "reference frame" is used to make the world space behave like the local space of said reference frame.
 
+        private static IReferenceFrameTransform _targetObject;
+        public static IReferenceFrameTransform TargetObject
+        {
+            get => _targetObject;
+            set
+            {
+                _targetObject = value;
+                TryFixActiveObjectOutOfBounds();
+            }
+        }
+
         /// <summary>
         /// Called when the scene's reference frame switches.
         /// </summary>
@@ -31,8 +42,20 @@ namespace HSP.ReferenceFrames
         /// </summary>
         public static IReferenceFrame ReferenceFrame
         {
-            get => instance._referenceFrame;
+#warning TODO - remove this getter - accessors should not return a modified reference frame. Use GetReferenceFrame.
+            //get => instance._referenceFrame;
+            get => instance._referenceFrame.AtUT( TimeManager.UT );
             set => instance._referenceFrame = value;
+        }
+
+        public static IReferenceFrame GetReferenceFrame()
+        {
+            return instance._referenceFrame.AtUT( TimeManager.UT );
+        }
+
+        public static IReferenceFrame GetReferenceFrameAtUT( double ut )
+        {
+            return instance._referenceFrame.AtUT( ut );
         }
 
         /// <summary>
@@ -93,7 +116,7 @@ namespace HSP.ReferenceFrames
         /// </summary>
         public static void TryFixActiveObjectOutOfBounds()
         {
-            if( ActiveObjectManager.ActiveObject == null )
+            if( TargetObject == null )
             {
                 return;
             }
@@ -106,13 +129,19 @@ namespace HSP.ReferenceFrames
 
                 ChangeSceneReferenceFrame( ReferenceFrame.Shift( scenePosition ) );
             }
-            IReferenceFrameTransform trans = ActiveObjectManager.ActiveObject.GetComponent<IReferenceFrameTransform>();
-            if( trans != null )
+            else
             {
-                Vector3 sceneVelocity = trans.Velocity;
-                if( sceneVelocity.magnitude > MaxRelativeVelocity )
+                IReferenceFrameTransform trans = ActiveObjectManager.ActiveObject.GetComponent<IReferenceFrameTransform>();
+                if( trans != null )
                 {
-                    //ChangeSceneReferenceFrame( new CenteredInertialReferenceFrame( ReferenceFrame.Position, (Vector3Dbl)sceneVelocity, Vector3Dbl.zero ) );
+                    Vector3 sceneVelocity = trans.Velocity;
+                    if( sceneVelocity.magnitude > MaxRelativeVelocity )
+                    {
+                        if( ReferenceFrame is CenteredReferenceFrame rf )
+                            ChangeSceneReferenceFrame( new CenteredInertialReferenceFrame( TimeManager.UT, rf.Position, (Vector3Dbl)sceneVelocity, Vector3Dbl.zero ) );
+                        else if( ReferenceFrame is CenteredInertialReferenceFrame rf2 )
+                            ChangeSceneReferenceFrame( new CenteredInertialReferenceFrame( TimeManager.UT, rf2.Position, (Vector3Dbl)sceneVelocity, Vector3Dbl.zero ) );
+                    }
                 }
             }
         }
@@ -126,17 +155,13 @@ namespace HSP.ReferenceFrames
 
         void Awake()
         {
-            ReferenceFrame = new CenteredReferenceFrame( Vector3Dbl.zero );
+            ReferenceFrame = new CenteredReferenceFrame( TimeManager.UT, Vector3Dbl.zero );
 
-            ChangeSceneReferenceFrame( new CenteredInertialReferenceFrame( Vector3Dbl.zero, new Vector3Dbl( 0, 25, 25 ).normalized * 500.0, Vector3Dbl.zero ) );
+            //ChangeSceneReferenceFrame( new CenteredInertialReferenceFrame( TimeManager.UT, Vector3Dbl.zero, new Vector3Dbl( 0, 25, 25 ).normalized * 50.0, Vector3Dbl.zero ) );
         }
 
         void FixedUpdate()
         {
-#warning TODO - non-rest reference frames need to be updated, and they will need to be continuous, not discrete. Able to be sampled at a given UT offset.
-            // to do this, non-rest reference frames need to know the UT at which they were created.
-            ReferenceFrame = ReferenceFrame.AddUT( TimeManager.FixedDeltaTime );
-
             TryFixActiveObjectOutOfBounds();
         }
     }

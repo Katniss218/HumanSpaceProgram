@@ -271,6 +271,8 @@ namespace HSP.Trajectories
 
 #warning TODO - celestial bodies need something that will replace the buildin parenting of colliders with 64-bit parents and update their scene position at all times (fixedupdate + update + lateupdate).
 
+#warning TODO - atmosphere renderer(s) need to be attached to a body and follow it.
+
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
             RecalculateAbsoluteValues( data.OldFrame );

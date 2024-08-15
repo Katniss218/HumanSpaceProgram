@@ -8,21 +8,24 @@ namespace HSP.ReferenceFrames
     /// </summary>
     public sealed class CenteredReferenceFrame : IReferenceFrame
     {
+        public double ReferenceUT { get; }
+
         public Vector3Dbl Position => _position;
 
         private readonly Vector3Dbl _position;
 
-        public CenteredReferenceFrame( Vector3Dbl center )
+        public CenteredReferenceFrame( double referenceUT, Vector3Dbl center )
         {
+            this.ReferenceUT = referenceUT;
             this._position = center;
         }
 
         public IReferenceFrame Shift( Vector3Dbl absolutePositionDelta )
         {
-            return new CenteredReferenceFrame( _position + absolutePositionDelta );
+            return new CenteredReferenceFrame( ReferenceUT, _position + absolutePositionDelta );
         }
 
-        public IReferenceFrame AddUT( double ut )
+        public IReferenceFrame AtUT( double ut )
         {
             return this; // Reference frames are immutable, so this is allowed.
         }

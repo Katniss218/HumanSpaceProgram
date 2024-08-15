@@ -19,6 +19,9 @@ namespace HSP.ReferenceFrames
         [SerializeField]
         private Transform _activeObject;
 #warning TODO - move this / split it off from the reference frame center object and player control.
+
+#warning TODO - add an interface for types that can be selected by the player? could be a vessel, but you could select part of the vessel to (to launch a specific sub-vessel or something).
+
         /// <summary>
         /// Gets or sets the object that is currently being 'controlled' or viewed by the player.
         /// </summary>

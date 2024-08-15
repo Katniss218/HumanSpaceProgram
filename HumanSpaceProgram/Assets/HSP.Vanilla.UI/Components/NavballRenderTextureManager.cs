@@ -95,7 +95,7 @@ namespace HSP.Vanilla.UI.Components
                 Vector3 gravity = -GravityUtils.GetNBodyGravityAcceleration( activeVessel.ReferenceFrameTransform.AbsolutePosition ).NormalizeToVector3();
                 forward = Vector3.ProjectOnPlane( forward, gravity );
                 NavballOrientation = Quaternion.LookRotation( forward, gravity );
-                VesselOrientation = (Quaternion)FControlFrame.GetAIRFRotation( FControlFrame.VesselControlFrame, activeVessel );
+                VesselOrientation = (Quaternion)FControlFrame.GetAbsoluteRotation( FControlFrame.VesselControlFrame, activeVessel );
             }
         }
     }

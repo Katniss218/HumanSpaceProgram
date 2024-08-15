@@ -10,6 +10,8 @@ namespace HSP.ReferenceFrames
     /// </summary>
     public sealed class OrientedNonInertialReferenceFrame : INonInertialReferenceFrame
     {
+        public double ReferenceUT { get; }
+
         public Vector3Dbl Position => _position;
         public QuaternionDbl Rotation => _rotation;
         public Vector3Dbl Velocity => _velocity;
@@ -29,8 +31,9 @@ namespace HSP.ReferenceFrames
         private readonly Vector3Dbl _acceleration;
         private readonly Vector3Dbl _angularAcceleration;
 
-        public OrientedNonInertialReferenceFrame( Vector3Dbl center, Quaternion rotation, Vector3Dbl velocity, Vector3Dbl angularVelocity, Vector3Dbl acceleration, Vector3Dbl angularAcceleration )
+        public OrientedNonInertialReferenceFrame( double referenceUT, Vector3Dbl center, Quaternion rotation, Vector3Dbl velocity, Vector3Dbl angularVelocity, Vector3Dbl acceleration, Vector3Dbl angularAcceleration )
         {
+            this.ReferenceUT = referenceUT;
             this._position = center;
             this._rotation = rotation;
             this._inverseRotation = QuaternionDbl.Inverse( rotation );
@@ -49,7 +52,7 @@ namespace HSP.ReferenceFrames
             throw new NotImplementedException();
         }
 
-        public IReferenceFrame AddUT( double ut )
+        public IReferenceFrame AtUT( double ut )
         {
             throw new NotImplementedException();
         }

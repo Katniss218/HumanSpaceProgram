@@ -28,12 +28,14 @@ namespace HSP.ReferenceFrames
         // - if the frame is centered on the active vessel, then "world" space in Unity needs to be transformed into local space for that frame.
         // - - This can be done by applying forces/changing positions manually.
 
+        double ReferenceUT { get; }
+
         /// <summary>
         /// Returns a new reference frame that is shifted (translated) by a given distance in the Absolute Inertial Reference Frame (AIRF) space.
         /// </summary>
         IReferenceFrame Shift( Vector3Dbl absolutePositionDelta );
 
-        IReferenceFrame AddUT( double ut );
+        IReferenceFrame AtUT( double ut );
 
         /// <summary>
         /// Transforms a point in the frame's local space to the Absolute (AIRF) space.

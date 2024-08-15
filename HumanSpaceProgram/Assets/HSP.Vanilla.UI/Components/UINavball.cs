@@ -53,7 +53,7 @@ namespace HSP.Vanilla.UI.Components
                 if( activeVessel.ReferenceFrameTransform == null )
                     return;
 
-                Quaternion airfRotation = (Quaternion)FControlFrame.GetAIRFRotation( FControlFrame.VesselControlFrame, activeVessel );
+                Quaternion airfRotation = (Quaternion)FControlFrame.GetAbsoluteRotation( FControlFrame.VesselControlFrame, activeVessel );
                 Matrix4x4 airfToLocalMatrix = Matrix4x4.Rotate( airfRotation ).inverse;
 
                 Vector3Dbl airfVelocity = activeVessel.ReferenceFrameTransform.AbsoluteVelocity;

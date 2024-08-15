@@ -8,6 +8,8 @@ namespace HSP.ReferenceFrames
     /// </summary>
     public sealed class CenteredInertialReferenceFrame : IReferenceFrame
     {
+        public double ReferenceUT { get; }
+
         public Vector3Dbl Position => _position;
         public Vector3Dbl Velocity => _velocity;
         public Vector3Dbl AngularVelocity => _angularVelocity;
@@ -18,8 +20,9 @@ namespace HSP.ReferenceFrames
         private readonly Vector3Dbl _velocity;
         private readonly Vector3Dbl _angularVelocity;
 
-        public CenteredInertialReferenceFrame( Vector3Dbl center, Vector3Dbl velocity, Vector3Dbl angularVelocity )
+        public CenteredInertialReferenceFrame( double referenceUT, Vector3Dbl center, Vector3Dbl velocity, Vector3Dbl angularVelocity )
         {
+            this.ReferenceUT = referenceUT;
             this._position = center;
 
             this._velocity = velocity;
@@ -28,14 +31,24 @@ namespace HSP.ReferenceFrames
 
         public IReferenceFrame Shift( Vector3Dbl absolutePositionDelta )
         {
-            return new CenteredInertialReferenceFrame( _position + absolutePositionDelta, _velocity, _angularVelocity );
+            return new CenteredInertialReferenceFrame( ReferenceUT, _position + absolutePositionDelta, _velocity, _angularVelocity );
         }
 
-        public IReferenceFrame AddUT( double ut )
+        public IReferenceFrame AtUT( double ut )
         {
-            var newPos = _position + (_velocity * ut);
-            var newRot = /* 0      + */ QuaternionDbl.AngleAxis( _angularVelocity.magnitude * ut, _angularVelocity );
-            return new OrientedInertialReferenceFrame( newPos, newRot, _velocity, _angularVelocity );
+            double deltaTime = ut - ReferenceUT;
+
+            var newPos = _position + (_velocity * deltaTime);
+            double angularVelocityMagnitude = _angularVelocity.magnitude;
+            if( angularVelocityMagnitude == 0 )
+            {
+                return new CenteredInertialReferenceFrame( ut, newPos, _velocity, _angularVelocity );
+            }
+            else
+            {
+                var newRot = /* 0      + */ QuaternionDbl.AngleAxis( _angularVelocity.magnitude * deltaTime, _angularVelocity );
+                return new OrientedInertialReferenceFrame( ut, newPos, newRot, _velocity, _angularVelocity );
+            }
         }
 
 

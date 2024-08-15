@@ -9,6 +9,8 @@ namespace HSP.ReferenceFrames
     /// </summary>
     public sealed class OrientedReferenceFrame : IReferenceFrame
     {
+        public double ReferenceUT { get; }
+
         public Vector3Dbl Position => _position;
         public QuaternionDbl Rotation => _rotation;
 
@@ -16,8 +18,9 @@ namespace HSP.ReferenceFrames
         private readonly QuaternionDbl _rotation;
         private readonly QuaternionDbl _inverseRotation;
 
-        public OrientedReferenceFrame( Vector3Dbl center, QuaternionDbl rotation )
+        public OrientedReferenceFrame( double referenceUT, Vector3Dbl center, QuaternionDbl rotation )
         {
+            this.ReferenceUT = referenceUT;
             this._position = center;
             this._rotation = rotation;
             this._inverseRotation = QuaternionDbl.Inverse( rotation );
@@ -25,10 +28,10 @@ namespace HSP.ReferenceFrames
 
         public IReferenceFrame Shift( Vector3Dbl absolutePositionDelta )
         {
-            return new OrientedReferenceFrame( this._position + absolutePositionDelta, this._rotation );
+            return new OrientedReferenceFrame( ReferenceUT, this._position + absolutePositionDelta, this._rotation );
         }
 
-        public IReferenceFrame AddUT( double ut )
+        public IReferenceFrame AtUT( double ut )
         {
             return this; // Reference frames are immutable, so this is allowed.
         }

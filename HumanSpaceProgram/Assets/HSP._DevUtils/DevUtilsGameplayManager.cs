@@ -68,6 +68,7 @@ namespace HSP._DevUtils
 
             var v = CreateVessel( launchSite );
             ActiveObjectManager.ActiveObject = v.RootPart.GetVessel().gameObject.transform;
+            SceneReferenceFrameManager.TargetObject = v.RootPart.GetVessel().ReferenceFrameTransform;
             vessel = v;
         }
 
