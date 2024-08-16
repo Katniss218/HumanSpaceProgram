@@ -5,7 +5,7 @@ namespace HSP.ReferenceFrames
 {
     /// <summary>
     /// A reference frame centered on a given point, and with a given orientation. <br/>
-    /// The inertial terms are instantanous and constant. This class is immutable.
+    /// The inertial terms are constant in time. This class is immutable.
     /// </summary>
     public sealed class OrientedInertialReferenceFrame : IReferenceFrame
     {

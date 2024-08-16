@@ -4,6 +4,7 @@ using HSP.ReferenceFrames;
 using HSP.Time;
 using HSP.Vanilla.Scenes.GameplayScene.Cameras;
 using HSP.Vessels;
+using System.Linq;
 using UnityEngine;
 
 namespace HSP.Vanilla.Scenes.GameplayScene
@@ -84,6 +85,15 @@ namespace HSP.Vanilla.Scenes.GameplayScene
             atmosphereRenderer.light = GameObject.Find( "CBLight" ).GetComponent<Light>();
             atmosphereRenderer.ColorRenderTextureGetter = () => GameplaySceneCameraManager.ColorRenderTexture;
             atmosphereRenderer.DepthRenderTextureGetter = () => GameplaySceneDepthBufferCombiner.CombinedDepthRenderTexture;
+
+        }
+
+        [HSPEventListener( HSPEvent_ON_CELESTIAL_BODY_CREATED.ID, ADD_ATMOSPHERE_RENDERER )]
+        private static void SetBody( CelestialBody body )
+        {
+#warning TODO - configurable bodies need their own atmospheres. sorted by distance (*hopefully* bodies won't intersect each other so it's enough to draw atmos farthest to nearest).
+            if( body.ID == "main" )
+                AtmosphereRenderer.Body = CelestialBodyManager.CelestialBodies.First();
         }
     }
 }

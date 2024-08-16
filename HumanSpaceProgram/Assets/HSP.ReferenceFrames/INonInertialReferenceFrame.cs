@@ -2,6 +2,9 @@
 
 namespace HSP.ReferenceFrames
 {
+    /// <summary>
+    /// Represents an arbitrary non-inertial (i.e. accelerating) reference frame.
+    /// </summary>
     public interface INonInertialReferenceFrame : IReferenceFrame
     {
         /// <summary>

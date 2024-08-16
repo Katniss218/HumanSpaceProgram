@@ -6,7 +6,7 @@ namespace HSP.ReferenceFrames
 {
     /// <summary>
     /// A reference frame aligned with the AIRF frame, and shifted (offset) by a set distance. <br/>
-    /// The inertial and non-inertial terms are instantanous and constant. This class is immutable.
+    /// The inertial and non-inertial terms are constant in time. This class is immutable.
     /// </summary>
     public sealed class OrientedNonInertialReferenceFrame : INonInertialReferenceFrame
     {
