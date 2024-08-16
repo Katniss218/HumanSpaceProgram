@@ -1,4 +1,5 @@
-﻿using HSP.CelestialBodies;
+﻿using Assets.HSP.Vanilla;
+using HSP.CelestialBodies;
 using HSP.CelestialBodies.Surfaces;
 using HSP.Content;
 using HSP.Content.Vessels.Serialization;
@@ -67,7 +68,7 @@ namespace HSP._DevUtils
             launchSite.RootPart = root.transform;
 
             var v = CreateVessel( launchSite );
-            ActiveObjectManager.ActiveObject = v.RootPart.GetVessel().gameObject.transform;
+            ActiveVesselManager.ActiveObject = v.RootPart.GetVessel().gameObject.transform;
             SceneReferenceFrameManager.TargetObject = v.RootPart.GetVessel().ReferenceFrameTransform;
             vessel = v;
         }
@@ -162,7 +163,7 @@ namespace HSP._DevUtils
                     Author = "Katniss"
                 };
                 vm.SaveToDisk();
-                var data = SerializationUnit.Serialize( ActiveObjectManager.ActiveObject.GetVessel().RootPart.gameObject );
+                var data = SerializationUnit.Serialize( ActiveVesselManager.ActiveObject.GetVessel().RootPart.gameObject );
                 handler = new JsonSerializedDataHandler( partDir + "/gameobjects.json" );
                 handler.Write( data );
 
@@ -375,7 +376,7 @@ namespace HSP._DevUtils
             ((SequenceAction)seq.Sequence.Elements[1].Actions[1]).OnInvoke.TryConnect( t2Sep.Separate );
 
             FControlFrame fc = capsule.gameObject.GetComponent<FControlFrame>();
-            FControlFrame.VesselControlFrame = fc;
+            SelectedControlFrameManager.ControlFrame = fc;
 
             return v;
         }

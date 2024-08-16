@@ -9,11 +9,11 @@ namespace HSP.Vanilla.UI.Components
     {
         void LateUpdate()
         {
-            var physObj = ActiveObjectManager.ActiveObject == null
+            var physObj = ActiveVesselManager.ActiveObject == null
                 ? null
-                : ActiveObjectManager.ActiveObject.GetComponent<IReferenceFrameTransform>();
+                : ActiveVesselManager.ActiveObject.GetComponent<IReferenceFrameTransform>();
 
-#warning TODO - absolute is not very useful.
+#warning TODO - absolute is not very useful. Also, have a selarate field for what should be tracked and change it in the event. that would be better.
             this.Text = physObj == null ? "" : $"{physObj.AbsoluteVelocity.magnitude:#0} m/s";
         }
 

@@ -18,9 +18,9 @@ namespace HSP.Vanilla.Scenes.GameplayScene
             string savePath = SaveMetadata.GetRootDirectory( e.timelineId, e.saveId );
             Directory.CreateDirectory( savePath );
 
-            JsonSerializedDataHandler _vesselsDataHandler = new JsonSerializedDataHandler( Path.Combine( savePath, $"{nameof( ActiveObjectManager )}.json" ) );
+            JsonSerializedDataHandler _vesselsDataHandler = new JsonSerializedDataHandler( Path.Combine( savePath, $"{nameof( ActiveVesselManager )}.json" ) );
 
-            var data = SerializationUnit.Serialize( UnityEngine.Object.FindObjectOfType<ActiveObjectManager>(), TimelineManager.RefStore );
+            var data = SerializationUnit.Serialize( UnityEngine.Object.FindObjectOfType<ActiveVesselManager>(), TimelineManager.RefStore );
             _vesselsDataHandler.Write( data );
         }
 
@@ -30,10 +30,10 @@ namespace HSP.Vanilla.Scenes.GameplayScene
             string savePath = SaveMetadata.GetRootDirectory( e.timelineId, e.saveId );
             Directory.CreateDirectory( savePath );
 
-            JsonSerializedDataHandler _vesselsDataHandler = new JsonSerializedDataHandler( Path.Combine( savePath, $"{nameof( ActiveObjectManager )}.json" ) );
+            JsonSerializedDataHandler _vesselsDataHandler = new JsonSerializedDataHandler( Path.Combine( savePath, $"{nameof( ActiveVesselManager )}.json" ) );
 
             var data = _vesselsDataHandler.Read();
-            SerializationUnit.Populate( UnityEngine.Object.FindObjectOfType<ActiveObjectManager>(), data, TimelineManager.RefStore );
+            SerializationUnit.Populate( UnityEngine.Object.FindObjectOfType<ActiveVesselManager>(), data, TimelineManager.RefStore );
         }
     }
 }

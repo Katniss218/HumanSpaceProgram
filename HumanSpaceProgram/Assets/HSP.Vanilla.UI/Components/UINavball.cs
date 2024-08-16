@@ -1,4 +1,5 @@
-﻿using HSP.CelestialBodies;
+﻿using Assets.HSP.Vanilla;
+using HSP.CelestialBodies;
 using HSP.ReferenceFrames;
 using HSP.Trajectories;
 using HSP.Vanilla.Components;
@@ -46,14 +47,14 @@ namespace HSP.Vanilla.UI.Components
 
         void LateUpdate()
         {
-            if( ActiveObjectManager.ActiveObject != null )
+            if( ActiveVesselManager.ActiveObject != null )
             {
-                Vessel activeVessel = ActiveObjectManager.ActiveObject.GetVessel();
+                Vessel activeVessel = ActiveVesselManager.ActiveObject.GetVessel();
 
                 if( activeVessel.ReferenceFrameTransform == null )
                     return;
 
-                Quaternion airfRotation = (Quaternion)FControlFrame.GetAbsoluteRotation( FControlFrame.VesselControlFrame, activeVessel );
+                Quaternion airfRotation = (Quaternion)SelectedControlFrameManager.GetAbsoluteRotation( fallback: activeVessel.ReferenceTransform );
                 Matrix4x4 airfToLocalMatrix = Matrix4x4.Rotate( airfRotation ).inverse;
 
                 Vector3Dbl airfVelocity = activeVessel.ReferenceFrameTransform.AbsoluteVelocity;

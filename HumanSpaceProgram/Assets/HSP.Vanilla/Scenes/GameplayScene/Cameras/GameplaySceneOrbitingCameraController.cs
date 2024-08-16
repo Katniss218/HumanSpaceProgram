@@ -83,10 +83,10 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
         {
             if( ReferenceObject == null )
             {
-                if( ActiveObjectManager.ActiveObject == null )
+                if( ActiveVesselManager.ActiveObject == null )
                     return;
 
-                ReferenceObject = ActiveObjectManager.ActiveObject;
+                ReferenceObject = ActiveVesselManager.ActiveObject;
             }
 
             SyncZoomDist();
@@ -151,10 +151,10 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
         [HSPEventListener( HSPEvent_AFTER_ACTIVE_OBJECT_CHANGED.ID, SNAP_CAMERA_TO_ACTIVE_OBJECT )]
         private static void SnapToActiveObject( object e )
         {
-            if( ActiveObjectManager.ActiveObject == null )
+            if( ActiveVesselManager.ActiveObject == null )
                 instance.ReferenceObject = null;
             else
-                instance.ReferenceObject = ActiveObjectManager.ActiveObject;
+                instance.ReferenceObject = ActiveVesselManager.ActiveObject;
 
             instance.transform.rotation = Quaternion.LookRotation( instance.transform.forward, instance.GetUpDir() );
         }

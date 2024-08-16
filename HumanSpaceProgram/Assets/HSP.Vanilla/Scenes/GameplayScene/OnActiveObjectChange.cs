@@ -1,3 +1,4 @@
+using Assets.HSP.Vanilla;
 using HSP.ReferenceFrames;
 using UnityEngine;
 
@@ -10,7 +11,10 @@ namespace HSP.Vanilla.Scenes.GameplayScene
         [HSPEventListener( HSPEvent_AFTER_ACTIVE_OBJECT_CHANGED.ID, TRY_SET_SCENE_REFERENCE_FRAME )]
         private static void OnActiveObjectChange()
         {
-            SceneReferenceFrameManager.TryFixActiveObjectOutOfBounds();
+            SceneReferenceFrameManager.TargetObject = ActiveVesselManager.ActiveVessel.ReferenceFrameTransform;
+
+#warning TODO - set to the vessel's default frame or something (don't use the null value inside when a vessel is selected).
+            SelectedControlFrameManager.ControlFrame = null;
         }
     }
 }

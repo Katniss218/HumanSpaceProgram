@@ -24,7 +24,7 @@ namespace HSP.Vanilla.UI.Components
                 _sequencerPanel.Destroy();
             }
 
-            if( ActiveObjectManager.ActiveObject != null )
+            if( ActiveVesselManager.ActiveObject != null )
             {
                 _sequencerPanel = canvas.AddSequencerPanel( new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (50, 100) ) );
             }

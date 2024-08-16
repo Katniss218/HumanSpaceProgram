@@ -9,9 +9,9 @@ namespace HSP.Vanilla.UI.Components
     {
         void LateUpdate()
         {
-            var physObj = ActiveObjectManager.ActiveObject == null
+            var physObj = ActiveVesselManager.ActiveObject == null
                 ? null
-                : ActiveObjectManager.ActiveObject.GetComponent<IReferenceFrameTransform>();
+                : ActiveVesselManager.ActiveObject.GetComponent<IReferenceFrameTransform>();
 
 #warning TODO - absolute is not very useful.
             this.Text = physObj == null ? "" : $"Acceleration: {physObj.AbsoluteAcceleration.magnitude:#0.0} m/s^2";

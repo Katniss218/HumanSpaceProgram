@@ -20,13 +20,13 @@ namespace HSP.ReferenceFrames
 
         // "reference frame" is used to make the world space behave like the local space of said reference frame.
 
-        private static IReferenceFrameTransform _targetObject;
+        private IReferenceFrameTransform _targetObject;
         public static IReferenceFrameTransform TargetObject
         {
-            get => _targetObject;
+            get => instance._targetObject;
             set
             {
-                _targetObject = value;
+                instance._targetObject = value;
                 TryFixActiveObjectOutOfBounds();
             }
         }
@@ -108,8 +108,8 @@ namespace HSP.ReferenceFrames
         /// If the active vessel moves outside of this range, an origin shift will happen. <br/>
         /// Larger values of MaxFloatingOriginRange can make the vessel's parts appear spread apart (because of limited number of possible world positions to map to).
         /// </remarks>
-        public static float MaxRelativePosition { get; set; } = 512.0f;
-        public static float MaxRelativeVelocity { get; set; } = 32.0f;
+        public static float MaxRelativePosition { get; set; } = 1024.0f;
+        public static float MaxRelativeVelocity { get; set; } = 64.0f;
 
         /// <summary>
         /// Checks whether the current active vessel is too far away from the scene's origin, and performs an origin shift if it is.
@@ -121,28 +121,15 @@ namespace HSP.ReferenceFrames
                 return;
             }
 
-#warning TODO - this needs to be a IReferenceFrameTransform, not active object. Which is related to the fact it should be split off.
-            Vector3 scenePosition = ActiveObjectManager.ActiveObject.position;
-            if( scenePosition.magnitude > MaxRelativePosition )
+            Vector3 scenePosition = TargetObject.Position;
+            Vector3 sceneVelocity = TargetObject.Velocity;
+            if( sceneVelocity.magnitude > MaxRelativeVelocity || scenePosition.magnitude > MaxRelativePosition )
             {
-#warning TODO - we might want to control the parameters more directly. Also, needs to switch based on object velocity as well (direction and magnitude) relative to frame velocity.
-
-                ChangeSceneReferenceFrame( ReferenceFrame.Shift( scenePosition ) );
-            }
-            else
-            {
-                IReferenceFrameTransform trans = ActiveObjectManager.ActiveObject.GetComponent<IReferenceFrameTransform>();
-                if( trans != null )
-                {
-                    Vector3 sceneVelocity = trans.Velocity;
-                    if( sceneVelocity.magnitude > MaxRelativeVelocity )
-                    {
-                        if( ReferenceFrame is CenteredReferenceFrame rf )
-                            ChangeSceneReferenceFrame( new CenteredInertialReferenceFrame( TimeManager.UT, rf.Position, (Vector3Dbl)sceneVelocity, Vector3Dbl.zero ) );
-                        else if( ReferenceFrame is CenteredInertialReferenceFrame rf2 )
-                            ChangeSceneReferenceFrame( new CenteredInertialReferenceFrame( TimeManager.UT, rf2.Position, (Vector3Dbl)sceneVelocity, Vector3Dbl.zero ) );
-                    }
-                }
+                // Zero both position and velocity at the same time - most efficient in terms of number of frame switches.
+                // Future available optimizations:
+                // - non-inertial frames (include acceleration).
+                // - switch the position to ahead of where the object is accelerating instead of the center of the object.
+                ChangeSceneReferenceFrame( new CenteredInertialReferenceFrame( TimeManager.UT, TargetObject.AbsolutePosition, TargetObject.AbsoluteVelocity, Vector3Dbl.zero ) );
             }
         }
 
@@ -156,8 +143,6 @@ namespace HSP.ReferenceFrames
         void Awake()
         {
             ReferenceFrame = new CenteredReferenceFrame( TimeManager.UT, Vector3Dbl.zero );
-
-            //ChangeSceneReferenceFrame( new CenteredInertialReferenceFrame( TimeManager.UT, Vector3Dbl.zero, new Vector3Dbl( 0, 25, 25 ).normalized * 50.0, Vector3Dbl.zero ) );
         }
 
         void FixedUpdate()

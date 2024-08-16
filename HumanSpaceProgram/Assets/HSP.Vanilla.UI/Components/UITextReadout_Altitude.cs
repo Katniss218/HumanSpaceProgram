@@ -10,9 +10,9 @@ namespace HSP.Vanilla.UI.Components
     {
         void LateUpdate()
         {
-            var activeObj = ActiveObjectManager.ActiveObject == null
+            var activeObj = ActiveVesselManager.ActiveObject == null
                 ? null
-                : ActiveObjectManager.ActiveObject.GetComponent<IReferenceFrameTransform>();
+                : ActiveVesselManager.ActiveObject.GetComponent<IReferenceFrameTransform>();
 
             if( activeObj == null )
             {

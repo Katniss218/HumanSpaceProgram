@@ -58,7 +58,7 @@ namespace HSP.Vanilla.UI.Components
         {
             T uiSequencerPanel = UIPanel.Create<T>( parent, layout, null );
 
-            uiSequencerPanel._activeVessel = ActiveObjectManager.ActiveObject.GetVessel();
+            uiSequencerPanel._activeVessel = ActiveVesselManager.ActiveObject.GetVessel();
 
             uiSequencerPanel.LayoutDriver = new VerticalLayoutDriver()
             {

@@ -14,7 +14,7 @@ namespace HSP.Vanilla.UI.Vessels
 
         void OnClick()
         {
-            ActiveObjectManager.ActiveObject = Vessel.gameObject.transform;
+            ActiveVesselManager.ActiveObject = Vessel.gameObject.transform;
         }
 
         void LateUpdate()
