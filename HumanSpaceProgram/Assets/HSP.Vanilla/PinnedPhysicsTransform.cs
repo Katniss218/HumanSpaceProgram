@@ -5,14 +5,14 @@ using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace HSP.Trajectories
+namespace HSP.Vanilla
 {
     /// <remarks>
-    /// A physobj that is pinned to a fixed pos/rot in the local coordinate system of a celestial body.
+    /// A physics transform that is pinned to a fixed pos/rot in the local coordinate system of a celestial body.
     /// </remarks>
 	[RequireComponent( typeof( Rigidbody ) )]
     [DisallowMultipleComponent]
-    public class PinnedPhysicsObject : MonoBehaviour, IReferenceFrameTransform, IPhysicsTransform
+    public class PinnedPhysicsTransform : MonoBehaviour, IReferenceFrameTransform, IPhysicsTransform
     {
         CelestialBody _referenceBody = null;
         Vector3Dbl _referencePosition = Vector3.zero;
@@ -198,7 +198,7 @@ namespace HSP.Trajectories
         {
             if( this.HasComponentOtherThan<IPhysicsTransform>( this ) )
             {
-                Debug.LogWarning( $"Tried to add a {nameof( PinnedPhysicsObject )} to a game object that already has a {nameof( IPhysicsTransform )}. This is not allowed. Remove the previous physics object first." );
+                Debug.LogWarning( $"Tried to add a {nameof( PinnedPhysicsTransform )} to a game object that already has a {nameof( IPhysicsTransform )}. This is not allowed. Remove the previous physics object first." );
                 Destroy( this );
                 return;
             }
@@ -266,19 +266,19 @@ namespace HSP.Trajectories
             IsColliding = false;
         }
 
-        [MapsInheritingFrom( typeof( PinnedPhysicsObject ) )]
+        [MapsInheritingFrom( typeof( PinnedPhysicsTransform ) )]
         public static SerializationMapping PinnedPhysicsObjectMapping()
         {
-            return new MemberwiseSerializationMapping<PinnedPhysicsObject>()
+            return new MemberwiseSerializationMapping<PinnedPhysicsTransform>()
             {
-                ("mass", new Member<PinnedPhysicsObject, float>( o => o.Mass )),
-                ("local_center_of_mass", new Member<PinnedPhysicsObject, Vector3>( o => o.LocalCenterOfMass )),
+                ("mass", new Member<PinnedPhysicsTransform, float>( o => o.Mass )),
+                ("local_center_of_mass", new Member<PinnedPhysicsTransform, Vector3>( o => o.LocalCenterOfMass )),
 
-                ("DO_NOT_TOUCH", new Member<PinnedPhysicsObject, bool>( o => true, (o, value) => o._rb.isKinematic = true)), // TODO - isKinematic member is a hack.
+                ("DO_NOT_TOUCH", new Member<PinnedPhysicsTransform, bool>( o => true, (o, value) => o._rb.isKinematic = true)), // TODO - isKinematic member is a hack.
 
-                ("reference_body", new Member<PinnedPhysicsObject, string>( o => o.ReferenceBody == null ? null : o.ReferenceBody.ID, (o, value) => o.ReferenceBody = value == null ? null : CelestialBodyManager.Get( value ) )),
-                ("reference_position", new Member<PinnedPhysicsObject, Vector3Dbl>( o => o.ReferencePosition )),
-                ("reference_rotation", new Member<PinnedPhysicsObject, QuaternionDbl>( o => o.ReferenceRotation ))
+                ("reference_body", new Member<PinnedPhysicsTransform, string>( o => o.ReferenceBody == null ? null : o.ReferenceBody.ID, (o, value) => o.ReferenceBody = value == null ? null : CelestialBodyManager.Get( value ) )),
+                ("reference_position", new Member<PinnedPhysicsTransform, Vector3Dbl>( o => o.ReferencePosition )),
+                ("reference_rotation", new Member<PinnedPhysicsTransform, QuaternionDbl>( o => o.ReferenceRotation ))
             };
         }
     }

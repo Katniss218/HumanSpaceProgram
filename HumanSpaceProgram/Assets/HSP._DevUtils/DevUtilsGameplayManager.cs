@@ -1,15 +1,13 @@
-﻿using Assets.HSP.Vanilla;
-using HSP.CelestialBodies;
+﻿using HSP.CelestialBodies;
 using HSP.CelestialBodies.Surfaces;
 using HSP.Content;
 using HSP.Content.Vessels.Serialization;
 using HSP.ReferenceFrames;
 using HSP.ResourceFlow;
 using HSP.Timelines;
-using HSP.Trajectories;
+using HSP.Vanilla;
 using HSP.Vanilla.Components;
 using HSP.Vanilla.Scenes.AlwaysLoadedScene;
-using HSP.Vanilla.Scenes.DesignScene;
 using HSP.Vessels;
 using System;
 using System.Collections.Generic;
@@ -88,9 +86,9 @@ namespace HSP._DevUtils
 
             Vector3 bottomBoundPos = v2.GetBottomPosition();
             Vector3Dbl closestBoundAirf = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( bottomBoundPos );
-            Vector3Dbl closestBoundToVesselAirf = v2.AIRFPosition - closestBoundAirf;
+            Vector3Dbl closestBoundToVesselAirf = v2.ReferenceFrameTransform.AbsolutePosition - closestBoundAirf;
             Vector3Dbl airfPos = spawnerPosAirf + closestBoundToVesselAirf;
-            v2.AIRFPosition = airfPos;
+            v2.ReferenceFrameTransform.AbsolutePosition = airfPos;
             return v2;
         }
 
@@ -138,9 +136,9 @@ namespace HSP._DevUtils
 
                 Vector3 bottomBoundPos = v2.GetBottomPosition();
                 Vector3Dbl closestBoundAirf = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( bottomBoundPos );
-                Vector3Dbl closestBoundToVesselAirf = v2.AIRFPosition - closestBoundAirf;
+                Vector3Dbl closestBoundToVesselAirf = v2.ReferenceFrameTransform.AbsolutePosition - closestBoundAirf;
                 Vector3Dbl airfPos = spawnerPosAirf + closestBoundToVesselAirf;
-                v2.AIRFPosition = airfPos;
+                v2.ReferenceFrameTransform.AbsolutePosition = airfPos;
             }
             if( UnityEngine.Input.GetKeyDown( KeyCode.F5 ) )
             {

@@ -1,7 +1,4 @@
-﻿using Assets.HSP.Vanilla;
-using HSP.CelestialBodies;
-using HSP.ReferenceFrames;
-using HSP.Vanilla.Components;
+﻿using HSP.CelestialBodies;
 using HSP.Vessels;
 using System.Linq;
 using UnityEngine;

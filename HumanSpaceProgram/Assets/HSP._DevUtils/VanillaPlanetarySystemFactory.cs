@@ -15,7 +15,7 @@ namespace HSP._DevUtils
         {
             CelestialBody cb = new CelestialBodyFactory(id).Create( airfPos, airfRot );
             LODQuadSphere lqs = cb.gameObject.AddComponent<LODQuadSphere>();
-            lqs.PoIGetter = () => VesselManager.LoadedVessels.Select( v => v.AIRFPosition );
+            lqs.PoIGetter = () => VesselManager.LoadedVessels.Select( v => v.ReferenceFrameTransform.AbsolutePosition );
             return cb;
         }
 

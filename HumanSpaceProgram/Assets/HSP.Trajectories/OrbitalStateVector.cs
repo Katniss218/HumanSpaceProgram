@@ -9,7 +9,11 @@ namespace HSP.Trajectories
     /// </summary>
     public struct OrbitalStateVector
     {
+        /// <summary>
+        /// The reference time.
+        /// </summary>
         public double UT { get; }
+
         public Vector3Dbl Position { get; }
         public Vector3Dbl Velocity { get; }
         public Vector3 GravityDir { get; }
@@ -22,6 +26,9 @@ namespace HSP.Trajectories
             this.GravityDir = gravityDir.normalized;
         }
 
+        /// <summary>
+        /// Calculates the orbital frame of this state vector.
+        /// </summary>
         public OrbitalFrame GetOrbitalFrame()
         {
             Vector3 forward = Velocity.NormalizeToVector3();
@@ -29,6 +36,9 @@ namespace HSP.Trajectories
             return new OrbitalFrame( forward, up );
         }
 
+        /// <summary>
+        /// Calculates the reference frame of this state vector.
+        /// </summary>
         public IReferenceFrame GetReferenceFrame()
         {
             Vector3 forward = Velocity.NormalizeToVector3();

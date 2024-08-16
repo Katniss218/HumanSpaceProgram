@@ -1,5 +1,4 @@
 using HSP.CelestialBodies;
-using HSP.Trajectories;
 
 namespace HSP.Vanilla
 {
@@ -13,7 +12,7 @@ namespace HSP.Vanilla
         {
             //if( SceneLoader.IsSceneLoaded( GameplaySceneManager.SCENE_NAME ) )
             //{
-            var comp = cb.gameObject.AddComponent<FixedPhysicsObject>();
+            var comp = cb.gameObject.AddComponent<FixedPhysicsTransform>();
             cb.PhysicsTransform = comp;
             cb.ReferenceFrameTransform = comp;
             //}

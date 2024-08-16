@@ -94,7 +94,6 @@ namespace HSP.CelestialBodies
             }
         }
 
-#warning TODO - add inertial and noninertial equivalents - requires trajectories and following them for correct conversion of values. requires caching/computation of the points along the trajectory.
         /// <summary>
         /// Constructs the reference frame centered on this body, with axes aligned with the AIRF frame.
         /// </summary>

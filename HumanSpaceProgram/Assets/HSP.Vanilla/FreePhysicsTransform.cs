@@ -1,15 +1,17 @@
-﻿using HSP.CelestialBodies;
-using HSP.ReferenceFrames;
+﻿using HSP.ReferenceFrames;
 using HSP.Time;
 using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace HSP.Trajectories
+namespace HSP.Vanilla
 {
+    /// <summary>
+    /// A physics transform that is free to move and collide with the environment.
+    /// </summary>
     [RequireComponent( typeof( Rigidbody ) )]
     [DisallowMultipleComponent]
-    public class FreePhysicsObject : MonoBehaviour, IReferenceFrameTransform, IPhysicsTransform
+    public class FreePhysicsTransform : MonoBehaviour, IReferenceFrameTransform, IPhysicsTransform
     {
         public Vector3 Position
         {
@@ -205,7 +207,7 @@ namespace HSP.Trajectories
         {
             if( this.HasComponentOtherThan<IPhysicsTransform>( this ) )
             {
-                Debug.LogWarning( $"Tried to add a {nameof( FreePhysicsObject )} to a game object that already has a {nameof( IPhysicsTransform )}. This is not allowed. Remove the previous physics object first." );
+                Debug.LogWarning( $"Tried to add a {nameof( FreePhysicsTransform )} to a game object that already has a {nameof( IPhysicsTransform )}. This is not allowed. Remove the previous physics object first." );
                 Destroy( this );
                 return;
             }
@@ -220,10 +222,6 @@ namespace HSP.Trajectories
 
         void FixedUpdate()
         {
-#warning TODO - gravity code doesn't belong here.
-            Vector3Dbl airfGravityForce = GravityUtils.GetNBodyGravityForce( this.AbsolutePosition, this.Mass );
-            this.AddForce( (Vector3)airfGravityForce );
-
             if( SceneReferenceFrameManager.ReferenceFrame is INonInertialReferenceFrame frame )
             {
                 Vector3Dbl localPos = frame.InverseTransformPosition( this.AbsolutePosition );
@@ -312,20 +310,20 @@ namespace HSP.Trajectories
             IsColliding = false;
         }
 
-        [MapsInheritingFrom( typeof( FreePhysicsObject ) )]
+        [MapsInheritingFrom( typeof( FreePhysicsTransform ) )]
         public static SerializationMapping FreePhysicsObjectMapping()
         {
-            return new MemberwiseSerializationMapping<FreePhysicsObject>()
+            return new MemberwiseSerializationMapping<FreePhysicsTransform>()
             {
-                ("mass", new Member<FreePhysicsObject, float>( o => o.Mass )),
-                ("local_center_of_mass", new Member<FreePhysicsObject, Vector3>( o => o.LocalCenterOfMass )),
+                ("mass", new Member<FreePhysicsTransform, float>( o => o.Mass )),
+                ("local_center_of_mass", new Member<FreePhysicsTransform, Vector3>( o => o.LocalCenterOfMass )),
 
-                ("DO_NOT_TOUCH", new Member<FreePhysicsObject, bool>( o => false, (o, value) => o._rb.isKinematic = false)), // TODO - isKinematic member is a hack.
+                ("DO_NOT_TOUCH", new Member<FreePhysicsTransform, bool>( o => false, (o, value) => o._rb.isKinematic = false)), // TODO - isKinematic member is a hack.
 
-                ("absolute_position", new Member<FreePhysicsObject, Vector3Dbl>( o => o.AbsolutePosition )),
-                ("absolute_rotation", new Member<FreePhysicsObject, QuaternionDbl>( o => o.AbsoluteRotation )),
-                ("absolute_velocity", new Member<FreePhysicsObject, Vector3Dbl>( o => o.AbsoluteVelocity )),
-                ("absolute_angular_velocity", new Member<FreePhysicsObject, Vector3Dbl>( o => o.AbsoluteAngularVelocity ))
+                ("absolute_position", new Member<FreePhysicsTransform, Vector3Dbl>( o => o.AbsolutePosition )),
+                ("absolute_rotation", new Member<FreePhysicsTransform, QuaternionDbl>( o => o.AbsoluteRotation )),
+                ("absolute_velocity", new Member<FreePhysicsTransform, Vector3Dbl>( o => o.AbsoluteVelocity )),
+                ("absolute_angular_velocity", new Member<FreePhysicsTransform, Vector3Dbl>( o => o.AbsoluteAngularVelocity ))
             };
         }
     }

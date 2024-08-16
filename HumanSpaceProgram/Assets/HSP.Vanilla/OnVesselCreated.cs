@@ -18,13 +18,13 @@ namespace HSP.Vanilla
         {
             if( SceneLoader.IsSceneLoaded( GameplaySceneManager.SCENE_NAME ) )
             {
-                var comp = v.gameObject.AddComponent<FreePhysicsObject>();
+                var comp = v.gameObject.AddComponent<FreePhysicsTransform>();
                 v.PhysicsTransform = comp;
                 v.ReferenceFrameTransform = comp;
             }
             else if( SceneLoader.IsSceneLoaded( DesignSceneManager.SCENE_NAME ) )
             {
-                var comp = v.gameObject.AddComponent<FixedPhysicsObject>();
+                var comp = v.gameObject.AddComponent<FixedPhysicsTransform>();
                 v.PhysicsTransform = comp;
                 v.ReferenceFrameTransform = comp;
             }
@@ -40,7 +40,7 @@ namespace HSP.Vanilla
 
                 if( FAnchor.IsAnchored( e.v.RootPart ) )
                 {
-                    PinnedPhysicsObject ppo = e.oldRootPart.GetVessel().GetComponent<PinnedPhysicsObject>();
+                    PinnedPhysicsTransform ppo = e.oldRootPart.GetVessel().GetComponent<PinnedPhysicsTransform>();
                     e.v.Pin( ppo.ReferenceBody, ppo.ReferencePosition, ppo.ReferenceRotation );
                 }
             }

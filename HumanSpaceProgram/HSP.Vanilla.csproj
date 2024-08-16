@@ -9,7 +9,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <ProjectGuid>{AE718BD5-B7C2-FF6D-CB3C-BD7A5FEC452C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -122,6 +123,10 @@
     <Compile Include="Assets\HSP.Vanilla\Components\FControlFrame.cs" />
     <Compile Include="Assets\HSP.Vanilla\SelectedControlFrameManager.cs" />
     <Compile Include="Assets\HSP.Vanilla\ActiveVesselManager.cs" />
+    <Compile Include="Assets\HSP.Vanilla\PinnedPhysicsTransform.cs" />
+    <Compile Include="Assets\HSP.Vanilla\FixedPhysicsTransform.cs" />
+    <Compile Include="Assets\HSP.Vanilla\FreePhysicsTransform.cs" />
+    <Compile Include="Assets\HSP.Vanilla\Vessel_Ex.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla\___HSP.Vanilla.asmdef" />
@@ -1036,10 +1041,6 @@
     <ProjectReference Include="HSP.Trajectories.csproj">
       <Project>{57FA29CC-9026-83EE-F242-EA051DEA7649}</Project>
       <Name>HSP.Trajectories</Name>
-    </ProjectReference>
-    <ProjectReference Include="HSP.Trajectories.Vessels.csproj">
-      <Project>{CF7071BC-BDAE-FF30-281B-D56F30917D0A}</Project>
-      <Name>HSP.Trajectories.Vessels</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.Vessels.csproj">
       <Project>{46E8105E-3165-8157-383E-59E6654156AA}</Project>

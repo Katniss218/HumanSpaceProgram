@@ -222,9 +222,6 @@ namespace HSP.Vessels
             //this.PhysicsObject.MomentOfInertiaTensor = inertia; // this is around an order of magnitude too small in each direction, but that might be because we're assuming point masses.
         }
 
-        public Vector3Dbl AIRFPosition { get => this.ReferenceFrameTransform.AbsolutePosition; set => this.ReferenceFrameTransform.AbsolutePosition = value; }
-        public QuaternionDbl AIRFRotation { get => this.ReferenceFrameTransform.AbsoluteRotation; set => this.ReferenceFrameTransform.AbsoluteRotation = value; }
-
         /// <summary>
         /// Calculates the scene world-space point at the very bottom of the vessel. Useful when placing it at launchsites and such.
         /// </summary>

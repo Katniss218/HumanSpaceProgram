@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace HSP
+namespace HSP.ReferenceFrames
 {
     /// <summary>
     /// Any object that interacts with the collision/physics system.
@@ -17,26 +17,6 @@ namespace HSP
         /// </summary>
         Vector3 LocalCenterOfMass { get; set; }
 
-       /* /// <summary>
-        /// Gets or sets the physics object's velocity in scene space, in [m/s].
-        /// </summary>
-        Vector3 Velocity { get; set; }
-
-        /// <summary>
-        /// Gets the acceleration that this physics object is under at this instant, in [m/s^2].
-        /// </summary>
-        Vector3 Acceleration { get; }
-
-        /// <summary>
-        /// Gets or sets the physics object's angular velocity in scene space, in [Rad/s].
-        /// </summary>
-        Vector3 AngularVelocity { get; set; }
-
-        /// <summary>
-        /// Gets the angular acceleration that this physics object is under at this instant, in [Rad/s^2].
-        /// </summary>
-        Vector3 AngularAcceleration { get; }*/
-        
         /// <summary>
         /// Gets the principal moments of inertia.
         /// </summary>

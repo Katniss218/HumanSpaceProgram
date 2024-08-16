@@ -3,7 +3,7 @@ using System;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace HSP.ReferenceFrames
+namespace HSP.Vanilla
 {
     public static class HSPEvent_AFTER_ACTIVE_OBJECT_CHANGED
     {

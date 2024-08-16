@@ -1,14 +1,8 @@
 ﻿using HSP.ReferenceFrames;
 using HSP.Vanilla.Components;
-using HSP.Vessels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Assets.HSP.Vanilla
+namespace HSP.Vanilla
 {
     /// <summary>
     /// Manages the control frame selected by the player.

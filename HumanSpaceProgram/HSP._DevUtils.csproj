@@ -61,6 +61,7 @@
     <Compile Include="Assets\HSP._DevUtils\VanillaPlanetarySystemFactory.cs" />
     <Compile Include="Assets\HSP._DevUtils\AIRFRotationFixer.cs" />
     <Compile Include="Assets\HSP._DevUtils\DevUtilsGameplayManager.cs" />
+    <Compile Include="Assets\HSP._DevUtils\GravityApplier.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP._DevUtils\WireframeSimpleQuad.shader" />
@@ -984,10 +985,6 @@
     <ProjectReference Include="HSP.Trajectories.csproj">
       <Project>{57FA29CC-9026-83EE-F242-EA051DEA7649}</Project>
       <Name>HSP.Trajectories</Name>
-    </ProjectReference>
-    <ProjectReference Include="HSP.Trajectories.Vessels.csproj">
-      <Project>{CF7071BC-BDAE-FF30-281B-D56F30917D0A}</Project>
-      <Name>HSP.Trajectories.Vessels</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.Vanilla.csproj">
       <Project>{AE718BD5-B7C2-FF6D-CB3C-BD7A5FEC452C}</Project>

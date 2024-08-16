@@ -1,4 +1,3 @@
-using Assets.HSP.Vanilla;
 using HSP.ReferenceFrames;
 using UnityEngine;
 
