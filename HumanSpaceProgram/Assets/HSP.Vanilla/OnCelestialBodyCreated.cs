@@ -12,7 +12,7 @@ namespace HSP.Vanilla
         {
             //if( SceneLoader.IsSceneLoaded( GameplaySceneManager.SCENE_NAME ) )
             //{
-            var comp = cb.gameObject.AddComponent<FixedPhysicsTransform>();
+            var comp = cb.gameObject.AddComponent<KinematicPhysicsTransform>();
             cb.PhysicsTransform = comp;
             cb.ReferenceFrameTransform = comp;
             //}

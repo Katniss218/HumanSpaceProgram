@@ -183,7 +183,7 @@ namespace HSP.Vanilla
         void FixedUpdate()
         {
             _rb.isKinematic = true;
-            MoveScenePositionAndRotation();
+            MoveScenePositionAndRotation(); // Move, because the scene might be moving, and move ensures that the body is swept instead of teleported.
         }
 
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )

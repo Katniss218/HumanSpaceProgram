@@ -7,10 +7,10 @@ namespace HSP.Vanilla.Scenes.GameplayScene
     {
         public const string TRY_SET_SCENE_REFERENCE_FRAME = HSPEvent.NAMESPACE_HSP + ".try_set_scene_reference_frame";
 
-        [HSPEventListener( HSPEvent_AFTER_ACTIVE_OBJECT_CHANGED.ID, TRY_SET_SCENE_REFERENCE_FRAME )]
-        private static void OnActiveObjectChange()
+        [HSPEventListener( HSPEvent_AFTER_ACTIVE_VESSEL_CHANGED.ID, TRY_SET_SCENE_REFERENCE_FRAME )]
+        private static void OnActiveVesselChange()
         {
-            SceneReferenceFrameManager.TargetObject = ActiveVesselManager.ActiveVessel.ReferenceFrameTransform;
+            SceneReferenceFrameManager.TargetObject = ActiveVesselManager.ActiveVessel == null ? null : ActiveVesselManager.ActiveVessel.ReferenceFrameTransform;
 
 #warning TODO - set to the vessel's default frame or something (don't use the null value inside when a vessel is selected).
             SelectedControlFrameManager.ControlFrame = null;

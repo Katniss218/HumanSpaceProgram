@@ -1,11 +1,12 @@
 ﻿using HSP.Trajectories;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace HSP.Core
 {
     /// <summary>
-    /// A trajectory that follows kepler's laws of planetary motion.
+    /// A simulated trajectory that follows kepler's laws of planetary motion.
     /// </summary>
     public class KeplerianOrbit : ITrajectory
     {
@@ -15,9 +16,6 @@ namespace HSP.Core
         // https://downloads.rene-schwarz.com/download/M002-Cartesian_State_Vectors_to_Keplerian_Orbit_Elements.pdf
         // https://gist.github.com/triffid/166b8f5597ce52bcafd15a18218b066f
 
-        // Orbits are always in body-centric frame, with the coordinate axes aligned with the absolute frame.
-        // State vectors too.
-
         /// <summary>
         /// The value of the gravitational constant, in [m^3/kg/s^2].
         /// </summary>
@@ -26,27 +24,27 @@ namespace HSP.Core
         /// <summary>
         /// The semi-major axis of the orbit, in [m].
         /// </summary>
-        public double semiMajorAxis { get; set; }
+        public double SemiMajorAxis { get; private set; }
 
         /// <summary>
         /// The eccentricity of the orbit, in [0] for circular, [0..1] for elliptical, [1] for parabolic, [1..] for hyperbolic.
         /// </summary>
-        public double eccentricity { get; set; }
+        public double Eccentricity { get; private set; }
 
         /// <summary>
         /// The inclination of the orbit, in [Rad].
         /// </summary>
-        public double inclination { get; set; }
+        public double Inclination { get; private set; }
 
         /// <summary>
         /// The longitude of the ascending node of the orbit, in [Rad].
         /// </summary>
-        public double longitudeOfAscendingNode { get; set; }
+        public double longitudeOfAscendingNode { get; private set; }
 
         /// <summary>
         /// The argument of periapsis of the orbit, in [Rad].
         /// </summary>
-        public double argumentOfPeriapsis { get; set; }
+        public double argumentOfPeriapsis { get; private set; }
 
         /// <summary>
         /// The mean anomaly of the orbiting object, at <see cref="epoch"/>, in [Rad]. <br />
@@ -55,28 +53,36 @@ namespace HSP.Core
         /// <remarks>
         /// This angle can be set outside the standard range [0..2*PI].
         /// </remarks>
-        public double meanAnomaly { get; set; } // We store the mean anomaly because it is convenient.
+        public double meanAnomaly { get; private set; } // We store the mean anomaly because it is convenient.
 
         /// <summary>
         /// The reference epoch for the orbit, UT, in [s].
         /// </summary>
-        public double epoch { get; set; }
+        public double epoch { get; private set; } // referenceUT
 
         public double GravitationalParameter { get; set; }
 
         /// <summary>
         /// The length of half of the chord line perpendicular to the major axis, and passing through the focus.
         /// </summary>
-        public double semiLatusRectum => semiMajorAxis * (1 - (eccentricity * eccentricity));
+        public double semiLatusRectum => SemiMajorAxis * (1 - (Eccentricity * Eccentricity));
 
-        public double ApoapsisHeight => (1 + eccentricity) * semiMajorAxis;
-        public double PeriapsisHeight => (1 - eccentricity) * semiMajorAxis;
+        public double ApoapsisHeight => (1 + Eccentricity) * SemiMajorAxis;
+        public double PeriapsisHeight => (1 - Eccentricity) * SemiMajorAxis;
+
+        public Vector3Dbl AbsolutePosition => throw new NotImplementedException();
+
+        public Vector3Dbl AbsoluteVelocity => throw new NotImplementedException();
+
+        public Vector3Dbl AbsoluteAcceleration => throw new NotImplementedException();
+
+        public double Mass => throw new NotImplementedException();
 
         public KeplerianOrbit( double semiMajorAxis, double eccentricity, double inclination, double longitudeOfAscendingNode, double argumentOfPeriapsis, double meanAnomaly, double epoch, double celestialBodyMass )
         {
-            this.semiMajorAxis = semiMajorAxis;
-            this.eccentricity = eccentricity;
-            this.inclination = inclination;
+            this.SemiMajorAxis = semiMajorAxis;
+            this.Eccentricity = eccentricity;
+            this.Inclination = inclination;
             this.longitudeOfAscendingNode = longitudeOfAscendingNode;
             this.argumentOfPeriapsis = argumentOfPeriapsis;
             this.meanAnomaly = meanAnomaly;
@@ -84,6 +90,9 @@ namespace HSP.Core
             this.epoch = epoch;
             this.GravitationalParameter = GetGravParameter( celestialBodyMass );
         }
+
+        // Orbits are always in body-centric frame, with the coordinate axes aligned with the absolute frame.
+        // State vectors too.
 
         /// <summary>
         /// Returns the orbital mean motion for a circular orbit of the same orbital period. <br />
@@ -93,7 +102,7 @@ namespace HSP.Core
         /// <returns>The mean motion, in [Rad/s].</returns>
         public double GetMeanMotion()
         {
-            return Math.Sqrt( GravitationalParameter / Math.Abs( semiMajorAxis * semiMajorAxis * semiMajorAxis ) );
+            return Math.Sqrt( GravitationalParameter / Math.Abs( SemiMajorAxis * SemiMajorAxis * SemiMajorAxis ) );
         }
 
         /// <summary>
@@ -103,7 +112,7 @@ namespace HSP.Core
         /// <returns>The orbital period, in [s].</returns>
         public double GetOrbitalPeriod()
         {
-            return (2 * Math.PI) * Math.Sqrt( (semiMajorAxis * semiMajorAxis * semiMajorAxis) / GravitationalParameter );
+            return (2 * Math.PI) * Math.Sqrt( (SemiMajorAxis * SemiMajorAxis * SemiMajorAxis) / GravitationalParameter );
         }
 
         /// <summary>
@@ -113,7 +122,7 @@ namespace HSP.Core
         /// <returns>The speed, in [m/s].</returns>
         public double GetSpeedAtApoapsis()
         {
-            return Math.Sqrt( ((1 - eccentricity) * GravitationalParameter) / ((1 + eccentricity) * semiMajorAxis) );
+            return Math.Sqrt( ((1 - Eccentricity) * GravitationalParameter) / ((1 + Eccentricity) * SemiMajorAxis) );
         }
 
         /// <summary>
@@ -123,7 +132,7 @@ namespace HSP.Core
         /// <returns>The speed, in [m/s].</returns>
         public double GetSpeedAtPeriapsis()
         {
-            return Math.Sqrt( ((1 + eccentricity) * GravitationalParameter) / ((1 - eccentricity) * semiMajorAxis) );
+            return Math.Sqrt( ((1 + Eccentricity) * GravitationalParameter) / ((1 - Eccentricity) * SemiMajorAxis) );
         }
 
         public double GetTimeSincePeriapsis()
@@ -138,7 +147,7 @@ namespace HSP.Core
         /// <returns>The specific orbital energy, in [J/kg].</returns>
         public double GetSpecificOrbitalEnergy()
         {
-            return -(GravitationalParameter / (2 * semiMajorAxis));
+            return -(GravitationalParameter / (2 * SemiMajorAxis));
         }
 
         public double GetRelativeInclination( KeplerianOrbit otherOrbit )
@@ -148,12 +157,12 @@ namespace HSP.Core
             throw new NotImplementedException();
         }
 
-        public void AddAcceleration( Vector3Dbl acceleration )
+        public void AddVelocityChange( Vector3Dbl velocityChange )
         {
             throw new NotImplementedException();
         }
 
-        public void AddAccelerationAtUT( Vector3Dbl acceleration, double ut )
+        public void AddVelocityChangeAtUT( Vector3Dbl velocityChange, double ut )
         {
             throw new NotImplementedException();
         }
@@ -196,9 +205,9 @@ namespace HSP.Core
             double p = semiLatusRectum;
 
             Vector3Dbl position = new Vector3Dbl(
-                p * (Math.Cos( longitudeOfAscendingNode ) * Math.Cos( argumentOfPeriapsis + trueAnomaly ) - Math.Sin( longitudeOfAscendingNode ) * Math.Cos( inclination ) * Math.Sin( argumentOfPeriapsis + trueAnomaly )),
-                p * (Math.Sin( longitudeOfAscendingNode ) * Math.Cos( argumentOfPeriapsis + trueAnomaly ) + Math.Cos( longitudeOfAscendingNode ) * Math.Cos( inclination ) * Math.Sin( argumentOfPeriapsis + trueAnomaly )),
-                p * Math.Sin( inclination ) * Math.Sin( argumentOfPeriapsis + trueAnomaly )
+                p * (Math.Cos( longitudeOfAscendingNode ) * Math.Cos( argumentOfPeriapsis + trueAnomaly ) - Math.Sin( longitudeOfAscendingNode ) * Math.Cos( Inclination ) * Math.Sin( argumentOfPeriapsis + trueAnomaly )),
+                p * (Math.Sin( longitudeOfAscendingNode ) * Math.Cos( argumentOfPeriapsis + trueAnomaly ) + Math.Cos( longitudeOfAscendingNode ) * Math.Cos( Inclination ) * Math.Sin( argumentOfPeriapsis + trueAnomaly )),
+                p * Math.Sin( Inclination ) * Math.Sin( argumentOfPeriapsis + trueAnomaly )
             );
 
             return position;
@@ -210,11 +219,11 @@ namespace HSP.Core
             double g = -Math.Sqrt( GravitationalParameter / semiLatusRectum );
 
             Vector3Dbl velocity = new Vector3Dbl(
-                g * (Math.Cos( longitudeOfAscendingNode ) * (Math.Sin( argumentOfPeriapsis + trueAnomaly ) + eccentricity * Math.Sin( argumentOfPeriapsis )) +
-                        Math.Sin( longitudeOfAscendingNode ) * Math.Cos( inclination ) * (Math.Cos( argumentOfPeriapsis + trueAnomaly ) + eccentricity * Math.Cos( argumentOfPeriapsis ))),
-                g * (Math.Sin( longitudeOfAscendingNode ) * (Math.Sin( argumentOfPeriapsis + trueAnomaly ) + eccentricity * Math.Sin( argumentOfPeriapsis )) -
-                        Math.Cos( longitudeOfAscendingNode ) * Math.Cos( inclination ) * (Math.Cos( argumentOfPeriapsis + trueAnomaly ) + eccentricity * Math.Cos( argumentOfPeriapsis ))),
-                g * (Math.Sin( inclination ) * (Math.Cos( argumentOfPeriapsis + trueAnomaly ) + eccentricity * Math.Cos( argumentOfPeriapsis )))
+                g * (Math.Cos( longitudeOfAscendingNode ) * (Math.Sin( argumentOfPeriapsis + trueAnomaly ) + Eccentricity * Math.Sin( argumentOfPeriapsis )) +
+                        Math.Sin( longitudeOfAscendingNode ) * Math.Cos( Inclination ) * (Math.Cos( argumentOfPeriapsis + trueAnomaly ) + Eccentricity * Math.Cos( argumentOfPeriapsis ))),
+                g * (Math.Sin( longitudeOfAscendingNode ) * (Math.Sin( argumentOfPeriapsis + trueAnomaly ) + Eccentricity * Math.Sin( argumentOfPeriapsis )) -
+                        Math.Cos( longitudeOfAscendingNode ) * Math.Cos( Inclination ) * (Math.Cos( argumentOfPeriapsis + trueAnomaly ) + Eccentricity * Math.Cos( argumentOfPeriapsis ))),
+                g * (Math.Sin( Inclination ) * (Math.Cos( argumentOfPeriapsis + trueAnomaly ) + Eccentricity * Math.Cos( argumentOfPeriapsis )))
             );
 
             return velocity;
@@ -225,14 +234,14 @@ namespace HSP.Core
         private double estimateTrueAnomaly( double meanAnomaly )
         {
             double M = meanAnomaly;
-            return M + 2 * eccentricity * Math.Sin( M ) + 1.25 * eccentricity * eccentricity * Math.Sin( 2 * M );
+            return M + 2 * Eccentricity * Math.Sin( M ) + 1.25 * Eccentricity * Eccentricity * Math.Sin( 2 * M );
         }
 
         double calcEccentricAnomaly()
         {
             double estTrueAnomaly = estimateTrueAnomaly( meanAnomaly );
-            double E = Math.Acos( (eccentricity + Math.Cos( estTrueAnomaly )) / (1.0 + eccentricity * Math.Cos( estTrueAnomaly )) );
-            double M = E - eccentricity * Math.Sin( E );
+            double E = Math.Acos( (Eccentricity + Math.Cos( estTrueAnomaly )) / (1.0 + Eccentricity * Math.Cos( estTrueAnomaly )) );
+            double M = E - Eccentricity * Math.Sin( E );
 
             // iterate to get M closer to meanAnomaly
             double rate = 0.01;
@@ -252,7 +261,7 @@ namespace HSP.Core
                     if( lastDec )
                         rate *= 0.1;
                 }
-                M = E - eccentricity * Math.Sin( E );
+                M = E - Eccentricity * Math.Sin( E );
             }
 
             if( meanAnomaly > Math.PI && E < Math.PI )
@@ -261,9 +270,9 @@ namespace HSP.Core
             return E;
         }
 
-       private double calcTrueAnomaly( double eccentricAnomaly )
+        private double calcTrueAnomaly( double eccentricAnomaly )
         {
-            double trueAnomaly = Math.Acos( (Math.Cos( eccentricAnomaly ) - eccentricity) / (1.0 - eccentricity * Math.Cos( eccentricAnomaly )) );
+            double trueAnomaly = Math.Acos( (Math.Cos( eccentricAnomaly ) - Eccentricity) / (1.0 - Eccentricity * Math.Cos( eccentricAnomaly )) );
 
             if( eccentricAnomaly > Math.PI && trueAnomaly < Math.PI )
                 trueAnomaly = (2.0 * Math.PI) - trueAnomaly;
@@ -306,6 +315,16 @@ namespace HSP.Core
         public static double GetOrbitalSpeedForRadius( double radius, double bodyMass, double semimajorAxis )
         {
             return Math.Sqrt( GetGravParameter( bodyMass ) * ((2.0 / radius) - (1.0 / semimajorAxis)) ); // circular orbit.
+        }
+
+        public bool HasCacheForUT( double ut )
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Step( IEnumerable<ITrajectory> attractors, double dt )
+        {
+            throw new NotImplementedException();
         }
     }
 }

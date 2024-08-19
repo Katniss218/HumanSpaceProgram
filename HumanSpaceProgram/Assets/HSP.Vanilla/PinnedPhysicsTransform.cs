@@ -213,7 +213,19 @@ namespace HSP.Vanilla
 
         void FixedUpdate()
         {
-            // Reference can be moving, and we aren't parented (due to precision), thus we continuously update.
+            /*if( _referenceBody.ReferenceFrameTransform is KinematicPhysicsTransform k ) test trying to force the position to be correct.
+            {
+                k.RecalculateAbsoluteValues( SceneReferenceFrameManager.ReferenceFrame );
+
+                ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, k._rb, k.AbsolutePosition );
+                ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, k._rb, k.AbsoluteRotation );
+
+                Vector3 sceneVelocity = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformVelocity( k.AbsoluteVelocity );
+                k.Velocity = sceneVelocity;
+                Vector3 sceneAngularVelocity = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformAngularVelocity( k.AbsoluteAngularVelocity );
+                k.AngularVelocity = sceneAngularVelocity;
+            }*/
+            // Move, because the scene (or reference body) might be moving, and move ensures that the body is swept instead of teleported.
             this.MoveScenePositionAndRotation();
 
             // If the object is colliding, we will use its rigidbody accelerations, because we don't have access to the forces due to collisions.
@@ -241,7 +253,7 @@ namespace HSP.Vanilla
             // Guarantees that the reference body has up-to-date reference frame, regardless of update order.
             // Simply calling `OnSceneReferenceFrameSwitch` on it should be safe,
             //   it'll just set the position twice (both times to the same value) in the same frame.
-            _referenceBody.ReferenceFrameTransform.OnSceneReferenceFrameSwitch( data );
+           // _referenceBody.ReferenceFrameTransform.OnSceneReferenceFrameSwitch( data );
 
             ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
             ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );

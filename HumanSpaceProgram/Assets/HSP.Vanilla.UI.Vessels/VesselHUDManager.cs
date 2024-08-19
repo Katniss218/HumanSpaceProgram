@@ -47,7 +47,7 @@ namespace HSP.Vanilla.UI.Vessels
             }
         }
 
-        [HSPEventListener( HSPEvent_AFTER_ACTIVE_OBJECT_CHANGED.ID, CREATE_OR_DESTROY_VESSEL_HUDS )]
+        [HSPEventListener( HSPEvent_AFTER_ACTIVE_VESSEL_CHANGED.ID, CREATE_OR_DESTROY_VESSEL_HUDS )]
         private static void AfterActiveObjectChanged()
         {
             if( !instanceExists )

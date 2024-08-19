@@ -18,7 +18,7 @@ namespace HSP.Vanilla.UI.Scenes.GameplayScene
 
         public const string CREATE_UI = HSPEvent.NAMESPACE_HSP + ".gameplay_ui";
 
-        [HSPEventListener( HSPEvent_AFTER_ACTIVE_OBJECT_CHANGED.ID, CREATE_UI )]
+        [HSPEventListener( HSPEvent_AFTER_ACTIVE_VESSEL_CHANGED.ID, CREATE_UI )]
         [HSPEventListener( HSPEvent_STARTUP_GAMEPLAY.ID, CREATE_UI, After = new[] { HSP.Vanilla.Scenes.GameplayScene.OnStartup.ADD_ACTIVE_VESSEL_MANAGER } )]
         public static void CreateUI()
         {

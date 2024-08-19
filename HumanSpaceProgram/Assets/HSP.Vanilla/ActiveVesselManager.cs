@@ -5,12 +5,12 @@ using UnityPlus.Serialization;
 
 namespace HSP.Vanilla
 {
-    public static class HSPEvent_AFTER_ACTIVE_OBJECT_CHANGED
+    public static class HSPEvent_AFTER_ACTIVE_VESSEL_CHANGED
     {
         /// <summary>
-        /// Invoked after the active object changes.
+        /// Invoked after the active vessel changes.
         /// </summary>
-        public const string ID = HSPEvent.NAMESPACE_HSP + ".after_active_object_changed";
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".after_active_vessel_changed";
     }
 
     /// <summary>
@@ -47,7 +47,7 @@ namespace HSP.Vanilla
 
                 instance._activeVessel = vessel;
                 instance._activeObject = value;
-                HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_ACTIVE_OBJECT_CHANGED.ID );
+                HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_ACTIVE_VESSEL_CHANGED.ID );
             }
         }
 
@@ -61,7 +61,7 @@ namespace HSP.Vanilla
 
                 instance._activeVessel = value;
                 instance._activeObject = value == null ? null : value.ReferenceTransform;
-                HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_ACTIVE_OBJECT_CHANGED.ID );
+                HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_ACTIVE_VESSEL_CHANGED.ID );
             }
         }
 

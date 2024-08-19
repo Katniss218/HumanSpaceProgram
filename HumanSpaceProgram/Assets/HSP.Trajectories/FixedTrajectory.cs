@@ -14,19 +14,22 @@ namespace HSP.Trajectories
         private List<Vector3Dbl> _positions;
         private List<QuaternionDbl> _rotations;
 
+        public Vector3Dbl AbsolutePosition => throw new NotImplementedException();
+
+        public Vector3Dbl AbsoluteVelocity => throw new NotImplementedException();
+
+        public Vector3Dbl AbsoluteAcceleration => throw new NotImplementedException();
+
+        public double Mass => throw new NotImplementedException();
+
         public void AddAcceleration( Vector3Dbl acceleration )
         {
-            throw new NotImplementedException();
+            return;
         }
 
         public void AddAccelerationAtUT( Vector3Dbl acceleration, double ut )
         {
-            throw new NotImplementedException();
-        }
-
-        public OrbitalFrame GetCurrentOrbitalFrame()
-        {
-            throw new NotImplementedException();
+            return;
         }
 
         public OrbitalStateVector GetCurrentStateVector()
@@ -34,7 +37,12 @@ namespace HSP.Trajectories
             throw new NotImplementedException();
         }
 
-        public OrbitalFrame GetOrbitalFrameAtUT( double ut )
+        public void SetCurrentStateVector( OrbitalStateVector stateVector )
+        {
+            return;
+        }
+
+        public OrbitalStateVector GetStateVectorAtUT( double ut )
         {
             throw new NotImplementedException();
         }
@@ -44,12 +52,32 @@ namespace HSP.Trajectories
             throw new NotImplementedException();
         }
 
-        public OrbitalStateVector GetStateVectorAtUT( double ut )
+        public OrbitalFrame GetCurrentOrbitalFrame()
         {
             throw new NotImplementedException();
         }
 
-        public void SetCurrentStateVector( OrbitalStateVector stateVector )
+        public OrbitalFrame GetOrbitalFrameAtUT( double ut )
+        {
+            throw new NotImplementedException();
+        }
+
+        public void AddVelocityChange( Vector3Dbl velocityChange )
+        {
+            throw new NotImplementedException();
+        }
+
+        public void AddVelocityChangeAtUT( Vector3Dbl velocityChange, double ut )
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool HasCacheForUT( double ut )
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Step( IEnumerable<ITrajectory> attractors, double dt )
         {
             throw new NotImplementedException();
         }

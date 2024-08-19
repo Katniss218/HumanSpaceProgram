@@ -11,18 +11,28 @@ namespace HSP.Trajectories
     {
         private double _cachedUpToUT;
 
+        // cache could work as an array of arrays and their dividing time points. Possibly halving the distance.
+
         private List<Vector3Dbl> _cachedPositions;
         private List<Vector3Dbl> _cachedVelocities;
 
-        public void AddAcceleration( Vector3Dbl acceleration )
+        public Vector3Dbl AbsolutePosition => throw new NotImplementedException();
+
+        public Vector3Dbl AbsoluteVelocity => throw new NotImplementedException();
+
+        public Vector3Dbl AbsoluteAcceleration => throw new NotImplementedException();
+
+        public double Mass => throw new NotImplementedException();
+
+        public void AddVelocityChange( Vector3Dbl velocityChange )
         {
             // invalidate anything beyond current UT.
             throw new NotImplementedException();
         }
 
-        public void AddAccelerationAtUT( Vector3Dbl acceleration, double ut )
+        public void AddVelocityChangeAtUT( Vector3Dbl velocityChange, double ut )
         {
-            // invalidate anything beyond specified UT.
+            // invalidate anything beyond current UT.
             throw new NotImplementedException();
         }
 
@@ -62,6 +72,16 @@ namespace HSP.Trajectories
             var up = Vector3Dbl.Cross( stateVector.GravityDir, stateVector.Velocity ).NormalizeToVector3();
 
             return new OrbitalFrame( forward, up );
+        }
+
+        public bool HasCacheForUT( double ut )
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Step( IEnumerable<ITrajectory> attractors, double dt )
+        {
+            throw new NotImplementedException();
         }
     }
 }

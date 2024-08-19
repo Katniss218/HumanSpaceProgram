@@ -11,7 +11,7 @@ namespace HSP.Vanilla
     /// </summary>
     [RequireComponent( typeof( Rigidbody ) )]
     [DisallowMultipleComponent]
-    public class FreePhysicsTransform : MonoBehaviour, IReferenceFrameTransform, IPhysicsTransform
+    public class KinematicPhysicsTransform : MonoBehaviour, IReferenceFrameTransform, IPhysicsTransform
     {
         public Vector3 Position
         {
@@ -57,11 +57,11 @@ namespace HSP.Vanilla
 
         public Vector3 Velocity
         {
-            get => this._rb.velocity;
+            get => this._velocity;
             set
             {
                 this._absoluteVelocity = SceneReferenceFrameManager.ReferenceFrame.TransformVelocity( value );
-                this._rb.velocity = value;
+                this._velocity = value;
             }
         }
 
@@ -71,17 +71,19 @@ namespace HSP.Vanilla
             set
             {
                 this._absoluteVelocity = value;
-                ReferenceFrameTransformUtils.SetSceneVelocityFromAbsolute( _rb, value );
+
+                Vector3 sceneVelocity = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformVelocity( value );
+                _velocity = sceneVelocity;
             }
         }
 
         public Vector3 AngularVelocity
         {
-            get => this._rb.angularVelocity;
+            get => this._angularVelocity;
             set
             {
                 this._absoluteAngularVelocity = SceneReferenceFrameManager.ReferenceFrame.TransformAngularVelocity( value );
-                this._rb.angularVelocity = value;
+                this._angularVelocity = value;
             }
         }
 
@@ -91,7 +93,9 @@ namespace HSP.Vanilla
             set
             {
                 this._absoluteAngularVelocity = value;
-                ReferenceFrameTransformUtils.SetSceneAngularVelocityFromAbsolute( _rb, value );
+
+                Vector3 sceneAngularVelocity = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformAngularVelocity( value );
+                _angularVelocity = sceneAngularVelocity;
             }
         }
 
@@ -109,6 +113,9 @@ namespace HSP.Vanilla
 
         [SerializeField] Vector3Dbl _absoluteVelocity;
         [SerializeField] Vector3Dbl _absoluteAngularVelocity;
+
+        Vector3 _velocity;
+        Vector3 _angularVelocity;
 
         Vector3 _oldVelocity;
         Vector3 _oldAngularVelocity;
@@ -159,26 +166,26 @@ namespace HSP.Vanilla
 
         public void AddForce( Vector3 force )
         {
-            _absoluteAccelerationSum += SceneReferenceFrameManager.ReferenceFrame.TransformAcceleration( (Vector3Dbl)force / Mass );
+            //_absoluteAccelerationSum += SceneReferenceFrameManager.ReferenceFrame.TransformAcceleration( (Vector3Dbl)force / Mass );
 
-            this._rb.AddForce( force, ForceMode.Force );
+            //this._rb.AddForce( force / Mass, ForceMode.VelocityChange );
         }
 
         public void AddForceAtPosition( Vector3 force, Vector3 position )
         {
-            Vector3 leverArm = position - this._rb.worldCenterOfMass;
+            /*Vector3 leverArm = position - this._rb.worldCenterOfMass;
             _absoluteAccelerationSum += SceneReferenceFrameManager.ReferenceFrame.TransformAcceleration( (Vector3Dbl)force / Mass );
             _absoluteAngularAccelerationSum += SceneReferenceFrameManager.ReferenceFrame.TransformAngularAcceleration( Vector3Dbl.Cross( force, leverArm ) / Mass );
 
             // TODO - possibly cache the values across a frame and apply it once instead of n-times.
-            this._rb.AddForceAtPosition( force, position, ForceMode.Force );
+            this._rb.AddForceAtPosition( force / Mass, position, ForceMode.VelocityChange );*/
         }
 
         public void AddTorque( Vector3 torque )
         {
-            _absoluteAngularAccelerationSum += SceneReferenceFrameManager.ReferenceFrame.TransformAngularAcceleration( (Vector3Dbl)torque / Mass );
+            //_absoluteAngularAccelerationSum += SceneReferenceFrameManager.ReferenceFrame.TransformAngularAcceleration( (Vector3Dbl)torque / Mass );
 
-            this._rb.AddTorque( torque, ForceMode.Force );
+            //this._rb.AddTorque( torque / Mass, ForceMode.VelocityChange );
         }
 
         /*private void MoveScenePositionAndRotation( IReferenceFrame referenceFrame )
@@ -187,18 +194,18 @@ namespace HSP.Vanilla
             var rot = (Quaternion)referenceFrame.InverseTransformRotation( _absoluteRotation );
             this._rb.Move( pos, rot );
 
-            var vel = (Vector3)referenceFrame.InverseTransformVelocity( _absoluteVelocity );
-            var angVel = (Vector3)referenceFrame.InverseTransformAngularVelocity( _absoluteAngularVelocity );
-            this._rb.velocity = vel;
-            this._rb.angularVelocity = angVel;
+            //var vel = (Vector3)referenceFrame.InverseTransformVelocity( _absoluteVelocity );
+            //var angVel = (Vector3)referenceFrame.InverseTransformAngularVelocity( _absoluteAngularVelocity );
+            //this._rb.velocity = vel;
+            //this._rb.angularVelocity = angVel;
         }*/
 
         private void RecalculateAbsoluteValues( IReferenceFrame referenceFrame )
         {
             this._absolutePosition = referenceFrame.TransformPosition( this._rb.position );
             this._absoluteRotation = referenceFrame.TransformRotation( this._rb.rotation );
-            this._absoluteVelocity = referenceFrame.TransformVelocity( this._rb.velocity );
-            this._absoluteAngularVelocity = referenceFrame.TransformAngularVelocity( this._rb.angularVelocity );
+            this._absoluteVelocity = referenceFrame.TransformVelocity( this._velocity );
+            this._absoluteAngularVelocity = referenceFrame.TransformAngularVelocity( this._angularVelocity );
 
             this.AbsoluteAcceleration = referenceFrame.TransformAcceleration( this.Acceleration );
             this.AbsoluteAngularAcceleration = referenceFrame.TransformAcceleration( this.AngularAcceleration );
@@ -218,11 +225,15 @@ namespace HSP.Vanilla
             _rb.useGravity = false;
             _rb.collisionDetectionMode = CollisionDetectionMode.Discrete; // Continuous (in any of its flavors) "jumps" when sitting on top of something when reference frame switches.
             _rb.interpolation = RigidbodyInterpolation.None; // DO NOT INTERPOLATE. Doing so will desync `rigidbody.position` and `transform.position`.
-            _rb.isKinematic = false;
+            _rb.isKinematic = true;
         }
 
         void FixedUpdate()
         {
+            Quaternion deltaRotation = Quaternion.Euler( _angularVelocity * TimeManager.FixedDeltaTime * Mathf.Rad2Deg );
+            _rb.Move( _rb.position + _velocity * TimeManager.FixedDeltaTime, deltaRotation * _rb.rotation );
+
+
             if( SceneReferenceFrameManager.ReferenceFrame is INonInertialReferenceFrame frame )
             {
                 Vector3Dbl localPos = frame.InverseTransformPosition( this.AbsolutePosition );
@@ -233,11 +244,10 @@ namespace HSP.Vanilla
 
                 this._acceleration += linAcc;
                 this._angularAcceleration += angAcc;
-                this._rb.AddForce( linAcc, ForceMode.Acceleration );
-                this._rb.AddTorque( angAcc, ForceMode.Acceleration );
+                //this._rb.AddForce( linAcc, ForceMode.Acceleration );
+                //this._rb.AddTorque( angAcc, ForceMode.Acceleration );
             }
 
-#warning TODO - timemanager.fixeddeltatime might not equal time.fixeddeltatime (at high warp values), it needs to be handled explicitly here (analogous to kinematic, but only when warp is not synced).
 
             // If the object is colliding, we will use its rigidbody accelerations, because we don't have access to the forces due to collisions.
             // Otherwise, we use our more precise method that relies on full encapsulation of the rigidbody.
@@ -262,36 +272,27 @@ namespace HSP.Vanilla
             this._absoluteAngularAccelerationSum = Vector3.zero;
         }
 
-        // The faster something goes in scene space when colliding with another thing, it gets laggier for physics processing (contacts creation)
-
-        // when switching while resting on something, the object jumps. possibly due to pinned updating before the celestial frame it uses to transform has correct values or something?
-        // possibly the same or related to rovers in RSS/RO jumping while driving
-        // - only happens with continuous speculative collision (continuous and continuous dynamic don't jump).
-
-#warning TODO - needs something to enable continuous when a something in the scene is not resting and is moving fast relative to something else.
-
-#warning TODO - celestial bodies need something that will replace the buildin parenting of colliders with 64-bit parents and update their scene position at all times (fixedupdate + update + lateupdate).
-
-#warning TODO - atmosphere renderer(s) need to be attached to a body and follow it.
-
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
             RecalculateAbsoluteValues( data.OldFrame );
 
             ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, _absolutePosition );
             ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, _absoluteRotation );
-            ReferenceFrameTransformUtils.SetSceneVelocityFromAbsolute( _rb, _absoluteVelocity );
-            ReferenceFrameTransformUtils.SetSceneAngularVelocityFromAbsolute( _rb, _absoluteAngularVelocity );
+
+            Vector3 sceneVelocity = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformVelocity( _absoluteVelocity );
+            _velocity = sceneVelocity;
+            Vector3 sceneAngularVelocity = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformAngularVelocity( _absoluteAngularVelocity );
+            _angularVelocity = sceneAngularVelocity;
         }
 
         void OnEnable()
         {
-            _rb.isKinematic = false; // Can't do `enabled = false` (doesn't exist) for a rigidbody, so we set it to kinematic instead.
+            _rb.isKinematic = true; // Force kinematic.
         }
 
         void OnDisable()
         {
-            _rb.isKinematic = true; // Can't do `enabled = false` (doesn't exist) for a rigidbody, so we set it to kinematic instead.
+            _rb.isKinematic = true;
         }
 
         void OnCollisionEnter( Collision collision )
@@ -313,20 +314,20 @@ namespace HSP.Vanilla
             IsColliding = false;
         }
 
-        [MapsInheritingFrom( typeof( FreePhysicsTransform ) )]
+        [MapsInheritingFrom( typeof( KinematicPhysicsTransform ) )]
         public static SerializationMapping FreePhysicsObjectMapping()
         {
-            return new MemberwiseSerializationMapping<FreePhysicsTransform>()
+            return new MemberwiseSerializationMapping<KinematicPhysicsTransform>()
             {
-                ("mass", new Member<FreePhysicsTransform, float>( o => o.Mass )),
-                ("local_center_of_mass", new Member<FreePhysicsTransform, Vector3>( o => o.LocalCenterOfMass )),
+                ("mass", new Member<KinematicPhysicsTransform, float>( o => o.Mass )),
+                ("local_center_of_mass", new Member<KinematicPhysicsTransform, Vector3>( o => o.LocalCenterOfMass )),
 
-                ("DO_NOT_TOUCH", new Member<FreePhysicsTransform, bool>( o => false, (o, value) => o._rb.isKinematic = false)), // TODO - isKinematic member is a hack.
+                ("DO_NOT_TOUCH", new Member<KinematicPhysicsTransform, bool>( o => true, (o, value) => o._rb.isKinematic = true)), // TODO - isKinematic member is a hack.
 
-                ("absolute_position", new Member<FreePhysicsTransform, Vector3Dbl>( o => o.AbsolutePosition )),
-                ("absolute_rotation", new Member<FreePhysicsTransform, QuaternionDbl>( o => o.AbsoluteRotation )),
-                ("absolute_velocity", new Member<FreePhysicsTransform, Vector3Dbl>( o => o.AbsoluteVelocity )),
-                ("absolute_angular_velocity", new Member<FreePhysicsTransform, Vector3Dbl>( o => o.AbsoluteAngularVelocity ))
+                ("absolute_position", new Member<KinematicPhysicsTransform, Vector3Dbl>( o => o.AbsolutePosition )),
+                ("absolute_rotation", new Member<KinematicPhysicsTransform, QuaternionDbl>( o => o.AbsoluteRotation )),
+                ("absolute_velocity", new Member<KinematicPhysicsTransform, Vector3Dbl>( o => o.AbsoluteVelocity )),
+                ("absolute_angular_velocity", new Member<KinematicPhysicsTransform, Vector3Dbl>( o => o.AbsoluteAngularVelocity ))
             };
         }
     }
