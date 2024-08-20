@@ -202,6 +202,12 @@ namespace HSP.Vanilla
 
         private void RecalculateAbsoluteValues( IReferenceFrame referenceFrame )
         {
+#warning TODO - after the scene position has been set, we lose track of what reference frame it's in. 
+            // (after updating, the scene pos is now in the new frame instead of old, but this is still called with the old frame).
+
+            // when transformposition is called first, it uses the 000 frame and correctly transforms the position.
+            // when it's called again, it uses the 000 frame and transforms the ALREADY TRANSFORMED position into an incorrect position.
+
             this._absolutePosition = referenceFrame.TransformPosition( this._rb.position );
             this._absoluteRotation = referenceFrame.TransformRotation( this._rb.rotation );
             this._absoluteVelocity = referenceFrame.TransformVelocity( this._velocity );
