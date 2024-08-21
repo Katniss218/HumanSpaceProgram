@@ -280,7 +280,7 @@ namespace HSP.Vanilla
             // Enforces that subsequent calls of the function will not further transform the values into an incorrect value if the values has already been transformed.
             // - I.e. makes the method idempotent.
             // This allows calling this method to ensure that the absolute position/rotation/etc is correct.
-            if( Math.Abs( (data.NewFrame.TransformPosition( this._rb.position ) - this._absolutePosition).magnitude ) < 1e-5 )
+            if( Math.Abs( (data.NewFrame.TransformPosition( this._rb.position ) - this._absolutePosition).magnitude ) < 1e-1 )
             {
                 return;
             }

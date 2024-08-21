@@ -210,6 +210,10 @@ namespace HSP.Vanilla
             // when it's called again, it uses the 000 frame and transforms the ALREADY TRANSFORMED position into an incorrect position.
 
             this._absolutePosition = referenceFrame.TransformPosition( this._rb.position );
+            if( Math.Abs( this._absolutePosition.magnitude ) > 0.01 )
+            {
+                Debug.Log( this._rb.position.magnitude + ":::::" + referenceFrame.TransformPosition( Vector3Dbl.zero ).magnitude );
+            }
             this._absoluteRotation = referenceFrame.TransformRotation( this._rb.rotation );
             this._absoluteVelocity = referenceFrame.TransformVelocity( this._velocity );
             this._absoluteAngularVelocity = referenceFrame.TransformAngularVelocity( this._angularVelocity );
@@ -284,10 +288,19 @@ namespace HSP.Vanilla
             // Enforces that subsequent calls of the function will not further transform the values into an incorrect value if the values has already been transformed.
             // - I.e. makes the method idempotent.
             // This allows calling this method to ensure that the absolute position/rotation/etc is correct.
-            if( Math.Abs( (data.NewFrame.TransformPosition( this._rb.position ) - this._absolutePosition).magnitude ) < 1e-5 )
+            double value = Math.Abs( (data.NewFrame.TransformPosition( this._rb.position ) - this._absolutePosition).magnitude );
+            //Debug.Log( this.gameObject.name + "    " + value );
+            Debug.Log( this.gameObject.name + "    " + this._absolutePosition.magnitude ); // absoluteposition changes from 0 for some reason.
+            if( value < 1 )
             {
                 return;
             }
+            else
+            {
+
+            }
+#warning TODO - planets shouldn't have any part of their transform simulated in scene space because their centers are too far away from scene center.
+            // and they don't even have to, because they won't have collision response.
 
             RecalculateAbsoluteValues( data.OldFrame );
 
