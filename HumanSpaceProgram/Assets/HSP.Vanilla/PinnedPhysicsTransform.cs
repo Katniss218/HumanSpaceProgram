@@ -251,7 +251,7 @@ namespace HSP.Vanilla
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
             // Guarantees that the reference body has up-to-date reference frame, regardless of update order.
-            // Simply calling `OnSceneReferenceFrameSwitch` on it IS NOT CORRECT
+            // Simply calling `OnSceneReferenceFrameSwitch` on it is the correct thing to do now, as it should be idempotent.
             _referenceBody.ReferenceFrameTransform.OnSceneReferenceFrameSwitch( data );
 
             ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, AbsolutePosition );

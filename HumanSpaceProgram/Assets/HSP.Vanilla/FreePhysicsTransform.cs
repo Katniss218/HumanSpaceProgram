@@ -1,5 +1,6 @@
 ﻿using HSP.ReferenceFrames;
 using HSP.Time;
+using System;
 using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
@@ -276,6 +277,14 @@ namespace HSP.Vanilla
 
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
+            // Enforces that subsequent calls of the function will not further transform the values into an incorrect value if the values has already been transformed.
+            // - I.e. makes the method idempotent.
+            // This allows calling this method to ensure that the absolute position/rotation/etc is correct.
+            if( Math.Abs( (data.NewFrame.TransformPosition( this._rb.position ) - this._absolutePosition).magnitude ) < 1e-5 )
+            {
+                return;
+            }
+
             RecalculateAbsoluteValues( data.OldFrame );
 
             ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, _absolutePosition );

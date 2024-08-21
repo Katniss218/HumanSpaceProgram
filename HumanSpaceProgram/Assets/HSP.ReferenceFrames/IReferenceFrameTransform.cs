@@ -64,6 +64,9 @@ namespace HSP.ReferenceFrames
         /// <summary>
         /// Callback to the reference frame switch event.
         /// </summary>
+        /// <remarks>
+        /// NOTE TO IMPLEMENTERS: This method should be idempotent.
+        /// </remarks>
         void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data );
     }
 }
