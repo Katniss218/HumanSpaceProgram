@@ -45,7 +45,7 @@ namespace HSP.ReferenceFrames
             double deltaTime = ut - ReferenceUT;
 
             var newPos = _position + (_velocity * deltaTime);
-            var newRot = QuaternionDbl.AngleAxis( _angularVelocity.magnitude * deltaTime, _angularVelocity ) * _rotation;
+            var newRot = QuaternionDbl.AngleAxis( _angularVelocity.magnitude * 57.2957795131 * deltaTime, _angularVelocity ) * _rotation;
             return new OrientedInertialReferenceFrame( ut, newPos, newRot, _velocity, _angularVelocity );
         }
 

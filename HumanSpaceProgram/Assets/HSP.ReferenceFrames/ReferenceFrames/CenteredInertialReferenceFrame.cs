@@ -46,7 +46,7 @@ namespace HSP.ReferenceFrames
             }
             else
             {
-                var newRot = /* 0      + */ QuaternionDbl.AngleAxis( _angularVelocity.magnitude * deltaTime, _angularVelocity );
+                var newRot = /* 0      + */ QuaternionDbl.AngleAxis( _angularVelocity.magnitude * 57.2957795131 * deltaTime, _angularVelocity );
                 return new OrientedInertialReferenceFrame( ut, newPos, newRot, _velocity, _angularVelocity );
             }
         }

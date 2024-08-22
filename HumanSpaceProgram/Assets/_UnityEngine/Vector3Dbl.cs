@@ -1,18 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Globalization;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace UnityEngine
 {
-	/// <summary>
-	/// A double-precision <see cref="Vector3"/>.
-	/// </summary>
-	[Serializable]
-	public struct Vector3Dbl : IEquatable<Vector3>, IEquatable<Vector3Dbl>
-	{
+    /// <summary>
+    /// A double-precision <see cref="Vector3"/>.
+    /// </summary>
+    [Serializable]
+	public struct Vector3Dbl : IEquatable<Vector3>, IEquatable<Vector3Dbl>, IFormattable
+    {
 		[SerializeField]
 		public double x;
 		[SerializeField]
@@ -96,10 +93,32 @@ namespace UnityEngine
 		}
 
 		[MethodImpl( MethodImplOptions.AggressiveInlining )]
+		public static Vector3Dbl Normalize( Vector3Dbl value )
+		{
+			double magn = value.magnitude;
+			return new Vector3Dbl( value.x / magn, value.y / magn, value.z / magn );
+		}
+		
+		[MethodImpl( MethodImplOptions.AggressiveInlining )]
 		public Vector3 NormalizeToVector3()
 		{
 			double magn = magnitude;
 			return new Vector3( (float)(this.x / magn), (float)(this.y / magn), (float)(this.z / magn) );
+		}
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static void OrthoNormalize( ref Vector3Dbl normal, ref Vector3Dbl tangent )
+		{
+			normal.Normalize();
+			tangent = ProjectOnPlane( tangent, normal ).normalized;
+		}
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static void OrthoNormalize( ref Vector3Dbl normal, ref Vector3Dbl tangent, ref Vector3Dbl binormal )
+		{
+			normal.Normalize();
+			tangent = ProjectOnPlane( tangent, normal ).normalized;
+			binormal = ProjectOnPlane( ProjectOnPlane( binormal, tangent ), normal ).normalized;
 		}
 
 		[MethodImpl( MethodImplOptions.AggressiveInlining )]
@@ -176,7 +195,104 @@ namespace UnityEngine
 			z *= other.z;
 		}
 
-		[MethodImpl( MethodImplOptions.AggressiveInlining )]
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static Vector3Dbl Project( Vector3Dbl vector, Vector3Dbl onNormal )
+        {
+            double normalSqrMag = onNormal.sqrMagnitude;
+            if( normalSqrMag < double.Epsilon )
+                return zero;
+
+            double dot = Dot( vector, onNormal );
+            return new Vector3Dbl( onNormal.x * dot / normalSqrMag, onNormal.y * dot / normalSqrMag, onNormal.z * dot / normalSqrMag );
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static Vector3Dbl ProjectOnPlane( Vector3Dbl vector, Vector3Dbl planeNormal )
+        {
+            double normalSqrMag = planeNormal.sqrMagnitude;
+            if( normalSqrMag < double.Epsilon )
+                return vector;
+
+            double dot = Dot( vector, planeNormal );
+            return new Vector3Dbl( vector.x - planeNormal.x * dot / normalSqrMag, vector.y - planeNormal.y * dot / normalSqrMag, vector.z - planeNormal.z * dot / normalSqrMag );
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static Vector3Dbl Reflect( Vector3Dbl inDirection, Vector3Dbl inNormal )
+        {
+            double minusTwoDot = -2f * Dot( inNormal, inDirection );
+
+            return new Vector3Dbl( minusTwoDot * inNormal.x + inDirection.x, minusTwoDot * inNormal.y + inDirection.y, minusTwoDot * inNormal.z + inDirection.z );
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static double Angle( Vector3Dbl from, Vector3Dbl to )
+        {
+            double num = (double)Math.Sqrt( from.sqrMagnitude * to.sqrMagnitude );
+            if( num < 1E-15 )
+            {
+                return 0f;
+            }
+
+            double num2 = Math.Clamp( Dot( from, to ) / num, -1f, 1f );
+            return (double)Math.Acos( num2 ) * 57.29578f;
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static double SignedAngle( Vector3Dbl from, Vector3Dbl to, Vector3Dbl axis )
+        {
+            double angle = Angle( from, to );
+            double crossX = (from.y * to.z) - (from.z * to.y);
+            double crossY = (from.z * to.x) - (from.x * to.z);
+            double crossZ = (from.x * to.y) - (from.y * to.x);
+            double sign = Math.Sign( (axis.x * crossX) + (axis.y * crossY) + (axis.z * crossZ) );
+            return angle * sign;
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static Vector3Dbl Lerp( Vector3Dbl a, Vector3Dbl b, double t )
+        {
+            t = Math.Clamp( t, 0, 1 );
+            return new Vector3Dbl( a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t, a.z + (b.z - a.z) * t );
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static Vector3Dbl LerpUnclamped( Vector3Dbl a, Vector3Dbl b, double t )
+        {
+            return new Vector3Dbl( a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t, a.z + (b.z - a.z) * t );
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static Vector3Dbl Slerp( Vector3Dbl a, Vector3Dbl b, double t )
+        {
+            t = Math.Clamp( t, 0, 1 );
+
+            double dot = Math.Clamp( Dot( a, b ), -1.0f, 1.0f );
+
+            // calculate the angle between the start/end vectors, and multiply by how far along that angle we want to interpolate to get the angle between the start and the returned interpolated vector.
+            double angle = (double)Math.Acos( dot ) * t;
+
+            // Calculate the interpolated vector using a formula based on the angle and the start and end vectors.
+            Vector3Dbl direction = (b - a * dot).normalized;
+
+            return ((a * Math.Cos( angle )) + (direction * Math.Sin( angle ))).normalized;
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static Vector3Dbl SlerpUnclamped( Vector3Dbl a, Vector3Dbl b, double t )
+        {
+            double dot = Math.Clamp( Dot( a, b ), -1.0f, 1.0f );
+
+            // calculate the angle between the start/end vectors, and multiply by how far along that angle we want to interpolate to get the angle between the start and the returned interpolated vector.
+            double angle = (double)Math.Acos( dot ) * t;
+
+            // Calculate the interpolated vector using a formula based on the angle and the start and end vectors.
+            Vector3Dbl direction = (b - a * dot).normalized;
+
+            return ((a * Math.Cos( angle )) + (direction * Math.Sin( angle ))).normalized;
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
 		public override bool Equals( object other )
 		{
 			if( other is Vector3Dbl v1 )
@@ -263,6 +379,27 @@ namespace UnityEngine
 			return Math.Abs( lhs.x - rhs.x ) >= 1e-12
 				|| Math.Abs( lhs.y - rhs.y ) >= 1e-12
 				|| Math.Abs( lhs.z - rhs.z ) >= 1e-12;
-		}
-	}
+        }
+
+        public override string ToString()
+        {
+            return ToString( null, null );
+        }
+
+        public string ToString( string format )
+        {
+            return ToString( format, null );
+        }
+
+        public string ToString( string format, IFormatProvider formatProvider )
+        {
+            if( string.IsNullOrEmpty( format ) )
+                format = "F2";
+
+            if( formatProvider == null )
+                formatProvider = CultureInfo.InvariantCulture.NumberFormat;
+
+            return String.Format( "({0}, {1}, {2})", x.ToString( format, formatProvider ), y.ToString( format, formatProvider ), z.ToString( format, formatProvider ) );
+        }
+    }
 }
