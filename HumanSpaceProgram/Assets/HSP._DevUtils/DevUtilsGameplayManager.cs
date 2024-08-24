@@ -69,7 +69,8 @@ namespace HSP._DevUtils
 
             var v = CreateVessel( launchSite );
             vessel = v;
-            Vector3Dbl velocity = new Vector3Dbl( 10, 1, 0 ).normalized * 50_000_000;
+           // Vector3Dbl velocity = new Vector3Dbl( 10, 0, 0 ).normalized * 50_000_000;
+            Vector3Dbl velocity = Vector3Dbl.zero;
             body.ReferenceFrameTransform.AbsoluteVelocity = velocity;
 #warning TODO - velocity propagation for 'pinned' objects.
             vessel.ReferenceFrameTransform.AbsoluteVelocity = velocity;

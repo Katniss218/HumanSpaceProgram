@@ -17,7 +17,7 @@ namespace HSP.Vanilla
 
         public Vector3 Position
         {
-            get => this.transform.position;
+            get => (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformPosition( _absolutePosition );
             set
             {
                 this._absolutePosition = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( value );
@@ -37,7 +37,7 @@ namespace HSP.Vanilla
 
         public Quaternion Rotation
         {
-            get => this.transform.rotation;
+            get => (Quaternion)SceneReferenceFrameManager.ReferenceFrame.InverseTransformRotation( _absoluteRotation );
             set
             {
                 this._absoluteRotation = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( value );

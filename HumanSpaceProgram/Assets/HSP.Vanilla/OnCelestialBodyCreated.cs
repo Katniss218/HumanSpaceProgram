@@ -16,6 +16,7 @@ namespace HSP.Vanilla
             cb.PhysicsTransform = comp;
             cb.ReferenceFrameTransform = comp;
             //}
+            comp.Mass = (float)cb.Mass;
         }
     }
 }

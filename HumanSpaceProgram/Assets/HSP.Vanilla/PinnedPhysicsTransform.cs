@@ -47,7 +47,11 @@ namespace HSP.Vanilla
 
         public Vector3 Position
         {
-            get => this._rb.position;
+            get
+            {
+                MoveScenePositionAndRotation();
+                return this._rb.position;
+            }
             set
             {
                 Vector3Dbl airfPos = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( value );
@@ -59,7 +63,11 @@ namespace HSP.Vanilla
 
         public Quaternion Rotation
         {
-            get => this._rb.rotation;
+            get
+            {
+                MoveScenePositionAndRotation();
+                return this._rb.rotation;
+            }
             set
             {
                 QuaternionDbl airfRot = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( value );
@@ -256,6 +264,7 @@ namespace HSP.Vanilla
 
             ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
             ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );
+#warning TODO - velocity?
         }
 
         void OnCollisionEnter( Collision collision )

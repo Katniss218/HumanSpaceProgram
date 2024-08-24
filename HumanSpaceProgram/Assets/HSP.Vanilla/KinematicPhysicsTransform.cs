@@ -117,19 +117,11 @@ namespace HSP.Vanilla
         //
         //
 
-        public float Mass
-        {
-            get => this._rb.mass;
-            set => this._rb.mass = value;
-        }
+        public float Mass { get; set; }
 
-        public Vector3 LocalCenterOfMass
-        {
-            get => this._rb.centerOfMass;
-            set => this._rb.centerOfMass = value;
-        }
+        public Vector3 LocalCenterOfMass { get; set; }
 
-        public Vector3 MomentsOfInertia => this._rb.inertiaTensor;
+        public Vector3 MomentsOfInertia { get; set; }
 
         public Matrix3x3 MomentOfInertiaTensor
         {
@@ -156,9 +148,9 @@ namespace HSP.Vanilla
 
         public void AddForce( Vector3 force )
         {
-            //_absoluteAccelerationSum += SceneReferenceFrameManager.ReferenceFrame.TransformAcceleration( (Vector3Dbl)force / Mass );
+            _absoluteAccelerationSum += SceneReferenceFrameManager.ReferenceFrame.TransformAcceleration( (Vector3Dbl)force / Mass );
 
-            //this._rb.AddForce( force / Mass, ForceMode.VelocityChange );
+            this._absoluteVelocity += (force / Mass) * TimeManager.FixedDeltaTime;
         }
 
         public void AddForceAtPosition( Vector3 force, Vector3 position )

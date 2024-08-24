@@ -24,7 +24,7 @@ namespace HSP._DevUtils
         public static void CreateDefaultPlanetarySystem( object e )
         {
             QuaternionDbl orientation = Quaternion.Euler( 270, 0, 0 );
-            CelestialBody cb = CreateCB( "main", Vector3Dbl.zero, orientation );
+            CelestialBody cb = CreateCB( "main", new Vector3Dbl( 0, 50_000_000, 0 ), orientation );
 
             CelestialBody cb1 = CreateCB( "moon1", new Vector3Dbl( 440_000_000, 0, 0 ), orientation );
             CelestialBody cb2 = CreateCB( "moon2", new Vector3Dbl( 440_000_000, 100_000_000, 0 ), orientation );
@@ -37,6 +37,9 @@ namespace HSP._DevUtils
             CelestialBodySurface srf = cb.GetComponent<CelestialBodySurface>();
             //var group = srf.SpawnGroup( "aabb", 28.5857702f, -80.6507262f, (float)(cb.Radius + 1.0) );
 
+            ConstantForceApplier ca = cb.gameObject.AddComponent<ConstantForceApplier>();
+            ca.Force = new Vector3( 1e24f, 0, 0 );
+            ca.Vessel = cb.PhysicsTransform;
         }
     }
 }
