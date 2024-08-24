@@ -4,6 +4,7 @@ using HSP.Content;
 using HSP.Content.Vessels.Serialization;
 using HSP.ReferenceFrames;
 using HSP.ResourceFlow;
+using HSP.Time;
 using HSP.Timelines;
 using HSP.Vanilla;
 using HSP.Vanilla.Components;
@@ -55,20 +56,26 @@ namespace HSP._DevUtils
         private static void OnAfterCreateDefault( object e )
         {
             CelestialBody body = CelestialBodyManager.Get( "main" );
+            CelestialBody bodyfar = CelestialBodyManager.Get( "main" );
             Vector3 localPos = CoordinateUtils.GeodeticToEuclidean( 28.5857702f, -80.6507262f, (float)(body.Radius + 12.5) );
 
             launchSite = VesselFactory.CreatePartless( Vector3Dbl.zero, QuaternionDbl.identity, Vector3Dbl.zero, Vector3Dbl.zero );
             launchSite.gameObject.name = "launchsite";
-            launchSite.Pin( body, localPos, Quaternion.FromToRotation( Vector3.up, localPos.normalized ) );
+            launchSite.Pin( bodyfar, localPos, Quaternion.FromToRotation( Vector3.up, localPos.normalized ) );
 
             GameObject launchSitePrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/testlaunchsite" );
             GameObject root = InstantiateLocal( launchSitePrefab, launchSite.transform, Vector3.zero, Quaternion.identity );
             launchSite.RootPart = root.transform;
 
             var v = CreateVessel( launchSite );
+            vessel = v;
+            Vector3Dbl velocity = new Vector3Dbl( 10, 1, 0 ).normalized * 50_000_000;
+            body.ReferenceFrameTransform.AbsoluteVelocity = velocity;
+#warning TODO - velocity propagation for 'pinned' objects.
+            vessel.ReferenceFrameTransform.AbsoluteVelocity = velocity;
+
             ActiveVesselManager.ActiveObject = v.RootPart.GetVessel().gameObject.transform;
             SceneReferenceFrameManager.TargetObject = v.RootPart.GetVessel().ReferenceFrameTransform;
-            vessel = v;
         }
 
         private static Vessel CreateVessel( Vessel launchSite )
@@ -113,6 +120,11 @@ namespace HSP._DevUtils
 
         void Update()
         {
+            if( UnityEngine.Input.GetKeyDown( KeyCode.F3 ) )
+            {
+                SceneReferenceFrameManager.ChangeSceneReferenceFrame( new CenteredInertialReferenceFrame( TimeManager.UT,
+                    SceneReferenceFrameManager.TargetObject.AbsolutePosition, SceneReferenceFrameManager.TargetObject.AbsoluteVelocity, Vector3Dbl.zero ) );
+            }
             if( UnityEngine.Input.GetKeyDown( KeyCode.F4 ) )
             {
                 VesselMetadata loadedVesselMetadata = VesselMetadata.LoadFromDisk( "vessel2" );
@@ -123,7 +135,7 @@ namespace HSP._DevUtils
                 var data = _designObjDataHandler.Read();
 
                 GameObject loadedObj = SerializationUnit.Deserialize<GameObject>( data );
-               
+
                 FLaunchSiteMarker launchSiteSpawner = launchSite.gameObject.GetComponentInChildren<FLaunchSiteMarker>();
                 Vector3Dbl spawnerPosAirf = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( launchSiteSpawner.transform.position );
                 QuaternionDbl spawnerRotAirf = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( launchSiteSpawner.transform.rotation );
@@ -195,7 +207,7 @@ namespace HSP._DevUtils
                 handler.Write( data );
 
                 partDir = gameDataPath + "/Vanilla/Parts/tank";
-                Directory.CreateDirectory( partDir ); 
+                Directory.CreateDirectory( partDir );
                 pm = new PartMetadata( partDir )
                 {
                     Name = "Tank",
@@ -286,7 +298,7 @@ namespace HSP._DevUtils
             conn21.End2.ConnectTo( engineP1.GetComponent<FRocketEngine>() );
             conn21.End2.Position = new Vector3( 0.0f, 0.0f, 0.0f );
             conn21.CrossSectionArea = 60f;
-            
+
             FBulkConnection conn22 = engineP2.gameObject.AddComponent<FBulkConnection>();
             conn22.End1.ConnectTo( tankP.GetComponent<FBulkContainer_Sphere>() );
             conn22.End1.Position = new Vector3( 0.0f, -1.5f, 0.0f );
@@ -314,8 +326,8 @@ namespace HSP._DevUtils
             FRocketEngine eng2 = engineP2.GetComponent<FRocketEngine>();
             F2AxisActuator ac2 = engineP2.GetComponent<F2AxisActuator>();
             av.OnSetThrottle.TryConnect( eng1.SetThrottle );
-           // av.OnSetThrottle.TryConnect( eng2.SetThrottle );
-           // only 1 output is allowed. This is annoying.
+            // av.OnSetThrottle.TryConnect( eng2.SetThrottle );
+            // only 1 output is allowed. This is annoying.
 
             av.OnSetAttitude.TryConnect( gc.SetAttitude );
             //atv.OnSetAttitude.TryConnect( gc.SetAttitude );

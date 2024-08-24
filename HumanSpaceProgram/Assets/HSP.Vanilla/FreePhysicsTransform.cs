@@ -16,7 +16,7 @@ namespace HSP.Vanilla
     {
         public Vector3 Position
         {
-            get => this.transform.position;
+            get => this._rb.position;
             set
             {
                 this._absolutePosition = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( value );
@@ -27,7 +27,12 @@ namespace HSP.Vanilla
 
         public Vector3Dbl AbsolutePosition
         {
-            get => _absolutePosition;
+            get
+            {
+                // Recalculation is needed to fix update order - if something requests absolute position before it's cached in FixedUpdate.
+                RecalculateAbsoluteValues( SceneReferenceFrameManager.ReferenceFrame );
+                return _absolutePosition;
+            }
             set
             {
                 _absolutePosition = value;
@@ -37,7 +42,7 @@ namespace HSP.Vanilla
 
         public Quaternion Rotation
         {
-            get => this.transform.rotation;
+            get => this._rb.rotation;
             set
             {
                 this._absoluteRotation = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( value );
@@ -48,7 +53,12 @@ namespace HSP.Vanilla
 
         public QuaternionDbl AbsoluteRotation
         {
-            get => _absoluteRotation;
+            get
+            {
+                // Recalculation is needed to fix update order - if something requests absolute rotation before it's cached in FixedUpdate.
+                RecalculateAbsoluteValues( SceneReferenceFrameManager.ReferenceFrame );
+                return _absoluteRotation;
+            }
             set
             {
                 _absoluteRotation = value;
@@ -68,7 +78,12 @@ namespace HSP.Vanilla
 
         public Vector3Dbl AbsoluteVelocity
         {
-            get => _absoluteVelocity;
+            get
+            {
+                // Recalculation is needed to fix update order - if something requests absolute velocity before it's cached in FixedUpdate.
+                RecalculateAbsoluteValues( SceneReferenceFrameManager.ReferenceFrame );
+                return _absoluteVelocity;
+            }
             set
             {
                 this._absoluteVelocity = value;
@@ -88,7 +103,12 @@ namespace HSP.Vanilla
 
         public Vector3Dbl AbsoluteAngularVelocity
         {
-            get => _absoluteAngularVelocity;
+            get
+            {
+                // Recalculation is needed to fix update order - if something requests absolute angular velocity before it's cached in FixedUpdate.
+                RecalculateAbsoluteValues( SceneReferenceFrameManager.ReferenceFrame );
+                return _absoluteAngularVelocity;
+            }
             set
             {
                 this._absoluteAngularVelocity = value;
@@ -97,10 +117,10 @@ namespace HSP.Vanilla
         }
 
         public Vector3 Acceleration => (Vector3)_acceleration;
-        public Vector3Dbl AbsoluteAcceleration { get; private set; }
+        public Vector3Dbl AbsoluteAcceleration => SceneReferenceFrameManager.ReferenceFrame.TransformAcceleration( this._acceleration );
 
         public Vector3 AngularAcceleration => (Vector3)_angularAcceleration;
-        public Vector3Dbl AbsoluteAngularAcceleration { get; private set; }
+        public Vector3Dbl AbsoluteAngularAcceleration => SceneReferenceFrameManager.ReferenceFrame.TransformAngularAcceleration( this._angularAcceleration );
 
         [SerializeField] Vector3Dbl _acceleration;
         [SerializeField] Vector3Dbl _angularAcceleration;
@@ -201,8 +221,8 @@ namespace HSP.Vanilla
             this._absoluteVelocity = referenceFrame.TransformVelocity( this._rb.velocity );
             this._absoluteAngularVelocity = referenceFrame.TransformAngularVelocity( this._rb.angularVelocity );
 
-            this.AbsoluteAcceleration = referenceFrame.TransformAcceleration( this.Acceleration );
-            this.AbsoluteAngularAcceleration = referenceFrame.TransformAcceleration( this.AngularAcceleration );
+            //this.AbsoluteAcceleration = referenceFrame.TransformAcceleration( this.Acceleration );
+            //this.AbsoluteAngularAcceleration = referenceFrame.TransformAcceleration( this.AngularAcceleration );
         }
 
         void Awake()

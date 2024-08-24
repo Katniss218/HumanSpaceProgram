@@ -16,7 +16,7 @@ namespace HSP.Vanilla
     {
         public Vector3 Position
         {
-            get => this.transform.position;
+            get => (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformPosition( _absolutePosition );
             set
             {
                 this._absolutePosition = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( value );
@@ -37,7 +37,7 @@ namespace HSP.Vanilla
 
         public Quaternion Rotation
         {
-            get => this.transform.rotation;
+            get => (Quaternion)SceneReferenceFrameManager.ReferenceFrame.InverseTransformRotation( _absoluteRotation );
             set
             {
                 this._absoluteRotation = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( value );
@@ -178,7 +178,7 @@ namespace HSP.Vanilla
             //this._rb.AddTorque( torque / Mass, ForceMode.VelocityChange );
         }
 
-        /*private void MoveScenePositionAndRotation( IReferenceFrame referenceFrame )
+        private void MoveScenePositionAndRotation( IReferenceFrame referenceFrame )
         {
             var pos = (Vector3)referenceFrame.InverseTransformPosition( _absolutePosition );
             var rot = (Quaternion)referenceFrame.InverseTransformRotation( _absoluteRotation );
@@ -188,7 +188,7 @@ namespace HSP.Vanilla
             //var angVel = (Vector3)referenceFrame.InverseTransformAngularVelocity( _absoluteAngularVelocity );
             //this._rb.velocity = vel;
             //this._rb.angularVelocity = angVel;
-        }*/
+        }
 
         void Awake()
         {
@@ -212,8 +212,9 @@ namespace HSP.Vanilla
             QuaternionDbl deltaRotation = QuaternionDbl.Euler( _absoluteAngularVelocity * TimeManager.FixedDeltaTime * 57.2957795131 );
             _absolutePosition = _absolutePosition + _absoluteVelocity * TimeManager.FixedDeltaTime;
             _absoluteRotation = deltaRotation * _absoluteRotation;
-            ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, _absolutePosition );
-            ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, _absoluteRotation );
+            MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame );
+            //ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, _absolutePosition );
+            //ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, _absoluteRotation );
 
             // If the object is colliding, we will use its rigidbody accelerations, because we don't have access to the forces due to collisions.
             // Otherwise, we use our more precise method that relies on full encapsulation of the rigidbody.
@@ -237,6 +238,16 @@ namespace HSP.Vanilla
 
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
+#warning TODO - after fixedupdate the position is "higher", but before, it's the same as here?
+
+#warning TODO - THAT'S IT
+            // reference frame switching code is called before the vessel's absolute position had a chance to recache itself.
+            // recaching everything upon calling fixes it. but we shouldn't need to cache all the time, that's expensive.
+
+#warning TODO - and kinematic needs the same recalc-on-demand treatment for local scene position values.
+
+            // I think this also means the line in pinned phys transform is unnecessary, because it should recalculate itself on demand now.
+
             ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, _absolutePosition );
             ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, _absoluteRotation );
         }

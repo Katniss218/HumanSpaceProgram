@@ -47,7 +47,7 @@ namespace HSP.Vanilla
 
         public Vector3 Position
         {
-            get => this.transform.position;
+            get => this._rb.position;
             set
             {
                 Vector3Dbl airfPos = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( value );
@@ -59,7 +59,7 @@ namespace HSP.Vanilla
 
         public Quaternion Rotation
         {
-            get => this.transform.rotation;
+            get => this._rb.rotation;
             set
             {
                 QuaternionDbl airfRot = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( value );
@@ -252,7 +252,7 @@ namespace HSP.Vanilla
         {
             // Guarantees that the reference body has up-to-date reference frame, regardless of update order.
             // Simply calling `OnSceneReferenceFrameSwitch` on it is the correct thing to do now, as it should be idempotent.
-            _referenceBody.ReferenceFrameTransform.OnSceneReferenceFrameSwitch( data );
+            //_referenceBody.ReferenceFrameTransform.OnSceneReferenceFrameSwitch( data );
 
             ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
             ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );
