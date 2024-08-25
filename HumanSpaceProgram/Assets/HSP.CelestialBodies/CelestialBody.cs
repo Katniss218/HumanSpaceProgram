@@ -55,6 +55,16 @@ namespace HSP.CelestialBodies
         public IPhysicsTransform PhysicsTransform { get; set; }
         public IReferenceFrameTransform ReferenceFrameTransform { get; set; }
 
+        /// <summary>
+        /// Constructs the reference frame centered on this body, with axes aligned with the AIRF frame.
+        /// </summary>
+        public IReferenceFrame CenteredReferenceFrame => new CenteredReferenceFrame( TimeManager.UT, this.ReferenceFrameTransform.AbsolutePosition );
+
+        /// <summary>
+        /// Constructs the reference frame centered on this body, with axes aligned with the body (i.e. local body space).
+        /// </summary>
+        public IReferenceFrame OrientedReferenceFrame => new OrientedReferenceFrame( TimeManager.UT, this.ReferenceFrameTransform.AbsolutePosition, this.ReferenceFrameTransform.AbsoluteRotation );
+
         void Awake()
         {
             this.ReferenceFrameTransform = this.GetComponent<IReferenceFrameTransform>();
@@ -94,15 +104,6 @@ namespace HSP.CelestialBodies
             }
         }
 
-        /// <summary>
-        /// Constructs the reference frame centered on this body, with axes aligned with the AIRF frame.
-        /// </summary>
-        public IReferenceFrame CenteredReferenceFrame => new CenteredReferenceFrame( TimeManager.UT, this.ReferenceFrameTransform.AbsolutePosition );
-
-        /// <summary>
-        /// Constructs the reference frame centered on this body, with axes aligned with the body (i.e. local body space).
-        /// </summary>
-        public IReferenceFrame OrientedReferenceFrame => new OrientedReferenceFrame( TimeManager.UT, this.ReferenceFrameTransform.AbsolutePosition, this.ReferenceFrameTransform.AbsoluteRotation );
 
         [MapsInheritingFrom( typeof( CelestialBody ) )]
         public static SerializationMapping CelestialBodyMapping()

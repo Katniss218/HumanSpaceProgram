@@ -10,13 +10,11 @@ namespace HSP.Vanilla
         [HSPEventListener( HSPEvent_ON_CELESTIAL_BODY_CREATED.ID, ADD_PHYSICS_OBJECT )]
         private static void AddGameplayPhysicsObject( CelestialBody cb )
         {
-            //if( SceneLoader.IsSceneLoaded( GameplaySceneManager.SCENE_NAME ) )
-            //{
             var comp = cb.gameObject.AddComponent<KinematicPhysicsTransform>();
+            comp.Mass = (float)cb.Mass;
+
             cb.PhysicsTransform = comp;
             cb.ReferenceFrameTransform = comp;
-            //}
-            comp.Mass = (float)cb.Mass;
         }
     }
 }
