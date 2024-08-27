@@ -12,7 +12,7 @@ namespace HSP.Vanilla
     /// </summary>
     [RequireComponent( typeof( Rigidbody ) )]
     [DisallowMultipleComponent]
-    public class FreePhysicsTransform : MonoBehaviour, IReferenceFrameTransform, IPhysicsTransform
+    public class FreeReferenceFrameTransform : MonoBehaviour, IReferenceFrameTransform, IPhysicsTransform
     {
         public Vector3 Position
         {
@@ -227,9 +227,9 @@ namespace HSP.Vanilla
 
         void Awake()
         {
-            if( this.HasComponentOtherThan<IPhysicsTransform>( this ) )
+            if( this.HasComponentOtherThan<IReferenceFrameTransform>( this ) )
             {
-                Debug.LogWarning( $"Tried to add a {nameof( FreePhysicsTransform )} to a game object that already has a {nameof( IPhysicsTransform )}. This is not allowed. Remove the previous physics object first." );
+                Debug.LogWarning( $"Tried to add a {nameof( FreeReferenceFrameTransform )} to a game object that already has a {nameof( IReferenceFrameTransform )}. This is not allowed. Remove the previous physics object first." );
                 Destroy( this );
                 return;
             }
@@ -342,20 +342,20 @@ namespace HSP.Vanilla
             IsColliding = false;
         }
 
-        [MapsInheritingFrom( typeof( FreePhysicsTransform ) )]
+        [MapsInheritingFrom( typeof( FreeReferenceFrameTransform ) )]
         public static SerializationMapping FreePhysicsObjectMapping()
         {
-            return new MemberwiseSerializationMapping<FreePhysicsTransform>()
+            return new MemberwiseSerializationMapping<FreeReferenceFrameTransform>()
             {
-                ("mass", new Member<FreePhysicsTransform, float>( o => o.Mass )),
-                ("local_center_of_mass", new Member<FreePhysicsTransform, Vector3>( o => o.LocalCenterOfMass )),
+                ("mass", new Member<FreeReferenceFrameTransform, float>( o => o.Mass )),
+                ("local_center_of_mass", new Member<FreeReferenceFrameTransform, Vector3>( o => o.LocalCenterOfMass )),
 
-                ("DO_NOT_TOUCH", new Member<FreePhysicsTransform, bool>( o => false, (o, value) => o._rb.isKinematic = false)), // TODO - isKinematic member is a hack.
+                ("DO_NOT_TOUCH", new Member<FreeReferenceFrameTransform, bool>( o => false, (o, value) => o._rb.isKinematic = false)), // TODO - isKinematic member is a hack.
 
-                ("absolute_position", new Member<FreePhysicsTransform, Vector3Dbl>( o => o.AbsolutePosition )),
-                ("absolute_rotation", new Member<FreePhysicsTransform, QuaternionDbl>( o => o.AbsoluteRotation )),
-                ("absolute_velocity", new Member<FreePhysicsTransform, Vector3Dbl>( o => o.AbsoluteVelocity )),
-                ("absolute_angular_velocity", new Member<FreePhysicsTransform, Vector3Dbl>( o => o.AbsoluteAngularVelocity ))
+                ("absolute_position", new Member<FreeReferenceFrameTransform, Vector3Dbl>( o => o.AbsolutePosition )),
+                ("absolute_rotation", new Member<FreeReferenceFrameTransform, QuaternionDbl>( o => o.AbsoluteRotation )),
+                ("absolute_velocity", new Member<FreeReferenceFrameTransform, Vector3Dbl>( o => o.AbsoluteVelocity )),
+                ("absolute_angular_velocity", new Member<FreeReferenceFrameTransform, Vector3Dbl>( o => o.AbsoluteAngularVelocity ))
             };
         }
     }

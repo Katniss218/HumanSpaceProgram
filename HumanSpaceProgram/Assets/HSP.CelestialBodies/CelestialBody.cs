@@ -52,8 +52,27 @@ namespace HSP.CelestialBodies
         /// </summary>
         public double Radius { get; internal set; }
 
-        public IPhysicsTransform PhysicsTransform { get; set; }
-        public IReferenceFrameTransform ReferenceFrameTransform { get; set; }
+        IPhysicsTransform _physicsTransform;
+        public IPhysicsTransform PhysicsTransform
+        {
+            get
+            {
+                if( _physicsTransform.IsUnityNull() )
+                    _physicsTransform = this.GetComponent<IPhysicsTransform>();
+                return _physicsTransform;
+            }
+        }
+
+        IReferenceFrameTransform _preferenceFrameTransform;
+        public IReferenceFrameTransform ReferenceFrameTransform
+        {
+            get
+            {
+                if( _preferenceFrameTransform.IsUnityNull() )
+                    _preferenceFrameTransform = this.GetComponent<IReferenceFrameTransform>();
+                return _preferenceFrameTransform;
+            }
+        }
 
         /// <summary>
         /// Constructs the reference frame centered on this body, with axes aligned with the AIRF frame.
@@ -65,17 +84,8 @@ namespace HSP.CelestialBodies
         /// </summary>
         public IReferenceFrame OrientedReferenceFrame => new OrientedReferenceFrame( TimeManager.UT, this.ReferenceFrameTransform.AbsolutePosition, this.ReferenceFrameTransform.AbsoluteRotation );
 
-        void Awake()
-        {
-            this.ReferenceFrameTransform = this.GetComponent<IReferenceFrameTransform>();
-            this.PhysicsTransform = this.GetComponent<IPhysicsTransform>();
-        }
-
         void Start()
         {
-            this.ReferenceFrameTransform = this.GetComponent<IReferenceFrameTransform>();
-            this.PhysicsTransform = this.GetComponent<IPhysicsTransform>();
-
             if( this.ID == null )
                 Debug.LogError( $"Celestial body '{this.gameObject.name}' has not been assigned an ID." );
             //this.gameObject.SetLayer( (int)Layer.CELESTIAL_BODY, true );

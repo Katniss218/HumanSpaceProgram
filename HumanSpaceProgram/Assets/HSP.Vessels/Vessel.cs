@@ -61,8 +61,27 @@ namespace HSP.Vessels
             }
         }
 
-        public IPhysicsTransform PhysicsTransform { get; set; }
-        public IReferenceFrameTransform ReferenceFrameTransform { get; set; }
+        IPhysicsTransform _physicsTransform;
+        public IPhysicsTransform PhysicsTransform
+        {
+            get
+            {
+                if( _physicsTransform.IsUnityNull() )
+                    _physicsTransform = this.GetComponent<IPhysicsTransform>();
+                return _physicsTransform;
+            }
+        }
+
+        IReferenceFrameTransform _preferenceFrameTransform;
+        public IReferenceFrameTransform ReferenceFrameTransform
+        {
+            get
+            {
+                if( _preferenceFrameTransform.IsUnityNull() )
+                    _preferenceFrameTransform = this.GetComponent<IReferenceFrameTransform>();
+                return _preferenceFrameTransform;
+            }
+        }
 
         /// <summary>
         /// Returns the transform that is the local space of the vessel.
@@ -103,17 +122,8 @@ namespace HSP.Vessels
 
         // mass and colliders
 
-        void Awake()
-        {
-            this.ReferenceFrameTransform = this.GetComponent<IReferenceFrameTransform>();
-            this.PhysicsTransform = this.GetComponent<IPhysicsTransform>();
-        }
-
         void Start()
         {
-            this.ReferenceFrameTransform = this.GetComponent<IReferenceFrameTransform>();
-            this.PhysicsTransform = this.GetComponent<IPhysicsTransform>(); // needs to be here for deserialization, because it might be added in any order and I can't use RequireComponent because it needs to be removed when pinning.
-            
             RecalculatePartCache();
             //SetPhysicsObjectParameters();
             this.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );

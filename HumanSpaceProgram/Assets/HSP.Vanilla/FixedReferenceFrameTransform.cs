@@ -10,7 +10,7 @@ namespace HSP.Vanilla
     /// </summary>
     [RequireComponent( typeof( Rigidbody ) )]
     [DisallowMultipleComponent]
-    public class FixedPhysicsTransform : MonoBehaviour, IReferenceFrameTransform, IPhysicsTransform
+    public class FixedReferenceFrameTransform : MonoBehaviour, IReferenceFrameTransform, IPhysicsTransform
     {
         Vector3Dbl _absolutePosition;
         QuaternionDbl _absoluteRotation;
@@ -165,9 +165,9 @@ namespace HSP.Vanilla
 
         void Awake()
         {
-            if( this.HasComponentOtherThan<IPhysicsTransform>( this ) )
+            if( this.HasComponentOtherThan<IReferenceFrameTransform>( this ) )
             {
-                Debug.LogWarning( $"Tried to add a {nameof( FixedPhysicsTransform )} to a game object that already has a {nameof( IPhysicsTransform )}. This is not allowed. Remove the previous physics object first." );
+                Debug.LogWarning( $"Tried to add a {nameof( FixedReferenceFrameTransform )} to a game object that already has a {nameof( IReferenceFrameTransform )}. This is not allowed. Remove the previous physics object first." );
                 Destroy( this );
                 return;
             }
@@ -213,18 +213,18 @@ namespace HSP.Vanilla
         }
 
 
-        [MapsInheritingFrom( typeof( FixedPhysicsTransform ) )]
+        [MapsInheritingFrom( typeof( FixedReferenceFrameTransform ) )]
         public static SerializationMapping FixedPhysicsObjectMapping()
         {
-            return new MemberwiseSerializationMapping<FixedPhysicsTransform>()
+            return new MemberwiseSerializationMapping<FixedReferenceFrameTransform>()
             {
-                ("mass", new Member<FixedPhysicsTransform, float>( o => o.Mass )),
-                ("local_center_of_mass", new Member<FixedPhysicsTransform, Vector3>( o => o.LocalCenterOfMass )),
+                ("mass", new Member<FixedReferenceFrameTransform, float>( o => o.Mass )),
+                ("local_center_of_mass", new Member<FixedReferenceFrameTransform, Vector3>( o => o.LocalCenterOfMass )),
 
-                ("DO_NOT_TOUCH", new Member<FixedPhysicsTransform, bool>( o => true, (o, value) => o._rb.isKinematic = true)), // TODO - isKinematic member is a hack.
+                ("DO_NOT_TOUCH", new Member<FixedReferenceFrameTransform, bool>( o => true, (o, value) => o._rb.isKinematic = true)), // TODO - isKinematic member is a hack.
 
-                ("absolute_position", new Member<FixedPhysicsTransform, Vector3Dbl>( o => o.AbsolutePosition )),
-                ("absolute_rotation", new Member<FixedPhysicsTransform, QuaternionDbl>( o => o.AbsoluteRotation ))
+                ("absolute_position", new Member<FixedReferenceFrameTransform, Vector3Dbl>( o => o.AbsolutePosition )),
+                ("absolute_rotation", new Member<FixedReferenceFrameTransform, QuaternionDbl>( o => o.AbsoluteRotation ))
             };
         }
     }
