@@ -1,5 +1,4 @@
 ﻿using HSP.CelestialBodies;
-using HSP.ReferenceFrames;
 using UnityEngine;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
@@ -10,9 +9,9 @@ namespace HSP.Vanilla.UI.Components
     {
         void LateUpdate()
         {
-            var activeObj = ActiveVesselManager.ActiveObject == null
+            var activeObj = ActiveVesselManager.ActiveVessel == null
                 ? null
-                : ActiveVesselManager.ActiveObject.GetComponent<IReferenceFrameTransform>();
+                : ActiveVesselManager.ActiveVessel.ReferenceFrameTransform;
 
             if( activeObj == null )
             {
@@ -21,11 +20,9 @@ namespace HSP.Vanilla.UI.Components
             else
             {
                 CelestialBody body = CelestialBodyManager.Get( "main" );
-                Vector3Dbl posV = activeObj.AbsolutePosition;
-                Vector3Dbl posCB = body.ReferenceFrameTransform.AbsolutePosition;
+                Vector3Dbl bodySpacePosition = body.CenteredReferenceFrame.InverseTransformPosition( activeObj.AbsolutePosition );
 
-                double magn = (posV - posCB).magnitude;
-                double alt = magn - body.Radius;
+                double alt = bodySpacePosition.magnitude - body.Radius;
 
                 this.Text = $"{(alt / 1000.0):#0.#} km";
             }

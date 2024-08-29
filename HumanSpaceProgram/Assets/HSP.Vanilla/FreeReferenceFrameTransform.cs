@@ -19,7 +19,7 @@ namespace HSP.Vanilla
             get => this._rb.position;
             set
             {
-                this._absolutePosition = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( value );
+                this._cachedAbsolutePosition = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( value );
                 this._rb.position = value;
                 this.transform.position = value;
             }
@@ -30,12 +30,12 @@ namespace HSP.Vanilla
             get
             {
                 // Recalculation is needed to fix update order - if something requests absolute position before it's cached in FixedUpdate.
-                RecalculateAbsoluteValues( SceneReferenceFrameManager.ReferenceFrame );
-                return _absolutePosition;
+                RecalculateCacheIfNeeded();
+                return _cachedAbsolutePosition;
             }
             set
             {
-                _absolutePosition = value;
+                _cachedAbsolutePosition = value;
                 ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, value );
             }
         }
@@ -45,7 +45,7 @@ namespace HSP.Vanilla
             get => this._rb.rotation;
             set
             {
-                this._absoluteRotation = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( value );
+                this._cachedAbsoluteRotation = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( value );
                 this._rb.rotation = value;
                 this.transform.rotation = value;
             }
@@ -56,12 +56,12 @@ namespace HSP.Vanilla
             get
             {
                 // Recalculation is needed to fix update order - if something requests absolute rotation before it's cached in FixedUpdate.
-                RecalculateAbsoluteValues( SceneReferenceFrameManager.ReferenceFrame );
-                return _absoluteRotation;
+                RecalculateCacheIfNeeded();
+                return _cachedAbsoluteRotation;
             }
             set
             {
-                _absoluteRotation = value;
+                _cachedAbsoluteRotation = value;
                 ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, value );
             }
         }
@@ -71,7 +71,7 @@ namespace HSP.Vanilla
             get => this._rb.velocity;
             set
             {
-                this._absoluteVelocity = SceneReferenceFrameManager.ReferenceFrame.TransformVelocity( value );
+                this._cachedAbsoluteVelocity = SceneReferenceFrameManager.ReferenceFrame.TransformVelocity( value );
                 this._rb.velocity = value;
             }
         }
@@ -81,12 +81,12 @@ namespace HSP.Vanilla
             get
             {
                 // Recalculation is needed to fix update order - if something requests absolute velocity before it's cached in FixedUpdate.
-                RecalculateAbsoluteValues( SceneReferenceFrameManager.ReferenceFrame );
-                return _absoluteVelocity;
+                RecalculateCacheIfNeeded();
+                return _cachedAbsoluteVelocity;
             }
             set
             {
-                this._absoluteVelocity = value;
+                this._cachedAbsoluteVelocity = value;
                 ReferenceFrameTransformUtils.SetSceneVelocityFromAbsolute( _rb, value );
             }
         }
@@ -96,7 +96,7 @@ namespace HSP.Vanilla
             get => this._rb.angularVelocity;
             set
             {
-                this._absoluteAngularVelocity = SceneReferenceFrameManager.ReferenceFrame.TransformAngularVelocity( value );
+                this._cachedAbsoluteAngularVelocity = SceneReferenceFrameManager.ReferenceFrame.TransformAngularVelocity( value );
                 this._rb.angularVelocity = value;
             }
         }
@@ -106,34 +106,37 @@ namespace HSP.Vanilla
             get
             {
                 // Recalculation is needed to fix update order - if something requests absolute angular velocity before it's cached in FixedUpdate.
-                RecalculateAbsoluteValues( SceneReferenceFrameManager.ReferenceFrame );
-                return _absoluteAngularVelocity;
+                RecalculateCacheIfNeeded();
+                return _cachedAbsoluteAngularVelocity;
             }
             set
             {
-                this._absoluteAngularVelocity = value;
+                this._cachedAbsoluteAngularVelocity = value;
                 ReferenceFrameTransformUtils.SetSceneAngularVelocityFromAbsolute( _rb, value );
             }
         }
 
-        public Vector3 Acceleration => (Vector3)_acceleration;
-        public Vector3Dbl AbsoluteAcceleration => SceneReferenceFrameManager.ReferenceFrame.TransformAcceleration( this._acceleration );
+        public Vector3 Acceleration => _cachedAcceleration;
+        public Vector3Dbl AbsoluteAcceleration => _cachedAbsoluteAcceleration;
+        public Vector3 AngularAcceleration => _cachedAngularAcceleration;
+        public Vector3Dbl AbsoluteAngularAcceleration => _cachedAbsoluteAngularAcceleration;
 
-        public Vector3 AngularAcceleration => (Vector3)_angularAcceleration;
-        public Vector3Dbl AbsoluteAngularAcceleration => SceneReferenceFrameManager.ReferenceFrame.TransformAngularAcceleration( this._angularAcceleration );
+        /// <summary> The scene frame in which the cached values are expressed. </summary>
+        IReferenceFrame _cachedSceneReferenceFrame;
+        Vector3Dbl _cachedAbsolutePosition;
+        QuaternionDbl _cachedAbsoluteRotation;
+        Vector3Dbl _cachedAbsoluteVelocity;
+        Vector3Dbl _cachedAbsoluteAngularVelocity;
 
-        [SerializeField] Vector3Dbl _acceleration;
-        [SerializeField] Vector3Dbl _angularAcceleration;
+        Vector3 _cachedAcceleration;
+        Vector3Dbl _cachedAbsoluteAcceleration;
+        Vector3 _cachedAngularAcceleration;
+        Vector3Dbl _cachedAbsoluteAngularAcceleration;
 
-        [SerializeField] Vector3Dbl _absolutePosition;
-        [SerializeField] QuaternionDbl _absoluteRotation;
-
-        [SerializeField] Vector3Dbl _absoluteVelocity;
-        [SerializeField] Vector3Dbl _absoluteAngularVelocity;
+        Vector3 _oldPosition;
 
         Vector3 _oldVelocity;
         Vector3 _oldAngularVelocity;
-
         Vector3Dbl _absoluteAccelerationSum = Vector3.zero;
         Vector3Dbl _absoluteAngularAccelerationSum = Vector3.zero;
 
@@ -214,15 +217,25 @@ namespace HSP.Vanilla
             this._rb.angularVelocity = angVel;
         }*/
 
-        private void RecalculateAbsoluteValues( IReferenceFrame referenceFrame )
+        private void RecalculateCacheIfNeeded()
         {
-            this._absolutePosition = referenceFrame.TransformPosition( this._rb.position );
-            this._absoluteRotation = referenceFrame.TransformRotation( this._rb.rotation );
-            this._absoluteVelocity = referenceFrame.TransformVelocity( this._rb.velocity );
-            this._absoluteAngularVelocity = referenceFrame.TransformAngularVelocity( this._rb.angularVelocity );
+            // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)
+            // Vector3's `==` operator does approximate comparison.
+            if( _rb.position.x != _oldPosition.x && _rb.position.y != _oldPosition.y && _rb.position.z != _oldPosition.z )
+                return;
 
-            //this.AbsoluteAcceleration = referenceFrame.TransformAcceleration( this.Acceleration );
-            //this.AbsoluteAngularAcceleration = referenceFrame.TransformAcceleration( this.AngularAcceleration );
+            RecalculateCache( SceneReferenceFrameManager.ReferenceFrame );
+            _oldPosition = _rb.position;
+        }
+
+        private void RecalculateCache( IReferenceFrame sceneReferenceFrame )
+        {
+#warning TODO - use cached frame?
+            _cachedAbsolutePosition = sceneReferenceFrame.TransformPosition( _rb.position );
+            _cachedAbsoluteRotation = sceneReferenceFrame.TransformRotation( _rb.rotation );
+            _cachedAbsoluteVelocity = sceneReferenceFrame.TransformVelocity( _rb.velocity );
+            _cachedAbsoluteAngularVelocity = sceneReferenceFrame.TransformAngularVelocity( _rb.angularVelocity );
+            _cachedSceneReferenceFrame = sceneReferenceFrame;
         }
 
         void Awake()
@@ -252,8 +265,8 @@ namespace HSP.Vanilla
                 Vector3 linAcc = (Vector3)frame.GetFicticiousAcceleration( localPos, localVel );
                 Vector3 angAcc = (Vector3)frame.GetFictitiousAngularAcceleration( localPos, localAngVel );
 
-                this._acceleration += linAcc;
-                this._angularAcceleration += angAcc;
+                this._cachedAcceleration += linAcc;
+                this._cachedAngularAcceleration += angAcc;
                 this._rb.AddForce( linAcc, ForceMode.Acceleration );
                 this._rb.AddTorque( angAcc, ForceMode.Acceleration );
             }
@@ -264,18 +277,21 @@ namespace HSP.Vanilla
             // Otherwise, we use our more precise method that relies on full encapsulation of the rigidbody.
             if( IsColliding )
             {
-                this._acceleration = ((Vector3Dbl)(Velocity - _oldVelocity)) / TimeManager.FixedDeltaTime;
-                this._angularAcceleration = ((Vector3Dbl)(AngularVelocity - _oldAngularVelocity)) / TimeManager.FixedDeltaTime;
+                _cachedAcceleration = (Velocity - _oldVelocity) / TimeManager.FixedDeltaTime;
+                _cachedAngularAcceleration = (AngularVelocity - _oldAngularVelocity) / TimeManager.FixedDeltaTime;
+
+                _cachedAbsoluteAcceleration = SceneReferenceFrameManager.ReferenceFrame.TransformAcceleration( _cachedAcceleration );
+                _cachedAbsoluteAngularAcceleration = SceneReferenceFrameManager.ReferenceFrame.TransformAcceleration( _cachedAngularAcceleration );
             }
             else
             {
                 // Acceleration sum will be whatever was accumulated between the previous frame (after it was zeroed out) and this frame. I think it should work fine.
-                this._acceleration = _absoluteAccelerationSum;
-                this._angularAcceleration = _absoluteAngularAccelerationSum;
-            }
+                _cachedAbsoluteAcceleration = _absoluteAccelerationSum;
+                _cachedAbsoluteAngularAcceleration = _absoluteAngularAccelerationSum;
 
-            // No need to sweep here, since this physics transform is simulated in scene space.
-            RecalculateAbsoluteValues( SceneReferenceFrameManager.ReferenceFrame );
+                _cachedAcceleration = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformAcceleration( _cachedAbsoluteAcceleration );
+                _cachedAngularAcceleration = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformAngularAcceleration( _cachedAbsoluteAngularAcceleration );
+            }
 
             this._oldVelocity = Velocity;
             this._oldAngularVelocity = AngularVelocity;
@@ -283,7 +299,7 @@ namespace HSP.Vanilla
             this._absoluteAngularAccelerationSum = Vector3.zero;
         }
 
-        // The faster something goes in scene space when colliding with another thing, it gets laggier for physics processing (contacts creation)
+        // The faster something goes in scene space when colliding with another thing, it gets laggier for physics processing (computation of "contacts")
 
         // when switching while resting on something, the object jumps. possibly due to pinned updating before the celestial frame it uses to transform has correct values or something?
         // possibly the same or related to rovers in RSS/RO jumping while driving
@@ -293,24 +309,22 @@ namespace HSP.Vanilla
 
 #warning TODO - celestial bodies need something that will replace the buildin parenting of colliders with 64-bit parents and update their scene position at all times (fixedupdate + update + lateupdate).
 
-#warning TODO - atmosphere renderer(s) need to be attached to a body and follow it.
-
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
             // Enforces that subsequent calls of the function will not further transform the values into an incorrect value if the values has already been transformed.
             // - I.e. makes the method idempotent.
             // This allows calling this method to ensure that the absolute position/rotation/etc is correct.
-            if( Math.Abs( (data.NewFrame.TransformPosition( this._rb.position ) - this._absolutePosition).magnitude ) < 1e-1 )
+            if( Math.Abs( (data.NewFrame.TransformPosition( this._rb.position ) - this._cachedAbsolutePosition).magnitude ) < 1e-1 )
             {
                 return;
             }
 
-            RecalculateAbsoluteValues( data.OldFrame );
+            RecalculateCache( data.OldFrame ); // Old frame because the data is in the old frame.
 
-            ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, _absolutePosition );
-            ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, _absoluteRotation );
-            ReferenceFrameTransformUtils.SetSceneVelocityFromAbsolute( _rb, _absoluteVelocity );
-            ReferenceFrameTransformUtils.SetSceneAngularVelocityFromAbsolute( _rb, _absoluteAngularVelocity );
+            ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, _cachedAbsolutePosition );
+            ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, _cachedAbsoluteRotation );
+            ReferenceFrameTransformUtils.SetSceneVelocityFromAbsolute( _rb, _cachedAbsoluteVelocity );
+            ReferenceFrameTransformUtils.SetSceneAngularVelocityFromAbsolute( _rb, _cachedAbsoluteAngularVelocity );
         }
 
         void OnEnable()

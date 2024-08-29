@@ -129,7 +129,7 @@ namespace HSP.ReferenceFrames
                 // Future available optimizations:
                 // - non-inertial frames (include acceleration).
                 // - switch the position to ahead of where the object is accelerating instead of the center of the object.
-                ChangeSceneReferenceFrame( new CenteredInertialReferenceFrame( TimeManager.UT, TargetObject.AbsolutePosition, TargetObject.AbsoluteVelocity, Vector3Dbl.zero ) );
+                ChangeSceneReferenceFrame( new CenteredInertialReferenceFrame( TimeManager.UT, TargetObject.AbsolutePosition, TargetObject.AbsoluteVelocity ) );
             }
         }
 

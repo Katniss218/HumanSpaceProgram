@@ -69,11 +69,11 @@ namespace HSP._DevUtils
 
             var v = CreateVessel( launchSite );
             vessel = v;
-           // Vector3Dbl velocity = new Vector3Dbl( 10, 0, 0 ).normalized * 50_000_000;
-            Vector3Dbl velocity = Vector3Dbl.zero;
-            body.ReferenceFrameTransform.AbsoluteVelocity = velocity;
+            // Vector3Dbl velocity = new Vector3Dbl( 10, 0, 0 ).normalized * 50_000_000;
+            //Vector3Dbl velocity = Vector3Dbl.zero;
+            //body.ReferenceFrameTransform.AbsoluteVelocity = velocity;
 #warning TODO - velocity propagation for 'pinned' objects.
-            vessel.ReferenceFrameTransform.AbsoluteVelocity = velocity;
+            vessel.ReferenceFrameTransform.AbsoluteVelocity = launchSite.ReferenceFrameTransform.AbsoluteVelocity;
 
             ActiveVesselManager.ActiveObject = v.RootPart.GetVessel().gameObject.transform;
             SceneReferenceFrameManager.TargetObject = v.RootPart.GetVessel().ReferenceFrameTransform;
@@ -124,7 +124,7 @@ namespace HSP._DevUtils
             if( UnityEngine.Input.GetKeyDown( KeyCode.F3 ) )
             {
                 SceneReferenceFrameManager.ChangeSceneReferenceFrame( new CenteredInertialReferenceFrame( TimeManager.UT,
-                    SceneReferenceFrameManager.TargetObject.AbsolutePosition, SceneReferenceFrameManager.TargetObject.AbsoluteVelocity, Vector3Dbl.zero ) );
+                    SceneReferenceFrameManager.TargetObject.AbsolutePosition, SceneReferenceFrameManager.TargetObject.AbsoluteVelocity ) );
             }
             if( UnityEngine.Input.GetKeyDown( KeyCode.F4 ) )
             {

@@ -16,12 +16,16 @@ namespace HSP.Vanilla
     {
         public Vector3 Position
         {
-            get => (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformPosition( _absolutePosition );
+            get
+            {
+                RecalculateCacheIfNeeded();
+                return _rb.position;
+            }
             set
             {
-                this._absolutePosition = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( value );
-                this._rb.position = value;
-                this.transform.position = value;
+                _absolutePosition = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( value );
+                _rb.position = value;
+                transform.position = value;
             }
         }
 
@@ -37,12 +41,16 @@ namespace HSP.Vanilla
 
         public Quaternion Rotation
         {
-            get => (Quaternion)SceneReferenceFrameManager.ReferenceFrame.InverseTransformRotation( _absoluteRotation );
+            get
+            {
+                RecalculateCacheIfNeeded();
+                return _rb.rotation;
+            }
             set
             {
-                this._absoluteRotation = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( value );
-                this._rb.rotation = value;
-                this.transform.rotation = value;
+                _absoluteRotation = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( value );
+                _rb.rotation = value;
+                transform.rotation = value;
             }
         }
 
@@ -58,57 +66,64 @@ namespace HSP.Vanilla
 
         public Vector3 Velocity
         {
-            get => (Vector3)SceneReferenceFrameManager.ReferenceFrame.TransformVelocity( _absoluteVelocity );
+            get
+            {
+                RecalculateCacheIfNeeded();
+                return _cachedVelocity;
+            }
             set
             {
-                this._absoluteVelocity = SceneReferenceFrameManager.ReferenceFrame.TransformVelocity( value );
+                _absoluteVelocity = SceneReferenceFrameManager.ReferenceFrame.TransformVelocity( value );
             }
         }
 
         public Vector3Dbl AbsoluteVelocity
         {
             get => _absoluteVelocity;
-            set
-            {
-                this._absoluteVelocity = value;
-            }
+            set => _absoluteVelocity = value;
         }
 
         public Vector3 AngularVelocity
         {
-            get => (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformAngularVelocity( _absoluteAngularVelocity );
+            get
+            {
+                RecalculateCacheIfNeeded();
+                return _cachedAngularVelocity;
+            }
             set
             {
-                this._absoluteAngularVelocity = SceneReferenceFrameManager.ReferenceFrame.TransformAngularVelocity( value );
+                _absoluteAngularVelocity = SceneReferenceFrameManager.ReferenceFrame.TransformAngularVelocity( value );
             }
         }
 
         public Vector3Dbl AbsoluteAngularVelocity
         {
             get => _absoluteAngularVelocity;
-            set
-            {
-                this._absoluteAngularVelocity = value;
-            }
+            set => _absoluteAngularVelocity = value;
         }
 
-        public Vector3 Acceleration => (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformAcceleration( this._absoluteAcceleration );
-        public Vector3Dbl AbsoluteAcceleration => this._absoluteAcceleration;
+        public Vector3 Acceleration => _cachedAcceleration;
+        public Vector3Dbl AbsoluteAcceleration => _cachedAbsoluteAcceleration;
+        public Vector3 AngularAcceleration => _cachedAngularAcceleration;
+        public Vector3Dbl AbsoluteAngularAcceleration => _cachedAbsoluteAngularAcceleration;
 
-        public Vector3 AngularAcceleration => (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformAcceleration( this._absoluteAngularAcceleration );
-        public Vector3Dbl AbsoluteAngularAcceleration => this._absoluteAngularAcceleration;
+        Vector3Dbl _absolutePosition;
+        QuaternionDbl _absoluteRotation;
+        Vector3Dbl _absoluteVelocity;
+        Vector3Dbl _absoluteAngularVelocity;
 
-        [SerializeField] Vector3Dbl _absoluteAcceleration;
-        [SerializeField] Vector3Dbl _absoluteAngularAcceleration;
+        /// <summary> The scene frame in which the cached values are expressed. </summary>
+        IReferenceFrame _cachedSceneReferenceFrame; 
+        //Vector3 _cachedPosition;
+        //Quaternion _cachedRotation;
+        Vector3 _cachedVelocity;
+        Vector3 _cachedAngularVelocity;
+        Vector3 _cachedAcceleration;
+        Vector3Dbl _cachedAbsoluteAcceleration;
+        Vector3 _cachedAngularAcceleration;
+        Vector3Dbl _cachedAbsoluteAngularAcceleration;
 
-        [SerializeField] Vector3Dbl _absolutePosition;
-        [SerializeField] QuaternionDbl _absoluteRotation;
-
-        [SerializeField] Vector3Dbl _absoluteVelocity;
-        [SerializeField] Vector3Dbl _absoluteAngularVelocity;
-
-        Vector3Dbl _oldAbsoluteVelocity;
-        Vector3Dbl _oldAbsoluteAngularVelocity;
+        Vector3 _oldPosition;
 
         Vector3Dbl _absoluteAccelerationSum = Vector3.zero;
         Vector3Dbl _absoluteAngularAccelerationSum = Vector3.zero;
@@ -170,16 +185,35 @@ namespace HSP.Vanilla
             //this._rb.AddTorque( torque / Mass, ForceMode.VelocityChange );
         }
 
-        private void MoveScenePositionAndRotation( IReferenceFrame referenceFrame )
+        private void MoveScenePositionAndRotation( IReferenceFrame sceneReferenceFrame )
         {
-            var pos = (Vector3)referenceFrame.InverseTransformPosition( _absolutePosition );
-            var rot = (Quaternion)referenceFrame.InverseTransformRotation( _absoluteRotation );
-            this._rb.Move( pos, rot );
+            var pos = (Vector3)sceneReferenceFrame.InverseTransformPosition( _absolutePosition );
+            var rot = (Quaternion)sceneReferenceFrame.InverseTransformRotation( _absoluteRotation );
+            _rb.Move( pos, rot );
+            _cachedSceneReferenceFrame = sceneReferenceFrame;
+        }
 
-            //var vel = (Vector3)referenceFrame.InverseTransformVelocity( _absoluteVelocity );
-            //var angVel = (Vector3)referenceFrame.InverseTransformAngularVelocity( _absoluteAngularVelocity );
-            //this._rb.velocity = vel;
-            //this._rb.angularVelocity = angVel;
+        /// <summary>
+        /// Checks if the cacheable values need to be recalculated, and recalculates them if needed.
+        /// </summary>
+        private void RecalculateCacheIfNeeded()
+        {
+#error TODO - something's still broken with the cached values somewhere either here or in free or pinned transform??.
+            // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)
+            // Vector3's `==` operator does approximate comparison.
+            if( _rb.position.x != _oldPosition.x && _rb.position.y != _oldPosition.y && _rb.position.z != _oldPosition.z )
+                return;
+
+            MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame );
+            RecalculateCache( SceneReferenceFrameManager.ReferenceFrame );
+            _oldPosition = _rb.position;
+        }
+
+        private void RecalculateCache( IReferenceFrame sceneReferenceFrame )
+        {
+            _cachedVelocity = (Vector3)sceneReferenceFrame.InverseTransformVelocity( AbsoluteVelocity );
+            _cachedAngularVelocity = (Vector3)sceneReferenceFrame.InverseTransformAngularVelocity( AbsoluteAngularVelocity );
+            _cachedSceneReferenceFrame = sceneReferenceFrame;
         }
 
         void Awake()
@@ -205,43 +239,24 @@ namespace HSP.Vanilla
             _absolutePosition = _absolutePosition + _absoluteVelocity * TimeManager.FixedDeltaTime;
             _absoluteRotation = deltaRotation * _absoluteRotation;
             MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame );
-            //ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, _absolutePosition );
-            //ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, _absoluteRotation );
 
-            // If the object is colliding, we will use its rigidbody accelerations, because we don't have access to the forces due to collisions.
             // Otherwise, we use our more precise method that relies on full encapsulation of the rigidbody.
-            if( IsColliding )
-            {
-                this._absoluteAcceleration = (Velocity - _oldAbsoluteVelocity) / TimeManager.FixedDeltaTime;
-                this._absoluteAngularAcceleration = (AngularVelocity - _oldAbsoluteAngularVelocity) / TimeManager.FixedDeltaTime;
-            }
-            else
-            {
-                // Acceleration sum will be whatever was accumulated between the previous frame (after it was zeroed out) and this frame. I think it should work fine.
-                this._absoluteAcceleration = _absoluteAccelerationSum;
-                this._absoluteAngularAcceleration = _absoluteAngularAccelerationSum;
-            }
+            // Acceleration sum will be whatever was accumulated between the previous frame (after it was zeroed out) and this frame. I think it should work fine.
+            _cachedAbsoluteAcceleration = _absoluteAccelerationSum;
+            _cachedAbsoluteAngularAcceleration = _absoluteAngularAccelerationSum;
 
-            this._oldAbsoluteVelocity = AbsoluteVelocity;
-            this._oldAbsoluteAngularVelocity = AbsoluteAngularVelocity;
+            _cachedAcceleration = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformAcceleration( _cachedAbsoluteAcceleration );
+            _cachedAngularAcceleration = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformAngularAcceleration( _cachedAbsoluteAngularAcceleration );
+
             this._absoluteAccelerationSum = Vector3.zero;
             this._absoluteAngularAccelerationSum = Vector3.zero;
         }
 
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
-#warning TODO - after fixedupdate the position is "higher", but before, it's the same as here?
-
-#warning TODO - THAT'S IT
-            // reference frame switching code is called before the vessel's absolute position had a chance to recache itself.
-            // recaching everything upon calling fixes it. but we shouldn't need to cache all the time, that's expensive.
-
-#warning TODO - and kinematic needs the same recalc-on-demand treatment for local scene position values.
-
-            // I think this also means the line in pinned phys transform is unnecessary, because it should recalculate itself on demand now.
-
             ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, _absolutePosition );
             ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, _absoluteRotation );
+            RecalculateCache( data.NewFrame );
         }
 
         void OnEnable()

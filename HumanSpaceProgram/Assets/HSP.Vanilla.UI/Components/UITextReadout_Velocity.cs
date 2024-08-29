@@ -1,5 +1,5 @@
-﻿using HSP.ReferenceFrames;
-using HSP.Trajectories;
+﻿using HSP.CelestialBodies;
+using UnityEngine;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
 
@@ -9,12 +9,23 @@ namespace HSP.Vanilla.UI.Components
     {
         void LateUpdate()
         {
-            var physObj = ActiveVesselManager.ActiveObject == null
+            var activeObj = ActiveVesselManager.ActiveVessel == null
                 ? null
-                : ActiveVesselManager.ActiveObject.GetComponent<IReferenceFrameTransform>();
+                : ActiveVesselManager.ActiveVessel.ReferenceFrameTransform;
 
-#warning TODO - absolute is not very useful. Also, have a selarate field for what should be tracked and change it in the event. that would be better.
-            this.Text = physObj == null ? "" : $"{physObj.AbsoluteVelocity.magnitude:#0} m/s";
+            if( activeObj == null )
+            {
+                this.Text = "";
+            }
+            else
+            {
+                CelestialBody body = CelestialBodyManager.Get( "main" );
+                Vector3Dbl bodySpaceVelocity = body.CenteredReferenceFrame.InverseTransformVelocity( activeObj.AbsoluteVelocity );
+
+                double vel = bodySpaceVelocity.magnitude;
+
+                this.Text = $"{vel:#0} m/s";
+            }
         }
 
         protected internal static T Create<T>( IUIElementContainer parent, UILayoutInfo layout ) where T : UITextReadout_Velocity

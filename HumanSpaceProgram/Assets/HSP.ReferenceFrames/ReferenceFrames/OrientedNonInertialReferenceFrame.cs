@@ -25,9 +25,9 @@ namespace HSP.ReferenceFrames
 
         // Inertial terms
         private readonly Vector3Dbl _velocity;
-        private readonly Vector3Dbl _angularVelocity;
 
         // Non-inertial terms
+        private readonly Vector3Dbl _angularVelocity;
         private readonly Vector3Dbl _acceleration;
         private readonly Vector3Dbl _angularAcceleration;
 
@@ -128,6 +128,11 @@ namespace HSP.ReferenceFrames
             return _inverseRotation * Vector3Dbl.Subtract( globalAngularAcceleration, _angularAcceleration );
         }
 
+
+        public Vector3Dbl GetTangentialVelocity( Vector3Dbl localPosition )
+        {
+            return Vector3Dbl.Cross( AngularVelocity, localPosition );
+        }
 
         public Vector3Dbl GetFicticiousAcceleration( Vector3Dbl localPosition, Vector3Dbl localVelocity )
         {
