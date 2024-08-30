@@ -20,6 +20,7 @@ namespace HSP.Vanilla
             set
             {
                 this._cachedAbsolutePosition = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( value );
+                MakeCacheInvalid();
                 this._rb.position = value;
                 this.transform.position = value;
             }
@@ -36,6 +37,7 @@ namespace HSP.Vanilla
             set
             {
                 _cachedAbsolutePosition = value;
+                MakeCacheInvalid();
                 ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, value );
             }
         }
@@ -46,6 +48,7 @@ namespace HSP.Vanilla
             set
             {
                 this._cachedAbsoluteRotation = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( value );
+                MakeCacheInvalid();
                 this._rb.rotation = value;
                 this.transform.rotation = value;
             }
@@ -62,6 +65,7 @@ namespace HSP.Vanilla
             set
             {
                 _cachedAbsoluteRotation = value;
+                MakeCacheInvalid();
                 ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, value );
             }
         }
@@ -72,6 +76,7 @@ namespace HSP.Vanilla
             set
             {
                 this._cachedAbsoluteVelocity = SceneReferenceFrameManager.ReferenceFrame.TransformVelocity( value );
+                MakeCacheInvalid();
                 this._rb.velocity = value;
             }
         }
@@ -87,6 +92,7 @@ namespace HSP.Vanilla
             set
             {
                 this._cachedAbsoluteVelocity = value;
+                MakeCacheInvalid();
                 ReferenceFrameTransformUtils.SetSceneVelocityFromAbsolute( _rb, value );
             }
         }
@@ -97,6 +103,7 @@ namespace HSP.Vanilla
             set
             {
                 this._cachedAbsoluteAngularVelocity = SceneReferenceFrameManager.ReferenceFrame.TransformAngularVelocity( value );
+                MakeCacheInvalid();
                 this._rb.angularVelocity = value;
             }
         }
@@ -112,6 +119,7 @@ namespace HSP.Vanilla
             set
             {
                 this._cachedAbsoluteAngularVelocity = value;
+                MakeCacheInvalid();
                 ReferenceFrameTransformUtils.SetSceneAngularVelocityFromAbsolute( _rb, value );
             }
         }
@@ -219,9 +227,7 @@ namespace HSP.Vanilla
 
         private void RecalculateCacheIfNeeded()
         {
-            // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)
-            // Vector3's `==` operator does approximate comparison.
-            if( _rb.position.x != _oldPosition.x && _rb.position.y != _oldPosition.y && _rb.position.z != _oldPosition.z )
+            if( IsCacheValid() )
                 return;
 
             RecalculateCache( SceneReferenceFrameManager.ReferenceFrame );
@@ -230,13 +236,21 @@ namespace HSP.Vanilla
 
         private void RecalculateCache( IReferenceFrame sceneReferenceFrame )
         {
-#warning TODO - use cached frame?
             _cachedAbsolutePosition = sceneReferenceFrame.TransformPosition( _rb.position );
             _cachedAbsoluteRotation = sceneReferenceFrame.TransformRotation( _rb.rotation );
             _cachedAbsoluteVelocity = sceneReferenceFrame.TransformVelocity( _rb.velocity );
             _cachedAbsoluteAngularVelocity = sceneReferenceFrame.TransformAngularVelocity( _rb.angularVelocity );
+            // Don't cache acceleration, since it's impossible to compute it here for a dynamic body. Acceleration is recalculated on every fixedupdate instead.
             _cachedSceneReferenceFrame = sceneReferenceFrame;
         }
+
+        // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)
+        // Vector3's `==` operator does approximate comparison.
+        private bool IsCacheValid() => (_rb.position.x == _oldPosition.x && _rb.position.y == _oldPosition.y && _rb.position.z == _oldPosition.z);
+
+        private void MakeCacheValid() => _oldPosition = _rb.position;
+
+        private void MakeCacheInvalid() => _oldPosition = -_rb.position + new Vector3( 1234.56789f, 12345678.9f, 1.23456789f );
 
         void Awake()
         {

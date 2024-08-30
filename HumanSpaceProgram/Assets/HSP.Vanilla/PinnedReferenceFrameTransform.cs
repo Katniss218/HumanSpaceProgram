@@ -26,7 +26,7 @@ namespace HSP.Vanilla
                 _referenceBody = value;
                 if( value != null )
                 {
-                    // invalidate cache.
+                    MakeCacheInvalid();
                     ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
                     ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );
                 }
@@ -39,7 +39,7 @@ namespace HSP.Vanilla
             set
             {
                 _referencePosition = value;
-                // invalidate cache.
+                MakeCacheInvalid();
                 ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
             }
         }
@@ -50,7 +50,7 @@ namespace HSP.Vanilla
             set
             {
                 _referenceRotation = value;
-                // invalidate cache.
+                MakeCacheInvalid();
                 ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );
             }
         }
@@ -60,7 +60,7 @@ namespace HSP.Vanilla
             _referenceBody = referenceBody;
             _referencePosition = referencePosition;
             _referenceRotation = referenceRotation;
-            // invalidate cache.
+            MakeCacheInvalid();
             ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
             ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );
         }
@@ -76,10 +76,7 @@ namespace HSP.Vanilla
             set
             {
                 Vector3Dbl absolutePosition = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( value );
-                _referencePosition = _referenceBody.OrientedReferenceFrame.InverseTransformPosition( absolutePosition );
-
-                // invalidate cache.
-                ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
+                ReferencePosition = _referenceBody.OrientedReferenceFrame.InverseTransformPosition( absolutePosition );
             }
         }
 
@@ -93,10 +90,7 @@ namespace HSP.Vanilla
             set
             {
                 QuaternionDbl absoluteRotation = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( value );
-                _referenceRotation = _referenceBody.OrientedReferenceFrame.InverseTransformRotation( absoluteRotation );
-                
-                // invalidate cache.
-                ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );
+                ReferenceRotation = _referenceBody.OrientedReferenceFrame.InverseTransformRotation( absoluteRotation );
             }
         }
 
@@ -109,9 +103,7 @@ namespace HSP.Vanilla
             }
             set
             {
-                _referencePosition = _referenceBody.OrientedReferenceFrame.InverseTransformPosition( value );
-                // invalidate cache.
-                ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, value );
+                ReferencePosition = _referenceBody.OrientedReferenceFrame.InverseTransformPosition( value );
             }
         }
 
@@ -124,9 +116,7 @@ namespace HSP.Vanilla
             }
             set
             {
-                _referenceRotation = _referenceBody.OrientedReferenceFrame.InverseTransformRotation( value );
-                // invalidate cache.
-                ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, value );
+                ReferenceRotation = _referenceBody.OrientedReferenceFrame.InverseTransformRotation( value );
             }
         }
 
@@ -265,15 +255,12 @@ namespace HSP.Vanilla
 
         private void RecalculateCacheIfNeeded()
         {
-#warning TODO - The cache validation check should be different than just rigidbody position.
-            // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)
-            // Vector3's `==` operator does approximate comparison.
-            if( _rb.position.x != _oldPosition.x && _rb.position.y != _oldPosition.y && _rb.position.z != _oldPosition.z )
+            if( IsCacheValid() )
                 return;
 
             MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame );
             RecalculateCache( SceneReferenceFrameManager.ReferenceFrame );
-            _oldPosition = _rb.position;
+            MakeCacheValid();
         }
 
         private void RecalculateCache( IReferenceFrame sceneReferenceFrame )
@@ -298,6 +285,14 @@ namespace HSP.Vanilla
             _cachedAngularAcceleration = (Vector3)sceneReferenceFrame.InverseTransformAngularAcceleration( _cachedAbsoluteAngularAcceleration );
             _cachedSceneReferenceFrame = sceneReferenceFrame;
         }
+
+        // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)
+        // Vector3's `==` operator does approximate comparison.
+        private bool IsCacheValid() => (_rb.position.x == _oldPosition.x && _rb.position.y == _oldPosition.y && _rb.position.z == _oldPosition.z);
+
+        private void MakeCacheValid() => _oldPosition = _rb.position;
+
+        private void MakeCacheInvalid() => _oldPosition = -_rb.position + new Vector3( 1234.56789f, 12345678.9f, 1.23456789f );
 
         void Awake()
         {

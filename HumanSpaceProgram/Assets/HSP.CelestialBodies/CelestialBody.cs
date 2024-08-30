@@ -75,14 +75,24 @@ namespace HSP.CelestialBodies
         }
 
         /// <summary>
-        /// Constructs the reference frame centered on this body, with axes aligned with the AIRF frame.
+        /// Constructs a reference frame centered on this body, with axes aligned with the absolute frame.
         /// </summary>
         public IReferenceFrame CenteredReferenceFrame => new CenteredReferenceFrame( TimeManager.UT, this.ReferenceFrameTransform.AbsolutePosition );
 
         /// <summary>
-        /// Constructs the reference frame centered on this body, with axes aligned with the body (i.e. local body space).
+        /// Constructs a reference frame centered on this body, with axes aligned with the absolute frame, and the frame's velocity matching that of the body.
+        /// </summary>
+        public IReferenceFrame CenteredInertialReferenceFrame => new CenteredInertialReferenceFrame( TimeManager.UT, this.ReferenceFrameTransform.AbsolutePosition, this.ReferenceFrameTransform.AbsoluteVelocity );
+
+        /// <summary>
+        /// Constructs a reference frame centered on this body, with axes aligned with the body (i.e. local body space).
         /// </summary>
         public IReferenceFrame OrientedReferenceFrame => new OrientedReferenceFrame( TimeManager.UT, this.ReferenceFrameTransform.AbsolutePosition, this.ReferenceFrameTransform.AbsoluteRotation );
+
+        /// <summary>
+        /// Constructs a reference frame centered on this body, with axes aligned with the body (i.e. local body space), and the frame's velocity matching that of the body.
+        /// </summary>
+        public IReferenceFrame OrientedInertialReferenceFrame => new OrientedInertialReferenceFrame( TimeManager.UT, this.ReferenceFrameTransform.AbsolutePosition, this.ReferenceFrameTransform.AbsoluteRotation, this.ReferenceFrameTransform.AbsoluteVelocity );
 
         void Start()
         {

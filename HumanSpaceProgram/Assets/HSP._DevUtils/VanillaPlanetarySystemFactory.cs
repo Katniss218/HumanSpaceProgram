@@ -38,7 +38,7 @@ namespace HSP._DevUtils
             //var group = srf.SpawnGroup( "aabb", 28.5857702f, -80.6507262f, (float)(cb.Radius + 1.0) );
 
             ConstantForceApplier ca = cb.gameObject.AddComponent<ConstantForceApplier>();
-            ca.Force = new Vector3( 1e24f, 0, 0 );
+            ca.Force = new Vector3( 3e24f, 0, 0 );
             ca.Vessel = cb.PhysicsTransform;
         }
     }

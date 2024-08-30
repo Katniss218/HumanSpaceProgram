@@ -24,6 +24,7 @@ namespace HSP.Vanilla
             set
             {
                 _absolutePosition = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( value );
+                MakeCacheInvalid();
                 _rb.position = value;
                 transform.position = value;
             }
@@ -35,6 +36,7 @@ namespace HSP.Vanilla
             set
             {
                 _absolutePosition = value;
+                MakeCacheInvalid();
                 ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, value );
             }
         }
@@ -49,6 +51,7 @@ namespace HSP.Vanilla
             set
             {
                 _absoluteRotation = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( value );
+                MakeCacheInvalid();
                 _rb.rotation = value;
                 transform.rotation = value;
             }
@@ -60,6 +63,7 @@ namespace HSP.Vanilla
             set
             {
                 _absoluteRotation = value;
+                MakeCacheInvalid();
                 ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, value );
             }
         }
@@ -74,13 +78,18 @@ namespace HSP.Vanilla
             set
             {
                 _absoluteVelocity = SceneReferenceFrameManager.ReferenceFrame.TransformVelocity( value );
+                MakeCacheInvalid();
             }
         }
 
         public Vector3Dbl AbsoluteVelocity
         {
             get => _absoluteVelocity;
-            set => _absoluteVelocity = value;
+            set
+            {
+                _absoluteVelocity = value;
+                MakeCacheInvalid();
+            }
         }
 
         public Vector3 AngularVelocity
@@ -93,13 +102,18 @@ namespace HSP.Vanilla
             set
             {
                 _absoluteAngularVelocity = SceneReferenceFrameManager.ReferenceFrame.TransformAngularVelocity( value );
+                MakeCacheInvalid();
             }
         }
 
         public Vector3Dbl AbsoluteAngularVelocity
         {
             get => _absoluteAngularVelocity;
-            set => _absoluteAngularVelocity = value;
+            set
+            {
+                _absoluteAngularVelocity = value;
+                MakeCacheInvalid();
+            }
         }
 
         public Vector3 Acceleration => _cachedAcceleration;
@@ -113,7 +127,7 @@ namespace HSP.Vanilla
         Vector3Dbl _absoluteAngularVelocity;
 
         /// <summary> The scene frame in which the cached values are expressed. </summary>
-        IReferenceFrame _cachedSceneReferenceFrame; 
+        IReferenceFrame _cachedSceneReferenceFrame;
         //Vector3 _cachedPosition;
         //Quaternion _cachedRotation;
         Vector3 _cachedVelocity;
@@ -198,10 +212,7 @@ namespace HSP.Vanilla
         /// </summary>
         private void RecalculateCacheIfNeeded()
         {
-#error TODO - something's still broken with the cached values somewhere either here or in free or pinned transform??.
-            // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)
-            // Vector3's `==` operator does approximate comparison.
-            if( _rb.position.x != _oldPosition.x && _rb.position.y != _oldPosition.y && _rb.position.z != _oldPosition.z )
+            if( IsCacheValid() )
                 return;
 
             MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame );
@@ -213,8 +224,17 @@ namespace HSP.Vanilla
         {
             _cachedVelocity = (Vector3)sceneReferenceFrame.InverseTransformVelocity( AbsoluteVelocity );
             _cachedAngularVelocity = (Vector3)sceneReferenceFrame.InverseTransformAngularVelocity( AbsoluteAngularVelocity );
+            // Don't cache acceleration, since it's impossible to compute it here for a dynamic body. Acceleration is recalculated on every fixedupdate instead.
             _cachedSceneReferenceFrame = sceneReferenceFrame;
         }
+
+        // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)
+        // Vector3's `==` operator does approximate comparison.
+        private bool IsCacheValid() => (_rb.position.x == _oldPosition.x && _rb.position.y == _oldPosition.y && _rb.position.z == _oldPosition.z);
+
+        private void MakeCacheValid() => _oldPosition = _rb.position;
+
+        private void MakeCacheInvalid() => _oldPosition = -_rb.position + new Vector3( 1234.56789f, 12345678.9f, 1.23456789f );
 
         void Awake()
         {

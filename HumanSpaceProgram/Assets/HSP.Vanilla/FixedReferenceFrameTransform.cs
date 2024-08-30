@@ -25,6 +25,7 @@ namespace HSP.Vanilla
             set
             {
                 this._absolutePosition = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( value );
+                MakeCacheInvalid();
                 ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, _absolutePosition );
             }
         }
@@ -35,6 +36,7 @@ namespace HSP.Vanilla
             set
             {
                 _absolutePosition = value;
+                MakeCacheInvalid();
                 ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, value );
             }
         }
@@ -49,6 +51,7 @@ namespace HSP.Vanilla
             set
             {
                 this._absoluteRotation = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( value );
+                MakeCacheInvalid();
                 ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, _absoluteRotation );
             }
         }
@@ -59,6 +62,7 @@ namespace HSP.Vanilla
             set
             {
                 _absoluteRotation = value;
+                MakeCacheInvalid();
                 ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, value );
             }
         }
@@ -204,9 +208,7 @@ namespace HSP.Vanilla
         /// </summary>
         private void RecalculateCacheIfNeeded()
         {
-            // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)
-            // Vector3's `==` operator does approximate comparison.
-            if( _rb.position.x != _oldPosition.x && _rb.position.y != _oldPosition.y && _rb.position.z != _oldPosition.z )
+            if( IsCacheValid() )
                 return;
 
             MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame );
@@ -222,6 +224,14 @@ namespace HSP.Vanilla
             _cachedAngularAcceleration = (Vector3)sceneReferenceFrame.InverseTransformAngularAcceleration( AbsoluteAngularAcceleration );
             _cachedSceneReferenceFrame = sceneReferenceFrame;
         }
+
+        // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)
+        // Vector3's `==` operator does approximate comparison.
+        private bool IsCacheValid() => (_rb.position.x == _oldPosition.x && _rb.position.y == _oldPosition.y && _rb.position.z == _oldPosition.z);
+
+        private void MakeCacheValid() => _oldPosition = _rb.position;
+
+        private void MakeCacheInvalid() => _oldPosition = -_rb.position + new Vector3( 1234.56789f, 12345678.9f, 1.23456789f );
 
         void Awake()
         {
