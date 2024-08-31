@@ -69,14 +69,16 @@ namespace HSP._DevUtils
 
             var v = CreateVessel( launchSite );
             vessel = v;
-            // Vector3Dbl velocity = new Vector3Dbl( 10, 0, 0 ).normalized * 50_000_000;
-            //Vector3Dbl velocity = Vector3Dbl.zero;
-            //body.ReferenceFrameTransform.AbsoluteVelocity = velocity;
-#warning TODO - velocity propagation for 'pinned' objects.
-            vessel.ReferenceFrameTransform.AbsoluteVelocity = launchSite.ReferenceFrameTransform.AbsoluteVelocity;
 
-            ActiveVesselManager.ActiveObject = v.RootPart.GetVessel().gameObject.transform;
-            SceneReferenceFrameManager.TargetObject = v.RootPart.GetVessel().ReferenceFrameTransform;
+            //ActiveVesselManager.ActiveObject = vessel.RootPart.GetVessel().gameObject.transform;
+            //SceneReferenceFrameManager.TargetObject = vessel.RootPart.GetVessel().ReferenceFrameTransform;
+            ActiveVesselManager.ActiveObject = launchSite.RootPart.GetVessel().gameObject.transform;
+            SceneReferenceFrameManager.TargetObject = launchSite.RootPart.GetVessel().ReferenceFrameTransform;
+
+            Vector3Dbl velocity = new Vector3Dbl( 32, 0, 0 );
+            body.ReferenceFrameTransform.AbsoluteVelocity = velocity;
+#warning TODO - velocity propagation for objects near planets.
+            vessel.ReferenceFrameTransform.AbsoluteVelocity = velocity;
         }
 
         private static Vessel CreateVessel( Vessel launchSite )
@@ -119,13 +121,23 @@ namespace HSP._DevUtils
             uiImage.texture = normalmap;*/
         }
 
-        void Update()
+        void FixedUpdate()
         {
+
             if( UnityEngine.Input.GetKeyDown( KeyCode.F3 ) )
             {
                 SceneReferenceFrameManager.ChangeSceneReferenceFrame( new CenteredInertialReferenceFrame( TimeManager.UT,
                     SceneReferenceFrameManager.TargetObject.AbsolutePosition, SceneReferenceFrameManager.TargetObject.AbsoluteVelocity ) );
             }
+        }
+
+        void Update()
+        {
+            /*if( UnityEngine.Input.GetKeyDown( KeyCode.F3 ) )
+            {
+                SceneReferenceFrameManager.ChangeSceneReferenceFrame( new CenteredInertialReferenceFrame( TimeManager.UT,
+                    SceneReferenceFrameManager.TargetObject.AbsolutePosition, SceneReferenceFrameManager.TargetObject.AbsoluteVelocity ) );
+            }*/
             if( UnityEngine.Input.GetKeyDown( KeyCode.F4 ) )
             {
                 VesselMetadata loadedVesselMetadata = VesselMetadata.LoadFromDisk( "vessel2" );

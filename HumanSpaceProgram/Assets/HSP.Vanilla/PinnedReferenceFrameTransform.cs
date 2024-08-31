@@ -168,6 +168,7 @@ namespace HSP.Vanilla
 
         /// <summary> The scene frame in which the cached values are expressed. </summary>
         IReferenceFrame _cachedSceneReferenceFrame;
+        IReferenceFrame _cachedBodyReferenceFrame;
         //Vector3 _cachedPosition;
         Vector3Dbl _cachedAbsolutePosition;
         //Quaternion _cachedRotation;
@@ -245,12 +246,11 @@ namespace HSP.Vanilla
         {
             if( ReferenceBody == null )
                 return;
-
             var bodyFrame = ReferenceBody.OrientedReferenceFrame;
             var pos = (Vector3)sceneReferenceFrame.InverseTransformPosition( bodyFrame.TransformPosition( _referencePosition ) );
             var rot = (Quaternion)sceneReferenceFrame.InverseTransformRotation( bodyFrame.TransformRotation( _referenceRotation ) );
             _rb.Move( pos, rot );
-            _cachedSceneReferenceFrame = sceneReferenceFrame;
+            //_cachedSceneReferenceFrame = sceneReferenceFrame;
         }
 
         private void RecalculateCacheIfNeeded()
@@ -258,37 +258,51 @@ namespace HSP.Vanilla
             if( IsCacheValid() )
                 return;
 
-            MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame );
+            //MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame );
             RecalculateCache( SceneReferenceFrameManager.ReferenceFrame );
             MakeCacheValid();
         }
 
         private void RecalculateCache( IReferenceFrame sceneReferenceFrame )
         {
-            IReferenceFrame bodyFrame = _referenceBody.OrientedReferenceFrame;
-            _cachedAbsolutePosition = bodyFrame.TransformPosition( _referencePosition );
-            _cachedAbsoluteRotation = bodyFrame.TransformRotation( _referenceRotation );
-            _cachedAbsoluteVelocity = bodyFrame.TransformVelocity( Vector3Dbl.zero );
-            _cachedAbsoluteAngularVelocity = bodyFrame.TransformAngularVelocity( Vector3Dbl.zero );
+            if( _referenceBody == null )
+                return;
 
-            if( bodyFrame is INonInertialReferenceFrame nonInertialBodyFrame )
+#warning TODO - pinned stops recalculating if scene velocity matches it, even if the reference body is moving. so absolute values are not recached.
+            //Debug.LogWarning( "PINNED RECALCULATING" );
+            IReferenceFrame bodyReferenceFrame = _referenceBody.OrientedInertialReferenceFrame;
+            _cachedAbsolutePosition = bodyReferenceFrame.TransformPosition( _referencePosition );
+            _cachedAbsoluteRotation = bodyReferenceFrame.TransformRotation( _referenceRotation );
+            _cachedAbsoluteVelocity = bodyReferenceFrame.TransformVelocity( Vector3Dbl.zero );
+            _cachedAbsoluteAngularVelocity = bodyReferenceFrame.TransformAngularVelocity( Vector3Dbl.zero );
+
+            if( bodyReferenceFrame is INonInertialReferenceFrame nonInertialBodyFrame )
             {
                 _cachedAbsoluteVelocity += nonInertialBodyFrame.GetTangentialVelocity( _referencePosition );
             }
 
-            _cachedVelocity = (Vector3)sceneReferenceFrame.InverseTransformAngularVelocity( _cachedAbsoluteVelocity );
+            _cachedVelocity = (Vector3)sceneReferenceFrame.InverseTransformVelocity( _cachedAbsoluteVelocity );
             _cachedAngularVelocity = (Vector3)sceneReferenceFrame.InverseTransformAngularVelocity( _cachedAbsoluteVelocity );
 
-            _cachedAbsoluteAcceleration = bodyFrame.TransformAcceleration( Vector3Dbl.zero );
-            _cachedAbsoluteAngularAcceleration = bodyFrame.TransformAngularAcceleration( Vector3Dbl.zero );
-            _cachedAcceleration = (Vector3)sceneReferenceFrame.InverseTransformAngularAcceleration( _cachedAbsoluteAcceleration );
+            _cachedAbsoluteAcceleration = bodyReferenceFrame.TransformAcceleration( Vector3Dbl.zero );
+            _cachedAbsoluteAngularAcceleration = bodyReferenceFrame.TransformAngularAcceleration( Vector3Dbl.zero );
+            _cachedAcceleration = (Vector3)sceneReferenceFrame.InverseTransformAcceleration( _cachedAbsoluteAcceleration );
             _cachedAngularAcceleration = (Vector3)sceneReferenceFrame.InverseTransformAngularAcceleration( _cachedAbsoluteAngularAcceleration );
             _cachedSceneReferenceFrame = sceneReferenceFrame;
+            _cachedBodyReferenceFrame = bodyReferenceFrame;
+
+            //var pinned2 = FindObjectOfType<PinnedReferenceFrameTransform>();
+            //var pinned = pinned2.Position;
+#warning TODO - pinned rigidbody pos and `Position` are equal.
+#warning TODO - pinned rigidbody pos is not 0 even though it's supposedly being followed.
+           // Debug.Log( "P" + _rb.position.x );
         }
 
         // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)
         // Vector3's `==` operator does approximate comparison.
-        private bool IsCacheValid() => (_rb.position.x == _oldPosition.x && _rb.position.y == _oldPosition.y && _rb.position.z == _oldPosition.z);
+        private bool IsCacheValid() => (_rb.position.x == _oldPosition.x && _rb.position.y == _oldPosition.y && _rb.position.z == _oldPosition.z
+            && SceneReferenceFrameManager.ReferenceFrame.Equals( _cachedSceneReferenceFrame )
+            && _referenceBody.OrientedInertialReferenceFrame.Equals( _cachedBodyReferenceFrame ));
 
         private void MakeCacheValid() => _oldPosition = _rb.position;
 
@@ -323,6 +337,9 @@ namespace HSP.Vanilla
             ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
             ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );
             RecalculateCache( data.NewFrame );
+            //Debug.LogWarning( "v: " + _cachedAbsolutePosition.x );
+            // -907799,812522888
+            // -907799,812522888 - doesn't change.
         }
 
         void OnEnable()

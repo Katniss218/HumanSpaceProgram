@@ -213,7 +213,7 @@ namespace HSP.Vanilla
 
             MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame );
             RecalculateCache( SceneReferenceFrameManager.ReferenceFrame );
-            _oldPosition = _rb.position;
+            MakeCacheValid();
         }
 
         private void RecalculateCache( IReferenceFrame sceneReferenceFrame )

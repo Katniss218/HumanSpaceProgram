@@ -99,5 +99,33 @@ namespace HSP.ReferenceFrames
         {
             return absoluteAngularAcceleration;
         }
+
+        public bool Equals( IReferenceFrame other )
+        {
+            if( other == null )
+                return false;
+
+            return other.TransformPosition( Vector3Dbl.zero ) == this._position
+                && other.TransformRotation( QuaternionDbl.identity ) == QuaternionDbl.identity
+                && other.TransformVelocity( Vector3Dbl.zero ) == Vector3Dbl.zero
+                && other.TransformAngularVelocity( Vector3Dbl.zero ) == Vector3Dbl.zero
+                && other.TransformAcceleration( Vector3Dbl.zero ) == Vector3Dbl.zero
+                && other.TransformAngularAcceleration( Vector3Dbl.zero ) == Vector3Dbl.zero;
+        }
+
+        public bool EqualsIgnoreUT( IReferenceFrame other )
+        {
+            if( other == null )
+                return false;
+
+            IReferenceFrame otherNormalizedUT = other.AtUT( this.ReferenceUT );
+
+            return otherNormalizedUT.TransformPosition( Vector3Dbl.zero ) == this._position
+                && otherNormalizedUT.TransformRotation( QuaternionDbl.identity ) == QuaternionDbl.identity
+                && otherNormalizedUT.TransformVelocity( Vector3Dbl.zero ) == Vector3Dbl.zero
+                && otherNormalizedUT.TransformAngularVelocity( Vector3Dbl.zero ) == Vector3Dbl.zero
+                && otherNormalizedUT.TransformAcceleration( Vector3Dbl.zero ) == Vector3Dbl.zero
+                && otherNormalizedUT.TransformAngularAcceleration( Vector3Dbl.zero ) == Vector3Dbl.zero;
+        }
     }
 }

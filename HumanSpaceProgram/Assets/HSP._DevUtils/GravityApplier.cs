@@ -12,7 +12,7 @@ namespace HSP._DevUtils
         void FixedUpdate()
         {
             Vector3Dbl airfGravityForce = GravityUtils.GetNBodyGravityForce( Vessel.ReferenceFrameTransform.AbsolutePosition, Vessel.PhysicsTransform.Mass );
-            Vessel.PhysicsTransform.AddForce( (Vector3)airfGravityForce );
+           // Vessel.PhysicsTransform.AddForce( (Vector3)airfGravityForce );
         }
 
         [HSPEventListener( HSPEvent_ON_VESSEL_CREATED.ID, "add_gravity_applier" )]

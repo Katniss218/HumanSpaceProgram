@@ -123,7 +123,7 @@ namespace HSP.Time
                 return;
             }
 
-            UnityEngine.Time.fixedDeltaTime = Mathf.Clamp( 0.02f * (timeScale / 8.0f), 0.02f, 0.08f );
+          //  UnityEngine.Time.fixedDeltaTime = Mathf.Clamp( 0.02f * (timeScale / 8.0f), 0.02f, 0.08f );
 
             _oldTimeScale = _timeScale;
             _timeScale = timeScale;

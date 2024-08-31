@@ -1,11 +1,12 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace HSP.ReferenceFrames
 {
     /// <summary>
     /// Represents an arbitrary reference frame.
     /// </summary>
-    public interface IReferenceFrame
+    public interface IReferenceFrame : IEquatable<IReferenceFrame>
     {
         // There's "Absolute" space, which is the new 64-bit "world space".
         // - We can't use Unity's world space for that because of 32-bit float precision issues.
@@ -97,5 +98,7 @@ namespace HSP.ReferenceFrames
         /// Transforms angular acceleration in the Absolute (AIRF) space to the frame's space.
         /// </summary>
         Vector3Dbl InverseTransformAngularAcceleration( Vector3Dbl absoluteAngularAcceleration );
+
+        bool EqualsIgnoreUT( IReferenceFrame other );
     }
 }

@@ -2,6 +2,7 @@
 using HSP.Time;
 using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityPlus.Serialization;
 
@@ -137,7 +138,7 @@ namespace HSP.Vanilla
         Vector3 _cachedAngularAcceleration;
         Vector3Dbl _cachedAbsoluteAngularAcceleration;
 
-        Vector3 _oldPosition;
+        Vector3Dbl _oldAbsolutePosition;
 
         Vector3Dbl _absoluteAccelerationSum = Vector3.zero;
         Vector3Dbl _absoluteAngularAccelerationSum = Vector3.zero;
@@ -215,9 +216,10 @@ namespace HSP.Vanilla
             if( IsCacheValid() )
                 return;
 
+            Debug.Log( "RECALCULATING" );
             MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame );
             RecalculateCache( SceneReferenceFrameManager.ReferenceFrame );
-            _oldPosition = _rb.position;
+            MakeCacheValid();
         }
 
         private void RecalculateCache( IReferenceFrame sceneReferenceFrame )
@@ -226,15 +228,20 @@ namespace HSP.Vanilla
             _cachedAngularVelocity = (Vector3)sceneReferenceFrame.InverseTransformAngularVelocity( AbsoluteAngularVelocity );
             // Don't cache acceleration, since it's impossible to compute it here for a dynamic body. Acceleration is recalculated on every fixedupdate instead.
             _cachedSceneReferenceFrame = sceneReferenceFrame;
+
+            var vessel = FindObjectOfType<FreeReferenceFrameTransform>();
+            var launchpad = FindObjectOfType<PinnedReferenceFrameTransform>().GetComponent<Rigidbody>();
+            Debug.Log( TimeManager.UT + " :: " + this.AbsolutePosition.x + " :: " + (vessel.Position.x - launchpad.position.x) );
         }
 
         // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)
         // Vector3's `==` operator does approximate comparison.
-        private bool IsCacheValid() => (_rb.position.x == _oldPosition.x && _rb.position.y == _oldPosition.y && _rb.position.z == _oldPosition.z);
+        private bool IsCacheValid() => (_absolutePosition.x == _oldAbsolutePosition.x && _absolutePosition.y == _oldAbsolutePosition.y && _absolutePosition.z == _oldAbsolutePosition.z
+            && SceneReferenceFrameManager.ReferenceFrame.Equals( _cachedSceneReferenceFrame ));
 
-        private void MakeCacheValid() => _oldPosition = _rb.position;
+        private void MakeCacheValid() => _oldAbsolutePosition = _absolutePosition;
 
-        private void MakeCacheInvalid() => _oldPosition = -_rb.position + new Vector3( 1234.56789f, 12345678.9f, 1.23456789f );
+        private void MakeCacheInvalid() => _oldAbsolutePosition = -_absolutePosition + new Vector3Dbl( 1234.56789, 12345678.9, 1.23456789 );
 
         void Awake()
         {
@@ -277,6 +284,10 @@ namespace HSP.Vanilla
             ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, _absolutePosition );
             ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, _absoluteRotation );
             RecalculateCache( data.NewFrame );
+
+            var vessel = FindObjectOfType<FreeReferenceFrameTransform>();
+            var launchpad = FindObjectOfType<PinnedReferenceFrameTransform>().GetComponent<Rigidbody>();
+            Debug.Log( "W" + TimeManager.UT + " :: " + this.AbsolutePosition.x + " :: " + (vessel.Position.x - launchpad.position.x) );
         }
 
         void OnEnable()

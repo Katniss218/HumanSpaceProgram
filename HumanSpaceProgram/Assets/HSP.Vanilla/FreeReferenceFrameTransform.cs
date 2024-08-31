@@ -1,4 +1,5 @@
-﻿using HSP.ReferenceFrames;
+﻿using HSP.CelestialBodies;
+using HSP.ReferenceFrames;
 using HSP.Time;
 using System;
 using System.Linq;
@@ -231,22 +232,35 @@ namespace HSP.Vanilla
                 return;
 
             RecalculateCache( SceneReferenceFrameManager.ReferenceFrame );
-            _oldPosition = _rb.position;
+            MakeCacheValid();
         }
+
+        Vector3Dbl _previousCachedAbsolutePosition;
 
         private void RecalculateCache( IReferenceFrame sceneReferenceFrame )
         {
+            //Debug.LogWarning( "FREE RECALCULATING" );
             _cachedAbsolutePosition = sceneReferenceFrame.TransformPosition( _rb.position );
             _cachedAbsoluteRotation = sceneReferenceFrame.TransformRotation( _rb.rotation );
             _cachedAbsoluteVelocity = sceneReferenceFrame.TransformVelocity( _rb.velocity );
             _cachedAbsoluteAngularVelocity = sceneReferenceFrame.TransformAngularVelocity( _rb.angularVelocity );
             // Don't cache acceleration, since it's impossible to compute it here for a dynamic body. Acceleration is recalculated on every fixedupdate instead.
             _cachedSceneReferenceFrame = sceneReferenceFrame;
+
+           var pinned = FindObjectOfType<PinnedReferenceFrameTransform>();
+#warning TODO - _rb.position is set to a wrong value one frame after the (0,0,0) case.
+            //Debug.Log( TimeManager.UT + " :: " + pinned.AbsolutePosition.x + " :: " + (_rb.position.x - pinned.Position.x) + " :: " + (_cachedAbsolutePosition - _previousCachedAbsolutePosition) );
+            var x = TimeManager.UT + " :: " + pinned.AbsolutePosition.x + " :: " + (_rb.position.x - pinned.Position.x) + " :: " + (_cachedAbsolutePosition - _previousCachedAbsolutePosition);
+            // body position in that time also moves. but now which one is right, it's a relative question. body uses absolute to drive itself.
+            // and there's no difference in the absolute position, only scene position, which implies that the vessel moves.
+#warning The same absolute position is cached twice. For some reason. This doesn't happen when manually set the update order of scene reference frame manager, for some reason.
+            _previousCachedAbsolutePosition = _cachedAbsolutePosition;
         }
 
         // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)
         // Vector3's `==` operator does approximate comparison.
-        private bool IsCacheValid() => (_rb.position.x == _oldPosition.x && _rb.position.y == _oldPosition.y && _rb.position.z == _oldPosition.z);
+        private bool IsCacheValid() => (_rb.position.x == _oldPosition.x && _rb.position.y == _oldPosition.y && _rb.position.z == _oldPosition.z
+            && SceneReferenceFrameManager.ReferenceFrame.Equals( _cachedSceneReferenceFrame ));
 
         private void MakeCacheValid() => _oldPosition = _rb.position;
 
@@ -284,6 +298,13 @@ namespace HSP.Vanilla
                 this._rb.AddForce( linAcc, ForceMode.Acceleration );
                 this._rb.AddTorque( angAcc, ForceMode.Acceleration );
             }
+
+#warning TODO - absoluteposition appears to have frozen?? regardless of what the active object is. cache invalidation not working?
+            // var pinned = FindObjectOfType<PinnedReferenceFrameTransform>().AbsolutePosition;
+            // Debug.Log( AbsolutePosition.x + " " + (AbsolutePosition.x - pinned.x) + " " + pinned.x );
+            //Debug.Log( _rb.velocity.x );
+
+
 
 #warning TODO - timemanager.fixeddeltatime might not equal time.fixeddeltatime (at high warp values), it needs to be handled explicitly here (analogous to kinematic, but only when warp is not synced).
 
@@ -325,6 +346,8 @@ namespace HSP.Vanilla
 
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
+            Debug.LogWarning( "SWITCH 444444444444444444444444444444444444444444444" );
+#warning TODO - removing this doesn't seem to do anything anymore. It's also not done properly.
             // Enforces that subsequent calls of the function will not further transform the values into an incorrect value if the values has already been transformed.
             // - I.e. makes the method idempotent.
             // This allows calling this method to ensure that the absolute position/rotation/etc is correct.
@@ -332,13 +355,13 @@ namespace HSP.Vanilla
             {
                 return;
             }
-
-            RecalculateCache( data.OldFrame ); // Old frame because the data is in the old frame.
-
+            var cachedFrame = _cachedSceneReferenceFrame;
+            RecalculateCache( data.OldFrame ); // Old frame because the current scene-space data is still in the old frame.
             ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, _cachedAbsolutePosition );
             ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, _cachedAbsoluteRotation );
             ReferenceFrameTransformUtils.SetSceneVelocityFromAbsolute( _rb, _cachedAbsoluteVelocity );
             ReferenceFrameTransformUtils.SetSceneAngularVelocityFromAbsolute( _rb, _cachedAbsoluteAngularVelocity );
+            _cachedSceneReferenceFrame = cachedFrame;
         }
 
         void OnEnable()

@@ -149,5 +149,33 @@ namespace HSP.ReferenceFrames
             // If not accounted for, the object would pick up rotational velocity from the frame.
             return (-_angularAcceleration);
         }
+
+        public bool Equals( IReferenceFrame other )
+        {
+            if( other == null )
+                return false;
+
+            return other.TransformPosition( Vector3Dbl.zero ) == this._position
+                && other.TransformRotation( QuaternionDbl.identity ) == QuaternionDbl.identity
+                && other.TransformVelocity( Vector3Dbl.zero ) == this._velocity
+                && other.TransformAngularVelocity( Vector3Dbl.zero ) == this._angularVelocity
+                && other.TransformAcceleration( Vector3Dbl.zero ) == this._acceleration
+                && other.TransformAngularAcceleration( Vector3Dbl.zero ) == this._angularAcceleration;
+        }
+
+        public bool EqualsIgnoreUT( IReferenceFrame other )
+        {
+            if( other == null )
+                return false;
+
+            IReferenceFrame otherNormalizedUT = other.AtUT( this.ReferenceUT );
+
+            return otherNormalizedUT.TransformPosition( Vector3Dbl.zero ) == this._position
+                && otherNormalizedUT.TransformRotation( QuaternionDbl.identity ) == QuaternionDbl.identity
+                && otherNormalizedUT.TransformVelocity( Vector3Dbl.zero ) == this._velocity
+                && otherNormalizedUT.TransformAngularVelocity( Vector3Dbl.zero ) == this._angularVelocity
+                && otherNormalizedUT.TransformAcceleration( Vector3Dbl.zero ) == this._acceleration
+                && otherNormalizedUT.TransformAngularAcceleration( Vector3Dbl.zero ) == this._angularAcceleration;
+        }
     }
 }
