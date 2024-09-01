@@ -216,7 +216,6 @@ namespace HSP.Vanilla
             if( IsCacheValid() )
                 return;
 
-            Debug.Log( "RECALCULATING" );
             MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame );
             RecalculateCache( SceneReferenceFrameManager.ReferenceFrame );
             MakeCacheValid();
@@ -228,10 +227,6 @@ namespace HSP.Vanilla
             _cachedAngularVelocity = (Vector3)sceneReferenceFrame.InverseTransformAngularVelocity( AbsoluteAngularVelocity );
             // Don't cache acceleration, since it's impossible to compute it here for a dynamic body. Acceleration is recalculated on every fixedupdate instead.
             _cachedSceneReferenceFrame = sceneReferenceFrame;
-
-            var vessel = FindObjectOfType<FreeReferenceFrameTransform>();
-            var launchpad = FindObjectOfType<PinnedReferenceFrameTransform>().GetComponent<Rigidbody>();
-            Debug.Log( TimeManager.UT + " :: " + this.AbsolutePosition.x + " :: " + (vessel.Position.x - launchpad.position.x) );
         }
 
         // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)

@@ -247,10 +247,10 @@ namespace HSP.Vanilla
             // Don't cache acceleration, since it's impossible to compute it here for a dynamic body. Acceleration is recalculated on every fixedupdate instead.
             _cachedSceneReferenceFrame = sceneReferenceFrame;
 
-           var pinned = FindObjectOfType<PinnedReferenceFrameTransform>();
+            var pinned = FindObjectOfType<PinnedReferenceFrameTransform>();
 #warning TODO - _rb.position is set to a wrong value one frame after the (0,0,0) case.
-            //Debug.Log( TimeManager.UT + " :: " + pinned.AbsolutePosition.x + " :: " + (_rb.position.x - pinned.Position.x) + " :: " + (_cachedAbsolutePosition - _previousCachedAbsolutePosition) );
-            var x = TimeManager.UT + " :: " + pinned.AbsolutePosition.x + " :: " + (_rb.position.x - pinned.Position.x) + " :: " + (_cachedAbsolutePosition - _previousCachedAbsolutePosition);
+            
+            Debug.Log( (_rb.position.x - pinned.Position.x) + " :: " + _cachedAbsolutePosition + " :: " + _rb.position );
             // body position in that time also moves. but now which one is right, it's a relative question. body uses absolute to drive itself.
             // and there's no difference in the absolute position, only scene position, which implies that the vessel moves.
 #warning The same absolute position is cached twice. For some reason. This doesn't happen when manually set the update order of scene reference frame manager, for some reason.
@@ -300,8 +300,8 @@ namespace HSP.Vanilla
             }
 
 #warning TODO - absoluteposition appears to have frozen?? regardless of what the active object is. cache invalidation not working?
-            // var pinned = FindObjectOfType<PinnedReferenceFrameTransform>().AbsolutePosition;
-            // Debug.Log( AbsolutePosition.x + " " + (AbsolutePosition.x - pinned.x) + " " + pinned.x );
+            //var pinned = FindObjectOfType<PinnedReferenceFrameTransform>().AbsolutePosition;
+            //Debug.Log( AbsolutePosition.x + " " + (AbsolutePosition.x - pinned.x) + " " + pinned.x );
             //Debug.Log( _rb.velocity.x );
 
 
