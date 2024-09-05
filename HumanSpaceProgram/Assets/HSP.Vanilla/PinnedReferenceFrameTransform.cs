@@ -249,7 +249,12 @@ namespace HSP.Vanilla
             var bodyFrame = ReferenceBody.OrientedReferenceFrame;
             var pos = (Vector3)sceneReferenceFrame.InverseTransformPosition( bodyFrame.TransformPosition( _referencePosition ) );
             var rot = (Quaternion)sceneReferenceFrame.InverseTransformRotation( bodyFrame.TransformRotation( _referenceRotation ) );
-            _rb.Move( pos, rot );
+            //_rb.Move( pos, rot );
+
+            transform.position = pos; // Setting the transform is still important for some cases.
+            _rb.position = pos;
+            transform.rotation = rot; // Setting the transform is still important for some cases.
+            _rb.rotation = rot;
             //_cachedSceneReferenceFrame = sceneReferenceFrame;
         }
 
@@ -258,11 +263,12 @@ namespace HSP.Vanilla
             if( IsCacheValid() )
                 return;
 
-            //MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame );
+            MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame );
             RecalculateCache( SceneReferenceFrameManager.ReferenceFrame );
             MakeCacheValid();
         }
 
+        int i = 0;
         private void RecalculateCache( IReferenceFrame sceneReferenceFrame )
         {
             if( _referenceBody == null )
@@ -290,12 +296,16 @@ namespace HSP.Vanilla
             _cachedAngularAcceleration = (Vector3)sceneReferenceFrame.InverseTransformAngularAcceleration( _cachedAbsoluteAngularAcceleration );
             _cachedSceneReferenceFrame = sceneReferenceFrame;
             _cachedBodyReferenceFrame = bodyReferenceFrame;
+            //var pos = (Vector3)sceneReferenceFrame.InverseTransformPosition( bodyReferenceFrame.TransformPosition( _referencePosition ) );
+
+#warning TODO - _rb.position is not the same as the cached position when using _rb.Move
+            //Debug.Log( "PINN" + i + $"[{sceneReferenceFrame.ReferenceUT}] " + " :: " + _cachedAbsolutePosition.x + " :: " + _rb.position.x + " :: " + pos.x + " :: " + sceneReferenceFrame.TransformPosition( Vector3Dbl.zero ).x );
 
             //var pinned2 = FindObjectOfType<PinnedReferenceFrameTransform>();
             //var pinned = pinned2.Position;
 #warning TODO - pinned rigidbody pos and `Position` are equal.
 #warning TODO - pinned rigidbody pos is not 0 even though it's supposedly being followed.
-           // Debug.Log( "P" + _rb.position.x );
+            // Debug.Log( "P" + _rb.position.x );
         }
 
         // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)
@@ -329,6 +339,7 @@ namespace HSP.Vanilla
         {
             // Move, because the scene (or reference body) might be moving, and move ensures that the body is swept instead of teleported.
             this.MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame );
+            i++;
         }
 
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )

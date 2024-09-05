@@ -249,8 +249,9 @@ namespace HSP.Vanilla
 
             var pinned = FindObjectOfType<PinnedReferenceFrameTransform>();
 #warning TODO - _rb.position is set to a wrong value one frame after the (0,0,0) case.
-            
-            Debug.Log( (_rb.position.x - pinned.Position.x) + " :: " + _cachedAbsolutePosition + " :: " + _rb.position );
+#warning TODO - something with calling cache from update vs fixedupdate and timemanager returning incorrect UT mayyyyybe??
+            // cached position
+            Debug.Log( "FREE" + i + "{} " + (_rb.position.x - pinned.Position.x) + " :: " + _cachedAbsolutePosition.x + " :: " + _rb.position.x + " :: " + _rb.velocity.x + " :: " + sceneReferenceFrame.TransformPosition( Vector3Dbl.zero ).x );
             // body position in that time also moves. but now which one is right, it's a relative question. body uses absolute to drive itself.
             // and there's no difference in the absolute position, only scene position, which implies that the vessel moves.
 #warning The same absolute position is cached twice. For some reason. This doesn't happen when manually set the update order of scene reference frame manager, for some reason.
@@ -283,6 +284,8 @@ namespace HSP.Vanilla
             _rb.isKinematic = false;
         }
 
+        int i = 0;
+
         void FixedUpdate()
         {
             if( SceneReferenceFrameManager.ReferenceFrame is INonInertialReferenceFrame frame )
@@ -303,7 +306,6 @@ namespace HSP.Vanilla
             //var pinned = FindObjectOfType<PinnedReferenceFrameTransform>().AbsolutePosition;
             //Debug.Log( AbsolutePosition.x + " " + (AbsolutePosition.x - pinned.x) + " " + pinned.x );
             //Debug.Log( _rb.velocity.x );
-
 
 
 #warning TODO - timemanager.fixeddeltatime might not equal time.fixeddeltatime (at high warp values), it needs to be handled explicitly here (analogous to kinematic, but only when warp is not synced).
@@ -332,6 +334,7 @@ namespace HSP.Vanilla
             this._oldAngularVelocity = AngularVelocity;
             this._absoluteAccelerationSum = Vector3.zero;
             this._absoluteAngularAccelerationSum = Vector3.zero;
+            i++;
         }
 
         // The faster something goes in scene space when colliding with another thing, it gets laggier for physics processing (computation of "contacts")

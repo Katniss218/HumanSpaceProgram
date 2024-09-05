@@ -227,6 +227,9 @@ namespace HSP.Vanilla
             _cachedAngularVelocity = (Vector3)sceneReferenceFrame.InverseTransformAngularVelocity( AbsoluteAngularVelocity );
             // Don't cache acceleration, since it's impossible to compute it here for a dynamic body. Acceleration is recalculated on every fixedupdate instead.
             _cachedSceneReferenceFrame = sceneReferenceFrame;
+
+            //Debug.Log( "KINE" + i + "{} " + (double.NaN) + " :: " + _absolutePosition.x + " :: " + _rb.position.x + " :: " + _rb.velocity.x + " :: " + sceneReferenceFrame.TransformPosition( Vector3Dbl.zero ).x );
+
         }
 
         // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)
@@ -255,6 +258,8 @@ namespace HSP.Vanilla
             _rb.isKinematic = true;
         }
 
+        int i = 0;
+
         void FixedUpdate()
         {
             QuaternionDbl deltaRotation = QuaternionDbl.Euler( _absoluteAngularVelocity * TimeManager.FixedDeltaTime * 57.2957795131 );
@@ -272,6 +277,7 @@ namespace HSP.Vanilla
 
             this._absoluteAccelerationSum = Vector3.zero;
             this._absoluteAngularAccelerationSum = Vector3.zero;
+            i++;
         }
 
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
