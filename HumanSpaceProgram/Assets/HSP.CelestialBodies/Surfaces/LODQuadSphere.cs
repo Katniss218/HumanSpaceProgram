@@ -110,7 +110,7 @@ namespace HSP.CelestialBodies.Surfaces
             List<LODQuad> newActiveQuads = new List<LODQuad>( _activeQuads );
             List<LODQuad> needRemeshing = new List<LODQuad>();
 
-            Vector3Dbl[] airfPOIs = new Vector3Dbl[] { Vector3Dbl.zero }; // PoIGetter.Invoke().ToArray();
+            Vector3Dbl[] airfPOIs = PoIGetter.Invoke().ToArray();
 
             bool allPoisTheSame = NewPoisTheSameAsLastFrame( airfPOIs );
 

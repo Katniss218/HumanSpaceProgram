@@ -59,9 +59,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\HSP.ViewportTools\TranslationTransformHandle.cs" />
-    <Compile Include="Assets\HSP.ViewportTools\TransformHandleSet.cs" />
     <Compile Include="Assets\HSP.ViewportTools\TransformHandle.cs" />
     <Compile Include="Assets\HSP.ViewportTools\RotationTransformHandle.cs" />
+    <Compile Include="Assets\HSP.ViewportTools\TransformHandleSet.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.ViewportTools\___HSP.ViewportTools.asmdef" />

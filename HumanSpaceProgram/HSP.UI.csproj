@@ -58,13 +58,13 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.UI\CanvasName.cs" />
-    <Compile Include="Assets\HSP.UI\UILineRenderer.cs" />
-    <Compile Include="Assets\HSP.UI\UITextReadout_FPS.cs" />
     <Compile Include="Assets\HSP.UI\Windows\UIPromptWindow.cs" />
     <Compile Include="Assets\HSP.UI\Defaults\UIText_Ex.cs" />
+    <Compile Include="Assets\HSP.UI\CanvasName.cs" />
     <Compile Include="Assets\HSP.UI\Windows\UIConfirmWindow.cs" />
     <Compile Include="Assets\HSP.UI\Defaults\UIDefaults.cs" />
+    <Compile Include="Assets\HSP.UI\UILineRenderer.cs" />
+    <Compile Include="Assets\HSP.UI\UITextReadout_FPS.cs" />
     <Compile Include="Assets\HSP.UI\Windows\UIAlertWindow.cs" />
   </ItemGroup>
   <ItemGroup>

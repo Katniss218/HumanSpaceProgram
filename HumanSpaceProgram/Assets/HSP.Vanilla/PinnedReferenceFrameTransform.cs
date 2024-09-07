@@ -2,6 +2,7 @@
 using HSP.ReferenceFrames;
 using HSP.Time;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityPlus.Serialization;
 
@@ -71,12 +72,13 @@ namespace HSP.Vanilla
             get
             {
                 RecalculateCacheIfNeeded();
-                return _rb.position;
+                return _rbPos;
             }
             set
             {
                 Vector3Dbl absolutePosition = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( value );
                 ReferencePosition = _referenceBody.OrientedReferenceFrame.InverseTransformPosition( absolutePosition );
+                _rbPos = 
             }
         }
 
@@ -85,7 +87,7 @@ namespace HSP.Vanilla
             get
             {
                 RecalculateCacheIfNeeded();
-                return _rb.rotation;
+                return _rbRot;
             }
             set
             {
@@ -268,11 +270,18 @@ namespace HSP.Vanilla
             MakeCacheValid();
         }
 
+        private Vector3 _rbPos;
+        private Quaternion _rbRot;
+
         int i = 0;
         private void RecalculateCache( IReferenceFrame sceneReferenceFrame )
         {
             if( _referenceBody == null )
                 return;
+
+            //bool b1 = _rbPos.x == _oldPosition.x && _rbPos.y == _oldPosition.y && _rbPos.z == _oldPosition.z;
+            //bool b2 = SceneReferenceFrameManager.ReferenceFrame.Equals( _cachedSceneReferenceFrame );
+            //bool b3 = _referenceBody.OrientedInertialReferenceFrame.Equals( _cachedBodyReferenceFrame );
 
 #warning TODO - pinned stops recalculating if scene velocity matches it, even if the reference body is moving. so absolute values are not recached.
             //Debug.LogWarning( "PINNED RECALCULATING" );
@@ -296,21 +305,26 @@ namespace HSP.Vanilla
             _cachedAngularAcceleration = (Vector3)sceneReferenceFrame.InverseTransformAngularAcceleration( _cachedAbsoluteAngularAcceleration );
             _cachedSceneReferenceFrame = sceneReferenceFrame;
             _cachedBodyReferenceFrame = bodyReferenceFrame;
-            //var pos = (Vector3)sceneReferenceFrame.InverseTransformPosition( bodyReferenceFrame.TransformPosition( _referencePosition ) );
+            // var pos = (Vector3)sceneReferenceFrame.InverseTransformPosition( bodyReferenceFrame.TransformPosition( _referencePosition ) );
 
 #warning TODO - _rb.position is not the same as the cached position when using _rb.Move
-            //Debug.Log( "PINN" + i + $"[{sceneReferenceFrame.ReferenceUT}] " + " :: " + _cachedAbsolutePosition.x + " :: " + _rb.position.x + " :: " + pos.x + " :: " + sceneReferenceFrame.TransformPosition( Vector3Dbl.zero ).x );
 
-            //var pinned2 = FindObjectOfType<PinnedReferenceFrameTransform>();
-            //var pinned = pinned2.Position;
-#warning TODO - pinned rigidbody pos and `Position` are equal.
-#warning TODO - pinned rigidbody pos is not 0 even though it's supposedly being followed.
-            // Debug.Log( "P" + _rb.position.x );
+            // one frame consists of 2 RecalculateCache calls. They're not consistent.
+#warning TODO - _rb.position is different, but the frame position is the same.
+
+            // it's recaching during Update.
+
+            //Debug.Log( "PINN" + i + b1 + b2 + b3 + "{} " + " :: " + _cachedAbsolutePosition.x + " :: " + _rb.position.x + " :: " + sceneReferenceFrame.TransformPosition( Vector3Dbl.zero ).x );
+
+#warning TODO - pinned ends up at scene position (0.64, 0, 0) even though it's the active object (wtf?)
+
+
+            // when the scene frame manager is ordered first, it doesn't call the cache and the cache is only called in Update, curiously enough.
         }
 
         // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)
         // Vector3's `==` operator does approximate comparison.
-        private bool IsCacheValid() => (_rb.position.x == _oldPosition.x && _rb.position.y == _oldPosition.y && _rb.position.z == _oldPosition.z
+        private bool IsCacheValid() => (_rbPos.x == _oldPosition.x && _rbPos.y == _oldPosition.y && _rbPos.z == _oldPosition.z
             && SceneReferenceFrameManager.ReferenceFrame.Equals( _cachedSceneReferenceFrame )
             && _referenceBody.OrientedInertialReferenceFrame.Equals( _cachedBodyReferenceFrame ));
 
@@ -339,18 +353,20 @@ namespace HSP.Vanilla
         {
             // Move, because the scene (or reference body) might be moving, and move ensures that the body is swept instead of teleported.
             this.MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame );
+            _rbPos = _rb.position;
+            _rbRot = _rb.rotation;
+#warning TODO - should this happen *after* the rigidbody is moved??? (the rbPos is old and stale, but at least it's consistently stale)
+#warning TODO - or at least after the position is moved manually, the rbPos here should reflect this.
             i++;
         }
 
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
+            Debug.LogWarning( "SWITCH 444444444444444444444444444444444444444444444" );
             // `_referenceBody.OrientedReferenceFrame` Guarantees up-to-date reference frame, regardless of update order.
             ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
             ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );
             RecalculateCache( data.NewFrame );
-            //Debug.LogWarning( "v: " + _cachedAbsolutePosition.x );
-            // -907799,812522888
-            // -907799,812522888 - doesn't change.
         }
 
         void OnEnable()

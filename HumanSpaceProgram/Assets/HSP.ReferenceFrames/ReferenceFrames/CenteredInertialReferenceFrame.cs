@@ -34,18 +34,11 @@ namespace HSP.ReferenceFrames
         public IReferenceFrame AtUT( double ut )
         {
             double deltaTime = ut - ReferenceUT;
+            if( deltaTime == 0 )
+                return this;
 
             var newPos = _position + (_velocity * deltaTime);
-            //double angularVelocityMagnitude = _angularVelocity.magnitude;
-            //if( angularVelocityMagnitude == 0 )
-            //{
             return new CenteredInertialReferenceFrame( ut, newPos, _velocity );
-            /*}
-            else
-            {
-                var newRot = /* 0      + / QuaternionDbl.AngleAxis( _angularVelocity.magnitude * 57.2957795131 * deltaTime, _angularVelocity );
-                return new OrientedInertialReferenceFrame( ut, newPos, newRot, _velocity, _angularVelocity );
-            }*/
         }
 
 

@@ -59,10 +59,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\HSP._DevUtils\VanillaPlanetarySystemFactory.cs" />
-    <Compile Include="Assets\HSP._DevUtils\GravityApplier.cs" />
+    <Compile Include="Assets\HSP._DevUtils\DevUtilsGameplayManager.cs" />
     <Compile Include="Assets\HSP._DevUtils\AIRFRotationFixer.cs" />
     <Compile Include="Assets\HSP._DevUtils\AsyncTester.cs" />
-    <Compile Include="Assets\HSP._DevUtils\DevUtilsGameplayManager.cs" />
+    <Compile Include="Assets\HSP._DevUtils\GravityApplier.cs" />
     <Compile Include="Assets\HSP._DevUtils\ConstantForceApplier.cs" />
   </ItemGroup>
   <ItemGroup>

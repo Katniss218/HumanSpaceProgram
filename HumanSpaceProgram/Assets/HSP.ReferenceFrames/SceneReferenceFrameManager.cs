@@ -44,13 +44,20 @@ namespace HSP.ReferenceFrames
         {
 #warning TODO - remove this getter - accessors should not return a modified reference frame. Use GetReferenceFrame.
             //get => instance._referenceFrame;
-            get => instance._referenceFrame.AtUT( TimeManager.UT );
+            get => GetReferenceFrame();
             set => instance._referenceFrame = value;
         }
 
+        private double cachedUT;
+
         public static IReferenceFrame GetReferenceFrame()
         {
-            return instance._referenceFrame.AtUT( TimeManager.UT );
+            if( instance.cachedUT != TimeManager.UT )
+            {
+                instance._referenceFrame = instance._referenceFrame.AtUT( TimeManager.UT );
+                instance.cachedUT = TimeManager.UT;
+            }
+            return instance._referenceFrame;
         }
 
         public static IReferenceFrame GetReferenceFrameAtUT( double ut )

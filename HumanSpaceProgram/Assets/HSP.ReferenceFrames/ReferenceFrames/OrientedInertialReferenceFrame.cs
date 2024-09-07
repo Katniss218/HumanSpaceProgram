@@ -123,8 +123,8 @@ namespace HSP.ReferenceFrames
 
             return other.TransformPosition( Vector3Dbl.zero ) == this._position
                 && other.TransformRotation( QuaternionDbl.identity ) == this._rotation
-                && other.TransformVelocity( Vector3Dbl.zero ) == Vector3Dbl.zero
-                && other.TransformAngularVelocity( Vector3Dbl.zero ) == this._velocity
+                && other.TransformVelocity( Vector3Dbl.zero ) == this._velocity
+                && other.TransformAngularVelocity( Vector3Dbl.zero ) == Vector3Dbl.zero
                 && other.TransformAcceleration( Vector3Dbl.zero ) == Vector3Dbl.zero
                 && other.TransformAngularAcceleration( Vector3Dbl.zero ) == Vector3Dbl.zero;
         }
@@ -138,8 +138,8 @@ namespace HSP.ReferenceFrames
 
             return otherNormalizedUT.TransformPosition( Vector3Dbl.zero ) == this._position
                 && otherNormalizedUT.TransformRotation( QuaternionDbl.identity ) == this._rotation
-                && otherNormalizedUT.TransformVelocity( Vector3Dbl.zero ) == Vector3Dbl.zero
-                && otherNormalizedUT.TransformAngularVelocity( Vector3Dbl.zero ) == this._velocity
+                && otherNormalizedUT.TransformVelocity( Vector3Dbl.zero ) == this._velocity
+                && otherNormalizedUT.TransformAngularVelocity( Vector3Dbl.zero ) == Vector3Dbl.zero
                 && otherNormalizedUT.TransformAcceleration( Vector3Dbl.zero ) == Vector3Dbl.zero
                 && otherNormalizedUT.TransformAngularAcceleration( Vector3Dbl.zero ) == Vector3Dbl.zero;
         }
