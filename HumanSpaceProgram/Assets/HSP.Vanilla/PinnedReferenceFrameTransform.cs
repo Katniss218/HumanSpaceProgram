@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityPlus.Serialization;
+using static UnityEditor.PlayerSettings;
 
 namespace HSP.Vanilla
 {
@@ -71,6 +72,7 @@ namespace HSP.Vanilla
         {
             get
             {
+#warning TODO - why is rigidbody position even used here what?! (it's wrong after using Move which is what's being used). Move queues the position to change during physics processing.
                 RecalculateCacheIfNeeded();
                 return _rbPos;
             }
@@ -78,7 +80,6 @@ namespace HSP.Vanilla
             {
                 Vector3Dbl absolutePosition = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( value );
                 ReferencePosition = _referenceBody.OrientedReferenceFrame.InverseTransformPosition( absolutePosition );
-                _rbPos = 
             }
         }
 
@@ -251,13 +252,7 @@ namespace HSP.Vanilla
             var bodyFrame = ReferenceBody.OrientedReferenceFrame;
             var pos = (Vector3)sceneReferenceFrame.InverseTransformPosition( bodyFrame.TransformPosition( _referencePosition ) );
             var rot = (Quaternion)sceneReferenceFrame.InverseTransformRotation( bodyFrame.TransformRotation( _referenceRotation ) );
-            //_rb.Move( pos, rot );
-
-            transform.position = pos; // Setting the transform is still important for some cases.
-            _rb.position = pos;
-            transform.rotation = rot; // Setting the transform is still important for some cases.
-            _rb.rotation = rot;
-            //_cachedSceneReferenceFrame = sceneReferenceFrame;
+            _rb.Move( pos, rot );
         }
 
         private void RecalculateCacheIfNeeded()
@@ -279,12 +274,6 @@ namespace HSP.Vanilla
             if( _referenceBody == null )
                 return;
 
-            //bool b1 = _rbPos.x == _oldPosition.x && _rbPos.y == _oldPosition.y && _rbPos.z == _oldPosition.z;
-            //bool b2 = SceneReferenceFrameManager.ReferenceFrame.Equals( _cachedSceneReferenceFrame );
-            //bool b3 = _referenceBody.OrientedInertialReferenceFrame.Equals( _cachedBodyReferenceFrame );
-
-#warning TODO - pinned stops recalculating if scene velocity matches it, even if the reference body is moving. so absolute values are not recached.
-            //Debug.LogWarning( "PINNED RECALCULATING" );
             IReferenceFrame bodyReferenceFrame = _referenceBody.OrientedInertialReferenceFrame;
             _cachedAbsolutePosition = bodyReferenceFrame.TransformPosition( _referencePosition );
             _cachedAbsoluteRotation = bodyReferenceFrame.TransformRotation( _referenceRotation );
@@ -305,7 +294,6 @@ namespace HSP.Vanilla
             _cachedAngularAcceleration = (Vector3)sceneReferenceFrame.InverseTransformAngularAcceleration( _cachedAbsoluteAngularAcceleration );
             _cachedSceneReferenceFrame = sceneReferenceFrame;
             _cachedBodyReferenceFrame = bodyReferenceFrame;
-            // var pos = (Vector3)sceneReferenceFrame.InverseTransformPosition( bodyReferenceFrame.TransformPosition( _referencePosition ) );
 
 #warning TODO - _rb.position is not the same as the cached position when using _rb.Move
 
@@ -351,18 +339,27 @@ namespace HSP.Vanilla
 
         void FixedUpdate()
         {
+            // this.MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame );
+            // _rbPos = _rb.position;
+            // _rbRot = _rb.rotation;
+
+            if( ReferenceBody == null )
+                return;
+            var sceneReferenceFrame = SceneReferenceFrameManager.ReferenceFrame;
+            var bodyFrame = ReferenceBody.OrientedReferenceFrame;
+            var pos = (Vector3)sceneReferenceFrame.InverseTransformPosition( bodyFrame.TransformPosition( _referencePosition ) );
+            var rot = (Quaternion)sceneReferenceFrame.InverseTransformRotation( bodyFrame.TransformRotation( _referenceRotation ) );
             // Move, because the scene (or reference body) might be moving, and move ensures that the body is swept instead of teleported.
-            this.MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame );
-            _rbPos = _rb.position;
-            _rbRot = _rb.rotation;
-#warning TODO - should this happen *after* the rigidbody is moved??? (the rbPos is old and stale, but at least it's consistently stale)
-#warning TODO - or at least after the position is moved manually, the rbPos here should reflect this.
+            _rb.Move( pos, rot );
+            _rbPos = pos;
+            _rbRot = rot;
+#warning TODO - this can only be recached in a single consistent place (?)
+#warning TODO - but it needs to be updated if we move the celestial itself as well. As it's supposed to be pinned.
             i++;
         }
 
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
-            Debug.LogWarning( "SWITCH 444444444444444444444444444444444444444444444" );
             // `_referenceBody.OrientedReferenceFrame` Guarantees up-to-date reference frame, regardless of update order.
             ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
             ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );
