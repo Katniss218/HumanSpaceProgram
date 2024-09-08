@@ -1,11 +1,8 @@
 ﻿using HSP.CelestialBodies;
 using HSP.ReferenceFrames;
-using HSP.Time;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityPlus.Serialization;
-using static UnityEditor.PlayerSettings;
 
 namespace HSP.Vanilla
 {
@@ -31,6 +28,7 @@ namespace HSP.Vanilla
                     MakeCacheInvalid();
                     ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
                     ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );
+                    CachePositionAndRotation();
                 }
             }
         }
@@ -43,6 +41,7 @@ namespace HSP.Vanilla
                 _referencePosition = value;
                 MakeCacheInvalid();
                 ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
+                CachePositionAndRotation();
             }
         }
 
@@ -54,6 +53,7 @@ namespace HSP.Vanilla
                 _referenceRotation = value;
                 MakeCacheInvalid();
                 ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );
+                CachePositionAndRotation();
             }
         }
 
@@ -72,9 +72,8 @@ namespace HSP.Vanilla
         {
             get
             {
-#warning TODO - why is rigidbody position even used here what?! (it's wrong after using Move which is what's being used). Move queues the position to change during physics processing.
                 RecalculateCacheIfNeeded();
-                return _rbPos;
+                return _cachedPosition;
             }
             set
             {
@@ -88,7 +87,7 @@ namespace HSP.Vanilla
             get
             {
                 RecalculateCacheIfNeeded();
-                return _rbRot;
+                return _cachedRotation;
             }
             set
             {
@@ -172,10 +171,10 @@ namespace HSP.Vanilla
         /// <summary> The scene frame in which the cached values are expressed. </summary>
         IReferenceFrame _cachedSceneReferenceFrame;
         IReferenceFrame _cachedBodyReferenceFrame;
-        //Vector3 _cachedPosition;
+        Vector3 _cachedPosition;
         Vector3Dbl _cachedAbsolutePosition;
-        //Quaternion _cachedRotation;
-        QuaternionDbl _cachedAbsoluteRotation;
+        Quaternion _cachedRotation = Quaternion.identity;
+        QuaternionDbl _cachedAbsoluteRotation = QuaternionDbl.identity;
         Vector3 _cachedVelocity;
         Vector3Dbl _cachedAbsoluteVelocity;
         Vector3 _cachedAngularVelocity;
@@ -245,14 +244,38 @@ namespace HSP.Vanilla
             return;
         }
 
-        private void MoveScenePositionAndRotation( IReferenceFrame sceneReferenceFrame )
+        private void MoveScenePositionAndRotation( IReferenceFrame sceneReferenceFrame, bool cachePositionAndRotation = false )
         {
             if( ReferenceBody == null )
                 return;
-            var bodyFrame = ReferenceBody.OrientedReferenceFrame;
-            var pos = (Vector3)sceneReferenceFrame.InverseTransformPosition( bodyFrame.TransformPosition( _referencePosition ) );
-            var rot = (Quaternion)sceneReferenceFrame.InverseTransformRotation( bodyFrame.TransformRotation( _referenceRotation ) );
+
+            IReferenceFrame bodyFrame = ReferenceBody.OrientedReferenceFrame;
+            Vector3 pos = (Vector3)sceneReferenceFrame.InverseTransformPosition( bodyFrame.TransformPosition( _referencePosition ) );
+            Quaternion rot = (Quaternion)sceneReferenceFrame.InverseTransformRotation( bodyFrame.TransformRotation( _referenceRotation ) );
             _rb.Move( pos, rot );
+
+            if( cachePositionAndRotation )
+            {
+                _cachedPosition = pos;
+                _cachedRotation = rot;
+            }
+        }
+
+        private void CachePositionAndRotation()
+        {
+            if( ReferenceBody == null )
+                return;
+
+            IReferenceFrame sceneReferenceFrame = SceneReferenceFrameManager.ReferenceFrame;
+            IReferenceFrame bodyFrame = ReferenceBody.OrientedReferenceFrame;
+            Vector3 pos = (Vector3)sceneReferenceFrame.InverseTransformPosition( bodyFrame.TransformPosition( _referencePosition ) );
+            Quaternion rot = (Quaternion)sceneReferenceFrame.InverseTransformRotation( bodyFrame.TransformRotation( _referenceRotation ) );
+            _rb.position = pos;
+            _rb.rotation = rot;
+            transform.position = pos;
+            transform.rotation = rot;
+            _cachedPosition = pos;
+            _cachedRotation = rot;
         }
 
         private void RecalculateCacheIfNeeded()
@@ -265,10 +288,6 @@ namespace HSP.Vanilla
             MakeCacheValid();
         }
 
-        private Vector3 _rbPos;
-        private Quaternion _rbRot;
-
-        int i = 0;
         private void RecalculateCache( IReferenceFrame sceneReferenceFrame )
         {
             if( _referenceBody == null )
@@ -302,23 +321,19 @@ namespace HSP.Vanilla
 
             // it's recaching during Update.
 
-            //Debug.Log( "PINN" + i + b1 + b2 + b3 + "{} " + " :: " + _cachedAbsolutePosition.x + " :: " + _rb.position.x + " :: " + sceneReferenceFrame.TransformPosition( Vector3Dbl.zero ).x );
+            Debug.Log( "PINN" + "{} " + " :: " + _cachedAbsolutePosition.x + " :: " + _rb.position.x + " :: " + bodyReferenceFrame.TransformPosition( Vector3Dbl.zero ).x );
 
-#warning TODO - pinned ends up at scene position (0.64, 0, 0) even though it's the active object (wtf?)
-
-
-            // when the scene frame manager is ordered first, it doesn't call the cache and the cache is only called in Update, curiously enough.
+            //   _rb.position will only be up-to-date after physicsprocessing.
         }
 
         // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)
         // Vector3's `==` operator does approximate comparison.
-        private bool IsCacheValid() => (_rbPos.x == _oldPosition.x && _rbPos.y == _oldPosition.y && _rbPos.z == _oldPosition.z
-            && SceneReferenceFrameManager.ReferenceFrame.Equals( _cachedSceneReferenceFrame )
-            && _referenceBody.OrientedInertialReferenceFrame.Equals( _cachedBodyReferenceFrame ));
+        private bool IsCacheValid() => SceneReferenceFrameManager.ReferenceFrame.Equals( _cachedSceneReferenceFrame )
+            && _referenceBody.OrientedInertialReferenceFrame.Equals( _cachedBodyReferenceFrame );
 
-        private void MakeCacheValid() => _oldPosition = _rb.position;
+        private void MakeCacheValid() => _oldPosition = _cachedPosition;
 
-        private void MakeCacheInvalid() => _oldPosition = -_rb.position + new Vector3( 1234.56789f, 12345678.9f, 1.23456789f );
+        private void MakeCacheInvalid() => _oldPosition = -_cachedPosition + new Vector3( 1234.56789f, 12345678.9f, 1.23456789f );
 
         void Awake()
         {
@@ -339,23 +354,12 @@ namespace HSP.Vanilla
 
         void FixedUpdate()
         {
-            // this.MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame );
-            // _rbPos = _rb.position;
-            // _rbRot = _rb.rotation;
-
             if( ReferenceBody == null )
                 return;
-            var sceneReferenceFrame = SceneReferenceFrameManager.ReferenceFrame;
-            var bodyFrame = ReferenceBody.OrientedReferenceFrame;
-            var pos = (Vector3)sceneReferenceFrame.InverseTransformPosition( bodyFrame.TransformPosition( _referencePosition ) );
-            var rot = (Quaternion)sceneReferenceFrame.InverseTransformRotation( bodyFrame.TransformRotation( _referenceRotation ) );
-            // Move, because the scene (or reference body) might be moving, and move ensures that the body is swept instead of teleported.
-            _rb.Move( pos, rot );
-            _rbPos = pos;
-            _rbRot = rot;
-#warning TODO - this can only be recached in a single consistent place (?)
-#warning TODO - but it needs to be updated if we move the celestial itself as well. As it's supposed to be pinned.
-            i++;
+
+            // Calling MoveScenePositionAndRotation in every fixed update is not ideal, but it ensures that the scene position is always correct
+            //   without having hooks in the reference body.
+            MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame, true );
         }
 
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
@@ -363,6 +367,7 @@ namespace HSP.Vanilla
             // `_referenceBody.OrientedReferenceFrame` Guarantees up-to-date reference frame, regardless of update order.
             ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
             ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );
+            CachePositionAndRotation();
             RecalculateCache( data.NewFrame );
         }
 

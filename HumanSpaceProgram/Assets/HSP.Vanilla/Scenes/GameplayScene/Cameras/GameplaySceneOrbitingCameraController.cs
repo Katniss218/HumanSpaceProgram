@@ -149,13 +149,17 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
         public const string SNAP_CAMERA_TO_ACTIVE_OBJECT = HSPEvent.NAMESPACE_HSP + ".camera.snap_to_vessel";
 
         [HSPEventListener( HSPEvent_AFTER_ACTIVE_VESSEL_CHANGED.ID, SNAP_CAMERA_TO_ACTIVE_OBJECT )]
-        private static void SnapToActiveObject( object e )
+        private static void SnapToActiveObject()
         {
-            if( ActiveVesselManager.ActiveObject == null )
-                instance.ReferenceObject = null;
-            else
-                instance.ReferenceObject = ActiveVesselManager.ActiveObject;
+            var referenceObject = (ActiveVesselManager.ActiveObject == null)
+                ? null
+                : ActiveVesselManager.ActiveObject;
 
+            instance.ReferenceObject = referenceObject;
+            if( referenceObject != null )
+            {
+                instance.transform.position = referenceObject.transform.position;
+            }
             instance.transform.rotation = Quaternion.LookRotation( instance.transform.forward, instance.GetUpDir() );
         }
     }

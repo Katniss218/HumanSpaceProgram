@@ -58,13 +58,13 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.ResourceFlow\FluidState.cs" />
     <Compile Include="Assets\HSP.ResourceFlow\IResourceConsumer.cs" />
     <Compile Include="Assets\HSP.ResourceFlow\IResourceContainer.cs" />
-    <Compile Include="Assets\HSP.ResourceFlow\IResourceProducer.cs" />
     <Compile Include="Assets\HSP.ResourceFlow\SubstanceState.cs" />
-    <Compile Include="Assets\HSP.ResourceFlow\FlowUtils.cs" />
     <Compile Include="Assets\HSP.ResourceFlow\Substance.cs" />
+    <Compile Include="Assets\HSP.ResourceFlow\FluidState.cs" />
+    <Compile Include="Assets\HSP.ResourceFlow\IResourceProducer.cs" />
+    <Compile Include="Assets\HSP.ResourceFlow\FlowUtils.cs" />
     <Compile Include="Assets\HSP.ResourceFlow\SubstanceStateCollection.cs" />
   </ItemGroup>
   <ItemGroup>

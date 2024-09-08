@@ -133,7 +133,7 @@ namespace HSP.Vanilla
         /// <summary> The scene frame in which the cached values are expressed. </summary>
         IReferenceFrame _cachedSceneReferenceFrame;
         Vector3Dbl _cachedAbsolutePosition;
-        QuaternionDbl _cachedAbsoluteRotation;
+        QuaternionDbl _cachedAbsoluteRotation = QuaternionDbl.identity;
         Vector3Dbl _cachedAbsoluteVelocity;
         Vector3Dbl _cachedAbsoluteAngularVelocity;
 
