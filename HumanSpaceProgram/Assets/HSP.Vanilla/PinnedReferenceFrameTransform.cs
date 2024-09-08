@@ -73,7 +73,7 @@ namespace HSP.Vanilla
             get
             {
                 RecalculateCacheIfNeeded();
-                return _cachedPosition;
+                return _cachedPosition; // _rb.position will only be up-to-date after physicsprocessing.
             }
             set
             {
@@ -184,8 +184,6 @@ namespace HSP.Vanilla
         Vector3 _cachedAngularAcceleration;
         Vector3Dbl _cachedAbsoluteAngularAcceleration;
 
-        Vector3 _oldPosition;
-
         Vector3Dbl _absoluteAccelerationSum = Vector3.zero;
         Vector3Dbl _absoluteAngularAccelerationSum = Vector3.zero;
 
@@ -285,8 +283,10 @@ namespace HSP.Vanilla
 
             MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame );
             RecalculateCache( SceneReferenceFrameManager.ReferenceFrame );
-            MakeCacheValid();
+            //MakeCacheValid();
         }
+
+        int i = 0;
 
         private void RecalculateCache( IReferenceFrame sceneReferenceFrame )
         {
@@ -314,16 +314,7 @@ namespace HSP.Vanilla
             _cachedSceneReferenceFrame = sceneReferenceFrame;
             _cachedBodyReferenceFrame = bodyReferenceFrame;
 
-#warning TODO - _rb.position is not the same as the cached position when using _rb.Move
-
-            // one frame consists of 2 RecalculateCache calls. They're not consistent.
-#warning TODO - _rb.position is different, but the frame position is the same.
-
-            // it's recaching during Update.
-
-            Debug.Log( "PINN" + "{} " + " :: " + _cachedAbsolutePosition.x + " :: " + _rb.position.x + " :: " + bodyReferenceFrame.TransformPosition( Vector3Dbl.zero ).x );
-
-            //   _rb.position will only be up-to-date after physicsprocessing.
+            //Debug.Log( "PINN" + i + "{} " + " :: " + _cachedAbsolutePosition.x + " :: " + _rb.position.x + " :: " + bodyReferenceFrame.TransformPosition( Vector3Dbl.zero ).x );
         }
 
         // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)
@@ -331,9 +322,9 @@ namespace HSP.Vanilla
         private bool IsCacheValid() => SceneReferenceFrameManager.ReferenceFrame.Equals( _cachedSceneReferenceFrame )
             && _referenceBody.OrientedInertialReferenceFrame.Equals( _cachedBodyReferenceFrame );
 
-        private void MakeCacheValid() => _oldPosition = _cachedPosition;
+        //private void MakeCacheValid() => ;
 
-        private void MakeCacheInvalid() => _oldPosition = -_cachedPosition + new Vector3( 1234.56789f, 12345678.9f, 1.23456789f );
+        private void MakeCacheInvalid() => _cachedBodyReferenceFrame = null;
 
         void Awake()
         {
@@ -362,8 +353,10 @@ namespace HSP.Vanilla
             MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame, true );
         }
 
+#warning TODO - The visible position of the planet (and pinned objects) changes vs the position of the free transforms depending on if the reference frame is moving or not.
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
+            //Debug.LogWarning( "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW" );
             // `_referenceBody.OrientedReferenceFrame` Guarantees up-to-date reference frame, regardless of update order.
             ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
             ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );

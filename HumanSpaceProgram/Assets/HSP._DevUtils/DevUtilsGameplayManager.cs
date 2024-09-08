@@ -121,23 +121,25 @@ namespace HSP._DevUtils
             uiImage.texture = normalmap;*/
         }
 
+        bool isPressed = false;
+
         void FixedUpdate()
         {
 
-            if( UnityEngine.Input.GetKeyDown( KeyCode.F3 ) )
+            if( isPressed )
             {
                 SceneReferenceFrameManager.ChangeSceneReferenceFrame( new CenteredInertialReferenceFrame( TimeManager.UT,
-                    SceneReferenceFrameManager.TargetObject.AbsolutePosition, SceneReferenceFrameManager.TargetObject.AbsoluteVelocity ) );
+                    SceneReferenceFrameManager.TargetObject.AbsolutePosition, Vector3Dbl.zero ) );
+                isPressed = false;
             }
         }
 
         void Update()
         {
-            /*if( UnityEngine.Input.GetKeyDown( KeyCode.F3 ) )
+            if( UnityEngine.Input.GetKeyDown( KeyCode.F3 ) )
             {
-                SceneReferenceFrameManager.ChangeSceneReferenceFrame( new CenteredInertialReferenceFrame( TimeManager.UT,
-                    SceneReferenceFrameManager.TargetObject.AbsolutePosition, SceneReferenceFrameManager.TargetObject.AbsoluteVelocity ) );
-            }*/
+                isPressed = true;
+            }
             if( UnityEngine.Input.GetKeyDown( KeyCode.F4 ) )
             {
                 VesselMetadata loadedVesselMetadata = VesselMetadata.LoadFromDisk( "vessel2" );

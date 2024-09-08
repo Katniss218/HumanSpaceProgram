@@ -272,8 +272,6 @@ namespace HSP.Vanilla
             _rb.isKinematic = false;
         }
 
-        int i = 0;
-
         void FixedUpdate()
         {
             if( SceneReferenceFrameManager.ReferenceFrame is INonInertialReferenceFrame frame )
@@ -316,7 +314,6 @@ namespace HSP.Vanilla
             this._oldAngularVelocity = AngularVelocity;
             this._absoluteAccelerationSum = Vector3.zero;
             this._absoluteAngularAccelerationSum = Vector3.zero;
-            i++;
         }
 
         // The faster something goes in scene space when colliding with another thing, it gets laggier for physics processing (computation of "contacts")
@@ -331,17 +328,15 @@ namespace HSP.Vanilla
 
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
-#warning TODO - removing this doesn't seem to do anything anymore. It's also not done properly.
-            // Enforces that subsequent calls of the function will not further transform the values into an incorrect value if the values has already been transformed.
-            // - I.e. makes the method idempotent.
-            // This allows calling this method to ensure that the absolute position/rotation/etc is correct.
-            if( Math.Abs( (data.NewFrame.TransformPosition( this._rb.position ) - this._cachedAbsolutePosition).magnitude ) < 1e-1 )
-            {
-                return;
-            }
-            var cachedFrame = _cachedSceneReferenceFrame;
+            IReferenceFrame cachedFrame = _cachedSceneReferenceFrame;
             RecalculateCache( data.OldFrame ); // Old frame because the current scene-space data is still in the old frame.
             ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, _cachedAbsolutePosition );
+#warning TODO - might be due to the rigidbody position/rotation being correct only after PhysicsProcessing? (update happens after, and if switch is commanded from update, it's correct).
+            // - it makes some sense because in one case, it has velocity, and on the other it doesn't. (for calculating the cache)
+
+            // one solution might be to command the switch once per fixedupdate, after physicsprocessing ???
+            // and the switch method wouldn't immediately switch, but only command to switch when the time is right. That would be pretty well structured if it works.
+
             ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, _cachedAbsoluteRotation );
             ReferenceFrameTransformUtils.SetSceneVelocityFromAbsolute( _rb, _cachedAbsoluteVelocity );
             ReferenceFrameTransformUtils.SetSceneAngularVelocityFromAbsolute( _rb, _cachedAbsoluteAngularVelocity );
