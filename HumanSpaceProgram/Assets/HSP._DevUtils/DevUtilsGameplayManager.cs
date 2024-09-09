@@ -13,7 +13,9 @@ using HSP.Vessels;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using UnityEngine;
+using UnityEngine.LowLevel;
 using UnityEngine.UI;
 using UnityPlus.AssetManagement;
 using UnityPlus.Serialization;
@@ -44,6 +46,14 @@ namespace HSP._DevUtils
 
         public const string LOAD_PLACEHOLDER_CONTENT = "devutils.load_game_data";
         public const string CREATE_PLACEHOLDER_UNIVERSE = "devutils.timeline.new.after";
+
+        /*[RuntimeInitializeOnLoadMethod( RuntimeInitializeLoadType.AfterAssembliesLoaded )]
+        internal static void Initialize()
+        {
+            var pl = PlayerLoop.GetCurrentPlayerLoop();
+
+            PlayerLoopUtils.PrintPlayerLoop( pl );
+        }*/
 
         [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, LOAD_PLACEHOLDER_CONTENT )]
         private static void LoadGameData( object e )
@@ -125,10 +135,9 @@ namespace HSP._DevUtils
 
         void FixedUpdate()
         {
-
             if( isPressed )
             {
-                SceneReferenceFrameManager.ChangeSceneReferenceFrame( new CenteredInertialReferenceFrame( TimeManager.UT,
+                SceneReferenceFrameManager.RequestChangeSceneReferenceFrame( new CenteredInertialReferenceFrame( TimeManager.UT,
                     SceneReferenceFrameManager.TargetObject.AbsolutePosition, Vector3Dbl.zero ) );
                 isPressed = false;
             }

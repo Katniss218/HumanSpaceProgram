@@ -1,7 +1,10 @@
 ﻿using HSP.Time;
 using System;
+using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
-using UnityEngine.UIElements;
+using UnityEngine.LowLevel;
+using UnityEngine.PlayerLoop;
 
 namespace HSP.ReferenceFrames
 {
@@ -65,15 +68,35 @@ namespace HSP.ReferenceFrames
             return instance._referenceFrame.AtUT( ut );
         }
 
+        private static IReferenceFrame _toChange = null;
+
+        public static void RequestChangeSceneReferenceFrame( IReferenceFrame referenceFrame )
+        {
+            _toChange = referenceFrame;
+        }
+
         /// <summary>
         /// Sets the scene's reference frame to the specified frame, and calls out a frame switch event.
         /// </summary>
-        public static void ChangeSceneReferenceFrame( IReferenceFrame newFrame )
+        private static void ChangeSceneReferenceFrame()
         {
-            IReferenceFrame old = ReferenceFrame;
-            ReferenceFrame = newFrame;
+            if( _toChange == null )
+                return;
 
-            OnAfterReferenceFrameSwitch?.Invoke( new ReferenceFrameSwitchData() { OldFrame = old, NewFrame = newFrame } );
+            IReferenceFrame newFrame = _toChange;
+            IReferenceFrame oldFrame = ReferenceFrame;
+            ReferenceFrame = newFrame;
+            _toChange = null;
+
+            try
+            {
+                OnAfterReferenceFrameSwitch?.Invoke( new ReferenceFrameSwitchData() { OldFrame = oldFrame, NewFrame = newFrame } );
+            }
+            catch( Exception ex )
+            {
+                Debug.LogError( $"An exception occurred while changing the scene reference frame." );
+                Debug.LogException( ex );
+            }
         }
 
         private static void ReferenceFrameSwitch_Objects( ReferenceFrameSwitchData data )
@@ -136,7 +159,7 @@ namespace HSP.ReferenceFrames
                 // Future available optimizations:
                 // - non-inertial frames (include acceleration).
                 // - switch the position to ahead of where the object is accelerating instead of the center of the object.
-                ChangeSceneReferenceFrame( new CenteredInertialReferenceFrame( TimeManager.UT, TargetObject.AbsolutePosition, TargetObject.AbsoluteVelocity ) );
+                RequestChangeSceneReferenceFrame( new CenteredInertialReferenceFrame( TimeManager.UT, TargetObject.AbsolutePosition, TargetObject.AbsoluteVelocity ) );
             }
         }
 
@@ -155,6 +178,137 @@ namespace HSP.ReferenceFrames
         void FixedUpdate()
         {
             TryFixActiveObjectOutOfBounds();
+        }
+
+
+        private void OnEnable()
+        {
+            AddFrameSwitcherToPlayerLoop();
+        }
+
+        private void OnDisable()
+        {
+            RemoveFrameSwitcherFromPlayerLoop();
+        }
+
+
+
+
+        public static void PlayerLoop_AfterPhysics()
+        {
+            if( !instanceExists )
+                return;
+
+            ChangeSceneReferenceFrame();
+        }
+
+        static PlayerLoopSystem _playerLoopSystem = new PlayerLoopSystem()
+        {
+            type = typeof( SceneReferenceFrameManager ),
+            updateDelegate = PlayerLoop_AfterPhysics,
+            subSystemList = null
+        };
+
+        private static void AddFrameSwitcherToPlayerLoop()
+        {
+            var playerLoop = PlayerLoop.GetCurrentPlayerLoop();
+            PlayerLoopUtils.InsertSystem<FixedUpdate>( ref playerLoop, in _playerLoopSystem, 12 );
+            PlayerLoop.SetPlayerLoop( playerLoop );
+        }
+
+        private static void RemoveFrameSwitcherFromPlayerLoop()
+        {
+            var playerLoop = PlayerLoop.GetCurrentPlayerLoop();
+            PlayerLoopUtils.RemoveSystem<FixedUpdate>( ref playerLoop, in _playerLoopSystem );
+            PlayerLoop.SetPlayerLoop( playerLoop );
+        }
+    }
+
+
+
+#warning TODO - clean up. Also, add a way to insert 'before' / 'after' a specified system type when inserting into a subsystem list.
+
+    public class PlayerLoopUtils
+    {
+        // https://github.com/adammyhre/Unity-Improved-Timers/blob/master/Runtime/PlayerLoopUtils.cs
+
+        public static void RemoveSystem<T>( ref PlayerLoopSystem loop, in PlayerLoopSystem systemToRemove )
+        {
+            if( loop.subSystemList == null )
+                return;
+
+            var playerLoopSystemList = new List<PlayerLoopSystem>( loop.subSystemList );
+            for( int i = 0; i < playerLoopSystemList.Count; ++i )
+            {
+                if( playerLoopSystemList[i].type == systemToRemove.type && playerLoopSystemList[i].updateDelegate == systemToRemove.updateDelegate )
+                {
+                    playerLoopSystemList.RemoveAt( i );
+                    loop.subSystemList = playerLoopSystemList.ToArray();
+                }
+            }
+
+            HandleSubSystemLoopForRemoval<T>( ref loop, systemToRemove );
+        }
+
+        static void HandleSubSystemLoopForRemoval<T>( ref PlayerLoopSystem loop, PlayerLoopSystem systemToRemove )
+        {
+            if( loop.subSystemList == null )
+                return;
+
+            for( int i = 0; i < loop.subSystemList.Length; ++i )
+            {
+                RemoveSystem<T>( ref loop.subSystemList[i], systemToRemove );
+            }
+        }
+
+        public static bool InsertSystem<T>( ref PlayerLoopSystem loop, in PlayerLoopSystem systemToInsert, int index )
+        {
+            if( loop.type != typeof( T ) )
+                return HandleSubSystemLoop<T>( ref loop, systemToInsert, index );
+
+            var playerLoopSystemList = new List<PlayerLoopSystem>();
+            if( loop.subSystemList != null )
+                playerLoopSystemList.AddRange( loop.subSystemList );
+            playerLoopSystemList.Insert( index, systemToInsert );
+            loop.subSystemList = playerLoopSystemList.ToArray();
+            return true;
+        }
+
+        static bool HandleSubSystemLoop<T>( ref PlayerLoopSystem loop, in PlayerLoopSystem systemToInsert, int index )
+        {
+            if( loop.subSystemList == null )
+                return false;
+
+            for( int i = 0; i < loop.subSystemList.Length; ++i )
+            {
+                if( !InsertSystem<T>( ref loop.subSystemList[i], in systemToInsert, index ) )
+                    continue;
+                return true;
+            }
+
+            return false;
+        }
+
+        public static void PrintPlayerLoop( PlayerLoopSystem loop )
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine( "Unity Player Loop" );
+            foreach( PlayerLoopSystem subSystem in loop.subSystemList )
+            {
+                PrintSubsystem( subSystem, sb, 0 );
+            }
+            Debug.Log( sb.ToString() );
+        }
+
+        static void PrintSubsystem( PlayerLoopSystem system, StringBuilder sb, int level )
+        {
+            sb.Append( ' ', level * 2 ).AppendLine( system.type.ToString() );
+            if( system.subSystemList == null || system.subSystemList.Length == 0 ) return;
+
+            foreach( PlayerLoopSystem subSystem in system.subSystemList )
+            {
+                PrintSubsystem( subSystem, sb, level + 1 );
+            }
         }
     }
 }
