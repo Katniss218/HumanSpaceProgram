@@ -101,6 +101,7 @@ namespace HSP.Vanilla.Components
             return new MemberwiseSerializationMapping<FGimbalActuatorController>()
             {
                 ("actuators_2d", new Member<FGimbalActuatorController, Actuator2DGroup[]>( o => o.Actuators2D )),
+#warning TODO - OR, another possibility is that it's saved correctly, but the prefab has it as null, and when the prefab is saved to save the part, the rest is created by the default initializer, but Awake is never called.
                 ("set_attitude", new Member<FGimbalActuatorController, ControlleeInput<Vector3>>( o => o.SetAttitude ))
             };
         }

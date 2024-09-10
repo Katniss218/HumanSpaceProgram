@@ -61,6 +61,7 @@
     <Compile Include="Assets\_UnityPlus\IOverridable_Ex.cs" />
     <Compile Include="Assets\_UnityPlus\IOverridable.cs" />
     <Compile Include="Assets\_UnityPlus\ITopologicallySortable.cs" />
+    <Compile Include="Assets\_UnityPlus\PlayerLoopUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_UnityPlus\___UnityPlus.asmdef" />
