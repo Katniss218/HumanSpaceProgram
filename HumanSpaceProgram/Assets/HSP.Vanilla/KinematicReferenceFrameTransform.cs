@@ -168,6 +168,7 @@ namespace HSP.Vanilla
 
         public bool IsColliding { get; private set; }
 
+        protected new Rigidbody rigidbody => _rb;
         Rigidbody _rb;
 
         public void AddForce( Vector3 force )
@@ -194,7 +195,7 @@ namespace HSP.Vanilla
             //this._rb.AddTorque( torque / Mass, ForceMode.VelocityChange );
         }
 
-        private void MoveScenePositionAndRotation( IReferenceFrame sceneReferenceFrame, bool cachePositionAndRotation = false )
+        protected void MoveScenePositionAndRotation( IReferenceFrame sceneReferenceFrame, bool cachePositionAndRotation = false )
         {
             var pos = (Vector3)sceneReferenceFrame.InverseTransformPosition( _absolutePosition );
             var rot = (Quaternion)sceneReferenceFrame.InverseTransformRotation( _absoluteRotation );
@@ -208,7 +209,7 @@ namespace HSP.Vanilla
             }
         }
 
-        private void CachePositionAndRotation()
+        protected void CachePositionAndRotation()
         {
             IReferenceFrame sceneReferenceFrame = SceneReferenceFrameManager.ReferenceFrame;
             Vector3 pos = (Vector3)sceneReferenceFrame.InverseTransformPosition( _absolutePosition );
@@ -224,7 +225,7 @@ namespace HSP.Vanilla
         /// <summary>
         /// Checks if the cacheable values need to be recalculated, and recalculates them if needed.
         /// </summary>
-        private void RecalculateCacheIfNeeded()
+        protected void RecalculateCacheIfNeeded()
         {
             if( IsCacheValid() )
                 return;
@@ -234,7 +235,7 @@ namespace HSP.Vanilla
             MakeCacheValid();
         }
 
-        private void RecalculateCache( IReferenceFrame sceneReferenceFrame )
+        protected void RecalculateCache( IReferenceFrame sceneReferenceFrame )
         {
             _cachedVelocity = (Vector3)sceneReferenceFrame.InverseTransformVelocity( _absoluteVelocity );
             _cachedAngularVelocity = (Vector3)sceneReferenceFrame.InverseTransformAngularVelocity( _absoluteAngularVelocity );
@@ -244,14 +245,14 @@ namespace HSP.Vanilla
 
         // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)
         // Vector3's `==` operator does approximate comparison.
-        private bool IsCacheValid() => (_absolutePosition.x == _oldAbsolutePosition.x && _absolutePosition.y == _oldAbsolutePosition.y && _absolutePosition.z == _oldAbsolutePosition.z)
+        protected bool IsCacheValid() => (_absolutePosition.x == _oldAbsolutePosition.x && _absolutePosition.y == _oldAbsolutePosition.y && _absolutePosition.z == _oldAbsolutePosition.z)
             && SceneReferenceFrameManager.ReferenceFrame.Equals( _cachedSceneReferenceFrame );
 
-        private void MakeCacheValid() => _oldAbsolutePosition = _absolutePosition;
+        protected void MakeCacheValid() => _oldAbsolutePosition = _absolutePosition;
 
-        private void MakeCacheInvalid() => _oldAbsolutePosition = -_absolutePosition + new Vector3Dbl( 1234.56789, 12345678.9, 1.23456789 );
+        protected void MakeCacheInvalid() => _oldAbsolutePosition = -_absolutePosition + new Vector3Dbl( 1234.56789, 12345678.9, 1.23456789 );
 
-        void Awake()
+        protected virtual void Awake()
         {
             if( this.HasComponentOtherThan<IReferenceFrameTransform>( this ) )
             {
@@ -268,7 +269,7 @@ namespace HSP.Vanilla
             _rb.isKinematic = true;
         }
 
-        void FixedUpdate()
+        protected virtual void FixedUpdate()
         {
             QuaternionDbl deltaRotation = QuaternionDbl.Euler( _absoluteAngularVelocity * TimeManager.FixedDeltaTime * 57.2957795131 );
             _absolutePosition = _absolutePosition + _absoluteVelocity * TimeManager.FixedDeltaTime;
@@ -300,22 +301,22 @@ namespace HSP.Vanilla
             RecalculateCache( data.NewFrame );
         }
 
-        void OnEnable()
+        protected virtual void OnEnable()
         {
             _rb.isKinematic = true; // Force kinematic.
         }
 
-        void OnDisable()
+        protected virtual void OnDisable()
         {
             _rb.isKinematic = true;
         }
 
-        void OnCollisionEnter( Collision collision )
+        protected virtual void OnCollisionEnter( Collision collision )
         {
             IsColliding = true;
         }
 
-        void OnCollisionStay( Collision collision )
+        protected virtual void OnCollisionStay( Collision collision )
         {
             // `OnCollisionEnter` / Exit are called for every collider.
             // I've tried using an incrementing/decrementing int with enter/exit, but it wasn't updating correctly, and after some time, there were too many collisions.
@@ -324,7 +325,7 @@ namespace HSP.Vanilla
             IsColliding = true;
         }
 
-        void OnCollisionExit( Collision collision )
+        protected virtual void OnCollisionExit( Collision collision )
         {
             IsColliding = false;
         }

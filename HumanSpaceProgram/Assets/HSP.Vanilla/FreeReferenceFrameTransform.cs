@@ -1,7 +1,5 @@
-﻿using HSP.CelestialBodies;
-using HSP.ReferenceFrames;
+﻿using HSP.ReferenceFrames;
 using HSP.Time;
-using System;
 using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
@@ -331,12 +329,6 @@ namespace HSP.Vanilla
             IReferenceFrame cachedFrame = _cachedSceneReferenceFrame;
             RecalculateCache( data.OldFrame ); // Old frame because the current scene-space data is still in the old frame.
             ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, _cachedAbsolutePosition );
-#warning TODO - might be due to the rigidbody position/rotation being correct only after PhysicsProcessing? (update happens after, and if switch is commanded from update, it's correct).
-            // - it makes some sense because in one case, it has velocity, and on the other it doesn't. (for calculating the cache)
-
-            // one solution might be to command the switch once per fixedupdate, after physicsprocessing ???
-            // and the switch method wouldn't immediately switch, but only command to switch when the time is right. That would be pretty well structured if it works.
-
             ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, _cachedAbsoluteRotation );
             ReferenceFrameTransformUtils.SetSceneVelocityFromAbsolute( _rb, _cachedAbsoluteVelocity );
             ReferenceFrameTransformUtils.SetSceneAngularVelocityFromAbsolute( _rb, _cachedAbsoluteAngularVelocity );

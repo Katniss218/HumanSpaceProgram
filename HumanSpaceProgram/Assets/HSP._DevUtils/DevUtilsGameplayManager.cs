@@ -13,9 +13,7 @@ using HSP.Vessels;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using UnityEngine;
-using UnityEngine.LowLevel;
 using UnityEngine.UI;
 using UnityPlus.AssetManagement;
 using UnityPlus.Serialization;
@@ -23,6 +21,22 @@ using UnityPlus.Serialization.DataHandlers;
 
 namespace HSP._DevUtils
 {
+
+    public class UpdateTester : MonoBehaviour
+    {
+        protected void Update()
+        {
+            Debug.Log( "A" );
+        }
+    }
+    public class UpdateTesterDerived : UpdateTester
+    {
+        protected new void Update()
+        {
+            Debug.Log( "B" );
+            base.Update();
+        }
+    }
     /// <summary>
     /// Game manager for testing.
     /// </summary>
@@ -56,14 +70,14 @@ namespace HSP._DevUtils
         }*/
 
         [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, LOAD_PLACEHOLDER_CONTENT )]
-        private static void LoadGameData( object e )
+        private static void LoadGameData()
         {
             AssetRegistry.Register( "substance.f", new Substance() { Density = 1000, DisplayName = "Fuel", UIColor = new Color( 1.0f, 0.3764706f, 0.2509804f ) } );
             AssetRegistry.Register( "substance.ox", new Substance() { Density = 1000, DisplayName = "Oxidizer", UIColor = new Color( 0.2509804f, 0.5607843f, 1.0f ) } );
         }
 
         [HSPEventListener( HSPEvent_AFTER_TIMELINE_NEW.ID, CREATE_PLACEHOLDER_UNIVERSE )]
-        private static void OnAfterCreateDefault( object e )
+        private static void OnAfterCreateDefault()
         {
             CelestialBody body = CelestialBodyManager.Get( "main" );
             CelestialBody bodyfar = CelestialBodyManager.Get( "main" );

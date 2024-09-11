@@ -313,8 +313,6 @@ namespace HSP.Vanilla
             _cachedAngularAcceleration = (Vector3)sceneReferenceFrame.InverseTransformAngularAcceleration( _cachedAbsoluteAngularAcceleration );
             _cachedSceneReferenceFrame = sceneReferenceFrame;
             _cachedBodyReferenceFrame = bodyReferenceFrame;
-
-            //Debug.Log( "PINN" + i + "{} " + " :: " + _cachedAbsolutePosition.x + " :: " + _rb.position.x + " :: " + bodyReferenceFrame.TransformPosition( Vector3Dbl.zero ).x );
         }
 
         // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)
@@ -353,10 +351,8 @@ namespace HSP.Vanilla
             MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame, true );
         }
 
-#warning TODO - The visible position of the planet (and pinned objects) changes vs the position of the free transforms depending on if the reference frame is moving or not.
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
-            //Debug.LogWarning( "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW" );
             // `_referenceBody.OrientedReferenceFrame` Guarantees up-to-date reference frame, regardless of update order.
             ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
             ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );
