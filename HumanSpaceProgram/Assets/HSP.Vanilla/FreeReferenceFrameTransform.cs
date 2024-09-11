@@ -186,6 +186,7 @@ namespace HSP.Vanilla
 
         public bool IsColliding { get; private set; }
 
+        protected new Rigidbody rigidbody => _rb;
         Rigidbody _rb;
 
         public void AddForce( Vector3 force )
@@ -224,7 +225,7 @@ namespace HSP.Vanilla
             this._rb.angularVelocity = angVel;
         }*/
 
-        private void RecalculateCacheIfNeeded()
+        protected void RecalculateCacheIfNeeded()
         {
             if( IsCacheValid() )
                 return;
@@ -233,7 +234,7 @@ namespace HSP.Vanilla
             MakeCacheValid();
         }
 
-        private void RecalculateCache( IReferenceFrame sceneReferenceFrame )
+        protected void RecalculateCache( IReferenceFrame sceneReferenceFrame )
         {
             //Debug.LogWarning( "FREE RECALCULATING" );
             _cachedAbsolutePosition = sceneReferenceFrame.TransformPosition( _rb.position );
@@ -246,14 +247,14 @@ namespace HSP.Vanilla
 
         // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)
         // Vector3's `==` operator does approximate comparison.
-        private bool IsCacheValid() => (_rb.position.x == _oldPosition.x && _rb.position.y == _oldPosition.y && _rb.position.z == _oldPosition.z
+        protected virtual bool IsCacheValid() => (_rb.position.x == _oldPosition.x && _rb.position.y == _oldPosition.y && _rb.position.z == _oldPosition.z
             && SceneReferenceFrameManager.ReferenceFrame.Equals( _cachedSceneReferenceFrame ));
 
-        private void MakeCacheValid() => _oldPosition = _rb.position;
+        protected virtual void MakeCacheValid() => _oldPosition = _rb.position;
 
-        private void MakeCacheInvalid() => _oldPosition = -_rb.position + new Vector3( 1234.56789f, 12345678.9f, 1.23456789f );
+        protected virtual void MakeCacheInvalid() => _oldPosition = -_rb.position + new Vector3( 1234.56789f, 12345678.9f, 1.23456789f );
 
-        void Awake()
+        protected virtual void Awake()
         {
             if( this.HasComponentOtherThan<IReferenceFrameTransform>( this ) )
             {
@@ -270,7 +271,7 @@ namespace HSP.Vanilla
             _rb.isKinematic = false;
         }
 
-        void FixedUpdate()
+        protected virtual void FixedUpdate()
         {
             if( SceneReferenceFrameManager.ReferenceFrame is INonInertialReferenceFrame frame )
             {
@@ -324,7 +325,7 @@ namespace HSP.Vanilla
 
 #warning TODO - celestial bodies need something that will replace the buildin parenting of colliders with 64-bit parents and update their scene position at all times (fixedupdate + update + lateupdate).
 
-        public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
+        public virtual void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
             IReferenceFrame cachedFrame = _cachedSceneReferenceFrame;
             RecalculateCache( data.OldFrame ); // Old frame because the current scene-space data is still in the old frame.
@@ -335,22 +336,22 @@ namespace HSP.Vanilla
             _cachedSceneReferenceFrame = cachedFrame;
         }
 
-        void OnEnable()
+        protected virtual void OnEnable()
         {
             _rb.isKinematic = false; // Can't do `enabled = false` (doesn't exist) for a rigidbody, so we set it to kinematic instead.
         }
 
-        void OnDisable()
+        protected virtual void OnDisable()
         {
             _rb.isKinematic = true; // Can't do `enabled = false` (doesn't exist) for a rigidbody, so we set it to kinematic instead.
         }
 
-        void OnCollisionEnter( Collision collision )
+        protected virtual void OnCollisionEnter( Collision collision )
         {
             IsColliding = true;
         }
 
-        void OnCollisionStay( Collision collision )
+        protected virtual void OnCollisionStay( Collision collision )
         {
             // `OnCollisionEnter` / Exit are called for every collider.
             // I've tried using an incrementing/decrementing int with enter/exit, but it wasn't updating correctly, and after some time, there were too many collisions.
@@ -359,7 +360,7 @@ namespace HSP.Vanilla
             IsColliding = true;
         }
 
-        void OnCollisionExit( Collision collision )
+        protected virtual void OnCollisionExit( Collision collision )
         {
             IsColliding = false;
         }

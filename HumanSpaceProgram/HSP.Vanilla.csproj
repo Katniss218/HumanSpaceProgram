@@ -128,6 +128,7 @@
     <Compile Include="Assets\HSP.Vanilla\Components\FReactionControlController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FControlFrame.cs" />
     <Compile Include="Assets\HSP.Vanilla\TrajectoryKinematicReferenceFrameTransform.cs" />
+    <Compile Include="Assets\HSP.Vanilla\TrajectoryFreeReferenceFrameTransform.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla\___HSP.Vanilla.asmdef" />

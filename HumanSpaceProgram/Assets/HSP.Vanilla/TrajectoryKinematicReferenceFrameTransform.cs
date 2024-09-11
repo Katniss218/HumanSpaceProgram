@@ -1,4 +1,5 @@
-﻿using HSP.Trajectories;
+﻿using HSP.Time;
+using HSP.Trajectories;
 using UnityEngine;
 using UnityPlus.Serialization;
 
@@ -7,6 +8,12 @@ namespace HSP.Vanilla
     public class TrajectoryKinematicReferenceFrameTransform : KinematicReferenceFrameTransform
     {
         public ITrajectory Trajectory { get; private set; }
+
+        protected override void MakeCacheInvalid()
+        {
+            Trajectory.InvalidateCache();
+            base.MakeCacheInvalid();
+        }
 
         protected override void FixedUpdate()
         {

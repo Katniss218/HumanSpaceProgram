@@ -245,12 +245,12 @@ namespace HSP.Vanilla
 
         // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)
         // Vector3's `==` operator does approximate comparison.
-        protected bool IsCacheValid() => (_absolutePosition.x == _oldAbsolutePosition.x && _absolutePosition.y == _oldAbsolutePosition.y && _absolutePosition.z == _oldAbsolutePosition.z)
+        protected virtual bool IsCacheValid() => (_absolutePosition.x == _oldAbsolutePosition.x && _absolutePosition.y == _oldAbsolutePosition.y && _absolutePosition.z == _oldAbsolutePosition.z)
             && SceneReferenceFrameManager.ReferenceFrame.Equals( _cachedSceneReferenceFrame );
 
-        protected void MakeCacheValid() => _oldAbsolutePosition = _absolutePosition;
+        protected virtual void MakeCacheValid() => _oldAbsolutePosition = _absolutePosition;
 
-        protected void MakeCacheInvalid() => _oldAbsolutePosition = -_absolutePosition + new Vector3Dbl( 1234.56789, 12345678.9, 1.23456789 );
+        protected virtual void MakeCacheInvalid() => _oldAbsolutePosition = -_absolutePosition + new Vector3Dbl( 1234.56789, 12345678.9, 1.23456789 );
 
         protected virtual void Awake()
         {
@@ -288,7 +288,7 @@ namespace HSP.Vanilla
             this._absoluteAngularAccelerationSum = Vector3.zero;
         }
 
-        public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
+        public virtual void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
             ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, _absolutePosition );
             ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, _absoluteRotation );
