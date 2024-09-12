@@ -6,7 +6,7 @@ using UnityEngine;
 namespace HSP.Trajectories
 {
     /// <summary>
-    /// An arbitrary simulated trajectory.
+    /// An arbitrary simulated trajectory. A.k.a. ephemeris, but more generalized.
     /// </summary>
     public interface ITrajectory
     {
@@ -31,9 +31,9 @@ namespace HSP.Trajectories
 
         void Step( IEnumerable<ITrajectory> attractors, double dt );
 
-        //OrbitalStateVector GetCurrentStateVector();
-        //void SetCurrentStateVector( OrbitalStateVector stateVector );
-        //OrbitalStateVector GetStateVectorAtUT( double ut );
+        OrbitalStateVector GetCurrentStateVector();
+        void SetCurrentStateVector( OrbitalStateVector stateVector );
+        OrbitalStateVector GetStateVectorAtUT( double ut );
 
         /// <summary>
         /// Calculates the state vector for the normalized time of the trajectory.

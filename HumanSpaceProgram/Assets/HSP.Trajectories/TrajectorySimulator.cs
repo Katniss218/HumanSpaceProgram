@@ -16,6 +16,10 @@ namespace HSP.Trajectories
 
         private double _ut;
 
+        /// <summary>
+        /// Simulates the trajectories all the way to the specified UT.
+        /// </summary>
+        /// <param name="endUT">The UT at which to finish the simulation.</param>
         public void Simulate( double endUT )
         {
             double dt = 1.0 / 200;

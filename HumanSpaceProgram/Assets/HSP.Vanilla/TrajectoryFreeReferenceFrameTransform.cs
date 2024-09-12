@@ -9,6 +9,12 @@ namespace HSP.Vanilla
         bool _isAttractor;
         ITrajectory _trajectory;
 
+        protected override void MakeCacheInvalid()
+        {
+            _trajectory.SetPositionAndRotation();
+            base.MakeCacheInvalid();
+        }
+
         protected override void OnEnable()
         {
             if( _isAttractor )

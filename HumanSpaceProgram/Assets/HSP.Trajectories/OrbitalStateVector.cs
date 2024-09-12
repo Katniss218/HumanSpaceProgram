@@ -21,17 +21,17 @@ namespace HSP.Trajectories
         /// <summary>
         /// The direction of the gravitational acceleration at <see cref="AbsolutePosition"/>.
         /// </summary>
-        public Vector3 GravityDir { get; }
+        //public Vector3 GravityDir { get; }
 
-        public OrbitalStateVector( double ut, Vector3Dbl absolutePosition, Vector3Dbl absoluteVelocity, Vector3 gravityDir )
+        public OrbitalStateVector( double ut, Vector3Dbl absolutePosition, Vector3Dbl absoluteVelocity/*, Vector3 gravityDir*/ )
         {
             this.UT = ut;
             this.AbsolutePosition = absolutePosition;
             this.AbsoluteVelocity = absoluteVelocity;
-            this.GravityDir = gravityDir.normalized;
+           //this.GravityDir = gravityDir.normalized;
         }
 
-        /// <summary>
+        /*/// <summary>
         /// Calculates the orbital frame of this state vector.
         /// </summary>
         public OrbitalFrame GetOrbitalFrame()
@@ -50,6 +50,6 @@ namespace HSP.Trajectories
             Vector3 up = Vector3.ProjectOnPlane( -GravityDir, forward );
 
             return new OrientedReferenceFrame( UT, AbsolutePosition, Quaternion.LookRotation( forward, up ) );
-        }
+        }*/
     }
 }

@@ -77,17 +77,34 @@ namespace Assets.HSP.Trajectories
             if( !instanceExists )
                 return;
 
-            // TODO - feed back the current positions and velocities of the objects if they have collided with anything in the previous frame.
-            {
+            /*
+            simulation will compute the position of the object, that's correct IF IT HASN'T COLLIDED WITH ANYTHING (during fixedupdate or physicsupdate).
+            - so if it hasn't collided with anything, then move it, but if it has, then don't?
+            - also, if the velocity has changed (forces applied outside the trajectory), then we also don't want to apply the trajectory, 
+                or the force could be passed into the trajectory as well.
 
+            so the position could be updated *after* the fixedupdate/physicsupdate, assuming some conditions are met that'll guarantee
+                that the simulation data is correct for what's happening to the physicsobject.
+            */
+
+#warning TODO - velocity will be accumulated twice, once here via moveposition, and once when the Velocity accumulates in the rigidbody.
+            foreach( var (trajectory, trajectoryTransform) in instance._trajectoryMap )
+            {
+                if( trajectoryTransform.AbsolutePosition != trajectory.AbsolutePosition
+                 && trajectoryTransform.AbsoluteVelocity != trajectory.AbsoluteVelocity )
+                {
+                    OrbitalStateVector stateVector = new OrbitalStateVector( TimeManager.UT, trajectoryTransform.AbsolutePosition, trajectoryTransform.AbsoluteVelocity );
+                    trajectory.SetCurrentStateVector( stateVector );
+                }
             }
 
             instance._simulator.Simulate( TimeManager.UT );
             foreach( var (trajectory, trajectoryTransform) in instance._trajectoryMap )
             {
-               // OrbitalStateVector stateVector = trajectory.GetStateVectorAtUT( TimeManager.UT );
-               // trajectoryTransform.AbsolutePosition = stateVector.AbsolutePosition;
-               // trajectoryTransform.AbsoluteVelocity = stateVector.AbsoluteVelocity;
+                OrbitalStateVector stateVector = trajectory.GetStateVectorAtUT( TimeManager.UT );
+#warning TODO - use MovePosition?
+                //trajectoryTransform.AbsolutePosition = stateVector.AbsolutePosition;
+                trajectoryTransform.AbsoluteVelocity = stateVector.AbsoluteVelocity;
             }
         }
     }

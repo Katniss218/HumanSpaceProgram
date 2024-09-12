@@ -66,12 +66,13 @@ namespace HSP.Trajectories
             // Prograde -> towards velocity.
             // Antiradial -> "towards" gravity, but projected onto a plane whose normal is velocity, such that it's orthogonal to Prograde.
 
-            OrbitalStateVector stateVector = GetStateVectorAtUT( ut );
+            //OrbitalStateVector stateVector = GetStateVectorAtUT( ut );
 
-            var forward = stateVector.AbsoluteVelocity.NormalizeToVector3();
-            var up = Vector3Dbl.Cross( stateVector.GravityDir, stateVector.AbsoluteVelocity ).NormalizeToVector3();
+            //var forward = stateVector.AbsoluteVelocity.NormalizeToVector3();
+            //var up = Vector3Dbl.Cross( GravityDir, stateVector.AbsoluteVelocity ).NormalizeToVector3();
 
-            return new OrbitalFrame( forward, up );
+            //return new OrbitalFrame( forward, up );
+            throw new NotImplementedException();
         }
 
         public bool HasCacheForUT( double ut )
