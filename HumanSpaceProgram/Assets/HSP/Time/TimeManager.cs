@@ -30,6 +30,7 @@ namespace HSP.Time
         /// </summary>
         public static float TimeScale { get => _timeScale; }
 
+#warning TODO - this should probably be updated first, before fixedupdate.
         /// <summary>
         /// Returns the current universal time, in [s].
         /// </summary>

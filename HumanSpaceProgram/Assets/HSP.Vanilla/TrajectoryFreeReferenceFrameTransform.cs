@@ -1,33 +1,30 @@
-﻿using HSP.Time;
+﻿using Assets.HSP.Trajectories;
 using HSP.Trajectories;
-using UnityEngine;
 using UnityPlus.Serialization;
 
 namespace HSP.Vanilla
 {
     public class TrajectoryFreeReferenceFrameTransform : FreeReferenceFrameTransform
     {
-        public ITrajectory Trajectory { get; private set; }
+        bool _isAttractor;
+        ITrajectory _trajectory;
 
-        protected override void RecalculateCache()
+        protected override void OnEnable()
         {
-#warning TODO - need a way to communicate to the simulator that "hey, I need the properly computed position for the current time", regardless if it has been computed or not yet.
-            Trajectory.ProlongToUT( TimeManager.UT );
-            base.RecalculateCache();
+            if( _isAttractor )
+                TrajectoryManager.RegisterAttractor( _trajectory, this );
+            else
+                TrajectoryManager.RegisterFollower( _trajectory, this );
+            base.OnEnable();
         }
 
-        protected override void MakeCacheInvalid()
+        protected override void OnDisable()
         {
-            Trajectory.InvalidateCache();
-            base.MakeCacheInvalid();
-        }
-
-        protected override void FixedUpdate()
-        {
-            // update trajectory.
-
-            // if collision or force is present, reject.
-            base.FixedUpdate();
+            if( _isAttractor )
+                TrajectoryManager.UnregisterAttractor( _trajectory );
+            else
+                TrajectoryManager.UnregisterFollower( _trajectory );
+            base.OnDisable();
         }
 
         [MapsInheritingFrom( typeof( TrajectoryFreeReferenceFrameTransform ) )]
@@ -35,7 +32,7 @@ namespace HSP.Vanilla
         {
             return new MemberwiseSerializationMapping<TrajectoryFreeReferenceFrameTransform>()
             {
-                ("trajectory", new Member<TrajectoryFreeReferenceFrameTransform, ITrajectory>( o => o.Trajectory )),
+                ("trajectory", new Member<TrajectoryFreeReferenceFrameTransform, ITrajectory>( o => o._trajectory )),
             };
         }
     }

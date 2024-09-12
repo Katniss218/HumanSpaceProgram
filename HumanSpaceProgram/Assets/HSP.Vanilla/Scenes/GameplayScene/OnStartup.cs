@@ -1,3 +1,4 @@
+using Assets.HSP.Trajectories;
 using HSP.CelestialBodies;
 using HSP.ReferenceFrames;
 using HSP.Time;
@@ -27,7 +28,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene
         public const string ADD_ACTIVE_VESSEL_MANAGER = HSPEvent.NAMESPACE_HSP + ".add_active_vessel_manager";
         public const string ADD_SELECTED_CONTROL_FRAME_MANAGER = HSPEvent.NAMESPACE_HSP + ".add_selected_control_frame_manager";
         public const string ADD_ESCAPE_INPUT_CONTROLLER = HSPEvent.NAMESPACE_HSP + ".add_escape_icontroller";
-        public const string ADD_TRAJECTORY_SIMULATOR_MANAGER = HSPEvent.NAMESPACE_HSP + ".add_trajectory_simulator";
+        public const string ADD_TRAJECTORY_MANAGER = HSPEvent.NAMESPACE_HSP + ".add_trajectory_manager";
         public const string ADD_ATMOSPHERE_RENDERER = HSPEvent.NAMESPACE_HSP + ".add_atmosphere_renderer";
 
         [HSPEventListener( HSPEvent_STARTUP_GAMEPLAY.ID, ADD_TIMESCALE_INPUT_CONTROLLER )]
@@ -78,10 +79,10 @@ namespace HSP.Vanilla.Scenes.GameplayScene
             GameplaySceneManager.Instance.gameObject.AddComponent<GameplaySceneEscapeInputController>();
         }
 
-        [HSPEventListener( HSPEvent_STARTUP_GAMEPLAY.ID, ADD_TRAJECTORY_SIMULATOR_MANAGER )]
-        private static void AddTrajectorySimulator()
+        [HSPEventListener( HSPEvent_STARTUP_GAMEPLAY.ID, ADD_TRAJECTORY_MANAGER )]
+        private static void AddTrajectoryManager()
         {
-            GameplaySceneManager.Instance.gameObject.AddComponent<TrajectorySimulator>();
+            GameplaySceneManager.Instance.gameObject.AddComponent<TrajectoryManager>();
         }
 
         [HSPEventListener( HSPEvent_STARTUP_GAMEPLAY.ID, ADD_ATMOSPHERE_RENDERER,

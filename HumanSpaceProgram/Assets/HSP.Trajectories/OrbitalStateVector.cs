@@ -10,19 +10,24 @@ namespace HSP.Trajectories
     public struct OrbitalStateVector
     {
         /// <summary>
-        /// The reference time.
+        /// The time at which this state vector was captured.
         /// </summary>
         public double UT { get; }
 
-        public Vector3Dbl Position { get; }
-        public Vector3Dbl Velocity { get; }
+        public Vector3Dbl AbsolutePosition { get; }
+
+        public Vector3Dbl AbsoluteVelocity { get; }
+
+        /// <summary>
+        /// The direction of the gravitational acceleration at <see cref="AbsolutePosition"/>.
+        /// </summary>
         public Vector3 GravityDir { get; }
 
-        public OrbitalStateVector( double ut, Vector3Dbl position, Vector3Dbl velocity, Vector3 gravityDir )
+        public OrbitalStateVector( double ut, Vector3Dbl absolutePosition, Vector3Dbl absoluteVelocity, Vector3 gravityDir )
         {
             this.UT = ut;
-            this.Position = position;
-            this.Velocity = velocity;
+            this.AbsolutePosition = absolutePosition;
+            this.AbsoluteVelocity = absoluteVelocity;
             this.GravityDir = gravityDir.normalized;
         }
 
@@ -31,7 +36,7 @@ namespace HSP.Trajectories
         /// </summary>
         public OrbitalFrame GetOrbitalFrame()
         {
-            Vector3 forward = Velocity.NormalizeToVector3();
+            Vector3 forward = AbsoluteVelocity.NormalizeToVector3();
             Vector3 up = Vector3.ProjectOnPlane( -GravityDir, forward );
             return new OrbitalFrame( forward, up );
         }
@@ -41,10 +46,10 @@ namespace HSP.Trajectories
         /// </summary>
         public IReferenceFrame GetReferenceFrame()
         {
-            Vector3 forward = Velocity.NormalizeToVector3();
+            Vector3 forward = AbsoluteVelocity.NormalizeToVector3();
             Vector3 up = Vector3.ProjectOnPlane( -GravityDir, forward );
 
-            return new OrientedReferenceFrame( UT, Position, Quaternion.LookRotation( forward, up ) );
+            return new OrientedReferenceFrame( UT, AbsolutePosition, Quaternion.LookRotation( forward, up ) );
         }
     }
 }

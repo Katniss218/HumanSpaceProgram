@@ -3,53 +3,28 @@ using UnityEngine;
 
 namespace HSP.Trajectories
 {
-    public class TrajectorySimulator : SingletonMonoBehaviour<TrajectorySimulator>
+    public class TrajectorySimulator
     {
-        private List<ITrajectory> _attractors = new();
-        private List<ITrajectory> _followers = new();
+        public List<ITrajectory> Attractors { get; } = new();
+        public List<ITrajectory> Followers { get; } = new();
 
-        Vector3[][] _predictedFollowerFuturePositions; // lower accuracy but available for future ut values
+        private double _estimatedFuturePositionUTSpacing = 50.0; // 50 seconds between sample points
+        Vector3[][] _estimatedFollowerFuturePositions; // lower accuracy but available for future ut values, sampled at fixed UT offsets.
 
 
         private double _simulationEndUT; // The last ut for which the sim has been computed.
 
         private double _ut;
 
-        public static void RegisterAttractor( ITrajectory attractorTrajectory )
-        {
-            instance._attractors.Add( attractorTrajectory );
-        }
-
-        public static void UnregisterAttractor( ITrajectory attractorTrajectory )
-        {
-            instance._attractors.Remove( attractorTrajectory );
-        }
-
-        public static void RegisterFollower( ITrajectory followerTrajectory )
-        {
-            instance._followers.Add( followerTrajectory );
-        }
-
-        public static void UnregisterFollower( ITrajectory followerTrajectory )
-        {
-            instance._followers.Remove( followerTrajectory );
-        }
-
-        public static void Clear()
-        {
-            instance._attractors.Clear();
-            instance._followers.Clear();
-        }
-
         public void Simulate( double endUT )
         {
             double dt = 1.0 / 200;
 
-            while( _ut < endUT )
+            for( ; _ut < endUT; _ut += dt )
             {
                 // attractors go first, because they attract each other.
 
-                foreach( var attractor in _attractors )
+                foreach( var attractor in Attractors )
                 {
                     if( attractor.HasCacheForUT( _ut ) ) // attractor trajectory data has been computed up to specified UT (in case of keplerian, it's always available).
                     {
@@ -57,18 +32,15 @@ namespace HSP.Trajectories
                     }
 
                     // sim.
-                    attractor.Step( _attractors, dt ); // calculate the cached values for the next timestep based on current cached values of the system.
+                    attractor.Step( Attractors, dt ); // calculate the cached values for the next timestep based on current cached values of the system.
                 }
-
 
                 // followers go second.
 
-                foreach( var follower in _followers )
+                foreach( var follower in Followers )
                 {
-                    follower.Step( _attractors, dt );
+                    follower.Step( Attractors, dt );
                 }
-
-                _ut += dt;
             }
 
             _simulationEndUT = endUT;

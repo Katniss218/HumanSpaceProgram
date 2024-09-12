@@ -151,7 +151,7 @@ namespace HSP._DevUtils
         {
             if( isPressed )
             {
-                SceneReferenceFrameManager.RequestChangeSceneReferenceFrame( new CenteredInertialReferenceFrame( TimeManager.UT,
+                SceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT,
                     SceneReferenceFrameManager.TargetObject.AbsolutePosition, Vector3Dbl.zero ) );
                 isPressed = false;
             }

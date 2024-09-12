@@ -1,26 +1,30 @@
-﻿using HSP.Time;
+﻿using Assets.HSP.Trajectories;
 using HSP.Trajectories;
-using UnityEngine;
 using UnityPlus.Serialization;
 
 namespace HSP.Vanilla
 {
     public class TrajectoryKinematicReferenceFrameTransform : KinematicReferenceFrameTransform
     {
-        public ITrajectory Trajectory { get; private set; }
+        bool _isAttractor;
+        ITrajectory _trajectory;
 
-        protected override void MakeCacheInvalid()
+        protected override void OnEnable()
         {
-            Trajectory.InvalidateCache();
-            base.MakeCacheInvalid();
+            if( _isAttractor )
+                TrajectoryManager.RegisterAttractor( _trajectory, this );
+            else
+                TrajectoryManager.RegisterFollower( _trajectory, this );
+            base.OnEnable();
         }
 
-        protected override void FixedUpdate()
+        protected override void OnDisable()
         {
-            // update trajectory.
-
-            // if collision or force is present, reject.
-            base.FixedUpdate();
+            if( _isAttractor )
+                TrajectoryManager.UnregisterAttractor( _trajectory );
+            else
+                TrajectoryManager.UnregisterFollower( _trajectory );
+            base.OnDisable();
         }
 
         [MapsInheritingFrom( typeof( TrajectoryKinematicReferenceFrameTransform ) )]
@@ -28,7 +32,7 @@ namespace HSP.Vanilla
         {
             return new MemberwiseSerializationMapping<TrajectoryKinematicReferenceFrameTransform>()
             {
-                ("trajectory", new Member<TrajectoryKinematicReferenceFrameTransform, ITrajectory>( o => o.Trajectory )),
+                ("trajectory", new Member<TrajectoryKinematicReferenceFrameTransform, ITrajectory>( o => o._trajectory )),
             };
         }
     }

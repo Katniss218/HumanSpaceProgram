@@ -66,6 +66,7 @@
     <Compile Include="Assets\HSP.Trajectories\FixedTrajectory.cs" />
     <Compile Include="Assets\HSP.Trajectories\TrajectorySimulator.cs" />
     <Compile Include="Assets\HSP.Trajectories\KeplerianOrbit.cs" />
+    <Compile Include="Assets\HSP.Trajectories\TrajectoryManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Trajectories\___HSP.Trajectories.asmdef" />

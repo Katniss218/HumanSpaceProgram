@@ -67,25 +67,25 @@ namespace HSP.ReferenceFrames
             return instance._referenceFrame.AtUT( ut );
         }
 
-        private static IReferenceFrame _toChange = null;
+        private static IReferenceFrame _frameToSwitchTo = null;
 
-        public static void RequestChangeSceneReferenceFrame( IReferenceFrame referenceFrame )
+        public static void RequestSceneReferenceFrameSwitch( IReferenceFrame referenceFrame )
         {
-            _toChange = referenceFrame;
+            _frameToSwitchTo = referenceFrame;
         }
 
         /// <summary>
         /// Sets the scene's reference frame to the specified frame, and calls out a frame switch event.
         /// </summary>
-        private static void ChangeSceneReferenceFrame()
+        private static void SwitchToRequestedSceneReferenceFrame()
         {
-            if( _toChange == null )
+            if( _frameToSwitchTo == null )
                 return;
 
-            IReferenceFrame newFrame = _toChange;
+            IReferenceFrame newFrame = _frameToSwitchTo;
             IReferenceFrame oldFrame = ReferenceFrame;
             ReferenceFrame = newFrame;
-            _toChange = null;
+            _frameToSwitchTo = null;
 
             try
             {
@@ -158,7 +158,7 @@ namespace HSP.ReferenceFrames
                 // Future available optimizations:
                 // - non-inertial frames (include acceleration).
                 // - switch the position to ahead of where the object is accelerating instead of the center of the object.
-                RequestChangeSceneReferenceFrame( new CenteredInertialReferenceFrame( TimeManager.UT, TargetObject.AbsolutePosition, TargetObject.AbsoluteVelocity ) );
+                RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT, TargetObject.AbsolutePosition, TargetObject.AbsoluteVelocity ) );
             }
         }
 
@@ -182,15 +182,15 @@ namespace HSP.ReferenceFrames
 
         void OnEnable()
         {
-            AddFrameSwitcherToPlayerLoop();
+            PlayerLoopUtils.InsertSystemAfter<FixedUpdate>( in _playerLoopSystem, typeof( FixedUpdate.PhysicsFixedUpdate ) );
         }
 
         void OnDisable()
         {
-            RemoveFrameSwitcherFromPlayerLoop();
+            PlayerLoopUtils.RemoveSystem<FixedUpdate>( in _playerLoopSystem );
         }
 
-        static PlayerLoopSystem _playerLoopSystem = new PlayerLoopSystem()
+        private static PlayerLoopSystem _playerLoopSystem = new PlayerLoopSystem()
         {
             type = typeof( SceneReferenceFrameManager ),
             updateDelegate = PlayerLoopFixedUpdate,
@@ -202,21 +202,7 @@ namespace HSP.ReferenceFrames
             if( !instanceExists )
                 return;
 
-            ChangeSceneReferenceFrame();
-        }
-
-        private static void AddFrameSwitcherToPlayerLoop()
-        {
-            var playerLoop = PlayerLoop.GetCurrentPlayerLoop();
-            PlayerLoopUtils.InsertSystem<FixedUpdate>( ref playerLoop, in _playerLoopSystem, 12 );
-            PlayerLoop.SetPlayerLoop( playerLoop );
-        }
-
-        private static void RemoveFrameSwitcherFromPlayerLoop()
-        {
-            var playerLoop = PlayerLoop.GetCurrentPlayerLoop();
-            PlayerLoopUtils.RemoveSystem<FixedUpdate>( ref playerLoop, in _playerLoopSystem );
-            PlayerLoop.SetPlayerLoop( playerLoop );
+            SwitchToRequestedSceneReferenceFrame();
         }
     }
 }

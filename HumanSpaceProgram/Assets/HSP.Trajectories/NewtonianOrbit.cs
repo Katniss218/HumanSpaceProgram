@@ -68,8 +68,8 @@ namespace HSP.Trajectories
 
             OrbitalStateVector stateVector = GetStateVectorAtUT( ut );
 
-            var forward = stateVector.Velocity.NormalizeToVector3();
-            var up = Vector3Dbl.Cross( stateVector.GravityDir, stateVector.Velocity ).NormalizeToVector3();
+            var forward = stateVector.AbsoluteVelocity.NormalizeToVector3();
+            var up = Vector3Dbl.Cross( stateVector.GravityDir, stateVector.AbsoluteVelocity ).NormalizeToVector3();
 
             return new OrbitalFrame( forward, up );
         }

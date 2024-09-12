@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEngine.LowLevel;
@@ -7,66 +9,150 @@ namespace UnityPlus
 {
     public static class PlayerLoopUtils
     {
-#warning TODO - Add a way to insert 'before' / 'after' a specified system type when inserting into a subsystem list.
-
-        // https://github.com/adammyhre/Unity-Improved-Timers/blob/master/Runtime/PlayerLoopUtils.cs
-
-        public static bool InsertSystem<T>( ref PlayerLoopSystem loop, in PlayerLoopSystem systemToInsert, int index )
+        public static void InsertSystemAfter<T1>( in PlayerLoopSystem systemToInsert, Type previous )
         {
-            if( loop.type != typeof( T ) )
-                return InsertSystemNested<T>( ref loop, systemToInsert, index );
-
-            var playerLoopSystemList = new List<PlayerLoopSystem>();
-            if( loop.subSystemList != null )
-                playerLoopSystemList.AddRange( loop.subSystemList );
-            playerLoopSystemList.Insert( index, systemToInsert );
-            loop.subSystemList = playerLoopSystemList.ToArray();
-            return true;
+            PlayerLoopSystem loopRoot = PlayerLoop.GetCurrentPlayerLoop();
+            InsertSystemNested( new[] { typeof( T1 ) }, 0, ref loopRoot, in systemToInsert, new List<Type>() { previous }, new Type[] { } );
+            PlayerLoop.SetPlayerLoop( loopRoot );
         }
 
-        private static bool InsertSystemNested<T>( ref PlayerLoopSystem loop, in PlayerLoopSystem systemToInsert, int index )
+        public static void InsertSystemBefore<T1>( in PlayerLoopSystem systemToInsert, Type next )
         {
-            if( loop.subSystemList == null )
-                return false;
+            PlayerLoopSystem loopRoot = PlayerLoop.GetCurrentPlayerLoop();
+            InsertSystemNested( new[] { typeof( T1 ) }, 0, ref loopRoot, in systemToInsert, new List<Type>(), new Type[] { next } );
+            PlayerLoop.SetPlayerLoop( loopRoot );
+        }
 
-            for( int i = 0; i < loop.subSystemList.Length; ++i )
+        public static void InsertSystemBetween<T1>( in PlayerLoopSystem systemToInsert, Type previous, Type next )
+        {
+            PlayerLoopSystem loopRoot = PlayerLoop.GetCurrentPlayerLoop();
+            InsertSystemNested( new[] { typeof( T1 ) }, 0, ref loopRoot, in systemToInsert, new List<Type>() { previous }, new Type[] { next } );
+            PlayerLoop.SetPlayerLoop( loopRoot );
+        }
+
+        public static void InsertSystemAfter<T1, T2>( in PlayerLoopSystem systemToInsert, Type previous )
+        {
+            PlayerLoopSystem loopRoot = PlayerLoop.GetCurrentPlayerLoop();
+            InsertSystemNested( new[] { typeof( T1 ), typeof( T2 ) }, 0, ref loopRoot, in systemToInsert, new List<Type>() { previous }, new Type[] { } );
+            PlayerLoop.SetPlayerLoop( loopRoot );
+        }
+
+        public static void InsertSystemBefore<T1, T2>( in PlayerLoopSystem systemToInsert, Type next )
+        {
+            PlayerLoopSystem loopRoot = PlayerLoop.GetCurrentPlayerLoop();
+            InsertSystemNested( new[] { typeof( T1 ), typeof( T2 ) }, 0, ref loopRoot, in systemToInsert, new List<Type>(), new Type[] { next } );
+            PlayerLoop.SetPlayerLoop( loopRoot );
+        }
+
+        public static void InsertSystemBetween<T1, T2>( in PlayerLoopSystem systemToInsert, Type previous, Type next )
+        {
+            PlayerLoopSystem loopRoot = PlayerLoop.GetCurrentPlayerLoop();
+            InsertSystemNested( new[] { typeof( T1 ), typeof( T2 ) }, 0, ref loopRoot, in systemToInsert, new List<Type>() { previous }, new Type[] { next } );
+            PlayerLoop.SetPlayerLoop( loopRoot );
+        }
+
+        private static void InsertSystemNested( Type[] types, int typeIndex, ref PlayerLoopSystem systemParent, in PlayerLoopSystem systemToInsert, List<Type> previous, Type[] next )
+        {
+            if( typeIndex == types.Length )
             {
-                if( !InsertSystem<T>( ref loop.subSystemList[i], in systemToInsert, index ) )
-                    continue;
-                return true;
+                if( systemParent.subSystemList == null )
+                {
+                    throw new ArgumentException( $"Can't add after 'before' if the parent doesn't have any children." );
+                }
+
+                List<Type> previousYetToEncounter = previous;
+                int index = 0;
+
+                for( int i = 0; i < systemParent.subSystemList.Length; i++ )
+                {
+                    // If we encounter anything that should be 'after', but before encountering everything that should be 'before' - error.
+                    if( next.Contains( systemParent.subSystemList[i].type ) && previousYetToEncounter.Any() )
+                    {
+                        throw new ArgumentException( $"Circular dependency." );
+                    }
+
+                    if( !previousYetToEncounter.Any() ) // If there's nothing to go 'before', ignore anything else that might be 'after'.
+                    {
+                        if( !next.Any() )
+                        {
+                            index = i;
+                            break;
+                        }
+                        else if( next.Contains( systemParent.subSystemList[i].type ) )
+                        {
+                            index = i;
+                            break;
+                        }
+                    }
+
+                    if( previousYetToEncounter.Contains( systemParent.subSystemList[i].type ) )
+                    {
+                        previousYetToEncounter.Remove( systemParent.subSystemList[i].type );
+                    }
+                }
+
+                List<PlayerLoopSystem> playerLoopSystemList = new();
+                if( systemParent.subSystemList != null )
+                    playerLoopSystemList.AddRange( systemParent.subSystemList );
+
+                playerLoopSystemList.Insert( index, systemToInsert );
+                systemParent.subSystemList = playerLoopSystemList.ToArray();
+                return;
             }
 
-            return false;
-        }
-
-        public static void RemoveSystem<T>( ref PlayerLoopSystem loop, in PlayerLoopSystem systemToRemove )
-        {
-            if( loop.subSystemList == null )
-                return;
-
-            var playerLoopSystemList = new List<PlayerLoopSystem>( loop.subSystemList );
-            for( int i = 0; i < playerLoopSystemList.Count; ++i )
+            for( int i = 0; i < systemParent.subSystemList.Length; i++ )
             {
-                if( playerLoopSystemList[i].type == systemToRemove.type && playerLoopSystemList[i].updateDelegate == systemToRemove.updateDelegate )
+                if( systemParent.subSystemList[i].type == types[typeIndex] )
                 {
-                    playerLoopSystemList.RemoveAt( i );
-                    loop.subSystemList = playerLoopSystemList.ToArray();
+                    InsertSystemNested( types, typeIndex + 1, ref systemParent.subSystemList[i], in systemToInsert, previous, next );
                 }
             }
-
-            RemoveSystemNested<T>( ref loop, systemToRemove );
         }
 
-        private static void RemoveSystemNested<T>( ref PlayerLoopSystem loop, PlayerLoopSystem systemToRemove )
-        {
-            if( loop.subSystemList == null )
-                return;
 
-            for( int i = 0; i < loop.subSystemList.Length; ++i )
+        public static void RemoveSystem<T1>( in PlayerLoopSystem systemToRemove )
+        {
+            PlayerLoopSystem loopRoot = PlayerLoop.GetCurrentPlayerLoop();
+            RemoveSystemNested( new[] { typeof( T1 ) }, 0, ref loopRoot, in systemToRemove );
+            PlayerLoop.SetPlayerLoop( loopRoot );
+        }
+
+        public static void RemoveSystem<T1, T2>( in PlayerLoopSystem systemToRemove )
+        {
+            PlayerLoopSystem loopRoot = PlayerLoop.GetCurrentPlayerLoop();
+            RemoveSystemNested( new[] { typeof( T1 ), typeof( T2 ) }, 0, ref loopRoot, in systemToRemove );
+            PlayerLoop.SetPlayerLoop( loopRoot );
+        }
+
+        private static void RemoveSystemNested( Type[] types, int typeIndex, ref PlayerLoopSystem systemParent, in PlayerLoopSystem systemToRemove )
+        {
+            if( typeIndex == types.Length )
             {
-                RemoveSystem<T>( ref loop.subSystemList[i], systemToRemove );
+                if( systemParent.subSystemList == null )
+                {
+                    throw new ArgumentException( $"Can't remove a subsystem if the parent doesn't contain any subsystems." );
+                }
+
+                var typeToRemove = systemToRemove.type;
+                var delegateToRemove = systemToRemove.updateDelegate;
+
+                List<PlayerLoopSystem> parentSubsystemList = new( systemParent.subSystemList );
+                parentSubsystemList.RemoveAll( s => s.type == typeToRemove && s.updateDelegate == delegateToRemove );
+                systemParent.subSystemList = parentSubsystemList.ToArray();
+
+                return;
+            }
+
+            for( int i = 0; i < systemParent.subSystemList.Length; i++ )
+            {
+                if( systemParent.subSystemList[i].type == types[typeIndex] )
+                {
+                    RemoveSystemNested( types, typeIndex + 1, ref systemParent.subSystemList[i], in systemToRemove );
+                }
             }
         }
+
+        // https://github.com/adammyhre/Unity-Improved-Timers/blob/master/Runtime/PlayerLoopUtils.cs
 
         public static void PrintPlayerLoop( PlayerLoopSystem loop )
         {
