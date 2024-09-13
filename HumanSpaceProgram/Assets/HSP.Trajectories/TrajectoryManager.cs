@@ -16,36 +16,46 @@ namespace Assets.HSP.Trajectories
     public class TrajectoryManager : SingletonMonoBehaviour<TrajectoryManager>
     {
         private TrajectorySimulator _simulator = new();
-        private Dictionary<ITrajectory, IReferenceFrameTransform> _trajectoryMap = new();
+        private Dictionary<ITrajectory, TrajectoryTransform> _trajectoryMap = new();
 
-        public static void RegisterAttractor( ITrajectory attractorTrajectory, IReferenceFrameTransform transform )
+        public static bool TryRegisterAttractor( ITrajectory attractorTrajectory, TrajectoryTransform transform )
         {
             if( instance._trajectoryMap.ContainsKey( attractorTrajectory ) )
-                throw new ArgumentException( $"The trajectory '{attractorTrajectory}' has already been registered.", nameof( attractorTrajectory ) );
+                return false;
 
             instance._simulator.Attractors.Add( attractorTrajectory );
             instance._trajectoryMap.Add( attractorTrajectory, transform );
+            return true;
         }
 
-        public static void UnregisterAttractor( ITrajectory attractorTrajectory )
+        public static bool TryUnregisterAttractor( ITrajectory attractorTrajectory )
         {
+            if( !instance._trajectoryMap.ContainsKey( attractorTrajectory ) )
+                return false;
+
             instance._simulator.Attractors.Remove( attractorTrajectory );
             instance._trajectoryMap.Remove( attractorTrajectory );
+            return true;
         }
 
-        public static void RegisterFollower( ITrajectory followerTrajectory, IReferenceFrameTransform transform )
+        public static bool TryRegisterFollower( ITrajectory followerTrajectory, TrajectoryTransform transform )
         {
             if( instance._trajectoryMap.ContainsKey( followerTrajectory ) )
-                throw new ArgumentException( $"The trajectory '{followerTrajectory}' has already been registered.", nameof( followerTrajectory ) );
+                return false;
 
             instance._simulator.Followers.Add( followerTrajectory );
             instance._trajectoryMap.Add( followerTrajectory, transform );
+            return true;
         }
 
-        public static void UnregisterFollower( ITrajectory followerTrajectory )
+        public static bool TryUnregisterFollower( ITrajectory followerTrajectory )
         {
+            if( !instance._trajectoryMap.ContainsKey( followerTrajectory ) )
+                return false;
+
             instance._simulator.Followers.Remove( followerTrajectory );
             instance._trajectoryMap.Remove( followerTrajectory );
+            return true;
         }
 
         public static void Clear()
@@ -57,7 +67,7 @@ namespace Assets.HSP.Trajectories
 
         void OnEnable()
         {
-            PlayerLoopUtils.InsertSystemBefore<FixedUpdate>( in _playerLoopSystem, typeof( FixedUpdate.Physics2DFixedUpdate ) );
+            PlayerLoopUtils.InsertSystemAfter<FixedUpdate>( in _playerLoopSystem, typeof( FixedUpdate.PhysicsFixedUpdate ) );
         }
 
         void OnDisable()
@@ -85,27 +95,39 @@ namespace Assets.HSP.Trajectories
 
             so the position could be updated *after* the fixedupdate/physicsupdate, assuming some conditions are met that'll guarantee
                 that the simulation data is correct for what's happening to the physicsobject.
+
+            the correctness is when: someone didn't move it, and it didn't collide with anything.
             */
 
-#warning TODO - velocity will be accumulated twice, once here via moveposition, and once when the Velocity accumulates in the rigidbody.
-            foreach( var (trajectory, trajectoryTransform) in instance._trajectoryMap )
+            // after physics has moved it, so the transform should now have the correct position and won't move.
+
+            instance._simulator.Simulate( TimeManager.UT );
+            foreach( var (trajectory, trajectoryFollower) in instance._trajectoryMap )
             {
-                if( trajectoryTransform.AbsolutePosition != trajectory.AbsolutePosition
-                 && trajectoryTransform.AbsoluteVelocity != trajectory.AbsoluteVelocity )
+                if( trajectoryFollower.PhysicsTransform.IsColliding || wasMovedByHandSinceLastSync || hadNonGravitationalForcesApplied )
                 {
-                    OrbitalStateVector stateVector = new OrbitalStateVector( TimeManager.UT, trajectoryTransform.AbsolutePosition, trajectoryTransform.AbsoluteVelocity );
-                    trajectory.SetCurrentStateVector( stateVector );
+                    // update trajectory for the next position.
+                    var stateVector = new OrbitalStateVector( TimeManager.UT, trajectoryFollower.ReferenceFrameTransform.AbsolutePosition, trajectoryFollower.ReferenceFrameTransform.AbsoluteVelocity );
+                    trajectoryFollower.Trajectory.SetCurrentStateVector( stateVector );
+                }
+                // every time the position/velocity is manually changed, we need to update the trajectory as well.
+                else
+                {
+                    OrbitalStateVector stateVector = trajectory.GetCurrentStateVector();
+#warning TODO - use MovePosition?
+                    trajectoryFollower.ReferenceFrameTransform.AbsolutePosition = stateVector.AbsolutePosition;
+                    trajectoryFollower.ReferenceFrameTransform.AbsoluteVelocity = stateVector.AbsoluteVelocity;
                 }
             }
 
-            instance._simulator.Simulate( TimeManager.UT );
-            foreach( var (trajectory, trajectoryTransform) in instance._trajectoryMap )
-            {
-                OrbitalStateVector stateVector = trajectory.GetStateVectorAtUT( TimeManager.UT );
-#warning TODO - use MovePosition?
-                //trajectoryTransform.AbsolutePosition = stateVector.AbsolutePosition;
-                trajectoryTransform.AbsoluteVelocity = stateVector.AbsoluteVelocity;
-            }
+            // We can check if the position/velocity before physicsupdate is still the same as the previous frame's position/velocity after physicsupdate.
+            // would that require that all movements are done during physicsupdate?
+
+            // if we exclusively use the trajectory transforms, we can have more control over it.
+#warning TODO - if we don't use custom trajectory transforms, it's easier to handle pinning, unpinning, and so on. It decouples things.
+            // we need a custom trajectory-holding component for that but that's okay. It also decouples things.
+
+
         }
     }
 }

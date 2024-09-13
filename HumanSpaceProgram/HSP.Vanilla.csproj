@@ -86,7 +86,6 @@
     <Compile Include="Assets\HSP.Vanilla\SelectedControlFrameManager.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\IGhostable_Ex.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\EditorScene\EditorSceneEscapeInputController.cs" />
-    <Compile Include="Assets\HSP.Vanilla\TrajectoryKinematicReferenceFrameTransform.cs" />
     <Compile Include="Assets\HSP.Vanilla\ActiveVesselManager.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\Tools\PickTool.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\Cameras\GameplaySceneCameraManager.cs" />
@@ -116,7 +115,6 @@
     <Compile Include="Assets\HSP.Vanilla\Components\FRocketEngine.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\Cameras\GameplaySceneDepthBufferCombiner.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\F2AxisActuator.cs" />
-    <Compile Include="Assets\HSP.Vanilla\TrajectoryFreeReferenceFrameTransform.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\Tools\TranslateTool.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\EditorScene\OnStartup.cs" />
     <Compile Include="Assets\HSP.Vanilla\OnVesselCreated.cs" />

@@ -82,7 +82,7 @@ namespace HSP.Trajectories
 
         public void Step( IEnumerable<ITrajectory> attractors, double dt )
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
     }
 }
