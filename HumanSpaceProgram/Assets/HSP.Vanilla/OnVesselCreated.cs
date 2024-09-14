@@ -8,21 +8,33 @@ using UnityEngine;
 
 namespace HSP.Vanilla
 {
-    public static class Vessel_Ex
+    public static class OnVesselCreated
     {
-        public const string ADD_PHYSICS_OBJECT = HSPEvent.NAMESPACE_HSP + ".add_physics_object";
+        public const string ADD_REFERENCE_FRAME_TRANSFORM = HSPEvent.NAMESPACE_HSP + ".add_reference_frame_transform";
+        public const string ADD_TRAJECTORY_TRANSFORM = HSPEvent.NAMESPACE_HSP + ".add_trajectory_transform";
         public const string TRY_PIN_PHYSICS_OBJECT = HSPEvent.NAMESPACE_HSP + ".try_pin_physics_object";
 
-        [HSPEventListener( HSPEvent_ON_VESSEL_CREATED.ID, ADD_PHYSICS_OBJECT )]
-        private static void AddGameplayPhysicsObject( Vessel v )
+        [HSPEventListener( HSPEvent_ON_VESSEL_CREATED.ID, ADD_REFERENCE_FRAME_TRANSFORM )]
+        private static void AddGameplayReferenceFrameTransform( Vessel v )
         {
             if( SceneLoader.IsSceneLoaded( GameplaySceneManager.SCENE_NAME ) )
             {
-                var comp = v.gameObject.AddComponent<TrajectoryFreeReferenceFrameTransform>();
+                var comp = v.gameObject.AddComponent<FreeReferenceFrameTransform>();
             }
             else if( SceneLoader.IsSceneLoaded( DesignSceneManager.SCENE_NAME ) )
             {
                 var comp = v.gameObject.AddComponent<FixedReferenceFrameTransform>();
+            }
+        }
+        
+        [HSPEventListener( HSPEvent_ON_VESSEL_CREATED.ID, ADD_TRAJECTORY_TRANSFORM )]
+        private static void AddGameplayTrajectoryTransform( Vessel v )
+        {
+            if( SceneLoader.IsSceneLoaded( GameplaySceneManager.SCENE_NAME ) )
+            {
+                var comp = v.gameObject.AddComponent<TrajectoryTransform>();
+                comp.Trajectory = new NewtonianOrbit();
+                comp.IsAttractor = false;
             }
         }
 

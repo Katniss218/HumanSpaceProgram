@@ -1,14 +1,14 @@
 using HSP.ReferenceFrames;
 using UnityEngine;
 
-namespace HSP.Vanilla.Scenes.GameplayScene
+namespace HSP.Vanilla
 {
-    public class OnActiveObjectChangeListener : MonoBehaviour
+    public class OnActiveVesselChanged : MonoBehaviour
     {
         public const string TRY_SET_SCENE_REFERENCE_FRAME = HSPEvent.NAMESPACE_HSP + ".try_set_scene_reference_frame";
 
         [HSPEventListener( HSPEvent_AFTER_ACTIVE_VESSEL_CHANGED.ID, TRY_SET_SCENE_REFERENCE_FRAME )]
-        private static void OnActiveVesselChange()
+        private static void TrySetSceneReferenceFrame()
         {
             SceneReferenceFrameManager.TargetObject = ActiveVesselManager.ActiveVessel == null ? null : ActiveVesselManager.ActiveVessel.ReferenceFrameTransform;
 

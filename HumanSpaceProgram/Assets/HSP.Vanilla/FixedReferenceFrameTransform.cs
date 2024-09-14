@@ -1,4 +1,5 @@
 ﻿using HSP.ReferenceFrames;
+using System;
 using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
@@ -27,6 +28,8 @@ namespace HSP.Vanilla
                 this._absolutePosition = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( value );
                 MakeCacheInvalid();
                 ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, _absolutePosition );
+                OnAbsolutePositionChanged?.Invoke();
+                OnAnyValueChanged?.Invoke();
             }
         }
 
@@ -38,6 +41,8 @@ namespace HSP.Vanilla
                 _absolutePosition = value;
                 MakeCacheInvalid();
                 ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, value );
+                OnAbsolutePositionChanged?.Invoke();
+                OnAnyValueChanged?.Invoke();
             }
         }
 
@@ -53,6 +58,8 @@ namespace HSP.Vanilla
                 this._absoluteRotation = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( value );
                 MakeCacheInvalid();
                 ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, _absoluteRotation );
+                OnAbsoluteRotationChanged?.Invoke();
+                OnAnyValueChanged?.Invoke();
             }
         }
 
@@ -64,6 +71,8 @@ namespace HSP.Vanilla
                 _absoluteRotation = value;
                 MakeCacheInvalid();
                 ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, value );
+                OnAbsoluteRotationChanged?.Invoke();
+                OnAnyValueChanged?.Invoke();
             }
         }
 
@@ -138,6 +147,13 @@ namespace HSP.Vanilla
         Vector3 _cachedAngularVelocity;
         Vector3 _cachedAcceleration;
         Vector3 _cachedAngularAcceleration;
+
+
+        public event Action OnAbsolutePositionChanged;
+        public event Action OnAbsoluteRotationChanged;
+        public event Action OnAbsoluteVelocityChanged;
+        public event Action OnAbsoluteAngularVelocityChanged;
+        public event Action OnAnyValueChanged;
 
         //
         //

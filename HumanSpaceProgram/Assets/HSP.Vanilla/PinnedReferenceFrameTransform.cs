@@ -1,5 +1,6 @@
 ﻿using HSP.CelestialBodies;
 using HSP.ReferenceFrames;
+using System;
 using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
@@ -29,6 +30,9 @@ namespace HSP.Vanilla
                     ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
                     ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );
                     CachePositionAndRotation();
+                    OnAbsolutePositionChanged?.Invoke();
+                    OnAbsoluteRotationChanged?.Invoke();
+                    OnAnyValueChanged?.Invoke();
                 }
             }
         }
@@ -42,6 +46,8 @@ namespace HSP.Vanilla
                 MakeCacheInvalid();
                 ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
                 CachePositionAndRotation();
+                OnAbsolutePositionChanged?.Invoke();
+                OnAnyValueChanged?.Invoke();
             }
         }
 
@@ -54,6 +60,8 @@ namespace HSP.Vanilla
                 MakeCacheInvalid();
                 ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );
                 CachePositionAndRotation();
+                OnAbsoluteRotationChanged?.Invoke();
+                OnAnyValueChanged?.Invoke();
             }
         }
 
@@ -65,6 +73,9 @@ namespace HSP.Vanilla
             MakeCacheInvalid();
             ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
             ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );
+            OnAbsolutePositionChanged?.Invoke();
+            OnAbsoluteRotationChanged?.Invoke();
+            OnAnyValueChanged?.Invoke();
         }
 
 
@@ -186,6 +197,13 @@ namespace HSP.Vanilla
 
         Vector3Dbl _absoluteAccelerationSum = Vector3.zero;
         Vector3Dbl _absoluteAngularAccelerationSum = Vector3.zero;
+
+#warning Should these fire when the planet makes the transform follow itself as well?
+        public event Action OnAbsolutePositionChanged;
+        public event Action OnAbsoluteRotationChanged;
+        public event Action OnAbsoluteVelocityChanged;
+        public event Action OnAbsoluteAngularVelocityChanged;
+        public event Action OnAnyValueChanged;
 
         //
 

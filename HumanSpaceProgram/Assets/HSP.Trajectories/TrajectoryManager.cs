@@ -20,6 +20,10 @@ namespace Assets.HSP.Trajectories
 
         public static bool TryRegisterAttractor( ITrajectory attractorTrajectory, TrajectoryTransform transform )
         {
+            if( !instanceExists )
+                return false;
+            if( attractorTrajectory == null || transform == null )
+                return false;
             if( instance._trajectoryMap.ContainsKey( attractorTrajectory ) )
                 return false;
 
@@ -30,6 +34,10 @@ namespace Assets.HSP.Trajectories
 
         public static bool TryUnregisterAttractor( ITrajectory attractorTrajectory )
         {
+            if( !instanceExists )
+                return false;
+            if( attractorTrajectory == null )
+                return false;
             if( !instance._trajectoryMap.ContainsKey( attractorTrajectory ) )
                 return false;
 
@@ -40,6 +48,10 @@ namespace Assets.HSP.Trajectories
 
         public static bool TryRegisterFollower( ITrajectory followerTrajectory, TrajectoryTransform transform )
         {
+            if( !instanceExists )
+                return false;
+            if( followerTrajectory == null || transform == null )
+                return false;
             if( instance._trajectoryMap.ContainsKey( followerTrajectory ) )
                 return false;
 
@@ -50,6 +62,10 @@ namespace Assets.HSP.Trajectories
 
         public static bool TryUnregisterFollower( ITrajectory followerTrajectory )
         {
+            if( !instanceExists )
+                return false;
+            if( followerTrajectory == null )
+                return false;
             if( !instance._trajectoryMap.ContainsKey( followerTrajectory ) )
                 return false;
 
@@ -60,6 +76,9 @@ namespace Assets.HSP.Trajectories
 
         public static void Clear()
         {
+            if( !instanceExists )
+                return;
+
             instance._trajectoryMap.Clear();
             instance._simulator.Attractors.Clear();
             instance._simulator.Followers.Clear();
@@ -101,22 +120,31 @@ namespace Assets.HSP.Trajectories
 
             // after physics has moved it, so the transform should now have the correct position and won't move.
 
+#warning TODO - forces include gravitational forces (there's no way to distinguish them really, and we do want to use trajectories to do gravity anyway so there won't be gravity forces on the vessels)
+
+            // do we want to do this checking via events or flags?
+
+            // events can be hooked by the trajectory follower and then exposed as flags.
+
+
+
+#warning TODO - maybe expose some HSPEvents at specific points during the frame?? (via playerloop) I don't want hspevents to be related to the frame, not HSP things happening though.
+
             instance._simulator.Simulate( TimeManager.UT );
             foreach( var (trajectory, trajectoryFollower) in instance._trajectoryMap )
             {
-                if( trajectoryFollower.PhysicsTransform.IsColliding || wasMovedByHandSinceLastSync || hadNonGravitationalForcesApplied )
-                {
-                    // update trajectory for the next position.
-                    var stateVector = new OrbitalStateVector( TimeManager.UT, trajectoryFollower.ReferenceFrameTransform.AbsolutePosition, trajectoryFollower.ReferenceFrameTransform.AbsoluteVelocity );
-                    trajectoryFollower.Trajectory.SetCurrentStateVector( stateVector );
-                }
-                // every time the position/velocity is manually changed, we need to update the trajectory as well.
-                else
+                if( trajectoryFollower.IsSynchronized() )
                 {
                     OrbitalStateVector stateVector = trajectory.GetCurrentStateVector();
 #warning TODO - use MovePosition?
                     trajectoryFollower.ReferenceFrameTransform.AbsolutePosition = stateVector.AbsolutePosition;
                     trajectoryFollower.ReferenceFrameTransform.AbsoluteVelocity = stateVector.AbsoluteVelocity;
+                }
+                else
+                {
+                    // update trajectory for the next position.
+                    var stateVector = new OrbitalStateVector( TimeManager.UT, trajectoryFollower.ReferenceFrameTransform.AbsolutePosition, trajectoryFollower.ReferenceFrameTransform.AbsoluteVelocity );
+                    trajectoryFollower.Trajectory.SetCurrentStateVector( stateVector );
                 }
             }
 

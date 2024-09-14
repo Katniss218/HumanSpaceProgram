@@ -1,5 +1,6 @@
 ﻿using HSP.ReferenceFrames;
 using HSP.Time;
+using System;
 using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
@@ -22,6 +23,8 @@ namespace HSP.Vanilla
                 MakeCacheInvalid();
                 this._rb.position = value;
                 this.transform.position = value;
+                OnAbsolutePositionChanged?.Invoke();
+                OnAnyValueChanged?.Invoke();
             }
         }
 
@@ -38,6 +41,8 @@ namespace HSP.Vanilla
                 _cachedAbsolutePosition = value;
                 MakeCacheInvalid();
                 ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, value );
+                OnAbsolutePositionChanged?.Invoke();
+                OnAnyValueChanged?.Invoke();
             }
         }
 
@@ -50,6 +55,8 @@ namespace HSP.Vanilla
                 MakeCacheInvalid();
                 this._rb.rotation = value;
                 this.transform.rotation = value;
+                OnAbsoluteRotationChanged?.Invoke();
+                OnAnyValueChanged?.Invoke();
             }
         }
 
@@ -66,6 +73,8 @@ namespace HSP.Vanilla
                 _cachedAbsoluteRotation = value;
                 MakeCacheInvalid();
                 ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, value );
+                OnAbsoluteRotationChanged?.Invoke();
+                OnAnyValueChanged?.Invoke();
             }
         }
 
@@ -77,6 +86,8 @@ namespace HSP.Vanilla
                 this._cachedAbsoluteVelocity = SceneReferenceFrameManager.ReferenceFrame.TransformVelocity( value );
                 MakeCacheInvalid();
                 this._rb.velocity = value;
+                OnAbsoluteVelocityChanged?.Invoke();
+                OnAnyValueChanged?.Invoke();
             }
         }
 
@@ -93,6 +104,8 @@ namespace HSP.Vanilla
                 this._cachedAbsoluteVelocity = value;
                 MakeCacheInvalid();
                 ReferenceFrameTransformUtils.SetSceneVelocityFromAbsolute( _rb, value );
+                OnAbsoluteVelocityChanged?.Invoke();
+                OnAnyValueChanged?.Invoke();
             }
         }
 
@@ -104,6 +117,8 @@ namespace HSP.Vanilla
                 this._cachedAbsoluteAngularVelocity = SceneReferenceFrameManager.ReferenceFrame.TransformAngularVelocity( value );
                 MakeCacheInvalid();
                 this._rb.angularVelocity = value;
+                OnAbsoluteAngularVelocityChanged?.Invoke();
+                OnAnyValueChanged?.Invoke();
             }
         }
 
@@ -120,6 +135,8 @@ namespace HSP.Vanilla
                 this._cachedAbsoluteAngularVelocity = value;
                 MakeCacheInvalid();
                 ReferenceFrameTransformUtils.SetSceneAngularVelocityFromAbsolute( _rb, value );
+                OnAbsoluteAngularVelocityChanged?.Invoke();
+                OnAnyValueChanged?.Invoke();
             }
         }
 
@@ -146,6 +163,13 @@ namespace HSP.Vanilla
         Vector3 _oldAngularVelocity;
         Vector3Dbl _absoluteAccelerationSum = Vector3.zero;
         Vector3Dbl _absoluteAngularAccelerationSum = Vector3.zero;
+
+
+        public event Action OnAbsolutePositionChanged;
+        public event Action OnAbsoluteRotationChanged;
+        public event Action OnAbsoluteVelocityChanged;
+        public event Action OnAbsoluteAngularVelocityChanged;
+        public event Action OnAnyValueChanged;
 
         //
         //

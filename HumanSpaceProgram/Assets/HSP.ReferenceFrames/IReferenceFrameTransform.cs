@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace HSP.ReferenceFrames
 {
@@ -57,6 +58,27 @@ namespace HSP.ReferenceFrames
         /// Gets the angular acceleration at this instant, in [Rad/s^2].
         /// </summary>
         Vector3Dbl AbsoluteAngularAcceleration { get; }
+
+        /// <summary>
+        /// Invoked when the absolute position property is set.
+        /// </summary>
+        event Action OnAbsolutePositionChanged;
+        /// <summary>
+        /// Invoked when the absolute rotation is set.
+        /// </summary>
+        event Action OnAbsoluteRotationChanged;
+        /// <summary>
+        /// Invoked when the absolute velocity is set.
+        /// </summary>
+        event Action OnAbsoluteVelocityChanged;
+        /// <summary>
+        /// Invoked when the absolute angular velocity is set.
+        /// </summary>
+        event Action OnAbsoluteAngularVelocityChanged;
+        /// <summary>
+        /// Invoked when any of the primary values (pos/rot/vel/angvel) are set.
+        /// </summary>
+        event Action OnAnyValueChanged;
     }
 
     public interface IReferenceFrameSwitchResponder

@@ -6,11 +6,6 @@ namespace HSP.CelestialBodies
 {
     public static class GravityUtils
     {
-        /// <summary>
-        /// Gravitational constant G [N * kg^-2 * m^2].
-        /// </summary>
-        public const double G = 6.67430e-11;
-
         public static IEnumerable<(CelestialBody, Vector3Dbl)> GetNBodyGravityAccelerations( Vector3Dbl absolutePosition )
         {
             // method to get the gravitational contribution of every CB individually, mostly for analysis and for auxiliary functionality.
@@ -27,7 +22,7 @@ namespace HSP.CelestialBodies
                     continue;
                 }
 
-                double accelerationMagnitude = G * (body.Mass / distanceSq);
+                double accelerationMagnitude = PhysicalConstants.G * (body.Mass / distanceSq);
                 acc[i] = (body, toBody.normalized * accelerationMagnitude);
                 i++;
             }
@@ -52,7 +47,7 @@ namespace HSP.CelestialBodies
                     continue;
                 }
 
-                double accelerationMagnitude = G * (body.Mass / distanceSq);
+                double accelerationMagnitude = PhysicalConstants.G * (body.Mass / distanceSq);
                 accSum += toBody.normalized * accelerationMagnitude;
             }
 

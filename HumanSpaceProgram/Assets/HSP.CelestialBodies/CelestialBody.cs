@@ -63,14 +63,14 @@ namespace HSP.CelestialBodies
             }
         }
 
-        IReferenceFrameTransform _preferenceFrameTransform;
+        IReferenceFrameTransform _referenceFrameTransform;
         public IReferenceFrameTransform ReferenceFrameTransform
         {
             get
             {
-                if( _preferenceFrameTransform.IsUnityNull() )
-                    _preferenceFrameTransform = this.GetComponent<IReferenceFrameTransform>();
-                return _preferenceFrameTransform;
+                if( _referenceFrameTransform.IsUnityNull() )
+                    _referenceFrameTransform = this.GetComponent<IReferenceFrameTransform>();
+                return _referenceFrameTransform;
             }
         }
 

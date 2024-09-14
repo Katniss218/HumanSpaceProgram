@@ -16,25 +16,9 @@ namespace HSP.Trajectories
         private List<Vector3Dbl> _cachedPositions;
         private List<Vector3Dbl> _cachedVelocities;
 
-        public Vector3Dbl AbsolutePosition => throw new NotImplementedException();
-
-        public Vector3Dbl AbsoluteVelocity => throw new NotImplementedException();
-
-        public Vector3Dbl AbsoluteAcceleration => throw new NotImplementedException();
+        public double UT { get; private set; }
 
         public double Mass => throw new NotImplementedException();
-
-        public void AddVelocityChange( Vector3Dbl velocityChange )
-        {
-            // invalidate anything beyond current UT.
-            throw new NotImplementedException();
-        }
-
-        public void AddVelocityChangeAtUT( Vector3Dbl velocityChange, double ut )
-        {
-            // invalidate anything beyond current UT.
-            throw new NotImplementedException();
-        }
 
         public OrbitalStateVector GetCurrentStateVector()
         {
@@ -80,9 +64,29 @@ namespace HSP.Trajectories
             throw new NotImplementedException();
         }
 
-        public void Step( IEnumerable<ITrajectory> attractors, double dt )
+        public void Step( IEnumerable<TrajectoryBodyState> attractors, double dt )
         {
-            //throw new NotImplementedException();
+            Vector3Dbl selfAbsolutePosition = this.GetCurrentStateVector().AbsolutePosition;
+
+            Vector3Dbl accSum = Vector3Dbl.zero;
+            foreach( var body in attractors )
+            {
+#warning TODO - the trajectory might've been updated (stepped before, we need to get the position it had at the current time).
+                // instead of passing in a trajectory, maybe pass in the state vectors collected earlier?
+
+                Vector3Dbl toBody = body.AbsolutePosition - selfAbsolutePosition;
+
+                double distanceSq = toBody.sqrMagnitude;
+                if( distanceSq == 0.0 )
+                {
+                    continue;
+                }
+
+                double accelerationMagnitude = PhysicalConstants.G * (body.Mass / distanceSq);
+                accSum += toBody.normalized * accelerationMagnitude;
+            }
+
+            return accSum;
         }
     }
 }

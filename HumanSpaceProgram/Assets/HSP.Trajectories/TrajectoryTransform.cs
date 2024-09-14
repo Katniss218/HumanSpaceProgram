@@ -10,29 +10,46 @@ namespace HSP.Trajectories
     /// </summary>
     public class TrajectoryTransform : MonoBehaviour
     {
-        IPhysicsTransform _physicsTransform;
+        private IPhysicsTransform _physicsTransform;
         public IPhysicsTransform PhysicsTransform
         {
             get
             {
                 if( _physicsTransform.IsUnityNull() )
+                {
                     _physicsTransform = this.GetComponent<IPhysicsTransform>();
+                }
                 return _physicsTransform;
             }
         }
 
-        IReferenceFrameTransform _preferenceFrameTransform;
+        private IReferenceFrameTransform _referenceFrameTransform;
         public IReferenceFrameTransform ReferenceFrameTransform
         {
             get
             {
-                if( _preferenceFrameTransform.IsUnityNull() )
-                    _preferenceFrameTransform = this.GetComponent<IReferenceFrameTransform>();
-                return _preferenceFrameTransform;
+                if( _referenceFrameTransform.IsUnityNull() )
+                {
+                    _referenceFrameTransform = this.GetComponent<IReferenceFrameTransform>();
+                    _referenceFrameTransform.OnAnyValueChanged += OnValueChanged;
+                }
+                return _referenceFrameTransform;
             }
         }
 
-        bool _isAttractor;
+        private ITrajectory _trajectory;
+        public ITrajectory Trajectory
+        {
+            get => _trajectory;
+            set
+            {
+                TryUnregister();
+                _trajectory = value;
+                TryRegister();
+            }
+        }
+
+        private bool _isAttractor;
         public bool IsAttractor
         {
             get => _isAttractor;
@@ -47,27 +64,60 @@ namespace HSP.Trajectories
             }
         }
 
-        ITrajectory _trajectory;
-        public ITrajectory Trajectory
+        private bool _forceResyncWithTrajectory = false;
+        private IReferenceFrameTransform _lastSynchronizedTransform;
+        private Vector3Dbl _oldAbsoluteVelocity;
+
+        /// <summary>
+        /// Checks whether or not the trajectory needs to be resynchronized with the object (discarding any cached values beyond this point).
+        /// </summary>
+        public bool IsSynchronized()
         {
-            get => _trajectory;
-            set
-            {
-                TryUnregister();
-                _trajectory = value;
-                TryRegister();
-            }
+            bool value = _lastSynchronizedTransform == this.ReferenceFrameTransform // Because we use an event to check the manual reset of values, it would be possible for you to
+                                                                                    //   swap the phystransform to a different instance and change its position before the event is
+                                                                                    //   re-registered to that new instance.
+                && !HasCollidedWithSomething() // Because trajectories shouldn't ignore object's collision response.
+                && !HadForcesApplied()         // Because trajectories shouldn't ignore external forces you apply to the object.
+                && !_hadValuesChangedByHand    // Because trajectories shouldn't ignore when you move the object by hand.
+                && !_forceResyncWithTrajectory;
+
+            _lastSynchronizedTransform = this.ReferenceFrameTransform;
+            _forceResyncWithTrajectory = false;
+
+            return value;
         }
+
+        /// <summary>
+        /// Makes the trajectory resynchronize with the object using object's values on the next trajectory update.
+        /// </summary>
+        public void RequestForcedResynchronization()
+        {
+            _forceResyncWithTrajectory = true;
+        }
+
+        private bool HasCollidedWithSomething() => this.PhysicsTransform.IsColliding;
+
+        private bool HadForcesApplied() => this.ReferenceFrameTransform.AbsoluteVelocity != _oldAbsoluteVelocity; // check if velocity is different than last frame's velocity (ANY force will change that which is what we want).
+
+#warning TODO - frame switching
+        private bool _hadValuesChangedByHand; // An absoluteposition vs oldabsoluteposition check is not enough because velocity will be integrated (possibly in non-obvious ways),
+                                              //   so the check would always fail.
 
         void OnEnable()
         {
+            RequestForcedResynchronization();
+            _referenceFrameTransform = this.GetComponent<IReferenceFrameTransform>(); // The assignment is needed, otherwise the event will also be added (again) by the getter.
+            _referenceFrameTransform.OnAnyValueChanged += OnValueChanged;
             TryRegister();
         }
 
         void OnDisable()
         {
+            _referenceFrameTransform.OnAnyValueChanged -= OnValueChanged;
             TryUnregister();
         }
+
+        private void OnValueChanged() => _hadValuesChangedByHand = false;
 
         private void TryRegister()
         {

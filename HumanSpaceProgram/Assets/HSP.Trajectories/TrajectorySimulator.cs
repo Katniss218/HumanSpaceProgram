@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace HSP.Trajectories
@@ -24,8 +25,21 @@ namespace HSP.Trajectories
         {
             double dt = 1.0 / 200;
 
+#warning TODO - last step needs to be such that the time matches the desired time.
             for( ; _ut < endUT; _ut += dt )
             {
+                // Copy the states to ensure that the simulation doesn't use values calculated for the next step on elements after the first element.
+                List<TrajectoryBodyState> attractorStates = new List<TrajectoryBodyState>( Attractors.Count );
+                List<TrajectoryBodyState> followerStates = new List<TrajectoryBodyState>( Attractors.Count );
+                foreach( var t in Attractors )
+                {
+                    attractorStates.Add( t.GetCurrentStateVector() );
+                }
+                foreach( var t in Followers )
+                {
+                    followerStates.Add( t.GetCurrentStateVector() );
+                }
+
                 // attractors go first, because they attract each other.
 
                 foreach( var attractor in Attractors )
@@ -35,19 +49,18 @@ namespace HSP.Trajectories
                         continue;
                     }
 
-                    // sim.
-                    attractor.Step( Attractors, dt ); // calculate the cached values for the next timestep based on current cached values of the system.
+                    attractor.Step( attractorStates, dt ); // calculate the cached values for the next timestep based on current cached values of the system.
                 }
 
                 // followers go second.
 
                 foreach( var follower in Followers )
                 {
-                    follower.Step( Attractors, dt );
+                    follower.Step( attractorStates, dt );
                 }
             }
 
-            _simulationEndUT = endUT;
+            _simulationEndUT = _ut;
         }
     }
 }

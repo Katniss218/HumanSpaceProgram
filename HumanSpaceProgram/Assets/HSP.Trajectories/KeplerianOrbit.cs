@@ -55,10 +55,14 @@ namespace HSP.Core
         /// </remarks>
         public double meanAnomaly { get; private set; } // We store the mean anomaly because it is convenient.
 
+        double _cachedTrueAnomaly;
+
         /// <summary>
         /// The reference epoch for the orbit, UT, in [s].
         /// </summary>
         public double epoch { get; private set; } // referenceUT
+
+        public double UT { get; private set; }
 
         public double GravitationalParameter { get; set; }
 
@@ -157,16 +161,6 @@ namespace HSP.Core
             throw new NotImplementedException();
         }
 
-        public void AddVelocityChange( Vector3Dbl velocityChange )
-        {
-            throw new NotImplementedException();
-        }
-
-        public void AddVelocityChangeAtUT( Vector3Dbl velocityChange, double ut )
-        {
-            throw new NotImplementedException();
-        }
-
         public OrbitalStateVector GetCurrentStateVector()
         {
             throw new NotImplementedException();
@@ -201,7 +195,7 @@ namespace HSP.Core
 
         private Vector3Dbl CalculatePosition()
         {
-            double trueAnomaly = 0;
+            double trueAnomaly = _cachedTrueAnomaly;
             double p = semiLatusRectum;
 
             Vector3Dbl position = new Vector3Dbl(
@@ -215,7 +209,7 @@ namespace HSP.Core
 
         private Vector3Dbl CalculateVelocity()
         {
-            double trueAnomaly = 0;
+            double trueAnomaly = _cachedTrueAnomaly;
             double g = -Math.Sqrt( GravitationalParameter / semiLatusRectum );
 
             Vector3Dbl velocity = new Vector3Dbl(
@@ -319,12 +313,20 @@ namespace HSP.Core
 
         public bool HasCacheForUT( double ut )
         {
-            throw new NotImplementedException();
+            // Keplerian orbits have a closed form solution, so they can be calculated arbitrarily far ahead in an instant.
+
+#warning TODO - change to 'true' when the on-demand calculation is ready.
+            return false;
         }
 
-        public void Step( IEnumerable<ITrajectory> attractors, double dt )
+        public void Step( IEnumerable<TrajectoryBodyState> attractors, double dt )
         {
-            throw new NotImplementedException();
+            double meanMotion = GetMeanMotion();
+            meanAnomaly += meanMotion * dt;
+            UT += dt;
+
+            double eccentricAnomaly = calcEccentricAnomaly();
+            _cachedTrueAnomaly = calcTrueAnomaly( eccentricAnomaly );
         }
     }
 }

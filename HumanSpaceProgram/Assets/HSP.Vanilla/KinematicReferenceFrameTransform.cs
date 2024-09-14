@@ -1,5 +1,6 @@
 ﻿using HSP.ReferenceFrames;
 using HSP.Time;
+using System;
 using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
@@ -35,6 +36,8 @@ namespace HSP.Vanilla
                 MakeCacheInvalid();
                 ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, value );
                 CachePositionAndRotation();
+                OnAbsolutePositionChanged?.Invoke();
+                OnAnyValueChanged?.Invoke();
             }
         }
 
@@ -60,6 +63,8 @@ namespace HSP.Vanilla
                 MakeCacheInvalid();
                 ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, value );
                 CachePositionAndRotation();
+                OnAbsoluteRotationChanged?.Invoke();
+                OnAnyValueChanged?.Invoke();
             }
         }
 
@@ -74,6 +79,8 @@ namespace HSP.Vanilla
             {
                 _absoluteVelocity = SceneReferenceFrameManager.ReferenceFrame.TransformVelocity( value );
                 MakeCacheInvalid();
+                OnAbsoluteVelocityChanged?.Invoke();
+                OnAnyValueChanged?.Invoke();
             }
         }
 
@@ -84,6 +91,8 @@ namespace HSP.Vanilla
             {
                 _absoluteVelocity = value;
                 MakeCacheInvalid();
+                OnAbsoluteVelocityChanged?.Invoke();
+                OnAnyValueChanged?.Invoke();
             }
         }
 
@@ -98,6 +107,8 @@ namespace HSP.Vanilla
             {
                 _absoluteAngularVelocity = SceneReferenceFrameManager.ReferenceFrame.TransformAngularVelocity( value );
                 MakeCacheInvalid();
+                OnAbsoluteAngularVelocityChanged?.Invoke();
+                OnAnyValueChanged?.Invoke();
             }
         }
 
@@ -108,6 +119,8 @@ namespace HSP.Vanilla
             {
                 _absoluteAngularVelocity = value;
                 MakeCacheInvalid();
+                OnAbsoluteAngularVelocityChanged?.Invoke();
+                OnAnyValueChanged?.Invoke();
             }
         }
 
@@ -136,6 +149,13 @@ namespace HSP.Vanilla
 
         Vector3Dbl _absoluteAccelerationSum = Vector3.zero;
         Vector3Dbl _absoluteAngularAccelerationSum = Vector3.zero;
+
+
+        public event Action OnAbsolutePositionChanged;
+        public event Action OnAbsoluteRotationChanged;
+        public event Action OnAbsoluteVelocityChanged;
+        public event Action OnAbsoluteAngularVelocityChanged;
+        public event Action OnAnyValueChanged;
 
         //
         //

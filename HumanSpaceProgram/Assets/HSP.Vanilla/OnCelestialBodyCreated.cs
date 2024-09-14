@@ -2,7 +2,7 @@ using HSP.CelestialBodies;
 
 namespace HSP.Vanilla
 {
-    public static class CelestialBody_Ex
+    public static class OnCelestialBodyCreated
     {
         public const string ADD_PHYSICS_OBJECT = HSPEvent.NAMESPACE_HSP + ".add_physics_object";
         public const string ADD_SURFACE = HSPEvent.NAMESPACE_HSP + ".add_surface";
