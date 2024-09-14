@@ -9,33 +9,35 @@ namespace HSP.Trajectories
     /// </summary>
     public class NewtonianOrbit : ITrajectory
     {
-        private double _cachedUpToUT;
+        //private double _cachedUpToUT;
 
         // cache could work as an array of arrays and their dividing time points. Possibly halving the distance.
 
-        private List<Vector3Dbl> _cachedPositions;
-        private List<Vector3Dbl> _cachedVelocities;
+        //private List<Vector3Dbl> _cachedPositions;
+        //private List<Vector3Dbl> _cachedVelocities;
 
         public double UT { get; private set; }
 
-        public double Mass => throw new NotImplementedException();
+        private Vector3Dbl _currentPosition;
+        private Vector3Dbl _currentVelocity;
+        private Vector3Dbl _currentAcceleration;
 
-        public OrbitalStateVector GetCurrentStateVector()
+        public double Mass { get; set; }
+
+        public TrajectoryBodyState GetCurrentState()
         {
-            throw new NotImplementedException();
+            return new TrajectoryBodyState( _currentPosition, _currentVelocity, _currentAcceleration, Mass );
         }
 
-        public void SetCurrentStateVector( OrbitalStateVector stateVector )
+        public void SetCurrentState( TrajectoryBodyState stateVector )
         {
-            throw new NotImplementedException();
+            _currentPosition = stateVector.AbsolutePosition;
+            _currentVelocity = stateVector.AbsoluteVelocity;
+            _currentAcceleration = stateVector.AbsoluteAcceleration;
+            Mass = stateVector.Mass;
         }
 
-        public OrbitalStateVector GetStateVectorAtUT( double ut )
-        {
-            throw new NotImplementedException();
-        }
-
-        public OrbitalStateVector GetStateVector( float t )
+        public TrajectoryBodyState GetStateAtUT( double ut )
         {
             throw new NotImplementedException();
         }
@@ -66,14 +68,11 @@ namespace HSP.Trajectories
 
         public void Step( IEnumerable<TrajectoryBodyState> attractors, double dt )
         {
-            Vector3Dbl selfAbsolutePosition = this.GetCurrentStateVector().AbsolutePosition;
+            Vector3Dbl selfAbsolutePosition = this.GetCurrentState().AbsolutePosition;
 
             Vector3Dbl accSum = Vector3Dbl.zero;
             foreach( var body in attractors )
             {
-#warning TODO - the trajectory might've been updated (stepped before, we need to get the position it had at the current time).
-                // instead of passing in a trajectory, maybe pass in the state vectors collected earlier?
-
                 Vector3Dbl toBody = body.AbsolutePosition - selfAbsolutePosition;
 
                 double distanceSq = toBody.sqrMagnitude;
@@ -86,7 +85,9 @@ namespace HSP.Trajectories
                 accSum += toBody.normalized * accelerationMagnitude;
             }
 
-            return accSum;
+            _currentAcceleration = accSum;
+            _currentVelocity += _currentAcceleration * dt;
+            _currentPosition += _currentVelocity * dt;
         }
     }
 }

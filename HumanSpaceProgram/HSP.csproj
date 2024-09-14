@@ -63,6 +63,7 @@
     <Compile Include="Assets\HSP\SceneCamera.cs" />
     <Compile Include="Assets\HSP\Utils\InertiaUtils.cs" />
     <Compile Include="Assets\HSP\HSPEvent.cs" />
+    <Compile Include="Assets\HSP\PhysicalConstants.cs" />
     <Compile Include="Assets\HSP\HSPEventListenerAttribute.cs" />
     <Compile Include="Assets\HSP\Utils\CoordinateUtils.cs" />
     <Compile Include="Assets\HSP\IHasMass.cs" />
@@ -71,7 +72,6 @@
     <Compile Include="Assets\HSP\TransformRedirect.cs" />
     <Compile Include="Assets\HSP\Utils\IOHelper.cs" />
     <Compile Include="Assets\HSP\PIDLoop.cs" />
-    <Compile Include="Assets\HSP\PhysicalConstants.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP\___HSP.asmdef" />

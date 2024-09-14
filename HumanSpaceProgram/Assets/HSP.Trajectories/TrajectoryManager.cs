@@ -135,7 +135,7 @@ namespace Assets.HSP.Trajectories
             {
                 if( trajectoryFollower.IsSynchronized() )
                 {
-                    OrbitalStateVector stateVector = trajectory.GetCurrentStateVector();
+                    TrajectoryBodyState stateVector = trajectory.GetCurrentState();
 #warning TODO - use MovePosition?
                     trajectoryFollower.ReferenceFrameTransform.AbsolutePosition = stateVector.AbsolutePosition;
                     trajectoryFollower.ReferenceFrameTransform.AbsoluteVelocity = stateVector.AbsoluteVelocity;
@@ -143,8 +143,12 @@ namespace Assets.HSP.Trajectories
                 else
                 {
                     // update trajectory for the next position.
-                    var stateVector = new OrbitalStateVector( TimeManager.UT, trajectoryFollower.ReferenceFrameTransform.AbsolutePosition, trajectoryFollower.ReferenceFrameTransform.AbsoluteVelocity );
-                    trajectoryFollower.Trajectory.SetCurrentStateVector( stateVector );
+                    var stateVector = new TrajectoryBodyState(
+                        trajectoryFollower.ReferenceFrameTransform.AbsolutePosition,
+                        trajectoryFollower.ReferenceFrameTransform.AbsoluteVelocity,
+                        trajectoryFollower.ReferenceFrameTransform.AbsoluteAcceleration,
+                        trajectoryFollower.PhysicsTransform.Mass );
+                    trajectoryFollower.Trajectory.SetCurrentState( stateVector );
                 }
             }
 

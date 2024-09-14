@@ -74,13 +74,7 @@ namespace HSP.Core
         public double ApoapsisHeight => (1 + Eccentricity) * SemiMajorAxis;
         public double PeriapsisHeight => (1 - Eccentricity) * SemiMajorAxis;
 
-        public Vector3Dbl AbsolutePosition => throw new NotImplementedException();
-
-        public Vector3Dbl AbsoluteVelocity => throw new NotImplementedException();
-
-        public Vector3Dbl AbsoluteAcceleration => throw new NotImplementedException();
-
-        public double Mass => throw new NotImplementedException();
+        public double Mass { get; set; }
 
         public KeplerianOrbit( double semiMajorAxis, double eccentricity, double inclination, double longitudeOfAscendingNode, double argumentOfPeriapsis, double meanAnomaly, double epoch, double celestialBodyMass )
         {
@@ -161,22 +155,19 @@ namespace HSP.Core
             throw new NotImplementedException();
         }
 
-        public OrbitalStateVector GetCurrentStateVector()
+        public TrajectoryBodyState GetCurrentState()
         {
+#warning TODO - acceleration.
+            return new TrajectoryBodyState( CalculatePosition(), CalculateVelocity(), Vector3Dbl.zero, Mass );
+        }
+
+        public void SetCurrentState( TrajectoryBodyState stateVector )
+        {
+            Mass = stateVector.Mass;
             throw new NotImplementedException();
         }
 
-        public void SetCurrentStateVector( OrbitalStateVector stateVector )
-        {
-            throw new NotImplementedException();
-        }
-
-        public OrbitalStateVector GetStateVectorAtUT( double ut )
-        {
-            throw new NotImplementedException();
-        }
-
-        public OrbitalStateVector GetStateVector( float t )
+        public TrajectoryBodyState GetStateAtUT( double ut )
         {
             throw new NotImplementedException();
         }

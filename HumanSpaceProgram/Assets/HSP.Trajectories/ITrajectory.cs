@@ -10,6 +10,14 @@ namespace HSP.Trajectories
         public Vector3Dbl AbsoluteVelocity;
         public Vector3Dbl AbsoluteAcceleration;
         public double Mass;
+
+        public TrajectoryBodyState( Vector3Dbl absolutePosition, Vector3Dbl absoluteVelocity, Vector3Dbl absoluteAcceleration, double mass )
+        {
+            this.AbsolutePosition = absolutePosition;
+            this.AbsoluteVelocity = absoluteVelocity;
+            this.AbsoluteAcceleration = absoluteAcceleration;
+            this.Mass = mass;
+        }
     }
 
     /// <summary>
@@ -27,12 +35,33 @@ namespace HSP.Trajectories
         /// </summary>
         double Mass { get; }
 
-#warning TODO - get/set the pos/vel/acc instead of a state vector maybe?
-        OrbitalStateVector GetCurrentStateVector();
+        /// <summary>
+        /// Gets the position, velocity, acceleration, and mass for the point on the trajectory at the current UT.
+        /// </summary>
+        TrajectoryBodyState GetCurrentState();
 
-        void SetCurrentStateVector( OrbitalStateVector stateVector );
+        /// <summary>
+        /// Sets the position, velocity, acceleration, and mass for the point on the trajectory at the current UT.
+        /// </summary>
+        /// <remarks>
+        /// Resets any cache that might've been calculated for future UTs.
+        /// </remarks>
+        void SetCurrentState( TrajectoryBodyState stateVector );
 
-        OrbitalStateVector GetStateVectorAtUT( double ut );
+        /// <summary>
+        /// Gets the position, velocity, acceleration, and mass for the point on the trajectory at the specified UT.
+        /// </summary>
+        TrajectoryBodyState GetStateAtUT( double ut );
+
+        /// <summary>
+        /// Gets the orbital frame (orientation) for the point on the trajectory at the current UT.
+        /// </summary>
+        OrbitalFrame GetCurrentOrbitalFrame();
+
+        /// <summary>
+        /// Gets the orbital frame (orientation) for the point on the trajectory at the specified UT.
+        /// </summary>
+        OrbitalFrame GetOrbitalFrameAtUT( double ut );
 
         /// <summary>
         /// If true, the trajectory won't be simulated, and the GetStateVectorAtUT will be used instead.

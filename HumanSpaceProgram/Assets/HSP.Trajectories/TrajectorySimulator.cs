@@ -33,11 +33,11 @@ namespace HSP.Trajectories
                 List<TrajectoryBodyState> followerStates = new List<TrajectoryBodyState>( Attractors.Count );
                 foreach( var t in Attractors )
                 {
-                    attractorStates.Add( t.GetCurrentStateVector() );
+                    attractorStates.Add( t.GetCurrentState() );
                 }
                 foreach( var t in Followers )
                 {
-                    followerStates.Add( t.GetCurrentStateVector() );
+                    followerStates.Add( t.GetCurrentState() );
                 }
 
                 // attractors go first, because they attract each other.
