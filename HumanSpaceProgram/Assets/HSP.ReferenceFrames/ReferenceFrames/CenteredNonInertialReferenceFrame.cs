@@ -1,6 +1,7 @@
 ﻿
 using System;
 using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace HSP.ReferenceFrames
 {
@@ -10,7 +11,7 @@ namespace HSP.ReferenceFrames
     /// </summary>
     public sealed class CenteredNonInertialReferenceFrame : INonInertialReferenceFrame
     {
-        public double ReferenceUT { get; }
+        public double ReferenceUT { get; private set; }
 
         public Vector3Dbl Position => _position;
         public Vector3Dbl Velocity => _velocity;
@@ -176,6 +177,13 @@ namespace HSP.ReferenceFrames
                 && otherNormalizedUT.TransformAngularVelocity( Vector3Dbl.zero ) == this._angularVelocity
                 && otherNormalizedUT.TransformAcceleration( Vector3Dbl.zero ) == this._acceleration
                 && otherNormalizedUT.TransformAngularAcceleration( Vector3Dbl.zero ) == this._angularAcceleration;
+        }
+
+        //[MapsInheritingFrom( typeof( CenteredNonInertialReferenceFrame ) )]
+        public static SerializationMapping CenteredNonInertialReferenceFrameMapping()
+        {
+#warning TODO - easier way to load memberwise objects that are immutable
+            throw new NotImplementedException();
         }
     }
 }

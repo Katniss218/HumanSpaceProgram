@@ -9,7 +9,7 @@ namespace HSP._DevUtils
 {
     public static class VanillaPlanetarySystemFactory
     {
-        public const string CREATE_UNIVERSE = HSPEvent.NAMESPACE_HSP + ".create_universe";
+        public const string CREATE_CELESTIAL_BODIES = HSPEvent.NAMESPACE_HSP + ".create_universe";
 
         private static CelestialBody CreateCB( string id, Vector3Dbl airfPos, QuaternionDbl airfRot )
         {
@@ -19,8 +19,8 @@ namespace HSP._DevUtils
             return cb;
         }
 
-        [HSPEventListener( HSPEvent_BEFORE_TIMELINE_NEW.ID, CREATE_UNIVERSE )]
-        [HSPEventListener( HSPEvent_BEFORE_TIMELINE_LOAD.ID, CREATE_UNIVERSE )]
+        [HSPEventListener( HSPEvent_BEFORE_TIMELINE_NEW.ID, CREATE_CELESTIAL_BODIES )]
+        [HSPEventListener( HSPEvent_BEFORE_TIMELINE_LOAD.ID, CREATE_CELESTIAL_BODIES )]
         public static void CreateDefaultPlanetarySystem()
         {
             QuaternionDbl orientation = Quaternion.Euler( 270, 0, 0 );

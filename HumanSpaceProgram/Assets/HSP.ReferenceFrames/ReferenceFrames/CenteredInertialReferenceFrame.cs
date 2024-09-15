@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace HSP.ReferenceFrames
 {
@@ -137,6 +139,13 @@ namespace HSP.ReferenceFrames
                 && otherNormalizedUT.TransformAngularVelocity( Vector3Dbl.zero ) == Vector3Dbl.zero
                 && otherNormalizedUT.TransformAcceleration( Vector3Dbl.zero ) == Vector3Dbl.zero
                 && otherNormalizedUT.TransformAngularAcceleration( Vector3Dbl.zero ) == Vector3Dbl.zero;
+        }
+
+        //[MapsInheritingFrom( typeof( CenteredInertialReferenceFrame ) )]
+        public static SerializationMapping CenteredInertialReferenceFrameMapping()
+        {
+#warning TODO - easier way to load memberwise objects that are immutable
+            throw new NotImplementedException();
         }
     }
 }

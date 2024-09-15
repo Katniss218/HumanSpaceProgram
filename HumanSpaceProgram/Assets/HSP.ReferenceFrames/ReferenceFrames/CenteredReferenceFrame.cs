@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace HSP.ReferenceFrames
 {
@@ -8,7 +10,7 @@ namespace HSP.ReferenceFrames
     /// </summary>
     public sealed class CenteredReferenceFrame : IReferenceFrame
     {
-        public double ReferenceUT { get; }
+        public double ReferenceUT { get; private set; }
 
         public Vector3Dbl Position => _position;
 
@@ -126,6 +128,13 @@ namespace HSP.ReferenceFrames
                 && otherNormalizedUT.TransformAngularVelocity( Vector3Dbl.zero ) == Vector3Dbl.zero
                 && otherNormalizedUT.TransformAcceleration( Vector3Dbl.zero ) == Vector3Dbl.zero
                 && otherNormalizedUT.TransformAngularAcceleration( Vector3Dbl.zero ) == Vector3Dbl.zero;
+        }
+
+        //[MapsInheritingFrom( typeof( CenteredReferenceFrame ) )]
+        public static SerializationMapping CenteredReferenceFrameMapping()
+        {
+#warning TODO - easier way to load memberwise objects that are immutable
+            throw new NotImplementedException();
         }
     }
 }

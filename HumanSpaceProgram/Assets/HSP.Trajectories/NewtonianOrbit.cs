@@ -9,7 +9,7 @@ namespace HSP.Trajectories
     /// </summary>
     public class NewtonianOrbit : ITrajectory
     {
-        //private double _cachedUpToUT;
+        private double _cachedUpToUT => UT;
 
         // cache could work as an array of arrays and their dividing time points. Possibly halving the distance.
 
@@ -23,6 +23,23 @@ namespace HSP.Trajectories
         private Vector3Dbl _currentAcceleration;
 
         public double Mass { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ut"></param>
+        /// <param name="initialAbsolutePosition"></param>
+        /// <param name="initialAbsoluteVelocity"></param>
+        /// <param name="initialAbsoluteAcceleration"></param>
+        /// <param name="mass">The mass of the object represented by this trajectory.</param>
+        public NewtonianOrbit( double ut, Vector3Dbl initialAbsolutePosition, Vector3Dbl initialAbsoluteVelocity, Vector3Dbl initialAbsoluteAcceleration, double mass )
+        {
+            this.UT = ut;
+            this._currentPosition = initialAbsolutePosition;
+            this._currentVelocity = initialAbsoluteVelocity;
+            this._currentAcceleration = initialAbsoluteAcceleration;
+            this.Mass = mass;
+        }
 
         public TrajectoryBodyState GetCurrentState()
         {
@@ -39,31 +56,35 @@ namespace HSP.Trajectories
 
         public TrajectoryBodyState GetStateAtUT( double ut )
         {
+            if( _cachedUpToUT < ut )
+            {
+                throw new ArgumentOutOfRangeException( $"The {nameof( NewtonianOrbit )} hasn't been cached for UT: '{ut}'." );
+            }
+
             throw new NotImplementedException();
         }
 
         public OrbitalFrame GetCurrentOrbitalFrame()
         {
-            throw new NotImplementedException();
+            return new OrbitalFrame( _currentVelocity.NormalizeToVector3(), -_currentAcceleration.NormalizeToVector3() );
         }
 
         public OrbitalFrame GetOrbitalFrameAtUT( double ut )
         {
             // Prograde -> towards velocity.
-            // Antiradial -> "towards" gravity, but projected onto a plane whose normal is velocity, such that it's orthogonal to Prograde.
+            // 'up' -> opposite of acceleration (gravity).
 
-            //OrbitalStateVector stateVector = GetStateVectorAtUT( ut );
+            if( _cachedUpToUT < ut )
+            {
+                throw new ArgumentOutOfRangeException( $"The {nameof( NewtonianOrbit )} hasn't been cached for UT: '{ut}'." );
+            }
 
-            //var forward = stateVector.AbsoluteVelocity.NormalizeToVector3();
-            //var up = Vector3Dbl.Cross( GravityDir, stateVector.AbsoluteVelocity ).NormalizeToVector3();
-
-            //return new OrbitalFrame( forward, up );
             throw new NotImplementedException();
         }
 
         public bool HasCacheForUT( double ut )
         {
-            throw new NotImplementedException();
+            return _cachedUpToUT >= ut;
         }
 
         public void Step( IEnumerable<TrajectoryBodyState> attractors, double dt )
@@ -88,6 +109,7 @@ namespace HSP.Trajectories
             _currentAcceleration = accSum;
             _currentVelocity += _currentAcceleration * dt;
             _currentPosition += _currentVelocity * dt;
+            UT += dt;
         }
     }
 }

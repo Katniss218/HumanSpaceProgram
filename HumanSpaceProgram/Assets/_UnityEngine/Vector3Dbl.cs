@@ -10,10 +10,21 @@ namespace UnityEngine
     [Serializable]
 	public struct Vector3Dbl : IEquatable<Vector3>, IEquatable<Vector3Dbl>, IFormattable
     {
+        /// <summary>
+        /// X component of the vector.
+        /// </summary>
 		[SerializeField]
 		public double x;
+
+        /// <summary>
+        /// Y component of the vector.
+        /// </summary>
 		[SerializeField]
 		public double y;
+
+        /// <summary>
+        /// Z component of the vector.
+        /// </summary>
 		[SerializeField]
 		public double z;
 
@@ -66,15 +77,6 @@ namespace UnityEngine
 		}
 
 		[MethodImpl( MethodImplOptions.AggressiveInlining )]
-		public static Vector3 GetDirection( Vector3Dbl from, Vector3Dbl to )
-		{
-			Vector3Dbl dir = to - from;
-			dir.Normalize();
-
-			return new Vector3( (float)dir.x, (float)dir.y, (float)dir.z );
-		}
-
-		[MethodImpl( MethodImplOptions.AggressiveInlining )]
 		public void Normalize()
 		{
 			double magn = magnitude;
@@ -121,7 +123,16 @@ namespace UnityEngine
 			binormal = ProjectOnPlane( ProjectOnPlane( binormal, tangent ), normal ).normalized;
 		}
 
-		[MethodImpl( MethodImplOptions.AggressiveInlining )]
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static Vector3 GetDirection( Vector3Dbl from, Vector3Dbl to )
+        {
+            Vector3Dbl dir = to - from;
+            dir.Normalize();
+
+            return new Vector3( (float)dir.x, (float)dir.y, (float)dir.z );
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
 		public static double Dot( Vector3Dbl a, Vector3Dbl b )
 		{
 			return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);

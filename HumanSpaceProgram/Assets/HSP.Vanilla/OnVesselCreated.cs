@@ -32,8 +32,8 @@ namespace HSP.Vanilla
         {
             if( SceneLoader.IsSceneLoaded( GameplaySceneManager.SCENE_NAME ) )
             {
-                var comp = v.gameObject.AddComponent<TrajectoryTransform>();
-                comp.Trajectory = new NewtonianOrbit();
+                TrajectoryTransform comp = v.gameObject.AddComponent<TrajectoryTransform>();
+                comp.Trajectory = new NewtonianOrbit( Time.TimeManager.UT, ..., ..., ... );
                 comp.IsAttractor = false;
             }
         }

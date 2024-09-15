@@ -15,21 +15,25 @@ namespace UnityEngine
         /// <summary>
         /// X component of the QuaternionDbl. Don't modify this directly unless you know quaternions inside out.
         /// </summary>
+		[SerializeField]
         public double x;
 
         /// <summary>
         /// Y component of the QuaternionDbl. Don't modify this directly unless you know quaternions inside out.
         /// </summary>
+		[SerializeField]
         public double y;
 
         /// <summary>
         /// Z component of the QuaternionDbl. Don't modify this directly unless you know quaternions inside out.
         /// </summary>
+		[SerializeField]
         public double z;
 
         /// <summary>
         /// W component of the QuaternionDbl. Do not directly modify quaternions.
         /// </summary>
+		[SerializeField]
         public double w;
 
         public double sqrMagnitude { get => (x * x) + (y * y) + (z * z) + (w * w); }
@@ -38,23 +42,6 @@ namespace UnityEngine
         /// Returns the length (norm) of the quaternion.
         /// </summary>
         public double magnitude { get => Math.Sqrt( sqrMagnitude ); }
-
-        /// <summary>
-        /// Returns a quaternion with its length (norm) set to 1.
-        /// </summary>
-        public QuaternionDbl normalized
-        {
-            get
-            {
-                double length = this.magnitude;
-
-                return new QuaternionDbl(
-                    x / length,
-                    y / length,
-                    z / length,
-                    w / length );
-            }
-        }
 
         public static QuaternionDbl identity { get => new QuaternionDbl( 0.0, 0.0, 0.0, 1.0 ); }
 
@@ -101,6 +88,57 @@ namespace UnityEngine
             this.y = y;
             this.z = z;
             this.w = w;
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public void Normalize()
+        {
+            double magn = magnitude;
+            this.x /= magn;
+            this.y /= magn;
+            this.z /= magn;
+            this.w /= magn;
+        }
+
+        /// <summary>
+        /// Returns a quaternion with its length (norm) set to 1.
+        /// </summary>
+        public QuaternionDbl normalized
+        {
+            get
+            {
+                double magn = this.magnitude;
+
+                return new QuaternionDbl(
+                    x / magn,
+                    y / magn,
+                    z / magn,
+                    w / magn );
+            }
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static QuaternionDbl Normalize( QuaternionDbl value )
+        {
+            double magn = value.magnitude;
+
+            return new QuaternionDbl(
+                value.x / magn,
+                value.y / magn,
+                value.z / magn,
+                value.w / magn );
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public Quaternion NormalizeToQuaternion()
+        {
+            double magn = this.magnitude;
+
+            return new Quaternion(
+                (float)(x / magn),
+                (float)(y / magn),
+                (float)(z / magn),
+                (float)(w / magn) );
         }
 
         /// <summary>

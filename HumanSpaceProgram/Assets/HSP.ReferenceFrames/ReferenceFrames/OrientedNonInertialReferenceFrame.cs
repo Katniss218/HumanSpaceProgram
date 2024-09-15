@@ -1,6 +1,7 @@
 ﻿
 using System;
 using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace HSP.ReferenceFrames
 {
@@ -184,6 +185,12 @@ namespace HSP.ReferenceFrames
                 && otherNormalizedUT.TransformAngularVelocity( Vector3Dbl.zero ) == this._angularVelocity
                 && otherNormalizedUT.TransformAcceleration( Vector3Dbl.zero ) == this._acceleration
                 && otherNormalizedUT.TransformAngularAcceleration( Vector3Dbl.zero ) == this._angularAcceleration;
+        }
+
+        //[MapsInheritingFrom( typeof( OrientedNonInertialReferenceFrame ) )]
+        public static SerializationMapping OrientedNonInertialReferenceFrameMapping()
+        {
+            throw new NotImplementedException();
         }
     }
 }

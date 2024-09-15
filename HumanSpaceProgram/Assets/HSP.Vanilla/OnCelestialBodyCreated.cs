@@ -1,10 +1,14 @@
 using HSP.CelestialBodies;
+using HSP.SceneManagement;
+using HSP.Trajectories;
+using HSP.Vanilla.Scenes.GameplayScene;
 
 namespace HSP.Vanilla
 {
     public static class OnCelestialBodyCreated
     {
         public const string ADD_PHYSICS_OBJECT = HSPEvent.NAMESPACE_HSP + ".add_physics_object";
+        public const string ADD_TRAJECTORY_TRANSFORM = HSPEvent.NAMESPACE_HSP + ".add_trajectory_transform";
         public const string ADD_SURFACE = HSPEvent.NAMESPACE_HSP + ".add_surface";
 
         [HSPEventListener( HSPEvent_ON_CELESTIAL_BODY_CREATED.ID, ADD_PHYSICS_OBJECT )]
@@ -13,5 +17,18 @@ namespace HSP.Vanilla
             var comp = cb.gameObject.AddComponent<KinematicReferenceFrameTransform>();
             comp.Mass = (float)cb.Mass;
         }
+
+        [HSPEventListener( HSPEvent_ON_CELESTIAL_BODY_CREATED.ID, ADD_TRAJECTORY_TRANSFORM )]
+        private static void AddGameplayTrajectoryTransform( CelestialBody cb )
+        {
+            if( SceneLoader.IsSceneLoaded( GameplaySceneManager.SCENE_NAME ) )
+            {
+                TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
+                comp.Trajectory = new StationaryOrbit( Time.TimeManager.UT, ..., ..., cb.Mass );
+#warning parent body
+                comp.IsAttractor = false;
+            }
+        }
+
     }
 }
