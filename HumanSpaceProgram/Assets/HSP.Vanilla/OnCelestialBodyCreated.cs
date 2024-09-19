@@ -1,7 +1,4 @@
 using HSP.CelestialBodies;
-using HSP.SceneManagement;
-using HSP.Trajectories;
-using HSP.Vanilla.Scenes.GameplayScene;
 
 namespace HSP.Vanilla
 {
@@ -18,17 +15,18 @@ namespace HSP.Vanilla
             comp.Mass = (float)cb.Mass;
         }
 
-        [HSPEventListener( HSPEvent_ON_CELESTIAL_BODY_CREATED.ID, ADD_TRAJECTORY_TRANSFORM )]
+        /*[HSPEventListener( HSPEvent_ON_CELESTIAL_BODY_CREATED.ID, ADD_TRAJECTORY_TRANSFORM )]
         private static void AddGameplayTrajectoryTransform( CelestialBody cb )
         {
             if( SceneLoader.IsSceneLoaded( GameplaySceneManager.SCENE_NAME ) )
             {
                 TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
-                comp.Trajectory = new StationaryOrbit( Time.TimeManager.UT, ..., ..., cb.Mass );
+                comp.Trajectory = new KeplerianOrbit( Time.TimeManager.UT, ..., ..., cb.Mass );
 #warning parent body
-                comp.IsAttractor = false;
+                comp.IsAttractor = true;
             }
+        THIS SHOULD BE SET UP BY THE PLANETARY SYSTEM FACTORY.
         }
-
+        */
     }
 }

@@ -3,6 +3,7 @@ using HSP.Trajectories;
 using HSP.Trajectories.Components;
 using HSP.Vanilla.Scenes.DesignScene;
 using HSP.Vanilla.Scenes.GameplayScene;
+using HSP.Vanilla.Trajectories;
 using HSP.Vessels;
 using UnityEngine;
 
@@ -33,8 +34,9 @@ namespace HSP.Vanilla
             if( SceneLoader.IsSceneLoaded( GameplaySceneManager.SCENE_NAME ) )
             {
                 TrajectoryTransform comp = v.gameObject.AddComponent<TrajectoryTransform>();
-                comp.Trajectory = new NewtonianOrbit( Time.TimeManager.UT, ..., ..., ... );
+                comp.Trajectory = new NewtonianOrbit( Time.TimeManager.UT, Vector3Dbl.zero, Vector3Dbl.zero, Vector3Dbl.zero, 1.0 );
                 comp.IsAttractor = false;
+                // no need to recalculate the mass of the vessel because it's not an attractor.
             }
         }
 

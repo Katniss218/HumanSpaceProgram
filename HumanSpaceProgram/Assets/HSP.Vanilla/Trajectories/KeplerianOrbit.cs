@@ -1,9 +1,11 @@
-﻿using HSP.Trajectories;
+﻿using HSP.CelestialBodies;
+using HSP.Trajectories;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityPlus.Serialization;
 
-namespace HSP.Core
+namespace HSP.Vanilla.Trajectories
 {
     /// <summary>
     /// A simulated trajectory that follows kepler's laws of planetary motion.
@@ -15,11 +17,6 @@ namespace HSP.Core
         // https://downloads.rene-schwarz.com/download/M001-Keplerian_Orbit_Elements_to_Cartesian_State_Vectors.pdf
         // https://downloads.rene-schwarz.com/download/M002-Cartesian_State_Vectors_to_Keplerian_Orbit_Elements.pdf
         // https://gist.github.com/triffid/166b8f5597ce52bcafd15a18218b066f
-
-        /// <summary>
-        /// The value of the gravitational constant, in [m^3/kg/s^2].
-        /// </summary>
-        public const double G = 6.6743e-11;
 
         /// <summary>
         /// The semi-major axis of the orbit, in [m].
@@ -77,6 +74,18 @@ namespace HSP.Core
         public double ApoapsisHeight => (1 + Eccentricity) * SemiMajorAxis;
         public double PeriapsisHeight => (1 - Eccentricity) * SemiMajorAxis;
 
+        ITrajectory _parentBody;
+        public ITrajectory ParentBody
+        {
+            get
+            {
+                if( _parentBody.IsUnityNull() )
+                    _parentBody = CelestialBodyManager.Get( ParentBodyID ).GetComponent<TrajectoryTransform>().Trajectory;
+                return _parentBody;
+            }
+        }
+        public string ParentBodyID { get; set; }
+
         public double Mass { get; set; }
 
         /// <summary>
@@ -90,8 +99,10 @@ namespace HSP.Core
         /// <param name="meanAnomaly"></param>
         /// <param name="epoch"></param>
         /// <param name="mass">The mass of the object represented by this trajectory.</param>
-        public KeplerianOrbit( double semiMajorAxis, double eccentricity, double inclination, double longitudeOfAscendingNode, double argumentOfPeriapsis, double meanAnomaly, double epoch, double mass )
+        public KeplerianOrbit( double ut, string parentBodyId, double semiMajorAxis, double eccentricity, double inclination, double longitudeOfAscendingNode, double argumentOfPeriapsis, double meanAnomaly, double epoch, double mass )
         {
+            this.UT = ut;
+            this.ParentBodyID = parentBodyId;
             this.SemiMajorAxis = semiMajorAxis;
             this.Eccentricity = eccentricity;
             this.Inclination = inclination;
@@ -175,21 +186,28 @@ namespace HSP.Core
 
         public TrajectoryBodyState GetCurrentState()
         {
-#warning TODO - parent body
+#warning TODO - using ITrajectory directly MIGHT introduce the same synchronization problem LATER.
+            TrajectoryBodyState parentState = ParentBody.GetCurrentState();
+
             Vector3Dbl bodyCentricPosition = CalculatePosition( _cachedTrueAnomaly, semiLatusRectum, LongitudeOfAscendingNode, ArgumentOfPeriapsis, Inclination );
             Vector3Dbl velocity = CalculateVelocity( _cachedTrueAnomaly, GravitationalParameter, semiLatusRectum, LongitudeOfAscendingNode, ArgumentOfPeriapsis, Inclination, Eccentricity );
-            Vector3Dbl acceleration = bodyCentricPosition.normalized * PhysicalConstants.G * (parentBodyMass / bodyCentricPosition.sqrMagnitude);
+            Vector3Dbl acceleration = bodyCentricPosition.normalized * PhysicalConstants.G * (parentState.Mass / bodyCentricPosition.sqrMagnitude);
 
-            return new TrajectoryBodyState( bodyCentricPosition + parentBodyPosition, velocity + parentBodyVelocity, acceleration + parentBodyAcceleration, Mass );
+            return new TrajectoryBodyState( bodyCentricPosition + parentState.AbsolutePosition, velocity + parentState.AbsoluteVelocity, acceleration + parentState.AbsoluteAcceleration, Mass );
         }
 
         public void SetCurrentState( TrajectoryBodyState stateVector )
         {
-            Vector3Dbl pos = stateVector.AbsolutePosition - parentBodyPosition;
-            Vector3Dbl velocity = stateVector.AbsoluteVelocity - parentBodyVelocity;
+            TrajectoryBodyState parentState = ParentBody.GetCurrentState();
+            Vector3Dbl bodyCentricPosition = stateVector.AbsolutePosition - parentState.AbsolutePosition;
+            Vector3Dbl bodyCentricVelocity = stateVector.AbsoluteVelocity - parentState.AbsoluteVelocity;
+#warning TODO - stuck in infinite loop.
+            return;
+#warning TODO - using ITrajectory directly MIGHT introduce the same synchronization problem LATER.
+
             //Vector3Dbl acceleration = stateVector.AbsoluteAcceleration - parentBodyAcceleration;
-            (double eccentricity, double semiMajorAxis, double inclination, double longitudeOfAscendingNode, double argumentOfPeriapsis, double trueAnomaly) 
-                = CalcFromPosVel( GravitationalParameter, pos, velocity );
+            (double eccentricity, double semiMajorAxis, double inclination, double longitudeOfAscendingNode, double argumentOfPeriapsis, double trueAnomaly)
+                = CalcFromPosVel( GravitationalParameter, bodyCentricPosition, bodyCentricVelocity );
 
             Eccentricity = eccentricity;
             SemiMajorAxis = semiMajorAxis;
@@ -409,7 +427,7 @@ namespace HSP.Core
         /// <returns>The standard gravitational parameter for a body with the given mass, in [m^3/s^2].</returns>
         public static double GetGravParameter( double bodyMass )
         {
-            return G * bodyMass;
+            return PhysicalConstants.G * bodyMass;
         }
 
         /// <summary>
@@ -437,6 +455,19 @@ namespace HSP.Core
         public static double GetOrbitalSpeedForRadius( double radius, double bodyMass, double semimajorAxis )
         {
             return Math.Sqrt( GetGravParameter( bodyMass ) * ((2.0 / radius) - (1.0 / semimajorAxis)) ); // circular orbit.
+        }
+
+
+        [MapsInheritingFrom( typeof( KeplerianOrbit ) )]
+        public static SerializationMapping KeplerianOrbitMapping()
+        {
+            return new MemberwiseSerializationMapping<KeplerianOrbit>()
+            {
+                ("ut", new Member<KeplerianOrbit, double>( o => o.UT )),
+                ("mass", new Member<KeplerianOrbit, double>( o => o.Mass )),
+                ("parent_body", new Member<KeplerianOrbit, string>( o => o.ParentBodyID )),
+                ("semi_major_axis", new Member<KeplerianOrbit, double>( o => o.SemiMajorAxis )),
+            };
         }
     }
 }

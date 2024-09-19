@@ -69,7 +69,7 @@ namespace HSP.Trajectories
         private Vector3Dbl _oldAbsoluteVelocity;
 
         /// <summary>
-        /// Checks whether or not the trajectory needs to be resynchronized with the object (discarding any cached values beyond this point).
+        /// Checks if the object has more up-to-date (more correct) information than the trajectory.
         /// </summary>
         public bool IsSynchronized()
         {
@@ -97,9 +97,8 @@ namespace HSP.Trajectories
 
         private bool HasCollidedWithSomething() => this.PhysicsTransform.IsColliding;
 
-        private bool HadForcesApplied() => this.ReferenceFrameTransform.AbsoluteVelocity != _oldAbsoluteVelocity; // check if velocity is different than last frame's velocity (ANY force will change that which is what we want).
+        private bool HadForcesApplied() => this.ReferenceFrameTransform.AbsoluteAcceleration != Vector3Dbl.zero;
 
-#warning TODO - frame switching
         private bool _hadValuesChangedByHand; // An absoluteposition vs oldabsoluteposition check is not enough because velocity will be integrated (possibly in non-obvious ways),
                                               //   so the check would always fail.
 
@@ -121,6 +120,9 @@ namespace HSP.Trajectories
 
         private void TryRegister()
         {
+            if( _trajectory == null )
+                return;
+
             if( _isAttractor )
                 TrajectoryManager.TryRegisterAttractor( _trajectory, this );
             else
@@ -129,6 +131,9 @@ namespace HSP.Trajectories
 
         private void TryUnregister()
         {
+            if( _trajectory == null )
+                return;
+
             if( _isAttractor )
                 TrajectoryManager.TryUnregisterAttractor( _trajectory );
             else

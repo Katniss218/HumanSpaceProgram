@@ -99,10 +99,10 @@ namespace HSP._DevUtils
             ActiveVesselManager.ActiveObject = launchSite.RootPart.GetVessel().gameObject.transform;
             SceneReferenceFrameManager.TargetObject = launchSite.RootPart.GetVessel().ReferenceFrameTransform;
 
-            Vector3Dbl velocity = new Vector3Dbl( 32, 0, 0 );
-            body.ReferenceFrameTransform.AbsoluteVelocity = velocity;
+           // Vector3Dbl velocity = new Vector3Dbl( 32, 0, 0 );
+           // body.ReferenceFrameTransform.AbsoluteVelocity = velocity;
 #warning TODO - velocity propagation for objects near planets.
-            vessel.ReferenceFrameTransform.AbsoluteVelocity = velocity;
+           // vessel.ReferenceFrameTransform.AbsoluteVelocity = velocity;
         }
 
         private static Vessel CreateVessel( Vessel launchSite )

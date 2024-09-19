@@ -1,8 +1,10 @@
-﻿using System;
+﻿using HSP.Trajectories;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityPlus.Serialization;
 
-namespace HSP.Trajectories
+namespace HSP.Vanilla.Trajectories
 {
     /// <summary>
     /// A trajectory that follows a newtonian gravitational field.
@@ -91,10 +93,11 @@ namespace HSP.Trajectories
         {
             Vector3Dbl selfAbsolutePosition = this.GetCurrentState().AbsolutePosition;
 
+            int i = 0;
             Vector3Dbl accSum = Vector3Dbl.zero;
-            foreach( var body in attractors )
+            foreach( var attractor in attractors )
             {
-                Vector3Dbl toBody = body.AbsolutePosition - selfAbsolutePosition;
+                Vector3Dbl toBody = attractor.AbsolutePosition - selfAbsolutePosition;
 
                 double distanceSq = toBody.sqrMagnitude;
                 if( distanceSq == 0.0 )
@@ -102,14 +105,27 @@ namespace HSP.Trajectories
                     continue;
                 }
 
-                double accelerationMagnitude = PhysicalConstants.G * (body.Mass / distanceSq);
+                double accelerationMagnitude = PhysicalConstants.G * (attractor.Mass / distanceSq);
                 accSum += toBody.normalized * accelerationMagnitude;
+                i++;
             }
 
             _currentAcceleration = accSum;
             _currentVelocity += _currentAcceleration * dt;
             _currentPosition += _currentVelocity * dt;
             UT += dt;
+        }
+
+        [MapsInheritingFrom( typeof( NewtonianOrbit ) )]
+        public static SerializationMapping NewtonianOrbitMapping()
+        {
+            return new MemberwiseSerializationMapping<NewtonianOrbit>()
+            {
+                ("ut", new Member<NewtonianOrbit, double>( o => o.UT )),
+                ("mass", new Member<NewtonianOrbit, double>( o => o.Mass )),
+                ("position", new Member<NewtonianOrbit, Vector3Dbl>( o => o._currentPosition )),
+                ("velocity", new Member<NewtonianOrbit, Vector3Dbl>( o => o._currentVelocity ))
+            };
         }
     }
 }

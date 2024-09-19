@@ -70,6 +70,7 @@
     <Compile Include="Assets\HSP.Vanilla\PinnedReferenceFrameTransform.cs" />
     <Compile Include="Assets\HSP.Vanilla\OnActiveVesselChanged.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\DesignSceneToolManager.cs" />
+    <Compile Include="Assets\HSP.Vanilla\Trajectories\NewtonianOrbit.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\MainMenuScene\Cameras\MainMenuSceneCameraManager.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FBulkContainer_Sphere.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FAttachNode.cs" />
@@ -81,8 +82,10 @@
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\DesignSceneManager.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FGimbalActuatorController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\MainMenuScene\OnStartup.cs" />
+    <Compile Include="Assets\HSP.Vanilla\Trajectories\KeplerianOrbit.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\MainMenuScene\MainMenuEscapeInputController.cs" />
     <Compile Include="Assets\HSP.Vanilla\OnCelestialBodyCreated.cs" />
+    <Compile Include="Assets\HSP.Vanilla\Trajectories\FixedOrbit.cs" />
     <Compile Include="Assets\HSP.Vanilla\SelectedControlFrameManager.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\IGhostable_Ex.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\EditorScene\EditorSceneEscapeInputController.cs" />

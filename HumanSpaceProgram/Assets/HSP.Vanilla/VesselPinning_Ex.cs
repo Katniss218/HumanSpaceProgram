@@ -1,5 +1,7 @@
 using HSP.CelestialBodies;
 using HSP.ReferenceFrames;
+using HSP.Trajectories;
+using HSP.Vanilla.Trajectories;
 using HSP.Vessels;
 using System;
 using UnityEngine;
@@ -34,6 +36,9 @@ namespace HSP.Vanilla
             ppo.Mass = oldPhysTransform.Mass;
             ppo.LocalCenterOfMass = oldPhysTransform.LocalCenterOfMass;
             ppo.MomentOfInertiaTensor = oldPhysTransform.MomentOfInertiaTensor;
+
+            TrajectoryTransform tt = vessel.gameObject.GetComponent<TrajectoryTransform>();
+            tt.enabled = false;
         }
 
         /// <summary>
@@ -51,6 +56,9 @@ namespace HSP.Vanilla
             ppo.Mass = oldPhysTransform.Mass;
             ppo.LocalCenterOfMass = oldPhysTransform.LocalCenterOfMass;
             ppo.MomentOfInertiaTensor = oldPhysTransform.MomentOfInertiaTensor;
+
+            TrajectoryTransform tt = vessel.gameObject.GetComponent<TrajectoryTransform>();
+            tt.enabled = true;
         }
     }
 }

@@ -17,7 +17,7 @@ namespace HSP._DevUtils
             Vessel.PhysicsTransform.AddForce( (Vector3)airfGravityForce );
         }
 
-        [HSPEventListener( HSPEvent_ON_VESSEL_CREATED.ID, "add_gravity_applier" )]
+        /*[HSPEventListener( HSPEvent_ON_VESSEL_CREATED.ID, "add_gravity_applier" )]
         public static void AddGravityApplier( Vessel vessel )
         {
             if( SceneLoader.IsSceneLoaded( GameplaySceneManager.SCENE_NAME ) )
@@ -25,6 +25,6 @@ namespace HSP._DevUtils
                 GravityApplier g = vessel.gameObject.AddComponent<GravityApplier>();
                 g.Vessel = vessel;
             }
-        }
+        }*/
     }
 }

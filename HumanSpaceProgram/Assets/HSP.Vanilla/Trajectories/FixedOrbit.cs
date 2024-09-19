@@ -1,13 +1,15 @@
-﻿using System;
+﻿using HSP.Trajectories;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityPlus.Serialization;
 
-namespace HSP.Trajectories
+namespace HSP.Vanilla.Trajectories
 {
     /// <summary>
     /// A trajectory that remains stationary.
     /// </summary>
-    public class StationaryOrbit : ITrajectory
+    public class FixedOrbit : ITrajectory
     {
         private Vector3Dbl _currentPosition;
         private QuaternionDbl _rotation;
@@ -22,7 +24,7 @@ namespace HSP.Trajectories
         /// <param name="absolutePosition"></param>
         /// <param name="absoluteRotation"></param>
         /// <param name="mass">The mass of the object represented by this trajectory.</param>
-        public StationaryOrbit( double ut, Vector3Dbl absolutePosition, QuaternionDbl absoluteRotation, double mass )
+        public FixedOrbit( double ut, Vector3Dbl absolutePosition, QuaternionDbl absoluteRotation, double mass )
         {
             this.UT = ut;
             this._currentPosition = absolutePosition;
@@ -70,6 +72,18 @@ namespace HSP.Trajectories
         {
             UT += dt;
             return; // Do nothing, since stationary is not moving.
+        }
+
+        [MapsInheritingFrom( typeof( FixedOrbit ) )]
+        public static SerializationMapping NewtonianOrbitMapping()
+        {
+            return new MemberwiseSerializationMapping<FixedOrbit>()
+            {
+                ("ut", new Member<FixedOrbit, double>( o => o.UT )),
+                ("mass", new Member<FixedOrbit, double>( o => o.Mass )),
+                ("position", new Member<FixedOrbit, Vector3Dbl>( o => o._currentPosition )),
+                ("rotation", new Member<FixedOrbit, QuaternionDbl>( o => o._rotation ))
+            };
         }
     }
 }

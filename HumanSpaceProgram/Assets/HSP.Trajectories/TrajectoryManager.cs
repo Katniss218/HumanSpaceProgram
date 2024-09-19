@@ -107,10 +107,7 @@ namespace Assets.HSP.Trajectories
                 return;
 
             /*
-            simulation will compute the position of the object, that's correct IF IT HASN'T COLLIDED WITH ANYTHING (during fixedupdate or physicsupdate).
-            - so if it hasn't collided with anything, then move it, but if it has, then don't?
-            - also, if the velocity has changed (forces applied outside the trajectory), then we also don't want to apply the trajectory, 
-                or the force could be passed into the trajectory as well.
+            simulation will compute the position of the object, that's correct IF IT HASN'T COLLIDED WITH ANYTHING or it hasn't had any other forces than gravity applied to it.
 
             so the position could be updated *after* the fixedupdate/physicsupdate, assuming some conditions are met that'll guarantee
                 that the simulation data is correct for what's happening to the physicsobject.
@@ -130,35 +127,58 @@ namespace Assets.HSP.Trajectories
 
 #warning TODO - maybe expose some HSPEvents at specific points during the frame?? (via playerloop) I don't want hspevents to be related to the frame, not HSP things happening though.
 
-            instance._simulator.Simulate( TimeManager.UT );
-            foreach( var (trajectory, trajectoryFollower) in instance._trajectoryMap )
+            // what if I put the sync code here:
+
+            foreach( var (trajectory, trajectoryTransform) in instance._trajectoryMap )
             {
-                if( trajectoryFollower.IsSynchronized() )
+                if( !trajectoryTransform.IsSynchronized() )
                 {
-                    TrajectoryBodyState stateVector = trajectory.GetCurrentState();
-#warning TODO - use MovePosition?
-                    trajectoryFollower.ReferenceFrameTransform.AbsolutePosition = stateVector.AbsolutePosition;
-                    trajectoryFollower.ReferenceFrameTransform.AbsoluteVelocity = stateVector.AbsoluteVelocity;
-                }
-                else
-                {
-                    // update trajectory for the next position.
+                    // synchronize
                     var stateVector = new TrajectoryBodyState(
-                        trajectoryFollower.ReferenceFrameTransform.AbsolutePosition,
-                        trajectoryFollower.ReferenceFrameTransform.AbsoluteVelocity,
-                        trajectoryFollower.ReferenceFrameTransform.AbsoluteAcceleration,
-                        trajectoryFollower.PhysicsTransform.Mass );
-                    trajectoryFollower.Trajectory.SetCurrentState( stateVector );
+                        trajectoryTransform.ReferenceFrameTransform.AbsolutePosition,
+                        trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity,
+                        trajectoryTransform.ReferenceFrameTransform.AbsoluteAcceleration,
+                        trajectoryTransform.PhysicsTransform.Mass );
+                    trajectory.SetCurrentState( stateVector );
+                    // apply the velocity that would result from the trajectory or something?
                 }
             }
+            // if not synchronized - set the trajectory to current, then simulate, and set again?
+#warning syncing before causes velocity to be integrated twice (because velocity has been applied to the position by the physics object, and we're now reusing that position).
+            // can't use old position because collision might've happened.
 
-            // We can check if the position/velocity before physicsupdate is still the same as the previous frame's position/velocity after physicsupdate.
-            // would that require that all movements are done during physicsupdate?
+            instance._simulator.Simulate( TimeManager.UT );
+            foreach( var (trajectory, trajectoryTransform) in instance._trajectoryMap )
+            {
+                //if( trajectoryTransform.IsSynchronized() )
+                //{
+                TrajectoryBodyState stateVector = trajectory.GetCurrentState();
+#warning TODO - use MovePosition?
+                trajectoryTransform.ReferenceFrameTransform.AbsolutePosition = stateVector.AbsolutePosition;
+                trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = stateVector.AbsoluteVelocity;
+                // }
+                /* else
+                {
+ #warning TODO - if we stop applying trajectory, then the gravity will also stop being applied if you fire the engine.
+ #warning        passing forces into the trajectory won't solve it because we need to apply gravity when colliding as well, but then we can split the sim into scene or trajectory based on collision state.
 
-            // if we exclusively use the trajectory transforms, we can have more control over it.
-#warning TODO - if we don't use custom trajectory transforms, it's easier to handle pinning, unpinning, and so on. It decouples things.
-            // we need a custom trajectory-holding component for that but that's okay. It also decouples things.
+                     // update trajectory for the next position.
+                     var stateVector = new TrajectoryBodyState(
+                         trajectoryTransform.ReferenceFrameTransform.AbsolutePosition,
+                         trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity,
+                         trajectoryTransform.ReferenceFrameTransform.AbsoluteAcceleration,
+                         trajectoryTransform.PhysicsTransform.Mass );
+                     trajectory.SetCurrentState( stateVector );
 
+                     // apply the velocity that would result from the trajectory or something?
+                 }*/
+            }
+
+#warning TODO - can I somehow apply the trajectory even if it's not synchronized?
+            // or synchronize it and then simulate?
+
+            // if not, we need to switch between manual and trajectory-based gravity whenever the trajectory based can't be used.
+            // and manual gravity must be excluded from the acceleration calculation for the purpose of syncing.
 
         }
     }

@@ -23,14 +23,16 @@ namespace HSP.Trajectories
         /// <param name="endUT">The UT at which to finish the simulation.</param>
         public void Simulate( double endUT )
         {
-            double dt = 1.0 / 200;
-
+            double delta = endUT -_simulationEndUT;
+            double dt = delta / 10;
+           // int i = 0;
 #warning TODO - last step needs to be such that the time matches the desired time.
             for( ; _ut < endUT; _ut += dt )
             {
+                //i++;
                 // Copy the states to ensure that the simulation doesn't use values calculated for the next step on elements after the first element.
                 List<TrajectoryBodyState> attractorStates = new List<TrajectoryBodyState>( Attractors.Count );
-                List<TrajectoryBodyState> followerStates = new List<TrajectoryBodyState>( Attractors.Count );
+                List<TrajectoryBodyState> followerStates = new List<TrajectoryBodyState>( Followers.Count );
                 foreach( var t in Attractors )
                 {
                     attractorStates.Add( t.GetCurrentState() );
