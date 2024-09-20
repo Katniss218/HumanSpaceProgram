@@ -86,7 +86,7 @@ namespace Assets.HSP.Trajectories
 
         void OnEnable()
         {
-            PlayerLoopUtils.InsertSystemAfter<FixedUpdate>( in _playerLoopSystem, typeof( FixedUpdate.PhysicsFixedUpdate ) );
+            PlayerLoopUtils.InsertSystemBefore<FixedUpdate>( in _playerLoopSystem, typeof( FixedUpdate.PhysicsFixedUpdate ) );
         }
 
         void OnDisable()
@@ -131,54 +131,43 @@ namespace Assets.HSP.Trajectories
 
             foreach( var (trajectory, trajectoryTransform) in instance._trajectoryMap )
             {
-                if( !trajectoryTransform.IsSynchronized() )
-                {
-                    // synchronize
-                    var stateVector = new TrajectoryBodyState(
-                        trajectoryTransform.ReferenceFrameTransform.AbsolutePosition,
-                        trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity,
-                        trajectoryTransform.ReferenceFrameTransform.AbsoluteAcceleration,
-                        trajectoryTransform.PhysicsTransform.Mass );
-                    trajectory.SetCurrentState( stateVector );
-                    // apply the velocity that would result from the trajectory or something?
-                }
+                //if( !trajectoryTransform.IsSynchronized() )
+                //{
+                // synchronize
+                var stateVector = new TrajectoryBodyState(
+                    trajectoryTransform.ReferenceFrameTransform.AbsolutePosition,
+                    trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity,
+                    Vector3Dbl.zero,
+                    trajectoryTransform.PhysicsTransform.Mass );
+                trajectory.SetCurrentState( stateVector );
+                Debug.Log( trajectoryTransform.gameObject.name + " 1 " + trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity.magnitude );
+                //}
             }
-            // if not synchronized - set the trajectory to current, then simulate, and set again?
-#warning syncing before causes velocity to be integrated twice (because velocity has been applied to the position by the physics object, and we're now reusing that position).
-            // can't use old position because collision might've happened.
 
             instance._simulator.Simulate( TimeManager.UT );
+
             foreach( var (trajectory, trajectoryTransform) in instance._trajectoryMap )
             {
-                //if( trajectoryTransform.IsSynchronized() )
-                //{
                 TrajectoryBodyState stateVector = trajectory.GetCurrentState();
-#warning TODO - use MovePosition?
-                trajectoryTransform.ReferenceFrameTransform.AbsolutePosition = stateVector.AbsolutePosition;
-                trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = stateVector.AbsoluteVelocity;
-                // }
-                /* else
-                {
- #warning TODO - if we stop applying trajectory, then the gravity will also stop being applied if you fire the engine.
- #warning        passing forces into the trajectory won't solve it because we need to apply gravity when colliding as well, but then we can split the sim into scene or trajectory based on collision state.
+                Vector3Dbl delta = stateVector.AbsolutePosition - trajectoryTransform.ReferenceFrameTransform.AbsolutePosition;
+                Vector3Dbl vel = delta / TimeManager.FixedDeltaTime;
+                //trajectoryTransform.ReferenceFrameTransform.AbsolutePosition = stateVector.AbsolutePosition;
 
-                     // update trajectory for the next position.
-                     var stateVector = new TrajectoryBodyState(
-                         trajectoryTransform.ReferenceFrameTransform.AbsolutePosition,
-                         trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity,
-                         trajectoryTransform.ReferenceFrameTransform.AbsoluteAcceleration,
-                         trajectoryTransform.PhysicsTransform.Mass );
-                     trajectory.SetCurrentState( stateVector );
+                vel = stateVector.AbsoluteVelocity; // temporary fix
+                                                    // We want to use the delta between the start and end, not the last sub-frame's velocity.
 
-                     // apply the velocity that would result from the trajectory or something?
-                 }*/
+                trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = vel;
+                Debug.Log( trajectoryTransform.gameObject.name + " 2 " + trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity.magnitude );
+#warning TODO - vel (delta) doesn't want to accumulate correctly.
+                // it's set to weird values between frames?
+
+                // input vel = 15, output vel = 17
+                // input vel = 17, output vel = 15 (WTF?)
+#warning TODO - only happens when I use the absolute position delta based velocity.
+
+                // the velocity inside the simulator sometimes ends up lower than it started with when a vessel is in free fall
+                //Debug.Log( trajectoryTransform.gameObject.name + " " + trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity + " " + vel.magnitude );
             }
-
-#warning TODO - can I somehow apply the trajectory even if it's not synchronized?
-            // or synchronize it and then simulate?
-
-            // if not, we need to switch between manual and trajectory-based gravity whenever the trajectory based can't be used.
-            // and manual gravity must be excluded from the acceleration calculation for the purpose of syncing.
 
         }
     }

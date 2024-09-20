@@ -86,7 +86,8 @@ namespace HSP.Vanilla.Trajectories
 
         public bool HasCacheForUT( double ut )
         {
-            return _cachedUpToUT >= ut;
+            return false;
+            //return _cachedUpToUT >= ut;
         }
 
         public void Step( IEnumerable<TrajectoryBodyState> attractors, double dt )

@@ -23,8 +23,10 @@ namespace HSP.Trajectories
         /// <param name="endUT">The UT at which to finish the simulation.</param>
         public void Simulate( double endUT )
         {
-            double delta = endUT -_simulationEndUT;
+            double delta = endUT - _simulationEndUT;
             double dt = delta / 10;
+
+            //double attr1vel = Followers[0].GetCurrentState().AbsoluteVelocity.magnitude;
            // int i = 0;
 #warning TODO - last step needs to be such that the time matches the desired time.
             for( ; _ut < endUT; _ut += dt )
@@ -61,6 +63,8 @@ namespace HSP.Trajectories
                     follower.Step( attractorStates, dt );
                 }
             }
+            //double attr1vel2 = Followers[0].GetCurrentState().AbsoluteVelocity.magnitude;
+            //Debug.Log( attr1vel + " " + attr1vel2 );
 
             _simulationEndUT = _ut;
         }
