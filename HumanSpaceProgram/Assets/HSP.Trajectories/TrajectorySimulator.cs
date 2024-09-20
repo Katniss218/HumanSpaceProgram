@@ -14,6 +14,7 @@ namespace HSP.Trajectories
 
 
         private double _simulationEndUT; // The last ut for which the sim has been computed.
+        public double EndUT => _simulationEndUT;
 
         private double _ut;
 
@@ -26,8 +27,8 @@ namespace HSP.Trajectories
             double delta = endUT - _simulationEndUT;
             double dt = delta / 10;
 
-            //double attr1vel = Followers[0].GetCurrentState().AbsoluteVelocity.magnitude;
-           // int i = 0;
+            double attr1vel = Followers[0].GetCurrentState().AbsolutePosition.magnitude;
+            // int i = 0;
 #warning TODO - last step needs to be such that the time matches the desired time.
             for( ; _ut < endUT; _ut += dt )
             {
@@ -62,10 +63,15 @@ namespace HSP.Trajectories
                 {
                     follower.Step( attractorStates, dt );
                 }
+                //Debug.Log( " step: " + (attr1vel - Followers[0].GetCurrentState().AbsolutePosition.magnitude) );
             }
-            //double attr1vel2 = Followers[0].GetCurrentState().AbsoluteVelocity.magnitude;
-            //Debug.Log( attr1vel + " " + attr1vel2 );
+            double attr1vel2 = Followers[0].GetCurrentState().AbsolutePosition.magnitude;
+            double attr1velEnd = Followers[0].GetCurrentState().AbsoluteVelocity.magnitude;
+            Debug.Log( attr1vel + " : " + (attr1vel - attr1vel2) + " : " + attr1velEnd );
+#warning TODO - endUT and _ut are sometimes not consistent for some reason.
+            // initial UT difference in first frame is huge.
 
+            Debug.Log( "delta" + delta + ", " + endUT + " " + _ut );
             _simulationEndUT = _ut;
         }
     }

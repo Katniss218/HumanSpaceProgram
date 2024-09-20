@@ -54,11 +54,12 @@ namespace HSP._DevUtils
         public static void CreateDefaultPlanetarySystem()
         {
             QuaternionDbl orientation = Quaternion.Euler( 270, 0, 0 );
-            CelestialBody cb = CreateCB( "main", Vector3Dbl.zero, Vector3Dbl.zero, orientation );
-            //CelestialBody cb = CreateCB( "main", Vector3Dbl.zero, orientation );
+           // CelestialBody cb = CreateCB( "main", Vector3Dbl.zero, Vector3Dbl.zero, orientation );
+            CelestialBody cb = CreateCB( "main", Vector3Dbl.zero, orientation );
 
             //CelestialBody cb1 = CreateCB( "moon1", "main", 440_000_00, 0, 0, 0, 0, 0, orientation );
-            CelestialBody cb1 = CreateCB( "moon1", new Vector3Dbl( 440_000_00, 0, 0 ), new Vector3Dbl( 0, 100000, 0 ), orientation );
+           // CelestialBody cb1 = CreateCB( "moon1", new Vector3Dbl( 440_000_00, 0, 0 ), new Vector3Dbl( 0, 100000, 0 ), orientation );
+            CelestialBody cb1 = CreateCB( "moon1", new Vector3Dbl( 440_000_00, 0, 0 ), orientation );
             //CelestialBody cb2 = CreateCB( "moon2", new Vector3Dbl( 440_000_000, 100_000_000, 0 ), orientation );
             //CelestialBody cb_farawayTEST = CreateCB( "far", new Vector3Dbl( 440_000_000_0.0, 100_000_000, 0 ), orientation );
             //CelestialBody cb_farawayTEST2 = CreateCB( "further", new Vector3Dbl( 440_000_000_00.0, 100_000_000, 0 ), orientation );

@@ -101,6 +101,9 @@ namespace Assets.HSP.Trajectories
             subSystemList = null
         };
 
+
+        static int i = 0;
+
         private static void PlayerLoopFixedUpdate()
         {
             if( !instanceExists )
@@ -140,35 +143,44 @@ namespace Assets.HSP.Trajectories
                     Vector3Dbl.zero,
                     trajectoryTransform.PhysicsTransform.Mass );
                 trajectory.SetCurrentState( stateVector );
-                Debug.Log( trajectoryTransform.gameObject.name + " 1 " + trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity.magnitude );
+                //Debug.Log( trajectoryTransform.gameObject.name + " 1 " + trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity.magnitude );
                 //}
             }
 
+            double time = instance._simulator.EndUT;
             instance._simulator.Simulate( TimeManager.UT );
+            double deltaTime = instance._simulator.EndUT - time;
 
             foreach( var (trajectory, trajectoryTransform) in instance._trajectoryMap )
             {
                 TrajectoryBodyState stateVector = trajectory.GetCurrentState();
                 Vector3Dbl delta = stateVector.AbsolutePosition - trajectoryTransform.ReferenceFrameTransform.AbsolutePosition;
-                Vector3Dbl vel = delta / TimeManager.FixedDeltaTime;
-                //trajectoryTransform.ReferenceFrameTransform.AbsolutePosition = stateVector.AbsolutePosition;
+                //Vector3Dbl vel = delta2 / TimeManager.FixedDeltaTime;
+                Vector3Dbl vel2 = delta / TimeManager.FixedDeltaTime;
+                Vector3Dbl vel3 = delta / deltaTime;
 
-                vel = stateVector.AbsoluteVelocity; // temporary fix
-                                                    // We want to use the delta between the start and end, not the last sub-frame's velocity.
+                Vector3Dbl vel = stateVector.AbsoluteVelocity; // temporary fix
+                                                               // We want to use the delta between the start and end, not the last sub-frame's velocity.
 
+                // if( !double.IsNaN( vel3.magnitude ) )
+                // {
                 trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = vel;
-                Debug.Log( trajectoryTransform.gameObject.name + " 2 " + trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity.magnitude );
+               // }
+                if( trajectoryTransform.gameObject.name != "celestialbody" )
+                {
+                    Debug.Log( " T" + i + " " + trajectoryTransform.gameObject.name + " ::: " + vel.magnitude + " ::: " + vel2.magnitude + " ::: " + vel3.magnitude );
+                }
 #warning TODO - vel (delta) doesn't want to accumulate correctly.
+                // something inside trajectory simulator and related to delta time, timemanager's UT, etc.
+
                 // it's set to weird values between frames?
 
                 // input vel = 15, output vel = 17
                 // input vel = 17, output vel = 15 (WTF?)
 #warning TODO - only happens when I use the absolute position delta based velocity.
 
-                // the velocity inside the simulator sometimes ends up lower than it started with when a vessel is in free fall
-                //Debug.Log( trajectoryTransform.gameObject.name + " " + trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity + " " + vel.magnitude );
             }
-
+            i++;
         }
     }
 }
