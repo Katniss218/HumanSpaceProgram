@@ -138,7 +138,7 @@ namespace UnityEngine
 			return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
 		}
 
-		[MethodImpl( MethodImplOptions.AggressiveInlining )]
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
 		public static Vector3Dbl Cross( Vector3Dbl v1, Vector3Dbl v2 )
 		{
 			double x = (v1.y * v2.z) - (v1.z * v2.y);

@@ -141,7 +141,7 @@ namespace HSP.Trajectories
         }
 
         [MapsInheritingFrom( typeof( TrajectoryTransform ) )]
-        public static SerializationMapping TrajectoryKinematicReferenceFrameTransformMapping()
+        public static SerializationMapping TrajectoryTransformMapping()
         {
             return new MemberwiseSerializationMapping<TrajectoryTransform>()
             {

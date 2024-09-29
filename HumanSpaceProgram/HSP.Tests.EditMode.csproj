@@ -59,6 +59,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Tests\EditMode\E_Template.cs" />
+    <Compile Include="Assets\Tests\EditMode\NewtonianOrbitTests.cs" />
+    <Compile Include="Assets\Tests\EditMode\NUnit\ApproxEqual.cs" />
+    <Compile Include="Assets\Tests\EditMode\KeplerianOrbitTests.cs" />
     <Compile Include="Assets\Tests\EditMode\Core\Substances\SubstanceStateCollectionTests.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -931,25 +934,89 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="_UnityPlus.UILib.csproj">
-      <Project>{3A5E96D9-C189-180D-1672-7BEFFDEBCE5F}</Project>
-      <Name>_UnityPlus.UILib</Name>
+    <ProjectReference Include="_UnityEngine.csproj">
+      <Project>{29A28F5C-31DD-0068-5BB5-61A0CFFA20FA}</Project>
+      <Name>_UnityEngine</Name>
+    </ProjectReference>
+    <ProjectReference Include="_UnityPlus.csproj">
+      <Project>{49D4BC99-1C12-776F-CC5E-D6CE66E348FE}</Project>
+      <Name>_UnityPlus</Name>
+    </ProjectReference>
+    <ProjectReference Include="_UnityPlus.OverridableEvents.csproj">
+      <Project>{049D3356-CD2A-DFB0-C50D-8CFE5B092848}</Project>
+      <Name>_UnityPlus.OverridableEvents</Name>
     </ProjectReference>
     <ProjectReference Include="_UnityPlus.Serialization.csproj">
       <Project>{FED3C19A-E743-9E19-D660-957D0801811E}</Project>
       <Name>_UnityPlus.Serialization</Name>
     </ProjectReference>
+    <ProjectReference Include="_UnityPlus.UILib.csproj">
+      <Project>{3A5E96D9-C189-180D-1672-7BEFFDEBCE5F}</Project>
+      <Name>_UnityPlus.UILib</Name>
+    </ProjectReference>
     <ProjectReference Include="HSP.csproj">
       <Project>{5294BE79-15AB-2AAE-E8C3-9E735E001D6D}</Project>
       <Name>HSP</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.CelestialBodies.csproj">
+      <Project>{83793330-5AED-C186-5E4B-AAD4BB463469}</Project>
+      <Name>HSP.CelestialBodies</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Content.csproj">
+      <Project>{642CD5D5-9E37-E1CA-969F-267B97A7FC25}</Project>
+      <Name>HSP.Content</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.ControlSystems.csproj">
+      <Project>{5E371463-138D-D25A-49B8-DED13355C7DC}</Project>
+      <Name>HSP.ControlSystems</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.ReferenceFrames.csproj">
+      <Project>{D8846B96-55B1-C32C-F90A-52C14F5C8043}</Project>
+      <Name>HSP.ReferenceFrames</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.ResourceFlow.csproj">
+      <Project>{26023575-EB06-DAA2-C7B2-77FFBAED8CB8}</Project>
+      <Name>HSP.ResourceFlow</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.SceneManagement.csproj">
+      <Project>{5B21ACE1-5E92-EEB2-818D-AF6D6AE9F824}</Project>
+      <Name>HSP.SceneManagement</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Timelines.csproj">
+      <Project>{C443A3BB-4D58-3A1D-D085-E8AEA15B2BC0}</Project>
+      <Name>HSP.Timelines</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Trajectories.csproj">
+      <Project>{57FA29CC-9026-83EE-F242-EA051DEA7649}</Project>
+      <Name>HSP.Trajectories</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.UI.csproj">
       <Project>{05A5E85F-FD04-4199-F86F-3A6E38B383FB}</Project>
       <Name>HSP.UI</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.ResourceFlow.csproj">
-      <Project>{26023575-EB06-DAA2-C7B2-77FFBAED8CB8}</Project>
-      <Name>HSP.ResourceFlow</Name>
+    <ProjectReference Include="HSP.Vanilla.csproj">
+      <Project>{AE718BD5-B7C2-FF6D-CB3C-BD7A5FEC452C}</Project>
+      <Name>HSP.Vanilla</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Vanilla.Content.AssetLoaders.csproj">
+      <Project>{573227E4-A25D-03E9-9B45-58A35D983087}</Project>
+      <Name>HSP.Vanilla.Content.AssetLoaders</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Vanilla.UI.csproj">
+      <Project>{6C8F7BA3-CBB1-7E26-D57A-944E3A2E5099}</Project>
+      <Name>HSP.Vanilla.UI</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Vanilla.UI.Vessels.csproj">
+      <Project>{3CA21801-D573-73FC-585D-691DDF1E6A9B}</Project>
+      <Name>HSP.Vanilla.UI.Vessels</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Vessels.csproj">
+      <Project>{46E8105E-3165-8157-383E-59E6654156AA}</Project>
+      <Name>HSP.Vessels</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Vessels.Construction.csproj">
+      <Project>{973ADF42-28BF-171E-CCCB-558E6DFC2896}</Project>
+      <Name>HSP.Vessels.Construction</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

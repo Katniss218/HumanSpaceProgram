@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityPlus.Serialization;
 
@@ -124,12 +125,17 @@ namespace HSP.Time
                 return;
             }
 
-          //  UnityEngine.Time.fixedDeltaTime = Mathf.Clamp( 0.02f * (timeScale / 8.0f), 0.02f, 0.08f );
+            //  UnityEngine.Time.fixedDeltaTime = Mathf.Clamp( 0.02f * (timeScale / 8.0f), 0.02f, 0.08f );
 
             _oldTimeScale = _timeScale;
             _timeScale = timeScale;
             UnityEngine.Time.timeScale = timeScale;
             OnAfterTimescaleChanged?.Invoke( new TimeScaleChangedData() { Old = _oldTimeScale, New = timeScale } );
+        }
+
+        public static void SetUT( double ut )
+        {
+            UT = ut;
         }
 
         /// <summary>
@@ -169,9 +175,10 @@ namespace HSP.Time
 
         void FixedUpdate()
         {
+            // also, UT should increase at the beginning of the fixedupdate.
+
             UT += FixedDeltaTime;
         }
-
 
         [MapsInheritingFrom( typeof( TimeManager ) )]
         public static SerializationMapping TimeStepManagerMapping()

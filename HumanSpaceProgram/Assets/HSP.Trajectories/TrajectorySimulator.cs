@@ -24,15 +24,12 @@ namespace HSP.Trajectories
         /// <param name="endUT">The UT at which to finish the simulation.</param>
         public void Simulate( double endUT )
         {
-            double delta = endUT - _simulationEndUT;
-            double dt = delta / 10;
+            double TotalDelta = endUT - _simulationEndUT;
+            int stepCount = 10; // TODO - dynamic step count.
+            double dt = TotalDelta / (double)stepCount;
 
-            double attr1vel = Followers[0].GetCurrentState().AbsolutePosition.magnitude;
-            // int i = 0;
-#warning TODO - last step needs to be such that the time matches the desired time.
-            for( ; _ut < endUT; _ut += dt )
+            for( int i = 0; i < stepCount; i++ )
             {
-                //i++;
                 // Copy the states to ensure that the simulation doesn't use values calculated for the next step on elements after the first element.
                 List<TrajectoryBodyState> attractorStates = new List<TrajectoryBodyState>( Attractors.Count );
                 List<TrajectoryBodyState> followerStates = new List<TrajectoryBodyState>( Followers.Count );
@@ -63,15 +60,11 @@ namespace HSP.Trajectories
                 {
                     follower.Step( attractorStates, dt );
                 }
-                //Debug.Log( " step: " + (attr1vel - Followers[0].GetCurrentState().AbsolutePosition.magnitude) );
-            }
-            double attr1vel2 = Followers[0].GetCurrentState().AbsolutePosition.magnitude;
-            double attr1velEnd = Followers[0].GetCurrentState().AbsoluteVelocity.magnitude;
-            Debug.Log( attr1vel + " : " + (attr1vel - attr1vel2) + " : " + attr1velEnd );
-#warning TODO - endUT and _ut are sometimes not consistent for some reason.
-            // initial UT difference in first frame is huge.
 
-            Debug.Log( "delta" + delta + ", " + endUT + " " + _ut );
+                _ut += dt;
+            }
+
+            _ut = endUT;
             _simulationEndUT = _ut;
         }
     }

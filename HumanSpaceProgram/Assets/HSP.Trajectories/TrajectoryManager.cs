@@ -1,11 +1,6 @@
-﻿using HSP.ReferenceFrames;
-using HSP.Time;
+﻿using HSP.Time;
 using HSP.Trajectories;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.LowLevel;
 using UnityEngine.PlayerLoop;
@@ -101,50 +96,25 @@ namespace Assets.HSP.Trajectories
             subSystemList = null
         };
 
-
-        static int i = 0;
-
         private static void PlayerLoopFixedUpdate()
         {
             if( !instanceExists )
                 return;
 
-            /*
-            simulation will compute the position of the object, that's correct IF IT HASN'T COLLIDED WITH ANYTHING or it hasn't had any other forces than gravity applied to it.
+            // simulation scheme is as follows:
+            // Before physics engine is run - take the position and velocity, run the sim, and apply the result back.
 
-            so the position could be updated *after* the fixedupdate/physicsupdate, assuming some conditions are met that'll guarantee
-                that the simulation data is correct for what's happening to the physicsobject.
-
-            the correctness is when: someone didn't move it, and it didn't collide with anything.
-            */
-
-            // after physics has moved it, so the transform should now have the correct position and won't move.
-
-#warning TODO - forces include gravitational forces (there's no way to distinguish them really, and we do want to use trajectories to do gravity anyway so there won't be gravity forces on the vessels)
-
-            // do we want to do this checking via events or flags?
-
-            // events can be hooked by the trajectory follower and then exposed as flags.
-
-
-
-#warning TODO - maybe expose some HSPEvents at specific points during the frame?? (via playerloop) I don't want hspevents to be related to the frame, not HSP things happening though.
-
-            // what if I put the sync code here:
+            // This simulation code DOESN'T have to be in any specific point during the frame I think.
 
             foreach( var (trajectory, trajectoryTransform) in instance._trajectoryMap )
             {
-                //if( !trajectoryTransform.IsSynchronized() )
-                //{
-                // synchronize
-                var stateVector = new TrajectoryBodyState(
+                TrajectoryBodyState stateVector = new TrajectoryBodyState(
                     trajectoryTransform.ReferenceFrameTransform.AbsolutePosition,
                     trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity,
                     Vector3Dbl.zero,
                     trajectoryTransform.PhysicsTransform.Mass );
+
                 trajectory.SetCurrentState( stateVector );
-                //Debug.Log( trajectoryTransform.gameObject.name + " 1 " + trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity.magnitude );
-                //}
             }
 
             double time = instance._simulator.EndUT;
@@ -154,33 +124,18 @@ namespace Assets.HSP.Trajectories
             foreach( var (trajectory, trajectoryTransform) in instance._trajectoryMap )
             {
                 TrajectoryBodyState stateVector = trajectory.GetCurrentState();
-                Vector3Dbl delta = stateVector.AbsolutePosition - trajectoryTransform.ReferenceFrameTransform.AbsolutePosition;
-                //Vector3Dbl vel = delta2 / TimeManager.FixedDeltaTime;
-                Vector3Dbl vel2 = delta / TimeManager.FixedDeltaTime;
-                Vector3Dbl vel3 = delta / deltaTime;
 
-                Vector3Dbl vel = stateVector.AbsoluteVelocity; // temporary fix
-                                                               // We want to use the delta between the start and end, not the last sub-frame's velocity.
+                trajectoryTransform.ReferenceFrameTransform.AbsolutePosition = stateVector.AbsolutePosition;
+                trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = stateVector.AbsoluteVelocity;
+                // Summing up the subframe accelerations and applying them as a force to the RB is possible, but requires knowing the accurate mass of the object.
 
-                // if( !double.IsNaN( vel3.magnitude ) )
-                // {
-                trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = vel;
-               // }
-                if( trajectoryTransform.gameObject.name != "celestialbody" )
-                {
-                    Debug.Log( " T" + i + " " + trajectoryTransform.gameObject.name + " ::: " + vel.magnitude + " ::: " + vel2.magnitude + " ::: " + vel3.magnitude );
-                }
-#warning TODO - vel (delta) doesn't want to accumulate correctly.
-                // something inside trajectory simulator and related to delta time, timemanager's UT, etc.
+#warning TODO why is the difference in position divided by time taken not even roughly equal final velocity though? And why does it fluctuate over time
+                // find out what the velocity should be (from an external formula)
 
-                // it's set to weird values between frames?
+                // Check how long it takes to cross the top of the tower in both cases
 
-                // input vel = 15, output vel = 17
-                // input vel = 17, output vel = 15 (WTF?)
-#warning TODO - only happens when I use the absolute position delta based velocity.
-
+                // write tests that test the newtonian and keplerian trajectories.
             }
-            i++;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace HSP.Vessels
@@ -31,11 +32,17 @@ namespace HSP.Vessels
 
         internal static void Register( Vessel vessel )
         {
+            if( vessel == null )
+                throw new ArgumentNullException( nameof( vessel ) );
+
             instance._vessels.Add( vessel );
         }
 
         internal static void Unregister( Vessel vessel )
         {
+            if( vessel == null )
+                throw new ArgumentNullException( nameof( vessel ) );
+
             instance._vessels.Remove( vessel );
         }
     }

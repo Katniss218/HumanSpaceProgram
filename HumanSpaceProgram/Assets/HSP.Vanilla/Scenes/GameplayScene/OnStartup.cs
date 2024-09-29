@@ -2,7 +2,6 @@ using Assets.HSP.Trajectories;
 using HSP.CelestialBodies;
 using HSP.ReferenceFrames;
 using HSP.Time;
-using HSP.Trajectories;
 using HSP.Vanilla.Scenes.GameplayScene.Cameras;
 using HSP.Vessels;
 using System.Linq;
@@ -94,6 +93,14 @@ namespace HSP.Vanilla.Scenes.GameplayScene
             atmosphereRenderer.ColorRenderTextureGetter = () => GameplaySceneCameraManager.ColorRenderTexture;
             atmosphereRenderer.DepthRenderTextureGetter = () => GameplaySceneDepthBufferCombiner.CombinedDepthRenderTexture;
 
+        }
+
+        public const string RESET_UT = HSPEvent.NAMESPACE_HSP + ".reset_ut";
+
+        [HSPEventListener( HSPEvent_STARTUP_GAMEPLAY.ID, RESET_UT )]
+        private static void ResetUT()
+        {
+            TimeManager.SetUT( 0 );
         }
 
         [HSPEventListener( HSPEvent_ON_CELESTIAL_BODY_CREATED.ID, ADD_ATMOSPHERE_RENDERER )]

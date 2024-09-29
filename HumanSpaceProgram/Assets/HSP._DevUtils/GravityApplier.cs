@@ -8,7 +8,6 @@ namespace HSP._DevUtils
 {
     public class GravityApplier : MonoBehaviour
     {
-#warning TODO - remove this once the proper trajectory code is done.
         public Vessel Vessel { get; set; }
 
         void FixedUpdate()

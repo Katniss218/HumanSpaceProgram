@@ -1,7 +1,7 @@
 using HSP.ResourceFlow;
 using NUnit.Framework;
 
-namespace KSS_Tests_EditMode
+namespace HSP_Tests_EditMode
 {
     public class SubstanceStateCollectionTests
     {

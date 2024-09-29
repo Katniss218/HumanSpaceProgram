@@ -54,17 +54,18 @@ namespace HSP.Vanilla.Trajectories
         /// </remarks>
         public double MeanAnomaly { get; private set; } // We store the mean anomaly because it is convenient.
 
-        double _cachedTrueAnomaly;
-
-        /// <summary>
-        /// The reference epoch for the orbit
-        /// </summary>
-        //public double epoch { get; private set; }
-        // original code has a Vector3 epoch which is calculated as "position on orbit - state vector position" (so, vector.zero??)
+        double? _cachedTrueAnomaly;
+        public double TrueAnomaly
+        {
+            get
+            {
+                //if( _cachedTrueAnomaly.HasValue )
+                _cachedTrueAnomaly = CalculateTrueAnomaly( MeanAnomaly, Eccentricity );
+                return _cachedTrueAnomaly.Value;
+            }
+        }
 
         public double UT { get; private set; }
-
-        public double GravitationalParameter { get; set; }
 
         /// <summary>
         /// The length of half of the chord line perpendicular to the major axis, and passing through the focus.
@@ -75,14 +76,19 @@ namespace HSP.Vanilla.Trajectories
         public double PeriapsisHeight => (1 - Eccentricity) * SemiMajorAxis;
 
         ITrajectory _parentBody;
+        /// <summary>
+        /// Gets or sets the parent trajectory directly. <br/>
+        /// May be null.
+        /// </summary>
         public ITrajectory ParentBody
         {
             get
             {
-                if( _parentBody.IsUnityNull() )
+                if( _parentBody.IsUnityNull() && ParentBodyID != null )
                     _parentBody = CelestialBodyManager.Get( ParentBodyID ).GetComponent<TrajectoryTransform>().Trajectory;
                 return _parentBody;
             }
+            set => _parentBody = value;
         }
         public string ParentBodyID { get; set; }
 
@@ -91,16 +97,19 @@ namespace HSP.Vanilla.Trajectories
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="ut">The current (initial) univeral time.</param>
         /// <param name="semiMajorAxis"></param>
         /// <param name="eccentricity"></param>
         /// <param name="inclination"></param>
         /// <param name="longitudeOfAscendingNode"></param>
         /// <param name="argumentOfPeriapsis"></param>
-        /// <param name="meanAnomaly"></param>
-        /// <param name="epoch"></param>
+        /// <param name="initialMeanAnomaly">The initial mean anomaly (at <paramref name="ut"/>).</param>
         /// <param name="mass">The mass of the object represented by this trajectory.</param>
-        public KeplerianOrbit( double ut, string parentBodyId, double semiMajorAxis, double eccentricity, double inclination, double longitudeOfAscendingNode, double argumentOfPeriapsis, double meanAnomaly, double epoch, double mass )
+        public KeplerianOrbit( double ut, string parentBodyId, double semiMajorAxis, double eccentricity, double inclination, double longitudeOfAscendingNode, double argumentOfPeriapsis, double initialMeanAnomaly, double mass )
         {
+            if( eccentricity > 1 && semiMajorAxis > 0 )
+                throw new ArgumentOutOfRangeException( nameof( semiMajorAxis ), $"semiMajorAxis must be negative for hyperbolic orbits (eccentricity > 1)." );
+
             this.UT = ut;
             this.ParentBodyID = parentBodyId;
             this.SemiMajorAxis = semiMajorAxis;
@@ -108,14 +117,8 @@ namespace HSP.Vanilla.Trajectories
             this.Inclination = inclination;
             this.LongitudeOfAscendingNode = longitudeOfAscendingNode;
             this.ArgumentOfPeriapsis = argumentOfPeriapsis;
-            this.MeanAnomaly = meanAnomaly;
-
-            //this.epoch = epoch;
-            this.GravitationalParameter = GetGravParameter( mass );
+            this.MeanAnomaly = initialMeanAnomaly;
         }
-
-        // Orbits are always in body-centric frame, with the coordinate axes aligned with the absolute frame.
-        // State vectors too.
 
         /// <summary>
         /// Returns the orbital mean motion for a circular orbit of the same orbital period. <br />
@@ -125,7 +128,8 @@ namespace HSP.Vanilla.Trajectories
         /// <returns>The mean motion, in [Rad/s].</returns>
         public double GetMeanMotion()
         {
-            return Math.Sqrt( GravitationalParameter / Math.Abs( SemiMajorAxis * SemiMajorAxis * SemiMajorAxis ) );
+            double gravParam = GetGravParameter( ParentBody.Mass );
+            return Math.Sqrt( gravParam / Math.Abs( SemiMajorAxis * SemiMajorAxis * SemiMajorAxis ) );
         }
 
         /// <summary>
@@ -135,7 +139,8 @@ namespace HSP.Vanilla.Trajectories
         /// <returns>The orbital period, in [s].</returns>
         public double GetOrbitalPeriod()
         {
-            return (2 * Math.PI) * Math.Sqrt( (SemiMajorAxis * SemiMajorAxis * SemiMajorAxis) / GravitationalParameter );
+            double gravParam = GetGravParameter( ParentBody.Mass );
+            return (2 * Math.PI) * Math.Sqrt( (SemiMajorAxis * SemiMajorAxis * SemiMajorAxis) / gravParam );
         }
 
         /// <summary>
@@ -145,7 +150,8 @@ namespace HSP.Vanilla.Trajectories
         /// <returns>The speed, in [m/s].</returns>
         public double GetSpeedAtApoapsis()
         {
-            return Math.Sqrt( ((1 - Eccentricity) * GravitationalParameter) / ((1 + Eccentricity) * SemiMajorAxis) );
+            double gravParam = GetGravParameter( ParentBody.Mass );
+            return Math.Sqrt( ((1 - Eccentricity) * gravParam) / ((1 + Eccentricity) * SemiMajorAxis) );
         }
 
         /// <summary>
@@ -155,7 +161,8 @@ namespace HSP.Vanilla.Trajectories
         /// <returns>The speed, in [m/s].</returns>
         public double GetSpeedAtPeriapsis()
         {
-            return Math.Sqrt( ((1 + Eccentricity) * GravitationalParameter) / ((1 - Eccentricity) * SemiMajorAxis) );
+            double gravParam = GetGravParameter( ParentBody.Mass );
+            return Math.Sqrt( ((1 + Eccentricity) * gravParam) / ((1 - Eccentricity) * SemiMajorAxis) );
         }
 
         public double GetTimeSincePeriapsis()
@@ -170,14 +177,13 @@ namespace HSP.Vanilla.Trajectories
         /// <returns>The specific orbital energy, in [J/kg].</returns>
         public double GetSpecificOrbitalEnergy()
         {
-            return -(GravitationalParameter / (2 * SemiMajorAxis));
+            double gravParam = GetGravParameter( ParentBody.Mass );
+            return -(gravParam / (2 * SemiMajorAxis));
         }
 
         public double GetRelativeInclination( KeplerianOrbit otherOrbit )
         {
-            //return Vector3Dbl.Angle( GetOrbitNormal(), otherOrbit.GetOrbitNormal() );
-
-            throw new NotImplementedException();
+            return Vector3.Angle( GetCurrentOrbitalFrame().GetNormal(), otherOrbit.GetCurrentOrbitalFrame().GetNormal() );
         }
 
         //
@@ -186,11 +192,14 @@ namespace HSP.Vanilla.Trajectories
 
         public TrajectoryBodyState GetCurrentState()
         {
-#warning TODO - using ITrajectory directly MIGHT introduce the same synchronization problem LATER.
-            TrajectoryBodyState parentState = ParentBody.GetCurrentState();
+            TrajectoryBodyState parentState = ParentBody?.GetCurrentState() ?? new TrajectoryBodyState();
 
-            Vector3Dbl bodyCentricPosition = CalculatePosition( _cachedTrueAnomaly, semiLatusRectum, LongitudeOfAscendingNode, ArgumentOfPeriapsis, Inclination );
-            Vector3Dbl velocity = CalculateVelocity( _cachedTrueAnomaly, GravitationalParameter, semiLatusRectum, LongitudeOfAscendingNode, ArgumentOfPeriapsis, Inclination, Eccentricity );
+            double gravParam = GetGravParameter( ParentBody.Mass );
+            double trueAnomaly = TrueAnomaly;
+            Vector3Dbl bodyCentricPosition = GetPosition();
+            //bodyCentricPosition = CalculatePosition( trueAnomaly, semiLatusRectum, LongitudeOfAscendingNode, ArgumentOfPeriapsis, Inclination );
+            Vector3Dbl velocity = GetVelocity();
+            //velocity = CalculateVelocity( trueAnomaly, gravParam, semiLatusRectum, LongitudeOfAscendingNode, ArgumentOfPeriapsis, Inclination, Eccentricity );
             Vector3Dbl acceleration = bodyCentricPosition.normalized * PhysicalConstants.G * (parentState.Mass / bodyCentricPosition.sqrMagnitude);
 
             return new TrajectoryBodyState( bodyCentricPosition + parentState.AbsolutePosition, velocity + parentState.AbsoluteVelocity, acceleration + parentState.AbsoluteAcceleration, Mass );
@@ -198,16 +207,15 @@ namespace HSP.Vanilla.Trajectories
 
         public void SetCurrentState( TrajectoryBodyState stateVector )
         {
-            TrajectoryBodyState parentState = ParentBody.GetCurrentState();
+            TrajectoryBodyState parentState = ParentBody?.GetCurrentState() ?? new TrajectoryBodyState();
             Vector3Dbl bodyCentricPosition = stateVector.AbsolutePosition - parentState.AbsolutePosition;
             Vector3Dbl bodyCentricVelocity = stateVector.AbsoluteVelocity - parentState.AbsoluteVelocity;
-#warning TODO - stuck in infinite loop.
-            return;
-#warning TODO - using ITrajectory directly MIGHT introduce the same synchronization problem LATER.
 
-            //Vector3Dbl acceleration = stateVector.AbsoluteAcceleration - parentBodyAcceleration;
+            double gravParam = GetGravParameter( ParentBody.Mass );
             (double eccentricity, double semiMajorAxis, double inclination, double longitudeOfAscendingNode, double argumentOfPeriapsis, double trueAnomaly)
-                = CalcFromPosVel( GravitationalParameter, bodyCentricPosition, bodyCentricVelocity );
+                = CalculateFromStateVector( gravParam, bodyCentricPosition, bodyCentricVelocity );
+            double eccAnom = EccentricAnomalyFromTrueAnomaly( trueAnomaly, eccentricity );
+            double meanAnom = MeanAnomalyFromEccentricAnomaly( eccAnom, eccentricity );
 
             Eccentricity = eccentricity;
             SemiMajorAxis = semiMajorAxis;
@@ -215,10 +223,8 @@ namespace HSP.Vanilla.Trajectories
             LongitudeOfAscendingNode = longitudeOfAscendingNode;
             ArgumentOfPeriapsis = argumentOfPeriapsis;
             _cachedTrueAnomaly = trueAnomaly;
-            MeanAnomaly = MeanAnomaly;
+            MeanAnomaly = meanAnom;
             Mass = stateVector.Mass;
-            // keplerian from state vector.
-            throw new NotImplementedException();
         }
 
         public TrajectoryBodyState GetStateAtUT( double ut )
@@ -249,8 +255,10 @@ namespace HSP.Vanilla.Trajectories
         public void Step( IEnumerable<TrajectoryBodyState> attractors, double dt )
         {
             double meanMotion = GetMeanMotion();
-            MeanAnomaly += meanMotion * dt;
+            MeanAnomaly += (meanMotion * dt) % Math.PI;
             UT += dt;
+            // 0.0199613554149011
+            // 0.01996135541490106327
 
             _cachedTrueAnomaly = CalculateTrueAnomaly( this.MeanAnomaly, this.Eccentricity );
         }
@@ -261,42 +269,77 @@ namespace HSP.Vanilla.Trajectories
         //
         //
 
-        public static Vector3Dbl CalculatePosition(
-            double trueAnomaly, double semiLatusRectum,
-            double longitudeOfAscendingNode, double argumentOfPeriapsis, double inclination )
+        public Vector3Dbl GetPosition()
         {
-            double p = semiLatusRectum;
+            double trueAnomaly = TrueAnomaly;
 
-            Vector3Dbl position = new Vector3Dbl(
-                p * (Math.Cos( longitudeOfAscendingNode ) * Math.Cos( argumentOfPeriapsis + trueAnomaly ) - Math.Sin( longitudeOfAscendingNode ) * Math.Cos( inclination ) * Math.Sin( argumentOfPeriapsis + trueAnomaly )),
-                p * (Math.Sin( longitudeOfAscendingNode ) * Math.Cos( argumentOfPeriapsis + trueAnomaly ) + Math.Cos( longitudeOfAscendingNode ) * Math.Cos( inclination ) * Math.Sin( argumentOfPeriapsis + trueAnomaly )),
-                p * Math.Sin( inclination ) * Math.Sin( argumentOfPeriapsis + trueAnomaly )
-            );
+            // Distance to body
+            double r = (SemiMajorAxis * (1 - (Eccentricity * Eccentricity))) / (1 + Eccentricity * Math.Cos( trueAnomaly ));
 
-#warning TODO - original has a Vector3 epoch, what is that?
-            return position /* - epoch */;
+            // Position in the perifocal frame
+            double xOrbital = r * Math.Cos( trueAnomaly );
+            double yOrbital = r * Math.Sin( trueAnomaly );
+            double zOrbital = 0;
+
+            Vector3Dbl positionInOrbitalPlane = new Vector3Dbl( xOrbital, yOrbital, zOrbital );
+
+            positionInOrbitalPlane = RotateZ( positionInOrbitalPlane, ArgumentOfPeriapsis );
+            positionInOrbitalPlane = RotateX( positionInOrbitalPlane, Inclination );
+            positionInOrbitalPlane = RotateZ( positionInOrbitalPlane, LongitudeOfAscendingNode );
+
+            return positionInOrbitalPlane;
         }
 
-        public static Vector3Dbl CalculateVelocity(
-            double trueAnomaly, double gravitationalParameter, double semiLatusRectum,
-            double longitudeOfAscendingNode, double argumentOfPeriapsis, double inclination, double eccentricity )
+        public Vector3Dbl GetVelocity()
         {
-            double g = -Math.Sqrt( gravitationalParameter / semiLatusRectum );
+            double trueAnomaly = TrueAnomaly;
+            double gravParam = GetGravParameter( ParentBody.Mass );
 
-            Vector3Dbl velocity = new Vector3Dbl(
-                g * (Math.Cos( longitudeOfAscendingNode ) * (Math.Sin( argumentOfPeriapsis + trueAnomaly ) + eccentricity * Math.Sin( argumentOfPeriapsis )) +
-                        Math.Sin( longitudeOfAscendingNode ) * Math.Cos( inclination ) * (Math.Cos( argumentOfPeriapsis + trueAnomaly ) + eccentricity * Math.Cos( argumentOfPeriapsis ))),
-                g * (Math.Sin( longitudeOfAscendingNode ) * (Math.Sin( argumentOfPeriapsis + trueAnomaly ) + eccentricity * Math.Sin( argumentOfPeriapsis )) -
-                        Math.Cos( longitudeOfAscendingNode ) * Math.Cos( inclination ) * (Math.Cos( argumentOfPeriapsis + trueAnomaly ) + eccentricity * Math.Cos( argumentOfPeriapsis ))),
-                g * (Math.Sin( inclination ) * (Math.Cos( argumentOfPeriapsis + trueAnomaly ) + eccentricity * Math.Cos( argumentOfPeriapsis )))
-            );
+            // Specific angular momentum
+            double h = Math.Sqrt( SemiMajorAxis * (1 - Eccentricity * Eccentricity) * gravParam );
 
-            return velocity;
+            // Radial and tangential velocity components in the orbital plane
+            double vr = (gravParam / h) * Eccentricity * Math.Sin( trueAnomaly );
+            double vtheta = (gravParam / h) * (1 + Eccentricity * Math.Cos( trueAnomaly ));
+
+            // Velocity in the perifocal frame
+            double vxOrbital = vr * Math.Cos( trueAnomaly ) - vtheta * Math.Sin( trueAnomaly );
+            double vyOrbital = vr * Math.Sin( trueAnomaly ) + vtheta * Math.Cos( trueAnomaly );
+            double vzOrbital = 0;
+
+            Vector3Dbl velocityInOrbitalPlane = new Vector3Dbl( vxOrbital, vyOrbital, vzOrbital );
+
+            velocityInOrbitalPlane = RotateZ( velocityInOrbitalPlane, ArgumentOfPeriapsis );
+            velocityInOrbitalPlane = RotateX( velocityInOrbitalPlane, Inclination );
+            velocityInOrbitalPlane = RotateZ( velocityInOrbitalPlane, LongitudeOfAscendingNode );
+
+            return velocityInOrbitalPlane;
         }
 
+        private static Vector3Dbl RotateZ( Vector3Dbl position, double angle )
+        {
+            double cosAngle = Math.Cos( angle );
+            double sinAngle = Math.Sin( angle );
+
+            double newX = (cosAngle * position.x) - (sinAngle * position.y);
+            double newY = (sinAngle * position.x) + (cosAngle * position.y);
+
+            return new Vector3Dbl( newX, newY, position.z );
+        }
+
+        private static Vector3Dbl RotateX( Vector3Dbl position, double angle )
+        {
+            double cosAngle = Math.Cos( angle );
+            double sinAngle = Math.Sin( angle );
+
+            double newY = (cosAngle * position.y) - (sinAngle * position.z);
+            double newZ = (sinAngle * position.y) + (cosAngle * position.z);
+
+            return new Vector3Dbl( position.x, newY, newZ );
+        }
 
         private static (double eccentricity, double semiMajorAxis, double inclination, double longitudeOfAscendingNode, double argumentOfPeriapsis, double trueAnomaly)
-            CalcFromPosVel( double GravitationalParameter, Vector3Dbl stateVectorPosition, Vector3Dbl stateVectorVelocity )
+            CalculateFromStateVector( double gravitationalParameter, Vector3Dbl stateVectorPosition, Vector3Dbl stateVectorVelocity )
         {
             // vectors in planet-centric absolute frame. (axes aligned with absolute frame)
             double eccentricity;
@@ -305,7 +348,6 @@ namespace HSP.Vanilla.Trajectories
             double longitudeOfAscendingNode;
             double argumentOfPeriapsis;
             double trueAnomaly;
-            //Vector3Dbl thisepoch;
 
             // calculate specific relative angular momement
             Vector3Dbl h = Vector3Dbl.Cross( stateVectorPosition, stateVectorVelocity );
@@ -313,111 +355,122 @@ namespace HSP.Vanilla.Trajectories
             // calculate vector to the ascending node
             Vector3Dbl n = new Vector3Dbl( -h.y, h.x, 0 );
 
-            // calculate eccentricity vector and scalar
-            Vector3Dbl e = (Vector3Dbl.Cross( stateVectorVelocity, h ) * (1.0 / GravitationalParameter)) - (stateVectorPosition * (1.0 / stateVectorPosition.magnitude));
+            // calculate the eccentricity vector and eccentricity itself
+            Vector3Dbl e = (Vector3Dbl.Cross( stateVectorVelocity, h ) * (1.0 / gravitationalParameter)) - (stateVectorPosition * (1.0 / stateVectorPosition.magnitude));
             eccentricity = e.magnitude;
 
             // calculate specific orbital energy and semi-major axis
-            double E = stateVectorVelocity.sqrMagnitude * 0.5 - GravitationalParameter / stateVectorPosition.magnitude;
-            semiMajorAxis = -GravitationalParameter / (E * 2);
+            double orbitalEnergy = (stateVectorVelocity.sqrMagnitude * 0.5) - (gravitationalParameter / stateVectorPosition.magnitude);
 
-            // calculate inclination
+            if( eccentricity < 1.0 )
+                semiMajorAxis = -gravitationalParameter / (2 * orbitalEnergy);
+            else
+            {
+                double semiLatusRectum = h.sqrMagnitude / gravitationalParameter;
+                semiMajorAxis = ((-semiLatusRectum) / (e.sqrMagnitude - 1));
+            }
+
             inclination = Math.Acos( h.z / h.magnitude );
 
-            // calculate longitude of ascending node
             if( inclination == 0.0 )
                 longitudeOfAscendingNode = 0;
-            else if( n.y >= 0.0 )
-                longitudeOfAscendingNode = Math.Acos( n.x / n.magnitude );
             else
-                longitudeOfAscendingNode = 2 * Math.PI - Math.Acos( n.x / n.magnitude );
+            {
+                if( n.y >= 0.0 )
+                    longitudeOfAscendingNode = Math.Acos( n.x / n.magnitude );
+                else
+                    longitudeOfAscendingNode = (2 * Math.PI) - Math.Acos( n.x / n.magnitude );
+            }
 
-            // calculate argument of periapsis
-            if( inclination == 0.0 )
-                argumentOfPeriapsis = Math.Acos( e.x / e.magnitude );
-            else if( e.z >= 0.0 )
-                argumentOfPeriapsis = Math.Acos( Vector3Dbl.Dot( n, e ) / (n.magnitude * e.magnitude) );
+            if( eccentricity == 0 )
+                argumentOfPeriapsis = 0;
             else
-                argumentOfPeriapsis = 2 * Math.PI - Math.Acos( Vector3Dbl.Dot( n, e ) / (n.magnitude * e.magnitude) );
+            {
+                if( inclination == 0.0 )
+                    argumentOfPeriapsis = Math.Acos( e.x / e.magnitude );
+                else if( e.z >= 0.0 )
+                    argumentOfPeriapsis = Math.Acos( Vector3Dbl.Dot( n, e ) / (n.magnitude * e.magnitude) );
+                else
+                    argumentOfPeriapsis = (2 * Math.PI) - Math.Acos( Vector3Dbl.Dot( n, e ) / (n.magnitude * e.magnitude) );
+            }
 
-            // calculate true anomaly
             if( Vector3Dbl.Dot( stateVectorPosition, stateVectorVelocity ) >= 0.0 )
                 trueAnomaly = Math.Acos( Vector3Dbl.Dot( e, stateVectorPosition ) / (e.magnitude * stateVectorPosition.magnitude) );
             else
-                trueAnomaly = 2 * Math.PI - Math.Acos( Vector3Dbl.Dot( e, stateVectorPosition ) / (e.magnitude * stateVectorPosition.magnitude) );
+                trueAnomaly = (2 * Math.PI) - Math.Acos( Vector3Dbl.Dot( e, stateVectorPosition ) / (e.magnitude * stateVectorPosition.magnitude) );
 
-            // calculate epoch
-            //thisepoch = new Vector3Dbl( 0, 0, 0 );
-            //thisepoch = CalculatePosition( ... ) - stateVectorPosition;
             return (eccentricity, semiMajorAxis, inclination, longitudeOfAscendingNode, argumentOfPeriapsis, trueAnomaly);
         }
 
 
         public static double CalculateTrueAnomaly( double meanAnomaly, double eccentricity )
         {
+            meanAnomaly %= Math.PI;
             double eccentricAnomaly = CalculateEccentricAnomaly( meanAnomaly, eccentricity );
             double trueAnomaly = CalculateTrueAnomalyFromEccentric( eccentricAnomaly, eccentricity );
             return trueAnomaly;
         }
 
-        // For small eccentricities a good approximation of true anomaly can be 
-        // obtained by the following formula (the error is of the order e^3)
-        private static double EstimateTrueAnomalyLowEccentricity( double meanAnomaly, double eccentricity )
-        {
-            double M = meanAnomaly;
-            return M + 2 * eccentricity * Math.Sin( M ) + 1.25 * eccentricity * eccentricity * Math.Sin( 2 * M );
-        }
-
         private static double CalculateEccentricAnomaly( double meanAnomaly, double eccentricity )
         {
-            double estTrueAnomaly = EstimateTrueAnomalyLowEccentricity( meanAnomaly, eccentricity );
-            double E = Math.Acos( (eccentricity + Math.Cos( estTrueAnomaly )) / (1.0 + eccentricity * Math.Cos( estTrueAnomaly )) );
-            double M = E - eccentricity * Math.Sin( E );
+            const double maxError = 1e-10;
 
-            // iterate to get M closer to meanAnomaly
-            double rate = 0.01;
-            bool lastDec = false;
-            while( true )
+            // Initial guess
+            double eccentricAnomaly = meanAnomaly + (eccentricity * Math.Sin( meanAnomaly )) + (0.5 * (eccentricity * eccentricity) * Math.Sin( 2.0 * meanAnomaly ));
+            double error = 1.0;
+
+            while( Math.Abs( error ) > maxError )
             {
-                if( Math.Abs( M - meanAnomaly ) < 0.0000000000001 )
-                    break;
-                if( M > meanAnomaly )
-                {
-                    E -= rate;
-                    lastDec = true;
-                }
-                else
-                {
-                    E += rate;
-                    if( lastDec )
-                        rate *= 0.1;
-                }
-                M = E - eccentricity * Math.Sin( E );
+                double step = eccentricAnomaly - (eccentricity * Math.Sin( eccentricAnomaly ));
+
+                error = (meanAnomaly - step) / (1.0 - (eccentricity * Math.Cos( eccentricAnomaly )));
+
+                eccentricAnomaly += error;
             }
 
-            if( meanAnomaly > Math.PI && E < Math.PI )
-                E = 2 * Math.PI - E;
-
-            return E;
+            return eccentricAnomaly;
         }
 
         private static double CalculateTrueAnomalyFromEccentric( double eccentricAnomaly, double eccentricity )
         {
-            double trueAnomaly = Math.Acos( (Math.Cos( eccentricAnomaly ) - eccentricity) / (1.0 - eccentricity * Math.Cos( eccentricAnomaly )) );
+            if( eccentricity >= 1.0 )
+            {
+                double coshE = Math.Sinh( eccentricAnomaly / 2.0 );
+                double sinhE = Math.Cosh( eccentricAnomaly / 2.0 );
+                return 2.0 * Math.Atan2( Math.Sqrt( eccentricity + 1.0 ) * coshE, Math.Sqrt( eccentricity - 1.0 ) * sinhE );
+            }
 
-            if( eccentricAnomaly > Math.PI && trueAnomaly < Math.PI )
-                trueAnomaly = (2.0 * Math.PI) - trueAnomaly;
-
-            return trueAnomaly;
+            double cosE = Math.Cos( eccentricAnomaly / 2.0 );
+            double sinE = Math.Sin( eccentricAnomaly / 2.0 );
+            return 2.0 * Math.Atan2( Math.Sqrt( 1.0 + eccentricity ) * sinE, Math.Sqrt( 1.0 - eccentricity ) * cosE );
         }
 
 
         private static double EccentricAnomalyFromTrueAnomaly( double trueAnomaly, double eccentricity )
         {
-            double E = Math.Acos( (eccentricity + Math.Cos( trueAnomaly )) / (1 + eccentricity * Math.Cos( trueAnomaly )) );
-            if( trueAnomaly > Math.PI && E < Math.PI )
-                E = 2 * Math.PI - E;
-            return E;
+            if( eccentricity == 0 )
+                return 0;
+
+            double cosT = Math.Cos( trueAnomaly / 2.0 );
+            double sinT = Math.Sin( trueAnomaly / 2.0 );
+            if( eccentricity < 1.0 )
+            {
+                return 2.0 * Math.Atan2( Math.Sqrt( 1.0 - eccentricity ) * sinT, Math.Sqrt( 1.0 + eccentricity ) * cosT );
+            }
+
+            double root = Math.Sqrt( (eccentricity - 1.0) / (eccentricity + 1.0) ) * sinT / cosT;
+
+            return Math.Log( (1.0 + root) / (1.0 - root) );
+        }
+
+        private static double MeanAnomalyFromEccentricAnomaly( double eccentricAnomaly, double eccentricity )
+        {
+            if( eccentricity >= 1.0 )
+            {
+                return eccentricity * Math.Sinh( eccentricAnomaly ) - eccentricAnomaly;
+            }
+            return eccentricAnomaly - eccentricity * Math.Sin( eccentricAnomaly )
+                % Math.PI;
         }
 
         /// <summary>
