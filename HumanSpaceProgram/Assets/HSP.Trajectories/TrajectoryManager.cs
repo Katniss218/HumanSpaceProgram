@@ -1,4 +1,5 @@
-﻿using HSP.Time;
+﻿using HSP.ReferenceFrames;
+using HSP.Time;
 using HSP.Trajectories;
 using System.Collections.Generic;
 using UnityEngine;
@@ -124,6 +125,13 @@ namespace Assets.HSP.Trajectories
             foreach( var (trajectory, trajectoryTransform) in instance._trajectoryMap )
             {
                 TrajectoryBodyState stateVector = trajectory.GetCurrentState();
+
+#warning why is angular velocity (and velocity) 0 in some fixedupdates though?!
+
+#warning TODO - adding set position changes the angular velocity (possibly because collisions or something?)
+                // doing MovePosition doesn't change anything.
+
+                // is the vertical velocity correct?
 
                 trajectoryTransform.ReferenceFrameTransform.AbsolutePosition = stateVector.AbsolutePosition;
                 trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = stateVector.AbsoluteVelocity;
