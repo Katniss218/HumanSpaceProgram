@@ -1,5 +1,4 @@
-﻿using Assets.HSP.Trajectories;
-using HSP.ReferenceFrames;
+﻿using HSP.ReferenceFrames;
 using UnityEngine;
 using UnityPlus.Serialization;
 

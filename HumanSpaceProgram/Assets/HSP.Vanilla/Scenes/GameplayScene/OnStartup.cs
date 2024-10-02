@@ -1,7 +1,7 @@
-using Assets.HSP.Trajectories;
 using HSP.CelestialBodies;
 using HSP.ReferenceFrames;
 using HSP.Time;
+using HSP.Trajectories;
 using HSP.Vanilla.Scenes.GameplayScene.Cameras;
 using HSP.Vessels;
 using System.Linq;

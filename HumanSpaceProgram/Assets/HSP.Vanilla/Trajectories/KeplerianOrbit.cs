@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityPlus.Serialization;
+using static UnityEditor.PlayerSettings;
 
 namespace HSP.Vanilla.Trajectories
 {
@@ -269,6 +270,14 @@ namespace HSP.Vanilla.Trajectories
         //
         //
 
+        // An orbit with eccentricity = 1 is always a straight line (with tangential velocity component equal to 0).
+        // stepping an orbit with eccentricity = 1 might be tricky.
+
+        // hyperbolic (and parabolic) orbits have negative semimajor axis because if it's positive, it causes h (specific angular momentum) to be NaN
+
+        // ecc=1 orbits have 2 cases - elliptical and hyperbolic, depending on initial velocity
+
+
         public Vector3Dbl GetPosition()
         {
             double trueAnomaly = TrueAnomaly;
@@ -297,6 +306,7 @@ namespace HSP.Vanilla.Trajectories
 
             // Specific angular momentum
             double h = Math.Sqrt( SemiMajorAxis * (1 - Eccentricity * Eccentricity) * gravParam );
+#warning TODO - when the object velocity is 0, the eccentricity is 1, and `h` is 0.
 
             // Radial and tangential velocity components in the orbital plane
             double vr = (gravParam / h) * Eccentricity * Math.Sin( trueAnomaly );
@@ -358,19 +368,33 @@ namespace HSP.Vanilla.Trajectories
             // calculate the eccentricity vector and eccentricity itself
             Vector3Dbl e = (Vector3Dbl.Cross( stateVectorVelocity, h ) * (1.0 / gravitationalParameter)) - (stateVectorPosition * (1.0 / stateVectorPosition.magnitude));
             eccentricity = e.magnitude;
-
+             
             // calculate specific orbital energy and semi-major axis
             double orbitalEnergy = (stateVectorVelocity.sqrMagnitude * 0.5) - (gravitationalParameter / stateVectorPosition.magnitude);
 
-            if( eccentricity < 1.0 )
-                semiMajorAxis = -gravitationalParameter / (2 * orbitalEnergy);
-            else
+            if( eccentricity > 1.0 )
             {
                 double semiLatusRectum = h.sqrMagnitude / gravitationalParameter;
-                semiMajorAxis = ((-semiLatusRectum) / (e.sqrMagnitude - 1));
+                semiMajorAxis = (-semiLatusRectum) / (e.sqrMagnitude - 1);
+            }
+            else if( eccentricity == 1 )
+            {
+                semiMajorAxis = gravitationalParameter / (2 * orbitalEnergy); // parabolic/hyperbolic is negative.
+            }
+            else
+            {
+                semiMajorAxis = -gravitationalParameter / (2 * orbitalEnergy);
             }
 
-            inclination = Math.Acos( h.z / h.magnitude );
+            if( h.sqrMagnitude == 0 )
+            {
+                inclination = Math.Acos( stateVectorPosition.z / stateVectorPosition.magnitude );
+                n = Vector3Dbl.Cross( stateVectorPosition, Vector3Dbl.forward );
+            }
+            else
+            {
+                inclination = Math.Acos( h.z / h.magnitude );
+            }
 
             if( inclination == 0.0 )
                 longitudeOfAscendingNode = 0;
@@ -413,6 +437,9 @@ namespace HSP.Vanilla.Trajectories
 
         private static double CalculateEccentricAnomaly( double meanAnomaly, double eccentricity )
         {
+            if( meanAnomaly == 0 )
+                return 0;
+
             const double maxError = 1e-10;
 
             // Initial guess
@@ -433,6 +460,9 @@ namespace HSP.Vanilla.Trajectories
 
         private static double CalculateTrueAnomalyFromEccentric( double eccentricAnomaly, double eccentricity )
         {
+            if( eccentricAnomaly == 0 )
+                return 0;
+
             if( eccentricity >= 1.0 )
             {
                 double coshE = Math.Sinh( eccentricAnomaly / 2.0 );

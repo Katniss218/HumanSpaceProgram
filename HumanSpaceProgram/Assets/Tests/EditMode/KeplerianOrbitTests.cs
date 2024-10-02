@@ -320,7 +320,6 @@ namespace HSP_Tests_EditMode
             TrajectoryBodyState state = sut.GetCurrentState();
             sut2.SetCurrentState( state );
 
-            // Assert SemiMajorAxis of large orbit with lower precision because the orbit itself is so big that we'll start losing precision anyway.
             Assert.That( sut2.SemiMajorAxis, Is.EqualTo( sut.SemiMajorAxis ).Within( 0.00000001 ) );
             Assert.That( sut2.Eccentricity, Is.EqualTo( sut.Eccentricity ).Within( 0.00000001 ) );
             Assert.That( sut2.Inclination, Is.EqualTo( sut.Inclination ).Within( 0.00000001 ) );
@@ -328,6 +327,42 @@ namespace HSP_Tests_EditMode
             Assert.That( sut2.ArgumentOfPeriapsis, Is.EqualTo( sut.ArgumentOfPeriapsis ).Within( 0.00000001 ) );
             Assert.That( sut2.MeanAnomaly, Is.EqualTo( sut.MeanAnomaly ).Within( 0.00000001 ) );
             Assert.That( sut2.TrueAnomaly, Is.EqualTo( sut.TrueAnomaly ).Within( 0.00000001 ) );
+        }
+
+        [Test]
+        public void RoundTrip___RadialVelOnly___IsCorrect()
+        {
+            FixedOrbit parent = new FixedOrbit( 0, Vector3Dbl.zero, QuaternionDbl.identity, 5.97e24 );
+            KeplerianOrbit sut = new KeplerianOrbit( 0, null, 0, 0, 0, 0, 0, 0, 1 );
+            sut.ParentBody = parent;
+            TrajectoryBodyState origState = new TrajectoryBodyState( new Vector3Dbl( -1000000, 0, 0 ), new Vector3Dbl( 100, 0, 0 ), Vector3Dbl.zero, 1 );
+            sut.SetCurrentState( origState );
+
+            // Act
+            TrajectoryBodyState state = sut.GetCurrentState();
+
+            Assert.That( state.AbsolutePosition, Is.EqualTo( origState.AbsolutePosition ).Using( vector3DblApproxComparer ) );
+            Assert.That( state.AbsoluteVelocity, Is.EqualTo( origState.AbsolutePosition ).Using( vector3DblApproxComparer ) );
+            Assert.That( state.AbsoluteAcceleration, Is.EqualTo( origState.AbsolutePosition ).Using( vector3DblApproxComparer ) );
+            Assert.That( state.Mass, Is.EqualTo( origState.Mass ) );
+        }
+
+        [Test]
+        public void RoundTrip___0Vel___IsCorrect()
+        {
+            FixedOrbit parent = new FixedOrbit( 0, Vector3Dbl.zero, QuaternionDbl.identity, 5.97e24 );
+            KeplerianOrbit sut = new KeplerianOrbit( 0, null, 0, 0, 0, 0, 0, 0, 1 );
+            sut.ParentBody = parent;
+            TrajectoryBodyState origState = new TrajectoryBodyState( new Vector3Dbl( -1000000, 0, 0 ), Vector3Dbl.zero, Vector3Dbl.zero, 1 );
+            sut.SetCurrentState( origState );
+
+            // Act
+            TrajectoryBodyState state = sut.GetCurrentState();
+
+            Assert.That( state.AbsolutePosition, Is.EqualTo( origState.AbsolutePosition ).Using( vector3DblApproxComparer ) );
+            Assert.That( state.AbsoluteVelocity, Is.EqualTo( origState.AbsolutePosition ).Using( vector3DblApproxComparer ) );
+            Assert.That( state.AbsoluteAcceleration, Is.EqualTo( origState.AbsolutePosition ).Using( vector3DblApproxComparer ) );
+            Assert.That( state.Mass, Is.EqualTo( origState.Mass ) );
         }
     }
 }

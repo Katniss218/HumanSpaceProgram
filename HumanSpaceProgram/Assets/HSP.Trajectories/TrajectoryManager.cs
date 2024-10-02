@@ -1,13 +1,11 @@
-﻿using HSP.ReferenceFrames;
-using HSP.Time;
-using HSP.Trajectories;
+﻿using HSP.Time;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.LowLevel;
 using UnityEngine.PlayerLoop;
 using UnityPlus;
 
-namespace Assets.HSP.Trajectories
+namespace HSP.Trajectories
 {
     public class TrajectoryManager : SingletonMonoBehaviour<TrajectoryManager>
     {
@@ -82,22 +80,35 @@ namespace Assets.HSP.Trajectories
 
         void OnEnable()
         {
-            PlayerLoopUtils.InsertSystemBefore<FixedUpdate>( in _playerLoopSystem, typeof( FixedUpdate.PhysicsFixedUpdate ) );
+            PlayerLoopUtils.InsertSystemBefore<FixedUpdate>( in _beforePlayerLoopSystem, typeof( FixedUpdate.PhysicsFixedUpdate ) );
+            PlayerLoopUtils.InsertSystemAfter<FixedUpdate>( in _afterPlayerLoopSystem, typeof( FixedUpdate.PhysicsFixedUpdate ) );
         }
 
         void OnDisable()
         {
-            PlayerLoopUtils.RemoveSystem<FixedUpdate>( in _playerLoopSystem );
+            PlayerLoopUtils.RemoveSystem<FixedUpdate>( in _beforePlayerLoopSystem );
+            PlayerLoopUtils.RemoveSystem<FixedUpdate>( in _afterPlayerLoopSystem );
         }
 
-        private static PlayerLoopSystem _playerLoopSystem = new PlayerLoopSystem()
+        private static PlayerLoopSystem _beforePlayerLoopSystem = new PlayerLoopSystem()
         {
             type = typeof( TrajectoryManager ),
-            updateDelegate = PlayerLoopFixedUpdate,
+            updateDelegate = BeforePhysicsProcessing,
             subSystemList = null
         };
 
-        private static void PlayerLoopFixedUpdate()
+        private static PlayerLoopSystem _afterPlayerLoopSystem = new PlayerLoopSystem()
+        {
+            type = typeof( TrajectoryManager ),
+            updateDelegate = AfterPhysicsProcessing,
+            subSystemList = null
+        };
+
+        public static int i = 0;
+
+        private Dictionary<ITrajectory, Vector3Dbl> _velocityCache = new();
+
+        private static void BeforePhysicsProcessing()
         {
             if( !instanceExists )
                 return;
@@ -111,7 +122,7 @@ namespace Assets.HSP.Trajectories
             {
                 TrajectoryBodyState stateVector = new TrajectoryBodyState(
                     trajectoryTransform.ReferenceFrameTransform.AbsolutePosition,
-                    trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity,
+                    trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity, // velocity before rigidbody forces from this frame are applied.
                     Vector3Dbl.zero,
                     trajectoryTransform.PhysicsTransform.Mass );
 
@@ -126,24 +137,42 @@ namespace Assets.HSP.Trajectories
             {
                 TrajectoryBodyState stateVector = trajectory.GetCurrentState();
 
-#warning why is angular velocity (and velocity) 0 in some fixedupdates though?!
+                if( trajectoryTransform.ReferenceFrameTransform.gameObject.name == "tempname_vessel" )
+                {
+                    Debug.Log( i + "  :  " + deltaTime + " : " + stateVector.AbsoluteVelocity );
+                }
 
-#warning TODO - adding set position changes the angular velocity (possibly because collisions or something?)
-                // doing MovePosition doesn't change anything.
+                // 160 frames with velocity, so it's even weirder.
+                // 210 with resetting position
+                // 210 with gravity applier (previous)
 
-                // is the vertical velocity correct?
 
-                trajectoryTransform.ReferenceFrameTransform.AbsolutePosition = stateVector.AbsolutePosition;
+                // subtracting velocity kind of works as a correction, but can fuck with collision, because we *are* moving the object around.
+                // setting Rigidbody velocity directly resets queued forces
+
+                instance._velocityCache[trajectory] = stateVector.AbsolutePosition;
+                //trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = (stateVector.AbsolutePosition - trajectoryTransform.ReferenceFrameTransform.AbsolutePosition) / TimeManager.FixedDeltaTime;
+                //trajectoryTransform.ReferenceFrameTransform.AbsolutePosition = stateVector.AbsolutePosition - (stateVector.AbsoluteVelocity * TimeManager.FixedDeltaTime);
                 trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = stateVector.AbsoluteVelocity;
-                // Summing up the subframe accelerations and applying them as a force to the RB is possible, but requires knowing the accurate mass of the object.
-
-#warning TODO why is the difference in position divided by time taken not even roughly equal final velocity though? And why does it fluctuate over time
-                // find out what the velocity should be (from an external formula)
-
-                // Check how long it takes to cross the top of the tower in both cases
-
-                // write tests that test the newtonian and keplerian trajectories.
             }
+        }
+
+        private static void AfterPhysicsProcessing()
+        {
+            foreach( var (trajectory, trajectoryTransform) in instance._trajectoryMap )
+            {
+                if( trajectoryTransform.ReferenceFrameTransform.gameObject.name == "tempname_vessel" )
+                {
+                    Debug.Log( i + "  :  " + (trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity) );
+                }
+                if( trajectoryTransform.IsSynchronized() )
+                {
+#warning TODO - velocity is being accumulated twice after the tanks detach, for some reason.
+                     trajectoryTransform.ReferenceFrameTransform.AbsolutePosition = instance._velocityCache[trajectory];
+                }
+            }
+
+            i++;
         }
     }
 }

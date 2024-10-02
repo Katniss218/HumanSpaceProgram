@@ -1,4 +1,5 @@
-﻿using HSP.ControlSystems;
+﻿using HSP.Trajectories;
+using HSP.ControlSystems;
 using HSP.ControlSystems.Controls;
 using HSP.ResourceFlow;
 using HSP.Vessels;
@@ -43,6 +44,7 @@ namespace HSP.Vanilla.Components
         private void SetThrottleListener( float value )
         {
             this.Throttle = value;
+            TrajectoryManager.i = 0;
         }
 
         /// <summary>
