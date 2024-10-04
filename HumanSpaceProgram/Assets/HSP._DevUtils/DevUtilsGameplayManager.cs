@@ -99,10 +99,10 @@ namespace HSP._DevUtils
             ActiveVesselManager.ActiveObject = launchSite.RootPart.GetVessel().gameObject.transform;
             SceneReferenceFrameManager.TargetObject = launchSite.RootPart.GetVessel().ReferenceFrameTransform;
 
-           // Vector3Dbl velocity = new Vector3Dbl( 32, 0, 0 );
-           // body.ReferenceFrameTransform.AbsoluteVelocity = velocity;
+            // Vector3Dbl velocity = new Vector3Dbl( 32, 0, 0 );
+            // body.ReferenceFrameTransform.AbsoluteVelocity = velocity;
 #warning TODO - velocity propagation for objects near planets.
-           // vessel.ReferenceFrameTransform.AbsoluteVelocity = velocity;
+            // vessel.ReferenceFrameTransform.AbsoluteVelocity = velocity;
         }
 
         private static Vessel CreateVessel( Vessel launchSite )
@@ -310,8 +310,10 @@ namespace HSP._DevUtils
             Transform capsule = InstantiateLocal( capsulePrefab, tankL1, new Vector3( 0, 2.625f, 0 ), Quaternion.identity ).transform;
             Transform t1 = InstantiateLocal( tankLongPrefab, root, new Vector3( 20, 2.625f, 0 ), Quaternion.identity ).transform;
             Transform t2 = InstantiateLocal( tankLongPrefab, root, new Vector3( -20, 2.625f, 0 ), Quaternion.identity ).transform;
-            Transform engineP1 = InstantiateLocal( enginePrefab, tankP, new Vector3( 2, -3.45533f, 0 ), Quaternion.identity ).transform;
-            Transform engineP2 = InstantiateLocal( enginePrefab, tankP, new Vector3( -2, -3.45533f, 0 ), Quaternion.identity ).transform;
+            // Transform engineP1 = InstantiateLocal( enginePrefab, tankP, new Vector3( 2, -3.45533f, 0 ), Quaternion.identity ).transform;
+            // Transform engineP2 = InstantiateLocal( enginePrefab, tankP, new Vector3( -2, -3.45533f, 0 ), Quaternion.identity ).transform;
+            Transform engineP1 = InstantiateLocal( enginePrefab, tankP, new Vector3( 0, -3.45533f, 0 ), Quaternion.identity ).transform;
+            Transform engineP2 = InstantiateLocal( enginePrefab, tankP, new Vector3( 0, 0, 0 ), Quaternion.identity ).transform;
             v.RootPart = root;
 
             FBulkConnection conn = tankP.gameObject.AddComponent<FBulkConnection>();

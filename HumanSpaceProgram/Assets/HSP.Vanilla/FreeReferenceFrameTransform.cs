@@ -254,7 +254,7 @@ namespace HSP.Vanilla
             if( IsCacheValid() )
                 return;
 
-            RecalculateCache( SceneReferenceFrameManager.ReferenceFrame );
+            RecalculateCache( SceneReferenceFrameManager.GetReferenceFrame() );
             MakeCacheValid();
         }
 
@@ -271,8 +271,9 @@ namespace HSP.Vanilla
 
         // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)
         // Vector3's `==` operator does approximate comparison.
-        protected virtual bool IsCacheValid() => (_rb.position.x == _oldPosition.x && _rb.position.y == _oldPosition.y && _rb.position.z == _oldPosition.z
-            && SceneReferenceFrameManager.ReferenceFrame.Equals( _cachedSceneReferenceFrame ));
+#warning TODO - something here is busted
+        protected virtual bool IsCacheValid() => (_rb.position.x == _oldPosition.x && _rb.position.y == _oldPosition.y && _rb.position.z == _oldPosition.z)
+            && SceneReferenceFrameManager.GetReferenceFrame().EqualsIgnoreUT( _cachedSceneReferenceFrame );
 
         protected virtual void MakeCacheValid() => _oldPosition = _rb.position;
 
@@ -335,6 +336,7 @@ namespace HSP.Vanilla
 
             this._oldVelocity = Velocity;
             this._oldAngularVelocity = AngularVelocity;
+#warning TODO - these should be cleared at the start of a fixedupdate frame, not here inside behaviourfixedupdate.
             this._absoluteAccelerationSum = Vector3.zero;
             this._absoluteAngularAccelerationSum = Vector3.zero;
         }

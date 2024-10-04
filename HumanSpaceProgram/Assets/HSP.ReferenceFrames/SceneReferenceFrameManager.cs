@@ -42,6 +42,7 @@ namespace HSP.ReferenceFrames
         /// <summary>
         /// The reference frame that describes how to convert between Absolute Inertial Reference Frame and the scene's world space.
         /// </summary>
+        [Obsolete( "use GetReferenceFrame() instead." )]
         public static IReferenceFrame ReferenceFrame
         {
 #warning TODO - remove this getter - accessors should not return a modified reference frame. Use GetReferenceFrame.
@@ -159,6 +160,7 @@ namespace HSP.ReferenceFrames
                 // - non-inertial frames (include acceleration).
                 // - switch the position to ahead of where the object is accelerating instead of the center of the object.
                 RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT, TargetObject.AbsolutePosition, TargetObject.AbsoluteVelocity ) );
+                //RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT, TargetObject.AbsolutePosition, Vector3Dbl.zero ) );
             }
         }
 
@@ -182,7 +184,7 @@ namespace HSP.ReferenceFrames
 
         void OnEnable()
         {
-            PlayerLoopUtils.InsertSystemAfter<FixedUpdate>( in _playerLoopSystem, typeof( FixedUpdate.PhysicsFixedUpdate ) );
+            PlayerLoopUtils.InsertSystemAfter<FixedUpdate>( in _playerLoopSystem, typeof( FixedUpdate.Physics2DFixedUpdate ) );
         }
 
         void OnDisable()

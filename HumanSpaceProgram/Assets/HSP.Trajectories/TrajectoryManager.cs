@@ -81,7 +81,7 @@ namespace HSP.Trajectories
         void OnEnable()
         {
             PlayerLoopUtils.InsertSystemBefore<FixedUpdate>( in _beforePlayerLoopSystem, typeof( FixedUpdate.PhysicsFixedUpdate ) );
-            PlayerLoopUtils.InsertSystemAfter<FixedUpdate>( in _afterPlayerLoopSystem, typeof( FixedUpdate.PhysicsFixedUpdate ) );
+            PlayerLoopUtils.InsertSystemAfter<FixedUpdate>( in _afterPlayerLoopSystem, typeof( FixedUpdate.Physics2DFixedUpdate ) );
         }
 
         void OnDisable()
@@ -106,17 +106,12 @@ namespace HSP.Trajectories
 
         public static int i = 0;
 
-        private Dictionary<ITrajectory, Vector3Dbl> _velocityCache = new();
+        private Dictionary<ITrajectory, (Vector3Dbl pos, Vector3Dbl vel)> _posAndVelCache = new();
 
         private static void BeforePhysicsProcessing()
         {
             if( !instanceExists )
                 return;
-
-            // simulation scheme is as follows:
-            // Before physics engine is run - take the position and velocity, run the sim, and apply the result back.
-
-            // This simulation code DOESN'T have to be in any specific point during the frame I think.
 
             foreach( var (trajectory, trajectoryTransform) in instance._trajectoryMap )
             {
@@ -137,23 +132,25 @@ namespace HSP.Trajectories
             {
                 TrajectoryBodyState stateVector = trajectory.GetCurrentState();
 
-                if( trajectoryTransform.ReferenceFrameTransform.gameObject.name == "tempname_vessel" )
+                instance._posAndVelCache[trajectory] = (stateVector.AbsolutePosition, stateVector.AbsoluteVelocity);
+
+                if( trajectoryTransform.IsSynchronized() )
                 {
-                    Debug.Log( i + "  :  " + deltaTime + " : " + stateVector.AbsoluteVelocity );
+                    if( trajectoryTransform.gameObject.name == "tempname_vessel" )
+                    {
+                        // To reach the top of the tower:
+                        // 160 frames with velocity, so it's even weirder.
+                        // 210 frames with resetting position
+                        // 210 frames with gravity applier (previous method)
+                        Debug.Log( i + " BEFORE: " + trajectoryTransform.ReferenceFrameTransform.AbsolutePosition.magnitude );
+                    }
+
+                    trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = (stateVector.AbsolutePosition - trajectoryTransform.ReferenceFrameTransform.AbsolutePosition) / TimeManager.FixedDeltaTime;
                 }
-
-                // 160 frames with velocity, so it's even weirder.
-                // 210 with resetting position
-                // 210 with gravity applier (previous)
-
-
-                // subtracting velocity kind of works as a correction, but can fuck with collision, because we *are* moving the object around.
-                // setting Rigidbody velocity directly resets queued forces
-
-                instance._velocityCache[trajectory] = stateVector.AbsolutePosition;
-                //trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = (stateVector.AbsolutePosition - trajectoryTransform.ReferenceFrameTransform.AbsolutePosition) / TimeManager.FixedDeltaTime;
-                //trajectoryTransform.ReferenceFrameTransform.AbsolutePosition = stateVector.AbsolutePosition - (stateVector.AbsoluteVelocity * TimeManager.FixedDeltaTime);
-                trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = stateVector.AbsoluteVelocity;
+                else 
+                {
+                    trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = stateVector.AbsoluteVelocity;
+                }
             }
         }
 
@@ -161,14 +158,23 @@ namespace HSP.Trajectories
         {
             foreach( var (trajectory, trajectoryTransform) in instance._trajectoryMap )
             {
-                if( trajectoryTransform.ReferenceFrameTransform.gameObject.name == "tempname_vessel" )
-                {
-                    Debug.Log( i + "  :  " + (trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity) );
-                }
+                // If it is STILL synchronized after physicsprocessing
                 if( trajectoryTransform.IsSynchronized() )
                 {
-#warning TODO - velocity is being accumulated twice after the tanks detach, for some reason.
-                     trajectoryTransform.ReferenceFrameTransform.AbsolutePosition = instance._velocityCache[trajectory];
+                    if( trajectoryTransform.gameObject.name == "tempname_vessel" )
+                    {
+                        // this doesn't seem to match regardless of whether it's integrated or not. weird.
+                        Debug.Log( i + " AFTER: " + trajectoryTransform.ReferenceFrameTransform.AbsolutePosition.magnitude );
+                    }
+#warning TODO - adding this 'reset' of position doubles the position integration rate (only of objects that are synchronized because of the if statement above)... wtf
+#warning TODO - absoluteposition from here changes before physicsprocessing on the next frame. but only if the scene reference frame is not stationary
+                    // something with how the moving frame is handled causes the position to be bad.
+
+#warning TODO - maybe related - position still jumps when there are multiple fixedupdate frames within a frame
+                    // this is highly tied to the free reference transform cache invalidation.
+
+                    trajectoryTransform.ReferenceFrameTransform.AbsolutePosition = instance._posAndVelCache[trajectory].pos; // This is not needed, although omitting it introduces floating point errors.
+                    trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = instance._posAndVelCache[trajectory].vel;
                 }
             }
 

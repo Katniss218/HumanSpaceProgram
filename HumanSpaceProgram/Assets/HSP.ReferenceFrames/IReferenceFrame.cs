@@ -99,6 +99,11 @@ namespace HSP.ReferenceFrames
         /// </summary>
         Vector3Dbl InverseTransformAngularAcceleration( Vector3Dbl absoluteAngularAcceleration );
 
+        /// <summary>
+        /// Brings the other reference frame to this frame's UT, and then checks for equality. Useful for inertial and non-inertial (moving) reference frames.
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
         bool EqualsIgnoreUT( IReferenceFrame other );
     }
 }

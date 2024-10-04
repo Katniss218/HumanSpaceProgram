@@ -70,6 +70,7 @@ namespace HSP.Trajectories
         /// <summary>
         /// Checks if the object has more up-to-date (more correct) information than the trajectory.
         /// </summary>
+        /// <returns>True if the trajectory is up-to-date, false if something happened to the object and the trajectory needs to be synced up again.</returns>
         public bool IsSynchronized()
         {
             bool value = _lastSynchronizedTransform == this.ReferenceFrameTransform // Because we use an event to check the manual reset of values, it would be possible for you to
