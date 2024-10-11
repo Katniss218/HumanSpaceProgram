@@ -335,7 +335,7 @@ namespace HSP.Vanilla
 
         // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)
         // Vector3's `==` operator does approximate comparison.
-        private bool IsCacheValid() => SceneReferenceFrameManager.GetReferenceFrame().EqualsIgnoreUT( _cachedSceneReferenceFrame )
+        private bool IsCacheValid() => SceneReferenceFrameManager.ReferenceFrame.EqualsIgnoreUT( _cachedSceneReferenceFrame )
             && _referenceBody.OrientedInertialReferenceFrame.EqualsIgnoreUT( _cachedBodyReferenceFrame );
 
         //private void MakeCacheValid() => ;

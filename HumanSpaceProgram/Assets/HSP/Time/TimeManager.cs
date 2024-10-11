@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using UnityEngine.LowLevel;
+using UnityEngine.PlayerLoop;
+using UnityPlus;
 using UnityPlus.Serialization;
 
 namespace HSP.Time
@@ -173,12 +176,32 @@ namespace HSP.Time
             SetTimeScale( 1 );
         }
 
-        void FixedUpdate()
+
+        void OnEnable()
         {
-            // also, UT should increase at the beginning of the fixedupdate.
+            PlayerLoopUtils.InsertSystemAfter<FixedUpdate>( in _playerLoopSystem, typeof( FixedUpdate.PhysicsFixedUpdate ) );
+        }
+
+        void OnDisable()
+        {
+            PlayerLoopUtils.RemoveSystem<FixedUpdate>( in _playerLoopSystem );
+        }
+
+        private static PlayerLoopSystem _playerLoopSystem = new PlayerLoopSystem()
+        {
+            type = typeof( TimeManager ),
+            updateDelegate = PlayerLoopImmediatelyAtTheStartOfFixedUpdate,
+            subSystemList = null
+        };
+
+        private static void PlayerLoopImmediatelyAtTheStartOfFixedUpdate()
+        {
+            if( !instanceExists )
+                return;
 
             UT += FixedDeltaTime;
         }
+
 
         [MapsInheritingFrom( typeof( TimeManager ) )]
         public static SerializationMapping TimeStepManagerMapping()

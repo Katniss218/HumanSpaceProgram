@@ -62,6 +62,7 @@
     <Compile Include="Assets\Tests\EditMode\NewtonianOrbitTests.cs" />
     <Compile Include="Assets\Tests\EditMode\NUnit\ApproxEqual.cs" />
     <Compile Include="Assets\Tests\EditMode\KeplerianOrbitTests.cs" />
+    <Compile Include="Assets\Tests\EditMode\ReferenceFrameTests.cs" />
     <Compile Include="Assets\Tests\EditMode\Core\Substances\SubstanceStateCollectionTests.cs" />
   </ItemGroup>
   <ItemGroup>

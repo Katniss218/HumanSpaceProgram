@@ -4,12 +4,15 @@
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "_UnityPlus.UILib",
+        "_UnityEngine",
+        "_UnityPlus",
         "_UnityPlus.Serialization",
+        "_UnityPlus.UILib",
         "HSP",
-        "HSP.Core",
-        "HSP.DevUtils",
-        "HSP.UI"
+        "HSP.ReferenceFrames",
+        "HSP.Trajectories",
+        "HSP.UI",
+        "HSP.Vanilla"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

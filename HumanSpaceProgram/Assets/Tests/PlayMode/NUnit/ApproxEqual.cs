@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace HSP_Tests_EditMode.NUnit
+namespace HSP_Tests_PlayMode.NUnit
 {
     public class Vector3ApproximateComparer : IEqualityComparer<Vector3>
     {
@@ -25,7 +25,7 @@ namespace HSP_Tests_EditMode.NUnit
             return 0;
         }
     }
-
+    
     public class Vector3DblApproximateComparer : IEqualityComparer<Vector3Dbl>
     {
         double tolerance = 0;

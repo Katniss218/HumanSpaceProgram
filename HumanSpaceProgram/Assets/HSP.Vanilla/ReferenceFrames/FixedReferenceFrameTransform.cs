@@ -227,8 +227,8 @@ namespace HSP.Vanilla
             if( IsCacheValid() )
                 return;
 
-            MoveScenePositionAndRotation( SceneReferenceFrameManager.GetReferenceFrame() );
-            RecalculateCache( SceneReferenceFrameManager.GetReferenceFrame() );
+            MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame );
+            RecalculateCache( SceneReferenceFrameManager.ReferenceFrame );
             MakeCacheValid();
         }
 
@@ -244,7 +244,7 @@ namespace HSP.Vanilla
         // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)
         // Vector3's `==` operator does approximate comparison.
         private bool IsCacheValid() => (_rb.position.x == _oldPosition.x && _rb.position.y == _oldPosition.y && _rb.position.z == _oldPosition.z)
-            && SceneReferenceFrameManager.GetReferenceFrame().EqualsIgnoreUT( _cachedSceneReferenceFrame );
+            && SceneReferenceFrameManager.ReferenceFrame.EqualsIgnoreUT( _cachedSceneReferenceFrame );
 
         private void MakeCacheValid() => _oldPosition = _rb.position;
 

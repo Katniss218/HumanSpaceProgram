@@ -250,8 +250,8 @@ namespace HSP.Vanilla
             if( IsCacheValid() )
                 return;
 
-            MoveScenePositionAndRotation( SceneReferenceFrameManager.GetReferenceFrame(), true );
-            RecalculateCache( SceneReferenceFrameManager.GetReferenceFrame() );
+            MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame, true );
+            RecalculateCache( SceneReferenceFrameManager.ReferenceFrame );
             MakeCacheValid();
         }
 
@@ -266,7 +266,7 @@ namespace HSP.Vanilla
         // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)
         // Vector3's `==` operator does approximate comparison.
         protected virtual bool IsCacheValid() => (_absolutePosition.x == _oldAbsolutePosition.x && _absolutePosition.y == _oldAbsolutePosition.y && _absolutePosition.z == _oldAbsolutePosition.z)
-            && SceneReferenceFrameManager.GetReferenceFrame().EqualsIgnoreUT( _cachedSceneReferenceFrame );
+            && SceneReferenceFrameManager.ReferenceFrame.EqualsIgnoreUT( _cachedSceneReferenceFrame );
 
         protected virtual void MakeCacheValid() => _oldAbsolutePosition = _absolutePosition;
 
@@ -310,6 +310,7 @@ namespace HSP.Vanilla
 
         public virtual void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
+#warning TODO - kinematic also doesn't work
             ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, _absolutePosition );
             ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, _absoluteRotation );
             IReferenceFrame sceneReferenceFrame = SceneReferenceFrameManager.ReferenceFrame;

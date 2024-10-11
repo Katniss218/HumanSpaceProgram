@@ -40,9 +40,8 @@ namespace HSP.ReferenceFrames
 
         private IReferenceFrame _referenceFrame;
         /// <summary>
-        /// The reference frame that describes how to convert between Absolute Inertial Reference Frame and the scene's world space.
+        /// The current reference frame that describes how to convert between Absolute Inertial Reference Frame and the scene's world space.
         /// </summary>
-        [Obsolete( "use GetReferenceFrame() instead." )]
         public static IReferenceFrame ReferenceFrame
         {
 #warning TODO - remove this getter - accessors should not return a modified reference frame. Use GetReferenceFrame.
@@ -53,7 +52,7 @@ namespace HSP.ReferenceFrames
 
         private double cachedUT;
 
-        public static IReferenceFrame GetReferenceFrame()
+        private static IReferenceFrame GetReferenceFrame()
         {
             if( instance.cachedUT != TimeManager.UT )
             {
@@ -103,8 +102,7 @@ namespace HSP.ReferenceFrames
         {
             foreach( var obj in UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects() )
             {
-                IReferenceFrameSwitchResponder referenceFrameSwitch = obj.GetComponent<IReferenceFrameSwitchResponder>();
-                if( referenceFrameSwitch != null )
+                if( obj.TryGetComponent<IReferenceFrameSwitchResponder>( out var referenceFrameSwitch ) )
                 {
                     referenceFrameSwitch.OnSceneReferenceFrameSwitch( data );
                 }
@@ -159,8 +157,9 @@ namespace HSP.ReferenceFrames
                 // Future available optimizations:
                 // - non-inertial frames (include acceleration).
                 // - switch the position to ahead of where the object is accelerating instead of the center of the object.
+                //RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT, TargetObject.AbsolutePosition, new Vector3Dbl( -26.59, 92.30, 168.38 ) ) );
                 RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT, TargetObject.AbsolutePosition, TargetObject.AbsoluteVelocity ) );
-                //RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT, TargetObject.AbsolutePosition, Vector3Dbl.zero ) );
+                // RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT, TargetObject.AbsolutePosition, Vector3Dbl.zero ) );
             }
         }
 
@@ -173,7 +172,7 @@ namespace HSP.ReferenceFrames
 
         void Awake()
         {
-            ReferenceFrame = new CenteredReferenceFrame( TimeManager.UT, Vector3Dbl.zero );
+            instance._referenceFrame = new CenteredReferenceFrame( TimeManager.UT, Vector3Dbl.zero );
         }
 
         void FixedUpdate()
@@ -184,7 +183,7 @@ namespace HSP.ReferenceFrames
 
         void OnEnable()
         {
-            PlayerLoopUtils.InsertSystemAfter<FixedUpdate>( in _playerLoopSystem, typeof( FixedUpdate.Physics2DFixedUpdate ) );
+            PlayerLoopUtils.InsertSystemAfter<FixedUpdate>( in _playerLoopSystem, typeof( FixedUpdate.PhysicsFixedUpdate ) );
         }
 
         void OnDisable()

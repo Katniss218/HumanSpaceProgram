@@ -125,7 +125,7 @@ namespace HSP.Trajectories
             }
 
             double time = instance._simulator.EndUT;
-            instance._simulator.Simulate( TimeManager.UT );
+            instance._simulator.Simulate( TimeManager.UT + TimeManager.FixedDeltaTime ); // since UT hasn't updated yet
             double deltaTime = instance._simulator.EndUT - time;
 
             foreach( var (trajectory, trajectoryTransform) in instance._trajectoryMap )
@@ -142,7 +142,7 @@ namespace HSP.Trajectories
                         // 160 frames with velocity, so it's even weirder.
                         // 210 frames with resetting position
                         // 210 frames with gravity applier (previous method)
-                        Debug.Log( i + " BEFORE: " + trajectoryTransform.ReferenceFrameTransform.AbsolutePosition.magnitude );
+                       // Debug.Log( i + " BEFORE : " + TimeManager.UT + " : " + trajectoryTransform.ReferenceFrameTransform.AbsolutePosition.magnitude );
                     }
 
                     trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = (stateVector.AbsolutePosition - trajectoryTransform.ReferenceFrameTransform.AbsolutePosition) / TimeManager.FixedDeltaTime;
@@ -164,14 +164,14 @@ namespace HSP.Trajectories
                     if( trajectoryTransform.gameObject.name == "tempname_vessel" )
                     {
                         // this doesn't seem to match regardless of whether it's integrated or not. weird.
-                        Debug.Log( i + " AFTER: " + trajectoryTransform.ReferenceFrameTransform.AbsolutePosition.magnitude );
+                        //Debug.Log( i + " AFTER : " + TimeManager.UT + " : " + trajectoryTransform.ReferenceFrameTransform.AbsolutePosition.magnitude + " : " + instance._posAndVelCache[trajectory].pos.magnitude );
                     }
-#warning TODO - adding this 'reset' of position doubles the position integration rate (only of objects that are synchronized because of the if statement above)... wtf
-#warning TODO - absoluteposition from here changes before physicsprocessing on the next frame. but only if the scene reference frame is not stationary
-                    // something with how the moving frame is handled causes the position to be bad.
 
-#warning TODO - maybe related - position still jumps when there are multiple fixedupdate frames within a frame
-                    // this is highly tied to the free reference transform cache invalidation.
+
+#warning TODO - absoluteposition here is wrong frame after spawning
+                    // something with how absoluteposition is calculated still seems wrong.
+
+
 
                     trajectoryTransform.ReferenceFrameTransform.AbsolutePosition = instance._posAndVelCache[trajectory].pos; // This is not needed, although omitting it introduces floating point errors.
                     trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = instance._posAndVelCache[trajectory].vel;

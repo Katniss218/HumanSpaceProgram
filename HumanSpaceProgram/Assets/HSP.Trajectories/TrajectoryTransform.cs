@@ -65,7 +65,6 @@ namespace HSP.Trajectories
 
         private bool _forceResyncWithTrajectory = false;
         private IReferenceFrameTransform _lastSynchronizedTransform;
-        private Vector3Dbl _oldAbsoluteVelocity;
 
         /// <summary>
         /// Checks if the object has more up-to-date (more correct) information than the trajectory.
