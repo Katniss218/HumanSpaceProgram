@@ -364,12 +364,16 @@ namespace HSP.Vanilla
 
         public virtual void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
-#warning TODO - something with position is not applied right if the frame is moving. Subtracting `TimeManager.FixedDeltaTime` somehow fixes that.
-            Debug.Log( TimeManager.UT + " : " + data.OldFrame.ReferenceUT + " : " + _rb.position + " : " + _rb.velocity );
-            var frame = data.OldFrame.AtUT( TimeManager.UT - TimeManager.FixedDeltaTime );
+#warning TODO - Position and absolutePosition are desynchronized.
+
+            // maybe update UT immediately at the start, but update the current frame to reflect that UT later?
+            // something like GetUpToDateFrame(), or AtCurrentUT()
+            var ut = TimeManager.UT;
+
+            var frame = data.OldFrame;
             RecalculateCache( frame );
             _cachedSceneReferenceFrame = frame;
-            ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, _cachedAbsolutePosition );
+            ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, _cachedAbsolutePosition, data.NewFrame );
             ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, _cachedAbsoluteRotation );
             ReferenceFrameTransformUtils.SetSceneVelocityFromAbsolute( _rb, _cachedAbsoluteVelocity );
             ReferenceFrameTransformUtils.SetSceneAngularVelocityFromAbsolute( _rb, _cachedAbsoluteAngularVelocity );

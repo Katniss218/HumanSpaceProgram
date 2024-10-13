@@ -19,7 +19,7 @@ namespace HSP_Tests_PlayMode
             if( sut == null )
                 return;
 
-            Debug.Log( TimeManager.UT + " - " + sut.Position );
+            Debug.Log( TimeManager.UT + " - " + sut.Position + " : " + sut.AbsolutePosition );
         }
     }
 }

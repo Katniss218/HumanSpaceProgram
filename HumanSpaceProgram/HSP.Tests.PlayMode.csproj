@@ -59,10 +59,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Tests\PlayMode\P_Template.cs" />
-    <Compile Include="Assets\Tests\PlayMode\FreeReferenceFrameTransformTests.cs" />
-    <Compile Include="Assets\Tests\PlayMode\TestRbForces.cs" />
-    <Compile Include="Assets\Tests\PlayMode\AssertMonoBehaviour.cs" />
     <Compile Include="Assets\Tests\PlayMode\NUnit\ApproxEqual.cs" />
+    <Compile Include="Assets\Tests\PlayMode\ReferenceFrameTransformTests.cs" />
+    <Compile Include="Assets\Tests\PlayMode\AssertMonoBehaviour.cs" />
+    <Compile Include="Assets\Tests\PlayMode\TestRbForces.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Tests\PlayMode\Tests.PlayMode.asmdef" />

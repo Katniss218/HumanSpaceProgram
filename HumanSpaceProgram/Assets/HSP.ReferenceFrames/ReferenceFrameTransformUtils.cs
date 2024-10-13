@@ -14,7 +14,17 @@ namespace HSP.ReferenceFrames
             // THIS IS CRITICALLY IMPORTANT. Rigidbodies keep their own position/rotation.
             if( rigidbody != null )
                 rigidbody.position = scenePos;
+        }
 
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static void SetScenePositionFromAbsolute( Transform transform, Rigidbody rigidbody, Vector3Dbl absolutePosition, IReferenceFrame frame )
+        {
+            Vector3 scenePos = (Vector3)frame.InverseTransformPosition( absolutePosition );
+            transform.position = scenePos; // Setting the transform is still important for some cases.
+
+            // THIS IS CRITICALLY IMPORTANT. Rigidbodies keep their own position/rotation.
+            if( rigidbody != null )
+                rigidbody.position = scenePos;
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]

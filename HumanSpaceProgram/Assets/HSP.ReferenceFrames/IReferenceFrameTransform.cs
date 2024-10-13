@@ -87,7 +87,7 @@ namespace HSP.ReferenceFrames
         /// Callback to the reference frame switch event.
         /// </summary>
         /// <remarks>
-        /// NOTE TO IMPLEMENTERS: This method should be idempotent.
+        /// This method will be called AFTER 'PhysicsProcessing', but still in the same fixedupdate as it.
         /// </remarks>
         void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data );
     }

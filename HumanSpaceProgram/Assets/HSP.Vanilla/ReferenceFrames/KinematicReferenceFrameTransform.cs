@@ -291,18 +291,20 @@ namespace HSP.Vanilla
 
         protected virtual void FixedUpdate()
         {
+            var sceneFrame = SceneReferenceFrameManager.ReferenceFrame.AtUT( TimeManager.UT );
+
             QuaternionDbl deltaRotation = QuaternionDbl.Euler( _absoluteAngularVelocity * TimeManager.FixedDeltaTime * 57.2957795131 );
             _absolutePosition = _absolutePosition + _absoluteVelocity * TimeManager.FixedDeltaTime;
             _absoluteRotation = deltaRotation * _absoluteRotation;
-            MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame, true );
+            MoveScenePositionAndRotation( sceneFrame, true );
 
             // Otherwise, we use our more precise method that relies on full encapsulation of the rigidbody.
             // Acceleration sum will be whatever was accumulated between the previous frame (after it was zeroed out) and this frame. I think it should work fine.
             _cachedAbsoluteAcceleration = _absoluteAccelerationSum;
             _cachedAbsoluteAngularAcceleration = _absoluteAngularAccelerationSum;
 
-            _cachedAcceleration = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformAcceleration( _cachedAbsoluteAcceleration );
-            _cachedAngularAcceleration = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformAngularAcceleration( _cachedAbsoluteAngularAcceleration );
+            _cachedAcceleration = (Vector3)sceneFrame.InverseTransformAcceleration( _cachedAbsoluteAcceleration );
+            _cachedAngularAcceleration = (Vector3)sceneFrame.InverseTransformAngularAcceleration( _cachedAbsoluteAngularAcceleration );
 
             this._absoluteAccelerationSum = Vector3.zero;
             this._absoluteAngularAccelerationSum = Vector3.zero;
@@ -310,9 +312,10 @@ namespace HSP.Vanilla
 
         public virtual void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
-#warning TODO - kinematic also doesn't work
+#warning TODO - let the ReferenceFrameTransformUtils.SetScenePositionFromAbsolute use a custom frame. It's equal, but it would be better to use the event data.
             ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, _absolutePosition );
             ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, _absoluteRotation );
+
             IReferenceFrame sceneReferenceFrame = SceneReferenceFrameManager.ReferenceFrame;
             var pos = (Vector3)sceneReferenceFrame.InverseTransformPosition( _absolutePosition );
             var rot = (Quaternion)sceneReferenceFrame.InverseTransformRotation( _absoluteRotation );

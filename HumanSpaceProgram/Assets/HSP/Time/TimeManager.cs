@@ -179,7 +179,7 @@ namespace HSP.Time
 
         void OnEnable()
         {
-            PlayerLoopUtils.InsertSystemAfter<FixedUpdate>( in _playerLoopSystem, typeof( FixedUpdate.PhysicsFixedUpdate ) );
+            PlayerLoopUtils.InsertSystemAfter<FixedUpdate>( in _playerLoopSystem, typeof( FixedUpdate.ClearLines ) );
         }
 
         void OnDisable()

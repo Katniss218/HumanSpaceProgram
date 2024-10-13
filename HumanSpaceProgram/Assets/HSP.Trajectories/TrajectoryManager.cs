@@ -167,12 +167,6 @@ namespace HSP.Trajectories
                         //Debug.Log( i + " AFTER : " + TimeManager.UT + " : " + trajectoryTransform.ReferenceFrameTransform.AbsolutePosition.magnitude + " : " + instance._posAndVelCache[trajectory].pos.magnitude );
                     }
 
-
-#warning TODO - absoluteposition here is wrong frame after spawning
-                    // something with how absoluteposition is calculated still seems wrong.
-
-
-
                     trajectoryTransform.ReferenceFrameTransform.AbsolutePosition = instance._posAndVelCache[trajectory].pos; // This is not needed, although omitting it introduces floating point errors.
                     trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = instance._posAndVelCache[trajectory].vel;
                 }
