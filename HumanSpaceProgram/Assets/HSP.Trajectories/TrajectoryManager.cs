@@ -125,7 +125,7 @@ namespace HSP.Trajectories
             }
 
             double time = instance._simulator.EndUT;
-            instance._simulator.Simulate( TimeManager.UT + TimeManager.FixedDeltaTime ); // since UT hasn't updated yet
+            instance._simulator.Simulate( TimeManager.UT );
             double deltaTime = instance._simulator.EndUT - time;
 
             foreach( var (trajectory, trajectoryTransform) in instance._trajectoryMap )
@@ -152,7 +152,8 @@ namespace HSP.Trajectories
                 // If it is STILL synchronized after physicsprocessing
                 if( trajectoryTransform.IsSynchronized() )
                 {
-                    trajectoryTransform.ReferenceFrameTransform.AbsolutePosition = instance._posAndVelCache[trajectory].pos; // This is not needed, although omitting it introduces floating point errors.
+#warning TODO - When the planet is moving, something causes double accumulation
+                    trajectoryTransform.ReferenceFrameTransform.AbsolutePosition = instance._posAndVelCache[trajectory].pos; // Experimental testing seems to indicate that this is indeed unnecessary.
                     trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = instance._posAndVelCache[trajectory].vel;
                 }
             }

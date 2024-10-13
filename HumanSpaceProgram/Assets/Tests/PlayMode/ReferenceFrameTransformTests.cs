@@ -124,6 +124,67 @@ namespace HSP_Tests_PlayMode
         }
 
         [UnityTest]
+        public IEnumerator Velocity_In_MovingFrame_Free()
+        {
+            yield return Velocity_In_MovingFrame_T<FreeReferenceFrameTransform>();
+        }
+
+        [UnityTest]
+        public IEnumerator Velocity_In_MovingFrame_Kinematic()
+        {
+            yield return Velocity_In_MovingFrame_T<KinematicReferenceFrameTransform>();
+        }
+
+        public IEnumerator Velocity_In_MovingFrame_T<T>() where T : Component, IReferenceFrameTransform
+        {
+            // Arrange
+            GameObject manager = new GameObject();
+            manager.AddComponent<TimeManager>();
+            manager.AddComponent<SceneReferenceFrameManager>();
+            AssertMonoBehaviour assertHandler = manager.AddComponent<AssertMonoBehaviour>();
+
+            yield return new WaitForFixedUpdate();
+
+            TimeManager.SetTimeScale( 5 );
+
+            double ut = TimeManager.UT;
+            SceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT, Vector3Dbl.zero, new Vector3Dbl( 0, 10, 0 ) ) );
+            GameObject reference = new GameObject();
+            assertHandler.sut = reference.AddComponent<T>();
+
+            assertHandler.sut.AbsolutePosition = Vector3.zero;
+            assertHandler.sut.AbsoluteVelocity = new Vector3Dbl( 10, 0, 0 );
+
+            for( int i = 0; i < 10; i++ )
+            {
+                yield return new WaitForFixedUpdate();
+
+                var pos = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( Vector3Dbl.zero );
+                SceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT, pos, new Vector3Dbl( 0, 10, 0 ) ) );
+            }
+
+            for( int i = 0; i < 1000; i++ )
+            {
+                if( Math.Abs( TimeManager.UT - (ut + 1.0) ) < 0.000001 )
+                {
+                    // Already after physicsprocessing.
+
+                    Debug.Log( "E" + TimeManager.UT );
+                    Debug.Log( "E" + assertHandler.sut.Position.magnitude );
+                    Debug.Log( "E" + assertHandler.sut.AbsolutePosition.magnitude );
+                    Assert.That( assertHandler.sut.Position, Is.EqualTo( new Vector3( 10, -10, 0 ) ).Using( vector3ApproxComparer ) );
+                    Assert.That( assertHandler.sut.AbsolutePosition, Is.EqualTo( new Vector3Dbl( 10, 0, 0 ) ).Using( vector3DblApproxComparer ) );
+                    yield break;
+                }
+
+                yield return new WaitForFixedUpdate();
+            }
+
+            Debug.LogWarning( "Test failed within the specified number of frames." );
+            Assert.IsTrue( false );
+        }
+
+        [UnityTest]
         public IEnumerator PositionChangeTimewarped2_Fixed()
         {
             yield return PositionChangeTimewarped2_T<FixedReferenceFrameTransform>();

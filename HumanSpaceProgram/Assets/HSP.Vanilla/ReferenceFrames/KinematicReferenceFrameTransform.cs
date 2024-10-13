@@ -222,6 +222,7 @@ namespace HSP.Vanilla
             _rb.Move( pos, rot );
             _cachedSceneReferenceFrame = sceneReferenceFrame;
 
+#warning TODO - this movement needs to happen during physicsprocessing.
             if( cachePositionAndRotation )
             {
                 _cachedPosition = pos;

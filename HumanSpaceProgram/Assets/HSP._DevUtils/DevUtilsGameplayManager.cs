@@ -6,6 +6,7 @@ using HSP.ReferenceFrames;
 using HSP.ResourceFlow;
 using HSP.Time;
 using HSP.Timelines;
+using HSP.Trajectories;
 using HSP.Vanilla;
 using HSP.Vanilla.Components;
 using HSP.Vanilla.Scenes.AlwaysLoadedScene;
@@ -94,15 +95,14 @@ namespace HSP._DevUtils
             var v = CreateVessel( launchSite );
             vessel = v;
 
-            //ActiveVesselManager.ActiveObject = vessel.RootPart.GetVessel().gameObject.transform;
-            //SceneReferenceFrameManager.TargetObject = vessel.RootPart.GetVessel().ReferenceFrameTransform;
-            ActiveVesselManager.ActiveObject = launchSite.RootPart.GetVessel().gameObject.transform;
-            SceneReferenceFrameManager.TargetObject = launchSite.RootPart.GetVessel().ReferenceFrameTransform;
+            ActiveVesselManager.ActiveObject = vessel.RootPart.GetVessel().gameObject.transform;
+            //ActiveVesselManager.ActiveObject = launchSite.RootPart.GetVessel().gameObject.transform;
+            //SceneReferenceFrameManager.TargetObject = launchSite.RootPart.GetVessel().ReferenceFrameTransform;
 
-            // Vector3Dbl velocity = new Vector3Dbl( 32, 0, 0 );
-            // body.ReferenceFrameTransform.AbsoluteVelocity = velocity;
+             Vector3Dbl velocity = new Vector3Dbl( 500, 0, 0 );
+             //body.ReferenceFrameTransform.AbsoluteVelocity = velocity;
 #warning TODO - velocity propagation for objects near planets.
-            // vessel.ReferenceFrameTransform.AbsoluteVelocity = velocity;
+             //vessel.ReferenceFrameTransform.AbsoluteVelocity = velocity;
         }
 
         private static Vessel CreateVessel( Vessel launchSite )
@@ -152,9 +152,12 @@ namespace HSP._DevUtils
             if( isPressed )
             {
                 isPressed = false;
+
+                Debug.Log( CelestialBodyManager.Get( "main" ).ReferenceFrameTransform.AbsoluteVelocity );
                 vessel.ReferenceFrameTransform.AbsolutePosition = CelestialBodyManager.Get( "main" ).ReferenceFrameTransform.AbsolutePosition
                     + new Vector3Dbl( CelestialBodyManager.Get( "main" ).Radius + 200_000, 0, 0 );
-                vessel.ReferenceFrameTransform.AbsoluteVelocity = new Vector3Dbl( 0, 8500, 0 );
+                vessel.ReferenceFrameTransform.AbsoluteVelocity = CelestialBodyManager.Get( "main" ).ReferenceFrameTransform.AbsoluteVelocity
+                    + new Vector3Dbl( 0, 8500, 0 );
                 SceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT,
                     SceneReferenceFrameManager.TargetObject.AbsolutePosition, SceneReferenceFrameManager.TargetObject.AbsoluteVelocity ) );
             }
