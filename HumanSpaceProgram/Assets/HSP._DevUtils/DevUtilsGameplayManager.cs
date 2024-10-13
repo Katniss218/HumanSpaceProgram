@@ -151,9 +151,12 @@ namespace HSP._DevUtils
         {
             if( isPressed )
             {
-                SceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT,
-                    SceneReferenceFrameManager.TargetObject.AbsolutePosition, Vector3Dbl.zero ) );
                 isPressed = false;
+                vessel.ReferenceFrameTransform.AbsolutePosition = CelestialBodyManager.Get( "main" ).ReferenceFrameTransform.AbsolutePosition
+                    + new Vector3Dbl( CelestialBodyManager.Get( "main" ).Radius + 200_000, 0, 0 );
+                vessel.ReferenceFrameTransform.AbsoluteVelocity = new Vector3Dbl( 0, 8500, 0 );
+                SceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT,
+                    SceneReferenceFrameManager.TargetObject.AbsolutePosition, SceneReferenceFrameManager.TargetObject.AbsoluteVelocity ) );
             }
         }
 

@@ -41,21 +41,36 @@ namespace HSP_Tests_EditMode
             IEqualityComparer<Vector3Dbl> maxAccumulatedErrorComparer = new Vector3DblApproximateComparer( 0.01 );
 
             // Arrange
-            const double seconds = 10;
-            const int stepCount = 100000;
+            const double seconds = 3000;
+            const int stepCount = 1000000;
             const double step = seconds / stepCount;
 
             FixedOrbit parent = new FixedOrbit( 0, Vector3Dbl.zero, QuaternionDbl.identity, 5.97e24 );
-            NewtonianOrbit sut = new NewtonianOrbit( 0, new Vector3Dbl( 6_371_000.0 + 1000, 0, 0 ), Vector3Dbl.zero, Vector3Dbl.zero, 1 );
+            NewtonianOrbit sut = new NewtonianOrbit( 0, new Vector3Dbl( 6_371_000.0 + 200_000, 0, 0 ), new Vector3Dbl( 0, 8500, 0 ), Vector3Dbl.zero, 1 );
+
+            KeplerianOrbit sut2 = new KeplerianOrbit( 0, null, 0, 0, 0, 0, 0, 0, 1 );
+            sut2.ParentBody = parent;
+            sut2.SetCurrentState( new TrajectoryBodyState( new Vector3Dbl( 6_371_000.0 + 200_000, 0, 0 ), new Vector3Dbl( 0, 8500, 0 ), Vector3Dbl.zero, 1 ) );
+            
+            KeplerianOrbit sut3 = new KeplerianOrbit( 0, null, 0, 0, 0, 0, 0, 0, 1 );
+            sut3.ParentBody = parent;
+            sut3.SetCurrentState( new TrajectoryBodyState( new Vector3Dbl( 6_371_000.0 + 200_000, 0, 0 ), new Vector3Dbl( 0, 8500, 0 ), Vector3Dbl.zero, 1 ) );
 
             double time = 0;
             // Act
             for( int i = 0; i < stepCount; i++ )
             {
                 sut.Step( new[] { parent.GetCurrentState() }, step );
+                sut2.Step( new[] { parent.GetCurrentState() }, step );
                 time += step;
             }
+            sut3.Step( new[] { parent.GetCurrentState() }, seconds );
             TrajectoryBodyState state = sut.GetCurrentState();
+            TrajectoryBodyState state2 = sut2.GetCurrentState();
+            TrajectoryBodyState state3 = sut3.GetCurrentState();
+
+            Debug.Log( (state.AbsolutePosition.magnitude - 6_371_000.0) + " : " + state.AbsoluteVelocity.magnitude );
+            Debug.Log( (state2.AbsolutePosition.magnitude - 6_371_000.0) + " : " + state2.AbsoluteVelocity.magnitude );
 
             // Assert
             Assert.That( time, Is.EqualTo( seconds ).Within( 0.0000001 ) );

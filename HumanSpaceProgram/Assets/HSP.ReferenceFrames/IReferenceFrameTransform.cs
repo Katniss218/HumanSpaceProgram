@@ -83,6 +83,7 @@ namespace HSP.ReferenceFrames
 #warning TODO - add methods for getting velocity/acceleration/forces of a point relative to the center.
         // maybe via getting the instantaneous non-inertial reference frame representing this physical body.
         // similarly to how it works for celestial bodies.
+        // - They would have to have correct UT based on where they were called.
     }
 
     public interface IReferenceFrameSwitchResponder

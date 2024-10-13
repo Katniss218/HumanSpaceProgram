@@ -1,3 +1,4 @@
+using HSP.ReferenceFrames;
 using HSP.Vanilla.Components;
 using UnityEngine;
 
@@ -11,7 +12,9 @@ namespace HSP.Vanilla
         [HSPEventListener( HSPEvent_AFTER_ACTIVE_VESSEL_CHANGED.ID, TRY_SET_SCENE_REFERENCE_FRAME )]
         private static void TrySetSceneReferenceFrame()
         {
-            SelectedControlFrameManager.ControlFrame = null;
+            SceneReferenceFrameManager.TargetObject = ActiveVesselManager.ActiveVessel == null
+                ? null
+                : ActiveVesselManager.ActiveVessel.ReferenceFrameTransform;
         }
 
         [HSPEventListener( HSPEvent_AFTER_ACTIVE_VESSEL_CHANGED.ID, TRY_SET_DEFAULT_CONTROL_FRAME )]

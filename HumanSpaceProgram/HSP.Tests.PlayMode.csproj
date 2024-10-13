@@ -914,6 +914,22 @@
       <Project>{49D4BC99-1C12-776F-CC5E-D6CE66E348FE}</Project>
       <Name>_UnityPlus</Name>
     </ProjectReference>
+    <ProjectReference Include="_UnityPlus.AssetManagement.csproj">
+      <Project>{7122B491-FD2B-2B59-D391-006CB0AE788B}</Project>
+      <Name>_UnityPlus.AssetManagement</Name>
+    </ProjectReference>
+    <ProjectReference Include="_UnityPlus.Input.csproj">
+      <Project>{1B7EDF60-A4D7-21D6-6511-CFB4286999D1}</Project>
+      <Name>_UnityPlus.Input</Name>
+    </ProjectReference>
+    <ProjectReference Include="_UnityPlus.OverridableEvents.csproj">
+      <Project>{049D3356-CD2A-DFB0-C50D-8CFE5B092848}</Project>
+      <Name>_UnityPlus.OverridableEvents</Name>
+    </ProjectReference>
+    <ProjectReference Include="_UnityPlus.OverridableValueProviders.csproj">
+      <Project>{2FD51314-7711-BD56-25C5-0C8F36A30A82}</Project>
+      <Name>_UnityPlus.OverridableValueProviders</Name>
+    </ProjectReference>
     <ProjectReference Include="_UnityPlus.Serialization.csproj">
       <Project>{FED3C19A-E743-9E19-D660-957D0801811E}</Project>
       <Name>_UnityPlus.Serialization</Name>
@@ -925,6 +941,10 @@
     <ProjectReference Include="HSP.csproj">
       <Project>{5294BE79-15AB-2AAE-E8C3-9E735E001D6D}</Project>
       <Name>HSP</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.CelestialBodies.csproj">
+      <Project>{83793330-5AED-C186-5E4B-AAD4BB463469}</Project>
+      <Name>HSP.CelestialBodies</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.ReferenceFrames.csproj">
       <Project>{D8846B96-55B1-C32C-F90A-52C14F5C8043}</Project>
@@ -941,6 +961,10 @@
     <ProjectReference Include="HSP.Vanilla.csproj">
       <Project>{AE718BD5-B7C2-FF6D-CB3C-BD7A5FEC452C}</Project>
       <Name>HSP.Vanilla</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Vessels.csproj">
+      <Project>{46E8105E-3165-8157-383E-59E6654156AA}</Project>
+      <Name>HSP.Vessels</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

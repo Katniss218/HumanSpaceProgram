@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityPlus.Serialization;
-using static UnityEditor.PlayerSettings;
 
 namespace HSP.Vanilla.Trajectories
 {
