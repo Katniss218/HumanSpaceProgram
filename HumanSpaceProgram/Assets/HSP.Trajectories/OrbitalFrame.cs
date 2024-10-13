@@ -6,7 +6,7 @@ namespace HSP.Trajectories
     /// Represents the orientation of a point in orbit. <br/>
     /// Use this to get orbital directions (prograde/retrograde/etc).
     /// </summary>
-    public struct OrbitalFrame
+    public readonly struct OrbitalFrame
     {
         private readonly Quaternion _rotation;
 

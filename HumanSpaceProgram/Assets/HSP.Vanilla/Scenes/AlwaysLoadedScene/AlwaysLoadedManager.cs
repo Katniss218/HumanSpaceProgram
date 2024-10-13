@@ -33,7 +33,6 @@ namespace HSP.Vanilla.Scenes.AlwaysLoadedScene
 
         void Awake()
         {
-#warning TODO - finish here. !!!!!!!!!!!!!!!!!
             // Load mods before caching autorunning methods.
             // Because mods might (WILL and SHOULD) attach autorunning methods via the attributes.
             HumanSpaceProgramModLoader.LoadModAssemblies();

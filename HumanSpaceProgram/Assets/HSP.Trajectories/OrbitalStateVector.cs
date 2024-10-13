@@ -6,7 +6,7 @@ namespace HSP.Trajectories
     /// Represents the position and velocity of an object in a gravitational field at a specified point in time. <br/>
     /// This struct is immutable.
     /// </summary>
-    public struct OrbitalStateVector
+    public readonly struct OrbitalStateVector
     {
         /// <summary>
         /// The time at which this state vector was captured.

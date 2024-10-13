@@ -136,15 +136,6 @@ namespace HSP.Trajectories
 
                 if( trajectoryTransform.IsSynchronized() )
                 {
-                    if( trajectoryTransform.gameObject.name == "tempname_vessel" )
-                    {
-                        // To reach the top of the tower:
-                        // 160 frames with velocity, so it's even weirder.
-                        // 210 frames with resetting position
-                        // 210 frames with gravity applier (previous method)
-                       // Debug.Log( i + " BEFORE : " + TimeManager.UT + " : " + trajectoryTransform.ReferenceFrameTransform.AbsolutePosition.magnitude );
-                    }
-
                     trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = (stateVector.AbsolutePosition - trajectoryTransform.ReferenceFrameTransform.AbsolutePosition) / TimeManager.FixedDeltaTime;
                 }
                 else 
@@ -161,12 +152,6 @@ namespace HSP.Trajectories
                 // If it is STILL synchronized after physicsprocessing
                 if( trajectoryTransform.IsSynchronized() )
                 {
-                    if( trajectoryTransform.gameObject.name == "tempname_vessel" )
-                    {
-                        // this doesn't seem to match regardless of whether it's integrated or not. weird.
-                        //Debug.Log( i + " AFTER : " + TimeManager.UT + " : " + trajectoryTransform.ReferenceFrameTransform.AbsolutePosition.magnitude + " : " + instance._posAndVelCache[trajectory].pos.magnitude );
-                    }
-
                     trajectoryTransform.ReferenceFrameTransform.AbsolutePosition = instance._posAndVelCache[trajectory].pos; // This is not needed, although omitting it introduces floating point errors.
                     trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = instance._posAndVelCache[trajectory].vel;
                 }

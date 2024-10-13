@@ -33,7 +33,6 @@ namespace HSP.Vanilla
         {
             get
             {
-                return SceneReferenceFrameManager.ReferenceFrame.TransformPosition( _rb.position );
                 RecalculateCacheIfNeeded();
                 return _cachedAbsolutePosition;
             }
@@ -267,19 +266,17 @@ namespace HSP.Vanilla
             _cachedAbsoluteAngularVelocity = sceneReferenceFrame.TransformAngularVelocity( _rb.angularVelocity );
             // Don't cache acceleration, since it's impossible to compute it here for a dynamic body. Acceleration is recalculated on every fixedupdate instead.
             _cachedSceneReferenceFrame = sceneReferenceFrame;
-
-            //Debug.Log( TrajectoryManager.i + "A " + _rb.position.magnitude + " : " + sceneReferenceFrame.TransformPosition( Vector3Dbl.zero ).magnitude + " : " + _cachedAbsolutePosition.magnitude + " : " + sceneReferenceFrame.ReferenceUT + " : " + TimeManager.UT ); // frame reference ut is good.
         }
 
         // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)
         // Vector3's `==` operator does approximate comparison.
-        protected virtual bool IsCacheValid() => false;/* _cachedSceneReferenceFrame != null
+        protected virtual bool IsCacheValid() => _cachedSceneReferenceFrame != null
             && (_rb.position.x == _lastCachedPosition.x && _rb.position.y == _lastCachedPosition.y && _rb.position.z == _lastCachedPosition.z)
             && (_rb.rotation.x == _lastCachedRotation.x && _rb.rotation.y == _lastCachedRotation.y && _rb.rotation.z == _lastCachedRotation.z && _rb.rotation.w == _lastCachedRotation.w)
             && (_rb.velocity.x == _lastCachedVelocity.x && _rb.velocity.y == _lastCachedVelocity.y && _rb.velocity.z == _lastCachedVelocity.z)
             && (_rb.angularVelocity.x == _lastCachedAngularVelocity.x && _rb.angularVelocity.y == _lastCachedAngularVelocity.y && _rb.angularVelocity.z == _lastCachedAngularVelocity.z)
             && SceneReferenceFrameManager.ReferenceFrame.EqualsIgnoreUT( _cachedSceneReferenceFrame );
-        */
+        
         protected virtual void MakeCacheValid()
         {
             _lastCachedPosition = _rb.position;
@@ -364,15 +361,8 @@ namespace HSP.Vanilla
 
         public virtual void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
-#warning TODO - Position and absolutePosition are desynchronized.
-
-            // maybe update UT immediately at the start, but update the current frame to reflect that UT later?
-            // something like GetUpToDateFrame(), or AtCurrentUT()
-            var ut = TimeManager.UT;
-
-            var frame = data.OldFrame;
-            RecalculateCache( frame );
-            _cachedSceneReferenceFrame = frame;
+            RecalculateCache( data.OldFrame );
+            _cachedSceneReferenceFrame = data.OldFrame;
             ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, _cachedAbsolutePosition, data.NewFrame );
             ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, _cachedAbsoluteRotation );
             ReferenceFrameTransformUtils.SetSceneVelocityFromAbsolute( _rb, _cachedAbsoluteVelocity );
