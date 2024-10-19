@@ -15,7 +15,7 @@ namespace HSP._DevUtils
 
         private static CelestialBody CreateCB( string id, Vector3Dbl airfPos, QuaternionDbl airfRot )
         {
-            CelestialBody cb = new CelestialBodyFactory( id ).Create( airfPos, airfRot );
+            CelestialBody cb = new CelestialBodyFactory( id ) { radius = 696_340_000, mass = 1.989e30 }.Create( airfPos, airfRot );
             LODQuadSphere lqs = cb.gameObject.AddComponent<LODQuadSphere>();
             lqs.PoIGetter = () => VesselManager.LoadedVessels.Select( v => v.ReferenceFrameTransform.AbsolutePosition );
 
@@ -56,9 +56,9 @@ namespace HSP._DevUtils
         {
             QuaternionDbl orientation = Quaternion.Euler( 270, 0, 0 );
             //CelestialBody cb = CreateCB( "main", Vector3Dbl.zero, Vector3Dbl.zero, orientation );
-            //CelestialBody cbSun = CreateCB( "sun", Vector3Dbl.zero, orientation );
+            CelestialBody cb = CreateCB( "main", new Vector3Dbl( 150_000_000_000_000, 0, 0 ), new Vector3Dbl( 0, 29800, 0 ), orientation );
+            CelestialBody cbSun = CreateCB( "sun", Vector3Dbl.zero, orientation );
             //CelestialBody cb = CreateCB( "main", "sun", 150_000_000_000, 0, 0, 0, 0, 0, orientation );
-            CelestialBody cb = CreateCB( "main", new Vector3Dbl( 0, 0, 0 ), Vector3Dbl.zero /*new Vector3Dbl( 0, 29800, 0 )*/, orientation );
 
             foreach( var cbody in CelestialBodyManager.CelestialBodies )
             {

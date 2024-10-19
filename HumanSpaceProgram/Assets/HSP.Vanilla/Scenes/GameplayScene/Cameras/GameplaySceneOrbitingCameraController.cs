@@ -115,7 +115,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
         {
             if( ReferenceObject != null ) // Raycasts using rays from the camera fail when the vessel is moving fast, but updating the camera earlier as well as later doesn't fix it.
             {
-                if( ReferenceObject.transform.position.magnitude < 100_000 )
+                if( ReferenceObject.transform.position.magnitude < 1_000_000 )
                     this.transform.position = ReferenceObject.transform.position;
             }
         }
@@ -159,7 +159,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
             instance.ReferenceObject = referenceObject;
             if( referenceObject != null )
             {
-                if( referenceObject.transform.position.magnitude < 100_000 )
+                if( referenceObject.transform.position.magnitude < 1_000_000 )
                     instance.transform.position = referenceObject.transform.position;
             }
             instance.transform.rotation = Quaternion.LookRotation( instance.transform.forward, instance.GetUpDir() );

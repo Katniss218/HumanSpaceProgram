@@ -43,19 +43,5 @@ namespace HSP.CelestialBodies
 
             return celestialBody;
         }
-
-        public static Guid GuidFromHash( byte[] dataToHash )
-        {
-            byte[] guidBytes;
-            using( HashAlgorithm algorithm = MD5.Create() )
-            {
-                guidBytes = algorithm.ComputeHash( dataToHash );
-            }
-
-            guidBytes[6] = (byte)((guidBytes[6] & 0x0F) | (3 << 4));
-            guidBytes[8] = (byte)((guidBytes[8] & 0x3F) | 0x80);
-
-            return new Guid( guidBytes );
-        }
     }
 }

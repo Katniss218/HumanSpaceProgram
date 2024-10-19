@@ -10,6 +10,7 @@ using HSP.Trajectories;
 using HSP.Vanilla;
 using HSP.Vanilla.Components;
 using HSP.Vanilla.Scenes.AlwaysLoadedScene;
+using HSP.Vanilla.Scenes.GameplayScene.Cameras;
 using HSP.Vessels;
 using System;
 using System.Collections.Generic;
@@ -98,15 +99,6 @@ namespace HSP._DevUtils
             //ActiveVesselManager.ActiveObject = vessel.RootPart.GetVessel().gameObject.transform;
             ActiveVesselManager.ActiveObject = launchSite.RootPart.GetVessel().gameObject.transform;
 
-#warning TODO - at large distances, placing the rocket doesn't work right, possibly due to 32bit transforms before the rocket is moved to the scene origin.
-
-#warning TODO - for some reason, the shadows add a large circle if the object was created at large distance, even though the current scene space is the same.
-            // If we restrict the camera controller to only follow if the target is close to the scene origin it doesn't change.
-            // if we move the target object *later* it still works.
-            //  unless the jump itself is too large?
-            //    but if we restrict then, then it works.
-            //      but no, it's still broken
-
             //Vector3Dbl velocity = new Vector3Dbl( 500, 0, 0 );
             //body.ReferenceFrameTransform.AbsoluteVelocity = velocity;
             Vector3Dbl velocity = body.ReferenceFrameTransform.AbsoluteVelocity;
@@ -126,12 +118,11 @@ namespace HSP._DevUtils
 
             var v2 = CreateDummyVessel( spawnerPosAirf, spawnerRotAirf ); // position is temp.
 
-            /*Vector3 bottomBoundPos = v2.GetBottomPosition();
+            Vector3 bottomBoundPos = v2.GetBottomPosition();
             Vector3Dbl closestBoundAirf = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( bottomBoundPos );
             Vector3Dbl closestBoundToVesselAirf = v2.ReferenceFrameTransform.AbsolutePosition - closestBoundAirf;
-            Vector3Dbl airfPos = spawnerPosAirf + closestBoundToVesselAirf;*/
-            //v2.ReferenceFrameTransform.AbsolutePosition = airfPos;
-            v2.ReferenceFrameTransform.AbsolutePosition = launchSite.ReferenceFrameTransform.AbsolutePosition;
+            Vector3Dbl airfPos = spawnerPosAirf + closestBoundToVesselAirf;
+            v2.ReferenceFrameTransform.AbsolutePosition = airfPos;
             return v2;
         }
 
@@ -162,19 +153,13 @@ namespace HSP._DevUtils
             {
                 isPressed = false;
 
-                /*Debug.Log( CelestialBodyManager.Get( "main" ).ReferenceFrameTransform.AbsoluteVelocity );
+                Debug.Log( CelestialBodyManager.Get( "main" ).ReferenceFrameTransform.AbsoluteVelocity );
                 vessel.ReferenceFrameTransform.AbsolutePosition = CelestialBodyManager.Get( "main" ).ReferenceFrameTransform.AbsolutePosition
                     + new Vector3Dbl( CelestialBodyManager.Get( "main" ).Radius + 200_000, 0, 0 );
                 vessel.ReferenceFrameTransform.AbsoluteVelocity = CelestialBodyManager.Get( "main" ).ReferenceFrameTransform.AbsoluteVelocity
                     + new Vector3Dbl( 0, 8500, 0 );
                 SceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT,
-                    SceneReferenceFrameManager.TargetObject.AbsolutePosition, SceneReferenceFrameManager.TargetObject.AbsoluteVelocity ) );*/
-
-                var cb = CelestialBodyManager.Get( "main" );
-                if( cb.ReferenceFrameTransform.AbsolutePosition.magnitude > 100_000_000_000 )
-                    cb.ReferenceFrameTransform.AbsolutePosition = new Vector3Dbl( 0, 0, 0 );
-                else
-                    cb.ReferenceFrameTransform.AbsolutePosition = new Vector3Dbl( 150_000_000_000, 0, 0 );
+                    SceneReferenceFrameManager.TargetObject.AbsolutePosition, SceneReferenceFrameManager.TargetObject.AbsoluteVelocity ) );
             }
         }
 
@@ -370,6 +355,7 @@ namespace HSP._DevUtils
             FVesselSeparator t1Sep = t1.gameObject.AddComponent<FVesselSeparator>();
             FVesselSeparator t2Sep = t2.gameObject.AddComponent<FVesselSeparator>();
 
+            /* trail completely breaks down when switching between far away things. I suppose this is caused by its mesh spanning more than 150 000 000 000 meters
             TrailRenderer tr = v.gameObject.AddComponent<TrailRenderer>();
             tr.material = FindObjectOfType<DevUtilsGameplayManager>().Material;
             tr.time = 250;
@@ -378,6 +364,7 @@ namespace HSP._DevUtils
             curve.AddKey( 1, 2.5f );
             tr.widthCurve = curve;
             tr.minVertexDistance = 50f;
+            */
 
             FPlayerInputAvionics av = capsule.GetComponent<FPlayerInputAvionics>();
             FAttitudeAvionics atv = capsule.GetComponent<FAttitudeAvionics>();
