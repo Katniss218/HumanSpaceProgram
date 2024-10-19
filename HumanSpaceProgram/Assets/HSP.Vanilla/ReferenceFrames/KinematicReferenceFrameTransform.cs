@@ -30,7 +30,7 @@ namespace HSP.Vanilla
         {
             get
             {
-                // To synchronize, we keep trach of where the rigidbody is in fixedupdate, and where it is going to be after physicsprocessing (scene rigidbody is using its own velocity)
+                // To synchronize, we keep track of where the rigidbody is in fixedupdate and where it is going to be after physicsprocessing (at the end of fixed frame)
                 // We return whichever value matches.
                 return _rb.position == _actualPosition
                         ? _actualAbsolutePosition
@@ -253,7 +253,7 @@ namespace HSP.Vanilla
 
         protected virtual void FixedUpdate()
         {
-            IReferenceFrame sceneReferenceFrame = SceneReferenceFrameManager.ReferenceFrame.AtUT( TimeManager.UT );
+            IReferenceFrame sceneReferenceFrame = SceneReferenceFrameManager.ReferenceFrame;
             IReferenceFrame sceneReferenceFrameAfterPhysicsProcessing = SceneReferenceFrameManager.ReferenceFrame.AtUT( TimeManager.UT );
 
             _actualAbsolutePosition = _requestedAbsolutePosition;
@@ -264,14 +264,14 @@ namespace HSP.Vanilla
             _requestedAbsoluteRotation = deltaRotation * _actualAbsoluteRotation;
 
             // Queue Move Rigidbody To Requested
-            var pos = (Vector3)sceneReferenceFrame.InverseTransformPosition( _actualAbsolutePosition );
-            var rot = (Quaternion)sceneReferenceFrame.InverseTransformRotation( _actualAbsoluteRotation );
+            //var pos = (Vector3)sceneReferenceFrame.InverseTransformPosition( _actualAbsolutePosition );
+            //var rot = (Quaternion)sceneReferenceFrame.InverseTransformRotation( _actualAbsoluteRotation );
 
             var requestedPos = (Vector3)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformPosition( _requestedAbsolutePosition );
             var requestedRot = (Quaternion)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformRotation( _requestedAbsoluteRotation );
             _rb.Move( requestedPos, requestedRot );
-            _actualPosition = pos;
-            _actualRotation = rot;
+            _actualPosition = _rb.position;
+            _actualRotation = _rb.rotation;
 
 
             // Otherwise, we use our more precise method that relies on full encapsulation of the rigidbody.

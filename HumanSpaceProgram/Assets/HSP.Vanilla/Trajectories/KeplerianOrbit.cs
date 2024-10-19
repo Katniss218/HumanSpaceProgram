@@ -427,7 +427,7 @@ namespace HSP.Vanilla.Trajectories
 
 
         public static double CalculateTrueAnomaly( double meanAnomaly, double eccentricity )
-        {
+        { // 4.34786982945266E-07   1.46366746500703E-08
             meanAnomaly %= Math.PI;
             double eccentricAnomaly = CalculateEccentricAnomaly( meanAnomaly, eccentricity );
             double trueAnomaly = CalculateTrueAnomalyFromEccentric( eccentricAnomaly, eccentricity );

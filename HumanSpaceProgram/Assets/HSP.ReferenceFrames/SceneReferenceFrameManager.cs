@@ -192,7 +192,7 @@ namespace HSP.ReferenceFrames
 
         void Awake()
         {
-            instance._referenceFrame = new CenteredReferenceFrame( TimeManager.UT, Vector3Dbl.zero );
+            instance._referenceFrame = new CenteredReferenceFrame( 0, Vector3Dbl.zero );
         }
 
 

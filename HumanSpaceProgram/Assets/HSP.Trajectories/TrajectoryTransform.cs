@@ -117,6 +117,10 @@ namespace HSP.Trajectories
 
         private void OnValueChanged() => _hadValuesChangedByHand = false;
 
+#warning TODO - need to set the values whenever the trajectory is set, to make the planet's values correct immediately.
+
+#warning TODO - velocity propagation for objects near planets (when the planet suddenly moves objects around it should have the choice to start moving too).
+
         private void TryRegister()
         {
             if( _trajectory == null )

@@ -138,7 +138,7 @@ namespace HSP.Trajectories
                 {
                     trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = (stateVector.AbsolutePosition - trajectoryTransform.ReferenceFrameTransform.AbsolutePosition) / TimeManager.FixedDeltaTime;
                 }
-                else 
+                else
                 {
                     trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = stateVector.AbsoluteVelocity;
                 }
@@ -152,8 +152,7 @@ namespace HSP.Trajectories
                 // If it is STILL synchronized after physicsprocessing
                 if( trajectoryTransform.IsSynchronized() )
                 {
-#warning TODO - When the planet is moving, something causes double accumulation
-                    //trajectoryTransform.ReferenceFrameTransform.AbsolutePosition = instance._posAndVelCache[trajectory].pos; // Experimental testing seems to indicate that this is indeed unnecessary.
+                    //trajectoryTransform.ReferenceFrameTransform.AbsolutePosition = instance._posAndVelCache[trajectory].pos; // Experimental testing seems to indicate that this is indeed unnecessary for countering drift.
                     trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = instance._posAndVelCache[trajectory].vel;
                 }
             }

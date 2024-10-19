@@ -34,6 +34,7 @@ namespace HSP._DevUtils
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
             comp.IsAttractor = true;
             comp.Trajectory = new KeplerianOrbit( Time.TimeManager.UT, parentId, semiMajorAxis, eccentricity, inclination, longitudeOfAscendingNode, argumentOfPeriapsis, meanAnomaly, cb.Mass );
+
             return cb;
         }
 
@@ -54,11 +55,23 @@ namespace HSP._DevUtils
         public static void CreateDefaultPlanetarySystem()
         {
             QuaternionDbl orientation = Quaternion.Euler( 270, 0, 0 );
-            // CelestialBody cb = CreateCB( "main", Vector3Dbl.zero, Vector3Dbl.zero, orientation );
-            CelestialBody cb = CreateCB( "main", Vector3Dbl.zero, Vector3Dbl.zero, orientation );
+            //CelestialBody cb = CreateCB( "main", Vector3Dbl.zero, Vector3Dbl.zero, orientation );
+            //CelestialBody cbSun = CreateCB( "sun", Vector3Dbl.zero, orientation );
+            //CelestialBody cb = CreateCB( "main", "sun", 150_000_000_000, 0, 0, 0, 0, 0, orientation );
+            CelestialBody cb = CreateCB( "main", new Vector3Dbl( 0, 0, 0 ), Vector3Dbl.zero /*new Vector3Dbl( 0, 29800, 0 )*/, orientation );
+
+            foreach( var cbody in CelestialBodyManager.CelestialBodies )
+            {
+                TrajectoryTransform t = cbody.GetComponent<TrajectoryTransform>();
+
+                TrajectoryBodyState state = t.Trajectory.GetCurrentState();
+
+                cbody.ReferenceFrameTransform.AbsolutePosition = state.AbsolutePosition;
+                cbody.ReferenceFrameTransform.AbsoluteVelocity = state.AbsoluteVelocity;
+            }
 
             //CelestialBody cb1 = CreateCB( "moon1", "main", 440_000_00, 0, 0, 0, 0, 0, orientation );
-            CelestialBody cb1 = CreateCB( "moon2", new Vector3Dbl( 440_000_00, 100_000_000, 0 ), new Vector3Dbl( 0, 0, 0 ), orientation );
+            //CelestialBody cb1 = CreateCB( "moon2", new Vector3Dbl( 440_000_00, 100_000_000, 0 ), new Vector3Dbl( 0, 0, 0 ), orientation );
             //CelestialBody cb1 = CreateCB( "moon1", new Vector3Dbl( 440_000_00, 0, 0 ), orientation );
             //CelestialBody cb2 = CreateCB( "moon2", new Vector3Dbl( 440_000_000, 100_000_000, 0 ), orientation );
             //CelestialBody cb_farawayTEST = CreateCB( "far", new Vector3Dbl( 440_000_000_0.0, 100_000_000, 0 ), orientation );

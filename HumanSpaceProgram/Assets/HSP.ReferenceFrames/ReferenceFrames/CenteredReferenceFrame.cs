@@ -29,7 +29,7 @@ namespace HSP.ReferenceFrames
 
         public IReferenceFrame AtUT( double ut )
         {
-            return this; // Reference frames are immutable, so this is allowed.
+            return new CenteredReferenceFrame( ut, _position );
         }
 
 
