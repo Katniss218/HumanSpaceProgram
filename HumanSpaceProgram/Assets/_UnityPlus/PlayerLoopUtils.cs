@@ -9,6 +9,54 @@ namespace UnityPlus
 {
     public static class PlayerLoopUtils
     {
+        public static void AddSystem( in PlayerLoopSystem systemToAdd )
+        {
+            PlayerLoopSystem loopRoot = PlayerLoop.GetCurrentPlayerLoop();
+            AddSystemNested( new Type[] { }, 0, ref loopRoot, in systemToAdd );
+            PlayerLoop.SetPlayerLoop( loopRoot );
+        }
+        
+        public static void AddSystem<T1>( in PlayerLoopSystem systemToAdd )
+        {
+            PlayerLoopSystem loopRoot = PlayerLoop.GetCurrentPlayerLoop();
+            AddSystemNested( new[] { typeof( T1 ) }, 0, ref loopRoot, in systemToAdd );
+            PlayerLoop.SetPlayerLoop( loopRoot );
+        }
+        
+        public static void AddSystem<T1, T2>( in PlayerLoopSystem systemToAdd )
+        {
+            PlayerLoopSystem loopRoot = PlayerLoop.GetCurrentPlayerLoop();
+            AddSystemNested( new[] { typeof( T1 ), typeof( T2 ) }, 0, ref loopRoot, in systemToAdd );
+            PlayerLoop.SetPlayerLoop( loopRoot );
+        }
+        
+        public static void AddSystem<T1, T2, T3>( in PlayerLoopSystem systemToAdd )
+        {
+            PlayerLoopSystem loopRoot = PlayerLoop.GetCurrentPlayerLoop();
+            AddSystemNested( new[] { typeof( T1 ), typeof( T2 ), typeof( T3 ) }, 0, ref loopRoot, in systemToAdd );
+            PlayerLoop.SetPlayerLoop( loopRoot );
+        }
+
+        private static void AddSystemNested( Type[] types, int typeIndex, ref PlayerLoopSystem systemParent, in PlayerLoopSystem systemToInsert )
+        {
+            if( typeIndex == types.Length )
+            {
+                List<PlayerLoopSystem> playerLoopSystemList = systemParent.subSystemList?.ToList() ?? new List<PlayerLoopSystem>();
+
+                playerLoopSystemList.Add( systemToInsert );
+                systemParent.subSystemList = playerLoopSystemList.ToArray();
+                return;
+            }
+
+            for( int i = 0; i < systemParent.subSystemList.Length; i++ )
+            {
+                if( systemParent.subSystemList[i].type == types[typeIndex] )
+                {
+                    AddSystemNested( types, typeIndex + 1, ref systemParent.subSystemList[i], in systemToInsert );
+                }
+            }
+        }
+
         public static void InsertSystemAfter<T1>( in PlayerLoopSystem systemToInsert, Type previous )
         {
             PlayerLoopSystem loopRoot = PlayerLoop.GetCurrentPlayerLoop();
@@ -57,7 +105,7 @@ namespace UnityPlus
             {
                 if( systemParent.subSystemList == null )
                 {
-                    throw new ArgumentException( $"Can't add after 'before' if the parent doesn't have any children." );
+                    throw new ArgumentException( $"Can't insert a system before/after to a leaf node." );
                 }
 
                 List<Type> previousYetToEncounter = previous;
@@ -91,9 +139,7 @@ namespace UnityPlus
                     }
                 }
 
-                List<PlayerLoopSystem> playerLoopSystemList = new();
-                if( systemParent.subSystemList != null )
-                    playerLoopSystemList.AddRange( systemParent.subSystemList );
+                List<PlayerLoopSystem> playerLoopSystemList = systemParent.subSystemList?.ToList() ?? new List<PlayerLoopSystem>();
 
                 playerLoopSystemList.Insert( index, systemToInsert );
                 systemParent.subSystemList = playerLoopSystemList.ToArray();
@@ -130,13 +176,13 @@ namespace UnityPlus
             {
                 if( systemParent.subSystemList == null )
                 {
-                    throw new ArgumentException( $"Can't remove a subsystem if the parent doesn't contain any subsystems." );
+                    throw new ArgumentException( $"Can't remove a subsystem from a leaf node." );
                 }
 
                 var typeToRemove = systemToRemove.type;
                 var delegateToRemove = systemToRemove.updateDelegate;
 
-                List<PlayerLoopSystem> parentSubsystemList = new( systemParent.subSystemList );
+                List<PlayerLoopSystem> parentSubsystemList = systemParent.subSystemList.ToList();
                 parentSubsystemList.RemoveAll( s => s.type == typeToRemove && s.updateDelegate == delegateToRemove );
                 systemParent.subSystemList = parentSubsystemList.ToArray();
 
@@ -154,6 +200,11 @@ namespace UnityPlus
 
         // https://github.com/adammyhre/Unity-Improved-Timers/blob/master/Runtime/PlayerLoopUtils.cs
 
+        public static void PrintCurrentPlayerLoop()
+        {
+            PrintPlayerLoop( PlayerLoop.GetCurrentPlayerLoop() );
+        }
+        
         public static void PrintPlayerLoop( PlayerLoopSystem loop )
         {
             StringBuilder sb = new StringBuilder();

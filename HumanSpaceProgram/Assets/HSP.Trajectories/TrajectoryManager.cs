@@ -153,7 +153,7 @@ namespace HSP.Trajectories
                 if( trajectoryTransform.IsSynchronized() )
                 {
 #warning TODO - When the planet is moving, something causes double accumulation
-                    trajectoryTransform.ReferenceFrameTransform.AbsolutePosition = instance._posAndVelCache[trajectory].pos; // Experimental testing seems to indicate that this is indeed unnecessary.
+                    //trajectoryTransform.ReferenceFrameTransform.AbsolutePosition = instance._posAndVelCache[trajectory].pos; // Experimental testing seems to indicate that this is indeed unnecessary.
                     trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = instance._posAndVelCache[trajectory].vel;
                 }
             }

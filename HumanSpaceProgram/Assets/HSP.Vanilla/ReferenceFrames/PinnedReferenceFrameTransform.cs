@@ -1,5 +1,6 @@
 ﻿using HSP.CelestialBodies;
 using HSP.ReferenceFrames;
+using HSP.Time;
 using System;
 using System.Linq;
 using UnityEngine;
@@ -198,7 +199,6 @@ namespace HSP.Vanilla
         Vector3Dbl _absoluteAccelerationSum = Vector3.zero;
         Vector3Dbl _absoluteAngularAccelerationSum = Vector3.zero;
 
-#warning Should these fire when the planet makes the transform follow itself as well?
         public event Action OnAbsolutePositionChanged;
         public event Action OnAbsoluteRotationChanged;
         public event Action OnAbsoluteVelocityChanged;
@@ -301,10 +301,7 @@ namespace HSP.Vanilla
 
             MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame );
             RecalculateCache( SceneReferenceFrameManager.ReferenceFrame );
-            //MakeCacheValid();
         }
-
-        int i = 0;
 
         private void RecalculateCache( IReferenceFrame sceneReferenceFrame )
         {
@@ -338,7 +335,7 @@ namespace HSP.Vanilla
         private bool IsCacheValid() => SceneReferenceFrameManager.ReferenceFrame.EqualsIgnoreUT( _cachedSceneReferenceFrame )
             && _referenceBody.OrientedInertialReferenceFrame.EqualsIgnoreUT( _cachedBodyReferenceFrame );
 
-        //private void MakeCacheValid() => ;
+        //private void MakeCacheValid() => ; cache validates itself when the frames are set
 
         private void MakeCacheInvalid() => _cachedBodyReferenceFrame = null;
 
@@ -364,9 +361,8 @@ namespace HSP.Vanilla
             if( ReferenceBody == null )
                 return;
 
-            // Calling MoveScenePositionAndRotation in every fixed update is not ideal, but it ensures that the scene position is always correct
-            //   without having hooks in the reference body.
-            MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame, true );
+            // ReferenceFrame.AtUT is used because we want to access the frame for the end of the frame, and FixedUpdate (caller) is called before ReferenceFrame updates.
+            MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame.AtUT( TimeManager.UT ), true );
         }
 
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )

@@ -41,7 +41,7 @@ namespace HSP.ReferenceFrames
             set
             {
                 instance._targetObject = value;
-                TryFixActiveObjectOutOfBounds();
+                EnsureTargetObjectInSceneBounds();
             }
         }
 
@@ -56,13 +56,16 @@ namespace HSP.ReferenceFrames
         /// </summary>
         /// <remarks>
         /// The reference frame is updated during PhysicsProcessing, which happens after FixedUpdate. <br/>
-        /// When using <see cref="ReferenceFrame"/> for UT-sensitive work inside FixedUpdate, you may need to call `ReferenceFrame.AtUT( TimeManager.UT )`, to ensure that the position/rotation of the frame matches the current UT.
+        /// Use `ReferenceFrame.AtUT( TimeManager.UT )`, if you want to access what the scene frame will equal at the end of the current frame (assuming it won't switch in the meantime).
         /// </remarks>
         public static IReferenceFrame ReferenceFrame
         {
             get => instance._referenceFrame;
             set => instance._referenceFrame = value;
         }
+#warning TODO - Consider including a getter for the 'referenceframe at end of current frame', which could consider incoming switches and return the frame after the switch.
+
+        public bool IsSwitchRequested => _frameToSwitchTo != null;
 
         private static IReferenceFrame _frameToSwitchTo = null;
 
@@ -161,7 +164,7 @@ namespace HSP.ReferenceFrames
         /// <summary>
         /// Ensures that the <see cref="TargetObject"/> is within the allowed values for position and velocity. Requests a reference frame switch if required.
         /// </summary>
-        public static void TryFixActiveObjectOutOfBounds()
+        public static void EnsureTargetObjectInSceneBounds()
         {
             if( TargetObject == null )
             {
@@ -192,11 +195,6 @@ namespace HSP.ReferenceFrames
             instance._referenceFrame = new CenteredReferenceFrame( TimeManager.UT, Vector3Dbl.zero );
         }
 
-        void FixedUpdate()
-        {
-            TryFixActiveObjectOutOfBounds();
-        }
-
 
         void OnEnable()
         {
@@ -220,9 +218,15 @@ namespace HSP.ReferenceFrames
             if( !instanceExists )
                 return;
 
+            // IMPORTANT: Do not put code above this line.
+            // Otherwise things can desync - you'll be using rigidbody positions after they've been updated
+            //                               alongside a reference frame that hasn't, breaking the contract.
             instance._referenceFrame = instance._referenceFrame.AtUT( TimeManager.UT );
 
-            // It is important that the switch happens after the scene frame is brought up to current UT.
+            // Checking for out of bounds objects AFTER they have updated their positions (as opposed to inside FixedUpdate)
+            //   prevents moving objects from appearing offset from the center.
+            EnsureTargetObjectInSceneBounds();
+
             TrySwitchToRequestedSceneReferenceFrame();
         }
     }
