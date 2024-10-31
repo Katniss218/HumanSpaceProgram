@@ -82,12 +82,11 @@ namespace HSP._DevUtils
         private static void OnAfterCreateDefault()
         {
             CelestialBody body = CelestialBodyManager.Get( "main" );
-            CelestialBody bodyfar = CelestialBodyManager.Get( "main" );
             Vector3 localPos = CoordinateUtils.GeodeticToEuclidean( 28.5857702f, -80.6507262f, (float)(body.Radius + 12.5) );
-
+            
             launchSite = VesselFactory.CreatePartless( Vector3Dbl.zero, QuaternionDbl.identity, Vector3Dbl.zero, Vector3Dbl.zero );
             launchSite.gameObject.name = "launchsite";
-            launchSite.Pin( bodyfar, localPos, Quaternion.FromToRotation( Vector3.up, localPos.normalized ) );
+            launchSite.Pin( body, localPos, Quaternion.FromToRotation( Vector3.up, localPos.normalized ) );
 
             GameObject launchSitePrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/testlaunchsite" );
             GameObject root = InstantiateLocal( launchSitePrefab, launchSite.transform, Vector3.zero, Quaternion.identity );
@@ -96,8 +95,8 @@ namespace HSP._DevUtils
             var v = CreateVessel( launchSite );
             vessel = v;
 
-            //ActiveVesselManager.ActiveObject = vessel.RootPart.GetVessel().gameObject.transform;
-            ActiveVesselManager.ActiveObject = launchSite.RootPart.GetVessel().gameObject.transform;
+            ActiveVesselManager.ActiveObject = vessel.RootPart.GetVessel().gameObject.transform;
+            //ActiveVesselManager.ActiveObject = launchSite.RootPart.GetVessel().gameObject.transform;
 
             //Vector3Dbl velocity = new Vector3Dbl( 500, 0, 0 );
             //body.ReferenceFrameTransform.AbsoluteVelocity = velocity;

@@ -75,6 +75,7 @@ namespace HSP.Vanilla.Trajectories
         public double ApoapsisHeight => (1 + Eccentricity) * SemiMajorAxis;
         public double PeriapsisHeight => (1 - Eccentricity) * SemiMajorAxis;
 
+        TrajectoryTransform _parentBodyPointer;
         ITrajectory _parentBody;
         /// <summary>
         /// Gets or sets the parent trajectory directly. <br/>
@@ -84,11 +85,31 @@ namespace HSP.Vanilla.Trajectories
         {
             get
             {
-                if( _parentBody.IsUnityNull() && ParentBodyID != null )
-                    _parentBody = CelestialBodyManager.Get( ParentBodyID ).GetComponent<TrajectoryTransform>().Trajectory;
+
+                if( _parentBody == null && ParentBodyID != null )
+                {
+                    if( _parentBodyPointer == null )
+                    {
+                        var body = CelestialBodyManager.Get( ParentBodyID );
+                        if( body == null )
+                        {
+                            Debug.LogError( $"Couldn't find a body with ID '{ParentBodyID}'." );
+                        }
+                        _parentBodyPointer = body.GetComponent<TrajectoryTransform>();
+                        if( _parentBodyPointer == null )
+                        {
+                            Debug.LogError( $"The body with ID '{ParentBodyID}' doesn't have a trajectory transform." );
+                        }
+                    }
+                    _parentBody = _parentBodyPointer.Trajectory;
+                }
                 return _parentBody;
             }
-            set => _parentBody = value;
+            set
+            {
+                _parentBody = value;
+                _parentBodyPointer = null;
+            }
         }
         public string ParentBodyID { get; set; }
 
@@ -114,10 +135,32 @@ namespace HSP.Vanilla.Trajectories
             this.ParentBodyID = parentBodyId;
             this.SemiMajorAxis = semiMajorAxis;
             this.Eccentricity = eccentricity;
-            this.Inclination = inclination;
-            this.LongitudeOfAscendingNode = longitudeOfAscendingNode;
-            this.ArgumentOfPeriapsis = argumentOfPeriapsis;
-            this.MeanAnomaly = initialMeanAnomaly;
+            if( inclination == 0 )
+            {
+                this.Inclination = 0;
+                this.LongitudeOfAscendingNode = 0;
+            }
+            else if( inclination < 0 )
+            {
+                this.Inclination = -inclination;
+                this.LongitudeOfAscendingNode = NormalizeAngle( longitudeOfAscendingNode + Math.PI );
+                initialMeanAnomaly -= Math.PI;
+            }
+            else
+            {
+                this.Inclination = inclination;
+                this.LongitudeOfAscendingNode = NormalizeAngle( longitudeOfAscendingNode );
+            }
+            if( eccentricity < 0.000000001 )
+            {
+                initialMeanAnomaly += argumentOfPeriapsis;
+                this.ArgumentOfPeriapsis = 0;
+            }
+            else
+            {
+                this.ArgumentOfPeriapsis = NormalizeAngle( argumentOfPeriapsis );
+            }
+            this.MeanAnomaly = NormalizeAngle( initialMeanAnomaly );
         }
 
         /// <summary>
@@ -194,12 +237,8 @@ namespace HSP.Vanilla.Trajectories
         {
             TrajectoryBodyState parentState = ParentBody?.GetCurrentState() ?? new TrajectoryBodyState();
 
-            double gravParam = GetGravParameter( ParentBody.Mass );
-            double trueAnomaly = TrueAnomaly;
             Vector3Dbl bodyCentricPosition = GetPosition();
-            //bodyCentricPosition = CalculatePosition( trueAnomaly, semiLatusRectum, LongitudeOfAscendingNode, ArgumentOfPeriapsis, Inclination );
             Vector3Dbl velocity = GetVelocity();
-            //velocity = CalculateVelocity( trueAnomaly, gravParam, semiLatusRectum, LongitudeOfAscendingNode, ArgumentOfPeriapsis, Inclination, Eccentricity );
             Vector3Dbl acceleration = bodyCentricPosition.normalized * PhysicalConstants.G * (parentState.Mass / bodyCentricPosition.sqrMagnitude);
 
             return new TrajectoryBodyState( bodyCentricPosition + parentState.AbsolutePosition, velocity + parentState.AbsoluteVelocity, acceleration + parentState.AbsoluteAcceleration, Mass );
@@ -213,7 +252,7 @@ namespace HSP.Vanilla.Trajectories
 
             double gravParam = GetGravParameter( ParentBody.Mass );
             (double eccentricity, double semiMajorAxis, double inclination, double longitudeOfAscendingNode, double argumentOfPeriapsis, double trueAnomaly)
-                = CalculateFromStateVector( gravParam, bodyCentricPosition, bodyCentricVelocity );
+                = CalculateFromStateVector2( gravParam, bodyCentricPosition, bodyCentricVelocity );
             double eccAnom = EccentricAnomalyFromTrueAnomaly( trueAnomaly, eccentricity );
             double meanAnom = MeanAnomalyFromEccentricAnomaly( eccAnom, eccentricity );
 
@@ -259,7 +298,6 @@ namespace HSP.Vanilla.Trajectories
             UT += dt;
             // 0.0199613554149011
             // 0.01996135541490106327
-
             _cachedTrueAnomaly = CalculateTrueAnomaly( this.MeanAnomaly, this.Eccentricity );
         }
 
@@ -367,7 +405,7 @@ namespace HSP.Vanilla.Trajectories
             // calculate the eccentricity vector and eccentricity itself
             Vector3Dbl e = (Vector3Dbl.Cross( stateVectorVelocity, h ) * (1.0 / gravitationalParameter)) - (stateVectorPosition * (1.0 / stateVectorPosition.magnitude));
             eccentricity = e.magnitude;
-             
+
             // calculate specific orbital energy and semi-major axis
             double orbitalEnergy = (stateVectorVelocity.sqrMagnitude * 0.5) - (gravitationalParameter / stateVectorPosition.magnitude);
 
@@ -394,6 +432,8 @@ namespace HSP.Vanilla.Trajectories
             {
                 inclination = Math.Acos( h.z / h.magnitude );
             }
+
+#warning TODO - n can be all zeroes
 
             if( inclination == 0.0 )
                 longitudeOfAscendingNode = 0;
@@ -425,10 +465,102 @@ namespace HSP.Vanilla.Trajectories
             return (eccentricity, semiMajorAxis, inclination, longitudeOfAscendingNode, argumentOfPeriapsis, trueAnomaly);
         }
 
+        private static (double eccentricity, double semiMajorAxis, double inclination, double longitudeOfAscendingNode, double argumentOfPeriapsis, double trueAnomaly)
+            CalculateFromStateVector2( double gravitationalParameter, Vector3Dbl stateVectorPosition, Vector3Dbl stateVectorVelocity )
+        {
+            double Position_mag = stateVectorPosition.magnitude;
+            double Velocity_mag = stateVectorVelocity.magnitude;
+            double semiMajorAxis = 1 / (2 / Position_mag - Velocity_mag * Velocity_mag / gravitationalParameter);
+
+            Vector3Dbl h = Vector3Dbl.Cross( stateVectorPosition, stateVectorVelocity );
+            double h_mag = h.magnitude;
+
+            double posDotVel = Vector3Dbl.Dot( stateVectorPosition, stateVectorVelocity );
+
+#warning TODO - ecc vector is small negative or small positive on x axis with barely different velocities
+            // calculate the eccentricity vector and eccentricity itself
+            //Vector3Dbl cross = Vector3Dbl.Cross( stateVectorVelocity, h );
+            Vector3Dbl e = (Vector3Dbl.Cross( stateVectorVelocity, h ) * (1.0 / gravitationalParameter)) - (stateVectorPosition * (1.0 / stateVectorPosition.magnitude));
+            double eccentricity = e.magnitude;
+
+            //double p = (h_mag * h_mag) / gravitationalParameter;
+            //double eccentricity = Math.Sqrt( 1 - p / semiMajorAxis ); // eccentricity
+            // 0, z=4.46237315682851E+15
+            // 0, z=4.46237314105398E+15
+
+            //double Ex = 1 - Position_mag / semiMajorAxis;
+            //double Ey = posDotVel / Math.Sqrt( semiMajorAxis * gravitationalParameter );
+
+            double inclination = Math.Acos( h.z / h_mag );
+            //inclination = NormalizeAngle( inclination );
+
+            double longitudeOfAscendingNode = 0;
+            if( inclination != 0 )
+            {
+                longitudeOfAscendingNode = Math.Atan2( h.x, -h.y );
+                longitudeOfAscendingNode = NormalizeAngle( longitudeOfAscendingNode );
+            }
+
+#warning TODO - arccos can only give you half of a full circle
+            //double trueAnomaly;
+            //if( Vector3Dbl.Dot( stateVectorPosition, stateVectorVelocity ) >= 0.0 )
+            //    trueAnomaly = Math.Acos( Vector3Dbl.Dot( e, stateVectorPosition ) / (e.magnitude * stateVectorPosition.magnitude) );
+            //else
+            //    trueAnomaly = (2 * Math.PI) - Math.Acos( Vector3Dbl.Dot( e, stateVectorPosition ) / (e.magnitude * stateVectorPosition.magnitude) );
+
+#warning TODO - when x is close to 0, small changes to it can flip the anomaly by PI
+            double trueAnomalyX = ((h_mag * h_mag) / (Position_mag * gravitationalParameter)) - 1;
+            double trueAnomalyY = (h_mag * posDotVel) / (Position_mag * gravitationalParameter);
+            double trueAnomaly = Math.Atan2( trueAnomalyY, trueAnomalyX );
+            trueAnomaly = NormalizeAngle( trueAnomaly );
+
+            /*double sinOmega;
+            if( inclination == 0 || inclination == Math.PI )
+            {
+                sinOmega = (Ry * Math.Cos( longitudeOfAscendingNode ) - Rx * Math.Sin( longitudeOfAscendingNode )) / Position_mag;
+            }
+            else
+            {
+            }*/
+
+            double argumentOfPeriapsis = 0;
+            if( inclination != 0 )
+            {
+                double Rx = stateVectorPosition.x;
+                double Ry = stateVectorPosition.y;
+                double Rz = stateVectorPosition.z;
+
+                double CosOmega = (Rx * Math.Cos( longitudeOfAscendingNode ) + Ry * Math.Sin( longitudeOfAscendingNode )) / Position_mag;
+                double sinOmega = Rz / (Position_mag * Math.Sin( inclination ));
+                argumentOfPeriapsis = Math.Atan2( sinOmega, CosOmega ) - trueAnomaly;
+            }
+            /*if( argumentOfPeriapsis < 0 )
+            {
+                argumentOfPeriapsis = 2 * Math.PI + argumentOfPeriapsis;
+            }*/
+            argumentOfPeriapsis = NormalizeAngle( argumentOfPeriapsis );
+
+            //double eccentricAnomaly = Math.Atan2( Ey, Ex );
+            //double meanAnomaly = eccentricAnomaly - eccentricity * Math.Sin( eccentricAnomaly );
+
+            return (eccentricity, semiMajorAxis, inclination, longitudeOfAscendingNode, argumentOfPeriapsis, trueAnomaly);
+        }
+
+        public static double NormalizeAngle( double radians )
+        {
+            const double twoPi = 2 * Math.PI;
+
+            double normalized = radians % twoPi;
+
+            if( normalized < 0 )
+                normalized += twoPi;
+
+            return normalized;
+        }
 
         public static double CalculateTrueAnomaly( double meanAnomaly, double eccentricity )
         { // 4.34786982945266E-07   1.46366746500703E-08
-            meanAnomaly %= Math.PI;
+            meanAnomaly = NormalizeAngle( meanAnomaly );
             double eccentricAnomaly = CalculateEccentricAnomaly( meanAnomaly, eccentricity );
             double trueAnomaly = CalculateTrueAnomalyFromEccentric( eccentricAnomaly, eccentricity );
             return trueAnomaly;

@@ -121,6 +121,12 @@ namespace HSP.Trajectories
                     Vector3Dbl.zero,
                     trajectoryTransform.PhysicsTransform.Mass );
 
+                // (3727.62, -29514.69, 0.00)
+                // the entire thing kind of gets fucked up though
+
+#warning TODO - Seems that the state vector to keplerian gives wrong results still... ugh...
+                // the anomaly is fucked up somewhere between the first and 2nd simulate
+
                 trajectory.SetCurrentState( stateVector );
             }
 
@@ -131,16 +137,18 @@ namespace HSP.Trajectories
             foreach( var (trajectory, trajectoryTransform) in instance._trajectoryMap )
             {
                 TrajectoryBodyState stateVector = trajectory.GetCurrentState();
-
                 instance._posAndVelCache[trajectory] = (stateVector.AbsolutePosition, stateVector.AbsoluteVelocity);
 
                 if( trajectoryTransform.IsSynchronized() )
                 {
                     trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = (stateVector.AbsolutePosition - trajectoryTransform.ReferenceFrameTransform.AbsolutePosition) / TimeManager.FixedDeltaTime;
+
+                    Debug.Log( trajectoryTransform.gameObject.name + "  S:  " + trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity + "  :  " + stateVector.AbsoluteVelocity );
                 }
                 else
                 {
                     trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = stateVector.AbsoluteVelocity;
+                    Debug.Log( trajectoryTransform.gameObject.name + "  NS:  " + trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity + "  :  " + stateVector.AbsoluteVelocity );
                 }
             }
         }

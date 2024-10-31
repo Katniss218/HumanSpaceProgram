@@ -294,6 +294,7 @@ namespace HSP.Vanilla
             _cachedRotation = rot;
         }
 
+#warning TODO - pretty sure this stuff is not valid for the new reference frame split update order.
         private void RecalculateCacheIfNeeded()
         {
             if( IsCacheValid() )

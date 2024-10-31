@@ -269,6 +269,7 @@ namespace HSP.Vanilla
 
             var requestedPos = (Vector3)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformPosition( _requestedAbsolutePosition );
             var requestedRot = (Quaternion)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformRotation( _requestedAbsoluteRotation );
+            
             _rb.Move( requestedPos, requestedRot );
             _actualPosition = _rb.position;
             _actualRotation = _rb.rotation;

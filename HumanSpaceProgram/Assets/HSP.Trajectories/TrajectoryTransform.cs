@@ -116,6 +116,9 @@ namespace HSP.Trajectories
         }
 
         private void OnValueChanged() => _hadValuesChangedByHand = false;
+#warning TODO - things shouldn't desynchronize if the velocity changed but if the velocity is correct for the "new" UT
+        // OnValueChanged - compare the trajectory's pos/vel for the current UT, and check if they match the rigidbody's pos/vel for the same UT.
+        // i.e. if what we set is correct for the trajectory for the current UT
 
 #warning TODO - need to set the values whenever the trajectory is set, to make the planet's values correct immediately.
 

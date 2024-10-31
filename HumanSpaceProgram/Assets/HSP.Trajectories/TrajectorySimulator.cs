@@ -28,19 +28,20 @@ namespace HSP.Trajectories
             int stepCount = 10; // TODO - dynamic step count.
             double dt = TotalDelta / (double)stepCount;
 
+            // Copy the states to ensure that the simulation doesn't use values calculated for the next step on elements after the first element.
+            TrajectoryBodyState[] attractorStates = new TrajectoryBodyState[Attractors.Count];
+            //TrajectoryBodyState[] followerStates = new TrajectoryBodyState[Followers.Count];
+
             for( int i = 0; i < stepCount; i++ )
             {
-                // Copy the states to ensure that the simulation doesn't use values calculated for the next step on elements after the first element.
-                List<TrajectoryBodyState> attractorStates = new List<TrajectoryBodyState>( Attractors.Count );
-                List<TrajectoryBodyState> followerStates = new List<TrajectoryBodyState>( Followers.Count );
-                foreach( var t in Attractors )
+                for( int j = 0; j < Attractors.Count; j++ )
                 {
-                    attractorStates.Add( t.GetCurrentState() );
+                    attractorStates[j] = Attractors[j].GetCurrentState();
                 }
-                foreach( var t in Followers )
-                {
-                    followerStates.Add( t.GetCurrentState() );
-                }
+                //for( int j = 0; j < Followers.Count; j++ )
+                //{
+                //    followerStates[j] = Followers[j].GetCurrentState();
+                //}
 
                 // attractors go first, because they attract each other.
 
