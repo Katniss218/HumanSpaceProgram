@@ -121,12 +121,8 @@ namespace HSP.Trajectories
                     Vector3Dbl.zero,
                     trajectoryTransform.PhysicsTransform.Mass );
 
-                // (3727.62, -29514.69, 0.00)
-                // the entire thing kind of gets fucked up though
-
-#warning TODO - Seems that the state vector to keplerian gives wrong results still... ugh...
-                // the anomaly is fucked up somewhere between the first and 2nd simulate
-
+#warning TODO - only do SetCurrentState if the current state of the referenceframetransform doesn't match the trajectory, to stop keplerian orbits accumulating roundoff errors over time.
+                // Maybe this could be done with IsSynchronized, I need to check
                 trajectory.SetCurrentState( stateVector );
             }
 
@@ -139,16 +135,14 @@ namespace HSP.Trajectories
                 TrajectoryBodyState stateVector = trajectory.GetCurrentState();
                 instance._posAndVelCache[trajectory] = (stateVector.AbsolutePosition, stateVector.AbsoluteVelocity);
 
+                Debug.Log( stateVector.AbsolutePosition + " : " + stateVector.AbsoluteVelocity );
                 if( trajectoryTransform.IsSynchronized() )
                 {
                     trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = (stateVector.AbsolutePosition - trajectoryTransform.ReferenceFrameTransform.AbsolutePosition) / TimeManager.FixedDeltaTime;
-
-                    Debug.Log( trajectoryTransform.gameObject.name + "  S:  " + trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity + "  :  " + stateVector.AbsoluteVelocity );
                 }
                 else
                 {
                     trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = stateVector.AbsoluteVelocity;
-                    Debug.Log( trajectoryTransform.gameObject.name + "  NS:  " + trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity + "  :  " + stateVector.AbsoluteVelocity );
                 }
             }
         }
@@ -160,6 +154,7 @@ namespace HSP.Trajectories
                 // If it is STILL synchronized after physicsprocessing
                 if( trajectoryTransform.IsSynchronized() )
                 {
+#warning TODO - enabling the position update makes keplerian trajectories freeze in place.
                     //trajectoryTransform.ReferenceFrameTransform.AbsolutePosition = instance._posAndVelCache[trajectory].pos; // Experimental testing seems to indicate that this is indeed unnecessary for countering drift.
                     trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = instance._posAndVelCache[trajectory].vel;
                 }
