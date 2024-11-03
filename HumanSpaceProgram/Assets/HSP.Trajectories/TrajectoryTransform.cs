@@ -44,6 +44,8 @@ namespace HSP.Trajectories
             {
                 TryUnregister();
                 _trajectory = value;
+#warning TODO - need to set the values whenever the trajectory is set, to make the planet's values correct immediately.
+
                 TryRegister();
             }
         }
@@ -82,6 +84,7 @@ namespace HSP.Trajectories
 
             _lastSynchronizedTransform = this.ReferenceFrameTransform;
             _forceResyncWithTrajectory = false;
+            _hadValuesChangedByHand = false;
 
             return value;
         }
@@ -98,8 +101,7 @@ namespace HSP.Trajectories
 
         private bool HadForcesApplied() => this.ReferenceFrameTransform.AbsoluteAcceleration != Vector3Dbl.zero;
 
-        private bool _hadValuesChangedByHand; // An absoluteposition vs oldabsoluteposition check is not enough because velocity will be integrated (possibly in non-obvious ways),
-                                              //   so the check would always fail.
+        private bool _hadValuesChangedByHand;
 
         void OnEnable()
         {
@@ -115,14 +117,7 @@ namespace HSP.Trajectories
             TryUnregister();
         }
 
-        private void OnValueChanged() => _hadValuesChangedByHand = false;
-#warning TODO - things shouldn't desynchronize if the velocity changed but if the velocity is correct for the "new" UT
-        // OnValueChanged - compare the trajectory's pos/vel for the current UT, and check if they match the rigidbody's pos/vel for the same UT.
-        // i.e. if what we set is correct for the trajectory for the current UT
-
-#warning TODO - need to set the values whenever the trajectory is set, to make the planet's values correct immediately.
-
-#warning TODO - velocity propagation for objects near planets (when the planet suddenly moves objects around it should have the choice to start moving too).
+        private void OnValueChanged() => _hadValuesChangedByHand = true;
 
         private void TryRegister()
         {

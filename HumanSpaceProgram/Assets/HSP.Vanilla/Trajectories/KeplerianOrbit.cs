@@ -2,6 +2,7 @@
 using HSP.Trajectories;
 using System;
 using System.Collections.Generic;
+using UnityEditor.Search;
 using UnityEngine;
 using UnityPlus.Serialization;
 
@@ -128,8 +129,10 @@ namespace HSP.Vanilla.Trajectories
         /// <param name="mass">The mass of the object represented by this trajectory.</param>
         public KeplerianOrbit( double ut, string parentBodyId, double semiMajorAxis, double eccentricity, double inclination, double longitudeOfAscendingNode, double argumentOfPeriapsis, double initialMeanAnomaly, double mass )
         {
+            if( mass <= 0 )
+                throw new ArgumentOutOfRangeException( nameof( mass ), $"Mass must be positive." );
             if( eccentricity > 1 && semiMajorAxis > 0 )
-                throw new ArgumentOutOfRangeException( nameof( semiMajorAxis ), $"semiMajorAxis must be negative for hyperbolic orbits (eccentricity > 1)." );
+                throw new ArgumentOutOfRangeException( nameof( semiMajorAxis ), $"Semi-Major Axis must be negative for hyperbolic orbits (Eccentricity > 1)." );
 
             this.UT = ut;
             this.ParentBodyID = parentBodyId;
@@ -241,6 +244,9 @@ namespace HSP.Vanilla.Trajectories
             Vector3Dbl velocity = GetVelocity();
             Vector3Dbl acceleration = bodyCentricPosition.normalized * PhysicalConstants.G * (parentState.Mass / bodyCentricPosition.sqrMagnitude);
 
+#warning TODO - if the parent is not updated before 'this', the position will be different to if it was.
+            // It won't accumulate, but will be consistently offset proportionally to the velocity of the parent.
+
             return new TrajectoryBodyState( bodyCentricPosition + parentState.AbsolutePosition, velocity + parentState.AbsoluteVelocity, acceleration + parentState.AbsoluteAcceleration, Mass );
         }
 
@@ -288,6 +294,9 @@ namespace HSP.Vanilla.Trajectories
             // Keplerian orbits have a closed form solution, so they can be calculated arbitrarily far ahead in an instant.
 
 #warning TODO - change to 'true' when the on-demand calculation is ready.
+            // Figure out how to do on demand if the parent is not cacheable.
+            // - It is possible, but code it nicely
+
             return false;
         }
 
@@ -343,7 +352,7 @@ namespace HSP.Vanilla.Trajectories
 
             // Specific angular momentum
             double h = Math.Sqrt( SemiMajorAxis * (1 - Eccentricity * Eccentricity) * gravParam );
-#warning TODO - when the object velocity is 0, the eccentricity is 1, and `h` is 0.
+#warning TODO - when the object velocity is 0, the eccentricity is 1, and `h` is 0. when velociy is 0 we should assume it's at apoapsis of a perfectly linear orbit
 
             // Radial and tangential velocity components in the orbital plane
             double vr = (gravParam / h) * Eccentricity * Math.Sin( trueAnomaly );
@@ -396,7 +405,7 @@ namespace HSP.Vanilla.Trajectories
             Vector3Dbl n = new Vector3Dbl( -h.y, h.x, 0.0 );
 
             // Eccentricity vector is the vector pointing from apoapsis towards periapsis, with its magnitude equal to the eccentricity.
-            Vector3Dbl e = (Vector3Dbl.Cross( stateVectorVelocity, h ) * (1.0 / gravitationalParameter)) - (stateVectorPosition * (1.0 / stateVectorPosition.magnitude));
+            Vector3Dbl e = (Vector3Dbl.Cross( stateVectorVelocity, h ) / gravitationalParameter) - (stateVectorPosition / stateVectorPosition.magnitude);
 
             double semiMajorAxis = 1.0 / (2.0 / stateVectorPosition.magnitude - (stateVectorVelocity.magnitude * stateVectorVelocity.magnitude) / gravitationalParameter);
 
@@ -405,7 +414,7 @@ namespace HSP.Vanilla.Trajectories
             double inclination = Math.Acos( h.z / h.magnitude );
 
             double longitudeOfAscendingNode;
-            if( inclination < 1e-6 )
+            if( inclination < 1e-6 || inclination > (Math.PI - 1e-6) )
                 longitudeOfAscendingNode = 0;
             else
             {
@@ -425,8 +434,11 @@ namespace HSP.Vanilla.Trajectories
                 argumentOfPeriapsis = 0;
             else
             {
-                if( inclination < 1e-6 )
-                    argumentOfPeriapsis = Math.Acos( e.x / e.magnitude );
+                if( inclination < 1e-6 || inclination > (Math.PI - 1e-6) )
+                    if( h.z >= 0 )
+                        argumentOfPeriapsis = Math.Atan2( e.y, e.x ); // y and x being in opposite order to how atan2 wants them is deliberate.
+                    else
+                        argumentOfPeriapsis = (2.0 * Math.PI) - Math.Atan2( e.y, e.x ); // y and x being in opposite order to how atan2 wants them is deliberate.
                 else
                 {
                     if( e.z >= 0.0 )
@@ -441,7 +453,7 @@ namespace HSP.Vanilla.Trajectories
             if( eccentricity < 1e-6 )
             {
                 // Since a circular orbit doesn't have a uniquely determined periapsis, the eccentricity vector can't be used to determine the anomaly.
-                if( inclination < 1e-6 )
+                if( inclination < 1e-6 || inclination > (Math.PI - 1e-6) )
                 {
                     // For non-inclined circular orbits, we use the angle between the position and reference direction (true longitude).
                     if( stateVectorVelocity.x <= 0 )
@@ -460,15 +472,16 @@ namespace HSP.Vanilla.Trajectories
             }
             else
             {
-                // For most orbits (inclined and non-circular) we use the standard equation for mean anomaly.
                 //if( Vector3Dbl.Dot( stateVectorPosition, stateVectorVelocity ) >= 0.0 )
                 //    trueAnomaly = Math.Acos( Vector3Dbl.Dot( e, stateVectorPosition ) / (e.magnitude * stateVectorPosition.magnitude) );
                 //else
                 //    trueAnomaly = (2 * Math.PI) - Math.Acos( Vector3Dbl.Dot( e, stateVectorPosition ) / (e.magnitude * stateVectorPosition.magnitude) );
 
-#warning TODO - using the above version for some reason makes the orbit not update correctly when using small time steps to move it.
+                // For most orbits (inclined and non-circular) we use the standard equation for mean anomaly.
+                // This variant appears to be more numerically stable for large orbits.
+                var posDotvel = Vector3Dbl.Dot( stateVectorPosition, stateVectorVelocity );
                 double trueAnomalyX = ((h.magnitude * h.magnitude) / (stateVectorPosition.magnitude * gravitationalParameter)) - 1.0;
-                double trueAnomalyY = (h.magnitude * Vector3Dbl.Dot( stateVectorPosition, stateVectorVelocity )) / (stateVectorPosition.magnitude * gravitationalParameter);
+                double trueAnomalyY = (h.magnitude * posDotvel) / (stateVectorPosition.magnitude * gravitationalParameter);
                 trueAnomaly = Math.Atan2( trueAnomalyY, trueAnomalyX );
             }
             trueAnomaly = NormalizeAngle( trueAnomaly );
@@ -489,10 +502,11 @@ namespace HSP.Vanilla.Trajectories
         }
 
         public static double CalculateTrueAnomaly( double meanAnomaly, double eccentricity )
-        { // 4.34786982945266E-07   1.46366746500703E-08
+        {
             meanAnomaly = NormalizeAngle( meanAnomaly );
             double eccentricAnomaly = CalculateEccentricAnomaly( meanAnomaly, eccentricity );
             double trueAnomaly = CalculateTrueAnomalyFromEccentric( eccentricAnomaly, eccentricity );
+
             return trueAnomaly;
         }
 

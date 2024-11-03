@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace HSP.Trajectories
 {
-    public struct TrajectoryBodyState
+    public struct TrajectoryBodyState : IEquatable<TrajectoryBodyState>
     {
         public Vector3Dbl AbsolutePosition;
         public Vector3Dbl AbsoluteVelocity;
@@ -16,6 +17,14 @@ namespace HSP.Trajectories
             this.AbsoluteVelocity = absoluteVelocity;
             this.AbsoluteAcceleration = absoluteAcceleration;
             this.Mass = mass;
+        }
+
+        public bool Equals( TrajectoryBodyState other )
+        {
+            return this.AbsolutePosition == other.AbsolutePosition
+                && this.AbsoluteVelocity == other.AbsoluteVelocity
+                // && this.AbsoluteAcceleration == other.AbsoluteAcceleration
+                && this.Mass == other.Mass;
         }
     }
 

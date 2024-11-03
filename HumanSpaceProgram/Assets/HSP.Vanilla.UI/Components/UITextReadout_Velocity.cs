@@ -20,10 +20,10 @@ namespace HSP.Vanilla.UI.Components
             else
             {
                 CelestialBody body = CelestialBodyManager.Get( "main" );
-                //Vector3Dbl bodySpaceVelocity = body.CenteredInertialReferenceFrame.InverseTransformVelocity( activeObj.AbsoluteVelocity );
-                Vector3Dbl absoluteVelocity = activeObj.AbsoluteVelocity;
+                Vector3Dbl bodySpaceVelocity = body.CenteredInertialReferenceFrame.InverseTransformVelocity( activeObj.AbsoluteVelocity );
+                //Vector3Dbl absoluteVelocity = activeObj.AbsoluteVelocity;
 
-                double vel = absoluteVelocity.magnitude;
+                double vel = bodySpaceVelocity.magnitude;
 
                 this.Text = $"{vel:#0} m/s";
             }

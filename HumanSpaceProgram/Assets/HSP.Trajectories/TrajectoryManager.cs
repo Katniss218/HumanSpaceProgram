@@ -106,24 +106,29 @@ namespace HSP.Trajectories
 
         public static int i = 0;
 
-        private Dictionary<ITrajectory, (Vector3Dbl pos, Vector3Dbl vel)> _posAndVelCache = new();
+        private Dictionary<ITrajectory, (Vector3Dbl pos, Vector3Dbl vel, Vector3Dbl interpolatedVel)> _posAndVelCache = new();
 
         private static void BeforePhysicsProcessing()
         {
             if( !instanceExists )
                 return;
 
+#warning TODO - velocity propagation for objects near planets 
+            // - when the planet suddenly moves, the objects around it should move as well (maybe make it a choice),
+            //   proportionally to the part of gravitational influence that's due to the planet.
+
             foreach( var (trajectory, trajectoryTransform) in instance._trajectoryMap )
             {
-                TrajectoryBodyState stateVector = new TrajectoryBodyState(
-                    trajectoryTransform.ReferenceFrameTransform.AbsolutePosition,
-                    trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity, // velocity before rigidbody forces from this frame are applied.
-                    Vector3Dbl.zero,
-                    trajectoryTransform.PhysicsTransform.Mass );
+                if( !trajectoryTransform.IsSynchronized() )
+                {
+                    TrajectoryBodyState stateVector = new TrajectoryBodyState(
+                        trajectoryTransform.ReferenceFrameTransform.AbsolutePosition,
+                        trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity, // velocity before rigidbody forces from this frame are applied.
+                        Vector3Dbl.zero,
+                        trajectoryTransform.PhysicsTransform.Mass );
 
-#warning TODO - only do SetCurrentState if the current state of the referenceframetransform doesn't match the trajectory, to stop keplerian orbits accumulating roundoff errors over time.
-                // Maybe this could be done with IsSynchronized, I need to check
-                trajectory.SetCurrentState( stateVector );
+                    trajectory.SetCurrentState( stateVector );
+                }
             }
 
             double time = instance._simulator.EndUT;
@@ -133,15 +138,19 @@ namespace HSP.Trajectories
             foreach( var (trajectory, trajectoryTransform) in instance._trajectoryMap )
             {
                 TrajectoryBodyState stateVector = trajectory.GetCurrentState();
-                instance._posAndVelCache[trajectory] = (stateVector.AbsolutePosition, stateVector.AbsoluteVelocity);
 
-                Debug.Log( stateVector.AbsolutePosition + " : " + stateVector.AbsoluteVelocity );
                 if( trajectoryTransform.IsSynchronized() )
                 {
-                    trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = (stateVector.AbsolutePosition - trajectoryTransform.ReferenceFrameTransform.AbsolutePosition) / TimeManager.FixedDeltaTime;
+#warning TODO - the difference in distance being twice of what it should be implies that the AbsolutePosition is being calculated wrong?
+                    var interpolatedVel = (stateVector.AbsolutePosition - trajectoryTransform.ReferenceFrameTransform.AbsolutePosition) / TimeManager.FixedDeltaTime;
+
+                    instance._posAndVelCache[trajectory] = (stateVector.AbsolutePosition, stateVector.AbsoluteVelocity, interpolatedVel);
+
+                    trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = interpolatedVel;
                 }
                 else
                 {
+                    instance._posAndVelCache[trajectory] = (stateVector.AbsolutePosition, stateVector.AbsoluteVelocity, Vector3Dbl.zero);
                     trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = stateVector.AbsoluteVelocity;
                 }
             }
@@ -151,12 +160,17 @@ namespace HSP.Trajectories
         {
             foreach( var (trajectory, trajectoryTransform) in instance._trajectoryMap )
             {
-                // If it is STILL synchronized after physicsprocessing
-                if( trajectoryTransform.IsSynchronized() )
+                var (_, vel, interpolatedVel) = instance._posAndVelCache[trajectory];
+
+                /*if( trajectoryTransform.IsSynchronized() ) // Experimental testing seems to indicate that this is unnecessary for countering drift.
                 {
-#warning TODO - enabling the position update makes keplerian trajectories freeze in place.
-                    //trajectoryTransform.ReferenceFrameTransform.AbsolutePosition = instance._posAndVelCache[trajectory].pos; // Experimental testing seems to indicate that this is indeed unnecessary for countering drift.
-                    trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = instance._posAndVelCache[trajectory].vel;
+#warning TODO - enabling the position reset makes keplerian trajectories act weird
+                    trajectoryTransform.ReferenceFrameTransform.AbsolutePosition = pos;
+                }*/
+
+                if( trajectoryTransform.IsSynchronized() || trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity == interpolatedVel )
+                {
+                    trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = vel;
                 }
             }
 

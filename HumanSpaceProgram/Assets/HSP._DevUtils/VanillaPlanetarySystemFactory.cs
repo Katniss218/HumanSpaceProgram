@@ -58,12 +58,6 @@ namespace HSP._DevUtils
             //CelestialBody cb = CreateCB( "main", Vector3Dbl.zero, Vector3Dbl.zero, orientation );
             //CelestialBody cb = CreateCB( "main", new Vector3Dbl( 150_000_000_000_000, 0, 0 ), new Vector3Dbl( 0, 29800, 0 ), orientation );
 
-#warning TODO - something is ducked up with the order of where these are created. if main is first, then NaNs appear
-            // Due to the order in which they are processed by the trajectory stuff maybe?
-
-#warning TODO - but when the pos/vel of parent stays fixed, something still breaks.
-
-
             CelestialBody cb = CreateCB( "main", "sun", 150_000_000_000, 0, 0, 0, 0, 0, orientation );
             //CelestialBody cb = CreateCB( "main", new Vector3Dbl( 150000000000, 0, 0 ), new Vector3Dbl( 0, 29749.1543788567, 0 ), orientation );
             CelestialBody cbSun = CreateCB( "sun", Vector3Dbl.zero, orientation );

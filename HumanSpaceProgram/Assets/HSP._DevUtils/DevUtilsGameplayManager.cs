@@ -83,7 +83,7 @@ namespace HSP._DevUtils
         {
             CelestialBody body = CelestialBodyManager.Get( "main" );
             Vector3 localPos = CoordinateUtils.GeodeticToEuclidean( 28.5857702f, -80.6507262f, (float)(body.Radius + 12.5) );
-            
+
             launchSite = VesselFactory.CreatePartless( Vector3Dbl.zero, QuaternionDbl.identity, Vector3Dbl.zero, Vector3Dbl.zero );
             launchSite.gameObject.name = "launchsite";
             launchSite.Pin( body, localPos, Quaternion.FromToRotation( Vector3.up, localPos.normalized ) );
@@ -152,11 +152,13 @@ namespace HSP._DevUtils
             {
                 isPressed = false;
 
-                Debug.Log( CelestialBodyManager.Get( "main" ).ReferenceFrameTransform.AbsoluteVelocity );
-                vessel.ReferenceFrameTransform.AbsolutePosition = CelestialBodyManager.Get( "main" ).ReferenceFrameTransform.AbsolutePosition
-                    + new Vector3Dbl( CelestialBodyManager.Get( "main" ).Radius + 200_000, 0, 0 );
-                vessel.ReferenceFrameTransform.AbsoluteVelocity = CelestialBodyManager.Get( "main" ).ReferenceFrameTransform.AbsoluteVelocity
-                    + new Vector3Dbl( 0, 8500, 0 );
+                var body = CelestialBodyManager.Get( "main" );
+
+                Debug.Log( body.ReferenceFrameTransform.AbsoluteVelocity );
+
+                vessel.ReferenceFrameTransform.AbsolutePosition = body.ReferenceFrameTransform.AbsolutePosition + new Vector3Dbl( body.Radius + 200_000, 0, 0 );
+                vessel.ReferenceFrameTransform.AbsoluteVelocity = body.ReferenceFrameTransform.AbsoluteVelocity + new Vector3Dbl( 0, 8500, 0 );
+
                 SceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT,
                     SceneReferenceFrameManager.TargetObject.AbsolutePosition, SceneReferenceFrameManager.TargetObject.AbsoluteVelocity ) );
             }
