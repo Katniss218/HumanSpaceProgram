@@ -2,7 +2,6 @@
 using HSP.Trajectories;
 using System;
 using System.Collections.Generic;
-using UnityEditor.Search;
 using UnityEngine;
 using UnityPlus.Serialization;
 
@@ -13,12 +12,6 @@ namespace HSP.Vanilla.Trajectories
     /// </summary>
     public class KeplerianOrbit : ITrajectory
     {
-        // Sources:
-        // https://github.com/MuMech/MechJeb2/blob/dev/MechJeb2/MechJebLib/Core/Maths.cs#L226
-        // https://downloads.rene-schwarz.com/download/M001-Keplerian_Orbit_Elements_to_Cartesian_State_Vectors.pdf
-        // https://downloads.rene-schwarz.com/download/M002-Cartesian_State_Vectors_to_Keplerian_Orbit_Elements.pdf
-        // https://gist.github.com/triffid/166b8f5597ce52bcafd15a18218b066f
-
         /// <summary>
         /// The semi-major axis of the orbit, in [m].
         /// </summary>
@@ -60,8 +53,8 @@ namespace HSP.Vanilla.Trajectories
         {
             get
             {
-                //if( _cachedTrueAnomaly.HasValue )
-                _cachedTrueAnomaly = CalculateTrueAnomaly( MeanAnomaly, Eccentricity );
+                if( !_cachedTrueAnomaly.HasValue )
+                    _cachedTrueAnomaly = CalculateTrueAnomaly( MeanAnomaly, Eccentricity );
                 return _cachedTrueAnomaly.Value;
             }
         }
@@ -86,7 +79,6 @@ namespace HSP.Vanilla.Trajectories
         {
             get
             {
-
                 if( _parentBody == null && ParentBodyID != null )
                 {
                     if( _parentBodyPointer == null )
@@ -304,10 +296,11 @@ namespace HSP.Vanilla.Trajectories
         {
             double meanMotion = GetMeanMotion();
 
-            MeanAnomaly += (meanMotion * dt) % Math.PI;
+            MeanAnomaly += (meanMotion * dt);
+            MeanAnomaly = NormalizeAngle( MeanAnomaly );
             UT += dt;
 
-            // True anomaly will be calculated on demand from mean anomaly later.
+            _cachedTrueAnomaly = null; // Invalidate the cache
         }
 
 

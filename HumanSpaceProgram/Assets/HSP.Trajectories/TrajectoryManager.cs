@@ -7,11 +7,18 @@ using UnityPlus;
 
 namespace HSP.Trajectories
 {
+    /// <summary>
+    /// Manages the celestial simulation, updates the game objects based on that simulation.
+    /// </summary>
     public class TrajectoryManager : SingletonMonoBehaviour<TrajectoryManager>
     {
         private TrajectorySimulator _simulator = new();
         private Dictionary<ITrajectory, TrajectoryTransform> _trajectoryMap = new();
 
+        /// <summary>
+        /// Tries to add the specified trajectory to the simulation as an attractor.
+        /// </summary>
+        /// <returns>True if the trajectory was successfully added to the simulation, otherwise false.</returns>
         public static bool TryRegisterAttractor( ITrajectory attractorTrajectory, TrajectoryTransform transform )
         {
             if( !instanceExists )
@@ -26,6 +33,10 @@ namespace HSP.Trajectories
             return true;
         }
 
+        /// <summary>
+        /// Tries to remove the specified trajectory (attractor) from the simulation.
+        /// </summary>
+        /// <returns>True if the trajectory was successfully removed, otherwise false.</returns>
         public static bool TryUnregisterAttractor( ITrajectory attractorTrajectory )
         {
             if( !instanceExists )
@@ -40,6 +51,10 @@ namespace HSP.Trajectories
             return true;
         }
 
+        /// <summary>
+        /// Tries to add the specified trajectory to the simulation as a follower.
+        /// </summary>
+        /// <returns>True if the trajectory was successfully added to the simulation, otherwise false.</returns>
         public static bool TryRegisterFollower( ITrajectory followerTrajectory, TrajectoryTransform transform )
         {
             if( !instanceExists )
@@ -54,6 +69,10 @@ namespace HSP.Trajectories
             return true;
         }
 
+        /// <summary>
+        /// Tries to remove the specified trajectory (follower) from the simulation.
+        /// </summary>
+        /// <returns>True if the trajectory was successfully removed, otherwise false.</returns>
         public static bool TryUnregisterFollower( ITrajectory followerTrajectory )
         {
             if( !instanceExists )
@@ -68,6 +87,9 @@ namespace HSP.Trajectories
             return true;
         }
 
+        /// <summary>
+        /// Clears all attractors and followers from the simulation.
+        /// </summary>
         public static void Clear()
         {
             if( !instanceExists )
@@ -93,22 +115,40 @@ namespace HSP.Trajectories
         private static PlayerLoopSystem _beforePlayerLoopSystem = new PlayerLoopSystem()
         {
             type = typeof( TrajectoryManager ),
-            updateDelegate = BeforePhysicsProcessing,
+            updateDelegate = ImmediatelyBeforeUnityPhysicsStep,
             subSystemList = null
         };
 
         private static PlayerLoopSystem _afterPlayerLoopSystem = new PlayerLoopSystem()
         {
             type = typeof( TrajectoryManager ),
-            updateDelegate = AfterPhysicsProcessing,
+            updateDelegate = ImmediatelyAfterUnityPhysicsStep,
             subSystemList = null
         };
 
-        public static int i = 0;
-
         private Dictionary<ITrajectory, (Vector3Dbl pos, Vector3Dbl vel, Vector3Dbl interpolatedVel)> _posAndVelCache = new();
 
-        private static void BeforePhysicsProcessing()
+        // Simulation works as follows:
+
+        //          FIXED UPDATE
+
+        // 1. Update the trajectories of objects that are not synchronized
+        //      (e.g. someone manually set some value on the transforms,
+        //       or a rocket engine has applied a force directly to the game object/vessel)
+
+        // 2. Advance the simulation to the current frame's UT.
+
+        // 3. Set the velocity to a value such that the object will get to the desired location after the Unity's physics step.
+
+        //          UNITY PHYSICS STEP
+
+        // 4. If the object is still synchronized, set the velocity back to what it should be so that other systems can use it,
+        // 4.1 If it was desynchronized (e.g. collided with something), it will be resynchronized at next frame's (1.).
+
+        //          UPDATE
+        //          LATE UPDATE
+
+        private static void ImmediatelyBeforeUnityPhysicsStep()
         {
             if( !instanceExists )
                 return;
@@ -142,7 +182,7 @@ namespace HSP.Trajectories
                 if( trajectoryTransform.IsSynchronized() )
                 {
 #warning TODO - the difference in distance being twice of what it should be implies that the AbsolutePosition is being calculated wrong?
-                    var interpolatedVel = (stateVector.AbsolutePosition - trajectoryTransform.ReferenceFrameTransform.AbsolutePosition) / TimeManager.FixedDeltaTime;
+                    Vector3Dbl interpolatedVel = (stateVector.AbsolutePosition - trajectoryTransform.ReferenceFrameTransform.AbsolutePosition) / TimeManager.FixedDeltaTime;
 
                     instance._posAndVelCache[trajectory] = (stateVector.AbsolutePosition, stateVector.AbsoluteVelocity, interpolatedVel);
 
@@ -156,7 +196,7 @@ namespace HSP.Trajectories
             }
         }
 
-        private static void AfterPhysicsProcessing()
+        private static void ImmediatelyAfterUnityPhysicsStep()
         {
             foreach( var (trajectory, trajectoryTransform) in instance._trajectoryMap )
             {
@@ -164,17 +204,17 @@ namespace HSP.Trajectories
 
                 /*if( trajectoryTransform.IsSynchronized() ) // Experimental testing seems to indicate that this is unnecessary for countering drift.
                 {
-#warning TODO - enabling the position reset makes keplerian trajectories act weird
+                 TODO - enabling the position reset makes keplerian trajectories act weird
                     trajectoryTransform.ReferenceFrameTransform.AbsolutePosition = pos;
                 }*/
 
+                // IsSynchronized() will return false if a kinematic object (e.g. planet) is colliding,
+                //   in such a case, the object didn't change its velocity so it's technically still synchronized.
                 if( trajectoryTransform.IsSynchronized() || trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity == interpolatedVel )
                 {
                     trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = vel;
                 }
             }
-
-            i++;
         }
     }
 }

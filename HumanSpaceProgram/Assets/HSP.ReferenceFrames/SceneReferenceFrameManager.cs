@@ -19,11 +19,11 @@ namespace HSP.ReferenceFrames
         public struct ReferenceFrameSwitchData
         {
             /// <summary>
-            /// The reference frame that was active before the switch (with up-to-date <see cref="IReferenceFrame.ReferenceUT"/>).
+            /// The reference frame that was active before the switch (with up-to-date <see cref="IReferenceFrame.ReferenceUT"/> matching <see cref="TimeManager.UT"/>).
             /// </summary>
             public IReferenceFrame OldFrame { get; set; }
             /// <summary>
-            /// The reference frame that becomes active after the switch (with up-to-date <see cref="IReferenceFrame.ReferenceUT"/>).
+            /// The reference frame that becomes active after the switch (with up-to-date <see cref="IReferenceFrame.ReferenceUT"/> matching <see cref="TimeManager.UT"/>).
             /// </summary>
             public IReferenceFrame NewFrame { get; set; }
         }
@@ -48,6 +48,10 @@ namespace HSP.ReferenceFrames
         /// <summary>
         /// Invoked immediately AFTER the scene's reference frame switches.
         /// </summary>
+        /// <remarks>
+        /// NOTE TO IMPLEMENTERS: <br/>
+        ///     This event is invoked 'during' (immediately after) unity physics step.
+        /// </remarks>
         public static event Action<ReferenceFrameSwitchData> OnAfterReferenceFrameSwitch;
 
         private IReferenceFrame _referenceFrame;
@@ -55,8 +59,9 @@ namespace HSP.ReferenceFrames
         /// The current reference frame used by the scene.
         /// </summary>
         /// <remarks>
-        /// The reference frame is updated during PhysicsProcessing, which happens after FixedUpdate. <br/>
-        /// Use `ReferenceFrame.AtUT( TimeManager.UT )`, if you want to access what the scene frame will equal at the end of the current frame (assuming it won't switch in the meantime).
+        /// NOTE TO IMPLEMENTERS: <br/>
+        ///     The reference frame is updated 'during' (immediately after) unity physics step, which happens after FixedUpdate. <br/>
+        ///     Use `ReferenceFrame.AtUT( TimeManager.UT )`, if you want to access what the scene frame will be at the end of the current frame.
         /// </remarks>
         public static IReferenceFrame ReferenceFrame
         {
@@ -65,6 +70,9 @@ namespace HSP.ReferenceFrames
         }
 #warning TODO - Consider including a getter for the 'referenceframe at end of current frame', which could consider incoming switches and return the frame after the switch.
 
+        /// <summary>
+        /// Returns true if a new reference frame is queued for switch at the next available time.
+        /// </summary>
         public bool IsSwitchRequested => _frameToSwitchTo != null;
 
         private static IReferenceFrame _frameToSwitchTo = null;
@@ -83,7 +91,8 @@ namespace HSP.ReferenceFrames
         }
 
         /// <summary>
-        /// Attempts to switch to the requested reference frame, if one is set.
+        /// Attempts to immediately switch to the requested reference frame, if one is set. <br/>
+        /// Only to be used after unity physics step
         /// </summary>
         private static void TrySwitchToRequestedSceneReferenceFrame()
         {
@@ -107,7 +116,7 @@ namespace HSP.ReferenceFrames
 
             try
             {
-                // Both oldFrame and newFrame should have up-to-date UT here.
+                // Both oldFrame and newFrame should now have UT that matches TimeManager.UT.
                 OnAfterReferenceFrameSwitch?.Invoke( new ReferenceFrameSwitchData() { OldFrame = oldFrame, NewFrame = newFrame } );
             }
             catch( Exception ex )
@@ -117,7 +126,7 @@ namespace HSP.ReferenceFrames
             }
         }
 
-        private static void ReferenceFrameSwitch_Objects( ReferenceFrameSwitchData data )
+        private static void ReferenceFrameSwitch_Responders( ReferenceFrameSwitchData data )
         {
             foreach( var obj in UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects() )
             {
@@ -127,26 +136,6 @@ namespace HSP.ReferenceFrames
                 }
             }
         }
-
-        private static void ReferenceFrameSwitch_Trail( ReferenceFrameSwitchData data )
-        {
-            // WARN: This is very expensive to run when the trail has a lot of vertices.
-            // When moving fast, don't use the default trail parameters, it produces too many vertices.
-
-            // Trails don't work properly when the reference frame is moving anyway, they're in scene frame, not in any sort of useful frame.
-
-            foreach( var trail in FindObjectsOfType<TrailRenderer>() ) // this is slow. It would be beneficial to keep a cache, or wrap this in a module.
-            {
-                for( int i = 0; i < trail.positionCount; i++ )
-                {
-                    trail.SetPosition( i, (Vector3)ReferenceFrameUtils.GetNewPosition( data.OldFrame, data.NewFrame, trail.GetPosition( i ) ) );
-                }
-            }
-        }
-
-        //
-        //
-        // Floating origin and active vessel following part of the class below:
 
         /// <summary>
         /// The maximum distance from scene origin that the <see cref="TargetObject"/> can reach before a reference frame switch will happen.
@@ -183,15 +172,13 @@ namespace HSP.ReferenceFrames
             }
         }
 
-        static SceneReferenceFrameManager() // If this is set in awake, the atmosphere renderer and other things might get desynced.
-        {
-            OnAfterReferenceFrameSwitch = null;
-            OnAfterReferenceFrameSwitch += ReferenceFrameSwitch_Objects;
-            OnAfterReferenceFrameSwitch += ReferenceFrameSwitch_Trail;
-        }
-
         void Awake()
         {
+            // This can now be inside Awake because the frame is switched during unity physics step, and not immediately.
+            OnAfterReferenceFrameSwitch = null;
+            OnAfterReferenceFrameSwitch += ReferenceFrameSwitch_Responders;
+
+            // Initial frame
             instance._referenceFrame = new CenteredReferenceFrame( 0, Vector3Dbl.zero );
         }
 
@@ -209,22 +196,20 @@ namespace HSP.ReferenceFrames
         private static PlayerLoopSystem _playerLoopSystem = new PlayerLoopSystem()
         {
             type = typeof( SceneReferenceFrameManager ),
-            updateDelegate = PlayerLoopFixedUpdate,
+            updateDelegate = ImmediatelyAfterUnityPhysicsStep,
             subSystemList = null
         };
 
-        private static void PlayerLoopFixedUpdate()
+        private static void ImmediatelyAfterUnityPhysicsStep()
         {
             if( !instanceExists )
                 return;
 
-            // IMPORTANT: Do not put code above this line.
-            // Otherwise things can desync - you'll be using rigidbody positions after they've been updated
-            //                               alongside a reference frame that hasn't, breaking the contract.
+            // IMPORTANT: Do not put any code before the reference frame is updated.
+            //   If you do, things can desync - You'll be using updated rigidbody values alongside a non-updated reference frame.
             instance._referenceFrame = instance._referenceFrame.AtUT( TimeManager.UT );
 
-            // Checking for out of bounds objects AFTER they have updated their positions (as opposed to inside FixedUpdate)
-            //   prevents moving objects from appearing offset from the center.
+            // Checking object in scene bounds after unity physics step ensures that the new frame will match where the object is.
             EnsureTargetObjectInSceneBounds();
 
             TrySwitchToRequestedSceneReferenceFrame();

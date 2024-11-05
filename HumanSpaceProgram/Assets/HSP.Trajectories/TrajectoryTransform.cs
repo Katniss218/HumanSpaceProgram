@@ -1,4 +1,5 @@
 ﻿using HSP.ReferenceFrames;
+using System;
 using UnityEngine;
 using UnityPlus.Serialization;
 
@@ -10,6 +11,9 @@ namespace HSP.Trajectories
     public class TrajectoryTransform : MonoBehaviour
     {
         private IPhysicsTransform _physicsTransform;
+        /// <summary>
+        /// Gets the physics transform associated with this game object.
+        /// </summary>
         public IPhysicsTransform PhysicsTransform
         {
             get
@@ -23,6 +27,9 @@ namespace HSP.Trajectories
         }
 
         private IReferenceFrameTransform _referenceFrameTransform;
+        /// <summary>
+        /// Gets the reference frame transform associated with this game object.
+        /// </summary>
         public IReferenceFrameTransform ReferenceFrameTransform
         {
             get
@@ -37,20 +44,35 @@ namespace HSP.Trajectories
         }
 
         private ITrajectory _trajectory;
+        /// <summary>
+        /// Gets or sets the trajectory that this object will follow.
+        /// </summary>
         public ITrajectory Trajectory
         {
             get => _trajectory;
             set
             {
+                if( value == null )
+                {
+                    throw new ArgumentNullException( nameof( value ), "The trajectory can't be null." );
+                }
+
                 TryUnregister();
                 _trajectory = value;
-#warning TODO - need to set the values whenever the trajectory is set, to make the planet's values correct immediately.
+
+                // The state might not be fully available yet.
+                //var state = value.GetCurrentState();
+                //_referenceFrameTransform.AbsolutePosition = state.AbsolutePosition;
+                //_referenceFrameTransform.AbsoluteVelocity = state.AbsoluteVelocity;
 
                 TryRegister();
             }
         }
 
         private bool _isAttractor;
+        /// <summary>
+        /// If true, the object will act like a gravitational attractor.
+        /// </summary>
         public bool IsAttractor
         {
             get => _isAttractor;
@@ -71,7 +93,11 @@ namespace HSP.Trajectories
         /// <summary>
         /// Checks if the object has more up-to-date (more correct) information than the trajectory.
         /// </summary>
-        /// <returns>True if the trajectory is up-to-date, false if something happened to the object and the trajectory needs to be synced up again.</returns>
+        /// <returns>
+        /// True if the trajectory and reference frame transform are in sync. <br/>
+        /// False if the trajectory needs to be updated using the reference frame transform's values. <br/>
+        /// Related to <see cref="RequestForcedResynchronization"/>.
+        /// </returns>
         public bool IsSynchronized()
         {
             bool value = _lastSynchronizedTransform == this.ReferenceFrameTransform // Because we use an event to check the manual reset of values, it would be possible for you to
@@ -90,7 +116,7 @@ namespace HSP.Trajectories
         }
 
         /// <summary>
-        /// Makes the trajectory resynchronize with the object using object's values on the next trajectory update.
+        /// Forces the trajectory to update using the reference transform's values at the next available time.
         /// </summary>
         public void RequestForcedResynchronization()
         {

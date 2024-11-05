@@ -1,9 +1,11 @@
 ﻿using HSP.CelestialBodies;
 using HSP.CelestialBodies.Surfaces;
+using HSP.ReferenceFrames;
 using HSP.Timelines;
 using HSP.Trajectories;
 using HSP.Vanilla.Trajectories;
 using HSP.Vessels;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -55,22 +57,52 @@ namespace HSP._DevUtils
         public static void CreateDefaultPlanetarySystem()
         {
             QuaternionDbl orientation = Quaternion.Euler( 270, 0, 0 );
-            //CelestialBody cb = CreateCB( "main", Vector3Dbl.zero, Vector3Dbl.zero, orientation );
-            //CelestialBody cb = CreateCB( "main", new Vector3Dbl( 150_000_000_000_000, 0, 0 ), new Vector3Dbl( 0, 29800, 0 ), orientation );
 
             CelestialBody cb = CreateCB( "main", "sun", 150_000_000_000, 0, 0, 0, 0, 0, orientation );
-            //CelestialBody cb = CreateCB( "main", new Vector3Dbl( 150000000000, 0, 0 ), new Vector3Dbl( 0, 29749.1543788567, 0 ), orientation );
             CelestialBody cbSun = CreateCB( "sun", Vector3Dbl.zero, orientation );
 
-            foreach( var cbody in CelestialBodyManager.CelestialBodies )
+            foreach( var x in CelestialBodyManager.CelestialBodies )
             {
-                TrajectoryTransform t = cbody.GetComponent<TrajectoryTransform>();
-
-                TrajectoryBodyState state = t.Trajectory.GetCurrentState();
-
-                cbody.ReferenceFrameTransform.AbsolutePosition = state.AbsolutePosition;
-                cbody.ReferenceFrameTransform.AbsoluteVelocity = state.AbsoluteVelocity;
+                var state = x.GetComponent<TrajectoryTransform>().Trajectory.GetCurrentState();
+                x.ReferenceFrameTransform.AbsolutePosition = state.AbsolutePosition;
+                x.ReferenceFrameTransform.AbsoluteVelocity = state.AbsoluteVelocity;
             }
+
+
+            //CelestialBody cb = CreateCB( "main", Vector3Dbl.zero, Vector3Dbl.zero, orientation );
+            //CelestialBody cb = CreateCB( "main", new Vector3Dbl( 150_000_000_000_000, 0, 0 ), new Vector3Dbl( 0, 29800, 0 ), orientation );
+            //CelestialBody cb = CreateCB( "main", new Vector3Dbl( 150_000_000_000_000_000, 0, 0 ), new Vector3Dbl( 0, 29749.1543788567, 0 ), orientation );
+
+#warning TODO - all trajectories need to be instantiated and assigned before setting the pos/vel.
+            // this requirement here to set the pos/vel also means we can't really load the parent lazily like I was doing.
+            // this 'requirement' also needs to be satisfied for deserialization
+
+            // we need to achieve this because the trajectory manager expects the correct value to be there.
+
+#warning TODO maybe instead of issynchronized, we can have an enum specifying what is more up to date, or that both are synchronized.
+            // this would eliminate the requirement by stating that the trajectory has correct values and the transform can be overwritten (would stop the initial back-feed)
+
+#warning TODO - transform values NEED to be overwritten basically immediately, to spawn vessels and other stuff.
+
+            // every external direct change of values should be passed through.
+
+            // cb
+            // body is created
+            // traj is assigned
+
+            // vessel
+            // vessel is created
+            // traj is assigned
+            // 
+
+
+            // deserialization would be fine because the vel is saved directly.
+
+
+
+
+#warning TODO - first switch doesn't switch correctly, only after switching back and switching again, it switches right.
+#warning TODO - at large SMA it doesn't want to switch at all.
 
             //CelestialBody cb1 = CreateCB( "moon1", "main", 440_000_00, 0, 0, 0, 0, 0, orientation );
             //CelestialBody cb1 = CreateCB( "moon2", new Vector3Dbl( 440_000_00, 100_000_000, 0 ), new Vector3Dbl( 0, 0, 0 ), orientation );

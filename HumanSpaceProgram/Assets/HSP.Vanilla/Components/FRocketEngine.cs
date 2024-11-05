@@ -44,7 +44,6 @@ namespace HSP.Vanilla.Components
         private void SetThrottleListener( float value )
         {
             this.Throttle = value;
-            TrajectoryManager.i = 0;
         }
 
         /// <summary>

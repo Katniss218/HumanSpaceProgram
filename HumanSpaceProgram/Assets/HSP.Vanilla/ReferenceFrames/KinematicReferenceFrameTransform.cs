@@ -89,6 +89,8 @@ namespace HSP.Vanilla
         {
             get
             {
+                return (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformVelocity( _absoluteVelocity );
+#warning TODO - where is this set? if it's set by rigidbody.Move then it's gonna be wrong because it uses interpolated values by the trajectory system.
                 return _rb.velocity;
             }
             set
@@ -119,6 +121,7 @@ namespace HSP.Vanilla
         {
             get
             {
+                return (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformVelocity( _absoluteAngularVelocity );
                 return _rb.angularVelocity;
             }
             set
@@ -253,6 +256,7 @@ namespace HSP.Vanilla
 
         protected virtual void FixedUpdate()
         {
+            Debug.Log( this.AbsoluteVelocity );
             IReferenceFrame sceneReferenceFrame = SceneReferenceFrameManager.ReferenceFrame;
             IReferenceFrame sceneReferenceFrameAfterPhysicsProcessing = SceneReferenceFrameManager.ReferenceFrame.AtUT( TimeManager.UT );
 
@@ -269,7 +273,7 @@ namespace HSP.Vanilla
 
             var requestedPos = (Vector3)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformPosition( _requestedAbsolutePosition );
             var requestedRot = (Quaternion)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformRotation( _requestedAbsoluteRotation );
-            
+
             _rb.Move( requestedPos, requestedRot );
             _actualPosition = _rb.position;
             _actualRotation = _rb.rotation;

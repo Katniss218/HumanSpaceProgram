@@ -139,6 +139,16 @@ namespace HSP.Vanilla
         {
             get
             {
+                return _referenceBody.ReferenceFrameTransform.Velocity; // technically correct (when the planet is not spinning), since the thing is pinned to the surface.
+
+#warning TODO - using these complicated things results in very frequent reference frame switching
+                IReferenceFrame sceneReferenceFrame = SceneReferenceFrameManager.ReferenceFrame;
+                IReferenceFrame bodyReferenceFrame = _referenceBody.OrientedInertialReferenceFrame;
+                var _cachedAbsoluteVelocity = _referenceBody.ReferenceFrameTransform.AbsoluteVelocity;// bodyReferenceFrame.TransformVelocity( Vector3Dbl.zero );
+                                                                                                      // Debug.Log( _cachedAbsoluteVelocity );
+                var _cachedVelocity = (Vector3)sceneReferenceFrame.InverseTransformVelocity( _cachedAbsoluteVelocity );
+                return _cachedVelocity;
+
                 RecalculateCacheIfNeeded();
                 return _cachedVelocity;
             }
@@ -265,7 +275,7 @@ namespace HSP.Vanilla
             if( ReferenceBody == null )
                 return;
 
-            IReferenceFrame bodyFrame = ReferenceBody.OrientedReferenceFrame;
+            IReferenceFrame bodyFrame = ReferenceBody.OrientedInertialReferenceFrame.AtUT( TimeManager.UT );
             Vector3 pos = (Vector3)sceneReferenceFrame.InverseTransformPosition( bodyFrame.TransformPosition( _referencePosition ) );
             Quaternion rot = (Quaternion)sceneReferenceFrame.InverseTransformRotation( bodyFrame.TransformRotation( _referenceRotation ) );
             _rb.Move( pos, rot );
@@ -283,7 +293,7 @@ namespace HSP.Vanilla
                 return;
 
             IReferenceFrame sceneReferenceFrame = SceneReferenceFrameManager.ReferenceFrame;
-            IReferenceFrame bodyFrame = ReferenceBody.OrientedReferenceFrame;
+            IReferenceFrame bodyFrame = ReferenceBody.OrientedInertialReferenceFrame;
             Vector3 pos = (Vector3)sceneReferenceFrame.InverseTransformPosition( bodyFrame.TransformPosition( _referencePosition ) );
             Quaternion rot = (Quaternion)sceneReferenceFrame.InverseTransformRotation( bodyFrame.TransformRotation( _referenceRotation ) );
             _rb.position = pos;
@@ -294,13 +304,12 @@ namespace HSP.Vanilla
             _cachedRotation = rot;
         }
 
-#warning TODO - pretty sure this stuff is not valid for the new reference frame split update order.
+#warning TODO - pinned objects' position flickers by the velocity of whatever they're pinned to times dt
         private void RecalculateCacheIfNeeded()
         {
             if( IsCacheValid() )
                 return;
 
-            MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame );
             RecalculateCache( SceneReferenceFrameManager.ReferenceFrame );
         }
 
@@ -333,7 +342,7 @@ namespace HSP.Vanilla
 
         // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)
         // Vector3's `==` operator does approximate comparison.
-        private bool IsCacheValid() => SceneReferenceFrameManager.ReferenceFrame.EqualsIgnoreUT( _cachedSceneReferenceFrame )
+        private bool IsCacheValid() => false && SceneReferenceFrameManager.ReferenceFrame.EqualsIgnoreUT( _cachedSceneReferenceFrame )
             && _referenceBody.OrientedInertialReferenceFrame.EqualsIgnoreUT( _cachedBodyReferenceFrame );
 
         //private void MakeCacheValid() => ; cache validates itself when the frames are set
@@ -363,16 +372,43 @@ namespace HSP.Vanilla
                 return;
 
             // ReferenceFrame.AtUT is used because we want to access the frame for the end of the frame, and FixedUpdate (caller) is called before ReferenceFrame updates.
-            MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame.AtUT( TimeManager.UT ), true );
+            //MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame.AtUT( TimeManager.UT ), true );
+
+            var sceneFrame = SceneReferenceFrameManager.ReferenceFrame;//.AtUT( TimeManager.UT );
+            var bodyFrame = ReferenceBody.OrientedInertialReferenceFrame;//.AtUT( TimeManager.UT );
+
+#warning TODO - scene position "flickers" when using keplerian
+            // doesn't happen with newtonian
+            Vector3 pos = (Vector3)sceneFrame.InverseTransformPosition( bodyFrame.TransformPosition( _referencePosition ) );
+            Quaternion rot = (Quaternion)bodyFrame.InverseTransformRotation( bodyFrame.TransformRotation( _referenceRotation ) );
+            _rb.Move( pos, rot );
         }
 
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
             // `_referenceBody.OrientedReferenceFrame` Guarantees up-to-date reference frame, regardless of update order.
-            ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
-            ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );
-            CachePositionAndRotation();
-            RecalculateCache( data.NewFrame );
+
+            var sceneFrame = data.NewFrame;
+            var bodyFrame = ReferenceBody.OrientedInertialReferenceFrame;
+
+#warning TODO - scene position "flickers" when using keplerian
+            // doesn't happen with newtonian
+            Vector3 pos = (Vector3)sceneFrame.InverseTransformPosition( bodyFrame.TransformPosition( _referencePosition ) );
+            Quaternion rot = (Quaternion)bodyFrame.InverseTransformRotation( bodyFrame.TransformRotation( _referenceRotation ) );
+            _rb.position = pos;
+            _rb.rotation = rot;
+            //var sceneFrame = SceneReferenceFrameManager.ReferenceFrame.AtUT( TimeManager.UT );
+            //var bodyFrame = ReferenceBody.OrientedInertialReferenceFrame.AtUT( TimeManager.UT );
+
+            //Vector3 pos = (Vector3)sceneFrame.InverseTransformPosition( bodyFrame.TransformPosition( _referencePosition ) );
+            //Quaternion rot = (Quaternion)bodyFrame.InverseTransformRotation( bodyFrame.TransformRotation( _referenceRotation ) );
+            //_rb.position = pos;
+            //_rb.rotation = rot;
+
+            //ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
+            //ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );
+            //CachePositionAndRotation();
+            //RecalculateCache( data.NewFrame );
         }
 
         void OnEnable()
