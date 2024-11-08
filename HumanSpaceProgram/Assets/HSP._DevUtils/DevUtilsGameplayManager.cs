@@ -145,6 +145,8 @@ namespace HSP._DevUtils
         }
 
         bool isPressed = false;
+        bool wasFired = false;
+        int bodyI;
 
         void FixedUpdate()
         {
@@ -154,13 +156,28 @@ namespace HSP._DevUtils
 
                 var body = CelestialBodyManager.Get( "main" );
 
+                //for( int i = 0; i < 50; i++ )
+                //{
+                System.Random r = new System.Random();
+                Vector3Dbl rand = new Vector3Dbl( 0, r.Next( -50000000, 50000000 ), r.Next( -50000000, 50000000 ) );
+                CelestialBody cbi = VanillaPlanetarySystemFactory.CreateCBNonAttractor( $"rand{bodyI}", new Vector3Dbl( 149_500_000_000, 0, 0 ) + rand, rand * 0.01, QuaternionDbl.identity );
+                //}
+                bodyI++;
+
                 Debug.Log( body.ReferenceFrameTransform.AbsoluteVelocity );
 
-                vessel.ReferenceFrameTransform.AbsolutePosition = body.ReferenceFrameTransform.AbsolutePosition + new Vector3Dbl( body.Radius + 200_000, 0, 0 );
-                vessel.ReferenceFrameTransform.AbsoluteVelocity = body.ReferenceFrameTransform.AbsoluteVelocity + new Vector3Dbl( 0, 8500, 0 );
+                if( !wasFired )
+                {
+                    CelestialBody cb = VanillaPlanetarySystemFactory.CreateCB( "moon2", new Vector3Dbl( 150_200_000_000, 0, 0 ), new Vector3Dbl( 0, -129749.1543788567, 0 ), QuaternionDbl.identity );
+                    body = cb;
 
-                SceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT,
-                    SceneReferenceFrameManager.TargetObject.AbsolutePosition, SceneReferenceFrameManager.TargetObject.AbsoluteVelocity ) );
+                    vessel.ReferenceFrameTransform.AbsolutePosition = body.ReferenceFrameTransform.AbsolutePosition + new Vector3Dbl( body.Radius + 200_000, 0, 0 );
+                    vessel.ReferenceFrameTransform.AbsoluteVelocity = body.ReferenceFrameTransform.AbsoluteVelocity + new Vector3Dbl( 0, 8500, 0 );
+
+                    SceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT,
+                        SceneReferenceFrameManager.TargetObject.AbsolutePosition, SceneReferenceFrameManager.TargetObject.AbsoluteVelocity ) );
+                }
+                wasFired = true;
             }
         }
 

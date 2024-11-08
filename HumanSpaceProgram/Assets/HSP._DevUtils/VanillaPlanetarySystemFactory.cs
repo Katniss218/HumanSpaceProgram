@@ -17,7 +17,7 @@ namespace HSP._DevUtils
 
         private static CelestialBody CreateCB( string id, Vector3Dbl airfPos, QuaternionDbl airfRot )
         {
-            CelestialBody cb = new CelestialBodyFactory( id ) { radius = 696_340_000, mass = 1.989e30 }.Create( airfPos, airfRot );
+            CelestialBody cb = new CelestialBodyFactory( id ) { radius = 696_340_000 * 15.0, mass = 1.989e30 }.Create( airfPos, airfRot );
             LODQuadSphere lqs = cb.gameObject.AddComponent<LODQuadSphere>();
             lqs.PoIGetter = () => VesselManager.LoadedVessels.Select( v => v.ReferenceFrameTransform.AbsolutePosition );
 
@@ -40,7 +40,7 @@ namespace HSP._DevUtils
             return cb;
         }
 
-        private static CelestialBody CreateCB( string id, Vector3Dbl airfPos, Vector3Dbl airfVel, QuaternionDbl airfRot )
+        public static CelestialBody CreateCB( string id, Vector3Dbl airfPos, Vector3Dbl airfVel, QuaternionDbl airfRot )
         {
             CelestialBody cb = new CelestialBodyFactory( id ).Create( airfPos, airfRot );
             LODQuadSphere lqs = cb.gameObject.AddComponent<LODQuadSphere>();
@@ -48,6 +48,18 @@ namespace HSP._DevUtils
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
             comp.IsAttractor = true;
+            comp.Trajectory = new NewtonianOrbit( Time.TimeManager.UT, airfPos, airfVel, Vector3Dbl.zero, cb.Mass );
+            return cb;
+        }
+        
+        public static CelestialBody CreateCBNonAttractor( string id, Vector3Dbl airfPos, Vector3Dbl airfVel, QuaternionDbl airfRot )
+        {
+            CelestialBody cb = new CelestialBodyFactory( id ).Create( airfPos, airfRot );
+            LODQuadSphere lqs = cb.gameObject.AddComponent<LODQuadSphere>();
+            lqs.PoIGetter = () => VesselManager.LoadedVessels.Select( v => v.ReferenceFrameTransform.AbsolutePosition );
+
+            TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
+            comp.IsAttractor = false;
             comp.Trajectory = new NewtonianOrbit( Time.TimeManager.UT, airfPos, airfVel, Vector3Dbl.zero, cb.Mass );
             return cb;
         }
@@ -60,6 +72,11 @@ namespace HSP._DevUtils
 
             CelestialBody cbSun = CreateCB( "sun", Vector3Dbl.zero, orientation );
             CelestialBody cb = CreateCB( "main", "sun", 150_000_000_000, 0, 0, 0, 0, 0, orientation );
+
+
+            //CelestialBodyManager.Get( "sun" ).ReferenceFrameTransform.AbsoluteAngularVelocity = new Vector3Dbl( 0, -1, 0 );
+            //CelestialBodyManager.Get( "main" ).ReferenceFrameTransform.AbsoluteAngularVelocity = new Vector3Dbl( 0, -7.2921159e-5, 0 );
+
             //CelestialBody cb = CreateCB( "main", new Vector3Dbl( 150_000_000_000, 0, 0 ), new Vector3Dbl( 0, 29749.1543788567, 0 ), orientation );
 
             //CelestialBody cb = CreateCB( "main", Vector3Dbl.zero, Vector3Dbl.zero, orientation );

@@ -84,27 +84,12 @@ namespace HSP.Vanilla
         {
             get
             {
-                RecalculateCacheIfNeeded();
                 return _rb.position; // rb.position should be correct, since it's updated during unityphysics step
             }
             set
             {
                 Vector3Dbl absolutePosition = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( value );
                 ReferencePosition = _referenceBody.OrientedReferenceFrame.InverseTransformPosition( absolutePosition );
-            }
-        }
-
-        public Quaternion Rotation
-        {
-            get
-            {
-                RecalculateCacheIfNeeded();
-                return _rb.rotation; // rb.rotation should be correct, since it's updated during unityphysics step
-            }
-            set
-            {
-                QuaternionDbl absoluteRotation = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( value );
-                ReferenceRotation = _referenceBody.OrientedReferenceFrame.InverseTransformRotation( absoluteRotation );
             }
         }
 
@@ -118,6 +103,19 @@ namespace HSP.Vanilla
             set
             {
                 ReferencePosition = _referenceBody.OrientedReferenceFrame.InverseTransformPosition( value );
+            }
+        }
+
+        public Quaternion Rotation
+        {
+            get
+            {
+                return _rb.rotation; // rb.rotation should be correct, since it's updated during unityphysics step
+            }
+            set
+            {
+                QuaternionDbl absoluteRotation = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( value );
+                ReferenceRotation = _referenceBody.OrientedReferenceFrame.InverseTransformRotation( absoluteRotation );
             }
         }
 
@@ -183,9 +181,7 @@ namespace HSP.Vanilla
         /// <summary> The scene frame in which the cached values are expressed. </summary>
         IReferenceFrame _cachedSceneReferenceFrame;
         IReferenceFrame _cachedBodyReferenceFrame;
-        //Vector3 _cachedPosition;
         Vector3Dbl _cachedAbsolutePosition;
-        //Quaternion _cachedRotation = Quaternion.identity;
         QuaternionDbl _cachedAbsoluteRotation = QuaternionDbl.identity;
         Vector3 _cachedVelocity;
         Vector3Dbl _cachedAbsoluteVelocity;

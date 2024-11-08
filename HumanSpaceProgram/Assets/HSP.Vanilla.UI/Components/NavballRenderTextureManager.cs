@@ -89,7 +89,8 @@ namespace HSP.Vanilla.UI.Components
                 if( activeVessel.ReferenceFrameTransform == null )
                     return;
 
-                Vector3 forward = (Vector3)CelestialBodyManager.CelestialBodies.First().ReferenceFrameTransform.AbsoluteRotation.GetForwardAxis();
+#warning TODO - get currently most influential body
+                Vector3 forward = (Vector3)CelestialBodyManager.Get( "main" ).ReferenceFrameTransform.AbsoluteRotation.GetForwardAxis();
                 Vector3 gravity = -GravityUtils.GetNBodyGravityAcceleration( activeVessel.ReferenceFrameTransform.AbsolutePosition ).NormalizeToVector3();
                 forward = Vector3.ProjectOnPlane( forward, gravity );
                 NavballOrientation = Quaternion.LookRotation( forward, gravity );
