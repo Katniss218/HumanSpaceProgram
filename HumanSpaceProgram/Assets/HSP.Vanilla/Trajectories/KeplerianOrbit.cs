@@ -446,7 +446,7 @@ namespace HSP.Vanilla.Trajectories
             if( eccentricity < 1e-6 )
             {
                 // Since a circular orbit doesn't have a uniquely determined periapsis, the eccentricity vector can't be used to determine the anomaly.
-                if( inclination < 1e-6 || inclination > (Math.PI - 1e-6) )
+                if( inclination < 1e-6 )
                 {
                     // For non-inclined circular orbits, we use the angle between the position and reference direction (true longitude).
                     //if( stateVectorVelocity.x <= 0 )
@@ -456,6 +456,11 @@ namespace HSP.Vanilla.Trajectories
 
                     // This variant appears to be more numerically stable for large orbits.
                     trueAnomaly = Math.Atan2( stateVectorPosition.y, stateVectorPosition.x );
+                }
+                else if( inclination > (Math.PI - 1e-6) )
+                {
+                    // flip sign for 'retrograde' orbits
+                    trueAnomaly = Math.Atan2( -stateVectorPosition.y, stateVectorPosition.x );
                 }
                 else
                 {

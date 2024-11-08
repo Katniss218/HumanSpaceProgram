@@ -290,12 +290,8 @@ namespace HSP.Vanilla
             if( _referenceBody == null )
                 return;
 
-#warning TODO - position returned by _cachedAbsolutePosition doesn't match the scene position, proportionally to the velocity of the planet.
-            // also, only fails with pinned vessels, normal vessels report normal position.
-
             IReferenceFrame bodyFrame = _referenceBody.OrientedInertialReferenceFrame;
             _cachedAbsolutePosition = bodyFrame.TransformPosition( _referencePosition );
-            //Debug.Log( TimeManager.UT + " : " + _cachedAbsolutePosition );
             _cachedAbsoluteRotation = bodyFrame.TransformRotation( _referenceRotation );
             _cachedAbsoluteVelocity = bodyFrame.TransformVelocity( Vector3Dbl.zero );
             _cachedAbsoluteAngularVelocity = bodyFrame.TransformAngularVelocity( Vector3Dbl.zero );

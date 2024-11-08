@@ -30,9 +30,10 @@ namespace HSP.Vanilla
         {
             get
             {
-                // To synchronize, we keep track of where the rigidbody is in fixedupdate and where it is going to be after physicsprocessing (at the end of fixed frame)
-                // We return whichever value matches.
-                return _rb.position == _actualPosition
+#warning TODO - comparing using reference frames involves a hack, make a proper solution to distinguish whether we're before or after unity physics step.
+                // To synchronize, we keep track of where the object is (going to be) before and after unity physics step (at the end of fixed frame)
+                // Return whichever value is correct, depending on whether someone calls before or after.
+                return TimeManager.UT != SceneReferenceFrameManager.ReferenceFrame.ReferenceUT // _rb.position == _actualPosition
                         ? _actualAbsolutePosition
                         : _requestedAbsolutePosition;
             }
@@ -67,7 +68,7 @@ namespace HSP.Vanilla
         {
             get
             {
-                return _rb.rotation == _actualRotation
+                return TimeManager.UT != SceneReferenceFrameManager.ReferenceFrame.ReferenceUT //_rb.rotation == _actualRotation
                         ? _actualAbsoluteRotation
                         : _requestedAbsoluteRotation;
             }
@@ -89,9 +90,7 @@ namespace HSP.Vanilla
         {
             get
             {
-                //return (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformVelocity( _absoluteVelocity );
-#warning TODO - where is this set? if it's set by rigidbody.Move then it's gonna be wrong because it uses interpolated values by the trajectory system.
-                return _rb.velocity;
+                return (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformVelocity( _absoluteVelocity );
             }
             set
             {
@@ -106,8 +105,6 @@ namespace HSP.Vanilla
         {
             get
             {
-#warning TODO - keplerian breaks absolute velocity, making the frame switches too fast
-
                 return _absoluteVelocity;
             }
             set
@@ -123,8 +120,7 @@ namespace HSP.Vanilla
         {
             get
             {
-                //return (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformVelocity( _absoluteAngularVelocity );
-                return _rb.angularVelocity;
+                return (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformVelocity( _absoluteAngularVelocity );
             }
             set
             {
@@ -297,7 +293,7 @@ namespace HSP.Vanilla
             _actualPosition = scenePos;
             _actualAbsolutePosition = absolutePosition;
             _requestedAbsolutePosition = absolutePosition;
-            
+
             QuaternionDbl absoluteRotation = this.AbsoluteRotation;
             Quaternion sceneRot = (Quaternion)SceneReferenceFrameManager.ReferenceFrame.InverseTransformRotation( absoluteRotation );
             _rb.rotation = sceneRot;
