@@ -449,10 +449,13 @@ namespace HSP.Vanilla.Trajectories
                 if( inclination < 1e-6 || inclination > (Math.PI - 1e-6) )
                 {
                     // For non-inclined circular orbits, we use the angle between the position and reference direction (true longitude).
-                    if( stateVectorVelocity.x <= 0 )
-                        trueAnomaly = Math.Acos( stateVectorPosition.x / stateVectorPosition.magnitude );
-                    else
-                        trueAnomaly = (2.0 * Math.PI) - Math.Acos( stateVectorPosition.x / stateVectorPosition.magnitude );
+                    //if( stateVectorVelocity.x <= 0 )
+                    //    trueAnomaly = Math.Acos( stateVectorPosition.x / stateVectorPosition.magnitude );
+                    //else
+                    //    trueAnomaly = (2.0 * Math.PI) - Math.Acos( stateVectorPosition.x / stateVectorPosition.magnitude );
+
+                    // This variant appears to be more numerically stable for large orbits.
+                    trueAnomaly = Math.Atan2( stateVectorPosition.y, stateVectorPosition.x );
                 }
                 else
                 {
