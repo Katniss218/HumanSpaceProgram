@@ -89,7 +89,7 @@ namespace HSP.Vanilla
         {
             get
             {
-                return (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformVelocity( _absoluteVelocity );
+                //return (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformVelocity( _absoluteVelocity );
 #warning TODO - where is this set? if it's set by rigidbody.Move then it's gonna be wrong because it uses interpolated values by the trajectory system.
                 return _rb.velocity;
             }
@@ -106,6 +106,8 @@ namespace HSP.Vanilla
         {
             get
             {
+#warning TODO - keplerian breaks absolute velocity, making the frame switches too fast
+
                 return _absoluteVelocity;
             }
             set
@@ -121,7 +123,7 @@ namespace HSP.Vanilla
         {
             get
             {
-                return (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformVelocity( _absoluteAngularVelocity );
+                //return (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformVelocity( _absoluteAngularVelocity );
                 return _rb.angularVelocity;
             }
             set
@@ -256,7 +258,6 @@ namespace HSP.Vanilla
 
         protected virtual void FixedUpdate()
         {
-            Debug.Log( this.AbsoluteVelocity );
             IReferenceFrame sceneReferenceFrame = SceneReferenceFrameManager.ReferenceFrame;
             IReferenceFrame sceneReferenceFrameAfterPhysicsProcessing = SceneReferenceFrameManager.ReferenceFrame.AtUT( TimeManager.UT );
 
@@ -266,10 +267,6 @@ namespace HSP.Vanilla
             QuaternionDbl deltaRotation = QuaternionDbl.Euler( _absoluteAngularVelocity * TimeManager.FixedDeltaTime * 57.2957795131 );
             _requestedAbsolutePosition = _actualAbsolutePosition + _absoluteVelocity * TimeManager.FixedDeltaTime;
             _requestedAbsoluteRotation = deltaRotation * _actualAbsoluteRotation;
-
-            // Queue Move Rigidbody To Requested
-            //var pos = (Vector3)sceneReferenceFrame.InverseTransformPosition( _actualAbsolutePosition );
-            //var rot = (Quaternion)sceneReferenceFrame.InverseTransformRotation( _actualAbsoluteRotation );
 
             var requestedPos = (Vector3)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformPosition( _requestedAbsolutePosition );
             var requestedRot = (Quaternion)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformRotation( _requestedAbsoluteRotation );
@@ -293,8 +290,21 @@ namespace HSP.Vanilla
 
         public virtual void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
-            AbsolutePosition = AbsolutePosition;
-            AbsoluteRotation = AbsoluteRotation;
+            Vector3Dbl absolutePosition = this.AbsolutePosition;
+            Vector3 scenePos = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformPosition( absolutePosition );
+            _rb.position = scenePos;
+            transform.position = scenePos;
+            _actualPosition = scenePos;
+            _actualAbsolutePosition = absolutePosition;
+            _requestedAbsolutePosition = absolutePosition;
+            
+            QuaternionDbl absoluteRotation = this.AbsoluteRotation;
+            Quaternion sceneRot = (Quaternion)SceneReferenceFrameManager.ReferenceFrame.InverseTransformRotation( absoluteRotation );
+            _rb.rotation = sceneRot;
+            transform.rotation = sceneRot;
+            _actualRotation = sceneRot;
+            _actualAbsoluteRotation = absoluteRotation;
+            _requestedAbsoluteRotation = absoluteRotation;
         }
 
         protected virtual void OnEnable()

@@ -61,7 +61,7 @@ namespace HSP.ReferenceFrames
         /// <remarks>
         /// NOTE TO IMPLEMENTERS: <br/>
         ///     The reference frame is updated 'during' (immediately after) unity physics step, which happens after FixedUpdate. <br/>
-        ///     Use `ReferenceFrame.AtUT( TimeManager.UT )`, if you want to access what the scene frame will be at the end of the current frame.
+        ///     If you want to access what the reference frame will be at the end of the frame from e.g. FixedUpdate, use `ReferenceFrame.AtUT( TimeManager.UT )`.
         /// </remarks>
         public static IReferenceFrame ReferenceFrame
         {

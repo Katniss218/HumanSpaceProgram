@@ -273,7 +273,7 @@ namespace HSP_Tests_EditMode
             Assert.That( sut2.ArgumentOfPeriapsis, Is.EqualTo( sut.ArgumentOfPeriapsis ).Within( 0.0000001 ) );
         }
 
-        [TestCase( 1_000_000, 0.9999999, 3.1415, 3.1415, 3.1415, 3.1415 )] // large eccentricity
+        [TestCase( 1_000_000, 0.9999999, Math.PI, Math.PI, Math.PI, Math.PI )] // large eccentricity
         [TestCase( 1_000_000_000_000, 0.5, 0.872664625997, 0.698131700798, 0.523598775598, 1.0471975512 )]
         [TestCase( 150_000_000_000, 0.0, 1.152359877559, 0.198131700798, -1.872664625997, 0.00000001 )]
         [TestCase( 150_000_000_000, 0.0001, 1.152359877559, 0.198131700798, -1.872664625997, 0.00000001 )]
@@ -357,14 +357,6 @@ namespace HSP_Tests_EditMode
             Assert.That( state.Mass, Is.EqualTo( origState.Mass ) );
         }
 
-        //[TestCase( 150000000000, 20000, 0, -55, 29749.1543788567, 0 )]
-        //[TestCase( 150000000000, 0, 0, 55, -29749.1543788567, 0 )]
-        //[TestCase( 149999999989.376, 1787781.68553105, 0, 539.218019470941, 29659.508245391, 0 )]
-        //[TestCase( 150000000000, 1750000, 0, 540, 29660, 0 )]
-        //[TestCase( 150000000000, 1750000, 0, 0, 29660, 0 )] // negative xvel works, positive doesn't?
-        //[TestCase( 150000000000.161, 1788374.87568269, 0, 17341.1957428645, -24067.8232399869, 0 )] // negative xvel works, positive doesn't?
-        //[TestCase( 149999999991.503, 1596934.59912459, 0, -0.31671613056214, 29749.1548970355, 0 )]
-        //[TestCase( 149999999991.496, 1597529.58220924, 0, -0.323486335355483, 29748.1714346503, 0 )]
         [TestCase( 150_000_000_000, 0, 0, 0, 29750, 0 )]
         [TestCase( 150_000_000_000, 1_000_000, 0, 50, 29750, 0 )]
         [TestCase( 150_000_000_000, 1_000_000, 0, -50, 29750, 0 )]
@@ -420,8 +412,8 @@ namespace HSP_Tests_EditMode
             Assert.That( target.TrueAnomaly, Is.EqualTo( source.TrueAnomaly ).Within( 0.00000001 ) );
         }
 
-        [TestCase( 150_000_000_000, 0, 0, 0, 29750, 0 )]
-        [TestCase( 150_000_000_000, 0, 0, 0, -29750, 0 )]
+        [TestCase( 150_000_000_000, 0, 0, 0, 29749.1543788567, 0 )]
+        [TestCase( 150_000_000_000, 0, 0, 0, -29749.1543788567, 0 )]
         [TestCase( 150_000_000_000, -500, 0, 20000, 10000, 50 )]
         [TestCase( 150_000_000_000, 0, 500, -5000, -20000, -500 )]
         [Test]
@@ -450,6 +442,8 @@ namespace HSP_Tests_EditMode
 
                 kepler.SetCurrentState( testStateKepler );
                 newton.SetCurrentState( testStateNewton );
+
+                Debug.Log( i + " : " + testStateKepler.AbsolutePosition + " : " + testStateNewton.AbsolutePosition );
 
                 Assert.That( testStateKepler.AbsolutePosition, Is.EqualTo( testStateNewton.AbsolutePosition ).Using( posApproxComparer ) );
                 Assert.That( testStateKepler.AbsoluteVelocity, Is.EqualTo( testStateNewton.AbsoluteVelocity ).Using( posApproxComparer ) );

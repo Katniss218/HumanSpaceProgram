@@ -181,7 +181,8 @@ namespace HSP.Trajectories
 
                 if( trajectoryTransform.IsSynchronized() )
                 {
-#warning TODO - the difference in distance being twice of what it should be implies that the AbsolutePosition is being calculated wrong?
+                    // If the transform is synchronized, make the velocity what it should be to make it move to the target location.
+                    // This - at least in theory - should make PhysX happier, because the position is not being reset, in turn resetting some physics scene stuff.
                     Vector3Dbl interpolatedVel = (stateVector.AbsolutePosition - trajectoryTransform.ReferenceFrameTransform.AbsolutePosition) / TimeManager.FixedDeltaTime;
 
                     instance._posAndVelCache[trajectory] = (stateVector.AbsolutePosition, stateVector.AbsoluteVelocity, interpolatedVel);

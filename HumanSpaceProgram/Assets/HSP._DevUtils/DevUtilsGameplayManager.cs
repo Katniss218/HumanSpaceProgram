@@ -95,8 +95,8 @@ namespace HSP._DevUtils
             var v = CreateVessel( launchSite );
             vessel = v;
 
-            ActiveVesselManager.ActiveObject = vessel.RootPart.GetVessel().gameObject.transform;
-            //ActiveVesselManager.ActiveObject = launchSite.RootPart.GetVessel().gameObject.transform;
+            //ActiveVesselManager.ActiveObject = vessel.RootPart.GetVessel().gameObject.transform;
+            ActiveVesselManager.ActiveObject = launchSite.RootPart.GetVessel().gameObject.transform;
 
             //Vector3Dbl velocity = new Vector3Dbl( 500, 0, 0 );
             //body.ReferenceFrameTransform.AbsoluteVelocity = velocity;

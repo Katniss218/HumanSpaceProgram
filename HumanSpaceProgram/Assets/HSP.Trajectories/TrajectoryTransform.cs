@@ -60,10 +60,9 @@ namespace HSP.Trajectories
                 TryUnregister();
                 _trajectory = value;
 
-                // The state might not be fully available yet.
-                //var state = value.GetCurrentState();
-                //_referenceFrameTransform.AbsolutePosition = state.AbsolutePosition;
-                //_referenceFrameTransform.AbsoluteVelocity = state.AbsoluteVelocity;
+                TrajectoryBodyState trajectoryState = value.GetCurrentState();
+                _referenceFrameTransform.AbsolutePosition = trajectoryState.AbsolutePosition;
+                _referenceFrameTransform.AbsoluteVelocity = trajectoryState.AbsoluteVelocity;
 
                 TryRegister();
             }
@@ -127,6 +126,7 @@ namespace HSP.Trajectories
 
         private bool HadForcesApplied() => this.ReferenceFrameTransform.AbsoluteAcceleration != Vector3Dbl.zero;
 
+#warning TODO - has values changed by hand will be true because the traj manager sets them by hand.
         private bool _hadValuesChangedByHand;
 
         void OnEnable()

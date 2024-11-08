@@ -30,7 +30,7 @@ namespace HSP.Vanilla
                     MakeCacheInvalid();
                     ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
                     ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );
-                    CachePositionAndRotation();
+                    SetPositionAndRotation();
                     OnAbsolutePositionChanged?.Invoke();
                     OnAbsoluteRotationChanged?.Invoke();
                     OnAnyValueChanged?.Invoke();
@@ -46,7 +46,7 @@ namespace HSP.Vanilla
                 _referencePosition = value;
                 MakeCacheInvalid();
                 ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
-                CachePositionAndRotation();
+                SetPositionAndRotation();
                 OnAbsolutePositionChanged?.Invoke();
                 OnAnyValueChanged?.Invoke();
             }
@@ -60,7 +60,7 @@ namespace HSP.Vanilla
                 _referenceRotation = value;
                 MakeCacheInvalid();
                 ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );
-                CachePositionAndRotation();
+                SetPositionAndRotation();
                 OnAbsoluteRotationChanged?.Invoke();
                 OnAnyValueChanged?.Invoke();
             }
@@ -85,7 +85,7 @@ namespace HSP.Vanilla
             get
             {
                 RecalculateCacheIfNeeded();
-                return _cachedPosition; // _rb.position will only be up-to-date after physicsprocessing.
+                return _rb.position; // rb.position should be correct, since it's updated during unityphysics step
             }
             set
             {
@@ -99,7 +99,7 @@ namespace HSP.Vanilla
             get
             {
                 RecalculateCacheIfNeeded();
-                return _cachedRotation;
+                return _rb.rotation; // rb.rotation should be correct, since it's updated during unityphysics step
             }
             set
             {
@@ -139,16 +139,6 @@ namespace HSP.Vanilla
         {
             get
             {
-                return _referenceBody.ReferenceFrameTransform.Velocity; // technically correct (when the planet is not spinning), since the thing is pinned to the surface.
-
-#warning TODO - using these complicated things results in very frequent reference frame switching
-                IReferenceFrame sceneReferenceFrame = SceneReferenceFrameManager.ReferenceFrame;
-                IReferenceFrame bodyReferenceFrame = _referenceBody.OrientedInertialReferenceFrame;
-                var _cachedAbsoluteVelocity = _referenceBody.ReferenceFrameTransform.AbsoluteVelocity;// bodyReferenceFrame.TransformVelocity( Vector3Dbl.zero );
-                                                                                                      // Debug.Log( _cachedAbsoluteVelocity );
-                var _cachedVelocity = (Vector3)sceneReferenceFrame.InverseTransformVelocity( _cachedAbsoluteVelocity );
-                return _cachedVelocity;
-
                 RecalculateCacheIfNeeded();
                 return _cachedVelocity;
             }
@@ -193,9 +183,9 @@ namespace HSP.Vanilla
         /// <summary> The scene frame in which the cached values are expressed. </summary>
         IReferenceFrame _cachedSceneReferenceFrame;
         IReferenceFrame _cachedBodyReferenceFrame;
-        Vector3 _cachedPosition;
+        //Vector3 _cachedPosition;
         Vector3Dbl _cachedAbsolutePosition;
-        Quaternion _cachedRotation = Quaternion.identity;
+        //Quaternion _cachedRotation = Quaternion.identity;
         QuaternionDbl _cachedAbsoluteRotation = QuaternionDbl.identity;
         Vector3 _cachedVelocity;
         Vector3Dbl _cachedAbsoluteVelocity;
@@ -270,24 +260,7 @@ namespace HSP.Vanilla
             return;
         }
 
-        private void MoveScenePositionAndRotation( IReferenceFrame sceneReferenceFrame, bool cachePositionAndRotation = false )
-        {
-            if( ReferenceBody == null )
-                return;
-
-            IReferenceFrame bodyFrame = ReferenceBody.OrientedInertialReferenceFrame.AtUT( TimeManager.UT );
-            Vector3 pos = (Vector3)sceneReferenceFrame.InverseTransformPosition( bodyFrame.TransformPosition( _referencePosition ) );
-            Quaternion rot = (Quaternion)sceneReferenceFrame.InverseTransformRotation( bodyFrame.TransformRotation( _referenceRotation ) );
-            _rb.Move( pos, rot );
-
-            if( cachePositionAndRotation )
-            {
-                _cachedPosition = pos;
-                _cachedRotation = rot;
-            }
-        }
-
-        private void CachePositionAndRotation()
+        private void SetPositionAndRotation()
         {
             if( ReferenceBody == null )
                 return;
@@ -296,15 +269,14 @@ namespace HSP.Vanilla
             IReferenceFrame bodyFrame = ReferenceBody.OrientedInertialReferenceFrame;
             Vector3 pos = (Vector3)sceneReferenceFrame.InverseTransformPosition( bodyFrame.TransformPosition( _referencePosition ) );
             Quaternion rot = (Quaternion)sceneReferenceFrame.InverseTransformRotation( bodyFrame.TransformRotation( _referenceRotation ) );
+
             _rb.position = pos;
-            _rb.rotation = rot;
             transform.position = pos;
+
+            _rb.rotation = rot;
             transform.rotation = rot;
-            _cachedPosition = pos;
-            _cachedRotation = rot;
         }
 
-#warning TODO - pinned objects' position flickers by the velocity of whatever they're pinned to times dt
         private void RecalculateCacheIfNeeded()
         {
             if( IsCacheValid() )
@@ -318,13 +290,17 @@ namespace HSP.Vanilla
             if( _referenceBody == null )
                 return;
 
-            IReferenceFrame bodyReferenceFrame = _referenceBody.OrientedInertialReferenceFrame;
-            _cachedAbsolutePosition = bodyReferenceFrame.TransformPosition( _referencePosition );
-            _cachedAbsoluteRotation = bodyReferenceFrame.TransformRotation( _referenceRotation );
-            _cachedAbsoluteVelocity = bodyReferenceFrame.TransformVelocity( Vector3Dbl.zero );
-            _cachedAbsoluteAngularVelocity = bodyReferenceFrame.TransformAngularVelocity( Vector3Dbl.zero );
+#warning TODO - position returned by _cachedAbsolutePosition doesn't match the scene position, proportionally to the velocity of the planet.
+            // also, only fails with pinned vessels, normal vessels report normal position.
 
-            if( bodyReferenceFrame is INonInertialReferenceFrame nonInertialBodyFrame )
+            IReferenceFrame bodyFrame = _referenceBody.OrientedInertialReferenceFrame;
+            _cachedAbsolutePosition = bodyFrame.TransformPosition( _referencePosition );
+            //Debug.Log( TimeManager.UT + " : " + _cachedAbsolutePosition );
+            _cachedAbsoluteRotation = bodyFrame.TransformRotation( _referenceRotation );
+            _cachedAbsoluteVelocity = bodyFrame.TransformVelocity( Vector3Dbl.zero );
+            _cachedAbsoluteAngularVelocity = bodyFrame.TransformAngularVelocity( Vector3Dbl.zero );
+
+            if( bodyFrame is INonInertialReferenceFrame nonInertialBodyFrame )
             {
                 _cachedAbsoluteVelocity += nonInertialBodyFrame.GetTangentialVelocity( _referencePosition );
             }
@@ -332,12 +308,12 @@ namespace HSP.Vanilla
             _cachedVelocity = (Vector3)sceneReferenceFrame.InverseTransformVelocity( _cachedAbsoluteVelocity );
             _cachedAngularVelocity = (Vector3)sceneReferenceFrame.InverseTransformAngularVelocity( _cachedAbsoluteVelocity );
 
-            _cachedAbsoluteAcceleration = bodyReferenceFrame.TransformAcceleration( Vector3Dbl.zero );
-            _cachedAbsoluteAngularAcceleration = bodyReferenceFrame.TransformAngularAcceleration( Vector3Dbl.zero );
+            _cachedAbsoluteAcceleration = bodyFrame.TransformAcceleration( Vector3Dbl.zero );
+            _cachedAbsoluteAngularAcceleration = bodyFrame.TransformAngularAcceleration( Vector3Dbl.zero );
             _cachedAcceleration = (Vector3)sceneReferenceFrame.InverseTransformAcceleration( _cachedAbsoluteAcceleration );
             _cachedAngularAcceleration = (Vector3)sceneReferenceFrame.InverseTransformAngularAcceleration( _cachedAbsoluteAngularAcceleration );
             _cachedSceneReferenceFrame = sceneReferenceFrame;
-            _cachedBodyReferenceFrame = bodyReferenceFrame;
+            _cachedBodyReferenceFrame = bodyFrame;
         }
 
         // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)
@@ -372,15 +348,11 @@ namespace HSP.Vanilla
                 return;
 
             // ReferenceFrame.AtUT is used because we want to access the frame for the end of the frame, and FixedUpdate (caller) is called before ReferenceFrame updates.
-            //MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame.AtUT( TimeManager.UT ), true );
+            var sceneReferenceFrame = SceneReferenceFrameManager.ReferenceFrame.AtUT( TimeManager.UT );
+            var bodyFrame = ReferenceBody.OrientedInertialReferenceFrame.AtUT( TimeManager.UT );
 
-            var sceneFrame = SceneReferenceFrameManager.ReferenceFrame;//.AtUT( TimeManager.UT );
-            var bodyFrame = ReferenceBody.OrientedInertialReferenceFrame;//.AtUT( TimeManager.UT );
-
-#warning TODO - scene position "flickers" when using keplerian
-            // doesn't happen with newtonian
-            Vector3 pos = (Vector3)sceneFrame.InverseTransformPosition( bodyFrame.TransformPosition( _referencePosition ) );
-            Quaternion rot = (Quaternion)bodyFrame.InverseTransformRotation( bodyFrame.TransformRotation( _referenceRotation ) );
+            Vector3 pos = (Vector3)sceneReferenceFrame.InverseTransformPosition( bodyFrame.TransformPosition( _referencePosition ) );
+            Quaternion rot = (Quaternion)sceneReferenceFrame.InverseTransformRotation( bodyFrame.TransformRotation( _referenceRotation ) );
             _rb.Move( pos, rot );
         }
 
@@ -388,27 +360,7 @@ namespace HSP.Vanilla
         {
             // `_referenceBody.OrientedReferenceFrame` Guarantees up-to-date reference frame, regardless of update order.
 
-            var sceneFrame = data.NewFrame;
-            var bodyFrame = ReferenceBody.OrientedInertialReferenceFrame;
-
-#warning TODO - scene position "flickers" when using keplerian
-            // doesn't happen with newtonian
-            Vector3 pos = (Vector3)sceneFrame.InverseTransformPosition( bodyFrame.TransformPosition( _referencePosition ) );
-            Quaternion rot = (Quaternion)bodyFrame.InverseTransformRotation( bodyFrame.TransformRotation( _referenceRotation ) );
-            _rb.position = pos;
-            _rb.rotation = rot;
-            //var sceneFrame = SceneReferenceFrameManager.ReferenceFrame.AtUT( TimeManager.UT );
-            //var bodyFrame = ReferenceBody.OrientedInertialReferenceFrame.AtUT( TimeManager.UT );
-
-            //Vector3 pos = (Vector3)sceneFrame.InverseTransformPosition( bodyFrame.TransformPosition( _referencePosition ) );
-            //Quaternion rot = (Quaternion)bodyFrame.InverseTransformRotation( bodyFrame.TransformRotation( _referenceRotation ) );
-            //_rb.position = pos;
-            //_rb.rotation = rot;
-
-            //ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
-            //ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );
-            //CachePositionAndRotation();
-            //RecalculateCache( data.NewFrame );
+            SetPositionAndRotation();
         }
 
         void OnEnable()

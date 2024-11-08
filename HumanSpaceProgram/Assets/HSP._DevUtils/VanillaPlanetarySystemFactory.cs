@@ -56,21 +56,13 @@ namespace HSP._DevUtils
         [HSPEventListener( HSPEvent_BEFORE_TIMELINE_LOAD.ID, CREATE_CELESTIAL_BODIES )]
         public static void CreateDefaultPlanetarySystem()
         {
-            QuaternionDbl orientation = Quaternion.Euler( 270, 0, 0 );
+            QuaternionDbl orientation =  Quaternion.Euler( 270, 0, 0 );
 
-            CelestialBody cb = CreateCB( "main", "sun", 150_000_000_000, 0, 0, 0, 0, 0, orientation );
             CelestialBody cbSun = CreateCB( "sun", Vector3Dbl.zero, orientation );
-
-            foreach( var x in CelestialBodyManager.CelestialBodies )
-            {
-                var state = x.GetComponent<TrajectoryTransform>().Trajectory.GetCurrentState();
-                x.ReferenceFrameTransform.AbsolutePosition = state.AbsolutePosition;
-                x.ReferenceFrameTransform.AbsoluteVelocity = state.AbsoluteVelocity;
-            }
-
+            //CelestialBody cb = CreateCB( "main", "sun", 150_000_000_000, 0, 0, 0, 0, 0, orientation );
+            CelestialBody cb = CreateCB( "main", new Vector3Dbl( 150_000_000_000, 0, 0 ), new Vector3Dbl( 0, 29749.1543788567 * 5.0, 0 ), orientation );
 
             //CelestialBody cb = CreateCB( "main", Vector3Dbl.zero, Vector3Dbl.zero, orientation );
-            //CelestialBody cb = CreateCB( "main", new Vector3Dbl( 150_000_000_000_000, 0, 0 ), new Vector3Dbl( 0, 29800, 0 ), orientation );
             //CelestialBody cb = CreateCB( "main", new Vector3Dbl( 150_000_000_000_000_000, 0, 0 ), new Vector3Dbl( 0, 29749.1543788567, 0 ), orientation );
 
 #warning TODO - all trajectories need to be instantiated and assigned before setting the pos/vel.

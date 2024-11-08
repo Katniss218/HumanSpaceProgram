@@ -108,7 +108,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene
         {
 #warning TODO - configurable bodies need their own atmospheres. sorted by distance (*hopefully* bodies won't intersect each other so it's enough to draw atmos farthest to nearest).
             if( body.ID == "main" )
-                AtmosphereRenderer.Body = CelestialBodyManager.CelestialBodies.First();
+                AtmosphereRenderer.Body = body;
         }
     }
 }

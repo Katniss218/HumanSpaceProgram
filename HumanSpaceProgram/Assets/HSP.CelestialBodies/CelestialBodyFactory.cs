@@ -27,7 +27,7 @@ namespace HSP.CelestialBodies
 
         public CelestialBody Create( Vector3Dbl absolutePosition, QuaternionDbl absoluteRotation )
         {
-            GameObject gameObject = new GameObject( "celestialbody" );
+            GameObject gameObject = new GameObject( $"celestialbody-{this.ID}" );
 
             CelestialBody celestialBody = gameObject.AddComponent<CelestialBody>();
             celestialBody.ID = this.ID;
