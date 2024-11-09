@@ -42,7 +42,7 @@ namespace HSP.CelestialBodies.Surfaces
             _quadTree = new LODQuadTree[6];
             for( int i = 0; i < 6; i++ )
             {
-                // temporary, there's no data structure to hold this stuff yet.
+#warning TODO - Move these to some sort of celestial body definition.
                 Material mat = new Material( cbShader );
                 mat.SetTexture( "_MainTex", cbTex[i] );
                 mat.SetFloat( "_Glossiness", 0.05f );

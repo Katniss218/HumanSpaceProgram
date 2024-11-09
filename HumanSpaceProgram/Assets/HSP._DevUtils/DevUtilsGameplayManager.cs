@@ -95,13 +95,29 @@ namespace HSP._DevUtils
             var v = CreateVessel( launchSite );
             vessel = v;
 
-            //ActiveVesselManager.ActiveObject = vessel.RootPart.GetVessel().gameObject.transform;
-            ActiveVesselManager.ActiveObject = launchSite.RootPart.GetVessel().gameObject.transform;
+            ActiveVesselManager.ActiveObject = vessel.RootPart.GetVessel().gameObject.transform;
+            //ActiveVesselManager.ActiveObject = launchSite.RootPart.GetVessel().gameObject.transform;
 
             //Vector3Dbl velocity = new Vector3Dbl( 500, 0, 0 );
             //body.ReferenceFrameTransform.AbsoluteVelocity = velocity;
-            Vector3Dbl velocity = body.ReferenceFrameTransform.AbsoluteVelocity;
-            vessel.ReferenceFrameTransform.AbsoluteVelocity = velocity;
+        }
+
+
+        private static Vector3 GetLocalPositionRelativeToRoot( Transform target )
+        {
+            Vector3 relativePosition = target.localPosition;
+            Transform current = target;
+
+            while( current.parent != null )
+            {
+                current = current.parent;
+                if( current.parent == null ) // break out before we calculate the root values.
+                    break;
+
+                relativePosition = current.localRotation * relativePosition + current.localPosition;
+            }
+
+            return relativePosition;
         }
 
         private static Vessel CreateVessel( Vessel launchSite )
@@ -112,17 +128,30 @@ namespace HSP._DevUtils
             }
 
             FLaunchSiteMarker launchSiteSpawner = launchSite.gameObject.GetComponentInChildren<FLaunchSiteMarker>();
-            Vector3Dbl spawnerPosAirf = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( launchSiteSpawner.transform.position );
+            Vector3Dbl zeroPosAirf = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( Vector3Dbl.zero );
+            Vector3Dbl spawnerPosAirf = launchSite.ReferenceFrameTransform.AbsolutePosition + GetLocalPositionRelativeToRoot( launchSiteSpawner.transform );
             QuaternionDbl spawnerRotAirf = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( launchSiteSpawner.transform.rotation );
 
-            var v2 = CreateDummyVessel( spawnerPosAirf, spawnerRotAirf ); // position is temp.
+            var v2 = CreateDummyVessel( zeroPosAirf, spawnerRotAirf ); // position is temp.
 
             Vector3 bottomBoundPos = v2.GetBottomPosition();
             Vector3Dbl closestBoundAirf = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( bottomBoundPos );
             Vector3Dbl closestBoundToVesselAirf = v2.ReferenceFrameTransform.AbsolutePosition - closestBoundAirf;
             Vector3Dbl airfPos = spawnerPosAirf + closestBoundToVesselAirf;
+#warning TODO - Because we are sending the vessel far away from the scene origin, its position is clamped to 32-bit precision values.
+            // free reference transform uses scene values as ground truth.
+
+#warning TODO - we would need something that can detect when it's too far away and switch between Kinematic and Free behaviours (in a single monobehaviour).
+
+            // toggle ability to do collision response via physX, when close enough.
+
             v2.ReferenceFrameTransform.AbsolutePosition = airfPos;
+
+            Vector3Dbl velocity = launchSite.ReferenceFrameTransform.AbsoluteVelocity;
+            v2.ReferenceFrameTransform.AbsoluteVelocity = velocity;
+            Debug.Log( closestBoundToVesselAirf + " : " + velocity + " : " + (airfPos - v2.ReferenceFrameTransform.AbsolutePosition) );
             return v2;
+
         }
 
         void Awake()
@@ -156,12 +185,10 @@ namespace HSP._DevUtils
 
                 var body = CelestialBodyManager.Get( "main" );
 
-                //for( int i = 0; i < 50; i++ )
-                //{
                 System.Random r = new System.Random();
                 Vector3Dbl rand = new Vector3Dbl( 0, r.Next( -50000000, 50000000 ), r.Next( -50000000, 50000000 ) );
                 CelestialBody cbi = VanillaPlanetarySystemFactory.CreateCBNonAttractor( $"rand{bodyI}", new Vector3Dbl( 149_500_000_000, 0, 0 ) + rand, rand * 0.01, QuaternionDbl.identity );
-                //}
+
                 bodyI++;
 
                 Debug.Log( body.ReferenceFrameTransform.AbsoluteVelocity );
