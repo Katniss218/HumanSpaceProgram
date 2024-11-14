@@ -1,7 +1,6 @@
 using HSP.CelestialBodies;
 using HSP.ReferenceFrames;
 using HSP.Trajectories;
-using HSP.Vanilla.Trajectories;
 using HSP.Vessels;
 using System;
 using UnityEngine;
@@ -51,7 +50,11 @@ namespace HSP.Vanilla
             IPhysicsTransform oldPhysTransform = vessel.PhysicsTransform;
 
             UnityEngine.Object.DestroyImmediate( (Component)vessel.PhysicsTransform );
-            var ppo = vessel.gameObject.AddComponent<FreeReferenceFrameTransform>();
+            var ppo = vessel.gameObject.AddComponent<HybridReferenceFrameTransform>();
+            ppo.PositionRange = OnVesselCreated.VESSEL_POSITION_RANGE;
+            ppo.VelocityRange = OnVesselCreated.VESSEL_VELOCITY_RANGE;
+            ppo.MaxTimeScale = OnVesselCreated.VESSEL_MAX_TIMESCALE;
+            ppo.AllowSceneSimulation = true;
 
             ppo.Mass = oldPhysTransform.Mass;
             ppo.LocalCenterOfMass = oldPhysTransform.LocalCenterOfMass;

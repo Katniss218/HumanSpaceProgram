@@ -11,6 +11,10 @@ namespace HSP.Vanilla
 {
     public static class OnVesselCreated
     {
+        public const float VESSEL_POSITION_RANGE = 1e5f;
+        public const float VESSEL_VELOCITY_RANGE = 1e4f;
+        public const float VESSEL_MAX_TIMESCALE = 64f;
+
         public const string ADD_REFERENCE_FRAME_TRANSFORM = HSPEvent.NAMESPACE_HSP + ".add_reference_frame_transform";
         public const string ADD_TRAJECTORY_TRANSFORM = HSPEvent.NAMESPACE_HSP + ".add_trajectory_transform";
         public const string TRY_PIN_PHYSICS_OBJECT = HSPEvent.NAMESPACE_HSP + ".try_pin_physics_object";
@@ -20,12 +24,11 @@ namespace HSP.Vanilla
         {
             if( SceneLoader.IsSceneLoaded( GameplaySceneManager.SCENE_NAME ) )
             {
-                //var comp = v.gameObject.AddComponent<FreeReferenceFrameTransform>();
                 var comp = v.gameObject.AddComponent<HybridReferenceFrameTransform>();
-                comp.PositionRange = 1e6f;
-                comp.VelocityRange = 1e5f;
-                comp.MaxTimeScale = 64f;
-                comp.AllowCollisionResponse = true;
+                comp.PositionRange = VESSEL_POSITION_RANGE;
+                comp.VelocityRange = VESSEL_VELOCITY_RANGE;
+                comp.MaxTimeScale = VESSEL_MAX_TIMESCALE;
+                comp.AllowSceneSimulation = true;
             }
             else if( SceneLoader.IsSceneLoaded( DesignSceneManager.SCENE_NAME ) )
             {

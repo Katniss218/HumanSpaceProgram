@@ -4,6 +4,7 @@ using HSP.Vanilla.Scenes.AlwaysLoadedScene;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.LowLevel;
 using UnityEngine.PlayerLoop;
@@ -15,16 +16,16 @@ namespace HSP.Vanilla
     [DisallowMultipleComponent]
     public class HybridReferenceFrameTransform : MonoBehaviour, IReferenceFrameTransform, IPhysicsTransform
     {
-        private bool _collisionResponseEnabled = false;
+        private bool _allowSceneSimulation = false;
         /// <summary>
         /// If true, the object is allowed to simulate using scene space, allowing for collisions, when the position and velocity are within the range allowed for scene space simulation.
         /// </summary>
-        public bool AllowCollisionResponse // a.k.a. allow simulation
+        public bool AllowSceneSimulation
         {
-            get => _collisionResponseEnabled;
+            get => _allowSceneSimulation;
             set
             {
-                _collisionResponseEnabled = value;
+                _allowSceneSimulation = value;
                 if( value )
                 {
                     SwitchToSceneMode();
@@ -37,21 +38,22 @@ namespace HSP.Vanilla
         }
 
         /// <summary>
-        /// The allowed values for scene position where the object can have collision response, in [m].
+        /// The allowed values for scene position, in [m]. <br/>
+        /// Outside of this range the object will be simulated using absolute space.
         /// </summary>
         public float PositionRange { get; set; }
         /// <summary>
-        /// The allowed values for scene velocity where the object can have collision response, in [m/s].
+        /// The allowed values for scene velocity, in [m/s]. <br/>
+        /// Outside of this range the object will be simulated using absolute space.
         /// </summary>
         public float VelocityRange { get; set; }
         /// <summary>
-        /// The maximum allowed timescale where the object can have collision response.
+        /// The maximum allowed timescale. <br/>
+        /// When the timescale is higher than this value, the object will be simulated using absolute space.
         /// </summary>
         public float MaxTimeScale { get; set; }
 
-        Rigidbody _rb;
-
-        // absolute mode variables
+        // absolute space simulation variables
 
         Vector3Dbl _requestedAbsolutePosition;
         Vector3Dbl _actualAbsolutePosition;
@@ -66,7 +68,8 @@ namespace HSP.Vanilla
 
         //
 
-        private bool _isSceneSpace;
+        bool _isSceneSpace;
+        Rigidbody _rb;
 
         public Vector3 Position
         {
@@ -328,15 +331,18 @@ namespace HSP.Vanilla
 
         private void SwitchToAbsoluteMode()
         {
+            Debug.Log( "A " + _actualAbsolutePosition + " : " + SceneReferenceFrameManager.ReferenceFrame.TransformPosition( Vector3Dbl.zero ) );
+#warning TODO - sometimes absoluteposition gets set to 0, but not straight away... only at ut = around 0.05
+
             IReferenceFrame sceneReferenceFrame = SceneReferenceFrameManager.ReferenceFrame;
 
             _absoluteVelocity = sceneReferenceFrame.TransformVelocity( _rb.velocity );
-            _actualAbsolutePosition = sceneReferenceFrame.TransformVelocity( _rb.position );
+            _actualAbsolutePosition = sceneReferenceFrame.TransformPosition( _rb.position );
             _requestedAbsolutePosition = _actualAbsolutePosition + (_absoluteVelocity * TimeManager.FixedDeltaTime);
 
             _absoluteAngularVelocity = sceneReferenceFrame.TransformAngularVelocity( _rb.angularVelocity );
             _actualAbsoluteRotation = sceneReferenceFrame.TransformRotation( _rb.rotation );
-            QuaternionDbl deltaRotation = QuaternionDbl.Euler( _absoluteAngularVelocity * TimeManager.FixedDeltaTime * 57.2957795131 );
+            QuaternionDbl deltaRotation = QuaternionDbl.Euler( _absoluteAngularVelocity * TimeManager.FixedDeltaTime * 57.29577951308232087679 );
             _requestedAbsoluteRotation = deltaRotation * _actualAbsoluteRotation;
 
             _isSceneSpace = false;
@@ -354,7 +360,7 @@ namespace HSP.Vanilla
             Vector3 requestedPos = (Vector3)sceneReferenceFrame.InverseTransformPosition( _requestedAbsolutePosition );
             Quaternion requestedRot = (Quaternion)sceneReferenceFrame.InverseTransformRotation( _requestedAbsoluteRotation );
 
-            //_rb.Move( requestedPos, requestedRot ); // sets the ground truth values.
+            // set values immediately so that the returned AbsolutePosition is correct immediately after exiting this method.
             _rb.position = requestedPos;
             _rb.rotation = requestedRot;
         }
@@ -378,15 +384,13 @@ namespace HSP.Vanilla
 
         void FixedUpdate()
         {
-            // Only try toggling in and out of scene mode when collisions are desired.
-            if( _collisionResponseEnabled )
+            if( _allowSceneSimulation )
             {
                 if( _isSceneSpace )
                 {
                     Vector3 scenePos = _rb.position;
                     Vector3 sceneVel = _rb.velocity;
 
-                    // Ensure that the condition switch to one doesn't have overlap with the condition to switch back, as this would be silly.
                     if( Mathf.Abs( scenePos.x ) > PositionRange || Mathf.Abs( scenePos.y ) > PositionRange || Mathf.Abs( scenePos.z ) > PositionRange
                      || Mathf.Abs( sceneVel.x ) > PositionRange || Mathf.Abs( sceneVel.y ) > PositionRange || Mathf.Abs( sceneVel.z ) > PositionRange
                      || TimeManager.TimeScale > MaxTimeScale )
@@ -399,7 +403,6 @@ namespace HSP.Vanilla
                     Vector3 scenePos = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformPosition( _actualAbsolutePosition );
                     Vector3 sceneVel = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformVelocity( _absoluteVelocity );
 
-                    // Ensure that the condition switch to one doesn't have overlap with the condition to switch back, as this would be silly.
                     if( Mathf.Abs( scenePos.x ) <= PositionRange && Mathf.Abs( scenePos.y ) <= PositionRange && Mathf.Abs( scenePos.z ) <= PositionRange
                      && Mathf.Abs( sceneVel.x ) <= PositionRange && Mathf.Abs( sceneVel.y ) <= PositionRange && Mathf.Abs( sceneVel.z ) <= PositionRange
                      && TimeManager.TimeScale <= MaxTimeScale )
@@ -411,8 +414,6 @@ namespace HSP.Vanilla
 
             if( !_isSceneSpace )
             {
-                //
-                // Simulate absolute space \/
                 IReferenceFrame sceneReferenceFrameAfterPhysicsProcessing = SceneReferenceFrameManager.ReferenceFrame.AtUT( TimeManager.UT );
 
                 // `_actualAbsolutePosition` should be up to date due to the callback inside physics step, which was invoked in the previous frame.
@@ -426,22 +427,25 @@ namespace HSP.Vanilla
 
                 _rb.Move( requestedPos, requestedRot );
             }
-
-            //
-            // Rigidbody simulates itself during scene mode.
         }
 
         public virtual void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
-#warning TODO - switch immediately to absolute if needed to prevent loss of precision.
-
             if( _isSceneSpace )
             {
+                Vector3 scenePos = _rb.position;
+                Vector3 sceneVel = _rb.velocity;
                 var sceneReferenceFrame = data.OldFrame;
-                _actualAbsolutePosition = sceneReferenceFrame.TransformPosition( _rb.position );
+                _actualAbsolutePosition = sceneReferenceFrame.TransformPosition( scenePos );
                 _actualAbsoluteRotation = sceneReferenceFrame.TransformRotation( _rb.rotation );
-                _absoluteVelocity = sceneReferenceFrame.TransformVelocity( _rb.velocity );
+                _absoluteVelocity = sceneReferenceFrame.TransformVelocity( sceneVel );
                 _absoluteAngularVelocity = sceneReferenceFrame.TransformAngularVelocity( _rb.angularVelocity );
+
+                if( Mathf.Abs( scenePos.x ) > PositionRange || Mathf.Abs( scenePos.y ) > PositionRange || Mathf.Abs( scenePos.z ) > PositionRange
+                 || Mathf.Abs( sceneVel.x ) > PositionRange || Mathf.Abs( sceneVel.y ) > PositionRange || Mathf.Abs( sceneVel.z ) > PositionRange )
+                {
+                    SwitchToAbsoluteMode();
+                }
 
                 ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, _actualAbsolutePosition, data.NewFrame );
                 ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, _actualAbsoluteRotation );
@@ -454,7 +458,6 @@ namespace HSP.Vanilla
                 Vector3 scenePos = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformPosition( absolutePosition );
                 _rb.position = scenePos;
                 transform.position = scenePos;
-                //_actualPosition = scenePos;
                 _actualAbsolutePosition = absolutePosition;
                 _requestedAbsolutePosition = absolutePosition;
 
@@ -462,7 +465,6 @@ namespace HSP.Vanilla
                 Quaternion sceneRot = (Quaternion)SceneReferenceFrameManager.ReferenceFrame.InverseTransformRotation( absoluteRotation );
                 _rb.rotation = sceneRot;
                 transform.rotation = sceneRot;
-                //_actualRotation = sceneRot;
                 _actualAbsoluteRotation = absoluteRotation;
                 _requestedAbsoluteRotation = absoluteRotation;
             }
@@ -470,12 +472,12 @@ namespace HSP.Vanilla
 
         void OnEnable()
         {
-            _transforms.Add( this );
+            _activeHybridTransforms.Add( this );
         }
 
         void OnDisable()
         {
-            _transforms.Remove( this );
+            _activeHybridTransforms.Remove( this );
         }
 
         protected virtual void OnCollisionEnter( Collision collision )
@@ -511,7 +513,7 @@ namespace HSP.Vanilla
             subSystemList = null
         };
 
-        static HashSet<HybridReferenceFrameTransform> _transforms = new();
+        static List<HybridReferenceFrameTransform> _activeHybridTransforms = new();
 
         static void InsidePhysicsStep()
         {
@@ -520,7 +522,7 @@ namespace HSP.Vanilla
             //   This is unacceptable.
 
             // Assume that other objects aren't allowed to get the absolute position/velocity during physics step, as it is undefined (changes) during it.
-            foreach( var t in _transforms )
+            foreach( var t in _activeHybridTransforms )
             {
                 if( !t._isSceneSpace )
                 {
