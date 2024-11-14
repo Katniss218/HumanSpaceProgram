@@ -1,4 +1,5 @@
 ﻿
+using HSP.Time;
 using System;
 using UnityEngine;
 using UnityPlus.Serialization;
@@ -32,7 +33,7 @@ namespace HSP.ReferenceFrames
         private readonly Vector3Dbl _acceleration;
         private readonly Vector3Dbl _angularAcceleration;
 
-        public OrientedNonInertialReferenceFrame( double referenceUT, Vector3Dbl center, Quaternion rotation, Vector3Dbl velocity, Vector3Dbl angularVelocity, Vector3Dbl acceleration, Vector3Dbl angularAcceleration )
+        public OrientedNonInertialReferenceFrame( double referenceUT, Vector3Dbl center, QuaternionDbl rotation, Vector3Dbl velocity, Vector3Dbl angularVelocity, Vector3Dbl acceleration, Vector3Dbl angularAcceleration )
         {
             this.ReferenceUT = referenceUT;
             this._position = center;
@@ -55,6 +56,14 @@ namespace HSP.ReferenceFrames
 
         public IReferenceFrame AtUT( double ut )
         {
+            double deltaTime = ut - ReferenceUT;
+
+            var newPos = _position + (_velocity * deltaTime);
+            var newRot = QuaternionDbl.AngleAxis( _angularVelocity.magnitude * 57.2957795131 * deltaTime, _angularVelocity ) * _rotation;
+            //QuaternionDbl deltaRotation = QuaternionDbl.Euler( _angularVelocity * TimeManager.FixedDeltaTime * 57.2957795131 );
+            //var newRot = deltaRotation * _rotation;
+            return new OrientedNonInertialReferenceFrame( ut, newPos, newRot, _velocity, _angularVelocity, _acceleration, _angularAcceleration );
+
             throw new NotImplementedException();
         }
 
@@ -132,11 +141,13 @@ namespace HSP.ReferenceFrames
 
         public Vector3Dbl GetTangentialVelocity( Vector3Dbl localPosition )
         {
+            localPosition = _rotation * localPosition;
             return Vector3Dbl.Cross( AngularVelocity, localPosition );
         }
 
         public Vector3Dbl GetFicticiousAcceleration( Vector3Dbl localPosition, Vector3Dbl localVelocity )
         {
+#warning TODO - handle the frame's own orientation (like with tangential velocity).
             // Everything is in local (including the returned values), so the orientation is irrelevant.
 
             // TODO - handle near-zeroes in the terms.

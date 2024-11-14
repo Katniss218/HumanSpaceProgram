@@ -145,11 +145,10 @@ namespace HSP._DevUtils
 
             // toggle ability to do collision response via physX, when close enough.
 
+            Vector3Dbl airfVel = launchSite.ReferenceFrameTransform.AbsoluteVelocity;
             v2.ReferenceFrameTransform.AbsolutePosition = airfPos;
-
-            Vector3Dbl velocity = launchSite.ReferenceFrameTransform.AbsoluteVelocity;
-            v2.ReferenceFrameTransform.AbsoluteVelocity = velocity;
-            Debug.Log( closestBoundToVesselAirf + " : " + velocity + " : " + (airfPos - v2.ReferenceFrameTransform.AbsolutePosition) );
+            v2.ReferenceFrameTransform.AbsoluteVelocity = airfVel;
+            Debug.Log( closestBoundToVesselAirf + " : " + airfVel + " : " + (airfPos - v2.ReferenceFrameTransform.AbsolutePosition) );
             return v2;
 
         }

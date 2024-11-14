@@ -12,6 +12,8 @@ namespace HSP.Vanilla
         private static void AddGameplayPhysicsObject( CelestialBody cb )
         {
             var comp = cb.gameObject.AddComponent<KinematicReferenceFrameTransform>();
+            //var comp = cb.gameObject.AddComponent<HybridReferenceFrameTransform>();
+            //comp.AllowCollisionResponse = false;
             comp.Mass = (float)cb.Mass;
         }
 

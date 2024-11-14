@@ -100,14 +100,6 @@ namespace HSP.Time
         }
 
         /// <summary>
-        /// Gets the current value of the time scale.
-        /// </summary>
-        public static float GetTimeScale()
-        {
-            return _timeScale;
-        }
-
-        /// <summary>
         /// Sets the current time scale to the specified value, if the time scale is not locked.
         /// </summary>
         public static void SetTimeScale( float timeScale )
@@ -178,7 +170,7 @@ namespace HSP.Time
 
         void OnEnable()
         {
-            PlayerLoopUtils.InsertSystemAfter<FixedUpdate>( in _playerLoopSystem, typeof( FixedUpdate.ClearLines ) );
+            PlayerLoopUtils.InsertSystemBefore<FixedUpdate>( in _playerLoopSystem, typeof( FixedUpdate.ClearLines ) );
         }
 
         void OnDisable()

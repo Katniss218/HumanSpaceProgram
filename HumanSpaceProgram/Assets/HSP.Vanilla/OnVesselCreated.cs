@@ -20,7 +20,12 @@ namespace HSP.Vanilla
         {
             if( SceneLoader.IsSceneLoaded( GameplaySceneManager.SCENE_NAME ) )
             {
-                var comp = v.gameObject.AddComponent<FreeReferenceFrameTransform>();
+                //var comp = v.gameObject.AddComponent<FreeReferenceFrameTransform>();
+                var comp = v.gameObject.AddComponent<HybridReferenceFrameTransform>();
+                comp.PositionRange = 1e6f;
+                comp.VelocityRange = 1e5f;
+                comp.MaxTimeScale = 64f;
+                comp.AllowCollisionResponse = true;
             }
             else if( SceneLoader.IsSceneLoaded( DesignSceneManager.SCENE_NAME ) )
             {

@@ -92,7 +92,8 @@ namespace HSP.CelestialBodies
         /// <summary>
         /// Constructs a reference frame centered on this body, with axes aligned with the body (i.e. local body space), and the frame's velocity matching that of the body.
         /// </summary>
-        public IReferenceFrame OrientedInertialReferenceFrame => new OrientedInertialReferenceFrame( SceneReferenceFrameManager.ReferenceFrame.ReferenceUT, this.ReferenceFrameTransform.AbsolutePosition, this.ReferenceFrameTransform.AbsoluteRotation, this.ReferenceFrameTransform.AbsoluteVelocity );
+        //public IReferenceFrame OrientedInertialReferenceFrame => new OrientedInertialReferenceFrame( SceneReferenceFrameManager.ReferenceFrame.ReferenceUT, this.ReferenceFrameTransform.AbsolutePosition, this.ReferenceFrameTransform.AbsoluteRotation, this.ReferenceFrameTransform.AbsoluteVelocity );
+        public IReferenceFrame OrientedInertialReferenceFrame => new OrientedNonInertialReferenceFrame( SceneReferenceFrameManager.ReferenceFrame.ReferenceUT, this.ReferenceFrameTransform.AbsolutePosition, this.ReferenceFrameTransform.AbsoluteRotation, this.ReferenceFrameTransform.AbsoluteVelocity, this.ReferenceFrameTransform.AbsoluteAngularVelocity, Vector3Dbl.zero, Vector3Dbl.zero );
 
         void Start()
         {

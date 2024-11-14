@@ -54,7 +54,7 @@ namespace HSP.ReferenceFrames
         /// </remarks>
         public static event Action<ReferenceFrameSwitchData> OnAfterReferenceFrameSwitch;
 
-        private IReferenceFrame _referenceFrame;
+        private IReferenceFrame _referenceFrame = new CenteredReferenceFrame( 0, Vector3Dbl.zero );
         /// <summary>
         /// The current reference frame used by the scene.
         /// </summary>
@@ -177,20 +177,18 @@ namespace HSP.ReferenceFrames
             // This can now be inside Awake because the frame is switched during unity physics step, and not immediately.
             OnAfterReferenceFrameSwitch = null;
             OnAfterReferenceFrameSwitch += ReferenceFrameSwitch_Responders;
-
-            // Initial frame
-            instance._referenceFrame = new CenteredReferenceFrame( 0, Vector3Dbl.zero );
         }
 
 
         void OnEnable()
         {
-            PlayerLoopUtils.InsertSystemAfter<FixedUpdate>( in _playerLoopSystem, typeof( FixedUpdate.PhysicsFixedUpdate ) );
+            //PlayerLoopUtils.InsertSystemAfter<FixedUpdate>( in _playerLoopSystem, typeof( FixedUpdate.PhysicsFixedUpdate ) );
+            PlayerLoopUtils.AddSystem<FixedUpdate, FixedUpdate.PhysicsFixedUpdate>( in _playerLoopSystem );
         }
 
         void OnDisable()
         {
-            PlayerLoopUtils.RemoveSystem<FixedUpdate>( in _playerLoopSystem );
+            PlayerLoopUtils.RemoveSystem<FixedUpdate, FixedUpdate.PhysicsFixedUpdate>( in _playerLoopSystem );
         }
 
         private static PlayerLoopSystem _playerLoopSystem = new PlayerLoopSystem()

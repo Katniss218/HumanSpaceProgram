@@ -30,7 +30,6 @@ namespace HSP.Trajectories
 
             // Copy the states to ensure that the simulation doesn't use values calculated for the next step on elements after the first element.
             TrajectoryBodyState[] attractorStates = new TrajectoryBodyState[Attractors.Count];
-            //TrajectoryBodyState[] followerStates = new TrajectoryBodyState[Followers.Count];
 
             for( int i = 0; i < stepCount; i++ )
             {
@@ -38,10 +37,6 @@ namespace HSP.Trajectories
                 {
                     attractorStates[j] = Attractors[j].GetCurrentState();
                 }
-                //for( int j = 0; j < Followers.Count; j++ )
-                //{
-                //    followerStates[j] = Followers[j].GetCurrentState();
-                //}
 
                 // attractors go first, because they attract each other.
 
