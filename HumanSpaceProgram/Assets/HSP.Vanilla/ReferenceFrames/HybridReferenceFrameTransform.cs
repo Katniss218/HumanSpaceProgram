@@ -302,7 +302,7 @@ namespace HSP.Vanilla
 
         public void AddForceAtPosition( Vector3 force, Vector3 position )
         {
-#warning TODO - worldCoM is not accurate enough for absolute mode.
+#warning TODO - worldCoM is not accurate enough for absolute mode. - use self as reference frame
 #warning TODO - force and position are not accurate enough either.
             Vector3 leverArm = position - this._rb.worldCenterOfMass;
             _absoluteAcceleration += SceneReferenceFrameManager.ReferenceFrame.TransformAcceleration( (Vector3Dbl)force / Mass );

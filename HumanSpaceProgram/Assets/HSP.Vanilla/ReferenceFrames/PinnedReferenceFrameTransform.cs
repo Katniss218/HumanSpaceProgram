@@ -89,7 +89,7 @@ namespace HSP.Vanilla
             set
             {
                 Vector3Dbl absolutePosition = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( value );
-                ReferencePosition = _referenceBody.OrientedReferenceFrame.InverseTransformPosition( absolutePosition );
+                ReferencePosition = _referenceBody.ReferenceFrameTransform.OrientedReferenceFrame().InverseTransformPosition( absolutePosition );
             }
         }
 
@@ -102,7 +102,7 @@ namespace HSP.Vanilla
             }
             set
             {
-                ReferencePosition = _referenceBody.OrientedReferenceFrame.InverseTransformPosition( value );
+                ReferencePosition = _referenceBody.ReferenceFrameTransform.OrientedReferenceFrame().InverseTransformPosition( value );
             }
         }
 
@@ -115,7 +115,7 @@ namespace HSP.Vanilla
             set
             {
                 QuaternionDbl absoluteRotation = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( value );
-                ReferenceRotation = _referenceBody.OrientedReferenceFrame.InverseTransformRotation( absoluteRotation );
+                ReferenceRotation = _referenceBody.ReferenceFrameTransform.OrientedReferenceFrame().InverseTransformRotation( absoluteRotation );
             }
         }
 
@@ -128,7 +128,7 @@ namespace HSP.Vanilla
             }
             set
             {
-                ReferenceRotation = _referenceBody.OrientedReferenceFrame.InverseTransformRotation( value );
+                ReferenceRotation = _referenceBody.ReferenceFrameTransform.OrientedReferenceFrame().InverseTransformRotation( value );
             }
         }
 
@@ -262,7 +262,7 @@ namespace HSP.Vanilla
                 return;
 
             IReferenceFrame sceneReferenceFrame = SceneReferenceFrameManager.ReferenceFrame;
-            IReferenceFrame bodyFrame = ReferenceBody.OrientedInertialReferenceFrame;
+            IReferenceFrame bodyFrame = ReferenceBody.ReferenceFrameTransform.OrientedInertialReferenceFrame();
             Vector3 pos = (Vector3)sceneReferenceFrame.InverseTransformPosition( bodyFrame.TransformPosition( _referencePosition ) );
             Quaternion rot = (Quaternion)sceneReferenceFrame.InverseTransformRotation( bodyFrame.TransformRotation( _referenceRotation ) );
 
@@ -286,7 +286,7 @@ namespace HSP.Vanilla
             if( _referenceBody == null )
                 return;
 
-            INonInertialReferenceFrame bodyFrame = _referenceBody.NonInertialReferenceFrame;
+            INonInertialReferenceFrame bodyFrame = _referenceBody.ReferenceFrameTransform.NonInertialReferenceFrame();
             _cachedAbsolutePosition = bodyFrame.TransformPosition( _referencePosition );
             _cachedAbsoluteRotation = bodyFrame.TransformRotation( _referenceRotation );
             _cachedAbsoluteVelocity = bodyFrame.TransformVelocity( Vector3Dbl.zero );
@@ -338,7 +338,7 @@ namespace HSP.Vanilla
 
             // ReferenceFrame.AtUT is used because we want to access the frame for the end of the frame, and FixedUpdate (caller) is called before ReferenceFrame updates.
             var sceneReferenceFrame = SceneReferenceFrameManager.ReferenceFrame.AtUT( TimeManager.UT );
-            var bodyFrame = ReferenceBody.NonInertialReferenceFrame.AtUT( TimeManager.UT );
+            var bodyFrame = ReferenceBody.ReferenceFrameTransform.NonInertialReferenceFrame().AtUT( TimeManager.UT );
 
             Vector3 pos = (Vector3)sceneReferenceFrame.InverseTransformPosition( bodyFrame.TransformPosition( _referencePosition ) );
             Quaternion rot = (Quaternion)sceneReferenceFrame.InverseTransformRotation( bodyFrame.TransformRotation( _referenceRotation ) );

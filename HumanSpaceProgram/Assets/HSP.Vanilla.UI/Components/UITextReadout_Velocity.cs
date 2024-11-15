@@ -1,4 +1,5 @@
 ﻿using HSP.CelestialBodies;
+using HSP.ReferenceFrames;
 using UnityEngine;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
@@ -20,8 +21,7 @@ namespace HSP.Vanilla.UI.Components
             else
             {
                 CelestialBody body = CelestialBodyManager.Get( "main" );
-                Vector3Dbl bodySpaceVelocity = body.CenteredInertialReferenceFrame.InverseTransformVelocity( activeObj.AbsoluteVelocity );
-                //Vector3Dbl absoluteVelocity = activeObj.AbsoluteVelocity;
+                Vector3Dbl bodySpaceVelocity = body.ReferenceFrameTransform.CenteredReferenceFrame().InverseTransformVelocity( activeObj.AbsoluteVelocity );
 
                 double vel = bodySpaceVelocity.magnitude;
 

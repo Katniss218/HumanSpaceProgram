@@ -151,13 +151,13 @@ namespace HSP.ReferenceFrames
 
         public Vector3Dbl GetTangentialVelocity( Vector3Dbl localPosition )
         {
+            // Since the output is in absolute space, the orientation matters here.
             localPosition = _rotation * localPosition;
             return Vector3Dbl.Cross( AngularVelocity, localPosition );
         }
 
         public Vector3Dbl GetFicticiousAcceleration( Vector3Dbl localPosition, Vector3Dbl localVelocity )
         {
-#warning TODO - handle the frame's own orientation (like with tangential velocity).
             // Everything is in local (including the returned values), so the orientation is irrelevant.
 
             // TODO - handle near-zeroes in the terms.

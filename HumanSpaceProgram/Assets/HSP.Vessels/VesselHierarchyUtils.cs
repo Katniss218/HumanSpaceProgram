@@ -151,12 +151,14 @@ namespace HSP.Vessels
             // Detach the parts from the old vessel.
             Vessel oldVessel = partToSplit.GetVessel();
 
-#warning TODO - Use linear and angular velocities of part that works correctly for spinning vessels.
+            var vesselFrame = oldVessel.ReferenceFrameTransform.NonInertialReferenceFrame();
+            Vector3Dbl partPosAirf = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( partToSplit.transform.position );
+            Vector3Dbl partPosInVesselSpace = vesselFrame.InverseTransformPosition( partPosAirf );
 
             Vessel newVessel = VesselFactory.CreatePartless(
-                SceneReferenceFrameManager.ReferenceFrame.TransformPosition( partToSplit.transform.position ),
+                partPosAirf,
                 SceneReferenceFrameManager.ReferenceFrame.TransformRotation( partToSplit.transform.rotation ),
-                oldVessel.ReferenceFrameTransform.AbsoluteVelocity,
+                oldVessel.ReferenceFrameTransform.AbsoluteVelocity + vesselFrame.GetTangentialVelocity( partPosInVesselSpace ),
                 oldVessel.ReferenceFrameTransform.AbsoluteAngularVelocity );
 
             partToSplit.SetParent( newVessel.transform );

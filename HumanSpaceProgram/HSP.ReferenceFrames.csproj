@@ -71,6 +71,7 @@
     <Compile Include="Assets\HSP.ReferenceFrames\IReferenceFrameTransform.cs" />
     <Compile Include="Assets\HSP.ReferenceFrames\ReferenceFrames\OrientedReferenceFrame.cs" />
     <Compile Include="Assets\HSP.ReferenceFrames\IReferenceFrame.cs" />
+    <Compile Include="Assets\HSP.ReferenceFrames\IReferenceFrameTransform_Ex.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.ReferenceFrames\___HSP.ReferenceFrames.asmdef" />
