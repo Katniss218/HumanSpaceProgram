@@ -21,11 +21,6 @@ namespace HSP.ReferenceFrames
         double ReferenceUT { get; }
 
         /// <summary>
-        /// Calculates the current reference frame shifted (translated) by a given distance in the Absolute Inertial Reference Frame (AIRF) space.
-        /// </summary>
-        IReferenceFrame Shift( Vector3Dbl absolutePositionDelta );
-
-        /// <summary>
         /// Calculates where the current reference frame will be at the specified reference time.
         /// </summary>
         IReferenceFrame AtUT( double ut );

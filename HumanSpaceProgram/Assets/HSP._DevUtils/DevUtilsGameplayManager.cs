@@ -6,11 +6,9 @@ using HSP.ReferenceFrames;
 using HSP.ResourceFlow;
 using HSP.Time;
 using HSP.Timelines;
-using HSP.Trajectories;
 using HSP.Vanilla;
 using HSP.Vanilla.Components;
 using HSP.Vanilla.Scenes.AlwaysLoadedScene;
-using HSP.Vanilla.Scenes.GameplayScene.Cameras;
 using HSP.Vessels;
 using System;
 using System.Collections.Generic;
@@ -23,7 +21,6 @@ using UnityPlus.Serialization.DataHandlers;
 
 namespace HSP._DevUtils
 {
-
     public class UpdateTester : MonoBehaviour
     {
         protected void Update()
@@ -58,7 +55,7 @@ namespace HSP._DevUtils
         public RawImage uiImage;
 
         static Vessel launchSite;
-        static Vessel vessel;
+        static Vessel _vessel;
 
         public const string LOAD_PLACEHOLDER_CONTENT = "devutils.load_game_data";
         public const string CREATE_PLACEHOLDER_UNIVERSE = "devutils.timeline.new.after";
@@ -92,14 +89,9 @@ namespace HSP._DevUtils
             GameObject root = InstantiateLocal( launchSitePrefab, launchSite.transform, Vector3.zero, Quaternion.identity );
             launchSite.RootPart = root.transform;
 
-            var v = CreateVessel( launchSite );
-            vessel = v;
+            _vessel = CreateVessel( launchSite );
 
-            ActiveVesselManager.ActiveObject = vessel.RootPart.GetVessel().gameObject.transform;
-            //ActiveVesselManager.ActiveObject = launchSite.RootPart.GetVessel().gameObject.transform;
-
-            //Vector3Dbl velocity = new Vector3Dbl( 500, 0, 0 );
-            //body.ReferenceFrameTransform.AbsoluteVelocity = velocity;
+            ActiveVesselManager.ActiveObject = _vessel.RootPart.GetVessel().gameObject.transform;
         }
 
 
@@ -132,25 +124,18 @@ namespace HSP._DevUtils
             Vector3Dbl spawnerPosAirf = launchSite.ReferenceFrameTransform.AbsolutePosition + GetLocalPositionRelativeToRoot( launchSiteSpawner.transform );
             QuaternionDbl spawnerRotAirf = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( launchSiteSpawner.transform.rotation );
 
-            var v2 = CreateDummyVessel( zeroPosAirf, spawnerRotAirf ); // position is temp.
+            var vessel = CreateDummyVessel( zeroPosAirf, spawnerRotAirf ); // position is temp.
 
-            Vector3 bottomBoundPos = v2.GetBottomPosition();
+            Vector3 bottomBoundPos = vessel.GetBottomPosition();
             Vector3Dbl closestBoundAirf = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( bottomBoundPos );
-            Vector3Dbl closestBoundToVesselAirf = v2.ReferenceFrameTransform.AbsolutePosition - closestBoundAirf;
+            Vector3Dbl closestBoundToVesselAirf = vessel.ReferenceFrameTransform.AbsolutePosition - closestBoundAirf;
             Vector3Dbl airfPos = spawnerPosAirf + closestBoundToVesselAirf;
-#warning TODO - Because we are sending the vessel far away from the scene origin, its position is clamped to 32-bit precision values.
-            // free reference transform uses scene values as ground truth.
-
-#warning TODO - we would need something that can detect when it's too far away and switch between Kinematic and Free behaviours (in a single monobehaviour).
-
-            // toggle ability to do collision response via physX, when close enough.
 
             Vector3Dbl airfVel = launchSite.ReferenceFrameTransform.AbsoluteVelocity;
-            v2.ReferenceFrameTransform.AbsolutePosition = airfPos;
-            v2.ReferenceFrameTransform.AbsoluteVelocity = airfVel;
-            Debug.Log( closestBoundToVesselAirf + " : " + airfVel + " : " + (airfPos - v2.ReferenceFrameTransform.AbsolutePosition) );
-            return v2;
 
+            vessel.ReferenceFrameTransform.AbsolutePosition = airfPos;
+            vessel.ReferenceFrameTransform.AbsoluteVelocity = airfVel;
+            return vessel;
         }
 
         void Awake()
@@ -197,8 +182,8 @@ namespace HSP._DevUtils
                     CelestialBody cb = VanillaPlanetarySystemFactory.CreateCB( "moon2", new Vector3Dbl( 150_200_000_000, 0, 0 ), new Vector3Dbl( 0, -129749.1543788567, 0 ), QuaternionDbl.identity );
                     body = cb;
 
-                    vessel.ReferenceFrameTransform.AbsolutePosition = body.ReferenceFrameTransform.AbsolutePosition + new Vector3Dbl( body.Radius + 200_000, 0, 0 );
-                    vessel.ReferenceFrameTransform.AbsoluteVelocity = body.ReferenceFrameTransform.AbsoluteVelocity + new Vector3Dbl( 0, 8500, 0 );
+                    _vessel.ReferenceFrameTransform.AbsolutePosition = body.ReferenceFrameTransform.AbsolutePosition + new Vector3Dbl( body.Radius + 200_000, 0, 0 );
+                    _vessel.ReferenceFrameTransform.AbsoluteVelocity = body.ReferenceFrameTransform.AbsoluteVelocity + new Vector3Dbl( 0, 8500, 0 );
 
                     SceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT,
                         SceneReferenceFrameManager.TargetObject.AbsolutePosition, SceneReferenceFrameManager.TargetObject.AbsoluteVelocity ) );

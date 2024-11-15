@@ -286,16 +286,13 @@ namespace HSP.Vanilla
             if( _referenceBody == null )
                 return;
 
-            IReferenceFrame bodyFrame = _referenceBody.OrientedInertialReferenceFrame;
+            INonInertialReferenceFrame bodyFrame = _referenceBody.NonInertialReferenceFrame;
             _cachedAbsolutePosition = bodyFrame.TransformPosition( _referencePosition );
             _cachedAbsoluteRotation = bodyFrame.TransformRotation( _referenceRotation );
             _cachedAbsoluteVelocity = bodyFrame.TransformVelocity( Vector3Dbl.zero );
             _cachedAbsoluteAngularVelocity = bodyFrame.TransformAngularVelocity( Vector3Dbl.zero );
 
-            if( bodyFrame is INonInertialReferenceFrame nonInertialBodyFrame )
-            {
-                _cachedAbsoluteVelocity += nonInertialBodyFrame.GetTangentialVelocity( _referencePosition );
-            }
+            _cachedAbsoluteVelocity += bodyFrame.GetTangentialVelocity( _referencePosition );
 
             _cachedVelocity = (Vector3)sceneReferenceFrame.InverseTransformVelocity( _cachedAbsoluteVelocity );
             _cachedAngularVelocity = (Vector3)sceneReferenceFrame.InverseTransformAngularVelocity( _cachedAbsoluteVelocity );
@@ -311,7 +308,7 @@ namespace HSP.Vanilla
         // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)
         // Vector3's `==` operator does approximate comparison.
         private bool IsCacheValid() => false;// SceneReferenceFrameManager.ReferenceFrame.EqualsIgnoreUT( _cachedSceneReferenceFrame )
-           // && _referenceBody.OrientedInertialReferenceFrame.EqualsIgnoreUT( _cachedBodyReferenceFrame );
+                                             // && _referenceBody.OrientedInertialReferenceFrame.EqualsIgnoreUT( _cachedBodyReferenceFrame );
 
         //private void MakeCacheValid() => ; cache validates itself when the frames are set
 
@@ -341,7 +338,7 @@ namespace HSP.Vanilla
 
             // ReferenceFrame.AtUT is used because we want to access the frame for the end of the frame, and FixedUpdate (caller) is called before ReferenceFrame updates.
             var sceneReferenceFrame = SceneReferenceFrameManager.ReferenceFrame.AtUT( TimeManager.UT );
-            var bodyFrame = ReferenceBody.OrientedInertialReferenceFrame.AtUT( TimeManager.UT );
+            var bodyFrame = ReferenceBody.NonInertialReferenceFrame.AtUT( TimeManager.UT );
 
             Vector3 pos = (Vector3)sceneReferenceFrame.InverseTransformPosition( bodyFrame.TransformPosition( _referencePosition ) );
             Quaternion rot = (Quaternion)sceneReferenceFrame.InverseTransformRotation( bodyFrame.TransformRotation( _referenceRotation ) );

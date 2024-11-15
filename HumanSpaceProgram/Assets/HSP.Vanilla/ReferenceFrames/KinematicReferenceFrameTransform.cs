@@ -264,7 +264,7 @@ namespace HSP.Vanilla
             _actualAbsolutePosition = _requestedAbsolutePosition;
             _actualAbsoluteRotation = _requestedAbsoluteRotation;
 
-            QuaternionDbl deltaRotation = QuaternionDbl.Euler( _absoluteAngularVelocity * TimeManager.FixedDeltaTime * 57.29577951308232087679 );
+            QuaternionDbl deltaRotation = QuaternionDbl.Euler( _absoluteAngularVelocity * TimeManager.FixedDeltaTime * 57.29577951308232 );
             _requestedAbsolutePosition = _actualAbsolutePosition + _absoluteVelocity * TimeManager.FixedDeltaTime;
             _requestedAbsoluteRotation = deltaRotation * _actualAbsoluteRotation;
 

@@ -27,11 +27,6 @@ namespace HSP.ReferenceFrames
             this._inverseRotation = QuaternionDbl.Inverse( rotation );
         }
 
-        public IReferenceFrame Shift( Vector3Dbl absolutePositionDelta )
-        {
-            return new OrientedReferenceFrame( ReferenceUT, this._position + absolutePositionDelta, this._rotation );
-        }
-
         public IReferenceFrame AtUT( double ut )
         {
             return new OrientedReferenceFrame( ut, _position, _rotation );

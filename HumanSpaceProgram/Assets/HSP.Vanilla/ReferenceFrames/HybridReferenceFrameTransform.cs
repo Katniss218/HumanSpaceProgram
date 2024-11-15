@@ -331,9 +331,6 @@ namespace HSP.Vanilla
 
         private void SwitchToAbsoluteMode()
         {
-            Debug.Log( "A " + _actualAbsolutePosition + " : " + SceneReferenceFrameManager.ReferenceFrame.TransformPosition( Vector3Dbl.zero ) );
-#warning TODO - sometimes absoluteposition gets set to 0, but not straight away... only at ut = around 0.05
-
             IReferenceFrame sceneReferenceFrame = SceneReferenceFrameManager.ReferenceFrame;
 
             _absoluteVelocity = sceneReferenceFrame.TransformVelocity( _rb.velocity );
@@ -342,7 +339,7 @@ namespace HSP.Vanilla
 
             _absoluteAngularVelocity = sceneReferenceFrame.TransformAngularVelocity( _rb.angularVelocity );
             _actualAbsoluteRotation = sceneReferenceFrame.TransformRotation( _rb.rotation );
-            QuaternionDbl deltaRotation = QuaternionDbl.Euler( _absoluteAngularVelocity * TimeManager.FixedDeltaTime * 57.29577951308232087679 );
+            QuaternionDbl deltaRotation = QuaternionDbl.Euler( _absoluteAngularVelocity * TimeManager.FixedDeltaTime * 57.29577951308232 );
             _requestedAbsoluteRotation = deltaRotation * _actualAbsoluteRotation;
 
             _isSceneSpace = false;
@@ -499,8 +496,11 @@ namespace HSP.Vanilla
             IsColliding = false;
         }
 
+
+        public const string ADD_PLAYER_LOOP_SYSTEM = "76523523453544";
+
         // Imo it's kind of ugly using HSPEvent_STARTUP_IMMEDIATELY to mess with player loop, but it is what it is.
-        [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, "a" )]
+        [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, ADD_PLAYER_LOOP_SYSTEM )]
         static void A()
         {
             PlayerLoopUtils.AddSystem<FixedUpdate, FixedUpdate.PhysicsFixedUpdate>( in _playerLoopSystem );

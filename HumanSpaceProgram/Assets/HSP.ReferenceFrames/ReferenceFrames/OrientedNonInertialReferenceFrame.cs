@@ -33,6 +33,17 @@ namespace HSP.ReferenceFrames
         private readonly Vector3Dbl _acceleration;
         private readonly Vector3Dbl _angularAcceleration;
 
+        public OrientedNonInertialReferenceFrame( double referenceUT, Vector3Dbl center, QuaternionDbl rotation, Vector3Dbl velocity, Vector3Dbl angularVelocity )
+        {
+            this.ReferenceUT = referenceUT;
+            this._position = center;
+            this._rotation = rotation;
+            this._inverseRotation = QuaternionDbl.Inverse( rotation );
+
+            this._velocity = velocity;
+            this._angularVelocity = angularVelocity;
+        }
+        
         public OrientedNonInertialReferenceFrame( double referenceUT, Vector3Dbl center, QuaternionDbl rotation, Vector3Dbl velocity, Vector3Dbl angularVelocity, Vector3Dbl acceleration, Vector3Dbl angularAcceleration )
         {
             this.ReferenceUT = referenceUT;
@@ -47,24 +58,23 @@ namespace HSP.ReferenceFrames
             this._angularAcceleration = angularAcceleration;
         }
 
-        public IReferenceFrame Shift( Vector3Dbl absolutePositionDelta )
-        {
-            // calculate the new rotation/acceleration/etc terms for the new frame, so that the fictitious force is still correct.
-
-            throw new NotImplementedException();
-        }
-
         public IReferenceFrame AtUT( double ut )
         {
             double deltaTime = ut - ReferenceUT;
 
-            var newPos = _position + (_velocity * deltaTime);
-            var newRot = QuaternionDbl.AngleAxis( _angularVelocity.magnitude * 57.2957795131 * deltaTime, _angularVelocity ) * _rotation;
-            //QuaternionDbl deltaRotation = QuaternionDbl.Euler( _angularVelocity * TimeManager.FixedDeltaTime * 57.2957795131 );
-            //var newRot = deltaRotation * _rotation;
-            return new OrientedNonInertialReferenceFrame( ut, newPos, newRot, _velocity, _angularVelocity, _acceleration, _angularAcceleration );
+            // new pos/rot consist of the component due to existing velocity and the component due to constant acceleration.
+            var newPos = _position
+                + (_velocity * deltaTime)
+                + (0.5 * _acceleration * (deltaTime * deltaTime));
+            var newRot =
+                QuaternionDbl.AngleAxis( 0.5 * _angularAcceleration.magnitude * (deltaTime * deltaTime) * 57.29577951308232, _angularAcceleration )
+                * QuaternionDbl.AngleAxis( _angularVelocity.magnitude * deltaTime * 57.29577951308232, _angularVelocity )
+                * _rotation;
 
-            throw new NotImplementedException();
+            Vector3Dbl newVelocity = _velocity + (_acceleration * deltaTime);
+            Vector3Dbl newAngularVelocity = _angularVelocity + (_angularAcceleration * deltaTime);
+
+            return new OrientedNonInertialReferenceFrame( ut, newPos, newRot, newVelocity, newAngularVelocity, _acceleration, _angularAcceleration );
         }
 
 

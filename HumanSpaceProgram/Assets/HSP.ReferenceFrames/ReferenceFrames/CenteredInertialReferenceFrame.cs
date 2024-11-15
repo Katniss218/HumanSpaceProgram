@@ -28,11 +28,6 @@ namespace HSP.ReferenceFrames
             this._velocity = velocity;
         }
 
-        public IReferenceFrame Shift( Vector3Dbl absolutePositionDelta )
-        {
-            return new CenteredInertialReferenceFrame( ReferenceUT, _position + absolutePositionDelta, _velocity );
-        }
-
         public IReferenceFrame AtUT( double ut )
         {
             double deltaTime = ut - ReferenceUT;

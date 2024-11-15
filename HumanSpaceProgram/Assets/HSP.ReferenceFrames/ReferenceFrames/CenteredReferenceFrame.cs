@@ -22,11 +22,6 @@ namespace HSP.ReferenceFrames
             this._position = center;
         }
 
-        public IReferenceFrame Shift( Vector3Dbl absolutePositionDelta )
-        {
-            return new CenteredReferenceFrame( ReferenceUT, _position + absolutePositionDelta );
-        }
-
         public IReferenceFrame AtUT( double ut )
         {
             return new CenteredReferenceFrame( ut, _position );
