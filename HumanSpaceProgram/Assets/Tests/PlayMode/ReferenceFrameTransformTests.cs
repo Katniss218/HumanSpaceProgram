@@ -1,9 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using HSP;
 using HSP.ReferenceFrames;
 using HSP.Time;
 using HSP.Vanilla;
+using HSP.Vanilla.Scenes.AlwaysLoadedScene;
 using HSP_Tests_PlayMode.NUnit;
 using NUnit.Framework;
 using UnityEngine;
@@ -30,6 +32,9 @@ namespace HSP_Tests_PlayMode
             manager.AddComponent<TimeManager>();
             manager.AddComponent<SceneReferenceFrameManager>();
             SceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredReferenceFrame( TimeManager.UT, Vector3Dbl.zero ) );
+
+            //HybridReferenceFrameTransform.AddPlayerLoopSystem();
+            //KinematicReferenceFrameTransform.AddPlayerLoopSystem();
 
             yield return new WaitForFixedUpdate(); // resumes right before Update
 
@@ -81,6 +86,9 @@ namespace HSP_Tests_PlayMode
             manager.AddComponent<TimeManager>();
             manager.AddComponent<SceneReferenceFrameManager>();
             AssertMonoBehaviour assertHandler = manager.AddComponent<AssertMonoBehaviour>();
+
+            //HybridReferenceFrameTransform.AddPlayerLoopSystem();
+            //KinematicReferenceFrameTransform.AddPlayerLoopSystem();
 
             yield return new WaitForFixedUpdate();
 
@@ -143,6 +151,9 @@ namespace HSP_Tests_PlayMode
             manager.AddComponent<SceneReferenceFrameManager>();
             AssertMonoBehaviour assertHandler = manager.AddComponent<AssertMonoBehaviour>();
 
+            //HybridReferenceFrameTransform.AddPlayerLoopSystem();
+            //KinematicReferenceFrameTransform.AddPlayerLoopSystem();
+
             yield return new WaitForFixedUpdate();
 
             TimeManager.SetTimeScale( 5 );
@@ -160,6 +171,7 @@ namespace HSP_Tests_PlayMode
                 yield return new WaitForFixedUpdate();
 
                 var pos = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( Vector3Dbl.zero );
+                Debug.Log( "POS: " + pos );
                 SceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT, pos, new Vector3Dbl( 0, 10, 0 ) ) );
             }
 
@@ -211,6 +223,9 @@ namespace HSP_Tests_PlayMode
             manager.AddComponent<TimeManager>();
             manager.AddComponent<SceneReferenceFrameManager>();
             AssertMonoBehaviour assertHandler = manager.AddComponent<AssertMonoBehaviour>();
+
+            //HybridReferenceFrameTransform.AddPlayerLoopSystem();
+            //KinematicReferenceFrameTransform.AddPlayerLoopSystem();
 
             yield return new WaitForFixedUpdate();
 

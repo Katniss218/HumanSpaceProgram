@@ -13,12 +13,12 @@ namespace HSP.ReferenceFrames
         Vector3Dbl GetTangentialVelocity( Vector3Dbl localPosition );
 
         /// <summary>
-        /// Gets the net fictitious linear acceleration (not force) (in the frame's space) acting on an object due to the reference frame.
+        /// Gets the net fictitious linear acceleration (NOT force) (in the frame's space) acting on an object due to the reference frame.
         /// </summary>
         Vector3Dbl GetFicticiousAcceleration( Vector3Dbl localPosition, Vector3Dbl localVelocity );
 
         /// <summary>
-        /// Gets the net fictitious angular acceleration (not torque) (in the frame's space) acting on an object due to the reference frame.
+        /// Gets the net fictitious angular acceleration (NOT torque) (in the frame's space) acting on an object due to the reference frame.
         /// </summary>
         Vector3Dbl GetFictitiousAngularAcceleration( Vector3Dbl localPosition, Vector3Dbl localAngularVelocity );
     }

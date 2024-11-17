@@ -108,15 +108,7 @@ namespace HSP.Vanilla.Trajectories
 
         public double Mass { get; set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="ut">The current (initial) univeral time.</param>
-        /// <param name="semiMajorAxis"></param>
-        /// <param name="eccentricity"></param>
-        /// <param name="inclination"></param>
-        /// <param name="longitudeOfAscendingNode"></param>
-        /// <param name="argumentOfPeriapsis"></param>
         /// <param name="initialMeanAnomaly">The initial mean anomaly (at <paramref name="ut"/>).</param>
         /// <param name="mass">The mass of the object represented by this trajectory.</param>
         public KeplerianOrbit( double ut, string parentBodyId, double semiMajorAxis, double eccentricity, double inclination, double longitudeOfAscendingNode, double argumentOfPeriapsis, double initialMeanAnomaly, double mass )

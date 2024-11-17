@@ -1,5 +1,6 @@
 ﻿using HSP.ReferenceFrames;
 using HSP.Time;
+using HSP.Vanilla.Scenes.AlwaysLoadedScene;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,11 +23,16 @@ namespace HSP.Vanilla
         {
             get
             {
-                return _rb.position; // Rigidbody value is synchronized with absolute values so we can use it directly and both will be consistnent.
+                return _rb.position;
             }
             set
             {
-                AbsolutePosition = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( value );
+                // Set both absolute and rigidbody because the call might happen after physics/fixedupdate.
+                _rb.position = value;
+                transform.position = value;
+                var absolutePos = SceneReferenceFrameManager.ReferenceFrame.InverseTransformPosition( value );
+                _actualAbsolutePosition = absolutePos;
+                _requestedAbsolutePosition = absolutePos;
             }
         }
 
@@ -34,22 +40,15 @@ namespace HSP.Vanilla
         {
             get
             {
-#warning TODO - comparing using reference frames involves a hack, make a proper solution to distinguish whether we're before or after unity physics step.
-                // To synchronize, we keep track of where the object is (going to be) before and after unity physics step (at the end of fixed frame)
-                // Return whichever value is correct, depending on whether someone calls before or after.
-                return TimeManager.UT != SceneReferenceFrameManager.ReferenceFrame.ReferenceUT // _rb.position == _actualPosition
-                        ? _actualAbsolutePosition
-                        : _requestedAbsolutePosition;
+                return _actualAbsolutePosition;
             }
             set
             {
                 // When setting, both values are set.
                 Vector3 scenePos = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformPosition( value );
-                _rb.position = scenePos;
-                transform.position = scenePos;
-                _actualPosition = scenePos;
                 _actualAbsolutePosition = value;
                 _requestedAbsolutePosition = value;
+                ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, value );
 
                 OnAbsolutePositionChanged?.Invoke();
                 OnAnyValueChanged?.Invoke();
@@ -60,11 +59,16 @@ namespace HSP.Vanilla
         {
             get
             {
-                return _rb.rotation; // Rigidbody value is synchronized with absolute values so we can use it directly and both will be consistnent.
+                return _rb.rotation;
             }
             set
             {
-                AbsoluteRotation = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( value );
+                // Set both absolute and rigidbody because the call might happen after physics/fixedupdate.
+                _rb.rotation = value;
+                transform.rotation = value;
+                var absoluteRot = SceneReferenceFrameManager.ReferenceFrame.InverseTransformRotation( value );
+                _actualAbsoluteRotation = absoluteRot;
+                _requestedAbsoluteRotation = absoluteRot;
             }
         }
 
@@ -72,18 +76,14 @@ namespace HSP.Vanilla
         {
             get
             {
-                return TimeManager.UT != SceneReferenceFrameManager.ReferenceFrame.ReferenceUT //_rb.rotation == _actualRotation
-                        ? _actualAbsoluteRotation
-                        : _requestedAbsoluteRotation;
+                return _actualAbsoluteRotation;
             }
             set
             {
                 Quaternion sceneRot = (Quaternion)SceneReferenceFrameManager.ReferenceFrame.InverseTransformRotation( value );
-                _rb.rotation = sceneRot;
-                transform.rotation = sceneRot;
-                _actualRotation = sceneRot;
                 _actualAbsoluteRotation = value;
                 _requestedAbsoluteRotation = value;
+                ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, value );
 
                 OnAbsoluteRotationChanged?.Invoke();
                 OnAnyValueChanged?.Invoke();
@@ -94,7 +94,7 @@ namespace HSP.Vanilla
         {
             get
             {
-                return (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformVelocity( _absoluteVelocity );
+                return _rb.velocity;
             }
             set
             {
@@ -124,7 +124,7 @@ namespace HSP.Vanilla
         {
             get
             {
-                return (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformVelocity( _absoluteAngularVelocity );
+                return _rb.angularVelocity;
             }
             set
             {
@@ -150,29 +150,21 @@ namespace HSP.Vanilla
             }
         }
 
-        public Vector3 Acceleration => _cachedAcceleration;
-        public Vector3Dbl AbsoluteAcceleration => _cachedAbsoluteAcceleration;
-        public Vector3 AngularAcceleration => _cachedAngularAcceleration;
-        public Vector3Dbl AbsoluteAngularAcceleration => _cachedAbsoluteAngularAcceleration;
+        public Vector3 Acceleration => (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformAcceleration( _absoluteAcceleration );
+        public Vector3Dbl AbsoluteAcceleration => _absoluteAcceleration;
+        public Vector3 AngularAcceleration => (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformAngularAcceleration( _absoluteAngularAcceleration );
+        public Vector3Dbl AbsoluteAngularAcceleration => _absoluteAngularAcceleration;
 
-        Vector3 _actualPosition;
-        Vector3Dbl _actualAbsolutePosition;
         Vector3Dbl _requestedAbsolutePosition;
-
-        Quaternion _actualRotation = Quaternion.identity;
-        QuaternionDbl _actualAbsoluteRotation = QuaternionDbl.identity;
+        Vector3Dbl _actualAbsolutePosition;
         QuaternionDbl _requestedAbsoluteRotation = QuaternionDbl.identity;
+        QuaternionDbl _actualAbsoluteRotation = QuaternionDbl.identity;
+
+        Vector3Dbl _absoluteAcceleration;
+        Vector3Dbl _absoluteAngularAcceleration;
 
         Vector3Dbl _absoluteVelocity;
         Vector3Dbl _absoluteAngularVelocity;
-
-        Vector3 _cachedAcceleration;
-        Vector3Dbl _cachedAbsoluteAcceleration;
-        Vector3 _cachedAngularAcceleration;
-        Vector3Dbl _cachedAbsoluteAngularAcceleration;
-
-        Vector3Dbl _absoluteAccelerationSum = Vector3.zero;
-        Vector3Dbl _absoluteAngularAccelerationSum = Vector3.zero;
 
 
         public event Action OnAbsolutePositionChanged;
@@ -208,26 +200,20 @@ namespace HSP.Vanilla
 
         public void AddForce( Vector3 force )
         {
-            _absoluteAccelerationSum += SceneReferenceFrameManager.ReferenceFrame.TransformAcceleration( (Vector3Dbl)force / Mass );
-
-            this._absoluteVelocity += (force / Mass) * TimeManager.FixedDeltaTime;
+            _absoluteAcceleration += SceneReferenceFrameManager.ReferenceFrame.TransformAcceleration( (Vector3Dbl)force / Mass );
         }
 
         public void AddForceAtPosition( Vector3 force, Vector3 position )
         {
-            /*Vector3 leverArm = position - this._rb.worldCenterOfMass;
-            _absoluteAccelerationSum += SceneReferenceFrameManager.ReferenceFrame.TransformAcceleration( (Vector3Dbl)force / Mass );
-            _absoluteAngularAccelerationSum += SceneReferenceFrameManager.ReferenceFrame.TransformAngularAcceleration( Vector3Dbl.Cross( force, leverArm ) / Mass );
-
-            // TODO - possibly cache the values across a frame and apply it once instead of n-times.
-            this._rb.AddForceAtPosition( force / Mass, position, ForceMode.VelocityChange );*/
+            Vector3 leverArm = position - this._rb.worldCenterOfMass;
+            Vector3Dbl torque = Vector3Dbl.Cross( force, leverArm );
+            _absoluteAcceleration += SceneReferenceFrameManager.ReferenceFrame.TransformAcceleration( (Vector3Dbl)force / Mass );
+            _absoluteAngularAcceleration += SceneReferenceFrameManager.ReferenceFrame.TransformAngularAcceleration( torque / this.GetInertia( torque.NormalizeToVector3() ) );
         }
 
         public void AddTorque( Vector3 torque )
         {
-            //_absoluteAngularAccelerationSum += SceneReferenceFrameManager.ReferenceFrame.TransformAngularAcceleration( (Vector3Dbl)torque / Mass );
-
-            //this._rb.AddTorque( torque / Mass, ForceMode.VelocityChange );
+            _absoluteAngularAcceleration += SceneReferenceFrameManager.ReferenceFrame.TransformAngularAcceleration( (Vector3Dbl)torque / this.GetInertia( torque.normalized ) );
         }
 
         protected virtual void Awake()
@@ -249,34 +235,18 @@ namespace HSP.Vanilla
 
         protected virtual void FixedUpdate()
         {
-            IReferenceFrame sceneReferenceFrame = SceneReferenceFrameManager.ReferenceFrame;
             IReferenceFrame sceneReferenceFrameAfterPhysicsProcessing = SceneReferenceFrameManager.ReferenceFrame.AtUT( TimeManager.UT );
 
-            _actualAbsolutePosition = _requestedAbsolutePosition;
-            _actualAbsoluteRotation = _requestedAbsoluteRotation;
+            // `_actualAbsolutePosition` should be up to date due to the callback inside physics step, which was invoked in the previous frame.
 
-            QuaternionDbl deltaRotation = QuaternionDbl.Euler( _absoluteAngularVelocity * TimeManager.FixedDeltaTime * 57.29577951308232 );
             _requestedAbsolutePosition = _actualAbsolutePosition + _absoluteVelocity * TimeManager.FixedDeltaTime;
+            QuaternionDbl deltaRotation = QuaternionDbl.Euler( _absoluteAngularVelocity * TimeManager.FixedDeltaTime * 57.29577951308232 );
             _requestedAbsoluteRotation = deltaRotation * _actualAbsoluteRotation;
 
             var requestedPos = (Vector3)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformPosition( _requestedAbsolutePosition );
             var requestedRot = (Quaternion)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformRotation( _requestedAbsoluteRotation );
 
             _rb.Move( requestedPos, requestedRot );
-            _actualPosition = _rb.position;
-            _actualRotation = _rb.rotation;
-
-
-            // Otherwise, we use our more precise method that relies on full encapsulation of the rigidbody.
-            // Acceleration sum will be whatever was accumulated between the previous frame (after it was zeroed out) and this frame. I think it should work fine.
-            _cachedAbsoluteAcceleration = _absoluteAccelerationSum;
-            _cachedAbsoluteAngularAcceleration = _absoluteAngularAccelerationSum;
-
-            _cachedAcceleration = (Vector3)sceneReferenceFrame.InverseTransformAcceleration( _cachedAbsoluteAcceleration );
-            _cachedAngularAcceleration = (Vector3)sceneReferenceFrame.InverseTransformAngularAcceleration( _cachedAbsoluteAngularAcceleration );
-
-            this._absoluteAccelerationSum = Vector3.zero;
-            this._absoluteAngularAccelerationSum = Vector3.zero;
         }
 
         public virtual void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
@@ -285,26 +255,24 @@ namespace HSP.Vanilla
             Vector3 scenePos = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformPosition( absolutePosition );
             _rb.position = scenePos;
             transform.position = scenePos;
-            _actualPosition = scenePos;
             _actualAbsolutePosition = absolutePosition;
-            _requestedAbsolutePosition = absolutePosition;
 
             QuaternionDbl absoluteRotation = this.AbsoluteRotation;
             Quaternion sceneRot = (Quaternion)SceneReferenceFrameManager.ReferenceFrame.InverseTransformRotation( absoluteRotation );
             _rb.rotation = sceneRot;
             transform.rotation = sceneRot;
-            _actualRotation = sceneRot;
             _actualAbsoluteRotation = absoluteRotation;
-            _requestedAbsoluteRotation = absoluteRotation;
         }
 
         protected virtual void OnEnable()
         {
+            _activeKinematicTransforms.Add( this );
             _rb.isKinematic = true; // Force kinematic.
         }
 
         protected virtual void OnDisable()
         {
+            _activeKinematicTransforms.Remove( this );
             _rb.isKinematic = true;
         }
 
@@ -325,6 +293,42 @@ namespace HSP.Vanilla
         protected virtual void OnCollisionExit( Collision collision )
         {
             IsColliding = false;
+        }
+
+
+        public const string ADD_PLAYER_LOOP_SYSTEM = "12431242132131";
+
+        // Imo it's kind of ugly using HSPEvent_STARTUP_IMMEDIATELY to mess with player loop, but it is what it is.
+        [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, ADD_PLAYER_LOOP_SYSTEM )]
+        static void AddPlayerLoopSystem()
+        {
+            PlayerLoopUtils.AddSystem<FixedUpdate, FixedUpdate.PhysicsFixedUpdate>( in _playerLoopSystem );
+        }
+
+        private static PlayerLoopSystem _playerLoopSystem = new PlayerLoopSystem()
+        {
+            type = typeof( SceneReferenceFrameManager ),
+            updateDelegate = InsidePhysicsStep,
+            subSystemList = null
+        };
+
+        static List<KinematicReferenceFrameTransform> _activeKinematicTransforms = new();
+
+        static void InsidePhysicsStep()
+        {
+            // Assume that other objects aren't allowed to get the absolute position/velocity during physics step, as it is undefined (changes) during it.
+            foreach( var t in _activeKinematicTransforms )
+            {
+                t._absoluteVelocity += t._absoluteAcceleration * TimeManager.FixedDeltaTime;
+                t._absoluteAngularVelocity += t._absoluteAngularAcceleration * TimeManager.FixedDeltaTime;
+
+
+                t._absoluteAcceleration = Vector3Dbl.zero;
+                t._absoluteAngularAcceleration = Vector3Dbl.zero;
+
+                t._actualAbsolutePosition = t._requestedAbsolutePosition;
+                t._actualAbsoluteRotation = t._requestedAbsoluteRotation;
+            }
         }
 
         [MapsInheritingFrom( typeof( KinematicReferenceFrameTransform ) )]

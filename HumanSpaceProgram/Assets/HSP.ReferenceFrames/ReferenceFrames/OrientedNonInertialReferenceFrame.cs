@@ -153,6 +153,7 @@ namespace HSP.ReferenceFrames
         {
             // Since the output is in absolute space, the orientation matters here.
             localPosition = _rotation * localPosition;
+
             return Vector3Dbl.Cross( AngularVelocity, localPosition );
         }
 
@@ -160,15 +161,13 @@ namespace HSP.ReferenceFrames
         {
             // Everything is in local (including the returned values), so the orientation is irrelevant.
 
-            // TODO - handle near-zeroes in the terms.
+            Vector3Dbl centrifugalAcc = Vector3Dbl.Cross( _angularVelocity, Vector3Dbl.Cross( _angularVelocity, localPosition ) );
 
-            var centrifugalAcc = Vector3Dbl.Cross( _angularVelocity, Vector3Dbl.Cross( _angularVelocity, localPosition ) );
+            Vector3Dbl coriolisAcc = -2.0 * Vector3Dbl.Cross( _angularVelocity, localVelocity );
 
-            var coriolisAcc = -2.0 * Vector3Dbl.Cross( _angularVelocity, localVelocity );
+            Vector3Dbl eulerAcc = -Vector3Dbl.Cross( _angularAcceleration, localPosition );
 
-            var eulerAcc = -Vector3Dbl.Cross( _angularAcceleration, localPosition );
-
-            var linearAcc = -_acceleration;
+            Vector3Dbl linearAcc = -_acceleration;
 
             return (centrifugalAcc + coriolisAcc + eulerAcc + linearAcc);
         }

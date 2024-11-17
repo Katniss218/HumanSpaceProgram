@@ -153,10 +153,6 @@ namespace HSP.Trajectories
             if( !instanceExists )
                 return;
 
-#warning TODO - velocity propagation for objects near planets 
-            // - when the planet suddenly moves, the objects around it should move as well (maybe make it a choice),
-            //   proportionally to the part of gravitational influence that's due to the planet.
-
             foreach( var (trajectory, trajectoryTransform) in instance._trajectoryMap )
             {
                 if( !trajectoryTransform.IsSynchronized() )

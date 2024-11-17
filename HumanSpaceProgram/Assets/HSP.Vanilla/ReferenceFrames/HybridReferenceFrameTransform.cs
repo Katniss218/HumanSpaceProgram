@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.LowLevel;
 using UnityEngine.PlayerLoop;
 using UnityPlus;
+using UnityPlus.Serialization;
 
 namespace HSP.Vanilla
 {
@@ -166,8 +167,7 @@ namespace HSP.Vanilla
 
                 if( _isSceneSpace )
                     _rb.velocity = value;
-                var absoluteVel = SceneReferenceFrameManager.ReferenceFrame.InverseTransformVelocity( value );
-                _absoluteVelocity = absoluteVel;
+                _absoluteVelocity = SceneReferenceFrameManager.ReferenceFrame.InverseTransformVelocity( value );
 
                 OnAbsoluteVelocityChanged?.Invoke();
                 OnAnyValueChanged?.Invoke();
@@ -207,8 +207,7 @@ namespace HSP.Vanilla
             {
                 if( _isSceneSpace )
                     _rb.angularVelocity = value;
-                var absoluteAngVel = SceneReferenceFrameManager.ReferenceFrame.InverseTransformAngularVelocity( value );
-                _absoluteAngularVelocity = absoluteAngVel;
+                _absoluteAngularVelocity = SceneReferenceFrameManager.ReferenceFrame.InverseTransformAngularVelocity( value );
 
                 OnAbsoluteAngularVelocityChanged?.Invoke();
                 OnAnyValueChanged?.Invoke();
@@ -394,14 +393,28 @@ namespace HSP.Vanilla
                 }
             }
 
-            if( !_isSceneSpace )
+            if( _isSceneSpace )
+            {
+                if( SceneReferenceFrameManager.ReferenceFrame is INonInertialReferenceFrame frame )
+                {
+                    Vector3Dbl localPos = frame.InverseTransformPosition( this.AbsolutePosition );
+                    Vector3Dbl localVel = this.Velocity;
+                    Vector3Dbl localAngVel = this.AngularVelocity;
+                    Vector3 linAcc = (Vector3)frame.GetFicticiousAcceleration( localPos, localVel );
+                    Vector3 angAcc = (Vector3)frame.GetFictitiousAngularAcceleration( localPos, localAngVel );
+
+                    this._rb.AddForce( linAcc, ForceMode.Acceleration );
+                    this._rb.AddTorque( angAcc, ForceMode.Acceleration );
+                }
+            }
+            else
             {
                 IReferenceFrame sceneReferenceFrameAfterPhysicsProcessing = SceneReferenceFrameManager.ReferenceFrame.AtUT( TimeManager.UT );
 
                 // `_actualAbsolutePosition` should be up to date due to the callback inside physics step, which was invoked in the previous frame.
 
                 _requestedAbsolutePosition = _actualAbsolutePosition + _absoluteVelocity * TimeManager.FixedDeltaTime;
-                QuaternionDbl deltaRotation = QuaternionDbl.Euler( _absoluteAngularVelocity * TimeManager.FixedDeltaTime * 57.2957795131 );
+                QuaternionDbl deltaRotation = QuaternionDbl.Euler( _absoluteAngularVelocity * TimeManager.FixedDeltaTime * 57.29577951308232 );
                 _requestedAbsoluteRotation = deltaRotation * _actualAbsoluteRotation;
 
                 var requestedPos = (Vector3)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformPosition( _requestedAbsolutePosition );
@@ -441,14 +454,12 @@ namespace HSP.Vanilla
                 _rb.position = scenePos;
                 transform.position = scenePos;
                 _actualAbsolutePosition = absolutePosition;
-                _requestedAbsolutePosition = absolutePosition;
 
                 QuaternionDbl absoluteRotation = this.AbsoluteRotation;
                 Quaternion sceneRot = (Quaternion)SceneReferenceFrameManager.ReferenceFrame.InverseTransformRotation( absoluteRotation );
                 _rb.rotation = sceneRot;
                 transform.rotation = sceneRot;
                 _actualAbsoluteRotation = absoluteRotation;
-                _requestedAbsoluteRotation = absoluteRotation;
             }
         }
 
@@ -486,7 +497,7 @@ namespace HSP.Vanilla
 
         // Imo it's kind of ugly using HSPEvent_STARTUP_IMMEDIATELY to mess with player loop, but it is what it is.
         [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, ADD_PLAYER_LOOP_SYSTEM )]
-        static void A()
+        static void AddPlayerLoopSystem()
         {
             PlayerLoopUtils.AddSystem<FixedUpdate, FixedUpdate.PhysicsFixedUpdate>( in _playerLoopSystem );
         }
@@ -519,7 +530,28 @@ namespace HSP.Vanilla
                 t._absoluteAngularAcceleration = Vector3Dbl.zero;
 
                 t._actualAbsolutePosition = t._requestedAbsolutePosition;
+                t._actualAbsoluteRotation = t._requestedAbsoluteRotation;
             }
+        }
+
+        [MapsInheritingFrom( typeof( HybridReferenceFrameTransform ) )]
+        public static SerializationMapping FreePhysicsObjectMapping()
+        {
+            return new MemberwiseSerializationMapping<HybridReferenceFrameTransform>()
+            {
+                ("allow_scene_simulation", new Member<HybridReferenceFrameTransform, bool>( o => o.AllowSceneSimulation )),
+                ("position_range", new Member<HybridReferenceFrameTransform, float>( o => o.PositionRange )),
+                ("velocity_range", new Member<HybridReferenceFrameTransform, float>( o => o.VelocityRange )),
+                ("max_timescale", new Member<HybridReferenceFrameTransform, float>( o => o.MaxTimeScale )),
+
+                ("mass", new Member<HybridReferenceFrameTransform, float>( o => o.Mass )),
+                ("local_center_of_mass", new Member<HybridReferenceFrameTransform, Vector3>( o => o.LocalCenterOfMass )),
+
+                ("absolute_position", new Member<HybridReferenceFrameTransform, Vector3Dbl>( o => o.AbsolutePosition )),
+                ("absolute_rotation", new Member<HybridReferenceFrameTransform, QuaternionDbl>( o => o.AbsoluteRotation )),
+                ("absolute_velocity", new Member<HybridReferenceFrameTransform, Vector3Dbl>( o => o.AbsoluteVelocity )),
+                ("absolute_angular_velocity", new Member<HybridReferenceFrameTransform, Vector3Dbl>( o => o.AbsoluteAngularVelocity ))
+            };
         }
     }
 }

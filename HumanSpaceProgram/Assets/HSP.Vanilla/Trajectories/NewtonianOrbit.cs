@@ -26,13 +26,6 @@ namespace HSP.Vanilla.Trajectories
 
         public double Mass { get; set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="ut"></param>
-        /// <param name="initialAbsolutePosition"></param>
-        /// <param name="initialAbsoluteVelocity"></param>
-        /// <param name="initialAbsoluteAcceleration"></param>
         /// <param name="mass">The mass of the object represented by this trajectory.</param>
         public NewtonianOrbit( double ut, Vector3Dbl initialAbsolutePosition, Vector3Dbl initialAbsoluteVelocity, Vector3Dbl initialAbsoluteAcceleration, double mass )
         {
@@ -87,7 +80,6 @@ namespace HSP.Vanilla.Trajectories
         public bool HasCacheForUT( double ut )
         {
             return false;
-            //return _cachedUpToUT >= ut;
         }
 
         public void Step( IEnumerable<TrajectoryBodyState> attractors, double dt )
@@ -101,6 +93,7 @@ namespace HSP.Vanilla.Trajectories
                 Vector3Dbl toBody = attractor.AbsolutePosition - selfAbsolutePosition;
 
                 double distanceSq = toBody.sqrMagnitude;
+                // Skip 'this', if 'this' is an attractor (for allocation reasons, the list of attractors is the same for every attractor, and will contain 'this'.)
                 if( distanceSq == 0.0 )
                 {
                     continue;

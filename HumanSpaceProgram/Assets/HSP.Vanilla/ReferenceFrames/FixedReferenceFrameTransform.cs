@@ -85,13 +85,13 @@ namespace HSP.Vanilla
                 RecalculateCacheIfNeeded();
                 return _cachedVelocity;
             }
-            set { }
+            set { } // 'Fixed' is always stationary, so it makes no sense to 'set' it to anything.
         }
 
         public Vector3Dbl AbsoluteVelocity
         {
             get => Vector3Dbl.zero;
-            set { }
+            set { } // 'Fixed' is always stationary, so it makes no sense to 'set' it to anything.
         }
 
         public Vector3 AngularVelocity
@@ -101,13 +101,13 @@ namespace HSP.Vanilla
                 RecalculateCacheIfNeeded();
                 return _cachedAngularVelocity;
             }
-            set { }
+            set { } // 'Fixed' is always stationary, so it makes no sense to 'set' it to anything.
         }
 
         public Vector3Dbl AbsoluteAngularVelocity
         {
             get => Vector3Dbl.zero;
-            set { }
+            set { } // 'Fixed' is always stationary, so it makes no sense to 'set' it to anything.
         }
 
         public Vector3 Acceleration
@@ -190,17 +190,17 @@ namespace HSP.Vanilla
 
         public void AddForce( Vector3 force )
         {
-            return;
+            return; // 'Fixed' is always stationary.
         }
 
         public void AddForceAtPosition( Vector3 force, Vector3 position )
         {
-            return;
+            return; // 'Fixed' is always stationary.
         }
 
         public void AddTorque( Vector3 force )
         {
-            return;
+            return; // 'Fixed' is always stationary.
         }
 
         private void MoveScenePositionAndRotation( IReferenceFrame sceneReferenceFrame )

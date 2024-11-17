@@ -17,12 +17,6 @@ namespace HSP.Vanilla.Trajectories
         public double UT { get; private set; }
         public double Mass { get; set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="ut"></param>
-        /// <param name="absolutePosition"></param>
-        /// <param name="absoluteRotation"></param>
         /// <param name="mass">The mass of the object represented by this trajectory.</param>
         public FixedOrbit( double ut, Vector3Dbl absolutePosition, QuaternionDbl absoluteRotation, double mass )
         {

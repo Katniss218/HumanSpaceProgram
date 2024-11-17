@@ -217,7 +217,7 @@ namespace HSP.Vanilla
             _absoluteAccelerationSum += SceneReferenceFrameManager.ReferenceFrame.TransformAcceleration( (Vector3Dbl)force / Mass );
             _absoluteAngularAccelerationSum += SceneReferenceFrameManager.ReferenceFrame.TransformAngularAcceleration( Vector3Dbl.Cross( force, leverArm ) / Mass );
 
-            // TODO - possibly cache the values across a frame and apply it once instead of n-times.
+            // TODO - In the future possibly cache the values across a frame and apply it once instead of n-times.
             this._rb.AddForceAtPosition( force, position, ForceMode.Force );
         }
 
@@ -227,18 +227,6 @@ namespace HSP.Vanilla
 
             this._rb.AddTorque( torque, ForceMode.Force );
         }
-
-        /*private void MoveScenePositionAndRotation( IReferenceFrame referenceFrame )
-        {
-            var pos = (Vector3)referenceFrame.InverseTransformPosition( _absolutePosition );
-            var rot = (Quaternion)referenceFrame.InverseTransformRotation( _absoluteRotation );
-            this._rb.Move( pos, rot );
-
-            var vel = (Vector3)referenceFrame.InverseTransformVelocity( _absoluteVelocity );
-            var angVel = (Vector3)referenceFrame.InverseTransformAngularVelocity( _absoluteAngularVelocity );
-            this._rb.velocity = vel;
-            this._rb.angularVelocity = angVel;
-        }*/
 
         protected void RecalculateCacheIfNeeded()
         {
@@ -311,8 +299,6 @@ namespace HSP.Vanilla
                 this._rb.AddTorque( angAcc, ForceMode.Acceleration );
             }
 
-#warning TODO - timemanager.fixeddeltatime might not equal time.fixeddeltatime (at high warp values), it needs to be handled explicitly here (analogous to kinematic, but only when warp is not synced).
-
             // If the object is colliding, we will use its rigidbody accelerations, because we don't have access to the forces due to collisions.
             // Otherwise, we use our more precise method that relies on full encapsulation of the rigidbody.
             if( IsColliding )
@@ -335,20 +321,9 @@ namespace HSP.Vanilla
 
             this._oldVelocity = Velocity;
             this._oldAngularVelocity = AngularVelocity;
-#warning TODO - these should be cleared at the start of a fixedupdate frame, not here inside behaviourfixedupdate.
             this._absoluteAccelerationSum = Vector3.zero;
             this._absoluteAngularAccelerationSum = Vector3.zero;
         }
-
-        // The faster something goes in scene space when colliding with another thing, it gets laggier for physics processing (computation of "contacts")
-
-        // when switching while resting on something, the object jumps. possibly due to pinned updating before the celestial frame it uses to transform has correct values or something?
-        // possibly the same or related to rovers in RSS/RO jumping while driving
-        // - only happens with continuous speculative collision (continuous and continuous dynamic don't jump).
-
-#warning TODO - needs something to enable continuous when a something in the scene is not resting and is moving fast relative to something else.
-
-#warning TODO - celestial bodies need something that will replace the buildin parenting of colliders with 64-bit parents and update their scene position at all times (fixedupdate + update + lateupdate).
 
         public virtual void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
