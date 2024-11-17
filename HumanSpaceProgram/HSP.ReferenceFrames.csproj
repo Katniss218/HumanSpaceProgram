@@ -62,6 +62,7 @@
     <Compile Include="Assets\HSP.ReferenceFrames\INonInertialReferenceFrame.cs" />
     <Compile Include="Assets\HSP.ReferenceFrames\ReferenceFrameUtils.cs" />
     <Compile Include="Assets\HSP.ReferenceFrames\ReferenceFrameTransformUtils.cs" />
+    <Compile Include="Assets\HSP.ReferenceFrames\IReferenceFrameTransform_Ex.cs" />
     <Compile Include="Assets\HSP.ReferenceFrames\SceneReferenceFrameManager.cs" />
     <Compile Include="Assets\HSP.ReferenceFrames\ReferenceFrames\CenteredNonInertialReferenceFrame.cs" />
     <Compile Include="Assets\HSP.ReferenceFrames\ReferenceFrames\OrientedNonInertialReferenceFrame.cs" />
@@ -69,9 +70,9 @@
     <Compile Include="Assets\HSP.ReferenceFrames\ReferenceFrames\CenteredInertialReferenceFrame.cs" />
     <Compile Include="Assets\HSP.ReferenceFrames\ReferenceFrames\OrientedInertialReferenceFrame.cs" />
     <Compile Include="Assets\HSP.ReferenceFrames\IReferenceFrameTransform.cs" />
+    <Compile Include="Assets\HSP.ReferenceFrames\IPhysicsTransform_Ex.cs" />
     <Compile Include="Assets\HSP.ReferenceFrames\ReferenceFrames\OrientedReferenceFrame.cs" />
     <Compile Include="Assets\HSP.ReferenceFrames\IReferenceFrame.cs" />
-    <Compile Include="Assets\HSP.ReferenceFrames\IReferenceFrameTransform_Ex.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.ReferenceFrames\___HSP.ReferenceFrames.asmdef" />

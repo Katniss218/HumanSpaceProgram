@@ -156,8 +156,18 @@ namespace HSP.Vessels
 
         void FixedUpdate()
         {
-            SetPhysicsObjectParameters(); // this full recalc every frame should be replaced by update-based approach.
+            // Toggle the vessel active if within 'physics range'
+            if( this._rootPart.gameObject.activeSelf )
+            {
+                SetPhysicsObjectParameters(); // this full recalc every frame should be replaced by update-based approach.
 
+                if( this.ReferenceFrameTransform.Position.magnitude > 1e5 )
+                    this._rootPart.gameObject.SetActive( false );
+            }
+            if( !this._rootPart.gameObject.activeSelf && this.ReferenceFrameTransform.Position.magnitude <= 1e5 )
+            {
+                this._rootPart.gameObject.SetActive( true );
+            }
 
             // ---------------------
 

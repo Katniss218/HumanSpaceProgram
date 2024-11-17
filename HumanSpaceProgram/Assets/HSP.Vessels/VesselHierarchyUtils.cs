@@ -155,6 +155,7 @@ namespace HSP.Vessels
             Vector3Dbl partPosAirf = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( partToSplit.transform.position );
             Vector3Dbl partPosInVesselSpace = vesselFrame.InverseTransformPosition( partPosAirf );
 
+#warning TODO - use a physically accurate calculation that preserves angular and linear momenta.
             Vessel newVessel = VesselFactory.CreatePartless(
                 partPosAirf,
                 SceneReferenceFrameManager.ReferenceFrame.TransformRotation( partToSplit.transform.rotation ),

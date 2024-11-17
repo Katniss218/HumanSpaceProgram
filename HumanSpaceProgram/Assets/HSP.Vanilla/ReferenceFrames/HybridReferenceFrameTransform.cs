@@ -267,25 +267,16 @@ namespace HSP.Vanilla
             set => this._rb.centerOfMass = value;
         }
 
-        public Vector3 MomentsOfInertia => this._rb.inertiaTensor;
-
-        public Matrix3x3 MomentOfInertiaTensor
+        public Vector3 MomentsOfInertia
         {
-            get
-            {
-                Matrix3x3 R = Matrix3x3.Rotate( this._rb.inertiaTensorRotation );
-                Matrix3x3 S = Matrix3x3.Scale( this._rb.inertiaTensor );
-                return R * S * R.transpose;
-            }
-            set
-            {
-                (Vector3 eigenvector, float eigenvalue)[] eigen = value.Diagonalize().OrderByDescending( m => m.eigenvalue ).ToArray();
-                this._rb.inertiaTensor = new Vector3( eigen[0].eigenvalue, eigen[1].eigenvalue, eigen[2].eigenvalue );
-                Matrix3x3 m = new Matrix3x3( eigen[0].eigenvector.x, eigen[0].eigenvector.y, eigen[0].eigenvector.z,
-                    eigen[1].eigenvector.x, eigen[1].eigenvector.y, eigen[1].eigenvector.z,
-                    eigen[2].eigenvector.x, eigen[2].eigenvector.y, eigen[2].eigenvector.z );
-                this._rb.inertiaTensorRotation = m.rotation;
-            }
+            get => this._rb.inertiaTensor;
+            set => this._rb.inertiaTensor = value;
+        }
+
+        public Quaternion MomentsOfInertiaRotation
+        {
+            get => this._rb.inertiaTensorRotation;
+            set => this._rb.inertiaTensorRotation = value;
         }
 
         public bool IsColliding { get; private set; }
@@ -302,17 +293,11 @@ namespace HSP.Vanilla
 
         public void AddForceAtPosition( Vector3 force, Vector3 position )
         {
-#warning TODO - worldCoM is not accurate enough for absolute mode. - use self as reference frame
-#warning TODO - force and position are not accurate enough either.
             Vector3 leverArm = position - this._rb.worldCenterOfMass;
+            Vector3Dbl torque = Vector3Dbl.Cross( force, leverArm );
             _absoluteAcceleration += SceneReferenceFrameManager.ReferenceFrame.TransformAcceleration( (Vector3Dbl)force / Mass );
-            _absoluteAngularAcceleration += SceneReferenceFrameManager.ReferenceFrame.TransformAngularAcceleration( Vector3Dbl.Cross( force, leverArm ) / Mass );
+            _absoluteAngularAcceleration += SceneReferenceFrameManager.ReferenceFrame.TransformAngularAcceleration( torque / this.GetInertia( torque.NormalizeToVector3() ) );
 
-            // T = torque??
-            // Quaternion q = transform.rotation * rigidbody.inertiaTensorRotation; // q is rotation of inertia tensor in world space
-            // T = q * Vector3.Scale(rigidbody.inertiaTensor, (Quaternion.Inverse(q) * w));
-
-#warning TODO - take into account the moment of inertia?
             if( _isSceneSpace )
             {
                 this._rb.AddForceAtPosition( force, position, ForceMode.Force );
@@ -321,7 +306,7 @@ namespace HSP.Vanilla
 
         public void AddTorque( Vector3 torque )
         {
-            _absoluteAngularAcceleration += SceneReferenceFrameManager.ReferenceFrame.TransformAngularAcceleration( (Vector3Dbl)torque / Mass );
+            _absoluteAngularAcceleration += SceneReferenceFrameManager.ReferenceFrame.TransformAngularAcceleration( (Vector3Dbl)torque / this.GetInertia( torque.normalized ) );
 
             if( _isSceneSpace )
             {

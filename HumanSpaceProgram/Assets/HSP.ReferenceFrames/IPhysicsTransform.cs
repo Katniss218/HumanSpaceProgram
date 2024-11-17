@@ -18,14 +18,18 @@ namespace HSP.ReferenceFrames
         Vector3 LocalCenterOfMass { get; set; }
 
         /// <summary>
-        /// Gets the principal moments of inertia.
+        /// Gets the principal moments of inertia, in [kg*m^2].
         /// </summary>
-        Vector3 MomentsOfInertia { get; }
-        
+        /// <remarks>
+        /// The principal moments of inertia are orthogonal to each other, centered at the center of mass, and rotated by <see cref="MomentsOfInertiaRotation"/> relative to the local space of the object.
+        /// </remarks>
+        Vector3 MomentsOfInertia { get; set; }
+
         /// <summary>
-        /// Gets or sets the moment of inertia tensor.
+        /// Gets or sets the orientation of the principal moments of inertia. <br/>
+        /// This orientation is relative to the local space of the physics object.
         /// </summary>
-        Matrix3x3 MomentOfInertiaTensor { get; set; }
+        Quaternion MomentsOfInertiaRotation { get; set; }
 
         /// <summary>
         /// True if the physics object is colliding with any other objects in the current frame, false otherwise.
@@ -33,18 +37,18 @@ namespace HSP.ReferenceFrames
         bool IsColliding { get; }
 
         /// <summary>
-        /// Applies a force at the center of mass, in [N].
+        /// Applies a force (in scene space) through the center of mass, in [N].
         /// </summary>
         void AddForce( Vector3 force );
 
         /// <summary>
-        /// Applies a force at the specified position, in [N]. <br/>
+        /// Applies a force (in scene space) at the specified position, in [N]. <br/>
         /// By extension, can organically apply torque.
         /// </summary>
         void AddForceAtPosition( Vector3 force, Vector3 position );
 
         /// <summary>
-        /// Applies a torque through the center of mass, in [N*m].
+        /// Applies a torque (in scene space) through the center of mass, in [N*m].
         /// </summary>
         void AddTorque( Vector3 torque );
     }

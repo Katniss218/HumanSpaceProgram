@@ -34,7 +34,8 @@ namespace HSP.Vanilla
 
             ppo.Mass = oldPhysTransform.Mass;
             ppo.LocalCenterOfMass = oldPhysTransform.LocalCenterOfMass;
-            ppo.MomentOfInertiaTensor = oldPhysTransform.MomentOfInertiaTensor;
+            ppo.MomentsOfInertia = oldPhysTransform.MomentsOfInertia;
+            ppo.MomentsOfInertiaRotation = oldPhysTransform.MomentsOfInertiaRotation;
 
             TrajectoryTransform tt = vessel.gameObject.GetComponent<TrajectoryTransform>();
             tt.enabled = false;
@@ -58,7 +59,8 @@ namespace HSP.Vanilla
 
             ppo.Mass = oldPhysTransform.Mass;
             ppo.LocalCenterOfMass = oldPhysTransform.LocalCenterOfMass;
-            ppo.MomentOfInertiaTensor = oldPhysTransform.MomentOfInertiaTensor;
+            ppo.MomentsOfInertia = oldPhysTransform.MomentsOfInertia;
+            ppo.MomentsOfInertiaRotation = oldPhysTransform.MomentsOfInertiaRotation;
 
             TrajectoryTransform tt = vessel.gameObject.GetComponent<TrajectoryTransform>();
             tt.enabled = true;
