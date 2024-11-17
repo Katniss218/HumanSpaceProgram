@@ -2,8 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Unity.Jobs;
 using UnityEngine;
+using static HSP.CelestialBodies.Surfaces.LODQuad.State;
 
 namespace HSP.CelestialBodies.Surfaces
 {
@@ -27,8 +29,10 @@ namespace HSP.CelestialBodies.Surfaces
             }
             public class Rebuild : State
             {
-                public MakeQuadMesh_Job Job;
-                public JobHandle JobHandle;
+                public Mesh mesh;
+
+                public ILODQuadJob[] jobs;
+                public JobHandle[] handles;
             }
         }
 
@@ -68,18 +72,44 @@ namespace HSP.CelestialBodies.Surfaces
             _meshRenderer = this.GetComponent<MeshRenderer>();
         }
 
+        public static void Schedule<T>( ILODQuadJob[] jobs, JobHandle[] handles, int index ) where T : struct, ILODQuadJob
+        {
+            T jobToSchedule = (T)jobs[index];
+            if( index == 0 )
+                handles[index] = jobToSchedule.Schedule();
+            else
+                handles[index] = jobToSchedule.Schedule( handles[index - 1] );
+            jobs[index] = jobToSchedule; // doesn't work without this line, idk why because it just copies the job instance, which should be the same as the one already there.
+        }
+
         internal void SetState( State state )
         {
             if( this.CurrentState is State.Rebuild r )
             {
-                r.JobHandle.Complete();
-                r.Job.Finish( this );
+                r.handles[^1].Complete();
+
+                for( int i = 0; i < r.jobs.Length; i++ )
+                    r.jobs[i].Finish( this, r.mesh );
+
+                SetMesh( r.mesh );
             }
 
             if( state is State.Rebuild rebuild )
             {
-                rebuild.Job.Initialize( this ); // This (and collection) would have to be Reflection-ified to make it extendable by other user-provided assemblies.
-                rebuild.JobHandle = rebuild.Job.Schedule();
+                rebuild.mesh = new Mesh();
+
+                for( int i = 0; i < rebuild.jobs.Length; i++ )
+                    rebuild.jobs[i].Initialize( this, rebuild.mesh );
+
+                // Schedule<MakeQuadMesh_Job>( rebuild.jobs, rebuild.handles, 0 );
+
+                Type jobType = rebuild.jobs[0].GetType();
+                MethodInfo method = typeof( LODQuad ).GetMethod( nameof( LODQuad.Schedule ), BindingFlags.Static | BindingFlags.Public );
+
+                for( int i = 0; i < rebuild.jobs.Length; i++ )
+                {
+                    method.MakeGenericMethod( jobType ).Invoke( null, new object[] { rebuild.jobs, rebuild.handles, i } );
+                }
             }
 
             this.CurrentState = state;

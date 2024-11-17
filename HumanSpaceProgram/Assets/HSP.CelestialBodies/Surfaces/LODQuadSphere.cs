@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using Unity.Jobs;
 using UnityEngine;
 
 namespace HSP.CelestialBodies.Surfaces
@@ -183,11 +184,22 @@ namespace HSP.CelestialBodies.Surfaces
             }
         }
 
+        public ILODQuadJob[] jobs = new ILODQuadJob[]
+        {
+            new MakeQuadMesh_Job()
+        };
+
+        public JobHandle[] handles = new JobHandle[]
+        {
+            default
+        };
+
         void RemeshQuad( LODQuad quad )
         {
             var rebuildState = new LODQuad.State.Rebuild()
             {
-                Job = new MakeQuadMesh_Job()
+                jobs = this.jobs.ToArray(),
+                handles = this.handles.ToArray(),
             };
 
             quad.SetState( rebuildState );

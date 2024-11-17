@@ -8,7 +8,7 @@ namespace HSP.CelestialBodies.Surfaces
     /// <summary>
     /// A job that constructs the base mesh for the terrain.
     /// </summary>
-    public struct MakeQuadMesh_Job : IJob
+    public struct MakeQuadMesh_Job : ILODQuadJob
     {
         int subdivisions;
         double radius;
@@ -31,10 +31,8 @@ namespace HSP.CelestialBodies.Surfaces
 
         NativeArray<int> edgeSubdivisionRelative;
 
-        public void Initialize( LODQuad quad )
+        public void Initialize( LODQuad quad, Mesh mesh )
         {
-            // Initialize is called on the main thread to initialize the job.
-
             subdivisions = quad.EdgeSubdivisions;
             radius = (float)quad.CelestialBody.Radius;
             center = quad.Node.Center;
@@ -66,11 +64,8 @@ namespace HSP.CelestialBodies.Surfaces
             resultTriangles = new NativeArray<int>( (numberOfEdges * numberOfEdges) * 6, Allocator.TempJob );
         }
 
-        public void Finish( LODQuad quad )
+        public void Finish( LODQuad quad, Mesh mesh )
         {
-            // Finish is called on the main thread to collect the result and dispose of the job.
-            Mesh mesh = new Mesh();
-
             mesh.SetVertices( resultVertices );
             mesh.SetNormals( resultNormals );
             mesh.SetUVs( 0, resultUvs );
@@ -79,8 +74,6 @@ namespace HSP.CelestialBodies.Surfaces
             mesh.RecalculateTangents();
             mesh.FixTangents(); // fix broken tangents.
             mesh.RecalculateBounds();
-
-            quad.SetMesh( mesh );
 
             //MeshUpdateFlags MESH_UPDATE_FLAGS = MeshUpdateFlags.DontValidateIndices | MeshUpdateFlags.DontNotifyMeshUsers | MeshUpdateFlags.DontRecalculateBounds | MeshUpdateFlags.DontResetBoneBounds;
             //meshID = quad.tempMesh.GetInstanceID();
