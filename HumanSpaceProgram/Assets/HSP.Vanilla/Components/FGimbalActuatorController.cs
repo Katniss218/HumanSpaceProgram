@@ -79,7 +79,7 @@ namespace HSP.Vanilla.Components
 
                     Vector3 engineSpaceSteeringCmd = engineReferenceTransform.InverseTransformDirection( worldSteering );
 
-                    Vector3 engineSpaceCoM = engineReferenceTransform.InverseTransformPoint( vessel.ReferenceTransform.TransformPoint( vessel.PhysicsObject.LocalCenterOfMass ) );
+                    Vector3 engineSpaceCoM = engineReferenceTransform.InverseTransformPoint( vessel.ReferenceTransform.TransformPoint( vessel.PhysicsTransform.LocalCenterOfMass ) );
 
                     Vector2 rollDeflectionDir = new Vector2( engineSpaceCoM.x, engineSpaceCoM.y ).normalized;
                     rollDeflectionDir *= engineSpaceSteeringCmd.y;

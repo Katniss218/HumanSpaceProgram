@@ -61,35 +61,35 @@
     <Compile Include="Assets\HSP.Vanilla.UI\Components\UITextReadout_Velocity.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\UIControlSetupWindow.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Timelines\UITimelineMetadata.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI\Components\ControlSetupControlGroupUI.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI\Components\UITextReadout_Altitude.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI\Components\UIPartWindow.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI\Components\ControlSetupControlUI.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\ControlSetupWindowComponentUI.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Timelines\UISaveMetadata.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI\Components\UISequenceElement.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI\Scenes\GameplayScene\GameplaySceneUIFactory.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\UIPartWindowComponent.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\UISequenceAction.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Scenes\DesignScene\UIPartListEntry.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\UISequencerPanel.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\SequencerPanelFactory.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI\Timelines\UISaveWindow.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI\Scenes\DesignScene\UIPartList.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI\UITextReadout_ElapsedUT.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI\Components\UIIResourceContainer.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI\Scenes\DesignScene\DesignSceneUIFactory.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI\Components\ControlSetupControlGroupUI.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI\Components\UITextReadout_Altitude.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI\Components\UIPartWindow.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI\Components\ControlSetupControlUI.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI\Components\UISequenceElement.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI\Scenes\GameplayScene\GameplaySceneUIFactory.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Scenes\GameplayScene\GameplayEscapeUIFactory.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\WindowRelationHighlight.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Scenes\MainMenuScene\MainMenuSceneUIFactory.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Scenes\GameplayScene\GameplayViewportClickController.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\UITimewarpSelector.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\ControlSetupControlConnectionUI.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI\Timelines\UISaveWindow.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI\Scenes\DesignScene\UIPartList.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI\UITextReadout_ElapsedUT.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\UINavball.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Timelines\UIStartNewGameWindow.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Timelines\UILoadWindow.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\NavballRenderTextureManager.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\UITextReadout_Acceleration.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI\Components\UIIResourceContainer.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI\Scenes\DesignScene\DesignSceneUIFactory.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Scenes\GameplayScene\OnStartup.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -945,6 +945,10 @@
     <ProjectReference Include="_UnityEngine.csproj">
       <Project>{29A28F5C-31DD-0068-5BB5-61A0CFFA20FA}</Project>
       <Name>_UnityEngine</Name>
+    </ProjectReference>
+    <ProjectReference Include="_UnityPlus.csproj">
+      <Project>{49D4BC99-1C12-776F-CC5E-D6CE66E348FE}</Project>
+      <Name>_UnityPlus</Name>
     </ProjectReference>
     <ProjectReference Include="_UnityPlus.AssetManagement.csproj">
       <Project>{7122B491-FD2B-2B59-D391-006CB0AE788B}</Project>

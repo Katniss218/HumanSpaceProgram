@@ -1,5 +1,4 @@
-﻿using HSP.ReferenceFrames;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace HSP.Vessels
 {
@@ -20,34 +19,22 @@ namespace HSP.Vessels
         /// <summary>
         /// Creates a new partless vessel at the specified global position.
         /// </summary>
-        /// <param name="airfPosition">The `Absolute Inertial Reference Frame` position of the vessel to create.</param>
-        /// <param name="airfRotation">Rotation of the vessel in the `Absolute Inertial Reference Frame`</param>
+        /// <param name="absolutePosition">The `Absolute Inertial Reference Frame` position of the vessel to create.</param>
+        /// <param name="absoluteRotation">Rotation of the vessel in the `Absolute Inertial Reference Frame`</param>
         /// <returns>The created partless vessel.</returns>
-        public static Vessel CreatePartless( Vector3Dbl airfPosition, QuaternionDbl airfRotation, Vector3 sceneVelocity, Vector3 sceneAngularVelocity )
-        {
-            Vessel vessel = CreateGO( airfPosition, airfRotation );
-
-            HSPEvent.EventManager.TryInvoke( HSPEvent_ON_VESSEL_CREATED.ID, vessel );
-
-            vessel.PhysicsObject.Velocity = sceneVelocity;
-            vessel.PhysicsObject.AngularVelocity = sceneAngularVelocity;
-
-            return vessel;
-        }
-
-        private static Vessel CreateGO( Vector3Dbl airfPosition, QuaternionDbl airfRotation )
+        public static Vessel CreatePartless( Vector3Dbl absolutePosition, QuaternionDbl absoluteRotation, Vector3Dbl absoluteVelocity, Vector3Dbl absoluteAngularVelocity )
         {
             GameObject gameObject = new GameObject( $"Vessel, '{name}'" );
 
-            ReferenceFrameTransform ro = gameObject.AddComponent<ReferenceFrameTransform>();
-            //FreePhysicsObject fpo = gameObject.AddComponent<FreePhysicsObject>();
-#warning TODO - Hook the free/pinned physobj into the event.
-            // it also registers the vessel with an appropriate manager?
-
             Vessel vessel = gameObject.AddComponent<Vessel>();
             vessel.DisplayName = name;
-            ro.AIRFPosition = airfPosition;
-            ro.AIRFRotation = airfRotation;
+
+            HSPEvent.EventManager.TryInvoke( HSPEvent_ON_VESSEL_CREATED.ID, vessel );
+
+            vessel.ReferenceFrameTransform.AbsolutePosition = absolutePosition;
+            vessel.ReferenceFrameTransform.AbsoluteRotation = absoluteRotation;
+            vessel.ReferenceFrameTransform.AbsoluteVelocity = absoluteVelocity;
+            vessel.ReferenceFrameTransform.AbsoluteAngularVelocity = absoluteAngularVelocity;
 
             return vessel;
         }

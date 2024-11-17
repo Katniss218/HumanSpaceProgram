@@ -27,21 +27,18 @@ namespace HSP.CelestialBodies
         CommandBuffer _cmdAtmospheres;
         CommandBuffer _cmdComposition;
 
-        Vector3 _center = Vector3.zero;
+        public static CelestialBody Body;
+
         [SerializeField]
         new public Light light { get; set; }
+
+        public float Height { get; set; } = 140_000;
 
         [SerializeField]
         RenderTexture _rt;
 
         public Func<RenderTexture> ColorRenderTextureGetter { get; set; }
         public Func<RenderTexture> DepthRenderTextureGetter { get; set; }
-
-        void OnReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
-        {
-            Vector3Dbl oldAirfPos = data.OldFrame.TransformPosition( _center );
-            _center = (Vector3)data.NewFrame.InverseTransformPosition( oldAirfPos );
-        }
 
         void Awake()
         {
@@ -55,8 +52,6 @@ namespace HSP.CelestialBodies
             {
                 name = "HSP - Atmospheres - Composition"
             };
-
-            SceneReferenceFrameManager.OnAfterReferenceFrameSwitch += OnReferenceFrameSwitch;
         }
 
         void OnEnable()
@@ -70,8 +65,6 @@ namespace HSP.CelestialBodies
 
         void OnDestroy()
         {
-            SceneReferenceFrameManager.OnAfterReferenceFrameSwitch -= OnReferenceFrameSwitch;
-
             if( _rt != null )
                 RenderTexture.ReleaseTemporary( _rt );
 
@@ -88,6 +81,8 @@ namespace HSP.CelestialBodies
         {
             if( instance._atmosphereMaterial == null )
                 return;
+            if( Body == null )
+                return;
 
             this._rt = RenderTexture.GetTemporary( Screen.width, Screen.height, 0, RenderTextureFormat.ARGB32 );
 
@@ -95,13 +90,13 @@ namespace HSP.CelestialBodies
             _atmosphereMaterial.SetTexture( Shader.PropertyToID( "_texgsfs" ), ColorRenderTextureGetter.Invoke() );
             _atmosphereMaterial.SetTexture( Shader.PropertyToID( "_DepthBuffer" ), DepthRenderTextureGetter.Invoke(), RenderTextureSubElement.Depth );
 
-            _atmosphereMaterial.SetVector( Shader.PropertyToID( "_Center" ), _center );
+            _atmosphereMaterial.SetVector( Shader.PropertyToID( "_Center" ), Body.ReferenceFrameTransform.Position );
             _atmosphereMaterial.SetVector( Shader.PropertyToID( "_SunDirection" ), -light.transform.forward );
             _atmosphereMaterial.SetVector( Shader.PropertyToID( "_ScatteringWavelengths" ), new Vector3( 675, 530, 400 ) );
             _atmosphereMaterial.SetFloat( Shader.PropertyToID( "_ScatteringStrength" ), 128 );
             _atmosphereMaterial.SetFloat( Shader.PropertyToID( "_TerminatorFalloff" ), 32 );
-            _atmosphereMaterial.SetFloat( Shader.PropertyToID( "_MinRadius" ), 6371000f );
-            _atmosphereMaterial.SetFloat( Shader.PropertyToID( "_MaxRadius" ), 6500000f );
+            _atmosphereMaterial.SetFloat( Shader.PropertyToID( "_MinRadius" ), (float)Body.Radius );
+            _atmosphereMaterial.SetFloat( Shader.PropertyToID( "_MaxRadius" ), (float)(Body.Radius + Height) );
             _atmosphereMaterial.SetFloat( Shader.PropertyToID( "_InScatteringPointCount" ), 16 );
             _atmosphereMaterial.SetFloat( Shader.PropertyToID( "_OpticalDepthPointCount" ), 8 );
             _atmosphereMaterial.SetFloat( Shader.PropertyToID( "_DensityFalloffPower" ), 13.7f );

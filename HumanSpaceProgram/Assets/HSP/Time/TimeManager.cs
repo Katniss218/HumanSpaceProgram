@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using UnityEngine;
+using UnityEngine.LowLevel;
+using UnityEngine.PlayerLoop;
+using UnityPlus;
 using UnityPlus.Serialization;
 
 namespace HSP.Time
@@ -31,7 +35,7 @@ namespace HSP.Time
         public static float TimeScale { get => _timeScale; }
 
         /// <summary>
-        /// Returns the current universal time, in [s].
+        /// Returns the current frame's universal time, in [s].
         /// </summary>
         public static double UT { get; private set; }
 
@@ -96,14 +100,6 @@ namespace HSP.Time
         }
 
         /// <summary>
-        /// Gets the current value of the time scale.
-        /// </summary>
-        public static float GetTimeScale()
-        {
-            return _timeScale;
-        }
-
-        /// <summary>
         /// Sets the current time scale to the specified value, if the time scale is not locked.
         /// </summary>
         public static void SetTimeScale( float timeScale )
@@ -123,12 +119,17 @@ namespace HSP.Time
                 return;
             }
 
-            UnityEngine.Time.fixedDeltaTime = Mathf.Clamp( 0.02f * (timeScale / 8.0f), 0.02f, 0.08f );
+            //  UnityEngine.Time.fixedDeltaTime = Mathf.Clamp( 0.02f * (timeScale / 8.0f), 0.02f, 0.08f );
 
             _oldTimeScale = _timeScale;
             _timeScale = timeScale;
             UnityEngine.Time.timeScale = timeScale;
             OnAfterTimescaleChanged?.Invoke( new TimeScaleChangedData() { Old = _oldTimeScale, New = timeScale } );
+        }
+
+        public static void SetUT( double ut )
+        {
+            UT = ut;
         }
 
         /// <summary>
@@ -166,8 +167,29 @@ namespace HSP.Time
             SetTimeScale( 1 );
         }
 
-        void FixedUpdate()
+
+        void OnEnable()
         {
+            PlayerLoopUtils.InsertSystemBefore<FixedUpdate>( in _playerLoopSystem, typeof( FixedUpdate.ClearLines ) );
+        }
+
+        void OnDisable()
+        {
+            PlayerLoopUtils.RemoveSystem<FixedUpdate>( in _playerLoopSystem );
+        }
+
+        private static PlayerLoopSystem _playerLoopSystem = new PlayerLoopSystem()
+        {
+            type = typeof( TimeManager ),
+            updateDelegate = PlayerLoopImmediatelyAtTheStartOfFixedUpdate,
+            subSystemList = null
+        };
+
+        private static void PlayerLoopImmediatelyAtTheStartOfFixedUpdate()
+        {
+            if( !instanceExists )
+                return;
+
             UT += FixedDeltaTime;
         }
 

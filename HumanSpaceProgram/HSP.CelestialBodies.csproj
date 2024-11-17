@@ -61,13 +61,13 @@
     <Compile Include="Assets\HSP.CelestialBodies\Surfaces\LODQuadTree.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\CelestialBodyManager.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\Atmospheres\AtmosphereRenderer.cs" />
+    <Compile Include="Assets\HSP.CelestialBodies\CelestialBodySurface.cs" />
+    <Compile Include="Assets\HSP.CelestialBodies\CelestialBody.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\CelestialBodyFactory.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\Surfaces\MakeQuadMesh_Job.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\Surfaces\LODQuadSphere.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\GravityUtils.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\Surfaces\LODQuad.cs" />
-    <Compile Include="Assets\HSP.CelestialBodies\CelestialBodySurface.cs" />
-    <Compile Include="Assets\HSP.CelestialBodies\CelestialBody.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\Surfaces\LODQuadTree_NodeUtils.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -923,6 +923,10 @@
     <ProjectReference Include="_UnityEngine.csproj">
       <Project>{29A28F5C-31DD-0068-5BB5-61A0CFFA20FA}</Project>
       <Name>_UnityEngine</Name>
+    </ProjectReference>
+    <ProjectReference Include="_UnityPlus.csproj">
+      <Project>{49D4BC99-1C12-776F-CC5E-D6CE66E348FE}</Project>
+      <Name>_UnityPlus</Name>
     </ProjectReference>
     <ProjectReference Include="_UnityPlus.AssetManagement.csproj">
       <Project>{7122B491-FD2B-2B59-D391-006CB0AE788B}</Project>

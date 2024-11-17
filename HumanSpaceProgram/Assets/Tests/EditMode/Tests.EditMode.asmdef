@@ -4,11 +4,27 @@
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "_UnityPlus.UILib",
+        "_UnityEngine",
+        "_UnityPlus",
+        "_UnityPlus.OverridableEvents",
         "_UnityPlus.Serialization",
+        "_UnityPlus.UILib",
         "HSP",
+        "HSP.CelestialBodies",
+        "HSP.Content",
+        "HSP.ControlSystems",
+        "HSP.ReferenceFrames",
+        "HSP.ResourceFlow",
+        "HSP.SceneManagement",
+        "HSP.Timelines",
+        "HSP.Trajectories",
         "HSP.UI",
-        "HSP.ResourceFlow"
+        "HSP.Vanilla",
+        "HSP.Vanilla.Content.AssetLoaders",
+        "HSP.Vanilla.UI",
+        "HSP.Vanilla.UI.Vessels",
+        "HSP.Vessels",
+        "HSP.Vessels.Construction"
     ],
     "includePlatforms": [
         "Editor"

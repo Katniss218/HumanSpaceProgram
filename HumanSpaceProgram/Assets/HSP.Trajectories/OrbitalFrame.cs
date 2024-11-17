@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace HSP.Trajectories
 {
@@ -7,16 +6,16 @@ namespace HSP.Trajectories
     /// Represents the orientation of a point in orbit. <br/>
     /// Use this to get orbital directions (prograde/retrograde/etc).
     /// </summary>
-    public struct OrbitalFrame
+    public readonly struct OrbitalFrame
     {
-        private Quaternion _orientation;
+        private readonly Quaternion _rotation;
 
         /// <summary>
         /// The direction along the velocity vector.
         /// </summary>
         public Vector3 GetPrograde()
         {
-            return _orientation.GetForwardAxis();
+            return _rotation.GetForwardAxis();
         }
 
         /// <summary>
@@ -24,7 +23,7 @@ namespace HSP.Trajectories
         /// </summary>
         public Vector3 GetRetrograde()
         {
-            return _orientation.GetBackAxis();
+            return _rotation.GetBackAxis();
         }
 
         /// <summary>
@@ -32,7 +31,7 @@ namespace HSP.Trajectories
         /// </summary>
         public Vector3 GetNormal()
         {
-            return _orientation.GetUpAxis();
+            return _rotation.GetLeftAxis();
         }
 
         /// <summary>
@@ -40,7 +39,7 @@ namespace HSP.Trajectories
         /// </summary>
         public Vector3 GetAntinormal()
         {
-            return _orientation.GetDownAxis();
+            return _rotation.GetRightAxis();
         }
 
         /// <summary>
@@ -48,7 +47,7 @@ namespace HSP.Trajectories
         /// </summary>
         public Vector3 GetAntiradial() // antiradial = radial "out"
         {
-            return _orientation.GetRightAxis();
+            return _rotation.GetUpAxis();
         }
 
         /// <summary>
@@ -56,25 +55,17 @@ namespace HSP.Trajectories
         /// </summary>
         public Vector3 GetRadial() // radial = radial "in"
         {
-            return _orientation.GetLeftAxis();
+            return _rotation.GetDownAxis();
         }
 
-        public static OrbitalFrame FromNBody( Vector3Dbl velocity, Vector3Dbl gravity )
+        public OrbitalFrame( Quaternion rotation )
         {
-            // Prograde -> towards velocity.
-            // Antiradial -> "towards" gravity, but projected onto a plane whose normal is velocity, such that it's orthogonal to Prograde.
-
-            return new OrbitalFrame()
-            {
-                _orientation = Quaternion.LookRotation( velocity.NormalizeToVector3(), Vector3Dbl.Cross( gravity, velocity ).NormalizeToVector3() )
-            };
+            _rotation = rotation;
         }
 
-        public static OrbitalFrame FromKeplerian( Orbit orbit, double ut )
+        public OrbitalFrame( Vector3 forward, Vector3 up )
         {
-            // For keplerian, you don't get the directions directly, but first compute the orientation and then get the directions from that.
-
-            throw new NotImplementedException();
+            _rotation = Quaternion.LookRotation( forward, up );
         }
     }
 }

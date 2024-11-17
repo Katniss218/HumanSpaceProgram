@@ -4,13 +4,14 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace KSS_Tests_EditMode
+namespace HSP_Tests_EditMode
 {
     public class E_Template
     {
         // ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
         // Tests use a fresh, clean scene.
+        // If multiple tests are invoked at once, they will run in a single scene. Be careful.
 
         // ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
@@ -23,17 +24,5 @@ namespace KSS_Tests_EditMode
             Assert.AreEqual( go.name, "hi" );
             // Use the Assert class to test conditions
         }
-
-
-        /*
-        // A UnityTest behaves like a coroutine in Play Mode. In Edit Mode you can use
-        // `yield return null;` to skip a frame.
-        [UnityTest]
-        public IEnumerator NewTestScriptWithEnumeratorPasses()
-        {
-            // Use the Assert class to test conditions.
-            // Use yield to skip a frame.
-            yield return null;
-        }*/
     }
 }

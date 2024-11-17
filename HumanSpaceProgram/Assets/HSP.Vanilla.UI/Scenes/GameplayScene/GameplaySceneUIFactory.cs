@@ -18,8 +18,8 @@ namespace HSP.Vanilla.UI.Scenes.GameplayScene
 
         public const string CREATE_UI = HSPEvent.NAMESPACE_HSP + ".gameplay_ui";
 
-        [HSPEventListener( HSPEvent_AFTER_ACTIVE_OBJECT_CHANGED.ID, CREATE_UI )]
-        [HSPEventListener( HSPEvent_STARTUP_GAMEPLAY.ID, CREATE_UI, After = new[] { HSP.Vanilla.Scenes.GameplayScene.OnStartup.ADD_ACTIVE_OBJECT_MANAGER } )]
+        [HSPEventListener( HSPEvent_AFTER_ACTIVE_VESSEL_CHANGED.ID, CREATE_UI )]
+        [HSPEventListener( HSPEvent_STARTUP_GAMEPLAY.ID, CREATE_UI, After = new[] { HSP.Vanilla.Scenes.GameplayScene.OnStartup.ADD_ACTIVE_VESSEL_MANAGER } )]
         public static void CreateUI()
         {
             UICanvas canvas = CanvasManager.Get( CanvasName.STATIC );
@@ -31,7 +31,7 @@ namespace HSP.Vanilla.UI.Scenes.GameplayScene
 
             _mainPanel = canvas.AddPanel( new UILayoutInfo( UIFill.Fill() ), null );
 
-            if( ActiveObjectManager.ActiveObject == null )
+            if( ActiveVesselManager.ActiveObject == null )
             {
                 CreateUIActiveObjectNull();
             }
@@ -77,7 +77,7 @@ namespace HSP.Vanilla.UI.Scenes.GameplayScene
 
         private static void CreateTopPanel()
         {
-            if( ActiveObjectManager.ActiveObject == null )
+            if( ActiveVesselManager.ActiveObject == null )
             {
                 UIPanel topPanel = _mainPanel.AddPanel( new UILayoutInfo( UIFill.Horizontal( -15, -15 ), UIAnchor.Top, 0, 30 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/top_panel" ) );
 
@@ -120,7 +120,7 @@ namespace HSP.Vanilla.UI.Scenes.GameplayScene
                 UIPanel p4 = topRightPanel.AddPanel( new UILayoutInfo( UIAnchor.Right, UIFill.Vertical(), -35, 30 ), null );
                 UIButton deselectActive = p4.AddButton( new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_leave" ), () =>
                 {
-                    ActiveObjectManager.ActiveObject = null;
+                    ActiveVesselManager.ActiveObject = null;
                 } );
             }
         }

@@ -58,38 +58,38 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\_UnityEngine\Extensions\Vector3Dbl_Ex.cs" />
     <Compile Include="Assets\_UnityEngine\QuaternionDbl.cs" />
-    <Compile Include="Assets\_UnityEngine\Vector3Curve.cs" />
-    <Compile Include="Assets\_UnityEngine\Extensions\GameObjectEx.cs" />
-    <Compile Include="Assets\_UnityEngine\AncestralMap.cs" />
-    <Compile Include="Assets\_UnityEngine\Extensions\Quaternion_Ex.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\RectTransform_Ex.cs" />
-    <Compile Include="Assets\_UnityEngine\Direction3D.cs" />
     <Compile Include="Assets\_UnityEngine\Direction2D.cs" />
-    <Compile Include="Assets\_UnityEngine\CoroutineRunner.cs" />
-    <Compile Include="Assets\_UnityEngine\Matrix4x4Dbl.cs" />
     <Compile Include="Assets\_UnityEngine\Matrix3x3.cs" />
-    <Compile Include="Assets\_UnityEngine\Extensions\Vector3_Ex.cs" />
-    <Compile Include="Assets\_UnityEngine\Extensions\Object_Ex.cs" />
     <Compile Include="Assets\_UnityEngine\MathD.cs" />
-    <Compile Include="Assets\_UnityEngine\MonoBehaviourProxy.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\Matrix3x3_Ex.cs" />
     <Compile Include="Assets\_UnityEngine\SingletonMonoBehaviour.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\QuaternionDbl_Ex.cs" />
-    <Compile Include="Assets\_UnityEngine\Extensions\Transform_Ex.cs" />
-    <Compile Include="Assets\_UnityEngine\MeshUtils.cs" />
     <Compile Include="Assets\_UnityEngine\UnityApplication.cs" />
-    <Compile Include="Assets\_UnityEngine\Extensions\MatrixMxN_Ex.cs" />
-    <Compile Include="Assets\_UnityEngine\Vector3Dbl.cs" />
     <Compile Include="Assets\_UnityEngine\QuaternionCurve.cs" />
-    <Compile Include="Assets\_UnityEngine\Extensions\IEnumerable_Component__Ex.cs" />
-    <Compile Include="Assets\_UnityEngine\TypeMap.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\ComponentEx.cs" />
     <Compile Include="Assets\_UnityEngine\IComponent.cs" />
+    <Compile Include="Assets\_UnityEngine\Extensions\Vector3Dbl_Ex.cs" />
+    <Compile Include="Assets\_UnityEngine\Vector3Curve.cs" />
+    <Compile Include="Assets\_UnityEngine\Extensions\GameObjectEx.cs" />
+    <Compile Include="Assets\_UnityEngine\SingletonInstanceException.cs" />
+    <Compile Include="Assets\_UnityEngine\AncestralMap.cs" />
+    <Compile Include="Assets\_UnityEngine\Extensions\Quaternion_Ex.cs" />
+    <Compile Include="Assets\_UnityEngine\Direction3D.cs" />
+    <Compile Include="Assets\_UnityEngine\CoroutineRunner.cs" />
+    <Compile Include="Assets\_UnityEngine\Matrix4x4Dbl.cs" />
+    <Compile Include="Assets\_UnityEngine\Extensions\Vector3_Ex.cs" />
+    <Compile Include="Assets\_UnityEngine\Extensions\Object_Ex.cs" />
+    <Compile Include="Assets\_UnityEngine\MonoBehaviourProxy.cs" />
+    <Compile Include="Assets\_UnityEngine\Extensions\Transform_Ex.cs" />
+    <Compile Include="Assets\_UnityEngine\MeshUtils.cs" />
+    <Compile Include="Assets\_UnityEngine\Vector3Dbl.cs" />
+    <Compile Include="Assets\_UnityEngine\Extensions\MatrixMxN_Ex.cs" />
+    <Compile Include="Assets\_UnityEngine\Extensions\IEnumerable_Component__Ex.cs" />
+    <Compile Include="Assets\_UnityEngine\TypeMap.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\Vector2_Ex.cs" />
     <Compile Include="Assets\_UnityEngine\MatrixMxN.cs" />
-    <Compile Include="Assets\_UnityEngine\SingletonInstanceException.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_UnityEngine\___UnityEngine.asmdef" />

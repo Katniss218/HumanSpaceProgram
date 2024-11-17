@@ -10,9 +10,9 @@ namespace HSP.Vanilla.UI.Components
     {
         void LateUpdate()
         {
-            var activeObj = ActiveObjectManager.ActiveObject == null
+            var activeObj = ActiveVesselManager.ActiveVessel == null
                 ? null
-                : ActiveObjectManager.ActiveObject.GetComponent<ReferenceFrameTransform>();
+                : ActiveVesselManager.ActiveVessel.ReferenceFrameTransform;
 
             if( activeObj == null )
             {
@@ -21,11 +21,9 @@ namespace HSP.Vanilla.UI.Components
             else
             {
                 CelestialBody body = CelestialBodyManager.Get( "main" );
-                Vector3Dbl posV = activeObj.AIRFPosition;
-                Vector3Dbl posCB = body.AIRFPosition;
+                Vector3Dbl bodySpacePosition = body.ReferenceFrameTransform.CenteredInertialReferenceFrame().InverseTransformPosition( activeObj.AbsolutePosition );
 
-                double magn = (posV - posCB).magnitude;
-                double alt = magn - body.Radius;
+                double alt = bodySpacePosition.magnitude - body.Radius;
 
                 this.Text = $"{(alt / 1000.0):#0.#} km";
             }

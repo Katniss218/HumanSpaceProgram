@@ -49,7 +49,7 @@ namespace HSP.Vanilla.Scenes.DesignScene
         [HSPEventListener( HSPEvent_STARTUP_DESIGN.ID, ADD_ACTIVE_OBJECT_MANAGER )]
         private static void AddActiveObjectManager()
         {
-            DesignSceneManager.Instance.gameObject.AddComponent<ActiveObjectManager>();
+            DesignSceneManager.Instance.gameObject.AddComponent<ActiveVesselManager>();
         }
 
         [HSPEventListener( HSPEvent_STARTUP_DESIGN.ID, ADD_ESCAPE_INPUT_CONTROLLER )]

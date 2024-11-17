@@ -109,7 +109,7 @@ namespace HSP.CelestialBodies.Surfaces
             }
 
             // Check if any of the PIOs is within the subdiv radius.
-            Vector3Dbl airfQuad = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.transform.position );
+            Vector3Dbl airfQuad = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( this.transform.position );
             foreach( var airfPOI in this.AirfPOIs )
             {
                 double dist = (airfPOI - airfQuad).magnitude;
@@ -155,7 +155,7 @@ namespace HSP.CelestialBodies.Surfaces
             }
 
             Vector3 originBodySpace = _quadSphereFace.GetSpherePoint( this.Node.Parent.Center ) * (float)CelestialBody.Radius;
-            Vector3Dbl parentQuadOriginAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( this.CelestialBody.transform.TransformPoint( originBodySpace ) );
+            Vector3Dbl parentQuadOriginAirf = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( this.CelestialBody.transform.TransformPoint( originBodySpace ) );
             foreach( var airfPOI in this.AirfPOIs )
             {
                 double distanceToPoi = (airfPOI - parentQuadOriginAirf).magnitude;

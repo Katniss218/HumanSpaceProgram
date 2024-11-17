@@ -4,11 +4,11 @@ using HSP.Content;
 using HSP.Content.Vessels.Serialization;
 using HSP.ReferenceFrames;
 using HSP.ResourceFlow;
+using HSP.Time;
 using HSP.Timelines;
-using HSP.Trajectories;
+using HSP.Vanilla;
 using HSP.Vanilla.Components;
 using HSP.Vanilla.Scenes.AlwaysLoadedScene;
-using HSP.Vanilla.Scenes.DesignScene;
 using HSP.Vessels;
 using System;
 using System.Collections.Generic;
@@ -21,6 +21,21 @@ using UnityPlus.Serialization.DataHandlers;
 
 namespace HSP._DevUtils
 {
+    public class UpdateTester : MonoBehaviour
+    {
+        protected void Update()
+        {
+            Debug.Log( "A" );
+        }
+    }
+    public class UpdateTesterDerived : UpdateTester
+    {
+        protected new void Update()
+        {
+            Debug.Log( "B" );
+            base.Update();
+        }
+    }
     /// <summary>
     /// Game manager for testing.
     /// </summary>
@@ -40,25 +55,33 @@ namespace HSP._DevUtils
         public RawImage uiImage;
 
         static Vessel launchSite;
-        static Vessel vessel;
+        static Vessel _vessel;
 
         public const string LOAD_PLACEHOLDER_CONTENT = "devutils.load_game_data";
         public const string CREATE_PLACEHOLDER_UNIVERSE = "devutils.timeline.new.after";
 
+        /*[RuntimeInitializeOnLoadMethod( RuntimeInitializeLoadType.AfterAssembliesLoaded )]
+        internal static void Initialize()
+        {
+            var pl = PlayerLoop.GetCurrentPlayerLoop();
+
+            PlayerLoopUtils.PrintPlayerLoop( pl );
+        }*/
+
         [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, LOAD_PLACEHOLDER_CONTENT )]
-        private static void LoadGameData( object e )
+        private static void LoadGameData()
         {
             AssetRegistry.Register( "substance.f", new Substance() { Density = 1000, DisplayName = "Fuel", UIColor = new Color( 1.0f, 0.3764706f, 0.2509804f ) } );
             AssetRegistry.Register( "substance.ox", new Substance() { Density = 1000, DisplayName = "Oxidizer", UIColor = new Color( 0.2509804f, 0.5607843f, 1.0f ) } );
         }
 
         [HSPEventListener( HSPEvent_AFTER_TIMELINE_NEW.ID, CREATE_PLACEHOLDER_UNIVERSE )]
-        private static void OnAfterCreateDefault( object e )
+        private static void OnAfterCreateDefault()
         {
             CelestialBody body = CelestialBodyManager.Get( "main" );
-            Vector3 localPos = CoordinateUtils.GeodeticToEuclidean( 28.5857702f, -80.6507262f, (float)(body.Radius + 1.0) );
+            Vector3 localPos = CoordinateUtils.GeodeticToEuclidean( 28.5857702f, -80.6507262f, (float)(body.Radius + 12.5) );
 
-            launchSite = VesselFactory.CreatePartless( Vector3Dbl.zero, QuaternionDbl.identity, Vector3.zero, Vector3.zero );
+            launchSite = VesselFactory.CreatePartless( Vector3Dbl.zero, QuaternionDbl.identity, Vector3Dbl.zero, Vector3Dbl.zero );
             launchSite.gameObject.name = "launchsite";
             launchSite.Pin( body, localPos, Quaternion.FromToRotation( Vector3.up, localPos.normalized ) );
 
@@ -66,9 +89,27 @@ namespace HSP._DevUtils
             GameObject root = InstantiateLocal( launchSitePrefab, launchSite.transform, Vector3.zero, Quaternion.identity );
             launchSite.RootPart = root.transform;
 
-            var v = CreateVessel( launchSite );
-            ActiveObjectManager.ActiveObject = v.RootPart.GetVessel().gameObject.transform;
-            vessel = v;
+            _vessel = CreateVessel( launchSite );
+
+            ActiveVesselManager.ActiveObject = _vessel.RootPart.GetVessel().gameObject.transform;
+        }
+
+
+        private static Vector3 GetLocalPositionRelativeToRoot( Transform target )
+        {
+            Vector3 relativePosition = target.localPosition;
+            Transform current = target;
+
+            while( current.parent != null )
+            {
+                current = current.parent;
+                if( current.parent == null ) // break out before we calculate the root values.
+                    break;
+
+                relativePosition = current.localRotation * relativePosition + current.localPosition;
+            }
+
+            return relativePosition;
         }
 
         private static Vessel CreateVessel( Vessel launchSite )
@@ -79,17 +120,22 @@ namespace HSP._DevUtils
             }
 
             FLaunchSiteMarker launchSiteSpawner = launchSite.gameObject.GetComponentInChildren<FLaunchSiteMarker>();
-            Vector3Dbl spawnerPosAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( launchSiteSpawner.transform.position );
-            QuaternionDbl spawnerRotAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( launchSiteSpawner.transform.rotation );
+            Vector3Dbl zeroPosAirf = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( Vector3Dbl.zero );
+            Vector3Dbl spawnerPosAirf = launchSite.ReferenceFrameTransform.AbsolutePosition + GetLocalPositionRelativeToRoot( launchSiteSpawner.transform );
+            QuaternionDbl spawnerRotAirf = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( launchSiteSpawner.transform.rotation );
 
-            var v2 = CreateDummyVessel( spawnerPosAirf, spawnerRotAirf ); // position is temp.
+            var vessel = CreateDummyVessel( zeroPosAirf, spawnerRotAirf ); // position is temp.
 
-            Vector3 bottomBoundPos = v2.GetBottomPosition();
-            Vector3Dbl closestBoundAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( bottomBoundPos );
-            Vector3Dbl closestBoundToVesselAirf = v2.AIRFPosition - closestBoundAirf;
+            Vector3 bottomBoundPos = vessel.GetBottomPosition();
+            Vector3Dbl closestBoundAirf = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( bottomBoundPos );
+            Vector3Dbl closestBoundToVesselAirf = vessel.ReferenceFrameTransform.AbsolutePosition - closestBoundAirf;
             Vector3Dbl airfPos = spawnerPosAirf + closestBoundToVesselAirf;
-            v2.AIRFPosition = airfPos;
-            return v2;
+
+            Vector3Dbl airfVel = launchSite.ReferenceFrameTransform.AbsoluteVelocity;
+
+            vessel.ReferenceFrameTransform.AbsolutePosition = airfPos;
+            vessel.ReferenceFrameTransform.AbsoluteVelocity = airfVel;
+            return vessel;
         }
 
         void Awake()
@@ -111,8 +157,47 @@ namespace HSP._DevUtils
             uiImage.texture = normalmap;*/
         }
 
+        bool isPressed = false;
+        bool wasFired = false;
+        int bodyI;
+
+        void FixedUpdate()
+        {
+            if( isPressed )
+            {
+                isPressed = false;
+
+                var body = CelestialBodyManager.Get( "main" );
+
+                System.Random r = new System.Random();
+                Vector3Dbl rand = new Vector3Dbl( 0, r.Next( -50000000, 50000000 ), r.Next( -50000000, 50000000 ) );
+                CelestialBody cbi = VanillaPlanetarySystemFactory.CreateCBNonAttractor( $"rand{bodyI}", new Vector3Dbl( 149_500_000_000, 0, 0 ) + rand, rand * 0.01, QuaternionDbl.identity );
+
+                bodyI++;
+
+                Debug.Log( body.ReferenceFrameTransform.AbsoluteVelocity );
+
+                if( !wasFired )
+                {
+                    CelestialBody cb = VanillaPlanetarySystemFactory.CreateCB( "moon2", new Vector3Dbl( 150_200_000_000, 0, 0 ), new Vector3Dbl( 0, -129749.1543788567, 0 ), QuaternionDbl.identity );
+                    body = cb;
+
+                    _vessel.ReferenceFrameTransform.AbsolutePosition = body.ReferenceFrameTransform.AbsolutePosition + new Vector3Dbl( body.Radius + 200_000, 0, 0 );
+                    _vessel.ReferenceFrameTransform.AbsoluteVelocity = body.ReferenceFrameTransform.AbsoluteVelocity + new Vector3Dbl( 0, 8500, 0 );
+
+                    SceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT,
+                        SceneReferenceFrameManager.TargetObject.AbsolutePosition, SceneReferenceFrameManager.TargetObject.AbsoluteVelocity ) );
+                }
+                wasFired = true;
+            }
+        }
+
         void Update()
         {
+            if( UnityEngine.Input.GetKeyDown( KeyCode.F3 ) )
+            {
+                isPressed = true;
+            }
             if( UnityEngine.Input.GetKeyDown( KeyCode.F4 ) )
             {
                 VesselMetadata loadedVesselMetadata = VesselMetadata.LoadFromDisk( "vessel2" );
@@ -123,22 +208,22 @@ namespace HSP._DevUtils
                 var data = _designObjDataHandler.Read();
 
                 GameObject loadedObj = SerializationUnit.Deserialize<GameObject>( data );
-               
-                FLaunchSiteMarker launchSiteSpawner = launchSite.gameObject.GetComponentInChildren<FLaunchSiteMarker>();
-                Vector3Dbl spawnerPosAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( launchSiteSpawner.transform.position );
-                QuaternionDbl spawnerRotAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( launchSiteSpawner.transform.rotation );
 
-                Vessel v2 = VesselFactory.CreatePartless( spawnerPosAirf, spawnerRotAirf, Vector3.zero, Vector3.zero );
+                FLaunchSiteMarker launchSiteSpawner = launchSite.gameObject.GetComponentInChildren<FLaunchSiteMarker>();
+                Vector3Dbl spawnerPosAirf = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( launchSiteSpawner.transform.position );
+                QuaternionDbl spawnerRotAirf = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( launchSiteSpawner.transform.rotation );
+
+                Vessel v2 = VesselFactory.CreatePartless( spawnerPosAirf, spawnerRotAirf, Vector3Dbl.zero, Vector3Dbl.zero );
 
                 v2.RootPart = loadedObj.transform;
                 v2.RootPart.localPosition = Vector3.zero;
                 v2.RootPart.localRotation = Quaternion.identity;
 
                 Vector3 bottomBoundPos = v2.GetBottomPosition();
-                Vector3Dbl closestBoundAirf = SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( bottomBoundPos );
-                Vector3Dbl closestBoundToVesselAirf = v2.AIRFPosition - closestBoundAirf;
+                Vector3Dbl closestBoundAirf = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( bottomBoundPos );
+                Vector3Dbl closestBoundToVesselAirf = v2.ReferenceFrameTransform.AbsolutePosition - closestBoundAirf;
                 Vector3Dbl airfPos = spawnerPosAirf + closestBoundToVesselAirf;
-                v2.AIRFPosition = airfPos;
+                v2.ReferenceFrameTransform.AbsolutePosition = airfPos;
             }
             if( UnityEngine.Input.GetKeyDown( KeyCode.F5 ) )
             {
@@ -161,7 +246,7 @@ namespace HSP._DevUtils
                     Author = "Katniss"
                 };
                 vm.SaveToDisk();
-                var data = SerializationUnit.Serialize( ActiveObjectManager.ActiveObject.GetVessel().RootPart.gameObject );
+                var data = SerializationUnit.Serialize( ActiveVesselManager.ActiveObject.GetVessel().RootPart.gameObject );
                 handler = new JsonSerializedDataHandler( partDir + "/gameobjects.json" );
                 handler.Write( data );
 
@@ -195,7 +280,7 @@ namespace HSP._DevUtils
                 handler.Write( data );
 
                 partDir = gameDataPath + "/Vanilla/Parts/tank";
-                Directory.CreateDirectory( partDir ); 
+                Directory.CreateDirectory( partDir );
                 pm = new PartMetadata( partDir )
                 {
                     Name = "Tank",
@@ -252,7 +337,7 @@ namespace HSP._DevUtils
             GameObject tankLongPrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/tank_long" );
             GameObject enginePrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/engine" );
 
-            Vessel v = VesselFactory.CreatePartless( airfPosition, rotation, Vector3.zero, Vector3.zero );
+            Vessel v = VesselFactory.CreatePartless( airfPosition, rotation, Vector3Dbl.zero, Vector3Dbl.zero );
             Transform root = InstantiateLocal( intertankPrefab, v.transform, Vector3.zero, Quaternion.identity ).transform;
 
             Transform tankP = InstantiateLocal( tankPrefab, root, new Vector3( 0, -1.625f, 0 ), Quaternion.identity ).transform;
@@ -262,6 +347,8 @@ namespace HSP._DevUtils
             Transform t2 = InstantiateLocal( tankLongPrefab, root, new Vector3( -20, 2.625f, 0 ), Quaternion.identity ).transform;
             Transform engineP1 = InstantiateLocal( enginePrefab, tankP, new Vector3( 2, -3.45533f, 0 ), Quaternion.identity ).transform;
             Transform engineP2 = InstantiateLocal( enginePrefab, tankP, new Vector3( -2, -3.45533f, 0 ), Quaternion.identity ).transform;
+            // Transform engineP1 = InstantiateLocal( enginePrefab, tankP, new Vector3( 0, -3.45533f, 0 ), Quaternion.identity ).transform;
+            // Transform engineP2 = InstantiateLocal( enginePrefab, tankP, new Vector3( 0, 0, 0 ), Quaternion.identity ).transform;
             v.RootPart = root;
 
             FBulkConnection conn = tankP.gameObject.AddComponent<FBulkConnection>();
@@ -286,7 +373,7 @@ namespace HSP._DevUtils
             conn21.End2.ConnectTo( engineP1.GetComponent<FRocketEngine>() );
             conn21.End2.Position = new Vector3( 0.0f, 0.0f, 0.0f );
             conn21.CrossSectionArea = 60f;
-            
+
             FBulkConnection conn22 = engineP2.gameObject.AddComponent<FBulkConnection>();
             conn22.End1.ConnectTo( tankP.GetComponent<FBulkContainer_Sphere>() );
             conn22.End1.Position = new Vector3( 0.0f, -1.5f, 0.0f );
@@ -297,6 +384,7 @@ namespace HSP._DevUtils
             FVesselSeparator t1Sep = t1.gameObject.AddComponent<FVesselSeparator>();
             FVesselSeparator t2Sep = t2.gameObject.AddComponent<FVesselSeparator>();
 
+            /* trail completely breaks down when switching between far away things. I suppose this is caused by its mesh spanning more than 150 000 000 000 meters
             TrailRenderer tr = v.gameObject.AddComponent<TrailRenderer>();
             tr.material = FindObjectOfType<DevUtilsGameplayManager>().Material;
             tr.time = 250;
@@ -305,6 +393,7 @@ namespace HSP._DevUtils
             curve.AddKey( 1, 2.5f );
             tr.widthCurve = curve;
             tr.minVertexDistance = 50f;
+            */
 
             FPlayerInputAvionics av = capsule.GetComponent<FPlayerInputAvionics>();
             FAttitudeAvionics atv = capsule.GetComponent<FAttitudeAvionics>();
@@ -314,8 +403,8 @@ namespace HSP._DevUtils
             FRocketEngine eng2 = engineP2.GetComponent<FRocketEngine>();
             F2AxisActuator ac2 = engineP2.GetComponent<F2AxisActuator>();
             av.OnSetThrottle.TryConnect( eng1.SetThrottle );
-           // av.OnSetThrottle.TryConnect( eng2.SetThrottle );
-           // only 1 output is allowed. This is annoying.
+            // av.OnSetThrottle.TryConnect( eng2.SetThrottle );
+            // only 1 output is allowed. This is annoying.
 
             av.OnSetAttitude.TryConnect( gc.SetAttitude );
             //atv.OnSetAttitude.TryConnect( gc.SetAttitude );
@@ -374,7 +463,7 @@ namespace HSP._DevUtils
             ((SequenceAction)seq.Sequence.Elements[1].Actions[1]).OnInvoke.TryConnect( t2Sep.Separate );
 
             FControlFrame fc = capsule.gameObject.GetComponent<FControlFrame>();
-            FControlFrame.VesselControlFrame = fc;
+            SelectedControlFrameManager.ControlFrame = fc;
 
             return v;
         }

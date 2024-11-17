@@ -1,7 +1,5 @@
 ﻿using HSP.CelestialBodies;
-using HSP.ReferenceFrames;
 using HSP.Trajectories;
-using HSP.Vanilla.Components;
 using HSP.Vessels;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,6 +11,8 @@ namespace HSP.Vanilla.UI.Components
 {
     public class UINavball : UIPanel
     {
+        public const float MIN_ABSOLUTE_VELOCITY_FOR_MARKERS = 0.25f;
+
         private UIIcon _prograde;
         private UIIcon _retrograde;
         private UIIcon _normal;
@@ -44,17 +44,22 @@ namespace HSP.Vanilla.UI.Components
 
         void LateUpdate()
         {
-            if( ActiveObjectManager.ActiveObject != null )
+            if( ActiveVesselManager.ActiveObject != null )
             {
-                Vessel activeVessel = ActiveObjectManager.ActiveObject.GetVessel();
+                Vessel activeVessel = ActiveVesselManager.ActiveObject.GetVessel();
 
-                Quaternion airfRotation = (Quaternion)FControlFrame.GetAIRFRotation( FControlFrame.VesselControlFrame, activeVessel );
+                if( activeVessel.ReferenceFrameTransform == null )
+                    return;
+
+                Quaternion airfRotation = (Quaternion)SelectedControlFrameManager.GetAbsoluteRotation( fallback: activeVessel.ReferenceTransform );
                 Matrix4x4 airfToLocalMatrix = Matrix4x4.Rotate( airfRotation ).inverse;
 
-                Vector3Dbl airfVelocity = SceneReferenceFrameManager.SceneReferenceFrame.TransformDirection( activeVessel.PhysicsObject.Velocity );
-                if( airfVelocity.magnitude > 0.25f )
+                Vector3Dbl airfVelocity = activeVessel.ReferenceFrameTransform.AbsoluteVelocity;
+                if( airfVelocity.magnitude > MIN_ABSOLUTE_VELOCITY_FOR_MARKERS )
                 {
-                    OrbitalFrame orbitalFrame = OrbitalFrame.FromNBody( airfVelocity, GravityUtils.GetNBodyGravityAcceleration( activeVessel.RootObjTransform.AIRFPosition ) );
+                    Vector3Dbl gravityAcc = GravityUtils.GetNBodyGravityAcceleration( activeVessel.ReferenceFrameTransform.AbsolutePosition );
+
+                    OrbitalFrame orbitalFrame = new OrbitalFrame( airfVelocity.NormalizeToVector3(), -gravityAcc.NormalizeToVector3() );
 
                     Vector3 localPrograde = airfToLocalMatrix.MultiplyVector( orbitalFrame.GetPrograde() ) * NavballPixelRadius;
                     Vector3 localRetrograde = airfToLocalMatrix.MultiplyVector( orbitalFrame.GetRetrograde() ) * NavballPixelRadius;

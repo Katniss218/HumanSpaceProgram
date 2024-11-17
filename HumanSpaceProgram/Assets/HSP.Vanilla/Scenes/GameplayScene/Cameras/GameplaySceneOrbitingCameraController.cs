@@ -21,7 +21,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
         public float ZoomDist
         {
             get => _zoomDist;
-            set 
+            set
             {
                 _zoomDist = value;
                 SyncZoomDist();
@@ -60,9 +60,9 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
                 ? this.transform.position
                 : this.ReferenceObject.position;
 
-            Vector3Dbl airfGravVec = GravityUtils.GetNBodyGravityAcceleration( SceneReferenceFrameManager.SceneReferenceFrame.TransformPosition( referencePosition ) );
+            Vector3Dbl airfGravVec = GravityUtils.GetNBodyGravityAcceleration( SceneReferenceFrameManager.ReferenceFrame.TransformPosition( referencePosition ) );
 
-            Vector3 upDir = -SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformDirection( airfGravVec.NormalizeToVector3() );
+            Vector3 upDir = -SceneReferenceFrameManager.ReferenceFrame.InverseTransformDirection( airfGravVec.NormalizeToVector3() );
 
             return upDir;
         }
@@ -83,10 +83,10 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
         {
             if( ReferenceObject == null )
             {
-                if( ActiveObjectManager.ActiveObject == null )
+                if( ActiveVesselManager.ActiveObject == null )
                     return;
 
-                ReferenceObject = ActiveObjectManager.ActiveObject;
+                ReferenceObject = ActiveVesselManager.ActiveObject;
             }
 
             SyncZoomDist();
@@ -115,7 +115,8 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
         {
             if( ReferenceObject != null ) // Raycasts using rays from the camera fail when the vessel is moving fast, but updating the camera earlier as well as later doesn't fix it.
             {
-                this.transform.position = ReferenceObject.transform.position;
+                if( ReferenceObject.transform.position.magnitude < 1_000_000 )
+                    this.transform.position = ReferenceObject.transform.position;
             }
         }
 
@@ -148,14 +149,19 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
 
         public const string SNAP_CAMERA_TO_ACTIVE_OBJECT = HSPEvent.NAMESPACE_HSP + ".camera.snap_to_vessel";
 
-        [HSPEventListener( HSPEvent_AFTER_ACTIVE_OBJECT_CHANGED.ID, SNAP_CAMERA_TO_ACTIVE_OBJECT )]
-        private static void SnapToActiveObject( object e )
+        [HSPEventListener( HSPEvent_AFTER_ACTIVE_VESSEL_CHANGED.ID, SNAP_CAMERA_TO_ACTIVE_OBJECT )]
+        private static void SnapToActiveObject()
         {
-            if( ActiveObjectManager.ActiveObject == null )
-                instance.ReferenceObject = null;
-            else
-                instance.ReferenceObject = ActiveObjectManager.ActiveObject;
+            var referenceObject = (ActiveVesselManager.ActiveObject == null)
+                ? null
+                : ActiveVesselManager.ActiveObject;
 
+            instance.ReferenceObject = referenceObject;
+            if( referenceObject != null )
+            {
+                if( referenceObject.transform.position.magnitude < 1_000_000 )
+                    instance.transform.position = referenceObject.transform.position;
+            }
             instance.transform.rotation = Quaternion.LookRotation( instance.transform.forward, instance.GetUpDir() );
         }
     }

@@ -2,6 +2,7 @@ using HSP.ReferenceFrames;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace HSP.Vessels
 {
@@ -30,7 +31,6 @@ namespace HSP.Vessels
     /// <remarks>
     /// Vessels exist only in the gameplay scene.
     /// </remarks>
-    [RequireComponent( typeof( ReferenceFrameTransform ) )]
     public sealed partial class Vessel : MonoBehaviour
     {
         [SerializeField]
@@ -61,9 +61,31 @@ namespace HSP.Vessels
             }
         }
 
-        public IPhysicsObject PhysicsObject { get; set; }
-        public ReferenceFrameTransform RootObjTransform { get; private set; }
+        IPhysicsTransform _physicsTransform;
+        public IPhysicsTransform PhysicsTransform
+        {
+            get
+            {
+                if( _physicsTransform.IsUnityNull() )
+                    _physicsTransform = this.GetComponent<IPhysicsTransform>();
+                return _physicsTransform;
+            }
+        }
 
+        IReferenceFrameTransform _referenceFrameTransform;
+        public IReferenceFrameTransform ReferenceFrameTransform
+        {
+            get
+            {
+                if( _referenceFrameTransform.IsUnityNull() )
+                    _referenceFrameTransform = this.GetComponent<IReferenceFrameTransform>();
+                return _referenceFrameTransform;
+            }
+        }
+
+        /// <summary>
+        /// Returns the transform that is the local space of the vessel.
+        /// </summary>
         public Transform ReferenceTransform => this.transform;
 
         // the active vessel has also glithed out and accelerated to the speed of light at least once after jettisonning the side tanks on the pad.
@@ -100,20 +122,19 @@ namespace HSP.Vessels
 
         // mass and colliders
 
-        void Awake()
+        void Start()
         {
-            this.RootObjTransform = this.GetComponent<ReferenceFrameTransform>();
-            this.PhysicsObject = this.GetComponent<IPhysicsObject>();
+            RecalculatePartCache();
+            //SetPhysicsObjectParameters();
+            this.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
+
+            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_VESSEL_CREATED.ID, this );
             this.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
         }
 
-        void Start()
+        private void OnDestroy()
         {
-            this.PhysicsObject = this.GetComponent<IPhysicsObject>(); // needs to be here for deserialization, because it might be added in any order and I can't use RequireComponent because it needs to be removed when pinning.
-            RecalculatePartCache();
-            //SetPhysicsObjectParameters();
-
-            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_VESSEL_CREATED.ID, this );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_VESSEL_DESTROYED.ID, this );
         }
 
         void OnEnable()
@@ -133,15 +154,20 @@ namespace HSP.Vessels
             }
         }
 
-        private void OnDestroy()
-        {
-            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_VESSEL_DESTROYED.ID, this );
-        }
-
         void FixedUpdate()
         {
-            SetPhysicsObjectParameters(); // this full recalc every frame should be replaced by update-based approach.
+            // Toggle the vessel active if within 'physics range'
+            if( this._rootPart.gameObject.activeSelf )
+            {
+                SetPhysicsObjectParameters(); // this full recalc every frame should be replaced by update-based approach.
 
+                if( this.ReferenceFrameTransform.Position.magnitude > 1e5 )
+                    this._rootPart.gameObject.SetActive( false );
+            }
+            if( !this._rootPart.gameObject.activeSelf && this.ReferenceFrameTransform.Position.magnitude <= 1e5 )
+            {
+                this._rootPart.gameObject.SetActive( true );
+            }
 
             // ---------------------
 
@@ -209,16 +235,13 @@ namespace HSP.Vessels
         void SetPhysicsObjectParameters()
         {
             (Vector3 comLocal, float mass, Matrix3x3 inertia) = this.RecalculateMass();
-            this.PhysicsObject.LocalCenterOfMass = comLocal;
-            this.PhysicsObject.Mass = mass;
+            this.PhysicsTransform.LocalCenterOfMass = comLocal;
+            this.PhysicsTransform.Mass = mass;
             //var x = this.PhysicsObject.MomentOfInertiaTensor;
 
             // disabled for now. needs a better calculation of moments of inertia
             //this.PhysicsObject.MomentOfInertiaTensor = inertia; // this is around an order of magnitude too small in each direction, but that might be because we're assuming point masses.
         }
-
-        public Vector3Dbl AIRFPosition { get => this.RootObjTransform.AIRFPosition; set => this.RootObjTransform.AIRFPosition = value; }
-        public QuaternionDbl AIRFRotation { get => this.RootObjTransform.AIRFRotation; set => this.RootObjTransform.AIRFRotation = value; }
 
         /// <summary>
         /// Calculates the scene world-space point at the very bottom of the vessel. Useful when placing it at launchsites and such.
@@ -248,7 +271,7 @@ namespace HSP.Vessels
         private void OnDrawGizmos()
         {
             Gizmos.color = Color.blue;
-            Gizmos.DrawWireCube( this.transform.TransformPoint( this.PhysicsObject.LocalCenterOfMass ), Vector3.one * 0.25f );
+            Gizmos.DrawWireCube( this.transform.TransformPoint( this.PhysicsTransform.LocalCenterOfMass ), Vector3.one * 0.25f );
         }
 
         public static double GetExhaustVelocity( (Vector3 thrust, float exhaustVelocity)[] thrusters )
@@ -280,6 +303,18 @@ namespace HSP.Vessels
         public static double GetInitialMass( double deltaV, double exhaustVelocity, double finalMass )
         {
             return finalMass * Math.Exp( deltaV / exhaustVelocity );
+        }
+
+
+        [MapsInheritingFrom( typeof( Vessel ) )]
+        public static SerializationMapping VesselMapping()
+        {
+            return new MemberwiseSerializationMapping<Vessel>()
+            {
+                ("display_name", new Member<Vessel, bool>( o => o.enabled )),
+                ("root_part", new Member<Vessel, Transform>( ObjectContext.Ref, o => o.RootPart )),
+                ("on_after_recalculate_parts", new Member<Vessel, Action>( o => o.OnAfterRecalculateParts ))
+            };
         }
     }
 }

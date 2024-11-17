@@ -1,4 +1,5 @@
-﻿using HSP.ControlSystems;
+﻿using HSP.Trajectories;
+using HSP.ControlSystems;
 using HSP.ControlSystems.Controls;
 using HSP.ResourceFlow;
 using HSP.Vessels;
@@ -76,7 +77,7 @@ namespace HSP.Vanilla.Components
             Vessel vessel = this.transform.GetVessel();
             if( vessel != null )
             {
-                vessel.PhysicsObject.AddForceAtPosition( this.ThrustTransform.forward * this.Thrust, this.ThrustTransform.position );
+                vessel.PhysicsTransform.AddForceAtPosition( this.ThrustTransform.forward * this.Thrust, this.ThrustTransform.position );
             }
         }
 

@@ -119,6 +119,8 @@ Shader "Hidden/Atmosphere"
 						float2 toSun = raySphere(inScatterPoint, dirToSun, _Center, _MaxRadius);
 						float lengthToSun = toSun.y;
 
+						/// terminator blocking the rays, version 1 (crude, sharp)
+
 						//float2 hitSurface = raySphere(inScatterPoint, dirToSun, _Center, _MinRadius);
 						//lengthToSun = min(hitSurface.x + hitSurface.y, lengthToSun);
 						//if (hitSurface.x != maxFloat) // this can be done to black out the side behind the sun.
@@ -129,7 +131,9 @@ Shader "Hidden/Atmosphere"
 						float sunRayOpticalDepth = opticalDepth(inScatterPoint, dirToSun, lengthToSun); // average density of the ray from the point to the edge in the direction towards the sun.
 						viewRayOpticalDepth = opticalDepth(inScatterPoint, -rayDir, stepSize * i); // * i to get the entire ray up to the current point.
 
-						//if (i != _InScatteringPointCount - 1) // terminator and blacking out the back side, different way to do it.
+						/// terminator blocking the rays, version 2 (softer)
+
+						//if (i != _InScatteringPointCount - 1)
 						//{
 						//	float2 hitSurface = raySphere(inScatterPoint, dirToSun, _Center, _MinRadius);
 						//	if (hitSurface.x != maxFloat)

@@ -58,20 +58,20 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\HSP\Layer.cs" />
+    <Compile Include="Assets\HSP\Time\TimeManager.cs" />
+    <Compile Include="Assets\HSP\SceneCamera.cs" />
     <Compile Include="Assets\HSP\Utils\InertiaUtils.cs" />
     <Compile Include="Assets\HSP\HSPEvent.cs" />
-    <Compile Include="Assets\HSP\Layer.cs" />
+    <Compile Include="Assets\HSP\PhysicalConstants.cs" />
     <Compile Include="Assets\HSP\HSPEventListenerAttribute.cs" />
     <Compile Include="Assets\HSP\Utils\CoordinateUtils.cs" />
     <Compile Include="Assets\HSP\IHasMass.cs" />
-    <Compile Include="Assets\HSP\Time\TimeManager.cs" />
     <Compile Include="Assets\HSP\Utils\RollingStatistics.cs" />
-    <Compile Include="Assets\HSP\SceneCamera.cs" />
     <Compile Include="Assets\HSP\HumanSpaceProgram.cs" />
     <Compile Include="Assets\HSP\TransformRedirect.cs" />
     <Compile Include="Assets\HSP\Utils\IOHelper.cs" />
     <Compile Include="Assets\HSP\PIDLoop.cs" />
-    <Compile Include="Assets\HSP\IPhysicsObject.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP\___HSP.asmdef" />
@@ -930,6 +930,10 @@
     <ProjectReference Include="_UnityEngine.csproj">
       <Project>{29A28F5C-31DD-0068-5BB5-61A0CFFA20FA}</Project>
       <Name>_UnityEngine</Name>
+    </ProjectReference>
+    <ProjectReference Include="_UnityPlus.csproj">
+      <Project>{49D4BC99-1C12-776F-CC5E-D6CE66E348FE}</Project>
+      <Name>_UnityPlus</Name>
     </ProjectReference>
     <ProjectReference Include="_UnityPlus.AssetManagement.csproj">
       <Project>{7122B491-FD2B-2B59-D391-006CB0AE788B}</Project>

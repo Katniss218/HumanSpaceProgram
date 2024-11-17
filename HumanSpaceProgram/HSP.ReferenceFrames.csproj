@@ -58,14 +58,21 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.ReferenceFrames\CenteredReferenceFrame.cs" />
-    <Compile Include="Assets\HSP.ReferenceFrames\ReferenceFrameTransform.cs" />
+    <Compile Include="Assets\HSP.ReferenceFrames\ReferenceFrames\CenteredReferenceFrame.cs" />
+    <Compile Include="Assets\HSP.ReferenceFrames\INonInertialReferenceFrame.cs" />
     <Compile Include="Assets\HSP.ReferenceFrames\ReferenceFrameUtils.cs" />
-    <Compile Include="Assets\HSP.ReferenceFrames\OrientedReferenceFrame.cs" />
-    <Compile Include="Assets\HSP.ReferenceFrames\IReferenceFrameSwitchResponder.cs" />
-    <Compile Include="Assets\HSP.ReferenceFrames\IReferenceFrame.cs" />
+    <Compile Include="Assets\HSP.ReferenceFrames\ReferenceFrameTransformUtils.cs" />
+    <Compile Include="Assets\HSP.ReferenceFrames\IReferenceFrameTransform_Ex.cs" />
     <Compile Include="Assets\HSP.ReferenceFrames\SceneReferenceFrameManager.cs" />
-    <Compile Include="Assets\HSP.ReferenceFrames\ActiveObjectManager.cs" />
+    <Compile Include="Assets\HSP.ReferenceFrames\ReferenceFrames\CenteredNonInertialReferenceFrame.cs" />
+    <Compile Include="Assets\HSP.ReferenceFrames\ReferenceFrames\OrientedNonInertialReferenceFrame.cs" />
+    <Compile Include="Assets\HSP.ReferenceFrames\IPhysicsTransform.cs" />
+    <Compile Include="Assets\HSP.ReferenceFrames\ReferenceFrames\CenteredInertialReferenceFrame.cs" />
+    <Compile Include="Assets\HSP.ReferenceFrames\ReferenceFrames\OrientedInertialReferenceFrame.cs" />
+    <Compile Include="Assets\HSP.ReferenceFrames\IReferenceFrameTransform.cs" />
+    <Compile Include="Assets\HSP.ReferenceFrames\IPhysicsTransform_Ex.cs" />
+    <Compile Include="Assets\HSP.ReferenceFrames\ReferenceFrames\OrientedReferenceFrame.cs" />
+    <Compile Include="Assets\HSP.ReferenceFrames\IReferenceFrame.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.ReferenceFrames\___HSP.ReferenceFrames.asmdef" />
@@ -916,6 +923,10 @@
     <ProjectReference Include="_UnityEngine.csproj">
       <Project>{29A28F5C-31DD-0068-5BB5-61A0CFFA20FA}</Project>
       <Name>_UnityEngine</Name>
+    </ProjectReference>
+    <ProjectReference Include="_UnityPlus.csproj">
+      <Project>{49D4BC99-1C12-776F-CC5E-D6CE66E348FE}</Project>
+      <Name>_UnityPlus</Name>
     </ProjectReference>
     <ProjectReference Include="_UnityPlus.AssetManagement.csproj">
       <Project>{7122B491-FD2B-2B59-D391-006CB0AE788B}</Project>

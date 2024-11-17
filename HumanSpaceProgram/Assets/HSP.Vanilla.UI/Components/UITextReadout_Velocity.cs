@@ -1,5 +1,6 @@
-﻿using HSP.ReferenceFrames;
-using HSP.Trajectories;
+﻿using HSP.CelestialBodies;
+using HSP.ReferenceFrames;
+using UnityEngine;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
 
@@ -9,11 +10,23 @@ namespace HSP.Vanilla.UI.Components
     {
         void LateUpdate()
         {
-            var physObj = ActiveObjectManager.ActiveObject == null
+            var activeObj = ActiveVesselManager.ActiveVessel == null
                 ? null
-                : ActiveObjectManager.ActiveObject.GetComponent<FreePhysicsObject>();
+                : ActiveVesselManager.ActiveVessel.ReferenceFrameTransform;
 
-            this.Text = physObj == null ? "" : $"{physObj.Velocity.magnitude:#0} m/s";
+            if( activeObj == null )
+            {
+                this.Text = "";
+            }
+            else
+            {
+                CelestialBody body = CelestialBodyManager.Get( "main" );
+                Vector3Dbl bodySpaceVelocity = body.ReferenceFrameTransform.CenteredInertialReferenceFrame().InverseTransformVelocity( activeObj.AbsoluteVelocity );
+
+                double vel = bodySpaceVelocity.magnitude;
+
+                this.Text = $"{vel:#0} m/s";
+            }
         }
 
         protected internal static T Create<T>( IUIElementContainer parent, UILayoutInfo layout ) where T : UITextReadout_Velocity

@@ -1,0 +1,351 @@
+﻿using HSP.ReferenceFrames;
+using HSP.Time;
+using HSP.Vanilla.Scenes.AlwaysLoadedScene;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using UnityEngine.LowLevel;
+using UnityEngine.PlayerLoop;
+using UnityPlus;
+using UnityPlus.Serialization;
+
+namespace HSP.Vanilla
+{
+    /// <summary>
+    /// A physics transform that is free to move around and respond to forces, but doesn't respond to collisions (other objects can still collide with it).
+    /// </summary>
+    [RequireComponent( typeof( Rigidbody ) )]
+    [DisallowMultipleComponent]
+    public class KinematicReferenceFrameTransform : MonoBehaviour, IReferenceFrameTransform, IPhysicsTransform
+    {
+        public Vector3 Position
+        {
+            get
+            {
+                return _rb.position;
+            }
+            set
+            {
+                // Set both absolute and rigidbody because the call might happen after physics/fixedupdate.
+                _rb.position = value;
+                transform.position = value;
+                var absolutePos = SceneReferenceFrameManager.ReferenceFrame.InverseTransformPosition( value );
+                _actualAbsolutePosition = absolutePos;
+                _requestedAbsolutePosition = absolutePos;
+            }
+        }
+
+        public Vector3Dbl AbsolutePosition
+        {
+            get
+            {
+                return _actualAbsolutePosition;
+            }
+            set
+            {
+                // When setting, both values are set.
+                Vector3 scenePos = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformPosition( value );
+                _actualAbsolutePosition = value;
+                _requestedAbsolutePosition = value;
+                ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, value );
+
+                OnAbsolutePositionChanged?.Invoke();
+                OnAnyValueChanged?.Invoke();
+            }
+        }
+
+        public Quaternion Rotation
+        {
+            get
+            {
+                return _rb.rotation;
+            }
+            set
+            {
+                // Set both absolute and rigidbody because the call might happen after physics/fixedupdate.
+                _rb.rotation = value;
+                transform.rotation = value;
+                var absoluteRot = SceneReferenceFrameManager.ReferenceFrame.InverseTransformRotation( value );
+                _actualAbsoluteRotation = absoluteRot;
+                _requestedAbsoluteRotation = absoluteRot;
+            }
+        }
+
+        public QuaternionDbl AbsoluteRotation
+        {
+            get
+            {
+                return _actualAbsoluteRotation;
+            }
+            set
+            {
+                Quaternion sceneRot = (Quaternion)SceneReferenceFrameManager.ReferenceFrame.InverseTransformRotation( value );
+                _actualAbsoluteRotation = value;
+                _requestedAbsoluteRotation = value;
+                ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, value );
+
+                OnAbsoluteRotationChanged?.Invoke();
+                OnAnyValueChanged?.Invoke();
+            }
+        }
+
+        public Vector3 Velocity
+        {
+            get
+            {
+                return _rb.velocity;
+            }
+            set
+            {
+                _absoluteVelocity = SceneReferenceFrameManager.ReferenceFrame.TransformVelocity( value );
+
+                OnAbsoluteVelocityChanged?.Invoke();
+                OnAnyValueChanged?.Invoke();
+            }
+        }
+
+        public Vector3Dbl AbsoluteVelocity
+        {
+            get
+            {
+                return _absoluteVelocity;
+            }
+            set
+            {
+                _absoluteVelocity = value;
+
+                OnAbsoluteVelocityChanged?.Invoke();
+                OnAnyValueChanged?.Invoke();
+            }
+        }
+
+        public Vector3 AngularVelocity
+        {
+            get
+            {
+                return _rb.angularVelocity;
+            }
+            set
+            {
+                _absoluteAngularVelocity = SceneReferenceFrameManager.ReferenceFrame.TransformAngularVelocity( value );
+
+                OnAbsoluteAngularVelocityChanged?.Invoke();
+                OnAnyValueChanged?.Invoke();
+            }
+        }
+
+        public Vector3Dbl AbsoluteAngularVelocity
+        {
+            get
+            {
+                return _absoluteAngularVelocity;
+            }
+            set
+            {
+                _absoluteAngularVelocity = value;
+
+                OnAbsoluteAngularVelocityChanged?.Invoke();
+                OnAnyValueChanged?.Invoke();
+            }
+        }
+
+        public Vector3 Acceleration => (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformAcceleration( _absoluteAcceleration );
+        public Vector3Dbl AbsoluteAcceleration => _absoluteAcceleration;
+        public Vector3 AngularAcceleration => (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformAngularAcceleration( _absoluteAngularAcceleration );
+        public Vector3Dbl AbsoluteAngularAcceleration => _absoluteAngularAcceleration;
+
+        Vector3Dbl _requestedAbsolutePosition;
+        Vector3Dbl _actualAbsolutePosition;
+        QuaternionDbl _requestedAbsoluteRotation = QuaternionDbl.identity;
+        QuaternionDbl _actualAbsoluteRotation = QuaternionDbl.identity;
+
+        Vector3Dbl _absoluteAcceleration;
+        Vector3Dbl _absoluteAngularAcceleration;
+
+        Vector3Dbl _absoluteVelocity;
+        Vector3Dbl _absoluteAngularVelocity;
+
+
+        public event Action OnAbsolutePositionChanged;
+        public event Action OnAbsoluteRotationChanged;
+        public event Action OnAbsoluteVelocityChanged;
+        public event Action OnAbsoluteAngularVelocityChanged;
+        public event Action OnAnyValueChanged;
+
+        //
+        //
+        //
+
+        public float Mass { get; set; }
+
+        public Vector3 LocalCenterOfMass { get; set; }
+
+        public Vector3 MomentsOfInertia
+        {
+            get => this._rb.inertiaTensor;
+            set => this._rb.inertiaTensor = value;
+        }
+
+        public Quaternion MomentsOfInertiaRotation
+        {
+            get => this._rb.inertiaTensorRotation;
+            set => this._rb.inertiaTensorRotation = value;
+        }
+
+        public bool IsColliding { get; private set; }
+
+        protected new Rigidbody rigidbody => _rb;
+        Rigidbody _rb;
+
+        public void AddForce( Vector3 force )
+        {
+            _absoluteAcceleration += SceneReferenceFrameManager.ReferenceFrame.TransformAcceleration( (Vector3Dbl)force / Mass );
+        }
+
+        public void AddForceAtPosition( Vector3 force, Vector3 position )
+        {
+            Vector3 leverArm = position - this._rb.worldCenterOfMass;
+            Vector3Dbl torque = Vector3Dbl.Cross( force, leverArm );
+            _absoluteAcceleration += SceneReferenceFrameManager.ReferenceFrame.TransformAcceleration( (Vector3Dbl)force / Mass );
+            _absoluteAngularAcceleration += SceneReferenceFrameManager.ReferenceFrame.TransformAngularAcceleration( torque / this.GetInertia( torque.NormalizeToVector3() ) );
+        }
+
+        public void AddTorque( Vector3 torque )
+        {
+            _absoluteAngularAcceleration += SceneReferenceFrameManager.ReferenceFrame.TransformAngularAcceleration( (Vector3Dbl)torque / this.GetInertia( torque.normalized ) );
+        }
+
+        protected virtual void Awake()
+        {
+            if( this.HasComponentOtherThan<IReferenceFrameTransform>( this ) )
+            {
+                Debug.LogWarning( $"Tried to add a {nameof( KinematicReferenceFrameTransform )} to a game object that already has a {nameof( IReferenceFrameTransform )}. This is not allowed. Remove the previous physics object first." );
+                Destroy( this );
+                return;
+            }
+
+            _rb = this.GetComponent<Rigidbody>();
+
+            _rb.useGravity = false;
+            _rb.collisionDetectionMode = CollisionDetectionMode.Discrete; // Continuous (in any of its flavors) "jumps" when sitting on top of something when reference frame switches.
+            _rb.interpolation = RigidbodyInterpolation.None; // DO NOT INTERPOLATE. Doing so will desync `rigidbody.position` and `transform.position`.
+            _rb.isKinematic = true;
+        }
+
+        protected virtual void FixedUpdate()
+        {
+            IReferenceFrame sceneReferenceFrameAfterPhysicsProcessing = SceneReferenceFrameManager.ReferenceFrame.AtUT( TimeManager.UT );
+
+            // `_actualAbsolutePosition` should be up to date due to the callback inside physics step, which was invoked in the previous frame.
+
+            _requestedAbsolutePosition = _actualAbsolutePosition + _absoluteVelocity * TimeManager.FixedDeltaTime;
+            QuaternionDbl deltaRotation = QuaternionDbl.Euler( _absoluteAngularVelocity * TimeManager.FixedDeltaTime * 57.29577951308232 );
+            _requestedAbsoluteRotation = deltaRotation * _actualAbsoluteRotation;
+
+            var requestedPos = (Vector3)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformPosition( _requestedAbsolutePosition );
+            var requestedRot = (Quaternion)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformRotation( _requestedAbsoluteRotation );
+
+            _rb.Move( requestedPos, requestedRot );
+        }
+
+        public virtual void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
+        {
+            Vector3Dbl absolutePosition = this.AbsolutePosition;
+            Vector3 scenePos = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformPosition( absolutePosition );
+            _rb.position = scenePos;
+            transform.position = scenePos;
+            _actualAbsolutePosition = absolutePosition;
+
+            QuaternionDbl absoluteRotation = this.AbsoluteRotation;
+            Quaternion sceneRot = (Quaternion)SceneReferenceFrameManager.ReferenceFrame.InverseTransformRotation( absoluteRotation );
+            _rb.rotation = sceneRot;
+            transform.rotation = sceneRot;
+            _actualAbsoluteRotation = absoluteRotation;
+        }
+
+        protected virtual void OnEnable()
+        {
+            _activeKinematicTransforms.Add( this );
+            _rb.isKinematic = true; // Force kinematic.
+        }
+
+        protected virtual void OnDisable()
+        {
+            _activeKinematicTransforms.Remove( this );
+            _rb.isKinematic = true;
+        }
+
+        protected virtual void OnCollisionEnter( Collision collision )
+        {
+            IsColliding = true;
+        }
+
+        protected virtual void OnCollisionStay( Collision collision )
+        {
+            // `OnCollisionEnter` / Exit are called for every collider.
+            // I've tried using an incrementing/decrementing int with enter/exit, but it wasn't updating correctly, and after some time, there were too many collisions.
+            // Using `OnCollisionStay` prevents desynchronization.
+
+            IsColliding = true;
+        }
+
+        protected virtual void OnCollisionExit( Collision collision )
+        {
+            IsColliding = false;
+        }
+
+
+        public const string ADD_PLAYER_LOOP_SYSTEM = "12431242132131";
+
+        // Imo it's kind of ugly using HSPEvent_STARTUP_IMMEDIATELY to mess with player loop, but it is what it is.
+        [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, ADD_PLAYER_LOOP_SYSTEM )]
+        static void AddPlayerLoopSystem()
+        {
+            PlayerLoopUtils.AddSystem<FixedUpdate, FixedUpdate.PhysicsFixedUpdate>( in _playerLoopSystem );
+        }
+
+        private static PlayerLoopSystem _playerLoopSystem = new PlayerLoopSystem()
+        {
+            type = typeof( SceneReferenceFrameManager ),
+            updateDelegate = InsidePhysicsStep,
+            subSystemList = null
+        };
+
+        static List<KinematicReferenceFrameTransform> _activeKinematicTransforms = new();
+
+        static void InsidePhysicsStep()
+        {
+            // Assume that other objects aren't allowed to get the absolute position/velocity during physics step, as it is undefined (changes) during it.
+            foreach( var t in _activeKinematicTransforms )
+            {
+                t._absoluteVelocity += t._absoluteAcceleration * TimeManager.FixedDeltaTime;
+                t._absoluteAngularVelocity += t._absoluteAngularAcceleration * TimeManager.FixedDeltaTime;
+
+
+                t._absoluteAcceleration = Vector3Dbl.zero;
+                t._absoluteAngularAcceleration = Vector3Dbl.zero;
+
+                t._actualAbsolutePosition = t._requestedAbsolutePosition;
+                t._actualAbsoluteRotation = t._requestedAbsoluteRotation;
+            }
+        }
+
+        [MapsInheritingFrom( typeof( KinematicReferenceFrameTransform ) )]
+        public static SerializationMapping FreePhysicsObjectMapping()
+        {
+            return new MemberwiseSerializationMapping<KinematicReferenceFrameTransform>()
+            {
+                ("mass", new Member<KinematicReferenceFrameTransform, float>( o => o.Mass )),
+                ("local_center_of_mass", new Member<KinematicReferenceFrameTransform, Vector3>( o => o.LocalCenterOfMass )),
+
+                ("DO_NOT_TOUCH", new Member<KinematicReferenceFrameTransform, bool>( o => true, (o, value) => o._rb.isKinematic = true)), // TODO - isKinematic member is a hack.
+
+                ("absolute_position", new Member<KinematicReferenceFrameTransform, Vector3Dbl>( o => o.AbsolutePosition )),
+                ("absolute_rotation", new Member<KinematicReferenceFrameTransform, QuaternionDbl>( o => o.AbsoluteRotation )),
+                ("absolute_velocity", new Member<KinematicReferenceFrameTransform, Vector3Dbl>( o => o.AbsoluteVelocity )),
+                ("absolute_angular_velocity", new Member<KinematicReferenceFrameTransform, Vector3Dbl>( o => o.AbsoluteAngularVelocity ))
+            };
+        }
+    }
+}

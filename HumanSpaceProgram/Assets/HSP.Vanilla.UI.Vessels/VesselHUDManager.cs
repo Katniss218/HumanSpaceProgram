@@ -21,7 +21,7 @@ namespace HSP.Vanilla.UI.Vessels
             if( !instanceExists )
                 return;
 
-            if( ActiveObjectManager.ActiveObject == null )
+            if( ActiveVesselManager.ActiveObject == null )
             {
                 var hud = CanvasManager.Get( CanvasName.BACKGROUND ).AddVesselHUD( vessel );
                 instance._huds.Add( hud );
@@ -47,13 +47,13 @@ namespace HSP.Vanilla.UI.Vessels
             }
         }
 
-        [HSPEventListener( HSPEvent_AFTER_ACTIVE_OBJECT_CHANGED.ID, CREATE_OR_DESTROY_VESSEL_HUDS )]
+        [HSPEventListener( HSPEvent_AFTER_ACTIVE_VESSEL_CHANGED.ID, CREATE_OR_DESTROY_VESSEL_HUDS )]
         private static void AfterActiveObjectChanged()
         {
             if( !instanceExists )
                 return;
 
-            if( ActiveObjectManager.ActiveObject == null )
+            if( ActiveVesselManager.ActiveObject == null )
             {
                 foreach( var vessel in VesselManager.LoadedVessels )
                 {

@@ -1,5 +1,6 @@
 using HSP.Content.Mods;
 using HSP.SceneManagement;
+using HSP.Vanilla.Scenes.MainMenuScene;
 using System;
 using UnityEngine;
 
@@ -31,9 +32,10 @@ namespace HSP.Vanilla.Scenes.AlwaysLoadedScene
         public static AlwaysLoadedManager Instance => instance;
         public static GameObject GameObject => instance.gameObject;
 
+        public bool LoadMainMenu { get; set; } = true;
+
         void Awake()
         {
-#warning TODO - finish here. !!!!!!!!!!!!!!!!!
             // Load mods before caching autorunning methods.
             // Because mods might (WILL and SHOULD) attach autorunning methods via the attributes.
             HumanSpaceProgramModLoader.LoadModAssemblies();
@@ -48,8 +50,10 @@ namespace HSP.Vanilla.Scenes.AlwaysLoadedScene
         {
             HSPEvent.EventManager.TryInvoke( HSPEvent_STARTUP_EARLY.ID );
 
-            //SceneLoader.LoadSceneAsync( MainMenuSceneManager.SCENE_NAME, true, false, null );
-            SceneLoader.LoadSceneAsync( "MainMenu", true, false, null );
+            if( LoadMainMenu )
+            {
+                SceneLoader.LoadSceneAsync( MainMenuSceneManager.SCENE_NAME, true, false, null );
+            }
         }
     }
 }

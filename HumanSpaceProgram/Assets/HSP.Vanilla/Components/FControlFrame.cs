@@ -10,28 +10,15 @@ namespace HSP.Vanilla.Components
     /// </summary>
     public sealed class FControlFrame : MonoBehaviour
     {
-#warning TODO - save this (and in general handle this properly, with a selector in the UI where the player can click "control from here").
-#warning TODO - handle this appropriately (and per-control system)
-        public static FControlFrame VesselControlFrame { get; set; }
-
         /// <summary>
         /// The transform to use as the coordinate system.
         /// </summary>
         [SerializeField]
         private Transform _referenceTransform;
 
-        public static Quaternion GetSceneRotation( FControlFrame frame, Vessel fallback )
+        public Quaternion GetRotation()
         {
-            return frame == null
-                ? fallback.ReferenceTransform.rotation
-                : frame._referenceTransform.rotation;
-        }
-
-        public static QuaternionDbl GetAIRFRotation( FControlFrame frame, Vessel fallback )
-        {
-            return frame == null
-                ? SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( fallback.ReferenceTransform.rotation )
-                : SceneReferenceFrameManager.SceneReferenceFrame.TransformRotation( frame._referenceTransform.rotation );
+            return this._referenceTransform.rotation;
         }
 
         [MapsInheritingFrom( typeof( FControlFrame ) )]

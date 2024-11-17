@@ -82,6 +82,10 @@ namespace HSP.CelestialBodies.Surfaces
 
             quad.SetMesh( mesh );
 
+            //MeshUpdateFlags MESH_UPDATE_FLAGS = MeshUpdateFlags.DontValidateIndices | MeshUpdateFlags.DontNotifyMeshUsers | MeshUpdateFlags.DontRecalculateBounds | MeshUpdateFlags.DontResetBoneBounds;
+            //meshID = quad.tempMesh.GetInstanceID();
+#warning we need to set the mesh to the mesh instance, then call another job to bake everything
+
             edgeSubdivisionRelative.Dispose();
 
             resultVertices.Dispose();

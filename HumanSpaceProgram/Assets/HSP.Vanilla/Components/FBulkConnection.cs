@@ -253,9 +253,9 @@ namespace HSP.Vanilla.Components
             Vessel vessel = this.transform.GetVessel();
             if( vessel != null ) 
             {
-                Vector3Dbl airfAcceleration = GravityUtils.GetNBodyGravityAcceleration( vessel.RootObjTransform.AIRFPosition );
-                Vector3 sceneAcceleration = SceneReferenceFrameManager.SceneReferenceFrame.InverseTransformDirection( (Vector3)airfAcceleration );
-                Vector3 vesselAcceleration = vessel.PhysicsObject.Acceleration;
+                Vector3Dbl airfAcceleration = GravityUtils.GetNBodyGravityAcceleration( vessel.ReferenceFrameTransform.AbsolutePosition );
+                Vector3 sceneAcceleration = SceneReferenceFrameManager.ReferenceFrame.InverseTransformDirection( (Vector3)airfAcceleration );
+                Vector3 vesselAcceleration = vessel.ReferenceFrameTransform.Acceleration;
 
                 // acceleration due to external forces (gravity) minus the acceleration of the vessel.
                 sceneAcceleration -= vesselAcceleration;

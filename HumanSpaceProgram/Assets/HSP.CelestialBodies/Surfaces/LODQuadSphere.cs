@@ -42,7 +42,7 @@ namespace HSP.CelestialBodies.Surfaces
             _quadTree = new LODQuadTree[6];
             for( int i = 0; i < 6; i++ )
             {
-                // temporary, there's no data structure to hold this stuff yet.
+#warning TODO - Move these to some sort of celestial body definition.
                 Material mat = new Material( cbShader );
                 mat.SetTexture( "_MainTex", cbTex[i] );
                 mat.SetFloat( "_Glossiness", 0.05f );
@@ -54,7 +54,7 @@ namespace HSP.CelestialBodies.Surfaces
 
                 _quadTree[i] = new LODQuadTree( new LODQuadTree.Node( null, center, LODQuadTree_NodeUtils.GetSize( lN ) ) );
 
-#warning TODO - there is some funkiness with the collider physics (it acts as if the object was unparented (when unparenting, it changes scene position slightly)).
+#warning TODO - celestial bodies need something that will replace the buildin parenting of colliders with 64-bit parents and update their scene position at all times (fixedupdate + update + lateupdate).
 
                 LODQuad quad = LODQuad.CreateL0( _celestialBody.transform, this, _celestialBody, _quadTree[i].Root, (float)_celestialBody.Radius * QUAD_RANGE_MULTIPLIER, mat, (Direction3D)i );
                 _activeQuads.Add( quad );

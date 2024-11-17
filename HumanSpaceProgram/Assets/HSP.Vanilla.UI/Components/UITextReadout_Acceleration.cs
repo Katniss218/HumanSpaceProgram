@@ -1,6 +1,4 @@
-﻿using HSP.ReferenceFrames;
-using HSP.Trajectories;
-using UnityPlus.UILib;
+﻿using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
 
 namespace HSP.Vanilla.UI.Components
@@ -9,11 +7,12 @@ namespace HSP.Vanilla.UI.Components
     {
         void LateUpdate()
         {
-            var physObj = ActiveObjectManager.ActiveObject == null
+            var activeObj = ActiveVesselManager.ActiveVessel == null
                 ? null
-                : ActiveObjectManager.ActiveObject.GetComponent<FreePhysicsObject>();
+                : ActiveVesselManager.ActiveVessel.ReferenceFrameTransform;
 
-            this.Text = physObj == null ? "" : $"Acceleration: {physObj.Acceleration.magnitude:#0.0} m/s^2";
+#warning TODO - absolute is not very useful.
+            this.Text = activeObj == null ? "" : $"Acceleration: {activeObj.AbsoluteAcceleration.magnitude:#0.0} m/s^2";
         }
 
         protected internal static T Create<T>( IUIElementContainer parent, UILayoutInfo layout ) where T : UITextReadout_Acceleration

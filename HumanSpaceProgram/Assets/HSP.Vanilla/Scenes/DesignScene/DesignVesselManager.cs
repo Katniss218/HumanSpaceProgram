@@ -146,8 +146,8 @@ namespace HSP.Vanilla.Scenes.DesignScene
                 VesselFactory.Destroy( instance._designObj );
                 instance._designObj = null;
             }
-            instance._designObj = VesselFactory.CreatePartless( Vector3Dbl.zero, QuaternionDbl.identity, Vector3.zero, Vector3.zero );
-            ActiveObjectManager.ActiveObject = instance._designObj.RootPart;
+            instance._designObj = VesselFactory.CreatePartless( Vector3Dbl.zero, QuaternionDbl.identity, Vector3Dbl.zero, Vector3Dbl.zero );
+            ActiveVesselManager.ActiveObject = instance._designObj.RootPart;
             instance._designObj.RootPart = obj;
             return true;
         }
@@ -166,7 +166,7 @@ namespace HSP.Vanilla.Scenes.DesignScene
             {
                 instance._designObj.RootPart = null;
                 VesselFactory.Destroy( instance._designObj );
-                ActiveObjectManager.ActiveObject = null;
+                ActiveVesselManager.ActiveObject = null;
                 instance._designObj = null;
                 return true;
             }

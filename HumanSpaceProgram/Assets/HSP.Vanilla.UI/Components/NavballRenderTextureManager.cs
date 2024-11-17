@@ -1,6 +1,4 @@
 ﻿using HSP.CelestialBodies;
-using HSP.ReferenceFrames;
-using HSP.Vanilla.Components;
 using HSP.Vessels;
 using System.Linq;
 using UnityEngine;
@@ -84,14 +82,19 @@ namespace HSP.Vanilla.UI.Components
 
         void LateUpdate()
         {
-            if( ActiveObjectManager.ActiveObject != null )
+            if( ActiveVesselManager.ActiveObject != null )
             {
-                Vessel v = ActiveObjectManager.ActiveObject.GetVessel();
-                Vector3 forward = (Vector3)CelestialBodyManager.CelestialBodies.First().AIRFRotation.GetForwardAxis();
-                Vector3 gravity = -GravityUtils.GetNBodyGravityAcceleration( v.RootObjTransform.AIRFPosition ).NormalizeToVector3();
+                Vessel activeVessel = ActiveVesselManager.ActiveObject.GetVessel();
+
+                if( activeVessel.ReferenceFrameTransform == null )
+                    return;
+
+#warning TODO - get currently most influential body
+                Vector3 forward = (Vector3)CelestialBodyManager.Get( "main" ).ReferenceFrameTransform.AbsoluteRotation.GetForwardAxis();
+                Vector3 gravity = -GravityUtils.GetNBodyGravityAcceleration( activeVessel.ReferenceFrameTransform.AbsolutePosition ).NormalizeToVector3();
                 forward = Vector3.ProjectOnPlane( forward, gravity );
                 NavballOrientation = Quaternion.LookRotation( forward, gravity );
-                VesselOrientation = (Quaternion)FControlFrame.GetAIRFRotation( FControlFrame.VesselControlFrame, v );
+                VesselOrientation = (Quaternion)SelectedControlFrameManager.GetAbsoluteRotation( fallback: activeVessel.ReferenceTransform );
             }
         }
     }

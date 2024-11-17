@@ -59,8 +59,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\HSP.Vanilla.UI.Vessels.Construction\ConstructionSiteHUD.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI.Vessels.Construction\ConstructionSiteHUDManager.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI.Vessels.Construction\OnStartup.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI.Vessels.Construction\ConstructionSiteHUDManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla.UI.Vessels.Construction\___HSP.Vanilla.UI.Vessels.Construction.asmdef" />
@@ -911,6 +911,10 @@
     <ProjectReference Include="_UnityEngine.csproj">
       <Project>{29A28F5C-31DD-0068-5BB5-61A0CFFA20FA}</Project>
       <Name>_UnityEngine</Name>
+    </ProjectReference>
+    <ProjectReference Include="_UnityPlus.csproj">
+      <Project>{49D4BC99-1C12-776F-CC5E-D6CE66E348FE}</Project>
+      <Name>_UnityPlus</Name>
     </ProjectReference>
     <ProjectReference Include="_UnityPlus.AssetManagement.csproj">
       <Project>{7122B491-FD2B-2B59-D391-006CB0AE788B}</Project>

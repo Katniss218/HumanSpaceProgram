@@ -67,6 +67,8 @@ namespace HSP.Vanilla.Scenes.DesignScene
                 }
             }
 
+            // Disabling the parent GameObject before adding the component (and disabling the component itself)
+            //   ensures that Awake/Start of the tool aren't invoked until the tool is selected.
             bool wasActive = instance.gameObject.activeSelf;
             instance.gameObject.SetActive( false );
             T comp = instance.gameObject.AddComponent<T>();
