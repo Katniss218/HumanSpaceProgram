@@ -24,11 +24,32 @@ namespace HSP.Vanilla
         [SerializeField]
         private Transform _activeObject;
 
-#warning TODO - add an interface for types that can be selected by the player? could be a vessel, but you could select part of the vessel to (to launch a specific sub-vessel or something).
+        /// <summary>
+        /// Gets or sets the active vessel.
+        /// </summary>
+        /// <remarks>
+        /// The active object will be set to the reference transform of the active vessel.
+        /// </remarks>
+        public static Vessel ActiveVessel
+        {
+            get => instance._activeVessel;
+            set
+            {
+                if( value == instance._activeVessel )
+                    return;
+
+                instance._activeVessel = value;
+                instance._activeObject = value == null ? null : value.ReferenceTransform;
+                HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_ACTIVE_VESSEL_CHANGED.ID );
+            }
+        }
 
         /// <summary>
-        /// Gets or sets the object that is currently being 'controlled' or viewed by the player.
+        /// Gets or sets the part of the active vessel that is currently being 'controlled' or viewed by the player.
         /// </summary>
+        /// <remarks>
+        /// If the new active object is not part of the active vessel, the active vessel will also be set.
+        /// </remarks>
         public static Transform ActiveObject
         {
             get => instance._activeObject;
@@ -47,20 +68,6 @@ namespace HSP.Vanilla
 
                 instance._activeVessel = vessel;
                 instance._activeObject = value;
-                HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_ACTIVE_VESSEL_CHANGED.ID );
-            }
-        }
-
-        public static Vessel ActiveVessel
-        {
-            get => instance._activeVessel;
-            set
-            {
-                if( value == instance._activeVessel )
-                    return;
-
-                instance._activeVessel = value;
-                instance._activeObject = value == null ? null : value.ReferenceTransform;
                 HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_ACTIVE_VESSEL_CHANGED.ID );
             }
         }
