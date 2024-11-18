@@ -186,12 +186,16 @@ namespace HSP.CelestialBodies.Surfaces
 
         public ILODQuadJob[] jobs = new ILODQuadJob[]
         {
-            new MakeQuadMesh_Job()
+            new MakeQuadMesh_Job(),
+            new Displace_Job(),
+            new SmoothNeighbors_Job(),
         };
 
         public JobHandle[] handles = new JobHandle[]
         {
-            default
+            default,
+            default,
+            default,
         };
 
         void RemeshQuad( LODQuad quad )

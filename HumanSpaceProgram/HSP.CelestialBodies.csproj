@@ -9,8 +9,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace>
-    </RootNamespace>
+    <RootNamespace></RootNamespace>
     <ProjectGuid>{83793330-5AED-C186-5E4B-AAD4BB463469}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -60,8 +59,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\HSP.CelestialBodies\Surfaces\LODQuadTree.cs" />
+    <Compile Include="Assets\HSP.CelestialBodies\Surfaces\ILODQuadJob.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\CelestialBodyManager.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\Atmospheres\AtmosphereRenderer.cs" />
+    <Compile Include="Assets\HSP.CelestialBodies\Surfaces\Displace_Job.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\CelestialBodySurface.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\CelestialBody.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\CelestialBodyFactory.cs" />
@@ -69,8 +70,8 @@
     <Compile Include="Assets\HSP.CelestialBodies\Surfaces\LODQuadSphere.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\GravityUtils.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\Surfaces\LODQuad.cs" />
+    <Compile Include="Assets\HSP.CelestialBodies\Surfaces\SmoothNeighbors_Job.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\Surfaces\LODQuadTree_NodeUtils.cs" />
-    <Compile Include="Assets\HSP.CelestialBodies\Surfaces\ILODQuadJob.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.CelestialBodies\Surfaces\TerrainShader.shader" />

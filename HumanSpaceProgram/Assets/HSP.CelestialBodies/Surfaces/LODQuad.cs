@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
+using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 using static HSP.CelestialBodies.Surfaces.LODQuad.State;
@@ -33,6 +35,11 @@ namespace HSP.CelestialBodies.Surfaces
 
                 public ILODQuadJob[] jobs;
                 public JobHandle[] handles;
+
+                public NativeArray<Vector3> resultVertices;
+                public NativeArray<Vector3> resultNormals;
+                public NativeArray<Vector2> resultUvs;
+                public NativeArray<int> resultTriangles;
             }
         }
 
@@ -89,7 +96,12 @@ namespace HSP.CelestialBodies.Surfaces
                 r.handles[^1].Complete();
 
                 for( int i = 0; i < r.jobs.Length; i++ )
-                    r.jobs[i].Finish( this, r.mesh );
+                    r.jobs[i].Finish( this, r );
+
+                r.resultVertices.Dispose();
+                r.resultNormals.Dispose();
+                r.resultUvs.Dispose();
+                r.resultTriangles.Dispose();
 
                 SetMesh( r.mesh );
             }
@@ -98,18 +110,26 @@ namespace HSP.CelestialBodies.Surfaces
             {
                 rebuild.mesh = new Mesh();
 
+                int numberOfEdges = 1 << this.EdgeSubdivisions; // Fast 2^n for integer types.
+                int numberOfVertices = numberOfEdges + 1;
+                rebuild.resultVertices = new NativeArray<Vector3>( numberOfVertices * numberOfVertices, Allocator.TempJob );
+                rebuild.resultNormals = new NativeArray<Vector3>( numberOfVertices * numberOfVertices, Allocator.TempJob );
+                rebuild.resultUvs = new NativeArray<Vector2>( numberOfVertices * numberOfVertices, Allocator.TempJob );
+                rebuild.resultTriangles = new NativeArray<int>( (numberOfEdges * numberOfEdges) * 6, Allocator.TempJob );
+
                 for( int i = 0; i < rebuild.jobs.Length; i++ )
-                    rebuild.jobs[i].Initialize( this, rebuild.mesh );
+                    rebuild.jobs[i].Initialize( this, rebuild );
 
                 // Schedule<MakeQuadMesh_Job>( rebuild.jobs, rebuild.handles, 0 );
 
-                Type jobType = rebuild.jobs[0].GetType();
                 MethodInfo method = typeof( LODQuad ).GetMethod( nameof( LODQuad.Schedule ), BindingFlags.Static | BindingFlags.Public );
 
                 for( int i = 0; i < rebuild.jobs.Length; i++ )
                 {
+                    Type jobType = rebuild.jobs[i].GetType();
                     method.MakeGenericMethod( jobType ).Invoke( null, new object[] { rebuild.jobs, rebuild.handles, i } );
                 }
+
             }
 
             this.CurrentState = state;
