@@ -16,7 +16,7 @@ namespace HSP.CelestialBodies.Surfaces
         /// <summary>
         /// Calculates the center of a child with the specified index for a given node.
         /// </summary>
-        public static Vector2 GetChildCenter( this LODQuadTree.Node node, int childXIndex, int childYIndex )
+        public static Vector2 GetChildCenter( this LODQuadTree_Old.Node node, int childXIndex, int childYIndex )
         {
             // For both x and y, it should return:
             // - childIndex == 0 => child < parent
@@ -33,14 +33,14 @@ namespace HSP.CelestialBodies.Surfaces
         /// <summary>
         /// Inverse of <see cref="GetChildCenter"/>.
         /// </summary>
-        public static (int childXIndex, int childYIndex) GetChildIndex( this LODQuadTree.Node node )
+        public static (int childXIndex, int childYIndex) GetChildIndex( this LODQuadTree_Old.Node node )
         {
             int x = node.minX == node.Parent.minX ? 0 : 1; // if min/max of a given node matches the min/max of the parent, it's in the min/max quadrant.
             int y = node.minY == node.Parent.minY ? 0 : 1;
             return (x, y);
         }
 
-        public static bool Intersects( this LODQuadTree.Node node, float minX, float minY, float maxX, float maxY )
+        public static bool Intersects( this LODQuadTree_Old.Node node, float minX, float minY, float maxX, float maxY )
         {
             return (node.minX <= maxX && node.maxX >= minX)
                 && (node.minY <= maxY && node.maxY >= minY);

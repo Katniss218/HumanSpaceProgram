@@ -24,10 +24,12 @@ namespace HSP.CelestialBodies.Surfaces
         public int HardLimitSubdivLevel { get; set; } = 20;
 
         [field: SerializeField]
-        LODQuadTree[] _quadTree;
+        LODQuadTree _quadTree;
         CelestialBody _celestialBody;
 
         public const float QUAD_RANGE_MULTIPLIER = 2.0f; // 3.0 makes all joints only between the same subdiv.
+
+        public LODQuadMode Mode { get; }
 
         public static Shader cbShader;
         public static Texture2D[] cbTex;
@@ -40,7 +42,7 @@ namespace HSP.CelestialBodies.Surfaces
 
         void Start()
         {
-            _quadTree = new LODQuadTree[6];
+            _quadTree = new LODQuadTree_Old[6];
             for( int i = 0; i < 6; i++ )
             {
 #warning TODO - Move these to some sort of celestial body definition.
@@ -53,7 +55,7 @@ namespace HSP.CelestialBodies.Surfaces
                 Vector2 center = Vector2.zero;
                 int lN = 0;
 
-                _quadTree[i] = new LODQuadTree( new LODQuadTree.Node( null, center, LODQuadTree_NodeUtils.GetSize( lN ) ) );
+                _quadTree[i] = new LODQuadTree_Old( new LODQuadTree_Old.Node( null, center, LODQuadTree_NodeUtils.GetSize( lN ) ) );
 
 #warning TODO - celestial bodies need something that will replace the buildin parenting of colliders with 64-bit parents and update their scene position at all times (fixedupdate + update + lateupdate).
 
@@ -102,6 +104,9 @@ namespace HSP.CelestialBodies.Surfaces
 
             return true;
         }
+
+#warning INFO - only 1 rebuild per quadtree (so 1 visual and 1 physical) at any given time.
+        // However, this rebuild can be cancelled at any of the stage boundaries, and a new one started.
 
         bool _wasChangedLastFrame = true; // initial value true is important for initial subdivision. This can only be removed if the CB is pre-subdivided to the initial pois ahead of time.
         Vector3Dbl[] _poisAtLastChange = null; // Initial value null is important.

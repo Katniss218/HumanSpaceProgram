@@ -21,6 +21,8 @@ namespace HSP.CelestialBodies.Surfaces
             numberOfEdges = 1 << quad.EdgeSubdivisions; // Fast 2^n for integer types.
             numberOfVertices = numberOfEdges + 1;
 
+            // A quad with subdivision level N will never border more than 1 quad with subdivision level >= N per side.
+            // It can however border more than 1 quad with larger subdivision level than itself.
             edgeSubdivisionRelative = new NativeArray<int>( 4, Allocator.TempJob );
             for( int i = 0; i < edgeSubdivisionRelative.Length; i++ )
             {

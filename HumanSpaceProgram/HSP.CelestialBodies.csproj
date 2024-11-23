@@ -65,6 +65,7 @@
     <Compile Include="Assets\HSP.CelestialBodies\Surfaces\Displace_Job.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\CelestialBodySurface.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\CelestialBody.cs" />
+    <Compile Include="Assets\HSP.CelestialBodies\Surfaces\LODQuadRebuilder.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\CelestialBodyFactory.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\Surfaces\MakeQuadMesh_Job.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\Surfaces\LODQuadSphere.cs" />
