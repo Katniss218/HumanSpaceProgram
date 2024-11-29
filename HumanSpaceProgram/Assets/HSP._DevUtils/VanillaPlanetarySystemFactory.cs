@@ -19,6 +19,7 @@ namespace HSP._DevUtils
         {
             CelestialBody cb = new CelestialBodyFactory( id ) { radius = 696_340_000.0, mass = 1.989e30 }.Create( airfPos, airfRot );
             LODQuadSphere lqs = cb.gameObject.AddComponent<LODQuadSphere>();
+            lqs.Mode = LODQuadMode.VisualAndCollider;
             lqs.PoIGetter = () => VesselManager.LoadedVessels.Select( v => v.ReferenceFrameTransform.AbsolutePosition );
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
@@ -31,6 +32,7 @@ namespace HSP._DevUtils
         {
             CelestialBody cb = new CelestialBodyFactory( id ).Create( Vector3Dbl.zero, airfRot );
             LODQuadSphere lqs = cb.gameObject.AddComponent<LODQuadSphere>();
+            lqs.Mode = LODQuadMode.VisualAndCollider;
             lqs.PoIGetter = () => VesselManager.LoadedVessels.Select( v => v.ReferenceFrameTransform.AbsolutePosition );
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
@@ -44,6 +46,7 @@ namespace HSP._DevUtils
         {
             CelestialBody cb = new CelestialBodyFactory( id ).Create( airfPos, airfRot );
             LODQuadSphere lqs = cb.gameObject.AddComponent<LODQuadSphere>();
+            lqs.Mode = LODQuadMode.VisualAndCollider;
             lqs.PoIGetter = () => VesselManager.LoadedVessels.Select( v => v.ReferenceFrameTransform.AbsolutePosition );
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();

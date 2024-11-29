@@ -1,48 +1,35 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
 using Unity.Collections;
-using UnityEditor.Search;
+using UnityEngine;
 
 namespace HSP.CelestialBodies.Surfaces
 {
     public struct Displace_Job : ILODQuadJob
     {
-        int subdivisions;
         double radius;
-        Vector2 center;
-        int lN;
-        Vector3 origin;
-
-        NativeArray<Vector3> resultVertices;
-
-        float size;
+        Vector3Dbl origin;
 
         int totalVerts;
         int numberOfEdges;
         int numberOfVertices;
 
-        public void Initialize( LODQuad quad, LODQuad.State.Rebuild r )
+        NativeArray<Vector3> resultVertices;
+
+        public LODQuadMode QuadMode => LODQuadMode.VisualAndCollider;
+
+        public void Initialize( LODQuadRebuildData r )
         {
-            subdivisions = quad.EdgeSubdivisions;
-            radius = (float)quad.CelestialBody.Radius;
-            center = quad.Node.Center;
-            lN = quad.SubdivisionLevel;
-            origin = quad.transform.localPosition;
+            radius = (float)r.radius;
+            origin = r.node.SphereCenter * radius;
 
-            size = LODQuadTree_NodeUtils.GetSize( lN );
-
-            numberOfEdges = 1 << subdivisions; // Fast 2^n for integer types.
-            numberOfVertices = numberOfEdges + 1;
+            numberOfEdges = r.numberOfEdges;
+            numberOfVertices = r.numberOfVertices;
             totalVerts = numberOfVertices * numberOfVertices;
 
             resultVertices = r.resultVertices;
         }
 
-        public void Finish( LODQuad quad, LODQuad.State.Rebuild r )
+        public void Finish( LODQuadRebuildData r )
         {
         }
 
@@ -50,13 +37,13 @@ namespace HSP.CelestialBodies.Surfaces
         {
             for( int index = 0; index < totalVerts; index++ )
             {
-                Vector3Dbl posD = (resultVertices[index] + (Vector3Dbl)origin) / radius;
+                Vector3Dbl posD = (resultVertices[index] + origin) / radius;
 
                 Vector3 unitSpherePos = (Vector3)posD;
 
                 Vector3Dbl temporaryHeightOffset_Removelater = posD * 5 * Math.Sin( (unitSpherePos.x + unitSpherePos.y + unitSpherePos.z) * radius );
 
-                resultVertices[index] = (Vector3)(((posD * radius) + temporaryHeightOffset_Removelater) - (Vector3Dbl)origin);
+                resultVertices[index] = (Vector3)(((posD * radius) + temporaryHeightOffset_Removelater) - origin);
             }
         }
     }

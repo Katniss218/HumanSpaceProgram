@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Threading.Tasks;
 using Unity.Collections;
-using Unity.Jobs;
 using UnityEngine;
 
 namespace HSP.CelestialBodies.Surfaces
@@ -11,40 +9,38 @@ namespace HSP.CelestialBodies.Surfaces
     /// </summary>
     public struct MakeQuadMesh_Job : ILODQuadJob
     {
-        int subdivisions;
         double radius;
-        Vector2 center;
-        int lN;
-        Vector3 origin;
+        Vector3Dbl origin;
+        float size;
+        float edgeLength;
+        float minX;
+        float minY;
+        Direction3D face;
+
+        int numberOfEdges;
+        int numberOfVertices;
 
         NativeArray<Vector3> resultVertices;
         NativeArray<Vector3> resultNormals;
         NativeArray<Vector2> resultUvs;
         NativeArray<int> resultTriangles;
 
-        float size;
+        public LODQuadMode QuadMode => LODQuadMode.VisualAndCollider;
 
-        int numberOfEdges;
-        int numberOfVertices;
-        float edgeLength;
-        float minX;
-        float minY;
-
-        public void Initialize( LODQuad quad, LODQuad.State.Rebuild r )
+        public void Initialize( LODQuadRebuildData r )
         {
-            subdivisions = quad.EdgeSubdivisions;
-            radius = (float)quad.CelestialBody.Radius;
-            center = quad.Node.Center;
-            lN = quad.SubdivisionLevel;
-            origin = quad.transform.localPosition;
+#warning TODO - keep the verts in body space (as vector3dbl), turn into mesh-space when finalizing.
+            radius = (float)r.radius;
+            origin = r.node.SphereCenter * radius;
+            size = r.node.Size;
+            face = r.node.Face;
 
-            size = LODQuadTree_NodeUtils.GetSize( lN );
-
-            numberOfEdges = 1 << subdivisions; // Fast 2^n for integer types.
-            numberOfVertices = numberOfEdges + 1;
+            Debug.Log( face );
+            numberOfEdges = r.numberOfEdges;
+            numberOfVertices = r.numberOfVertices;
             edgeLength = size / numberOfEdges; // size represents the edge length of the original square, twice the radius.
-            minX = center.x - (size / 2f); // center minus half the edge length of the cube.
-            minY = center.y - (size / 2f);
+            minX = r.node.FaceCenter.x - (size / 2f); // center minus half the edge length of the cube.
+            minY = r.node.FaceCenter.y - (size / 2f);
 
             resultVertices = r.resultVertices;
             resultNormals = r.resultNormals;
@@ -52,7 +48,7 @@ namespace HSP.CelestialBodies.Surfaces
             resultTriangles = r.resultTriangles;
         }
 
-        public void Finish( LODQuad quad, LODQuad.State.Rebuild r )
+        public void Finish( LODQuadRebuildData r )
         {
             r.mesh.SetVertices( resultVertices );
             r.mesh.SetNormals( resultNormals );
@@ -86,8 +82,6 @@ namespace HSP.CelestialBodies.Surfaces
         public void GenerateCubeSphereFace()
         {
             // The origin of a valid, the center will never be at any of the edges of its ancestors, and will always be at the point where the inner edges of its direct children meet.
-
-            Direction3D face = Direction3DUtils.BasisFromVector( origin.normalized );
 
             if( numberOfVertices > 65535 )
             {
@@ -149,12 +143,11 @@ namespace HSP.CelestialBodies.Surfaces
                     float quadX = (x * edgeLength) + minX; // This might need to be turned into a double perhaps (for large bodies with lots of subdivs).
                     float quadY = (y * edgeLength) + minY;
 
-#warning TODO - if I can replace this by some other coordinate system to get sphere positions, it'll allow these additional 'fake' vertices
                     Vector3Dbl posD = face.GetSpherePointDbl( quadX, quadY );
 
                     Vector3 normal = (Vector3)posD;
 
-                    resultVertices[index] = (Vector3)((posD * radius) - (Vector3Dbl)origin);
+                    resultVertices[index] = (Vector3)((posD * radius) - origin);
 
                     const float margin = 0.0f; // margin can be 0 when the texture wrap mode is set to mirror.
                     resultUvs[index] = new Vector2( quadX * (0.5f - margin) + 0.5f, quadY * (0.5f - margin) + 0.5f );

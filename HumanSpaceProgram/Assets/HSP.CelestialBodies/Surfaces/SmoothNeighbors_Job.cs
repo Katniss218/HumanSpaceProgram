@@ -1,45 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Unity.Collections;
 using UnityEngine;
-using Unity.Collections;
 
 namespace HSP.CelestialBodies.Surfaces
 {
     public struct SmoothNeighbors_Job : ILODQuadJob
     {
-        NativeArray<int> edgeSubdivisionRelative;
-        NativeArray<Vector3> resultVertices;
+        int stepXn;
+        int stepXp;
+        int stepYn;
+        int stepYp;
 
         int numberOfEdges;
         int numberOfVertices;
 
-        public void Initialize( LODQuad quad, LODQuad.State.Rebuild r )
+        NativeArray<Vector3> resultVertices;
+
+        public LODQuadMode QuadMode => LODQuadMode.VisualAndCollider;
+
+        public void Initialize( LODQuadRebuildData r )
         {
-            numberOfEdges = 1 << quad.EdgeSubdivisions; // Fast 2^n for integer types.
-            numberOfVertices = numberOfEdges + 1;
+            numberOfEdges = r.numberOfEdges;
+            numberOfVertices = r.numberOfVertices;
 
             // A quad with subdivision level N will never border more than 1 quad with subdivision level >= N per side.
             // It can however border more than 1 quad with larger subdivision level than itself.
-            edgeSubdivisionRelative = new NativeArray<int>( 4, Allocator.TempJob );
-            for( int i = 0; i < edgeSubdivisionRelative.Length; i++ )
-            {
-                if( quad.Edges[i] == null )
-                {
-                    edgeSubdivisionRelative[i] = 0;
-                    continue;
-                }
-                edgeSubdivisionRelative[i] = quad.Edges[i].SubdivisionLevel - quad.SubdivisionLevel;
-            }
-
+            stepXn = 1 << (r.node.SubdivisionLevel - r.node.Xn.SubdivisionLevel);
+            stepXp = 1 << (r.node.SubdivisionLevel - r.node.Xp.SubdivisionLevel);
+            stepYn = 1 << (r.node.SubdivisionLevel - r.node.Yn.SubdivisionLevel);
+            stepYp = 1 << (r.node.SubdivisionLevel - r.node.Yp.SubdivisionLevel);
             resultVertices = r.resultVertices;
         }
 
-        public void Finish( LODQuad quad, LODQuad.State.Rebuild r )
+        public void Finish( LODQuadRebuildData r )
         {
-            edgeSubdivisionRelative.Dispose();
         }
 
         int GetIndex( int x, int y )
@@ -49,77 +42,73 @@ namespace HSP.CelestialBodies.Surfaces
 
         public void Execute()
         {
-            if( edgeSubdivisionRelative[0] < 0 )
+            if( stepXn < 0 )
             {
-                int step = (1 << -edgeSubdivisionRelative[0]);
                 int x = 0;
-                for( int y = 0; y < numberOfVertices - step; y += step )
+                for( int y = 0; y < numberOfVertices - stepXn; y += stepXn )
                 {
                     int indexMin = GetIndex( x, y );
-                    int indexMax = GetIndex( x, y + step );
-                    for( int y2 = 0; y2 < step; y2++ )
+                    int indexMax = GetIndex( x, y + stepXn );
+                    for( int y2 = 0; y2 < stepXn; y2++ )
                     {
                         int index = GetIndex( x, y + y2 );
                         // find index of interval.
                         // smoothly blend.
 
-                        resultVertices[index] = Vector3.Lerp( resultVertices[indexMin], resultVertices[indexMax], (float)y2 / step );
+                        resultVertices[index] = Vector3.Lerp( resultVertices[indexMin], resultVertices[indexMax], (float)y2 / stepXn );
                     }
                 }
             }
 
-            if( edgeSubdivisionRelative[1] < 0 )
+            if( stepXp != 0 )
             {
-                int step = (1 << -edgeSubdivisionRelative[1]);
                 int x = numberOfVertices - 1;
-                for( int y = 0; y < numberOfVertices - step; y += step )
+                for( int y = 0; y < numberOfVertices - stepXp; y += stepXp )
                 {
                     int indexMin = GetIndex( x, y );
-                    int indexMax = GetIndex( x, y + step );
-                    for( int y2 = 0; y2 < step; y2++ )
+                    int indexMax = GetIndex( x, y + stepXp );
+                    for( int y2 = 0; y2 < stepXp; y2++ )
                     {
                         int index = GetIndex( x, y + y2 );
                         // find index of interval.
                         // smoothly blend.
 
-                        resultVertices[index] = Vector3.Lerp( resultVertices[indexMin], resultVertices[indexMax], (float)y2 / step );
+                        resultVertices[index] = Vector3.Lerp( resultVertices[indexMin], resultVertices[indexMax], (float)y2 / stepXp );
                     }
                 }
             }
 
-            if( edgeSubdivisionRelative[2] < 0 )
+            if( stepYn != 0 )
             {
-                int step = (1 << -edgeSubdivisionRelative[2]);
                 int y = 0;
-                for( int x = 0; x < numberOfVertices - step; x += step )
+                for( int x = 0; x < numberOfVertices - stepYn; x += stepYn )
                 {
                     int indexMin = GetIndex( x, y );
-                    int indexMax = GetIndex( x + step, y );
-                    for( int x2 = 0; x2 < step; x2++ )
+                    int indexMax = GetIndex( x + stepYn, y );
+                    for( int x2 = 0; x2 < stepYn; x2++ )
                     {
                         int index = GetIndex( x + x2, y );
                         // find index of interval.
                         // smoothly blend.
 
-                        resultVertices[index] = Vector3.Lerp( resultVertices[indexMin], resultVertices[indexMax], (float)x2 / step );
+                        resultVertices[index] = Vector3.Lerp( resultVertices[indexMin], resultVertices[indexMax], (float)x2 / stepYn );
                     }
                 }
             }
-            if( edgeSubdivisionRelative[3] < 0 )
+            if( stepYp != 0 )
             {
-                int step = (1 << -edgeSubdivisionRelative[3]);
                 int y = numberOfVertices - 1;
-                for( int x = 0; x < numberOfVertices - step; x += step )
+                for( int x = 0; x < numberOfVertices - stepYp; x += stepYp )
                 {
                     int indexMin = GetIndex( x, y );
-                    int indexMax = GetIndex( x + step, y );
-                    for( int x2 = 0; x2 < step; x2++ )
+                    int indexMax = GetIndex( x + stepYp, y );
+                    for( int x2 = 0; x2 < stepYp; x2++ )
                     {
                         int index = GetIndex( x + x2, y );
                         // find index of interval.
                         // smoothly blend.
 
-                        resultVertices[index] = Vector3.Lerp( resultVertices[indexMin], resultVertices[indexMax], (float)x2 / step );
+                        resultVertices[index] = Vector3.Lerp( resultVertices[indexMin], resultVertices[indexMax], (float)x2 / stepYp );
                     }
                 }
             }

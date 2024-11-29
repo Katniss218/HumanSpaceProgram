@@ -48,21 +48,17 @@ namespace HSP.CelestialBodies.Surfaces
         public LODQuadMode QuadMode { get; }
 
         /// <summary>
-        /// Initialize is called on the main thread to initialize the job.
+        /// Called on the main thread to initialize the job.
         /// </summary>
-        /// <param name="quad"></param>
-        /// <param name="mesh"></param>
-        public void Initialize( LODQuadRebuildData r, LODQuadRebuilder r2 );
+        public void Initialize( LODQuadRebuildData r );
 
         /// <summary>
-        /// Finish is called on the main thread to collect the result and dispose of the job.
+        /// Called on the main thread to collect the result and dispose of the job.
         /// </summary>
-        /// <param name="quad"></param>
-        /// <param name="mesh"></param>
-        public void Finish( LODQuadRebuildData r, LODQuadRebuilder r2 );
+        public void Finish( LODQuadRebuildData r );
 
         /// <summary>
-        /// Filters jobs, returning only the ones used to
+        /// Filters jobs, returning only the ones used in the particular build mode.
         /// </summary>
         /// <param name="jobsInStages">The collection of jobs, split up into stages - jobsInStages[stage][job]</param>
         /// <returns>An array of all jobs matching the specified build mode, and an array containing the indices of the first job from each subsequent stage.</returns>
@@ -72,7 +68,7 @@ namespace HSP.CelestialBodies.Surfaces
             List<int> firstJobPerStage = new();
             foreach( var stage in jobsInStages )
             {
-                int stageStart = jobs.Count - 1;
+                int stageStart = jobs.Count;
                 bool anythingInStageAdded = false;
 
                 foreach( var job in stage )

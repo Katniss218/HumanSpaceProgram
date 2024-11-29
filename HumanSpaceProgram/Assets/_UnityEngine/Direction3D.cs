@@ -100,6 +100,65 @@ namespace UnityEngine
         }
 
         /// <summary>
+        /// Gets the global direction on a cubemap from a face and a local direction on that face.
+        /// </summary>
+        public static Direction3D GetGlobalDirection( Direction3D first, Direction2D local )
+        {
+            return first switch
+            {
+                Direction3D.Xn => local switch
+                {
+                    Direction2D.Xn => Direction3D.Yn,
+                    Direction2D.Xp => Direction3D.Yp,
+                    Direction2D.Yn => Direction3D.Zn,
+                    Direction2D.Yp => Direction3D.Zp,
+                    _ => throw new ArgumentException( $"Invalid direction.", nameof( local ) ),
+                },
+                Direction3D.Xp => local switch
+                {
+                    Direction2D.Xn => Direction3D.Yp,
+                    Direction2D.Xp => Direction3D.Yn,
+                    Direction2D.Yn => Direction3D.Zn,
+                    Direction2D.Yp => Direction3D.Zp,
+                    _ => throw new ArgumentException( $"Invalid direction.", nameof( local ) ),
+                },
+                Direction3D.Yn => local switch
+                {
+                    Direction2D.Xn => Direction3D.Xp,
+                    Direction2D.Xp => Direction3D.Xn,
+                    Direction2D.Yn => Direction3D.Zn,
+                    Direction2D.Yp => Direction3D.Zp,
+                    _ => throw new ArgumentException( $"Invalid direction.", nameof( local ) ),
+                },
+                Direction3D.Yp => local switch
+                {
+                    Direction2D.Xn => Direction3D.Xn,
+                    Direction2D.Xp => Direction3D.Xp,
+                    Direction2D.Yn => Direction3D.Zn,
+                    Direction2D.Yp => Direction3D.Zp,
+                    _ => throw new ArgumentException( $"Invalid direction.", nameof( local ) ),
+                },
+                Direction3D.Zn => local switch
+                {
+                    Direction2D.Xn => Direction3D.Yn,
+                    Direction2D.Xp => Direction3D.Yp,
+                    Direction2D.Yn => Direction3D.Xp,
+                    Direction2D.Yp => Direction3D.Xn,
+                    _ => throw new ArgumentException( $"Invalid direction.", nameof( local ) ),
+                },
+                Direction3D.Zp => local switch
+                {
+                    Direction2D.Xn => Direction3D.Yn,
+                    Direction2D.Xp => Direction3D.Yp,
+                    Direction2D.Yn => Direction3D.Xn,
+                    Direction2D.Yp => Direction3D.Xp,
+                    _ => throw new ArgumentException( $"Invalid direction.", nameof( local ) ),
+                },
+                _ => throw new ArgumentException( $"Invalid direction.", nameof( first ) ),
+            };
+        }
+
+        /// <summary>
         /// Gets the direction where `to` is located in local space of `from`, and where `from` is located in local space of `to`
         /// </summary>
         /// <param name="first">The first 3D axis.</param>
@@ -191,32 +250,16 @@ namespace UnityEngine
             // quad x, y go in range [-1..1]
             Contract.Assert( quadX >= -1 && quadX <= 1, $"{nameof( quadX )} has to be in range [-1..1]." );
             Contract.Assert( quadY >= -1 && quadY <= 1, $"{nameof( quadY )} has to be in range [-1..1]." );
-
-            Vector3Dbl pos;
-            switch( face )
+            var pos = face switch
             {
-                case Direction3D.Xp:
-                    pos = new Vector3Dbl( 1.0, -quadX, quadY );
-                    break;
-                case Direction3D.Xn:
-                    pos = new Vector3Dbl( -1.0, quadX, quadY );
-                    break;
-                case Direction3D.Yp:
-                    pos = new Vector3Dbl( quadX, 1.0, quadY );
-                    break;
-                case Direction3D.Yn:
-                    pos = new Vector3Dbl( -quadX, -1.0, quadY );
-                    break;
-                case Direction3D.Zp:
-                    pos = new Vector3Dbl( quadY, quadX, 1.0 );
-                    break;
-                case Direction3D.Zn:
-                    pos = new Vector3Dbl( -quadY, quadX, -1.0 );
-                    break;
-                default:
-                    throw new ArgumentException( $"Invalid face orientation {face}", nameof( face ) );
-            }
-
+                Direction3D.Xp => new Vector3Dbl( 1.0, -quadX, quadY ),
+                Direction3D.Xn => new Vector3Dbl( -1.0, quadX, quadY ),
+                Direction3D.Yp => new Vector3Dbl( quadX, 1.0, quadY ),
+                Direction3D.Yn => new Vector3Dbl( -quadX, -1.0, quadY ),
+                Direction3D.Zp => new Vector3Dbl( quadY, quadX, 1.0 ),
+                Direction3D.Zn => new Vector3Dbl( -quadY, quadX, -1.0 ),
+                _ => throw new ArgumentException( $"Invalid face orientation {face}", nameof( face ) ),
+            };
             return pos;
         }
 
