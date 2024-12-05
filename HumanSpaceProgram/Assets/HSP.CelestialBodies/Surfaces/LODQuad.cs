@@ -48,7 +48,6 @@ namespace HSP.CelestialBodies.Surfaces
                 MeshFilter mf = gameObject.AddComponent<MeshFilter>();
                 mf.sharedMesh = mesh;
 
-                Debug.Log( mesh );
                 MeshRenderer mr = gameObject.AddComponent<MeshRenderer>();
                 //mr.material = mat;
             }

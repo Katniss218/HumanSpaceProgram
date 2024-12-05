@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace HSP.CelestialBodies.Surfaces
@@ -10,15 +11,12 @@ namespace HSP.CelestialBodies.Surfaces
         /// </summary>
         public LODQuadTreeNode[] newRoots;
 
-        /// <summary>
-        /// List of 4-tuple nodes that were created.
-        /// </summary>
-        public List<(LODQuadTreeNode xnyn, LODQuadTreeNode xpyn, LODQuadTreeNode xnyp, LODQuadTreeNode xpyp)> subdivided;
+        public Dictionary<LODQuadTreeNode, (LODQuadTreeNode xnyn, LODQuadTreeNode xpyn, LODQuadTreeNode xnyp, LODQuadTreeNode xpyp)> subdivided;
 
         /// <summary>
         /// Nodes to make into leaves.
         /// </summary>
-        public List<LODQuadTreeNode> unSubdivided;
+        public HashSet<LODQuadTreeNode> unSubdivided;
 
         public bool AnythingChanged => newRoots != null || subdivided != null || unSubdivided != null;
 
@@ -98,20 +96,21 @@ namespace HSP.CelestialBodies.Surfaces
             }
 
 #warning TODO
-            return changes;
 
             LODQuadTreeNode currentNode = nodesToProcess.Dequeue();
-            int lastProcessedDepth = currentNode.SubdivisionLevel;
-            int lastLevelIndex = 0;
+
+            int currentLevel = currentNode.SubdivisionLevel;
+            List<LODQuadTreeNode> currentLevelNodes = new();
 
             while( currentNode != null )
             {
-                if( currentNode.SubdivisionLevel > lastProcessedDepth )
+                if( currentNode.SubdivisionLevel > currentLevel )
                 {
+                    currentLevel++;
                     // resolve connectivity of subdivided (new) quads.
                     // It's important to do this *between* going deeper and not immediately, because the neighbor we need might not have been subdivided (created) yet.
 
-                    for( int i = lastLevelIndex; i < changes.subdivided.Count; i++ )
+                    foreach( var subdividedNode in currentLevelNodes )
                     {
                         // still do BFS and resolve connectivity between going to a smaller node.
                         // unsubdivided nodes will have their connectivity already resolved.
@@ -127,42 +126,64 @@ namespace HSP.CelestialBodies.Surfaces
 
                         // get node that was subdivided into these 4, get its neighbor in each direction,
                         // and follow down a single step to wchichever child is closest - unless that node is a leaf.
-                        (LODQuadTreeNode subXnYn, LODQuadTreeNode subXpYn, LODQuadTreeNode subXnYp, LODQuadTreeNode subXpYp) = changes.subdivided[i];
-                        LODQuadTreeNode parent = subXnYn.Parent;
-                        LODQuadTreeNode parentXn = parent.Xn;
-                        LODQuadTreeNode parentXp = parent.Xp;
-                        LODQuadTreeNode parentYn = parent.Yn;
-                        LODQuadTreeNode parentYp = parent.Yp;
+                        (LODQuadTreeNode subXnYn, LODQuadTreeNode subXpYn, LODQuadTreeNode subXnYp, LODQuadTreeNode subXpYp) = changes.subdivided[subdividedNode];
+                        LODQuadTreeNode parentsXn = subdividedNode.Xn;
+                        LODQuadTreeNode parentsXp = subdividedNode.Xp;
+                        LODQuadTreeNode parentsYn = subdividedNode.Yn;
+                        LODQuadTreeNode parentsYp = subdividedNode.Yp;
 
                         // Only need to go to the immediate child, since the nodes of the previous size will be already resolved.
-                        subXnYn.Xn = parentXn.IsLeaf ? parentXn : GetClosestChild( parentXn, subXnYn.SphereCenter );
-                        subXnYn.Yn = parentYn.IsLeaf ? parentYn : GetClosestChild( parentYn, subXnYn.SphereCenter );
+                        subXnYn.Xn = changes.GetNeighborToUse( parentsXn, subXnYn.SphereCenter );
+                        subXnYn.Yn = changes.GetNeighborToUse( parentsYn, subXnYn.SphereCenter );
+                        subXnYn.Xp = subXpYn;
+                        subXnYn.Yp = subXnYp;
 
-                        subXpYn.Xp = parentXp.IsLeaf ? parentXp : GetClosestChild( parentXp, subXpYn.SphereCenter );
-                        subXpYn.Yn = parentYn.IsLeaf ? parentYn : GetClosestChild( parentYn, subXpYn.SphereCenter );
+                        subXpYn.Xp = changes.GetNeighborToUse( parentsXp, subXpYn.SphereCenter );
+                        subXpYn.Yn = changes.GetNeighborToUse( parentsYn, subXpYn.SphereCenter );
+                        subXpYn.Xn = subXnYn;
+                        subXpYn.Yp = subXpYp;
 
-                        subXnYp.Xn = parentXn.IsLeaf ? parentXn : GetClosestChild( parentXn, subXnYp.SphereCenter );
-                        subXnYp.Yp = parentYp.IsLeaf ? parentYp : GetClosestChild( parentYp, subXnYp.SphereCenter );
+                        subXnYp.Xn = changes.GetNeighborToUse( parentsXn, subXnYp.SphereCenter );
+                        subXnYp.Yp = changes.GetNeighborToUse( parentsYp, subXnYp.SphereCenter );
+                        subXnYp.Xp = subXpYp;
+                        subXnYp.Yn = subXnYn;
 
-                        subXpYp.Xp = parentXp.IsLeaf ? parentXp : GetClosestChild( parentXp, subXpYp.SphereCenter );
-                        subXpYp.Yp = parentYp.IsLeaf ? parentYp : GetClosestChild( parentYp, subXpYp.SphereCenter );
+                        subXpYp.Xp = changes.GetNeighborToUse( parentsXp, subXpYp.SphereCenter );
+                        subXpYp.Yp = changes.GetNeighborToUse( parentsYp, subXpYp.SphereCenter );
+                        subXpYp.Xn = subXnYp;
+                        subXpYp.Yn = subXpYn;
                     }
+
+                    currentLevelNodes.Clear();
                 }
 
-                lastProcessedDepth = currentNode.SubdivisionLevel;
+                currentLevel = currentNode.SubdivisionLevel;
 
                 if( currentNode.IsLeaf )
                 {
                     if( currentNode.ShouldSubdivide( normalizedPois ) )
                     {
-                        var newNodes = LODQuadTreeNode.CreateChildren( currentNode ); // non-recursive.
-                        changes.subdivided.Add( newNodes );
+                        if( changes.subdivided == null )
+                        {
+                            changes.subdivided = new();
+                        }
+                        var newNodes = LODQuadTreeNode.CreateChildren( currentNode );
+                        changes.subdivided.Add( currentNode, newNodes );
+                        currentLevelNodes.Add( currentNode );
+                        nodesToProcess.Enqueue( newNodes.xnyn );
+                        nodesToProcess.Enqueue( newNodes.xpyn );
+                        nodesToProcess.Enqueue( newNodes.xnyp );
+                        nodesToProcess.Enqueue( newNodes.xpyp );
                     }
                 }
                 else
                 {
                     if( currentNode.ShouldUnsubdivide( normalizedPois ) )
                     {
+                        if( changes.subdivided == null )
+                        {
+                            changes.unSubdivided = new();
+                        }
                         changes.unSubdivided.Add( currentNode );
                     }
                     else
@@ -175,7 +196,10 @@ namespace HSP.CelestialBodies.Surfaces
                     }
                 }
 
-                currentNode = nodesToProcess.Dequeue();
+                if( !nodesToProcess.TryDequeue( out currentNode ) )
+                {
+                    break;
+                }
             }
 
             return changes;
@@ -192,7 +216,7 @@ namespace HSP.CelestialBodies.Surfaces
 
                 foreach( var subdivided4Tuple in this.subdivided )
                 {
-                    subdivided4Tuple.xnyn.Parent.Children = subdivided4Tuple;
+                    subdivided4Tuple.Key.Children = subdivided4Tuple.Value;
                 }
             }
             else
@@ -201,9 +225,23 @@ namespace HSP.CelestialBodies.Surfaces
             }
         }
 
-        public static LODQuadTreeNode GetClosestChild( LODQuadTreeNode node, Vector3Dbl spherePos )
+        public LODQuadTreeNode GetNeighborToUse( LODQuadTreeNode node, Vector3Dbl spherePos )
         {
-            (LODQuadTreeNode xnyn, LODQuadTreeNode xpyn, LODQuadTreeNode xnyp, LODQuadTreeNode xpyp) = node.Children.Value;
+            // get the child (if exists), or self.
+
+            if( node.IsLeaf && this.subdivided != null && !this.subdivided.ContainsKey( node ) ) // was a leaf, and still is a leaf
+            {
+                return node;
+            }
+            else if( this.unSubdivided != null && this.unSubdivided.Contains( node ) ) // was not a leaf, but is now a leaf.
+            {
+                return node;
+            }
+
+            (LODQuadTreeNode xnyn, LODQuadTreeNode xpyn, LODQuadTreeNode xnyp, LODQuadTreeNode xpyp) = node.IsLeaf
+                ? this.subdivided[node]
+                : node.Children.Value;
+
             LODQuadTreeNode closestNode = null;
             double closestDistance = double.MaxValue;
 

@@ -58,6 +58,16 @@ namespace HSP.CelestialBodies.Surfaces
         public void Finish( LODQuadRebuildData r );
 
         /// <summary>
+        /// Clones the instance, copying the persistent settings.
+        /// </summary>
+        /// <remarks>
+        /// NOTE TO IMPLEMENTERS: <br/>
+        /// - The members that are set in <see cref="Initialize"/> don't have to be copied.
+        /// </remarks>
+        /// <returns>The cloned job struct.</returns>
+        public ILODQuadJob Clone();
+
+        /// <summary>
         /// Filters jobs, returning only the ones used in the particular build mode.
         /// </summary>
         /// <param name="jobsInStages">The collection of jobs, split up into stages - jobsInStages[stage][job]</param>

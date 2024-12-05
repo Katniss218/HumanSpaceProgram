@@ -35,7 +35,6 @@ namespace HSP.CelestialBodies.Surfaces
             size = r.node.Size;
             face = r.node.Face;
 
-            Debug.Log( face );
             numberOfEdges = r.numberOfEdges;
             numberOfVertices = r.numberOfVertices;
             edgeLength = size / numberOfEdges; // size represents the edge length of the original square, twice the radius.
@@ -63,6 +62,11 @@ namespace HSP.CelestialBodies.Surfaces
             //meshID = quad.tempMesh.GetInstanceID();
 #warning we need to set the mesh to the mesh instance, then call another job to bake everything
 
+        }
+
+        public ILODQuadJob Clone()
+        {
+            return new MakeQuadMesh_Job();
         }
 
         public void Execute() // Called by Unity from a job thread.

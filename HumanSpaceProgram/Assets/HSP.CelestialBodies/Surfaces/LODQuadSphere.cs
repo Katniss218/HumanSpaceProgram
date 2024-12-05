@@ -35,6 +35,7 @@ namespace HSP.CelestialBodies.Surfaces
         Vector3Dbl[] _poisAtLastChange = null; // Initial value null is important.
 
         LODQuadRebuilder _currentBuild;
+        LODQuadTreeChanges _currentChanges;
 
         public Transform QuadParent => this.transform;
 
@@ -128,11 +129,12 @@ namespace HSP.CelestialBodies.Surfaces
             {
                 double radius = CelestialBody.Radius;
 #warning TODO - rotate pois to be in normalized oriented space
-                LODQuadTreeChanges changes = LODQuadTreeChanges.GetChanges( _quadTree, airfPOIs.Select( p => p / radius ) );
+                LODQuadTreeChanges changes = LODQuadTreeChanges.GetChanges( _quadTree, airfPOIs.Select( p => new Vector3Dbl( 1, 0.3, -0.5 ).normalized * 1.000001 ) );
 
                 if( changes.AnythingChanged )
                 {
                     _currentBuild = LODQuadRebuilder.FromChanges( this, jobs, changes, LODQuadRebuildMode.Visual );
+                    _currentChanges = changes;
                 }
             }
         }
@@ -146,12 +148,13 @@ namespace HSP.CelestialBodies.Surfaces
             if( _currentBuild.IsDone ) // if build finished.
             {
                 IEnumerable<LODQuad> builtQuads = _currentBuild.GetResults();
+                _currentChanges.ApplyChanges( _quadTree ); // apply before querying the tree's nodes.
                 foreach( var quad in builtQuads )
                 {
-                    //if( quad.Node.IsLeaf )
-                    //{
+                    if( quad.Node.IsLeaf )
+                    {
                         quad.Activate();
-                    //}
+                    }
                 }
                 //_currentBuild = null;
             }
@@ -160,8 +163,8 @@ namespace HSP.CelestialBodies.Surfaces
         public ILODQuadJob[][] jobs = new ILODQuadJob[][]
         {
             new ILODQuadJob[] { new MakeQuadMesh_Job(),
-            new Displace_Job(),
-            new SmoothNeighbors_Job(),
+           // new Displace_Job(),
+           // new SmoothNeighbors_Job(),
             }
         };
 

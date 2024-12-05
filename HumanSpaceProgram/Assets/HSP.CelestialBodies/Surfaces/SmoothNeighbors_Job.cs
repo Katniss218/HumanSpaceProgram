@@ -35,6 +35,11 @@ namespace HSP.CelestialBodies.Surfaces
         {
         }
 
+        public ILODQuadJob Clone()
+        {
+            return new SmoothNeighbors_Job();
+        }
+
         int GetIndex( int x, int y )
         {
             return (x * numberOfEdges) + x + y;

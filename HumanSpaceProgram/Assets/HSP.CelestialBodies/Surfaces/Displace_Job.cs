@@ -33,6 +33,11 @@ namespace HSP.CelestialBodies.Surfaces
         {
         }
 
+        public ILODQuadJob Clone()
+        {
+            return new Displace_Job();
+        }
+
         public void Execute()
         {
             for( int index = 0; index < totalVerts; index++ )

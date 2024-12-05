@@ -46,9 +46,9 @@ namespace HSP.CelestialBodies.Surfaces
         /// </summary>
         /// <remarks>
         /// This is equal to the edge length of the quad on its cube face. <br/>
-        /// Starts at 1 and halves with every subdivision.
+        /// Starts at 2 for subdivision level 0, and halves with every subdivision.
         /// </remarks>
-        public float Size => 1.0f / (float)(1 << SubdivisionLevel);
+        public float Size => 2.0f / (float)(1 << SubdivisionLevel);
 
         /// <summary>
         /// The 3D center of the quad. Normalized to the surface of the sphere.
@@ -166,7 +166,7 @@ namespace HSP.CelestialBodies.Surfaces
             LODQuadTreeNode xpyp = new LODQuadTreeNode( subdivisionLevel, center, node.Face, faceCenter );
             xpyp.Parent = node;
 
-            return (xnyp, xpyn, xnyp, xpyp);
+            return (xnyn, xpyn, xnyp, xpyp);
         }
 
         public static int GetChildIndex( int childYIndex, int childXIndex )

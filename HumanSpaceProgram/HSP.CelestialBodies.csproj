@@ -68,12 +68,12 @@
     <Compile Include="Assets\HSP.CelestialBodies\Surfaces\LODQuadRebuilder.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\CelestialBodyFactory.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\Surfaces\MakeQuadMesh_Job.cs" />
+    <Compile Include="Assets\HSP.CelestialBodies\Surfaces\LODQuadTreeNode.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\Surfaces\LODQuadSphere.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\GravityUtils.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\Surfaces\LODQuad.cs" />
-    <Compile Include="Assets\HSP.CelestialBodies\Surfaces\SmoothNeighbors_Job.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\Surfaces\LODQuadTreeChanges.cs" />
-    <Compile Include="Assets\HSP.CelestialBodies\Surfaces\LODQuadTreeNode.cs" />
+    <Compile Include="Assets\HSP.CelestialBodies\Surfaces\SmoothNeighbors_Job.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.CelestialBodies\Surfaces\TerrainShader.shader" />

@@ -231,12 +231,12 @@ namespace UnityEngine
             Contract.Assert( quadY >= -1 && quadY <= 1, $"{nameof( quadY )} has to be in range [-1..1]." );
             var pos = face switch
             {
-                Direction3D.Xp => new Vector3( 1.0f, -quadX, quadY ),
                 Direction3D.Xn => new Vector3( -1.0f, quadX, quadY ),
-                Direction3D.Yp => new Vector3( quadX, 1.0f, quadY ),
+                Direction3D.Xp => new Vector3( 1.0f, -quadX, quadY ),
                 Direction3D.Yn => new Vector3( -quadX, -1.0f, quadY ),
-                Direction3D.Zp => new Vector3( quadY, quadX, 1.0f ),
+                Direction3D.Yp => new Vector3( quadX, 1.0f, quadY ),
                 Direction3D.Zn => new Vector3( -quadY, quadX, -1.0f ),
+                Direction3D.Zp => new Vector3( quadY, quadX, 1.0f ),
                 _ => throw new ArgumentException( $"Invalid face orientation {face}", nameof( face ) ),
             };
             pos.Normalize(); // unit sphere.
@@ -252,12 +252,12 @@ namespace UnityEngine
             Contract.Assert( quadY >= -1 && quadY <= 1, $"{nameof( quadY )} has to be in range [-1..1]." );
             var pos = face switch
             {
-                Direction3D.Xp => new Vector3Dbl( 1.0, -quadX, quadY ),
                 Direction3D.Xn => new Vector3Dbl( -1.0, quadX, quadY ),
-                Direction3D.Yp => new Vector3Dbl( quadX, 1.0, quadY ),
+                Direction3D.Xp => new Vector3Dbl( 1.0, -quadX, quadY ),
                 Direction3D.Yn => new Vector3Dbl( -quadX, -1.0, quadY ),
-                Direction3D.Zp => new Vector3Dbl( quadY, quadX, 1.0 ),
+                Direction3D.Yp => new Vector3Dbl( quadX, 1.0, quadY ),
                 Direction3D.Zn => new Vector3Dbl( -quadY, quadX, -1.0 ),
+                Direction3D.Zp => new Vector3Dbl( quadY, quadX, 1.0 ),
                 _ => throw new ArgumentException( $"Invalid face orientation {face}", nameof( face ) ),
             };
             return pos;

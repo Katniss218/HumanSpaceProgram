@@ -33,27 +33,41 @@ namespace HSP.CelestialBodies.Surfaces
         private ILODQuadJob[] _jobs;
         private int[] _firstJobPerStage; // index of the first job in the given stage
 
-        private int _stageCount => _firstJobPerStage.Length; // how many frames it will take from start to finish.
+        public int StageCount => _firstJobPerStage.Length; // how many frames it will take from start to finish.
 
-        private int _nextStage = 0;
-        private int _jobBeingBuilt = -1; // index of the last job in sequence in the stage that's currently being built.
+        /// <summary>
+        /// Stage currently being built.
+        /// </summary>
+        public int LastStartedStage { get; private set; } = -1;
+        /// <summary>
+        /// Last stage that was completed.
+        /// </summary>
+        public int LastFinishedStage { get; private set; } = -1;
 
-        LODQuadSphere sphere;
-        private LODQuadRebuildMode _buildMode;
+        public bool IsDone => LastFinishedStage == (StageCount - 1);
 
-        public bool IsDone => _nextStage == (_firstJobPerStage.Length + 1);
+        LODQuadSphere _sphere;
+        LODQuadRebuildMode _buildMode;
+
+        private LODQuadRebuilder()
+        {
+        }
 
         private void InitializeBuild( LODQuadRebuildData r )
         {
             r.mesh = new Mesh();
-            r.jobs = this._jobs;
+            r.jobs = new ILODQuadJob[this._jobs.Length];
+            for( int i = 0; i < this._jobs.Length; i++ )
+            {
+                r.jobs[i] = this._jobs[i].Clone();
+            }
             r.handles = new JobHandle[this._jobs.Length];
 
-            int numberOfEdges = 1 << sphere.EdgeSubdivisions; // Fast 2^n for integer types.
+            int numberOfEdges = 1 << _sphere.EdgeSubdivisions; // Fast 2^n for integer types.
             int numberOfVertices = numberOfEdges + 1;
             r.numberOfVertices = numberOfVertices;
             r.numberOfEdges = numberOfEdges;
-            r.radius = sphere.CelestialBody.Radius;
+            r.radius = _sphere.CelestialBody.Radius;
             r.resultVertices = new NativeArray<Vector3>( numberOfVertices * numberOfVertices, Allocator.Persistent );
             r.resultNormals = new NativeArray<Vector3>( numberOfVertices * numberOfVertices, Allocator.Persistent );
             r.resultUvs = new NativeArray<Vector2>( numberOfVertices * numberOfVertices, Allocator.Persistent );
@@ -62,7 +76,7 @@ namespace HSP.CelestialBodies.Surfaces
 
         private void FinalizeBuild( LODQuadRebuildData r )
         {
-            r.quad = LODQuad.CreateInactive( sphere, r.node, r.mesh );
+            r.quad = LODQuad.CreateInactive( _sphere, r.node, r.mesh );
             r.resultVertices.Dispose();
             r.resultNormals.Dispose();
             r.resultUvs.Dispose();
@@ -91,7 +105,7 @@ namespace HSP.CelestialBodies.Surfaces
                 throw new InvalidOperationException( $"{nameof( LODQuadRebuilder )}.{nameof( Build )} was called, but the rebuild is already finished." );
             }
 
-            if( _nextStage == 0 )
+            if( LastStartedStage == -1 )
             {
                 foreach( var quad in _quads )
                 {
@@ -99,28 +113,38 @@ namespace HSP.CelestialBodies.Surfaces
                 }
             }
 
-            if( _jobBeingBuilt != -1 )
-            {
-                int stageStart = _nextStage == 0 ? _firstJobPerStage[0] : _firstJobPerStage[_nextStage - 1];
-                int stageEnd = (_firstJobPerStage.Length > _nextStage) ? _firstJobPerStage[_nextStage] : _jobs.Length;
+            // FINISH CURRENT
 
-                // 'await' the previous stage (should have an entire frame worth of time to finish)
+            if( LastStartedStage > LastFinishedStage )
+            {
+                int currentStage = LastStartedStage;
+
+                int firstJob = currentStage < 0
+                    ? _firstJobPerStage[0]
+                    : _firstJobPerStage[currentStage];
+                int lastJob = (currentStage + 1) < StageCount
+                    ? _firstJobPerStage[currentStage + 1]
+                    : _jobs.Length;
+
                 foreach( var quad in _quads )
                 {
-#warning TODO - some jobs aren't finished or something?
-                    quad.handles[stageEnd - 1].Complete();
+                    quad.handles[lastJob - 1].Complete();
 
-                    foreach( var job in quad.jobs[stageStart..stageEnd] )
-                        job.Finish( quad );
+                    foreach( var job in quad.jobs[firstJob..lastJob] )
+                    {
+                        try
+                        {
+                            job.Finish( quad );
+                        }
+                        catch( Exception ex )
+                        {
+                            Debug.LogError( $"Exception occurred while finishing a stage {currentStage} job of type '{job.GetType()}' on body '{_sphere.CelestialBody}'." );
+                            Debug.LogException( ex );
+                        }
+                    }
                 }
 
-                _jobBeingBuilt = -1;
-            }
-
-            // advance to the next stage, until there are stages to build.
-            if( _jobBeingBuilt == -1 )
-            {
-                _nextStage++;
+                LastFinishedStage++;
 
                 if( IsDone )
                 {
@@ -130,17 +154,36 @@ namespace HSP.CelestialBodies.Surfaces
                     }
                     return;
                 }
+            }
 
-                _jobBeingBuilt = _nextStage;
+            // START NEXT
 
-                int stageStart = _nextStage == 0 ? _firstJobPerStage[0] : _firstJobPerStage[_nextStage - 1];
-                int stageEnd = (_firstJobPerStage.Length > _nextStage) ? _firstJobPerStage[_nextStage] : _jobs.Length;
+            if( LastStartedStage == LastFinishedStage )
+            {
+                int currentStage = LastStartedStage + 1;
+
+                int firstJob = currentStage < 0
+                    ? _firstJobPerStage[0]
+                    : _firstJobPerStage[currentStage];
+                int lastJob = (currentStage + 1) < StageCount
+                    ? _firstJobPerStage[currentStage + 1]
+                    : _jobs.Length;
 
                 // Initialize everything first, because they might talk to each other.
                 foreach( var quad in _quads )
                 {
-                    foreach( var job in quad.jobs[stageStart..stageEnd] )
-                        job.Initialize( quad );
+                    foreach( var job in quad.jobs[firstJob..lastJob] )
+                    {
+                        try
+                        {
+                            job.Initialize( quad );
+                        }
+                        catch( Exception ex )
+                        {
+                            Debug.LogError( $"Exception occurred while initializing a stage {currentStage} job of type '{job.GetType()}' on body '{_sphere.CelestialBody}'." );
+                            Debug.LogException( ex );
+                        }
+                    }
                 }
 
                 MethodInfo method = typeof( LODQuadRebuilder ).GetMethod( nameof( LODQuadRebuilder.Schedule ), BindingFlags.Static | BindingFlags.NonPublic );
@@ -148,7 +191,7 @@ namespace HSP.CelestialBodies.Surfaces
                 // Schedule once they're done talking to each other.
                 foreach( var quad in _quads )
                 {
-                    for( int i = stageStart; i < stageEnd; i++ )
+                    for( int i = firstJob; i < lastJob; i++ )
                     {
                         // Schedule<MakeQuadMesh_Job>( quad._jobsPerStage[_stageBeingBuilt][i], quad.handlesPerStage[_stageBeingBuilt][i], i );
 
@@ -158,7 +201,7 @@ namespace HSP.CelestialBodies.Surfaces
                     }
                 }
 
-                _nextStage++;
+                LastStartedStage++;
             }
         }
 
@@ -169,6 +212,7 @@ namespace HSP.CelestialBodies.Surfaces
                 throw new InvalidOperationException( $"{nameof( LODQuadRebuilder )}.{nameof( GetResults )} was called, but the rebuild hasn't been finished yet." );
             }
 
+#warning TODO - This can be called before the jobs have finished executing.
             return _quads.Select( q => q.quad );
         }
 
@@ -182,7 +226,7 @@ namespace HSP.CelestialBodies.Surfaces
         {
             LODQuadRebuilder rebuilder = new LODQuadRebuilder();
 
-            rebuilder.sphere = sphere;
+            rebuilder._sphere = sphere;
             (rebuilder._jobs, rebuilder._firstJobPerStage) = ILODQuadJob.FilterJobs( jobsInStages, buildMode );
             rebuilder._buildMode = buildMode;
             rebuilder._quads = GetQuadsToBuild( changes );
@@ -211,41 +255,44 @@ namespace HSP.CelestialBodies.Surfaces
         {
             LODQuadRebuildData[] quads = new LODQuadRebuildData[(changes.newRoots?.Length ?? 0) + (changes.subdivided?.Count * 4 ?? 0)];
 
-            int i = 0;
+            int quadIndex = 0;
+            int lastQuadIndex = 0;
             if( changes.newRoots != null )
             {
-                int end = i + changes.newRoots.Length;
-                for( ; i < end; i++ )
+                for( quadIndex = 0; quadIndex < changes.newRoots.Length; quadIndex++ )
                 {
-                    quads[i] = new LODQuadRebuildData()
+                    quads[quadIndex] = new LODQuadRebuildData()
                     {
-                        node = changes.newRoots[i],
+                        node = changes.newRoots[quadIndex],
                     };
                 }
+                lastQuadIndex += quadIndex;
             }
 
             if( changes.subdivided != null )
             {
-                int end = i + changes.subdivided.Count;
-                for( ; i < end; i++ )
+                quadIndex = 0;
+                foreach( var subdivided in changes.subdivided.Values )
                 {
-                    quads[(i * 4)] = new LODQuadRebuildData()
+                    quads[lastQuadIndex + (quadIndex * 4)] = new LODQuadRebuildData()
                     {
-                        node = changes.subdivided[i].xnyn,
+                        node = subdivided.xnyn,
                     };
-                    quads[(i * 4) + 1] = new LODQuadRebuildData()
+                    quads[lastQuadIndex + (quadIndex * 4) + 1] = new LODQuadRebuildData()
                     {
-                        node = changes.subdivided[i].xpyn,
+                        node = subdivided.xpyn,
                     };
-                    quads[(i * 4) + 2] = new LODQuadRebuildData()
+                    quads[lastQuadIndex + (quadIndex * 4) + 2] = new LODQuadRebuildData()
                     {
-                        node = changes.subdivided[i].xnyp,
+                        node = subdivided.xnyp,
                     };
-                    quads[(i * 4) + 3] = new LODQuadRebuildData()
+                    quads[lastQuadIndex + (quadIndex * 4) + 3] = new LODQuadRebuildData()
                     {
-                        node = changes.subdivided[i].xpyp,
+                        node = subdivided.xpyp,
                     };
+                    quadIndex++;
                 }
+                lastQuadIndex += quadIndex;
             }
 
             return quads;
