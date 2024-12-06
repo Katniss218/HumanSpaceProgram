@@ -28,7 +28,7 @@ namespace HSP.CelestialBodies.Surfaces
 
         public const float QUAD_RANGE_MULTIPLIER = 2.0f; // 3.0 makes all joints only between the same subdiv.
 
-#warning TODO - remove setter.
+#warning TODO - Setter causes desyncs with existing quads
         public LODQuadMode Mode { get; set; }
 
         public Func<IEnumerable<Vector3Dbl>> PoIGetter { get; set; }
@@ -38,10 +38,23 @@ namespace HSP.CelestialBodies.Surfaces
         LODQuadRebuilder _currentBuild;
         LODQuadTreeChanges _currentChanges;
 
+        Dictionary<LODQuadTreeNode, LODQuad> allQuads = new();
+
         public Transform QuadParent => this.transform;
 
         public static Shader cbShader;
         public static Texture2D[] cbTex;
+
+
+        ILODQuadJob[][] jobs = new ILODQuadJob[][]
+        {
+            new ILODQuadJob[]
+            {
+                new MakeQuadMesh_Job(),
+                new Displace_Job(),
+                new SmoothNeighbors_Job(),
+            }
+        };
 
         void Awake()
         {
@@ -71,7 +84,7 @@ namespace HSP.CelestialBodies.Surfaces
                 || Math.Abs( lhs.z - rhs.z ) >= threshold;
         }
 
-        private bool PoisChanged( Vector3Dbl[] newPois )
+        private bool PoisChanged( Vector3Dbl[] newPois, double maxDelta )
         {
             if( _oldPois == null )
                 return true;
@@ -81,7 +94,7 @@ namespace HSP.CelestialBodies.Surfaces
 
             for( int i = 0; i < newPois.Length; i++ )
             {
-                if( ApproximatelyDifferent( newPois[i], _oldPois[i], 0.5 ) )
+                if( ApproximatelyDifferent( newPois[i], _oldPois[i], maxDelta ) )
                 {
                     return true;
                 }
@@ -106,7 +119,15 @@ namespace HSP.CelestialBodies.Surfaces
             }
         }
 
-        void TryRebuild()
+        void OnDestroy()
+        {
+            if( _currentBuild != null )
+            {
+                _currentBuild.Dispose();
+            }
+        }
+
+        private void TryRebuild()
         {
             Vector3Dbl pos = this.CelestialBody.ReferenceFrameTransform.AbsolutePosition;
             QuaternionDbl rot = this.CelestialBody.ReferenceFrameTransform.AbsoluteRotation;
@@ -114,20 +135,20 @@ namespace HSP.CelestialBodies.Surfaces
 
             Vector3Dbl[] localPois = PoIGetter.Invoke().Select( p => rot.Inverse() * ((p - pos) / scale) ).ToArray();
 
-            if( PoisChanged( localPois ) )
+            if( PoisChanged( localPois, 0.5 / scale ) )
             {
                 LODQuadTreeChanges changes = LODQuadTreeChanges.GetChanges( _quadTree, localPois );
 
                 if( changes.AnythingChanged )
                 {
                     _oldPois = localPois;
-                    _currentBuild = LODQuadRebuilder.FromChanges( this, jobs, changes, LODQuadRebuildMode.Visual );
+                    _currentBuild = LODQuadRebuilder.FromChanges( this, jobs, changes, LODQuadRebuildMode.Visual, LODQuadRebuilder.BuildSettings.IncludeNeighborsOfChanged );
                     _currentChanges = changes;
                 }
             }
         }
 
-        void TryBuild()
+        private void TryBuild()
         {
             if( !_currentBuild.IsDone )
             {
@@ -135,28 +156,62 @@ namespace HSP.CelestialBodies.Surfaces
             }
             if( _currentBuild.IsDone ) // if build finished.
             {
-                IEnumerable<LODQuad> builtQuads = _currentBuild.GetResults();
-                _currentChanges.ApplyChanges( _quadTree ); // apply before querying the tree's nodes.
-                foreach( var quad in builtQuads )
+                foreach( var node in _currentChanges.GetRemovedNodes() )
                 {
-                    if( quad.Node.IsLeaf )
+                    if( allQuads.Remove( node, out var quad ) ) // destroy the children of unsubdivided nodes.
+                    {
+                        Destroy( quad.gameObject );
+                    }
+                }
+
+                foreach( var node in _currentChanges.GetLeafNodesDueToRemoval() )
+                {
+                    if( allQuads.TryGetValue( node, out var quad ) )  // activate the existing unsubdivided nodes.
+                    {
+                        if( quad.IsActive )
+                        {
+                            Debug.LogError( $"Quad was already active." );
+                        }
+                        else
+                        {
+                            quad.Activate();
+                        }
+                    }
+                }
+
+                _currentChanges.ApplyTo( _quadTree );
+
+                foreach( var quad in _currentBuild.GetResults() )
+                {
+                    if( allQuads.Remove( quad.Node, out var existingQuad ) ) // existing leaf was refreshed.
+                    {
+                        Destroy( existingQuad.gameObject );
+                    }
+
+                    if( quad.Node.Parent != null )
+                    {
+                        if( allQuads.TryGetValue( quad.Node.Parent, out var parentQuad ) ) // deactivate the parents of subdivided nodes.
+                        {
+                            if( !parentQuad.IsActive )
+                            {
+                                //Debug.LogError( $"Quad was already inactive." ); // not an error, technically normal (can be when a node subdivides more than once in a frame).
+                            }
+                            else
+                            {
+                                parentQuad.Deactivate();
+                            }
+                        }
+                    }
+
+                    allQuads.Add( quad.Node, quad );
+
+                    if( quad.Node.IsLeaf )      // activate the leaves of subdivided chains.
                     {
                         quad.Activate();
                     }
-#warning TODO - get quads to delete as well.
                 }
                 _currentBuild = null;
             }
         }
-
-        public ILODQuadJob[][] jobs = new ILODQuadJob[][]
-        {
-            new ILODQuadJob[] { new MakeQuadMesh_Job(),
-            new Displace_Job(),
-            new SmoothNeighbors_Job(),
-            }
-        };
-
-        // ondestroy delete itself?
     }
 }

@@ -9,24 +9,101 @@ namespace HSP.CelestialBodies.Surfaces
         /// <summary>
         /// An array of 6 root elements. Only non-null if the tree was not initialized yet.
         /// </summary>
-        public LODQuadTreeNode[] newRoots;
+        LODQuadTreeNode[] newRoots;
 
-        public Dictionary<LODQuadTreeNode, (LODQuadTreeNode xnyn, LODQuadTreeNode xpyn, LODQuadTreeNode xnyp, LODQuadTreeNode xpyp)> subdivided;
+        Dictionary<LODQuadTreeNode, (LODQuadTreeNode xnyn, LODQuadTreeNode xpyn, LODQuadTreeNode xnyp, LODQuadTreeNode xpyp)> subdivided;
 
         /// <summary>
         /// Nodes to make into leaves.
         /// </summary>
-        public HashSet<LODQuadTreeNode> unSubdivided;
+        HashSet<LODQuadTreeNode> unSubdivided;
 
         public bool AnythingChanged => newRoots != null || subdivided != null || unSubdivided != null;
 
+        public int AddedCount => ((newRoots?.Length) ?? 0) + ((subdivided?.Count * 4) ?? 0);
+
+        private LODQuadTreeChanges()
+        {
+        }
+
         /// <summary>
-        /// Computes a map of children to add to existing leaf nodes (subdivided), and existing leaf nodes to remove (unsubdivided), for a given collection of points of interest.
+        /// Gets the collection of new nodes that will be added by the changes.
+        /// </summary>
+        public IEnumerable<LODQuadTreeNode> GetAddedNodes()
+        {
+            if( newRoots != null )
+            {
+                foreach( var rootNode in newRoots )
+                {
+                    yield return rootNode;
+                }
+            }
+
+            if( subdivided != null )
+            {
+                foreach( var (xnyn, xpyn, xnyp, xpyp) in subdivided.Values )
+                {
+                    yield return xnyn;
+                    yield return xpyn;
+                    yield return xnyp;
+                    yield return xpyp;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the collection of nodes that will become leaves due to the changes removing their children.
+        /// </summary>
+        public IEnumerable<LODQuadTreeNode> GetLeafNodesDueToRemoval()
+        {
+            return (IEnumerable<LODQuadTreeNode>)unSubdivided ?? new LODQuadTreeNode[] { };
+        }
+
+        /// <summary>
+        /// Gets the collection of existing nodes that will be removed by the changes.
+        /// </summary>
+        public IEnumerable<LODQuadTreeNode> GetRemovedNodes()
+        {
+            if( unSubdivided != null )
+            {
+                Queue<LODQuadTreeNode> nodesToProcess = new Queue<LODQuadTreeNode>( unSubdivided.Count * 4 );
+                foreach( var unsub in unSubdivided )
+                {
+                    var (xnyn, xpyn, xnyp, xpyp) = unsub.Children.Value;
+                    nodesToProcess.Enqueue( xnyn );
+                    nodesToProcess.Enqueue( xpyn );
+                    nodesToProcess.Enqueue( xnyp );
+                    nodesToProcess.Enqueue( xpyp );
+                }
+
+                LODQuadTreeNode node = nodesToProcess.Dequeue();
+                while( true )
+                {
+                    if( !node.IsLeaf ) // if node has any previously existing children - add them.
+                    {
+                        var (xnyn, xpyn, xnyp, xpyp) = node.Children.Value;
+                        nodesToProcess.Enqueue( xnyn );
+                        nodesToProcess.Enqueue( xpyn );
+                        nodesToProcess.Enqueue( xnyp );
+                        nodesToProcess.Enqueue( xpyp );
+                    }
+                    if( !unSubdivided.Contains( node ) )
+                        yield return node;
+
+                    if( !nodesToProcess.TryDequeue( out node ) )
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Computes the changes to the specified tree to make it satisfy the specified points of interest.
         /// </summary>
         /// <remarks>
-        /// Can handle an uninitialized LOD sphere (without nay faces) just fine.
+        /// This method is able to handle an uninitialized LODQuadTree (one without any faces).
         /// </remarks>
-        /// <param name="tree">The existing LOD sphere.</param>
         /// <param name="normalizedPois">The collection of points of interest, normalized to LOD sphere radius = 1.</param>
         /// <returns>The computed changes to apply to the LOD sphere to make it to where the POIs are satisfied.</returns>
         public static LODQuadTreeChanges GetChanges( LODQuadTree tree, IEnumerable<Vector3Dbl> normalizedPois )
@@ -40,7 +117,7 @@ namespace HSP.CelestialBodies.Surfaces
             LODQuadTreeChanges changes = new LODQuadTreeChanges();
 
             Queue<LODQuadTreeNode> nodesToProcess;
-            if( tree.Nodes == null )
+            if( tree.RootNodes == null )
             {
                 LODQuadTreeNode[] roots = new LODQuadTreeNode[6];
                 LODQuadTreeNode xn = new LODQuadTreeNode( 0, new Vector3Dbl( -1, 0, 0 ), Direction3D.Xn, Vector2.zero );
@@ -92,40 +169,24 @@ namespace HSP.CelestialBodies.Surfaces
             }
             else
             {
-                nodesToProcess = new Queue<LODQuadTreeNode>( tree.Nodes );
+                nodesToProcess = new Queue<LODQuadTreeNode>( tree.RootNodes );
             }
-
-#warning TODO
 
             LODQuadTreeNode currentNode = nodesToProcess.Dequeue();
 
             int currentLevel = currentNode.SubdivisionLevel;
             List<LODQuadTreeNode> currentLevelNodes = new();
 
-            while( currentNode != null )
+            while( true )
             {
                 if( currentNode.SubdivisionLevel > currentLevel )
                 {
                     currentLevel++;
-                    // resolve connectivity of subdivided (new) quads.
-                    // It's important to do this *between* going deeper and not immediately, because the neighbor we need might not have been subdivided (created) yet.
 
+                    // Resolve connectivity of the newly created nodes (one subdivision level at a time, i.e. breadth-first)
+                    // This needs to be done here - after all nodes of the given level have been processed - because the neighbors will always be lower level or equal.
                     foreach( var subdividedNode in currentLevelNodes )
                     {
-                        // still do BFS and resolve connectivity between going to a smaller node.
-                        // unsubdivided nodes will have their connectivity already resolved.
-                        // I think it's still enough to check 2 neighbors?
-                        // if subdivided, set connectivity to subdivided neighbors immediately.
-                        // set non-null from parent.
-                        // - when walking *up* from parent, we have to walk towards the child that borders the current child. Only have to walk a single child chain. The direction can change during the walk up.
-                        // - - it may walk a different amount than 1, if a node borders a highly subdivided node at the start.
-                        // - - we can just compare the distance to the 4 children, and pick the closest
-
-                        // ---------------
-
-
-                        // get node that was subdivided into these 4, get its neighbor in each direction,
-                        // and follow down a single step to wchichever child is closest - unless that node is a leaf.
                         (LODQuadTreeNode subXnYn, LODQuadTreeNode subXpYn, LODQuadTreeNode subXnYp, LODQuadTreeNode subXpYp) = changes.subdivided[subdividedNode];
                         LODQuadTreeNode parentsXn = subdividedNode.Xn;
                         LODQuadTreeNode parentsXp = subdividedNode.Xp;
@@ -157,11 +218,11 @@ namespace HSP.CelestialBodies.Surfaces
                     currentLevelNodes.Clear();
                 }
 
-                currentLevel = currentNode.SubdivisionLevel;
+                // currentLevel = currentNode.SubdivisionLevel;
 
                 if( currentNode.IsLeaf )
                 {
-                    if( currentNode.ShouldSubdivide( normalizedPois ) )
+                    if( currentNode.SubdivisionLevel < tree.MaxDepth && currentNode.ShouldSubdivide( normalizedPois ) )
                     {
                         if( changes.subdivided == null )
                         {
@@ -205,11 +266,11 @@ namespace HSP.CelestialBodies.Surfaces
             return changes;
         }
 
-        public void ApplyChanges( LODQuadTree tree )
+        public void ApplyTo( LODQuadTree tree )
         {
             if( this.newRoots != null )
             {
-                tree.SetNodes( this.newRoots );
+                tree.SetRootNodes( this.newRoots );
             }
 
             if( this.unSubdivided != null )
@@ -227,50 +288,52 @@ namespace HSP.CelestialBodies.Surfaces
                     subdivided4Tuple.Key.Children = subdivided4Tuple.Value;
                 }
             }
+#warning TODO - resolve the neighbors of the new nodes (new nodes might now be the neighbors of existing nodes, if eligible).
+            // I might think I should just create a new tree for this... it would be a lot simpler. And probably fast enough... Since I'm doing so many allocations and stuff anyway
         }
 
-        public LODQuadTreeNode GetNeighborToUse( LODQuadTreeNode node, Vector3Dbl spherePos )
+        private LODQuadTreeNode GetNeighborToUse( LODQuadTreeNode parentsNeighbor, Vector3Dbl selfSpherePos )
         {
             // get the child (if exists), or self.
 
-            if( node.IsLeaf && this.subdivided != null && !this.subdivided.ContainsKey( node ) ) // was a leaf, and still is a leaf
+            if( parentsNeighbor.IsLeaf && this.subdivided != null && !this.subdivided.ContainsKey( parentsNeighbor ) ) // was a leaf, and still is a leaf
             {
-                return node;
+                return parentsNeighbor;
             }
-            else if( this.unSubdivided != null && this.unSubdivided.Contains( node ) ) // was not a leaf, but is now a leaf.
+            else if( this.unSubdivided != null && this.unSubdivided.Contains( parentsNeighbor ) ) // was not a leaf, but is now a leaf.
             {
-                return node;
+                return parentsNeighbor;
             }
 
-            (LODQuadTreeNode xnyn, LODQuadTreeNode xpyn, LODQuadTreeNode xnyp, LODQuadTreeNode xpyp) = node.IsLeaf
-                ? this.subdivided[node]
-                : node.Children.Value;
+            (LODQuadTreeNode xnyn, LODQuadTreeNode xpyn, LODQuadTreeNode xnyp, LODQuadTreeNode xpyp) = parentsNeighbor.IsLeaf
+                ? this.subdivided[parentsNeighbor]
+                : parentsNeighbor.Children.Value;
 
             LODQuadTreeNode closestNode = null;
             double closestDistance = double.MaxValue;
 
-            double dist = Vector3Dbl.Distance( spherePos, xnyn.SphereCenter );
+            double dist = Vector3Dbl.Distance( selfSpherePos, xnyn.SphereCenter );
             if( dist < closestDistance )
             {
                 closestDistance = dist;
                 closestNode = xnyn;
             }
 
-            dist = Vector3Dbl.Distance( spherePos, xpyn.SphereCenter );
+            dist = Vector3Dbl.Distance( selfSpherePos, xpyn.SphereCenter );
             if( dist < closestDistance )
             {
                 closestDistance = dist;
                 closestNode = xpyn;
             }
 
-            dist = Vector3Dbl.Distance( spherePos, xnyp.SphereCenter );
+            dist = Vector3Dbl.Distance( selfSpherePos, xnyp.SphereCenter );
             if( dist < closestDistance )
             {
                 closestDistance = dist;
                 closestNode = xnyp;
             }
 
-            dist = Vector3Dbl.Distance( spherePos, xpyp.SphereCenter );
+            dist = Vector3Dbl.Distance( selfSpherePos, xpyp.SphereCenter );
             if( dist < closestDistance )
             {
                 closestDistance = dist;

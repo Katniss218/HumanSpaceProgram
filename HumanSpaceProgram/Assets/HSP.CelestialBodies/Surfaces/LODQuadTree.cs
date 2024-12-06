@@ -4,16 +4,27 @@ using UnityEngine;
 
 namespace HSP.CelestialBodies.Surfaces
 {
+    /// <summary>
+    /// Represents the surface of a subdivided chunked sphere
+    /// </summary>
     public class LODQuadTree
     {
-        LODQuadTreeNode[] _nodes = null; // Null, or 6 elements long - xn, xp, yn, yp, zn, zp (same order as Direction3D enum).
+        LODQuadTreeNode[] _nodes = null;
 
         /// <summary>
-        /// The maximum nesting level of the leaf nodes.
+        /// Gets the maximum depth of the nodes (the allowed number of descendants).
         /// </summary>
         public int MaxDepth { get; }
 
-        public IEnumerable<LODQuadTreeNode> Nodes => _nodes;
+        /// <summary>
+        /// Gets the collection of 6 root nodes.
+        /// </summary>
+        /// <remarks>
+        /// The returned value is null (for uninitialized tree), or 6 elements long - in the order: Xn, Xp, Yn, Yp, Zn, Zp (same as Direction3D enum).
+        /// </remarks>
+        public IEnumerable<LODQuadTreeNode> RootNodes => _nodes;
+
+        public bool IsInitialized => _nodes != null;
 
         public LODQuadTree( int maxDepth )
         {
@@ -25,23 +36,7 @@ namespace HSP.CelestialBodies.Surfaces
             return _nodes[(int)face];
         }
 
-        /*public void SetRootNode( Direction3D face, LODQuadTreeNode value )
-        {
-            if( value.Face != face )
-            {
-                throw new ArgumentException( $"The node's {nameof( LODQuadTreeNode.Face )} field must match the specified {nameof( face )} parameter.", nameof( value ) );
-            }
-            if( value.SubdivisionLevel != 0 )
-            {
-                throw new ArgumentException( $"The node must have subdivision level of 0 (i.e. be a root node).", nameof( value ) );
-            }
-
-            // resolve connectivity with the new node.
-
-            _nodes[(int)face] = value;
-        }*/
-
-        internal void SetNodes( LODQuadTreeNode[] nodes )
+        internal void SetRootNodes( LODQuadTreeNode[] nodes )
         {
             if( nodes.Length != 6 )
                 throw new ArgumentException( $"The nodes array must contain 6 orthogonal nodes.", nameof( nodes ) );

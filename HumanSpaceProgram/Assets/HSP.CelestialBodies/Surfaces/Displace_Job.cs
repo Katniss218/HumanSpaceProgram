@@ -9,9 +9,10 @@ namespace HSP.CelestialBodies.Surfaces
         double radius;
         Vector3Dbl origin;
 
-        int totalVerts;
-        int numberOfEdges;
-        int numberOfVertices;
+        int totalVertices;
+
+        int sideVertices;
+        int sideEdges;
 
         NativeArray<Vector3> resultVertices;
 
@@ -19,14 +20,14 @@ namespace HSP.CelestialBodies.Surfaces
 
         public void Initialize( LODQuadRebuildData r )
         {
-            radius = (float)r.radius;
-            origin = r.node.SphereCenter * radius;
+            radius = (float)r.CelestialBody.Radius;
+            origin = r.Node.SphereCenter * radius;
 
-            numberOfEdges = r.numberOfEdges;
-            numberOfVertices = r.numberOfVertices;
-            totalVerts = numberOfVertices * numberOfVertices;
+            sideEdges = r.SideEdges;
+            sideVertices = r.SideVertices;
+            totalVertices = sideVertices * sideVertices;
 
-            resultVertices = r.resultVertices;
+            resultVertices = r.ResultVertices;
         }
 
         public void Finish( LODQuadRebuildData r )
@@ -40,7 +41,7 @@ namespace HSP.CelestialBodies.Surfaces
 
         public void Execute()
         {
-            for( int index = 0; index < totalVerts; index++ )
+            for( int index = 0; index < totalVertices; index++ )
             {
                 Vector3Dbl posD = (resultVertices[index] + origin) / radius;
 

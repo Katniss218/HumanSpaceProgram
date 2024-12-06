@@ -29,6 +29,8 @@ namespace HSP.CelestialBodies.Surfaces
             _meshRenderer = this.GetComponent<MeshRenderer>();
         }
 
+        public bool IsActive => this.gameObject.activeSelf;
+
         public void Activate()
         {
             this.gameObject.SetActive( true );
@@ -68,7 +70,7 @@ namespace HSP.CelestialBodies.Surfaces
             lodQuad.QuadSphere = sphere;
             lodQuad.CelestialBody = sphere.CelestialBody;
 
-            gameObject.SetActive( false );
+            lodQuad.Deactivate();
 
             return lodQuad;
         }

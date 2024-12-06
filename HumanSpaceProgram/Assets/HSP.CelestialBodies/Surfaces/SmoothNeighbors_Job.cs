@@ -19,16 +19,16 @@ namespace HSP.CelestialBodies.Surfaces
 
         public void Initialize( LODQuadRebuildData r )
         {
-            numberOfEdges = r.numberOfEdges;
-            numberOfVertices = r.numberOfVertices;
+            numberOfEdges = r.SideEdges;
+            numberOfVertices = r.SideVertices;
 
             // A quad with subdivision level N will never border more than 1 quad with subdivision level >= N per side.
             // It can however border more than 1 quad with larger subdivision level than itself.
-            stepXn = 1 << (r.node.SubdivisionLevel - r.node.Xn.SubdivisionLevel);
-            stepXp = 1 << (r.node.SubdivisionLevel - r.node.Xp.SubdivisionLevel);
-            stepYn = 1 << (r.node.SubdivisionLevel - r.node.Yn.SubdivisionLevel);
-            stepYp = 1 << (r.node.SubdivisionLevel - r.node.Yp.SubdivisionLevel);
-            resultVertices = r.resultVertices;
+            stepXn = 1 << (r.Node.SubdivisionLevel - r.Node.Xn.SubdivisionLevel);
+            stepXp = 1 << (r.Node.SubdivisionLevel - r.Node.Xp.SubdivisionLevel);
+            stepYn = 1 << (r.Node.SubdivisionLevel - r.Node.Yn.SubdivisionLevel);
+            stepYp = 1 << (r.Node.SubdivisionLevel - r.Node.Yp.SubdivisionLevel);
+            resultVertices = r.ResultVertices;
         }
 
         public void Finish( LODQuadRebuildData r )
@@ -47,7 +47,7 @@ namespace HSP.CelestialBodies.Surfaces
 
         public void Execute()
         {
-            if( stepXn < 0 )
+            if( stepXn != 0 )
             {
                 int x = 0;
                 for( int y = 0; y < numberOfVertices - stepXn; y += stepXn )

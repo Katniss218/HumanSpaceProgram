@@ -8,27 +8,10 @@ using UnityEngine;
 
 namespace HSP.CelestialBodies.Surfaces
 {
-    public class LODQuadRebuildData // describes a *single* quad that's being created.
+
+    public class LODQuadRebuilder : IDisposable
     {
-        public LODQuad quad;
-        public LODQuadTreeNode node;
-        public Mesh mesh;
-
-        public ILODQuadJob[] jobs;
-        public JobHandle[] handles;
-
-        public double radius;
-        public int numberOfVertices; // per side
-        public int numberOfEdges;
-        public NativeArray<Vector3> resultVertices;
-        public NativeArray<Vector3> resultNormals;
-        public NativeArray<Vector2> resultUvs;
-        public NativeArray<int> resultTriangles;
-    }
-
-    public class LODQuadRebuilder
-    {
-        private LODQuadRebuildData[] _quads;
+        private LODQuadRebuildData[] _rebuildQuads;
 
         private ILODQuadJob[] _jobs;
         private int[] _firstJobPerStage; // index of the first job in the given stage
@@ -48,39 +31,10 @@ namespace HSP.CelestialBodies.Surfaces
 
         LODQuadSphere _sphere;
         LODQuadRebuildMode _buildMode;
+        BuildSettings _settings;
 
         private LODQuadRebuilder()
         {
-        }
-
-        private void InitializeBuild( LODQuadRebuildData r )
-        {
-            r.mesh = new Mesh();
-            r.jobs = new ILODQuadJob[this._jobs.Length];
-            for( int i = 0; i < this._jobs.Length; i++ )
-            {
-                r.jobs[i] = this._jobs[i].Clone();
-            }
-            r.handles = new JobHandle[this._jobs.Length];
-
-            int numberOfEdges = 1 << _sphere.EdgeSubdivisions; // Fast 2^n for integer types.
-            int numberOfVertices = numberOfEdges + 1;
-            r.numberOfVertices = numberOfVertices;
-            r.numberOfEdges = numberOfEdges;
-            r.radius = _sphere.CelestialBody.Radius;
-            r.resultVertices = new NativeArray<Vector3>( numberOfVertices * numberOfVertices, Allocator.Persistent );
-            r.resultNormals = new NativeArray<Vector3>( numberOfVertices * numberOfVertices, Allocator.Persistent );
-            r.resultUvs = new NativeArray<Vector2>( numberOfVertices * numberOfVertices, Allocator.Persistent );
-            r.resultTriangles = new NativeArray<int>( (numberOfEdges * numberOfEdges) * 6, Allocator.Persistent );
-        }
-
-        private void FinalizeBuild( LODQuadRebuildData r )
-        {
-            r.quad = LODQuad.CreateInactive( _sphere, r.node, r.mesh );
-            r.resultVertices.Dispose();
-            r.resultNormals.Dispose();
-            r.resultUvs.Dispose();
-            r.resultTriangles.Dispose();
         }
 
         static void Schedule<T>( ILODQuadJob[] jobs, JobHandle[] handles, int index ) where T : struct, ILODQuadJob
@@ -107,9 +61,9 @@ namespace HSP.CelestialBodies.Surfaces
 
             if( LastStartedStage == -1 )
             {
-                foreach( var quad in _quads )
+                foreach( var rQuad in _rebuildQuads )
                 {
-                    InitializeBuild( quad );
+                    rQuad.InitializeBuild( _jobs, _sphere );
                 }
             }
 
@@ -126,15 +80,15 @@ namespace HSP.CelestialBodies.Surfaces
                     ? _firstJobPerStage[currentStage + 1]
                     : _jobs.Length;
 
-                foreach( var quad in _quads )
+                foreach( var rQuad in _rebuildQuads )
                 {
-                    quad.handles[lastJob - 1].Complete();
+                    rQuad.handles[lastJob - 1].Complete();
 
-                    foreach( var job in quad.jobs[firstJob..lastJob] )
+                    foreach( var job in rQuad.jobs[firstJob..lastJob] )
                     {
                         try
                         {
-                            job.Finish( quad );
+                            job.Finish( rQuad );
                         }
                         catch( Exception ex )
                         {
@@ -148,9 +102,10 @@ namespace HSP.CelestialBodies.Surfaces
 
                 if( IsDone )
                 {
-                    foreach( var quad in _quads )
+                    foreach( var rQuad in _rebuildQuads )
                     {
-                        FinalizeBuild( quad );
+                        rQuad.FinalizeBuild( _sphere );
+                        rQuad.Dispose();
                     }
                     return;
                 }
@@ -170,13 +125,13 @@ namespace HSP.CelestialBodies.Surfaces
                     : _jobs.Length;
 
                 // Initialize everything first, because they might talk to each other.
-                foreach( var quad in _quads )
+                foreach( var rQuad in _rebuildQuads )
                 {
-                    foreach( var job in quad.jobs[firstJob..lastJob] )
+                    foreach( var job in rQuad.jobs[firstJob..lastJob] )
                     {
                         try
                         {
-                            job.Initialize( quad );
+                            job.Initialize( rQuad );
                         }
                         catch( Exception ex )
                         {
@@ -189,7 +144,7 @@ namespace HSP.CelestialBodies.Surfaces
                 MethodInfo method = typeof( LODQuadRebuilder ).GetMethod( nameof( LODQuadRebuilder.Schedule ), BindingFlags.Static | BindingFlags.NonPublic );
 
                 // Schedule once they're done talking to each other.
-                foreach( var quad in _quads )
+                foreach( var rQuad in _rebuildQuads )
                 {
                     for( int i = firstJob; i < lastJob; i++ )
                     {
@@ -197,7 +152,7 @@ namespace HSP.CelestialBodies.Surfaces
 
 #warning TODO - can be optimized because every quad will have the same types in parallel
                         Type jobType = _jobs[i].GetType();
-                        method.MakeGenericMethod( jobType ).Invoke( null, new object[] { quad.jobs, quad.handles, i } );
+                        method.MakeGenericMethod( jobType ).Invoke( null, new object[] { rQuad.jobs, rQuad.handles, i } );
                     }
                 }
 
@@ -212,8 +167,32 @@ namespace HSP.CelestialBodies.Surfaces
                 throw new InvalidOperationException( $"{nameof( LODQuadRebuilder )}.{nameof( GetResults )} was called, but the rebuild hasn't been finished yet." );
             }
 
-#warning TODO - This can be called before the jobs have finished executing.
-            return _quads.Select( q => q.quad );
+            return _rebuildQuads.Select( q => q.Quad );
+        }
+
+        /// <summary>
+        /// Waits for the scheduled build jobs to finish and disposes rebuild the data.
+        /// </summary>
+        public void Dispose()
+        {
+            if( LastStartedStage > LastFinishedStage )
+            {
+                int currentStage = LastStartedStage;
+
+                int lastJob = (currentStage + 1) < StageCount
+                    ? _firstJobPerStage[currentStage + 1]
+                    : _jobs.Length;
+
+                foreach( var quad in _rebuildQuads )
+                {
+                    quad.handles[lastJob - 1].Complete();
+                }
+
+                foreach( var rQuad in _rebuildQuads )
+                {
+                    rQuad.Dispose();
+                }
+            }
         }
 
 
@@ -222,80 +201,70 @@ namespace HSP.CelestialBodies.Surfaces
         /// </summary>
         /// <param name="jobs">The jobs to use when building the meshes.</param>
         /// <returns>The rebuilder to use to rebuild the specified meshes.</returns>
-        public static LODQuadRebuilder FromChanges( LODQuadSphere sphere, ILODQuadJob[][] jobsInStages, LODQuadTreeChanges changes, LODQuadRebuildMode buildMode )
+        public static LODQuadRebuilder FromChanges( LODQuadSphere sphere, ILODQuadJob[][] jobsInStages, LODQuadTreeChanges changes, LODQuadRebuildMode buildMode, BuildSettings settings )
         {
             LODQuadRebuilder rebuilder = new LODQuadRebuilder();
 
             rebuilder._sphere = sphere;
             (rebuilder._jobs, rebuilder._firstJobPerStage) = ILODQuadJob.FilterJobs( jobsInStages, buildMode );
             rebuilder._buildMode = buildMode;
-            rebuilder._quads = GetQuadsToBuild( changes );
+            rebuilder._settings = settings;
+
+            rebuilder.SetQuadsToBuild( changes );
 
             return rebuilder;
         }
 
-        /// <summary>
-        /// Builds the meshes for the entire quad sphere.
-        /// </summary>
-        /// <param name="jobs">The jobs to use when building the meshes.</param>
-        /// <returns>The rebuilder to use to rebuild the specified meshes.</returns>
-        /*public static LODQuadRebuilder FromWhole( double radius, ILODQuadJob[][] jobsInStages, LODQuadTree tree, LODQuadRebuildMode buildMode )
+        [Flags]
+        public enum BuildSettings
         {
-            LODQuadRebuilder rebuilder = new LODQuadRebuilder();
-        
-            rebuilder.radius = radius;
-            (rebuilder._jobs, rebuilder._firstJobPerStage) = ILODQuadJob.FilterJobs( jobsInStages, buildMode );
-            rebuilder._buildMode = buildMode;
-            rebuilder._quads = GetQuadsToBuild( tree );
+            /// <summary>
+            /// If specified, the rebuilder will include the immediate neighbors of the build area in the build process.
+            /// </summary>
+            /// <remarks>
+            /// Use to clean edges of nodes that depend on the neighbors (e.g. smoothing).
+            /// </remarks>
+            IncludeNeighborsOfChanged = 1
+        }
 
-            return rebuilder;
-        }*/
-
-        private static LODQuadRebuildData[] GetQuadsToBuild( LODQuadTreeChanges changes )
+        private void SetQuadsToBuild( LODQuadTreeChanges changes )
         {
-            LODQuadRebuildData[] quads = new LODQuadRebuildData[(changes.newRoots?.Length ?? 0) + (changes.subdivided?.Count * 4 ?? 0)];
+            // Nodes can be completely new and/or just updated (if a neighbor was subdivided, the node needs to update its edge in that direction, so the neighbors of new nodes need to be rebuilt).
 
-            int quadIndex = 0;
-            int lastQuadIndex = 0;
-            if( changes.newRoots != null )
+#warning TODO - neighbors of new nodes don't have the new nodes as their neighbors.
+            LODQuadRebuildData[] quads = changes.GetAddedNodes().IncludeNeighbors().Distinct( new LodQuadTreeNodeComparer() ).Select( node => new LODQuadRebuildData( node ) ).ToArray();
+
+            this._rebuildQuads = quads;
+        }
+    }
+
+    public static class IEnumerable_LODQuadTreeNode_Ex
+    {
+        public static IEnumerable<LODQuadTreeNode> IncludeNeighbors( this IEnumerable<LODQuadTreeNode> nodes )
+        {
+            foreach( var node in nodes )
             {
-                for( quadIndex = 0; quadIndex < changes.newRoots.Length; quadIndex++ )
-                {
-                    quads[quadIndex] = new LODQuadRebuildData()
-                    {
-                        node = changes.newRoots[quadIndex],
-                    };
-                }
-                lastQuadIndex += quadIndex;
-            }
+                yield return node;
 
-            if( changes.subdivided != null )
-            {
-                quadIndex = 0;
-                foreach( var subdivided in changes.subdivided.Values )
-                {
-                    quads[lastQuadIndex + (quadIndex * 4)] = new LODQuadRebuildData()
-                    {
-                        node = subdivided.xnyn,
-                    };
-                    quads[lastQuadIndex + (quadIndex * 4) + 1] = new LODQuadRebuildData()
-                    {
-                        node = subdivided.xpyn,
-                    };
-                    quads[lastQuadIndex + (quadIndex * 4) + 2] = new LODQuadRebuildData()
-                    {
-                        node = subdivided.xnyp,
-                    };
-                    quads[lastQuadIndex + (quadIndex * 4) + 3] = new LODQuadRebuildData()
-                    {
-                        node = subdivided.xpyp,
-                    };
-                    quadIndex++;
-                }
-                lastQuadIndex += quadIndex;
+                yield return node.Xn;
+                yield return node.Xp;
+                yield return node.Yn;
+                yield return node.Yp;
             }
+        }
+    }
 
-            return quads;
+    public class LodQuadTreeNodeComparer : IEqualityComparer<LODQuadTreeNode>
+    {
+        public bool Equals( LODQuadTreeNode x, LODQuadTreeNode y )
+        {
+            return x.Face == y.Face
+                && x.SphereCenter == y.SphereCenter;
+        }
+
+        public int GetHashCode( LODQuadTreeNode obj )
+        {
+            return HashCode.Combine( obj.Face.GetHashCode(), obj.SphereCenter.GetHashCode() );
         }
     }
 }

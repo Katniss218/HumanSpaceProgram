@@ -17,8 +17,8 @@ namespace HSP.CelestialBodies.Surfaces
         float minY;
         Direction3D face;
 
-        int numberOfEdges;
-        int numberOfVertices;
+        int sideEdges;
+        int sideVertices;
 
         NativeArray<Vector3> resultVertices;
         NativeArray<Vector3> resultNormals;
@@ -30,33 +30,33 @@ namespace HSP.CelestialBodies.Surfaces
         public void Initialize( LODQuadRebuildData r )
         {
 #warning TODO - keep the verts in body space (as vector3dbl), turn into mesh-space when finalizing.
-            radius = (float)r.radius;
-            origin = r.node.SphereCenter * radius;
-            size = r.node.Size;
-            face = r.node.Face;
+            radius = (float)r.CelestialBody.Radius;
+            origin = r.Node.SphereCenter * radius;
+            size = r.Node.Size;
+            face = r.Node.Face;
 
-            numberOfEdges = r.numberOfEdges;
-            numberOfVertices = r.numberOfVertices;
-            edgeLength = size / numberOfEdges; // size represents the edge length of the original square, twice the radius.
-            minX = r.node.FaceCenter.x - (size / 2f); // center minus half the edge length of the cube.
-            minY = r.node.FaceCenter.y - (size / 2f);
+            sideEdges = r.SideEdges;
+            sideVertices = r.SideVertices;
+            edgeLength = size / sideEdges; // size represents the edge length of the original square, twice the radius.
+            minX = r.Node.FaceCenter.x - (size / 2f); // center minus half the edge length of the cube.
+            minY = r.Node.FaceCenter.y - (size / 2f);
 
-            resultVertices = r.resultVertices;
-            resultNormals = r.resultNormals;
-            resultUvs = r.resultUvs;
-            resultTriangles = r.resultTriangles;
+            resultVertices = r.ResultVertices;
+            resultNormals = r.ResultNormals;
+            resultUvs = r.ResultUVs;
+            resultTriangles = r.ResultTriangles;
         }
 
         public void Finish( LODQuadRebuildData r )
         {
-            r.mesh.SetVertices( resultVertices );
-            r.mesh.SetNormals( resultNormals );
-            r.mesh.SetUVs( 0, resultUvs );
-            r.mesh.SetTriangles( resultTriangles.ToArray(), 0 );
+            r.Mesh.SetVertices( resultVertices );
+            r.Mesh.SetNormals( resultNormals );
+            r.Mesh.SetUVs( 0, resultUvs );
+            r.Mesh.SetTriangles( resultTriangles.ToArray(), 0 );
             // tangents calc'd here because job can't create Mesh object to calc them.
-            r.mesh.RecalculateTangents();
-            r.mesh.FixTangents(); // fix broken tangents.
-            r.mesh.RecalculateBounds();
+            r.Mesh.RecalculateTangents();
+            r.Mesh.FixTangents(); // fix broken tangents.
+            r.Mesh.RecalculateBounds();
 
             //MeshUpdateFlags MESH_UPDATE_FLAGS = MeshUpdateFlags.DontValidateIndices | MeshUpdateFlags.DontNotifyMeshUsers | MeshUpdateFlags.DontRecalculateBounds | MeshUpdateFlags.DontResetBoneBounds;
             //meshID = quad.tempMesh.GetInstanceID();
@@ -76,7 +76,7 @@ namespace HSP.CelestialBodies.Surfaces
 
         int GetIndex( int x, int y )
         {
-            return (x * numberOfEdges) + x + y;
+            return (x * sideEdges) + x + y;
         }
 
         /// <summary>
@@ -87,18 +87,18 @@ namespace HSP.CelestialBodies.Surfaces
         {
             // The origin of a valid, the center will never be at any of the edges of its ancestors, and will always be at the point where the inner edges of its direct children meet.
 
-            if( numberOfVertices > 65535 )
+            if( sideVertices > 65535 )
             {
                 // technically wrong, since Mesh.indexFormat can be switched to 32 bit, but i'll leave this for now. Meshes don't have to be over that value anyway because laggy and big and far away.
-                throw new ArgumentOutOfRangeException( $"Unity's Mesh can contain at most 65535 vertices (16-bit buffer). Tried to create a Mesh with {numberOfVertices}." );
+                throw new ArgumentOutOfRangeException( $"Unity's Mesh can contain at most 65535 vertices (16-bit buffer). Tried to create a Mesh with {sideVertices}." );
             }
 
             int triIndex = 0;
-            for( int i = 0; i < numberOfEdges; i++ )
+            for( int i = 0; i < sideEdges; i++ )
             {
-                for( int j = 0; j < numberOfEdges; j++ )
+                for( int j = 0; j < sideEdges; j++ )
                 {
-                    int index = (i * numberOfEdges) + i + j;
+                    int index = (i * sideEdges) + i + j;
 
                     //   C - D
                     //   | / |
@@ -106,12 +106,12 @@ namespace HSP.CelestialBodies.Surfaces
 
                     // Adding numberOfVertices makes it skip to the next row (number of vertices is 1 higher than edges).
                     resultTriangles[triIndex] = index; // A
-                    resultTriangles[triIndex + 1] = index + numberOfVertices + 1; // D
-                    resultTriangles[triIndex + 2] = index + numberOfVertices; // C
+                    resultTriangles[triIndex + 1] = index + sideVertices + 1; // D
+                    resultTriangles[triIndex + 2] = index + sideVertices; // C
 
                     resultTriangles[triIndex + 3] = index; // A
                     resultTriangles[triIndex + 4] = index + 1; // B
-                    resultTriangles[triIndex + 5] = index + numberOfVertices + 1; // D
+                    resultTriangles[triIndex + 5] = index + sideVertices + 1; // D
 
 #warning TODO - we'll need additional 'fake' triangles to compute normals, and they might have problems at the seams of the 6 primary faces because of Direction3D.GetSpherePointDbl.
                     // so this needs to know if any of the 4 edges match the edges of the L0 quad.
@@ -138,9 +138,9 @@ namespace HSP.CelestialBodies.Surfaces
                 }
             }
 
-            for( int x = 0; x < numberOfVertices; x++ )
+            for( int x = 0; x < sideVertices; x++ )
             {
-                for( int y = 0; y < numberOfVertices; y++ )
+                for( int y = 0; y < sideVertices; y++ )
                 {
                     int index = GetIndex( x, y );
 

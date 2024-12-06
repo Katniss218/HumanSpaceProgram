@@ -74,6 +74,7 @@
     <Compile Include="Assets\HSP.CelestialBodies\Surfaces\LODQuad.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\Surfaces\LODQuadTreeChanges.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\Surfaces\SmoothNeighbors_Job.cs" />
+    <Compile Include="Assets\HSP.CelestialBodies\Surfaces\LODQuadRebuildData.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.CelestialBodies\Surfaces\TerrainShader.shader" />

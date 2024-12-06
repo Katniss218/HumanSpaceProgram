@@ -19,21 +19,13 @@ namespace HSP.CelestialBodies.Surfaces
         public LODQuadTreeNode Parent { get; internal set; }
 
         /// <summary>
-        /// Returns the 4-tuple of quads that share the common parent.
+        /// Returns the 4-tuple of quads that share the parent with this node. <br/>
+        /// Null for root nodes.
         /// </summary>
         /// <remarks>
         /// Contains itself (!) <br/>
         /// </remarks>
-        public (LODQuadTreeNode xnyn, LODQuadTreeNode xpyn, LODQuadTreeNode xnyp, LODQuadTreeNode xpyp) Siblings
-        {
-            get
-            {
-                if( Parent == null )
-                    throw new InvalidOperationException( $"A root node has no siblings." );
-
-                return this.Parent.Children.Value;
-            }
-        }
+        public (LODQuadTreeNode xnyn, LODQuadTreeNode xpyn, LODQuadTreeNode xnyp, LODQuadTreeNode xpyp)? Siblings => this.Parent?.Children;
 
         /// <summary>
         /// The depth of this quad. <br/>
@@ -95,7 +87,7 @@ namespace HSP.CelestialBodies.Surfaces
         /// </summary>
         public LODQuadTreeNode Yp;
 
-        public LODQuadTreeNode( int subdivisionLevel, Vector3Dbl center, Direction3D face, Vector2 faceCenter )
+        internal LODQuadTreeNode( int subdivisionLevel, Vector3Dbl center, Direction3D face, Vector2 faceCenter )
         {
             this.SubdivisionLevel = subdivisionLevel;
             this.SphereCenter = center;
@@ -103,6 +95,12 @@ namespace HSP.CelestialBodies.Surfaces
             this.FaceCenter = faceCenter;
         }
 
+        /// <summary>
+        /// Checks if this node should be subdivided, based on the collection of pois in local normalized space.
+        /// </summary>
+        /// <remarks>
+        /// Assumes that the node is a leaf (hasn't already been subdivided).
+        /// </remarks>
         public bool ShouldSubdivide( IEnumerable<Vector3Dbl> localPois )
         {
             foreach( var localPoi in localPois )
@@ -118,20 +116,25 @@ namespace HSP.CelestialBodies.Surfaces
             return false;
         }
 
+        /// <summary>
+        /// Checks if this node should be unsubdivided, based on the collection of pois in local normalized space.
+        /// </summary>
+        /// <remarks>
+        /// Assumes that the node is not a leaf (hasn't already been unsubdivided).
+        /// </remarks>
         public bool ShouldUnsubdivide( IEnumerable<Vector3Dbl> localPois )
         {
             foreach( var localPoi in localPois )
             {
                 double distance = Vector3Dbl.Distance( localPoi, SphereCenter );
 
-                // Inverse of ShouldSubdivide.
-                if( distance > (double)this.Size )
+                if( distance < (double)this.Size )
                 {
-                    return true;
+                    return false;
                 }
             }
 
-            return false;
+            return true;
         }
 
         /// <summary>
@@ -142,7 +145,7 @@ namespace HSP.CelestialBodies.Surfaces
         /// </remarks>
         /// <param name="node">The node to subdivide.</param>
         /// <returns>A 4-tuple with the newly instantiated children.</returns>
-        public static (LODQuadTreeNode xnyn, LODQuadTreeNode xpyn, LODQuadTreeNode xnyp, LODQuadTreeNode xpyp) CreateChildren( LODQuadTreeNode node )
+        internal static (LODQuadTreeNode xnyn, LODQuadTreeNode xpyn, LODQuadTreeNode xnyp, LODQuadTreeNode xpyp) CreateChildren( LODQuadTreeNode node )
         {
             int subdivisionLevel = node.SubdivisionLevel + 1;
 
