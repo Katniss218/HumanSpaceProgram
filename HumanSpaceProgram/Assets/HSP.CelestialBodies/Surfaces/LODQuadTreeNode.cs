@@ -107,9 +107,9 @@ namespace HSP.CelestialBodies.Surfaces
         {
             foreach( var localPoi in localPois )
             {
-                float distance = (float)(localPoi - SphereCenter).magnitude;
+                double distance = Vector3Dbl.Distance( localPoi, SphereCenter );
 
-                if( distance < Size )
+                if( distance < (double)Size )
                 {
                     return true;
                 }
@@ -122,10 +122,10 @@ namespace HSP.CelestialBodies.Surfaces
         {
             foreach( var localPoi in localPois )
             {
-                float distance = (float)(localPoi - SphereCenter).magnitude;
+                double distance = Vector3Dbl.Distance( localPoi, SphereCenter );
 
                 // Inverse of ShouldSubdivide.
-                if( distance >= this.Size )
+                if( distance > (double)this.Size )
                 {
                     return true;
                 }

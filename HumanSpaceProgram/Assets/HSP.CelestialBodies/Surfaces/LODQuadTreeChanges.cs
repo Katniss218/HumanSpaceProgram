@@ -180,7 +180,7 @@ namespace HSP.CelestialBodies.Surfaces
                 {
                     if( currentNode.ShouldUnsubdivide( normalizedPois ) )
                     {
-                        if( changes.subdivided == null )
+                        if( changes.unSubdivided == null )
                         {
                             changes.unSubdivided = new();
                         }
@@ -207,21 +207,25 @@ namespace HSP.CelestialBodies.Surfaces
 
         public void ApplyChanges( LODQuadTree tree )
         {
-            if( this.newRoots == null )
+            if( this.newRoots != null )
+            {
+                tree.SetNodes( this.newRoots );
+            }
+
+            if( this.unSubdivided != null )
             {
                 foreach( var unsubdivided in this.unSubdivided )
                 {
                     unsubdivided.Children = null;
                 }
+            }
 
+            if( this.subdivided != null )
+            {
                 foreach( var subdivided4Tuple in this.subdivided )
                 {
                     subdivided4Tuple.Key.Children = subdivided4Tuple.Value;
                 }
-            }
-            else
-            {
-                tree.SetNodes( this.newRoots );
             }
         }
 

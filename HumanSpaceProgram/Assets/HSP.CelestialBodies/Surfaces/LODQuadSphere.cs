@@ -121,15 +121,17 @@ namespace HSP.CelestialBodies.Surfaces
 
         void TryRebuild()
         {
-            Vector3Dbl[] airfPOIs = PoIGetter.Invoke().ToArray();
+            Vector3Dbl pos = this.CelestialBody.ReferenceFrameTransform.AbsolutePosition;
+            QuaternionDbl rot = this.CelestialBody.ReferenceFrameTransform.AbsoluteRotation;
+            double scale = this.CelestialBody.Radius;
 
-            bool allPoisTheSame = NewPoisTheSameAsLastFrame( airfPOIs );
+            Vector3Dbl[] localPois = PoIGetter.Invoke().Select( p => rot.Inverse() * ((p - pos) / scale) ).ToArray();
+
+            bool allPoisTheSame = NewPoisTheSameAsLastFrame( localPois );
 
             if( !allPoisTheSame )
             {
-                double radius = CelestialBody.Radius;
-#warning TODO - rotate pois to be in normalized oriented space
-                LODQuadTreeChanges changes = LODQuadTreeChanges.GetChanges( _quadTree, airfPOIs.Select( p => new Vector3Dbl( 1, 0.3, -0.5 ).normalized * 1.000001 ) );
+                LODQuadTreeChanges changes = LODQuadTreeChanges.GetChanges( _quadTree, localPois );
 
                 if( changes.AnythingChanged )
                 {
@@ -155,16 +157,17 @@ namespace HSP.CelestialBodies.Surfaces
                     {
                         quad.Activate();
                     }
+#warning TODO - get quads to delete as well.
                 }
-                //_currentBuild = null;
+                _currentBuild = null;
             }
         }
 
         public ILODQuadJob[][] jobs = new ILODQuadJob[][]
         {
             new ILODQuadJob[] { new MakeQuadMesh_Job(),
-           // new Displace_Job(),
-           // new SmoothNeighbors_Job(),
+            new Displace_Job(),
+            new SmoothNeighbors_Job(),
             }
         };
 

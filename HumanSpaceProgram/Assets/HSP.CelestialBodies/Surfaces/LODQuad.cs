@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityPlus.AssetManagement;
 
 namespace HSP.CelestialBodies.Surfaces
 {
@@ -49,7 +50,7 @@ namespace HSP.CelestialBodies.Surfaces
                 mf.sharedMesh = mesh;
 
                 MeshRenderer mr = gameObject.AddComponent<MeshRenderer>();
-                //mr.material = mat;
+                mr.material = AssetRegistry.Get<Material>( "builtin::Resources/New Material 1" );
             }
 
             if( (sphere.Mode & LODQuadMode.Collider) == LODQuadMode.Collider )
