@@ -12,8 +12,8 @@ namespace UnityEngine
     /// </remarks>
     public enum Direction3D
     {
-        // Not supposed to be combinable.
-        Xn = 0,
+        // Not supposed to be combined into compound directions (like XY).
+        Xn = 0, // DO NOT CHANGE THE VALUES.
         Xp = 1,
 
         Yn = 2,
@@ -27,6 +27,83 @@ namespace UnityEngine
 
     public static class Direction3DUtils
     {
+        static readonly Direction3D[] _inverseDir = new Direction3D[6]
+        {
+            Direction3D.Xp,
+            Direction3D.Xn,
+            Direction3D.Yp,
+            Direction3D.Yn,
+            Direction3D.Zp,
+            Direction3D.Zn
+        };
+
+        static readonly Vector3[] _directionVectors = new Vector3[6]
+        {
+            new Vector3( -1, 0, 0 ),
+            new Vector3( 1, 0, 0 ),
+            new Vector3( 0, -1, 0 ),
+            new Vector3( 0, 1, 0 ),
+            new Vector3( 0, 0, -1 ),
+            new Vector3( 0, 0, 1 )
+        };
+
+        public static readonly Direction3D[] Every = new Direction3D[6]
+        {
+            Direction3D.Xn,
+            Direction3D.Xp,
+            Direction3D.Yn,
+            Direction3D.Yp,
+            Direction3D.Zn,
+            Direction3D.Zp
+        };
+
+        /// <summary>
+        /// Inverts the direction.
+        /// </summary>
+        public static Direction3D Inverse( this Direction3D dir )
+        {
+            return _inverseDir[(int)dir];
+        }
+
+        private static Direction3D FromX( float x )
+        {
+            if( x == 0 )
+                throw new ArgumentOutOfRangeException( nameof( x ), $"Direction value can't be 0, because 0 doesn't point in any direction." );
+
+            if( x < 0 )
+            {
+                return Direction3D.Xn;
+            }
+
+            return Direction3D.Xp;
+        }
+
+        private static Direction3D FromY( float y )
+        {
+            if( y == 0 )
+                throw new ArgumentOutOfRangeException( nameof( y ), $"Direction value can't be 0, because 0 doesn't point in any direction." );
+
+            if( y < 0 )
+            {
+                return Direction3D.Yn;
+            }
+
+            return Direction3D.Yp;
+        }
+
+        private static Direction3D FromZ( float z )
+        {
+            if( z == 0 )
+                throw new ArgumentOutOfRangeException( nameof( z ), $"Direction value can't be 0, because 0 doesn't point in any direction." );
+
+            if( z < 0 )
+            {
+                return Direction3D.Zn;
+            }
+
+            return Direction3D.Zp;
+        }
+
         /// <summary>
         /// Calculates the <see cref="Direction3D"/> for a given vector.
         /// </summary>
@@ -75,22 +152,43 @@ namespace UnityEngine
         /// </summary>
         public static Vector3 ToVector3( this Direction3D dir )
         {
-            switch( dir )
+            return _directionVectors[(int)dir];
+        }
+
+        /// <returns>Returns the point on the surface of a unit cube corresponding to the specified cube face and face coordinates.</returns>
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static Vector3 GetQuadPoint( this Direction3D face, float quadX, float quadY )
+        {
+            // quad x, y go in range [-1..1]
+            Contract.Assert( quadX >= -1 && quadX <= 1, $"{nameof( quadX )} has to be in range [-1..1]." );
+            Contract.Assert( quadY >= -1 && quadY <= 1, $"{nameof( quadY )} has to be in range [-1..1]." );
+            var pos = face switch
             {
-                case Direction3D.Xp:
-                    return new Vector3( 1, 0, 0 );
-                case Direction3D.Xn:
-                    return new Vector3( -1, 0, 0 );
-                case Direction3D.Yp:
-                    return new Vector3( 0, 1, 0 );
-                case Direction3D.Yn:
-                    return new Vector3( 0, -1, 0 );
-                case Direction3D.Zp:
-                    return new Vector3( 0, 0, 1 );
-                case Direction3D.Zn:
-                    return new Vector3( 0, 0, -1 );
-            }
-            throw new ArgumentException( $"Unknown {nameof( Direction3D )} '{dir}'.", nameof( dir ) );
+                Direction3D.Xn => new Vector3( -1.0f, quadX, quadY ),
+                Direction3D.Xp => new Vector3( 1.0f, -quadX, quadY ),
+                Direction3D.Yn => new Vector3( -quadX, -1.0f, quadY ),
+                Direction3D.Yp => new Vector3( quadX, 1.0f, quadY ),
+                Direction3D.Zn => new Vector3( -quadY, quadX, -1.0f ),
+                Direction3D.Zp => new Vector3( quadY, quadX, 1.0f ),
+                _ => throw new ArgumentException( $"Invalid face orientation {face}", nameof( face ) ),
+            };
+            return pos;
+        }
+
+        /// <returns>Returns the point on the surface of a unit cube corresponding to the specified cube face and face coordinates.</returns>
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static Vector3Dbl GetQuadPoint( this Direction3D face, Vector2 quadXY )
+        {
+            return GetQuadPointDbl( face, quadXY.x, quadXY.y );
+        }
+
+        /// <returns>Returns the point on the surface of a unit cube corresponding to the specified cube face and face coordinates.</returns>
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static Vector3 GetSpherePoint( this Direction3D face, float quadX, float quadY )
+        {
+            Vector3 pos = GetQuadPoint( face, quadX, quadY );
+            pos.Normalize(); // unit sphere.
+            return pos;
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
@@ -98,6 +196,50 @@ namespace UnityEngine
         {
             return GetSpherePoint( face, quadXY.x, quadXY.y );
         }
+
+        /// <returns>Returns the point on the surface of a unit cube corresponding to the specified cube face and face coordinates.</returns>
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static Vector3Dbl GetQuadPointDbl( this Direction3D face, float quadX, float quadY )
+        {
+            // quad x, y go in range [-1..1]
+            Contract.Assert( quadX >= -1 && quadX <= 1, $"{nameof( quadX )} has to be in range [-1..1]." );
+            Contract.Assert( quadY >= -1 && quadY <= 1, $"{nameof( quadY )} has to be in range [-1..1]." );
+            var pos = face switch
+            {
+                Direction3D.Xn => new Vector3Dbl( -1.0, quadX, quadY ),
+                Direction3D.Xp => new Vector3Dbl( 1.0, -quadX, quadY ),
+                Direction3D.Yn => new Vector3Dbl( -quadX, -1.0, quadY ),
+                Direction3D.Yp => new Vector3Dbl( quadX, 1.0, quadY ),
+                Direction3D.Zn => new Vector3Dbl( -quadY, quadX, -1.0 ),
+                Direction3D.Zp => new Vector3Dbl( quadY, quadX, 1.0 ),
+                _ => throw new ArgumentException( $"Invalid face orientation {face}", nameof( face ) ),
+            };
+            return pos;
+        }
+
+        /// <returns>Returns the point on the surface of a unit cube corresponding to the specified cube face and face coordinates.</returns>
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static Vector3Dbl GetQuadPointDbl( this Direction3D face, Vector2 quadXY )
+        {
+            return GetQuadPointDbl( face, quadXY.x, quadXY.y );
+        }
+
+        /// <returns>Returns the point on the surface of a unit cube corresponding to the specified cube face and face coordinates.</returns>
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static Vector3Dbl GetSpherePointDbl( this Direction3D face, float quadX, float quadY )
+        {
+            Vector3Dbl pos = GetQuadPointDbl( face, quadX, quadY );
+            pos.Normalize(); // unit sphere.
+            return pos;
+        }
+
+        /// <returns>Returns the point on the surface of a unit cube corresponding to the specified cube face and face coordinates.</returns>
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static Vector3Dbl GetSpherePointDbl( this Direction3D face, Vector2 quadXY )
+        {
+            return GetSpherePointDbl( face, quadXY.x, quadXY.y );
+        }
+
 
         /// <summary>
         /// Gets the global direction on a cubemap from a face and a local direction on that face.
@@ -219,57 +361,6 @@ namespace UnityEngine
                 },
                 _ => throw new ArgumentException( $"{first} doesn't share an edge with {second}.", nameof( first ) ),
             };
-        }
-
-
-        /// <returns>Returns the point on the surface of a unit cube corresponding to the specified cube face and face coordinates.</returns>
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static Vector3 GetSpherePoint( this Direction3D face, float quadX, float quadY )
-        {
-            // quad x, y go in range [-1..1]
-            Contract.Assert( quadX >= -1 && quadX <= 1, $"{nameof( quadX )} has to be in range [-1..1]." );
-            Contract.Assert( quadY >= -1 && quadY <= 1, $"{nameof( quadY )} has to be in range [-1..1]." );
-            var pos = face switch
-            {
-                Direction3D.Xn => new Vector3( -1.0f, quadX, quadY ),
-                Direction3D.Xp => new Vector3( 1.0f, -quadX, quadY ),
-                Direction3D.Yn => new Vector3( -quadX, -1.0f, quadY ),
-                Direction3D.Yp => new Vector3( quadX, 1.0f, quadY ),
-                Direction3D.Zn => new Vector3( -quadY, quadX, -1.0f ),
-                Direction3D.Zp => new Vector3( quadY, quadX, 1.0f ),
-                _ => throw new ArgumentException( $"Invalid face orientation {face}", nameof( face ) ),
-            };
-            pos.Normalize(); // unit sphere.
-            return pos;
-        }
-
-        /// <returns>Returns the point on the surface of a unit cube corresponding to the specified cube face and face coordinates.</returns>
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static Vector3Dbl GetQuadPointDbl( this Direction3D face, float quadX, float quadY )
-        {
-            // quad x, y go in range [-1..1]
-            Contract.Assert( quadX >= -1 && quadX <= 1, $"{nameof( quadX )} has to be in range [-1..1]." );
-            Contract.Assert( quadY >= -1 && quadY <= 1, $"{nameof( quadY )} has to be in range [-1..1]." );
-            var pos = face switch
-            {
-                Direction3D.Xn => new Vector3Dbl( -1.0, quadX, quadY ),
-                Direction3D.Xp => new Vector3Dbl( 1.0, -quadX, quadY ),
-                Direction3D.Yn => new Vector3Dbl( -quadX, -1.0, quadY ),
-                Direction3D.Yp => new Vector3Dbl( quadX, 1.0, quadY ),
-                Direction3D.Zn => new Vector3Dbl( -quadY, quadX, -1.0 ),
-                Direction3D.Zp => new Vector3Dbl( quadY, quadX, 1.0 ),
-                _ => throw new ArgumentException( $"Invalid face orientation {face}", nameof( face ) ),
-            };
-            return pos;
-        }
-
-        /// <returns>Returns the point on the surface of a unit cube corresponding to the specified cube face and face coordinates.</returns>
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static Vector3Dbl GetSpherePointDbl( this Direction3D face, float quadX, float quadY )
-        {
-            Vector3Dbl pos = GetQuadPointDbl( face, quadX, quadY );
-            pos.Normalize(); // unit sphere.
-            return pos;
         }
     }
 }

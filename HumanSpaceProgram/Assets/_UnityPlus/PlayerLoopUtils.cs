@@ -15,21 +15,21 @@ namespace UnityPlus
             AddSystemNested( new Type[] { }, 0, ref loopRoot, in systemToAdd );
             PlayerLoop.SetPlayerLoop( loopRoot );
         }
-        
+
         public static void AddSystem<T1>( in PlayerLoopSystem systemToAdd )
         {
             PlayerLoopSystem loopRoot = PlayerLoop.GetCurrentPlayerLoop();
             AddSystemNested( new[] { typeof( T1 ) }, 0, ref loopRoot, in systemToAdd );
             PlayerLoop.SetPlayerLoop( loopRoot );
         }
-        
+
         public static void AddSystem<T1, T2>( in PlayerLoopSystem systemToAdd )
         {
             PlayerLoopSystem loopRoot = PlayerLoop.GetCurrentPlayerLoop();
             AddSystemNested( new[] { typeof( T1 ), typeof( T2 ) }, 0, ref loopRoot, in systemToAdd );
             PlayerLoop.SetPlayerLoop( loopRoot );
         }
-        
+
         public static void AddSystem<T1, T2, T3>( in PlayerLoopSystem systemToAdd )
         {
             PlayerLoopSystem loopRoot = PlayerLoop.GetCurrentPlayerLoop();
@@ -204,7 +204,7 @@ namespace UnityPlus
         {
             PrintPlayerLoop( PlayerLoop.GetCurrentPlayerLoop() );
         }
-        
+
         public static void PrintPlayerLoop( PlayerLoopSystem loop )
         {
             StringBuilder sb = new StringBuilder();
