@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityPlus.AssetManagement;
 
 namespace HSP.CelestialBodies.Surfaces
 {
@@ -32,7 +33,7 @@ namespace HSP.CelestialBodies.Surfaces
 
         public Func<IEnumerable<Vector3Dbl>> PoIGetter { get; set; }
 
-        Vector3Dbl[] _poisAtLastChange = null; // Initial value null is important.
+        Vector3Dbl[] _oldPois = null; // Initial value null is important.
 
         LODQuadRebuilder _currentBuild;
         LODQuadTreeChanges _currentChanges;
@@ -44,13 +45,6 @@ namespace HSP.CelestialBodies.Surfaces
 
         void Awake()
         {
-            // Possibly move this to a child, so it can be disabled without disabling entire CB.
-            CelestialBody = this.GetComponent<CelestialBody>();
-        }
-
-        void Start()
-        {
-            _quadTree = new LODQuadTree( HardLimitSubdivLevel );
             for( int i = 0; i < 6; i++ )
             {
 #warning TODO - Move these to some sort of celestial body definition.
@@ -58,49 +52,42 @@ namespace HSP.CelestialBodies.Surfaces
                 mat.SetTexture( "_MainTex", cbTex[i] );
                 mat.SetFloat( "_Glossiness", 0.05f );
                 mat.SetFloat( "_NormalStrength", 0.0f );
-
-
-                //Vector2 center = Vector2.zero;
-                //int lN = 0;
-
-                //_quadTree[i] = new LODQuadTree_Old( new LODQuadTree_Old.Node( null, center, LODQuadTree_NodeUtils.GetSize( lN ) ) );
-
-#warning TODO - celestial bodies need something that will replace the buildin parenting of colliders with 64-bit parents and update their scene position at all times (fixedupdate + update + lateupdate).
-
-                //LODQuad quad = LODQuad.CreateL0( _celestialBody.transform, this, _celestialBody, _quadTree[i].Root, (float)_celestialBody.Radius * QUAD_RANGE_MULTIPLIER, mat, (Direction3D)i );
-                //_activeQuads.Add( quad );
-
-                //RemeshQuad( quad );
+                AssetRegistry.Register( $"Vanilla::CBMATERIAL{i}", mat );
             }
+
+            // Possibly move this to a child, so it can be disabled without disabling entire CB.
+            CelestialBody = this.GetComponent<CelestialBody>();
         }
 
-        private static bool ApproximatelyDifferent( Vector3Dbl lhs, Vector3Dbl rhs )
+        void Start()
         {
-            const double UPDATE_THRESHOLD = 0.5;
-
-            return Math.Abs( lhs.x - rhs.x ) >= UPDATE_THRESHOLD
-                || Math.Abs( lhs.y - rhs.y ) >= UPDATE_THRESHOLD
-                || Math.Abs( lhs.z - rhs.z ) >= UPDATE_THRESHOLD;
+            _quadTree = new LODQuadTree( HardLimitSubdivLevel );
         }
 
-        private bool NewPoisTheSameAsLastFrame( Vector3Dbl[] airfPOIs ) // with moving vessels, we will need to use POIs in celestial body space.
+        private static bool ApproximatelyDifferent( Vector3Dbl lhs, Vector3Dbl rhs, double threshold )
         {
-            // Checks if the new pois are close enough to the old pois that we don't need to change the subdivisions.
-            if( _poisAtLastChange == null )
-                return false;
+            return Math.Abs( lhs.x - rhs.x ) >= threshold
+                || Math.Abs( lhs.y - rhs.y ) >= threshold
+                || Math.Abs( lhs.z - rhs.z ) >= threshold;
+        }
 
-            if( _poisAtLastChange.Length != airfPOIs.Length )
-                return false;
+        private bool PoisChanged( Vector3Dbl[] newPois )
+        {
+            if( _oldPois == null )
+                return true;
 
-            for( int i = 0; i < airfPOIs.Length; i++ )
+            if( _oldPois.Length != newPois.Length )
+                return true;
+
+            for( int i = 0; i < newPois.Length; i++ )
             {
-                if( ApproximatelyDifferent( airfPOIs[i], _poisAtLastChange[i] ) )
+                if( ApproximatelyDifferent( newPois[i], _oldPois[i], 0.5 ) )
                 {
-                    return false;
+                    return true;
                 }
             }
 
-            return true;
+            return false;
         }
 
 #warning INFO - you can't 'finish' a rebuild, while another rebuild is active. This basically boild down to "1 rebuild can be active at a given time".
@@ -127,14 +114,13 @@ namespace HSP.CelestialBodies.Surfaces
 
             Vector3Dbl[] localPois = PoIGetter.Invoke().Select( p => rot.Inverse() * ((p - pos) / scale) ).ToArray();
 
-            bool allPoisTheSame = NewPoisTheSameAsLastFrame( localPois );
-
-            if( !allPoisTheSame )
+            if( PoisChanged( localPois ) )
             {
                 LODQuadTreeChanges changes = LODQuadTreeChanges.GetChanges( _quadTree, localPois );
 
                 if( changes.AnythingChanged )
                 {
+                    _oldPois = localPois;
                     _currentBuild = LODQuadRebuilder.FromChanges( this, jobs, changes, LODQuadRebuildMode.Visual );
                     _currentChanges = changes;
                 }

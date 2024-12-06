@@ -50,7 +50,7 @@ namespace HSP.CelestialBodies.Surfaces
                 mf.sharedMesh = mesh;
 
                 MeshRenderer mr = gameObject.AddComponent<MeshRenderer>();
-                mr.material = AssetRegistry.Get<Material>( "builtin::Resources/New Material 1" );
+                mr.material = AssetRegistry.Get<Material>( $"Vanilla::CBMATERIAL{(int)node.Face}" );
             }
 
             if( (sphere.Mode & LODQuadMode.Collider) == LODQuadMode.Collider )
