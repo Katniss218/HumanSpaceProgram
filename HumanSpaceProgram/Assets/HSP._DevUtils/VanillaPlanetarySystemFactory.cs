@@ -48,8 +48,15 @@ namespace HSP._DevUtils
             CelestialBody cb = new CelestialBodyFactory( id ).Create( airfPos, airfRot );
             LODQuadSphere lqs = cb.gameObject.AddComponent<LODQuadSphere>();
             lqs.Mode = LODQuadMode.Visual;
+            lqs.HardLimitSubdivLevel = 16;
             //lqs.PoIGetter = () => VesselManager.LoadedVessels.Select( v => v.ReferenceFrameTransform.AbsolutePosition );
             lqs.PoIGetter = () => new Vector3Dbl[] { SceneReferenceFrameManager.ReferenceFrame.TransformPosition( GameplaySceneCameraManager.NearCamera.transform.position ) };
+
+            LODQuadSphere lqs2 = cb.gameObject.AddComponent<LODQuadSphere>();
+            lqs2.Mode = LODQuadMode.Collider;
+            lqs2.HardLimitSubdivLevel = 14;
+            lqs2.PoIGetter = () => VesselManager.LoadedVessels.Select( v => v.ReferenceFrameTransform.AbsolutePosition );
+            //lqs2.PoIGetter = () => new Vector3Dbl[] { SceneReferenceFrameManager.ReferenceFrame.TransformPosition( GameplaySceneCameraManager.NearCamera.transform.position ) };
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
             comp.IsAttractor = true;
