@@ -54,9 +54,6 @@ namespace HSP.CelestialBodies.Surfaces
             r.Mesh.SetUVs( 0, resultUvs );
             r.Mesh.SetTriangles( resultTriangles.ToArray(), 0 );
             // tangents calc'd here because job can't create Mesh object to calc them.
-            r.Mesh.RecalculateTangents();
-            r.Mesh.FixTangents(); // fix broken tangents.
-            r.Mesh.RecalculateBounds();
 
             //MeshUpdateFlags MESH_UPDATE_FLAGS = MeshUpdateFlags.DontValidateIndices | MeshUpdateFlags.DontNotifyMeshUsers | MeshUpdateFlags.DontRecalculateBounds | MeshUpdateFlags.DontResetBoneBounds;
             //meshID = quad.tempMesh.GetInstanceID();

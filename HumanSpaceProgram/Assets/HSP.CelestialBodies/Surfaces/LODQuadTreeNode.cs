@@ -40,7 +40,7 @@ namespace HSP.CelestialBodies.Surfaces
         /// This is equal to the edge length of the quad on its cube face. <br/>
         /// Starts at 2 for subdivision level 0, and halves with every subdivision.
         /// </remarks>
-        public float Size => 2.0f / (float)(1 << SubdivisionLevel);
+        public float Size { get; }
 
         /// <summary>
         /// The 3D center of the quad. Normalized to the surface of the sphere.
@@ -87,10 +87,13 @@ namespace HSP.CelestialBodies.Surfaces
         /// </summary>
         public LODQuadTreeNode Yp;
 
-        internal LODQuadTreeNode( int subdivisionLevel, Vector3Dbl center, Direction3D face, Vector2 faceCenter )
+        public const double SUBDIV_RANGE_MULTIPLIER = 1.25;
+
+        internal LODQuadTreeNode( int subdivisionLevel, Vector3Dbl sphereCenter, Direction3D face, Vector2 faceCenter )
         {
             this.SubdivisionLevel = subdivisionLevel;
-            this.SphereCenter = center;
+            this.Size = 2.0f / (float)(1 << subdivisionLevel);
+            this.SphereCenter = sphereCenter;
             this.Face = face;
             this.FaceCenter = faceCenter;
         }
@@ -107,34 +110,13 @@ namespace HSP.CelestialBodies.Surfaces
             {
                 double distance = Vector3Dbl.Distance( localPoi, SphereCenter );
 
-                if( distance < (double)Size )
+                if( distance < (double)Size * SUBDIV_RANGE_MULTIPLIER )
                 {
                     return true;
                 }
             }
 
             return false;
-        }
-
-        /// <summary>
-        /// Checks if this node should be unsubdivided, based on the collection of pois in local normalized space.
-        /// </summary>
-        /// <remarks>
-        /// Assumes that the node is not a leaf (hasn't already been unsubdivided).
-        /// </remarks>
-        public bool ShouldUnsubdivide( IEnumerable<Vector3Dbl> localPois )
-        {
-            foreach( var localPoi in localPois )
-            {
-                double distance = Vector3Dbl.Distance( localPoi, SphereCenter );
-
-                if( distance < (double)this.Size )
-                {
-                    return false;
-                }
-            }
-
-            return true;
         }
 
         /// <summary>
@@ -204,6 +186,20 @@ namespace HSP.CelestialBodies.Surfaces
             int x = node.FaceCenter.x < node.Parent.FaceCenter.x ? 0 : 1;
             int y = node.FaceCenter.y < node.Parent.FaceCenter.y ? 0 : 1;
             return (x, y);
+        }
+    }
+
+    public class ValueLODQuadTreeNodeComparer : IEqualityComparer<LODQuadTreeNode>
+    {
+        public bool Equals( LODQuadTreeNode x, LODQuadTreeNode y )
+        {
+            return x.Face == y.Face
+                && x.FaceCenter == y.FaceCenter;
+        }
+
+        public int GetHashCode( LODQuadTreeNode obj )
+        {
+            return HashCode.Combine( obj.Face.GetHashCode(), obj.FaceCenter.GetHashCode() );
         }
     }
 }

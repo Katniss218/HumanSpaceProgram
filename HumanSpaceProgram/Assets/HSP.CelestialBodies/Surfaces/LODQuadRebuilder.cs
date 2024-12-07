@@ -2,15 +2,28 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 
 namespace HSP.CelestialBodies.Surfaces
 {
-
     public class LODQuadRebuilder : IDisposable
     {
+        [Flags]
+        public enum BuildSettings
+        {
+            None = 0,
+            /// <summary>
+            /// If specified, the rebuilder will include the immediate neighbors of the build area in the build process.
+            /// </summary>
+            /// <remarks>
+            /// Use to clean edges of nodes that depend on the neighbors (e.g. smoothing).
+            /// </remarks>
+            IncludeNeighborsOfChanged = 1,
+
+            Default = IncludeNeighborsOfChanged
+        }
+
         private LODQuadRebuildData[] _rebuildQuads;
 
         private ILODQuadJob[] _jobs;
@@ -210,61 +223,23 @@ namespace HSP.CelestialBodies.Surfaces
             rebuilder._buildMode = buildMode;
             rebuilder._settings = settings;
 
-            rebuilder.SetQuadsToBuild( changes );
+            rebuilder.SetQuadsToBuild( changes, settings );
 
             return rebuilder;
         }
 
-        [Flags]
-        public enum BuildSettings
+        private void SetQuadsToBuild( LODQuadTreeChanges changes, BuildSettings settings )
         {
-            /// <summary>
-            /// If specified, the rebuilder will include the immediate neighbors of the build area in the build process.
-            /// </summary>
-            /// <remarks>
-            /// Use to clean edges of nodes that depend on the neighbors (e.g. smoothing).
-            /// </remarks>
-            IncludeNeighborsOfChanged = 1
-        }
+            var nodes = changes.GetNewNodes();
 
-        private void SetQuadsToBuild( LODQuadTreeChanges changes )
-        {
-            // Nodes can be completely new and/or just updated (if a neighbor was subdivided, the node needs to update its edge in that direction, so the neighbors of new nodes need to be rebuilt).
+            if( settings.HasFlag( BuildSettings.IncludeNeighborsOfChanged ) )
+            {
+                nodes = nodes.Union( changes.GetDifferentNeighbors() );
+            }
 
-#warning TODO - neighbors of new nodes don't have the new nodes as their neighbors.
-            LODQuadRebuildData[] quads = changes.GetAddedNodes().IncludeNeighbors().Distinct( new LodQuadTreeNodeComparer() ).Select( node => new LODQuadRebuildData( node ) ).ToArray();
+            LODQuadRebuildData[] quads = nodes.Distinct( new ValueLODQuadTreeNodeComparer() ).Select( node => new LODQuadRebuildData( node ) ).ToArray();
 
             this._rebuildQuads = quads;
-        }
-    }
-
-    public static class IEnumerable_LODQuadTreeNode_Ex
-    {
-        public static IEnumerable<LODQuadTreeNode> IncludeNeighbors( this IEnumerable<LODQuadTreeNode> nodes )
-        {
-            foreach( var node in nodes )
-            {
-                yield return node;
-
-                yield return node.Xn;
-                yield return node.Xp;
-                yield return node.Yn;
-                yield return node.Yp;
-            }
-        }
-    }
-
-    public class LodQuadTreeNodeComparer : IEqualityComparer<LODQuadTreeNode>
-    {
-        public bool Equals( LODQuadTreeNode x, LODQuadTreeNode y )
-        {
-            return x.Face == y.Face
-                && x.SphereCenter == y.SphereCenter;
-        }
-
-        public int GetHashCode( LODQuadTreeNode obj )
-        {
-            return HashCode.Combine( obj.Face.GetHashCode(), obj.SphereCenter.GetHashCode() );
         }
     }
 }

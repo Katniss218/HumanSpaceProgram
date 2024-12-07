@@ -15,18 +15,14 @@ namespace HSP.CelestialBodies.Surfaces
         /// <summary>
         /// The number of binary subdivisions per edge of each of the quads.
         /// </summary>
-        public int EdgeSubdivisions { get; private set; } = 4;
+        public int EdgeSubdivisions { get; private set; } = 5;
 
         /// <summary>
         /// The level of subdivision (lN) at which the quad will stop subdividing.
         /// </summary>
-        public int HardLimitSubdivLevel { get; set; } = 20;
+        public int HardLimitSubdivLevel { get; set; } = 16;
 
-        [field: SerializeField]
-        LODQuadTree _quadTree;
         public CelestialBody CelestialBody { get; private set; }
-
-        public const float QUAD_RANGE_MULTIPLIER = 2.0f; // 3.0 makes all joints only between the same subdiv.
 
 #warning TODO - Setter causes desyncs with existing quads
         public LODQuadMode Mode { get; set; }
@@ -35,10 +31,14 @@ namespace HSP.CelestialBodies.Surfaces
 
         Vector3Dbl[] _oldPois = null; // Initial value null is important.
 
-        LODQuadRebuilder _currentBuild;
-        LODQuadTreeChanges _currentChanges;
+        LODQuadTree _currentTree;
+        Dictionary<LODQuadTreeNode, LODQuad> _currentQuads = new( new ValueLODQuadTreeNodeComparer() );
 
-        Dictionary<LODQuadTreeNode, LODQuad> allQuads = new();
+        LODQuadRebuilder _builder;
+        LODQuadTree _buildingTree;
+        LODQuadTreeChanges _buildingChanges;
+
+        public bool IsBuilding => _builder != null;
 
         public Transform QuadParent => this.transform;
 
@@ -74,7 +74,7 @@ namespace HSP.CelestialBodies.Surfaces
 
         void Start()
         {
-            _quadTree = new LODQuadTree( HardLimitSubdivLevel );
+            _currentTree = new LODQuadTree( HardLimitSubdivLevel );
         }
 
         private static bool ApproximatelyDifferent( Vector3Dbl lhs, Vector3Dbl rhs, double threshold )
@@ -108,12 +108,12 @@ namespace HSP.CelestialBodies.Surfaces
 
         void Update()
         {
-            if( _currentBuild == null )
+            if( _builder == null )
             {
                 TryRebuild();
             }
 
-            if( _currentBuild != null ) // also starts the build.
+            if( _builder != null ) // also starts the build.
             {
                 TryBuild();
             }
@@ -121,9 +121,9 @@ namespace HSP.CelestialBodies.Surfaces
 
         void OnDestroy()
         {
-            if( _currentBuild != null )
+            if( _builder != null )
             {
-                _currentBuild.Dispose();
+                _builder.Dispose();
             }
         }
 
@@ -137,40 +137,48 @@ namespace HSP.CelestialBodies.Surfaces
 
             if( PoisChanged( localPois, 0.5 / scale ) )
             {
-                LODQuadTreeChanges changes = LODQuadTreeChanges.GetChanges( _quadTree, localPois );
+#warning TODO - filter only use pois that are within the range of the planet itself. Only use those pois when doing comparisons as well
 
-                if( changes.AnythingChanged )
+                var buildingTree = LODQuadTree.FromPois( _currentTree.MaxDepth, localPois );
+                var buildingChanges = LODQuadTree.GetDifferences( _currentTree, buildingTree );
+
+                if( buildingChanges.AnythingChanged )
                 {
                     _oldPois = localPois;
-                    _currentBuild = LODQuadRebuilder.FromChanges( this, jobs, changes, LODQuadRebuildMode.Visual, LODQuadRebuilder.BuildSettings.IncludeNeighborsOfChanged );
-                    _currentChanges = changes;
+                    _builder = LODQuadRebuilder.FromChanges( this, jobs, buildingChanges, LODQuadRebuildMode.Visual, LODQuadRebuilder.BuildSettings.IncludeNeighborsOfChanged );
+                    _buildingTree = buildingTree;
+                    _buildingChanges = buildingChanges;
                 }
             }
         }
 
         private void TryBuild()
         {
-            if( !_currentBuild.IsDone )
+            if( !_builder.IsDone )
             {
-                _currentBuild.Build();
+                _builder.Build();
             }
-            if( _currentBuild.IsDone ) // if build finished.
+            if( _builder.IsDone ) // if build finished.
             {
-                foreach( var node in _currentChanges.GetRemovedNodes() )
+                foreach( var node in _buildingChanges.GetRemovedNodes() )
                 {
-                    if( allQuads.Remove( node, out var quad ) ) // destroy the children of unsubdivided nodes.
-                    {
+                    if( _currentQuads.Remove( node, out var quad ) ) // destroy the children of unsubdivided nodes.
+                    { 
                         Destroy( quad.gameObject );
+                    }
+                    else
+                    {
+                        Debug.LogError( "Quad [exists in old, doesn't exist in new] was already destroyed." );
                     }
                 }
 
-                foreach( var node in _currentChanges.GetLeafNodesDueToRemoval() )
+                foreach( var node in _buildingChanges.GetBecameLeaf() )
                 {
-                    if( allQuads.TryGetValue( node, out var quad ) )  // activate the existing unsubdivided nodes.
+                    if( _currentQuads.TryGetValue( node, out var quad ) )  // activate the existing unsubdivided nodes.
                     {
                         if( quad.IsActive )
                         {
-                            Debug.LogError( $"Quad was already active." );
+                            Debug.LogError( $"Quad [became a leaf in new] was already active." );
                         }
                         else
                         {
@@ -179,38 +187,40 @@ namespace HSP.CelestialBodies.Surfaces
                     }
                 }
 
-                _currentChanges.ApplyTo( _quadTree );
-
-                foreach( var quad in _currentBuild.GetResults() )
+                foreach( var node in _buildingChanges.GetBecameNonLeaf() )
                 {
-                    if( allQuads.Remove( quad.Node, out var existingQuad ) ) // existing leaf was refreshed.
+                    if( _currentQuads.TryGetValue( node, out var quad ) )  // activate the existing unsubdivided nodes.
+                    {
+                        if( !quad.IsActive )
+                        {
+                            Debug.LogError( $"Quad [became a non-leaf in new] was already inactive." );
+                        }
+                        else
+                        {
+                            quad.Deactivate();
+                        }
+                    }
+                }
+
+                foreach( var quad in _builder.GetResults() )
+                {
+                    if( _currentQuads.Remove( quad.Node, out var existingQuad ) ) // existing leaf was refreshed.
                     {
                         Destroy( existingQuad.gameObject );
                     }
 
-                    if( quad.Node.Parent != null )
-                    {
-                        if( allQuads.TryGetValue( quad.Node.Parent, out var parentQuad ) ) // deactivate the parents of subdivided nodes.
-                        {
-                            if( !parentQuad.IsActive )
-                            {
-                                //Debug.LogError( $"Quad was already inactive." ); // not an error, technically normal (can be when a node subdivides more than once in a frame).
-                            }
-                            else
-                            {
-                                parentQuad.Deactivate();
-                            }
-                        }
-                    }
-
-                    allQuads.Add( quad.Node, quad );
+                    _currentQuads.Add( quad.Node, quad );
 
                     if( quad.Node.IsLeaf )      // activate the leaves of subdivided chains.
                     {
                         quad.Activate();
                     }
                 }
-                _currentBuild = null;
+
+                _currentTree = _buildingTree;
+                _builder = null;
+                _buildingTree = null;
+                _buildingChanges = null;
             }
         }
     }
