@@ -1,7 +1,8 @@
-﻿using Unity.Collections;
+﻿using HSP.CelestialBodies.Surfaces;
+using Unity.Collections;
 using UnityEngine;
 
-namespace HSP.CelestialBodies.Surfaces
+namespace HSP.Vanilla.CelestialBodies
 {
     public struct SmoothNeighbors_Job : ILODQuadJob
     {
@@ -33,10 +34,13 @@ namespace HSP.CelestialBodies.Surfaces
 
         public void Finish( LODQuadRebuildData r )
         {
-            r.Mesh.RecalculateNormals();
-            r.Mesh.RecalculateTangents();
-            r.Mesh.FixTangents(); // fix broken tangents.
-            r.Mesh.RecalculateBounds();
+            //r.Mesh.RecalculateNormals();
+            //r.Mesh.RecalculateTangents();
+            //r.Mesh.FixTangents(); // fix broken tangents.
+        }
+
+        public void Dispose()
+        {
         }
 
         public ILODQuadJob Clone()

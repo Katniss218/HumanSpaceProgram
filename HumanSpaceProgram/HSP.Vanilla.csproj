@@ -62,6 +62,7 @@
     <Compile Include="Assets\HSP.Vanilla\Scenes\EditorScene\EditorSceneManager.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\DesignVesselManager.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\Tools\VanillaToolRegisterer.cs" />
+    <Compile Include="Assets\HSP.Vanilla\CelestialBodies\BakeCollisionData_Job.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FSequencer.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\Cameras\DesignSceneCameraManager.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\F3AxisActuator.cs" />
@@ -76,6 +77,7 @@
     <Compile Include="Assets\HSP.Vanilla\Components\FAttachNode.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FBulkConnection.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\OnTimelineSave.cs" />
+    <Compile Include="Assets\HSP.Vanilla\CelestialBodies\MakeQuadMesh_Job.cs" />
     <Compile Include="Assets\HSP.Vanilla\VesselPinning_Ex.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\GameplaySceneTool.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\Tools\RerootTool.cs" />
@@ -85,6 +87,7 @@
     <Compile Include="Assets\HSP.Vanilla\Trajectories\KeplerianOrbit.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\MainMenuScene\MainMenuEscapeInputController.cs" />
     <Compile Include="Assets\HSP.Vanilla\OnCelestialBodyCreated.cs" />
+    <Compile Include="Assets\HSP.Vanilla\CelestialBodies\MakeMeshData_Job.cs" />
     <Compile Include="Assets\HSP.Vanilla\Trajectories\FixedOrbit.cs" />
     <Compile Include="Assets\HSP.Vanilla\SelectedControlFrameManager.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\IGhostable_Ex.cs" />
@@ -97,6 +100,7 @@
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\Tools\DefaultTool.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FVesselSeparator.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FSequencer.Sequence.cs" />
+    <Compile Include="Assets\HSP.Vanilla\CelestialBodies\SmoothNeighbors_Job.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\OnStartup.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FAttitudeAvionics.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FPointMass.cs" />
@@ -128,6 +132,7 @@
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\TimeScaleInputController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\GameplaySceneToolManager.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\F1AxisActuator.cs" />
+    <Compile Include="Assets\HSP.Vanilla\CelestialBodies\Displace_Job.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FLaunchSiteMarker.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FReactionControlController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FControlFrame.cs" />

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HSP.ReferenceFrames;
+using System;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 
@@ -6,17 +7,20 @@ namespace HSP.CelestialBodies.Surfaces
 {
     /// <summary>
     /// The front end for <see cref="LODQuadTreeNode"/>.
+    /// A single quad of a LOD sphere.
     /// </summary>
     [RequireComponent( typeof( MeshFilter ) )]
     public class LODQuad : MonoBehaviour
     {
+        /// <summary>
+        /// The LOD sphere that this quad belongs to.
+        /// </summary>
         public LODQuadSphere QuadSphere { get; private set; }
 
-        public LODQuadMode Mode => QuadSphere.Mode;
-
+        /// <summary>
+        /// The backend node that this quad is associated with.
+        /// </summary>
         public LODQuadTreeNode Node { get; private set; }
-
-        public CelestialBody CelestialBody { get; private set; }
 
         MeshFilter _meshFilter;
         MeshCollider _meshCollider;
@@ -31,9 +35,28 @@ namespace HSP.CelestialBodies.Surfaces
 
         public bool IsActive => this.gameObject.activeSelf;
 
+        void FixedUpdate()
+        {
+            Vector3Dbl relativePos = Node.SphereCenter * QuadSphere.CelestialBody.Radius;
+            var refFrame = QuadSphere.CelestialBody.ReferenceFrameTransform.OrientedInertialReferenceFrame();
+            Vector3Dbl airfPos = refFrame.TransformPosition( relativePos );
+            QuaternionDbl airfRot = refFrame.TransformRotation( QuaternionDbl.identity );
+            Vector3 scenePos = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformPosition( airfPos );
+            Quaternion sceneRot = (Quaternion)SceneReferenceFrameManager.ReferenceFrame.InverseTransformRotation( airfRot );
+            this.transform.SetPositionAndRotation( scenePos, sceneRot );
+        }
+
         public void Activate()
         {
             this.gameObject.SetActive( true );
+
+            Vector3Dbl relativePos = Node.SphereCenter * QuadSphere.CelestialBody.Radius;
+            var refFrame = QuadSphere.CelestialBody.ReferenceFrameTransform.OrientedInertialReferenceFrame();
+            Vector3Dbl airfPos = refFrame.TransformPosition( relativePos );
+            QuaternionDbl airfRot = refFrame.TransformRotation( QuaternionDbl.identity );
+            Vector3 scenePos = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformPosition( airfPos );
+            Quaternion sceneRot = (Quaternion)SceneReferenceFrameManager.ReferenceFrame.InverseTransformRotation( airfRot );
+            this.transform.SetPositionAndRotation( scenePos, sceneRot );
         }
 
         public void Deactivate()
@@ -51,6 +74,7 @@ namespace HSP.CelestialBodies.Surfaces
                 MeshFilter mf = gameObject.AddComponent<MeshFilter>();
                 mf.sharedMesh = mesh;
 
+#warning TODO - add proper way to get textures/materials
                 MeshRenderer mr = gameObject.AddComponent<MeshRenderer>();
                 mr.material = AssetRegistry.Get<Material>( $"Vanilla::CBMATERIAL{(int)node.Face}" );
             }
@@ -68,7 +92,6 @@ namespace HSP.CelestialBodies.Surfaces
 
             lodQuad.Node = node;
             lodQuad.QuadSphere = sphere;
-            lodQuad.CelestialBody = sphere.CelestialBody;
 
             lodQuad.Deactivate();
 

@@ -3,6 +3,7 @@ using HSP.CelestialBodies.Surfaces;
 using HSP.ReferenceFrames;
 using HSP.Timelines;
 using HSP.Trajectories;
+using HSP.Vanilla.CelestialBodies;
 using HSP.Vanilla.Scenes.GameplayScene.Cameras;
 using HSP.Vanilla.Trajectories;
 using HSP.Vessels;
@@ -19,9 +20,16 @@ namespace HSP._DevUtils
         private static CelestialBody CreateCB( string id, Vector3Dbl airfPos, QuaternionDbl airfRot )
         {
             CelestialBody cb = new CelestialBodyFactory( id ) { radius = 696_340_000.0, mass = 1.989e30 }.Create( airfPos, airfRot );
-            //LODQuadSphere lqs = cb.gameObject.AddComponent<LODQuadSphere>();
-            //lqs.Mode = LODQuadMode.VisualAndCollider;
-            //lqs.PoIGetter = () => VesselManager.LoadedVessels.Select( v => v.ReferenceFrameTransform.AbsolutePosition );
+           /* LODQuadSphere lqs = cb.gameObject.AddComponent<LODQuadSphere>();
+            lqs.SetMode( LODQuadMode.VisualAndCollider );
+            lqs.EdgeSubdivisions = 5;
+            lqs.MaxDepth = 16;
+            lqs.PoIGetter = () => VesselManager.LoadedVessels.Select( v => v.ReferenceFrameTransform.AbsolutePosition );
+            lqs.SetJobs( new ILODQuadJob[]
+            {
+                new MakeQuadMesh_Job(),
+                new SmoothNeighbors_Job(),
+            } );*/
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
             comp.IsAttractor = true;
@@ -33,7 +41,9 @@ namespace HSP._DevUtils
         {
             CelestialBody cb = new CelestialBodyFactory( id ).Create( Vector3Dbl.zero, airfRot );
             LODQuadSphere lqs = cb.gameObject.AddComponent<LODQuadSphere>();
-            lqs.Mode = LODQuadMode.VisualAndCollider;
+            lqs.SetMode( LODQuadMode.VisualAndCollider );
+            lqs.EdgeSubdivisions = 5;
+            lqs.MaxDepth = 16;
             lqs.PoIGetter = () => VesselManager.LoadedVessels.Select( v => v.ReferenceFrameTransform.AbsolutePosition );
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
@@ -47,20 +57,44 @@ namespace HSP._DevUtils
         {
             CelestialBody cb = new CelestialBodyFactory( id ).Create( airfPos, airfRot );
             LODQuadSphere lqs = cb.gameObject.AddComponent<LODQuadSphere>();
-            lqs.Mode = LODQuadMode.Visual;
-            lqs.HardLimitSubdivLevel = 16;
-            //lqs.PoIGetter = () => VesselManager.LoadedVessels.Select( v => v.ReferenceFrameTransform.AbsolutePosition );
-            lqs.PoIGetter = () => new Vector3Dbl[] { SceneReferenceFrameManager.ReferenceFrame.TransformPosition( GameplaySceneCameraManager.NearCamera.transform.position ) };
+            lqs.SetMode( LODQuadMode.Visual );
+            lqs.EdgeSubdivisions = 5;
+            lqs.MaxDepth = 16;
+            lqs.PoIGetter = () => new Vector3Dbl[]
+            {
+                SceneReferenceFrameManager.ReferenceFrame.TransformPosition( GameplaySceneCameraManager.NearCamera.transform.position ),
+                SceneReferenceFrameManager.ReferenceFrame.TransformPosition( GameplaySceneCameraManager.NearCamera.transform.position + GameplaySceneCameraManager.NearCamera.transform.forward * 500 ),
+            };
+            lqs.SetJobs( new ILODQuadJob[]
+            {
+                new MakeQuadMesh_Job(),
+               // new Displace_Job(),
+                new SmoothNeighbors_Job(),
+                new MakeMeshData_Job(),
+            }/*, new ILODQuadJob[]
+            {
+                new BakeCollisionData_Job(),
+            }*/ );
 
             LODQuadSphere lqs2 = cb.gameObject.AddComponent<LODQuadSphere>();
-            lqs2.Mode = LODQuadMode.Collider;
-            lqs2.HardLimitSubdivLevel = 14;
+            lqs2.SetMode( LODQuadMode.Collider );
+            lqs2.EdgeSubdivisions = 5;
+            lqs2.MaxDepth = 14;
             lqs2.PoIGetter = () => VesselManager.LoadedVessels.Select( v => v.ReferenceFrameTransform.AbsolutePosition );
-            //lqs2.PoIGetter = () => new Vector3Dbl[] { SceneReferenceFrameManager.ReferenceFrame.TransformPosition( GameplaySceneCameraManager.NearCamera.transform.position ) };
+            lqs2.SetJobs( new ILODQuadJob[]
+            {
+                new MakeQuadMesh_Job(),
+               // new Displace_Job(),
+                new SmoothNeighbors_Job(),
+            }, new ILODQuadJob[]
+            {
+                new BakeCollisionData_Job(),
+            } );
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
             comp.IsAttractor = true;
-            comp.Trajectory = new NewtonianOrbit( Time.TimeManager.UT, airfPos, airfVel, Vector3Dbl.zero, cb.Mass );
+            //comp.Trajectory = new NewtonianOrbit( Time.TimeManager.UT, airfPos, airfVel, Vector3Dbl.zero, cb.Mass );
+            comp.Trajectory = new FixedOrbit( Time.TimeManager.UT, airfPos, airfRot, cb.Mass );
             return cb;
         }
 
@@ -102,7 +136,7 @@ namespace HSP._DevUtils
 
 
             CelestialBodyManager.Get( "sun" ).ReferenceFrameTransform.AbsoluteAngularVelocity = new Vector3Dbl( 0, -1, 0 );
-            CelestialBodyManager.Get( "main" ).ReferenceFrameTransform.AbsoluteAngularVelocity = new Vector3Dbl( 0, -7.2921159e-5, 0 );
+            //CelestialBodyManager.Get( "main" ).ReferenceFrameTransform.AbsoluteAngularVelocity = new Vector3Dbl( 0, -7.2921159e-5, 0 );
         }
     }
 }

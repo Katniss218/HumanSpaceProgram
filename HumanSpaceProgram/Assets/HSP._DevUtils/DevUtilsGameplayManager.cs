@@ -43,6 +43,7 @@ namespace HSP._DevUtils
     {
         public Shader cbShader;
         public Texture2D[] cbTextures = new Texture2D[6];
+        public Texture2D cbNormal;
 
         public Mesh Mesh;
         public Material Material;
@@ -142,6 +143,7 @@ namespace HSP._DevUtils
         {
             LODQuadSphere.cbShader = this.cbShader;
             LODQuadSphere.cbTex = this.cbTextures;
+            LODQuadSphere.cbNormal = this.cbNormal;
         }
 
         void Start()

@@ -43,7 +43,7 @@ namespace HSP.CelestialBodies.Surfaces
         public bool IsDone => LastFinishedStage == (StageCount - 1);
 
         LODQuadSphere _sphere;
-        LODQuadRebuildMode _buildMode;
+        LODQuadMode _buildMode;
         BuildSettings _settings;
 
         private LODQuadRebuilder()
@@ -108,6 +108,8 @@ namespace HSP.CelestialBodies.Surfaces
                             Debug.LogError( $"Exception occurred while finishing a stage {currentStage} job of type '{job.GetType()}' on body '{_sphere.CelestialBody}'." );
                             Debug.LogException( ex );
                         }
+
+                        job.Dispose();
                     }
                 }
 
@@ -161,11 +163,9 @@ namespace HSP.CelestialBodies.Surfaces
                 {
                     for( int i = firstJob; i < lastJob; i++ )
                     {
-                        // Schedule<MakeQuadMesh_Job>( quad._jobsPerStage[_stageBeingBuilt][i], quad.handlesPerStage[_stageBeingBuilt][i], i );
-
-#warning TODO - can be optimized because every quad will have the same types in parallel
+                        // This can be optimized because every quad will have the same types in parallel
                         Type jobType = _jobs[i].GetType();
-                        method.MakeGenericMethod( jobType ).Invoke( null, new object[] { rQuad.jobs, rQuad.handles, i } );
+                        method.MakeGenericMethod( jobType ).Invoke( null, new object[] { rQuad.jobs, rQuad.handles, i } ); // Schedule<JobType>( rQuad.jobs, rQuad.handles, i );
                     }
                 }
 
@@ -214,7 +214,7 @@ namespace HSP.CelestialBodies.Surfaces
         /// </summary>
         /// <param name="jobs">The jobs to use when building the meshes.</param>
         /// <returns>The rebuilder to use to rebuild the specified meshes.</returns>
-        public static LODQuadRebuilder FromChanges( LODQuadSphere sphere, ILODQuadJob[][] jobsInStages, LODQuadTreeChanges changes, LODQuadRebuildMode buildMode, BuildSettings settings )
+        public static LODQuadRebuilder FromChanges( LODQuadSphere sphere, ILODQuadJob[][] jobsInStages, LODQuadTreeChanges changes, LODQuadMode buildMode, BuildSettings settings )
         {
             LODQuadRebuilder rebuilder = new LODQuadRebuilder();
 

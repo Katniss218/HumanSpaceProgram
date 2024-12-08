@@ -1,8 +1,9 @@
-﻿using System;
+﻿using HSP.CelestialBodies.Surfaces;
+using System;
 using Unity.Collections;
 using UnityEngine;
 
-namespace HSP.CelestialBodies.Surfaces
+namespace HSP.Vanilla.CelestialBodies
 {
     public struct Displace_Job : ILODQuadJob
     {
@@ -31,6 +32,10 @@ namespace HSP.CelestialBodies.Surfaces
         }
 
         public void Finish( LODQuadRebuildData r )
+        {
+        }
+
+        public void Dispose()
         {
         }
 

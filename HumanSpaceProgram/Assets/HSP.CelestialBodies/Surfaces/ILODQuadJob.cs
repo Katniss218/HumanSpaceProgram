@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Unity.Jobs;
-using UnityEngine;
 
 namespace HSP.CelestialBodies.Surfaces
 {
@@ -27,23 +23,14 @@ namespace HSP.CelestialBodies.Surfaces
         VisualAndCollider = Visual | Collider
     }
 
-    public enum LODQuadRebuildMode
+    /// <summary>
+    /// Jobs are used to create/modify the data of the quad (vertex positions, normals, etc) as it's being built. <br/>
+    /// Implement this interface to create a custom job type.
+    /// </summary>
+    public interface ILODQuadJob : IJob, IDisposable
     {
         /// <summary>
-        /// Build the visual meshes.
-        /// </summary>
-        Visual = 1,
-
-        /// <summary>
-        /// Build the collision meshes.
-        /// </summary>
-        Collider = 2
-    }
-
-    public interface ILODQuadJob : IJob
-    {
-        /// <summary>
-        /// Determines when the job should be executed.
+        /// Determines which LOD sphere modes the job should be executed for.
         /// </summary>
         public LODQuadMode QuadMode { get; }
 
@@ -53,7 +40,7 @@ namespace HSP.CelestialBodies.Surfaces
         public void Initialize( LODQuadRebuildData r );
 
         /// <summary>
-        /// Called on the main thread to collect the result and dispose of the job.
+        /// Called on the main thread to collect the result.
         /// </summary>
         public void Finish( LODQuadRebuildData r );
 
@@ -72,7 +59,7 @@ namespace HSP.CelestialBodies.Surfaces
         /// </summary>
         /// <param name="jobsInStages">The collection of jobs, split up into stages - jobsInStages[stage][job]</param>
         /// <returns>An array of all jobs matching the specified build mode, and an array containing the indices of the first job from each subsequent stage.</returns>
-        public static (ILODQuadJob[] jobs, int[] firstJobPerStage) FilterJobs( ILODQuadJob[][] jobsInStages, LODQuadRebuildMode buildMode )
+        public static (ILODQuadJob[] jobs, int[] firstJobPerStage) FilterJobs( ILODQuadJob[][] jobsInStages, LODQuadMode buildMode )
         {
             List<ILODQuadJob> jobs = new();
             List<int> firstJobPerStage = new();
@@ -83,6 +70,7 @@ namespace HSP.CelestialBodies.Surfaces
 
                 foreach( var job in stage )
                 {
+                    // All jobs that intersect the desired build mode.
                     if( ((int)job.QuadMode & (int)buildMode) != 0 )
                     {
                         jobs.Add( job );
@@ -96,6 +84,34 @@ namespace HSP.CelestialBodies.Surfaces
             }
 
             return (jobs.ToArray(), firstJobPerStage.ToArray());
+        }
+
+        /// <summary>
+        /// Clones the job instances into a new array
+        /// </summary>
+        public static ILODQuadJob[][] CopyJobsWithValidation( ILODQuadJob[][] jobs )
+        {
+            if( jobs == null )
+            {
+                throw new ArgumentNullException( nameof( jobs ), $"Jobs can't be null." );
+            }
+
+            ILODQuadJob[][] jobsInStages = new ILODQuadJob[jobs.Length][];
+            for( int i = 0; i < jobs.Length; i++ )
+            {
+                if( jobs[i] == null )
+                    throw new ArgumentNullException( nameof( jobs ), $"The stage {i} was null." );
+
+                jobsInStages[i] = new ILODQuadJob[jobs[i].Length];
+                for( int j = 0; j < jobs[i].Length; j++ )
+                {
+                    if( jobs[i][j] == null )
+                        throw new ArgumentNullException( nameof( jobs ), $"The job {j} in stage {i} was null." );
+
+                    jobsInStages[i][j] = jobs[i][j].Clone();
+                }
+            }
+            return jobsInStages;
         }
     }
 }

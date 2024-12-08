@@ -1,8 +1,9 @@
-﻿using System;
+﻿using HSP.CelestialBodies.Surfaces;
+using System;
 using Unity.Collections;
 using UnityEngine;
 
-namespace HSP.CelestialBodies.Surfaces
+namespace HSP.Vanilla.CelestialBodies
 {
     /// <summary>
     /// A job that constructs the base mesh for the terrain.
@@ -53,12 +54,10 @@ namespace HSP.CelestialBodies.Surfaces
             r.Mesh.SetNormals( resultNormals );
             r.Mesh.SetUVs( 0, resultUvs );
             r.Mesh.SetTriangles( resultTriangles.ToArray(), 0 );
-            // tangents calc'd here because job can't create Mesh object to calc them.
+        }
 
-            //MeshUpdateFlags MESH_UPDATE_FLAGS = MeshUpdateFlags.DontValidateIndices | MeshUpdateFlags.DontNotifyMeshUsers | MeshUpdateFlags.DontRecalculateBounds | MeshUpdateFlags.DontResetBoneBounds;
-            //meshID = quad.tempMesh.GetInstanceID();
-#warning we need to set the mesh to the mesh instance, then call another job to bake everything
-
+        public void Dispose()
+        {
         }
 
         public ILODQuadJob Clone()
@@ -91,11 +90,11 @@ namespace HSP.CelestialBodies.Surfaces
             }
 
             int triIndex = 0;
-            for( int i = 0; i < sideEdges; i++ )
+            for( int x = 0; x < sideEdges; x++ )
             {
-                for( int j = 0; j < sideEdges; j++ )
+                for( int y = 0; y < sideEdges; y++ )
                 {
-                    int index = (i * sideEdges) + i + j;
+                    int index = GetIndex( x, y );
 
                     //   C - D
                     //   | / |
