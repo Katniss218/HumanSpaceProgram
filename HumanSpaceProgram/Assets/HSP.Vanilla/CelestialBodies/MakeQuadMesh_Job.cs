@@ -1,5 +1,6 @@
 ﻿using HSP.CelestialBodies.Surfaces;
 using System;
+using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine;
 
@@ -28,7 +29,7 @@ namespace HSP.Vanilla.CelestialBodies
 
         public LODQuadMode QuadMode => LODQuadMode.VisualAndCollider;
 
-        public void Initialize( LODQuadRebuildData r )
+        public void Initialize( LODQuadRebuildData r, IReadOnlyDictionary<LODQuadTreeNode, LODQuadRebuildData> _ )
         {
 #warning TODO - keep the verts in body space (as vector3dbl), turn into mesh-space when finalizing.
             radius = (float)r.CelestialBody.Radius;

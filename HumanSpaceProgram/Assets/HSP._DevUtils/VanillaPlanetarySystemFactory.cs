@@ -20,16 +20,16 @@ namespace HSP._DevUtils
         private static CelestialBody CreateCB( string id, Vector3Dbl airfPos, QuaternionDbl airfRot )
         {
             CelestialBody cb = new CelestialBodyFactory( id ) { radius = 696_340_000.0, mass = 1.989e30 }.Create( airfPos, airfRot );
-           /* LODQuadSphere lqs = cb.gameObject.AddComponent<LODQuadSphere>();
+            LODQuadSphere lqs = cb.gameObject.AddComponent<LODQuadSphere>();
             lqs.SetMode( LODQuadMode.VisualAndCollider );
-            lqs.EdgeSubdivisions = 5;
-            lqs.MaxDepth = 16;
+            lqs.EdgeSubdivisions = 4;
+            lqs.MaxDepth = 10;
             lqs.PoIGetter = () => VesselManager.LoadedVessels.Select( v => v.ReferenceFrameTransform.AbsolutePosition );
             lqs.SetJobs( new ILODQuadJob[]
             {
                 new MakeQuadMesh_Job(),
                 new SmoothNeighbors_Job(),
-            } );*/
+            } );
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
             comp.IsAttractor = true;
@@ -68,13 +68,13 @@ namespace HSP._DevUtils
             lqs.SetJobs( new ILODQuadJob[]
             {
                 new MakeQuadMesh_Job(),
-               // new Displace_Job(),
+                new Displace_Job(),
                 new SmoothNeighbors_Job(),
-                new MakeMeshData_Job(),
-            }/*, new ILODQuadJob[]
+            }, new ILODQuadJob[]
             {
-                new BakeCollisionData_Job(),
-            }*/ );
+                new MakeMeshData_Job(),
+                //new BakeCollisionData_Job(),
+            } );
 
             LODQuadSphere lqs2 = cb.gameObject.AddComponent<LODQuadSphere>();
             lqs2.SetMode( LODQuadMode.Collider );
@@ -84,8 +84,11 @@ namespace HSP._DevUtils
             lqs2.SetJobs( new ILODQuadJob[]
             {
                 new MakeQuadMesh_Job(),
-               // new Displace_Job(),
+                new Displace_Job(),
                 new SmoothNeighbors_Job(),
+            }, new ILODQuadJob[]
+            {
+                new MakeMeshData_Job(),
             }, new ILODQuadJob[]
             {
                 new BakeCollisionData_Job(),
@@ -136,7 +139,7 @@ namespace HSP._DevUtils
 
 
             CelestialBodyManager.Get( "sun" ).ReferenceFrameTransform.AbsoluteAngularVelocity = new Vector3Dbl( 0, -1, 0 );
-            //CelestialBodyManager.Get( "main" ).ReferenceFrameTransform.AbsoluteAngularVelocity = new Vector3Dbl( 0, -7.2921159e-5, 0 );
+            CelestialBodyManager.Get( "main" ).ReferenceFrameTransform.AbsoluteAngularVelocity = new Vector3Dbl( 0, -7.2921159e-5, 0 );
         }
     }
 }

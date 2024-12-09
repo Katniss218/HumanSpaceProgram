@@ -1,12 +1,16 @@
 ﻿using HSP.CelestialBodies.Surfaces;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace HSP.Vanilla.CelestialBodies
 {
     /// <summary>
-    /// Makes the PhysX collision data
+    /// Bakes the PhysX collision data off the main thread.
     /// </summary>
+    /// <remarks>
+    /// Without this job, the data is baked when the mesh is assigned to the collider (blocking the main thread).
+    /// </remarks>
     public struct BakeCollisionData_Job : ILODQuadJob
     {
         public bool Convex;
@@ -15,7 +19,7 @@ namespace HSP.Vanilla.CelestialBodies
 
         public LODQuadMode QuadMode => LODQuadMode.Collider;
 
-        public void Initialize( LODQuadRebuildData r )
+        public void Initialize( LODQuadRebuildData r, IReadOnlyDictionary<LODQuadTreeNode, LODQuadRebuildData> _ )
         {
             instanceId = r.Mesh.GetInstanceID();
         }

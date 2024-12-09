@@ -1,5 +1,6 @@
 ﻿using HSP.CelestialBodies.Surfaces;
 using System;
+using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine;
 
@@ -15,21 +16,44 @@ namespace HSP.Vanilla.CelestialBodies
         int sideVertices;
         int sideEdges;
 
+        [ReadOnly]
         NativeArray<int> resultTriangles;
-
+        [ReadOnly]
         NativeArray<Vector2> resultUVs;
+        [ReadOnly]
         NativeArray<Vector3> resultVertices;
+
         NativeArray<Vector3> resultNormals;
         NativeArray<Vector4> resultTangents;
 
-        //NativeArray<Vector3> resultVerticesXn;
-        //NativeArray<Vector3> resultVerticesXp;
-        //NativeArray<Vector3> resultVerticesYn;
-        //NativeArray<Vector3> resultVerticesYp;
+#warning TODO - Some mechanism for safety regarding when you can schedule these would be nice, as these arrays can be writeable, so no other jobs should be writing to them.
+        // Also some documentation would be nice.
+
+        // Using these without readonly can cause exceptions being thrown,
+        // writing to an array when another job reads from it can also cause big synchronization problems
+        //   (this is the reason that we can't e.g. use other normals when setting our normals).
+
+        // This essentially boils down to that using certain 'job' types in the same stage causes race conditions (depending on what these jobs do).
+
+        [ReadOnly]
+        NativeArray<Vector3> resultVerticesXn;
+        bool availableXn;
+
+        [ReadOnly]
+        NativeArray<Vector3> resultVerticesXp;
+        bool availableXp;
+
+        [ReadOnly]
+        NativeArray<Vector3> resultVerticesYn;
+        bool availableYn;
+
+        [ReadOnly]
+        NativeArray<Vector3> resultVerticesYp;
+        bool availableYp;
 
         public LODQuadMode QuadMode => LODQuadMode.VisualAndCollider;
 
-        public void Initialize( LODQuadRebuildData r )
+        public void Initialize( LODQuadRebuildData r, IReadOnlyDictionary<LODQuadTreeNode, LODQuadRebuildData> rAll )
         {
             radius = (float)r.CelestialBody.Radius;
             origin = r.Node.SphereCenter * radius;
@@ -42,9 +66,44 @@ namespace HSP.Vanilla.CelestialBodies
             resultVertices = r.ResultVertices;
             resultUVs = r.ResultUVs;
             resultNormals = r.ResultNormals;
-            resultTangents = new NativeArray<Vector4>( totalVertices, Allocator.Persistent );
+            resultTangents = new NativeArray<Vector4>( totalVertices, Allocator.TempJob );
 
-#warning TODO - let access rebuild data for other quads.
+            if( rAll.TryGetValue( r.Node.Xp, out var neighbor ) )
+            {
+                resultVerticesXn = neighbor.ResultVertices;
+                availableXn = true;
+            }
+            else
+            {
+                resultVerticesXn = resultVertices;
+            }
+            if( rAll.TryGetValue( r.Node.Xp, out neighbor ) )
+            {
+                resultVerticesXp = neighbor.ResultVertices;
+                availableXp = true;
+            }
+            else
+            {
+                resultVerticesXp = resultVertices;
+            }
+            if( rAll.TryGetValue( r.Node.Yn, out neighbor ) )
+            {
+                resultVerticesYn = neighbor.ResultVertices;
+                availableYn = true;
+            }
+            else
+            {
+                resultVerticesYn = resultVertices;
+            }
+            if( rAll.TryGetValue( r.Node.Yp, out neighbor ) )
+            {
+                resultVerticesYp = neighbor.ResultVertices;
+                availableYp = true;
+            }
+            else
+            {
+                resultVerticesYp = resultVertices;
+            }
         }
 
         public void Finish( LODQuadRebuildData r )
@@ -68,6 +127,8 @@ namespace HSP.Vanilla.CelestialBodies
         {
             return (x * sideEdges) + x + y;
         }
+
+#warning TODO - get vertex to access the appropriate neighbor, alongside the reference to said neighbor.
 
         public void Execute()
         {

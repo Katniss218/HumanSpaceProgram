@@ -24,12 +24,15 @@ namespace HSP.CelestialBodies.Surfaces
             Default = IncludeNeighborsOfChanged
         }
 
-        private LODQuadRebuildData[] _rebuildQuads;
+        private static IEqualityComparer<LODQuadTreeNode> _nodeEqualityComparer = new ValueLODQuadTreeNodeComparer();
 
+        private Dictionary<LODQuadTreeNode, LODQuadRebuildData> _rebuildData;
+
+        private MethodInfo[] _jobSchedulerPerJob; // Cached Schedule<JobType>( ... ) method with the job type for each job in sequence.
         private ILODQuadJob[] _jobs;
-        private int[] _firstJobPerStage; // index of the first job in the given stage
+        private int[] _firstJobPerStage; // Index of the first job in the stage given by the index.
 
-        public int StageCount => _firstJobPerStage.Length; // how many frames it will take from start to finish.
+        public int StageCount => _firstJobPerStage.Length; // How many frames it will take from start to finish.
 
         /// <summary>
         /// Stage currently being built.
@@ -74,7 +77,7 @@ namespace HSP.CelestialBodies.Surfaces
 
             if( LastStartedStage == -1 )
             {
-                foreach( var rQuad in _rebuildQuads )
+                foreach( var rQuad in _rebuildData.Values )
                 {
                     rQuad.InitializeBuild( _jobs, _sphere );
                 }
@@ -93,7 +96,7 @@ namespace HSP.CelestialBodies.Surfaces
                     ? _firstJobPerStage[currentStage + 1]
                     : _jobs.Length;
 
-                foreach( var rQuad in _rebuildQuads )
+                foreach( var rQuad in _rebuildData.Values )
                 {
                     rQuad.handles[lastJob - 1].Complete();
 
@@ -105,7 +108,7 @@ namespace HSP.CelestialBodies.Surfaces
                         }
                         catch( Exception ex )
                         {
-                            Debug.LogError( $"Exception occurred while finishing a stage {currentStage} job of type '{job.GetType()}' on body '{_sphere.CelestialBody}'." );
+                            Debug.LogError( $"Exception occurred while finishing a stage {currentStage} job of type '{job.GetType()}' on body '{_sphere.CelestialBody.ID}'." );
                             Debug.LogException( ex );
                         }
 
@@ -117,9 +120,18 @@ namespace HSP.CelestialBodies.Surfaces
 
                 if( IsDone )
                 {
-                    foreach( var rQuad in _rebuildQuads )
+                    foreach( var rQuad in _rebuildData.Values )
                     {
-                        rQuad.FinalizeBuild( _sphere );
+                        try
+                        {
+                            rQuad.FinalizeBuild( _sphere );
+                        }
+                        catch( Exception ex )
+                        {
+                            Debug.LogError( $"Exception occurred while finalizing the build of a quad on body '{_sphere.CelestialBody.ID}'." );
+                            Debug.LogException( ex );
+                        }
+
                         rQuad.Dispose();
                     }
                     return;
@@ -140,32 +152,28 @@ namespace HSP.CelestialBodies.Surfaces
                     : _jobs.Length;
 
                 // Initialize everything first, because they might talk to each other.
-                foreach( var rQuad in _rebuildQuads )
+                foreach( var rQuad in _rebuildData.Values )
                 {
                     foreach( var job in rQuad.jobs[firstJob..lastJob] )
                     {
                         try
                         {
-                            job.Initialize( rQuad );
+                            job.Initialize( rQuad, _rebuildData );
                         }
                         catch( Exception ex )
                         {
-                            Debug.LogError( $"Exception occurred while initializing a stage {currentStage} job of type '{job.GetType()}' on body '{_sphere.CelestialBody}'." );
+                            Debug.LogError( $"Exception occurred while initializing a stage {currentStage} job of type '{job.GetType()}' on body '{_sphere.CelestialBody.ID}'." );
                             Debug.LogException( ex );
                         }
                     }
                 }
 
-                MethodInfo method = typeof( LODQuadRebuilder ).GetMethod( nameof( LODQuadRebuilder.Schedule ), BindingFlags.Static | BindingFlags.NonPublic );
-
                 // Schedule once they're done talking to each other.
-                foreach( var rQuad in _rebuildQuads )
+                foreach( var rQuad in _rebuildData.Values )
                 {
                     for( int i = firstJob; i < lastJob; i++ )
                     {
-                        // This can be optimized because every quad will have the same types in parallel
-                        Type jobType = _jobs[i].GetType();
-                        method.MakeGenericMethod( jobType ).Invoke( null, new object[] { rQuad.jobs, rQuad.handles, i } ); // Schedule<JobType>( rQuad.jobs, rQuad.handles, i );
+                        _jobSchedulerPerJob[i].Invoke( null, new object[] { rQuad.jobs, rQuad.handles, i } ); // Schedule<JobType>( rQuad.jobs, rQuad.handles, i );
                     }
                 }
 
@@ -173,6 +181,10 @@ namespace HSP.CelestialBodies.Surfaces
             }
         }
 
+        /// <summary>
+        /// Gets the newly built quads.
+        /// </summary>
+        /// <exception cref="InvalidOperationException"></exception>
         public IEnumerable<LODQuad> GetResults()
         {
             if( !IsDone )
@@ -180,11 +192,11 @@ namespace HSP.CelestialBodies.Surfaces
                 throw new InvalidOperationException( $"{nameof( LODQuadRebuilder )}.{nameof( GetResults )} was called, but the rebuild hasn't been finished yet." );
             }
 
-            return _rebuildQuads.Select( q => q.Quad );
+            return _rebuildData.Values.Select( q => q.Quad );
         }
 
         /// <summary>
-        /// Waits for the scheduled build jobs to finish and disposes rebuild the data.
+        /// Waits for the remaining scheduled build jobs to finish (blocking the thread) and disposes rebuild the data.
         /// </summary>
         public void Dispose()
         {
@@ -196,12 +208,12 @@ namespace HSP.CelestialBodies.Surfaces
                     ? _firstJobPerStage[currentStage + 1]
                     : _jobs.Length;
 
-                foreach( var quad in _rebuildQuads )
+                foreach( var quad in _rebuildData.Values )
                 {
                     quad.handles[lastJob - 1].Complete();
                 }
 
-                foreach( var rQuad in _rebuildQuads )
+                foreach( var rQuad in _rebuildData.Values )
                 {
                     rQuad.Dispose();
                 }
@@ -223,6 +235,15 @@ namespace HSP.CelestialBodies.Surfaces
             rebuilder._buildMode = buildMode;
             rebuilder._settings = settings;
 
+
+            MethodInfo method = typeof( LODQuadRebuilder ).GetMethod( nameof( LODQuadRebuilder.Schedule ), BindingFlags.Static | BindingFlags.NonPublic );
+
+            rebuilder._jobSchedulerPerJob = new MethodInfo[rebuilder._jobs.Length];
+            for( int i = 0; i < rebuilder._jobs.Length; i++ )
+            {
+                rebuilder._jobSchedulerPerJob[i] = method.MakeGenericMethod( rebuilder._jobs[i].GetType() );
+            }
+
             rebuilder.SetQuadsToBuild( changes, settings );
 
             return rebuilder;
@@ -237,9 +258,16 @@ namespace HSP.CelestialBodies.Surfaces
                 nodes = nodes.Union( changes.GetDifferentNeighbors() );
             }
 
-            LODQuadRebuildData[] quads = nodes.Distinct( new ValueLODQuadTreeNodeComparer() ).Select( node => new LODQuadRebuildData( node ) ).ToArray();
+            Dictionary<LODQuadTreeNode, LODQuadRebuildData> rebuildData = new( _nodeEqualityComparer );
+            foreach( var node in nodes )
+            {
+                if( !rebuildData.TryAdd( node, new LODQuadRebuildData( node ) ) )
+                {
+                    Debug.LogWarning( $"The rebuild of celestial body '{_sphere.CelestialBody.ID}' contained duplicate quads." );
+                }
+            }
 
-            this._rebuildQuads = quads;
+            this._rebuildData = rebuildData;
         }
     }
 }
