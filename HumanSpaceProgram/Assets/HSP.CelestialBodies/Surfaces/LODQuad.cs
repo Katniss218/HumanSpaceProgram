@@ -9,7 +9,6 @@ namespace HSP.CelestialBodies.Surfaces
     /// The front end for <see cref="LODQuadTreeNode"/>.
     /// A single quad of a LOD sphere.
     /// </summary>
-    [RequireComponent( typeof( MeshFilter ) )]
     public class LODQuad : MonoBehaviour
     {
         /// <summary>
@@ -21,6 +20,8 @@ namespace HSP.CelestialBodies.Surfaces
         /// The backend node that this quad is associated with.
         /// </summary>
         public LODQuadTreeNode Node { get; private set; }
+
+        Mesh mesh;
 
         MeshFilter _meshFilter;
         MeshCollider _meshCollider;
@@ -46,6 +47,11 @@ namespace HSP.CelestialBodies.Surfaces
             this.transform.SetPositionAndRotation( scenePos, sceneRot );
         }
 
+        void OnDestroy()
+        {
+            Destroy( mesh ); // Destroying the mesh prevents a memory leak (One would think that a mesh would have a destructor to handle it, but I guess not).
+        }
+
         public void Activate()
         {
             this.gameObject.SetActive( true );
@@ -66,8 +72,17 @@ namespace HSP.CelestialBodies.Surfaces
 
         public static LODQuad CreateInactive( LODQuadSphere sphere, LODQuadTreeNode node, Mesh mesh )
         {
-            GameObject gameObject = new GameObject( $"LODQuad L{node.SubdivisionLevel}, {node.Face}, ({node.FaceCenter.x:#0.################}, {node.FaceCenter.y:#0.################})" );
+            GameObject gameObject = new GameObject( $"LODQuad {node.Face}, L{node.SubdivisionLevel}, ({node.FaceCenter.x:#0.################}, {node.FaceCenter.y:#0.################})" );
             gameObject.transform.SetParent( sphere.QuadParent );
+
+            LODQuad lodQuad = gameObject.AddComponent<LODQuad>();
+            lodQuad.mesh = mesh;
+            lodQuad.transform.localPosition = (Vector3)(node.SphereCenter * sphere.CelestialBody.Radius);
+            lodQuad.transform.localRotation = Quaternion.identity;
+            lodQuad.transform.localScale = Vector3.one;
+
+            lodQuad.Node = node;
+            lodQuad.QuadSphere = sphere;
 
             if( (sphere.Mode & LODQuadMode.Visual) == LODQuadMode.Visual )
             {
@@ -84,14 +99,6 @@ namespace HSP.CelestialBodies.Surfaces
                 MeshCollider mc = gameObject.AddComponent<MeshCollider>();
                 mc.sharedMesh = mesh;
             }
-
-            LODQuad lodQuad = gameObject.AddComponent<LODQuad>();
-            lodQuad.transform.localPosition = (Vector3)(node.SphereCenter * sphere.CelestialBody.Radius);
-            lodQuad.transform.localRotation = Quaternion.identity;
-            lodQuad.transform.localScale = Vector3.one;
-
-            lodQuad.Node = node;
-            lodQuad.QuadSphere = sphere;
 
             lodQuad.Deactivate();
 
