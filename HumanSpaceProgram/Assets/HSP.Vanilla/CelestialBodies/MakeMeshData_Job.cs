@@ -6,10 +6,13 @@ using UnityEngine;
 
 namespace HSP.Vanilla.CelestialBodies
 {
+
+
     public struct MakeMeshData_Job : ILODQuadJob
     {
         double radius;
         Vector3Dbl origin;
+        Direction3D face;
 
         int totalVertices;
 
@@ -38,18 +41,26 @@ namespace HSP.Vanilla.CelestialBodies
         [ReadOnly]
         NativeArray<Vector3> resultVerticesXn;
         bool availableXn;
+        Direction3D faceXn;
+        int relativeSizeXn;
 
         [ReadOnly]
         NativeArray<Vector3> resultVerticesXp;
         bool availableXp;
+        Direction3D faceXp;
+        int relativeSizeXp;
 
         [ReadOnly]
         NativeArray<Vector3> resultVerticesYn;
         bool availableYn;
+        Direction3D faceYn;
+        int relativeSizeYn;
 
         [ReadOnly]
         NativeArray<Vector3> resultVerticesYp;
         bool availableYp;
+        Direction3D faceYp;
+        int relativeSizeYp;
 
         public LODQuadMode QuadMode => LODQuadMode.VisualAndCollider;
 
@@ -68,10 +79,18 @@ namespace HSP.Vanilla.CelestialBodies
             resultNormals = r.ResultNormals;
             resultTangents = new NativeArray<Vector4>( totalVertices, Allocator.TempJob );
 
-            if( rAll.TryGetValue( r.Node.Xp, out var neighbor ) )
+            if( rAll.TryGetValue( r.Node.Xn, out var neighbor ) )
             {
+#warning could artificially expand each quad too. that would be simpler and probably faster, as well as safer. Then trim the unneeded verts.
+                // SetNormals has start and length params. could just cram the extra data at the end I guess
+
+                // triangles are doable too, it's just a tad more difficult. make a nativeslice and get ToArray on that.
+                // GetSpherePos needs to havdle values outside range 0..1 (switch the face and the coordinate system and invoke again) can just modulo 4 due to wrapping
+                // need a method that will do that, convert unbounded coords into another face and bounded coords.
+
                 resultVerticesXn = neighbor.ResultVertices;
                 availableXn = true;
+                faceXn = r.Node.Xn.Face;
             }
             else
             {
@@ -81,6 +100,7 @@ namespace HSP.Vanilla.CelestialBodies
             {
                 resultVerticesXp = neighbor.ResultVertices;
                 availableXp = true;
+                faceXp = r.Node.Xp.Face;
             }
             else
             {
@@ -90,6 +110,7 @@ namespace HSP.Vanilla.CelestialBodies
             {
                 resultVerticesYn = neighbor.ResultVertices;
                 availableYn = true;
+                faceYn = r.Node.Yn.Face;
             }
             else
             {
@@ -99,6 +120,7 @@ namespace HSP.Vanilla.CelestialBodies
             {
                 resultVerticesYp = neighbor.ResultVertices;
                 availableYp = true;
+                faceYp = r.Node.Yp.Face;
             }
             else
             {
@@ -129,6 +151,24 @@ namespace HSP.Vanilla.CelestialBodies
         }
 
 #warning TODO - get vertex to access the appropriate neighbor, alongside the reference to said neighbor.
+
+        Vector3 GetVertex( int x, int y )
+        {
+            if( x < 0 && y < 0 )
+                throw new ArgumentOutOfRangeException( "", $"Invalid quadrant." );
+            if( x < 0 && y >= sideVertices )
+                throw new ArgumentOutOfRangeException( "", $"Invalid quadrant." );
+            if( x >= sideVertices && y < 0 )
+                throw new ArgumentOutOfRangeException( "", $"Invalid quadrant." );
+            if( x >= sideVertices && y >= sideVertices )
+                throw new ArgumentOutOfRangeException( "", $"Invalid quadrant." );
+
+            if( x < 0 )
+            {
+                (_, Direction2D xnToSelf) = Direction3DUtils.GetLocalDirection( face, faceXn );
+                // find corresponding index. Possibly need to interpolate between 2 (if neighbor is larger). if it's larger, we also need to take facecenter into account.
+            }
+        }
 
         public void Execute()
         {
