@@ -1,6 +1,4 @@
 ﻿using HSP.CelestialBodies.Surfaces;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace HSP.Vanilla.CelestialBodies
@@ -19,7 +17,7 @@ namespace HSP.Vanilla.CelestialBodies
 
         public LODQuadMode QuadMode => LODQuadMode.Collider;
 
-        public void Initialize( LODQuadRebuildData r, IReadOnlyDictionary<LODQuadTreeNode, LODQuadRebuildData> _ )
+        public void Initialize( LODQuadRebuildData r, LODQuadRebuildAdditionalData _ )
         {
             instanceId = r.Mesh.GetInstanceID();
         }

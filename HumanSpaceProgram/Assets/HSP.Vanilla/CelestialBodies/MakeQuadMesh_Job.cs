@@ -1,6 +1,5 @@
 ﻿using HSP.CelestialBodies.Surfaces;
 using System;
-using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine;
 
@@ -29,7 +28,7 @@ namespace HSP.Vanilla.CelestialBodies
 
         public LODQuadMode QuadMode => LODQuadMode.VisualAndCollider;
 
-        public void Initialize( LODQuadRebuildData r, IReadOnlyDictionary<LODQuadTreeNode, LODQuadRebuildData> _ )
+        public void Initialize( LODQuadRebuildData r, LODQuadRebuildAdditionalData _ )
         {
 #warning TODO - keep the verts in body space (as vector3dbl), turn into mesh-space when finalizing.
             radius = (float)r.CelestialBody.Radius;
@@ -109,27 +108,6 @@ namespace HSP.Vanilla.CelestialBodies
                     resultTriangles[triIndex + 3] = index; // A
                     resultTriangles[triIndex + 4] = index + 1; // B
                     resultTriangles[triIndex + 5] = index + sideVertices + 1; // D
-
-#warning TODO - we'll need additional 'fake' triangles to compute normals, and they might have problems at the seams of the 6 primary faces because of Direction3D.GetSpherePointDbl.
-                    // so this needs to know if any of the 4 edges match the edges of the L0 quad.
-
-                    // would be benefitial to get neighboring meshes to talk to each other.
-
-                    // maybe abandon the direction3d stuff and use a different way to encode the position of the quad, equirectangular? spherical coords?
-
-
-#warning TODO - we could do it by 'creating the new meshes' kind of 'on the side', and swapping the existing quads once the new meshes are 'ready'
-
-                    // this could allow swapping (updating) arbitrary areas of terrain 'at once', instead of waiting for quads to recursively subdivide themselves
-                    // - previous algorithm needs the previous quad to exist to subdivide it into 4
-
-                    // we could keep trach of which faces (leaves) we want, and which faces we have
-                    // compute the difference and figure out which faces need to change
-                    // when swapping, update which faces we have.
-
-                    // when initializing, let the mods retrieve all meshes? (they will only use the ones they need, but all may be available)
-
-#warning TODO - check if the jobs can access the same container one after the other. If not, .NET threading will have to be used (task/async)
 
                     triIndex += 6;
                 }

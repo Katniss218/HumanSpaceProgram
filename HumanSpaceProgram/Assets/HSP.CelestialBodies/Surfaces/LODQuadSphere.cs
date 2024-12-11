@@ -70,16 +70,19 @@ namespace HSP.CelestialBodies.Surfaces
             ClearAllQuads();
         }
 
-        /// <summary>
-        /// Checks if the LOD sphere is currently building any new quads.
-        /// </summary>
-        public bool IsBuilding => _builder != null;
-
         private ILODQuadJob[][] _jobs;
         /// <summary>
         /// Gets a *copy* of all jobs used by this LOD sphere.
         /// </summary>
         public ILODQuadJob[][] Jobs => ILODQuadJob.CopyJobsWithValidation( _jobs );
+
+        /// <summary>
+        /// Gets the LOD sphere's jobs filtered for the LOD sphere's current build mode.
+        /// </summary>
+        public (ILODQuadJob[] jobs, int[] firstJobPerStage) GetJobsForBuild()
+        {
+            return ILODQuadJob.FilterJobs( _jobs, Mode ); // Skips a copy by using the underlying jobs array instead of the exposed Jobs property.
+        }
 
         /// <summary>
         /// Sets the jobs used by this LOD sphere
@@ -102,6 +105,11 @@ namespace HSP.CelestialBodies.Surfaces
         /// </remarks>
         public Func<IEnumerable<Vector3Dbl>> PoIGetter { get; set; }
 
+        /// <summary>
+        /// Checks if the LOD sphere is currently building any new quads.
+        /// </summary>
+        public bool IsBuilding => _builder != null;
+
         public static Shader cbShader;
         public static Texture2D[] cbTex;
         public static Texture2D cbNormal;
@@ -109,6 +117,7 @@ namespace HSP.CelestialBodies.Surfaces
         Vector3Dbl[] _oldPois = null; // Initial value null is important.
 
         Dictionary<LODQuadTreeNode, LODQuad> _currentQuads = new( new ValueLODQuadTreeNodeComparer() );
+        public IReadOnlyDictionary<LODQuadTreeNode, LODQuad> CurrentQuads => _currentQuads;
         LODQuadTree _currentTree;
 
         LODQuadRebuilder _builder;
@@ -203,7 +212,7 @@ namespace HSP.CelestialBodies.Surfaces
                 if( buildingChanges.AnythingChanged )
                 {
                     _oldPois = localPois;
-                    _builder = LODQuadRebuilder.FromChanges( this, _jobs, buildingChanges, Mode, LODQuadRebuilder.BuildSettings.IncludeNeighborsOfChanged );
+                    _builder = new LODQuadRebuilder( this, buildingChanges, LODQuadRebuilder.BuildSettings.IncludeNodesWithChangedNeighbors );
                     _buildingTree = buildingTree;
                     _buildingChanges = buildingChanges;
                 }

@@ -22,6 +22,8 @@ namespace HSP.CelestialBodies.Surfaces
         public LODQuadTreeNode Node { get; private set; }
 
         Mesh mesh;
+        public Mesh.MeshDataArray meshDataArray { get; private set; }
+        public Mesh.MeshData meshData => meshDataArray[0];
 
         MeshFilter _meshFilter;
         MeshCollider _meshCollider;
@@ -50,6 +52,7 @@ namespace HSP.CelestialBodies.Surfaces
         void OnDestroy()
         {
             Destroy( mesh ); // Destroying the mesh prevents a memory leak (One would think that a mesh would have a destructor to handle it, but I guess not).
+            meshDataArray.Dispose();
         }
 
         public void Activate()
@@ -77,6 +80,8 @@ namespace HSP.CelestialBodies.Surfaces
 
             LODQuad lodQuad = gameObject.AddComponent<LODQuad>();
             lodQuad.mesh = mesh;
+#warning TODO - Keep the rebuilddata that was used to create this quad. Won't need to use the mesh data, and won't need to copy anything if we do so.
+            lodQuad.meshDataArray = Mesh.AcquireReadOnlyMeshData( mesh );
             lodQuad.transform.localPosition = (Vector3)(node.SphereCenter * sphere.CelestialBody.Radius);
             lodQuad.transform.localRotation = Quaternion.identity;
             lodQuad.transform.localScale = Vector3.one;

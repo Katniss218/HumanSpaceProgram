@@ -22,41 +22,41 @@ namespace HSP.CelestialBodies.Surfaces
         /// <summary>
         /// Gets the collection of nodes that exist in the new tree, but don't exist in the old tree.
         /// </summary>
-        public IEnumerable<LODQuadTreeNode> GetNewNodes() // nodes missing in old tree
+        public IReadOnlyList<LODQuadTreeNode> GetNewNodes() // nodes missing in old tree
         {
-            return (IEnumerable<LODQuadTreeNode>)newNodes ?? new LODQuadTreeNode[] { };
+            return (IReadOnlyList<LODQuadTreeNode>)newNodes ?? new LODQuadTreeNode[] { };
         }
 
         /// <summary>
         /// Gets the collection of nodes that exist in the old tree, but don't exist in the new tree.
         /// </summary>
-        public IEnumerable<LODQuadTreeNode> GetRemovedNodes() // nodes missing in new tree
+        public IReadOnlyList<LODQuadTreeNode> GetRemovedNodes() // nodes missing in new tree
         {
-            return (IEnumerable<LODQuadTreeNode>)removedNodes ?? new LODQuadTreeNode[] { };
+            return (IReadOnlyList<LODQuadTreeNode>)removedNodes ?? new LODQuadTreeNode[] { };
         }
 
         /// <summary>
         /// Gets the collection of nodes that have different neighbors between the old and new trees.
         /// </summary>
-        public IEnumerable<LODQuadTreeNode> GetDifferentNeighbors()
+        public IReadOnlyList<LODQuadTreeNode> GetDifferentNeighbors()
         {
-            return (IEnumerable<LODQuadTreeNode>)differentNeighbors ?? new LODQuadTreeNode[] { };
+            return (IReadOnlyList<LODQuadTreeNode>)differentNeighbors ?? new LODQuadTreeNode[] { };
         }
 
         /// <summary>
         /// Gets the collection of nodes that are leaves in the new tree, but aren't in the old tree.
         /// </summary>
-        public IEnumerable<LODQuadTreeNode> GetBecameLeaf()
+        public IReadOnlyList<LODQuadTreeNode> GetBecameLeaf()
         {
-            return (IEnumerable<LODQuadTreeNode>)becameLeaf ?? new LODQuadTreeNode[] { };
+            return (IReadOnlyList<LODQuadTreeNode>)becameLeaf ?? new LODQuadTreeNode[] { };
         }
 
         /// <summary>
         /// Gets the collection of nodes that are leaves in the old tree, but aren't in the new tree.
         /// </summary>
-        public IEnumerable<LODQuadTreeNode> GetBecameNonLeaf()
+        public IReadOnlyList<LODQuadTreeNode> GetBecameNonLeaf()
         {
-            return (IEnumerable<LODQuadTreeNode>)becameNonLeaf ?? new LODQuadTreeNode[] { };
+            return (IReadOnlyList<LODQuadTreeNode>)becameNonLeaf ?? new LODQuadTreeNode[] { };
         }
     }
 }

@@ -19,14 +19,15 @@ namespace HSP.CelestialBodies.Surfaces
             /// <remarks>
             /// Use to clean edges of nodes that depend on the neighbors (e.g. smoothing).
             /// </remarks>
-            IncludeNeighborsOfChanged = 1,
+            IncludeNodesWithChangedNeighbors = 1,
 
-            Default = IncludeNeighborsOfChanged
+            Default = IncludeNodesWithChangedNeighbors
         }
 
         private static IEqualityComparer<LODQuadTreeNode> _nodeEqualityComparer = new ValueLODQuadTreeNodeComparer();
 
-        private Dictionary<LODQuadTreeNode, LODQuadRebuildData> _rebuildData;
+        private LODQuadRebuildData[] _rebuild;
+        private LODQuadRebuildAdditionalData _additionalData;
 
         private MethodInfo[] _jobSchedulerPerJob; // Cached Schedule<JobType>( ... ) method with the job type for each job in sequence.
         private ILODQuadJob[] _jobs;
@@ -49,24 +50,94 @@ namespace HSP.CelestialBodies.Surfaces
         LODQuadMode _buildMode;
         BuildSettings _settings;
 
-        private LODQuadRebuilder()
+        public LODQuadRebuilder( LODQuadSphere sphere, LODQuadTreeChanges changes, BuildSettings settings = BuildSettings.Default )
         {
+            this._sphere = sphere;
+            (this._jobs, this._firstJobPerStage) = sphere.GetJobsForBuild();
+            this._buildMode = sphere.Mode;
+            this._settings = settings;
+
+            MethodInfo method = typeof( LODQuadRebuilder ).GetMethod( nameof( LODQuadRebuilder.Schedule ), BindingFlags.Static | BindingFlags.NonPublic );
+
+            this._jobSchedulerPerJob = new MethodInfo[this._jobs.Length];
+            for( int i = 0; i < this._jobs.Length; i++ )
+            {
+                this._jobSchedulerPerJob[i] = method.MakeGenericMethod( this._jobs[i].GetType() );
+            }
+
+            this.InitializeRebuildData( sphere, changes, settings );
         }
 
-        static void Schedule<T>( ILODQuadJob[] jobs, JobHandle[] handles, int index ) where T : struct, ILODQuadJob
+        private void InitializeRebuildData( LODQuadSphere sphere, LODQuadTreeChanges changes, BuildSettings settings )
         {
-            // Schedule a job from an array containing every job in some stage. The type T is the type of the job being scheduled.
+            IReadOnlyDictionary<LODQuadTreeNode, LODQuad> existingNodes = sphere.CurrentQuads;
+            IEnumerable<LODQuadTreeNode> newNodes = changes.GetNewNodes();
+
+            if( settings.HasFlag( BuildSettings.IncludeNodesWithChangedNeighbors ) )
+            {
+                newNodes = newNodes.Union( changes.GetDifferentNeighbors() );
+            }
+
+            Dictionary<LODQuadTreeNode, LODQuadRebuildData> rebuildDict = new();
+            foreach( var node in newNodes )
+            {
+                if( !rebuildDict.TryAdd( node, new LODQuadRebuildData( node ) ) )
+                {
+                    Debug.LogWarning( $"The rebuild of celestial body '{_sphere.CelestialBody.ID}' contained duplicate quads." );
+                }
+            }
+
+            Dictionary<LODQuadTreeNode, LODQuadRebuildAdditionalData.Entry> rebuildData = new( _nodeEqualityComparer );
+            foreach( var node in existingNodes )
+            {
+                var entry = new LODQuadRebuildAdditionalData.Entry( node.Value.meshData );
+
+                if( !rebuildData.TryAdd( node.Key, entry ) )
+                {
+                    Debug.LogWarning( $"The rebuild of celestial body '{_sphere.CelestialBody.ID}' contained duplicate quads." );
+                }
+            }
+
+            foreach( var node in newNodes )
+            {
+                if( rebuildData.TryGetValue( node, out var data ) )
+                {
+                    // add new info and replace in dict.
+                    data = new LODQuadRebuildAdditionalData.Entry( rebuildDict[node], data.old );
+                    rebuildData[node] = data;
+                }
+                else
+                {
+                    data = new LODQuadRebuildAdditionalData.Entry( rebuildDict[node] );
+                    rebuildData[node] = data;
+                }
+            }
+
+            this._additionalData = new LODQuadRebuildAdditionalData( rebuildData );
+            this._rebuild = rebuildDict.Values.ToArray();
+        }
+
+
+        /// <summary>
+        /// Schedule a job from the array containing all jobs.
+        /// </summary>
+        /// <typeparam name="T">The type of the job being scheduled.</typeparam>
+        private static void Schedule<T>( ILODQuadJob[] jobs, JobHandle[] handles, int index ) where T : struct, ILODQuadJob
+        {
             T jobToSchedule = (T)jobs[index];
             if( index == 0 )
                 handles[index] = jobToSchedule.Schedule();
             else
                 handles[index] = jobToSchedule.Schedule( handles[index - 1] );
-            jobs[index] = jobToSchedule; // doesn't work without this line, idk why because it just copies the job instance, which should be the same as the one already there.
+            jobs[index] = jobToSchedule; // doesn't work without re-setting the job, idk why.
         }
 
         /// <summary>
-        /// Builds the next stage.
+        /// Waits for the current stage to finish building (if any), and schedules the next stage to start building (if any).
         /// </summary>
+        /// <remarks>
+        /// Check if the build has been completed (<see cref="IsDone"/>) before calling this method.
+        /// </remarks>
         /// <exception cref="InvalidOperationException"></exception>
         public void Build()
         {
@@ -77,7 +148,7 @@ namespace HSP.CelestialBodies.Surfaces
 
             if( LastStartedStage == -1 )
             {
-                foreach( var rQuad in _rebuildData.Values )
+                foreach( var rQuad in _rebuild )
                 {
                     rQuad.InitializeBuild( _jobs, _sphere );
                 }
@@ -96,7 +167,7 @@ namespace HSP.CelestialBodies.Surfaces
                     ? _firstJobPerStage[currentStage + 1]
                     : _jobs.Length;
 
-                foreach( var rQuad in _rebuildData.Values )
+                foreach( var rQuad in _rebuild )
                 {
                     rQuad.handles[lastJob - 1].Complete();
 
@@ -120,7 +191,7 @@ namespace HSP.CelestialBodies.Surfaces
 
                 if( IsDone )
                 {
-                    foreach( var rQuad in _rebuildData.Values )
+                    foreach( var rQuad in _rebuild )
                     {
                         try
                         {
@@ -152,13 +223,13 @@ namespace HSP.CelestialBodies.Surfaces
                     : _jobs.Length;
 
                 // Initialize everything first, because they might talk to each other.
-                foreach( var rQuad in _rebuildData.Values )
+                foreach( var rQuad in _rebuild )
                 {
                     foreach( var job in rQuad.jobs[firstJob..lastJob] )
                     {
                         try
                         {
-                            job.Initialize( rQuad, _rebuildData );
+                            job.Initialize( rQuad, _additionalData );
                         }
                         catch( Exception ex )
                         {
@@ -169,7 +240,7 @@ namespace HSP.CelestialBodies.Surfaces
                 }
 
                 // Schedule once they're done talking to each other.
-                foreach( var rQuad in _rebuildData.Values )
+                foreach( var rQuad in _rebuild )
                 {
                     for( int i = firstJob; i < lastJob; i++ )
                     {
@@ -184,6 +255,9 @@ namespace HSP.CelestialBodies.Surfaces
         /// <summary>
         /// Gets the newly built quads.
         /// </summary>
+        /// <remarks>
+        /// Check if the build has been completed (<see cref="IsDone"/>) before calling this method.
+        /// </remarks>
         /// <exception cref="InvalidOperationException"></exception>
         public IEnumerable<LODQuad> GetResults()
         {
@@ -192,7 +266,7 @@ namespace HSP.CelestialBodies.Surfaces
                 throw new InvalidOperationException( $"{nameof( LODQuadRebuilder )}.{nameof( GetResults )} was called, but the rebuild hasn't been finished yet." );
             }
 
-            return _rebuildData.Values.Select( q => q.Quad );
+            return _rebuild.Select( q => q.Quad );
         }
 
         /// <summary>
@@ -208,66 +282,16 @@ namespace HSP.CelestialBodies.Surfaces
                     ? _firstJobPerStage[currentStage + 1]
                     : _jobs.Length;
 
-                foreach( var quad in _rebuildData.Values )
+                foreach( var quad in _rebuild )
                 {
                     quad.handles[lastJob - 1].Complete();
                 }
 
-                foreach( var rQuad in _rebuildData.Values )
+                foreach( var rQuad in _rebuild )
                 {
                     rQuad.Dispose();
                 }
             }
-        }
-
-
-        /// <summary>
-        /// Builds the meshes for the corresponding changes in the quad sphere.
-        /// </summary>
-        /// <param name="jobs">The jobs to use when building the meshes.</param>
-        /// <returns>The rebuilder to use to rebuild the specified meshes.</returns>
-        public static LODQuadRebuilder FromChanges( LODQuadSphere sphere, ILODQuadJob[][] jobsInStages, LODQuadTreeChanges changes, LODQuadMode buildMode, BuildSettings settings )
-        {
-            LODQuadRebuilder rebuilder = new LODQuadRebuilder();
-
-            rebuilder._sphere = sphere;
-            (rebuilder._jobs, rebuilder._firstJobPerStage) = ILODQuadJob.FilterJobs( jobsInStages, buildMode );
-            rebuilder._buildMode = buildMode;
-            rebuilder._settings = settings;
-
-
-            MethodInfo method = typeof( LODQuadRebuilder ).GetMethod( nameof( LODQuadRebuilder.Schedule ), BindingFlags.Static | BindingFlags.NonPublic );
-
-            rebuilder._jobSchedulerPerJob = new MethodInfo[rebuilder._jobs.Length];
-            for( int i = 0; i < rebuilder._jobs.Length; i++ )
-            {
-                rebuilder._jobSchedulerPerJob[i] = method.MakeGenericMethod( rebuilder._jobs[i].GetType() );
-            }
-
-            rebuilder.SetQuadsToBuild( changes, settings );
-
-            return rebuilder;
-        }
-
-        private void SetQuadsToBuild( LODQuadTreeChanges changes, BuildSettings settings )
-        {
-            var nodes = changes.GetNewNodes();
-
-            if( settings.HasFlag( BuildSettings.IncludeNeighborsOfChanged ) )
-            {
-                nodes = nodes.Union( changes.GetDifferentNeighbors() );
-            }
-
-            Dictionary<LODQuadTreeNode, LODQuadRebuildData> rebuildData = new( _nodeEqualityComparer );
-            foreach( var node in nodes )
-            {
-                if( !rebuildData.TryAdd( node, new LODQuadRebuildData( node ) ) )
-                {
-                    Debug.LogWarning( $"The rebuild of celestial body '{_sphere.CelestialBody.ID}' contained duplicate quads." );
-                }
-            }
-
-            this._rebuildData = rebuildData;
         }
     }
 }

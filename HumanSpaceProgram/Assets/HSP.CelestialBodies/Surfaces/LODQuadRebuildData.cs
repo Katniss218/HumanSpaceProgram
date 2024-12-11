@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
@@ -100,6 +101,49 @@ namespace HSP.CelestialBodies.Surfaces
             ResultNormals.Dispose();
             ResultUVs.Dispose();
             ResultTriangles.Dispose();
+        }
+    }
+
+    public class LODQuadRebuildAdditionalData
+    {
+        public struct Entry
+        {
+            public readonly bool hasNew;
+            public readonly bool hasOld;
+
+            public readonly LODQuadRebuildData @new;
+            public readonly Mesh.MeshData old;
+
+            public Entry( Mesh.MeshData old )
+            {
+                this.hasNew = false;
+                this.hasOld = true;
+                this.@new = null;
+                this.old = old;
+            }
+
+            public Entry( LODQuadRebuildData @new )
+            {
+
+                this.hasNew = true;
+                this.hasOld = false;
+                this.@new = @new;
+                this.old = default;
+            }
+            public Entry( LODQuadRebuildData @new, Mesh.MeshData old )
+            {
+                this.hasNew = true;
+                this.hasOld = true;
+                this.@new = @new;
+                this.old = old;
+            }
+        }
+
+        public IReadOnlyDictionary<LODQuadTreeNode, Entry> allQuads;
+
+        public LODQuadRebuildAdditionalData( Dictionary<LODQuadTreeNode, Entry> quads )
+        {
+            this.allQuads = quads;
         }
     }
 }

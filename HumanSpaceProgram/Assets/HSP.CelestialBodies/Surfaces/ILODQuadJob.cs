@@ -42,7 +42,7 @@ namespace HSP.CelestialBodies.Surfaces
         /// </summary>
         /// <param name="r">The rebuild data of the current quad.</param>
         /// <param name="rAll">A dictionary containing the rest of the quads being rebuilt. USE WITH CARE, ONLY SYNCHRONIZED WITH DATA FROM THE PREVIOUS STAGE.</param>
-        public void Initialize( LODQuadRebuildData r, IReadOnlyDictionary<LODQuadTreeNode, LODQuadRebuildData> rAll );
+        public void Initialize( LODQuadRebuildData r, LODQuadRebuildAdditionalData rAdditional );
 
         /// <summary>
         /// Called on the main thread to collect the result.

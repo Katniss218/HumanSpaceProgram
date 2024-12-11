@@ -1,8 +1,10 @@
 ﻿using HSP.CelestialBodies.Surfaces;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Unity.Collections;
 using UnityEngine;
+using UnityEngine.XR;
 
 namespace HSP.Vanilla.CelestialBodies
 {
@@ -13,6 +15,8 @@ namespace HSP.Vanilla.CelestialBodies
         double radius;
         Vector3Dbl origin;
         Direction3D face;
+        float quadSize;
+        Vector2 faceCenter;
 
         int totalVertices;
 
@@ -40,34 +44,32 @@ namespace HSP.Vanilla.CelestialBodies
 
         [ReadOnly]
         NativeArray<Vector3> resultVerticesXn;
-        bool availableXn;
-        Direction3D faceXn;
-        int relativeSizeXn;
+        float quadSizeXn;
+        Vector2 faceCenterXn;
 
         [ReadOnly]
         NativeArray<Vector3> resultVerticesXp;
-        bool availableXp;
-        Direction3D faceXp;
-        int relativeSizeXp;
+        float quadSizeXp;
+        Vector2 faceCenterXp;
 
         [ReadOnly]
         NativeArray<Vector3> resultVerticesYn;
-        bool availableYn;
-        Direction3D faceYn;
-        int relativeSizeYn;
+        float quadSizeYn;
+        Vector2 faceCenterYn;
 
         [ReadOnly]
         NativeArray<Vector3> resultVerticesYp;
-        bool availableYp;
-        Direction3D faceYp;
-        int relativeSizeYp;
+        float quadSizeYp;
+        Vector2 faceCenterYp;
 
         public LODQuadMode QuadMode => LODQuadMode.VisualAndCollider;
 
-        public void Initialize( LODQuadRebuildData r, IReadOnlyDictionary<LODQuadTreeNode, LODQuadRebuildData> rAll )
+        public void Initialize( LODQuadRebuildData r, LODQuadRebuildAdditionalData rAdditional )
         {
             radius = (float)r.CelestialBody.Radius;
             origin = r.Node.SphereCenter * radius;
+            quadSize = r.Node.Size;
+            faceCenter = r.Node.FaceCenter;
 
             sideEdges = r.SideEdges;
             sideVertices = r.SideVertices;
@@ -79,52 +81,54 @@ namespace HSP.Vanilla.CelestialBodies
             resultNormals = r.ResultNormals;
             resultTangents = new NativeArray<Vector4>( totalVertices, Allocator.TempJob );
 
-            if( rAll.TryGetValue( r.Node.Xn, out var neighbor ) )
+            var xn = rAdditional.allQuads[r.Node.Xn];
+            faceCenterXn = r.Node.Xn.FaceCenter;
+            quadSizeXn = r.Node.Xn.Size;
+            if( xn.hasNew )
             {
-#warning could artificially expand each quad too. that would be simpler and probably faster, as well as safer. Then trim the unneeded verts.
-                // SetNormals has start and length params. could just cram the extra data at the end I guess
+                resultVerticesXn = xn.@new.ResultVertices;
+            }
+            else
+            {
+#error TODO - Keep these buffers until the quad made with them is destroyed.
+                xn.old.GetVertices( resultVerticesXn );
+            }
 
-                // triangles are doable too, it's just a tad more difficult. make a nativeslice and get ToArray on that.
-                // GetSpherePos needs to havdle values outside range 0..1 (switch the face and the coordinate system and invoke again) can just modulo 4 due to wrapping
-                // need a method that will do that, convert unbounded coords into another face and bounded coords.
+            var xp = rAdditional.allQuads[r.Node.Xp];
+            faceCenterXp = r.Node.Xp.FaceCenter;
+            quadSizeXp = r.Node.Xp.Size;
+            if( xp.hasNew )
+            {
+                resultVerticesXp = xp.@new.ResultVertices;
+            }
+            else
+            {
+                // this array seems to need to be allocated ahead.
+                xp.old.GetVertices( resultVerticesXp );
+            }
 
-                resultVerticesXn = neighbor.ResultVertices;
-                availableXn = true;
-                faceXn = r.Node.Xn.Face;
+            var yn = rAdditional.allQuads[r.Node.Yn];
+            faceCenterYn = r.Node.Yn.FaceCenter;
+            quadSizeYn = r.Node.Yn.Size;
+            if( yn.hasNew )
+            {
+                resultVerticesYn = yn.@new.ResultVertices;
             }
             else
             {
-                resultVerticesXn = resultVertices;
+                yn.old.GetVertices( resultVerticesYn );
             }
-            if( rAll.TryGetValue( r.Node.Xp, out neighbor ) )
+
+            var yp = rAdditional.allQuads[r.Node.Yp];
+            faceCenterYp = r.Node.Yp.FaceCenter;
+            quadSizeYp = r.Node.Yp.Size;
+            if( yp.hasNew )
             {
-                resultVerticesXp = neighbor.ResultVertices;
-                availableXp = true;
-                faceXp = r.Node.Xp.Face;
-            }
-            else
-            {
-                resultVerticesXp = resultVertices;
-            }
-            if( rAll.TryGetValue( r.Node.Yn, out neighbor ) )
-            {
-                resultVerticesYn = neighbor.ResultVertices;
-                availableYn = true;
-                faceYn = r.Node.Yn.Face;
+                resultVerticesYp = yp.@new.ResultVertices;
             }
             else
             {
-                resultVerticesYn = resultVertices;
-            }
-            if( rAll.TryGetValue( r.Node.Yp, out neighbor ) )
-            {
-                resultVerticesYp = neighbor.ResultVertices;
-                availableYp = true;
-                faceYp = r.Node.Yp.Face;
-            }
-            else
-            {
-                resultVerticesYp = resultVertices;
+                yp.old.GetVertices( resultVerticesYp );
             }
         }
 
@@ -138,6 +142,12 @@ namespace HSP.Vanilla.CelestialBodies
         public void Dispose()
         {
             resultTangents.Dispose();
+
+#warning TODO - only dispose of the new arrays (but if I keep the original arrays in the quads, that won't be necessary, they'd be disposed after.
+            //resultVerticesXn.Dispose();
+            //resultVerticesXp.Dispose();
+            //resultVerticesYn.Dispose();
+            //resultVerticesYp.Dispose();
         }
 
         public ILODQuadJob Clone()
@@ -150,24 +160,245 @@ namespace HSP.Vanilla.CelestialBodies
             return (x * sideEdges) + x + y;
         }
 
-#warning TODO - get vertex to access the appropriate neighbor, alongside the reference to said neighbor.
-
-        Vector3 GetVertex( int x, int y )
+        /// <summary>
+        /// Transforms from overflowed coordinates in the space of 1 face into the other face.
+        /// </summary>
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public static void FixCoordinates( ref Direction3D face, ref double x, ref double y )
         {
-            if( x < 0 && y < 0 )
-                throw new ArgumentOutOfRangeException( "", $"Invalid quadrant." );
-            if( x < 0 && y >= sideVertices )
-                throw new ArgumentOutOfRangeException( "", $"Invalid quadrant." );
-            if( x >= sideVertices && y < 0 )
-                throw new ArgumentOutOfRangeException( "", $"Invalid quadrant." );
-            if( x >= sideVertices && y >= sideVertices )
-                throw new ArgumentOutOfRangeException( "", $"Invalid quadrant." );
+            // uv = fix(uv * 2.0 - 1.0) * 0.5 + 0.5
+            // xy = fix(xy)
 
-            if( x < 0 )
+            if( face == Direction3D.Xn )
             {
-                (_, Direction2D xnToSelf) = Direction3DUtils.GetLocalDirection( face, faceXn );
-                // find corresponding index. Possibly need to interpolate between 2 (if neighbor is larger). if it's larger, we also need to take facecenter into account.
+                if( x < -1 )
+                {
+                    face = Direction3D.Yn;
+                    x += 2;
+                }
+                else if( x > 1 )
+                {
+                    face = Direction3D.Yp;
+                    x -= 2;
+                }
+                else if( y < -1 )
+                {
+                    face = Direction3D.Zn;
+                    y += 2;
+                }
+                else if( y > 1 )
+                {
+                    face = Direction3D.Zp;
+                    y -= 2;
+                }
             }
+
+            if( face == Direction3D.Xp )
+            {
+                if( x < -1 )
+                {
+                    face = Direction3D.Yp;
+                    x += 2;
+                }
+                else if( x > 1 )
+                {
+                    face = Direction3D.Yn;
+                    x -= 2;
+                }
+                else if( y < -1 )
+                {
+                    face = Direction3D.Zn;
+                    x = -x;
+                    y = -(y + 2);
+                }
+                else if( y > 1 )
+                {
+                    face = Direction3D.Zp;
+                    x = -x;
+                    y = -(y - 2);
+                }
+            }
+
+            if( face == Direction3D.Yn )
+            {
+                if( x < -1 )
+                {
+                    face = Direction3D.Xp;
+                    x += 2;
+                }
+                else if( x > 1 )
+                {
+                    face = Direction3D.Xn;
+                    x -= 2;
+                }
+                else if( y < -1 )
+                {
+                    face = Direction3D.Zn;
+                    var tempy = x;
+                    x = -(y + 2);
+                    y = tempy;
+                }
+                else if( y > 1 )
+                {
+                    face = Direction3D.Zp;
+                    var tempy = -x;
+                    x = y - 2;
+                    y = tempy;
+                }
+            }
+
+            if( face == Direction3D.Yp )
+            {
+                if( x < -1 )
+                {
+                    face = Direction3D.Xn;
+                    x += 2;
+                }
+                else if( x > 1 )
+                {
+                    face = Direction3D.Xp;
+                    x -= 2;
+                }
+                else if( y < -1 )
+                {
+                    face = Direction3D.Zn;
+                    var tempy = -x;
+                    x = y + 2;
+                    y = tempy;
+                }
+                else if( y > 1 )
+                {
+                    face = Direction3D.Zp;
+                    var tempy = x;
+                    x = -(y - 2);
+                    y = tempy;
+                }
+            }
+
+            if( face == Direction3D.Zn )
+            {
+                if( x < -1 )
+                {
+                    face = Direction3D.Yn;
+                    var tempy = -(x + 2);
+                    x = y;
+                    y = tempy;
+                }
+                else if( x > 1 )
+                {
+                    face = Direction3D.Yp;
+                    var tempy = (x - 2);
+                    x = y;
+                    y = tempy;
+                }
+                else if( y < -1 )
+                {
+                    face = Direction3D.Xp;
+                    var tempy = -(y + 2);
+                    x = -x;
+                    y = tempy;
+                }
+                else if( y > 1 )
+                {
+                    face = Direction3D.Xn;
+                    y = y - 2;
+                }
+            }
+
+            if( face == Direction3D.Zp )
+            {
+                if( x < -1 )
+                {
+                    face = Direction3D.Yn;
+                    var tempy = (x + 2);
+                    x = -y;
+                    y = tempy;
+                }
+                else if( x > 1 )
+                {
+                    face = Direction3D.Yp;
+                    var tempy = -(x - 2);
+                    x = y;
+                    y = tempy;
+                }
+                else if( y < -1 )
+                {
+                    face = Direction3D.Xn;
+                    y = y + 2;
+                }
+                else if( y > 1 )
+                {
+                    face = Direction3D.Xp;
+                    var tempy = -(y - 2);
+                    x = -x;
+                    y = tempy;
+                }
+            }
+        }
+
+        private (Vector3 self, Vector3 xn, Vector3 xp, Vector3 yn, Vector3 yp) GetVertex( int x, int y )
+        {
+            Vector3 self = resultVertices[GetIndex( x, y )];
+            Vector3 xn, xp, yn, yp;
+
+            Direction3D _ = default;
+            if( x == 0 )
+            {
+                double xnx = ((x - 1) * quadSize * 2 - 1) + faceCenter.x;
+                double xny = (y * quadSize * 2 - 1) + faceCenter.y;
+                FixCoordinates( ref _, ref xnx, ref xny );
+                int indexXnX = (int)((xnx - faceCenterXn.x) / quadSizeXn * 0.5 + 0.5);
+                int indexXnY = (int)((xny - faceCenterXn.y) / quadSizeXn * 0.5 + 0.5);
+
+                xn = resultVerticesXn[GetIndex( indexXnX, indexXnY )];
+                xp = resultVerticesXn[GetIndex( x + 1, y )];
+            }
+            else if( x == sideEdges - 1 )
+            {
+                double xpx = ((x + 1) * quadSize * 2 - 1) + faceCenter.x;
+                double xpy = (y * quadSize * 2 - 1) + faceCenter.y;
+                FixCoordinates( ref _, ref xpx, ref xpy );
+                int indexXpX = (int)((xpx - faceCenterXp.x) / quadSizeXp * 0.5 + 0.5);
+                int indexXpY = (int)((xpy - faceCenterXp.y) / quadSizeXp * 0.5 + 0.5);
+
+                xn = resultVerticesXn[GetIndex( x - 1, y )];
+                xp = resultVerticesXn[GetIndex( indexXpX, indexXpY )];
+            }
+            else
+            {
+                xn = resultVerticesXn[GetIndex( x - 1, y )];
+                xp = resultVerticesXn[GetIndex( x + 1, y )];
+            }
+
+            if( y == 0 )
+            {
+                double ynx = (x * quadSize * 2 - 1) + faceCenter.x;
+                double yny = ((y - 1) * quadSize * 2 - 1) + faceCenter.y;
+                FixCoordinates( ref _, ref ynx, ref yny );
+                int indexYnX = (int)((ynx - faceCenterYn.x) / quadSizeYn * 0.5 + 0.5);
+                int indexYnY = (int)((yny - faceCenterYn.y) / quadSizeYn * 0.5 + 0.5);
+
+                yn = resultVerticesXn[GetIndex( indexYnX, indexYnY )];
+                yp = resultVerticesXn[GetIndex( x, y + 1 )];
+            }
+            else if( y == sideEdges - 1 )
+            {
+                double ypx = (x * quadSize * 2 - 1) + faceCenter.x;
+                double ypy = ((y + 1) * quadSize * 2 - 1) + faceCenter.y;
+                FixCoordinates( ref _, ref ypx, ref ypy );
+                int indexYpX = (int)((ypx - faceCenterYp.x) / quadSizeYp * 0.5 + 0.5);
+                int indexYpY = (int)((ypy - faceCenterYp.y) / quadSizeYp * 0.5 + 0.5);
+
+                yn = resultVerticesXn[GetIndex( x, y - 1 )];
+                yp = resultVerticesXn[GetIndex( indexYpX, indexYpY )];
+            }
+            else
+            {
+                yn = resultVerticesXn[GetIndex( x, y - 1 )];
+                yp = resultVerticesXn[GetIndex( x, y + 1 )];
+            }
+
+            return (self, xn, xp, yn, yp);
         }
 
         public void Execute()
