@@ -1,9 +1,11 @@
 ﻿using HSP.CelestialBodies.Surfaces;
+using System;
 using Unity.Collections;
 using UnityEngine;
 
 namespace HSP.Vanilla.CelestialBodies
 {
+    [Obsolete( "Use MakeMeshdata job instead." )]
     public struct SmoothNeighbors_Job : ILODQuadJob
     {
         int stepXn;
@@ -11,17 +13,18 @@ namespace HSP.Vanilla.CelestialBodies
         int stepYn;
         int stepYp;
 
-        int numberOfEdges;
-        int numberOfVertices;
+        int sideEdges;
+        int sideVertices;
 
         NativeArray<Vector3Dbl> resultVertices;
+        NativeArray<Vector3> resultNormals;
 
         public LODQuadMode QuadMode => LODQuadMode.VisualAndCollider;
 
         public void Initialize( LODQuadRebuildData r, LODQuadRebuildAdditionalData _ )
         {
-            numberOfEdges = r.SideEdges;
-            numberOfVertices = r.SideVertices;
+            sideEdges = r.SideEdges;
+            sideVertices = r.SideVertices;
 
             // A quad with subdivision level N will never border more than 1 quad with subdivision level >= N per side.
             // It can however border more than 1 quad with larger subdivision level than itself.
@@ -30,6 +33,7 @@ namespace HSP.Vanilla.CelestialBodies
             stepYn = 1 << (r.Node.SubdivisionLevel - r.Node.Yn.SubdivisionLevel);
             stepYp = 1 << (r.Node.SubdivisionLevel - r.Node.Yp.SubdivisionLevel);
             resultVertices = r.ResultVertices;
+            resultNormals = r.ResultNormals;
         }
 
         public void Finish( LODQuadRebuildData r )
@@ -50,7 +54,7 @@ namespace HSP.Vanilla.CelestialBodies
 
         int GetIndex( int x, int y )
         {
-            return (x * numberOfEdges) + x + y;
+            return (x * sideEdges) + x + y;
         }
 
         public void Execute()
@@ -58,7 +62,7 @@ namespace HSP.Vanilla.CelestialBodies
             if( stepXn != 0 )
             {
                 int x = 0;
-                for( int y = 0; y < numberOfVertices - stepXn; y += stepXn )
+                for( int y = 0; y < sideVertices - stepXn; y += stepXn )
                 {
                     int indexMin = GetIndex( x, y );
                     int indexMax = GetIndex( x, y + stepXn );
@@ -69,14 +73,15 @@ namespace HSP.Vanilla.CelestialBodies
                         // smoothly blend.
 
                         resultVertices[index] = Vector3Dbl.Lerp( resultVertices[indexMin], resultVertices[indexMax], (float)y2 / stepXn );
+                        resultNormals[index] = Vector3.Lerp( resultNormals[indexMin], resultNormals[indexMax], (float)y2 / stepXn );
                     }
                 }
             }
 
             if( stepXp != 0 )
             {
-                int x = numberOfVertices - 1;
-                for( int y = 0; y < numberOfVertices - stepXp; y += stepXp )
+                int x = sideVertices - 1;
+                for( int y = 0; y < sideVertices - stepXp; y += stepXp )
                 {
                     int indexMin = GetIndex( x, y );
                     int indexMax = GetIndex( x, y + stepXp );
@@ -87,6 +92,7 @@ namespace HSP.Vanilla.CelestialBodies
                         // smoothly blend.
 
                         resultVertices[index] = Vector3Dbl.Lerp( resultVertices[indexMin], resultVertices[indexMax], (float)y2 / stepXp );
+                        resultNormals[index] = Vector3.Lerp( resultNormals[indexMin], resultNormals[indexMax], (float)y2 / stepXp );
                     }
                 }
             }
@@ -94,7 +100,7 @@ namespace HSP.Vanilla.CelestialBodies
             if( stepYn != 0 )
             {
                 int y = 0;
-                for( int x = 0; x < numberOfVertices - stepYn; x += stepYn )
+                for( int x = 0; x < sideVertices - stepYn; x += stepYn )
                 {
                     int indexMin = GetIndex( x, y );
                     int indexMax = GetIndex( x + stepYn, y );
@@ -105,13 +111,14 @@ namespace HSP.Vanilla.CelestialBodies
                         // smoothly blend.
 
                         resultVertices[index] = Vector3Dbl.Lerp( resultVertices[indexMin], resultVertices[indexMax], (float)x2 / stepYn );
+                        resultNormals[index] = Vector3.Lerp( resultNormals[indexMin], resultNormals[indexMax], (float)x2 / stepYn );
                     }
                 }
             }
             if( stepYp != 0 )
             {
-                int y = numberOfVertices - 1;
-                for( int x = 0; x < numberOfVertices - stepYp; x += stepYp )
+                int y = sideVertices - 1;
+                for( int x = 0; x < sideVertices - stepYp; x += stepYp )
                 {
                     int indexMin = GetIndex( x, y );
                     int indexMax = GetIndex( x + stepYp, y );
@@ -122,6 +129,7 @@ namespace HSP.Vanilla.CelestialBodies
                         // smoothly blend.
 
                         resultVertices[index] = Vector3Dbl.Lerp( resultVertices[indexMin], resultVertices[indexMax], (float)x2 / stepYp );
+                        resultNormals[index] = Vector3.Lerp( resultNormals[indexMin], resultNormals[indexMax], (float)x2 / stepYp );
                     }
                 }
             }

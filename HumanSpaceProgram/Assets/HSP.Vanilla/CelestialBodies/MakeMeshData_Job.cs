@@ -1,11 +1,8 @@
 ﻿using HSP.CelestialBodies.Surfaces;
 using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Unity.Collections;
 using UnityEngine;
-using UnityEngine.XR;
-using static UnityEngine.UI.Image;
 
 namespace HSP.Vanilla.CelestialBodies
 {
@@ -50,10 +47,10 @@ namespace HSP.Vanilla.CelestialBodies
         float halfSizeYn;
         float halfSizeYp;
 
-        Vector3Dbl originXn;
-        Vector3Dbl originXp;
-        Vector3Dbl originYn;
-        Vector3Dbl originYp;
+        int stepXn;
+        int stepXp;
+        int stepYn;
+        int stepYp;
 
         [ReadOnly]
         NativeArray<Vector3Dbl> resultVerticesXn;
@@ -81,6 +78,10 @@ namespace HSP.Vanilla.CelestialBodies
         {
             radius = (float)r.CelestialBody.Radius;
             origin = r.Node.SphereCenter * radius;
+            stepXn = 1 << (r.Node.SubdivisionLevel - r.Node.Xn.SubdivisionLevel);
+            stepXp = 1 << (r.Node.SubdivisionLevel - r.Node.Xp.SubdivisionLevel);
+            stepYn = 1 << (r.Node.SubdivisionLevel - r.Node.Yn.SubdivisionLevel);
+            stepYp = 1 << (r.Node.SubdivisionLevel - r.Node.Yp.SubdivisionLevel);
 
             sideEdges = r.SideEdges;
             sideVertices = r.SideVertices;
@@ -336,22 +337,21 @@ namespace HSP.Vanilla.CelestialBodies
             Vector3Dbl self = resultVertices[GetIndex( x, y )];
             Vector3Dbl xn, xp, yn, yp;
 
-            Direction3D _;
             if( x == 0 )
             {
                 double xnx = ((x - 1) * edgeLength) + faceCenter.x - halfSize;
                 double xny = (y * edgeLength) + faceCenter.y - halfSize;
-                double xnxB = xnx;
-                double xnyB = xny;
-                _ = face;
+                //double xnxB = xnx;
+                //double xnyB = xny;
+                Direction3D _ = face;
                 FixCoordinates( ref _, ref xnx, ref xny );
-                int indexXnX = (int)((xnx - faceCenterXn.x + halfSizeXn) / edgeLengthXn);
+#warning TODO - This should sample both surface 'points' at the same distance from the seam, regardless of the seld/neighbor relative subdiv level, instead of rounding to the nearest.
+                int indexXnX = (int)Math.Floor( (xnx - faceCenterXn.x + halfSizeXn) / edgeLengthXn );
                 int indexXnY = (int)((xny - faceCenterXn.y + halfSizeXn) / edgeLengthXn);
-                if( indexXnX < 0 || indexXnY < 0 )
+                /*if( indexXnX < 0 || indexXnY < 0 )
                 {
                     Debug.LogError( face + " : " + x + " " + y + " " + xnxB + " : " + xnyB + " : " + faceCenter + " @@@@@@@ " + _ + " : " + indexXnX + " : " + indexXnY + " : " + xnx + " : " + xny + " : " + faceCenterXn );
-                }
-#warning TODO - handle quads of mismatched size - lerp 2 verts based on how close they are.
+                }*/
                 xn = resultVerticesXn[GetIndex( indexXnX, indexXnY )];
                 xp = resultVertices[GetIndex( x + 1, y )];
             }
@@ -359,17 +359,16 @@ namespace HSP.Vanilla.CelestialBodies
             {
                 double xpx = ((x + 1) * edgeLength) + faceCenter.x - halfSize;
                 double xpy = (y * edgeLength) + faceCenter.y - halfSize;
-                double xpxB = xpx;
-                double xpyB = xpy;
-                _ = face;
+                //double xpxB = xpx;
+                //double xpyB = xpy;
+                Direction3D _ = face;
                 FixCoordinates( ref _, ref xpx, ref xpy );
-                int indexXpX = (int)((xpx - faceCenterXp.x + halfSizeXp) / edgeLengthXp);
+                int indexXpX = (int)Math.Ceiling( (xpx - faceCenterXp.x + halfSizeXp) / edgeLengthXp );
                 int indexXpY = (int)((xpy - faceCenterXp.y + halfSizeXp) / edgeLengthXp);
-
-                if( indexXpX < 0 || indexXpY < 0 )
+                /*if( indexXpX < 0 || indexXpY < 0 )
                 {
                     Debug.LogError( face + " : " + x + " " + y + " " + xpxB + " : " + xpyB + " : " + faceCenter + " @@@@@@@ " + _ + " : " + indexXpX + " : " + indexXpY + " : " + xpx + " : " + xpy + " : " + faceCenterXp );
-                }
+                }*/
                 xn = resultVertices[GetIndex( x - 1, y )];
                 xp = resultVerticesXp[GetIndex( indexXpX, indexXpY )];
             }
@@ -382,17 +381,16 @@ namespace HSP.Vanilla.CelestialBodies
             {
                 double ynx = (x * edgeLength) + faceCenter.x - halfSize;
                 double yny = ((y - 1) * edgeLength) + faceCenter.y - halfSize;
-                double ynxB = ynx;
-                double ynyB = yny;
-                _ = face;
+                //double ynxB = ynx;
+                //double ynyB = yny;
+                Direction3D _ = face;
                 FixCoordinates( ref _, ref ynx, ref yny );
                 int indexYnX = (int)((ynx - faceCenterYn.x + halfSizeYn) / edgeLengthYn);
-                int indexYnY = (int)((yny - faceCenterYn.y + halfSizeYn) / edgeLengthYn);
-
-                if( indexYnX < 0 || indexYnY < 0 )
+                int indexYnY = (int)Math.Floor( (yny - faceCenterYn.y + halfSizeYn) / edgeLengthYn );
+                /*if( indexYnX < 0 || indexYnY < 0 )
                 {
                     Debug.LogError( face + " : " + x + " " + y + " " + ynxB + " : " + ynyB + " : " + faceCenter + " @@@@@@@ " + _ + " : " + indexYnX + " : " + indexYnY + " : " + ynx + " : " + yny + " : " + faceCenterYn );
-                }
+                }*/
                 yn = resultVerticesYn[GetIndex( indexYnX, indexYnY )];
                 yp = resultVertices[GetIndex( x, y + 1 )];
             }
@@ -400,17 +398,16 @@ namespace HSP.Vanilla.CelestialBodies
             {
                 double ypx = (x * edgeLength) + faceCenter.x - halfSize;
                 double ypy = ((y + 1) * edgeLength) + faceCenter.y - halfSize;
-                double ypxB = ypx;
-                double ypyB = ypy;
-                _ = face;
+                //double ypxB = ypx;
+                //double ypyB = ypy;
+                Direction3D _ = face;
                 FixCoordinates( ref _, ref ypx, ref ypy );
                 int indexYpX = (int)((ypx - faceCenterYp.x + halfSizeYp) / edgeLengthYp);
-                int indexYpY = (int)((ypy - faceCenterYp.y + halfSizeYp) / edgeLengthYp);
-
-                if( indexYpX < 0 || indexYpY < 0 )
+                int indexYpY = (int)Math.Ceiling( (ypy - faceCenterYp.y + halfSizeYp) / edgeLengthYp );
+                /*if( indexYpX < 0 || indexYpY < 0 )
                 {
                     Debug.LogError( face + " : " + x + " " + y + " " + ypxB + " : " + ypyB + " : " + faceCenter + " @@@@@@@ " + _ + " : " + indexYpX + " : " + indexYpY + " : " + ypx + " : " + ypy + " : " + faceCenterYp );
-                }
+                }*/
                 yn = resultVertices[GetIndex( x, y - 1 )];
                 yp = resultVerticesYp[GetIndex( indexYpX, indexYpY )];
             }
@@ -441,63 +438,78 @@ namespace HSP.Vanilla.CelestialBodies
                 }
             }
 
-            /*
-            // this tangents calc takes about half of the time it takes the entire thing to run.
-            int triangleCount = (sideEdges * sideEdges) * 6;
+            // below is lerping neighboring larger quads. should only operate on local arrays.
 
-            Vector3[] tan1 = new Vector3[totalVertices];
-            Vector3[] tan2 = new Vector3[totalVertices];
-            for( int a = 0; a < triangleCount; a += 3 )
+            if( stepXn != 0 )
             {
-                int i1 = resultTriangles[a + 0];
-                int i2 = resultTriangles[a + 1];
-                int i3 = resultTriangles[a + 2];
+                int x = 0;
+                for( int y = 0; y < sideVertices - stepXn; y += stepXn )
+                {
+                    int indexMin = GetIndex( x, y );
+                    int indexMax = GetIndex( x, y + stepXn );
+                    for( int y2 = 0; y2 < stepXn; y2++ )
+                    {
+                        int index = GetIndex( x, y + y2 );
 
-                Vector3 v1 = meshVertices[i1];
-                Vector3 v2 = meshVertices[i2];
-                Vector3 v3 = meshVertices[i3];
-
-                Vector2 w1 = resultUVs[i1];
-                Vector2 w2 = resultUVs[i2];
-                Vector2 w3 = resultUVs[i3];
-
-                float x1 = v2.x - v1.x;
-                float x2 = v3.x - v1.x;
-                float y1 = v2.y - v1.y;
-                float y2 = v3.y - v1.y;
-                float z1 = v2.z - v1.z;
-                float z2 = v3.z - v1.z;
-
-                float s1 = w2.x - w1.x;
-                float s2 = w3.x - w1.x;
-                float t1 = w2.y - w1.y;
-                float t2 = w3.y - w1.y;
-
-                float r = 1.0f / (s1 * t2 - s2 * t1);
-
-                Vector3 sdir = new Vector3( (t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r, (t2 * z1 - t1 * z2) * r );
-                Vector3 tdir = new Vector3( (s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r, (s1 * z2 - s2 * z1) * r );
-
-                tan1[i1] += sdir;
-                tan1[i2] += sdir;
-                tan1[i3] += sdir;
-
-                tan2[i1] += tdir;
-                tan2[i2] += tdir;
-                tan2[i3] += tdir;
+                        meshVertices[index] = (Vector3)Vector3Dbl.Lerp( meshVertices[indexMin], meshVertices[indexMax], (float)y2 / stepXn );
+                        resultNormals[index] = Vector3.Lerp( resultNormals[indexMin], resultNormals[indexMax], (float)y2 / stepXn ).normalized;
+                        resultTangents[index] = Vector4.Lerp( resultTangents[indexMin], resultTangents[indexMax], (float)y2 / stepXn );
+                    }
+                }
             }
 
-            for( int a = 0; a < totalVertices; ++a )
+            if( stepXp != 0 )
             {
-                Vector3 normal = resultNormals[a];
-                Vector3 t = tan1[a];
+                int x = sideVertices - 1;
+                for( int y = 0; y < sideVertices - stepXp; y += stepXp )
+                {
+                    int indexMin = GetIndex( x, y );
+                    int indexMax = GetIndex( x, y + stepXp );
+                    for( int y2 = 0; y2 < stepXp; y2++ )
+                    {
+                        int index = GetIndex( x, y + y2 );
 
-                Vector3 tmp = (t - normal * Vector3.Dot( normal, t )).normalized;
-                Vector4 tangent = new Vector4( tmp.x, tmp.y, tmp.z );
-                tangent.w = (Vector3.Dot( Vector3.Cross( normal, t ), tan2[a] ) < 0.0f) ? -1.0f : 1.0f;
+                        meshVertices[index] = (Vector3)Vector3Dbl.Lerp( meshVertices[indexMin], meshVertices[indexMax], (float)y2 / stepXp );
+                        resultNormals[index] = Vector3.Lerp( resultNormals[indexMin], resultNormals[indexMax], (float)y2 / stepXp ).normalized;
+                        resultTangents[index] = Vector4.Lerp( resultTangents[indexMin], resultTangents[indexMax], (float)y2 / stepXp );
+                    }
+                }
+            }
 
-                resultTangents[a] = tangent;
-            }*/
+            if( stepYn != 0 )
+            {
+                int y = 0;
+                for( int x = 0; x < sideVertices - stepYn; x += stepYn )
+                {
+                    int indexMin = GetIndex( x, y );
+                    int indexMax = GetIndex( x + stepYn, y );
+                    for( int x2 = 0; x2 < stepYn; x2++ )
+                    {
+                        int index = GetIndex( x + x2, y );
+
+                        meshVertices[index] = (Vector3)Vector3Dbl.Lerp( meshVertices[indexMin], meshVertices[indexMax], (float)x2 / stepYn );
+                        resultNormals[index] = Vector3.Lerp( resultNormals[indexMin], resultNormals[indexMax], (float)x2 / stepYn ).normalized;
+                        resultTangents[index] = Vector4.Lerp( resultTangents[indexMin], resultTangents[indexMax], (float)x2 / stepYn );
+                    }
+                }
+            }
+            if( stepYp != 0 )
+            {
+                int y = sideVertices - 1;
+                for( int x = 0; x < sideVertices - stepYp; x += stepYp )
+                {
+                    int indexMin = GetIndex( x, y );
+                    int indexMax = GetIndex( x + stepYp, y );
+                    for( int x2 = 0; x2 < stepYp; x2++ )
+                    {
+                        int index = GetIndex( x + x2, y );
+
+                        meshVertices[index] = (Vector3)Vector3Dbl.Lerp( meshVertices[indexMin], meshVertices[indexMax], (float)x2 / stepYp );
+                        resultNormals[index] = Vector3.Lerp( resultNormals[indexMin], resultNormals[indexMax], (float)x2 / stepYp ).normalized;
+                        resultTangents[index] = Vector4.Lerp( resultTangents[indexMin], resultTangents[indexMax], (float)x2 / stepYp );
+                    }
+                }
+            }
         }
     }
 }

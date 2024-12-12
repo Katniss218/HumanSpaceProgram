@@ -101,6 +101,9 @@ namespace HSP.Vanilla.CelestialBodies
                     //   A - B
 
                     // Adding numberOfVertices makes it skip to the next row (number of vertices is 1 higher than edges).
+                    // TODO - This can be improved in the future, by doing the triangles after the vertices/normals are calculated, and checking which split generates the smoothest triangle
+                    // - split along the diagonal where the opposite diagonal's vertex normals have the largest angle between them.
+                    // - if A and D have larger angle than B and C, then split between B and C
                     resultTriangles[triIndex] = index; // A
                     resultTriangles[triIndex + 1] = index + sideVertices + 1; // D
                     resultTriangles[triIndex + 2] = index + sideVertices; // C

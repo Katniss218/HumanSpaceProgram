@@ -28,7 +28,10 @@ namespace HSP._DevUtils
             lqs.SetJobs( new ILODQuadJob[]
             {
                 new MakeQuadMesh_Job(),
-                new SmoothNeighbors_Job(),
+               // new SmoothNeighbors_Job(),
+            }, new ILODQuadJob[]
+            {
+                new MakeMeshData_Job(),
             } );
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
@@ -69,7 +72,7 @@ namespace HSP._DevUtils
             {
                 new MakeQuadMesh_Job(),
                 new Displace_Job(),
-                new SmoothNeighbors_Job(),
+                //new SmoothNeighbors_Job(),
             }, new ILODQuadJob[]
             {
                 new MakeMeshData_Job(),
@@ -84,7 +87,7 @@ namespace HSP._DevUtils
             {
                 new MakeQuadMesh_Job(),
                 new Displace_Job(),
-                new SmoothNeighbors_Job(),
+               // new SmoothNeighbors_Job(),
             }, new ILODQuadJob[]
             {
                 new MakeMeshData_Job(),
