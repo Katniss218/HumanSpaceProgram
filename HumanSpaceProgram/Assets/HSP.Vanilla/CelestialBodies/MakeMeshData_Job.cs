@@ -29,7 +29,8 @@ namespace HSP.Vanilla.CelestialBodies
         [ReadOnly]
         NativeArray<Vector2> resultUVs;
         [ReadOnly]
-        NativeArray<Vector3> resultVertices;
+        NativeArray<Vector3Dbl> resultVertices;
+        NativeArray<Vector3> meshVertices;
 
         NativeArray<Vector3> resultNormals;
         NativeArray<Vector4> resultTangents;
@@ -55,22 +56,22 @@ namespace HSP.Vanilla.CelestialBodies
         Vector3Dbl originYp;
 
         [ReadOnly]
-        NativeArray<Vector3> resultVerticesXn;
+        NativeArray<Vector3Dbl> resultVerticesXn;
         float edgeLengthXn;
         Vector2 faceCenterXn;
 
         [ReadOnly]
-        NativeArray<Vector3> resultVerticesXp;
+        NativeArray<Vector3Dbl> resultVerticesXp;
         float edgeLengthXp;
         Vector2 faceCenterXp;
 
         [ReadOnly]
-        NativeArray<Vector3> resultVerticesYn;
+        NativeArray<Vector3Dbl> resultVerticesYn;
         float edgeLengthYn;
         Vector2 faceCenterYn;
 
         [ReadOnly]
-        NativeArray<Vector3> resultVerticesYp;
+        NativeArray<Vector3Dbl> resultVerticesYp;
         float edgeLengthYp;
         Vector2 faceCenterYp;
 
@@ -94,7 +95,8 @@ namespace HSP.Vanilla.CelestialBodies
             resultVertices = r.ResultVertices;
             resultUVs = r.ResultUVs;
             resultNormals = r.ResultNormals;
-            resultTangents = new NativeArray<Vector4>( totalVertices, Allocator.TempJob );
+            resultTangents = new NativeArray<Vector4>( totalVertices, Allocator.Persistent );
+            meshVertices = new NativeArray<Vector3>( sideVertices * sideVertices, Allocator.Persistent );
 
             var xn = rAdditional.allQuads[r.Node.Xn];
             faceCenterXn = r.Node.Xn.FaceCenter;// - (Vector2.one * (r.Node.Xn.Size / 2));
@@ -127,6 +129,11 @@ namespace HSP.Vanilla.CelestialBodies
 
         public void Finish( LODQuadRebuildData r )
         {
+            r.ResultMesh.SetVertices( meshVertices );
+            r.ResultMesh.SetNormals( resultNormals );
+            r.ResultMesh.SetUVs( 0, resultUVs );
+            r.ResultMesh.SetTriangles( resultTriangles.ToArray(), 0 );
+
             r.ResultMesh.SetNormals( resultNormals );
             r.ResultMesh.SetTangents( resultTangents );
             r.ResultMesh.RecalculateBounds();
@@ -135,6 +142,7 @@ namespace HSP.Vanilla.CelestialBodies
         public void Dispose()
         {
             resultTangents.Dispose();
+            meshVertices.Dispose();
         }
 
         public ILODQuadJob Clone()
@@ -323,10 +331,10 @@ namespace HSP.Vanilla.CelestialBodies
             }
         }
 
-        private (Vector3 self, Vector3 xn, Vector3 xp, Vector3 yn, Vector3 yp) GetVertex( int x, int y )
+        private (Vector3Dbl self, Vector3Dbl xn, Vector3Dbl xp, Vector3Dbl yn, Vector3Dbl yp) GetVertex( int x, int y )
         {
-            Vector3 self = resultVertices[GetIndex( x, y )];
-            Vector3 xn, xp, yn, yp;
+            Vector3Dbl self = resultVertices[GetIndex( x, y )];
+            Vector3Dbl xn, xp, yn, yp;
 
             Direction3D _;
             if( x == 0 )
@@ -343,7 +351,7 @@ namespace HSP.Vanilla.CelestialBodies
                 {
                     Debug.LogError( face + " : " + x + " " + y + " " + xnxB + " : " + xnyB + " : " + faceCenter + " @@@@@@@ " + _ + " : " + indexXnX + " : " + indexXnY + " : " + xnx + " : " + xny + " : " + faceCenterXn );
                 }
-
+#warning TODO - handle quads of mismatched size - lerp 2 verts based on how close they are.
                 xn = resultVerticesXn[GetIndex( indexXnX, indexXnY )];
                 xp = resultVertices[GetIndex( x + 1, y )];
             }
@@ -372,10 +380,6 @@ namespace HSP.Vanilla.CelestialBodies
             }
             if( y == 0 )
             {
-                if( face == Direction3D.Xn && faceCenter == new Vector2( 0.5f, -0.5f ) && x == 32 && y == 0 )
-                {
-
-                }
                 double ynx = (x * edgeLength) + faceCenter.x - halfSize;
                 double yny = ((y - 1) * edgeLength) + faceCenter.y - halfSize;
                 double ynxB = ynx;
@@ -425,35 +429,19 @@ namespace HSP.Vanilla.CelestialBodies
             {
                 for( int y = 0; y < sideVertices; y++ )
                 {
-                    var vert = GetVertex( x, y );
-
                     int index = GetIndex( x, y );
-#error TODO - store vertices in body-space and change them at the end only.
+                    var (self, xn, xp, yn, yp) = GetVertex( x, y );
 
-                    var xn = (vert.xn + originXn);// radius;
-                    var xp = (vert.xp + origin);// radius;
-                    var yn = (vert.yn + origin);// radius;
-                    var yp = (vert.yp + origin);// radius;
-                    //Vector3 tangent = (resultVertices[index] - resultVertices[index1]).normalized;
-                    //Vector3 bitangent = (resultVertices[index] - resultVertices[index2]).normalized;
-                    Vector3 tangent = (xp - xn).NormalizeToVector3();
-                    Vector3 bitangent = (yp - yn).NormalizeToVector3();
-                    Vector3 normal;
-                    if( ((x == 0) ^ (y == 0)) ^ ((x == sideVertices - 1) ^ (y == sideVertices - 1)) )
-                    {
-                       // Debug.Log( edgeLength + " : " + (xp - xn) + " : " + (yp - yn) );
-                        //normal = Vector3.Cross( bitangent, tangent );
-                        normal = Vector3.Cross( tangent, bitangent );
-                    }
-                    else
-                    {
-                        normal = Vector3.Cross( bitangent, tangent );
-                    }
+                    Vector3 tangent = (xn - xp).NormalizeToVector3();
+                    Vector3 bitangent = (yn - yp).NormalizeToVector3();
 
-                    resultNormals[index] = normal;
+                    meshVertices[index] = (Vector3)(resultVertices[index] - origin);
+                    resultNormals[index] = Vector3.Cross( bitangent, tangent );
+                    resultTangents[index] = new Vector4( tangent.x, tangent.y, tangent.z, 1 );
                 }
             }
 
+            /*
             // this tangents calc takes about half of the time it takes the entire thing to run.
             int triangleCount = (sideEdges * sideEdges) * 6;
 
@@ -465,9 +453,9 @@ namespace HSP.Vanilla.CelestialBodies
                 int i2 = resultTriangles[a + 1];
                 int i3 = resultTriangles[a + 2];
 
-                Vector3 v1 = resultVertices[i1];
-                Vector3 v2 = resultVertices[i2];
-                Vector3 v3 = resultVertices[i3];
+                Vector3 v1 = meshVertices[i1];
+                Vector3 v2 = meshVertices[i2];
+                Vector3 v3 = meshVertices[i3];
 
                 Vector2 w1 = resultUVs[i1];
                 Vector2 w2 = resultUVs[i2];
@@ -509,7 +497,7 @@ namespace HSP.Vanilla.CelestialBodies
                 tangent.w = (Vector3.Dot( Vector3.Cross( normal, t ), tan2[a] ) < 0.0f) ? -1.0f : 1.0f;
 
                 resultTangents[a] = tangent;
-            }
+            }*/
         }
     }
 }

@@ -20,7 +20,7 @@ namespace HSP._DevUtils
         private static CelestialBody CreateCB( string id, Vector3Dbl airfPos, QuaternionDbl airfRot )
         {
             CelestialBody cb = new CelestialBodyFactory( id ) { radius = 696_340_000.0, mass = 1.989e30 }.Create( airfPos, airfRot );
-            /*LODQuadSphere lqs = cb.gameObject.AddComponent<LODQuadSphere>();
+            LODQuadSphere lqs = cb.gameObject.AddComponent<LODQuadSphere>();
             lqs.SetMode( LODQuadMode.VisualAndCollider );
             lqs.EdgeSubdivisions = 4;
             lqs.MaxDepth = 10;
@@ -29,7 +29,7 @@ namespace HSP._DevUtils
             {
                 new MakeQuadMesh_Job(),
                 new SmoothNeighbors_Job(),
-            } );*/
+            } );
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
             comp.IsAttractor = true;
@@ -58,8 +58,8 @@ namespace HSP._DevUtils
             CelestialBody cb = new CelestialBodyFactory( id ).Create( airfPos, airfRot );
             LODQuadSphere lqs = cb.gameObject.AddComponent<LODQuadSphere>();
             lqs.SetMode( LODQuadMode.Visual );
-            lqs.EdgeSubdivisions = 5;
-            lqs.MaxDepth = 16;
+            lqs.EdgeSubdivisions = 6;
+            lqs.MaxDepth = 14;
             lqs.PoIGetter = () => new Vector3Dbl[]
             {
                 SceneReferenceFrameManager.ReferenceFrame.TransformPosition( GameplaySceneCameraManager.NearCamera.transform.position ),
@@ -73,10 +73,9 @@ namespace HSP._DevUtils
             }, new ILODQuadJob[]
             {
                 new MakeMeshData_Job(),
-                //new BakeCollisionData_Job(),
             } );
 
-            /*LODQuadSphere lqs2 = cb.gameObject.AddComponent<LODQuadSphere>();
+            LODQuadSphere lqs2 = cb.gameObject.AddComponent<LODQuadSphere>();
             lqs2.SetMode( LODQuadMode.Collider );
             lqs2.EdgeSubdivisions = 5;
             lqs2.MaxDepth = 14;
@@ -92,7 +91,7 @@ namespace HSP._DevUtils
             }, new ILODQuadJob[]
             {
                 new BakeCollisionData_Job(),
-            } );*/
+            } );
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
             comp.IsAttractor = true;

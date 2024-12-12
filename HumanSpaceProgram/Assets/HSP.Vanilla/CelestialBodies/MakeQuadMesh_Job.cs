@@ -21,7 +21,7 @@ namespace HSP.Vanilla.CelestialBodies
         int sideEdges;
         int sideVertices;
 
-        NativeArray<Vector3> resultVertices;
+        NativeArray<Vector3Dbl> resultVertices;
         NativeArray<Vector3> resultNormals;
         NativeArray<Vector2> resultUvs;
         NativeArray<int> resultTriangles;
@@ -50,10 +50,10 @@ namespace HSP.Vanilla.CelestialBodies
 
         public void Finish( LODQuadRebuildData r )
         {
-            r.ResultMesh.SetVertices( resultVertices );
-            r.ResultMesh.SetNormals( resultNormals );
-            r.ResultMesh.SetUVs( 0, resultUvs );
-            r.ResultMesh.SetTriangles( resultTriangles.ToArray(), 0 );
+            //r.ResultMesh.SetVertices( resultVertices );
+            //r.ResultMesh.SetNormals( resultNormals );
+            //r.ResultMesh.SetUVs( 0, resultUvs );
+            //r.ResultMesh.SetTriangles( resultTriangles.ToArray(), 0 );
         }
 
         public void Dispose()
@@ -124,18 +124,12 @@ namespace HSP.Vanilla.CelestialBodies
 
                     Vector3Dbl posD = face.GetSpherePointDbl( quadX, quadY );
 
-                    Vector3 normal = (Vector3)posD;
+                    resultVertices[index] = posD * radius;
 
-                    resultVertices[index] = (Vector3)((posD * radius) - origin);
+                    // INFO - 'lerping' it like that introduces stretch, the cubemap should be counter-stretched to cancel it.
+                    resultUvs[index] = new Vector2( quadX * 0.5f + 0.5f, quadY * 0.5f + 0.5f );
 
-                    const float margin = 0.0f; // margin can be 0 when the texture wrap mode is set to mirror.
-                    resultUvs[index] = new Vector2( quadX * (0.5f - margin) + 0.5f, quadY * (0.5f - margin) + 0.5f );
-#warning INFO - 'lerping' it like that introduces stretch, the cubemap should be counter-stretched to cancel it.
-
-                    // Normals after displacing by heightmap will need to be calculated by hand instead of with RecalculateNormals() to avoid seams not matching up.
-                    // normals can be calculated by adding the normals of each face to its vertices, then normalizing.
-                    // - this will compute smooth VERTEX normals!!
-                    resultNormals[index] = normal;
+                    resultNormals[index] = (Vector3)posD;
                 }
             }
         }

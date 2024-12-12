@@ -44,7 +44,7 @@ namespace HSP.CelestialBodies.Surfaces
         /// <summary>
         /// The shared array with vertex positions.
         /// </summary>
-        public NativeArray<Vector3> ResultVertices { get; private set; }
+        public NativeArray<Vector3Dbl> ResultVertices { get; private set; }
 
         /// <summary>
         /// The shared array with vertex normals.
@@ -84,7 +84,7 @@ namespace HSP.CelestialBodies.Surfaces
             SideEdges = 1 << sphere.EdgeSubdivisions; // Fast 2^n for integer types.
             SideVertices = SideEdges + 1;
 
-            ResultVertices = new NativeArray<Vector3>( SideVertices * SideVertices, Allocator.Persistent );
+            ResultVertices = new NativeArray<Vector3Dbl>( SideVertices * SideVertices, Allocator.Persistent );
             ResultNormals = new NativeArray<Vector3>( SideVertices * SideVertices, Allocator.Persistent );
             ResultUVs = new NativeArray<Vector2>( SideVertices * SideVertices, Allocator.Persistent );
             ResultTriangles = new NativeArray<int>( (SideEdges * SideEdges) * 6, Allocator.Persistent );

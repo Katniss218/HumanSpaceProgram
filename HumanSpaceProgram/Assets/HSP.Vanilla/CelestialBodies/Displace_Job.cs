@@ -15,7 +15,7 @@ namespace HSP.Vanilla.CelestialBodies
         int sideVertices;
         int sideEdges;
 
-        NativeArray<Vector3> resultVertices;
+        NativeArray<Vector3Dbl> resultVertices;
 
         public LODQuadMode QuadMode => LODQuadMode.VisualAndCollider;
 
@@ -48,13 +48,18 @@ namespace HSP.Vanilla.CelestialBodies
         {
             for( int index = 0; index < totalVertices; index++ )
             {
-                Vector3Dbl posD = (resultVertices[index] + origin) / radius;
+                Vector3Dbl pos = resultVertices[index];
+                Vector3Dbl unitSpherePos = resultVertices[index].normalized;
 
-                Vector3 unitSpherePos = (Vector3)posD;
+                Vector3Dbl temporaryHeightOffset_Removelater = unitSpherePos * 4000 + unitSpherePos * Math.Sin( (unitSpherePos.x * unitSpherePos.y * unitSpherePos.z) / 4190.0 * radius ) * 4000;
+                temporaryHeightOffset_Removelater += unitSpherePos * Math.Sin( 0.1 + (unitSpherePos.x + unitSpherePos.y - unitSpherePos.z) / 1156.0 * radius ) * 1000;
+                temporaryHeightOffset_Removelater += unitSpherePos * Math.Sin( 4 + (unitSpherePos.x - unitSpherePos.y + unitSpherePos.z) / 768.0 * radius ) * 500;
+                temporaryHeightOffset_Removelater += unitSpherePos * Math.Sin( 143 + (unitSpherePos.x * unitSpherePos.y + unitSpherePos.z) / 358.0 * radius ) * 500;
+                temporaryHeightOffset_Removelater += unitSpherePos * Math.Sin( -2 + (unitSpherePos.x + unitSpherePos.y * unitSpherePos.z) / 221.0 * radius ) * 203;
+                temporaryHeightOffset_Removelater += unitSpherePos * Math.Sin( -12 + (unitSpherePos.x + unitSpherePos.y * unitSpherePos.z) / 22.0 * radius ) * 23;
+                temporaryHeightOffset_Removelater += unitSpherePos * Math.Sin( -2 + (unitSpherePos.x + unitSpherePos.y * unitSpherePos.z) / 3.0 * radius ) * 7;
 
-                Vector3Dbl temporaryHeightOffset_Removelater = posD * 5 * Math.Sin( (unitSpherePos.x + unitSpherePos.y + unitSpherePos.z) / 300 * radius * 30 );
-
-                resultVertices[index] = (Vector3)(((posD * radius) + temporaryHeightOffset_Removelater) - origin);
+                resultVertices[index] = pos + temporaryHeightOffset_Removelater;
             }
         }
     }

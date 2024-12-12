@@ -14,7 +14,7 @@ namespace HSP.Vanilla.CelestialBodies
         int numberOfEdges;
         int numberOfVertices;
 
-        NativeArray<Vector3> resultVertices;
+        NativeArray<Vector3Dbl> resultVertices;
 
         public LODQuadMode QuadMode => LODQuadMode.VisualAndCollider;
 
@@ -68,7 +68,7 @@ namespace HSP.Vanilla.CelestialBodies
                         // find index of interval.
                         // smoothly blend.
 
-                        resultVertices[index] = Vector3.Lerp( resultVertices[indexMin], resultVertices[indexMax], (float)y2 / stepXn );
+                        resultVertices[index] = Vector3Dbl.Lerp( resultVertices[indexMin], resultVertices[indexMax], (float)y2 / stepXn );
                     }
                 }
             }
@@ -86,7 +86,7 @@ namespace HSP.Vanilla.CelestialBodies
                         // find index of interval.
                         // smoothly blend.
 
-                        resultVertices[index] = Vector3.Lerp( resultVertices[indexMin], resultVertices[indexMax], (float)y2 / stepXp );
+                        resultVertices[index] = Vector3Dbl.Lerp( resultVertices[indexMin], resultVertices[indexMax], (float)y2 / stepXp );
                     }
                 }
             }
@@ -104,7 +104,7 @@ namespace HSP.Vanilla.CelestialBodies
                         // find index of interval.
                         // smoothly blend.
 
-                        resultVertices[index] = Vector3.Lerp( resultVertices[indexMin], resultVertices[indexMax], (float)x2 / stepYn );
+                        resultVertices[index] = Vector3Dbl.Lerp( resultVertices[indexMin], resultVertices[indexMax], (float)x2 / stepYn );
                     }
                 }
             }
@@ -121,7 +121,7 @@ namespace HSP.Vanilla.CelestialBodies
                         // find index of interval.
                         // smoothly blend.
 
-                        resultVertices[index] = Vector3.Lerp( resultVertices[indexMin], resultVertices[indexMax], (float)x2 / stepYp );
+                        resultVertices[index] = Vector3Dbl.Lerp( resultVertices[indexMin], resultVertices[indexMax], (float)x2 / stepYp );
                     }
                 }
             }

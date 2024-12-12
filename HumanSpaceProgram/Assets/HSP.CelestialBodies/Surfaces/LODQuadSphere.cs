@@ -133,7 +133,7 @@ namespace HSP.CelestialBodies.Surfaces
                 mat.SetTexture( "_MainTex", cbTex[i] );
                 mat.SetTexture( "_NormalTex", cbNormal );
                 mat.SetFloat( "_Glossiness", 0.05f );
-                mat.SetFloat( "_NormalStrength", 0.0f );
+                mat.SetFloat( "_NormalStrength", 0.5f );
                 AssetRegistry.Register( $"Vanilla::CBMATERIAL{i}", mat );
             }
 
