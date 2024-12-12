@@ -19,7 +19,7 @@ namespace HSP.Vanilla.CelestialBodies
 
         public void Initialize( LODQuadRebuildData r, LODQuadRebuildAdditionalData _ )
         {
-            instanceId = r.Mesh.GetInstanceID();
+            instanceId = r.ResultMesh.GetInstanceID();
         }
 
         public void Finish( LODQuadRebuildData r )

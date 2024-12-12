@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace HSP.CelestialBodies.Surfaces
 {
-    public class LODQuadRebuilder : IDisposable
+    public sealed class LODQuadRebuilder : IDisposable
     {
         [Flags]
         public enum BuildSettings
@@ -70,7 +70,7 @@ namespace HSP.CelestialBodies.Surfaces
 
         private void InitializeRebuildData( LODQuadSphere sphere, LODQuadTreeChanges changes, BuildSettings settings )
         {
-            IReadOnlyDictionary<LODQuadTreeNode, LODQuad> existingNodes = sphere.CurrentQuads;
+            IReadOnlyDictionary<LODQuadTreeNode, LODQuadRebuildData> existingNodes = sphere.CurrentQuads;
             IEnumerable<LODQuadTreeNode> newNodes = changes.GetNewNodes();
 
             if( settings.HasFlag( BuildSettings.IncludeNodesWithChangedNeighbors ) )
@@ -90,7 +90,7 @@ namespace HSP.CelestialBodies.Surfaces
             Dictionary<LODQuadTreeNode, LODQuadRebuildAdditionalData.Entry> rebuildData = new( _nodeEqualityComparer );
             foreach( var node in existingNodes )
             {
-                var entry = new LODQuadRebuildAdditionalData.Entry( node.Value.meshData );
+                var entry = new LODQuadRebuildAdditionalData.Entry( null, node.Value );
 
                 if( !rebuildData.TryAdd( node.Key, entry ) )
                 {
@@ -103,12 +103,12 @@ namespace HSP.CelestialBodies.Surfaces
                 if( rebuildData.TryGetValue( node, out var data ) )
                 {
                     // add new info and replace in dict.
-                    data = new LODQuadRebuildAdditionalData.Entry( rebuildDict[node], data.old );
+                    data = new LODQuadRebuildAdditionalData.Entry( rebuildDict[node], data.oldR );
                     rebuildData[node] = data;
                 }
                 else
                 {
-                    data = new LODQuadRebuildAdditionalData.Entry( rebuildDict[node] );
+                    data = new LODQuadRebuildAdditionalData.Entry( rebuildDict[node], null );
                     rebuildData[node] = data;
                 }
             }
@@ -203,7 +203,7 @@ namespace HSP.CelestialBodies.Surfaces
                             Debug.LogException( ex );
                         }
 
-                        rQuad.Dispose();
+                        //rQuad.Dispose(); moved to lodsphere, done only after the quad is also destroyed.
                     }
                     return;
                 }
@@ -259,14 +259,14 @@ namespace HSP.CelestialBodies.Surfaces
         /// Check if the build has been completed (<see cref="IsDone"/>) before calling this method.
         /// </remarks>
         /// <exception cref="InvalidOperationException"></exception>
-        public IEnumerable<LODQuad> GetResults()
+        public IEnumerable<LODQuadRebuildData> GetResults()
         {
             if( !IsDone )
             {
                 throw new InvalidOperationException( $"{nameof( LODQuadRebuilder )}.{nameof( GetResults )} was called, but the rebuild hasn't been finished yet." );
             }
 
-            return _rebuild.Select( q => q.Quad );
+            return _rebuild.Select( q => q );
         }
 
         /// <summary>

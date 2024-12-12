@@ -10,7 +10,7 @@ namespace HSP.CelestialBodies.Surfaces
     /// Adds a solid surface to a celestial body.
     /// </summary>
     [RequireComponent( typeof( CelestialBody ) )]
-    public class LODQuadSphere : MonoBehaviour
+    public sealed class LODQuadSphere : MonoBehaviour
     {
         int _edgeSubdivisions = 4;
         /// <summary>
@@ -116,8 +116,8 @@ namespace HSP.CelestialBodies.Surfaces
 
         Vector3Dbl[] _oldPois = null; // Initial value null is important.
 
-        Dictionary<LODQuadTreeNode, LODQuad> _currentQuads = new( new ValueLODQuadTreeNodeComparer() );
-        public IReadOnlyDictionary<LODQuadTreeNode, LODQuad> CurrentQuads => _currentQuads;
+        Dictionary<LODQuadTreeNode, LODQuadRebuildData> _currentQuads = new( new ValueLODQuadTreeNodeComparer() );
+        public IReadOnlyDictionary<LODQuadTreeNode, LODQuadRebuildData> CurrentQuads => _currentQuads;
         LODQuadTree _currentTree;
 
         LODQuadRebuilder _builder;
@@ -133,7 +133,7 @@ namespace HSP.CelestialBodies.Surfaces
                 mat.SetTexture( "_MainTex", cbTex[i] );
                 mat.SetTexture( "_NormalTex", cbNormal );
                 mat.SetFloat( "_Glossiness", 0.05f );
-                mat.SetFloat( "_NormalStrength", 0.7f );
+                mat.SetFloat( "_NormalStrength", 0.0f );
                 AssetRegistry.Register( $"Vanilla::CBMATERIAL{i}", mat );
             }
 
@@ -164,6 +164,10 @@ namespace HSP.CelestialBodies.Surfaces
         void OnDestroy()
         {
             _builder?.Dispose();
+            foreach( var oldRebuildData in _currentQuads.Values )
+            {
+                oldRebuildData.Dispose();
+            }
         }
 
         void OnDisable()
@@ -179,10 +183,11 @@ namespace HSP.CelestialBodies.Surfaces
         {
             foreach( var kvp in _currentQuads )
             {
-                Destroy( kvp.Value );
+                Destroy( kvp.Value.Quad );
+                kvp.Value.Dispose();
             }
             _currentQuads.Clear();
-            _currentTree = null;
+            _currentTree = new LODQuadTree( MaxDepth );
         }
 
         private void TryRebuild()
@@ -239,7 +244,8 @@ namespace HSP.CelestialBodies.Surfaces
                 {
                     if( _currentQuads.Remove( node, out var quad ) )
                     {
-                        Destroy( quad.gameObject );
+                        Destroy( quad.Quad.gameObject );
+                        quad.Dispose();
                     }
                     else
                     {
@@ -252,13 +258,13 @@ namespace HSP.CelestialBodies.Surfaces
                 {
                     if( _currentQuads.TryGetValue( node, out var quad ) )
                     {
-                        if( quad.IsActive )
+                        if( quad.Quad.IsActive )
                         {
                             Debug.LogError( $"Quad [became a leaf in new] was already active." );
                         }
                         else
                         {
-                            quad.Activate();
+                            quad.Quad.Activate();
                         }
                     }
                 }
@@ -268,9 +274,9 @@ namespace HSP.CelestialBodies.Surfaces
                 {
                     if( _currentQuads.TryGetValue( node, out var quad ) )
                     {
-                        if( quad.IsActive )
+                        if( quad.Quad.IsActive )
                         {
-                            quad.Deactivate();
+                            quad.Quad.Deactivate();
                         }
                         else
                         {
@@ -281,18 +287,19 @@ namespace HSP.CelestialBodies.Surfaces
 
                 // Activate the newly built leaves.
                 // Some quads might've been *rebuilt* (existed before, got refreshed)
-                foreach( var quad in _builder.GetResults() )
+                foreach( var newBuilt in _builder.GetResults() )
                 {
-                    if( _currentQuads.Remove( quad.Node, out var existingQuad ) )
+                    if( _currentQuads.Remove( newBuilt.Node, out var existingQuad ) )
                     {
-                        Destroy( existingQuad.gameObject );
+                        Destroy( existingQuad.Quad.gameObject );
+                        existingQuad.Dispose();
                     }
 
-                    _currentQuads.Add( quad.Node, quad );
+                    _currentQuads.Add( newBuilt.Node, newBuilt );
 
-                    if( quad.Node.IsLeaf )
+                    if( newBuilt.Node.IsLeaf )
                     {
-                        quad.Activate();
+                        newBuilt.Quad.Activate();
                     }
                 }
 

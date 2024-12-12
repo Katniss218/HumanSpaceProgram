@@ -9,7 +9,7 @@ namespace HSP.CelestialBodies.Surfaces
     /// <summary>
     /// Contains shared data about a single quad mesh being created.
     /// </summary>
-    public class LODQuadRebuildData : IDisposable
+    public sealed class LODQuadRebuildData : IDisposable
     {
         /// <summary>
         /// The quad being build. <br/>
@@ -21,11 +21,6 @@ namespace HSP.CelestialBodies.Surfaces
         /// The tree node associated with this quad.
         /// </summary>
         public LODQuadTreeNode Node { get; }
-
-        /// <summary>
-        /// The new mesh instance associated with this quad.
-        /// </summary>
-        public Mesh Mesh { get; private set; }
 
         /// <summary>
         /// The radius of the celestial body.
@@ -40,6 +35,11 @@ namespace HSP.CelestialBodies.Surfaces
         /// The number of edges per side (1 - number of vertices).
         /// </summary>
         public int SideEdges { get; private set; }
+
+        /// <summary>
+        /// The new mesh instance associated with this quad.
+        /// </summary>
+        public Mesh ResultMesh { get; private set; }
 
         /// <summary>
         /// The shared array with vertex positions.
@@ -78,7 +78,7 @@ namespace HSP.CelestialBodies.Surfaces
                 this.jobs[i] = jobs[i].Clone();
             }
 
-            Mesh = new Mesh();
+            ResultMesh = new Mesh();
 
             CelestialBody = sphere.CelestialBody;
             SideEdges = 1 << sphere.EdgeSubdivisions; // Fast 2^n for integer types.
@@ -92,11 +92,13 @@ namespace HSP.CelestialBodies.Surfaces
 
         public void FinalizeBuild( LODQuadSphere sphere )
         {
-            Quad = LODQuad.CreateInactive( sphere, Node, Mesh );
+            Quad = LODQuad.CreateInactive( sphere, Node, ResultMesh );
         }
 
         public void Dispose()
         {
+            // Don't dispose of the ResultMesh because it's owned by the quad.
+
             ResultVertices.Dispose();
             ResultNormals.Dispose();
             ResultUVs.Dispose();
@@ -104,38 +106,20 @@ namespace HSP.CelestialBodies.Surfaces
         }
     }
 
-    public class LODQuadRebuildAdditionalData
+    public sealed class LODQuadRebuildAdditionalData
     {
         public struct Entry
         {
-            public readonly bool hasNew;
-            public readonly bool hasOld;
+            public readonly LODQuadRebuildData newR;
+            public readonly LODQuadRebuildData oldR;
 
-            public readonly LODQuadRebuildData @new;
-            public readonly Mesh.MeshData old;
+            public bool HasNew => newR != null;
+            public bool HasOld => oldR != null;
 
-            public Entry( Mesh.MeshData old )
+            public Entry( LODQuadRebuildData @new, LODQuadRebuildData old )
             {
-                this.hasNew = false;
-                this.hasOld = true;
-                this.@new = null;
-                this.old = old;
-            }
-
-            public Entry( LODQuadRebuildData @new )
-            {
-
-                this.hasNew = true;
-                this.hasOld = false;
-                this.@new = @new;
-                this.old = default;
-            }
-            public Entry( LODQuadRebuildData @new, Mesh.MeshData old )
-            {
-                this.hasNew = true;
-                this.hasOld = true;
-                this.@new = @new;
-                this.old = old;
+                this.newR = @new;
+                this.oldR = old;
             }
         }
 

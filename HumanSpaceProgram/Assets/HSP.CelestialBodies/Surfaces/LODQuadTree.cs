@@ -147,24 +147,24 @@ namespace HSP.CelestialBodies.Surfaces
 
                 // Only need to go to the immediate child, since the nodes of the previous size will be already resolved.
                 subXnYn.Xn = GetNeighborToUse( parentsXn, subXnYn.SphereCenter );
-                subXnYn.Yn = GetNeighborToUse( parentsYn, subXnYn.SphereCenter );
                 subXnYn.Xp = subXpYn;
+                subXnYn.Yn = GetNeighborToUse( parentsYn, subXnYn.SphereCenter );
                 subXnYn.Yp = subXnYp;
 
+                subXpYn.Xn = subXnYn;
                 subXpYn.Xp = GetNeighborToUse( parentsXp, subXpYn.SphereCenter );
                 subXpYn.Yn = GetNeighborToUse( parentsYn, subXpYn.SphereCenter );
-                subXpYn.Xn = subXnYn;
                 subXpYn.Yp = subXpYp;
 
                 subXnYp.Xn = GetNeighborToUse( parentsXn, subXnYp.SphereCenter );
-                subXnYp.Yp = GetNeighborToUse( parentsYp, subXnYp.SphereCenter );
                 subXnYp.Xp = subXpYp;
                 subXnYp.Yn = subXnYn;
+                subXnYp.Yp = GetNeighborToUse( parentsYp, subXnYp.SphereCenter );
 
-                subXpYp.Xp = GetNeighborToUse( parentsXp, subXpYp.SphereCenter );
-                subXpYp.Yp = GetNeighborToUse( parentsYp, subXpYp.SphereCenter );
                 subXpYp.Xn = subXnYp;
+                subXpYp.Xp = GetNeighborToUse( parentsXp, subXpYp.SphereCenter );
                 subXpYp.Yn = subXpYn;
+                subXpYp.Yp = GetNeighborToUse( parentsYp, subXpYp.SphereCenter );
             }
         }
 

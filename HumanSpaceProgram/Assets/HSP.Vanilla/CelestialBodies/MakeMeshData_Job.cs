@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.XR;
+using static UnityEngine.UI.Image;
 
 namespace HSP.Vanilla.CelestialBodies
 {
@@ -15,7 +16,7 @@ namespace HSP.Vanilla.CelestialBodies
         double radius;
         Vector3Dbl origin;
         Direction3D face;
-        float quadSize;
+        float edgeLength;
         Vector2 faceCenter;
 
         int totalVertices;
@@ -42,24 +43,35 @@ namespace HSP.Vanilla.CelestialBodies
 
         // This essentially boils down to that using certain 'job' types in the same stage causes race conditions (depending on what these jobs do).
 
+        float halfSize;
+        float halfSizeXn;
+        float halfSizeXp;
+        float halfSizeYn;
+        float halfSizeYp;
+
+        Vector3Dbl originXn;
+        Vector3Dbl originXp;
+        Vector3Dbl originYn;
+        Vector3Dbl originYp;
+
         [ReadOnly]
         NativeArray<Vector3> resultVerticesXn;
-        float quadSizeXn;
+        float edgeLengthXn;
         Vector2 faceCenterXn;
 
         [ReadOnly]
         NativeArray<Vector3> resultVerticesXp;
-        float quadSizeXp;
+        float edgeLengthXp;
         Vector2 faceCenterXp;
 
         [ReadOnly]
         NativeArray<Vector3> resultVerticesYn;
-        float quadSizeYn;
+        float edgeLengthYn;
         Vector2 faceCenterYn;
 
         [ReadOnly]
         NativeArray<Vector3> resultVerticesYp;
-        float quadSizeYp;
+        float edgeLengthYp;
         Vector2 faceCenterYp;
 
         public LODQuadMode QuadMode => LODQuadMode.VisualAndCollider;
@@ -68,12 +80,15 @@ namespace HSP.Vanilla.CelestialBodies
         {
             radius = (float)r.CelestialBody.Radius;
             origin = r.Node.SphereCenter * radius;
-            quadSize = r.Node.Size;
-            faceCenter = r.Node.FaceCenter;
 
             sideEdges = r.SideEdges;
             sideVertices = r.SideVertices;
             totalVertices = sideVertices * sideVertices;
+
+            edgeLength = r.Node.Size / sideEdges;
+            faceCenter = r.Node.FaceCenter;// - (Vector2.one * (r.Node.Size / 2));
+            halfSize = r.Node.Size / 2;
+            face = r.Node.Face;
 
             resultTriangles = r.ResultTriangles;
             resultVertices = r.ResultVertices;
@@ -82,72 +97,44 @@ namespace HSP.Vanilla.CelestialBodies
             resultTangents = new NativeArray<Vector4>( totalVertices, Allocator.TempJob );
 
             var xn = rAdditional.allQuads[r.Node.Xn];
-            faceCenterXn = r.Node.Xn.FaceCenter;
-            quadSizeXn = r.Node.Xn.Size;
-            if( xn.hasNew )
-            {
-                resultVerticesXn = xn.@new.ResultVertices;
-            }
-            else
-            {
-#error TODO - Keep these buffers until the quad made with them is destroyed.
-                xn.old.GetVertices( resultVerticesXn );
-            }
+            faceCenterXn = r.Node.Xn.FaceCenter;// - (Vector2.one * (r.Node.Xn.Size / 2));
+            originXn = r.Node.Xn.SphereCenter;
+            halfSizeXn = r.Node.Xn.Size / 2;
+            edgeLengthXn = r.Node.Xn.Size / sideEdges;
+            resultVerticesXn = xn.HasNew ? xn.newR.ResultVertices : xn.oldR.ResultVertices;
 
             var xp = rAdditional.allQuads[r.Node.Xp];
-            faceCenterXp = r.Node.Xp.FaceCenter;
-            quadSizeXp = r.Node.Xp.Size;
-            if( xp.hasNew )
-            {
-                resultVerticesXp = xp.@new.ResultVertices;
-            }
-            else
-            {
-                // this array seems to need to be allocated ahead.
-                xp.old.GetVertices( resultVerticesXp );
-            }
+            faceCenterXp = r.Node.Xp.FaceCenter;// - (Vector2.one * (r.Node.Xp.Size / 2));
+            originXp = r.Node.Xp.SphereCenter;
+            halfSizeXp = r.Node.Xp.Size / 2;
+            edgeLengthXp = r.Node.Xp.Size / sideEdges;
+            resultVerticesXp = xp.HasNew ? xp.newR.ResultVertices : xp.oldR.ResultVertices;
 
             var yn = rAdditional.allQuads[r.Node.Yn];
-            faceCenterYn = r.Node.Yn.FaceCenter;
-            quadSizeYn = r.Node.Yn.Size;
-            if( yn.hasNew )
-            {
-                resultVerticesYn = yn.@new.ResultVertices;
-            }
-            else
-            {
-                yn.old.GetVertices( resultVerticesYn );
-            }
+            faceCenterYn = r.Node.Yn.FaceCenter;// - (Vector2.one * (r.Node.Yn.Size / 2));
+            originYn = r.Node.Yn.SphereCenter;
+            halfSizeYn = r.Node.Yn.Size / 2;
+            edgeLengthYn = r.Node.Yn.Size / sideEdges;
+            resultVerticesYn = yn.HasNew ? yn.newR.ResultVertices : yn.oldR.ResultVertices;
 
             var yp = rAdditional.allQuads[r.Node.Yp];
-            faceCenterYp = r.Node.Yp.FaceCenter;
-            quadSizeYp = r.Node.Yp.Size;
-            if( yp.hasNew )
-            {
-                resultVerticesYp = yp.@new.ResultVertices;
-            }
-            else
-            {
-                yp.old.GetVertices( resultVerticesYp );
-            }
+            faceCenterYp = r.Node.Yp.FaceCenter;// - (Vector2.one * (r.Node.Yp.Size / 2));
+            originYp = r.Node.Yp.SphereCenter;
+            halfSizeYp = r.Node.Yp.Size / 2;
+            edgeLengthYp = r.Node.Yp.Size / sideEdges;
+            resultVerticesYp = yp.HasNew ? yp.newR.ResultVertices : yp.oldR.ResultVertices;
         }
 
         public void Finish( LODQuadRebuildData r )
         {
-            r.Mesh.SetNormals( resultNormals );
-            r.Mesh.SetTangents( resultTangents );
-            r.Mesh.RecalculateBounds();
+            r.ResultMesh.SetNormals( resultNormals );
+            r.ResultMesh.SetTangents( resultTangents );
+            r.ResultMesh.RecalculateBounds();
         }
 
         public void Dispose()
         {
             resultTangents.Dispose();
-
-#warning TODO - only dispose of the new arrays (but if I keep the original arrays in the quads, that won't be necessary, they'd be disposed after.
-            //resultVerticesXn.Dispose();
-            //resultVerticesXp.Dispose();
-            //resultVerticesYn.Dispose();
-            //resultVerticesYp.Dispose();
         }
 
         public ILODQuadJob Clone()
@@ -193,7 +180,7 @@ namespace HSP.Vanilla.CelestialBodies
                 }
             }
 
-            if( face == Direction3D.Xp )
+            else if( face == Direction3D.Xp )
             {
                 if( x < -1 )
                 {
@@ -219,7 +206,7 @@ namespace HSP.Vanilla.CelestialBodies
                 }
             }
 
-            if( face == Direction3D.Yn )
+            else if( face == Direction3D.Yn )
             {
                 if( x < -1 )
                 {
@@ -247,7 +234,7 @@ namespace HSP.Vanilla.CelestialBodies
                 }
             }
 
-            if( face == Direction3D.Yp )
+            else if( face == Direction3D.Yp )
             {
                 if( x < -1 )
                 {
@@ -275,7 +262,7 @@ namespace HSP.Vanilla.CelestialBodies
                 }
             }
 
-            if( face == Direction3D.Zn )
+            else if( face == Direction3D.Zn )
             {
                 if( x < -1 )
                 {
@@ -288,7 +275,7 @@ namespace HSP.Vanilla.CelestialBodies
                 {
                     face = Direction3D.Yp;
                     var tempy = (x - 2);
-                    x = y;
+                    x = -y;
                     y = tempy;
                 }
                 else if( y < -1 )
@@ -305,7 +292,7 @@ namespace HSP.Vanilla.CelestialBodies
                 }
             }
 
-            if( face == Direction3D.Zp )
+            else if( face == Direction3D.Zp )
             {
                 if( x < -1 )
                 {
@@ -341,61 +328,92 @@ namespace HSP.Vanilla.CelestialBodies
             Vector3 self = resultVertices[GetIndex( x, y )];
             Vector3 xn, xp, yn, yp;
 
-            Direction3D _ = default;
+            Direction3D _;
             if( x == 0 )
             {
-                double xnx = ((x - 1) * quadSize * 2 - 1) + faceCenter.x;
-                double xny = (y * quadSize * 2 - 1) + faceCenter.y;
+                double xnx = ((x - 1) * edgeLength) + faceCenter.x - halfSize;
+                double xny = (y * edgeLength) + faceCenter.y - halfSize;
+                double xnxB = xnx;
+                double xnyB = xny;
+                _ = face;
                 FixCoordinates( ref _, ref xnx, ref xny );
-                int indexXnX = (int)((xnx - faceCenterXn.x) / quadSizeXn * 0.5 + 0.5);
-                int indexXnY = (int)((xny - faceCenterXn.y) / quadSizeXn * 0.5 + 0.5);
+                int indexXnX = (int)((xnx - faceCenterXn.x + halfSizeXn) / edgeLengthXn);
+                int indexXnY = (int)((xny - faceCenterXn.y + halfSizeXn) / edgeLengthXn);
+                if( indexXnX < 0 || indexXnY < 0 )
+                {
+                    Debug.LogError( face + " : " + x + " " + y + " " + xnxB + " : " + xnyB + " : " + faceCenter + " @@@@@@@ " + _ + " : " + indexXnX + " : " + indexXnY + " : " + xnx + " : " + xny + " : " + faceCenterXn );
+                }
 
                 xn = resultVerticesXn[GetIndex( indexXnX, indexXnY )];
-                xp = resultVerticesXn[GetIndex( x + 1, y )];
+                xp = resultVertices[GetIndex( x + 1, y )];
             }
-            else if( x == sideEdges - 1 )
+            else if( x == sideVertices - 1 )
             {
-                double xpx = ((x + 1) * quadSize * 2 - 1) + faceCenter.x;
-                double xpy = (y * quadSize * 2 - 1) + faceCenter.y;
+                double xpx = ((x + 1) * edgeLength) + faceCenter.x - halfSize;
+                double xpy = (y * edgeLength) + faceCenter.y - halfSize;
+                double xpxB = xpx;
+                double xpyB = xpy;
+                _ = face;
                 FixCoordinates( ref _, ref xpx, ref xpy );
-                int indexXpX = (int)((xpx - faceCenterXp.x) / quadSizeXp * 0.5 + 0.5);
-                int indexXpY = (int)((xpy - faceCenterXp.y) / quadSizeXp * 0.5 + 0.5);
+                int indexXpX = (int)((xpx - faceCenterXp.x + halfSizeXp) / edgeLengthXp);
+                int indexXpY = (int)((xpy - faceCenterXp.y + halfSizeXp) / edgeLengthXp);
 
-                xn = resultVerticesXn[GetIndex( x - 1, y )];
-                xp = resultVerticesXn[GetIndex( indexXpX, indexXpY )];
+                if( indexXpX < 0 || indexXpY < 0 )
+                {
+                    Debug.LogError( face + " : " + x + " " + y + " " + xpxB + " : " + xpyB + " : " + faceCenter + " @@@@@@@ " + _ + " : " + indexXpX + " : " + indexXpY + " : " + xpx + " : " + xpy + " : " + faceCenterXp );
+                }
+                xn = resultVertices[GetIndex( x - 1, y )];
+                xp = resultVerticesXp[GetIndex( indexXpX, indexXpY )];
             }
             else
             {
-                xn = resultVerticesXn[GetIndex( x - 1, y )];
-                xp = resultVerticesXn[GetIndex( x + 1, y )];
+                xn = resultVertices[GetIndex( x - 1, y )];
+                xp = resultVertices[GetIndex( x + 1, y )];
             }
-
             if( y == 0 )
             {
-                double ynx = (x * quadSize * 2 - 1) + faceCenter.x;
-                double yny = ((y - 1) * quadSize * 2 - 1) + faceCenter.y;
+                if( face == Direction3D.Xn && faceCenter == new Vector2( 0.5f, -0.5f ) && x == 32 && y == 0 )
+                {
+
+                }
+                double ynx = (x * edgeLength) + faceCenter.x - halfSize;
+                double yny = ((y - 1) * edgeLength) + faceCenter.y - halfSize;
+                double ynxB = ynx;
+                double ynyB = yny;
+                _ = face;
                 FixCoordinates( ref _, ref ynx, ref yny );
-                int indexYnX = (int)((ynx - faceCenterYn.x) / quadSizeYn * 0.5 + 0.5);
-                int indexYnY = (int)((yny - faceCenterYn.y) / quadSizeYn * 0.5 + 0.5);
+                int indexYnX = (int)((ynx - faceCenterYn.x + halfSizeYn) / edgeLengthYn);
+                int indexYnY = (int)((yny - faceCenterYn.y + halfSizeYn) / edgeLengthYn);
 
-                yn = resultVerticesXn[GetIndex( indexYnX, indexYnY )];
-                yp = resultVerticesXn[GetIndex( x, y + 1 )];
+                if( indexYnX < 0 || indexYnY < 0 )
+                {
+                    Debug.LogError( face + " : " + x + " " + y + " " + ynxB + " : " + ynyB + " : " + faceCenter + " @@@@@@@ " + _ + " : " + indexYnX + " : " + indexYnY + " : " + ynx + " : " + yny + " : " + faceCenterYn );
+                }
+                yn = resultVerticesYn[GetIndex( indexYnX, indexYnY )];
+                yp = resultVertices[GetIndex( x, y + 1 )];
             }
-            else if( y == sideEdges - 1 )
+            else if( y == sideVertices - 1 )
             {
-                double ypx = (x * quadSize * 2 - 1) + faceCenter.x;
-                double ypy = ((y + 1) * quadSize * 2 - 1) + faceCenter.y;
+                double ypx = (x * edgeLength) + faceCenter.x - halfSize;
+                double ypy = ((y + 1) * edgeLength) + faceCenter.y - halfSize;
+                double ypxB = ypx;
+                double ypyB = ypy;
+                _ = face;
                 FixCoordinates( ref _, ref ypx, ref ypy );
-                int indexYpX = (int)((ypx - faceCenterYp.x) / quadSizeYp * 0.5 + 0.5);
-                int indexYpY = (int)((ypy - faceCenterYp.y) / quadSizeYp * 0.5 + 0.5);
+                int indexYpX = (int)((ypx - faceCenterYp.x + halfSizeYp) / edgeLengthYp);
+                int indexYpY = (int)((ypy - faceCenterYp.y + halfSizeYp) / edgeLengthYp);
 
-                yn = resultVerticesXn[GetIndex( x, y - 1 )];
-                yp = resultVerticesXn[GetIndex( indexYpX, indexYpY )];
+                if( indexYpX < 0 || indexYpY < 0 )
+                {
+                    Debug.LogError( face + " : " + x + " " + y + " " + ypxB + " : " + ypyB + " : " + faceCenter + " @@@@@@@ " + _ + " : " + indexYpX + " : " + indexYpY + " : " + ypx + " : " + ypy + " : " + faceCenterYp );
+                }
+                yn = resultVertices[GetIndex( x, y - 1 )];
+                yp = resultVerticesYp[GetIndex( indexYpX, indexYpY )];
             }
             else
             {
-                yn = resultVerticesXn[GetIndex( x, y - 1 )];
-                yp = resultVerticesXn[GetIndex( x, y + 1 )];
+                yn = resultVertices[GetIndex( x, y - 1 )];
+                yp = resultVertices[GetIndex( x, y + 1 )];
             }
 
             return (self, xn, xp, yn, yp);
@@ -403,62 +421,40 @@ namespace HSP.Vanilla.CelestialBodies
 
         public void Execute()
         {
-            for( int x = 0; x < sideEdges; x++ )
+            for( int x = 0; x < sideVertices; x++ )
             {
-                for( int y = 0; y < sideEdges; y++ )
+                for( int y = 0; y < sideVertices; y++ )
                 {
+                    var vert = GetVertex( x, y );
+
                     int index = GetIndex( x, y );
+#error TODO - store vertices in body-space and change them at the end only.
 
-                    int indexXn = GetIndex( x - 1, y );
-                    int indexXp = GetIndex( x + 1, y );
-                    int indexYn = GetIndex( x, y - 1 );
-                    int indexYp = GetIndex( x, y + 1 );
-
-                    if( indexXn < 0 )
+                    var xn = (vert.xn + originXn);// radius;
+                    var xp = (vert.xp + origin);// radius;
+                    var yn = (vert.yn + origin);// radius;
+                    var yp = (vert.yp + origin);// radius;
+                    //Vector3 tangent = (resultVertices[index] - resultVertices[index1]).normalized;
+                    //Vector3 bitangent = (resultVertices[index] - resultVertices[index2]).normalized;
+                    Vector3 tangent = (xp - xn).NormalizeToVector3();
+                    Vector3 bitangent = (yp - yn).NormalizeToVector3();
+                    Vector3 normal;
+                    if( ((x == 0) ^ (y == 0)) ^ ((x == sideVertices - 1) ^ (y == sideVertices - 1)) )
                     {
-                        // sample from quad Xn
+                       // Debug.Log( edgeLength + " : " + (xp - xn) + " : " + (yp - yn) );
+                        //normal = Vector3.Cross( bitangent, tangent );
+                        normal = Vector3.Cross( tangent, bitangent );
                     }
-                    else if( indexXp > totalVertices )
+                    else
                     {
-                        // sample from quad Xp
-                    }
-                    if( indexYn < 0 )
-                    {
-                        // sample from quad Yn
-                    }
-                    else if( indexYp > totalVertices )
-                    {
-                        // sample from quad Yp
-                    }
-
-                    int index1 = indexXn;
-                    int index2 = indexYn;
-                    //bool flippedX = false;
-                    //bool flippedY = false;
-
-                    if( x == 0 )
-                    {
-                        index1 = indexXp;
-                        //flippedX = true;
-                    }
-                    if( y == 0 )
-                    {
-                        index2 = indexYp;
-                        //flippedY = true;
-                    }
-
-                    Vector3 tangent = (resultVertices[index] - resultVertices[index1]).normalized;
-                    Vector3 bitangent = (resultVertices[index] - resultVertices[index2]).normalized;
-                    Vector3 normal = Vector3.Cross( bitangent, tangent );
-                    if( (x == 0) ^ (y == 0) )
-                    {
-                        normal = -normal;
+                        normal = Vector3.Cross( bitangent, tangent );
                     }
 
                     resultNormals[index] = normal;
                 }
             }
 
+            // this tangents calc takes about half of the time it takes the entire thing to run.
             int triangleCount = (sideEdges * sideEdges) * 6;
 
             Vector3[] tan1 = new Vector3[totalVertices];

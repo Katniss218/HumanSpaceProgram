@@ -9,7 +9,7 @@ namespace HSP.CelestialBodies.Surfaces
     /// The front end for <see cref="LODQuadTreeNode"/>.
     /// A single quad of a LOD sphere.
     /// </summary>
-    public class LODQuad : MonoBehaviour
+    public sealed class LODQuad : MonoBehaviour
     {
         /// <summary>
         /// The LOD sphere that this quad belongs to.
@@ -21,13 +21,19 @@ namespace HSP.CelestialBodies.Surfaces
         /// </summary>
         public LODQuadTreeNode Node { get; private set; }
 
-        Mesh mesh;
-        public Mesh.MeshDataArray meshDataArray { get; private set; }
-        public Mesh.MeshData meshData => meshDataArray[0];
+        Mesh _mesh;
 
         MeshFilter _meshFilter;
         MeshCollider _meshCollider;
         MeshRenderer _meshRenderer;
+
+        /// <summary>
+        /// Checks if the quad is active (visible/enabled).
+        /// </summary>
+        /// <remarks>
+        /// If the quad is not active, it usually means that it's subdivided, and its child quads are active instead.
+        /// </remarks>
+        public bool IsActive => this.gameObject.activeSelf;
 
         void Awake()
         {
@@ -35,8 +41,6 @@ namespace HSP.CelestialBodies.Surfaces
             _meshCollider = this.GetComponent<MeshCollider>();
             _meshRenderer = this.GetComponent<MeshRenderer>();
         }
-
-        public bool IsActive => this.gameObject.activeSelf;
 
         void FixedUpdate()
         {
@@ -51,8 +55,7 @@ namespace HSP.CelestialBodies.Surfaces
 
         void OnDestroy()
         {
-            Destroy( mesh ); // Destroying the mesh prevents a memory leak (One would think that a mesh would have a destructor to handle it, but I guess not).
-            meshDataArray.Dispose();
+            Destroy( _mesh ); // Destroying the mesh prevents a memory leak (One would think that a mesh would have a destructor to handle it, but I guess not).
         }
 
         public void Activate()
@@ -79,9 +82,7 @@ namespace HSP.CelestialBodies.Surfaces
             gameObject.transform.SetParent( sphere.QuadParent );
 
             LODQuad lodQuad = gameObject.AddComponent<LODQuad>();
-            lodQuad.mesh = mesh;
-#warning TODO - Keep the rebuilddata that was used to create this quad. Won't need to use the mesh data, and won't need to copy anything if we do so.
-            lodQuad.meshDataArray = Mesh.AcquireReadOnlyMeshData( mesh );
+            lodQuad._mesh = mesh;
             lodQuad.transform.localPosition = (Vector3)(node.SphereCenter * sphere.CelestialBody.Radius);
             lodQuad.transform.localRotation = Quaternion.identity;
             lodQuad.transform.localScale = Vector3.one;

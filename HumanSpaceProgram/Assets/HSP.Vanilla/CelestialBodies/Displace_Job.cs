@@ -52,7 +52,7 @@ namespace HSP.Vanilla.CelestialBodies
 
                 Vector3 unitSpherePos = (Vector3)posD;
 
-                Vector3Dbl temporaryHeightOffset_Removelater = posD * 5 * Math.Sin( (unitSpherePos.x + unitSpherePos.y + unitSpherePos.z) * radius );
+                Vector3Dbl temporaryHeightOffset_Removelater = posD * 5 * Math.Sin( (unitSpherePos.x + unitSpherePos.y + unitSpherePos.z) / 300 * radius * 30 );
 
                 resultVertices[index] = (Vector3)(((posD * radius) + temporaryHeightOffset_Removelater) - origin);
             }

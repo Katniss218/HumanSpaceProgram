@@ -50,10 +50,10 @@ namespace HSP.Vanilla.CelestialBodies
 
         public void Finish( LODQuadRebuildData r )
         {
-            r.Mesh.SetVertices( resultVertices );
-            r.Mesh.SetNormals( resultNormals );
-            r.Mesh.SetUVs( 0, resultUvs );
-            r.Mesh.SetTriangles( resultTriangles.ToArray(), 0 );
+            r.ResultMesh.SetVertices( resultVertices );
+            r.ResultMesh.SetNormals( resultNormals );
+            r.ResultMesh.SetUVs( 0, resultUvs );
+            r.ResultMesh.SetTriangles( resultTriangles.ToArray(), 0 );
         }
 
         public void Dispose()
