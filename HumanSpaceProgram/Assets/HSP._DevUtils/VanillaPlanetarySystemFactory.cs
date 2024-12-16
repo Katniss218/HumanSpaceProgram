@@ -9,13 +9,59 @@ using HSP.Vanilla.Trajectories;
 using HSP.Vessels;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Collections;
 using UnityEngine;
+using UnityPlus.AssetManagement;
 
 namespace HSP._DevUtils
 {
     public static class VanillaPlanetarySystemFactory
     {
         public const string CREATE_CELESTIAL_BODIES = HSPEvent.NAMESPACE_HSP + ".create_universe";
+
+        private static Material[] _earthMaterial = new Material[6];
+
+        static Texture2D _heightmapT;
+        static NativeArray<short> _heightmap;
+
+        private static void A()
+        {
+            const int size = 2048;
+            /*if( _heightmap.IsCreated )
+            {
+                _heightmap.Dispose();
+            }*/
+            _heightmap = new NativeArray<short>( size * size, Allocator.Persistent );
+            for( int i = 0; i < size * size; i++ )
+            {
+                _heightmap[i] = (short)UnityEngine.Random.Range( 0, 32767 );
+            }
+            _heightmapT = new Texture2D( size, size, TextureFormat.R16, false );
+            _heightmapT.LoadRawTextureData<short>( _heightmap );
+
+
+            var cbShader = AssetRegistry.Get<Shader>( "builtin::HSP.CelestialBodies/Surfaces/TerrainShader" );
+            var cbTex = new Texture2D[]
+            {
+                AssetRegistry.Get<Texture2D>( "Vanilla::Assets/earth_color_xn" ),
+                AssetRegistry.Get<Texture2D>( "Vanilla::Assets/earth_color_xp" ),
+                AssetRegistry.Get<Texture2D>( "Vanilla::Assets/earth_color_yn" ),
+                AssetRegistry.Get<Texture2D>( "Vanilla::Assets/earth_color_yp" ),
+                AssetRegistry.Get<Texture2D>( "Vanilla::Assets/earth_color_zn" ),
+                AssetRegistry.Get<Texture2D>( "Vanilla::Assets/earth_color_zp" )
+            };
+            var cbNormal = AssetRegistry.Get<Texture2D>( "Vanilla::Assets/Moon_NRM" );
+
+            for( int i = 0; i < 6; i++ )
+            {
+                Material mat = new Material( cbShader );
+                mat.SetTexture( "_MainTex", cbTex[i] );
+                mat.SetTexture( "_NormalTex", cbNormal );
+                mat.SetFloat( "_Glossiness", 0.05f );
+                mat.SetFloat( "_NormalStrength", 0.0f );
+                _earthMaterial[i] = mat;
+            }
+        }
 
         private static CelestialBody CreateCB( string id, Vector3Dbl airfPos, QuaternionDbl airfRot )
         {
@@ -24,11 +70,11 @@ namespace HSP._DevUtils
             lqs.SetMode( LODQuadMode.VisualAndCollider );
             lqs.EdgeSubdivisions = 4;
             lqs.MaxDepth = 10;
+            lqs.Materials = _earthMaterial;
             lqs.PoIGetter = () => VesselManager.LoadedVessels.Select( v => v.ReferenceFrameTransform.AbsolutePosition );
             lqs.SetJobs( new ILODQuadJob[]
             {
                 new MakeQuadMesh_Job(),
-               // new SmoothNeighbors_Job(),
             }, new ILODQuadJob[]
             {
                 new MakeMeshData_Job(),
@@ -47,6 +93,7 @@ namespace HSP._DevUtils
             lqs.SetMode( LODQuadMode.VisualAndCollider );
             lqs.EdgeSubdivisions = 5;
             lqs.MaxDepth = 16;
+            lqs.Materials = _earthMaterial;
             lqs.PoIGetter = () => VesselManager.LoadedVessels.Select( v => v.ReferenceFrameTransform.AbsolutePosition );
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
@@ -63,6 +110,7 @@ namespace HSP._DevUtils
             lqs.SetMode( LODQuadMode.Visual );
             lqs.EdgeSubdivisions = 6;
             lqs.MaxDepth = 14;
+            lqs.Materials = _earthMaterial;
             lqs.PoIGetter = () => new Vector3Dbl[]
             {
                 SceneReferenceFrameManager.ReferenceFrame.TransformPosition( GameplaySceneCameraManager.NearCamera.transform.position ),
@@ -71,8 +119,17 @@ namespace HSP._DevUtils
             lqs.SetJobs( new ILODQuadJob[]
             {
                 new MakeQuadMesh_Job(),
-                new Displace_Job(),
-                //new SmoothNeighbors_Job(),
+                new HeightMap_Job()
+                {
+                    HeightmapXn = _heightmapT,
+                    HeightmapXp = _heightmapT,
+                    HeightmapYn = _heightmapT,
+                    HeightmapYp = _heightmapT,
+                    HeightmapZn = _heightmapT,
+                    HeightmapZp = _heightmapT,
+                    MinLevel = -2000,
+                    MaxLevel = 2000
+                },
             }, new ILODQuadJob[]
             {
                 new MakeMeshData_Job(),
@@ -86,8 +143,7 @@ namespace HSP._DevUtils
             lqs2.SetJobs( new ILODQuadJob[]
             {
                 new MakeQuadMesh_Job(),
-                new Displace_Job(),
-               // new SmoothNeighbors_Job(),
+               // new Displace_Job(),
             }, new ILODQuadJob[]
             {
                 new MakeMeshData_Job(),
@@ -98,8 +154,7 @@ namespace HSP._DevUtils
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
             comp.IsAttractor = true;
-            //comp.Trajectory = new NewtonianOrbit( Time.TimeManager.UT, airfPos, airfVel, Vector3Dbl.zero, cb.Mass );
-            comp.Trajectory = new FixedOrbit( Time.TimeManager.UT, airfPos, airfRot, cb.Mass );
+            comp.Trajectory = new NewtonianOrbit( Time.TimeManager.UT, airfPos, airfVel, Vector3Dbl.zero, cb.Mass );
             return cb;
         }
 
@@ -107,6 +162,7 @@ namespace HSP._DevUtils
         {
             CelestialBody cb = new CelestialBodyFactory( id ).Create( airfPos, airfRot );
             LODQuadSphere lqs = cb.gameObject.AddComponent<LODQuadSphere>();
+            lqs.Materials = _earthMaterial;
             lqs.PoIGetter = () => VesselManager.LoadedVessels.Select( v => v.ReferenceFrameTransform.AbsolutePosition );
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
@@ -119,6 +175,8 @@ namespace HSP._DevUtils
         [HSPEventListener( HSPEvent_BEFORE_TIMELINE_LOAD.ID, CREATE_CELESTIAL_BODIES )]
         public static void CreateDefaultPlanetarySystem()
         {
+            A();
+
             QuaternionDbl orientation = Quaternion.Euler( 270, 0, 0 );
 
             CelestialBody cbSun = CreateCB( "sun", Vector3Dbl.zero, orientation );

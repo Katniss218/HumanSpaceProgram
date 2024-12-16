@@ -1,7 +1,5 @@
 ﻿using HSP.ReferenceFrames;
-using System;
 using UnityEngine;
-using UnityPlus.AssetManagement;
 
 namespace HSP.CelestialBodies.Surfaces
 {
@@ -27,6 +25,14 @@ namespace HSP.CelestialBodies.Surfaces
         MeshCollider _meshCollider;
         MeshRenderer _meshRenderer;
 
+        public void ResetMaterial()
+        {
+            if( this._meshRenderer != null )
+            {
+                this._meshRenderer.sharedMaterial = this.QuadSphere.Materials?[(int)this.Node.Face];
+            }
+        }
+
         /// <summary>
         /// Checks if the quad is active (visible/enabled).
         /// </summary>
@@ -34,13 +40,6 @@ namespace HSP.CelestialBodies.Surfaces
         /// If the quad is not active, it usually means that it's subdivided, and its child quads are active instead.
         /// </remarks>
         public bool IsActive => this.gameObject.activeSelf;
-
-        void Awake()
-        {
-            _meshFilter = this.GetComponent<MeshFilter>();
-            _meshCollider = this.GetComponent<MeshCollider>();
-            _meshRenderer = this.GetComponent<MeshRenderer>();
-        }
 
         void FixedUpdate()
         {
@@ -82,28 +81,28 @@ namespace HSP.CelestialBodies.Surfaces
             gameObject.transform.SetParent( sphere.QuadParent );
 
             LODQuad lodQuad = gameObject.AddComponent<LODQuad>();
-            lodQuad._mesh = mesh;
             lodQuad.transform.localPosition = (Vector3)(node.SphereCenter * sphere.CelestialBody.Radius);
             lodQuad.transform.localRotation = Quaternion.identity;
             lodQuad.transform.localScale = Vector3.one;
+
+            lodQuad._mesh = mesh;
 
             lodQuad.Node = node;
             lodQuad.QuadSphere = sphere;
 
             if( (sphere.Mode & LODQuadMode.Visual) == LODQuadMode.Visual )
             {
-                MeshFilter mf = gameObject.AddComponent<MeshFilter>();
-                mf.sharedMesh = mesh;
+                lodQuad._meshFilter = gameObject.AddComponent<MeshFilter>();
+                lodQuad._meshFilter.sharedMesh = mesh;
 
-#warning TODO - add proper way to get textures/materials
-                MeshRenderer mr = gameObject.AddComponent<MeshRenderer>();
-                mr.material = AssetRegistry.Get<Material>( $"Vanilla::CBMATERIAL{(int)node.Face}" );
+                lodQuad._meshRenderer = gameObject.AddComponent<MeshRenderer>();
+                lodQuad.ResetMaterial();
             }
 
             if( (sphere.Mode & LODQuadMode.Collider) == LODQuadMode.Collider )
             {
-                MeshCollider mc = gameObject.AddComponent<MeshCollider>();
-                mc.sharedMesh = mesh;
+                lodQuad._meshCollider = gameObject.AddComponent<MeshCollider>();
+                lodQuad._meshCollider.sharedMesh = mesh;
             }
 
             lodQuad.Deactivate();

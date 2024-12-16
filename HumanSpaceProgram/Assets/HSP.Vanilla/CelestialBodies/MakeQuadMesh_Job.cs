@@ -1,5 +1,6 @@
 ﻿using HSP.CelestialBodies.Surfaces;
 using System;
+using System.Runtime.CompilerServices;
 using Unity.Collections;
 using UnityEngine;
 
@@ -11,7 +12,6 @@ namespace HSP.Vanilla.CelestialBodies
     public struct MakeQuadMesh_Job : ILODQuadJob
     {
         double radius;
-        Vector3Dbl origin;
         float size;
         float edgeLength;
         float minX;
@@ -30,9 +30,7 @@ namespace HSP.Vanilla.CelestialBodies
 
         public void Initialize( LODQuadRebuildData r, LODQuadRebuildAdditionalData _ )
         {
-#warning TODO - keep the verts in body space (as vector3dbl), turn into mesh-space when finalizing.
             radius = (float)r.CelestialBody.Radius;
-            origin = r.Node.SphereCenter * radius;
             size = r.Node.Size;
             face = r.Node.Face;
 
@@ -50,10 +48,6 @@ namespace HSP.Vanilla.CelestialBodies
 
         public void Finish( LODQuadRebuildData r )
         {
-            //r.ResultMesh.SetVertices( resultVertices );
-            //r.ResultMesh.SetNormals( resultNormals );
-            //r.ResultMesh.SetUVs( 0, resultUvs );
-            //r.ResultMesh.SetTriangles( resultTriangles.ToArray(), 0 );
         }
 
         public void Dispose()
@@ -70,6 +64,7 @@ namespace HSP.Vanilla.CelestialBodies
             GenerateCubeSphereFace();
         }
 
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
         int GetIndex( int x, int y )
         {
             return (x * sideEdges) + x + y;

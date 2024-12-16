@@ -60,6 +60,7 @@
   <ItemGroup>
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\Cameras\DesignSceneOrbitingCameraController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\EditorScene\EditorSceneManager.cs" />
+    <Compile Include="Assets\HSP.Vanilla\CelestialBodies\HeightMap_Job.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\DesignVesselManager.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\Tools\VanillaToolRegisterer.cs" />
     <Compile Include="Assets\HSP.Vanilla\CelestialBodies\BakeCollisionData_Job.cs" />

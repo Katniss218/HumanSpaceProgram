@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityPlus.AssetManagement;
+using UnityPlus.Serialization;
 
 namespace HSP.CelestialBodies.Surfaces
 {
@@ -16,6 +17,9 @@ namespace HSP.CelestialBodies.Surfaces
         /// <summary>
         /// Gets or sets the number of binary subdivisions per edge of each of the quads.
         /// </summary>
+        /// <remarks>
+        /// Setting this member will force a rebuild.
+        /// </remarks>
         public int EdgeSubdivisions
         {
             get => _edgeSubdivisions;
@@ -33,6 +37,9 @@ namespace HSP.CelestialBodies.Surfaces
         /// <summary>
         /// Gets or sets the maximum allowed subdivision level for this LOD sphere.
         /// </summary>
+        /// <remarks>
+        /// Setting this member will force a rebuild.
+        /// </remarks>
         public int MaxDepth
         {
             get => _maxDepth;
@@ -61,6 +68,9 @@ namespace HSP.CelestialBodies.Surfaces
         /// </summary>
         public LODQuadMode Mode { get; private set; }
 
+        /// <remarks>
+        /// Calling this method will force a rebuild.
+        /// </remarks>
         public void SetMode( LODQuadMode mode )
         {
             if( IsBuilding )
@@ -87,6 +97,9 @@ namespace HSP.CelestialBodies.Surfaces
         /// <summary>
         /// Sets the jobs used by this LOD sphere
         /// </summary>
+        /// <remarks>
+        /// Calling this method will force a rebuild.
+        /// </remarks>
         /// <param name="jobs">The jobs to copy when setting. Must not be null or contain any nulls.</param>
         public void SetJobs( params ILODQuadJob[][] jobs )
         {
@@ -110,9 +123,19 @@ namespace HSP.CelestialBodies.Surfaces
         /// </summary>
         public bool IsBuilding => _builder != null;
 
-        public static Shader cbShader;
-        public static Texture2D[] cbTex;
-        public static Texture2D cbNormal;
+        private Material[] _materials;
+        public Material[] Materials
+        {
+            get => _materials;
+            set
+            {
+                _materials = value;
+                foreach( var lod in _currentQuads )
+                {
+                    lod.Value.Quad.ResetMaterial();
+                }
+            }
+        }
 
         Vector3Dbl[] _oldPois = null; // Initial value null is important.
 
@@ -126,17 +149,6 @@ namespace HSP.CelestialBodies.Surfaces
 
         void Awake()
         {
-            for( int i = 0; i < 6; i++ )
-            {
-#warning TODO - Move these to some sort of celestial body definition.
-                Material mat = new Material( cbShader );
-                mat.SetTexture( "_MainTex", cbTex[i] );
-                mat.SetTexture( "_NormalTex", cbNormal );
-                mat.SetFloat( "_Glossiness", 0.05f );
-                mat.SetFloat( "_NormalStrength", 0.0f );
-                AssetRegistry.Register( $"Vanilla::CBMATERIAL{i}", mat );
-            }
-
             // Possibly move this to a child, so it can be disabled without disabling entire CB.
             CelestialBody = this.GetComponent<CelestialBody>();
         }
@@ -204,6 +216,7 @@ namespace HSP.CelestialBodies.Surfaces
             QuaternionDbl invRot = this.CelestialBody.ReferenceFrameTransform.AbsoluteRotation.Inverse();
             double scale = this.CelestialBody.Radius;
 
+#warning TODO - something with pois to determine how much each quad should subdivide towards it (stopping subdiv level) (may be useful for camera frustum biasing and for fast moving objects)
             Vector3Dbl[] localPois = PoIGetter.Invoke()
                 .Select( p => invRot * ((p - pos) / scale) )
                 .Where( p => p.magnitude < 2 * LODQuadTreeNode.SUBDIV_RANGE_MULTIPLIER )

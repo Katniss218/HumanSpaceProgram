@@ -31,21 +31,23 @@ namespace HSP.Vanilla.Content.AssetLoaders
                 foreach( var file in files )
                 {
                     string relPath = FixPath( Path.GetRelativePath( modPath, file ) );
-                    AssetRegistry.RegisterLazy( $"{modId}::{relPath}", () => LoadPNG( file, GraphicsFormat.R8G8B8A8_UNorm, TextureCreationFlags.MipChain ), true );
+                    // texture
+                    // sprite
+                    AssetRegistry.RegisterLazy( $"{modId}::{relPath}", () => LoadPNG( file, GraphicsFormat.R8G8B8A8_SRGB, TextureCreationFlags.MipChain ), true );
                 }
 
                 files = Directory.GetFiles( modPath, "*.jpg", SearchOption.AllDirectories );
                 foreach( var file in files )
                 {
                     string relPath = FixPath( Path.GetRelativePath( modPath, file ) );
-                    AssetRegistry.RegisterLazy( $"{modId}::{relPath}", () => LoadJPG( file, GraphicsFormat.R8G8B8A8_UNorm, TextureCreationFlags.MipChain ), true );
+                    AssetRegistry.RegisterLazy( $"{modId}::{relPath}", () => LoadJPG( file, GraphicsFormat.R8G8B8A8_SRGB, TextureCreationFlags.MipChain ), true );
                 }
 
                 files = Directory.GetFiles( modPath, "*.tga", SearchOption.AllDirectories );
                 foreach( var file in files )
                 {
                     string relPath = FixPath( Path.GetRelativePath( modPath, file ) );
-                    AssetRegistry.RegisterLazy( $"{modId}::{relPath}", () => LoadTGA( file, GraphicsFormat.R8G8B8A8_UNorm, TextureCreationFlags.MipChain ), true );
+                    AssetRegistry.RegisterLazy( $"{modId}::{relPath}", () => LoadTGA( file, GraphicsFormat.R8G8B8A8_SRGB, TextureCreationFlags.MipChain ), true );
                 }
             }
         }

@@ -101,28 +101,24 @@ namespace HSP.Vanilla.CelestialBodies
 
             var xn = rAdditional.allQuads[r.Node.Xn];
             faceCenterXn = r.Node.Xn.FaceCenter;// - (Vector2.one * (r.Node.Xn.Size / 2));
-            originXn = r.Node.Xn.SphereCenter;
             halfSizeXn = r.Node.Xn.Size / 2;
             edgeLengthXn = r.Node.Xn.Size / sideEdges;
             resultVerticesXn = xn.HasNew ? xn.newR.ResultVertices : xn.oldR.ResultVertices;
 
             var xp = rAdditional.allQuads[r.Node.Xp];
             faceCenterXp = r.Node.Xp.FaceCenter;// - (Vector2.one * (r.Node.Xp.Size / 2));
-            originXp = r.Node.Xp.SphereCenter;
             halfSizeXp = r.Node.Xp.Size / 2;
             edgeLengthXp = r.Node.Xp.Size / sideEdges;
             resultVerticesXp = xp.HasNew ? xp.newR.ResultVertices : xp.oldR.ResultVertices;
 
             var yn = rAdditional.allQuads[r.Node.Yn];
             faceCenterYn = r.Node.Yn.FaceCenter;// - (Vector2.one * (r.Node.Yn.Size / 2));
-            originYn = r.Node.Yn.SphereCenter;
             halfSizeYn = r.Node.Yn.Size / 2;
             edgeLengthYn = r.Node.Yn.Size / sideEdges;
             resultVerticesYn = yn.HasNew ? yn.newR.ResultVertices : yn.oldR.ResultVertices;
 
             var yp = rAdditional.allQuads[r.Node.Yp];
             faceCenterYp = r.Node.Yp.FaceCenter;// - (Vector2.one * (r.Node.Yp.Size / 2));
-            originYp = r.Node.Yp.SphereCenter;
             halfSizeYp = r.Node.Yp.Size / 2;
             edgeLengthYp = r.Node.Yp.Size / sideEdges;
             resultVerticesYp = yp.HasNew ? yp.newR.ResultVertices : yp.oldR.ResultVertices;
@@ -151,7 +147,8 @@ namespace HSP.Vanilla.CelestialBodies
             return new MakeMeshData_Job();
         }
 
-        int GetIndex( int x, int y )
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        private int GetIndex( int x, int y )
         {
             return (x * sideEdges) + x + y;
         }
@@ -160,178 +157,138 @@ namespace HSP.Vanilla.CelestialBodies
         /// Transforms from overflowed coordinates in the space of 1 face into the other face.
         /// </summary>
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static void FixCoordinates( ref Direction3D face, ref double x, ref double y )
+        public static (double x, double y) FixCoordinates( Direction3D face, double x, double y )
         {
-            // uv = fix(uv * 2.0 - 1.0) * 0.5 + 0.5
-            // xy = fix(xy)
-
-            if( face == Direction3D.Xn )
+            switch( face )
             {
-                if( x < -1 )
+                case Direction3D.Xn:
+                    if( x < -1 )
+                    {
+                        return (x + 2, y);
+                    }
+                    else if( x > 1 )
+                    {
+                        return (x - 2, y);
+                    }
+                    else if( y < -1 )
+                    {
+                        return (x, y + 2);
+                    }
+                    else if( y > 1 )
+                    {
+                        return (x, y - 2);
+                    }
+                    break;
+                case Direction3D.Xp:
+                    if( x < -1 )
+                    {
+                        return (x + 2, y);
+                    }
+                    else if( x > 1 )
+                    {
+                        return (x - 2, y);
+                    }
+                    else if( y < -1 )
+                    {
+                        return (-x, -(y + 2));
+                    }
+                    else if( y > 1 )
+                    {
+                        return (-x, -(y - 2));
+                    }
+                    break;
+                case Direction3D.Yn:
                 {
-                    face = Direction3D.Yn;
-                    x += 2;
+                    if( x < -1 )
+                    {
+                        return (x + 2, y);
+                    }
+                    else if( x > 1 )
+                    {
+                        return (x - 2, y);
+                    }
+                    else if( y < -1 )
+                    {
+                        return (-(y + 2), x);
+                    }
+                    else if( y > 1 )
+                    {
+                        return (y - 2, -x);
+                    }
+
+                    break;
                 }
-                else if( x > 1 )
+
+                case Direction3D.Yp:
                 {
-                    face = Direction3D.Yp;
-                    x -= 2;
+                    if( x < -1 )
+                    {
+                        return (x + 2, y);
+                    }
+                    else if( x > 1 )
+                    {
+                        return (x - 2, y);
+                    }
+                    else if( y < -1 )
+                    {
+                        return (y + 2, -x);
+                    }
+                    else if( y > 1 )
+                    {
+                        return (-(y - 2), x);
+                    }
+
+                    break;
                 }
-                else if( y < -1 )
+
+                case Direction3D.Zn:
                 {
-                    face = Direction3D.Zn;
-                    y += 2;
+                    if( x < -1 )
+                    {
+                        return (y, -(x + 2));
+                    }
+                    else if( x > 1 )
+                    {
+                        return (-y, x - 2);
+                    }
+                    else if( y < -1 )
+                    {
+                        return (-x, -(y + 2));
+                    }
+                    else if( y > 1 )
+                    {
+                        return (x, y - 2);
+                    }
+
+                    break;
                 }
-                else if( y > 1 )
+
+                case Direction3D.Zp:
                 {
-                    face = Direction3D.Zp;
-                    y -= 2;
+                    if( x < -1 )
+                    {
+                        return (-y, x + 2);
+                    }
+                    else if( x > 1 )
+                    {
+                        return (y, -(x - 2));
+                    }
+                    else if( y < -1 )
+                    {
+                        return (x, y + 2);
+                    }
+                    else if( y > 1 )
+                    {
+                        return (-x, -(y - 2));
+                    }
+
+                    break;
                 }
             }
-
-            else if( face == Direction3D.Xp )
-            {
-                if( x < -1 )
-                {
-                    face = Direction3D.Yp;
-                    x += 2;
-                }
-                else if( x > 1 )
-                {
-                    face = Direction3D.Yn;
-                    x -= 2;
-                }
-                else if( y < -1 )
-                {
-                    face = Direction3D.Zn;
-                    x = -x;
-                    y = -(y + 2);
-                }
-                else if( y > 1 )
-                {
-                    face = Direction3D.Zp;
-                    x = -x;
-                    y = -(y - 2);
-                }
-            }
-
-            else if( face == Direction3D.Yn )
-            {
-                if( x < -1 )
-                {
-                    face = Direction3D.Xp;
-                    x += 2;
-                }
-                else if( x > 1 )
-                {
-                    face = Direction3D.Xn;
-                    x -= 2;
-                }
-                else if( y < -1 )
-                {
-                    face = Direction3D.Zn;
-                    var tempy = x;
-                    x = -(y + 2);
-                    y = tempy;
-                }
-                else if( y > 1 )
-                {
-                    face = Direction3D.Zp;
-                    var tempy = -x;
-                    x = y - 2;
-                    y = tempy;
-                }
-            }
-
-            else if( face == Direction3D.Yp )
-            {
-                if( x < -1 )
-                {
-                    face = Direction3D.Xn;
-                    x += 2;
-                }
-                else if( x > 1 )
-                {
-                    face = Direction3D.Xp;
-                    x -= 2;
-                }
-                else if( y < -1 )
-                {
-                    face = Direction3D.Zn;
-                    var tempy = -x;
-                    x = y + 2;
-                    y = tempy;
-                }
-                else if( y > 1 )
-                {
-                    face = Direction3D.Zp;
-                    var tempy = x;
-                    x = -(y - 2);
-                    y = tempy;
-                }
-            }
-
-            else if( face == Direction3D.Zn )
-            {
-                if( x < -1 )
-                {
-                    face = Direction3D.Yn;
-                    var tempy = -(x + 2);
-                    x = y;
-                    y = tempy;
-                }
-                else if( x > 1 )
-                {
-                    face = Direction3D.Yp;
-                    var tempy = (x - 2);
-                    x = -y;
-                    y = tempy;
-                }
-                else if( y < -1 )
-                {
-                    face = Direction3D.Xp;
-                    var tempy = -(y + 2);
-                    x = -x;
-                    y = tempy;
-                }
-                else if( y > 1 )
-                {
-                    face = Direction3D.Xn;
-                    y = y - 2;
-                }
-            }
-
-            else if( face == Direction3D.Zp )
-            {
-                if( x < -1 )
-                {
-                    face = Direction3D.Yn;
-                    var tempy = (x + 2);
-                    x = -y;
-                    y = tempy;
-                }
-                else if( x > 1 )
-                {
-                    face = Direction3D.Yp;
-                    var tempy = -(x - 2);
-                    x = y;
-                    y = tempy;
-                }
-                else if( y < -1 )
-                {
-                    face = Direction3D.Xn;
-                    y = y + 2;
-                }
-                else if( y > 1 )
-                {
-                    face = Direction3D.Xp;
-                    var tempy = -(y - 2);
-                    x = -x;
-                    y = tempy;
-                }
-            }
+            return (x, y);
         }
 
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
         private (Vector3Dbl self, Vector3Dbl xn, Vector3Dbl xp, Vector3Dbl yn, Vector3Dbl yp) GetVertex( int x, int y )
         {
             Vector3Dbl self = resultVertices[GetIndex( x, y )];
@@ -341,17 +298,10 @@ namespace HSP.Vanilla.CelestialBodies
             {
                 double xnx = ((x - 1) * edgeLength) + faceCenter.x - halfSize;
                 double xny = (y * edgeLength) + faceCenter.y - halfSize;
-                //double xnxB = xnx;
-                //double xnyB = xny;
-                Direction3D _ = face;
-                FixCoordinates( ref _, ref xnx, ref xny );
-#warning TODO - This should sample both surface 'points' at the same distance from the seam, regardless of the seld/neighbor relative subdiv level, instead of rounding to the nearest.
+                (xnx, xny) = FixCoordinates( face, xnx, xny );
+#warning TODO - This should sample both surface 'points' at the same distance from the seam, regardless of the seld/neighbor relative subdiv level, instead of floor/ceil to the nearest.
                 int indexXnX = (int)Math.Floor( (xnx - faceCenterXn.x + halfSizeXn) / edgeLengthXn );
                 int indexXnY = (int)((xny - faceCenterXn.y + halfSizeXn) / edgeLengthXn);
-                /*if( indexXnX < 0 || indexXnY < 0 )
-                {
-                    Debug.LogError( face + " : " + x + " " + y + " " + xnxB + " : " + xnyB + " : " + faceCenter + " @@@@@@@ " + _ + " : " + indexXnX + " : " + indexXnY + " : " + xnx + " : " + xny + " : " + faceCenterXn );
-                }*/
                 xn = resultVerticesXn[GetIndex( indexXnX, indexXnY )];
                 xp = resultVertices[GetIndex( x + 1, y )];
             }
@@ -359,16 +309,9 @@ namespace HSP.Vanilla.CelestialBodies
             {
                 double xpx = ((x + 1) * edgeLength) + faceCenter.x - halfSize;
                 double xpy = (y * edgeLength) + faceCenter.y - halfSize;
-                //double xpxB = xpx;
-                //double xpyB = xpy;
-                Direction3D _ = face;
-                FixCoordinates( ref _, ref xpx, ref xpy );
+                (xpx, xpy) = FixCoordinates( face, xpx, xpy );
                 int indexXpX = (int)Math.Ceiling( (xpx - faceCenterXp.x + halfSizeXp) / edgeLengthXp );
                 int indexXpY = (int)((xpy - faceCenterXp.y + halfSizeXp) / edgeLengthXp);
-                /*if( indexXpX < 0 || indexXpY < 0 )
-                {
-                    Debug.LogError( face + " : " + x + " " + y + " " + xpxB + " : " + xpyB + " : " + faceCenter + " @@@@@@@ " + _ + " : " + indexXpX + " : " + indexXpY + " : " + xpx + " : " + xpy + " : " + faceCenterXp );
-                }*/
                 xn = resultVertices[GetIndex( x - 1, y )];
                 xp = resultVerticesXp[GetIndex( indexXpX, indexXpY )];
             }
@@ -377,20 +320,14 @@ namespace HSP.Vanilla.CelestialBodies
                 xn = resultVertices[GetIndex( x - 1, y )];
                 xp = resultVertices[GetIndex( x + 1, y )];
             }
+
             if( y == 0 )
             {
                 double ynx = (x * edgeLength) + faceCenter.x - halfSize;
                 double yny = ((y - 1) * edgeLength) + faceCenter.y - halfSize;
-                //double ynxB = ynx;
-                //double ynyB = yny;
-                Direction3D _ = face;
-                FixCoordinates( ref _, ref ynx, ref yny );
+                (ynx, yny) = FixCoordinates( face, ynx, yny );
                 int indexYnX = (int)((ynx - faceCenterYn.x + halfSizeYn) / edgeLengthYn);
                 int indexYnY = (int)Math.Floor( (yny - faceCenterYn.y + halfSizeYn) / edgeLengthYn );
-                /*if( indexYnX < 0 || indexYnY < 0 )
-                {
-                    Debug.LogError( face + " : " + x + " " + y + " " + ynxB + " : " + ynyB + " : " + faceCenter + " @@@@@@@ " + _ + " : " + indexYnX + " : " + indexYnY + " : " + ynx + " : " + yny + " : " + faceCenterYn );
-                }*/
                 yn = resultVerticesYn[GetIndex( indexYnX, indexYnY )];
                 yp = resultVertices[GetIndex( x, y + 1 )];
             }
@@ -398,16 +335,9 @@ namespace HSP.Vanilla.CelestialBodies
             {
                 double ypx = (x * edgeLength) + faceCenter.x - halfSize;
                 double ypy = ((y + 1) * edgeLength) + faceCenter.y - halfSize;
-                //double ypxB = ypx;
-                //double ypyB = ypy;
-                Direction3D _ = face;
-                FixCoordinates( ref _, ref ypx, ref ypy );
+                (ypx, ypy) = FixCoordinates( face, ypx, ypy );
                 int indexYpX = (int)((ypx - faceCenterYp.x + halfSizeYp) / edgeLengthYp);
                 int indexYpY = (int)Math.Ceiling( (ypy - faceCenterYp.y + halfSizeYp) / edgeLengthYp );
-                /*if( indexYpX < 0 || indexYpY < 0 )
-                {
-                    Debug.LogError( face + " : " + x + " " + y + " " + ypxB + " : " + ypyB + " : " + faceCenter + " @@@@@@@ " + _ + " : " + indexYpX + " : " + indexYpY + " : " + ypx + " : " + ypy + " : " + faceCenterYp );
-                }*/
                 yn = resultVertices[GetIndex( x, y - 1 )];
                 yp = resultVerticesYp[GetIndex( indexYpX, indexYpY )];
             }
@@ -427,7 +357,7 @@ namespace HSP.Vanilla.CelestialBodies
                 for( int y = 0; y < sideVertices; y++ )
                 {
                     int index = GetIndex( x, y );
-                    var (self, xn, xp, yn, yp) = GetVertex( x, y );
+                    var (_, xn, xp, yn, yp) = GetVertex( x, y );
 
                     Vector3 tangent = (xn - xp).NormalizeToVector3();
                     Vector3 bitangent = (yn - yp).NormalizeToVector3();
@@ -493,6 +423,7 @@ namespace HSP.Vanilla.CelestialBodies
                     }
                 }
             }
+
             if( stepYp != 0 )
             {
                 int y = sideVertices - 1;
