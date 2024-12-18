@@ -59,10 +59,10 @@ namespace HSP._DevUtils
             lqs.PoIGetter = () => VesselManager.LoadedVessels.Select( v => v.ReferenceFrameTransform.AbsolutePosition );
             lqs.SetJobs( new ILODQuadModifier[]
             {
-                new LODQuadModifier_MakeQuadMesh(),
+                new LODQuadModifier_InitializeMesh(),
             }, new ILODQuadModifier[]
             {
-                new LODQuadModifier_MakeMeshData(),
+                new LODQuadModifier_FinalizeMesh(),
             } );
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
@@ -103,7 +103,7 @@ namespace HSP._DevUtils
             };
             lqs.SetJobs( new ILODQuadModifier[]
             {
-                new LODQuadModifier_MakeQuadMesh(),
+                new LODQuadModifier_InitializeMesh(),
                 new LODQuadModifier_Heightmap()
                 {
                     HeightmapXn = AssetRegistry.Get<Texture2D>( "Vanilla::Assets/EarthHeight" ),
@@ -115,9 +115,10 @@ namespace HSP._DevUtils
                     MinLevel = -8000,
                     MaxLevel = 6000
                 },
+                new LODQuadModifier_Displace()
             }, new ILODQuadModifier[]
             {
-                new LODQuadModifier_MakeMeshData(),
+                new LODQuadModifier_FinalizeMesh(),
             } );
 
             LODQuadSphere lqs2 = cb.gameObject.AddComponent<LODQuadSphere>();
@@ -127,7 +128,7 @@ namespace HSP._DevUtils
             lqs2.PoIGetter = () => VesselManager.LoadedVessels.Select( v => v.ReferenceFrameTransform.AbsolutePosition );
             lqs2.SetJobs( new ILODQuadModifier[]
             {
-                new LODQuadModifier_MakeQuadMesh(),
+                new LODQuadModifier_InitializeMesh(),
                 new LODQuadModifier_Heightmap()
                 {
                     HeightmapXn = AssetRegistry.Get<Texture2D>( "Vanilla::Assets/EarthHeight" ),
@@ -138,14 +139,33 @@ namespace HSP._DevUtils
                     HeightmapZp = AssetRegistry.Get<Texture2D>( "Vanilla::Assets/EarthHeight" ),
                     MinLevel = -8000,
                     MaxLevel = 6000
-                },
+                }
             }, new ILODQuadModifier[]
             {
-                new LODQuadModifier_MakeMeshData(),
+                new LODQuadModifier_FinalizeMesh(),
             }, new ILODQuadModifier[]
             {
                 new LODQuadModifier_BakeCollisionData(),
             } );
+
+            /*LODQuadSphere lqsWater = cb.gameObject.AddComponent<LODQuadSphere>();
+            lqsWater.SetMode( LODQuadMode.Visual );
+            lqsWater.EdgeSubdivisions = 5;
+            lqsWater.MaxDepth = 11;
+            var mat = AssetRegistry.Get<Material>( "builtin::Resources/New Material 2" );
+            lqsWater.Materials = new Material[] { mat, mat, mat, mat, mat, mat };
+            lqsWater.PoIGetter = () => new Vector3Dbl[]
+            {
+                SceneReferenceFrameManager.ReferenceFrame.TransformPosition( GameplaySceneCameraManager.NearCamera.transform.position ),
+                SceneReferenceFrameManager.ReferenceFrame.TransformPosition( GameplaySceneCameraManager.NearCamera.transform.position + GameplaySceneCameraManager.NearCamera.transform.forward * 500 ),
+            };
+            lqsWater.SetJobs( new ILODQuadModifier[]
+            {
+                new LODQuadModifier_MakeQuadMesh()
+            }, new ILODQuadModifier[]
+            {
+                new LODQuadModifier_MakeMeshData(),
+            } );*/
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
             comp.IsAttractor = true;
@@ -195,15 +215,6 @@ namespace HSP._DevUtils
 
             CelestialBodyManager.Get( "sun" ).ReferenceFrameTransform.AbsoluteAngularVelocity = new Vector3Dbl( 0, -1, 0 );
             CelestialBodyManager.Get( "main" ).ReferenceFrameTransform.AbsoluteAngularVelocity = new Vector3Dbl( 0, -7.2921159e-5, 0 );
-        }
-
-        [HSPEventListener( HSPEvent_ON_LOD_QUAD_PARENT_CREATED.ID, "aaasd" )]
-        public static void ADD( LODQuadSphere sphere )
-        {
-            var p = sphere.QuadParent.gameObject.AddComponent<PinnedLODSphereReferenceFrameTransform>();
-            // Vector3 localPos = CoordinateUtils.GeodeticToEuclidean( 28.5857702f, -80.6507262f, (float)sphere.CelestialBody.Radius );
-            Vector3Dbl localPos = Vector3Dbl.zero;
-            p.SetReference( sphere.CelestialBody, localPos, Quaternion.identity );
         }
     }
 }

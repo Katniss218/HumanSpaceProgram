@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace HSP.Vanilla.CelestialBodies
 {
-    public class LODQuadModifier_MakeQuadMesh : ILODQuadModifier
+    public class LODQuadModifier_InitializeMesh : ILODQuadModifier
     {
         public LODQuadMode QuadMode => LODQuadMode.VisualAndCollider;
 
@@ -31,7 +31,6 @@ namespace HSP.Vanilla.CelestialBodies
             int sideVertices;
 
             NativeArray<Vector3Dbl> resultVertices;
-            NativeArray<Vector3> resultNormals;
             NativeArray<Vector2> resultUvs;
             NativeArray<int> resultTriangles;
 
@@ -48,7 +47,6 @@ namespace HSP.Vanilla.CelestialBodies
                 minY = r.Node.FaceCenter.y - (size / 2f);
 
                 resultVertices = r.ResultVertices;
-                resultNormals = r.ResultNormals;
                 resultUvs = r.ResultUVs;
                 resultTriangles = r.ResultTriangles;
             }
@@ -61,29 +59,12 @@ namespace HSP.Vanilla.CelestialBodies
             {
             }
 
-            public void Execute() // Called by Unity from a job thread.
+            public void Execute()
             {
-                GenerateCubeSphereFace();
-            }
-
-            [MethodImpl( MethodImplOptions.AggressiveInlining )]
-            int GetIndex( int x, int y )
-            {
-                return (x * sideEdges) + x + y;
-            }
-
-            /// <summary>
-            /// The method that generates the PQS mesh projected onto a sphere of the specified radius, with its origin at the center of the cube projected onto the same sphere.
-            /// </summary>
-            /// <param name="lN">How many times this mesh was subdivided (l0, l1, l2, ...).</param>
-            public void GenerateCubeSphereFace()
-            {
-                // The origin of a valid, the center will never be at any of the edges of its ancestors, and will always be at the point where the inner edges of its direct children meet.
-
-                if( sideVertices > 65535 )
+                if( sideVertices > 256 )
                 {
                     // technically wrong, since Mesh.indexFormat can be switched to 32 bit, but i'll leave this for now. Meshes don't have to be over that value anyway because laggy and big and far away.
-                    throw new ArgumentOutOfRangeException( $"Unity's Mesh can contain at most 65535 vertices (16-bit buffer). Tried to create a Mesh with {sideVertices}." );
+                    throw new ArgumentOutOfRangeException( $"Tried to create a LOD quad mesh with {sideVertices * sideVertices} vertices, which is more than the 16-bit limit." );
                 }
 
                 int triIndex = 0;
@@ -128,10 +109,14 @@ namespace HSP.Vanilla.CelestialBodies
 
                         // INFO - 'lerping' it like that introduces stretch, the cubemap should be counter-stretched to cancel it.
                         resultUvs[index] = new Vector2( quadX * 0.5f + 0.5f, quadY * 0.5f + 0.5f );
-
-                        resultNormals[index] = (Vector3)posD;
                     }
                 }
+            }
+
+            [MethodImpl( MethodImplOptions.AggressiveInlining )]
+            int GetIndex( int x, int y )
+            {
+                return (x * sideEdges) + x + y;
             }
         }
     }

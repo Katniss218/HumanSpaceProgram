@@ -6,8 +6,12 @@ using UnityEngine;
 
 namespace HSP.Vanilla.CelestialBodies
 {
-    public class LODQuadModifier_MakeMeshData : ILODQuadModifier 
+    public class LODQuadModifier_FinalizeMesh : ILODQuadModifier
     {
+        // INFO
+
+        // Running some other modifiers in the same stage as this one may result in race conditions. Specifically modifiers that modify the vertices of the current mesh.
+
         public LODQuadMode QuadMode => LODQuadMode.VisualAndCollider;
 
         public ILODQuadJob GetJob()
@@ -21,7 +25,7 @@ namespace HSP.Vanilla.CelestialBodies
             Vector3Dbl origin;
             Direction3D face;
             float edgeLength;
-            Vector2 faceCenter;
+            Vector2 minCorner;
 
             int totalVertices;
 
@@ -39,21 +43,6 @@ namespace HSP.Vanilla.CelestialBodies
             NativeArray<Vector3> resultNormals;
             NativeArray<Vector4> resultTangents;
 
-#warning TODO - Some mechanism for safety regarding when you can schedule these would be nice, as these arrays can be writeable, so no other jobs should be writing to them.
-            // Also some documentation would be nice.
-
-            // Using these without readonly can cause exceptions being thrown,
-            // writing to an array when another job reads from it can also cause big synchronization problems
-            //   (this is the reason that we can't e.g. use other normals when setting our normals).
-
-            // This essentially boils down to that using certain 'job' types in the same stage causes race conditions (depending on what these jobs do).
-
-            float halfSize;
-            float halfSizeXn;
-            float halfSizeXp;
-            float halfSizeYn;
-            float halfSizeYp;
-
             int stepXn;
             int stepXp;
             int stepYn;
@@ -62,22 +51,22 @@ namespace HSP.Vanilla.CelestialBodies
             [ReadOnly]
             NativeArray<Vector3Dbl> resultVerticesXn;
             float edgeLengthXn;
-            Vector2 faceCenterXn;
+            Vector2 minCornerXn;
 
             [ReadOnly]
             NativeArray<Vector3Dbl> resultVerticesXp;
             float edgeLengthXp;
-            Vector2 faceCenterXp;
+            Vector2 minCornerXp;
 
             [ReadOnly]
             NativeArray<Vector3Dbl> resultVerticesYn;
             float edgeLengthYn;
-            Vector2 faceCenterYn;
+            Vector2 minCornerYn;
 
             [ReadOnly]
             NativeArray<Vector3Dbl> resultVerticesYp;
             float edgeLengthYp;
-            Vector2 faceCenterYp;
+            Vector2 minCornerYp;
 
             public void Initialize( LODQuadRebuildData r, LODQuadRebuildAdditionalData rAdditional )
             {
@@ -93,8 +82,8 @@ namespace HSP.Vanilla.CelestialBodies
                 totalVertices = sideVertices * sideVertices;
 
                 edgeLength = r.Node.Size / sideEdges;
-                faceCenter = r.Node.FaceCenter;// - (Vector2.one * (r.Node.Size / 2));
-                halfSize = r.Node.Size / 2;
+                float halfSize = r.Node.Size / 2;
+                minCorner = r.Node.FaceCenter - (Vector2.one * halfSize);
                 face = r.Node.Face;
 
                 resultTriangles = r.ResultTriangles;
@@ -105,26 +94,26 @@ namespace HSP.Vanilla.CelestialBodies
                 meshVertices = new NativeArray<Vector3>( sideVertices * sideVertices, Allocator.Persistent );
 
                 var xn = rAdditional.allQuads[r.Node.Xn];
-                faceCenterXn = r.Node.Xn.FaceCenter;// - (Vector2.one * (r.Node.Xn.Size / 2));
-                halfSizeXn = r.Node.Xn.Size / 2;
+                float halfSizeXn = r.Node.Xn.Size / 2;
+                minCornerXn = r.Node.Xn.FaceCenter - (Vector2.one * halfSizeXn);
                 edgeLengthXn = r.Node.Xn.Size / sideEdges;
                 resultVerticesXn = xn.HasNew ? xn.newR.ResultVertices : xn.oldR.ResultVertices;
 
                 var xp = rAdditional.allQuads[r.Node.Xp];
-                faceCenterXp = r.Node.Xp.FaceCenter;// - (Vector2.one * (r.Node.Xp.Size / 2));
-                halfSizeXp = r.Node.Xp.Size / 2;
+                float halfSizeXp = r.Node.Xp.Size / 2;
+                minCornerXp = r.Node.Xp.FaceCenter - (Vector2.one * halfSizeXp);
                 edgeLengthXp = r.Node.Xp.Size / sideEdges;
                 resultVerticesXp = xp.HasNew ? xp.newR.ResultVertices : xp.oldR.ResultVertices;
 
                 var yn = rAdditional.allQuads[r.Node.Yn];
-                faceCenterYn = r.Node.Yn.FaceCenter;// - (Vector2.one * (r.Node.Yn.Size / 2));
-                halfSizeYn = r.Node.Yn.Size / 2;
+                float halfSizeYn = r.Node.Yn.Size / 2;
+                minCornerYn = r.Node.Yn.FaceCenter - (Vector2.one * halfSizeYn);
                 edgeLengthYn = r.Node.Yn.Size / sideEdges;
                 resultVerticesYn = yn.HasNew ? yn.newR.ResultVertices : yn.oldR.ResultVertices;
 
                 var yp = rAdditional.allQuads[r.Node.Yp];
-                faceCenterYp = r.Node.Yp.FaceCenter;// - (Vector2.one * (r.Node.Yp.Size / 2));
-                halfSizeYp = r.Node.Yp.Size / 2;
+                float halfSizeYp = r.Node.Yp.Size / 2;
+                minCornerYp = r.Node.Yp.FaceCenter - (Vector2.one * halfSizeYp);
                 edgeLengthYp = r.Node.Yp.Size / sideEdges;
                 resultVerticesYp = yp.HasNew ? yp.newR.ResultVertices : yp.oldR.ResultVertices;
             }
@@ -157,7 +146,7 @@ namespace HSP.Vanilla.CelestialBodies
             /// Transforms from overflowed coordinates in the space of 1 face into the other face.
             /// </summary>
             [MethodImpl( MethodImplOptions.AggressiveInlining )]
-            public static (double x, double y) FixCoordinates( Direction3D face, double x, double y )
+            public static (float x, float y) FixCoordinates( Direction3D face, float x, float y )
             {
                 switch( face )
                 {
@@ -179,6 +168,7 @@ namespace HSP.Vanilla.CelestialBodies
                             return (x, y - 2);
                         }
                         break;
+
                     case Direction3D.Xp:
                         if( x < -1 )
                         {
@@ -197,6 +187,7 @@ namespace HSP.Vanilla.CelestialBodies
                             return (-x, -(y - 2));
                         }
                         break;
+
                     case Direction3D.Yn:
                     {
                         if( x < -1 )
@@ -293,26 +284,24 @@ namespace HSP.Vanilla.CelestialBodies
             {
                 Vector3Dbl self = resultVertices[GetIndex( x, y )];
                 Vector3Dbl xn, xp, yn, yp;
-
                 if( x == 0 )
                 {
-                    double xnx = ((x - 1) * edgeLength) + faceCenter.x - halfSize;
-                    double xny = (y * edgeLength) + faceCenter.y - halfSize;
+                    float xnx = (x * edgeLength) + minCorner.x - edgeLengthXn;
+                    float xny = (y * edgeLength) + minCorner.y;
                     (xnx, xny) = FixCoordinates( face, xnx, xny );
-#warning TODO - This should sample both surface 'points' at the same distance from the seam, regardless of the seld/neighbor relative subdiv level, instead of floor/ceil to the nearest.
-                    int indexXnX = (int)Math.Floor( (xnx - faceCenterXn.x + halfSizeXn) / edgeLengthXn );
-                    int indexXnY = (int)((xny - faceCenterXn.y + halfSizeXn) / edgeLengthXn);
+                    int indexXnX = (int)((xnx - minCornerXn.x) / edgeLengthXn);
+                    int indexXnY = (int)((xny - minCornerXn.y) / edgeLengthXn);
                     xn = resultVerticesXn[GetIndex( indexXnX, indexXnY )];
-                    xp = resultVertices[GetIndex( x + 1, y )];
+                    xp = resultVertices[GetIndex( x + 1 * stepXn, y )]; // Multiplied by step size to take the same step into both quads.
                 }
                 else if( x == sideVertices - 1 )
                 {
-                    double xpx = ((x + 1) * edgeLength) + faceCenter.x - halfSize;
-                    double xpy = (y * edgeLength) + faceCenter.y - halfSize;
+                    float xpx = (x * edgeLength) + minCorner.x + edgeLengthXp;
+                    float xpy = (y * edgeLength) + minCorner.y;
                     (xpx, xpy) = FixCoordinates( face, xpx, xpy );
-                    int indexXpX = (int)Math.Ceiling( (xpx - faceCenterXp.x + halfSizeXp) / edgeLengthXp );
-                    int indexXpY = (int)((xpy - faceCenterXp.y + halfSizeXp) / edgeLengthXp);
-                    xn = resultVertices[GetIndex( x - 1, y )];
+                    int indexXpX = (int)((xpx - minCornerXp.x) / edgeLengthXp);
+                    int indexXpY = (int)((xpy - minCornerXp.y) / edgeLengthXp);
+                    xn = resultVertices[GetIndex( x - 1 * stepXp, y )];
                     xp = resultVerticesXp[GetIndex( indexXpX, indexXpY )];
                 }
                 else
@@ -323,22 +312,22 @@ namespace HSP.Vanilla.CelestialBodies
 
                 if( y == 0 )
                 {
-                    double ynx = (x * edgeLength) + faceCenter.x - halfSize;
-                    double yny = ((y - 1) * edgeLength) + faceCenter.y - halfSize;
+                    float ynx = (x * edgeLength) + minCorner.x;
+                    float yny = (y * edgeLength) + minCorner.y - edgeLengthYn;
                     (ynx, yny) = FixCoordinates( face, ynx, yny );
-                    int indexYnX = (int)((ynx - faceCenterYn.x + halfSizeYn) / edgeLengthYn);
-                    int indexYnY = (int)Math.Floor( (yny - faceCenterYn.y + halfSizeYn) / edgeLengthYn );
+                    int indexYnX = (int)((ynx - minCornerYn.x) / edgeLengthYn);
+                    int indexYnY = (int)((yny - minCornerYn.y) / edgeLengthYn);
                     yn = resultVerticesYn[GetIndex( indexYnX, indexYnY )];
-                    yp = resultVertices[GetIndex( x, y + 1 )];
+                    yp = resultVertices[GetIndex( x, y + stepYn )];
                 }
                 else if( y == sideVertices - 1 )
                 {
-                    double ypx = (x * edgeLength) + faceCenter.x - halfSize;
-                    double ypy = ((y + 1) * edgeLength) + faceCenter.y - halfSize;
+                    float ypx = (x * edgeLength) + minCorner.x;
+                    float ypy = (y * edgeLength) + minCorner.y + edgeLengthYp;
                     (ypx, ypy) = FixCoordinates( face, ypx, ypy );
-                    int indexYpX = (int)((ypx - faceCenterYp.x + halfSizeYp) / edgeLengthYp);
-                    int indexYpY = (int)Math.Ceiling( (ypy - faceCenterYp.y + halfSizeYp) / edgeLengthYp );
-                    yn = resultVertices[GetIndex( x, y - 1 )];
+                    int indexYpX = (int)((ypx - minCornerYp.x) / edgeLengthYp);
+                    int indexYpY = (int)((ypy - minCornerYp.y) / edgeLengthYp);
+                    yn = resultVertices[GetIndex( x, y - stepYp )];
                     yp = resultVerticesYp[GetIndex( indexYpX, indexYpY )];
                 }
                 else
@@ -443,5 +432,5 @@ namespace HSP.Vanilla.CelestialBodies
                 }
             }
         }
-    } 
+    }
 }

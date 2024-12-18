@@ -138,11 +138,13 @@ namespace HSP.Vanilla.CelestialBodies
             }
 
             [MethodImpl( MethodImplOptions.AggressiveInlining )]
-            int GetIndex( int x, int y )
+            private int GetIndex( int x, int y )
             {
                 return (x * sideEdges) + x + y;
             }
-            double lerp( double a, double b, double f )
+
+            [MethodImpl( MethodImplOptions.AggressiveInlining )]
+            private double Lerp( double a, double b, double f )
             {
                 return a + f * (b - a);
             }
@@ -206,9 +208,9 @@ namespace HSP.Vanilla.CelestialBodies
                 double dx = u - x0;
                 double dy = v - y0;
 
-                double h0 = lerp( h00, h10, dx );
-                double h1 = lerp( h01, h11, dx );
-                double interpolatedHeight = lerp( h0, h1, dy );
+                double h0 = Lerp( h00, h10, dx );
+                double h1 = Lerp( h01, h11, dx );
+                double interpolatedHeight = Lerp( h0, h1, dy );
 
                 return ((interpolatedHeight / 65535.0) * (maxlevel - minlevel)) + minlevel;
             }

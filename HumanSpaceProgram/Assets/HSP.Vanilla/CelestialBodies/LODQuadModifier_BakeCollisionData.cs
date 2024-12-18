@@ -8,11 +8,9 @@ namespace HSP.Vanilla.CelestialBodies
     {
         public LODQuadMode QuadMode => LODQuadMode.Collider;
 
-        public bool Convex { get; set; }
-
         public ILODQuadJob GetJob()
         {
-            return new Job( this );
+            return new Job();
         }
 
         /// <summary>
@@ -23,15 +21,7 @@ namespace HSP.Vanilla.CelestialBodies
         /// </remarks>
         public struct Job : ILODQuadJob
         {
-            bool convex;
             int instanceId;
-
-            public Job( LODQuadModifier_BakeCollisionData modifier )
-            {
-                convex = modifier.Convex;
-
-                instanceId = default;
-            }
 
             public void Initialize( LODQuadRebuildData r, LODQuadRebuildAdditionalData _ )
             {
@@ -48,7 +38,7 @@ namespace HSP.Vanilla.CelestialBodies
 
             public void Execute()
             {
-                Physics.BakeMesh( instanceId, convex );
+                Physics.BakeMesh( instanceId, false );
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using HSP.CelestialBodies.Surfaces;
+using UnityEngine;
 
 namespace HSP.Vanilla.ReferenceFrames
 {
@@ -23,6 +24,16 @@ namespace HSP.Vanilla.ReferenceFrames
             }
 
             base.FixedUpdate();
+        }
+
+        public const string ADD_PINNED_LOD_REFERENCE_TRANSFORM = HSPEvent.NAMESPACE_HSP + ".addpinnedlreftrans";
+
+        [HSPEventListener( HSPEvent_ON_LOD_QUAD_PARENT_CREATED.ID, ADD_PINNED_LOD_REFERENCE_TRANSFORM )]
+        public static void AddPinnedLODSphereReferenceFrameTransform( LODQuadSphere sphere )
+        {
+            var p = sphere.QuadParent.gameObject.AddComponent<PinnedLODSphereReferenceFrameTransform>();
+            Vector3Dbl localPos = Vector3Dbl.zero;
+            p.SetReference( sphere.CelestialBody, localPos, Quaternion.identity );
         }
     }
 }
