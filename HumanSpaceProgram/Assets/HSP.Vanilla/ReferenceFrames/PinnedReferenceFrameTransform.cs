@@ -304,7 +304,7 @@ namespace HSP.Vanilla
 
         private void MakeCacheInvalid() => _cachedBodyReferenceFrame = null;
 
-        void Awake()
+        protected virtual void Awake()
         {
             if( this.HasComponentOtherThan<IReferenceFrameTransform>( this ) )
             {
@@ -321,7 +321,7 @@ namespace HSP.Vanilla
             _rb.isKinematic = true;
         }
 
-        void FixedUpdate()
+        protected virtual void FixedUpdate()
         {
             if( ReferenceBody == null )
                 return;
@@ -342,22 +342,22 @@ namespace HSP.Vanilla
             SetPositionAndRotation();
         }
 
-        void OnEnable()
+        protected virtual void OnEnable()
         {
             _rb.isKinematic = true; // Force kinematic.
         }
 
-        void OnDisable()
+        protected virtual void OnDisable()
         {
             _rb.isKinematic = true;
         }
 
-        void OnCollisionEnter( Collision collision )
+        protected virtual void OnCollisionEnter( Collision collision )
         {
             IsColliding = true;
         }
 
-        void OnCollisionStay( Collision collision )
+        protected virtual void OnCollisionStay( Collision collision )
         {
             // `OnCollisionEnter` / Exit are called for every collider.
             // I've tried using an incrementing/decrementing int with enter/exit, but it wasn't updating correctly, and after some time, there were too many collisions.
@@ -366,7 +366,7 @@ namespace HSP.Vanilla
             IsColliding = true;
         }
 
-        void OnCollisionExit( Collision collision )
+        protected virtual void OnCollisionExit( Collision collision )
         {
             IsColliding = false;
         }

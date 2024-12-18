@@ -30,7 +30,7 @@ namespace HSP.CelestialBodies.Surfaces
         private LODQuadRebuildAdditionalData _additionalData;
 
         private MethodInfo[] _jobSchedulerPerJob; // Cached Schedule<JobType>( ... ) method with the job type for each job in sequence.
-        private ILODQuadJob[] _jobs;
+        private ILODQuadModifier[] _modifiers;
         private int[] _firstJobPerStage; // Index of the first job in the stage given by the index.
 
         public int StageCount => _firstJobPerStage.Length; // How many frames it will take from start to finish.
@@ -53,16 +53,16 @@ namespace HSP.CelestialBodies.Surfaces
         public LODQuadRebuilder( LODQuadSphere sphere, LODQuadTreeChanges changes, BuildSettings settings = BuildSettings.Default )
         {
             this._sphere = sphere;
-            (this._jobs, this._firstJobPerStage) = sphere.GetJobsForBuild();
+            (this._modifiers, this._firstJobPerStage) = sphere.GetJobsForBuild();
             this._buildMode = sphere.Mode;
             this._settings = settings;
 
             MethodInfo method = typeof( LODQuadRebuilder ).GetMethod( nameof( LODQuadRebuilder.Schedule ), BindingFlags.Static | BindingFlags.NonPublic );
 
-            this._jobSchedulerPerJob = new MethodInfo[this._jobs.Length];
-            for( int i = 0; i < this._jobs.Length; i++ )
+            this._jobSchedulerPerJob = new MethodInfo[this._modifiers.Length];
+            for( int i = 0; i < this._modifiers.Length; i++ )
             {
-                this._jobSchedulerPerJob[i] = method.MakeGenericMethod( this._jobs[i].GetType() );
+                this._jobSchedulerPerJob[i] = method.MakeGenericMethod( this._modifiers[i].GetJob().GetType() );
             }
 
             this.InitializeRebuildData( sphere, changes, settings );
@@ -150,7 +150,7 @@ namespace HSP.CelestialBodies.Surfaces
             {
                 foreach( var rQuad in _rebuild )
                 {
-                    rQuad.InitializeBuild( _jobs, _sphere );
+                    rQuad.InitializeBuild( _modifiers, _sphere );
                 }
             }
 
@@ -165,7 +165,7 @@ namespace HSP.CelestialBodies.Surfaces
                     : _firstJobPerStage[currentStage];
                 int lastJob = (currentStage + 1) < StageCount
                     ? _firstJobPerStage[currentStage + 1]
-                    : _jobs.Length;
+                    : _modifiers.Length;
 
                 foreach( var rQuad in _rebuild )
                 {
@@ -202,8 +202,6 @@ namespace HSP.CelestialBodies.Surfaces
                             Debug.LogError( $"Exception occurred while finalizing the build of a quad on body '{_sphere.CelestialBody.ID}'." );
                             Debug.LogException( ex );
                         }
-
-                        //rQuad.Dispose(); moved to lodsphere, done only after the quad is also destroyed.
                     }
                     return;
                 }
@@ -220,13 +218,14 @@ namespace HSP.CelestialBodies.Surfaces
                     : _firstJobPerStage[currentStage];
                 int lastJob = (currentStage + 1) < StageCount
                     ? _firstJobPerStage[currentStage + 1]
-                    : _jobs.Length;
+                    : _modifiers.Length;
 
                 // Initialize everything first, because they might talk to each other.
                 foreach( var rQuad in _rebuild )
                 {
-                    foreach( var job in rQuad.jobs[firstJob..lastJob] )
+                    for( int i = firstJob; i < lastJob; i++ ) // set the jobs array in each build.
                     {
+                        var job = _modifiers[i].GetJob();
                         try
                         {
                             job.Initialize( rQuad, _additionalData );
@@ -236,6 +235,7 @@ namespace HSP.CelestialBodies.Surfaces
                             Debug.LogError( $"Exception occurred while initializing a stage {currentStage} job of type '{job.GetType()}' on body '{_sphere.CelestialBody.ID}'." );
                             Debug.LogException( ex );
                         }
+                        rQuad.jobs[i] = job;
                     }
                 }
 
@@ -280,7 +280,7 @@ namespace HSP.CelestialBodies.Surfaces
 
                 int lastJob = (currentStage + 1) < StageCount
                     ? _firstJobPerStage[currentStage + 1]
-                    : _jobs.Length;
+                    : _modifiers.Length;
 
                 foreach( var quad in _rebuild )
                 {

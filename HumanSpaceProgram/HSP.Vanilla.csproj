@@ -101,7 +101,6 @@
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\Tools\DefaultTool.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FVesselSeparator.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FSequencer.Sequence.cs" />
-    <Compile Include="Assets\HSP.Vanilla\CelestialBodies\SmoothNeighbors_Job.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\OnStartup.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FAttitudeAvionics.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FPointMass.cs" />
@@ -137,6 +136,7 @@
     <Compile Include="Assets\HSP.Vanilla\Components\FLaunchSiteMarker.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FReactionControlController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FControlFrame.cs" />
+    <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\PinnedLODSphereReferenceFrameTransform.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla\___HSP.Vanilla.asmdef" />

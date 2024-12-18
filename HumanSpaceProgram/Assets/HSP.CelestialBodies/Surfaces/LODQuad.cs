@@ -41,17 +41,6 @@ namespace HSP.CelestialBodies.Surfaces
         /// </remarks>
         public bool IsActive => this.gameObject.activeSelf;
 
-        void FixedUpdate()
-        {
-            Vector3Dbl relativePos = Node.SphereCenter * QuadSphere.CelestialBody.Radius;
-            var refFrame = QuadSphere.CelestialBody.ReferenceFrameTransform.OrientedInertialReferenceFrame();
-            Vector3Dbl airfPos = refFrame.TransformPosition( relativePos );
-            QuaternionDbl airfRot = refFrame.TransformRotation( QuaternionDbl.identity );
-            Vector3 scenePos = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformPosition( airfPos );
-            Quaternion sceneRot = (Quaternion)SceneReferenceFrameManager.ReferenceFrame.InverseTransformRotation( airfRot );
-            this.transform.SetPositionAndRotation( scenePos, sceneRot );
-        }
-
         void OnDestroy()
         {
             Destroy( _mesh ); // Destroying the mesh prevents a memory leak (One would think that a mesh would have a destructor to handle it, but I guess not).
@@ -60,19 +49,25 @@ namespace HSP.CelestialBodies.Surfaces
         public void Activate()
         {
             this.gameObject.SetActive( true );
-
-            Vector3Dbl relativePos = Node.SphereCenter * QuadSphere.CelestialBody.Radius;
-            var refFrame = QuadSphere.CelestialBody.ReferenceFrameTransform.OrientedInertialReferenceFrame();
-            Vector3Dbl airfPos = refFrame.TransformPosition( relativePos );
-            QuaternionDbl airfRot = refFrame.TransformRotation( QuaternionDbl.identity );
-            Vector3 scenePos = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformPosition( airfPos );
-            Quaternion sceneRot = (Quaternion)SceneReferenceFrameManager.ReferenceFrame.InverseTransformRotation( airfRot );
-            this.transform.SetPositionAndRotation( scenePos, sceneRot );
+            ResetPositionAndRotation();
         }
 
         public void Deactivate()
         {
             this.gameObject.SetActive( false );
+        }
+
+        public void ResetPositionAndRotation()
+        {
+            IReferenceFrame bodyReferenceFrame = QuadSphere.CelestialBody.ReferenceFrameTransform.OrientedInertialReferenceFrame();
+
+            Vector3Dbl airfPos = bodyReferenceFrame.TransformPosition( Node.SphereCenter * QuadSphere.CelestialBody.Radius );
+            QuaternionDbl airfRot = bodyReferenceFrame.TransformRotation( QuaternionDbl.identity );
+
+            Vector3 scenePos = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformPosition( airfPos );
+            Quaternion sceneRot = (Quaternion)SceneReferenceFrameManager.ReferenceFrame.InverseTransformRotation( airfRot );
+
+            this.transform.SetPositionAndRotation( scenePos, sceneRot );
         }
 
         public static LODQuad CreateInactive( LODQuadSphere sphere, LODQuadTreeNode node, Mesh mesh )

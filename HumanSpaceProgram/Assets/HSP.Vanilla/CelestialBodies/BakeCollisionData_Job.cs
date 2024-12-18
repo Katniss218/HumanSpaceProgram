@@ -1,46 +1,55 @@
 ﻿using HSP.CelestialBodies.Surfaces;
+using System;
 using UnityEngine;
 
 namespace HSP.Vanilla.CelestialBodies
 {
-    /// <summary>
-    /// Bakes the PhysX collision data off the main thread.
-    /// </summary>
-    /// <remarks>
-    /// Without this job, the data is baked when the mesh is assigned to the collider (blocking the main thread).
-    /// </remarks>
-    public struct BakeCollisionData_Job : ILODQuadJob
+    public class LODQuadModifier_BakeCollisionData : ILODQuadModifier
     {
-        public bool Convex;
-
-        int instanceId;
-
         public LODQuadMode QuadMode => LODQuadMode.Collider;
 
-        public void Initialize( LODQuadRebuildData r, LODQuadRebuildAdditionalData _ )
+        public bool Convex { get; set; }
+
+        public ILODQuadJob GetJob()
         {
-            instanceId = r.ResultMesh.GetInstanceID();
+            return new Job( this );
         }
 
-        public void Finish( LODQuadRebuildData r )
+        /// <summary>
+        /// Bakes the PhysX collision data off the main thread.
+        /// </summary>
+        /// <remarks>
+        /// Without this job, the data is baked when the mesh is assigned to the collider (blocking the main thread).
+        /// </remarks>
+        public struct Job : ILODQuadJob
         {
-        }
+            bool convex;
+            int instanceId;
 
-        public void Dispose()
-        {
-        }
-
-        public ILODQuadJob Clone()
-        {
-            return new BakeCollisionData_Job()
+            public Job( LODQuadModifier_BakeCollisionData modifier )
             {
-                Convex = Convex,
-            };
-        }
+                convex = modifier.Convex;
 
-        public void Execute()
-        {
-            Physics.BakeMesh( instanceId, Convex );
+                instanceId = default;
+            }
+
+            public void Initialize( LODQuadRebuildData r, LODQuadRebuildAdditionalData _ )
+            {
+                instanceId = r.ResultMesh.GetInstanceID();
+            }
+
+            public void Finish( LODQuadRebuildData r )
+            {
+            }
+
+            public void Dispose()
+            {
+            }
+
+            public void Execute()
+            {
+                Physics.BakeMesh( instanceId, convex );
+            }
         }
     }
 }

@@ -68,14 +68,10 @@ namespace HSP.CelestialBodies.Surfaces
             this.Node = node;
         }
 
-        public void InitializeBuild( ILODQuadJob[] jobs, LODQuadSphere sphere )
+        public void InitializeBuild( ILODQuadModifier[] jobs, LODQuadSphere sphere )
         {
             this.jobs = new ILODQuadJob[jobs.Length];
             this.handles = new JobHandle[jobs.Length];
-            for( int i = 0; i < jobs.Length; i++ )
-            {
-                this.jobs[i] = jobs[i].Clone();
-            }
 
             ResultMesh = new Mesh();
 

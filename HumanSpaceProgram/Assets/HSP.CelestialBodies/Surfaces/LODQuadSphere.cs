@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityPlus.AssetManagement;
-using UnityPlus.Serialization;
 
 namespace HSP.CelestialBodies.Surfaces
 {
+    public static class HSPEvent_ON_LOD_QUAD_PARENT_CREATED
+    {
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".lodquadparentcreated";
+    }
+
     /// <summary>
     /// Adds a solid surface to a celestial body.
     /// </summary>
@@ -80,18 +83,13 @@ namespace HSP.CelestialBodies.Surfaces
             ClearAllQuads();
         }
 
-        private ILODQuadJob[][] _jobs;
-        /// <summary>
-        /// Gets a *copy* of all jobs used by this LOD sphere.
-        /// </summary>
-        public ILODQuadJob[][] Jobs => ILODQuadJob.CopyJobsWithValidation( _jobs );
-
+        private ILODQuadModifier[][] _jobs;
         /// <summary>
         /// Gets the LOD sphere's jobs filtered for the LOD sphere's current build mode.
         /// </summary>
-        public (ILODQuadJob[] jobs, int[] firstJobPerStage) GetJobsForBuild()
+        public (ILODQuadModifier[] jobs, int[] firstJobPerStage) GetJobsForBuild()
         {
-            return ILODQuadJob.FilterJobs( _jobs, Mode ); // Skips a copy by using the underlying jobs array instead of the exposed Jobs property.
+            return ILODQuadModifier.FilterJobs( _jobs, Mode );
         }
 
         /// <summary>
@@ -101,12 +99,12 @@ namespace HSP.CelestialBodies.Surfaces
         /// Calling this method will force a rebuild.
         /// </remarks>
         /// <param name="jobs">The jobs to copy when setting. Must not be null or contain any nulls.</param>
-        public void SetJobs( params ILODQuadJob[][] jobs )
+        public void SetJobs( params ILODQuadModifier[][] jobs )
         {
             if( IsBuilding )
                 throw new InvalidOperationException( $"Can't set {nameof( _jobs )} of a LOD sphere while it's building." );
 
-            _jobs = ILODQuadJob.CopyJobsWithValidation( jobs );
+            _jobs = jobs;
             ClearAllQuads();
         }
 
@@ -156,8 +154,7 @@ namespace HSP.CelestialBodies.Surfaces
         void Start()
         {
             _currentTree = new LODQuadTree( MaxDepth );
-            GameObject parent = new GameObject( "PARENT" );
-            QuadParent = parent.transform;
+            TryCreateQuadParentGameObject();
         }
 
         void Update()
@@ -189,6 +186,16 @@ namespace HSP.CelestialBodies.Surfaces
                 _builder.Dispose();
                 Debug.LogWarning( $"{nameof( LODQuadSphere )} on celestial body '{CelestialBody.ID}' was disabled while building." );
             }
+        }
+
+        private void TryCreateQuadParentGameObject()
+        {
+            if( QuadParent != null )
+                return;
+
+            GameObject parent = new GameObject( $"QUADPARENT-{this.CelestialBody.ID}" );
+            QuadParent = parent.transform;
+            HSPEvent.EventManager.TryInvoke( HSPEvent_ON_LOD_QUAD_PARENT_CREATED.ID, this );
         }
 
         private void ClearAllQuads()

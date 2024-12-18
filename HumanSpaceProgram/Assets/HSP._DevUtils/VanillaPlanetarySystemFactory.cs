@@ -3,7 +3,9 @@ using HSP.CelestialBodies.Surfaces;
 using HSP.ReferenceFrames;
 using HSP.Timelines;
 using HSP.Trajectories;
+using HSP.Vanilla;
 using HSP.Vanilla.CelestialBodies;
+using HSP.Vanilla.ReferenceFrames;
 using HSP.Vanilla.Scenes.GameplayScene.Cameras;
 using HSP.Vanilla.Trajectories;
 using HSP.Vessels;
@@ -21,25 +23,8 @@ namespace HSP._DevUtils
 
         private static Material[] _earthMaterial = new Material[6];
 
-        static Texture2D _heightmapT;
-        static NativeArray<short> _heightmap;
-
         private static void A()
         {
-            const int size = 2048;
-            /*if( _heightmap.IsCreated )
-            {
-                _heightmap.Dispose();
-            }*/
-            _heightmap = new NativeArray<short>( size * size, Allocator.Persistent );
-            for( int i = 0; i < size * size; i++ )
-            {
-                _heightmap[i] = (short)UnityEngine.Random.Range( 0, 32767 );
-            }
-            _heightmapT = new Texture2D( size, size, TextureFormat.R16, false );
-            _heightmapT.LoadRawTextureData<short>( _heightmap );
-
-
             var cbShader = AssetRegistry.Get<Shader>( "builtin::HSP.CelestialBodies/Surfaces/TerrainShader" );
             var cbTex = new Texture2D[]
             {
@@ -72,12 +57,12 @@ namespace HSP._DevUtils
             lqs.MaxDepth = 10;
             lqs.Materials = _earthMaterial;
             lqs.PoIGetter = () => VesselManager.LoadedVessels.Select( v => v.ReferenceFrameTransform.AbsolutePosition );
-            lqs.SetJobs( new ILODQuadJob[]
+            lqs.SetJobs( new ILODQuadModifier[]
             {
-                new MakeQuadMesh_Job(),
-            }, new ILODQuadJob[]
+                new LODQuadModifier_MakeQuadMesh(),
+            }, new ILODQuadModifier[]
             {
-                new MakeMeshData_Job(),
+                new LODQuadModifier_MakeMeshData(),
             } );
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
@@ -116,23 +101,23 @@ namespace HSP._DevUtils
                 SceneReferenceFrameManager.ReferenceFrame.TransformPosition( GameplaySceneCameraManager.NearCamera.transform.position ),
                 SceneReferenceFrameManager.ReferenceFrame.TransformPosition( GameplaySceneCameraManager.NearCamera.transform.position + GameplaySceneCameraManager.NearCamera.transform.forward * 500 ),
             };
-            lqs.SetJobs( new ILODQuadJob[]
+            lqs.SetJobs( new ILODQuadModifier[]
             {
-                new MakeQuadMesh_Job(),
-                new HeightMap_Job()
+                new LODQuadModifier_MakeQuadMesh(),
+                new LODQuadModifier_Heightmap()
                 {
-                    HeightmapXn = _heightmapT,
-                    HeightmapXp = _heightmapT,
-                    HeightmapYn = _heightmapT,
-                    HeightmapYp = _heightmapT,
-                    HeightmapZn = _heightmapT,
-                    HeightmapZp = _heightmapT,
-                    MinLevel = -2000,
-                    MaxLevel = 2000
+                    HeightmapXn = AssetRegistry.Get<Texture2D>( "Vanilla::Assets/EarthHeight" ),
+                    HeightmapXp = AssetRegistry.Get<Texture2D>( "Vanilla::Assets/EarthHeight" ),
+                    HeightmapYn = AssetRegistry.Get<Texture2D>( "Vanilla::Assets/EarthHeight" ),
+                    HeightmapYp = AssetRegistry.Get<Texture2D>( "Vanilla::Assets/EarthHeight" ),
+                    HeightmapZn = AssetRegistry.Get<Texture2D>( "Vanilla::Assets/EarthHeight" ),
+                    HeightmapZp = AssetRegistry.Get<Texture2D>( "Vanilla::Assets/EarthHeight" ),
+                    MinLevel = -8000,
+                    MaxLevel = 6000
                 },
-            }, new ILODQuadJob[]
+            }, new ILODQuadModifier[]
             {
-                new MakeMeshData_Job(),
+                new LODQuadModifier_MakeMeshData(),
             } );
 
             LODQuadSphere lqs2 = cb.gameObject.AddComponent<LODQuadSphere>();
@@ -140,16 +125,26 @@ namespace HSP._DevUtils
             lqs2.EdgeSubdivisions = 5;
             lqs2.MaxDepth = 14;
             lqs2.PoIGetter = () => VesselManager.LoadedVessels.Select( v => v.ReferenceFrameTransform.AbsolutePosition );
-            lqs2.SetJobs( new ILODQuadJob[]
+            lqs2.SetJobs( new ILODQuadModifier[]
             {
-                new MakeQuadMesh_Job(),
-               // new Displace_Job(),
-            }, new ILODQuadJob[]
+                new LODQuadModifier_MakeQuadMesh(),
+                new LODQuadModifier_Heightmap()
+                {
+                    HeightmapXn = AssetRegistry.Get<Texture2D>( "Vanilla::Assets/EarthHeight" ),
+                    HeightmapXp = AssetRegistry.Get<Texture2D>( "Vanilla::Assets/EarthHeight" ),
+                    HeightmapYn = AssetRegistry.Get<Texture2D>( "Vanilla::Assets/EarthHeight" ),
+                    HeightmapYp = AssetRegistry.Get<Texture2D>( "Vanilla::Assets/EarthHeight" ),
+                    HeightmapZn = AssetRegistry.Get<Texture2D>( "Vanilla::Assets/EarthHeight" ),
+                    HeightmapZp = AssetRegistry.Get<Texture2D>( "Vanilla::Assets/EarthHeight" ),
+                    MinLevel = -8000,
+                    MaxLevel = 6000
+                },
+            }, new ILODQuadModifier[]
             {
-                new MakeMeshData_Job(),
-            }, new ILODQuadJob[]
+                new LODQuadModifier_MakeMeshData(),
+            }, new ILODQuadModifier[]
             {
-                new BakeCollisionData_Job(),
+                new LODQuadModifier_BakeCollisionData(),
             } );
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
@@ -200,6 +195,15 @@ namespace HSP._DevUtils
 
             CelestialBodyManager.Get( "sun" ).ReferenceFrameTransform.AbsoluteAngularVelocity = new Vector3Dbl( 0, -1, 0 );
             CelestialBodyManager.Get( "main" ).ReferenceFrameTransform.AbsoluteAngularVelocity = new Vector3Dbl( 0, -7.2921159e-5, 0 );
+        }
+
+        [HSPEventListener( HSPEvent_ON_LOD_QUAD_PARENT_CREATED.ID, "aaasd" )]
+        public static void ADD( LODQuadSphere sphere )
+        {
+            var p = sphere.QuadParent.gameObject.AddComponent<PinnedLODSphereReferenceFrameTransform>();
+            // Vector3 localPos = CoordinateUtils.GeodeticToEuclidean( 28.5857702f, -80.6507262f, (float)sphere.CelestialBody.Radius );
+            Vector3Dbl localPos = Vector3Dbl.zero;
+            p.SetReference( sphere.CelestialBody, localPos, Quaternion.identity );
         }
     }
 }
