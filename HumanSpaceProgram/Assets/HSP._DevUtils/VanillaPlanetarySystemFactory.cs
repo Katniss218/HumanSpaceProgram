@@ -30,7 +30,7 @@ namespace HSP._DevUtils
             {
                 AssetRegistry.Get<Texture2D>( "Vanilla::Assets/earth_color_xn" ),
                 AssetRegistry.Get<Texture2D>( "Vanilla::Assets/earth_color_xp" ),
-                AssetRegistry.Get<Texture2D>( "Vanilla::Assets/earth_color_yn" ),
+                AssetRegistry.Get<Texture2D>( "Vanilla::Assets/earth_color_yn2" ),
                 AssetRegistry.Get<Texture2D>( "Vanilla::Assets/earth_color_yp" ),
                 AssetRegistry.Get<Texture2D>( "Vanilla::Assets/earth_color_zn" ),
                 AssetRegistry.Get<Texture2D>( "Vanilla::Assets/earth_color_zp" )
@@ -106,16 +106,15 @@ namespace HSP._DevUtils
                 new LODQuadModifier_InitializeMesh(),
                 new LODQuadModifier_Heightmap()
                 {
-                    HeightmapXn = AssetRegistry.Get<Texture2D>( "Vanilla::Assets/EarthHeight" ),
-                    HeightmapXp = AssetRegistry.Get<Texture2D>( "Vanilla::Assets/EarthHeight" ),
-                    HeightmapYn = AssetRegistry.Get<Texture2D>( "Vanilla::Assets/EarthHeight" ),
-                    HeightmapYp = AssetRegistry.Get<Texture2D>( "Vanilla::Assets/EarthHeight" ),
-                    HeightmapZn = AssetRegistry.Get<Texture2D>( "Vanilla::Assets/EarthHeight" ),
-                    HeightmapZp = AssetRegistry.Get<Texture2D>( "Vanilla::Assets/EarthHeight" ),
-                    MinLevel = -8000,
-                    MaxLevel = 6000
-                },
-                new LODQuadModifier_Displace()
+                    HeightmapXn = AssetRegistry.Get<Texture2D>( "Vanilla::Assets/EarthHeight2" ),
+                    HeightmapXp = AssetRegistry.Get<Texture2D>( "Vanilla::Assets/EarthHeight2" ),
+                    HeightmapYn = AssetRegistry.Get<Texture2D>( "Vanilla::Assets/EarthHeight2" ),
+                    HeightmapYp = AssetRegistry.Get<Texture2D>( "Vanilla::Assets/EarthHeight2" ),
+                    HeightmapZn = AssetRegistry.Get<Texture2D>( "Vanilla::Assets/EarthHeight2" ),
+                    HeightmapZp = AssetRegistry.Get<Texture2D>( "Vanilla::Assets/EarthHeight2" ),
+                    MinLevel = -10921,
+                    MaxLevel = 9606
+                }
             }, new ILODQuadModifier[]
             {
                 new LODQuadModifier_FinalizeMesh(),
@@ -148,10 +147,10 @@ namespace HSP._DevUtils
                 new LODQuadModifier_BakeCollisionData(),
             } );
 
-            /*LODQuadSphere lqsWater = cb.gameObject.AddComponent<LODQuadSphere>();
+            LODQuadSphere lqsWater = cb.gameObject.AddComponent<LODQuadSphere>();
             lqsWater.SetMode( LODQuadMode.Visual );
-            lqsWater.EdgeSubdivisions = 5;
-            lqsWater.MaxDepth = 11;
+            lqsWater.EdgeSubdivisions = 6;
+            lqsWater.MaxDepth = 10;
             var mat = AssetRegistry.Get<Material>( "builtin::Resources/New Material 2" );
             lqsWater.Materials = new Material[] { mat, mat, mat, mat, mat, mat };
             lqsWater.PoIGetter = () => new Vector3Dbl[]
@@ -161,11 +160,15 @@ namespace HSP._DevUtils
             };
             lqsWater.SetJobs( new ILODQuadModifier[]
             {
-                new LODQuadModifier_MakeQuadMesh()
+                new LODQuadModifier_InitializeMesh(),
+                new LODQuadModifier_Displace()
+                {
+                    Offset = 760
+                }
             }, new ILODQuadModifier[]
             {
-                new LODQuadModifier_MakeMeshData(),
-            } );*/
+                new LODQuadModifier_FinalizeMesh(),
+            } );
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
             comp.IsAttractor = true;

@@ -1,4 +1,5 @@
 ﻿using HSP.Content;
+using HSP.Vanilla.Content.AssetLoaders.DDS;
 using HSP.Vanilla.Scenes.AlwaysLoadedScene;
 using System;
 using System.IO;
@@ -91,27 +92,80 @@ namespace HSP.Vanilla.Content.AssetLoaders
 
         private static Texture2D LoadDDS( string fileName )
         {
-            var fileData = File.ReadAllBytes( fileName );
+            BinaryReader binaryReader = new BinaryReader( new MemoryStream( File.ReadAllBytes( fileName ) ) );
 
-            //if( textureFormat != TextureFormat.DXT1 && textureFormat != TextureFormat.DXT5 )
-            //    throw new Exception( "Invalid TextureFormat. Only DXT1 and DXT5 formats are supported by this method." );
+            if( binaryReader.ReadUInt32() != FourCC.DDS_ )
+            {
+                throw new IOException( $"File '{fileName}' is not a DDS file!" );
+            }
 
-            byte ddsSizeCheck = fileData[4];
-            if( ddsSizeCheck != 124 )
-                throw new Exception( "Invalid DDS DXTn texture. Unable to read" );  //this header byte should be 124 for DDS image files
+            DDSHeader ddsHeader = new DDSHeader( binaryReader );
 
-            int height = fileData[13] * 256 + fileData[12];
-            int width = fileData[17] * 256 + fileData[16];
+            bool mipChain = ddsHeader.ddsCaps.dwCaps.HasFlag( DDSCaps.MIPMAP );
 
-            const int DDS_HEADER_SIZE = 128;
-            byte[] dxtBytes = new byte[fileData.Length - DDS_HEADER_SIZE];
-            Buffer.BlockCopy( fileData, DDS_HEADER_SIZE, dxtBytes, 0, fileData.Length - DDS_HEADER_SIZE );
+            if( ddsHeader.ddpfPixelFormat.dwFourCC == 0 )
+            {
+                // explicit format from bit RGBA mask
+                uint rBitMask = ddsHeader.ddpfPixelFormat.dwRBitMask;
+                uint gBitMask = ddsHeader.ddpfPixelFormat.dwGBitMask;
+                uint bBitMask = ddsHeader.ddpfPixelFormat.dwBBitMask;
+                uint aBitMask = ddsHeader.ddpfPixelFormat.dwRGBAlphaBitMask;
 
-            Texture2D texture = new Texture2D( width, height, TextureFormat.R16, false );
-            texture.LoadRawTextureData( dxtBytes );
-            texture.Apply();
+                TextureFormat format = TextureFormat.Alpha8;
+                if( rBitMask == 0xfff && gBitMask == 0 && bBitMask == 0 && aBitMask == 0 )
+                    format = TextureFormat.R8;
+                else if( rBitMask == 0xfff && gBitMask == 0xfff && bBitMask == 0 && aBitMask == 0 )
+                    format = TextureFormat.RG16;
+                else if( rBitMask == 0xfff && gBitMask == 0xfff && bBitMask == 0xfff && aBitMask == 0 )
+                    format = TextureFormat.RGB24;
+                else if( rBitMask == 0xfff && gBitMask == 0xfff && bBitMask == 0xfff && aBitMask == 0xfff )
+                    format = TextureFormat.RGBA32;
+                else if( rBitMask == 0xffff && gBitMask == 0 && bBitMask == 0 && aBitMask == 0 )
+                    format = TextureFormat.R16;
+                else if( rBitMask == 0xffff && gBitMask == 0xffff && bBitMask == 0 && aBitMask == 0 )
+                    format = TextureFormat.RG32;
+                else if( rBitMask == 0xffff && gBitMask == 0xffff && bBitMask == 0xffff && aBitMask == 0 )
+                    format = TextureFormat.RGB48;
+                else if( rBitMask == 0xffff && gBitMask == 0xffff && bBitMask == 0xffff && aBitMask == 0xffff )
+                    format = TextureFormat.RGBA64;
 
-            return (texture);
+                var texture2D = new Texture2D( (int)ddsHeader.dwWidth, (int)ddsHeader.dwHeight, format, mipChain );
+                texture2D.LoadRawTextureData( binaryReader.ReadBytes( (int)(binaryReader.BaseStream.Length - binaryReader.BaseStream.Position) ) );
+                texture2D.Apply( false, false ); // TODO - IsReadable should be a member in the accompanying JSON file.
+                return texture2D;
+            }
+            if( ddsHeader.ddpfPixelFormat.dwFourCC == FourCC.DXT1 )
+            {
+                var texture2D = new Texture2D( (int)ddsHeader.dwWidth, (int)ddsHeader.dwHeight, TextureFormat.DXT1, mipChain );
+                texture2D.LoadRawTextureData( binaryReader.ReadBytes( (int)(binaryReader.BaseStream.Length - binaryReader.BaseStream.Position) ) );
+                texture2D.Apply( false, false );
+                return texture2D;
+            }
+            else if( ddsHeader.ddpfPixelFormat.dwFourCC == FourCC.DXT2 )
+            {
+                Debug.Log( "DXT2 format is not supported!" );
+            }
+            else if( ddsHeader.ddpfPixelFormat.dwFourCC == FourCC.DXT3 )
+            {
+                Debug.LogError( "DXT3 format is not supported." );
+            }
+            else if( ddsHeader.ddpfPixelFormat.dwFourCC == FourCC.DXT4 )
+            {
+                Debug.Log( "DXT4 format is not supported!" );
+            }
+            else if( ddsHeader.ddpfPixelFormat.dwFourCC == FourCC.DXT5 )
+            {
+                var texture2D = new Texture2D( (int)ddsHeader.dwWidth, (int)ddsHeader.dwHeight, TextureFormat.DXT5, mipChain );
+                texture2D.LoadRawTextureData( binaryReader.ReadBytes( (int)(binaryReader.BaseStream.Length - binaryReader.BaseStream.Position) ) );
+                texture2D.Apply( false, false );
+                return texture2D;
+            }
+            else if( ddsHeader.ddpfPixelFormat.dwFourCC == FourCC.DX10 )
+            {
+                Debug.Log( "DX10 format is not supported!" );
+            }
+
+            throw new IOException();
         }
     }
 }

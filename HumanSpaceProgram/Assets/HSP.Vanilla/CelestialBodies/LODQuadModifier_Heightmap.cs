@@ -61,7 +61,7 @@ namespace HSP.Vanilla.CelestialBodies
             double radius;
 
             int totalVertices;
-            Vector2 faceCenter;
+            Vector2 minCorner;
             float edgeLength;
             float halfSize;
 
@@ -107,7 +107,7 @@ namespace HSP.Vanilla.CelestialBodies
                 radius = default;
                 halfSize = default;
                 sideEdges = default;
-                faceCenter = default;
+                minCorner = default;
                 edgeLength = default;
                 sideVertices = default;
                 totalVertices = default;
@@ -123,8 +123,8 @@ namespace HSP.Vanilla.CelestialBodies
                 sideVertices = r.SideVertices;
                 totalVertices = sideVertices * sideVertices;
                 edgeLength = r.Node.Size / sideEdges;
-                faceCenter = r.Node.FaceCenter;// - (Vector2.one * (r.Node.Size / 2));
                 halfSize = r.Node.Size / 2;
+                minCorner = r.Node.FaceCenter - (Vector2.one * halfSize);
 
                 resultVertices = r.ResultVertices;
             }
@@ -262,8 +262,8 @@ namespace HSP.Vanilla.CelestialBodies
 
                         Vector3Dbl dir = resultVertices[index].normalized;
 
-                        double ypx = (x * edgeLength) + faceCenter.x - halfSize;
-                        double ypy = (y * edgeLength) + faceCenter.y - halfSize;
+                        double ypx = (x * edgeLength) + minCorner.x;
+                        double ypy = (y * edgeLength) + minCorner.y;
                         //Vector3Dbl offset = dir * SampleHeightmapPoint( ypx, ypy );
                         Vector3Dbl offset = dir * SampleHeightmapLinear( ypx, ypy );
 

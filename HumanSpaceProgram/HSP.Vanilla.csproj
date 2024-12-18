@@ -137,6 +137,7 @@
     <Compile Include="Assets\HSP.Vanilla\Components\FReactionControlController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FControlFrame.cs" />
     <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\PinnedLODSphereReferenceFrameTransform.cs" />
+    <Compile Include="Assets\HSP.Vanilla\CelestialBodies\LODQuadModifier_NoiseDisplace.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla\___HSP.Vanilla.asmdef" />
