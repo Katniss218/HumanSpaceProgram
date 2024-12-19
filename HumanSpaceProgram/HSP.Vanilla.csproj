@@ -68,6 +68,7 @@
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\Cameras\DesignSceneCameraManager.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\F3AxisActuator.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\OnStartup.cs" />
+    <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\PinnedLODSphereReferenceFrameTransform.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FSequencer.SequenceElement.cs" />
     <Compile Include="Assets\HSP.Vanilla\OnActiveVesselChanged.cs" />
     <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\FreeReferenceFrameTransform.cs" />
@@ -113,6 +114,7 @@
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\Tools\VanillaToolRegisterer.cs" />
     <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\PinnedReferenceFrameTransform.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\Tools\RotateTool.cs" />
+    <Compile Include="Assets\HSP.Vanilla\CelestialBodies\LODQuadModifier_NoiseDisplace.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\AlwaysLoadedScene\OnStartup.cs" />
     <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\KinematicReferenceFrameTransform.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\DesignSceneEscapeInputController.cs" />
@@ -136,8 +138,6 @@
     <Compile Include="Assets\HSP.Vanilla\Components\FLaunchSiteMarker.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FReactionControlController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FControlFrame.cs" />
-    <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\PinnedLODSphereReferenceFrameTransform.cs" />
-    <Compile Include="Assets\HSP.Vanilla\CelestialBodies\LODQuadModifier_NoiseDisplace.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla\___HSP.Vanilla.asmdef" />

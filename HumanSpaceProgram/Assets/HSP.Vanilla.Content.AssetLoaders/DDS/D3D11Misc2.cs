@@ -1,4 +1,5 @@
-﻿namespace HSP.Vanilla.Content.AssetLoaders.DDS
+﻿
+namespace HSP.Vanilla.Content.AssetLoaders.DDS
 {
     public enum D3D11Misc2 : uint
     {

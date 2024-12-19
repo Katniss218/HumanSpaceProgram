@@ -1,11 +1,18 @@
 ﻿using HSP.Content;
+using HSP.Timelines;
 using HSP.Vanilla.Content.AssetLoaders.DDS;
+using HSP.Vanilla.Content.AssetLoaders.Metadata;
 using HSP.Vanilla.Scenes.AlwaysLoadedScene;
 using System;
 using System.IO;
+using System.Xml.Linq;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
+using UnityEngine.Profiling.Memory.Experimental;
+using UnityEngine.Tilemaps;
 using UnityPlus.AssetManagement;
+using UnityPlus.Serialization;
+using UnityPlus.Serialization.DataHandlers;
 
 namespace HSP.Vanilla.Content.AssetLoaders
 {
@@ -33,32 +40,47 @@ namespace HSP.Vanilla.Content.AssetLoaders
                 foreach( var file in files )
                 {
                     string relPath = FixPath( Path.GetRelativePath( modPath, file ) );
-                    // texture
+                    Texture2DMetadata metadata = GetTextureMetadata( Path.ChangeExtension( file, ".json" ) );
                     // sprite
-                    AssetRegistry.RegisterLazy( $"{modId}::{relPath}", () => LoadPNG( file, GraphicsFormat.R8G8B8A8_SRGB, TextureCreationFlags.MipChain ), true );
+                    AssetRegistry.RegisterLazy( $"{modId}::{relPath}", () => LoadPNG( file, metadata ), true );
                 }
 
                 files = Directory.GetFiles( modPath, "*.jpg", SearchOption.AllDirectories );
                 foreach( var file in files )
                 {
                     string relPath = FixPath( Path.GetRelativePath( modPath, file ) );
-                    AssetRegistry.RegisterLazy( $"{modId}::{relPath}", () => LoadJPG( file, GraphicsFormat.R8G8B8A8_SRGB, TextureCreationFlags.MipChain ), true );
+                    Texture2DMetadata metadata = GetTextureMetadata( Path.ChangeExtension( file, ".json" ) );
+                    // sprite
+                    AssetRegistry.RegisterLazy( $"{modId}::{relPath}", () => LoadJPG( file, metadata ), true );
                 }
 
                 files = Directory.GetFiles( modPath, "*.tga", SearchOption.AllDirectories );
                 foreach( var file in files )
                 {
                     string relPath = FixPath( Path.GetRelativePath( modPath, file ) );
-                    AssetRegistry.RegisterLazy( $"{modId}::{relPath}", () => LoadTGA( file, GraphicsFormat.R8G8B8A8_SRGB, TextureCreationFlags.MipChain ), true );
+                    Texture2DMetadata metadata = GetTextureMetadata( Path.ChangeExtension( file, ".json" ) );
+                    // sprite
+                    AssetRegistry.RegisterLazy( $"{modId}::{relPath}", () => LoadTGA( file, metadata ), true );
                 }
 
                 files = Directory.GetFiles( modPath, "*.dds", SearchOption.AllDirectories );
                 foreach( var file in files )
                 {
                     string relPath = FixPath( Path.GetRelativePath( modPath, file ) );
-                    AssetRegistry.RegisterLazy( $"{modId}::{relPath}", () => LoadDDS( file ), true );
+                    Texture2DMetadata metadata = GetTextureMetadata( Path.ChangeExtension( file, ".json" ) );
+                    // sprite
+                    AssetRegistry.RegisterLazy( $"{modId}::{relPath}", () => LoadDDS( file, metadata ), true );
                 }
             }
+        }
+
+        private static Texture2DMetadata GetTextureMetadata( string metaPath )
+        {
+            if( !File.Exists( metaPath ) )
+                return new Texture2DMetadata();
+
+            JsonSerializedDataHandler _vesselsDataHandler = new JsonSerializedDataHandler( metaPath );
+            return SerializationUnit.Deserialize<Texture2DMetadata>( _vesselsDataHandler.Read() );
         }
 
         private static string FixPath( string assetPath )
@@ -66,31 +88,40 @@ namespace HSP.Vanilla.Content.AssetLoaders
             return assetPath.Replace( "\\", "/" ).Split( "." )[0];
         }
 
-        private static Texture2D LoadPNG( string fileName, GraphicsFormat format, TextureCreationFlags flags )
+        private static Texture2D LoadPNG( string fileName, Texture2DMetadata metadata )
         {
-            var fileData = File.ReadAllBytes( fileName );
-            Texture2D tex = new Texture2D( 2, 2, format, flags );
-            tex.LoadImage( fileData );
+            var fileBytes = File.ReadAllBytes( fileName );
+            Texture2D tex = new Texture2D( 2, 2, metadata.GraphicsFormat, metadata.MipMapCount, TextureCreationFlags.MipChain );
+            tex.wrapMode = metadata.WrapMode;
+            tex.filterMode = metadata.FilterMode;
+            tex.anisoLevel = metadata.AnisoLevel;
+            tex.LoadImage( fileBytes, !metadata.Readable );
             return tex;
         }
 
-        private static Texture2D LoadJPG( string fileName, GraphicsFormat format, TextureCreationFlags flags )
+        private static Texture2D LoadJPG( string fileName, Texture2DMetadata metadata )
         {
-            var fileData = File.ReadAllBytes( fileName );
-            Texture2D tex = new Texture2D( 2, 2, format, flags );
-            tex.LoadImage( fileData );
+            var fileBytes = File.ReadAllBytes( fileName );
+            Texture2D tex = new Texture2D( 2, 2, metadata.GraphicsFormat, metadata.MipMapCount, TextureCreationFlags.MipChain );
+            tex.wrapMode = metadata.WrapMode;
+            tex.filterMode = metadata.FilterMode;
+            tex.anisoLevel = metadata.AnisoLevel;
+            tex.LoadImage( fileBytes, !metadata.Readable );
             return tex;
         }
 
-        private static Texture2D LoadTGA( string fileName, GraphicsFormat format, TextureCreationFlags flags )
+        private static Texture2D LoadTGA( string fileName, Texture2DMetadata metadata )
         {
-            var fileData = File.ReadAllBytes( fileName );
-            Texture2D tex = new Texture2D( 2, 2, format, flags );
-            tex.LoadImage( fileData );
+            var fileBytes = File.ReadAllBytes( fileName );
+            Texture2D tex = new Texture2D( 2, 2, metadata.GraphicsFormat, metadata.MipMapCount, TextureCreationFlags.MipChain );
+            tex.wrapMode = metadata.WrapMode;
+            tex.filterMode = metadata.FilterMode;
+            tex.anisoLevel = metadata.AnisoLevel;
+            tex.LoadImage( fileBytes, !metadata.Readable );
             return tex;
         }
 
-        private static Texture2D LoadDDS( string fileName )
+        private static Texture2D LoadDDS( string fileName, Texture2DMetadata metadata )
         {
             BinaryReader binaryReader = new BinaryReader( new MemoryStream( File.ReadAllBytes( fileName ) ) );
 
@@ -129,17 +160,23 @@ namespace HSP.Vanilla.Content.AssetLoaders
                 else if( rBitMask == 0xffff && gBitMask == 0xffff && bBitMask == 0xffff && aBitMask == 0xffff )
                     format = TextureFormat.RGBA64;
 
-                var texture2D = new Texture2D( (int)ddsHeader.dwWidth, (int)ddsHeader.dwHeight, format, mipChain );
-                texture2D.LoadRawTextureData( binaryReader.ReadBytes( (int)(binaryReader.BaseStream.Length - binaryReader.BaseStream.Position) ) );
-                texture2D.Apply( false, false ); // TODO - IsReadable should be a member in the accompanying JSON file.
-                return texture2D;
+                Texture2D tex = new Texture2D( (int)ddsHeader.dwWidth, (int)ddsHeader.dwHeight, format, mipChain );
+                tex.wrapMode = metadata.WrapMode;
+                tex.filterMode = metadata.FilterMode;
+                tex.anisoLevel = metadata.AnisoLevel;
+                tex.LoadRawTextureData( binaryReader.ReadBytes( (int)(binaryReader.BaseStream.Length - binaryReader.BaseStream.Position) ) );
+                tex.Apply( false, !metadata.Readable );
+                return tex;
             }
             if( ddsHeader.ddpfPixelFormat.dwFourCC == FourCC.DXT1 )
             {
-                var texture2D = new Texture2D( (int)ddsHeader.dwWidth, (int)ddsHeader.dwHeight, TextureFormat.DXT1, mipChain );
-                texture2D.LoadRawTextureData( binaryReader.ReadBytes( (int)(binaryReader.BaseStream.Length - binaryReader.BaseStream.Position) ) );
-                texture2D.Apply( false, false );
-                return texture2D;
+                Texture2D tex = new Texture2D( (int)ddsHeader.dwWidth, (int)ddsHeader.dwHeight, TextureFormat.DXT1, mipChain );
+                tex.wrapMode = metadata.WrapMode;
+                tex.filterMode = metadata.FilterMode;
+                tex.anisoLevel = metadata.AnisoLevel;
+                tex.LoadRawTextureData( binaryReader.ReadBytes( (int)(binaryReader.BaseStream.Length - binaryReader.BaseStream.Position) ) );
+                tex.Apply( false, !metadata.Readable );
+                return tex;
             }
             else if( ddsHeader.ddpfPixelFormat.dwFourCC == FourCC.DXT2 )
             {
@@ -155,10 +192,13 @@ namespace HSP.Vanilla.Content.AssetLoaders
             }
             else if( ddsHeader.ddpfPixelFormat.dwFourCC == FourCC.DXT5 )
             {
-                var texture2D = new Texture2D( (int)ddsHeader.dwWidth, (int)ddsHeader.dwHeight, TextureFormat.DXT5, mipChain );
-                texture2D.LoadRawTextureData( binaryReader.ReadBytes( (int)(binaryReader.BaseStream.Length - binaryReader.BaseStream.Position) ) );
-                texture2D.Apply( false, false );
-                return texture2D;
+                Texture2D tex = new Texture2D( (int)ddsHeader.dwWidth, (int)ddsHeader.dwHeight, TextureFormat.DXT5, mipChain );
+                tex.wrapMode = metadata.WrapMode;
+                tex.filterMode = metadata.FilterMode;
+                tex.anisoLevel = metadata.AnisoLevel;
+                tex.LoadRawTextureData( binaryReader.ReadBytes( (int)(binaryReader.BaseStream.Length - binaryReader.BaseStream.Position) ) );
+                tex.Apply( false, !metadata.Readable );
+                return tex;
             }
             else if( ddsHeader.ddpfPixelFormat.dwFourCC == FourCC.DX10 )
             {

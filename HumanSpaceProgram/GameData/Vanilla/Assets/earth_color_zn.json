@@ -1,0 +1,5 @@
+{
+    "graphics_format": "R8G8B8A8_SRGB",
+    "wrap_mode": "Mirror",
+    "filter_mode": "Bilinear"
+}

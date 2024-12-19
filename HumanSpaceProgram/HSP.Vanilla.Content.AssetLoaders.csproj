@@ -58,22 +58,24 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\GameDataJsonPartFactory.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\GameDataJsonVesselFactory.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\GameDataTextureLoader.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DDSHeader.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DDPixelFormat.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DDSCaps.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DDSCaps2.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DDSHeaderDX10.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DXGIFormat.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DDSD.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\D3D11Misc.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DDSHeader.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\D3D11Misc2.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\D3D11ResourceDimension.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\D3D11Misc.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\GameDataJsonPartFactory.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DDSD.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\GameDataJsonVesselFactory.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DDSCaps2.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DDPF.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\D3D11ResourceDimension.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DDSHeaderDX10.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\GameDataTextureLoader.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DXGIFormat.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DDCaps.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\FourCC.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\Metadata\Texture2DMetadata.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\Metadata\SpriteMetadata.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla.Content.AssetLoaders\___HSP.Vanilla.Content.AssetLoaders.asmdef" />

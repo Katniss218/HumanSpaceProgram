@@ -5,6 +5,9 @@ using UnityEngine;
 
 namespace HSP.Vanilla.CelestialBodies
 {
+    /// <summary>
+    /// Displaces the LOD quad vertices uniformly along their existing position vectors.
+    /// </summary>
     public class LODQuadModifier_Displace : ILODQuadModifier
     {
         public LODQuadMode QuadMode => LODQuadMode.VisualAndCollider;

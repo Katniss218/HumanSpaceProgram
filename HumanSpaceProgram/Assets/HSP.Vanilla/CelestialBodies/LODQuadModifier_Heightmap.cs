@@ -137,6 +137,26 @@ namespace HSP.Vanilla.CelestialBodies
             {
             }
 
+            public void Execute()
+            {
+                for( int x = 0; x < sideVertices; x++ )
+                {
+                    for( int y = 0; y < sideVertices; y++ )
+                    {
+                        int index = GetIndex( x, y );
+
+                        Vector3Dbl dir = resultVertices[index].normalized;
+
+                        double ypx = (x * edgeLength) + minCorner.x;
+                        double ypy = (y * edgeLength) + minCorner.y;
+                        //Vector3Dbl offset = dir * SampleHeightmapPoint( ypx, ypy );
+                        Vector3Dbl offset = dir * SampleHeightmapLinear( ypx, ypy );
+
+                        resultVertices[index] += offset;
+                    }
+                }
+            }
+
             [MethodImpl( MethodImplOptions.AggressiveInlining )]
             private int GetIndex( int x, int y )
             {
@@ -152,50 +172,90 @@ namespace HSP.Vanilla.CelestialBodies
             [MethodImpl( MethodImplOptions.AggressiveInlining )]
             private double SampleHeightmapLinear( double x, double y )
             {
-                double halfRes = _widthXn * 0.5;
-                double u = (x + 1) * halfRes - 0.5f;
-                double v = (y + 1) * halfRes - 0.5f;
-
-                int x0 = Mathf.Clamp( (int)Math.Floor( u ), 0, _widthXn - 1 );
-                int y0 = Mathf.Clamp( (int)Math.Floor( v ), 0, _widthXn - 1 );
-
-                int x1 = Mathf.Clamp( x0 + 1, 0, _widthXn - 1 );
-                int y1 = Mathf.Clamp( y0 + 1, 0, _widthXn - 1 );
-
+                double u, v;
+                int x0, y0, x1, y1;
                 ushort h00, h01, h10, h11;
                 switch( face )
                 {
                     case Direction3D.Xn:
+                        u = (x + 1) * (_widthXn * 0.5f) - 0.5f;
+                        v = (y + 1) * (_heightXn * 0.5f) - 0.5f;
+                        x0 = Mathf.Clamp( (int)Math.Floor( u ), 0, _widthXn - 1 );
+                        y0 = Mathf.Clamp( (int)Math.Floor( v ), 0, _heightXn - 1 );
+
+                        x1 = Mathf.Clamp( x0 + 1, 0, _widthXn - 1 );
+                        y1 = Mathf.Clamp( y0 + 1, 0, _heightXn - 1 );
+
                         h00 = _heightmapArray16bitXn[y0 * _widthXn + x0];
                         h10 = _heightmapArray16bitXn[y0 * _widthXn + x1];
                         h01 = _heightmapArray16bitXn[y1 * _widthXn + x0];
                         h11 = _heightmapArray16bitXn[y1 * _widthXn + x1];
                         break;
                     case Direction3D.Xp:
+                        u = (x + 1) * (_widthXp * 0.5f) - 0.5f;
+                        v = (y + 1) * (_heightXp * 0.5f) - 0.5f;
+                        x0 = Mathf.Clamp( (int)Math.Floor( u ), 0, _widthXp - 1 );
+                        y0 = Mathf.Clamp( (int)Math.Floor( v ), 0, _heightXp - 1 );
+
+                        x1 = Mathf.Clamp( x0 + 1, 0, _widthXp - 1 );
+                        y1 = Mathf.Clamp( y0 + 1, 0, _heightXp - 1 );
+
                         h00 = _heightmapArray16bitXp[y0 * _widthXp + x0];
                         h10 = _heightmapArray16bitXp[y0 * _widthXp + x1];
                         h01 = _heightmapArray16bitXp[y1 * _widthXp + x0];
                         h11 = _heightmapArray16bitXp[y1 * _widthXp + x1];
                         break;
                     case Direction3D.Yn:
+                        u = (x + 1) * (_widthYn * 0.5f) - 0.5f;
+                        v = (y + 1) * (_heightYn * 0.5f) - 0.5f;
+                        x0 = Mathf.Clamp( (int)Math.Floor( u ), 0, _widthYn - 1 );
+                        y0 = Mathf.Clamp( (int)Math.Floor( v ), 0, _heightYn - 1 );
+
+                        x1 = Mathf.Clamp( x0 + 1, 0, _widthYn - 1 );
+                        y1 = Mathf.Clamp( y0 + 1, 0, _heightYn - 1 );
+
                         h00 = _heightmapArray16bitYn[y0 * _widthYn + x0];
                         h10 = _heightmapArray16bitYn[y0 * _widthYn + x1];
                         h01 = _heightmapArray16bitYn[y1 * _widthYn + x0];
                         h11 = _heightmapArray16bitYn[y1 * _widthYn + x1];
                         break;
                     case Direction3D.Yp:
+                        u = (x + 1) * (_widthYp * 0.5f) - 0.5f;
+                        v = (y + 1) * (_heightYp * 0.5f) - 0.5f;
+                        x0 = Mathf.Clamp( (int)Math.Floor( u ), 0, _widthYp - 1 );
+                        y0 = Mathf.Clamp( (int)Math.Floor( v ), 0, _heightYp - 1 );
+
+                        x1 = Mathf.Clamp( x0 + 1, 0, _widthYp - 1 );
+                        y1 = Mathf.Clamp( y0 + 1, 0, _heightYp - 1 );
+
                         h00 = _heightmapArray16bitYp[y0 * _widthYp + x0];
                         h10 = _heightmapArray16bitYp[y0 * _widthYp + x1];
                         h01 = _heightmapArray16bitYp[y1 * _widthYp + x0];
                         h11 = _heightmapArray16bitYp[y1 * _widthYp + x1];
                         break;
                     case Direction3D.Zn:
+                        u = (x + 1) * (_widthZn * 0.5f) - 0.5f;
+                        v = (y + 1) * (_heightZn * 0.5f) - 0.5f;
+                        x0 = Mathf.Clamp( (int)Math.Floor( u ), 0, _widthZn - 1 );
+                        y0 = Mathf.Clamp( (int)Math.Floor( v ), 0, _heightZn - 1 );
+
+                        x1 = Mathf.Clamp( x0 + 1, 0, _widthZn - 1 );
+                        y1 = Mathf.Clamp( y0 + 1, 0, _heightZn - 1 );
+
                         h00 = _heightmapArray16bitZn[y0 * _widthZn + x0];
                         h10 = _heightmapArray16bitZn[y0 * _widthZn + x1];
                         h01 = _heightmapArray16bitZn[y1 * _widthZn + x0];
                         h11 = _heightmapArray16bitZn[y1 * _widthZn + x1];
                         break;
                     case Direction3D.Zp:
+                        u = (x + 1) * (_widthZp * 0.5f) - 0.5f;
+                        v = (y + 1) * (_heightZp * 0.5f) - 0.5f;
+                        x0 = Mathf.Clamp( (int)Math.Floor( u ), 0, _widthZp - 1 );
+                        y0 = Mathf.Clamp( (int)Math.Floor( v ), 0, _heightZp - 1 );
+
+                        x1 = Mathf.Clamp( x0 + 1, 0, _widthZp - 1 );
+                        y1 = Mathf.Clamp( y0 + 1, 0, _heightZp - 1 );
+
                         h00 = _heightmapArray16bitZp[y0 * _widthZp + x0];
                         h10 = _heightmapArray16bitZp[y0 * _widthZp + x1];
                         h01 = _heightmapArray16bitZp[y1 * _widthZp + x0];
@@ -218,31 +278,57 @@ namespace HSP.Vanilla.CelestialBodies
             [MethodImpl( MethodImplOptions.AggressiveInlining )]
             private double SampleHeightmapPoint( double x, double y )
             {
-                double halfRes = _widthXn * 0.5;
-                double u = (x + 1) * halfRes;
-                double v = (y + 1) * halfRes;
-                int x0 = Mathf.Clamp( (int)Math.Floor( u ), 0, _widthXn - 1 );
-                int y0 = Mathf.Clamp( (int)Math.Floor( v ), 0, _widthXn - 1 );
-
+                double u, v;
+                int x0, y0;
                 ushort pointHeight;
                 switch( face )
                 {
                     case Direction3D.Xn:
+                        u = (x + 1) * (_widthXn * 0.5f);
+                        v = (y + 1) * (_heightXn * 0.5f);
+                        x0 = Mathf.Clamp( (int)Math.Floor( u ), 0, _widthXn - 1 );
+                        y0 = Mathf.Clamp( (int)Math.Floor( v ), 0, _heightXn - 1 );
+
                         pointHeight = _heightmapArray16bitXn[y0 * _widthXn + x0];
                         break;
                     case Direction3D.Xp:
+                        u = (x + 1) * (_widthXp * 0.5f);
+                        v = (y + 1) * (_heightXp * 0.5f);
+                        x0 = Mathf.Clamp( (int)Math.Floor( u ), 0, _widthXp - 1 );
+                        y0 = Mathf.Clamp( (int)Math.Floor( v ), 0, _heightXp - 1 );
+
                         pointHeight = _heightmapArray16bitXp[y0 * _widthXp + x0];
                         break;
                     case Direction3D.Yn:
+                        u = (x + 1) * (_widthYn * 0.5f);
+                        v = (y + 1) * (_heightYn * 0.5f);
+                        x0 = Mathf.Clamp( (int)Math.Floor( u ), 0, _widthYn - 1 );
+                        y0 = Mathf.Clamp( (int)Math.Floor( v ), 0, _heightYn - 1 );
+
                         pointHeight = _heightmapArray16bitYn[y0 * _widthYn + x0];
                         break;
                     case Direction3D.Yp:
+                        u = (x + 1) * (_widthYp * 0.5f);
+                        v = (y + 1) * (_heightYp * 0.5f);
+                        x0 = Mathf.Clamp( (int)Math.Floor( u ), 0, _widthYp - 1 );
+                        y0 = Mathf.Clamp( (int)Math.Floor( v ), 0, _heightYp - 1 );
+
                         pointHeight = _heightmapArray16bitYp[y0 * _widthYp + x0];
                         break;
                     case Direction3D.Zn:
+                        u = (x + 1) * (_widthZn * 0.5f);
+                        v = (y + 1) * (_heightZn * 0.5f);
+                        x0 = Mathf.Clamp( (int)Math.Floor( u ), 0, _widthZn - 1 );
+                        y0 = Mathf.Clamp( (int)Math.Floor( v ), 0, _heightZn - 1 );
+
                         pointHeight = _heightmapArray16bitZn[y0 * _widthZn + x0];
                         break;
                     case Direction3D.Zp:
+                        u = (x + 1) * (_widthZp * 0.5f);
+                        v = (y + 1) * (_heightZp * 0.5f);
+                        x0 = Mathf.Clamp( (int)Math.Floor( u ), 0, _widthZp - 1 );
+                        y0 = Mathf.Clamp( (int)Math.Floor( v ), 0, _heightZp - 1 );
+
                         pointHeight = _heightmapArray16bitZp[y0 * _widthZp + x0];
                         break;
                     default:
@@ -250,26 +336,6 @@ namespace HSP.Vanilla.CelestialBodies
                 }
 
                 return ((pointHeight / 65535.0) * (maxlevel - minlevel)) + minlevel;
-            }
-
-            public void Execute()
-            {
-                for( int x = 0; x < sideVertices; x++ )
-                {
-                    for( int y = 0; y < sideVertices; y++ )
-                    {
-                        int index = GetIndex( x, y );
-
-                        Vector3Dbl dir = resultVertices[index].normalized;
-
-                        double ypx = (x * edgeLength) + minCorner.x;
-                        double ypy = (y * edgeLength) + minCorner.y;
-                        //Vector3Dbl offset = dir * SampleHeightmapPoint( ypx, ypy );
-                        Vector3Dbl offset = dir * SampleHeightmapLinear( ypx, ypy );
-
-                        resultVertices[index] += offset;
-                    }
-                }
             }
         }
     }
