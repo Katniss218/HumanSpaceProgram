@@ -58,8 +58,6 @@ namespace HSP.Vanilla.CelestialBodies
             double maxlevel;
             double minlevel;
 
-            double radius;
-
             int totalVertices;
             Vector2 minCorner;
             float edgeLength;
@@ -104,7 +102,6 @@ namespace HSP.Vanilla.CelestialBodies
                 _heightZp = modifier.HeightmapZp.height;
 
                 face = default;
-                radius = default;
                 halfSize = default;
                 sideEdges = default;
                 minCorner = default;
@@ -116,7 +113,6 @@ namespace HSP.Vanilla.CelestialBodies
 
             public void Initialize( LODQuadRebuildData r, LODQuadRebuildAdditionalData _ )
             {
-                radius = (float)r.CelestialBody.Radius;
                 face = r.Node.Face;
 
                 sideEdges = r.SideEdges;

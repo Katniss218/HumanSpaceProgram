@@ -32,7 +32,6 @@ namespace HSP.Vanilla.CelestialBodies
             int sideVertices;
             int sideEdges;
 
-            [ReadOnly]
             NativeArray<int> resultTriangles;
             [ReadOnly]
             NativeArray<Vector2> resultUVs;

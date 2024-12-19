@@ -107,7 +107,8 @@ namespace HSP.Vanilla.UI.Components
             RawImage rawImage = rawGameObject.AddComponent<RawImage>();
             rawImage.texture = NavballRenderTextureManager.AttitudeIndicatorRT;
 
-            UIIcon attitudeIndicator = navball.AddIcon( new UILayoutInfo( UIFill.Fill() ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/attitude_indicator" ) );
+            //UIIcon attitudeIndicator = navball.AddIcon( new UILayoutInfo( UIFill.Fill() ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/attitude_indicator" ) );
+            UIIcon attitudeIndicator = navball.AddIcon( new UILayoutInfo( UIFill.Fill() ), AssetRegistry.Get<Sprite>( "Vanilla::Assets/attitude_indicator_sprite" ) );
 
 
             UIIcon prograde = mask.AddIcon( new UILayoutInfo( UIAnchor.Center, (0, 0), (34, 34) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/nodes/m_prograde" ) );

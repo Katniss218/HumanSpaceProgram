@@ -41,6 +41,14 @@ namespace HSP.Vanilla.Content.AssetLoaders
                 {
                     string relPath = FixPath( Path.GetRelativePath( modPath, file ) );
                     Texture2DMetadata metadata = GetTextureMetadata( Path.ChangeExtension( file, ".json" ) );
+                    string spritePath =  file.Replace( ".png", "_sprite.json" );
+                    if( File.Exists( spritePath ) )
+                    {
+                        JsonSerializedDataHandler dataHandler = new JsonSerializedDataHandler( spritePath );
+                        SpriteMetadata sm = SerializationUnit.Deserialize<SpriteMetadata>( dataHandler.Read() );
+                        string spriteRelPath = FixPath( Path.GetRelativePath( modPath, spritePath ) );
+                        AssetRegistry.RegisterLazy( $"{modId}::{spriteRelPath}", () => Sprite.Create( AssetRegistry.Get<Texture2D>( $"{modId}::{relPath}" ), sm.Rect, sm.Pivot, 100, 1, SpriteMeshType.Tight, sm.Border ), true );
+                    }
                     // sprite
                     AssetRegistry.RegisterLazy( $"{modId}::{relPath}", () => LoadPNG( file, metadata ), true );
                 }
@@ -79,8 +87,8 @@ namespace HSP.Vanilla.Content.AssetLoaders
             if( !File.Exists( metaPath ) )
                 return new Texture2DMetadata();
 
-            JsonSerializedDataHandler _vesselsDataHandler = new JsonSerializedDataHandler( metaPath );
-            return SerializationUnit.Deserialize<Texture2DMetadata>( _vesselsDataHandler.Read() );
+            JsonSerializedDataHandler dataHandler = new JsonSerializedDataHandler( metaPath );
+            return SerializationUnit.Deserialize<Texture2DMetadata>( dataHandler.Read() );
         }
 
         private static string FixPath( string assetPath )
