@@ -112,8 +112,8 @@ namespace HSP._DevUtils
                     HeightmapYp = AssetRegistry.Get<Texture2D>( "Vanilla::Assets/earth_height_yp" ),
                     HeightmapZn = AssetRegistry.Get<Texture2D>( "Vanilla::Assets/earth_height_zn" ),
                     HeightmapZp = AssetRegistry.Get<Texture2D>( "Vanilla::Assets/earth_height_zp" ),
-                    MinLevel = -11522,
-                    MaxLevel = 8724
+                    MinLevel = -11684,
+                    MaxLevel = 8848
                 }
             }, new ILODQuadModifier[]
             {
@@ -136,8 +136,8 @@ namespace HSP._DevUtils
                     HeightmapYp = AssetRegistry.Get<Texture2D>( "Vanilla::Assets/earth_height_yp" ),
                     HeightmapZn = AssetRegistry.Get<Texture2D>( "Vanilla::Assets/earth_height_zn" ),
                     HeightmapZp = AssetRegistry.Get<Texture2D>( "Vanilla::Assets/earth_height_zp" ),
-                    MinLevel = -11522,
-                    MaxLevel = 8724
+                    MinLevel = -11684,
+                    MaxLevel = 8848
                 }
             }, new ILODQuadModifier[]
             {
