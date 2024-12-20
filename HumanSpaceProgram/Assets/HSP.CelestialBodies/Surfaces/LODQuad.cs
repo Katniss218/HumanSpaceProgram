@@ -1,389 +1,108 @@
 ﻿using HSP.ReferenceFrames;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Unity.Jobs;
 using UnityEngine;
 
 namespace HSP.CelestialBodies.Surfaces
 {
     /// <summary>
-    /// A subdivisible inflated quad.
+    /// The front end for <see cref="LODQuadTreeNode"/>.
+    /// A single quad of a LOD sphere.
     /// </summary>
-    [RequireComponent( typeof( MeshFilter ) )]
-    [RequireComponent( typeof( MeshCollider ) )]
-    [RequireComponent( typeof( MeshRenderer ) )]
-    public class LODQuad : MonoBehaviour
+    public sealed class LODQuad : MonoBehaviour
     {
-        public abstract class State
-        {
-            public class Idle : State
-            {
-
-            }
-            public class Active : State
-            {
-
-            }
-            public class Rebuild : State
-            {
-                public MakeQuadMesh_Job Job;
-                public JobHandle JobHandle;
-            }
-        }
-
-        public LODQuadTree.Node Node { get; private set; }
+        /// <summary>
+        /// The LOD sphere that this quad belongs to.
+        /// </summary>
+        public LODQuadSphere QuadSphere { get; private set; }
 
         /// <summary>
-        /// How many edge subdivision steps to apply for each quad, on top of and regardless of <see cref="SubdivisionLevel"/>.
+        /// The backend node that this quad is associated with.
         /// </summary>
-        public int EdgeSubdivisions { get => _quadSphere.EdgeSubdivisions; }
+        public LODQuadTreeNode Node { get; private set; }
 
-        public CelestialBody CelestialBody { get; private set; }
-
-        public float SubdivisionDistance { get; private set; }
-
-        public Vector3Dbl[] AirfPOIs { get; set; }
-
-        [field: SerializeField]
-        public int SubdivisionLevel { get; private set; }
-
-        internal State CurrentState { get; private set; }
-
-        Direction3D _quadSphereFace;
+        Mesh _mesh;
 
         MeshFilter _meshFilter;
         MeshCollider _meshCollider;
         MeshRenderer _meshRenderer;
 
-        LODQuadSphere _quadSphere;
-
-        [SerializeField]
-        public LODQuad[] Edges = new LODQuad[4];
-
-        void Awake()
+        public void ResetMaterial()
         {
-            _meshFilter = this.GetComponent<MeshFilter>();
-            _meshCollider = this.GetComponent<MeshCollider>();
-            _meshRenderer = this.GetComponent<MeshRenderer>();
-        }
-
-        internal void SetState( State state )
-        {
-            if( this.CurrentState is State.Rebuild r )
+            if( this._meshRenderer != null )
             {
-                r.JobHandle.Complete();
-                r.Job.Finish( this );
-            }
-
-            if( state is State.Rebuild rebuild )
-            {
-                rebuild.Job.Initialize( this ); // This (and collection) would have to be Reflection-ified to make it extendable by other user-provided assemblies.
-                rebuild.JobHandle = rebuild.Job.Schedule();
-            }
-
-            this.CurrentState = state;
-        }
-
-        internal void SetMesh( Mesh mesh )
-        {
-            this._meshCollider.sharedMesh = mesh; // this is kinda slow.
-            this._meshFilter.sharedMesh = mesh;
-        }
-
-        internal bool ShouldSubdivide()
-        {
-            if( this.SubdivisionLevel >= _quadSphere.HardLimitSubdivLevel )
-            {
-                return false;
-            }
-
-            if( AirfPOIs == null )
-            {
-                return false;
-            }
-
-            if( AirfPOIs.Length == 0 )
-            {
-                return false;
-            }
-
-            // Check if any of the PIOs is within the subdiv radius.
-            Vector3Dbl airfQuad = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( this.transform.position );
-            foreach( var airfPOI in this.AirfPOIs )
-            {
-                double dist = (airfPOI - airfQuad).magnitude;
-
-                if( (float)dist < SubdivisionDistance )
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        internal bool ShouldUnsubdivide()
-        {
-            if( this.SubdivisionLevel == 0 )
-            {
-                return false;
-            }
-
-            if( AirfPOIs == null ) // default.
-            {
-                return false;
-            }
-
-            if( AirfPOIs.Length == 0 )
-            {
-                return true;
-            }
-
-            foreach( var siblingNode in this.Node.Siblings )
-            {
-                // Don't unsubdivide if one of the siblings is subdivided. That would require handling nested unsubdivisions, and is nasty, blergh and unnecessary.
-                if( siblingNode.Children != null )
-                {
-                    return false;
-                }
-                // Sibling node is still generating - don't unsubdivide.
-                // Without this check - memory leaks due to destroyed Meshing Job handles not freeing their stuff.
-                if( siblingNode.Value != null && siblingNode.Value.CurrentState is State.Rebuild )
-                {
-                    return false;
-                }
-            }
-
-            Vector3 originBodySpace = _quadSphereFace.GetSpherePoint( this.Node.Parent.Center ) * (float)CelestialBody.Radius;
-            Vector3Dbl parentQuadOriginAirf = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( this.CelestialBody.transform.TransformPoint( originBodySpace ) );
-            foreach( var airfPOI in this.AirfPOIs )
-            {
-                double distanceToPoi = (airfPOI - parentQuadOriginAirf).magnitude;
-
-                // Multiply by 2 because parent subdiv range is 2x more than its child, and we don't want the parent to immediately subdivide again.
-                if( distanceToPoi <= this.SubdivisionDistance * 2 )
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        static readonly float Cos45DegPlusEpsilon = Mathf.Cos( 45 * Mathf.Deg2Rad ) + 0.025f; // also, cos(45deg) is equal to sin(45deg)
-
-        private static List<LODQuad> UpdateNeighbors( IEnumerable<LODQuad> neighborQuads, LODQuad newQuad, Direction2D direction )
-        {
-            List<LODQuad> neighborsInSpecifiedDirection = new List<LODQuad>();
-
-            // Find all nodes that lay in a given direction from the current node.
-            foreach( var potentialQuad in neighborQuads )
-            {
-                if( potentialQuad == newQuad )
-                    continue;
-
-                Vector2 toNode = potentialQuad.Node.Center - newQuad.Node.Center;
-
-                // Comparing with Vector2.zero for near-zero vectors leads to rounding errors.
-                if( toNode.x == 0.0f && toNode.y == 0.0f )
-                    continue;
-
-                toNode /= toNode.magnitude; // Using Normalize() on near-zero vectors results in (0,0) instead of the correct vector.
-
-                // if vector's principal axis points towards direction.
-                float dot = Vector2.Dot( toNode, direction.ToVector2() );
-                if( dot > Cos45DegPlusEpsilon )
-                {
-                    neighborsInSpecifiedDirection.Add( potentialQuad );
-                }
-            }
-
-            Direction2D inverseDirection = direction.Inverse();
-
-            List<LODQuad> updatedNeighbors = new List<LODQuad>();
-
-            // Always update the neighbors' edges - in case the current node was unsubdivided, and the edges of all its contacting neighbors need to be updated.
-            foreach( var neighbor in neighborsInSpecifiedDirection )
-            {
-                if( newQuad.SubdivisionLevel > neighbor.SubdivisionLevel ) // equivalent to checking whether there are multiple quads contacting the neighbor.
-                {
-                    continue;
-                }
-
-                // Return the neighbors that have changed.
-                if( neighbor.Edges[(int)inverseDirection] != newQuad )
-                {
-                    neighbor.Edges[(int)inverseDirection] = newQuad;
-                    updatedNeighbors.Add( neighbor );
-                }
-            }
-
-            if( neighborsInSpecifiedDirection.Count != 1 )
-            {
-                // Don't update the current node if there are multiple (smaller) nodes contacting it from a given direction.
-                // - Otherwise, possibly `unsubdividedQuad.neighbors[direction] = mixed;`. Maybe mark the edge with highest, lowest, or maybe mark each interval. idk.
-                return updatedNeighbors;
-            }
-
-            newQuad.Edges[(int)direction] = neighborsInSpecifiedDirection[0];
-            return updatedNeighbors;
-        }
-
-        /// <summary>
-        /// Splits the quad into 4 separate quads.
-        /// </summary>
-        internal void Subdivide( ref List<LODQuad> activeQuads, ref List<LODQuad> needRemeshing )
-        {
-            if( this.Node.Children != null )
-            {
-                throw new InvalidOperationException( "Tried subdividing a subdivided node" );
-            }
-
-            if( this.SubdivisionLevel >= this._quadSphere.HardLimitSubdivLevel )
-            {
-                return;
-            }
-
-            LODQuadTree.Node rootNode = this.Node.Root;
-            int newSubdivisionLevel = this.SubdivisionLevel + 1;
-
-            activeQuads.Remove( this );
-            this.Destroy();
-            // Don't make the parent a leaf, because once subdivided there definitely are children.
-
-            // Create the 4 nodes.
-            LODQuad[] _4_quads = new LODQuad[4];
-
-            for( int i = 0; i < 4; i++ )
-            {
-                (int xIndex, int yIndex) = LODQuadTree_NodeUtils.GetChildIndex( i );
-
-                Vector2 subdividedCenter = LODQuadTree_NodeUtils.GetChildCenter( this.Node, xIndex, yIndex );
-                Vector3 subdividedOrigin = this._quadSphereFace.GetSpherePoint( subdividedCenter.x, subdividedCenter.y ) * (float)this.CelestialBody.Radius;
-
-                LODQuadTree.Node newNode = new LODQuadTree.Node( this.Node, subdividedCenter, LODQuadTree_NodeUtils.GetSize( newSubdivisionLevel ) );
-
-                LODQuad newQuad = Create( this.transform.parent, subdividedOrigin, this._quadSphere, this.CelestialBody, subdividedCenter, newSubdivisionLevel, newNode, this.SubdivisionDistance / 2f, this._meshRenderer.material, this._quadSphereFace );
-                _4_quads[i] = newQuad;
-                activeQuads.Add( newQuad );
-            }
-
-            // Update neighbors.
-            foreach( var quad in _4_quads )
-            {
-                // Query area of each node separately
-                // - because if the entire area is queried, then the nodes that are not direct neighbors of the current node are included and it breaks shit.
-                List<LODQuadTree.Node> queryResult = rootNode.QueryOverlappingLeaves( quad.Node.minX, quad.Node.minY, quad.Node.maxX, quad.Node.maxY );
-
-                foreach( var direction in Direction2DUtils.Every )
-                {
-                    var newN = UpdateNeighbors( queryResult.Where( n => n.Value != null ).Select( n => n.Value ), quad, direction );
-                    needRemeshing.AddRange( newN );
-                }
-                needRemeshing.Add( quad );
+                this._meshRenderer.sharedMaterial = this.QuadSphere.Materials?[(int)this.Node.Face];
             }
         }
 
         /// <summary>
-        /// Joins the quad and its 3 siblings into a single quad of lower subdivision level.
+        /// Checks if the quad is active (visible/enabled).
         /// </summary>
-        internal void Unsubdivide( ref List<LODQuad> activeQuads, ref List<LODQuad> needRemeshing )
+        /// <remarks>
+        /// If the quad is not active, it usually means that it's subdivided, and its child quads are active instead.
+        /// </remarks>
+        public bool IsActive => this.gameObject.activeSelf;
+
+        void OnDestroy()
         {
-            if( this.SubdivisionLevel <= 0 )
-            {
-                Debug.LogWarning( "Tried subdividing an l0 node" );
-                return;
-            }
-
-            foreach( var qSibling in this.Node.Siblings )
-            {
-                if( qSibling.Children != null )
-                {
-                    return; // one of the siblings is subdivided
-                }
-            }
-
-            // cache before removing the node from the quadtree.
-            LODQuadTree.Node rootNode = this.Node.Root;
-            LODQuadTree.Node parentNode = this.Node.Parent;
-
-            foreach( var qSibling in this.Node.Siblings )
-            {
-                qSibling.Value.Destroy();
-                activeQuads.Remove( qSibling.Value );
-            }
-            // Make the parent a leaf, because once unsubdivided, there will be no children. This should also remove it completely from the quadtree.
-            this.Node.Parent.MakeLeaf();
-
-            // create new node.
-            Vector2 unsubdividedCenter = parentNode.Center;
-            Vector3 unsubdividedOrigin = this._quadSphereFace.GetSpherePoint( unsubdividedCenter.x, unsubdividedCenter.y ) * (float)this.CelestialBody.Radius;
-            int newSubdivisionLevel = this.SubdivisionLevel - 1;
-
-            LODQuad newQuad = Create( this.transform.parent, unsubdividedOrigin, this._quadSphere, this.CelestialBody, unsubdividedCenter, newSubdivisionLevel, parentNode, this.SubdivisionDistance * 2f, this._meshRenderer.material, this._quadSphereFace );
-
-            activeQuads.Add( newQuad );
-
-            // update neighbors.
-            List<LODQuadTree.Node> queryResult = rootNode.QueryOverlappingLeaves( newQuad.Node.minX, newQuad.Node.minY, newQuad.Node.maxX, newQuad.Node.maxY );
-
-            foreach( var direction in Direction2DUtils.Every )
-            {
-                var newN = UpdateNeighbors( queryResult.Where( n => n.Value != null ).Select( n => n.Value ), newQuad, direction );
-                needRemeshing.AddRange( newN );
-            }
-            needRemeshing.Add( newQuad );
+            Destroy( _mesh ); // Destroying the mesh prevents a memory leak (One would think that a mesh would have a destructor to handle it, but I guess not).
         }
 
-        /// <summary>
-        /// Destroy the gameobject representation of the quad, and removes that representation from the quadtree.
-        /// </summary>
-        private void Destroy()
+        public void Activate()
         {
-            Destroy( this.gameObject );
-            this.Node.Value = null;
+            this.gameObject.SetActive( true );
+            ResetPositionAndRotation();
         }
 
-        public static LODQuad CreateL0( Transform parent, LODQuadSphere quadSphere, CelestialBody celestialBody, LODQuadTree.Node node, float subdivisionDistance, Material mat, Direction3D face )
+        public void Deactivate()
         {
-            return Create( parent, face.ToVector3() * (float)celestialBody.Radius, quadSphere, celestialBody, Vector2.zero, 0, node, subdivisionDistance, mat, face );
+            this.gameObject.SetActive( false );
         }
 
-        static LODQuad Create( Transform parent, Vector3 localPosition, LODQuadSphere quadSphere, CelestialBody celestialBody, Vector2 center, int lN, LODQuadTree.Node node, float subdivisionDistance, Material mat, Direction3D face )
+        public void ResetPositionAndRotation()
         {
-            GameObject go = new GameObject( $"LODQuad L{lN}, {face}, ({center.x:#0.################}, {center.y:#0.################})" );
-            go.transform.SetParent( parent );
+            IReferenceFrame bodyReferenceFrame = QuadSphere.CelestialBody.ReferenceFrameTransform.OrientedInertialReferenceFrame();
 
-            MeshRenderer mr = go.AddComponent<MeshRenderer>();
-            mr.material = mat;
+            Vector3Dbl airfPos = bodyReferenceFrame.TransformPosition( Node.SphereCenter * QuadSphere.CelestialBody.Radius );
+            QuaternionDbl airfRot = bodyReferenceFrame.TransformRotation( QuaternionDbl.identity );
 
-            go.AddComponent<MeshCollider>();
+            Vector3 scenePos = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformPosition( airfPos );
+            Quaternion sceneRot = (Quaternion)SceneReferenceFrameManager.ReferenceFrame.InverseTransformRotation( airfRot );
 
-            LODQuad newQuad = go.AddComponent<LODQuad>();
-            newQuad.Node = node;
-            node.Value = newQuad;
+            this.transform.SetPositionAndRotation( scenePos, sceneRot );
+        }
 
-            if( lN > 0 )
+        public static LODQuad CreateInactive( LODQuadSphere sphere, LODQuadTreeNode node, Mesh mesh )
+        {
+            GameObject gameObject = new GameObject( $"LODQuad {node.Face}, L{node.SubdivisionLevel}, ({node.FaceCenter.x:#0.################}, {node.FaceCenter.y:#0.################})" );
+            gameObject.transform.SetParent( sphere.QuadParent );
+
+            LODQuad lodQuad = gameObject.AddComponent<LODQuad>();
+            lodQuad.transform.localPosition = (Vector3)(node.SphereCenter * sphere.CelestialBody.Radius);
+            lodQuad.transform.localRotation = Quaternion.identity;
+            lodQuad.transform.localScale = Vector3.one;
+
+            lodQuad._mesh = mesh;
+
+            lodQuad.Node = node;
+            lodQuad.QuadSphere = sphere;
+
+            if( (sphere.Mode & LODQuadMode.Visual) == LODQuadMode.Visual )
             {
-                (int x, int y) = LODQuadTree_NodeUtils.GetChildIndex( newQuad.Node );
+                lodQuad._meshFilter = gameObject.AddComponent<MeshFilter>();
+                lodQuad._meshFilter.sharedMesh = mesh;
 
-                newQuad.Node.Parent.Children[x, y].Value = newQuad;
+                lodQuad._meshRenderer = gameObject.AddComponent<MeshRenderer>();
+                lodQuad.ResetMaterial();
             }
 
-            newQuad.CelestialBody = celestialBody;
-            newQuad._quadSphere = quadSphere;
-            newQuad.SubdivisionDistance = subdivisionDistance;
+            if( (sphere.Mode & LODQuadMode.Collider) == LODQuadMode.Collider )
+            {
+                lodQuad._meshCollider = gameObject.AddComponent<MeshCollider>();
+                lodQuad._meshCollider.sharedMesh = mesh;
+            }
 
-            newQuad.SubdivisionLevel = lN;
-            newQuad._quadSphereFace = face;
+            lodQuad.Deactivate();
 
-            // Unity keeps the local positions of objects internally.
-            newQuad.transform.localPosition = localPosition;
-            newQuad.transform.localRotation = Quaternion.identity;
-            newQuad.transform.localScale = Vector3.one;
-            newQuad.SetState( new State.Idle() );
-
-            return newQuad;
+            return lodQuad;
         }
     }
 }

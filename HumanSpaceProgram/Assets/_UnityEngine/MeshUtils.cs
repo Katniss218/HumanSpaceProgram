@@ -67,6 +67,7 @@ namespace UnityEngine
                 {
                     tang[i] = -tang[i]; // flipping only w doesn't fix how the mesh looks.
                 }
+                tang[i] = -tang[i];
             }
             mesh.SetTangents( tang ); // this is fast.
         }

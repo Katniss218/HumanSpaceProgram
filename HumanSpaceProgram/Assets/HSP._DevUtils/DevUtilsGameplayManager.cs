@@ -41,9 +41,6 @@ namespace HSP._DevUtils
     /// </summary>
     public class DevUtilsGameplayManager : SingletonMonoBehaviour<DevUtilsGameplayManager>
     {
-        public Shader cbShader;
-        public Texture2D[] cbTextures = new Texture2D[6];
-
         public Mesh Mesh;
         public Material Material;
 
@@ -140,8 +137,6 @@ namespace HSP._DevUtils
 
         void Awake()
         {
-            LODQuadSphere.cbShader = this.cbShader;
-            LODQuadSphere.cbTex = this.cbTextures;
         }
 
         void Start()

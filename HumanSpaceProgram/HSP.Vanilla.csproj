@@ -60,12 +60,15 @@
   <ItemGroup>
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\Cameras\DesignSceneOrbitingCameraController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\EditorScene\EditorSceneManager.cs" />
+    <Compile Include="Assets\HSP.Vanilla\CelestialBodies\LODQuadModifier_Heightmap.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\DesignVesselManager.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\Tools\VanillaToolRegisterer.cs" />
+    <Compile Include="Assets\HSP.Vanilla\CelestialBodies\LODQuadModifier_BakeCollisionData.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FSequencer.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\Cameras\DesignSceneCameraManager.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\F3AxisActuator.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\OnStartup.cs" />
+    <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\PinnedLODSphereReferenceFrameTransform.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FSequencer.SequenceElement.cs" />
     <Compile Include="Assets\HSP.Vanilla\OnActiveVesselChanged.cs" />
     <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\FreeReferenceFrameTransform.cs" />
@@ -76,6 +79,7 @@
     <Compile Include="Assets\HSP.Vanilla\Components\FAttachNode.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FBulkConnection.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\OnTimelineSave.cs" />
+    <Compile Include="Assets\HSP.Vanilla\CelestialBodies\LODQuadModifier_InitializeMesh.cs" />
     <Compile Include="Assets\HSP.Vanilla\VesselPinning_Ex.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\GameplaySceneTool.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\Tools\RerootTool.cs" />
@@ -85,6 +89,7 @@
     <Compile Include="Assets\HSP.Vanilla\Trajectories\KeplerianOrbit.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\MainMenuScene\MainMenuEscapeInputController.cs" />
     <Compile Include="Assets\HSP.Vanilla\OnCelestialBodyCreated.cs" />
+    <Compile Include="Assets\HSP.Vanilla\CelestialBodies\LODQuadModifier_FinalizeMesh.cs" />
     <Compile Include="Assets\HSP.Vanilla\Trajectories\FixedOrbit.cs" />
     <Compile Include="Assets\HSP.Vanilla\SelectedControlFrameManager.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\IGhostable_Ex.cs" />
@@ -109,6 +114,7 @@
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\Tools\VanillaToolRegisterer.cs" />
     <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\PinnedReferenceFrameTransform.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\Tools\RotateTool.cs" />
+    <Compile Include="Assets\HSP.Vanilla\CelestialBodies\LODQuadModifier_NoiseDisplace.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\AlwaysLoadedScene\OnStartup.cs" />
     <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\KinematicReferenceFrameTransform.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\DesignSceneEscapeInputController.cs" />
@@ -128,6 +134,7 @@
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\TimeScaleInputController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\GameplaySceneToolManager.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\F1AxisActuator.cs" />
+    <Compile Include="Assets\HSP.Vanilla\CelestialBodies\LODQuadModifier_Displace.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FLaunchSiteMarker.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FReactionControlController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FControlFrame.cs" />

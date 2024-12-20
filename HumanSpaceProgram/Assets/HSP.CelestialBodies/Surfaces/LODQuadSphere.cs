@@ -1,198 +1,359 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using UnityEngine;
 
 namespace HSP.CelestialBodies.Surfaces
 {
+    public static class HSPEvent_ON_LOD_QUAD_PARENT_CREATED
+    {
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".lodquadparentcreated";
+    }
+
     /// <summary>
-    /// Wraps around 6 faces of a sphere.
+    /// Adds a solid surface to a celestial body.
     /// </summary>
     [RequireComponent( typeof( CelestialBody ) )]
-    public class LODQuadSphere : MonoBehaviour
+    public sealed class LODQuadSphere : MonoBehaviour
     {
+        int _edgeSubdivisions = 4;
         /// <summary>
-        /// The number of binary subdivisions per edge of each of the quads.
+        /// Gets or sets the number of binary subdivisions per edge of each of the quads.
         /// </summary>
-        public int EdgeSubdivisions { get; private set; } = 4;
+        /// <remarks>
+        /// Setting this member will force a rebuild.
+        /// </remarks>
+        public int EdgeSubdivisions
+        {
+            get => _edgeSubdivisions;
+            set
+            {
+                if( IsBuilding )
+                    throw new InvalidOperationException( $"Can't set {nameof( EdgeSubdivisions )} of a LOD sphere while it's building." );
+
+                _edgeSubdivisions = value;
+                ClearAllQuads();
+            }
+        }
+
+        int _maxDepth = 15;
+        /// <summary>
+        /// Gets or sets the maximum allowed subdivision level for this LOD sphere.
+        /// </summary>
+        /// <remarks>
+        /// Setting this member will force a rebuild.
+        /// </remarks>
+        public int MaxDepth
+        {
+            get => _maxDepth;
+            set
+            {
+                if( IsBuilding )
+                    throw new InvalidOperationException( $"Can't set {nameof( MaxDepth )} of a LOD sphere while it's building." );
+
+                _maxDepth = value;
+                ClearAllQuads();
+            }
+        }
 
         /// <summary>
-        /// The level of subdivision (lN) at which the quad will stop subdividing.
+        /// Gets the celestial body that this LOD sphere belongs to.
         /// </summary>
-        public int HardLimitSubdivLevel { get; set; } = 20;
+        public CelestialBody CelestialBody { get; private set; }
 
-        [field: SerializeField]
-        LODQuadTree[] _quadTree;
-        CelestialBody _celestialBody;
+        /// <summary>
+        /// The object that the built quads are parented to.
+        /// </summary>
+        public Transform QuadParent { get; private set; }
 
-        public const float QUAD_RANGE_MULTIPLIER = 2.0f; // 3.0 makes all joints only between the same subdiv.
+        /// <summary>
+        /// Specifies how the quads of this LOD sphere behaves.
+        /// </summary>
+        public LODQuadMode Mode { get; private set; }
 
-        public static Shader cbShader;
-        public static Texture2D[] cbTex;
+        /// <remarks>
+        /// Calling this method will force a rebuild.
+        /// </remarks>
+        public void SetMode( LODQuadMode mode )
+        {
+            if( IsBuilding )
+                throw new InvalidOperationException( $"Can't set {nameof( Mode )} of a LOD sphere while it's building." );
+
+            this.Mode = mode;
+            ClearAllQuads();
+        }
+
+        private ILODQuadModifier[][] _jobs;
+        /// <summary>
+        /// Gets the LOD sphere's jobs filtered for the LOD sphere's current build mode.
+        /// </summary>
+        public (ILODQuadModifier[] jobs, int[] firstJobPerStage) GetJobsForBuild()
+        {
+            return ILODQuadModifier.FilterJobs( _jobs, Mode );
+        }
+
+        /// <summary>
+        /// Sets the jobs used by this LOD sphere
+        /// </summary>
+        /// <remarks>
+        /// Calling this method will force a rebuild.
+        /// </remarks>
+        /// <param name="jobs">The jobs to copy when setting. Must not be null or contain any nulls.</param>
+        public void SetJobs( params ILODQuadModifier[][] jobs )
+        {
+            if( IsBuilding )
+                throw new InvalidOperationException( $"Can't set {nameof( _jobs )} of a LOD sphere while it's building." );
+
+            _jobs = jobs;
+            ClearAllQuads();
+        }
+
+        /// <summary>
+        /// The getter is invoked to get the points of interest that this LOD sphere should subdivide towards.
+        /// </summary>
+        /// <remarks>
+        /// The points returned by the getter should be in absolute space.
+        /// </remarks>
+        public Func<IEnumerable<Vector3Dbl>> PoIGetter { get; set; }
+
+        /// <summary>
+        /// Checks if the LOD sphere is currently building any new quads.
+        /// </summary>
+        public bool IsBuilding => _builder != null;
+
+        private Material[] _materials;
+        public Material[] Materials
+        {
+            get => _materials;
+            set
+            {
+                _materials = value;
+                foreach( var lod in _currentQuads )
+                {
+                    lod.Value.Quad.ResetMaterial();
+                }
+            }
+        }
+
+        Vector3Dbl[] _oldPois = null; // Initial value null is important.
+
+        Dictionary<LODQuadTreeNode, LODQuadRebuildData> _currentQuads = new( new ValueLODQuadTreeNodeComparer() );
+        public IReadOnlyDictionary<LODQuadTreeNode, LODQuadRebuildData> CurrentQuads => _currentQuads;
+        LODQuadTree _currentTree;
+
+        LODQuadRebuilder _builder;
+        LODQuadTree _buildingTree;
+        LODQuadTreeChanges _buildingChanges;
 
         void Awake()
         {
             // Possibly move this to a child, so it can be disabled without disabling entire CB.
-            _celestialBody = this.GetComponent<CelestialBody>();
+            CelestialBody = this.GetComponent<CelestialBody>();
         }
 
         void Start()
         {
-            _quadTree = new LODQuadTree[6];
-            for( int i = 0; i < 6; i++ )
-            {
-#warning TODO - Move these to some sort of celestial body definition.
-                Material mat = new Material( cbShader );
-                mat.SetTexture( "_MainTex", cbTex[i] );
-                mat.SetFloat( "_Glossiness", 0.05f );
-                mat.SetFloat( "_NormalStrength", 0.0f );
-
-
-                Vector2 center = Vector2.zero;
-                int lN = 0;
-
-                _quadTree[i] = new LODQuadTree( new LODQuadTree.Node( null, center, LODQuadTree_NodeUtils.GetSize( lN ) ) );
-
-#warning TODO - celestial bodies need something that will replace the buildin parenting of colliders with 64-bit parents and update their scene position at all times (fixedupdate + update + lateupdate).
-
-                LODQuad quad = LODQuad.CreateL0( _celestialBody.transform, this, _celestialBody, _quadTree[i].Root, (float)_celestialBody.Radius * QUAD_RANGE_MULTIPLIER, mat, (Direction3D)i );
-                _activeQuads.Add( quad );
-
-                RemeshQuad( quad );
-            }
+            _currentTree = new LODQuadTree( MaxDepth );
+            TryCreateQuadParentGameObject();
         }
-
-        List<LODQuad> _activeQuads = new List<LODQuad>();
-
-        public Func<IEnumerable<Vector3Dbl>> PoIGetter { get; set; }
-
-#warning TODO - integrate a poi getter.
-        /*private static IEnumerable<Vector3Dbl> GetVesselPOIs()
-        {
-            return VesselManager.LoadedVessels.Select( v => v.AIRFPosition );
-        }*/
-
-        private static bool ApproximatelyDifferent( Vector3Dbl lhs, Vector3Dbl rhs )
-        {
-            const double UPDATE_THRESHOLD = 0.5;
-
-            return Math.Abs( lhs.x - rhs.x ) >= UPDATE_THRESHOLD
-                || Math.Abs( lhs.y - rhs.y ) >= UPDATE_THRESHOLD
-                || Math.Abs( lhs.z - rhs.z ) >= UPDATE_THRESHOLD;
-        }
-
-        private bool NewPoisTheSameAsLastFrame( Vector3Dbl[] airfPOIs ) // with moving vessels, we will need to use POIs in celestial body space.
-        {
-            // Checks if the new pois are close enough to the old pois that we don't need to change the subdivisions.
-            if( _poisAtLastChange == null )
-                return false;
-
-            if( _poisAtLastChange.Length != airfPOIs.Length )
-                return false;
-
-            for( int i = 0; i < airfPOIs.Length; i++ )
-            {
-                if( ApproximatelyDifferent( airfPOIs[i], _poisAtLastChange[i] ) )
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        bool _wasChangedLastFrame = true; // initial value true is important for initial subdivision. This can only be removed if the CB is pre-subdivided to the initial pois ahead of time.
-        Vector3Dbl[] _poisAtLastChange = null; // Initial value null is important.
 
         void Update()
         {
-            List<LODQuad> newActiveQuads = new List<LODQuad>( _activeQuads );
-            List<LODQuad> needRemeshing = new List<LODQuad>();
-
-            Vector3Dbl[] airfPOIs = PoIGetter.Invoke().ToArray();
-
-            bool allPoisTheSame = NewPoisTheSameAsLastFrame( airfPOIs );
-
-            bool wasChangedThisFrame = false;
-            // Optimization is applied:
-            // - The quads only need to be checked if they were changed in the last frame (potentially still not subdivided enough / too much), or if the pois changed by some threshold.
-
-            // TODO - Another optimization could be to not check every ~800 quads (for large set of objects), but check their virtual parents first - the number of parents is exponentially less.
-
-            // TODO - Another optimization could be to not subdivide further if there is no additional detail that would become visible.
-            if( !allPoisTheSame || _wasChangedLastFrame )
+            if( _builder == null )
             {
-                foreach( var quad in _activeQuads )
+                TryRebuild();
+            }
+
+            if( _builder != null ) // also starts the build.
+            {
+                TryBuild();
+            }
+        }
+
+        void OnDestroy()
+        {
+            _builder?.Dispose();
+            foreach( var oldRebuildData in _currentQuads.Values )
+            {
+                oldRebuildData.Dispose();
+            }
+        }
+
+        void OnDisable()
+        {
+            if( IsBuilding )
+            {
+                _builder.Dispose();
+                Debug.LogWarning( $"{nameof( LODQuadSphere )} on celestial body '{CelestialBody.ID}' was disabled while building." );
+            }
+        }
+
+        private void TryCreateQuadParentGameObject()
+        {
+            if( QuadParent != null )
+                return;
+
+            GameObject parent = new GameObject( $"QUADPARENT-{this.CelestialBody.ID}" );
+            QuadParent = parent.transform;
+            HSPEvent.EventManager.TryInvoke( HSPEvent_ON_LOD_QUAD_PARENT_CREATED.ID, this );
+        }
+
+        private void ClearAllQuads()
+        {
+            foreach( var kvp in _currentQuads )
+            {
+                Destroy( kvp.Value.Quad );
+                kvp.Value.Dispose();
+            }
+            _currentQuads.Clear();
+            _currentTree = new LODQuadTree( MaxDepth );
+        }
+
+        private void TryRebuild()
+        {
+            if( _builder != null )
+                throw new InvalidOperationException( $"Tried to start building while already building." );
+            if( PoIGetter == null )
+                throw new InvalidOperationException( $"Tried to start building while the PoI getter was not set." );
+
+            if( _jobs == null )
+                return;
+
+            Vector3Dbl pos = this.CelestialBody.ReferenceFrameTransform.AbsolutePosition;
+            QuaternionDbl invRot = this.CelestialBody.ReferenceFrameTransform.AbsoluteRotation.Inverse();
+            double scale = this.CelestialBody.Radius;
+
+#warning TODO - something with pois to determine how much each quad should subdivide towards it (stopping subdiv level) (may be useful for camera frustum biasing and for fast moving objects)
+            Vector3Dbl[] localPois = PoIGetter.Invoke()
+                .Select( p => invRot * ((p - pos) / scale) )
+                .Where( p => p.magnitude < 2 * LODQuadTreeNode.SUBDIV_RANGE_MULTIPLIER )
+                .ToArray();
+
+            if( PoisChanged( localPois, 0.5 / scale ) )
+            {
+                var buildingTree = LODQuadTree.FromPois( _currentTree.MaxDepth, localPois );
+                var buildingChanges = LODQuadTree.GetDifferences( _currentTree, buildingTree );
+
+                if( buildingChanges.AnythingChanged )
                 {
-                    if( quad.Node.Value == null ) // marked as destroyed.
-                        continue;
+                    _oldPois = localPois;
+                    _builder = new LODQuadRebuilder( this, buildingChanges, LODQuadRebuilder.BuildSettings.IncludeNodesWithChangedNeighbors );
+                    _buildingTree = buildingTree;
+                    _buildingChanges = buildingChanges;
+                }
+            }
+        }
 
-                    quad.AirfPOIs = airfPOIs;
+        private void TryBuild()
+        {
+            if( _builder == null )
+                throw new InvalidOperationException( $"Tried to build without starting a build first." );
 
-                    if( quad.CurrentState is LODQuad.State.Idle )
+            if( _jobs == null )
+                return;
+
+            if( !_builder.IsDone )
+            {
+                _builder.Build();
+            }
+
+            if( _builder.IsDone ) // Building might've been finished by the previous call (in this frame), in which case collect the results immediately.
+            {
+                // Destroy quads that don't exist anymore.
+                foreach( var node in _buildingChanges.GetRemovedNodes() )
+                {
+                    if( _currentQuads.Remove( node, out var quad ) )
                     {
-                        continue;
+                        Destroy( quad.Quad.gameObject );
+                        quad.Dispose();
                     }
-
-                    if( quad.CurrentState is LODQuad.State.Active )
+                    else
                     {
-                        if( quad.ShouldSubdivide() )
-                        {
-                            quad.Subdivide( ref newActiveQuads, ref needRemeshing );
-                            wasChangedThisFrame = true;
-                            continue;
-                        }
+                        Debug.LogError( "Quad [exists in old, doesn't exist in new] was already destroyed." );
+                    }
+                }
 
-                        if( quad.ShouldUnsubdivide() )
+                // Activate quads that were made into leaves.
+                foreach( var node in _buildingChanges.GetBecameLeaf() )
+                {
+                    if( _currentQuads.TryGetValue( node, out var quad ) )
+                    {
+                        if( quad.Quad.IsActive )
                         {
-                            quad.Unsubdivide( ref newActiveQuads, ref needRemeshing );
-                            wasChangedThisFrame = true;
-                            continue;
+                            Debug.LogError( $"Quad [became a leaf in new] was already active." );
+                        }
+                        else
+                        {
+                            quad.Quad.Activate();
                         }
                     }
                 }
-            }
 
-            if( wasChangedThisFrame )
-            {
-                _poisAtLastChange = airfPOIs;
-            }
-            _wasChangedLastFrame = wasChangedThisFrame;
+                // Deactivate quads that stopped being leaves.
+                foreach( var node in _buildingChanges.GetBecameNonLeaf() )
+                {
+                    if( _currentQuads.TryGetValue( node, out var quad ) )
+                    {
+                        if( quad.Quad.IsActive )
+                        {
+                            quad.Quad.Deactivate();
+                        }
+                        else
+                        {
+                            Debug.LogError( $"Quad [became a non-leaf in new] was already inactive." );
+                        }
+                    }
+                }
 
-            // this filtering stuff is kinda ugly.
-            // And it's fucking retarded, because if I just check the _activeQuads, it breaks.
-            _activeQuads = newActiveQuads.Where( q => q.Node.Value != null ).ToList();
-            needRemeshing = needRemeshing.Where( q => q.Node.Value != null ).Distinct().ToList();
+                // Activate the newly built leaves.
+                // Some quads might've been *rebuilt* (existed before, got refreshed)
+                foreach( var newBuilt in _builder.GetResults() )
+                {
+                    if( _currentQuads.Remove( newBuilt.Node, out var existingQuad ) )
+                    {
+                        Destroy( existingQuad.Quad.gameObject );
+                        existingQuad.Dispose();
+                    }
 
-            foreach( var quad in needRemeshing )
-            {
-                Contract.Assert( quad.Node.Value != null, $"Quads to rebuild ({nameof( needRemeshing )}) must not contain destroyed quads." );
+                    _currentQuads.Add( newBuilt.Node, newBuilt );
 
-                RemeshQuad( quad );
+                    if( newBuilt.Node.IsLeaf )
+                    {
+                        newBuilt.Quad.Activate();
+                    }
+                }
+
+                _currentTree = _buildingTree;
+                _builder = null;
+                _buildingTree = null;
+                _buildingChanges = null;
             }
         }
 
-        void LateUpdate()
+        private bool PoisChanged( Vector3Dbl[] newPois, double maxDelta )
         {
-            foreach( var quad in _activeQuads )
-            {
-                Contract.Assert( quad.Node.Value != null, $"Active quads ({nameof( _activeQuads )}) must not contain destroyed quads." );
+            if( _oldPois == null )
+                return true;
 
-                quad.SetState( new LODQuad.State.Active() );
+            if( _oldPois.Length != newPois.Length )
+                return true;
+
+            for( int i = 0; i < newPois.Length; i++ )
+            {
+                if( ApproximatelyDifferent( newPois[i], _oldPois[i], maxDelta ) )
+                {
+                    return true;
+                }
             }
+
+            return false;
         }
 
-        void RemeshQuad( LODQuad quad )
+        private static bool ApproximatelyDifferent( Vector3Dbl lhs, Vector3Dbl rhs, double threshold )
         {
-            var rebuildState = new LODQuad.State.Rebuild()
-            {
-                Job = new MakeQuadMesh_Job()
-            };
-
-            quad.SetState( rebuildState );
+            return Math.Abs( lhs.x - rhs.x ) >= threshold
+                || Math.Abs( lhs.y - rhs.y ) >= threshold
+                || Math.Abs( lhs.z - rhs.z ) >= threshold;
         }
-
-        // ondestroy delete itself?
     }
 }

@@ -1,157 +1,300 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace HSP.CelestialBodies.Surfaces
 {
+    /// <summary>
+    /// Represents the surface of a subdivided chunked sphere
+    /// </summary>
     public class LODQuadTree
     {
-        public class Node
+        LODQuadTreeNode[] _roots = null;
+
+        /// <summary>
+        /// Gets the maximum depth of the nodes (the allowed number of descendants).
+        /// </summary>
+        public int MaxDepth { get; }
+
+        /// <summary>
+        /// Gets the collection of 6 root nodes.
+        /// </summary>
+        /// <remarks>
+        /// The returned value is null (for uninitialized tree), or 6 elements long - in the order: Xn, Xp, Yn, Yp, Zn, Zp (same as Direction3D enum).
+        /// </remarks>
+        public IEnumerable<LODQuadTreeNode> RootNodes => _roots;
+
+        public bool IsInitialized => _roots != null;
+
+        internal LODQuadTree( int maxDepth )
         {
-            /// <summary>
-            /// A way to retrieve the quad from the quadtree.
-            /// </summary>
-            public LODQuad Value { get; set; }
+            this.MaxDepth = maxDepth;
+        }
 
-            public float minX { get; }
-            public float maxX { get; }
-            public float minY { get; }
-            public float maxY { get; }
+        private LODQuadTree( int maxDepth, LODQuadTreeNode[] roots )
+        {
+            this.MaxDepth = maxDepth;
+            this._roots = roots;
+        }
 
-            /// <summary>
-            /// Calculates and returns the center of the node.
-            /// </summary>
-            public Vector2 Center => new Vector2( (minX + maxX) / 2.0f, (minY + maxY) / 2.0f );
-            /// <summary>
-            /// Calculates and returns the (square) edge length of the node.
-            /// </summary>
-            public float Size => maxX - minX; // Nodes are supposed to be square, so we can use either coordinate.
+        public static LODQuadTree FromPois( int maxDepth, IEnumerable<Vector3Dbl> localPois )
+        {
+            LODQuadTreeNode[] newRoots;
 
-            /// <summary>
-            /// The root node of the entire quadtree.
-            /// </summary>
-            public Node Root { get; private set; }
-            public Node Parent { get; private set; }
+            Queue<LODQuadTreeNode> nodesToProcess;
 
-            public Node[,] Children { get; private set; }
+            LODQuadTreeNode xn = new LODQuadTreeNode( 0, new Vector3Dbl( -1, 0, 0 ), Direction3D.Xn, Vector2.zero );
+            LODQuadTreeNode xp = new LODQuadTreeNode( 0, new Vector3Dbl( 1, 0, 0 ), Direction3D.Xp, Vector2.zero );
+            LODQuadTreeNode yn = new LODQuadTreeNode( 0, new Vector3Dbl( 0, -1, 0 ), Direction3D.Yn, Vector2.zero );
+            LODQuadTreeNode yp = new LODQuadTreeNode( 0, new Vector3Dbl( 0, 1, 0 ), Direction3D.Yp, Vector2.zero );
+            LODQuadTreeNode zn = new LODQuadTreeNode( 0, new Vector3Dbl( 0, 0, -1 ), Direction3D.Zn, Vector2.zero );
+            LODQuadTreeNode zp = new LODQuadTreeNode( 0, new Vector3Dbl( 0, 0, 1 ), Direction3D.Zp, Vector2.zero );
 
-            /// <remarks>
-            /// Contains itself (!)
-            /// </remarks>
-            public Node[,] Siblings => this.Parent?.Children;
+            xn.Xn = yn;
+            xn.Xp = yp;
+            xn.Yn = zn;
+            xn.Yp = zp;
 
-            public void MakeLeaf()
+            xp.Xn = yp;
+            xp.Xp = yn;
+            xp.Yn = zn;
+            xp.Yp = zp;
+
+            yn.Xn = xp;
+            yn.Xp = xn;
+            yn.Yn = zn;
+            yn.Yp = zp;
+
+            yp.Xn = xn;
+            yp.Xp = xp;
+            yp.Yn = zn;
+            yp.Yp = zp;
+
+            zn.Xn = yn;
+            zn.Xp = yp;
+            zn.Yn = xp;
+            zn.Yp = xn;
+
+            zp.Xn = yn;
+            zp.Xp = yp;
+            zp.Yn = xn;
+            zp.Yp = xp;
+
+            newRoots = new LODQuadTreeNode[6];
+            newRoots[0] = xn;
+            newRoots[1] = xp;
+            newRoots[2] = yn;
+            newRoots[3] = yp;
+            newRoots[4] = zn;
+            newRoots[5] = zp;
+
+            nodesToProcess = new Queue<LODQuadTreeNode>( newRoots );
+
+            LODQuadTreeNode currentNode = nodesToProcess.Dequeue();
+
+            int currentSubdivisionLevel = 0;
+            List<LODQuadTreeNode> currentLevelParents = new();
+
+            int totalNodeCount = 0;
+
+            do
             {
-                foreach( var child in this.Children )
+                // Resolves neighbors after all nodes of a given level have been created (guarantees that the neighbors are created, since the neighbors can be same level or lower).
+                if( currentNode.SubdivisionLevel > currentSubdivisionLevel )
                 {
-                    child.RemoveFromHierarchy();
+                    currentSubdivisionLevel++;
+                    AssignNeighborsBFS( currentLevelParents );
+                    currentLevelParents.Clear();
                 }
 
-                this.Children = null;
-            }
+                totalNodeCount++;
 
-            private void RemoveFromHierarchy()
-            {
-                this.Root = null;
-                this.Parent = null;
-            }
-
-            public Node( Node parent, Vector2 center, float size )
-            {
-                float halfSize = size / 2.0f;
-                this.minX = center.x - halfSize;
-                this.maxX = center.x + halfSize;
-                this.minY = center.y - halfSize;
-                this.maxY = center.y + halfSize;
-
-                this.Parent = parent;
-                if( parent == null )
+                // Subdivide
+                if( currentNode.SubdivisionLevel < maxDepth && currentNode.ShouldSubdivide( localPois ) )
                 {
-                    this.Root = this;
+                    var newChildren = LODQuadTreeNode.CreateChildren( currentNode );
+                    currentLevelParents.Add( currentNode );
+                    currentNode.Children = newChildren;
+
+                    nodesToProcess.Enqueue( newChildren.xnyn );
+                    nodesToProcess.Enqueue( newChildren.xpyn );
+                    nodesToProcess.Enqueue( newChildren.xnyp );
+                    nodesToProcess.Enqueue( newChildren.xpyp );
+                }
+
+            } while( nodesToProcess.TryDequeue( out currentNode ) );
+
+            AssignNeighborsBFS( currentLevelParents );
+
+            //Debug.Log( "node count: " + totalNodeCount );
+            return new LODQuadTree( maxDepth, newRoots );
+        }
+
+
+        static void AssignNeighborsBFS( List<LODQuadTreeNode> currentLevelParents )
+        {
+            // resolve neighbors for all nodes of a given subdivision level.
+
+            foreach( var parent in currentLevelParents )
+            {
+                (LODQuadTreeNode subXnYn, LODQuadTreeNode subXpYn, LODQuadTreeNode subXnYp, LODQuadTreeNode subXpYp) = parent.Children.Value;
+                LODQuadTreeNode parentsXn = parent.Xn;
+                LODQuadTreeNode parentsXp = parent.Xp;
+                LODQuadTreeNode parentsYn = parent.Yn;
+                LODQuadTreeNode parentsYp = parent.Yp;
+
+                // Only need to go to the immediate child, since the nodes of the previous size will be already resolved.
+                subXnYn.Xn = GetNeighborToUse( parentsXn, subXnYn.SphereCenter );
+                subXnYn.Xp = subXpYn;
+                subXnYn.Yn = GetNeighborToUse( parentsYn, subXnYn.SphereCenter );
+                subXnYn.Yp = subXnYp;
+
+                subXpYn.Xn = subXnYn;
+                subXpYn.Xp = GetNeighborToUse( parentsXp, subXpYn.SphereCenter );
+                subXpYn.Yn = GetNeighborToUse( parentsYn, subXpYn.SphereCenter );
+                subXpYn.Yp = subXpYp;
+
+                subXnYp.Xn = GetNeighborToUse( parentsXn, subXnYp.SphereCenter );
+                subXnYp.Xp = subXpYp;
+                subXnYp.Yn = subXnYn;
+                subXnYp.Yp = GetNeighborToUse( parentsYp, subXnYp.SphereCenter );
+
+                subXpYp.Xn = subXnYp;
+                subXpYp.Xp = GetNeighborToUse( parentsXp, subXpYp.SphereCenter );
+                subXpYp.Yn = subXpYn;
+                subXpYp.Yp = GetNeighborToUse( parentsYp, subXpYp.SphereCenter );
+            }
+        }
+
+        public static LODQuadTreeChanges GetDifferences( LODQuadTree old, LODQuadTree @new )
+        {
+            LODQuadTreeChanges changes = new LODQuadTreeChanges();
+
+            Stack<(LODQuadTreeNode o, LODQuadTreeNode n)> nodesToProcess = new();
+            int rootCount = old._roots?.Length ?? @new._roots.Length;
+            for( int i = 0; i < rootCount; i++ )
+            {
+                nodesToProcess.Push( (old._roots?[i], @new._roots?[i]) );
+            }
+
+            (LODQuadTreeNode o, LODQuadTreeNode n) currentNodePair = nodesToProcess.Pop();
+
+            do
+            {
+                var (o, n) = currentNodePair;
+
+                if( o == null && n != null )
+                {
+                    changes.newNodes ??= new();
+                    changes.newNodes.Add( n );
+                }
+                else if( o != null && n == null )
+                {
+                    changes.removedNodes ??= new();
+                    changes.removedNodes.Add( o );
+                }
+                else if( o != null && n != null )
+                {
+                    if( o.Xn.SubdivisionLevel != n.Xn.SubdivisionLevel || o.Xp.SubdivisionLevel != n.Xp.SubdivisionLevel || o.Yn.SubdivisionLevel != n.Yn.SubdivisionLevel || o.Yp.SubdivisionLevel != n.Yp.SubdivisionLevel )
+                    {
+                        changes.differentNeighbors ??= new();
+                        changes.differentNeighbors.Add( n );
+                    }
+                    if( o.IsLeaf && !n.IsLeaf )
+                    {
+                        changes.becameNonLeaf ??= new();
+                        changes.becameNonLeaf.Add( o );
+                    }
+                    else if( !o.IsLeaf && n.IsLeaf )
+                    {
+                        changes.becameLeaf ??= new();
+                        changes.becameLeaf.Add( o );
+                    }
+                }
+
+                if( o == null || o.IsLeaf )
+                {
+                    if( n != null && !n.IsLeaf )
+                    {
+                        var (xnyn, xpyn, xnyp, xpyp) = n.Children.Value;
+                        nodesToProcess.Push( (null, xnyn) );
+                        nodesToProcess.Push( (null, xpyn) );
+                        nodesToProcess.Push( (null, xnyp) );
+                        nodesToProcess.Push( (null, xpyp) );
+                    }
                 }
                 else
                 {
-                    this.Root = parent.Root;
-                    if( parent.Children == null )
+                    if( n == null || n.IsLeaf )
                     {
-                        parent.Children = new Node[2, 2];
+                        var (xnyn, xpyn, xnyp, xpyp) = o.Children.Value;
+                        nodesToProcess.Push( (xnyn, null) );
+                        nodesToProcess.Push( (xpyn, null) );
+                        nodesToProcess.Push( (xnyp, null) );
+                        nodesToProcess.Push( (xpyp, null) );
                     }
-                    (int x, int y) = LODQuadTree_NodeUtils.GetChildIndex( this );
-                    parent.Children[x, y] = this;
+                    else
+                    {
+                        var (xnyn, xpyn, xnyp, xpyp) = o.Children.Value;
+                        var (xnyn2, xpyn2, xnyp2, xpyp2) = n.Children.Value;
+                        nodesToProcess.Push( (xnyn, xnyn2) );
+                        nodesToProcess.Push( (xpyn, xpyn2) );
+                        nodesToProcess.Push( (xnyp, xnyp2) );
+                        nodesToProcess.Push( (xpyp, xpyp2) );
+                    }
                 }
-            }
 
-            /// <remarks>
-            /// Includes nodes that are intersecting, as well as if the edges or corners touch.
-            /// </remarks>
-            public List<Node> QueryOverlappingLeaves( float minX, float minY, float maxX, float maxY )
+            } while( nodesToProcess.TryPop( out currentNodePair ) );
+
+            return changes;
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        private static LODQuadTreeNode GetNeighborToUse( LODQuadTreeNode replacementNeighbor, Vector3Dbl selfSpherePos )
+        {
+            // parent is a node in the new tree here.
+
+            if( replacementNeighbor.IsLeaf ) // isleaf is correct, because if the node was subdivided, it is already subdivided.
             {
-#warning TODO - Add a way to include other faces in the query. And not just the quad face of the current quad. Combine the 6 quadtrees into one datastructure.
-                // return the list of nodes that overlap with the region.
-
-                // we could also group the results based on direction from the center here.
-
-                if( this.Intersects( minX, minY, maxX, maxY ) )
-                {
-                    if( this.Children == null )
-                    {
-                        return new List<Node>() { this };
-                    }
-
-                    List<Node> nodes = new List<Node>();
-
-                    foreach( var child in this.Children )
-                    {
-                        nodes.AddRange( child.QueryOverlappingLeaves( minX, minY, maxX, maxY ) );
-                    }
-
-                    return nodes;
-                }
-
-                return new List<Node>();
+                return replacementNeighbor;
             }
-        }
 
-        public Node Root { get; private set; }
+            (LODQuadTreeNode xnyn, LODQuadTreeNode xpyn, LODQuadTreeNode xnyp, LODQuadTreeNode xpyp) = replacementNeighbor.Children.Value;
 
-        public LODQuadTree( Node root )
-        {
-            Root = root;
-        }
+            LODQuadTreeNode closestNode = null;
+            double closestDistance = double.MaxValue;
 
-
-        List<LODQuad> GetNonNullLeafNodes( Node rootNode )
-        {
-            // This could be further optimized later by caching the list of leaf nodes, if needed (update cache when node is added/removed).
-
-            List<LODQuad> leafNodes = new List<LODQuad>();
-            Stack<Node> stack = new Stack<Node>();
-            stack.Push( rootNode );
-
-            while( stack.Count > 0 )
+            double dist = Vector3Dbl.Distance( selfSpherePos, xnyn.SphereCenter );
+            if( dist < closestDistance )
             {
-                Node currentNode = stack.Pop();
-                if( currentNode.Children == null )
-                {
-                    if( currentNode.Value != null )
-                    {
-                        leafNodes.Add( currentNode.Value );
-                    }
-                }
-                else
-                {
-                    foreach( Node child in currentNode.Children )
-                    {
-                        stack.Push( child );
-                    }
-                }
+                closestDistance = dist;
+                closestNode = xnyn;
             }
 
-            return leafNodes;
-        }
+            dist = Vector3Dbl.Distance( selfSpherePos, xpyn.SphereCenter );
+            if( dist < closestDistance )
+            {
+                closestDistance = dist;
+                closestNode = xpyn;
+            }
 
-        public List<LODQuad> GetNonNullLeafNodes()
-        {
-            return GetNonNullLeafNodes( Root );
+            dist = Vector3Dbl.Distance( selfSpherePos, xnyp.SphereCenter );
+            if( dist < closestDistance )
+            {
+                closestDistance = dist;
+                closestNode = xnyp;
+            }
+
+            dist = Vector3Dbl.Distance( selfSpherePos, xpyp.SphereCenter );
+            if( dist < closestDistance )
+            {
+                closestDistance = dist;
+                closestNode = xpyp;
+            }
+
+            return closestNode;
         }
     }
 }

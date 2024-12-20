@@ -1,0 +1,18 @@
+{
+    "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 444,
+        "height": 404
+    },
+    "pivot": [
+        222,
+        202
+    ],
+    "border": {
+        "left": 0,
+        "right": 0,
+        "top": 0,
+        "bottom": 0
+    }
+}
