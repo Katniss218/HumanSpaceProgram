@@ -138,6 +138,8 @@
     <Compile Include="Assets\HSP.Vanilla\Components\FLaunchSiteMarker.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FReactionControlController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FControlFrame.cs" />
+    <Compile Include="Assets\HSP.Vanilla\Settings\SettingsPage_Graphics.cs" />
+    <Compile Include="Assets\HSP.Vanilla\Settings\SettingsPage_Keybinds.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla\___HSP.Vanilla.asmdef" />
@@ -1048,6 +1050,10 @@
     <ProjectReference Include="HSP.ScreenCapturing.csproj">
       <Project>{A72CC48E-46C1-25C7-DFC0-DDA669184CFD}</Project>
       <Name>HSP.ScreenCapturing</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Settings.csproj">
+      <Project>{40D40A9F-D8D4-16D9-E477-9EC39F056D3E}</Project>
+      <Name>HSP.Settings</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.Timelines.csproj">
       <Project>{C443A3BB-4D58-3A1D-D085-E8AEA15B2BC0}</Project>

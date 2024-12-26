@@ -1,0 +1,21 @@
+﻿{
+    "$id": "60eec519-5361-4bbb-be2d-2fbcbe28c338",
+    "$type": "HSP.Settings.SettingsFile, HSP.Settings, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+    "pages": [
+        {
+            "$id": "01826ba9-681a-4e97-b673-69d15fef2feb",
+            "$type": "HSP.Vanilla.Settings.SettingsPage_Graphics, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+            "target_framerate": 120
+        },
+        {
+            "$id": "a6c14708-8601-41e3-bff4-74f0a80ef7a0",
+            "$type": "HSP.Vanilla.Settings.SettingsPage_Keybinds, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+            "sequencer_advance": {
+                "$id": "083fbc27-a4e0-479b-8ebe-0102a1d0db8a",
+                "$type": "UnityPlus.Input.Bindings.KeyDownBinding, _UnityPlus.Input, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "value": 0,
+                "key": "Space"
+            }
+        }
+    ]
+}
