@@ -32,10 +32,8 @@ namespace HSP.Vanilla.Components
         public static SerializationMapping FVesselSeparatorMapping()
         {
             return new MemberwiseSerializationMapping<FVesselSeparator>()
-            {
-                ("separate", new Member<FVesselSeparator, ControlleeInput>( o => o.Separate )),
-                ("has_separated", new Member<FVesselSeparator, bool>( o => o._hasSeparated ))
-            };
+                .WithMember( "separate", o => o.Separate )
+                .WithMember( "has_separated", o => o._hasSeparated );
         }
     }
 }

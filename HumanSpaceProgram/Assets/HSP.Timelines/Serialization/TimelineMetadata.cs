@@ -126,10 +126,8 @@ namespace HSP.Content.Timelines.Serialization
         public static SerializationMapping TimelineMetadataMapping()
         {
             return new MemberwiseSerializationMapping<TimelineMetadata>()
-            {
-                ("name", new Member<TimelineMetadata, string>( o => o.Name )),
-                ("description", new Member<TimelineMetadata, string>( o => o.Description ))
-            };
+                .WithMember( "name", o => o.Name )
+                .WithMember( "description", o => o.Description );
         }
     }
 }

@@ -1,10 +1,6 @@
 ﻿using HSP.Input;
 using HSP.Settings;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Input;
 using UnityPlus.Input.Bindings;
@@ -18,9 +14,21 @@ namespace HSP.Vanilla.Settings
 
         protected override SettingsPage_Keybinds OnApply()
         {
-            HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_SEQUENCER_ADVANCE, ControlPitch );
-            Debug.Log( ((KeyDownBinding)ControlPitch).Key );
             return this;
+        }
+
+        private static void BindOrUnbind( string channel, IInputBinding binding )
+        {
+            if( binding == null )
+            {
+                throw new NotImplementedException();
+#warning TODO - implement this method.
+                // HierarchicalInputManager.UnbindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_PITCH );
+            }
+            else
+            {
+                HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_PITCH, binding );
+            }
         }
 
 
@@ -28,9 +36,7 @@ namespace HSP.Vanilla.Settings
         public static SerializationMapping SettingsPage_KeybindsMapping()
         {
             return new MemberwiseSerializationMapping<SettingsPage_Keybinds>()
-            {
-                ("control_pitch", new Member<SettingsPage_Keybinds, IInputBinding>( o => o.ControlPitch )),
-            };
+                .WithMember( "control_pitch", o => o.ControlPitch );
         }
     }
 }

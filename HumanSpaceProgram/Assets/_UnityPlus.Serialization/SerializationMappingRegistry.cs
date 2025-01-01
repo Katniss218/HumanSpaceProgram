@@ -21,11 +21,11 @@ namespace UnityPlus.Serialization
 
         private static readonly Dictionary<(int, Type), SerializationMapping> _directCache = new();
 
-        private static readonly MapsInheritingFromSearcher<int, MappingGetterMethod> _inheritedMappings = new();
+        private static readonly MapsInheritingFromSearcher<int, MappingGetterMethod> _inheritingFromMappings = new();
         private static readonly MapsImplementingSearcher<int, MappingGetterMethod> _implementingMappings = new();
-        private static readonly MapsAnyClassSearcher<int, MappingGetterMethod> _classMappings = new();
-        private static readonly MapsAnyStructSearcher<int, MappingGetterMethod> _structMappings = new();
-        private static readonly MapsAnyInterfaceSearcher<int, MappingGetterMethod> _interfaceMappings = new();
+        private static readonly MapsAnyClassSearcher<int, MappingGetterMethod> _anyClassMappings = new();
+        private static readonly MapsAnyStructSearcher<int, MappingGetterMethod> _anyStructMappings = new();
+        private static readonly MapsAnyInterfaceSearcher<int, MappingGetterMethod> _anyInterfaceMappings = new();
         private static readonly MapsAnySearcher<int, MappingGetterMethod> _anyMappings = new();
 
         private static bool _isInitialized = false;
@@ -74,7 +74,7 @@ namespace UnityPlus.Serialization
                             {
                                 case MapsInheritingFromAttribute:
 
-                                    if( !_inheritedMappings.TrySet( context, attr.MappedType, entry ) )
+                                    if( !_inheritingFromMappings.TrySet( context, attr.MappedType, entry ) )
                                     {
                                         Debug.LogWarning( $"Multiple '{nameof(MapsInheritingFromAttribute)}' mappings found for type `{attr.MappedType.AssemblyQualifiedName}`." );
                                     }
@@ -88,21 +88,21 @@ namespace UnityPlus.Serialization
                                     break;
                                 case MapsAnyClassAttribute:
 
-                                    if( !_classMappings.TrySet( context, attr.MappedType, entry ) )
+                                    if( !_anyClassMappings.TrySet( context, attr.MappedType, entry ) )
                                     {
                                         Debug.LogWarning( $"Multiple '{nameof( MapsAnyClassAttribute )}' mappings found for type `{attr.MappedType.AssemblyQualifiedName}`." );
                                     }
                                     break;
                                 case MapsAnyStructAttribute:
 
-                                    if( !_structMappings.TrySet( context, attr.MappedType, entry ) )
+                                    if( !_anyStructMappings.TrySet( context, attr.MappedType, entry ) )
                                     {
                                         Debug.LogWarning( $"Multiple '{nameof( MapsAnyStructAttribute )}' mappings found for type `{attr.MappedType.AssemblyQualifiedName}`." );
                                     }
                                     break;
                                 case MapsAnyInterfaceAttribute:
 
-                                    if( !_inheritedMappings.TrySet( context, attr.MappedType, entry ) )
+                                    if( !_anyInterfaceMappings.TrySet( context, attr.MappedType, entry ) )
                                     {
                                         Debug.LogWarning( $"Multiple '{nameof( MapsAnyInterfaceAttribute )}' mappings found for type `{attr.MappedType.AssemblyQualifiedName}`." );
                                     }
@@ -199,7 +199,7 @@ namespace UnityPlus.Serialization
 
             // Get the mapping using the previously found method.
             var mapping = (SerializationMapping)method.Invoke( null, null );
-            mapping.context = context;
+            mapping.Context = context;
 
             _directCache[(context, objType)] = mapping;
 
@@ -216,12 +216,12 @@ namespace UnityPlus.Serialization
 
                 return mapping.GetInstance();
             }
-
-            if( _inheritedMappings.TryGet( context, type, out var entry )
+             
+            if( _inheritingFromMappings.TryGet( context, type, out var entry )
              || _implementingMappings.TryGet( context, type, out entry )
-             || _interfaceMappings.TryGet( context, type, out entry )
-             || _classMappings.TryGet( context, type, out entry )
-             || _structMappings.TryGet( context, type, out entry )
+             || _anyInterfaceMappings.TryGet( context, type, out entry )
+             || _anyClassMappings.TryGet( context, type, out entry )
+             || _anyStructMappings.TryGet( context, type, out entry )
              || _anyMappings.TryGet( context, type, out entry ) )
             {
                 mapping = MakeReadyAndRegister( context, entry, type );

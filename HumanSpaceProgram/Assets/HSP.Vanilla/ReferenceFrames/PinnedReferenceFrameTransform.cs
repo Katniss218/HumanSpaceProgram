@@ -375,16 +375,14 @@ namespace HSP.Vanilla
         public static SerializationMapping PinnedPhysicsObjectMapping()
         {
             return new MemberwiseSerializationMapping<PinnedReferenceFrameTransform>()
-            {
-                ("mass", new Member<PinnedReferenceFrameTransform, float>( o => o.Mass )),
-                ("local_center_of_mass", new Member<PinnedReferenceFrameTransform, Vector3>( o => o.LocalCenterOfMass )),
+                .WithMember( "mass", o => o.Mass )
+                .WithMember( "local_center_of_mass", o => o.LocalCenterOfMass )
 
-                ("DO_NOT_TOUCH", new Member<PinnedReferenceFrameTransform, bool>( o => true, (o, value) => o._rb.isKinematic = true)), // TODO - isKinematic member is a hack.
+                .WithMember( "DO_NOT_TOUCH", o => true, ( o, value ) => o._rb.isKinematic = true )
 
-                ("reference_body", new Member<PinnedReferenceFrameTransform, string>( o => o.ReferenceBody == null ? null : o.ReferenceBody.ID, (o, value) => o.ReferenceBody = value == null ? null : CelestialBodyManager.Get( value ) )),
-                ("reference_position", new Member<PinnedReferenceFrameTransform, Vector3Dbl>( o => o.ReferencePosition )),
-                ("reference_rotation", new Member<PinnedReferenceFrameTransform, QuaternionDbl>( o => o.ReferenceRotation ))
-            };
+                .WithMember( "reference_body", o => o.ReferenceBody == null ? null : o.ReferenceBody.ID, ( o, value ) => o.ReferenceBody = value == null ? null : CelestialBodyManager.Get( value ) )
+                .WithMember( "reference_position", o => o.ReferencePosition )
+                .WithMember( "reference_rotation", o => o.ReferenceRotation );
         }
     }
 }

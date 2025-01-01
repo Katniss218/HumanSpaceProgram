@@ -15,34 +15,28 @@ namespace HSP.Vanilla.Content.AssetLoaders.Metadata
         public static SerializationMapping SpriteMetadataMapping()
         {
             return new MemberwiseSerializationMapping<SpriteMetadata>()
-            {
-                ("rect", new Member<SpriteMetadata, Rect>( o => o.Rect )),
-                ("pivot", new Member<SpriteMetadata, Vector2>( o => o.Pivot )),
-                ("border", new Member<SpriteMetadata, Vector4>( CONTEXT_BORDER, o => o.Border ))
-            };
+                .WithMember( "rect", o => o.Rect )
+                .WithMember( "pivot", o => o.Pivot )
+                .WithMember( "border", CONTEXT_BORDER, o => o.Border );
         }
 
         [MapsInheritingFrom( typeof( Vector4 ), Context = CONTEXT_BORDER )]
         public static SerializationMapping Vector4BorderMapping()
         {
             return new MemberwiseSerializationMapping<Vector4>()
-            {
-                ("left", new Member<Vector4, float>( o => o.x )),
-                ("right", new Member<Vector4, float>( o => o.z )),
-                ("top", new Member<Vector4, float>( o => o.w )),
-                ("bottom", new Member<Vector4, float>( o => o.y ))
-            };
+                .WithMember( "left", o => o.x )
+                .WithMember( "right", o => o.z )
+                .WithMember( "top", o => o.w )
+                .WithMember( "bottom", o => o.y );
         }
         [MapsInheritingFrom( typeof( Rect ) )]
         public static SerializationMapping RectMapping()
         {
             return new MemberwiseSerializationMapping<Rect>()
-            {
-                ("x", new Member<Rect, float>( o => o.x )),
-                ("y", new Member<Rect, float>( o => o.y )),
-                ("width", new Member<Rect, float>( o => o.width )),
-                ("height", new Member<Rect, float>( o => o.height ))
-            };
+                .WithMember( "x", o => o.x )
+                .WithMember( "y", o => o.y )
+                .WithMember( "width", o => o.width )
+                .WithMember( "height", o => o.height );
         }
     }
 }

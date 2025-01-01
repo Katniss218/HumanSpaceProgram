@@ -198,9 +198,7 @@ namespace HSP.Time
         public static SerializationMapping TimeStepManagerMapping()
         {
             return new MemberwiseSerializationMapping<TimeManager>()
-            {
-                ("ut", new Member<TimeManager, double>( o => TimeManager.UT, (o, value) => TimeManager.UT = value ))
-            };
+                .WithMember( "ut", o => TimeManager.UT, ( o, value ) => TimeManager.UT = value );
         }
     }
 }

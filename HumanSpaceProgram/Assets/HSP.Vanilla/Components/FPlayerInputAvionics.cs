@@ -128,12 +128,10 @@ namespace HSP.Vanilla.Components
         public static SerializationMapping FPlayerInputAvionicsMapping()
         {
             return new MemberwiseSerializationMapping<FPlayerInputAvionics>()
-            {
-                ("control_frame", new Member<FPlayerInputAvionics, FControlFrame>( ObjectContext.Ref, o => o.ControlFrame )),
-                ("on_set_throttle", new Member<FPlayerInputAvionics, ControllerOutput<float>>( o => o.OnSetThrottle )),
-                ("on_set_attitude", new Member<FPlayerInputAvionics, ControllerOutput<Vector3>>( o => o.OnSetAttitude )),
-                ("on_set_translation", new Member<FPlayerInputAvionics, ControllerOutput<Vector3>>( o => o.OnSetTranslation ))
-            };
+                .WithMember( "control_frame", ObjectContext.Ref, o => o.ControlFrame )
+                .WithMember( "on_set_throttle", o => o.OnSetThrottle )
+                .WithMember( "on_set_attitude", o => o.OnSetAttitude )
+                .WithMember( "on_set_translation", o => o.OnSetTranslation );
         }
     }
 }

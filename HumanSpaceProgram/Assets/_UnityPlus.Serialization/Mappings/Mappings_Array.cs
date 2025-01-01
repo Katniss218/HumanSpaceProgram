@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace UnityPlus.Serialization.Mappings
 {
@@ -8,72 +9,83 @@ namespace UnityPlus.Serialization.Mappings
         public static SerializationMapping ArrayMapping<T>()
         {
 #warning TODO - multidimensional arrays?
-            return new NonPrimitiveSerializationMapping<T[]>()
-            {
-                OnSave = ( o, s ) =>
+            return new IndexedSerializationMapping<T[], T>( o => o.Length,
+                ObjectContext.Value,
+                ( o, i ) => // writes to data
                 {
-                    if( o == null )
-                        return null;
-
-                    SerializedArray serializedArray = new SerializedArray( o.Length );
-                    for( int i = 0; i < o.Length; i++ )
-                    {
-                        T value = o[i];
-
-                        var mapping = SerializationMappingRegistry.GetMapping<T>( ObjectContext.Default, value );
-                        var data = mapping.SafeSave<T>( value, s );
-
-                        serializedArray.Add( data );
-                    }
-
-                    return serializedArray;
+                    return o[i];
                 },
-                OnInstantiate = ( data, l ) =>
+                ( o, i, oElem ) => // loads from data
                 {
-                    if( data is not SerializedArray serializedArray )
-                        return null;
+                    o[i] = oElem;
+                } )
+                .WithFactory( ( int count ) => new T[count] );
+        }
 
-                    return data == null ? default : new T[serializedArray.Count];
+        [MapsInheritingFrom( typeof( Array ), Context = ArrayContext.Assets )]
+        public static SerializationMapping ArrayAssetMapping<T>() where T : class
+        {
+            return new IndexedSerializationMapping<T[], T>( o => o.Length,
+                ObjectContext.Asset,
+                ( o, i ) => // writes to data
+                {
+                    return o[i];
                 },
-                OnLoad = ( ref T[] o, SerializedData data, ILoader l ) =>
+                ( o, i, oElem ) => // loads from data
                 {
-                    if( data is not SerializedArray serializedArray )
-                        return;
+                    o[i] = oElem;
+                } )
+                .WithFactory( length => new T[length] );
+        }
 
-                    for( int i = 0; i < serializedArray.Count; i++ )
-                    {
-                        SerializedData elementData = serializedArray[i];
-
-                        Type elementType = elementData != null && elementData.TryGetValue( KeyNames.TYPE, out var elementType2 )
-                            ? elementType2.DeserializeType()
-                            : typeof( T );
-
-                        T element = default;
-                        var mapping = MappingHelper.GetMapping_Load<T>( ObjectContext.Default, elementType, elementData, l );
-                        if( mapping.SafeLoad( ref element, elementData, l ) )
-                        {
-                            o[i] = element;
-                        }
-                    }
+        [MapsInheritingFrom( typeof( Array ), Context = ArrayContext.Refs )]
+        public static SerializationMapping ArrayReferenceMapping<T>() where T : class
+        {
+            return new IndexedSerializationMapping<T[], T>( o => o.Length,
+                ObjectContext.Ref,
+                ( o, i ) => // writes to data
+                {
+                    return o[i];
                 },
-                OnLoadReferences = ( ref T[] o, SerializedData data, ILoader l ) =>
+                ( o, i, oElem ) => // loads from data
                 {
-                    if( data is not SerializedArray serializedArray )
-                        return;
+                    o[i] = oElem;
+                } )
+                .WithFactory( length => new T[length] );
+        }
 
-                    for( int i = 0; i < o.Length; i++ )
-                    {
-                        SerializedData elementData = serializedArray[i];
+        /*[MapsInheritingFrom( typeof( List<> ), Context = ArrayContext.Values )]
+        public static SerializationMapping ListMapping<T>()
+        {
+            return new IndexedSerializationMapping<List<T>, T>( o => o.Count,
+                ObjectContext.Value,
+                ( o, i ) => // writes to data
+                {
+                    return o[i];
+                },
+                ( o, i, oElem ) => // loads from data
+                {
+#warning TODO - using Add doesn't guarantee same order if some elements fail and are added later.
+        // could work if the list is filled with default elements up to capacity first.
+                    if( o.Count <= i )
+                        o.Add( oElem );
+                    else
+                        o[i] = oElem;
+                } )
+                .WithFactory( ( int count ) => new List<T>( count ) );
+        }*/
 
-                        T element = o[i];
-                        var mapping = MappingHelper.GetMapping_LoadReferences<T>( ObjectContext.Default, element, elementData, l );
-                        if( mapping.SafeLoadReferences( ref element, elementData, l ) )
-                        {
-                            o[i] = element;
-                        }
-                    }
-                }
-            };
+        [MapsInheritingFrom( typeof( List<> ), Context = ArrayContext.Values )]
+        public static SerializationMapping ListMapping<T>()
+        {
+            return new IndexedSerializationMapping<List<T>, T>( o => o.Count,
+                ObjectContext.Value,
+                ( o, i ) => // writes to data
+                {
+                    return o[i];
+                },
+                ( o, i, oElem ) => { } )
+                .WithFactory( ( IEnumerable<T> elements ) => elements == null ? new List<T>() : new List<T>( elements ) );
         }
     }
 }

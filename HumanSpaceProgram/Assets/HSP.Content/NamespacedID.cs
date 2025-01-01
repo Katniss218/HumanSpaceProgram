@@ -73,7 +73,7 @@ namespace HSP
         [MapsInheritingFrom( typeof( NamespacedID ) )]
         public static SerializationMapping NamespacedIdentifierMapping()
         {
-            return new PrimitiveStructSerializationMapping<NamespacedID>()
+            return new PrimitiveSerializationMapping<NamespacedID>()
             {
                 OnSave = ( o, s ) => (SerializedPrimitive)o.ToString(),
                 OnInstantiate = ( data, l ) => NamespacedID.Parse( (string)data )

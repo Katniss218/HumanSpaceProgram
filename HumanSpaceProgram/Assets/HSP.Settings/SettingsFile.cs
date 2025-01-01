@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UnityPlus.Serialization;
 
 namespace HSP.Settings
@@ -15,9 +14,7 @@ namespace HSP.Settings
         public static SerializationMapping SettingsPage_GraphicsMapping()
         {
             return new MemberwiseSerializationMapping<SettingsFile>()
-            {
-                ("pages", new Member<SettingsFile, ISettingsPage[]>( o => o.Pages?.ToArray(), (o, value) => o.Pages = value?.ToList() )),
-            };
+                .WithMember( "pages", o => o.Pages );
         }
     }
 }

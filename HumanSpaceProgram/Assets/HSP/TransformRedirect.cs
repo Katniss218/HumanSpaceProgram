@@ -31,9 +31,7 @@ namespace HSP
         public static SerializationMapping FClickInteractionRedirectMapping()
         {
             return new MemberwiseSerializationMapping<TransformRedirect>()
-            {
-                ("target", new Member<TransformRedirect, Transform>( ObjectContext.Ref, o => o.Target ))
-            };
+                .WithMember( "target", ObjectContext.Ref, o => o.Target );
         }
     }
 }

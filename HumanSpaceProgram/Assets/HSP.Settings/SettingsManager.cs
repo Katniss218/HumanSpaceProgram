@@ -29,6 +29,9 @@ namespace HSP.Settings
                 .Where( t => !t.IsAbstract && t != typeof( ISettingsPage ) && typeof( ISettingsPage ).IsAssignableFrom( t ) ).ToArray();
         }
 
+        /// <summary>
+        /// Reloads the current settings from disk.
+        /// </summary>
         public static void ReloadSettings()
         {
             string path = HumanSpaceProgramSettings.GetSettingsFilePath();
@@ -93,6 +96,9 @@ namespace HSP.Settings
             }
         }
 
+        /// <summary>
+        /// Saves the current settings to disk.
+        /// </summary>
         public static void SaveSettings()
         {
             Type[] pageTypes = GetPageTypes();
@@ -101,7 +107,7 @@ namespace HSP.Settings
             arr.Pages = new List<ISettingsPage>( pageTypes.Length );
             foreach( var type in pageTypes )
             {
-                PropertyInfo instanceProperty = type.GetProperty( "Instance", BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy );
+                PropertyInfo instanceProperty = type.GetProperty( "Current", BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy );
                 ISettingsPage page = (ISettingsPage)instanceProperty.GetValue( null );
                 arr.Pages.Add( page );
             }

@@ -22,14 +22,12 @@ namespace HSP.Vanilla.Content.AssetLoaders.Metadata
         public static SerializationMapping Texture2DMetadataMapping()
         {
             return new MemberwiseSerializationMapping<Texture2DMetadata>()
-            {
-                ("graphics_format", new Member<Texture2DMetadata, GraphicsFormat>( o => o.GraphicsFormat )),
-                ("filter_mode", new Member<Texture2DMetadata, FilterMode>( o => o.FilterMode )),
-                ("wrap_mode", new Member<Texture2DMetadata, TextureWrapMode>( o => o.WrapMode )),
-                ("mipmap_count", new Member<Texture2DMetadata, int>( o => o.MipMapCount )),
-                ("aniso_level", new Member<Texture2DMetadata, int>( o => o.AnisoLevel )),
-                ("readable", new Member<Texture2DMetadata, bool>( o => o.Readable ))
-            };
+                .WithMember( "graphics_format", o => o.GraphicsFormat )
+                .WithMember( "filter_mode", o => o.FilterMode )
+                .WithMember( "wrap_mode", o => o.WrapMode )
+                .WithMember( "mipmap_count", o => o.MipMapCount )
+                .WithMember( "aniso_level", o => o.AnisoLevel )
+                .WithMember( "readable", o => o.Readable );
         }
     }
 }

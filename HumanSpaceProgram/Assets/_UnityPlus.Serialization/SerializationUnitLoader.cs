@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization.ReferenceMaps;
+using Debug = UnityEngine.Debug;
 
 namespace UnityPlus.Serialization
 {
@@ -23,6 +25,7 @@ namespace UnityPlus.Serialization
 
     public class SerializationUnitLoader<T> : ILoader
     {
+        private bool[] _finishedMembers;
         private SerializedData[] _data;
         private T[] _objects;
 
@@ -30,12 +33,9 @@ namespace UnityPlus.Serialization
 
         public IForwardReferenceMap RefMap { get; set; }
 
-        public Dictionary<SerializedData, SerializationMapping> MappingCache { get; }
-
         internal SerializationUnitLoader( SerializedData[] data, int context )
         {
             this.RefMap = new BidirectionalReferenceStore();
-            this.MappingCache = new Dictionary<SerializedData, SerializationMapping>( new SerializedDataReferenceComparer() );
             this._data = data;
             this._context = context;
         }
@@ -43,10 +43,14 @@ namespace UnityPlus.Serialization
         internal SerializationUnitLoader( T[] objects, SerializedData[] data, int context )
         {
             this.RefMap = new BidirectionalReferenceStore();
-            this.MappingCache = new Dictionary<SerializedData, SerializationMapping>( new SerializedDataReferenceComparer() );
             this._objects = objects;
             this._data = data;
             this._context = context;
+        }
+
+        public bool ShouldPause()
+        {
+            return false;
         }
 
         //
@@ -56,45 +60,71 @@ namespace UnityPlus.Serialization
         /// <summary>
         /// Performs deserialization of the previously specified objects.
         /// </summary>
-        public void Deserialize()
+        public void Deserialize( int maxIters = 10 )
         {
-            this.LoadCallback();
-            this.LoadReferencesCallback();
+            this._finishedMembers = new bool[_data.Length];
+            this._objects = new T[_data.Length];
+
+            for( int i = 0; i < maxIters; i++ )
+            {
+                MappingResult result = this.LoadCallback( false );
+                if( result != MappingResult.Progressed )
+                    return;
+            }
         }
 
         /// <summary>
         /// Performs deserialization of the previously specified objects.
         /// </summary>
-        public void Deserialize( IForwardReferenceMap l )
+        public void Deserialize( IForwardReferenceMap l, int maxIters = 10 )
         {
             if( l == null )
                 throw new ArgumentNullException( nameof( l ), $"The reference map to use can't be null." );
 
+            this._finishedMembers = new bool[_data.Length];
+            this._objects = new T[_data.Length];
             this.RefMap = l;
-            this.LoadCallback();
-            this.LoadReferencesCallback();
+
+            for( int i = 0; i < maxIters; i++ )
+            {
+                MappingResult result = this.LoadCallback( false );
+                if( result != MappingResult.Progressed )
+                    return;
+            }
         }
 
         /// <summary>
         /// Performs population of members of the previously specified objects.
         /// </summary>
-        public void Populate()
+        public void Populate( int maxIters = 10 )
         {
-            this.PopulateCallback();
-            this.LoadReferencesCallback();
+            this._finishedMembers = new bool[_data.Length];
+
+            for( int i = 0; i < maxIters; i++ )
+            {
+                MappingResult result = this.LoadCallback( true );
+                if( result != MappingResult.Progressed )
+                    return;
+            }
         }
 
         /// <summary>
         /// Performs population of members of the previously specified objects.
         /// </summary>
-        public void Populate( IForwardReferenceMap l )
+        public void Populate( IForwardReferenceMap l, int maxIters = 10 )
         {
             if( l == null )
                 throw new ArgumentNullException( nameof( l ), $"The reference map to use can't be null." );
 
+            this._finishedMembers = new bool[_data.Length];
             this.RefMap = l;
-            this.PopulateCallback();
-            this.LoadReferencesCallback();
+
+            for( int i = 0; i < maxIters; i++ )
+            {
+                MappingResult result = this.LoadCallback( true );
+                if( result != MappingResult.Progressed )
+                    return;
+            }
         }
 
         //
@@ -112,67 +142,46 @@ namespace UnityPlus.Serialization
         /// <summary>
         /// Returns the objects that were deserialized or populated, but only those that are of the specified type.
         /// </summary>
-        public IEnumerable<TDerived> GetObjectsOfType<TDerived>()
+        public IEnumerable<TDerived> GetObjects<TDerived>()
         {
             return _objects.OfType<TDerived>();
         }
 
-        private void PopulateCallback()
+        private MappingResult LoadCallback( bool populate )
         {
-            // Called by the loader.
+            bool anyFailed = false;
+            bool anyFinished = false;
+            bool anyProgressed = false;
 
             for( int i = 0; i < _data.Length; i++ )
             {
+                if( _finishedMembers[i] )
+                    continue;
+
                 SerializedData data = _data[i];
 
-                var mapping = MappingHelper.GetMapping_Load<T>( _context, MappingHelper.GetSerializedType<T>( data ), data, this );
-
-                // Parity with Member (mostly).
-                T member = _objects[i];
-                if( mapping.SafePopulate( ref member, data, this ) )
-                {
-                    _objects[i] = member;
-                }
-            }
-        }
-
-        private void LoadCallback()
-        {
-            // Called by the loader.
-
-            _objects = new T[_data.Length];
-
-            for( int i = 0; i < _data.Length; i++ )
-            {
-                SerializedData data = _data[i];
-
-                var mapping = MappingHelper.GetMapping_Load<T>( _context, MappingHelper.GetSerializedType<T>( data ), data, this );
-
-                T member = default;
-                if( mapping.SafeLoad( ref member, data, this ) )
-                {
-                    _objects[i] = member;
-                }
-            }
-        }
-
-        private void LoadReferencesCallback()
-        {
-            // Called by the loader.
-
-            for( int i = 0; i < _data.Length; i++ )
-            {
-                SerializedData data = _data[i];
+                var mapping = SerializationMappingRegistry.GetMapping<T>( _context, MappingHelper.GetSerializedType<T>( data ) );
 
                 T member = _objects[i];
-
-                var mapping = MappingHelper.GetMapping_LoadReferences<T>( _context, member, data, this );
-
-                if( mapping.SafeLoadReferences( ref member, data, this ) )
+                var memberResult = mapping.SafeLoad( ref member, data, this, populate );
+                switch( memberResult )
                 {
-                    _objects[i] = member;
+                    case MappingResult.Finished:
+                        _finishedMembers[i] = true;
+                        anyFinished = true;
+                        break;
+                    case MappingResult.Failed:
+                        anyFailed = true;
+                        break;
+                    case MappingResult.Progressed:
+                        anyProgressed = true;
+                        break;
                 }
+
+                _objects[i] = member;
             }
+
+            return MappingResult_Ex.GetCompoundResult( anyFailed, anyFinished, anyProgressed );
         }
     }
 }

@@ -255,7 +255,7 @@ namespace HSP.Vanilla
             && (_rb.velocity.x == _lastCachedVelocity.x && _rb.velocity.y == _lastCachedVelocity.y && _rb.velocity.z == _lastCachedVelocity.z)
             && (_rb.angularVelocity.x == _lastCachedAngularVelocity.x && _rb.angularVelocity.y == _lastCachedAngularVelocity.y && _rb.angularVelocity.z == _lastCachedAngularVelocity.z)
             && SceneReferenceFrameManager.ReferenceFrame.EqualsIgnoreUT( _cachedSceneReferenceFrame );
-        
+
         protected virtual void MakeCacheValid()
         {
             _lastCachedPosition = _rb.position;
@@ -368,17 +368,15 @@ namespace HSP.Vanilla
         public static SerializationMapping FreePhysicsObjectMapping()
         {
             return new MemberwiseSerializationMapping<FreeReferenceFrameTransform>()
-            {
-                ("mass", new Member<FreeReferenceFrameTransform, float>( o => o.Mass )),
-                ("local_center_of_mass", new Member<FreeReferenceFrameTransform, Vector3>( o => o.LocalCenterOfMass )),
+                .WithMember( "mass", o => o.Mass )
+                .WithMember( "local_center_of_mass", o => o.LocalCenterOfMass )
 
-                ("DO_NOT_TOUCH", new Member<FreeReferenceFrameTransform, bool>( o => false, (o, value) => o._rb.isKinematic = false)), // TODO - isKinematic member is a hack.
+                .WithMember( "DO_NOT_TOUCH", o => false, ( o, value ) => o._rb.isKinematic = false ) // TODO - isKinematic member is a hack.
 
-                ("absolute_position", new Member<FreeReferenceFrameTransform, Vector3Dbl>( o => o.AbsolutePosition )),
-                ("absolute_rotation", new Member<FreeReferenceFrameTransform, QuaternionDbl>( o => o.AbsoluteRotation )),
-                ("absolute_velocity", new Member<FreeReferenceFrameTransform, Vector3Dbl>( o => o.AbsoluteVelocity )),
-                ("absolute_angular_velocity", new Member<FreeReferenceFrameTransform, Vector3Dbl>( o => o.AbsoluteAngularVelocity ))
-            };
+                .WithMember( "absolute_position", o => o.AbsolutePosition )
+                .WithMember( "absolute_rotation", o => o.AbsoluteRotation )
+                .WithMember( "absolute_velocity", o => o.AbsoluteVelocity )
+                .WithMember( "absolute_angular_velocity", o => o.AbsoluteAngularVelocity );
         }
     }
 }

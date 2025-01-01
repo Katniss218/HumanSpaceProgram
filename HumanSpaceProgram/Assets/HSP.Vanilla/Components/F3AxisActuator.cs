@@ -113,28 +113,26 @@ namespace HSP.Vanilla.Components
         public static SerializationMapping F3AxisActuatorMapping()
         {
             return new MemberwiseSerializationMapping<F3AxisActuator>()
-            {
-                ("reference_transform", new Member<F3AxisActuator, Transform>( ObjectContext.Ref, o => o.ReferenceTransform )),
-                ("x_actuator_transform", new Member<F3AxisActuator, Transform>( ObjectContext.Ref, o => o.XActuatorTransform )),
-                ("y_actuator_transform", new Member<F3AxisActuator, Transform>( ObjectContext.Ref, o => o.YActuatorTransform )),
-                ("z_actuator_transform", new Member<F3AxisActuator, Transform>( ObjectContext.Ref, o => o.ZActuatorTransform )),
+                .WithMember( "reference_transform", ObjectContext.Ref, o => o.ReferenceTransform )
+                .WithMember( "x_actuator_transform", ObjectContext.Ref, o => o.XActuatorTransform )
+                .WithMember( "y_actuator_transform", ObjectContext.Ref, o => o.YActuatorTransform )
+                .WithMember( "z_actuator_transform", ObjectContext.Ref, o => o.ZActuatorTransform )
 
-                ("x", new Member<F3AxisActuator, float>( o => o.X )),
-                ("y", new Member<F3AxisActuator, float>( o => o.Y )),
-                ("z", new Member<F3AxisActuator, float>( o => o.Z )),
-                ("min_x", new Member<F3AxisActuator, float>( o => o.MinX )),
-                ("max_x", new Member<F3AxisActuator, float>( o => o.MaxX )),
-                ("min_y", new Member<F3AxisActuator, float>( o => o.MinY )),
-                ("max_y", new Member<F3AxisActuator, float>( o => o.MaxY )),
-                ("min_z", new Member<F3AxisActuator, float>( o => o.MinZ )),
-                ("max_z", new Member<F3AxisActuator, float>( o => o.MaxZ )),
+                .WithMember( "x", o => o.X )
+                .WithMember( "y", o => o.Y )
+                .WithMember( "z", o => o.Z )
+                .WithMember( "min_x", o => o.MinX )
+                .WithMember( "max_x", o => o.MaxX )
+                .WithMember( "min_y", o => o.MinY )
+                .WithMember( "max_y", o => o.MaxY )
+                .WithMember( "min_z", o => o.MinZ )
+                .WithMember( "max_z", o => o.MaxZ )
 
-                ("get_reference_transform", new Member<F3AxisActuator, ControlParameterOutput<Transform>>( o => o.GetReferenceTransform )),
-                ("set_x", new Member<F3AxisActuator, ControlleeInput<float>>( o => o.SetX )),
-                ("set_y", new Member<F3AxisActuator, ControlleeInput<float>>( o => o.SetY )),
-                ("set_z", new Member<F3AxisActuator, ControlleeInput<float>>( o => o.SetZ )),
-                ("set_xyz", new Member<F3AxisActuator, ControlleeInput<Vector3>>( o => o.SetXYZ ))
-            };
+                .WithMember( "get_reference_transform", o => o.GetReferenceTransform )
+                .WithMember( "set_x", o => o.SetX )
+                .WithMember( "set_y", o => o.SetY )
+                .WithMember( "set_z", o => o.SetZ )
+                .WithMember( "set_xyz", o => o.SetXYZ );
         }
     }
 }

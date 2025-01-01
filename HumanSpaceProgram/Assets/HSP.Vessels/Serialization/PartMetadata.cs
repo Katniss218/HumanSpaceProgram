@@ -147,16 +147,14 @@ namespace HSP.Content.Vessels.Serialization
         public static SerializationMapping PartMetadataMapping()
         {
             return new MemberwiseSerializationMapping<PartMetadata>()
-            {
-                ("name", new Member<PartMetadata, string>( o => o.Name )),
-                ("description", new Member<PartMetadata, string>( o => o.Description )),
-                ("author", new Member<PartMetadata, string>( o => o.Author )),
-                ("categories", new Member<PartMetadata, string[]>( o => o.Categories )),
-                ("filter", new Member<PartMetadata, string>( o => o.Filter )),
-                ("group", new Member<PartMetadata, string>( o => o.Group )),
-               // ("file_version", new Member<PartMetadata, Version>( o => o.FileVersion )),
-               // ("mod_versions", new Member<PartMetadata, Dictionary<string, Version>>( o => o.ModVersions ))
-            };
+                .WithMember( "name", o => o.Name )
+                .WithMember( "description", o => o.Description )
+                .WithMember( "author", o => o.Author )
+                .WithMember( "categories", o => o.Categories )
+                .WithMember( "filter", o => o.Filter )
+                .WithMember( "group", o => o.Group );
+                // .WithMember( "file_version", o => o.FileVersion )
+                // .WithMember( "mod_versions", o => o.ModVersions )
         }
     }
 }

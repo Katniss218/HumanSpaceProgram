@@ -287,9 +287,7 @@ namespace HSP.Vanilla.Components
         public static SerializationMapping FAttitudeAvionicsMapping()
         {
 			return new MemberwiseSerializationMapping<FAttitudeAvionics>()
-			{
-				("on_set_attitude", new Member<FAttitudeAvionics, ControllerOutput<Vector3>>( o => o.OnSetAttitude ))
-			};
+                .WithMember( "on_set_attitude", o => o.OnSetAttitude );
         }
     }
 }

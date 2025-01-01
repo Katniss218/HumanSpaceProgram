@@ -32,9 +32,7 @@ namespace HSP.Vanilla.Components
         public static SerializationMapping FSequencerMapping()
         {
             return new MemberwiseSerializationMapping<FSequencer>()
-            {
-                ("sequence", new Member<FSequencer, Sequence>( o => o.Sequence ))
-            };
+                .WithMember( "sequence", o => o.Sequence );
         }
     }
 }

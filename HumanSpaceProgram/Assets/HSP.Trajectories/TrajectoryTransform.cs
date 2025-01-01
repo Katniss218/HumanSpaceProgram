@@ -1,4 +1,5 @@
 ﻿using HSP.ReferenceFrames;
+using HSP.Time;
 using System;
 using UnityEngine;
 using UnityPlus.Serialization;
@@ -171,9 +172,7 @@ namespace HSP.Trajectories
         public static SerializationMapping TrajectoryTransformMapping()
         {
             return new MemberwiseSerializationMapping<TrajectoryTransform>()
-            {
-                ("trajectory", new Member<TrajectoryTransform, ITrajectory>( o => o._trajectory )),
-            };
+                .WithMember( "trajectory", o => o._trajectory );
         }
     }
 }

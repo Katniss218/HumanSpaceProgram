@@ -613,12 +613,15 @@ namespace HSP.Vanilla.Trajectories
         public static SerializationMapping KeplerianOrbitMapping()
         {
             return new MemberwiseSerializationMapping<KeplerianOrbit>()
-            {
-                ("ut", new Member<KeplerianOrbit, double>( o => o.UT )),
-                ("mass", new Member<KeplerianOrbit, double>( o => o.Mass )),
-                ("parent_body", new Member<KeplerianOrbit, string>( o => o.ParentBodyID )),
-                ("semi_major_axis", new Member<KeplerianOrbit, double>( o => o.SemiMajorAxis )),
-            };
+                .WithMember( "ut", o => o.UT )
+                .WithMember( "mass", o => o.Mass )
+                .WithMember( "parent_body", o => o.ParentBodyID )
+                .WithMember( "semi_major_axis", o => o.SemiMajorAxis )
+                .WithMember( "eccentricity", o => o.Eccentricity )
+                .WithMember( "inclination", o => o.Inclination )
+                .WithMember( "longitude_of_ascending_node", o => o.LongitudeOfAscendingNode )
+                .WithMember( "argument_of_periapsis", o => o.ArgumentOfPeriapsis )
+                .WithMember( "mean_anomaly", o => o.MeanAnomaly );
         }
     }
 }

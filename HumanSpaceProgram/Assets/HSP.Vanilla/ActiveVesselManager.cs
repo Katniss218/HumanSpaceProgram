@@ -76,9 +76,7 @@ namespace HSP.Vanilla
         public static SerializationMapping ActiveObjectManagerMapping()
         {
             return new MemberwiseSerializationMapping<ActiveVesselManager>()
-            {
-                ("active_object", new Member<ActiveVesselManager, Transform>( ObjectContext.Ref, o => ActiveVesselManager.ActiveObject, (o, value) => ActiveVesselManager.ActiveObject = value ))
-            };
+                .WithMember( "active_object", ObjectContext.Ref, o => ActiveVesselManager.ActiveObject, ( o, value ) => ActiveVesselManager.ActiveObject = value );
         }
     }
 }

@@ -96,13 +96,11 @@ namespace HSP.Vanilla.Components
         public static SerializationMapping FRocketEngineMapping()
         {
             return new MemberwiseSerializationMapping<FRocketEngine>()
-            {
-                ("max_thrust", new Member<FRocketEngine, float>( o => o.MaxThrust )),
-                ("set_throttle", new Member<FRocketEngine, ControlleeInput<float>>( o => o.SetThrottle )),
-                ("isp", new Member<FRocketEngine, float>( o => o.Isp )),
-                ("throttle", new Member<FRocketEngine, float>( o => o.Throttle )),
-                ("thrust_transform", new Member<FRocketEngine, Transform>( ObjectContext.Ref, o => o.ThrustTransform ))
-            };
+                .WithMember( "max_thrust", o => o.MaxThrust )
+                .WithMember( "set_throttle", o => o.SetThrottle )
+                .WithMember( "isp", o => o.Isp )
+                .WithMember( "throttle", o => o.Throttle )
+                .WithMember( "thrust_transform", ObjectContext.Ref, o => o.ThrustTransform );
         }
     }
 }

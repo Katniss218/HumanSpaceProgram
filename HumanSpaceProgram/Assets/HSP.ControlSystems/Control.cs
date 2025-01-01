@@ -42,9 +42,7 @@ namespace HSP.ControlSystems
         public static SerializationMapping ControlMapping()
         {
             return new MemberwiseSerializationMapping<Control>()
-            {
-                ("transform", new Member<Control, Transform>( ObjectContext.Ref, o => o.transform )),
-            };
+                .WithMember( "transform", ObjectContext.Ref, o => o.transform );
         }
     }
 }

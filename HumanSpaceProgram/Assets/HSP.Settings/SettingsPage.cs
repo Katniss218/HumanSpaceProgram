@@ -2,14 +2,21 @@
 
 namespace HSP.Settings
 {
+    /// <summary>
+    /// An arbitrary settings page. <br/>
+    /// Inherit from this class like this: `CustomPage : SettingsPage<![CDATA[<]]>CustomPage<![CDATA[>]]>` to have a custom singleton settings page.
+    /// </summary>
+    /// <typeparam name="T">The inheriting singleton type.</typeparam>
     public abstract class SettingsPage<T> : ISettingsPage where T : SettingsPage<T>
     {
-        // reset to default is accomplished via the default values in each page (instantiates a new instance of the page).
+        // Reset to default values is accomplished via the default values (it instantiates a new instance of the page).
 
-        public static T Instance { get; protected set; }
+        /// <summary>
+        /// Gets the currently used settings values for this page.
+        /// </summary>
+        public static T Current { get; protected set; }
+
         internal static SerializedData data;
-
-        // each page needs to be able to apply - change the underlying unity variables, as well as apply - make itself the singleton
 
         /// <summary>
         /// Implement this method to send the settings to an external member, like e.g. UnityEngine.Application.targetFramerate.
@@ -18,12 +25,12 @@ namespace HSP.Settings
         protected abstract T OnApply();
 
         /// <summary>
-        /// Applies the current page as the working page.
+        /// Applies this page as the current working page.
         /// </summary>
         public void Apply()
         {
             T page = OnApply();
-            Instance = page;
+            Current = page;
             data = SerializationUnit.Serialize<T>( page );
             SettingsManager.SaveSettings();
         }

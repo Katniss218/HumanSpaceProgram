@@ -129,9 +129,7 @@ namespace HSP.Vanilla.Components
         public static SerializationMapping FAttachNodeMapping()
         {
             return new MemberwiseSerializationMapping<FAttachNode>()
-            {
-                ("range", new Member<FAttachNode, float>( o => o.Range ))
-            };
+                .WithMember( "range", o => o.Range );
         }
 
         void OnDrawGizmos()

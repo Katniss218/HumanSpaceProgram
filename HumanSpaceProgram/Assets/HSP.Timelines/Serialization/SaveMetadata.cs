@@ -152,12 +152,10 @@ namespace HSP.Content.Timelines.Serialization
         public static SerializationMapping SaveMetadataMapping()
         {
             return new MemberwiseSerializationMapping<SaveMetadata>()
-            {
-                ("name", new Member<SaveMetadata, string>( o => o.Name )),
-                ("description", new Member<SaveMetadata, string>( o => o.Description )),
-                ("file_version", new Member<SaveMetadata, Version>( o => o.FileVersion )),
-                ("mod_versions", new Member<SaveMetadata, Dictionary<string, Version>>( o => o.ModVersions ))
-            };
+                .WithMember( "name", o => o.Name )
+                .WithMember( "description", o => o.Description )
+                .WithMember( "file_version", o => o.FileVersion )
+                .WithMember( "mod_versions", o => o.ModVersions );
         }
     }
 }

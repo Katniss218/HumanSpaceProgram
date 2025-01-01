@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace UnityPlus.Serialization
 {
     /// <summary>
@@ -13,8 +6,6 @@ namespace UnityPlus.Serialization
     /// </summary>
     public interface ISaver
     {
-        //public delegate void Action( IReverseReferenceMap s );
-
         /// <summary>
         /// The current state of the saver. <br />
         /// Saving is split into 2 stages - see the enum values.
@@ -37,26 +28,8 @@ namespace UnityPlus.Serialization
         /// <summary>
         /// The reference map used to map object IDs to references when serializing.
         /// </summary>
-        IReverseReferenceMap RefMap { get; }
-    }
+        public IReverseReferenceMap RefMap { get; }
 
-    /// <summary>
-    /// <see cref="ISaver"/>, but can save over multiple frames.
-    /// </summary>
-    public interface IAsyncSaver : ISaver
-    {
-        //new public delegate IEnumerator Action( IReverseReferenceMap s );
-
-        /// <summary>
-        /// The percentage (in [0..1]) of completion of the current action (0 = 0% completed, 1 = 100% completed).
-        /// </summary>
-        /// <remarks>
-        /// Intended to be set by the serialization strategy, and not by the saver.
-        /// </remarks>
-        float CurrentActionPercentCompleted { get; set; }
-        /// <summary>
-        /// The percentage (in [0..1]) of completion of the entire saving process (0 = 0% completed, 1 = 100% completed).
-        /// </summary>
-        float TotalPercentCompleted { get; }
+        public bool ShouldPause();
     }
 }

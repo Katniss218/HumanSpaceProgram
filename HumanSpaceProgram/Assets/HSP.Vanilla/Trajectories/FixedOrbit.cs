@@ -72,12 +72,10 @@ namespace HSP.Vanilla.Trajectories
         public static SerializationMapping NewtonianOrbitMapping()
         {
             return new MemberwiseSerializationMapping<FixedOrbit>()
-            {
-                ("ut", new Member<FixedOrbit, double>( o => o.UT )),
-                ("mass", new Member<FixedOrbit, double>( o => o.Mass )),
-                ("position", new Member<FixedOrbit, Vector3Dbl>( o => o._currentPosition )),
-                ("rotation", new Member<FixedOrbit, QuaternionDbl>( o => o._rotation ))
-            };
+                .WithMember( "ut", o => o.UT )
+                .WithMember( "mass", o => o.Mass )
+                .WithMember( "position", o => o._currentPosition )
+                .WithMember( "rotation", o => o._rotation );
         }
     }
 }

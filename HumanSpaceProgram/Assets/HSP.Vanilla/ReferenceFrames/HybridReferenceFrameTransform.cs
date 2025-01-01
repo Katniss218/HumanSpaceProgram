@@ -538,20 +538,18 @@ namespace HSP.Vanilla
         public static SerializationMapping FreePhysicsObjectMapping()
         {
             return new MemberwiseSerializationMapping<HybridReferenceFrameTransform>()
-            {
-                ("allow_scene_simulation", new Member<HybridReferenceFrameTransform, bool>( o => o.AllowSceneSimulation )),
-                ("position_range", new Member<HybridReferenceFrameTransform, float>( o => o.PositionRange )),
-                ("velocity_range", new Member<HybridReferenceFrameTransform, float>( o => o.VelocityRange )),
-                ("max_timescale", new Member<HybridReferenceFrameTransform, float>( o => o.MaxTimeScale )),
+                .WithMember( "allow_scene_simulation", o => o.AllowSceneSimulation )
+                .WithMember( "position_range", o => o.PositionRange )
+                .WithMember( "velocity_range", o => o.VelocityRange )
+                .WithMember( "max_timescale", o => o.MaxTimeScale )
 
-                ("mass", new Member<HybridReferenceFrameTransform, float>( o => o.Mass )),
-                ("local_center_of_mass", new Member<HybridReferenceFrameTransform, Vector3>( o => o.LocalCenterOfMass )),
+                .WithMember( "mass", o => o.Mass )
+                .WithMember( "local_center_of_mass", o => o.LocalCenterOfMass )
 
-                ("absolute_position", new Member<HybridReferenceFrameTransform, Vector3Dbl>( o => o.AbsolutePosition )),
-                ("absolute_rotation", new Member<HybridReferenceFrameTransform, QuaternionDbl>( o => o.AbsoluteRotation )),
-                ("absolute_velocity", new Member<HybridReferenceFrameTransform, Vector3Dbl>( o => o.AbsoluteVelocity )),
-                ("absolute_angular_velocity", new Member<HybridReferenceFrameTransform, Vector3Dbl>( o => o.AbsoluteAngularVelocity ))
-            };
+                .WithMember( "absolute_position", o => o.AbsolutePosition )
+                .WithMember( "absolute_rotation", o => o.AbsoluteRotation )
+                .WithMember( "absolute_velocity", o => o.AbsoluteVelocity )
+                .WithMember( "absolute_angular_velocity", o => o.AbsoluteAngularVelocity );
         }
     }
 }

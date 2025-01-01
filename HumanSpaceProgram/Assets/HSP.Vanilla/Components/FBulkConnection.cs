@@ -68,12 +68,10 @@ namespace HSP.Vanilla.Components
             public static SerializationMapping PortMapping()
             {
                 return new MemberwiseSerializationMapping<Port>()
-                {
-                    ("obj_c", new Member<Port, object>( ObjectContext.Ref, o => (object)o._objC, (o, value) => o._objC = (IResourceConsumer)value )),
-                    ("obj_p", new Member<Port, object>( ObjectContext.Ref, o => (object)o._objP, (o, value) => o._objP = (IResourceProducer)value )),
-                    ("position", new Member<Port, Vector3>( o => o.Position )),
-                    ("forward", new Member<Port, Vector3>( o => o.Forward ))
-                };
+                    .WithMember<object>( "obj_c", ObjectContext.Ref, o => (object)o._objC, ( o, value ) => o._objC = (IResourceConsumer)value )
+                    .WithMember<object>( "obj_p", ObjectContext.Ref, o => (object)o._objP, ( o, value ) => o._objP = (IResourceProducer)value )
+                    .WithMember( "position", o => o.Position )
+                    .WithMember( "forward", o => o.Forward );
             }
         }
 
@@ -251,7 +249,7 @@ namespace HSP.Vanilla.Components
             }
 
             Vessel vessel = this.transform.GetVessel();
-            if( vessel != null ) 
+            if( vessel != null )
             {
                 Vector3Dbl airfAcceleration = GravityUtils.GetNBodyGravityAcceleration( vessel.ReferenceFrameTransform.AbsolutePosition );
                 Vector3 sceneAcceleration = SceneReferenceFrameManager.ReferenceFrame.InverseTransformDirection( (Vector3)airfAcceleration );
@@ -272,11 +270,9 @@ namespace HSP.Vanilla.Components
         public static SerializationMapping FBulkConnectionMapping()
         {
             return new MemberwiseSerializationMapping<FBulkConnection>()
-            {
-                ("end1", new Member<FBulkConnection, Port>( o => o.End1 )),
-                ("end2", new Member<FBulkConnection, Port>( o => o.End2 )),
-                ("cross_section_area", new Member<FBulkConnection, float>( o => o.CrossSectionArea ))
-            };
+                .WithMember( "end1", o => o.End1 )
+                .WithMember( "end2", o => o.End2 )
+                .WithMember( "cross_section_area", o => o.CrossSectionArea );
         }
     }
 }

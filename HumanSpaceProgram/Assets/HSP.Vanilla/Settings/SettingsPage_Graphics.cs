@@ -1,9 +1,4 @@
 ﻿using HSP.Settings;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityPlus.Serialization;
 
@@ -25,9 +20,7 @@ namespace HSP.Vanilla.Settings
         public static SerializationMapping SettingsPage_GraphicsMapping()
         {
             return new MemberwiseSerializationMapping<SettingsPage_Graphics>()
-            {
-                ("target_framerate", new Member<SettingsPage_Graphics, int>( o => o.TargetFramerate )),
-            };
+                .WithMember( "target_framerate", o => o.TargetFramerate );
         }
     }
 }

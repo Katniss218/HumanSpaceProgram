@@ -1,4 +1,5 @@
-﻿using HSP.ReferenceFrames;
+﻿using HSP.CelestialBodies;
+using HSP.ReferenceFrames;
 using HSP.Time;
 using System;
 using System.Linq;
@@ -307,15 +308,13 @@ namespace HSP.Vanilla
         public static SerializationMapping FixedPhysicsObjectMapping()
         {
             return new MemberwiseSerializationMapping<FixedReferenceFrameTransform>()
-            {
-                ("mass", new Member<FixedReferenceFrameTransform, float>( o => o.Mass )),
-                ("local_center_of_mass", new Member<FixedReferenceFrameTransform, Vector3>( o => o.LocalCenterOfMass )),
+                .WithMember( "mass", o => o.Mass )
+                .WithMember( "local_center_of_mass", o => o.LocalCenterOfMass )
 
-                ("DO_NOT_TOUCH", new Member<FixedReferenceFrameTransform, bool>( o => true, (o, value) => o._rb.isKinematic = true)), // TODO - isKinematic member is a hack.
+                .WithMember( "DO_NOT_TOUCH", o => true, ( o, value ) => o._rb.isKinematic = true )
 
-                ("absolute_position", new Member<FixedReferenceFrameTransform, Vector3Dbl>( o => o.AbsolutePosition )),
-                ("absolute_rotation", new Member<FixedReferenceFrameTransform, QuaternionDbl>( o => o.AbsoluteRotation ))
-            };
+                .WithMember( "absolute_position", o => o.AbsolutePosition )
+                .WithMember( "absolute_rotation", o => o.AbsoluteRotation );
         }
     }
 }

@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace UnityPlus.Serialization
 {
     /// <summary>
-    /// An arbitrary structure that has the ability to map Objects to IDs.
+    /// Represents a structure that has the ability to map objects to IDs.
     /// </summary>
     public interface IReverseReferenceMap
     {
@@ -25,7 +22,7 @@ namespace UnityPlus.Serialization
         /// Tries to return the ID of a previously registered object.
         /// </summary>
         /// <remarks>
-        /// Should always return false for <see cref="null"/>.
+        /// Should always return false for <see cref="null"/> and for references that are not registered.
         /// </remarks>
         bool TryGetID( object obj, out Guid id );
 
@@ -34,7 +31,7 @@ namespace UnityPlus.Serialization
         /// </summary>
         /// <remarks>
         /// Should always return <see cref="Guid.Empty"/> for <see cref="null"/>. <br />
-        /// Should register the <paramref name="obj"/> under a random <see cref="Guid"/> if not yet registered.
+        /// Should register the <paramref name="obj"/> under a new <see cref="Guid"/> if not yet registered.
         /// </remarks>
         Guid GetID( object obj );
 

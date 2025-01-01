@@ -43,9 +43,7 @@ namespace HSP.Vanilla.Components
         public static SerializationMapping SequenceElementMapping()
         {
             return new MemberwiseSerializationMapping<SequenceElement>()
-            {
-                ("actions", new Member<SequenceElement, SequenceActionBase[]>( o => o.Actions.ToArray(), (o, value) => o.Actions = value.ToList() ))
-            };
+                .WithMember( "actions", o => o.Actions );
         }
     }
 
@@ -66,9 +64,7 @@ namespace HSP.Vanilla.Components
         public static SerializationMapping KeyboardSequenceElementMapping()
         {
             return new MemberwiseSerializationMapping<KeyboardSequenceElement>()
-            {
-                ("key", new Member<KeyboardSequenceElement, KeyCode>( o => o.Key ))
-            };
+                .WithMember( "key", o => o.Key );
         }
     }
 
@@ -95,10 +91,8 @@ namespace HSP.Vanilla.Components
         public static SerializationMapping TimedSequenceElementMapping()
         {
             return new MemberwiseSerializationMapping<TimedSequenceElement>()
-            {
-                ("delay", new Member<TimedSequenceElement, float>( o => o.Delay )),
-                ("start_ut", new Member<TimedSequenceElement, double>( o => o._startUT ))
-            };
+                .WithMember( "delay", o => o.Delay )
+                .WithMember( "start_ut", o => o._startUT );
         }
     }
 }

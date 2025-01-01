@@ -13,29 +13,23 @@ namespace HSP.Vanilla.Components
         public static SerializationMapping RendererMapping()
         {
             return new MemberwiseSerializationMapping<Renderer>()
-            {
-                ("shared_materials", new Member<Renderer, Material[]>( ArrayContext.Assets,
+                .WithMember( "shared_materials", ArrayContext.Assets,
                     o => o.sharedMaterials.Select( m => AssetRegistry.Get<Material>( "builtin::Resources/Materials/ghost_wireframe" ) ).ToArray(),
-                   (o, value) => o.sharedMaterials = value )),
-            };
+                   ( o, value ) => o.sharedMaterials = value );
         }
 
         [MapsInheritingFrom( typeof( Collider ), Context = GhostableContext.Ghost )]
         public static SerializationMapping ColliderMapping()
         {
             return new MemberwiseSerializationMapping<Collider>()
-            {
-                ("is_trigger", new Member<Collider, bool>( o => true, (o, value) => o.isTrigger = value ))
-            };
+                .WithMember( "is_trigger", o => true, ( o, value ) => o.isTrigger = value );
         }
 
         [MapsInheritingFrom( typeof( FPointMass ), Context = GhostableContext.Ghost )]
         public static SerializationMapping FPointMassMapping()
         {
             return new MemberwiseSerializationMapping<FPointMass>()
-            {
-                ("mass", new Member<FPointMass, float>( o => 0.0f, (o, value) => o.Mass = value ))
-            };
+                .WithMember( "mass", o => 0.0f, ( o, value ) => o.Mass = value );
         }
     }
 }

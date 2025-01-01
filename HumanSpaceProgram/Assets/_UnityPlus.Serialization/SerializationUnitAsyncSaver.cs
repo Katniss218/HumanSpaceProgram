@@ -1,43 +1,38 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
 using UnityPlus.Serialization.ReferenceMaps;
 
 namespace UnityPlus.Serialization
 {
-    [Obsolete( "Not finished yet" )]
     public class SerializationUnitAsyncSaver<T> : ISaver
     {
-        private struct Entry
-        {
-            public SerializationMapping mapping;
-            public object obj;
-            public SerializedData parentData;
-        }
-
+        private bool[] _finishedMembers;
         private SerializedData[] _data;
         private T[] _objects;
 
-        private Type _memberType; // Specifies the type that all serialized/deserialized objects will derive from. May be `typeof(object)`
         private int _context = default;
 
-        private readonly Stack<Entry> _dynamicStack;
+        public long AllowedMilisecondsPerInvocation { get; set; } = 100;
+        long _lastInvocationTimestamp = 0;
 
         public IReverseReferenceMap RefMap { get; set; }
+        public MappingResult Result { get; private set; }
 
-        internal SerializationUnitAsyncSaver( T[] objects, Type memberType, int context )
+        internal SerializationUnitAsyncSaver( T[] objects, int context )
         {
             this.RefMap = new BidirectionalReferenceStore();
             this._objects = objects;
-            this._memberType = memberType;
             this._context = context;
+        }
 
-            this._dynamicStack = new Stack<Entry>();
+        public bool ShouldPause()
+        {
+            long stamp = Stopwatch.GetTimestamp();
+            long miliseconds = ((stamp - _lastInvocationTimestamp) * 1000) / Stopwatch.Frequency;
+
+            return (miliseconds > AllowedMilisecondsPerInvocation);
         }
 
         //
@@ -47,25 +42,29 @@ namespace UnityPlus.Serialization
         /// <summary>
         /// Performs serialization of the previously specified objects.
         /// </summary>
-        public IEnumerator SerializeAsync( GameObject coroutineContainer )
+        public void Serialize()
         {
-            this.SaveCallback();
+            this._finishedMembers = new bool[_objects.Length];
+            this._data = new SerializedData[_objects.Length];
+            _lastInvocationTimestamp = Stopwatch.GetTimestamp();
 
-            yield return null;
+            this.Result = this.SaveCallback();
         }
 
         /// <summary>
         /// Performs serialization of the previously specified objects.
         /// </summary>
-        public IEnumerator SerializeAsync( GameObject coroutineContainer, IReverseReferenceMap s )
+        public void Serialize( IReverseReferenceMap s )
         {
             if( s == null )
                 throw new ArgumentNullException( nameof( s ), $"The reference map to use can't be null." );
 
+            this._finishedMembers = new bool[_objects.Length];
+            this._data = new SerializedData[_objects.Length];
             this.RefMap = s;
-            this.SaveCallback();
+            _lastInvocationTimestamp = Stopwatch.GetTimestamp();
 
-            yield return null;
+            this.Result = this.SaveCallback();
         }
 
         //
@@ -77,6 +76,9 @@ namespace UnityPlus.Serialization
         /// </summary>
         public IEnumerable<SerializedData> GetData()
         {
+            if( _data == null )
+                throw new InvalidOperationException( $"Can't get the saved data before any has been saved." );
+
             return _data;
         }
 
@@ -85,30 +87,50 @@ namespace UnityPlus.Serialization
         /// </summary>
         public IEnumerable<SerializedData> GetDataOfType<TDerived>()
         {
+            if( _data == null )
+                throw new InvalidOperationException( $"Can't get the saved data before any has been saved." );
+
             return _data.Where( d =>
             {
                 return d.TryGetValue( KeyNames.TYPE, out var type ) && typeof( TDerived ).IsAssignableFrom( type.DeserializeType() );
             } );
         }
 
-        private void SaveCallback()
+        private MappingResult SaveCallback()
         {
-            _data = new SerializedData[_objects.Length];
+            bool anyFailed = false;
+            bool anyFinished = false;
+            bool anyProgressed = false;
 
             for( int i = 0; i < _objects.Length; i++ )
             {
+                if( _finishedMembers[i] )
+                    continue;
+
                 T obj = _objects[i];
 
                 var mapping = SerializationMappingRegistry.GetMapping<T>( _context, obj );
 
-                _data[i] = mapping.SafeSave<T>( obj, this );
-            }
-        }
+                var data = _data[i];
+                MappingResult memberResult = mapping.SafeSave<T>( obj, ref data, this );
+                switch( memberResult )
+                {
+                    case MappingResult.Finished:
+                        _finishedMembers[i] = true;
+                        anyFinished = true;
+                        break;
+                    case MappingResult.Failed:
+                        anyFailed = true;
+                        break;
+                    case MappingResult.Progressed:
+                        anyProgressed = true;
+                        break;
+                }
 
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public void PushToDynamicStack( SerializationMapping mapping, object obj, SerializedData parentData )
-        {
-            _dynamicStack.Push( new Entry() { obj = obj, mapping = mapping, parentData = parentData } );
+                _data[i] = data;
+            }
+
+            return MappingResult_Ex.GetCompoundResult( anyFailed, anyFinished, anyProgressed );
         }
     }
 }

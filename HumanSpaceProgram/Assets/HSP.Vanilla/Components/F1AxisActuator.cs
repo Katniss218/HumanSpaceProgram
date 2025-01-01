@@ -57,17 +57,15 @@ namespace HSP.Vanilla.Components
         public static SerializationMapping F1AxisActuatorMapping()
         {
             return new MemberwiseSerializationMapping<F1AxisActuator>()
-            {
-                ("reference_transform", new Member<F1AxisActuator, Transform>( ObjectContext.Ref, o => o.ReferenceTransform )),
-                ("x_actuator_transform", new Member<F1AxisActuator, Transform>( ObjectContext.Ref, o => o.XActuatorTransform )),
+                .WithMember( "reference_transform", ObjectContext.Ref, o => o.ReferenceTransform )
+                .WithMember( "x_actuator_transform", ObjectContext.Ref, o => o.XActuatorTransform )
 
-                ("x", new Member<F1AxisActuator, float>( o => o.X )),
-                ("min_x", new Member<F1AxisActuator, float>( o => o.MinX )),
-                ("max_x", new Member<F1AxisActuator, float>( o => o.MaxX )),
+                .WithMember( "x", o => o.X )
+                .WithMember( "min_x", o => o.MinX )
+                .WithMember( "max_x", o => o.MaxX )
 
-                ("get_reference_transform", new Member<F1AxisActuator, ControlParameterOutput<Transform>>( o => o.GetReferenceTransform )),
-                ("set_x", new Member<F1AxisActuator, ControlleeInput<float>>( o => o.SetX ))
-            };
+                .WithMember( "get_reference_transform", o => o.GetReferenceTransform )
+                .WithMember( "set_x", o => o.SetX );
         }
     }
 }
