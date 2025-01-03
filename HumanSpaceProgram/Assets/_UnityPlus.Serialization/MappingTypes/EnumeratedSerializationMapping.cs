@@ -1,9 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using UnityEngine;
 
 namespace UnityPlus.Serialization
 {
+    /// <summary>
+    /// A type of mapping that operates on a collection type that is not indexable.
+    /// </summary>
+    /// <remarks>
+    /// Failed elements will be appended after elements that have succeeded. <br/>
+    /// Assumes that the collection type <typeparamref name="TSource"/> returns its elements in a consistent order.
+    /// </remarks>
+    /// <typeparam name="TSource">The type being mapped.</typeparam>
     public class EnumeratedSerializationMapping<TSource, TElement> : SerializationMapping where TSource : IEnumerable<TElement>
     {
         int elementContext;
@@ -38,7 +47,7 @@ namespace UnityPlus.Serialization
             };
         }
 
-        public override MappingResult Save<T>( T obj, ref SerializedData data, ISaver s )
+        public override MappingResult Save<TMember>( TMember obj, ref SerializedData data, ISaver s )
         {
             if( obj == null )
             {
@@ -155,7 +164,7 @@ namespace UnityPlus.Serialization
             return MappingResult_Ex.GetCompoundResult( anyFailed, anyFinished, anyProgressed );
         }
 
-        public override MappingResult Load<T>( ref T obj, SerializedData data, ILoader l, bool populate )
+        public override MappingResult Load<TMember>( ref TMember obj, SerializedData data, ILoader l, bool populate )
         {
             if( data == null )
             {
@@ -294,7 +303,7 @@ namespace UnityPlus.Serialization
                 _objectHasBeenInstantiated = true;
             }
 
-            obj = (T)(object)sourceObj;
+            obj = (TMember)(object)sourceObj;
             return MappingResult_Ex.GetCompoundResult( anyFailed, anyFinished, anyProgressed );
         }
 

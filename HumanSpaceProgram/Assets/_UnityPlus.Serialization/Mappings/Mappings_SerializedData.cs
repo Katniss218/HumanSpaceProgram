@@ -9,7 +9,7 @@ namespace UnityPlus.Serialization.Mappings
             return new PrimitiveSerializationMapping<SerializedPrimitive>()
             {
                 OnSave = ( o, s ) => o,
-                OnInstantiate = ( data, l ) => data as SerializedPrimitive
+                OnLoad = ( data, l ) => data as SerializedPrimitive
             };
         }
 
@@ -19,7 +19,7 @@ namespace UnityPlus.Serialization.Mappings
             return new PrimitiveSerializationMapping<SerializedObject>()
             {
                 OnSave = ( o, s ) => o,
-                OnInstantiate = ( data, l ) => data as SerializedObject
+                OnLoad = ( data, l ) => data as SerializedObject
             };
         }
 
@@ -29,7 +29,7 @@ namespace UnityPlus.Serialization.Mappings
             return new PrimitiveSerializationMapping<SerializedArray>()
             {
                 OnSave = ( o, s ) => o,
-                OnInstantiate = ( data, l ) => data as SerializedArray
+                OnLoad = ( data, l ) => data as SerializedArray
             };
         }
     }

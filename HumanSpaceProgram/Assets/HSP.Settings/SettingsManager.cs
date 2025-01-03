@@ -52,7 +52,7 @@ namespace HSP.Settings
                     Debug.LogError( $"Exception occurred while trying to load the settings file '{path}'." );
                     Debug.LogException( ex );
 
-                    File.Copy( path, path.Replace( ".json", "_loadingfailed.json" ) );
+                    File.Copy( path, path.Replace( ".json", "_loadingfailed.json" ), true );
 
                     arr = CreateNewSettings( pageTypes );
                     errorOrMissingFile = true;

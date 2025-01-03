@@ -4,6 +4,10 @@ using System.Runtime.CompilerServices;
 
 namespace UnityPlus.Serialization
 {
+    /// <summary>
+    /// A type of mapping that operates on a collection type that's indexable by an integer.
+    /// </summary>
+    /// <typeparam name="TSource">The type being mapped.</typeparam>
     public class IndexedSerializationMapping<TSource, TElement> : SerializationMapping
     {
         int elementContext;

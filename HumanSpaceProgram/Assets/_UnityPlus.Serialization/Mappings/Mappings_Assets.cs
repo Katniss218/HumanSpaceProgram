@@ -10,7 +10,7 @@ namespace UnityPlus.Serialization.Mappings
             return new PrimitiveSerializationMapping<T>()
             {
                 OnSave = ( o, s ) => s.RefMap.WriteAssetReference<T>( o ),
-                OnInstantiate = ( data, l ) => l.ReadAssetReference<T>( data )
+                OnLoad = ( data, l ) => l.ReadAssetReference<T>( data )
             };
         }
     }

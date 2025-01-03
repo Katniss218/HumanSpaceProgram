@@ -8,7 +8,6 @@ namespace HSP.Vanilla.Components
 {
     public static class IGhostable_Ex
     {
-
         [MapsInheritingFrom( typeof( Renderer ), Context = GhostableContext.Ghost )]
         public static SerializationMapping RendererMapping()
         {

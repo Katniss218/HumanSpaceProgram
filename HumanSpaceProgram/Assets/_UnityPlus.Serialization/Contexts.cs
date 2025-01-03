@@ -1,13 +1,7 @@
 ﻿
 namespace UnityPlus.Serialization
 {
-    // TODO - maybe use this in places other than the attribute?
-    //public struct SerializationContext
-    //{
-    //    readonly int _value;
-    //}
-
-    // These must be `int` because attribute parameters can't be custom structs.
+    // These must be a primitive value type because attribute parameters can't be custom structs.
 
     /// <summary>
     /// General contexts applicable to any object type.

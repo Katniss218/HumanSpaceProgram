@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 namespace UnityPlus.Input.Bindings
 {
-	/// <summary>
-	/// Binds to a specific key being pressed (after being not pressed).
-	/// </summary>
-	public sealed class KeyDownBinding : IInputBinding
+    /// <summary>
+    /// Binds to a specific key being pressed (after being not pressed).
+    /// </summary>
+    public sealed class KeyDownBinding : IInputBinding
 	{
 		public bool IsValid { get; private set; }
 

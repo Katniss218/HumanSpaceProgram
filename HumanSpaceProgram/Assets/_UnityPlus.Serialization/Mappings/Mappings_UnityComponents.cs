@@ -1,14 +1,34 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Extensions;
-using UnityEngine.Rendering;
+using static UnityPlus.Serialization.SerializedPrimitive;
 
 namespace UnityPlus.Serialization.Mappings
 {
     public static class Mappings_UnityComponents
     {
+        [MapsInheritingFrom( typeof( ScriptableObject ) )]
+        public static SerializationMapping ScriptableObjectMapping()
+        {
+            return new MemberwiseSerializationMapping<ScriptableObject>()
+                .WithRawFactory( ( data, l ) =>
+                {
+                    if( data.TryGetValue( KeyNames.TYPE, out var type ) )
+                    {
+                        Type soType = type.DeserializeType();
+
+                        ScriptableObject obj = ScriptableObject.CreateInstance( soType );
+                        if( data.TryGetValue( KeyNames.ID, out var id ) )
+                        {
+                            l.RefMap.SetObj( id.DeserializeGuid(), obj );
+                        }
+                        return obj;
+                    }
+                    return null;
+                } );
+        }
+
         [MapsInheritingFrom( typeof( Behaviour ) )]
         public static SerializationMapping BehaviourMapping()
         {
@@ -36,7 +56,7 @@ namespace UnityPlus.Serialization.Mappings
             return new MemberwiseSerializationMapping<GameObject>()
                 .WithMember( "name", o => o.name )
                 .WithMember( "layer", o => o.layer )
-                .WithMember( "is_active", o => o.activeSelf, ( o, value ) => o.SetActive( value ) )
+                .WithMember( "is_active", o => o.activeSelf, ( o, value ) => { /*o.SetActive( value )*/ } )
                 .WithMember( "is_static", o => o.isStatic )
                 .WithMember( "tag", o => o.tag )
                 .WithMember( "children", o =>
@@ -60,6 +80,10 @@ namespace UnityPlus.Serialization.Mappings
             .WithRawFactory( ( data, l ) =>
             {
                 GameObject obj = new GameObject();
+                // Disable the gameobject to prevent 'start' from firing prematurely if deserializing over multiple frames.
+                // It will be re-enabled by the finalizer.
+                obj.SetActive( false );
+
                 if( data.TryGetValue( KeyNames.ID, out var id ) )
                 {
                     l.RefMap.SetObj( id.DeserializeGuid(), obj );
@@ -79,7 +103,7 @@ namespace UnityPlus.Serialization.Mappings
                             if( component is Behaviour behaviour )
                             {
                                 // Disable the behaviour to prevent 'start' from firing prematurely if deserializing over multiple frames.
-                                // It will be re-enabled by SetData.
+                                // It will be re-enabled later when the members are set.
                                 behaviour.enabled = false;
                             }
 
@@ -93,6 +117,13 @@ namespace UnityPlus.Serialization.Mappings
                     }
                 }
                 return obj;
+            } )
+            .WithFinalizer( ( data, go ) =>
+            {
+                if( data.TryGetValue( "is_active", out var isActive ) )
+                {
+                    go.SetActive( (bool)isActive );
+                }
             } );
         }
 

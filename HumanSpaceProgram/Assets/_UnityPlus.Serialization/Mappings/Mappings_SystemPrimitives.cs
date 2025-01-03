@@ -11,7 +11,7 @@ namespace UnityPlus.Serialization.Mappings
             return new PrimitiveSerializationMapping<bool>()
             {
                 OnSave = ( o, s ) => (SerializedPrimitive)o,
-                OnInstantiate = ( data, l ) => (bool)data
+                OnLoad = ( data, l ) => (bool)data
             };
         }
 
@@ -21,7 +21,7 @@ namespace UnityPlus.Serialization.Mappings
             return new PrimitiveSerializationMapping<byte>()
             {
                 OnSave = ( o, s ) => (SerializedPrimitive)o,
-                OnInstantiate = ( data, l ) => (byte)data
+                OnLoad = ( data, l ) => (byte)data
             };
         }
 
@@ -31,7 +31,7 @@ namespace UnityPlus.Serialization.Mappings
             return new PrimitiveSerializationMapping<sbyte>()
             {
                 OnSave = ( o, s ) => (SerializedPrimitive)o,
-                OnInstantiate = ( data, l ) => (sbyte)data
+                OnLoad = ( data, l ) => (sbyte)data
             };
         }
 
@@ -41,7 +41,7 @@ namespace UnityPlus.Serialization.Mappings
             return new PrimitiveSerializationMapping<short>()
             {
                 OnSave = ( o, s ) => (SerializedPrimitive)o,
-                OnInstantiate = ( data, l ) => (short)data
+                OnLoad = ( data, l ) => (short)data
             };
         }
 
@@ -51,7 +51,7 @@ namespace UnityPlus.Serialization.Mappings
             return new PrimitiveSerializationMapping<ushort>()
             {
                 OnSave = ( o, s ) => (SerializedPrimitive)o,
-                OnInstantiate = ( data, l ) => (ushort)data
+                OnLoad = ( data, l ) => (ushort)data
             };
         }
 
@@ -61,7 +61,7 @@ namespace UnityPlus.Serialization.Mappings
             return new PrimitiveSerializationMapping<int>()
             {
                 OnSave = ( o, s ) => (SerializedPrimitive)o,
-                OnInstantiate = ( data, l ) => (int)data
+                OnLoad = ( data, l ) => (int)data
             };
         }
 
@@ -71,7 +71,7 @@ namespace UnityPlus.Serialization.Mappings
             return new PrimitiveSerializationMapping<uint>()
             {
                 OnSave = ( o, s ) => (SerializedPrimitive)o,
-                OnInstantiate = ( data, l ) => (uint)data
+                OnLoad = ( data, l ) => (uint)data
             };
         }
 
@@ -81,7 +81,7 @@ namespace UnityPlus.Serialization.Mappings
             return new PrimitiveSerializationMapping<long>()
             {
                 OnSave = ( o, s ) => (SerializedPrimitive)o,
-                OnInstantiate = ( data, l ) => (long)data
+                OnLoad = ( data, l ) => (long)data
             };
         }
 
@@ -91,7 +91,7 @@ namespace UnityPlus.Serialization.Mappings
             return new PrimitiveSerializationMapping<ulong>()
             {
                 OnSave = ( o, s ) => (SerializedPrimitive)o,
-                OnInstantiate = ( data, l ) => (ulong)data
+                OnLoad = ( data, l ) => (ulong)data
             };
         }
 
@@ -101,7 +101,7 @@ namespace UnityPlus.Serialization.Mappings
             return new PrimitiveSerializationMapping<float>()
             {
                 OnSave = ( o, s ) => (SerializedPrimitive)o,
-                OnInstantiate = ( data, l ) => (float)data
+                OnLoad = ( data, l ) => (float)data
             };
         }
 
@@ -111,7 +111,7 @@ namespace UnityPlus.Serialization.Mappings
             return new PrimitiveSerializationMapping<double>()
             {
                 OnSave = ( o, s ) => (SerializedPrimitive)o,
-                OnInstantiate = ( data, l ) => (double)data
+                OnLoad = ( data, l ) => (double)data
             };
         }
 
@@ -121,7 +121,7 @@ namespace UnityPlus.Serialization.Mappings
             return new PrimitiveSerializationMapping<decimal>()
             {
                 OnSave = ( o, s ) => (SerializedPrimitive)o,
-                OnInstantiate = ( data, l ) => (decimal)data
+                OnLoad = ( data, l ) => (decimal)data
             };
         }
 
@@ -131,7 +131,7 @@ namespace UnityPlus.Serialization.Mappings
             return new PrimitiveSerializationMapping<char>()
             {
                 OnSave = ( o, s ) => (SerializedPrimitive)(o.ToString()),
-                OnInstantiate = ( data, l ) => ((string)data)[0]
+                OnLoad = ( data, l ) => ((string)data)[0]
             };
         }
 
@@ -141,7 +141,7 @@ namespace UnityPlus.Serialization.Mappings
             return new PrimitiveSerializationMapping<string>()
             {
                 OnSave = ( o, s ) => (SerializedPrimitive)o,
-                OnInstantiate = ( data, l ) => (string)data
+                OnLoad = ( data, l ) => (string)data
             };
         }
 
@@ -154,7 +154,7 @@ namespace UnityPlus.Serialization.Mappings
             return new PrimitiveSerializationMapping<DateTime>()
             {
                 OnSave = ( o, s ) => (SerializedPrimitive)o.ToString( "o", CultureInfo.InvariantCulture ),
-                OnInstantiate = ( data, l ) => DateTime.Parse( (string)data, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind )
+                OnLoad = ( data, l ) => DateTime.Parse( (string)data, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind )
             };
         }
 
@@ -167,7 +167,7 @@ namespace UnityPlus.Serialization.Mappings
             return new PrimitiveSerializationMapping<DateTimeOffset>()
             {
                 OnSave = ( o, s ) => (SerializedPrimitive)o.ToString( "o", CultureInfo.InvariantCulture ),
-                OnInstantiate = ( data, l ) => DateTimeOffset.Parse( (string)data, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind )
+                OnLoad = ( data, l ) => DateTimeOffset.Parse( (string)data, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind )
             };
         }
 
@@ -180,7 +180,7 @@ namespace UnityPlus.Serialization.Mappings
             return new PrimitiveSerializationMapping<TimeSpan>()
             {
                 OnSave = ( o, s ) => (SerializedPrimitive)o.ToString( "c", CultureInfo.InvariantCulture ),
-                OnInstantiate = ( data, l ) => TimeSpan.ParseExact( (string)data, "c", CultureInfo.InvariantCulture )
+                OnLoad = ( data, l ) => TimeSpan.ParseExact( (string)data, "c", CultureInfo.InvariantCulture )
             };
         }
 
@@ -190,7 +190,7 @@ namespace UnityPlus.Serialization.Mappings
             return new PrimitiveSerializationMapping<T>()
             {
                 OnSave = ( o, s ) => (SerializedPrimitive)o.ToString( "G" ),
-                OnInstantiate = ( data, l ) => Enum.Parse<T>( (string)data )
+                OnLoad = ( data, l ) => Enum.Parse<T>( (string)data )
             };
         }
 
@@ -203,7 +203,7 @@ namespace UnityPlus.Serialization.Mappings
                 {
                     return Persistent_Delegate.GetData( o, s.RefMap );
                 },
-                OnInstantiate = ( SerializedData data, IForwardReferenceMap l ) =>
+                OnLoad = ( SerializedData data, IForwardReferenceMap l ) =>
                 {
                     // This is kinda non-standard, but since we need the reference to the `target` to even create the delegate, we can only create it here.
                     return Persistent_Delegate.ToDelegate( data, l );

@@ -96,7 +96,7 @@ namespace HSP
             return new PrimitiveSerializationMapping<Version>()
             {
                 OnSave = ( o, s ) => (SerializedPrimitive)o.ToString(),
-                OnInstantiate = ( data, l ) => Version.Parse( (string)data )
+                OnLoad = ( data, l ) => Version.Parse( (string)data )
             };
         }
     }

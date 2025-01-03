@@ -49,6 +49,7 @@ namespace HSP.Vanilla.Components
 
     public class KeyboardSequenceElement : SequenceElement
     {
+#warning TODO - default key (if not set to custom) equal to the one in settings.
         public KeyCode Key { get; set; } = KeyCode.Space;
 
         public override void Initialize()

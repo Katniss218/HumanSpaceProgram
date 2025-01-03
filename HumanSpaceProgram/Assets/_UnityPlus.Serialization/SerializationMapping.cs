@@ -11,13 +11,13 @@ namespace UnityPlus.Serialization
         /// </summary>
         public int Context { get; internal set; }
 
-        // Mappings use generic `T` instead of being themselves generic - because `SerializationMapping<Transform>` can't be cast to `SerializationMapping<Component>`.
-        // - This CAN NOT be solved using variant interfaces - variance is not supported on `ref` parameters.
+        // Mappings have to use generic `TMember` method param instead of being themselves generic
+        // - Because `SerializationMapping<Transform>` can't be cast to `SerializationMapping<Component>`.
+        // - And this CAN NOT be solved using variant interfaces - variance is not supported on `ref` parameters.
 
         /// <summary>
-        /// Override this if your mapping contains any additional data (and return copy of the mapping, but with those additional data fields cleared).
+        /// Copies the working data from a mapping definition to a 'work' mapping.
         /// </summary>
-        /// <returns>Either "this", or a clone (depending on if the mapping needs to persist data between Load and LoadReferences).</returns>
         public abstract SerializationMapping GetInstance();
 
         /// <summary>
@@ -26,7 +26,8 @@ namespace UnityPlus.Serialization
         /// <returns>
         /// True if the member has been fully serialized, false if the method needs to be called again to serialize more.
         /// </returns>
-        public abstract MappingResult Save<T>( T obj, ref SerializedData data, ISaver s );
+        /// <typeparam name="TMember">Set to the type of the member (field/property) that contains the object.</typeparam>
+        public abstract MappingResult Save<TMember>( TMember obj, ref SerializedData data, ISaver s );
 
         /// <summary>
         /// 
@@ -34,6 +35,7 @@ namespace UnityPlus.Serialization
         /// <returns>
         /// True if the member has been fully deserialized, false if the method needs to be called again to deserialize more.
         /// </returns>
-        public abstract MappingResult Load<T>( ref T obj, SerializedData data, ILoader l, bool populate );
+        /// <typeparam name="TMember">Set to the type of the member (field/property) that contains the object.</typeparam>
+        public abstract MappingResult Load<TMember>( ref TMember obj, SerializedData data, ILoader l, bool populate );
     }
 }

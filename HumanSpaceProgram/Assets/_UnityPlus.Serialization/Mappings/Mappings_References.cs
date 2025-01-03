@@ -11,7 +11,7 @@ namespace UnityPlus.Serialization.Mappings
             return new PrimitiveSerializationMapping<T>()
             {
                 OnSave = ( o, s ) => s.RefMap.WriteObjectReference<T>( o ),
-                OnInstantiate = ( data, l ) =>
+                OnLoad = ( data, l ) =>
                 {
                     if( l.TryReadObjectReference<T>( data, out var obj ) )
                         return obj;

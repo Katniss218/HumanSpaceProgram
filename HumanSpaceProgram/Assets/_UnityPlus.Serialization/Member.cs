@@ -31,7 +31,6 @@ namespace UnityPlus.Serialization
         public int Context => _context;
 
         private bool _hasCachedMapping;
-#warning TODO - members can only cache mappings if the mapping is primitive.
         private SerializationMapping _cachedMapping;
 
         private void TryCacheMemberMapping()
@@ -39,12 +38,11 @@ namespace UnityPlus.Serialization
             Type type = typeof( TMember );
             if( type.IsValueType || (!type.IsInterface && type.BaseType == null) )
             {
-                var mapping1 = SerializationMappingRegistry.GetMappingOrNull( _context, typeof( TMember ) );
-                var mapping2 = mapping1.GetInstance();
-                if( object.ReferenceEquals( mapping1, mapping2 ) ) // This is needed due to GetInstance and mappings that can hold state (like the dict mapping).
+                var mapping = SerializationMappingRegistry.GetMappingOrNull( _context, typeof( TMember ) );
+                if( mapping is PrimitiveSerializationMapping<TMember> )
                 {
                     _hasCachedMapping = true;
-                    _cachedMapping = mapping1;
+                    _cachedMapping = mapping;
                 }
             }
         }
@@ -114,14 +112,12 @@ namespace UnityPlus.Serialization
 
         public override MappingResult Save( TSource sourceObj, SerializedData sourceData, ISaver s, out SerializationMapping mapping, out object memberObj )
         {
-            if( !sourceData.TryGetValue( Name, out var memberData ) )
-                memberData = null;
-
             TMember memberObj2 = _getter.Invoke( sourceObj );
             memberObj = memberObj2;
 
             mapping = SerializationMappingRegistry.GetMapping<TMember>( _context, memberObj2 );
 
+            SerializedData memberData = null;
             MappingResult memberResult = mapping.SafeSave<TMember>( memberObj2, ref memberData, s );
             sourceData[Name] = memberData;
 
@@ -144,7 +140,11 @@ namespace UnityPlus.Serialization
         public override MappingResult Load( ref TSource sourceObj, bool isInstantiated, SerializedData sourceData, ILoader l, out SerializationMapping mapping, out object memberObj )
         {
             if( !sourceData.TryGetValue( Name, out SerializedData memberData ) )
-                memberData = null;
+            {
+                mapping = default;
+                memberObj = default;
+                return MappingResult.Finished;
+            }
 
             if( _hasCachedMapping )             // This caching appears to not do much performance-wise.
             {
