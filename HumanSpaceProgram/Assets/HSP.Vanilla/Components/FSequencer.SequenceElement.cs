@@ -1,5 +1,6 @@
 ﻿using HSP.ControlSystems;
 using HSP.Time;
+using HSP.Vanilla.Settings;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -49,8 +50,7 @@ namespace HSP.Vanilla.Components
 
     public class KeyboardSequenceElement : SequenceElement
     {
-#warning TODO - default key (if not set to custom) equal to the one in settings.
-        public KeyCode Key { get; set; } = KeyCode.Space;
+        public KeyCode Key { get; set; } = SettingsPage_Keybinds.Current.GameplayControlSequencerAdvance;
 
         public override void Initialize()
         {

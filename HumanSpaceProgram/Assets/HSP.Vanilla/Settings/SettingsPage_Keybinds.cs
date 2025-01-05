@@ -1,6 +1,5 @@
 ﻿using HSP.Input;
 using HSP.Settings;
-using System;
 using UnityEngine;
 using UnityPlus.Input;
 using UnityPlus.Input.Bindings;
@@ -43,8 +42,18 @@ namespace HSP.Vanilla.Settings
         public IInputBinding GameplayControlRollLeft { get; set; } = new KeyDownBinding( 1, KeyCode.Q );
         public IInputBinding GameplayControlRollRight { get; set; } = new KeyDownBinding( -1, KeyCode.E );
 
+        public KeyCode GameplayControlSequencerAdvance { get; set; } = KeyCode.Space;
+
         public IInputBinding GameplayTimescaleIncrease { get; set; } = new KeyDownBinding( 1, KeyCode.Period );
         public IInputBinding GameplayTimescaleDecrease { get; set; } = new KeyDownBinding( -1, KeyCode.Comma );
+
+        public IInputBinding DesignSave { get; set; } = new MultipleKeyDownBinding( 0, KeyCode.LeftControl, KeyCode.S );
+        public IInputBinding DesignPartRotateXn { get; set; } = new KeyDownBinding( -1, KeyCode.S );
+        public IInputBinding DesignPartRotateXp { get; set; } = new KeyDownBinding( 1, KeyCode.W );
+        public IInputBinding DesignPartRotateYn { get; set; } = new KeyDownBinding( -1, KeyCode.A );
+        public IInputBinding DesignPartRotateYp { get; set; } = new KeyDownBinding( 1, KeyCode.D );
+        public IInputBinding DesignPartRotateZn { get; set; } = new KeyDownBinding( -1, KeyCode.E );
+        public IInputBinding DesignPartRotateZp { get; set; } = new KeyDownBinding( 1, KeyCode.Q );
 
         protected override SettingsPage_Keybinds OnApply()
         {
@@ -83,6 +92,14 @@ namespace HSP.Vanilla.Settings
 
             BindOrUnbind( HierarchicalInputChannel.GAMEPLAY_TIMESCALE_INCREASE, GameplayTimescaleIncrease );
             BindOrUnbind( HierarchicalInputChannel.GAMEPLAY_TIMESCALE_DECREASE, GameplayTimescaleDecrease );
+
+            BindOrUnbind( HierarchicalInputChannel.DESIGN_SAVE, DesignSave );
+            BindOrUnbind( HierarchicalInputChannel.DESIGN_PART_ROTATE_XN, DesignPartRotateXn );
+            BindOrUnbind( HierarchicalInputChannel.DESIGN_PART_ROTATE_XP, DesignPartRotateXp );
+            BindOrUnbind( HierarchicalInputChannel.DESIGN_PART_ROTATE_YN, DesignPartRotateYn );
+            BindOrUnbind( HierarchicalInputChannel.DESIGN_PART_ROTATE_YP, DesignPartRotateYp );
+            BindOrUnbind( HierarchicalInputChannel.DESIGN_PART_ROTATE_ZN, DesignPartRotateZn );
+            BindOrUnbind( HierarchicalInputChannel.DESIGN_PART_ROTATE_ZP, DesignPartRotateZp );
             return this;
         }
 
@@ -136,8 +153,18 @@ namespace HSP.Vanilla.Settings
                 .WithMember( "gameplay_control_roll_left", o => o.GameplayControlRollLeft )
                 .WithMember( "gameplay_control_roll_right", o => o.GameplayControlRollRight )
 
+                .WithMember( "gameplay_control_sequencer_advance", o => o.GameplayControlSequencerAdvance )
+
                 .WithMember( "gameplay_timescale_increase", o => o.GameplayTimescaleIncrease )
-                .WithMember( "gameplay_timescale_decrease", o => o.GameplayTimescaleDecrease );
+                .WithMember( "gameplay_timescale_decrease", o => o.GameplayTimescaleDecrease )
+
+                .WithMember( "design_save", o => o.DesignSave )
+                .WithMember( "design_part_rotate_xn", o => o.DesignPartRotateXn )
+                .WithMember( "design_part_rotate_xp", o => o.DesignPartRotateXp )
+                .WithMember( "design_part_rotate_yn", o => o.DesignPartRotateYn )
+                .WithMember( "design_part_rotate_yp", o => o.DesignPartRotateYp )
+                .WithMember( "design_part_rotate_zn", o => o.DesignPartRotateZn )
+                .WithMember( "design_part_rotate_zp", o => o.DesignPartRotateZp );
         }
     }
 }

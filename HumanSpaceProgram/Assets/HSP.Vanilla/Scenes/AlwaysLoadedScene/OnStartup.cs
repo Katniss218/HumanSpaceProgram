@@ -9,17 +9,9 @@ namespace HSP.Vanilla.Scenes.AlwaysLoadedScene
 {
     public static class OnStartup
     {
-        public const string BIND_INPUT_CHANNELS = HSPEvent.NAMESPACE_HSP + ".bind_input_channels";
+        public const string RELOAD_SETTINGS = HSPEvent.NAMESPACE_HSP + ".settings.load";
 
-        [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, BIND_INPUT_CHANNELS )]
-        private static void BindInputs()
-        {
-            HierarchicalInputChannel.BindInputs();
-        }
-
-        public const string LOAD_SETTINGS_FROM_FILE = HSPEvent.NAMESPACE_HSP + ".settings.load";
-
-        [HSPEventListener( HSPEvent_STARTUP_EARLY.ID, LOAD_SETTINGS_FROM_FILE )]
+        [HSPEventListener( HSPEvent_STARTUP_EARLY.ID, RELOAD_SETTINGS )]
         private static void LoadSettingsFromFileOnStartup()
         {
             SettingsManager.ReloadSettings();

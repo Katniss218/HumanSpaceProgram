@@ -431,8 +431,8 @@ namespace HSP._DevUtils
                                 OnInvokeTyped = new ControlSystems.Controls.ControllerOutput<float>(),
                                 SignalValue = 1f
                             }
-                        },
-                        Key = KeyCode.Space
+                        }//,
+                        //Key = KeyCode.Space
                     },
                     new TimedSequenceElement()
                     {

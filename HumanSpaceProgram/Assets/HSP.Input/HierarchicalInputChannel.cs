@@ -1,7 +1,4 @@
-﻿using UnityEngine;
-using UnityPlus.Input;
-using UnityPlus.Input.Bindings;
-
+﻿
 namespace HSP.Input
 {
     public static class HierarchicalInputChannel
@@ -56,19 +53,5 @@ namespace HSP.Input
 		public const string DESIGN_PART_ROTATE_YN = "vanilla.gameplayc_rotate_yn";
 		public const string DESIGN_PART_ROTATE_ZP = "vanilla.gameplayc_rotate_zp";
 		public const string DESIGN_PART_ROTATE_ZN = "vanilla.gameplayc_rotate_zn";
-
-		public static void BindInputs()
-		{
-			HierarchicalInputManager.BindInput( HierarchicalInputChannel.GAMEPLAY_CONTROL_SEQUENCER_ADVANCE, new KeyDownBinding( 0, KeyCode.Space ) );
-
-			HierarchicalInputManager.BindInput( HierarchicalInputChannel.DESIGN_SAVE, new MultipleKeyDownBinding( 0, KeyCode.LeftControl, KeyCode.S ) );
-
-			HierarchicalInputManager.BindInput( HierarchicalInputChannel.DESIGN_PART_ROTATE_XP, new KeyDownBinding( 1, KeyCode.W ) );
-			HierarchicalInputManager.BindInput( HierarchicalInputChannel.DESIGN_PART_ROTATE_XN, new KeyDownBinding( -1, KeyCode.S ) );
-			HierarchicalInputManager.BindInput( HierarchicalInputChannel.DESIGN_PART_ROTATE_YP, new KeyDownBinding( 1, KeyCode.D ) );
-			HierarchicalInputManager.BindInput( HierarchicalInputChannel.DESIGN_PART_ROTATE_YN, new KeyDownBinding( -1, KeyCode.A ) );
-			HierarchicalInputManager.BindInput( HierarchicalInputChannel.DESIGN_PART_ROTATE_ZP, new KeyDownBinding( 1, KeyCode.Q ) );
-			HierarchicalInputManager.BindInput( HierarchicalInputChannel.DESIGN_PART_ROTATE_ZN, new KeyDownBinding( -1, KeyCode.E ) );
-		}
 	}
 }
