@@ -13,14 +13,14 @@ namespace HSP.Vanilla.Scenes.GameplayScene
 	{
 		void OnEnable()
 		{
-			HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_TIMESCALE_INCREASE, HierarchicalInputPriority.MEDIUM, Input_TimescaleIncrease );
-			HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_TIMESCALE_DECREASE, HierarchicalInputPriority.MEDIUM, Input_TimescaleDecrease );
+			HierarchicalInputManager.AddAction( InputChannel.GAMEPLAY_TIMESCALE_INCREASE, InputChannelPriority.MEDIUM, Input_TimescaleIncrease );
+			HierarchicalInputManager.AddAction( InputChannel.GAMEPLAY_TIMESCALE_DECREASE, InputChannelPriority.MEDIUM, Input_TimescaleDecrease );
 		}
 
 		void OnDisable()
 		{
-			HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_TIMESCALE_INCREASE, Input_TimescaleIncrease );
-			HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_TIMESCALE_DECREASE, Input_TimescaleDecrease );
+			HierarchicalInputManager.RemoveAction( InputChannel.GAMEPLAY_TIMESCALE_INCREASE, Input_TimescaleIncrease );
+			HierarchicalInputManager.RemoveAction( InputChannel.GAMEPLAY_TIMESCALE_DECREASE, Input_TimescaleDecrease );
 		}
 
 		private bool Input_TimescaleIncrease( float value )

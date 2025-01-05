@@ -1,6 +1,6 @@
 ﻿namespace HSP.Input
 {
-    public static class HierarchicalInputPriority
+    public static class InputChannelPriority
     {
         public const int MIN = 10;
 

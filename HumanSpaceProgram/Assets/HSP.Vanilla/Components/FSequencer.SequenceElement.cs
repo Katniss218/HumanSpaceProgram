@@ -50,7 +50,7 @@ namespace HSP.Vanilla.Components
 
     public class KeyboardSequenceElement : SequenceElement
     {
-        public KeyCode Key { get; set; } = SettingsPage_Keybinds.Current.GameplayControlSequencerAdvance;
+        public KeyCode Key { get; set; } = SettingsPage_Keybinds.Current.GameplayControlDefaultSequencerKey;
 
         public override void Initialize()
         {

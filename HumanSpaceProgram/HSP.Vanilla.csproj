@@ -140,6 +140,7 @@
     <Compile Include="Assets\HSP.Vanilla\Components\FLaunchSiteMarker.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FReactionControlController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FControlFrame.cs" />
+    <Compile Include="Assets\HSP.Vanilla\InputChannel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla\___HSP.Vanilla.asmdef" />
@@ -1030,10 +1031,6 @@
     <ProjectReference Include="HSP.ControlSystems.csproj">
       <Project>{5E371463-138D-D25A-49B8-DED13355C7DC}</Project>
       <Name>HSP.ControlSystems</Name>
-    </ProjectReference>
-    <ProjectReference Include="HSP.Input.csproj">
-      <Project>{27123301-09AF-37AC-2FCA-FF7B2CC75C42}</Project>
-      <Name>HSP.Input</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.ReferenceFrames.csproj">
       <Project>{D8846B96-55B1-C32C-F90A-52C14F5C8043}</Project>

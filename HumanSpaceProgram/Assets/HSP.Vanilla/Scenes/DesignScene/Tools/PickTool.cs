@@ -67,12 +67,12 @@ namespace HSP.Vanilla.Scenes.DesignScene.Tools
 
 		void OnEnable()
 		{
-			HierarchicalInputManager.AddAction( HierarchicalInputChannel.VIEWPORT_PRIMARY_UP, HierarchicalInputPriority.MEDIUM, Input_MouseClick );
+            HierarchicalInputManager.AddAction( Input.InputChannel.PRIMARY_UP, InputChannelPriority.MEDIUM, Input_MouseClick );
 		}
 
 		void OnDisable() // if tool switched while action is performed.
 		{
-			HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.VIEWPORT_PRIMARY_UP, Input_MouseClick );
+            HierarchicalInputManager.RemoveAction( Input.InputChannel.PRIMARY_UP, Input_MouseClick );
 			if( _heldPart != null )
 			{
 				PlacePart();

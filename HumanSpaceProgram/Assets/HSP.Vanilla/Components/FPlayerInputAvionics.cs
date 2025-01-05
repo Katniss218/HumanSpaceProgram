@@ -46,22 +46,22 @@ namespace HSP.Vanilla.Components
 
         void OnEnable()
         {
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_PITCH, HierarchicalInputPriority.MEDIUM, Input_Pitch );
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_YAW, HierarchicalInputPriority.MEDIUM, Input_Yaw );
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_ROLL, HierarchicalInputPriority.MEDIUM, Input_Roll );
+            HierarchicalInputManager.AddAction( InputChannel.GAMEPLAY_CONTROL_PITCH, InputChannelPriority.MEDIUM, Input_Pitch );
+            HierarchicalInputManager.AddAction( InputChannel.GAMEPLAY_CONTROL_YAW, InputChannelPriority.MEDIUM, Input_Yaw );
+            HierarchicalInputManager.AddAction( InputChannel.GAMEPLAY_CONTROL_ROLL, InputChannelPriority.MEDIUM, Input_Roll );
 
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MAX, HierarchicalInputPriority.MEDIUM, Input_FullThrottle );
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MIN, HierarchicalInputPriority.MEDIUM, Input_CutThrottle );
+            HierarchicalInputManager.AddAction( InputChannel.GAMEPLAY_CONTROL_THROTTLE_MAX, InputChannelPriority.MEDIUM, Input_FullThrottle );
+            HierarchicalInputManager.AddAction( InputChannel.GAMEPLAY_CONTROL_THROTTLE_MIN, InputChannelPriority.MEDIUM, Input_CutThrottle );
         }
 
         void OnDisable()
         {
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_PITCH, Input_Pitch );
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_YAW, Input_Yaw );
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_ROLL, Input_Roll );
+            HierarchicalInputManager.RemoveAction( InputChannel.GAMEPLAY_CONTROL_PITCH, Input_Pitch );
+            HierarchicalInputManager.RemoveAction( InputChannel.GAMEPLAY_CONTROL_YAW, Input_Yaw );
+            HierarchicalInputManager.RemoveAction( InputChannel.GAMEPLAY_CONTROL_ROLL, Input_Roll );
 
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MAX, Input_FullThrottle );
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MIN, Input_CutThrottle );
+            HierarchicalInputManager.RemoveAction( InputChannel.GAMEPLAY_CONTROL_THROTTLE_MAX, Input_FullThrottle );
+            HierarchicalInputManager.RemoveAction( InputChannel.GAMEPLAY_CONTROL_THROTTLE_MIN, Input_CutThrottle );
         }
 
         private bool Input_FullThrottle( float value )

@@ -81,14 +81,14 @@ namespace HSP.Vanilla.Scenes.DesignScene.Cameras
 
         void OnEnable()
         {
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.VIEWPORT_SECONDARY_DOWN, HierarchicalInputPriority.HIGH, Input_MouseDown );
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.VIEWPORT_SECONDARY_UP, HierarchicalInputPriority.HIGH, Input_MouseUp );
+            HierarchicalInputManager.AddAction( Input.InputChannel.SECONDARY_DOWN, InputChannelPriority.HIGH, Input_MouseDown );
+            HierarchicalInputManager.AddAction( Input.InputChannel.SECONDARY_UP, InputChannelPriority.HIGH, Input_MouseUp );
         }
 
         void OnDisable()
         {
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.VIEWPORT_SECONDARY_DOWN, Input_MouseDown );
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.VIEWPORT_SECONDARY_UP, Input_MouseUp );
+            HierarchicalInputManager.RemoveAction( Input.InputChannel.SECONDARY_DOWN, Input_MouseDown );
+            HierarchicalInputManager.RemoveAction( Input.InputChannel.SECONDARY_UP, Input_MouseUp );
         }
 
         private bool Input_MouseDown( float val )

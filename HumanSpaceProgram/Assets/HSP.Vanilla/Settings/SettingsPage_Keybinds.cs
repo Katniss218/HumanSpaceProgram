@@ -9,16 +9,16 @@ namespace HSP.Vanilla.Settings
 {
     public sealed class SettingsPage_Keybinds : SettingsPage<SettingsPage_Keybinds>
     {
-        public IInputBinding ViewportPrimaryDown { get; set; } = new KeyDownBinding( 0, KeyCode.Mouse0 );
-        public IInputBinding ViewportPrimary { get; set; } = new KeyHoldBinding( 0, KeyCode.Mouse0 );
-        public IInputBinding ViewportPrimaryUp { get; set; } = new KeyUpBinding( 0, KeyCode.Mouse0 );
-        public IInputBinding ViewportSecondaryDown { get; set; } = new KeyDownBinding( 0, KeyCode.Mouse1 );
-        public IInputBinding ViewportSecondary { get; set; } = new KeyHoldBinding( 0, KeyCode.Mouse1 );
-        public IInputBinding ViewportSecondaryUp { get; set; } = new KeyUpBinding( 0, KeyCode.Mouse1 );
+        public IInputBinding CommonPrimaryDown { get; set; } = new KeyDownBinding( 0, KeyCode.Mouse0 );
+        public IInputBinding CommonPrimary { get; set; } = new KeyHoldBinding( 0, KeyCode.Mouse0 );
+        public IInputBinding CommonPrimaryUp { get; set; } = new KeyUpBinding( 0, KeyCode.Mouse0 );
+        public IInputBinding CommonSecondaryDown { get; set; } = new KeyDownBinding( 0, KeyCode.Mouse1 );
+        public IInputBinding CommonSecondary { get; set; } = new KeyHoldBinding( 0, KeyCode.Mouse1 );
+        public IInputBinding CommonSecondaryUp { get; set; } = new KeyUpBinding( 0, KeyCode.Mouse1 );
 
-        public IInputBinding CommonEscape { get; set; } = new KeyDownBinding( 0, KeyCode.Escape );
-        public IInputBinding CommonToggleUI { get; set; } = new KeyDownBinding( 0, KeyCode.F1 );
-        public IInputBinding CommonScreenshot { get; set; } = new KeyDownBinding( 0, KeyCode.F2 );
+        public IInputBinding VanillaEscape { get; set; } = new KeyDownBinding( 0, KeyCode.Escape );
+        public IInputBinding VanillaToggleUI { get; set; } = new KeyDownBinding( 0, KeyCode.F1 );
+        public IInputBinding VanillaScreenshot { get; set; } = new KeyDownBinding( 0, KeyCode.F2 );
 
         public IInputBinding GameplayControlThrottleMin { get; set; } = new KeyDownBinding( 1, KeyCode.X );
         public IInputBinding GameplayControlThrottleMax { get; set; } = new KeyDownBinding( -1, KeyCode.Z );
@@ -42,64 +42,66 @@ namespace HSP.Vanilla.Settings
         public IInputBinding GameplayControlRollLeft { get; set; } = new KeyDownBinding( 1, KeyCode.Q );
         public IInputBinding GameplayControlRollRight { get; set; } = new KeyDownBinding( -1, KeyCode.E );
 
-        public KeyCode GameplayControlSequencerAdvance { get; set; } = KeyCode.Space;
+        public KeyCode GameplayControlDefaultSequencerKey { get; set; } = KeyCode.Space;
 
         public IInputBinding GameplayTimescaleIncrease { get; set; } = new KeyDownBinding( 1, KeyCode.Period );
         public IInputBinding GameplayTimescaleDecrease { get; set; } = new KeyDownBinding( -1, KeyCode.Comma );
 
         public IInputBinding DesignSave { get; set; } = new MultipleKeyDownBinding( 0, KeyCode.LeftControl, KeyCode.S );
-        public IInputBinding DesignPartRotateXn { get; set; } = new KeyDownBinding( -1, KeyCode.S );
-        public IInputBinding DesignPartRotateXp { get; set; } = new KeyDownBinding( 1, KeyCode.W );
-        public IInputBinding DesignPartRotateYn { get; set; } = new KeyDownBinding( -1, KeyCode.A );
-        public IInputBinding DesignPartRotateYp { get; set; } = new KeyDownBinding( 1, KeyCode.D );
-        public IInputBinding DesignPartRotateZn { get; set; } = new KeyDownBinding( -1, KeyCode.E );
-        public IInputBinding DesignPartRotateZp { get; set; } = new KeyDownBinding( 1, KeyCode.Q );
+
+        public IInputBinding ConstructPartRotateXn { get; set; } = new KeyDownBinding( -1, KeyCode.S );
+        public IInputBinding ConstructPartRotateXp { get; set; } = new KeyDownBinding( 1, KeyCode.W );
+        public IInputBinding ConstructPartRotateYn { get; set; } = new KeyDownBinding( -1, KeyCode.A );
+        public IInputBinding ConstructPartRotateYp { get; set; } = new KeyDownBinding( 1, KeyCode.D );
+        public IInputBinding ConstructPartRotateZn { get; set; } = new KeyDownBinding( -1, KeyCode.E );
+        public IInputBinding ConstructPartRotateZp { get; set; } = new KeyDownBinding( 1, KeyCode.Q );
 
         protected override SettingsPage_Keybinds OnApply()
         {
-            BindOrUnbind( HierarchicalInputChannel.VIEWPORT_PRIMARY_DOWN, ViewportPrimaryDown );
-            BindOrUnbind( HierarchicalInputChannel.VIEWPORT_PRIMARY, ViewportPrimary );
-            BindOrUnbind( HierarchicalInputChannel.VIEWPORT_PRIMARY_UP, ViewportPrimaryUp );
-            BindOrUnbind( HierarchicalInputChannel.VIEWPORT_SECONDARY_DOWN, ViewportSecondaryDown );
-            BindOrUnbind( HierarchicalInputChannel.VIEWPORT_SECONDARY, ViewportSecondary );
-            BindOrUnbind( HierarchicalInputChannel.VIEWPORT_SECONDARY_UP, ViewportSecondaryUp );
+            BindOrUnbind( Input.InputChannel.PRIMARY_DOWN, CommonPrimaryDown );
+            BindOrUnbind( Input.InputChannel.PRIMARY, CommonPrimary );
+            BindOrUnbind( Input.InputChannel.PRIMARY_UP, CommonPrimaryUp );
+            BindOrUnbind( Input.InputChannel.SECONDARY_DOWN, CommonSecondaryDown );
+            BindOrUnbind( Input.InputChannel.SECONDARY, CommonSecondary );
+            BindOrUnbind( Input.InputChannel.SECONDARY_UP, CommonSecondaryUp );
 
-            BindOrUnbind( HierarchicalInputChannel.COMMON_ESCAPE, CommonEscape );
-            BindOrUnbind( HierarchicalInputChannel.COMMON_TOGGLE_UI, CommonToggleUI );
-            BindOrUnbind( HierarchicalInputChannel.COMMON_SCREENSHOT, CommonScreenshot );
+            BindOrUnbind( InputChannel.ESCAPE, VanillaEscape );
+            BindOrUnbind( InputChannel.TOGGLE_UI, VanillaToggleUI );
+            BindOrUnbind( InputChannel.SCREENSHOT, VanillaScreenshot );
 
-            BindOrUnbind( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MIN, GameplayControlThrottleMin );
-            BindOrUnbind( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_MAX, GameplayControlThrottleMax );
-            BindOrUnbind( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_UP, GameplayControlThrottleUp );
-            BindOrUnbind( HierarchicalInputChannel.GAMEPLAY_CONTROL_THROTTLE_DOWN, GameplayControlThrottleDown );
+            BindOrUnbind( InputChannel.GAMEPLAY_CONTROL_THROTTLE_MIN, GameplayControlThrottleMin );
+            BindOrUnbind( InputChannel.GAMEPLAY_CONTROL_THROTTLE_MAX, GameplayControlThrottleMax );
+            BindOrUnbind( InputChannel.GAMEPLAY_CONTROL_THROTTLE_UP, GameplayControlThrottleUp );
+            BindOrUnbind( InputChannel.GAMEPLAY_CONTROL_THROTTLE_DOWN, GameplayControlThrottleDown );
 
-            BindOrUnbind( HierarchicalInputChannel.GAMEPLAY_CONTROL_TRANSLATE_FORWARD, GameplayControlTranslateForward );
-            BindOrUnbind( HierarchicalInputChannel.GAMEPLAY_CONTROL_TRANSLATE_BACKWARD, GameplayControlTranslateBackward );
-            BindOrUnbind( HierarchicalInputChannel.GAMEPLAY_CONTROL_TRANSLATE_LEFT, GameplayControlTranslateLeft );
-            BindOrUnbind( HierarchicalInputChannel.GAMEPLAY_CONTROL_TRANSLATE_RIGHT, GameplayControlTranslateRight );
-            BindOrUnbind( HierarchicalInputChannel.GAMEPLAY_CONTROL_TRANSLATE_UP, GameplayControlTranslateUp );
-            BindOrUnbind( HierarchicalInputChannel.GAMEPLAY_CONTROL_TRANSLATE_DOWN, GameplayControlTranslateDown );
+            BindOrUnbind( InputChannel.GAMEPLAY_CONTROL_TRANSLATE_FORWARD, GameplayControlTranslateForward );
+            BindOrUnbind( InputChannel.GAMEPLAY_CONTROL_TRANSLATE_BACKWARD, GameplayControlTranslateBackward );
+            BindOrUnbind( InputChannel.GAMEPLAY_CONTROL_TRANSLATE_LEFT, GameplayControlTranslateLeft );
+            BindOrUnbind( InputChannel.GAMEPLAY_CONTROL_TRANSLATE_RIGHT, GameplayControlTranslateRight );
+            BindOrUnbind( InputChannel.GAMEPLAY_CONTROL_TRANSLATE_UP, GameplayControlTranslateUp );
+            BindOrUnbind( InputChannel.GAMEPLAY_CONTROL_TRANSLATE_DOWN, GameplayControlTranslateDown );
 
-            BindOrUnbind( HierarchicalInputChannel.GAMEPLAY_CONTROL_PITCH, GameplayControlPitch );
-            BindOrUnbind( HierarchicalInputChannel.GAMEPLAY_CONTROL_PITCH_UP, GameplayControlPitchUp );
-            BindOrUnbind( HierarchicalInputChannel.GAMEPLAY_CONTROL_PITCH_DOWN, GameplayControlPitchDown );
-            BindOrUnbind( HierarchicalInputChannel.GAMEPLAY_CONTROL_YAW, GameplayControlYaw );
-            BindOrUnbind( HierarchicalInputChannel.GAMEPLAY_CONTROL_YAW_LEFT, GameplayControlYawLeft );
-            BindOrUnbind( HierarchicalInputChannel.GAMEPLAY_CONTROL_YAW_RIGHT, GameplayControlYawRight );
-            BindOrUnbind( HierarchicalInputChannel.GAMEPLAY_CONTROL_ROLL, GameplayControlRoll );
-            BindOrUnbind( HierarchicalInputChannel.GAMEPLAY_CONTROL_ROLL_LEFT, GameplayControlRollLeft );
-            BindOrUnbind( HierarchicalInputChannel.GAMEPLAY_CONTROL_ROLL_RIGHT, GameplayControlRollRight );
+            BindOrUnbind( InputChannel.GAMEPLAY_CONTROL_PITCH, GameplayControlPitch );
+            BindOrUnbind( InputChannel.GAMEPLAY_CONTROL_PITCH_UP, GameplayControlPitchUp );
+            BindOrUnbind( InputChannel.GAMEPLAY_CONTROL_PITCH_DOWN, GameplayControlPitchDown );
+            BindOrUnbind( InputChannel.GAMEPLAY_CONTROL_YAW, GameplayControlYaw );
+            BindOrUnbind( InputChannel.GAMEPLAY_CONTROL_YAW_LEFT, GameplayControlYawLeft );
+            BindOrUnbind( InputChannel.GAMEPLAY_CONTROL_YAW_RIGHT, GameplayControlYawRight );
+            BindOrUnbind( InputChannel.GAMEPLAY_CONTROL_ROLL, GameplayControlRoll );
+            BindOrUnbind( InputChannel.GAMEPLAY_CONTROL_ROLL_LEFT, GameplayControlRollLeft );
+            BindOrUnbind( InputChannel.GAMEPLAY_CONTROL_ROLL_RIGHT, GameplayControlRollRight );
 
-            BindOrUnbind( HierarchicalInputChannel.GAMEPLAY_TIMESCALE_INCREASE, GameplayTimescaleIncrease );
-            BindOrUnbind( HierarchicalInputChannel.GAMEPLAY_TIMESCALE_DECREASE, GameplayTimescaleDecrease );
+            BindOrUnbind( InputChannel.GAMEPLAY_TIMESCALE_INCREASE, GameplayTimescaleIncrease );
+            BindOrUnbind( InputChannel.GAMEPLAY_TIMESCALE_DECREASE, GameplayTimescaleDecrease );
 
-            BindOrUnbind( HierarchicalInputChannel.DESIGN_SAVE, DesignSave );
-            BindOrUnbind( HierarchicalInputChannel.DESIGN_PART_ROTATE_XN, DesignPartRotateXn );
-            BindOrUnbind( HierarchicalInputChannel.DESIGN_PART_ROTATE_XP, DesignPartRotateXp );
-            BindOrUnbind( HierarchicalInputChannel.DESIGN_PART_ROTATE_YN, DesignPartRotateYn );
-            BindOrUnbind( HierarchicalInputChannel.DESIGN_PART_ROTATE_YP, DesignPartRotateYp );
-            BindOrUnbind( HierarchicalInputChannel.DESIGN_PART_ROTATE_ZN, DesignPartRotateZn );
-            BindOrUnbind( HierarchicalInputChannel.DESIGN_PART_ROTATE_ZP, DesignPartRotateZp );
+            BindOrUnbind( InputChannel.DESIGN_SAVE, DesignSave );
+
+            BindOrUnbind( InputChannel.CONSTRUCT_PART_ROTATE_XN, ConstructPartRotateXn );
+            BindOrUnbind( InputChannel.CONSTRUCT_PART_ROTATE_XP, ConstructPartRotateXp );
+            BindOrUnbind( InputChannel.CONSTRUCT_PART_ROTATE_YN, ConstructPartRotateYn );
+            BindOrUnbind( InputChannel.CONSTRUCT_PART_ROTATE_YP, ConstructPartRotateYp );
+            BindOrUnbind( InputChannel.CONSTRUCT_PART_ROTATE_ZN, ConstructPartRotateZn );
+            BindOrUnbind( InputChannel.CONSTRUCT_PART_ROTATE_ZP, ConstructPartRotateZp );
             return this;
         }
 
@@ -120,16 +122,16 @@ namespace HSP.Vanilla.Settings
         public static SerializationMapping SettingsPage_KeybindsMapping()
         {
             return new MemberwiseSerializationMapping<SettingsPage_Keybinds>()
-                .WithMember( "viewport_primary_down", o => o.ViewportPrimaryDown )
-                .WithMember( "viewport_primary", o => o.ViewportPrimary )
-                .WithMember( "viewport_primary_up", o => o.ViewportPrimaryUp )
-                .WithMember( "viewport_secondary_down", o => o.ViewportSecondaryDown )
-                .WithMember( "viewport_secondary", o => o.ViewportSecondary )
-                .WithMember( "viewport_secondary_up", o => o.ViewportSecondaryUp )
+                .WithMember( "common_primary_down", o => o.CommonPrimaryDown )
+                .WithMember( "common_primary", o => o.CommonPrimary )
+                .WithMember( "common_primary_up", o => o.CommonPrimaryUp )
+                .WithMember( "common_secondary_down", o => o.CommonSecondaryDown )
+                .WithMember( "common_secondary", o => o.CommonSecondary )
+                .WithMember( "common_secondary_up", o => o.CommonSecondaryUp )
 
-                .WithMember( "common_escape", o => o.CommonEscape )
-                .WithMember( "common_toggle_ui", o => o.CommonToggleUI )
-                .WithMember( "common_screenshot", o => o.CommonScreenshot )
+                .WithMember( "common_escape", o => o.VanillaEscape )
+                .WithMember( "common_toggle_ui", o => o.VanillaToggleUI )
+                .WithMember( "common_screenshot", o => o.VanillaScreenshot )
 
                 .WithMember( "gameplay_control_throttle_min", o => o.GameplayControlThrottleMin )
                 .WithMember( "gameplay_control_throttle_max", o => o.GameplayControlThrottleMax )
@@ -153,18 +155,19 @@ namespace HSP.Vanilla.Settings
                 .WithMember( "gameplay_control_roll_left", o => o.GameplayControlRollLeft )
                 .WithMember( "gameplay_control_roll_right", o => o.GameplayControlRollRight )
 
-                .WithMember( "gameplay_control_sequencer_advance", o => o.GameplayControlSequencerAdvance )
+                .WithMember( "gameplay_control_default_sequencer_key", o => o.GameplayControlDefaultSequencerKey )
 
                 .WithMember( "gameplay_timescale_increase", o => o.GameplayTimescaleIncrease )
                 .WithMember( "gameplay_timescale_decrease", o => o.GameplayTimescaleDecrease )
 
                 .WithMember( "design_save", o => o.DesignSave )
-                .WithMember( "design_part_rotate_xn", o => o.DesignPartRotateXn )
-                .WithMember( "design_part_rotate_xp", o => o.DesignPartRotateXp )
-                .WithMember( "design_part_rotate_yn", o => o.DesignPartRotateYn )
-                .WithMember( "design_part_rotate_yp", o => o.DesignPartRotateYp )
-                .WithMember( "design_part_rotate_zn", o => o.DesignPartRotateZn )
-                .WithMember( "design_part_rotate_zp", o => o.DesignPartRotateZp );
+
+                .WithMember( "construct_part_rotate_xn", o => o.ConstructPartRotateXn )
+                .WithMember( "construct_part_rotate_xp", o => o.ConstructPartRotateXp )
+                .WithMember( "construct_part_rotate_yn", o => o.ConstructPartRotateYn )
+                .WithMember( "construct_part_rotate_yp", o => o.ConstructPartRotateYp )
+                .WithMember( "construct_part_rotate_zn", o => o.ConstructPartRotateZn )
+                .WithMember( "construct_part_rotate_zp", o => o.ConstructPartRotateZp );
         }
     }
 }
