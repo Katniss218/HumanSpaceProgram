@@ -31,10 +31,10 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
                 instance._farCamera.clearFlags = CameraClearFlags.Skybox;
                 instance._nearCamera.clearFlags = CameraClearFlags.Depth;
 
-                //instance._colorRT = RenderTexture.GetTemporary( Screen.width, Screen.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Default, 4 ); Doesn't work, adding MSAA for some reason turns it black.
-                instance._colorRT = RenderTexture.GetTemporary( Screen.width, Screen.height, 0, RenderTextureFormat.ARGB32 );
-                instance._farDepthRT = RenderTexture.GetTemporary( Screen.width, Screen.height, 24, RenderTextureFormat.Depth );
-                instance._nearDepthRT = RenderTexture.GetTemporary( Screen.width, Screen.height, 24, RenderTextureFormat.Depth );
+                //instance._colorRT = RenderTexture.GetTemporary( Screen.currentResolution.width, Screen.currentResolution.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Default, 4 ); Doesn't work, adding MSAA for some reason turns it black.
+                instance._colorRT = RenderTexture.GetTemporary( Screen.currentResolution.width, Screen.currentResolution.height, 0, RenderTextureFormat.ARGB32 );
+                instance._farDepthRT = RenderTexture.GetTemporary( Screen.currentResolution.width, Screen.currentResolution.height, 24, RenderTextureFormat.Depth );
+                instance._nearDepthRT = RenderTexture.GetTemporary( Screen.currentResolution.width, Screen.currentResolution.height, 24, RenderTextureFormat.Depth );
 
                 instance._farCamera.SetTargetBuffers( instance._colorRT.colorBuffer, instance._farDepthRT.depthBuffer );
                 instance._nearCamera.SetTargetBuffers( instance._colorRT.colorBuffer, instance._nearDepthRT.depthBuffer );

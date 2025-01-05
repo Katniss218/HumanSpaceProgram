@@ -1,4 +1,3 @@
-using HSP.Vanilla.Scenes.EditorScene;
 using UnityEngine;
 
 namespace HSP.Vanilla.Scenes.DesignScene.Cameras
