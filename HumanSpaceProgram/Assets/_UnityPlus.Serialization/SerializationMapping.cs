@@ -27,7 +27,7 @@ namespace UnityPlus.Serialization
         /// True if the member has been fully serialized, false if the method needs to be called again to serialize more.
         /// </returns>
         /// <typeparam name="TMember">Set to the type of the member (field/property) that contains the object.</typeparam>
-        public abstract MappingResult Save<TMember>( TMember obj, ref SerializedData data, ISaver s );
+        public abstract SerializationResult Save<TMember>( TMember obj, ref SerializedData data, ISaver s );
 
         /// <summary>
         /// 
@@ -36,6 +36,6 @@ namespace UnityPlus.Serialization
         /// True if the member has been fully deserialized, false if the method needs to be called again to deserialize more.
         /// </returns>
         /// <typeparam name="TMember">Set to the type of the member (field/property) that contains the object.</typeparam>
-        public abstract MappingResult Load<TMember>( ref TMember obj, SerializedData data, ILoader l, bool populate );
+        public abstract SerializationResult Load<TMember>( ref TMember obj, SerializedData data, ILoader l, bool populate );
     }
 }

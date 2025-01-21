@@ -123,6 +123,7 @@
     <Compile Include="Assets\HSP.Vanilla\Components\FPart.cs" />
     <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\FixedReferenceFrameTransform.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FRocketEngine.cs" />
+    <Compile Include="Assets\HSP.Vanilla\InputChannel.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\Cameras\GameplaySceneDepthBufferCombiner.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\F2AxisActuator.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\Tools\TranslateTool.cs" />
@@ -140,7 +141,6 @@
     <Compile Include="Assets\HSP.Vanilla\Components\FLaunchSiteMarker.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FReactionControlController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FControlFrame.cs" />
-    <Compile Include="Assets\HSP.Vanilla\InputChannel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla\___HSP.Vanilla.asmdef" />

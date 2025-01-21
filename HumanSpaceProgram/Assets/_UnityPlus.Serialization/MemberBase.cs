@@ -12,11 +12,11 @@ namespace UnityPlus.Serialization
         public abstract MemberBase<TSource> Copy();
 
         // one is for initial save/load, and the 2nd is for the 'retry' one (if first time failed).
-        public abstract MappingResult Save( TSource sourceObj, SerializedData sourceData, ISaver s, out SerializationMapping mapping, out object memberObj );
-        public abstract MappingResult SaveRetry( object memberObj, SerializationMapping mapping, SerializedData sourceData, ISaver s );
+        public abstract SerializationResult Save( TSource sourceObj, SerializedData sourceData, ISaver s, out SerializationMapping mapping, out object memberObj );
+        public abstract SerializationResult SaveRetry( object memberObj, SerializationMapping mapping, SerializedData sourceData, ISaver s );
 
-        public abstract MappingResult Load( ref TSource sourceObj, bool isInstantiated, SerializedData sourceData, ILoader l, out SerializationMapping mapping, out object memberObj );
-        public abstract MappingResult LoadRetry( ref object memberObj, SerializationMapping mapping, SerializedData sourceData, ILoader l );
+        public abstract SerializationResult Load( ref TSource sourceObj, bool isInstantiated, SerializedData sourceData, ILoader l, out SerializationMapping mapping, out object memberObj );
+        public abstract SerializationResult LoadRetry( ref object memberObj, SerializationMapping mapping, SerializedData sourceData, ILoader l );
 
         /// <summary>
         /// Calls the getter associated with this member.

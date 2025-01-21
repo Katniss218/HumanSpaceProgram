@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace UnityPlus.Serialization
 {
-	public static class Persistent_Type
+    public static class Persistent_Type
 	{
 		private static readonly Dictionary<Type, string> _typeToString = new();
 		private static readonly Dictionary<string, Type> _stringToType = new();
@@ -18,6 +14,11 @@ namespace UnityPlus.Serialization
 		[MethodImpl( MethodImplOptions.AggressiveInlining )]
 		public static SerializedPrimitive SerializeType( this Type type )
 		{
+			if( type == null )
+			{
+				return null;
+			}
+
 			if( _typeToString.TryGetValue( type, out string assemblyQualifiedName ) )
 			{
 				return (SerializedPrimitive)assemblyQualifiedName;

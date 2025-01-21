@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Linq.Expressions;
-using UnityEngine;
-using UnityEngine.Networking.Types;
 
 namespace UnityPlus.Serialization
 {
@@ -110,7 +108,7 @@ namespace UnityPlus.Serialization
         //  Logic
         //
 
-        public override MappingResult Save( TSource sourceObj, SerializedData sourceData, ISaver s, out SerializationMapping mapping, out object memberObj )
+        public override SerializationResult Save( TSource sourceObj, SerializedData sourceData, ISaver s, out SerializationMapping mapping, out object memberObj )
         {
             TMember memberObj2 = _getter.Invoke( sourceObj );
             memberObj = memberObj2;
@@ -118,32 +116,32 @@ namespace UnityPlus.Serialization
             mapping = SerializationMappingRegistry.GetMapping<TMember>( _context, memberObj2 );
 
             SerializedData memberData = null;
-            MappingResult memberResult = mapping.SafeSave<TMember>( memberObj2, ref memberData, s );
+            SerializationResult memberResult = mapping.SafeSave<TMember>( memberObj2, ref memberData, s );
             sourceData[Name] = memberData;
 
             return memberResult;
         }
 
-        public override MappingResult SaveRetry( object memberObj, SerializationMapping mapping, SerializedData sourceData, ISaver s )
+        public override SerializationResult SaveRetry( object memberObj, SerializationMapping mapping, SerializedData sourceData, ISaver s )
         {
             if( !sourceData.TryGetValue( Name, out var memberData ) )
                 memberData = null;
 
             TMember memberObj2 = (TMember)memberObj;
-            MappingResult memberResult = mapping.SafeSave<TMember>( memberObj2, ref memberData, s );
+            SerializationResult memberResult = mapping.SafeSave<TMember>( memberObj2, ref memberData, s );
 
             sourceData[Name] = memberData;
 
             return memberResult;
         }
 
-        public override MappingResult Load( ref TSource sourceObj, bool isInstantiated, SerializedData sourceData, ILoader l, out SerializationMapping mapping, out object memberObj )
+        public override SerializationResult Load( ref TSource sourceObj, bool isInstantiated, SerializedData sourceData, ILoader l, out SerializationMapping mapping, out object memberObj )
         {
             if( !sourceData.TryGetValue( Name, out SerializedData memberData ) )
             {
                 mapping = default;
                 memberObj = default;
-                return MappingResult.Finished;
+                return SerializationResult.PrimitiveFinished;
             }
 
             if( _hasCachedMapping )             // This caching appears to not do much performance-wise.
@@ -157,8 +155,8 @@ namespace UnityPlus.Serialization
             }
 
             TMember memberObj2 = default;
-            MappingResult memberResult = mapping.SafeLoad<TMember>( ref memberObj2, memberData, l, false );
-            if( isInstantiated && memberResult == MappingResult.Finished )
+            SerializationResult memberResult = mapping.SafeLoad<TMember>( ref memberObj2, memberData, l, false );
+            if( isInstantiated && memberResult.HasFlag( SerializationResult.Finished ) )
             {
                 memberObj = null;
                 if( _structSetter != null )
@@ -174,13 +172,13 @@ namespace UnityPlus.Serialization
             return memberResult;
         }
 
-        public override MappingResult LoadRetry( ref object memberObj, SerializationMapping mapping, SerializedData sourceData, ILoader l )
+        public override SerializationResult LoadRetry( ref object memberObj, SerializationMapping mapping, SerializedData sourceData, ILoader l )
         {
             if( !sourceData.TryGetValue( Name, out SerializedData memberData ) )
                 memberData = null;
 
             TMember memberObj2 = (TMember)memberObj;
-            MappingResult memberResult = mapping.SafeLoad<TMember>( ref memberObj2, memberData, l, false );
+            SerializationResult memberResult = mapping.SafeLoad<TMember>( ref memberObj2, memberData, l, false );
             memberObj = memberObj2;
 
             return memberResult;

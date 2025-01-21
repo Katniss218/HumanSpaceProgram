@@ -76,6 +76,9 @@ namespace HSP.ControlSystems.Controls
                 .WithFactory<Func<T>>( onInvoke => new ControlParameterOutput<T>( onInvoke ) )
                 .WithMember( "connects_to", ArrayContext.Refs, o => o.inputs, ( o, value ) =>
                 {
+                    if( value == null )
+                        return;
+
                     foreach( var c in value )
                     {
                         ControlParameterInput<T>.Connect( c, o );

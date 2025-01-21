@@ -24,6 +24,8 @@ namespace UnityPlus.Serialization
         Func<int, object> _factory;
         Func<IEnumerable<TElement>, object> _lateFactory;
 
+        bool _wasFailureNoRetry = false;
+
         public IndexedSerializationMapping( Func<TSource, int> countGetter, Func<TSource, int, TElement> getter, Action<TSource, int, TElement> setter )
         {
             elementContext = 0;
@@ -50,11 +52,11 @@ namespace UnityPlus.Serialization
             };
         }
 
-        public override MappingResult Save<T>( T obj, ref SerializedData data, ISaver s )
+        public override SerializationResult Save<TMember>( TMember obj, ref SerializedData data, ISaver s )
         {
             if( obj == null )
             {
-                return MappingResult.Finished;
+                return SerializationResult.Finished;
             }
 
             TSource sourceObj = (TSource)(object)obj;
@@ -64,8 +66,8 @@ namespace UnityPlus.Serialization
             if( data == null )
             {
                 data = new SerializedObject();
-                data[KeyNames.ID] = s.RefMap.GetID( sourceObj ).SerializeGuid();
                 data[KeyNames.TYPE] = obj.GetType().SerializeType();
+                data[KeyNames.ID] = s.RefMap.GetID( sourceObj ).SerializeGuid();
 
                 serArray = new SerializedArray( length );
                 data["value"] = serArray;
@@ -74,10 +76,6 @@ namespace UnityPlus.Serialization
             {
                 serArray = (SerializedArray)data["value"];
             }
-
-            bool anyFailed = false;
-            bool anyFinished = false;
-            bool anyProgressed = false;
 
             //
             //
@@ -91,26 +89,25 @@ namespace UnityPlus.Serialization
                 {
                     SerializedData elementData = null;
 
-                    MappingResult elementResult = entry.mapping.SafeSave<TElement>( entry.value, ref elementData, s );
-                    switch( elementResult )
+                    SerializationResult elementResult = entry.mapping.SafeSave<TElement>( entry.value, ref elementData, s );
+                    if( elementResult.HasFlag( SerializationResult.Failed ) )
                     {
-                        case MappingResult.Finished:
-                            retryMembersThatSucceededThisTime.Add( i );
-                            anyFinished = true;
-                            break;
-                        case MappingResult.Failed:
-                            anyFailed = true;
-                            break;
-                        case MappingResult.Progressed:
-                            anyProgressed = true;
-                            break;
+                        entry.pass = s.CurrentPass;
+                    }
+                    else if( elementResult.HasFlag( SerializationResult.Finished ) )
+                    {
+                        retryMembersThatSucceededThisTime.Add( i );
                     }
 
                     serArray[i] = elementData;
 
                     if( s.ShouldPause() )
                     {
-                        break;
+                        foreach( var ii in retryMembersThatSucceededThisTime )
+                        {
+                            _retryElements.Remove( ii );
+                        }
+                        return SerializationResult.Paused;
                     }
                 }
 
@@ -123,7 +120,6 @@ namespace UnityPlus.Serialization
             //
             //
             //
-
             for( int i = _startIndex; i < length; i++ )
             {
                 TElement elementObj = elementGetter.Invoke( sourceObj, i );
@@ -132,41 +128,50 @@ namespace UnityPlus.Serialization
 
                 SerializedData elementData = null;
 
-                MappingResult elementResult = mapping.SafeSave( elementObj, ref elementData, s );
-                switch( elementResult )
+                SerializationResult elementResult = mapping.SafeSave( elementObj, ref elementData, s );
+                if( elementResult.HasFlag( SerializationResult.Finished ) )
                 {
-                    case MappingResult.Finished:
-                        _startIndex = i + 1;
-                        anyFinished = true;
-                        break;
-                    case MappingResult.Failed:
-                        _retryElements ??= new();
-                        _retryElements.Add( i, new RetryEntry<TElement>( elementObj, mapping ) );
-                        anyFailed = true;
-                        break;
-                    case MappingResult.Progressed:
-                        _retryElements ??= new();
-                        _retryElements.Add( i, new RetryEntry<TElement>( elementObj, mapping ) );
-                        anyProgressed = true;
-                        break;
+                    if( elementResult.HasFlag( SerializationResult.Failed ) )
+                        _wasFailureNoRetry = true;
+
+                    _startIndex = i + 1;
+                }
+                else
+                {
+                    _retryElements ??= new();
+                    _startIndex = i + 1;
+
+                    if( elementResult.HasFlag( SerializationResult.Paused ) )
+                        _retryElements.Add( i, new RetryEntry<TElement>( elementObj, mapping, -1 ) );
+                    else
+                        _retryElements.Add( i, new RetryEntry<TElement>( elementObj, mapping, s.CurrentPass ) );
                 }
 
                 serArray.Add( elementData );
 
                 if( s.ShouldPause() )
                 {
-                    break;
+                    return SerializationResult.Paused;
                 }
             }
 
-            return MappingResult_Ex.GetCompoundResult( anyFailed, anyFinished, anyProgressed );
+            SerializationResult result = SerializationResult.NoChange;
+            if( _wasFailureNoRetry || _retryElements != null && _retryElements.Count != 0 )
+                result |= SerializationResult.HasFailures;
+            if( _retryElements == null || _retryElements.Count == 0 )
+                result |= SerializationResult.Finished;
+
+            if( result.HasFlag( SerializationResult.Finished ) && result.HasFlag( SerializationResult.HasFailures ) )
+                result |= SerializationResult.Failed;
+
+            return result;
         }
 
-        public override MappingResult Load<T>( ref T obj, SerializedData data, ILoader l, bool populate )
+        public override SerializationResult Load<TMember>( ref TMember obj, SerializedData data, ILoader l, bool populate )
         {
             if( data == null )
             {
-                return MappingResult.Finished;
+                return SerializationResult.PrimitiveFinished;
             }
 
             TSource sourceObj = (obj == null) ? default : (TSource)(object)obj;
@@ -191,10 +196,6 @@ namespace UnityPlus.Serialization
                 }
             }
 
-            bool anyFailed = false;
-            bool anyFinished = false;
-            bool anyProgressed = false;
-
             //
             //
             //
@@ -207,39 +208,41 @@ namespace UnityPlus.Serialization
                 {
                     SerializedData elementData = array[i];
 
-                    MappingResult elementResult = entry.mapping.SafeLoad<TElement>( ref entry.value, elementData, l, false );
-                    switch( elementResult )
+                    SerializationResult elementResult = entry.mapping.SafeLoad<TElement>( ref entry.value, elementData, l, false );
+                    if( elementResult.HasFlag( SerializationResult.Failed ) )
                     {
-                        case MappingResult.Finished:
-                            retryMembersThatSucceededThisTime.Add( i );
-                            anyFinished = true;
-                            break;
-                        case MappingResult.Failed:
-                            anyFailed = true;
-                            break;
-                        case MappingResult.Progressed:
-                            anyProgressed = true;
-                            break;
+                        entry.pass = l.CurrentPass;
+                    }
+                    else if( elementResult.HasFlag( SerializationResult.Finished ) )
+                    {
+                        retryMembersThatSucceededThisTime.Add( i );
                     }
 
-                    if( _objectHasBeenInstantiated )
+                    if( elementResult.HasFlag( SerializationResult.Finished ) )
                     {
-                        elementSetter.Invoke( sourceObj, i, entry.value );
-                    }
-                    else if( !populate )
-                    {
-                        _factoryElementStorage[i] = entry.value;
+                        if( _objectHasBeenInstantiated )
+                        {
+                            elementSetter.Invoke( sourceObj, i, entry.value );
+                        }
+                        else if( !populate )
+                        {
+                            _factoryElementStorage[i] = entry.value;
+                        }
                     }
 
                     if( l.ShouldPause() )
                     {
-                        break;
+                        foreach( var ii in retryMembersThatSucceededThisTime )
+                        {
+                            _retryElements.Remove( ii );
+                        }
+                        obj = (TMember)(object)sourceObj;
+                        return SerializationResult.Paused;
                     }
                 }
 
                 foreach( var i in retryMembersThatSucceededThisTime )
                 {
-#warning TODO - in case of break here, prevent later block of members from running.
                     _retryElements.Remove( i );
                 }
             }
@@ -256,37 +259,41 @@ namespace UnityPlus.Serialization
                 var mapping = SerializationMappingRegistry.GetMapping<TElement>( elementContext, memberType );
 
                 TElement elementObj = default;
-                MappingResult elementResult = mapping.SafeLoad<TElement>( ref elementObj, elementData, l, false );
-                switch( elementResult )
+                SerializationResult elementResult = mapping.SafeLoad<TElement>( ref elementObj, elementData, l, false );
+                if( elementResult.HasFlag( SerializationResult.Finished ) )
                 {
-                    case MappingResult.Finished:
-                        _startIndex = i + 1;
-                        anyFinished = true;
-                        break;
-                    case MappingResult.Failed:
-                        _retryElements ??= new();
-                        _retryElements.Add( i, new RetryEntry<TElement>( elementObj, mapping ) );
-                        anyFailed = true;
-                        break;
-                    case MappingResult.Progressed:
-                        _retryElements ??= new();
-                        _retryElements.Add( i, new RetryEntry<TElement>( elementObj, mapping ) );
-                        anyProgressed = true;
-                        break;
+                    if( elementResult.HasFlag( SerializationResult.Failed ) )
+                        _wasFailureNoRetry = true;
+
+                    _startIndex = i + 1;
+                }
+                else
+                {
+                    _retryElements ??= new();
+                    _startIndex = i + 1;
+
+                    if( elementResult.HasFlag( SerializationResult.Paused ) )
+                        _retryElements.Add( i, new RetryEntry<TElement>( elementObj, mapping, -1 ) );
+                    else
+                        _retryElements.Add( i, new RetryEntry<TElement>( elementObj, mapping, l.CurrentPass ) );
                 }
 
-                if( _objectHasBeenInstantiated )
+                if( elementResult.HasFlag( SerializationResult.Finished ) )
                 {
-                    elementSetter.Invoke( sourceObj, i, elementObj );
-                }
-                else if( !populate )
-                {
-                    _factoryElementStorage[i] = elementObj;
+                    if( _objectHasBeenInstantiated )
+                    {
+                        elementSetter.Invoke( sourceObj, i, elementObj );
+                    }
+                    else if( !populate )
+                    {
+                        _factoryElementStorage[i] = elementObj;
+                    }
                 }
 
                 if( l.ShouldPause() )
                 {
-                    break;
+                    obj = (TMember)(object)sourceObj;
+                    return SerializationResult.Paused;
                 }
             }
 
@@ -296,8 +303,17 @@ namespace UnityPlus.Serialization
                 _objectHasBeenInstantiated = true;
             }
 
-            obj = (T)(object)sourceObj;
-            return MappingResult_Ex.GetCompoundResult( anyFailed, anyFinished, anyProgressed );
+            obj = (TMember)(object)sourceObj;
+            SerializationResult result = SerializationResult.NoChange;
+            if( _wasFailureNoRetry || _retryElements != null && _retryElements.Count != 0 )
+                result |= SerializationResult.HasFailures;
+            if( _retryElements == null || _retryElements.Count == 0 )
+                result |= SerializationResult.Finished;
+
+            if( result.HasFlag( SerializationResult.Finished ) && result.HasFlag( SerializationResult.HasFailures ) )
+                result |= SerializationResult.Failed;
+
+            return result;
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]

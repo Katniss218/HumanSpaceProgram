@@ -42,6 +42,8 @@ namespace UnityPlus.Serialization
         /// </summary>
         public IForwardReferenceMap RefMap { get; }
 
+        public int CurrentPass { get; }
+
         public bool ShouldPause();
     }
 }

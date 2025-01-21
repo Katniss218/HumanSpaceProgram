@@ -64,6 +64,7 @@ namespace UnityPlus.Serialization.Mappings
                         return o.transform.Children().Select( child => child.gameObject ).ToArray();
                     }, ( o, value ) =>
                     {
+#warning TODO - memberwise doesn't work here with pausing. for some reason
                         foreach( var child in value )           // The 'value' array here is a sort of 'virtual' array.
                         {
                             child.transform.SetParent( o.transform );
@@ -98,6 +99,8 @@ namespace UnityPlus.Serialization.Mappings
                         {
                             Guid id2 = compData[KeyNames.ID].DeserializeGuid();
                             Type type = compData[KeyNames.TYPE].DeserializeType();
+                            if( type == null )
+                                continue; // Skips adding to refmap
 
                             Component component = obj.GetTransformOrAddComponent( type );
                             if( component is Behaviour behaviour )

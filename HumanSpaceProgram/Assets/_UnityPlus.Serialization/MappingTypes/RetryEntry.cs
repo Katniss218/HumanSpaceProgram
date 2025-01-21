@@ -8,11 +8,13 @@
     {
         public T value;
         public SerializationMapping mapping;
+        public int pass; // the pass in which it failed.
 
-        public RetryEntry( T value, SerializationMapping mapping )
+        public RetryEntry( T value, SerializationMapping mapping, int pass )
         {
             this.value = value;
             this.mapping = mapping;
+            this.pass = pass;
         }
     }
 }

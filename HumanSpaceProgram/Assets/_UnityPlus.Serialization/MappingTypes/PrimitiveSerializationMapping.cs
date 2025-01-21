@@ -36,16 +36,16 @@ namespace UnityPlus.Serialization
             };
         }
 
-        public override MappingResult Save<TMember>( TMember obj, ref SerializedData data, ISaver s )
+        public override SerializationResult Save<TMember>( TMember obj, ref SerializedData data, ISaver s )
         {
             if( OnSave == null )
-                return MappingResult.Finished;
+                return SerializationResult.PrimitiveFinishedFailed;
 
             if( obj != null && MappingHelper.IsNonNullEligibleForTypeHeader<TMember>() ) // This doesn't appear to slow the system down much at all when benchbarked.
             {
                 data = new SerializedObject();
-                data[KeyNames.ID] = s.RefMap.GetID( obj ).SerializeGuid(); // doesn't make sense for structs.
                 data[KeyNames.TYPE] = obj.GetType().SerializeType();        // DOES make sense for structs (they may be boxed in an `object` or an interface)
+                data[KeyNames.ID] = s.RefMap.GetID( obj ).SerializeGuid(); // doesn't make sense for structs, even if boxed.
 
                 try
                 {
@@ -53,7 +53,8 @@ namespace UnityPlus.Serialization
                 }
                 catch
                 {
-                    return MappingResult.Failed;
+#warning TODO - let the delegate specify whether it should retry or not.
+                    return SerializationResult.PrimitiveRetryFailed;
                 }
             }
             else
@@ -64,17 +65,17 @@ namespace UnityPlus.Serialization
                 }
                 catch
                 {
-                    return MappingResult.Failed;
+                    return SerializationResult.PrimitiveRetryFailed;
                 }
             }
 
-            return MappingResult.Finished;
+            return SerializationResult.PrimitiveFinished;
         }
 
-        public override MappingResult Load<TMember>( ref TMember obj, SerializedData data, ILoader l, bool populate )
+        public override SerializationResult Load<TMember>( ref TMember obj, SerializedData data, ILoader l, bool populate )
         {
             if( OnLoad == null )
-                return MappingResult.Finished;
+                return SerializationResult.PrimitiveFinishedFailed;
 
             if( data != null && MappingHelper.IsNonNullEligibleForTypeHeader<TMember>() ) // This doesn't appear to slow the system down much at all when benchbarked.
             {
@@ -85,7 +86,7 @@ namespace UnityPlus.Serialization
                 }
                 catch
                 {
-                    return MappingResult.Failed;
+                    return SerializationResult.PrimitiveRetryFailed;
                 }
             }
             else
@@ -97,10 +98,10 @@ namespace UnityPlus.Serialization
                 }
                 catch
                 {
-                    return MappingResult.Failed;
+                    return SerializationResult.PrimitiveRetryFailed;
                 }
             }
-            return MappingResult.Finished;
+            return SerializationResult.PrimitiveFinished;
         }
     }
 }

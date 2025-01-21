@@ -1,6 +1,4 @@
 ﻿
-using UnityEngine.Networking.Types;
-
 namespace UnityPlus.Serialization
 {
     /// <summary>
@@ -33,18 +31,18 @@ namespace UnityPlus.Serialization
             return _member.Get( ref source2 );
         }
 
-        public override MappingResult Save( TSource sourceObj, SerializedData sourceData, ISaver s, out SerializationMapping mapping, out object memberObj )
+        public override SerializationResult Save( TSource sourceObj, SerializedData sourceData, ISaver s, out SerializationMapping mapping, out object memberObj )
         {
             TSourceBase sourceObj2 = sourceObj;
             return _member.Save( sourceObj2, sourceData, s, out mapping, out memberObj );
         }
 
-        public override MappingResult SaveRetry( object memberObj, SerializationMapping mapping, SerializedData sourceData, ISaver s )
+        public override SerializationResult SaveRetry( object memberObj, SerializationMapping mapping, SerializedData sourceData, ISaver s )
         {
             return _member.SaveRetry( memberObj, mapping, sourceData, s );
         }
 
-        public override MappingResult Load( ref TSource sourceObj, bool isInstantiated, SerializedData sourceData, ILoader l, out SerializationMapping mapping, out object memberObj )
+        public override SerializationResult Load( ref TSource sourceObj, bool isInstantiated, SerializedData sourceData, ILoader l, out SerializationMapping mapping, out object memberObj )
         {
             TSourceBase sourceObj2 = sourceObj;
             var res = _member.Load( ref sourceObj2, isInstantiated, sourceData, l, out mapping, out memberObj );
@@ -52,7 +50,7 @@ namespace UnityPlus.Serialization
             return res;
         }
 
-        public override MappingResult LoadRetry( ref object memberObj, SerializationMapping mapping, SerializedData sourceData, ILoader l )
+        public override SerializationResult LoadRetry( ref object memberObj, SerializationMapping mapping, SerializedData sourceData, ILoader l )
         {
             return _member.LoadRetry( ref memberObj, mapping, sourceData, l );
         }

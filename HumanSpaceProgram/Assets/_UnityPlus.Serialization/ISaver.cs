@@ -30,6 +30,8 @@ namespace UnityPlus.Serialization
         /// </summary>
         public IReverseReferenceMap RefMap { get; }
 
+        public int CurrentPass { get; }
+
         public bool ShouldPause();
     }
 }

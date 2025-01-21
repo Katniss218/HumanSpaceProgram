@@ -1,5 +1,4 @@
-﻿using HSP.Input;
-using HSP.Settings;
+﻿using HSP.Settings;
 using UnityEngine;
 using UnityPlus.Input;
 using UnityPlus.Input.Bindings;
@@ -16,9 +15,9 @@ namespace HSP.Vanilla.Settings
         public IInputBinding CommonSecondary { get; set; } = new KeyHoldBinding( 0, KeyCode.Mouse1 );
         public IInputBinding CommonSecondaryUp { get; set; } = new KeyUpBinding( 0, KeyCode.Mouse1 );
 
-        public IInputBinding VanillaEscape { get; set; } = new KeyDownBinding( 0, KeyCode.Escape );
-        public IInputBinding VanillaToggleUI { get; set; } = new KeyDownBinding( 0, KeyCode.F1 );
-        public IInputBinding VanillaScreenshot { get; set; } = new KeyDownBinding( 0, KeyCode.F2 );
+        public IInputBinding Escape { get; set; } = new KeyDownBinding( 0, KeyCode.Escape );
+        public IInputBinding ToggleUI { get; set; } = new KeyDownBinding( 0, KeyCode.F1 );
+        public IInputBinding Screenshot { get; set; } = new KeyDownBinding( 0, KeyCode.F2 );
 
         public IInputBinding GameplayControlThrottleMin { get; set; } = new KeyDownBinding( 1, KeyCode.X );
         public IInputBinding GameplayControlThrottleMax { get; set; } = new KeyDownBinding( -1, KeyCode.Z );
@@ -65,9 +64,9 @@ namespace HSP.Vanilla.Settings
             BindOrUnbind( Input.InputChannel.SECONDARY, CommonSecondary );
             BindOrUnbind( Input.InputChannel.SECONDARY_UP, CommonSecondaryUp );
 
-            BindOrUnbind( InputChannel.ESCAPE, VanillaEscape );
-            BindOrUnbind( InputChannel.TOGGLE_UI, VanillaToggleUI );
-            BindOrUnbind( InputChannel.SCREENSHOT, VanillaScreenshot );
+            BindOrUnbind( InputChannel.ESCAPE, Escape );
+            BindOrUnbind( InputChannel.TOGGLE_UI, ToggleUI );
+            BindOrUnbind( InputChannel.SCREENSHOT, Screenshot );
 
             BindOrUnbind( InputChannel.GAMEPLAY_CONTROL_THROTTLE_MIN, GameplayControlThrottleMin );
             BindOrUnbind( InputChannel.GAMEPLAY_CONTROL_THROTTLE_MAX, GameplayControlThrottleMax );
@@ -129,9 +128,9 @@ namespace HSP.Vanilla.Settings
                 .WithMember( "common_secondary", o => o.CommonSecondary )
                 .WithMember( "common_secondary_up", o => o.CommonSecondaryUp )
 
-                .WithMember( "common_escape", o => o.VanillaEscape )
-                .WithMember( "common_toggle_ui", o => o.VanillaToggleUI )
-                .WithMember( "common_screenshot", o => o.VanillaScreenshot )
+                .WithMember( "escape", o => o.Escape )
+                .WithMember( "toggle_ui", o => o.ToggleUI )
+                .WithMember( "screenshot", o => o.Screenshot )
 
                 .WithMember( "gameplay_control_throttle_min", o => o.GameplayControlThrottleMin )
                 .WithMember( "gameplay_control_throttle_max", o => o.GameplayControlThrottleMax )

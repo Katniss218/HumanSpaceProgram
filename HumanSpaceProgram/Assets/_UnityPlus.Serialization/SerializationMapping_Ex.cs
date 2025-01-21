@@ -11,10 +11,10 @@ namespace UnityPlus.Serialization
         /// Doesn't require doing a null check on the mapping.
         /// </remarks>
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static MappingResult SafeSave<TMember>( this SerializationMapping mapping, TMember obj, ref SerializedData data, ISaver s )
+        public static SerializationResult SafeSave<TMember>( this SerializationMapping mapping, TMember obj, ref SerializedData data, ISaver s )
         {
             if( mapping == null )
-                return MappingResult.Finished;
+                return SerializationResult.PrimitiveFinishedFailed;
 
             return mapping.Save<TMember>( obj, ref data, s );
         }
@@ -26,10 +26,10 @@ namespace UnityPlus.Serialization
         /// Doesn't require doing a null check on the mapping.
         /// </remarks>
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        public static MappingResult SafeLoad<TMember>( this SerializationMapping mapping, ref TMember obj, SerializedData data, ILoader l, bool populate )
+        public static SerializationResult SafeLoad<TMember>( this SerializationMapping mapping, ref TMember obj, SerializedData data, ILoader l, bool populate )
         {
             if( mapping == null )
-                return MappingResult.Finished;
+                return SerializationResult.PrimitiveFinishedFailed;
 
             return mapping.Load<TMember>( ref obj, data, l, populate );
         }

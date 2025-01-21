@@ -88,6 +88,9 @@ namespace HSP.ControlSystems.Controls
                 .WithFactory<Action>( onInvoke => new ControlleeInput( onInvoke ) )
                 .WithMember( "connects_to", ArrayContext.Refs, o => o.outputs, ( o, value ) =>
                 {
+                    if( value == null )
+                        return;
+
                     foreach( var c in value )
                     {
                         ControlleeInput.Connect( o, c );
