@@ -5,7 +5,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using UnityEngine;
 
 namespace UnityPlus.Serialization
 {
@@ -161,7 +160,7 @@ namespace UnityPlus.Serialization
             if( data == null )
             {
                 data = new SerializedObject();
-                 
+
                 if( MappingHelper.IsNonNullEligibleForTypeHeader<TMember>() )
                 {
                     data[KeyNames.TYPE] = obj.GetType().SerializeType();

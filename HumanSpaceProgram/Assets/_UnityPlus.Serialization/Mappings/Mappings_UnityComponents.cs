@@ -2,7 +2,6 @@
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Extensions;
-using static UnityPlus.Serialization.SerializedPrimitive;
 
 namespace UnityPlus.Serialization.Mappings
 {
@@ -29,13 +28,6 @@ namespace UnityPlus.Serialization.Mappings
                 } );
         }
 
-        [MapsInheritingFrom( typeof( Behaviour ) )]
-        public static SerializationMapping BehaviourMapping()
-        {
-            return new MemberwiseSerializationMapping<Behaviour>()
-                .WithMember( "is_enabled", o => o.enabled );
-        }
-
         [MapsInheritingFrom( typeof( Component ) )]
         public static SerializationMapping ComponentMapping()
         {
@@ -53,18 +45,17 @@ namespace UnityPlus.Serialization.Mappings
         [MapsInheritingFrom( typeof( GameObject ) )]
         public static SerializationMapping GameObjectMapping()
         {
-            return new MemberwiseSerializationMapping<GameObject>()
-                .WithMember( "name", o => o.name )
-                .WithMember( "layer", o => o.layer )
-                .WithMember( "is_active", o => o.activeSelf, ( o, value ) => { /*o.SetActive( value )*/ } )
+            return new GameObjectSerializationMapping()
+                //.WithMember( "is_active", o => o.activeSelf, ( o, value ) => { /*o.SetActive( value )*/ } ) // handled by the GameObjectSerializationMapping itself.
                 .WithMember( "is_static", o => o.isStatic )
+                .WithMember( "layer", o => o.layer )
+                .WithMember( "name", o => o.name )
                 .WithMember( "tag", o => o.tag )
                 .WithMember( "children", o =>
                     {
                         return o.transform.Children().Select( child => child.gameObject ).ToArray();
                     }, ( o, value ) =>
                     {
-#warning TODO - memberwise doesn't work here with pausing. for some reason
                         foreach( var child in value )           // The 'value' array here is a sort of 'virtual' array.
                         {
                             child.transform.SetParent( o.transform );
@@ -81,9 +72,6 @@ namespace UnityPlus.Serialization.Mappings
             .WithRawFactory( ( data, l ) =>
             {
                 GameObject obj = new GameObject();
-                // Disable the gameobject to prevent 'start' from firing prematurely if deserializing over multiple frames.
-                // It will be re-enabled by the finalizer.
-                obj.SetActive( false );
 
                 if( data.TryGetValue( KeyNames.ID, out var id ) )
                 {
@@ -103,12 +91,6 @@ namespace UnityPlus.Serialization.Mappings
                                 continue; // Skips adding to refmap
 
                             Component component = obj.GetTransformOrAddComponent( type );
-                            if( component is Behaviour behaviour )
-                            {
-                                // Disable the behaviour to prevent 'start' from firing prematurely if deserializing over multiple frames.
-                                // It will be re-enabled later when the members are set.
-                                behaviour.enabled = false;
-                            }
 
                             l.RefMap.SetObj( id2, component );
                         }
@@ -120,14 +102,14 @@ namespace UnityPlus.Serialization.Mappings
                     }
                 }
                 return obj;
-            } )
-            .WithFinalizer( ( data, go ) =>
-            {
-                if( data.TryGetValue( "is_active", out var isActive ) )
-                {
-                    go.SetActive( (bool)isActive );
-                }
             } );
+        }
+
+        [MapsInheritingFrom( typeof( Behaviour ) )]
+        public static SerializationMapping BehaviourMapping()
+        {
+            return new MemberwiseSerializationMapping<Behaviour>()
+                .WithMember( "is_enabled", o => o.enabled );
         }
 
         [MapsInheritingFrom( typeof( Renderer ) )]

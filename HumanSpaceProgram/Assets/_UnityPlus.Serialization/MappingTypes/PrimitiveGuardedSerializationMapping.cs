@@ -9,36 +9,36 @@ namespace UnityPlus.Serialization
     /// A primitive type is one that can't be paused mid-save/load. Generally should be small, of fixed size, and not generic.
     /// </remarks>
     /// <typeparam name="TSource">The type being mapped.</typeparam>
-    public sealed class PrimitiveSerializationMapping<TSource> : SerializationMapping
+    public sealed class PrimitiveGuardedSerializationMapping<TSource> : SerializationMapping
     {
         /// <summary>
         /// The function invoked to convert the C# object into its serialized representation.
         /// </summary>
-        public Func<TSource, ISaver, SerializedData> OnSave { get; set; }
+        public Func<TSource, ISaver, (SerializedData data, SerializationResult result)> OnSave { get; set; }
 
         /// <summary>
         /// The function invoked to convert the serialized representation back into its corresponding C# object.
         /// </summary>
-        public Func<SerializedData, IForwardReferenceMap, TSource> OnLoad { get; set; }
+        public Func<SerializedData, IForwardReferenceMap, (TSource obj, SerializationResult result)> OnLoad { get; set; }
 
         /// <summary>
         /// Force the serializer to skip the object header and serialize inline.
         /// </summary>
         bool _skipHeader;
 
-        public PrimitiveSerializationMapping()
+        public PrimitiveGuardedSerializationMapping()
         {
 
         }
 
-        public PrimitiveSerializationMapping( bool skipHeader )
+        public PrimitiveGuardedSerializationMapping( bool skipHeader )
         {
             _skipHeader = skipHeader;
         }
 
         public override SerializationMapping GetInstance()
         {
-            return new PrimitiveSerializationMapping<TSource>()
+            return new PrimitiveGuardedSerializationMapping<TSource>()
             {
                 Context = this.Context,
                 OnSave = this.OnSave, // copy since it stores the member obj var.
@@ -60,7 +60,9 @@ namespace UnityPlus.Serialization
 
                 try
                 {
-                    data["value"] = OnSave.Invoke( (TSource)(object)obj, s );
+                    (var data2, var result) = OnSave.Invoke( (TSource)(object)obj, s );
+                    data["value"] = data2;
+                    return result;
                 }
                 catch
                 {
@@ -71,15 +73,15 @@ namespace UnityPlus.Serialization
             {
                 try
                 {
-                    data = OnSave.Invoke( (TSource)(object)obj, s );
+                    (var data2, var result) = OnSave.Invoke( (TSource)(object)obj, s );
+                    data = data2;
+                    return result;
                 }
                 catch
                 {
                     return SerializationResult.PrimitiveRetryFailed;
                 }
             }
-
-            return SerializationResult.PrimitiveFinished;
         }
 
         public override SerializationResult Load<TMember>( ref TMember obj, SerializedData data, ILoader l, bool populate )
@@ -91,8 +93,9 @@ namespace UnityPlus.Serialization
             {
                 try
                 {
-                    TSource obj2 = OnLoad.Invoke( data["value"], l.RefMap );
+                    (TSource obj2, var result) = OnLoad.Invoke( data["value"], l.RefMap );
                     obj = (TMember)(object)obj2;
+                    return result;
                 }
                 catch
                 {
@@ -103,15 +106,15 @@ namespace UnityPlus.Serialization
             {
                 try
                 {
-                    TSource obj2 = OnLoad.Invoke( data, l.RefMap );
+                    (TSource obj2, var result) = OnLoad.Invoke( data, l.RefMap );
                     obj = (TMember)(object)obj2;
+                    return result;
                 }
                 catch
                 {
                     return SerializationResult.PrimitiveRetryFailed;
                 }
             }
-            return SerializationResult.PrimitiveFinished;
         }
     }
 }
