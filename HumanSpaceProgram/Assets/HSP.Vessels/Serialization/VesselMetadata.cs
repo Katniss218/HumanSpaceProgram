@@ -100,16 +100,14 @@ namespace HSP.Content.Vessels.Serialization
         public static SerializationMapping VesselMetadataMapping()
         {
             return new MemberwiseSerializationMapping<VesselMetadata>()
-            {
-                ("name", new Member<VesselMetadata, string>( o => o.Name )),
-                ("description", new Member<VesselMetadata, string>( o => o.Description )),
-                ("author", new Member<VesselMetadata, string>( o => o.Author )),
-               // ("categories", new Member<VesselMetadata, string[]>( o => o.Categories )),
-               // ("filter", new Member<VesselMetadata, string>( o => o.Filter )),
-               // ("group", new Member<VesselMetadata, string>( o => o.Group )),
-                ("file_version", new Member<VesselMetadata, Version>( o => o.FileVersion )),
-                ("mod_versions", new Member<VesselMetadata, Dictionary<string, Version>>( o => o.ModVersions ))
-            };
+                .WithMember( "name", o => o.Name )
+                .WithMember( "description", o => o.Description )
+                .WithMember( "author", o => o.Author )
+                // .WithMember( "categories", o => o.Categories )
+                // .WithMember( "filter", o => o.Filter )
+                // .WithMember( "group", o => o.Group )
+                .WithMember( "file_version", o => o.FileVersion )
+                .WithMember( "mod_versions", o => o.ModVersions );
         }
     }
 }

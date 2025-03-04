@@ -68,7 +68,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
             _mergeDepthMaterial.SetFloat( Shader.PropertyToID( "_DstNear" ), EffectCamera.nearClipPlane );
             _mergeDepthMaterial.SetFloat( Shader.PropertyToID( "_DstFar" ), EffectCamera.farClipPlane );
             _cmdMergeDepth.SetRenderTarget( _dstColorRT, _dstDepthRT );
-            
+
             if( instance.NearCamera.gameObject.activeInHierarchy && instance.NearCamera.enabled )
                 _cmdMergeDepth.Blit( null, BuiltinRenderTextureType.CurrentActive, _mergeDepthMaterial, 0 );
             else
@@ -83,9 +83,12 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
             if( instance._mergeDepthMaterial == null )
                 return;
 
+            int width = Screen.fullScreen ? Screen.currentResolution.width : Screen.width;
+            int height = Screen.fullScreen ? Screen.currentResolution.height : Screen.height;
+
             // tex used as output for depth merging.
-            instance._dstColorRT = RenderTexture.GetTemporary( Screen.width, Screen.height, 0, RenderTextureFormat.ARGB32 );
-            instance._dstDepthRT = RenderTexture.GetTemporary( Screen.width, Screen.height, 32, RenderTextureFormat.Depth );
+            instance._dstColorRT = RenderTexture.GetTemporary( width, height, 0, RenderTextureFormat.ARGB32 );
+            instance._dstDepthRT = RenderTexture.GetTemporary( width, height, 32, RenderTextureFormat.Depth );
             instance.EffectCamera.SetTargetBuffers( instance._dstColorRT.colorBuffer, instance._dstDepthRT.depthBuffer );
 
             instance.EffectCamera.RemoveCommandBuffer( CameraEvent.BeforeForwardOpaque, instance._cmdMergeDepth );

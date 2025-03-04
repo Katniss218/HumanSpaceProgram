@@ -93,10 +93,10 @@ namespace HSP
         [MapsInheritingFrom( typeof( Version ) )]
         public static SerializationMapping VersionMapping()
         {
-            return new PrimitiveStructSerializationMapping<Version>()
+            return new PrimitiveSerializationMapping<Version>()
             {
                 OnSave = ( o, s ) => (SerializedPrimitive)o.ToString(),
-                OnInstantiate = ( data, l ) => Version.Parse( (string)data )
+                OnLoad = ( data, l ) => Version.Parse( (string)data )
             };
         }
     }

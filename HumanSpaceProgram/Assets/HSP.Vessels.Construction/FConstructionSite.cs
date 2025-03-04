@@ -315,13 +315,9 @@ namespace HSP.Vessels.Construction
         public static SerializationMapping FConstructionSiteMapping()
         {
             return new MemberwiseSerializationMapping<FConstructionSite>()
-            {
-                ("state", new Member<FConstructionSite, ConstructionState>( o => o.State )),
-
-                ("constructibles", new Member<FConstructionSite, object>( o => null, (o, value) => o._constructibles = AncestralMap<FConstructible>.Create( o.transform ).Keys.ToArray() )),
-
-                ("build_speed", new Member<FConstructionSite, float>( o => o.BuildSpeed ))
-            };
+                .WithMember( "state", o => o.State )
+                .WithMember<object>( "constructibles", o => null, ( o, value ) => o._constructibles = AncestralMap<FConstructible>.Create( o.transform ).Keys.ToArray() )
+                .WithMember( "build_speed", o => o.BuildSpeed );
         }
     }
 }

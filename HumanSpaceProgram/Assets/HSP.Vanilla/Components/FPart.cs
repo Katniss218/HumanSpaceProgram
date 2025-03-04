@@ -31,9 +31,7 @@ namespace HSP.Vessels.Components
         public static SerializationMapping FPartMapping()
         {
             return new MemberwiseSerializationMapping<FPart>()
-            {
-                ("part_id", new Member<FPart, NamespacedID>( o => o.PartID ))
-            };
+                .WithMember( "part_id", o => o.PartID );
         }
     }
 }

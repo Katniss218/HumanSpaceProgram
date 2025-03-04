@@ -27,10 +27,8 @@ namespace HSP.Vanilla.Components
             public static SerializationMapping Actuator2DGroupMapping()
             {
                 return new MemberwiseSerializationMapping<Actuator2DGroup>()
-                {
-                    ("get_reference_transform", new Member<Actuator2DGroup, ControlParameterInput<Transform>>( o => o.GetReferenceTransform )),
-                    ("on_set_xy", new Member<Actuator2DGroup, ControllerOutput<Vector2>>( o => o.OnSetXY ))
-                };
+                    .WithMember( "get_reference_transform", o => o.GetReferenceTransform )
+                    .WithMember( "on_set_xy", o => o.OnSetXY );
             }
         }
 
@@ -99,10 +97,8 @@ namespace HSP.Vanilla.Components
         public static SerializationMapping FGimbalActuatorControllerMapping()
         {
             return new MemberwiseSerializationMapping<FGimbalActuatorController>()
-            {
-                ("actuators_2d", new Member<FGimbalActuatorController, Actuator2DGroup[]>( o => o.Actuators2D )),
-                ("set_attitude", new Member<FGimbalActuatorController, ControlleeInput<Vector3>>( o => o.SetAttitude ))
-            };
+                .WithMember( "actuators_2d", o => o.Actuators2D )
+                .WithMember( "set_attitude", o => o.SetAttitude );
         }
     }
 }

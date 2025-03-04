@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityPlus.Serialization.ReferenceMaps;
 
 namespace UnityPlus.Serialization
@@ -11,16 +9,27 @@ namespace UnityPlus.Serialization
     {
         private SerializedData[] _data;
         private T[] _objects;
+        int _startIndex;
+        Dictionary<int, RetryEntry<T>> _retryElements;
+        bool _wasFailureNoRetry;
 
         private int _context = default;
 
         public IReverseReferenceMap RefMap { get; set; }
+
+        public int CurrentPass { get; private set; }
+
 
         internal SerializationUnitSaver( T[] objects, int context )
         {
             this.RefMap = new BidirectionalReferenceStore();
             this._objects = objects;
             this._context = context;
+        }
+
+        public bool ShouldPause()
+        {
+            return false;
         }
 
         //
@@ -30,21 +39,39 @@ namespace UnityPlus.Serialization
         /// <summary>
         /// Performs serialization of the previously specified objects.
         /// </summary>
-        public void Serialize()
+        public void Serialize( int maxIters = 10 )
         {
-            this.SaveCallback();
+            this._data = new SerializedData[_objects.Length];
+            this.CurrentPass = -1;
+
+            for( int i = 0; i < maxIters; i++ )
+            {
+                this.CurrentPass++;
+                SerializationResult result = this.SaveCallback();
+                if( result.HasFlag( SerializationResult.Finished ) )
+                    return;
+            }
         }
 
         /// <summary>
         /// Performs serialization of the previously specified objects.
         /// </summary>
-        public void Serialize( IReverseReferenceMap s )
+        public void Serialize( IReverseReferenceMap s, int maxIters = 10 )
         {
             if( s == null )
                 throw new ArgumentNullException( nameof( s ), $"The reference map to use can't be null." );
 
+            this._data = new SerializedData[_objects.Length];
+            this.CurrentPass = -1;
             this.RefMap = s;
-            this.SaveCallback();
+
+            for( int i = 0; i < maxIters; i++ )
+            {
+                this.CurrentPass++;
+                SerializationResult result = this.SaveCallback();
+                if( result.HasFlag( SerializationResult.Finished ) )
+                    return;
+            }
         }
 
         //
@@ -56,6 +83,9 @@ namespace UnityPlus.Serialization
         /// </summary>
         public IEnumerable<SerializedData> GetData()
         {
+            if( _data == null )
+                throw new InvalidOperationException( $"Can't get the saved data before any has been saved." );
+
             return _data;
         }
 
@@ -64,24 +94,89 @@ namespace UnityPlus.Serialization
         /// </summary>
         public IEnumerable<SerializedData> GetDataOfType<TDerived>()
         {
+            if( _data == null )
+                throw new InvalidOperationException( $"Can't get the saved data before any has been saved." );
+
             return _data.Where( d =>
             {
                 return d.TryGetValue( KeyNames.TYPE, out var type ) && typeof( TDerived ).IsAssignableFrom( type.DeserializeType() );
             } );
         }
 
-        private void SaveCallback()
+        private SerializationResult SaveCallback()
         {
-            _data = new SerializedData[_objects.Length];
+            if( _retryElements != null )
+            {
+                List<int> retryMembersThatSucceededThisTime = new();
 
-            for( int i = 0; i < _objects.Length; i++ )
+                foreach( (int i, var entry) in _retryElements )
+                {
+                    if( entry.pass == CurrentPass )
+                        continue;
+
+                    T obj = _objects[i];
+                    SerializedData data = _data[i];
+
+                    var mapping = entry.mapping;
+
+                    SerializationResult elementResult = mapping.SafeSave<T>( obj, ref data, this );
+                    if( elementResult.HasFlag( SerializationResult.Failed ) )
+                    {
+                        entry.pass = CurrentPass;
+                    }
+                    else if( elementResult.HasFlag( SerializationResult.Finished ) )
+                    {
+                        retryMembersThatSucceededThisTime.Add( i );
+                    }
+
+                    _data[i] = data;
+                }
+
+                foreach( var i in retryMembersThatSucceededThisTime )
+                {
+                    _retryElements.Remove( i );
+                }
+            }
+
+            for( int i = _startIndex; i < _objects.Length; i++ )
             {
                 T obj = _objects[i];
+                SerializedData data = _data[i];
 
                 var mapping = SerializationMappingRegistry.GetMapping<T>( _context, obj );
 
-                _data[i] = mapping.SafeSave<T>( obj, this );
+                SerializationResult elementResult = mapping.SafeSave<T>( obj, ref data, this );
+                if( elementResult.HasFlag( SerializationResult.Finished ) )
+                {
+                    if( elementResult.HasFlag( SerializationResult.Failed ) )
+                        _wasFailureNoRetry = true;
+
+                    _startIndex = i + 1;
+                }
+                else
+                {
+                    _retryElements ??= new();
+                    _startIndex = i + 1;
+
+                    if( elementResult.HasFlag( SerializationResult.Paused ) )
+                        _retryElements.Add( i, new RetryEntry<T>( obj, mapping, -1 ) );
+                    else
+                        _retryElements.Add( i, new RetryEntry<T>( obj, mapping, CurrentPass ) );
+                }
+
+                _data[i] = data;
             }
+
+            SerializationResult result = SerializationResult.NoChange;
+            if( _wasFailureNoRetry || _retryElements != null && _retryElements.Count != 0 )
+                result |= SerializationResult.HasFailures;
+            if( _retryElements == null || _retryElements.Count == 0 )
+                result |= SerializationResult.Finished;
+
+            if( result.HasFlag( SerializationResult.Finished ) && result.HasFlag( SerializationResult.HasFailures ) )
+                result |= SerializationResult.Failed;
+
+            return result;
         }
     }
 }

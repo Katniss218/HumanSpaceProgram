@@ -39,10 +39,8 @@ namespace HSP.ResourceFlow
         public static SerializationMapping SubstanceStateMapping()
         {
             return new MemberwiseSerializationMapping<SubstanceState>()
-            {
-                ("substance", new Member<SubstanceState, Substance>( ObjectContext.Asset, o => o.Substance )),
-                ("mass_amount", new Member<SubstanceState, float>( o => o.MassAmount ))
-            };
+                .WithMember( "substance", ObjectContext.Asset, o => o.Substance )
+                .WithMember( "mass_amount", o => o.MassAmount );
         }
     }
 }

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 using UnityPlus.Serialization;
+using UnityPlus.Serialization.Json;
 using UnityPlus.Serialization.ReferenceMaps;
 
 namespace HSP.Vessels.Construction
@@ -32,9 +34,7 @@ namespace HSP.Vessels.Construction
         public static SerializationMapping CraneBuildConditionMapping()
         {
             return new MemberwiseSerializationMapping<CraneBuildCondition>()
-            {
-                ("min_lift_capacity", new Member<CraneBuildCondition, float>( o => o.minLiftCapacity ))
-            };
+                .WithMember( "min_lift_capacity", o => o.minLiftCapacity );
         }
     }
 
@@ -193,6 +193,8 @@ namespace HSP.Vessels.Construction
                         _cachedData.Add( comp, (originalToGhost, ghostToOriginal) );
                     }
                 }
+
+
             }
         }
 
@@ -204,13 +206,9 @@ namespace HSP.Vessels.Construction
         public static SerializationMapping FConstructibleMapping()
         {
             return new MemberwiseSerializationMapping<FConstructible>()
-            {
-                ("max_build_points", new Member<FConstructible, float>( o => o._maxBuildPoints )),
-                ("build_points", new Member<FConstructible, float>( o => o._buildPoints )),
-                // todo - conditions.
-#warning TODO - the dict RefToValue doesn't load properly.
-                ("cached_data", new Member<FConstructible, Dictionary<Component, (SerializedData fwd, SerializedData rev)>>( KeyValueContext.RefToValue, o => o._cachedData ))
-            };
+                .WithMember( "max_build_points", o => o._maxBuildPoints )
+                .WithMember( "build_points", o => o._buildPoints )
+                .WithMember( "cached_data", KeyValueContext.RefToValue, o => o._cachedData );
         }
     }
 }

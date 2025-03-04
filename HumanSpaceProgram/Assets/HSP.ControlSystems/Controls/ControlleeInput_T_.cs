@@ -83,17 +83,19 @@ namespace HSP.ControlSystems.Controls
         public static SerializationMapping ControlleeInputMapping<T>()
         {
             return new MemberwiseSerializationMapping<ControlleeInput<T>>()
-            {
-                ("on_invoke", new Member<ControlleeInput<T>, Action<T>>( o => o.onInvoke )),
-                ("connects_to", new Member<ControlleeInput<T>, ControllerOutput<T>[]>( ArrayContext.Refs, o => o.outputs.ToArray(), (o, value) =>
+                .WithReadonlyMember( "on_invoke", o => o.onInvoke )
+                .WithFactory<Action<T>>( onInvoke => new ControlleeInput<T>( onInvoke ) )
+                .WithMember( "connects_to", ArrayContext.Refs, o => o.outputs, ( o, value ) =>
                 {
+                    if( value == null ) 
+                        return;
+
                     foreach( var c in value )
                     {
                         ControlleeInput<T>.Connect( o, c );
                     }
-                } ))
-            }
-            .WithFactory( ( data, l ) => // Either this, or use mapping that instantiates on reference pass.
+                } );
+            /*.WithFactory( ( data, l ) => // Either this, or use mapping that instantiates on reference pass.
             {
                 if( data == null )
                     return null;
@@ -103,7 +105,7 @@ namespace HSP.ControlSystems.Controls
                 Action<T> onInvoke = (Action<T>)Persistent_Delegate.ToDelegate( data["on_invoke"], l.RefMap );
 
                 return new ControlleeInput<T>( onInvoke );
-            } );
+            } );*/
         }
     }
 }

@@ -59,18 +59,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\_UnityPlus.Serialization\PassthroughMember.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\MappingTypes\IInstantiableSerializationMapping.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\MappingProviders\MapsImplementingSearcher.cs" />
+    <Compile Include="Assets\_UnityPlus.Serialization\MappingTypes\RetryEntry.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Utils\AccessorUtils.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Delegates.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\SerializationUnitAsyncSaver.cs" />
+    <Compile Include="Assets\_UnityPlus.Serialization\MappingTypes\EnumeratedSerializationMapping.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\MappingProviders\MapsInheritingFromAttribute.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\MappingTypes\NonPrimitiveSerializationMapping.cs" />
+    <Compile Include="Assets\_UnityPlus.Serialization\MappingTypes\MappingResult.cs" />
+    <Compile Include="Assets\_UnityPlus.Serialization\Mappings\Mappings_List.cs" />
+    <Compile Include="Assets\_UnityPlus.Serialization\MappingTypes\IndexedSerializationMapping.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Json\JsonStreamWriter.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\SerializedData.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\MappingTypes\MemberwiseSerializationMapping.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\MappingProviders\MapsImplementingAttribute.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\MappingTypes\PrimitiveStructSerializationMapping.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Mappings\Persistent_Type.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\SerializedArray.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\MappingProviders\MapsAnyInterfaceAttribute.cs" />
@@ -86,19 +88,19 @@
     <Compile Include="Assets\_UnityPlus.Serialization\SerializationUnit.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\MappingProviders\MapsAnyAttribute.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\IReverseReferenceMap.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\MappingTypes\NonPrimitiveSerializationMappingWithTemp.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\IForwardReferenceMap.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\ReferenceMaps\ForwardReferenceStore.cs" />
+    <Compile Include="Assets\_UnityPlus.Serialization\SerializationUnit.Async.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Mappings\Mappings_UnityPrimitives.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\AsyncSaver.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\ISerializedDataHandler.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\SerializationContexts.cs" />
+    <Compile Include="Assets\_UnityPlus.Serialization\Contexts.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\ILoader.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\MappingProviders\MapsAnyClassAttribute.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\MappingProviders\MapsAnyClassSearcher.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\MappingProviders\MapsAnyStructAttribute.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\SerializedPrimitive.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Extensions\IReverseReferenceMap_Ex_References.cs" />
+    <Compile Include="Assets\_UnityPlus.Serialization\MappingTypes\PrimitiveGuardedSerializationMapping.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\MappingProviders\IMappingProviderSearcher.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Mappings\Mappings_SerializedData.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Mappings\Mappings_References.cs" />
@@ -107,6 +109,7 @@
     <Compile Include="Assets\_UnityPlus.Serialization\Member.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Mappings\Persistent_Delegate.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Utils\MappingHelper.cs" />
+    <Compile Include="Assets\_UnityPlus.Serialization\MappingTypes\GameobjectSerializationMapping.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\MappingProviders\MappingProviderAttribute.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\SerializationUnitSaver.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Mappings\Mappings_UnityComponents.cs" />
@@ -123,10 +126,9 @@
     <Compile Include="Assets\_UnityPlus.Serialization\SerializedObject.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\SerializationMappingRegistry.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Mappings\Mappings_Assets.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\MappingTypes\PrimitiveObjectSerializationMapping.cs" />
+    <Compile Include="Assets\_UnityPlus.Serialization\MappingTypes\PrimitiveSerializationMapping.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\SerializationUnitAsyncLoader.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\KeyNames.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\AsyncLoader.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\SerializationUnitLoader.cs" />
   </ItemGroup>
   <ItemGroup>

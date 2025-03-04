@@ -60,7 +60,7 @@ namespace HSP.Vanilla.Scenes.DesignScene.Tools
 
 		void OnEnable()
 		{
-			HierarchicalInputManager.AddAction( HierarchicalInputChannel.VIEWPORT_PRIMARY_DOWN, HierarchicalInputPriority.MEDIUM, Input_MouseDown );
+            HierarchicalInputManager.AddAction( Input.InputChannel.PRIMARY_DOWN, InputChannelPriority.MEDIUM, Input_MouseDown );
 			if( DesignVesselManager.DesignObject != null )
 			{
 				CreateHandles();
@@ -72,7 +72,7 @@ namespace HSP.Vanilla.Scenes.DesignScene.Tools
 
 		void OnDisable()
 		{
-			HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.VIEWPORT_PRIMARY_DOWN, Input_MouseDown );
+            HierarchicalInputManager.RemoveAction( Input.InputChannel.PRIMARY_DOWN, Input_MouseDown );
 			if( _handles != null )
 			{
 				_handles.Destroy();

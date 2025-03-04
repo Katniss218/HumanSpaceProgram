@@ -82,24 +82,24 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Tools
 
         void OnEnable()
         {
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.VIEWPORT_PRIMARY_UP, HierarchicalInputPriority.MEDIUM, Input_MouseClick );
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.DESIGN_PART_ROTATE_XP, HierarchicalInputPriority.MEDIUM, Input_RotateXp );
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.DESIGN_PART_ROTATE_XN, HierarchicalInputPriority.MEDIUM, Input_RotateXn );
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.DESIGN_PART_ROTATE_YP, HierarchicalInputPriority.MEDIUM, Input_RotateYp );
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.DESIGN_PART_ROTATE_YN, HierarchicalInputPriority.MEDIUM, Input_RotateYn );
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.DESIGN_PART_ROTATE_ZP, HierarchicalInputPriority.MEDIUM, Input_RotateZp );
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.DESIGN_PART_ROTATE_ZN, HierarchicalInputPriority.MEDIUM, Input_RotateZn );
+            HierarchicalInputManager.AddAction( Input.InputChannel.PRIMARY_UP, InputChannelPriority.MEDIUM, Input_MouseClick );
+            HierarchicalInputManager.AddAction( InputChannel.CONSTRUCT_PART_ROTATE_XP, InputChannelPriority.MEDIUM, Input_RotateXp );
+            HierarchicalInputManager.AddAction( InputChannel.CONSTRUCT_PART_ROTATE_XN, InputChannelPriority.MEDIUM, Input_RotateXn );
+            HierarchicalInputManager.AddAction( InputChannel.CONSTRUCT_PART_ROTATE_YP, InputChannelPriority.MEDIUM, Input_RotateYp );
+            HierarchicalInputManager.AddAction( InputChannel.CONSTRUCT_PART_ROTATE_YN, InputChannelPriority.MEDIUM, Input_RotateYn );
+            HierarchicalInputManager.AddAction( InputChannel.CONSTRUCT_PART_ROTATE_ZP, InputChannelPriority.MEDIUM, Input_RotateZp );
+            HierarchicalInputManager.AddAction( InputChannel.CONSTRUCT_PART_ROTATE_ZN, InputChannelPriority.MEDIUM, Input_RotateZn );
         }
 
         void OnDisable()
         {
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.VIEWPORT_PRIMARY_UP, Input_MouseClick );
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.DESIGN_PART_ROTATE_XP, Input_RotateXp );
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.DESIGN_PART_ROTATE_XN, Input_RotateXn );
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.DESIGN_PART_ROTATE_YP, Input_RotateYp );
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.DESIGN_PART_ROTATE_YN, Input_RotateYn );
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.DESIGN_PART_ROTATE_ZP, Input_RotateZp );
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.DESIGN_PART_ROTATE_ZN, Input_RotateZn );
+            HierarchicalInputManager.RemoveAction( Input.InputChannel.PRIMARY_UP, Input_MouseClick );
+            HierarchicalInputManager.RemoveAction( InputChannel.CONSTRUCT_PART_ROTATE_XP, Input_RotateXp );
+            HierarchicalInputManager.RemoveAction( InputChannel.CONSTRUCT_PART_ROTATE_XN, Input_RotateXn );
+            HierarchicalInputManager.RemoveAction( InputChannel.CONSTRUCT_PART_ROTATE_YP, Input_RotateYp );
+            HierarchicalInputManager.RemoveAction( InputChannel.CONSTRUCT_PART_ROTATE_YN, Input_RotateYn );
+            HierarchicalInputManager.RemoveAction( InputChannel.CONSTRUCT_PART_ROTATE_ZP, Input_RotateZp );
+            HierarchicalInputManager.RemoveAction( InputChannel.CONSTRUCT_PART_ROTATE_ZN, Input_RotateZn );
             if( _heldPart != null )
             {
                 Destroy( _heldPart.gameObject );

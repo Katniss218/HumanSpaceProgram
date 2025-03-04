@@ -78,6 +78,7 @@
     <Compile Include="Assets\HSP.Vanilla\Components\FBulkContainer_Sphere.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FAttachNode.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FBulkConnection.cs" />
+    <Compile Include="Assets\HSP.Vanilla\Settings\SettingsPage_Graphics.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\OnTimelineSave.cs" />
     <Compile Include="Assets\HSP.Vanilla\CelestialBodies\LODQuadModifier_InitializeMesh.cs" />
     <Compile Include="Assets\HSP.Vanilla\VesselPinning_Ex.cs" />
@@ -122,6 +123,7 @@
     <Compile Include="Assets\HSP.Vanilla\Components\FPart.cs" />
     <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\FixedReferenceFrameTransform.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FRocketEngine.cs" />
+    <Compile Include="Assets\HSP.Vanilla\InputChannel.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\Cameras\GameplaySceneDepthBufferCombiner.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\F2AxisActuator.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\Tools\TranslateTool.cs" />
@@ -135,6 +137,7 @@
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\GameplaySceneToolManager.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\F1AxisActuator.cs" />
     <Compile Include="Assets\HSP.Vanilla\CelestialBodies\LODQuadModifier_Displace.cs" />
+    <Compile Include="Assets\HSP.Vanilla\Settings\SettingsPage_Keybinds.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FLaunchSiteMarker.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FReactionControlController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FControlFrame.cs" />
@@ -1029,10 +1032,6 @@
       <Project>{5E371463-138D-D25A-49B8-DED13355C7DC}</Project>
       <Name>HSP.ControlSystems</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.Input.csproj">
-      <Project>{27123301-09AF-37AC-2FCA-FF7B2CC75C42}</Project>
-      <Name>HSP.Input</Name>
-    </ProjectReference>
     <ProjectReference Include="HSP.ReferenceFrames.csproj">
       <Project>{D8846B96-55B1-C32C-F90A-52C14F5C8043}</Project>
       <Name>HSP.ReferenceFrames</Name>
@@ -1048,6 +1047,10 @@
     <ProjectReference Include="HSP.ScreenCapturing.csproj">
       <Project>{A72CC48E-46C1-25C7-DFC0-DDA669184CFD}</Project>
       <Name>HSP.ScreenCapturing</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Settings.csproj">
+      <Project>{40D40A9F-D8D4-16D9-E477-9EC39F056D3E}</Project>
+      <Name>HSP.Settings</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.Timelines.csproj">
       <Project>{C443A3BB-4D58-3A1D-D085-E8AEA15B2BC0}</Project>

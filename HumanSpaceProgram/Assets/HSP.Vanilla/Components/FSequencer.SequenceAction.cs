@@ -36,9 +36,7 @@ namespace HSP.Vanilla.Components
         public static SerializationMapping SequenceActionMapping()
         {
             return new MemberwiseSerializationMapping<SequenceAction>()
-            {
-                ("on_invoke", new Member<SequenceAction, ControllerOutput>( o => o.OnInvokeTyped ))
-            };
+                .WithMember( "on_invoke", o => o.OnInvokeTyped );
         }
     }
 
@@ -66,10 +64,8 @@ namespace HSP.Vanilla.Components
         public static SerializationMapping SequenceActionMapping<T>()
         {
             return new MemberwiseSerializationMapping<SequenceAction<T>>()
-            {
-                ("on_invoke", new Member<SequenceAction<T>, ControllerOutput<T>>( o => o.OnInvokeTyped )),
-                ("signal_value", new Member<SequenceAction<T>, T>( o => o.SignalValue ))
-            };
+                .WithMember( "on_invoke", o => o.OnInvokeTyped )
+                .WithMember( "signal_value", o => o.SignalValue );
         }
     }
 }

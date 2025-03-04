@@ -2,41 +2,69 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using UnityEngine;
 
 namespace UnityPlus.Serialization
 {
-    /// <summary>
-    /// Creates a <see cref="SerializedObject"/> from the child mappings.
-    /// </summary>
-    /// <typeparam name="TSource">The type of the object being mapped.</typeparam>
-    public sealed class MemberwiseSerializationMapping<TSource> : SerializationMapping, IInstantiableSerializationMapping, IEnumerable<(string, MemberBase<TSource>)>
+    public interface IMemberwiseTemp
     {
-#warning TODO - allow members to keep static values instead of saving them (i.e. force isKinematic to true on every deserialization).
+        Func<SerializedData, ILoader, object> _rawFactory { get; }
+        int _factoryStartMemberIndex { get; }
+        int _factoryMemberCount { get; }
+        Delegate _untypedFactory { get; }
+    }
 
-        private readonly List<(string, MemberBase<TSource>)> _items = new();
-        public Func<SerializedData, ILoader, object> OnInstantiate { get; private set; } = null;
+    /// <summary>
+    /// A type of mapping that operates on a compound (non-primitive) type and its constituent members.
+    /// </summary>
+    /// <typeparam name="TSource">The type being mapped.</typeparam>
+    public sealed class MemberwiseSerializationMapping<TSource> : SerializationMapping, IMemberwiseTemp
+    {
+        private List<MemberBase<TSource>> _members = new();
+        private bool _objectHasBeenInstantiated;
+
+        object[] _preFactoryMemberStorage;
+        object[] _factoryMemberStorage;
+        int _startIndex;
+        Dictionary<int, RetryEntry<object>> _retryMembers;
+
+        public Func<SerializedData, ILoader, object> _rawFactory { get; private set; } = null;
+        public int _factoryStartMemberIndex { get; private set; }
+        public int _factoryMemberCount { get; private set; }
+        public Delegate _untypedFactory { get; private set; } = null;
+        Action<SerializedData, TSource> _finalizer = null;
+
+        bool _wasFailureNoRetry = false;
 
         public MemberwiseSerializationMapping()
         {
-            //
-            UseBaseTypeFactoryRecursive();
+            UseBaseTypeFactoryRecursive( null );
             IncludeBaseMembersRecursive();
         }
 
-        /// <summary>
-        /// Makes the deserialization use a custom factory method instead of <see cref="Activator.CreateInstance{T}()"/>.
-        /// </summary>
-        /// <remarks>
-        /// The factory is only needed to create an instance, not to set its internal state. The state should be set using the members.
-        /// </remarks>
-        /// <param name="customFactory">The method used to create an instance of <typeparamref name="TSource"/> from its serialized representation.</param>
-        public MemberwiseSerializationMapping<TSource> WithFactory( Func<SerializedData, ILoader, object> customFactory )
+        /// <param name="baseTypeContext">The serialization context to use when retrieving the members/factories for the base type. USE WITH CARE.</param>
+        public MemberwiseSerializationMapping( int baseTypeContext )
         {
-            this.OnInstantiate = customFactory;
-            return this;
+            UseBaseTypeFactoryRecursive( baseTypeContext );
+            IncludeBaseMembersRecursive();
+        }
+
+        private MemberwiseSerializationMapping( MemberwiseSerializationMapping<TSource> copy )
+        {
+            this.Context = copy.Context;
+            this._members = copy._members;
+            this._rawFactory = copy._rawFactory;
+            this._factoryStartMemberIndex = copy._factoryStartMemberIndex;
+            this._factoryMemberCount = copy._factoryMemberCount;
+            this._untypedFactory = copy._untypedFactory;
+            this._finalizer = copy._finalizer;
+        }
+
+        public override SerializationMapping GetInstance()
+        {
+            return new MemberwiseSerializationMapping<TSource>( this );
         }
 
         /// <summary>
@@ -48,7 +76,7 @@ namespace UnityPlus.Serialization
             if( baseType == null )
                 return this;
 
-            SerializationMapping mapping = SerializationMappingRegistry.GetMappingOrNull( this.context, baseType );
+            SerializationMapping mapping = SerializationMappingRegistry.GetMappingOrNull( this.Context, baseType );
 
             if( mapping == null )
                 return this;
@@ -66,28 +94,20 @@ namespace UnityPlus.Serialization
                 if( !mappedType.IsAssignableFrom( baseType ) )
                     return this;
 
-                FieldInfo listField = mappingType.GetField( "_items", BindingFlags.Instance | BindingFlags.NonPublic );
+                FieldInfo listField = mappingType.GetField( nameof( _members ), BindingFlags.Instance | BindingFlags.NonPublic );
 
-                IList mapping__items = listField.GetValue( mapping ) as IList;
+                IList mapping__members = listField.GetValue( mapping ) as IList;
 
-                Type valueTupleType = typeof( ValueTuple<,> )
-                    .MakeGenericType( typeof( string ), typeof( MemberBase<> ).MakeGenericType( mappedType ) );
-
-                FieldInfo item1Field = valueTupleType.GetField( "Item1", BindingFlags.Instance | BindingFlags.Public );
-                FieldInfo item2Field = valueTupleType.GetField( "Item2", BindingFlags.Instance | BindingFlags.Public );
-
-                foreach( var item in mapping__items )
+                foreach( var member in mapping__members )
                 {
-                    string name = (string)item1Field.GetValue( item );
-                    object member = item2Field.GetValue( item );
-
+                    // Would be nice to have this be flattened, instead of one layer of passthrough per inheritance level.
                     MethodInfo method = typeof( PassthroughMember<,> )
                         .MakeGenericType( typeof( TSource ), mappedType )
-                        .GetMethod( "Create", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic );
+                        .GetMethod( nameof( PassthroughMember<object, object>.Create ), BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic );
 
                     MemberBase<TSource> m = (MemberBase<TSource>)method.Invoke( null, new object[] { member } );
 
-                    this._items.Add( (name, m) );
+                    this._members.Add( m );
                 }
             }
 
@@ -97,153 +117,612 @@ namespace UnityPlus.Serialization
         /// <summary>
         /// Makes the deserialization use the factory of the nearest base type of <typeparamref name="TSource"/>.
         /// </summary>
-        private MemberwiseSerializationMapping<TSource> UseBaseTypeFactoryRecursive()
+        private MemberwiseSerializationMapping<TSource> UseBaseTypeFactoryRecursive( int? baseTypeContext )
         {
             Type baseType = typeof( TSource ).BaseType;
             if( baseType == null )
                 return this;
 
-            SerializationMapping mapping = SerializationMappingRegistry.GetMappingOrNull( this.context, baseType );
+            SerializationMapping mapping = SerializationMappingRegistry.GetMappingOrNull( this.Context, baseType );
 
-            if( mapping is IInstantiableSerializationMapping m )
+            if( mapping == null && baseTypeContext != null )
             {
-                this.OnInstantiate = m.OnInstantiate;
+                mapping = SerializationMappingRegistry.GetMappingOrNull( baseTypeContext.Value, baseType );
+            }
+
+            // later on, this entire thing is going to be overriden
+
+            if( mapping is IMemberwiseTemp m )
+            {
+                this._rawFactory = m._rawFactory;
+                this._untypedFactory = m._untypedFactory;
+                this._factoryStartMemberIndex = m._factoryStartMemberIndex;
+                this._factoryMemberCount = m._factoryMemberCount;
                 return this;
             }
 
             return this;
         }
 
-        public void Add( (string, MemberBase<TSource>) item )
-        {
-            if( item.Item1 == null )
-                throw new Exception( $"The member name can't be null" );
-
-            _items.Add( item );
-        }
-
-        public IEnumerator<(string, MemberBase<TSource>)> GetEnumerator()
-        {
-            return _items.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return _items.GetEnumerator();
-        }
-
         //
         //  Mapping methods:
         //
 
-        protected override bool Save<T>( T obj, ref SerializedData data, ISaver s )
+        public override SerializationResult Save<TMember>( TMember obj, ref SerializedData data, ISaver s )
         {
             if( obj == null )
-                return false;
+            {
+                return SerializationResult.Finished;
+            }
 
             TSource sourceObj = (TSource)(object)obj;
 
             if( data == null )
+            {
                 data = new SerializedObject();
 
-            data[KeyNames.ID] = s.RefMap.GetID( sourceObj ).SerializeGuid();
-            data[KeyNames.TYPE] = obj.GetType().SerializeType();
+                if( MappingHelper.IsNonNullEligibleForTypeHeader<TMember>() )
+                {
+                    data[KeyNames.TYPE] = obj.GetType().SerializeType();
+                    data[KeyNames.ID] = s.RefMap.GetID( sourceObj ).SerializeGuid();
+                }
+            }
 
-            foreach( var item in _items )
+            //
+            //      RETRY PREVIOUSLY FAILED MEMBERS
+            //
+
+            if( _retryMembers != null )
             {
-                SerializedData memberData = item.Item2.Save( sourceObj, s );
-                data[item.Item1] = memberData;
+                List<int> retryMembersThatSucceededThisTime = new();
+
+                foreach( (int i, var entry) in _retryMembers )
+                {
+                    if( entry.pass == s.CurrentPass )
+                        continue;
+
+                    MemberBase<TSource> member = this._members[i];
+
+                    SerializationResult memberResult = member.SaveRetry( entry.value, entry.mapping, data, s );
+                    if( memberResult.HasFlag( SerializationResult.Failed ) )
+                    {
+                        entry.pass = s.CurrentPass;
+                    }
+                    else if( memberResult.HasFlag( SerializationResult.Finished ) )
+                    {
+                        retryMembersThatSucceededThisTime.Add( i );
+                    }
+
+                    if( s.ShouldPause() )
+                    {
+                        foreach( var ii in retryMembersThatSucceededThisTime )
+                        {
+                            _retryMembers.Remove( ii );
+                        }
+                        return SerializationResult.Paused;
+                    }
+                }
+
+                foreach( var i in retryMembersThatSucceededThisTime )
+                {
+                    _retryMembers.Remove( i );
+                }
+            }
+
+            //
+            //      PROCESS THE MEMBERS THAT HAVE NOT FAILED YET.
+            //
+
+            for( int i = _startIndex; i < this._members.Count; i++ )
+            {
+                MemberBase<TSource> member = this._members[i];
+
+                SerializationResult memberResult = member.Save( sourceObj, data, s, out var mapping, out var memberObj );
+                if( memberResult.HasFlag( SerializationResult.Finished ) )
+                {
+                    if( memberResult.HasFlag( SerializationResult.Failed ) )
+                        _wasFailureNoRetry = true;
+
+                    _startIndex = i + 1;
+                }
+                else
+                {
+                    _retryMembers ??= new();
+                    _startIndex = i + 1;
+
+                    if( memberResult.HasFlag( SerializationResult.Paused ) )
+                        _retryMembers.Add( i, new RetryEntry<object>( memberObj, mapping, -1 ) );
+                    else
+                        _retryMembers.Add( i, new RetryEntry<object>( memberObj, mapping, s.CurrentPass ) );
+                }
+
+                if( s.ShouldPause() )
+                {
+                    return SerializationResult.Paused;
+                }
+            }
+
+            SerializationResult result = SerializationResult.NoChange;
+            if( _wasFailureNoRetry || _retryMembers != null && _retryMembers.Count != 0 )
+                result |= SerializationResult.HasFailures;
+            if( _retryMembers == null || _retryMembers.Count == 0 )
+                result |= SerializationResult.Finished;
+
+            if( result.HasFlag( SerializationResult.Finished ) && result.HasFlag( SerializationResult.HasFailures ) )
+                result |= SerializationResult.Failed;
+
+            return result;
+        }
+
+        bool FactoryMembersReadyForInstantiation( List<int> retryIndicesToIgnore = null )
+        {
+            if( _factoryMemberCount == 0 )
+                return true;
+
+            int lastFactoryMemberIndex = (_factoryStartMemberIndex + _factoryMemberCount);
+
+            if( _startIndex < lastFactoryMemberIndex )
+            {
+                return false;
+            }
+
+            if( _retryMembers != null )
+            {
+                foreach( var i in _retryMembers.Keys )
+                {
+                    if( i < lastFactoryMemberIndex )
+                    {
+                        if( retryIndicesToIgnore != null && retryIndicesToIgnore.Contains( i ) )
+                            continue;
+
+                        return false;
+                    }
+                }
             }
 
             return true;
         }
 
-
-        protected override bool TryPopulate<T>( ref T obj, SerializedData data, ILoader l )
+        public override SerializationResult Load<TMember>( ref TMember obj, SerializedData data, ILoader l, bool populate )
         {
-            // obj can be null here, this is normal.
-            TSource obj2 = (TSource)(object)obj;
-            Load( ref obj2, data, l );
-            obj = (T)(object)obj2;
+            if( data == null )
+            {
+                return SerializationResult.Finished;
+            }
 
-            return true;
+            TSource sourceObj = (obj == null) ? default : (TSource)(object)obj;
+
+            // obj can be null here, this is normal.
+
+            // Instantiate the object that contains the members ('parent'), if available.
+            // It stores when the factory is invoked instead of checking for null,
+            //   because structs are never null, but they may be immutable.
+            if( populate )
+            {
+                _objectHasBeenInstantiated = true;
+            }
+            else
+            {
+                if( !_objectHasBeenInstantiated && FactoryMembersReadyForInstantiation() )
+                {
+                    sourceObj = Instantiate( data, l );
+                    _objectHasBeenInstantiated = true;
+                }
+
+                if( _factoryStartMemberIndex != 0 )
+                {
+                    _preFactoryMemberStorage ??= new object[_factoryStartMemberIndex];
+                }
+                if( _factoryMemberCount != 0 )
+                {
+                    _factoryMemberStorage ??= new object[_factoryMemberCount];
+                }
+            }
+
+            //
+            //      RETRY PREVIOUSLY FAILED MEMBERS
+            //
+
+            if( _retryMembers != null )
+            {
+                List<int> retryMembersThatSucceededThisTime = new();
+
+                foreach( (int i, var entry) in _retryMembers )
+                {
+                    if( entry.pass == l.CurrentPass )
+                        continue;
+
+                    MemberBase<TSource> member = this._members[i];
+
+                    SerializationResult memberResult = member.LoadRetry( ref entry.value, entry.mapping, data, l );
+
+                    // Store the member for later in case the object doesn't exist yet.
+                    if( _objectHasBeenInstantiated )
+                    {
+#warning TODO - remember load and loadretry are different in that loadretry never assigns. It honestly should always assign inside I think.
+                        if( !memberResult.HasFlag( SerializationResult.Finished ) && !memberResult.HasFlag( SerializationResult.Paused ) )
+                        {
+                            member.Set( ref sourceObj, entry.value );
+                        }
+                    }
+                    else if( !populate )
+                    {
+                        AssignMemberToTempStorage( i, entry.value );
+                    }
+
+                    if( memberResult.HasFlag( SerializationResult.Failed ) )
+                    {
+                        entry.pass = l.CurrentPass;
+                    }
+                    else if( memberResult.HasFlag( SerializationResult.Finished ) )
+                    {
+                        retryMembersThatSucceededThisTime.Add( i );
+                        member.Set( ref sourceObj, entry.value ); // Due to LoadRetry not setting the member, we set it here
+                    }
+
+                    // Instantiate the object that contains the members ('parent'), if available.
+                    if( !populate && !_objectHasBeenInstantiated && FactoryMembersReadyForInstantiation( retryMembersThatSucceededThisTime ) )
+                    {
+                        AssignMemberToTempStorage( i, entry.value );
+
+                        sourceObj = Instantiate( data, l );
+                        CopyTempStorageMembersToObject( ref sourceObj );
+                        _objectHasBeenInstantiated = true;
+                    }
+
+                    if( l.ShouldPause() )
+                    {
+                        foreach( var ii in retryMembersThatSucceededThisTime )
+                        {
+                            _retryMembers.Remove( ii );
+                        }
+                        obj = (TMember)(object)sourceObj;
+                        return SerializationResult.Paused;
+                    }
+                }
+
+                foreach( var i in retryMembersThatSucceededThisTime )
+                {
+                    _retryMembers.Remove( i );
+                }
+            }
+
+            //
+            //      PROCESS THE MEMBERS THAT HAVE NOT FAILED YET.
+            //
+
+            for( int i = _startIndex; i < this._members.Count; i++ )
+            {
+                MemberBase<TSource> member = this._members[i];
+
+                // INFO: This will store the value of the loaded object in the source object if it is instantiated, and the result was successful.
+                SerializationResult memberResult = member.Load( ref sourceObj, _objectHasBeenInstantiated, data, l, out var mapping, out var memberObj );
+
+                // Store the member for later in case the object doesn't exist yet.
+
+                if( _objectHasBeenInstantiated )
+                {
+                    if( !memberResult.HasFlag( SerializationResult.Finished ) && !memberResult.HasFlag( SerializationResult.Paused ) )
+                    {
+                        member.Set( ref sourceObj, memberObj );
+                    }
+                }
+                else if( !populate )
+                {
+                    AssignMemberToTempStorage( i, memberObj );
+                }
+
+                if( memberResult.HasFlag( SerializationResult.Finished ) )
+                {
+                    if( memberResult.HasFlag( SerializationResult.Failed ) )
+                        _wasFailureNoRetry = true;
+
+                    _startIndex = i + 1;
+                }
+                else
+                {
+                    _retryMembers ??= new();
+                    _startIndex = i + 1;
+
+                    if( memberResult.HasFlag( SerializationResult.Paused ) )
+                        _retryMembers.Add( i, new RetryEntry<object>( memberObj, mapping, -1 ) );
+                    else
+                        _retryMembers.Add( i, new RetryEntry<object>( memberObj, mapping, l.CurrentPass ) );
+                }
+
+                // Instantiate the object that contains the members ('parent'), if available.
+                // It stores when the factory is invoked instead of checking for null,
+                //   because structs are never null, but they may be immutable.
+                if( !populate && !_objectHasBeenInstantiated && FactoryMembersReadyForInstantiation() )
+                {
+                    AssignMemberToTempStorage( i, memberObj );
+
+                    sourceObj = Instantiate( data, l );
+                    CopyTempStorageMembersToObject( ref sourceObj );
+                    _objectHasBeenInstantiated = true;
+                }
+
+                if( l.ShouldPause() )
+                {
+                    obj = (TMember)(object)sourceObj;
+                    return SerializationResult.Paused;
+                }
+            }
+
+            obj = (TMember)(object)sourceObj;
+            SerializationResult result = SerializationResult.NoChange;
+            if( _wasFailureNoRetry || _retryMembers != null && _retryMembers.Count != 0 )
+                result |= SerializationResult.HasFailures;
+            if( _retryMembers == null || _retryMembers.Count == 0 )
+            {
+                _finalizer?.Invoke( data, sourceObj );
+                result |= SerializationResult.Finished;
+            }
+            if( result.HasFlag( SerializationResult.Finished ) && result.HasFlag( SerializationResult.HasFailures ) )
+                result |= SerializationResult.Failed;
+            return result;
         }
 
-        protected override bool TryLoad<T>( ref T obj, SerializedData data, ILoader l )
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        private void CopyTempStorageMembersToObject( ref TSource sourceObj )
         {
-            // obj can be null here, this is normal.
-            TSource obj2 = Instantiate( data, l );
-            Load( ref obj2, data, l );
-            obj = (T)(object)obj2;
-
-            return true;
+            // assign the initial members (if members are readonly this will silently do nothing).
+            for( int j = 0; j < _factoryStartMemberIndex; j++ )
+            {
+                _members[j].Set( ref sourceObj, this._preFactoryMemberStorage[j] );
+            }
+            for( int j = 0; j < _factoryMemberCount; j++ )
+            {
+                _members[_factoryStartMemberIndex + j].Set( ref sourceObj, this._factoryMemberStorage[j] );
+            }
         }
 
-        protected override bool TryLoadReferences<T>( ref T obj, SerializedData data, ILoader l )
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        private void AssignMemberToTempStorage( int i, object memberObj )
         {
-            // obj can be null here, this is normal.
-            var obj2 = (TSource)(object)obj;
-            LoadReferences( ref obj2, data, l );
-            obj = (T)(object)obj2;
-
-            return true;
+            if( i < _factoryStartMemberIndex )
+                _preFactoryMemberStorage[i] = memberObj;
+            else
+                _factoryMemberStorage[i - _factoryStartMemberIndex] = memberObj;
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         TSource Instantiate( SerializedData data, ILoader l )
         {
             TSource obj;
-            if( OnInstantiate == null )
+            if( _untypedFactory != null )
+            {
+                obj = (TSource)_untypedFactory.DynamicInvoke( _factoryMemberStorage );
+            }
+            else if( _rawFactory != null )
+            {
+                obj = (TSource)_rawFactory.Invoke( data, l );
+            }
+            else
             {
                 if( data == null )
                     return default;
 
                 obj = Activator.CreateInstance<TSource>();
-                if( data.TryGetValue( KeyNames.ID, out var id ) )
-                {
-                    l.RefMap.SetObj( id.DeserializeGuid(), obj );
-                }
             }
-            else
+
+            if( data.TryGetValue( KeyNames.ID, out var id ) )
             {
-                obj = (TSource)OnInstantiate.Invoke( data, l );
+                l.RefMap.SetObj( id.DeserializeGuid(), obj );
             }
 
             return obj;
         }
 
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        void Load( ref TSource obj, SerializedData data, ILoader l )
-        {
-            if( obj == null )
-                return;
-            if( data == null )
-                return;
+        //
 
-            foreach( var item in _items )
+        private void IncludeMember( MemberBase<TSource> member )
+        {
+            // If member already exists - replace it, otherwise append as new.
+            for( int i = 0; i < _members.Count; i++ )
             {
-                if( data.TryGetValue( item.Item1, out var memberData ) )
+                if( _members[i].Name == member.Name )
                 {
-                    item.Item2.Load( ref obj, memberData, l );
+                    this._members[i] = member;
+                    return;
                 }
             }
+
+            this._members.Add( member );
         }
 
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        void LoadReferences( ref TSource obj, SerializedData data, ILoader l )
+        public MemberwiseSerializationMapping<TSource> WithMember<TMember>( string serializedName, Expression<Func<TSource, TMember>> member )
         {
-            if( obj == null )
-                return;
-            if( data == null )
-                return;
+            IncludeMember( new Member<TSource, TMember>( serializedName, ObjectContext.Default, member ) );
+            return this;
+        }
 
-            foreach( var item in _items )
+        public MemberwiseSerializationMapping<TSource> WithMember<TMember>( string serializedName, int context, Expression<Func<TSource, TMember>> member )
+        {
+            IncludeMember( new Member<TSource, TMember>( serializedName, context, member ) );
+            return this;
+        }
+
+        public MemberwiseSerializationMapping<TSource> WithMember<TMember>( string serializedName, Getter<TSource, TMember> getter, Setter<TSource, TMember> setter )
+        {
+            IncludeMember( new Member<TSource, TMember>( serializedName, ObjectContext.Default, getter, setter ) );
+            return this;
+        }
+
+        public MemberwiseSerializationMapping<TSource> WithMember<TMember>( string serializedName, int context, Getter<TSource, TMember> getter, Setter<TSource, TMember> setter )
+        {
+            IncludeMember( new Member<TSource, TMember>( serializedName, context, getter, setter ) );
+            return this;
+        }
+
+        public MemberwiseSerializationMapping<TSource> WithMember<TMember>( string serializedName, Getter<TSource, TMember> getter, RefSetter<TSource, TMember> setter )
+        {
+            IncludeMember( new Member<TSource, TMember>( serializedName, ObjectContext.Default, getter, setter ) );
+            return this;
+        }
+
+        public MemberwiseSerializationMapping<TSource> WithMember<TMember>( string serializedName, int context, Getter<TSource, TMember> getter, RefSetter<TSource, TMember> setter )
+        {
+            IncludeMember( new Member<TSource, TMember>( serializedName, context, getter, setter ) );
+            return this;
+        }
+
+        public MemberwiseSerializationMapping<TSource> WithReadonlyMember<TMember>( string serializedName, Getter<TSource, TMember> getter )
+        {
+            IncludeMember( new Member<TSource, TMember>( serializedName, ObjectContext.Default, getter ) );
+            return this;
+        }
+
+        public MemberwiseSerializationMapping<TSource> WithReadonlyMember<TMember>( string serializedName, int context, Getter<TSource, TMember> getter )
+        {
+            IncludeMember( new Member<TSource, TMember>( serializedName, context, getter ) );
+            return this;
+        }
+
+        //
+
+        public MemberwiseSerializationMapping<TSource> WithRawFactory( Func<SerializedData, ILoader, object> customFactory )
+        {
+            this._rawFactory = customFactory;
+            return this;
+        }
+
+        private void SetupFactory( Delegate factory, params Type[] types )
+        {
+            int start = _members.Count - types.Length;
+            if( start < 0 )
+                throw new Exception( $"Tried to register a factory with {types.Length} parameters, but there's only {_members.Count} members registered." );
+
+            for( int i = 0; i < types.Length; i++ )
             {
-                if( data.TryGetValue( item.Item1, out var memberData ) )
+                Type memberXType = _members[start + i].GetType();
+                if( memberXType.GetGenericTypeDefinition() == typeof( Member<,> ) )
                 {
-                    item.Item2.LoadReferences( ref obj, memberData, l );
+                    Type memberType = memberXType.GetGenericArguments()[1];
+                    if( memberType != types[i] )
+                    {
+                        throw new ArgumentException( $"Mismatched member type '{memberType.FullName}' vs factory parameter type '{types[i].FullName}'. Factory parameters must match the last (in this case) {types.Length} member types." );
+                    }
                 }
             }
+
+            _factoryStartMemberIndex = start;
+            _factoryMemberCount = types.Length;
+            _untypedFactory = factory;
+        }
+
+        public MemberwiseSerializationMapping<TSource> WithFactory( Func<object> factory )
+        {
+            // Here the factory doesn't need checking, as it doesn't use members.
+            _untypedFactory = factory;
+            return this;
+        }
+
+        public MemberwiseSerializationMapping<TSource> WithFactory<TMember1>( Func<TMember1, object> factory )
+        {
+            SetupFactory( factory, typeof( TMember1 ) );
+            return this;
+        }
+
+        public MemberwiseSerializationMapping<TSource> WithFactory<TMember1, TMember2>( Func<TMember1, TMember2, object> factory )
+        {
+            SetupFactory( factory, typeof( TMember1 ), typeof( TMember2 ) );
+            return this;
+        }
+
+        public MemberwiseSerializationMapping<TSource> WithFactory<TMember1, TMember2, TMember3>( Func<TMember1, TMember2, TMember3, object> factory )
+        {
+            SetupFactory( factory, typeof( TMember1 ), typeof( TMember2 ), typeof( TMember3 ) );
+            return this;
+        }
+
+        public MemberwiseSerializationMapping<TSource> WithFactory<TMember1, TMember2, TMember3, TMember4>( Func<TMember1, TMember2, TMember3, TMember4, object> factory )
+        {
+            SetupFactory( factory, typeof( TMember1 ), typeof( TMember2 ), typeof( TMember3 ), typeof( TMember4 ) );
+            return this;
+        }
+
+        public MemberwiseSerializationMapping<TSource> WithFactory<TMember1, TMember2, TMember3, TMember4, TMember5>( Func<TMember1, TMember2, TMember3, TMember4, TMember5, object> factory )
+        {
+            SetupFactory( factory, typeof( TMember1 ), typeof( TMember2 ), typeof( TMember3 ), typeof( TMember4 ), typeof( TMember5 ) );
+            return this;
+        }
+
+        public MemberwiseSerializationMapping<TSource> WithFactory<TMember1, TMember2, TMember3, TMember4, TMember5, TMember6>( Func<TMember1, TMember2, TMember3, TMember4, TMember5, TMember6, object> factory )
+        {
+            SetupFactory( factory, typeof( TMember1 ), typeof( TMember2 ), typeof( TMember3 ), typeof( TMember4 ), typeof( TMember5 ), typeof( TMember6 ) );
+            return this;
+        }
+
+        public MemberwiseSerializationMapping<TSource> WithFactory<TMember1, TMember2, TMember3, TMember4, TMember5, TMember6, TMember7>( Func<TMember1, TMember2, TMember3, TMember4, TMember5, TMember6, TMember7, object> factory )
+        {
+            SetupFactory( factory, typeof( TMember1 ), typeof( TMember2 ), typeof( TMember3 ), typeof( TMember4 ), typeof( TMember5 ), typeof( TMember6 ), typeof( TMember7 ) );
+            return this;
+        }
+
+        public MemberwiseSerializationMapping<TSource> WithFactory<TMember1, TMember2, TMember3, TMember4, TMember5, TMember6, TMember7, TMember8>( Func<TMember1, TMember2, TMember3, TMember4, TMember5, TMember6, TMember7, TMember8, object> factory )
+        {
+            SetupFactory( factory, typeof( TMember1 ), typeof( TMember2 ), typeof( TMember3 ), typeof( TMember4 ), typeof( TMember5 ), typeof( TMember6 ), typeof( TMember7 ), typeof( TMember8 ) );
+            return this;
+        }
+
+        public MemberwiseSerializationMapping<TSource> WithFactory<TMember1, TMember2, TMember3, TMember4, TMember5, TMember6, TMember7, TMember8, TMember9>( Func<TMember1, TMember2, TMember3, TMember4, TMember5, TMember6, TMember7, TMember8, TMember9, object> factory )
+        {
+            SetupFactory( factory, typeof( TMember1 ), typeof( TMember2 ), typeof( TMember3 ), typeof( TMember4 ), typeof( TMember5 ), typeof( TMember6 ), typeof( TMember7 ), typeof( TMember8 ), typeof( TMember9 ) );
+            return this;
+        }
+
+        public MemberwiseSerializationMapping<TSource> WithFactory<TMember1, TMember2, TMember3, TMember4, TMember5, TMember6, TMember7, TMember8, TMember9, TMember10>( Func<TMember1, TMember2, TMember3, TMember4, TMember5, TMember6, TMember7, TMember8, TMember9, TMember10, object> factory )
+        {
+            SetupFactory( factory, typeof( TMember1 ), typeof( TMember2 ), typeof( TMember3 ), typeof( TMember4 ), typeof( TMember5 ), typeof( TMember6 ), typeof( TMember7 ), typeof( TMember8 ), typeof( TMember9 ), typeof( TMember10 ) );
+            return this;
+        }
+
+        public MemberwiseSerializationMapping<TSource> WithFactory<TMember1, TMember2, TMember3, TMember4, TMember5, TMember6, TMember7, TMember8, TMember9, TMember10, TMember11>( Func<TMember1, TMember2, TMember3, TMember4, TMember5, TMember6, TMember7, TMember8, TMember9, TMember10, TMember11, object> factory )
+        {
+            SetupFactory( factory, typeof( TMember1 ), typeof( TMember2 ), typeof( TMember3 ), typeof( TMember4 ), typeof( TMember5 ), typeof( TMember6 ), typeof( TMember7 ), typeof( TMember8 ), typeof( TMember9 ), typeof( TMember10 ), typeof( TMember11 ) );
+            return this;
+        }
+
+        public MemberwiseSerializationMapping<TSource> WithFactory<TMember1, TMember2, TMember3, TMember4, TMember5, TMember6, TMember7, TMember8, TMember9, TMember10, TMember11, TMember12>( Func<TMember1, TMember2, TMember3, TMember4, TMember5, TMember6, TMember7, TMember8, TMember9, TMember10, TMember11, TMember12, object> factory )
+        {
+            SetupFactory( factory, typeof( TMember1 ), typeof( TMember2 ), typeof( TMember3 ), typeof( TMember4 ), typeof( TMember5 ), typeof( TMember6 ), typeof( TMember7 ), typeof( TMember8 ), typeof( TMember9 ), typeof( TMember10 ), typeof( TMember11 ), typeof( TMember12 ) );
+            return this;
+        }
+
+        public MemberwiseSerializationMapping<TSource> WithFactory<TMember1, TMember2, TMember3, TMember4, TMember5, TMember6, TMember7, TMember8, TMember9, TMember10, TMember11, TMember12, TMember13>( Func<TMember1, TMember2, TMember3, TMember4, TMember5, TMember6, TMember7, TMember8, TMember9, TMember10, TMember11, TMember12, TMember13, object> factory )
+        {
+            SetupFactory( factory, typeof( TMember1 ), typeof( TMember2 ), typeof( TMember3 ), typeof( TMember4 ), typeof( TMember5 ), typeof( TMember6 ), typeof( TMember7 ), typeof( TMember8 ), typeof( TMember9 ), typeof( TMember10 ), typeof( TMember11 ), typeof( TMember12 ), typeof( TMember13 ) );
+            return this;
+        }
+
+        public MemberwiseSerializationMapping<TSource> WithFactory<TMember1, TMember2, TMember3, TMember4, TMember5, TMember6, TMember7, TMember8, TMember9, TMember10, TMember11, TMember12, TMember13, TMember14>( Func<TMember1, TMember2, TMember3, TMember4, TMember5, TMember6, TMember7, TMember8, TMember9, TMember10, TMember11, TMember12, TMember13, TMember14, object> factory )
+        {
+            SetupFactory( factory, typeof( TMember1 ), typeof( TMember2 ), typeof( TMember3 ), typeof( TMember4 ), typeof( TMember5 ), typeof( TMember6 ), typeof( TMember7 ), typeof( TMember8 ), typeof( TMember9 ), typeof( TMember10 ), typeof( TMember11 ), typeof( TMember12 ), typeof( TMember13 ), typeof( TMember14 ) );
+            return this;
+        }
+
+        public MemberwiseSerializationMapping<TSource> WithFactory<TMember1, TMember2, TMember3, TMember4, TMember5, TMember6, TMember7, TMember8, TMember9, TMember10, TMember11, TMember12, TMember13, TMember14, TMember15>( Func<TMember1, TMember2, TMember3, TMember4, TMember5, TMember6, TMember7, TMember8, TMember9, TMember10, TMember11, TMember12, TMember13, TMember14, TMember15, object> factory )
+        {
+            SetupFactory( factory, typeof( TMember1 ), typeof( TMember2 ), typeof( TMember3 ), typeof( TMember4 ), typeof( TMember5 ), typeof( TMember6 ), typeof( TMember7 ), typeof( TMember8 ), typeof( TMember9 ), typeof( TMember10 ), typeof( TMember11 ), typeof( TMember12 ), typeof( TMember13 ), typeof( TMember14 ), typeof( TMember15 ) );
+            return this;
+        }
+
+        public MemberwiseSerializationMapping<TSource> WithFactory<TMember1, TMember2, TMember3, TMember4, TMember5, TMember6, TMember7, TMember8, TMember9, TMember10, TMember11, TMember12, TMember13, TMember14, TMember15, TMember16>( Func<TMember1, TMember2, TMember3, TMember4, TMember5, TMember6, TMember7, TMember8, TMember9, TMember10, TMember11, TMember12, TMember13, TMember14, TMember15, TMember16, object> factory )
+        {
+            SetupFactory( factory, typeof( TMember1 ), typeof( TMember2 ), typeof( TMember3 ), typeof( TMember4 ), typeof( TMember5 ), typeof( TMember6 ), typeof( TMember7 ), typeof( TMember8 ), typeof( TMember9 ), typeof( TMember10 ), typeof( TMember11 ), typeof( TMember12 ), typeof( TMember13 ), typeof( TMember14 ), typeof( TMember15 ), typeof( TMember16 ) );
+            return this;
+        }
+
+        /*public MemberwiseSerializationMapping<TSource> WithFactory<TMember1, TMember2, TMember3>( string member1Name, string member2Name, string member3Name, Func<TMember1, TMember2, TMember3, object> factory )
+        {
+            throw new NotImplementedException();
+        }*/
+
+        public MemberwiseSerializationMapping<TSource> WithFinalizer( Action<SerializedData, TSource> finalizer )
+        {
+            this._finalizer = finalizer;
+            return this;
         }
     }
 }

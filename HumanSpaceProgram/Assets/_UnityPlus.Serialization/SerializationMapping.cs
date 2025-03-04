@@ -1,7 +1,4 @@
-﻿using System;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-
+﻿
 namespace UnityPlus.Serialization
 {
     /// <summary>
@@ -9,61 +6,36 @@ namespace UnityPlus.Serialization
     /// </summary>
     public abstract class SerializationMapping
     {
-        /*
-        
-        SerializationMapping, by design, should be able to decide how to serialize/deserialize any value (including null).
-        - This means that no shoft-circuiting is possible in the code using the mappings.
-
-        */
-
-        internal int context;
         /// <summary>
         /// Gets the serialization context in which this mapping operates.
         /// </summary>
-        public int Context => this.context;
+        public int Context { get; internal set; }
 
-        // Mappings use generic `T` instead of being themselves generic - because `SerializationMapping<Transform>` can't be cast to `SerializationMapping<Component>`.
-        // - This CAN NOT be solved using variant interfaces - variance is not supported on `ref` parameters.
+        // Mappings have to use generic `TMember` method param instead of being themselves generic
+        // - Because `SerializationMapping<Transform>` can't be cast to `SerializationMapping<Component>`.
+        // - And this CAN NOT be solved using variant interfaces - variance is not supported on `ref` parameters.
+
+        /// <summary>
+        /// Copies the working data from a mapping definition to a 'work' mapping.
+        /// </summary>
+        public abstract SerializationMapping GetInstance();
 
         /// <summary>
         /// Saves the full state of the object.
         /// </summary>
-        protected abstract bool Save<T>( T obj, ref SerializedData data, ISaver s );
+        /// <returns>
+        /// True if the member has been fully serialized, false if the method needs to be called again to serialize more.
+        /// </returns>
+        /// <typeparam name="TMember">Set to the type of the member (field/property) that contains the object.</typeparam>
+        public abstract SerializationResult Save<TMember>( TMember obj, ref SerializedData data, ISaver s );
 
         /// <summary>
         /// 
         /// </summary>
-        protected abstract bool TryPopulate<T>( ref T obj, SerializedData data, ILoader l );
-
-        /// <summary>
-        /// 
-        /// </summary>
-        protected abstract bool TryLoad<T>( ref T obj, SerializedData data, ILoader l );
-
-        /// <summary>
-        /// 
-        /// </summary>
-        protected abstract bool TryLoadReferences<T>( ref T obj, SerializedData data, ILoader l );
-
-        /// <summary>
-        /// Override this if your mapping contains any additional data (and return copy of the mapping, but with those additional data fields cleared).
-        /// </summary>
-        /// <returns>Either "this", or a clone (depending on if the mapping needs to persist data between Load and LoadReferences).</returns>
-        public virtual SerializationMapping GetInstance()
-        {
-            return this;
-        }
-
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        internal bool ___passthroughSave<T>( T obj, ref SerializedData data, ISaver s ) => Save<T>( obj, ref data, s );
-
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        internal bool ___passthroughPopulate<T>( ref T obj, SerializedData data, ILoader l ) => TryPopulate<T>( ref obj, data, l );
-
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        internal bool ___passthroughLoad<T>( ref T obj, SerializedData data, ILoader l ) => TryLoad<T>( ref obj, data, l );
-
-        [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        internal bool ___passthroughLoadReferences<T>( ref T obj, SerializedData data, ILoader l ) => TryLoadReferences<T>( ref obj, data, l );
+        /// <returns>
+        /// True if the member has been fully deserialized, false if the method needs to be called again to deserialize more.
+        /// </returns>
+        /// <typeparam name="TMember">Set to the type of the member (field/property) that contains the object.</typeparam>
+        public abstract SerializationResult Load<TMember>( ref TMember obj, SerializedData data, ILoader l, bool populate );
     }
 }

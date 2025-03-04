@@ -1,44 +1,54 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityPlus.Serialization.ReferenceMaps;
 
 namespace UnityPlus.Serialization
 {
-    [Obsolete( "Not finished yet" )]
     public class SerializationUnitAsyncLoader<T> : ILoader
     {
         private SerializedData[] _data;
         private T[] _objects;
+        int _startIndex;
+        Dictionary<int, RetryEntry<T>> _retryElements;
+        bool _wasFailureNoRetry;
 
-        private Type _memberType; // Specifies the type that all serialized/deserialized objects will derive from. May be `typeof(object)`
         private int _context = default;
+
+        public long AllowedMilisecondsPerInvocation { get; set; } = 100;
+        long _lastInvocationTimestamp = 0;
 
         public IForwardReferenceMap RefMap { get; set; }
 
-        public Dictionary<SerializedData, SerializationMapping> MappingCache { get; }
+        public int CurrentPass { get; private set; }
 
-        private Stack<LoadAction> loadActionsToPerform; // something like this?
+        public SerializationResult Result { get; private set; }
 
-        internal SerializationUnitAsyncLoader( SerializedData[] data, Type memberType, int context )
+        internal SerializationUnitAsyncLoader( SerializedData[] data, int context )
         {
             this.RefMap = new BidirectionalReferenceStore();
-            this.MappingCache = new Dictionary<SerializedData, SerializationMapping>( new SerializedDataReferenceComparer() );
+            this.CurrentPass = -1;
+            this._objects = new T[data.Length];
             this._data = data;
-            this._memberType = memberType;
             this._context = context;
         }
 
-        internal SerializationUnitAsyncLoader( T[] objects, SerializedData[] data, Type memberType, int context )
+        internal SerializationUnitAsyncLoader( T[] objects, SerializedData[] data, int context )
         {
             this.RefMap = new BidirectionalReferenceStore();
-            this.MappingCache = new Dictionary<SerializedData, SerializationMapping>( new SerializedDataReferenceComparer() );
+            this.CurrentPass = -1;
             this._objects = objects;
             this._data = data;
-            this._memberType = memberType;
             this._context = context;
+        }
+
+        public bool ShouldPause()
+        {
+            long stamp = Stopwatch.GetTimestamp();
+            long miliseconds = ((stamp - _lastInvocationTimestamp) * 1000) / Stopwatch.Frequency;
+
+            return (miliseconds > AllowedMilisecondsPerInvocation);
         }
 
         //
@@ -50,8 +60,10 @@ namespace UnityPlus.Serialization
         /// </summary>
         public void Deserialize()
         {
-            this.LoadCallback();
-            this.LoadReferencesCallback();
+            //this._objects = new T[_data.Length];
+            _lastInvocationTimestamp = Stopwatch.GetTimestamp();
+
+            this.LoadOrPopulateCallback( false );
         }
 
         /// <summary>
@@ -62,9 +74,11 @@ namespace UnityPlus.Serialization
             if( l == null )
                 throw new ArgumentNullException( nameof( l ), $"The reference map to use can't be null." );
 
+            //this._objects = new T[_data.Length];
             this.RefMap = l;
-            this.LoadCallback();
-            this.LoadReferencesCallback();
+            _lastInvocationTimestamp = Stopwatch.GetTimestamp();
+
+            this.LoadOrPopulateCallback( false );
         }
 
         /// <summary>
@@ -72,8 +86,9 @@ namespace UnityPlus.Serialization
         /// </summary>
         public void Populate()
         {
-            this.PopulateCallback();
-            this.LoadReferencesCallback();
+            _lastInvocationTimestamp = Stopwatch.GetTimestamp();
+
+            this.LoadOrPopulateCallback( true );
         }
 
         /// <summary>
@@ -85,8 +100,9 @@ namespace UnityPlus.Serialization
                 throw new ArgumentNullException( nameof( l ), $"The reference map to use can't be null." );
 
             this.RefMap = l;
-            this.PopulateCallback();
-            this.LoadReferencesCallback();
+            _lastInvocationTimestamp = Stopwatch.GetTimestamp();
+
+            this.LoadOrPopulateCallback( true );
         }
 
         //
@@ -104,67 +120,109 @@ namespace UnityPlus.Serialization
         /// <summary>
         /// Returns the objects that were deserialized or populated, but only those that are of the specified type.
         /// </summary>
-        public IEnumerable<TDerived> GetObjectsOfType<TDerived>()
+        public IEnumerable<TDerived> GetObjects<TDerived>()
         {
             return _objects.OfType<TDerived>();
         }
 
-        private void PopulateCallback()
+        SerializationResult _lastResult;
+
+        private void LoadOrPopulateCallback( bool populate )
         {
-            // Called by the loader.
+            //if( _lastResult != SerializationResult.Paused && this.Result != SerializationResult.Paused )
+                this.CurrentPass++;
+            // if previously called mapping returned paused, don't increment.
+            // if previously returned mapping (in the middle) did not return paused, it'll just go on to the next one.
 
-            for( int i = 0; i < _data.Length; i++ )
+            if( _retryElements != null )
             {
-                SerializedData data = _data[i];
+                List<int> retryMembersThatSucceededThisTime = new();
 
-                var mapping = MappingHelper.GetMapping_Load<T>( _context, MappingHelper.GetSerializedType<T>( data ), data, this );
-
-                // Parity with Member (mostly).
-                T member = _objects[i];
-                if( mapping.SafePopulate( ref member, data, this ) )
+                foreach( (int i, var entry) in _retryElements )
                 {
-                    _objects[i] = member;
+                    if( entry.pass == CurrentPass )
+                        continue;
+
+                    T obj = _objects[i];
+                    SerializedData data = _data[i];
+
+                    var mapping = entry.mapping;
+
+                    _lastResult = mapping.SafeLoad( ref obj, data, this, populate );
+                    if( _lastResult.HasFlag( SerializationResult.Failed ) )
+                    {
+                        entry.pass = CurrentPass;
+                    }
+                    else if( _lastResult.HasFlag( SerializationResult.Finished ) )
+                    {
+                        retryMembersThatSucceededThisTime.Add( i );
+                    }
+
+                    _objects[i] = obj;
+
+                    if( this.ShouldPause() )
+                    {
+                        foreach( var ii in retryMembersThatSucceededThisTime )
+                        {
+                            _retryElements.Remove( ii );
+                        }
+
+                        this.Result = SerializationResult.Paused;
+                        return;
+                    }
+                }
+
+                foreach( var i in retryMembersThatSucceededThisTime )
+                {
+                    _retryElements.Remove( i );
                 }
             }
-        }
 
-        private void LoadCallback()
-        {
-            // Called by the loader.
-
-            _objects = new T[_data.Length];
-
-            for( int i = 0; i < _data.Length; i++ )
+            for( int i = _startIndex; i < _data.Length; i++ )
             {
+                T obj = _objects[i];
                 SerializedData data = _data[i];
 
-                var mapping = MappingHelper.GetMapping_Load<T>( _context, MappingHelper.GetSerializedType<T>( data ), data, this );
+                var mapping = SerializationMappingRegistry.GetMapping<T>( _context, MappingHelper.GetSerializedType<T>( data ) );
 
-                T member = default;
-                if( mapping.SafeLoad( ref member, data, this ) )
+                _lastResult = mapping.SafeLoad( ref obj, data, this, populate );
+                if( _lastResult.HasFlag( SerializationResult.Finished ) )
                 {
-                    _objects[i] = member;
+                    if( _lastResult.HasFlag( SerializationResult.Failed ) )
+                        _wasFailureNoRetry = true;
+
+                    _startIndex = i + 1;
+                }
+                else
+                {
+                    _retryElements ??= new();
+                    _startIndex = i + 1;
+
+                    if( _lastResult.HasFlag( SerializationResult.Paused ) )
+                        _retryElements.Add( i, new RetryEntry<T>( obj, mapping, -1 ) );
+                    else
+                        _retryElements.Add( i, new RetryEntry<T>( obj, mapping, CurrentPass ) );
+                }
+
+                _objects[i] = obj;
+
+                if( this.ShouldPause() )
+                {
+                    this.Result = SerializationResult.Paused;
+                    return;
                 }
             }
-        }
 
-        private void LoadReferencesCallback()
-        {
-            // Called by the loader.
+            SerializationResult result = SerializationResult.NoChange;
+            if( _wasFailureNoRetry || _retryElements != null && _retryElements.Count != 0 )
+                result |= SerializationResult.HasFailures;
+            if( _retryElements == null || _retryElements.Count == 0 )
+                result |= SerializationResult.Finished;
 
-            for( int i = 0; i < _data.Length; i++ )
-            {
-                SerializedData data = _data[i];
+            if( result.HasFlag( SerializationResult.Finished ) && result.HasFlag( SerializationResult.HasFailures ) )
+                result |= SerializationResult.Failed;
 
-                T member = _objects[i];
-
-                var mapping = MappingHelper.GetMapping_LoadReferences<T>( _context, member, data, this );
-
-                if( mapping.SafeLoadReferences( ref member, data, this ) )
-                {
-                    _objects[i] = member;
-                }
-            }
+            this.Result = result;
         }
     }
 }

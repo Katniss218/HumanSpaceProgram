@@ -54,16 +54,16 @@ namespace HSP.ViewportTools
 
         void OnEnable()
         {
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.VIEWPORT_PRIMARY_DOWN, HierarchicalInputPriority.HIGH, Input_MouseDown );
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.VIEWPORT_PRIMARY, HierarchicalInputPriority.HIGH, Input_MouseHeld );
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.VIEWPORT_PRIMARY_UP, HierarchicalInputPriority.HIGH, Input_MouseUp );
+            HierarchicalInputManager.AddAction( InputChannel.PRIMARY_DOWN, InputChannelPriority.HIGH, Input_MouseDown );
+            HierarchicalInputManager.AddAction( InputChannel.PRIMARY, InputChannelPriority.HIGH, Input_MouseHeld );
+            HierarchicalInputManager.AddAction( InputChannel.PRIMARY_UP, InputChannelPriority.HIGH, Input_MouseUp );
         }
 
         void OnDisable()
         {
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.VIEWPORT_PRIMARY_DOWN, Input_MouseDown );
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.VIEWPORT_PRIMARY, Input_MouseHeld );
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.VIEWPORT_PRIMARY_UP, Input_MouseUp );
+            HierarchicalInputManager.RemoveAction( InputChannel.PRIMARY_DOWN, Input_MouseDown );
+            HierarchicalInputManager.RemoveAction( InputChannel.PRIMARY, Input_MouseHeld );
+            HierarchicalInputManager.RemoveAction( InputChannel.PRIMARY_UP, Input_MouseUp );
         }
 
         private bool Input_MouseDown( float value )

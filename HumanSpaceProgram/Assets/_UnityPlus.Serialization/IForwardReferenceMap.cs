@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace UnityPlus.Serialization
 {
     /// <summary>
-    /// An arbitrary structure that has the ability to map IDs to Objects.
+    /// Represents a structure that has the ability to map IDs to objects.
     /// </summary>
     public interface IForwardReferenceMap
     {
@@ -33,7 +30,7 @@ namespace UnityPlus.Serialization
         /// Returns the previously registered object.
         /// </summary>
         /// <remarks>
-        /// Should always return <see cref="null"/> for <see cref="Guid.Empty"/>. <br />
+        /// Should always return <see cref="null"/> for <see cref="Guid.Empty"/>, and for references that are not registered. <br />
         /// </remarks>
         object GetObj( Guid id );
 

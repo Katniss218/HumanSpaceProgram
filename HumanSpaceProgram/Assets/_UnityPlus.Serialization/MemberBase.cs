@@ -7,16 +7,26 @@ namespace UnityPlus.Serialization
     /// <typeparam name="TSource">The type that this item belongs to.</typeparam>
     public abstract class MemberBase<TSource>
     {
-        /// <summary>
-        /// Saves the member, and returns the <see cref="SerializedData"/> representing it.
-        /// </summary>
-        public abstract SerializedData Save( TSource source, ISaver s );
+        public string Name { get; protected set; }
+
+        public abstract MemberBase<TSource> Copy();
+
+        // one is for initial save/load, and the 2nd is for the 'retry' one (if first time failed).
+        public abstract SerializationResult Save( TSource sourceObj, SerializedData sourceData, ISaver s, out SerializationMapping mapping, out object memberObj );
+        public abstract SerializationResult SaveRetry( object memberObj, SerializationMapping mapping, SerializedData sourceData, ISaver s );
+
+        public abstract SerializationResult Load( ref TSource sourceObj, bool isInstantiated, SerializedData sourceData, ILoader l, out SerializationMapping mapping, out object memberObj );
+        public abstract SerializationResult LoadRetry( ref object memberObj, SerializationMapping mapping, SerializedData sourceData, ILoader l );
 
         /// <summary>
-        /// Instantiates the member from <see cref="SerializedData"/> using the most appropriate mapping for the member type and serialized object's '$type', and assigns it to the member.
+        /// Calls the getter associated with this member.
         /// </summary>
-        public abstract void Load( ref TSource source, SerializedData data, ILoader l );
+        public abstract object Get( ref TSource sourceObj );
 
-        public abstract void LoadReferences( ref TSource source, SerializedData data, ILoader l );
+        /// <summary>
+        /// Calls the setter associated with this member. <br/>
+        /// Does nothing if the member is 'readonly'.
+        /// </summary>
+        public abstract void Set( ref TSource sourceObj, object member );
     }
 }

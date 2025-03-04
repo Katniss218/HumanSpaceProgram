@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 namespace UnityPlus.Input.Bindings
 {
-	/// <summary>
-	/// Binds to a specific key being released after being pressed, restricting that the mouse must have moved a certain distance between when the key was pressed and released.
-	/// </summary>
-	public sealed class MouseDragBinding : IInputBinding
+    /// <summary>
+    /// Binds to a specific key being released after being pressed, restricting that the mouse must have moved a certain distance between when the key was pressed and released.
+    /// </summary>
+    public sealed class MouseDragBinding : IInputBinding
 	{
 		public const float MaxMouseDelta = 4.0f;
 

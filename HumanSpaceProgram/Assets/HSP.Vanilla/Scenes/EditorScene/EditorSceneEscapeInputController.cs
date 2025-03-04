@@ -21,12 +21,12 @@ namespace HSP.Vanilla.Scenes.EditorScene
     {
         void OnEnable()
         {
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.COMMON_ESCAPE, HierarchicalInputPriority.MEDIUM, Input_Escape );
+            HierarchicalInputManager.AddAction( InputChannel.ESCAPE, InputChannelPriority.MEDIUM, Input_Escape );
         }
 
         void OnDisable()
         {
-            HierarchicalInputManager.RemoveAction( HierarchicalInputChannel.COMMON_ESCAPE, Input_Escape );
+            HierarchicalInputManager.RemoveAction( InputChannel.ESCAPE, Input_Escape );
         }
 
         private bool Input_Escape( float value )

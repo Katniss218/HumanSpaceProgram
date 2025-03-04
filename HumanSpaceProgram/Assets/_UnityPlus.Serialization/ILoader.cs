@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using System.Collections.Generic;
 
 namespace UnityPlus.Serialization
 {
@@ -14,8 +7,6 @@ namespace UnityPlus.Serialization
     /// </summary>
     public interface ILoader
     {
-        //public delegate void Action( IForwardReferenceMap l );
-
         /// <summary>
         /// The current state of the loader. <br />
         /// Loading is split into 2 stages - see the enum values.
@@ -49,28 +40,10 @@ namespace UnityPlus.Serialization
         /// <summary>
         /// The reference map used to map object IDs to references when deserializing.
         /// </summary>
-        IForwardReferenceMap RefMap { get; }
+        public IForwardReferenceMap RefMap { get; }
 
-        Dictionary<SerializedData, SerializationMapping> MappingCache { get; }
-    }
+        public int CurrentPass { get; }
 
-    /// <summary>
-    /// <see cref="ILoader"/>, but can save over multiple frames.
-    /// </summary>
-    public interface IAsyncLoader : ILoader
-    {
-       // new public delegate IEnumerator Action( IForwardReferenceMap l );
-
-        /// <summary>
-        /// The percentage (in [0..1]) of completion of the current action (0 = 0% completed, 1 = 100% completed).
-        /// </summary>
-        /// <remarks>
-        /// Intended to be set by the serialization strategy, and not by the loader.
-        /// </remarks>
-        float CurrentActionPercentCompleted { get; set; }
-        /// <summary>
-        /// The percentage (in [0..1]) of completion of the entire loading process (0 = 0% completed, 1 = 100% completed).
-        /// </summary>
-        float TotalPercentCompleted { get; }
+        public bool ShouldPause();
     }
 }

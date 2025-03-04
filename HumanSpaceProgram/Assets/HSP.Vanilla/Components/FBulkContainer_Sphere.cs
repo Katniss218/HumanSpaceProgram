@@ -119,12 +119,10 @@ namespace HSP.Vanilla.Components
         public static SerializationMapping FBulkContainer_SphereMapping()
         {
             return new MemberwiseSerializationMapping<FBulkContainer_Sphere>()
-            {
-                ("volume_transform", new Member<FBulkContainer_Sphere, Transform>( ObjectContext.Ref, o => o.VolumeTransform )),
-                ("max_volume", new Member<FBulkContainer_Sphere, float>( o => o.MaxVolume )),
-                ("radius", new Member<FBulkContainer_Sphere, float>( o => o.Radius )),
-                ("contents", new Member<FBulkContainer_Sphere, SubstanceStateCollection>( o => o.Contents ))
-            };
+                .WithMember( "volume_transform", ObjectContext.Ref, o => o.VolumeTransform )
+                .WithMember( "max_volume", o => o.MaxVolume )
+                .WithMember( "radius",  o => o.Radius )
+                .WithMember( "contents", o => o.Contents );
         }
 
         /// <summary>

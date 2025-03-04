@@ -28,10 +28,8 @@ namespace HSP.Vanilla.Components
         public static SerializationMapping FPointMassMapping()
         {
             return new MemberwiseSerializationMapping<FPointMass>()
-            {
-                ("mass", new Member<FPointMass, float>( o => o.Mass )),
-                ("on_after_mass_changed", new Member<FPointMass, IHasMass.MassChange>( o => o.OnAfterMassChanged ))
-            };
+                .WithMember( "mass", o => o.Mass )
+                .WithMember( "on_after_mass_changed", o => o.OnAfterMassChanged );
         }
     }
 }

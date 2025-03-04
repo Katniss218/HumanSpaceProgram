@@ -89,23 +89,21 @@ namespace HSP.Vanilla.Components
         public static SerializationMapping F2AxisActuatorMapping()
         {
             return new MemberwiseSerializationMapping<F2AxisActuator>()
-            {
-                ("reference_transform", new Member<F2AxisActuator, Transform>( ObjectContext.Ref, o => o.ReferenceTransform )),
-                ("x_actuator_transform", new Member<F2AxisActuator, Transform>( ObjectContext.Ref, o => o.XActuatorTransform )),
-                ("y_actuator_transform", new Member<F2AxisActuator, Transform>( ObjectContext.Ref, o => o.YActuatorTransform )),
+                .WithMember( "reference_transform", ObjectContext.Ref, o => o.ReferenceTransform )
+                .WithMember( "x_actuator_transform", ObjectContext.Ref, o => o.XActuatorTransform )
+                .WithMember( "y_actuator_transform", ObjectContext.Ref, o => o.YActuatorTransform )
 
-                ("x", new Member<F2AxisActuator, float>( o => o.X )),
-                ("y", new Member<F2AxisActuator, float>( o => o.Y )),
-                ("min_x", new Member<F2AxisActuator, float>( o => o.MinX )),
-                ("max_x", new Member<F2AxisActuator, float>( o => o.MaxX )),
-                ("min_y", new Member<F2AxisActuator, float>( o => o.MinY )),
-                ("max_y", new Member<F2AxisActuator, float>( o => o.MaxY )),
+                .WithMember( "x", o => o.X )
+                .WithMember( "y", o => o.Y )
+                .WithMember( "min_x", o => o.MinX )
+                .WithMember( "max_x", o => o.MaxX )
+                .WithMember( "min_y", o => o.MinY )
+                .WithMember( "max_y", o => o.MaxY )
 
-                ("get_reference_transform", new Member<F2AxisActuator, ControlParameterOutput<Transform>>( o => o.GetReferenceTransform )),
-                ("set_x", new Member<F2AxisActuator, ControlleeInput<float>>( o => o.SetX )),
-                ("set_y", new Member<F2AxisActuator, ControlleeInput<float>>( o => o.SetY )),
-                ("set_xy", new Member<F2AxisActuator, ControlleeInput<Vector2>>( o => o.SetXY ))
-            };
+                .WithMember( "get_reference_transform", o => o.GetReferenceTransform )
+                .WithMember( "set_x", o => o.SetX )
+                .WithMember( "set_y", o => o.SetY )
+                .WithMember( "set_xy", o => o.SetXY );
         }
     }
 }

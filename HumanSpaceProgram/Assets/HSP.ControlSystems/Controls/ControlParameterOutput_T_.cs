@@ -72,25 +72,18 @@ namespace HSP.ControlSystems.Controls
         public static SerializationMapping ControlParameterOutputMapping<T>()
         {
             return new MemberwiseSerializationMapping<ControlParameterOutput<T>>()
-            {
-                ("getter", new Member<ControlParameterOutput<T>, Func<T>>( o => o.getter )),
-                ("connects_to", new Member<ControlParameterOutput<T>, ControlParameterInput<T>[]>( ArrayContext.Refs, o => o.inputs.ToArray(), (o, value) =>
+                .WithReadonlyMember( "getter", o => o.getter )
+                .WithFactory<Func<T>>( onInvoke => new ControlParameterOutput<T>( onInvoke ) )
+                .WithMember( "connects_to", ArrayContext.Refs, o => o.inputs, ( o, value ) =>
                 {
+                    if( value == null )
+                        return;
+
                     foreach( var c in value )
                     {
                         ControlParameterInput<T>.Connect( c, o );
                     }
-                } ))
-            }
-			.WithFactory( ( data, l ) => // Either this, or use mapping that instantiates on reference pass.
-            {
-                if( data == null )
-                    return null;
-
-                Func<T> onInvoke = (Func<T>)Persistent_Delegate.ToDelegate( data["getter"], l.RefMap );
-
-                return new ControlParameterOutput<T>( onInvoke );
-            } );
+                } );
         }
     }
 }

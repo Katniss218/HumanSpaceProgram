@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace UnityPlus.Serialization.Mappings
 {
@@ -8,255 +7,86 @@ namespace UnityPlus.Serialization.Mappings
         [MapsInheritingFrom( typeof( KeyValuePair<,> ), Context = KeyValueContext.ValueToValue )]
         public static SerializationMapping KeyValuePair_ValueToValue_Mapping<TKey, TValue>()
         {
-            return new NonPrimitiveSerializationMapping<KeyValuePair<TKey, TValue>>()
-            {
-                OnSave = ( o, s ) =>
-                {
-                    var mapping = SerializationMappingRegistry.GetMapping<TKey>( ObjectContext.Default, o.Key );
-                    var keyData = mapping.SafeSave<TKey>( o.Key, s );
+            return new MemberwiseSerializationMapping<KeyValuePair<TKey, TValue>>()
+                .WithReadonlyMember( "key", o => o.Key )
+                .WithReadonlyMember( "value", o => o.Value )
+                .WithFactory<TKey, TValue>( ( key, value ) => new KeyValuePair<TKey, TValue>( key, value ) );
+        }
 
-                    mapping = SerializationMappingRegistry.GetMapping<TValue>( ObjectContext.Default, o.Value );
-                    var valueData = mapping.SafeSave<TValue>( o.Value, s );
+        [MapsInheritingFrom( typeof( KeyValuePair<,> ), Context = KeyValueContext.RefToValue )]
+        public static SerializationMapping KeyValuePair_RefToValue_Mapping<TKey, TValue>()
+        {
+            return new MemberwiseSerializationMapping<KeyValuePair<TKey, TValue>>()
+                .WithReadonlyMember( "key", ObjectContext.Ref, o => o.Key )
+                .WithReadonlyMember( "value", o => o.Value )
+                .WithFactory<TKey, TValue>( ( key, value ) => new KeyValuePair<TKey, TValue>( key, value ) );
+        }
 
-                    SerializedObject kvpData = new SerializedObject()
-                    {
-                        { "key", keyData },
-                        { "value", valueData }
-                    };
+        [MapsInheritingFrom( typeof( KeyValuePair<,> ), Context = KeyValueContext.ValueToRef )]
+        public static SerializationMapping KeyValuePair_ValueToRef_Mapping<TKey, TValue>()
+        {
+            return new MemberwiseSerializationMapping<KeyValuePair<TKey, TValue>>()
+                .WithReadonlyMember( "key", o => o.Key )
+                .WithReadonlyMember( "value", ObjectContext.Ref, o => o.Value )
+                .WithFactory<TKey, TValue>( ( key, value ) => new KeyValuePair<TKey, TValue>( key, value ) );
+        }
 
-                    return kvpData;
-                },
-                OnInstantiate = ( data, l ) =>
-                {
-                    return data == null ? default : new KeyValuePair<TKey, TValue>();
-                },
-                OnLoad = ( ref KeyValuePair<TKey, TValue> o, SerializedData data, ILoader l ) =>
-                {
-                    SerializedData keyData = data["key"];
-                    SerializedData valueData = data["value"];
-
-                    TKey key = default;
-                    var mapping = MappingHelper.GetMapping_Load<TKey>( ObjectContext.Default, MappingHelper.GetSerializedType<TKey>( keyData ), keyData, l );
-                    mapping.SafeLoad( ref key, keyData, l );
-
-                    TValue value = default;
-                    mapping = MappingHelper.GetMapping_Load<TValue>( ObjectContext.Default, MappingHelper.GetSerializedType<TValue>( valueData ), valueData, l );
-                    mapping.SafeLoad( ref value, valueData, l );
-
-                    o = new KeyValuePair<TKey, TValue>( key, value );
-                },
-                OnLoadReferences = ( ref KeyValuePair<TKey, TValue> o, SerializedData data, ILoader l ) =>
-                {
-                    SerializedData keyData = data["key"];
-                    SerializedData valueData = data["value"];
-
-                    TKey key = o.Key;
-                    var mapping = MappingHelper.GetMapping_LoadReferences<TKey>( ObjectContext.Default, key, keyData, l );
-                    mapping.SafeLoadReferences( ref key, keyData, l );
-
-                    TValue value = o.Value;
-                    mapping = MappingHelper.GetMapping_LoadReferences<TValue>( ObjectContext.Default, value, valueData, l );
-                    mapping.SafeLoadReferences( ref value, valueData, l );
-
-                    o = new KeyValuePair<TKey, TValue>( key, value );
-                }
-            };
+        [MapsInheritingFrom( typeof( KeyValuePair<,> ), Context = KeyValueContext.RefToRef )]
+        public static SerializationMapping KeyValuePair_RefToRef_Mapping<TKey, TValue>()
+        {
+            return new MemberwiseSerializationMapping<KeyValuePair<TKey, TValue>>()
+                .WithReadonlyMember( "key", ObjectContext.Ref, o => o.Key )
+                .WithReadonlyMember( "value", ObjectContext.Ref, o => o.Value )
+                .WithFactory<TKey, TValue>( ( key, value ) => new KeyValuePair<TKey, TValue>( key, value ) );
         }
 
         [MapsInheritingFrom( typeof( Dictionary<,> ), Context = KeyValueContext.ValueToValue )]
         public static SerializationMapping Dictionary_ValueToValue_Mapping<TKey, TValue>()
         {
-            return new NonPrimitiveSerializationMappingWithTemp<(TKey, TValue)[], Dictionary<TKey, TValue>>()
-            {
-                OnSave = ( o, s ) =>
+            return new EnumeratedSerializationMapping<Dictionary<TKey, TValue>, KeyValuePair<TKey, TValue>>(
+                KeyValueContext.ValueToValue,
+                ( o, i, oElem ) =>
                 {
-                    if( o == null )
-                        return null;
-
-                    SerializedArray arr = new SerializedArray();
-
-                    foreach( var kvp in o )
-                    {
-                        var mapping = SerializationMappingRegistry.GetMapping<TKey>( ObjectContext.Default, kvp.Key );
-                        var keyData = mapping.SafeSave<TKey>( kvp.Key, s );
-
-                        mapping = SerializationMappingRegistry.GetMapping<TValue>( ObjectContext.Default, kvp.Value );
-                        var valueData = mapping.SafeSave<TValue>( kvp.Value, s );
-
-                        SerializedObject kvpData = new SerializedObject()
-                        {
-                            { "key", keyData },
-                            { "value", valueData }
-                        };
-
-                        arr.Add( kvpData );
-                    }
-
-                    return arr;
-                },
-                OnInstantiate = ( data, l ) =>
-                {
-                    return data == null ? default : new Dictionary<TKey, TValue>();
-                },
-                OnInstantiateTemp = ( data, l ) =>
-                {
-                    if( data is not SerializedArray dataObj )
-                        return null;
-
-                    return data == null ? null : new (TKey, TValue)[dataObj.Count];
-                },
-                OnLoad = ( NonPrimitiveSerializationMappingWithTemp<(TKey, TValue)[], Dictionary<TKey, TValue>> self, ref Dictionary<TKey, TValue> o, SerializedData data, ILoader l ) =>
-                {
-                    if( data is not SerializedArray dataObj )
-                        return;
-
-                    int i = 0;
-                    foreach( var dataKvp in dataObj )
-                    {
-                        SerializedData keyData = dataKvp["key"];
-                        SerializedData valueData = dataKvp["value"];
-
-                        TKey key = default;
-                        var mapping = MappingHelper.GetMapping_Load<TKey>( ObjectContext.Default, MappingHelper.GetSerializedType<TKey>( keyData ), keyData, l );
-                        mapping.SafeLoad( ref key, keyData, l );
-
-                        TValue value = default;
-                        mapping = MappingHelper.GetMapping_Load<TValue>( ObjectContext.Default, MappingHelper.GetSerializedType<TValue>( valueData ), valueData, l );
-                        mapping.SafeLoad( ref value, valueData, l );
-
-                        self.temp[i] = (key, value);
-                        i++;
-                    }
-                },
-                OnLoadReferences = ( NonPrimitiveSerializationMappingWithTemp<(TKey, TValue)[], Dictionary<TKey, TValue>> self, ref Dictionary<TKey, TValue> o, SerializedData data, ILoader l ) =>
-                {
-                    if( data is not SerializedArray dataObj )
-                        return;
-
-                    if( self.temp == null )
-                        return;
-
-                    int i = 0;
-                    foreach( var (key, value) in self.temp )
-                    {
-                        SerializedData dataKvp = dataObj[i];
-
-                        SerializedData keyData = dataKvp["key"];
-                        SerializedData valueData = dataKvp["value"];
-
-                        TKey key2 = key;
-                        var mapping = MappingHelper.GetMapping_LoadReferences<TKey>( ObjectContext.Default, key2, keyData, l );
-                        mapping.SafeLoadReferences( ref key2, keyData, l );
-
-                        TValue value2 = value;
-                        mapping = MappingHelper.GetMapping_LoadReferences<TValue>( ObjectContext.Default, value2, valueData, l );
-                        mapping.SafeLoadReferences( ref value2, valueData, l );
-
-                        if( key2 != null )
-                            o[key2] = value2;
-
-                        i++;
-                    }
-                }
-            };
+                    o[oElem.Key] = oElem.Value;
+                } )
+                .WithFactory( ( int count ) => new Dictionary<TKey, TValue>( count ) );
         }
 
         [MapsInheritingFrom( typeof( Dictionary<,> ), Context = KeyValueContext.RefToValue )]
-        public static SerializationMapping Dictionary_TKey_TValue_Mapping<TKey, TValue>()
+        public static SerializationMapping Dictionary_RefToValue_Mapping<TKey, TValue>()
         {
-            return new NonPrimitiveSerializationMappingWithTemp<(TKey, TValue)[], Dictionary<TKey, TValue>>()
-            {
-                OnSave = ( o, s ) =>
+            return new EnumeratedSerializationMapping<Dictionary<TKey, TValue>, KeyValuePair<TKey, TValue>>(
+                KeyValueContext.RefToValue,
+                ( o, i, oElem ) =>
                 {
-                    if( o == null )
-                        return null;
+                    o[oElem.Key] = oElem.Value;
+                } )
+                .WithFactory( ( int count ) => new Dictionary<TKey, TValue>( count ) );
+        }
 
-                    SerializedArray arr = new SerializedArray();
-
-                    foreach( var kvp in o )
-                    {
-                        var mapping = SerializationMappingRegistry.GetMapping<TKey>( ObjectContext.Ref, kvp.Key );
-                        var keyData = mapping.SafeSave<TKey>( kvp.Key, s );
-
-                        mapping = SerializationMappingRegistry.GetMapping<TValue>( ObjectContext.Default, kvp.Value );
-                        var valueData = mapping.SafeSave<TValue>( kvp.Value, s );
-
-                        SerializedObject kvpData = new SerializedObject()
-                        {
-                            { "key", keyData },
-                            { "value", valueData }
-                        };
-
-                        arr.Add( kvpData );
-                    }
-
-                    return arr;
-                },
-                OnInstantiate = ( data, l ) =>
+        [MapsInheritingFrom( typeof( Dictionary<,> ), Context = KeyValueContext.ValueToRef )]
+        public static SerializationMapping Dictionary_ValueToRef_Mapping<TKey, TValue>()
+        {
+            return new EnumeratedSerializationMapping<Dictionary<TKey, TValue>, KeyValuePair<TKey, TValue>>(
+                KeyValueContext.ValueToRef,
+                ( o, i, oElem ) =>
                 {
-                    return data == null ? default : new Dictionary<TKey, TValue>();
-                },
-                OnInstantiateTemp = ( data, l ) =>
+                    o[oElem.Key] = oElem.Value;
+                } )
+                .WithFactory( ( int count ) => new Dictionary<TKey, TValue>( count ) );
+        }
+
+        [MapsInheritingFrom( typeof( Dictionary<,> ), Context = KeyValueContext.RefToRef )]
+        public static SerializationMapping Dictionary_RefToRef_Mapping<TKey, TValue>()
+        {
+#warning TODO - would be nice if the element context could be specified as 'pass through' from the mapping's main context.
+            return new EnumeratedSerializationMapping<Dictionary<TKey, TValue>, KeyValuePair<TKey, TValue>>(
+                KeyValueContext.RefToRef,
+                ( o, i, oElem ) =>
                 {
-                    if( data is not SerializedArray dataObj )
-                        return null;
-
-                    return data == null ? null : new (TKey, TValue)[dataObj.Count];
-                },
-                OnLoad = ( NonPrimitiveSerializationMappingWithTemp<(TKey, TValue)[], Dictionary<TKey, TValue>> self, ref Dictionary<TKey, TValue> o, SerializedData data, ILoader l ) =>
-                {
-                    if( data is not SerializedArray dataObj )
-                        return;
-
-                    int i = 0;
-                    foreach( var dataKvp in dataObj )
-                    {
-                        SerializedData keyData = dataKvp["key"];
-                        SerializedData valueData = dataKvp["value"];
-
-                        TKey key = default;
-                        var mapping = MappingHelper.GetMapping_Load<TKey>( ObjectContext.Ref, MappingHelper.GetSerializedType<TKey>( keyData ), keyData, l );
-                        mapping.SafeLoad( ref key, keyData, l );
-
-                        TValue value = default;
-                        mapping = MappingHelper.GetMapping_Load<TValue>( ObjectContext.Default, MappingHelper.GetSerializedType<TValue>( valueData ), valueData, l );
-                        mapping.SafeLoad( ref value, valueData, l );
-
-                        self.temp[i] = (key, value);
-                        i++;
-                    }
-                },
-                OnLoadReferences = ( NonPrimitiveSerializationMappingWithTemp<(TKey, TValue)[], Dictionary<TKey, TValue>> self, ref Dictionary<TKey, TValue> o, SerializedData data, ILoader l ) =>
-                {
-                    if( data is not SerializedArray dataObj )
-                        return;
-
-                    if( self.temp == null )
-                        return;
-
-                    int i = 0;
-                    foreach( var (key, value) in self.temp )
-                    {
-                        SerializedData dataKvp = dataObj[i];
-
-                        SerializedData keyData = dataKvp["key"];
-                        SerializedData valueData = dataKvp["value"];
-
-                        TKey key2 = key;
-                        var mapping = MappingHelper.GetMapping_LoadReferences<TKey>( ObjectContext.Ref, key2, keyData, l );
-                        mapping.SafeLoadReferences( ref key2, keyData, l );
-
-                        TValue value2 = value;
-                        mapping = MappingHelper.GetMapping_LoadReferences<TValue>( ObjectContext.Default, value2, valueData, l );
-                        mapping.SafeLoadReferences( ref value2, valueData, l );
-
-                        if( key2 != null )
-                            o[key2] = value2;
-
-                        i++;
-                    }
-                }
-            };
+                    o[oElem.Key] = oElem.Value;
+                } )
+                .WithFactory( ( int count ) => new Dictionary<TKey, TValue>( count ) );
         }
     }
 }

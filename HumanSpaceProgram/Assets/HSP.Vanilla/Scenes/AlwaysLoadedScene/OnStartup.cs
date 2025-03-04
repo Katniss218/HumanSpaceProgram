@@ -1,5 +1,6 @@
 using HSP.Input;
 using HSP.ScreenCapturing;
+using HSP.Settings;
 using HSP.Time;
 using HSP.Timelines;
 using UnityPlus.Input;
@@ -8,12 +9,12 @@ namespace HSP.Vanilla.Scenes.AlwaysLoadedScene
 {
     public static class OnStartup
     {
-        public const string BIND_INPUT_CHANNELS = HSPEvent.NAMESPACE_HSP + ".bind_input_channels";
+        public const string RELOAD_SETTINGS = HSPEvent.NAMESPACE_HSP + ".settings.load";
 
-        [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, BIND_INPUT_CHANNELS )]
-        private static void BindInputs()
+        [HSPEventListener( HSPEvent_STARTUP_EARLY.ID, RELOAD_SETTINGS )]
+        private static void LoadSettingsFromFileOnStartup()
         {
-            HierarchicalInputChannel.BindInputs();
+            SettingsManager.ReloadSettings();
         }
 
 
@@ -37,7 +38,7 @@ namespace HSP.Vanilla.Scenes.AlwaysLoadedScene
         private static void AddScreenshotManager()
         {
             ScreenshotManager sm = AlwaysLoadedManager.GameObject.AddComponent<ScreenshotManager>();
-            HierarchicalInputManager.AddAction( HierarchicalInputChannel.COMMON_SCREENSHOT, HierarchicalInputPriority.MEDIUM, ( _ ) => sm.TakeScreenshot() );
+            HierarchicalInputManager.AddAction( InputChannel.SCREENSHOT, InputChannelPriority.MEDIUM, ( _ ) => sm.TakeScreenshot() );
         }
 
     }

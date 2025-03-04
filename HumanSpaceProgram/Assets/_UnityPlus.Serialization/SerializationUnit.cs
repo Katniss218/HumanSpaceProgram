@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace UnityPlus.Serialization
 {
-    public static class SerializationUnit
+    public static partial class SerializationUnit
     {
         /// <summary>
         /// Helper method to serialize a single object easily.
