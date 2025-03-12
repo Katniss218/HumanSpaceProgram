@@ -1,0 +1,60 @@
+a+b
+
+{
+	
+}
+(FOR "Vessels".[*]."gameobjects")      // Runs the transformation on every matched object.
+{
+    // ...
+}
+
+(FOR any)                              // Flattens the hierarchy, running the transform for every element.
+{
+    // ...
+}
+
+(FOR any WHERE $"$type" == "somevalue")    // Runs the transform on any object that contains an immediate child "$type" of value "somevalue"
+{
+	this = null;
+}
+
+
+(FOR any WHERE this == "somevalue")		// delete keys by value.
+{
+	this = null;
+}
+
+(FOR any WHERE this == $"keyname")			// delete keys by value of some other key
+{
+	this = null;
+}
+
+
+// need some util functions for comparing collections.
+// need util functions to add, insert new elements to SerializedArray.
+// need util function to delete an element instead of setting its value to null (these are distinct states).
+// Need function to compare values by regex (Regex.Match)
+
+(FOR $"Parts".[*] WHERE ((contains $"MODULE".[*]."name", "ModuleEngines*") && !(contains $"MODULE".[*]."name", "SSTUModularEngineCluster")))
+{
+	(FOR $"MODULE".[*] WHERE $"name" == "FXModuleLookAtConstraint")
+	{
+		"$type" = "SSTUModelConstraint";
+		
+		"LOOK_CONST" = $"CONSTRAINLOOKFX";
+		(delete $this, $"CONSTRAINLOOKFX");
+		(FOR $"LOOK_CONST".[*])
+		{
+			"transformName" = $"rotatorsName";
+			(delete $this, $"rotatorsName");
+		}
+	}
+	
+	(append $"MODULE", {
+		"name" = "SSTUModularEngineCluster",
+		// ...
+	});
+	
+	"MODEL".[0]."model" = "SSTU/Assets/EmptyProxyModel";
+	"rescaleFactor" = 1;
+}

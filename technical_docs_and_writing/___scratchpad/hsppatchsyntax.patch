@@ -1,0 +1,26 @@
+@SERIALIZATIONUNIT where *
+{
+	// patches modify in-memory loaded serialization units.
+	
+	@INSTANCE [children/0] where "$type" = "UnityEngine.BoxCollider"
+	{
+	eh no
+	}
+	
+	@INSTANCEDATA where "$type" = "FRocketEngineRF"
+	{
+		@max_thrust *= 2
+	}
+	
+	// you have to have a way to select where to add/remove/modify a value/object
+	// you have to have a way to specify what to modify it to.
+	
+}
+
+// these kinds of patches shouldn't be part of UnityPlus.Serialization (too specific).
+
+
+
+
+
+

@@ -1,5 +1,7 @@
 # HSP's Intended Gameplay Loop:
 
+    This document is not strictly documentation. It hopefully should be close, but I'm not perfect and sometimes can't be bothered to update every doc.
+#
 
 - The player starts with an initial spaceport.
 
