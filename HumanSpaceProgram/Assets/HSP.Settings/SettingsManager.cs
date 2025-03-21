@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using UnityEditor;
 using UnityEngine;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.DataHandlers;
@@ -10,116 +11,29 @@ using UnityPlus.Serialization.DataHandlers;
 namespace HSP.Settings
 {
     /// <summary>
-    /// Represents a class that provides some collection of settings pages.
+    /// A class that can manage the settings from many different sources.
     /// </summary>
-    public interface ISettingsProvider
-    {
-        /// <summary>
-        /// Gets the types of all of the settings pages of this provider.
-        /// </summary>
-        public IEnumerable<Type> GetPageTypes();
-
-#warning TODO - replace by loadsettings / savesettings that returns a SettingsFile ?? - this would allow saving to network and stuff.
-        /// <summary>
-        /// Gets path to the file containing the settings.
-        /// </summary>
-        public string GetSettingsFilePath();
-
-        public static bool IsValidSettingsPage<T>( Type t ) where T : ISettingsPage
-        {
-            return !t.IsAbstract && !t.IsInterface && typeof( T ).IsAssignableFrom( t );
-        }
-    }
-
-
-
-    public interface IGameSettingsPage : ISettingsPage
-    {
-        // global settings - this is not in HSP.Settings either.
-        // move HumanSpaceProgramGameSettings with it.
-    }
-
-    public sealed class GameSettingsProvider : ISettingsProvider
-    {
-        public const string SettingsFileName = "settings.json";
-
-        public IEnumerable<Type> GetPageTypes()
-        {
-            return AppDomain.CurrentDomain.GetAssemblies().SelectMany( a => a.GetTypes() )
-                .Where( t => ISettingsProvider.IsValidSettingsPage<IGameSettingsPage>( t ) );
-        }
-
-        public string GetSettingsFilePath()
-        {
-            string path = Path.Combine( ApplicationUtils.GetBaseDirectoryPath(), SettingsFileName );
-
-            return path;
-        }
-    }
-
-
-
-    public interface IScenarioSettingsPage : ISettingsPage
-    {
-        // HSP.Timelines is not basal, we can include settings in it.
-    }
-
-    public interface ITimelineSettingsPage : ISettingsPage
-    {
-        // HSP.Timelines is not basal, we can include settings in it.
-    }
-
-    /// <summary>
-    /// Fixed scenario settings
-    /// </summary>
-    public sealed class ScenarioSettingsProvider : ISettingsProvider
-    {
-        public IEnumerable<Type> GetPageTypes()
-        {
-            return AppDomain.CurrentDomain.GetAssemblies().SelectMany( a => a.GetTypes() )
-                .Where( t => ISettingsProvider.IsValidSettingsPage<IScenarioSettingsPage>( t ) );
-        }
-
-        public string GetSettingsFilePath()
-        {
-            // more complex, use the current scenario and take the default settings from it.
-            throw new NotImplementedException();
-        }
-    }
-
-    /// <summary>
-    /// 'scenario' settings that are editable after the scenario has started.
-    /// </summary>
-    public sealed class TimelineSettingsProvider : ISettingsProvider
-    {
-        public IEnumerable<Type> GetPageTypes()
-        {
-            return AppDomain.CurrentDomain.GetAssemblies().SelectMany( a => a.GetTypes() )
-                .Where( t => ISettingsProvider.IsValidSettingsPage<ITimelineSettingsPage>( t ) );
-        }
-
-        public string GetSettingsFilePath()
-        {
-            // more complex, use the current timeline and take the settings from it.
-            throw new NotImplementedException();
-        }
-    }
-
-
-
     public static class SettingsManager
     {
-        private static List<ISettingsProvider> _settingsProviders = new();
+        private static ISettingsProvider[] _settingsProviders = null;
 
-        public static bool TryRegisterProvider( ISettingsProvider provider )
+        private static ISettingsProvider[] GetProviders()
         {
-            Type providerType = provider.GetType();
+            if( _settingsProviders == null )
+            {
+                Type[] types = AppDomain.CurrentDomain.GetAssemblies().SelectMany( a => a.GetTypes() )
+                    .Where( t => !t.IsAbstract && !t.IsInterface && typeof( ISettingsProvider ).IsAssignableFrom( t ) ).ToArray();
 
-            if( _settingsProviders.Any( p => p.GetType() == providerType ) )
-                return false;
+                _settingsProviders = new ISettingsProvider[types.Length];
 
-            _settingsProviders.Add( provider );
-            return true;
+                for( int i = 0; i < types.Length; i++)
+                {
+                    var provider = (ISettingsProvider)Activator.CreateInstance( types[i] );
+                    _settingsProviders[i] = provider;
+                }
+            }
+
+            return _settingsProviders;
         }
 
         private static SettingsFile CreateNewSettings( Type[] types )
@@ -139,14 +53,14 @@ namespace HSP.Settings
         /// </summary>
         public static void ReloadSettings()
         {
-            foreach( var provider in _settingsProviders )
+            foreach( var provider in GetProviders() )
             {
                 ReloadSettings( provider );
             }
         }
 
         /// <summary>
-        /// Reloads the current settings from disk.
+        /// Reloads the current settings of a given settings provider from disk.
         /// </summary>
         private static void ReloadSettings( ISettingsProvider provider )
         {
@@ -217,14 +131,14 @@ namespace HSP.Settings
         /// </summary>
         public static void SaveSettings()
         {
-            foreach( var provider in _settingsProviders )
+            foreach( var provider in GetProviders() )
             {
                 SaveSettings( provider );
             }
         }
 
         /// <summary>
-        /// Saves the current settings to disk.
+        /// Saves the current settings of a given settings provider to disk.
         /// </summary>
         private static void SaveSettings( ISettingsProvider provider )
         {

@@ -62,7 +62,8 @@
     <Compile Include="Assets\HSP.Timelines\Serialization\ScenarioMetadata.cs" />
     <Compile Include="Assets\HSP.Timelines\TimelineManager.cs" />
     <Compile Include="Assets\HSP.Timelines\Serialization\SaveMetadata.cs" />
-    <Compile Include="Assets\HSP.Timelines\Scenarios\Scenario.cs" />
+    <Compile Include="Assets\HSP.Timelines\ScenarioSettings.cs" />
+    <Compile Include="Assets\HSP.Timelines\TimelineSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Timelines\___HSP.Timelines.asmdef" />
@@ -941,6 +942,10 @@
     <ProjectReference Include="HSP.SceneManagement.csproj">
       <Project>{5B21ACE1-5E92-EEB2-818D-AF6D6AE9F824}</Project>
       <Name>HSP.SceneManagement</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Settings.csproj">
+      <Project>{40D40A9F-D8D4-16D9-E477-9EC39F056D3E}</Project>
+      <Name>HSP.Settings</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

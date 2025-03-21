@@ -21,7 +21,6 @@ namespace HSP.Vanilla.Scenes.AlwaysLoadedScene
         public const string ADD_TIME_MANAGER = HSPEvent.NAMESPACE_HSP + ".add_time_manager";
         public const string ADD_TIMELINE_MANAGER = HSPEvent.NAMESPACE_HSP + ".add_timeline_manager";
         public const string ADD_SCREENSHOT_MANAGER = HSPEvent.NAMESPACE_HSP + ".add_screenshot_manager";
-        public const string REGISTER_GAME_SETTINGS_PROVIDER = HSPEvent.NAMESPACE_HSP + ".add_settings_prov.game";
 
         [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, ADD_TIME_MANAGER )]
         private static void AddTimeManager()
@@ -41,12 +40,5 @@ namespace HSP.Vanilla.Scenes.AlwaysLoadedScene
             ScreenshotManager sm = AlwaysLoadedManager.GameObject.AddComponent<ScreenshotManager>();
             HierarchicalInputManager.AddAction( InputChannel.SCREENSHOT, InputChannelPriority.MEDIUM, ( _ ) => sm.TakeScreenshot() );
         }
-        
-        [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, REGISTER_GAME_SETTINGS_PROVIDER )]
-        private static void RegisterGameSettingsProvider()
-        {
-            SettingsManager.TryRegisterProvider( new GameSettingsProvider() );
-        }
-
     }
 }
