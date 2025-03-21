@@ -1,4 +1,5 @@
-﻿using HSP.Content.Vessels;
+﻿using HSP.Content;
+using HSP.Content.Vessels;
 using HSP.Content.Vessels.Serialization;
 using UnityEngine;
 using UnityPlus.Serialization;

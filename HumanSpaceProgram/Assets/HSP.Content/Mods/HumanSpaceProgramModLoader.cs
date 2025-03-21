@@ -7,8 +7,9 @@ namespace HSP.Content.Mods
     /// <summary>
     /// Constants regarding mods for HSP.
     /// </summary>
-    public class HumanSpaceProgramModLoader
+    public static class HumanSpaceProgramModLoader
     {
+#warning TODO - replace this by a more sophisticated system that keeps track of which mods are loaded.
         private static bool _modsLoaded = false; // can be replaced by an array of mod metadatas and exposed publicly later.
 
         // TODO - Later, a mod should be located in an appropriate folder, along with a `_mod.json` file containing ModMetadata (name, author, etc, and a version info for compatibility checking)

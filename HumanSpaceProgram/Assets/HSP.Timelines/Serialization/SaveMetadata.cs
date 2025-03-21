@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.DataHandlers;
 
-namespace HSP.Content.Timelines.Serialization
+namespace HSP.Timelines.Serialization
 {
     /// <summary>
     /// Serializable (meta)data of a specific timeline's save.
@@ -56,8 +56,26 @@ namespace HSP.Content.Timelines.Serialization
         /// </summary>
         public Dictionary<string, Version> ModVersions { get; set; } = new Dictionary<string, Version>();
 
+        /// <summary>
+        /// Creates a new persistent save.
+        /// </summary>
+        public SaveMetadata( string timelineId )
+        {
+            if( string.IsNullOrEmpty( timelineId ) )
+                throw new ArgumentNullException( nameof( timelineId ) );
+
+            this.TimelineID = timelineId;
+            this.SaveID = PERSISTENT_SAVE_ID;
+        }
+
         public SaveMetadata( string timelineId, string saveId )
         {
+            if( string.IsNullOrEmpty( timelineId ) )
+                throw new ArgumentNullException( nameof( timelineId ) );
+
+            if( string.IsNullOrEmpty( saveId ) )
+                throw new ArgumentNullException( nameof( saveId ) );
+
             this.TimelineID = timelineId;
             this.SaveID = saveId;
         }
@@ -125,9 +143,14 @@ namespace HSP.Content.Timelines.Serialization
             return saves;
         }
 
+        public static SaveMetadata LoadPersistentFromDisk( string timelineId )
+        {
+            return LoadFromDisk( timelineId, PERSISTENT_SAVE_ID );
+        }
+
         public static SaveMetadata LoadFromDisk( string timelineId, string saveId )
         {
-#warning TODO - guard against files that might've been deleted.
+#warning TODO - guard against IO exceptions. Any problem should log an error and return a valid, but empty, save.
             string saveFilePath = Path.Combine( GetRootDirectory( timelineId, saveId ), SAVE_FILENAME );
 
             SaveMetadata saveMetadata = new SaveMetadata( timelineId, saveId );

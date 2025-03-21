@@ -9,8 +9,119 @@ using UnityPlus.Serialization.DataHandlers;
 
 namespace HSP.Settings
 {
+    /// <summary>
+    /// Represents a class that provides some collection of settings pages.
+    /// </summary>
+    public interface ISettingsProvider
+    {
+        /// <summary>
+        /// Gets the types of all of the settings pages of this provider.
+        /// </summary>
+        public IEnumerable<Type> GetPageTypes();
+
+#warning TODO - replace by loadsettings / savesettings that returns a SettingsFile ?? - this would allow saving to network and stuff.
+        /// <summary>
+        /// Gets path to the file containing the settings.
+        /// </summary>
+        public string GetSettingsFilePath();
+
+        public static bool IsValidSettingsPage<T>( Type t ) where T : ISettingsPage
+        {
+            return !t.IsAbstract && !t.IsInterface && typeof( T ).IsAssignableFrom( t );
+        }
+    }
+
+
+
+    public interface IGameSettingsPage : ISettingsPage
+    {
+        // global settings - this is not in HSP.Settings either.
+        // move HumanSpaceProgramGameSettings with it.
+    }
+
+    public sealed class GameSettingsProvider : ISettingsProvider
+    {
+        public const string SettingsFileName = "settings.json";
+
+        public IEnumerable<Type> GetPageTypes()
+        {
+            return AppDomain.CurrentDomain.GetAssemblies().SelectMany( a => a.GetTypes() )
+                .Where( t => ISettingsProvider.IsValidSettingsPage<IGameSettingsPage>( t ) );
+        }
+
+        public string GetSettingsFilePath()
+        {
+            string path = Path.Combine( ApplicationUtils.GetBaseDirectoryPath(), SettingsFileName );
+
+            return path;
+        }
+    }
+
+
+
+    public interface IScenarioSettingsPage : ISettingsPage
+    {
+        // HSP.Timelines is not basal, we can include settings in it.
+    }
+
+    public interface ITimelineSettingsPage : ISettingsPage
+    {
+        // HSP.Timelines is not basal, we can include settings in it.
+    }
+
+    /// <summary>
+    /// Fixed scenario settings
+    /// </summary>
+    public sealed class ScenarioSettingsProvider : ISettingsProvider
+    {
+        public IEnumerable<Type> GetPageTypes()
+        {
+            return AppDomain.CurrentDomain.GetAssemblies().SelectMany( a => a.GetTypes() )
+                .Where( t => ISettingsProvider.IsValidSettingsPage<IScenarioSettingsPage>( t ) );
+        }
+
+        public string GetSettingsFilePath()
+        {
+            // more complex, use the current scenario and take the default settings from it.
+            throw new NotImplementedException();
+        }
+    }
+
+    /// <summary>
+    /// 'scenario' settings that are editable after the scenario has started.
+    /// </summary>
+    public sealed class TimelineSettingsProvider : ISettingsProvider
+    {
+        public IEnumerable<Type> GetPageTypes()
+        {
+            return AppDomain.CurrentDomain.GetAssemblies().SelectMany( a => a.GetTypes() )
+                .Where( t => ISettingsProvider.IsValidSettingsPage<ITimelineSettingsPage>( t ) );
+        }
+
+        public string GetSettingsFilePath()
+        {
+            // more complex, use the current timeline and take the settings from it.
+            throw new NotImplementedException();
+        }
+    }
+
+
+
     public static class SettingsManager
     {
+        private static List<ISettingsProvider> _settingsProviders = new();
+
+        public static bool TryRegisterProvider( ISettingsProvider provider )
+        {
+            Type providerType = provider.GetType();
+
+            if( _settingsProviders.Any( p => p.GetType() == providerType ) )
+                return false;
+
+            _settingsProviders.Add( provider );
+            return true;
+        }
+
         private static SettingsFile CreateNewSettings( Type[] types )
         {
             SettingsFile arr = new();
@@ -23,21 +134,26 @@ namespace HSP.Settings
             return arr;
         }
 
-        private static Type[] GetPageTypes()
-        {
-            return AppDomain.CurrentDomain.GetAssemblies().SelectMany( a => a.GetTypes() )
-                .Where( t => !t.IsAbstract && t != typeof( ISettingsPage ) && typeof( ISettingsPage ).IsAssignableFrom( t ) ).ToArray();
-        }
-
         /// <summary>
         /// Reloads the current settings from disk.
         /// </summary>
         public static void ReloadSettings()
         {
-            string path = HumanSpaceProgramSettings.GetSettingsFilePath();
+            foreach( var provider in _settingsProviders )
+            {
+                ReloadSettings( provider );
+            }
+        }
+
+        /// <summary>
+        /// Reloads the current settings from disk.
+        /// </summary>
+        private static void ReloadSettings( ISettingsProvider provider )
+        {
+            string path = provider.GetSettingsFilePath();
             SettingsFile arr;
 
-            Type[] pageTypes = GetPageTypes();
+            Type[] pageTypes = provider.GetPageTypes().ToArray();
 
             bool errorOrMissingFile = false;
             if( File.Exists( path ) )
@@ -101,7 +217,18 @@ namespace HSP.Settings
         /// </summary>
         public static void SaveSettings()
         {
-            Type[] pageTypes = GetPageTypes();
+            foreach( var provider in _settingsProviders )
+            {
+                SaveSettings( provider );
+            }
+        }
+
+        /// <summary>
+        /// Saves the current settings to disk.
+        /// </summary>
+        private static void SaveSettings( ISettingsProvider provider )
+        {
+            Type[] pageTypes = provider.GetPageTypes().ToArray();
 
             SettingsFile arr = new SettingsFile();
             arr.Pages = new List<ISettingsPage>( pageTypes.Length );
@@ -112,7 +239,7 @@ namespace HSP.Settings
                 arr.Pages.Add( page );
             }
 
-            JsonSerializedDataHandler dataHandler = new JsonSerializedDataHandler( HumanSpaceProgramSettings.GetSettingsFilePath() );
+            JsonSerializedDataHandler dataHandler = new JsonSerializedDataHandler( provider.GetSettingsFilePath() );
 
             var data = SerializationUnit.Serialize( arr );
             dataHandler.Write( data );

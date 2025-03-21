@@ -1,5 +1,5 @@
 using HSP.Timelines;
-using HSP.Content.Timelines.Serialization;
+using HSP.Timelines.Serialization;
 using HSP.UI;
 using System.Linq;
 using UnityEngine;
@@ -19,7 +19,9 @@ namespace HSP.Vanilla.UI.Timelines
         UIInputField<string> _nameInputField;
         UIInputField<string> _descriptionInputField;
 
-        void RefreshSaveList()
+        public SaveMetadata Save { get; private set; }
+
+        private void RefreshSaveList()
         {
             if( _saveListUI.IsNullOrDestroyed() )
             {
@@ -40,16 +42,22 @@ namespace HSP.Vanilla.UI.Timelines
             _selectedTimelineSaves = new UISaveMetadata[saves.Length];
             for( int i = 0; i < _selectedTimelineSaves.Length; i++ )
             {
-                _selectedTimelineSaves[i] = _saveListUI.AddSaveMetadata( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Bottom, 0, 40 ), saves[i], ( ui ) =>
-                {
-                    _selectedSave = ui;
-                } );
+                _selectedTimelineSaves[i] = _saveListUI.AddSaveMetadata( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Bottom, 0, 40 ), saves[i], OnExistingSaveClick );
             }
         }
 
-        void OnSave()
+        private void OnExistingSaveClick( UISaveMetadata ui )
         {
-            if( _nameInputField.TryGetValue( out string Text ) )
+            _selectedSave = ui;
+            Save = ui.Save;
+            _nameInputField.SetValue( ui.Save.Name );
+            _descriptionInputField.SetValue( ui.Save.Description );
+        }
+
+        private void OnSave()
+        {
+            TimelineManager.BeginSaveAsync( Save );
+           /* if( _nameInputField.TryGetValue( out string Text ) )
             {
                 _descriptionInputField.TryGetValue( out string Description );
                 TimelineManager.BeginSaveAsync( TimelineManager.CurrentTimeline.TimelineID, IOHelper.SanitizeFileName( Text ), Text, Description );
@@ -58,6 +66,11 @@ namespace HSP.Vanilla.UI.Timelines
             {
                 TimelineManager.BeginSaveAsync( TimelineManager.CurrentTimeline.TimelineID, _selectedSave.Save.SaveID, _selectedSave.Save.Name, _selectedSave.Save.Description );
             }
+           */
+#warning TODO -
+            // after changing the name - change the name of the selected save.
+            // add a button that deselects the current save.
+            // currently selected timeline/save should be outlined in the UI.
         }
 
         /// <summary>

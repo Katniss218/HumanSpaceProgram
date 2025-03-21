@@ -1,11 +1,12 @@
-﻿using System;
+﻿using HSP.Content;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.DataHandlers;
 
-namespace HSP.Content.Timelines.Serialization
+namespace HSP.Timelines.Serialization
 {
     /// <summary>
     /// Serializable (meta)data of a timeline.
@@ -34,6 +35,9 @@ namespace HSP.Content.Timelines.Serialization
 
         public TimelineMetadata( string timelineId )
         {
+            if( string.IsNullOrEmpty( timelineId ) )
+                throw new ArgumentNullException( nameof( timelineId ) );
+
             this.TimelineID = timelineId;
         }
 
@@ -42,7 +46,7 @@ namespace HSP.Content.Timelines.Serialization
         /// </summary>
         public static string GetTimelinesPath()
         {
-            return HumanSpaceProgram.GetSaveDirectoryPath();
+            return HumanSpaceProgramContent.GetSaveDirectoryPath();
         }
 
         /// <summary>
@@ -83,16 +87,16 @@ namespace HSP.Content.Timelines.Serialization
 
             List<TimelineMetadata> timelines = new List<TimelineMetadata>();
 
-            foreach( var timelineDirName in potentialTimelines )
+            foreach( var timelineDirPath in potentialTimelines )
             {
                 try
                 {
-                    TimelineMetadata timelineMetadata = TimelineMetadata.LoadFromDisk( timelineDirName );
+                    TimelineMetadata timelineMetadata = TimelineMetadata.LoadFromDisk( timelineDirPath );
                     timelines.Add( timelineMetadata );
                 }
                 catch( Exception ex )
                 {
-                    Debug.LogWarning( $"Couldn't load timeline `{timelineDirName}`." );
+                    Debug.LogWarning( $"Couldn't load timeline `{timelineDirPath}`." );
                     Debug.LogException( ex );
                 }
             }
@@ -102,11 +106,11 @@ namespace HSP.Content.Timelines.Serialization
 
         public static TimelineMetadata LoadFromDisk( string timelineId )
         {
-            string saveFilePath = Path.Combine( GetRootDirectory( timelineId ), TIMELINE_FILENAME );
+            string filePath = Path.Combine( GetRootDirectory( timelineId ), TIMELINE_FILENAME );
 
             TimelineMetadata timelineMetadata = new TimelineMetadata( timelineId );
 
-            JsonSerializedDataHandler handler = new JsonSerializedDataHandler( saveFilePath );
+            JsonSerializedDataHandler handler = new JsonSerializedDataHandler( filePath );
             var data = handler.Read();
             SerializationUnit.Populate( timelineMetadata, data );
             return timelineMetadata;
@@ -114,11 +118,11 @@ namespace HSP.Content.Timelines.Serialization
 
         public void SaveToDisk()
         {
-            string saveFilePath = Path.Combine( GetRootDirectory(), TIMELINE_FILENAME );
+            string filePath = Path.Combine( GetRootDirectory(), TIMELINE_FILENAME );
 
             var data = SerializationUnit.Serialize( this );
 
-            JsonSerializedDataHandler handler = new JsonSerializedDataHandler( saveFilePath );
+            JsonSerializedDataHandler handler = new JsonSerializedDataHandler( filePath );
             handler.Write( data );
         }
 

@@ -1,5 +1,3 @@
-using HSP.Content.Timelines.Serialization;
-using HSP.ReferenceFrames;
 using HSP.Timelines;
 using System.IO;
 using UnityPlus.Serialization;
@@ -15,7 +13,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene
         [HSPEventListener( HSPEvent_AFTER_TIMELINE_SAVE.ID, SERIALIZE_ACTIVE_OBJECT_MANAGER )]
         private static void OnBeforeSave( TimelineManager.SaveEventData e )
         {
-            string savePath = SaveMetadata.GetRootDirectory( e.timelineId, e.saveId );
+            string savePath = e.save.GetRootDirectory();
             Directory.CreateDirectory( savePath );
 
             JsonSerializedDataHandler _vesselsDataHandler = new JsonSerializedDataHandler( Path.Combine( savePath, $"{nameof( ActiveVesselManager )}.json" ) );
@@ -27,7 +25,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene
         [HSPEventListener( HSPEvent_AFTER_TIMELINE_LOAD.ID, DESERIALIZE_ACTIVE_OBJECT_MANAGER )]
         private static void OnLoad( TimelineManager.LoadEventData e )
         {
-            string savePath = SaveMetadata.GetRootDirectory( e.timelineId, e.saveId );
+            string savePath = e.save.GetRootDirectory();
             Directory.CreateDirectory( savePath );
 
             JsonSerializedDataHandler _vesselsDataHandler = new JsonSerializedDataHandler( Path.Combine( savePath, $"{nameof( ActiveVesselManager )}.json" ) );

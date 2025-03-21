@@ -232,7 +232,7 @@ namespace HSP._DevUtils
                 string partDir;
 
                 VesselMetadata vm;
-                partDir = HumanSpaceProgram.GetSavedVesselsDirectoryPath() + "/vessel";
+                partDir = HumanSpaceProgramContent.GetSavedVesselsDirectoryPath() + "/vessel";
                 Directory.CreateDirectory( partDir );
                 vm = new VesselMetadata( "vessel" )
                 {

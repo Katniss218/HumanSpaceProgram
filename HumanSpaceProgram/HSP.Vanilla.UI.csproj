@@ -89,6 +89,7 @@
     <Compile Include="Assets\HSP.Vanilla.UI\Timelines\UIStartNewGameWindow.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Timelines\UILoadWindow.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\NavballRenderTextureManager.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI\Timelines\UIScenarioMetadata.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\UITextReadout_Acceleration.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Scenes\GameplayScene\OnStartup.cs" />
   </ItemGroup>

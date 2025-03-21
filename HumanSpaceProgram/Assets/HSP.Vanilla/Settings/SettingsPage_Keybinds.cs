@@ -6,7 +6,7 @@ using UnityPlus.Serialization;
 
 namespace HSP.Vanilla.Settings
 {
-    public sealed class SettingsPage_Keybinds : SettingsPage<SettingsPage_Keybinds>
+    public sealed class SettingsPage_Keybinds : SettingsPage<SettingsPage_Keybinds>, IGameSettingsPage
     {
         public IInputBinding CommonPrimaryDown { get; set; } = new KeyDownBinding( 0, KeyCode.Mouse0 );
         public IInputBinding CommonPrimary { get; set; } = new KeyHoldBinding( 0, KeyCode.Mouse0 );

@@ -1,73 +1,123 @@
 ﻿using System;
-using UnityEngine;
+using System.IO;
 using UnityPlus.Serialization;
 
-namespace HSP
+namespace HSP.Content
 {
     /// <summary>
-    /// An identifier that consists of a namespace and a name.
+    /// An identifier that consists of a namespace (mod id) and a name (content id).
     /// </summary>
     [Serializable]
     public struct NamespacedID
     {
-        [SerializeField]
-        string _data;
-
         const string SEPARATOR = "::";
 
-        public NamespacedID( string @namespace, string name )
+        public string ModID { get; }
+        public string ContentID { get; }
+
+        public NamespacedID( string modId, string contentId )
         {
-            if( string.IsNullOrEmpty( @namespace ) )
+            if( string.IsNullOrEmpty( modId ) )
             {
-                throw new ArgumentException( $"Namespace and a name must both be a nonnull, nonzero length strings.", nameof( @namespace ) );
+                throw new ArgumentException( $"{nameof( modId )} and {nameof( contentId )} must both be nonnull, nonzero length strings.", nameof( modId ) );
             }
-            if( string.IsNullOrEmpty( name ) )
+            if( string.IsNullOrEmpty( contentId ) )
             {
-                throw new ArgumentException( $"Namespace and a name must both be a nonnull, nonzero length strings.", nameof( name ) );
+                throw new ArgumentException( $"{nameof( modId )} and {nameof( contentId )} must both be nonnull, nonzero length strings.", nameof( contentId ) );
             }
 
-            _data = @namespace + SEPARATOR + name;
-        }
-
-        public bool BelongsTo( string @namespace )
-        {
-            return _data.StartsWith( @namespace );
+            this.ModID = modId;
+            this.ContentID = contentId;
         }
 
         public override int GetHashCode()
         {
-            return _data.GetHashCode();
+            return HashCode.Combine( ModID.GetHashCode(), ContentID.GetHashCode() );
         }
 
         public override bool Equals( object obj )
         {
-            if( obj is NamespacedID id )
-                return this._data.Equals( id._data );
+            if( obj is NamespacedID other )
+                return this.ModID == other.ModID
+                    && this.ContentID == other.ContentID;
 
             return false;
         }
 
         public override string ToString()
         {
-            return _data.ToString();
+            return ModID + SEPARATOR + ContentID;
         }
 
         public static NamespacedID Parse( string str )
         {
-            string[] parts = str.Split( "::" );
+            string[] parts = str.Split( SEPARATOR );
+
             if( parts.Length != 2 )
             {
-                throw new ArgumentException( $"Namespaced string must contain a namespace and a name.", nameof( str ) );
+                throw new ArgumentException( $"Namespaced string must contain modId and contentId, separated by `{SEPARATOR}`.", nameof( str ) );
             }
             if( string.IsNullOrEmpty( parts[0] ) || string.IsNullOrEmpty( parts[0] ) )
             {
-                throw new ArgumentException( $"Namespace and a name must both be a nonnull, nonzero length strings.", nameof( str ) );
+                throw new ArgumentException( $"modId and contentId must both be a nonnull, nonzero length strings.", nameof( str ) );
             }
 
-            return new NamespacedID()
+            return new NamespacedID( parts[0], parts[1] );
+        }
+
+        /// <summary>
+        /// Gets the namespaced ID corresponding to the specified content inside HSP's content directory.
+        /// </summary>
+        /// <param name="contentPath">The path to the content, in the form of `GameData/{mod_id}/{content_type}/{content_id}`.</param>
+        /// <param name="contentType">The type of the content (see <paramref name="contentPath"/>)</param>
+        /// <returns>The namespaced ID corresponding to the specified content.</returns>
+        public static NamespacedID FromContentPath( string contentPath, out string contentType )
+        {
+            if( string.IsNullOrWhiteSpace( contentPath ) )
+                throw new ArgumentException( "Content path cannot be null or empty", nameof( contentPath ) );
+
+            contentPath = contentPath.Replace( '\\', '/' );
+            string contentDirectory = HumanSpaceProgramContent.GetContentDirectoryPath();
+
+            string localContentPath = Path.GetRelativePath( contentDirectory, contentDirectory );
+            if( string.IsNullOrEmpty( localContentPath ) )
             {
-                _data = str
-            };
+                throw new ArgumentException( $"Invalid content path '{contentPath}'.", nameof( contentPath ) );
+            }
+
+            string[] parts = localContentPath.Split( new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries );
+
+            if( parts.Length < 3 ) // ../mod_id/ContentType/content_id
+            {
+                throw new ArgumentException( $"Invalid content path '{contentPath}'.", nameof( contentPath ) );
+            }
+
+            string modId = parts[0];
+            contentType = parts[1];
+            string contentId = parts[2];
+
+            return new NamespacedID( modId, contentId );
+        }
+
+        /// <summary>
+        /// Gets the path to content inside HSP's content directory corresponding to the specified namespaced ID.
+        /// </summary>
+        /// <param name="contentType">The type of the content, see: `GameData/{mod_id}/{content_type}/{content_id}`</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public string ToContentPath( string contentType )
+        {
+            if( string.IsNullOrWhiteSpace( contentType ) )
+                throw new ArgumentException( "Content type cannot be null or empty", nameof( contentType ) );
+
+            string path = Path.Combine( HumanSpaceProgramContent.GetContentDirectoryPath(), this.ModID, contentType, this.ContentID );
+
+            if( !path.EndsWith( Path.DirectorySeparatorChar.ToString() ) )
+            {
+                path += Path.DirectorySeparatorChar;
+            }
+
+            return path;
         }
 
         [MapsInheritingFrom( typeof( NamespacedID ) )]

@@ -12,7 +12,7 @@ namespace HSP.Vanilla.Settings
         Eighth = 3
     }
 
-    public sealed class SettingsPage_Graphics : SettingsPage<SettingsPage_Graphics>
+    public sealed class SettingsPage_Graphics : SettingsPage<SettingsPage_Graphics>, IGameSettingsPage
     {
         public int HorizontalResolution { get; set; } = Screen.currentResolution.width;
         public int VerticalResolution { get; set; } = Screen.currentResolution.height;

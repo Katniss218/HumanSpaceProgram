@@ -4,7 +4,7 @@ using UnityPlus.Serialization;
 namespace HSP.Settings
 {
     /// <summary>
-    /// data object representation of the settings file.
+    /// The object representation of a settings file.
     /// </summary>
     internal class SettingsFile
     {

@@ -1,4 +1,5 @@
-﻿using HSP.Content.Vessels;
+﻿using HSP.Content;
+using HSP.Content.Vessels;
 using HSP.Content.Vessels.Serialization;
 using HSP.Vanilla.Scenes.AlwaysLoadedScene;
 using System.IO;
@@ -45,7 +46,7 @@ namespace HSP.Vanilla.Content.AssetLoaders
 
         public static void ReloadVesselsAsParts()
         {
-            string modsPath = HumanSpaceProgram.GetSavedVesselsDirectoryPath();
+            string modsPath = HumanSpaceProgramContent.GetSavedVesselsDirectoryPath();
             string[] modDirectories = Directory.GetDirectories( modsPath );
 
             // register a loader for each part.

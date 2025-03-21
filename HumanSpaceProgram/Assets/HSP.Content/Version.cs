@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityPlus.Serialization;
 
-namespace HSP
+namespace HSP.Content
 {
     /// <summary>
     /// Represents a version where the major number indicates breaking changes, and minor indicates non-breaking changes.

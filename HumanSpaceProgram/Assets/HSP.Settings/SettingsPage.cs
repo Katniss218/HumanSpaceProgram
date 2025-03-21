@@ -6,10 +6,13 @@ namespace HSP.Settings
     /// An arbitrary settings page. <br/>
     /// Inherit from this class like this: `CustomPage : SettingsPage<![CDATA[<]]>CustomPage<![CDATA[>]]>` to have a custom singleton settings page.
     /// </summary>
+    /// <remarks>
+    /// REMEMBER TO IMPLEMENT THE SPECIFIC ISETTINGSPAGE FOR YOUR SETTINGS PAGE'S PROVIDER!!!
+    /// </remarks>
     /// <typeparam name="T">The inheriting singleton type.</typeparam>
     public abstract class SettingsPage<T> : ISettingsPage where T : SettingsPage<T>
     {
-        // Reset to default values is accomplished via the default values (it instantiates a new instance of the page).
+        // 'Reset to default' can be accomplished via the C# default values (instantiate a new instance of the page).
 
         /// <summary>
         /// Gets the currently used settings values for this page.
@@ -32,7 +35,7 @@ namespace HSP.Settings
             T page = OnApply();
             Current = page;
             data = SerializationUnit.Serialize<T>( page );
-            SettingsManager.SaveSettings();
+            SettingsManager.SaveSettings(); // We can only save a specific provider to disk, not individual pages themselves, and this is okay.
         }
 
         /// <summary>

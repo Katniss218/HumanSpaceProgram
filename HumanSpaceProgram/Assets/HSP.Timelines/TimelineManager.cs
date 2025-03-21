@@ -1,5 +1,6 @@
-using HSP.Content.Timelines.Serialization;
+using HSP.Content;
 using HSP.Time;
+using HSP.Timelines.Serialization;
 using System;
 using System.IO;
 using UnityEngine;
@@ -84,39 +85,39 @@ namespace HSP.Timelines
     /// </summary>
     public class TimelineManager : SingletonMonoBehaviour<TimelineManager>
     {
-        public struct NewEventData
-        {
-            public string timelineId;
-            public string saveId;
-
-            public NewEventData( string timelineId, string saveId )
-            {
-                this.timelineId = timelineId;
-                this.saveId = saveId;
-            }
-        }
-
         public struct SaveEventData
         {
-            public string timelineId;
-            public string saveId;
+            public readonly TimelineMetadata timeline;
+            public readonly SaveMetadata save;
 
-            public SaveEventData( string timelineId, string saveId )
+            public SaveEventData( TimelineMetadata timeline, SaveMetadata save )
             {
-                this.timelineId = timelineId;
-                this.saveId = saveId;
+                this.timeline = timeline;
+                this.save = save;
             }
         }
 
         public struct LoadEventData
         {
-            public string timelineId;
-            public string saveId;
+            public readonly TimelineMetadata timeline;
+            public readonly SaveMetadata save;
 
-            public LoadEventData( string timelineId, string saveId )
+            public LoadEventData( TimelineMetadata timeline, SaveMetadata save )
             {
-                this.timelineId = timelineId;
-                this.saveId = saveId;
+                this.timeline = timeline;
+                this.save = save;
+            }
+        }
+
+        public struct StartNewEventData
+        {
+            public readonly ScenarioMetadata scenario;
+            public readonly TimelineMetadata timeline;
+
+            public StartNewEventData( ScenarioMetadata scenario, TimelineMetadata timeline )
+            {
+                this.scenario = scenario;
+                this.timeline = timeline;
             }
         }
 
@@ -135,8 +136,8 @@ namespace HSP.Timelines
         /// </summary>
         public static SaveMetadata CurrentSave { get; private set; }
 
-        private static bool _wasPausedBeforeSerializing = false;
 
+        private static bool _wasPausedBeforeSerializing = false;
         public static BidirectionalReferenceStore RefStore { get; private set; }
 
         public static void SaveLoadStartFunc()
@@ -161,20 +162,30 @@ namespace HSP.Timelines
         /// Asynchronously saves the current game state over multiple frames. <br/>
         /// The game should remain paused for the duration of the saving (this is generally handled automatically, but be careful).
         /// </summary>
-        public static void BeginSaveAsync( string timelineId, string saveId, string saveName, string saveDescription )
+        public static void BeginSaveAsync()
         {
-            if( string.IsNullOrEmpty( timelineId ) && string.IsNullOrEmpty( saveId ) )
+            BeginSaveAsync( CurrentSave );
+        }
+
+        /// <summary>
+        /// Asynchronously saves the current game state over multiple frames. <br/>
+        /// The game should remain paused for the duration of the saving (this is generally handled automatically, but be careful).
+        /// </summary>
+        /// <param name="save">A new save instance that will be used to save, and also set as the active save.</param>
+        public static void BeginSaveAsync( SaveMetadata save )
+        {
+            if( save == null )
             {
-                throw new ArgumentException( $"Both can't be null." );
+                throw new ArgumentNullException( nameof( save ), $"The save to save to must not be null. If you have intended to save as the persistent save, use `SaveMetadata.LoadPersistentFromDisk`." );
             }
             if( IsSavingOrLoading )
             {
                 throw new InvalidOperationException( $"Can't start saving a timeline while already saving or loading." );
             }
 
-            Directory.CreateDirectory( SaveMetadata.GetRootDirectory( timelineId, saveId ) );
+            Directory.CreateDirectory( SaveMetadata.GetRootDirectory( save.TimelineID, save.SaveID ) );
 
-            var eSave = new SaveEventData( timelineId, saveId );
+            var eSave = new SaveEventData( CurrentTimeline, save );
             RefStore = new BidirectionalReferenceStore();
 
             HSPEvent.EventManager.TryInvoke( HSPEvent_BEFORE_TIMELINE_SAVE.ID, eSave );
@@ -184,12 +195,9 @@ namespace HSP.Timelines
             HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_TIMELINE_SAVE.ID, eSave );
 
             CurrentTimeline.SaveToDisk();
-            SaveMetadata savedSave = new SaveMetadata( timelineId, saveId );
-            savedSave.Name = saveName;
-            savedSave.Description = saveDescription;
-            savedSave.FileVersion = SaveMetadata.CURRENT_SAVE_FILE_VERSION;
-            savedSave.SaveToDisk();
-            CurrentSave = savedSave;
+            save.FileVersion = SaveMetadata.CURRENT_SAVE_FILE_VERSION;
+            save.SaveToDisk();
+            CurrentSave = save;
         }
 
         /// <summary>
@@ -212,7 +220,7 @@ namespace HSP.Timelines
             TimelineMetadata loadedTimeline = TimelineMetadata.LoadFromDisk( timelineId );
             SaveMetadata loadedSave = SaveMetadata.LoadFromDisk( timelineId, saveId );
 
-            var eLoad = new LoadEventData( timelineId, saveId );
+            var eLoad = new LoadEventData( loadedTimeline, loadedSave );
             RefStore = new BidirectionalReferenceStore();
 
             HSPEvent.EventManager.TryInvoke( HSPEvent_BEFORE_TIMELINE_LOAD.ID, eLoad );
@@ -228,22 +236,15 @@ namespace HSP.Timelines
         /// <summary>
         /// Creates a new default (empty) timeline and "loads" it.
         /// </summary>
-        public static void CreateNew( string timelineId, string saveId, string timelineName, string timelineDescription )
+        public static void BeginScenarioAsync( NamespacedID scenarioId, TimelineMetadata timeline )
         {
-            if( string.IsNullOrEmpty( timelineId ) && string.IsNullOrEmpty( saveId ) )
-            {
-                throw new ArgumentException( $"Both can't be null." );
-            }
             if( IsSavingOrLoading )
             {
                 throw new InvalidOperationException( $"Can't create a new timeline while already saving or loading." );
             }
 
-            TimelineMetadata newTimeline = new TimelineMetadata( timelineId );
-            newTimeline.Name = timelineName;
-            newTimeline.Description = timelineDescription;
-
-            var eNew = new NewEventData( timelineId, saveId );
+            ScenarioMetadata loadedScenario = ScenarioMetadata.LoadFromDisk( scenarioId );
+            var eNew = new StartNewEventData( loadedScenario, timeline );
             RefStore = new BidirectionalReferenceStore();
 
             HSPEvent.EventManager.TryInvoke( HSPEvent_BEFORE_TIMELINE_NEW.ID, eNew );
@@ -251,8 +252,8 @@ namespace HSP.Timelines
             HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_NEW.ID, eNew );
             SaveLoadFinishFunc();
             HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_TIMELINE_NEW.ID, eNew );
-            CurrentTimeline = newTimeline;
-            CurrentSave = null;
+            CurrentTimeline = timeline;
+            CurrentSave = new SaveMetadata( timeline.TimelineID );
         }
     }
 }
