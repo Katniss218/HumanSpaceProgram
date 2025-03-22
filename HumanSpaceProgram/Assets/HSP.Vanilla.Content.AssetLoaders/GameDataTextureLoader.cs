@@ -26,6 +26,15 @@ namespace HSP.Vanilla.Content.AssetLoaders
             GameDataTextureLoader.ReloadTextures();
         }
 
+        private static string ReplaceEnd( this string source, string oldSuffix, string newSuffix )
+        {
+            if( source.EndsWith( oldSuffix ) )
+            {
+                return source[..^oldSuffix.Length] + newSuffix;
+            }
+            return source;
+        }
+
         public static void ReloadTextures()
         {
             string gameDataPath = HumanSpaceProgramContent.GetContentDirectoryPath();
@@ -41,9 +50,10 @@ namespace HSP.Vanilla.Content.AssetLoaders
                 {
                     string relPath = FixPath( Path.GetRelativePath( modPath, file ) );
                     Texture2DMetadata metadata = GetTextureMetadata( Path.ChangeExtension( file, ".json" ) );
-                    string spritePath =  file.Replace( ".png", "_sprite.json" );
+                    string spritePath = file.ReplaceEnd( ".png", "_sprite.json" );
                     if( File.Exists( spritePath ) )
                     {
+                        Debug.Log( spritePath );
                         JsonSerializedDataHandler dataHandler = new JsonSerializedDataHandler( spritePath );
                         SpriteMetadata sm = SerializationUnit.Deserialize<SpriteMetadata>( dataHandler.Read() );
                         string spriteRelPath = FixPath( Path.GetRelativePath( modPath, spritePath ) );

@@ -4,9 +4,11 @@ using HSP.Timelines;
 using HSP.Timelines.Serialization;
 using HSP.UI;
 using HSP.Vanilla.Scenes.GameplayScene;
+using System.Linq;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
+using UnityPlus.UILib.Layout;
 using UnityPlus.UILib.UIElements;
 
 namespace HSP.Vanilla.UI.Timelines
@@ -25,7 +27,7 @@ namespace HSP.Vanilla.UI.Timelines
         UIInputField<string> _nameInputField;
         UIInputField<string> _descriptionInputField;
 
-        public NamespacedID ScenarioID { get; private set; }
+        public ScenarioMetadata SelectedScenario { get; private set; }
 
         public Step CurrentStep { get; private set; }
 
@@ -39,27 +41,53 @@ namespace HSP.Vanilla.UI.Timelines
 
             SceneLoader.UnloadActiveSceneAsync( () => SceneLoader.LoadSceneAsync( GameplaySceneManager.SCENE_NAME, true, false, () =>
             {
-                TimelineManager.BeginScenarioAsync( ScenarioID, meta );
+                TimelineManager.BeginScenarioAsync( SelectedScenario.ScenarioID, meta );
             } ) );
         }
 
         private void ReloadScenarios()
         {
+            foreach( var child in _scenarioListUI.Children.ToArray() )
+            {
+                child.Destroy();
+            }
 
+            ScenarioMetadata[] scenarios = ScenarioMetadata.ReadAllScenarios().ToArray();
+
+            var arr = new UIScenarioMetadata[scenarios.Length];
+            for( int i = 0; i < arr.Length; i++ )
+            {
+                arr[i] = _scenarioListUI.AddScenarioMetadata( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Bottom, 0, 100 ), scenarios[i], OnScenarioClick );
+            }
+        }
+
+        void OnScenarioClick( UIScenarioMetadata ui )
+        {
+            SelectedScenario = ui.Scenario;
         }
 
         private void Create_Step1()
         {
-            foreach( var child in _contentsPanel.Children )
+            foreach( var child in _contentsPanel.Children.ToArray() )
             {
                 child.Destroy();
             }
             this.CurrentStep = Step.SelectScenario;
 
-            _scenarioListUI = _contentsPanel.AddPanel( new UILayoutInfo( UIFill.Fill( 0, 0, 0, 30 ) ), null );
+            var scrollview = _contentsPanel.AddVerticalScrollView( new UILayoutInfo( UIFill.Fill( 0, 0, 0, 30 ) ), 100 );
+            var panel = scrollview.AddPanel( new UILayoutInfo( UIFill.Horizontal( 0, 30 ), UIAnchor.Top, 0, 100 ), null );
+            panel.LayoutDriver = new VerticalLayoutDriver()
+            {
+                Dir = VerticalLayoutDriver.Direction.TopToBottom,
+                FitToSize = true,
+                Spacing = 2.0f
+            };
+            _scenarioListUI = panel;
 
             var btn = _contentsPanel.AddButton( new UILayoutInfo( UIAnchor.BottomRight, (0, 0), (100, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
             {
+                if( SelectedScenario == null )
+                    return;
                 Create_Step2();
             } );
 
@@ -68,7 +96,7 @@ namespace HSP.Vanilla.UI.Timelines
 
         private void Create_Step2()
         {
-            foreach( var child in _contentsPanel.Children )
+            foreach( var child in _contentsPanel.Children.ToArray() )
             {
                 child.Destroy();
             }

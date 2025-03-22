@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityPlus.AssetManagement;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.DataHandlers;
 
@@ -24,7 +25,7 @@ namespace HSP.Timelines.Serialization
         public string Description { get; set; }
         public string Author { get; set; }
 
-        public Sprite Icon => throw new NotImplementedException(); // load and return the _scenario.png/jpg/etc file
+        public Sprite Icon => AssetRegistry.Get<Sprite>( ScenarioID.ModID + "::Scenarios/" + ScenarioID.ContentID + "/_scenario_sprite" ); // load and return the _scenario.png/jpg/etc file
 
         public ScenarioMetadata( NamespacedID scenarioId )
         {

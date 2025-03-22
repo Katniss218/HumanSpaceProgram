@@ -79,7 +79,7 @@ namespace HSP.Content
             contentPath = contentPath.Replace( '\\', '/' );
             string contentDirectory = HumanSpaceProgramContent.GetContentDirectoryPath();
 
-            string localContentPath = Path.GetRelativePath( contentDirectory, contentDirectory );
+            string localContentPath = Path.GetRelativePath( contentDirectory, contentPath ).Replace( '\\', '/' ); ;
             if( string.IsNullOrEmpty( localContentPath ) )
             {
                 throw new ArgumentException( $"Invalid content path '{contentPath}'.", nameof( contentPath ) );

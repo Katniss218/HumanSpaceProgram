@@ -26,22 +26,18 @@ namespace HSP.Vanilla.UI.Timelines
 
         protected internal static T Create<T>( IUIElementContainer parent, UILayoutInfo layout, ScenarioMetadata scenario, Action<UIScenarioMetadata> onClick ) where T : UIScenarioMetadata
         {
-            T uiSaveMetadata = (T)UIPanel.Create<T>( parent, layout, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/functionality_panel" ) )
+            T uiSaveMetadata = (T)UIPanel.Create<T>( parent, layout, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/panel" ) )
                 .Raycastable();
 
-            uiSaveMetadata.LayoutDriver = new VerticalLayoutDriver() { FitToSize = true };
             uiSaveMetadata.Scenario = scenario;
             uiSaveMetadata.onClick = onClick;
 
             UIIcon iconUI = uiSaveMetadata.AddIcon( new UILayoutInfo( UIAnchor.Left, (0, 0), (100, 100) ), scenario.Icon );
 
-            UIText nameText = uiSaveMetadata.AddStdText( new UILayoutInfo( UIFill.Horizontal( 100, 0 ), UIAnchor.Bottom, 0, 0.5f ), scenario.Name );
+            UIText nameText = uiSaveMetadata.AddStdText( new UILayoutInfo( UIFill.Horizontal( 110, 10 ), UIAnchor.Top, 0, 30f ), scenario.Name );
 
-            nameText.FitToContents = true;
-
-            UIText descriptionText = uiSaveMetadata.AddStdText( new UILayoutInfo( UIFill.Horizontal( 100, 0 ), UIAnchor.Bottom, 0.5f, 0f ), scenario.Description );
-
-            descriptionText.FitToContents = true;
+            UIText descriptionText = uiSaveMetadata.AddStdText( new UILayoutInfo( UIFill.Fill( 110, 10, 30, 0 ) ), scenario.Description )
+                .WithAlignment( TMPro.VerticalAlignmentOptions.Top );
 
             UILayoutManager.ForceLayoutUpdate( uiSaveMetadata );
 
@@ -51,7 +47,7 @@ namespace HSP.Vanilla.UI.Timelines
 
     public static class UIScenarioMetadata_Ex
     {
-        public static UIScenarioMetadata AddSaveMetadata( this IUIElementContainer parent, UILayoutInfo layout, ScenarioMetadata scenario, Action<UIScenarioMetadata> onClick )
+        public static UIScenarioMetadata AddScenarioMetadata( this IUIElementContainer parent, UILayoutInfo layout, ScenarioMetadata scenario, Action<UIScenarioMetadata> onClick )
         {
             return UIScenarioMetadata.Create<UIScenarioMetadata>( parent, layout, scenario, onClick );
         }
