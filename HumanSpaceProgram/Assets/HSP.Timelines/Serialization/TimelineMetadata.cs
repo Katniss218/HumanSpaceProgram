@@ -50,16 +50,23 @@ namespace HSP.Timelines.Serialization
         }
 
         /// <summary>
-        /// Root directory is the directory that contains the _timeline.json file.
+        /// Returns the path to the (root) directory of the timeline.
         /// </summary>
+        /// <remarks>
+        /// Root directory is the directory that contains the _timeline.json file.
+        /// </remarks>
         public static string GetRootDirectory( string timelineId )
         {
+            // Saves/<timeline_id>/...
             return Path.Combine( GetTimelinesPath(), timelineId );
         }
 
         /// <summary>
         /// Returns the path to the (root) directory of the timeline.
         /// </summary>
+        /// <remarks>
+        /// Root directory is the directory that contains the _timeline.json file.
+        /// </remarks>
         public string GetRootDirectory()
         {
             return GetRootDirectory( this.TimelineID );
@@ -89,9 +96,11 @@ namespace HSP.Timelines.Serialization
 
             foreach( var timelineDirPath in potentialTimelines )
             {
+                string timelineId = Path.GetRelativePath( timelinesDirectory, timelineDirPath );
                 try
                 {
-                    TimelineMetadata timelineMetadata = TimelineMetadata.LoadFromDisk( timelineDirPath );
+#warning TODO - ids shouldn't be full paths
+                    TimelineMetadata timelineMetadata = TimelineMetadata.LoadFromDisk( timelineId );
                     timelines.Add( timelineMetadata );
                 }
                 catch( Exception ex )

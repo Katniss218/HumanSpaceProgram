@@ -24,6 +24,7 @@ namespace HSP.Timelines
 
         public string GetSettingsFilePath()
         {
+            //TimelineManager.CurrentScenario
             // more complex, use the current scenario and take the default settings from it.
             throw new NotImplementedException();
         }

@@ -40,6 +40,30 @@ namespace HSP.Vanilla.UI.Timelines
 
         // clicking on the load button becomes possible after a save has been selected.
 
+        void RefreshTimelineList()
+        {
+            if( _timelineListUI.IsNullOrDestroyed() )
+            {
+                return;
+            }
+
+            foreach( UIElement timelineUI in _timelineListUI.Children.ToArray() )
+            {
+                timelineUI.Destroy();
+            }
+
+            var timelines = TimelineMetadata.ReadAllTimelines().ToArray();
+            _timelines = new UITimelineMetadata[timelines.Length];
+            for( int i = 0; i < _timelines.Length; i++ )
+            {
+                _timelines[i] = _timelineListUI.AddTimelineMetadata( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Bottom, 0, 40 ), timelines[i], ( ui ) =>
+                {
+                    _selectedTimeline = ui;
+                    RefreshSaveList();
+                } );
+            }
+        }
+
         void RefreshSaveList()
         {
             if( _saveListUI.IsNullOrDestroyed() )
@@ -64,30 +88,6 @@ namespace HSP.Vanilla.UI.Timelines
                 _selectedTimelineSaves[i] = _saveListUI.AddSaveMetadata( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Bottom, 0, 40 ), saves[i], ( ui ) =>
                 {
                     _selectedSave = ui;
-                } );
-            }
-        }
-
-        void RefreshTimelineList()
-        {
-            if( _timelineListUI.IsNullOrDestroyed() )
-            {
-                return;
-            }
-
-            foreach( UIElement timelineUI in _timelineListUI.Children.ToArray() )
-            {
-                timelineUI.Destroy();
-            }
-
-            var timelines = TimelineMetadata.ReadAllTimelines().ToArray();
-            _timelines = new UITimelineMetadata[timelines.Length];
-            for( int i = 0; i < _timelines.Length; i++ )
-            {
-                _timelines[i] = _timelineListUI.AddTimelineMetadata( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Bottom, 0, 40 ), timelines[i], ( ui ) =>
-                {
-                    _selectedTimeline = ui;
-                    RefreshSaveList();
                 } );
             }
         }

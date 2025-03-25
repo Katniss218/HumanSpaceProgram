@@ -3,15 +3,11 @@ using HSP.CelestialBodies.Surfaces;
 using HSP.ReferenceFrames;
 using HSP.Timelines;
 using HSP.Trajectories;
-using HSP.Vanilla;
 using HSP.Vanilla.CelestialBodies;
-using HSP.Vanilla.ReferenceFrames;
 using HSP.Vanilla.Scenes.GameplayScene.Cameras;
 using HSP.Vanilla.Trajectories;
 using HSP.Vessels;
-using System.Collections.Generic;
 using System.Linq;
-using Unity.Collections;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 

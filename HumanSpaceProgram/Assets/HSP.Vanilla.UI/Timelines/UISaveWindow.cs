@@ -19,7 +19,7 @@ namespace HSP.Vanilla.UI.Timelines
         UIInputField<string> _nameInputField;
         UIInputField<string> _descriptionInputField;
 
-        public SaveMetadata Save { get; private set; }
+        public SaveMetadata Save { get; private set; } = TimelineManager.CurrentSave ?? new SaveMetadata( TimelineManager.CurrentTimeline.TimelineID );
 
         private void RefreshSaveList()
         {
@@ -54,19 +54,29 @@ namespace HSP.Vanilla.UI.Timelines
             _descriptionInputField.SetValue( ui.Save.Description );
         }
 
+        private void OnNameChanged( IUIInputElement<string>.ValueChangedEventData e )
+        {
+            _selectedSave = null;
+            Save = new SaveMetadata( Save.TimelineID, IOHelper.SanitizeFileName( e.NewValue ) )
+            {
+                Name = e.NewValue,
+                Description = Save.Description,
+            };
+        }
+
         private void OnSave()
         {
             TimelineManager.BeginSaveAsync( Save );
-           /* if( _nameInputField.TryGetValue( out string Text ) )
-            {
-                _descriptionInputField.TryGetValue( out string Description );
-                TimelineManager.BeginSaveAsync( TimelineManager.CurrentTimeline.TimelineID, IOHelper.SanitizeFileName( Text ), Text, Description );
-            }
-            else
-            {
-                TimelineManager.BeginSaveAsync( TimelineManager.CurrentTimeline.TimelineID, _selectedSave.Save.SaveID, _selectedSave.Save.Name, _selectedSave.Save.Description );
-            }
-           */
+            /* if( _nameInputField.TryGetValue( out string Text ) )
+             {
+                 _descriptionInputField.TryGetValue( out string Description );
+                 TimelineManager.BeginSaveAsync( TimelineManager.CurrentTimeline.TimelineID, IOHelper.SanitizeFileName( Text ), Text, Description );
+             }
+             else
+             {
+                 TimelineManager.BeginSaveAsync( TimelineManager.CurrentTimeline.TimelineID, _selectedSave.Save.SaveID, _selectedSave.Save.Name, _selectedSave.Save.Description );
+             }
+            */
 #warning TODO -
             // after changing the name - change the name of the selected save.
             // add a button that deselects the current save.
@@ -96,6 +106,7 @@ namespace HSP.Vanilla.UI.Timelines
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center );
 
             UIInputField<string> inputField = uiWindow.AddStringInputField( new UILayoutInfo( UIFill.Horizontal( 2, 99 ), UIAnchor.Bottom, 5, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
+            inputField.OnValueChanged += uiWindow.OnNameChanged;
 
             uiWindow._nameInputField = inputField;
             uiWindow._descriptionInputField = inputField;

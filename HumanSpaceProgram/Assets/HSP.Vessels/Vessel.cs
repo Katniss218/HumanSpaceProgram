@@ -130,19 +130,11 @@ namespace HSP.Vessels
 
             HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_VESSEL_CREATED.ID, this );
             this.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
-        }
 
-        private void OnDestroy()
-        {
-            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_VESSEL_DESTROYED.ID, this );
-        }
-
-        void OnEnable()
-        {
             VesselManager.Register( this );
         }
 
-        void OnDisable()
+        private void OnDestroy()
         {
             try
             {
@@ -152,6 +144,8 @@ namespace HSP.Vessels
             {
                 // OnDisable was called when scene was unloaded, ignore.
             }
+
+            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_VESSEL_DESTROYED.ID, this );
         }
 
         void FixedUpdate()

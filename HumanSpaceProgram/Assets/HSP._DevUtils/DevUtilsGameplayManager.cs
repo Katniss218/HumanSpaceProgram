@@ -1,5 +1,4 @@
 ﻿using HSP.CelestialBodies;
-using HSP.CelestialBodies.Surfaces;
 using HSP.Content;
 using HSP.Content.Vessels.Serialization;
 using HSP.ReferenceFrames;

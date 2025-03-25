@@ -81,7 +81,7 @@ namespace HSP.Timelines
     }
 
     /// <summary>
-    /// Manages the currently loaded timeline (a.k.a. save/workspace). See <see cref="TimelineMetadata"/> and <see cref="SaveMetadata"/>.
+    /// Manages the currently loaded timeline (i.e. a save or world). See <see cref="TimelineMetadata"/> and <see cref="SaveMetadata"/>.
     /// </summary>
     public class TimelineManager : SingletonMonoBehaviour<TimelineManager>
     {
@@ -125,6 +125,11 @@ namespace HSP.Timelines
         /// Checks if a timeline is currently being either saved or loaded.
         /// </summary>
         public static bool IsSavingOrLoading { get; private set; }
+
+        /// <summary>
+        /// Gets the scenario that the currently active timeline is based on.
+        /// </summary>
+        public static ScenarioMetadata CurrentScenario { get; private set; }
 
         /// <summary>
         /// Gets the currently active timeline.
@@ -192,12 +197,12 @@ namespace HSP.Timelines
             SaveLoadStartFunc();
             HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_SAVE.ID, eSave );
             SaveLoadFinishFunc();
-            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_TIMELINE_SAVE.ID, eSave );
 
             CurrentTimeline.SaveToDisk();
             save.FileVersion = SaveMetadata.CURRENT_SAVE_FILE_VERSION;
             save.SaveToDisk();
             CurrentSave = save;
+            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_TIMELINE_SAVE.ID, eSave );
         }
 
         /// <summary>
@@ -227,10 +232,9 @@ namespace HSP.Timelines
             SaveLoadStartFunc();
             HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_LOAD.ID, eLoad );
             SaveLoadFinishFunc();
-            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_TIMELINE_LOAD.ID, eLoad );
-
             CurrentTimeline = loadedTimeline;
             CurrentSave = loadedSave;
+            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_TIMELINE_LOAD.ID, eLoad );
         }
 
         /// <summary>
@@ -251,9 +255,10 @@ namespace HSP.Timelines
             SaveLoadStartFunc();
             HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_NEW.ID, eNew );
             SaveLoadFinishFunc();
-            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_TIMELINE_NEW.ID, eNew );
+            CurrentScenario = loadedScenario;
             CurrentTimeline = timeline;
             CurrentSave = new SaveMetadata( timeline.TimelineID );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_TIMELINE_NEW.ID, eNew );
         }
     }
 }

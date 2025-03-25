@@ -1,0 +1,10 @@
+﻿{
+    "name": "Test",
+    "description": null,
+    "file_version": null,
+    "mod_versions": {
+        "$type": "System.Collections.Generic.Dictionary`2[[System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Version, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
+        "$id": "6c7a163b-f2d5-4473-b9cd-fc647f9150ce",
+        "value": []
+    }
+}

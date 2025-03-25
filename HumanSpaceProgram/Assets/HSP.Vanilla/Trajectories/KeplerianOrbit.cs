@@ -613,15 +613,17 @@ namespace HSP.Vanilla.Trajectories
         public static SerializationMapping KeplerianOrbitMapping()
         {
             return new MemberwiseSerializationMapping<KeplerianOrbit>()
-                .WithMember( "ut", o => o.UT )
-                .WithMember( "mass", o => o.Mass )
-                .WithMember( "parent_body", o => o.ParentBodyID )
-                .WithMember( "semi_major_axis", o => o.SemiMajorAxis )
-                .WithMember( "eccentricity", o => o.Eccentricity )
-                .WithMember( "inclination", o => o.Inclination )
-                .WithMember( "longitude_of_ascending_node", o => o.LongitudeOfAscendingNode )
-                .WithMember( "argument_of_periapsis", o => o.ArgumentOfPeriapsis )
-                .WithMember( "mean_anomaly", o => o.MeanAnomaly );
+                .WithReadonlyMember( "ut", o => o.UT )
+                .WithReadonlyMember( "mass", o => o.Mass )
+                .WithReadonlyMember( "parent_body", o => o.ParentBodyID )
+                .WithReadonlyMember( "semi_major_axis", o => o.SemiMajorAxis )
+                .WithReadonlyMember( "eccentricity", o => o.Eccentricity )
+                .WithReadonlyMember( "inclination", o => o.Inclination )
+                .WithReadonlyMember( "longitude_of_ascending_node", o => o.LongitudeOfAscendingNode )
+                .WithReadonlyMember( "argument_of_periapsis", o => o.ArgumentOfPeriapsis )
+                .WithReadonlyMember( "mean_anomaly", o => o.MeanAnomaly )
+                .WithFactory<double, double, string, double, double, double, double, double, double>(
+                    ( ut, mass, parentBodyId, sma, ecc, inc, lan, argPe, meanAnom ) => new KeplerianOrbit( ut, parentBodyId, sma, ecc, inc, lan, argPe, meanAnom, mass ) ); ;
         }
     }
 }

@@ -1,0 +1,147 @@
+﻿{
+    "$type": "UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+    "$id": "29063c67-d771-46ac-9a31-032c6d5fa5d1",
+    "is_active": true,
+    "is_static": false,
+    "layer": 20,
+    "name": "launchsite",
+    "tag": "Untagged",
+    "children": {
+        "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+        "$id": "67ae89a3-5269-4959-8554-069d42a9d85c",
+        "value": [
+            {
+                "$type": "UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "88d4a90c-cd1e-47c0-a547-3a770028dc8f",
+                "is_active": true,
+                "is_static": false,
+                "layer": 20,
+                "name": "testlaunchsite(Clone)",
+                "tag": "Untagged",
+                "children": {
+                    "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "a20bca7d-c847-48a2-9771-569be67e2d37",
+                    "value": [ ]
+                },
+                "components": {
+                    "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "2c8d1d7b-112c-4dd4-afd4-371cdea730dd",
+                    "value": [
+                        {
+                            "$type": "UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                            "$id": "c333c333-016e-4ffa-9bec-a2eac191f7b1",
+                            "local_position": [
+                                0,
+                                0,
+                                0
+                            ],
+                            "local_rotation": [
+                                0,
+                                0,
+                                0,
+                                1
+                            ],
+                            "local_scale": [
+                                50,
+                                1,
+                                50
+                            ]
+                        },
+                        {
+                            "$type": "HSP.Vessels.Components.FPart, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                            "$id": "6d8e0de0-8e88-4e7d-b4e9-f6c84c00bb1e",
+                            "is_enabled": true,
+                            "part_id": "a::a"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "components": {
+        "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+        "$id": "02124084-d83c-4ded-9a9d-bedd971f9b80",
+        "value": [
+            {
+                "$type": "UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "78125dbd-aee7-4669-8fed-e228e8b19085",
+                "local_position": [
+                    -0.19329833984375,
+                    -4.44408321380615,
+                    -3.57006359100342
+                ],
+                "local_rotation": [
+                    -0.471860527992249,
+                    -0.19506411254406,
+                    -0.195219725370407,
+                    -0.837369024753571
+                ],
+                "local_scale": [
+                    1,
+                    1,
+                    1
+                ]
+            },
+            {
+                "$type": "HSP.Vessels.Vessel, HSP.Vessels, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "0899321c-9734-4580-b353-08ccf8471fac",
+                "is_enabled": true,
+                "display_name": "tempname_vessel",
+                "root_part": {
+                    "$ref": "c333c333-016e-4ffa-9bec-a2eac191f7b1"
+                },
+                "on_after_recalculate_parts": null
+            },
+            {
+                "$type": "UnityEngine.Rigidbody, UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "b2c5238d-cd91-4603-a34a-4aba8d5b7144",
+                "is_kinematic": true
+            },
+            {
+                "$type": "HSP.Trajectories.TrajectoryTransform, HSP.Trajectories, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "0ddfe6e8-1752-42ba-8ef1-4a85780815dc",
+                "is_enabled": false,
+                "trajectory": {
+                    "$type": "HSP.Vanilla.Trajectories.NewtonianOrbit, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "5fc880b3-4647-4f64-b0ae-66b9f7e4ca76",
+                    "ut": 0.0199999995529652,
+                    "mass": 1,
+                    "position": [
+                        0,
+                        0,
+                        0
+                    ],
+                    "velocity": [
+                        0,
+                        0,
+                        0
+                    ]
+                }
+            },
+            {
+                "$type": "HSP.Vanilla.PinnedReferenceFrameTransform, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "2af7108f-7bf1-454b-a5ba-e441a1599abe",
+                "is_enabled": true,
+                "mass": 500000,
+                "local_center_of_mass": [
+                    0,
+                    0,
+                    0
+                ],
+                "DO_NOT_TOUCH": true,
+                "reference_body": "main",
+                "reference_position": [
+                    -908823.8125,
+                    -5520084,
+                    3048362.5
+                ],
+                "reference_rotation": [
+                    0.925765097141266,
+                    0,
+                    0.276003062725067,
+                    0.25842073559761
+                ]
+            }
+        ]
+    }
+}

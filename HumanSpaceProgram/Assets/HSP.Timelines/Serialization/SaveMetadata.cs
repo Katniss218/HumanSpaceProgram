@@ -81,19 +81,26 @@ namespace HSP.Timelines.Serialization
         }
 
         /// <summary>
-        /// Root directory is the directory that contains the _save.json file.
+        /// Returns the path to the (root) directory of the save.
         /// </summary>
-        public string GetRootDirectory()
+        /// <remarks>
+        /// Root directory is the directory that contains the _save.json file.
+        /// </remarks>
+        public static string GetRootDirectory( string timelineId, string saveId )
         {
-            return GetRootDirectory( this.TimelineID, this.SaveID );
+            // Saves/<timeline_id>/<save_id>/...
+            return Path.Combine( TimelineMetadata.GetRootDirectory( timelineId ), saveId );
         }
 
         /// <summary>
-        /// Root directory is the directory that contains the _save.json file.
+        /// Returns the path to the (root) directory of the save.
         /// </summary>
-        public static string GetRootDirectory( string timelineId, string saveId )
+        /// <remarks>
+        /// Root directory is the directory that contains the _save.json file.
+        /// </remarks>
+        public string GetRootDirectory()
         {
-            return Path.Combine( TimelineMetadata.GetRootDirectory( timelineId ), saveId );
+            return GetRootDirectory( this.TimelineID, this.SaveID );
         }
 
         /// <summary>
@@ -128,6 +135,7 @@ namespace HSP.Timelines.Serialization
 
             foreach( var saveDirPath in potentialSaves )
             {
+                string saveId = Path.GetRelativePath( savesPath, saveDirPath );
                 try
                 {
                     SaveMetadata saveMetadata = SaveMetadata.LoadFromDisk( timelineId, saveDirPath );

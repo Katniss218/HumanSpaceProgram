@@ -25,7 +25,10 @@ namespace HSP.Timelines.Serialization
         public string Description { get; set; }
         public string Author { get; set; }
 
-        public Sprite Icon => AssetRegistry.Get<Sprite>( ScenarioID.ModID + "::Scenarios/" + ScenarioID.ContentID + "/_scenario_sprite" ); // load and return the _scenario.png/jpg/etc file
+        /// <summary>
+        /// Gets the thumbnail icon of this scenario.
+        /// </summary>
+        public Sprite Icon => AssetRegistry.Get<Sprite>( $"{ScenarioID.ModID}::Scenarios/{ScenarioID.ContentID}/_scenario_sprite" );
 
         public ScenarioMetadata( NamespacedID scenarioId )
         {
@@ -33,8 +36,11 @@ namespace HSP.Timelines.Serialization
         }
 
         /// <summary>
-        /// Root directory is the directory that contains the _scenario.json file.
+        /// Returns the path to the (root) directory of the scenario.
         /// </summary>
+        /// <remarks>
+        /// Root directory is the directory that contains the _scenario.json file.
+        /// </remarks>
         public static string GetRootDirectory( NamespacedID scenarioId )
         {
             // GameData/<mod_id>/Scenarios/<scenario_id>/...
@@ -44,6 +50,9 @@ namespace HSP.Timelines.Serialization
         /// <summary>
         /// Returns the path to the (root) directory of the scenario.
         /// </summary>
+        /// <remarks>
+        /// Root directory is the directory that contains the _scenario.json file.
+        /// </remarks>
         public string GetRootDirectory()
         {
             return GetRootDirectory( this.ScenarioID );
@@ -52,7 +61,6 @@ namespace HSP.Timelines.Serialization
         /// <summary>
         /// Reads all timelines from disk and returns a list of their metadata.
         /// </summary>
-        /// <returns></returns>
         public static IEnumerable<ScenarioMetadata> ReadAllScenarios()
         {
             List<string> potentialScenarios = new();

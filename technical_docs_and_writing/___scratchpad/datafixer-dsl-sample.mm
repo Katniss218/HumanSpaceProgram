@@ -11,7 +11,7 @@
 // @/.../ means select by regex on the name or index (index will be converted to a string to match the regex)
 
 
-// $ means we're passing in the value of an object. No $ means we're passing in a literal.
+// `$` is the 'value of' operator - means we're passing in the value of an object. No $ means we're passing in a literal.
 
 (FOR "Vessels".[*]."gameobjects")	// [*] can be used in a dict as well, it will select every value. 
 									// Here "Vessels" is a serializedobject containing serializedobjects corresponding to folders.
@@ -52,6 +52,7 @@
 		this = $"temp";	// $ means we're dealing with a selectable object that has a value instead of a literal.
 		
 		//"temp" = null; not needed since 'this' being reassigned to an int cleared it.
+		// delete "temp";
     }
 	
 	// @ means use regex for name/index resolution. (convert index to a string and check if it matches) 
@@ -102,13 +103,43 @@
 #FUNCTION
 (ADD $"p1", $"p2")
 {
-	// 'this' is the value returned FOR the function.
+	// 'this' is the value returned FROM the function.
 	this = $"p1";
 }
 
 (FOR "vessels".[*]."gameobjects")
 {
-	"value" = $(ADD "$type", "$id");
+	"value" = $(ADD $"$type", $"$id");
 }
 
+// ################################################################
+// version 2
+
+// support either [A-Za-z0-9_]* (minus keywords) or quoted keys, with dot preceeding a key access and [] for key, index, or range based access.
+// if you want to set the value of a key that is also a keyword, use a quoted or [] access - `"this" = 5;` or `["this"] = 5;` or `this.this = 5;`
+// if `this` is omitted from the beginning, it is implied.
+
+// path expression examples:
+a = 5;
+a[0] = 5;
+a[0].b = 5;
+"hello world"[0] = 5;
+"hello world"[0]."hi there" = 5;
+"hello world"[0]["hi there"] = 5;
+this = 5;
+this.a = 5;
+this.a = $a[0].b;
+
+#FUNCTION
+(ADD p1, p2) // parameter names are now specified as literals, without a $ prefix
+{
+	// 'this' is the value returned FROM the function.
+	this = $p1 + $p2;
+}
+
+(FOR vessels[*].gameobjects)
+{
+	value = $(ADD $"$type", $"$id");
+	// equivalent to `this.value = ...;`
+}
 
