@@ -58,6 +58,9 @@ namespace UnityPlus.Serialization.Mappings
                     {
                         foreach( var child in value )           // The 'value' array here is a sort of 'virtual' array.
                         {
+                            if( child == null ) // only true if something failed.
+                                continue;
+
                             child.transform.SetParent( o.transform );
                         }
                     } )
@@ -72,6 +75,7 @@ namespace UnityPlus.Serialization.Mappings
             .WithRawFactory( ( data, l ) =>
             {
                 GameObject obj = new GameObject();
+                obj.SetActive( false ); // Still needed because ne need to disable it before adding components.
 
                 if( data.TryGetValue( KeyNames.ID, out var id ) )
                 {
