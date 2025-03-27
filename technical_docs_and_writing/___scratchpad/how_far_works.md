@@ -31,3 +31,23 @@ Their [voxels'] size varies with the size of the vessel bounds, there's a limit 
 CL and CD are computed first and then used to compute the actual forces with units
 
 
+# FAR reverse engineering, Katniss:
+
+simulation and flight contexts
+
+FARVesselAero
+- main runtime vessel simulation class
+
+FARAeroSection
+- can be merged together, based on flatness (within 5%)
+- are used to calculate the aero forces on a voxel vessel
+
+main axis is the axis along which the VoxelCrossSections and FARAeroSections are iterated.
+
+Each FARAeroSection has a corresponding VoxelCrossSection, and their counts match
+VehicleVoxel.Volume is the volume of the entire voxel domain, not each voxel.
+
+voxel count is the total count, not per axis.
+
+
+

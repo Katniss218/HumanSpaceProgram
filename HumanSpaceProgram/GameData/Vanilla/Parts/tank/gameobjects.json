@@ -1,1 +1,292 @@
-﻿{"$type":"UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"4e181ccc-3607-4639-a82b-30b93ebd6c85","is_active":true,"is_static":false,"layer":20,"name":"tank","tag":"Untagged","children":{"$type":"UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"151cfbad-4128-4a39-806a-b05e346f897b","value":[{"$type":"UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"fac5065e-13bc-4fb2-840f-de263e2930a8","is_active":true,"is_static":false,"layer":20,"name":"tank","tag":"Untagged","children":{"$type":"UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"a39bf7f6-4ab3-4120-a300-47e13d8a18ff","value":[]},"components":{"$type":"UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"af9e28ba-2260-4433-9d59-6740d5af9a50","value":[{"$type":"UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"33c645aa-8c43-4441-b084-e5c01ba39c01","local_position":[0,0,0],"local_rotation":[0,0,0,1],"local_scale":[1,1,1]},{"$type":"UnityEngine.MeshFilter, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"df3ffd28-7324-4532-acd8-d19ff9bfc92b","shared_mesh":{"$assetref":"builtin::Resources/tank"}},{"$type":"UnityEngine.MeshRenderer, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"98cc7420-6e24-4b2f-a185-a5c4e5ecd061","is_enabled":true,"shared_materials":{"$type":"UnityEngine.Material[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"bd6d2ec4-b64a-4705-8df0-0caebd8c3d8b","value":[{"$assetref":"builtin::Resources/New Material 1"}]},"shadow_casting_mode":"On","receive_shadows":true}]}},{"$type":"UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"2c873031-fd82-4303-adb6-8676e433ea6f","is_active":true,"is_static":false,"layer":20,"name":"volumeTransform","tag":"Untagged","children":{"$type":"UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"a39bf7f6-4ab3-4120-a300-47e13d8a18ff","value":[]},"components":{"$type":"UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"7dee23b7-4f69-4124-9cef-071262106d00","value":[{"$type":"UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"0745c060-c81d-44d3-9a2d-113a97cf3379","local_position":[0,0,0],"local_rotation":[0,0,0,1],"local_scale":[1,1,1]}]}},{"$type":"UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"846ca938-ae27-443b-a9f9-ba82d0ced659","is_active":true,"is_static":false,"layer":20,"name":"NODE","tag":"Untagged","children":{"$type":"UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"a39bf7f6-4ab3-4120-a300-47e13d8a18ff","value":[]},"components":{"$type":"UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"0030cc9d-a47e-4bd6-b738-dd438373576e","value":[{"$type":"UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"d29299d1-68c6-4021-91b7-5650ae995cc1","local_position":[0,1,0],"local_rotation":[-0.707106828689575,0,0,0.707106828689575],"local_scale":[1,1,1]},{"$type":"HSP.Vanilla.Components.FAttachNode, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"212fc594-0e42-4124-9fb7-fa3ff4b1ab8e","is_enabled":true,"range":2}]}},{"$type":"UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"63342769-6be4-4071-b53c-a3eb53ed0913","is_active":true,"is_static":false,"layer":20,"name":"NODE","tag":"Untagged","children":{"$type":"UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"a39bf7f6-4ab3-4120-a300-47e13d8a18ff","value":[]},"components":{"$type":"UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"27f236a7-5ac4-4abe-b56e-ce13f3437ad0","value":[{"$type":"UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"358da440-6522-4ae3-b4a8-67b1b85b10fa","local_position":[0,-1,0],"local_rotation":[0,0.707106828689575,-0.707106828689575,0],"local_scale":[1,1,1]},{"$type":"HSP.Vanilla.Components.FAttachNode, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"a41574e3-0f90-45a9-af18-202d4fcac53b","is_enabled":true,"range":2}]}}]},"components":{"$type":"UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"86f5e873-2959-4a78-926b-213f7fb42dd7","value":[{"$type":"UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"4d9e5bd4-b497-490f-a277-ecbd14adde0e","local_position":[0,0,0],"local_rotation":[0,0,0,1],"local_scale":[1,1,1]},{"$type":"UnityEngine.BoxCollider, UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"54765dc1-90c0-41f0-9cc3-10e3690193b7","is_enabled":true,"is_trigger":false,"size":[2,3,2],"center":[0,0,0]},{"$type":"HSP.Vanilla.Components.FPointMass, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"e7f7fce4-0adb-438d-a42a-e03657f0ab05","is_enabled":true,"mass":200,"on_after_mass_changed":null},{"$type":"HSP.Vanilla.Components.FBulkContainer_Sphere, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"6a80e5ac-4a29-407b-a9d8-e98a3e31bf8d","is_enabled":true,"volume_transform":{"$ref":"0745c060-c81d-44d3-9a2d-113a97cf3379"},"max_volume":7,"radius":1.5,"contents":{"$type":"HSP.ResourceFlow.SubstanceStateCollection, HSP.ResourceFlow, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"66b01a77-a516-4480-9181-524efd6247d7","substances":{"$type":"System.Collections.Generic.List`1[[HSP.ResourceFlow.SubstanceState, HSP.ResourceFlow, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089","$id":"bb67fe96-808e-4194-9543-e1385b42f41b","value":[]}}},{"$type":"HSP.Vessels.Components.FPart, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"f2aef068-4cf1-4b10-b955-4fa16ba5ae2c","is_enabled":true,"part_id":"Vanilla::tank"},{"$type":"HSP.Vessels.Construction.FConstructible, HSP.Vessels.Construction, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"1b34c0db-dbf9-4938-8480-89ba0d4cf4e5","is_enabled":true,"max_build_points":90,"build_points":90,"cached_data":null}]}}
+﻿{
+    "$type": "UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+    "$id": "0577d402-163b-4324-b0f3-1b6d25cd1ecc",
+    "is_active": true,
+    "is_static": false,
+    "layer": 20,
+    "name": "tank",
+    "tag": "Untagged",
+    "children": {
+        "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+        "$id": "a7b4be68-d9cc-4607-9902-9d1d0dfa0f79",
+        "value": [
+            {
+                "$type": "UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "12de0454-8352-4be5-be77-64794f4b0352",
+                "is_active": true,
+                "is_static": false,
+                "layer": 20,
+                "name": "tank",
+                "tag": "Untagged",
+                "children": {
+                    "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "93330ab5-f9da-4957-b61c-e188d776b1af",
+                    "value": []
+                },
+                "components": {
+                    "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "a917d71c-5300-479a-a106-30219ae486d4",
+                    "value": [
+                        {
+                            "$type": "UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                            "$id": "3cde6b31-035e-454c-a5fb-65b2d87efa89",
+                            "local_position": [
+                                0,
+                                0,
+                                0
+                            ],
+                            "local_rotation": [
+                                0,
+                                0,
+                                0,
+                                1
+                            ],
+                            "local_scale": [
+                                1,
+                                1,
+                                1
+                            ]
+                        },
+                        {
+                            "$type": "UnityEngine.MeshFilter, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                            "$id": "b50b1b24-2d55-4418-827b-7616207283ce",
+                            "shared_mesh": {
+                                "$assetref": "builtin::Resources/tank"
+                            }
+                        },
+                        {
+                            "$type": "UnityEngine.MeshRenderer, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                            "$id": "2c14f1a7-25ee-4c06-bbcc-4c31d5f783d6",
+                            "is_enabled": true,
+                            "shared_materials": {
+                                "$type": "UnityEngine.Material[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                "$id": "c9da15f8-a1dc-48c2-b3c1-5ae6e7557bc9",
+                                "value": [
+                                    {
+                                        "$assetref": "builtin::Resources/New Material 1"
+                                    }
+                                ]
+                            },
+                            "shadow_casting_mode": "On",
+                            "receive_shadows": true
+                        }
+                    ]
+                }
+            },
+            {
+                "$type": "UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "083e2573-67b0-4536-91f4-5ed1c824eea9",
+                "is_active": true,
+                "is_static": false,
+                "layer": 20,
+                "name": "volumeTransform",
+                "tag": "Untagged",
+                "children": {
+                    "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "93330ab5-f9da-4957-b61c-e188d776b1af",
+                    "value": []
+                },
+                "components": {
+                    "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "debfa42b-14eb-4025-94d3-1b0b0ed82b40",
+                    "value": [
+                        {
+                            "$type": "UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                            "$id": "56235d26-27d4-47f7-949d-243913b2b1e6",
+                            "local_position": [
+                                0,
+                                0,
+                                0
+                            ],
+                            "local_rotation": [
+                                0,
+                                0,
+                                0,
+                                1
+                            ],
+                            "local_scale": [
+                                1,
+                                1,
+                                1
+                            ]
+                        }
+                    ]
+                }
+            },
+            {
+                "$type": "UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "3d77bbe2-f1c3-4e96-bf6b-ccafe3809e69",
+                "is_active": true,
+                "is_static": false,
+                "layer": 20,
+                "name": "NODE",
+                "tag": "Untagged",
+                "children": {
+                    "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "93330ab5-f9da-4957-b61c-e188d776b1af",
+                    "value": []
+                },
+                "components": {
+                    "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "3d824696-365f-4ec5-8e7e-7fca5e40bb6f",
+                    "value": [
+                        {
+                            "$type": "UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                            "$id": "d21487e0-13c2-44c5-bd0d-214efdf02cc4",
+                            "local_position": [
+                                0,
+                                1,
+                                0
+                            ],
+                            "local_rotation": [
+                                -0.707106828689575,
+                                0,
+                                0,
+                                0.707106828689575
+                            ],
+                            "local_scale": [
+                                1,
+                                1,
+                                1
+                            ]
+                        },
+                        {
+                            "$type": "HSP.Vanilla.Components.FAttachNode, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                            "$id": "47e647b8-3b4c-4e3c-8692-f7950f48066c",
+                            "is_enabled": true,
+                            "range": 2
+                        }
+                    ]
+                }
+            },
+            {
+                "$type": "UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "4a554b41-0bd1-4a42-a120-40c3db1fd579",
+                "is_active": true,
+                "is_static": false,
+                "layer": 20,
+                "name": "NODE",
+                "tag": "Untagged",
+                "children": {
+                    "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "93330ab5-f9da-4957-b61c-e188d776b1af",
+                    "value": []
+                },
+                "components": {
+                    "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "528fb34d-896d-4cad-bf60-8c84192ac649",
+                    "value": [
+                        {
+                            "$type": "UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                            "$id": "826804b3-9a8b-4292-a769-70d974ed63c8",
+                            "local_position": [
+                                0,
+                                -1,
+                                0
+                            ],
+                            "local_rotation": [
+                                0,
+                                0.707106828689575,
+                                -0.707106828689575,
+                                0
+                            ],
+                            "local_scale": [
+                                1,
+                                1,
+                                1
+                            ]
+                        },
+                        {
+                            "$type": "HSP.Vanilla.Components.FAttachNode, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                            "$id": "d196818c-2162-40f3-862f-00c0ea9e1015",
+                            "is_enabled": true,
+                            "range": 2
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "components": {
+        "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+        "$id": "4d4dd718-d7dc-44e7-9b4a-03608df46bbd",
+        "value": [
+            {
+                "$type": "UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "74bddb06-fb21-448e-ba78-c9e2bff3ed71",
+                "local_position": [
+                    0,
+                    0,
+                    0
+                ],
+                "local_rotation": [
+                    0,
+                    0,
+                    0,
+                    1
+                ],
+                "local_scale": [
+                    1,
+                    1,
+                    1
+                ]
+            },
+            {
+                "$type": "UnityEngine.BoxCollider, UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "b707a4cc-72f0-4885-b2c2-150d9a6ad825",
+                "is_enabled": true,
+                "is_trigger": false,
+                "size": [
+                    2,
+                    3,
+                    2
+                ],
+                "center": [
+                    0,
+                    0,
+                    0
+                ]
+            },
+            {
+                "$type": "HSP.Vanilla.Components.FPointMass, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "48f35bad-5016-41c8-b29c-09d9c42a8046",
+                "is_enabled": true,
+                "mass": 200,
+                "on_after_mass_changed": null
+            },
+            {
+                "$type": "HSP.Vanilla.Components.FBulkContainer_Sphere, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "a83fcaf6-e9db-41b7-b8a9-5764d5939c4d",
+                "is_enabled": true,
+                "volume_transform": {
+                    "$ref": "56235d26-27d4-47f7-949d-243913b2b1e6"
+                },
+                "max_volume": 7,
+                "radius": 1.5,
+                "contents": {
+                    "$type": "HSP.ResourceFlow.SubstanceStateCollection, HSP.ResourceFlow, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "ce13852f-27ad-424e-8f53-f940f9f65185",
+                    "substances": {
+                        "$type": "System.Collections.Generic.List`1[[HSP.ResourceFlow.SubstanceState, HSP.ResourceFlow, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
+                        "$id": "1058419c-4199-4d93-b790-1f89fe829a8e",
+                        "value": []
+                    }
+                }
+            },
+            {
+                "$type": "HSP.Vessels.Components.FPart, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "f04e2537-a5d6-465c-b7e5-3f55122b9725",
+                "is_enabled": true,
+                "part_id": "Vanilla::tank"
+            },
+            {
+                "$type": "HSP.Vessels.Construction.FConstructible, HSP.Vessels.Construction, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "d0832b7d-5e5e-4c5e-bc18-ffa889c65e7d",
+                "is_enabled": true,
+                "max_build_points": 90,
+                "build_points": 90,
+                "cached_data": null
+            }
+        ]
+    }
+}

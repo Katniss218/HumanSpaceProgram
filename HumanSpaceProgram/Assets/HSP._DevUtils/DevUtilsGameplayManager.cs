@@ -1,5 +1,6 @@
 ﻿using HSP.CelestialBodies;
 using HSP.Content;
+using HSP.Content.Vessels;
 using HSP.Content.Vessels.Serialization;
 using HSP.ReferenceFrames;
 using HSP.ResourceFlow;
@@ -81,8 +82,7 @@ namespace HSP._DevUtils
             launchSite.gameObject.name = "launchsite";
             launchSite.Pin( body, localPos, Quaternion.FromToRotation( Vector3.up, localPos.normalized ) );
 
-            GameObject launchSitePrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/testlaunchsite" );
-            GameObject root = InstantiateLocal( launchSitePrefab, launchSite.transform, Vector3.zero, Quaternion.identity );
+            GameObject root = DontInstantiateLocal( PartRegistry.Load( (NamespacedID)"Vanilla::testlaunchsite" ), launchSite.transform, Vector3.zero, Quaternion.identity );
             launchSite.RootPart = root.transform;
 
             _vessel = CreateVessel( launchSite );
@@ -223,7 +223,8 @@ namespace HSP._DevUtils
             {
                 CreateVessel( launchSite );
             }
-            if( UnityEngine.Input.GetKeyDown( KeyCode.F1 ) )
+            // disabled to prevent accidental overwrite with data that needs to be edited manually (unity can't serialize everything we need)
+            /*if( UnityEngine.Input.GetKeyDown( KeyCode.F1 ) )
             {
                 JsonSerializedDataHandler handler;
 
@@ -242,7 +243,7 @@ namespace HSP._DevUtils
                 vm.SaveToDisk();
                 var data = SerializationUnit.Serialize( ActiveVesselManager.ActiveObject.GetVessel().RootPart.gameObject );
                 handler = new JsonSerializedDataHandler( partDir + "/gameobjects.json" );
-                handler.Write( data );
+                //handler.Write( data );
 
                 PartMetadata pm;
 
@@ -257,7 +258,7 @@ namespace HSP._DevUtils
                 pm.SaveToDisk();
                 data = SerializationUnit.Serialize( AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/engine" ) );
                 handler = new JsonSerializedDataHandler( partDir + "/gameobjects.json" );
-                handler.Write( data );
+                //handler.Write( data );
 
 
                 partDir = gameDataPath + "/Vanilla/Parts/intertank";
@@ -271,7 +272,7 @@ namespace HSP._DevUtils
                 pm.SaveToDisk();
                 data = SerializationUnit.Serialize( AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/intertank" ) );
                 handler = new JsonSerializedDataHandler( partDir + "/gameobjects.json" );
-                handler.Write( data );
+                //handler.Write( data );
 
                 partDir = gameDataPath + "/Vanilla/Parts/tank";
                 Directory.CreateDirectory( partDir );
@@ -284,8 +285,7 @@ namespace HSP._DevUtils
                 pm.SaveToDisk();
                 data = SerializationUnit.Serialize( AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/tank" ) );
                 handler = new JsonSerializedDataHandler( partDir + "/gameobjects.json" );
-                handler.Write( data );
-
+                //handler.Write( data );
 
                 partDir = gameDataPath + "/Vanilla/Parts/tank_long";
                 Directory.CreateDirectory( partDir );
@@ -298,7 +298,7 @@ namespace HSP._DevUtils
                 pm.SaveToDisk();
                 data = SerializationUnit.Serialize( AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/tank_long" ) );
                 handler = new JsonSerializedDataHandler( partDir + "/gameobjects.json" );
-                handler.Write( data );
+                //handler.Write( data );
 
                 partDir = gameDataPath + "/Vanilla/Parts/capsule";
                 Directory.CreateDirectory( partDir );
@@ -311,36 +311,43 @@ namespace HSP._DevUtils
                 pm.SaveToDisk();
                 data = SerializationUnit.Serialize( AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/capsule" ) );
                 handler = new JsonSerializedDataHandler( partDir + "/gameobjects.json" );
-                handler.Write( data );
-            }
+                //handler.Write( data );
+
+                partDir = gameDataPath + "/Vanilla/Parts/testlaunchsite";
+                Directory.CreateDirectory( partDir );
+                pm = new PartMetadata( partDir )
+                {
+                    Name = "Test Launch Site",
+                    Author = "Katniss",
+                    Categories = new string[] { }
+                };
+                pm.SaveToDisk();
+                data = SerializationUnit.Serialize( AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/testlaunchsite" ) );
+                handler = new JsonSerializedDataHandler( partDir + "/gameobjects.json" );
+                //handler.Write( data );
+            }*/
         }
 
-        private static GameObject InstantiateLocal( GameObject original, Transform parent, Vector3 pos, Quaternion rot )
+        private static GameObject DontInstantiateLocal( GameObject original, Transform parent, Vector3 pos, Quaternion rot )
         {
-            GameObject go = Instantiate( original, parent );
-            go.transform.localPosition = pos;
-            go.transform.localRotation = rot;
-            return go;
+            original.transform.SetParent( parent, false );
+            original.transform.localPosition = pos;
+            original.transform.localRotation = rot;
+            return original;
         }
 
         private static Vessel CreateDummyVessel( Vector3Dbl airfPosition, QuaternionDbl rotation )
         {
-            GameObject capsulePrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/capsule" );
-            GameObject intertankPrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/intertank" );
-            GameObject tankPrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/tank" );
-            GameObject tankLongPrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/tank_long" );
-            GameObject enginePrefab = AssetRegistry.Get<GameObject>( "builtin::Resources/Prefabs/Parts/engine" );
-
             Vessel v = VesselFactory.CreatePartless( airfPosition, rotation, Vector3Dbl.zero, Vector3Dbl.zero );
-            Transform root = InstantiateLocal( intertankPrefab, v.transform, Vector3.zero, Quaternion.identity ).transform;
+            Transform root = DontInstantiateLocal( PartRegistry.Load( (NamespacedID)"Vanilla::intertank" ), v.transform, Vector3.zero, Quaternion.identity ).transform;
 
-            Transform tankP = InstantiateLocal( tankPrefab, root, new Vector3( 0, -1.625f, 0 ), Quaternion.identity ).transform;
-            Transform tankL1 = InstantiateLocal( tankLongPrefab, root, new Vector3( 0, 2.625f, 0 ), Quaternion.identity ).transform;
-            Transform capsule = InstantiateLocal( capsulePrefab, tankL1, new Vector3( 0, 2.625f, 0 ), Quaternion.identity ).transform;
-            Transform t1 = InstantiateLocal( tankLongPrefab, root, new Vector3( 20, 2.625f, 0 ), Quaternion.identity ).transform;
-            Transform t2 = InstantiateLocal( tankLongPrefab, root, new Vector3( -20, 2.625f, 0 ), Quaternion.identity ).transform;
-            Transform engineP1 = InstantiateLocal( enginePrefab, tankP, new Vector3( 2, -3.45533f, 0 ), Quaternion.identity ).transform;
-            Transform engineP2 = InstantiateLocal( enginePrefab, tankP, new Vector3( -2, -3.45533f, 0 ), Quaternion.identity ).transform;
+            Transform tankP = DontInstantiateLocal( PartRegistry.Load( (NamespacedID)"Vanilla::tank" ), root, new Vector3( 0, -1.625f, 0 ), Quaternion.identity ).transform;
+            Transform tankL1 = DontInstantiateLocal( PartRegistry.Load( (NamespacedID)"Vanilla::tank_long" ), root, new Vector3( 0, 2.625f, 0 ), Quaternion.identity ).transform;
+            Transform capsule = DontInstantiateLocal( PartRegistry.Load( (NamespacedID)"Vanilla::capsule" ), tankL1, new Vector3( 0, 2.625f, 0 ), Quaternion.identity ).transform;
+            Transform t1 = DontInstantiateLocal( PartRegistry.Load( (NamespacedID)"Vanilla::tank_long" ), root, new Vector3( 20, 2.625f, 0 ), Quaternion.identity ).transform;
+            Transform t2 = DontInstantiateLocal( PartRegistry.Load( (NamespacedID)"Vanilla::tank_long" ), root, new Vector3( -20, 2.625f, 0 ), Quaternion.identity ).transform;
+            Transform engineP1 = DontInstantiateLocal( PartRegistry.Load( (NamespacedID)"Vanilla::engine" ), tankP, new Vector3( 2, -3.45533f, 0 ), Quaternion.identity ).transform;
+            Transform engineP2 = DontInstantiateLocal( PartRegistry.Load( (NamespacedID)"Vanilla::engine" ), tankP, new Vector3( -2, -3.45533f, 0 ), Quaternion.identity ).transform;
             // Transform engineP1 = InstantiateLocal( enginePrefab, tankP, new Vector3( 0, -3.45533f, 0 ), Quaternion.identity ).transform;
             // Transform engineP2 = InstantiateLocal( enginePrefab, tankP, new Vector3( 0, 0, 0 ), Quaternion.identity ).transform;
             v.RootPart = root;

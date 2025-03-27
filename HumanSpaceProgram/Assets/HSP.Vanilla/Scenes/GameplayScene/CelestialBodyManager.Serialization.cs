@@ -29,7 +29,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene
             }
         }
 
-        /*[HSPEventListener( HSPEvent_ON_TIMELINE_LOAD.ID, DESERIALIZE_CELESTIAL_BODIES )]
+        [HSPEventListener( HSPEvent_ON_TIMELINE_LOAD.ID, DESERIALIZE_CELESTIAL_BODIES )]
         private static void DeserializeCelestialBodies( TimelineManager.LoadEventData e )
         {
             string path = Path.Combine( e.save.GetRootDirectory(), "CelestialBodies" );
@@ -45,7 +45,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene
             }
         }
 
-        [HSPEventListener( HSPEvent_ON_TIMELINE_NEW.ID, DESERIALIZE_CELESTIAL_BODIES )]
+        /*[HSPEventListener( HSPEvent_ON_TIMELINE_NEW.ID, DESERIALIZE_CELESTIAL_BODIES )]
         private static void DeserializeScenarioCelestialBodies( TimelineManager.StartNewEventData e )
         {
             string path = Path.Combine( e.scenario.GetRootDirectory(), "CelestialBodies" );

@@ -1,1 +1,525 @@
-﻿{"$type":"UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"d0ef883c-0d2f-486b-b632-cd64a12b3a0f","is_active":true,"is_static":false,"layer":20,"name":"capsule","tag":"Untagged","children":{"$type":"UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"0dfba435-5787-48aa-a352-addb01aa2f92","value":[{"$type":"UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"ea991e81-3cad-40cb-bffb-ab13e7744456","is_active":true,"is_static":false,"layer":20,"name":"mesh","tag":"Untagged","children":{"$type":"UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"3ace3371-d1d4-43cb-b14d-cbad93f5b50b","value":[]},"components":{"$type":"UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"4c010985-e63f-45b4-8e37-c771b23b5425","value":[{"$type":"UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"a2d3e309-e9e5-419c-bc76-e8ec1c5ace2d","local_position":[0,0,0],"local_rotation":[0,0,0,1],"local_scale":[1,1,1]},{"$type":"UnityEngine.MeshFilter, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"b39f6d1c-0e85-4c11-8ec6-7c07e8a61e0c","shared_mesh":{"$assetref":"builtin::Resources/gemini_capsule"}},{"$type":"UnityEngine.MeshRenderer, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"27fbadc1-0ba7-4839-81c9-871d256b5bcf","is_enabled":true,"shared_materials":{"$type":"UnityEngine.Material[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"f177dcbc-5949-4de6-9872-13126b8c12e7","value":[{"$assetref":"builtin::Resources/New Material 1"}]},"shadow_casting_mode":"On","receive_shadows":true}]}},{"$type":"UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"6cd61bba-e337-4811-a509-d326ebeb9290","is_active":true,"is_static":false,"layer":20,"name":"NODE","tag":"Untagged","children":{"$type":"UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"3ace3371-d1d4-43cb-b14d-cbad93f5b50b","value":[]},"components":{"$type":"UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"9a784df4-47d2-4070-b7e4-744dd4e625e5","value":[{"$type":"UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"297f88c9-9dc7-431d-b037-7dc22ccf3159","local_position":[0,1,0],"local_rotation":[-0.707106828689575,0,0,0.707106828689575],"local_scale":[1,1,1]},{"$type":"HSP.Vanilla.Components.FAttachNode, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"ebfc8c08-135b-4a0a-9ecd-0337f146d3be","is_enabled":true,"range":2}]}},{"$type":"UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"6a52110a-7187-40b1-bc39-d407373d3ad9","is_active":true,"is_static":false,"layer":20,"name":"NODE","tag":"Untagged","children":{"$type":"UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"3ace3371-d1d4-43cb-b14d-cbad93f5b50b","value":[]},"components":{"$type":"UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"91ab5950-b3a8-4f87-a367-cf9a53beb7db","value":[{"$type":"UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"a71df9d5-fe6f-4652-9c5b-8c6fe77924f3","local_position":[0,-1,0],"local_rotation":[0,0.707106828689575,-0.707106828689575,0],"local_scale":[1,1,1]},{"$type":"HSP.Vanilla.Components.FAttachNode, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"886aa86b-a5e7-41d7-9872-f374f94cdf8f","is_enabled":true,"range":2}]}},{"$type":"UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"a644b680-7631-4f29-93a6-8fc54ffefdb4","is_active":true,"is_static":false,"layer":20,"name":"controlFrameTransform","tag":"Untagged","children":{"$type":"UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"3ace3371-d1d4-43cb-b14d-cbad93f5b50b","value":[]},"components":{"$type":"UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"cec989f7-c25b-4e0a-909d-aeb1a6f767d7","value":[{"$type":"UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"f808c10c-bba3-46a9-9c5e-b0d6770272a7","local_position":[0,0,0],"local_rotation":[0,0.707106828689575,0.707106828689575,0],"local_scale":[1,1,1]}]}},{"$type":"UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"34ac3a61-1f2d-4eec-8d81-4ddd2740940d","is_active":true,"is_static":false,"layer":20,"name":"mesh (1)","tag":"Untagged","children":{"$type":"UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"3ace3371-d1d4-43cb-b14d-cbad93f5b50b","value":[]},"components":{"$type":"UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"ddd7e1ce-c3f4-44e2-88b9-3bb6cc0b73c8","value":[{"$type":"UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"65ed78b1-1f96-43c1-9b1a-48c2ed058514","local_position":[0,0,0],"local_rotation":[0,0,0,1],"local_scale":[1,1,1]},{"$type":"UnityEngine.MeshFilter, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"fad40c2b-cc70-4406-bd03-01c64f78507c","shared_mesh":{"$assetref":"builtin::Resources/Meshes/translate_handle_1d"}},{"$type":"UnityEngine.MeshRenderer, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"679a6e9e-51d6-4963-bec9-8add306cd992","is_enabled":true,"shared_materials":{"$type":"UnityEngine.Material[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"94fff535-b241-486d-9564-a596a0149126","value":[{"$assetref":"builtin::HSP._DevUtils/axis_z"}]},"shadow_casting_mode":"On","receive_shadows":true}]}},{"$type":"UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"4723cd42-b1e3-48d0-8e33-9249b676ec72","is_active":true,"is_static":false,"layer":20,"name":"mesh (2)","tag":"Untagged","children":{"$type":"UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"3ace3371-d1d4-43cb-b14d-cbad93f5b50b","value":[]},"components":{"$type":"UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"3d7ef686-7bda-4e5a-9b69-7a22732a7817","value":[{"$type":"UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"68eecbb8-b8f6-402d-bd48-ede0fd3b4e21","local_position":[0,0,0],"local_rotation":[0,0.707106828689575,0,0.707106828689575],"local_scale":[1,1,1]},{"$type":"UnityEngine.MeshFilter, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"587b7a6c-9c4d-4f74-a752-1bffd5a1420a","shared_mesh":{"$assetref":"builtin::Resources/Meshes/translate_handle_1d"}},{"$type":"UnityEngine.MeshRenderer, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"0152ddc8-8eff-4355-bf42-cec457490888","is_enabled":true,"shared_materials":{"$type":"UnityEngine.Material[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"7e2e35cd-cd8e-46f5-b972-ccdec9992a75","value":[{"$assetref":"builtin::HSP._DevUtils/axis_x"}]},"shadow_casting_mode":"On","receive_shadows":true}]}},{"$type":"UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"842a29f1-5a9e-4b8b-8331-485207c1fb62","is_active":true,"is_static":false,"layer":20,"name":"mesh (3)","tag":"Untagged","children":{"$type":"UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"3ace3371-d1d4-43cb-b14d-cbad93f5b50b","value":[]},"components":{"$type":"UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"7c6f3b10-9c84-4883-be82-b67b27226be0","value":[{"$type":"UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"f5e135ae-f9f2-4ee0-8a1a-fcd69123c6a6","local_position":[0,0,0],"local_rotation":[-0.707106828689575,0,0,0.707106828689575],"local_scale":[1,1,1]},{"$type":"UnityEngine.MeshFilter, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"8ccf0bdd-0ff2-4862-86d7-7aec1467f2b0","shared_mesh":{"$assetref":"builtin::Resources/Meshes/translate_handle_1d"}},{"$type":"UnityEngine.MeshRenderer, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"9261288e-0a53-478d-8760-0680f2d791d1","is_enabled":true,"shared_materials":{"$type":"UnityEngine.Material[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"ad6badf2-c55e-4886-8210-97ad7b128654","value":[{"$assetref":"builtin::HSP._DevUtils/axis_y"}]},"shadow_casting_mode":"On","receive_shadows":true}]}}]},"components":{"$type":"UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"424e8ca1-f0da-4a42-822e-7ce0337d6090","value":[{"$type":"UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"68b0a66a-c12e-4377-94fa-36b24c30fc90","local_position":[0,0,0],"local_rotation":[0,0,0,1],"local_scale":[1,1,1]},{"$type":"UnityEngine.BoxCollider, UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"1d16ba51-47a0-40f2-bc7b-15ead7f2e9a6","is_enabled":true,"is_trigger":false,"size":[2,3,2],"center":[0,0,0]},{"$type":"HSP.Vanilla.Components.FPointMass, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"7a71b229-308d-44c1-8917-3b38bb1ffc22","is_enabled":true,"mass":200,"on_after_mass_changed":null},{"$type":"HSP.Vessels.Components.FPart, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"b110e28c-a3b4-4d9e-86b8-0c53bdce5568","is_enabled":true,"part_id":"Vanilla::capsule"},{"$type":"HSP.Vessels.Construction.FConstructible, HSP.Vessels.Construction, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"99cb1cda-60e5-44ce-9239-ee142a6767bb","is_enabled":true,"max_build_points":90,"build_points":90,"cached_data":null},{"$type":"HSP.Vanilla.Components.FPlayerInputAvionics, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"cf343e43-2090-44c5-b0a6-5a28d92dbd73","is_enabled":true,"control_frame":null,"on_set_throttle":{"transform":null},"on_set_attitude":{"transform":null},"on_set_translation":{"transform":null}},{"$type":"HSP.Vanilla.Components.FGimbalActuatorController, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"ee3f7a5c-ba00-4f84-a2ba-0fb0630ce5c4","is_enabled":true,"actuators_2d":{"$type":"HSP.Vanilla.Components.FGimbalActuatorController+Actuator2DGroup[], HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"20915007-6e22-438c-a7c4-8e3cd9960c20","value":[null,null,null,null,null]},"set_attitude":null},{"$type":"HSP.Vanilla.Components.FAttitudeAvionics, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"d845248d-e6b0-4e37-a943-bfd97e5d8f61","is_enabled":true,"on_set_attitude":{"transform":null}},{"$type":"HSP.Vanilla.Components.FSequencer, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"f22fc7aa-9016-4f6f-9183-acd92525808e","is_enabled":true,"sequence":{"$type":"HSP.Vanilla.Components.Sequence, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"c1e17071-6392-4abd-a24c-7b0ea63863e1","elements":{"$type":"System.Collections.Generic.List`1[[HSP.Vanilla.Components.SequenceElement, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089","$id":"9dd92173-a74e-4aae-9f55-f5454d80a3cf","value":[]},"current":0}},{"$type":"HSP.Vanilla.Components.FControlFrame, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"0cf2129f-9145-49fe-8bbd-f76ba66bafc2","is_enabled":true,"reference_transform":{"$ref":"f808c10c-bba3-46a9-9c5e-b0d6770272a7"}}]}}
+﻿{
+    "$type": "UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+    "$id": "7bdc7ead-02c0-410c-b3c6-e7b0e8e7aa76",
+    "is_active": true,
+    "is_static": false,
+    "layer": 20,
+    "name": "capsule",
+    "tag": "Untagged",
+    "children": {
+        "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+        "$id": "56612866-732e-464c-9483-59af345709a5",
+        "value": [
+            {
+                "$type": "UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "66952cd9-97bc-4869-a1f6-dda57c4db565",
+                "is_active": true,
+                "is_static": false,
+                "layer": 20,
+                "name": "mesh",
+                "tag": "Untagged",
+                "children": {
+                    "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "f073594b-3a5d-45a1-9502-8f80634f9695",
+                    "value": []
+                },
+                "components": {
+                    "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "486cca1e-15c7-49e7-b2a6-3937a5197a3c",
+                    "value": [
+                        {
+                            "$type": "UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                            "$id": "c7977efa-4321-45af-ab22-2bfe839d53fc",
+                            "local_position": [
+                                0,
+                                0,
+                                0
+                            ],
+                            "local_rotation": [
+                                0,
+                                0,
+                                0,
+                                1
+                            ],
+                            "local_scale": [
+                                1,
+                                1,
+                                1
+                            ]
+                        },
+                        {
+                            "$type": "UnityEngine.MeshFilter, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                            "$id": "ee9756be-efc7-43b5-81e2-4057c182c3ce",
+                            "shared_mesh": {
+                                "$assetref": "builtin::Resources/gemini_capsule"
+                            }
+                        },
+                        {
+                            "$type": "UnityEngine.MeshRenderer, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                            "$id": "31615664-b148-4097-ab80-43c20b0e7f52",
+                            "is_enabled": true,
+                            "shared_materials": {
+                                "$type": "UnityEngine.Material[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                "$id": "a6f31712-eff7-4ec2-977d-951849234d5d",
+                                "value": [
+                                    {
+                                        "$assetref": "builtin::Resources/New Material 1"
+                                    }
+                                ]
+                            },
+                            "shadow_casting_mode": "On",
+                            "receive_shadows": true
+                        }
+                    ]
+                }
+            },
+            {
+                "$type": "UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "224082de-8b02-4201-b7a5-32b949ca725f",
+                "is_active": true,
+                "is_static": false,
+                "layer": 20,
+                "name": "NODE",
+                "tag": "Untagged",
+                "children": {
+                    "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "f073594b-3a5d-45a1-9502-8f80634f9695",
+                    "value": []
+                },
+                "components": {
+                    "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "fde8e942-84ab-4777-bf8f-048c0e12058f",
+                    "value": [
+                        {
+                            "$type": "UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                            "$id": "7ed8cf52-3eef-4a9c-a419-48dd1fccbea8",
+                            "local_position": [
+                                0,
+                                1,
+                                0
+                            ],
+                            "local_rotation": [
+                                -0.707106828689575,
+                                0,
+                                0,
+                                0.707106828689575
+                            ],
+                            "local_scale": [
+                                1,
+                                1,
+                                1
+                            ]
+                        },
+                        {
+                            "$type": "HSP.Vanilla.Components.FAttachNode, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                            "$id": "873be4ae-e0f2-4e62-bd65-8837bffe6afc",
+                            "is_enabled": true,
+                            "range": 2
+                        }
+                    ]
+                }
+            },
+            {
+                "$type": "UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "f9d6047a-e67e-4900-b045-dcd89af143f3",
+                "is_active": true,
+                "is_static": false,
+                "layer": 20,
+                "name": "NODE",
+                "tag": "Untagged",
+                "children": {
+                    "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "f073594b-3a5d-45a1-9502-8f80634f9695",
+                    "value": []
+                },
+                "components": {
+                    "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "92ac180f-b9f5-49b1-b6bf-f2ca82d326f8",
+                    "value": [
+                        {
+                            "$type": "UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                            "$id": "df469827-18a7-479b-b814-24139cab2100",
+                            "local_position": [
+                                0,
+                                -1,
+                                0
+                            ],
+                            "local_rotation": [
+                                0,
+                                0.707106828689575,
+                                -0.707106828689575,
+                                0
+                            ],
+                            "local_scale": [
+                                1,
+                                1,
+                                1
+                            ]
+                        },
+                        {
+                            "$type": "HSP.Vanilla.Components.FAttachNode, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                            "$id": "4dcf129a-fb7a-4450-934e-d57f2719a55c",
+                            "is_enabled": true,
+                            "range": 2
+                        }
+                    ]
+                }
+            },
+            {
+                "$type": "UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "d166958a-aadc-4820-a051-b06ed35113bd",
+                "is_active": true,
+                "is_static": false,
+                "layer": 20,
+                "name": "controlFrameTransform",
+                "tag": "Untagged",
+                "children": {
+                    "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "f073594b-3a5d-45a1-9502-8f80634f9695",
+                    "value": []
+                },
+                "components": {
+                    "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "4ea4817d-8cb0-4020-b16d-6736ff0bd4da",
+                    "value": [
+                        {
+                            "$type": "UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                            "$id": "2eac4651-a14a-46f6-a9cc-3c7d15b34e3b",
+                            "local_position": [
+                                0,
+                                0,
+                                0
+                            ],
+                            "local_rotation": [
+                                0,
+                                0.707106828689575,
+                                0.707106828689575,
+                                0
+                            ],
+                            "local_scale": [
+                                1,
+                                1,
+                                1
+                            ]
+                        }
+                    ]
+                }
+            },
+            {
+                "$type": "UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "017dfb58-0774-47a6-9423-2346a55e5c65",
+                "is_active": true,
+                "is_static": false,
+                "layer": 20,
+                "name": "mesh (1)",
+                "tag": "Untagged",
+                "children": {
+                    "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "f073594b-3a5d-45a1-9502-8f80634f9695",
+                    "value": []
+                },
+                "components": {
+                    "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "12928e5d-e430-4032-b50d-c91874367813",
+                    "value": [
+                        {
+                            "$type": "UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                            "$id": "507b10f9-f991-4233-bc73-cf3225286c67",
+                            "local_position": [
+                                0,
+                                0,
+                                0
+                            ],
+                            "local_rotation": [
+                                0,
+                                0,
+                                0,
+                                1
+                            ],
+                            "local_scale": [
+                                1,
+                                1,
+                                1
+                            ]
+                        },
+                        {
+                            "$type": "UnityEngine.MeshFilter, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                            "$id": "e77d4946-06cf-422f-a935-b0692f43f158",
+                            "shared_mesh": {
+                                "$assetref": "builtin::Resources/Meshes/translate_handle_1d"
+                            }
+                        },
+                        {
+                            "$type": "UnityEngine.MeshRenderer, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                            "$id": "9897d3a5-7577-4a71-97ed-c52fa0a52a05",
+                            "is_enabled": true,
+                            "shared_materials": {
+                                "$type": "UnityEngine.Material[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                "$id": "b38363cf-6683-4b58-833a-db14a4ba76b0",
+                                "value": [
+                                    {
+                                        "$assetref": "builtin::HSP._DevUtils/axis_z"
+                                    }
+                                ]
+                            },
+                            "shadow_casting_mode": "On",
+                            "receive_shadows": true
+                        }
+                    ]
+                }
+            },
+            {
+                "$type": "UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "c35b7d16-5269-4309-bbd5-90e49d0e2d8a",
+                "is_active": true,
+                "is_static": false,
+                "layer": 20,
+                "name": "mesh (2)",
+                "tag": "Untagged",
+                "children": {
+                    "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "f073594b-3a5d-45a1-9502-8f80634f9695",
+                    "value": []
+                },
+                "components": {
+                    "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "ccdde809-ee69-485d-ba34-f80e03cf8847",
+                    "value": [
+                        {
+                            "$type": "UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                            "$id": "4e46e9c2-ba2e-4751-9f27-26d57b19d9fc",
+                            "local_position": [
+                                0,
+                                0,
+                                0
+                            ],
+                            "local_rotation": [
+                                0,
+                                0.707106828689575,
+                                0,
+                                0.707106828689575
+                            ],
+                            "local_scale": [
+                                1,
+                                1,
+                                1
+                            ]
+                        },
+                        {
+                            "$type": "UnityEngine.MeshFilter, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                            "$id": "3f4e0c74-afeb-45a2-951e-e8c28f35a1e0",
+                            "shared_mesh": {
+                                "$assetref": "builtin::Resources/Meshes/translate_handle_1d"
+                            }
+                        },
+                        {
+                            "$type": "UnityEngine.MeshRenderer, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                            "$id": "1119ab77-4e5d-4349-9f1a-7ac171c937af",
+                            "is_enabled": true,
+                            "shared_materials": {
+                                "$type": "UnityEngine.Material[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                "$id": "9c4012ea-962b-4da5-8463-d959bddd568b",
+                                "value": [
+                                    {
+                                        "$assetref": "builtin::HSP._DevUtils/axis_x"
+                                    }
+                                ]
+                            },
+                            "shadow_casting_mode": "On",
+                            "receive_shadows": true
+                        }
+                    ]
+                }
+            },
+            {
+                "$type": "UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "c7def539-ee05-4194-8081-0a8bb072e016",
+                "is_active": true,
+                "is_static": false,
+                "layer": 20,
+                "name": "mesh (3)",
+                "tag": "Untagged",
+                "children": {
+                    "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "f073594b-3a5d-45a1-9502-8f80634f9695",
+                    "value": []
+                },
+                "components": {
+                    "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "30e2f5f9-692a-4f3f-88b7-6e157e565dfc",
+                    "value": [
+                        {
+                            "$type": "UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                            "$id": "d2c99715-1047-443c-ab61-8e8fbdd22962",
+                            "local_position": [
+                                0,
+                                0,
+                                0
+                            ],
+                            "local_rotation": [
+                                -0.707106828689575,
+                                0,
+                                0,
+                                0.707106828689575
+                            ],
+                            "local_scale": [
+                                1,
+                                1,
+                                1
+                            ]
+                        },
+                        {
+                            "$type": "UnityEngine.MeshFilter, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                            "$id": "3d4e6374-49fa-4f35-b7ad-49163911e8d1",
+                            "shared_mesh": {
+                                "$assetref": "builtin::Resources/Meshes/translate_handle_1d"
+                            }
+                        },
+                        {
+                            "$type": "UnityEngine.MeshRenderer, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                            "$id": "8313b666-d7c2-426a-93bd-db7b885e8be1",
+                            "is_enabled": true,
+                            "shared_materials": {
+                                "$type": "UnityEngine.Material[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                "$id": "706520d5-cc50-4866-b94a-1682a7a0f6d4",
+                                "value": [
+                                    {
+                                        "$assetref": "builtin::HSP._DevUtils/axis_y"
+                                    }
+                                ]
+                            },
+                            "shadow_casting_mode": "On",
+                            "receive_shadows": true
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "components": {
+        "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+        "$id": "6826fe44-7ca2-4ecd-946c-22d43f458e8f",
+        "value": [
+            {
+                "$type": "UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "93f6c2b3-4556-474a-8727-63e808b6118a",
+                "local_position": [
+                    0,
+                    0,
+                    0
+                ],
+                "local_rotation": [
+                    0,
+                    0,
+                    0,
+                    1
+                ],
+                "local_scale": [
+                    1,
+                    1,
+                    1
+                ]
+            },
+            {
+                "$type": "UnityEngine.BoxCollider, UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "f2503466-bd23-4d80-a773-6452cadca4be",
+                "is_enabled": true,
+                "is_trigger": false,
+                "size": [
+                    2,
+                    3,
+                    2
+                ],
+                "center": [
+                    0,
+                    0,
+                    0
+                ]
+            },
+            {
+                "$type": "HSP.Vanilla.Components.FPointMass, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "98d84bc3-50cf-46cc-b52c-014ab3f68d3b",
+                "is_enabled": true,
+                "mass": 200,
+                "on_after_mass_changed": null
+            },
+            {
+                "$type": "HSP.Vessels.Components.FPart, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "8d748a25-c47a-421a-a63e-37cba100dfd3",
+                "is_enabled": true,
+                "part_id": "Vanilla::capsule"
+            },
+            {
+                "$type": "HSP.Vessels.Construction.FConstructible, HSP.Vessels.Construction, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "82e179df-0f40-4b85-b85b-3228e1cf3059",
+                "is_enabled": true,
+                "max_build_points": 90,
+                "build_points": 90,
+                "cached_data": null
+            },
+            {
+                "$type": "HSP.Vanilla.Components.FPlayerInputAvionics, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "46d33303-c5f5-4cf6-a048-c94834f8c264",
+                "is_enabled": true,
+                "control_frame": null,
+                "on_set_throttle": {
+                    "transform": null
+                },
+                "on_set_attitude": {
+                    "transform": null
+                },
+                "on_set_translation": {
+                    "transform": null
+                }
+            },
+            {
+                "$type": "HSP.Vanilla.Components.FGimbalActuatorController, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "ef753137-fc1e-4239-b64e-ddb56e2ca61a",
+                "is_enabled": true,
+                "actuators_2d": {
+                    "$type": "HSP.Vanilla.Components.FGimbalActuatorController+Actuator2DGroup[], HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "02207c96-3fe8-4f81-8e44-4b63ea9c8cac",
+                    "value": [
+                        null,
+                        null,
+                        null,
+                        null,
+                        null
+                    ]
+                },
+                "set_attitude": null
+            },
+            {
+                "$type": "HSP.Vanilla.Components.FAttitudeAvionics, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "c9a35d3d-edca-431d-aaea-195dccfb1203",
+                "is_enabled": true,
+                "on_set_attitude": {
+                    "transform": null
+                }
+            },
+            {
+                "$type": "HSP.Vanilla.Components.FSequencer, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "d84e8031-2c30-4090-8733-86e8142b6e24",
+                "is_enabled": true,
+                "sequence": {
+                    "$type": "HSP.Vanilla.Components.Sequence, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "c1ba831e-4dea-4534-8671-59af6a55d584",
+                    "elements": {
+                        "$type": "System.Collections.Generic.List`1[[HSP.Vanilla.Components.SequenceElement, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
+                        "$id": "ea3ceaea-622b-450a-bcc5-f6d2f784ea94",
+                        "value": []
+                    },
+                    "current": 0
+                }
+            },
+            {
+                "$type": "HSP.Vanilla.Components.FControlFrame, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "dd28ea6b-fed1-4324-b5be-3271821f3b35",
+                "is_enabled": true,
+                "reference_transform": {
+                    "$ref": "2eac4651-a14a-46f6-a9cc-3c7d15b34e3b"
+                }
+            }
+        ]
+    }
+}

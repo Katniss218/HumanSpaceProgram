@@ -120,6 +120,11 @@ namespace HSP.Content
             return path;
         }
 
+        public static explicit operator NamespacedID( string str )
+        {
+            return NamespacedID.Parse( str );
+        }
+
         [MapsInheritingFrom( typeof( NamespacedID ) )]
         public static SerializationMapping NamespacedIdentifierMapping()
         {

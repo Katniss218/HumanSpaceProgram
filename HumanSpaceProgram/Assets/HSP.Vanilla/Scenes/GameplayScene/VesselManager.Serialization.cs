@@ -45,7 +45,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene
             }
         }
 
-        [HSPEventListener( HSPEvent_ON_TIMELINE_NEW.ID, DESERIALIZE_VESSELS )]
+        /*[HSPEventListener( HSPEvent_ON_TIMELINE_NEW.ID, DESERIALIZE_VESSELS )]
         private static void DeserializeScenarioVessels( TimelineManager.StartNewEventData e )
         {
             string path = Path.Combine( e.scenario.GetRootDirectory(), "Vessels" );
@@ -59,6 +59,6 @@ namespace HSP.Vanilla.Scenes.GameplayScene
                 var data = _vesselsDataHandler.Read();
                 var go = SerializationUnit.Deserialize<GameObject>( data, TimelineManager.RefStore );
             }
-        }
+        }*/
     }
 }

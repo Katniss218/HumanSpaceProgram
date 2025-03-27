@@ -70,7 +70,16 @@ namespace HSP.Vanilla
         //
 
         bool _isSceneSpace;
-        Rigidbody _rb;
+        Rigidbody ___rb;
+        Rigidbody _rb
+        {
+            get
+            {
+                if( ___rb == null )
+                    ___rb = this.GetComponent<Rigidbody>();
+                return ___rb;
+            }
+        }
 
         public Vector3 Position
         {
@@ -354,8 +363,6 @@ namespace HSP.Vanilla
                 Destroy( this );
                 return;
             }
-
-            _rb = this.GetComponent<Rigidbody>();
 
             _rb.useGravity = false;
             _rb.collisionDetectionMode = CollisionDetectionMode.Discrete; // Continuous (in any of its flavors) "jumps" when sitting on top of something when reference frame switches.
