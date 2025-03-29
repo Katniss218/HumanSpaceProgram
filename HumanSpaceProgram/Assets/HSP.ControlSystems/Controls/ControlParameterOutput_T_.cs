@@ -81,6 +81,9 @@ namespace HSP.ControlSystems.Controls
 
                     foreach( var c in value )
                     {
+                        if( c == null )
+                            continue;
+
                         ControlParameterInput<T>.Connect( c, o );
                     }
                 } );

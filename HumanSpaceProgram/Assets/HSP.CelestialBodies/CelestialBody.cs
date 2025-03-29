@@ -98,13 +98,15 @@ namespace HSP.CelestialBodies
             }
             HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_CELESTIAL_BODY_DESTROYED.ID, this );
         }
-
+         
         [MapsInheritingFrom( typeof( CelestialBody ) )]
         public static SerializationMapping CelestialBodyMapping()
         {
             return new MemberwiseSerializationMapping<CelestialBody>()
-            {
-            };
+                .WithMember( "id", o => o.ID )
+                .WithMember( "display_name", o => o.DisplayName )
+                .WithMember( "mass", o => o.Mass )
+                .WithMember( "radius", o => o.Radius );
         }
     }
 }

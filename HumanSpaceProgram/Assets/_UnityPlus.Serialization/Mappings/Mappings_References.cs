@@ -8,7 +8,7 @@ namespace UnityPlus.Serialization.Mappings
         [MapsAnyClass( Context = ObjectContext.Ref )]
         public static SerializationMapping ObjectRefMapping<T>() where T : class
         {
-            return new PrimitiveSerializationMapping<T>( skipHeader: true )
+            return new PrimitiveSerializationMapping<T>( skipHeader: ObjectHeaderSkipMode.Always )
             {
                 OnSave = ( o, s ) => s.RefMap.WriteObjectReference<T>( o ),
                 OnLoad = ( data, l ) =>

@@ -149,7 +149,7 @@ namespace HSP.Vanilla
             get
             {
                 if( _isSceneSpace )
-                    return SceneReferenceFrameManager.ReferenceFrame.TransformRotation( _rb.rotation );
+                    return SceneReferenceFrameManager.ReferenceFrame.TransformRotation( this.gameObject.activeInHierarchy ? _rb.rotation : transform.rotation ); // Apparently, rigidbody.rotation gets set to identity when disabled...
                 else
                     return _actualAbsoluteRotation;
             }
@@ -542,10 +542,14 @@ namespace HSP.Vanilla
         }
 
         [MapsInheritingFrom( typeof( HybridReferenceFrameTransform ) )]
-        public static SerializationMapping FreePhysicsObjectMapping()
+        public static SerializationMapping HybridReferenceFrameTransformMapping()
         {
             return new MemberwiseSerializationMapping<HybridReferenceFrameTransform>()
-                .WithMember( "allow_scene_simulation", o => o.AllowSceneSimulation )
+                //.WithMember( "allow_scene_simulation", o => o.AllowSceneSimulation )
+                .WithMember( "allow_scene_simulation", o =>
+                {
+                    return o.AllowSceneSimulation;
+                }, ( o, value ) => o.AllowSceneSimulation = value )
                 .WithMember( "position_range", o => o.PositionRange )
                 .WithMember( "velocity_range", o => o.VelocityRange )
                 .WithMember( "max_timescale", o => o.MaxTimeScale )
@@ -554,7 +558,10 @@ namespace HSP.Vanilla
                 .WithMember( "local_center_of_mass", o => o.LocalCenterOfMass )
 
                 .WithMember( "absolute_position", o => o.AbsolutePosition )
-                .WithMember( "absolute_rotation", o => o.AbsoluteRotation )
+                .WithMember( "absolute_rotation", o =>
+                {
+                    return o.AbsoluteRotation;
+                }, ( o, value ) => o.AbsoluteRotation = value )
                 .WithMember( "absolute_velocity", o => o.AbsoluteVelocity )
                 .WithMember( "absolute_angular_velocity", o => o.AbsoluteAngularVelocity );
         }

@@ -45,6 +45,7 @@ namespace HSP._DevUtils
         public Material Material;
 
         public GameObject TestLaunchSite;
+        public Rigidbody obj;
 
         public Texture2D heightmap;
         public RenderTexture normalmap;
@@ -221,6 +222,7 @@ namespace HSP._DevUtils
             }
             if( UnityEngine.Input.GetKeyDown( KeyCode.F5 ) )
             {
+                Debug.Log( "r: " + obj.rotation.x + " : " + obj.rotation.y + " : " + obj.rotation.z + " : " + obj.rotation.w );
                 CreateVessel( launchSite );
             }
             // disabled to prevent accidental overwrite with data that needs to be edited manually (unity can't serialize everything we need)

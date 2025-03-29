@@ -25,7 +25,7 @@ namespace HSP.Vanilla.Components
 
         void Awake()
         {
-            Separate = new ControlleeInput( SeparateListener );
+            Separate ??= new ControlleeInput( SeparateListener );
         }
 
         [MapsInheritingFrom( typeof( FVesselSeparator ) )]

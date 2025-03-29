@@ -62,10 +62,10 @@ namespace HSP.Vanilla.Components
 
         void Awake()
         {
-            GetReferenceTransform = new ControlParameterOutput<Transform>( GetTransform );
-            SetX = new ControlleeInput<float>( SetXListener );
-            SetY = new ControlleeInput<float>( SetYListener );
-            SetXY = new ControlleeInput<Vector2>( SetXYListener );
+            GetReferenceTransform ??= new ControlParameterOutput<Transform>( GetTransform );
+            SetX ??= new ControlleeInput<float>( SetXListener );
+            SetY ??= new ControlleeInput<float>( SetYListener );
+            SetXY ??= new ControlleeInput<Vector2>( SetXYListener );
         }
 
         void FixedUpdate()

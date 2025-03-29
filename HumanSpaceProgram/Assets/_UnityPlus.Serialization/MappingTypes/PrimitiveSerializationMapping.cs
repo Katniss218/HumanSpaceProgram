@@ -22,16 +22,18 @@ namespace UnityPlus.Serialization
         public Func<SerializedData, IForwardReferenceMap, TSource> OnLoad { get; set; }
 
         /// <summary>
-        /// Force the serializer to skip the object header and serialize inline.
+        /// Makes the serializer to skip the object header and serialize inline, but only if the types match.
         /// </summary>
-        bool _skipHeader;
+        ObjectHeaderSkipMode _skipHeader;
 
         public PrimitiveSerializationMapping()
         {
 
         }
 
-        public PrimitiveSerializationMapping( bool skipHeader )
+        /// <param name="skipHeader">Whether or not to skip the '$type'/'$id'/'value' header and always serialize inline. <br/>
+        /// If set to true, the type is effectively unreferencable, and will always use the member type when deserializing, even if the actual object type was more derived than the member type.</param>
+        public PrimitiveSerializationMapping( ObjectHeaderSkipMode skipHeader )
         {
             _skipHeader = skipHeader;
         }
@@ -52,11 +54,14 @@ namespace UnityPlus.Serialization
             if( OnSave == null )
                 return SerializationResult.PrimitiveFinishedFailed;
 
-            if( !_skipHeader && obj != null && MappingHelper.IsNonNullEligibleForTypeHeader<TMember>() ) // This doesn't appear to slow the system down much at all when benchbarked.
+            var headerStyle = MappingHelper.ShouldAddHeader<TSource, TMember>( _skipHeader, obj, null );
+            if( headerStyle != ObjectHeaderStyle.None )
             {
                 data = new SerializedObject();
-                data[KeyNames.TYPE] = obj.GetType().SerializeType();        // DOES make sense for structs (they may be boxed in an `object` or an interface)
-                data[KeyNames.ID] = s.RefMap.GetID( obj ).SerializeGuid(); // doesn't make sense for structs, even if boxed.
+                if( headerStyle.HasFlag( ObjectHeaderStyle.TypeField ) )
+                    data[KeyNames.TYPE] = obj.GetType().SerializeType();        // DOES make sense for structs (they may be boxed in an `object` or an interface)
+                if( headerStyle.HasFlag( ObjectHeaderStyle.IDField ) )
+                    data[KeyNames.ID] = s.RefMap.GetID( obj ).SerializeGuid(); // doesn't make sense for structs, even if boxed.
 
                 try
                 {
@@ -87,7 +92,8 @@ namespace UnityPlus.Serialization
             if( OnLoad == null )
                 return SerializationResult.PrimitiveFinishedFailed;
 
-            if( !_skipHeader && data != null && MappingHelper.IsNonNullEligibleForTypeHeader<TMember>() ) // This doesn't appear to slow the system down much at all when benchbarked.
+            var headerStyle = MappingHelper.ShouldAddHeader<TSource, TMember>( _skipHeader, default, data );
+            if( headerStyle != ObjectHeaderStyle.None )
             {
                 try
                 {

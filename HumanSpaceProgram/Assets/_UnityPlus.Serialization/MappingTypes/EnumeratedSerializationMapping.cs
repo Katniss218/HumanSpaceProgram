@@ -62,8 +62,14 @@ namespace UnityPlus.Serialization
             if( data == null )
             {
                 data = new SerializedObject();
-                data[KeyNames.TYPE] = obj.GetType().SerializeType();
-                data[KeyNames.ID] = s.RefMap.GetID( sourceObj ).SerializeGuid();
+                var headerStyle = MappingHelper.IsNonNullEligibleForTypeHeader<TMember>();
+                if( headerStyle != ObjectHeaderStyle.None )
+                {
+                    if( headerStyle.HasFlag( ObjectHeaderStyle.TypeField ) )
+                        data[KeyNames.TYPE] = obj.GetType().SerializeType();
+                    if( headerStyle.HasFlag( ObjectHeaderStyle.IDField ) )
+                        data[KeyNames.ID] = s.RefMap.GetID( sourceObj ).SerializeGuid();
+                }
 
                 serArray = new SerializedArray();
                 data["value"] = serArray;
@@ -300,13 +306,6 @@ namespace UnityPlus.Serialization
                 }
             }
 
-            if( !populate && !_objectHasBeenInstantiated )
-            {
-                sourceObj = InstantiateLate( data, l );
-                _objectHasBeenInstantiated = true;
-            }
-
-            obj = (TMember)(object)sourceObj;
             SerializationResult result = SerializationResult.NoChange;
             if( _wasFailureNoRetry || _retryElements != null && _retryElements.Count != 0 )
                 result |= SerializationResult.HasFailures;
@@ -316,6 +315,13 @@ namespace UnityPlus.Serialization
             if( result.HasFlag( SerializationResult.Finished ) && result.HasFlag( SerializationResult.HasFailures ) )
                 result |= SerializationResult.Failed;
 
+            if( !populate && !_objectHasBeenInstantiated && result.HasFlag( SerializationResult.Finished ) )
+            {
+                sourceObj = InstantiateLate( data, l );
+                _objectHasBeenInstantiated = true;
+            }
+
+            obj = (TMember)(object)sourceObj;
             return result;
         }
 

@@ -161,10 +161,13 @@ namespace UnityPlus.Serialization
             {
                 data = new SerializedObject();
 
-                if( MappingHelper.IsNonNullEligibleForTypeHeader<TMember>() )
+                var headerStyle = MappingHelper.IsNonNullEligibleForTypeHeader<TMember>();
+                if( headerStyle != ObjectHeaderStyle.None )
                 {
-                    data[KeyNames.TYPE] = obj.GetType().SerializeType();
-                    data[KeyNames.ID] = s.RefMap.GetID( sourceObj ).SerializeGuid();
+                    if( headerStyle.HasFlag( ObjectHeaderStyle.TypeField ) )
+                        data[KeyNames.TYPE] = obj.GetType().SerializeType();
+                    if( headerStyle.HasFlag( ObjectHeaderStyle.IDField ) )
+                        data[KeyNames.ID] = s.RefMap.GetID( sourceObj ).SerializeGuid();
                 }
             }
 
@@ -404,6 +407,7 @@ namespace UnityPlus.Serialization
                 {
                     if( !memberResult.HasFlag( SerializationResult.Finished ) && !memberResult.HasFlag( SerializationResult.Paused ) )
                     {
+#warning TODO - only assign once finished, we don't know how complex the setter is, and if it has error handling/side effects.
                         member.Set( ref sourceObj, memberObj );
                     }
                 }

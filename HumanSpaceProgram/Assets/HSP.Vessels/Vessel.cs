@@ -305,7 +305,7 @@ namespace HSP.Vessels
         {
             return new MemberwiseSerializationMapping<Vessel>()
                 .WithMember( "display_name", o => o.DisplayName )
-                .WithMember( "root_part", ObjectContext.Ref, o => o.RootPart )
+                .WithMember( "root_part", ObjectContext.Ref, o => o._rootPart )
                 .WithMember( "on_after_recalculate_parts", o => o.OnAfterRecalculateParts );
         }
     }

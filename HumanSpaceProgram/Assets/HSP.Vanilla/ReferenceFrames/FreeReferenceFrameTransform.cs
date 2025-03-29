@@ -248,7 +248,7 @@ namespace HSP.Vanilla
         protected void RecalculateCache( IReferenceFrame sceneReferenceFrame )
         {
             _cachedAbsolutePosition = sceneReferenceFrame.TransformPosition( _rb.position );
-            _cachedAbsoluteRotation = sceneReferenceFrame.TransformRotation( _rb.rotation );
+            _cachedAbsoluteRotation = sceneReferenceFrame.TransformRotation( this.gameObject.activeInHierarchy ? _rb.rotation : transform.rotation ); // Apparently, rigidbody.rotation gets set to identity when disabled...
             _cachedAbsoluteVelocity = sceneReferenceFrame.TransformVelocity( _rb.velocity );
             _cachedAbsoluteAngularVelocity = sceneReferenceFrame.TransformAngularVelocity( _rb.angularVelocity );
             // Don't cache acceleration, since it's impossible to compute it here for a dynamic body. Acceleration is recalculated on every fixedupdate instead.

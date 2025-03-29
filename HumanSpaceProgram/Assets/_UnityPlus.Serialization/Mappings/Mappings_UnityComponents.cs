@@ -58,10 +58,10 @@ namespace UnityPlus.Serialization.Mappings
                     {
                         foreach( var child in value )           // The 'value' array here is a sort of 'virtual' array.
                         {
-                            if( child == null ) // only true if something failed.
+                            if( child == null ) // only true if setter invoked after failure.
                                 continue;
 
-                            child.transform.SetParent( o.transform );
+                            child.transform.SetParent( o.transform, false );
                         }
                     } )
                 .WithMember( "components", o =>

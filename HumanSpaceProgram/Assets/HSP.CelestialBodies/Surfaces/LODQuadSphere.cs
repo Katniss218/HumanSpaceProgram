@@ -159,6 +159,9 @@ namespace HSP.CelestialBodies.Surfaces
 
         void Update()
         {
+            if( PoIGetter == null )
+                return;
+
             if( _builder == null )
             {
                 TryRebuild();
