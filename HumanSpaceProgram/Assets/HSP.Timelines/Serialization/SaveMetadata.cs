@@ -78,6 +78,8 @@ namespace HSP.Timelines.Serialization
 
             this.TimelineID = timelineId;
             this.SaveID = saveId;
+            this.Name = "Persistent";
+            this.Description = "The default save";
         }
 
         /// <summary>
@@ -138,7 +140,7 @@ namespace HSP.Timelines.Serialization
                 string saveId = Path.GetRelativePath( savesPath, saveDirPath );
                 try
                 {
-                    SaveMetadata saveMetadata = SaveMetadata.LoadFromDisk( timelineId, saveDirPath );
+                    SaveMetadata saveMetadata = SaveMetadata.LoadFromDisk( timelineId, saveId );
                     saves.Add( saveMetadata );
                 }
                 catch( Exception ex )
@@ -158,7 +160,6 @@ namespace HSP.Timelines.Serialization
 
         public static SaveMetadata LoadFromDisk( string timelineId, string saveId )
         {
-#warning TODO - guard against IO exceptions. Any problem should log an error and return a valid, but empty, save.
             string saveFilePath = Path.Combine( GetRootDirectory( timelineId, saveId ), SAVE_FILENAME );
 
             SaveMetadata saveMetadata = new SaveMetadata( timelineId, saveId );

@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
+using UnityPlus.UILib.Layout;
 using UnityPlus.UILib.UIElements;
 
 namespace HSP.Vanilla.UI.Timelines
@@ -63,10 +64,17 @@ namespace HSP.Vanilla.UI.Timelines
                 Description = Save.Description,
             };
         }
+        
+        private void OnDescriptionChanged( IUIInputElement<string>.ValueChangedEventData e )
+        {
+            _selectedSave = null;
+            Save.Description = e.NewValue;
+        }
 
         private void OnSave()
         {
             TimelineManager.BeginSaveAsync( Save );
+            RefreshSaveList();
             /* if( _nameInputField.TryGetValue( out string Text ) )
              {
                  _descriptionInputField.TryGetValue( out string Description );
@@ -97,20 +105,25 @@ namespace HSP.Vanilla.UI.Timelines
             uiWindow.AddStdText( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Top, 0, 30 ), "Save..." )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center );
 
-            UIScrollView saveScrollView = uiWindow.AddVerticalScrollView( new UILayoutInfo( UIFill.Fill( 2, 2, 30, 22 ) ), 75 )
+            UIScrollView saveList = uiWindow.AddVerticalScrollView( new UILayoutInfo( UIFill.Fill( 2, 2, 30, 72 ) ), 75 )
                 .WithVerticalScrollbar( UIAnchor.Right, 10, null, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_handle" ), out UIScrollBar scrollbar );
+
+            saveList.LayoutDriver = new VerticalLayoutDriver() { Spacing = 2, FitToSize = true };
 
             UIButton saveBtn = uiWindow.AddButton( new UILayoutInfo( UIAnchor.BottomRight, (-2, 5), (95, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), uiWindow.OnSave );
 
             saveBtn.AddStdText( new UILayoutInfo( UIFill.Fill() ), "Save" )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center );
 
-            UIInputField<string> inputField = uiWindow.AddStringInputField( new UILayoutInfo( UIFill.Horizontal( 2, 99 ), UIAnchor.Bottom, 5, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
+            UIInputField<string> inputField = uiWindow.AddStringInputField( new UILayoutInfo( UIFill.Horizontal( 2, 2 ), UIAnchor.Bottom, 70, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
             inputField.OnValueChanged += uiWindow.OnNameChanged;
+            
+            UIInputField<string> inputField2 = uiWindow.AddStringInputField( new UILayoutInfo( UIFill.Horizontal( 2, 2 ), UIAnchor.Bottom, 55, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
+            inputField2.OnValueChanged += uiWindow.OnDescriptionChanged;
 
             uiWindow._nameInputField = inputField;
-            uiWindow._descriptionInputField = inputField;
-            uiWindow._saveListUI = saveScrollView;
+            uiWindow._descriptionInputField = inputField2;
+            uiWindow._saveListUI = saveList;
 
             uiWindow.RefreshSaveList();
 

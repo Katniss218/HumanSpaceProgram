@@ -26,7 +26,7 @@ namespace HSP.Vanilla.UI.Timelines
 
         protected internal static T Create<T>( IUIElementContainer parent, UILayoutInfo layout, SaveMetadata save, Action<UISaveMetadata> onClick ) where T : UISaveMetadata
         {
-            T uiSaveMetadata = (T)UIPanel.Create<T>( parent, layout, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/functionality_panel" ) )
+            T uiSaveMetadata = (T)UIPanel.Create<T>( parent, layout, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/panel" ) )
                 .Raycastable();
 
             uiSaveMetadata.LayoutDriver = new VerticalLayoutDriver() { FitToSize = true };

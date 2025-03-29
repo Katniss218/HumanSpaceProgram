@@ -99,7 +99,6 @@ namespace HSP.Timelines.Serialization
                 string timelineId = Path.GetRelativePath( timelinesDirectory, timelineDirPath );
                 try
                 {
-#warning TODO - ids shouldn't be full paths
                     TimelineMetadata timelineMetadata = TimelineMetadata.LoadFromDisk( timelineId );
                     timelines.Add( timelineMetadata );
                 }
