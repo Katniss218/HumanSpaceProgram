@@ -21,10 +21,10 @@ namespace HSP.Vanilla.Scenes.GameplayScene
             int i = 0;
             foreach( var vessel in VesselManager.LoadedVessels )
             {
-                JsonSerializedDataHandler _vesselsDataHandler = new JsonSerializedDataHandler( Path.Combine( e.save.GetRootDirectory(), "Vessels", $"{i}", "gameobjects.json" ) );
+                JsonSerializedDataHandler vesselsDataHandler = new JsonSerializedDataHandler( Path.Combine( e.save.GetRootDirectory(), "Vessels", $"{i}", "gameobjects.json" ) );
 
                 var data = SerializationUnit.Serialize( vessel.gameObject, TimelineManager.RefStore );
-                _vesselsDataHandler.Write( data );
+                vesselsDataHandler.Write( data );
                 i++;
             }
         }
@@ -38,14 +38,14 @@ namespace HSP.Vanilla.Scenes.GameplayScene
 
             foreach( var dir in Directory.GetDirectories( path ) )
             {
-                JsonSerializedDataHandler _vesselsDataHandler = new JsonSerializedDataHandler( Path.Combine( dir, "gameobjects.json" ) );
+                JsonSerializedDataHandler vesselsDataHandler = new JsonSerializedDataHandler( Path.Combine( dir, "gameobjects.json" ) );
 
-                var data = _vesselsDataHandler.Read();
+                var data = vesselsDataHandler.Read();
                 var go = SerializationUnit.Deserialize<GameObject>( data, TimelineManager.RefStore );
             }
         }
 
-        /*[HSPEventListener( HSPEvent_ON_TIMELINE_NEW.ID, DESERIALIZE_VESSELS )]
+        [HSPEventListener( HSPEvent_ON_TIMELINE_NEW.ID, DESERIALIZE_VESSELS )]
         private static void DeserializeScenarioVessels( TimelineManager.StartNewEventData e )
         {
             string path = Path.Combine( e.scenario.GetRootDirectory(), "Vessels" );
@@ -54,11 +54,11 @@ namespace HSP.Vanilla.Scenes.GameplayScene
 
             foreach( var dir in Directory.GetDirectories( path ) )
             {
-                JsonSerializedDataHandler _vesselsDataHandler = new JsonSerializedDataHandler( Path.Combine( dir, "gameobjects.json" ) );
+                JsonSerializedDataHandler vesselsDataHandler = new JsonSerializedDataHandler( Path.Combine( dir, "gameobjects.json" ) );
 
-                var data = _vesselsDataHandler.Read();
+                var data = vesselsDataHandler.Read();
                 var go = SerializationUnit.Deserialize<GameObject>( data, TimelineManager.RefStore );
             }
-        }*/
+        }
     }
 }

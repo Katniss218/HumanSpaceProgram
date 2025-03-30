@@ -64,6 +64,7 @@
     <Compile Include="Assets\HSP._DevUtils\AsyncTester.cs" />
     <Compile Include="Assets\HSP._DevUtils\DevUtilsGameplayManager.cs" />
     <Compile Include="Assets\HSP._DevUtils\ConstantForceApplier.cs" />
+    <Compile Include="Assets\HSP._DevUtils\DevDefaultScenarioCreator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP._DevUtils\WireframeSimpleQuad.shader" />

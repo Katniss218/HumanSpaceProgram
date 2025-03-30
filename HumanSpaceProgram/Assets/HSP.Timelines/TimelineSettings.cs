@@ -1,6 +1,7 @@
 ﻿using HSP.Settings;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace HSP.Timelines
@@ -14,8 +15,10 @@ namespace HSP.Timelines
     /// Provides the editable 'scenario settings' - with values that are editable after starting a timeline using the scenario. <br/>
     /// These settings are the same across a timeline.
     /// </summary>
-    public sealed class TimelineSettingsProvider// : ISettingsProvider
+    public sealed class TimelineSettingsProvider : ISettingsProvider
     {
+        public const string SETTINGS_FILENAME = "timeline_settings.json";
+
         public IEnumerable<Type> GetPageTypes()
         {
             return AppDomain.CurrentDomain.GetAssemblies().SelectMany( a => a.GetTypes() )
@@ -24,8 +27,7 @@ namespace HSP.Timelines
 
         public string GetSettingsFilePath()
         {
-            // more complex, use the current timeline and take the settings from it.
-            throw new NotImplementedException();
+            return Path.Combine( TimelineManager.CurrentTimeline.GetRootDirectory(), SETTINGS_FILENAME );
         }
     }
 }

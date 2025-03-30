@@ -21,10 +21,10 @@ namespace HSP.Vanilla.Scenes.GameplayScene
             int i = 0;
             foreach( var celestialBody in CelestialBodyManager.CelestialBodies )
             {
-                JsonSerializedDataHandler _vesselsDataHandler = new JsonSerializedDataHandler( Path.Combine( e.save.GetRootDirectory(), "CelestialBodies", $"{i}", "gameobjects.json" ) );
+                JsonSerializedDataHandler celestialBodiesDataHandler = new JsonSerializedDataHandler( Path.Combine( e.save.GetRootDirectory(), "CelestialBodies", $"{i}", "gameobjects.json" ) );
 
                 var data = SerializationUnit.Serialize( celestialBody.gameObject, TimelineManager.RefStore );
-                _vesselsDataHandler.Write( data );
+                celestialBodiesDataHandler.Write( data );
                 i++;
             }
         }
@@ -38,14 +38,14 @@ namespace HSP.Vanilla.Scenes.GameplayScene
 
             foreach( var dir in Directory.GetDirectories( path ) )
             {
-                JsonSerializedDataHandler _vesselsDataHandler = new JsonSerializedDataHandler( Path.Combine( dir, "gameobjects.json" ) );
+                JsonSerializedDataHandler celestialBodiesDataHandler = new JsonSerializedDataHandler( Path.Combine( dir, "gameobjects.json" ) );
 
-                var data = _vesselsDataHandler.Read();
+                var data = celestialBodiesDataHandler.Read();
                 var go = SerializationUnit.Deserialize<GameObject>( data, TimelineManager.RefStore );
             }
         }
 
-        /*[HSPEventListener( HSPEvent_ON_TIMELINE_NEW.ID, DESERIALIZE_CELESTIAL_BODIES )]
+        [HSPEventListener( HSPEvent_ON_TIMELINE_NEW.ID, DESERIALIZE_CELESTIAL_BODIES )]
         private static void DeserializeScenarioCelestialBodies( TimelineManager.StartNewEventData e )
         {
             string path = Path.Combine( e.scenario.GetRootDirectory(), "CelestialBodies" );
@@ -54,11 +54,11 @@ namespace HSP.Vanilla.Scenes.GameplayScene
 
             foreach( var dir in Directory.GetDirectories( path ) )
             {
-                JsonSerializedDataHandler _vesselsDataHandler = new JsonSerializedDataHandler( Path.Combine( dir, "gameobjects.json" ) );
+                JsonSerializedDataHandler celestialBodiesDataHandler = new JsonSerializedDataHandler( Path.Combine( dir, "gameobjects.json" ) );
 
-                var data = _vesselsDataHandler.Read();
+                var data = celestialBodiesDataHandler.Read();
                 var go = SerializationUnit.Deserialize<GameObject>( data, TimelineManager.RefStore );
             }
-        }*/
+        }
     }
 }

@@ -17,7 +17,7 @@ namespace HSP.Settings
     /// </summary>
     public sealed class GameSettingsProvider : ISettingsProvider
     {
-        public const string SettingsFileName = "settings.json";
+        public const string SETTINGS_FILENAME = "settings.json";
 
         public IEnumerable<Type> GetPageTypes()
         {
@@ -27,9 +27,7 @@ namespace HSP.Settings
 
         public string GetSettingsFilePath()
         {
-            string path = Path.Combine( ApplicationUtils.GetBaseDirectoryPath(), SettingsFileName );
-
-            return path;
+            return Path.Combine( ApplicationUtils.GetBaseDirectoryPath(), SETTINGS_FILENAME );
         }
     }
 }
