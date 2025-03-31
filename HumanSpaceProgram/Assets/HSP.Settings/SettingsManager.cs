@@ -49,7 +49,7 @@ namespace HSP.Settings
         }
 
         /// <summary>
-        /// Reloads the current settings from disk.
+        /// Reloads the current settings using the available settings providers.
         /// </summary>
         public static void ReloadSettings()
         {
@@ -65,7 +65,7 @@ namespace HSP.Settings
         private static void ReloadSettings( ISettingsProvider provider )
         {
             string path = provider.GetSettingsFilePath();
-            SettingsFile arr;
+            SettingsFile settingsFile;
 
             Type[] pageTypes = provider.GetPageTypes().ToArray();
 
@@ -75,7 +75,7 @@ namespace HSP.Settings
                 try
                 {
                     var data = new JsonSerializedDataHandler( path ).Read();
-                    arr = SerializationUnit.Deserialize<SettingsFile>( data );
+                    settingsFile = SerializationUnit.Deserialize<SettingsFile>( data );
                 }
                 catch( Exception ex )
                 {
@@ -84,30 +84,30 @@ namespace HSP.Settings
 
                     File.Copy( path, path.Replace( ".json", "_loadingfailed.json" ), true );
 
-                    arr = CreateNewSettings( pageTypes );
+                    settingsFile = CreateNewSettings( pageTypes );
                     errorOrMissingFile = true;
                 }
             }
             else
             {
-                arr = CreateNewSettings( pageTypes );
+                settingsFile = CreateNewSettings( pageTypes );
                 errorOrMissingFile = true;
             }
-            if( arr == null || arr.Pages == null )
-                arr = CreateNewSettings( pageTypes );
+            if( settingsFile == null || settingsFile.Pages == null )
+                settingsFile = CreateNewSettings( pageTypes );
 
             // Add any pages that were missing in the settings.json.
             foreach( var type in pageTypes )
             {
-                if( !arr.Pages.Select( p => p.GetType() ).Contains( type ) )
+                if( !settingsFile.Pages.Select( p => p.GetType() ).Contains( type ) )
                 {
                     var page = (ISettingsPage)Activator.CreateInstance( type );
-                    arr.Pages.Add( page );
+                    settingsFile.Pages.Add( page );
                 }
             }
 
             // apply the final settings.
-            foreach( var page in arr.Pages )
+            foreach( var page in settingsFile.Pages )
             {
                 try
                 {

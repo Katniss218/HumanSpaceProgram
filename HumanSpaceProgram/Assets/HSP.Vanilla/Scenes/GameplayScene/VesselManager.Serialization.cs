@@ -1,5 +1,6 @@
 using HSP.Timelines;
 using HSP.Vessels;
+using System;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -29,26 +30,18 @@ namespace HSP.Vanilla.Scenes.GameplayScene
             }
         }
 
-        [HSPEventListener( HSPEvent_ON_TIMELINE_LOAD.ID, DESERIALIZE_VESSELS )]
-        private static void DeserializeVessels( TimelineManager.LoadEventData e )
-        {
-            string path = Path.Combine( e.save.GetRootDirectory(), "Vessels" );
-            if( !Directory.Exists( path ) )
-                return;
-
-            foreach( var dir in Directory.GetDirectories( path ) )
-            {
-                JsonSerializedDataHandler vesselsDataHandler = new JsonSerializedDataHandler( Path.Combine( dir, "gameobjects.json" ) );
-
-                var data = vesselsDataHandler.Read();
-                var go = SerializationUnit.Deserialize<GameObject>( data, TimelineManager.RefStore );
-            }
-        }
-
         [HSPEventListener( HSPEvent_ON_TIMELINE_NEW.ID, DESERIALIZE_VESSELS )]
-        private static void DeserializeScenarioVessels( TimelineManager.StartNewEventData e )
+        [HSPEventListener( HSPEvent_ON_TIMELINE_LOAD.ID, DESERIALIZE_VESSELS )]
+        private static void DeserializeVessels( object e )
         {
-            string path = Path.Combine( e.scenario.GetRootDirectory(), "Vessels" );
+            string path;
+            if( e is TimelineManager.LoadEventData e2 )
+                path = Path.Combine( e2.save.GetRootDirectory(), "Vessels" );
+            else if( e is TimelineManager.StartNewEventData e3 )
+                path = Path.Combine( e3.scenario.GetRootDirectory(), "Vessels" );
+            else
+                throw new ArgumentException();
+
             if( !Directory.Exists( path ) )
                 return;
 
