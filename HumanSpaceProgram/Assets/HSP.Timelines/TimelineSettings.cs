@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UnityPlus.Serialization.DataHandlers;
+using UnityPlus.Serialization;
 
 namespace HSP.Timelines
 {
@@ -25,9 +27,36 @@ namespace HSP.Timelines
                 .Where( t => ISettingsProvider.IsValidSettingsPage<ITimelineSettingsPage>( t ) );
         }
 
-        public string GetSettingsFilePath()
+        private string GetSettingsFilePath()
         {
             return Path.Combine( TimelineManager.CurrentTimeline.GetRootDirectory(), SETTINGS_FILENAME );
+        }
+
+        public bool IsAvailable()
+        {
+            return TimelineManager.CurrentTimeline != null;
+        }
+
+        public SettingsFile LoadSettings()
+        {
+            string path = GetSettingsFilePath();
+
+            if( File.Exists( path ) )
+            {
+                SerializedData data = new JsonSerializedDataHandler( path )
+                    .Read();
+
+                return SerializationUnit.Deserialize<SettingsFile>( data );
+            }
+            return null;
+        }
+
+        public void SaveSettings( SettingsFile settings )
+        {
+            SerializedData data = SerializationUnit.Serialize( settings );
+
+            new JsonSerializedDataHandler( GetSettingsFilePath() )
+                .Write( data );
         }
     }
 }

@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using UnityEditor;
 using UnityEngine;
-using UnityPlus.Serialization;
-using UnityPlus.Serialization.DataHandlers;
 
 namespace HSP.Settings
 {
@@ -17,35 +13,28 @@ namespace HSP.Settings
     {
         private static ISettingsProvider[] _settingsProviders = null;
 
-        private static ISettingsProvider[] GetProviders()
+        private static void ReloadProviders()
+        {
+            Type[] types = AppDomain.CurrentDomain.GetAssemblies().SelectMany( a => a.GetTypes() )
+                .Where( t => !t.IsAbstract && !t.IsInterface && typeof( ISettingsProvider ).IsAssignableFrom( t ) ).ToArray();
+
+            _settingsProviders = new ISettingsProvider[types.Length];
+
+            for( int i = 0; i < types.Length; i++ )
+            {
+                var provider = (ISettingsProvider)Activator.CreateInstance( types[i] );
+                _settingsProviders[i] = provider;
+            }
+        }
+
+        private static IEnumerable<ISettingsProvider> GetAvailableProviders()
         {
             if( _settingsProviders == null )
             {
-                Type[] types = AppDomain.CurrentDomain.GetAssemblies().SelectMany( a => a.GetTypes() )
-                    .Where( t => !t.IsAbstract && !t.IsInterface && typeof( ISettingsProvider ).IsAssignableFrom( t ) ).ToArray();
-
-                _settingsProviders = new ISettingsProvider[types.Length];
-
-                for( int i = 0; i < types.Length; i++)
-                {
-                    var provider = (ISettingsProvider)Activator.CreateInstance( types[i] );
-                    _settingsProviders[i] = provider;
-                }
+                ReloadProviders();
             }
 
-            return _settingsProviders;
-        }
-
-        private static SettingsFile CreateNewSettings( Type[] types )
-        {
-            SettingsFile arr = new();
-            arr.Pages = new List<ISettingsPage>( types.Length );
-            for( int i = 0; i < types.Length; i++ )
-            {
-                var page = (ISettingsPage)Activator.CreateInstance( types[i] );
-                arr.Pages.Add( page );
-            }
-            return arr;
+            return _settingsProviders.Where( p => p.IsAvailable() );
         }
 
         /// <summary>
@@ -53,7 +42,7 @@ namespace HSP.Settings
         /// </summary>
         public static void ReloadSettings()
         {
-            foreach( var provider in GetProviders() )
+            foreach( var provider in GetAvailableProviders() )
             {
                 ReloadSettings( provider );
             }
@@ -64,37 +53,31 @@ namespace HSP.Settings
         /// </summary>
         private static void ReloadSettings( ISettingsProvider provider )
         {
-            string path = provider.GetSettingsFilePath();
             SettingsFile settingsFile;
 
             Type[] pageTypes = provider.GetPageTypes().ToArray();
 
             bool errorOrMissingFile = false;
-            if( File.Exists( path ) )
+            try
             {
-                try
-                {
-                    var data = new JsonSerializedDataHandler( path ).Read();
-                    settingsFile = SerializationUnit.Deserialize<SettingsFile>( data );
-                }
-                catch( Exception ex )
-                {
-                    Debug.LogError( $"Exception occurred while trying to load the settings file '{path}'." );
-                    Debug.LogException( ex );
-
-                    File.Copy( path, path.Replace( ".json", "_loadingfailed.json" ), true );
-
-                    settingsFile = CreateNewSettings( pageTypes );
-                    errorOrMissingFile = true;
-                }
+                settingsFile = provider.LoadSettings();
             }
-            else
+            catch( Exception ex )
             {
-                settingsFile = CreateNewSettings( pageTypes );
+                Debug.LogError( $"Exception occurred while trying to load the settings file for provider '{provider}'." );
+                Debug.LogException( ex );
+
+                //File.Copy( path, path.Replace( ".json", "_loadingfailed.json" ), true );
+
+                settingsFile = SettingsFile.FromPageTypes( pageTypes );
                 errorOrMissingFile = true;
             }
+
             if( settingsFile == null || settingsFile.Pages == null )
-                settingsFile = CreateNewSettings( pageTypes );
+            {
+                settingsFile = SettingsFile.FromPageTypes( pageTypes );
+                errorOrMissingFile = true;
+            }
 
             // Add any pages that were missing in the settings.json.
             foreach( var type in pageTypes )
@@ -131,7 +114,7 @@ namespace HSP.Settings
         /// </summary>
         public static void SaveSettings()
         {
-            foreach( var provider in GetProviders() )
+            foreach( var provider in GetAvailableProviders() )
             {
                 SaveSettings( provider );
             }
@@ -144,19 +127,16 @@ namespace HSP.Settings
         {
             Type[] pageTypes = provider.GetPageTypes().ToArray();
 
-            SettingsFile arr = new SettingsFile();
-            arr.Pages = new List<ISettingsPage>( pageTypes.Length );
+            SettingsFile settingsFile = new SettingsFile();
+            settingsFile.Pages = new List<ISettingsPage>( pageTypes.Length );
             foreach( var type in pageTypes )
             {
                 PropertyInfo instanceProperty = type.GetProperty( "Current", BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy );
                 ISettingsPage page = (ISettingsPage)instanceProperty.GetValue( null );
-                arr.Pages.Add( page );
+                settingsFile.Pages.Add( page );
             }
 
-            JsonSerializedDataHandler dataHandler = new JsonSerializedDataHandler( provider.GetSettingsFilePath() );
-
-            var data = SerializationUnit.Serialize( arr );
-            dataHandler.Write( data );
+            provider.SaveSettings( settingsFile );
         }
     }
 }

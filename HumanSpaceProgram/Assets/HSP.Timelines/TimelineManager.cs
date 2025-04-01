@@ -131,6 +131,7 @@ namespace HSP.Timelines
         /// </summary>
         public static ScenarioMetadata CurrentScenario { get; private set; }
 
+#warning TODO - use instance for storage, so it's removed when scene unloads.
         /// <summary>
         /// Gets the currently active timeline.
         /// </summary>

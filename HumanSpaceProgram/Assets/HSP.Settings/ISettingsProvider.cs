@@ -24,8 +24,7 @@ namespace HSP.Settings
         /// This is useful for providers that are 'valid' only in specific circumstances, <br/>
         /// like timeline settings only being applicable when a timeline is loaded/active.
         /// </remarks>
-        public bool IsAvailable(); // The provider must also not be saved before it is loaded (if the method is true for save but was false for preceeding load - that would force-overwrite everything with defaults),
-                                   //   so the state when 'load' is called must be cached in the SettingsManager
+        public bool IsAvailable();
 
         /// <summary>
         /// Loads the settings data.

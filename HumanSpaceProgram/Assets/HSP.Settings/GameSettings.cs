@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using UnityPlus.Serialization.DataHandlers;
+using UnityPlus.Serialization;
 
 namespace HSP.Settings
 {
@@ -25,9 +27,33 @@ namespace HSP.Settings
                 .Where( t => ISettingsProvider.IsValidSettingsPage<IGameSettingsPage>( t ) );
         }
 
-        public string GetSettingsFilePath()
+        private string GetSettingsFilePath()
         {
             return Path.Combine( ApplicationUtils.GetBaseDirectoryPath(), SETTINGS_FILENAME );
+        }
+
+        public bool IsAvailable() => true;
+
+        public SettingsFile LoadSettings()
+        {
+            string path = GetSettingsFilePath();
+
+            if( File.Exists( path ) )
+            {
+                SerializedData data = new JsonSerializedDataHandler( path )
+                    .Read();
+
+                return SerializationUnit.Deserialize<SettingsFile>( data );
+            }
+            return null;
+        }
+
+        public void SaveSettings( SettingsFile settings )
+        {
+            SerializedData data = SerializationUnit.Serialize( settings );
+
+            new JsonSerializedDataHandler( GetSettingsFilePath() )
+                .Write( data );
         }
     }
 }
