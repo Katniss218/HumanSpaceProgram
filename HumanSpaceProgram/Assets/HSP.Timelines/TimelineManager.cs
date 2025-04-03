@@ -87,11 +87,13 @@ namespace HSP.Timelines
     {
         public struct SaveEventData
         {
+            public readonly ScenarioMetadata scenario;
             public readonly TimelineMetadata timeline;
             public readonly SaveMetadata save;
 
-            public SaveEventData( TimelineMetadata timeline, SaveMetadata save )
+            public SaveEventData( ScenarioMetadata scenario, TimelineMetadata timeline, SaveMetadata save )
             {
+                this.scenario = scenario;
                 this.timeline = timeline;
                 this.save = save;
             }
@@ -99,11 +101,13 @@ namespace HSP.Timelines
 
         public struct LoadEventData
         {
+            public readonly ScenarioMetadata scenario;
             public readonly TimelineMetadata timeline;
             public readonly SaveMetadata save;
 
-            public LoadEventData( TimelineMetadata timeline, SaveMetadata save )
+            public LoadEventData( ScenarioMetadata scenario, TimelineMetadata timeline, SaveMetadata save )
             {
+                this.scenario = scenario;
                 this.timeline = timeline;
                 this.save = save;
             }
@@ -126,21 +130,23 @@ namespace HSP.Timelines
         /// </summary>
         public static bool IsSavingOrLoading { get; private set; }
 
+        private ScenarioMetadata _currentScenario;
         /// <summary>
         /// Gets the scenario that the currently active timeline is based on.
         /// </summary>
-        public static ScenarioMetadata CurrentScenario { get; private set; }
+        public static ScenarioMetadata CurrentScenario => instance._currentScenario;
 
-#warning TODO - use instance for storage, so it's removed when scene unloads.
+        private TimelineMetadata _currentTimeline;
         /// <summary>
         /// Gets the currently active timeline.
         /// </summary>
-        public static TimelineMetadata CurrentTimeline { get; private set; }
+        public static TimelineMetadata CurrentTimeline => instance._currentTimeline;
 
+        private SaveMetadata _currentSave;
         /// <summary>
         /// Gets the currently active save (if any).
         /// </summary>
-        public static SaveMetadata CurrentSave { get; private set; }
+        public static SaveMetadata CurrentSave => instance._currentSave;
 
 
         private static bool _wasPausedBeforeSerializing = false;
@@ -191,7 +197,7 @@ namespace HSP.Timelines
 
             Directory.CreateDirectory( SaveMetadata.GetRootDirectory( save.TimelineID, save.SaveID ) );
 
-            var eSave = new SaveEventData( CurrentTimeline, save );
+            var eSave = new SaveEventData( CurrentScenario, CurrentTimeline, save );
             RefStore = new BidirectionalReferenceStore();
 
             HSPEvent.EventManager.TryInvoke( HSPEvent_BEFORE_TIMELINE_SAVE.ID, eSave );
@@ -202,7 +208,7 @@ namespace HSP.Timelines
             CurrentTimeline.SaveToDisk();
             save.FileVersion = SaveMetadata.CURRENT_SAVE_FILE_VERSION;
             save.SaveToDisk();
-            CurrentSave = save;
+            instance._currentSave = save;
             HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_TIMELINE_SAVE.ID, eSave );
         }
 
@@ -224,31 +230,33 @@ namespace HSP.Timelines
             Directory.CreateDirectory( SaveMetadata.GetRootDirectory( timelineId, saveId ) );
 
             TimelineMetadata loadedTimeline = TimelineMetadata.LoadFromDisk( timelineId );
+            ScenarioMetadata loadedScenario = ScenarioMetadata.LoadFromDisk( loadedTimeline.ScenarioID );
             SaveMetadata loadedSave = SaveMetadata.LoadFromDisk( timelineId, saveId );
 
-            var eLoad = new LoadEventData( loadedTimeline, loadedSave );
+            var eLoad = new LoadEventData( loadedScenario, loadedTimeline, loadedSave );
             RefStore = new BidirectionalReferenceStore();
 
             HSPEvent.EventManager.TryInvoke( HSPEvent_BEFORE_TIMELINE_LOAD.ID, eLoad );
             SaveLoadStartFunc();
             HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_LOAD.ID, eLoad );
             SaveLoadFinishFunc();
-            CurrentTimeline = loadedTimeline;
-            CurrentSave = loadedSave;
+            instance._currentScenario = loadedScenario;
+            instance._currentTimeline = loadedTimeline;
+            instance._currentSave = loadedSave;
             HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_TIMELINE_LOAD.ID, eLoad );
         }
 
         /// <summary>
         /// Creates a new default (empty) timeline and "loads" it.
         /// </summary>
-        public static void BeginScenarioAsync( NamespacedID scenarioId, TimelineMetadata timeline )
+        public static void BeginNewTimelineAsync( TimelineMetadata timeline )
         {
             if( IsSavingOrLoading )
             {
                 throw new InvalidOperationException( $"Can't create a new timeline while already saving or loading." );
             }
 
-            ScenarioMetadata loadedScenario = ScenarioMetadata.LoadFromDisk( scenarioId );
+            ScenarioMetadata loadedScenario = ScenarioMetadata.LoadFromDisk( timeline.ScenarioID );
             var eNew = new StartNewEventData( loadedScenario, timeline );
             RefStore = new BidirectionalReferenceStore();
 
@@ -256,9 +264,9 @@ namespace HSP.Timelines
             SaveLoadStartFunc();
             HSPEvent.EventManager.TryInvoke( HSPEvent_ON_TIMELINE_NEW.ID, eNew );
             SaveLoadFinishFunc();
-            CurrentScenario = loadedScenario;
-            CurrentTimeline = timeline;
-            CurrentSave = new SaveMetadata( timeline.TimelineID );
+            instance._currentScenario = loadedScenario;
+            instance._currentTimeline = timeline;
+            instance._currentSave = new SaveMetadata( timeline.TimelineID );
             HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_TIMELINE_NEW.ID, eNew );
         }
     }

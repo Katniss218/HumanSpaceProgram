@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using UnityEditor.VersionControl;
 using UnityEngine;
 
 namespace HSP.Settings
@@ -11,23 +12,34 @@ namespace HSP.Settings
     /// </summary>
     public static class SettingsManager
     {
-        private static ISettingsProvider[] _settingsProviders = null;
+        private class Entry
+        {
+            public ISettingsProvider provider;
+            public bool wasAvailableDuringLastReload;
+        }
+
+        private static Entry[] _settingsProviders = null;
 
         private static void ReloadProviders()
         {
             Type[] types = AppDomain.CurrentDomain.GetAssemblies().SelectMany( a => a.GetTypes() )
                 .Where( t => !t.IsAbstract && !t.IsInterface && typeof( ISettingsProvider ).IsAssignableFrom( t ) ).ToArray();
 
-            _settingsProviders = new ISettingsProvider[types.Length];
+            _settingsProviders = new Entry[types.Length];
 
             for( int i = 0; i < types.Length; i++ )
             {
-                var provider = (ISettingsProvider)Activator.CreateInstance( types[i] );
+                var provider = new Entry()
+                {
+                    provider = (ISettingsProvider)Activator.CreateInstance( types[i] ),
+                    wasAvailableDuringLastReload = false
+                };
+
                 _settingsProviders[i] = provider;
             }
         }
 
-        private static IEnumerable<ISettingsProvider> GetAvailableProviders()
+        /*private static IEnumerable<ISettingsProvider> GetAvailableProviders()
         {
             if( _settingsProviders == null )
             {
@@ -35,14 +47,14 @@ namespace HSP.Settings
             }
 
             return _settingsProviders.Where( p => p.IsAvailable() );
-        }
+        }*/
 
         /// <summary>
         /// Reloads the current settings using the available settings providers.
         /// </summary>
         public static void ReloadSettings()
         {
-            foreach( var provider in GetAvailableProviders() )
+            foreach( var provider in _settingsProviders )
             {
                 ReloadSettings( provider );
             }
@@ -51,43 +63,52 @@ namespace HSP.Settings
         /// <summary>
         /// Reloads the current settings of a given settings provider from disk.
         /// </summary>
-        private static void ReloadSettings( ISettingsProvider provider )
+        private static void ReloadSettings( Entry provider2 )
         {
-            SettingsFile settingsFile;
+            ISettingsProvider provider = provider2.provider;
+
+            SettingsFile settingsFile = null;
 
             Type[] pageTypes = provider.GetPageTypes().ToArray();
 
-            bool errorOrMissingFile = false;
-            try
+            bool saveToDisk = false;
+            if( provider.IsAvailable() )
             {
-                settingsFile = provider.LoadSettings();
-            }
-            catch( Exception ex )
-            {
-                Debug.LogError( $"Exception occurred while trying to load the settings file for provider '{provider}'." );
-                Debug.LogException( ex );
+                try
+                {
+                    settingsFile = provider.LoadSettings();
+                }
+                catch( Exception ex )
+                {
+                    Debug.LogError( $"Exception occurred while trying to load the settings file for provider '{provider}'." );
+                    Debug.LogException( ex );
 
-                //File.Copy( path, path.Replace( ".json", "_loadingfailed.json" ), true );
+                    //File.Copy( path, path.Replace( ".json", "_loadingfailed.json" ), true );
+
+                    settingsFile = SettingsFile.FromPageTypes( pageTypes );
+                    saveToDisk = true;
+                }
+
+                provider2.wasAvailableDuringLastReload = true;
+
+                if( settingsFile == null || settingsFile.Pages == null )
+                {
+                    settingsFile = SettingsFile.FromPageTypes( pageTypes );
+                    saveToDisk = true;
+                }
+            }
+            else
+            {
+                // Force apply default values for providers that are no longer available.
+                // Ideally providers would be ensure this is called as soon as the provider goes unavailable.
+
+                // This is done to ensure that after leaving a scenario, the settings from it don't linger in the game.
 
                 settingsFile = SettingsFile.FromPageTypes( pageTypes );
-                errorOrMissingFile = true;
-            }
-
-            if( settingsFile == null || settingsFile.Pages == null )
-            {
-                settingsFile = SettingsFile.FromPageTypes( pageTypes );
-                errorOrMissingFile = true;
             }
 
             // Add any pages that were missing in the settings.json.
-            foreach( var type in pageTypes )
-            {
-                if( !settingsFile.Pages.Select( p => p.GetType() ).Contains( type ) )
-                {
-                    var page = (ISettingsPage)Activator.CreateInstance( type );
-                    settingsFile.Pages.Add( page );
-                }
-            }
+            settingsFile.FillMissingTypes( pageTypes );
 
             // apply the final settings.
             foreach( var page in settingsFile.Pages )
@@ -103,7 +124,7 @@ namespace HSP.Settings
                 }
             }
 
-            if( errorOrMissingFile ) // if something went wrong, save a default version of the file.
+            if( saveToDisk ) // if something went wrong, save a default version of the file.
             {
                 SaveSettings();
             }
@@ -114,7 +135,7 @@ namespace HSP.Settings
         /// </summary>
         public static void SaveSettings()
         {
-            foreach( var provider in GetAvailableProviders() )
+            foreach( var provider in _settingsProviders )
             {
                 SaveSettings( provider );
             }
@@ -123,8 +144,15 @@ namespace HSP.Settings
         /// <summary>
         /// Saves the current settings of a given settings provider to disk.
         /// </summary>
-        private static void SaveSettings( ISettingsProvider provider )
+        private static void SaveSettings( Entry provider2 )
         {
+            if( !provider2.wasAvailableDuringLastReload )
+                return;
+
+            ISettingsProvider provider = provider2.provider;
+            if( !provider.IsAvailable() )
+                return;
+
             Type[] pageTypes = provider.GetPageTypes().ToArray();
 
             SettingsFile settingsFile = new SettingsFile();

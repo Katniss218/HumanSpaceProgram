@@ -24,6 +24,11 @@ namespace HSP.Timelines.Serialization
         public readonly string TimelineID;
 
         /// <summary>
+        /// The unique ID of the scenario associated with this timeline.
+        /// </summary>
+        public NamespacedID ScenarioID;
+
+        /// <summary>
         /// The display name shown in the GUI.
         /// </summary>
         public string Name { get; set; }
@@ -138,6 +143,7 @@ namespace HSP.Timelines.Serialization
         public static SerializationMapping TimelineMetadataMapping()
         {
             return new MemberwiseSerializationMapping<TimelineMetadata>()
+                .WithMember( "scenario_id", o => o.ScenarioID )
                 .WithMember( "name", o => o.Name )
                 .WithMember( "description", o => o.Description );
         }

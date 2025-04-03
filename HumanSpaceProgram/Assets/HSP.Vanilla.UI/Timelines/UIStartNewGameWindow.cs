@@ -35,13 +35,14 @@ namespace HSP.Vanilla.UI.Timelines
         {
             TimelineMetadata meta = new TimelineMetadata( IOHelper.SanitizeFileName( _nameInputField.GetOrDefault( "" ) ) )
             {
+                ScenarioID = SelectedScenario.ScenarioID,
                 Name = _nameInputField.GetOrDefault( "" ),
                 Description = _descriptionInputField.GetOrDefault( "" )
             };
 
             SceneLoader.UnloadActiveSceneAsync( () => SceneLoader.LoadSceneAsync( GameplaySceneManager.SCENE_NAME, true, false, () =>
             {
-                TimelineManager.BeginScenarioAsync( SelectedScenario.ScenarioID, meta );
+                TimelineManager.BeginNewTimelineAsync( meta );
             } ) );
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityPlus.Serialization;
 
 namespace HSP.Settings
@@ -14,6 +15,12 @@ namespace HSP.Settings
         /// </summary>
         public List<ISettingsPage> Pages;
 
+        /// <summary>
+        /// Creates a new settings file and populates it with default values.
+        /// </summary>
+        /// <param name="types"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException">Thrown when one or more of the types don't implement <see cref="ISettingsPage"/>.</exception>
         public static SettingsFile FromPageTypes( Type[] types )
         {
             SettingsFile settingsFile = new();
@@ -23,7 +30,7 @@ namespace HSP.Settings
             {
                 if( !typeof( ISettingsPage ).IsAssignableFrom( type ) )
                 {
-                    throw new ArgumentException( $"All types must derive from '{nameof( ISettingsPage )}'.", nameof( type ) );
+                    throw new ArgumentException( $"All types must implement '{nameof( ISettingsPage )}'.", nameof( type ) );
                 }
 
                 var page = (ISettingsPage)Activator.CreateInstance( type );
@@ -31,6 +38,18 @@ namespace HSP.Settings
             }
 
             return settingsFile;
+        }
+
+        public void FillMissingTypes( Type[] types )
+        {
+            foreach( var type in types )
+            {
+                if( !this.Pages.Select( p => p.GetType() ).Contains( type ) )
+                {
+                    var page = (ISettingsPage)Activator.CreateInstance( type );
+                    this.Pages.Add( page );
+                }
+            }
         }
 
         [MapsInheritingFrom( typeof( SettingsFile ) )]

@@ -45,6 +45,7 @@ namespace HSP.Settings
 
                 return SerializationUnit.Deserialize<SettingsFile>( data );
             }
+            //File.Copy( path, path.Replace( ".json", "_loadingfailed.json" ), true );
             return null;
         }
 
