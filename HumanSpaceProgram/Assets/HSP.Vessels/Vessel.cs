@@ -122,6 +122,11 @@ namespace HSP.Vessels
 
         // mass and colliders
 
+        void Awake()
+        {
+            VesselManager.Register( this );
+        }
+
         void Start()
         {
             RecalculatePartCache();
@@ -131,7 +136,7 @@ namespace HSP.Vessels
             HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_VESSEL_CREATED.ID, this );
             this.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
 
-            VesselManager.Register( this );
+           // VesselManager.Register( this );
         }
 
         private void OnDestroy()

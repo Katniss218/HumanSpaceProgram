@@ -152,7 +152,7 @@ namespace HSP._DevUtils
             }
             if( UnityEngine.Input.GetKeyDown( KeyCode.F5 ) )
             {
-                Debug.Log( "r: " + obj.rotation.x + " : " + obj.rotation.y + " : " + obj.rotation.z + " : " + obj.rotation.w );
+                DevDefaultScenarioCreator.CreateScenario();
                 //CreateVessel( launchSite );
             }
             // disabled to prevent accidental overwrite with data that needs to be edited manually (unity can't serialize everything we need)

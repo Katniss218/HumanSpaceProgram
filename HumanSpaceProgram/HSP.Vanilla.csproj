@@ -79,7 +79,7 @@
     <Compile Include="Assets\HSP.Vanilla\Components\FAttachNode.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FBulkConnection.cs" />
     <Compile Include="Assets\HSP.Vanilla\Settings\SettingsPage_Graphics.cs" />
-    <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\OnTimelineSave.cs" />
+    <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\ActiveVesselManager.Serialization.cs" />
     <Compile Include="Assets\HSP.Vanilla\CelestialBodies\LODQuadModifier_InitializeMesh.cs" />
     <Compile Include="Assets\HSP.Vanilla\VesselPinning_Ex.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\GameplaySceneTool.cs" />

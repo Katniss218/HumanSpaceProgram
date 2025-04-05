@@ -40,7 +40,6 @@ namespace HSP._DevUtils
 
         public static void LoadGameplayScene()
         {
-
             SceneLoader.UnloadActiveSceneAsync( () => SceneLoader.LoadSceneAsync( GameplaySceneManager.SCENE_NAME, true, false, () =>
             {
                 VanillaPlanetarySystemFactory.CreateDefaultPlanetarySystem();
@@ -135,8 +134,6 @@ namespace HSP._DevUtils
             Transform t2 = DontInstantiateLocal( PartRegistry.Load( (NamespacedID)"Vanilla::tank_long" ), root, new Vector3( -20, 2.625f, 0 ), Quaternion.identity ).transform;
             Transform engineP1 = DontInstantiateLocal( PartRegistry.Load( (NamespacedID)"Vanilla::engine" ), tankP, new Vector3( 2, -3.45533f, 0 ), Quaternion.identity ).transform;
             Transform engineP2 = DontInstantiateLocal( PartRegistry.Load( (NamespacedID)"Vanilla::engine" ), tankP, new Vector3( -2, -3.45533f, 0 ), Quaternion.identity ).transform;
-            // Transform engineP1 = InstantiateLocal( enginePrefab, tankP, new Vector3( 0, -3.45533f, 0 ), Quaternion.identity ).transform;
-            // Transform engineP2 = InstantiateLocal( enginePrefab, tankP, new Vector3( 0, 0, 0 ), Quaternion.identity ).transform;
             v.RootPart = root;
 
             FBulkConnection conn = tankP.gameObject.AddComponent<FBulkConnection>();

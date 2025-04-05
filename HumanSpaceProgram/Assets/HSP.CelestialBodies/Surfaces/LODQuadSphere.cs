@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace HSP.CelestialBodies.Surfaces
 {
@@ -83,13 +84,14 @@ namespace HSP.CelestialBodies.Surfaces
             ClearAllQuads();
         }
 
-        private ILODQuadModifier[][] _jobs;
+        public ILODQuadModifier[][] Jobs { get; private set; }
+
         /// <summary>
         /// Gets the LOD sphere's jobs filtered for the LOD sphere's current build mode.
         /// </summary>
-        public (ILODQuadModifier[] jobs, int[] firstJobPerStage) GetJobsForBuild()
+        public (ILODQuadModifier[] jobs, int[] firstJobPerStage) GetJobsToBuild()
         {
-            return ILODQuadModifier.FilterJobs( _jobs, Mode );
+            return ILODQuadModifier.FilterJobs( Jobs, Mode );
         }
 
         /// <summary>
@@ -102,9 +104,9 @@ namespace HSP.CelestialBodies.Surfaces
         public void SetJobs( params ILODQuadModifier[][] jobs )
         {
             if( IsBuilding )
-                throw new InvalidOperationException( $"Can't set {nameof( _jobs )} of a LOD sphere while it's building." );
+                throw new InvalidOperationException( $"Can't set {nameof( Jobs )} of a LOD sphere while it's building." );
 
-            _jobs = jobs;
+            Jobs = jobs;
             ClearAllQuads();
         }
 
@@ -219,7 +221,7 @@ namespace HSP.CelestialBodies.Surfaces
             if( PoIGetter == null )
                 throw new InvalidOperationException( $"Tried to start building while the PoI getter was not set." );
 
-            if( _jobs == null )
+            if( Jobs == null )
                 return;
 
             Vector3Dbl pos = this.CelestialBody.ReferenceFrameTransform.AbsolutePosition;
@@ -252,7 +254,7 @@ namespace HSP.CelestialBodies.Surfaces
             if( _builder == null )
                 throw new InvalidOperationException( $"Tried to build without starting a build first." );
 
-            if( _jobs == null )
+            if( Jobs == null )
                 return;
 
             if( !_builder.IsDone )
@@ -357,6 +359,18 @@ namespace HSP.CelestialBodies.Surfaces
             return Math.Abs( lhs.x - rhs.x ) >= threshold
                 || Math.Abs( lhs.y - rhs.y ) >= threshold
                 || Math.Abs( lhs.z - rhs.z ) >= threshold;
+        }
+
+        [MapsInheritingFrom( typeof( LODQuadSphere ) )]
+        public static SerializationMapping LODQuadSphereMapping()
+        {
+            return new MemberwiseSerializationMapping<LODQuadSphere>()
+                .WithMember( "mode", o => o.Mode )
+                .WithMember( "edge_subdivisions", o => o.EdgeSubdivisions )
+                .WithMember( "max_depth", o => o.MaxDepth )
+                .WithMember( "materials", ArrayContext.Assets, o => o.Materials )
+                .WithMember( "poi_getter", o => o.PoIGetter )
+                .WithMember( "jobs", o => o.Jobs, ( o, value ) => o.SetJobs( value ) );
         }
     }
 }
