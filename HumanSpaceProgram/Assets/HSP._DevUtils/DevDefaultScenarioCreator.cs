@@ -34,15 +34,9 @@ namespace HSP._DevUtils
             LoadGameplayScene();
         }
 
-        public static void SaveCurrentSceneAsScenario( NamespacedID scenarioId )
-        {
-            // save as normal save, then move?
-
-            // load from scenario and from save differ only in how the root path is retrieved.
-        }
-
-
-
+        //
+        //
+        //
 
         public static void LoadGameplayScene()
         {
@@ -53,7 +47,7 @@ namespace HSP._DevUtils
 
                 CreateVessels();
 
-                SaveCurrentSceneAsScenario( scenario.ScenarioID );
+                TimelineManager.BeginScenarioSaveAsync( scenario );
             } ) );
         }
 
@@ -74,6 +68,10 @@ namespace HSP._DevUtils
             ActiveVesselManager.ActiveObject = vessel.RootPart.GetVessel().gameObject.transform;
         }
 
+        //
+        //
+        //
+        
         private static Vector3 GetLocalPositionRelativeToRoot( Transform target )
         {
             Vector3 relativePosition = target.localPosition;

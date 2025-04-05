@@ -2,7 +2,6 @@ using HSP.CelestialBodies;
 using HSP.Timelines;
 using System;
 using System.IO;
-using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.DataHandlers;
@@ -15,14 +14,22 @@ namespace HSP.Vanilla.Scenes.GameplayScene
         public const string DESERIALIZE_CELESTIAL_BODIES = HSPEvent.NAMESPACE_HSP + ".deserialize_celestial_bodies";
 
         [HSPEventListener( HSPEvent_ON_TIMELINE_SAVE.ID, SERIALIZE_CELESTIAL_BODIES )]
-        private static void SerializeCelestialBodies( TimelineManager.SaveEventData e )
+        [HSPEventListener( HSPEvent_ON_SCENARIO_SAVE.ID, SERIALIZE_CELESTIAL_BODIES )]
+        private static void SerializeCelestialBodies( object e )
         {
-            Directory.CreateDirectory( Path.Combine( e.save.GetRootDirectory(), "CelestialBodies" ) );
+            string rootPath;
+            if( e is TimelineManager.LoadEventData e2 )
+                rootPath = Path.Combine( e2.save.GetRootDirectory(), "CelestialBodies" );
+            else if( e is TimelineManager.StartNewEventData e3 )
+                rootPath = Path.Combine( e3.scenario.GetRootDirectory(), "CelestialBodies" );
+            else
+                throw new ArgumentException();
+            Directory.CreateDirectory( Path.Combine( rootPath, "CelestialBodies" ) );
 
             int i = 0;
             foreach( var celestialBody in CelestialBodyManager.CelestialBodies )
             {
-                JsonSerializedDataHandler celestialBodiesDataHandler = new JsonSerializedDataHandler( Path.Combine( e.save.GetRootDirectory(), "CelestialBodies", $"{i}", "gameobjects.json" ) );
+                JsonSerializedDataHandler celestialBodiesDataHandler = new JsonSerializedDataHandler( Path.Combine( rootPath, "CelestialBodies", $"{i}", "gameobjects.json" ) );
 
                 var data = SerializationUnit.Serialize( celestialBody.gameObject, TimelineManager.RefStore );
                 celestialBodiesDataHandler.Write( data );
@@ -34,18 +41,18 @@ namespace HSP.Vanilla.Scenes.GameplayScene
         [HSPEventListener( HSPEvent_ON_TIMELINE_LOAD.ID, DESERIALIZE_CELESTIAL_BODIES )]
         private static void DeserializeCelestialBodies( object e )
         {
-            string path;
+            string rootPath;
             if( e is TimelineManager.LoadEventData e2 )
-                path = Path.Combine( e2.save.GetRootDirectory(), "Vessels" );
+                rootPath = Path.Combine( e2.save.GetRootDirectory(), "CelestialBodies" );
             else if( e is TimelineManager.StartNewEventData e3 )
-                path = Path.Combine( e3.scenario.GetRootDirectory(), "Vessels" );
+                rootPath = Path.Combine( e3.scenario.GetRootDirectory(), "CelestialBodies" );
             else
                 throw new ArgumentException();
 
-            if( !Directory.Exists( path ) )
+            if( !Directory.Exists( rootPath ) )
                 return;
 
-            foreach( var dir in Directory.GetDirectories( path ) )
+            foreach( var dir in Directory.GetDirectories( rootPath ) )
             {
                 JsonSerializedDataHandler celestialBodiesDataHandler = new JsonSerializedDataHandler( Path.Combine( dir, "gameobjects.json" ) );
 

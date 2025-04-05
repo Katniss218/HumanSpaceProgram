@@ -15,6 +15,8 @@ namespace HSP.Settings
         /// </summary>
         public List<ISettingsPage> Pages;
 
+        public static SettingsFile Empty => new SettingsFile();
+
         /// <summary>
         /// Creates a new settings file and populates it with default values.
         /// </summary>

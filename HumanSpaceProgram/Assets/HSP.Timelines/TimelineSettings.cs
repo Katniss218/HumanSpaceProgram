@@ -43,13 +43,21 @@ namespace HSP.Timelines
 
             if( File.Exists( path ) )
             {
-                SerializedData data = new JsonSerializedDataHandler( path )
-                    .Read();
+                try
+                {
+                    SerializedData data = new JsonSerializedDataHandler( path )
+                        .Read();
 
-                return SerializationUnit.Deserialize<SettingsFile>( data );
+                    return SerializationUnit.Deserialize<SettingsFile>( data );
+                }
+                catch( Exception ex )
+                {
+                    File.Copy( path, path.Replace( ".json", "_loadingfailed.json" ), true );
+                    throw ex;
+                }
             }
-            //File.Copy( path, path.Replace( ".json", "_loadingfailed.json" ), true );
-            return null;
+
+            return SettingsFile.Empty;
         }
 
         public void SaveSettings( SettingsFile settings )
