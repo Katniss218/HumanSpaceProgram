@@ -22,14 +22,15 @@ namespace HSP.Settings
         internal static SerializedData data;
 
         /// <summary>
-        /// Implement this method to send the settings to an external member, like e.g. UnityEngine.Application.targetFramerate.
-        /// </summary>
-        /// <returns>The instance that was being invoked.</returns>
-        protected abstract T OnApply();
-
-        /// <summary>
         /// Applies this page as the current working page.
         /// </summary>
+        /// <remarks>
+        /// NOTE TO IMPLEMENTERS: <br/>
+        /// - This method should only apply members that need to be set somewhere externally, like Unity graphics settings, keybind mappings, etc.
+        /// </remarks>
+        /// <returns>The instance `this` that was being invoked.</returns>
+        protected abstract T OnApply();
+
         public void Apply()
         {
             T page = OnApply();

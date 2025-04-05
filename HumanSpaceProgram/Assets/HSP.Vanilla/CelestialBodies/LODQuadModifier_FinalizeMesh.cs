@@ -3,6 +3,7 @@ using System;
 using System.Runtime.CompilerServices;
 using Unity.Collections;
 using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace HSP.Vanilla.CelestialBodies
 {
@@ -430,6 +431,12 @@ namespace HSP.Vanilla.CelestialBodies
                     }
                 }
             }
+        }
+
+        [MapsInheritingFrom( typeof( LODQuadModifier_FinalizeMesh ) )]
+        public static SerializationMapping LODQuadModifier_FinalizeMeshMapping()
+        {
+            return new MemberwiseSerializationMapping<LODQuadModifier_FinalizeMesh>();
         }
     }
 }

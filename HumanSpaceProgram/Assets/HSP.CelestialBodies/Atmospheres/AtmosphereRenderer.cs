@@ -1,7 +1,9 @@
+using HSP.CelestialBodies.Surfaces;
 using HSP.ReferenceFrames;
 using System;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityPlus.Serialization;
 
 namespace HSP.CelestialBodies
 {
@@ -127,6 +129,13 @@ namespace HSP.CelestialBodies
 
             _cmdComposition.Clear();
             _cmdComposition.Blit( _rt, (RenderTexture)null );
+        }
+
+#warning TODO - add a renderer per planet with atmosphere, build one cmdbuffer using each of them.
+        [MapsInheritingFrom( typeof( AtmosphereRenderer ) )]
+        public static SerializationMapping AtmosphereRendererMapping()
+        {
+            return new MemberwiseSerializationMapping<AtmosphereRenderer>();
         }
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using Unity.Collections;
 using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace HSP.Vanilla.CelestialBodies
 {
@@ -63,6 +64,12 @@ namespace HSP.Vanilla.CelestialBodies
                     resultVertices[index] += temporaryHeightOffset_Removelater;
                 }
             }
+        }
+
+        [MapsInheritingFrom( typeof( LODQuadModifier_NoiseDisplace ) )]
+        public static SerializationMapping LODQuadModifier_NoiseDisplaceMapping()
+        {
+            return new MemberwiseSerializationMapping<LODQuadModifier_NoiseDisplace>();
         }
     }
 }

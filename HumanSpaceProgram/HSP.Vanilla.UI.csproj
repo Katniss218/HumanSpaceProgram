@@ -92,6 +92,7 @@
     <Compile Include="Assets\HSP.Vanilla.UI\Timelines\UIScenarioMetadata.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\UITextReadout_Acceleration.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Scenes\GameplayScene\OnStartup.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI\Settings\UISettingsPage.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla.UI\___HSP.Vanilla.UI.asmdef" />
@@ -998,6 +999,10 @@
     <ProjectReference Include="HSP.SceneManagement.csproj">
       <Project>{5B21ACE1-5E92-EEB2-818D-AF6D6AE9F824}</Project>
       <Name>HSP.SceneManagement</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Settings.csproj">
+      <Project>{40D40A9F-D8D4-16D9-E477-9EC39F056D3E}</Project>
+      <Name>HSP.Settings</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.Timelines.csproj">
       <Project>{C443A3BB-4D58-3A1D-D085-E8AEA15B2BC0}</Project>

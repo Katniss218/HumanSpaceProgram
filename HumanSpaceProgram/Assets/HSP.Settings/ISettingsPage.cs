@@ -13,6 +13,10 @@ namespace HSP.Settings
         /// <summary>
         /// Applies this page as the current working page.
         /// </summary>
+        /// <remarks>
+        /// NOTE TO IMPLEMENTERS: <br/>
+        /// - This method should only apply members that need to be set somewhere externally, like Unity graphics settings, keybind mappings, etc.
+        /// </remarks>
         void Apply();
     }
 }

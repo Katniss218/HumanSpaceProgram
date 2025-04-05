@@ -1,7 +1,6 @@
 ﻿using HSP.CelestialBodies;
 using HSP.CelestialBodies.Surfaces;
 using HSP.ReferenceFrames;
-using HSP.Timelines;
 using HSP.Trajectories;
 using HSP.Vanilla.CelestialBodies;
 using HSP.Vanilla.Scenes.GameplayScene.Cameras;
@@ -181,8 +180,6 @@ namespace HSP._DevUtils
             return cb;
         }
 
-        //[HSPEventListener( HSPEvent_BEFORE_TIMELINE_NEW.ID, CREATE_CELESTIAL_BODIES )]
-        //[HSPEventListener( HSPEvent_BEFORE_TIMELINE_LOAD.ID, CREATE_CELESTIAL_BODIES )]
         public static void CreateDefaultPlanetarySystem()
         {
             A();
