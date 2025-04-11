@@ -58,15 +58,15 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\HSP.Timelines\TimelineNotFoundException.cs" />
     <Compile Include="Assets\HSP.Timelines\Serialization\TimelineMetadata.cs" />
     <Compile Include="Assets\HSP.Timelines\Serialization\ScenarioMetadata.cs" />
     <Compile Include="Assets\HSP.Timelines\TimelineManager.cs" />
     <Compile Include="Assets\HSP.Timelines\ScenarioSettings.cs" />
     <Compile Include="Assets\HSP.Timelines\TimelineSettings.cs" />
     <Compile Include="Assets\HSP.Timelines\Serialization\SaveMetadata.cs" />
-    <Compile Include="Assets\HSP.Timelines\TimelineNotFoundException.cs" />
-    <Compile Include="Assets\HSP.Timelines\ScenarioNotFoundException.cs" />
     <Compile Include="Assets\HSP.Timelines\SaveNotFoundException.cs" />
+    <Compile Include="Assets\HSP.Timelines\ScenarioNotFoundException.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Timelines\___HSP.Timelines.asmdef" />

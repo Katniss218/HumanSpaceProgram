@@ -71,6 +71,7 @@
     <Compile Include="Assets\HSP.Vanilla.UI\Timelines\UISaveWindow.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Scenes\DesignScene\UIPartList.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\UITextReadout_ElapsedUT.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI\Settings\UISettingsPage.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\UIIResourceContainer.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Scenes\DesignScene\DesignSceneUIFactory.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\ControlSetupControlGroupUI.cs" />
@@ -78,6 +79,7 @@
     <Compile Include="Assets\HSP.Vanilla.UI\Components\UIPartWindow.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\ControlSetupControlUI.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\UISequenceElement.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI\Settings\ScenarioSettings\UISettingsPage_Scenario.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Scenes\GameplayScene\GameplaySceneUIFactory.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Scenes\GameplayScene\GameplayEscapeUIFactory.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\WindowRelationHighlight.cs" />
@@ -92,7 +94,6 @@
     <Compile Include="Assets\HSP.Vanilla.UI\Timelines\UIScenarioMetadata.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\UITextReadout_Acceleration.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Scenes\GameplayScene\OnStartup.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI\Settings\UISettingsPage.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla.UI\___HSP.Vanilla.UI.asmdef" />

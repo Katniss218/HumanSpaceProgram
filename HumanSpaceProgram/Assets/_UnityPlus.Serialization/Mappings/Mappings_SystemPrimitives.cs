@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.SqlTypes;
 using System.Globalization;
 
 namespace UnityPlus.Serialization.Mappings
@@ -192,6 +193,12 @@ namespace UnityPlus.Serialization.Mappings
                 OnSave = ( o, s ) => (SerializedPrimitive)o.ToString( "G" ),
                 OnLoad = ( data, l ) => Enum.Parse<T>( (string)data )
             };
+        }
+
+        [MapsInheritingFrom( typeof( Nullable<> ) )]
+        public static SerializationMapping NullableMapping<T>() where T : struct
+        {
+            return new NullableSerializationMapping<T>();
         }
 
         [MapsInheritingFrom( typeof( Delegate ) )]

@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HSP.Vanilla.UI", "HSP.Vanil
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HSP.CelestialBodies", "HSP.CelestialBodies.csproj", "{83793330-5AED-C186-5E4B-AAD4BB463469}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HSP.Timelines", "HSP.Timelines.csproj", "{C443A3BB-4D58-3A1D-D085-E8AEA15B2BC0}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HSP.Tests.PlayMode", "HSP.Tests.PlayMode.csproj", "{F7996F56-86CE-7CC9-2E18-0B9B6A755B26}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_UnityPlus.Logging", "_UnityPlus.Logging.csproj", "{71FF22E3-6491-7B94-7004-34ABCE1AC5F6}"
@@ -26,8 +28,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_UnityPlus.Serialization.Input", "_UnityPlus.Serialization.Input.csproj", "{BB5113DD-1774-27FF-3084-16CB7069AEEB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_UnityEngine", "_UnityEngine.csproj", "{29A28F5C-31DD-0068-5BB5-61A0CFFA20FA}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HSP.Timelines", "HSP.Timelines.csproj", "{C443A3BB-4D58-3A1D-D085-E8AEA15B2BC0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_UnityPlus.OverridableValueProviders", "_UnityPlus.OverridableValueProviders.csproj", "{2FD51314-7711-BD56-25C5-0C8F36A30A82}"
 EndProject
@@ -97,6 +97,10 @@ Global
 		{83793330-5AED-C186-5E4B-AAD4BB463469}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{83793330-5AED-C186-5E4B-AAD4BB463469}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{83793330-5AED-C186-5E4B-AAD4BB463469}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C443A3BB-4D58-3A1D-D085-E8AEA15B2BC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C443A3BB-4D58-3A1D-D085-E8AEA15B2BC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C443A3BB-4D58-3A1D-D085-E8AEA15B2BC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C443A3BB-4D58-3A1D-D085-E8AEA15B2BC0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F7996F56-86CE-7CC9-2E18-0B9B6A755B26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F7996F56-86CE-7CC9-2E18-0B9B6A755B26}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F7996F56-86CE-7CC9-2E18-0B9B6A755B26}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -129,10 +133,6 @@ Global
 		{29A28F5C-31DD-0068-5BB5-61A0CFFA20FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{29A28F5C-31DD-0068-5BB5-61A0CFFA20FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{29A28F5C-31DD-0068-5BB5-61A0CFFA20FA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C443A3BB-4D58-3A1D-D085-E8AEA15B2BC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C443A3BB-4D58-3A1D-D085-E8AEA15B2BC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C443A3BB-4D58-3A1D-D085-E8AEA15B2BC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C443A3BB-4D58-3A1D-D085-E8AEA15B2BC0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2FD51314-7711-BD56-25C5-0C8F36A30A82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2FD51314-7711-BD56-25C5-0C8F36A30A82}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2FD51314-7711-BD56-25C5-0C8F36A30A82}.Release|Any CPU.ActiveCfg = Release|Any CPU

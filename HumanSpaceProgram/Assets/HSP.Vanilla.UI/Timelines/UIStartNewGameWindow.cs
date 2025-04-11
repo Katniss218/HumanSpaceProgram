@@ -112,12 +112,28 @@ namespace HSP.Vanilla.UI.Timelines
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Right );
 
             UIInputField<string> inputField2 = _contentsPanel.AddStringInputField( new UILayoutInfo( UIFill.Horizontal( 154, 2 ), UIAnchor.Top, -32 - 17, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
+            
             _contentsPanel.AddButton( new UILayoutInfo( UIAnchor.Bottom, (0, 2), (100, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), this.StartGame )
-            .AddStdText( new UILayoutInfo( UIFill.Fill() ), "Start" )
+                .AddStdText( new UILayoutInfo( UIFill.Fill() ), "Start" )
+                .WithAlignment( TMPro.HorizontalAlignmentOptions.Center );
+
+            _contentsPanel.AddButton( new UILayoutInfo( UIAnchor.Bottom, (-105, 2), (100, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
+            {
+                Create_Step1();
+            } )
+                .AddStdText( new UILayoutInfo( UIFill.Fill() ), "Back" )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center );
 
             this._nameInputField = inputField;
             this._descriptionInputField = inputField2;
+        }
+
+        private void ReloadUISettingsPages()
+        {
+            // get page types for a scenario
+            // get the allowed page types from the scenario (filter)
+
+            // create the pages
         }
 
         public static T Create<T>( UICanvas parent, Step step = Step.SelectScenario ) where T : UIStartNewGameWindow

@@ -3,6 +3,7 @@ using HSP.CelestialBodies.Surfaces;
 using HSP.ReferenceFrames;
 using HSP.Trajectories;
 using HSP.Vanilla.CelestialBodies;
+using HSP.Vanilla.Scenes.AlwaysLoadedScene;
 using HSP.Vanilla.Scenes.GameplayScene.Cameras;
 using HSP.Vanilla.Trajectories;
 using HSP.Vessels;
@@ -18,6 +19,7 @@ namespace HSP._DevUtils
 
         private static Material[] _earthMaterial = new Material[6];
 
+        [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, "a654" )]
         private static void A()
         {
             var cbShader = AssetRegistry.Get<Shader>( "builtin::HSP.CelestialBodies/Surfaces/TerrainShader" );
@@ -182,8 +184,6 @@ namespace HSP._DevUtils
 
         public static void CreateDefaultPlanetarySystem()
         {
-            A();
-
             QuaternionDbl orientation = Quaternion.Euler( 270, 0, 0 );
 
             CelestialBody cbSun = CreateCB( "sun", Vector3Dbl.zero, orientation );

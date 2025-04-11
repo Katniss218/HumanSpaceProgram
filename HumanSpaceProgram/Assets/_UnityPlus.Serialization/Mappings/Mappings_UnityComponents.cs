@@ -8,32 +8,6 @@ namespace UnityPlus.Serialization.Mappings
 {
     public static class Mappings_UnityComponents
     {
-        [MapsInheritingFrom( typeof( Material ) )]
-        public static SerializationMapping MaterialMapping()
-        {
-            return new MemberwiseSerializationMapping<Material>()
-                .WithMember( "floats", o =>
-                {
-                    var shader = o.shader;
-                    var floats = new Dictionary<string, float>();
-                    int count = shader.GetPropertyCount();
-                    for( int i = 0; i < count; i++ )
-                    {
-                        string name = shader.GetPropertyName( i );
-                        float val = o.GetFloat( shader.GetPropertyNameId( i ) );
-                        floats.Add( name, val );
-                    }
-                    return floats;
-                }, ( o, value ) =>
-                {
-                    var shader = o.shader;
-                    foreach( (string name, float val) in value )
-                    {
-                        o.SetFloat( Shader.PropertyToID( name ), val );
-                    }
-                } );
-        }
-
         [MapsInheritingFrom( typeof( ScriptableObject ) )]
         public static SerializationMapping ScriptableObjectMapping()
         {
