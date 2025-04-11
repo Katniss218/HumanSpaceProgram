@@ -35,7 +35,7 @@ namespace HSP.Settings
                     throw new ArgumentException( $"All types must implement '{nameof( ISettingsPage )}'.", nameof( type ) );
                 }
 
-                var page = (ISettingsPage)Activator.CreateInstance( type );
+                var page = ISettingsPage.CreateDefaultPage( type );
                 settingsFile.Pages.Add( page );
             }
 
@@ -48,7 +48,7 @@ namespace HSP.Settings
             {
                 if( !this.Pages.Select( p => p.GetType() ).Contains( type ) )
                 {
-                    var page = (ISettingsPage)Activator.CreateInstance( type );
+                    var page = ISettingsPage.CreateDefaultPage( type );
                     this.Pages.Add( page );
                 }
             }

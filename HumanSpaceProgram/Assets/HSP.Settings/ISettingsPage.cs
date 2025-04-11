@@ -1,4 +1,6 @@
 
+using System;
+
 namespace HSP.Settings
 {
     /// <summary>
@@ -18,5 +20,15 @@ namespace HSP.Settings
         /// - This method should only apply members that need to be set somewhere externally, like Unity graphics settings, keybind mappings, etc.
         /// </remarks>
         void Apply();
+
+        public static ISettingsPage CreateDefaultPage( Type type )
+        {
+            return (ISettingsPage)Activator.CreateInstance( type );
+        }
+
+        public static T CreateDefaultPage<T>() where T : ISettingsPage
+        {
+            return (T)CreateDefaultPage( typeof( T ) );
+        }
     }
 }

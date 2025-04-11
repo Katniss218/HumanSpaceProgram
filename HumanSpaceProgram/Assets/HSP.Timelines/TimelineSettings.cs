@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using UnityPlus.Serialization.DataHandlers;
 using UnityPlus.Serialization;
+using HSP.Timelines.Serialization;
 
 namespace HSP.Timelines
 {
@@ -21,15 +22,23 @@ namespace HSP.Timelines
     {
         public const string SETTINGS_FILENAME = "timeline_settings.json";
 
+        public static IEnumerable<ISettingsPage> GetDefaultPages()
+        {
+            var types = AppDomain.CurrentDomain.GetAssemblies().SelectMany( a => a.GetTypes() )
+                .Where( t => ISettingsProvider.IsValidSettingsPage<ITimelineSettingsPage>( t ) );
+
+            return types.Select( t => ISettingsPage.CreateDefaultPage( t ) );
+        }
+
         public IEnumerable<Type> GetPageTypes()
         {
             return AppDomain.CurrentDomain.GetAssemblies().SelectMany( a => a.GetTypes() )
                 .Where( t => ISettingsProvider.IsValidSettingsPage<ITimelineSettingsPage>( t ) );
         }
 
-        private string GetSettingsFilePath()
+        private static string GetSettingsFilePath( TimelineMetadata timeline )
         {
-            return Path.Combine( TimelineManager.CurrentTimeline.GetRootDirectory(), SETTINGS_FILENAME );
+            return Path.Combine( timeline.GetRootDirectory(), SETTINGS_FILENAME );
         }
 
         public bool IsAvailable()
@@ -37,9 +46,9 @@ namespace HSP.Timelines
             return TimelineManager.CurrentTimeline != null;
         }
 
-        public SettingsFile LoadSettings()
+        public static SettingsFile LoadSettings( TimelineMetadata timeline )
         {
-            string path = GetSettingsFilePath();
+            string path = GetSettingsFilePath( timeline );
 
             if( File.Exists( path ) )
             {
@@ -60,12 +69,22 @@ namespace HSP.Timelines
             return SettingsFile.Empty;
         }
 
-        public void SaveSettings( SettingsFile settings )
+        public SettingsFile LoadSettings()
+        {
+            return LoadSettings( TimelineManager.CurrentTimeline );
+        }
+
+        public static void SaveSettings( TimelineMetadata timeline, SettingsFile settings )
         {
             SerializedData data = SerializationUnit.Serialize( settings );
 
-            new JsonSerializedDataHandler( GetSettingsFilePath() )
+            new JsonSerializedDataHandler( GetSettingsFilePath( timeline ) )
                 .Write( data );
+        }
+
+        public void SaveSettings( SettingsFile settings )
+        {
+            SaveSettings( TimelineManager.CurrentTimeline, settings );
         }
     }
 }

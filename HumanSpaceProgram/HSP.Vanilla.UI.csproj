@@ -79,7 +79,7 @@
     <Compile Include="Assets\HSP.Vanilla.UI\Components\UIPartWindow.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\ControlSetupControlUI.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\UISequenceElement.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI\Settings\ScenarioSettings\UISettingsPage_Scenario.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI\Settings\TimelineSettings\UISettingsPage_Scenario.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Scenes\GameplayScene\GameplaySceneUIFactory.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Scenes\GameplayScene\GameplayEscapeUIFactory.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\WindowRelationHighlight.cs" />

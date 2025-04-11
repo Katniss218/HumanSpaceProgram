@@ -1,4 +1,9 @@
 ﻿using HSP.Settings;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
@@ -7,11 +12,58 @@ using UnityPlus.UILib.UIElements;
 
 namespace HSP.Vanilla.UI.Settings
 {
+    public interface IUISettingsPage
+    {
+        void Apply();
+
+
+        //
+
+        private static Dictionary<Type, MethodInfo> _factoryCache = new();
+
+        /// <summary>
+        /// Creates an <see cref="IUISettingsPage"/> for the given settings page instance.
+        /// </summary>
+        /// <param name="parent">The UI element to use as the parent.</param>
+        /// <param name="page">The settings page to create the UI for.</param>
+        /// <returns>The instantiated UI element.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when an appropriate factory method could not be found.</exception>
+        public static IUISettingsPage Create( IUIElementContainer parent, ISettingsPage page )
+        {
+            // find the UI for the page using reflection
+            Type pageType = page.GetType();
+            if( !_factoryCache.TryGetValue( page.GetType(), out MethodInfo factoryMethod ) )
+            {
+                Type uiBaseType = typeof( UISettingsPage<> ).MakeGenericType( pageType );
+
+                IEnumerable<Type> uiType = AppDomain.CurrentDomain.GetAssemblies().SelectMany( a => a.GetTypes() )
+                    .Where( t => !t.IsAbstract && uiBaseType.IsAssignableFrom( t ) );
+
+                Type type = uiType.FirstOrDefault();
+                if( type == null )
+                {
+                    throw new InvalidOperationException( $"No UI found for the settings page '{pageType.Name}'." );
+                }
+                if( uiType.Count() > 1 )
+                {
+                    throw new InvalidOperationException( $"Multiple UIs found for the settings page '{pageType.Name}'." );
+                }
+
+                // Finds the standard 'Create' factory method and uses that.
+
+                factoryMethod = type.GetMethod( "Create", BindingFlags.Public | BindingFlags.Static );
+                _factoryCache.Add( pageType, factoryMethod );
+            }
+
+            return (IUISettingsPage)factoryMethod.Invoke( null, new object[] { parent, page } );
+        }
+    }
+
     /// <summary>
     /// A base class for all settings page UIs.
     /// </summary>
     /// <typeparam name="TSettingsPage">The type of the settings page being displayed.</typeparam>
-    public abstract class UISettingsPage<TSettingsPage> : UIPanel where TSettingsPage : ISettingsPage
+    public abstract class UISettingsPage<TSettingsPage> : UIPanel, IUISettingsPage where TSettingsPage : ISettingsPage
     {
         protected UIRectMask contentPanel;
 
@@ -19,6 +71,11 @@ namespace HSP.Vanilla.UI.Settings
         /// The object that is referenced by this UI element.
         /// </summary>
         public TSettingsPage SettingsPage { get; private set; }
+
+        public void Apply()
+        {
+            SettingsPage.Apply();
+        }
 
         /// <summary>
         /// Creates the core/base of the functionality panel.
