@@ -6,6 +6,7 @@ using HSP.Timelines.Serialization;
 using HSP.UI;
 using HSP.Vanilla.Scenes.GameplayScene;
 using HSP.Vanilla.UI.Settings;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor.PackageManager.UI;
@@ -27,8 +28,10 @@ namespace HSP.Vanilla.UI.Timelines
 
         IUIElementContainer _contentsPanel;
         IUIElementContainer _scenarioListUI;
-        IUIElementContainer _settingsPageList;
-        List<IUISettingsPage> _settingsPages = new();
+        IUIElementContainer _settingsPageContainer;
+        IUIElementContainer _settingsPageTabList;
+
+        ISettingsPage[] _settingsPages;
 
         UIInputField<string> _nameInputField;
         UIInputField<string> _descriptionInputField;
@@ -83,7 +86,7 @@ namespace HSP.Vanilla.UI.Timelines
             {
                 child.Destroy();
             }
-            _settingsPages.Clear();
+
             this.CurrentStep = Step.SelectScenario;
 
             var scrollview = _contentsPanel.AddVerticalScrollView( new UILayoutInfo( UIFill.Fill( 0, 0, 0, 30 ) ), 100 );
@@ -114,15 +117,18 @@ namespace HSP.Vanilla.UI.Timelines
             }
             this.CurrentStep = Step.SetParameters;
 
-            _contentsPanel.AddStdText( new UILayoutInfo( UIAnchor.TopLeft, (2, -32), (150, 15) ), "Timeline Name" )
+            _settingsPageContainer = _contentsPanel.AddPanel( new UILayoutInfo( UIFill.Horizontal( 104, 2 ), UIAnchor.Top, 2, 300 ), null );
+            _settingsPageTabList = _contentsPanel.AddPanel( new UILayoutInfo( UIAnchor.TopLeft, (2, 2), (100, 300) ), null );
+
+            _contentsPanel.AddStdText( new UILayoutInfo( UIAnchor.BottomLeft, (2, 32 + 17), (150, 15) ), "Timeline Name" )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Right );
 
-            UIInputField<string> inputField = _contentsPanel.AddStringInputField( new UILayoutInfo( UIFill.Horizontal( 154, 2 ), UIAnchor.Top, -32, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
+            UIInputField<string> inputField = _contentsPanel.AddStringInputField( new UILayoutInfo( UIFill.Horizontal( 154, 2 ), UIAnchor.Bottom, 32 + 17, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
 
-            _contentsPanel.AddStdText( new UILayoutInfo( UIAnchor.TopLeft, (2, -32 - 17), (150, 15) ), "Timeline Description" )
+            _contentsPanel.AddStdText( new UILayoutInfo( UIAnchor.BottomLeft, (2, 32), (150, 15) ), "Timeline Description" )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Right );
 
-            UIInputField<string> inputField2 = _contentsPanel.AddStringInputField( new UILayoutInfo( UIFill.Horizontal( 154, 2 ), UIAnchor.Top, -32 - 17, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
+            UIInputField<string> inputField2 = _contentsPanel.AddStringInputField( new UILayoutInfo( UIFill.Horizontal( 154, 2 ), UIAnchor.Bottom, 32, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
 
             _contentsPanel.AddButton( new UILayoutInfo( UIAnchor.Bottom, (0, 2), (100, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), this.StartGame )
                 .AddStdText( new UILayoutInfo( UIFill.Fill() ), "Start" )
@@ -135,33 +141,40 @@ namespace HSP.Vanilla.UI.Timelines
                 .AddStdText( new UILayoutInfo( UIFill.Fill() ), "Back" )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center );
 
-            _settingsPageList = _contentsPanel.AddPanel( new UILayoutInfo( UIFill.Fill() ), null );
-
             ReloadUISettingsPages();
 
             this._nameInputField = inputField;
             this._descriptionInputField = inputField2;
         }
 
-        private void ReloadUISettingsPages()
+        private void ShowPage( int index )
         {
-            foreach( var child in _settingsPageList.Children.ToArray() )
+            if( index < 0 || index >= _settingsPages.Length )
+                throw new ArgumentOutOfRangeException( nameof( index ) );
+
+            foreach( var child in _settingsPageContainer.Children.ToArray() )
             {
                 child.Destroy();
             }
-            _settingsPages.Clear();
-            IEnumerable<ISettingsPage> pages = TimelineSettingsProvider.GetDefaultPages();
 
+            var uiPage = IUISettingsPage.Create( _settingsPageContainer, _settingsPages[index] );
+        }
 
-            foreach( var page in pages )
+        private void ReloadUISettingsPages()
+        {
+            _settingsPages = TimelineSettingsProvider.GetDefaultPages().ToArray();
+
+            for( int i = 0; i < _settingsPages.Length; i++ )
             {
-                var uiPage = IUISettingsPage.Create( _settingsPageList, page );
-                _settingsPages.Add( uiPage );
+                int index = i; // capture the current index for the lambda expression
+                var tab = _settingsPageTabList.AddButton( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Top, 0, 30 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
+                {
+                    ShowPage( index );
+                } );
             }
-            // get page types for a timeline
-            // get the allowed page types from the scenario (filter)
 
-            // create the pages
+            if( _settingsPages.Length > 0 )
+                ShowPage( 0 );
         }
 
         public static T Create<T>( UICanvas parent, Step step = Step.SelectScenario ) where T : UIStartNewGameWindow

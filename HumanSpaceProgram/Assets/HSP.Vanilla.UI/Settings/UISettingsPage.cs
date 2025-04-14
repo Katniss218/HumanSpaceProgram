@@ -36,22 +36,23 @@ namespace HSP.Vanilla.UI.Settings
             {
                 Type uiBaseType = typeof( UISettingsPage<> ).MakeGenericType( pageType );
 
-                IEnumerable<Type> uiType = AppDomain.CurrentDomain.GetAssemblies().SelectMany( a => a.GetTypes() )
+                IEnumerable<Type> uiTypes = AppDomain.CurrentDomain.GetAssemblies().SelectMany( a => a.GetTypes() )
                     .Where( t => !t.IsAbstract && uiBaseType.IsAssignableFrom( t ) );
 
-                Type type = uiType.FirstOrDefault();
-                if( type == null )
+                Type uiType = uiTypes.FirstOrDefault();
+                if( uiType == null )
                 {
                     throw new InvalidOperationException( $"No UI found for the settings page '{pageType.Name}'." );
                 }
-                if( uiType.Count() > 1 )
+                if( uiTypes.Count() > 1 )
                 {
                     throw new InvalidOperationException( $"Multiple UIs found for the settings page '{pageType.Name}'." );
                 }
 
                 // Finds the standard 'Create' factory method and uses that.
 
-                factoryMethod = type.GetMethod( "Create", BindingFlags.Public | BindingFlags.Static );
+                factoryMethod = uiType.GetMethod( "Create", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static );
+                factoryMethod = factoryMethod.MakeGenericMethod( uiType );
                 _factoryCache.Add( pageType, factoryMethod );
             }
 
@@ -80,7 +81,7 @@ namespace HSP.Vanilla.UI.Settings
         /// <summary>
         /// Creates the core/base of the functionality panel.
         /// </summary>
-        protected static T Create<T>( IUIElementContainer parent, TSettingsPage settingsPage ) where T : UISettingsPage<TSettingsPage>
+        protected static T Create<T>( IUIElementContainer parent, float height, TSettingsPage settingsPage ) where T : UISettingsPage<TSettingsPage>
         {
             T uiPage = UIPanel.Create<T>( parent, new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Top, 0, default ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/functionality_panel" ) );
 

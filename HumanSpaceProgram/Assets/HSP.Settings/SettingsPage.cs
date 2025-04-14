@@ -36,9 +36,8 @@ namespace HSP.Settings
             T page = OnApply();
             Current = page;
             data = SerializationUnit.Serialize<T>( page );
-            SettingsManager.SaveSettings(); // We can only save a specific provider to disk, not individual pages themselves, and this is okay.
-                                            // It would be nice to be able to tell if the provider for this page is available though.
-                                            // - This can be done by checking which types are returned by which provider.
+
+            SettingsManager.SaveSettings<T>();
         }
 
         /// <summary>

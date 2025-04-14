@@ -330,6 +330,7 @@ namespace HSP.Timelines
             {
                 throw new InvalidOperationException( $"Can't create a new timeline while already saving or loading." );
             }
+#warning TODO - validation for already existing timelines, possibly overwrite, but prompt user (elsewhere, here doesnt prompt)
 
             ScenarioMetadata loadedScenario;
             try

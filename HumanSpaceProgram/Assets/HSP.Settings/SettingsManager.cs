@@ -19,10 +19,15 @@ namespace HSP.Settings
 
         private static Entry[] _settingsProviders;
 
+        private static Type[] GetProviderTypes()
+        {
+            return AppDomain.CurrentDomain.GetAssemblies().SelectMany( a => a.GetTypes() )
+                .Where( t => !t.IsAbstract && !t.IsInterface && typeof( ISettingsProvider ).IsAssignableFrom( t ) ).ToArray();
+        }
+
         private static void ReloadProviders()
         {
-            Type[] types = AppDomain.CurrentDomain.GetAssemblies().SelectMany( a => a.GetTypes() )
-                .Where( t => !t.IsAbstract && !t.IsInterface && typeof( ISettingsProvider ).IsAssignableFrom( t ) ).ToArray();
+            Type[] types = GetProviderTypes();
 
             _settingsProviders = new Entry[types.Length];
 
@@ -120,7 +125,7 @@ namespace HSP.Settings
 
             if( saveToDisk ) // if something went wrong, save a default version of the file.
             {
-                SaveSettings();
+                SaveSettings( providerEntry );
             }
         }
 
@@ -136,11 +141,27 @@ namespace HSP.Settings
         }
 
         /// <summary>
+        /// Saves the provider associated with the given page type.
+        /// </summary>
+        /// <param name="page"></param>
+        public static void SaveSettings<T>() where T : ISettingsPage
+        {
+            foreach( var provider in GetProviders() )
+            {
+                if( provider.provider.GetPageTypes().Contains( typeof( T ) ) )
+                {
+                    SaveSettings( provider, true );
+                    return;
+                }
+            }
+        }
+
+        /// <summary>
         /// Saves the current settings of a given settings provider to disk.
         /// </summary>
-        private static void SaveSettings( Entry providerEntry )
+        private static void SaveSettings( Entry providerEntry, bool force = false )
         {
-            if( !providerEntry.wasAvailableDuringLastReload )
+            if( !force && !providerEntry.wasAvailableDuringLastReload )
                 return;
 
             ISettingsProvider provider = providerEntry.provider;
