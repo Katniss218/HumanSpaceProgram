@@ -1,4 +1,3 @@
-
 using System;
 
 namespace HSP.Settings
@@ -13,7 +12,7 @@ namespace HSP.Settings
     public interface ISettingsPage
     {
         /// <summary>
-        /// Applies this page as the current working page.
+        /// Applies this settings page's parameters to external members. Effectively sets this page as the 'in use' page.
         /// </summary>
         /// <remarks>
         /// NOTE TO IMPLEMENTERS: <br/>

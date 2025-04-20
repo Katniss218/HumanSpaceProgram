@@ -1,0 +1,87 @@
+﻿{
+    "$type": "UnityEngine.Material, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+    "$id": "869b7d8c-29f4-43fb-8a2f-f6fcf107a15f",
+    "shader": {
+        "$assetref": "builtin::HSP.CelestialBodies/Surfaces/TerrainShader"
+    },
+    "textures": {
+        "$type": "System.Collections.Generic.Dictionary`2[[System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[UnityPlus.Serialization.TextureInfo, _UnityPlus.Serialization, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
+        "$id": "21ea3c42-a852-4226-9948-5ae27f88ba5e",
+        "value": [
+            {
+                "key": "_MainTex",
+                "value": {
+                    "texture": {
+                        "$assetref": "Vanilla::Assets/earth_color_yp"
+                    },
+                    "offset": [
+                        0,
+                        0
+                    ],
+                    "scale": [
+                        1,
+                        1
+                    ]
+                }
+            },
+            {
+                "key": "_NormalTex",
+                "value": {
+                    "texture": {
+                        "$assetref": "Vanilla::Assets/Moon_NRM"
+                    },
+                    "offset": [
+                        0,
+                        0
+                    ],
+                    "scale": [
+                        1,
+                        1
+                    ]
+                }
+            }
+        ]
+    },
+    "vectors": {
+        "$type": "System.Collections.Generic.Dictionary`2[[System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[UnityEngine.Vector4, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
+        "$id": "73729ea8-e121-4da5-8e5b-a662fd91e78f",
+        "value": []
+    },
+    "colors": {
+        "$type": "System.Collections.Generic.Dictionary`2[[System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[UnityEngine.Color, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
+        "$id": "d609b29f-ba8c-4a9e-bb55-55db0e991fe8",
+        "value": [
+            {
+                "key": "_Color",
+                "value": null
+            }
+        ]
+    },
+    "floats": {
+        "$type": "System.Collections.Generic.Dictionary`2[[System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
+        "$id": "68d56ebd-0edc-4fab-9a90-4f36b996b665",
+        "value": [
+            {
+                "key": "_NormalStrength",
+                "value": 0
+            },
+            {
+                "key": "_Glossiness",
+                "value": 0.0500000007450581
+            },
+            {
+                "key": "_Metallic",
+                "value": 0
+            }
+        ]
+    },
+    "ints": {
+        "$type": "System.Collections.Generic.Dictionary`2[[System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089",
+        "$id": "89b6a6b1-5139-4dca-8d76-33f6e9e33df8",
+        "value": []
+    },
+    "keywords": {
+        "$id": "91af03a5-88b0-4161-9957-da7f84a27729",
+        "value": []
+    }
+}

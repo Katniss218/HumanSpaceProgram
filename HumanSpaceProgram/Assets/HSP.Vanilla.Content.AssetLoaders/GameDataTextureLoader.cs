@@ -1,15 +1,10 @@
 ﻿using HSP.Content;
-using HSP.Timelines;
 using HSP.Vanilla.Content.AssetLoaders.DDS;
 using HSP.Vanilla.Content.AssetLoaders.Metadata;
 using HSP.Vanilla.Scenes.AlwaysLoadedScene;
-using System;
 using System.IO;
-using System.Xml.Linq;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
-using UnityEngine.Profiling.Memory.Experimental;
-using UnityEngine.Tilemaps;
 using UnityPlus.AssetManagement;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.DataHandlers;
@@ -18,7 +13,7 @@ namespace HSP.Vanilla.Content.AssetLoaders
 {
     public static class GameDataTextureLoader
     {
-        public const string RELOAD_TEXTURES = HSPEvent.NAMESPACE_HSP + ".reload_textures";
+        public const string RELOAD_TEXTURES = HSPEvent.NAMESPACE_HSP + ".gdtl.reload_textures";
 
         [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, RELOAD_TEXTURES )]
         public static void ReloadTextures2()
@@ -37,57 +32,49 @@ namespace HSP.Vanilla.Content.AssetLoaders
 
         public static void ReloadTextures()
         {
-            string gameDataPath = HumanSpaceProgramContent.GetContentDirectoryPath();
-            string[] modDirectories = Directory.GetDirectories( gameDataPath );
-
-            foreach( var modPath in modDirectories )
+            foreach( var modPath in HumanSpaceProgramContent.GetAllModDirectories() )
             {
-                string modId = Path.GetFileName( modPath );
+                string modId = HumanSpaceProgramContent.GetModID( modPath );
                 // <mod_id>::xyz
 
                 string[] files = Directory.GetFiles( modPath, "*.png", SearchOption.AllDirectories );
                 foreach( var file in files )
                 {
-                    string relPath = FixPath( Path.GetRelativePath( modPath, file ) );
+                    string assetId = HumanSpaceProgramContent.GetAssetID( file );
+
                     Texture2DMetadata metadata = GetTextureMetadata( Path.ChangeExtension( file, ".json" ) );
                     string spritePath = file.ReplaceEnd( ".png", "_sprite.json" );
                     if( File.Exists( spritePath ) )
                     {
-                        Debug.Log( spritePath );
                         JsonSerializedDataHandler dataHandler = new JsonSerializedDataHandler( spritePath );
                         SpriteMetadata sm = SerializationUnit.Deserialize<SpriteMetadata>( dataHandler.Read() );
-                        string spriteRelPath = FixPath( Path.GetRelativePath( modPath, spritePath ) );
-                        AssetRegistry.RegisterLazy( $"{modId}::{spriteRelPath}", () => Sprite.Create( AssetRegistry.Get<Texture2D>( $"{modId}::{relPath}" ), sm.Rect, sm.Pivot, 100, 1, SpriteMeshType.Tight, sm.Border ), true );
+                        AssetRegistry.RegisterLazy( HumanSpaceProgramContent.GetAssetID( spritePath ), () => Sprite.Create( AssetRegistry.Get<Texture2D>( assetId ), sm.Rect, sm.Pivot, 100, 1, SpriteMeshType.Tight, sm.Border ), true );
                     }
-                    // sprite
-                    AssetRegistry.RegisterLazy( $"{modId}::{relPath}", () => LoadPNG( file, metadata ), true );
+                    AssetRegistry.RegisterLazy( assetId, () => LoadPNG( file, metadata ), true );
                 }
 
                 files = Directory.GetFiles( modPath, "*.jpg", SearchOption.AllDirectories );
                 foreach( var file in files )
                 {
-                    string relPath = FixPath( Path.GetRelativePath( modPath, file ) );
                     Texture2DMetadata metadata = GetTextureMetadata( Path.ChangeExtension( file, ".json" ) );
                     // sprite
-                    AssetRegistry.RegisterLazy( $"{modId}::{relPath}", () => LoadJPG( file, metadata ), true );
+                    AssetRegistry.RegisterLazy( HumanSpaceProgramContent.GetAssetID( file ), () => LoadJPG( file, metadata ), true );
                 }
 
                 files = Directory.GetFiles( modPath, "*.tga", SearchOption.AllDirectories );
                 foreach( var file in files )
                 {
-                    string relPath = FixPath( Path.GetRelativePath( modPath, file ) );
                     Texture2DMetadata metadata = GetTextureMetadata( Path.ChangeExtension( file, ".json" ) );
                     // sprite
-                    AssetRegistry.RegisterLazy( $"{modId}::{relPath}", () => LoadTGA( file, metadata ), true );
+                    AssetRegistry.RegisterLazy( HumanSpaceProgramContent.GetAssetID( file ), () => LoadTGA( file, metadata ), true );
                 }
 
                 files = Directory.GetFiles( modPath, "*.dds", SearchOption.AllDirectories );
                 foreach( var file in files )
                 {
-                    string relPath = FixPath( Path.GetRelativePath( modPath, file ) );
                     Texture2DMetadata metadata = GetTextureMetadata( Path.ChangeExtension( file, ".json" ) );
                     // sprite
-                    AssetRegistry.RegisterLazy( $"{modId}::{relPath}", () => LoadDDS( file, metadata ), true );
+                    AssetRegistry.RegisterLazy( HumanSpaceProgramContent.GetAssetID( file ), () => LoadDDS( file, metadata ), true );
                 }
             }
         }
@@ -99,11 +86,6 @@ namespace HSP.Vanilla.Content.AssetLoaders
 
             JsonSerializedDataHandler dataHandler = new JsonSerializedDataHandler( metaPath );
             return SerializationUnit.Deserialize<Texture2DMetadata>( dataHandler.Read() );
-        }
-
-        private static string FixPath( string assetPath )
-        {
-            return assetPath.Replace( "\\", "/" ).Split( "." )[0];
         }
 
         private static Texture2D LoadPNG( string fileName, Texture2DMetadata metadata )

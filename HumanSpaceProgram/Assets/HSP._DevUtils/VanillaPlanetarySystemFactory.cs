@@ -1,5 +1,6 @@
 ﻿using HSP.CelestialBodies;
 using HSP.CelestialBodies.Surfaces;
+using HSP.Content;
 using HSP.ReferenceFrames;
 using HSP.Trajectories;
 using HSP.Vanilla.CelestialBodies;
@@ -10,6 +11,8 @@ using HSP.Vessels;
 using System.Linq;
 using UnityEngine;
 using UnityPlus.AssetManagement;
+using UnityPlus.Serialization;
+using UnityPlus.Serialization.DataHandlers;
 
 namespace HSP._DevUtils
 {
@@ -19,7 +22,7 @@ namespace HSP._DevUtils
 
         private static Material[] _earthMaterial = new Material[6];
 
-        [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, "a654" )]
+        [HSPEventListener( HSPEvent_STARTUP_EARLY.ID, "a654" )]
         private static void A()
         {
             var cbShader = AssetRegistry.Get<Shader>( "builtin::HSP.CelestialBodies/Surfaces/TerrainShader" );
@@ -42,6 +45,15 @@ namespace HSP._DevUtils
                 mat.SetFloat( "_Glossiness", 0.05f );
                 mat.SetFloat( "_NormalStrength", 0.0f );
                 _earthMaterial[i] = mat;
+
+                var shader = mat.shader;
+                string name = shader.GetPropertyName( i );
+                var pn = Shader.PropertyToID("_MainTex");
+                var tex = mat.GetTexture( pn );
+
+                var data = SerializationUnit.Serialize( mat );
+                new JsonSerializedDataHandler( HumanSpaceProgramContent.GetAssetPath( "Vanilla::Assets/earth_material_" + i, "jsonmat" ) )
+                    .Write( data );
             }
         }
 

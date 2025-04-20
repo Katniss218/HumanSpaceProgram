@@ -170,7 +170,8 @@ namespace HSP.Vanilla.UI.Timelines
                 var tab = _settingsPageTabList.AddButton( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Top, 0, 30 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
                 {
                     ShowPage( index );
-                } );
+                } )
+                    .WithStdText( new UILayoutInfo( UIFill.Fill() ), _settingsPages[i].GetType().Name.Replace( "SettingsPage_", "" ), out _ );
             }
 
             if( _settingsPages.Length > 0 )

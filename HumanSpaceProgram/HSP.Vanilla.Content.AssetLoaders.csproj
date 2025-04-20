@@ -60,13 +60,14 @@
   <ItemGroup>
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DDPixelFormat.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DDSCaps.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\GameDataMaterialLoader.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DDSHeader.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\D3D11Misc2.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\D3D11Misc.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\GameDataJsonPartFactory.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\Metadata\SpriteMetadata.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DDSD.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\GameDataJsonVesselFactory.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\JsonVesselFactory.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DDSCaps2.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DDPF.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\D3D11ResourceDimension.cs" />

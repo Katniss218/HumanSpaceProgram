@@ -40,6 +40,28 @@ namespace UnityPlus.Serialization.Mappings
                 .WithFactory<TKey, TValue>( ( key, value ) => new KeyValuePair<TKey, TValue>( key, value ) );
         }
 
+        [MapsInheritingFrom( typeof( KeyValuePair<,> ), Context = KeyValueContext.ValueToAsset )]
+        public static SerializationMapping KeyValuePair_ValueToAsset_Mapping<TKey, TValue>()
+        {
+            return new MemberwiseSerializationMapping<KeyValuePair<TKey, TValue>>()
+                .WithReadonlyMember( "key", o => o.Key )
+                .WithReadonlyMember( "value", ObjectContext.Asset, o => o.Value )
+                .WithFactory<TKey, TValue>( ( key, value ) => new KeyValuePair<TKey, TValue>( key, value ) );
+        }
+
+        [MapsInheritingFrom( typeof( KeyValuePair<,> ), Context = KeyValueContext.RefToAsset )]
+        public static SerializationMapping KeyValuePair_RefToAsset_Mapping<TKey, TValue>()
+        {
+            return new MemberwiseSerializationMapping<KeyValuePair<TKey, TValue>>()
+                .WithReadonlyMember( "key", ObjectContext.Ref, o => o.Key )
+                .WithReadonlyMember( "value", ObjectContext.Asset, o => o.Value )
+                .WithFactory<TKey, TValue>( ( key, value ) => new KeyValuePair<TKey, TValue>( key, value ) );
+        }
+
+        //
+        //
+        //
+
         [MapsInheritingFrom( typeof( Dictionary<,> ), Context = KeyValueContext.ValueToValue )]
         public static SerializationMapping Dictionary_ValueToValue_Mapping<TKey, TValue>()
         {
@@ -82,6 +104,30 @@ namespace UnityPlus.Serialization.Mappings
 #warning TODO - would be nice if the element context could be specified as 'pass through' from the mapping's main context.
             return new EnumeratedSerializationMapping<Dictionary<TKey, TValue>, KeyValuePair<TKey, TValue>>(
                 KeyValueContext.RefToRef,
+                ( o, i, oElem ) =>
+                {
+                    o[oElem.Key] = oElem.Value;
+                } )
+                .WithFactory( ( int count ) => new Dictionary<TKey, TValue>( count ) );
+        }
+
+        [MapsInheritingFrom( typeof( Dictionary<,> ), Context = KeyValueContext.ValueToAsset )]
+        public static SerializationMapping Dictionary_ValueToAsset_Mapping<TKey, TValue>()
+        {
+            return new EnumeratedSerializationMapping<Dictionary<TKey, TValue>, KeyValuePair<TKey, TValue>>(
+                KeyValueContext.ValueToAsset,
+                ( o, i, oElem ) =>
+                {
+                    o[oElem.Key] = oElem.Value;
+                } )
+                .WithFactory( ( int count ) => new Dictionary<TKey, TValue>( count ) );
+        }
+
+        [MapsInheritingFrom( typeof( Dictionary<,> ), Context = KeyValueContext.RefToAsset )]
+        public static SerializationMapping Dictionary_RefToAsset_Mapping<TKey, TValue>()
+        {
+            return new EnumeratedSerializationMapping<Dictionary<TKey, TValue>, KeyValuePair<TKey, TValue>>(
+                KeyValueContext.RefToAsset,
                 ( o, i, oElem ) =>
                 {
                     o[oElem.Key] = oElem.Value;

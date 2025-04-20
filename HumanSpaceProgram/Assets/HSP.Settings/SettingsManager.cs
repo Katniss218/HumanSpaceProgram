@@ -143,12 +143,12 @@ namespace HSP.Settings
         /// <summary>
         /// Saves the provider associated with the given page type.
         /// </summary>
-        /// <param name="page"></param>
-        public static void SaveSettings<T>() where T : ISettingsPage
+        /// <typeparam name="TSettingsPage">The type of the settings page to save.</typeparam>
+        public static void SaveSettings<TSettingsPage>() where TSettingsPage : ISettingsPage
         {
             foreach( var provider in GetProviders() )
             {
-                if( provider.provider.GetPageTypes().Contains( typeof( T ) ) )
+                if( provider.provider.GetPageTypes().Contains( typeof( TSettingsPage ) ) )
                 {
                     SaveSettings( provider, true );
                     return;

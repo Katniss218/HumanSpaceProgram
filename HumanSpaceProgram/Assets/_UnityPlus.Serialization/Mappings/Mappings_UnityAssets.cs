@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace UnityPlus.Serialization
 {
@@ -30,13 +31,17 @@ namespace UnityPlus.Serialization.Mappings
         public static SerializationMapping MaterialMapping()
         {
             return new MemberwiseSerializationMapping<Material>()
-                .WithMember( "textures", ArrayContext.Assets, o =>
+                .WithMember( "shader", ObjectContext.Asset, o => o.shader )
+                .WithMember( "textures", o =>
                 {
                     var shader = o.shader;
                     var textures = new Dictionary<string, TextureInfo>();
                     int count = shader.GetPropertyCount();
                     for( int i = 0; i < count; i++ )
                     {
+                        if( shader.GetPropertyType( i ) != ShaderPropertyType.Texture )
+                            continue;
+
                         string name = shader.GetPropertyName( i );
                         TextureInfo info = new()
                         {
@@ -64,6 +69,9 @@ namespace UnityPlus.Serialization.Mappings
                     int count = shader.GetPropertyCount();
                     for( int i = 0; i < count; i++ )
                     {
+                        if( shader.GetPropertyType( i ) != ShaderPropertyType.Vector )
+                            continue;
+
                         string name = shader.GetPropertyName( i );
                         Vector4 val = o.GetVector( shader.GetPropertyNameId( i ) );
                         vectors.Add( name, val );
@@ -84,6 +92,9 @@ namespace UnityPlus.Serialization.Mappings
                     int count = shader.GetPropertyCount();
                     for( int i = 0; i < count; i++ )
                     {
+                        if( shader.GetPropertyType( i ) != ShaderPropertyType.Color )
+                            continue;
+
                         string name = shader.GetPropertyName( i );
                         Color val = o.GetColor( shader.GetPropertyNameId( i ) );
                         colors.Add( name, val );
@@ -97,26 +108,6 @@ namespace UnityPlus.Serialization.Mappings
                         o.SetColor( Shader.PropertyToID( name ), val );
                     }
                 } )
-                .WithMember( "matrices", o =>
-                {
-                    var shader = o.shader;
-                    var matrices = new Dictionary<string, Matrix4x4>();
-                    int count = shader.GetPropertyCount();
-                    for( int i = 0; i < count; i++ )
-                    {
-                        string name = shader.GetPropertyName( i );
-                        Matrix4x4 val = o.GetMatrix( shader.GetPropertyNameId( i ) );
-                        matrices.Add( name, val );
-                    }
-                    return matrices;
-                }, ( o, value ) =>
-                {
-                    var shader = o.shader;
-                    foreach( (string name, Matrix4x4 val) in value )
-                    {
-                        o.SetMatrix( Shader.PropertyToID( name ), val );
-                    }
-                } )
                 .WithMember( "floats", o =>
                 {
                     var shader = o.shader;
@@ -124,6 +115,10 @@ namespace UnityPlus.Serialization.Mappings
                     int count = shader.GetPropertyCount();
                     for( int i = 0; i < count; i++ )
                     {
+                        var type = shader.GetPropertyType( i );
+                        if( type != ShaderPropertyType.Float && type != ShaderPropertyType.Range )
+                            continue;
+
                         string name = shader.GetPropertyName( i );
                         float val = o.GetFloat( shader.GetPropertyNameId( i ) );
                         floats.Add( name, val );
@@ -144,6 +139,9 @@ namespace UnityPlus.Serialization.Mappings
                     int count = shader.GetPropertyCount();
                     for( int i = 0; i < count; i++ )
                     {
+                        if( shader.GetPropertyType( i ) != ShaderPropertyType.Int )
+                            continue;
+
                         string name = shader.GetPropertyName( i );
                         int val = o.GetInteger( shader.GetPropertyNameId( i ) );
                         ints.Add( name, val );

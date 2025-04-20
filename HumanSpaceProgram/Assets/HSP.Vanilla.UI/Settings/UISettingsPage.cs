@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
@@ -14,6 +13,9 @@ namespace HSP.Vanilla.UI.Settings
 {
     public interface IUISettingsPage
     {
+        /// <summary>
+        /// Applies the settings of the settings page associated with this UI.
+        /// </summary>
         void Apply();
 
 
@@ -66,12 +68,12 @@ namespace HSP.Vanilla.UI.Settings
     /// <typeparam name="TSettingsPage">The type of the settings page being displayed.</typeparam>
     public abstract class UISettingsPage<TSettingsPage> : UIPanel, IUISettingsPage where TSettingsPage : ISettingsPage
     {
-        protected UIRectMask contentPanel;
-
         /// <summary>
         /// The object that is referenced by this UI element.
         /// </summary>
         public TSettingsPage SettingsPage { get; private set; }
+
+        protected UIRectMask contentPanel;
 
         public void Apply()
         {
