@@ -196,6 +196,13 @@ namespace HSP._DevUtils
 
         public static void CreateDefaultPlanetarySystem()
         {
+            _earthMaterial[0] = AssetRegistry.Get<Material>( "Vanilla::Assets/earth_material_0" );
+            _earthMaterial[1] = AssetRegistry.Get<Material>( "Vanilla::Assets/earth_material_1" );
+            _earthMaterial[2] = AssetRegistry.Get<Material>( "Vanilla::Assets/earth_material_2" );
+            _earthMaterial[3] = AssetRegistry.Get<Material>( "Vanilla::Assets/earth_material_3" );
+            _earthMaterial[4] = AssetRegistry.Get<Material>( "Vanilla::Assets/earth_material_4" );
+            _earthMaterial[5] = AssetRegistry.Get<Material>( "Vanilla::Assets/earth_material_5" );
+
             QuaternionDbl orientation = Quaternion.Euler( 270, 0, 0 );
 
             CelestialBody cbSun = CreateCB( "sun", Vector3Dbl.zero, orientation );

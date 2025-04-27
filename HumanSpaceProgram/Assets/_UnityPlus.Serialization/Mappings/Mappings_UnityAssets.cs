@@ -31,7 +31,8 @@ namespace UnityPlus.Serialization.Mappings
         public static SerializationMapping MaterialMapping()
         {
             return new MemberwiseSerializationMapping<Material>()
-                .WithMember( "shader", ObjectContext.Asset, o => o.shader )
+                .WithReadonlyMember( "shader", ObjectContext.Asset, o => o.shader )
+                .WithFactory<Shader>( s => new Material( s ) )
                 .WithMember( "textures", o =>
                 {
                     var shader = o.shader;

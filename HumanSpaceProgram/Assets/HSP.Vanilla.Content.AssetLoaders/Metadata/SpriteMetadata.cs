@@ -29,14 +29,5 @@ namespace HSP.Vanilla.Content.AssetLoaders.Metadata
                 .WithMember( "top", o => o.w )
                 .WithMember( "bottom", o => o.y );
         }
-        [MapsInheritingFrom( typeof( Rect ) )]
-        public static SerializationMapping RectMapping()
-        {
-            return new MemberwiseSerializationMapping<Rect>()
-                .WithMember( "x", o => o.x )
-                .WithMember( "y", o => o.y )
-                .WithMember( "width", o => o.width )
-                .WithMember( "height", o => o.height );
-        }
     }
 }
