@@ -102,13 +102,5 @@ namespace HSP.Vanilla.Scenes.GameplayScene
         {
             TimeManager.SetUT( 0 );
         }
-
-        [HSPEventListener( HSPEvent_ON_CELESTIAL_BODY_CREATED.ID, ADD_ATMOSPHERE_RENDERER )]
-        private static void SetBody( CelestialBody body )
-        {
-#warning TODO - configurable bodies need their own atmospheres. sorted by distance (*hopefully* bodies won't intersect each other so it's enough to draw atmos farthest to nearest).
-            if( body.ID == "main" )
-                AtmosphereRenderer.Body = body;
-        }
     }
 }

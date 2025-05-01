@@ -1,4 +1,5 @@
 ﻿using HSP.CelestialBodies;
+using HSP.CelestialBodies.Atmospheres;
 using HSP.CelestialBodies.Surfaces;
 using HSP.Content;
 using HSP.ReferenceFrames;
@@ -48,7 +49,7 @@ namespace HSP._DevUtils
 
                 var shader = mat.shader;
                 string name = shader.GetPropertyName( i );
-                var pn = Shader.PropertyToID("_MainTex");
+                var pn = Shader.PropertyToID( "_MainTex" );
                 var tex = mat.GetTexture( pn );
 
                 var data = SerializationUnit.Serialize( mat );
@@ -208,6 +209,14 @@ namespace HSP._DevUtils
             CelestialBody cbSun = CreateCB( "sun", Vector3Dbl.zero, orientation );
             //CelestialBody cb = CreateCB( "main", "sun", 150_000_000_000, 0, 0, 0, 0, 0, orientation );
             CelestialBody cb = CreateCB( "main", new Vector3Dbl( 150_000_000_000, 0, 0 ), new Vector3Dbl( 0, 29749.1543788567, 0 ), orientation );
+            var atm = cb.gameObject.AddComponent<Atmosphere>();
+            atm.Height = 140_000;
+            atm.sharedMaterial = AssetRegistry.Get<Material>( "builtin::Resources/Materials/Atmosphere" );
+
+            cb = CreateCB( "main2", new Vector3Dbl( 150_000_000_000, 400_000_000, 0 ), new Vector3Dbl( 0, 29749.1543788567, 0 ), orientation );
+            atm = cb.gameObject.AddComponent<Atmosphere>();
+            atm.Height = 140_000;
+            atm.sharedMaterial = AssetRegistry.Get<Material>( "builtin::Resources/Materials/Atmosphere" );
 
             //CelestialBody cb = CreateCB( "main", Vector3Dbl.zero, Vector3Dbl.zero, orientation );
             //CelestialBody cb = CreateCB( "main", new Vector3Dbl( 150_000_000_000_000_000, 0, 0 ), new Vector3Dbl( 0, 29749.1543788567, 0 ), orientation );
