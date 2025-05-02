@@ -46,6 +46,8 @@ namespace HSP.Timelines.Serialization
             this.TimelineID = timelineId;
         }
 
+        // The relative path where the timeline is stored on disk is defined fully by its ID.
+
         /// <summary>
         /// Root directory is the directory that contains the _timeline.json file.
         /// </summary>

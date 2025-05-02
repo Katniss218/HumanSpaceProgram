@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.DataHandlers;
+using Version = HSP.Content.Version;
 
 namespace HSP.Timelines.Serialization
 {
@@ -15,14 +16,35 @@ namespace HSP.Timelines.Serialization
     public sealed class ScenarioMetadata
     {
         /// <summary>
+        /// The current version of new scenario files.
+        /// </summary>
+        public static readonly Version CURRENT_SCENARIO_FILE_VERSION = new Version( 0, 0 );
+
+        /// <summary>
         /// The name of the file that stores the timeline metadata.
         /// </summary>
         public const string SCENARIO_FILENAME = "_scenario.json";
 
-        public readonly NamespacedID ScenarioID; // modId::scenarioId
 
+        /// <summary>
+        /// The unique ID of this scenario. <br/>
+        /// In the format 'modId::scenarioId'
+        /// </summary>
+        public readonly NamespacedID ScenarioID;
+
+        /// <summary>
+        /// The display name shown in the GUI.
+        /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// The description shown in the GUI.
+        /// </summary>
         public string Description { get; set; }
+
+        /// <summary>
+        /// The author(s) of this scenario.
+        /// </summary>
         public string Author { get; set; }
 
         /// <summary>
@@ -30,10 +52,22 @@ namespace HSP.Timelines.Serialization
         /// </summary>
         public Sprite Icon => AssetRegistry.Get<Sprite>( $"{ScenarioID.ModID}::Scenarios/{ScenarioID.ContentID}/_scenario_sprite" );
 
+        /// <summary>
+        /// The version of the scenario file.
+        /// </summary>
+        public Version FileVersion { get; set; }
+
+        /// <summary>
+        /// The versions of all the mods required to load the scenario correctly.
+        /// </summary>
+        public Dictionary<string, Version> ModVersions { get; set; } = new();
+
         public ScenarioMetadata( NamespacedID scenarioId )
         {
             this.ScenarioID = scenarioId;
         }
+
+        // The relative path where the scenario is stored on disk is defined fully by its ID.
 
         /// <summary>
         /// Returns the path to the (root) directory of the scenario.
@@ -103,6 +137,9 @@ namespace HSP.Timelines.Serialization
             return scenarios;
         }
 
+        /// <summary>
+        /// Loads the metadata of the given scenario from disk.
+        /// </summary>
         public static ScenarioMetadata LoadFromDisk( NamespacedID scenarioId )
         {
             string filePath = Path.Combine( GetRootDirectory( scenarioId ), SCENARIO_FILENAME );
@@ -115,6 +152,9 @@ namespace HSP.Timelines.Serialization
             return scenarioMetadata;
         }
 
+        /// <summary>
+        /// Saves the current metadata to disk.
+        /// </summary>
         public void SaveToDisk()
         {
             string filePath = Path.Combine( GetRootDirectory(), SCENARIO_FILENAME );
@@ -131,7 +171,9 @@ namespace HSP.Timelines.Serialization
             return new MemberwiseSerializationMapping<ScenarioMetadata>()
                 .WithMember( "name", o => o.Name )
                 .WithMember( "description", o => o.Description )
-                .WithMember( "author", o => o.Author );
+                .WithMember( "author", o => o.Author )
+                .WithMember( "file_version", o => o.FileVersion )
+                .WithMember( "mod_versions", o => o.ModVersions );
         }
     }
 }

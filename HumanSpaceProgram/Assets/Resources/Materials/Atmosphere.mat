@@ -71,21 +71,21 @@ Material:
     m_Floats:
     - _BumpScale: 1
     - _Cutoff: 0.5
-    - _DensityFalloffPower: 1.77
+    - _DensityFalloffPower: 13.7
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _InScatteringPointCount: 5
-    - _MaxRadius: 125
+    - _InScatteringPointCount: 16
+    - _MaxRadius: 6511000
     - _Metallic: 0
-    - _MinRadius: 0
+    - _MinRadius: 6371000
     - _Mode: 0
     - _OcclusionStrength: 1
-    - _OpticalDepthPointCount: 5
+    - _OpticalDepthPointCount: 8
     - _Parallax: 0.02
-    - _ScatteringStrength: 4
+    - _ScatteringStrength: 128
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
@@ -93,9 +93,9 @@ Material:
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
-    - _Center: {r: 0, g: 0, b: 0, a: 1}
+    - _Center: {r: 919021.9, g: -3048366.2, b: -5518408, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _ScatteringWavelengths: {r: 700, g: 530, b: 400, a: 1}
-    - _SunDirection: {r: 0, g: 0, b: 0, a: 1}
+    - _ScatteringWavelengths: {r: 675, g: 530, b: 400, a: 0}
+    - _SunDirection: {r: 0.70710653, g: -0, b: 0.70710707, a: 0}
   m_BuildTextureStacks: []

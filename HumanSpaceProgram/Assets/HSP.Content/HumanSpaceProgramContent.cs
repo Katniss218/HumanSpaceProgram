@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using HSP.Content.Mods;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using Version = HSP.Content.Version;
 
 namespace HSP.Content
 {
@@ -31,7 +33,7 @@ namespace HSP.Content
         }
 
         /// <summary>
-        /// Gets the list of all mod directories present in the current installation.
+        /// Gets the list of all mod directories present in the current installation, keyed by the corresponding mod ID.
         /// </summary>
         /// <remarks>
         /// Some or all of the directories that are returned might be empty, or otherwise unused. Use with care.

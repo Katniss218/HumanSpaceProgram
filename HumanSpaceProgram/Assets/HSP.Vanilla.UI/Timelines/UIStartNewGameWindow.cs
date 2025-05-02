@@ -1,4 +1,3 @@
-using HSP.Content;
 using HSP.SceneManagement;
 using HSP.Settings;
 using HSP.Timelines;
@@ -7,9 +6,7 @@ using HSP.UI;
 using HSP.Vanilla.Scenes.GameplayScene;
 using HSP.Vanilla.UI.Settings;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using UnityEditor.PackageManager.UI;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib;

@@ -1,19 +1,15 @@
 ﻿using HSP.CelestialBodies;
 using HSP.CelestialBodies.Atmospheres;
 using HSP.CelestialBodies.Surfaces;
-using HSP.Content;
 using HSP.ReferenceFrames;
 using HSP.Trajectories;
 using HSP.Vanilla.CelestialBodies;
-using HSP.Vanilla.Scenes.AlwaysLoadedScene;
 using HSP.Vanilla.Scenes.GameplayScene.Cameras;
 using HSP.Vanilla.Trajectories;
 using HSP.Vessels;
 using System.Linq;
 using UnityEngine;
 using UnityPlus.AssetManagement;
-using UnityPlus.Serialization;
-using UnityPlus.Serialization.DataHandlers;
 
 namespace HSP._DevUtils
 {
@@ -23,8 +19,7 @@ namespace HSP._DevUtils
 
         private static Material[] _earthMaterial = new Material[6];
 
-        [HSPEventListener( HSPEvent_STARTUP_EARLY.ID, "a654" )]
-        private static void A()
+        /*private static void A()
         {
             var cbShader = AssetRegistry.Get<Shader>( "builtin::HSP.CelestialBodies/Surfaces/TerrainShader" );
             var cbTex = new Texture2D[]
@@ -56,7 +51,7 @@ namespace HSP._DevUtils
                 new JsonSerializedDataHandler( HumanSpaceProgramContent.GetAssetPath( "Vanilla::Assets/earth_material_" + i, "jsonmat" ) )
                     .Write( data );
             }
-        }
+        }*/
 
         private static CelestialBody CreateCB( string id, Vector3Dbl airfPos, QuaternionDbl airfRot )
         {
@@ -213,10 +208,10 @@ namespace HSP._DevUtils
             atm.Height = 140_000;
             atm.sharedMaterial = AssetRegistry.Get<Material>( "builtin::Resources/Materials/Atmosphere" );
 
-            cb = CreateCB( "main2", new Vector3Dbl( 150_000_000_000, 400_000_000, 0 ), new Vector3Dbl( 0, 29749.1543788567, 0 ), orientation );
-            atm = cb.gameObject.AddComponent<Atmosphere>();
-            atm.Height = 140_000;
-            atm.sharedMaterial = AssetRegistry.Get<Material>( "builtin::Resources/Materials/Atmosphere" );
+            //cb = CreateCB( "main2", new Vector3Dbl( 150_000_000_000, 400_000_000, 0 ), new Vector3Dbl( 0, 29749.1543788567, 0 ), orientation );
+            //atm = cb.gameObject.AddComponent<Atmosphere>();
+            //atm.Height = 140_000;
+            //atm.sharedMaterial = AssetRegistry.Get<Material>( "builtin::Resources/Materials/Atmosphere" );
 
             //CelestialBody cb = CreateCB( "main", Vector3Dbl.zero, Vector3Dbl.zero, orientation );
             //CelestialBody cb = CreateCB( "main", new Vector3Dbl( 150_000_000_000_000_000, 0, 0 ), new Vector3Dbl( 0, 29749.1543788567, 0 ), orientation );

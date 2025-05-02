@@ -88,10 +88,10 @@ namespace HSP.CelestialBodies
 
             foreach( var atmosphere in Atmosphere._activeAtmospheres )
             {
-                if( atmosphere.sharedMaterial == null )
+                if( atmosphere.material == null )
                     continue;
 
-                _cmdAtmospheres.Blit( null, _rt, atmosphere.sharedMaterial, 0 );
+                _cmdAtmospheres.Blit( null, _rt, atmosphere.material, 0 );
             }
 
             _cmdComposition.Clear();

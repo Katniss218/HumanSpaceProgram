@@ -14,9 +14,20 @@ namespace HSP.CelestialBodies.Atmospheres
     {
         internal static List<Atmosphere> _activeAtmospheres = new();
 
+        /// <summary>
+        /// The height of the atmosphere above the celestial body's surface.
+        /// </summary>
         public float Height { get; set; } = 100_000f;
 
+        /// <summary>
+        /// The material used to render the atmosphere.
+        /// </summary>
         public Material sharedMaterial { get; set; }
+
+        /// <summary>
+        /// Clone of <see cref="sharedMaterial"/>, contains runtime properties for this atmosphere.
+        /// </summary>
+        internal Material material { get; private set; }
 
         /// <summary>
         /// Gets the celestial body that this LOD sphere belongs to.
@@ -28,20 +39,23 @@ namespace HSP.CelestialBodies.Atmospheres
             if( sharedMaterial == null )
                 return;
 
-            // The `_Texture` property name gets overriden by something else... Unity... >:{
-            sharedMaterial.SetTexture( Shader.PropertyToID( "_texgsfs" ), ColorRenderTextureGetter.Invoke() );
-            sharedMaterial.SetTexture( Shader.PropertyToID( "_DepthBuffer" ), DepthRenderTextureGetter.Invoke(), RenderTextureSubElement.Depth );
+            if( material == null )
+                material = new Material( sharedMaterial );
 
-            sharedMaterial.SetVector( Shader.PropertyToID( "_Center" ), CelestialBody.ReferenceFrameTransform.Position );
-            sharedMaterial.SetVector( Shader.PropertyToID( "_SunDirection" ), -light.transform.forward );
-            sharedMaterial.SetVector( Shader.PropertyToID( "_ScatteringWavelengths" ), new Vector3( 675, 530, 400 ) );
-            sharedMaterial.SetFloat( Shader.PropertyToID( "_ScatteringStrength" ), 128 );
-            sharedMaterial.SetFloat( Shader.PropertyToID( "_TerminatorFalloff" ), 32 );
-            sharedMaterial.SetFloat( Shader.PropertyToID( "_MinRadius" ), (float)CelestialBody.Radius );
-            sharedMaterial.SetFloat( Shader.PropertyToID( "_MaxRadius" ), (float)(CelestialBody.Radius + Height) );
-            sharedMaterial.SetFloat( Shader.PropertyToID( "_InScatteringPointCount" ), 16 );
-            sharedMaterial.SetFloat( Shader.PropertyToID( "_OpticalDepthPointCount" ), 8 );
-            sharedMaterial.SetFloat( Shader.PropertyToID( "_DensityFalloffPower" ), 13.7f );
+            // The `_Texture` property name gets overriden by something else... Unity... >:{
+            material.SetTexture( Shader.PropertyToID( "_texgsfs" ), ColorRenderTextureGetter.Invoke() );
+            material.SetTexture( Shader.PropertyToID( "_DepthBuffer" ), DepthRenderTextureGetter.Invoke(), RenderTextureSubElement.Depth );
+
+            material.SetVector( Shader.PropertyToID( "_Center" ), CelestialBody.ReferenceFrameTransform.Position );
+            material.SetVector( Shader.PropertyToID( "_SunDirection" ), -light.transform.forward );
+            material.SetVector( Shader.PropertyToID( "_ScatteringWavelengths" ), new Vector3( 675, 530, 400 ) );
+            material.SetFloat( Shader.PropertyToID( "_ScatteringStrength" ), 128 );
+            material.SetFloat( Shader.PropertyToID( "_TerminatorFalloff" ), 32 );
+            material.SetFloat( Shader.PropertyToID( "_MinRadius" ), (float)CelestialBody.Radius );
+            material.SetFloat( Shader.PropertyToID( "_MaxRadius" ), (float)(CelestialBody.Radius + Height) );
+            material.SetFloat( Shader.PropertyToID( "_InScatteringPointCount" ), 16 );
+            material.SetFloat( Shader.PropertyToID( "_OpticalDepthPointCount" ), 8 );
+            material.SetFloat( Shader.PropertyToID( "_DensityFalloffPower" ), 13.7f );
         }
 
         void Awake()

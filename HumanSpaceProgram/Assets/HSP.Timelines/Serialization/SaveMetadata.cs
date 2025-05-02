@@ -4,6 +4,7 @@ using System.IO;
 using UnityEngine;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.DataHandlers;
+using Version = HSP.Content.Version;
 
 namespace HSP.Timelines.Serialization
 {
@@ -26,6 +27,7 @@ namespace HSP.Timelines.Serialization
         /// The persistent save's ID. A persistent save is the default save when a custom save is not specified.
         /// </summary>
         public const string PERSISTENT_SAVE_ID = "___persistent";
+
 
         /// <summary>
         /// The unique ID of this specific save's timeline.
@@ -54,7 +56,7 @@ namespace HSP.Timelines.Serialization
         /// <summary>
         /// The versions of all the mods used when the save file was created.
         /// </summary>
-        public Dictionary<string, Version> ModVersions { get; set; } = new Dictionary<string, Version>();
+        public Dictionary<string, Version> ModVersions { get; set; } = new();
 
         /// <summary>
         /// Creates a new persistent save.
@@ -81,6 +83,8 @@ namespace HSP.Timelines.Serialization
             this.Name = "Persistent";
             this.Description = "The default save";
         }
+
+        // The relative path where the save is stored on disk is defined fully by its ID and the ID of its timeline.
 
         /// <summary>
         /// Returns the path to the (root) directory of the save.
@@ -153,11 +157,17 @@ namespace HSP.Timelines.Serialization
             return saves;
         }
 
+        /// <summary>
+        /// Loads the metadata of the persistent save of the given timeline from disk.
+        /// </summary>
         public static SaveMetadata LoadPersistentFromDisk( string timelineId )
         {
             return LoadFromDisk( timelineId, PERSISTENT_SAVE_ID );
         }
 
+        /// <summary>
+        /// Loads the metadata of the given save of the given timeline from disk.
+        /// </summary>
         public static SaveMetadata LoadFromDisk( string timelineId, string saveId )
         {
             string saveFilePath = Path.Combine( GetRootDirectory( timelineId, saveId ), SAVE_FILENAME );
@@ -170,6 +180,9 @@ namespace HSP.Timelines.Serialization
             return saveMetadata;
         }
 
+        /// <summary>
+        /// Saves the current metadata to disk.
+        /// </summary>
         public void SaveToDisk()
         {
             string saveFilePath = Path.Combine( GetRootDirectory(), SAVE_FILENAME );

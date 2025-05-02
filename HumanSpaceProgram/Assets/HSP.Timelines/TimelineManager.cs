@@ -205,7 +205,9 @@ namespace HSP.Timelines
                 throw new InvalidOperationException( $"Can't start saving a timeline while already saving or loading." );
             }
 
-            Directory.CreateDirectory( scenario.GetRootDirectory() );
+            string rootDirectory = scenario.GetRootDirectory();
+            Directory.Delete( rootDirectory, true ); // Delete the old directory (if exists) to stop old, not-overwritten data remaining there.
+            Directory.CreateDirectory( rootDirectory );
 
             var eScenario = new SaveScenarioEventData( scenario );
             RefStore = new BidirectionalReferenceStore();
@@ -244,7 +246,9 @@ namespace HSP.Timelines
                 throw new InvalidOperationException( $"Can't start saving a timeline while already saving or loading." );
             }
 
-            Directory.CreateDirectory( save.GetRootDirectory() );
+            string rootDirectory = save.GetRootDirectory();
+            Directory.Delete( rootDirectory, true ); // Delete the old directory (if exists) to stop old, not-overwritten data remaining there.
+            Directory.CreateDirectory( rootDirectory );
 
             var eSave = new SaveEventData( CurrentScenario, CurrentTimeline, save );
             RefStore = new BidirectionalReferenceStore();

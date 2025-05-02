@@ -23,7 +23,7 @@ namespace HSP._DevUtils
         {
             Name = "The default scenario",
             Description = "",
-            Author = "Katniss"
+            Author = "Katniss",
         };
 
         /// <summary>
