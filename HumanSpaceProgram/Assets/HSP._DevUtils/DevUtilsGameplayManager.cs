@@ -1,4 +1,5 @@
-﻿using HSP.CelestialBodies;
+﻿using HSP.Audio;
+using HSP.CelestialBodies;
 using HSP.Content;
 using HSP.Content.Vessels;
 using HSP.Content.Vessels.Serialization;
@@ -13,6 +14,7 @@ using HSP.Vessels;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityPlus.AssetManagement;
@@ -51,9 +53,6 @@ namespace HSP._DevUtils
         public RenderTexture normalmap;
         public ComputeShader shader;
         public RawImage uiImage;
-
-        static Vessel launchSite;
-        static Vessel _vessel;
 
         public const string LOAD_PLACEHOLDER_CONTENT = "devutils.load_game_data";
         public const string CREATE_PLACEHOLDER_UNIVERSE = "devutils.timeline.new.after";
@@ -107,8 +106,9 @@ namespace HSP._DevUtils
                     CelestialBody cb = VanillaPlanetarySystemFactory.CreateCB( "moon2", new Vector3Dbl( 150_200_000_000, 0, 0 ), new Vector3Dbl( 0, -129749.1543788567, 0 ), QuaternionDbl.identity );
                     body = cb;
 
-                    _vessel.ReferenceFrameTransform.AbsolutePosition = body.ReferenceFrameTransform.AbsolutePosition + new Vector3Dbl( body.Radius + 200_000, 0, 0 );
-                    _vessel.ReferenceFrameTransform.AbsoluteVelocity = body.ReferenceFrameTransform.AbsoluteVelocity + new Vector3Dbl( 0, 8500, 0 );
+                    var vessel = VesselManager.LoadedVessels.Skip( 1 ).First();
+                    vessel.ReferenceFrameTransform.AbsolutePosition = body.ReferenceFrameTransform.AbsolutePosition + new Vector3Dbl( body.Radius + 200_000, 0, 0 );
+                    vessel.ReferenceFrameTransform.AbsoluteVelocity = body.ReferenceFrameTransform.AbsoluteVelocity + new Vector3Dbl( 0, 8500, 0 );
 
                     SceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT,
                         SceneReferenceFrameManager.TargetObject.AbsolutePosition, SceneReferenceFrameManager.TargetObject.AbsoluteVelocity ) );
@@ -119,6 +119,10 @@ namespace HSP._DevUtils
 
         void Update()
         {
+            if( UnityEngine.Input.GetKeyDown( KeyCode.F6 ) )
+            {
+                AudioManager.Play( AssetRegistry.Get<AudioClip>( "Vanilla::Assets/sound_liq8_spin" ), VesselManager.LoadedVessels.Skip( 1 ).First().ReferenceTransform, false, 6 );
+            }
             if( UnityEngine.Input.GetKeyDown( KeyCode.F3 ) )
             {
                 isPressed = true;
@@ -134,7 +138,7 @@ namespace HSP._DevUtils
 
                 GameObject loadedObj = SerializationUnit.Deserialize<GameObject>( data );
 
-                FLaunchSiteMarker launchSiteSpawner = launchSite.gameObject.GetComponentInChildren<FLaunchSiteMarker>();
+                FLaunchSiteMarker launchSiteSpawner = VesselManager.LoadedVessels.First().gameObject.GetComponentInChildren<FLaunchSiteMarker>();
                 Vector3Dbl spawnerPosAirf = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( launchSiteSpawner.transform.position );
                 QuaternionDbl spawnerRotAirf = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( launchSiteSpawner.transform.rotation );
 

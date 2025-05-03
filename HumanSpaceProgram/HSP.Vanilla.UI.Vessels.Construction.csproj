@@ -936,6 +936,10 @@
       <Project>{5294BE79-15AB-2AAE-E8C3-9E735E001D6D}</Project>
       <Name>HSP</Name>
     </ProjectReference>
+    <ProjectReference Include="HSP.Audio.csproj">
+      <Project>{BBE3A705-F416-7434-8527-C1D92CEE2832}</Project>
+      <Name>HSP.Audio</Name>
+    </ProjectReference>
     <ProjectReference Include="HSP.UI.csproj">
       <Project>{05A5E85F-FD04-4199-F86F-3A6E38B383FB}</Project>
       <Name>HSP.UI</Name>
