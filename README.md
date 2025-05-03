@@ -2,7 +2,7 @@
 
 **Hello there!**
 
-Human Space Program (HSP for short) is a free and open source realistic spaceflight game inspired by Kerbal Space Program, currently in pre-alpha development phase.
+Human Space Program (HSP for short) is a free and open source realistic spaceflight game that is currently in pre-alpha development phase.
 ![Imgur](https://i.imgur.com/y5dWba2.png)
 
 ![Static Badge](https://img.shields.io/badge/-Unity_2022\.1\.8f1-white?logo=unity&labelColor=gray) ![GitHub contributors](https://img.shields.io/github/contributors/Katniss218/HumanSpaceProgram) ![GitHub Created At](https://img.shields.io/github/created-at/Katniss218/HumanSpaceProgram) ![GitHub last commit](https://img.shields.io/github/last-commit/Katniss218/HumanSpaceProgram) ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/Katniss218/HumanSpaceProgram/total)
@@ -25,14 +25,14 @@ Human Space Program (HSP for short) is a free and open source realistic spacefli
 
 Human Space Program aims to create a realistic spaceflight game with hopefully a relatively low barrier of entry (comparatively speaking) that is easy to mod.
 
-- **Free of Charge** - HSP is and will forever be available for free for everyone.
-- **Open Source** - Contribute to the project.
+- **Free of Charge** - HSP is and will always be available for free for everyone!
+- **Open Source** - Contribute to the project!
 
-If you like Kerbal Space Program, you will also like this.
+If you like games such as Kerbal Space Program or Juno: New Origins, you will also like this.
 
 - **Real Scale Systems** - The Earth, the Solar System, and real world-sized rockets.
 - **Modular Rockets** - Build rockets from parts, which themselves may consist of even more parts.
-- **Highly Flexible** - Replace any system you want using mods. 
+- **Highly Flexible** - Replace any system you want using mods.
 
 ## Installation:
 
@@ -46,7 +46,7 @@ There is no installation process - simply unzip and double-click on the executab
 If you prefer to build HSP from source or want to contribute to its development, you can follow the steps below.
 
 **Prerequisites:**
-- **Unity Editor** - Version 2022.1.8f1 (*as of 2024/07/10*). 
+- **Unity Editor** - Version 2022.1.8f1 (*as of 2025/05/03*). 
 HSP will transition to Unity 6 sometime in the future.
 - **Git or a Git client** - To clone the repository (optional).
 
@@ -81,10 +81,14 @@ Contributions are always welcome! See the [Contributing Guide](CONTRIBUTING.md) 
 
 ## License:
 
-Human Space Program is licensed under [AGPL-3.0](LICENSE)
+Human Space Program is licensed under [AGPL-3.0](LICENSE), unless otherwise noted.
+
+Some files or subdirectories in this repository may be subject to different licenses. That license shall be clearly indicated either:
+- in a header comment with an SPDX-License-Identifier, or
+- in a `LICENSE` file within the corresponding directory, which can apply to specific files listed within the license file, or to the entire directory and all its contents (when no files are listed). The files listed in a license file must be contained within the directory where the license is located.
 
 ## Additional Links:
-- [Human Space Program creator's official Discord server](https://discord.gg/w9JqtxM3Tw)
+- [Discord](https://discord.gg/w9JqtxM3Tw)
 - [Reddit](https://reddit.com/r/HumanSpaceProgram/)
 
 *Thank you for your interest in Human Space Program!* :heart:
