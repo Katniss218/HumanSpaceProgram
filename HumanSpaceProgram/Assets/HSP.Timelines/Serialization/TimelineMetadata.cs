@@ -1,11 +1,12 @@
-﻿using System;
+﻿using HSP.Content;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.DataHandlers;
 
-namespace HSP.Content.Timelines.Serialization
+namespace HSP.Timelines.Serialization
 {
     /// <summary>
     /// Serializable (meta)data of a timeline.
@@ -23,6 +24,11 @@ namespace HSP.Content.Timelines.Serialization
         public readonly string TimelineID;
 
         /// <summary>
+        /// The unique ID of the scenario associated with this timeline.
+        /// </summary>
+        public NamespacedID ScenarioID;
+
+        /// <summary>
         /// The display name shown in the GUI.
         /// </summary>
         public string Name { get; set; }
@@ -34,28 +40,40 @@ namespace HSP.Content.Timelines.Serialization
 
         public TimelineMetadata( string timelineId )
         {
+            if( string.IsNullOrEmpty( timelineId ) )
+                throw new ArgumentNullException( nameof( timelineId ) );
+
             this.TimelineID = timelineId;
         }
+
+        // The relative path where the timeline is stored on disk is defined fully by its ID.
 
         /// <summary>
         /// Root directory is the directory that contains the _timeline.json file.
         /// </summary>
         public static string GetTimelinesPath()
         {
-            return HumanSpaceProgram.GetSaveDirectoryPath();
+            return HumanSpaceProgramContent.GetSaveDirectoryPath();
         }
 
         /// <summary>
-        /// Root directory is the directory that contains the _timeline.json file.
+        /// Returns the path to the (root) directory of the timeline.
         /// </summary>
+        /// <remarks>
+        /// Root directory is the directory that contains the _timeline.json file.
+        /// </remarks>
         public static string GetRootDirectory( string timelineId )
         {
+            // Saves/<timeline_id>/...
             return Path.Combine( GetTimelinesPath(), timelineId );
         }
 
         /// <summary>
         /// Returns the path to the (root) directory of the timeline.
         /// </summary>
+        /// <remarks>
+        /// Root directory is the directory that contains the _timeline.json file.
+        /// </remarks>
         public string GetRootDirectory()
         {
             return GetRootDirectory( this.TimelineID );
@@ -83,16 +101,17 @@ namespace HSP.Content.Timelines.Serialization
 
             List<TimelineMetadata> timelines = new List<TimelineMetadata>();
 
-            foreach( var timelineDirName in potentialTimelines )
+            foreach( var timelineDirPath in potentialTimelines )
             {
+                string timelineId = Path.GetRelativePath( timelinesDirectory, timelineDirPath );
                 try
                 {
-                    TimelineMetadata timelineMetadata = TimelineMetadata.LoadFromDisk( timelineDirName );
+                    TimelineMetadata timelineMetadata = TimelineMetadata.LoadFromDisk( timelineId );
                     timelines.Add( timelineMetadata );
                 }
                 catch( Exception ex )
                 {
-                    Debug.LogWarning( $"Couldn't load timeline `{timelineDirName}`." );
+                    Debug.LogWarning( $"Couldn't load timeline `{timelineDirPath}`." );
                     Debug.LogException( ex );
                 }
             }
@@ -102,11 +121,11 @@ namespace HSP.Content.Timelines.Serialization
 
         public static TimelineMetadata LoadFromDisk( string timelineId )
         {
-            string saveFilePath = Path.Combine( GetRootDirectory( timelineId ), TIMELINE_FILENAME );
+            string filePath = Path.Combine( GetRootDirectory( timelineId ), TIMELINE_FILENAME );
 
             TimelineMetadata timelineMetadata = new TimelineMetadata( timelineId );
 
-            JsonSerializedDataHandler handler = new JsonSerializedDataHandler( saveFilePath );
+            JsonSerializedDataHandler handler = new JsonSerializedDataHandler( filePath );
             var data = handler.Read();
             SerializationUnit.Populate( timelineMetadata, data );
             return timelineMetadata;
@@ -114,11 +133,11 @@ namespace HSP.Content.Timelines.Serialization
 
         public void SaveToDisk()
         {
-            string saveFilePath = Path.Combine( GetRootDirectory(), TIMELINE_FILENAME );
+            string filePath = Path.Combine( GetRootDirectory(), TIMELINE_FILENAME );
 
             var data = SerializationUnit.Serialize( this );
 
-            JsonSerializedDataHandler handler = new JsonSerializedDataHandler( saveFilePath );
+            JsonSerializedDataHandler handler = new JsonSerializedDataHandler( filePath );
             handler.Write( data );
         }
 
@@ -126,6 +145,7 @@ namespace HSP.Content.Timelines.Serialization
         public static SerializationMapping TimelineMetadataMapping()
         {
             return new MemberwiseSerializationMapping<TimelineMetadata>()
+                .WithMember( "scenario_id", o => o.ScenarioID )
                 .WithMember( "name", o => o.Name )
                 .WithMember( "description", o => o.Description );
         }

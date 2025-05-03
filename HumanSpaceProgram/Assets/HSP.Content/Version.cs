@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityPlus.Serialization;
 
-namespace HSP
+namespace HSP.Content
 {
     /// <summary>
     /// Represents a version where the major number indicates breaking changes, and minor indicates non-breaking changes.
@@ -15,6 +15,7 @@ namespace HSP
         /// The number indicating the major (breaking) part of the version.
         /// </summary>
         public int Major { get; }
+
         /// <summary>
         /// The number indicating the minor (non-breaking) part of the version.
         /// </summary>
@@ -26,9 +27,17 @@ namespace HSP
             this.Minor = minor;
         }
 
+        /// <summary>
+        /// Checks if two versions (of the same thing) are compatible with each other.
+        /// </summary>
+        /// <remarks>
+        /// Versions are compatible if they don't have any breaking changes between them (major is the same).
+        /// </remarks>
+        /// <param name="v1">The first version.</param>
+        /// <param name="v2">The second version.</param>
+        /// <returns>True if the versions are compatible. False otherwise.</returns>
         public static bool AreCompatible( Version v1, Version v2 )
         {
-            // Versions are compatible if they don't have any breaking changes between them (major is the same).
             return v1.Major == v2.Major;
         }
 
@@ -75,6 +84,10 @@ namespace HSP
             return Major.ToString( "#########0" ) + "." + Minor.ToString( "#########0" );
         }
 
+        /// <summary>
+        /// Parses a version from its string representation.
+        /// </summary>
+        /// <exception cref="ArgumentException">The string doesn't match any known valid version format.</exception>
         public static Version Parse( string s )
         {
             string[] strings = s.Split( '.' );
@@ -86,10 +99,8 @@ namespace HSP
             int minor = int.Parse( strings[1] );
             return new Version( major, minor );
         }
-    }
 
-    public static class Persistent_Version
-    {
+
         [MapsInheritingFrom( typeof( Version ) )]
         public static SerializationMapping VersionMapping()
         {

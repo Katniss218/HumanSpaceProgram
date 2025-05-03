@@ -6,6 +6,7 @@ using HSP.Vessels;
 using System;
 using UnityEngine;
 using UnityPlus.Serialization;
+using System.Linq;
 
 namespace HSP.Vanilla.Components
 {
@@ -62,7 +63,7 @@ namespace HSP.Vanilla.Components
 
         void Awake()
         {
-            SetThrottle = new ControlleeInput<float>( SetThrottleListener );
+            SetThrottle ??= new ControlleeInput<float>( SetThrottleListener );
         }
 
         void FixedUpdate()

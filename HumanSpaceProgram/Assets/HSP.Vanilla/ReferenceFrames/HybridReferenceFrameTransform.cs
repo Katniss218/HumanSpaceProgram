@@ -70,7 +70,16 @@ namespace HSP.Vanilla
         //
 
         bool _isSceneSpace;
-        Rigidbody _rb;
+        Rigidbody ___rb;
+        Rigidbody _rb
+        {
+            get
+            {
+                if( ___rb == null )
+                    ___rb = this.GetComponent<Rigidbody>();
+                return ___rb;
+            }
+        }
 
         public Vector3 Position
         {
@@ -140,7 +149,7 @@ namespace HSP.Vanilla
             get
             {
                 if( _isSceneSpace )
-                    return SceneReferenceFrameManager.ReferenceFrame.TransformRotation( _rb.rotation );
+                    return SceneReferenceFrameManager.ReferenceFrame.TransformRotation( this.gameObject.activeInHierarchy ? _rb.rotation : transform.rotation ); // Apparently, rigidbody.rotation gets set to identity when disabled...
                 else
                     return _actualAbsoluteRotation;
             }
@@ -355,8 +364,6 @@ namespace HSP.Vanilla
                 return;
             }
 
-            _rb = this.GetComponent<Rigidbody>();
-
             _rb.useGravity = false;
             _rb.collisionDetectionMode = CollisionDetectionMode.Discrete; // Continuous (in any of its flavors) "jumps" when sitting on top of something when reference frame switches.
             _rb.interpolation = RigidbodyInterpolation.None; // DO NOT INTERPOLATE. Doing so will desync `rigidbody.position` and `transform.position`.
@@ -535,10 +542,14 @@ namespace HSP.Vanilla
         }
 
         [MapsInheritingFrom( typeof( HybridReferenceFrameTransform ) )]
-        public static SerializationMapping FreePhysicsObjectMapping()
+        public static SerializationMapping HybridReferenceFrameTransformMapping()
         {
             return new MemberwiseSerializationMapping<HybridReferenceFrameTransform>()
-                .WithMember( "allow_scene_simulation", o => o.AllowSceneSimulation )
+                //.WithMember( "allow_scene_simulation", o => o.AllowSceneSimulation )
+                .WithMember( "allow_scene_simulation", o =>
+                {
+                    return o.AllowSceneSimulation;
+                }, ( o, value ) => o.AllowSceneSimulation = value )
                 .WithMember( "position_range", o => o.PositionRange )
                 .WithMember( "velocity_range", o => o.VelocityRange )
                 .WithMember( "max_timescale", o => o.MaxTimeScale )
@@ -547,7 +558,10 @@ namespace HSP.Vanilla
                 .WithMember( "local_center_of_mass", o => o.LocalCenterOfMass )
 
                 .WithMember( "absolute_position", o => o.AbsolutePosition )
-                .WithMember( "absolute_rotation", o => o.AbsoluteRotation )
+                .WithMember( "absolute_rotation", o =>
+                {
+                    return o.AbsoluteRotation;
+                }, ( o, value ) => o.AbsoluteRotation = value )
                 .WithMember( "absolute_velocity", o => o.AbsoluteVelocity )
                 .WithMember( "absolute_angular_velocity", o => o.AbsoluteAngularVelocity );
         }

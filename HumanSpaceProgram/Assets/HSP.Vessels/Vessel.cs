@@ -122,6 +122,11 @@ namespace HSP.Vessels
 
         // mass and colliders
 
+        void Awake()
+        {
+            VesselManager.Register( this );
+        }
+
         void Start()
         {
             RecalculatePartCache();
@@ -130,19 +135,11 @@ namespace HSP.Vessels
 
             HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_VESSEL_CREATED.ID, this );
             this.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
+
+           // VesselManager.Register( this );
         }
 
         private void OnDestroy()
-        {
-            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_VESSEL_DESTROYED.ID, this );
-        }
-
-        void OnEnable()
-        {
-            VesselManager.Register( this );
-        }
-
-        void OnDisable()
         {
             try
             {
@@ -152,6 +149,8 @@ namespace HSP.Vessels
             {
                 // OnDisable was called when scene was unloaded, ignore.
             }
+
+            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_VESSEL_DESTROYED.ID, this );
         }
 
         void FixedUpdate()
@@ -311,7 +310,7 @@ namespace HSP.Vessels
         {
             return new MemberwiseSerializationMapping<Vessel>()
                 .WithMember( "display_name", o => o.DisplayName )
-                .WithMember( "root_part", ObjectContext.Ref, o => o.RootPart )
+                .WithMember( "root_part", ObjectContext.Ref, o => o._rootPart )
                 .WithMember( "on_after_recalculate_parts", o => o.OnAfterRecalculateParts );
         }
     }

@@ -55,7 +55,7 @@ namespace HSP.Content.Vessels.Serialization
         /// </summary>
         public static string GetSavedVesselsPath()
         {
-            return HumanSpaceProgram.GetSavedVesselsDirectoryPath();
+            return HumanSpaceProgramContent.GetSavedVesselsDirectoryPath();
         }
 
         /// <summary>

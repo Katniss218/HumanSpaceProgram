@@ -76,7 +76,7 @@ namespace UnityPlus.Serialization
 
                                     if( !_inheritingFromMappings.TrySet( context, attr.MappedType, entry ) )
                                     {
-                                        Debug.LogWarning( $"Multiple '{nameof(MapsInheritingFromAttribute)}' mappings found for type `{attr.MappedType.AssemblyQualifiedName}`." );
+                                        Debug.LogWarning( $"Multiple '{nameof( MapsInheritingFromAttribute )}' mappings found for type `{attr.MappedType.AssemblyQualifiedName}`." );
                                     }
                                     break;
                                 case MapsImplementingAttribute:
@@ -216,7 +216,7 @@ namespace UnityPlus.Serialization
 
                 return mapping.GetInstance();
             }
-             
+
             if( _inheritingFromMappings.TryGet( context, type, out var entry )
              || _implementingMappings.TryGet( context, type, out entry )
              || _anyInterfaceMappings.TryGet( context, type, out entry )

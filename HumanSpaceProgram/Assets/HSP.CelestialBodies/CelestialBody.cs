@@ -1,5 +1,4 @@
 ﻿using HSP.ReferenceFrames;
-using HSP.Time;
 using System;
 using UnityEngine;
 using UnityPlus.Serialization;
@@ -86,11 +85,6 @@ namespace HSP.CelestialBodies
 
         private void OnDestroy()
         {
-            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_CELESTIAL_BODY_DESTROYED.ID, this );
-        }
-
-        void OnDisable()
-        {
             if( this.ID != null )
             {
                 try
@@ -102,15 +96,17 @@ namespace HSP.CelestialBodies
                     // OnDisable was called when scene was unloaded, ignore.
                 }
             }
+            HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_CELESTIAL_BODY_DESTROYED.ID, this );
         }
-
-
+         
         [MapsInheritingFrom( typeof( CelestialBody ) )]
         public static SerializationMapping CelestialBodyMapping()
         {
             return new MemberwiseSerializationMapping<CelestialBody>()
-            {
-            };
+                .WithMember( "id", o => o.ID )
+                .WithMember( "display_name", o => o.DisplayName )
+                .WithMember( "mass", o => o.Mass )
+                .WithMember( "radius", o => o.Radius );
         }
     }
 }

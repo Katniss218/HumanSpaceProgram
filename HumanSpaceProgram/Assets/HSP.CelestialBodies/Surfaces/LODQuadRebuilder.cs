@@ -53,7 +53,7 @@ namespace HSP.CelestialBodies.Surfaces
         public LODQuadRebuilder( LODQuadSphere sphere, LODQuadTreeChanges changes, BuildSettings settings = BuildSettings.Default )
         {
             this._sphere = sphere;
-            (this._modifiers, this._firstJobPerStage) = sphere.GetJobsForBuild();
+            (this._modifiers, this._firstJobPerStage) = sphere.GetJobsToBuild();
             this._buildMode = sphere.Mode;
             this._settings = settings;
 

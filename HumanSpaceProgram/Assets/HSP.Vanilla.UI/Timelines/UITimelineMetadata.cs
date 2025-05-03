@@ -1,4 +1,4 @@
-﻿using HSP.Content.Timelines.Serialization;
+﻿using HSP.Timelines.Serialization;
 using HSP.UI;
 using System;
 using UnityEngine;
@@ -26,7 +26,7 @@ namespace HSP.Vanilla.UI.Timelines
 
         public static T Create<T>( IUIElementContainer parent, UILayoutInfo layout, TimelineMetadata timeline, Action<UITimelineMetadata> onClick ) where T : UITimelineMetadata
         {
-            T uiSaveMetadata = (T)UIPanel.Create<T>( parent, layout, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/functionality_panel" ) )
+            T uiSaveMetadata = (T)UIPanel.Create<T>( parent, layout, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/panel" ) )
                 .Raycastable();
 
             uiSaveMetadata.LayoutDriver = new VerticalLayoutDriver() { FitToSize = true };

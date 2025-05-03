@@ -1,6 +1,6 @@
 using HSP.Timelines;
-using HSP.Content.Timelines.Serialization;
 using HSP.Vessels;
+using System;
 using System.IO;
 using UnityEngine;
 using UnityPlus.Serialization;
@@ -14,34 +14,50 @@ namespace HSP.Vanilla.Scenes.GameplayScene
         public const string DESERIALIZE_VESSELS = HSPEvent.NAMESPACE_HSP + ".deserialize_vessels";
 
         [HSPEventListener( HSPEvent_ON_TIMELINE_SAVE.ID, SERIALIZE_VESSELS )]
-        private static void OnBeforeSave( TimelineManager.SaveEventData e )
+        [HSPEventListener( HSPEvent_ON_SCENARIO_SAVE.ID, SERIALIZE_VESSELS )]
+        private static void SerializeVessels( object e )
         {
-            Directory.CreateDirectory( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels" ) );
+            string vesselsPath;
+            if( e is TimelineManager.SaveEventData e2 )
+                vesselsPath = Path.Combine( e2.save.GetRootDirectory(), "Vessels" );
+            else if( e is TimelineManager.SaveScenarioEventData e3 )
+                vesselsPath = Path.Combine( e3.scenario.GetRootDirectory(), "Vessels" );
+            else
+                throw new ArgumentException();
+
+            Directory.CreateDirectory( vesselsPath );
 
             int i = 0;
             foreach( var vessel in VesselManager.LoadedVessels )
             {
-                GameObject vesselobject = vessel.gameObject;
+                JsonSerializedDataHandler dataHandler = new JsonSerializedDataHandler( Path.Combine( vesselsPath, $"{i}", "gameobjects.json" ) );
 
-                JsonSerializedDataHandler _vesselsDataHandler = new JsonSerializedDataHandler( Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels", $"{i}", "gameobjects.json" ) );
-
-                var data = SerializationUnit.Serialize( vesselobject, TimelineManager.RefStore );
-                _vesselsDataHandler.Write( data );
+                var data = SerializationUnit.Serialize( vessel.gameObject, TimelineManager.RefStore );
+                dataHandler.Write( data );
                 i++;
             }
         }
 
+        [HSPEventListener( HSPEvent_ON_TIMELINE_NEW.ID, DESERIALIZE_VESSELS )]
         [HSPEventListener( HSPEvent_ON_TIMELINE_LOAD.ID, DESERIALIZE_VESSELS )]
-        private static void OnLoad( TimelineManager.LoadEventData e )
+        private static void DeserializeVessels( object e )
         {
-            string path = Path.Combine( SaveMetadata.GetRootDirectory( e.timelineId, e.saveId ), "Vessels" );
-            Directory.CreateDirectory( path );
+            string vesselsPath;
+            if( e is TimelineManager.LoadEventData e2 )
+                vesselsPath = Path.Combine( e2.save.GetRootDirectory(), "Vessels" );
+            else if( e is TimelineManager.StartNewEventData e3 )
+                vesselsPath = Path.Combine( e3.scenario.GetRootDirectory(), "Vessels" );
+            else
+                throw new ArgumentException();
 
-            foreach( var dir in Directory.GetDirectories( path ) )
+            if( !Directory.Exists( vesselsPath ) )
+                return;
+
+            foreach( var dir in Directory.GetDirectories( vesselsPath ) )
             {
-                JsonSerializedDataHandler _vesselsDataHandler = new JsonSerializedDataHandler( Path.Combine( dir, "gameobjects.json" ) );
+                JsonSerializedDataHandler dataHandler = new JsonSerializedDataHandler( Path.Combine( dir, "gameobjects.json" ) );
 
-                var data = _vesselsDataHandler.Read();
+                var data = dataHandler.Read();
                 var go = SerializationUnit.Deserialize<GameObject>( data, TimelineManager.RefStore );
             }
         }

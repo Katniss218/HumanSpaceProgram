@@ -227,8 +227,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9dbaab46dfbfb3d45b402c96d954e966, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <PartID>k__BackingField:
-    _data: Vanilla::tank_long
 --- !u!114 &-8463795735707923941
 MonoBehaviour:
   m_ObjectHideFlags: 0

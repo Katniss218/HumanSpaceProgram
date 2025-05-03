@@ -70,7 +70,6 @@
     <Compile Include="Assets\HSP\Utils\CoordinateUtils.cs" />
     <Compile Include="Assets\HSP\IHasMass.cs" />
     <Compile Include="Assets\HSP\Utils\RollingStatistics.cs" />
-    <Compile Include="Assets\HSP\HumanSpaceProgram.cs" />
     <Compile Include="Assets\HSP\TransformRedirect.cs" />
     <Compile Include="Assets\HSP\Utils\IOHelper.cs" />
     <Compile Include="Assets\HSP\PIDLoop.cs" />

@@ -3,6 +3,7 @@ using System;
 using System.Runtime.CompilerServices;
 using Unity.Collections;
 using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace HSP.Vanilla.CelestialBodies
 {
@@ -333,6 +334,20 @@ namespace HSP.Vanilla.CelestialBodies
 
                 return ((pointHeight / 65535.0) * (maxlevel - minlevel)) + minlevel;
             }
+        }
+
+        [MapsInheritingFrom( typeof( LODQuadModifier_Heightmap ) )]
+        public static SerializationMapping LODQuadModifier_HeightmapMapping()
+        {
+            return new MemberwiseSerializationMapping<LODQuadModifier_Heightmap>()
+                .WithMember( "heightmap_xn", ObjectContext.Asset, o => o.HeightmapXn )
+                .WithMember( "heightmap_xp", ObjectContext.Asset, o => o.HeightmapXp )
+                .WithMember( "heightmap_yn", ObjectContext.Asset, o => o.HeightmapYn )
+                .WithMember( "heightmap_yp", ObjectContext.Asset, o => o.HeightmapYp )
+                .WithMember( "heightmap_zn", ObjectContext.Asset, o => o.HeightmapZn )
+                .WithMember( "heightmap_zp", ObjectContext.Asset, o => o.HeightmapZp )
+                .WithMember( "min_level", o => o.MinLevel )
+                .WithMember( "max_level", o => o.MaxLevel );
         }
     }
 }

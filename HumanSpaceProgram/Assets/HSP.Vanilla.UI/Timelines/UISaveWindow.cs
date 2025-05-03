@@ -1,10 +1,11 @@
 using HSP.Timelines;
-using HSP.Content.Timelines.Serialization;
+using HSP.Timelines.Serialization;
 using HSP.UI;
 using System.Linq;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 using UnityPlus.UILib;
+using UnityPlus.UILib.Layout;
 using UnityPlus.UILib.UIElements;
 
 namespace HSP.Vanilla.UI.Timelines
@@ -19,7 +20,9 @@ namespace HSP.Vanilla.UI.Timelines
         UIInputField<string> _nameInputField;
         UIInputField<string> _descriptionInputField;
 
-        void RefreshSaveList()
+        public SaveMetadata Save { get; private set; } = TimelineManager.CurrentSave ?? new SaveMetadata( TimelineManager.CurrentTimeline.TimelineID );
+
+        private void RefreshSaveList()
         {
             if( _saveListUI.IsNullOrDestroyed() )
             {
@@ -40,24 +43,52 @@ namespace HSP.Vanilla.UI.Timelines
             _selectedTimelineSaves = new UISaveMetadata[saves.Length];
             for( int i = 0; i < _selectedTimelineSaves.Length; i++ )
             {
-                _selectedTimelineSaves[i] = _saveListUI.AddSaveMetadata( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Bottom, 0, 40 ), saves[i], ( ui ) =>
-                {
-                    _selectedSave = ui;
-                } );
+                _selectedTimelineSaves[i] = _saveListUI.AddSaveMetadata( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Bottom, 0, 40 ), saves[i], OnExistingSaveClick );
             }
         }
 
-        void OnSave()
+        private void OnExistingSaveClick( UISaveMetadata ui )
         {
-            if( _nameInputField.TryGetValue( out string Text ) )
+            _selectedSave = ui;
+            Save = ui.Save;
+            _nameInputField.SetValue( ui.Save.Name );
+            _descriptionInputField.SetValue( ui.Save.Description );
+        }
+
+        private void OnNameChanged( IUIInputElement<string>.ValueChangedEventData e )
+        {
+            _selectedSave = null;
+            Save = new SaveMetadata( Save.TimelineID, IOHelper.SanitizeFileName( e.NewValue ) )
             {
-                _descriptionInputField.TryGetValue( out string Description );
-                TimelineManager.BeginSaveAsync( TimelineManager.CurrentTimeline.TimelineID, IOHelper.SanitizeFileName( Text ), Text, Description );
-            }
-            else
-            {
-                TimelineManager.BeginSaveAsync( TimelineManager.CurrentTimeline.TimelineID, _selectedSave.Save.SaveID, _selectedSave.Save.Name, _selectedSave.Save.Description );
-            }
+                Name = e.NewValue,
+                Description = Save.Description,
+            };
+        }
+        
+        private void OnDescriptionChanged( IUIInputElement<string>.ValueChangedEventData e )
+        {
+            _selectedSave = null;
+            Save.Description = e.NewValue;
+        }
+
+        private void OnSave()
+        {
+            TimelineManager.BeginSaveAsync( Save );
+            RefreshSaveList();
+            /* if( _nameInputField.TryGetValue( out string Text ) )
+             {
+                 _descriptionInputField.TryGetValue( out string Description );
+                 TimelineManager.BeginSaveAsync( TimelineManager.CurrentTimeline.TimelineID, IOHelper.SanitizeFileName( Text ), Text, Description );
+             }
+             else
+             {
+                 TimelineManager.BeginSaveAsync( TimelineManager.CurrentTimeline.TimelineID, _selectedSave.Save.SaveID, _selectedSave.Save.Name, _selectedSave.Save.Description );
+             }
+            */
+#warning TODO -
+            // after changing the name - change the name of the selected save.
+            // add a button that deselects the current save.
+            // currently selected timeline/save should be outlined in the UI.
         }
 
         /// <summary>
@@ -74,19 +105,25 @@ namespace HSP.Vanilla.UI.Timelines
             uiWindow.AddStdText( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Top, 0, 30 ), "Save..." )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center );
 
-            UIScrollView saveScrollView = uiWindow.AddVerticalScrollView( new UILayoutInfo( UIFill.Fill( 2, 2, 30, 22 ) ), 75 )
+            UIScrollView saveList = uiWindow.AddVerticalScrollView( new UILayoutInfo( UIFill.Fill( 2, 2, 30, 72 ) ), 75 )
                 .WithVerticalScrollbar( UIAnchor.Right, 10, null, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_handle" ), out UIScrollBar scrollbar );
+
+            saveList.LayoutDriver = new VerticalLayoutDriver() { Spacing = 2, FitToSize = true };
 
             UIButton saveBtn = uiWindow.AddButton( new UILayoutInfo( UIAnchor.BottomRight, (-2, 5), (95, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), uiWindow.OnSave );
 
             saveBtn.AddStdText( new UILayoutInfo( UIFill.Fill() ), "Save" )
                 .WithAlignment( TMPro.HorizontalAlignmentOptions.Center );
 
-            UIInputField<string> inputField = uiWindow.AddStringInputField( new UILayoutInfo( UIFill.Horizontal( 2, 99 ), UIAnchor.Bottom, 5, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
+            UIInputField<string> inputField = uiWindow.AddStringInputField( new UILayoutInfo( UIFill.Horizontal( 2, 2 ), UIAnchor.Bottom, 70, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
+            inputField.OnValueChanged += uiWindow.OnNameChanged;
+            
+            UIInputField<string> inputField2 = uiWindow.AddStringInputField( new UILayoutInfo( UIFill.Horizontal( 2, 2 ), UIAnchor.Bottom, 55, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/input_field" ) );
+            inputField2.OnValueChanged += uiWindow.OnDescriptionChanged;
 
             uiWindow._nameInputField = inputField;
-            uiWindow._descriptionInputField = inputField;
-            uiWindow._saveListUI = saveScrollView;
+            uiWindow._descriptionInputField = inputField2;
+            uiWindow._saveListUI = saveList;
 
             uiWindow.RefreshSaveList();
 

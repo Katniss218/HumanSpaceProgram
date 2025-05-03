@@ -1,4 +1,5 @@
-﻿using HSP.Content.Vessels;
+﻿using HSP.Content;
+using HSP.Content.Vessels;
 using HSP.Input;
 using HSP.Vanilla.Components;
 using HSP.Vessels;

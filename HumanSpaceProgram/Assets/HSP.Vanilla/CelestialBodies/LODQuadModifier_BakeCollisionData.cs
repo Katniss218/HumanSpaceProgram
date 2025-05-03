@@ -1,6 +1,7 @@
 ﻿using HSP.CelestialBodies.Surfaces;
 using System;
 using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace HSP.Vanilla.CelestialBodies
 {
@@ -40,6 +41,12 @@ namespace HSP.Vanilla.CelestialBodies
             {
                 Physics.BakeMesh( instanceId, false );
             }
+        }
+
+        [MapsInheritingFrom( typeof( LODQuadModifier_BakeCollisionData ) )]
+        public static SerializationMapping LODQuadModifier_BakeCollisionDataMapping()
+        {
+            return new MemberwiseSerializationMapping<LODQuadModifier_BakeCollisionData>();
         }
     }
 }

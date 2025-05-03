@@ -1,4 +1,4 @@
-using HSP.Content.Timelines.Serialization;
+using HSP.Timelines.Serialization;
 using HSP.SceneManagement;
 using HSP.Timelines;
 using HSP.UI;
@@ -40,6 +40,30 @@ namespace HSP.Vanilla.UI.Timelines
 
         // clicking on the load button becomes possible after a save has been selected.
 
+        void RefreshTimelineList()
+        {
+            if( _timelineListUI.IsNullOrDestroyed() )
+            {
+                return;
+            }
+
+            foreach( UIElement timelineUI in _timelineListUI.Children.ToArray() )
+            {
+                timelineUI.Destroy();
+            }
+
+            var timelines = TimelineMetadata.ReadAllTimelines().ToArray();
+            _timelines = new UITimelineMetadata[timelines.Length];
+            for( int i = 0; i < _timelines.Length; i++ )
+            {
+                _timelines[i] = _timelineListUI.AddTimelineMetadata( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Bottom, 0, 40 ), timelines[i], ( ui ) =>
+                {
+                    _selectedTimeline = ui;
+                    RefreshSaveList();
+                } );
+            }
+        }
+
         void RefreshSaveList()
         {
             if( _saveListUI.IsNullOrDestroyed() )
@@ -64,30 +88,6 @@ namespace HSP.Vanilla.UI.Timelines
                 _selectedTimelineSaves[i] = _saveListUI.AddSaveMetadata( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Bottom, 0, 40 ), saves[i], ( ui ) =>
                 {
                     _selectedSave = ui;
-                } );
-            }
-        }
-
-        void RefreshTimelineList()
-        {
-            if( _timelineListUI.IsNullOrDestroyed() )
-            {
-                return;
-            }
-
-            foreach( UIElement timelineUI in _timelineListUI.Children.ToArray() )
-            {
-                timelineUI.Destroy();
-            }
-
-            var timelines = TimelineMetadata.ReadAllTimelines().ToArray();
-            _timelines = new UITimelineMetadata[timelines.Length];
-            for( int i = 0; i < _timelines.Length; i++ )
-            {
-                _timelines[i] = _timelineListUI.AddTimelineMetadata( new UILayoutInfo( UIFill.Horizontal(), UIAnchor.Bottom, 0, 40 ), timelines[i], ( ui ) =>
-                {
-                    _selectedTimeline = ui;
-                    RefreshSaveList();
                 } );
             }
         }
@@ -119,12 +119,12 @@ namespace HSP.Vanilla.UI.Timelines
             UIScrollView timelineList = uiWindow.AddVerticalScrollView( new UILayoutInfo( UIFill.HorizontalPercent( 0, 0.6667f ), UIFill.Vertical( 32, 19 ) ), 100 )
                 .WithVerticalScrollbar( UIAnchor.Right, 10, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_vertical_background" ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_vertical" ), out _ );
 
-            timelineList.LayoutDriver = new VerticalLayoutDriver() { FitToSize = true };
+            timelineList.LayoutDriver = new VerticalLayoutDriver() { Spacing = 2, FitToSize = true };
 
             UIScrollView saveList = uiWindow.AddVerticalScrollView( new UILayoutInfo( UIFill.HorizontalPercent( 0.3333f, 0 ), UIFill.Vertical( 32, 19 ) ), 100 )
                 .WithVerticalScrollbar( UIAnchor.Right, 10, AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_vertical_background" ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/scrollbar_vertical" ), out _ );
 
-            saveList.LayoutDriver = new VerticalLayoutDriver() { FitToSize = true };
+            saveList.LayoutDriver = new VerticalLayoutDriver() { Spacing = 2, FitToSize = true };
 
             UIButton loadButton = uiWindow.AddButton( new UILayoutInfo( UIAnchor.Bottom, (0, 2), (100, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ), uiWindow.OnLoad );
 

@@ -201,8 +201,16 @@ namespace HSP.Vanilla
 
         public bool IsColliding { get; private set; }
 
-        protected new Rigidbody rigidbody => _rb;
-        Rigidbody _rb;
+        Rigidbody ___rb;
+        Rigidbody _rb
+        {
+            get
+            {
+                if( ___rb == null )
+                    ___rb = this.GetComponent<Rigidbody>();
+                return ___rb;
+            }
+        }
 
         public void AddForce( Vector3 force )
         {
@@ -240,7 +248,7 @@ namespace HSP.Vanilla
         protected void RecalculateCache( IReferenceFrame sceneReferenceFrame )
         {
             _cachedAbsolutePosition = sceneReferenceFrame.TransformPosition( _rb.position );
-            _cachedAbsoluteRotation = sceneReferenceFrame.TransformRotation( _rb.rotation );
+            _cachedAbsoluteRotation = sceneReferenceFrame.TransformRotation( this.gameObject.activeInHierarchy ? _rb.rotation : transform.rotation ); // Apparently, rigidbody.rotation gets set to identity when disabled...
             _cachedAbsoluteVelocity = sceneReferenceFrame.TransformVelocity( _rb.velocity );
             _cachedAbsoluteAngularVelocity = sceneReferenceFrame.TransformAngularVelocity( _rb.angularVelocity );
             // Don't cache acceleration, since it's impossible to compute it here for a dynamic body. Acceleration is recalculated on every fixedupdate instead.
@@ -274,8 +282,6 @@ namespace HSP.Vanilla
                 Destroy( this );
                 return;
             }
-
-            _rb = this.GetComponent<Rigidbody>();
 
             _rb.useGravity = false;
             _rb.collisionDetectionMode = CollisionDetectionMode.Discrete; // Continuous (in any of its flavors) "jumps" when sitting on top of something when reference frame switches.

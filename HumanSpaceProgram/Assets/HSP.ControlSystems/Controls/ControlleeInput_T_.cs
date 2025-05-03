@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using UnityEngine;
 using UnityPlus.Serialization;
 
 namespace HSP.ControlSystems.Controls
@@ -92,20 +93,12 @@ namespace HSP.ControlSystems.Controls
 
                     foreach( var c in value )
                     {
+                        if( c == null )
+                            continue;
+
                         ControlleeInput<T>.Connect( o, c );
                     }
                 } );
-            /*.WithFactory( ( data, l ) => // Either this, or use mapping that instantiates on reference pass.
-            {
-                if( data == null )
-                    return null;
-
-#warning TODO - I think this could be removed by having 2 contexts for the delegate - one creating it in Load and one in LoadReferences.
-
-                Action<T> onInvoke = (Action<T>)Persistent_Delegate.ToDelegate( data["on_invoke"], l.RefMap );
-
-                return new ControlleeInput<T>( onInvoke );
-            } );*/
         }
     }
 }

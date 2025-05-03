@@ -14,7 +14,7 @@ namespace HSP.Vanilla.Content.AssetLoaders
     /// </summary>
     public sealed class GameDataJsonPartFactory : PartFactory
     {
-        public const string RELOAD_PARTS = HSPEvent.NAMESPACE_HSP + ".reload_parts";
+        public const string RELOAD_PARTS = HSPEvent.NAMESPACE_HSP + ".gdjpf.reload_parts";
 
         [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, RELOAD_PARTS )]
         public static void ReloadParts2()
@@ -42,10 +42,7 @@ namespace HSP.Vanilla.Content.AssetLoaders
         public static void ReloadParts()
         {
             // <mod_folder>/Parts/<part_id>/objects.json, data.json, _part.json
-            string gameDataPath = HumanSpaceProgramContent.GetContentDirectoryPath();
-            string[] modDirectories = Directory.GetDirectories( gameDataPath );
-
-            foreach( var modPath in modDirectories )
+            foreach( var modPath in HumanSpaceProgramContent.GetAllModDirectories() )
             {
                 string partsDir = Path.Combine( modPath, "Parts" );
                 if( !Directory.Exists( partsDir ) )

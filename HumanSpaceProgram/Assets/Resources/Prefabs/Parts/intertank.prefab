@@ -315,8 +315,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9dbaab46dfbfb3d45b402c96d954e966, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <PartID>k__BackingField:
-    _data: Vanilla::intertank
 --- !u!114 &2237606412665995627
 MonoBehaviour:
   m_ObjectHideFlags: 0

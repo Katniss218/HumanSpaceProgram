@@ -50,7 +50,7 @@ namespace HSP.Vanilla.Components
 
         void Awake()
         {
-            SetAttitude = new ControlleeInput<Vector3>( SetAttitudeListener );
+            SetAttitude ??= new ControlleeInput<Vector3>( SetAttitudeListener );
         }
 
         void FixedUpdate()

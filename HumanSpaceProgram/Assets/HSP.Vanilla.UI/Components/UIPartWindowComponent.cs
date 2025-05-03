@@ -7,6 +7,10 @@ using UnityPlus.UILib.UIElements;
 
 namespace HSP.Vanilla.UI.Components
 {
+    /// <summary>
+    /// A base class for all components that are displayed in the <see cref="UIPartWindow"/>.
+    /// </summary>
+    /// <typeparam name="TComponent">The type of the component being displayed.</typeparam>
     public abstract class UIPartWindowComponent<TComponent> : UIPanel
     {
         protected UIRectMask contentPanel;

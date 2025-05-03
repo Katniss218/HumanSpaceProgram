@@ -39,8 +39,8 @@ namespace HSP.Vanilla.Components
 
         void Awake()
         {
-            GetReferenceTransform = new ControlParameterOutput<Transform>( GetTransform );
-            SetX = new ControlleeInput<float>( SetXListener );
+            GetReferenceTransform ??= new ControlParameterOutput<Transform>( GetTransform );
+            SetX ??= new ControlleeInput<float>( SetXListener );
         }
 
         void FixedUpdate()

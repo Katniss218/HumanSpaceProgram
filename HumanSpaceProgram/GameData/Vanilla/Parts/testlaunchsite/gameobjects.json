@@ -1,0 +1,132 @@
+﻿{
+    "$type": "UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+    "$id": "49a330f4-f301-43ac-b8b4-a32439edca27",
+    "is_active": true,
+    "is_static": false,
+    "layer": 20,
+    "name": "testlaunchsite",
+    "tag": "Untagged",
+    "children": {
+        "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+        "$id": "acfda209-8ae5-480e-ac7f-85855430a0c5",
+        "value": [
+            {
+                "$type": "UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "f9613ba7-81ad-4b32-9f12-92804839fc74",
+                "is_active": true,
+                "is_static": false,
+                "layer": 20,
+                "name": "spawn",
+                "tag": "Untagged",
+                "children": {
+                    "$type": "UnityEngine.GameObject[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "e5d57559-96ca-4a61-92b0-c0606530f90e",
+                    "value": []
+                },
+                "components": {
+                    "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "71de93fc-dd19-48c5-a75b-9cc6b9b6b92e",
+                    "value": [
+                        {
+                            "$type": "UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                            "$id": "f1a7bad4-b1d7-4c8d-a72b-83188d08fcc3",
+                            "local_position": [
+                                0,
+                                1,
+                                0
+                            ],
+                            "local_rotation": [
+                                0,
+                                0,
+                                0,
+                                1
+                            ],
+                            "local_scale": [
+                                0.0199999995529652,
+                                1,
+                                0.0199999995529652
+                            ]
+                        },
+                        {
+                            "$type": "HSP.Vanilla.Components.FLaunchSiteMarker, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                            "$id": "6186fe71-519a-47ca-826d-d8392f334443",
+                            "is_enabled": true
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    "components": {
+        "$type": "UnityEngine.Component[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+        "$id": "f935967a-0a5a-4257-9e96-e34bcfdf07ca",
+        "value": [
+            {
+                "$type": "UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "83321415-e4ac-4099-b493-3975d8d63d3c",
+                "local_position": [
+                    0,
+                    0,
+                    0
+                ],
+                "local_rotation": [
+                    0,
+                    0,
+                    0,
+                    1
+                ],
+                "local_scale": [
+                    50,
+                    1,
+                    50
+                ]
+            },
+            {
+                "$type": "UnityEngine.MeshFilter, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "63d0938d-4c84-4495-882b-3018bfcb7c81",
+                "shared_mesh": {
+                    "$assetref": "builtin::HSP._DevUtils/_untitled"
+                }
+            },
+            {
+                "$type": "UnityEngine.MeshRenderer, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "a37466d5-4d38-44c3-bced-718d3a01d11c",
+                "is_enabled": true,
+                "shared_materials": {
+                    "$type": "UnityEngine.Material[], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "8be331f2-8d72-4011-8b4e-9a8da9cb0723",
+                    "value": [
+                        {
+                            "$assetref": "builtin::Resources/New Material 2"
+                        }
+                    ]
+                },
+                "shadow_casting_mode": "On",
+                "receive_shadows": true
+            },
+            {
+                "$type": "UnityEngine.MeshCollider, UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "286bdfef-ace9-4906-a585-40779df3f6f7",
+                "is_enabled": true,
+                "is_trigger": false,
+                "shared_mesh": {
+                    "$assetref": "builtin::HSP._DevUtils/_untitled"
+                },
+                "is_convex": false
+            },
+            {
+                "$type": "HSP.Vessels.Components.FPart, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "bff5d46f-02b9-46d1-9ef1-0386ec675b83",
+                "is_enabled": true,
+                "part_id": "Vanilla::testlaunchsite"
+            },
+            {
+                "$type": "HSP.Vanilla.Components.FPointMass, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "e47b9a2d-eee4-46c0-b55f-bcea77664b9a",
+                "is_enabled": true,
+                "mass": 500000,
+                "on_after_mass_changed": null
+            }
+        ]
+    }
+}

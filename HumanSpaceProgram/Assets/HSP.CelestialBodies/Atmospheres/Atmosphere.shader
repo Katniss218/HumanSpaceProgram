@@ -1,5 +1,5 @@
 
-Shader "Hidden/Atmosphere"
+Shader "Custom/Atmosphere"
 {
 	Properties
 	{

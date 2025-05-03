@@ -172,7 +172,8 @@ namespace HSP.Trajectories
         public static SerializationMapping TrajectoryTransformMapping()
         {
             return new MemberwiseSerializationMapping<TrajectoryTransform>()
-                .WithMember( "trajectory", o => o._trajectory );
+                .WithMember( "trajectory", o => o._trajectory )
+                .WithMember( "is_attractor", o => o._isAttractor );
         }
     }
 }

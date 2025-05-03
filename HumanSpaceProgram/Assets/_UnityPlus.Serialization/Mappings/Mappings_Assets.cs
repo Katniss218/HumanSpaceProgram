@@ -6,7 +6,7 @@ namespace UnityPlus.Serialization.Mappings
         [MapsInheritingFrom( typeof( object ), Context = ObjectContext.Asset )]
         public static SerializationMapping ObjectAssetMapping<T>() where T : class
         {
-            return new PrimitiveSerializationMapping<T>( skipHeader: true )
+            return new PrimitiveSerializationMapping<T>( skipHeader: ObjectHeaderSkipMode.Always )
             {
                 OnSave = ( o, s ) => s.RefMap.WriteAssetReference<T>( o ),
                 OnLoad = ( data, l ) => l.ReadAssetReference<T>( data )

@@ -58,10 +58,11 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP._DevUtils\VanillaPlanetarySystemFactory.cs" />
     <Compile Include="Assets\HSP._DevUtils\GravityApplier.cs" />
     <Compile Include="Assets\HSP._DevUtils\AIRFRotationFixer.cs" />
     <Compile Include="Assets\HSP._DevUtils\AsyncTester.cs" />
+    <Compile Include="Assets\HSP._DevUtils\DefaultScenarioCreation\DevDefaultScenarioCreator.cs" />
+    <Compile Include="Assets\HSP._DevUtils\DefaultScenarioCreation\VanillaPlanetarySystemFactory.cs" />
     <Compile Include="Assets\HSP._DevUtils\DevUtilsGameplayManager.cs" />
     <Compile Include="Assets\HSP._DevUtils\ConstantForceApplier.cs" />
   </ItemGroup>

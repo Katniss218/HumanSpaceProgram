@@ -195,6 +195,9 @@ namespace HSP.Trajectories
 
         private static void ImmediatelyAfterUnityPhysicsStep()
         {
+            if( !instanceExists )
+                return;
+
             foreach( var (trajectory, trajectoryTransform) in instance._trajectoryMap )
             {
                 var (_, vel, interpolatedVel) = instance._posAndVelCache[trajectory];

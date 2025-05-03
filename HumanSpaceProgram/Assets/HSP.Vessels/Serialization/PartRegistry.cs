@@ -59,7 +59,7 @@ namespace HSP.Content.Vessels
 
             foreach( var kvp in _registry )
             {
-                if( kvp.Key.BelongsTo( modId ) )
+                if( kvp.Key.ModID == modId )
                 {
                     assets.Add( kvp.Value.LoadMetadata() );
                 }

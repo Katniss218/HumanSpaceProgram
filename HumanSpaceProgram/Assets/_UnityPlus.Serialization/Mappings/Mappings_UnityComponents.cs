@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Extensions;
@@ -58,7 +59,10 @@ namespace UnityPlus.Serialization.Mappings
                     {
                         foreach( var child in value )           // The 'value' array here is a sort of 'virtual' array.
                         {
-                            child.transform.SetParent( o.transform );
+                            if( child == null ) // only true if setter invoked after failure.
+                                continue;
+
+                            child.transform.SetParent( o.transform, false );
                         }
                     } )
                 .WithMember( "components", o =>
@@ -72,6 +76,7 @@ namespace UnityPlus.Serialization.Mappings
             .WithRawFactory( ( data, l ) =>
             {
                 GameObject obj = new GameObject();
+                obj.SetActive( false ); // Still needed because ne need to disable it before adding components.
 
                 if( data.TryGetValue( KeyNames.ID, out var id ) )
                 {

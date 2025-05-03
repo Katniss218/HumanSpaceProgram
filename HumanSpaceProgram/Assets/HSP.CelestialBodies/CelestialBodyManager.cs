@@ -45,6 +45,9 @@ namespace HSP.CelestialBodies
             if( celestialBody.ID == null )
                 throw new ArgumentException( $"Can't register a celestial body that has a null ID.", nameof( celestialBody ) );
 
+            if( instance._celestialBodies.ContainsKey( celestialBody.ID ) )
+                throw new InvalidOperationException( $"Can't register a celestial body with ID '{celestialBody.ID}'. A celestial body with that ID is already registered." );
+
             instance._celestialBodies[celestialBody.ID] = celestialBody;
         }
 
