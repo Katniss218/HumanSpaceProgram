@@ -206,8 +206,10 @@ namespace HSP.Timelines
             }
 
             string rootDirectory = scenario.GetRootDirectory();
-            Directory.Delete( rootDirectory, true ); // Delete the old directory (if exists) to stop old, not-overwritten data remaining there.
-            Directory.CreateDirectory( rootDirectory );
+            if( Directory.Exists( rootDirectory ) )
+                Directory.Delete( rootDirectory, true ); // Delete the old directory (if exists) to stop old, not-overwritten data remaining there.
+            else
+                Directory.CreateDirectory( rootDirectory );
 
             var eScenario = new SaveScenarioEventData( scenario );
             RefStore = new BidirectionalReferenceStore();
@@ -247,8 +249,10 @@ namespace HSP.Timelines
             }
 
             string rootDirectory = save.GetRootDirectory();
-            Directory.Delete( rootDirectory, true ); // Delete the old directory (if exists) to stop old, not-overwritten data remaining there.
-            Directory.CreateDirectory( rootDirectory );
+            if( Directory.Exists( rootDirectory ) )
+                Directory.Delete( rootDirectory, true ); // Delete the old directory (if exists) to stop old, not-overwritten data remaining there.
+            else
+                Directory.CreateDirectory( rootDirectory );
 
             var eSave = new SaveEventData( CurrentScenario, CurrentTimeline, save );
             RefStore = new BidirectionalReferenceStore();
