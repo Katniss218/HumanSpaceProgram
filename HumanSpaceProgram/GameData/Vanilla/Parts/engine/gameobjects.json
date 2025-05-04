@@ -325,6 +325,11 @@
                 }
             },
             {
+                "$type": "HSP.Vanilla.Effects.FRocketEngineAudio, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "8633432d-cf82-435a-8bc2-a3b2dcbbd302",
+                "is_enabled": true
+            },
+            {
                 "$type": "HSP.Vanilla.Components.FPointMass, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
                 "$id": "a19f6f8d-3145-4101-84a6-fc81ef5cc450",
                 "is_enabled": true,

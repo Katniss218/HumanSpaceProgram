@@ -15,10 +15,27 @@ namespace HSP.Vanilla.Components
     {
         const float g = 9.80665f;
 
-        public float Thrust { get; private set; }
+        float _thrust;
+        /// <summary>
+        /// The thrust that the engine is currently producing, in [N].
+        /// </summary>
+        public float Thrust
+        {
+
+            get => _thrust;
+            set
+            {
+                float oldThrust = _thrust;
+
+                _thrust = value;
+
+                if( oldThrust != value )
+                    OnAfterThrustChanged?.Invoke();
+            }
+        }
 
         /// <summary>
-        /// The maximum thrust, in [N].
+        /// The maximum thrust that the engine can produce, in [N].
         /// </summary>
         [field: SerializeField]
         public float MaxThrust { get; set; } = 10000f;
@@ -34,11 +51,29 @@ namespace HSP.Vanilla.Components
         /// </summary>
         public float MaxMassFlow => MaxThrust / (Isp * g);
 
+        [SerializeField]
+        float _throttle;
         /// <summary>
         /// The current throttle level, in [0..1].
         /// </summary>
-        [field: SerializeField]
-        public float Throttle { get; set; }
+        public float Throttle
+        {
+            get => _throttle;
+            set
+            {
+                float oldThrottle = _throttle;
+
+                _throttle = value;
+
+                if( oldThrottle == 0 && value > 0 )
+                    OnAfterIgnite?.Invoke();
+                else if( oldThrottle > 0 && value == 0 )
+                    OnAfterShutdown?.Invoke();
+
+                if( oldThrottle != value )
+                    OnAfterThrottleChanged?.Invoke();
+            }
+        }
 
         [NamedControl( "Throttle", "Connect this to the controller's throttle output." )]
         public ControlleeInput<float> SetThrottle;
@@ -55,6 +90,11 @@ namespace HSP.Vanilla.Components
 
         [field: SerializeField]
         public SubstanceStateCollection Inflow { get; private set; } = SubstanceStateCollection.Empty;
+
+        public event Action OnAfterIgnite;
+        public event Action OnAfterShutdown;
+        public event Action OnAfterThrottleChanged;
+        public event Action OnAfterThrustChanged;
 
         private float GetThrust( float massFlow )
         {
