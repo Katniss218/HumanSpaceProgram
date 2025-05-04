@@ -26,7 +26,8 @@ namespace UnityPlus.AssetManagement.AssetSources
 
             UnityEngine.Object[] assets;
             Type mainAssetType = AssetDatabase.GetMainAssetTypeAtPath( path );
-            if( mainAssetType == typeof( SceneAsset ) )
+            if( mainAssetType == typeof( SceneAsset )
+             || mainAssetType.FullName == "UnityEditor.Audio.AudioMixerController" ) // "type inaccessible due to protection level" fuck off Unity... Making my code ugly...
             {
                 assets = new[] { AssetDatabase.LoadMainAssetAtPath( path ) };
             }

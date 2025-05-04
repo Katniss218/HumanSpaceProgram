@@ -117,11 +117,42 @@ namespace HSP._DevUtils
             }
         }
 
+        IAudioHandle[] loopAudios;
+        IAudioHandle[] startAudios;
+        int audioCount = 32;
+
         void Update()
         {
             if( UnityEngine.Input.GetKeyDown( KeyCode.F6 ) )
             {
-                AudioManager.Play( AssetRegistry.Get<AudioClip>( "Vanilla::Assets/sound_liq8_spin" ), VesselManager.LoadedVessels.Skip( 1 ).First().ReferenceTransform, false, 6 );
+                if( loopAudios != null )
+                {
+                    for( int i = 0; i < audioCount; i++ )
+                    {
+                        AudioManager.PlayInWorld( AssetRegistry.Get<AudioClip>( "Vanilla::Assets/sounds/kero_flameout_hard" ), VesselManager.LoadedVessels.Skip( 1 ).First().ReferenceTransform, false, AudioChannel.Main_3D, 6 );
+                    }
+
+                    foreach( var startAudio in startAudios )
+                        startAudio.Stop();
+                    foreach( var loopAudio in loopAudios )
+                        loopAudio.Stop( 0, 0.5f );
+                    loopAudios = null;
+                }
+                else
+                {
+                    startAudios = new IAudioHandle[audioCount];
+                    for( int i = 0; i < startAudios.Length; i++ )
+                    {
+                        startAudios[i] = AudioManager.PlayInWorld( AssetRegistry.Get<AudioClip>( "Vanilla::Assets/sounds/sound_liq8_enhanced" ), VesselManager.LoadedVessels.Skip( 1 ).First().ReferenceTransform, false, AudioChannel.Main_3D, 6 );
+                    }
+
+                    loopAudios = new IAudioHandle[audioCount];
+                    for( int i = 0; i < loopAudios.Length; i++ )
+                    {
+                        loopAudios[i] = AudioManager.PrepareInWorld( AssetRegistry.Get<AudioClip>( "Vanilla::Assets/sounds/kero_loop_hard" ), VesselManager.LoadedVessels.Skip( 1 ).First().ReferenceTransform, true, AudioChannel.Main_3D, 6 );
+                        loopAudios[i].Play( 3, 6 );
+                    }
+                }
             }
             if( UnityEngine.Input.GetKeyDown( KeyCode.F3 ) )
             {
