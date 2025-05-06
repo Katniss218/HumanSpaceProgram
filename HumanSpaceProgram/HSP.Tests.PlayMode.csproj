@@ -58,10 +58,10 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Tests\PlayMode\AssertMonoBehaviour.cs" />
     <Compile Include="Assets\Tests\PlayMode\P_Template.cs" />
     <Compile Include="Assets\Tests\PlayMode\NUnit\ApproxEqual.cs" />
     <Compile Include="Assets\Tests\PlayMode\ReferenceFrameTransformTests.cs" />
-    <Compile Include="Assets\Tests\PlayMode\AssertMonoBehaviour.cs" />
     <Compile Include="Assets\Tests\PlayMode\TestRbForces.cs" />
   </ItemGroup>
   <ItemGroup>

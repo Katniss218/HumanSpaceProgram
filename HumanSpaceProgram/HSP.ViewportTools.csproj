@@ -58,10 +58,10 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.ViewportTools\TranslationTransformHandle.cs" />
-    <Compile Include="Assets\HSP.ViewportTools\TransformHandleSet.cs" />
     <Compile Include="Assets\HSP.ViewportTools\TransformHandle.cs" />
     <Compile Include="Assets\HSP.ViewportTools\RotationTransformHandle.cs" />
+    <Compile Include="Assets\HSP.ViewportTools\TranslationTransformHandle.cs" />
+    <Compile Include="Assets\HSP.ViewportTools\TransformHandleSet.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.ViewportTools\___HSP.ViewportTools.asmdef" />
@@ -409,6 +409,10 @@
     </Reference>
     <Reference Include="ReportGeneratorMerged">
       <HintPath>Library\PackageCache\com.unity.testtools.codecoverage@1.1.1\lib\ReportGenerator\ReportGeneratorMerged.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Collections.LowLevel.ILSupport">
+      <HintPath>Library\PackageCache\com.unity.collections@1.2.4\Unity.Collections.LowLevel.ILSupport\Unity.Collections.LowLevel.ILSupport.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="netstandard">

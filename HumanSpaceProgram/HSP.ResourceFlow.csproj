@@ -60,10 +60,10 @@
   <ItemGroup>
     <Compile Include="Assets\HSP.ResourceFlow\IResourceConsumer.cs" />
     <Compile Include="Assets\HSP.ResourceFlow\IResourceContainer.cs" />
-    <Compile Include="Assets\HSP.ResourceFlow\SubstanceState.cs" />
     <Compile Include="Assets\HSP.ResourceFlow\Substance.cs" />
     <Compile Include="Assets\HSP.ResourceFlow\FluidState.cs" />
     <Compile Include="Assets\HSP.ResourceFlow\IResourceProducer.cs" />
+    <Compile Include="Assets\HSP.ResourceFlow\SubstanceState.cs" />
     <Compile Include="Assets\HSP.ResourceFlow\FlowUtils.cs" />
     <Compile Include="Assets\HSP.ResourceFlow\SubstanceStateCollection.cs" />
   </ItemGroup>
@@ -413,6 +413,10 @@
     </Reference>
     <Reference Include="ReportGeneratorMerged">
       <HintPath>Library\PackageCache\com.unity.testtools.codecoverage@1.1.1\lib\ReportGenerator\ReportGeneratorMerged.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Collections.LowLevel.ILSupport">
+      <HintPath>Library\PackageCache\com.unity.collections@1.2.4\Unity.Collections.LowLevel.ILSupport\Unity.Collections.LowLevel.ILSupport.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="netstandard">

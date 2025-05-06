@@ -76,7 +76,17 @@ namespace UnityPlus.AssetManagement
             // Try to load a lazy asset.
             if( _lazyRegistry.TryGetValue( assetID, out LazyAsset lazy ) )
             {
-                object asset = lazy.loader();
+                object asset = null;
+                try
+                {
+                    asset = lazy.loader.Invoke();
+                }
+                catch( Exception ex )
+                {
+                    Debug.LogError( $"Failed to load an asset with ID '{assetID}' using its lazy loader." );
+                    Debug.LogException( ex );
+                }
+
                 if( asset != null )
                 {
                     if( lazy.isCacheable )
@@ -145,13 +155,13 @@ namespace UnityPlus.AssetManagement
         /// <param name="asset">The asset object to register.</param>
         public static void Register( string assetID, object asset )
         {
-            if( asset == null )
-            {
-                throw new ArgumentNullException( nameof( asset ), $"Asset to register can't be null." );
-            }
             if( assetID == null )
             {
                 throw new ArgumentNullException( nameof( assetID ), $"Asset ID of an asset to register can't be null." );
+            }
+            if( asset == null )
+            {
+                throw new ArgumentNullException( nameof( asset ), $"Asset to register can't be null." );
             }
 
             _cache[assetID] = asset;
@@ -171,6 +181,15 @@ namespace UnityPlus.AssetManagement
         /// <param name="isCacheable">Whether or not the loaded value can be cached. <br/> True if the asset is persistent and singleton, otherwise should be false.</param>
         public static void RegisterLazy( string assetID, Func<object> loader, bool isCacheable )
         {
+            if( assetID == null )
+            {
+                throw new ArgumentNullException( nameof( assetID ), $"Asset ID of an asset to register can't be null." );
+            }
+            if( loader == null )
+            {
+                throw new ArgumentNullException( nameof( loader ), $"Lazy-loader function can't be null." );
+            }
+
             // loader example: `() => PNGLoad(imagePathVariable);`
             _lazyRegistry[assetID] = new LazyAsset( loader, isCacheable );
         }

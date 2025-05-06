@@ -68,7 +68,7 @@ namespace HSP._DevUtils
         {
         }
 
-        void Start()
+        async void Start()
         {
             /*normalmap = new RenderTexture( heightmap.width, heightmap.height, 8, RenderTextureFormat.ARGB32 );
             normalmap.enableRandomWrite = true;
@@ -79,6 +79,15 @@ namespace HSP._DevUtils
             shader.Dispatch( shader.FindKernel( "CalculateNormalMap" ), heightmap.width / 8, heightmap.height / 8, 1 );
 
             uiImage.texture = normalmap;*/
+
+            //  var gltf = new UnityGLTF.GLTFSceneImporter( "E:\\GIT\\HumanSpaceProgram\\HumanSpaceProgram\\GameData\\Vanilla\\Assets\\test.glb", new UnityGLTF.ImportOptions() );
+
+            // await gltf.LoadSceneAsync();
+
+            //Mesh mesh = await gltf.LoadMeshAsync( 0, default );
+
+            // Debug.Log( mesh );
+            Debug.Log( AssetRegistry.Get<Mesh>( "Vanilla::Assets/test" ) );
         }
 
         bool isPressed = false;

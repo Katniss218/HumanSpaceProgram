@@ -58,12 +58,12 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Tests\EditMode\E_Template.cs" />
-    <Compile Include="Assets\Tests\EditMode\NewtonianOrbitTests.cs" />
     <Compile Include="Assets\Tests\EditMode\NUnit\ApproxEqual.cs" />
     <Compile Include="Assets\Tests\EditMode\KeplerianOrbitTests.cs" />
     <Compile Include="Assets\Tests\EditMode\ReferenceFrameTests.cs" />
     <Compile Include="Assets\Tests\EditMode\Core\Substances\SubstanceStateCollectionTests.cs" />
+    <Compile Include="Assets\Tests\EditMode\E_Template.cs" />
+    <Compile Include="Assets\Tests\EditMode\NewtonianOrbitTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Tests\EditMode\Tests.EditMode.asmdef" />

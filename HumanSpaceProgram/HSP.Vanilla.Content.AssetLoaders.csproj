@@ -58,27 +58,28 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DDPixelFormat.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\GameDataAudioLoader.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\GameDataMeshLoader.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DDSCaps.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\GameDataMaterialLoader.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DDSHeader.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\D3D11Misc2.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\D3D11Misc.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\GameDataJsonPartFactory.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\Metadata\SpriteMetadata.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DDSD.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\JsonVesselFactory.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DDSCaps2.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DDPF.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\D3D11ResourceDimension.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DDSHeaderDX10.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\GameDataTextureLoader.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\WAV\Importer.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\Metadata\Texture2DMetadata.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\Importer.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DDPixelFormat.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DDSHeader.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\D3D11Misc2.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\D3D11Misc.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\GameDataJsonPartFactory.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DDSD.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\WAV\Importer.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DXGIFormat.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DDCaps.cs" />
-    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\Importer.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\FourCC.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -427,6 +428,10 @@
     </Reference>
     <Reference Include="ReportGeneratorMerged">
       <HintPath>Library\PackageCache\com.unity.testtools.codecoverage@1.1.1\lib\ReportGenerator\ReportGeneratorMerged.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Collections.LowLevel.ILSupport">
+      <HintPath>Library\PackageCache\com.unity.collections@1.2.4\Unity.Collections.LowLevel.ILSupport\Unity.Collections.LowLevel.ILSupport.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="netstandard">
@@ -919,6 +924,14 @@
     </Reference>
     <Reference Include="Unity.Postprocessing.Runtime">
       <HintPath>Library\ScriptAssemblies\Unity.Postprocessing.Runtime.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="glTFast">
+      <HintPath>Library\ScriptAssemblies\glTFast.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="glTFast.Animation">
+      <HintPath>Library\ScriptAssemblies\glTFast.Animation.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEditor.UI">

@@ -58,18 +58,18 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.ControlSystems\Controls\ControlParameterInputBase.cs" />
     <Compile Include="Assets\HSP.ControlSystems\NamedControlAttribute.cs" />
     <Compile Include="Assets\HSP.ControlSystems\Controls\ControlleeInputBase.cs" />
     <Compile Include="Assets\HSP.ControlSystems\Controls\ControlleeInput.cs" />
-    <Compile Include="Assets\HSP.ControlSystems\Controls\ControllerOutput.cs" />
     <Compile Include="Assets\HSP.ControlSystems\Control.cs" />
-    <Compile Include="Assets\HSP.ControlSystems\Controls\ControllerOutput_T_.cs" />
     <Compile Include="Assets\HSP.ControlSystems\Controls\ControlParameterOutputBase.cs" />
+    <Compile Include="Assets\HSP.ControlSystems\ControlGroup.cs" />
+    <Compile Include="Assets\HSP.ControlSystems\Controls\ControlParameterInputBase.cs" />
+    <Compile Include="Assets\HSP.ControlSystems\Controls\ControllerOutput.cs" />
+    <Compile Include="Assets\HSP.ControlSystems\Controls\ControllerOutput_T_.cs" />
     <Compile Include="Assets\HSP.ControlSystems\Controls\ControlParameterOutput_T_.cs" />
     <Compile Include="Assets\HSP.ControlSystems\Controls\ControlleeInput_T_.cs" />
     <Compile Include="Assets\HSP.ControlSystems\Controls\ControlParameterInput_T_.cs" />
-    <Compile Include="Assets\HSP.ControlSystems\ControlGroup.cs" />
     <Compile Include="Assets\HSP.ControlSystems\ControlUtils.cs" />
     <Compile Include="Assets\HSP.ControlSystems\Controls\ControllerOutputBase.cs" />
   </ItemGroup>
@@ -419,6 +419,10 @@
     </Reference>
     <Reference Include="ReportGeneratorMerged">
       <HintPath>Library\PackageCache\com.unity.testtools.codecoverage@1.1.1\lib\ReportGenerator\ReportGeneratorMerged.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Collections.LowLevel.ILSupport">
+      <HintPath>Library\PackageCache\com.unity.collections@1.2.4\Unity.Collections.LowLevel.ILSupport\Unity.Collections.LowLevel.ILSupport.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="netstandard">

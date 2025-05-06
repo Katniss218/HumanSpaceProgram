@@ -62,12 +62,12 @@
     <Compile Include="Assets\HSP.Vessels\Vessel.cs" />
     <Compile Include="Assets\HSP.Vessels\Serialization\PartMetadata.cs" />
     <Compile Include="Assets\HSP.Vessels\Serialization\VesselMetadata.cs" />
-    <Compile Include="Assets\HSP.Vessels\Serialization\PartRegistry.cs" />
     <Compile Include="Assets\HSP.Vessels\VesselManager.cs" />
-    <Compile Include="Assets\HSP.Vessels\SymmetryDataContainer.cs" />
-    <Compile Include="Assets\HSP.Vessels\Serialization\PartFactory.cs" />
     <Compile Include="Assets\HSP.Vessels\VesselHierarchyUtils.cs" />
     <Compile Include="Assets\HSP.Vessels\Vessel_Ex.cs" />
+    <Compile Include="Assets\HSP.Vessels\Serialization\PartRegistry.cs" />
+    <Compile Include="Assets\HSP.Vessels\SymmetryDataContainer.cs" />
+    <Compile Include="Assets\HSP.Vessels\Serialization\PartFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vessels\___HSP.Vessels.asmdef" />
@@ -415,6 +415,10 @@
     </Reference>
     <Reference Include="ReportGeneratorMerged">
       <HintPath>Library\PackageCache\com.unity.testtools.codecoverage@1.1.1\lib\ReportGenerator\ReportGeneratorMerged.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Collections.LowLevel.ILSupport">
+      <HintPath>Library\PackageCache\com.unity.collections@1.2.4\Unity.Collections.LowLevel.ILSupport\Unity.Collections.LowLevel.ILSupport.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="netstandard">

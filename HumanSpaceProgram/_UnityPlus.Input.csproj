@@ -64,11 +64,11 @@
     <Compile Include="Assets\_UnityPlus.Input\HierarchicalInputManager.cs" />
     <Compile Include="Assets\_UnityPlus.Input\Bindings\MouseDragBinding.cs" />
     <Compile Include="Assets\_UnityPlus.Input\Bindings\CompoundBinding.cs" />
+    <Compile Include="Assets\_UnityPlus.Input\Bindings\MultipleKeyDownBinding.cs" />
+    <Compile Include="Assets\_UnityPlus.Input\IInputBinding.cs" />
     <Compile Include="Assets\_UnityPlus.Input\Bindings\KeyDownBinding.cs" />
     <Compile Include="Assets\_UnityPlus.Input\Bindings\MouseClickBinding.cs" />
-    <Compile Include="Assets\_UnityPlus.Input\Bindings\MultipleKeyDownBinding.cs" />
     <Compile Include="Assets\_UnityPlus.Input\Bindings\KeyHoldBinding.cs" />
-    <Compile Include="Assets\_UnityPlus.Input\IInputBinding.cs" />
     <Compile Include="Assets\_UnityPlus.Input\HierarchicalActionChannel.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -417,6 +417,10 @@
     </Reference>
     <Reference Include="ReportGeneratorMerged">
       <HintPath>Library\PackageCache\com.unity.testtools.codecoverage@1.1.1\lib\ReportGenerator\ReportGeneratorMerged.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Collections.LowLevel.ILSupport">
+      <HintPath>Library\PackageCache\com.unity.collections@1.2.4\Unity.Collections.LowLevel.ILSupport\Unity.Collections.LowLevel.ILSupport.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="netstandard">
