@@ -11,13 +11,13 @@
 // @/.../ means select by regex on the name or index (index will be converted to a string to match the regex)
 
 
-// `$` is the 'value of' operator - means we're passing in the value of an object. No $ means we're passing in a literal.
+// `$` is the 'value of' operator - means we're getting the value . No $ means we're passing in a literal.
 
 (FOR "Vessels".[*]."gameobjects")	// [*] can be used in a dict as well, it will select every value. 
 									// Here "Vessels" is a serializedobject containing serializedobjects corresponding to folders.
 {
     // selects the 'root' serializeddata to be the one that directly contains the match.
-    (WHERE $"$type" == "value")
+    (WHERE $this."$type" == "value")
     {
         "$type" = "othervalue";	// this will create a key if it's not already there.
 		
@@ -44,7 +44,7 @@
 	}
 	
     // selects entries that match the path (i.e. ones that exist).
-    (FOR $"components".[1..5].[1..].[..5])
+    (FOR "components".[1..5].[1..].[..5])
     {
 		"temp" = this;
 		"temp" += 5;
@@ -65,7 +65,7 @@
 	(FOR "components".[0])
 	{
 		// first component.
-		value = $(FOR "children" WHERE "$type" == "somevalue").[0];	// copies the first element of "children" that has type "somevalue"
+		value = (FOR "children" WHERE "$type" == "somevalue").[0];	// copies the first element of "children" that has type "somevalue"
 	}
 	// equivalent to the above, but slower.
 	(FOR (FOR "components").[0])
@@ -109,7 +109,7 @@
 
 (FOR "vessels".[*]."gameobjects")
 {
-	"value" = $(ADD $"$type", $"$id");
+	"value" = (ADD $"$type", $"$id");
 }
 
 // ################################################################
@@ -139,7 +139,37 @@ this.a = $a[0].b;
 
 (FOR vessels[*].gameobjects)
 {
-	value = $(ADD $"$type", $"$id");
+	value = (ADD $"$type", $"$id");
 	// equivalent to `this.value = ...;`
 }
+
+
+
+// passing in a function would be very useful.
+// expressions that return/operate on multiple values would also be VERY useful.
+// - they can be treated as an implicit array.
+
+// `vessels[*].gameobjects` - expands to all array elements contained inside the vessels (none if vessels is not an array) that have a 'gameobjects' object key. sets that key as the pivot.
+
+(FOR $vessels[*].gameobjects.any) // do whatever to find the thing
+{
+	//																		\/ index access here should be valid.
+	// transformation header is an expression
+	(FOR $this.components[*] WHERE $"$type" == "HSP.Vessels.Components.FPart").[0]
+	{
+		temp = $"$type";
+		// variables could be done using a variable path segment maybe.
+		
+		this = (FOR $global.parts[*] WHERE $this."folder_name" == temp)[0]; // a way to access `temp` here would be nice too. a function would help, since it can be encoded as a parameter.
+		
+		// variables would also be nice. each scope is limited to the transformation body. parent scopes are accessible in child scopes.
+		// having it all baked into the AST feels like it would be very clunky now.
+		// - a separate interpreter that traverses the AST would be better.
+		
+		// a way to set something using a mapping would also be somewhat nice. as in, if the mapping is memberwise, it only replaces the members with names that are present in he mapping
+		// - could be a builtin function
+	}
+}
+
+// new change: FOR header needs an element / implicit arrayy of elements to operate on, use $ to evaluate the path and return an array. Requires `expressions that return/operate on multiple values`.
 

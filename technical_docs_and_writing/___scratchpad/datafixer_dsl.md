@@ -5,9 +5,10 @@
 
 ## Introduction:
 
-The "program" of the DataFixer DSL consists of a set of transformation operations executed in sequence.
+The "program" of the DataFixer DSL consists of a sequence of transformations.
+A transformation can be thought of as a function invocation.
 
-Each of these transformations has a scope. It specifies which parts of the overall SerializedData tree the transformation can access.
+Each of these transformations has a scope. It specifies which parts of the overall SerializedData tree the transformation can access, and specifies what the access paths are relative to.
 
 ## Transformations:
 
@@ -49,6 +50,14 @@ They don't reset the scope for things after them, only filter out parts of the s
 }
 
 ```
+
+## Operators:
+
+DataFixer supports the standard range of operators on primitive types:
+- `+`, `-`, `*`, `/`, `%` arithmetic operators
+- `!`, `&`, `|`, `^` boolean and bitwise operators
+- `>`, `>=`, `==`, `!=`, `<`, `<=` comparison operators
+- `&&`, `||` conditional operators
 
 
 

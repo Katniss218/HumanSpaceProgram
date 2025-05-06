@@ -35,9 +35,9 @@ a+b
 // need util function to delete an element instead of setting its value to null (these are distinct states).
 // Need function to compare values by regex (Regex.Match)
 
-(FOR $"Parts".[*] WHERE ((contains $"MODULE".[*]."name", "ModuleEngines*") && !(contains $"MODULE".[*]."name", "SSTUModularEngineCluster")))
+(FOR "Parts".[*] WHERE ((contains $"MODULE".[*]."name", "ModuleEngines*") && !(contains $"MODULE".[*]."name", "SSTUModularEngineCluster")))
 {
-	(FOR $"MODULE".[*] WHERE $"name" == "FXModuleLookAtConstraint")
+	(FOR "MODULE".[*] WHERE $"name" == "FXModuleLookAtConstraint")
 	{
 		"$type" = "SSTUModelConstraint";
 		

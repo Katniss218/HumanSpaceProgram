@@ -3,7 +3,7 @@ grammar DFDSL;
 // main
 
 program
-    : statement* EOF
+    : statement_or_transformation* EOF
     ;
 
 //
@@ -12,9 +12,13 @@ program
 
 // statements 'do something'.
 
+statement_or_transformation
+    : statement
+    | transformation
+    ;
+
 statement
     : assignment SEMI
-    | transformation SEMI
     ;
 
 assignment
@@ -23,11 +27,12 @@ assignment
 
 transformation
     : LPAREN transformation_header+ RPAREN
-     (LBRACKET statement* RBRACKET)?
+     (LBRACKET statement_or_transformation* RBRACKET)
     ;
     
 transformation_header
-    : TRANSFORMATION_IDENTIFIER expression (',' expression)*
+    : FOR_TRANSFORMATION_IDENTIFIER path
+    | WHERE_TRANSFORMATION_IDENTIFIER expression
     ;
 
 // expressions return a value.
@@ -86,7 +91,8 @@ value
 literal
     : TRUE
     | FALSE
-    | KEY_SEGMENT // string literal is the same as key
+    | NULL
+    | QUOTED_STRING
     | number
     ;
 
@@ -103,7 +109,7 @@ path
 
 segment
     : ROOT_SEGMENT
-    | KEY_SEGMENT
+    | QUOTED_STRING
     | arraySegment
     ;
 
@@ -156,9 +162,16 @@ LTE : '<=';
 EQ  : '==';
 NEQ : '!=';
 
+NULL
+    : 'null'
+    ;
 
 INT 
     : [0-9]+
+    ;
+
+QUOTED_STRING
+    : '"' (~["\\] | '\\' .)* '"'
     ;
 
 RANGE
@@ -169,12 +182,12 @@ ROOT_SEGMENT
     : 'this' | 'any'
     ;
 
-KEY_SEGMENT
-    : '"' (~["\\] | '\\' .)* '"'
+FOR_TRANSFORMATION_IDENTIFIER
+    : 'FOR'
     ;
 
-TRANSFORMATION_IDENTIFIER
-    : [a-zA-Z_] [a-zA-Z0-9_]*
+WHERE_TRANSFORMATION_IDENTIFIER
+    : 'WHERE'
     ;
 
 WS  : [ \t\r\n]+ -> skip;

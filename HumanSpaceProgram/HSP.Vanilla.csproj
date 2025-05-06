@@ -75,6 +75,7 @@
     <Compile Include="Assets\HSP.Vanilla\OnActiveVesselChanged.cs" />
     <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\FreeReferenceFrameTransform.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\DesignSceneToolManager.cs" />
+    <Compile Include="Assets\HSP.Vanilla\Effects\FRocketEngineAudio.cs" />
     <Compile Include="Assets\HSP.Vanilla\Trajectories\NewtonianOrbit.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\MainMenuScene\Cameras\MainMenuSceneCameraManager.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FBulkContainer_Sphere.cs" />
@@ -144,7 +145,6 @@
     <Compile Include="Assets\HSP.Vanilla\Components\FLaunchSiteMarker.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FReactionControlController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FControlFrame.cs" />
-    <Compile Include="Assets\HSP.Vanilla\Effects\FRocketEngineAudio.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla\___HSP.Vanilla.asmdef" />
