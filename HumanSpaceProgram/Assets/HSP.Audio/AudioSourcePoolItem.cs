@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace HSP.Audio
@@ -6,32 +8,23 @@ namespace HSP.Audio
     [RequireComponent( typeof( AudioSource ) )]
     public class AudioSourcePoolItem : MonoBehaviour, IAudioHandle
     {
-        public AudioClip Clip => _audioSource.clip;
+        public AudioClip Clip { get => _audioSource.clip; internal set => _audioSource.clip = value; }
 
+        [field: SerializeField]
         public AudioHandleState State { get; private set; }
 
-        float _volume;
-        public float Volume
-        {
-            get => _volume;
-            set
-            {
-                _volume = value;
-                if( State == AudioHandleState.Playing ) // Only set right away if playing (not fading).
-                    _audioSource.volume = value;
-                _audioSource.volume = value;
-            }
-        }
+        public float Volume { get => _audioSource.volume; set => _audioSource.volume = value; }
 
         public float Pitch { get => _audioSource.pitch; set => _audioSource.pitch = value; }
 
         public bool Loop { get => _audioSource.loop; internal set => _audioSource.loop = value; }
 
-        private Transform _transformToFollow;
-        private AudioSource _audioSource;
+        Transform _transformToFollow;
 
-        private float timeAtNextState;
-        private float fadeSeconds;
+        AudioSource _audioSource;
+
+        [field: SerializeField]
+        float _timeWhenFinished;
 
         void Awake()
         {
@@ -44,49 +37,11 @@ namespace HSP.Audio
                 return;
 
             if( _transformToFollow != null )
-                transform.position = _transformToFollow.position;
-
-            if( State == AudioHandleState.PlayingDelay )
-            {
-                if( UnityEngine.Time.time >= timeAtNextState )
-                {
-                    SetState_PlayingFade();
-                }
-            }
-            else if( State == AudioHandleState.FinishedDelay )
-            {
-                if( UnityEngine.Time.time >= timeAtNextState )
-                {
-                    SetState_FinishedFade();
-                }
-            }
-
-            if( State == AudioHandleState.PlayingFade )
-            {
-                float remainingFadeSeconds = timeAtNextState - UnityEngine.Time.time; // We know when the fade will end (timeAtNextState) and how long to fade for in total (fadeSeconds).
-                float fadePercent = 1.0f - (remainingFadeSeconds / fadeSeconds);
-                _audioSource.volume = Mathf.Lerp( 0.0f, Volume, fadePercent );
-
-                if( UnityEngine.Time.time >= timeAtNextState )
-                {
-                    SetState_Playing();
-                }
-            }
-            else if( State == AudioHandleState.FinishedFade )
-            {
-                float remainingFadeSeconds = timeAtNextState - UnityEngine.Time.time; // We know when the fade will end (timeAtNextState) and how long to fade for in total (fadeSeconds).
-                float fadePercent = 1.0f - (remainingFadeSeconds / fadeSeconds);
-                _audioSource.volume = Mathf.Lerp( Volume, 0.0f, fadePercent );
-
-                if( UnityEngine.Time.time >= timeAtNextState )
-                {
-                    SetState_Finished();
-                }
-            }
+                this.transform.position = _transformToFollow.position;
 
             if( State == AudioHandleState.Playing )
             {
-                if( UnityEngine.Time.time >= timeAtNextState ) // When finished, just stop.
+                if( UnityEngine.Time.time >= _timeWhenFinished ) // When finished, just stop.
                 {
                     SetState_Finished();
                 }
@@ -97,37 +52,21 @@ namespace HSP.Audio
         {
             State = AudioHandleState.Ready;
             _audioSource.time = 0.0f;
-            this.gameObject.SetActive( true );
         }
-        private void SetState_PlayingDelay( float delaySeconds )
-        {
-            timeAtNextState = UnityEngine.Time.time + delaySeconds;
-            State = AudioHandleState.PlayingDelay;
-        }
-        private void SetState_PlayingFade()
-        {
-            _audioSource.Play();
-            timeAtNextState = UnityEngine.Time.time + fadeSeconds;
-            State = AudioHandleState.PlayingFade;
-        }
+
         private void SetState_Playing()
         {
-            timeAtNextState = Loop
+            this.gameObject.SetActive( true );
+
+            _audioSource.Play();
+
+            _timeWhenFinished = Loop
                 ? float.MaxValue
-                : UnityEngine.Time.time + (_audioSource.clip.length - fadeSeconds);
+                : UnityEngine.Time.time + _audioSource.clip.length;
 
             State = AudioHandleState.Playing;
         }
-        private void SetState_FinishedDelay( float delaySeconds )
-        {
-            timeAtNextState = UnityEngine.Time.time + delaySeconds;
-            State = AudioHandleState.FinishedDelay;
-        }
-        private void SetState_FinishedFade()
-        {
-            timeAtNextState = UnityEngine.Time.time + fadeSeconds;
-            State = AudioHandleState.FinishedFade;
-        }
+
         private void SetState_Finished()
         {
             _audioSource.Stop();
@@ -162,73 +101,15 @@ namespace HSP.Audio
             if( State != AudioHandleState.Ready )
                 throw new InvalidOperationException( $"Audio can only be played when in the {nameof( AudioHandleState.Ready )} state." );
 
-            this.fadeSeconds = 0.0f;
-            _audioSource.Play();
             SetState_Playing();
-        }
-
-        public void Play( float delaySeconds, float fadeSeconds )
-        {
-            if( State != AudioHandleState.Ready )
-                throw new InvalidOperationException( $"Audio can only be played when in the {nameof( AudioHandleState.Ready )} state." );
-
-            if( delaySeconds == 0.0f )
-            {
-                if( fadeSeconds == 0.0f )
-                {
-                    this.fadeSeconds = 0.0f;
-                    _audioSource.Play();
-                    SetState_Playing();
-                }
-                else
-                {
-                    this.fadeSeconds = fadeSeconds;
-                    SetState_PlayingFade();
-                }
-            }
-            else
-            {
-                this.fadeSeconds = fadeSeconds;
-                SetState_PlayingDelay( delaySeconds );
-            }
         }
 
         public void Stop()
         {
-            if( State == AudioHandleState.Finished )
-                throw new InvalidOperationException( $"Audio can only be stopped when not in the {nameof( AudioHandleState.Finished )} state." );
+            if( State != AudioHandleState.Playing )
+                throw new InvalidOperationException( $"Audio can only be stopped when in the {nameof( AudioHandleState.Playing )} state." );
 
             SetState_Finished();
-        }
-
-        public void Stop( float delaySeconds, float fadeSeconds )
-        {
-            if( State == AudioHandleState.Ready )
-            {
-                State = AudioHandleState.Finished;
-                gameObject.SetActive( false );
-            }
-
-            if( State == AudioHandleState.Finished )
-                throw new InvalidOperationException( $"Audio can only be stopped when not in the {nameof( AudioHandleState.Finished )} state." );
-
-            if( delaySeconds == 0.0f )
-            {
-                if( fadeSeconds == 0.0f )
-                {
-                    SetState_Finished();
-                }
-                else
-                {
-                    this.fadeSeconds = fadeSeconds;
-                    SetState_FinishedFade();
-                }
-            }
-            else
-            {
-                this.fadeSeconds = fadeSeconds;
-                SetState_FinishedDelay( delaySeconds );
-            }
         }
     }
 }

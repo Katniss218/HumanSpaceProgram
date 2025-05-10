@@ -161,6 +161,10 @@ namespace UnityPlus.Serialization
             {
                 return SerializationResult.Finished;
             }
+            if( data is not SerializedObject )
+            {
+                return SerializationResult.Finished;
+            }
 
             GameObject sourceObj = (obj == null) ? default : (GameObject)(object)obj;
 

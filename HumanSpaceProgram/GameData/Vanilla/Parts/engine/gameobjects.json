@@ -327,7 +327,75 @@
             {
                 "$type": "HSP.Vanilla.Effects.FRocketEngineAudio, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
                 "$id": "8633432d-cf82-435a-8bc2-a3b2dcbbd302",
-                "is_enabled": true
+                "is_enabled": true,
+                "engine": {
+                    "$ref": "0dbaead5-1d18-4bd8-9244-3f117ff7bfca"
+                },
+                "ignition_audio": {
+                    "$type": "HSP.Audio.AudioEffectDefinition, HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "7122aaf6-195d-49cb-90ca-146f61460cad",
+                    "shapers": {
+                        "$type": "HSP.Audio.AudioShaper[], HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                        "$id": "1fdb2b8a-3f79-400c-81a6-ebd76a67b8be",
+                        "value": [
+
+                        ]
+                    },
+                    "audio_clip": {
+                        "$assetref": "Vanilla::Assets/sounds/sound_liq8_enhanced"
+                    },
+                    "audio_channel": "Main_3D",
+                    "volume": 6.0,
+                    "pitch": 1.0,
+                    "loop": false
+                },
+                "loop_audio": {
+                    "$type": "HSP.Audio.AudioEffectDefinition, HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "eff12a5e-1b82-469b-b2ed-b49b3c684d80",
+                    "shapers": {
+                        "$type": "HSP.Audio.AudioShaper[], HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                        "$id": "787651b7-53a6-45d3-aae5-b01b791a42d7",
+                        "value": [
+                            {
+                                "$type": "HSP.Audio.AudioShaper, HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                "getter": {
+                                    "$type": "HSP.Vanilla.Effects.FadeInValueGetter, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                    "$id": "9c69167e-1721-4c9b-ac6d-072a7124709e",
+                                    "fade_duration": 6,
+                                    "loop_fade": false
+                                },
+                                "setter": {
+                                    "$type": "HSP.Audio.AudioVolumeSetter, HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+                                }
+                            }
+                        ]
+                    },
+                    "audio_clip": {
+                        "$assetref": "Vanilla::Assets/sounds/kero_loop_hard"
+                    },
+                    "audio_channel": "Main_3D",
+                    "volume": 6.0,
+                    "pitch": 1.0,
+                    "loop": true
+                },
+                "shutdown_audio": {
+                    "$type": "HSP.Audio.AudioEffectDefinition, HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "f93e6be8-8816-45e2-ae03-615cf589a520",
+                    "shapers": {
+                        "$type": "HSP.Audio.AudioEffectDefinition.Shaper[], HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                        "$id": "182e8dc0-34bc-44ac-a986-c027395d51af",
+                        "value": [
+
+                        ]
+                    },
+                    "audio_clip": {
+                        "$assetref": "Vanilla::Assets/sounds/kero_flameout_hard"
+                    },
+                    "audio_channel": "Main_3D",
+                    "volume": 6.0,
+                    "pitch": 1.0,
+                    "loop": false
+                }
             },
             {
                 "$type": "HSP.Vanilla.Components.FPointMass, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",

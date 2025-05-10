@@ -170,6 +170,25 @@ namespace UnityPlus.Serialization.Mappings
                 .WithMember( "mode", o => o.mode );
         }
 
+        [MapsInheritingFrom( typeof( Keyframe ) )]
+        public static SerializationMapping KeyframeMapping()
+        {
+            return new MemberwiseSerializationMapping<Keyframe>()
+                .WithMember( "time", o => o.time )
+                .WithMember( "value", o => o.value )
+                .WithMember( "in_tangent", o => o.inTangent )
+                .WithMember( "out_tangent", o => o.outTangent );
+        }
+
+        [MapsInheritingFrom( typeof( AnimationCurve ) )]
+        public static SerializationMapping AnimationCurveMapping()
+        {
+            return new MemberwiseSerializationMapping<AnimationCurve>()
+                .WithMember( "keys", o => o.keys )
+                .WithMember( "pre_wrap_mode", o => o.preWrapMode )
+                .WithMember( "post_wrap_mode", o => o.postWrapMode );
+        }
+
         [MapsInheritingFrom( typeof( Matrix4x4 ) )]
         public static SerializationMapping Matrix4x4Mapping()
         {
@@ -177,10 +196,10 @@ namespace UnityPlus.Serialization.Mappings
             {
                 OnSave = ( o, s ) => new SerializedArray( 16 )
                 {
-                    (SerializedPrimitive)o.m00, (SerializedPrimitive)o.m01, (SerializedPrimitive)o.m02 , (SerializedPrimitive)o.m03,
-                    (SerializedPrimitive)o.m10, (SerializedPrimitive)o.m11, (SerializedPrimitive)o.m12 , (SerializedPrimitive)o.m13,
-                    (SerializedPrimitive)o.m20, (SerializedPrimitive)o.m21, (SerializedPrimitive)o.m22 , (SerializedPrimitive)o.m23,
-                    (SerializedPrimitive)o.m30, (SerializedPrimitive)o.m31, (SerializedPrimitive)o.m32 , (SerializedPrimitive)o.m33
+                    (SerializedPrimitive)o.m00, (SerializedPrimitive)o.m01, (SerializedPrimitive)o.m02, (SerializedPrimitive)o.m03,
+                    (SerializedPrimitive)o.m10, (SerializedPrimitive)o.m11, (SerializedPrimitive)o.m12, (SerializedPrimitive)o.m13,
+                    (SerializedPrimitive)o.m20, (SerializedPrimitive)o.m21, (SerializedPrimitive)o.m22, (SerializedPrimitive)o.m23,
+                    (SerializedPrimitive)o.m30, (SerializedPrimitive)o.m31, (SerializedPrimitive)o.m32, (SerializedPrimitive)o.m33
                 },
                 OnLoad = ( data, l ) => new Matrix4x4()
                 {

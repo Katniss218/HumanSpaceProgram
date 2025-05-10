@@ -35,7 +35,7 @@ namespace HSP.Audio
         /// The audio should be started with <see cref="IAudioHandle.Play"/>. This is useful for preparing an audio that will be played later.
         /// </remarks>
         /// <param name="transform">The source of the sound. The audio will be played at the position of the transform.</param>
-        public static IAudioHandle PrepareInWorld( AudioClip clip, Transform transform, bool loop, AudioChannel channel, float volume = 1.0f, float pitch = 1.0f )
+        public static IAudioHandle PrepareInWorld( Transform transform, AudioClip clip, bool loop, AudioChannel channel, float volume = 1.0f, float pitch = 1.0f )
         {
             var poolItem = _pool.GetItem( clip, transform, loop, channel, volume, pitch );
 
@@ -46,14 +46,14 @@ namespace HSP.Audio
         /// Plays a new audio that will follow the given transform until it ends playing.
         /// </summary>
         /// <param name="transform">The source of the sound. The audio will be played at the position of the transform.</param>
-        public static IAudioHandle PlayInWorld( AudioClip clip, Transform transform, bool loop, AudioChannel channel, float volume = 1.0f, float pitch = 1.0f )
+        public static IAudioHandle PlayInWorld( Transform transform, AudioClip clip, bool loop, AudioChannel channel, float volume = 1.0f, float pitch = 1.0f )
         {
             var poolItem = _pool.GetItem( clip, transform, loop, channel, volume, pitch );
 
             poolItem.Play();
             return poolItem;
         }
-
+        
         /// <summary>
         /// Prepares a new audio that is not located in the game world, and is not affected by its effects, but doesn't start playing it.
         /// </summary>
@@ -77,7 +77,7 @@ namespace HSP.Audio
             poolItem.Play();
             return poolItem;
         }
-
+        
 
         // saving/loading audio, how will that work?
 

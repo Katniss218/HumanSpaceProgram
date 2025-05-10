@@ -82,7 +82,7 @@
     <Compile Include="Assets\_UnityPlus.Serialization\Json\JsonStringReader.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\SerializationMapping.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Mappings\Persistent_Guid.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\SerializationMapping_Ex.cs" />
+    <Compile Include="Assets\_UnityPlus.Serialization\Extensions\SerializationMapping_Ex.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\ReferenceMaps\ReverseReferenceStore.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Mappings\Mappings_SystemPrimitives.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Json\JsonStringWriter.cs" />
@@ -126,7 +126,7 @@
     <Compile Include="Assets\_UnityPlus.Serialization\MappingProviders\MapsInheritingFromSearcher.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\MappingTypes\PassthroughMember.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Mappings\Mappings_ValueTuple.cs" />
-    <Compile Include="Assets\_UnityPlus.Serialization\ReferenceMaps\ReferenceMap_Ex.cs" />
+    <Compile Include="Assets\_UnityPlus.Serialization\Extensions\ReferenceMap_Ex.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\SerializedObject.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\SerializationMappingRegistry.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\Mappings\Mappings_Assets.cs" />
@@ -134,6 +134,8 @@
     <Compile Include="Assets\_UnityPlus.Serialization\SerializationUnitAsyncLoader.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\KeyNames.cs" />
     <Compile Include="Assets\_UnityPlus.Serialization\SerializationUnitLoader.cs" />
+    <Compile Include="Assets\_UnityPlus.Serialization\Exceptions\UPSMissingReferenceException.cs" />
+    <Compile Include="Assets\_UnityPlus.Serialization\Exceptions\UPSSerializationException.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_UnityPlus.Serialization\___UnityPlus.Serialization.asmdef" />

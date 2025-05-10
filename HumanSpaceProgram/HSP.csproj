@@ -73,6 +73,7 @@
     <Compile Include="Assets\HSP\TransformRedirect.cs" />
     <Compile Include="Assets\HSP\Utils\IOHelper.cs" />
     <Compile Include="Assets\HSP\PIDLoop.cs" />
+    <Compile Include="Assets\HSP\AlwaysLoadedManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP\___HSP.asmdef" />

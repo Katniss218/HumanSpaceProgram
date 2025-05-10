@@ -129,13 +129,13 @@ namespace HSP._DevUtils
                 {
                     for( int i = 0; i < audioCount; i++ )
                     {
-                        AudioManager.PlayInWorld( AssetRegistry.Get<AudioClip>( "Vanilla::Assets/sounds/kero_flameout_hard" ), VesselManager.LoadedVessels.Skip( 1 ).First().ReferenceTransform, false, AudioChannel.Main_3D, 6 );
+                        AudioManager.PlayInWorld( VesselManager.LoadedVessels.Skip( 1 ).First().ReferenceTransform, AssetRegistry.Get<AudioClip>( "Vanilla::Assets/sounds/kero_flameout_hard" ), false, AudioChannel.Main_3D, 6 );
                     }
 
                     foreach( var startAudio in startAudios )
                         startAudio.Stop();
                     foreach( var loopAudio in loopAudios )
-                        loopAudio.Stop( 0, 0.5f );
+                        loopAudio.Stop();
                     loopAudios = null;
                 }
                 else
@@ -143,14 +143,14 @@ namespace HSP._DevUtils
                     startAudios = new IAudioHandle[audioCount];
                     for( int i = 0; i < startAudios.Length; i++ )
                     {
-                        startAudios[i] = AudioManager.PlayInWorld( AssetRegistry.Get<AudioClip>( "Vanilla::Assets/sounds/sound_liq8_enhanced" ), VesselManager.LoadedVessels.Skip( 1 ).First().ReferenceTransform, false, AudioChannel.Main_3D, 6 );
+                        startAudios[i] = AudioManager.PlayInWorld( VesselManager.LoadedVessels.Skip( 1 ).First().ReferenceTransform, AssetRegistry.Get<AudioClip>( "Vanilla::Assets/sounds/sound_liq8_enhanced" ), false, AudioChannel.Main_3D, 6 );
                     }
 
                     loopAudios = new IAudioHandle[audioCount];
                     for( int i = 0; i < loopAudios.Length; i++ )
                     {
-                        loopAudios[i] = AudioManager.PrepareInWorld( AssetRegistry.Get<AudioClip>( "Vanilla::Assets/sounds/kero_loop_hard" ), VesselManager.LoadedVessels.Skip( 1 ).First().ReferenceTransform, true, AudioChannel.Main_3D, 6 );
-                        loopAudios[i].Play( 3, 6 );
+                        loopAudios[i] = AudioManager.PrepareInWorld( VesselManager.LoadedVessels.Skip( 1 ).First().ReferenceTransform, AssetRegistry.Get<AudioClip>( "Vanilla::Assets/sounds/kero_loop_hard" ), true, AudioChannel.Main_3D, 6 );
+                        loopAudios[i].Play();
                     }
                 }
             }

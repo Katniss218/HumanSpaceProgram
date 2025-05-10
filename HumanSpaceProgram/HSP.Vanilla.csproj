@@ -135,7 +135,6 @@
     <Compile Include="Assets\HSP.Vanilla\OnVesselCreated.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\DesignSceneTool.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\MainMenuScene\MainMenuSceneManager.cs" />
-    <Compile Include="Assets\HSP.Vanilla\Scenes\AlwaysLoadedScene\AlwaysLoadedManager.cs" />
     <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\HybridReferenceFrameTransform.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\TimeScaleInputController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\GameplaySceneToolManager.cs" />

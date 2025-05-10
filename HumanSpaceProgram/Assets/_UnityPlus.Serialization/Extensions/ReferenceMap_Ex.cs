@@ -1,13 +1,42 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace UnityPlus.Serialization.ReferenceMaps
 {
     public static class ReferenceMap_Ex
     {
+        /// <summary>
+        /// Remaps the reference store 1-to-1, with a new random identifier for each existing identifier.
+        /// </summary>
+        public static IForwardReferenceMap RemapRandomly( this IForwardReferenceMap refStore )
+        {
+            switch( refStore )
+            {
+                case BidirectionalReferenceStore bidirectionalRefStore:
+                    return RemapRandomly( bidirectionalRefStore );
+                case ForwardReferenceStore forwardRefStore:
+                    return RemapRandomly( forwardRefStore );
+                default:
+                    throw new ArgumentException( $"Unsupported reference store type: {refStore.GetType()}" );
+            }
+        }
+
+        /// <summary>
+        /// Remaps the reference store 1-to-1, with a new random identifier for each existing identifier.
+        /// </summary>
+        public static IReverseReferenceMap RemapRandomly( this IReverseReferenceMap refStore )
+        {
+            switch( refStore )
+            {
+                case BidirectionalReferenceStore bidirectionalRefStore:
+                    return RemapRandomly( bidirectionalRefStore );
+                case ReverseReferenceStore reverseReferenceStore:
+                    return RemapRandomly( reverseReferenceStore );
+                default:
+                    throw new ArgumentException( $"Unsupported reference store type: {refStore.GetType()}" );
+            }
+        }
+
         /// <summary>
         /// Remaps the reference store 1-to-1, with a new random identifier for each existing identifier.
         /// </summary>

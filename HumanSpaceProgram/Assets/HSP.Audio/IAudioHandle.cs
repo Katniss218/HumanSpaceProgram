@@ -1,4 +1,5 @@
 ﻿
+using System;
 using UnityEngine;
 
 namespace HSP.Audio
@@ -19,14 +20,19 @@ namespace HSP.Audio
         public AudioHandleState State { get; }
 
         /// <summary>
-        /// The current maximum volume of the audio. <br/>
-        /// Doesn't take into account the current fade state.
+        /// The current volume of the audio.
         /// </summary>
+        /// <remarks>
+        /// Doesn't take into account any shaping effects.
+        /// </remarks>
         public float Volume { get; set; }
 
         /// <summary>
         /// The current pitch of the audio.
         /// </summary>
+        /// <remarks>
+        /// Doesn't take into account any shaping effects.
+        /// </remarks>
         public float Pitch { get; set; }
 
         /// <summary>
@@ -42,22 +48,10 @@ namespace HSP.Audio
         /// Starts the playback immediately.
         /// </summary>
         public void Play();
-        /// <summary>
-        /// Starts the playback after a specified delay and fades in the audio over a specified time.
-        /// </summary>
-        /// <param name="delaySeconds"></param>
-        /// <param name="fadeSeconds"></param>
-        public void Play( float delaySeconds, float fadeSeconds );
 
         /// <summary>
         /// Stops the playback immediately.
         /// </summary>
         public void Stop();
-        /// <summary>
-        /// Stops the playback after a specified delay and fades out the audio over a specified time.
-        /// </summary>
-        /// <param name="delaySeconds"></param>
-        /// <param name="fadeSeconds"></param>
-        public void Stop( float delaySeconds, float fadeSeconds );
     }
 }

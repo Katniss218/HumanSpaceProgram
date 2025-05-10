@@ -129,7 +129,8 @@ namespace HSP
         }
 
         /// <summary>
-        /// Searches for "autorunning" methods (i.e. with the attribute) in the specified assemblies and registers them as listeners.
+        /// Searches for "autorunning" methods (i.e. with the attribute) in the specified assemblies and registers them as listeners. <br/>
+        /// This method is idempotent.
         /// </summary>
         public static void CreateEventsForAutorunningMethods( IEnumerable<Assembly> assemblies )
         {

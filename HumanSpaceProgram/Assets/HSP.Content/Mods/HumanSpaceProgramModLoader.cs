@@ -32,7 +32,8 @@ namespace HSP.Content.Mods
         /// <summary>
         /// Loads all of the assemblies (.dll) in the mod directory.
         /// </summary>
-        public static void LoadModAssemblies()
+        [HSPEventListener( HSPEvent_STARTUP_LOAD_MOD_ASSEMBLIES.ID, HSPEvent.NAMESPACE_HSP + ".load_mod_assemblies" )]
+        private static void LoadModAssemblies()
         {
             string modDirectory = HumanSpaceProgramContent.GetContentDirectoryPath();
 

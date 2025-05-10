@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 namespace UnityPlus.Serialization.Mappings
 {
     public static class Mappings_References
@@ -15,7 +14,7 @@ namespace UnityPlus.Serialization.Mappings
                 {
                     if( l.TryReadObjectReference<T>( data, out var obj ) )
                         return obj;
-                    throw new Exception( $"missing reference, try again" );
+                    throw new UPSMissingReferenceException( $"missing reference, try again" );
                 }
             };
         }

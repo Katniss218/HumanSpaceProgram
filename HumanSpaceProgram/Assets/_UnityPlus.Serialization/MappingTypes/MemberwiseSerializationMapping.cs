@@ -290,6 +290,10 @@ namespace UnityPlus.Serialization
             {
                 return SerializationResult.Finished;
             }
+            if( data is not SerializedObject )
+            {
+                return SerializationResult.Finished;
+            }
 
             TSource sourceObj = (obj == null) ? default : (TSource)(object)obj;
 
@@ -457,6 +461,10 @@ namespace UnityPlus.Serialization
                 result |= SerializationResult.HasFailures;
             if( _retryMembers == null || _retryMembers.Count == 0 )
                 result |= SerializationResult.Finished;
+
+#warning TODO - this failure is propagated high enough, that a sinple 'handleable' failure (e.g. wrong [] {} in a member that can be nulled) gets turned into a huge deal and stops the gameobjects from deserializing correctly.
+            // this should fail, but the gameobjects should be destroyed when failed?
+
             if( result.HasFlag( SerializationResult.Finished ) && result.HasFlag( SerializationResult.HasFailures ) )
                 result |= SerializationResult.Failed;
             return result;

@@ -3,84 +3,205 @@ using HSP.Vanilla.Components;
 using HSP.Vessels;
 using System.Linq;
 using UnityEngine;
-using UnityPlus.AssetManagement;
 using UnityPlus.Serialization;
 
 namespace HSP.Vanilla.Effects
 {
+    public sealed class RocketEngineThrustValueGetter : IValueGetter<float>
+    {
+        public FRocketEngine Engine { get; }
+
+        public RocketEngineThrustValueGetter( FRocketEngine engine )
+        {
+            Engine = engine;
+        }
+
+        public float Get()
+        {
+            return Engine.Thrust / Engine.MaxThrust;
+        }
+
+
+        [MapsInheritingFrom( typeof( RocketEngineThrustValueGetter ) )]
+        public static SerializationMapping RocketEngineThrustValueGetterMapping()
+        {
+            return new MemberwiseSerializationMapping<RocketEngineThrustValueGetter>()
+                .WithReadonlyMember( "engine", ObjectContext.Ref, o => o.Engine )
+                .WithFactory<FRocketEngine>( ( engine ) => new RocketEngineThrustValueGetter( engine ) );
+        }
+    }
+
+    public sealed class FadeInValueGetter : IValueGetter<float>, IAudioInitValueGetter
+    {
+        public float FadeDuration { get; }
+        public bool LoopFade { get; set; } = true;
+
+        float _startPlaybackTime;
+        float _clipLength;
+
+        public FadeInValueGetter( float fadeDuration )
+        {
+            this.FadeDuration = fadeDuration;
+        }
+
+        public void OnInit( AudioClip clip )
+        {
+            _startPlaybackTime = UnityEngine.Time.time;
+            _clipLength = clip.length;
+        }
+
+        public float Get()
+        {
+            // Lerp from 0 to 1 over the duration of the fade.
+            // Handles looping audios by looping the fade.
+            float timeSinceStart = (UnityEngine.Time.time - _startPlaybackTime);
+
+            if( LoopFade )
+                timeSinceStart %= _clipLength;
+
+            if( timeSinceStart < 0 )
+                return 0.0f;
+
+            if( timeSinceStart < FadeDuration )
+                return timeSinceStart / FadeDuration;
+
+            return 1.0f;
+        }
+
+
+        [MapsInheritingFrom( typeof( FadeInValueGetter ) )]
+        public static SerializationMapping FadeInValueGetterMapping()
+        {
+            return new MemberwiseSerializationMapping<FadeInValueGetter>()
+                .WithReadonlyMember( "fade_duration", o => o.FadeDuration )
+                .WithFactory<float>( ( fadeDuration ) => new FadeInValueGetter( fadeDuration ) )
+                .WithMember( "loop_fade", o => o.LoopFade );
+        }
+    }
+
+    public sealed class FadeOutValueGetter : IValueGetter<float>, IAudioInitValueGetter
+    {
+        public float FadeDuration { get; }
+
+        public bool LoopFade { get; set; } = true;
+
+        float _startFadingTime; // 'start playback', offset by the clip length and fade duration.
+        float _clipLength;
+
+        public FadeOutValueGetter( float fadeDuration )
+        {
+            this.FadeDuration = fadeDuration;
+        }
+
+        public void OnInit( AudioClip clip )
+        {
+            _startFadingTime = UnityEngine.Time.time + clip.length - FadeDuration;
+            _clipLength = clip.length;
+        }
+
+        public float Get()
+        {
+            // Lerp from 1 to 0 over the duration of the fade.
+            // Handles looping audios by looping the fade.
+            float timeSinceStart = (UnityEngine.Time.time - _startFadingTime);
+
+            if( LoopFade )
+                timeSinceStart %= _clipLength;
+
+            if( timeSinceStart < 0 )
+                return 1.0f;
+
+            if( timeSinceStart < FadeDuration )
+                return 1.0f - (timeSinceStart / FadeDuration);
+
+            return 0.0f;
+        }
+
+
+        [MapsInheritingFrom( typeof( FadeOutValueGetter ) )]
+        public static SerializationMapping FadeOutValueGetterMapping()
+        {
+            return new MemberwiseSerializationMapping<FadeOutValueGetter>()
+                .WithReadonlyMember( "fade_duration", o => o.FadeDuration )
+                .WithFactory<float>( ( fadeDuration ) => new FadeOutValueGetter( fadeDuration ) )
+                .WithMember( "loop_fade", o => o.LoopFade );
+        }
+    }
+
+    public class ParticleSystemEffectShaper
+    {
+        // particle plumes
+    }
+
+    public class MeshEffectShaper
+    {
+        // mesh plumes
+    }
+
     public class FRocketEngineAudio : MonoBehaviour
     {
-        FRocketEngine _engine;
+        public FRocketEngine Engine;
 
-        IAudioHandle _ignitionAudio;
-        IAudioHandle _shutdownAudio;
-        IAudioHandle _loopAudio;
+        public AudioEffectDefinition IgnitionAudio;
+        public AudioEffectDefinition ShutdownAudio;
+        public AudioEffectDefinition LoopAudio;
 
         void OnEnable()
         {
-            if( _engine == null )
-                _engine = this.GetComponent<FRocketEngine>();
+            if( Engine == null )
+                Engine = this.GetComponent<FRocketEngine>();
 
-            _engine.OnAfterIgnite += OnIgnite;
-            _engine.OnAfterShutdown += OnShutdown;
-            _engine.OnAfterThrustChanged += OnThrustChanged;
+            Engine.OnAfterIgnite += OnIgnite;
+            Engine.OnAfterShutdown += OnShutdown;
         }
 
         void OnDisable()
         {
-            if( _engine == null )
+            if( Engine == null )
                 return;
 
-            _engine.OnAfterIgnite -= OnIgnite;
-            _engine.OnAfterShutdown -= OnShutdown;
-            _engine.OnAfterThrustChanged -= OnThrustChanged;
+            Engine.OnAfterIgnite -= OnIgnite;
+            Engine.OnAfterShutdown -= OnShutdown;
         }
 
         void OnIgnite()
         {
-            if( _engine == null )
+            if( Engine == null )
                 return;
 
-            _ignitionAudio?.TryStop();
-            _ignitionAudio = AudioManager.PlayInWorld( AssetRegistry.Get<AudioClip>( "Vanilla::Assets/sounds/sound_liq8_enhanced" ), VesselManager.LoadedVessels.Skip( 1 ).First().ReferenceTransform, false, AudioChannel.Main_3D, 6 );
+            Transform t = this.transform.GetVessel().ReferenceTransform;
 
-            _loopAudio?.TryStop();
-            _loopAudio = AudioManager.PrepareInWorld( AssetRegistry.Get<AudioClip>( "Vanilla::Assets/sounds/kero_loop_hard" ), VesselManager.LoadedVessels.Skip( 1 ).First().ReferenceTransform, true, AudioChannel.Main_3D, (_engine.Thrust / _engine.MaxThrust) * 6 );
-            _loopAudio.Play( 3, 6 );
+            IgnitionAudio?.TryStop();
+            IgnitionAudio?.PlayInWorld( t );
 
-            _shutdownAudio?.TryStop();
-            _shutdownAudio = null;
+            LoopAudio?.TryStop();
+            LoopAudio?.PlayInWorld( t );
+
+            ShutdownAudio?.TryStop();
         }
 
         void OnShutdown()
         {
-            if( _engine == null )
+            if( Engine == null )
                 return;
 
-            _ignitionAudio?.TryStop();
-            _ignitionAudio = null;
+            IgnitionAudio?.TryStop();
 
-            _loopAudio?.TryStop( 0, 0.5f );
-            _loopAudio = null;
+            LoopAudio?.TryStop();
 
-            _shutdownAudio?.TryStop();
-            _shutdownAudio = AudioManager.PlayInWorld( AssetRegistry.Get<AudioClip>( "Vanilla::Assets/sounds/kero_flameout_hard" ), VesselManager.LoadedVessels.Skip( 1 ).First().ReferenceTransform, false, AudioChannel.Main_3D, 6 );
-        }
-
-        void OnThrustChanged()
-        {
-            if( _engine == null )
-                return;
-
-            if( _loopAudio != null )
-                _loopAudio.Volume = (_engine.Thrust / _engine.MaxThrust) * 6;
+            ShutdownAudio?.TryStop();
+            ShutdownAudio?.PlayInWorld( this.transform.GetVessel().ReferenceTransform );
         }
 
 
         [MapsInheritingFrom( typeof( FRocketEngineAudio ) )]
         public static SerializationMapping FRocketEngineAudioMapping()
         {
-            return new MemberwiseSerializationMapping<FRocketEngineAudio>();
+            return new MemberwiseSerializationMapping<FRocketEngineAudio>()
+                .WithMember( "engine", ObjectContext.Ref, o => o.Engine )
+                .WithMember( "ignition_audio", o => o.IgnitionAudio )
+                .WithMember( "loop_audio", o => o.LoopAudio )
+                .WithMember( "shutdown_audio", o => o.ShutdownAudio );
         }
     }
 }
