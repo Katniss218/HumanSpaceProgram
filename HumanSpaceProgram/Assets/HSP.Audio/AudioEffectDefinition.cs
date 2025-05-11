@@ -94,7 +94,7 @@ namespace HSP.Audio
             foreach( var shaper in Shapers )
             {
                 if( shaper.Getter is IAudioInitValueGetter evg )
-                    evg.OnInit( this.Clip );
+                    evg.OnInit( _handle );
             }
 
             _handle.Play();
@@ -108,7 +108,7 @@ namespace HSP.Audio
             foreach( var shaper in Shapers )
             {
                 if( shaper.Getter is IAudioInitValueGetter evg )
-                    evg.OnInit( this.Clip );
+                    evg.OnInit( _handle );
             }
 
             _handle.Play();

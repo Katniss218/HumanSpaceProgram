@@ -359,7 +359,7 @@
                             {
                                 "$type": "HSP.Audio.AudioShaper, HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
                                 "getter": {
-                                    "$type": "HSP.Vanilla.Effects.FadeInValueGetter, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                    "$type": "HSP.Audio.FadeInValueGetter, HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
                                     "$id": "9c69167e-1721-4c9b-ac6d-072a7124709e",
                                     "fade_duration": 6,
                                     "loop_fade": false

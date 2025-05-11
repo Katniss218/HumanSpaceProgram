@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-
+﻿
 namespace HSP.Audio
 {
     public interface IValueGetter<T>
@@ -13,6 +12,6 @@ namespace HSP.Audio
     /// </summary>
     public interface IAudioInitValueGetter
     {
-        void OnInit( AudioClip clip );
+        void OnInit( IAudioHandle handle );
     }
 }

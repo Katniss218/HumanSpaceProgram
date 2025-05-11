@@ -68,12 +68,12 @@
     <Compile Include="Assets\HSP\PhysicalConstants.cs" />
     <Compile Include="Assets\HSP\HSPEventListenerAttribute.cs" />
     <Compile Include="Assets\HSP\Utils\CoordinateUtils.cs" />
+    <Compile Include="Assets\HSP\AlwaysLoadedManager.cs" />
     <Compile Include="Assets\HSP\IHasMass.cs" />
     <Compile Include="Assets\HSP\Utils\RollingStatistics.cs" />
     <Compile Include="Assets\HSP\TransformRedirect.cs" />
     <Compile Include="Assets\HSP\Utils\IOHelper.cs" />
     <Compile Include="Assets\HSP\PIDLoop.cs" />
-    <Compile Include="Assets\HSP\AlwaysLoadedManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP\___HSP.asmdef" />
