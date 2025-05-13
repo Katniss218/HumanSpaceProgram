@@ -1,11 +1,32 @@
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityPlus;
 using UnityPlus.AssetManagement;
 
 namespace HSP.Audio
 {
     public class AudioManager : SingletonMonoBehaviour<AudioManager>
     {
+        private struct AudioHandlePoolData
+        {
+            public AudioClip clip;
+            public Transform transform;
+            public bool loop;
+            public AudioChannel channel;
+            public float volume;
+            public float pitch;
+
+            public AudioHandlePoolData( AudioClip clip, Transform transform, bool loop, AudioChannel channel, float volume, float pitch )
+            {
+                this.clip = clip;
+                this.transform = transform;
+                this.loop = loop;
+                this.channel = channel;
+                this.volume = volume;
+                this.pitch = pitch;
+            }
+        }
+
         static AudioMixer _audioMixer;
         /// <summary>
         /// Gets the audio mixer used by HSP.
@@ -22,7 +43,12 @@ namespace HSP.Audio
             }
         }
 
-        static AudioSourcePool _pool = new AudioSourcePool();
+        static ObjectPool<AudioSourcePoolItem, AudioHandlePoolData> _pool = new(
+            ( i, data ) =>
+            {
+                i.SetAudioData( data.transform, data.clip, data.loop, data.channel, data.volume, data.pitch );
+            },
+            i => i.State == AudioHandleState.Finished );
 
         // The earth moves, so 'position'-based audio will soon get out of range, unless its pinned to something.
         // We can't use absolute position, or scene position for those reasons. Everything in 3D should be pinned to something else, possibly with an offset.
@@ -37,7 +63,7 @@ namespace HSP.Audio
         /// <param name="transform">The source of the sound. The audio will be played at the position of the transform.</param>
         public static IAudioHandle PrepareInWorld( Transform transform, AudioClip clip, bool loop, AudioChannel channel, float volume = 1.0f, float pitch = 1.0f )
         {
-            var poolItem = _pool.GetItem( clip, transform, loop, channel, volume, pitch );
+            var poolItem = _pool.Get( new AudioHandlePoolData( clip, transform, loop, channel, volume, pitch ) );
 
             return poolItem;
         }
@@ -48,12 +74,12 @@ namespace HSP.Audio
         /// <param name="transform">The source of the sound. The audio will be played at the position of the transform.</param>
         public static IAudioHandle PlayInWorld( Transform transform, AudioClip clip, bool loop, AudioChannel channel, float volume = 1.0f, float pitch = 1.0f )
         {
-            var poolItem = _pool.GetItem( clip, transform, loop, channel, volume, pitch );
+            var poolItem = _pool.Get( new AudioHandlePoolData( clip, transform, loop, channel, volume, pitch ) );
 
             poolItem.Play();
             return poolItem;
         }
-        
+
         /// <summary>
         /// Prepares a new audio that is not located in the game world, and is not affected by its effects, but doesn't start playing it.
         /// </summary>
@@ -62,7 +88,7 @@ namespace HSP.Audio
         /// </remarks>
         public static IAudioHandle Prepare( AudioClip clip, bool loop, AudioChannel channel, float volume = 1.0f, float pitch = 1.0f )
         {
-            var poolItem = _pool.GetItem( clip, null, loop, channel, volume, pitch );
+            var poolItem = _pool.Get( new AudioHandlePoolData( clip, null, loop, channel, volume, pitch ) );
 
             return poolItem;
         }
@@ -72,12 +98,12 @@ namespace HSP.Audio
         /// </summary>
         public static IAudioHandle Play( AudioClip clip, bool loop, AudioChannel channel, float volume = 1.0f, float pitch = 1.0f )
         {
-            var poolItem = _pool.GetItem( clip, null, loop, channel, volume, pitch );
+            var poolItem = _pool.Get( new AudioHandlePoolData( clip, null, loop, channel, volume, pitch ) );
 
             poolItem.Play();
             return poolItem;
         }
-        
+
 
         // saving/loading audio, how will that work?
 
