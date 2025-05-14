@@ -5,7 +5,7 @@ using UnityPlus.Serialization;
 
 namespace HSP.Audio
 {
-    public struct AudioShaper
+    /*public struct AudioShaper
     {
         public IValueGetter<float> Getter { get; set; }
         public IAudioValueSetter<float> Setter { get; set; }
@@ -16,16 +16,16 @@ namespace HSP.Audio
         public AnimationCurve Curve { get; set; }
 
         [MapsInheritingFrom( typeof( AudioShaper ) )]
-        public static SerializationMapping ShaperMapping()
+        public static SerializationMapping AudioShaperMapping()
         {
             return new MemberwiseSerializationMapping<AudioShaper>()
                 .WithMember( "getter", o => o.Getter )
                 .WithMember( "setter", o => o.Setter )
                 .WithMember( "curve", o => o.Curve );
         }
-    }
+    }*/
 
-    public class AudioEffectPlayer : SingletonMonoBehaviour<AudioEffectPlayer>
+    /*public class AudioEffectPlayer : SingletonMonoBehaviour<AudioEffectPlayer>
     {
         private List<AudioEffectDefinition> _playingEffects = new();
 
@@ -47,7 +47,7 @@ namespace HSP.Audio
                         {
                             float value = getter.Get();
                             float mappedValue = shaper.Curve?.Evaluate( value ) ?? value;
-#warning TODO - needs to get the 'max' value corresponding to the value on the audio we want to set, then multiply it by the mapped value to get correct layering.
+#warning INFO/TODO - Initial values are not needed. start with 1, multiply by the curve-mapped value of the getter.
                             shaper.Setter.Set( effect._handle, mappedValue );
                         }
                     }
@@ -60,7 +60,7 @@ namespace HSP.Audio
                 }
             }
         }
-    }
+    }*/
 
     /// <summary>
     /// A 'definition' of an audio effect. <br/>
@@ -72,7 +72,7 @@ namespace HSP.Audio
     /// </remarks>
     public class AudioEffectDefinition
     {
-        public AudioShaper[] Shapers { get; set; }
+        //public AudioShaper[] Shapers { get; set; }
 
         public AudioHandleState State => _handle?.State ?? AudioHandleState.Ready;
 
@@ -80,13 +80,24 @@ namespace HSP.Audio
 
         public AudioChannel AudioChannel { get; set; }
 
-        public float Volume { get; set; }
-        public float Pitch { get; set; }
+        /// <summary>
+        /// The reference volume of the audio effect, before any shapers are applied.
+        /// </summary>
+        public ConstantEffectValue<float> Volume { get; set; }
+        /// <summary>
+        /// The reference pitch of the audio effect, before any shapers are applied.
+        /// </summary>
+        public ConstantEffectValue<float> Pitch { get; set; }
+        /// <summary>
+        /// Whether the audio should loop or not.
+        /// </summary>
         public bool Loop { get; set; }
+
+        public Transform TransformToFollow { get; set; }
 
         internal IAudioHandle _handle;
 
-        public void Play()
+        /*public void Play()
         {
             _handle = AudioManager.Prepare( this.Clip, this.Loop, this.AudioChannel, this.Volume, this.Pitch );
             AudioEffectPlayer.playingEffects.Add( this );
@@ -119,13 +130,13 @@ namespace HSP.Audio
             _handle?.TryStop();
             _handle = null;
         }
-
+        */
 
         [MapsInheritingFrom( typeof( AudioEffectDefinition ) )]
         public static SerializationMapping AudioEffectDefinitionMapping()
         {
             return new MemberwiseSerializationMapping<AudioEffectDefinition>()
-                .WithMember( "shapers", o => o.Shapers )
+               // .WithMember( "shapers", o => o.Shapers )
                 .WithMember( "audio_clip", ObjectContext.Asset, o => o.Clip )
                 .WithMember( "audio_channel", o => o.AudioChannel )
                 .WithMember( "volume", o => o.Volume )

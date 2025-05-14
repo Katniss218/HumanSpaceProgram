@@ -1,7 +1,6 @@
 ﻿using HSP.Audio;
 using HSP.Vanilla.Components;
 using HSP.Vessels;
-using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
 
@@ -47,16 +46,16 @@ namespace HSP.Vanilla.Effects
 
     public class FRocketEngineAudio : MonoBehaviour
     {
-        public FRocketEngine Engine;
+        public IPropulsion Engine;
 
         public AudioEffectDefinition IgnitionAudio;
-        public AudioEffectDefinition ShutdownAudio;
         public AudioEffectDefinition LoopAudio;
+        public AudioEffectDefinition ShutdownAudio;
 
         void OnEnable()
         {
             if( Engine == null )
-                Engine = this.GetComponent<FRocketEngine>();
+                Engine = this.GetComponent<IPropulsion>();
 
             Engine.OnAfterIgnite += OnIgnite;
             Engine.OnAfterShutdown += OnShutdown;

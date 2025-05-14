@@ -22,17 +22,11 @@ namespace HSP.Audio
         /// <summary>
         /// The current volume of the audio.
         /// </summary>
-        /// <remarks>
-        /// Doesn't take into account any shaping effects.
-        /// </remarks>
         public float Volume { get; set; }
 
         /// <summary>
         /// The current pitch of the audio.
         /// </summary>
-        /// <remarks>
-        /// Doesn't take into account any shaping effects.
-        /// </remarks>
         public float Pitch { get; set; }
 
         /// <summary>

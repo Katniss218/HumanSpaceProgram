@@ -106,6 +106,7 @@
     <Compile Include="Assets\HSP.Vanilla\Components\FPlayerInputAvionics.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\Tools\DefaultTool.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FVesselSeparator.cs" />
+    <Compile Include="Assets\HSP.Vanilla\Effects\FRocketEngineExhaustFx.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FSequencer.Sequence.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\OnStartup.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FAttitudeAvionics.cs" />

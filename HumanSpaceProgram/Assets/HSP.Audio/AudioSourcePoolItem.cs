@@ -11,9 +11,10 @@ namespace HSP.Audio
         [field: SerializeField]
         public AudioHandleState State { get; private set; }
 
-        public float Volume { get => _audioSource.volume; set => _audioSource.volume = value; }
+        private AudioEffectDefinition _definition;
+        //public float Volume { get => _audioSource.volume; set => _audioSource.volume = value; }
 
-        public float Pitch { get => _audioSource.pitch; set => _audioSource.pitch = value; }
+        //public float Pitch { get => _audioSource.pitch; set => _audioSource.pitch = value; }
 
         public bool Loop { get => _audioSource.loop; internal set => _audioSource.loop = value; }
 
@@ -72,7 +73,7 @@ namespace HSP.Audio
             gameObject.SetActive( false ); // Disable to stop empty update calls.
         }
 
-        internal void SetAudioData( Transform transformToFollow, AudioClip clip, bool loop, AudioChannel channel, float volume = 1.0f, float pitch = 1.0f )
+        internal void SetAudioData( AudioEffectDefinition data )
         {
             const float VOLUME_MIN_DISTANCE_MULTIPLIER = 1f;
             const float VOLUME_MAX_DISTANCE_MULTIPLIER = 1000f;

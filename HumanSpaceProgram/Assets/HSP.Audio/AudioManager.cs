@@ -7,7 +7,7 @@ namespace HSP.Audio
 {
     public class AudioManager : SingletonMonoBehaviour<AudioManager>
     {
-        private struct AudioHandlePoolData
+        /*private struct AudioHandlePoolData
         {
             public AudioClip clip;
             public Transform transform;
@@ -25,7 +25,7 @@ namespace HSP.Audio
                 this.volume = volume;
                 this.pitch = pitch;
             }
-        }
+        }*/
 
         static AudioMixer _audioMixer;
         /// <summary>
@@ -43,10 +43,10 @@ namespace HSP.Audio
             }
         }
 
-        static ObjectPool<AudioSourcePoolItem, AudioHandlePoolData> _pool = new(
+        static ObjectPool<AudioSourcePoolItem, AudioEffectDefinition> _pool = new(
             ( i, data ) =>
             {
-                i.SetAudioData( data.transform, data.clip, data.loop, data.channel, data.volume, data.pitch );
+                i.SetAudioData( data );
             },
             i => i.State == AudioHandleState.Finished );
 
