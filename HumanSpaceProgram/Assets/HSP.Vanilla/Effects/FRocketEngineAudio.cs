@@ -1,4 +1,5 @@
-﻿using HSP.Audio;
+﻿using HSP.Effects;
+using HSP.Effects.Audio;
 using HSP.Vanilla.Components;
 using HSP.Vessels;
 using UnityEngine;
@@ -30,9 +31,9 @@ namespace HSP.Vanilla.Effects
         }
     }
 
-    
 
-    
+
+
 
     public class FRocketEngineAudio : MonoBehaviour
     {
@@ -69,16 +70,21 @@ namespace HSP.Vanilla.Effects
             if( Engine == null )
                 return;
 
-            Transform t = this.transform.GetVessel().ReferenceTransform;
-            IgnitionAudio.TargetTransform = t;
-            LoopAudio.TargetTransform = t;
-            ShutdownAudio.TargetTransform = t;
+            Transform t = this.transform;
+            if( IgnitionAudio != null && IgnitionAudio.TargetTransform == null )
+                IgnitionAudio.TargetTransform = t;
+            if( LoopAudio != null && LoopAudio.TargetTransform == null )
+                LoopAudio.TargetTransform = t;
+            if( ShutdownAudio != null && ShutdownAudio.TargetTransform == null )
+                ShutdownAudio.TargetTransform = t;
 
             _ignitionHandle.TryStop();
-            _ignitionHandle = AudioManager.Play( IgnitionAudio );
+            if( IgnitionAudio != null )
+                _ignitionHandle = AudioEffectManager.Play( IgnitionAudio );
 
             _loopHandle.TryStop();
-            _loopHandle = AudioManager.Play( LoopAudio );
+            if( LoopAudio != null )
+                _loopHandle = AudioEffectManager.Play( LoopAudio );
 
             _shutdownHandle.TryStop();
         }
@@ -88,17 +94,21 @@ namespace HSP.Vanilla.Effects
             if( Engine == null )
                 return;
 
-            Transform t = this.transform.GetVessel().ReferenceTransform;
-            IgnitionAudio.TargetTransform = t;
-            LoopAudio.TargetTransform = t;
-            ShutdownAudio.TargetTransform = t;
+            Transform t = this.transform;
+            if( IgnitionAudio != null && IgnitionAudio.TargetTransform == null )
+                IgnitionAudio.TargetTransform = t;
+            if( LoopAudio != null && LoopAudio.TargetTransform == null )
+                LoopAudio.TargetTransform = t;
+            if( ShutdownAudio != null && ShutdownAudio.TargetTransform == null )
+                ShutdownAudio.TargetTransform = t;
 
             _ignitionHandle.TryStop();
 
             _loopHandle.TryStop();
 
             _shutdownHandle.TryStop();
-            _shutdownHandle = AudioManager.Play( ShutdownAudio );
+            if( ShutdownAudio != null )
+                _shutdownHandle = AudioEffectManager.Play( ShutdownAudio );
         }
 
 

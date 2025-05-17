@@ -1,4 +1,4 @@
-﻿using HSP.Audio;
+﻿using HSP.Effects;
 using HSP.CelestialBodies;
 using HSP.Content;
 using HSP.Content.Vessels;

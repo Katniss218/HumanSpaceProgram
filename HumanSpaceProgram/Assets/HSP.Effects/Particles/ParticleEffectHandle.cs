@@ -1,0 +1,118 @@
+﻿using HSP.Effects.Audio;
+using System.Runtime.CompilerServices;
+using System;
+using UnityEngine;
+
+namespace HSP.Effects.Particles
+{
+    public readonly struct ParticleEffectHandle
+    {
+        private readonly int _version;
+        private readonly ParticleEffectPoolItem _poolItem;
+
+        internal ParticleEffectHandle( ParticleEffectPoolItem poolItem )
+        {
+            _poolItem = poolItem;
+            _version = poolItem.version;
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        private void EnsureValid()
+        {
+            // Null check because the _poolItem might've been destroyyed for whatever reason.
+            if( _poolItem == null || _version != _poolItem.version )
+                throw new ObjectDisposedException( nameof( ParticleEffectHandle ), $"The {nameof( ParticleEffectPoolItem )} backing the {nameof( ParticleEffectHandle )} has been disposed or reused and is no longer valid for this handle." );
+        }
+
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
+        public bool IsValid()
+        {
+            // Null check because the _poolItem might've been destroyyed for whatever reason.
+            return _poolItem != null && _version == _poolItem.version;
+        }
+
+        /// <summary>
+        /// The state that the audio handle is currently in.
+        /// </summary>
+        public ParticleEffectState State
+        {
+            get
+            {
+                EnsureValid();
+                return _poolItem.State;
+            }
+        }
+
+        /// <summary>
+        /// The transform that the playing audio will follow.
+        /// </summary>
+        public Transform TargetTransform
+        {
+            get
+            {
+                EnsureValid();
+                return _poolItem.TargetTransform;
+            }
+            set
+            {
+                EnsureValid();
+                _poolItem.TargetTransform = value;
+            }
+        }
+
+        /// <summary>
+        /// The audio clip that the audio handle is currently using.
+        /// </summary>
+        public float Size
+        {
+            get
+            {
+                EnsureValid();
+                return _poolItem.Size;
+            }
+            set
+            {
+                EnsureValid();
+                _poolItem.Size = value;
+            }
+        }
+
+        public Material Material
+        {
+            get
+            {
+                EnsureValid();
+                return _poolItem.Material;
+            }
+            set
+            {
+                EnsureValid();
+                _poolItem.Material = value;
+            }
+        }
+
+
+
+        //
+        //  Playback controls
+        //
+
+        /// <summary>
+        /// Starts the playback immediately.
+        /// </summary>
+        public void Play()
+        {
+            EnsureValid();
+            _poolItem.Play();
+        }
+
+        /// <summary>
+        /// Stops the playback immediately.
+        /// </summary>
+        public void Stop()
+        {
+            EnsureValid();
+            _poolItem.Stop();
+        }
+    }
+}

@@ -1024,10 +1024,6 @@
       <Project>{5294BE79-15AB-2AAE-E8C3-9E735E001D6D}</Project>
       <Name>HSP</Name>
     </ProjectReference>
-    <ProjectReference Include="HSP.Audio.csproj">
-      <Project>{BBE3A705-F416-7434-8527-C1D92CEE2832}</Project>
-      <Name>HSP.Audio</Name>
-    </ProjectReference>
     <ProjectReference Include="HSP.CelestialBodies.csproj">
       <Project>{83793330-5AED-C186-5E4B-AAD4BB463469}</Project>
       <Name>HSP.CelestialBodies</Name>
@@ -1039,6 +1035,10 @@
     <ProjectReference Include="HSP.ControlSystems.csproj">
       <Project>{5E371463-138D-D25A-49B8-DED13355C7DC}</Project>
       <Name>HSP.ControlSystems</Name>
+    </ProjectReference>
+    <ProjectReference Include="HSP.Effects.csproj">
+      <Project>{29090DAC-0334-EB9C-8A35-E4EFB153D0F8}</Project>
+      <Name>HSP.Effects</Name>
     </ProjectReference>
     <ProjectReference Include="HSP.ReferenceFrames.csproj">
       <Project>{D8846B96-55B1-C32C-F90A-52C14F5C8043}</Project>

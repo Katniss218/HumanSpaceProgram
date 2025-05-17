@@ -504,6 +504,8 @@ MonoBehaviour:
     asset: {fileID: 21300000, guid: 813c3b3ec38dd5449852743c0b33481c, type: 3}
   - assetID: builtin::Resources/Prefabs/Parts/capsule
     asset: {fileID: 1175757436153444479, guid: b1a35d216412591489790b82c952e01a, type: 3}
+  - assetID: builtin::HSP.Effects/Audio/RSE_Mixer
+    asset: {fileID: 24100000, guid: c1c8889b6e4748a4b88573756d07abe5, type: 2}
   - assetID: builtin::Resources/Meshes/attitude_indicator
     asset: {fileID: -7163177602714537324, guid: c10a9c87b58aac9448bcab4f35f869df, type: 3}
   - assetID: builtin::HSP._DevUtils/cube/Xn
@@ -558,7 +560,7 @@ MonoBehaviour:
     asset: {fileID: 12800000, guid: e3265ab4bf004d28a9537516768c1c75, type: 3}
   - assetID: builtin::HSP.CelestialBodies/Surfaces/TerrainShader
     asset: {fileID: 4800000, guid: e3f72d5ef871243408ac05fea5ed9243, type: 3}
-  - assetID: builtin::HSP.Audio/NewAudioMixer
+  - assetID: builtin::HSP.Effects/Audio/NewAudioMixer
     asset: {fileID: 24100000, guid: f364cf67bec73e24381ec683a5a8a242, type: 2}
   - assetID: builtin::Resources/Sprites/std0/ui_percent_bar_bg
     asset: {fileID: 21300000, guid: f329ac740530a7640993d6c7647d30b6, type: 3}
