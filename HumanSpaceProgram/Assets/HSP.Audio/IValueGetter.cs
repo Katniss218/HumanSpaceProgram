@@ -7,11 +7,13 @@ namespace HSP.Audio
     }
 
     /// <summary>
+    /// Value Getter that has an initialize callback. <br/><br/>
+    /// 
     /// NOTE TO IMPLEMENTERS: This should be used on top of <see cref="IValueGetter{T}"/>. Using this interface standalone makes no sense. <br/>
     /// But due to limitations of the language and type casting, I can't derive this non-generic interface from it.
     /// </summary>
-    public interface IAudioInitValueGetter
+    public interface IInitValueGetter<TDriven>
     {
-        void OnInit( IAudioHandle handle );
+        void OnInit( TDriven handle );
     }
 }

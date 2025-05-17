@@ -4,7 +4,7 @@ namespace HSP.Audio
     /// <summary>
     /// All states that an audio handle can be in.
     /// </summary>
-    public enum AudioHandleState
+    public enum AudioEffectState
     {
         /// <summary>
         /// The audio is ready to play, but has not started yet.

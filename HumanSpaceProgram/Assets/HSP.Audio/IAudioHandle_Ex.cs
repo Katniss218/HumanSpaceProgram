@@ -1,19 +1,19 @@
 ﻿
 namespace HSP.Audio
 {
-    public static class IAudioHandle_Ex
+    public static class AudioEffectHandle_Ex
     {
-        public static void TryPlay( this IAudioHandle handle )
+        public static void TryPlay( this AudioEffectHandle handle )
         {
-            if( handle == null || handle.State != AudioHandleState.Ready )
+            if( !handle.IsValid() || handle.State != AudioEffectState.Ready )
                 return;
 
             handle.Play();
         }
 
-        public static void TryStop( this IAudioHandle handle )
+        public static void TryStop( this AudioEffectHandle handle )
         {
-            if( handle == null || handle.State != AudioHandleState.Playing )
+            if( !handle.IsValid() || handle.State != AudioEffectState.Playing )
                 return;
 
             handle.Stop();

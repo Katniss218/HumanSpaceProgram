@@ -1,8 +1,9 @@
-﻿using UnityPlus.Serialization;
+﻿using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace HSP.Audio
 {
-    public sealed class FadeInValueGetter : IValueGetter<float>, IAudioInitValueGetter
+    public sealed class FadeInValueGetter : IValueGetter<float>, IInitValueGetter<AudioEffectHandle>
     {
         public float FadeDuration { get; }
 
@@ -16,7 +17,7 @@ namespace HSP.Audio
             this.FadeDuration = fadeDuration;
         }
 
-        public void OnInit( IAudioHandle handle )
+        public void OnInit( AudioEffectHandle handle )
         {
             _startPlaybackTime = UnityEngine.Time.time;
             _clipLength = handle.Clip.length;

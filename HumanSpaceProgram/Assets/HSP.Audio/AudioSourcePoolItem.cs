@@ -4,52 +4,80 @@ using UnityEngine;
 namespace HSP.Audio
 {
     [RequireComponent( typeof( AudioSource ) )]
-    public class AudioSourcePoolItem : MonoBehaviour, IAudioHandle
+    internal class AudioSourcePoolItem : MonoBehaviour
     {
-        public AudioClip Clip { get => _audioSource.clip; internal set => _audioSource.clip = value; }
+        internal const float VOLUME_MIN_DISTANCE_MULTIPLIER = 1f;
+        internal const float VOLUME_MAX_DISTANCE_MULTIPLIER = 1000f;
 
-        [field: SerializeField]
-        public AudioHandleState State { get; private set; }
+        internal AudioClip Clip { get => _audioSource.clip; set => _audioSource.clip = value; }
 
-        private AudioEffectDefinition _definition;
-        //public float Volume { get => _audioSource.volume; set => _audioSource.volume = value; }
+        internal AudioEffectState State { get; private set; }
 
-        //public float Pitch { get => _audioSource.pitch; set => _audioSource.pitch = value; }
+        internal float Volume
+        {
+            get => _audioSource.volume;
+            set
+            {
+                float volumeSquared = value * value;
 
-        public bool Loop { get => _audioSource.loop; internal set => _audioSource.loop = value; }
+                _audioSource.volume = value;
+                _audioSource.minDistance = volumeSquared * VOLUME_MIN_DISTANCE_MULTIPLIER;
+                _audioSource.maxDistance = volumeSquared * VOLUME_MAX_DISTANCE_MULTIPLIER;
+            }
+        }
 
-        Transform _transformToFollow;
+        internal float Pitch { get => _audioSource.pitch; set => _audioSource.pitch = value; }
 
-        AudioSource _audioSource;
+        internal bool Loop { get => _audioSource.loop; set => _audioSource.loop = value; }
 
-        [field: SerializeField]
-        float _timeWhenFinished;
+        AudioChannel _channel;
+        internal AudioChannel Channel
+        {
+            get => _channel;
+            set
+            {
+                _channel = value;
+                _audioSource.spatialBlend = _channel.Is3D() ? 1.0f : 0.0f;
+                _audioSource.priority = _channel.GetPriority();
+                _audioSource.outputAudioMixerGroup = _channel.GetAudioMixerGroup();
+            }
+        }
+
+        internal Transform TargetTransform { get; set; }
+
+        internal int version;
+        internal AudioEffectHandle currentHandle; // kind of singleton (per pool item) with the handle management.
+
+        private AudioSource _audioSource;
+        private float _timeWhenFinished;
+        private IAudioEffectData _data;
 
         void Awake()
         {
             _audioSource = GetComponent<AudioSource>();
+            _audioSource.dopplerLevel = 0.0f; // Doppler sounds blergh when you move the camera around.
+            _audioSource.playOnAwake = false;
         }
 
         void Update()
         {
-            if( State == AudioHandleState.Finished || State == AudioHandleState.Ready )
+            if( State == AudioEffectState.Finished || State == AudioEffectState.Ready )
                 return;
 
-            if( _transformToFollow != null )
-                this.transform.position = _transformToFollow.position;
+            if( TargetTransform != null )
+                this.transform.position = TargetTransform.position;
 
-            if( State == AudioHandleState.Playing )
+            _data.OnUpdate( this.currentHandle );
+
+            if( UnityEngine.Time.time >= _timeWhenFinished ) // When finished, just stop.
             {
-                if( UnityEngine.Time.time >= _timeWhenFinished ) // When finished, just stop.
-                {
-                    SetState_Finished();
-                }
+                SetState_Finished();
             }
         }
 
         private void ResetState()
         {
-            State = AudioHandleState.Ready;
+            State = AudioEffectState.Ready;
             _audioSource.time = 0.0f;
         }
 
@@ -57,56 +85,45 @@ namespace HSP.Audio
         {
             this.gameObject.SetActive( true );
 
-            _audioSource.Play();
+            _data.OnInit( this.currentHandle );
 
             _timeWhenFinished = Loop
                 ? float.MaxValue
                 : UnityEngine.Time.time + _audioSource.clip.length;
 
-            State = AudioHandleState.Playing;
+            _audioSource.Play();
+
+            State = AudioEffectState.Playing;
         }
 
         private void SetState_Finished()
         {
             _audioSource.Stop();
-            State = AudioHandleState.Finished;
-            gameObject.SetActive( false ); // Disable to stop empty update calls.
+            State = AudioEffectState.Finished;
+            gameObject.SetActive( false ); // Disables the gameobject to stop empty update calls and other processing.
         }
 
-        internal void SetAudioData( AudioEffectDefinition data )
+        internal void SetAudioData( IAudioEffectData data )
         {
-            const float VOLUME_MIN_DISTANCE_MULTIPLIER = 1f;
-            const float VOLUME_MAX_DISTANCE_MULTIPLIER = 1000f;
+            _data = data;
+            version++;
+            currentHandle = new AudioEffectHandle( this );
 
-            this._audioSource.clip = clip;
-            this._audioSource.loop = loop;
-
-            this.Volume = volume;
-            this.Pitch = pitch;
-            this._transformToFollow = transformToFollow;
-            this.Loop = loop;
-            this._audioSource.spatialBlend = channel.Is3D() ? 1.0f : 0.0f;
-            this._audioSource.dopplerLevel = 0.0f; // Doppler sounds blergh when you move the camera around.
-            this._audioSource.minDistance = (volume * volume) * VOLUME_MIN_DISTANCE_MULTIPLIER;
-            this._audioSource.maxDistance = (volume * volume) * VOLUME_MAX_DISTANCE_MULTIPLIER;
-            this._audioSource.outputAudioMixerGroup = channel.GetAudioMixerGroup();
-            this._audioSource.playOnAwake = false;
-            this._audioSource.priority = channel.GetPriority();
             this.ResetState();
         }
 
-        public void Play()
+        internal void Play()
         {
-            if( State != AudioHandleState.Ready )
-                throw new InvalidOperationException( $"Audio can only be played when in the {nameof( AudioHandleState.Ready )} state." );
+            if( State != AudioEffectState.Ready )
+                throw new InvalidOperationException( $"Audio can only be played when in the {nameof( AudioEffectState.Ready )} state." );
 
             SetState_Playing();
         }
 
-        public void Stop()
+        internal void Stop()
         {
-            if( State != AudioHandleState.Playing )
-                throw new InvalidOperationException( $"Audio can only be stopped when in the {nameof( AudioHandleState.Playing )} state." );
+            if( State != AudioEffectState.Playing )
+                throw new InvalidOperationException( $"Audio can only be stopped when in the {nameof( AudioEffectState.Playing )} state." );
 
             SetState_Finished();
         }

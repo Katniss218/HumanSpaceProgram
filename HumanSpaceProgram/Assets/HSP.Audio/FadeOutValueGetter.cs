@@ -2,7 +2,7 @@
 
 namespace HSP.Audio
 {
-    public sealed class FadeOutValueGetter : IValueGetter<float>, IAudioInitValueGetter
+    public sealed class FadeOutValueGetter : IValueGetter<float>, IInitValueGetter<AudioEffectHandle>
     {
         public float FadeDuration { get; }
 
@@ -16,7 +16,7 @@ namespace HSP.Audio
             this.FadeDuration = fadeDuration;
         }
 
-        public void OnInit( IAudioHandle handle )
+        public void OnInit( AudioEffectHandle handle )
         {
             _startFadingTime = UnityEngine.Time.time + handle.Clip.length - FadeDuration;
             _clipLength = handle.Clip.length;

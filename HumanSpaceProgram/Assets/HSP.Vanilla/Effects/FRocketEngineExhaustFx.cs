@@ -18,39 +18,51 @@ namespace HSP.Vanilla.Effects
         LocalTransform,
     }
 
+    public enum ParticleEffectState
+    {
+        Ready,
+        Playing,
+        Finished,
+    }
+
+    public interface IParticleEffectData
+    {
+        void Init( ParticleEffectHandle handle );
+        void Update( ParticleEffectHandle handle );
+    }
+
+
     public class ParticleEffectManager : SingletonMonoBehaviour<ParticleEffectManager>
     {
-        private struct ParticleEffectPoolData
-        {
-        }
-
-        static ObjectPool<AudioSourcePoolItem, ParticleEffectPoolData> _pool = new(
+        static ObjectPool<ParticleEffectPoolItem, IParticleEffectData> _pool = new(
             ( i, data ) =>
             {
                 i.SetParticleData( data );
             },
-            i => i.State == AudioHandleState.Finished );
+            i => i.State == ParticleEffectState.Finished );
 
-        public static IParticleEffectHandle Poof( Transform transform, Material material, ParticleEffectDataSimple data )
+        public static ParticleEffectHandle Poof( Transform transform, Material material, IParticleEffectData data )
         {
-
+            throw new NotImplementedException();
         }
     }
-
-    public interface IParticleEffectHandle
+    
+    public readonly struct ParticleEffectHandle
     {
 
     }
 
-    public class ParticleEffectPoolItem : MonoBehaviour, IParticleEffectHandle
+    internal class ParticleEffectPoolItem : MonoBehaviour
     {
+        internal ParticleEffectState State { get; private set; } = ParticleEffectState.Ready;
+
         private struct CachedEntry
         {
             public Action Setter;
         }
 
         // properties need *some kind of path* to identify the property in question?
-        private ParticleEffectDefinition _definition;
+        private IParticleEffectData _definition;
 
         private ParticleSystem _ps;
 
@@ -71,6 +83,12 @@ namespace HSP.Vanilla.Effects
             //_ps.main.startSize.constantMin = _definition.size.GetMin();
             //_ps.main.startSize.constantMax = _definition.size.GetMax();
         }
+
+        internal void SetParticleData( IParticleEffectData data )
+        {
+            _definition = data;
+            // TODO - set the particle data
+        }
     }
 
     /// <summary>
@@ -79,7 +97,7 @@ namespace HSP.Vanilla.Effects
     /// </summary>
     public interface IParticleEffectInitValueGetter
     {
-        void OnInit( IParticleEffectHandle handle );
+        void OnInit( ParticleEffectHandle handle );
     }
 
     public class ParticleEffectDefinition

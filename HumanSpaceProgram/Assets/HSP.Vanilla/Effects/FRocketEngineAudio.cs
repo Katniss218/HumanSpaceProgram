@@ -34,16 +34,6 @@ namespace HSP.Vanilla.Effects
 
     
 
-    public class ParticleSystemEffectShaper
-    {
-        // particle plumes
-    }
-
-    public class MeshEffectShaper
-    {
-        // mesh plumes
-    }
-
     public class FRocketEngineAudio : MonoBehaviour
     {
         public IPropulsion Engine;
@@ -51,6 +41,10 @@ namespace HSP.Vanilla.Effects
         public AudioEffectDefinition IgnitionAudio;
         public AudioEffectDefinition LoopAudio;
         public AudioEffectDefinition ShutdownAudio;
+
+        AudioEffectHandle _ignitionHandle;
+        AudioEffectHandle _loopHandle;
+        AudioEffectHandle _shutdownHandle;
 
         void OnEnable()
         {
@@ -76,14 +70,17 @@ namespace HSP.Vanilla.Effects
                 return;
 
             Transform t = this.transform.GetVessel().ReferenceTransform;
+            IgnitionAudio.TargetTransform = t;
+            LoopAudio.TargetTransform = t;
+            ShutdownAudio.TargetTransform = t;
 
-            IgnitionAudio?.TryStop();
-            IgnitionAudio?.PlayInWorld( t );
+            _ignitionHandle.TryStop();
+            _ignitionHandle = AudioManager.Play( IgnitionAudio );
 
-            LoopAudio?.TryStop();
-            LoopAudio?.PlayInWorld( t );
+            _loopHandle.TryStop();
+            _loopHandle = AudioManager.Play( LoopAudio );
 
-            ShutdownAudio?.TryStop();
+            _shutdownHandle.TryStop();
         }
 
         void OnShutdown()
@@ -91,12 +88,17 @@ namespace HSP.Vanilla.Effects
             if( Engine == null )
                 return;
 
-            IgnitionAudio?.TryStop();
+            Transform t = this.transform.GetVessel().ReferenceTransform;
+            IgnitionAudio.TargetTransform = t;
+            LoopAudio.TargetTransform = t;
+            ShutdownAudio.TargetTransform = t;
 
-            LoopAudio?.TryStop();
+            _ignitionHandle.TryStop();
 
-            ShutdownAudio?.TryStop();
-            ShutdownAudio?.PlayInWorld( this.transform.GetVessel().ReferenceTransform );
+            _loopHandle.TryStop();
+
+            _shutdownHandle.TryStop();
+            _shutdownHandle = AudioManager.Play( ShutdownAudio );
         }
 
 

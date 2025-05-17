@@ -1,66 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityPlus.Serialization;
 
 namespace HSP.Audio
 {
-    /*public struct AudioShaper
+    public interface IAudioEffectData
     {
-        public IValueGetter<float> Getter { get; set; }
-        public IAudioValueSetter<float> Setter { get; set; }
-
-        /// <summary>
-        /// Maps what is returned by the getter to what is passed into the setter.
-        /// </summary>
-        public AnimationCurve Curve { get; set; }
-
-        [MapsInheritingFrom( typeof( AudioShaper ) )]
-        public static SerializationMapping AudioShaperMapping()
-        {
-            return new MemberwiseSerializationMapping<AudioShaper>()
-                .WithMember( "getter", o => o.Getter )
-                .WithMember( "setter", o => o.Setter )
-                .WithMember( "curve", o => o.Curve );
-        }
-    }*/
-
-    /*public class AudioEffectPlayer : SingletonMonoBehaviour<AudioEffectPlayer>
-    {
-        private List<AudioEffectDefinition> _playingEffects = new();
-
-        internal static List<AudioEffectDefinition> playingEffects => instance._playingEffects;
-
-
-        void Update()
-        {
-            // check if any of the effects are finished
-            for( int i = _playingEffects.Count - 1; i >= 0; i-- )
-            {
-                var effect = _playingEffects[i];
-
-                if( effect.State == AudioHandleState.Playing )
-                {
-                    foreach( var shaper in effect.Shapers )
-                    {
-                        if( shaper.Getter is IValueGetter<float> getter )
-                        {
-                            float value = getter.Get();
-                            float mappedValue = shaper.Curve?.Evaluate( value ) ?? value;
-#warning INFO/TODO - Initial values are not needed. start with 1, multiply by the curve-mapped value of the getter.
-                            shaper.Setter.Set( effect._handle, mappedValue );
-                        }
-                    }
-                }
-
-                if( effect.State == AudioHandleState.Finished )
-                {
-                    effect._handle = null;
-                    _playingEffects.RemoveAt( i );
-                }
-            }
-        }
-    }*/
+        void OnInit( AudioEffectHandle handle );
+        void OnUpdate( AudioEffectHandle handle );
+    }
 
     /// <summary>
     /// A 'definition' of an audio effect. <br/>
@@ -70,75 +18,65 @@ namespace HSP.Audio
     /// Each instance of this class can play a single audio clip at a time. <br/><br/>
     /// This class is higher-level than just playing clips directly using the <see cref="AudioManager"/>.
     /// </remarks>
-    public class AudioEffectDefinition
+    public class AudioEffectDefinition : IAudioEffectData
     {
-        //public AudioShaper[] Shapers { get; set; }
-
-        public AudioHandleState State => _handle?.State ?? AudioHandleState.Ready;
-
+        /// <summary>
+        /// The audio clip to play.
+        /// </summary>
         public AudioClip Clip { get; set; }
 
-        public AudioChannel AudioChannel { get; set; }
-
-        /// <summary>
-        /// The reference volume of the audio effect, before any shapers are applied.
-        /// </summary>
-        public ConstantEffectValue<float> Volume { get; set; }
-        /// <summary>
-        /// The reference pitch of the audio effect, before any shapers are applied.
-        /// </summary>
-        public ConstantEffectValue<float> Pitch { get; set; }
         /// <summary>
         /// Whether the audio should loop or not.
         /// </summary>
         public bool Loop { get; set; }
 
-        public Transform TransformToFollow { get; set; }
+        /// <summary>
+        /// The audio channel to use for playback.
+        /// </summary>
+        public AudioChannel Channel { get; set; }
 
-        internal IAudioHandle _handle;
+        /// <summary>
+        /// The transform that the playing audio will follow.
+        /// </summary>
+        public Transform TargetTransform { get; set; }
 
-        /*public void Play()
+        //
+        // Driven properties:
+
+        public ConstantEffectValue<float> Volume { get; set; } = new( 1f );
+
+        public ConstantEffectValue<float> Pitch { get; set; } = new( 1f );
+
+
+        public void OnInit( AudioEffectHandle handle )
         {
-            _handle = AudioManager.Prepare( this.Clip, this.Loop, this.AudioChannel, this.Volume, this.Pitch );
-            AudioEffectPlayer.playingEffects.Add( this );
+            handle.Clip = this.Clip;
 
-            foreach( var shaper in Shapers )
-            {
-                if( shaper.Getter is IAudioInitValueGetter evg )
-                    evg.OnInit( _handle );
-            }
+            handle.Loop = this.Loop;
+            handle.Channel = this.Channel;
+            handle.TargetTransform = this.TargetTransform;
 
-            _handle.Play();
+            // Set non-driven properties first. Properties might need to initialize.
+
+            this.Volume.OnInit( handle );
+            handle.Volume = this.Volume.Get();
+            this.Pitch.OnInit( handle );
+            handle.Pitch = this.Pitch.Get();
         }
 
-        public void PlayInWorld( Transform transform )
+        public void OnUpdate( AudioEffectHandle handle )
         {
-            _handle = AudioManager.PrepareInWorld( transform, this.Clip, this.Loop, this.AudioChannel, this.Volume, this.Pitch );
-            AudioEffectPlayer.playingEffects.Add( this );
-
-            foreach( var shaper in Shapers )
-            {
-                if( shaper.Getter is IAudioInitValueGetter evg )
-                    evg.OnInit( _handle );
-            }
-
-            _handle.Play();
+            handle.Volume = this.Volume.Get();
+            handle.Pitch = this.Pitch.Get();
         }
-
-        public void TryStop()
-        {
-            _handle?.TryStop();
-            _handle = null;
-        }
-        */
 
         [MapsInheritingFrom( typeof( AudioEffectDefinition ) )]
         public static SerializationMapping AudioEffectDefinitionMapping()
         {
             return new MemberwiseSerializationMapping<AudioEffectDefinition>()
-               // .WithMember( "shapers", o => o.Shapers )
+                // .WithMember( "shapers", o => o.Shapers )
                 .WithMember( "audio_clip", ObjectContext.Asset, o => o.Clip )
-                .WithMember( "audio_channel", o => o.AudioChannel )
+                .WithMember( "audio_channel", o => o.Channel )
                 .WithMember( "volume", o => o.Volume )
                 .WithMember( "pitch", o => o.Pitch )
                 .WithMember( "loop", o => o.Loop );

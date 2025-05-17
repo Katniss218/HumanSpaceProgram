@@ -779,19 +779,18 @@
                                                     "ignition_audio": {
                                                         "$type": "HSP.Audio.AudioEffectDefinition, HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
                                                         "$id": "7122aaf6-195d-49cb-90ca-146f61460cad",
-                                                        "shapers": {
-                                                            "$type": "HSP.Audio.AudioShaper[], HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                                                            "$id": "1fdb2b8a-3f79-400c-81a6-ebd76a67b8be",
-                                                            "value": [
-
-                                                            ]
-                                                        },
                                                         "audio_clip": {
                                                             "$assetref": "Vanilla::Assets/sounds/sound_liq8_enhanced"
                                                         },
                                                         "audio_channel": "Main_3D",
-                                                        "volume": 6.0,
-                                                        "pitch": 1.0,
+                                                        "volume": {
+                                                            "$type": "HSP.Audio.ConstantEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                            "value": 6.0
+                                                        },
+                                                        "pitch": {
+                                                            "$type": "HSP.Audio.ConstantEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                            "value": 1.0
+                                                        },
                                                         "loop": false
                                                     },
                                                     "loop_audio": {
@@ -799,13 +798,11 @@
                                                         "$id": "eff12a5e-1b82-469b-b2ed-b49b3c684d80",
                                                         "shapers": {
                                                             "$type": "HSP.Audio.AudioShaper[], HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                                                            "$id": "787651b7-53a6-45d3-aae5-b01b791a42d7",
                                                             "value": [
                                                                 {
                                                                     "$type": "HSP.Audio.AudioShaper, HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
                                                                     "getter": {
                                                                         "$type": "HSP.Audio.FadeInValueGetter, HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                                                                        "$id": "9c69167e-1721-4c9b-ac6d-072a7124709e",
                                                                         "fade_duration": 6,
                                                                         "loop_fade": false
                                                                     },
@@ -819,8 +816,51 @@
                                                             "$assetref": "Vanilla::Assets/sounds/kero_loop_hard"
                                                         },
                                                         "audio_channel": "Main_3D",
-                                                        "volume": 6.0,
-                                                        "pitch": 1.0,
+                                                        "volume": {
+                                                            "$type": "HSP.Audio.ConstantEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                            "value": 6.0,
+                                                            "drivers": {
+                                                                "$type": "HSP.Audio.EffectValueDriver`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]][], HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                                "value": [
+                                                                    {
+                                                                        "$type": "HSP.Audio.EffectValueDriver`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                                        "getter": {
+                                                                            "$type": "HSP.Audio.FadeInValueGetter, HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                                            "fade_duration": 6,
+                                                                            "loop_fade": false
+                                                                        },
+                                                                        "curve": {
+                                                                            "$type": "HSP.Audio.MappingCurve`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                                            "interpolator": {
+                                                                                "$type": "HSP.Audio.FloatInterpolator, HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+                                                                            },
+                                                                            "keys": {
+                                                                                "value": [
+                                                                                    {
+                                                                                        "$type": "HSP.Audio.MappingCurve`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]].Keyframe, HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                                                        "t": 0,
+                                                                                        "v": 0,
+                                                                                        "v_in": 0,
+                                                                                        "v_out": 0
+                                                                                    },
+                                                                                    {
+                                                                                        "$type": "HSP.Audio.MappingCurve`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]].Keyframe, HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                                                        "t": 1,
+                                                                                        "v": 1,
+                                                                                        "v_in": 0,
+                                                                                        "v_out": 0
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                ]
+                                                            }
+                                                        },
+                                                        "pitch": {
+                                                            "$type": "HSP.Audio.ConstantEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                            "value": 1.0
+                                                        },
                                                         "loop": true
                                                     },
                                                     "shutdown_audio": {
@@ -837,8 +877,14 @@
                                                             "$assetref": "Vanilla::Assets/sounds/kero_flameout_hard"
                                                         },
                                                         "audio_channel": "Main_3D",
-                                                        "volume": 6.0,
-                                                        "pitch": 1.0,
+                                                        "volume": {
+                                                            "$type": "HSP.Audio.ConstantEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                            "value": 6.0
+                                                        },
+                                                        "pitch": {
+                                                            "$type": "HSP.Audio.ConstantEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                            "value": 1.0
+                                                        },
                                                         "loop": false
                                                     }
                                                 },
@@ -1422,8 +1468,14 @@
                                                             "$assetref": "Vanilla::Assets/sounds/sound_liq8_enhanced"
                                                         },
                                                         "audio_channel": "Main_3D",
-                                                        "volume": 6.0,
-                                                        "pitch": 1.0,
+                                                        "volume": {
+                                                            "$type": "HSP.Audio.ConstantEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                            "value": 6.0
+                                                        },
+                                                        "pitch": {
+                                                            "$type": "HSP.Audio.ConstantEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                            "value": 1.0
+                                                        },
                                                         "loop": false
                                                     },
                                                     "loop_audio": {
@@ -1431,16 +1483,69 @@
                                                         "$id": "4b6c505f-66f7-4f07-beb4-e351d9c4bd0c",
                                                         "shapers": {
                                                             "$type": "HSP.Audio.AudioShaper[], HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                                                            "$id": "787651b7-53a6-45d3-aae5-b01b791a42d7",
                                                             "value": [
+                                                                {
+                                                                    "$type": "HSP.Audio.AudioShaper, HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                                    "getter": {
+                                                                        "$type": "HSP.Audio.FadeInValueGetter, HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                                        "fade_duration": 6,
+                                                                        "loop_fade": false
+                                                                    },
+                                                                    "setter": {
+                                                                        "$type": "HSP.Audio.AudioVolumeSetter, HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+                                                                    }
+                                                                }
                                                             ]
                                                         },
                                                         "audio_clip": {
                                                             "$assetref": "Vanilla::Assets/sounds/kero_loop_hard"
                                                         },
                                                         "audio_channel": "Main_3D",
-                                                        "volume": 6.0,
-                                                        "pitch": 1.0,
+                                                        "volume": {
+                                                            "$type": "HSP.Audio.ConstantEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                            "value": 6.0,
+                                                            "drivers": {
+                                                                "$type": "HSP.Audio.EffectValueDriver`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]][], HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                                "value": [
+                                                                    {
+                                                                        "$type": "HSP.Audio.EffectValueDriver`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                                        "getter": {
+                                                                            "$type": "HSP.Audio.FadeInValueGetter, HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                                            "fade_duration": 6,
+                                                                            "loop_fade": false
+                                                                        },
+                                                                        "curve": {
+                                                                            "$type": "HSP.Audio.MappingCurve`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                                            "interpolator": {
+                                                                                "$type": "HSP.Audio.FloatInterpolator, HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+                                                                            },
+                                                                            "keys": {
+                                                                                "value": [
+                                                                                    {
+                                                                                        "$type": "HSP.Audio.MappingCurve`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]].Keyframe, HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                                                        "t": 0,
+                                                                                        "v": 0,
+                                                                                        "v_in": 0,
+                                                                                        "v_out": 0
+                                                                                    },
+                                                                                    {
+                                                                                        "$type": "HSP.Audio.MappingCurve`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]].Keyframe, HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                                                        "t": 1,
+                                                                                        "v": 1,
+                                                                                        "v_in": 0,
+                                                                                        "v_out": 0
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                ]
+                                                            }
+                                                        },
+                                                        "pitch": {
+                                                            "$type": "HSP.Audio.ConstantEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                            "value": 1.0
+                                                        },
                                                         "loop": true
                                                     },
                                                     "shutdown_audio": {
@@ -1457,8 +1562,14 @@
                                                             "$assetref": "Vanilla::Assets/sounds/kero_flameout_hard"
                                                         },
                                                         "audio_channel": "Main_3D",
-                                                        "volume": 6.0,
-                                                        "pitch": 1.0,
+                                                        "volume": {
+                                                            "$type": "HSP.Audio.ConstantEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                            "value": 6.0
+                                                        },
+                                                        "pitch": {
+                                                            "$type": "HSP.Audio.ConstantEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Audio, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                            "value": 1.0
+                                                        },
                                                         "loop": false
                                                     }
                                                 },
