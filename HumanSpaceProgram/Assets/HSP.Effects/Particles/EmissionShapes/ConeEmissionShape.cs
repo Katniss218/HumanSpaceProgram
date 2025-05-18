@@ -6,7 +6,13 @@ namespace HSP.Effects.Particles.EmissionShapes
 {
     public sealed class ConeEmissionShape : IParticleEffectEmissionShape
     {
-        public ParticleEffectSpawnLocation SpawnFrom { get; set; } = ParticleEffectSpawnLocation.Base;
+        public enum SpawnLocation
+        {
+            Base,
+            Volume
+        }
+
+        public SpawnLocation SpawnFrom { get; set; } = SpawnLocation.Base;
 
         public ConstantEffectValue<float> Radius { get; set; } = new( 1 );
         public ConstantEffectValue<float> Height { get; set; } = null;
@@ -18,8 +24,8 @@ namespace HSP.Effects.Particles.EmissionShapes
             var shape = handle.poolItem.particleSystem.shape;
             shape.shapeType = SpawnFrom switch
             {
-                ParticleEffectSpawnLocation.Base => ParticleSystemShapeType.Cone,
-                ParticleEffectSpawnLocation.Volume => ParticleSystemShapeType.ConeVolume,
+                SpawnLocation.Base => ParticleSystemShapeType.Cone,
+                SpawnLocation.Volume => ParticleSystemShapeType.ConeVolume,
                 _ => throw new ArgumentException( $"Invalid SpawnFrom '{SpawnFrom}'." )
             };
 
@@ -29,7 +35,8 @@ namespace HSP.Effects.Particles.EmissionShapes
                 shape.length = Height.Get();
             if( Angle != null )
                 shape.angle = Angle.Get();
-            // shape.radiusThickness = 1.0f - (InnerAngle.Get() / shape.angle);
+            if( InnerAngle != null )
+                shape.radiusThickness = Mathf.Clamp01( 1.0f - (InnerAngle.Get() / shape.angle) );
         }
 
         public void OnUpdate( ParticleEffectHandle handle )
@@ -42,7 +49,8 @@ namespace HSP.Effects.Particles.EmissionShapes
                 shape.length = Height.Get();
             if( Angle != null )
                 shape.angle = Angle.Get();
-            // shape.radiusThickness = 1.0f - (InnerAngle.Get() / shape.angle);
+            if( InnerAngle != null )
+                shape.radiusThickness = Mathf.Clamp01( 1.0f - (InnerAngle.Get() / shape.angle) );
         }
 
 

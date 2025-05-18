@@ -1,8 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityPlus.Serialization;
-using static HSP.Effects.Particles.ParticleEffectDefinition;
 
 namespace HSP.Effects.Particles
 {
@@ -12,7 +12,7 @@ namespace HSP.Effects.Particles
 
         public void OnUpdate( ParticleEffectHandle handle );
     }
-    
+
     public interface IParticleEffectRenderMode
     {
         public void OnInit( ParticleEffectHandle handle );
@@ -20,10 +20,10 @@ namespace HSP.Effects.Particles
         public void OnUpdate( ParticleEffectHandle handle );
     }
 
-    public enum ParticleEffectSpawnLocation
+    public enum TrailStyle
     {
-        Base,
-        Volume
+        Individual,
+        Connected
     }
 
     public class ParticleEffectDefinition : IParticleEffectData
@@ -81,7 +81,7 @@ namespace HSP.Effects.Particles
             public MinMaxEffectValue<float> AngularSpeed { get; set; } = new( 5.0f, 5.0f ); // rotation over lifetime
             public MinMaxEffectValue<float> Rotation { get; set; } = new( -Mathf.PI, Mathf.PI );
             public MinMaxEffectValue<float> Lifetime { get; set; } = new( 1.0f, 1.0f );
-            public MinMaxEffectValue<Color> Tint { get; set; } = new();
+            public MinMaxEffectValue<Color> Tint { get; set; } = null;
 
             /// <summary>
             /// Adds a constant linear velocity to the particles
@@ -141,7 +141,7 @@ namespace HSP.Effects.Particles
         public sealed class Lifetime
         {
             public MinMaxEffectValue<Vector3> Force { get; set; } = null; // always local space, because scene space is fucked
-            public MinMaxEffectValue<Gradient> Tint { get; set; } = null;
+            public MinMaxEffectValue<Color> Tint { get; set; } = null;
             public MinMaxEffectValue<AnimationCurve> Size { get; set; } = null;
 
 
@@ -156,20 +156,56 @@ namespace HSP.Effects.Particles
         }
         public Lifetime LifetimeValues { get; set; } = null;
 
+        public sealed class Trail
+        {
+            public Material Material { get; set; }
+            public TrailStyle Style { get; set; } = TrailStyle.Individual;
+            public bool InheritTint { get; set; } = false;
+            public bool WidthFromSize { get; set; } = true;
+            public bool LifetimeFromSize { get; set; } = true;
+            public bool DieWithParticle { get; set; } = true;
+            /// <summary>
+            /// Tint gradient along the trail.
+            /// </summary>
+            public ConstantEffectValue<float> TrailFrequency { get; set; } = new( 1.0f );
+            public ConstantEffectValue<float> MinVertexDistance { get; set; } = new( 1f );
+            public MinMaxEffectValue<float> Lifetime { get; set; } = new( 1.0f, 1.0f );
+            public MinMaxEffectValue<float> Width { get; set; } = new( 1f );
+            public MinMaxEffectValue<Color> Tint { get; set; } = null;
+            public MinMaxEffectValue<Color> TintOverLifetime { get; set; } = null;
+
+
+            [MapsInheritingFrom( typeof( Trail ) )]
+            public static SerializationMapping TrailMapping()
+            {
+                return new MemberwiseSerializationMapping<Trail>()
+                    .WithMember( "material", ObjectContext.Asset, t => t.Material )
+                    .WithMember( "style", t => t.Style )
+                    .WithMember( "inherit_tint", t => t.InheritTint )
+                    .WithMember( "width_from_size", t => t.WidthFromSize )
+                    .WithMember( "lifetime_from_size", t => t.LifetimeFromSize )
+                    .WithMember( "die_with_particle", t => t.DieWithParticle )
+                    .WithMember( "trail_frequency", t => t.TrailFrequency )
+                    .WithMember( "min_vertex_distance", t => t.MinVertexDistance )
+                    .WithMember( "lifetime", t => t.Lifetime )
+                    .WithMember( "width", t => t.Width )
+                    .WithMember( "tint", t => t.Tint )
+                    .WithMember( "tint_over_lifetime", t => t.TintOverLifetime );
+            }
+        }
+        public Trail TrailValues { get; set; } = null;
+
 
         public void OnInit( ParticleEffectHandle handle )
         {
             var main = handle.poolItem.main;
             var renderer = handle.poolItem.renderer;
-            var rotationOverLifetime = handle.poolItem.particleSystem.rotationOverLifetime;
-            var velocityOverLifetime = handle.poolItem.particleSystem.velocityOverLifetime;
             var emission = handle.poolItem.particleSystem.emission;
             var shape = handle.poolItem.particleSystem.shape;
 
             handle.TargetTransform = this.TargetTransform;
             main.duration = this.Duration;
 
-            // Renderer
             if( RenderValues != null )
             {
                 RenderValues.RenderMode.OnInit( handle );
@@ -184,12 +220,16 @@ namespace HSP.Effects.Particles
                     renderer.pivot = this.RenderValues.Pivot.Get();
             }
 
-            // Initial
+#warning TODO - add initializers to all of these properties.
+
             if( InitialValues != null )
             {
+                var rotationOverLifetime = handle.poolItem.particleSystem.rotationOverLifetime;
+
                 if( this.InitialValues.Size != null )
                     main.startSize = this.InitialValues.Size.GetMinMaxCurve();
-                //main.startColor = this.InitialValues.Tint.GetMinMaxCurve();
+                if( this.InitialValues.Tint != null )
+                    main.startColor = this.InitialValues.Tint.GetMinMaxGradient();
                 if( this.InitialValues.Lifetime != null )
                     main.startLifetime = this.InitialValues.Lifetime.GetMinMaxCurve();
                 if( this.InitialValues.Rotation != null )
@@ -203,8 +243,12 @@ namespace HSP.Effects.Particles
                 }
                 if( this.InitialValues.AdditionalLinearVelocity != null )
                 {
+                    var velocityOverLifetime = handle.poolItem.particleSystem.velocityOverLifetime;
                     velocityOverLifetime.enabled = true;
-                    //velocityOverLifetime.x = this.InitialValues.AdditionalLinearVelocity.Get();
+                    var (min, max) = this.InitialValues.AdditionalLinearVelocity.Get();
+                    velocityOverLifetime.x = new ParticleSystem.MinMaxCurve( min.x, max.x );
+                    velocityOverLifetime.y = new ParticleSystem.MinMaxCurve( min.y, max.y );
+                    velocityOverLifetime.z = new ParticleSystem.MinMaxCurve( min.z, max.z );
                 }
                 if( this.InitialValues.AdditionalRadialVelocity != null )
                 {
@@ -213,7 +257,6 @@ namespace HSP.Effects.Particles
                 }
             }
 
-            // Emission
             if( EmissionValues != null )
             {
                 main.maxParticles = this.EmissionValues.MaxParticles.Get();
@@ -232,10 +275,61 @@ namespace HSP.Effects.Particles
                 this.EmissionValues.SpawnShape.OnInit( handle );
             }
 
-            // Lifetime
             if( LifetimeValues != null )
             {
+                if( this.LifetimeValues.Force != null )
+                {
+                    var forceOverLifetime = handle.poolItem.particleSystem.forceOverLifetime;
+                    forceOverLifetime.enabled = true;
+                    var (min, max) = this.LifetimeValues.Force.Get();
+                    forceOverLifetime.x = new ParticleSystem.MinMaxCurve( min.x, max.x );
+                    forceOverLifetime.y = new ParticleSystem.MinMaxCurve( min.y, max.y );
+                    forceOverLifetime.z = new ParticleSystem.MinMaxCurve( min.z, max.z );
+                }
+                if( this.LifetimeValues.Tint != null )
+                {
+                    var colorOverLifetime = handle.poolItem.particleSystem.colorOverLifetime;
 
+                    colorOverLifetime.color = this.LifetimeValues.Tint.GetMinMaxGradient();
+                }
+                if( this.LifetimeValues.Size != null )
+                {
+                    var sizeOverLifetime = handle.poolItem.particleSystem.sizeOverLifetime;
+                    var (min, max) = this.LifetimeValues.Size.Get();
+                    sizeOverLifetime.size = new ParticleSystem.MinMaxCurve( 1f, min, max );
+                }
+            }
+
+            if( TrailValues != null )
+            {
+                var trails = handle.poolItem.particleSystem.trails;
+                trails.enabled = true;
+
+                renderer.trailMaterial = this.TrailValues.Material;
+                trails.mode = this.TrailValues.Style switch
+                {
+                    TrailStyle.Individual => ParticleSystemTrailMode.PerParticle,
+                    TrailStyle.Connected => ParticleSystemTrailMode.Ribbon,
+                    _ => throw new ArgumentException( $"Invalid TrailValues.Style '{this.TrailValues.Style}'." )
+                };
+                trails.inheritParticleColor = this.TrailValues.InheritTint;
+                trails.generateLightingData = true;
+                trails.sizeAffectsWidth = this.TrailValues.WidthFromSize;
+                trails.sizeAffectsLifetime = this.TrailValues.LifetimeFromSize;
+                trails.dieWithParticles = this.TrailValues.DieWithParticle;
+
+                if( this.TrailValues.MinVertexDistance != null )
+                    trails.minVertexDistance = this.TrailValues.MinVertexDistance.Get();
+                if( this.TrailValues.TrailFrequency != null )
+                    trails.ratio = this.TrailValues.TrailFrequency.Get();
+                if( this.TrailValues.Lifetime != null )
+                    trails.lifetime = this.TrailValues.Lifetime.GetMinMaxCurve();
+                if( this.TrailValues.Width != null )
+                    trails.widthOverTrail = this.TrailValues.Width.GetMinMaxCurve();
+                if( this.TrailValues.Tint != null )
+                    trails.colorOverTrail = this.TrailValues.Tint.GetMinMaxGradient();
+                if( this.TrailValues.TintOverLifetime != null )
+                    trails.colorOverLifetime = this.TrailValues.TintOverLifetime.GetMinMaxGradient();
             }
         }
 
@@ -243,12 +337,9 @@ namespace HSP.Effects.Particles
         {
             var main = handle.poolItem.main;
             var renderer = handle.poolItem.renderer;
-            var rotationOverLifetime = handle.poolItem.particleSystem.rotationOverLifetime;
-            var velocityOverLifetime = handle.poolItem.particleSystem.velocityOverLifetime;
             var emission = handle.poolItem.particleSystem.emission;
             var shape = handle.poolItem.particleSystem.shape;
 
-            // Renderer
             if( RenderValues != null )
             {
                 RenderValues.RenderMode.OnUpdate( handle );
@@ -256,58 +347,114 @@ namespace HSP.Effects.Particles
                     renderer.pivot = this.RenderValues.Pivot.Get();
             }
 
-            // Initial
             if( InitialValues != null )
             {
-                if( this.InitialValues.Size != null )
+                var rotationOverLifetime = handle.poolItem.particleSystem.rotationOverLifetime;
+
+                if( this.InitialValues.Size?.drivers != null )
                     main.startSize = this.InitialValues.Size.GetMinMaxCurve();
-                //main.startColor = this.InitialValues.Tint.GetMinMaxCurve();
-                if( this.InitialValues.Lifetime != null )
+                if( this.InitialValues.Tint?.drivers != null )
+                    main.startColor = this.InitialValues.Tint.GetMinMaxGradient();
+                if( this.InitialValues.Lifetime?.drivers != null )
                     main.startLifetime = this.InitialValues.Lifetime.GetMinMaxCurve();
-                if( this.InitialValues.Rotation != null )
+                if( this.InitialValues.Rotation?.drivers != null )
                     main.startRotation = this.InitialValues.Rotation.GetMinMaxCurve();
-                if( this.InitialValues.Speed != null )
+                if( this.InitialValues.Speed?.drivers != null )
                     main.startSpeed = this.InitialValues.Speed.GetMinMaxCurve();
-                if( this.InitialValues.AngularSpeed != null )
+                if( this.InitialValues.AngularSpeed?.drivers != null )
                 {
                     rotationOverLifetime.enabled = true;
                     rotationOverLifetime.z = this.InitialValues.AngularSpeed.GetMinMaxCurve();
                 }
-                if( this.InitialValues.AdditionalLinearVelocity != null )
+                if( this.InitialValues.AdditionalLinearVelocity?.drivers != null )
                 {
+                    var velocityOverLifetime = handle.poolItem.particleSystem.velocityOverLifetime;
                     velocityOverLifetime.enabled = true;
-                    //velocityOverLifetime.x = this.InitialValues.AdditionalLinearVelocity.Get();
+                    var (min, max) = this.InitialValues.AdditionalLinearVelocity.Get();
+                    velocityOverLifetime.x = new ParticleSystem.MinMaxCurve( min.x, max.x );
+                    velocityOverLifetime.y = new ParticleSystem.MinMaxCurve( min.y, max.y );
+                    velocityOverLifetime.z = new ParticleSystem.MinMaxCurve( min.z, max.z );
                 }
-                if( this.InitialValues.AdditionalRadialVelocity != null )
+                if( this.InitialValues.AdditionalRadialVelocity?.drivers != null )
                 {
                     rotationOverLifetime.enabled = true;
                     rotationOverLifetime.z = this.InitialValues.AngularSpeed.GetMinMaxCurve();
                 }
             }
 
-            // Emission
             if( EmissionValues != null )
             {
-                main.maxParticles = this.EmissionValues.MaxParticles.Get();
-                if( this.EmissionValues.SpawnRate != null )
+                if( this.EmissionValues.MaxParticles?.drivers != null )
+                    main.maxParticles = this.EmissionValues.MaxParticles.Get();
+                if( this.EmissionValues.SpawnRate?.drivers != null )
                     emission.rateOverTime = this.EmissionValues.SpawnRate.GetMinMaxCurve();
-                if( this.EmissionValues.Position != null )
+                if( this.EmissionValues.Position?.drivers != null )
                     shape.position = this.EmissionValues.Position.Get();
-                if( this.EmissionValues.Rotation != null )
+                if( this.EmissionValues.Rotation?.drivers != null )
                     shape.rotation = this.EmissionValues.Rotation.Get().eulerAngles;
-                if( this.EmissionValues.SpawnRate != null )
+                if( this.EmissionValues.SpawnRate?.drivers != null )
                     emission.rateOverTime = this.EmissionValues.SpawnRate.GetMinMaxCurve();
-                if( this.EmissionValues.RandomPosition != null )
+                if( this.EmissionValues.RandomPosition?.drivers != null )
                     shape.randomPositionAmount = this.EmissionValues.RandomPosition.Get();
-                if( this.EmissionValues.RandomDirection != null )
+                if( this.EmissionValues.RandomDirection?.drivers != null )
                     shape.randomDirectionAmount = this.EmissionValues.RandomDirection.Get();
                 this.EmissionValues.SpawnShape.OnInit( handle );
             }
 
-            // Lifetime
             if( LifetimeValues != null )
             {
+                if( this.LifetimeValues.Force?.drivers != null )
+                {
+                    var forceOverLifetime = handle.poolItem.particleSystem.forceOverLifetime;
+                    forceOverLifetime.enabled = true;
+                    var (min, max) = this.LifetimeValues.Force.Get();
+                    forceOverLifetime.x = new ParticleSystem.MinMaxCurve( min.x, max.x );
+                    forceOverLifetime.y = new ParticleSystem.MinMaxCurve( min.y, max.y );
+                    forceOverLifetime.z = new ParticleSystem.MinMaxCurve( min.z, max.z );
+                }
+                if( this.LifetimeValues.Tint?.drivers != null )
+                {
+                    var colorOverLifetime = handle.poolItem.particleSystem.colorOverLifetime;
 
+                    colorOverLifetime.color = this.LifetimeValues.Tint.GetMinMaxGradient();
+                }
+                if( this.LifetimeValues.Size?.drivers != null )
+                {
+                    var sizeOverLifetime = handle.poolItem.particleSystem.sizeOverLifetime;
+                    var (min, max) = this.LifetimeValues.Size.Get();
+                    sizeOverLifetime.size = new ParticleSystem.MinMaxCurve( 1f, min, max );
+                }
+            }
+
+            if( TrailValues != null )
+            {
+                var trails = handle.poolItem.particleSystem.trails;
+
+                renderer.trailMaterial = this.TrailValues.Material;
+                trails.mode = this.TrailValues.Style switch
+                {
+                    TrailStyle.Individual => ParticleSystemTrailMode.PerParticle,
+                    TrailStyle.Connected => ParticleSystemTrailMode.Ribbon,
+                    _ => throw new ArgumentException( $"Invalid TrailValues.Style '{this.TrailValues.Style}'." )
+                };
+                trails.inheritParticleColor = this.TrailValues.InheritTint;
+                trails.generateLightingData = true;
+                trails.sizeAffectsWidth = this.TrailValues.WidthFromSize;
+                trails.sizeAffectsLifetime = this.TrailValues.LifetimeFromSize;
+                trails.dieWithParticles = this.TrailValues.DieWithParticle;
+
+                if( this.TrailValues.MinVertexDistance?.drivers != null )
+                    trails.minVertexDistance = this.TrailValues.MinVertexDistance.Get();
+                if( this.TrailValues.TrailFrequency?.drivers != null )
+                    trails.ratio = this.TrailValues.TrailFrequency.Get();
+                if( this.TrailValues.Lifetime?.drivers != null )
+                    trails.lifetime = this.TrailValues.Lifetime.GetMinMaxCurve();
+                if( this.TrailValues.Width?.drivers != null )
+                    trails.widthOverTrail = this.TrailValues.Width.GetMinMaxCurve();
+                if( this.TrailValues.Tint?.drivers != null )
+                    trails.colorOverTrail = this.TrailValues.Tint.GetMinMaxGradient();
+                if( this.TrailValues.TintOverLifetime?.drivers != null )
+                    trails.colorOverLifetime = this.TrailValues.TintOverLifetime.GetMinMaxGradient();
             }
         }
 
@@ -318,17 +465,20 @@ namespace HSP.Effects.Particles
         {
             return new MemberwiseSerializationMapping<ParticleEffectDefinition>()
                 .WithMember( "render", o => o.RenderValues )
+                .WithMember( "duration", o => o.Duration )
                 .WithMember( "loop", o => o.Loop )
                 .WithMember( "target_transform", o => o.TargetTransform )
                 //.WithMember( "simulation_space", o => o.SimulationSpace )
 
                 .WithMember( "initial", o => o.InitialValues )
                 .WithMember( "emission", o => o.EmissionValues )
-                .WithMember( "lifetime", o => o.LifetimeValues );
+                .WithMember( "lifetime", o => o.LifetimeValues )
+                .WithMember( "trails", o => o.TrailValues );
         }
     }
 
-    public static class A {
+    public static class A
+    {
 
         public static ParticleSystem.MinMaxCurve GetMinMaxCurve( this ConstantEffectValue<float> value )
         {
@@ -339,6 +489,17 @@ namespace HSP.Effects.Particles
         {
             var minMax = value.Get();
             return new ParticleSystem.MinMaxCurve( minMax.min, minMax.max );
+        }
+
+        public static ParticleSystem.MinMaxGradient GetMinMaxGradient( this ConstantEffectValue<Color> value )
+        {
+            return new ParticleSystem.MinMaxGradient( value.Get() );
+        }
+
+        public static ParticleSystem.MinMaxGradient GetMinMaxGradient( this MinMaxEffectValue<Color> value )
+        {
+            var minMax = value.Get();
+            return new ParticleSystem.MinMaxGradient( minMax.min, minMax.max );
         }
     }
 }

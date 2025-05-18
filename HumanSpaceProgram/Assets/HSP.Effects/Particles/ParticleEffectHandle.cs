@@ -1,6 +1,5 @@
-﻿using HSP.Effects.Audio;
+﻿using System;
 using System.Runtime.CompilerServices;
-using System;
 using UnityEngine;
 
 namespace HSP.Effects.Particles

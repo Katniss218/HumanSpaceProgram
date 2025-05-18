@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityPlus.Serialization;
 
 namespace HSP.Effects.Audio
@@ -52,16 +51,24 @@ namespace HSP.Effects.Audio
 
             // Set non-driven properties first. Properties might need to initialize.
 
-            this.Volume.OnInit( handle );
-            handle.Volume = this.Volume.Get();
-            this.Pitch.OnInit( handle );
-            handle.Pitch = this.Pitch.Get();
+            if( this.Volume != null )
+            {
+                this.Volume.OnInit( handle );
+                handle.Volume = this.Volume.Get();
+            }
+            if( this.Pitch != null )
+            {
+                this.Pitch.OnInit( handle );
+                handle.Pitch = this.Pitch.Get();
+            }
         }
 
         public void OnUpdate( AudioEffectHandle handle )
         {
-            handle.Volume = this.Volume.Get();
-            handle.Pitch = this.Pitch.Get();
+            if( this.Volume?.drivers != null )
+                handle.Volume = this.Volume.Get();
+            if( this.Pitch?.drivers != null )
+                handle.Pitch = this.Pitch.Get();
         }
 
         [MapsInheritingFrom( typeof( AudioEffectDefinition ) )]

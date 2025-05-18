@@ -888,13 +888,13 @@
                                                         "initial": {
                                                             "size": {
                                                                 "$type": "HSP.Effects.MinMaxEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                                                                "min": 2.0,
+                                                                "min": 1.5,
                                                                 "max": 3.0
                                                             },
                                                             "speed": {
                                                                 "$type": "HSP.Effects.MinMaxEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                                                                "min": 25.0,
-                                                                "max": 35.0
+                                                                "min": 55.0,
+                                                                "max": 77.0
                                                             },
                                                             "angular_speed": {
                                                                 "$type": "HSP.Effects.MinMaxEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
@@ -903,18 +903,42 @@
                                                             },
                                                             "lifetime": {
                                                                 "$type": "HSP.Effects.MinMaxEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                                                                "min": 0.7,
-                                                                "max": 1.0
+                                                                "min": 0.4,
+                                                                "max": 0.5
+                                                            },
+                                                            "tint": {
+                                                                "$type": "HSP.Effects.MinMaxEffectValue`1[[UnityEngine.Color, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                                "min": {
+                                                                    "r": 1,
+                                                                    "g": 1,
+                                                                    "b": 1,
+                                                                    "a": 0.5
+                                                                },
+                                                                "max": {
+                                                                    "r": 1,
+                                                                    "g": 1,
+                                                                    "b": 1,
+                                                                    "a": 0.3
+                                                                }
                                                             }
                                                         },
                                                         "emission": {
                                                             "position": {
                                                                 "$type": "HSP.Effects.ConstantEffectValue`1[[UnityEngine.Vector3, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                                                                "value": [ 0, 0, -0.5 ]
+                                                                "value": [
+                                                                    0,
+                                                                    0,
+                                                                    0
+                                                                ]
                                                             },
                                                             "rotation": {
                                                                 "$type": "HSP.Effects.ConstantEffectValue`1[[UnityEngine.Quaternion, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                                                                "value": [ -1, 0, 0, 0 ]
+                                                                "value": [
+                                                                    -1,
+                                                                    0,
+                                                                    0,
+                                                                    0
+                                                                ]
                                                             },
                                                             "spawn_shape": {
                                                                 "$type": "HSP.Effects.Particles.EmissionShapes.ConeEmissionShape, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
@@ -930,9 +954,16 @@
                                                             },
                                                             "spawn_rate": {
                                                                 "$type": "HSP.Effects.MinMaxEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                                                                "min": 40.0,
-                                                                "max": 80.0
+                                                                "min": 30.0,
+                                                                "max": 30.0
                                                             }
+                                                        },
+                                                        "lifetime": null,
+                                                        "trails": {
+                                                            "material": {
+                                                                "$assetref": "Vanilla::Assets/testparticle"
+                                                            },
+                                                            "frequency": 0.3333
                                                         }
                                                     }
                                                 },
@@ -1614,13 +1645,13 @@
                                                         "initial": {
                                                             "size": {
                                                                 "$type": "HSP.Effects.MinMaxEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                                                                "min": 2.0,
+                                                                "min": 1.5,
                                                                 "max": 3.0
                                                             },
                                                             "speed": {
                                                                 "$type": "HSP.Effects.MinMaxEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                                                                "min": 25.0,
-                                                                "max": 35.0
+                                                                "min": 55.0,
+                                                                "max": 77.0
                                                             },
                                                             "angular_speed": {
                                                                 "$type": "HSP.Effects.MinMaxEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
@@ -1629,18 +1660,42 @@
                                                             },
                                                             "lifetime": {
                                                                 "$type": "HSP.Effects.MinMaxEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                                                                "min": 0.7,
-                                                                "max": 1.0
+                                                                "min": 0.4,
+                                                                "max": 0.5
+                                                            },
+                                                            "tint": {
+                                                                "$type": "HSP.Effects.MinMaxEffectValue`1[[UnityEngine.Color, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                                "min": {
+                                                                    "r": 1,
+                                                                    "g": 1,
+                                                                    "b": 1,
+                                                                    "a": 0.5
+                                                                },
+                                                                "max": {
+                                                                    "r": 1,
+                                                                    "g": 1,
+                                                                    "b": 1,
+                                                                    "a": 0.3
+                                                                }
                                                             }
                                                         },
                                                         "emission": {
                                                             "position": {
                                                                 "$type": "HSP.Effects.ConstantEffectValue`1[[UnityEngine.Vector3, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                                                                "value": [ 0, 0, -0.5 ]
+                                                                "value": [
+                                                                    0,
+                                                                    0,
+                                                                    0
+                                                                ]
                                                             },
                                                             "rotation": {
                                                                 "$type": "HSP.Effects.ConstantEffectValue`1[[UnityEngine.Quaternion, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                                                                "value": [ -1, 0, 0, 0 ]
+                                                                "value": [
+                                                                    -1,
+                                                                    0,
+                                                                    0,
+                                                                    0
+                                                                ]
                                                             },
                                                             "spawn_shape": {
                                                                 "$type": "HSP.Effects.Particles.EmissionShapes.ConeEmissionShape, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
@@ -1656,9 +1711,16 @@
                                                             },
                                                             "spawn_rate": {
                                                                 "$type": "HSP.Effects.MinMaxEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                                                                "min": 40.0,
-                                                                "max": 80.0
+                                                                "min": 30.0,
+                                                                "max": 30.0
                                                             }
+                                                        },
+                                                        "lifetime": null,
+                                                        "trails": {
+                                                            "material": {
+                                                                "$assetref": "Vanilla::Assets/testparticle"
+                                                            },
+                                                            "frequency": 0.3333
                                                         }
                                                     }
                                                 },
