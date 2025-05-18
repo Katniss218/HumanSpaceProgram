@@ -39,8 +39,7 @@ namespace HSP.Vanilla.Effects
 
         void OnIgnite()
         {
-            // TODO - play exhaust fx
-            Transform t = this.transform;
+            Transform t = Engine.ThrustTransform;
             if( IgnitionSystem != null && IgnitionSystem.TargetTransform == null )
                 IgnitionSystem.TargetTransform = t;
             if( LoopSystem != null && LoopSystem.TargetTransform == null )
@@ -61,7 +60,7 @@ namespace HSP.Vanilla.Effects
 
         void OnShutdown()
         {
-            Transform t = this.transform;
+            Transform t = Engine.ThrustTransform;
             if( IgnitionSystem != null && IgnitionSystem.TargetTransform == null )
                 IgnitionSystem.TargetTransform = t;
             if( LoopSystem != null && LoopSystem.TargetTransform == null )

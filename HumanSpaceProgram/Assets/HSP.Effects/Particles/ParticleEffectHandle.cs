@@ -10,6 +10,9 @@ namespace HSP.Effects.Particles
         private readonly int _version;
         private readonly ParticleEffectPoolItem _poolItem;
 
+        // Expose internally so we don't have to expose every property here again and add essentially duplicated code.
+        internal ParticleEffectPoolItem poolItem => _poolItem;
+
         internal ParticleEffectHandle( ParticleEffectPoolItem poolItem )
         {
             _poolItem = poolItem;
@@ -60,9 +63,6 @@ namespace HSP.Effects.Particles
             }
         }
 
-        /// <summary>
-        /// The audio clip that the audio handle is currently using.
-        /// </summary>
         public float Size
         {
             get

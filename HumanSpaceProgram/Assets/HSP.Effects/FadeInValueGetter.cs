@@ -1,9 +1,11 @@
-﻿using UnityEngine;
+﻿using HSP.Effects.Audio;
+using HSP.Effects.Particles;
+using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace HSP.Effects.Audio
+namespace HSP.Effects
 {
-    public sealed class FadeInValueGetter : IValueGetter<float>, IInitValueGetter<AudioEffectHandle>
+    public sealed class FadeInValueGetter : IValueGetter<float>, IInitValueGetter<AudioEffectHandle>, IInitValueGetter<ParticleEffectHandle>
     {
         public float FadeDuration { get; }
 
@@ -21,6 +23,12 @@ namespace HSP.Effects.Audio
         {
             _startPlaybackTime = UnityEngine.Time.time;
             _clipLength = handle.Clip.length;
+        }
+        
+        public void OnInit( ParticleEffectHandle handle )
+        {
+            _startPlaybackTime = UnityEngine.Time.time;
+            _clipLength = handle.poolItem.main.duration;
         }
 
         public float Get()

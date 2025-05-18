@@ -67,9 +67,6 @@ namespace HSP.Vanilla.Effects
 
         void OnIgnite()
         {
-            if( Engine == null )
-                return;
-
             Transform t = this.transform;
             if( IgnitionAudio != null && IgnitionAudio.TargetTransform == null )
                 IgnitionAudio.TargetTransform = t;
@@ -91,9 +88,6 @@ namespace HSP.Vanilla.Effects
 
         void OnShutdown()
         {
-            if( Engine == null )
-                return;
-
             Transform t = this.transform;
             if( IgnitionAudio != null && IgnitionAudio.TargetTransform == null )
                 IgnitionAudio.TargetTransform = t;

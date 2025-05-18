@@ -23,9 +23,15 @@ namespace HSP.Effects.Particles
         internal int version;
         internal ParticleEffectHandle currentHandle; // kind of singleton (per pool item) with the handle management.
 
+        // Expose internally so we don't have to expose every property here again and add essentially duplicated code.
+        internal ParticleSystem particleSystem => _particleSystem;
+        internal ParticleSystem.MainModule main => _main;
+        internal ParticleSystemRenderer renderer => _renderer;
+
         private ParticleSystem _particleSystem;
         private ParticleSystem.MainModule _main;
         private ParticleSystemRenderer _renderer;
+
         private float _timeWhenFinished;
         private IParticleEffectData _data;
 
@@ -64,6 +70,7 @@ namespace HSP.Effects.Particles
             _main = _particleSystem.main;
             _renderer = this.GetComponent<ParticleSystemRenderer>();
             _main.playOnAwake = false;
+            _particleSystem.Stop();
         }
 
         void Update()
@@ -72,7 +79,9 @@ namespace HSP.Effects.Particles
                 return;
 
             if( TargetTransform != null )
-                this.transform.position = TargetTransform.position;
+            {
+                this.transform.SetPositionAndRotation( TargetTransform.position, TargetTransform.rotation );
+            }
 
             _data.OnUpdate( this.currentHandle );
 

@@ -1,6 +1,7 @@
-﻿using UnityPlus.Serialization;
+﻿using HSP.Effects.Audio;
+using UnityPlus.Serialization;
 
-namespace HSP.Effects.Audio
+namespace HSP.Effects
 {
     public sealed class FadeOutValueGetter : IValueGetter<float>, IInitValueGetter<AudioEffectHandle>
     {

@@ -10,6 +10,7 @@ namespace HSP.Vanilla.Components
 {
     public interface IPropulsion
     {
+        public Transform ThrustTransform { get; }
         float Thrust { get; }
         float MaxThrust { get; }
 

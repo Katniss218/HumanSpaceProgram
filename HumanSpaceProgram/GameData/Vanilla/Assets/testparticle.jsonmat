@@ -82,7 +82,7 @@
             },
             {
                 "key": "_DstBlend",
-                "value": 10
+                "value": 1
             },
             {
                 "key": "_BlendOp",
