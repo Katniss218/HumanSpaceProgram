@@ -1,5 +1,4 @@
-﻿using HSP.Effects.Audio;
-using HSP.Effects.Particles;
+﻿using HSP.Effects;
 using HSP.Vanilla.Components;
 using UnityEngine;
 using UnityPlus.Serialization;
@@ -10,13 +9,13 @@ namespace HSP.Vanilla.Effects
     {
         public IPropulsion Engine;
 
-        public ParticleEffectDefinition IgnitionSystem;
-        public ParticleEffectDefinition LoopSystem;
-        public ParticleEffectDefinition ShutdownSystem;
+        public IEffectData IgnitionSystem;
+        public IEffectData LoopSystem;
+        public IEffectData ShutdownSystem;
 
-        ParticleEffectHandle _ignitionHandle;
-        ParticleEffectHandle _loopHandle;
-        ParticleEffectHandle _shutdownHandle;
+        IEffectHandle _ignitionHandle;
+        IEffectHandle _loopHandle;
+        IEffectHandle _shutdownHandle;
 
         void OnEnable()
         {
@@ -46,15 +45,15 @@ namespace HSP.Vanilla.Effects
             if( ShutdownSystem != null && ShutdownSystem.TargetTransform == null )
                 ShutdownSystem.TargetTransform = t;
 
-            _ignitionHandle.TryStop();
+            _ignitionHandle?.TryStop();
             if( IgnitionSystem != null )
-                _ignitionHandle = ParticleEffectManager.Play( IgnitionSystem );
+                _ignitionHandle = IgnitionSystem.Play();
 
-            _loopHandle.TryStop();
+            _loopHandle?.TryStop();
             if( LoopSystem != null )
-                _loopHandle = ParticleEffectManager.Play( LoopSystem );
+                _loopHandle = LoopSystem.Play();
 
-            _shutdownHandle.TryStop();
+            _shutdownHandle?.TryStop();
         }
 
         void OnShutdown()
@@ -67,13 +66,13 @@ namespace HSP.Vanilla.Effects
             if( ShutdownSystem != null && ShutdownSystem.TargetTransform == null )
                 ShutdownSystem.TargetTransform = t;
 
-            _ignitionHandle.TryStop();
+            _ignitionHandle?.TryStop();
 
-            _loopHandle.TryStop();
+            _loopHandle?.TryStop();
 
-            _shutdownHandle.TryStop();
+            _shutdownHandle?.TryStop();
             if( ShutdownSystem != null )
-                _shutdownHandle = ParticleEffectManager.Play( ShutdownSystem );
+                _shutdownHandle = ShutdownSystem.Play();
         }
 
 

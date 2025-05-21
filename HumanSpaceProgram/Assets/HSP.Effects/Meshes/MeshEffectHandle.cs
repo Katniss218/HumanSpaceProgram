@@ -2,17 +2,17 @@
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
-namespace HSP.Effects.Particles
+namespace HSP.Effects.Meshes
 {
-    public readonly struct ParticleEffectHandle : IEffectHandle
+    /// <summary>
+    /// Represents an audio that has been prepared to play, and/or may be currently playing.
+    /// </summary>
+    public readonly struct MeshEffectHandle : IEffectHandle
     {
         private readonly int _version;
-        private readonly ParticleEffectPoolItem _poolItem;
+        private readonly MeshEffectPoolItem _poolItem;
 
-        // Expose internally so we don't have to expose every property here again and add essentially duplicated code.
-        internal ParticleEffectPoolItem poolItem => _poolItem;
-
-        internal ParticleEffectHandle( ParticleEffectPoolItem poolItem )
+        internal MeshEffectHandle( MeshEffectPoolItem poolItem )
         {
             _poolItem = poolItem;
             _version = poolItem.version;
@@ -23,7 +23,7 @@ namespace HSP.Effects.Particles
         {
             // Null check because the _poolItem might've been destroyyed for whatever reason.
             if( _poolItem == null || _version != _poolItem.version )
-                throw new ObjectDisposedException( nameof( ParticleEffectHandle ), $"The {nameof( ParticleEffectPoolItem )} backing the {nameof( ParticleEffectHandle )} has been disposed or reused and is no longer valid for this handle." );
+                throw new ObjectDisposedException( nameof( MeshEffectHandle ), $"The {nameof( MeshEffectPoolItem )} backing the {nameof( MeshEffectHandle )} has been disposed or reused and is no longer valid for this handle." );
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
@@ -61,36 +61,6 @@ namespace HSP.Effects.Particles
                 _poolItem.TargetTransform = value;
             }
         }
-
-        public float Size
-        {
-            get
-            {
-                EnsureValid();
-                return _poolItem.Size;
-            }
-            set
-            {
-                EnsureValid();
-                _poolItem.Size = value;
-            }
-        }
-
-        public Material Material
-        {
-            get
-            {
-                EnsureValid();
-                return _poolItem.Material;
-            }
-            set
-            {
-                EnsureValid();
-                _poolItem.Material = value;
-            }
-        }
-
-
 
         //
         //  Playback controls

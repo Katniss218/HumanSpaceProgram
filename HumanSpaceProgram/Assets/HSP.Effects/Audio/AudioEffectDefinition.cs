@@ -49,8 +49,6 @@ namespace HSP.Effects.Audio
             handle.Channel = this.Channel;
             handle.TargetTransform = this.TargetTransform;
 
-            // Set non-driven properties first. Properties might need to initialize.
-
             if( this.Volume != null )
             {
                 this.Volume.OnInit( handle );
@@ -75,12 +73,16 @@ namespace HSP.Effects.Audio
         public static SerializationMapping AudioEffectDefinitionMapping()
         {
             return new MemberwiseSerializationMapping<AudioEffectDefinition>()
-                // .WithMember( "shapers", o => o.Shapers )
                 .WithMember( "audio_clip", ObjectContext.Asset, o => o.Clip )
                 .WithMember( "audio_channel", o => o.Channel )
                 .WithMember( "volume", o => o.Volume )
                 .WithMember( "pitch", o => o.Pitch )
                 .WithMember( "loop", o => o.Loop );
+        }
+
+        public IEffectHandle Play()
+        {
+            return AudioEffectManager.Play( this );
         }
     }
 }

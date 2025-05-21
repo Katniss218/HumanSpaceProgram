@@ -475,6 +475,11 @@ namespace HSP.Effects.Particles
                 .WithMember( "lifetime", o => o.LifetimeValues )
                 .WithMember( "trails", o => o.TrailValues );
         }
+
+        public IEffectHandle Play()
+        {
+            return ParticleEffectManager.Play( this );
+        }
     }
 
     public static class A

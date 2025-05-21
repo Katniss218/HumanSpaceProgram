@@ -13,7 +13,7 @@ namespace HSP.Effects.Particles
         }
 
 
-        internal ParticleEffectState State { get; private set; } = ParticleEffectState.Ready;
+        internal ObjectPoolItemState State { get; private set; } = ObjectPoolItemState.Ready;
 
         private CachedEntry[] _cachedEntriesWithoutDrivers; // set only on init
         private CachedEntry[] _cachedEntriesWithDrivers; // set in update, or whenever the value changed.
@@ -75,7 +75,7 @@ namespace HSP.Effects.Particles
 
         void Update()
         {
-            if( State == ParticleEffectState.Finished || State == ParticleEffectState.Ready )
+            if( State == ObjectPoolItemState.Finished || State == ObjectPoolItemState.Ready )
                 return;
 
             if( TargetTransform != null )
@@ -93,7 +93,7 @@ namespace HSP.Effects.Particles
 
         private void ResetState()
         {
-            State = ParticleEffectState.Ready;
+            State = ObjectPoolItemState.Ready;
             _particleSystem.time = 0.0f;
         }
 
@@ -109,13 +109,13 @@ namespace HSP.Effects.Particles
 
             _particleSystem.Play();
 
-            State = ParticleEffectState.Playing;
+            State = ObjectPoolItemState.Playing;
         }
 
         private void SetState_Finished()
         {
             _particleSystem.Stop();
-            State = ParticleEffectState.Finished;
+            State = ObjectPoolItemState.Finished;
             gameObject.SetActive( false ); // Disables the gameobject to stop empty update calls and other processing.
         }
 
@@ -130,16 +130,16 @@ namespace HSP.Effects.Particles
 
         internal void Play()
         {
-            if( State != ParticleEffectState.Ready )
-                throw new InvalidOperationException( $"Particles can only be played when in the {nameof( ParticleEffectState.Ready )} state." );
+            if( State != ObjectPoolItemState.Ready )
+                throw new InvalidOperationException( $"Particles can only be played when in the {nameof( ObjectPoolItemState.Ready )} state." );
 
             SetState_Playing();
         }
 
         internal void Stop()
         {
-            if( State != ParticleEffectState.Playing )
-                throw new InvalidOperationException( $"Particles can only be stopped when in the {nameof( ParticleEffectState.Playing )} state." );
+            if( State != ObjectPoolItemState.Playing )
+                throw new InvalidOperationException( $"Particles can only be stopped when in the {nameof( ObjectPoolItemState.Playing )} state." );
 
             _particleSystem.Stop();
             _timeWhenFinished = UnityEngine.Time.time + _main.duration;

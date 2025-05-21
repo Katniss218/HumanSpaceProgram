@@ -11,7 +11,7 @@ namespace HSP.Effects.Audio
 
         internal AudioClip Clip { get => _audioSource.clip; set => _audioSource.clip = value; }
 
-        internal AudioEffectState State { get; private set; }
+        internal ObjectPoolItemState State { get; private set; } = ObjectPoolItemState.Ready;
 
         internal float Volume
         {
@@ -61,7 +61,7 @@ namespace HSP.Effects.Audio
 
         void Update()
         {
-            if( State == AudioEffectState.Finished || State == AudioEffectState.Ready )
+            if( State == ObjectPoolItemState.Finished || State == ObjectPoolItemState.Ready )
                 return;
 
             if( TargetTransform != null )
@@ -77,7 +77,7 @@ namespace HSP.Effects.Audio
 
         private void ResetState()
         {
-            State = AudioEffectState.Ready;
+            State = ObjectPoolItemState.Ready;
             _audioSource.time = 0.0f;
         }
 
@@ -93,13 +93,13 @@ namespace HSP.Effects.Audio
 
             _audioSource.Play();
 
-            State = AudioEffectState.Playing;
+            State = ObjectPoolItemState.Playing;
         }
 
         private void SetState_Finished()
         {
             _audioSource.Stop();
-            State = AudioEffectState.Finished;
+            State = ObjectPoolItemState.Finished;
             gameObject.SetActive( false ); // Disables the gameobject to stop empty update calls and other processing.
         }
 
@@ -114,16 +114,16 @@ namespace HSP.Effects.Audio
 
         internal void Play()
         {
-            if( State != AudioEffectState.Ready )
-                throw new InvalidOperationException( $"Audio can only be played when in the {nameof( AudioEffectState.Ready )} state." );
+            if( State != ObjectPoolItemState.Ready )
+                throw new InvalidOperationException( $"Audio can only be played when in the {nameof( ObjectPoolItemState.Ready )} state." );
 
             SetState_Playing();
         }
 
         internal void Stop()
         {
-            if( State != AudioEffectState.Playing )
-                throw new InvalidOperationException( $"Audio can only be stopped when in the {nameof( AudioEffectState.Playing )} state." );
+            if( State != ObjectPoolItemState.Playing )
+                throw new InvalidOperationException( $"Audio can only be stopped when in the {nameof( ObjectPoolItemState.Playing )} state." );
 
             SetState_Finished();
         }

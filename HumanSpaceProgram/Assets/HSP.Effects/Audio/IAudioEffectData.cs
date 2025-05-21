@@ -1,8 +1,8 @@
-﻿namespace HSP.Effects.Audio
+﻿using HSP.Effects;
+
+namespace HSP.Effects.Audio
 {
-    public interface IAudioEffectData
+    public interface IAudioEffectData : IEffectData<AudioEffectHandle>
     {
-        void OnInit( AudioEffectHandle handle );
-        void OnUpdate( AudioEffectHandle handle );
     }
 }

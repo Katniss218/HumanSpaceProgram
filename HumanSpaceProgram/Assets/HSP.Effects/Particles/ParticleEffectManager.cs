@@ -22,7 +22,7 @@ namespace HSP.Effects.Particles
             {
                 i.SetParticleData( data );
             },
-            i => i.State == ParticleEffectState.Finished );
+            i => i.State == ObjectPoolItemState.Finished );
 
         public static ParticleEffectHandle Prepare( IParticleEffectData data )
         {

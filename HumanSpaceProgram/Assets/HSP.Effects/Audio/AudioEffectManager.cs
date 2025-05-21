@@ -5,6 +5,9 @@ using UnityPlus.AssetManagement;
 
 namespace HSP.Effects.Audio
 {
+    /// <summary>
+    /// Audio Effects play audio clips. It's quite broad and simple really.
+    /// </summary>
     public class AudioEffectManager : SingletonMonoBehaviour<AudioEffectManager>
     {
         static AudioMixer _audioMixer;
@@ -28,7 +31,7 @@ namespace HSP.Effects.Audio
             {
                 i.SetAudioData( data );
             },
-            i => i.State == AudioEffectState.Finished );
+            i => i.State == ObjectPoolItemState.Finished );
 
         // The earth moves, so 'position'-based audio will soon get out of range, unless its pinned to something.
         // We can't use absolute position, or scene position for those reasons. Everything in 3D should be pinned to something else, possibly with an offset.

@@ -1,5 +1,4 @@
-﻿using HSP.Effects.Particles;
-using System;
+﻿using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
@@ -8,7 +7,7 @@ namespace HSP.Effects.Audio
     /// <summary>
     /// Represents an audio that has been prepared to play, and/or may be currently playing.
     /// </summary>
-    public readonly struct AudioEffectHandle
+    public readonly struct AudioEffectHandle : IEffectHandle
     {
         private readonly int _version;
         private readonly AudioEffectPoolItem _poolItem;
@@ -37,7 +36,7 @@ namespace HSP.Effects.Audio
         /// <summary>
         /// The state that the audio handle is currently in.
         /// </summary>
-        public AudioEffectState State
+        public ObjectPoolItemState State
         {
             get
             {
@@ -159,6 +158,24 @@ namespace HSP.Effects.Audio
         {
             EnsureValid();
             _poolItem.Stop();
+        }
+
+        public bool TryPlay()
+        {
+            if( !this.IsValid() || this.State != ObjectPoolItemState.Ready )
+                return false;
+
+            this.Play();
+            return true;
+        }
+
+        public bool TryStop()
+        {
+            if( !this.IsValid() || this.State != ObjectPoolItemState.Playing )
+                return false;
+
+            this.Stop();
+            return true;
         }
     }
 }

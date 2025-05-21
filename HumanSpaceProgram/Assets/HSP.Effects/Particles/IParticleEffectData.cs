@@ -1,8 +1,6 @@
 ﻿namespace HSP.Effects.Particles
 {
-    public interface IParticleEffectData
+    public interface IParticleEffectData : IEffectData<ParticleEffectHandle>
     {
-        void OnInit( ParticleEffectHandle handle );
-        void OnUpdate( ParticleEffectHandle handle );
     }
 }
