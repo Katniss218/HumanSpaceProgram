@@ -34,7 +34,6 @@ namespace HSP.Effects.Particles.EmissionShapes
 
         public void OnUpdate( ParticleEffectHandle handle )
         {
-            var shape = handle.poolItem.particleSystem.shape;
         }
 
         [MapsInheritingFrom( typeof( MeshRendererEmissionShape ) )]

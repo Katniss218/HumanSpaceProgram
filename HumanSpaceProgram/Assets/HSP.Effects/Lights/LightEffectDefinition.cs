@@ -18,10 +18,15 @@ namespace HSP.Effects.Lights
         public void OnInit( LightEffectHandle handle )
         {
             handle.TargetTransform = this.TargetTransform;
+
+            if( this.Intensity != null )
+                handle.Intensity = this.Intensity.Get();
         }
 
         public void OnUpdate( LightEffectHandle handle )
         {
+            if( this.Intensity != null && this.Intensity.drivers != null )
+                handle.Intensity = this.Intensity.Get();
         }
 
         [MapsInheritingFrom( typeof( LightEffectHandle ) )]

@@ -19,7 +19,7 @@ namespace HSP.Effects.Lights
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        private void EnsureValid()
+        public void EnsureValid()
         {
             // Null check because the _poolItem might've been destroyyed for whatever reason.
             if( _poolItem == null || _version != _poolItem.version )
@@ -61,6 +61,77 @@ namespace HSP.Effects.Lights
                 _poolItem.TargetTransform = value;
             }
         }
+
+        public LightType Type
+        {
+            get
+            {
+                EnsureValid();
+                return _poolItem.light.type;
+            }
+            set
+            {
+                EnsureValid();
+                _poolItem.light.type = value;
+            }
+        }
+
+        public float Intensity
+        {
+            get
+            {
+                EnsureValid();
+                return _poolItem.light.intensity;
+            }
+            set
+            {
+                EnsureValid();
+                _poolItem.light.intensity = value;
+            }
+        }
+
+        public float Range
+        {
+            get
+            {
+                EnsureValid();
+                return _poolItem.light.range;
+            }
+            set
+            {
+                EnsureValid();
+                _poolItem.light.range = value;
+            }
+        }
+
+        public float ConeAngle
+        {
+            get
+            {
+                EnsureValid();
+                return _poolItem.light.spotAngle;
+            }
+            set
+            {
+                EnsureValid();
+                _poolItem.light.spotAngle = value;
+            }
+        }
+
+        public Color Color
+        {
+            get
+            {
+                EnsureValid();
+                return _poolItem.light.color;
+            }
+            set
+            {
+                EnsureValid();
+                _poolItem.light.color = value;
+            }
+        }
+
 
         //
         //  Playback controls

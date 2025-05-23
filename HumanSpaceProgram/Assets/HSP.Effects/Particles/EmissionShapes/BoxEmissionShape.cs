@@ -46,7 +46,7 @@ namespace HSP.Effects.Particles.EmissionShapes
         {
             var shape = handle.poolItem.particleSystem.shape;
 
-            if( Size != null )
+            if( Size != null && Size.drivers != null )
             {
                 float val = Size.Get();
                 shape.scale = new Vector3( val, val, val );

@@ -43,13 +43,13 @@ namespace HSP.Effects.Particles.EmissionShapes
         {
             var shape = handle.poolItem.particleSystem.shape;
 
-            if( Radius != null )
+            if( Radius != null && Radius.drivers != null )
                 shape.radius = Radius.Get();
-            if( Height != null )
+            if( Height != null && Height.drivers != null )
                 shape.length = Height.Get();
-            if( Angle != null )
+            if( Angle != null && Angle.drivers != null )
                 shape.angle = Angle.Get();
-            if( InnerAngle != null )
+            if( InnerAngle != null && InnerAngle.drivers != null )
                 shape.radiusThickness = Mathf.Clamp01( 1.0f - (InnerAngle.Get() / shape.angle) );
         }
 

@@ -6,26 +6,6 @@ using UnityPlus.Serialization;
 
 namespace HSP.Effects.Particles
 {
-    public interface IParticleEffectEmissionShape
-    {
-        public void OnInit( ParticleEffectHandle handle );
-
-        public void OnUpdate( ParticleEffectHandle handle );
-    }
-
-    public interface IParticleEffectRenderMode
-    {
-        public void OnInit( ParticleEffectHandle handle );
-
-        public void OnUpdate( ParticleEffectHandle handle );
-    }
-
-    public enum TrailStyle
-    {
-        Individual,
-        Connected
-    }
-
     public class ParticleEffectDefinition : IParticleEffectData
     {
         // particles need to specify a frame
@@ -159,7 +139,7 @@ namespace HSP.Effects.Particles
         public sealed class Trail
         {
             public Material Material { get; set; }
-            public TrailStyle Style { get; set; } = TrailStyle.Individual;
+            public ParticleEffectTrailStyle Style { get; set; } = ParticleEffectTrailStyle.Individual;
             public bool InheritTint { get; set; } = false;
             public bool WidthFromSize { get; set; } = true;
             public bool LifetimeFromSize { get; set; } = true;
@@ -198,6 +178,8 @@ namespace HSP.Effects.Particles
 
         public void OnInit( ParticleEffectHandle handle )
         {
+            handle.EnsureValid();
+
             var main = handle.poolItem.main;
             var renderer = handle.poolItem.renderer;
             var emission = handle.poolItem.particleSystem.emission;
@@ -308,8 +290,8 @@ namespace HSP.Effects.Particles
                 renderer.trailMaterial = this.TrailValues.Material;
                 trails.mode = this.TrailValues.Style switch
                 {
-                    TrailStyle.Individual => ParticleSystemTrailMode.PerParticle,
-                    TrailStyle.Connected => ParticleSystemTrailMode.Ribbon,
+                    ParticleEffectTrailStyle.Individual => ParticleSystemTrailMode.PerParticle,
+                    ParticleEffectTrailStyle.Connected => ParticleSystemTrailMode.Ribbon,
                     _ => throw new ArgumentException( $"Invalid TrailValues.Style '{this.TrailValues.Style}'." )
                 };
                 trails.inheritParticleColor = this.TrailValues.InheritTint;
@@ -335,6 +317,8 @@ namespace HSP.Effects.Particles
 
         public void OnUpdate( ParticleEffectHandle handle )
         {
+            handle.EnsureValid();
+
             var main = handle.poolItem.main;
             var renderer = handle.poolItem.renderer;
             var emission = handle.poolItem.particleSystem.emission;
@@ -433,8 +417,8 @@ namespace HSP.Effects.Particles
                 renderer.trailMaterial = this.TrailValues.Material;
                 trails.mode = this.TrailValues.Style switch
                 {
-                    TrailStyle.Individual => ParticleSystemTrailMode.PerParticle,
-                    TrailStyle.Connected => ParticleSystemTrailMode.Ribbon,
+                    ParticleEffectTrailStyle.Individual => ParticleSystemTrailMode.PerParticle,
+                    ParticleEffectTrailStyle.Connected => ParticleSystemTrailMode.Ribbon,
                     _ => throw new ArgumentException( $"Invalid TrailValues.Style '{this.TrailValues.Style}'." )
                 };
                 trails.inheritParticleColor = this.TrailValues.InheritTint;

@@ -11,6 +11,7 @@
     {
         public ObjectPoolItemState State { get; }
 
+        public void EnsureValid();
         public bool IsValid();
 
         public void Play();

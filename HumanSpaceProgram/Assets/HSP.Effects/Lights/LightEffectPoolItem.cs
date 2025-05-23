@@ -13,14 +13,14 @@ namespace HSP.Effects.Lights
         internal int version;
         internal LightEffectHandle currentHandle; // kind of singleton (per pool item) with the handle management.
 
-        private Light _light;
+        internal Light light;
         private float _duration;
         private float _timeWhenFinished;
         private ILightEffectData _data;
 
         void Awake()
         {
-            _light = GetComponent<Light>();
+            light = GetComponent<Light>();
         }
 
         void Update()

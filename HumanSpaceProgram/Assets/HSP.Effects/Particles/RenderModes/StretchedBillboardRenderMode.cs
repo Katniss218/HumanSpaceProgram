@@ -24,14 +24,18 @@ namespace HSP.Effects.Particles.RenderModes
             handle.poolItem.renderer.renderMode = ParticleSystemRenderMode.Stretch;
             handle.poolItem.renderer.enableGPUInstancing = true;
 
-            handle.poolItem.renderer.lengthScale = Scale.Get();
-            handle.poolItem.renderer.velocityScale = VelocityScale.Get();
+            if( Scale != null )
+                handle.poolItem.renderer.lengthScale = Scale.Get();
+            if( VelocityScale != null )
+                handle.poolItem.renderer.velocityScale = VelocityScale.Get();
         }
 
         public void OnUpdate( ParticleEffectHandle handle )
         {
-            handle.poolItem.renderer.lengthScale = Scale.Get();
-            handle.poolItem.renderer.velocityScale = VelocityScale.Get();
+            if( Scale != null && Scale.drivers != null )
+                handle.poolItem.renderer.lengthScale = Scale.Get();
+            if( VelocityScale != null && VelocityScale.drivers != null )
+                handle.poolItem.renderer.velocityScale = VelocityScale.Get();
         }
 
 

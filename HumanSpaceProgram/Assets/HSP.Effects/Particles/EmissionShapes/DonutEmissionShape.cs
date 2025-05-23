@@ -37,11 +37,11 @@ namespace HSP.Effects.Particles.EmissionShapes
         {
             var shape = handle.poolItem.particleSystem.shape;
 
-            if( MajorRadius != null )
+            if( MajorRadius != null && MajorRadius.drivers != null )
                 shape.radius = MajorRadius.Get();
-            if( MinorRadius != null )
+            if( MinorRadius != null && MinorRadius.drivers != null )
                 shape.donutRadius = MinorRadius.Get();
-            if( SpawnFrom == SpawnLocation.Volume && RadiusThickness != null )
+            if( SpawnFrom == SpawnLocation.Volume && RadiusThickness != null && RadiusThickness.drivers != null )
                 shape.radiusThickness = Mathf.Clamp01( RadiusThickness.Get() );
         }
 
