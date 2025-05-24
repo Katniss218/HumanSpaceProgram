@@ -84,7 +84,7 @@ namespace HSP.Effects
 
 
         [MapsInheritingFrom( typeof( MinMaxEffectValue<> ) )]
-        public static SerializationMapping MinMaxEffectValueMapping<T>()
+        public static SerializationMapping MinMaxEffectValueMapping()
         {
             return new MemberwiseSerializationMapping<MinMaxEffectValue<T>>()
                 .WithReadonlyMember( "min", o => o.min )

@@ -169,8 +169,14 @@ namespace UnityPlus.Serialization
             MethodInfo method = entry.method;
 
             // method.ContainsGenericParameters is true for methods gotten from an unconstructed generic type (e.g. `SomeType<,>.GetMapping()`).
-            if( method.IsGenericMethod && method.ContainsGenericParameters )
+            // method.IsGenericMethod is true even for constructed methods, but we're passing only unconstructed methods here.
+            if( method.IsGenericMethod )
             {
+                if( method.DeclaringType.IsGenericType )
+                {
+                    throw new InvalidOperationException( $"Couldn't initialize mapping from method `{method}` (mapped type: `{objType}`). Mappings using generic methods inside generic types are not supported. Choose one or the other." );
+                }
+
                 if( entry.providerAttribute is MapsAnyClassAttribute )
                 {
                     method = method.MakeGenericMethod( objType );
