@@ -234,16 +234,6 @@ namespace HSP.Effects.Particles
 
                 this.SpawnShape.OnInit( handle );
 
-                if( this.MaxParticles != null )
-                {
-                    this.MaxParticles.InitDrivers( handle );
-                    main.maxParticles = this.MaxParticles.Get();
-                }
-                if( this.SpawnRate != null )
-                {
-                    this.SpawnRate.InitDrivers( handle );
-                    emission.rateOverTime = this.SpawnRate.GetMinMaxCurve();
-                }
                 if( this.Position != null )
                 {
                     this.Position.InitDrivers( handle );
@@ -253,6 +243,16 @@ namespace HSP.Effects.Particles
                 {
                     this.Rotation.InitDrivers( handle );
                     shape.rotation = this.Rotation.Get().eulerAngles;
+                }
+                if( this.MaxParticles != null )
+                {
+                    this.MaxParticles.InitDrivers( handle );
+                    main.maxParticles = this.MaxParticles.Get();
+                }
+                if( this.SpawnRate != null )
+                {
+                    this.SpawnRate.InitDrivers( handle );
+                    emission.rateOverTime = this.SpawnRate.GetMinMaxCurve();
                 }
                 if( this.SpawnRate != null )
                 {
@@ -278,14 +278,14 @@ namespace HSP.Effects.Particles
 
                 this.SpawnShape.OnUpdate( handle );
 
-                if( this.MaxParticles?.drivers != null )
-                    main.maxParticles = this.MaxParticles.Get();
-                if( this.SpawnRate?.drivers != null )
-                    emission.rateOverTime = this.SpawnRate.GetMinMaxCurve();
                 if( this.Position?.drivers != null )
                     shape.position = this.Position.Get();
                 if( this.Rotation?.drivers != null )
                     shape.rotation = this.Rotation.Get().eulerAngles;
+                if( this.MaxParticles?.drivers != null )
+                    main.maxParticles = this.MaxParticles.Get();
+                if( this.SpawnRate?.drivers != null )
+                    emission.rateOverTime = this.SpawnRate.GetMinMaxCurve();
                 if( this.SpawnRate?.drivers != null )
                     emission.rateOverTime = this.SpawnRate.GetMinMaxCurve();
                 if( this.RandomPosition?.drivers != null )

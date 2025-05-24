@@ -325,201 +325,208 @@
                 }
             },
             {
-                "$type": "HSP.Vanilla.Effects.FRocketEngineAudio, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                "$id": "8633432d-cf82-435a-8bc2-a3b2dcbbd302",
+                "$type": "HSP.Vanilla.Effects.FRocketEngineFX, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "23bb9123-7fcb-42d1-aab7-a697ba562c50",
                 "is_enabled": true,
                 "engine": {
                     "$ref": "0dbaead5-1d18-4bd8-9244-3f117ff7bfca"
                 },
-                "ignition_audio": {
-                    "$type": "HSP.Effects.Audio.AudioEffectDefinition, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                    "$id": "7122aaf6-195d-49cb-90ca-146f61460cad",
-                    "audio_clip": {
-                        "$assetref": "Vanilla::Assets/sounds/sound_liq8_enhanced"
-                    },
-                    "audio_channel": "Main_3D",
-                    "volume": {
-                        "$type": "HSP.Effects.ConstantEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                        "value": 6.0
-                    },
-                    "pitch": {
-                        "$type": "HSP.Effects.ConstantEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                        "value": 1.0
-                    },
-                    "loop": false
-                },
-                "loop_audio": {
-                    "$type": "HSP.Effects.Audio.AudioEffectDefinition, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                    "$id": "eff12a5e-1b82-469b-b2ed-b49b3c684d80",
-                    "audio_clip": {
-                        "$assetref": "Vanilla::Assets/sounds/kero_loop_hard"
-                    },
-                    "audio_channel": "Main_3D",
-                    "volume": {
-                        "$type": "HSP.Effects.ConstantEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                        "value": 6.0,
-                        "drivers": {
-                            "$type": "HSP.Effects.EffectValueDriver`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]][], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                            "value": [
-                                {
-                                    "$type": "HSP.Effects.EffectValueDriver`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                                    "getter": {
-                                        "$type": "HSP.Effects.FadeInValueGetter, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                                        "fade_duration": 6,
-                                        "loop_fade": false
-                                    },
-                                    "curve": {
-                                        "$type": "HSP.Effects.MappingCurve`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                                        "interpolator": {
-                                            "$type": "HSP.Effects.FloatInterpolator, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
-                                        },
-                                        "keys": {
-                                            "value": [
-                                                {
-                                                    "$type": "HSP.Effects.MappingCurve`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]].Keyframe, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                                                    "t": 0,
-                                                    "v": 0,
-                                                    "v_in": 0,
-                                                    "v_out": 0
-                                                },
-                                                {
-                                                    "$type": "HSP.Effects.MappingCurve`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]].Keyframe, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                                                    "t": 1,
-                                                    "v": 1,
-                                                    "v_in": 0,
-                                                    "v_out": 0
-                                                }
-                                            ]
-                                        }
-                                    }
-                                }
-                            ]
+                "ignition_system": {
+                    "$type": "HSP.Effects.IEffectData[], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "value": [
+                        {
+                            "$type": "HSP.Effects.Audio.AudioEffectDefinition, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                            "$id": "7122aaf6-195d-49cb-90ca-146f61460cad",
+                            "audio_clip": {
+                                "$assetref": "Vanilla::Assets/sounds/sound_liq8_enhanced"
+                            },
+                            "audio_channel": "Main_3D",
+                            "volume": {
+                                "$type": "HSP.Effects.ConstantEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                "value": 6.0
+                            },
+                            "pitch": {
+                                "$type": "HSP.Effects.ConstantEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                "value": 1.0
+                            },
+                            "loop": false
                         }
-                    },
-                    "pitch": {
-                        "$type": "HSP.Effects.ConstantEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                        "value": 1.0
-                    },
-                    "loop": true
-                },
-                "shutdown_audio": {
-                    "$type": "HSP.Effects.Audio.AudioEffectDefinition, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                    "$id": "f93e6be8-8816-45e2-ae03-615cf589a520",
-                    "audio_clip": {
-                        "$assetref": "Vanilla::Assets/sounds/kero_flameout_hard"
-                    },
-                    "audio_channel": "Main_3D",
-                    "volume": {
-                        "$type": "HSP.Effects.ConstantEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                        "value": 6.0
-                    },
-                    "pitch": {
-                        "$type": "HSP.Effects.ConstantEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                        "value": 1.0
-                    },
-                    "loop": false
-                }
-            },
-            {
-                "$type": "HSP.Vanilla.Effects.FRocketEngineExhaustFx, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                "$id": "dd52e531-71f6-4238-84c9-c94ee7923b14",
-                "is_enabled": true,
-                "engine": {
-                    "$ref": "0dbaead5-1d18-4bd8-9244-3f117ff7bfca"
+                    ]
                 },
                 "loop_system": {
-                    "$type": "HSP.Effects.Particles.ParticleEffectDefinition, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                    "$id": "e46ff641-e1d5-4cc9-ba7b-cc77783feb3e",
-                    "render": {
-                        "render_mode": {
-                            "$type": "HSP.Effects.Particles.RenderModes.BillboardRenderMode, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                            "alignment": "FaceCamera"
-                        },
-                        "material": {
-                            "$assetref": "Vanilla::Assets/testparticle"
-                        }
-                    },
-                    "loop": true,
-                    "initial": {
-                        "size": {
-                            "$type": "HSP.Effects.MinMaxEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                            "min": 1.5,
-                            "max": 3.0
-                        },
-                        "speed": {
-                            "$type": "HSP.Effects.MinMaxEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                            "min": 55.0,
-                            "max": 77.0
-                        },
-                        "angular_speed": {
-                            "$type": "HSP.Effects.MinMaxEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                            "min": 200.0,
-                            "max": 300.0
-                        },
-                        "lifetime": {
-                            "$type": "HSP.Effects.MinMaxEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                            "min": 0.4,
-                            "max": 0.5
-                        },
-                        "tint": {
-                            "$type": "HSP.Effects.MinMaxEffectValue`1[[UnityEngine.Color, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                            "min": {
-                                "r": 1,
-                                "g": 1,
-                                "b": 1,
-                                "a": 0.5
+                    "$type": "HSP.Effects.IEffectData[], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "value": [
+                        {
+                            "$type": "HSP.Effects.Particles.ParticleEffectDefinition, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                            "$id": "e46ff641-e1d5-4cc9-ba7b-cc77783feb3e",
+                            "render": {
+                                "render_mode": {
+                                    "$type": "HSP.Effects.Particles.RenderModes.BillboardRenderMode, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                    "alignment": "FaceCamera"
+                                },
+                                "material": {
+                                    "$assetref": "Vanilla::Assets/testparticle"
+                                }
                             },
-                            "max": {
-                                "r": 1,
-                                "g": 1,
-                                "b": 1,
-                                "a": 0.3
-                            }
-                        }
-                    },
-                    "emission": {
-                        "position": {
-                            "$type": "HSP.Effects.ConstantEffectValue`1[[UnityEngine.Vector3, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                            "value": [
-                                0,
-                                0,
-                                0
-                            ]
-                        },
-                        "rotation": {
-                            "$type": "HSP.Effects.ConstantEffectValue`1[[UnityEngine.Quaternion, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                            "value": [
-                                -1,
-                                0,
-                                0,
-                                0
-                            ]
-                        },
-                        "spawn_shape": {
-                            "$type": "HSP.Effects.Particles.EmissionShapes.ConeEmissionShape, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                            "spawn_from": "Base",
-                            "radius": {
-                                "$type": "HSP.Effects.ConstantEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                                "value": 0.2
+                            "loop": true,
+                            "initial": {
+                                "size": {
+                                    "$type": "HSP.Effects.MinMaxEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                    "min": 1.5,
+                                    "max": 3.0
+                                },
+                                "speed": {
+                                    "$type": "HSP.Effects.MinMaxEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                    "min": 55.0,
+                                    "max": 77.0
+                                },
+                                "angular_speed": {
+                                    "$type": "HSP.Effects.MinMaxEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                    "min": 200.0,
+                                    "max": 300.0
+                                },
+                                "lifetime": {
+                                    "$type": "HSP.Effects.MinMaxEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                    "min": 0.4,
+                                    "max": 0.5
+                                },
+                                "tint": {
+                                    "$type": "HSP.Effects.MinMaxEffectValue`1[[UnityEngine.Color, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                    "min": {
+                                        "r": 1,
+                                        "g": 1,
+                                        "b": 1,
+                                        "a": 0.5
+                                    },
+                                    "max": {
+                                        "r": 1,
+                                        "g": 1,
+                                        "b": 1,
+                                        "a": 0.3
+                                    }
+                                }
                             },
-                            "angle": {
-                                "$type": "HSP.Effects.ConstantEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                                "value": 0
+                            "emission": {
+                                "position": {
+                                    "$type": "HSP.Effects.ConstantEffectValue`1[[UnityEngine.Vector3, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                    "value": [
+                                        0,
+                                        0,
+                                        0
+                                    ]
+                                },
+                                "rotation": {
+                                    "$type": "HSP.Effects.ConstantEffectValue`1[[UnityEngine.Quaternion, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                    "value": [
+                                        -1,
+                                        0,
+                                        0,
+                                        0
+                                    ]
+                                },
+                                "spawn_shape": {
+                                    "$type": "HSP.Effects.Particles.EmissionShapes.ConeEmissionShape, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                    "spawn_from": "Base",
+                                    "radius": {
+                                        "$type": "HSP.Effects.ConstantEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                        "value": 0.2
+                                    },
+                                    "angle": {
+                                        "$type": "HSP.Effects.ConstantEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                        "value": 0
+                                    }
+                                },
+                                "spawn_rate": {
+                                    "$type": "HSP.Effects.MinMaxEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                    "min": 30.0,
+                                    "max": 30.0
+                                }
+                            },
+                            "lifetime": null,
+                            "trails": {
+                                "material": {
+                                    "$assetref": "Vanilla::Assets/testparticle"
+                                },
+                                "frequency": 0.3333
                             }
                         },
-                        "spawn_rate": {
-                            "$type": "HSP.Effects.MinMaxEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                            "min": 30.0,
-                            "max": 30.0
+                        {
+                            "$type": "HSP.Effects.Audio.AudioEffectDefinition, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                            "$id": "eff12a5e-1b82-469b-b2ed-b49b3c684d80",
+                            "audio_clip": {
+                                "$assetref": "Vanilla::Assets/sounds/kero_loop_hard"
+                            },
+                            "audio_channel": "Main_3D",
+                            "volume": {
+                                "$type": "HSP.Effects.ConstantEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                "value": 6.0,
+                                "drivers": {
+                                    "$type": "HSP.Effects.EffectValueDriver`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]][], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                    "value": [
+                                        {
+                                            "$type": "HSP.Effects.EffectValueDriver`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                            "getter": {
+                                                "$type": "HSP.Effects.FadeInValueGetter, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                "fade_duration": 6,
+                                                "loop_fade": false
+                                            },
+                                            "curve": {
+                                                "$type": "HSP.Effects.MappingCurve`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                "interpolator": {
+                                                    "$type": "HSP.Effects.FloatInterpolator, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+                                                },
+                                                "keys": {
+                                                    "value": [
+                                                        {
+                                                            "$type": "HSP.Effects.MappingCurve`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]].Keyframe, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                            "t": 0,
+                                                            "v": 0,
+                                                            "v_in": 0,
+                                                            "v_out": 0
+                                                        },
+                                                        {
+                                                            "$type": "HSP.Effects.MappingCurve`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]].Keyframe, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                            "t": 1,
+                                                            "v": 1,
+                                                            "v_in": 0,
+                                                            "v_out": 0
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            "pitch": {
+                                "$type": "HSP.Effects.ConstantEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                "value": 1.0
+                            },
+                            "loop": true
                         }
-                    },
-                    "lifetime": null,
-                    "trails": {
-                        "material": {
-                            "$assetref": "Vanilla::Assets/testparticle"
-                        },
-                        "frequency": 0.3333
-                    }
+                    ]
+                },
+                "shutdown_system": {
+                    "$type": "HSP.Effects.IEffectData[], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "value": [
+                        {
+                            "$type": "HSP.Effects.Audio.AudioEffectDefinition, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                            "$id": "f93e6be8-8816-45e2-ae03-615cf589a520",
+                            "audio_clip": {
+                                "$assetref": "Vanilla::Assets/sounds/kero_flameout_hard"
+                            },
+                            "audio_channel": "Main_3D",
+                            "volume": {
+                                "$type": "HSP.Effects.ConstantEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                "value": 6.0
+                            },
+                            "pitch": {
+                                "$type": "HSP.Effects.ConstantEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                "value": 1.0
+                            },
+                            "loop": false
+                        }
+                    ]
                 }
             },
             {

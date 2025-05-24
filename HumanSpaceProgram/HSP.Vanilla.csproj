@@ -75,7 +75,6 @@
     <Compile Include="Assets\HSP.Vanilla\OnActiveVesselChanged.cs" />
     <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\FreeReferenceFrameTransform.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\DesignSceneToolManager.cs" />
-    <Compile Include="Assets\HSP.Vanilla\Effects\FRocketEngineAudio.cs" />
     <Compile Include="Assets\HSP.Vanilla\Trajectories\NewtonianOrbit.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\MainMenuScene\Cameras\MainMenuSceneCameraManager.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FBulkContainer_Sphere.cs" />
@@ -106,7 +105,7 @@
     <Compile Include="Assets\HSP.Vanilla\Components\FPlayerInputAvionics.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\Tools\DefaultTool.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FVesselSeparator.cs" />
-    <Compile Include="Assets\HSP.Vanilla\Effects\FRocketEngineExhaustFx.cs" />
+    <Compile Include="Assets\HSP.Vanilla\Effects\FRocketEngineFX.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FSequencer.Sequence.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\OnStartup.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FAttitudeAvionics.cs" />

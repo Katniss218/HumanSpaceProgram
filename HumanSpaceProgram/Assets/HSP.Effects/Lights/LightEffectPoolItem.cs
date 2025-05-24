@@ -13,10 +13,14 @@ namespace HSP.Effects.Lights
         internal int version;
         internal LightEffectHandle currentHandle; // kind of singleton (per pool item) with the handle management.
 
-        internal Light light;
+        internal new Light light;
         private float _duration;
         private float _timeWhenFinished;
         private ILightEffectData _data;
+
+        // local to the parent transform.
+        internal Vector3 localPosition = Vector3.zero;
+        internal Quaternion localRotation = Quaternion.identity;
 
         void Awake()
         {
@@ -29,7 +33,11 @@ namespace HSP.Effects.Lights
                 return;
 
             if( TargetTransform != null )
-                this.transform.position = TargetTransform.position;
+            {
+                Vector3 scenePos = (TargetTransform.rotation * TargetTransform.position) + localPosition;
+                Quaternion sceneRot = TargetTransform.rotation * localRotation;
+                this.transform.SetPositionAndRotation( scenePos, sceneRot );
+            }
 
             _data.OnUpdate( this.currentHandle );
 

@@ -132,6 +132,59 @@ namespace HSP.Effects.Lights
             }
         }
 
+        public LightShadows Shadows
+        {
+            get
+            {
+                EnsureValid();
+                return _poolItem.light.shadows;
+            }
+            set
+            {
+                EnsureValid();
+                _poolItem.light.shadows = value;
+            }
+        }
+        public Vector3 Position
+        {
+            get
+            {
+                EnsureValid();
+                return _poolItem.localPosition;
+            }
+            set
+            {
+                EnsureValid();
+                _poolItem.localPosition = value;
+            }
+        }
+        public Quaternion Rotation
+        {
+            get
+            {
+                EnsureValid();
+                return _poolItem.localRotation;
+            }
+            set
+            {
+                EnsureValid();
+                _poolItem.localRotation = value;
+            }
+        }
+        public int CullingMask
+        {
+            get
+            {
+                EnsureValid();
+                return _poolItem.light.cullingMask;
+            }
+            set
+            {
+                EnsureValid();
+                _poolItem.light.cullingMask = value;
+            }
+        }
+
 
         //
         //  Playback controls
