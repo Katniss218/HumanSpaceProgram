@@ -25,9 +25,15 @@ namespace HSP.Effects.Particles.RenderModes
             handle.poolItem.renderer.enableGPUInstancing = true;
 
             if( Scale != null )
+            {
+                Scale.InitDrivers( handle );
                 handle.poolItem.renderer.lengthScale = Scale.Get();
+            }
             if( VelocityScale != null )
+            {
+                VelocityScale.InitDrivers( handle );
                 handle.poolItem.renderer.velocityScale = VelocityScale.Get();
+            }
         }
 
         public void OnUpdate( ParticleEffectHandle handle )

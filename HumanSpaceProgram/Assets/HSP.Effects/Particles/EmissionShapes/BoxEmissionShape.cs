@@ -37,6 +37,7 @@ namespace HSP.Effects.Particles.EmissionShapes
 
             if( Size != null )
             {
+                Size.InitDrivers( handle );
                 float val = Size.Get();
                 shape.scale = new Vector3( val, val, val );
             }

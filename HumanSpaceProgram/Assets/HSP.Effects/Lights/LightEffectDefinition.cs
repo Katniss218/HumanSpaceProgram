@@ -20,7 +20,10 @@ namespace HSP.Effects.Lights
             handle.TargetTransform = this.TargetTransform;
 
             if( this.Intensity != null )
+            {
+                this.Intensity.InitDrivers( handle );
                 handle.Intensity = this.Intensity.Get();
+            }
         }
 
         public void OnUpdate( LightEffectHandle handle )

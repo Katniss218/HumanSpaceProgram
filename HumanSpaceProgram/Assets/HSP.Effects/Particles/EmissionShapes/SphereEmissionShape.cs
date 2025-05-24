@@ -21,10 +21,16 @@ namespace HSP.Effects.Particles.EmissionShapes
             var shape = handle.poolItem.particleSystem.shape;
 
             shape.shapeType = ParticleSystemShapeType.Sphere;
-            if( Radius != null ) 
+            if( Radius != null )
+            {
+                Radius.InitDrivers( handle );
                 shape.radius = Radius.Get();
+            }
             if( SpawnFrom == SpawnLocation.Volume && InnerRadius != null )
+            {
+                InnerRadius.InitDrivers( handle );
                 shape.radiusThickness = Mathf.Clamp01( 1.0f - (InnerRadius.Get() / shape.radius) );
+            }
         }
 
         public void OnUpdate( ParticleEffectHandle handle )

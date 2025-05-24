@@ -26,11 +26,20 @@ namespace HSP.Effects.Particles.EmissionShapes
             shape.shapeType = ParticleSystemShapeType.Donut;
 
             if( MajorRadius != null )
+            {
+                MajorRadius.InitDrivers( handle );
                 shape.radius = MajorRadius.Get();
+            }
             if( MinorRadius != null )
+            {
+                MinorRadius.InitDrivers( handle );
                 shape.donutRadius = MinorRadius.Get();
+            }
             if( SpawnFrom == SpawnLocation.Volume && RadiusThickness != null )
+            {
+                RadiusThickness.InitDrivers( handle );
                 shape.radiusThickness = Mathf.Clamp01( RadiusThickness.Get() );
+            }
         }
 
         public void OnUpdate( ParticleEffectHandle handle )

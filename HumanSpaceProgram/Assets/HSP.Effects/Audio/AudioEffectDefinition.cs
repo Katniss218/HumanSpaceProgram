@@ -51,12 +51,12 @@ namespace HSP.Effects.Audio
 
             if( this.Volume != null )
             {
-                this.Volume.OnInit( handle );
+                this.Volume.InitDrivers( handle );
                 handle.Volume = this.Volume.Get();
             }
             if( this.Pitch != null )
             {
-                this.Pitch.OnInit( handle );
+                this.Pitch.InitDrivers( handle );
                 handle.Pitch = this.Pitch.Get();
             }
         }

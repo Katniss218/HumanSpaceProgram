@@ -19,7 +19,7 @@ namespace HSP.Effects.Audio
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        private void EnsureValid()
+        public void EnsureValid()
         {
             // Null check because the _poolItem might've been destroyyed for whatever reason.
             if( _poolItem == null || _version != _poolItem.version )

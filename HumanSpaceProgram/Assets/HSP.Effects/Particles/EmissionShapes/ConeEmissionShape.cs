@@ -30,13 +30,25 @@ namespace HSP.Effects.Particles.EmissionShapes
             };
 
             if( Radius != null )
+            {
+                Radius.InitDrivers( handle );
                 shape.radius = Radius.Get();
+            }
             if( Height != null )
+            {
+                Height.InitDrivers( handle );
                 shape.length = Height.Get();
+            }
             if( Angle != null )
+            {
+                Angle.InitDrivers( handle );
                 shape.angle = Angle.Get();
+            }
             if( InnerAngle != null )
+            {
+                InnerAngle.InitDrivers( handle );
                 shape.radiusThickness = Mathf.Clamp01( 1.0f - (InnerAngle.Get() / shape.angle) );
+            }
         }
 
         public void OnUpdate( ParticleEffectHandle handle )

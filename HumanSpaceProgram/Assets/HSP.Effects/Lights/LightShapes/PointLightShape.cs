@@ -11,15 +11,19 @@ namespace HSP.Effects.Lights.LightShapes
         {
             handle.Type = LightType.Point;
 
-            if( Radius != null ) 
+            if( Radius != null )
                 handle.Range = Radius.Get();
         }
 
         public void OnUpdate( LightEffectHandle handle )
         {
             if( Radius != null && Radius.drivers != null )
+            {
+                Radius.InitDrivers( handle );
                 handle.Range = Radius.Get();
+            }
         }
+
 
         [MapsInheritingFrom( typeof( PointLightShape ) )]
         public static SerializationMapping PointLightShapeMapping()
