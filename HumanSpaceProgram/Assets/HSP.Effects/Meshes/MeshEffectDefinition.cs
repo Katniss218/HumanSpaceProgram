@@ -5,7 +5,6 @@ namespace HSP.Effects.Meshes
 {
     public class MeshEffectDefinition : IMeshEffectData
     {
-
         /// <summary>
         /// The transform that the mesh effect will follow.
         /// </summary>
@@ -14,10 +13,14 @@ namespace HSP.Effects.Meshes
         //
         // Driven properties:
 
+        public BoneData[] Bones { get; set; } = null;
+
 
         public void OnInit( MeshEffectHandle handle )
         {
             handle.TargetTransform = this.TargetTransform;
+
+            // if has bones - spawn them at initial positions, and rig the mesh using these positions.
         }
 
         public void OnUpdate( MeshEffectHandle handle )
@@ -28,20 +31,16 @@ namespace HSP.Effects.Meshes
             // bones can be deformed via curves/drivers
         }
 
-        [MapsInheritingFrom( typeof( MeshEffectHandle ) )]
-        public static SerializationMapping MeshEffectHandleMapping()
-        {
-            return new MemberwiseSerializationMapping<MeshEffectHandle>()
-                /*.WithMember( "audio_clip", ObjectContext.Asset, o => o.Clip )
-                .WithMember( "audio_channel", o => o.Channel )
-                .WithMember( "volume", o => o.Volume )
-                .WithMember( "pitch", o => o.Pitch )
-                .WithMember( "loop", o => o.Loop )*/;
-        }
-
         public IEffectHandle Play()
         {
             return MeshEffectManager.Play( this );
+        }
+
+        [MapsInheritingFrom( typeof( MeshEffectDefinition ) )]
+        public static SerializationMapping MeshEffectDefinitionMapping()
+        {
+            return new MemberwiseSerializationMapping<MeshEffectDefinition>()
+                .WithMember( "bones", o => o.Bones );
         }
     }
 }

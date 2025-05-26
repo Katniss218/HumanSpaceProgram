@@ -3,7 +3,6 @@ using UnityEngine;
 
 namespace HSP.Effects.Meshes
 {
-    [RequireComponent( typeof( Mesh ) )]
     internal class MeshEffectPoolItem : MonoBehaviour
     {
         internal ObjectPoolItemState State { get; private set; } = ObjectPoolItemState.Ready;
@@ -13,14 +12,14 @@ namespace HSP.Effects.Meshes
         internal int version;
         internal MeshEffectHandle currentHandle; // kind of singleton (per pool item) with the handle management.
 
-        private Mesh _mesh;
+        private MeshRenderer _meshRenderer;
+        private SkinnedMeshRenderer _skinnedMeshRenderer;
         private float _duration;
         private float _timeWhenFinished;
         private IMeshEffectData _data;
 
         void Awake()
         {
-            _mesh = GetComponent<Mesh>();
         }
 
         void Update()
@@ -63,6 +62,9 @@ namespace HSP.Effects.Meshes
 
         internal void SetMeshData( IMeshEffectData data )
         {
+#warning TODO - create bones and stuff.
+            // needs to reparent existing bones, creae/delete if not enough/too many exist
+
             _data = data;
             version++;
             currentHandle = new MeshEffectHandle( this );

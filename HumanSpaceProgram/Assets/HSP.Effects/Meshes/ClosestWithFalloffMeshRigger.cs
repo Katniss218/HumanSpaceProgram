@@ -45,10 +45,15 @@ namespace HSP.Effects.Meshes
         /// <summary>
         /// Rigs the mesh, replacing its bone weights (if any exist) with the new values.
         /// </summary>
-        public void RigInPlace( Mesh mesh, Vector3[] bonePositions )
+        public void RigInPlace( Mesh mesh, List<Transform> bones )
         {
             throw new NotImplementedException();
 
+            // bindposes are what tells the renderer where the bones are at no deformation (base state).
+            // they should be relative to the root
+            Transform t;
+            t.GetLocalToAncestorMatrix( t );
+            /*
             var boneCountPerVertex = mesh.GetBonesPerVertex();
 
             var boneWeights = mesh.GetAllBoneWeights();
@@ -76,17 +81,19 @@ namespace HSP.Effects.Meshes
                 }
                 Debug.Assert( Mathf.Approximately( 1f, totalWeight ) );
             }
+            */
         }
 
         /// <summary>
         /// Creates an exact copy of the mesh and rigs it with the given bones.
         /// </summary>
-        public Mesh RigCopy( Mesh mesh, Vector3[] bonePositions )
+        public Mesh RigCopy( Mesh mesh, List<Transform> bones )
         {
-            Mesh newMesh = new Mesh();
-            newMesh.name = mesh.name;
+            Mesh newMesh = mesh.GetDeepCopy();
 
-            throw new NotImplementedException();
+            RigInPlace( newMesh, bones );
+
+            return newMesh;
         }
     }
 }
