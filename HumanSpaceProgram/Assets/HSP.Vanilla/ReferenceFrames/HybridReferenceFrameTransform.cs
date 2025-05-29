@@ -502,7 +502,7 @@ namespace HSP.Vanilla
 
         public const string ADD_PLAYER_LOOP_SYSTEM = "76523523453544";
 
-        // Imo it's kind of ugly using HSPEvent_STARTUP_IMMEDIATELY to mess with player loop, but it is what it is.
+#warning TODO - It's ugly using HSPEvent_STARTUP_IMMEDIATELY to mess with player loop, but it is what it is. Also messes with unit-testing.
         [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, ADD_PLAYER_LOOP_SYSTEM )]
         static void AddPlayerLoopSystem()
         {
