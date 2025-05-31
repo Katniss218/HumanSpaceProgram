@@ -1,20 +1,8 @@
-using System;
 using UnityEngine;
 using UnityPlus;
 
 namespace HSP.Effects.Particles
 {
-    public enum ParticleEffectFrame
-    {
-        PositionedNearestCelestialBody,
-        OrientedNearestCelestialBody,
-
-        PositionedTransform,
-        OrientedTransform,
-        LocalTransform,
-    }
-
-
     public class ParticleEffectManager : SingletonMonoBehaviour<ParticleEffectManager>
     {
         static ObjectPool<ParticleEffectPoolItem, IParticleEffectData> _pool = new(

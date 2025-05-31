@@ -128,6 +128,7 @@
     <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\FixedReferenceFrameTransform.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FRocketEngine.cs" />
     <Compile Include="Assets\HSP.Vanilla\InputChannel.cs" />
+    <Compile Include="Assets\HSP.Vanilla\Effects\AbsoluteAxisAlignedSimulationFrame.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\Cameras\GameplaySceneDepthBufferCombiner.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\F2AxisActuator.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\Tools\TranslateTool.cs" />

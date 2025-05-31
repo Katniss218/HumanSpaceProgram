@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HSP.Effects.Particles.SimulationFrames;
+using System;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -75,6 +76,8 @@ namespace HSP.Effects.Particles
         /// The transform that the playing audio will follow.
         /// </summary>
         public Transform TargetTransform { get; set; }
+
+        public IParticleEffectSimulationFrame SimulationFrame { get; set; } = new LocalSimulationFrame();
 
         // if simulation space is set, it needs to spawn a new gameobject, add a airf fixer to it, and set that as the PS's sim space.
         //public Transform SimulationSpace { get; set; } = null;
@@ -518,6 +521,7 @@ namespace HSP.Effects.Particles
 
             handle.TargetTransform = this.TargetTransform;
             main.duration = this.Duration;
+            this.SimulationFrame.OnInit( handle );
 
             if( RenderValues != null )
             {
@@ -548,6 +552,8 @@ namespace HSP.Effects.Particles
         public void OnUpdate( ParticleEffectHandle handle )
         {
             handle.EnsureValid();
+
+            this.SimulationFrame.OnUpdate( handle );
 
             if( RenderValues != null )
             {
@@ -589,8 +595,7 @@ namespace HSP.Effects.Particles
                 .WithMember( "duration", o => o.Duration )
                 .WithMember( "loop", o => o.Loop )
                 .WithMember( "target_transform", o => o.TargetTransform )
-#warning TODO - simulation spaces (local, 'global', and mixes of both)
-                //.WithMember( "simulation_space", o => o.SimulationSpace )
+                .WithMember( "simulation_frame", o => o.SimulationFrame )
 
                 .WithMember( "initial", o => o.InitialValues )
                 .WithMember( "emission", o => o.EmissionValues )

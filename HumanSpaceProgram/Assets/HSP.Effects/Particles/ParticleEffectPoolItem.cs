@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HSP.Effects.Particles.SimulationFrames;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,16 +8,7 @@ namespace HSP.Effects.Particles
     [RequireComponent( typeof( ParticleSystem ) )]
     internal class ParticleEffectPoolItem : MonoBehaviour
     {
-        private struct CachedEntry
-        {
-            public Action Setter;
-        }
-
-
         internal ObjectPoolItemState State { get; private set; } = ObjectPoolItemState.Ready;
-
-        private CachedEntry[] _cachedEntriesWithoutDrivers; // set only on init
-        private CachedEntry[] _cachedEntriesWithDrivers; // set in update, or whenever the value changed.
 
         internal Transform TargetTransform { get; set; }
 
@@ -24,9 +16,9 @@ namespace HSP.Effects.Particles
         internal ParticleEffectHandle currentHandle; // kind of singleton (per pool item) with the handle management.
 
         // Expose internally so we don't have to expose every property here again and add essentially duplicated code.
-        internal ParticleSystem particleSystem => _particleSystem;
+        internal new ParticleSystem particleSystem => _particleSystem;
         internal ParticleSystem.MainModule main => _main;
-        internal ParticleSystemRenderer renderer => _renderer;
+        internal new ParticleSystemRenderer renderer => _renderer;
 
         private ParticleSystem _particleSystem;
         private ParticleSystem.MainModule _main;
@@ -35,6 +27,8 @@ namespace HSP.Effects.Particles
         private float _timeWhenFinished;
         private IParticleEffectData _data;
 
+        internal GameObject simulationGameObject;
+
         internal bool Loop { get => _main.loop; set => _main.loop = value; }
 
         internal float Size
@@ -42,7 +36,6 @@ namespace HSP.Effects.Particles
             get => _particleSystem.main.startSize.constant;
             set
             {
-#warning TODO - come up with some way to simplify this, I don't want to have 1000 properties for this.
                 var val = _main.startSize;
                 val.constant = value;
                 _main.startSize = val;
