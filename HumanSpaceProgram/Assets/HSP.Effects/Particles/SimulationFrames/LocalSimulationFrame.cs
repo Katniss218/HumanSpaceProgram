@@ -5,14 +5,12 @@ namespace HSP.Effects.Particles.SimulationFrames
 {
     public sealed class LocalSimulationFrame : IParticleEffectSimulationFrame
     {
-        public bool OnInit( ParticleEffectHandle handle )
+        public void OnInit( ParticleEffectHandle handle )
         {
             var main = handle.poolItem.main;
 
             main.simulationSpace = ParticleSystemSimulationSpace.Local;
             main.customSimulationSpace = null;
-
-            return false;
         }
 
         public void OnUpdate( ParticleEffectHandle handle )

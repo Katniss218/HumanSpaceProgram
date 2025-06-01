@@ -124,7 +124,7 @@ namespace HSP.Effects.Particles
         internal void Play()
         {
             if( State != ObjectPoolItemState.Ready )
-                throw new InvalidOperationException( $"Particles can only be played when in the {nameof( ObjectPoolItemState.Ready )} state." );
+                throw new InvalidOperationException( $"Particle effect can only be played when in the {nameof( ObjectPoolItemState.Ready )} state." );
 
             SetState_Playing();
         }
@@ -132,7 +132,7 @@ namespace HSP.Effects.Particles
         internal void Stop()
         {
             if( State != ObjectPoolItemState.Playing )
-                throw new InvalidOperationException( $"Particles can only be stopped when in the {nameof( ObjectPoolItemState.Playing )} state." );
+                throw new InvalidOperationException( $"Particle effect can only be stopped when in the {nameof( ObjectPoolItemState.Playing )} state." );
 
             _particleSystem.Stop();
             _timeWhenFinished = UnityEngine.Time.time + _main.duration;

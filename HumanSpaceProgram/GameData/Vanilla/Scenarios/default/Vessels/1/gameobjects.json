@@ -1574,6 +1574,18 @@
                                                         "$type": "HSP.Effects.IEffectData[], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
                                                         "value": [
                                                             {
+                                                                "$type": "HSP.Effects.Meshes.MeshEffectDefinition, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                                "$id": "68f497e5-aaf1-44c5-80b8-949432ad0089",
+                                                                "mesh": {
+                                                                    "$assetref": "builtin::HSP._DevUtils/meshplume"
+                                                                },
+                                                                "material": {
+                                                                    "$assetref": "Vanilla::Assets/testparticle"
+                                                                },
+                                                                "duration": 1,
+                                                                "loop": true
+                                                            },
+                                                            {
                                                                 "$type": "HSP.Effects.Particles.ParticleEffectDefinition, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
                                                                 "$id": "f9c7e7dc-22e3-4b15-8ba0-746a2029bbe6",
                                                                 "render": {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
@@ -45,6 +46,8 @@ namespace HSP.Effects.Meshes
             }
         }
 
+        public bool IsSkinned => _poolItem.IsSkinned;
+
         /// <summary>
         /// The transform that the playing audio will follow.
         /// </summary>
@@ -59,6 +62,123 @@ namespace HSP.Effects.Meshes
             {
                 EnsureValid();
                 _poolItem.TargetTransform = value;
+            }
+        }
+
+        /// <summary>
+        /// The transform that the playing audio will follow.
+        /// </summary>
+        public Mesh Mesh
+        {
+            get
+            {
+                EnsureValid();
+                return _poolItem.meshFilter.sharedMesh;
+            }
+            set
+            {
+                EnsureValid();
+                if( _poolItem.meshFilter != null )
+                    _poolItem.meshFilter.sharedMesh = value;
+                if( _poolItem.skinnedMeshRenderer != null )
+                    _poolItem.skinnedMeshRenderer.sharedMesh = value;
+            }
+        }
+
+        /// <summary>
+        /// The transform that the playing audio will follow.
+        /// </summary>
+        public Material Material
+        {
+            get
+            {
+                EnsureValid();
+                return _poolItem.meshRenderer.sharedMaterial;
+            }
+            set
+            {
+                EnsureValid();
+                if( _poolItem.meshRenderer != null )
+                    _poolItem.meshRenderer.sharedMaterial = value;
+                if( _poolItem.skinnedMeshRenderer != null )
+                    _poolItem.skinnedMeshRenderer.sharedMaterial = value;
+            }
+        }
+
+        public float Duration
+        {
+            get
+            {
+                EnsureValid();
+                return _poolItem.duration;
+            }
+            set
+            {
+                EnsureValid();
+                _poolItem.duration = value;
+            }
+        }
+        public bool Loop
+        {
+            get
+            {
+                EnsureValid();
+                return _poolItem.loop;
+            }
+            set
+            {
+                EnsureValid();
+                _poolItem.loop = value;
+            }
+        }
+        public Vector3 Position
+        {
+            get
+            {
+                EnsureValid();
+                return _poolItem.localPos;
+            }
+            set
+            {
+                EnsureValid();
+                _poolItem.localPos = value;
+            }
+        }
+        public Quaternion Rotation
+        {
+            get
+            {
+                EnsureValid();
+                return _poolItem.localRot;
+            }
+            set
+            {
+                EnsureValid();
+                _poolItem.localRot = value;
+            }
+        }
+        public Vector3 Scale
+        {
+            get
+            {
+                EnsureValid();
+                return _poolItem.localScale;
+            }
+            set
+            {
+                EnsureValid();
+                _poolItem.localScale = value;
+            }
+        }
+
+        public IReadOnlyList<Transform> Bones
+        {
+            get
+            {
+                EnsureValid();
+                if( !this.IsSkinned )
+                    throw new InvalidOperationException( "Cannot access bones of a non-skinned mesh." );
+                return _poolItem.skinnedMeshRenderer.bones;
             }
         }
 

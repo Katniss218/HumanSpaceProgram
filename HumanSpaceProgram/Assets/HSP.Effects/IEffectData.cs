@@ -19,9 +19,9 @@ namespace HSP.Effects
         public IEffectHandle Play();
     }
 
-    public interface IEffectData<T> : IEffectData where T : IEffectHandle
+    public interface IEffectData<THandle> : IEffectData where THandle : IEffectHandle
     {
-        void OnInit( T handle );
-        void OnUpdate( T handle );
+        void OnInit( THandle handle );
+        void OnUpdate( THandle handle );
     }
 }

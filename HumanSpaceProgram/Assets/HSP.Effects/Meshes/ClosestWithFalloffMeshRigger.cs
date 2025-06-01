@@ -1,15 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace HSP.Effects.Meshes
 {
+    public interface IMeshRigger
+    {
+        void RigInPlace( Mesh mesh, IReadOnlyList<Transform> bones );
+
+        Mesh RigCopy( Mesh mesh, IReadOnlyList<Transform> bones );
+    }
+
     /// <summary>
     /// Automatically rigs the bones.
     /// </summary>
-    public class ClosestWithFalloffMeshRigger
+    public class ClosestWithFalloffMeshRigger : IMeshRigger
     {
-        public int MaxBonesPerVertex { get; set; } = 2;
+        /// <summary>
+        /// The maximum number of bones that a vertex will be affected by. <br/>
+        /// Each vertex will be affected by that many nearest bones.
+        /// </summary>
+        public int InfluenceCount { get; set; } = 2;
 
         public float FalloffStartDistance { get; set; } = 0.5f;
         public float FalloffEndDistance { get; set; } = 1.0f;
@@ -20,7 +32,7 @@ namespace HSP.Effects.Meshes
         /// <summary>
         /// Calculates the bone positions of the given bones relative to the given parent transform.
         /// </summary>
-        public Vector3[] GetRelativePositions( Transform parent, List<Transform> bones )
+        public Vector3[] GetRelativePositions( Transform parent, IReadOnlyList<Transform> bones )
         {
             if( parent == null )
                 throw new ArgumentNullException( nameof( parent ) );
@@ -45,7 +57,7 @@ namespace HSP.Effects.Meshes
         /// <summary>
         /// Rigs the mesh, replacing its bone weights (if any exist) with the new values.
         /// </summary>
-        public void RigInPlace( Mesh mesh, List<Transform> bones )
+        public void RigInPlace( Mesh mesh, IReadOnlyList<Transform> bones )
         {
             throw new NotImplementedException();
 
@@ -87,13 +99,23 @@ namespace HSP.Effects.Meshes
         /// <summary>
         /// Creates an exact copy of the mesh and rigs it with the given bones.
         /// </summary>
-        public Mesh RigCopy( Mesh mesh, List<Transform> bones )
+        public Mesh RigCopy( Mesh mesh, IReadOnlyList<Transform> bones )
         {
             Mesh newMesh = mesh.GetDeepCopy();
 
             RigInPlace( newMesh, bones );
 
             return newMesh;
+        }
+
+
+        [MapsInheritingFrom( typeof( ClosestWithFalloffMeshRigger ) )]
+        public static SerializationMapping ClosestWithFalloffMeshRiggerMapping()
+        {
+            return new MemberwiseSerializationMapping<ClosestWithFalloffMeshRigger>()
+                .WithMember( "influence_count", o => o.InfluenceCount )
+                .WithMember( "falloff_start_distance", o => o.FalloffStartDistance )
+                .WithMember( "falloff_end_distance", o => o.FalloffEndDistance );
         }
     }
 }

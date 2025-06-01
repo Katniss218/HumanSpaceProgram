@@ -14,6 +14,7 @@ namespace HSP.Effects.Meshes
     public class MeshEffectManager : SingletonMonoBehaviour<MeshEffectManager>
     {
         static ObjectPool<MeshEffectPoolItem, IMeshEffectData> _pool = new(
+            MeshEffectPoolItem.Create,
             ( i, data ) =>
             {
                 i.SetMeshData( data );

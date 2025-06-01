@@ -115,7 +115,7 @@ namespace HSP.Effects.Audio
         internal void Play()
         {
             if( State != ObjectPoolItemState.Ready )
-                throw new InvalidOperationException( $"Audio can only be played when in the {nameof( ObjectPoolItemState.Ready )} state." );
+                throw new InvalidOperationException( $"Audio effect can only be played when in the {nameof( ObjectPoolItemState.Ready )} state." );
 
             SetState_Playing();
         }
@@ -123,7 +123,7 @@ namespace HSP.Effects.Audio
         internal void Stop()
         {
             if( State != ObjectPoolItemState.Playing )
-                throw new InvalidOperationException( $"Audio can only be stopped when in the {nameof( ObjectPoolItemState.Playing )} state." );
+                throw new InvalidOperationException( $"Audio effect can only be stopped when in the {nameof( ObjectPoolItemState.Playing )} state." );
 
             SetState_Finished();
         }

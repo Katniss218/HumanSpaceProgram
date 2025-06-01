@@ -4,7 +4,7 @@ namespace HSP.Effects.Particles.SimulationFrames
 {
     public abstract class CustomSimulationFrame : IParticleEffectSimulationFrame
     {
-        public bool OnInit( ParticleEffectHandle handle )
+        public void OnInit( ParticleEffectHandle handle )
         {
             // Create the simulation frame object (if needed).
             // It will stay in the pool, being set/unset from the property as needed (instead of being destroyed).
@@ -19,14 +19,16 @@ namespace HSP.Effects.Particles.SimulationFrames
 
             main.simulationSpace = ParticleSystemSimulationSpace.Custom;
             main.customSimulationSpace = handle.poolItem.simulationGameObject.transform;
-
-            return false;
         }
+
         public void OnUpdate( ParticleEffectHandle handle )
         {
             this.OnUpdateInternal( handle, handle.poolItem.simulationGameObject.transform );
         }
 
         protected abstract void OnUpdateInternal( ParticleEffectHandle handle, Transform customFrame );
+
+
+        // No serialization becuase abstract
     }
 }
