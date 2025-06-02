@@ -136,12 +136,12 @@ namespace HSP.Effects.Meshes
             get
             {
                 EnsureValid();
-                return _poolItem.localPos;
+                return _poolItem.localPosition;
             }
             set
             {
                 EnsureValid();
-                _poolItem.localPos = value;
+                _poolItem.localPosition = value;
             }
         }
         public Quaternion Rotation
@@ -149,12 +149,12 @@ namespace HSP.Effects.Meshes
             get
             {
                 EnsureValid();
-                return _poolItem.localRot;
+                return _poolItem.localRotation;
             }
             set
             {
                 EnsureValid();
-                _poolItem.localRot = value;
+                _poolItem.localRotation = value;
             }
         }
         public Vector3 Scale

@@ -79,6 +79,9 @@ namespace HSP.Effects.Particles
 
         public IParticleEffectSimulationFrame SimulationFrame { get; set; } = new LocalSimulationFrame();
 
+        public ConstantEffectValue<Vector3> Position { get; set; } = null;
+        public ConstantEffectValue<Quaternion> Rotation { get; set; } = null;
+
         // if simulation space is set, it needs to spawn a new gameobject, add a airf fixer to it, and set that as the PS's sim space.
         //public Transform SimulationSpace { get; set; } = null;
 
@@ -218,9 +221,6 @@ namespace HSP.Effects.Particles
 
         public sealed class Emission
         {
-            public ConstantEffectValue<Vector3> Position { get; set; } = null;
-            public ConstantEffectValue<Quaternion> Rotation { get; set; } = null;
-
             public IParticleEffectEmissionShape SpawnShape { get; set; }
 
             public MinMaxEffectValue<float> SpawnRate { get; set; } = new( 10.0f );
@@ -237,16 +237,6 @@ namespace HSP.Effects.Particles
 
                 this.SpawnShape.OnInit( handle );
 
-                if( this.Position != null )
-                {
-                    this.Position.InitDrivers( handle );
-                    shape.position = this.Position.Get();
-                }
-                if( this.Rotation != null )
-                {
-                    this.Rotation.InitDrivers( handle );
-                    shape.rotation = this.Rotation.Get().eulerAngles;
-                }
                 if( this.MaxParticles != null )
                 {
                     this.MaxParticles.InitDrivers( handle );
@@ -281,10 +271,6 @@ namespace HSP.Effects.Particles
 
                 this.SpawnShape.OnUpdate( handle );
 
-                if( this.Position?.drivers != null )
-                    shape.position = this.Position.Get();
-                if( this.Rotation?.drivers != null )
-                    shape.rotation = this.Rotation.Get().eulerAngles;
                 if( this.MaxParticles?.drivers != null )
                     main.maxParticles = this.MaxParticles.Get();
                 if( this.SpawnRate?.drivers != null )
@@ -302,8 +288,6 @@ namespace HSP.Effects.Particles
             public static SerializationMapping EmissionMapping()
             {
                 return new MemberwiseSerializationMapping<Emission>()
-                    .WithMember( "position", o => o.Position )
-                    .WithMember( "rotation", o => o.Rotation )
                     .WithMember( "spawn_shape", o => o.SpawnShape )
                     .WithMember( "spawn_rate", o => o.SpawnRate )
                     .WithMember( "max_particles", o => o.MaxParticles )
@@ -518,10 +502,22 @@ namespace HSP.Effects.Particles
             handle.EnsureValid();
 
             var main = handle.poolItem.main;
+            var shape = handle.poolItem.particleSystem.shape;
 
             handle.TargetTransform = this.TargetTransform;
             main.duration = this.Duration;
             this.SimulationFrame.OnInit( handle );
+
+            if( this.Position != null )
+            {
+                this.Position.InitDrivers( handle );
+                shape.position = this.Position.Get();
+            }
+            if( this.Rotation != null )
+            {
+                this.Rotation.InitDrivers( handle );
+                shape.rotation = this.Rotation.Get().eulerAngles;
+            }
 
             if( RenderValues != null )
             {
@@ -553,7 +549,14 @@ namespace HSP.Effects.Particles
         {
             handle.EnsureValid();
 
+            var shape = handle.poolItem.particleSystem.shape;
+
             this.SimulationFrame.OnUpdate( handle );
+
+            if( this.Position?.drivers != null )
+                shape.position = this.Position.Get();
+            if( this.Rotation?.drivers != null )
+                shape.rotation = this.Rotation.Get().eulerAngles;
 
             if( RenderValues != null )
             {
@@ -591,6 +594,8 @@ namespace HSP.Effects.Particles
         public static SerializationMapping ParticleEffectDefinitionMapping()
         {
             return new MemberwiseSerializationMapping<ParticleEffectDefinition>()
+                .WithMember( "position", o => o.Position )
+                .WithMember( "rotation", o => o.Rotation )
                 .WithMember( "render", o => o.RenderValues )
                 .WithMember( "duration", o => o.Duration )
                 .WithMember( "loop", o => o.Loop )

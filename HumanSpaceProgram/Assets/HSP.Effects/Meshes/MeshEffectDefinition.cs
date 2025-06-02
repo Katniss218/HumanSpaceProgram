@@ -1,12 +1,36 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityPlus.Serialization;
 
 namespace HSP.Effects.Meshes
 {
     public class MeshEffectDefinition : IMeshEffectData
     {
+        public sealed class BoneData : IBoneData
+        {
+            /// <summary>
+            /// The initial pose of the bone. Corresponds to when the mesh is not deformed.
+            /// </summary>
+            public BindPose BindPose { get; set; }
+
+            public ConstantEffectValue<Vector3> Position { get; set; } = null;
+            public ConstantEffectValue<Quaternion> Rotation { get; set; } = null;
+            public ConstantEffectValue<Vector3> Scale { get; set; } = null;
+
+
+            [MapsInheritingFrom( typeof( BoneData ) )]
+            public static SerializationMapping BoneDataMapping()
+            {
+                return new MemberwiseSerializationMapping<BoneData>()
+                    .WithMember( "bind_pose", o => o.BindPose )
+                    .WithMember( "position", o => o.Position )
+                    .WithMember( "rotation", o => o.Rotation )
+                    .WithMember( "scale", o => o.Scale );
+            }
+        }
+
         /// <summary>
         /// The transform that the mesh effect will follow.
         /// </summary>
@@ -25,6 +49,18 @@ namespace HSP.Effects.Meshes
         public IMeshEffectSimulationFrame SimulationFrame { get; set; }
 
         public BoneData[] Bones { get; set; } = null;
+
+        public bool IsSkinned => Bones != null && Bones.Length > 0;
+        public IReadOnlyList<BindPose> BoneBindPoses
+        {
+            get
+            {
+                return Bones
+                    ?.Select( b => b.BindPose )
+                    .ToArray() ?? null;
+            }
+        }
+
         public float Duration { get; set; }
         public bool Loop { get; set; }
 
@@ -86,7 +122,7 @@ namespace HSP.Effects.Meshes
 
                 if( MeshRigger != null )
                 {
-                    MeshRigger.RigInPlace( handle.Mesh, handle.Bones );
+                    handle.Mesh = MeshRigger.RigCopy( handle.Mesh, this.BoneBindPoses );
                 }
             }
 

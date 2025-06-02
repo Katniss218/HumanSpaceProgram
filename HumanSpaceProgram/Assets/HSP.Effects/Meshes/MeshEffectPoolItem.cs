@@ -24,8 +24,8 @@ namespace HSP.Effects.Meshes
 
         internal List<Transform> _bonePool;
 
-        internal Vector3 localPos = Vector3.zero;
-        internal Quaternion localRot = Quaternion.identity;
+        internal Vector3 localPosition = Vector3.zero;
+        internal Quaternion localRotation = Quaternion.identity;
         internal Vector3 localScale = Vector3.one;
 
         public bool IsSkinned => _isSkinned;
@@ -41,7 +41,7 @@ namespace HSP.Effects.Meshes
 
             if( TargetTransform != null )
             {
-                this.transform.SetPositionAndRotation( TargetTransform.position + localPos, TargetTransform.rotation * localRot );
+                this.transform.SetPositionAndRotation( TargetTransform.position + localPosition, TargetTransform.rotation * localRotation );
                 this.transform.localScale = localScale;
             }
 
@@ -106,26 +106,32 @@ namespace HSP.Effects.Meshes
 
         internal void SetMeshData( IMeshEffectData data )
         {
-            if( data.Bones != null )
+            if( data.IsSkinned )
             {
                 _isSkinned = true;
+                var boneBindPoses = data.BoneBindPoses;
+
+                if( meshRenderer != null )
+                    UnityEngine.Object.Destroy( meshRenderer ); // can only have one or the other, unfortunately.
+                skinnedMeshRenderer = this.gameObject.GetOrAddComponent<SkinnedMeshRenderer>();
+
                 if( _bonePool == null )
-                    _bonePool = new List<Transform>( data.Bones.Length );
+                    _bonePool = new List<Transform>( boneBindPoses.Count );
 
                 // New bone array, but only 
                 Transform[] boneArray = skinnedMeshRenderer.bones;
-                if( _bonePool.Count != data.Bones.Length )
+                if( _bonePool.Count != boneBindPoses.Count )
                 {
-                    boneArray = new Transform[data.Bones.Length];
+                    boneArray = new Transform[boneBindPoses.Count];
                 }
 
                 // Initialize the bones using their bindposes.
-                for( int i = 0; i < data.Bones.Length; i++ )
+                for( int i = 0; i < boneBindPoses.Count; i++ )
                 {
-                    BoneData boneData = data.Bones[i];
+                    BindPose bindPose = boneBindPoses[i];
 
                     Transform bone;
-                    if( i > _bonePool.Count )
+                    if( i >= _bonePool.Count )
                     {
                         bone = new GameObject( "BONE" ).transform;
                         bone.SetParent( this.transform, false );
@@ -136,22 +142,19 @@ namespace HSP.Effects.Meshes
                         bone = _bonePool[i];
                     }
 
-                    bone.localPosition = boneData.BindPose.Position;
-                    bone.localRotation = boneData.BindPose.Rotation;
-                    bone.localScale = boneData.BindPose.Scale;
+                    bone.localPosition = bindPose.Position;
+                    bone.localRotation = bindPose.Rotation;
+                    bone.localScale = bindPose.Scale;
                     boneArray[i] = bone;
                 }
 
-                if( meshRenderer != null )
-                    UnityEngine.Object.Destroy( meshRenderer ); // can only have one or the other, unfortunately.
-                skinnedMeshRenderer = this.gameObject.GetOrAddComponent<SkinnedMeshRenderer>();
                 skinnedMeshRenderer.bones = boneArray;
             }
             else
             {
-                meshRenderer = this.gameObject.GetOrAddComponent<MeshRenderer>();
                 if( skinnedMeshRenderer != null )
                     UnityEngine.Object.Destroy( skinnedMeshRenderer ); // can only have one or the other, unfortunately.
+                meshRenderer = this.gameObject.GetOrAddComponent<MeshRenderer>();
             }
 
             _data = data;

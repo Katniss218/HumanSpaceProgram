@@ -817,6 +817,23 @@
                                                                 "simulation_frame": {
                                                                     "$type": "HSP.Vanilla.Effects.AbsoluteAxisAlignedSimulationFrame, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
                                                                 },
+                                                                "position": {
+                                                                    "$type": "HSP.Effects.ConstantEffectValue`1[[UnityEngine.Vector3, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                                    "value": [
+                                                                        0,
+                                                                        0,
+                                                                        0
+                                                                    ]
+                                                                },
+                                                                "rotation": {
+                                                                    "$type": "HSP.Effects.ConstantEffectValue`1[[UnityEngine.Quaternion, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                                    "value": [
+                                                                        -1,
+                                                                        0,
+                                                                        0,
+                                                                        0
+                                                                    ]
+                                                                },
                                                                 "initial": {
                                                                     "size": {
                                                                         "$type": "HSP.Effects.MinMaxEffectValue`1[[System.Single, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
@@ -855,23 +872,6 @@
                                                                     }
                                                                 },
                                                                 "emission": {
-                                                                    "position": {
-                                                                        "$type": "HSP.Effects.ConstantEffectValue`1[[UnityEngine.Vector3, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                                                                        "value": [
-                                                                            0,
-                                                                            0,
-                                                                            0
-                                                                        ]
-                                                                    },
-                                                                    "rotation": {
-                                                                        "$type": "HSP.Effects.ConstantEffectValue`1[[UnityEngine.Quaternion, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                                                                        "value": [
-                                                                            -1,
-                                                                            0,
-                                                                            0,
-                                                                            0
-                                                                        ]
-                                                                    },
                                                                     "spawn_shape": {
                                                                         "$type": "HSP.Effects.Particles.EmissionShapes.ConeEmissionShape, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
                                                                         "spawn_from": "Base",
@@ -1583,7 +1583,60 @@
                                                                     "$assetref": "Vanilla::Assets/testparticle"
                                                                 },
                                                                 "duration": 1,
-                                                                "loop": true
+                                                                "loop": true,
+                                                                "bones": {
+                                                                    "$type": "HSP.Effects.Meshes.BoneData[], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                                    "value": [
+                                                                        {
+                                                                            "$type": "HSP.Effects.Meshes.BoneData, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                                            "bind_pose": {
+                                                                                "position": [
+                                                                                    0,
+                                                                                    0,
+                                                                                    1
+                                                                                ],
+                                                                                "rotation": [
+                                                                                    0,
+                                                                                    0,
+                                                                                    0,
+                                                                                    1
+                                                                                ],
+                                                                                "scale": [
+                                                                                    1,
+                                                                                    1,
+                                                                                    1
+                                                                                ]
+                                                                            }
+                                                                        },
+                                                                        {
+                                                                            "$type": "HSP.Effects.Meshes.BoneData, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                                            "bind_pose": {
+                                                                                "position": [
+                                                                                    0,
+                                                                                    0,
+                                                                                    -1
+                                                                                ],
+                                                                                "rotation": [
+                                                                                    0,
+                                                                                    0,
+                                                                                    0,
+                                                                                    1
+                                                                                ],
+                                                                                "scale": [
+                                                                                    1,
+                                                                                    1,
+                                                                                    1
+                                                                                ]
+                                                                            }
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                "mesh_rigger": {
+                                                                    "$type": "HSP.Effects.Meshes.ClosestWithFalloffMeshRigger, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                                    "influence_count": 2,
+                                                                    "falloff_start_distance": 0.5,
+                                                                    "falloff_end_distance": 2
+                                                                }
                                                             },
                                                             {
                                                                 "$type": "HSP.Effects.Particles.ParticleEffectDefinition, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
@@ -1600,6 +1653,23 @@
                                                                 "loop": true,
                                                                 "simulation_frame": {
                                                                     "$type": "HSP.Vanilla.Effects.AbsoluteAxisAlignedSimulationFrame, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+                                                                },
+                                                                "position": {
+                                                                    "$type": "HSP.Effects.ConstantEffectValue`1[[UnityEngine.Vector3, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                                    "value": [
+                                                                        0,
+                                                                        0,
+                                                                        0
+                                                                    ]
+                                                                },
+                                                                "rotation": {
+                                                                    "$type": "HSP.Effects.ConstantEffectValue`1[[UnityEngine.Quaternion, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                                    "value": [
+                                                                        -1,
+                                                                        0,
+                                                                        0,
+                                                                        0
+                                                                    ]
                                                                 },
                                                                 "initial": {
                                                                     "size": {
@@ -1639,23 +1709,6 @@
                                                                     }
                                                                 },
                                                                 "emission": {
-                                                                    "position": {
-                                                                        "$type": "HSP.Effects.ConstantEffectValue`1[[UnityEngine.Vector3, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                                                                        "value": [
-                                                                            0,
-                                                                            0,
-                                                                            0
-                                                                        ]
-                                                                    },
-                                                                    "rotation": {
-                                                                        "$type": "HSP.Effects.ConstantEffectValue`1[[UnityEngine.Quaternion, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                                                                        "value": [
-                                                                            -1,
-                                                                            0,
-                                                                            0,
-                                                                            0
-                                                                        ]
-                                                                    },
                                                                     "spawn_shape": {
                                                                         "$type": "HSP.Effects.Particles.EmissionShapes.ConeEmissionShape, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
                                                                         "spawn_from": "Base",

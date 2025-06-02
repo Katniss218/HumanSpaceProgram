@@ -6,29 +6,19 @@ namespace HSP.Effects.Meshes.SimulationFrames
 {
     public class CustomSimulationFrame : IMeshEffectSimulationFrame
     {
-        private struct Sample<T>
-        {
-            public float Time;
-            public T Value;
-
-            public Sample( float time, T value )
-            {
-                Time = time;
-                Value = value;
-            }
-        }
-
-        private const float SAMPLE_RATE = 0.25f; // Take sample every SAMPLE_RATE seconds from previous.
-                                                 // Use to actual current time in the sample though.
-
-        private float _startTime;
-        private Quaternion[] _emitterRotationBuffer;
+        private Quaternion _lastFrameEmitterRotation;
         private float[] _emitterSpeedBuffer;
 
         private float[] _boneTime;
 
 #warning TODO - maybe reproject the bones every frame using previous frame's data?
+        /*
+        We have current local bone position and velocity. We have old velocity, old rotation. 
 
+        Transform the old velocity from old frame to new frame.
+        Move bone back along current velocity so we're effectively sampling the part of the plume flow that is going to arrive at the bone (plume is moving). 
+        Move the bone forward along the transformed velocity. 
+        */
 
         public void OnInit( MeshEffectHandle handle )
         {
@@ -83,21 +73,6 @@ namespace HSP.Effects.Meshes.SimulationFrames
                 
                // bone.SetTRS( pos, rot, Vector3.one );
             }
-        }
-
-        private static Quaternion GetEmitterRotationAtTime( float time, float boneTime )
-        {
-            throw new NotImplementedException();
-        }
-
-        private static float GetEmitterDistanceAtTime( float time, float boneTime )
-        {
-            throw new NotImplementedException();
-        }
-
-        private static float GetEmitterSpeedAtTime( float time, float boneTime )
-        {
-            throw new NotImplementedException();
         }
 
 

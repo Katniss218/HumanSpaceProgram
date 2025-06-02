@@ -16,6 +16,8 @@ namespace HSP.Effects.Meshes
         {
             if( source == null )
                 throw new ArgumentNullException( nameof( source ) );
+            if( !source.isReadable )
+                throw new ArgumentException( $"The source mesh must be readable to create a copy.", nameof( source ) );
 
             Mesh mesh = new Mesh()
             {

@@ -19,7 +19,7 @@ namespace HSP.Effects.Lights
         public ConstantEffectValue<Vector3> Position { get; set; } = null;
         public ConstantEffectValue<Quaternion> Rotation { get; set; } = null;
         public ConstantEffectValue<float> Intensity { get; set; } = new( 1f );
-        public ConstantEffectValue<Color> Color { get; set; }
+        public ConstantEffectValue<Color> Color { get; set; } = null;
 
 
         public void OnInit( LightEffectHandle handle )
