@@ -802,6 +802,71 @@
                                                         "$type": "HSP.Effects.IEffectData[], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
                                                         "value": [
                                                             {
+                                                                "$type": "HSP.Effects.Meshes.MeshEffectDefinition, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                                "$id": "68f497e5-aaf1-44c5-80b8-949432ad0089",
+                                                                "mesh": {
+                                                                    "$assetref": "builtin::HSP._DevUtils/meshplume"
+                                                                },
+                                                                "material": {
+                                                                    "$assetref": "Vanilla::Assets/testparticle"
+                                                                },
+                                                                "duration": 1,
+                                                                "loop": true,
+                                                                "bones": {
+                                                                    "$type": "HSP.Effects.Meshes.BoneData[], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                                    "value": [
+                                                                        {
+                                                                            "$type": "HSP.Effects.Meshes.BoneData, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                                            "bind_pose": {
+                                                                                "position": [
+                                                                                    0,
+                                                                                    0,
+                                                                                    1
+                                                                                ],
+                                                                                "rotation": [
+                                                                                    0,
+                                                                                    0,
+                                                                                    0,
+                                                                                    1
+                                                                                ],
+                                                                                "scale": [
+                                                                                    1,
+                                                                                    1,
+                                                                                    1
+                                                                                ]
+                                                                            }
+                                                                        },
+                                                                        {
+                                                                            "$type": "HSP.Effects.Meshes.BoneData, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                                            "bind_pose": {
+                                                                                "position": [
+                                                                                    0,
+                                                                                    0,
+                                                                                    -1
+                                                                                ],
+                                                                                "rotation": [
+                                                                                    0,
+                                                                                    0,
+                                                                                    0,
+                                                                                    1
+                                                                                ],
+                                                                                "scale": [
+                                                                                    1,
+                                                                                    1,
+                                                                                    1
+                                                                                ]
+                                                                            }
+                                                                        }
+                                                                    ]
+                                                                },
+                                                                "mesh_rigger": {
+                                                                    "$type": "HSP.Effects.Meshes.MeshRiggers.CartesianSmoothRigger, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                                                    "influence_count": 2,
+                                                                    "falloff_start_distance": 0.5,
+                                                                    "falloff_end_distance": 2
+                                                                }
+                                                            },
+                                                            {
                                                                 "$type": "HSP.Effects.Particles.ParticleEffectDefinition, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
                                                                 "$id": "e46ff641-e1d5-4cc9-ba7b-cc77783feb3e",
                                                                 "render": {
@@ -1573,71 +1638,6 @@
                                                     "loop_system": {
                                                         "$type": "HSP.Effects.IEffectData[], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
                                                         "value": [
-                                                            {
-                                                                "$type": "HSP.Effects.Meshes.MeshEffectDefinition, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                                                                "$id": "68f497e5-aaf1-44c5-80b8-949432ad0089",
-                                                                "mesh": {
-                                                                    "$assetref": "builtin::HSP._DevUtils/meshplume"
-                                                                },
-                                                                "material": {
-                                                                    "$assetref": "Vanilla::Assets/testparticle"
-                                                                },
-                                                                "duration": 1,
-                                                                "loop": true,
-                                                                "bones": {
-                                                                    "$type": "HSP.Effects.Meshes.BoneData[], HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                                                                    "value": [
-                                                                        {
-                                                                            "$type": "HSP.Effects.Meshes.BoneData, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                                                                            "bind_pose": {
-                                                                                "position": [
-                                                                                    0,
-                                                                                    0,
-                                                                                    1
-                                                                                ],
-                                                                                "rotation": [
-                                                                                    0,
-                                                                                    0,
-                                                                                    0,
-                                                                                    1
-                                                                                ],
-                                                                                "scale": [
-                                                                                    1,
-                                                                                    1,
-                                                                                    1
-                                                                                ]
-                                                                            }
-                                                                        },
-                                                                        {
-                                                                            "$type": "HSP.Effects.Meshes.BoneData, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                                                                            "bind_pose": {
-                                                                                "position": [
-                                                                                    0,
-                                                                                    0,
-                                                                                    -1
-                                                                                ],
-                                                                                "rotation": [
-                                                                                    0,
-                                                                                    0,
-                                                                                    0,
-                                                                                    1
-                                                                                ],
-                                                                                "scale": [
-                                                                                    1,
-                                                                                    1,
-                                                                                    1
-                                                                                ]
-                                                                            }
-                                                                        }
-                                                                    ]
-                                                                },
-                                                                "mesh_rigger": {
-                                                                    "$type": "HSP.Effects.Meshes.ClosestWithFalloffMeshRigger, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
-                                                                    "influence_count": 2,
-                                                                    "falloff_start_distance": 0.5,
-                                                                    "falloff_end_distance": 2
-                                                                }
-                                                            },
                                                             {
                                                                 "$type": "HSP.Effects.Particles.ParticleEffectDefinition, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
                                                                 "$id": "f9c7e7dc-22e3-4b15-8ba0-746a2029bbe6",

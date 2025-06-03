@@ -4,19 +4,13 @@ using Unity.Collections;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace HSP.Effects.Meshes
+namespace HSP.Effects.Meshes.MeshRiggers
 {
-    public interface IMeshRigger
-    {
-        void RigInPlace( Mesh mesh, IReadOnlyList<BindPose> bones );
-
-        Mesh RigCopy( Mesh mesh, IReadOnlyList<BindPose> bones );
-    }
-
     /// <summary>
-    /// Automatically rigs the bones.
+    /// Rigs the mesh using an easing function to smoothly interpolate between start/end distances. <br/>
+    /// The distance between each vertex and bones is calculated using the cartesian straight-line metric.
     /// </summary>
-    public class ClosestWithFalloffMeshRigger : IMeshRigger
+    public class CartesianSmoothRigger : IMeshRigger
     {
         /// <summary>
         /// The maximum number of bones that a vertex will be affected by. <br/>
@@ -24,11 +18,15 @@ namespace HSP.Effects.Meshes
         /// </summary>
         public int InfluenceCount { get; set; } = 2;
 
+        /// <summary>
+        /// The distance where the bone influence starts to fall off from 1 to 0. <br/>
+        /// </summary>
         public float FalloffStartDistance { get; set; } = 0.5f;
-        public float FalloffEndDistance { get; set; } = 1.0f;
 
-        // rigs up to N closest bones per vertex
-        // uses a linear value within the falloff distance, and a smoothstep value between the falloff start and end.
+        /// <summary>
+        /// The distance where the bone influence reaches 0. <br/>
+        /// </summary>
+        public float FalloffEndDistance { get; set; } = 1.0f;
 
         /// <summary>
         /// Calculates the bone positions of the given bones relative to the given parent transform.
@@ -155,10 +153,10 @@ namespace HSP.Effects.Meshes
         }
 
 
-        [MapsInheritingFrom( typeof( ClosestWithFalloffMeshRigger ) )]
+        [MapsInheritingFrom( typeof( CartesianSmoothRigger ) )]
         public static SerializationMapping ClosestWithFalloffMeshRiggerMapping()
         {
-            return new MemberwiseSerializationMapping<ClosestWithFalloffMeshRigger>()
+            return new MemberwiseSerializationMapping<CartesianSmoothRigger>()
                 .WithMember( "influence_count", o => o.InfluenceCount )
                 .WithMember( "falloff_start_distance", o => o.FalloffStartDistance )
                 .WithMember( "falloff_end_distance", o => o.FalloffEndDistance );

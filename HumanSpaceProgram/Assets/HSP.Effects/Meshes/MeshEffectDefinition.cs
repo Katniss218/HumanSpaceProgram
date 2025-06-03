@@ -43,7 +43,19 @@ namespace HSP.Effects.Meshes
         public ConstantEffectValue<Quaternion> Rotation { get; set; } = null;
         public ConstantEffectValue<Vector3> Scale { get; set; } = null;
 
-        public Mesh Mesh { get; set; }
+        private Mesh _mesh;
+        public Mesh Mesh
+        {
+            get => _mesh;
+            set
+            {
+                _mesh = value;
+                if( _riggedMesh != null )
+                    UnityEngine.Object.Destroy( _riggedMesh ); // destroy the rigged mesh to stop a memory leak.
+                _riggedMesh = null;
+            }
+        }
+        private Mesh _riggedMesh; // only set for rigged mesh effects.
         public Material Material { get; set; }
 
         public IMeshEffectSimulationFrame SimulationFrame { get; set; }
@@ -120,9 +132,15 @@ namespace HSP.Effects.Meshes
                     }
                 }
 
-                if( MeshRigger != null )
+                if( MeshRigger != null && _riggedMesh == null )
                 {
-                    handle.Mesh = MeshRigger.RigCopy( handle.Mesh, this.BoneBindPoses );
+                    // TODO - This can be optimized by checking if a mesh is already (globally) rigged for the given (mesh, bones) pair.
+                    _riggedMesh = MeshRigger.RigCopy( this.Mesh, this.BoneBindPoses );
+                }
+
+                if( _riggedMesh != null )
+                {
+                    handle.Mesh = _riggedMesh;
                 }
             }
 
@@ -163,6 +181,7 @@ namespace HSP.Effects.Meshes
             if( SimulationFrame != null )
                 SimulationFrame.OnUpdate( handle );
         }
+#warning TODO - add OnEnd method to clean up the effect when it ends, if needed (needed for new rigged mesh instances).
 
         public IEffectHandle Play()
         {
