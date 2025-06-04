@@ -1,4 +1,5 @@
-﻿using HSP.Effects.Particles.SimulationFrames;
+﻿using HSP.Effects.Meshes;
+using HSP.Effects.Particles.SimulationFrames;
 using System;
 using System.Linq;
 using UnityEngine;
@@ -576,12 +577,16 @@ namespace HSP.Effects.Particles
             if( LifetimeValues != null )
             {
                 LifetimeValues.OnUpdate( handle );
-            }
+            } 
 
             if( TrailValues != null )
             {
                 TrailValues.OnUpdate( handle );
             }
+        }
+
+        public void OnDispose( ParticleEffectHandle handle )
+        {
         }
 
         public IEffectHandle Play()

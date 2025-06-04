@@ -27,10 +27,12 @@ namespace HSP.Effects.Audio
         }
 
         static ObjectPool<AudioEffectPoolItem, IAudioEffectData> _pool = new(
+            null,
             ( i, data ) =>
             {
                 i.SetAudioData( data );
             },
+            i => i.OnDispose(),
             i => i.State == ObjectPoolItemState.Finished );
 
         // The earth moves, so 'position'-based audio will soon get out of range, unless its pinned to something.

@@ -120,6 +120,10 @@ namespace HSP.Effects.Particles
 
             this.ResetState();
         }
+        internal void OnDispose()
+        {
+            _data.OnDispose( this.currentHandle );
+        }
 
         internal void Play()
         {

@@ -58,8 +58,6 @@ namespace HSP.Effects.Meshes
         private Mesh _riggedMesh; // only set for rigged mesh effects.
         public Material Material { get; set; }
 
-        public IMeshEffectSimulationFrame SimulationFrame { get; set; }
-
         public BoneData[] Bones { get; set; } = null;
 
         public bool IsSkinned => Bones != null && Bones.Length > 0;
@@ -135,6 +133,7 @@ namespace HSP.Effects.Meshes
                 if( MeshRigger != null && _riggedMesh == null )
                 {
                     // TODO - This can be optimized by checking if a mesh is already (globally) rigged for the given (mesh, bones) pair.
+                    // - using some sort of rigged effect mesh manager.
                     _riggedMesh = MeshRigger.RigCopy( this.Mesh, this.BoneBindPoses );
                 }
 
@@ -143,9 +142,6 @@ namespace HSP.Effects.Meshes
                     handle.Mesh = _riggedMesh;
                 }
             }
-
-            if( SimulationFrame != null )
-                SimulationFrame.OnInit( handle );
         }
 
         public void OnUpdate( MeshEffectHandle handle )
@@ -177,11 +173,16 @@ namespace HSP.Effects.Meshes
                         boneTransform.localScale = boneData.Scale.Get();
                 }
             }
-
-            if( SimulationFrame != null )
-                SimulationFrame.OnUpdate( handle );
         }
-#warning TODO - add OnEnd method to clean up the effect when it ends, if needed (needed for new rigged mesh instances).
+
+        public void OnDispose( MeshEffectHandle handle )
+        {
+            if( _riggedMesh != null ) // TODO - when some sort of manager is built, to manage the rigging and automatically rigged meshes, task the deletion and mesh ownership to that manager.
+            {
+                UnityEngine.Object.Destroy( _riggedMesh ); // destroy the instantiated mesh to stop a memory leak.
+                _riggedMesh = null;
+            }
+        }
 
         public IEffectHandle Play()
         {
@@ -195,7 +196,6 @@ namespace HSP.Effects.Meshes
             return new MemberwiseSerializationMapping<MeshEffectDefinition>()
                 .WithMember( "mesh", ObjectContext.Asset, o => o.Mesh )
                 .WithMember( "material", ObjectContext.Asset, o => o.Material )
-                .WithMember( "simulation_frame", o => o.SimulationFrame )
                 .WithMember( "duration", o => o.Duration )
                 .WithMember( "loop", o => o.Loop )
                 .WithMember( "bones", o => o.Bones )

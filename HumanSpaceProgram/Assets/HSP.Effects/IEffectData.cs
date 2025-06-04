@@ -21,7 +21,19 @@ namespace HSP.Effects
 
     public interface IEffectData<THandle> : IEffectData where THandle : IEffectHandle
     {
+        /// <summary>
+        /// Invoked once, right before the effect begins playing.
+        /// </summary>
         void OnInit( THandle handle );
+
+        /// <summary>
+        /// Invoked every Unity Update().
+        /// </summary>
         void OnUpdate( THandle handle );
+
+        /// <summary>
+        /// Invoked when the effect is released back to the pool.
+        /// </summary>
+        void OnDispose( THandle handle );
     }
 }

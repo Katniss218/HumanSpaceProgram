@@ -6,10 +6,12 @@ namespace HSP.Effects.Particles
     public class ParticleEffectManager : SingletonMonoBehaviour<ParticleEffectManager>
     {
         static ObjectPool<ParticleEffectPoolItem, IParticleEffectData> _pool = new(
+            null,
             ( i, data ) =>
             {
                 i.SetParticleData( data );
             },
+            i => i.OnDispose(),
             i => i.State == ObjectPoolItemState.Finished );
 
         public static ParticleEffectHandle Prepare( IParticleEffectData data )

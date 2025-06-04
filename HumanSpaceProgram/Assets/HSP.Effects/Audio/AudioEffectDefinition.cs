@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using HSP.Effects.Lights;
+using UnityEngine;
 using UnityPlus.Serialization;
 
 namespace HSP.Effects.Audio
@@ -67,6 +68,10 @@ namespace HSP.Effects.Audio
                 handle.Volume = this.Volume.Get();
             if( this.Pitch?.drivers != null )
                 handle.Pitch = this.Pitch.Get();
+        }
+
+        public void OnDispose( AudioEffectHandle handle )
+        {
         }
 
         [MapsInheritingFrom( typeof( AudioEffectDefinition ) )]

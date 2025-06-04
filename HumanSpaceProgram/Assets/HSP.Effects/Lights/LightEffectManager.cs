@@ -6,10 +6,12 @@ namespace HSP.Effects.Lights
     public class LightEffectManager : SingletonMonoBehaviour<LightEffectManager>
     {
         static ObjectPool<LightEffectPoolItem, ILightEffectData> _pool = new(
+            null,
             ( i, data ) =>
             {
                 i.SetLightData( data );
             },
+            i => i.OnDispose(),
             i => i.State == ObjectPoolItemState.Finished );
 
 

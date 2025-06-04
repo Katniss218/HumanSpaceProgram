@@ -68,6 +68,10 @@ namespace HSP.Effects.Lights
             State = ObjectPoolItemState.Finished;
             gameObject.SetActive( false ); // Disables the gameobject to stop empty update calls and other processing.
         }
+        internal void OnDispose()
+        {
+            _data.OnDispose( this.currentHandle );
+        }
 
         internal void SetLightData( ILightEffectData data )
         {

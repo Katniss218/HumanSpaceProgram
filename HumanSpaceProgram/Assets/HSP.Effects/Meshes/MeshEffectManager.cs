@@ -19,6 +19,7 @@ namespace HSP.Effects.Meshes
             {
                 i.SetMeshData( data );
             },
+            i => i.OnDispose(),
             i => i.State == ObjectPoolItemState.Finished );
 
         public static MeshEffectHandle Prepare( IMeshEffectData data )

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using HSP.Effects.Particles;
+using UnityEngine;
 using UnityPlus.Serialization;
 
 namespace HSP.Effects.Lights
@@ -53,6 +54,10 @@ namespace HSP.Effects.Lights
         {
             if( this.Intensity != null && this.Intensity.drivers != null )
                 handle.Intensity = this.Intensity.Get();
+        }
+
+        public void OnDispose( LightEffectHandle handle )
+        {
         }
 
         [MapsInheritingFrom( typeof( LightEffectDefinition ) )]

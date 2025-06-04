@@ -42,7 +42,7 @@ namespace HSP.Effects.Meshes
                         mesh.SetUVs( channel, uvs );
                     }
                 }
-                catch( ArgumentException ex )
+                catch( ArgumentException )
                 {
                     // Channel not used, ignore
                 }
