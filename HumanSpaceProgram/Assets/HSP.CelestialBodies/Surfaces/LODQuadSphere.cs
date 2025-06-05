@@ -184,8 +184,17 @@ namespace HSP.CelestialBodies.Surfaces
             }
         }
 
+        void OnEnable()
+        {
+            if( QuadParent != null )
+                QuadParent.gameObject.SetActive( true );
+        }
+
         void OnDisable()
         {
+            if( QuadParent != null )
+                QuadParent.gameObject.SetActive( false );
+
             if( IsBuilding )
             {
                 _builder.Dispose();

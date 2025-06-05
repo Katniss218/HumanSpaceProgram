@@ -47,6 +47,18 @@ namespace UnityPlus
 
         private Transform _itemContainer;
 
+        public Transform ItemContainer
+        {
+            get => _itemContainer;
+            set
+            {
+                if( Count != 0 )
+                    throw new InvalidOperationException( $"Cannot set {nameof( ItemContainer )} when there are items in the pool." );
+
+                _itemContainer = value;
+            }
+        }
+
         /// <param name="initialize">The delegate to use to initialize the pooled items.</param>
         public ObjectPool( Action<TItem, TItemData> initialize )
         {
