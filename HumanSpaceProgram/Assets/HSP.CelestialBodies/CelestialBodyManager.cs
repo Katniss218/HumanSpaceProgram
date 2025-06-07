@@ -19,6 +19,23 @@ namespace HSP.CelestialBodies
             return null;
         }
 
+        public static CelestialBody GetClosest( Vector3Dbl absolutePosition )
+        {
+            double closestSqr = double.MaxValue;
+            CelestialBody closestBody = null;
+            foreach( CelestialBody body in instance._celestialBodies.Values )
+            {
+                double sqrDst = (body.ReferenceFrameTransform.AbsolutePosition - absolutePosition).sqrMagnitude;
+                if( sqrDst < closestSqr )
+                {
+                    closestBody = body;
+                    closestSqr = sqrDst;
+                }
+            }
+
+            return closestBody;
+        }
+
         /// <summary>
         /// Gets all celestial bodies that are currently loaded into memory.
         /// </summary>
