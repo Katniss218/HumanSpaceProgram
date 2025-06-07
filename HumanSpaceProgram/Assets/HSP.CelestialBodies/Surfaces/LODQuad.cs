@@ -59,6 +59,7 @@ namespace HSP.CelestialBodies.Surfaces
 
         public void ResetPositionAndRotation()
         {
+#warning TODO - when activated, the position is sometimes wrong. The position of the parent transform looks alright, but the quads are fucked relative to it.
             IReferenceFrame bodyReferenceFrame = QuadSphere.CelestialBody.ReferenceFrameTransform.OrientedInertialReferenceFrame();
 
             Vector3Dbl airfPos = bodyReferenceFrame.TransformPosition( Node.SphereCenter * QuadSphere.CelestialBody.Radius );
@@ -73,13 +74,13 @@ namespace HSP.CelestialBodies.Surfaces
         public static LODQuad CreateInactive( LODQuadSphere sphere, LODQuadTreeNode node, Mesh mesh )
         {
             GameObject gameObject = new GameObject( $"LODQuad {node.Face}, L{node.SubdivisionLevel}, ({node.FaceCenter.x:#0.################}, {node.FaceCenter.y:#0.################})" );
-            gameObject.transform.SetParent( sphere.QuadParent );
+            gameObject.transform.localPosition = (Vector3)(node.SphereCenter * sphere.CelestialBody.Radius);
+            gameObject.transform.localRotation = Quaternion.identity;
+            gameObject.transform.localScale = Vector3.one;
+            gameObject.transform.SetParent( sphere.QuadParent, false );
+            gameObject.SetActive( false );
 
             LODQuad lodQuad = gameObject.AddComponent<LODQuad>();
-            lodQuad.transform.localPosition = (Vector3)(node.SphereCenter * sphere.CelestialBody.Radius);
-            lodQuad.transform.localRotation = Quaternion.identity;
-            lodQuad.transform.localScale = Vector3.one;
-
             lodQuad._mesh = mesh;
 
             lodQuad.Node = node;
@@ -99,8 +100,6 @@ namespace HSP.CelestialBodies.Surfaces
                 lodQuad._meshCollider = gameObject.AddComponent<MeshCollider>();
                 lodQuad._meshCollider.sharedMesh = mesh;
             }
-
-            lodQuad.Deactivate();
 
             return lodQuad;
         }

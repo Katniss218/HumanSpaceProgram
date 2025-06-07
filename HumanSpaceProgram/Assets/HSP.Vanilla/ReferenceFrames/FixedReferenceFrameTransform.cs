@@ -246,14 +246,14 @@ namespace HSP.Vanilla
 
         // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)
         // Vector3's `==` operator does approximate comparison.
-        private bool IsCacheValid() => (_rb.position.x == _oldPosition.x && _rb.position.y == _oldPosition.y && _rb.position.z == _oldPosition.z)
+        protected virtual bool IsCacheValid() => (_rb.position.x == _oldPosition.x && _rb.position.y == _oldPosition.y && _rb.position.z == _oldPosition.z)
             && SceneReferenceFrameManager.ReferenceFrame.EqualsIgnoreUT( _cachedSceneReferenceFrame );
 
-        private void MakeCacheValid() => _oldPosition = _rb.position;
+        protected virtual void MakeCacheValid() => _oldPosition = _rb.position;
 
-        private void MakeCacheInvalid() => _oldPosition = -_rb.position + new Vector3( 1234.56789f, 12345678.9f, 1.23456789f );
+        protected virtual void MakeCacheInvalid() => _oldPosition = -_rb.position + new Vector3( 1234.56789f, 12345678.9f, 1.23456789f );
 
-        void Awake()
+        protected virtual void Awake()
         {
             if( this.HasComponentOtherThan<IReferenceFrameTransform>( this ) )
             {
@@ -268,12 +268,12 @@ namespace HSP.Vanilla
             _rb.isKinematic = true;
         }
 
-        void FixedUpdate()
+        protected virtual void FixedUpdate()
         {
             MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame.AtUT( TimeManager.UT ) ); // Move, because the scene might be moving, and move ensures that the body is swept instead of teleported.
         }
 
-        public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
+        public virtual void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
 #warning TODO - let the ReferenceFrameTransformUtils.SetScenePositionFromAbsolute use a custom frame. It's equal, but it would be better to use the event data.
             // This one is already idempotent as it simply recalculates the same absolute values to scene space.
@@ -282,22 +282,22 @@ namespace HSP.Vanilla
             RecalculateCache( data.NewFrame );
         }
 
-        void OnEnable()
+        protected virtual void OnEnable()
         {
             _rb.isKinematic = true; // Force kinematic.
         }
 
-        void OnDisable()
+        protected virtual void OnDisable()
         {
             _rb.isKinematic = true;
         }
 
-        void OnCollisionEnter( Collision collision )
+        protected virtual void OnCollisionEnter( Collision collision )
         {
             IsColliding = true;
         }
 
-        void OnCollisionStay( Collision collision )
+        protected virtual void OnCollisionStay( Collision collision )
         {
             // `OnCollisionEnter` / Exit are called for every collider.
             // I've tried using an incrementing/decrementing int with enter/exit, but it wasn't updating correctly, and after some time, there were too many collisions.
@@ -306,7 +306,7 @@ namespace HSP.Vanilla
             IsColliding = true;
         }
 
-        void OnCollisionExit( Collision collision )
+        protected virtual void OnCollisionExit( Collision collision )
         {
             IsColliding = false;
         }

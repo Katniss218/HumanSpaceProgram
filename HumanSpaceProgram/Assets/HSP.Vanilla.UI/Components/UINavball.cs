@@ -1,4 +1,5 @@
 ﻿using HSP.CelestialBodies;
+using HSP.ReferenceFrames;
 using HSP.Trajectories;
 using HSP.Vessels;
 using UnityEngine;
@@ -55,11 +56,14 @@ namespace HSP.Vanilla.UI.Components
                 Matrix4x4 airfToLocalMatrix = Matrix4x4.Rotate( airfRotation ).inverse;
 
                 Vector3Dbl airfVelocity = activeVessel.ReferenceFrameTransform.AbsoluteVelocity;
-                if( airfVelocity.magnitude > MIN_ABSOLUTE_VELOCITY_FOR_MARKERS )
+                CelestialBody closestBody = CelestialBodyManager.GetClosest( activeVessel.ReferenceFrameTransform.AbsolutePosition );
+                Vector3Dbl velocityRelativeToBody = closestBody.ReferenceFrameTransform.CenteredInertialReferenceFrame().InverseTransformVelocity( airfVelocity );
+
+                if( velocityRelativeToBody.magnitude > MIN_ABSOLUTE_VELOCITY_FOR_MARKERS )
                 {
                     Vector3Dbl gravityAcc = GravityUtils.GetNBodyGravityAcceleration( activeVessel.ReferenceFrameTransform.AbsolutePosition );
 
-                    OrbitalFrame orbitalFrame = new OrbitalFrame( airfVelocity.NormalizeToVector3(), -gravityAcc.NormalizeToVector3() );
+                    OrbitalFrame orbitalFrame = new OrbitalFrame( velocityRelativeToBody.NormalizeToVector3(), -gravityAcc.NormalizeToVector3() );
 
                     Vector3 localPrograde = airfToLocalMatrix.MultiplyVector( orbitalFrame.GetPrograde() ) * NavballPixelRadius;
                     Vector3 localRetrograde = airfToLocalMatrix.MultiplyVector( orbitalFrame.GetRetrograde() ) * NavballPixelRadius;

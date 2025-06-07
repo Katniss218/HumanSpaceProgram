@@ -1,17 +1,25 @@
-﻿using HSP.Trajectories;
-using HSP.ControlSystems;
+﻿using HSP.ControlSystems;
 using HSP.ControlSystems.Controls;
 using HSP.ResourceFlow;
 using HSP.Vessels;
 using System;
 using UnityEngine;
 using UnityPlus.Serialization;
-using System.Linq;
 
 namespace HSP.Vanilla.Components
 {
+    public interface IPropulsion
+    {
+        public Transform ThrustTransform { get; }
+        float Thrust { get; }
+        float MaxThrust { get; }
+
+        event Action OnAfterIgnite;
+        event Action OnAfterShutdown;
+    }
+
     [Serializable]
-    public class FRocketEngine : MonoBehaviour, IResourceConsumer
+    public class FRocketEngine : MonoBehaviour, IPropulsion, IResourceConsumer
     {
         const float g = 9.80665f;
 

@@ -1,0 +1,24 @@
+// particle effect
+{
+    "particle_systems":
+    [
+        {
+            "properties":
+            {
+                "emission": { "min": 5, "max": 10, "value": null, "driver": null },
+                "size": {
+                    "value": 4, // base value
+                    "driver": {
+                        "getter": {
+                            // serialized representation of IValueGetter<T> with <T> matching the type of the size property.
+                        },
+                        // setter omitted since it's obvious what we're setting.
+                        "curve": {
+                            // needs a generic Curve<T> with custom interpolators, memberwise-interpolation should be okay in most cases.
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

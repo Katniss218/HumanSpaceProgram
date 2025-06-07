@@ -90,7 +90,7 @@ namespace UnityEngine
 
             return Direction3D.Yp;
         }
-
+        
         private static Direction3D FromZ( float z )
         {
             if( z == 0 )

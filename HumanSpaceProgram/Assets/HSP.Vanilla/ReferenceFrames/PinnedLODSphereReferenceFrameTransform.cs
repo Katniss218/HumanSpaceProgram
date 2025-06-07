@@ -12,6 +12,8 @@ namespace HSP.Vanilla.ReferenceFrames
 
         protected override void FixedUpdate()
         {
+            base.FixedUpdate();
+
             Vector3 scenePosition = this.Position;
 
             if( scenePosition.magnitude > MaxPosition )
@@ -22,8 +24,6 @@ namespace HSP.Vanilla.ReferenceFrames
                 }
                 this.Position = Vector3.zero;
             }
-
-            base.FixedUpdate();
         }
 
         public const string ADD_PINNED_LOD_REFERENCE_TRANSFORM = HSPEvent.NAMESPACE_HSP + ".addpinnedlreftrans";

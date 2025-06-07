@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Xml.Linq;
 using UnityEngine;
 
 namespace UnityPlus.Serialization
@@ -30,19 +31,25 @@ namespace UnityPlus.Serialization
 
         private static bool _isInitialized = false;
 
+        public static bool IsInitialized => _isInitialized;
+
         private static IEnumerable<Type> GetTypes( IEnumerable<Assembly> assemblies )
         {
             return assemblies
-                .SelectMany( a => a.GetTypes() )
-                .Where( t => !t.IsGenericType ); // Menetic types don't work in this context, so we skip them when searching for methods returning mappings.
-                                                 // The method itself can still be generic.
+                .SelectMany( a => a.GetTypes() );
+            //.Where( t => !t.IsGenericType ); // Menetic types don't work in this context, so we skip them when searching for methods returning mappings.
+            // The method itself can still be generic.
         }
 
-        private static void Initialize( IEnumerable<Assembly> assemblies )
+        private const BindingFlags METHOD_SEARCH_FLAGS = BindingFlags.Public | BindingFlags.Static;
+
+        private static void FindAndInitializeMappings( IEnumerable<Assembly> assemblies )
         {
+            Clear();
+
             foreach( var containingType in GetTypes( assemblies ) )
             {
-                MethodInfo[] methods = containingType.GetMethods( BindingFlags.Public | BindingFlags.Static );
+                MethodInfo[] methods = containingType.GetMethods( METHOD_SEARCH_FLAGS );
                 foreach( var method in methods )
                 {
                     // Find every method that returns a mapping, and cache *that method*.
@@ -123,6 +130,17 @@ namespace UnityPlus.Serialization
             _isInitialized = true;
         }
 
+        public static void Clear()
+        {
+            _inheritingFromMappings.Clear();
+            _implementingMappings.Clear();
+            _anyClassMappings.Clear();
+            _anyStructMappings.Clear();
+            _anyInterfaceMappings.Clear();
+            _anyMappings.Clear();
+            _directCache.Clear();
+        }
+
         /// <summary>
         /// Forces the registry to reload all its mappings.
         /// </summary>
@@ -131,7 +149,7 @@ namespace UnityPlus.Serialization
         /// </remarks>
         public static void ForceReload()
         {
-            Initialize( AppDomain.CurrentDomain.GetAssemblies() );
+            FindAndInitializeMappings( AppDomain.CurrentDomain.GetAssemblies() );
         }
 
         /// <summary>
@@ -142,15 +160,23 @@ namespace UnityPlus.Serialization
         /// </remarks>
         public static void ForceReload( Assembly assembly )
         {
-            Initialize( new Assembly[] { assembly } );
+            FindAndInitializeMappings( new Assembly[] { assembly } );
         }
 
+        /// <param name="objType">The type of the object we want to get the mapping for.</param>
         private static SerializationMapping MakeReadyAndRegister( int context, MappingGetterMethod entry, Type objType )
         {
             MethodInfo method = entry.method;
 
-            if( method.ContainsGenericParameters )
+            // method.ContainsGenericParameters is true for methods gotten from an unconstructed generic type (e.g. `SomeType<,>.GetMapping()`).
+            // method.IsGenericMethod is true even for constructed methods, but we're passing only unconstructed methods here.
+            if( method.IsGenericMethod )
             {
+                if( method.DeclaringType.IsGenericType )
+                {
+                    throw new InvalidOperationException( $"Couldn't initialize mapping from method `{method}` (mapped type: `{objType}`). Mappings using generic methods inside generic types are not supported. Choose one or the other." );
+                }
+
                 if( entry.providerAttribute is MapsAnyClassAttribute )
                 {
                     method = method.MakeGenericMethod( objType );
@@ -183,17 +209,34 @@ namespace UnityPlus.Serialization
                 {
                     method = method.MakeGenericMethod( objType );
                 }
-                // Catch-all clause for normal generic types (e.g. List<T>, Dictionary<TKey, TValue), etc).
-                // Only call it if special-cases don't match the type.
+                // Catch-all clause for normal generic methods (e.g. List<T>, Dictionary<TKey, TValue>, etc).
+                // Only used if the special cases don't match on the objType.
                 else
                 {
                     if( method.GetGenericArguments().Length != objType.GetGenericArguments().Length )
                     {
-                        throw new InvalidOperationException( $"Couldn't initialize mapping from method `{method}` (mapped type: `{objType}`). Number of generic parameters on the method doesn't match the number of generic parameters on the object type." );
+                        throw new InvalidOperationException( $"Couldn't initialize mapping from method `{method}` (mapped type: `{objType}`). Number of generic parameters on the method doesn't match the number of generic parameters on the mapped type." );
                     }
 
                     // This may still throw an exception if the method has additional generic constraints.
                     method = method.MakeGenericMethod( objType.GetGenericArguments() );
+                }
+            }
+            else
+            {
+                Type declaringType = method.DeclaringType;
+                // Here support for generic types instead of generic methods.
+                if( declaringType.IsGenericType && declaringType.ContainsGenericParameters )
+                {
+                    if( declaringType.GetGenericArguments().Length != objType.GetGenericArguments().Length )
+                    {
+                        throw new InvalidOperationException( $"Couldn't initialize mapping from method `{method}` (mapped type: `{objType}`). Number of generic parameters on the declaring type doesn't match the number of generic parameters on the mapped type." );
+                    }
+
+                    // This may still throw an exception if the declaring type has additional generic constraints.
+                    declaringType = declaringType.MakeGenericType( objType.GetGenericArguments() );
+                    // Re-get the method from the now-constructed generic type.
+                    method = declaringType.GetMethod( method.Name, METHOD_SEARCH_FLAGS );
                 }
             }
 
@@ -253,7 +296,7 @@ namespace UnityPlus.Serialization
             }
 
             if( !_isInitialized )
-                Initialize( AppDomain.CurrentDomain.GetAssemblies() );
+                FindAndInitializeMappings( AppDomain.CurrentDomain.GetAssemblies() );
 
             return GetMappingInternal( context, memberType );
         }
@@ -270,7 +313,7 @@ namespace UnityPlus.Serialization
         public static SerializationMapping GetMapping<TMember>( int context, TMember memberObj )
         {
             if( !_isInitialized )
-                Initialize( AppDomain.CurrentDomain.GetAssemblies() );
+                FindAndInitializeMappings( AppDomain.CurrentDomain.GetAssemblies() );
 
             Type objType = memberObj == null
                 ? typeof( TMember )
@@ -291,7 +334,7 @@ namespace UnityPlus.Serialization
         public static SerializationMapping GetMapping<TMember>( int context, Type objType )
         {
             if( !_isInitialized )
-                Initialize( AppDomain.CurrentDomain.GetAssemblies() );
+                FindAndInitializeMappings( AppDomain.CurrentDomain.GetAssemblies() );
 
             if( objType == null )
                 objType = typeof( TMember );
