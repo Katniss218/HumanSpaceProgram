@@ -20,8 +20,8 @@ namespace HSP.Vanilla.UI.Components
             }
             else
             {
-                CelestialBody body = CelestialBodyManager.Get( "main" );
-                Vector3Dbl bodySpaceVelocity = body.ReferenceFrameTransform.CenteredInertialReferenceFrame().InverseTransformVelocity( activeObj.AbsoluteVelocity );
+                CelestialBody closestBody = CelestialBodyManager.GetClosest( activeObj.AbsolutePosition );
+                Vector3Dbl bodySpaceVelocity = closestBody.ReferenceFrameTransform.CenteredInertialReferenceFrame().InverseTransformVelocity( activeObj.AbsoluteVelocity );
 
                 double vel = bodySpaceVelocity.magnitude;
 
