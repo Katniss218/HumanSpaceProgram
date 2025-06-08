@@ -82,6 +82,7 @@
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\Importer.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\FourCC.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\GameDataMeshLoader.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\OBJ\OBJVertex.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla.Content.AssetLoaders\___HSP.Vanilla.Content.AssetLoaders.asmdef" />
