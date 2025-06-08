@@ -58,19 +58,19 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\_UnityPlus\IOverridable_Ex.cs" />
-    <Compile Include="Assets\_UnityPlus\IOverridable.cs" />
-    <Compile Include="Assets\_UnityPlus\PlayerLoopUtils.cs" />
-    <Compile Include="Assets\_UnityPlus\ITopologicallySortable.cs" />
-    <Compile Include="Assets\_UnityPlus\Editor\AlwaysIncludedShadersWindow.cs" />
-    <Compile Include="Assets\_UnityPlus\LinearMappingCurve.cs" />
-    <Compile Include="Assets\_UnityPlus\ObjectPool.cs" />
-    <Compile Include="Assets\_UnityPlus\Editor\AlwaysIncludedShadersUtils.cs" />
     <Compile Include="Assets\_UnityPlus\MappingCurve.cs" />
+    <Compile Include="Assets\_UnityPlus\IOverridable_Ex.cs" />
     <Compile Include="Assets\_UnityPlus\ITopologicallySortable_Ex.cs" />
-    <Compile Include="Assets\_UnityPlus\IMappingCurve.cs" />
     <Compile Include="Assets\_UnityPlus\IMappingCurveInterpolator.cs" />
+    <Compile Include="Assets\_UnityPlus\Editor\AlwaysIncludedShadersWindow.cs" />
+    <Compile Include="Assets\_UnityPlus\IOverridable.cs" />
+    <Compile Include="Assets\_UnityPlus\Editor\AlwaysIncludedShadersUtils.cs" />
+    <Compile Include="Assets\_UnityPlus\LinearMappingCurve.cs" />
+    <Compile Include="Assets\_UnityPlus\IMappingCurve.cs" />
+    <Compile Include="Assets\_UnityPlus\PlayerLoopUtils.cs" />
     <Compile Include="Assets\_UnityPlus\FloatInterpolator.cs" />
+    <Compile Include="Assets\_UnityPlus\ITopologicallySortable.cs" />
+    <Compile Include="Assets\_UnityPlus\ObjectPool.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_UnityPlus\___UnityPlus.asmdef" />

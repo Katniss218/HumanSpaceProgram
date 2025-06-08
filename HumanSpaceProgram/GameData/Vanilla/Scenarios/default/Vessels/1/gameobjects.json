@@ -805,7 +805,7 @@
                                                                 "$type": "HSP.Effects.Meshes.MeshEffectDefinition, HSP.Effects, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
                                                                 "$id": "68f497e5-aaf1-44c5-80b8-949432ad0089",
                                                                 "mesh": {
-                                                                    "$assetref": "builtin::HSP._DevUtils/meshplume"
+                                                                    "$assetref": "Vanilla::Assets/cylinder"
                                                                 },
                                                                 "material": {
                                                                     "$assetref": "Vanilla::Assets/testparticle"

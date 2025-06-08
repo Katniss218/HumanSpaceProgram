@@ -6,13 +6,13 @@ namespace HSP.Vanilla.Content.AssetLoaders.DDS
 {
     public static class Importer
     {
-        public static Texture2D LoadDDS( string fileName, Texture2DMetadata metadata )
+        public static Texture2D LoadDDS( string filePath, Texture2DMetadata metadata )
         {
-            BinaryReader binaryReader = new BinaryReader( new MemoryStream( File.ReadAllBytes( fileName ) ) );
+            BinaryReader binaryReader = new BinaryReader( new MemoryStream( File.ReadAllBytes( filePath ) ) );
 
             if( binaryReader.ReadUInt32() != FourCC.DDS_ )
             {
-                throw new IOException( $"File '{fileName}' is not a DDS file!" );
+                throw new IOException( $"File '{filePath}' is not a DDS file!" );
             }
 
             DDSHeader ddsHeader = new DDSHeader( binaryReader );

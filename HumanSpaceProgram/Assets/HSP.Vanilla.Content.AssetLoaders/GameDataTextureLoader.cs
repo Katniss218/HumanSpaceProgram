@@ -1,6 +1,5 @@
 ﻿using HSP.Content;
 using HSP.Vanilla.Content.AssetLoaders.Metadata;
-using HSP.Vanilla.Scenes.AlwaysLoadedScene;
 using System.IO;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;

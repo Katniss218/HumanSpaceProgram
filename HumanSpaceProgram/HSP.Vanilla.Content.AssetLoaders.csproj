@@ -73,6 +73,7 @@
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DDPF.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\D3D11ResourceDimension.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DDSHeaderDX10.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\OBJ\Importer.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\GameDataTextureLoader.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\WAV\Importer.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\Metadata\Texture2DMetadata.cs" />
@@ -80,6 +81,7 @@
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\DDCaps.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\Importer.cs" />
     <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\DDS\FourCC.cs" />
+    <Compile Include="Assets\HSP.Vanilla.Content.AssetLoaders\GameDataMeshLoader.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla.Content.AssetLoaders\___HSP.Vanilla.Content.AssetLoaders.asmdef" />

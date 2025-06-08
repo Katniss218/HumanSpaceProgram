@@ -1,7 +1,6 @@
 ﻿using HSP.Content;
 using HSP.Content.Vessels;
 using HSP.Content.Vessels.Serialization;
-using HSP.Vanilla.Scenes.AlwaysLoadedScene;
 using System.IO;
 using UnityEngine;
 using UnityPlus.Serialization;

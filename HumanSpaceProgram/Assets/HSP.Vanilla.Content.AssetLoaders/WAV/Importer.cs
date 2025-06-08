@@ -8,9 +8,9 @@ namespace HSP.Vanilla.Content.AssetLoaders.WAV
         /// <remarks>
         /// This method can only handle PCM (uncompressed) wave files for now.
         /// </remarks>
-        public static AudioClip LoadWAV( string fileName )
+        public static AudioClip LoadWAV( string filePath )
         {
-            byte[] bytes = File.ReadAllBytes( fileName );
+            byte[] bytes = File.ReadAllBytes( filePath );
 
             //
             //	RIFF HEADER.
@@ -124,7 +124,7 @@ namespace HSP.Vanilla.Content.AssetLoaders.WAV
                 }
             }
 
-            AudioClip audioClip = AudioClip.Create( fileName, numSamples, numChannels, sampleRate, false );
+            AudioClip audioClip = AudioClip.Create( filePath, numSamples, numChannels, sampleRate, false );
             audioClip.SetData( pcmData, 0 );
 
             return audioClip;
