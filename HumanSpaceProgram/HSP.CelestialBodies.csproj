@@ -76,6 +76,7 @@
     <Compile Include="Assets\HSP.CelestialBodies\Surfaces\ILODQuadModifier.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\Surfaces\LODQuadRebuildAdditionalData.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\Surfaces\LODQuadMode.cs" />
+    <Compile Include="Assets\HSP.CelestialBodies\IPOIGetter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.CelestialBodies\Surfaces\TerrainShader.shader" />

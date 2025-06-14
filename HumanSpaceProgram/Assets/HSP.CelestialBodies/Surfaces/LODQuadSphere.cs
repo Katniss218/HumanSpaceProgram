@@ -58,6 +58,11 @@ namespace HSP.CelestialBodies.Surfaces
         }
 
         /// <summary>
+        /// Gets or sets how far the POIs returned by <see cref="PoIGetter"/> must move before they're considered to have changed.
+        /// </summary>
+        public double MaxPOIDistanceDelta { get; set; } = 0.5;
+
+        /// <summary>
         /// Gets the celestial body that this LOD sphere belongs to.
         /// </summary>
         public CelestialBody CelestialBody { get; private set; }
@@ -116,7 +121,7 @@ namespace HSP.CelestialBodies.Surfaces
         /// <remarks>
         /// The points returned by the getter should be in absolute space.
         /// </remarks>
-        public Func<IEnumerable<Vector3Dbl>> PoIGetter { get; set; }
+        public IPOIGetter PoIGetter { get; set; }
 
         /// <summary>
         /// Checks if the LOD sphere is currently building any new quads.
@@ -162,7 +167,10 @@ namespace HSP.CelestialBodies.Surfaces
         void Update()
         {
             if( PoIGetter == null )
+            {
+                Debug.LogWarning( $"The {nameof( PoIGetter )} is null." );
                 return;
+            }
 
             if( _builder == null )
             {
@@ -238,12 +246,12 @@ namespace HSP.CelestialBodies.Surfaces
             double scale = this.CelestialBody.Radius;
 
 #warning TODO - something with pois to determine how much each quad should subdivide towards it (stopping subdiv level) (may be useful for camera frustum biasing and for fast moving objects)
-            Vector3Dbl[] localPois = PoIGetter.Invoke()
+            Vector3Dbl[] localPois = PoIGetter.GetPOIs()
                 .Select( p => invRot * ((p - pos) / scale) )
                 .Where( p => p.magnitude < 2 * LODQuadTreeNode.SUBDIV_RANGE_MULTIPLIER )
                 .ToArray();
 
-            if( PoisChanged( localPois, 0.5 / scale ) )
+            if( PoisChanged( localPois, MaxPOIDistanceDelta / scale ) )
             {
                 var buildingTree = LODQuadTree.FromPois( _currentTree.MaxDepth, localPois );
                 var buildingChanges = LODQuadTree.GetDifferences( _currentTree, buildingTree );
@@ -379,6 +387,7 @@ namespace HSP.CelestialBodies.Surfaces
                 .WithMember( "max_depth", o => o.MaxDepth )
                 .WithMember( "materials", ArrayContext.Assets, o => o.Materials )
                 .WithMember( "poi_getter", o => o.PoIGetter )
+                .WithMember( "max_poi_distance_delta", o => o.MaxPOIDistanceDelta )
                 .WithMember( "jobs", o => o.Jobs, ( o, value ) => o.SetJobs( value ) );
         }
     }

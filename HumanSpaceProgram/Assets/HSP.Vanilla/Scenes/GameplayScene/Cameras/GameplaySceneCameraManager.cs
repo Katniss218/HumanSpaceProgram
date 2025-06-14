@@ -124,6 +124,8 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
         public static Camera EffectCamera => instance._effectCamera;
         public static Camera UICamera => instance._uiCamera;
 
+        public static Transform ViewTransform => instanceExists ? instance.CameraParent : null;
+
         float _effectCameraNearPlane;
 
         private void AdjustCameras()

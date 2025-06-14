@@ -61,7 +61,7 @@ namespace HSP._DevUtils
             lqs.EdgeSubdivisions = 4;
             lqs.MaxDepth = 10;
             lqs.Materials = _earthMaterial;
-            lqs.PoIGetter = () => VesselManager.LoadedVessels.Select( v => v.ReferenceFrameTransform.AbsolutePosition );
+            lqs.PoIGetter = new AllLoadedVesselsPOIGetter();
             lqs.SetJobs( new ILODQuadModifier[]
             {
                 new LODQuadModifier_InitializeMesh(),
@@ -84,7 +84,7 @@ namespace HSP._DevUtils
             lqs.EdgeSubdivisions = 5;
             lqs.MaxDepth = 16;
             lqs.Materials = _earthMaterial;
-            lqs.PoIGetter = () => VesselManager.LoadedVessels.Select( v => v.ReferenceFrameTransform.AbsolutePosition );
+            lqs.PoIGetter = new AllLoadedVesselsPOIGetter();
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
             comp.IsAttractor = true;
@@ -101,11 +101,7 @@ namespace HSP._DevUtils
             lqs.EdgeSubdivisions = 6;
             lqs.MaxDepth = 14;
             lqs.Materials = _earthMaterial;
-            lqs.PoIGetter = () => new Vector3Dbl[]
-            {
-                SceneReferenceFrameManager.ReferenceFrame.TransformPosition( GameplaySceneCameraManager.NearCamera.transform.position ),
-                SceneReferenceFrameManager.ReferenceFrame.TransformPosition( GameplaySceneCameraManager.NearCamera.transform.position + GameplaySceneCameraManager.NearCamera.transform.forward * 500 ),
-            };
+            lqs.PoIGetter = new ActiveCameraPOIGetter();
             lqs.SetJobs( new ILODQuadModifier[]
             {
                 new LODQuadModifier_InitializeMesh(),
@@ -129,7 +125,7 @@ namespace HSP._DevUtils
             lqs2.SetMode( LODQuadMode.Collider );
             lqs2.EdgeSubdivisions = 5;
             lqs2.MaxDepth = 14;
-            lqs2.PoIGetter = () => VesselManager.LoadedVessels.Select( v => v.ReferenceFrameTransform.AbsolutePosition );
+            lqs.PoIGetter = new AllLoadedVesselsPOIGetter();
             lqs2.SetJobs( new ILODQuadModifier[]
             {
                 new LODQuadModifier_InitializeMesh(),
@@ -158,11 +154,7 @@ namespace HSP._DevUtils
             lqsWater.MaxDepth = 10;
             var mat = AssetRegistry.Get<Material>( "builtin::Resources/New Material 2" );
             lqsWater.Materials = new Material[] { mat, mat, mat, mat, mat, mat };
-            lqsWater.PoIGetter = () => new Vector3Dbl[]
-            {
-                SceneReferenceFrameManager.ReferenceFrame.TransformPosition( GameplaySceneCameraManager.NearCamera.transform.position ),
-                SceneReferenceFrameManager.ReferenceFrame.TransformPosition( GameplaySceneCameraManager.NearCamera.transform.position + GameplaySceneCameraManager.NearCamera.transform.forward * 500 ),
-            };
+            lqs.PoIGetter = new ActiveCameraPOIGetter();
             lqsWater.SetJobs( new ILODQuadModifier[]
             {
                 new LODQuadModifier_InitializeMesh()
@@ -182,7 +174,7 @@ namespace HSP._DevUtils
             CelestialBody cb = new CelestialBodyFactory( id ).Create( airfPos, airfRot );
             LODQuadSphere lqs = cb.gameObject.AddComponent<LODQuadSphere>();
             lqs.Materials = _earthMaterial;
-            lqs.PoIGetter = () => VesselManager.LoadedVessels.Select( v => v.ReferenceFrameTransform.AbsolutePosition );
+            lqs.PoIGetter = new AllLoadedVesselsPOIGetter();
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
             comp.IsAttractor = false;

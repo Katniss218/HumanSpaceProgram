@@ -1,1 +1,328 @@
-﻿{"$type":"UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"28339b1f-1440-4add-af78-eaafd8536807","is_active":true,"is_static":false,"layer":0,"name":"celestialbody-main","tag":"Untagged","children":{"$id":"4067e3e5-dee2-449d-a1c3-19563dbf2daf","value":[]},"components":{"$id":"c3d36887-26d8-4b27-9bf8-61e471ad1fbc","value":[{"$type":"UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"2a7aeda7-deb2-4fb3-a3cd-df59f4c5538d","local_position":[149999992832,0,0],"local_rotation":[0.707106828689575,0,0,-0.707106828689575],"local_scale":[1,1,1]},{"$type":"HSP.CelestialBodies.CelestialBody, HSP.CelestialBodies, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"3cdebb8d-da38-4bef-91d9-99f6c776f0ce","is_enabled":true,"id":"main","display_name":null,"mass":5.97E+24,"radius":6371000},{"$type":"UnityEngine.Rigidbody, UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"d4a470cd-7d27-49d5-8a4b-72bab764b41e","is_kinematic":true},{"$type":"HSP.Vanilla.KinematicReferenceFrameTransform, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"82e6e329-0523-49dd-bf63-258895b30846","is_enabled":true,"mass":5.96999991261919E+24,"local_center_of_mass":[0,0,0],"DO_NOT_TOUCH":true,"absolute_position":[150000000000,0,0],"absolute_rotation":[0.70710676908493,0,0,-0.70710676908493],"absolute_velocity":[0,29749.1543788567,0],"absolute_angular_velocity":[0,-7.2921159E-05,0]},{"$type":"HSP.CelestialBodies.Surfaces.LODQuadSphere, HSP.CelestialBodies, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"06a9986a-fd8c-4a21-a411-40a087a9b08c","is_enabled":true,"mode":"Visual","edge_subdivisions":6,"max_depth":14,"materials":{"$id":"ed780de4-bfb7-426a-a54b-bddd5a0e3dcb","value":[{"$assetref":"Vanilla::Assets/earth_material_0"},{"$assetref":"Vanilla::Assets/earth_material_1"},{"$assetref":"Vanilla::Assets/earth_material_2"},{"$assetref":"Vanilla::Assets/earth_material_3"},{"$assetref":"Vanilla::Assets/earth_material_4"},{"$assetref":"Vanilla::Assets/earth_material_5"}]},"poi_getter":{"$id":"eca1c3c5-084d-40a8-8f68-78a598fe1ff8","value":[{"method":{"delegate_type":"System.Func`1[[System.Collections.Generic.IEnumerable`1[[UnityEngine.Vector3Dbl, _UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089","identifier":"<CreateCB>b__4_0","parameters":[],"declaring_type":"HSP._DevUtils.VanillaPlanetarySystemFactory+<>c, HSP._DevUtils, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"},"target":{"$ref":"02617fad-aaf2-491a-88c4-ed443efdeda7"}}]},"jobs":{"$id":"f8a9ac30-ae20-4247-9edc-a9223c315f78","value":[{"$id":"aafb0a94-affb-4c3d-8e7e-6a1a61d6830f","value":[{"$type":"HSP.Vanilla.CelestialBodies.LODQuadModifier_InitializeMesh, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"ff29ed45-486e-4789-a2a3-67fd0e325943"},{"$type":"HSP.Vanilla.CelestialBodies.LODQuadModifier_Heightmap, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"91cd92a7-b683-4747-9024-66b325850c9c","heightmap_xn":{"$assetref":"Vanilla::Assets/earth_height_xn"},"heightmap_xp":{"$assetref":"Vanilla::Assets/earth_height_xp"},"heightmap_yn":{"$assetref":"Vanilla::Assets/earth_height_yn"},"heightmap_yp":{"$assetref":"Vanilla::Assets/earth_height_yp"},"heightmap_zn":{"$assetref":"Vanilla::Assets/earth_height_zn"},"heightmap_zp":{"$assetref":"Vanilla::Assets/earth_height_zp"},"min_level":-11684,"max_level":8848}]},{"$id":"dc37d2df-fc69-421a-9067-2c6aafead1f5","value":[{"$type":"HSP.Vanilla.CelestialBodies.LODQuadModifier_FinalizeMesh, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"f54f17e8-c004-4654-9ee3-cee0649f3088"}]}]}},{"$type":"HSP.CelestialBodies.Surfaces.LODQuadSphere, HSP.CelestialBodies, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"432cf768-3f9f-4284-9b0c-56fc474c6604","is_enabled":true,"mode":"Collider","edge_subdivisions":5,"max_depth":14,"materials":null,"poi_getter":{"$id":"fbf269ba-083f-45da-95af-c8000fd31a7f","value":[{"method":{"delegate_type":"System.Func`1[[System.Collections.Generic.IEnumerable`1[[UnityEngine.Vector3Dbl, _UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089","identifier":"<CreateCB>b__4_1","parameters":[],"declaring_type":"HSP._DevUtils.VanillaPlanetarySystemFactory+<>c, HSP._DevUtils, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"},"target":{"$ref":"02617fad-aaf2-491a-88c4-ed443efdeda7"}}]},"jobs":{"$id":"baca3567-c7ad-4071-9255-dbe81219ea0b","value":[{"$id":"65709e2c-1c19-430b-acf3-dcc8d0b0a38f","value":[{"$type":"HSP.Vanilla.CelestialBodies.LODQuadModifier_InitializeMesh, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"f965d62e-edcc-4bd3-aeda-7fe3b0840ffb"},{"$type":"HSP.Vanilla.CelestialBodies.LODQuadModifier_Heightmap, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"0d77797d-07af-40c5-85bf-e6a260340f4f","heightmap_xn":{"$assetref":"Vanilla::Assets/earth_height_xn"},"heightmap_xp":{"$assetref":"Vanilla::Assets/earth_height_xp"},"heightmap_yn":{"$assetref":"Vanilla::Assets/earth_height_yn"},"heightmap_yp":{"$assetref":"Vanilla::Assets/earth_height_yp"},"heightmap_zn":{"$assetref":"Vanilla::Assets/earth_height_zn"},"heightmap_zp":{"$assetref":"Vanilla::Assets/earth_height_zp"},"min_level":-11684,"max_level":8848}]},{"$id":"8ced7ec4-0cc9-4036-8e3f-30d8322f336c","value":[{"$type":"HSP.Vanilla.CelestialBodies.LODQuadModifier_FinalizeMesh, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"4893dd3a-cc8b-4b92-925c-af49db172857"}]},{"$id":"df94e2c4-6e28-41e2-a8a0-079b247fcab7","value":[{"$type":"HSP.Vanilla.CelestialBodies.LODQuadModifier_BakeCollisionData, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"18f40e6a-6658-4ecf-8035-018de74d5b42"}]}]}},{"$type":"HSP.CelestialBodies.Surfaces.LODQuadSphere, HSP.CelestialBodies, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"022a4df3-1fbe-4ff7-a7aa-c4b549fb32ef","is_enabled":true,"mode":"Visual","edge_subdivisions":6,"max_depth":10,"materials":{"$id":"9b3882ad-4405-4d23-99b6-17a245e1725f","value":[{"$assetref":"builtin::Resources/New Material 2"},{"$assetref":"builtin::Resources/New Material 2"},{"$assetref":"builtin::Resources/New Material 2"},{"$assetref":"builtin::Resources/New Material 2"},{"$assetref":"builtin::Resources/New Material 2"},{"$assetref":"builtin::Resources/New Material 2"}]},"poi_getter":{"$id":"12d85c11-66dd-4fe9-bfde-607f194a12b2","value":[{"method":{"delegate_type":"System.Func`1[[System.Collections.Generic.IEnumerable`1[[UnityEngine.Vector3Dbl, _UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089","identifier":"<CreateCB>b__4_2","parameters":[],"declaring_type":"HSP._DevUtils.VanillaPlanetarySystemFactory+<>c, HSP._DevUtils, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"},"target":{"$ref":"02617fad-aaf2-491a-88c4-ed443efdeda7"}}]},"jobs":{"$id":"c241e08d-d63d-411b-bf24-9d8628e392b7","value":[{"$id":"1e703b8f-d0ad-40f6-9492-87c3f88907a5","value":[{"$type":"HSP.Vanilla.CelestialBodies.LODQuadModifier_InitializeMesh, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"93bfe4ef-cdfd-4df2-bda4-ab90a9c1c93a"}]},{"$id":"324c0631-1454-4e8f-aed1-4e2d0cd124d8","value":[{"$type":"HSP.Vanilla.CelestialBodies.LODQuadModifier_FinalizeMesh, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"a5531b9e-461b-424a-9d8a-5d5aac7fdd9a"}]}]}},{"$type":"HSP.Trajectories.TrajectoryTransform, HSP.Trajectories, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"ad0eca94-08f0-4c39-a62e-83b7ede818f3","is_enabled":true,"trajectory":{"$type":"HSP.Vanilla.Trajectories.NewtonianOrbit, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"4db49f32-95c0-4f83-9b53-f0981357ff48","ut":0,"mass":5.97E+24,"position":[150000000000,0,0],"velocity":[0,29749.1543788567,0]},"is_attractor":true},{"$type":"HSP.CelestialBodies.Atmospheres.Atmosphere, HSP.CelestialBodies, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null","$id":"7699694d-5a2d-4f0b-8f87-4bc0e4351f4b","is_enabled":true,"height":140000,"shared_material":{"$assetref":"builtin::Resources/Materials/Atmosphere"}}]}}
+﻿{
+    "$type": "UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+    "$id": "28339b1f-1440-4add-af78-eaafd8536807",
+    "is_active": true,
+    "is_static": false,
+    "layer": 0,
+    "name": "celestialbody-main",
+    "tag": "Untagged",
+    "children": {
+        "$id": "4067e3e5-dee2-449d-a1c3-19563dbf2daf",
+        "value": []
+    },
+    "components": {
+        "$id": "c3d36887-26d8-4b27-9bf8-61e471ad1fbc",
+        "value": [
+            {
+                "$type": "UnityEngine.Transform, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "2a7aeda7-deb2-4fb3-a3cd-df59f4c5538d",
+                "local_position": [
+                    149999992832,
+                    0,
+                    0
+                ],
+                "local_rotation": [
+                    0.707106828689575,
+                    0,
+                    0,
+                    -0.707106828689575
+                ],
+                "local_scale": [
+                    1,
+                    1,
+                    1
+                ]
+            },
+            {
+                "$type": "HSP.CelestialBodies.CelestialBody, HSP.CelestialBodies, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "3cdebb8d-da38-4bef-91d9-99f6c776f0ce",
+                "is_enabled": true,
+                "id": "main",
+                "display_name": null,
+                "mass": 5.97E+24,
+                "radius": 6371000
+            },
+            {
+                "$type": "UnityEngine.Rigidbody, UnityEngine.PhysicsModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "d4a470cd-7d27-49d5-8a4b-72bab764b41e",
+                "is_kinematic": true
+            },
+            {
+                "$type": "HSP.Vanilla.KinematicReferenceFrameTransform, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "82e6e329-0523-49dd-bf63-258895b30846",
+                "is_enabled": true,
+                "mass": 5.96999991261919E+24,
+                "local_center_of_mass": [
+                    0,
+                    0,
+                    0
+                ],
+                "DO_NOT_TOUCH": true,
+                "absolute_position": [
+                    150000000000,
+                    0,
+                    0
+                ],
+                "absolute_rotation": [
+                    0.70710676908493,
+                    0,
+                    0,
+                    -0.70710676908493
+                ],
+                "absolute_velocity": [
+                    0,
+                    29749.1543788567,
+                    0
+                ],
+                "absolute_angular_velocity": [
+                    0,
+                    -7.2921159E-05,
+                    0
+                ]
+            },
+            {
+                "$type": "HSP.CelestialBodies.Surfaces.LODQuadSphere, HSP.CelestialBodies, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "06a9986a-fd8c-4a21-a411-40a087a9b08c",
+                "is_enabled": true,
+                "mode": "Visual",
+                "edge_subdivisions": 6,
+                "max_depth": 14,
+                "materials": {
+                    "$id": "ed780de4-bfb7-426a-a54b-bddd5a0e3dcb",
+                    "value": [
+                        {
+                            "$assetref": "Vanilla::Assets/earth_material_0"
+                        },
+                        {
+                            "$assetref": "Vanilla::Assets/earth_material_1"
+                        },
+                        {
+                            "$assetref": "Vanilla::Assets/earth_material_2"
+                        },
+                        {
+                            "$assetref": "Vanilla::Assets/earth_material_3"
+                        },
+                        {
+                            "$assetref": "Vanilla::Assets/earth_material_4"
+                        },
+                        {
+                            "$assetref": "Vanilla::Assets/earth_material_5"
+                        }
+                    ]
+                },
+                "poi_getter": {
+                    "$type": "HSP.Vanilla.CelestialBodies.ActiveCameraPOIGetter, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "b85e61ff-4da9-42d7-8763-5124dff16a80"
+                },
+                "max_poi_distance_delta": 0.5,
+                "jobs": {
+                    "$id": "f8a9ac30-ae20-4247-9edc-a9223c315f78",
+                    "value": [
+                        {
+                            "$id": "aafb0a94-affb-4c3d-8e7e-6a1a61d6830f",
+                            "value": [
+                                {
+                                    "$type": "HSP.Vanilla.CelestialBodies.LODQuadModifier_InitializeMesh, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                    "$id": "ff29ed45-486e-4789-a2a3-67fd0e325943"
+                                },
+                                {
+                                    "$type": "HSP.Vanilla.CelestialBodies.LODQuadModifier_Heightmap, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                    "$id": "91cd92a7-b683-4747-9024-66b325850c9c",
+                                    "heightmap_xn": {
+                                        "$assetref": "Vanilla::Assets/earth_height_xn"
+                                    },
+                                    "heightmap_xp": {
+                                        "$assetref": "Vanilla::Assets/earth_height_xp"
+                                    },
+                                    "heightmap_yn": {
+                                        "$assetref": "Vanilla::Assets/earth_height_yn"
+                                    },
+                                    "heightmap_yp": {
+                                        "$assetref": "Vanilla::Assets/earth_height_yp"
+                                    },
+                                    "heightmap_zn": {
+                                        "$assetref": "Vanilla::Assets/earth_height_zn"
+                                    },
+                                    "heightmap_zp": {
+                                        "$assetref": "Vanilla::Assets/earth_height_zp"
+                                    },
+                                    "min_level": -11684,
+                                    "max_level": 8848
+                                }
+                            ]
+                        },
+                        {
+                            "$id": "dc37d2df-fc69-421a-9067-2c6aafead1f5",
+                            "value": [
+                                {
+                                    "$type": "HSP.Vanilla.CelestialBodies.LODQuadModifier_FinalizeMesh, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                    "$id": "f54f17e8-c004-4654-9ee3-cee0649f3088"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            {
+                "$type": "HSP.CelestialBodies.Surfaces.LODQuadSphere, HSP.CelestialBodies, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "432cf768-3f9f-4284-9b0c-56fc474c6604",
+                "is_enabled": true,
+                "mode": "Collider",
+                "edge_subdivisions": 5,
+                "max_depth": 14,
+                "materials": null,
+                "poi_getter": {
+                    "$type": "HSP.Vanilla.CelestialBodies.AllLoadedVesselsPOIGetter, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "b85e61ff-4da9-42d7-8763-5124dff16a80"
+                },
+                "max_poi_distance_delta": 0.5,
+                "jobs": {
+                    "$id": "baca3567-c7ad-4071-9255-dbe81219ea0b",
+                    "value": [
+                        {
+                            "$id": "65709e2c-1c19-430b-acf3-dcc8d0b0a38f",
+                            "value": [
+                                {
+                                    "$type": "HSP.Vanilla.CelestialBodies.LODQuadModifier_InitializeMesh, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                    "$id": "f965d62e-edcc-4bd3-aeda-7fe3b0840ffb"
+                                },
+                                {
+                                    "$type": "HSP.Vanilla.CelestialBodies.LODQuadModifier_Heightmap, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                    "$id": "0d77797d-07af-40c5-85bf-e6a260340f4f",
+                                    "heightmap_xn": {
+                                        "$assetref": "Vanilla::Assets/earth_height_xn"
+                                    },
+                                    "heightmap_xp": {
+                                        "$assetref": "Vanilla::Assets/earth_height_xp"
+                                    },
+                                    "heightmap_yn": {
+                                        "$assetref": "Vanilla::Assets/earth_height_yn"
+                                    },
+                                    "heightmap_yp": {
+                                        "$assetref": "Vanilla::Assets/earth_height_yp"
+                                    },
+                                    "heightmap_zn": {
+                                        "$assetref": "Vanilla::Assets/earth_height_zn"
+                                    },
+                                    "heightmap_zp": {
+                                        "$assetref": "Vanilla::Assets/earth_height_zp"
+                                    },
+                                    "min_level": -11684,
+                                    "max_level": 8848
+                                }
+                            ]
+                        },
+                        {
+                            "$id": "8ced7ec4-0cc9-4036-8e3f-30d8322f336c",
+                            "value": [
+                                {
+                                    "$type": "HSP.Vanilla.CelestialBodies.LODQuadModifier_FinalizeMesh, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                    "$id": "4893dd3a-cc8b-4b92-925c-af49db172857"
+                                }
+                            ]
+                        },
+                        {
+                            "$id": "df94e2c4-6e28-41e2-a8a0-079b247fcab7",
+                            "value": [
+                                {
+                                    "$type": "HSP.Vanilla.CelestialBodies.LODQuadModifier_BakeCollisionData, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                    "$id": "18f40e6a-6658-4ecf-8035-018de74d5b42"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            {
+                "$type": "HSP.CelestialBodies.Surfaces.LODQuadSphere, HSP.CelestialBodies, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "022a4df3-1fbe-4ff7-a7aa-c4b549fb32ef",
+                "is_enabled": true,
+                "mode": "Visual",
+                "edge_subdivisions": 6,
+                "max_depth": 10,
+                "materials": {
+                    "$id": "9b3882ad-4405-4d23-99b6-17a245e1725f",
+                    "value": [
+                        {
+                            "$assetref": "builtin::Resources/New Material 2"
+                        },
+                        {
+                            "$assetref": "builtin::Resources/New Material 2"
+                        },
+                        {
+                            "$assetref": "builtin::Resources/New Material 2"
+                        },
+                        {
+                            "$assetref": "builtin::Resources/New Material 2"
+                        },
+                        {
+                            "$assetref": "builtin::Resources/New Material 2"
+                        },
+                        {
+                            "$assetref": "builtin::Resources/New Material 2"
+                        }
+                    ]
+                },
+                "poi_getter": {
+                    "$type": "HSP.Vanilla.CelestialBodies.ActiveCameraPOIGetter, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "b85e61ff-4da9-42d7-8763-5124dff16a80"
+                },
+                "max_poi_distance_delta": 0.5,
+                "jobs": {
+                    "$id": "c241e08d-d63d-411b-bf24-9d8628e392b7",
+                    "value": [
+                        {
+                            "$id": "1e703b8f-d0ad-40f6-9492-87c3f88907a5",
+                            "value": [
+                                {
+                                    "$type": "HSP.Vanilla.CelestialBodies.LODQuadModifier_InitializeMesh, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                    "$id": "93bfe4ef-cdfd-4df2-bda4-ab90a9c1c93a"
+                                }
+                            ]
+                        },
+                        {
+                            "$id": "324c0631-1454-4e8f-aed1-4e2d0cd124d8",
+                            "value": [
+                                {
+                                    "$type": "HSP.Vanilla.CelestialBodies.LODQuadModifier_FinalizeMesh, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                                    "$id": "a5531b9e-461b-424a-9d8a-5d5aac7fdd9a"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            {
+                "$type": "HSP.Trajectories.TrajectoryTransform, HSP.Trajectories, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "ad0eca94-08f0-4c39-a62e-83b7ede818f3",
+                "is_enabled": true,
+                "trajectory": {
+                    "$type": "HSP.Vanilla.Trajectories.NewtonianOrbit, HSP.Vanilla, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                    "$id": "4db49f32-95c0-4f83-9b53-f0981357ff48",
+                    "ut": 0,
+                    "mass": 5.97E+24,
+                    "position": [
+                        150000000000,
+                        0,
+                        0
+                    ],
+                    "velocity": [
+                        0,
+                        29749.1543788567,
+                        0
+                    ]
+                },
+                "is_attractor": true
+            },
+            {
+                "$type": "HSP.CelestialBodies.Atmospheres.Atmosphere, HSP.CelestialBodies, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+                "$id": "7699694d-5a2d-4f0b-8f87-4bc0e4351f4b",
+                "is_enabled": true,
+                "height": 140000,
+                "shared_material": {
+                    "$assetref": "builtin::Resources/Materials/Atmosphere"
+                }
+            }
+        ]
+    }
+}
