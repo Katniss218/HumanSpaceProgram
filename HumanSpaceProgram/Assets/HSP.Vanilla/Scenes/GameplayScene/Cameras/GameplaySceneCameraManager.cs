@@ -84,27 +84,15 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
         [field: SerializeField]
         public Transform CameraParent { get; private set; }
 
-        /// <summary>
-        /// Used for rendering the planets mostly.
-        /// </summary>
         [SerializeField]
         Camera _farCamera;
 
-        /// <summary>
-        /// Used for rendering the vessels and other close / small objects, as well as shadows.
-        /// </summary>
         [SerializeField]
         Camera _nearCamera;
 
-        /// <summary>
-        /// Used for rendering screen space effects, like atmospheres.
-        /// </summary>
         [SerializeField]
         Camera _effectCamera;
 
-        /// <summary>
-        /// Used for rendering screen space effects, like atmospheres.
-        /// </summary>
         [SerializeField]
         Camera _uiCamera;
 
@@ -119,11 +107,26 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
         public static RenderTexture FarDepthRenderTexture => instance._farDepthRT;
         public static RenderTexture NearDepthRenderTexture => instance._nearDepthRT;
 
+        /// <summary>
+        /// Used for rendering the planets mostly.
+        /// </summary>
         public static Camera FarCamera => instance._farCamera;
+        /// <summary>
+        /// Used for rendering the vessels and other close / small objects, as well as shadows.
+        /// </summary>
         public static Camera NearCamera => instance._nearCamera;
+        /// <summary>
+        /// Used for rendering screen space effects, like atmospheres.
+        /// </summary>
         public static Camera EffectCamera => instance._effectCamera;
+        /// <summary>
+        /// Used for rendering screen space effects, like atmospheres.
+        /// </summary>
         public static Camera UICamera => instance._uiCamera;
 
+        /// <summary>
+        /// Return the transform at the position and orientation of the camera.
+        /// </summary>
         public static Transform ViewTransform => instanceExists ? instance.CameraParent : null;
 
         float _effectCameraNearPlane;

@@ -34,7 +34,9 @@ namespace HSP.Vanilla.CelestialBodies
     {
         public IEnumerable<Vector3Dbl> GetPOIs()
         {
-            // TODO - support map view???
+            if ( GameplaySceneCameraManager.ViewTransform == null )
+                return Enumerable.Empty<Vector3Dbl>();
+
             return new Vector3Dbl[]
             {
                 SceneReferenceFrameManager.ReferenceFrame.TransformPosition( GameplaySceneCameraManager.ViewTransform.position ),
