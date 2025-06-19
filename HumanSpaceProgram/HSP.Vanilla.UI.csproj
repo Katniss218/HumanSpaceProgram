@@ -94,6 +94,7 @@
     <Compile Include="Assets\HSP.Vanilla.UI\Timelines\UIScenarioMetadata.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\UITextReadout_Acceleration.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Scenes\GameplayScene\OnStartup.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI\Scenes\GameplayMapScene\MapSceneUIFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla.UI\___HSP.Vanilla.UI.asmdef" />

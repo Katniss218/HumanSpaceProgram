@@ -124,11 +124,6 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
         /// </summary>
         public static Camera UICamera => instance._uiCamera;
 
-        /// <summary>
-        /// Return the transform at the position and orientation of the camera.
-        /// </summary>
-        public static Transform ViewTransform => instanceExists ? instance.CameraParent : null;
-
         float _effectCameraNearPlane;
 
         private void AdjustCameras()

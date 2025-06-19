@@ -34,13 +34,13 @@ namespace HSP.Vanilla.CelestialBodies
     {
         public IEnumerable<Vector3Dbl> GetPOIs()
         {
-            if ( GameplaySceneCameraManager.ViewTransform == null )
+            if ( SceneCamera.Camera == null )
                 return Enumerable.Empty<Vector3Dbl>();
 
             return new Vector3Dbl[]
             {
-                SceneReferenceFrameManager.ReferenceFrame.TransformPosition( GameplaySceneCameraManager.ViewTransform.position ),
-                SceneReferenceFrameManager.ReferenceFrame.TransformPosition( GameplaySceneCameraManager.ViewTransform.position + GameplaySceneCameraManager.ViewTransform.forward * 500 ),
+                SceneReferenceFrameManager.ReferenceFrame.TransformPosition( SceneCamera.Camera.transform.position ),
+                SceneReferenceFrameManager.ReferenceFrame.TransformPosition( SceneCamera.Camera.transform.position + SceneCamera.Camera.transform.forward * 500 ),
             };
         }
 

@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HSP.CelestialBodies", "HSP.CelestialBodies.csproj", "{83793330-5AED-C186-5E4B-AAD4BB463469}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_UnityPlus.Serialization", "_UnityPlus.Serialization.csproj", "{FED3C19A-E743-9E19-D660-957D0801811E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HSP.Vanilla", "HSP.Vanilla.csproj", "{AE718BD5-B7C2-FF6D-CB3C-BD7A5FEC452C}"
@@ -12,8 +14,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HSP.ViewportTools", "HSP.ViewportTools.csproj", "{86E65C59-E535-B902-539C-629C971164F3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HSP.Vanilla.UI", "HSP.Vanilla.UI.csproj", "{6C8F7BA3-CBB1-7E26-D57A-944E3A2E5099}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HSP.CelestialBodies", "HSP.CelestialBodies.csproj", "{83793330-5AED-C186-5E4B-AAD4BB463469}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HSP.Timelines", "HSP.Timelines.csproj", "{C443A3BB-4D58-3A1D-D085-E8AEA15B2BC0}"
 EndProject
@@ -79,6 +79,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{83793330-5AED-C186-5E4B-AAD4BB463469}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83793330-5AED-C186-5E4B-AAD4BB463469}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83793330-5AED-C186-5E4B-AAD4BB463469}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83793330-5AED-C186-5E4B-AAD4BB463469}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FED3C19A-E743-9E19-D660-957D0801811E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FED3C19A-E743-9E19-D660-957D0801811E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FED3C19A-E743-9E19-D660-957D0801811E}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -103,10 +107,6 @@ Global
 		{6C8F7BA3-CBB1-7E26-D57A-944E3A2E5099}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C8F7BA3-CBB1-7E26-D57A-944E3A2E5099}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C8F7BA3-CBB1-7E26-D57A-944E3A2E5099}.Release|Any CPU.Build.0 = Release|Any CPU
-		{83793330-5AED-C186-5E4B-AAD4BB463469}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{83793330-5AED-C186-5E4B-AAD4BB463469}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{83793330-5AED-C186-5E4B-AAD4BB463469}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{83793330-5AED-C186-5E4B-AAD4BB463469}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C443A3BB-4D58-3A1D-D085-E8AEA15B2BC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C443A3BB-4D58-3A1D-D085-E8AEA15B2BC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C443A3BB-4D58-3A1D-D085-E8AEA15B2BC0}.Release|Any CPU.ActiveCfg = Release|Any CPU

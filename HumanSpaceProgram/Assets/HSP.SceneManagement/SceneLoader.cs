@@ -13,9 +13,16 @@ namespace HSP.SceneManagement
     {
         private static HashSet<string> _loadedScenes = new();
 
+        private static string _activeSceneName = null;
+
         public static bool IsSceneLoaded( string sceneName )
         {
             return _loadedScenes.Contains( sceneName );
+        }
+
+        public static IEnumerable<string> GetLoadedScenes()
+        {
+            return _loadedScenes;
         }
 
         public static void UnloadActiveSceneAsync( Action onAfterUnloaded )
@@ -55,6 +62,7 @@ namespace HSP.SceneManagement
             }
 
             _loadedScenes.Remove( sceneToUnload );
+            _activeSceneName = SceneManager.GetActiveScene().name;
 
             onAfterUnloaded?.Invoke();
         }
@@ -80,6 +88,7 @@ namespace HSP.SceneManagement
             if( !additive )
                 _loadedScenes.Clear();
             _loadedScenes.Add( sceneToLoad );
+            _activeSceneName = SceneManager.GetActiveScene().name;
 
             onAfterLoaded?.Invoke();
         }
