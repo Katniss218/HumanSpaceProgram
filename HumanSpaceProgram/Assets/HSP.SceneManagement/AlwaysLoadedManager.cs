@@ -1,10 +1,11 @@
+using Assets.HSP.SceneManagement;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
-namespace HSP
+namespace HSP.SceneManagement
 {
     /// <summary>
     /// Invoked at the immediate start of the game, to load the mod assemblies (that have to be loaded before other events are invoked).
@@ -38,9 +39,9 @@ namespace HSP
     /// <remarks>
     /// You can use this gameobject to set up logic that needs to be updated, or be a monobehariour.
     /// </remarks>
-    public class AlwaysLoadedManager : SingletonMonoBehaviour<AlwaysLoadedManager>
+    public class AlwaysLoadedManager : SceneManager<AlwaysLoadedManager>
     {
-        public const string ALWAYS_LOADED_SCENE_NAME = "_AlwaysLoaded";
+        public override string UNITY_SCENE_NAME => "_AlwaysLoaded";
 
         public static AlwaysLoadedManager Instance => instance;
         public static GameObject GameObject => instance.gameObject;

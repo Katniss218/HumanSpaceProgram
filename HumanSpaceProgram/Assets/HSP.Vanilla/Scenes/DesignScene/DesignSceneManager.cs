@@ -1,3 +1,4 @@
+using Assets.HSP.SceneManagement;
 using UnityEngine;
 
 namespace HSP.Vanilla.Scenes.DesignScene
@@ -13,7 +14,7 @@ namespace HSP.Vanilla.Scenes.DesignScene
     /// <summary>
     /// A Manager whose responsibility is to invoke the events relating to creation/destruction of the `design` scene.
     /// </summary>
-    public class DesignSceneManager : SingletonMonoBehaviour<DesignSceneManager>
+    public class DesignSceneManager : SceneManager<DesignSceneManager>
     {
         public const string SCENE_NAME = "Design";
 

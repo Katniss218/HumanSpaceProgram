@@ -1,3 +1,4 @@
+using Assets.HSP.SceneManagement;
 using UnityEngine;
 
 namespace HSP.Vanilla.Scenes.MainMenuScene
@@ -13,7 +14,7 @@ namespace HSP.Vanilla.Scenes.MainMenuScene
     /// <summary>
     /// A Manager whose responsibility is to invoke the events relating to creation/destruction of the `main menu` scene.
     /// </summary>
-    public class MainMenuSceneManager : SingletonMonoBehaviour<MainMenuSceneManager>
+    public class MainMenuSceneManager : SceneManager<MainMenuSceneManager>
     {
         public const string SCENE_NAME = "MainMenu";
 
