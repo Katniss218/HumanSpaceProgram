@@ -1,4 +1,4 @@
-using Assets.HSP.SceneManagement;
+using HSP.SceneManagement;
 using UnityEngine;
 
 namespace HSP.Vanilla.Scenes.MainMenuScene
@@ -14,9 +14,9 @@ namespace HSP.Vanilla.Scenes.MainMenuScene
     /// <summary>
     /// A Manager whose responsibility is to invoke the events relating to creation/destruction of the `main menu` scene.
     /// </summary>
-    public class MainMenuSceneManager : SceneManager<MainMenuSceneManager>
+    public class MainMenuSceneManager : HSPSceneManager<MainMenuSceneManager>
     {
-        public const string SCENE_NAME = "MainMenu";
+        public static string UNITY_SCENE_NAME = "MainMenu";
 
         public static MainMenuSceneManager Instance => instance;
         public static GameObject GameObject => instance.gameObject;
@@ -24,6 +24,22 @@ namespace HSP.Vanilla.Scenes.MainMenuScene
         void Awake()
         {
             HSPEvent.EventManager.TryInvoke( HSPEvent_STARTUP_MAIN_MENU.ID );
+        }
+
+        protected override void OnActivate()
+        {
+        }
+
+        protected override void OnDeactivate()
+        {
+        }
+
+        protected override void OnLoad()
+        {
+        }
+
+        protected override void OnUnload()
+        {
         }
     }
 }

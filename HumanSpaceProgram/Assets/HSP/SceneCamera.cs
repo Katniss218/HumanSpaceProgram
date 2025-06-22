@@ -5,7 +5,7 @@ namespace HSP
     /// <summary>
     /// The currently active primary camera in the scene.
     /// </summary>
-    public abstract class SceneCamera : SingletonMonoBehaviour<SceneCamera>
+    public sealed class SceneCamera : SingletonMonoBehaviour<SceneCamera>
     {
         new public Camera camera { get; set; }
 

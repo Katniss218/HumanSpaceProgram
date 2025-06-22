@@ -1,4 +1,4 @@
-using Assets.HSP.SceneManagement;
+using HSP.SceneManagement;
 using UnityEngine;
 
 namespace HSP.Vanilla.Scenes.EditorScene
@@ -14,9 +14,9 @@ namespace HSP.Vanilla.Scenes.EditorScene
     /// <summary>
     /// A Manager whose responsibility is to invoke the events relating to creation/destruction of the `editor` scene.
     /// </summary>
-    public class EditorSceneManager : SceneManager<EditorSceneManager>
+    public class EditorSceneManager : HSPSceneManager<EditorSceneManager>
     {
-        public const string SCENE_NAME = "Editor";
+        public static new string UNITY_SCENE_NAME = "Editor";
 
         public static EditorSceneManager Instance => instance;
         public static GameObject GameObject => instance.gameObject;
@@ -24,6 +24,22 @@ namespace HSP.Vanilla.Scenes.EditorScene
         void Awake()
         {
             HSPEvent.EventManager.TryInvoke( HSPEvent_STARTUP_EDITOR.ID );
+        }
+
+        protected override void OnActivate()
+        {
+        }
+
+        protected override void OnDeactivate()
+        {
+        }
+
+        protected override void OnLoad()
+        {
+        }
+
+        protected override void OnUnload()
+        {
         }
     }
 }

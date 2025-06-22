@@ -74,7 +74,7 @@ namespace HSP.Vanilla.UI.Scenes.MainMenuScene
         {
             parent.AddButton( new UILayoutInfo( UIAnchor.Center, (0, -100), (200, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
             {
-                SceneLoader.UnloadActiveSceneAsync( () => SceneLoader.LoadSceneAsync( DesignSceneManager.SCENE_NAME, true, false, null ) );
+                HSPSceneLoader.ReplaceForegroundScene<DesignSceneManager>();
             } )
                 .AddStdText( new UILayoutInfo( UIFill.Fill() ), "Design a Rocket" )
                 .WithAlignment( HorizontalAlignmentOptions.Center );
@@ -84,7 +84,7 @@ namespace HSP.Vanilla.UI.Scenes.MainMenuScene
         {
             parent.AddButton( new UILayoutInfo( UIAnchor.Center, (0, -120), (200, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
             {
-                SceneLoader.UnloadActiveSceneAsync( () => SceneLoader.LoadSceneAsync( EditorSceneManager.SCENE_NAME, true, false, null ) );
+                HSPSceneLoader.ReplaceForegroundScene<EditorSceneManager>();
             } )
                 .Disabled()
                 .AddStdText( new UILayoutInfo( UIFill.Fill() ), "Part Editor" )

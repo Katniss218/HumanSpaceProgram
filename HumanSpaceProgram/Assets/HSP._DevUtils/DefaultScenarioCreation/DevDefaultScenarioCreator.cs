@@ -40,14 +40,14 @@ namespace HSP._DevUtils
 
         public static void LoadGameplayScene()
         {
-            SceneLoader.UnloadActiveSceneAsync( () => SceneLoader.LoadSceneAsync( GameplaySceneManager.SCENE_NAME, true, false, () =>
+            HSPSceneLoader.ReplaceForegroundScene<GameplaySceneManager>( onAfterLoaded: () =>
             {
                 VanillaPlanetarySystemFactory.CreateDefaultPlanetarySystem();
 
                 CreateVessels();
 
                 TimelineManager.BeginScenarioSaveAsync( scenario );
-            } ) );
+            } );
         }
 
         private static void CreateVessels()

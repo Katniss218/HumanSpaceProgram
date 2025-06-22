@@ -1816,8 +1816,8 @@ GameObject:
   - component: {fileID: 1611604363}
   - component: {fileID: 1611604364}
   - component: {fileID: 1611604366}
-  - component: {fileID: 1611604367}
   - component: {fileID: 1611604368}
+  - component: {fileID: 1611604367}
   m_Layer: 3
   m_Name: _ ALWAYS LOADED MANAGER _
   m_TagString: Untagged
@@ -1886,7 +1886,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1611604357}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f26c91c250fad5441ae825679dbf9e31, type: 3}
+  m_Script: {fileID: 11500000, guid: 710e7b040e3e94f4abd917de448cd033, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &1611604368
@@ -1898,6 +1898,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 1611604357}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 93b122cc847a3b545a2aab6a750c5b1a, type: 3}
+  m_Script: {fileID: 11500000, guid: 3d1b5658a5d5d544a99136fb6409d31b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

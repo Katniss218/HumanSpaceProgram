@@ -58,12 +58,12 @@ namespace HSP.Vanilla.UI.Scenes.GameplayScene
 
                 escapeMenuWindow.AddButton( new UILayoutInfo( UIFill.Horizontal( 50, 50 ), UIAnchor.Top, -70, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ), () =>
                 {
-                    SceneLoader.UnloadActiveSceneAsync( () => SceneLoader.LoadSceneAsync( MainMenuSceneManager.SCENE_NAME, true, false, null ) );
+                    HSPSceneLoader.ReplaceForegroundScene<MainMenuSceneManager>();
                 } )
                     .AddStdText( new UILayoutInfo( UIFill.Fill() ), "MAIN MENU" )
                     .WithAlignment( TMPro.HorizontalAlignmentOptions.Center );
 
-                escapeMenuWindow.AddButton( new UILayoutInfo( UIFill.Horizontal( 50, 50 ), UIAnchor.Top, -90, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ), 
+                escapeMenuWindow.AddButton( new UILayoutInfo( UIFill.Horizontal( 50, 50 ), UIAnchor.Top, -90, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ),
                     () => CanvasManager.Get( CanvasName.WINDOWS ).AddSaveWindow( new UILayoutInfo( UIAnchor.Center, (0, 0), (350f, 400f) ) ) )
                     .AddStdText( new UILayoutInfo( UIFill.Fill() ), "SAVE" )
                     .WithAlignment( TMPro.HorizontalAlignmentOptions.Center );

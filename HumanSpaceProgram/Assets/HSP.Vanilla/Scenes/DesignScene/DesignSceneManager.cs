@@ -1,4 +1,4 @@
-using Assets.HSP.SceneManagement;
+using HSP.SceneManagement;
 using UnityEngine;
 
 namespace HSP.Vanilla.Scenes.DesignScene
@@ -14,9 +14,9 @@ namespace HSP.Vanilla.Scenes.DesignScene
     /// <summary>
     /// A Manager whose responsibility is to invoke the events relating to creation/destruction of the `design` scene.
     /// </summary>
-    public class DesignSceneManager : SceneManager<DesignSceneManager>
+    public class DesignSceneManager : HSPSceneManager<DesignSceneManager>
     {
-        public const string SCENE_NAME = "Design";
+        public static new string UNITY_SCENE_NAME = "Design";
 
         public static DesignSceneManager Instance => instance;
         public static GameObject GameObject => instance.gameObject;
@@ -24,6 +24,22 @@ namespace HSP.Vanilla.Scenes.DesignScene
         void Awake()
         {
             HSPEvent.EventManager.TryInvoke( HSPEvent_STARTUP_DESIGN.ID );
+        }
+
+        protected override void OnActivate()
+        {
+        }
+
+        protected override void OnDeactivate()
+        {
+        }
+
+        protected override void OnLoad()
+        {
+        }
+
+        protected override void OnUnload()
+        {
         }
     }
 }

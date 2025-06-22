@@ -43,7 +43,7 @@ namespace HSP.Vanilla.Scenes.AlwaysLoadedScene
         {
             AlwaysLoadedManager.Instance.gameObject.AddComponent<AudioEffectManager>();
         }
-        
+
         [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, ADD_PARTICLE_EFFECT_MANAGER )]
         private static void AddParticleEffectManager()
         {
@@ -53,7 +53,7 @@ namespace HSP.Vanilla.Scenes.AlwaysLoadedScene
         [HSPEventListener( HSPEvent_STARTUP_EARLY.ID, LOAD_MAIN_MENU )]
         private static void LoadMainMenu()
         {
-            SceneLoader.LoadSceneAsync( MainMenuSceneManager.SCENE_NAME, true, false, null );
+            HSPSceneLoader.LoadSceneAsync<MainMenuSceneManager>();
         }
     }
 }

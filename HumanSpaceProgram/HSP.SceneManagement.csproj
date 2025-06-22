@@ -58,9 +58,10 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.SceneManagement\SceneLoader.cs" />
     <Compile Include="Assets\HSP.SceneManagement\AlwaysLoadedManager.cs" />
-    <Compile Include="Assets\HSP.SceneManagement\IScene.cs" />
+    <Compile Include="Assets\HSP.SceneManagement\IHSPScene.cs" />
+    <Compile Include="Assets\HSP.SceneManagement\HSPSceneLoader.cs" />
+    <Compile Include="Assets\HSP.SceneManagement\HSPSceneManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.SceneManagement\___HSP.SceneManagement.asmdef" />

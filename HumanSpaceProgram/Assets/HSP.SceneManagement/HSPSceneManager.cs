@@ -1,23 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace HSP.SceneManagement
 {
-    public interface IScene
-    {
-
-    }
-
-    public abstract class SceneManager<T> : SingletonMonoBehaviour<T>, IScene where T : SceneManager<T>
+    public abstract class HSPSceneManager<T> : SingletonMonoBehaviour<T>, IHSPScene where T : HSPSceneManager<T>
     {
         /// <summary>
         /// Override this to tell the loader to load a custom scene (included in an asset bundle or in the project).
         /// </summary>
-        public virtual string UNITY_SCENE_NAME => "empty_scene";
+        public static string UNITY_SCENE_NAME { get => null; }
+
+        // The Unity scene associated with (backing) our scene manager instance.
+        private UnityEngine.SceneManagement.Scene _unityScene;
+
+        public UnityEngine.SceneManagement.Scene UnityScene
+        {
+            get => _unityScene;
+            set => _unityScene = value;
+        }
 
         /// <summary>
         /// Override this to perform any initialisation logic that should be run when the scene is loaded.
@@ -37,12 +37,33 @@ namespace HSP.SceneManagement
         /// </summary>
         protected abstract void OnDeactivate();
 
-        internal T GetOrCreateSceneManagerInActiveScene()
+        public void _onload()
+        {
+            this.OnLoad();
+        }
+        public void _onunload()
+        {
+            this.OnUnload();
+        }
+        public void _onactivate()
+        {
+            this.OnActivate();
+        }
+        public void _ondeactivate()
+        {
+            this.OnDeactivate();
+        }
+
+        internal static T GetOrCreateSceneManagerInActiveScene( Scene unityScene )
         {
             if( instance == null )
             {
                 // create
+                GameObject go = new GameObject( $"_ {typeof( T ).Name} _" );
+                T ins = go.AddComponent<T>();
+                ins._unityScene = unityScene;
             }
+
             return instance;
         }
     }
