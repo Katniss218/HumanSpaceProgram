@@ -9,7 +9,7 @@ namespace HSP.Vanilla.Scenes.DesignScene
     {
         public const string UNPAUSE = HSPEvent.NAMESPACE_HSP + ".unpause";
 
-        [HSPEventListener( HSPEvent_STARTUP_DESIGN.ID, UNPAUSE )]
+        [HSPEventListener( HSPEvent_SCENELOAD_DESIGN.ID, UNPAUSE )]
         private static void Unpause()
         {
             TimeManager.Unpause();
@@ -22,37 +22,37 @@ namespace HSP.Vanilla.Scenes.DesignScene
         public const string ADD_ACTIVE_OBJECT_MANAGER = HSPEvent.NAMESPACE_HSP + ".add_active_object_manager";
         public const string ADD_ESCAPE_INPUT_CONTROLLER = HSPEvent.NAMESPACE_HSP + ".add_escape_icontroller";
 
-        [HSPEventListener( HSPEvent_STARTUP_DESIGN.ID, ADD_VESSEL_MANAGER )]
+        [HSPEventListener( HSPEvent_SCENELOAD_DESIGN.ID, ADD_VESSEL_MANAGER )]
         private static void VesselManager()
         {
             DesignSceneManager.Instance.gameObject.AddComponent<VesselManager>();
         }
 
-        [HSPEventListener( HSPEvent_STARTUP_DESIGN.ID, ADD_DESIGN_SCENE_TOOL_MANAGER )]
+        [HSPEventListener( HSPEvent_SCENELOAD_DESIGN.ID, ADD_DESIGN_SCENE_TOOL_MANAGER )]
         private static void AddDesignSceneToolManager()
         {
             DesignSceneManager.Instance.gameObject.AddComponent<DesignSceneToolManager>();
         }
 
-        [HSPEventListener( HSPEvent_STARTUP_DESIGN.ID, ADD_DESIGN_VESSEL_MANAGER )]
+        [HSPEventListener( HSPEvent_SCENELOAD_DESIGN.ID, ADD_DESIGN_VESSEL_MANAGER )]
         private static void AddDesignVesselManager()
         {
             DesignSceneManager.Instance.gameObject.AddComponent<DesignVesselManager>();
         }
 
-        [HSPEventListener( HSPEvent_STARTUP_DESIGN.ID, ADD_SCENE_REFERENCE_FRAME_MANAGER )]
+        [HSPEventListener( HSPEvent_SCENELOAD_DESIGN.ID, ADD_SCENE_REFERENCE_FRAME_MANAGER )]
         private static void AddSceneReferenceFrameManager()
         {
             DesignSceneManager.Instance.gameObject.AddComponent<SceneReferenceFrameManager>();
         }
 
-        [HSPEventListener( HSPEvent_STARTUP_DESIGN.ID, ADD_ACTIVE_OBJECT_MANAGER )]
+        [HSPEventListener( HSPEvent_SCENELOAD_DESIGN.ID, ADD_ACTIVE_OBJECT_MANAGER )]
         private static void AddActiveObjectManager()
         {
             DesignSceneManager.Instance.gameObject.AddComponent<ActiveVesselManager>();
         }
 
-        [HSPEventListener( HSPEvent_STARTUP_DESIGN.ID, ADD_ESCAPE_INPUT_CONTROLLER )]
+        [HSPEventListener( HSPEvent_SCENELOAD_DESIGN.ID, ADD_ESCAPE_INPUT_CONTROLLER )]
         private static void CreateInstanceInScene()
         {
             DesignSceneManager.Instance.gameObject.AddComponent<DesignSceneEscapeInputController>();

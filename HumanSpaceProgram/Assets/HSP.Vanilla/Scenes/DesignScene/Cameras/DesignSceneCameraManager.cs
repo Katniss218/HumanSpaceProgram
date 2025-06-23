@@ -121,7 +121,7 @@ namespace HSP.Vanilla.Scenes.DesignScene.Cameras
 
         public const string CREATE_DESIGN_CAMERA = HSPEvent.NAMESPACE_HSP + ".designscene_camera";
 
-        [HSPEventListener( HSPEvent_STARTUP_DESIGN.ID, CREATE_DESIGN_CAMERA )]
+        [HSPEventListener( HSPEvent_SCENELOAD_DESIGN.ID, CREATE_DESIGN_CAMERA )]
         private static void OnGameplaySceneLoad()
         {
             GameObject cameraPivotGameObject = new GameObject( "Camera Pivot" );

@@ -28,7 +28,7 @@ namespace HSP.Vanilla.UI.Scenes.DesignScene
         public const string UPDATE_VESSEL_NAME = HSPEvent.NAMESPACE_HSP + ".update.vessel_name";
         public const string UPDATE_SELECTED_TOOL = HSPEvent.NAMESPACE_HSP + ".update.tool";
 
-        [HSPEventListener( HSPEvent_STARTUP_DESIGN.ID, CREATE_DESIGN_SCENE_UI )]
+        [HSPEventListener( HSPEvent_SCENELOAD_DESIGN.ID, CREATE_DESIGN_SCENE_UI )]
         public static void Create()
         {
             UICanvas canvas = CanvasManager.Get( CanvasName.STATIC );

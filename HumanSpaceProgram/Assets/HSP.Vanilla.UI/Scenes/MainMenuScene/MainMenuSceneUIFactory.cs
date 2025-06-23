@@ -22,7 +22,7 @@ namespace HSP.Vanilla.UI.Scenes.MainMenuScene
 
         public const string CREATE_UI = HSPEvent.NAMESPACE_HSP + ".mainmenu_ui";
 
-        [HSPEventListener( HSPEvent_STARTUP_MAIN_MENU.ID, CREATE_UI )]
+        [HSPEventListener( HSPEvent_SCENELOAD_MAIN_MENU.ID, CREATE_UI )]
         public static void Create()
         {
             UICanvas canvas = CanvasManager.Get( CanvasName.STATIC );
