@@ -1,4 +1,3 @@
-using HSP.Vanilla.Scenes.AlwaysLoadedScene;
 using HSP.Vanilla.Scenes.DesignScene;
 using HSP.Vanilla.Scenes.DesignScene.Cameras;
 using HSP.Vanilla.Scenes.GameplayScene;
@@ -48,7 +47,7 @@ namespace HSP.Vanilla.Scenes.PostProcessing
             layer.InitBundles();
         }
 
-        [HSPEventListener( HSPEvent_SCENELOAD_GAMEPLAY.ID, ADD_POST_PROCESS_LAYER, After = new[] { GameplaySceneCameraManager.CREATE_GAMEPLAY_CAMERA } )]
+        [HSPEventListener( HSPEvent_SCENEACTIVATE_GAMEPLAY.ID, ADD_POST_PROCESS_LAYER, After = new[] { GameplaySceneCameraManager.CREATE_GAMEPLAY_CAMERA } )]
         private static void CreatePostProcessingLayers()
         {
             //PostProcessLayer farPPL = GameplaySceneCameraManager.FarCamera.gameObject.AddComponent<PostProcessLayer>(); Appears to not be needed, and for some reason, it takes a big performance hit.
@@ -61,7 +60,7 @@ namespace HSP.Vanilla.Scenes.PostProcessing
             SetupPPL( uiPPL );
         }
 
-        [HSPEventListener( HSPEvent_SCENELOAD_MAIN_MENU.ID, ADD_POST_PROCESS_LAYER, After = new[] { MainMenuSceneCameraManager.CREATE_MAIN_MENU_CAMERA } )]
+        [HSPEventListener( HSPEvent_SCENEACTIVATE_MAIN_MENU.ID, ADD_POST_PROCESS_LAYER, After = new[] { MainMenuSceneCameraManager.CREATE_MAIN_MENU_CAMERA } )]
         private static void CreatePostProcessingLayers2()
         {
             PostProcessLayer nearPPL = MainMenuSceneCameraManager.NearCamera.gameObject.AddComponent<PostProcessLayer>();
@@ -71,7 +70,7 @@ namespace HSP.Vanilla.Scenes.PostProcessing
             SetupPPL( uiPPL );
         }
 
-        [HSPEventListener( HSPEvent_SCENELOAD_DESIGN.ID, ADD_POST_PROCESS_LAYER, After = new[] { DesignSceneCameraManager.CREATE_DESIGN_CAMERA } )]
+        [HSPEventListener( HSPEvent_SCENEACTIVATE_DESIGN.ID, ADD_POST_PROCESS_LAYER, After = new[] { DesignSceneCameraManager.CREATE_DESIGN_CAMERA } )]
         private static void CreatePostProcessingLayers3()
         {
             PostProcessLayer nearPPL = DesignSceneCameraManager.NearCamera.gameObject.AddComponent<PostProcessLayer>();

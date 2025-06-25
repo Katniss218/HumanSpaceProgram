@@ -83,15 +83,14 @@ namespace HSP.Vanilla.Scenes.GameplayScene
             GameplaySceneManager.Instance.gameObject.AddComponent<TrajectoryManager>();
         }
 
-        [HSPEventListener( HSPEvent_SCENELOAD_GAMEPLAY.ID, ADD_ATMOSPHERE_RENDERER,
+        [HSPEventListener( HSPEvent_SCENEACTIVATE_GAMEPLAY.ID, ADD_ATMOSPHERE_RENDERER,
             After = new[] { GameplaySceneCameraManager.CREATE_GAMEPLAY_CAMERA } )]
         private static void AddAtmosphereRenderer()
         {
-            AtmosphereRenderer atmosphereRenderer = GameplaySceneCameraManager.EffectCamera.gameObject.AddComponent<AtmosphereRenderer>();
+            AtmosphereRenderer atmosphereRenderer = GameplaySceneCameraManager.EffectCamera.gameObject.GetOrAddComponent<AtmosphereRenderer>();
             atmosphereRenderer.light = GameObject.Find( "CBLight" ).GetComponent<Light>();
             atmosphereRenderer.ColorRenderTextureGetter = () => GameplaySceneCameraManager.ColorRenderTexture;
             atmosphereRenderer.DepthRenderTextureGetter = () => GameplaySceneDepthBufferCombiner.CombinedDepthRenderTexture;
-
         }
 
         public const string RESET_UT = HSPEvent.NAMESPACE_HSP + ".reset_ut";
@@ -99,6 +98,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene
         [HSPEventListener( HSPEvent_SCENELOAD_GAMEPLAY.ID, RESET_UT )]
         private static void ResetUT()
         {
+#warning TODO - don't. save in scenario instead.
             TimeManager.SetUT( 0 );
         }
     }

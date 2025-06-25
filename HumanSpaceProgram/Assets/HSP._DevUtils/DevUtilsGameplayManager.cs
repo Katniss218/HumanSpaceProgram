@@ -20,6 +20,8 @@ using UnityEngine.UI;
 using UnityPlus.AssetManagement;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.DataHandlers;
+using HSP.Vanilla.Scenes.GameplayScene;
+using HSP.SceneManagement;
 
 namespace HSP._DevUtils
 {
@@ -121,7 +123,10 @@ namespace HSP._DevUtils
         {
             if( UnityEngine.Input.GetKeyDown( KeyCode.F6 ) )
             {
-                
+                if( HSPSceneLoader.IsSceneForeground<GameplaySceneManager>() )
+                    HSPSceneLoader.SetBackground<GameplaySceneManager>();
+                else
+                    HSPSceneLoader.SetForeground<GameplaySceneManager>();
             }
             if( UnityEngine.Input.GetKeyDown( KeyCode.F3 ) )
             {

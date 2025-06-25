@@ -38,7 +38,7 @@ namespace HSP.Vanilla.Scenes.MainMenuScene
     /// <summary>
     /// A Manager whose responsibility is to invoke the events relating to creation/destruction of the `main menu` scene.
     /// </summary>
-    public class MainMenuSceneManager : HSPSceneManager<MainMenuSceneManager>
+    public sealed class MainMenuSceneManager : HSPSceneManager<MainMenuSceneManager>
     {
         public static new string UNITY_SCENE_NAME => "MainMenu";
 

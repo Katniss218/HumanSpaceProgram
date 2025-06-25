@@ -3,6 +3,13 @@ using UnityEngine.SceneManagement;
 
 namespace HSP.SceneManagement
 {
+    /// <summary>
+    /// The base class that all HSP scenes should derive from.
+    /// </summary>
+    /// <remarks>
+    /// Usage Example: `public sealed class GameplaySceneManager : HSPSceneManager<![CDATA[<]]>GameplaySceneManager<![CDATA[>]]>`.
+    /// </remarks>
+    /// <typeparam name="T">The concrete scene type deriving from this manager.</typeparam>
     public abstract class HSPSceneManager<T> : SingletonMonoBehaviour<T>, IHSPScene where T : HSPSceneManager<T>
     {
         /// <summary>

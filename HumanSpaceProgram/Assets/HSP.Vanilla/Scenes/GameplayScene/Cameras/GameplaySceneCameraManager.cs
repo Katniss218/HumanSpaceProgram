@@ -237,7 +237,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
 
         public const string CREATE_GAMEPLAY_CAMERA = HSPEvent.NAMESPACE_HSP + ".gameplayscene_camera";
 
-        [HSPEventListener( HSPEvent_SCENELOAD_GAMEPLAY.ID, CREATE_GAMEPLAY_CAMERA )]
+        [HSPEventListener( HSPEvent_SCENEACTIVATE_GAMEPLAY.ID, CREATE_GAMEPLAY_CAMERA )]
         private static void OnGameplaySceneLoad()
         {
             GameObject cameraPivotGameObject = new GameObject( "Camera Pivot" );
@@ -284,6 +284,8 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
             bufferCombiner.EffectCamera = effectCamera;
             bufferCombiner.MergeDepthShader = AssetRegistry.Get<Shader>( "builtin::Resources/Shaders/merge_depth" );
 
+#warning TODO - destroy on scene deactivate.
+#warning TODO - destroy on scene deactivate in the other scenes' camera managers.
         }
     }
 }

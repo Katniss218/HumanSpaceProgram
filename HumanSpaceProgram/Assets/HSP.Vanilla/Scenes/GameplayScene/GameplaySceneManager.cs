@@ -38,7 +38,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene
     /// <summary>
     /// A Manager whose responsibility is to invoke the events relating to creation/destruction of the `gameplay` scene.
     /// </summary>
-    public class GameplaySceneManager : HSPSceneManager<GameplaySceneManager>
+    public sealed class GameplaySceneManager : HSPSceneManager<GameplaySceneManager>
     {
         public static new string UNITY_SCENE_NAME => "Testing And Shit"; // TODO - swap out for "Gameplay" when the part with creating and loading rockets is done.
 

@@ -38,7 +38,7 @@ namespace HSP.Vanilla.Scenes.DesignScene
     /// <summary>
     /// A Manager whose responsibility is to invoke the events relating to creation/destruction of the `design` scene.
     /// </summary>
-    public class DesignSceneManager : HSPSceneManager<DesignSceneManager>
+    public sealed class DesignSceneManager : HSPSceneManager<DesignSceneManager>
     {
         public static new string UNITY_SCENE_NAME => "Design";
 

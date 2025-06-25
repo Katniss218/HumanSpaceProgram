@@ -9,6 +9,7 @@ namespace HSP
     {
         new public Camera camera { get; set; }
 
+#warning TODO - requiring setting and managing this externally is sorta ugly and bug-prone
         /// <summary>
         /// Use this if you need to do camera-related transformations in the current scene.
         /// </summary>

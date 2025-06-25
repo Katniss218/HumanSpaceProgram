@@ -36,6 +36,19 @@ namespace HSP.SceneManagement
         }
 
         /// <summary>
+        /// Checks if the scene specified by the given type is currently loaded.
+        /// </summary>
+        /// <typeparam name="TScene">The type specifying the scene to check.</typeparam>
+        public static bool IsSceneForeground<TLoadedScene>() where TLoadedScene : IHSPScene
+        {
+            IHSPScene scene = _loadedScenes.FirstOrDefault( s => s.GetType() == typeof( TLoadedScene ) );
+            if( scene == null )
+                throw new InvalidOperationException( $"The scene '{typeof( TLoadedScene )}' is not loaded." );
+
+            return scene == _foregroundScene;
+        }
+
+        /// <summary>
         /// Gets all of the currently loaded scenes.
         /// </summary>
         public static IEnumerable<IHSPScene> GetLoadedScenes()
@@ -138,6 +151,38 @@ namespace HSP.SceneManagement
                 onAfterUnloaded?.Invoke();
                 StartSceneLoadCoroutine( typeof( TNewScene ), true, onAfterLoaded );
             } );
+        }
+
+        public static void SetForeground<TLoadedScene>() where TLoadedScene : IHSPScene
+        {
+            IHSPScene scene = _loadedScenes.FirstOrDefault( s => s.GetType() == typeof( TLoadedScene ) );
+            if( scene == null )
+                throw new InvalidOperationException( $"Can't set the foreground scene to '{typeof( TLoadedScene )}' that is not loaded." );
+
+            if( scene == _foregroundScene )
+                return;
+
+            if( _foregroundScene != null )
+            {
+                _foregroundScene._ondeactivate();
+            }
+
+            _foregroundScene = scene;
+            _foregroundScene._onactivate();
+        }
+
+        public static void SetBackground<TLoadedScene>() where TLoadedScene : IHSPScene
+        {
+            IHSPScene scene = _loadedScenes.FirstOrDefault( s => s.GetType() == typeof( TLoadedScene ) );
+            if( scene == null )
+                throw new InvalidOperationException( $"Can't set the background scene to '{typeof( TLoadedScene )}' that is not loaded." );
+
+            // Only one scene can be the foreground scene, so this can check for background too.
+            if( scene != _foregroundScene )
+                return;
+
+            _foregroundScene._ondeactivate();
+            _foregroundScene = null;
         }
 
         //

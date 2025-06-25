@@ -12,7 +12,7 @@ namespace HSP.SceneManagement
     /// <remarks>
     /// You can use this gameobject to set up logic that needs to be updated, or be a monobehariour.
     /// </remarks>
-    public class AlwaysLoadedManager : HSPSceneManager<AlwaysLoadedManager>
+    public sealed class AlwaysLoadedManager : HSPSceneManager<AlwaysLoadedManager>
     {
         public static new string UNITY_SCENE_NAME => "_AlwaysLoaded";
 
