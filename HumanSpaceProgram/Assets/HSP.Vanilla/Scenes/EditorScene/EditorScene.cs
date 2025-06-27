@@ -6,68 +6,63 @@ namespace HSP.Vanilla.Scenes.EditorScene
     /// <summary>
     /// Invoked immediately after loading the editor scene.
     /// </summary>
-    public static class HSPEvent_SCENELOAD_EDITOR
+    public static class HSPEvent_EDITOR_SCENE_LOAD
     {
-        public const string ID = HSPEvent.NAMESPACE_HSP + ".editorscene.load";
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".editor_scene.load";
     }
 
     /// <summary>
     /// Invoked immediately before unloading the editor scene.
     /// </summary>
-    public static class HSPEvent_SCENEUNLOAD_EDITOR
+    public static class HSPEvent_EDITOR_SCENE_UNLOAD
     {
-        public const string ID = HSPEvent.NAMESPACE_HSP + ".editorscene.unload";
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".editor_scene.unload";
     }
 
     /// <summary>
     /// Invoked immediately after the editor scene becomes the foreground scene.
     /// </summary>
-    public static class HSPEvent_SCENEACTIVATE_EDITOR
+    public static class HSPEvent_EDITOR_SCENE_ACTIVATE
     {
-        public const string ID = HSPEvent.NAMESPACE_HSP + ".editorscene.activate";
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".editor_scene.activate";
     }
 
     /// <summary>
     /// Invoked immediately before the editor scene stops being the foreground scene.
     /// </summary>
-    public static class HSPEvent_SCENEDEACTIVATE_EDITOR
+    public static class HSPEvent_EDITOR_SCENE_DEACTIVATE
     {
-        public const string ID = HSPEvent.NAMESPACE_HSP + ".editorscene.deactivate";
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".editor_scene.deactivate";
     }
 
     /// <summary>
     /// A Manager whose responsibility is to invoke the events relating to creation/destruction of the `editor` scene.
     /// </summary>
-    public sealed class EditorSceneManager : HSPSceneManager<EditorSceneManager>
+    public sealed class EditorScene : HSPScene<EditorScene>
     {
         public static new string UNITY_SCENE_NAME => "Editor";
 
-        public static EditorSceneManager Instance => instance;
+        public static EditorScene Instance => instance;
         public static GameObject GameObject => instance.gameObject;
-
-        //void Awake()
-        //{
-        //    HSPEvent.EventManager.TryInvoke( HSPEvent_SCENELOAD_EDITOR.ID );
-        //}
 
         protected override void OnLoad()
         {
-            HSPEvent.EventManager.TryInvoke( HSPEvent_SCENELOAD_EDITOR.ID );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_EDITOR_SCENE_LOAD.ID );
         }
 
         protected override void OnUnload()
         {
-            HSPEvent.EventManager.TryInvoke( HSPEvent_SCENEUNLOAD_EDITOR.ID );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_EDITOR_SCENE_UNLOAD.ID );
         }
 
         protected override void OnActivate()
         {
-            HSPEvent.EventManager.TryInvoke( HSPEvent_SCENEACTIVATE_EDITOR.ID );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_EDITOR_SCENE_ACTIVATE.ID );
         }
 
         protected override void OnDeactivate()
         {
-            HSPEvent.EventManager.TryInvoke( HSPEvent_SCENEDEACTIVATE_EDITOR.ID );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_EDITOR_SCENE_DEACTIVATE.ID );
         }
     }
 }

@@ -22,7 +22,7 @@ namespace HSP.Vanilla.UI.Scenes.MainMenuScene
 
         public const string CREATE_UI = HSPEvent.NAMESPACE_HSP + ".mainmenu_ui";
 
-        [HSPEventListener( HSPEvent_SCENELOAD_MAIN_MENU.ID, CREATE_UI )]
+        [HSPEventListener( HSPEvent_MAIN_MENU_SCENE_LOAD.ID, CREATE_UI )]
         public static void Create()
         {
             UICanvas canvas = CanvasManager.Get( CanvasName.STATIC );
@@ -74,7 +74,7 @@ namespace HSP.Vanilla.UI.Scenes.MainMenuScene
         {
             parent.AddButton( new UILayoutInfo( UIAnchor.Center, (0, -100), (200, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
             {
-                HSPSceneLoader.ReplaceForegroundScene<DesignSceneManager>();
+                HSPSceneManager.ReplaceForegroundScene<Vanilla.Scenes.DesignScene.DesignScene>();
             } )
                 .AddStdText( new UILayoutInfo( UIFill.Fill() ), "Design a Rocket" )
                 .WithAlignment( HorizontalAlignmentOptions.Center );
@@ -84,7 +84,7 @@ namespace HSP.Vanilla.UI.Scenes.MainMenuScene
         {
             parent.AddButton( new UILayoutInfo( UIAnchor.Center, (0, -120), (200, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
             {
-                HSPSceneLoader.ReplaceForegroundScene<EditorSceneManager>();
+                HSPSceneManager.ReplaceForegroundScene<EditorScene>();
             } )
                 .Disabled()
                 .AddStdText( new UILayoutInfo( UIFill.Fill() ), "Part Editor" )

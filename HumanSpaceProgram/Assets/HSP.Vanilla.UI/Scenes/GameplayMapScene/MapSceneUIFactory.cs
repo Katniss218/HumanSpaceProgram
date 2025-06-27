@@ -26,7 +26,7 @@ namespace HSP.Vanilla.UI.Scenes.GameplayMapScene
             // this event has to be a different event from the gameplay startup evt, because it will need to be invoked at other times.
         }
 
-        [HSPEventListener( HSPEvent_ON_MAP_OPENED.ID, CREATE_UI )]
+        [HSPEventListener( HSPEvent_MAP_SCENE_LOAD.ID, CREATE_UI )]
         public static void CreateUI()
         {
 

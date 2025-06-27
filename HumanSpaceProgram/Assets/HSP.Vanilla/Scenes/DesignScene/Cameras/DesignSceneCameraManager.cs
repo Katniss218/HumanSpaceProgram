@@ -1,3 +1,4 @@
+using HSP.Vanilla.Scenes.GameplayScene;
 using UnityEngine;
 
 namespace HSP.Vanilla.Scenes.DesignScene.Cameras
@@ -119,12 +120,16 @@ namespace HSP.Vanilla.Scenes.DesignScene.Cameras
             AdjustCameras();
         }
 
-        public const string CREATE_DESIGN_CAMERA = HSPEvent.NAMESPACE_HSP + ".designscene_camera";
+        public const string CREATE_CAMERA = HSPEvent.NAMESPACE_HSP + ".design_scene.camera.create";
+        public const string DESTROY_CAMERA = HSPEvent.NAMESPACE_HSP + ".design_scene.camera.destroy";
 
-        [HSPEventListener( HSPEvent_SCENELOAD_DESIGN.ID, CREATE_DESIGN_CAMERA )]
-        private static void OnGameplaySceneLoad()
+        static GameObject _cameraPivot;
+
+        [HSPEventListener( HSPEvent_DESIGN_SCENE_ACTIVATE.ID, CREATE_CAMERA )]
+        private static void OnDesignSceneActivate()
         {
             GameObject cameraPivotGameObject = new GameObject( "Camera Pivot" );
+            _cameraPivot = cameraPivotGameObject;
 
             SceneCamera sceneCamera = cameraPivotGameObject.AddComponent<SceneCamera>();
 
@@ -156,6 +161,16 @@ namespace HSP.Vanilla.Scenes.DesignScene.Cameras
 
             cameraController.CameraParent = cameraParentGameObject.transform;
             cameraController.ZoomDist = 5f;
+        }
+
+        [HSPEventListener( HSPEvent_DESIGN_SCENE_DEACTIVATE.ID, DESTROY_CAMERA )]
+        private static void OnDesignSceneDeactivate()
+        {
+            if( _cameraPivot != null )
+            {
+                Destroy( _cameraPivot );
+                _cameraPivot = null;
+            }
         }
     }
 }

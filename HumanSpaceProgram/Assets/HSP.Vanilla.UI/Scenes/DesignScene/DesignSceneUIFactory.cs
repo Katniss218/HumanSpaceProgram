@@ -28,7 +28,7 @@ namespace HSP.Vanilla.UI.Scenes.DesignScene
         public const string UPDATE_VESSEL_NAME = HSPEvent.NAMESPACE_HSP + ".update.vessel_name";
         public const string UPDATE_SELECTED_TOOL = HSPEvent.NAMESPACE_HSP + ".update.tool";
 
-        [HSPEventListener( HSPEvent_SCENELOAD_DESIGN.ID, CREATE_DESIGN_SCENE_UI )]
+        [HSPEventListener( HSPEvent_DESIGN_SCENE_LOAD.ID, CREATE_DESIGN_SCENE_UI )]
         public static void Create()
         {
             UICanvas canvas = CanvasManager.Get( CanvasName.STATIC );
@@ -103,7 +103,7 @@ namespace HSP.Vanilla.UI.Scenes.DesignScene
             UIPanel p4 = topPanel.AddPanel( new UILayoutInfo( UIAnchor.Right, UIFill.Vertical(), -20, 30 ), null );
             UIButton exitBtn = p4.AddButton( new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_leave" ), () =>
             {
-                HSPSceneLoader.ReplaceForegroundScene<MainMenuSceneManager>();
+                HSPSceneManager.ReplaceForegroundScene<Vanilla.Scenes.MainMenuScene.MainMenuScene>();
             } );
         }
 

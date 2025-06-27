@@ -5,7 +5,7 @@ namespace HSP.Vanilla.Scenes.DesignScene.Tools
     {
         public const string REGISTER_TOOLS = HSPEvent.NAMESPACE_HSP + "register_designtools";
 
-        [HSPEventListener( HSPEvent_SCENELOAD_DESIGN.ID, REGISTER_TOOLS )]
+        [HSPEventListener( HSPEvent_DESIGN_SCENE_LOAD.ID, REGISTER_TOOLS )]
         private static void RegisterTool()
         {
             DesignSceneToolManager.RegisterTool<PickTool>();

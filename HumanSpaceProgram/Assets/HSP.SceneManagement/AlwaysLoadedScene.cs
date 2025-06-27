@@ -7,16 +7,14 @@ using UnityEngine;
 namespace HSP.SceneManagement
 {
     /// <summary>
-    /// A manager that is loaded immediately and remains active until the game is exited.
+    /// This class is loaded at the start of the game and remains loaded until the game is exited.
     /// </summary>
-    /// <remarks>
-    /// You can use this gameobject to set up logic that needs to be updated, or be a monobehariour.
-    /// </remarks>
-    public sealed class AlwaysLoadedManager : HSPSceneManager<AlwaysLoadedManager>
+    public sealed class AlwaysLoadedScene : SingletonMonoBehaviour<AlwaysLoadedScene>
     {
-        public static new string UNITY_SCENE_NAME => "_AlwaysLoaded";
+        // This is not an HSPScene<T> because it's part of the scene management itself
+        //   and shouldn't be able to be unloaded or treated like a scene.
 
-        public static AlwaysLoadedManager Instance => instance;
+        public static AlwaysLoadedScene Instance => instance;
         public static GameObject GameObject => instance.gameObject;
 
         void Awake()
@@ -37,22 +35,6 @@ namespace HSP.SceneManagement
         void Start()
         {
             HSPEvent.EventManager.TryInvoke( HSPEvent_STARTUP_EARLY.ID );
-        }
-
-        protected override void OnActivate()
-        {
-        }
-
-        protected override void OnDeactivate()
-        {
-        }
-
-        protected override void OnLoad()
-        {
-        }
-
-        protected override void OnUnload()
-        {
         }
     }
 }

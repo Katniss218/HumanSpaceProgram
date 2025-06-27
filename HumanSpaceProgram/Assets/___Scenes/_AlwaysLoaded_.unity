@@ -1817,7 +1817,7 @@ GameObject:
   - component: {fileID: 1611604364}
   - component: {fileID: 1611604366}
   - component: {fileID: 1611604368}
-  - component: {fileID: 1611604367}
+  - component: {fileID: 1611604369}
   m_Layer: 3
   m_Name: _ ALWAYS LOADED MANAGER _
   m_TagString: Untagged
@@ -1877,18 +1877,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <LogFilePath>k__BackingField: log.txt
---- !u!114 &1611604367
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1611604357}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 710e7b040e3e94f4abd917de448cd033, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1611604368
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1899,5 +1887,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3d1b5658a5d5d544a99136fb6409d31b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1611604369
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1611604357}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a24172b7dd13fd4f9a001199e51c52b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

@@ -13,6 +13,6 @@ namespace HSP
         /// <summary>
         /// Use this if you need to do camera-related transformations in the current scene.
         /// </summary>
-        public static Camera Camera => instance.camera;
+        public static Camera Camera => instanceExists ? instance.camera : null;
     }
 }

@@ -1,3 +1,4 @@
+using HSP.Vanilla.Scenes.DesignScene;
 using UnityEngine;
 
 namespace HSP.Vanilla.Scenes.MainMenuScene.Cameras
@@ -119,10 +120,13 @@ namespace HSP.Vanilla.Scenes.MainMenuScene.Cameras
             AdjustCameras();
         }
 
-        public const string CREATE_MAIN_MENU_CAMERA = HSPEvent.NAMESPACE_HSP + ".mainmenuscene_camera";
+        public const string CREATE_CAMERA = HSPEvent.NAMESPACE_HSP + ".mainmenu_scene.camera.create";
+        public const string DESTROY_CAMERA = HSPEvent.NAMESPACE_HSP + ".mainmenu_scene.camera.destroy";
 
-        [HSPEventListener( HSPEvent_SCENEACTIVATE_MAIN_MENU.ID, CREATE_MAIN_MENU_CAMERA )]
-        private static void OnMainmenuSceneLoad()
+        static GameObject _cameraPivot;
+
+        [HSPEventListener( HSPEvent_MAIN_MENU_SCENE_ACTIVATE.ID, CREATE_CAMERA )]
+        private static void OnMainMenuSceneActivate()
         {
             GameObject cameraPivotGameObject = new GameObject( "Camera Pivot" );
 
@@ -151,6 +155,16 @@ namespace HSP.Vanilla.Scenes.MainMenuScene.Cameras
             cameraManager._nearCamera = nearCamera;
             cameraManager._effectCamera = effectCamera;
             cameraManager._uiCamera = uiCamera;
+        }
+
+        [HSPEventListener( HSPEvent_MAIN_MENU_SCENE_DEACTIVATE.ID, DESTROY_CAMERA )]
+        private static void OnMainMenuSceneDeactivate()
+        {
+            if( _cameraPivot != null )
+            {
+                Destroy( _cameraPivot );
+                _cameraPivot = null;
+            }
         }
     }
 }

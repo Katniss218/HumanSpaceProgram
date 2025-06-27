@@ -58,7 +58,7 @@ namespace HSP.Vanilla.UI.Scenes.GameplayScene
 
                 escapeMenuWindow.AddButton( new UILayoutInfo( UIFill.Horizontal( 50, 50 ), UIAnchor.Top, -70, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ), () =>
                 {
-                    HSPSceneLoader.ReplaceForegroundScene<MainMenuSceneManager>();
+                    HSPSceneManager.ReplaceForegroundScene<Vanilla.Scenes.MainMenuScene.MainMenuScene>();
                 } )
                     .AddStdText( new UILayoutInfo( UIFill.Fill() ), "MAIN MENU" )
                     .WithAlignment( TMPro.HorizontalAlignmentOptions.Center );

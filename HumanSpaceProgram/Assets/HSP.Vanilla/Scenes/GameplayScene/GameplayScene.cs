@@ -6,68 +6,63 @@ namespace HSP.Vanilla.Scenes.GameplayScene
     /// <summary>
     /// Invoked immediately after loading the gameplay scene.
     /// </summary>
-    public static class HSPEvent_SCENELOAD_GAMEPLAY
+    public static class HSPEvent_GAMEPLAY_SCENE_LOAD
     {
-        public const string ID = HSPEvent.NAMESPACE_HSP + ".gameplayscene.load";
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".gameplay_scene.load";
     }
 
     /// <summary>
     /// Invoked immediately before unloading the gameplay scene.
     /// </summary>
-    public static class HSPEvent_SCENEUNLOAD_GAMEPLAY
+    public static class HSPEvent_GAMEPLAY_SCENE_UNLOAD
     {
-        public const string ID = HSPEvent.NAMESPACE_HSP + ".gameplayscene.unload";
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".gameplay_scene.unload";
     }
     
     /// <summary>
     /// Invoked immediately after the gameplay scene becomes the foreground scene.
     /// </summary>
-    public static class HSPEvent_SCENEACTIVATE_GAMEPLAY
+    public static class HSPEvent_GAMEPLAY_SCENE_ACTIVATE
     {
-        public const string ID = HSPEvent.NAMESPACE_HSP + ".gameplayscene.activate";
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".gameplay_scene.activate";
     }
 
     /// <summary>
     /// Invoked immediately before the gameplay scene stops being the foreground scene.
     /// </summary>
-    public static class HSPEvent_SCENEDEACTIVATE_GAMEPLAY
+    public static class HSPEvent_GAMEPLAY_SCENE_DEACTIVATE
     {
-        public const string ID = HSPEvent.NAMESPACE_HSP + ".gameplayscene.deactivate";
+        public const string ID = HSPEvent.NAMESPACE_HSP + ".gameplay_scene.deactivate";
     }
 
     /// <summary>
     /// A Manager whose responsibility is to invoke the events relating to creation/destruction of the `gameplay` scene.
     /// </summary>
-    public sealed class GameplaySceneManager : HSPSceneManager<GameplaySceneManager>
+    public sealed class GameplayScene : HSPScene<GameplayScene>
     {
         public static new string UNITY_SCENE_NAME => "Testing And Shit"; // TODO - swap out for "Gameplay" when the part with creating and loading rockets is done.
 
-        public static GameplaySceneManager Instance => instance;
+        public static GameplayScene Instance => instance;
         public static GameObject GameObject => instance.gameObject;
-
-        //void Awake()
-        //{
-        //    HSPEvent.EventManager.TryInvoke( HSPEvent_STARTUP_GAMEPLAY.ID );
-        //}
 
         protected override void OnLoad()
         {
-            HSPEvent.EventManager.TryInvoke( HSPEvent_SCENELOAD_GAMEPLAY.ID );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_GAMEPLAY_SCENE_LOAD.ID );
         }
 
         protected override void OnUnload()
         {
-            HSPEvent.EventManager.TryInvoke( HSPEvent_SCENEUNLOAD_GAMEPLAY.ID );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_GAMEPLAY_SCENE_UNLOAD.ID );
         }
 
         protected override void OnActivate()
         {
-            HSPEvent.EventManager.TryInvoke( HSPEvent_SCENEACTIVATE_GAMEPLAY.ID );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_GAMEPLAY_SCENE_ACTIVATE.ID );
         }
 
         protected override void OnDeactivate()
         {
-            HSPEvent.EventManager.TryInvoke( HSPEvent_SCENEDEACTIVATE_GAMEPLAY.ID );
+            HSPEvent.EventManager.TryInvoke( HSPEvent_GAMEPLAY_SCENE_DEACTIVATE.ID );
         }
     }
 }
