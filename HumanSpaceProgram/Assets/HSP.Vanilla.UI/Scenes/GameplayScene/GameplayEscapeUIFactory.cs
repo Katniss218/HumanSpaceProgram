@@ -2,7 +2,6 @@
 using HSP.Time;
 using HSP.UI;
 using HSP.Vanilla.Scenes.GameplayScene;
-using HSP.Vanilla.Scenes.MainMenuScene;
 using HSP.Vanilla.UI.Timelines;
 using UnityEngine;
 using UnityPlus.AssetManagement;

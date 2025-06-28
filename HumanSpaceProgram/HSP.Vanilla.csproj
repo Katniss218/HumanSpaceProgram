@@ -85,9 +85,11 @@
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\GameplaySceneTool.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\Tools\RerootTool.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FGimbalActuatorController.cs" />
+    <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\DesignScene.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\MainMenuScene\OnStartup.cs" />
     <Compile Include="Assets\HSP.Vanilla\Trajectories\KeplerianOrbit.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\MainMenuScene\MainMenuEscapeInputController.cs" />
+    <Compile Include="Assets\HSP.Vanilla\Scenes\EditorScene\EditorScene.cs" />
     <Compile Include="Assets\HSP.Vanilla\OnCelestialBodyCreated.cs" />
     <Compile Include="Assets\HSP.Vanilla\CelestialBodies\LODQuadModifier_FinalizeMesh.cs" />
     <Compile Include="Assets\HSP.Vanilla\Settings\GameSettings\SettingsPage_Keybinds.cs" />
@@ -122,6 +124,7 @@
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\DesignSceneEscapeInputController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\CelestialBodyManager.Serialization.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FPart.cs" />
+    <Compile Include="Assets\HSP.Vanilla\Scenes\MainMenuScene\MainMenuScene.cs" />
     <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\FixedReferenceFrameTransform.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FRocketEngine.cs" />
     <Compile Include="Assets\HSP.Vanilla\InputChannel.cs" />
@@ -133,6 +136,7 @@
     <Compile Include="Assets\HSP.Vanilla\OnVesselCreated.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\DesignSceneTool.cs" />
     <Compile Include="Assets\HSP.Vanilla\CelestialBodies\POIGetterUtils.cs" />
+    <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\GameplayScene.cs" />
     <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\HybridReferenceFrameTransform.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\TimeScaleInputController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\GameplaySceneToolManager.cs" />
@@ -143,10 +147,6 @@
     <Compile Include="Assets\HSP.Vanilla\Components\FLaunchSiteMarker.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FReactionControlController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FControlFrame.cs" />
-    <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\GameplayScene.cs" />
-    <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\DesignScene.cs" />
-    <Compile Include="Assets\HSP.Vanilla\Scenes\EditorScene\EditorScene.cs" />
-    <Compile Include="Assets\HSP.Vanilla\Scenes\MainMenuScene\MainMenuScene.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla\___HSP.Vanilla.asmdef" />

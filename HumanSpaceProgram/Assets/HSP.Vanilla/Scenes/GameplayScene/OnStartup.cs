@@ -26,6 +26,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene
         public const string ADD_ACTIVE_VESSEL_MANAGER = HSPEvent.NAMESPACE_HSP + ".add_active_vessel_manager";
         public const string ADD_SELECTED_CONTROL_FRAME_MANAGER = HSPEvent.NAMESPACE_HSP + ".add_selected_control_frame_manager";
         public const string ADD_ESCAPE_INPUT_CONTROLLER = HSPEvent.NAMESPACE_HSP + ".add_escape_icontroller";
+        public const string REMOVE_ESCAPE_INPUT_CONTROLLER = HSPEvent.NAMESPACE_HSP + ".remove_escape_icontroller";
         public const string ADD_TRAJECTORY_MANAGER = HSPEvent.NAMESPACE_HSP + ".add_trajectory_manager";
         public const string ADD_ATMOSPHERE_RENDERER = HSPEvent.NAMESPACE_HSP + ".add_atmosphere_renderer";
 
@@ -71,10 +72,20 @@ namespace HSP.Vanilla.Scenes.GameplayScene
             GameplayScene.Instance.gameObject.AddComponent<SceneReferenceFrameManager>();
         }
 
-        [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_LOAD.ID, ADD_ESCAPE_INPUT_CONTROLLER )]
+        [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_ACTIVATE.ID, ADD_ESCAPE_INPUT_CONTROLLER )]
         private static void AddEscapeInputController()
         {
             GameplayScene.Instance.gameObject.AddComponent<GameplaySceneEscapeInputController>();
+        }
+
+        [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_DEACTIVATE.ID, REMOVE_ESCAPE_INPUT_CONTROLLER )]
+        private static void RemoveEscapeInputController()
+        {
+            var comp = GameplayScene.Instance.gameObject.GetComponent<GameplaySceneEscapeInputController>();
+            if( comp != null )
+            {
+                Destroy( comp );
+            }
         }
 
         [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_LOAD.ID, ADD_TRAJECTORY_MANAGER )]

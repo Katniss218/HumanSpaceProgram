@@ -1,6 +1,5 @@
 using HSP.SceneManagement;
 using HSP.UI;
-using HSP.Vanilla.Scenes.DesignScene;
 using HSP.Vanilla.Scenes.EditorScene;
 using HSP.Vanilla.Scenes.MainMenuScene;
 using HSP.Vanilla.UI.Timelines;
@@ -17,24 +16,33 @@ namespace HSP.Vanilla.UI.Scenes.MainMenuScene
     /// </summary>
     public static class MainMenuSceneUIFactory
     {
+        static UIPanel _mainPanel;
+
         static UIStartNewGameWindow _startNewGameWindow; // singleton window
         static UILoadWindow _loadWindow; // singleton window
 
-        public const string CREATE_UI = HSPEvent.NAMESPACE_HSP + ".mainmenu_ui";
+        public const string CREATE_UI = HSPEvent.NAMESPACE_HSP + ".mainmenu_scene.ui.create";
+        public const string DESTROY_UI = HSPEvent.NAMESPACE_HSP + ".mainmenu_scene.ui.destroy";
 
-        [HSPEventListener( HSPEvent_MAIN_MENU_SCENE_LOAD.ID, CREATE_UI )]
-        public static void Create()
+        [HSPEventListener( HSPEvent_MAIN_MENU_SCENE_ACTIVATE.ID, CREATE_UI )]
+        private static void Create()
         {
             UICanvas canvas = CanvasManager.Get( CanvasName.STATIC );
 
-            CreateStartNewGameButton( canvas );
-            CreateLoadButton( canvas );
-            CreateDesignARocketButton( canvas );
-            CreateDesignAPartButton( canvas );
-            CreateSettingsButton( canvas );
-            CreateExitButton( canvas );
+            if( !_mainPanel.IsNullOrDestroyed() )
+            {
+                _mainPanel.Destroy();
+            }
+            _mainPanel = canvas.AddPanel( new UILayoutInfo( UIFill.Fill() ), null );
 
-            UIValueBar bar = canvas.AddHorizontalValueBar( new UILayoutInfo( UIAnchor.Center, (0, 35), (200, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/bar_background" ) )
+            CreateStartNewGameButton( _mainPanel );
+            CreateLoadButton( _mainPanel );
+            CreateDesignARocketButton( _mainPanel );
+            CreateDesignAPartButton( _mainPanel );
+            CreateSettingsButton( _mainPanel );
+            CreateExitButton( _mainPanel );
+
+            UIValueBar bar = _mainPanel.AddHorizontalValueBar( new UILayoutInfo( UIAnchor.Center, (0, 35), (200, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/bar_background" ) )
                 .WithPadding( 5, 5, 1 );
 
             var seg = bar.AddSegment( 0.25f );
@@ -44,6 +52,15 @@ namespace HSP.Vanilla.UI.Scenes.MainMenuScene
             seg = bar.InsertSegment( 0, 0.5f );
             seg.Sprite = AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/bar" );
             seg.Color = Color.red;
+        }
+
+        [HSPEventListener( HSPEvent_MAIN_MENU_SCENE_DEACTIVATE.ID, DESTROY_UI )]
+        private static void Destroy()
+        {
+            if( !_mainPanel.IsNullOrDestroyed() )
+            {
+                _mainPanel.Destroy();
+            }
         }
 
         // #-#-#-#-#-#-#-#-#-#
