@@ -23,7 +23,7 @@ namespace HSP.SceneManagement
         public UnityEngine.SceneManagement.Scene UnityScene
         {
             get => _unityScene;
-            set => _unityScene = value;
+            // set => _unityScene = value;
         }
 
         /// <summary>
@@ -67,9 +67,10 @@ namespace HSP.SceneManagement
             {
                 // create
                 GameObject go = new GameObject( $"_ {typeof( T ).Name} _" );
-                T ins = go.AddComponent<T>();
-                ins._unityScene = unityScene;
+                go.AddComponent<T>(); // Will be found and validated against multiple instances later.
             }
+
+            instance._unityScene = unityScene;
 
             return instance;
         }

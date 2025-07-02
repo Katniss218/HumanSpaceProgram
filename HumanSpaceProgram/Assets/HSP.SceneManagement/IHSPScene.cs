@@ -14,7 +14,7 @@ namespace HSP.SceneManagement
         /// <summary>
         /// The loaded Unity scene associated with this HSP scene instance
         /// </summary>
-        Scene UnityScene { get; set; }
+        Scene UnityScene { get; }
 
         void _onload();
         void _onunload();
