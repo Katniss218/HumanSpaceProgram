@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityPlus.UILib.UIElements;
 using Object = UnityEngine.Object;
 
@@ -12,22 +13,42 @@ namespace UnityPlus.UILib
     /// </summary>
     public static partial class CanvasManager
     {
-        private static Dictionary<string, UICanvas> _canvases = new();
+        private static Dictionary<Scene, Dictionary<string, UICanvas>> _perSceneCanvases = new();
+        private static Dictionary<Type, MethodInfo> _factoryMethod = new();
 
-        public static UICanvas GetOrCreate<TCanvas>( string id ) where TCanvas : UICanvas
+        public static UICanvas GetOrCreate<TCanvas>( Scene scene, string id ) where TCanvas : UICanvas
         {
+            if( !scene.IsValid() || !scene.isLoaded )
+                throw new ArgumentException( "The scene must be valid and loaded.", nameof( scene ) );
+
             if( string.IsNullOrEmpty( id ) )
                 throw new ArgumentException( "The ID must not be null or empty.", nameof( id ) );
 
-            if( TryGet( id, out var canvas ) )
+            if( TryGet( scene, id, out var canvas ) )
             {
-                return canvas;
+                if( !canvas.IsNullOrDestroyed() )
+                {
+                    return canvas;
+                }
+
+                // the scene might've been unloaded and the canvas destroyed.
+                GetCanvasDict( scene ).Remove( id );
             }
 
-            canvas = CreateCanvas<TCanvas>( UnityEngine.SceneManagement.SceneManager.GetActiveScene(), id );
+            canvas = CreateCanvas<TCanvas>( scene, id );
 
-            Register( id, canvas );
+            Register( scene, id, canvas );
             return canvas;
+        }
+
+        private static Dictionary<string, UICanvas> GetCanvasDict( Scene scene )
+        {
+            if( !_perSceneCanvases.TryGetValue( scene, out var canvases ) )
+            {
+                canvases = new Dictionary<string, UICanvas>();
+                _perSceneCanvases[scene] = canvases;
+            }
+            return canvases;
         }
 
         /// <summary>
@@ -36,12 +57,17 @@ namespace UnityPlus.UILib
         /// <remarks>
         /// Tries to find the canvas is it isn't cached yet.
         /// </remarks>
-        public static bool TryGet( string id, out UICanvas canvas )
+        public static bool TryGet( Scene scene, string id, out UICanvas canvas )
         {
+            if( !scene.IsValid() || !scene.isLoaded )
+                throw new ArgumentException( "The scene must be valid and loaded.", nameof( scene ) );
+
             if( string.IsNullOrEmpty( id ) )
                 throw new ArgumentException( "The ID must not be null or empty.", nameof( id ) );
 
-            if( _canvases.TryGetValue( id, out canvas ) )
+            Dictionary<string, UICanvas> canvasesInScene = GetCanvasDict( scene );
+
+            if( canvasesInScene.TryGetValue( id, out canvas ) )
             {
                 if( !canvas.IsNullOrDestroyed() )
                 {
@@ -50,13 +76,13 @@ namespace UnityPlus.UILib
             }
 
             // If no canvas is found, we should try to find it, because it might've been loaded/created after the previous invocation of this method.
-            TryRegisterUnknownCanvases();
+            TryRegisterUnknownPerSceneCanvases();
 
-            if( _canvases.TryGetValue( id, out canvas ) )
+            if( canvasesInScene.TryGetValue( id, out canvas ) )
             {
                 if( canvas == null )
                 {
-                    _canvases.Remove( id );
+                    canvasesInScene.Remove( id );
                     return false;
                 }
                 return true;
@@ -71,12 +97,17 @@ namespace UnityPlus.UILib
         /// <remarks>
         /// Tries to find the canvas is it isn't cached yet.
         /// </remarks>
-        public static UICanvas Get( string id )
+        public static UICanvas Get( Scene scene, string id )
         {
+            if( !scene.IsValid() || !scene.isLoaded )
+                throw new ArgumentException( "The scene must be valid and loaded.", nameof( scene ) );
+
             if( string.IsNullOrEmpty( id ) )
                 throw new ArgumentException( "The ID must not be null or empty.", nameof( id ) );
 
-            if( _canvases.TryGetValue( id, out UICanvas canvas ) )
+            Dictionary<string, UICanvas> canvasesInScene = GetCanvasDict( scene );
+
+            if( canvasesInScene.TryGetValue( id, out UICanvas canvas ) )
             {
                 if( !canvas.IsNullOrDestroyed() )
                 {
@@ -85,13 +116,13 @@ namespace UnityPlus.UILib
             }
 
             // If no canvas is found, we should try to find it, because it might've been loaded/created after the previous invocation of this method.
-            TryRegisterUnknownCanvases();
+            TryRegisterUnknownPerSceneCanvases();
 
-            if( _canvases.TryGetValue( id, out canvas ) )
+            if( canvasesInScene.TryGetValue( id, out canvas ) )
             {
                 if( canvas == null )
                 {
-                    _canvases.Remove( id );
+                    canvasesInScene.Remove( id );
                     throw new ArgumentException( $"A canvas with the ID `{id}` doesn't exist." );
                 }
                 return canvas;
@@ -104,31 +135,40 @@ namespace UnityPlus.UILib
         /// Registers a canvas under a specified ID.
         /// </summary>
         /// <exception cref="InvalidOperationException"/>
-        public static void Register( string id, UICanvas canvas )
+        public static void Register( Scene scene, string id, UICanvas canvas )
         {
+            if( !scene.IsValid() || !scene.isLoaded )
+                throw new ArgumentException( "The scene must be valid and loaded.", nameof( scene ) );
+
             if( string.IsNullOrEmpty( id ) )
                 throw new ArgumentException( "The ID must not be null or empty.", nameof( id ) );
 
             if( canvas == null )
                 throw new ArgumentNullException( nameof( canvas ) );
 
-            if( _canvases.ContainsKey( id ) )
+            Dictionary<string, UICanvas> canvasesInScene = GetCanvasDict( scene );
+
+            if( canvasesInScene.ContainsKey( id ) )
             {
                 throw new InvalidOperationException( $"Can't register a canvas under the name `{id}`. A canvas with this name is already registered." );
             }
 
-            _canvases[id] = canvas;
+            canvasesInScene[id] = canvas;
         }
-        private static void TryRegisterUnknownCanvases()
+
+        private static void TryRegisterUnknownPerSceneCanvases()
         {
             UICanvas[] canvasLayers = Object.FindObjectsOfType<UICanvas>();
             foreach( var canvasLayer in canvasLayers )
             {
-                if( _canvases.TryGetValue( canvasLayer.ID, out UICanvas c ) )
+                Scene scene = canvasLayer.gameObject.scene;
+                Dictionary<string, UICanvas> canvasesInScene = GetCanvasDict( scene );
+
+                if( canvasesInScene.TryGetValue( canvasLayer.ID, out UICanvas c ) )
                 {
                     if( c.IsNullOrDestroyed() )
                     {
-                        _canvases.Remove( canvasLayer.ID );
+                        canvasesInScene.Remove( canvasLayer.ID );
                     }
                     else
                     {
@@ -152,39 +192,6 @@ namespace UnityPlus.UILib
                     Debug.LogException( ex );
                 }
             }
-        }
-
-        private static UICanvas CreateCanvas<TCanvas>( UnityEngine.SceneManagement.Scene scene, string id ) where TCanvas : UICanvas
-        {
-            UICanvas canvas;
-            Type type = typeof( TCanvas );
-            // Would be nice if we could use static interface members here instead of reflection.
-            if( !_factoryMethod.TryGetValue( type, out MethodInfo method ) )
-            {
-                try
-                {
-                    method = typeof( TCanvas ).GetMethod( "Create", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static, null, new Type[] { typeof( UnityEngine.SceneManagement.Scene ), typeof( string ) }, null );
-                    if( method == null )
-                    {
-                        throw new ArgumentException( $"The type `{typeof( TCanvas ).Name}` does not have a static `Create( Scene scene, string id )` method." );
-                    }
-                }
-                catch( Exception ex )
-                {
-                    throw new ArgumentException( $"The type `{typeof( TCanvas ).Name}` does not have a static `Create( Scene scene, string id )` method.", ex );
-                }
-            }
-
-            try
-            {
-                canvas = (UICanvas)method.Invoke( null, new object[] { scene, id } );
-            }
-            catch( Exception ex )
-            {
-                throw new ArgumentException( $"An exception occurred when trying to Create() a UICanvas of type `{type.Name}`.", ex );
-            }
-
-            return canvas;
         }
     }
 }

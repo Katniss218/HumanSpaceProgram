@@ -1,6 +1,7 @@
 ﻿using HSP.Content.Vessels.Serialization;
 using HSP.SceneManagement;
 using HSP.UI;
+using HSP.UI.Canvases;
 using HSP.UI.Windows;
 using HSP.Vanilla.Scenes.DesignScene;
 using HSP.Vanilla.Scenes.DesignScene.Tools;
@@ -89,7 +90,7 @@ namespace HSP.Vanilla.UI.Scenes.DesignScene
             {
                 if( DesignVesselManager.CurrentVesselMetadata == null )
                 {
-                    CanvasManager.Get( CanvasName.WINDOWS ).AddAlertWindow( "Specify the name of the vessel before saving." );
+                    CanvasManager.GetOrCreate<UIWindowCanvas>( HSP.Vanilla.Scenes.DesignScene.DesignScene.Instance.UnityScene, CanvasName.WINDOWS ).AddAlertWindow( "Specify the name of the vessel before saving." );
                     return;
                 }
 

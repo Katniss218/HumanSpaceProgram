@@ -66,6 +66,12 @@
     <Compile Include="Assets\HSP.UI\Windows\UIConfirmWindow.cs" />
     <Compile Include="Assets\HSP.UI\Defaults\UIDefaults.cs" />
     <Compile Include="Assets\HSP.UI\Windows\UIAlertWindow.cs" />
+    <Compile Include="Assets\HSP.UI\Canvases\UIConsoleCanvas.cs" />
+    <Compile Include="Assets\HSP.UI\Canvases\UIWindowCanvas.cs" />
+    <Compile Include="Assets\HSP.UI\Canvases\UIStaticCanvas.cs" />
+    <Compile Include="Assets\HSP.UI\Canvases\UIContextMenuCanvas.cs" />
+    <Compile Include="Assets\HSP.UI\Canvases\UICursorCanvas.cs" />
+    <Compile Include="Assets\HSP.UI\Canvases\UIBackgroundCanvas.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.UI\___HSP.UI.asmdef" />

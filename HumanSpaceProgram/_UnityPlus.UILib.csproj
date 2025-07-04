@@ -122,6 +122,7 @@
     <Compile Include="Assets\_UnityPlus.UILib\UILayoutInfo_Ex.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIScrollView_Ex.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\RectTransformTrackCursor.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\CanvasManager.PerScene.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\_UnityPlus.UILib\___UnityPlus.UILib.asmdef" />

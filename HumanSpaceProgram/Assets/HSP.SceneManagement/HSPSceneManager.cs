@@ -272,7 +272,7 @@ namespace HSP.SceneManagement
 
                     MethodInfo method = newSceneType.GetMethod( "GetOrCreateSceneManagerInActiveScene", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy );
                     IHSPScene newScene = (IHSPScene)method.Invoke( null, new object[] { newlyLoadedScene } );
-                    newScene.UnityScene = newlyLoadedScene;
+                    //newScene.UnityScene = newlyLoadedScene;
                     _loadedScenes.Add( newScene );
                     newScene._onload();
 
@@ -297,7 +297,7 @@ namespace HSP.SceneManagement
 
                 MethodInfo method = newSceneType.GetMethod( "GetOrCreateSceneManagerInActiveScene", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy );
                 IHSPScene newScene = (IHSPScene)method.Invoke( null, new object[] { newlyLoadedScene } );
-                newScene.UnityScene = newlyLoadedScene;
+                //newScene.UnityScene = newlyLoadedScene;
                 _loadedScenes.Add( newScene );
                 newScene._onload();
 
@@ -314,6 +314,9 @@ namespace HSP.SceneManagement
         private static IEnumerator UnloadCoroutine( IHSPScene scene, Action onAfterUnloaded )
         {
             Scene unityScene = scene.UnityScene;
+
+            Debug.Log( $"Unloading Unity scene '{unityScene.name}' as part of the HSP scene '{scene.GetType().Name}'..." );
+
             AsyncOperation op = SceneManager.UnloadSceneAsync( unityScene );
 
             // Wait until the asynchronous scene fully loads

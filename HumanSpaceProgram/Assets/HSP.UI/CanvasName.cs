@@ -4,7 +4,7 @@
     /// A class containing IDs to use with <see cref="UnityPlus.UILib.CanvasManager.Get(string)"/>.
     /// </summary>
     public static class CanvasName
-    {
+    {/*
         /// <summary>
         /// The (special) canvas for the console overlay. Renders on top of everything else.
         /// </summary>
@@ -38,6 +38,6 @@
         /// The primary canvas for background UI elements. <br />
         /// Renders behind everything else.
         /// </summary>
-        public const string BACKGROUND = "background";
+        public const string BACKGROUND = "background";*/
     }
 }
