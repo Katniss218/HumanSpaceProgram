@@ -46,7 +46,7 @@ namespace HSP.Vanilla.UI.Timelines
                 Description = _descriptionInputField.GetOrDefault( "" )
             };
 
-            HSPSceneManager.ReplaceForegroundScene<GameplayScene>( onAfterLoaded: () =>
+            HSPSceneManager.ReplaceForegroundScene<GameplaySceneM>( onAfterLoaded: () =>
             {
                 TimelineManager.BeginNewTimelineAsync( meta );
                 foreach( var page in _settingsPages )

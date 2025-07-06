@@ -9,7 +9,7 @@ namespace HSP.Vanilla.UI.Vessels
         [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_LOAD.ID, ADD_VESSEL_HUD_MANAGER )]
         private static void AddVesselHudManager()
         {
-            GameplayScene.GameObject.AddComponent<VesselHUDManager>();
+            GameplaySceneM.GameObject.AddComponent<GameplayVesselHUDManager>();
         }
     }
 }

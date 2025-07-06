@@ -38,11 +38,11 @@ namespace HSP.Vanilla.Scenes.EditorScene
     /// <summary>
     /// A Manager whose responsibility is to invoke the events relating to creation/destruction of the `editor` scene.
     /// </summary>
-    public sealed class EditorScene : HSPScene<EditorScene>
+    public sealed class EditorSceneM : HSPScene<EditorSceneM>
     {
         public static new string UNITY_SCENE_NAME => "Editor";
 
-        public static EditorScene Instance => instance;
+        public static EditorSceneM Instance => instance;
         public static GameObject GameObject => instance.gameObject;
 
         protected override void OnLoad()

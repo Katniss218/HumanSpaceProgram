@@ -18,7 +18,7 @@ namespace HSP.Vanilla.Scenes.MainMenuScene
         [HSPEventListener( HSPEvent_MAIN_MENU_SCENE_LOAD.ID, ADD_ESCAPE_INPUT_CONTROLLER )]
         private static void AddEscapeInputController()
         {
-            MainMenuScene.Instance.gameObject.AddComponent<MainMenuEscapeInputController>();
+            MainMenuSceneM.Instance.gameObject.AddComponent<MainMenuEscapeInputController>();
         }
     }
 }

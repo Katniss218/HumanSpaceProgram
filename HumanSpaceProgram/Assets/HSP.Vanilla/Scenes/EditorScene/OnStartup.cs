@@ -18,7 +18,7 @@ namespace HSP.Vanilla.Scenes.EditorScene
         [HSPEventListener( HSPEvent_EDITOR_SCENE_LOAD.ID, ADD_ESCAPE_INPUT_CONTROLLER )]
         private static void AddEscapeInputController()
         {
-            EditorScene.Instance.gameObject.AddComponent<EditorSceneEscapeInputController>();
+            EditorSceneM.Instance.gameObject.AddComponent<EditorSceneEscapeInputController>();
         }
     }
 }

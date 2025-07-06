@@ -1,4 +1,5 @@
 ﻿using HSP.UI;
+using HSP.UI.Canvases;
 using HSP.UI.Windows;
 using HSP.Vanilla.Scenes.GameplayScene;
 using HSP.Vanilla.Scenes.GameplayScene.Tools;
@@ -22,7 +23,7 @@ namespace HSP.Vanilla.UI.Scenes.GameplayScene
         [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_ACTIVATE.ID, CREATE_UI, After = new[] { HSP.Vanilla.Scenes.GameplayScene.OnStartup.ADD_ACTIVE_VESSEL_MANAGER } )]
         private static void Create()
         {
-            UICanvas canvas = CanvasManager.Get( CanvasName.STATIC );
+            UICanvas canvas = GameplaySceneM.Instance.GetStaticCanvas();
 
             if( !_mainPanel.IsNullOrDestroyed() )
             {
@@ -144,7 +145,8 @@ namespace HSP.Vanilla.UI.Scenes.GameplayScene
 
             UIButton constructButton = bottomPanel.AddButton( new UILayoutInfo( UIAnchor.Center, (-16, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), () =>
             {
-                CanvasManager.Get( CanvasName.WINDOWS ).AddPromptWindow( "Vessel to create...", "id here", vesselId =>
+                GameplaySceneM.Instance.GetWindowCanvas()
+                .AddPromptWindow( "Vessel to create...", "id here", vesselId =>
                 {
                     ConstructTool tool = GameplaySceneToolManager.UseTool<ConstructTool>();
                     tool.SpawnVesselAndSetGhost( vesselId );

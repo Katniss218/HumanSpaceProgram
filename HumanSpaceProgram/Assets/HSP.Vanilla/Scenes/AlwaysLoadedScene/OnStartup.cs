@@ -53,7 +53,7 @@ namespace HSP.Vanilla.Scenes.AlwaysLoadedScene
         [HSPEventListener( HSPEvent_STARTUP_EARLY.ID, LOAD_MAIN_MENU )]
         private static void LoadMainMenu()
         {
-            HSPSceneManager.LoadSceneAsync<MainMenuScene.MainMenuScene>();
+            HSPSceneManager.LoadSceneAsync<MainMenuScene.MainMenuSceneM>();
         }
     }
 }

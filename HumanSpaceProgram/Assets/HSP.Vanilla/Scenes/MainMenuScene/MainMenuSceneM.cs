@@ -38,11 +38,11 @@ namespace HSP.Vanilla.Scenes.MainMenuScene
     /// <summary>
     /// A Manager whose responsibility is to invoke the events relating to creation/destruction of the `main menu` scene.
     /// </summary>
-    public sealed class MainMenuScene : HSPScene<MainMenuScene>
+    public sealed class MainMenuSceneM : HSPScene<MainMenuSceneM>
     {
         public static new string UNITY_SCENE_NAME => "MainMenu";
 
-        public static MainMenuScene Instance => instance;
+        public static MainMenuSceneM Instance => instance;
         public static GameObject GameObject => instance.gameObject;
 
         protected override void OnActivate()

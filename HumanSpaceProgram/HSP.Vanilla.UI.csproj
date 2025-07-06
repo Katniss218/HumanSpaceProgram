@@ -65,10 +65,11 @@
     <Compile Include="Assets\HSP.Vanilla.UI\Timelines\UISaveMetadata.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\UIPartWindowComponent.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\UISequenceAction.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI\CanvasRegistry.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Scenes\DesignScene\UIPartListEntry.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\UISequencerPanel.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Scenes\GameplayMapScene\MapSceneUIFactory.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI\Components\SequencerPanelFactory.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI\Components\GameplaySequencerPanelFactory.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Timelines\UISaveWindow.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Scenes\DesignScene\UIPartList.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\UITextReadout_ElapsedUT.cs" />

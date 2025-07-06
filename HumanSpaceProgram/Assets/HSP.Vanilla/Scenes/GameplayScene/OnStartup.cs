@@ -33,55 +33,55 @@ namespace HSP.Vanilla.Scenes.GameplayScene
         [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_LOAD.ID, ADD_TIMESCALE_INPUT_CONTROLLER )]
         private static void AddTimescaleInputController()
         {
-            GameplayScene.Instance.gameObject.AddComponent<TimeScaleInputController>();
+            GameplaySceneM.Instance.gameObject.AddComponent<TimeScaleInputController>();
         }
 
         [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_LOAD.ID, ADD_VESSEL_MANAGER )]
         private static void AddVesselManager()
         {
-            GameplayScene.Instance.gameObject.AddComponent<VesselManager>();
+            GameplaySceneM.Instance.gameObject.AddComponent<VesselManager>();
         }
 
         [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_LOAD.ID, ADD_CELESTIAL_BODY_MANAGER )]
         private static void AddCelestialBodyManager()
         {
-            GameplayScene.Instance.gameObject.AddComponent<CelestialBodyManager>();
+            GameplaySceneM.Instance.gameObject.AddComponent<CelestialBodyManager>();
         }
 
         [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_LOAD.ID, ADD_ACTIVE_VESSEL_MANAGER )]
         private static void AddActiveVesselManager()
         {
-            GameplayScene.Instance.gameObject.AddComponent<ActiveVesselManager>();
+            GameplaySceneM.Instance.gameObject.AddComponent<ActiveVesselManager>();
         }
 
         [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_LOAD.ID, ADD_SELECTED_CONTROL_FRAME_MANAGER )]
         private static void AddSelectedControlFrameManager()
         {
-            GameplayScene.Instance.gameObject.AddComponent<SelectedControlFrameManager>();
+            GameplaySceneM.Instance.gameObject.AddComponent<SelectedControlFrameManager>();
         }
 
         [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_LOAD.ID, ADD_GAMEPLAY_SCENE_TOOL_MANAGER )]
         private static void AddGameplaySceneToolManager()
         {
-            GameplayScene.Instance.gameObject.AddComponent<GameplaySceneToolManager>();
+            GameplaySceneM.Instance.gameObject.AddComponent<GameplaySceneToolManager>();
         }
 
         [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_LOAD.ID, ADD_SCENE_REFERENCE_FRAME_MANAGER )]
         private static void AddSceneReferenceFrameManager()
         {
-            GameplayScene.Instance.gameObject.AddComponent<SceneReferenceFrameManager>();
+            GameplaySceneM.Instance.gameObject.AddComponent<SceneReferenceFrameManager>();
         }
 
         [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_ACTIVATE.ID, ADD_ESCAPE_INPUT_CONTROLLER )]
         private static void AddEscapeInputController()
         {
-            GameplayScene.Instance.gameObject.AddComponent<GameplaySceneEscapeInputController>();
+            GameplaySceneM.Instance.gameObject.AddComponent<GameplaySceneEscapeInputController>();
         }
 
         [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_DEACTIVATE.ID, REMOVE_ESCAPE_INPUT_CONTROLLER )]
         private static void RemoveEscapeInputController()
         {
-            var comp = GameplayScene.Instance.gameObject.GetComponent<GameplaySceneEscapeInputController>();
+            var comp = GameplaySceneM.Instance.gameObject.GetComponent<GameplaySceneEscapeInputController>();
             if( comp != null )
             {
                 Destroy( comp );
@@ -91,7 +91,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene
         [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_LOAD.ID, ADD_TRAJECTORY_MANAGER )]
         private static void AddTrajectoryManager()
         {
-            GameplayScene.Instance.gameObject.AddComponent<TrajectoryManager>();
+            GameplaySceneM.Instance.gameObject.AddComponent<TrajectoryManager>();
         }
 
         [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_ACTIVATE.ID, ADD_ATMOSPHERE_RENDERER,

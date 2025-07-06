@@ -35,11 +35,11 @@ namespace HSP.Vanilla.Scenes.MapScene
         public const string ID = HSPEvent.NAMESPACE_HSP + ".map_scene.deactivate";
     }
 
-    public class MapScene : HSPScene<MapScene>
+    public class MapSceneM : HSPScene<MapSceneM>
     {
         public static new string UNITY_SCENE_NAME => null; 
 
-        public static MapScene Instance => instance;
+        public static MapSceneM Instance => instance;
         public static GameObject GameObject => instance.gameObject;
 
         protected override void OnLoad()

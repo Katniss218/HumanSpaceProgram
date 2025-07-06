@@ -1,12 +1,11 @@
-﻿using HSP.Vessels.Construction;
-using HSP.UI;
+﻿using HSP.Vanilla.Scenes.GameplayScene;
+using HSP.Vessels.Construction;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityPlus.UILib;
 
 namespace HSP.Vanilla.UI.Vessels.Construction
 {
-    public class ConstructionSiteHUDManager : SingletonMonoBehaviour<ConstructionSiteHUDManager>
+    public class GameplayConstructionSiteHUDManager : SingletonMonoBehaviour<GameplayConstructionSiteHUDManager>
     {
         List<ConstructionSiteHUD> _huds = new List<ConstructionSiteHUD>();
 
@@ -18,8 +17,8 @@ namespace HSP.Vanilla.UI.Vessels.Construction
         {
             //if( ActiveObjectManager.ActiveObject == null )
             //{
-                var hud = CanvasManager.Get( CanvasName.BACKGROUND ).AddConstructionSiteHUD( constructionSite );
-                instance._huds.Add( hud );
+            var hud = GameplaySceneM.Instance.GetBackgroundCanvas().AddConstructionSiteHUD( constructionSite );
+            instance._huds.Add( hud );
             //}
         }
 
@@ -41,29 +40,33 @@ namespace HSP.Vanilla.UI.Vessels.Construction
                 }
             }
         }
-        /*
-        [HSPEventListener( HSPEvent.GAMEPLAY_AFTER_ACTIVE_OBJECT_CHANGE, "vanilla.csite_huds" )]
-        private static void OnActiveObjectChanged()
+
+        [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_ACTIVATE.ID, CREATE_CONSTRUCTION_SITE_HUD )]
+        private static void OnGameplaySceneActivate()
         {
-            if( ActiveObjectManager.ActiveObject == null )
+            if( !instanceExists )
+                return;
+
+            var canvas = GameplaySceneM.Instance.GetBackgroundCanvas();
+
+            foreach( var vessel in FindObjectsOfType<FConstructionSite>() )
             {
-                foreach( var vessel in VesselManager.LoadedVessels )
-                {
-                    foreach( var constructionSite in vessel.GetComponentsInChildren<FConstructionSite>() )
-                    {
-                        var hud = CanvasManager.Get( CanvasName.BACKGROUND ).AddConstructionSiteHUD( constructionSite );
-                        instance._huds.Add( hud );
-                    }
-                }
+                var hud = canvas.AddConstructionSiteHUD( vessel );
+                instance._huds.Add( hud );
             }
-            else
+        }
+
+        [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_DEACTIVATE.ID, DESTROY_CONSTRUCTION_SITE_HUD )]
+        private static void OnGameplaySceneDeactivate()
+        {
+            if( !instanceExists )
+                return;
+
+            foreach( var hud in instance._huds )
             {
-                foreach( var hud in instance._huds )
-                {
-                    Destroy( hud.gameObject );
-                }
-                instance._huds.Clear();
+                Destroy( hud.gameObject );
             }
-        }*/
+            instance._huds.Clear();
+        }
     }
 }

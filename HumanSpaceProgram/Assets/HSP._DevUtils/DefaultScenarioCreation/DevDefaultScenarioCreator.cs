@@ -40,7 +40,7 @@ namespace HSP._DevUtils
 
         public static void LoadGameplayScene()
         {
-            HSPSceneManager.ReplaceForegroundScene<GameplayScene>( onAfterLoaded: () =>
+            HSPSceneManager.ReplaceForegroundScene<GameplaySceneM>( onAfterLoaded: () =>
             {
                 VanillaPlanetarySystemFactory.CreateDefaultPlanetarySystem();
 

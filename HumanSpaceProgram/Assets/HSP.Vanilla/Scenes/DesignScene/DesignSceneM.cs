@@ -38,11 +38,11 @@ namespace HSP.Vanilla.Scenes.DesignScene
     /// <summary>
     /// A Manager whose responsibility is to invoke the events relating to creation/destruction of the `design` scene.
     /// </summary>
-    public sealed class DesignScene : HSPScene<DesignScene>
+    public sealed class DesignSceneM : HSPScene<DesignSceneM>
     {
         public static new string UNITY_SCENE_NAME => "Design";
 
-        public static DesignScene Instance => instance;
+        public static DesignSceneM Instance => instance;
         public static GameObject GameObject => instance.gameObject;
 
         protected override void OnActivate()

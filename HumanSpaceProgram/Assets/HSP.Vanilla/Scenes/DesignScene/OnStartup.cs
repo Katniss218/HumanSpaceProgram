@@ -25,37 +25,37 @@ namespace HSP.Vanilla.Scenes.DesignScene
         [HSPEventListener( HSPEvent_DESIGN_SCENE_LOAD.ID, ADD_VESSEL_MANAGER )]
         private static void VesselManager()
         {
-            DesignScene.Instance.gameObject.AddComponent<VesselManager>();
+            DesignSceneM.Instance.gameObject.AddComponent<VesselManager>();
         }
 
         [HSPEventListener( HSPEvent_DESIGN_SCENE_LOAD.ID, ADD_DESIGN_SCENE_TOOL_MANAGER )]
         private static void AddDesignSceneToolManager()
         {
-            DesignScene.Instance.gameObject.AddComponent<DesignSceneToolManager>();
+            DesignSceneM.Instance.gameObject.AddComponent<DesignSceneToolManager>();
         }
 
         [HSPEventListener( HSPEvent_DESIGN_SCENE_LOAD.ID, ADD_DESIGN_VESSEL_MANAGER )]
         private static void AddDesignVesselManager()
         {
-            DesignScene.Instance.gameObject.AddComponent<DesignVesselManager>();
+            DesignSceneM.Instance.gameObject.AddComponent<DesignVesselManager>();
         }
 
         [HSPEventListener( HSPEvent_DESIGN_SCENE_LOAD.ID, ADD_SCENE_REFERENCE_FRAME_MANAGER )]
         private static void AddSceneReferenceFrameManager()
         {
-            DesignScene.Instance.gameObject.AddComponent<SceneReferenceFrameManager>();
+            DesignSceneM.Instance.gameObject.AddComponent<SceneReferenceFrameManager>();
         }
 
         [HSPEventListener( HSPEvent_DESIGN_SCENE_LOAD.ID, ADD_ACTIVE_OBJECT_MANAGER )]
         private static void AddActiveObjectManager()
         {
-            DesignScene.Instance.gameObject.AddComponent<ActiveVesselManager>();
+            DesignSceneM.Instance.gameObject.AddComponent<ActiveVesselManager>();
         }
 
         [HSPEventListener( HSPEvent_DESIGN_SCENE_LOAD.ID, ADD_ESCAPE_INPUT_CONTROLLER )]
         private static void CreateInstanceInScene()
         {
-            DesignScene.Instance.gameObject.AddComponent<DesignSceneEscapeInputController>();
+            DesignSceneM.Instance.gameObject.AddComponent<DesignSceneEscapeInputController>();
         }
     }
 }

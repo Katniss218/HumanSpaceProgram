@@ -5,6 +5,7 @@ using HSP.UI.Canvases;
 using HSP.UI.Windows;
 using HSP.Vanilla.Scenes.DesignScene;
 using HSP.Vanilla.Scenes.DesignScene.Tools;
+using HSP.Vanilla.Scenes.GameplayScene;
 using HSP.Vanilla.UI.Components;
 using System;
 using UnityEngine;
@@ -33,7 +34,8 @@ namespace HSP.Vanilla.UI.Scenes.DesignScene
         [HSPEventListener( HSPEvent_DESIGN_SCENE_ACTIVATE.ID, CREATE_UI )]
         private static void Create()
         {
-            UICanvas canvas = CanvasManager.Get( CanvasName.STATIC );
+#warning TODO - mayyyyybe use a single canvas set in always loaded scene for everything?
+            UICanvas canvas = DesignSceneM.Instance.GetStaticCanvas();
 
             if( !_mainPanel.IsNullOrDestroyed() )
             {
@@ -81,7 +83,8 @@ namespace HSP.Vanilla.UI.Scenes.DesignScene
                 .Disabled();
             UIButton openBtn = p1.AddButton( new UILayoutInfo( UIAnchor.BottomLeft, (40, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_open" ), () =>
             {
-                CanvasManager.Get( CanvasName.WINDOWS ).AddPromptWindow( "Load ...", "vessel name/ID", ( text ) =>
+                DesignSceneM.Instance.GetWindowCanvas()
+                    .AddPromptWindow( "Load ...", "vessel name/ID", ( text ) =>
                 {
                     DesignVesselManager.LoadVessel( IOHelper.SanitizeFileName( text ) );
                 } );
@@ -90,11 +93,13 @@ namespace HSP.Vanilla.UI.Scenes.DesignScene
             {
                 if( DesignVesselManager.CurrentVesselMetadata == null )
                 {
-                    CanvasManager.GetOrCreate<UIWindowCanvas>( HSP.Vanilla.Scenes.DesignScene.DesignScene.Instance.UnityScene, CanvasName.WINDOWS ).AddAlertWindow( "Specify the name of the vessel before saving." );
+                    DesignSceneM.Instance.GetWindowCanvas()
+                        .AddAlertWindow( "Specify the name of the vessel before saving." );
                     return;
                 }
 
-                CanvasManager.Get( CanvasName.WINDOWS ).AddConfirmWindow( "Save ...", $"Confirm saving '{DesignVesselManager.CurrentVesselMetadata.ID}'.", () =>
+                DesignSceneM.Instance.GetWindowCanvas()
+                    .AddConfirmWindow( "Save ...", $"Confirm saving '{DesignVesselManager.CurrentVesselMetadata.ID}'.", () =>
                 {
                     DesignVesselManager.SaveVessel();
                 } );
@@ -120,7 +125,7 @@ namespace HSP.Vanilla.UI.Scenes.DesignScene
             UIPanel p4 = topPanel.AddPanel( new UILayoutInfo( UIAnchor.Right, UIFill.Vertical(), -20, 30 ), null );
             UIButton exitBtn = p4.AddButton( new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30_leave" ), () =>
             {
-                HSPSceneManager.ReplaceForegroundScene<Vanilla.Scenes.MainMenuScene.MainMenuScene>();
+                HSPSceneManager.ReplaceForegroundScene<Vanilla.Scenes.MainMenuScene.MainMenuSceneM>();
             } );
         }
 
@@ -193,7 +198,9 @@ namespace HSP.Vanilla.UI.Scenes.DesignScene
             UIButton deltaVAnalysisWindow = buttonListPanel.AddButton( new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
             UIButton controlSetupWindow = buttonListPanel.AddButton( new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), () =>
             {
-                UIControlSetupWindow.Create( DesignVesselManager.DesignObject.transform );
+                var wc = DesignSceneM.Instance.GetWindowCanvas();
+                var cmc = CanvasRegistry.GetContextMenuCanvas();
+                UIControlSetupWindow.Create( wc, cmc, DesignVesselManager.DesignObject.transform );
             } );
             UIButton button3 = buttonListPanel.AddButton( new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
 

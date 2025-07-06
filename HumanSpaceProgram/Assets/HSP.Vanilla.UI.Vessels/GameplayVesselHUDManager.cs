@@ -1,13 +1,11 @@
-﻿using HSP.ReferenceFrames;
-using HSP.UI;
+﻿using HSP.Vanilla.Scenes.GameplayScene;
 using HSP.Vessels;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityPlus.UILib;
 
 namespace HSP.Vanilla.UI.Vessels
 {
-    public class VesselHUDManager : SingletonMonoBehaviour<VesselHUDManager>
+    public class GameplayVesselHUDManager : SingletonMonoBehaviour<GameplayVesselHUDManager>
     {
         List<VesselHUD> _huds = new List<VesselHUD>();
 
@@ -23,7 +21,7 @@ namespace HSP.Vanilla.UI.Vessels
 
             if( ActiveVesselManager.ActiveObject == null )
             {
-                var hud = CanvasManager.Get( CanvasName.BACKGROUND ).AddVesselHUD( vessel );
+                var hud = GameplaySceneM.Instance.GetBackgroundCanvas().AddVesselHUD( vessel );
                 instance._huds.Add( hud );
             }
         }
@@ -55,9 +53,11 @@ namespace HSP.Vanilla.UI.Vessels
 
             if( ActiveVesselManager.ActiveObject == null )
             {
+                var canvas = GameplaySceneM.Instance.GetBackgroundCanvas();
+
                 foreach( var vessel in VesselManager.LoadedVessels )
                 {
-                    var hud = CanvasManager.Get( CanvasName.BACKGROUND ).AddVesselHUD( vessel );
+                    var hud = canvas.AddVesselHUD( vessel );
                     instance._huds.Add( hud );
                 }
             }
@@ -69,6 +69,37 @@ namespace HSP.Vanilla.UI.Vessels
                 }
                 instance._huds.Clear();
             }
+        }
+
+        [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_ACTIVATE.ID, CREATE_VESSEL_HUD )]
+        private static void OnGameplaySceneActivate()
+        {
+            if( !instanceExists )
+                return;
+
+            if( ActiveVesselManager.ActiveObject == null )
+            {
+                var canvas = GameplaySceneM.Instance.GetBackgroundCanvas();
+
+                foreach( var vessel in VesselManager.LoadedVessels )
+                {
+                    var hud = canvas.AddVesselHUD( vessel );
+                    instance._huds.Add( hud );
+                }
+            }
+        }
+
+        [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_DEACTIVATE.ID, DESTROY_VESSEL_HUD )]
+        private static void OnGameplaySceneDeactivate()
+        {
+            if( !instanceExists )
+                return;
+
+            foreach( var hud in instance._huds )
+            {
+                Destroy( hud.gameObject );
+            }
+            instance._huds.Clear();
         }
     }
 }

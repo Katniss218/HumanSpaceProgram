@@ -318,6 +318,11 @@ namespace HSP.SceneManagement
             Debug.Log( $"Unloading Unity scene '{unityScene.name}' as part of the HSP scene '{scene.GetType().Name}'..." );
 
             AsyncOperation op = SceneManager.UnloadSceneAsync( unityScene );
+            if( _foregroundScene == scene )
+            {
+                _foregroundScene._ondeactivate();
+                _foregroundScene = null;
+            }
 
             // Wait until the asynchronous scene fully loads
             while( !op.isDone )
@@ -328,7 +333,6 @@ namespace HSP.SceneManagement
             _loadedScenes.Remove( scene );
             if( _foregroundScene == scene )
             {
-                _foregroundScene._ondeactivate();
                 _foregroundScene = null;
             }
             scene._onunload();

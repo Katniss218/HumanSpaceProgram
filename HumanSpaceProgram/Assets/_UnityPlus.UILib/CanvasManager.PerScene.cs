@@ -88,7 +88,7 @@ namespace UnityPlus.UILib
                 return true;
             }
 
-            throw new ArgumentException( $"A canvas with the ID `{id}` doesn't exist." );
+            throw new ArgumentException( $"A canvas with the ID `{id}` doesn't exist in scene ' {scene.name} '." );
         }
 
         /// <summary>
@@ -123,12 +123,12 @@ namespace UnityPlus.UILib
                 if( canvas == null )
                 {
                     canvasesInScene.Remove( id );
-                    throw new ArgumentException( $"A canvas with the ID `{id}` doesn't exist." );
+                    throw new ArgumentException( $"A canvas with the ID `{id}` doesn't exist in scene '{scene.name}'." );
                 }
                 return canvas;
             }
 
-            throw new ArgumentException( $"A canvas with the ID `{id}` doesn't exist." );
+            throw new ArgumentException( $"A canvas with the ID `{id}` doesn't exist in scene '{scene.name}'." );
         }
 
         /// <summary>
@@ -177,18 +177,18 @@ namespace UnityPlus.UILib
                 }
                 if( canvasLayer.ID == null )
                 {
-                    Debug.LogWarning( $"Can't register a canvas `{canvasLayer.gameObject.name}` before its ID is set." );
+                    Debug.LogWarning( $"Can't register a canvas `{canvasLayer.gameObject.name}` in scene '{scene.name}' before its ID is set." );
                     continue;
                 }
                 try
                 {
                     UICanvas canvas = canvasLayer.GetComponent<UICanvas>();
 
-                    Register( canvasLayer.ID, canvas );
+                    Register( scene, canvasLayer.ID, canvas );
                 }
                 catch( Exception ex )
                 {
-                    Debug.LogError( $"Registering a canvas `{canvasLayer.gameObject.name}` threw an exception." );
+                    Debug.LogError( $"Registering a canvas `{canvasLayer.gameObject.name}` in scene '{scene.name}' threw an exception." );
                     Debug.LogException( ex );
                 }
             }

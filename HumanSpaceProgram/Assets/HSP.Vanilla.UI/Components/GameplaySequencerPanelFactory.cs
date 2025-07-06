@@ -1,5 +1,5 @@
-﻿using HSP.ReferenceFrames;
-using HSP.UI;
+﻿using HSP.UI.Canvases;
+using HSP.Vanilla.Scenes.GameplayScene;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
 
@@ -8,7 +8,7 @@ namespace HSP.Vanilla.UI.Components
     /// <summary>
     /// Manages the HUD UI elements displayed for FSequencer in the gameplay scene.
     /// </summary>
-    public static class SequencerPanelFactory
+    public static class GameplaySequencerPanelFactory
     {
         private static UISequencerPanel _sequencerPanel;
         
@@ -17,7 +17,7 @@ namespace HSP.Vanilla.UI.Components
         [HSPEventListener( HSPEvent_AFTER_ACTIVE_VESSEL_CHANGED.ID, CREATE_SEQUENCER_PANEL )]
         public static void CreateUI()
         {
-            UICanvas canvas = CanvasManager.Get( CanvasName.STATIC );
+            UICanvas canvas = GameplaySceneM.Instance.GetStaticCanvas();
 
             if( !_sequencerPanel.IsNullOrDestroyed() )
             {

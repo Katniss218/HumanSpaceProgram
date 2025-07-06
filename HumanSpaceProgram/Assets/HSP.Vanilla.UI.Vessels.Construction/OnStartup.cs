@@ -9,7 +9,7 @@ namespace HSP.Vanilla.UI.Vessels.Construction
         [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_LOAD.ID, ADD_CONSTRUCTION_SITE_HUD_MANAGER )]
         private static void ConstructionSiteHudManager()
         {
-            GameplayScene.GameObject.AddComponent<ConstructionSiteHUDManager>();
+            GameplaySceneM.GameObject.AddComponent<GameplayConstructionSiteHUDManager>();
         }
     }
 }

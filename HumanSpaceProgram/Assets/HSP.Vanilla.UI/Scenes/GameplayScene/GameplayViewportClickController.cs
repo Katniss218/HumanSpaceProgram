@@ -1,5 +1,7 @@
 ﻿using HSP.Input;
 using HSP.UI;
+using HSP.UI.Canvases;
+using HSP.Vanilla.Scenes.GameplayScene;
 using HSP.Vanilla.UI.Components;
 using HSP.Vessels;
 using HSP.Vessels.Components;
@@ -53,7 +55,7 @@ namespace HSP.Vanilla.UI.Scenes.GameplayScene
 
             if( !UIPartWindow.ExistsFor( clickedPart ) )
             {
-                UIPartWindow partWindow = CanvasManager.Get( CanvasName.WINDOWS ).AddPartWindow( new UILayoutInfo( UIAnchor.Center, (0, 0), (300f, 300f) ), clickedPart );
+                UIPartWindow partWindow = GameplaySceneM.Instance.GetWindowCanvas().AddPartWindow( new UILayoutInfo( UIAnchor.Center, (0, 0), (300f, 300f) ), clickedPart );
                 return true;
             }
             return false;

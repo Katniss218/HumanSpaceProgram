@@ -1,6 +1,7 @@
 ﻿using HSP.SceneManagement;
 using HSP.Time;
 using HSP.UI;
+using HSP.UI.Canvases;
 using HSP.Vanilla.Scenes.GameplayScene;
 using HSP.Vanilla.UI.Timelines;
 using UnityEngine;
@@ -33,7 +34,7 @@ namespace HSP.Vanilla.UI.Scenes.GameplayScene
 
             if( TimeManager.IsPaused )
             {
-                UICanvas canvas = CanvasManager.Get( CanvasName.WINDOWS );
+                UICanvas canvas = GameplaySceneM.Instance.GetWindowCanvas();
 
                 escapeMenuWindow = canvas.AddWindow( new UILayoutInfo( UIAnchor.Center, (0, 0), (300, 300) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/window" ) )
                     .Draggable()
@@ -57,18 +58,20 @@ namespace HSP.Vanilla.UI.Scenes.GameplayScene
 
                 escapeMenuWindow.AddButton( new UILayoutInfo( UIFill.Horizontal( 50, 50 ), UIAnchor.Top, -70, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ), () =>
                 {
-                    HSPSceneManager.ReplaceForegroundScene<Vanilla.Scenes.MainMenuScene.MainMenuScene>();
+                    HSPSceneManager.ReplaceForegroundScene<Vanilla.Scenes.MainMenuScene.MainMenuSceneM>();
                 } )
                     .AddStdText( new UILayoutInfo( UIFill.Fill() ), "MAIN MENU" )
                     .WithAlignment( TMPro.HorizontalAlignmentOptions.Center );
 
                 escapeMenuWindow.AddButton( new UILayoutInfo( UIFill.Horizontal( 50, 50 ), UIAnchor.Top, -90, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ),
-                    () => CanvasManager.Get( CanvasName.WINDOWS ).AddSaveWindow( new UILayoutInfo( UIAnchor.Center, (0, 0), (350f, 400f) ) ) )
+                    () => GameplaySceneM.Instance.GetWindowCanvas()
+                    .AddSaveWindow( new UILayoutInfo( UIAnchor.Center, (0, 0), (350f, 400f) ) ) )
                     .AddStdText( new UILayoutInfo( UIFill.Fill() ), "SAVE" )
                     .WithAlignment( TMPro.HorizontalAlignmentOptions.Center );
 
                 escapeMenuWindow.AddButton( new UILayoutInfo( UIFill.Horizontal( 50, 50 ), UIAnchor.Top, -110, 15 ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_horizontal" ),
-                    () => CanvasManager.Get( CanvasName.WINDOWS ).AddLoadWindow( new UILayoutInfo( UIAnchor.Center, (0, 0), (350f, 400f) ) ) )
+                    () => GameplaySceneM.Instance.GetWindowCanvas()
+                    .AddLoadWindow( new UILayoutInfo( UIAnchor.Center, (0, 0), (350f, 400f) ) ) )
                     .AddStdText( new UILayoutInfo( UIFill.Fill() ), "LOAD" )
                     .WithAlignment( TMPro.HorizontalAlignmentOptions.Center );
 
