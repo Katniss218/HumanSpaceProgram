@@ -1,6 +1,5 @@
 using HSP.SceneManagement;
 using HSP.UI;
-using HSP.UI.Canvases;
 using HSP.Vanilla.Scenes.EditorScene;
 using HSP.Vanilla.Scenes.MainMenuScene;
 using HSP.Vanilla.UI.Timelines;

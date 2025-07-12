@@ -32,7 +32,7 @@ namespace UnityPlus.UILib.UIElements
         /// </summary>
         public RectTransform rectTransform { get => (RectTransform)this.transform; }
 
-        public void Destroy()
+        public virtual void Destroy()
         {
             this.DestroyFixChildren();
             UnityEngine.Object.Destroy( this.gameObject );

@@ -1,4 +1,4 @@
-﻿using HSP.UI.Canvases;
+﻿using HSP.SceneManagement;
 using HSP.Vanilla.Scenes.GameplayScene;
 using UnityPlus.UILib;
 using UnityPlus.UILib.UIElements;
@@ -11,13 +11,40 @@ namespace HSP.Vanilla.UI.Components
     public static class GameplaySequencerPanelFactory
     {
         private static UISequencerPanel _sequencerPanel;
-        
-        public const string CREATE_SEQUENCER_PANEL = HSPEvent.NAMESPACE_HSP + ".ui.fsequencer";
 
-        [HSPEventListener( HSPEvent_AFTER_ACTIVE_VESSEL_CHANGED.ID, CREATE_SEQUENCER_PANEL )]
+        public const string ADD_SEQUENCER_PANEL = HSPEvent.NAMESPACE_HSP + ".ui.fsequencer.add";
+        public const string REMOVE_SEQUENCER_PANEL = HSPEvent.NAMESPACE_HSP + ".ui.fsequencer.remove";
+        public const string UPDATE_SEQUENCER_PANEL = HSPEvent.NAMESPACE_HSP + ".ui.fsequencer";
+
+        [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_ACTIVATE.ID, ADD_SEQUENCER_PANEL )]
+        private static void AddViewportClickController()
+        {
+            if( !_sequencerPanel.IsNullOrDestroyed() )
+            {
+                _sequencerPanel.Destroy();
+            }
+
+            if( ActiveVesselManager.ActiveObject != null )
+            {
+                UICanvas canvas = GameplaySceneM.Instance.GetStaticCanvas();
+                _sequencerPanel = canvas.AddSequencerPanel( new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (50, 100) ) );
+            }
+        }
+
+        [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_DEACTIVATE.ID, REMOVE_SEQUENCER_PANEL )]
+        private static void RemoveViewportClickController()
+        {
+            if( !_sequencerPanel.IsNullOrDestroyed() )
+            {
+                _sequencerPanel.Destroy();
+            }
+        }
+
+        [HSPEventListener( HSPEvent_AFTER_ACTIVE_VESSEL_CHANGED.ID, UPDATE_SEQUENCER_PANEL )]
         public static void CreateUI()
         {
-            UICanvas canvas = GameplaySceneM.Instance.GetStaticCanvas();
+            if( !HSPSceneManager.IsForeground<GameplaySceneM>() )
+                return;
 
             if( !_sequencerPanel.IsNullOrDestroyed() )
             {
@@ -26,6 +53,7 @@ namespace HSP.Vanilla.UI.Components
 
             if( ActiveVesselManager.ActiveObject != null )
             {
+                UICanvas canvas = GameplaySceneM.Instance.GetStaticCanvas();
                 _sequencerPanel = canvas.AddSequencerPanel( new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (50, 100) ) );
             }
         }

@@ -14,12 +14,12 @@ namespace UnityPlus.UILib
     {
         private static Dictionary<string, UICanvas> _canvases = new();
 
-        public static UICanvas GetOrCreate<TCanvas>( string id ) where TCanvas : UICanvas
+        public static TCanvas GetOrCreate<TCanvas>( string id ) where TCanvas : UICanvas
         {
             if( string.IsNullOrEmpty( id ) )
                 throw new ArgumentException( "The ID must not be null or empty.", nameof( id ) );
 
-            if( TryGet( id, out var canvas ) )
+            if( TryGet<TCanvas>( id, out var canvas ) )
             {
                 return canvas;
             }
@@ -36,15 +36,21 @@ namespace UnityPlus.UILib
         /// <remarks>
         /// Tries to find the canvas is it isn't cached yet.
         /// </remarks>
-        public static bool TryGet( string id, out UICanvas canvas )
+        public static bool TryGet<TCanvas>( string id, out TCanvas canvas ) where TCanvas : UICanvas
         {
             if( string.IsNullOrEmpty( id ) )
                 throw new ArgumentException( "The ID must not be null or empty.", nameof( id ) );
 
-            if( _canvases.TryGetValue( id, out canvas ) )
+            if( _canvases.TryGetValue( id, out var canvas2 ) )
             {
-                if( !canvas.IsNullOrDestroyed() )
+                if( !canvas2.IsNullOrDestroyed() )
                 {
+                    if( canvas2 is not TCanvas )
+                    {
+                        canvas = default;
+                        return false;
+                    }
+                    canvas = (TCanvas)canvas2;
                     return true;
                 }
             }
@@ -52,17 +58,26 @@ namespace UnityPlus.UILib
             // If no canvas is found, we should try to find it, because it might've been loaded/created after the previous invocation of this method.
             TryRegisterUnknownCanvases();
 
-            if( _canvases.TryGetValue( id, out canvas ) )
+            if( _canvases.TryGetValue( id, out canvas2 ) )
             {
-                if( canvas == null )
+                if( canvas2 == null )
                 {
                     _canvases.Remove( id );
+                    canvas = default;
                     return false;
                 }
+
+                if( canvas2 is not TCanvas )
+                {
+                    canvas = default;
+                    return false;
+                }
+                canvas = (TCanvas)canvas2;
                 return true;
             }
 
-            throw new ArgumentException( $"A canvas with the ID `{id}` doesn't exist." );
+            canvas = default;
+            return false;
         }
 
         /// <summary>
@@ -71,7 +86,7 @@ namespace UnityPlus.UILib
         /// <remarks>
         /// Tries to find the canvas is it isn't cached yet.
         /// </remarks>
-        public static UICanvas Get( string id )
+        public static TCanvas Get<TCanvas>( string id ) where TCanvas : UICanvas
         {
             if( string.IsNullOrEmpty( id ) )
                 throw new ArgumentException( "The ID must not be null or empty.", nameof( id ) );
@@ -80,7 +95,11 @@ namespace UnityPlus.UILib
             {
                 if( !canvas.IsNullOrDestroyed() )
                 {
-                    return canvas;
+                    if( canvas is not TCanvas )
+                    {
+                        throw new ArgumentException( $"Tried to get canvas with id '{id}' and type '{typeof( TCanvas ).Name}', but the canvas was of type '{canvas.GetType().Name}'." );
+                    }
+                    return (TCanvas)canvas;
                 }
             }
 
@@ -94,7 +113,12 @@ namespace UnityPlus.UILib
                     _canvases.Remove( id );
                     throw new ArgumentException( $"A canvas with the ID `{id}` doesn't exist." );
                 }
-                return canvas;
+
+                if( canvas is not TCanvas )
+                {
+                    throw new ArgumentException( $"Tried to get canvas with id '{id}' and type '{typeof( TCanvas ).Name}', but the canvas was of type '{canvas.GetType().Name}'." );
+                }
+                return (TCanvas)canvas;
             }
 
             throw new ArgumentException( $"A canvas with the ID `{id}` doesn't exist." );
@@ -119,6 +143,7 @@ namespace UnityPlus.UILib
 
             _canvases[id] = canvas;
         }
+
         private static void TryRegisterUnknownCanvases()
         {
             UICanvas[] canvasLayers = Object.FindObjectsOfType<UICanvas>();
@@ -154,9 +179,9 @@ namespace UnityPlus.UILib
             }
         }
 
-        private static UICanvas CreateCanvas<TCanvas>( UnityEngine.SceneManagement.Scene scene, string id ) where TCanvas : UICanvas
+        private static TCanvas CreateCanvas<TCanvas>( UnityEngine.SceneManagement.Scene scene, string id ) where TCanvas : UICanvas
         {
-            UICanvas canvas;
+            TCanvas canvas;
             Type type = typeof( TCanvas );
             // Would be nice if we could use static interface members here instead of reflection.
             if( !_factoryMethod.TryGetValue( type, out MethodInfo method ) )
@@ -166,18 +191,18 @@ namespace UnityPlus.UILib
                     method = typeof( TCanvas ).GetMethod( "Create", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static, null, new Type[] { typeof( UnityEngine.SceneManagement.Scene ), typeof( string ) }, null );
                     if( method == null )
                     {
-                        throw new ArgumentException( $"The type `{typeof( TCanvas ).Name}` does not have a static `Create( Scene scene, string id )` method." );
+                        throw new ArgumentException( $"The type '{typeof( TCanvas ).Name}' does not have a `static {typeof( TCanvas ).Name} Create( Scene scene, string id )` method." );
                     }
                 }
                 catch( Exception ex )
                 {
-                    throw new ArgumentException( $"The type `{typeof( TCanvas ).Name}` does not have a static `Create( Scene scene, string id )` method.", ex );
+                    throw new ArgumentException( $"The type '{typeof( TCanvas ).Name}' does not have a `static {typeof( TCanvas ).Name} Create( Scene scene, string id )` method.", ex );
                 }
             }
 
             try
             {
-                canvas = (UICanvas)method.Invoke( null, new object[] { scene, id } );
+                canvas = (TCanvas)method.Invoke( null, new object[] { scene, id } );
             }
             catch( Exception ex )
             {

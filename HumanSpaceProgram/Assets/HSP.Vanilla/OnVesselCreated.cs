@@ -22,7 +22,7 @@ namespace HSP.Vanilla
         [HSPEventListener( HSPEvent_ON_VESSEL_CREATED.ID, ADD_REFERENCE_FRAME_TRANSFORM )]
         private static void AddGameplayReferenceFrameTransform( Vessel v )
         {
-            if( HSPSceneManager.IsSceneLoaded<GameplaySceneM>() )
+            if( HSPSceneManager.IsLoaded<GameplaySceneM>() )
             {
                 var comp = v.gameObject.AddComponent<HybridReferenceFrameTransform>();
                 comp.PositionRange = VESSEL_POSITION_RANGE;
@@ -30,7 +30,7 @@ namespace HSP.Vanilla
                 comp.MaxTimeScale = VESSEL_MAX_TIMESCALE;
                 comp.AllowSceneSimulation = true;
             }
-            else if( HSPSceneManager.IsSceneLoaded<DesignSceneM>() )
+            else if( HSPSceneManager.IsLoaded<DesignSceneM>() )
             {
                 var comp = v.gameObject.AddComponent<FixedReferenceFrameTransform>();
             }
@@ -39,7 +39,7 @@ namespace HSP.Vanilla
         [HSPEventListener( HSPEvent_ON_VESSEL_CREATED.ID, ADD_TRAJECTORY_TRANSFORM )]
         private static void AddGameplayTrajectoryTransform( Vessel v )
         {
-            if( HSPSceneManager.IsSceneLoaded<GameplaySceneM>() )
+            if( HSPSceneManager.IsLoaded<GameplaySceneM>() )
             {
                 TrajectoryTransform comp = v.gameObject.AddComponent<TrajectoryTransform>();
                 comp.Trajectory = new NewtonianOrbit( Time.TimeManager.UT, Vector3Dbl.zero, Vector3Dbl.zero, Vector3Dbl.zero, 1.0 );
@@ -51,7 +51,7 @@ namespace HSP.Vanilla
         [HSPEventListener( HSPEvent_AFTER_VESSEL_HIERARCHY_CHANGED.ID, TRY_PIN_PHYSICS_OBJECT )]
         private static void TryPinPhysicsObject( (Vessel v, Transform oldRootPart, Transform newRootPart) e )
         {
-            if( HSPSceneManager.IsSceneLoaded<GameplaySceneM>() )
+            if( HSPSceneManager.IsLoaded<GameplaySceneM>() )
             {
                 if( e.oldRootPart == null )
                     return;

@@ -33,7 +33,7 @@ namespace HSP.SceneManagement
         /// Checks if the scene specified by the given type is currently loaded.
         /// </summary>
         /// <typeparam name="TScene">The type specifying the scene to check.</typeparam>
-        public static bool IsSceneLoaded<TScene>() where TScene : IHSPScene
+        public static bool IsLoaded<TScene>() where TScene : IHSPScene
         {
             return _loadedScenes.Any( s => s.GetType() == typeof( TScene ) );
         }
@@ -42,7 +42,7 @@ namespace HSP.SceneManagement
         /// Checks if the scene specified by the given type is currently loaded.
         /// </summary>
         /// <typeparam name="TScene">The type specifying the scene to check.</typeparam>
-        public static bool IsSceneForeground<TLoadedScene>() where TLoadedScene : IHSPScene
+        public static bool IsForeground<TLoadedScene>() where TLoadedScene : IHSPScene
         {
             IHSPScene scene = _loadedScenes.FirstOrDefault( s => s.GetType() == typeof( TLoadedScene ) );
             if( scene == null )
@@ -75,12 +75,12 @@ namespace HSP.SceneManagement
         /// <remarks>
         /// The scene is loaded additively, meaning that it will not replace the currently loaded scenes. <br/>
         /// If you wish to do so, use <br/>
-        /// - <see cref="UnloadSceneAsync{TOld}"/> or <br/>
-        /// - <see cref="ReplaceSceneAsync{TOld, TNew}"/> instead.
+        /// - <see cref="UnloadAsync{TOld}"/> or <br/>
+        /// - <see cref="ReplaceAsync{TOld, TNew}"/> instead.
         /// </remarks>
         /// <typeparam name="TNewScene">The type specifying the scene to load.</typeparam>
         /// <param name="onAfterLoaded">An action to be invoked after the new scene finishes loading (optional).</param>
-        public static void LoadSceneAsync<TNewScene>( Action onAfterLoaded = null ) where TNewScene : HSPScene<TNewScene>
+        public static void LoadAsync<TNewScene>( Action onAfterLoaded = null ) where TNewScene : HSPScene<TNewScene>
         {
             StartSceneLoadCoroutine( typeof( TNewScene ), true, onAfterLoaded );
         }
@@ -92,12 +92,12 @@ namespace HSP.SceneManagement
         /// <remarks>
         /// The scene is loaded additively, meaning that it will not replace the currently loaded scenes. <br/>
         /// If you wish to do so, use <br/>
-        /// - <see cref="UnloadSceneAsync{TOld}"/> or <br/>
-        /// - <see cref="ReplaceSceneAsync{TOld, TNew}"/> instead.
+        /// - <see cref="UnloadAsync{TOld}"/> or <br/>
+        /// - <see cref="ReplaceAsync{TOld, TNew}"/> instead.
         /// </remarks>
         /// <typeparam name="TNewScene">The type specifying the scene to load.</typeparam>
         /// <param name="onAfterLoaded">An action to be invoked after the new scene finishes loading (optional).</param>
-        public static void LoadSceneAsBackgroundAsync<TNewScene>( Action onAfterLoaded = null ) where TNewScene : HSPScene<TNewScene>
+        public static void LoadAsBackgroundAsync<TNewScene>( Action onAfterLoaded = null ) where TNewScene : HSPScene<TNewScene>
         {
             StartSceneLoadCoroutine( typeof( TNewScene ), false, onAfterLoaded );
         }
@@ -108,7 +108,7 @@ namespace HSP.SceneManagement
         /// </summary>
         /// <typeparam name="TOldScene">The type specifying the scene to unload.</typeparam>
         /// <param name="onAfterUnloaded">An action to be invoked after the scene finishes unloading (optional).</param>
-        public static void UnloadSceneAsync<TOldScene>( Action onAfterUnloaded = null ) where TOldScene : HSPScene<TOldScene>
+        public static void UnloadAsync<TOldScene>( Action onAfterUnloaded = null ) where TOldScene : HSPScene<TOldScene>
         {
             StartSceneUnloadCoroutine( typeof( TOldScene ), onAfterUnloaded );
         }
@@ -135,7 +135,7 @@ namespace HSP.SceneManagement
         /// <typeparam name="TNewScene"></typeparam>
         /// <param name="onAfterUnloaded"></param>
         /// <param name="onAfterLoaded"></param>
-        public static void ReplaceSceneAsync<TOldScene, TNewScene>( Action onAfterUnloaded = null, Action onAfterLoaded = null ) where TOldScene : HSPScene<TOldScene> where TNewScene : HSPScene<TNewScene>
+        public static void ReplaceAsync<TOldScene, TNewScene>( Action onAfterUnloaded = null, Action onAfterLoaded = null ) where TOldScene : HSPScene<TOldScene> where TNewScene : HSPScene<TNewScene>
         {
             StartSceneUnloadCoroutine( typeof( TOldScene ), () =>
             {
@@ -165,7 +165,7 @@ namespace HSP.SceneManagement
             } );
         }
 
-        public static void SetForeground<TLoadedScene>() where TLoadedScene : IHSPScene
+        public static void SetAsForeground<TLoadedScene>() where TLoadedScene : IHSPScene
         {
             IHSPScene scene = _loadedScenes.FirstOrDefault( s => s.GetType() == typeof( TLoadedScene ) );
             if( scene == null )
@@ -183,7 +183,7 @@ namespace HSP.SceneManagement
             _foregroundScene._onactivate();
         }
 
-        public static void SetBackground<TLoadedScene>() where TLoadedScene : IHSPScene
+        public static void SetAsBackground<TLoadedScene>() where TLoadedScene : IHSPScene
         {
             IHSPScene scene = _loadedScenes.FirstOrDefault( s => s.GetType() == typeof( TLoadedScene ) );
             if( scene == null )
