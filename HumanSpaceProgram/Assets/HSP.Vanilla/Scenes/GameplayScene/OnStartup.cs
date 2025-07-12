@@ -94,7 +94,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene
             GameplaySceneM.Instance.gameObject.AddComponent<TrajectoryManager>();
         }
 
-        [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_ACTIVATE.ID, ADD_ATMOSPHERE_RENDERER,
+        [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_LOAD.ID, ADD_ATMOSPHERE_RENDERER,
             After = new[] { GameplaySceneCameraManager.CREATE_CAMERA } )]
         private static void AddAtmosphereRenderer()
         {

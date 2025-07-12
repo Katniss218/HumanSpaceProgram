@@ -30,8 +30,6 @@ namespace HSP.Vanilla.UI.Scenes.GameplayScene
                 escapeMenuWindow.Destroy();
             }
 
-#warning TODO - Add conditional unpause to the 'ondestroy' of the escapeMenuWindow. (conditional = unless timescale has changed since displaying window).
-
             if( TimeManager.IsPaused )
             {
                 UICanvas canvas = GameplaySceneM.Instance.GetWindowCanvas();

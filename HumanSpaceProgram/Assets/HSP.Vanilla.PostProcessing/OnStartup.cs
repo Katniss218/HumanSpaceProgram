@@ -31,6 +31,7 @@ namespace HSP.Vanilla.Scenes.PostProcessing
         private static void SetupPPL( PostProcessLayer layer, bool onlyAA = false )
         {
             layer.antialiasingMode = PostProcessLayer.Antialiasing.TemporalAntialiasing;
+            layer.temporalAntialiasing = new TemporalAntialiasing();
             layer.temporalAntialiasing.jitterSpread = 0.65f;
             layer.temporalAntialiasing.stationaryBlending = 0.99f;
             layer.temporalAntialiasing.motionBlending = 0.25f;
@@ -47,7 +48,8 @@ namespace HSP.Vanilla.Scenes.PostProcessing
             layer.InitBundles();
         }
 
-        [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_ACTIVATE.ID, ADD_POST_PROCESS_LAYER, After = new[] { GameplaySceneCameraManager.CREATE_CAMERA } )]
+        [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_LOAD.ID, ADD_POST_PROCESS_LAYER, 
+            After = new[] { GameplaySceneCameraManager.CREATE_CAMERA } )]
         private static void CreatePostProcessingLayers()
         {
             //PostProcessLayer farPPL = GameplaySceneCameraManager.FarCamera.gameObject.AddComponent<PostProcessLayer>(); Appears to not be needed, and for some reason, it takes a big performance hit.
@@ -60,7 +62,8 @@ namespace HSP.Vanilla.Scenes.PostProcessing
             SetupPPL( uiPPL );
         }
 
-        [HSPEventListener( HSPEvent_MAIN_MENU_SCENE_ACTIVATE.ID, ADD_POST_PROCESS_LAYER, After = new[] { MainMenuSceneCameraManager.CREATE_CAMERA } )]
+        [HSPEventListener( HSPEvent_MAIN_MENU_SCENE_LOAD.ID, ADD_POST_PROCESS_LAYER, 
+            After = new[] { MainMenuSceneCameraManager.CREATE_CAMERA } )]
         private static void CreatePostProcessingLayers2()
         {
             PostProcessLayer nearPPL = MainMenuSceneCameraManager.NearCamera.gameObject.AddComponent<PostProcessLayer>();
@@ -70,7 +73,8 @@ namespace HSP.Vanilla.Scenes.PostProcessing
             SetupPPL( uiPPL );
         }
 
-        [HSPEventListener( HSPEvent_DESIGN_SCENE_ACTIVATE.ID, ADD_POST_PROCESS_LAYER, After = new[] { DesignSceneCameraManager.CREATE_CAMERA } )]
+        [HSPEventListener( HSPEvent_DESIGN_SCENE_LOAD.ID, ADD_POST_PROCESS_LAYER, 
+            After = new[] { DesignSceneCameraManager.CREATE_CAMERA } )]
         private static void CreatePostProcessingLayers3()
         {
             PostProcessLayer nearPPL = DesignSceneCameraManager.NearCamera.gameObject.AddComponent<PostProcessLayer>();

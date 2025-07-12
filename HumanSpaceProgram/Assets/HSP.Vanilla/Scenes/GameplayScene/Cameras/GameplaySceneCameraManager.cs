@@ -236,13 +236,12 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
         }
 
         public const string CREATE_CAMERA = HSPEvent.NAMESPACE_HSP + ".gameplay_scene.camera.create";
-        public const string DESTROY_CAMERA = HSPEvent.NAMESPACE_HSP + ".gameplay_scene.camera.destroy";
+        public const string ACTIVATE_CAMERA = HSPEvent.NAMESPACE_HSP + ".gameplay_scene.camera.activate";
+        public const string DEACTIVATE_CAMERA = HSPEvent.NAMESPACE_HSP + ".gameplay_scene.camera.deactivate";
 
         static GameObject _cameraPivot;
 
-#warning TODO - use json or something to save the state of the camera controllers so it's restored in the same position where it was destroyed.
-
-        [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_ACTIVATE.ID, CREATE_CAMERA )]
+        [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_LOAD.ID, CREATE_CAMERA )]
         private static void OnGameplaySceneLoad()
         {
             GameObject cameraPivotGameObject = new GameObject( "Camera Pivot" );
@@ -289,16 +288,20 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
             bufferCombiner.NearCamera = nearCamera;
             bufferCombiner.EffectCamera = effectCamera;
             bufferCombiner.MergeDepthShader = AssetRegistry.Get<Shader>( "builtin::Resources/Shaders/merge_depth" );
+
+            _cameraPivot.SetActive( false );
         }
 
-        [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_DEACTIVATE.ID, DESTROY_CAMERA )]
+        [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_ACTIVATE.ID, ACTIVATE_CAMERA )]
+        private static void OnGameplaySceneActivate()
+        {
+            _cameraPivot.SetActive( true );
+        }
+
+        [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_DEACTIVATE.ID, DEACTIVATE_CAMERA )]
         private static void OnGameplaySceneDeactivate()
         {
-            if( _cameraPivot != null )
-            {
-                Destroy( _cameraPivot );
-                _cameraPivot = null;
-            }
-        } 
+            _cameraPivot.SetActive( false );
+        }
     }
 }

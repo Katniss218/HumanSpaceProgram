@@ -1,4 +1,5 @@
 using HSP.Vanilla.Scenes.DesignScene;
+using HSP.Vanilla.Scenes.GameplayScene;
 using UnityEngine;
 
 namespace HSP.Vanilla.Scenes.MainMenuScene.Cameras
@@ -121,14 +122,16 @@ namespace HSP.Vanilla.Scenes.MainMenuScene.Cameras
         }
 
         public const string CREATE_CAMERA = HSPEvent.NAMESPACE_HSP + ".mainmenu_scene.camera.create";
-        public const string DESTROY_CAMERA = HSPEvent.NAMESPACE_HSP + ".mainmenu_scene.camera.destroy";
+        public const string ACTIVATE_CAMERA = HSPEvent.NAMESPACE_HSP + ".mainmenu_scene.camera.activate";
+        public const string DEACTIVATE_CAMERA = HSPEvent.NAMESPACE_HSP + ".mainmenu_scene.camera.deactivate";
 
         static GameObject _cameraPivot;
 
-        [HSPEventListener( HSPEvent_MAIN_MENU_SCENE_ACTIVATE.ID, CREATE_CAMERA )]
-        private static void OnMainMenuSceneActivate()
+        [HSPEventListener( HSPEvent_MAIN_MENU_SCENE_LOAD.ID, CREATE_CAMERA )]
+        private static void OnMainMenuSceneLoad()
         {
             GameObject cameraPivotGameObject = new GameObject( "Camera Pivot" );
+            _cameraPivot = cameraPivotGameObject;
 
             SceneCamera sceneCamera = cameraPivotGameObject.AddComponent<SceneCamera>();
             MainMenuSceneCameraManager cameraManager = cameraPivotGameObject.AddComponent<MainMenuSceneCameraManager>();
@@ -155,16 +158,20 @@ namespace HSP.Vanilla.Scenes.MainMenuScene.Cameras
             cameraManager._nearCamera = nearCamera;
             cameraManager._effectCamera = effectCamera;
             cameraManager._uiCamera = uiCamera;
+
+            _cameraPivot.SetActive( false );
         }
 
-        [HSPEventListener( HSPEvent_MAIN_MENU_SCENE_DEACTIVATE.ID, DESTROY_CAMERA )]
+        [HSPEventListener( HSPEvent_MAIN_MENU_SCENE_ACTIVATE.ID, ACTIVATE_CAMERA )]
+        private static void OnMainMenuSceneActivate()
+        {
+            _cameraPivot.SetActive( true );
+        }
+
+        [HSPEventListener( HSPEvent_MAIN_MENU_SCENE_DEACTIVATE.ID, DEACTIVATE_CAMERA )]
         private static void OnMainMenuSceneDeactivate()
         {
-            if( _cameraPivot != null )
-            {
-                Destroy( _cameraPivot );
-                _cameraPivot = null;
-            }
+            _cameraPivot.SetActive( false );
         }
     }
 }

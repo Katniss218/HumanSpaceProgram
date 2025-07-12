@@ -20,11 +20,12 @@ namespace HSP.Vanilla.UI.Scenes.GameplayScene
         public const string DESTROY_UI = HSPEvent.NAMESPACE_HSP + ".gameplay_scene.ui.destroy";
 
         [HSPEventListener( HSPEvent_AFTER_ACTIVE_VESSEL_CHANGED.ID, CREATE_UI )]
-        [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_ACTIVATE.ID, CREATE_UI, After = new[] { HSP.Vanilla.Scenes.GameplayScene.OnStartup.ADD_ACTIVE_VESSEL_MANAGER } )]
+        [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_ACTIVATE.ID, CREATE_UI )]
         private static void Create()
         {
             UICanvas canvas = GameplaySceneM.Instance.GetStaticCanvas();
 
+            Debug.Log( "A" );
             if( !_mainPanel.IsNullOrDestroyed() )
             {
                 _mainPanel.Destroy();
@@ -44,6 +45,7 @@ namespace HSP.Vanilla.UI.Scenes.GameplayScene
         [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_DEACTIVATE.ID, DESTROY_UI )]
         private static void Destroy()
         {
+            Debug.Log( "B" );
             if( !_mainPanel.IsNullOrDestroyed() )
             {
                 _mainPanel.Destroy();

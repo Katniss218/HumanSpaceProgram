@@ -121,12 +121,13 @@ namespace HSP.Vanilla.Scenes.DesignScene.Cameras
         }
 
         public const string CREATE_CAMERA = HSPEvent.NAMESPACE_HSP + ".design_scene.camera.create";
-        public const string DESTROY_CAMERA = HSPEvent.NAMESPACE_HSP + ".design_scene.camera.destroy";
+        public const string ACTIVATE_CAMERA = HSPEvent.NAMESPACE_HSP + ".design_scene.camera.activate";
+        public const string DEACTIVATE_CAMERA = HSPEvent.NAMESPACE_HSP + ".design_scene.camera.deactivate";
 
         static GameObject _cameraPivot;
 
-        [HSPEventListener( HSPEvent_DESIGN_SCENE_ACTIVATE.ID, CREATE_CAMERA )]
-        private static void OnDesignSceneActivate()
+        [HSPEventListener( HSPEvent_DESIGN_SCENE_LOAD.ID, CREATE_CAMERA )]
+        private static void OnDesignSceneLoad()
         {
             GameObject cameraPivotGameObject = new GameObject( "Camera Pivot" );
             _cameraPivot = cameraPivotGameObject;
@@ -161,16 +162,20 @@ namespace HSP.Vanilla.Scenes.DesignScene.Cameras
 
             cameraController.CameraParent = cameraParentGameObject.transform;
             cameraController.ZoomDist = 5f;
+
+            _cameraPivot.SetActive( false );
         }
 
-        [HSPEventListener( HSPEvent_DESIGN_SCENE_DEACTIVATE.ID, DESTROY_CAMERA )]
+        [HSPEventListener( HSPEvent_DESIGN_SCENE_ACTIVATE.ID, ACTIVATE_CAMERA )]
+        private static void OnDesignSceneActivate()
+        {
+            _cameraPivot.SetActive( true );
+        }
+
+        [HSPEventListener( HSPEvent_DESIGN_SCENE_DEACTIVATE.ID, DEACTIVATE_CAMERA )]
         private static void OnDesignSceneDeactivate()
         {
-            if( _cameraPivot != null )
-            {
-                Destroy( _cameraPivot );
-                _cameraPivot = null;
-            }
+            _cameraPivot.SetActive( false );
         }
     }
 }

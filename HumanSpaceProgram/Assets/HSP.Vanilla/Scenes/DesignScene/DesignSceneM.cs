@@ -45,22 +45,23 @@ namespace HSP.Vanilla.Scenes.DesignScene
         public static DesignSceneM Instance => instance;
         public static GameObject GameObject => instance.gameObject;
 
-        protected override void OnActivate()
+
+        protected override void OnLoad()
         {
             HSPEvent.EventManager.TryInvoke( HSPEvent_DESIGN_SCENE_LOAD.ID );
         }
 
-        protected override void OnDeactivate()
+        protected override void OnUnload()
         {
             HSPEvent.EventManager.TryInvoke( HSPEvent_DESIGN_SCENE_UNLOAD.ID );
         }
 
-        protected override void OnLoad()
+        protected override void OnActivate()
         {
             HSPEvent.EventManager.TryInvoke( HSPEvent_DESIGN_SCENE_ACTIVATE.ID );
         }
 
-        protected override void OnUnload()
+        protected override void OnDeactivate()
         {
             HSPEvent.EventManager.TryInvoke( HSPEvent_DESIGN_SCENE_DEACTIVATE.ID );
         }

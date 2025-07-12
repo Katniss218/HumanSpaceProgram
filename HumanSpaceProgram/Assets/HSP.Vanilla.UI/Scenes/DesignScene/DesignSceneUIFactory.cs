@@ -34,7 +34,6 @@ namespace HSP.Vanilla.UI.Scenes.DesignScene
         [HSPEventListener( HSPEvent_DESIGN_SCENE_ACTIVATE.ID, CREATE_UI )]
         private static void Create()
         {
-#warning TODO - mayyyyybe use a single canvas set in always loaded scene for everything?
             UICanvas canvas = DesignSceneM.Instance.GetStaticCanvas();
 
             if( !_mainPanel.IsNullOrDestroyed() )
@@ -58,17 +57,17 @@ namespace HSP.Vanilla.UI.Scenes.DesignScene
             }
         }
 
+        [HSPEventListener( HSPEvent_AFTER_DESIGN_SCENE_VESSEL_LOADED.ID, UPDATE_VESSEL_NAME )]
+        private static void OnAfterVesselLoad()
+        {
+            _vesselNameIF.SetValue( DesignVesselManager.CurrentVesselMetadata.Name );
+        }
+
         const float PART_LIST_WIDTH = 285f;
 
         private static void CreatePartList( IUIElementContainer parent )
         {
             UIPartList partListUI = parent.AddPartList( new UILayoutInfo( UIAnchor.Left, UIFill.Vertical( 30, 0 ), 0, PART_LIST_WIDTH ) );
-        }
-
-        [HSPEventListener( HSPEvent_AFTER_DESIGN_SCENE_VESSEL_LOADED.ID, UPDATE_VESSEL_NAME )]
-        private static void OnAfterVesselLoad()
-        {
-            _vesselNameIF.SetValue( DesignVesselManager.CurrentVesselMetadata.Name );
         }
 
         private static void CreateTopPanel( IUIElementContainer parent )
@@ -198,6 +197,9 @@ namespace HSP.Vanilla.UI.Scenes.DesignScene
             UIButton deltaVAnalysisWindow = buttonListPanel.AddButton( new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
             UIButton controlSetupWindow = buttonListPanel.AddButton( new UILayoutInfo( UIAnchor.BottomLeft, (0, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), () =>
             {
+                if( DesignVesselManager.DesignObject == null )
+                    return;
+
                 var wc = DesignSceneM.Instance.GetWindowCanvas();
                 var cmc = CanvasRegistry.GetContextMenuCanvas();
                 UIControlSetupWindow.Create( wc, cmc, DesignVesselManager.DesignObject.transform );
