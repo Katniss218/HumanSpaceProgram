@@ -48,15 +48,15 @@ namespace UnityPlus.UILib.UIElements
         /// <param name="id">The unique ID of the canvas.</param>
         protected internal static (T ui, Canvas canvas, CanvasScaler canvasScaler) Create<T>( Scene scene, string id ) where T : UICanvas
         {
-            GameObject canvasObject = new GameObject( "UICanvas" );
+            GameObject canvasObject = new GameObject( $"Canvas - {typeof( T ).Name}, '{id}'" );
             SceneManager.MoveGameObjectToScene( canvasObject, scene );
-
-            T uiCanvas = canvasObject.AddComponent<T>();
-            uiCanvas.ID = id;
 
             Canvas canvas = canvasObject.AddComponent<Canvas>();
             CanvasScaler canvasScaler = canvasObject.AddComponent<CanvasScaler>();
             GraphicRaycaster graphicRaycaster = canvasObject.AddComponent<GraphicRaycaster>();
+
+            T uiCanvas = canvasObject.AddComponent<T>();
+            uiCanvas.ID = id;
 
             return (uiCanvas, canvas, canvasScaler);
         }

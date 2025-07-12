@@ -6,6 +6,8 @@ namespace HSP.Vanilla.UI
 {
     public static class CanvasRegistry
     {
+        // Main (general-purpose) canvases
+
         public static UIBackgroundCanvas GetBackgroundCanvas( this IHSPScene scene )
         {
             return CanvasManager.GetOrCreate<UIBackgroundCanvas>( scene.UnityScene, "background" );
@@ -19,17 +21,19 @@ namespace HSP.Vanilla.UI
             return CanvasManager.GetOrCreate<UIWindowCanvas>( scene.UnityScene, "windows" );
         }
 
+        // Special canvases
+
         public static UIConsoleCanvas GetConsoleCanvas()
         {
             return CanvasManager.GetOrCreate<UIConsoleCanvas>( "sp.console" );
         }
-        public static UIConsoleCanvas GetCursorCanvas()
+        public static UICursorCanvas GetCursorCanvas()
         {
-            return CanvasManager.GetOrCreate<UIConsoleCanvas>( "sp.cursor" );
+            return CanvasManager.GetOrCreate<UICursorCanvas>( "sp.cursor" );
         }
-        public static UIConsoleCanvas GetContextMenuCanvas()
+        public static UIContextMenuCanvas GetContextMenuCanvas()
         {
-            return CanvasManager.GetOrCreate<UIConsoleCanvas>( "context_menus" );
+            return CanvasManager.GetOrCreate<UIContextMenuCanvas>( "context_menus" );
         }
     }
 }
