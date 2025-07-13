@@ -160,26 +160,22 @@ namespace HSP.SceneManagement
         /// Starts the unloading of a specified scene, and then the loading of a new scene asynchronously. <br/>
         /// The scene to unload must currently be loaded.
         /// </summary>
-        /// <typeparam name="TOldScene"></typeparam>
-        /// <typeparam name="TNewScene"></typeparam>
-        /// <param name="onAfterUnloaded"></param>
-        /// <param name="onAfterLoaded"></param>
+        /// <remarks>
+        /// If the scene to be unloaded is foreground, the new scene replacing it will also be foreground.
+        /// </remarks>
         public static void ReplaceAsync<TOldScene, TNewScene>( Action onAfterUnloaded = null, Action onAfterLoaded = null ) where TOldScene : HSPScene<TOldScene> where TNewScene : HSPScene<TNewScene>
         {
+            bool isForeground = IsForeground<TOldScene>();
             StartSceneUnloadCoroutine( typeof( TOldScene ), () =>
             {
-#warning TODO - load as foreground if old is foreground, otherwise background. Use the current state instead of the state at the beginning on unloading process.
                 onAfterUnloaded?.Invoke();
-                StartSceneLoadCoroutine( typeof( TNewScene ), true, onAfterLoaded );
+                StartSceneLoadCoroutine( typeof( TNewScene ), isForeground, onAfterLoaded );
             } );
         }
 
         /// <summary>
         /// Starts the unloading of the current foreground scene, and then the loading of a new scene asynchronously.
         /// </summary>
-        /// <typeparam name="TNewScene"></typeparam>
-        /// <param name="onAfterUnloaded"></param>
-        /// <param name="onAfterLoaded"></param>
         public static void ReplaceForegroundScene<TNewScene>( Action onAfterUnloaded = null, Action onAfterLoaded = null ) where TNewScene : HSPScene<TNewScene>
         {
             if( _foregroundScene == null )
@@ -221,9 +217,9 @@ namespace HSP.SceneManagement
             // Only one scene can be the foreground scene, so this can check for background too.
             if( scene != _foregroundScene )
                 return;
-
             _foregroundScene._ondeactivate();
             _foregroundScene = null;
+            SceneManager.SetActiveScene( AlwaysLoadedScene.Instance.UnityScene );
         }
 
         //
@@ -275,11 +271,11 @@ namespace HSP.SceneManagement
                 }
             }
 
+            Scene previousActiveScene = SceneManager.GetActiveScene();
+
             if( unitySceneName != null )
             {
                 Debug.Log( $"Loading Unity scene '{unitySceneName}' as part of the HSP scene '{newSceneType.Name}'..." );
-
-                Scene previousActiveScene = SceneManager.GetActiveScene();
 
                 AsyncOperation op = SceneManager.LoadSceneAsync( unitySceneName, new LoadSceneParameters( lm, lp ) );
                 op.completed += ( x ) =>
@@ -294,10 +290,6 @@ namespace HSP.SceneManagement
                         }
                         SceneManager.SetActiveScene( newlyLoadedScene );
                     }
-                    //else
-                    //{
-                    //    SceneManager.SetActiveScene( previousActiveScene );
-                    //}
 
                     MethodInfo method = newSceneType.GetMethod( "GetOrCreateSceneManagerInActiveScene", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy );
                     IHSPScene newScene = (IHSPScene)method.Invoke( null, new object[] { newlyLoadedScene } );
@@ -322,6 +314,14 @@ namespace HSP.SceneManagement
                 Debug.Log( $"Creating a new Unity scene '{newSceneType.Name}' as part of the HSP scene '{newSceneType.Name}'..." );
 
                 Scene newlyLoadedScene = SceneManager.CreateScene( newSceneType.Name, new CreateSceneParameters( lp ) );
+                if( asForeground )
+                {
+                    if( _foregroundScene != null )
+                    {
+                        _foregroundScene._ondeactivate();
+                    }
+                    SceneManager.SetActiveScene( newlyLoadedScene );
+                }
 
                 MethodInfo method = newSceneType.GetMethod( "GetOrCreateSceneManagerInActiveScene", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy );
                 IHSPScene newScene = (IHSPScene)method.Invoke( null, new object[] { newlyLoadedScene } );
@@ -350,6 +350,7 @@ namespace HSP.SceneManagement
                 _foregroundScene._ondeactivate();
                 _foregroundScene = null;
             }
+            SceneManager.SetActiveScene( AlwaysLoadedScene.Instance.UnityScene );
 
             // Wait until the asynchronous scene fully loads
             while( !op.isDone )
