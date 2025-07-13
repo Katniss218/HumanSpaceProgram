@@ -1,4 +1,5 @@
 ﻿using HSP.ReferenceFrames;
+using HSP.SceneManagement;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
@@ -156,7 +157,7 @@ namespace HSP.Vessels
             Vector3Dbl partPosInVesselSpace = vesselFrame.InverseTransformPosition( partPosAirf );
 
 #warning TODO - use a physically accurate calculation that preserves angular and linear momenta.
-            Vessel newVessel = VesselFactory.CreatePartless(
+            Vessel newVessel = VesselFactory.CreatePartless( HSPSceneManager.GetScene( oldVessel.gameObject ),
                 partPosAirf,
                 SceneReferenceFrameManager.ReferenceFrame.TransformRotation( partToSplit.transform.rotation ),
                 oldVessel.ReferenceFrameTransform.AbsoluteVelocity + vesselFrame.GetTangentialVelocity( partPosInVesselSpace ),

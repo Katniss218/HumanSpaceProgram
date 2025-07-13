@@ -46,7 +46,7 @@ namespace HSP.SceneManagement
         {
             IHSPScene scene = _loadedScenes.FirstOrDefault( s => s.GetType() == typeof( TLoadedScene ) );
             if( scene == null )
-                throw new InvalidOperationException( $"The scene '{typeof( TLoadedScene )}' is not loaded." );
+                throw new InvalidOperationException( $"The scene '{typeof( TLoadedScene ).Name}' is not loaded." );
 
             return scene == _foregroundScene;
         }
@@ -55,9 +55,38 @@ namespace HSP.SceneManagement
         {
             IHSPScene scene = _loadedScenes.FirstOrDefault( s => s.GetType() == typeof( TLoadedScene ) );
             if( scene == null )
-                throw new InvalidOperationException( $"The scene '{typeof( TLoadedScene )}' is not loaded." );
+                throw new InvalidOperationException( $"The scene '{typeof( TLoadedScene ).Name}' is not loaded." );
 
             SceneManager.MoveGameObjectToScene( gameObject, scene.UnityScene );
+        }
+        
+        public static void MoveGameObjectToScene( GameObject gameObject, IHSPScene scene )
+        {
+            if( !scene.UnityScene.isLoaded )
+                throw new InvalidOperationException( $"The scene '{scene.GetType().Name}' is not loaded." );
+
+            SceneManager.MoveGameObjectToScene( gameObject, scene.UnityScene );
+        }
+        
+        public static IHSPScene GetScene( GameObject gameObject )
+        {
+            if( gameObject == null )
+            {
+                throw new ArgumentNullException( nameof( gameObject ), "GameObject cannot be null." );
+            }
+
+            Scene scene = gameObject.scene;
+            if( !scene.isLoaded )
+            {
+                throw new InvalidOperationException( $"The scene '{scene.name}' is not loaded." );
+            }
+
+            var scene2 = _loadedScenes.FirstOrDefault( s => s.UnityScene == scene );
+            if( scene2 == null )
+            {
+                throw new InvalidOperationException( $"The GameObject '{gameObject.name}' is not part of any loaded HSP scene." );
+            }
+            return scene2;
         }
 
         /// <summary>
@@ -169,7 +198,7 @@ namespace HSP.SceneManagement
         {
             IHSPScene scene = _loadedScenes.FirstOrDefault( s => s.GetType() == typeof( TLoadedScene ) );
             if( scene == null )
-                throw new InvalidOperationException( $"Can't set the foreground scene to '{typeof( TLoadedScene )}' that is not loaded." );
+                throw new InvalidOperationException( $"Can't set the foreground scene to '{typeof( TLoadedScene ).Name}' that is not loaded." );
 
             if( scene == _foregroundScene )
                 return;
@@ -187,7 +216,7 @@ namespace HSP.SceneManagement
         {
             IHSPScene scene = _loadedScenes.FirstOrDefault( s => s.GetType() == typeof( TLoadedScene ) );
             if( scene == null )
-                throw new InvalidOperationException( $"Can't set the background scene to '{typeof( TLoadedScene )}' that is not loaded." );
+                throw new InvalidOperationException( $"Can't set the background scene to '{typeof( TLoadedScene ).Name}' that is not loaded." );
 
             // Only one scene can be the foreground scene, so this can check for background too.
             if( scene != _foregroundScene )
@@ -205,7 +234,7 @@ namespace HSP.SceneManagement
         {
             if( _loadedScenes.Any( s => s.GetType() == sceneType ) )
             {
-                throw new InvalidOperationException( $"Can't load the scene '{sceneType}' that is already loaded." );
+                throw new InvalidOperationException( $"Can't load the scene '{sceneType.Name}' that is already loaded." );
             }
 
             instance.StartCoroutine( LoadCoroutine( sceneType, asForeground, onAfterLoaded ) );
@@ -216,7 +245,7 @@ namespace HSP.SceneManagement
             IHSPScene scene = _loadedScenes.FirstOrDefault( s => s.GetType() == sceneType );
             if( scene == null )
             {
-                throw new InvalidOperationException( $"Can't unload the scene '{sceneType}' that is not loaded." );
+                throw new InvalidOperationException( $"Can't unload the scene '{sceneType.Name}' that is not loaded." );
             }
 
             instance.StartCoroutine( UnloadCoroutine( scene, onAfterUnloaded ) );
@@ -272,7 +301,6 @@ namespace HSP.SceneManagement
 
                     MethodInfo method = newSceneType.GetMethod( "GetOrCreateSceneManagerInActiveScene", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy );
                     IHSPScene newScene = (IHSPScene)method.Invoke( null, new object[] { newlyLoadedScene } );
-                    //newScene.UnityScene = newlyLoadedScene;
                     _loadedScenes.Add( newScene );
                     newScene._onload();
 
@@ -297,7 +325,6 @@ namespace HSP.SceneManagement
 
                 MethodInfo method = newSceneType.GetMethod( "GetOrCreateSceneManagerInActiveScene", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy );
                 IHSPScene newScene = (IHSPScene)method.Invoke( null, new object[] { newlyLoadedScene } );
-                //newScene.UnityScene = newlyLoadedScene;
                 _loadedScenes.Add( newScene );
                 newScene._onload();
 

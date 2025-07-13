@@ -52,9 +52,6 @@ namespace HSP.Vanilla.Scenes.PostProcessing
             After = new[] { GameplaySceneCameraManager.CREATE_CAMERA } )]
         private static void CreatePostProcessingLayers()
         {
-            //PostProcessLayer farPPL = GameplaySceneCameraManager.FarCamera.gameObject.AddComponent<PostProcessLayer>(); Appears to not be needed, and for some reason, it takes a big performance hit.
-            //SetupPPL( farPPL );
-
             PostProcessLayer nearPPL = GameplaySceneCameraManager.NearCamera.gameObject.AddComponent<PostProcessLayer>();
             SetupPPL( nearPPL, true );
 

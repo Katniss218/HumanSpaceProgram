@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using HSP.SceneManagement;
+using UnityEngine;
 
 namespace HSP.Vessels
 {
@@ -8,7 +9,7 @@ namespace HSP.Vessels
     }
     
     /// <summary>
-    /// A class responsible for instantiating a vessel from a source (save file, on launch, etc).
+    /// A class responsible for instantiating vessels.
     /// </summary>
     public static class VesselFactory
     {
@@ -17,14 +18,15 @@ namespace HSP.Vessels
         const string name = "tempname_vessel";
 
         /// <summary>
-        /// Creates a new partless vessel at the specified global position.
+        /// Creates a new partless (empty) vessel in the specified scene.
         /// </summary>
-        /// <param name="absolutePosition">The `Absolute Inertial Reference Frame` position of the vessel to create.</param>
-        /// <param name="absoluteRotation">Rotation of the vessel in the `Absolute Inertial Reference Frame`</param>
+        /// <param name="absolutePosition">The position where the vessel will be created, in `Absolute Inertial Reference Frame`.</param>
+        /// <param name="absoluteRotation">The rotation of the vessel, in `Absolute Inertial Reference Frame`.</param>
         /// <returns>The created partless vessel.</returns>
-        public static Vessel CreatePartless( Vector3Dbl absolutePosition, QuaternionDbl absoluteRotation, Vector3Dbl absoluteVelocity, Vector3Dbl absoluteAngularVelocity )
+        public static Vessel CreatePartless( IHSPScene scene, Vector3Dbl absolutePosition, QuaternionDbl absoluteRotation, Vector3Dbl absoluteVelocity, Vector3Dbl absoluteAngularVelocity )
         {
             GameObject gameObject = new GameObject( $"Vessel, '{name}'" );
+            HSPSceneManager.MoveGameObjectToScene( gameObject, scene );
 
             Vessel vessel = gameObject.AddComponent<Vessel>();
             vessel.DisplayName = name;

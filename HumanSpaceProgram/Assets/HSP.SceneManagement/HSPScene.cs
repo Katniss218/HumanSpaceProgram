@@ -9,7 +9,7 @@ namespace HSP.SceneManagement
     /// <remarks>
     /// Usage Example: `public sealed class GameplaySceneManager : HSPSceneManager<![CDATA[<]]>GameplaySceneManager<![CDATA[>]]>`.
     /// </remarks>
-    /// <typeparam name="T">The concrete scene type deriving from this manager.</typeparam>
+    /// <typeparam name="T">The derived scene type.</typeparam>
     public abstract class HSPScene<T> : SingletonMonoBehaviour<T>, IHSPScene where T : HSPScene<T>
     {
         /// <summary>
@@ -23,7 +23,6 @@ namespace HSP.SceneManagement
         public UnityEngine.SceneManagement.Scene UnityScene
         {
             get => _unityScene;
-            // set => _unityScene = value;
         }
 
         /// <summary>
@@ -63,7 +62,7 @@ namespace HSP.SceneManagement
 
         internal static T GetOrCreateSceneManagerInActiveScene( Scene unityScene )
         {
-            if( instance == null )
+            if( !instanceExists || instance == null )
             {
                 // create
                 GameObject go = new GameObject( $"_ {typeof( T ).Name} _" );

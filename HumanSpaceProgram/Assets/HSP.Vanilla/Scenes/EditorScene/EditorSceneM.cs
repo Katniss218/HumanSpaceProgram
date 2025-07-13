@@ -42,7 +42,15 @@ namespace HSP.Vanilla.Scenes.EditorScene
     {
         public static new string UNITY_SCENE_NAME => "Editor";
 
+        /// <summary>
+        /// Returns the scene instance, if loaded. <br/>
+        /// Throws an exception if the scene is not loaded.
+        /// </summary>
         public static EditorSceneM Instance => instance;
+        /// <summary>
+        /// Returns the manager gameobject associated with this scene instance, if the scene is loaded. <br/>
+        /// Throws an exception if the scene is not loaded.
+        /// </summary>
         public static GameObject GameObject => instance.gameObject;
 
         protected override void OnLoad()

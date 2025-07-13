@@ -25,7 +25,6 @@ namespace HSP.Vanilla.UI.Scenes.GameplayScene
         {
             UICanvas canvas = GameplaySceneM.Instance.GetStaticCanvas();
 
-            Debug.Log( "A" );
             if( !_mainPanel.IsNullOrDestroyed() )
             {
                 _mainPanel.Destroy();
@@ -45,7 +44,6 @@ namespace HSP.Vanilla.UI.Scenes.GameplayScene
         [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_DEACTIVATE.ID, DESTROY_UI )]
         private static void Destroy()
         {
-            Debug.Log( "B" );
             if( !_mainPanel.IsNullOrDestroyed() )
             {
                 _mainPanel.Destroy();
