@@ -1,6 +1,5 @@
 using HSP.SceneManagement;
 using HSP.UI;
-using HSP.Vanilla.Scenes.DesignScene;
 using HSP.Vanilla.Scenes.EditorScene;
 using HSP.Vanilla.Scenes.MainMenuScene;
 using HSP.Vanilla.UI.Timelines;
@@ -17,24 +16,33 @@ namespace HSP.Vanilla.UI.Scenes.MainMenuScene
     /// </summary>
     public static class MainMenuSceneUIFactory
     {
+        static UIPanel _mainPanel;
+
         static UIStartNewGameWindow _startNewGameWindow; // singleton window
         static UILoadWindow _loadWindow; // singleton window
 
-        public const string CREATE_UI = HSPEvent.NAMESPACE_HSP + ".mainmenu_ui";
+        public const string CREATE_UI = HSPEvent.NAMESPACE_HSP + ".mainmenu_scene.ui.create";
+        public const string DESTROY_UI = HSPEvent.NAMESPACE_HSP + ".mainmenu_scene.ui.destroy";
 
-        [HSPEventListener( HSPEvent_STARTUP_MAIN_MENU.ID, CREATE_UI )]
-        public static void Create()
+        [HSPEventListener( HSPEvent_MAIN_MENU_SCENE_ACTIVATE.ID, CREATE_UI )]
+        private static void Create()
         {
-            UICanvas canvas = CanvasManager.Get( CanvasName.STATIC );
+            UICanvas canvas = MainMenuSceneM.Instance.GetStaticCanvas();
 
-            CreateStartNewGameButton( canvas );
-            CreateLoadButton( canvas );
-            CreateDesignARocketButton( canvas );
-            CreateDesignAPartButton( canvas );
-            CreateSettingsButton( canvas );
-            CreateExitButton( canvas );
+            if( !_mainPanel.IsNullOrDestroyed() )
+            {
+                _mainPanel.Destroy();
+            }
+            _mainPanel = canvas.AddPanel( new UILayoutInfo( UIFill.Fill() ), null );
 
-            UIValueBar bar = canvas.AddHorizontalValueBar( new UILayoutInfo( UIAnchor.Center, (0, 35), (200, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/bar_background" ) )
+            CreateStartNewGameButton( _mainPanel );
+            CreateLoadButton( _mainPanel );
+            CreateDesignARocketButton( _mainPanel );
+            CreateDesignAPartButton( _mainPanel );
+            CreateSettingsButton( _mainPanel );
+            CreateExitButton( _mainPanel );
+
+            UIValueBar bar = _mainPanel.AddHorizontalValueBar( new UILayoutInfo( UIAnchor.Center, (0, 35), (200, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/bar_background" ) )
                 .WithPadding( 5, 5, 1 );
 
             var seg = bar.AddSegment( 0.25f );
@@ -46,6 +54,15 @@ namespace HSP.Vanilla.UI.Scenes.MainMenuScene
             seg.Color = Color.red;
         }
 
+        [HSPEventListener( HSPEvent_MAIN_MENU_SCENE_DEACTIVATE.ID, DESTROY_UI )]
+        private static void Destroy()
+        {
+            if( !_mainPanel.IsNullOrDestroyed() )
+            {
+                _mainPanel.Destroy();
+            }
+        }
+
         // #-#-#-#-#-#-#-#-#-#
 
         private static void CreateStartNewGameButton( IUIElementContainer parent )
@@ -53,7 +70,7 @@ namespace HSP.Vanilla.UI.Scenes.MainMenuScene
             parent.AddButton( new UILayoutInfo( UIAnchor.Center, (0, 0), (200, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
             {
                 if( _startNewGameWindow == null )
-                    _startNewGameWindow = CanvasManager.Get( CanvasName.WINDOWS ).AddStartNewGameWindow();
+                    _startNewGameWindow = MainMenuSceneM.Instance.GetWindowCanvas().AddStartNewGameWindow();
             } )
                 .AddStdText( new UILayoutInfo( UIFill.Fill() ), "Start New Game" )
                 .WithAlignment( HorizontalAlignmentOptions.Center );
@@ -64,7 +81,7 @@ namespace HSP.Vanilla.UI.Scenes.MainMenuScene
             parent.AddButton( new UILayoutInfo( UIAnchor.Center, (0, -20), (200, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
             {
                 if( _loadWindow == null )
-                    _loadWindow = CanvasManager.Get( CanvasName.WINDOWS ).AddLoadWindow( new UILayoutInfo( UIAnchor.Center, (0, 0), (350f, 400f) ) );
+                    _loadWindow = MainMenuSceneM.Instance.GetWindowCanvas().AddLoadWindow( new UILayoutInfo( UIAnchor.Center, (0, 0), (350f, 400f) ) );
             } )
                 .AddStdText( new UILayoutInfo( UIFill.Fill() ), "Load Game" )
                 .WithAlignment( HorizontalAlignmentOptions.Center );
@@ -74,7 +91,7 @@ namespace HSP.Vanilla.UI.Scenes.MainMenuScene
         {
             parent.AddButton( new UILayoutInfo( UIAnchor.Center, (0, -100), (200, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
             {
-                SceneLoader.UnloadActiveSceneAsync( () => SceneLoader.LoadSceneAsync( DesignSceneManager.SCENE_NAME, true, false, null ) );
+                HSPSceneManager.ReplaceForegroundScene<Vanilla.Scenes.DesignScene.DesignSceneM>();
             } )
                 .AddStdText( new UILayoutInfo( UIFill.Fill() ), "Design a Rocket" )
                 .WithAlignment( HorizontalAlignmentOptions.Center );
@@ -84,7 +101,7 @@ namespace HSP.Vanilla.UI.Scenes.MainMenuScene
         {
             parent.AddButton( new UILayoutInfo( UIAnchor.Center, (0, -120), (200, 15) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_biaxial" ), () =>
             {
-                SceneLoader.UnloadActiveSceneAsync( () => SceneLoader.LoadSceneAsync( EditorSceneManager.SCENE_NAME, true, false, null ) );
+                HSPSceneManager.ReplaceForegroundScene<EditorSceneM>();
             } )
                 .Disabled()
                 .AddStdText( new UILayoutInfo( UIFill.Fill() ), "Part Editor" )

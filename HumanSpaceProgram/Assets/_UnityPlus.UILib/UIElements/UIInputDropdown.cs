@@ -54,6 +54,15 @@ namespace UnityPlus.UILib.UIElements
             return false;
         }
 
+        public override void Destroy()
+        {
+            if( !contextMenu.IsNullOrDestroyed() )
+            {
+                contextMenu.Destroy();
+            }
+            base.Destroy();
+        }
+
         public TValue GetOrDefault( TValue defaultValue )
         {
             return selectedValue.HasValue ? this.options[selectedValue.Value] : defaultValue;

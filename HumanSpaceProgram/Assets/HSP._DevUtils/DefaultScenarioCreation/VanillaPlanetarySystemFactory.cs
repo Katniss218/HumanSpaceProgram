@@ -4,6 +4,7 @@ using HSP.CelestialBodies.Surfaces;
 using HSP.ReferenceFrames;
 using HSP.Trajectories;
 using HSP.Vanilla.CelestialBodies;
+using HSP.Vanilla.Scenes.GameplayScene;
 using HSP.Vanilla.Scenes.GameplayScene.Cameras;
 using HSP.Vanilla.Trajectories;
 using HSP.Vessels;
@@ -55,7 +56,7 @@ namespace HSP._DevUtils
 
         private static CelestialBody CreateCB( string id, Vector3Dbl airfPos, QuaternionDbl airfRot )
         {
-            CelestialBody cb = new CelestialBodyFactory( id ) { radius = 696_340_000.0, mass = 1.989e30 }.Create( airfPos, airfRot );
+            CelestialBody cb = new CelestialBodyFactory( id ) { radius = 696_340_000.0, mass = 1.989e30 }.Create( GameplaySceneM.Instance, airfPos, airfRot );
             LODQuadSphere lqs = cb.gameObject.AddComponent<LODQuadSphere>();
             lqs.SetMode( LODQuadMode.VisualAndCollider );
             lqs.EdgeSubdivisions = 4;
@@ -78,7 +79,7 @@ namespace HSP._DevUtils
 
         private static CelestialBody CreateCB( string id, string parentId, double semiMajorAxis, double eccentricity, double inclination, double longitudeOfAscendingNode, double argumentOfPeriapsis, double meanAnomaly, QuaternionDbl airfRot )
         {
-            CelestialBody cb = new CelestialBodyFactory( id ).Create( Vector3Dbl.zero, airfRot );
+            CelestialBody cb = new CelestialBodyFactory( id ).Create( GameplaySceneM.Instance, Vector3Dbl.zero, airfRot );
             LODQuadSphere lqs = cb.gameObject.AddComponent<LODQuadSphere>();
             lqs.SetMode( LODQuadMode.VisualAndCollider );
             lqs.EdgeSubdivisions = 5;
@@ -95,7 +96,7 @@ namespace HSP._DevUtils
 
         public static CelestialBody CreateCB( string id, Vector3Dbl airfPos, Vector3Dbl airfVel, QuaternionDbl airfRot )
         {
-            CelestialBody cb = new CelestialBodyFactory( id ).Create( airfPos, airfRot );
+            CelestialBody cb = new CelestialBodyFactory( id ).Create( GameplaySceneM.Instance, airfPos, airfRot );
             LODQuadSphere lqs = cb.gameObject.AddComponent<LODQuadSphere>();
             lqs.SetMode( LODQuadMode.Visual );
             lqs.EdgeSubdivisions = 6;
@@ -171,7 +172,7 @@ namespace HSP._DevUtils
 
         public static CelestialBody CreateCBNonAttractor( string id, Vector3Dbl airfPos, Vector3Dbl airfVel, QuaternionDbl airfRot )
         {
-            CelestialBody cb = new CelestialBodyFactory( id ).Create( airfPos, airfRot );
+            CelestialBody cb = new CelestialBodyFactory( id ).Create( GameplaySceneM.Instance, airfPos, airfRot );
             LODQuadSphere lqs = cb.gameObject.AddComponent<LODQuadSphere>();
             lqs.Materials = _earthMaterial;
             lqs.PoIGetter = new AllLoadedVesselsPOIGetter();

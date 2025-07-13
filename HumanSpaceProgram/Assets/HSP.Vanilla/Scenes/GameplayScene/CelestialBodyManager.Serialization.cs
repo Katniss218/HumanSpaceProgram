@@ -1,4 +1,5 @@
 using HSP.CelestialBodies;
+using HSP.SceneManagement;
 using HSP.Timelines;
 using System;
 using System.IO;
@@ -59,6 +60,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene
 
                 var data = dataHandler.Read();
                 var go = SerializationUnit.Deserialize<GameObject>( data, TimelineManager.RefStore );
+                HSPSceneManager.MoveGameObjectToScene<GameplaySceneM>( go );
             }
         }
     }

@@ -40,14 +40,14 @@ namespace HSP._DevUtils
 
         public static void LoadGameplayScene()
         {
-            SceneLoader.UnloadActiveSceneAsync( () => SceneLoader.LoadSceneAsync( GameplaySceneManager.SCENE_NAME, true, false, () =>
+            HSPSceneManager.ReplaceForegroundScene<GameplaySceneM>( onAfterLoaded: () =>
             {
                 VanillaPlanetarySystemFactory.CreateDefaultPlanetarySystem();
 
                 CreateVessels();
 
                 TimelineManager.BeginScenarioSaveAsync( scenario );
-            } ) );
+            } );
         }
 
         private static void CreateVessels()
@@ -55,7 +55,7 @@ namespace HSP._DevUtils
             CelestialBody body = CelestialBodyManager.Get( "main" );
             Vector3 localPos = CoordinateUtils.GeodeticToEuclidean( 28.5857702f, -80.6507262f, (float)(body.Radius + 12.5) );
 
-            var launchSite = VesselFactory.CreatePartless( Vector3Dbl.zero, QuaternionDbl.identity, Vector3Dbl.zero, Vector3Dbl.zero );
+            var launchSite = VesselFactory.CreatePartless( GameplaySceneM.Instance, Vector3Dbl.zero, QuaternionDbl.identity, Vector3Dbl.zero, Vector3Dbl.zero );
             launchSite.gameObject.name = "launchsite";
             launchSite.Pin( body, localPos, Quaternion.FromToRotation( Vector3.up, localPos.normalized ) );
 
@@ -124,7 +124,7 @@ namespace HSP._DevUtils
 
         private static Vessel CreateDummyVessel( Vector3Dbl airfPosition, QuaternionDbl rotation )
         {
-            Vessel v = VesselFactory.CreatePartless( airfPosition, rotation, Vector3Dbl.zero, Vector3Dbl.zero );
+            Vessel v = VesselFactory.CreatePartless( GameplaySceneM.Instance, airfPosition, rotation, Vector3Dbl.zero, Vector3Dbl.zero );
             Transform root = DontInstantiateLocal( PartRegistry.Load( (NamespacedID)"Vanilla::intertank" ), v.transform, Vector3.zero, Quaternion.identity ).transform;
 
             Transform tankP = DontInstantiateLocal( PartRegistry.Load( (NamespacedID)"Vanilla::tank" ), root, new Vector3( 0, -1.625f, 0 ), Quaternion.identity ).transform;

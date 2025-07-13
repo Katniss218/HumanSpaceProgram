@@ -45,6 +45,7 @@ namespace HSP.Vanilla.Settings
 
         public IInputBinding GameplayTimescaleIncrease { get; set; } = new KeyDownBinding( 1, KeyCode.Period );
         public IInputBinding GameplayTimescaleDecrease { get; set; } = new KeyDownBinding( -1, KeyCode.Comma );
+        public IInputBinding GameplayMapView { get; set; } = new KeyDownBinding( 0, KeyCode.M );
 
         public IInputBinding DesignSave { get; set; } = new MultipleKeyDownBinding( 0, KeyCode.LeftControl, KeyCode.S );
 
@@ -92,6 +93,7 @@ namespace HSP.Vanilla.Settings
 
             BindOrUnbind( InputChannel.GAMEPLAY_TIMESCALE_INCREASE, GameplayTimescaleIncrease );
             BindOrUnbind( InputChannel.GAMEPLAY_TIMESCALE_DECREASE, GameplayTimescaleDecrease );
+            BindOrUnbind( InputChannel.GAMEPLAY_TOGGLE_MAP_VIEW, GameplayMapView );
 
             BindOrUnbind( InputChannel.DESIGN_SAVE, DesignSave );
 
@@ -158,6 +160,7 @@ namespace HSP.Vanilla.Settings
 
                 .WithMember( "gameplay_timescale_increase", o => o.GameplayTimescaleIncrease )
                 .WithMember( "gameplay_timescale_decrease", o => o.GameplayTimescaleDecrease )
+                .WithMember( "gameplay_toggle_map_view", o => o.GameplayMapView )
 
                 .WithMember( "design_save", o => o.DesignSave )
 

@@ -1,5 +1,4 @@
-﻿using HSP.ReferenceFrames;
-using HSP.Vessels;
+﻿using HSP.Vessels;
 using System;
 using UnityEngine;
 using UnityPlus.AssetManagement;

@@ -46,14 +46,14 @@ namespace HSP.Vanilla.UI.Timelines
                 Description = _descriptionInputField.GetOrDefault( "" )
             };
 
-            SceneLoader.UnloadActiveSceneAsync( () => SceneLoader.LoadSceneAsync( GameplaySceneManager.SCENE_NAME, true, false, () =>
+            HSPSceneManager.ReplaceForegroundScene<GameplaySceneM>( onAfterLoaded: () =>
             {
                 TimelineManager.BeginNewTimelineAsync( meta );
                 foreach( var page in _settingsPages )
                 {
                     page.Apply();
                 }
-            } ) );
+            } );
         }
 
         private void ReloadScenarios()

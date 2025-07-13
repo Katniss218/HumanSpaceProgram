@@ -38,6 +38,8 @@ namespace HSP.Vanilla.UI.Components
 
         private static LastVisibleEntry[] _lastVisibleComponents = new LastVisibleEntry[] { };
 
+        UICanvas _contextMenuCanvas;
+
         /// <summary>
         /// Creates a component UI for the specified component, if not already visible. <br/>
         /// Updates the connections to keep synced.
@@ -260,7 +262,7 @@ namespace HSP.Vanilla.UI.Components
             } ).ToArray();
         }
 
-        public static UIControlSetupWindow Create( Transform target )
+        public static UIControlSetupWindow Create( UICanvas canvas, UICanvas contextMenuCanvas, Transform target )
         {
             _lastVisibleComponents = _lastVisibleComponents.Where( x => x.component != null ).ToArray(); // Removes components that were destroyed.
 
@@ -272,7 +274,7 @@ namespace HSP.Vanilla.UI.Components
                     .ToArray();
             }
 
-            UIControlSetupWindow controlWindow = (UIControlSetupWindow)UIWindow.Create<UIControlSetupWindow>( CanvasManager.Get( CanvasName.WINDOWS ), new UILayoutInfo( UIAnchor.Center, (0, 0), (750, 750) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/window" ) )
+            UIControlSetupWindow controlWindow = (UIControlSetupWindow)UIWindow.Create<UIControlSetupWindow>( canvas, new UILayoutInfo( UIAnchor.Center, (0, 0), (750, 750) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/window" ) )
                 .Draggable()
                 .Focusable()
                 .Resizeable()
@@ -292,6 +294,7 @@ namespace HSP.Vanilla.UI.Components
             controlWindow.ComponentContainer = nodeLayerPanel;
             controlWindow.ConnectionContainer = connectionLayerPanel;
             controlWindow.scrollView = scrollView;
+            controlWindow._contextMenuCanvas = contextMenuCanvas;
 
             componentListButton.onClick = () =>
             {
@@ -311,7 +314,7 @@ namespace HSP.Vanilla.UI.Components
 
         private static UIContextMenu CreateAllComponentsContextMenu( UIControlSetupWindow window, UIButton targetButton, Component[] componentsWithControls )
         {
-            UIContextMenu contextMenu = targetButton.rectTransform.CreateContextMenu( CanvasManager.Get( CanvasName.CONTEXT_MENUS ), new UILayoutInfo( UIAnchor.TopLeft, (0, 0), (200, 400) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/panel_light" ) );
+            UIContextMenu contextMenu = targetButton.rectTransform.CreateContextMenu( window._contextMenuCanvas, new UILayoutInfo( UIAnchor.TopLeft, (0, 0), (200, 400) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/panel_light" ) );
 
             contextMenu.TargetCorner = new Vector2( 0, 0 );
             contextMenu.SelfCorner = new Vector2( 0, 1 );

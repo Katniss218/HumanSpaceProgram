@@ -14,7 +14,7 @@ namespace HSP.Vanilla.UI.Components
         public RectTransform Circle { get; private set; }
 
         public ControlSetupControlGroupUI Group { get; private set; }
-        public ControlSystems.Control Control { get; private set; }
+        public Control Control { get; private set; }
 
         /// <summary>
         /// 0 or 1, depending on which side the endpoint is drawn on.
@@ -74,7 +74,7 @@ namespace HSP.Vanilla.UI.Components
 
         public void OnPointerEnter( PointerEventData eventData )
         {
-            UITooltip contextMenu = ((RectTransform)this.transform).CreateTooltip( CanvasManager.Get( CanvasName.CURSOR ), new UILayoutInfo( UIAnchor.TopLeft, (0, 0), (250, 60) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/panel_tooltip" ) );
+            UITooltip contextMenu = ((RectTransform)this.transform).CreateTooltip( CanvasRegistry.GetCursorCanvas(), new UILayoutInfo( UIAnchor.TopLeft, (0, 0), (250, 60) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/panel_tooltip" ) );
 
             contextMenu.AddStdText( new UILayoutInfo( UIFill.Horizontal( 5, 5 ), UIAnchor.Top, 0, 30 ), this._attr.Name );
             contextMenu.AddStdText( new UILayoutInfo( UIFill.Horizontal( 5, 5 ), UIAnchor.Top, -30, 30 ), this._attr.Description );

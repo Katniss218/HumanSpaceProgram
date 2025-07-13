@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using HSP.SceneManagement;
+using UnityEngine;
 
 namespace HSP.CelestialBodies
 {
@@ -8,7 +9,7 @@ namespace HSP.CelestialBodies
     }
 
     /// <summary>
-    /// Creates celestial body instances (game objects).
+    /// A class responsible for instantiating celestial bodies.
     /// </summary>
     public class CelestialBodyFactory
     {
@@ -25,9 +26,15 @@ namespace HSP.CelestialBodies
             this.ID = id;
         }
 
-        public CelestialBody Create( Vector3Dbl absolutePosition, QuaternionDbl absoluteRotation )
+        /// <summary>
+        /// Creates a new empty celestial body in the specified scene.
+        /// </summary>
+        /// <param name="absolutePosition">The position where the vessel will be created, in `Absolute Inertial Reference Frame`.</param>
+        /// <param name="absoluteRotation">The rotation of the vessel, in `Absolute Inertial Reference Frame`.</param>
+        public CelestialBody Create( IHSPScene scene, Vector3Dbl absolutePosition, QuaternionDbl absoluteRotation )
         {
             GameObject gameObject = new GameObject( $"celestialbody-{this.ID}" );
+            HSPSceneManager.MoveGameObjectToScene( gameObject, scene );
 
             CelestialBody celestialBody = gameObject.AddComponent<CelestialBody>();
             celestialBody.ID = this.ID;

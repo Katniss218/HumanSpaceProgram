@@ -20,6 +20,8 @@ using UnityEngine.UI;
 using UnityPlus.AssetManagement;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.DataHandlers;
+using HSP.Vanilla.Scenes.GameplayScene;
+using HSP.SceneManagement;
 
 namespace HSP._DevUtils
 {
@@ -121,7 +123,10 @@ namespace HSP._DevUtils
         {
             if( UnityEngine.Input.GetKeyDown( KeyCode.F6 ) )
             {
-                
+                if( HSPSceneManager.IsForeground<GameplaySceneM>() )
+                    HSPSceneManager.SetAsBackground<GameplaySceneM>();
+                else
+                    HSPSceneManager.SetAsForeground<GameplaySceneM>();
             }
             if( UnityEngine.Input.GetKeyDown( KeyCode.F3 ) )
             {
@@ -142,7 +147,7 @@ namespace HSP._DevUtils
                 Vector3Dbl spawnerPosAirf = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( launchSiteSpawner.transform.position );
                 QuaternionDbl spawnerRotAirf = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( launchSiteSpawner.transform.rotation );
 
-                Vessel v2 = VesselFactory.CreatePartless( spawnerPosAirf, spawnerRotAirf, Vector3Dbl.zero, Vector3Dbl.zero );
+                Vessel v2 = VesselFactory.CreatePartless( GameplaySceneM.instance, spawnerPosAirf, spawnerRotAirf, Vector3Dbl.zero, Vector3Dbl.zero );
 
                 v2.RootPart = loadedObj.transform;
                 v2.RootPart.localPosition = Vector3.zero;

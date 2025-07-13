@@ -1,3 +1,4 @@
+using HSP.Vanilla.Scenes.GameplayScene;
 using UnityEngine;
 
 namespace HSP.Vanilla.Scenes.DesignScene.Cameras
@@ -119,12 +120,17 @@ namespace HSP.Vanilla.Scenes.DesignScene.Cameras
             AdjustCameras();
         }
 
-        public const string CREATE_DESIGN_CAMERA = HSPEvent.NAMESPACE_HSP + ".designscene_camera";
+        public const string CREATE_CAMERA = HSPEvent.NAMESPACE_HSP + ".design_scene.camera.create";
+        public const string ACTIVATE_CAMERA = HSPEvent.NAMESPACE_HSP + ".design_scene.camera.activate";
+        public const string DEACTIVATE_CAMERA = HSPEvent.NAMESPACE_HSP + ".design_scene.camera.deactivate";
 
-        [HSPEventListener( HSPEvent_STARTUP_DESIGN.ID, CREATE_DESIGN_CAMERA )]
-        private static void OnGameplaySceneLoad()
+        static GameObject _cameraPivot;
+
+        [HSPEventListener( HSPEvent_DESIGN_SCENE_LOAD.ID, CREATE_CAMERA )]
+        private static void OnDesignSceneLoad()
         {
             GameObject cameraPivotGameObject = new GameObject( "Camera Pivot" );
+            _cameraPivot = cameraPivotGameObject;
 
             SceneCamera sceneCamera = cameraPivotGameObject.AddComponent<SceneCamera>();
 
@@ -156,6 +162,20 @@ namespace HSP.Vanilla.Scenes.DesignScene.Cameras
 
             cameraController.CameraParent = cameraParentGameObject.transform;
             cameraController.ZoomDist = 5f;
+
+            _cameraPivot.SetActive( false );
+        }
+
+        [HSPEventListener( HSPEvent_DESIGN_SCENE_ACTIVATE.ID, ACTIVATE_CAMERA )]
+        private static void OnDesignSceneActivate()
+        {
+            _cameraPivot.SetActive( true );
+        }
+
+        [HSPEventListener( HSPEvent_DESIGN_SCENE_DEACTIVATE.ID, DEACTIVATE_CAMERA )]
+        private static void OnDesignSceneDeactivate()
+        {
+            _cameraPivot.SetActive( false );
         }
     }
 }

@@ -3,12 +3,12 @@ namespace UnityEngine
 {
     /// <summary>
     /// SingletonMonoBehaviour is a base class for Unity scripts that can have at most one instance. <br />
-    /// The instance is available via a static field, and loaded lazily.
+    /// The instance is available via a static field, and is loaded lazily.
     /// </summary>
     /// <remarks>
     /// Usage Example: `public class PlayerManager : SingletonMonoBehaviour<![CDATA[<]]>PlayerManager<![CDATA[>]]>`.
     /// </remarks>
-    /// <typeparam name="T">The inheriting type.</typeparam>
+    /// <typeparam name="T">The derived singleton type.</typeparam>
     [DisallowMultipleComponent]
     public class SingletonMonoBehaviour<T> : MonoBehaviour where T : SingletonMonoBehaviour<T>
     {
@@ -16,8 +16,11 @@ namespace UnityEngine
 
         /// <summary>
         /// Gets the cached instance. <br/>
-        /// If nothing is cached, attempts to find the instance. Throws an exception if the number of active instances is not exactly 1.
+        /// If nothing is cached, attempts to find the instance.
         /// </summary>
+        /// <remarks>
+        /// Throws an exception if the number of active instances is not exactly 1.
+        /// </remarks>
         protected static T instance
         {
             get

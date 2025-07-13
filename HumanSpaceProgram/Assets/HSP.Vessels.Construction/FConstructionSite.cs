@@ -1,4 +1,5 @@
 ﻿using HSP.ReferenceFrames;
+using HSP.SceneManagement;
 using HSP.Time;
 using System;
 using System.Linq;
@@ -275,7 +276,7 @@ namespace HSP.Vessels.Construction
 
             if( parent == null )
             {
-                Vessel vessel = VesselFactory.CreatePartless(
+                Vessel vessel = VesselFactory.CreatePartless( HSPSceneManager.GetScene( ghostRoot.gameObject ),
                     SceneReferenceFrameManager.ReferenceFrame.TransformPosition( ghostRoot.position ),
                     SceneReferenceFrameManager.ReferenceFrame.TransformRotation( ghostRoot.rotation ),
                     Vector3Dbl.zero,

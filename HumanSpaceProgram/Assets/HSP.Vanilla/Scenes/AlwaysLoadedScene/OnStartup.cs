@@ -22,38 +22,38 @@ namespace HSP.Vanilla.Scenes.AlwaysLoadedScene
         [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, ADD_TIME_MANAGER )]
         private static void AddTimeManager()
         {
-            AlwaysLoadedManager.Instance.gameObject.AddComponent<TimeManager>();
+            SceneManagement.AlwaysLoadedScene.Instance.gameObject.AddComponent<TimeManager>();
         }
 
         [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, ADD_TIMELINE_MANAGER )]
         private static void AddTimelineManager()
         {
-            AlwaysLoadedManager.Instance.gameObject.AddComponent<TimelineManager>();
+            SceneManagement.AlwaysLoadedScene.Instance.gameObject.AddComponent<TimelineManager>();
         }
 
         [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, ADD_SCREENSHOT_MANAGER )]
         private static void AddScreenshotManager()
         {
-            ScreenshotManager sm = AlwaysLoadedManager.GameObject.AddComponent<ScreenshotManager>();
+            ScreenshotManager sm = SceneManagement.AlwaysLoadedScene.GameObject.AddComponent<ScreenshotManager>();
             HierarchicalInputManager.AddAction( InputChannel.SCREENSHOT, InputChannelPriority.MEDIUM, ( _ ) => sm.TakeScreenshot() );
         }
 
         [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, ADD_AUDIO_EFFECT_MANAGER )]
         private static void AddAudioEffectManager()
         {
-            AlwaysLoadedManager.Instance.gameObject.AddComponent<AudioEffectManager>();
+            SceneManagement.AlwaysLoadedScene.Instance.gameObject.AddComponent<AudioEffectManager>();
         }
-        
+
         [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, ADD_PARTICLE_EFFECT_MANAGER )]
         private static void AddParticleEffectManager()
         {
-            AlwaysLoadedManager.Instance.gameObject.AddComponent<ParticleEffectManager>();
+            SceneManagement.AlwaysLoadedScene.Instance.gameObject.AddComponent<ParticleEffectManager>();
         }
 
         [HSPEventListener( HSPEvent_STARTUP_EARLY.ID, LOAD_MAIN_MENU )]
         private static void LoadMainMenu()
         {
-            SceneLoader.LoadSceneAsync( MainMenuSceneManager.SCENE_NAME, true, false, null );
+            HSPSceneManager.LoadAsync<MainMenuScene.MainMenuSceneM>();
         }
     }
 }

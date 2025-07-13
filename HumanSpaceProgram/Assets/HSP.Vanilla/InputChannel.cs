@@ -44,8 +44,7 @@ namespace HSP.Vanilla
         // gameplay scene
         public const string GAMEPLAY_TIMESCALE_INCREASE = "vanilla.gameplay_timescale_up";
         public const string GAMEPLAY_TIMESCALE_DECREASE = "vanilla.gameplay_timescale_down";
-
-        //public const string GAMEPLAY_TOGGLE_MAP_VIEW = "vanilla.gameplay_map_view";
+        public const string GAMEPLAY_TOGGLE_MAP_VIEW = "vanilla.gameplay_map_toggle";
 
         // design scene
         public const string DESIGN_SAVE = "vanilla.design_save";

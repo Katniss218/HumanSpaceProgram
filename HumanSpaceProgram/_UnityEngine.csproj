@@ -69,6 +69,7 @@
     <Compile Include="Assets\_UnityEngine\UnityApplication.cs" />
     <Compile Include="Assets\_UnityEngine\QuaternionCurve.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\ComponentEx.cs" />
+    <Compile Include="Assets\_UnityEngine\SingletonPerSceneMonoBehaviour.cs" />
     <Compile Include="Assets\_UnityEngine\IComponent.cs" />
     <Compile Include="Assets\_UnityEngine\Extensions\Vector3Dbl_Ex.cs" />
     <Compile Include="Assets\_UnityEngine\Vector3Curve.cs" />

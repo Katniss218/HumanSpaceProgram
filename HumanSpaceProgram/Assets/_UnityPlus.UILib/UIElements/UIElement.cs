@@ -16,7 +16,7 @@ namespace UnityPlus.UILib.UIElements
         /// </summary>
         public RectTransform rectTransform { get => (RectTransform)this.transform; }
 
-        public void Destroy() // UI elements should be attached to the root GameObject of their subtree.
+        public virtual void Destroy() // UI elements should be attached to the root GameObject of their subtree.
         {
             this.DestroyFixChildren();
             Destroy( this.gameObject );

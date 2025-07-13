@@ -124,11 +124,6 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
         /// </summary>
         public static Camera UICamera => instance._uiCamera;
 
-        /// <summary>
-        /// Return the transform at the position and orientation of the camera.
-        /// </summary>
-        public static Transform ViewTransform => instanceExists ? instance.CameraParent : null;
-
         float _effectCameraNearPlane;
 
         private void AdjustCameras()
@@ -240,12 +235,17 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
             AdjustCameras();
         }
 
-        public const string CREATE_GAMEPLAY_CAMERA = HSPEvent.NAMESPACE_HSP + ".gameplayscene_camera";
+        public const string CREATE_CAMERA = HSPEvent.NAMESPACE_HSP + ".gameplay_scene.camera.create";
+        public const string ACTIVATE_CAMERA = HSPEvent.NAMESPACE_HSP + ".gameplay_scene.camera.activate";
+        public const string DEACTIVATE_CAMERA = HSPEvent.NAMESPACE_HSP + ".gameplay_scene.camera.deactivate";
 
-        [HSPEventListener( HSPEvent_STARTUP_GAMEPLAY.ID, CREATE_GAMEPLAY_CAMERA )]
+        static GameObject _cameraPivot;
+
+        [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_LOAD.ID, CREATE_CAMERA )]
         private static void OnGameplaySceneLoad()
         {
             GameObject cameraPivotGameObject = new GameObject( "Camera Pivot" );
+            _cameraPivot = cameraPivotGameObject;
 
             SceneCamera sceneCamera = cameraPivotGameObject.AddComponent<SceneCamera>();
 
@@ -289,6 +289,19 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
             bufferCombiner.EffectCamera = effectCamera;
             bufferCombiner.MergeDepthShader = AssetRegistry.Get<Shader>( "builtin::Resources/Shaders/merge_depth" );
 
+            _cameraPivot.SetActive( false );
+        }
+
+        [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_ACTIVATE.ID, ACTIVATE_CAMERA )]
+        private static void OnGameplaySceneActivate()
+        {
+            _cameraPivot.SetActive( true );
+        }
+
+        [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_DEACTIVATE.ID, DEACTIVATE_CAMERA )]
+        private static void OnGameplaySceneDeactivate()
+        {
+            _cameraPivot.SetActive( false );
         }
     }
 }

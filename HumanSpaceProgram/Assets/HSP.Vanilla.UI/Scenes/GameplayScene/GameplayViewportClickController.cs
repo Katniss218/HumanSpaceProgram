@@ -1,5 +1,5 @@
 ﻿using HSP.Input;
-using HSP.UI;
+using HSP.Vanilla.Scenes.GameplayScene;
 using HSP.Vanilla.UI.Components;
 using HSP.Vessels;
 using HSP.Vessels.Components;
@@ -14,6 +14,21 @@ namespace HSP.Vanilla.UI.Scenes.GameplayScene
     /// </summary>
     public class GameplayViewportClickController : SingletonMonoBehaviour<GameplayViewportClickController>
     {
+        public const string ADD_VIEWPORT_CLICK_CONTROLLER = HSPEvent.NAMESPACE_HSP + ".click_controller.add";
+        public const string REMOVE_VIEWPORT_CLICK_CONTROLLER = HSPEvent.NAMESPACE_HSP + ".click_controller.remove";
+
+        [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_ACTIVATE.ID, ADD_VIEWPORT_CLICK_CONTROLLER )]
+        private static void AddViewportClickController()
+        {
+            GameplaySceneM.Instance.gameObject.AddComponent<GameplayViewportClickController>();
+        }
+        [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_DEACTIVATE.ID, REMOVE_VIEWPORT_CLICK_CONTROLLER )]
+        private static void RemoveViewportClickController()
+        {
+            var comp = GameplaySceneM.Instance.gameObject.GetComponent<GameplayViewportClickController>();
+            UnityEngine.Object.Destroy( comp );
+        }
+
         void OnEnable()
         {
             HierarchicalInputManager.AddAction( Input.InputChannel.PRIMARY_DOWN, InputChannelPriority.MEDIUM, Input_MouseDown );
@@ -53,7 +68,7 @@ namespace HSP.Vanilla.UI.Scenes.GameplayScene
 
             if( !UIPartWindow.ExistsFor( clickedPart ) )
             {
-                UIPartWindow partWindow = CanvasManager.Get( CanvasName.WINDOWS ).AddPartWindow( new UILayoutInfo( UIAnchor.Center, (0, 0), (300f, 300f) ), clickedPart );
+                UIPartWindow partWindow = GameplaySceneM.Instance.GetWindowCanvas().AddPartWindow( new UILayoutInfo( UIAnchor.Center, (0, 0), (300f, 300f) ), clickedPart );
                 return true;
             }
             return false;

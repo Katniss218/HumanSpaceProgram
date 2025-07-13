@@ -73,6 +73,7 @@
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIMask_Ex.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIInputField_Ex.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIInputCycle.cs" />
+    <Compile Include="Assets\_UnityPlus.UILib\CanvasManager.PerScene.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\ValueBar.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\IUILayoutSelf.cs" />
     <Compile Include="Assets\_UnityPlus.UILib\UIElements\UIMask.cs" />

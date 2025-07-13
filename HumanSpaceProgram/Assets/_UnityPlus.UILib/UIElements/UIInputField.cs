@@ -6,7 +6,7 @@ using UnityPlus.UILib.Layout;
 namespace UnityPlus.UILib.UIElements
 {
     /// <summary>
-    /// 
+    /// A text input that deserializes the text into something else.
     /// </summary>
     public partial class UIInputField<TValue> : UIElementNonMonobehaviour, IUIInputElement<TValue>, IUIElementChild
     {

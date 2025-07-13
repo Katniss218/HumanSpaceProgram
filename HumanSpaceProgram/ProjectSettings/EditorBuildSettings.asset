@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/___Scenes/_AlwaysLoaded_.unity
     guid: c7a3cb11faa75aa4caf1c4baa7da50ab
   - enabled: 1
+    path: Assets/___Scenes/empty_scene.unity
+    guid: dc1a3e6317bed804eaa778fc2b4b1d67
+  - enabled: 1
     path: Assets/___Scenes/MainMenu.unity
     guid: 354f7f24182ca50469834dcc2098ce89
   - enabled: 1
