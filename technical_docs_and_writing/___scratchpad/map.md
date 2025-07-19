@@ -64,13 +64,49 @@ when map is opened
 
 
 
+# Rendering celestial bodies:
+
+solution 1:
+- render using atual CB modules
+adding an interface for IVessel / ICelestialBody is beneficial anyway
+
+solution 2:
+- custom map-specific rendering modules (annoying because need to sync with actual CB and duplicate stuff)
 
 
 
+solution 1:
+- interfaces
+- modify components to support interfaces
+- factory or something to create map versions of celestial bodies (needs to potentially map components to other components)
+- allow multiple scene reference frame transforms (assign each transform to one??)
+- trajectories
+- orbit line scene depth renderer
+- map scene camera-tied scene reference frame
+
+technically supports solution 2 as well, via the factory stuff
+
+the factory thing would basically be an object-to-object mapper with custom transformation support.
+useful in:
+- part component to UI mapping
+- setting page to UI mapping
+- celestialbody to mapview celestialbody mapping
+or anything else where you take one object and spit out a different object
+feels very similar to what the serialization is already doing.
 
 
 
+processing objects (celestial bodies/ guis/ etc):
+- list of processors
+- each gets fed the current source and destination objects
+- processors run in BEFORE/AFTER sorted sequence?
 
+having both source and target allows removing/replacing previous processors
+processors can be HSPEvent listeners honestly, the infrastructure is there already.
+
+
+add a scene reference frame getter to the reference frame transforms so they can use a different scene reference frame (multi-scene support)
+- this getter should be an interface (ISceneReferenceFrameProvider) and implementations be serializable
 
 
 

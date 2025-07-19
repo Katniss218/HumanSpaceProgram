@@ -26,20 +26,20 @@ namespace HSP.SceneManagement
         }
 
         /// <summary>
-        /// Override this to perform any initialisation logic that should be run when the scene is loaded.
+        /// Runs right after the scene is loaded.
         /// </summary>
         protected abstract void OnLoad();
         /// <summary>
-        /// Override this to perform any cleanup logic that should be run when the scene is unloaded.
+        /// Runs right before the scene is unloaded.
         /// </summary>
         protected abstract void OnUnload();
 
         /// <summary>
-        /// Override this to perform any initialisation logic that should be run when the scene becomes the 'foreground' scene.
+        /// Runs right after the scene becomes the 'foreground' scene.
         /// </summary>
         protected abstract void OnActivate();
         /// <summary>
-        /// Override this to perform any cleanup logic that should be run when the scene is no longer the 'foreground' scene.
+        /// Runs right before the scene is no longer the 'foreground' scene.
         /// </summary>
         protected abstract void OnDeactivate();
 

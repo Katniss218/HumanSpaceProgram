@@ -1,6 +1,6 @@
 ﻿using HSP.Vanilla.Scenes.MapScene;
 
-namespace HSP.Vanilla.UI.Scenes.GameplayMapScene
+namespace HSP.Vanilla.UI.Scenes.MapScene
 {
     internal class MapSceneUIFactory
     {

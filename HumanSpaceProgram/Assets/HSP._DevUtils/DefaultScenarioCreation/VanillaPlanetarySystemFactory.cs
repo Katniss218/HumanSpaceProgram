@@ -126,7 +126,7 @@ namespace HSP._DevUtils
             lqs2.SetMode( LODQuadMode.Collider );
             lqs2.EdgeSubdivisions = 5;
             lqs2.MaxDepth = 14;
-            lqs.PoIGetter = new AllLoadedVesselsPOIGetter();
+            lqs2.PoIGetter = new AllLoadedVesselsPOIGetter();
             lqs2.SetJobs( new ILODQuadModifier[]
             {
                 new LODQuadModifier_InitializeMesh(),
@@ -155,7 +155,7 @@ namespace HSP._DevUtils
             lqsWater.MaxDepth = 10;
             var mat = AssetRegistry.Get<Material>( "builtin::Resources/New Material 2" );
             lqsWater.Materials = new Material[] { mat, mat, mat, mat, mat, mat };
-            lqs.PoIGetter = new ActiveCameraPOIGetter();
+            lqsWater.PoIGetter = new ActiveCameraPOIGetter();
             lqsWater.SetJobs( new ILODQuadModifier[]
             {
                 new LODQuadModifier_InitializeMesh()

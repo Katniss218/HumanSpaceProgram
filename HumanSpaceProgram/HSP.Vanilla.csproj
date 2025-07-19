@@ -60,6 +60,7 @@
   <ItemGroup>
     <Compile Include="Assets\HSP.Vanilla\Scenes\EditorScene\EditorSceneM.cs" />
     <Compile Include="Assets\HSP.Vanilla\Settings\ReloadSettingsListener.cs" />
+    <Compile Include="Assets\HSP.Vanilla\Scenes\MapScene\Cameras\MapSceneOrbitingCameraController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\Cameras\DesignSceneOrbitingCameraController.cs" />
     <Compile Include="Assets\HSP.Vanilla\CelestialBodies\LODQuadModifier_Heightmap.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\DesignVesselManager.cs" />
@@ -91,6 +92,7 @@
     <Compile Include="Assets\HSP.Vanilla\Scenes\MainMenuScene\OnStartup.cs" />
     <Compile Include="Assets\HSP.Vanilla\Trajectories\KeplerianOrbit.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\MainMenuScene\MainMenuEscapeInputController.cs" />
+    <Compile Include="Assets\HSP.Vanilla\Scenes\MapScene\MapSceneCelestialBodyManager.cs" />
     <Compile Include="Assets\HSP.Vanilla\OnCelestialBodyCreated.cs" />
     <Compile Include="Assets\HSP.Vanilla\CelestialBodies\LODQuadModifier_FinalizeMesh.cs" />
     <Compile Include="Assets\HSP.Vanilla\Settings\GameSettings\SettingsPage_Keybinds.cs" />
@@ -117,6 +119,7 @@
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\Tools\ConstructTool.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FSequencer.SequenceAction.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\Tools\VanillaToolRegisterer.cs" />
+    <Compile Include="Assets\HSP.Vanilla\Scenes\MapScene\Cameras\MapSceneCameraManager.cs" />
     <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\PinnedReferenceFrameTransform.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\Tools\RotateTool.cs" />
     <Compile Include="Assets\HSP.Vanilla\CelestialBodies\LODQuadModifier_NoiseDisplace.cs" />
@@ -128,6 +131,7 @@
     <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\FixedReferenceFrameTransform.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FRocketEngine.cs" />
     <Compile Include="Assets\HSP.Vanilla\InputChannel.cs" />
+    <Compile Include="Assets\HSP.Vanilla\Scenes\MapScene\MapSceneToggle.cs" />
     <Compile Include="Assets\HSP.Vanilla\Effects\AbsoluteAxisAlignedSimulationFrame.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\Cameras\GameplaySceneDepthBufferCombiner.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\F2AxisActuator.cs" />
@@ -147,9 +151,10 @@
     <Compile Include="Assets\HSP.Vanilla\Components\FLaunchSiteMarker.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FReactionControlController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FControlFrame.cs" />
-    <Compile Include="Assets\HSP.Vanilla\Scenes\MapScene\MapSceneToggle.cs" />
-    <Compile Include="Assets\HSP.Vanilla\Scenes\MapScene\Cameras\MapSceneCameraManager.cs" />
-    <Compile Include="Assets\HSP.Vanilla\Scenes\MapScene\Cameras\MapSceneOrbitingCameraController.cs" />
+    <Compile Include="Assets\HSP.Vanilla\Scenes\MapScene\MapCelestialBody.cs" />
+    <Compile Include="Assets\HSP.Vanilla\Scenes\MapScene\MapSceneReferenceFrameManager.cs" />
+    <Compile Include="Assets\HSP.Vanilla\Scenes\MapScene\FollowingInDifferentSceneReferenceFrameTransform.cs" />
+    <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\SceneReferenceFrameProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla\___HSP.Vanilla.asmdef" />

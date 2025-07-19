@@ -1,4 +1,5 @@
 using HSP.CelestialBodies;
+using HSP.Vanilla.ReferenceFrames;
 
 namespace HSP.Vanilla
 {
@@ -12,6 +13,7 @@ namespace HSP.Vanilla
         private static void AddGameplayPhysicsObject( CelestialBody cb )
         {
             var comp = cb.gameObject.AddComponent<KinematicReferenceFrameTransform>();
+            comp.SceneReferenceFrameProvider = new GameplaySceneReferenceFrameProvider();
             //var comp = cb.gameObject.AddComponent<HybridReferenceFrameTransform>();
             //comp.AllowCollisionResponse = false;
             comp.Mass = (float)cb.Mass;

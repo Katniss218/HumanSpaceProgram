@@ -1,6 +1,7 @@
 using HSP.SceneManagement;
 using HSP.Trajectories;
 using HSP.Trajectories.Components;
+using HSP.Vanilla.ReferenceFrames;
 using HSP.Vanilla.Scenes.DesignScene;
 using HSP.Vanilla.Scenes.GameplayScene;
 using HSP.Vanilla.Trajectories;
@@ -25,6 +26,7 @@ namespace HSP.Vanilla
             if( HSPSceneManager.IsLoaded<GameplaySceneM>() )
             {
                 var comp = v.gameObject.AddComponent<HybridReferenceFrameTransform>();
+                comp.SceneReferenceFrameProvider = new GameplaySceneReferenceFrameProvider();
                 comp.PositionRange = VESSEL_POSITION_RANGE;
                 comp.VelocityRange = VESSEL_VELOCITY_RANGE;
                 comp.MaxTimeScale = VESSEL_MAX_TIMESCALE;
@@ -33,6 +35,7 @@ namespace HSP.Vanilla
             else if( HSPSceneManager.IsLoaded<DesignSceneM>() )
             {
                 var comp = v.gameObject.AddComponent<FixedReferenceFrameTransform>();
+                comp.SceneReferenceFrameProvider = new GameplaySceneReferenceFrameProvider();
             }
         }
 

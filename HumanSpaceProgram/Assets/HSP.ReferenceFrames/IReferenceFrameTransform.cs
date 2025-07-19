@@ -6,6 +6,11 @@ namespace HSP.ReferenceFrames
     public interface IReferenceFrameTransform : IComponent, IReferenceFrameSwitchResponder
     {
         /// <summary>
+        /// Gets or sets the scene reference frame provider, defines which reference frame the *scene space* properties will use.
+        /// </summary>
+        ISceneReferenceFrameProvider SceneReferenceFrameProvider { get; set; }
+
+        /// <summary>
         /// Gets or sets the *scene space* position.
         /// </summary>
         Vector3 Position { get; set; }
@@ -79,16 +84,5 @@ namespace HSP.ReferenceFrames
         /// Invoked when any of the primary values (pos/rot/vel/angvel) are set.
         /// </summary>
         event Action OnAnyValueChanged;
-    }
-
-    public interface IReferenceFrameSwitchResponder
-    {
-        /// <summary>
-        /// Callback to the reference frame switch event.
-        /// </summary>
-        /// <remarks>
-        /// This method will be called AFTER 'PhysicsProcessing', but still in the same fixedupdate as it.
-        /// </remarks>
-        void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data );
     }
 }

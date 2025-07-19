@@ -31,7 +31,7 @@ namespace HSP.Vessels
     /// <remarks>
     /// Vessels exist only in the gameplay scene.
     /// </remarks>
-    public sealed partial class Vessel : MonoBehaviour
+    public sealed partial class Vessel : MonoBehaviour, IVessel
     {
         [SerializeField]
         private string _displayName;

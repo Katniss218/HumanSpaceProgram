@@ -123,6 +123,9 @@ namespace HSP._DevUtils
         {
             if( UnityEngine.Input.GetKeyDown( KeyCode.F6 ) )
             {
+                if( !HSPSceneManager.IsLoaded<GameplaySceneM>() )
+                    return;
+
                 if( HSPSceneManager.IsForeground<GameplaySceneM>() )
                     HSPSceneManager.SetAsBackground<GameplaySceneM>();
                 else

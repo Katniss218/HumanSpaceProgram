@@ -2,7 +2,6 @@
 using HSP.ReferenceFrames;
 using HSP.Time;
 using System;
-using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
 
@@ -15,11 +14,13 @@ namespace HSP.Vanilla
     [DisallowMultipleComponent]
     public class PinnedReferenceFrameTransform : MonoBehaviour, IReferenceFrameTransform, IPhysicsTransform
     {
-        CelestialBody _referenceBody = null;
+        public ISceneReferenceFrameProvider SceneReferenceFrameProvider { get; set; }
+
+        ICelestialBody _referenceBody = null;
         Vector3Dbl _referencePosition = Vector3.zero;
         QuaternionDbl _referenceRotation = QuaternionDbl.identity;
 
-        public CelestialBody ReferenceBody
+        public ICelestialBody ReferenceBody
         {
             get => _referenceBody;
             set
@@ -28,8 +29,8 @@ namespace HSP.Vanilla
                 if( value != null )
                 {
                     MakeCacheInvalid();
-                    ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
-                    ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );
+                    ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, AbsolutePosition );
+                    ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, AbsoluteRotation );
                     SetPositionAndRotation();
                     OnAbsolutePositionChanged?.Invoke();
                     OnAbsoluteRotationChanged?.Invoke();
@@ -45,7 +46,7 @@ namespace HSP.Vanilla
             {
                 _referencePosition = value;
                 MakeCacheInvalid();
-                ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
+                ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, AbsolutePosition );
                 SetPositionAndRotation();
                 OnAbsolutePositionChanged?.Invoke();
                 OnAnyValueChanged?.Invoke();
@@ -59,21 +60,21 @@ namespace HSP.Vanilla
             {
                 _referenceRotation = value;
                 MakeCacheInvalid();
-                ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );
+                ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, AbsoluteRotation );
                 SetPositionAndRotation();
                 OnAbsoluteRotationChanged?.Invoke();
                 OnAnyValueChanged?.Invoke();
             }
         }
 
-        public void SetReference( CelestialBody referenceBody, Vector3Dbl referencePosition, QuaternionDbl referenceRotation )
+        public void SetReference( ICelestialBody referenceBody, Vector3Dbl referencePosition, QuaternionDbl referenceRotation )
         {
             _referenceBody = referenceBody;
             _referencePosition = referencePosition;
             _referenceRotation = referenceRotation;
             MakeCacheInvalid();
-            ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
-            ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );
+            ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, AbsolutePosition );
+            ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, AbsoluteRotation );
             OnAbsolutePositionChanged?.Invoke();
             OnAbsoluteRotationChanged?.Invoke();
             OnAnyValueChanged?.Invoke();
@@ -382,6 +383,7 @@ namespace HSP.Vanilla
         public static SerializationMapping PinnedPhysicsObjectMapping()
         {
             return new MemberwiseSerializationMapping<PinnedReferenceFrameTransform>()
+                .WithMember( "scene_reference_frame_provider", o => o.SceneReferenceFrameProvider )
                 .WithMember( "mass", o => o.Mass )
                 .WithMember( "local_center_of_mass", o => o.LocalCenterOfMass )
 

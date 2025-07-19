@@ -1,8 +1,6 @@
 ﻿using HSP.ReferenceFrames;
 using HSP.Time;
-using HSP.Trajectories;
 using System;
-using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
 
@@ -15,12 +13,14 @@ namespace HSP.Vanilla
     [DisallowMultipleComponent]
     public class FreeReferenceFrameTransform : MonoBehaviour, IReferenceFrameTransform, IPhysicsTransform
     {
+        public ISceneReferenceFrameProvider SceneReferenceFrameProvider { get; set; }
+
         public Vector3 Position
         {
             get => this._rb.position;
             set
             {
-                this._cachedAbsolutePosition = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( value );
+                this._cachedAbsolutePosition = SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformPosition( value );
                 MakeCacheInvalid();
                 this._rb.position = value;
                 this.transform.position = value;
@@ -40,7 +40,7 @@ namespace HSP.Vanilla
             {
                 _cachedAbsolutePosition = value;
                 MakeCacheInvalid();
-                ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, value );
+                ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, value );
                 OnAbsolutePositionChanged?.Invoke();
                 OnAnyValueChanged?.Invoke();
             }
@@ -51,7 +51,7 @@ namespace HSP.Vanilla
             get => this._rb.rotation;
             set
             {
-                this._cachedAbsoluteRotation = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( value );
+                this._cachedAbsoluteRotation = SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformRotation( value );
                 MakeCacheInvalid();
                 this._rb.rotation = value;
                 this.transform.rotation = value;
@@ -59,7 +59,7 @@ namespace HSP.Vanilla
                 OnAnyValueChanged?.Invoke();
             }
         }
-
+#warning TODO - add a getter for the scene reference frame so they can be reused by a different scene. this getter should be an interface and serializable
         public QuaternionDbl AbsoluteRotation
         {
             get
@@ -71,7 +71,7 @@ namespace HSP.Vanilla
             {
                 _cachedAbsoluteRotation = value;
                 MakeCacheInvalid();
-                ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, value );
+                ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, value );
                 OnAbsoluteRotationChanged?.Invoke();
                 OnAnyValueChanged?.Invoke();
             }
@@ -82,7 +82,7 @@ namespace HSP.Vanilla
             get => this._rb.velocity;
             set
             {
-                this._cachedAbsoluteVelocity = SceneReferenceFrameManager.ReferenceFrame.TransformVelocity( value );
+                this._cachedAbsoluteVelocity = SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformVelocity( value );
                 MakeCacheInvalid();
                 this._rb.velocity = value;
                 OnAbsoluteVelocityChanged?.Invoke();
@@ -101,7 +101,7 @@ namespace HSP.Vanilla
             {
                 this._cachedAbsoluteVelocity = value;
                 MakeCacheInvalid();
-                ReferenceFrameTransformUtils.SetSceneVelocityFromAbsolute( _rb, value );
+                ReferenceFrameTransformUtils.SetSceneVelocityFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), _rb, value );
                 OnAbsoluteVelocityChanged?.Invoke();
                 OnAnyValueChanged?.Invoke();
             }
@@ -112,7 +112,7 @@ namespace HSP.Vanilla
             get => this._rb.angularVelocity;
             set
             {
-                this._cachedAbsoluteAngularVelocity = SceneReferenceFrameManager.ReferenceFrame.TransformAngularVelocity( value );
+                this._cachedAbsoluteAngularVelocity = SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAngularVelocity( value );
                 MakeCacheInvalid();
                 this._rb.angularVelocity = value;
                 OnAbsoluteAngularVelocityChanged?.Invoke();
@@ -131,7 +131,7 @@ namespace HSP.Vanilla
             {
                 this._cachedAbsoluteAngularVelocity = value;
                 MakeCacheInvalid();
-                ReferenceFrameTransformUtils.SetSceneAngularVelocityFromAbsolute( _rb, value );
+                ReferenceFrameTransformUtils.SetSceneAngularVelocityFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), _rb, value );
                 OnAbsoluteAngularVelocityChanged?.Invoke();
                 OnAnyValueChanged?.Invoke();
             }
@@ -214,7 +214,7 @@ namespace HSP.Vanilla
 
         public void AddForce( Vector3 force )
         {
-            _absoluteAccelerationSum += SceneReferenceFrameManager.ReferenceFrame.TransformAcceleration( (Vector3Dbl)force / Mass );
+            _absoluteAccelerationSum += SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAcceleration( (Vector3Dbl)force / Mass );
 
             this._rb.AddForce( force, ForceMode.Force );
         }
@@ -222,8 +222,8 @@ namespace HSP.Vanilla
         public void AddForceAtPosition( Vector3 force, Vector3 position )
         {
             Vector3 leverArm = position - this._rb.worldCenterOfMass;
-            _absoluteAccelerationSum += SceneReferenceFrameManager.ReferenceFrame.TransformAcceleration( (Vector3Dbl)force / Mass );
-            _absoluteAngularAccelerationSum += SceneReferenceFrameManager.ReferenceFrame.TransformAngularAcceleration( Vector3Dbl.Cross( force, leverArm ) / Mass );
+            _absoluteAccelerationSum += SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAcceleration( (Vector3Dbl)force / Mass );
+            _absoluteAngularAccelerationSum += SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAngularAcceleration( Vector3Dbl.Cross( force, leverArm ) / Mass );
 
             // TODO - In the future possibly cache the values across a frame and apply it once instead of n-times.
             this._rb.AddForceAtPosition( force, position, ForceMode.Force );
@@ -231,7 +231,7 @@ namespace HSP.Vanilla
 
         public void AddTorque( Vector3 torque )
         {
-            _absoluteAngularAccelerationSum += SceneReferenceFrameManager.ReferenceFrame.TransformAngularAcceleration( (Vector3Dbl)torque / Mass );
+            _absoluteAngularAccelerationSum += SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAngularAcceleration( (Vector3Dbl)torque / Mass );
 
             this._rb.AddTorque( torque, ForceMode.Force );
         }
@@ -241,7 +241,7 @@ namespace HSP.Vanilla
             if( IsCacheValid() )
                 return;
 
-            RecalculateCache( SceneReferenceFrameManager.ReferenceFrame );
+            RecalculateCache( SceneReferenceFrameProvider.GetSceneReferenceFrame() );
             MakeCacheValid();
         }
 
@@ -262,7 +262,7 @@ namespace HSP.Vanilla
             && (_rb.rotation.x == _lastCachedRotation.x && _rb.rotation.y == _lastCachedRotation.y && _rb.rotation.z == _lastCachedRotation.z && _rb.rotation.w == _lastCachedRotation.w)
             && (_rb.velocity.x == _lastCachedVelocity.x && _rb.velocity.y == _lastCachedVelocity.y && _rb.velocity.z == _lastCachedVelocity.z)
             && (_rb.angularVelocity.x == _lastCachedAngularVelocity.x && _rb.angularVelocity.y == _lastCachedAngularVelocity.y && _rb.angularVelocity.z == _lastCachedAngularVelocity.z)
-            && SceneReferenceFrameManager.ReferenceFrame.EqualsIgnoreUT( _cachedSceneReferenceFrame );
+            && SceneReferenceFrameProvider.GetSceneReferenceFrame().EqualsIgnoreUT( _cachedSceneReferenceFrame );
 
         protected virtual void MakeCacheValid()
         {
@@ -291,7 +291,7 @@ namespace HSP.Vanilla
 
         protected virtual void FixedUpdate()
         {
-            if( SceneReferenceFrameManager.ReferenceFrame is INonInertialReferenceFrame frame )
+            if( SceneReferenceFrameProvider.GetSceneReferenceFrame() is INonInertialReferenceFrame frame )
             {
                 Vector3Dbl localPos = frame.InverseTransformPosition( this.AbsolutePosition );
                 Vector3Dbl localVel = this.Velocity;
@@ -312,8 +312,8 @@ namespace HSP.Vanilla
                 _cachedAcceleration = (Velocity - _oldVelocity) / TimeManager.FixedDeltaTime;
                 _cachedAngularAcceleration = (AngularVelocity - _oldAngularVelocity) / TimeManager.FixedDeltaTime;
 
-                _cachedAbsoluteAcceleration = SceneReferenceFrameManager.ReferenceFrame.TransformAcceleration( _cachedAcceleration );
-                _cachedAbsoluteAngularAcceleration = SceneReferenceFrameManager.ReferenceFrame.TransformAcceleration( _cachedAngularAcceleration );
+                _cachedAbsoluteAcceleration = SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAcceleration( _cachedAcceleration );
+                _cachedAbsoluteAngularAcceleration = SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAcceleration( _cachedAngularAcceleration );
             }
             else
             {
@@ -321,8 +321,8 @@ namespace HSP.Vanilla
                 _cachedAbsoluteAcceleration = _absoluteAccelerationSum;
                 _cachedAbsoluteAngularAcceleration = _absoluteAngularAccelerationSum;
 
-                _cachedAcceleration = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformAcceleration( _cachedAbsoluteAcceleration );
-                _cachedAngularAcceleration = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformAngularAcceleration( _cachedAbsoluteAngularAcceleration );
+                _cachedAcceleration = (Vector3)SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformAcceleration( _cachedAbsoluteAcceleration );
+                _cachedAngularAcceleration = (Vector3)SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformAngularAcceleration( _cachedAbsoluteAngularAcceleration );
             }
 
             this._oldVelocity = Velocity;
@@ -335,10 +335,10 @@ namespace HSP.Vanilla
         {
             RecalculateCache( data.OldFrame );
             _cachedSceneReferenceFrame = data.OldFrame;
-            ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, _cachedAbsolutePosition, data.NewFrame );
-            ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, _cachedAbsoluteRotation );
-            ReferenceFrameTransformUtils.SetSceneVelocityFromAbsolute( _rb, _cachedAbsoluteVelocity );
-            ReferenceFrameTransformUtils.SetSceneAngularVelocityFromAbsolute( _rb, _cachedAbsoluteAngularVelocity );
+            ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( data.NewFrame, transform, _rb, _cachedAbsolutePosition );
+            ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( data.NewFrame, transform, _rb, _cachedAbsoluteRotation );
+            ReferenceFrameTransformUtils.SetSceneVelocityFromAbsolute( data.NewFrame, _rb, _cachedAbsoluteVelocity );
+            ReferenceFrameTransformUtils.SetSceneAngularVelocityFromAbsolute( data.NewFrame, _rb, _cachedAbsoluteAngularVelocity );
         }
 
         protected virtual void OnEnable()
@@ -374,6 +374,7 @@ namespace HSP.Vanilla
         public static SerializationMapping FreePhysicsObjectMapping()
         {
             return new MemberwiseSerializationMapping<FreeReferenceFrameTransform>()
+                .WithMember( "scene_reference_frame_provider", o => o.SceneReferenceFrameProvider )
                 .WithMember( "mass", o => o.Mass )
                 .WithMember( "local_center_of_mass", o => o.LocalCenterOfMass )
 

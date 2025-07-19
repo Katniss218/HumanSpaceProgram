@@ -15,7 +15,7 @@ namespace HSP.CelestialBodies
         public const string ID = HSPEvent.NAMESPACE_HSP + ".celestial_body_destroyed.after";
     }
 
-    public class CelestialBody : MonoBehaviour
+    public class CelestialBody : MonoBehaviour, ICelestialBody
     {
         public string _id;
         /// <summary>

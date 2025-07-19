@@ -23,13 +23,15 @@ namespace HSP.Vanilla
         /// <summary>
         /// Pins the vessel to the celestial body at the specified location.
         /// </summary>
-        public static void Pin( this Vessel vessel, CelestialBody body, Vector3Dbl referencePosition, QuaternionDbl referenceRotation )
+        public static void Pin( this Vessel vessel, ICelestialBody body, Vector3Dbl referencePosition, QuaternionDbl referenceRotation )
         {
             IReferenceFrameTransform oldReferenceFrameTransform = vessel.ReferenceFrameTransform;
+            ISceneReferenceFrameProvider sceneFrameProvider = oldReferenceFrameTransform.SceneReferenceFrameProvider;
             IPhysicsTransform oldPhysTransform = vessel.PhysicsTransform;
 
             UnityEngine.Object.DestroyImmediate( (Component)vessel.PhysicsTransform );
             var ppo = vessel.gameObject.AddComponent<PinnedReferenceFrameTransform>();
+            ppo.SceneReferenceFrameProvider = sceneFrameProvider;
             ppo.SetReference( body, referencePosition, referenceRotation );
 
             ppo.Mass = oldPhysTransform.Mass;
@@ -48,10 +50,12 @@ namespace HSP.Vanilla
         {
             // possibly needs to set velocity.
             IReferenceFrameTransform oldReferenceFrameTransform = vessel.ReferenceFrameTransform;
+            ISceneReferenceFrameProvider sceneFrameProvider = oldReferenceFrameTransform.SceneReferenceFrameProvider;
             IPhysicsTransform oldPhysTransform = vessel.PhysicsTransform;
 
             UnityEngine.Object.DestroyImmediate( (Component)vessel.PhysicsTransform );
             var ppo = vessel.gameObject.AddComponent<HybridReferenceFrameTransform>();
+            ppo.SceneReferenceFrameProvider = sceneFrameProvider;
             ppo.PositionRange = OnVesselCreated.VESSEL_POSITION_RANGE;
             ppo.VelocityRange = OnVesselCreated.VESSEL_VELOCITY_RANGE;
             ppo.MaxTimeScale = OnVesselCreated.VESSEL_MAX_TIMESCALE;

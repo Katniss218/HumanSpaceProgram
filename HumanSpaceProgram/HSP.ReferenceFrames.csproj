@@ -73,6 +73,8 @@
     <Compile Include="Assets\HSP.ReferenceFrames\IPhysicsTransform_Ex.cs" />
     <Compile Include="Assets\HSP.ReferenceFrames\ReferenceFrames\OrientedReferenceFrame.cs" />
     <Compile Include="Assets\HSP.ReferenceFrames\IReferenceFrame.cs" />
+    <Compile Include="Assets\HSP.ReferenceFrames\IReferenceFrameSwitchResponder.cs" />
+    <Compile Include="Assets\HSP.ReferenceFrames\ISceneReferenceFrameProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.ReferenceFrames\___HSP.ReferenceFrames.asmdef" />

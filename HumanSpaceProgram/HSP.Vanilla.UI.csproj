@@ -68,7 +68,7 @@
     <Compile Include="Assets\HSP.Vanilla.UI\CanvasRegistry.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Scenes\DesignScene\UIPartListEntry.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\UISequencerPanel.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI\Scenes\GameplayMapScene\MapSceneUIFactory.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI\Scenes\MapScene\MapSceneUIFactory.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\GameplaySequencerPanelFactory.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Timelines\UISaveWindow.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Scenes\DesignScene\UIPartList.cs" />

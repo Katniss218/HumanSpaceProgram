@@ -68,6 +68,7 @@
     <Compile Include="Assets\HSP.CelestialBodies\Atmospheres\Atmosphere.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\CelestialBodySurface.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\CelestialBody.cs" />
+    <Compile Include="Assets\HSP.CelestialBodies\ICelestialBody.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\Surfaces\LODQuadRebuilder.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\CelestialBodyFactory.cs" />
     <Compile Include="Assets\HSP.CelestialBodies\Surfaces\LODQuadTreeNode.cs" />
