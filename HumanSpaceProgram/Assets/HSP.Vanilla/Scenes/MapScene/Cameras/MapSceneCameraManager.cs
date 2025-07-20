@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityPlus.AssetManagement;
 
 namespace HSP.Vanilla.Scenes.MapScene.Cameras
 {
@@ -24,10 +25,6 @@ namespace HSP.Vanilla.Scenes.MapScene.Cameras
 
         [SerializeField]
         Camera _uiCamera;
-
-        RenderTexture _colorRT;
-        RenderTexture _farDepthRT;
-        RenderTexture _nearDepthRT;
 
         public static Camera FarCamera => instance._farCamera;
         public static Camera EffectCamera => instance._effectCamera;
@@ -76,12 +73,10 @@ namespace HSP.Vanilla.Scenes.MapScene.Cameras
             _uiCamera.depth = 99;
 
             _farCamera.cullingMask =
-                  Layer.DEFAULT.ToMask()
+                  Layer.MAP.ToMask()
                 | Layer.Unity_TransparentFx.ToMask()
                 | Layer.Unity_IgnoreRaycast.ToMask()
-                | Layer.Unity_Water.ToMask()
-                | Layer.CELESTIAL_BODY.ToMask()
-                | Layer.CELESTIAL_BODY_LIGHT.ToMask();
+                | Layer.Unity_Water.ToMask();
 
             _effectCamera.cullingMask = 0;
 
@@ -139,6 +134,9 @@ namespace HSP.Vanilla.Scenes.MapScene.Cameras
 
             cameraController.CameraParent = cameraParentGameObject.transform;
             cameraController.ZoomDist = 12_000_000f;
+
+            Skybox skybox = farCameraGameObject.AddComponent<Skybox>();
+            skybox.material = AssetRegistry.Get<Material>( "builtin::HSP._DevUtils/skybox" );
 
             _cameraPivot.SetActive( false );
         }

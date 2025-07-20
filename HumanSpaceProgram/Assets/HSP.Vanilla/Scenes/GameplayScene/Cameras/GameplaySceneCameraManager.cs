@@ -196,6 +196,8 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
                 | Layer.Unity_TransparentFx.ToMask()
                 | Layer.Unity_IgnoreRaycast.ToMask()
                 | Layer.Unity_Water.ToMask()
+                | Layer.CELESTIAL_BODY.ToMask()
+                | Layer.CELESTIAL_BODY_LIGHT.ToMask()
                 | Layer.PART_OBJECT.ToMask()
                 | Layer.PART_OBJECT_LIGHT.ToMask()
                 | Layer.VESSEL_DESIGN_HELD.ToMask();
@@ -288,6 +290,9 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
             bufferCombiner.NearCamera = nearCamera;
             bufferCombiner.EffectCamera = effectCamera;
             bufferCombiner.MergeDepthShader = AssetRegistry.Get<Shader>( "builtin::Resources/Shaders/merge_depth" );
+
+            Skybox skybox = farCameraGameObject.AddComponent<Skybox>();
+            skybox.material = AssetRegistry.Get<Material>( "builtin::HSP._DevUtils/skybox" );
 
             _cameraPivot.SetActive( false );
         }

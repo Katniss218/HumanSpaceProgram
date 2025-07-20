@@ -16,6 +16,7 @@ namespace HSP.Vanilla
     {
         public ISceneReferenceFrameProvider SceneReferenceFrameProvider { get; set; }
 
+#warning TODO - change this to use a reference transform instead of a celestial body, and add a derived type that exposes a CB (for serialization purposes - also 'hide'/disable the original member to stop from setting to a missing reference, because the reference will be missing)
         ICelestialBody _referenceBody = null;
         Vector3Dbl _referencePosition = Vector3.zero;
         QuaternionDbl _referenceRotation = QuaternionDbl.identity;

@@ -77,10 +77,10 @@ namespace HSP.CelestialBodies
         {
             if( this.ID == null )
                 Debug.LogError( $"Celestial body '{this.gameObject.name}' has not been assigned an ID." );
-            //this.gameObject.SetLayer( (int)Layer.CELESTIAL_BODY, true );
+            this.gameObject.SetLayer( (int)Layer.CELESTIAL_BODY, true );
 
             HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_CELESTIAL_BODY_CREATED.ID, this );
-            //this.gameObject.SetLayer( (int)Layer.CELESTIAL_BODY, true );
+            this.gameObject.SetLayer( (int)Layer.CELESTIAL_BODY, true );
         }
 
         private void OnDestroy()

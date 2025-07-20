@@ -78,6 +78,7 @@ namespace HSP.CelestialBodies.Surfaces
             gameObject.transform.localRotation = Quaternion.identity;
             gameObject.transform.localScale = Vector3.one;
             gameObject.transform.SetParent( sphere.QuadParent, false );
+            gameObject.SetLayer( (int)Layer.DEFAULT );
             gameObject.SetActive( false );
 
             LODQuad lodQuad = gameObject.AddComponent<LODQuad>();

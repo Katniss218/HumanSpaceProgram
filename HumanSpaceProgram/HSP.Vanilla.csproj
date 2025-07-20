@@ -60,6 +60,7 @@
   <ItemGroup>
     <Compile Include="Assets\HSP.Vanilla\Scenes\EditorScene\EditorSceneM.cs" />
     <Compile Include="Assets\HSP.Vanilla\Settings\ReloadSettingsListener.cs" />
+    <Compile Include="Assets\HSP.Vanilla\Scenes\MapScene\MapCelestialBody.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\MapScene\Cameras\MapSceneOrbitingCameraController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\Cameras\DesignSceneOrbitingCameraController.cs" />
     <Compile Include="Assets\HSP.Vanilla\CelestialBodies\LODQuadModifier_Heightmap.cs" />
@@ -139,8 +140,10 @@
     <Compile Include="Assets\HSP.Vanilla\Scenes\EditorScene\OnStartup.cs" />
     <Compile Include="Assets\HSP.Vanilla\OnVesselCreated.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\GameplaySceneM.cs" />
+    <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\SceneReferenceFrameProvider.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\DesignSceneTool.cs" />
     <Compile Include="Assets\HSP.Vanilla\CelestialBodies\POIGetterUtils.cs" />
+    <Compile Include="Assets\HSP.Vanilla\Scenes\MapScene\FollowingInDifferentSceneReferenceFrameTransform.cs" />
     <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\HybridReferenceFrameTransform.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\TimeScaleInputController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\GameplaySceneToolManager.cs" />
@@ -148,13 +151,10 @@
     <Compile Include="Assets\HSP.Vanilla\Scenes\MapScene\MapSceneM.cs" />
     <Compile Include="Assets\HSP.Vanilla\CelestialBodies\LODQuadModifier_Displace.cs" />
     <Compile Include="Assets\HSP.Vanilla\Settings\GameSettings\SettingsPage_Graphics.cs" />
+    <Compile Include="Assets\HSP.Vanilla\Scenes\MapScene\MapSceneReferenceFrameManager.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FLaunchSiteMarker.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FReactionControlController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FControlFrame.cs" />
-    <Compile Include="Assets\HSP.Vanilla\Scenes\MapScene\MapCelestialBody.cs" />
-    <Compile Include="Assets\HSP.Vanilla\Scenes\MapScene\MapSceneReferenceFrameManager.cs" />
-    <Compile Include="Assets\HSP.Vanilla\Scenes\MapScene\FollowingInDifferentSceneReferenceFrameTransform.cs" />
-    <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\SceneReferenceFrameProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla\___HSP.Vanilla.asmdef" />

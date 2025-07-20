@@ -1,5 +1,6 @@
 using HSP.Vanilla.Scenes.GameplayScene;
 using UnityEngine;
+using UnityPlus.AssetManagement;
 
 namespace HSP.Vanilla.Scenes.DesignScene.Cameras
 {
@@ -162,6 +163,9 @@ namespace HSP.Vanilla.Scenes.DesignScene.Cameras
 
             cameraController.CameraParent = cameraParentGameObject.transform;
             cameraController.ZoomDist = 5f;
+
+            Skybox skybox = nearCameraGameObject.AddComponent<Skybox>();
+            skybox.material = AssetRegistry.Get<Material>( "builtin::HSP._DevUtils/skybox" );
 
             _cameraPivot.SetActive( false );
         }
