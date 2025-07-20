@@ -73,7 +73,8 @@ namespace HSP.Vanilla.Scenes.MapScene.Cameras
             _uiCamera.depth = 99;
 
             _farCamera.cullingMask =
-                  Layer.MAP.ToMask()
+                  Layer.DEFAULT.ToMask()
+                | Layer.MAP_ONLY.ToMask()
                 | Layer.Unity_TransparentFx.ToMask()
                 | Layer.Unity_IgnoreRaycast.ToMask()
                 | Layer.Unity_Water.ToMask();

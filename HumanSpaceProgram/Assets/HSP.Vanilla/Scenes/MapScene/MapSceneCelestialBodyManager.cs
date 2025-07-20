@@ -73,6 +73,9 @@ namespace HSP.Vanilla.Scenes.MapScene
         {
             GameObject go = new GameObject( "dummy" );
             var t = go.AddComponent<MapCelestialBody>();
+            t.Source = source;
+            t.ReferenceFrameTransform = source.ReferenceFrameTransform;
+            t.PhysicsTransform = source.PhysicsTransform;
             MapCelestialBody target = t;// spawn the gameobject stub
 
             _mapCelestialBodies.Add( source, target );
@@ -93,7 +96,9 @@ namespace HSP.Vanilla.Scenes.MapScene
             if( _mapCelestialBodies.TryGetValue( source, out MapCelestialBody target ) )
             {
                 // destroy the gameobject stub
-                UnityEngine.Object.Destroy( target.gameObject );
+                if( target.gameObject != null )
+                    UnityEngine.Object.Destroy( target.gameObject );
+
                 _mapCelestialBodies.Remove( source );
             }
         }

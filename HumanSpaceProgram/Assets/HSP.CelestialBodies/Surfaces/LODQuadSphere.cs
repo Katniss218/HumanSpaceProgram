@@ -14,7 +14,7 @@ namespace HSP.CelestialBodies.Surfaces
     /// <summary>
     /// Adds a solid surface to a celestial body.
     /// </summary>
-    [RequireComponent( typeof( CelestialBody ) )]
+    [RequireComponent( typeof( ICelestialBody ) )]
     public sealed class LODQuadSphere : MonoBehaviour
     {
         int _edgeSubdivisions = 4;
@@ -89,6 +89,9 @@ namespace HSP.CelestialBodies.Surfaces
             ClearAllQuads();
         }
 
+        /// <summary>
+        /// Gets all jobs assigned to this LODQuadSphere, regardless of filtering.
+        /// </summary>
         public ILODQuadModifier[][] Jobs { get; private set; }
 
         /// <summary>
@@ -155,7 +158,7 @@ namespace HSP.CelestialBodies.Surfaces
         void Awake()
         {
             // Possibly move this to a child, so it can be disabled without disabling entire CB.
-            CelestialBody = this.GetComponent<CelestialBody>();
+            CelestialBody = this.GetComponent<ICelestialBody>();
         }
 
         void Start()

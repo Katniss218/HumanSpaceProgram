@@ -9,7 +9,7 @@ namespace HSP.CelestialBodies.Atmospheres
     /// <summary>
     /// Add this to a celestial body to draw an atmosphere at its location.
     /// </summary>
-    [RequireComponent( typeof( CelestialBody ) )]
+    [RequireComponent( typeof( ICelestialBody ) )]
     public class Atmosphere : MonoBehaviour
     {
         internal static List<Atmosphere> _activeAtmospheres = new();
@@ -32,7 +32,7 @@ namespace HSP.CelestialBodies.Atmospheres
         /// <summary>
         /// Gets the celestial body that this LOD sphere belongs to.
         /// </summary>
-        public CelestialBody CelestialBody { get; private set; }
+        public ICelestialBody CelestialBody { get; private set; }
 
         internal void UpdateMaterialValues( Func<RenderTexture> ColorRenderTextureGetter, Func<RenderTexture> DepthRenderTextureGetter, Light light )
         {
@@ -60,8 +60,7 @@ namespace HSP.CelestialBodies.Atmospheres
 
         void Awake()
         {
-            // Possibly move this to a child, so it can be disabled without disabling entire CB.
-            CelestialBody = this.GetComponent<CelestialBody>();
+            CelestialBody = this.GetComponent<ICelestialBody>();
         }
 
         void OnEnable()

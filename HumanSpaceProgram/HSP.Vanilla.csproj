@@ -143,7 +143,7 @@
     <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\SceneReferenceFrameProvider.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\DesignSceneTool.cs" />
     <Compile Include="Assets\HSP.Vanilla\CelestialBodies\POIGetterUtils.cs" />
-    <Compile Include="Assets\HSP.Vanilla\Scenes\MapScene\FollowingInDifferentSceneReferenceFrameTransform.cs" />
+    <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\FollowingDifferentReferenceFrameTransform.cs" />
     <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\HybridReferenceFrameTransform.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\TimeScaleInputController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\GameplaySceneToolManager.cs" />
@@ -155,6 +155,7 @@
     <Compile Include="Assets\HSP.Vanilla\Components\FLaunchSiteMarker.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FReactionControlController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FControlFrame.cs" />
+    <Compile Include="Assets\HSP.Vanilla\Scenes\MapScene\CelestialBodyProcessors\LODQuadSphereProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla\___HSP.Vanilla.asmdef" />

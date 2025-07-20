@@ -5,9 +5,9 @@ using UnityEngine;
 namespace HSP.Vanilla.Scenes.MapScene
 {
     /// <summary>
-    /// A reference frame transform that follows a different reference frame transform, using a different scene reference frame.
+    /// A reference frame transform that follows some other reference frame transform, potentially also using a different scene reference frame.
     /// </summary>
-    public class FollowingInDifferentSceneReferenceFrameTransform : MonoBehaviour, IReferenceFrameTransform, IPhysicsTransform
+    public class FollowingDifferentReferenceFrameTransform : MonoBehaviour, IReferenceFrameTransform, IPhysicsTransform
     {
         public ISceneReferenceFrameProvider SceneReferenceFrameProvider { get; set; }
 
@@ -22,7 +22,7 @@ namespace HSP.Vanilla.Scenes.MapScene
             }
             set
             {
-                throw new InvalidOperationException( $"Can't set {nameof(Position)} of {nameof( FollowingInDifferentSceneReferenceFrameTransform )}. This transform always follows the reference object in another scene." );
+                throw new InvalidOperationException( $"Can't set {nameof(Position)} of {nameof( FollowingDifferentReferenceFrameTransform )}. This transform always follows the reference object in another scene." );
             }
         }
         public Vector3Dbl AbsolutePosition
@@ -33,7 +33,7 @@ namespace HSP.Vanilla.Scenes.MapScene
             }
             set
             {
-                throw new InvalidOperationException( $"Can't set {nameof( AbsolutePosition )} of {nameof( FollowingInDifferentSceneReferenceFrameTransform )}. This transform always follows the reference object in another scene." );
+                throw new InvalidOperationException( $"Can't set {nameof( AbsolutePosition )} of {nameof( FollowingDifferentReferenceFrameTransform )}. This transform always follows the reference object in another scene." );
             }
         }
         public Quaternion Rotation { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
@@ -45,7 +45,7 @@ namespace HSP.Vanilla.Scenes.MapScene
             }
             set
             {
-                throw new InvalidOperationException( $"Can't set {nameof( AbsoluteRotation )} of {nameof( FollowingInDifferentSceneReferenceFrameTransform )}. This transform always follows the reference object in another scene." );
+                throw new InvalidOperationException( $"Can't set {nameof( AbsoluteRotation )} of {nameof( FollowingDifferentReferenceFrameTransform )}. This transform always follows the reference object in another scene." );
             }
         }
         public Vector3 Velocity { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
@@ -57,7 +57,7 @@ namespace HSP.Vanilla.Scenes.MapScene
             }
             set
             {
-                throw new InvalidOperationException( $"Can't set {nameof( AbsoluteVelocity )} of {nameof( FollowingInDifferentSceneReferenceFrameTransform )}. This transform always follows the reference object in another scene." );
+                throw new InvalidOperationException( $"Can't set {nameof( AbsoluteVelocity )} of {nameof( FollowingDifferentReferenceFrameTransform )}. This transform always follows the reference object in another scene." );
             }
         }
         public Vector3 AngularVelocity { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
@@ -69,7 +69,7 @@ namespace HSP.Vanilla.Scenes.MapScene
             }
             set
             {
-                throw new InvalidOperationException( $"Can't set {nameof( AbsoluteAngularVelocity )} of {nameof( FollowingInDifferentSceneReferenceFrameTransform )}. This transform always follows the reference object in another scene." );
+                throw new InvalidOperationException( $"Can't set {nameof( AbsoluteAngularVelocity )} of {nameof( FollowingDifferentReferenceFrameTransform )}. This transform always follows the reference object in another scene." );
             }
         }
 
