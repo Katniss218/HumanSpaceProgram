@@ -128,11 +128,16 @@ namespace HSP.ReferenceFrames
 
         private static void ReferenceFrameSwitch_Responders( ReferenceFrameSwitchData data )
         {
-            foreach( var obj in UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects() )
+            // TODO - ideally, the responders should register themselves somewhere, so that they don't have to be rediscovered on every switch.
+            for( int i = 0; i < UnityEngine.SceneManagement.SceneManager.sceneCount; i++ )
             {
-                if( obj.TryGetComponent<IReferenceFrameSwitchResponder>( out var referenceFrameSwitch ) )
+                var scene = UnityEngine.SceneManagement.SceneManager.GetSceneAt( i );
+                foreach( var obj in scene.GetRootGameObjects() )
                 {
-                    referenceFrameSwitch.OnSceneReferenceFrameSwitch( data );
+                    if( obj.TryGetComponent<IReferenceFrameSwitchResponder>( out var referenceFrameSwitch ) )
+                    {
+                        referenceFrameSwitch.OnSceneReferenceFrameSwitch( data );
+                    }
                 }
             }
         }

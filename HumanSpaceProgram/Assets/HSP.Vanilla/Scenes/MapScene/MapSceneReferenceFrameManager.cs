@@ -110,7 +110,8 @@ namespace HSP.Vanilla.Scenes.MapScene
 
         private static void ReferenceFrameSwitch_Responders( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
-            foreach( var obj in UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects() )
+            foreach( var obj in MapSceneM.Instance.UnityScene.GetRootGameObjects() ) // This is a map scene manager, so we only get from map scene.
+                                                                                     // Everything registering to this event should be in the map scene.
             {
                 if( obj.TryGetComponent<IReferenceFrameSwitchResponder>( out var referenceFrameSwitch ) )
                 {
