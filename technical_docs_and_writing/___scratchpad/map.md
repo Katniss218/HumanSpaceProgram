@@ -79,7 +79,7 @@ solution 1:
 - interfaces
 - modify components to support interfaces
 - factory or something to create map versions of celestial bodies (needs to potentially map components to other components)
-- allow multiple scene reference frame transforms (assign each transform to one??)
+- allow multiple scene reference frame transforms (a provider interface retrieves it)
 - trajectories
 - orbit line scene depth renderer
 - map scene camera-tied scene reference frame
@@ -96,17 +96,6 @@ feels very similar to what the serialization is already doing.
 
 
 
-processing objects (celestial bodies/ guis/ etc):
-- list of processors
-- each gets fed the current source and destination objects
-- processors run in BEFORE/AFTER sorted sequence?
-
-having both source and target allows removing/replacing previous processors
-processors can be HSPEvent listeners honestly, the infrastructure is there already.
-
-
-add a scene reference frame getter to the reference frame transforms so they can use a different scene reference frame (multi-scene support)
-- this getter should be an interface (ISceneReferenceFrameProvider) and implementations be serializable
 
 
 
