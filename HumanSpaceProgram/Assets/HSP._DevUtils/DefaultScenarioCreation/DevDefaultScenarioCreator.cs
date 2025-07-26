@@ -96,14 +96,14 @@ namespace HSP._DevUtils
             }
 
             FLaunchSiteMarker launchSiteSpawner = launchSite.gameObject.GetComponentInChildren<FLaunchSiteMarker>();
-            Vector3Dbl zeroPosAirf = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( Vector3Dbl.zero );
+            Vector3Dbl zeroPosAirf = GameplaySceneReferenceFrameManager.ReferenceFrame.TransformPosition( Vector3Dbl.zero );
             Vector3Dbl spawnerPosAirf = launchSite.ReferenceFrameTransform.AbsolutePosition + GetLocalPositionRelativeToRoot( launchSiteSpawner.transform );
-            QuaternionDbl spawnerRotAirf = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( launchSiteSpawner.transform.rotation );
+            QuaternionDbl spawnerRotAirf = GameplaySceneReferenceFrameManager.ReferenceFrame.TransformRotation( launchSiteSpawner.transform.rotation );
 
             var vessel = CreateDummyVessel( zeroPosAirf, spawnerRotAirf ); // position is temp.
 
             Vector3 bottomBoundPos = vessel.GetBottomPosition();
-            Vector3Dbl closestBoundAirf = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( bottomBoundPos );
+            Vector3Dbl closestBoundAirf = GameplaySceneReferenceFrameManager.ReferenceFrame.TransformPosition( bottomBoundPos );
             Vector3Dbl closestBoundToVesselAirf = vessel.ReferenceFrameTransform.AbsolutePosition - closestBoundAirf;
             Vector3Dbl airfPos = spawnerPosAirf + closestBoundToVesselAirf;
 

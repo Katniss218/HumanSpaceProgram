@@ -11,7 +11,7 @@ namespace HSP.Vanilla
     {
         public static bool IsPinned( this Vessel vessel )
         {
-            return vessel.ReferenceFrameTransform is PinnedReferenceFrameTransform;
+            return vessel.ReferenceFrameTransform is PinnedCelestialBodyReferenceFrameTransform;
         }
 
         public static void Pin( this Vessel vessel )
@@ -30,7 +30,7 @@ namespace HSP.Vanilla
             IPhysicsTransform oldPhysTransform = vessel.PhysicsTransform;
 
             UnityEngine.Object.DestroyImmediate( (Component)vessel.PhysicsTransform );
-            var ppo = vessel.gameObject.AddComponent<PinnedReferenceFrameTransform>();
+            var ppo = vessel.gameObject.AddComponent<PinnedCelestialBodyReferenceFrameTransform>();
             ppo.SceneReferenceFrameProvider = sceneFrameProvider;
             ppo.SetReference( body, referencePosition, referenceRotation );
 

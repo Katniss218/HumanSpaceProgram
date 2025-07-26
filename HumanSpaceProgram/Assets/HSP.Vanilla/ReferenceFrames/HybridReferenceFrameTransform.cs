@@ -92,7 +92,7 @@ namespace HSP.Vanilla
                 // Set both absolute and rigidbody because the call might happen after physics/fixedupdate.
                 _rb.position = value;
                 transform.position = value;
-                var absolutePos = SceneReferenceFrameManager.ReferenceFrame.InverseTransformPosition( value );
+                var absolutePos = SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformPosition( value );
                 _actualAbsolutePosition = absolutePos;
                 _requestedAbsolutePosition = absolutePos;
 
@@ -358,7 +358,7 @@ namespace HSP.Vanilla
         {
             if( this.HasComponentOtherThan<IReferenceFrameTransform>( this ) )
             {
-                Debug.LogWarning( $"Tried to add a {nameof( HybridReferenceFrameTransform )} to a game object that already has a {nameof( IReferenceFrameTransform )}. This is not allowed. Remove the previous physics object first." );
+                Debug.LogWarning( $"Tried to add a {this.GetType().Name} to a game object that already has a {nameof( IReferenceFrameTransform )}. This is not allowed. Remove the previous physics object first." );
                 Destroy( this );
                 return;
             }

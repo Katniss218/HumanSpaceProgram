@@ -6,6 +6,7 @@ using HSP.ReferenceFrames;
 using HSP.Time;
 using HSP.Vanilla;
 using HSP.Vanilla.Scenes.AlwaysLoadedScene;
+using HSP.Vanilla.Scenes.GameplayScene;
 using HSP_Tests_PlayMode.NUnit;
 using NUnit.Framework;
 using UnityEngine;
@@ -30,8 +31,8 @@ namespace HSP_Tests_PlayMode
             // Arrange
             GameObject manager = new GameObject();
             manager.AddComponent<TimeManager>();
-            manager.AddComponent<SceneReferenceFrameManager>();
-            SceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredReferenceFrame( TimeManager.UT, Vector3Dbl.zero ) );
+            manager.AddComponent<GameplaySceneReferenceFrameManager>();
+            GameplaySceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredReferenceFrame( TimeManager.UT, Vector3Dbl.zero ) );
 
             //HybridReferenceFrameTransform.AddPlayerLoopSystem();
             //KinematicReferenceFrameTransform.AddPlayerLoopSystem();
@@ -44,14 +45,14 @@ namespace HSP_Tests_PlayMode
             sut.Position = Vector3.zero;
 
 
-            SceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredReferenceFrame( TimeManager.UT, new Vector3Dbl( 3, 4, 5 ) ) );
+            GameplaySceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredReferenceFrame( TimeManager.UT, new Vector3Dbl( 3, 4, 5 ) ) );
 
             yield return new WaitForFixedUpdate();
 
             Assert.That( sut.Position, Is.EqualTo( new Vector3( -3, -4, -5 ) ) );
             Assert.That( sut.AbsolutePosition, Is.EqualTo( Vector3Dbl.zero ) );
 
-            SceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredReferenceFrame( TimeManager.UT, new Vector3Dbl( 1, 1, 1 ) ) );
+            GameplaySceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredReferenceFrame( TimeManager.UT, new Vector3Dbl( 1, 1, 1 ) ) );
 
             yield return new WaitForFixedUpdate();
 
@@ -84,7 +85,7 @@ namespace HSP_Tests_PlayMode
             // Arrange
             GameObject manager = new GameObject();
             manager.AddComponent<TimeManager>();
-            manager.AddComponent<SceneReferenceFrameManager>();
+            manager.AddComponent<GameplaySceneReferenceFrameManager>();
             AssertMonoBehaviour assertHandler = manager.AddComponent<AssertMonoBehaviour>();
 
             //HybridReferenceFrameTransform.AddPlayerLoopSystem();
@@ -95,7 +96,7 @@ namespace HSP_Tests_PlayMode
             TimeManager.SetTimeScale( 5 );
 
             double ut = TimeManager.UT;
-            SceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT, Vector3Dbl.zero, Vector3Dbl.zero ) );
+            GameplaySceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT, Vector3Dbl.zero, Vector3Dbl.zero ) );
             GameObject reference = new GameObject();
             assertHandler.sut = reference.AddComponent<T>();
 
@@ -106,8 +107,8 @@ namespace HSP_Tests_PlayMode
             {
                 yield return new WaitForFixedUpdate();
 
-                var pos = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( Vector3Dbl.zero );
-                SceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT, pos, Vector3Dbl.zero ) );
+                var pos = GameplaySceneReferenceFrameManager.ReferenceFrame.TransformPosition( Vector3Dbl.zero );
+                GameplaySceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT, pos, Vector3Dbl.zero ) );
             }
 
             for( int i = 0; i < 1000; i++ )
@@ -148,7 +149,7 @@ namespace HSP_Tests_PlayMode
             // Arrange
             GameObject manager = new GameObject();
             manager.AddComponent<TimeManager>();
-            manager.AddComponent<SceneReferenceFrameManager>();
+            manager.AddComponent<GameplaySceneReferenceFrameManager>();
             AssertMonoBehaviour assertHandler = manager.AddComponent<AssertMonoBehaviour>();
 
             //HybridReferenceFrameTransform.AddPlayerLoopSystem();
@@ -159,7 +160,7 @@ namespace HSP_Tests_PlayMode
             TimeManager.SetTimeScale( 5 );
 
             double ut = TimeManager.UT;
-            SceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT, Vector3Dbl.zero, new Vector3Dbl( 0, 10, 0 ) ) );
+            GameplaySceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT, Vector3Dbl.zero, new Vector3Dbl( 0, 10, 0 ) ) );
             GameObject reference = new GameObject();
             assertHandler.sut = reference.AddComponent<T>();
 
@@ -170,9 +171,9 @@ namespace HSP_Tests_PlayMode
             {
                 yield return new WaitForFixedUpdate();
 
-                var pos = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( Vector3Dbl.zero );
+                var pos = GameplaySceneReferenceFrameManager.ReferenceFrame.TransformPosition( Vector3Dbl.zero );
                 Debug.Log( "POS: " + pos );
-                SceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT, pos, new Vector3Dbl( 0, 10, 0 ) ) );
+                GameplaySceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT, pos, new Vector3Dbl( 0, 10, 0 ) ) );
             }
 
             for( int i = 0; i < 1000; i++ )
@@ -221,7 +222,7 @@ namespace HSP_Tests_PlayMode
             // Arrange
             GameObject manager = new GameObject();
             manager.AddComponent<TimeManager>();
-            manager.AddComponent<SceneReferenceFrameManager>();
+            manager.AddComponent<GameplaySceneReferenceFrameManager>();
             AssertMonoBehaviour assertHandler = manager.AddComponent<AssertMonoBehaviour>();
 
             //HybridReferenceFrameTransform.AddPlayerLoopSystem();
@@ -237,14 +238,14 @@ namespace HSP_Tests_PlayMode
 
             assertHandler.sut.AbsolutePosition = Vector3.zero;
             assertHandler.sut.AbsoluteVelocity = Vector3.zero;
-            SceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT, Vector3Dbl.zero, new Vector3Dbl( 10, 0, 0 ) ) );
+            GameplaySceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT, Vector3Dbl.zero, new Vector3Dbl( 10, 0, 0 ) ) );
 
             for( int i = 0; i < 10; i++ )
             {
                 yield return new WaitForFixedUpdate();
 
-                var pos = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( Vector3Dbl.zero );
-                SceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT, pos, new Vector3Dbl( 10, 0, 0 ) ) );
+                var pos = GameplaySceneReferenceFrameManager.ReferenceFrame.TransformPosition( Vector3Dbl.zero );
+                GameplaySceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT, pos, new Vector3Dbl( 10, 0, 0 ) ) );
             }
 
             for( int i = 0; i < 1000; i++ )

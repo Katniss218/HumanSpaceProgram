@@ -181,7 +181,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Tools
                     return;
                 }
 
-                FConstructionSite.CreateOrAppend( _heldPart, _hitObject );
+                FConstructionSite.CreateOrAppend( GameplaySceneReferenceFrameManager.Instance, _heldPart, _hitObject );
             }
             else
             {
@@ -195,7 +195,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Tools
                 Transform newRoot = VesselHierarchyUtils.ReRoot( _currentSnap.Value.snappedNode.transform.parent );
                 _heldPart = newRoot;
                 // Node-attach (object is already positioned).
-                FConstructionSite.CreateOrAppend( _heldPart, parent );
+                FConstructionSite.CreateOrAppend( GameplaySceneReferenceFrameManager.Instance, _heldPart, parent );
             }
             _heldPart = null;
             _currentSnap = null;

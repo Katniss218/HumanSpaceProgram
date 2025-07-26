@@ -3,8 +3,10 @@ using HSP.ReferenceFrames;
 using HSP.Time;
 using HSP.Trajectories;
 using HSP.Vanilla.Scenes.GameplayScene.Cameras;
+using HSP.Vanilla.Scenes.MapScene;
 using HSP.Vessels;
 using UnityEngine;
+using static HSP.ReferenceFrames.SceneReferenceFrameManager;
 
 namespace HSP.Vanilla.Scenes.GameplayScene
 {
@@ -66,10 +68,29 @@ namespace HSP.Vanilla.Scenes.GameplayScene
             GameplaySceneM.Instance.gameObject.AddComponent<GameplaySceneToolManager>();
         }
 
+        private static void ReferenceFrameSwitch_Responders( ReferenceFrameSwitchData data )
+        {
+            // TODO - ideally, the responders should register themselves somewhere, so that they don't have to be rediscovered on every switch.
+            for( int i = 0; i < UnityEngine.SceneManagement.SceneManager.sceneCount; i++ )
+            {
+                var scene = UnityEngine.SceneManagement.SceneManager.GetSceneAt( i );
+                foreach( var obj in scene.GetRootGameObjects() )
+                {
+                    if( obj.TryGetComponent<IReferenceFrameSwitchResponder>( out var referenceFrameSwitch ) )
+                    {
+                        referenceFrameSwitch.OnSceneReferenceFrameSwitch( data );
+                    }
+                }
+            }
+        }
+
         [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_LOAD.ID, ADD_SCENE_REFERENCE_FRAME_MANAGER )]
         private static void AddSceneReferenceFrameManager()
         {
-            GameplaySceneM.Instance.gameObject.AddComponent<SceneReferenceFrameManager>();
+            GameplaySceneReferenceFrameManager.Instance = GameplaySceneM.Instance.gameObject.AddComponent<GameplaySceneReferenceFrameManager>();
+            GameplaySceneReferenceFrameManager.Instance.MaxRelativePosition = 1024.0f;
+            GameplaySceneReferenceFrameManager.Instance.MaxRelativeVelocity = 64.0f;
+            GameplaySceneReferenceFrameManager.Instance.OnAfterReferenceFrameSwitch += ReferenceFrameSwitch_Responders;
         }
 
         [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_ACTIVATE.ID, ADD_ESCAPE_INPUT_CONTROLLER )]

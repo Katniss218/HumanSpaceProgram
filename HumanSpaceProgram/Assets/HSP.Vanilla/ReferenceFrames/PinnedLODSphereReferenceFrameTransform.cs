@@ -7,7 +7,7 @@ namespace HSP.Vanilla.ReferenceFrames
     /// <summary>
     /// A pinned transform that repositions itself and its children whenever it goes too far from scene origin.
     /// </summary>
-    public class PinnedLODSphereReferenceFrameTransform : PinnedReferenceFrameTransform
+    public class PinnedLODSphereReferenceFrameTransform : PinnedCelestialBodyReferenceFrameTransform
     {
         public float MaxPosition { get; set; } = 2000;
 
@@ -33,7 +33,7 @@ namespace HSP.Vanilla.ReferenceFrames
         public static void AddPinnedLODSphereReferenceFrameTransform( LODQuadSphere sphere )
         {
             var p = sphere.QuadParent.gameObject.AddComponent<PinnedLODSphereReferenceFrameTransform>();
-            p.SceneReferenceFrameProvider = new GameplaySceneReferenceFrameProvider();
+            p.SceneReferenceFrameProvider = sphere.CelestialBody.ReferenceFrameTransform.SceneReferenceFrameProvider;
             Vector3Dbl localPos = Vector3Dbl.zero;
             p.SetReference( sphere.CelestialBody, localPos, Quaternion.identity );
         }

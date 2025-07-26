@@ -157,7 +157,6 @@ namespace HSP.CelestialBodies.Surfaces
 
         void Awake()
         {
-            // Possibly move this to a child, so it can be disabled without disabling entire CB.
             CelestialBody = this.GetComponent<ICelestialBody>();
         }
 

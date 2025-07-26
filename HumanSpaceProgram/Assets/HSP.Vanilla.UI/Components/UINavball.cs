@@ -47,7 +47,7 @@ namespace HSP.Vanilla.UI.Components
         {
             if( ActiveVesselManager.ActiveObject != null )
             {
-                Vessel activeVessel = ActiveVesselManager.ActiveObject.GetVessel();
+                Vessel activeVessel = ActiveVesselManager.ActiveVessel;
 
                 if( activeVessel.ReferenceFrameTransform == null )
                     return;

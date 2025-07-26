@@ -112,8 +112,8 @@ namespace HSP._DevUtils
                     vessel.ReferenceFrameTransform.AbsolutePosition = body.ReferenceFrameTransform.AbsolutePosition + new Vector3Dbl( body.Radius + 200_000, 0, 0 );
                     vessel.ReferenceFrameTransform.AbsoluteVelocity = body.ReferenceFrameTransform.AbsoluteVelocity + new Vector3Dbl( 0, 8500, 0 );
 
-                    SceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT,
-                        SceneReferenceFrameManager.TargetObject.AbsolutePosition, SceneReferenceFrameManager.TargetObject.AbsoluteVelocity ) );
+                    GameplaySceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredInertialReferenceFrame( TimeManager.UT,
+                        GameplaySceneReferenceFrameManager.TargetObject.AbsolutePosition, GameplaySceneReferenceFrameManager.TargetObject.AbsoluteVelocity ) );
                 }
                 wasFired = true;
             }
@@ -147,8 +147,8 @@ namespace HSP._DevUtils
                 GameObject loadedObj = SerializationUnit.Deserialize<GameObject>( data );
 
                 FLaunchSiteMarker launchSiteSpawner = VesselManager.LoadedVessels.First().gameObject.GetComponentInChildren<FLaunchSiteMarker>();
-                Vector3Dbl spawnerPosAirf = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( launchSiteSpawner.transform.position );
-                QuaternionDbl spawnerRotAirf = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( launchSiteSpawner.transform.rotation );
+                Vector3Dbl spawnerPosAirf = GameplaySceneReferenceFrameManager.ReferenceFrame.TransformPosition( launchSiteSpawner.transform.position );
+                QuaternionDbl spawnerRotAirf = GameplaySceneReferenceFrameManager.ReferenceFrame.TransformRotation( launchSiteSpawner.transform.rotation );
 
                 Vessel v2 = VesselFactory.CreatePartless( GameplaySceneM.instance, spawnerPosAirf, spawnerRotAirf, Vector3Dbl.zero, Vector3Dbl.zero );
 
@@ -157,7 +157,7 @@ namespace HSP._DevUtils
                 v2.RootPart.localRotation = Quaternion.identity;
 
                 Vector3 bottomBoundPos = v2.GetBottomPosition();
-                Vector3Dbl closestBoundAirf = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( bottomBoundPos );
+                Vector3Dbl closestBoundAirf = GameplaySceneReferenceFrameManager.ReferenceFrame.TransformPosition( bottomBoundPos );
                 Vector3Dbl closestBoundToVesselAirf = v2.ReferenceFrameTransform.AbsolutePosition - closestBoundAirf;
                 Vector3Dbl airfPos = spawnerPosAirf + closestBoundToVesselAirf;
                 v2.ReferenceFrameTransform.AbsolutePosition = airfPos;

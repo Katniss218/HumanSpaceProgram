@@ -1,4 +1,4 @@
-﻿using HSP.ReferenceFrames;
+﻿using HSP.Vanilla.Scenes.GameplayScene;
 using UnityEngine;
 
 namespace HSP._DevUtils
@@ -7,8 +7,8 @@ namespace HSP._DevUtils
     {
         private void Update()
         {
-            if( SceneReferenceFrameManager.ReferenceFrame != null )
-                this.transform.rotation = (Quaternion)SceneReferenceFrameManager.ReferenceFrame.InverseTransformRotation( QuaternionDbl.identity );
+            if( GameplaySceneReferenceFrameManager.ReferenceFrame != null )
+                this.transform.rotation = (Quaternion)GameplaySceneReferenceFrameManager.ReferenceFrame.InverseTransformRotation( QuaternionDbl.identity );
         }
     }
 }

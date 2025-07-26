@@ -1,4 +1,5 @@
 ﻿using HSP.ReferenceFrames;
+using HSP.Vanilla.Scenes.GameplayScene;
 using HSP.Vanilla.Scenes.MapScene;
 using UnityPlus.Serialization;
 
@@ -8,7 +9,7 @@ namespace HSP.Vanilla.ReferenceFrames
     {
         public IReferenceFrame GetSceneReferenceFrame()
         {
-            return SceneReferenceFrameManager.ReferenceFrame;
+            return GameplaySceneReferenceFrameManager.ReferenceFrame;
         }
 
         [MapsInheritingFrom( typeof( GameplaySceneReferenceFrameProvider ) )]
@@ -17,6 +18,7 @@ namespace HSP.Vanilla.ReferenceFrames
             return new MemberwiseSerializationMapping<GameplaySceneReferenceFrameProvider>();
         }
     }
+
     public sealed class MapSceneReferenceFrameProvider : ISceneReferenceFrameProvider
     {
         public IReferenceFrame GetSceneReferenceFrame()

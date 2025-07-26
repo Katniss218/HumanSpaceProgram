@@ -1,6 +1,8 @@
 ﻿using HSP.CelestialBodies;
 using HSP.ReferenceFrames;
+using HSP.Vanilla.Scenes.GameplayScene;
 using HSP.Vanilla.Scenes.GameplayScene.Cameras;
+using HSP.Vanilla.Scenes.MapScene;
 using HSP.Vessels;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,8 +41,8 @@ namespace HSP.Vanilla.CelestialBodies
 
             return new Vector3Dbl[]
             {
-                SceneReferenceFrameManager.ReferenceFrame.TransformPosition( SceneCamera.Camera.transform.position ),
-                SceneReferenceFrameManager.ReferenceFrame.TransformPosition( SceneCamera.Camera.transform.position + SceneCamera.Camera.transform.forward * 500 ),
+                GameplaySceneReferenceFrameManager.ReferenceFrame.TransformPosition( SceneCamera.Camera.transform.position ),
+                GameplaySceneReferenceFrameManager.ReferenceFrame.TransformPosition( SceneCamera.Camera.transform.position + SceneCamera.Camera.transform.forward * 500 ),
             };
         }
 
@@ -49,6 +51,31 @@ namespace HSP.Vanilla.CelestialBodies
         public static SerializationMapping ActiveCameraPOIGetterMapping()
         {
             return new MemberwiseSerializationMapping<ActiveCameraPOIGetter>();
+        }
+    }
+
+    /// <summary>
+    /// Returns POIs for the active camera.
+    /// </summary>
+    public sealed class MapActiveCameraPOIGetter : IPOIGetter
+    {
+        public IEnumerable<Vector3Dbl> GetPOIs()
+        {
+            if ( SceneCamera.Camera == null )
+                return Enumerable.Empty<Vector3Dbl>();
+
+            return new Vector3Dbl[]
+            {
+                MapSceneReferenceFrameManager.ReferenceFrame.TransformPosition( SceneCamera.Camera.transform.position ),
+                MapSceneReferenceFrameManager.ReferenceFrame.TransformPosition( SceneCamera.Camera.transform.position + SceneCamera.Camera.transform.forward * 500 ),
+            };
+        }
+
+
+        [MapsInheritingFrom( typeof( MapActiveCameraPOIGetter ) )]
+        public static SerializationMapping MapActiveCameraPOIGetterMapping()
+        {
+            return new MemberwiseSerializationMapping<MapActiveCameraPOIGetter>();
         }
     }
 }

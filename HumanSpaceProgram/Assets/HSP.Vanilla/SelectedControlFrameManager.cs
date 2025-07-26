@@ -1,5 +1,5 @@
-﻿using HSP.ReferenceFrames;
-using HSP.Vanilla.Components;
+﻿using HSP.Vanilla.Components;
+using HSP.Vanilla.Scenes.GameplayScene;
 using UnityEngine;
 
 namespace HSP.Vanilla
@@ -34,7 +34,7 @@ namespace HSP.Vanilla
         /// <returns>The rotation of the specified control frame, or the vessel.</returns>
         public static QuaternionDbl GetAbsoluteRotation( Transform fallback )
         {
-            return SceneReferenceFrameManager.ReferenceFrame.TransformRotation( instance._selectedControlFrame != null 
+            return GameplaySceneReferenceFrameManager.ReferenceFrame.TransformRotation( instance._selectedControlFrame != null 
                 ? instance._selectedControlFrame.GetRotation() 
                 : fallback.rotation );
         }

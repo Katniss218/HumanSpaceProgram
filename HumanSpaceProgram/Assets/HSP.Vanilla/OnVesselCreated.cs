@@ -61,7 +61,7 @@ namespace HSP.Vanilla
 
                 if( FAnchor.IsAnchored( e.v.RootPart ) )
                 {
-                    PinnedReferenceFrameTransform ppo = e.oldRootPart.GetVessel().GetComponent<PinnedReferenceFrameTransform>();
+                    PinnedCelestialBodyReferenceFrameTransform ppo = e.oldRootPart.GetVessel().GetComponent<PinnedCelestialBodyReferenceFrameTransform>();
                     e.v.Pin( ppo.ReferenceBody, ppo.ReferencePosition, ppo.ReferenceRotation );
                 }
             }

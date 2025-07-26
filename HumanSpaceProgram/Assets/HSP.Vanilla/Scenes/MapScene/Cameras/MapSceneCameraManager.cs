@@ -102,16 +102,15 @@ namespace HSP.Vanilla.Scenes.MapScene.Cameras
         [HSPEventListener( HSPEvent_MAP_SCENE_LOAD.ID, CREATE_CAMERA )]
         private static void OnGameplaySceneLoad()
         {
-            GameObject cameraPivotGameObject = new GameObject( "Camera Pivot" );
-            _cameraPivot = cameraPivotGameObject;
-
-            SceneCamera sceneCamera = cameraPivotGameObject.AddComponent<SceneCamera>();
-
-            MapSceneCameraManager cameraManager = cameraPivotGameObject.AddComponent<MapSceneCameraManager>();
-            MapSceneOrbitingCameraController cameraController = cameraPivotGameObject.AddComponent<MapSceneOrbitingCameraController>();
-
             GameObject cameraParentGameObject = new GameObject( "Camera Parent" );
-            cameraParentGameObject.transform.SetParent( cameraPivotGameObject.transform );
+            _cameraPivot = cameraParentGameObject;
+
+            SceneCamera sceneCamera = cameraParentGameObject.AddComponent<SceneCamera>();
+
+            MapSceneCameraManager cameraManager = cameraParentGameObject.AddComponent<MapSceneCameraManager>();
+            MapSceneOrbitingCameraController cameraController = cameraParentGameObject.AddComponent<MapSceneOrbitingCameraController>();
+
+            cameraParentGameObject.transform.SetParent( cameraParentGameObject.transform );
 
             AudioListener audioListener = cameraParentGameObject.AddComponent<AudioListener>();
 

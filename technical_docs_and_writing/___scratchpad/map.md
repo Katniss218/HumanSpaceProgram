@@ -39,35 +39,19 @@ would be a partially easier if I could decouple graphics and physics, but this a
 **Map scene is built on top of everything else, that is, normal stuff doesn't know about the map scene**
 
 
-in the map scene
-- draw vessel markers (and orbits)
-- draw celestialbody markers (and orbits)
-- different map-only UI, but using standard components that also exist in the gameplay scene.
+camera in the map scene can't be parented to anything.
 
-
-**problems**:
-- 2 different cameras, exiting map should restore the *previous* camera (not hardcoded)
-
-- 2 different canvases, 1 per scene?
-
-
-
-**proposed solutions**:
-- skip 'disabled' objects (would work both with canvases and cameras)
-
-- somehow specify that we want to search only a specific scene (canvases)
-- maybe add an event to fire when the active scene switches from the gameplay scene to something else, like 'startup' but with enabled/disabled pair instead?
-
-
-when map is opened
-- disable the gameplay scene cameras
-
+64-bit 'center' and use a pinned reftransform without a 'parent' to pin to (pinned reftransform needs to be split away from celestialbodies)
+- pinned without 'parent' will use scene as the frame.
+- so the camera will change where it's pinned in reference to scene origin?
+    will work just rotate it so it points to where the cameraParent would be.
+needs some mafs
 
 
 # Rendering celestial bodies:
 
 solution 1:
-- render using atual CB modules
+- render using actual CB modules
 adding an interface for IVessel / ICelestialBody is beneficial anyway
 
 solution 2:
@@ -75,24 +59,6 @@ solution 2:
 
 
 
-solution 1:
-- interfaces
-- modify components to support interfaces
-- factory or something to create map versions of celestial bodies (needs to potentially map components to other components)
-- allow multiple scene reference frame transforms (a provider interface retrieves it)
-- trajectories
-- orbit line scene depth renderer
-- map scene camera-tied scene reference frame
-
-technically supports solution 2 as well, via the factory stuff
-
-the factory thing would basically be an object-to-object mapper with custom transformation support.
-useful in:
-- part component to UI mapping
-- setting page to UI mapping
-- celestialbody to mapview celestialbody mapping
-or anything else where you take one object and spit out a different object
-feels very similar to what the serialization is already doing.
 
 
 

@@ -1,6 +1,5 @@
 using HSP.CelestialBodies;
 using HSP.Input;
-using HSP.ReferenceFrames;
 using UnityEngine;
 using UnityPlus.Input;
 
@@ -13,8 +12,8 @@ namespace HSP.Vanilla.Scenes.MapScene.Cameras
         /// </summary>
         public Transform ReferenceObject { get; private set; }
 
-        [field: SerializeField]
-        public Transform CameraParent { get; set; }
+        
+        public Vector3Dbl AbsolutePosition { get; private set; }
 
         [SerializeField]
         float _zoomDist = 5;
@@ -60,9 +59,9 @@ namespace HSP.Vanilla.Scenes.MapScene.Cameras
                 ? this.transform.position
                 : this.ReferenceObject.position;
 
-            Vector3Dbl airfGravVec = GravityUtils.GetNBodyGravityAcceleration( SceneReferenceFrameManager.ReferenceFrame.TransformPosition( referencePosition ) );
+            Vector3Dbl airfGravVec = GravityUtils.GetNBodyGravityAcceleration( MapSceneReferenceFrameManager.ReferenceFrame.TransformPosition( referencePosition ) );
 
-            Vector3 upDir = -SceneReferenceFrameManager.ReferenceFrame.InverseTransformDirection( airfGravVec.NormalizeToVector3() );
+            Vector3 upDir = -MapSceneReferenceFrameManager.ReferenceFrame.InverseTransformDirection( airfGravVec.NormalizeToVector3() );
 
             return upDir;
         }

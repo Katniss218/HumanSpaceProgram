@@ -1,6 +1,5 @@
 using HSP.CelestialBodies;
 using HSP.Input;
-using HSP.ReferenceFrames;
 using UnityEngine;
 using UnityPlus.Input;
 
@@ -60,9 +59,9 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
                 ? this.transform.position
                 : this.ReferenceObject.position;
 
-            Vector3Dbl airfGravVec = GravityUtils.GetNBodyGravityAcceleration( SceneReferenceFrameManager.ReferenceFrame.TransformPosition( referencePosition ) );
+            Vector3Dbl airfGravVec = GravityUtils.GetNBodyGravityAcceleration( GameplaySceneReferenceFrameManager.ReferenceFrame.TransformPosition( referencePosition ) );
 
-            Vector3 upDir = -SceneReferenceFrameManager.ReferenceFrame.InverseTransformDirection( airfGravVec.NormalizeToVector3() );
+            Vector3 upDir = -GameplaySceneReferenceFrameManager.ReferenceFrame.InverseTransformDirection( airfGravVec.NormalizeToVector3() );
 
             return upDir;
         }

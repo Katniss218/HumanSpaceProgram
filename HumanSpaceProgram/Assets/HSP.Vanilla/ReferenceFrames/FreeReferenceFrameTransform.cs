@@ -278,7 +278,7 @@ namespace HSP.Vanilla
         {
             if( this.HasComponentOtherThan<IReferenceFrameTransform>( this ) )
             {
-                Debug.LogWarning( $"Tried to add a {nameof( FreeReferenceFrameTransform )} to a game object that already has a {nameof( IReferenceFrameTransform )}. This is not allowed. Remove the previous physics object first." );
+                Debug.LogWarning( $"Tried to add a {this.GetType().Name} to a game object that already has a {nameof( IReferenceFrameTransform )}. This is not allowed. Remove the previous physics object first." );
                 Destroy( this );
                 return;
             }

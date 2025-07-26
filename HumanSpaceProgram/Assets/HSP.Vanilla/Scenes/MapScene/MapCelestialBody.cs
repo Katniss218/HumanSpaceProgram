@@ -6,6 +6,7 @@ namespace HSP.Vanilla.Scenes.MapScene
 {
     public class MapCelestialBody : MonoBehaviour, ICelestialBody
     {
+#warning TODO - maybe associate the scene reference frames with actual HSP scenes too?
         public CelestialBody Source { get; internal set; }
 
         public string ID => ((ICelestialBody)Source).ID;
@@ -14,8 +15,8 @@ namespace HSP.Vanilla.Scenes.MapScene
 
         public double Mass => ((ICelestialBody)Source).Mass;
 
-        public IPhysicsTransform PhysicsTransform { get; internal set; }
-
         public IReferenceFrameTransform ReferenceFrameTransform { get; internal set; }
+
+        public IPhysicsTransform PhysicsTransform { get; internal set; }
     }
 }

@@ -1,24 +1,24 @@
 ﻿using HSP.ReferenceFrames;
 using System;
 using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace HSP.Vanilla.Scenes.MapScene
 {
     /// <summary>
     /// A reference frame transform that follows some other reference frame transform, potentially also using a different scene reference frame.
     /// </summary>
-    public class FollowingDifferentReferenceFrameTransform : MonoBehaviour, IReferenceFrameTransform, IPhysicsTransform
+    public class FollowingDifferentReferenceFrameTransform : MonoBehaviour, IReferenceFrameTransform
     {
         public ISceneReferenceFrameProvider SceneReferenceFrameProvider { get; set; }
 
-        public IReferenceFrameTransform UnderlyingReferenceFrameTransform { get; set; }
-        public IPhysicsTransform UnderlyingPhysicsTransform { get; set; }
+        public IReferenceFrameTransform TargetTransform { get; set; }
 
         public Vector3 Position
         {
             get
             {
-                return (Vector3)SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformPosition( UnderlyingReferenceFrameTransform.AbsolutePosition );
+                return (Vector3)SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformPosition( TargetTransform.AbsolutePosition );
             }
             set
             {
@@ -29,7 +29,7 @@ namespace HSP.Vanilla.Scenes.MapScene
         {
             get
             {
-                return UnderlyingReferenceFrameTransform.AbsolutePosition;
+                return TargetTransform.AbsolutePosition;
             }
             set
             {
@@ -41,7 +41,7 @@ namespace HSP.Vanilla.Scenes.MapScene
         {
             get
             {
-                return UnderlyingReferenceFrameTransform.AbsoluteRotation;
+                return TargetTransform.AbsoluteRotation;
             }
             set
             {
@@ -53,7 +53,7 @@ namespace HSP.Vanilla.Scenes.MapScene
         {
             get
             {
-                return UnderlyingReferenceFrameTransform.AbsoluteVelocity;
+                return TargetTransform.AbsoluteVelocity;
             }
             set
             {
@@ -65,7 +65,7 @@ namespace HSP.Vanilla.Scenes.MapScene
         {
             get
             {
-                return UnderlyingReferenceFrameTransform.AbsoluteAngularVelocity;
+                return TargetTransform.AbsoluteAngularVelocity;
             }
             set
             {
@@ -75,16 +75,11 @@ namespace HSP.Vanilla.Scenes.MapScene
 
         public Vector3 Acceleration => throw new NotImplementedException();
 
-        public Vector3Dbl AbsoluteAcceleration => UnderlyingReferenceFrameTransform.AbsoluteAcceleration;
+        public Vector3Dbl AbsoluteAcceleration => TargetTransform.AbsoluteAcceleration;
 
         public Vector3 AngularAcceleration => throw new NotImplementedException();
 
-        public Vector3Dbl AbsoluteAngularAcceleration => UnderlyingReferenceFrameTransform.AbsoluteAngularAcceleration;
-
-        public float Mass { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public Vector3 LocalCenterOfMass { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public Vector3 MomentsOfInertia { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public Quaternion MomentsOfInertiaRotation { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public Vector3Dbl AbsoluteAngularAcceleration => TargetTransform.AbsoluteAngularAcceleration;
 
         public bool IsColliding => throw new NotImplementedException();
 
@@ -94,20 +89,6 @@ namespace HSP.Vanilla.Scenes.MapScene
         public event Action OnAbsoluteAngularVelocityChanged;
         public event Action OnAnyValueChanged;
 
-        public void AddForce( Vector3 force )
-        {
-            throw new NotImplementedException();
-        }
-
-        public void AddForceAtPosition( Vector3 force, Vector3 position )
-        {
-            throw new NotImplementedException();
-        }
-
-        public void AddTorque( Vector3 torque )
-        {
-            throw new NotImplementedException();
-        }
 
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
@@ -116,9 +97,18 @@ namespace HSP.Vanilla.Scenes.MapScene
 
         void FixedUpdate()
         {
-            var position = (Vector3)SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformPosition( UnderlyingReferenceFrameTransform.AbsolutePosition );
-            var rotation = (Quaternion)SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformRotation( UnderlyingReferenceFrameTransform.AbsoluteRotation );
+            var position = (Vector3)SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformPosition( TargetTransform.AbsolutePosition );
+            var rotation = (Quaternion)SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformRotation( TargetTransform.AbsoluteRotation );
             this.transform.SetPositionAndRotation( position, rotation );
+        }
+
+
+        [MapsInheritingFrom( typeof( FollowingDifferentReferenceFrameTransform ) )]
+        public static SerializationMapping FollowingDifferentReferenceFrameTransformMapping()
+        {
+            return new MemberwiseSerializationMapping<FollowingDifferentReferenceFrameTransform>()
+                .WithMember( "scene_reference_frame_provider", o => o.SceneReferenceFrameProvider )
+                .WithMember( "target_transform", o => o.TargetTransform );
         }
     }
 }

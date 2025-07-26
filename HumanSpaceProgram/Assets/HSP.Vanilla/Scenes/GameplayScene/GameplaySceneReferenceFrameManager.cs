@@ -1,10 +1,10 @@
 ﻿using HSP.ReferenceFrames;
 
-namespace HSP.Vanilla.Scenes.MapScene
+namespace HSP.Vanilla.Scenes.GameplayScene
 {
-    public class MapSceneReferenceFrameManager : SceneReferenceFrameManager
+    public class GameplaySceneReferenceFrameManager : SceneReferenceFrameManager
     {
-        public static MapSceneReferenceFrameManager Instance;
+        public static GameplaySceneReferenceFrameManager Instance;
 
         public static IReferenceFrame ReferenceFrame
         {
