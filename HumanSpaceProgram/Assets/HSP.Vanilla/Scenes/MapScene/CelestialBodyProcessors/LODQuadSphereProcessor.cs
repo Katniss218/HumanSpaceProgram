@@ -23,6 +23,7 @@ namespace HSP.Vanilla.Scenes.MapScene.CelestialBodyProcessors
                     lqs.MaxDepth = quadSphere.MaxDepth;
                     lqs.Materials = quadSphere.Materials;
                     lqs.PoIGetter = new MapActiveCameraPOIGetter();
+                    lqs.Layer = Layer.MAP_ONLY;
                     lqs.SetJobs( quadSphere.Jobs );
                 }
             }

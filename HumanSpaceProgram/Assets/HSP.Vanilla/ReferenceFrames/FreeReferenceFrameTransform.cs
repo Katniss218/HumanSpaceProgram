@@ -13,7 +13,20 @@ namespace HSP.Vanilla
     [DisallowMultipleComponent]
     public class FreeReferenceFrameTransform : MonoBehaviour, IReferenceFrameTransform, IPhysicsTransform
     {
-        public ISceneReferenceFrameProvider SceneReferenceFrameProvider { get; set; }
+        private ISceneReferenceFrameProvider _sceneReferenceFrameProvider;
+        public ISceneReferenceFrameProvider SceneReferenceFrameProvider
+        {
+            get => _sceneReferenceFrameProvider;
+            set
+            {
+                if( _sceneReferenceFrameProvider == value )
+                    return;
+
+                _sceneReferenceFrameProvider?.UnsubscribeIfSubscribed( this );
+                _sceneReferenceFrameProvider = value;
+                _sceneReferenceFrameProvider?.SubscribeIfNotSubscribed( this );
+            }
+        }
 
         public Vector3 Position
         {
@@ -343,11 +356,13 @@ namespace HSP.Vanilla
 
         protected virtual void OnEnable()
         {
+            _sceneReferenceFrameProvider?.SubscribeIfNotSubscribed( this );
             _rb.isKinematic = false; // Can't do `enabled = false` (doesn't exist) for a rigidbody, so we set it to kinematic instead.
         }
 
         protected virtual void OnDisable()
         {
+            _sceneReferenceFrameProvider?.UnsubscribeIfSubscribed( this );
             _rb.isKinematic = true; // Can't do `enabled = false` (doesn't exist) for a rigidbody, so we set it to kinematic instead.
         }
 

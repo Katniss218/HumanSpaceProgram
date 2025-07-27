@@ -14,7 +14,20 @@ namespace HSP.Vanilla
     [DisallowMultipleComponent]
     public class HybridReferenceFrameTransform : MonoBehaviour, IReferenceFrameTransform, IPhysicsTransform
     {
-        public ISceneReferenceFrameProvider SceneReferenceFrameProvider { get; set; }
+        private ISceneReferenceFrameProvider _sceneReferenceFrameProvider;
+        public ISceneReferenceFrameProvider SceneReferenceFrameProvider
+        {
+            get => _sceneReferenceFrameProvider;
+            set
+            {
+                if( _sceneReferenceFrameProvider == value )
+                    return;
+
+                _sceneReferenceFrameProvider?.UnsubscribeIfSubscribed( this );
+                _sceneReferenceFrameProvider = value;
+                _sceneReferenceFrameProvider?.SubscribeIfNotSubscribed( this );
+            }
+        }
 
         private bool _allowSceneSimulation = false;
         /// <summary>
@@ -469,13 +482,15 @@ namespace HSP.Vanilla
             }
         }
 
-        void OnEnable()
+        protected virtual void OnEnable()
         {
+            _sceneReferenceFrameProvider?.SubscribeIfNotSubscribed( this );
             _activeHybridTransforms.Add( this );
         }
 
-        void OnDisable()
+        protected virtual void OnDisable()
         {
+            _sceneReferenceFrameProvider?.UnsubscribeIfSubscribed( this );
             _activeHybridTransforms.Remove( this );
         }
 

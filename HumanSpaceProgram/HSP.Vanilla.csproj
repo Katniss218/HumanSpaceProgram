@@ -93,7 +93,9 @@
     <Compile Include="Assets\HSP.Vanilla\Scenes\MainMenuScene\OnStartup.cs" />
     <Compile Include="Assets\HSP.Vanilla\Trajectories\KeplerianOrbit.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\MainMenuScene\MainMenuEscapeInputController.cs" />
+    <Compile Include="Assets\HSP.Vanilla\Scenes\MapScene\OnStartup.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\MapScene\MapSceneCelestialBodyManager.cs" />
+    <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\DummyReferenceFrameTransform.cs" />
     <Compile Include="Assets\HSP.Vanilla\OnCelestialBodyCreated.cs" />
     <Compile Include="Assets\HSP.Vanilla\CelestialBodies\LODQuadModifier_FinalizeMesh.cs" />
     <Compile Include="Assets\HSP.Vanilla\Settings\GameSettings\SettingsPage_Keybinds.cs" />
@@ -119,6 +121,7 @@
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\Cameras\GameplaySceneOrbitingCameraController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\Tools\ConstructTool.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FSequencer.SequenceAction.cs" />
+    <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\GameplaySceneReferenceFrameManager.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\Tools\VanillaToolRegisterer.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\MapScene\Cameras\MapSceneCameraManager.cs" />
     <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\PinnedReferenceFrameTransform.cs" />
@@ -127,6 +130,7 @@
     <Compile Include="Assets\HSP.Vanilla\Scenes\AlwaysLoadedScene\OnStartup.cs" />
     <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\KinematicReferenceFrameTransform.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\DesignSceneEscapeInputController.cs" />
+    <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\PinnedCelestialBodyReferenceFrameTransform.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\CelestialBodyManager.Serialization.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FPart.cs" />
     <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\FixedReferenceFrameTransform.cs" />
@@ -156,10 +160,6 @@
     <Compile Include="Assets\HSP.Vanilla\Components\FLaunchSiteMarker.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FReactionControlController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FControlFrame.cs" />
-    <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\GameplaySceneReferenceFrameManager.cs" />
-    <Compile Include="Assets\HSP.Vanilla\Scenes\MapScene\OnStartup.cs" />
-    <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\DummyReferenceFrameTransform.cs" />
-    <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\PinnedCelestialBodyReferenceFrameTransform.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla\___HSP.Vanilla.asmdef" />

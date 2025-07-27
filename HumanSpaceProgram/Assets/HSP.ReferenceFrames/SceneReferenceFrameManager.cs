@@ -47,6 +47,8 @@ namespace HSP.ReferenceFrames
             }
         }
 
+        private HashSet<IReferenceFrameSwitchResponder> _responders = new();
+
         /// <summary>
         /// Invoked immediately AFTER the scene's reference frame switches.
         /// </summary>
@@ -55,6 +57,22 @@ namespace HSP.ReferenceFrames
         ///     This event is invoked 'during' (immediately after) unity physics step.
         /// </remarks>
         public event Action<ReferenceFrameSwitchData> OnAfterReferenceFrameSwitch;
+
+        public void Subscribe( IReferenceFrameSwitchResponder responder )
+        {
+            if( responder == null )
+                throw new ArgumentNullException( nameof( responder ), $"[{this.GetType().Name}] Can't subscribe a null responder." );
+
+            _responders.Add( responder );
+        }
+
+        public void Unsubscribe( IReferenceFrameSwitchResponder responder )
+        {
+            if( responder == null )
+                throw new ArgumentNullException( nameof( responder ), $"[{this.GetType().Name}] Can't unsubscribe a null responder." );
+
+            _responders.Remove( responder );
+        }
 
         /// <summary>
         /// The current reference frame used by the scene.
@@ -77,7 +95,7 @@ namespace HSP.ReferenceFrames
         /// </summary>
         public bool IsSwitchRequested => _frameToSwitchTo != null;
 
-        private static IReferenceFrame _frameToSwitchTo = null;
+        private IReferenceFrame _frameToSwitchTo = null;
 
         /// <summary>
         /// Requests a reference frame switch at the next available time.
@@ -89,6 +107,9 @@ namespace HSP.ReferenceFrames
             if( referenceFrame.ReferenceUT != TimeManager.UT )
                 throw new ArgumentException( $"[{this.GetType().Name}] The reference frame must have its {nameof( SceneReferenceFrameManager.referenceFrame.ReferenceUT )} equal to the current UT ({nameof( Time.TimeManager )}.{nameof( TimeManager.UT )}).", nameof( referenceFrame ) );
 
+            Vector3 scenePosition = targetObject.Position;
+            Vector3 sceneVelocity = targetObject.Velocity;
+            Debug.Log( $"[{this.GetType().Name}] requesting switch " + scenePosition + " : " + sceneVelocity );
             _frameToSwitchTo = referenceFrame;
         }
 
@@ -109,6 +130,8 @@ namespace HSP.ReferenceFrames
                                                                             // Additionally, this will not fire if the method called in Update adds FixedDeltaTime to the current UT
                                                                             //   (assuming the timestep won't change before the frame ends).
 
+            // Both oldFrame and newFrame should now have UT that matches TimeManager.UT.
+
             IReferenceFrame newFrame = _frameToSwitchTo;
             IReferenceFrame oldFrame = referenceFrame;
             _frameToSwitchTo = null;
@@ -118,7 +141,10 @@ namespace HSP.ReferenceFrames
 
             try
             {
-                // Both oldFrame and newFrame should now have UT that matches TimeManager.UT.
+                foreach( var responder in _responders )
+                {
+                    responder.OnSceneReferenceFrameSwitch( new ReferenceFrameSwitchData() { OldFrame = oldFrame, NewFrame = newFrame } );
+                }
                 OnAfterReferenceFrameSwitch?.Invoke( new ReferenceFrameSwitchData() { OldFrame = oldFrame, NewFrame = newFrame } );
             }
             catch( Exception ex )

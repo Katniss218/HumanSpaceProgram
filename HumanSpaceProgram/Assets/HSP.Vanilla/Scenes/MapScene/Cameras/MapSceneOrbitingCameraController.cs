@@ -1,19 +1,21 @@
 using HSP.CelestialBodies;
 using HSP.Input;
+using HSP.ReferenceFrames;
+using HSP.Time;
 using UnityEngine;
 using UnityPlus.Input;
 
 namespace HSP.Vanilla.Scenes.MapScene.Cameras
 {
+    [RequireComponent( typeof( IReferenceFrameTransform ) )]
     public class MapSceneOrbitingCameraController : SingletonMonoBehaviour<MapSceneOrbitingCameraController>
     {
         /// <summary>
         /// The camera will focus on this object.
         /// </summary>
-        public Transform ReferenceObject { get; private set; }
+        public Transform ReferenceObject { get; set; }
 
-        
-        public Vector3Dbl AbsolutePosition { get; private set; }
+        IReferenceFrameTransform _referenceFrameTransform;
 
         [SerializeField]
         float _zoomDist = 5;
@@ -31,7 +33,7 @@ namespace HSP.Vanilla.Scenes.MapScene.Cameras
         const float ZOOM_MULTIPLIER = 0.15f;
 
         const float MIN_ZOOM_DISTANCE = 1f;
-        const float MAX_ZOOM_DISTANCE = 1e10f;
+        const float MAX_ZOOM_DISTANCE = 1e25f;
 
         bool _isRotating;
 
@@ -49,19 +51,15 @@ namespace HSP.Vanilla.Scenes.MapScene.Cameras
         {
             _zoomDist = Mathf.Clamp( _zoomDist, MIN_ZOOM_DISTANCE, MAX_ZOOM_DISTANCE );
 
-            // ---
-            this.CameraParent.localPosition = Vector3.back * _zoomDist;
+            Vector3 targetPos = (ReferenceObject == null)
+                ? (Vector3)_referenceFrameTransform.SceneReferenceFrameProvider.GetSceneReferenceFrame().AtUT( TimeManager.UT ).InverseTransformPosition( Vector3.zero )
+                : ReferenceObject.position;
+            this.transform.position = targetPos + (-transform.forward) * _zoomDist;
         }
 
         private Vector3 GetUpDir()
         {
-            Vector3 referencePosition = (this.ReferenceObject == null)
-                ? this.transform.position
-                : this.ReferenceObject.position;
-
-            Vector3Dbl airfGravVec = GravityUtils.GetNBodyGravityAcceleration( MapSceneReferenceFrameManager.ReferenceFrame.TransformPosition( referencePosition ) );
-
-            Vector3 upDir = -MapSceneReferenceFrameManager.ReferenceFrame.InverseTransformDirection( airfGravVec.NormalizeToVector3() );
+            Vector3 upDir = MapSceneReferenceFrameManager.ReferenceFrame.InverseTransformDirection( Vector3.up );
 
             return upDir;
         }
@@ -78,16 +76,13 @@ namespace HSP.Vanilla.Scenes.MapScene.Cameras
             this.transform.rotation = Quaternion.AngleAxis( mouseX * MOVE_MULTIPLIER, upDir ) * this.transform.rotation;
         }
 
+        void Awake()
+        {
+            _referenceFrameTransform = this.GetComponent<IReferenceFrameTransform>();
+        }
+
         void Start()
         {
-            if( ReferenceObject == null )
-            {
-                if( ActiveVesselManager.ActiveObject == null )
-                    return;
-
-                ReferenceObject = ActiveVesselManager.ActiveObject;
-            }
-
             SyncZoomDist();
         }
 
@@ -110,13 +105,24 @@ namespace HSP.Vanilla.Scenes.MapScene.Cameras
             }
         }
 
+        void FixedUpdate() // Setting in fixed update will provide a proper frame switch at the end of it, if the map camera is far away from (0,0,0)
+        {
+            Vector3 targetPos = (ReferenceObject == null)
+                ? (Vector3)_referenceFrameTransform.SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformPosition( Vector3.zero )
+                : ReferenceObject.position;
+            Debug.Log( "pos : " + targetPos );
+            this.transform.position = targetPos + (-transform.forward) * _zoomDist;
+            Debug.Log( "pos 2: " + this.transform.position );
+        }
+
         void LateUpdate()
         {
-            if( ReferenceObject != null ) // Raycasts using rays from the camera fail when the vessel is moving fast, but updating the camera earlier as well as later doesn't fix it.
-            {
-                if( ReferenceObject.transform.position.magnitude < 1_000_000 )
-                    this.transform.position = ReferenceObject.transform.position;
-            }
+            Vector3 targetPos = (ReferenceObject == null)
+                ? (Vector3)_referenceFrameTransform.SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformPosition( Vector3.zero )
+                : ReferenceObject.position;
+            Debug.Log( "posB : " + targetPos );
+            this.transform.position = targetPos + (-transform.forward) * _zoomDist;
+            Debug.Log( "posB 2: " + this.transform.position );
         }
 
         void OnEnable()

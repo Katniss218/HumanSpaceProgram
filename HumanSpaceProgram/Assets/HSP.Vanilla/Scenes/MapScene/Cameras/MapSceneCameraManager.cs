@@ -1,3 +1,4 @@
+using HSP.Vanilla.ReferenceFrames;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 
@@ -73,8 +74,8 @@ namespace HSP.Vanilla.Scenes.MapScene.Cameras
             _uiCamera.depth = 99;
 
             _farCamera.cullingMask =
-                  Layer.DEFAULT.ToMask()
-                | Layer.MAP_ONLY.ToMask()
+                 // Layer.DEFAULT.ToMask()
+                 Layer.MAP_ONLY.ToMask()
                 | Layer.Unity_TransparentFx.ToMask()
                 | Layer.Unity_IgnoreRaycast.ToMask()
                 | Layer.Unity_Water.ToMask();
@@ -99,11 +100,13 @@ namespace HSP.Vanilla.Scenes.MapScene.Cameras
 
         static GameObject _cameraPivot;
 
-        [HSPEventListener( HSPEvent_MAP_SCENE_LOAD.ID, CREATE_CAMERA )]
+        [HSPEventListener( HSPEvent_MAP_SCENE_LOAD.ID, CREATE_CAMERA, After = new[] { OnStartup.ADD_SCENE_REFERENCE_FRAME_MANAGER, MapSceneCelestialBodyManager.CREATE_MAP_CELESTIAL_BODIES } )]
         private static void OnGameplaySceneLoad()
         {
             GameObject cameraParentGameObject = new GameObject( "Camera Parent" );
             _cameraPivot = cameraParentGameObject;
+            DummyReferenceFrameTransform refTransform = cameraParentGameObject.AddComponent<DummyReferenceFrameTransform>();
+            refTransform.SceneReferenceFrameProvider = new MapSceneReferenceFrameProvider();
 
             SceneCamera sceneCamera = cameraParentGameObject.AddComponent<SceneCamera>();
 
@@ -132,11 +135,12 @@ namespace HSP.Vanilla.Scenes.MapScene.Cameras
             cameraManager._effectCamera = effectCamera;
             cameraManager._uiCamera = uiCamera;
 
-            cameraController.CameraParent = cameraParentGameObject.transform;
             cameraController.ZoomDist = 12_000_000f;
+            cameraController.ReferenceObject = MapSceneCelestialBodyManager.Get( "main" ).transform;
 
             Skybox skybox = farCameraGameObject.AddComponent<Skybox>();
             skybox.material = AssetRegistry.Get<Material>( "builtin::HSP._DevUtils/skybox" );
+            MapSceneReferenceFrameManager.TargetObject = refTransform;
 
             _cameraPivot.SetActive( false );
         }

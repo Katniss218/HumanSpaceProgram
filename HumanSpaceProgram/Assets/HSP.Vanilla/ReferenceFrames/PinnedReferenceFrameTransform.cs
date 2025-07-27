@@ -13,7 +13,20 @@ namespace HSP.Vanilla
     [DisallowMultipleComponent]
     public class PinnedReferenceFrameTransform : MonoBehaviour, IReferenceFrameTransform, IPhysicsTransform
     {
-        public ISceneReferenceFrameProvider SceneReferenceFrameProvider { get; set; }
+        private ISceneReferenceFrameProvider _sceneReferenceFrameProvider;
+        public ISceneReferenceFrameProvider SceneReferenceFrameProvider
+        {
+            get => _sceneReferenceFrameProvider;
+            set
+            {
+                if( _sceneReferenceFrameProvider == value )
+                    return;
+
+                _sceneReferenceFrameProvider?.UnsubscribeIfSubscribed( this );
+                _sceneReferenceFrameProvider = value;
+                _sceneReferenceFrameProvider?.SubscribeIfNotSubscribed( this );
+            }
+        }
 
         IReferenceFrameTransform _referenceTransform = null;
         Vector3Dbl _referencePosition = Vector3.zero;
@@ -354,11 +367,13 @@ namespace HSP.Vanilla
 
         protected virtual void OnEnable()
         {
+            _sceneReferenceFrameProvider?.SubscribeIfNotSubscribed( this );
             _rb.isKinematic = true; // Force kinematic.
         }
 
         protected virtual void OnDisable()
         {
+            _sceneReferenceFrameProvider?.UnsubscribeIfSubscribed( this );
             _rb.isKinematic = true;
         }
 

@@ -12,6 +12,15 @@ namespace HSP.Vanilla.ReferenceFrames
             return GameplaySceneReferenceFrameManager.ReferenceFrame;
         }
 
+        public void SubscribeIfNotSubscribed( IReferenceFrameSwitchResponder responder )
+        {
+            GameplaySceneReferenceFrameManager.Instance.Subscribe( responder );
+        }
+        public void UnsubscribeIfSubscribed( IReferenceFrameSwitchResponder responder )
+        {
+            GameplaySceneReferenceFrameManager.Instance.Unsubscribe( responder );
+        }
+
         [MapsInheritingFrom( typeof( GameplaySceneReferenceFrameProvider ) )]
         public static SerializationMapping GameplaySceneReferenceFrameProviderMapping()
         {
@@ -24,6 +33,15 @@ namespace HSP.Vanilla.ReferenceFrames
         public IReferenceFrame GetSceneReferenceFrame()
         {
             return MapSceneReferenceFrameManager.ReferenceFrame;
+        }
+
+        public void SubscribeIfNotSubscribed( IReferenceFrameSwitchResponder responder )
+        {
+            MapSceneReferenceFrameManager.Instance.Subscribe( responder );
+        }
+        public void UnsubscribeIfSubscribed( IReferenceFrameSwitchResponder responder )
+        {
+            MapSceneReferenceFrameManager.Instance.Unsubscribe( responder );
         }
 
         [MapsInheritingFrom( typeof( MapSceneReferenceFrameProvider ) )]

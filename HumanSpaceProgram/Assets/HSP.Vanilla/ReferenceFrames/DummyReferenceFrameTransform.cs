@@ -7,9 +7,22 @@ namespace HSP.Vanilla.ReferenceFrames
     /// <summary>
     /// A reference frame transform that does nothing and calculates itself using the underlying UnityEngine transform.
     /// </summary>
-    public class DummyReferenceFrameTransform : MonoBehaviour, IReferenceFrameTransform
+    public sealed class DummyReferenceFrameTransform : MonoBehaviour, IReferenceFrameTransform
     {
-        public ISceneReferenceFrameProvider SceneReferenceFrameProvider { get; set; }
+        private ISceneReferenceFrameProvider _sceneReferenceFrameProvider;
+        public ISceneReferenceFrameProvider SceneReferenceFrameProvider
+        {
+            get => _sceneReferenceFrameProvider;
+            set
+            {
+                if( _sceneReferenceFrameProvider == value )
+                    return;
+
+                _sceneReferenceFrameProvider?.UnsubscribeIfSubscribed( this );
+                _sceneReferenceFrameProvider = value;
+                _sceneReferenceFrameProvider?.SubscribeIfNotSubscribed( this );
+            }
+        }
 
         public Vector3 Position
         {
@@ -69,7 +82,21 @@ namespace HSP.Vanilla.ReferenceFrames
 
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
-            throw new NotImplementedException();
+            var oldAbsPos = data.OldFrame.TransformPosition( transform.position );
+            var oldAbsRot = data.OldFrame.TransformRotation( transform.rotation );
+
+            ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( data.NewFrame, transform, null, oldAbsPos );
+            ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( data.NewFrame, transform, null, oldAbsRot );
+        }
+
+        void OnEnable()
+        {
+            _sceneReferenceFrameProvider?.SubscribeIfNotSubscribed( this );
+        }
+
+        void OnDisable()
+        {
+            _sceneReferenceFrameProvider?.UnsubscribeIfSubscribed( this );
         }
     }
 }

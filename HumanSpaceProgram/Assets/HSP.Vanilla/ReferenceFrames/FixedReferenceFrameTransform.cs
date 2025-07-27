@@ -11,9 +11,22 @@ namespace HSP.Vanilla
     /// </summary>
     [RequireComponent( typeof( Rigidbody ) )]
     [DisallowMultipleComponent]
-    public class FixedReferenceFrameTransform : MonoBehaviour, IReferenceFrameTransform, IPhysicsTransform
+    public sealed class FixedReferenceFrameTransform : MonoBehaviour, IReferenceFrameTransform, IPhysicsTransform
     {
-        public ISceneReferenceFrameProvider SceneReferenceFrameProvider { get; set; }
+        private ISceneReferenceFrameProvider _sceneReferenceFrameProvider;
+        public ISceneReferenceFrameProvider SceneReferenceFrameProvider
+        {
+            get => _sceneReferenceFrameProvider;
+            set
+            {
+                if( _sceneReferenceFrameProvider == value )
+                    return;
+
+                _sceneReferenceFrameProvider?.UnsubscribeIfSubscribed( this );
+                _sceneReferenceFrameProvider = value;
+                _sceneReferenceFrameProvider?.SubscribeIfNotSubscribed( this );
+            }
+        }
 
         Vector3Dbl _absolutePosition = Vector3Dbl.zero;
         QuaternionDbl _absoluteRotation = QuaternionDbl.identity;
@@ -284,11 +297,13 @@ namespace HSP.Vanilla
 
         void OnEnable()
         {
+            _sceneReferenceFrameProvider?.SubscribeIfNotSubscribed( this );
             _rb.isKinematic = true; // Force kinematic.
         }
 
         void OnDisable()
         {
+            _sceneReferenceFrameProvider?.UnsubscribeIfSubscribed( this );
             _rb.isKinematic = true;
         }
 

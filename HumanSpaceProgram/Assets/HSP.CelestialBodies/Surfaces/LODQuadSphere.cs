@@ -77,6 +77,20 @@ namespace HSP.CelestialBodies.Surfaces
         /// </summary>
         public LODQuadMode Mode { get; private set; }
 
+        private Layer _layer = Layer.DEFAULT;
+        public Layer Layer
+        {
+            get => _layer;
+            set
+            {
+                if( IsBuilding )
+                    throw new InvalidOperationException( $"Can't set {nameof( Layer )} of a LOD sphere while it's building." );
+
+                _layer = value;
+                ClearAllQuads();
+            }
+        }
+
         /// <remarks>
         /// Calling this method will force a rebuild.
         /// </remarks>
@@ -384,6 +398,7 @@ namespace HSP.CelestialBodies.Surfaces
         public static SerializationMapping LODQuadSphereMapping()
         {
             return new MemberwiseSerializationMapping<LODQuadSphere>()
+                .WithMember( "layer", o => o.Layer )
                 .WithMember( "mode", o => o.Mode )
                 .WithMember( "edge_subdivisions", o => o.EdgeSubdivisions )
                 .WithMember( "max_depth", o => o.MaxDepth )

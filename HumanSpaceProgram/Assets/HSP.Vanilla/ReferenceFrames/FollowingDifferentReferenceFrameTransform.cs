@@ -1,4 +1,5 @@
 ﻿using HSP.ReferenceFrames;
+using HSP.Time;
 using System;
 using UnityEngine;
 using UnityPlus.Serialization;
@@ -10,7 +11,20 @@ namespace HSP.Vanilla.Scenes.MapScene
     /// </summary>
     public class FollowingDifferentReferenceFrameTransform : MonoBehaviour, IReferenceFrameTransform
     {
-        public ISceneReferenceFrameProvider SceneReferenceFrameProvider { get; set; }
+        private ISceneReferenceFrameProvider _sceneReferenceFrameProvider;
+        public ISceneReferenceFrameProvider SceneReferenceFrameProvider
+        {
+            get => _sceneReferenceFrameProvider;
+            set
+            {
+                if( _sceneReferenceFrameProvider == value )
+                    return;
+
+                _sceneReferenceFrameProvider?.UnsubscribeIfSubscribed( this );
+                _sceneReferenceFrameProvider = value;
+                _sceneReferenceFrameProvider?.SubscribeIfNotSubscribed( this );
+            }
+        }
 
         public IReferenceFrameTransform TargetTransform { get; set; }
 
@@ -18,11 +32,11 @@ namespace HSP.Vanilla.Scenes.MapScene
         {
             get
             {
-                return (Vector3)SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformPosition( TargetTransform.AbsolutePosition );
+                return (Vector3)SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformPosition( TargetTransform.AbsolutePosition );
             }
             set
             {
-                throw new InvalidOperationException( $"Can't set {nameof(Position)} of {nameof( FollowingDifferentReferenceFrameTransform )}. This transform always follows the reference object in another scene." );
+                throw new InvalidOperationException( $"Can't set {nameof( Position )} of {nameof( FollowingDifferentReferenceFrameTransform )}. This transform always follows the reference object in another scene." );
             }
         }
         public Vector3Dbl AbsolutePosition
@@ -36,7 +50,17 @@ namespace HSP.Vanilla.Scenes.MapScene
                 throw new InvalidOperationException( $"Can't set {nameof( AbsolutePosition )} of {nameof( FollowingDifferentReferenceFrameTransform )}. This transform always follows the reference object in another scene." );
             }
         }
-        public Quaternion Rotation { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public Quaternion Rotation
+        {
+            get
+            {
+                return (Quaternion)SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformRotation( TargetTransform.AbsoluteRotation );
+            }
+            set
+            {
+                throw new InvalidOperationException( $"Can't set {nameof( Rotation )} of {nameof( FollowingDifferentReferenceFrameTransform )}. This transform always follows the reference object in another scene." );
+            }
+        }
         public QuaternionDbl AbsoluteRotation
         {
             get
@@ -48,7 +72,17 @@ namespace HSP.Vanilla.Scenes.MapScene
                 throw new InvalidOperationException( $"Can't set {nameof( AbsoluteRotation )} of {nameof( FollowingDifferentReferenceFrameTransform )}. This transform always follows the reference object in another scene." );
             }
         }
-        public Vector3 Velocity { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public Vector3 Velocity
+        {
+            get
+            {
+                return (Vector3)SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformVelocity( TargetTransform.AbsoluteVelocity );
+            }
+            set
+            {
+                throw new InvalidOperationException( $"Can't set {nameof( Velocity )} of {nameof( FollowingDifferentReferenceFrameTransform )}. This transform always follows the reference object in another scene." );
+            }
+        }
         public Vector3Dbl AbsoluteVelocity
         {
             get
@@ -60,7 +94,17 @@ namespace HSP.Vanilla.Scenes.MapScene
                 throw new InvalidOperationException( $"Can't set {nameof( AbsoluteVelocity )} of {nameof( FollowingDifferentReferenceFrameTransform )}. This transform always follows the reference object in another scene." );
             }
         }
-        public Vector3 AngularVelocity { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public Vector3 AngularVelocity
+        {
+            get
+            {
+                return (Vector3)SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformAngularVelocity( TargetTransform.AbsoluteAngularVelocity );
+            }
+            set
+            {
+                throw new InvalidOperationException( $"Can't set {nameof( AngularVelocity )} of {nameof( FollowingDifferentReferenceFrameTransform )}. This transform always follows the reference object in another scene." );
+            }
+        }
         public Vector3Dbl AbsoluteAngularVelocity
         {
             get
@@ -81,8 +125,6 @@ namespace HSP.Vanilla.Scenes.MapScene
 
         public Vector3Dbl AbsoluteAngularAcceleration => TargetTransform.AbsoluteAngularAcceleration;
 
-        public bool IsColliding => throw new NotImplementedException();
-
         public event Action OnAbsolutePositionChanged;
         public event Action OnAbsoluteRotationChanged;
         public event Action OnAbsoluteVelocityChanged;
@@ -92,16 +134,27 @@ namespace HSP.Vanilla.Scenes.MapScene
 
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
-            throw new NotImplementedException();
+            var position = (Vector3)data.NewFrame.InverseTransformPosition( TargetTransform.AbsolutePosition );
+            var rotation = (Quaternion)data.NewFrame.InverseTransformRotation( TargetTransform.AbsoluteRotation );
+            this.transform.SetPositionAndRotation( position, rotation );
         }
 
         void FixedUpdate()
         {
-            var position = (Vector3)SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformPosition( TargetTransform.AbsolutePosition );
-            var rotation = (Quaternion)SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformRotation( TargetTransform.AbsoluteRotation );
+            var position = (Vector3)SceneReferenceFrameProvider.GetSceneReferenceFrame().AtUT( TimeManager.UT ).InverseTransformPosition( TargetTransform.AbsolutePosition );
+            var rotation = (Quaternion)SceneReferenceFrameProvider.GetSceneReferenceFrame().AtUT( TimeManager.UT ).InverseTransformRotation( TargetTransform.AbsoluteRotation );
             this.transform.SetPositionAndRotation( position, rotation );
         }
 
+        void OnEnable()
+        {
+            _sceneReferenceFrameProvider?.SubscribeIfNotSubscribed( this );
+        }
+
+        void OnDisable()
+        {
+            _sceneReferenceFrameProvider?.UnsubscribeIfSubscribed( this );
+        }
 
         [MapsInheritingFrom( typeof( FollowingDifferentReferenceFrameTransform ) )]
         public static SerializationMapping FollowingDifferentReferenceFrameTransformMapping()

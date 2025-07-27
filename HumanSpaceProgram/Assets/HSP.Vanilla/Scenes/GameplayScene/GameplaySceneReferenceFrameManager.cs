@@ -4,6 +4,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene
 {
     public class GameplaySceneReferenceFrameManager : SceneReferenceFrameManager
     {
+#warning TODO - add auto-instance setting
         public static GameplaySceneReferenceFrameManager Instance;
 
         public static IReferenceFrame ReferenceFrame
