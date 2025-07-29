@@ -110,9 +110,8 @@ namespace HSP.Vanilla.Scenes.MapScene.Cameras
             Vector3 targetPos = (ReferenceObject == null)
                 ? (Vector3)_referenceFrameTransform.SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformPosition( Vector3.zero )
                 : ReferenceObject.position;
-            Debug.Log( "pos : " + targetPos );
+
             this.transform.position = targetPos + (-transform.forward) * _zoomDist;
-            Debug.Log( "pos 2: " + this.transform.position );
         }
 
         void LateUpdate()
@@ -120,9 +119,8 @@ namespace HSP.Vanilla.Scenes.MapScene.Cameras
             Vector3 targetPos = (ReferenceObject == null)
                 ? (Vector3)_referenceFrameTransform.SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformPosition( Vector3.zero )
                 : ReferenceObject.position;
-            Debug.Log( "posB : " + targetPos );
+
             this.transform.position = targetPos + (-transform.forward) * _zoomDist;
-            Debug.Log( "posB 2: " + this.transform.position );
         }
 
         void OnEnable()

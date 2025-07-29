@@ -109,7 +109,6 @@ namespace HSP.ReferenceFrames
 
             Vector3 scenePosition = targetObject.Position;
             Vector3 sceneVelocity = targetObject.Velocity;
-            Debug.Log( $"[{this.GetType().Name}] requesting switch " + scenePosition + " : " + sceneVelocity );
             _frameToSwitchTo = referenceFrame;
         }
 

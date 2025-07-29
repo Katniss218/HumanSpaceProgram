@@ -21,22 +21,33 @@ namespace HSP.Vanilla.Scenes.MapScene
         }
     }
 
-    public class MapSceneCelestialBodyManager
+    public class MapSceneCelestialBodyManager : SingletonMonoBehaviour<MapSceneCelestialBodyManager>
     {
-        static Dictionary<CelestialBody, MapCelestialBody> _mapCelestialBodies = new();
+        Dictionary<CelestialBody, MapCelestialBody> _mapCelestialBodies = new();
+
+        public const string ADD_MAP_SCENE_CELESTIAL_BODY_MANAGER = HSPEvent.NAMESPACE_HSP + ".vanilla.mapscenecelestialbodymanager.add";
 
         public const string CREATE_MAP_CELESTIAL_BODY = HSPEvent.NAMESPACE_HSP + ".vanilla.spawnmapcb";
-        public const string DESTROY_MAP_CELESTIAL_BODY = HSPEvent.NAMESPACE_HSP + ".vanilla.spawnmapcb";
+        public const string DESTROY_MAP_CELESTIAL_BODY = HSPEvent.NAMESPACE_HSP + ".vanilla.destroymapcb";
+
+        public const string CREATE_MAP_CELESTIAL_BODIES = HSPEvent.NAMESPACE_HSP + ".vanilla.spawnmapcbs";
+        public const string DESTROY_MAP_CELESTIAL_BODIES = HSPEvent.NAMESPACE_HSP + ".vanilla.destroymapcbs";
 
         public static MapCelestialBody Get( string id )
         {
-            return _mapCelestialBodies[CelestialBodyManager.Get( id )];
+            return instance._mapCelestialBodies[CelestialBodyManager.Get( id )];
+        }
+
+        [HSPEventListener( HSPEvent_MAP_SCENE_LOAD.ID, ADD_MAP_SCENE_CELESTIAL_BODY_MANAGER )]
+        public static void AddMapSceneCelestialBodyManager()
+        {
+            MapSceneM.Instance.gameObject.AddComponent<MapSceneCelestialBodyManager>();
         }
 
         [HSPEventListener( HSPEvent_AFTER_CELESTIAL_BODY_CREATED.ID, CREATE_MAP_CELESTIAL_BODY )]
         public static void OnCelestialBodyCreated( CelestialBody body )
         {
-            if( !HSPSceneManager.IsForeground<MapSceneM>() )
+            if( !HSPSceneManager.IsLoaded<MapSceneM>() )
                 return;
 
             CreateMapCelestialBody( body );
@@ -45,17 +56,14 @@ namespace HSP.Vanilla.Scenes.MapScene
         [HSPEventListener( HSPEvent_AFTER_CELESTIAL_BODY_DESTROYED.ID, DESTROY_MAP_CELESTIAL_BODY )]
         public static void OnCelestialBodyDestroyed( CelestialBody body )
         {
-            if( !HSPSceneManager.IsForeground<MapSceneM>() )
+            if( !HSPSceneManager.IsLoaded<MapSceneM>() )
                 return;
 
             DestroyMapCelestialBody( body );
         }
 
-        public const string CREATE_MAP_CELESTIAL_BODIES = HSPEvent.NAMESPACE_HSP + ".vanilla.spawnmapcbs";
-        public const string DESTROY_MAP_CELESTIAL_BODIES = HSPEvent.NAMESPACE_HSP + ".vanilla.spawnmapcbs";
-
-        [HSPEventListener( HSPEvent_MAP_SCENE_LOAD.ID, CREATE_MAP_CELESTIAL_BODIES, After = new[] { OnStartup.ADD_SCENE_REFERENCE_FRAME_MANAGER } )]
-        public static void OnMapSceneLoad()
+        [HSPEventListener( HSPEvent_MAP_SCENE_ACTIVATE.ID, CREATE_MAP_CELESTIAL_BODIES )]
+        public static void OnMapSceneActivate()
         {
             foreach( var body in CelestialBodyManager.CelestialBodies )
             {
@@ -63,10 +71,10 @@ namespace HSP.Vanilla.Scenes.MapScene
             }
         }
 
-        [HSPEventListener( HSPEvent_MAP_SCENE_UNLOAD.ID, DESTROY_MAP_CELESTIAL_BODIES )]
-        public static void OnMapSceneUnload()
+        [HSPEventListener( HSPEvent_MAP_SCENE_DEACTIVATE.ID, DESTROY_MAP_CELESTIAL_BODIES )]
+        public static void OnMapSceneDeactivate()
         {
-            foreach( var body in _mapCelestialBodies.Keys.ToArray() )
+            foreach( var body in instance._mapCelestialBodies.Keys.ToArray() )
             {
                 DestroyMapCelestialBody( body );
             }
@@ -77,7 +85,10 @@ namespace HSP.Vanilla.Scenes.MapScene
         /// </summary>
         private static void CreateMapCelestialBody( CelestialBody source )
         {
-            GameObject go = new GameObject( "dummy" );
+            if( !instanceExists )
+                return; // scene was unloaded.
+
+            GameObject go = new GameObject( $"map celestialbody - {source.ID}" );
             var t = go.AddComponent<MapCelestialBody>();
             t.Source = source;
             var trans = go.AddComponent<FollowingDifferentReferenceFrameTransform>();
@@ -87,7 +98,7 @@ namespace HSP.Vanilla.Scenes.MapScene
             t.PhysicsTransform = source.PhysicsTransform;
             MapCelestialBody target = t;
 
-            _mapCelestialBodies.Add( source, target );
+            instance._mapCelestialBodies.Add( source, target );
 
             var data = new HSPEvent_MAP_SCENE_CELESTIAL_BODY_BUILDER.Data
             {
@@ -102,13 +113,16 @@ namespace HSP.Vanilla.Scenes.MapScene
         /// </summary>
         private static void DestroyMapCelestialBody( CelestialBody source )
         {
-            if( _mapCelestialBodies.TryGetValue( source, out MapCelestialBody target ) )
+            if( !instanceExists )
+                return; // scene was unloaded.
+
+            if( instance._mapCelestialBodies.TryGetValue( source, out MapCelestialBody target ) )
             {
                 // destroy the gameobject stub
                 if( target.gameObject != null )
                     UnityEngine.Object.Destroy( target.gameObject );
 
-                _mapCelestialBodies.Remove( source );
+                instance._mapCelestialBodies.Remove( source );
             }
         }
     }

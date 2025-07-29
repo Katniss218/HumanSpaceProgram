@@ -100,8 +100,8 @@ namespace HSP.Vanilla.Scenes.MapScene.Cameras
 
         static GameObject _cameraPivot;
 
-        [HSPEventListener( HSPEvent_MAP_SCENE_LOAD.ID, CREATE_CAMERA, After = new[] { OnStartup.ADD_SCENE_REFERENCE_FRAME_MANAGER, MapSceneCelestialBodyManager.CREATE_MAP_CELESTIAL_BODIES } )]
-        private static void OnGameplaySceneLoad()
+        [HSPEventListener( HSPEvent_MAP_SCENE_LOAD.ID, CREATE_CAMERA, After = new[] { OnStartup.ADD_SCENE_REFERENCE_FRAME_MANAGER } )]
+        private static void OnMapSceneLoad()
         {
             GameObject cameraParentGameObject = new GameObject( "Camera Parent" );
             _cameraPivot = cameraParentGameObject;
@@ -136,7 +136,6 @@ namespace HSP.Vanilla.Scenes.MapScene.Cameras
             cameraManager._uiCamera = uiCamera;
 
             cameraController.ZoomDist = 12_000_000f;
-            cameraController.ReferenceObject = MapSceneCelestialBodyManager.Get( "main" ).transform;
 
             Skybox skybox = farCameraGameObject.AddComponent<Skybox>();
             skybox.material = AssetRegistry.Get<Material>( "builtin::HSP._DevUtils/skybox" );
@@ -145,14 +144,15 @@ namespace HSP.Vanilla.Scenes.MapScene.Cameras
             _cameraPivot.SetActive( false );
         }
 
-        [HSPEventListener( HSPEvent_MAP_SCENE_ACTIVATE.ID, ACTIVATE_CAMERA )]
-        private static void OnGameplaySceneActivate()
+        [HSPEventListener( HSPEvent_MAP_SCENE_ACTIVATE.ID, ACTIVATE_CAMERA, After = new[] { MapSceneCelestialBodyManager.CREATE_MAP_CELESTIAL_BODIES } )]
+        private static void OnMapSceneActivate()
         {
+            _cameraPivot.GetComponent<MapSceneOrbitingCameraController>().ReferenceObject = MapSceneCelestialBodyManager.Get( "main" ).transform;
             _cameraPivot.SetActive( true );
         }
 
         [HSPEventListener( HSPEvent_MAP_SCENE_DEACTIVATE.ID, DEACTIVATE_CAMERA )]
-        private static void OnGameplaySceneDeactivate()
+        private static void OnMapSceneDeactivate()
         {
             _cameraPivot.SetActive( false );
         }
