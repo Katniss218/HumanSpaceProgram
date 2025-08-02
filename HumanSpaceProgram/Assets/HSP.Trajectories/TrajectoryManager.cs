@@ -13,6 +13,7 @@ namespace HSP.Trajectories
     public class TrajectoryManager : SingletonMonoBehaviour<TrajectoryManager>
     {
         private TrajectorySimulator _simulator = new();
+        private TrajectorySimulator _predictionSimulator = new();
         private Dictionary<ITrajectory, TrajectoryTransform> _trajectoryMap = new();
 
         /// <summary>

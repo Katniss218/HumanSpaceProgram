@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace HSP.Trajectories
 {
     public struct TrajectoryBodyState : IEquatable<TrajectoryBodyState>
     {
+#warning TODO - rotation as well
         public Vector3Dbl AbsolutePosition;
         public Vector3Dbl AbsoluteVelocity;
         public Vector3Dbl AbsoluteAcceleration;
@@ -18,6 +18,14 @@ namespace HSP.Trajectories
             this.AbsoluteAcceleration = absoluteAcceleration;
             this.Mass = mass;
         }
+        
+        public TrajectoryBodyState( Vector3Dbl absolutePosition, Vector3Dbl absoluteVelocity, double mass )
+        {
+            this.AbsolutePosition = absolutePosition;
+            this.AbsoluteVelocity = absoluteVelocity;
+            this.AbsoluteAcceleration = Vector3Dbl.zero;
+            this.Mass = mass;
+        }
 
         public bool Equals( TrajectoryBodyState other )
         {
@@ -26,12 +34,21 @@ namespace HSP.Trajectories
                 // && this.AbsoluteAcceleration == other.AbsoluteAcceleration
                 && this.Mass == other.Mass;
         }
+        public static TrajectoryBodyState Lerp( TrajectoryBodyState a, TrajectoryBodyState b, double t )
+        {
+            return new TrajectoryBodyState(
+                Vector3Dbl.Lerp( a.AbsolutePosition, b.AbsolutePosition, t ),
+                Vector3Dbl.Lerp( a.AbsoluteVelocity, b.AbsoluteVelocity, t ),
+                Vector3Dbl.Lerp( a.AbsoluteAcceleration, b.AbsoluteAcceleration, t ),
+                MathD.Lerp( a.Mass, b.Mass, t )
+                );
+        }
     }
 
     /// <summary>
     /// An arbitrary simulated trajectory. A.k.a. ephemeris, but more generalized.
     /// </summary>
-    public interface ITrajectory
+    /*public interface ITrajectory
     {
         /// <summary>
         /// The current UT
@@ -84,5 +101,5 @@ namespace HSP.Trajectories
         /// <param name="attractors">Every trajectory that acts like an attractor on this trajectory.</param>
         /// <param name="dt">The delta-time between the current time and the new time.</param>
         void Step( IEnumerable<TrajectoryBodyState> attractors, double dt );
-    }
+    }*/
 }
