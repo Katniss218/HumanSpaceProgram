@@ -23,5 +23,38 @@ namespace UnityPlus.Serialization.Mappings
                 OnLoad = ( data, l ) => new QuaternionDbl( (double)data[0], (double)data[1], (double)data[2], (double)data[3] )
             };
         }
+
+        [MapsInheritingFrom( typeof( FloatInterpolator ) )]
+        public static SerializationMapping FloatInterpolatorMapping()
+        {
+            return new MemberwiseSerializationMapping<FloatInterpolator>();
+        }
+
+        [MapsInheritingFrom( typeof( MappingCurve<>.Keyframe ) )]
+        public static SerializationMapping KeyframeMapping<T>()
+        {
+            return new MemberwiseSerializationMapping<MappingCurve<T>.Keyframe>()
+                .WithMember( "t", o => o.Time )
+                .WithMember( "v", o => o.Value )
+                .WithMember( "v_in", o => o.InTangent )
+                .WithMember( "v_out", o => o.OutTangent );
+        }
+
+        [MapsInheritingFrom( typeof( MappingCurve<> ) )]
+        public static SerializationMapping AnimationCurveMapping<T>()
+        {
+            return new MemberwiseSerializationMapping<MappingCurve<T>>()
+                .WithReadonlyMember( "interpolator", o => o.Interpolator )
+                .WithFactory<IMappingCurveInterpolator<T>>( ( interpolator ) => new MappingCurve<T>( interpolator ) )
+                .WithMember( "keys", o => o.Keyframes );
+        }
+
+        [MapsInheritingFrom( typeof( LinearMappingCurve<> ) )]
+        public static SerializationMapping LinearMappingCurveMapping<T>()
+        {
+            return new MemberwiseSerializationMapping<LinearMappingCurve<T>>()
+                .WithReadonlyMember( "interpolator", o => o.Interpolator )
+                .WithFactory<IMappingCurveInterpolator<T>>( ( interpolator ) => new LinearMappingCurve<T>( interpolator ) );
+        }
     }
 }

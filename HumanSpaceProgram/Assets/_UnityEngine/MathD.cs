@@ -53,6 +53,30 @@ namespace UnityEngine
             return Math.Cosh( d ) / Math.Sinh( d );
         }
 
+        public static double Clamp01( double value )
+        {
+            if( value < 0 )
+            {
+                return 0;
+            }
+            if( value > 1 )
+            {
+                return 1;
+            }
+            return value;
+        }
+        
+        public static double Lerp( double a, double b, double t )
+        {
+            t = Clamp01( t );
+            return a + (b - a) * t;
+        }
+        
+        public static double LerpUnclamped( double a, double b, double t )
+        {
+            return a + (b - a) * t;
+        }
+
         /// <summary>
         /// Linearly maps a value from one range onto another range.
         /// </summary>

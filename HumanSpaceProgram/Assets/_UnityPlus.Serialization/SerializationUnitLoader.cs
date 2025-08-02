@@ -28,6 +28,9 @@ namespace UnityPlus.Serialization
 
         internal SerializationUnitLoader( T[] objects, SerializedData[] data, int context )
         {
+            if( objects.Length != data.Length )
+                throw new ArgumentException( $"The length of '{nameof( objects )}' ({objects.Length}) must match the length of '{nameof(data)}' ({data.Length})." );
+
             this.RefMap = new BidirectionalReferenceStore();
             this._objects = objects;
             this._data = data;
