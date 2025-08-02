@@ -12,80 +12,52 @@ namespace HSP.Trajectories
     /// </summary>
     public class TrajectoryManager : SingletonMonoBehaviour<TrajectoryManager>
     {
-        private TrajectorySimulator _simulator = new();
-        private TrajectorySimulator _predictionSimulator = new();
-        private Dictionary<ITrajectory, TrajectoryTransform> _trajectoryMap = new();
+        public static IReadonlyTrajectorySimulator Simulator => instance._simulators[0];
+        public static IReadonlyTrajectorySimulator PredictionSimulator => instance._simulators[1];
+
+        private TrajectorySimulator[] _simulators;
+
+        private HashSet<TrajectoryTransform> _transforms = new();
+
+        private bool _isStale = false;
+        private bool _attractorChanged = false;
+
+        private Dictionary<TrajectoryTransform, (Vector3Dbl pos, Vector3Dbl vel, Vector3Dbl interpolatedVel)> _posAndVelCache = new();
 
         /// <summary>
         /// Tries to add the specified trajectory to the simulation as an attractor.
         /// </summary>
         /// <returns>True if the trajectory was successfully added to the simulation, otherwise false.</returns>
-        public static bool TryRegisterAttractor( ITrajectory attractorTrajectory, TrajectoryTransform transform )
+        public static bool TryRegister( TrajectoryTransform transform )
         {
             if( !instanceExists )
                 return false;
-            if( attractorTrajectory == null || transform == null )
-                return false;
-            if( instance._trajectoryMap.ContainsKey( attractorTrajectory ) )
+
+            if( transform == null )
                 return false;
 
-            instance._simulator.Attractors.Add( attractorTrajectory );
-            instance._trajectoryMap.Add( attractorTrajectory, transform );
-            return true;
+            bool ret = instance._transforms.Add( transform );
+            instance._isStale = ret;
+            instance._attractorChanged = transform.IsAttractor;
+            return ret;
         }
 
         /// <summary>
         /// Tries to remove the specified trajectory (attractor) from the simulation.
         /// </summary>
         /// <returns>True if the trajectory was successfully removed, otherwise false.</returns>
-        public static bool TryUnregisterAttractor( ITrajectory attractorTrajectory )
+        public static bool TryUnregister( TrajectoryTransform transform )
         {
             if( !instanceExists )
                 return false;
-            if( attractorTrajectory == null )
-                return false;
-            if( !instance._trajectoryMap.ContainsKey( attractorTrajectory ) )
-                return false;
-
-            instance._simulator.Attractors.Remove( attractorTrajectory );
-            instance._trajectoryMap.Remove( attractorTrajectory );
-            return true;
-        }
-
-        /// <summary>
-        /// Tries to add the specified trajectory to the simulation as a follower.
-        /// </summary>
-        /// <returns>True if the trajectory was successfully added to the simulation, otherwise false.</returns>
-        public static bool TryRegisterFollower( ITrajectory followerTrajectory, TrajectoryTransform transform )
-        {
-            if( !instanceExists )
-                return false;
-            if( followerTrajectory == null || transform == null )
-                return false;
-            if( instance._trajectoryMap.ContainsKey( followerTrajectory ) )
+            
+            if( (object)transform == null ) // Allows unregistering destroyed.
                 return false;
 
-            instance._simulator.Followers.Add( followerTrajectory );
-            instance._trajectoryMap.Add( followerTrajectory, transform );
-            return true;
-        }
-
-        /// <summary>
-        /// Tries to remove the specified trajectory (follower) from the simulation.
-        /// </summary>
-        /// <returns>True if the trajectory was successfully removed, otherwise false.</returns>
-        public static bool TryUnregisterFollower( ITrajectory followerTrajectory )
-        {
-            if( !instanceExists )
-                return false;
-            if( followerTrajectory == null )
-                return false;
-            if( !instance._trajectoryMap.ContainsKey( followerTrajectory ) )
-                return false;
-
-            instance._simulator.Followers.Remove( followerTrajectory );
-            instance._trajectoryMap.Remove( followerTrajectory );
-            return true;
+            bool ret = instance._transforms.Remove( transform );
+            instance._isStale = ret;
+            instance._attractorChanged = transform.IsAttractor;
+            return ret;
         }
 
         /// <summary>
@@ -96,9 +68,17 @@ namespace HSP.Trajectories
             if( !instanceExists )
                 return;
 
-            instance._trajectoryMap.Clear();
-            instance._simulator.Attractors.Clear();
-            instance._simulator.Followers.Clear();
+            instance._isStale = true;
+            instance._transforms.Clear();
+        }
+
+        private void FixStale()
+        {
+            if( _attractorChanged )
+            {
+                // reset every ephemeris because accelerations changed.
+            }
+            // if anything that was added was an attractor
         }
 
         void OnEnable()
@@ -127,8 +107,6 @@ namespace HSP.Trajectories
             subSystemList = null
         };
 
-        private Dictionary<ITrajectory, (Vector3Dbl pos, Vector3Dbl vel, Vector3Dbl interpolatedVel)> _posAndVelCache = new();
-
         // Simulation works as follows:
 
         //          FIXED UPDATE
@@ -154,9 +132,14 @@ namespace HSP.Trajectories
             if( !instanceExists )
                 return;
 
-            foreach( var (trajectory, trajectoryTransform) in instance._trajectoryMap )
+            if( instance._isStale )
             {
-                if( !trajectoryTransform.IsSynchronized() )
+                instance.FixStale();
+            }
+
+            foreach( var trajectoryTransform in instance._transforms )
+            {
+                if( !trajectoryTransform.TrajectoryDoesntNeedUpdating() )
                 {
                     TrajectoryBodyState stateVector = new TrajectoryBodyState(
                         trajectoryTransform.ReferenceFrameTransform.AbsolutePosition,
@@ -164,31 +147,35 @@ namespace HSP.Trajectories
                         Vector3Dbl.zero,
                         trajectoryTransform.PhysicsTransform.Mass );
 
-                    trajectory.SetCurrentState( stateVector );
+                    foreach( var sim in instance._simulators )
+                        sim.SetCurrentStateVector( trajectoryTransform, stateVector );
                 }
             }
 
-            double time = instance._simulator.EndUT;
-            instance._simulator.Simulate( TimeManager.UT );
-            double deltaTime = instance._simulator.EndUT - time;
-
-            foreach( var (trajectory, trajectoryTransform) in instance._trajectoryMap )
+            foreach( var sim in instance._simulators )
             {
-                TrajectoryBodyState stateVector = trajectory.GetCurrentState();
+                //double time = sim.EndUT;
+                sim.Simulate( TimeManager.UT );
+                //double deltaTime = sim.EndUT - time;
+            }
 
-                if( trajectoryTransform.IsSynchronized() )
+            foreach( var trajectoryTransform in instance._transforms )
+            {
+                TrajectoryBodyState stateVector = Simulator.GetCurrentStateVector( trajectoryTransform );
+
+                if( trajectoryTransform.TrajectoryDoesntNeedUpdating() )
                 {
                     // If the transform is synchronized, make the velocity what it should be to make it move to the target location.
                     // This - at least in theory - should make PhysX happier, because the position is not being reset, in turn resetting some physics scene stuff.
                     Vector3Dbl interpolatedVel = (stateVector.AbsolutePosition - trajectoryTransform.ReferenceFrameTransform.AbsolutePosition) / TimeManager.FixedDeltaTime;
 
-                    instance._posAndVelCache[trajectory] = (stateVector.AbsolutePosition, stateVector.AbsoluteVelocity, interpolatedVel);
+                    instance._posAndVelCache[trajectoryTransform] = (stateVector.AbsolutePosition, stateVector.AbsoluteVelocity, interpolatedVel);
 
                     trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = interpolatedVel;
                 }
                 else
                 {
-                    instance._posAndVelCache[trajectory] = (stateVector.AbsolutePosition, stateVector.AbsoluteVelocity, Vector3Dbl.zero);
+                    instance._posAndVelCache[trajectoryTransform] = (stateVector.AbsolutePosition, stateVector.AbsoluteVelocity, Vector3Dbl.zero);
                     trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = stateVector.AbsoluteVelocity;
                 }
             }
@@ -199,9 +186,9 @@ namespace HSP.Trajectories
             if( !instanceExists )
                 return;
 
-            foreach( var (trajectory, trajectoryTransform) in instance._trajectoryMap )
+            foreach( var trajectoryTransform in instance._transforms )
             {
-                var (_, vel, interpolatedVel) = instance._posAndVelCache[trajectory];
+                var (_, vel, interpolatedVel) = instance._posAndVelCache[trajectoryTransform];
 
                 /*if( trajectoryTransform.IsSynchronized() ) // Experimental testing seems to indicate that this is unnecessary for countering drift.
                 {
@@ -211,7 +198,7 @@ namespace HSP.Trajectories
 
                 // IsSynchronized() will return false if a kinematic object (e.g. planet) is colliding,
                 //   in such a case, the object didn't change its velocity so it's technically still synchronized.
-                if( trajectoryTransform.IsSynchronized() || trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity == interpolatedVel )
+                if( trajectoryTransform.TrajectoryDoesntNeedUpdating() || trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity == interpolatedVel )
                 {
                     trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = vel;
                 }

@@ -152,6 +152,6 @@ public class NBodyAccelerationProvider : IAccelerationProvider
 
 ```
 
-
+where are the attractors stored and what ensures they're synchronized?
 
 

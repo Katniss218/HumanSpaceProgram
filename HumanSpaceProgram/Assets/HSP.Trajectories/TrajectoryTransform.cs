@@ -44,11 +44,11 @@ namespace HSP.Trajectories
             }
         }
 
-        private ITrajectory _trajectory;
+        private ITrajectoryIntegrator _trajectory;
         /// <summary>
         /// Gets or sets the trajectory that this object will follow.
         /// </summary>
-        public ITrajectory Trajectory
+        public ITrajectoryIntegrator Trajectory
         {
             get => _trajectory;
             set
@@ -61,9 +61,9 @@ namespace HSP.Trajectories
                 TryUnregister();
                 _trajectory = value;
 
-                TrajectoryBodyState trajectoryState = value.GetCurrentState();
-                _referenceFrameTransform.AbsolutePosition = trajectoryState.AbsolutePosition;
-                _referenceFrameTransform.AbsoluteVelocity = trajectoryState.AbsoluteVelocity;
+                //TrajectoryBodyState trajectoryState = value.Step(...);
+                //_referenceFrameTransform.AbsolutePosition = trajectoryState.AbsolutePosition;
+                //_referenceFrameTransform.AbsoluteVelocity = trajectoryState.AbsoluteVelocity;
 
                 TryRegister();
             }
@@ -98,11 +98,12 @@ namespace HSP.Trajectories
         /// False if the trajectory needs to be updated using the reference frame transform's values. <br/>
         /// Related to <see cref="RequestForcedResynchronization"/>.
         /// </returns>
-        public bool IsSynchronized()
+        public bool TrajectoryDoesntNeedUpdating()
         {
-            bool value = _lastSynchronizedTransform == this.ReferenceFrameTransform // Because we use an event to check the manual reset of values, it would be possible for you to
-                                                                                    //   swap the phystransform to a different instance and change its position before the event is
-                                                                                    //   re-registered to that new instance.
+            bool value = _lastSynchronizedTransform == this.ReferenceFrameTransform // Because we use an event to check the manual reset of values, it would be possible to swap
+                                                                                    // the reference frame transform on the GameObject to a different instance and change its
+                                                                                    // position before the event is re-registered to that new instance.
+
                 && !HasCollidedWithSomething() // Because trajectories shouldn't ignore object's collision response.
                 && !HadForcesApplied()         // Because trajectories shouldn't ignore external forces you apply to the object.
                 && !_hadValuesChangedByHand    // Because trajectories shouldn't ignore when you move the object by hand.
@@ -146,26 +147,20 @@ namespace HSP.Trajectories
 
         private void OnValueChanged() => _hadValuesChangedByHand = true;
 
-        private void TryRegister()
+        private bool TryRegister()
         {
             if( _trajectory == null )
-                return;
+                return false;
 
-            if( _isAttractor )
-                TrajectoryManager.TryRegisterAttractor( _trajectory, this );
-            else
-                TrajectoryManager.TryRegisterFollower( _trajectory, this );
+            return TrajectoryManager.TryRegister( this );
         }
 
-        private void TryUnregister()
+        private bool TryUnregister()
         {
             if( _trajectory == null )
-                return;
+                return false;
 
-            if( _isAttractor )
-                TrajectoryManager.TryUnregisterAttractor( _trajectory );
-            else
-                TrajectoryManager.TryUnregisterFollower( _trajectory );
+            return TrajectoryManager.TryUnregister( this );
         }
 
         [MapsInheritingFrom( typeof( TrajectoryTransform ) )]
