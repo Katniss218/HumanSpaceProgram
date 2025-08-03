@@ -1,6 +1,7 @@
 ﻿using HSP.ReferenceFrames;
-using HSP.Time;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
 
@@ -67,6 +68,33 @@ namespace HSP.Trajectories
 
                 TryRegister();
             }
+        }
+
+        private IAccelerationProvider[] _accelerationProviders;
+        /// <summary>
+        /// Gets or sets the trajectory that this object will follow.
+        /// </summary>
+        public IReadOnlyList<IAccelerationProvider> AccelerationProviders
+        {
+            get => _accelerationProviders;
+        }
+
+        /// <remarks>
+        /// The array will be copied.
+        /// </remarks>
+        public void SetAccelerationProviders( IEnumerable<IAccelerationProvider> accelerationProviders )
+        {
+            if( accelerationProviders == null )
+                throw new ArgumentNullException( nameof( accelerationProviders ), "The acceleration provider collection can't be null." );
+
+            if( !accelerationProviders.Any() )
+                throw new ArgumentException( "The acceleration provider collection can't be empty.", nameof( accelerationProviders ) );
+
+            if( accelerationProviders.Any( t => t == null ) )
+                throw new ArgumentException( "The acceleration provider collection can't contain null elements.", nameof( accelerationProviders ) );
+
+            _accelerationProviders = accelerationProviders.ToArray(); // copy to prevent later edits.
+            TrajectoryManager.MarkDirty( this );
         }
 
         private bool _isAttractor;
@@ -157,9 +185,6 @@ namespace HSP.Trajectories
 
         private bool TryUnregister()
         {
-            if( _trajectory == null )
-                return false;
-
             return TrajectoryManager.TryUnregister( this );
         }
 
