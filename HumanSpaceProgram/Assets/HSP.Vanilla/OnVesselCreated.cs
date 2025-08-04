@@ -45,7 +45,7 @@ namespace HSP.Vanilla
             if( HSPSceneManager.IsLoaded<GameplaySceneM>() )
             {
                 TrajectoryTransform comp = v.gameObject.AddComponent<TrajectoryTransform>();
-                comp.Trajectory = new NewtonianOrbit( Time.TimeManager.UT, Vector3Dbl.zero, Vector3Dbl.zero, Vector3Dbl.zero, 1.0 );
+                comp.TrajectoryIntegrator = new NewtonianOrbit( Time.TimeManager.UT, Vector3Dbl.zero, Vector3Dbl.zero, Vector3Dbl.zero, 1.0 );
                 comp.IsAttractor = false;
                 // no need to recalculate the mass of the vessel because it's not an attractor.
             }

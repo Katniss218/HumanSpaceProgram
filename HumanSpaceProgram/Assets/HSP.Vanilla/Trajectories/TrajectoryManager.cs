@@ -31,18 +31,15 @@ namespace HSP.Trajectories
 
         private TrajectorySimulator[] _simulators;
 
-        private HashSet<TrajectoryTransform> _transforms = new();
+        private HashSet<ITrajectoryTransform> _transforms = new();
 
-        private HashSet<TrajectoryTransform> _staleList = new();
-        private bool _attractorChanged = false;
-
-        private Dictionary<TrajectoryTransform, (Vector3Dbl pos, Vector3Dbl vel, Vector3Dbl interpolatedVel)> _posAndVelCache = new();
+        private Dictionary<ITrajectoryTransform, (Vector3Dbl pos, Vector3Dbl vel, Vector3Dbl interpolatedVel)> _posAndVelCache = new();
 
         /// <summary>
         /// Tries to add the specified trajectory to the simulation as an attractor.
         /// </summary>
         /// <returns>True if the trajectory was successfully added to the simulation, otherwise false.</returns>
-        public static bool TryRegister( TrajectoryTransform transform )
+        public static bool TryAddBody( ITrajectoryTransform transform )
         {
             if( !instanceExists )
                 return false;
@@ -50,20 +47,22 @@ namespace HSP.Trajectories
             if( transform == null )
                 return false;
 
-            bool ret = instance._transforms.Add( transform );
-            if( ret )
+            bool wasAdded = instance._transforms.Add( transform );
+            if( wasAdded )
             {
-                instance._staleList.Add( transform );
-                instance._attractorChanged |= transform.IsAttractor;
+                foreach( var simulator in instance._simulators )
+                {
+                    simulator.AddBody( transform );
+                }
             }
-            return ret;
+            return wasAdded;
         }
 
         /// <summary>
         /// Tries to remove the specified trajectory (attractor) from the simulation.
         /// </summary>
         /// <returns>True if the trajectory was successfully removed, otherwise false.</returns>
-        public static bool TryUnregister( TrajectoryTransform transform )
+        public static bool TryRemoveBody( ITrajectoryTransform transform )
         {
             if( !instanceExists )
                 return false;
@@ -71,25 +70,16 @@ namespace HSP.Trajectories
             if( (object)transform == null ) // Allows unregistering destroyed.
                 return false;
 
-            bool ret = instance._transforms.Remove( transform );
-            if( ret )
+            instance.EnsureSimulatorsExist();
+            bool wasRemoved = instance._transforms.Remove( transform );
+            if( wasRemoved )
             {
-                instance._staleList.Add( transform );
-                instance._attractorChanged |= transform.IsAttractor;
+                foreach( var simulator in instance._simulators )
+                {
+                    simulator.RemoveBody( transform );
+                }
             }
-            return ret;
-        }
-
-        public static void MarkDirty( TrajectoryTransform transform )
-        {
-            if( !instanceExists )
-                return;
-
-            if( transform == null )
-                return;
-
-            instance._staleList.Add( transform );
-            instance._attractorChanged |= transform.IsAttractor;
+            return wasRemoved;
         }
 
         /// <summary>
@@ -101,43 +91,21 @@ namespace HSP.Trajectories
                 return;
 
             instance._transforms.Clear();
-            instance._staleList.Clear();
-            instance._attractorChanged = false;
+            foreach( var simulator in instance._simulators )
+            {
+                simulator.Clear();
+            }
         }
 
-        private void FixStale()
+        private void EnsureSimulatorsExist()
         {
             if( _simulators == null )
             {
                 _simulators = new[]
                 {
-#warning TODO - ephemeris duration, per body. changeable by the player too ugh
                     new TrajectorySimulator( TimeManager.UT ),
                     new TrajectorySimulator( TimeManager.UT )
                 };
-            }
-
-            if( _attractorChanged )
-            {
-                foreach( var simulator in _simulators )
-                {
-                    simulator.Reset( bodyList );
-                }
-#warning TODO - reset bodies and ephemeris of existing bodies.
-            }
-            else
-            {
-                foreach( var simulator in _simulators )
-                {
-#warning TODO update ephemeris length if changed.
-                    foreach( var transform in _staleList )
-                    {
-                        if( _transforms.Contains( transform ) )
-                            simulator.AddBody( transform );
-                        else
-                            simulator.RemoveBody( transform );
-                    }
-                }
             }
         }
 
@@ -192,10 +160,7 @@ namespace HSP.Trajectories
             if( !instanceExists )
                 return;
 
-            if( instance._staleList.Any() )
-            {
-                instance.FixStale();
-            }
+            instance.EnsureSimulatorsExist();
 
             foreach( var trajectoryTransform in instance._transforms )
             {

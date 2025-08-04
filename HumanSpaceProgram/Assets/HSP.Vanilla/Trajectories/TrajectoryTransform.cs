@@ -1,16 +1,17 @@
 ﻿using HSP.ReferenceFrames;
+using HSP.Trajectories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
 
-namespace HSP.Trajectories
+namespace HSP.Vanilla.Trajectories
 {
     /// <summary>
     /// Makes an object follow a trajectory.
     /// </summary>
-    public class TrajectoryTransform : MonoBehaviour
+    public class TrajectoryTransform : MonoBehaviour, ITrajectoryTransform
     {
         private IPhysicsTransform _physicsTransform;
         /// <summary>
@@ -49,7 +50,7 @@ namespace HSP.Trajectories
         /// <summary>
         /// Gets or sets the trajectory that this object will follow.
         /// </summary>
-        public ITrajectoryIntegrator Trajectory
+        public ITrajectoryIntegrator TrajectoryIntegrator
         {
             get => _trajectory;
             set
@@ -93,8 +94,9 @@ namespace HSP.Trajectories
             if( accelerationProviders.Any( t => t == null ) )
                 throw new ArgumentException( "The acceleration provider collection can't contain null elements.", nameof( accelerationProviders ) );
 
+            TryUnregister();
             _accelerationProviders = accelerationProviders.ToArray(); // copy to prevent later edits.
-            TrajectoryManager.MarkDirty( this );
+            TryRegister();
         }
 
         private bool _isAttractor;
@@ -156,7 +158,6 @@ namespace HSP.Trajectories
 
         private bool HadForcesApplied() => this.ReferenceFrameTransform.AbsoluteAcceleration != Vector3Dbl.zero;
 
-#warning TODO - has values changed by hand will be true because the traj manager sets them by hand.
         private bool _hadValuesChangedByHand;
 
         void OnEnable()
@@ -180,12 +181,12 @@ namespace HSP.Trajectories
             if( _trajectory == null )
                 return false;
 
-            return TrajectoryManager.TryRegister( this );
+            return TrajectoryManager.TryAddBody( this );
         }
 
         private bool TryUnregister()
         {
-            return TrajectoryManager.TryUnregister( this );
+            return TrajectoryManager.TryRemoveBody( this );
         }
 
         [MapsInheritingFrom( typeof( TrajectoryTransform ) )]

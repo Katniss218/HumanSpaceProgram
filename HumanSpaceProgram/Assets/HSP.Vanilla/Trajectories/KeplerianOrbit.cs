@@ -94,7 +94,7 @@ namespace HSP.Vanilla.Trajectories
                             Debug.LogError( $"The body with ID '{ParentBodyID}' doesn't have a trajectory transform." );
                         }
                     }
-                    _parentBody = _parentBodyPointer.Trajectory;
+                    _parentBody = _parentBodyPointer.TrajectoryIntegrator;
                 }
                 return _parentBody;
             }

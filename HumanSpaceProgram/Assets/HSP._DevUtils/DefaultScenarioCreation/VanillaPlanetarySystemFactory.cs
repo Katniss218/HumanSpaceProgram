@@ -73,7 +73,7 @@ namespace HSP._DevUtils
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
             comp.IsAttractor = true;
-            comp.Trajectory = new FixedOrbit( Time.TimeManager.UT, airfPos, airfRot, cb.Mass );
+            comp.TrajectoryIntegrator = new FixedOrbit( Time.TimeManager.UT, airfPos, airfRot, cb.Mass );
             return cb;
         }
 
@@ -89,7 +89,7 @@ namespace HSP._DevUtils
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
             comp.IsAttractor = true;
-            comp.Trajectory = new KeplerianOrbit( Time.TimeManager.UT, parentId, semiMajorAxis, eccentricity, inclination, longitudeOfAscendingNode, argumentOfPeriapsis, meanAnomaly, cb.Mass );
+            comp.TrajectoryIntegrator = new KeplerianOrbit( Time.TimeManager.UT, parentId, semiMajorAxis, eccentricity, inclination, longitudeOfAscendingNode, argumentOfPeriapsis, meanAnomaly, cb.Mass );
 
             return cb;
         }
@@ -166,7 +166,7 @@ namespace HSP._DevUtils
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
             comp.IsAttractor = true;
-            comp.Trajectory = new NewtonianOrbit( Time.TimeManager.UT, airfPos, airfVel, Vector3Dbl.zero, cb.Mass );
+            comp.TrajectoryIntegrator = new NewtonianOrbit( Time.TimeManager.UT, airfPos, airfVel, Vector3Dbl.zero, cb.Mass );
             return cb;
         }
 
@@ -179,7 +179,7 @@ namespace HSP._DevUtils
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
             comp.IsAttractor = false;
-            comp.Trajectory = new NewtonianOrbit( Time.TimeManager.UT, airfPos, airfVel, Vector3Dbl.zero, cb.Mass );
+            comp.TrajectoryIntegrator = new NewtonianOrbit( Time.TimeManager.UT, airfPos, airfVel, Vector3Dbl.zero, cb.Mass );
             return cb;
         }
 

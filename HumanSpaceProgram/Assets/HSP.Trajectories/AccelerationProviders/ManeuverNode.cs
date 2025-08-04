@@ -20,8 +20,8 @@ namespace HSP.Trajectories.AccelerationProviders
     {
         // pseudo-singleton. One per system really.
 
-        TrajectorySimulator _simulator;
-        TrajectoryTransform _referenceBody;
+        IReadonlyTrajectorySimulator _simulator;
+        ITrajectoryTransform _referenceBody;
 
         public Vector3Dbl GetAcceleration( double ut )
         {
@@ -34,9 +34,9 @@ namespace HSP.Trajectories.AccelerationProviders
     [Obsolete( "Not implemented" )]
     public class FMMNBodyAccelerationProvider : IAccelerationProvider
     {
-        static Dictionary<TrajectorySimulator, Cache> _cachedSystem = new();
+        static Dictionary<IReadonlyTrajectorySimulator, Cache> _cachedSystem = new();
 
-        TrajectorySimulator _simulator;
+        IReadonlyTrajectorySimulator _simulator;
 
         public Vector3Dbl GetAcceleration( double ut )
         {
