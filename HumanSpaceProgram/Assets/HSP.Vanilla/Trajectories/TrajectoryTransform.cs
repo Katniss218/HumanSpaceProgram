@@ -60,14 +60,13 @@ namespace HSP.Vanilla.Trajectories
                     throw new ArgumentNullException( nameof( value ), "The trajectory can't be null." );
                 }
 
-                TryUnregister();
                 _trajectory = value;
 
                 //TrajectoryBodyState trajectoryState = value.Step(...);
                 //_referenceFrameTransform.AbsolutePosition = trajectoryState.AbsolutePosition;
                 //_referenceFrameTransform.AbsoluteVelocity = trajectoryState.AbsoluteVelocity;
 
-                TryRegister();
+                TrajectoryManager.MarkBodyDirty( this );
             }
         }
 
@@ -94,9 +93,8 @@ namespace HSP.Vanilla.Trajectories
             if( accelerationProviders.Any( t => t == null ) )
                 throw new ArgumentException( "The acceleration provider collection can't contain null elements.", nameof( accelerationProviders ) );
 
-            TryUnregister();
             _accelerationProviders = accelerationProviders.ToArray(); // copy to prevent later edits.
-            TryRegister();
+            TrajectoryManager.MarkBodyDirty( this );
         }
 
         private bool _isAttractor;
@@ -111,9 +109,8 @@ namespace HSP.Vanilla.Trajectories
                 if( _isAttractor == value )
                     return;
 
-                TryUnregister();
                 _isAttractor = value;
-                TryRegister();
+                TrajectoryManager.MarkBodyDirty( this );
             }
         }
 
@@ -181,7 +178,7 @@ namespace HSP.Vanilla.Trajectories
             if( _trajectory == null )
                 return false;
 
-            return TrajectoryManager.TryAddBody( this );
+            return TrajectoryManager.TryAddBody( this, this.Ephemeris );
         }
 
         private bool TryUnregister()

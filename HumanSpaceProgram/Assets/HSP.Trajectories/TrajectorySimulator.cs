@@ -1,23 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace HSP.Trajectories
 {
     public interface IReadonlyTrajectorySimulator
     {
-        public IReadOnlyList<ITrajectoryTransform> Attractors => ;
+        public IReadOnlyList<ITrajectoryTransform> Attractors { get; }
 
         public TrajectoryBodyState GetCurrentStateVector( ITrajectoryTransform trajectoryTransform );
 
         public void SetCurrentStateVector( ITrajectoryTransform trajectoryTransform, TrajectoryBodyState stateVector );
     }
 
-    public class TrajectorySimulatorTimestepper
+    public class TrajectorySimulator : IReadonlyTrajectorySimulator
     {
-        protected readonly TrajectorySimulator _simulator;
+        public class Entry
+        {
+            public bool isAttractor;
+            public int timestepperIndex; // either indexes to the attractor or follower arrays, depending on the isAttractor.
+            public Ephemeris ephemeris;
+        }
+
+        // timestepper
 
         protected ITrajectoryIntegrator[] _attractors;
         protected IAccelerationProvider[][] _attractorAccelerationProviders;
@@ -25,19 +30,190 @@ namespace HSP.Trajectories
         protected ITrajectoryIntegrator[] _followers;
         protected IAccelerationProvider[][] _followerAccelerationProviders;
 
-        protected TrajectoryBodyState[] _currentAttractors;
-        protected TrajectoryBodyState[] _nextAttractors;
+        protected TrajectoryBodyState[] _currentStateAttractors;
+        protected TrajectoryBodyState[] _nextStateAttractors;
 
-        protected TrajectoryBodyState[] _currentFollowers;
-        protected TrajectoryBodyState[] _nextFollowers;
+        protected TrajectoryBodyState[] _currentStateFollowers;
+        protected TrajectoryBodyState[] _nextStateFollowers;
 
         protected double _ut;
         protected double _step;
 
-        public TrajectorySimulatorTimestepper( TrajectorySimulator simulator, double ut )
+        protected Ephemeris[] _attractorEphemerides;
+        protected Ephemeris[] _followerEphemerides;
+
+
+        //
+
+        public virtual IReadOnlyList<ITrajectoryTransform> Attractors => _attractorCache;
+        ITrajectoryTransform[] _attractorCache;
+        Dictionary<ITrajectoryTransform, Entry> _bodies;
+
+        HashSet<ITrajectoryTransform> _staleBodies;
+        bool _isStaleAttractor;
+        bool _staleBodyCountChanged;
+
+        public TrajectorySimulator( double ut )
         {
-            this._simulator = simulator;
             this._ut = ut;
+            _isStaleAttractor = true; // will set up everything on first step.
+            _staleBodyCountChanged = true;
+        }
+
+        public virtual bool AddBody( ITrajectoryTransform transform, Ephemeris ephemeris )
+        {
+            bool wasAdded = _bodies.TryAdd( transform, new Entry() { timestepperIndex = -1, isAttractor = transform.IsAttractor, ephemeris = ephemeris } );
+            if( !wasAdded )
+                return false;
+
+            _staleBodies.Add( transform );
+            _isStaleAttractor |= transform.IsAttractor;
+            _staleBodyCountChanged = true;
+            return true;
+        }
+
+        public virtual bool SetEphemeris( ITrajectoryTransform transform, Ephemeris ephemeris )
+        {
+            if( !_bodies.TryGetValue( transform, out var entry ) )
+                return false;
+
+            entry.ephemeris = ephemeris;
+            _staleBodies.Add( transform );
+            _isStaleAttractor |= transform.IsAttractor;
+            return true;
+        }
+
+        public virtual bool RemoveBody( ITrajectoryTransform transform )
+        {
+            bool wasRemoved = _bodies.Remove( transform );
+            if( !wasRemoved )
+                return false;
+
+            _staleBodies.Add( transform );
+            _isStaleAttractor |= transform.IsAttractor;
+            _staleBodyCountChanged = true;
+            return true;
+        }
+
+        public virtual void MarkBodyDirty( ITrajectoryTransform transform )
+        {
+            _staleBodies.Add( transform );
+            _isStaleAttractor |= transform.IsAttractor;
+        }
+
+        public virtual void Clear()
+        {
+            _staleBodyCountChanged = true;
+            throw new NotImplementedException();
+        }
+
+        public virtual TrajectoryBodyState GetCurrentStateVector( ITrajectoryTransform trajectoryTransform )
+        {
+            throw new NotImplementedException();
+
+        }
+
+        public virtual void SetCurrentStateVector( ITrajectoryTransform trajectoryTransform, TrajectoryBodyState stateVector )
+        {
+            throw new NotImplementedException();
+
+            if( trajectoryTransform.IsAttractor )
+            {
+                _isStaleAttractor = true;
+                // reset ephemerides for all.
+            }
+        }
+
+        protected virtual void FixStale()
+        {
+            _attractorCache = _bodies.Keys
+                .Where( t => t.IsAttractor )
+                .ToArray();
+
+            // Keep references to the old arrays to be able to lookup (via the timestepperIndex) and not reallocate everything, since not every part has changed.
+            int numAttractors = _attractorCache.Length;
+            int numFollowers = _bodies.Count - numAttractors;
+
+            var oldAttractors = _attractors;
+            var oldFollowers = _followers;
+            var oldAttractorAccelerationProviders = _attractorAccelerationProviders;
+            var oldFollowerAccelerationProviders = _followerAccelerationProviders;
+
+            var oldCurrentStateAttractors = _currentStateAttractors;
+            var oldCurrentStateFollowers = _currentStateFollowers;
+            var oldNextStateAttractors = _nextStateAttractors;
+            var oldNextStateFollowers = _nextStateFollowers;
+
+            var oldAttractorEphemerides = _attractorEphemerides;
+            var oldFollowerEphemerides = _followerEphemerides;
+
+            if( _staleBodyCountChanged )
+            {
+                _attractors = new ITrajectoryIntegrator[numAttractors];
+                _followers = new ITrajectoryIntegrator[numFollowers];
+                _attractorAccelerationProviders = new IAccelerationProvider[numAttractors][];
+                _followerAccelerationProviders = new IAccelerationProvider[numFollowers][];
+
+                _currentStateAttractors = new TrajectoryBodyState[numAttractors];
+                _nextStateAttractors = new TrajectoryBodyState[numAttractors];
+                _currentStateFollowers = new TrajectoryBodyState[numFollowers];
+                _nextStateFollowers = new TrajectoryBodyState[numFollowers];
+
+                _attractorEphemerides = new Ephemeris[numAttractors];
+                _followerEphemerides = new Ephemeris[numFollowers];
+            }
+
+            if( _isStaleAttractor )
+            {
+                // If an attractor has changed, we can't use the previously calculated ephemerides, so we reset them.
+
+                int attractorIndex = 0;
+                int followerIndex = 0;
+                foreach( var (body, entry) in _bodies )
+                {
+                    if( body.IsAttractor )
+                    {
+                        _attractors[attractorIndex] = body.TrajectoryIntegrator;
+                        _attractorAccelerationProviders[attractorIndex] = body.AccelerationProviders.ToArray();
+                        _currentStateAttractors[attractorIndex] = body.ReferenceFrameTransform.GetCurrentStateVector();
+                        _attractorEphemerides[attractorIndex] = entry.ephemeris;
+                        entry.isAttractor = true;
+                        entry.timestepperIndex = attractorIndex;
+
+                        attractorIndex++;
+                    }
+                    else
+                    {
+                        _followers[followerIndex] = body.TrajectoryIntegrator;
+                        _followerAccelerationProviders[followerIndex] = body.AccelerationProviders.ToArray();
+                        _currentStateFollowers[followerIndex] = body.ReferenceFrameTransform.GetCurrentStateVector();
+                        _followerEphemerides[followerIndex] = entry.ephemeris;
+                        entry.isAttractor = false;
+                        entry.timestepperIndex = followerIndex;
+
+                        followerIndex++;
+                    }
+                }
+            }
+            else
+            {
+
+#warning TODO update ephemeris length if changed.
+
+
+                foreach( var transform in _staleBodies )
+                {
+                    var ephemeris = _bodies[transform];
+
+                    // fix ephemeris possibly being out ofsync with new pos/vel/etc.
+
+                    // later we simulate from the point where all ephemerides arecalculated, or from 'now' if there is one that hasn't been calculated.
+                }
+            }
+
+            _isStaleAttractor = false;
+            _staleBodyCountChanged = false;
+            _staleBodies.Clear();
         }
 
         /// <summary>
@@ -45,6 +221,11 @@ namespace HSP.Trajectories
         /// </summary>
         public virtual void Simulate( double endUT )
         {
+            if( _staleBodies.Count > 0 )
+            {
+                FixStale();
+            }
+
 #warning TODO - ensure that the simulation runs long enough to update every ephemeris. And clean up the time stepper arrays
 
             // run forward or backward, depending on endUT
@@ -54,10 +235,10 @@ namespace HSP.Trajectories
             {
                 // prolong
                 double minStep = double.MaxValue;
-                for( int i = 0; i < _currentAttractors.Length; i++ )
+                for( int i = 0; i < _currentStateAttractors.Length; i++ )
                 {
                     var body = _attractors[i];
-                    double step = body.Step( _step, _currentAttractors[i], _attractorAccelerationProviders[i], out _nextAttractors[i] );
+                    double step = body.Step( _step, _currentStateAttractors[i], _attractorAccelerationProviders[i], out _nextStateAttractors[i] );
 
                     if( step < minStep )
                     {
@@ -65,10 +246,10 @@ namespace HSP.Trajectories
                     }
                 }
 
-                for( int i = 0; i < _currentFollowers.Length; i++ )
+                for( int i = 0; i < _currentStateFollowers.Length; i++ )
                 {
                     var body = _attractors[i];
-                    double step = body.Step( _step, _currentFollowers[i], _followerAccelerationProviders[i], out _nextFollowers[i] );
+                    double step = body.Step( _step, _currentStateFollowers[i], _followerAccelerationProviders[i], out _nextStateFollowers[i] );
 
                     if( step < minStep )
                     {
@@ -90,130 +271,23 @@ namespace HSP.Trajectories
 #warning TODO - might need to interpolate and/or append multiple data points if step was larger than the ephemeris' time resolution.
                     if( _ut >= _attractorEphemerides[i].EndUT + _attractorEphemerides[i].TimeResolution )
                     {
-                        _attractorEphemerides[i].AppendToFront( _currentAttractors[i] );
+                        _attractorEphemerides[i].AppendToFront( _currentStateAttractors[i] );
                     }
                 }
 
 
 
-                var temp = _currentAttractors;
-                _currentAttractors = _nextAttractors;
-                _nextAttractors = temp;
+                var temp = _currentStateAttractors;
+                _currentStateAttractors = _nextStateAttractors;
+                _nextStateAttractors = temp;
 
-                temp = _currentFollowers;
-                _currentFollowers = _nextFollowers;
-                _nextFollowers = temp;
+                temp = _currentStateFollowers;
+                _currentStateFollowers = _nextStateFollowers;
+                _nextStateFollowers = temp;
             }
 
             _ut = endUT; // Setting to the actual value prevents accumulation of small precision errors due to repeated addition.
-        }
-    }
 
-    public class TrajectorySimulator : IReadonlyTrajectorySimulator
-    {
-        protected TrajectorySimulatorTimestepper _timestepper;
-
-        ITrajectoryTransform[] _attractorCache;
-        HashSet<ITrajectoryTransform> _bodies;
-
-        Ephemeris[] _attractorEphemerides;
-        Ephemeris[] _followerEphemerides;
-
-        public virtual IReadOnlyList<ITrajectoryTransform> Attractors => _attractorCache;
-
-        HashSet<ITrajectoryTransform> _staleBodies;
-        bool _isStaleAttractor;
-
-        public TrajectorySimulator( double ut )
-        {
-            _timestepper = new TrajectorySimulatorTimestepper( this, ut );
-        }
-
-        public virtual void AddBody( ITrajectoryTransform transform )
-        {
-            bool ret = _bodies.Add( transform );
-
-            if( ret )
-            {
-                _staleBodies.Add( transform );
-                _isStaleAttractor |= transform.IsAttractor;
-            }
-        }
-
-        public virtual void RemoveBody( ITrajectoryTransform transform )
-        {
-            bool ret = _bodies.Remove( transform );
-
-            if( ret )
-            {
-                _staleBodies.Add( transform );
-                _isStaleAttractor |= transform.IsAttractor;
-            }
-        }
-
-        public virtual void Clear()
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual void Reset( Ephemeris[] attractorEphemerides, Ephemeris[] followerEphemerides, double ut )
-        {
-#warning TODO - instead of ephemerides, we need full data
-            // assume the ephemerides are the 'ground truth', sync the timestepper to them.
-            throw new NotImplementedException();
-        }
-
-        public virtual TrajectoryBodyState GetCurrentStateVector( ITrajectoryTransform trajectoryTransform )
-        {
-            throw new NotImplementedException();
-
-        }
-
-        public virtual void SetCurrentStateVector( ITrajectoryTransform trajectoryTransform, TrajectoryBodyState stateVector )
-        {
-            throw new NotImplementedException();
-
-            if( trajectoryTransform.IsAttractor )
-            {
-                // reset ephemerides for all.
-            }
-        }
-
-        protected virtual void FixStale()
-        {
-            if( _attractorChanged )
-            {
-                Reset( bodyList );
-
-#warning TODO - reset bodies and ephemeris of existing bodies.
-            }
-            else
-            {
-#warning TODO update ephemeris length if changed.
-                foreach( var transform in _staleList )
-                {
-                    if( _transforms.Contains( transform ) )
-                        simulator.AddBody( transform );
-                    else
-                        simulator.RemoveBody( transform );
-                }
-            }
-
-            _attractorCache = _bodies
-                .Where( t => t.IsAttractor )
-                .ToArray();
-
-            _isStaleAttractor = false;
-            _staleBodies.Clear();
-        }
-
-        public virtual void Simulate( double endUT )
-        {
-            if( _staleBodies.Count > 0 )
-            {
-                FixStale();
-            }
-            _timestepper.Simulate( endUT );
         }
     }
 }

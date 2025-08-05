@@ -102,6 +102,7 @@
     <Compile Include="Assets\HSP.Vanilla\Settings\GameSettings\SettingsPage_Keybinds.cs" />
     <Compile Include="Assets\HSP.Vanilla\Settings\TimelineSettings\SettingsPage_Construction.cs" />
     <Compile Include="Assets\HSP.Vanilla\Trajectories\FixedOrbit.cs" />
+    <Compile Include="Assets\HSP.Vanilla\Trajectories\TrajectoryTransform.cs" />
     <Compile Include="Assets\HSP.Vanilla\SelectedControlFrameManager.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\IGhostable_Ex.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\EditorScene\EditorSceneEscapeInputController.cs" />
@@ -157,13 +158,12 @@
     <Compile Include="Assets\HSP.Vanilla\Components\F1AxisActuator.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\MapScene\MapSceneM.cs" />
     <Compile Include="Assets\HSP.Vanilla\CelestialBodies\LODQuadModifier_Displace.cs" />
+    <Compile Include="Assets\HSP.Vanilla\Trajectories\TrajectoryManager.cs" />
     <Compile Include="Assets\HSP.Vanilla\Settings\GameSettings\SettingsPage_Graphics.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\MapScene\MapSceneReferenceFrameManager.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FLaunchSiteMarker.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FReactionControlController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FControlFrame.cs" />
-    <Compile Include="Assets\HSP.Vanilla\Trajectories\TrajectoryManager.cs" />
-    <Compile Include="Assets\HSP.Vanilla\Trajectories\TrajectoryTransform.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla\___HSP.Vanilla.asmdef" />

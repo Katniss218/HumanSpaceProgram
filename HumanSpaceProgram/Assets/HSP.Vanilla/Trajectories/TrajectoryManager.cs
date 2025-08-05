@@ -39,7 +39,7 @@ namespace HSP.Trajectories
         /// Tries to add the specified trajectory to the simulation as an attractor.
         /// </summary>
         /// <returns>True if the trajectory was successfully added to the simulation, otherwise false.</returns>
-        public static bool TryAddBody( ITrajectoryTransform transform )
+        public static bool TryAddBody( ITrajectoryTransform transform, Ephemeris ephemeris )
         {
             if( !instanceExists )
                 return false;
@@ -52,6 +52,7 @@ namespace HSP.Trajectories
             {
                 foreach( var simulator in instance._simulators )
                 {
+#warning TODO - prediction ephemeris depends on user, 'ground truth' is config dependant.
                     simulator.AddBody( transform );
                 }
             }
@@ -80,6 +81,14 @@ namespace HSP.Trajectories
                 }
             }
             return wasRemoved;
+        }
+
+        public static void MarkBodyDirty( ITrajectoryTransform transform )
+        {
+            foreach( var simulator in instance._simulators )
+            {
+                simulator.MarkBodyDirty( transform );
+            }
         }
 
         /// <summary>
