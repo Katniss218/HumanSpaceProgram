@@ -9,7 +9,7 @@ namespace HSP.Vanilla.Trajectories
     /// <summary>
     /// A trajectory that follows a newtonian gravitational field.
     /// </summary>
-    public class NewtonianOrbit : ITrajectory
+    public class NewtonianOrbit 
     {
         private double _cachedUpToUT => UT;
 
@@ -36,12 +36,12 @@ namespace HSP.Vanilla.Trajectories
             this.Mass = mass;
         }
 
-        public TrajectoryBodyState GetCurrentState()
+        public TrajectoryStateVector GetCurrentState()
         {
-            return new TrajectoryBodyState( _currentPosition, _currentVelocity, _currentAcceleration, Mass );
+            return new TrajectoryStateVector( _currentPosition, _currentVelocity, _currentAcceleration, Mass );
         }
 
-        public void SetCurrentState( TrajectoryBodyState stateVector )
+        public void SetCurrentState( TrajectoryStateVector stateVector )
         {
             _currentPosition = stateVector.AbsolutePosition;
             _currentVelocity = stateVector.AbsoluteVelocity;
@@ -49,7 +49,7 @@ namespace HSP.Vanilla.Trajectories
             Mass = stateVector.Mass;
         }
 
-        public TrajectoryBodyState GetStateAtUT( double ut )
+        public TrajectoryStateVector GetStateAtUT( double ut )
         {
             if( _cachedUpToUT < ut )
             {
@@ -82,7 +82,7 @@ namespace HSP.Vanilla.Trajectories
             return false;
         }
 
-        public void Step( IEnumerable<TrajectoryBodyState> attractors, double dt )
+        public void Step( IEnumerable<TrajectoryStateVector> attractors, double dt )
         {
             Vector3Dbl selfAbsolutePosition = this.GetCurrentState().AbsolutePosition;
 

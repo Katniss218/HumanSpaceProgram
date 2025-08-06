@@ -1,4 +1,6 @@
 ﻿using HSP.Time;
+using HSP.Vanilla.Trajectories;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -31,15 +33,15 @@ namespace HSP.Trajectories
 
         private TrajectorySimulator[] _simulators;
 
-        private HashSet<ITrajectoryTransform> _transforms = new();
+        private HashSet<TrajectoryTransform> _transforms = new();
 
-        private Dictionary<ITrajectoryTransform, (Vector3Dbl pos, Vector3Dbl vel, Vector3Dbl interpolatedVel)> _posAndVelCache = new();
+        private Dictionary<TrajectoryTransform, (Vector3Dbl pos, Vector3Dbl vel, Vector3Dbl interpolatedVel)> _posAndVelCache = new();
 
         /// <summary>
         /// Tries to add the specified trajectory to the simulation as an attractor.
         /// </summary>
         /// <returns>True if the trajectory was successfully added to the simulation, otherwise false.</returns>
-        public static bool TryAddBody( ITrajectoryTransform transform, Ephemeris ephemeris )
+        public static bool TryAddBody( TrajectoryTransform transform )
         {
             if( !instanceExists )
                 return false;
@@ -53,7 +55,7 @@ namespace HSP.Trajectories
                 foreach( var simulator in instance._simulators )
                 {
 #warning TODO - prediction ephemeris depends on user, 'ground truth' is config dependant.
-                    simulator.AddBody( transform );
+                    simulator.AddBody( transform, null );
                 }
             }
             return wasAdded;
@@ -63,7 +65,7 @@ namespace HSP.Trajectories
         /// Tries to remove the specified trajectory (attractor) from the simulation.
         /// </summary>
         /// <returns>True if the trajectory was successfully removed, otherwise false.</returns>
-        public static bool TryRemoveBody( ITrajectoryTransform transform )
+        public static bool TryRemoveBody( TrajectoryTransform transform )
         {
             if( !instanceExists )
                 return false;
@@ -83,7 +85,7 @@ namespace HSP.Trajectories
             return wasRemoved;
         }
 
-        public static void MarkBodyDirty( ITrajectoryTransform transform )
+        public static void MarkBodyDirty( TrajectoryTransform transform )
         {
             foreach( var simulator in instance._simulators )
             {
@@ -175,7 +177,7 @@ namespace HSP.Trajectories
             {
                 if( !trajectoryTransform.TrajectoryDoesntNeedUpdating() )
                 {
-                    TrajectoryBodyState stateVector = new TrajectoryBodyState(
+                    TrajectoryStateVector stateVector = new TrajectoryStateVector(
                         trajectoryTransform.ReferenceFrameTransform.AbsolutePosition,
                         trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity, // velocity before rigidbody forces from this frame are applied.
                         Vector3Dbl.zero,
@@ -195,7 +197,7 @@ namespace HSP.Trajectories
 
             foreach( var trajectoryTransform in instance._transforms )
             {
-                TrajectoryBodyState stateVector = Simulator.GetCurrentStateVector( trajectoryTransform );
+                TrajectoryStateVector stateVector = Simulator.GetCurrentStateVector( trajectoryTransform );
 
                 if( trajectoryTransform.TrajectoryDoesntNeedUpdating() )
                 {

@@ -8,9 +8,9 @@ namespace HSP.Trajectories
     {
         public IReadOnlyList<ITrajectoryTransform> Attractors { get; }
 
-        public TrajectoryBodyState GetCurrentStateVector( ITrajectoryTransform trajectoryTransform );
+        public TrajectoryStateVector GetCurrentStateVector( ITrajectoryTransform trajectoryTransform );
 
-        public void SetCurrentStateVector( ITrajectoryTransform trajectoryTransform, TrajectoryBodyState stateVector );
+        public void SetCurrentStateVector( ITrajectoryTransform trajectoryTransform, TrajectoryStateVector stateVector );
     }
 
     public class TrajectorySimulator : IReadonlyTrajectorySimulator
@@ -30,12 +30,12 @@ namespace HSP.Trajectories
         protected ITrajectoryIntegrator[] _followers;
         protected IAccelerationProvider[][] _followerAccelerationProviders;
 
-        protected TrajectoryBodyState[] _currentStateAttractors;
-        protected TrajectoryBodyState[] _nextStateAttractors;
+        protected TrajectoryStateVector[] _currentStateAttractors;
+        protected TrajectoryStateVector[] _nextStateAttractors;
 
-        protected TrajectoryBodyState[] _currentStateFollowers;
-        protected TrajectoryBodyState[] _nextStateFollowers;
-
+        protected TrajectoryStateVector[] _currentStateFollowers;
+        protected TrajectoryStateVector[] _nextStateFollowers;
+#error TODO - we need getters for the current state so that the acceleration providers can use them. Potentially wrap them in a lightweight struct as readonly lists?
         protected double _ut;
         protected double _step;
 
@@ -107,13 +107,13 @@ namespace HSP.Trajectories
             throw new NotImplementedException();
         }
 
-        public virtual TrajectoryBodyState GetCurrentStateVector( ITrajectoryTransform trajectoryTransform )
+        public virtual TrajectoryStateVector GetCurrentStateVector( ITrajectoryTransform trajectoryTransform )
         {
             throw new NotImplementedException();
 
         }
 
-        public virtual void SetCurrentStateVector( ITrajectoryTransform trajectoryTransform, TrajectoryBodyState stateVector )
+        public virtual void SetCurrentStateVector( ITrajectoryTransform trajectoryTransform, TrajectoryStateVector stateVector )
         {
             throw new NotImplementedException();
 
@@ -154,10 +154,10 @@ namespace HSP.Trajectories
                 _attractorAccelerationProviders = new IAccelerationProvider[numAttractors][];
                 _followerAccelerationProviders = new IAccelerationProvider[numFollowers][];
 
-                _currentStateAttractors = new TrajectoryBodyState[numAttractors];
-                _nextStateAttractors = new TrajectoryBodyState[numAttractors];
-                _currentStateFollowers = new TrajectoryBodyState[numFollowers];
-                _nextStateFollowers = new TrajectoryBodyState[numFollowers];
+                _currentStateAttractors = new TrajectoryStateVector[numAttractors];
+                _nextStateAttractors = new TrajectoryStateVector[numAttractors];
+                _currentStateFollowers = new TrajectoryStateVector[numFollowers];
+                _nextStateFollowers = new TrajectoryStateVector[numFollowers];
 
                 _attractorEphemerides = new Ephemeris[numAttractors];
                 _followerEphemerides = new Ephemeris[numFollowers];
@@ -173,9 +173,9 @@ namespace HSP.Trajectories
                 {
                     if( body.IsAttractor )
                     {
-                        _attractors[attractorIndex] = body.TrajectoryIntegrator;
+                        _attractors[attractorIndex] = body.Integrator;
                         _attractorAccelerationProviders[attractorIndex] = body.AccelerationProviders.ToArray();
-                        _currentStateAttractors[attractorIndex] = body.ReferenceFrameTransform.GetCurrentStateVector();
+                        _currentStateAttractors[attractorIndex] = body.GetBodyState();
                         _attractorEphemerides[attractorIndex] = entry.ephemeris;
                         entry.isAttractor = true;
                         entry.timestepperIndex = attractorIndex;
@@ -184,9 +184,9 @@ namespace HSP.Trajectories
                     }
                     else
                     {
-                        _followers[followerIndex] = body.TrajectoryIntegrator;
+                        _followers[followerIndex] = body.Integrator;
                         _followerAccelerationProviders[followerIndex] = body.AccelerationProviders.ToArray();
-                        _currentStateFollowers[followerIndex] = body.ReferenceFrameTransform.GetCurrentStateVector();
+                        _currentStateFollowers[followerIndex] = body.GetBodyState();
                         _followerEphemerides[followerIndex] = entry.ephemeris;
                         entry.isAttractor = false;
                         entry.timestepperIndex = followerIndex;
@@ -238,7 +238,7 @@ namespace HSP.Trajectories
                 for( int i = 0; i < _currentStateAttractors.Length; i++ )
                 {
                     var body = _attractors[i];
-                    double step = body.Step( _step, _currentStateAttractors[i], _attractorAccelerationProviders[i], out _nextStateAttractors[i] );
+                    double step = body.Step( _ut, _step, _currentStateAttractors[i], _attractorAccelerationProviders[i], out _nextStateAttractors[i] );
 
                     if( step < minStep )
                     {
@@ -249,7 +249,7 @@ namespace HSP.Trajectories
                 for( int i = 0; i < _currentStateFollowers.Length; i++ )
                 {
                     var body = _attractors[i];
-                    double step = body.Step( _step, _currentStateFollowers[i], _followerAccelerationProviders[i], out _nextStateFollowers[i] );
+                    double step = body.Step( _ut, _step, _currentStateFollowers[i], _followerAccelerationProviders[i], out _nextStateFollowers[i] );
 
                     if( step < minStep )
                     {

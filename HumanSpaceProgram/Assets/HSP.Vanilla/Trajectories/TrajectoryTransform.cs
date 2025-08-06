@@ -46,13 +46,13 @@ namespace HSP.Vanilla.Trajectories
             }
         }
 
-        private ITrajectoryIntegrator _trajectory;
+        private ITrajectoryIntegrator _integrator;
         /// <summary>
         /// Gets or sets the trajectory that this object will follow.
         /// </summary>
-        public ITrajectoryIntegrator TrajectoryIntegrator
+        public ITrajectoryIntegrator Integrator
         {
-            get => _trajectory;
+            get => _integrator;
             set
             {
                 if( value == null )
@@ -60,7 +60,7 @@ namespace HSP.Vanilla.Trajectories
                     throw new ArgumentNullException( nameof( value ), "The trajectory can't be null." );
                 }
 
-                _trajectory = value;
+                _integrator = value;
 
                 //TrajectoryBodyState trajectoryState = value.Step(...);
                 //_referenceFrameTransform.AbsolutePosition = trajectoryState.AbsolutePosition;
@@ -93,7 +93,25 @@ namespace HSP.Vanilla.Trajectories
             if( accelerationProviders.Any( t => t == null ) )
                 throw new ArgumentException( "The acceleration provider collection can't contain null elements.", nameof( accelerationProviders ) );
 
-            _accelerationProviders = accelerationProviders.ToArray(); // copy to prevent later edits.
+            _accelerationProviders = accelerationProviders.ToArray();
+            TrajectoryManager.MarkBodyDirty( this );
+        }
+
+        /// <remarks>
+        /// The array will NOT be copied.
+        /// </remarks>
+        public void SetAccelerationProviders( params IAccelerationProvider[] accelerationProviders )
+        {
+            if( accelerationProviders == null )
+                throw new ArgumentNullException( nameof( accelerationProviders ), "The acceleration provider collection can't be null." );
+
+            if( !accelerationProviders.Any() )
+                throw new ArgumentException( "The acceleration provider collection can't be empty.", nameof( accelerationProviders ) );
+
+            if( accelerationProviders.Any( t => t == null ) )
+                throw new ArgumentException( "The acceleration provider collection can't contain null elements.", nameof( accelerationProviders ) );
+
+            _accelerationProviders = accelerationProviders;
             TrajectoryManager.MarkBodyDirty( this );
         }
 
@@ -175,10 +193,10 @@ namespace HSP.Vanilla.Trajectories
 
         private bool TryRegister()
         {
-            if( _trajectory == null )
+            if( _integrator == null )
                 return false;
 
-            return TrajectoryManager.TryAddBody( this, this.Ephemeris );
+            return TrajectoryManager.TryAddBody( this );
         }
 
         private bool TryUnregister()
@@ -190,8 +208,9 @@ namespace HSP.Vanilla.Trajectories
         public static SerializationMapping TrajectoryTransformMapping()
         {
             return new MemberwiseSerializationMapping<TrajectoryTransform>()
-                .WithMember( "trajectory", o => o._trajectory )
-                .WithMember( "is_attractor", o => o._isAttractor );
+                .WithMember( "is_attractor", o => o._isAttractor )
+                .WithMember( "integrator", o => o._integrator )
+                .WithMember( "acceleration_providers", o => o._accelerationProviders );
         }
     }
 }

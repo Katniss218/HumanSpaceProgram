@@ -2,7 +2,7 @@
 
 namespace HSP.Trajectories
 {
-    /// <summary>
+    /*/// <summary>
     /// Represents the position and velocity of an object in a gravitational field at a specified point in time. <br/>
     /// This struct is immutable.
     /// </summary>
@@ -29,5 +29,5 @@ namespace HSP.Trajectories
             this.AbsolutePosition = absolutePosition;
             this.AbsoluteVelocity = absoluteVelocity;
         }
-    }
+    }*/
 }

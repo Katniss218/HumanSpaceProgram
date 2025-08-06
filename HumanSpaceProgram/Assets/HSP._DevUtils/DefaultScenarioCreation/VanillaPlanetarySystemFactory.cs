@@ -3,11 +3,14 @@ using HSP.CelestialBodies.Atmospheres;
 using HSP.CelestialBodies.Surfaces;
 using HSP.ReferenceFrames;
 using HSP.Trajectories;
+using HSP.Trajectories.AccelerationProviders;
+using HSP.Trajectories.TrajectoryIntegrators;
 using HSP.Vanilla.CelestialBodies;
 using HSP.Vanilla.Scenes.GameplayScene;
 using HSP.Vanilla.Scenes.GameplayScene.Cameras;
 using HSP.Vanilla.Trajectories;
 using HSP.Vessels;
+using System;
 using System.Linq;
 using UnityEngine;
 using UnityPlus.AssetManagement;
@@ -73,12 +76,15 @@ namespace HSP._DevUtils
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
             comp.IsAttractor = true;
-            comp.TrajectoryIntegrator = new FixedOrbit( Time.TimeManager.UT, airfPos, airfRot, cb.Mass );
+            comp.Integrator = new EulerIntegrator();
+            comp.SetAccelerationProviders( new IAccelerationProvider[] { } );
+            //comp.TrajectoryIntegrator = new FixedOrbit( Time.TimeManager.UT, airfPos, airfRot, cb.Mass );
             return cb;
         }
 
         private static CelestialBody CreateCB( string id, string parentId, double semiMajorAxis, double eccentricity, double inclination, double longitudeOfAscendingNode, double argumentOfPeriapsis, double meanAnomaly, QuaternionDbl airfRot )
         {
+            throw new NotImplementedException();
             CelestialBody cb = new CelestialBodyFactory( id ).Create( GameplaySceneM.Instance, Vector3Dbl.zero, airfRot );
             LODQuadSphere lqs = cb.gameObject.AddComponent<LODQuadSphere>();
             lqs.SetMode( LODQuadMode.VisualAndCollider );
@@ -89,7 +95,7 @@ namespace HSP._DevUtils
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
             comp.IsAttractor = true;
-            comp.TrajectoryIntegrator = new KeplerianOrbit( Time.TimeManager.UT, parentId, semiMajorAxis, eccentricity, inclination, longitudeOfAscendingNode, argumentOfPeriapsis, meanAnomaly, cb.Mass );
+            //comp.TrajectoryIntegrator = new KeplerianOrbit( Time.TimeManager.UT, parentId, semiMajorAxis, eccentricity, inclination, longitudeOfAscendingNode, argumentOfPeriapsis, meanAnomaly, cb.Mass );
 
             return cb;
         }
@@ -166,7 +172,10 @@ namespace HSP._DevUtils
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
             comp.IsAttractor = true;
-            comp.TrajectoryIntegrator = new NewtonianOrbit( Time.TimeManager.UT, airfPos, airfVel, Vector3Dbl.zero, cb.Mass );
+            comp.Integrator = new EulerIntegrator();
+            comp.SetAccelerationProviders( new NBodyAccelerationProvider() );
+            comp.ReferenceFrameTransform.AbsoluteVelocity = airfVel;
+            //comp.TrajectoryIntegrator = new NewtonianOrbit( Time.TimeManager.UT, airfPos, airfVel, Vector3Dbl.zero, cb.Mass );
             return cb;
         }
 
@@ -179,7 +188,10 @@ namespace HSP._DevUtils
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
             comp.IsAttractor = false;
-            comp.TrajectoryIntegrator = new NewtonianOrbit( Time.TimeManager.UT, airfPos, airfVel, Vector3Dbl.zero, cb.Mass );
+            comp.Integrator = new EulerIntegrator();
+            comp.SetAccelerationProviders( new NBodyAccelerationProvider() );
+            comp.ReferenceFrameTransform.AbsoluteVelocity = airfVel;
+            //comp.TrajectoryIntegrator = new NewtonianOrbit( Time.TimeManager.UT, airfPos, airfVel, Vector3Dbl.zero, cb.Mass );
             return cb;
         }
 

@@ -41,7 +41,7 @@ namespace HSP.Trajectories
             double duration = endUT - startUT;
 
             int bufferSize = (int)Math.Ceiling( duration / TimeResolution ) + 1;
-            var newBuffer = new TrajectoryBodyState[bufferSize];
+            var newBuffer = new TrajectoryStateVector[bufferSize];
 
             double overlapStart = Math.Max( startUT, StartUT );
             double overlapEnd = Math.Min( endUT, EndUT );
@@ -82,7 +82,7 @@ namespace HSP.Trajectories
         public int Capacity => _buffer.Length;
 
         readonly double _inverseTimeResolution;
-        TrajectoryBodyState[] _buffer;
+        TrajectoryStateVector[] _buffer;
         int _startIndex;    // Index of the first (oldest) data point in the circular buffer.
         int _count;         // Current number of data points.
 
@@ -105,7 +105,7 @@ namespace HSP.Trajectories
             _inverseTimeResolution = 1.0 / timeResolution;
 
             int bufferSize = (int)Math.Ceiling( duration / timeResolution ) + 1;
-            _buffer = new TrajectoryBodyState[bufferSize];
+            _buffer = new TrajectoryStateVector[bufferSize];
             _startIndex = 0;
             _count = 0;
         }
@@ -113,7 +113,7 @@ namespace HSP.Trajectories
         /// <summary>
         /// Adds a new sample to the front (highest UT). If full, drops the newest.
         /// </summary>
-        public void AppendToFront( TrajectoryBodyState state )
+        public void AppendToFront( TrajectoryStateVector state )
         {
             double newEndUT = (_count == 0)
                 ? StartUT
@@ -135,7 +135,7 @@ namespace HSP.Trajectories
         /// <summary>
         /// Adds a new sample to the back (lowest UT). If full, drops the oldest.
         /// </summary>
-        public void AppendToBack( TrajectoryBodyState state )
+        public void AppendToBack( TrajectoryStateVector state )
         {
             double newStartUT = (_count == 0)
                 ? StartUT
@@ -156,7 +156,7 @@ namespace HSP.Trajectories
         /// Evaluates the ephemeris at the given time.
         /// </summary>
         /// <returns>The state vector representing the body at the specified time.</returns>
-        public TrajectoryBodyState Evaluate( double ut )
+        public TrajectoryStateVector Evaluate( double ut )
         {
             if( _count == 0 )
                 throw new InvalidOperationException( "The ephemeris to evaluate must have at least 1 data point." );
@@ -173,7 +173,7 @@ namespace HSP.Trajectories
             if( t == 0 )
                 return _buffer[index1];
             int index2 = (i1 + _startIndex) % Capacity;
-            return TrajectoryBodyState.Lerp( _buffer[index1], _buffer[index2], t );
+            return TrajectoryStateVector.Lerp( _buffer[index1], _buffer[index2], t );
         }
     }
 }

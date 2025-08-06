@@ -9,7 +9,7 @@ namespace HSP.Trajectories
 
         public IPhysicsTransform PhysicsTransform { get; }
 
-        public ITrajectoryIntegrator TrajectoryIntegrator { get; }
+        public ITrajectoryIntegrator Integrator { get; }
 
         public IReadOnlyList<IAccelerationProvider> AccelerationProviders { get; }
 
