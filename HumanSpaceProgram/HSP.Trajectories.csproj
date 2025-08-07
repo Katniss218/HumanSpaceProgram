@@ -9,7 +9,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <ProjectGuid>{57FA29CC-9026-83EE-F242-EA051DEA7649}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -60,15 +61,15 @@
   <ItemGroup>
     <Compile Include="Assets\HSP.Trajectories\AccelerationProviders\ManeuverNode.cs" />
     <Compile Include="Assets\HSP.Trajectories\OrbitalFrame.cs" />
-    <Compile Include="Assets\HSP.Trajectories\IAccelerationProvider.cs" />
+    <Compile Include="Assets\HSP.Trajectories\ITrajectoryStepProvider.cs" />
     <Compile Include="Assets\HSP.Trajectories\Components\FAnchor.cs" />
+    <Compile Include="Assets\HSP.Trajectories\TrajectoryIntegrators\EulerIntegrator.cs" />
+    <Compile Include="Assets\HSP.Trajectories\TrajectoryStateVector.cs" />
     <Compile Include="Assets\HSP.Trajectories\OrbitalStateVector.cs" />
     <Compile Include="Assets\HSP.Trajectories\ITrajectoryTransform.cs" />
     <Compile Include="Assets\HSP.Trajectories\Ephemeris.cs" />
     <Compile Include="Assets\HSP.Trajectories\TrajectorySimulator.cs" />
     <Compile Include="Assets\HSP.Trajectories\ITrajectoryIntegrator.cs" />
-    <Compile Include="Assets\HSP.Trajectories\TrajectoryStateVector.cs" />
-    <Compile Include="Assets\HSP.Trajectories\TrajectoryIntegrators\EulerIntegrator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Trajectories\___HSP.Trajectories.asmdef" />

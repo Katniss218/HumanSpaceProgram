@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System;
 
 namespace HSP.Trajectories
 {
@@ -15,6 +15,6 @@ namespace HSP.Trajectories
         /// <param name="accelerationProviders"></param>
         /// <param name="nextSelf">The resulting state vector of this body at T+step.</param>
         /// <returns>The desired time step to use next time. Return <paramref name="step"/> if the implementation doesn't support variable time stepping.</returns>
-        public double Step( double ut, double step, TrajectoryStateVector self, IEnumerable<IAccelerationProvider> accelerationProviders, out TrajectoryStateVector nextSelf );
+        public double Step( TrajectorySimulationContext context, ReadOnlySpan<ITrajectoryStepProvider> accelerationProviders, out TrajectoryStateVector nextSelf );
     }
 }

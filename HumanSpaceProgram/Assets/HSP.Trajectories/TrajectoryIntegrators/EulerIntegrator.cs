@@ -1,22 +1,22 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
 
 namespace HSP.Trajectories.TrajectoryIntegrators
 {
     public sealed class EulerIntegrator : ITrajectoryIntegrator
     {
-        public double Step( double ut, double step, TrajectoryStateVector self, IEnumerable<IAccelerationProvider> accelerationProviders, out TrajectoryStateVector nextSelf )
+        public double Step( TrajectorySimulationContext context, ReadOnlySpan<ITrajectoryStepProvider> accelerationProviders, out TrajectoryStateVector nextSelf )
         {
             Vector3Dbl _currentAcceleration = Vector3Dbl.zero;
             foreach( var attractor in accelerationProviders )
             {
-                _currentAcceleration += attractor.GetAcceleration( ut );
+                _currentAcceleration += attractor.GetAcceleration( context );
             }
 
-            Vector3Dbl _currentVelocity = self.AbsoluteVelocity + _currentAcceleration * step;
-            Vector3Dbl _currentPosition = self.AbsolutePosition + _currentVelocity * step;
-            nextSelf = new TrajectoryStateVector( _currentPosition, _currentVelocity, _currentAcceleration, self.Mass );
-            return step;
+            Vector3Dbl _currentVelocity = context.Self.AbsoluteVelocity + _currentAcceleration * context.Step;
+            Vector3Dbl _currentPosition = context.Self.AbsolutePosition + _currentVelocity * context.Step;
+            nextSelf = new TrajectoryStateVector( _currentPosition, _currentVelocity, _currentAcceleration, context.Self.Mass );
+            return context.Step;
         }
     }
 }

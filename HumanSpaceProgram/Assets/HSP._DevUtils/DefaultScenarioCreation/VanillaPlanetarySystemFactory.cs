@@ -77,7 +77,7 @@ namespace HSP._DevUtils
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
             comp.IsAttractor = true;
             comp.Integrator = new EulerIntegrator();
-            comp.SetAccelerationProviders( new IAccelerationProvider[] { } );
+            comp.SetAccelerationProviders( new ITrajectoryStepProvider[] { } );
             //comp.TrajectoryIntegrator = new FixedOrbit( Time.TimeManager.UT, airfPos, airfRot, cb.Mass );
             return cb;
         }

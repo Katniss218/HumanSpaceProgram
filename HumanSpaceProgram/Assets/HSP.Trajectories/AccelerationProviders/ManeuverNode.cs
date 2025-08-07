@@ -5,16 +5,22 @@ using UnityPlus.Serialization;
 
 namespace HSP.Trajectories.AccelerationProviders
 {
-    public class ManeuverNode : IAccelerationProvider
+    public class ManeuverNode : ITrajectoryStepProvider
     {
         // not a singleton
 
-        public Vector3Dbl GetAcceleration( double ut )
+
+        public ITrajectoryStepProvider Clone( ITrajectoryTransform self, IReadonlyTrajectorySimulator simulator )
         {
             throw new NotImplementedException();
         }
 
-        public double? GetMass( double ut )
+        public Vector3Dbl GetAcceleration( TrajectorySimulationContext context )
+        {
+            throw new NotImplementedException();
+        }
+
+        public double? GetMass( TrajectorySimulationContext context )
         {
             throw new NotImplementedException();
         }
@@ -22,23 +28,40 @@ namespace HSP.Trajectories.AccelerationProviders
         // serialization method.
     }
 
-    public class TwoBodyAccelerationProvider : IAccelerationProvider
+    public class TwoBodyAccelerationProvider : ITrajectoryStepProvider
     {
-        // pseudo-singleton. One per simulator really.
+        ITrajectoryTransform _parentBody; // Switch parent when crossing SOI boundaries?
+                                          // Would need some caching or something of the body graph, if any exists.
+        int _parentBodyIndex;
 
-        IReadonlyTrajectorySimulator _simulator;
-        ITrajectoryTransform _referenceBody;
-        ITrajectoryTransform _parentBody; // change when crossing SOI boundaries.
-
-#warning TODO - how to initialize these? they need to be copied, not just assigned, from the trajectory transform - per simulator.
-
-        public Vector3Dbl GetAcceleration( double ut )
+        public ITrajectoryStepProvider Clone( ITrajectoryTransform self, IReadonlyTrajectorySimulator simulator )
         {
-            throw new NotImplementedException();
+            if( _parentBody == self )
+                throw new InvalidOperationException( $"[{this.GetType().Name}] The body can't be its own parent." );
+
+            return new TwoBodyAccelerationProvider()
+            {
+                _parentBody = this._parentBody,
+                _parentBodyIndex = simulator.GetAttractorIndex( this._parentBody )
+            };
         }
-        public double? GetMass( double ut )
+
+        public Vector3Dbl GetAcceleration( TrajectorySimulationContext context )
         {
-            throw new NotImplementedException();
+            if( _parentBodyIndex == -1 )
+                return Vector3Dbl.zero; // no parent body, no acceleration.
+
+            Vector3Dbl selfPos = context.Self.AbsolutePosition;
+            var parent = context.CurrentAttractors[_parentBodyIndex];
+
+            Vector3Dbl toParent = parent.AbsolutePosition - selfPos;
+            double accelerationMagnitude = PhysicalConstants.G * (parent.Mass / toParent.sqrMagnitude);
+            return toParent.normalized * accelerationMagnitude;
+        }
+
+        public double? GetMass( TrajectorySimulationContext context )
+        {
+            return null;
         }
 
 
@@ -49,20 +72,38 @@ namespace HSP.Trajectories.AccelerationProviders
         }
     }
 
-    public class NBodyAccelerationProvider : IAccelerationProvider
+    public class NBodyAccelerationProvider : ITrajectoryStepProvider
     {
-        // pseudo-singleton. One per simulator really.
 
-        IReadonlyTrajectorySimulator _simulator;
-        ITrajectoryTransform _referenceBody;
-
-        public Vector3Dbl GetAcceleration( double ut )
+        public ITrajectoryStepProvider Clone( ITrajectoryTransform self, IReadonlyTrajectorySimulator simulator )
         {
-            throw new NotImplementedException();
+            return this; // Can return this, since there is no internal state.
         }
-        public double? GetMass( double ut )
+
+        public Vector3Dbl GetAcceleration( TrajectorySimulationContext context )
         {
-            throw new NotImplementedException();
+            Vector3Dbl selfPos = context.Self.AbsolutePosition;
+
+            Vector3Dbl accSum = Vector3Dbl.zero;
+            foreach( var attractor in context.CurrentAttractors )
+            {
+                Vector3Dbl toBody = attractor.AbsolutePosition - selfPos;
+
+                double distanceSq = toBody.sqrMagnitude;
+                if( distanceSq == 0.0 ) // Skip itself.
+                {
+                    continue;
+                }
+
+                double accelerationMagnitude = PhysicalConstants.G * (attractor.Mass / distanceSq);
+                accSum += toBody.normalized * accelerationMagnitude;
+            }
+            return accSum;
+        }
+
+        public double? GetMass( TrajectorySimulationContext context )
+        {
+            return null;
         }
 
 
@@ -74,7 +115,7 @@ namespace HSP.Trajectories.AccelerationProviders
     }
 
     [Obsolete( "Not implemented" )]
-    public class FMMNBodyAccelerationProvider : IAccelerationProvider
+    public class FMMNBodyAccelerationProvider : ITrajectoryStepProvider
     {
         // pseudo-singleton. One per simulator really.
 
@@ -82,7 +123,12 @@ namespace HSP.Trajectories.AccelerationProviders
 
         IReadonlyTrajectorySimulator _simulator;
 
-        public Vector3Dbl GetAcceleration( double ut )
+        public ITrajectoryStepProvider Clone( ITrajectoryTransform self, IReadonlyTrajectorySimulator simulator )
+        {
+            throw new NotImplementedException();
+        }
+
+        public Vector3Dbl GetAcceleration( TrajectorySimulationContext context )
         {
             // get the cached system for this simulator.
 
@@ -90,7 +136,8 @@ namespace HSP.Trajectories.AccelerationProviders
 
             throw new NotImplementedException();
         }
-        public double? GetMass( double ut )
+
+        public double? GetMass( TrajectorySimulationContext context )
         {
             throw new NotImplementedException();
         }

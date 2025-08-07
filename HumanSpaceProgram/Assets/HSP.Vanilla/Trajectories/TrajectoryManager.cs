@@ -177,14 +177,10 @@ namespace HSP.Trajectories
             {
                 if( !trajectoryTransform.TrajectoryDoesntNeedUpdating() )
                 {
-                    TrajectoryStateVector stateVector = new TrajectoryStateVector(
-                        trajectoryTransform.ReferenceFrameTransform.AbsolutePosition,
-                        trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity, // velocity before rigidbody forces from this frame are applied.
-                        Vector3Dbl.zero,
-                        trajectoryTransform.PhysicsTransform.Mass );
-
                     foreach( var simulator in instance._simulators )
-                        simulator.SetCurrentStateVector( trajectoryTransform, stateVector );
+                    {
+                        simulator.ResetCurrentStateVector( trajectoryTransform );
+                    }
                 }
             }
 

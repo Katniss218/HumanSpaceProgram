@@ -16,21 +16,21 @@ namespace HSP.Trajectories
         public double TimeResolution { get; }
 
         /// <summary>
-        /// The time at the last (highest UT) data point.
+        /// The time at the last (largest UT) data point.
         /// </summary>
-        public double EndUT { get; private set; }
+        public double MaxUT { get; private set; }
 
         /// <summary>
-        /// The time at the first (lowest UT) data point.
+        /// The time at the first (smallest UT) data point.
         /// </summary>
-        public double StartUT { get; private set; }
+        public double MinUT { get; private set; }
 
         /// <summary>
-        /// Gets the time between the start and end of the ephemeris, in [s].
+        /// Gets the duration between the start and end of the ephemeris, in [s].
         /// </summary>
         public double Duration
         {
-            get => EndUT - StartUT; 
+            get => MaxUT - MinUT; 
         }
 
         /// <summary>
@@ -43,14 +43,14 @@ namespace HSP.Trajectories
             int bufferSize = (int)Math.Ceiling( duration / TimeResolution ) + 1;
             var newBuffer = new TrajectoryStateVector[bufferSize];
 
-            double overlapStart = Math.Max( startUT, StartUT );
-            double overlapEnd = Math.Min( endUT, EndUT );
+            double overlapStart = Math.Max( startUT, MinUT );
+            double overlapEnd = Math.Min( endUT, MaxUT );
             int newCount = 0;
 
             if( overlapEnd >= overlapStart && _count > 0 )
             {
-                double firstPseudoIndex = (overlapStart - StartUT) * _inverseTimeResolution;
-                double lastPseudoIndex = (overlapEnd - StartUT) * _inverseTimeResolution;
+                double firstPseudoIndex = (overlapStart - MinUT) * _inverseTimeResolution;
+                double lastPseudoIndex = (overlapEnd - MinUT) * _inverseTimeResolution;
 
                 int firstIdx = (int)Math.Ceiling( firstPseudoIndex );
                 int lastIdx = (int)Math.Floor( lastPseudoIndex );
@@ -100,8 +100,8 @@ namespace HSP.Trajectories
                 throw new ArgumentOutOfRangeException( nameof( duration ) );
 
             TimeResolution = timeResolution;
-            EndUT = ut;
-            StartUT = ut;
+            MaxUT = ut;
+            MinUT = ut;
             _inverseTimeResolution = 1.0 / timeResolution;
 
             int bufferSize = (int)Math.Ceiling( duration / timeResolution ) + 1;
@@ -116,8 +116,8 @@ namespace HSP.Trajectories
         public void AppendToFront( TrajectoryStateVector state )
         {
             double newEndUT = (_count == 0)
-                ? StartUT
-                : EndUT + TimeResolution;
+                ? MinUT
+                : MaxUT + TimeResolution;
 
             int index = (_count + _startIndex) % Capacity;
 
@@ -129,7 +129,7 @@ namespace HSP.Trajectories
             _buffer[index] = state;
 
             if( _count == 1 )
-                EndUT = newEndUT;
+                MaxUT = newEndUT;
         }
 
         /// <summary>
@@ -138,8 +138,8 @@ namespace HSP.Trajectories
         public void AppendToBack( TrajectoryStateVector state )
         {
             double newStartUT = (_count == 0)
-                ? StartUT
-                : StartUT - TimeResolution;
+                ? MinUT
+                : MinUT - TimeResolution;
 
             int index = (_startIndex - 1 + Capacity) % Capacity;
 
@@ -149,7 +149,7 @@ namespace HSP.Trajectories
             _buffer[index] = state;
             _startIndex = index; // Slide the window backward.
 
-            StartUT = newStartUT;
+            MinUT = newStartUT;
         }
 
         /// <summary>
@@ -161,10 +161,10 @@ namespace HSP.Trajectories
             if( _count == 0 )
                 throw new InvalidOperationException( "The ephemeris to evaluate must have at least 1 data point." );
 
-            if( ut < StartUT || ut > EndUT )
-                throw new ArgumentOutOfRangeException( $"Time '{ut}' is out of the range of this ephemeris: [{StartUT}, {EndUT}]." );
+            if( ut < MinUT || ut > MaxUT )
+                throw new ArgumentOutOfRangeException( $"Time '{ut}' is out of the range of this ephemeris: [{MinUT}, {MaxUT}]." );
 
-            double pseudoIndex = (ut - StartUT) * _inverseTimeResolution;
+            double pseudoIndex = (ut - MinUT) * _inverseTimeResolution;
             int i0 = (int)pseudoIndex; // Does a floor operation.
             int i1 = i0 + 1;
 

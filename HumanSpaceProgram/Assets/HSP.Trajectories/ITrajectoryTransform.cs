@@ -11,7 +11,7 @@ namespace HSP.Trajectories
 
         public ITrajectoryIntegrator Integrator { get; }
 
-        public IReadOnlyList<IAccelerationProvider> AccelerationProviders { get; }
+        public IReadOnlyList<ITrajectoryStepProvider> AccelerationProviders { get; }
 
         public bool IsAttractor { get; }
 

@@ -70,11 +70,11 @@ namespace HSP.Vanilla.Trajectories
             }
         }
 
-        private IAccelerationProvider[] _accelerationProviders;
+        private ITrajectoryStepProvider[] _accelerationProviders;
         /// <summary>
         /// Gets or sets the trajectory that this object will follow.
         /// </summary>
-        public IReadOnlyList<IAccelerationProvider> AccelerationProviders
+        public IReadOnlyList<ITrajectoryStepProvider> AccelerationProviders
         {
             get => _accelerationProviders;
         }
@@ -82,7 +82,7 @@ namespace HSP.Vanilla.Trajectories
         /// <remarks>
         /// The array will be copied.
         /// </remarks>
-        public void SetAccelerationProviders( IEnumerable<IAccelerationProvider> accelerationProviders )
+        public void SetAccelerationProviders( IEnumerable<ITrajectoryStepProvider> accelerationProviders )
         {
             if( accelerationProviders == null )
                 throw new ArgumentNullException( nameof( accelerationProviders ), "The acceleration provider collection can't be null." );
@@ -100,7 +100,7 @@ namespace HSP.Vanilla.Trajectories
         /// <remarks>
         /// The array will NOT be copied.
         /// </remarks>
-        public void SetAccelerationProviders( params IAccelerationProvider[] accelerationProviders )
+        public void SetAccelerationProviders( params ITrajectoryStepProvider[] accelerationProviders )
         {
             if( accelerationProviders == null )
                 throw new ArgumentNullException( nameof( accelerationProviders ), "The acceleration provider collection can't be null." );
