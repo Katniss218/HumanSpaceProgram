@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace HSP.Trajectories.TrajectoryIntegrators
 {
@@ -13,10 +14,17 @@ namespace HSP.Trajectories.TrajectoryIntegrators
                 _currentAcceleration += attractor.GetAcceleration( context );
             }
 
-            Vector3Dbl _currentVelocity = context.Self.AbsoluteVelocity + _currentAcceleration * context.Step;
-            Vector3Dbl _currentPosition = context.Self.AbsolutePosition + _currentVelocity * context.Step;
+            Vector3Dbl _currentVelocity = context.Self.AbsoluteVelocity + (_currentAcceleration * context.Step);
+            Vector3Dbl _currentPosition = context.Self.AbsolutePosition + (_currentVelocity * context.Step);
             nextSelf = new TrajectoryStateVector( _currentPosition, _currentVelocity, _currentAcceleration, context.Self.Mass );
             return context.Step;
+        }
+
+
+        [MapsInheritingFrom( typeof( EulerIntegrator ) )]
+        public static SerializationMapping EulerIntegratorMapping()
+        {
+            return new MemberwiseSerializationMapping<EulerIntegrator>();
         }
     }
 }

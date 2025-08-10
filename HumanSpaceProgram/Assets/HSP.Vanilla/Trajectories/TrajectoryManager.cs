@@ -2,7 +2,6 @@
 using HSP.Vanilla.Trajectories;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.LowLevel;
 using UnityEngine.PlayerLoop;
@@ -15,8 +14,12 @@ namespace HSP.Trajectories
     /// </summary>
     public class TrajectoryManager : SingletonMonoBehaviour<TrajectoryManager>
     {
-        public static IReadonlyTrajectorySimulator Simulator => instance._simulators[0];
-        public static IReadonlyTrajectorySimulator PredictionSimulator => instance._simulators[1];
+        private const int SIMULATOR_INDEX = 0;
+        private const int PREDICTION_SIMULATOR_INDEX = 1;
+        public static IReadonlyTrajectorySimulator Simulator => instance._simulators[SIMULATOR_INDEX];
+        public static IReadonlyTrajectorySimulator PredictionSimulator => instance._simulators[PREDICTION_SIMULATOR_INDEX];
+
+        private TrajectorySimulator[] _simulators;
 
         private double _flightPlanDuration = 100 * 86400;
         public static double FlightPlanDuration
@@ -28,10 +31,10 @@ namespace HSP.Trajectories
                     throw new System.ArgumentOutOfRangeException( nameof( value ), "Flight plan duration must be greater than zero." );
 
                 instance._flightPlanDuration = value;
+                instance._simulators[PREDICTION_SIMULATOR_INDEX].SetEphemerisLength( FlightPlanDuration );
+
             }
         }
-
-        private TrajectorySimulator[] _simulators;
 
         private HashSet<TrajectoryTransform> _transforms = new();
 
@@ -49,14 +52,13 @@ namespace HSP.Trajectories
             if( transform == null )
                 return false;
 
+            instance.EnsureSimulatorsExist();
             bool wasAdded = instance._transforms.Add( transform );
             if( wasAdded )
             {
-                foreach( var simulator in instance._simulators )
-                {
 #warning TODO - prediction ephemeris depends on user, 'ground truth' is config dependant.
-                    simulator.AddBody( transform, null );
-                }
+                instance._simulators[SIMULATOR_INDEX].AddBody( transform );
+                instance._simulators[PREDICTION_SIMULATOR_INDEX].AddBody( transform );
             }
             return wasAdded;
         }
@@ -87,9 +89,16 @@ namespace HSP.Trajectories
 
         public static void MarkBodyDirty( TrajectoryTransform transform )
         {
+            if( !instanceExists )
+                return;
+
+            instance.EnsureSimulatorsExist();
             foreach( var simulator in instance._simulators )
             {
-                simulator.MarkBodyDirty( transform );
+                if( simulator.HasBody( transform ) )
+                {
+                    simulator.MarkBodyDirty( transform );
+                }
             }
         }
 
@@ -101,6 +110,7 @@ namespace HSP.Trajectories
             if( !instanceExists )
                 return;
 
+            instance.EnsureSimulatorsExist();
             instance._transforms.Clear();
             foreach( var simulator in instance._simulators )
             {
@@ -114,9 +124,10 @@ namespace HSP.Trajectories
             {
                 _simulators = new[]
                 {
-                    new TrajectorySimulator( TimeManager.UT ),
-                    new TrajectorySimulator( TimeManager.UT )
+                    new TrajectorySimulator( TimeManager.UT, 0.1, 1.0, 100.0 ),
+                    new TrajectorySimulator( TimeManager.UT, FlightPlanDuration / 1000.0, FlightPlanDuration / 1000.0, FlightPlanDuration )
                 };
+                _simulators[PREDICTION_SIMULATOR_INDEX].MaxStepSize = FlightPlanDuration / 1000.0;
             }
         }
 
@@ -175,27 +186,30 @@ namespace HSP.Trajectories
 
             foreach( var trajectoryTransform in instance._transforms )
             {
-                if( !trajectoryTransform.TrajectoryDoesntNeedUpdating() )
+                if( trajectoryTransform.TrajectoryNeedsUpdating() )
                 {
                     foreach( var simulator in instance._simulators )
                     {
-                        simulator.ResetCurrentStateVector( trajectoryTransform );
+                        simulator.ResetStateVector( trajectoryTransform );
                     }
                 }
             }
 
-            foreach( var simulator in instance._simulators )
-            {
-                //double time = sim.EndUT;
-                simulator.Simulate( TimeManager.UT );
-                //double deltaTime = sim.EndUT - time;
-            }
+            instance._simulators[SIMULATOR_INDEX].Simulate( TimeManager.UT );
+            instance._simulators[PREDICTION_SIMULATOR_INDEX].Simulate( TimeManager.UT + FlightPlanDuration );
 
             foreach( var trajectoryTransform in instance._transforms )
             {
                 TrajectoryStateVector stateVector = Simulator.GetCurrentStateVector( trajectoryTransform );
 
-                if( trajectoryTransform.TrajectoryDoesntNeedUpdating() )
+                if( trajectoryTransform.TrajectoryNeedsUpdating() )
+                {
+                    instance._posAndVelCache[trajectoryTransform] = (stateVector.AbsolutePosition, stateVector.AbsoluteVelocity, Vector3Dbl.zero);
+                    //trajectoryTransform.SuppressValueChanged(); // for some reason, suppressing it here makes engines not work right.
+                    trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = stateVector.AbsoluteVelocity;
+                    //trajectoryTransform.AllowValueChanged();
+                }
+                else
                 {
                     // If the transform is synchronized, make the velocity what it should be to make it move to the target location.
                     // This - at least in theory - should make PhysX happier, because the position is not being reset, in turn resetting some physics scene stuff.
@@ -203,12 +217,9 @@ namespace HSP.Trajectories
 
                     instance._posAndVelCache[trajectoryTransform] = (stateVector.AbsolutePosition, stateVector.AbsoluteVelocity, interpolatedVel);
 
+                    trajectoryTransform.SuppressValueChanged();
                     trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = interpolatedVel;
-                }
-                else
-                {
-                    instance._posAndVelCache[trajectoryTransform] = (stateVector.AbsolutePosition, stateVector.AbsoluteVelocity, Vector3Dbl.zero);
-                    trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = stateVector.AbsoluteVelocity;
+                    trajectoryTransform.AllowValueChanged();
                 }
             }
         }
@@ -228,11 +239,11 @@ namespace HSP.Trajectories
                     trajectoryTransform.ReferenceFrameTransform.AbsolutePosition = pos;
                 }*/
 
-                // IsSynchronized() will return false if a kinematic object (e.g. planet) is colliding,
-                //   in such a case, the object didn't change its velocity so it's technically still synchronized.
-                if( trajectoryTransform.TrajectoryDoesntNeedUpdating() || trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity == interpolatedVel )
+                if( !trajectoryTransform.TrajectoryNeedsUpdating() || trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity == interpolatedVel )
                 {
+                    trajectoryTransform.SuppressValueChanged();
                     trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = vel;
+                    trajectoryTransform.AllowValueChanged();
                 }
             }
         }

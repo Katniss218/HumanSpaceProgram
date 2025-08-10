@@ -59,6 +59,17 @@ solar system is an acceleration provider that takes the state of the attractors.
 
 need to separate the 'flight plan' acceleration providers from the 'real' ones.
 real ones get stored in the trajectory transform.
+flight plan uses real ones + some of its own ones
+
+
+unified ephemeris length would help solve some annoyances
+ephemerides themselves shouldn't be defined in the traj transform
+
+
+
+
+
+
 
 
 

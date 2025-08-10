@@ -1,44 +1,10 @@
-﻿using HSP.Time;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.Profiling;
 
 namespace HSP.Trajectories
 {
-    public interface IReadonlyTrajectorySimulator
-    {
-        /// <summary>
-        /// Gets the timestepper index of the given attractor.
-        /// </summary>
-        public int GetAttractorIndex( ITrajectoryTransform trajectoryTransform );
-
-        /// <summary>
-        /// Gets all attractors that are taking part in the simulation.
-        /// </summary>
-        public ReadOnlySpan<ITrajectoryTransform> Attractors { get; }
-
-        public TrajectoryStateVector GetCurrentStateVector( ITrajectoryTransform trajectoryTransform );
-
-        public void ResetCurrentStateVector( ITrajectoryTransform trajectoryTransform );
-    }
-
-    public readonly ref struct TrajectorySimulationContext
-    {
-        public double UT { get; }
-        public double Step { get; }
-        public TrajectoryStateVector Self { get; }
-        public ReadOnlySpan<TrajectoryStateVector> CurrentAttractors { get; }
-        // No followers because we're not allowed to use them in calculations (they don't influence the simulation, on purpose).
-
-        public TrajectorySimulationContext( double ut, double step, TrajectoryStateVector self, ReadOnlySpan<TrajectoryStateVector> currentAttractors )
-        {
-            this.UT = ut;
-            this.Step = step;
-            this.Self = self;
-            this.CurrentAttractors = currentAttractors;
-        }
-    }
-
     public class TrajectorySimulator : IReadonlyTrajectorySimulator
     {
         public class Entry
@@ -65,6 +31,11 @@ namespace HSP.Trajectories
         protected double _ut;
         protected double _step;
 
+        /// <summary>
+        /// Maximum global step size for the simulation, in [s].
+        /// </summary>
+        public double MaxStepSize { get; set; } = 1.0;
+
         protected Ephemeris[] _attractorEphemerides;
         protected Ephemeris[] _followerEphemerides;
 
@@ -82,25 +53,43 @@ namespace HSP.Trajectories
             return entry.timestepperIndex;
         }
 
+        public double UT => _ut;
+
         //
 
         public virtual ReadOnlySpan<ITrajectoryTransform> Attractors => _attractorCache;
         ITrajectoryTransform[] _attractorCache;
-        Dictionary<ITrajectoryTransform, Entry> _bodies;
+        Dictionary<ITrajectoryTransform, Entry> _bodies = new();
 
-        HashSet<ITrajectoryTransform> _staleBodies;
+        HashSet<ITrajectoryTransform> _staleBodies = new();
         bool _isStaleAttractor;
         bool _staleBodyCountChanged;
 
-        public TrajectorySimulator( double ut )
+        bool _staleEphemerisLengthChanged;
+        double _ephemerisDuration;
+        double _ephemerisTimeResolution;
+
+        public TrajectorySimulator( double ut, double step, double ephemerisTimeResolution, double ephemerisDuration )
         {
             this._ut = ut;
+            this._step = step;
             _isStaleAttractor = true; // will set up everything on first step.
             _staleBodyCountChanged = true;
+            _ephemerisDuration = ephemerisDuration;
+            _ephemerisTimeResolution = ephemerisTimeResolution;
         }
 
-        public virtual bool AddBody( ITrajectoryTransform transform, Ephemeris ephemeris )
+        public bool HasBody( ITrajectoryTransform trajectoryTransform )
         {
+            if( trajectoryTransform == null )
+                return false;
+
+            return _bodies.ContainsKey( trajectoryTransform );
+        }
+
+        public virtual bool AddBody( ITrajectoryTransform transform )
+        {
+            Ephemeris ephemeris = new Ephemeris( _ephemerisTimeResolution, _ephemerisDuration + _ephemerisTimeResolution /* padding */ );
             bool wasAdded = _bodies.TryAdd( transform, new Entry() { timestepperIndex = -1, isAttractor = transform.IsAttractor, ephemeris = ephemeris } );
             if( !wasAdded )
                 return false;
@@ -108,17 +97,6 @@ namespace HSP.Trajectories
             _staleBodies.Add( transform );
             _isStaleAttractor |= transform.IsAttractor;
             _staleBodyCountChanged = true;
-            return true;
-        }
-
-        public virtual bool SetEphemeris( ITrajectoryTransform transform, Ephemeris ephemeris )
-        {
-            if( !_bodies.TryGetValue( transform, out var entry ) )
-                return false;
-
-            entry.ephemeris = ephemeris;
-            _staleBodies.Add( transform );
-            _isStaleAttractor |= transform.IsAttractor;
             return true;
         }
 
@@ -143,10 +121,19 @@ namespace HSP.Trajectories
             _isStaleAttractor |= (trajectoryTransform.IsAttractor | bodyEntry.isAttractor); // if is attractor or was attractor (it could've changed).
         }
 
+        public virtual void SetEphemerisLength( double ephemerisDuration )
+        {
+            if( ephemerisDuration <= 0 )
+                throw new ArgumentOutOfRangeException( nameof( ephemerisDuration ), "The ephemeris duration must be greater than zero." );
+
+            _staleEphemerisLengthChanged = true;
+            this._ephemerisDuration = ephemerisDuration;
+        }
+
         public virtual void Clear()
         {
             _staleBodyCountChanged = true;
-            throw new NotImplementedException();
+            _bodies.Clear();
         }
 
         public virtual TrajectoryStateVector GetCurrentStateVector( ITrajectoryTransform trajectoryTransform )
@@ -154,23 +141,37 @@ namespace HSP.Trajectories
             if( !_bodies.TryGetValue( trajectoryTransform, out var bodyEntry ) )
                 throw new ArgumentException( $"The trajectory transform '{trajectoryTransform}' is not registered in the simulator.", nameof( trajectoryTransform ) );
 
-            double ut = TimeManager.UT;
-            var emphemeris = bodyEntry.ephemeris;
-
-            if( emphemeris.MaxUT < ut || emphemeris.MinUT > ut )
-                throw new ArgumentException( $"The trajectory transform '{trajectoryTransform}' has no ephemeris data for UT '{ut}'.", nameof( trajectoryTransform ) );
-
-            return emphemeris.Evaluate( ut );
+            // Current doesn't need to evaluate the ephemeris. The data is already in the timestepper.
+            if( bodyEntry.isAttractor )
+                return _currentStateAttractors[bodyEntry.timestepperIndex];
+            else
+                return _currentStateFollowers[bodyEntry.timestepperIndex];
         }
 
-        public virtual void ResetCurrentStateVector( ITrajectoryTransform trajectoryTransform )
+        public virtual bool TryGetStateVector( double ut, ITrajectoryTransform trajectoryTransform, out TrajectoryStateVector stateVector )
+        {
+            if( !_bodies.TryGetValue( trajectoryTransform, out var bodyEntry ) )
+                throw new ArgumentException( $"The trajectory transform '{trajectoryTransform}' is not registered in the simulator.", nameof( trajectoryTransform ) );
+
+            var emphemeris = bodyEntry.ephemeris;
+            if( emphemeris.HighUT < ut || emphemeris.LowUT > ut )
+            {
+                stateVector = default;
+                return false;
+            }
+
+            stateVector = emphemeris.Evaluate( ut );
+            return true;
+        }
+
+        public virtual void ResetStateVector( ITrajectoryTransform trajectoryTransform )
         {
             if( !_bodies.ContainsKey( trajectoryTransform ) )
                 throw new ArgumentException( $"The trajectory transform '{trajectoryTransform}' is not registered in the simulator.", nameof( trajectoryTransform ) );
 
             _staleBodies.Add( trajectoryTransform );
             _isStaleAttractor |= trajectoryTransform.IsAttractor;
-            
+
             // staleness will fix the state vector getting it from the actual trajtransform.
         }
 
@@ -197,6 +198,7 @@ namespace HSP.Trajectories
             var oldAttractorEphemerides = _attractorEphemerides;
             var oldFollowerEphemerides = _followerEphemerides;
 
+            Profiler.BeginSample( "_staleBodyCountChanged" );
             if( _staleBodyCountChanged )
             {
                 _attractors = new ITrajectoryIntegrator[numAttractors];
@@ -212,8 +214,10 @@ namespace HSP.Trajectories
                 _attractorEphemerides = new Ephemeris[numAttractors];
                 _followerEphemerides = new Ephemeris[numFollowers];
             }
+            Profiler.EndSample();
 
-            if( _isStaleAttractor )
+            Profiler.BeginSample( "_isStaleAttractor || _staleBodyCountChanged" );
+            if( _isStaleAttractor || _staleBodyCountChanged )
             {
                 // If an attractor has changed, we can't use the previously calculated ephemerides, so we reset them.
 
@@ -247,31 +251,31 @@ namespace HSP.Trajectories
             }
             else
             {
-
-#warning TODO update ephemeris length if changed.
-
-
                 foreach( var body in _staleBodies )
                 {
                     var entry = _bodies[body];
                     var index = entry.timestepperIndex;
 
-                    if( body.IsAttractor )
-                    {
-                        _attractors[index] = body.Integrator;
-                        _attractorAccelerationProviders[index] = body.AccelerationProviders.ToArray();
-                        _currentStateAttractors[index] = body.GetBodyState();
-                        _attractorEphemerides[index] = entry.ephemeris;
-                    }
-                    else
-                    {
-                        _followers[index] = body.Integrator;
-                        _followerAccelerationProviders[index] = body.AccelerationProviders.ToArray();
-                        _currentStateFollowers[index] = body.GetBodyState();
-                        _followerEphemerides[index] = entry.ephemeris;
-                    }
+                    // body is not an attractor because they're handled differently above.
+                    _followers[index] = body.Integrator;
+                    _followerAccelerationProviders[index] = body.AccelerationProviders.ToArray();
+                    _currentStateFollowers[index] = body.GetBodyState();
+                    _followerEphemerides[index] = entry.ephemeris;
+                    entry.ephemeris.Clear();
                 }
             }
+            Profiler.EndSample();
+
+            Profiler.BeginSample( "_staleEphemerisLengthChanged" );
+            if( _staleEphemerisLengthChanged )
+            {
+                foreach( var ephemeris in _attractorEphemerides )
+                {
+                    ephemeris.SetDuration( ephemeris.LowUT + _ephemerisDuration + ephemeris.TimeResolution /* padding */, ephemeris.LowUT );
+                }
+                _staleEphemerisLengthChanged = false;
+            }
+            Profiler.EndSample();
 
             _isStaleAttractor = false;
             _staleBodyCountChanged = false;
@@ -283,15 +287,37 @@ namespace HSP.Trajectories
         /// </summary>
         public virtual void Simulate( double endUT )
         {
+            if( _bodies.Count == 0 )
+            {
+                _ut = endUT;
+                return;
+            }
+
             if( _staleBodies.Count > 0 )
             {
                 FixStale();
             }
 
-#warning TODO - clamp endUT in such a way that there is at least one new data point on every ephemeris?
-
-            while( _ut < endUT )
+            if( _ut >= endUT )
             {
+                // Timestepper simulated past the desired time.
+                return;
+            }
+
+#warning TODO - when reversing (if an ephemeris has time points further 'forward' than endUT), override it.
+
+            while( endUT - _ut > 1e-4 )
+            {
+                if( _step > MaxStepSize )
+                {
+                    _step = MaxStepSize;
+                }
+
+                if( _step > (endUT - _ut) )
+                {
+                    _step = endUT - _ut; // don't overshoot the end time.
+                }
+
                 // Order in which the bodies are updated doesn't matter, since we're setting 'next' and that's not used in calculations until the... next step.
 
                 double minStep = double.MaxValue;
@@ -320,19 +346,14 @@ namespace HSP.Trajectories
                 _ut += _step;
                 _step = minStep;
 
-#warning TODO - all ephemerides here should have the same length? not necessarily! 
-                // all attractors will always have the same length.
-                // followers need to be at most as long as attractors, but can be shorter.
-
-
                 // when ran far enough, store the points as ephemerides in the corresponding ephemeris structs.
                 for( int i = 0; i < _attractorEphemerides.Length; i++ )
                 {
-#warning TODO - might need to interpolate and/or append multiple data points if step was larger than the ephemeris' time resolution.
-                    if( _ut >= _attractorEphemerides[i].MaxUT + _attractorEphemerides[i].TimeResolution )
-                    {
-                        _attractorEphemerides[i].AppendToFront( _currentStateAttractors[i] );
-                    }
+                    _attractorEphemerides[i].Append( _currentStateAttractors[i], _ut );
+                }
+                for( int i = 0; i < _followerEphemerides.Length; i++ )
+                {
+                    _followerEphemerides[i].Append( _currentStateFollowers[i], _ut );
                 }
 
 

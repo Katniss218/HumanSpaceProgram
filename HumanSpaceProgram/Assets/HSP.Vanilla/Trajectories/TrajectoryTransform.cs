@@ -87,9 +87,6 @@ namespace HSP.Vanilla.Trajectories
             if( accelerationProviders == null )
                 throw new ArgumentNullException( nameof( accelerationProviders ), "The acceleration provider collection can't be null." );
 
-            if( !accelerationProviders.Any() )
-                throw new ArgumentException( "The acceleration provider collection can't be empty.", nameof( accelerationProviders ) );
-
             if( accelerationProviders.Any( t => t == null ) )
                 throw new ArgumentException( "The acceleration provider collection can't contain null elements.", nameof( accelerationProviders ) );
 
@@ -104,9 +101,6 @@ namespace HSP.Vanilla.Trajectories
         {
             if( accelerationProviders == null )
                 throw new ArgumentNullException( nameof( accelerationProviders ), "The acceleration provider collection can't be null." );
-
-            if( !accelerationProviders.Any() )
-                throw new ArgumentException( "The acceleration provider collection can't be empty.", nameof( accelerationProviders ) );
 
             if( accelerationProviders.Any( t => t == null ) )
                 throw new ArgumentException( "The acceleration provider collection can't contain null elements.", nameof( accelerationProviders ) );
@@ -132,6 +126,9 @@ namespace HSP.Vanilla.Trajectories
             }
         }
 
+        public double EphemerisTimeResolution { get; set; }
+        public double EphemerisDuration { get; set; }
+
         private bool _forceResyncWithTrajectory = false;
         private IReferenceFrameTransform _lastSynchronizedTransform;
 
@@ -143,7 +140,7 @@ namespace HSP.Vanilla.Trajectories
         /// False if the trajectory needs to be updated using the reference frame transform's values. <br/>
         /// Related to <see cref="RequestForcedResynchronization"/>.
         /// </returns>
-        public bool TrajectoryDoesntNeedUpdating()
+        public bool TrajectoryNeedsUpdating()
         {
             bool value = _lastSynchronizedTransform == this.ReferenceFrameTransform // Because we use an event to check the manual reset of values, it would be possible to swap
                                                                                     // the reference frame transform on the GameObject to a different instance and change its
@@ -158,7 +155,7 @@ namespace HSP.Vanilla.Trajectories
             _forceResyncWithTrajectory = false;
             _hadValuesChangedByHand = false;
 
-            return value;
+            return !value;
         }
 
         /// <summary>
@@ -189,7 +186,18 @@ namespace HSP.Vanilla.Trajectories
             TryUnregister();
         }
 
-        private void OnValueChanged() => _hadValuesChangedByHand = true;
+        private void OnValueChanged() => _hadValuesChangedByHand = _allowValueChanged;
+        private bool _allowValueChanged = true;
+
+        // SuppressValueChanged and AllowValueChanged can be used to update the transform without marking the transform as stale.
+        public void SuppressValueChanged()
+        {
+            _allowValueChanged = false;
+        }
+        public void AllowValueChanged()
+        {
+            _allowValueChanged = true;
+        }
 
         private bool TryRegister()
         {

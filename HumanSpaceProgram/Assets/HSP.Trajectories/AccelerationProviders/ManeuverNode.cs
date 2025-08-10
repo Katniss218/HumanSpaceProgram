@@ -7,8 +7,9 @@ namespace HSP.Trajectories.AccelerationProviders
 {
     public class ManeuverNode : ITrajectoryStepProvider
     {
-        // not a singleton
-
+        public Vector3Dbl maneuver; // deltaV to acceleration. we need to know engine thrust etc.
+        public double startUT;
+        public double duration = 1.0; // in [s].
 
         public ITrajectoryStepProvider Clone( ITrajectoryTransform self, IReadonlyTrajectorySimulator simulator )
         {
@@ -18,6 +19,13 @@ namespace HSP.Trajectories.AccelerationProviders
         public Vector3Dbl GetAcceleration( TrajectorySimulationContext context )
         {
             throw new NotImplementedException();
+
+            if( context.UT < startUT || context.UT > startUT + duration )
+            {
+                return Vector3Dbl.zero; // No acceleration outside the maneuver time window.
+            }
+
+            
         }
 
         public double? GetMass( TrajectorySimulationContext context )
@@ -30,8 +38,8 @@ namespace HSP.Trajectories.AccelerationProviders
 
     public class TwoBodyAccelerationProvider : ITrajectoryStepProvider
     {
-        ITrajectoryTransform _parentBody; // Switch parent when crossing SOI boundaries?
-                                          // Would need some caching or something of the body graph, if any exists.
+        public ITrajectoryTransform _parentBody; // Switch parent when crossing SOI boundaries?
+                                                 // Would need some caching or something of the body graph, if any exists.
         int _parentBodyIndex;
 
         public ITrajectoryStepProvider Clone( ITrajectoryTransform self, IReadonlyTrajectorySimulator simulator )

@@ -1,178 +1,259 @@
 ﻿using System;
+using System.Reflection;
+using System.Threading;
+using UnityEngine;
 
 namespace HSP.Trajectories
 {
-    /// <summary>
-    /// Represents an arbitrary trajectory in space and time.
-    /// </summary>
-    /// <remarks>
-    /// This is implemented using a circular buffer of state vector data points, interpolated on evaluation.
-    /// </remarks>
     public sealed class Ephemeris
     {
-        /// <summary>
-        /// The time between adjacent data points, in [s].
-        /// </summary>
         public double TimeResolution { get; }
 
-        /// <summary>
-        /// The time at the last (largest UT) data point.
-        /// </summary>
-        public double MaxUT { get; private set; }
-
-        /// <summary>
-        /// The time at the first (smallest UT) data point.
-        /// </summary>
-        public double MinUT { get; private set; }
-
-        /// <summary>
-        /// Gets the duration between the start and end of the ephemeris, in [s].
-        /// </summary>
-        public double Duration
-        {
-            get => MaxUT - MinUT; 
-        }
-
-        /// <summary>
-        /// Sets the time interval of the ephemeris, keeping any data points that overlap with the new interval.
-        /// </summary>
-        public void SetDuration( double startUT, double endUT )
-        {
-            double duration = endUT - startUT;
-
-            int bufferSize = (int)Math.Ceiling( duration / TimeResolution ) + 1;
-            var newBuffer = new TrajectoryStateVector[bufferSize];
-
-            double overlapStart = Math.Max( startUT, MinUT );
-            double overlapEnd = Math.Min( endUT, MaxUT );
-            int newCount = 0;
-
-            if( overlapEnd >= overlapStart && _count > 0 )
-            {
-                double firstPseudoIndex = (overlapStart - MinUT) * _inverseTimeResolution;
-                double lastPseudoIndex = (overlapEnd - MinUT) * _inverseTimeResolution;
-
-                int firstIdx = (int)Math.Ceiling( firstPseudoIndex );
-                int lastIdx = (int)Math.Floor( lastPseudoIndex );
-
-                newCount = lastIdx - firstIdx + 1;
-                if( newCount < 0 )
-                    newCount = 0;
-
-                for( int i = 0; i < newCount; i++ )
-                {
-                    int oldIndex = (_startIndex + firstIdx + i) % Capacity;
-                    newBuffer[i] = _buffer[oldIndex];
-                }
-            }
-
-            this._buffer = newBuffer;
-            this._startIndex = 0;
-            this._count = newCount;
-        }
-
-        /// <summary>
-        /// The number of data points currently in this ephemeris.
-        /// </summary>
+        public double HighUT => _floatingHeadUT;
+        public double LowUT => _floatingTailUT;
+        public double Duration => _floatingHeadUT - _floatingTailUT;
+        public double MaxDuration => _buffer.Length * TimeResolution;
         public int Count => _count;
-
-        /// <summary>
-        /// The maximum number of data points that can be stored in this ephemeris.
-        /// </summary>
         public int Capacity => _buffer.Length;
 
-        readonly double _inverseTimeResolution;
+        readonly double _inverseTimeResolution; // number of data points in a second.
         TrajectoryStateVector[] _buffer;
-        int _startIndex;    // Index of the first (oldest) data point in the circular buffer.
-        int _count;         // Current number of data points.
+        int _headIndex;
+        int _tailIndex;
+        double _headUT;
+        double _tailUT;
+        int _count;
+
+        // 'Floating' head/tail are 2 'temporary' data points that exist when the start/end of
+        //   the ephemeris is not aligned with the regular grid of data points.
+        TrajectoryStateVector _floatingHead;
+        TrajectoryStateVector _floatingTail;
+        double _floatingHeadUT;
+        double _floatingTailUT;
 
         /// <summary>
-        /// Constructs an ephemeris with a fixed capacity.
+        /// 
         /// </summary>
-        /// <param name="ut">The initial universal time (UT) of the first data point.</param>
-        /// <param name="timeResolution">The time between adjacent data points, in [s].</param>
-        /// <param name="duration">The maximum duration of the ephemeris, in [s].</param>
-        public Ephemeris( double ut, double timeResolution, double duration )
+        public Ephemeris( double timeResolution, double maxDuration )
         {
             if( timeResolution <= 0 )
-                throw new ArgumentOutOfRangeException( nameof( timeResolution ) );
-            if( duration < timeResolution )
-                throw new ArgumentOutOfRangeException( nameof( duration ) );
+                throw new ArgumentOutOfRangeException( nameof( timeResolution ), $"Time resolution must be a positive number." );
 
-            TimeResolution = timeResolution;
-            MaxUT = ut;
-            MinUT = ut;
+            if( maxDuration < timeResolution )
+                throw new ArgumentOutOfRangeException( nameof( maxDuration ), $"Duration must be at least equal to the time resolution." );
+
             _inverseTimeResolution = 1.0 / timeResolution;
-
-            int bufferSize = (int)Math.Ceiling( duration / timeResolution ) + 1;
+            int bufferSize = (int)(maxDuration * _inverseTimeResolution) + 1;
             _buffer = new TrajectoryStateVector[bufferSize];
-            _startIndex = 0;
+            Clear();
+        }
+
+        public void SetDuration( double headUT, double tailUT )
+        {
+            if( tailUT >= headUT )
+                throw new ArgumentOutOfRangeException( nameof( tailUT ), $"Tail UT must be less than head UT." );
+
+            double maxDuration = headUT - tailUT;
+
+            if( maxDuration < TimeResolution )
+                throw new ArgumentOutOfRangeException( nameof( headUT ), $"Duration must be at least equal to the time resolution." );
+
+            int bufferSize = (int)(maxDuration * _inverseTimeResolution) + 1;
+            var newBuffer = new TrajectoryStateVector[bufferSize];
+
+            double overlapStart = Math.Max( tailUT, _tailUT );
+            double overlapEnd = Math.Min( headUT, _headUT );
+            double overlapDuration = overlapEnd - overlapStart;
+            if( overlapDuration <= 0 )
+            {
+                Clear();
+
+                return;
+            }
+
+            int newCount = (int)(overlapDuration * _inverseTimeResolution);
+            int oldIndex = _tailIndex;
+            int index = -1;
+            for( int i = 0; i < newCount; i++ )
+            {
+                index++;
+                if( index < 0 || index >= _buffer.Length )
+                    index %= _buffer.Length; // wrap around the circular buffer.
+
+                newBuffer[index] = _buffer[oldIndex];
+            }
+
+            _buffer = newBuffer;
+            _headIndex = newCount - 1;
+            _tailIndex = 0;
+            _headUT = overlapEnd;
+            _tailUT = overlapStart;
+            _count = newCount;
+
+            _floatingHead = _buffer[_headIndex];
+            _floatingTail = _buffer[_tailIndex];
+            _floatingHeadUT = _headUT;
+            _floatingTailUT = _tailUT;
+        }
+
+        public void Clear()
+        {
+            _headIndex = -1;
+            _tailIndex = -1;
+            _headUT = 0;
+            _tailUT = 0;
             _count = 0;
+
+            _floatingHeadUT = 0;
+            _floatingTailUT = 0;
         }
 
         /// <summary>
-        /// Adds a new sample to the front (highest UT). If full, drops the newest.
+        /// Fills the ephemeris with data points, interpolated between the current last data point, and the specified state vector at the specified UT.
         /// </summary>
-        public void AppendToFront( TrajectoryStateVector state )
-        {
-            double newEndUT = (_count == 0)
-                ? MinUT
-                : MaxUT + TimeResolution;
-
-            int index = (_count + _startIndex) % Capacity;
-
-            if( _count == Capacity )
-                _startIndex = (_startIndex + 1) % Capacity; // Slide the window forward.
-            else
-                _count++;
-
-            _buffer[index] = state;
-
-            if( _count == 1 )
-                MaxUT = newEndUT;
-        }
-
-        /// <summary>
-        /// Adds a new sample to the back (lowest UT). If full, drops the oldest.
-        /// </summary>
-        public void AppendToBack( TrajectoryStateVector state )
-        {
-            double newStartUT = (_count == 0)
-                ? MinUT
-                : MinUT - TimeResolution;
-
-            int index = (_startIndex - 1 + Capacity) % Capacity;
-
-            if( _count != Capacity )
-                _count++;
-
-            _buffer[index] = state;
-            _startIndex = index; // Slide the window backward.
-
-            MinUT = newStartUT;
-        }
-
-        /// <summary>
-        /// Evaluates the ephemeris at the given time.
-        /// </summary>
-        /// <returns>The state vector representing the body at the specified time.</returns>
-        public TrajectoryStateVector Evaluate( double ut )
+        public void Append( TrajectoryStateVector stateVector, double ut )
         {
             if( _count == 0 )
-                throw new InvalidOperationException( "The ephemeris to evaluate must have at least 1 data point." );
+            {
+                // Initialize the ephemeris with the first data point.
 
-            if( ut < MinUT || ut > MaxUT )
-                throw new ArgumentOutOfRangeException( $"Time '{ut}' is out of the range of this ephemeris: [{MinUT}, {MaxUT}]." );
+                _buffer[0] = stateVector;
+                _headIndex = 0;
+                _tailIndex = 0;
+                _headUT = ut;
+                _tailUT = ut;
+                _count = 1;
 
-            double pseudoIndex = (ut - MinUT) * _inverseTimeResolution;
-            int i0 = (int)pseudoIndex; // Does a floor operation.
+                _floatingHead = stateVector;
+                _floatingTail = stateVector;
+                _floatingHeadUT = ut;
+                _floatingTailUT = ut;
+                return;
+            }
+
+            if( ut > _headUT )
+            {
+                // append to head.
+                _floatingHead = stateVector;
+                _floatingHeadUT = ut;
+
+                double addedDuration = ut - _headUT;
+                if( addedDuration < TimeResolution )
+                    return;
+
+                // Append to the buffer, and slide the window forward, if the new length would be larger than the maximum duration.
+
+                TrajectoryStateVector head = _buffer[_headIndex];
+                int numSamples = (int)(addedDuration * _inverseTimeResolution);
+                int index = _headIndex;
+                for( int i = 0; i < numSamples; i++ )
+                {
+                    index++;
+                    if( index < 0 || index >= _buffer.Length )
+                        index %= _buffer.Length; // wrap around the circular buffer.
+
+                    double t = (double)i / addedDuration;
+                    _buffer[index] = TrajectoryStateVector.Lerp( head, stateVector, t );
+                }
+
+                _count += numSamples;
+                _headIndex = index;
+                _headUT += numSamples * TimeResolution;
+
+                // Slide forward and trim floating tail.
+
+                int overflowCount = _count - _buffer.Length;
+                if( overflowCount > 0 )
+                {
+                    _count = _buffer.Length - 1;
+                    _tailIndex += overflowCount;
+                    if( _tailIndex >= _buffer.Length )
+                        _tailIndex %= _buffer.Length; // wrap around the circular buffer.
+                    _tailUT += overflowCount * TimeResolution;
+                    _floatingTail = _buffer[_tailIndex];
+                    _floatingTailUT = _tailUT;
+                }
+
+                return;
+            }
+            if( ut < _tailUT )
+            {
+                // append to tail.
+                _floatingTail = stateVector;
+                _floatingTailUT = ut;
+
+                double addedDuration = _tailUT - ut;
+                if( addedDuration < TimeResolution )
+                    return;
+
+                // Append to the buffer, and slide the window backward, if the new length would be larger than the maximum duration.
+                TrajectoryStateVector tail = _buffer[_tailIndex];
+                int numSamples = (int)(addedDuration * _inverseTimeResolution);
+                int index = _tailIndex;
+                for( int i = 0; i < numSamples; i++ )
+                {
+                    index--;
+                    if( index < 0 )
+                        index = (index + _buffer.Length) % _buffer.Length; // wrap around the circular buffer.
+
+                    double t = (double)i / addedDuration;
+                    _buffer[index] = TrajectoryStateVector.Lerp( tail, stateVector, t );
+                }
+
+                _count += numSamples;
+                _tailIndex = index;
+                _tailUT -= numSamples * TimeResolution;
+
+                // Slide backward and trim floating head.
+
+                int overflowCount = _count - _buffer.Length;
+                if( overflowCount > 0 )
+                {
+                    _count = _buffer.Length - 1;
+                    _headIndex -= overflowCount;
+                    if( _headIndex < 0 )
+                        _headIndex = (_headIndex + _buffer.Length) % _buffer.Length; // wrap around the circular buffer.
+                    _headUT -= overflowCount * TimeResolution;
+                    _floatingHead = _buffer[_headIndex];
+                    _floatingHeadUT = _headUT;
+                }
+
+                return;
+            }
+
+            throw new ArgumentOutOfRangeException( nameof( ut ), $"Can't append a data point to the ephemeris. The data point must outside the existing ephemeris data." );
+        }
+
+        public TrajectoryStateVector Evaluate( double ut )
+        {
+            if( ut > HighUT || ut < LowUT )
+                throw new ArgumentOutOfRangeException( nameof( ut ), $"Time '{ut}' is out of the range of this ephemeris: [{LowUT}, {HighUT}]." );
+
+            double pseudoIndex;
+            if( ut > _headUT ) // interpolate between floating head and buffer head.
+            {
+                pseudoIndex = (ut - _headUT) * _inverseTimeResolution; // should already be in range 0..1. If it's not then the insertion fucked something up.
+
+                return TrajectoryStateVector.Lerp( _buffer[_headIndex], _floatingHead, pseudoIndex );
+            }
+
+            if( ut < _tailUT ) // interpolate between floating tail and buffer head.
+            {
+                pseudoIndex = (_tailUT - ut) * _inverseTimeResolution; // should already be in range 0..1. If it's not then the insertion fucked something up.
+
+                return TrajectoryStateVector.Lerp( _buffer[_tailIndex], _floatingTail, pseudoIndex );
+            }
+
+            // interpolate the buffer data points.
+            pseudoIndex = (ut - _tailUT) * _inverseTimeResolution;
+            int i0 = (int)pseudoIndex;
             int i1 = i0 + 1;
 
             double t = pseudoIndex - (double)i0;
-            int index1 = (i0 + _startIndex) % Capacity;
+            int index1 = (i0 + _tailIndex) % Capacity;
             if( t == 0 )
                 return _buffer[index1];
-            int index2 = (i1 + _startIndex) % Capacity;
+            int index2 = (i1 + _tailIndex) % Capacity;
             return TrajectoryStateVector.Lerp( _buffer[index1], _buffer[index2], t );
         }
     }

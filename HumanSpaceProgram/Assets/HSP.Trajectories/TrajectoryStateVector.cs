@@ -55,8 +55,8 @@ namespace HSP.Trajectories
         {
             return new TrajectoryStateVector( 
                 self.ReferenceFrameTransform.AbsolutePosition,
-                self.ReferenceFrameTransform.Velocity,
-                self.ReferenceFrameTransform.Acceleration,
+                self.ReferenceFrameTransform.AbsoluteVelocity,
+                self.ReferenceFrameTransform.AbsoluteAcceleration,
                 self.PhysicsTransform.Mass
                 );
         }

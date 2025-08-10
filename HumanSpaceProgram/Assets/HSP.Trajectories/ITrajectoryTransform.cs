@@ -15,6 +15,6 @@ namespace HSP.Trajectories
 
         public bool IsAttractor { get; }
 
-        public bool TrajectoryDoesntNeedUpdating();
+        public bool TrajectoryNeedsUpdating();
     }
 }
