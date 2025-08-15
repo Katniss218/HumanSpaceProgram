@@ -11,8 +11,8 @@ namespace HSP.Vanilla.Scenes.MapScene
         private static void AddSceneReferenceFrameManager()
         {
             MapSceneReferenceFrameManager.Instance = MapSceneM.Instance.gameObject.AddComponent<MapSceneReferenceFrameManager>();
-            GameplaySceneReferenceFrameManager.Instance.MaxRelativePosition = 1e8f;
-            GameplaySceneReferenceFrameManager.Instance.MaxRelativeVelocity = float.MaxValue;
+            MapSceneReferenceFrameManager.Instance.MaxRelativePosition = 1e8f;
+            MapSceneReferenceFrameManager.Instance.MaxRelativeVelocity = float.MaxValue;
         }
     }
 }
