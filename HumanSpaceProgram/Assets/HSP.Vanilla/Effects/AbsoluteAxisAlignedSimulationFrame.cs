@@ -22,7 +22,6 @@ namespace HSP.Vanilla.Effects
         [MapsInheritingFrom( typeof( AbsoluteAxisAlignedSimulationFrame ) )]
         public static SerializationMapping AbsoluteAxisAlignedSimulationFrameMapping()
         {
-#warning TODO - null interfaces and abstract classes without a mapping should be set to null, because they're not instantiable.
             return new MemberwiseSerializationMapping<AbsoluteAxisAlignedSimulationFrame>()
                 .WithMember("scene_reference_Frame_provider", o => o.SceneReferenceFrameProvider );
         }

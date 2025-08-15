@@ -51,13 +51,16 @@ namespace HSP.Vanilla.Scenes.MapScene.Cameras
 
             _uiCamera.nearClipPlane = (float)MathD.Map( zoomDist, MIN_ZOOM_DISTANCE, NEAR_CUTOFF_DISTANCE, 0.5f, 100f );
             _uiCamera.farClipPlane = (float)MathD.Map( zoomDist, MIN_ZOOM_DISTANCE, NEAR_CUTOFF_DISTANCE, 0.5f * 10000f, 100f * 10000f );
+            _farCamera.eventMask = 0; // Setting eventMask = 0 stops the annoying mouse event errors when the camera is far away from scene origin.
+            _effectCamera.eventMask = 0;
+            _uiCamera.eventMask = 0;
         }
 
         void Start()
         {
             _farCamera.clearFlags = CameraClearFlags.Skybox;
-            _farCamera.nearClipPlane = 90_000f;
-            _farCamera.farClipPlane = 1e18f;
+            _farCamera.nearClipPlane = 900_000f;
+            _farCamera.farClipPlane = 1e20f;
             _farCamera.fieldOfView = 60f;
             _farCamera.depth = -25f;
 

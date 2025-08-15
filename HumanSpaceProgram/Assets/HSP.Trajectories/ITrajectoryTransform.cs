@@ -1,9 +1,10 @@
 ﻿using HSP.ReferenceFrames;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace HSP.Trajectories
 {
-    public interface ITrajectoryTransform
+    public interface ITrajectoryTransform : IComponent
     {
         public IReferenceFrameTransform ReferenceFrameTransform { get; }
 

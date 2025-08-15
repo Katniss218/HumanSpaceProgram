@@ -1,6 +1,5 @@
 ﻿using HSP.Time;
 using HSP.Vanilla.Trajectories;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.LowLevel;
@@ -16,12 +15,12 @@ namespace HSP.Trajectories
     {
         private const int SIMULATOR_INDEX = 0;
         private const int PREDICTION_SIMULATOR_INDEX = 1;
-        public static IReadonlyTrajectorySimulator Simulator => instance._simulators[SIMULATOR_INDEX];
-        public static IReadonlyTrajectorySimulator PredictionSimulator => instance._simulators[PREDICTION_SIMULATOR_INDEX];
+        public static TrajectorySimulator Simulator => instance._simulators[SIMULATOR_INDEX];
+        public static TrajectorySimulator PredictionSimulator => instance._simulators[PREDICTION_SIMULATOR_INDEX];
 
         private TrajectorySimulator[] _simulators;
 
-        private double _flightPlanDuration = 100 * 86400;
+        private double _flightPlanDuration = 365 * 86400;
         public static double FlightPlanDuration
         {
             get => instance._flightPlanDuration;
@@ -232,12 +231,6 @@ namespace HSP.Trajectories
             foreach( var trajectoryTransform in instance._transforms )
             {
                 var (_, vel, interpolatedVel) = instance._posAndVelCache[trajectoryTransform];
-
-                /*if( trajectoryTransform.IsSynchronized() ) // Experimental testing seems to indicate that this is unnecessary for countering drift.
-                {
-                 TODO - enabling the position reset makes keplerian trajectories act weird
-                    trajectoryTransform.ReferenceFrameTransform.AbsolutePosition = pos;
-                }*/
 
                 if( !trajectoryTransform.TrajectoryNeedsUpdating() || trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity == interpolatedVel )
                 {

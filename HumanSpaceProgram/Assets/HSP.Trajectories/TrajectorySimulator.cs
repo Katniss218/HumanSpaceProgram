@@ -87,6 +87,11 @@ namespace HSP.Trajectories
             return _bodies.ContainsKey( trajectoryTransform );
         }
 
+        public IEnumerable<(ITrajectoryTransform t, IReadonlyEphemeris e)> GetBodies()
+        {
+            return _bodies.Select( kvp => (kvp.Key, (IReadonlyEphemeris)kvp.Value.ephemeris) );
+        }
+
         public virtual bool AddBody( ITrajectoryTransform transform )
         {
             Ephemeris ephemeris = new Ephemeris( _ephemerisTimeResolution, _ephemerisDuration + _ephemerisTimeResolution /* padding */ );
@@ -343,9 +348,6 @@ namespace HSP.Trajectories
                     }
                 }
 
-                _ut += _step;
-                _step = minStep;
-
                 // when ran far enough, store the points as ephemerides in the corresponding ephemeris structs.
                 for( int i = 0; i < _attractorEphemerides.Length; i++ )
                 {
@@ -356,6 +358,8 @@ namespace HSP.Trajectories
                     _followerEphemerides[i].Append( _currentStateFollowers[i], _ut );
                 }
 
+                _ut += _step;
+                _step = minStep;
 
                 // Swapping the reference is enough, we don't care what (if anything) is in the 'target' structs.
                 var temp = _currentStateAttractors;

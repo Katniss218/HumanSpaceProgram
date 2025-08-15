@@ -5,7 +5,19 @@ using UnityEngine;
 
 namespace HSP.Trajectories
 {
-    public sealed class Ephemeris
+    public interface IReadonlyEphemeris
+    {
+        double TimeResolution { get; }
+        double HighUT { get; }
+        double LowUT { get; }
+        double Duration { get; }
+        double MaxDuration { get; }
+        int Count { get; }
+        int Capacity { get; }
+        TrajectoryStateVector Evaluate( double ut );
+    }
+
+    public sealed class Ephemeris : IReadonlyEphemeris
     {
         public double TimeResolution { get; }
 
@@ -146,19 +158,19 @@ namespace HSP.Trajectories
                 TrajectoryStateVector head = _buffer[_headIndex];
                 int numSamples = (int)(addedDuration * _inverseTimeResolution);
                 int index = _headIndex;
-                for( int i = 0; i < numSamples; i++ )
+                for( int i = 1; i <= numSamples; i++ )
                 {
                     index++;
                     if( index < 0 || index >= _buffer.Length )
                         index %= _buffer.Length; // wrap around the circular buffer.
 
-                    double t = (double)i / addedDuration;
+                    double t = (double)i / numSamples;
                     _buffer[index] = TrajectoryStateVector.Lerp( head, stateVector, t );
                 }
 
                 _count += numSamples;
                 _headIndex = index;
-                _headUT += numSamples * TimeResolution;
+                _headUT += addedDuration;
 
                 // Slide forward and trim floating tail.
 
@@ -190,19 +202,19 @@ namespace HSP.Trajectories
                 TrajectoryStateVector tail = _buffer[_tailIndex];
                 int numSamples = (int)(addedDuration * _inverseTimeResolution);
                 int index = _tailIndex;
-                for( int i = 0; i < numSamples; i++ )
+                for( int i = 1; i <= numSamples; i++ )
                 {
                     index--;
                     if( index < 0 )
                         index = (index + _buffer.Length) % _buffer.Length; // wrap around the circular buffer.
 
-                    double t = (double)i / addedDuration;
+                    double t = (double)i / numSamples;
                     _buffer[index] = TrajectoryStateVector.Lerp( tail, stateVector, t );
                 }
 
                 _count += numSamples;
                 _tailIndex = index;
-                _tailUT -= numSamples * TimeResolution;
+                _tailUT -= addedDuration;
 
                 // Slide backward and trim floating head.
 
@@ -233,7 +245,7 @@ namespace HSP.Trajectories
             if( ut > _headUT ) // interpolate between floating head and buffer head.
             {
                 pseudoIndex = (ut - _headUT) * _inverseTimeResolution; // should already be in range 0..1. If it's not then the insertion fucked something up.
-
+                Debug.Log( "A " + _headUT + " : " + _floatingHeadUT );
                 return TrajectoryStateVector.Lerp( _buffer[_headIndex], _floatingHead, pseudoIndex );
             }
 
@@ -241,6 +253,7 @@ namespace HSP.Trajectories
             {
                 pseudoIndex = (_tailUT - ut) * _inverseTimeResolution; // should already be in range 0..1. If it's not then the insertion fucked something up.
 
+                Debug.Log( "B" );
                 return TrajectoryStateVector.Lerp( _buffer[_tailIndex], _floatingTail, pseudoIndex );
             }
 
