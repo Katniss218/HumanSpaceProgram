@@ -14,8 +14,14 @@ namespace UnityPlus.Serialization
         public static SerializationResult SafeSave<TMember>( this SerializationMapping mapping, TMember obj, ref SerializedData data, ISaver s )
         {
             if( mapping == null )
+            {
+                if( obj is null && (typeof( TMember ).IsInterface || typeof( TMember ).IsAbstract) )
+                {
+                    data = null;
+                    return SerializationResult.PrimitiveFinished;
+                }
                 return SerializationResult.PrimitiveFinishedFailed;
-
+            }
             return mapping.Save<TMember>( obj, ref data, s );
         }
 
@@ -29,8 +35,14 @@ namespace UnityPlus.Serialization
         public static SerializationResult SafeLoad<TMember>( this SerializationMapping mapping, ref TMember obj, SerializedData data, ILoader l, bool populate )
         {
             if( mapping == null )
+            {
+                if( data == null && (typeof( TMember ).IsInterface || typeof( TMember ).IsAbstract) )
+                {
+                    obj = default( TMember );
+                    return SerializationResult.PrimitiveFinished;
+                }
                 return SerializationResult.PrimitiveFinishedFailed;
-
+            }
             return mapping.Load<TMember>( ref obj, data, l, populate );
         }
     }
