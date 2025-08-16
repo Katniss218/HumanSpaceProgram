@@ -1,4 +1,5 @@
 ﻿using HSP.Vanilla.Scenes.MapScene;
+using UnityPlus.UILib.UIElements;
 
 namespace HSP.Vanilla.UI.Scenes.MapScene
 {
@@ -10,6 +11,7 @@ namespace HSP.Vanilla.UI.Scenes.MapScene
         [HSPEventListener( HSPEvent_MAP_SCENE_ACTIVATE.ID, CREATE_UI )]
         private static void Create()
         {
+           // UICanvas canvas = MapSceneM.Instance.GetBackgroundCanvas();
 
         }
 

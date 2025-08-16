@@ -212,6 +212,10 @@ namespace HSP._DevUtils
             var atm = cb.gameObject.AddComponent<Atmosphere>();
             atm.Height = 140_000;
             atm.sharedMaterial = AssetRegistry.Get<Material>( "builtin::Resources/Materials/Atmosphere" );
+            CelestialBody additionalCB = CreateCB( "cb1", new Vector3Dbl( 250_000_000_000, 0, 0 ), new Vector3Dbl( 0, 29749.1543788567, 0 ), orientation );
+            additionalCB = CreateCB( "cb2", new Vector3Dbl( 350_000_000_000, 0, 0 ), new Vector3Dbl( 0, 20749.1543788567, 10000 ), orientation );
+            additionalCB = CreateCB( "cb3", new Vector3Dbl( 50_000_000_000, 0, 0 ), new Vector3Dbl( 0, 39749.1543788567, 1000 ), orientation );
+            additionalCB = CreateCB( "cb4", new Vector3Dbl( 950_000_000_000, 0, 0 ), new Vector3Dbl( 0, 9749.1543788567, 0 ), orientation );
 
             //cb = CreateCB( "main2", new Vector3Dbl( 150_000_000_000, 400_000_000, 0 ), new Vector3Dbl( 0, 29749.1543788567, 0 ), orientation );
             //atm = cb.gameObject.AddComponent<Atmosphere>();

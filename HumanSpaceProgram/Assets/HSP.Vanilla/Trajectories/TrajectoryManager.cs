@@ -20,7 +20,7 @@ namespace HSP.Trajectories
 
         private TrajectorySimulator[] _simulators;
 
-        private double _flightPlanDuration = 365 * 86400;
+        private double _flightPlanDuration = 365 * 86400 * 6;
         public static double FlightPlanDuration
         {
             get => instance._flightPlanDuration;

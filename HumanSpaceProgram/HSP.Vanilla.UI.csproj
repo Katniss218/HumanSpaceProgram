@@ -70,6 +70,7 @@
     <Compile Include="Assets\HSP.Vanilla.UI\Components\UISequencerPanel.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Scenes\MapScene\MapSceneUIFactory.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\GameplaySequencerPanelFactory.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI\Scenes\MapScene\EphemerisDrawer.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Timelines\UISaveWindow.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Scenes\DesignScene\UIPartList.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\UITextReadout_ElapsedUT.cs" />
@@ -96,7 +97,7 @@
     <Compile Include="Assets\HSP.Vanilla.UI\Timelines\UIScenarioMetadata.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\UITextReadout_Acceleration.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Scenes\GameplayScene\OnStartup.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI\Scenes\MapScene\EphemerisDrawer.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI\Scenes\MapScene\EphemerisPosSetter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla.UI\___HSP.Vanilla.UI.asmdef" />

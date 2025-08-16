@@ -1,61 +1,48 @@
 ﻿using HSP.CelestialBodies;
-using HSP.Time;
 using HSP.Trajectories;
+using HSP.UI;
 using HSP.Vanilla.ReferenceFrames;
 using HSP.Vanilla.Scenes.MapScene;
+using HSP.Vanilla.Scenes.MapScene.Cameras;
 using UnityEngine;
-using UnityPlus.AssetManagement;
 
 namespace HSP.Vanilla.UI.Scenes.MapScene
 {
     public class EphemerisDrawer
     {
-        static GameObject[] _points = new GameObject[0];
-
         [HSPEventListener( HSPEvent_MAP_SCENE_ACTIVATE.ID, "recalc" )]
         private static void Recalc()
         {
-            foreach( var point in _points )
-            {
-                if( point != null )
-                    GameObject.Destroy( point );
-            }
-
-            const int max = 200;
-            _points = new GameObject[max + max];
+            const int LINE_POINT_COUNT = 500;
 
             var bodies = TrajectoryManager.PredictionSimulator.GetBodies();
             foreach( var (body, ephemeris) in bodies )
             {
                 if( body.gameObject.TryGetComponent<CelestialBody>( out var cb ) )
                 {
-                    if( cb.ID == "main" )
-                    {
-                        Draw(body, ephemeris, 0, 2e10f);
-                    }
-                    if( cb.ID == "sun" )
-                    {
-                        Draw(body, ephemeris, max, 1e10f);
-                    }
+                    Draw2( body, ephemeris );
                 }
             }
 
-            void Draw( ITrajectoryTransform body, IReadonlyEphemeris ephemeris, int offset, float scale )
+            void Draw2( ITrajectoryTransform body, IReadonlyEphemeris ephemeris )
             {
-                for( int i = 0; i < max; i++ )
+                GameObject point = new GameObject( $"orbit line" );
+                RectTransform rectTransform = point.AddComponent<RectTransform>();
+                rectTransform.SetParent( MapSceneM.Instance.GetBackgroundCanvas().transform, false );
+                UILineRenderer r = point.AddComponent<UILineRenderer>();
+
+                EphemerisPosSetter setter = point.AddComponent<EphemerisPosSetter>();
+                setter.SceneReferenceFrameProvider = new MapSceneReferenceFrameProvider();
+                setter.camera = MapSceneCameraManager.FarCamera;
+
+                Vector3Dbl[] points = new Vector3Dbl[LINE_POINT_COUNT];
+                for( int i = 0; i < LINE_POINT_COUNT; i++ )
                 {
-                    double time = MathD.Lerp( ephemeris.LowUT, ephemeris.HighUT, ((double)i / (double)max) );
+                    double time = MathD.Lerp( ephemeris.LowUT, ephemeris.HighUT, ((double)i / (double)LINE_POINT_COUNT) );
                     var pos = ephemeris.Evaluate( time );
-                    GameObject point = new GameObject( $"point {time:0} UT {pos.AbsolutePosition}" );
-                    point.AddComponent<MeshFilter>().sharedMesh = AssetRegistry.Get<Mesh>( "builtin::Cube" );
-                    point.AddComponent<MeshRenderer>().sharedMaterial = AssetRegistry.Get<Material>( "builtin::Resources/New Material 1" );
-                    point.layer = (int)Layer.MAP_ONLY;
-                    point.transform.localScale = Vector3.one * scale; // 100km radius
-                    var trans = point.AddComponent<FixedReferenceFrameTransform>();
-                    trans.SceneReferenceFrameProvider = new MapSceneReferenceFrameProvider();
-                    trans.AbsolutePosition = pos.AbsolutePosition;
-                    _points[offset + i] = point;
+                    points[i] = pos.AbsolutePosition;
                 }
+                setter.Points = points;
             }
         }
     }
