@@ -13,7 +13,7 @@ namespace HSP.Vanilla.UI.Scenes.MapScene
         [HSPEventListener( HSPEvent_MAP_SCENE_ACTIVATE.ID, "recalc" )]
         private static void Recalc()
         {
-            const int LINE_POINT_COUNT = 500;
+            const int LINE_POINT_COUNT = 800;
 
             var bodies = TrajectoryManager.PredictionSimulator.GetBodies();
             foreach( var (body, ephemeris) in bodies )

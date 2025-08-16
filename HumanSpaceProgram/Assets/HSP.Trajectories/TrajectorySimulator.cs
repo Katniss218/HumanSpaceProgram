@@ -311,6 +311,9 @@ namespace HSP.Trajectories
 
 #warning TODO - when reversing (if an ephemeris has time points further 'forward' than endUT), override it.
 
+#warning TODO - stale flight plan followers need to actually have their ephemerides recalculated.
+            // sort of a sliding window that should have valid data in that interval
+
             while( endUT - _ut > 1e-4 )
             {
                 if( _step > MaxStepSize )

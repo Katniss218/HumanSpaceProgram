@@ -20,7 +20,7 @@ namespace HSP.Trajectories
 
         private TrajectorySimulator[] _simulators;
 
-        private double _flightPlanDuration = 365 * 86400 * 6;
+        private double _flightPlanDuration = 365 * 86400 * 1;
         public static double FlightPlanDuration
         {
             get => instance._flightPlanDuration;
@@ -124,7 +124,7 @@ namespace HSP.Trajectories
                 _simulators = new[]
                 {
                     new TrajectorySimulator( TimeManager.UT, 0.1, 1.0, 100.0 ),
-                    new TrajectorySimulator( TimeManager.UT, FlightPlanDuration / 1000.0, FlightPlanDuration / 1000.0, FlightPlanDuration )
+                    new TrajectorySimulator( TimeManager.UT, FlightPlanDuration / 100000.0, FlightPlanDuration / 3000.0, FlightPlanDuration )
                 };
                 _simulators[PREDICTION_SIMULATOR_INDEX].MaxStepSize = FlightPlanDuration / 1000.0;
             }

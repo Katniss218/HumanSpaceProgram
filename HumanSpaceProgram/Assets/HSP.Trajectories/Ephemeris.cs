@@ -19,6 +19,9 @@ namespace HSP.Trajectories
 
     public sealed class Ephemeris : IReadonlyEphemeris
     {
+        /// <summary>
+        /// Gets the amount of time between the adjacent data points in the ephemeris, in [s].
+        /// </summary>
         public double TimeResolution { get; }
 
         public double HighUT => _floatingHeadUT;
@@ -28,7 +31,7 @@ namespace HSP.Trajectories
         public int Count => _count;
         public int Capacity => _buffer.Length;
 
-        readonly double _inverseTimeResolution; // number of data points in a second.
+        readonly double _inverseTimeResolution; // number of data points in 1 second.
         TrajectoryStateVector[] _buffer;
         int _headIndex;
         int _tailIndex;
@@ -54,6 +57,7 @@ namespace HSP.Trajectories
             if( maxDuration < timeResolution )
                 throw new ArgumentOutOfRangeException( nameof( maxDuration ), $"Duration must be at least equal to the time resolution." );
 
+            this.TimeResolution = timeResolution;
             _inverseTimeResolution = 1.0 / timeResolution;
             int bufferSize = (int)(maxDuration * _inverseTimeResolution) + 1;
             _buffer = new TrajectoryStateVector[bufferSize];
@@ -149,14 +153,17 @@ namespace HSP.Trajectories
                 _floatingHead = stateVector;
                 _floatingHeadUT = ut;
 
-                double addedDuration = ut - _headUT;
-                if( addedDuration < TimeResolution )
+                double durationFromHead = ut - _headUT;
+                if( durationFromHead < TimeResolution ) // No room for a new point yet.
                     return;
 
                 // Append to the buffer, and slide the window forward, if the new length would be larger than the maximum duration.
 
+                int numSamples = (int)(durationFromHead * _inverseTimeResolution);
+                if( numSamples == 0 )
+                    return;
+
                 TrajectoryStateVector head = _buffer[_headIndex];
-                int numSamples = (int)(addedDuration * _inverseTimeResolution);
                 int index = _headIndex;
                 for( int i = 1; i <= numSamples; i++ )
                 {
@@ -170,14 +177,14 @@ namespace HSP.Trajectories
 
                 _count += numSamples;
                 _headIndex = index;
-                _headUT += addedDuration;
+                _headUT += numSamples * TimeResolution;
 
                 // Slide forward and trim floating tail.
 
                 int overflowCount = _count - _buffer.Length;
                 if( overflowCount > 0 )
                 {
-                    _count = _buffer.Length - 1;
+                    _count = _buffer.Length;
                     _tailIndex += overflowCount;
                     if( _tailIndex >= _buffer.Length )
                         _tailIndex %= _buffer.Length; // wrap around the circular buffer.
@@ -194,13 +201,16 @@ namespace HSP.Trajectories
                 _floatingTail = stateVector;
                 _floatingTailUT = ut;
 
-                double addedDuration = _tailUT - ut;
-                if( addedDuration < TimeResolution )
+                double durationFromTail = _tailUT - ut;
+                if( durationFromTail < TimeResolution )
                     return;
 
                 // Append to the buffer, and slide the window backward, if the new length would be larger than the maximum duration.
+                int numSamples = (int)(durationFromTail * _inverseTimeResolution);
+                if( numSamples == 0 )
+                    return;
+
                 TrajectoryStateVector tail = _buffer[_tailIndex];
-                int numSamples = (int)(addedDuration * _inverseTimeResolution);
                 int index = _tailIndex;
                 for( int i = 1; i <= numSamples; i++ )
                 {
@@ -214,14 +224,14 @@ namespace HSP.Trajectories
 
                 _count += numSamples;
                 _tailIndex = index;
-                _tailUT -= addedDuration;
+                _tailUT -= numSamples * TimeResolution;
 
                 // Slide backward and trim floating head.
 
                 int overflowCount = _count - _buffer.Length;
                 if( overflowCount > 0 )
                 {
-                    _count = _buffer.Length - 1;
+                    _count = _buffer.Length;
                     _headIndex -= overflowCount;
                     if( _headIndex < 0 )
                         _headIndex = (_headIndex + _buffer.Length) % _buffer.Length; // wrap around the circular buffer.
@@ -245,7 +255,6 @@ namespace HSP.Trajectories
             if( ut > _headUT ) // interpolate between floating head and buffer head.
             {
                 pseudoIndex = (ut - _headUT) * _inverseTimeResolution; // should already be in range 0..1. If it's not then the insertion fucked something up.
-                Debug.Log( "A " + _headUT + " : " + _floatingHeadUT );
                 return TrajectoryStateVector.Lerp( _buffer[_headIndex], _floatingHead, pseudoIndex );
             }
 
@@ -253,14 +262,13 @@ namespace HSP.Trajectories
             {
                 pseudoIndex = (_tailUT - ut) * _inverseTimeResolution; // should already be in range 0..1. If it's not then the insertion fucked something up.
 
-                Debug.Log( "B" );
                 return TrajectoryStateVector.Lerp( _buffer[_tailIndex], _floatingTail, pseudoIndex );
             }
-
             // interpolate the buffer data points.
             pseudoIndex = (ut - _tailUT) * _inverseTimeResolution;
             int i0 = (int)pseudoIndex;
             int i1 = i0 + 1;
+
 
             double t = pseudoIndex - (double)i0;
             int index1 = (i0 + _tailIndex) % Capacity;

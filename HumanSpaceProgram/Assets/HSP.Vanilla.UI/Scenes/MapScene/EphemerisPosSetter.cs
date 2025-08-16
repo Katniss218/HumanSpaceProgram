@@ -55,13 +55,14 @@ namespace HSP.Vanilla.UI.Scenes.MapScene
         {
             this._lineRenderer = GetComponent<UILineRenderer>();
             this._lineRenderer.Thickness = 3;
+            this._lineRenderer.raycastTarget = false;
         }
 
         Vector2[] _screenSpacePoints;
 
         void FixedUpdate()
         {
-            var sceneReferenceFrame = SceneReferenceFrameProvider.GetSceneReferenceFrame().AtUT( TimeManager.UT );
+            var sceneReferenceFrame = SceneReferenceFrameProvider.GetSceneReferenceFrame();
 
             Vector2 HalfRes = new Vector2( Screen.width * 0.5f, Screen.height * 0.5f );
             for( int i = 0; i < _points.Length; i++ )
@@ -71,6 +72,7 @@ namespace HSP.Vanilla.UI.Scenes.MapScene
                 _screenSpacePoints[i] = (Vector2)camera.WorldToScreenPoint( pos ) - HalfRes;
             }
             _lineRenderer.Points = _screenSpacePoints;
+#warning TODO - this needs to go to a canvas with 'constant pixel size' scaling mode. else the positions are wrong.
         }
 
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
