@@ -25,7 +25,7 @@ namespace HSP.Vanilla.UI.Scenes.MapScene
 
             UIButton button = uiPanel.AddButton( new UILayoutInfo( UIAnchor.Center, (0, 0), (30, 30) ), AssetRegistry.Get<Sprite>( "builtin::Resources/Sprites/UI/button_30x30" ), null );
 
-            button.onClick = () => { };
+            button.onClick = () => MapFocusedObjectManager.FocusedObject = celestialBody;
             uiPanel.CelestialBody = celestialBody;
             return uiPanel;
         }

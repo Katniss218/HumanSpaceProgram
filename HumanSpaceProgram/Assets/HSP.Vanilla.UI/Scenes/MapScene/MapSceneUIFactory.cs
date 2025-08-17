@@ -1,4 +1,9 @@
 ﻿using HSP.Vanilla.Scenes.MapScene;
+using UnityPlus.AssetManagement;
+using UnityPlus.UILib.UIElements;
+using UnityPlus.UILib;
+using HSP.UI;
+using UnityEngine;
 
 namespace HSP.Vanilla.UI.Scenes.MapScene
 {
@@ -11,6 +16,15 @@ namespace HSP.Vanilla.UI.Scenes.MapScene
         private static void Create()
         {
             EphemerisDrawer.Recalc();
+            CreateFPSPanel( MapSceneM.Instance.GetBackgroundCanvas() );
+        }
+        static void CreateFPSPanel( IUIElementContainer parent )
+        {
+            UIPanel fpsPanel = parent.AddPanel( new UILayoutInfo( UIAnchor.TopLeft, (5, -35), (80, 30) ), null );
+
+            fpsPanel.AddTextReadout_FPS( new UILayoutInfo( UIFill.Fill() ) )
+                .WithAlignment( TMPro.HorizontalAlignmentOptions.Left )
+                .WithFont( AssetRegistry.Get<TMPro.TMP_FontAsset>( "builtin::Resources/Fonts/liberation_sans" ), 12, Color.white );
         }
 
         [HSPEventListener( HSPEvent_MAP_SCENE_DEACTIVATE.ID, DESTROY_UI )]
