@@ -16,7 +16,7 @@ namespace HSP.SceneManagement
     /// </remarks>
     public class HSPSceneManager : SingletonMonoBehaviour<HSPSceneManager>
     {
-        private static HashSet<IHSPScene> _loadedScenes = new();
+        private static List<IHSPScene> _loadedScenes = new();
 
         private static IHSPScene _foregroundScene = null;
 
@@ -80,6 +80,20 @@ namespace HSP.SceneManagement
         public static IEnumerable<IHSPScene> GetLoadedScenes()
         {
             return _loadedScenes;
+        }
+
+        /// <summary>
+        /// Gets the Unity scene associated with the given HSP scene. <br/>
+        /// The scene must currently be loaded.
+        /// </summary>
+        /// <typeparam name="TLoadedScene">The type specifying the scene to use.</typeparam>
+        public static UnityEngine.SceneManagement.Scene UnityScene<TLoadedScene>() where TLoadedScene : IHSPScene
+        {
+            IHSPScene scene = _loadedScenes.FirstOrDefault( s => s.GetType() == typeof( TLoadedScene ) );
+            if( scene == null )
+                throw new InvalidOperationException( $"The scene '{typeof( TLoadedScene ).Name}' is not loaded." );
+
+            return scene.UnityScene;
         }
 
         /// <summary>

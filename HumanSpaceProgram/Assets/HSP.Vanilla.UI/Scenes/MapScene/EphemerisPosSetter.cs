@@ -1,11 +1,8 @@
 ﻿using HSP.ReferenceFrames;
-using HSP.Time;
 using HSP.UI;
-using HSP.Vanilla.Settings;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 namespace HSP.Vanilla.UI.Scenes.MapScene
 {
@@ -60,7 +57,7 @@ namespace HSP.Vanilla.UI.Scenes.MapScene
 
         Vector2[] _screenSpacePoints;
 
-        void FixedUpdate()
+        void LateUpdate()
         {
             var sceneReferenceFrame = SceneReferenceFrameProvider.GetSceneReferenceFrame();
 

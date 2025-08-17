@@ -1,5 +1,7 @@
 ﻿using HSP.CelestialBodies;
 using HSP.ReferenceFrames;
+using HSP.SceneManagement;
+using HSP.Vanilla.Scenes.DesignScene;
 using HSP.Vanilla.Scenes.GameplayScene;
 using HSP.Vanilla.Scenes.GameplayScene.Cameras;
 using HSP.Vanilla.Scenes.MapScene;
@@ -32,50 +34,51 @@ namespace HSP.Vanilla.CelestialBodies
     /// <summary>
     /// Returns POIs for the active camera.
     /// </summary>
-    public sealed class ActiveCameraPOIGetter : IPOIGetter
+    public sealed class GameplaySceneCameraPOIGetter : IPOIGetter
     {
         public IEnumerable<Vector3Dbl> GetPOIs()
         {
-            if ( SceneCamera.Camera == null )
+            if ( !HSPSceneManager.IsForeground<GameplaySceneM>() )
                 return Enumerable.Empty<Vector3Dbl>();
 
+            Transform trans = SceneCamera.GetCamera<GameplaySceneM>().transform;
             return new Vector3Dbl[]
             {
-                GameplaySceneReferenceFrameManager.ReferenceFrame.TransformPosition( SceneCamera.Camera.transform.position ),
-                GameplaySceneReferenceFrameManager.ReferenceFrame.TransformPosition( SceneCamera.Camera.transform.position + SceneCamera.Camera.transform.forward * 500 ),
+                GameplaySceneReferenceFrameManager.ReferenceFrame.TransformPosition( trans.position ),
+                GameplaySceneReferenceFrameManager.ReferenceFrame.TransformPosition( trans.position + trans.forward * 500 ),
             };
         }
 
 
-        [MapsInheritingFrom( typeof( ActiveCameraPOIGetter ) )]
+        [MapsInheritingFrom( typeof( GameplaySceneCameraPOIGetter ) )]
         public static SerializationMapping ActiveCameraPOIGetterMapping()
         {
-            return new MemberwiseSerializationMapping<ActiveCameraPOIGetter>();
+            return new MemberwiseSerializationMapping<GameplaySceneCameraPOIGetter>();
         }
     }
 
     /// <summary>
     /// Returns POIs for the active camera.
     /// </summary>
-    public sealed class MapActiveCameraPOIGetter : IPOIGetter
+    public sealed class MapSceneCameraPOIGetter : IPOIGetter
     {
         public IEnumerable<Vector3Dbl> GetPOIs()
         {
-            if ( SceneCamera.Camera == null )
+            if( !HSPSceneManager.IsForeground<MapSceneM>() )
                 return Enumerable.Empty<Vector3Dbl>();
 
+            Transform trans = SceneCamera.GetCamera<MapSceneM>().transform;
             return new Vector3Dbl[]
             {
-                MapSceneReferenceFrameManager.ReferenceFrame.TransformPosition( SceneCamera.Camera.transform.position ),
-                MapSceneReferenceFrameManager.ReferenceFrame.TransformPosition( SceneCamera.Camera.transform.position + SceneCamera.Camera.transform.forward * 500 ),
+                MapSceneReferenceFrameManager.ReferenceFrame.TransformPosition( trans.position )
             };
         }
 
 
-        [MapsInheritingFrom( typeof( MapActiveCameraPOIGetter ) )]
+        [MapsInheritingFrom( typeof( MapSceneCameraPOIGetter ) )]
         public static SerializationMapping MapActiveCameraPOIGetterMapping()
         {
-            return new MemberwiseSerializationMapping<MapActiveCameraPOIGetter>();
+            return new MemberwiseSerializationMapping<MapSceneCameraPOIGetter>();
         }
     }
 }

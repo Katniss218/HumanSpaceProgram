@@ -1,6 +1,7 @@
 ﻿using HSP.CelestialBodies;
 using HSP.SceneManagement;
 using HSP.Vanilla.ReferenceFrames;
+using HSP.Vessels;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -33,9 +34,19 @@ namespace HSP.Vanilla.Scenes.MapScene
         public const string CREATE_MAP_CELESTIAL_BODIES = HSPEvent.NAMESPACE_HSP + ".vanilla.spawnmapcbs";
         public const string DESTROY_MAP_CELESTIAL_BODIES = HSPEvent.NAMESPACE_HSP + ".vanilla.destroymapcbs";
 
-        public static MapCelestialBody Get( string id )
+        public static bool TryGet( string id, out MapCelestialBody mapCelestialBody )
         {
-            return instance._mapCelestialBodies[CelestialBodyManager.Get( id )];
+            var celestialBody = CelestialBodyManager.Get( id );
+            if( celestialBody == null )
+            {
+                mapCelestialBody = default;
+                return false;
+            }
+            return instance._mapCelestialBodies.TryGetValue( celestialBody, out mapCelestialBody );
+        }
+        public static bool TryGet( CelestialBody celestialBody, out MapCelestialBody mapCelestialBody )
+        {
+            return instance._mapCelestialBodies.TryGetValue( celestialBody, out mapCelestialBody );
         }
 
         [HSPEventListener( HSPEvent_MAP_SCENE_LOAD.ID, ADD_MAP_SCENE_CELESTIAL_BODY_MANAGER )]

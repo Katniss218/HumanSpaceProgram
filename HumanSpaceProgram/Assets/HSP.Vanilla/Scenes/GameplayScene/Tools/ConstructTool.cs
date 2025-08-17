@@ -67,7 +67,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Tools
             if( UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject() )
                 return;
 
-            _cursorRay = SceneCamera.Camera.ScreenPointToRay( UnityEngine.Input.mousePosition );
+            _cursorRay = SceneCamera.GetCamera<GameplaySceneM>().ScreenPointToRay( UnityEngine.Input.mousePosition );
 
             if( Physics.Raycast( _cursorRay, out _hit, 8192, 1 << (int)Layer.PART_OBJECT ) )
             {
@@ -237,7 +237,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Tools
             }
 
             // Node attachment.
-            Plane viewPlane = new Plane( SceneCamera.Camera.transform.forward, (_heldPart.position + _heldOffset) );
+            Plane viewPlane = new Plane( SceneCamera.GetCamera<GameplaySceneM>().transform.forward, (_heldPart.position + _heldOffset) );
             if( viewPlane.Raycast( _cursorRay, out float intersectionDistance ) )
             {
                 Vector3 planePoint = _cursorRay.GetPoint( intersectionDistance );

@@ -8,12 +8,11 @@ using UnityEngine;
 
 namespace HSP.Vanilla.UI.Scenes.MapScene
 {
-    public class EphemerisDrawer
+    public static class EphemerisDrawer
     {
-        [HSPEventListener( HSPEvent_MAP_SCENE_ACTIVATE.ID, "recalc" )]
-        private static void Recalc()
+        public static void Recalc()
         {
-            const int LINE_POINT_COUNT = 800;
+            const int LINE_POINT_COUNT = 400;
 
             var bodies = TrajectoryManager.PredictionSimulator.GetBodies();
             foreach( var (body, ephemeris) in bodies )

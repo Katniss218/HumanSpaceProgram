@@ -1,4 +1,3 @@
-using HSP.CelestialBodies;
 using HSP.Input;
 using HSP.ReferenceFrames;
 using HSP.Time;
@@ -148,6 +147,14 @@ namespace HSP.Vanilla.Scenes.MapScene.Cameras
         {
             _isRotating = false;
             return true;
+        }
+
+        public const string FOLLOW_MAP_FOCUS = HSPEvent.NAMESPACE_HSP + ".map_scene.camera.focus";
+
+        [HSPEventListener( HSPEvent_AFTER_MAP_FOCUS_CHANGED.ID, FOLLOW_MAP_FOCUS )]
+        private static void OnMapFocusChanged( IMapFocusable focus )
+        {
+            instance.ReferenceObject = focus.transform;
         }
     }
 }

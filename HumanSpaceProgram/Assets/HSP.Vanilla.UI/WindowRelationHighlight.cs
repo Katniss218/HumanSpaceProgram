@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using HSP.Vanilla.Scenes.GameplayScene;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UnityPlus.UILib;
@@ -73,7 +74,8 @@ namespace HSP.Vanilla.UI
 
             if( _highlightedObject != null )
             {
-                Vector3 targetScreenPos = SceneCamera.Camera.WorldToScreenPoint( ReferenceTransform.position );
+#warning TODO - find the camera in the current foreground scene.
+                Vector3 targetScreenPos = SceneCamera.GetCamera<GameplaySceneM>().WorldToScreenPoint( ReferenceTransform.position );
                 targetScreenPos.z = 0.0f;
 
                 _highlightedObject.position = targetScreenPos;

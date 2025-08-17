@@ -1,4 +1,5 @@
-﻿using HSP.Vessels;
+﻿using HSP.Vanilla.Scenes.GameplayScene;
+using HSP.Vessels;
 using System;
 using UnityEngine;
 using UnityPlus.AssetManagement;
@@ -18,7 +19,7 @@ namespace HSP.Vanilla.UI.Vessels
 
         void LateUpdate()
         {
-            ((RectTransform)this.transform).SetScreenPosition( SceneCamera.Camera, (Vector3)Vessel.transform.position );
+            ((RectTransform)this.transform).SetScreenPosition( SceneCamera.GetCamera<GameplaySceneM>(), (Vector3)Vessel.transform.position );
         }
 
         protected internal static T Create<T>( IUIElementContainer parent, Vessel vessel ) where T : VesselHUD

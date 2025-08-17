@@ -132,7 +132,7 @@ namespace HSP.Vanilla.Scenes.MapScene.Cameras
             uiCameraGameObject.transform.SetParent( cameraParentGameObject.transform );
             Camera uiCamera = uiCameraGameObject.AddComponent<Camera>();
 
-            sceneCamera.camera = uiCamera;
+            sceneCamera.camera = farCamera;
             cameraManager.CameraParent = cameraParentGameObject.transform;
             cameraManager._farCamera = farCamera;
             cameraManager._effectCamera = effectCamera;
@@ -147,10 +147,9 @@ namespace HSP.Vanilla.Scenes.MapScene.Cameras
             _cameraPivot.SetActive( false );
         }
 
-        [HSPEventListener( HSPEvent_MAP_SCENE_ACTIVATE.ID, ACTIVATE_CAMERA, After = new[] { MapSceneCelestialBodyManager.CREATE_MAP_CELESTIAL_BODIES } )]
+        [HSPEventListener( HSPEvent_MAP_SCENE_ACTIVATE.ID, ACTIVATE_CAMERA )]
         private static void OnMapSceneActivate()
         {
-            _cameraPivot.GetComponent<MapSceneOrbitingCameraController>().ReferenceObject = MapSceneCelestialBodyManager.Get( "main" ).transform;
             _cameraPivot.SetActive( true );
         }
 

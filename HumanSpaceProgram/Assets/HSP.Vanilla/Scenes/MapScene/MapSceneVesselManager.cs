@@ -86,19 +86,15 @@ namespace HSP.Vanilla.Scenes.MapScene
         /// </summary>
         private static void CreateMapVessel( Vessel source )
         {
-            Debug.Log( "CREATE MAP VESSEL" );
             if( !instanceExists )
                 return; // scene was unloaded.
 
-            Debug.Log( "CREATE MAP VESSEL2" );
             GameObject go = new GameObject( $"map vessel - {source.name}" );
             var t = go.AddComponent<MapVessel>();
            // t.Source = source;
             var trans = go.AddComponent<FollowingDifferentReferenceFrameTransform>();
             trans.SceneReferenceFrameProvider = new MapSceneReferenceFrameProvider();
             trans.TargetTransform = source.ReferenceFrameTransform;
-           // t.ReferenceFrameTransform = trans;
-           // t.PhysicsTransform = source.PhysicsTransform;
             MapVessel target = t;
 
             instance._mapVessels.Add( source, target );
