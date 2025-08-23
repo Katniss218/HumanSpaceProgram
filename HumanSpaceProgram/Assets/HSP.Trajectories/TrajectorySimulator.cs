@@ -11,7 +11,7 @@ namespace HSP.Trajectories
         {
             public bool isAttractor;
             public int timestepperIndex; // either indexes to the attractor or follower arrays, depending on the isAttractor.
-            public Ephemeris ephemeris;
+            public Ephemeris2 ephemeris;
         }
 
         // timestepper
@@ -37,8 +37,8 @@ namespace HSP.Trajectories
         /// </summary>
         public double MaxStepSize { get; set; } = 1.0;
 
-        protected Ephemeris[] _attractorEphemerides;
-        protected Ephemeris[] _followerEphemerides;
+        protected Ephemeris2[] _attractorEphemerides;
+        protected Ephemeris2[] _followerEphemerides;
 
         public int GetAttractorIndex( ITrajectoryTransform trajectoryTransform )
         {
@@ -67,17 +67,20 @@ namespace HSP.Trajectories
         bool _staleBodyCountChanged;
 
         bool _staleEphemerisLengthChanged;
-        double _ephemerisDuration;
-        double _ephemerisTimeResolution;
+        int _ephemerisLength;
+        //double _ephemerisDuration;
+        //double _ephemerisTimeResolution;
 
-        public TrajectorySimulator( double ut, double step, double ephemerisTimeResolution, double ephemerisDuration )
+        //public TrajectorySimulator( double ut, double step, double ephemerisTimeResolution, double ephemerisDuration )
+        public TrajectorySimulator( double ut, double step, int ephemerisLength )
         {
             this._ut = ut;
             this._step = step;
             _isStaleAttractor = true; // will set up everything on first step.
             _staleBodyCountChanged = true;
-            _ephemerisDuration = ephemerisDuration;
-            _ephemerisTimeResolution = ephemerisTimeResolution;
+            _ephemerisLength = ephemerisLength;
+            //_ephemerisDuration = ephemerisDuration;
+            //_ephemerisTimeResolution = ephemerisTimeResolution;
         }
 
         public bool HasBody( ITrajectoryTransform trajectoryTransform )
@@ -95,7 +98,7 @@ namespace HSP.Trajectories
 
         public virtual bool AddBody( ITrajectoryTransform transform )
         {
-            Ephemeris ephemeris = new Ephemeris( _ephemerisTimeResolution, _ephemerisDuration + _ephemerisTimeResolution /* padding */ );
+            Ephemeris2 ephemeris = new Ephemeris2( 1000, 1e-2 );
             bool wasAdded = _bodies.TryAdd( transform, new Entry() { timestepperIndex = -1, isAttractor = transform.IsAttractor, ephemeris = ephemeris } );
             if( !wasAdded )
                 return false;
@@ -127,13 +130,15 @@ namespace HSP.Trajectories
             _isStaleAttractor |= (trajectoryTransform.IsAttractor | bodyEntry.isAttractor); // if is attractor or was attractor (it could've changed).
         }
 
-        public virtual void SetEphemerisLength( double ephemerisDuration )
+        //public virtual void SetEphemerisLength( double ephemerisDuration )
+        public virtual void SetEphemerisLength( int ephemerisLength )
         {
-            if( ephemerisDuration <= 0 )
-                throw new ArgumentOutOfRangeException( nameof( ephemerisDuration ), "The ephemeris duration must be greater than zero." );
+            if( ephemerisLength <= 0 )
+                throw new ArgumentOutOfRangeException( nameof( ephemerisLength ), "The ephemeris length must be greater than zero." );
 
             _staleEphemerisLengthChanged = true;
-            this._ephemerisDuration = ephemerisDuration;
+            this._ephemerisLength = ephemerisLength;
+            //this._ephemerisDuration = ephemerisDuration;
         }
 
         public virtual void Clear()
@@ -217,8 +222,8 @@ namespace HSP.Trajectories
                 _currentStateFollowers = new TrajectoryStateVector[numFollowers];
                 _nextStateFollowers = new TrajectoryStateVector[numFollowers];
 
-                _attractorEphemerides = new Ephemeris[numAttractors];
-                _followerEphemerides = new Ephemeris[numFollowers];
+                _attractorEphemerides = new Ephemeris2[numAttractors];
+                _followerEphemerides = new Ephemeris2[numFollowers];
             }
             Profiler.EndSample();
 
@@ -277,9 +282,15 @@ namespace HSP.Trajectories
             {
                 foreach( var ephemeris in _attractorEphemerides )
                 {
-                    ephemeris.SetDuration( ephemeris.LowUT + _ephemerisDuration + ephemeris.TimeResolution /* padding */, ephemeris.LowUT );
+                    //ephemeris.SetDuration( ephemeris.LowUT + _ephemerisDuration + ephemeris.TimeResolution /* padding */, ephemeris.LowUT );
+                    ephemeris.SetCapacity( _ephemerisLength );
+                }
+                foreach( var ephemeris in _followerEphemerides )
+                {
+                    ephemeris.SetCapacity( _ephemerisLength );
                 }
                 _staleEphemerisLengthChanged = false;
+#warning TODO - reset UT (actually, keep the reference UT and ensure that the ephemerides have values between the from/to).
             }
             Profiler.EndSample();
 
@@ -293,13 +304,14 @@ namespace HSP.Trajectories
         /// </summary>
         public virtual void Simulate( double endUT )
         {
+            Profiler.BeginSample( "TrajectorySimulator.Simulate" );
             if( _bodies.Count == 0 )
             {
                 _ut = endUT;
                 return;
             }
 
-            if( _staleBodies.Count > 0 )
+            if( _staleEphemerisLengthChanged || _staleBodies.Count > 0 )
             {
                 FixStale();
             }
@@ -332,8 +344,8 @@ namespace HSP.Trajectories
                 double minStep = double.MaxValue;
                 for( int i = 0; i < _currentStateAttractors.Length; i++ )
                 {
-                    ITrajectoryIntegrator body = _attractors[i];
-                    double step = body.Step( new TrajectorySimulationContext( _ut, _step, _currentStateAttractors[i], _currentStateAttractors ), _attractorAccelerationProviders[i], out _nextStateAttractors[i] );
+                    ITrajectoryIntegrator integrator = _attractors[i];
+                    double step = integrator.Step( new TrajectorySimulationContext( _ut, _step, _currentStateAttractors[i], _currentStateAttractors ), _attractorAccelerationProviders[i], out _nextStateAttractors[i] );
 
                     if( step < minStep )
                     {
@@ -343,8 +355,8 @@ namespace HSP.Trajectories
 
                 for( int i = 0; i < _currentStateFollowers.Length; i++ )
                 {
-                    ITrajectoryIntegrator body = _attractors[i];
-                    double step = body.Step( new TrajectorySimulationContext( _ut, _step, _currentStateFollowers[i], _currentStateAttractors ), _followerAccelerationProviders[i], out _nextStateFollowers[i] );
+                    ITrajectoryIntegrator integrator = _attractors[i];
+                    double step = integrator.Step( new TrajectorySimulationContext( _ut, _step, _currentStateFollowers[i], _currentStateAttractors ), _followerAccelerationProviders[i], out _nextStateFollowers[i] );
 
                     if( step < minStep )
                     {
@@ -355,11 +367,11 @@ namespace HSP.Trajectories
                 // when ran far enough, store the points as ephemerides in the corresponding ephemeris structs.
                 for( int i = 0; i < _attractorEphemerides.Length; i++ )
                 {
-                    _attractorEphemerides[i].Append( _currentStateAttractors[i], _ut );
+                    _attractorEphemerides[i].InsertAdaptive( _ut, _currentStateAttractors[i] );
                 }
                 for( int i = 0; i < _followerEphemerides.Length; i++ )
                 {
-                    _followerEphemerides[i].Append( _currentStateFollowers[i], _ut );
+                    _followerEphemerides[i].InsertAdaptive( _ut, _currentStateFollowers[i] );
                 }
 
                 _ut += _step;
@@ -376,6 +388,7 @@ namespace HSP.Trajectories
             }
 
             _ut = endUT; // Setting to the actual value at the end prevents accumulation of small precision errors due to repeated addition of delta-time.
+            Profiler.EndSample();
         }
     }
 }

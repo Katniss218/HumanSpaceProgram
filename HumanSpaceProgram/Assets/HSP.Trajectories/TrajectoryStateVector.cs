@@ -6,7 +6,7 @@ namespace HSP.Trajectories
     /// <summary>
     /// Represents a snapshot of a body's trajectory.
     /// </summary>
-    public readonly struct TrajectoryStateVector
+    public readonly struct TrajectoryStateVector : IEquatable<TrajectoryStateVector>
     {
         public Vector3Dbl AbsolutePosition { get; }
         public Vector3Dbl AbsoluteVelocity { get; }
@@ -38,6 +38,31 @@ namespace HSP.Trajectories
             }
 
             return 0f;
+        }
+
+        public bool EqualsIgnoreAcceleration( TrajectoryStateVector other )
+        {
+            return this.AbsolutePosition.Equals( other.AbsolutePosition ) &&
+                   this.AbsoluteVelocity.Equals( other.AbsoluteVelocity ) &&
+                   this.Mass == other.Mass;
+        }
+
+        public bool Equals( TrajectoryStateVector other )
+        {
+            return this.AbsolutePosition.Equals( other.AbsolutePosition ) &&
+                   this.AbsoluteVelocity.Equals( other.AbsoluteVelocity ) &&
+                   this.AbsoluteAcceleration.Equals( other.AbsoluteAcceleration ) &&
+                   this.Mass == other.Mass;
+        }
+
+        public override bool Equals( object obj )
+        {
+            return obj is TrajectoryStateVector other && this.Equals( other );
+        }
+
+        public override string ToString()
+        {
+            return $"{nameof( TrajectoryStateVector )}( Position: {this.AbsolutePosition}, Velocity: {this.AbsoluteVelocity}, Acceleration: {this.AbsoluteAcceleration}, Mass: {this.Mass} )";
         }
 
         public static TrajectoryStateVector Lerp( TrajectoryStateVector a, TrajectoryStateVector b, double t )

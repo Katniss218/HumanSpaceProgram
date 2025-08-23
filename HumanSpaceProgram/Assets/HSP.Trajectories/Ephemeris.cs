@@ -7,11 +7,9 @@ namespace HSP.Trajectories
 {
     public interface IReadonlyEphemeris
     {
-        double TimeResolution { get; }
         double HighUT { get; }
         double LowUT { get; }
         double Duration { get; }
-        double MaxDuration { get; }
         int Count { get; }
         int Capacity { get; }
         TrajectoryStateVector Evaluate( double ut );

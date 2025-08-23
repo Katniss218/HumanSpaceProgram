@@ -59,6 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Tests\EditMode\E_Template.cs" />
+    <Compile Include="Assets\Tests\EditMode\Ephemeris2Tests.cs" />
     <Compile Include="Assets\Tests\EditMode\NewtonianOrbitTests.cs" />
     <Compile Include="Assets\Tests\EditMode\NUnit\ApproxEqual.cs" />
     <Compile Include="Assets\Tests\EditMode\KeplerianOrbitTests.cs" />

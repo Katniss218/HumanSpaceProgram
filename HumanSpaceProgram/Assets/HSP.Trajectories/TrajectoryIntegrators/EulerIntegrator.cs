@@ -11,7 +11,7 @@ namespace HSP.Trajectories.TrajectoryIntegrators
             Vector3Dbl _currentAcceleration = Vector3Dbl.zero;
             foreach( var attractor in accelerationProviders )
             {
-                _currentAcceleration += attractor.GetAcceleration( context );
+                _currentAcceleration += attractor.GetAcceleration( context ); // Possibly heavy interface call, but needs more testing.
             }
 
             Vector3Dbl _currentVelocity = context.Self.AbsoluteVelocity + (_currentAcceleration * context.Step);

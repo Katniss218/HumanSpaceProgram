@@ -30,8 +30,7 @@ namespace HSP.Trajectories
                     throw new System.ArgumentOutOfRangeException( nameof( value ), "Flight plan duration must be greater than zero." );
 
                 instance._flightPlanDuration = value;
-                instance._simulators[PREDICTION_SIMULATOR_INDEX].SetEphemerisLength( FlightPlanDuration );
-
+                instance._simulators[PREDICTION_SIMULATOR_INDEX].SetEphemerisLength( (int)(value / 5000) );
             }
         }
 
@@ -123,8 +122,8 @@ namespace HSP.Trajectories
             {
                 _simulators = new[]
                 {
-                    new TrajectorySimulator( TimeManager.UT, 0.1, 1.0, 100.0 ),
-                    new TrajectorySimulator( TimeManager.UT, FlightPlanDuration / 100000.0, FlightPlanDuration / 3000.0, FlightPlanDuration )
+                    new TrajectorySimulator( TimeManager.UT, 0.1, 50 ),
+                    new TrajectorySimulator( TimeManager.UT, FlightPlanDuration / 100000.0, (int)(FlightPlanDuration / 5000) )
                 };
                 _simulators[PREDICTION_SIMULATOR_INDEX].MaxStepSize = FlightPlanDuration / 1000.0;
             }

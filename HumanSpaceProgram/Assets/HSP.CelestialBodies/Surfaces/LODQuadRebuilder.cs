@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 
@@ -278,13 +279,21 @@ namespace HSP.CelestialBodies.Surfaces
             {
                 int currentStage = LastStartedStage;
 
+                int firstJob = currentStage < 0
+                    ? _firstJobPerStage[0]
+                    : _firstJobPerStage[currentStage];
                 int lastJob = (currentStage + 1) < StageCount
                     ? _firstJobPerStage[currentStage + 1]
                     : _modifiers.Length;
 
-                foreach( var quad in _rebuild )
+                foreach( var rQuad in _rebuild )
                 {
-                    quad.handles[lastJob - 1].Complete();
+                    rQuad.handles[lastJob - 1].Complete();
+
+                    foreach( var job in rQuad.jobs[firstJob..lastJob] )
+                    {
+                        job.Dispose();
+                    }
                 }
 
                 foreach( var rQuad in _rebuild )

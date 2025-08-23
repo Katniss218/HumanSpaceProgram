@@ -202,6 +202,7 @@ namespace HSP.CelestialBodies.Surfaces
         void OnDestroy()
         {
             _builder?.Dispose();
+            _builder = null;
             foreach( var oldRebuildData in _currentQuads.Values )
             {
                 oldRebuildData.Dispose();
@@ -222,7 +223,8 @@ namespace HSP.CelestialBodies.Surfaces
             if( IsBuilding )
             {
                 _builder.Dispose();
-                Debug.LogWarning( $"{nameof( LODQuadSphere )} on celestial body '{CelestialBody.ID}' was disabled while building." );
+                _builder = null; // Important to avoid double disposal on scene unloads.
+                Debug.LogWarning( $"{nameof( LODQuadSphere )} on celestial body '{CelestialBody.ID}' was disabled while building. This is usually the case when unloading a scene." );
             }
         }
 
