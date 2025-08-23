@@ -9,6 +9,7 @@ namespace HSP.Vanilla.Trajectories
     /// <summary>
     /// A trajectory that follows a newtonian gravitational field.
     /// </summary>
+    [Obsolete("Use the new trajectory system instead.")]
     public class NewtonianOrbit 
     {
         private double _cachedUpToUT => UT;

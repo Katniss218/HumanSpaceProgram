@@ -116,12 +116,14 @@
     <Compile Include="Assets\HSP.Vanilla\Components\FVesselSeparator.cs" />
     <Compile Include="Assets\HSP.Vanilla\Effects\FRocketEngineFX.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FSequencer.Sequence.cs" />
+    <Compile Include="Assets\HSP.Vanilla\Scenes\MapScene\MapFocusedObjectManager.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\OnStartup.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FAttitudeAvionics.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FPointMass.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\GameplaySceneEscapeInputController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\VesselManager.Serialization.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\Cameras\GameplaySceneOrbitingCameraController.cs" />
+    <Compile Include="Assets\HSP.Vanilla\Scenes\MapScene\IMapFocusable.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\Tools\ConstructTool.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FSequencer.SequenceAction.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\GameplayScene\GameplaySceneReferenceFrameManager.cs" />
@@ -150,6 +152,7 @@
     <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\SceneReferenceFrameProvider.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\DesignScene\DesignSceneTool.cs" />
     <Compile Include="Assets\HSP.Vanilla\CelestialBodies\POIGetterUtils.cs" />
+    <Compile Include="Assets\HSP.Vanilla\SceneCamera.cs" />
     <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\FollowingDifferentReferenceFrameTransform.cs" />
     <Compile Include="Assets\HSP.Vanilla\Scenes\MapScene\CelestialBodyProcessors\LODQuadSphereProcessor.cs" />
     <Compile Include="Assets\HSP.Vanilla\ReferenceFrames\HybridReferenceFrameTransform.cs" />
@@ -164,9 +167,6 @@
     <Compile Include="Assets\HSP.Vanilla\Components\FLaunchSiteMarker.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FReactionControlController.cs" />
     <Compile Include="Assets\HSP.Vanilla\Components\FControlFrame.cs" />
-    <Compile Include="Assets\HSP.Vanilla\Scenes\MapScene\MapFocusedObjectManager.cs" />
-    <Compile Include="Assets\HSP.Vanilla\Scenes\MapScene\IMapFocusable.cs" />
-    <Compile Include="Assets\HSP.Vanilla\SceneCamera.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Vanilla\___HSP.Vanilla.asmdef" />

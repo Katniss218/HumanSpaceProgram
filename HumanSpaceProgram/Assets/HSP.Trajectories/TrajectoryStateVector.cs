@@ -6,12 +6,12 @@ namespace HSP.Trajectories
     /// <summary>
     /// Represents a snapshot of a body's trajectory.
     /// </summary>
-    public readonly struct TrajectoryStateVector : IEquatable<TrajectoryStateVector>
+    public readonly struct TrajectoryStateVector
     {
-#warning TODO - rotation as well
         public Vector3Dbl AbsolutePosition { get; }
         public Vector3Dbl AbsoluteVelocity { get; }
         public Vector3Dbl AbsoluteAcceleration { get; }
+#warning TODO - rotations
         public double Mass { get; }
 
         public TrajectoryStateVector( Vector3Dbl absolutePosition, Vector3Dbl absoluteVelocity, Vector3Dbl absoluteAcceleration, double mass )
@@ -30,12 +30,14 @@ namespace HSP.Trajectories
             this.Mass = mass;
         }
 
-        public bool Equals( TrajectoryStateVector other )
+        private static double InverseLerp( double a, double b, double value )
         {
-            return this.AbsolutePosition == other.AbsolutePosition
-                && this.AbsoluteVelocity == other.AbsoluteVelocity
-                // && this.AbsoluteAcceleration == other.AbsoluteAcceleration
-                && this.Mass == other.Mass;
+            if( a != b )
+            {
+                return (value - a) / (b - a);
+            }
+
+            return 0f;
         }
 
         public static TrajectoryStateVector Lerp( TrajectoryStateVector a, TrajectoryStateVector b, double t )
@@ -45,19 +47,6 @@ namespace HSP.Trajectories
                 Vector3Dbl.Lerp( a.AbsoluteVelocity, b.AbsoluteVelocity, t ),
                 Vector3Dbl.Lerp( a.AbsoluteAcceleration, b.AbsoluteAcceleration, t ),
                 MathD.Lerp( a.Mass, b.Mass, t )
-                );
-        }
-    }
-
-    public static class IReferenceFrameTransform_Ex
-    {
-        public static TrajectoryStateVector GetBodyState( this ITrajectoryTransform self )
-        {
-            return new TrajectoryStateVector( 
-                self.ReferenceFrameTransform.AbsolutePosition,
-                self.ReferenceFrameTransform.AbsoluteVelocity,
-                self.ReferenceFrameTransform.AbsoluteAcceleration,
-                self.PhysicsTransform.Mass
                 );
         }
     }

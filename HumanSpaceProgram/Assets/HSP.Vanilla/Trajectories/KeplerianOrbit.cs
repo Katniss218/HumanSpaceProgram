@@ -10,6 +10,7 @@
 //    /// <summary>
 //    /// A simulated trajectory that follows kepler's laws of planetary motion.
 //    /// </summary>
+//[Obsolete( "Use the new trajectory system instead." )]
 //    public class KeplerianOrbit 
 //    {
 //        /// <summary>

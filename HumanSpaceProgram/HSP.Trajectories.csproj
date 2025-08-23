@@ -67,9 +67,11 @@
     <Compile Include="Assets\HSP.Trajectories\TrajectorySimulationContext.cs" />
     <Compile Include="Assets\HSP.Trajectories\ITrajectoryTransform.cs" />
     <Compile Include="Assets\HSP.Trajectories\Ephemeris.cs" />
+    <Compile Include="Assets\HSP.Trajectories\IReferenceFrameTransform_Ex.cs" />
     <Compile Include="Assets\HSP.Trajectories\IReadonlyTrajectorySimulator.cs" />
     <Compile Include="Assets\HSP.Trajectories\ITrajectoryStepProvider.cs" />
     <Compile Include="Assets\HSP.Trajectories\TrajectorySimulator.cs" />
+    <Compile Include="Assets\HSP.Trajectories\Ephemeris2.cs" />
     <Compile Include="Assets\HSP.Trajectories\ITrajectoryIntegrator.cs" />
   </ItemGroup>
   <ItemGroup>

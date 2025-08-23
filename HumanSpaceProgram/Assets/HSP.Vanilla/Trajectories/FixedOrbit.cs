@@ -9,6 +9,7 @@ namespace HSP.Vanilla.Trajectories
     /// <summary>
     /// A trajectory that remains stationary.
     /// </summary>
+    [Obsolete( "Use the new trajectory system instead." )]
     public class FixedOrbit
     {
         private Vector3Dbl _currentPosition;

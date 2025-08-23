@@ -1,5 +1,4 @@
-﻿using HSP.CelestialBodies;
-using HSP.Vanilla.Scenes.MapScene;
+﻿using HSP.Vanilla.Scenes.MapScene;
 using System;
 using UnityEngine;
 using UnityPlus.AssetManagement;

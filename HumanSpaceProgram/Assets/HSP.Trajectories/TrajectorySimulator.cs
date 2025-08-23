@@ -28,6 +28,7 @@ namespace HSP.Trajectories
         protected TrajectoryStateVector[] _currentStateFollowers;
         protected TrajectoryStateVector[] _nextStateFollowers;
 
+#warning TODO - simulator should keep ground truth values for time (t_0) and have methods to update them. It should then predict forwards in time up to some t_p
         protected double _ut;
         protected double _step;
 
