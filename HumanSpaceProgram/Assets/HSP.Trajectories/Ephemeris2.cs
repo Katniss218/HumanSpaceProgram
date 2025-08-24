@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using UnityEditor.PackageManager.UI;
 using UnityEngine;
 
 namespace HSP.Trajectories
 {
-    public static class VectorErrorUtils
+    public static class VectorSimilarityUtils
     {
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
         static double Abs( double value ) => value < 0 ? -value : value;
 
+        [MethodImpl( MethodImplOptions.AggressiveInlining )]
         static double Max( double a, double b, double c, double d )
         {
             double m = a;
@@ -19,14 +21,14 @@ namespace HSP.Trajectories
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        static double SymRelativeVec( in Vector3Dbl a, in Vector3Dbl b, in double eps )
+        static double SymRelativeVec( Vector3Dbl a, Vector3Dbl b, double eps )
         {
             double den = a.magnitude + b.magnitude + eps;
             return (a - b).magnitude / den;
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        static double SymRelativeScalar( in double a, in double b, in double eps )
+        static double SymRelativeScalar( double a, double b, double eps )
         {
             double d = Abs( a - b );
             double den = Abs( a ) + Abs( b ) + eps;
@@ -34,22 +36,128 @@ namespace HSP.Trajectories
         }
 
         // Epsilon values. Prevent divide by 0 and numerical instability near 0.
-        const double epsP = 1e-1;
-        const double epsV = 1e-3;
+        const double epsP = 1e-3;
+        const double epsV = 1e-6;
         const double epsA = 1e-6;
-        const double epsM = 1e-1;
+        const double epsM = 1e-3;
 
         /// <summary>
-        /// Returns a value in [0..1]. 0 == identical. 1 == maximally different.
+        /// Calculates how 'similar' the state vectors are.
         /// </summary>
-        public static double Error( in TrajectoryStateVector A, in TrajectoryStateVector B )
+        /// <returns>
+        /// A value in [0..1], where 0 = identical, 1 = maximally different.
+        /// </returns>
+        public static double Error( in TrajectoryStateVector a, in TrajectoryStateVector b )
         {
-            double ep = SymRelativeVec( A.AbsolutePosition, B.AbsolutePosition, epsP );
-            double ev = SymRelativeVec( A.AbsoluteVelocity, B.AbsoluteVelocity, epsV );
-            double ea = SymRelativeVec( A.AbsoluteAcceleration, B.AbsoluteAcceleration, epsA );
-            double em = SymRelativeScalar( A.Mass, B.Mass, epsM );
+            double ep = SymRelativeVec( a.AbsolutePosition, b.AbsolutePosition, epsP );
+            double ev = SymRelativeVec( a.AbsoluteVelocity, b.AbsoluteVelocity, epsV );
+            double ea = SymRelativeVec( a.AbsoluteAcceleration, b.AbsoluteAcceleration, epsA );
+            double em = SymRelativeScalar( a.Mass, b.Mass, epsM );
 
-            return Max( ep, ev, ea, em );
+            return Max( ep, ev, ea, em ); // Any one component being 'bad' means that the ephemeris is 'bad',
+                                          // even if the other components haven't changed - because it still needs a sample to keep the 'bad' component in check.
+        }
+    }
+
+    public static class VectorInterpolationUtils
+    {
+        /// <summary>
+        /// Performs linear interpolation of the state vectors inside the two samples. <br/>
+        /// Continuous in position.
+        /// </summary>
+        public static TrajectoryStateVector Lerp( in Ephemeris2.Sample s1, in Ephemeris2.Sample s2, double ut )
+        {
+            double dt = s2.ut - s1.ut;
+            double t = (ut - s1.ut) / dt;
+
+            return TrajectoryStateVector.Lerp( s1.state, s2.state, t );
+        }
+
+        /// <summary>
+        /// Performs cubic hermite interpolation of the state vectors inside the two samples. <br/>
+        /// Continuous in position and velocity.
+        /// </summary>
+        public static TrajectoryStateVector CubicHermite( in Ephemeris2.Sample s1, in Ephemeris2.Sample s2, double ut )
+        {
+            double dt = s2.ut - s1.ut;
+            double t = (ut - s1.ut) / dt;
+
+            Vector3Dbl m0 = s1.state.AbsoluteVelocity * dt;
+            Vector3Dbl m1 = s2.state.AbsoluteVelocity * dt;
+            Vector3Dbl n0 = s1.state.AbsoluteAcceleration * dt;
+            Vector3Dbl n1 = s2.state.AbsoluteAcceleration * dt;
+
+            return new TrajectoryStateVector(
+                CubicHermiteNormalized( s1.state.AbsolutePosition, m0, s2.state.AbsolutePosition, m1, t ),
+                CubicHermiteNormalized( s1.state.AbsoluteVelocity, n0, s2.state.AbsoluteVelocity, n1, t ),
+                Vector3Dbl.Lerp( s1.state.AbsoluteAcceleration, s2.state.AbsoluteAcceleration, t ),
+                MathD.Lerp( s1.state.Mass, s2.state.Mass, t )
+                );
+        }
+
+        /// <summary>
+        /// Performs quintic hermite interpolation of the state vectors inside the two samples. <br/>
+        /// Continuous in position, velocity, and acceleration.
+        /// </summary>
+        public static TrajectoryStateVector QuinticHermite( in Ephemeris2.Sample s1, in Ephemeris2.Sample s2, double ut )
+        {
+            double dt = s2.ut - s1.ut;
+            double t = (ut - s1.ut) / dt;
+            double dt2 = dt * dt;
+
+            Vector3Dbl m0 = s1.state.AbsoluteVelocity * dt;
+            Vector3Dbl m1 = s2.state.AbsoluteVelocity * dt;
+            Vector3Dbl sd0 = s1.state.AbsoluteAcceleration * dt2;
+            Vector3Dbl sd1 = s2.state.AbsoluteAcceleration * dt2;
+            Vector3Dbl n0 = s1.state.AbsoluteAcceleration * dt;
+            Vector3Dbl n1 = s2.state.AbsoluteAcceleration * dt;
+
+            return new TrajectoryStateVector(
+                QuinticHermiteNormalized( s1.state.AbsolutePosition, m0, sd0, s2.state.AbsolutePosition, m1, sd1, t ),
+                CubicHermiteNormalized( s1.state.AbsoluteVelocity, n0, s2.state.AbsoluteVelocity, n1, t ),
+                Vector3Dbl.Lerp( s1.state.AbsoluteAcceleration, s2.state.AbsoluteAcceleration, t ),
+                MathD.Lerp( s1.state.Mass, s2.state.Mass, t )
+                );
+        }
+
+        public static Vector3Dbl CubicHermiteNormalized( Vector3Dbl p0, Vector3Dbl m0, Vector3Dbl p1, Vector3Dbl m1, double t )
+        {
+            // https://www.rose-hulman.edu/~finn/CCLI/Notes/day09.pdf
+            double t2 = t * t;
+            double t3 = t2 * t;
+
+            double h00 = 1.0 - (3.0 * t2) + (2.0 * t3);
+            double h10 = t - (2.0 * t2) + t3;
+            double h01 = (3.0 * t2) - (2.0 * t3);
+            double h11 = -t2 + t3;
+
+            return new Vector3Dbl(
+                h00 * p0.x + h10 * m0.x + h01 * p1.x + h11 * m1.x,
+                h00 * p0.y + h10 * m0.y + h01 * p1.y + h11 * m1.y,
+                h00 * p0.z + h10 * m0.z + h01 * p1.z + h11 * m1.z
+            );
+        }
+
+        public static Vector3Dbl QuinticHermiteNormalized( Vector3Dbl p0, Vector3Dbl m0, Vector3Dbl sd0, Vector3Dbl p1, Vector3Dbl m1, Vector3Dbl sd1, double t )
+        {
+            // https://www.rose-hulman.edu/~finn/CCLI/Notes/day09.pdf
+            double t2 = t * t;
+            double t3 = t2 * t;
+            double t4 = t3 * t;
+            double t5 = t4 * t;
+
+            double h00 = 1.0 - (10.0 * t3) + (15.0 * t4) - (6.0 * t5);
+            double h10 = t - (6.0 * t3) + (8.0 * t4) - (3.0 * t5);
+            double h20 = (0.5 * t2) - (1.5 * t3) + (1.5 * t4) - (0.5 * t5);
+            double h01 = (10.0 * t3) - (15.0 * t4) + (6.0 * t5);
+            double h11 = (-4.0 * t3) + (7.0 * t4) - (3.0 * t5);
+            double h21 = (0.5 * t3) - t4 + (0.5 * t5);
+
+            return new Vector3Dbl(
+                h00 * p0.x + h10 * m0.x + h20 * sd0.x + h01 * p1.x + h11 * m1.x + h21 * sd1.x,
+                h00 * p0.y + h10 * m0.y + h20 * sd0.y + h01 * p1.y + h11 * m1.y + h21 * sd1.y,
+                h00 * p0.z + h10 * m0.z + h20 * sd0.z + h01 * p1.z + h11 * m1.z + h21 * sd1.z
+            );
         }
     }
 
@@ -66,7 +174,7 @@ namespace HSP.Trajectories
             DecreasingUT = 1
         }
 
-        private readonly struct Sample
+        public readonly struct Sample
         {
             public readonly double ut;
             public readonly TrajectoryStateVector state;
@@ -86,22 +194,13 @@ namespace HSP.Trajectories
                 this.afterDiscontinuity = afterDiscontinuity;
                 this.sampleType = sampleType;
             }
-
-            public static TrajectoryStateVector Lerp( Sample s1, Sample s2, double ut )
-            {
-                double t = (ut - s1.ut) / (s2.ut - s1.ut);
-                return TrajectoryStateVector.Lerp( s1.state, s2.state, t );
-            }
-
-            public static TrajectoryStateVector Hermite( Sample s0, Sample s1, Sample s2, Sample s3, double ut )
-            {
-                // ... cubic hermite on the neighboring samples.
-                throw new NotImplementedException();
-            }
         }
 
         public enum SampleType : byte
         {
+            /// <summary>
+            /// Smooth sample.
+            /// </summary>
             Continuous,
             /// <summary>
             /// Sample is discontinuous, i.e. it has a jump in the trajectory.
@@ -109,13 +208,29 @@ namespace HSP.Trajectories
             InstantChange
         }
 
-        public int Count => _count;
-        public int Capacity => _samples.Length;
-        public double HighUT => _headUT;
-        public double LowUT => _tailUT;
-        public double Duration => _headUT - _tailUT;
         /// <summary>
-        /// Maximum error for insertion/deletion of samples.
+        /// The number of samples in the ephemeris.
+        /// </summary>
+        public int Count => _count;
+        /// <summary>
+        /// The maximum number of samples that this ephemeris can hold.
+        /// </summary>
+        public int Capacity => _samples.Length;
+        /// <summary>
+        /// The UT of the first sample in the ephemeris, in [s] since epoch - see <see cref="HSP.Time.TimeManager.UT"/>.
+        /// </summary>
+        public double HighUT => _headUT;
+        /// <summary>
+        /// The UT of the last sample in the ephemeris, in [s] since epoch - see <see cref="HSP.Time.TimeManager.UT"/>.
+        /// </summary>
+        public double LowUT => _tailUT;
+        /// <summary>
+        /// The duration of the ephemeris, in [s].
+        /// </summary>
+        public double Duration => _headUT - _tailUT;
+
+        /// <summary>
+        /// Maximum difference allowed between two consecutive samples when using adaptive insertion.
         /// </summary>
         public double MaxError { get; set; }
 
@@ -224,7 +339,7 @@ namespace HSP.Trajectories
 
         public static double CalculateError( TrajectoryStateVector a, TrajectoryStateVector b )
         {
-            return VectorErrorUtils.Error( a, b );
+            return VectorSimilarityUtils.Error( a, b );
         }
 
         /// <summary>
@@ -250,6 +365,7 @@ namespace HSP.Trajectories
                 _tailUT = ut;
                 return true;
             }
+
             if( _count == 1 )
             {
                 if( ut < _tailUT )
@@ -277,37 +393,32 @@ namespace HSP.Trajectories
 #warning TODO - maybe set the max duration in the ephemeris itself and let the buffer resize to fit?
 
             Sample s1;
-            Sample s2;
-            TrajectoryStateVector interpolated;
             double error;
             int index;
-            if( ut > _headUT ) // Append the new sample to the head.
+            // ---------------------------------------------
+            // Option 1: Append the new sample to the head.
+            if( ut > _headUT )
             {
                 index = _headIndex - 1;
                 if( index < 0 )
                     index += Capacity;
-                s1 = _samples[index]; // 2nd to last sample.
-                s2 = _samples[_headIndex];
+                s1 = _samples[index];
 
-                //interpolated = Sample.Lerp( s1, newSample, s2.ut );
-                //var interpolated = Sample.Hermite( s0, s1, newSample, newSample, s1.ut );
+                // Compare the 2nd-to-last sample with the new sample (and not the last, because the last is always updated and will not show much difference).
+                error = VectorSimilarityUtils.Error( state, s1.state );
 
-                //error = VectorErrorUtils.Error( interpolated, s2.state );
-                error = VectorErrorUtils.Error( state, s1.state );
-
-                if( error < MaxError ) // replace the head sample with the new one.
+                if( error < MaxError ) // Only replace the existing head sample.
                 {
                     _samples[_headIndex] = newSample;
                     _headUT = ut;
                     return false;
                 }
 
-                // append new.
                 _headUT = ut;
                 _headIndex++;
                 if( _headIndex >= Capacity )
                     _headIndex -= Capacity;
-                if( _headIndex == _tailIndex ) // Slide tail forward
+                if( _count == Capacity ) // Slide the tail forward when we reach the end of the buffer.
                 {
                     _tailIndex++;
                     if( _tailIndex >= Capacity )
@@ -321,24 +432,60 @@ namespace HSP.Trajectories
                 _samples[_headIndex] = newSample;
                 return true;
             }
+            // ---------------------------------------------
+            // Option 2: Append the new sample to the tail.
             if( ut < _tailUT )
             {
-                throw new ArgumentOutOfRangeException( nameof( ut ), $"Inserting to the back not supported yet." );
+                index = _tailIndex + 1;
+                if( index >= Capacity )
+                    index -= Capacity;
+                s1 = _samples[index];
+
+                error = VectorSimilarityUtils.Error( state, s1.state );
+
+                if( error < MaxError ) // Only replace the existing tail sample.
+                {
+                    _samples[_tailIndex] = newSample;
+                    _tailUT = ut;
+                    return false;
+                }
+
+                _tailUT = ut;
+                _tailIndex--;
+                if( _tailIndex < 0 )
+                    _tailIndex += Capacity;
+                if( _count == Capacity ) // Slide the head back when we reach the end of the buffer.
+                {
+                    _headIndex--;
+                    if( _headIndex < 0 )
+                        _headIndex += Capacity;
+                    _headUT = _samples[_headIndex].ut;
+                }
+                else
+                {
+                    _count++;
+                }
+                _samples[_tailIndex] = newSample;
+                return true;
             }
+            // ---------------------------------------------
+            // Option 3: Replace the head.
             if( ut == _headUT ) // replace the head sample with the new one.
             {
                 _samples[_headIndex] = newSample;
                 _headUT = ut;
                 return false;
             }
+            // ---------------------------------------------
+            // Option 4: Replace the tail.
             if( ut == _tailUT ) // replace the tail sample with the new one.
             {
                 _samples[_tailIndex] = newSample;
                 _tailUT = ut;
                 return false;
             }
-
-            // sample is within the ephemeris.
+            // ---------------------------------------------
+            // Option 5: Replace the interior samples.
             throw new InvalidOperationException( "Can't insert in the middle of an ephemeris." );
             /*
             index = FindIndex( ut, out s1 );
@@ -380,8 +527,6 @@ namespace HSP.Trajectories
 
         public TrajectoryStateVector Evaluate( double ut, Side side = Side.IncreasingUT )
         {
-            // evaluate as if approaching from the given side.
-            // Center will average over discontinuities.
             if( _count == 0 )
             {
                 throw new InvalidOperationException( "Cannot evaluate empty ephemeris." );
@@ -401,39 +546,31 @@ namespace HSP.Trajectories
                     if( side == Side.IncreasingUT )
                         return s1.state;
                     else if( side == Side.DecreasingUT )
+                    {
+                        index += 1;
+                        if( index >= Capacity )
+                            index -= Capacity;
                         return _samples[index + 1].state; // return [s2] - the upper discontinuous sample.
+                    }
                     else
-                        return TrajectoryStateVector.Lerp( s1.state, _samples[index + 1].state, 0.5 ); // mix both [s1] and [s2] equally.
+                    {
+                        index += 1;
+                        if( index >= Capacity )
+                            index -= Capacity;
+                        return TrajectoryStateVector.Lerp( s1.state, _samples[index].state, 0.5 ); // mix both [s1] and [s2] equally.
+                    }
                 }
 
                 return s1.state;
             }
 
-            // Get the 4 samples for hermite interpolation...
             index += 1;
             if( index >= Capacity )
                 index -= Capacity;
-            Sample s2 = _samples[index]; // Sample [s2]
-            index -= 2;
-            if( index < _tailIndex )
-                index = _tailIndex;
-            if( index < 0 )
-                index += Capacity;
-            Sample s0 = _samples[index]; // Sample [s0]
-            index += 3;
-            if( index > _headIndex )
-                index = _headIndex;
-            if( index >= Capacity )
-                index -= Capacity;
-            Sample s3 = _samples[index]; // Sample [s3]
-            //if( s0.sampleType == SampleType.InstantChange ) // we don't care, s0 is 'after' the discontinuity anyway. FindIndex ensures that.
-            //if( s3.sampleType == SampleType.InstantChange ) // we don't care, s3 is 'before' the discontinuity anyway.
-            if( s2.sampleType == SampleType.InstantChange )
-                s3 = s2;
+            Sample s2 = _samples[index];
             //if( s1.sampleType == SampleType.InstantChange ) should only be the case if s1.ut = ut, and already caught above.
 
-            return Sample.Lerp( s1, s2, ut );
-            //return Sample.Hermite( s0, s1, s2, s3, ut );
+            return VectorInterpolationUtils.CubicHermite( s1, s2, ut );
         }
     }
 }

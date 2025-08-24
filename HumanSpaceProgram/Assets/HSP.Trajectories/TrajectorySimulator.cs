@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HSP.Trajectories.TrajectoryIntegrators;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.Profiling;
@@ -98,7 +99,7 @@ namespace HSP.Trajectories
 
         public virtual bool AddBody( ITrajectoryTransform transform )
         {
-            Ephemeris2 ephemeris = new Ephemeris2( 1000, 1e-2 );
+            Ephemeris2 ephemeris = new Ephemeris2( 1000, 0.01 );
             bool wasAdded = _bodies.TryAdd( transform, new Entry() { timestepperIndex = -1, isAttractor = transform.IsAttractor, ephemeris = ephemeris } );
             if( !wasAdded )
                 return false;

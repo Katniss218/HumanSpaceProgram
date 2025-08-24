@@ -67,10 +67,19 @@ ephemerides themselves shouldn't be defined in the traj transform
 
 
 
+flight plan needs to be able to be reverted back to the ground truth state.
 
 
+```csharp
 
+{
+    // reference UT is always TimeManager.UT.
+    // this is the UT used when reverting the ephemeris/simulation.
 
+    // needs to be able to partially resimulate bodies. so basically, every body tells it where in time it has been computed (ephemeris), and it can then use that data to roll-back to the old time.
+}
+
+```
 
 
 

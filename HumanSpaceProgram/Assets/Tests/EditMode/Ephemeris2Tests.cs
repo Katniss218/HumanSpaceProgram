@@ -80,6 +80,27 @@ namespace HSP_Tests_EditMode
             Assert.That( sut.HighUT, Is.EqualTo( (count - 1) * step ) );
             Assert.That( sut.LowUT, Is.EqualTo( (count - max) * step ) );
         }
+        
+        [Test]
+        public void Insertion_Overflow___SlidesBackward()
+        {
+            const int max = 10;
+            const int count = 20;
+            // Arrange
+            Ephemeris2 sut = new Ephemeris2( max, maxError: 0 );
+
+            // Act
+            double step = -1.0; // Decreasing ut.
+            for( int i = 0; i < count; i++ )
+            {
+                sut.InsertAdaptive( i * step, new TrajectoryStateVector( new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), 1000.0 ) );
+            }
+
+            // Assert
+            Assert.That( sut.Count, Is.EqualTo( max ) );
+            Assert.That( sut.HighUT, Is.EqualTo( (count - max) * step ) );
+            Assert.That( sut.LowUT, Is.EqualTo( (count - 1) * step ) );
+        }
 
         [Test]
         public void Evaluate_2___IsCorrect()

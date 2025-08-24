@@ -15,7 +15,8 @@ namespace HSP.Vanilla.UI.Scenes.MapScene
         [HSPEventListener( HSPEvent_MAP_SCENE_ACTIVATE.ID, CREATE_UI )]
         private static void Create()
         {
-            EphemerisDrawer.Recalc();
+#warning TODO - sorting, ephemeris behind huds.
+            MapSceneM.GameObject.AddComponent<EphemerisDrawer>();
             CreateFPSPanel( MapSceneM.Instance.GetBackgroundCanvas() );
         }
         static void CreateFPSPanel( IUIElementContainer parent )
@@ -31,6 +32,7 @@ namespace HSP.Vanilla.UI.Scenes.MapScene
         private static void Destroy()
         {
 
+            UnityEngine.Object.Destroy( MapSceneM.GameObject.GetComponent<EphemerisDrawer>());
         }
     }
 }
