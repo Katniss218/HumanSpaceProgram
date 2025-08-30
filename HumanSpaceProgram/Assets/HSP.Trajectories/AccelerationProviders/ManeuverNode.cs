@@ -16,7 +16,7 @@ namespace HSP.Trajectories.AccelerationProviders
             throw new NotImplementedException();
         }
 
-        public Vector3Dbl GetAcceleration( TrajectorySimulationContext context )
+        public Vector3Dbl GetAcceleration( in TrajectorySimulationContext context )
         {
             throw new NotImplementedException();
 
@@ -25,10 +25,10 @@ namespace HSP.Trajectories.AccelerationProviders
                 return Vector3Dbl.zero; // No acceleration outside the maneuver time window.
             }
 
-            
+
         }
 
-        public double? GetMass( TrajectorySimulationContext context )
+        public double? GetMass( in TrajectorySimulationContext context )
         {
             throw new NotImplementedException();
         }
@@ -54,20 +54,20 @@ namespace HSP.Trajectories.AccelerationProviders
             };
         }
 
-        public Vector3Dbl GetAcceleration( TrajectorySimulationContext context )
+        public Vector3Dbl GetAcceleration( in TrajectorySimulationContext context )
         {
             if( _parentBodyIndex == -1 )
                 return Vector3Dbl.zero; // no parent body, no acceleration.
 
             Vector3Dbl selfPos = context.Self.AbsolutePosition;
-            var parent = context.CurrentAttractors[_parentBodyIndex];
+            var parent = context.GetAttractor( _parentBodyIndex );
 
             Vector3Dbl toParent = parent.AbsolutePosition - selfPos;
             double accelerationMagnitude = PhysicalConstants.G * (parent.Mass / toParent.sqrMagnitude);
             return toParent.normalized * accelerationMagnitude;
         }
 
-        public double? GetMass( TrajectorySimulationContext context )
+        public double? GetMass( in TrajectorySimulationContext context )
         {
             return null;
         }
@@ -88,28 +88,27 @@ namespace HSP.Trajectories.AccelerationProviders
             return this; // Can return this, since there is no internal state.
         }
 
-        public Vector3Dbl GetAcceleration( TrajectorySimulationContext context )
+        public Vector3Dbl GetAcceleration( in TrajectorySimulationContext context )
         {
             Vector3Dbl selfPos = context.Self.AbsolutePosition;
+            int selfI = context.SelfAttractorIndex;
 
             Vector3Dbl accSum = Vector3Dbl.zero;
-            foreach( var attractor in context.CurrentAttractors )
+            for( int i = 0; i < context.AttractorCount; i++ )
             {
+                if( i == selfI )
+                    continue;
+
+                var attractor = context.GetAttractor( i );
                 Vector3Dbl toBody = attractor.AbsolutePosition - selfPos;
 
-                double distanceSq = toBody.sqrMagnitude;
-                if( distanceSq == 0.0 ) // Skip itself.
-                {
-                    continue;
-                }
-
-                double accelerationMagnitude = PhysicalConstants.G * (attractor.Mass / distanceSq);
+                double accelerationMagnitude = PhysicalConstants.G * (attractor.Mass / toBody.sqrMagnitude);
                 accSum += toBody.normalized * accelerationMagnitude;
             }
             return accSum;
         }
 
-        public double? GetMass( TrajectorySimulationContext context )
+        public double? GetMass( in TrajectorySimulationContext context )
         {
             return null;
         }
@@ -136,7 +135,7 @@ namespace HSP.Trajectories.AccelerationProviders
             throw new NotImplementedException();
         }
 
-        public Vector3Dbl GetAcceleration( TrajectorySimulationContext context )
+        public Vector3Dbl GetAcceleration( in TrajectorySimulationContext context )
         {
             // get the cached system for this simulator.
 
@@ -145,7 +144,7 @@ namespace HSP.Trajectories.AccelerationProviders
             throw new NotImplementedException();
         }
 
-        public double? GetMass( TrajectorySimulationContext context )
+        public double? GetMass( in TrajectorySimulationContext context )
         {
             throw new NotImplementedException();
         }

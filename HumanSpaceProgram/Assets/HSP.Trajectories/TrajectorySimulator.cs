@@ -1,5 +1,4 @@
-﻿using HSP.Trajectories.TrajectoryIntegrators;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.Profiling;
@@ -328,6 +327,8 @@ namespace HSP.Trajectories
 #warning TODO - stale flight plan followers need to actually have their ephemerides recalculated.
             // sort of a sliding window that should have valid data in that interval
 
+            // only simulate the objects that haven't been prolonged up to the end UT.
+
             while( endUT - _ut > 1e-4 )
             {
                 if( _step > MaxStepSize )
@@ -346,7 +347,7 @@ namespace HSP.Trajectories
                 for( int i = 0; i < _currentStateAttractors.Length; i++ )
                 {
                     ITrajectoryIntegrator integrator = _attractors[i];
-                    double step = integrator.Step( new TrajectorySimulationContext( _ut, _step, _currentStateAttractors[i], _currentStateAttractors ), _attractorAccelerationProviders[i], out _nextStateAttractors[i] );
+                    double step = integrator.Step( new TrajectorySimulationContext( _ut, _step, _currentStateAttractors[i], i, _currentStateAttractors ), _attractorAccelerationProviders[i], out _nextStateAttractors[i] );
 
                     if( step < minStep )
                     {
@@ -356,8 +357,8 @@ namespace HSP.Trajectories
 
                 for( int i = 0; i < _currentStateFollowers.Length; i++ )
                 {
-                    ITrajectoryIntegrator integrator = _attractors[i];
-                    double step = integrator.Step( new TrajectorySimulationContext( _ut, _step, _currentStateFollowers[i], _currentStateAttractors ), _followerAccelerationProviders[i], out _nextStateFollowers[i] );
+                    ITrajectoryIntegrator integrator = _followers[i];
+                    double step = integrator.Step( new TrajectorySimulationContext( _ut, _step, _currentStateFollowers[i], -1, _currentStateAttractors ), _followerAccelerationProviders[i], out _nextStateFollowers[i] );
 
                     if( step < minStep )
                     {

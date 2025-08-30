@@ -8,16 +8,15 @@ namespace HSP.Trajectories.TrajectoryIntegrators
     {
         public double Step( TrajectorySimulationContext context, ReadOnlySpan<ITrajectoryStepProvider> accelerationProviders, out TrajectoryStateVector nextSelf )
         {
-            Vector3Dbl _currentAcceleration = Vector3Dbl.zero;
-            foreach( var attractor in accelerationProviders )
-            {
-                _currentAcceleration += attractor.GetAcceleration( context ); // Possibly heavy interface call, but needs more testing.
-            }
+            double dt = context.Step;
 
-            Vector3Dbl _currentVelocity = context.Self.AbsoluteVelocity + (_currentAcceleration * context.Step);
-            Vector3Dbl _currentPosition = context.Self.AbsolutePosition + (_currentVelocity * context.Step);
-            nextSelf = new TrajectoryStateVector( _currentPosition, _currentVelocity, _currentAcceleration, context.Self.Mass );
-            return context.Step;
+            Vector3Dbl acc1 = context.SumAccelerations( accelerationProviders );
+
+            Vector3Dbl _currentVelocity = context.Self.AbsoluteVelocity + (acc1 * dt);
+            Vector3Dbl _currentPosition = context.Self.AbsolutePosition + (_currentVelocity * dt);
+
+            nextSelf = new TrajectoryStateVector( _currentPosition, _currentVelocity, acc1, context.Self.Mass );
+            return dt;
         }
 
 

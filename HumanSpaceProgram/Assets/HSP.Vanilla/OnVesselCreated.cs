@@ -46,7 +46,7 @@ namespace HSP.Vanilla
             if( HSPSceneManager.IsLoaded<GameplaySceneM>() )
             {
                 TrajectoryTransform comp = v.gameObject.AddComponent<TrajectoryTransform>();
-                comp.Integrator = new EulerIntegrator();
+                comp.Integrator = new RK4Integrator();
                 comp.SetAccelerationProviders( new NBodyAccelerationProvider() );
                 comp.IsAttractor = false;
                 // no need to recalculate the mass of the vessel because it's not an attractor.

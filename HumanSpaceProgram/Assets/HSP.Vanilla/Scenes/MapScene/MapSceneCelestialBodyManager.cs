@@ -130,7 +130,7 @@ namespace HSP.Vanilla.Scenes.MapScene
             if( instance._mapCelestialBodies.TryGetValue( source, out MapCelestialBody target ) )
             {
                 // destroy the gameobject stub
-                if( target.gameObject != null )
+                if( target != null )
                     UnityEngine.Object.Destroy( target.gameObject );
 
                 instance._mapCelestialBodies.Remove( source );

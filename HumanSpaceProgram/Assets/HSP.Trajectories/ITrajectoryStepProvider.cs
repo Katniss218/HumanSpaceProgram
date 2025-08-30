@@ -12,11 +12,11 @@ namespace HSP.Trajectories
         /// <summary>
         /// Gets the acceleration at the specified UT, using its internal simulation context.
         /// </summary>
-        public Vector3Dbl GetAcceleration( TrajectorySimulationContext context );
+        public Vector3Dbl GetAcceleration( in TrajectorySimulationContext context );
 
         /// <summary>
         /// Gets the mass (NOT mass derivative) at the specified UT, using its internal simulation context.
         /// </summary>
-        public double? GetMass( TrajectorySimulationContext context ); // useful for maneuver nodes I guess. We Also need one for staging events?
+        public double? GetMass( in TrajectorySimulationContext context ); // useful for maneuver nodes I guess. We Also need one for staging events?
     }
 }

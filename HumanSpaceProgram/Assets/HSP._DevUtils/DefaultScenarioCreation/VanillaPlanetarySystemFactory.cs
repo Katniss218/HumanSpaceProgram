@@ -1,17 +1,13 @@
 ﻿using HSP.CelestialBodies;
 using HSP.CelestialBodies.Atmospheres;
 using HSP.CelestialBodies.Surfaces;
-using HSP.ReferenceFrames;
 using HSP.Trajectories;
 using HSP.Trajectories.AccelerationProviders;
 using HSP.Trajectories.TrajectoryIntegrators;
 using HSP.Vanilla.CelestialBodies;
 using HSP.Vanilla.Scenes.GameplayScene;
-using HSP.Vanilla.Scenes.GameplayScene.Cameras;
 using HSP.Vanilla.Trajectories;
-using HSP.Vessels;
 using System;
-using System.Linq;
 using UnityEngine;
 using UnityPlus.AssetManagement;
 
@@ -76,7 +72,7 @@ namespace HSP._DevUtils
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
             comp.IsAttractor = true;
-            comp.Integrator = new EulerIntegrator();
+            comp.Integrator = new RK45Integrator();
             comp.SetAccelerationProviders( new ITrajectoryStepProvider[] { } );
             //comp.TrajectoryIntegrator = new FixedOrbit( Time.TimeManager.UT, airfPos, airfRot, cb.Mass );
             return cb;
@@ -172,7 +168,7 @@ namespace HSP._DevUtils
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
             comp.IsAttractor = true;
-            comp.Integrator = new EulerIntegrator();
+            comp.Integrator = new RK45Integrator();
             comp.SetAccelerationProviders( new NBodyAccelerationProvider() );
             comp.ReferenceFrameTransform.AbsoluteVelocity = airfVel;
             //comp.TrajectoryIntegrator = new NewtonianOrbit( Time.TimeManager.UT, airfPos, airfVel, Vector3Dbl.zero, cb.Mass );
@@ -188,7 +184,7 @@ namespace HSP._DevUtils
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
             comp.IsAttractor = false;
-            comp.Integrator = new EulerIntegrator();
+            comp.Integrator = new RK45Integrator();
             comp.SetAccelerationProviders( new NBodyAccelerationProvider() );
             comp.ReferenceFrameTransform.AbsoluteVelocity = airfVel;
             //comp.TrajectoryIntegrator = new NewtonianOrbit( Time.TimeManager.UT, airfPos, airfVel, Vector3Dbl.zero, cb.Mass );

@@ -118,7 +118,7 @@ namespace HSP.Vanilla.Scenes.MapScene
             if( instance._mapVessels.TryGetValue( source, out MapVessel target ) )
             {
                 // destroy the gameobject stub
-                if( target.gameObject != null )
+                if( target != null )
                     UnityEngine.Object.Destroy( target.gameObject );
 
                 instance._mapVessels.Remove( source );

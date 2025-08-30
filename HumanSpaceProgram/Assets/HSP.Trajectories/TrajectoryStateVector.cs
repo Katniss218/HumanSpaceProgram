@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace HSP.Trajectories
@@ -77,6 +78,21 @@ namespace HSP.Trajectories
         public override string ToString()
         {
             return $"{nameof( TrajectoryStateVector )}( Position: {this.AbsolutePosition}, Velocity: {this.AbsoluteVelocity}, Acceleration: {this.AbsoluteAcceleration}, Mass: {this.Mass}, MassFlow: {this.MassFlow} )";
+        }
+
+        public TrajectoryStateVector Extrapolate( double dt )
+        {
+            var newPos = this.AbsolutePosition
+                       + this.AbsoluteVelocity * dt
+                       + 0.5 * this.AbsoluteAcceleration * (dt * dt);
+
+            var newVel = this.AbsoluteVelocity
+                       + this.AbsoluteAcceleration * dt;
+
+            var newMass = this.Mass
+                        + this.MassFlow * dt;
+
+            return new TrajectoryStateVector( newPos, newVel, this.AbsoluteAcceleration, newMass, this.MassFlow );
         }
 
         public static TrajectoryStateVector Lerp( TrajectoryStateVector a, TrajectoryStateVector b, double t )
