@@ -72,7 +72,7 @@ namespace HSP._DevUtils
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
             comp.IsAttractor = true;
-            comp.Integrator = new RK45Integrator();
+            comp.Integrator = new VerletIntegrator();
             comp.SetAccelerationProviders( new ITrajectoryStepProvider[] { } );
             //comp.TrajectoryIntegrator = new FixedOrbit( Time.TimeManager.UT, airfPos, airfRot, cb.Mass );
             return cb;
@@ -168,7 +168,7 @@ namespace HSP._DevUtils
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
             comp.IsAttractor = true;
-            comp.Integrator = new RK45Integrator();
+            comp.Integrator = new VerletIntegrator();
             comp.SetAccelerationProviders( new NBodyAccelerationProvider() );
             comp.ReferenceFrameTransform.AbsoluteVelocity = airfVel;
             //comp.TrajectoryIntegrator = new NewtonianOrbit( Time.TimeManager.UT, airfPos, airfVel, Vector3Dbl.zero, cb.Mass );
@@ -184,7 +184,7 @@ namespace HSP._DevUtils
 
             TrajectoryTransform comp = cb.gameObject.AddComponent<TrajectoryTransform>();
             comp.IsAttractor = false;
-            comp.Integrator = new RK45Integrator();
+            comp.Integrator = new VerletIntegrator();
             comp.SetAccelerationProviders( new NBodyAccelerationProvider() );
             comp.ReferenceFrameTransform.AbsoluteVelocity = airfVel;
             //comp.TrajectoryIntegrator = new NewtonianOrbit( Time.TimeManager.UT, airfPos, airfVel, Vector3Dbl.zero, cb.Mass );

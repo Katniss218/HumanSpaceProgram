@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using UnityEditor.PackageManager.UI;
 using UnityEngine;
 
 namespace HSP.Trajectories
@@ -21,14 +20,14 @@ namespace HSP.Trajectories
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        static double SymRelativeVec( Vector3Dbl a, Vector3Dbl b, double eps )
+        public static double SymRelativeVec( Vector3Dbl a, Vector3Dbl b, double eps )
         {
             double den = a.magnitude + b.magnitude + eps;
             return (a - b).magnitude / den;
         }
 
         [MethodImpl( MethodImplOptions.AggressiveInlining )]
-        static double SymRelativeScalar( double a, double b, double eps )
+        public static double SymRelativeScalar( double a, double b, double eps )
         {
             double d = Abs( a - b );
             double den = Abs( a ) + Abs( b ) + eps;
