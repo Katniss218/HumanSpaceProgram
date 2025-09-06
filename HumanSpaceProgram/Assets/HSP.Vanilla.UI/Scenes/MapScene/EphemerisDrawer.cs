@@ -21,7 +21,7 @@ namespace HSP.Vanilla.UI.Scenes.MapScene
 
         void Recalc()
         {
-#warning TODO - adaptive line count and/or line plotting. Adapt to camera distance and ephemeris curvature.
+#warning TODO - adaptive line count and/or line plotting. Adapt to camera distance and ephemeris curvature - more curve - more points.
             const int LINE_POINT_COUNT = 400;
 
             var bodies = TrajectoryManager.PredictionSimulator.GetBodies();

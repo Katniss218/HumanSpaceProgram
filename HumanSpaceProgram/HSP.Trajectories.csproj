@@ -58,6 +58,8 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\HSP.Trajectories\TrajectoryIntegrators\Yoshida4Integrator.cs" />
+    <Compile Include="Assets\HSP.Trajectories\VectorSimilarityUtils.cs" />
     <Compile Include="Assets\HSP.Trajectories\TrajectoryIntegrators\RK2Integrator.cs" />
     <Compile Include="Assets\HSP.Trajectories\AccelerationProviders\ManeuverNode.cs" />
     <Compile Include="Assets\HSP.Trajectories\OrbitalFrame.cs" />
@@ -75,6 +77,7 @@
     <Compile Include="Assets\HSP.Trajectories\IReferenceFrameTransform_Ex.cs" />
     <Compile Include="Assets\HSP.Trajectories\IReadonlyTrajectorySimulator.cs" />
     <Compile Include="Assets\HSP.Trajectories\ITrajectoryStepProvider.cs" />
+    <Compile Include="Assets\HSP.Trajectories\VectorInterpolationUtils.cs" />
     <Compile Include="Assets\HSP.Trajectories\TrajectorySimulator.cs" />
     <Compile Include="Assets\HSP.Trajectories\Ephemeris2.cs" />
     <Compile Include="Assets\HSP.Trajectories\ITrajectoryIntegrator.cs" />

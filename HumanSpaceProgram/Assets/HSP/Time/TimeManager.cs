@@ -35,7 +35,7 @@ namespace HSP.Time
         public static float TimeScale { get => _timeScale; }
 
         /// <summary>
-        /// Returns the current frame's universal time, in [s].
+        /// Returns the current universal time, in [s] since epoch.
         /// </summary>
         public static double UT { get; private set; }
 

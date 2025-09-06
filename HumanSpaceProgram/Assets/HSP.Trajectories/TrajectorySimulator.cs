@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using UnityEngine.Profiling;
 
 namespace HSP.Trajectories
@@ -55,8 +54,6 @@ namespace HSP.Trajectories
             return entry.timestepperIndex;
         }
 
-        public double UT => _ut;
-
         //
 
         public virtual ReadOnlySpan<ITrajectoryTransform> Attractors => _attractorCache;
@@ -99,7 +96,7 @@ namespace HSP.Trajectories
 
         public virtual bool AddBody( ITrajectoryTransform transform )
         {
-            Ephemeris2 ephemeris = new Ephemeris2( 1000, 0.01 );
+            Ephemeris2 ephemeris = new Ephemeris2( _ephemerisLength, 0.01 );
             bool wasAdded = _bodies.TryAdd( transform, new Entry() { timestepperIndex = -1, isAttractor = transform.IsAttractor, ephemeris = ephemeris } );
             if( !wasAdded )
                 return false;
@@ -160,6 +157,14 @@ namespace HSP.Trajectories
                 return _currentStateFollowers[bodyEntry.timestepperIndex];
         }
 
+        public virtual TrajectoryStateVector GetStateVector( double ut, ITrajectoryTransform trajectoryTransform )
+        {
+            if( !_bodies.TryGetValue( trajectoryTransform, out var bodyEntry ) )
+                throw new ArgumentException( $"The trajectory transform '{trajectoryTransform}' is not registered in the simulator.", nameof( trajectoryTransform ) );
+
+            return bodyEntry.ephemeris.Evaluate( ut );
+        }
+        
         public virtual bool TryGetStateVector( double ut, ITrajectoryTransform trajectoryTransform, out TrajectoryStateVector stateVector )
         {
             if( !_bodies.TryGetValue( trajectoryTransform, out var bodyEntry ) )
@@ -284,11 +289,11 @@ namespace HSP.Trajectories
                 foreach( var ephemeris in _attractorEphemerides )
                 {
                     //ephemeris.SetDuration( ephemeris.LowUT + _ephemerisDuration + ephemeris.TimeResolution /* padding */, ephemeris.LowUT );
-                    ephemeris.SetCapacity( _ephemerisLength );
+                    ephemeris.Clear( _ephemerisLength );
                 }
                 foreach( var ephemeris in _followerEphemerides )
                 {
-                    ephemeris.SetCapacity( _ephemerisLength );
+                    ephemeris.Clear( _ephemerisLength );
                 }
                 _staleEphemerisLengthChanged = false;
 #warning TODO - reset UT (actually, keep the reference UT and ensure that the ephemerides have values between the from/to).
@@ -388,6 +393,15 @@ namespace HSP.Trajectories
                 temp = _currentStateFollowers;
                 _currentStateFollowers = _nextStateFollowers;
                 _nextStateFollowers = temp;
+            }
+
+            for( int i = 0; i < _attractorEphemerides.Length; i++ )
+            {
+                _attractorEphemerides[i].InsertAdaptive( _ut, _currentStateAttractors[i] );
+            }
+            for( int i = 0; i < _followerEphemerides.Length; i++ )
+            {
+                _followerEphemerides[i].InsertAdaptive( _ut, _currentStateFollowers[i] );
             }
 
             _ut = endUT; // Setting to the actual value at the end prevents accumulation of small precision errors due to repeated addition of delta-time.

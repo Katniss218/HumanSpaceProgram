@@ -16,7 +16,7 @@ namespace HSP_Tests_EditMode
         public void Insertion_1___IsCorrect()
         {
             // Arrange
-            Ephemeris2 sut = new Ephemeris2( 10, maxError: 0 );
+            Ephemeris2 sut = new Ephemeris2( 10, maxError: 0, double.PositiveInfinity );
 
             // Act
             sut.InsertAdaptive( 0, new TrajectoryStateVector( new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), 1000.0 ) );
@@ -31,7 +31,7 @@ namespace HSP_Tests_EditMode
         public void Insertion_2___IsCorrect()
         {
             // Arrange
-            Ephemeris2 sut = new Ephemeris2( 10, maxError: 0 );
+            Ephemeris2 sut = new Ephemeris2( 10, maxError: 0, double.PositiveInfinity );
 
             // Act
             sut.InsertAdaptive( 0, new TrajectoryStateVector( new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), 1000.0 ) );
@@ -47,7 +47,7 @@ namespace HSP_Tests_EditMode
         public void Insertion_Three___IsCorrect()
         {
             // Arrange
-            Ephemeris2 sut = new Ephemeris2( 10, maxError: 0 );
+            Ephemeris2 sut = new Ephemeris2( 10, maxError: 0, double.PositiveInfinity );
 
             // Act
             sut.InsertAdaptive( 0, new TrajectoryStateVector( new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), 1000.0 ) );
@@ -61,12 +61,12 @@ namespace HSP_Tests_EditMode
         }
 
         [Test]
-        public void Insertion_Overflow___SlidesForward()
+        public void Insertion_TooManySamples___Resizes()
         {
-            const int max = 10;
-            const int count = 20;
+            const int initial = 10;
+            const int count = 45;
             // Arrange
-            Ephemeris2 sut = new Ephemeris2( max, maxError: 0 );
+            Ephemeris2 sut = new Ephemeris2( initial, maxError: 0, double.PositiveInfinity );
 
             // Act
             double step = 1.0;
@@ -76,9 +76,29 @@ namespace HSP_Tests_EditMode
             }
 
             // Assert
-            Assert.That( sut.Count, Is.EqualTo( max ) );
+            Assert.That( sut.Duration, Is.EqualTo( count - 1 ) ); // 45 samples = 44 intervals between them.
+            Assert.That( sut.Capacity, Is.EqualTo( 80 ) ); // 10 * 2^3, resizes 3 times
+        }
+
+        [Test]
+        public void Insertion_Overflow___SlidesForward()
+        {
+            const int max = 10;
+            const int count = 20;
+            // Arrange
+            Ephemeris2 sut = new Ephemeris2( max, maxError: 0, max );
+
+            // Act
+            double step = 1.0;
+            for( int i = 0; i < count; i++ )
+            {
+                sut.InsertAdaptive( i * step, new TrajectoryStateVector( new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), 1000.0 ) );
+            }
+
+            // Assert
+            Assert.That( sut.Duration, Is.EqualTo( max ) );
             Assert.That( sut.HighUT, Is.EqualTo( (count - 1) * step ) );
-            Assert.That( sut.LowUT, Is.EqualTo( (count - max) * step ) );
+            Assert.That( sut.LowUT, Is.EqualTo( (count - max - 1) * step ) );
         }
         
         [Test]
@@ -87,7 +107,7 @@ namespace HSP_Tests_EditMode
             const int max = 10;
             const int count = 20;
             // Arrange
-            Ephemeris2 sut = new Ephemeris2( max, maxError: 0 );
+            Ephemeris2 sut = new Ephemeris2( max, maxError: 0, max );
 
             // Act
             double step = -1.0; // Decreasing ut.
@@ -97,16 +117,37 @@ namespace HSP_Tests_EditMode
             }
 
             // Assert
-            Assert.That( sut.Count, Is.EqualTo( max ) );
-            Assert.That( sut.HighUT, Is.EqualTo( (count - max) * step ) );
+            Assert.That( sut.Duration, Is.EqualTo( max ) );
+            Assert.That( sut.HighUT, Is.EqualTo( (count - max - 1) * step ) );
             Assert.That( sut.LowUT, Is.EqualTo( (count - 1) * step ) );
+        }
+        [Test]
+        public void Insertion_Overflow_MultipleTimes___GrowsOnce()
+        {
+            const int max = 10;
+            const int count = 200; // Overflow multiple times.
+            // Arrange
+            Ephemeris2 sut = new Ephemeris2( max, maxError: 0, max );
+
+            // Act
+            double step = 1.0;
+            for( int i = 0; i < count; i++ )
+            {
+                sut.InsertAdaptive( i * step, new TrajectoryStateVector( new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), 1000.0 ) );
+            }
+
+            // Assert
+            Assert.That( sut.Duration, Is.EqualTo( max ) );
+            Assert.That( sut.HighUT, Is.EqualTo( (count - 1) * step ) );
+            Assert.That( sut.LowUT, Is.EqualTo( (count - max - 1) * step ) );
+            Assert.That( sut.Capacity, Is.EqualTo( 20 ) ); // Capacity should grow once, because samples are spread uniformly, error tolerance is 0.
         }
 
         [Test]
         public void Evaluate_2___IsCorrect()
         {
             // Arrange
-            Ephemeris2 sut = new Ephemeris2( 10, maxError: 0 );
+            Ephemeris2 sut = new Ephemeris2( 10, maxError: 0, double.PositiveInfinity );
             var expecteds = new TrajectoryStateVector( new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), new Vector3Dbl( 0, 0, 0 ), 1000.0 );
             var expected = new TrajectoryStateVector( new Vector3Dbl( 0.5, 0.5, 0.5 ), new Vector3Dbl( 0.5, 0.5, 0.5 ), new Vector3Dbl( 0, 0, 0 ), 1000.0 );
             var expectede = new TrajectoryStateVector( new Vector3Dbl( 1, 1, 1 ), new Vector3Dbl( 1, 1, 1 ), new Vector3Dbl( 0, 0, 0 ), 1000.0 );
@@ -127,7 +168,7 @@ namespace HSP_Tests_EditMode
             const int max = 10;
             const int count = 20;
             // Arrange
-            Ephemeris2 sut = new Ephemeris2( max, maxError: 0 );
+            Ephemeris2 sut = new Ephemeris2( max, maxError: 0, double.PositiveInfinity );
             var expecteds = new TrajectoryStateVector( new Vector3Dbl( 10, 10, 10 ), new Vector3Dbl( 10, 10, 10 ), new Vector3Dbl( 0, 0, 0 ), 1000.0 );
             var expected = new TrajectoryStateVector( new Vector3Dbl( 15.7, 15.7, 15.7 ), new Vector3Dbl( 15.7, 15.7, 15.7 ), new Vector3Dbl( 0, 0, 0 ), 1000.0 );
             var expectede = new TrajectoryStateVector( new Vector3Dbl( 19, 19, 19 ), new Vector3Dbl( 19, 19, 19 ), new Vector3Dbl( 0, 0, 0 ), 1000.0 );

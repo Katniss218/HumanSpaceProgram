@@ -5,11 +5,6 @@ namespace HSP.Trajectories
     public interface IReadonlyTrajectorySimulator
     {
         /// <summary>
-        /// The current simulation time, in [s] since the epoch.
-        /// </summary>
-        public double UT { get; }
-
-        /// <summary>
         /// Gets all attractors that are taking part in the simulation.
         /// </summary>
         public ReadOnlySpan<ITrajectoryTransform> Attractors { get; }
@@ -24,6 +19,11 @@ namespace HSP.Trajectories
         /// </summary>
         public TrajectoryStateVector GetCurrentStateVector( ITrajectoryTransform trajectoryTransform );
 
+        /// <summary>
+        /// Gets the state vector at the specified time.
+        /// </summary>
+        public TrajectoryStateVector GetStateVector( double ut, ITrajectoryTransform trajectoryTransform );
+        
         /// <summary>
         /// Gets the state vector at the specified time.
         /// </summary>
