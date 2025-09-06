@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HSP.Time;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.Profiling;
@@ -65,20 +66,16 @@ namespace HSP.Trajectories
         bool _staleBodyCountChanged;
 
         bool _staleEphemerisLengthChanged;
-        int _ephemerisLength;
-        //double _ephemerisDuration;
-        //double _ephemerisTimeResolution;
+        int _ephemerisCapacity;
+        double _ephemerisDuration;
 
-        //public TrajectorySimulator( double ut, double step, double ephemerisTimeResolution, double ephemerisDuration )
-        public TrajectorySimulator( double ut, double step, int ephemerisLength )
+        public TrajectorySimulator( double step, int count )
         {
-            this._ut = ut;
+            this._ut = TimeManager.UT;
             this._step = step;
             _isStaleAttractor = true; // will set up everything on first step.
             _staleBodyCountChanged = true;
-            _ephemerisLength = ephemerisLength;
-            //_ephemerisDuration = ephemerisDuration;
-            //_ephemerisTimeResolution = ephemerisTimeResolution;
+            _ephemerisCapacity = count;
         }
 
         public bool HasBody( ITrajectoryTransform trajectoryTransform )
@@ -94,9 +91,9 @@ namespace HSP.Trajectories
             return _bodies.Select( kvp => (kvp.Key, (IReadonlyEphemeris)kvp.Value.ephemeris) );
         }
 
-        public virtual bool AddBody( ITrajectoryTransform transform )
+        public virtual bool TryAddBody( ITrajectoryTransform transform )
         {
-            Ephemeris2 ephemeris = new Ephemeris2( _ephemerisLength, 0.01 );
+            Ephemeris2 ephemeris = new Ephemeris2( 0.01, 1000000 );
             bool wasAdded = _bodies.TryAdd( transform, new Entry() { timestepperIndex = -1, isAttractor = transform.IsAttractor, ephemeris = ephemeris } );
             if( !wasAdded )
                 return false;
@@ -107,7 +104,7 @@ namespace HSP.Trajectories
             return true;
         }
 
-        public virtual bool RemoveBody( ITrajectoryTransform transform )
+        public virtual bool TryRemoveBody( ITrajectoryTransform transform )
         {
             bool wasRemoved = _bodies.Remove( transform );
             if( !wasRemoved )
@@ -119,7 +116,7 @@ namespace HSP.Trajectories
             return true;
         }
 
-        public virtual void MarkBodyDirty( ITrajectoryTransform trajectoryTransform )
+        public virtual void MarkStale( ITrajectoryTransform trajectoryTransform )
         {
             if( !_bodies.TryGetValue( trajectoryTransform, out var bodyEntry ) )
                 throw new ArgumentException( $"The trajectory transform '{trajectoryTransform}' is not registered in the simulator.", nameof( trajectoryTransform ) );
@@ -128,15 +125,14 @@ namespace HSP.Trajectories
             _isStaleAttractor |= (trajectoryTransform.IsAttractor | bodyEntry.isAttractor); // if is attractor or was attractor (it could've changed).
         }
 
-        //public virtual void SetEphemerisLength( double ephemerisDuration )
-        public virtual void SetEphemerisLength( int ephemerisLength )
+        public void SetEphemerisParameters( double maxError, double maxDuration, int initialCapacity )
         {
-            if( ephemerisLength <= 0 )
-                throw new ArgumentOutOfRangeException( nameof( ephemerisLength ), "The ephemeris length must be greater than zero." );
+            if( maxDuration <= 0 )
+                throw new ArgumentOutOfRangeException( nameof( maxDuration ), "The max duration must be greater than zero." );
 
             _staleEphemerisLengthChanged = true;
-            this._ephemerisLength = ephemerisLength;
-            //this._ephemerisDuration = ephemerisDuration;
+            this._ephemerisCapacity = initialCapacity;
+            this._ephemerisDuration = maxDuration;
         }
 
         public virtual void Clear()
@@ -289,11 +285,11 @@ namespace HSP.Trajectories
                 foreach( var ephemeris in _attractorEphemerides )
                 {
                     //ephemeris.SetDuration( ephemeris.LowUT + _ephemerisDuration + ephemeris.TimeResolution /* padding */, ephemeris.LowUT );
-                    ephemeris.Clear( _ephemerisLength );
+                    ephemeris.Clear();
                 }
                 foreach( var ephemeris in _followerEphemerides )
                 {
-                    ephemeris.Clear( _ephemerisLength );
+                    ephemeris.Clear();
                 }
                 _staleEphemerisLengthChanged = false;
 #warning TODO - reset UT (actually, keep the reference UT and ensure that the ephemerides have values between the from/to).

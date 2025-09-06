@@ -15,12 +15,12 @@ namespace HSP.Trajectories
     {
         private const int SIMULATOR_INDEX = 0;
         private const int PREDICTION_SIMULATOR_INDEX = 1;
-        public static TrajectorySimulator Simulator => instance._simulators[SIMULATOR_INDEX];
-        public static TrajectorySimulator PredictionSimulator => instance._simulators[PREDICTION_SIMULATOR_INDEX];
+        public static TrajectorySimulator2 Simulator => instance._simulators[SIMULATOR_INDEX];
+        public static TrajectorySimulator2 PredictionSimulator => instance._simulators[PREDICTION_SIMULATOR_INDEX];
 
-        private TrajectorySimulator[] _simulators;
+        private TrajectorySimulator2[] _simulators;
 
-        private double _flightPlanDuration = 365 * 86400 * 10;
+        private double _flightPlanDuration = 365 * 86400 * 0.1;
         public static double FlightPlanDuration
         {
             get => instance._flightPlanDuration;
@@ -30,7 +30,7 @@ namespace HSP.Trajectories
                     throw new System.ArgumentOutOfRangeException( nameof( value ), "Flight plan duration must be greater than zero." );
 
                 instance._flightPlanDuration = value;
-                instance._simulators[PREDICTION_SIMULATOR_INDEX].SetEphemerisLength( (int)(value / 5000) );
+                instance._simulators[PREDICTION_SIMULATOR_INDEX].SetEphemerisParameters( 0.01, value, (int)(value / 5000) );
             }
         }
 
@@ -55,8 +55,8 @@ namespace HSP.Trajectories
             if( wasAdded )
             {
 #warning TODO - prediction ephemeris depends on user, 'ground truth' is config dependant.
-                instance._simulators[SIMULATOR_INDEX].AddBody( transform );
-                instance._simulators[PREDICTION_SIMULATOR_INDEX].AddBody( transform );
+                instance._simulators[SIMULATOR_INDEX].TryAddBody( transform );
+                instance._simulators[PREDICTION_SIMULATOR_INDEX].TryAddBody( transform );
             }
             return wasAdded;
         }
@@ -79,7 +79,7 @@ namespace HSP.Trajectories
             {
                 foreach( var simulator in instance._simulators )
                 {
-                    simulator.RemoveBody( transform );
+                    simulator.TryRemoveBody( transform );
                 }
             }
             return wasRemoved;
@@ -95,7 +95,7 @@ namespace HSP.Trajectories
             {
                 if( simulator.HasBody( transform ) )
                 {
-                    simulator.MarkBodyDirty( transform );
+                    simulator.MarkStale( transform );
                 }
             }
         }
@@ -122,11 +122,12 @@ namespace HSP.Trajectories
             {
                 _simulators = new[]
                 {
-                    new TrajectorySimulator( TimeManager.UT, 0.5, 50 ),
-                    new TrajectorySimulator( TimeManager.UT, FlightPlanDuration / 15000.0, (int)(FlightPlanDuration / 5000) )
+                    new TrajectorySimulator2( 0.5, 50 ),
+                    new TrajectorySimulator2( FlightPlanDuration / 15000.0, (int)(FlightPlanDuration / 5000) )
                 };
                 _simulators[SIMULATOR_INDEX].MaxStepSize = 20;
                 _simulators[PREDICTION_SIMULATOR_INDEX].MaxStepSize = FlightPlanDuration / 10.0;
+                _simulators[PREDICTION_SIMULATOR_INDEX].SetEphemerisParameters( 0.01, FlightPlanDuration, (int)(FlightPlanDuration / 5000) );
             }
         }
 

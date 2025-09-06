@@ -180,6 +180,8 @@ namespace HSP.ReferenceFrames
             Vector3 sceneVelocity = targetObject.Velocity;
             if( sceneVelocity.magnitude > MaxRelativeVelocity || scenePosition.magnitude > MaxRelativePosition )
             {
+                //Debug.Log( $"[{this.GetType().Name}] Target object is out of scene bounds. Position magnitude: {scenePosition.magnitude}, Velocity magnitude: {sceneVelocity.magnitude}. Requesting reference frame switch." );
+
                 // Zero both position and velocity at the same time - most efficient in terms of number of frame switches.
                 // Future available optimizations to further limit how often a switch needs to occur:
                 // - Set the new frame's position to ahead of the object, instead of at the object.
