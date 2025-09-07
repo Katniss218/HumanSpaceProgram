@@ -74,7 +74,7 @@ namespace HSP.Trajectories
         /// <summary>
         /// The duration of the ephemeris, in [s].
         /// </summary>
-        public double Duration => _headUT - _tailUT;
+        public double Duration => _samples.Length == 0 ? 0 : (_headUT - _tailUT);
 
         /// <summary>
         /// Maximum difference allowed between two consecutive samples when using adaptive insertion.
@@ -350,8 +350,8 @@ namespace HSP.Trajectories
 
         public void Clear()
         {
-            _headUT = 0.0;
-            _tailUT = 0.0;
+            _headUT = 0;
+            _tailUT = 0;
             _count = 0;
             _headIndex = 0;
             _tailIndex = 0;

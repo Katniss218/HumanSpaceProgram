@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityPlus.Serialization;
 
 namespace HSP.Trajectories.TrajectoryIntegrators
 {
@@ -49,6 +50,12 @@ namespace HSP.Trajectories.TrajectoryIntegrators
 
             nextSelf = new TrajectoryStateVector( pos3, vel3, acc3, context.Self.Mass );
             return context.Step;
+        }
+
+        [MapsInheritingFrom( typeof( Yoshida4Integrator ) )]
+        public static SerializationMapping Yoshida4IntegratorMapping()
+        {
+            return new MemberwiseSerializationMapping<Yoshida4Integrator>();
         }
     }
 }

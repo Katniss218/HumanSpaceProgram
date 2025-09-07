@@ -7,6 +7,39 @@ using UnityEngine;
 
 namespace HSP.Trajectories
 {
+    public readonly struct TimeInterval
+    {
+        public readonly double minUT;
+        public readonly double maxUT;
+
+        public double duration => maxUT - minUT;
+
+        public TimeInterval( double point )
+        {
+            this.minUT = point;
+            this.maxUT = point;
+        }
+
+        public TimeInterval( double minUT, double maxUT )
+        {
+            if( maxUT < minUT )
+                throw new ArgumentException( "maxUT must be greater than or equal to minUT." );
+
+            this.minUT = minUT;
+            this.maxUT = maxUT;
+        }
+
+        public bool Contains( double ut )
+        {
+            return ut >= minUT && ut <= maxUT;
+        }
+
+        public bool NearZero()
+        {
+            return (maxUT - minUT) < 1e-10;
+        }
+    }
+
     public sealed class TrajectorySimulator2 : IReadonlyTrajectorySimulator
     {
         public enum SimulationDirection
@@ -44,8 +77,7 @@ namespace HSP.Trajectories
         private TrajectoryStateVector[] _currentStateFollowers;
         private TrajectoryStateVector[] _nextStateFollowers;
 
-        //private double _headUT;
-        //private double _tailUT; // usually equal to TimeManager.UT, but store it here because that can change during the frame/thread safety.
+        private double _initialUT;
 
         private Ephemeris2[] _attractorEphemerides;
         private Ephemeris2[] _followerEphemerides;
@@ -79,8 +111,16 @@ namespace HSP.Trajectories
         /// </summary>
         public TrajectorySimulator2( double step, int count )
         {
+            _initialUT = TimeManager.UT;
             this.DefaultStepSize = step;
             // ignore count.
+            ResetToCurrent();
+        }
+
+        public void SetInitialTime( double ut )
+        {
+            Debug.LogWarning( "IN" );
+            _initialUT = ut;
             ResetToCurrent();
         }
 
@@ -150,7 +190,6 @@ namespace HSP.Trajectories
             return x;
         }
 
-        [Obsolete( "untested" )]
         public bool TryAddBody( ITrajectoryTransform transform )
         {
             if( transform == null )
@@ -169,7 +208,6 @@ namespace HSP.Trajectories
             return true;
         }
 
-        [Obsolete( "untested" )]
         public bool TryRemoveBody( ITrajectoryTransform transform )
         {
             if( transform == null )
@@ -188,7 +226,6 @@ namespace HSP.Trajectories
             return true;
         }
 
-        [Obsolete( "untested" )]
         public void Clear()
         {
             _bodies.Clear();
@@ -202,11 +239,14 @@ namespace HSP.Trajectories
         // 'MoveTo' methods move assuming the simulation is not stale.
         public void MoveTo( SimulationDirection direction )
         {
-            (double headUT, double tailUT) = GetSimulatedInterval();
+            TimeInterval i = GetSimulatedInterval();
+            if( i.NearZero() )
+                return;
+
             if( direction == SimulationDirection.Forward )
-                MoveTo( headUT );
+                MoveTo( i.maxUT );
             else
-                MoveTo( tailUT );
+                MoveTo( i.minUT );
         }
 
         public void MoveTo( double ut )
@@ -223,7 +263,6 @@ namespace HSP.Trajectories
         /// <summary>
         /// Resets the simulation state to the current game time.
         /// </summary>
-        [Obsolete( "untested" )]
         public void ResetToCurrent()
         {
             foreach( var (body, entry) in _bodies )
@@ -275,7 +314,6 @@ namespace HSP.Trajectories
                 return _currentStateFollowers[bodyEntry.timestepperIndex];
         }
 
-        [Obsolete( "untested" )]
         public void ResetStateVector( ITrajectoryTransform transform )
         {
             if( transform == null )
@@ -292,7 +330,6 @@ namespace HSP.Trajectories
         /// <summary>
         /// Marks the body as stale, meaning that the state vector stored in the simulation, and the ephemerides no longer match the actual body's state vector in the game.
         /// </summary>
-        [Obsolete( "untested" )]
         public void MarkStale( ITrajectoryTransform transform )
         {
             if( transform == null )
@@ -317,7 +354,6 @@ namespace HSP.Trajectories
 
         //}
 
-        [Obsolete( "untested" )]
         private void FixStale( SimulationDirection direction )
         {
             // Update attractor cache
@@ -331,20 +367,6 @@ namespace HSP.Trajectories
             int attractorIndex = _attractors?.Length ?? 0;
             int followerIndex = _followers?.Length ?? 0;
 
-            // new arrays and copy ephemerides.
-            var oldAttractors = _attractors;
-            var oldFollowers = _followers;
-            var oldAttractorAccelerationProviders = _attractorAccelerationProviders;
-            var oldFollowerAccelerationProviders = _followerAccelerationProviders;
-
-            var oldCurrentStateAttractors = _currentStateAttractors;
-            var oldCurrentStateFollowers = _currentStateFollowers;
-            var oldNextStateAttractors = _nextStateAttractors;
-            var oldNextStateFollowers = _nextStateFollowers;
-
-            var oldAttractorEphemerides = _attractorEphemerides;
-            var oldFollowerEphemerides = _followerEphemerides;
-
             // Copy the old data to the new arrays first.
             //   This will 'defragment' the gaps where existing bodies were removed.
             // The attractor/follower indices will point at the end of the copied section,
@@ -354,6 +376,20 @@ namespace HSP.Trajectories
                 int totalBodies = _bodies.Count + _staleToAdd.Count - _staleToRemove.Count;
                 int numAttractors = _attractorCache.Length;
                 int numFollowers = totalBodies - numAttractors;
+
+                // new arrays and copy ephemerides.
+                var oldAttractors = _attractors;
+                var oldFollowers = _followers;
+                var oldAttractorAccelerationProviders = _attractorAccelerationProviders;
+                var oldFollowerAccelerationProviders = _followerAccelerationProviders;
+
+                var oldCurrentStateAttractors = _currentStateAttractors;
+                var oldCurrentStateFollowers = _currentStateFollowers;
+                var oldNextStateAttractors = _nextStateAttractors;
+                var oldNextStateFollowers = _nextStateFollowers;
+
+                var oldAttractorEphemerides = _attractorEphemerides;
+                var oldFollowerEphemerides = _followerEphemerides;
 
                 _attractors = new ITrajectoryIntegrator[numAttractors];
                 _followers = new ITrajectoryIntegrator[numFollowers];
@@ -367,84 +403,61 @@ namespace HSP.Trajectories
 
                 _attractorEphemerides = new Ephemeris2[numAttractors];
                 _followerEphemerides = new Ephemeris2[numFollowers];
-            }
 
-            // Copy old data for non-stale bodies and update indices
-            if( bodyCountChanged )
-            {
                 attractorIndex = 0;
-                followerIndex = 0;
                 int sourceAttractorIndex = -1;
+                followerIndex = 0;
                 int sourceFollowerIndex = -1;
-
                 foreach( var (body, entry) in _bodies )
                 {
-                    // Skip bodies that are being removed
-                    if( _staleToRemove.Contains( body ) )
-                        continue;
-
-                    // Update source indices based on old state
+                    // `entry.isAttractor` - what it was when it was added.
+                    // `body.IsAttractor`  - what it is now.
                     if( entry.isAttractor )
                         sourceAttractorIndex++;
                     else
                         sourceFollowerIndex++;
 
-                    // Determine new state based on current body.IsAttractor
+                    // Only copy existing bodies that were not removed.
+                    if( _staleToRemove.Contains( body ) )
+                        continue;
+
                     if( body.IsAttractor )
                     {
-                        // Copy data from old arrays if available, otherwise use current body data
-                        if( oldAttractors != null && entry.isAttractor && sourceAttractorIndex < oldAttractors.Length )
-                        {
-                            _attractors[attractorIndex] = oldAttractors[sourceAttractorIndex];
-                            _attractorAccelerationProviders[attractorIndex] = oldAttractorAccelerationProviders[sourceAttractorIndex];
-                            _currentStateAttractors[attractorIndex] = oldCurrentStateAttractors[sourceAttractorIndex];
-                        }
-                        else if( oldFollowers != null && !entry.isAttractor && sourceFollowerIndex < oldFollowers.Length )
-                        {
-                            _attractors[attractorIndex] = oldFollowers[sourceFollowerIndex];
-                            _attractorAccelerationProviders[attractorIndex] = oldFollowerAccelerationProviders[sourceFollowerIndex];
-                            _currentStateAttractors[attractorIndex] = oldCurrentStateFollowers[sourceFollowerIndex];
-                        }
-                        else
-                        {
-                            _attractors[attractorIndex] = body.Integrator;
-                            _attractorAccelerationProviders[attractorIndex] = body.AccelerationProviders.ToArray();
-                            _currentStateAttractors[attractorIndex] = body.GetBodyState();
-                        }
-
+                        _attractors[attractorIndex] = entry.isAttractor
+                            ? oldAttractors[sourceAttractorIndex]
+                            : oldFollowers[sourceFollowerIndex];
+                        _attractorAccelerationProviders[attractorIndex] = entry.isAttractor
+                            ? oldAttractorAccelerationProviders[sourceAttractorIndex]
+                            : oldFollowerAccelerationProviders[sourceFollowerIndex];
+                        _currentStateAttractors[attractorIndex] = entry.isAttractor
+                            ? oldCurrentStateAttractors[sourceAttractorIndex]
+                            : oldCurrentStateFollowers[sourceFollowerIndex];
                         _attractorEphemerides[attractorIndex] = entry.ephemeris;
                         entry.isAttractor = true;
                         entry.timestepperIndex = attractorIndex;
+
                         attractorIndex++;
                     }
                     else
                     {
-                        // Copy data from old arrays if available, otherwise use current body data
-                        if( oldFollowers != null && !entry.isAttractor && sourceFollowerIndex < oldFollowers.Length )
-                        {
-                            _followers[followerIndex] = oldFollowers[sourceFollowerIndex];
-                            _followerAccelerationProviders[followerIndex] = oldFollowerAccelerationProviders[sourceFollowerIndex];
-                            _currentStateFollowers[followerIndex] = oldCurrentStateFollowers[sourceFollowerIndex];
-                        }
-                        else if( oldAttractors != null && entry.isAttractor && sourceAttractorIndex < oldAttractors.Length )
-                        {
-                            _followers[followerIndex] = oldAttractors[sourceAttractorIndex];
-                            _followerAccelerationProviders[followerIndex] = oldAttractorAccelerationProviders[sourceAttractorIndex];
-                            _currentStateFollowers[followerIndex] = oldCurrentStateAttractors[sourceAttractorIndex];
-                        }
-                        else
-                        {
-                            _followers[followerIndex] = body.Integrator;
-                            _followerAccelerationProviders[followerIndex] = body.AccelerationProviders.ToArray();
-                            _currentStateFollowers[followerIndex] = body.GetBodyState();
-                        }
-
+                        _followers[followerIndex] = entry.isAttractor
+                            ? oldAttractors[sourceAttractorIndex]
+                            : oldFollowers[sourceFollowerIndex];
+                        _followerAccelerationProviders[followerIndex] = entry.isAttractor
+                            ? oldAttractorAccelerationProviders[sourceAttractorIndex]
+                            : oldFollowerAccelerationProviders[sourceFollowerIndex];
+                        _currentStateFollowers[followerIndex] = entry.isAttractor
+                            ? oldCurrentStateAttractors[sourceAttractorIndex]
+                            : oldCurrentStateFollowers[sourceFollowerIndex];
                         _followerEphemerides[followerIndex] = entry.ephemeris;
                         entry.isAttractor = false;
                         entry.timestepperIndex = followerIndex;
+
                         followerIndex++;
                     }
                 }
+
+                _staleToRemove.Clear();
             }
 
             // Update stale bodies with current data
@@ -468,6 +481,7 @@ namespace HSP.Trajectories
                     }
                     else
                     {
+                        Debug.Log( "STALE" );
                         _followers[entry.timestepperIndex] = body.Integrator;
                         _followerAccelerationProviders[entry.timestepperIndex] = body.AccelerationProviders.ToArray();
                         _currentStateFollowers[entry.timestepperIndex] = body.GetBodyState();
@@ -539,27 +553,35 @@ namespace HSP.Trajectories
             return c;
         }
 
-        public (double headUT, double tailUT) GetSimulatedInterval()
+        public TimeInterval GetSimulatedInterval()
         {
+            if( _bodies.Count == 0 )
+                return new TimeInterval( _initialUT, _initialUT );
+
             double headUT = double.MinValue;
             double tailUT = double.MaxValue;
             foreach( var (_, entry) in _bodies )
             {
+                if( entry.ephemeris.Count == 0 )
+                    return new TimeInterval( _initialUT, _initialUT );
+
                 if( entry.ephemeris.HighUT > headUT )
                     headUT = entry.ephemeris.HighUT;
                 if( entry.ephemeris.LowUT < tailUT )
                     tailUT = entry.ephemeris.LowUT;
             }
 
-            return (headUT, tailUT);
+            return new TimeInterval( tailUT, headUT );
         }
 
         public void Simulate( double targetUT )
         {
-            (double headUT, double tailUT) = GetSimulatedInterval();
+            Debug.Log( "sim: " + TimeManager.UT + " : " + targetUT );
 
-            double fromUT = GetMiddleValue( headUT, tailUT, targetUT );
-            if( !this._isStale && targetUT <= headUT && targetUT >= tailUT )
+            TimeInterval i = GetSimulatedInterval();
+
+            double fromUT = GetMiddleValue( i.minUT, i.maxUT, targetUT );
+            if( !this._isStale && targetUT <= i.maxUT && targetUT >= i.minUT )
             {
                 return;
             }
@@ -569,23 +591,23 @@ namespace HSP.Trajectories
 
         public async Task SimulateAsync( double targetUT )
         {
-            (double headUT, double tailUT) = GetSimulatedInterval();
+            TimeInterval i = GetSimulatedInterval();
 
-            double fromUT = GetMiddleValue( headUT, tailUT, targetUT );
-            if( !this._isStale && targetUT <= headUT && targetUT >= tailUT )
+            double fromUT = GetMiddleValue( i.minUT, i.maxUT, targetUT );
+            if( !this._isStale && targetUT <= i.maxUT && targetUT >= i.minUT )
             {
                 return;
             }
 
             await Task.Run( () => Simulate_Internal( fromUT, targetUT ) );
         }
-
-        [Obsolete( "untested" )]
+#warning TODO - when I attach a debugger here, it magically changes how it works wtf
         private void Simulate_Internal( double startUT, double endUT )
         {
-#warning TODO - the interval is sometimes longer than max duration, why?
-            Debug.Log( (endUT - startUT) > _ephemerisDuration );
-            var newDirection = endUT > startUT ? SimulationDirection.Forward : SimulationDirection.Backward;
+            var newDirection = _direction;
+            if( Math.Abs( endUT - startUT ) > 1e-10 )
+                newDirection = endUT > startUT ? SimulationDirection.Forward : SimulationDirection.Backward;
+
             if( this._isStale )
             {
                 this.FixStale( newDirection );
@@ -595,6 +617,9 @@ namespace HSP.Trajectories
             {
                 MoveTo( newDirection );
             }
+#warning TODO - after 1 step, follower positions are not updated. because timemanager.UT is updated in the constructor.
+            // the actual way to fix that would be to simulate 'this frame', so we need to explicitly set the starting UT before we start simulating!
+            Debug.Log( "sim2: " + TimeManager.UT + " : " + _currentStateFollowers[0] );
 
             _direction = newDirection;
 
@@ -685,6 +710,7 @@ namespace HSP.Trajectories
                 {
                     _followerEphemerides[i].InsertAdaptive( ut, _currentStateFollowers[i] );
                 }
+                Debug.Log( "sim3: " + TimeManager.UT + " : " + _currentStateFollowers[0] );
                 return;
             }*/
 
@@ -711,10 +737,10 @@ namespace HSP.Trajectories
                     ITrajectoryIntegrator integrator = _attractors[i];
                     var nextStep = integrator.Step( new TrajectorySimulationContext( ut, step, _currentStateAttractors[i], i, _currentStateAttractors ), _attractorAccelerationProviders[i], out _nextStateAttractors[i] );
 
-                    /*if( (forward && nextStep < minStep) || nextStep > minStep )
+                    if( (forward && nextStep < minStep) || nextStep > minStep )
                     {
                         minStep = nextStep;
-                    }*/
+                    }
                 }
 
                 for( int i = 0; i < _attractorEphemerides.Length; i++ )
@@ -723,7 +749,7 @@ namespace HSP.Trajectories
                 }
 
                 ut += step;
-                step = minStep;
+                //step = minStep;
 
                 var temp = _currentStateAttractors;
                 _currentStateAttractors = _nextStateAttractors;
@@ -734,7 +760,6 @@ namespace HSP.Trajectories
             {
                 _attractorEphemerides[i].InsertAdaptive( ut, _currentStateAttractors[i] );
             }
-            Debug.Log( ut + " : " + endUT + " : " + _attractorEphemerides[1].HighUT + " : " + _attractorEphemerides[1].LowUT );
 
 #warning TODO - only simulate followers from their own ephemeris end point to the target time (if a given follower doesn't have ephemeris data for the UT).
             // Simulate individual followers in parallel.
@@ -748,7 +773,7 @@ namespace HSP.Trajectories
                     TrajectoryStateVector[] nextStateFollowers = _nextStateFollowers;
 
                     double localUT = startUT;
-                    double localStep = step;
+                    double localStep = originalStep;
                     while( endUT - localUT > EPSILON )
                     {
                         if( localStep > MaxStepSize )
@@ -778,8 +803,14 @@ namespace HSP.Trajectories
                     }
 
                     _followerEphemerides[bodyIndex].InsertAdaptive( localUT, currentStateFollowers[bodyIndex] );
+
+                    // needed
+                    _currentStateFollowers[bodyIndex] = currentStateFollowers[bodyIndex];
+                    _nextStateFollowers[bodyIndex] = nextStateFollowers[bodyIndex];
                 } //);
             }
+
+            Debug.Log( "sim3: " + TimeManager.UT + " : " + _currentStateFollowers[0] );
         }
     }
 }

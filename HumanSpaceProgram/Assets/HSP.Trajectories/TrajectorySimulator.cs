@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using UnityEngine.Profiling;
+using static UnityEngine.GraphicsBuffer;
 
 namespace HSP.Trajectories
 {
@@ -306,6 +308,8 @@ namespace HSP.Trajectories
         /// </summary>
         public virtual void Simulate( double endUT )
         {
+            Debug.Log( "sim: " + TimeManager.UT + " : " + endUT );
+
             Profiler.BeginSample( "TrajectorySimulator.Simulate" );
             if( _bodies.Count == 0 )
             {
@@ -317,6 +321,7 @@ namespace HSP.Trajectories
             {
                 FixStale();
             }
+            Debug.Log( "sim2: " + TimeManager.UT + " : " + _currentStateFollowers[0] + " : " + _ut + " : " + endUT );
 
             if( _ut >= endUT )
             {
@@ -402,6 +407,7 @@ namespace HSP.Trajectories
 
             _ut = endUT; // Setting to the actual value at the end prevents accumulation of small precision errors due to repeated addition of delta-time.
             Profiler.EndSample();
+            Debug.Log( "sim3: " + TimeManager.UT + " : " + _currentStateFollowers[0] );
         }
     }
 }

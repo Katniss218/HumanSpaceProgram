@@ -180,7 +180,7 @@ namespace HSP.ReferenceFrames
             Vector3 sceneVelocity = targetObject.Velocity;
             if( sceneVelocity.magnitude > MaxRelativeVelocity || scenePosition.magnitude > MaxRelativePosition )
             {
-                //Debug.Log( $"[{this.GetType().Name}] Target object is out of scene bounds. Position magnitude: {scenePosition.magnitude}, Velocity magnitude: {sceneVelocity.magnitude}. Requesting reference frame switch." );
+                Debug.Log( $"[{this.GetType().Name}] Target object is out of scene bounds. Position magnitude: {scenePosition.magnitude}, Velocity magnitude: {sceneVelocity.magnitude}. Requesting reference frame switch to {targetObject.AbsolutePosition.magnitude} v {targetObject.AbsoluteVelocity.magnitude}" );
 
                 // Zero both position and velocity at the same time - most efficient in terms of number of frame switches.
                 // Future available optimizations to further limit how often a switch needs to occur:
@@ -205,7 +205,8 @@ namespace HSP.ReferenceFrames
             _managers.Add( this );
             if( _managers.Count == 1 )
             {
-                PlayerLoopUtils.AddSystem<FixedUpdate, FixedUpdate.PhysicsFixedUpdate>( in _playerLoopSystem );
+                //PlayerLoopUtils.AddSystem<FixedUpdate, FixedUpdate.PhysicsFixedUpdate>( in _playerLoopSystem );
+                PlayerLoopUtils.InsertSystemAfter<FixedUpdate>( in _playerLoopSystem, typeof( FixedUpdate.Physics2DFixedUpdate ) );
             }
         }
 
@@ -214,7 +215,8 @@ namespace HSP.ReferenceFrames
             _managers.Remove( this );
             if( _managers.Count == 0 )
             {
-                PlayerLoopUtils.RemoveSystem<FixedUpdate, FixedUpdate.PhysicsFixedUpdate>( in _playerLoopSystem );
+                //PlayerLoopUtils.RemoveSystem<FixedUpdate, FixedUpdate.PhysicsFixedUpdate>( in _playerLoopSystem );
+                PlayerLoopUtils.RemoveSystem<FixedUpdate>( in _playerLoopSystem );
             }
         }
 

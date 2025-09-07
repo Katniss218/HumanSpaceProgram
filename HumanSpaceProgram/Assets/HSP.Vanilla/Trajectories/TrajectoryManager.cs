@@ -1,4 +1,5 @@
 ﻿using HSP.Time;
+using HSP.Vanilla;
 using HSP.Vanilla.Trajectories;
 using System.Collections.Generic;
 using UnityEngine;
@@ -134,13 +135,15 @@ namespace HSP.Trajectories
         void OnEnable()
         {
             PlayerLoopUtils.InsertSystemBefore<FixedUpdate>( in _beforePlayerLoopSystem, typeof( FixedUpdate.PhysicsFixedUpdate ) );
-            PlayerLoopUtils.InsertSystemAfter<FixedUpdate>( in _afterPlayerLoopSystem, typeof( FixedUpdate.Physics2DFixedUpdate ) );
+            //PlayerLoopUtils.InsertSystemAfter<FixedUpdate>( in _afterPlayerLoopSystem, typeof( FixedUpdate.Physics2DFixedUpdate ) );
+            PlayerLoopUtils.AddSystem<FixedUpdate, FixedUpdate.PhysicsFixedUpdate>( in _afterPlayerLoopSystem );
         }
 
         void OnDisable()
         {
             PlayerLoopUtils.RemoveSystem<FixedUpdate>( in _beforePlayerLoopSystem );
-            PlayerLoopUtils.RemoveSystem<FixedUpdate>( in _afterPlayerLoopSystem );
+            //PlayerLoopUtils.RemoveSystem<FixedUpdate>( in _afterPlayerLoopSystem );
+            PlayerLoopUtils.RemoveSystem<FixedUpdate, FixedUpdate.PhysicsFixedUpdate>( in _afterPlayerLoopSystem );
         }
 
         private static PlayerLoopSystem _beforePlayerLoopSystem = new PlayerLoopSystem()
@@ -179,8 +182,12 @@ namespace HSP.Trajectories
 
         private static void ImmediatelyBeforeUnityPhysicsStep()
         {
+            Debug.Log( TimeManager.UT );
+#warning TODO - this is sometimes invoked at 0.19999 and sometimes at 0.3999999 UT possibly something with the update loop
             if( !instanceExists )
+            {
                 return;
+            }
 
             instance.EnsureSimulatorsExist();
 
@@ -188,6 +195,7 @@ namespace HSP.Trajectories
             {
                 if( trajectoryTransform.TrajectoryNeedsUpdating() )
                 {
+                    Debug.Log( "STALE" );
                     foreach( var simulator in instance._simulators )
                     {
                         simulator.ResetStateVector( trajectoryTransform );
@@ -195,8 +203,13 @@ namespace HSP.Trajectories
                 }
             }
 
+#warning TODO - set initial time before first simulation...
+            if( instance._simulators[SIMULATOR_INDEX].GetSimulatedInterval().NearZero() )
+            {
+                instance._simulators[SIMULATOR_INDEX].SetInitialTime( TimeManager.UT - TimeManager.FixedDeltaTime );
+            }
             instance._simulators[SIMULATOR_INDEX].Simulate( TimeManager.UT );
-            instance._simulators[PREDICTION_SIMULATOR_INDEX].Simulate( TimeManager.UT + FlightPlanDuration );
+            //instance._simulators[PREDICTION_SIMULATOR_INDEX].Simulate( TimeManager.UT + FlightPlanDuration );
 
             foreach( var trajectoryTransform in instance._transforms )
             {
@@ -214,10 +227,14 @@ namespace HSP.Trajectories
                     // If the transform is synchronized, make the velocity what it should be to make it move to the target location.
                     // This - at least in theory - should make PhysX happier, because the position is not being reset, in turn resetting some physics scene stuff.
                     Vector3Dbl interpolatedVel = (stateVector.AbsolutePosition - trajectoryTransform.ReferenceFrameTransform.AbsolutePosition) / TimeManager.FixedDeltaTime;
-
+                    if( trajectoryTransform.name.Contains( "vessel" ) && trajectoryTransform.ReferenceFrameTransform is HybridReferenceFrameTransform e )
+                    {
+                        //    Debug.Log( TimeManager.UT + " : " + stateVector.AbsolutePosition + " : " + trajectoryTransform.ReferenceFrameTransform.AbsolutePosition + " : " + interpolatedVel );
+                    }
                     instance._posAndVelCache[trajectoryTransform] = (stateVector.AbsolutePosition, stateVector.AbsoluteVelocity, interpolatedVel);
 
                     trajectoryTransform.SuppressValueChanged();
+#warning TODO - interpolated vel is bad sometimes after switching from absolute mode. interpolated vel is very low, similar to scene space values
                     trajectoryTransform.ReferenceFrameTransform.AbsoluteVelocity = interpolatedVel;
                     trajectoryTransform.AllowValueChanged();
                 }

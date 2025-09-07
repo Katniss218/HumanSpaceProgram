@@ -316,7 +316,8 @@ namespace HSP.Vanilla
             Vector3 leverArm = position - this._rb.worldCenterOfMass;
             Vector3Dbl torque = Vector3Dbl.Cross( force, leverArm );
             _absoluteAcceleration += SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAcceleration( (Vector3Dbl)force / Mass );
-            _absoluteAngularAcceleration += SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAngularAcceleration( torque / this.GetInertia( torque.NormalizeToVector3() ) );
+            if( torque.magnitude != 0 )
+                _absoluteAngularAcceleration += SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAngularAcceleration( torque / this.GetInertia( torque.NormalizeToVector3() ) );
 
             if( _isSceneSpace )
             {
@@ -353,6 +354,7 @@ namespace HSP.Vanilla
 
         private void SwitchToSceneMode()
         {
+            Debug.Log( "A" );
             IReferenceFrame sceneReferenceFrame = SceneReferenceFrameProvider.GetSceneReferenceFrame();
 
             _isSceneSpace = true;
@@ -392,7 +394,7 @@ namespace HSP.Vanilla
                     Vector3 sceneVel = _rb.velocity;
 
                     if( Mathf.Abs( scenePos.x ) > PositionRange || Mathf.Abs( scenePos.y ) > PositionRange || Mathf.Abs( scenePos.z ) > PositionRange
-                     || Mathf.Abs( sceneVel.x ) > PositionRange || Mathf.Abs( sceneVel.y ) > PositionRange || Mathf.Abs( sceneVel.z ) > PositionRange
+                     || Mathf.Abs( sceneVel.x ) > VelocityRange || Mathf.Abs( sceneVel.y ) > VelocityRange || Mathf.Abs( sceneVel.z ) > VelocityRange
                      || TimeManager.TimeScale > MaxTimeScale )
                     {
                         SwitchToAbsoluteMode();
@@ -400,11 +402,16 @@ namespace HSP.Vanilla
                 }
                 else
                 {
-                    Vector3 scenePos = (Vector3)SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformPosition( _actualAbsolutePosition );
-                    Vector3 sceneVel = (Vector3)SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformVelocity( _absoluteVelocity );
+                    var frame = SceneReferenceFrameProvider.GetSceneReferenceFrame();
+                    Vector3 scenePos = (Vector3)frame.InverseTransformPosition( _actualAbsolutePosition );
+                    Vector3 sceneVel = (Vector3)frame.InverseTransformVelocity( _absoluteVelocity );
 
+                    if( _absoluteVelocity.magnitude < 1000 )
+                    {
+                        Debug.Log( _absoluteVelocity );
+                    }
                     if( Mathf.Abs( scenePos.x ) <= PositionRange && Mathf.Abs( scenePos.y ) <= PositionRange && Mathf.Abs( scenePos.z ) <= PositionRange
-                     && Mathf.Abs( sceneVel.x ) <= PositionRange && Mathf.Abs( sceneVel.y ) <= PositionRange && Mathf.Abs( sceneVel.z ) <= PositionRange
+                     && Mathf.Abs( sceneVel.x ) <= VelocityRange && Mathf.Abs( sceneVel.y ) <= VelocityRange && Mathf.Abs( sceneVel.z ) <= VelocityRange
                      && TimeManager.TimeScale <= MaxTimeScale )
                     {
                         SwitchToSceneMode();
@@ -456,7 +463,7 @@ namespace HSP.Vanilla
                 _absoluteAngularVelocity = sceneReferenceFrame.TransformAngularVelocity( _rb.angularVelocity );
 
                 if( Mathf.Abs( scenePos.x ) > PositionRange || Mathf.Abs( scenePos.y ) > PositionRange || Mathf.Abs( scenePos.z ) > PositionRange
-                 || Mathf.Abs( sceneVel.x ) > PositionRange || Mathf.Abs( sceneVel.y ) > PositionRange || Mathf.Abs( sceneVel.z ) > PositionRange )
+                 || Mathf.Abs( sceneVel.x ) > VelocityRange || Mathf.Abs( sceneVel.y ) > VelocityRange || Mathf.Abs( sceneVel.z ) > VelocityRange )
                 {
                     SwitchToAbsoluteMode();
                 }
