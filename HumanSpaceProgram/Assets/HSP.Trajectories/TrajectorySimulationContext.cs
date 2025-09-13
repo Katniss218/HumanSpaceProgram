@@ -4,29 +4,34 @@ using UnityEngine;
 
 namespace HSP.Trajectories
 {
+    /// <summary>
+    /// Contains the data, inherent to the simulation itself, that's available to trajectory step providers during a simulation step.
+    /// </summary>
     public readonly ref struct TrajectorySimulationContext
     {
         /// <summary>
         /// Gets the UT of the current simulation step.
         /// </summary>
         public double UT { get; }
+
         /// <summary>
         /// Gets the step size of the current simulation step.
         /// </summary>
         public double Step { get; }
+
         /// <summary>
         /// Gets the state vector of the body currently being processed.
         /// </summary>
         public TrajectoryStateVector Self { get; }
-        private ReadOnlySpan<TrajectoryStateVector> _attractors { get; } // No followers because we're not allowed to use them in calculations
-                                                                       // (they can't influence the simulation on purpose).
-        public int AttractorCount => _attractors.Length;
+
         /// <summary>
-        /// -1 if not attractor.
+        /// Contains the index of 'self' in the attractors array, or -1 if 'self' is not an attractor.
         /// </summary>
         public int SelfAttractorIndex { get; }
-        
 
+        public int AttractorCount => _attractors.Length;
+
+        readonly ReadOnlySpan<TrajectoryStateVector> _attractors; // No followers because they aren't allowed to influence any other body.
         readonly bool _isExtrapolated;
         readonly double _deltaTime;
 
@@ -65,12 +70,12 @@ namespace HSP.Trajectories
         }
 
         /// <summary>
-        /// Returns a new context that will extrapolate the attractors to the specified UT, and uses the specified self state.
+        /// Returns a new context that will extrapolate the attractor states to the specified UT, and uses the specified 'self' state.
         /// </summary>
         /// <param name="newUT">The UT to which the data will be extrapolated when retrieved.</param>
         public TrajectorySimulationContext Substep( double newUT, in TrajectoryStateVector newSelf )
         {
-            // New self is important and very often provided explicitly, so we also set it explicitly.
+            // newSelf is important and usually already calculated by the integrator, so we can have it as a parameter and just set it here.
             return new TrajectorySimulationContext( newUT, Step, newSelf, SelfAttractorIndex, _attractors, newUT - UT );
         }
     }

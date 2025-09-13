@@ -1,9 +1,9 @@
-﻿using HSP.Time;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using UnityEngine;
+using UnityEngine.Profiling;
+using static UnityEngine.Networking.UnityWebRequest;
 
 namespace HSP.Trajectories
 {
@@ -33,15 +33,25 @@ namespace HSP.Trajectories
         {
             return ut >= minUT && ut <= maxUT;
         }
-
-        public bool NearZero()
-        {
-            return (maxUT - minUT) < 1e-10;
-        }
     }
 
     public sealed class TrajectorySimulator2 : IReadonlyTrajectorySimulator
     {
+        static double GetMiddleValue( double a, double b, double c )
+        {
+            if( (a <= b && b <= c) || (c <= b && b <= a) ) return b;
+            if( (b <= a && a <= c) || (c <= a && a <= b) ) return a;
+            return c;
+        }
+
+        [Flags]
+        public enum SimulatedIntervalOptions
+        {
+            IncludeAttractors = 1 << 0,
+            IncludeFollowers = 1 << 1,
+            IncludeAttractorsAndFollowers = IncludeAttractors | IncludeFollowers
+        }
+
         public enum SimulationDirection
         {
             Forward,
@@ -103,25 +113,50 @@ namespace HSP.Trajectories
         private HashSet<ITrajectoryTransform> _staleToRemove = new();
         private bool _staleAttractorChanged = false;
         private bool _isStale = true;
+        private volatile bool _isSimulating = false; // thread safety thing.
+        private readonly object _simulationLock = new object();
 
         private ITrajectoryTransform[] _attractorCache;
+
+        public bool IsSimulating => _isSimulating;
 
         /// <summary>
         /// Initializes a new instance of the TrajectorySimulator2 class.
         /// </summary>
         public TrajectorySimulator2( double step, int count )
         {
-            _initialUT = TimeManager.UT;
             this.DefaultStepSize = step;
             // ignore count.
             ResetToCurrent();
         }
 
-        public void SetInitialTime( double ut )
+        /// <summary>
+        /// Computes the interval where the ephemerides are valid.
+        /// </summary>
+        public TimeInterval GetSimulatedInterval( SimulatedIntervalOptions options = SimulatedIntervalOptions.IncludeAttractorsAndFollowers )
         {
-            Debug.LogWarning( "IN" );
-            _initialUT = ut;
-            ResetToCurrent();
+            if( _bodies.Count == 0 )
+                return new TimeInterval( _initialUT, _initialUT );
+
+            double headUT = double.MinValue;
+            double tailUT = double.MaxValue;
+            foreach( var (_, entry) in _bodies )
+            {
+                if( entry.isAttractor && !options.HasFlag( SimulatedIntervalOptions.IncludeAttractors ) )
+                    continue;
+                if( !entry.isAttractor && !options.HasFlag( SimulatedIntervalOptions.IncludeFollowers ) )
+                    continue;
+
+                if( entry.ephemeris.Count == 0 )
+                    return new TimeInterval( _initialUT, _initialUT );
+
+                if( entry.ephemeris.HighUT > headUT )
+                    headUT = entry.ephemeris.HighUT;
+                if( entry.ephemeris.LowUT < tailUT )
+                    tailUT = entry.ephemeris.LowUT;
+            }
+
+            return new TimeInterval( tailUT, headUT );
         }
 
         public int GetAttractorIndex( ITrajectoryTransform transform )
@@ -136,6 +171,12 @@ namespace HSP.Trajectories
                 return -1;
 
             return entry.timestepperIndex;
+        }
+
+        public void SetInitialTime( double ut )
+        {
+            _initialUT = ut;
+            ResetToCurrent();
         }
 
         public void SetEphemerisParameters( double maxError, double maxDuration, int initialCapacity )
@@ -174,17 +215,25 @@ namespace HSP.Trajectories
         public bool HasBody( ITrajectoryTransform transform )
         {
             if( transform == null )
-                return false;
-            return _bodies.ContainsKey( transform );
+                throw new ArgumentNullException( nameof( transform ) );
+
+            return _bodies.ContainsKey( transform ) && !_staleToRemove.Contains( transform ) || _staleToAdd.Contains( transform );
         }
 
         public IEnumerable<(ITrajectoryTransform t, IReadonlyEphemeris e)> GetBodies()
         {
+            FixStale( _direction );
+
             return _bodies.Select( kvp => (kvp.Key, (IReadonlyEphemeris)kvp.Value.ephemeris) );
         }
 
         public bool TryGetBody( ITrajectoryTransform transform, out IReadonlyEphemeris ephemeris )
         {
+            if( transform == null )
+                throw new ArgumentNullException( nameof( transform ) );
+
+            FixStale( _direction );
+
             bool x = _bodies.TryGetValue( transform, out var entry );
             ephemeris = entry?.ephemeris;
             return x;
@@ -193,16 +242,14 @@ namespace HSP.Trajectories
         public bool TryAddBody( ITrajectoryTransform transform )
         {
             if( transform == null )
-                return false;
+                throw new ArgumentNullException( nameof( transform ) );
 
             if( _bodies.ContainsKey( transform ) )
                 return false;
 
-            bool wasAdded = _bodies.ContainsKey( transform );
-            if( wasAdded )
+            if( !_staleToAdd.Add( transform ) )
                 return false;
 
-            _staleToAdd.Add( transform );
             _staleAttractorChanged |= transform.IsAttractor;
             _isStale = true;
             return true;
@@ -211,16 +258,14 @@ namespace HSP.Trajectories
         public bool TryRemoveBody( ITrajectoryTransform transform )
         {
             if( transform == null )
-                return false;
+                throw new ArgumentNullException( nameof( transform ) );
 
             if( !_bodies.TryGetValue( transform, out var entry ) )
                 return false;
 
-            bool wasRemoved = _bodies.Remove( transform );
-            if( !wasRemoved )
+            if( !_staleToRemove.Add( transform ) )
                 return false;
 
-            _staleToRemove.Add( transform );
             _staleAttractorChanged |= entry.isAttractor;
             _isStale = true;
             return true;
@@ -232,50 +277,16 @@ namespace HSP.Trajectories
             _staleToAdd.Clear();
             _staleToRemove.Clear();
             _staleExisting.Clear();
-            _staleAttractorChanged = true;
+            _staleAttractorChanged = false;
             _isStale = true;
-        }
-
-        // 'MoveTo' methods move assuming the simulation is not stale.
-        public void MoveTo( SimulationDirection direction )
-        {
-            TimeInterval i = GetSimulatedInterval();
-            if( i.NearZero() )
-                return;
-
-            if( direction == SimulationDirection.Forward )
-                MoveTo( i.maxUT );
-            else
-                MoveTo( i.minUT );
-        }
-
-        public void MoveTo( double ut )
-        {
-            foreach( var entry in _bodies.Values )
-            {
-                if( entry.isAttractor )
-                    _currentStateAttractors[entry.timestepperIndex] = entry.ephemeris.Evaluate( ut );
-                else
-                    _currentStateFollowers[entry.timestepperIndex] = entry.ephemeris.Evaluate( ut );
-            }
-        }
-
-        /// <summary>
-        /// Resets the simulation state to the current game time.
-        /// </summary>
-        public void ResetToCurrent()
-        {
-            foreach( var (body, entry) in _bodies )
-            {
-                entry.ephemeris.Clear();
-            }
-#warning TODO - resetting maybe doesn't work?
         }
 
         public TrajectoryStateVector GetStateVector( double ut, ITrajectoryTransform transform )
         {
             if( transform == null )
                 throw new ArgumentNullException( nameof( transform ) );
+
+            FixStale( _direction );
 
             if( !_bodies.TryGetValue( transform, out var entry ) )
                 throw new ArgumentException( $"The trajectory transform '{transform}' is not registered in the simulator.", nameof( transform ) );
@@ -287,6 +298,8 @@ namespace HSP.Trajectories
         {
             if( transform == null )
                 throw new ArgumentNullException( nameof( transform ) );
+
+            FixStale( _direction );
 
             if( !_bodies.TryGetValue( transform, out var entry ) )
                 throw new ArgumentException( $"The trajectory transform '{transform}' is not registered in the simulator.", nameof( transform ) );
@@ -304,6 +317,10 @@ namespace HSP.Trajectories
 
         public TrajectoryStateVector GetCurrentStateVector( ITrajectoryTransform transform )
         {
+            if( transform == null )
+                throw new ArgumentNullException( nameof( transform ) );
+
+            FixStale( _direction );
             if( !_bodies.TryGetValue( transform, out var bodyEntry ) )
                 throw new ArgumentException( $"The trajectory transform '{transform}' is not registered in the simulator.", nameof( transform ) );
 
@@ -314,18 +331,6 @@ namespace HSP.Trajectories
                 return _currentStateFollowers[bodyEntry.timestepperIndex];
         }
 
-        public void ResetStateVector( ITrajectoryTransform transform )
-        {
-            if( transform == null )
-                throw new ArgumentNullException( nameof( transform ) );
-#warning    TODO - this is called before _bodies is updated in fixstale, so it will throw.
-            if( !_bodies.ContainsKey( transform ) ) return;
-            //  throw new ArgumentException( $"The transform is not part of the simulation.", nameof( transform ) );
-
-            _staleExisting.Add( transform );
-            _isStale = true;
-        }
-
 
         /// <summary>
         /// Marks the body as stale, meaning that the state vector stored in the simulation, and the ephemerides no longer match the actual body's state vector in the game.
@@ -333,7 +338,7 @@ namespace HSP.Trajectories
         public void MarkStale( ITrajectoryTransform transform )
         {
             if( transform == null )
-                return;
+                throw new ArgumentNullException( nameof( transform ) );
 
             if( !_bodies.TryGetValue( transform, out var entry ) )
                 return;
@@ -349,13 +354,55 @@ namespace HSP.Trajectories
             _isStale = true;
         }
 
+        /// <summary>
+        /// Resets the simulation state to the current game time.
+        /// </summary>
+        public void ResetToCurrent()
+        {
+            // Clear all ephemerides and mark everything stale so the stale pipeline
+            // (FixStale) refreshes integrators, acceleration providers, and state vectors.
+            foreach( var (body, entry) in _bodies )
+            {
+                entry.ephemeris.Clear();
+                _staleExisting.Add( body );
+            }
+
+            _isStale = true;
+        }
+
         //public void MarkStale( ITrajectoryTransform transform, double fromUT, double toUT )
         //{
 
         //}
 
+        void MoveFollowersTo( double ut )
+        {
+            foreach( var entry in _bodies.Values )
+            {
+                if( !entry.isAttractor )
+                    _currentStateFollowers[entry.timestepperIndex] = entry.ephemeris.Evaluate( ut );
+            }
+        }
+
+        void MoveAttractorsTo( double ut )
+        {
+            foreach( var entry in _bodies.Values )
+            {
+                if( entry.isAttractor )
+                    _currentStateAttractors[entry.timestepperIndex] = entry.ephemeris.Evaluate( ut );
+            }
+        }
+
         private void FixStale( SimulationDirection direction )
         {
+            if( !_isStale )
+                return;
+
+            if( _staleAttractorChanged )
+            {
+                ResetToCurrent();
+            }
+
             // Update attractor cache
             _attractorCache = _bodies.Keys
                 .Union( _staleToAdd )
@@ -481,7 +528,6 @@ namespace HSP.Trajectories
                     }
                     else
                     {
-                        Debug.Log( "STALE" );
                         _followers[entry.timestepperIndex] = body.Integrator;
                         _followerAccelerationProviders[entry.timestepperIndex] = body.AccelerationProviders.ToArray();
                         _currentStateFollowers[entry.timestepperIndex] = body.GetBodyState();
@@ -533,284 +579,203 @@ namespace HSP.Trajectories
             // ephemeris of a stale body needs to be reset, and the body needs to be resimulated.
             // the 'head' UT of the simulation needs to be rolled back to the min() of the bodies' head UT.
 
-
-            // Update head and tail UT
-            if( _staleAttractorChanged )
-            {
-                ResetToCurrent();
-            }
-
-            // body can theoretically be marked as partially stale, if e.g. a maneuver node was added in the middle of the ephemeris.
-            // that's for later tho.
+            // body can theoretically be marked as partially stale, if e.g. a maneuver node was added in the middle of the ephemeris. that's for later tho.
             _staleAttractorChanged = false;
             _isStale = false;
         }
 
-        static double GetMiddleValue( double a, double b, double c )
+        public void Simulate( double endUT )
         {
-            if( (a <= b && b <= c) || (c <= b && b <= a) ) return b;
-            if( (b <= a && a <= c) || (c <= a && a <= b) ) return a;
-            return c;
+            lock( _simulationLock )
+            {
+                if( _isSimulating )
+                    throw new InvalidOperationException( "The simulator is already simulating." );
+
+                Simulate_Internal( endUT );
+            }
         }
 
-        public TimeInterval GetSimulatedInterval()
+#warning TODO - ephemeris needs to be thread safe.
+        /*public Task SimulateAsync( double endUT )
         {
-            if( _bodies.Count == 0 )
-                return new TimeInterval( _initialUT, _initialUT );
-
-            double headUT = double.MinValue;
-            double tailUT = double.MaxValue;
-            foreach( var (_, entry) in _bodies )
+            lock( _simulationLock )
             {
-                if( entry.ephemeris.Count == 0 )
-                    return new TimeInterval( _initialUT, _initialUT );
+                if( _isSimulating )
+                    throw new InvalidOperationException( "The simulator is already simulating." );
 
-                if( entry.ephemeris.HighUT > headUT )
-                    headUT = entry.ephemeris.HighUT;
-                if( entry.ephemeris.LowUT < tailUT )
-                    tailUT = entry.ephemeris.LowUT;
+                return Task.Run( () => Simulate_Internal( endUT ) );
             }
+        }*/
 
-            return new TimeInterval( tailUT, headUT );
-        }
-
-        public void Simulate( double targetUT )
+        private void Simulate_Internal( double endUT )
         {
-            Debug.Log( "sim: " + TimeManager.UT + " : " + targetUT );
-
-            TimeInterval i = GetSimulatedInterval();
-
-            double fromUT = GetMiddleValue( i.minUT, i.maxUT, targetUT );
-            if( !this._isStale && targetUT <= i.maxUT && targetUT >= i.minUT )
+            try
             {
-                return;
-            }
+                _isSimulating = true;
 
-            Simulate_Internal( fromUT, targetUT );
-        }
+                Profiler.BeginSample( "TrajectorySimulator.Simulate_Internal" );
 
-        public async Task SimulateAsync( double targetUT )
-        {
-            TimeInterval i = GetSimulatedInterval();
+                TimeInterval interval = GetSimulatedInterval( SimulatedIntervalOptions.IncludeAttractorsAndFollowers );
 
-            double fromUT = GetMiddleValue( i.minUT, i.maxUT, targetUT );
-            if( !this._isStale && targetUT <= i.maxUT && targetUT >= i.minUT )
-            {
-                return;
-            }
-
-            await Task.Run( () => Simulate_Internal( fromUT, targetUT ) );
-        }
-#warning TODO - when I attach a debugger here, it magically changes how it works wtf
-        private void Simulate_Internal( double startUT, double endUT )
-        {
-            var newDirection = _direction;
-            if( Math.Abs( endUT - startUT ) > 1e-10 )
-                newDirection = endUT > startUT ? SimulationDirection.Forward : SimulationDirection.Backward;
-
-            if( this._isStale )
-            {
-                this.FixStale( newDirection );
-            }
-
-            if( newDirection != _direction )
-            {
-                MoveTo( newDirection );
-            }
-#warning TODO - after 1 step, follower positions are not updated. because timemanager.UT is updated in the constructor.
-            // the actual way to fix that would be to simulate 'this frame', so we need to explicitly set the starting UT before we start simulating!
-            Debug.Log( "sim2: " + TimeManager.UT + " : " + _currentStateFollowers[0] );
-
-            _direction = newDirection;
-
-            // simulate some bodies. use the already simulated bodies (if any) to retrieve state vectors from ephemerides.
-            // only followers can be simulated using ephemerides.
-
-            // use a heavy per-step integrator with larger step size.
-
-            // we'll call 'simulate' to perform a chunk of work at a given time?
-            // selectable which followers should be included in the simulation. where though? maybe just not add them to the simulation at all?
-
-            // find what we actually need to simulate, and the interval to simulate from/to.
-
-            if( _attractors == null || _attractors.Length == 0 )
-                return;
-
-            const double EPSILON = 1e-4;
-            double ut = startUT;
-            double step = _direction == SimulationDirection.Forward ? DefaultStepSize : -DefaultStepSize;
-            double originalStep = step;
-
-            /*{
-                while( endUT - ut > 1e-4 )
+                double startUT = GetMiddleValue( interval.minUT, interval.maxUT, endUT );
+                if( !_isStale && endUT <= interval.maxUT && endUT >= interval.minUT )
                 {
-                    if( step > MaxStepSize )
+                    return;
+                }
+
+                // Determine the direction from the start/end times and run the stale pipeline for that direction.
+                var newDirection = _direction;
+                if( Math.Abs( endUT - startUT ) > 1e-10 )
+                    newDirection = endUT > startUT ? SimulationDirection.Forward : SimulationDirection.Backward;
+
+                FixStale( newDirection );
+
+                // Move the timestepper arrays to the end of the valid interval.
+                _direction = newDirection;
+
+                const double STEP_EPSILON = 1e-4;
+                double originalStep = _direction == SimulationDirection.Forward ? DefaultStepSize : -DefaultStepSize;
+                bool forward = _direction == SimulationDirection.Forward;
+
+                // Simulate attractors.
+
+                if( _attractors != null && _attractors.Length > 0 )
+                {
+                    var attractorInterval = GetSimulatedInterval( SimulatedIntervalOptions.IncludeAttractors );
+                    if( attractorInterval.maxUT != _initialUT && interval.minUT != _initialUT )
                     {
-                        step = MaxStepSize;
+                        if( forward )
+                            MoveAttractorsTo( attractorInterval.maxUT );
+                        else
+                            MoveAttractorsTo( attractorInterval.minUT );
                     }
 
-                    if( step > (endUT - ut) )
+                    double step = originalStep;
+                    double ut = startUT;
+                    while( Math.Abs( endUT - ut ) > STEP_EPSILON )
                     {
-                        step = endUT - ut; // don't overshoot the end time.
-                    }
-
-                    // Order in which the bodies are updated doesn't matter, since we're setting 'next' and that's not used in calculations until the... next step.
-
-                    double minStep = double.MaxValue;
-                    for( int i = 0; i < _currentStateAttractors.Length; i++ )
-                    {
-                        ITrajectoryIntegrator integrator = _attractors[i];
-                        double step2 = integrator.Step( new TrajectorySimulationContext( ut, step, _currentStateAttractors[i], i, _currentStateAttractors ), _attractorAccelerationProviders[i], out _nextStateAttractors[i] );
-
-                        if( step2 < minStep )
+                        if( Math.Abs( step ) > MaxStepSize )
                         {
-                            minStep = step2;
+                            step = forward ? MaxStepSize : -MaxStepSize;
                         }
-                    }
 
-                    for( int i = 0; i < _currentStateFollowers.Length; i++ )
-                    {
-                        ITrajectoryIntegrator integrator = _followers[i];
-                        double step2 = integrator.Step( new TrajectorySimulationContext( ut, step, _currentStateFollowers[i], -1, _currentStateAttractors ), _followerAccelerationProviders[i], out _nextStateFollowers[i] );
-
-                        if( step2 < minStep )
+                        double remainingTime = endUT - ut;
+                        if( forward && step > remainingTime )
                         {
-                            minStep = step2;
+                            step = remainingTime; // don't overshoot the end time.
                         }
+                        else if( !forward && step < remainingTime )
+                        {
+                            step = remainingTime; // don't overshoot the end time.
+                        }
+
+                        double minStep = forward ? double.MaxValue : double.MinValue;
+                        for( int i = 0; i < _attractors.Length; i++ )
+                        {
+                            ITrajectoryIntegrator integrator = _attractors[i];
+                            var nextStep = integrator.Step( new TrajectorySimulationContext( ut, step, _currentStateAttractors[i], i, _currentStateAttractors ), _attractorAccelerationProviders[i], out _nextStateAttractors[i] );
+
+                            // Takes into account the sign of the step (direction).
+                            if( forward )
+                            {
+                                if( nextStep < minStep )
+                                    minStep = nextStep;
+                            }
+                            else
+                            {
+                                if( nextStep > minStep )
+                                    minStep = nextStep;
+                            }
+                        }
+
+                        for( int i = 0; i < _attractorEphemerides.Length; i++ )
+                        {
+                            _attractorEphemerides[i].InsertAdaptive( ut, _currentStateAttractors[i] );
+                        }
+
+                        ut += step;
+                        step = minStep;
+
+                        var temp = _currentStateAttractors;
+                        _currentStateAttractors = _nextStateAttractors;
+                        _nextStateAttractors = temp;
                     }
 
-                    // when ran far enough, store the points as ephemerides in the corresponding ephemeris structs.
                     for( int i = 0; i < _attractorEphemerides.Length; i++ )
                     {
                         _attractorEphemerides[i].InsertAdaptive( ut, _currentStateAttractors[i] );
                     }
-                    for( int i = 0; i < _followerEphemerides.Length; i++ )
+                }
+
+                // Simulate followers in parallel.
+                // The simulation can include only followers (e.g. path-based, or maneuver-based, etc).
+
+                if( _followers != null && _followers.Length > 0 )
+                {
+                    if( interval.maxUT != _initialUT && interval.minUT != _initialUT )
                     {
-                        _followerEphemerides[i].InsertAdaptive( ut, _currentStateFollowers[i] );
+                        if( forward )
+                            MoveFollowersTo( interval.maxUT );
+                        else
+                            MoveFollowersTo( interval.minUT );
                     }
 
-                    ut += step;
-                    step = minStep;
-
-                    // Swapping the reference is enough, we don't care what (if anything) is in the 'target' structs.
-                    var temp = _currentStateAttractors;
-                    _currentStateAttractors = _nextStateAttractors;
-                    _nextStateAttractors = temp;
-
-                    temp = _currentStateFollowers;
-                    _currentStateFollowers = _nextStateFollowers;
-                    _nextStateFollowers = temp;
-                }
-
-                for( int i = 0; i < _attractorEphemerides.Length; i++ )
-                {
-                    _attractorEphemerides[i].InsertAdaptive( ut, _currentStateAttractors[i] );
-                }
-                for( int i = 0; i < _followerEphemerides.Length; i++ )
-                {
-                    _followerEphemerides[i].InsertAdaptive( ut, _currentStateFollowers[i] );
-                }
-                Debug.Log( "sim3: " + TimeManager.UT + " : " + _currentStateFollowers[0] );
-                return;
-            }*/
-
-            double maxStepSizeSigned = _direction == SimulationDirection.Forward ? MaxStepSize : -MaxStepSize;
-            bool forward = _direction == SimulationDirection.Forward;
-
-#warning TODO - only simulate attractors is needed (no ephemeris data for the simulated interval) - because simulation will recalculate the followers often, while the attractors aren't affected.
-            // Forward simulation
-            while( endUT - ut > EPSILON )
-            {
-                if( step > MaxStepSize )
-                {
-                    step = MaxStepSize;
-                }
-
-                if( step > (endUT - ut) )
-                {
-                    step = endUT - ut; // don't overshoot the end time.
-                }
-
-                double minStep = double.MaxValue;
-                for( int i = 0; i < _attractors.Length; i++ )
-                {
-                    ITrajectoryIntegrator integrator = _attractors[i];
-                    var nextStep = integrator.Step( new TrajectorySimulationContext( ut, step, _currentStateAttractors[i], i, _currentStateAttractors ), _attractorAccelerationProviders[i], out _nextStateAttractors[i] );
-
-                    if( (forward && nextStep < minStep) || nextStep > minStep )
+                    Parallel.For( 0, _followers.Length, bodyIndex =>
+                    // for( int bodyIndex = 0; bodyIndex < _followers.Length; bodyIndex++ )
                     {
-                        minStep = nextStep;
-                    }
-                }
+                        TrajectoryStateVector[] currentStateAttractors = new TrajectoryStateVector[_currentStateAttractors.Length];
+                        TrajectoryStateVector[] currentStateFollowers = _currentStateFollowers;
+                        TrajectoryStateVector[] nextStateFollowers = _nextStateFollowers;
 
-                for( int i = 0; i < _attractorEphemerides.Length; i++ )
-                {
-                    _attractorEphemerides[i].InsertAdaptive( ut, _currentStateAttractors[i] );
-                }
-
-                ut += step;
-                //step = minStep;
-
-                var temp = _currentStateAttractors;
-                _currentStateAttractors = _nextStateAttractors;
-                _nextStateAttractors = temp;
-            }
-
-            for( int i = 0; i < _attractorEphemerides.Length; i++ )
-            {
-                _attractorEphemerides[i].InsertAdaptive( ut, _currentStateAttractors[i] );
-            }
-
-#warning TODO - only simulate followers from their own ephemeris end point to the target time (if a given follower doesn't have ephemeris data for the UT).
-            // Simulate individual followers in parallel.
-            if( _followers != null && _followers.Length > 0 )
-            {
-                //Parallel.For( 0, _followers.Length, bodyIndex =>
-                for( int bodyIndex = 0; bodyIndex < _followers.Length; bodyIndex++ )
-                {
-                    TrajectoryStateVector[] currentStateAttractors = new TrajectoryStateVector[_currentStateAttractors.Length];
-                    TrajectoryStateVector[] currentStateFollowers = _currentStateFollowers;
-                    TrajectoryStateVector[] nextStateFollowers = _nextStateFollowers;
-
-                    double localUT = startUT;
-                    double localStep = originalStep;
-                    while( endUT - localUT > EPSILON )
-                    {
-                        if( localStep > MaxStepSize )
+                        double localUT = startUT;
+                        double localStep = originalStep;
+                        while( Math.Abs( endUT - localUT ) > STEP_EPSILON )
                         {
-                            localStep = MaxStepSize;
+                            if( Math.Abs( localStep ) > MaxStepSize )
+                            {
+                                localStep = forward ? MaxStepSize : -MaxStepSize;
+                            }
+
+                            double remainingTime = endUT - localUT;
+                            if( forward && localStep > remainingTime )
+                            {
+                                localStep = remainingTime; // don't overshoot the end time.
+                            }
+                            else if( !forward && localStep < remainingTime )
+                            {
+                                localStep = remainingTime; // don't overshoot the end time.
+                            }
+
+                            for( int i = 0; i < currentStateAttractors.Length; i++ )
+                                currentStateAttractors[i] = _attractorEphemerides[i].Evaluate( localUT );
+
+                            ITrajectoryIntegrator integrator = _followers[bodyIndex];
+                            var nextStep = integrator.Step( new TrajectorySimulationContext( localUT, localStep, currentStateFollowers[bodyIndex], -1, currentStateAttractors ), _followerAccelerationProviders[bodyIndex], out nextStateFollowers[bodyIndex] );
+
+                            _followerEphemerides[bodyIndex].InsertAdaptive( localUT, currentStateFollowers[bodyIndex] );
+
+                            localUT += localStep;
+                            localStep = nextStep;
+
+                            var temp = currentStateFollowers;
+                            currentStateFollowers = nextStateFollowers;
+                            nextStateFollowers = temp;
                         }
-
-                        if( localStep > (endUT - localUT) )
-                        {
-                            localStep = endUT - localUT; // don't overshoot the end time.
-                        }
-
-                        for( int i = 0; i < currentStateAttractors.Length; i++ )
-                            currentStateAttractors[i] = _attractorEphemerides[i].Evaluate( localUT );
-
-                        ITrajectoryIntegrator integrator = _followers[bodyIndex];
-                        var nextStep = integrator.Step( new TrajectorySimulationContext( localUT, localStep, currentStateFollowers[bodyIndex], -1, currentStateAttractors ), _followerAccelerationProviders[bodyIndex], out nextStateFollowers[bodyIndex] );
 
                         _followerEphemerides[bodyIndex].InsertAdaptive( localUT, currentStateFollowers[bodyIndex] );
 
-                        localUT += localStep;
-                        localStep = nextStep;
+                        // The local arrays might've been ended up swapped relative to the original arrays.
+                        _currentStateFollowers[bodyIndex] = currentStateFollowers[bodyIndex];
+                        _nextStateFollowers[bodyIndex] = nextStateFollowers[bodyIndex];
+                    } );
+                }
 
-                        var temp = currentStateFollowers;
-                        currentStateFollowers = nextStateFollowers;
-                        nextStateFollowers = temp;
-                    }
-
-                    _followerEphemerides[bodyIndex].InsertAdaptive( localUT, currentStateFollowers[bodyIndex] );
-
-                    // needed
-                    _currentStateFollowers[bodyIndex] = currentStateFollowers[bodyIndex];
-                    _nextStateFollowers[bodyIndex] = nextStateFollowers[bodyIndex];
-                } //);
+                Profiler.EndSample();
             }
-
-            Debug.Log( "sim3: " + TimeManager.UT + " : " + _currentStateFollowers[0] );
+            finally
+            {
+                _isSimulating = false;
+            }
         }
     }
 }

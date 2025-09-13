@@ -24,27 +24,24 @@ namespace HSP.Vanilla.UI.Scenes.MapScene
             }
         }
 
-        Vector3Dbl _origin;
-        Vector3Dbl _lastPos;
-        QuaternionDbl _lastRot;
-        Transform _referenceTransform;
-        Vector3Dbl[] _points;
-        int _prevPointCount = -1;
         public new Camera camera;
         UILineRenderer _lineRenderer;
 
-        public IEnumerable<Vector3Dbl> Points
+        public List<Vector2> Points
         {
-            get => _points.Cast<Vector3Dbl>();
             set
             {
                 if( value == null )
                 {
-
                     return;
                 }
-                _points = value.ToArray();
-                _screenSpacePoints = new Vector2[_points.Length];
+
+                Vector2 HalfRes = new Vector2( Screen.width * 0.5f, Screen.height * 0.5f );
+                _screenSpacePoints = new Vector2[value.Count];
+                for( int i = 0; i < _screenSpacePoints.Length; i++ )
+                {
+                    _screenSpacePoints[i] = value[i] - HalfRes;
+                }
             }
         }
 
@@ -59,15 +56,6 @@ namespace HSP.Vanilla.UI.Scenes.MapScene
 
         void LateUpdate()
         {
-            var sceneReferenceFrame = SceneReferenceFrameProvider.GetSceneReferenceFrame();
-
-            Vector2 HalfRes = new Vector2( Screen.width * 0.5f, Screen.height * 0.5f );
-            for( int i = 0; i < _points.Length; i++ )
-            {
-                var point = _points[i];
-                var pos = (Vector3)sceneReferenceFrame.InverseTransformPosition( point );
-                _screenSpacePoints[i] = (Vector2)camera.WorldToScreenPoint( pos ) - HalfRes;
-            }
             _lineRenderer.Points = _screenSpacePoints;
 #warning TODO - this needs to go to a canvas with 'constant pixel size' scaling mode. else the positions are wrong.
         }

@@ -354,7 +354,6 @@ namespace HSP.Vanilla
 
         private void SwitchToSceneMode()
         {
-            Debug.Log( "A" );
             IReferenceFrame sceneReferenceFrame = SceneReferenceFrameProvider.GetSceneReferenceFrame();
 
             _isSceneSpace = true;

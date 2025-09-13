@@ -43,16 +43,6 @@ namespace HSP.Trajectories
             this.MassFlow = 0.0;
         }
 
-        private static double InverseLerp( double a, double b, double value )
-        {
-            if( a != b )
-            {
-                return (value - a) / (b - a);
-            }
-
-            return 0f;
-        }
-
         public bool EqualsIgnoreAcceleration( TrajectoryStateVector other )
         {
             return this.AbsolutePosition.Equals( other.AbsolutePosition ) &&
@@ -80,6 +70,9 @@ namespace HSP.Trajectories
             return $"{nameof( TrajectoryStateVector )}( Position: {this.AbsolutePosition}, Velocity: {this.AbsoluteVelocity}, Acceleration: {this.AbsoluteAcceleration}, Mass: {this.Mass}, MassFlow: {this.MassFlow} )";
         }
 
+        /// <summary>
+        /// Extrapolates the state vector forward in time by dt seconds, using constant acceleration.
+        /// </summary>
         public TrajectoryStateVector Extrapolate( double dt )
         {
             var newPos = this.AbsolutePosition
@@ -95,6 +88,9 @@ namespace HSP.Trajectories
             return new TrajectoryStateVector( newPos, newVel, this.AbsoluteAcceleration, newMass, this.MassFlow );
         }
 
+        /// <summary>
+        /// Linearly interpolates between two state vectors.
+        /// </summary>
         public static TrajectoryStateVector Lerp( TrajectoryStateVector a, TrajectoryStateVector b, double t )
         {
             return new TrajectoryStateVector(

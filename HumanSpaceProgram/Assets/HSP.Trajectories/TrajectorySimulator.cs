@@ -2,9 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using UnityEngine.Profiling;
-using static UnityEngine.GraphicsBuffer;
 
 namespace HSP.Trajectories
 {
@@ -31,7 +29,6 @@ namespace HSP.Trajectories
         protected TrajectoryStateVector[] _currentStateFollowers;
         protected TrajectoryStateVector[] _nextStateFollowers;
 
-#warning TODO - simulator should keep ground truth values for time (t_0) and have methods to update them. It should then predict forwards in time up to some t_p
         protected double _ut;
         protected double _step;
 
@@ -294,7 +291,6 @@ namespace HSP.Trajectories
                     ephemeris.Clear();
                 }
                 _staleEphemerisLengthChanged = false;
-#warning TODO - reset UT (actually, keep the reference UT and ensure that the ephemerides have values between the from/to).
             }
             Profiler.EndSample();
 
@@ -308,8 +304,6 @@ namespace HSP.Trajectories
         /// </summary>
         public virtual void Simulate( double endUT )
         {
-            Debug.Log( "sim: " + TimeManager.UT + " : " + endUT );
-
             Profiler.BeginSample( "TrajectorySimulator.Simulate" );
             if( _bodies.Count == 0 )
             {
@@ -321,20 +315,12 @@ namespace HSP.Trajectories
             {
                 FixStale();
             }
-            Debug.Log( "sim2: " + TimeManager.UT + " : " + _currentStateFollowers[0] + " : " + _ut + " : " + endUT );
 
             if( _ut >= endUT )
             {
                 // Timestepper simulated past the desired time.
                 return;
             }
-
-#warning TODO - when reversing (if an ephemeris has time points further 'forward' than endUT), override it.
-
-#warning TODO - stale flight plan followers need to actually have their ephemerides recalculated.
-            // sort of a sliding window that should have valid data in that interval
-
-            // only simulate the objects that haven't been prolonged up to the end UT.
 
             while( endUT - _ut > 1e-4 )
             {
@@ -407,7 +393,6 @@ namespace HSP.Trajectories
 
             _ut = endUT; // Setting to the actual value at the end prevents accumulation of small precision errors due to repeated addition of delta-time.
             Profiler.EndSample();
-            Debug.Log( "sim3: " + TimeManager.UT + " : " + _currentStateFollowers[0] );
         }
     }
 }

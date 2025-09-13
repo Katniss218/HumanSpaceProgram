@@ -81,11 +81,7 @@ flight plan needs to be able to be reverted back to the ground truth state.
 
 ```
 
-simulator2 needs to ensure that the previous simulation has completed before it can start simulating again.
-
-so you call simulate, and it starts to simulate.
-any staleness will be registered and stop the simulation, and then you tell it to simulate again, which will fix the staleness and continue.
-
-
+need a new canvas, constant pixel size
+order behind 'background'
 
 

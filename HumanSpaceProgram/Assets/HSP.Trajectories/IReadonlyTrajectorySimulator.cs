@@ -12,6 +12,9 @@ namespace HSP.Trajectories
         /// <summary>
         /// Gets the timestepper index of the given attractor.
         /// </summary>
+        /// <remarks>
+        /// Should return -1 for null and non-attractors.
+        /// </remarks>
         public int GetAttractorIndex( ITrajectoryTransform trajectoryTransform );
 
         /// <summary>
@@ -32,6 +35,6 @@ namespace HSP.Trajectories
         /// <summary>
         /// Resets the simulation data for the specified body. Sets the new state vector to the values returned by the body.
         /// </summary>
-        public void ResetStateVector( ITrajectoryTransform trajectoryTransform );
+        public void MarkStale( ITrajectoryTransform trajectoryTransform );
     }
 }
