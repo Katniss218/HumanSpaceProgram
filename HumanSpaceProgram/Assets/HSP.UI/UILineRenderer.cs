@@ -42,8 +42,8 @@ namespace HSP.UI
 		protected override void OnPopulateMesh( VertexHelper vh )
 		{
 			vh.Clear();
-
-			if( _points == null || _points.Length < 2 )
+#warning TODO - Trying to draw a line with points that are far outside of the screen bounds results in infinite runaway memory allocation (for some reason).
+            if( _points == null || _points.Length < 2 )
 				return;
 
 			if( _thickness == 0 )

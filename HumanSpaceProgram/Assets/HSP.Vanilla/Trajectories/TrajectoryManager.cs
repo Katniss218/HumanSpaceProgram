@@ -19,8 +19,8 @@ namespace HSP.Trajectories
         public static TrajectorySimulator2 PredictionSimulator => instance._simulators[PREDICTION_SIMULATOR_INDEX];
 
         private TrajectorySimulator2[] _simulators;
-
-        private double _flightPlanDuration = 365 * 86400 * 1;
+#warning TODO - long ephemerides seem to clamp their tails to precision related to their head.
+        private double _flightPlanDuration = 365 * 86400 * 1.05;
         public static double FlightPlanDuration
         {
             get => instance._flightPlanDuration;
@@ -126,6 +126,7 @@ namespace HSP.Trajectories
                     new TrajectorySimulator2( FlightPlanDuration / 15000.0, (int)(FlightPlanDuration / 5000) )
                 };
                 _simulators[SIMULATOR_INDEX].MaxStepSize = 20;
+                _simulators[SIMULATOR_INDEX].SetEphemerisParameters( 0.01, TimeManager.FixedDeltaTime, 20 );
                 _simulators[PREDICTION_SIMULATOR_INDEX].MaxStepSize = FlightPlanDuration / 10.0;
                 _simulators[PREDICTION_SIMULATOR_INDEX].SetEphemerisParameters( 0.01, FlightPlanDuration, (int)(FlightPlanDuration / 5000) );
             }
@@ -207,8 +208,11 @@ namespace HSP.Trajectories
             {
                 instance._simulators[PREDICTION_SIMULATOR_INDEX].SetInitialTime( TimeManager.UT - TimeManager.FixedDeltaTime );
             }
+#warning TODO - the first evaluation starts at 0 and simulates to 0 + deltaTime + duration
+            // start = 0.2 - 0.2
+            // end = 0.2 + duration
             instance._simulators[SIMULATOR_INDEX].Simulate( TimeManager.UT );
-            instance._simulators[PREDICTION_SIMULATOR_INDEX].Simulate( TimeManager.UT + FlightPlanDuration );
+            instance._simulators[PREDICTION_SIMULATOR_INDEX].Simulate( TimeManager.UT - TimeManager.FixedDeltaTime + FlightPlanDuration );
 
             foreach( var trajectoryTransform in instance._transforms )
             {
