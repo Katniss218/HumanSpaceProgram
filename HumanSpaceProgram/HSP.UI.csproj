@@ -72,8 +72,10 @@
     <Compile Include="Assets\HSP.UI\Defaults\UIDefaults.cs" />
     <Compile Include="Assets\HSP.UI\Canvases\UIConsoleCanvas.cs" />
     <Compile Include="Assets\HSP.UI\Windows\UIAlertWindow.cs" />
+    <Compile Include="Assets\HSP.UI\ScreenSpaceLineRenderer.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\HSP.UI\screenspacelineshader.shader" />
     <None Include="Assets\HSP.UI\___HSP.UI.asmdef" />
   </ItemGroup>
   <ItemGroup>
