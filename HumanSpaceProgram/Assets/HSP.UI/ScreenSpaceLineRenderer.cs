@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityPlus.AssetManagement;
 
 namespace HSP.UI
 {
     [RequireComponent( typeof( Camera ) )]
-    [DisallowMultipleComponent]
     public class ScreenSpaceLineRenderer : MonoBehaviour
     {
         [StructLayout( LayoutKind.Sequential )]
@@ -221,6 +221,7 @@ namespace HSP.UI
         {
             if( !TryGetComponent<Camera>( out _cam ) )
                 _cam = Camera.main;
+            lineMaterial = AssetRegistry.Get<Material>( "builtin::HSP.UI/Hidden_ScreenSpaceLine" );
         }
 
         void OnEnable()

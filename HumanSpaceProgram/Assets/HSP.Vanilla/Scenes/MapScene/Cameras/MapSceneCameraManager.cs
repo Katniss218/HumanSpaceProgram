@@ -49,8 +49,8 @@ namespace HSP.Vanilla.Scenes.MapScene.Cameras
 
             _effectCamera.nearClipPlane = _effectCameraNearPlane * (1 + (zoomDist * ZOOM_NEAR_PLANE_MULT));
 
-            _uiCamera.nearClipPlane = (float)MathD.Map( zoomDist, MIN_ZOOM_DISTANCE, NEAR_CUTOFF_DISTANCE, 0.5f, 100f );
-            _uiCamera.farClipPlane = (float)MathD.Map( zoomDist, MIN_ZOOM_DISTANCE, NEAR_CUTOFF_DISTANCE, 0.5f * 10000f, 100f * 10000f );
+            _uiCamera.nearClipPlane = 5000;// (float)MathD.Map( zoomDist, MIN_ZOOM_DISTANCE, NEAR_CUTOFF_DISTANCE, 0.5f, 100f );
+            _uiCamera.farClipPlane = 1e16f; // (float)MathD.Map( zoomDist, MIN_ZOOM_DISTANCE, NEAR_CUTOFF_DISTANCE, 0.5f * 1000000f, 100f * 100000000f );
             _farCamera.eventMask = 0; // Setting eventMask = 0 stops the annoying mouse event errors when the camera is far away from scene origin.
             _effectCamera.eventMask = 0;
             _uiCamera.eventMask = 0;

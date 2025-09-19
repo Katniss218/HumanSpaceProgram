@@ -2,12 +2,10 @@
 using HSP.ReferenceFrames;
 using HSP.Trajectories;
 using HSP.UI;
-using HSP.Vanilla.ReferenceFrames;
 using HSP.Vanilla.Scenes.MapScene;
 using HSP.Vanilla.Scenes.MapScene.Cameras;
 using System;
 using System.Collections.Generic;
-using System.Security.Cryptography;
 using UnityEngine;
 using UnityEngine.Profiling;
 
@@ -36,11 +34,12 @@ namespace HSP.Vanilla.UI.Scenes.MapScene
         /// </summary>
         class BodyEntry
         {
-            public EphemerisPosSetter Setter { get; internal set; }
+            public Color lineColor = Color.white;
+            public float lineThickness = 3f;
 
             public readonly Dictionary<double, Sample> evalCache = new();
             public readonly List<Sample> initial = new();
-            public readonly List<Vector2> output = new();
+            public readonly List<Vector3> worldPoints = new();
         }
 
         readonly struct Segment
@@ -64,6 +63,16 @@ namespace HSP.Vanilla.UI.Scenes.MapScene
         const double UT_THRESHOLD_SECONDS = 1;
 
         readonly Dictionary<ITrajectoryTransform, BodyEntry> _bodies = new();
+        public ScreenSpaceLineRenderer lineRenderer;
+
+        void Awake()
+        {
+            // Ensure we have a ScreenSpaceLineRenderer component
+            if( lineRenderer == null )
+            {
+                lineRenderer = MapSceneCameraManager.UICamera.gameObject.GetOrAddComponent<ScreenSpaceLineRenderer>();
+            }
+        }
 
         void Update()
         {
@@ -72,6 +81,11 @@ namespace HSP.Vanilla.UI.Scenes.MapScene
 
         private void Recalc()
         {
+            if( lineRenderer == null )
+                return;
+
+            lineRenderer.Clear();
+
             var bodies = TrajectoryManager.PredictionSimulator.GetBodies();
             foreach( var (body, ephemeris) in bodies )
             {
@@ -81,11 +95,21 @@ namespace HSP.Vanilla.UI.Scenes.MapScene
                 if( !_bodies.TryGetValue( body, out var entry ) )
                 {
                     entry = new BodyEntry();
+                    // Assign different colors to different bodies for visual distinction
+                    entry.lineColor = GetBodyColor( body );
                     _bodies[body] = entry;
                 }
 
                 DrawOptimized( body, ephemeris, entry );
             }
+        }
+
+        private Color GetBodyColor( ITrajectoryTransform body )
+        {
+            // Generate a consistent color based on the body's name hash
+            var hash = body.gameObject.name.GetHashCode();
+            var hue = (hash & 0xFFFFFF) / (float)0xFFFFFF;
+            return Color.HSVToRGB( hue, 0.8f, 1f );
         }
 
         private static float ScreenTriangleArea( in Sample a, in Sample b, in Sample c )
@@ -138,8 +162,7 @@ namespace HSP.Vanilla.UI.Scenes.MapScene
             return LiangBarsky( xmin, xmax, ymin, ymax, ref p0, ref p1 );
         }
 
-        private static bool LiangBarsky( float xmin, float xmax, float ymin, float ymax,
-                                        ref Vector2 p0, ref Vector2 p1 )
+        private static bool LiangBarsky( float xmin, float xmax, float ymin, float ymax, ref Vector2 p0, ref Vector2 p1 )
         {
             float dx = p1.x - p0.x;
             float dy = p1.y - p0.y;
@@ -250,49 +273,33 @@ namespace HSP.Vanilla.UI.Scenes.MapScene
             return (a - b).sqrMagnitude <= sqrEps;
         }
 
-        private static void AddPointAvoidDuplicate( List<Vector2> output, Vector2 left, Vector2 right, Camera camera )
+        private static void AddPointAvoidDuplicate( List<Vector3> output, Vector3 left, Vector3 right )
         {
-            if( left.magnitude > 2600 || right.magnitude > 2600 )
-            {
-                // Trying to draw a line with points that are far outside of the screen bounds results in infinite runaway memory allocation (for some reason).
-                // - even with clipping.
-                // doesn't happen if entry.Setter.Points are not being set.
-                Debug.LogWarning( "MAG " + left + " : " + right );
-                return;
-            }
             if( output.Count == 0 )
             {
                 output.Add( left );
             }
             else
             {
-                if( !PointsEqual( output[^1], left ) )
+                if( !WorldPointsEqual( output[^1], left ) )
                     output.Add( left );
             }
-            if( !PointsEqual( output[^1], right ) )
+            if( !WorldPointsEqual( output[^1], right ) )
                 output.Add( right );
+        }
+
+        private static bool WorldPointsEqual( Vector3 a, Vector3 b )
+        {
+            const float sqrEps = 0.01f; // Small world space tolerance
+            return (a - b).sqrMagnitude <= sqrEps;
         }
 
         private void DrawOptimized( ITrajectoryTransform body, IReadonlyEphemeris ephemeris, BodyEntry entry )
         {
-            if( entry.Setter == null )
-            {
-                GameObject point = new GameObject( $"orbit line" );
-                RectTransform rectTransform = point.AddComponent<RectTransform>();
-                rectTransform.SetParent( MapSceneM.Instance.GetBackgroundCanvas().transform, false );
-                UILineRenderer r = point.AddComponent<UILineRenderer>();
-
-                var setter = point.AddComponent<EphemerisPosSetter>();
-                setter.SceneReferenceFrameProvider = new MapSceneReferenceFrameProvider();
-                setter.camera = MapSceneCameraManager.FarCamera;
-
-                entry.Setter = setter;
-            }
-
             Profiler.BeginSample( "EphemerisDrawer.AdaptiveResample" );
 
             entry.initial.Clear();
-            entry.output.Clear();
+            entry.worldPoints.Clear();
             entry.evalCache.Clear();
 
             IReferenceFrame sceneReferenceFrame = MapSceneReferenceFrameManager.ReferenceFrame;
@@ -300,7 +307,7 @@ namespace HSP.Vanilla.UI.Scenes.MapScene
             double lowUT = ephemeris.LowUT;
             double highUT = ephemeris.HighUT;
 
-            Camera camera = entry.Setter.camera;
+            Camera camera = MapSceneCameraManager.FarCamera;
 
             for( int i = 0; i < INITIAL_POINT_COUNT; i++ )
             {
@@ -321,15 +328,15 @@ namespace HSP.Vanilla.UI.Scenes.MapScene
             while( subdivisionStack.Count > 0 && iters < 10000 )
             {
                 iters++;
-                if( entry.output.Count >= MAX_POINT_COUNT )
+                if( entry.worldPoints.Count >= MAX_POINT_COUNT )
                     break;
 
                 Segment segment = subdivisionStack.Pop();
                 Sample left = segment.Left;
                 Sample right = segment.Right;
                 int depth = segment.Depth;
-                Vector3 clippedLeft = left.screenPos;
-                Vector3 clippedRight = right.screenPos;
+                Vector3 clippedLeft = left.worldPos;
+                Vector3 clippedRight = right.worldPos;
 
                 // subdiv
                 double midUT = 0.5 * (left.ut + right.ut);
@@ -348,16 +355,20 @@ namespace HSP.Vanilla.UI.Scenes.MapScene
                 }
 
                 // clip and view
-                if( lineInView )
-                {
-                    AddPointAvoidDuplicate( entry.output, clippedLeft, clippedRight, camera );
-                }
+                //if( lineInView )
+                //{
+                    AddPointAvoidDuplicate( entry.worldPoints, left.worldPos, right.worldPos );
+                //}
             }
-            Debug.Log( $"EphemerisDrawer: body={body.gameObject.name} iters={iters} output={entry.output.Count}" );
+            Debug.Log( $"EphemerisDrawer: body={body.gameObject.name} iters={iters} output={entry.worldPoints.Count}" );
+
+            // Add the line to the ScreenSpaceLineRenderer
+            if( entry.worldPoints.Count >= 2 )
+            {
+                lineRenderer.AddLine( entry.worldPoints.ToArray(), entry.lineColor, entry.lineThickness );
+            }
 
             Profiler.EndSample();
-
-            entry.Setter.Points = entry.output;
         }
     }
 }
