@@ -55,7 +55,8 @@ namespace HSP.UI
         /// </summary>
         public void AddLine( Vector3[] points, Color color, float thicknessPx = 2f )
         {
-            if( points == null || points.Length < 2 ) return;
+            if( points == null || points.Length < 2 ) 
+                return;
 
             var line = new LineInstance
             {

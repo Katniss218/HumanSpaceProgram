@@ -38,6 +38,8 @@ namespace HSP.Vanilla.ReferenceFrames
             set
             {
                 transform.position = (Vector3)SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformPosition( value );
+                OnAbsolutePositionChanged?.Invoke();
+                OnAnyValueChanged?.Invoke();
             }
         }
 
@@ -55,6 +57,8 @@ namespace HSP.Vanilla.ReferenceFrames
             set
             {
                 transform.rotation = (Quaternion)SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformRotation( value );
+                OnAbsoluteRotationChanged?.Invoke();
+                OnAnyValueChanged?.Invoke();
             }
         }
 
@@ -66,13 +70,13 @@ namespace HSP.Vanilla.ReferenceFrames
 
         public Vector3Dbl AbsoluteAngularVelocity { get => SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAngularVelocity( Vector3.zero ); set { } }
 
-        public Vector3 Acceleration => throw new NotImplementedException();
+        public Vector3 Acceleration => Vector3.zero;
 
-        public Vector3Dbl AbsoluteAcceleration => throw new NotImplementedException();
+        public Vector3Dbl AbsoluteAcceleration => Vector3Dbl.zero;
 
-        public Vector3 AngularAcceleration => throw new NotImplementedException();
+        public Vector3 AngularAcceleration => Vector3.zero;
 
-        public Vector3Dbl AbsoluteAngularAcceleration => throw new NotImplementedException();
+        public Vector3Dbl AbsoluteAngularAcceleration => Vector3Dbl.zero;
 
         public event Action OnAbsolutePositionChanged;
         public event Action OnAbsoluteRotationChanged;

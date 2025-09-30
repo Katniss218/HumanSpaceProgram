@@ -1,4 +1,5 @@
 ﻿using HSP.CelestialBodies.Surfaces;
+using HSP.ReferenceFrames;
 using UnityEngine;
 using UnityPlus.Serialization;
 
@@ -9,10 +10,13 @@ namespace HSP.Vanilla.ReferenceFrames
     /// </summary>
     public class PinnedLODSphereReferenceFrameTransform : PinnedCelestialBodyReferenceFrameTransform
     {
+        //private LODQuadSphere _quadSphere;
         public float MaxPosition { get; set; } = 2000;
 
         protected override void FixedUpdate()
         {
+            base.FixedUpdate();
+
             Vector3 scenePosition = this.Position;
 
             if( scenePosition.magnitude > MaxPosition )
@@ -24,7 +28,9 @@ namespace HSP.Vanilla.ReferenceFrames
                 this.Position = Vector3.zero;
             }
 
-            base.FixedUpdate();
+            //LODQuad.ResetPositionAndRotationAll( _quadSphere ); // this partially fixes the desync but introduces flicker.
+
+            // after disabling, the scene pos is not the same on all quad parents
         }
 
         public const string ADD_PINNED_LOD_REFERENCE_TRANSFORM = HSPEvent.NAMESPACE_HSP + ".addpinnedlreftrans";
@@ -34,6 +40,7 @@ namespace HSP.Vanilla.ReferenceFrames
         {
             var p = sphere.QuadParent.gameObject.AddComponent<PinnedLODSphereReferenceFrameTransform>();
             p.SceneReferenceFrameProvider = sphere.CelestialBody.ReferenceFrameTransform.SceneReferenceFrameProvider;
+            //p._quadSphere = sphere;
             Vector3Dbl localPos = Vector3Dbl.zero;
             p.SetReference( sphere.CelestialBody, localPos, Quaternion.identity );
         }

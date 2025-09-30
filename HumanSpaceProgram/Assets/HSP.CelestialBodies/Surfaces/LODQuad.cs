@@ -63,6 +63,22 @@ namespace HSP.CelestialBodies.Surfaces
             IReferenceFrame bodyReferenceFrame = QuadSphere.CelestialBody.ReferenceFrameTransform.OrientedInertialReferenceFrame();
             IReferenceFrame sceneReferenceFrame = QuadSphere.CelestialBody.ReferenceFrameTransform.SceneReferenceFrameProvider.GetSceneReferenceFrame();
 
+            ResetPositionAndRotationImpl( bodyReferenceFrame, sceneReferenceFrame );
+        }
+
+        public static void ResetPositionAndRotationAll( LODQuadSphere quadSphere )
+        {
+            IReferenceFrame bodyReferenceFrame = quadSphere.CelestialBody.ReferenceFrameTransform.OrientedInertialReferenceFrame();
+            IReferenceFrame sceneReferenceFrame = quadSphere.CelestialBody.ReferenceFrameTransform.SceneReferenceFrameProvider.GetSceneReferenceFrame();
+
+            foreach( var node in quadSphere.CurrentQuads.Values )
+            {
+                node.Quad.ResetPositionAndRotationImpl( bodyReferenceFrame, sceneReferenceFrame );
+            }
+        }
+
+        private void ResetPositionAndRotationImpl( IReferenceFrame bodyReferenceFrame, IReferenceFrame sceneReferenceFrame )
+        {
             Vector3Dbl absolutePos = bodyReferenceFrame.TransformPosition( Node.SphereCenter * QuadSphere.CelestialBody.Radius );
             QuaternionDbl absoluteRot = bodyReferenceFrame.TransformRotation( QuaternionDbl.identity );
 

@@ -54,6 +54,7 @@ namespace HSP.Vanilla.Scenes.MapScene.Cameras
                 ? (Vector3)_referenceFrameTransform.SceneReferenceFrameProvider.GetSceneReferenceFrame().AtUT( TimeManager.UT ).InverseTransformPosition( Vector3.zero )
                 : ReferenceObject.position;
             this.transform.position = targetPos + (-transform.forward) * _zoomDist;
+            MapSceneCameraManager.instance.zoomDistance  = _zoomDist;
         }
 
         private Vector3 GetUpDir()

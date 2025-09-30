@@ -104,7 +104,8 @@ namespace HSP.Vanilla
         {
             get
             {
-                return _rb.velocity;
+                // kinematic rigidbodies don't store their velocity. use the absolute value.
+                return (Vector3)SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformVelocity( _absoluteVelocity );
             }
             set
             {
@@ -134,7 +135,8 @@ namespace HSP.Vanilla
         {
             get
             {
-                return _rb.angularVelocity;
+                // kinematic rigidbodies don't store their angular velocity. use the absolute value.
+                return (Vector3)SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformAngularVelocity( AbsoluteAngularVelocity );
             }
             set
             {
@@ -316,9 +318,10 @@ namespace HSP.Vanilla
 
         public const string ADD_PLAYER_LOOP_SYSTEM = "12431242132131";
 
+#warning TODO - change this so that tests can use it too. change to whenever the first is added/removed. use a better API than the current unityplus one.
         // Imo it's kind of ugly using HSPEvent_STARTUP_IMMEDIATELY to mess with player loop, but it is what it is.
         [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, ADD_PLAYER_LOOP_SYSTEM )]
-        static void AddPlayerLoopSystem()
+        public static void AddPlayerLoopSystem()
         {
             PlayerLoopUtils.AddSystem<FixedUpdate, FixedUpdate.PhysicsFixedUpdate>( in _playerLoopSystem );
         }

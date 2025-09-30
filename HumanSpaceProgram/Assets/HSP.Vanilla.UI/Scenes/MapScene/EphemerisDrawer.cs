@@ -267,9 +267,9 @@ namespace HSP.Vanilla.UI.Scenes.MapScene
             return true;
         }
 
-        private static bool PointsEqual( Vector2 a, Vector2 b )
+        private static bool PointsEqual( Vector3 a, Vector3 b )
         {
-            const float sqrEps = 0.25f; // 0.5 pixel tolerance
+            const float sqrEps = 0.1f; // Small world space tolerance
             return (a - b).sqrMagnitude <= sqrEps;
         }
 
@@ -281,17 +281,11 @@ namespace HSP.Vanilla.UI.Scenes.MapScene
             }
             else
             {
-                if( !WorldPointsEqual( output[^1], left ) )
+                if( !PointsEqual( output[^1], left ) )
                     output.Add( left );
             }
-            if( !WorldPointsEqual( output[^1], right ) )
+            if( !PointsEqual( output[^1], right ) )
                 output.Add( right );
-        }
-
-        private static bool WorldPointsEqual( Vector3 a, Vector3 b )
-        {
-            const float sqrEps = 0.01f; // Small world space tolerance
-            return (a - b).sqrMagnitude <= sqrEps;
         }
 
         private void DrawOptimized( ITrajectoryTransform body, IReadonlyEphemeris ephemeris, BodyEntry entry )
@@ -315,7 +309,7 @@ namespace HSP.Vanilla.UI.Scenes.MapScene
                 entry.initial.Add( EvalCached( t, ephemeris, entry, camera, sceneReferenceFrame ) );
             }
 
-            Stack<Segment> subdivisionStack = new(); // Can't do BFS (queue) without sorting.
+            Stack<Segment> subdivisionStack = new(); // Can't do BFS (queue) without sorting the points.
 
             for( int i = entry.initial.Count - 2; i >= 0; i-- )
             {
@@ -323,6 +317,7 @@ namespace HSP.Vanilla.UI.Scenes.MapScene
             }
 
             Plane[] planes = GeometryUtility.CalculateFrustumPlanes( camera );
+            Vector3 _ = default;
 
             int iters = 0;
             while( subdivisionStack.Count > 0 && iters < 10000 )
@@ -335,17 +330,14 @@ namespace HSP.Vanilla.UI.Scenes.MapScene
                 Sample left = segment.Left;
                 Sample right = segment.Right;
                 int depth = segment.Depth;
-                Vector3 clippedLeft = left.worldPos;
-                Vector3 clippedRight = right.worldPos;
 
                 // subdiv
                 double midUT = 0.5 * (left.ut + right.ut);
                 Sample mid = EvalCached( midUT, ephemeris, entry, camera, sceneReferenceFrame );
                 float area = ScreenTriangleArea( left, mid, right );
 
-                // this midpoint length thing seems to almost work...
                 bool midpointCloserThanLineLength = (mid.screenPos).magnitude <= (left.screenPos - right.screenPos).magnitude;
-                bool lineInView = ClipLineSegmentToCameraFrustum( left.worldPos, right.worldPos, ref clippedLeft, ref clippedRight, camera, planes );
+                bool lineInView = ClipLineSegmentToCameraFrustum( left.worldPos, right.worldPos, ref _, ref _, camera, planes );
 
                 if( (midpointCloserThanLineLength || lineInView) && area > AREA_THRESHOLD_PIXELS && depth < MAX_SUBDIVIDE_DEPTH && Math.Abs( right.ut - left.ut ) >= UT_THRESHOLD_SECONDS )
                 {
@@ -354,15 +346,10 @@ namespace HSP.Vanilla.UI.Scenes.MapScene
                     continue;
                 }
 
-                // clip and view
-                //if( lineInView )
-                //{
-                    AddPointAvoidDuplicate( entry.worldPoints, left.worldPos, right.worldPos );
-                //}
+                AddPointAvoidDuplicate( entry.worldPoints, left.worldPos, right.worldPos );
             }
             Debug.Log( $"EphemerisDrawer: body={body.gameObject.name} iters={iters} output={entry.worldPoints.Count}" );
 
-            // Add the line to the ScreenSpaceLineRenderer
             if( entry.worldPoints.Count >= 2 )
             {
                 lineRenderer.AddLine( entry.worldPoints.ToArray(), entry.lineColor, entry.lineThickness );

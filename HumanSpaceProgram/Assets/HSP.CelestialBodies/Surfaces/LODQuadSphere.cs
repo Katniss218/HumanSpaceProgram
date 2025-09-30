@@ -152,9 +152,9 @@ namespace HSP.CelestialBodies.Surfaces
             set
             {
                 _materials = value;
-                foreach( var lod in _currentQuads )
+                foreach( var lod in CurrentQuads.Values )
                 {
-                    lod.Value.Quad.ResetMaterial();
+                    lod.Quad.ResetMaterial();
                 }
             }
         }
@@ -240,17 +240,26 @@ namespace HSP.CelestialBodies.Surfaces
 
         private void ClearAllQuads()
         {
-            foreach( var kvp in _currentQuads )
+            foreach( var quad in _currentQuads.Values )
             {
-                Destroy( kvp.Value.Quad );
-                kvp.Value.Dispose();
+                Destroy( quad.Quad );
+                quad.Dispose();
             }
             _currentQuads.Clear();
             _currentTree = new LODQuadTree( MaxDepth );
         }
 
+        bool _canBuild = true;
+
         private void TryRebuild()
         {
+            if( UnityEngine.Input.GetKey(KeyCode.F))
+            {
+                _canBuild = false;
+            }
+            if( !_canBuild )
+                return;
+
             if( _builder != null )
                 throw new InvalidOperationException( $"Tried to start building while already building." );
             if( PoIGetter == null )

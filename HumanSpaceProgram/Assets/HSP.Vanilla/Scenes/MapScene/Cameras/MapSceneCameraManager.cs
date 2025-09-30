@@ -32,13 +32,12 @@ namespace HSP.Vanilla.Scenes.MapScene.Cameras
         public static Camera UICamera => instance._uiCamera;
 
         float _effectCameraNearPlane;
+        public float zoomDistance { get; set; }
 
         private void AdjustCameras()
         {
-            float zoomDist = this.CameraParent.position.magnitude;
-
             // helps to make the shadow look nicer.
-            QualitySettings.shadowDistance = 2550.0f + 1.3f * zoomDist;
+            QualitySettings.shadowDistance = 2550.0f + 1.3f * zoomDistance;
 
             //
             // When a camera is far away from scene origin, it needs to have appropriately scaled near and far plane values (roughly in the ballpark of how far away it currently is),
@@ -47,10 +46,10 @@ namespace HSP.Vanilla.Scenes.MapScene.Cameras
             // This can be mitigated either by increasing the clipping planes when highly zoomed out, or by turning the camera off.
             //
 
-            _effectCamera.nearClipPlane = _effectCameraNearPlane * (1 + (zoomDist * ZOOM_NEAR_PLANE_MULT));
+            _effectCamera.nearClipPlane = _effectCameraNearPlane * (1 + (zoomDistance * ZOOM_NEAR_PLANE_MULT));
 
-            _uiCamera.nearClipPlane = 5000;// (float)MathD.Map( zoomDist, MIN_ZOOM_DISTANCE, NEAR_CUTOFF_DISTANCE, 0.5f, 100f );
-            _uiCamera.farClipPlane = 1e16f; // (float)MathD.Map( zoomDist, MIN_ZOOM_DISTANCE, NEAR_CUTOFF_DISTANCE, 0.5f * 1000000f, 100f * 100000000f );
+            _uiCamera.nearClipPlane = (float)MathD.Map( zoomDistance, MIN_ZOOM_DISTANCE, NEAR_CUTOFF_DISTANCE, 0.5f, 100f );
+            _uiCamera.farClipPlane = (float)MathD.Map( zoomDistance, MIN_ZOOM_DISTANCE, NEAR_CUTOFF_DISTANCE, 0.5f * 1000000f, 100f * 100000000f );
             _farCamera.eventMask = 0; // Setting eventMask = 0 stops the annoying mouse event errors when the camera is far away from scene origin.
             _effectCamera.eventMask = 0;
             _uiCamera.eventMask = 0;

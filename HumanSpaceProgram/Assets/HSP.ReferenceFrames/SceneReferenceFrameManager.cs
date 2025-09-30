@@ -35,7 +35,8 @@ namespace HSP.ReferenceFrames
         /// The object that the scene will follow, ensuring that it's always close to the scene origin. 
         /// </summary>
         /// <remarks>
-        /// Changing this object may result in a reference frame switch happening (at the next available time), if the new object is too far away or moving too fast.
+        /// Changing this object may result in a reference frame switch happening (at the next available time), if the new object is too far away or moving too fast. <br/>
+        /// Setting to null will disable automatic reference frame switching. You can still requests reference frame switches manually <br/>
         /// </remarks>
         public IReferenceFrameTransform targetObject
         {
@@ -107,8 +108,6 @@ namespace HSP.ReferenceFrames
             if( referenceFrame.ReferenceUT != TimeManager.UT )
                 throw new ArgumentException( $"[{this.GetType().Name}] The reference frame must have its {nameof( SceneReferenceFrameManager.referenceFrame.ReferenceUT )} equal to the current UT ({nameof( Time.TimeManager )}.{nameof( TimeManager.UT )}).", nameof( referenceFrame ) );
 
-            Vector3 scenePosition = targetObject.Position;
-            Vector3 sceneVelocity = targetObject.Velocity;
             _frameToSwitchTo = referenceFrame;
         }
 

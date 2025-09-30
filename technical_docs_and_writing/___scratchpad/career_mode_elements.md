@@ -49,7 +49,7 @@ There are also "milestone" type bonus rewards (like "reach 100 km") that once co
 
 A given pool of money can be restricted to be spent on a given category of activity - such as:
 - building rockets
-- hiring researchers
+- hiring scientists
 - buying propellant
 - etc.
 
