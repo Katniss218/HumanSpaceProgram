@@ -31,11 +31,12 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
                 instance._farCamera.clearFlags = CameraClearFlags.Skybox;
                 instance._nearCamera.clearFlags = CameraClearFlags.Depth;
 
+                // camera.pixelWidth better?
                 int width = Screen.fullScreen ? Screen.currentResolution.width : Screen.width;
                 int height = Screen.fullScreen ? Screen.currentResolution.height : Screen.height;
-
+                
                 //instance._colorRT = RenderTexture.GetTemporary( width, height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Default, 4 ); Doesn't work, adding MSAA for some reason turns it black.
-                instance._colorRT = RenderTexture.GetTemporary( width, height, 0, RenderTextureFormat.ARGB32 );
+                instance._colorRT = RenderTexture.GetTemporary( width, height, 0, UnityEngine.Experimental.Rendering.GraphicsFormat.R32G32B32A32_SFloat );
                 instance._farDepthRT = RenderTexture.GetTemporary( width, height, 24, RenderTextureFormat.Depth );
                 instance._nearDepthRT = RenderTexture.GetTemporary( width, height, 24, RenderTextureFormat.Depth );
 
@@ -260,18 +261,22 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
             GameObject farCameraGameObject = new GameObject( "Far camera" );
             farCameraGameObject.transform.SetParent( cameraParentGameObject.transform );
             Camera farCamera = farCameraGameObject.AddComponent<Camera>();
+            farCamera.allowHDR = true;
 
             GameObject nearCameraGameObject = new GameObject( "Near camera" );
             nearCameraGameObject.transform.SetParent( cameraParentGameObject.transform );
             Camera nearCamera = nearCameraGameObject.AddComponent<Camera>();
+            nearCamera.allowHDR = true;
 
             GameObject effectCameraGameObject = new GameObject( "Effect camera" );
             effectCameraGameObject.transform.SetParent( cameraParentGameObject.transform );
             Camera effectCamera = effectCameraGameObject.AddComponent<Camera>();
+            effectCamera.allowHDR = true;
 
             GameObject uiCameraGameObject = new GameObject( "UI camera" );
             uiCameraGameObject.transform.SetParent( cameraParentGameObject.transform );
             Camera uiCamera = uiCameraGameObject.AddComponent<Camera>();
+            uiCamera.allowHDR = true;
 
             sceneCamera.camera = nearCamera;
             cameraManager.CameraParent = cameraParentGameObject.transform;
