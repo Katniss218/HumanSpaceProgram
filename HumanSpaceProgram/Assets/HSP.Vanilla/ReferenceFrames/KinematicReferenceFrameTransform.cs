@@ -249,6 +249,8 @@ namespace HSP.Vanilla
             _rb.collisionDetectionMode = CollisionDetectionMode.Discrete; // Continuous (in any of its flavors) "jumps" when sitting on top of something when reference frame switches.
             _rb.interpolation = RigidbodyInterpolation.None; // DO NOT INTERPOLATE. Doing so will desync `rigidbody.position` and `transform.position`.
             _rb.isKinematic = true;
+            _rb.drag = 0;
+            _rb.angularDrag = 0;
         }
 
         protected virtual void FixedUpdate()

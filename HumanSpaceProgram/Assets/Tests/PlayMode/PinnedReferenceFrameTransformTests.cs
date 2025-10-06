@@ -465,7 +465,8 @@ namespace HSP_Tests_PlayMode
             // Create pinned transform
             PinnedReferenceFrameTransform pinnedTransform = CreatePinnedReferenceFrameTransform();
             pinnedTransform.SceneReferenceFrameProvider = new GameplaySceneReferenceFrameProvider();
-            pinnedTransform.SetReference( targetTransform, new Vector3Dbl( 5, 0, 0 ), QuaternionDbl.identity ); // 5m offset in X direction
+            var initialPos = new Vector3Dbl( 5, 0, 0 );
+            pinnedTransform.SetReference( targetTransform, initialPos, QuaternionDbl.identity ); // 5m offset in X direction
 
             double startTime = TimeManager.UT;
             double testDuration = 1;
@@ -492,7 +493,7 @@ namespace HSP_Tests_PlayMode
                     $"{config.TestName}: Target should rotate correctly" );
 
                 // Pinned transform should be at the rotated position (5m in Y direction now)
-                Vector3Dbl expectedPinnedPosition = new Vector3Dbl( 0, 5, 0 );
+                Vector3Dbl expectedPinnedPosition = expectedTargetRotation * initialPos;
                 Assert.That( pinnedTransform.AbsolutePosition, Is.EqualTo( expectedPinnedPosition ).Using( vector3DblApproxComparer ),
                     $"{config.TestName}: Pinned transform should follow target rotation" );
             }
@@ -743,15 +744,15 @@ namespace HSP_Tests_PlayMode
         #region Velocity and Acceleration Tests
 
         [UnityTest]
-        public IEnumerator VelocityAndAcceleration_NonInertialFrame_AllTargetTypes()
+        public IEnumerator VelocityAndAcceleration_RotatingTangent_AllTargetTypes()
         {
             foreach( var config in TargetConfigs )
             {
-                yield return VelocityAndAcceleration_NonInertialFrame_T( config );
+                yield return VelocityAndAcceleration_RotatingTangent_T( config );
             }
         }
 
-        public IEnumerator VelocityAndAcceleration_NonInertialFrame_T( TargetConfig config )
+        public IEnumerator VelocityAndAcceleration_RotatingTangent_T( TargetConfig config )
         {
             // Arrange
             var (manager, timeManager, refFrameManager) = CreateTestScene();

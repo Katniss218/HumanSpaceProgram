@@ -72,7 +72,7 @@ namespace HSP.Vanilla
                 OnAnyValueChanged?.Invoke();
             }
         }
-#warning TODO - add a getter for the scene reference frame so they can be reused by a different scene. this getter should be an interface and serializable
+
         public QuaternionDbl AbsoluteRotation
         {
             get
@@ -300,6 +300,8 @@ namespace HSP.Vanilla
             _rb.collisionDetectionMode = CollisionDetectionMode.Discrete; // Continuous (in any of its flavors) "jumps" when sitting on top of something when reference frame switches.
             _rb.interpolation = RigidbodyInterpolation.None; // DO NOT INTERPOLATE. Doing so will desync `rigidbody.position` and `transform.position`.
             _rb.isKinematic = false;
+            _rb.drag = 0;
+            _rb.angularDrag = 0;
         }
 
         protected virtual void FixedUpdate()
@@ -326,7 +328,7 @@ namespace HSP.Vanilla
                 _cachedAngularAcceleration = (AngularVelocity - _oldAngularVelocity) / TimeManager.FixedDeltaTime;
 
                 _cachedAbsoluteAcceleration = SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAcceleration( _cachedAcceleration );
-                _cachedAbsoluteAngularAcceleration = SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAcceleration( _cachedAngularAcceleration );
+                _cachedAbsoluteAngularAcceleration = SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAngularAcceleration( _cachedAngularAcceleration );
             }
             else
             {

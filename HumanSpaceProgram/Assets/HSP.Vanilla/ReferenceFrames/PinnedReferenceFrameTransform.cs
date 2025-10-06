@@ -342,13 +342,15 @@ namespace HSP.Vanilla
             _rb.collisionDetectionMode = CollisionDetectionMode.Discrete;
             _rb.interpolation = RigidbodyInterpolation.None; // DO NOT INTERPOLATE. Doing so will desync `rigidbody.position` and `transform.position`.
             _rb.isKinematic = true;
+            _rb.drag = 0;
+            _rb.angularDrag = 0;
         }
 
         protected virtual void FixedUpdate()
         {
             IReferenceFrame bodyFrame = _referenceTransform == null
                 ? new CenteredReferenceFrame( TimeManager.UT, Vector3Dbl.zero )
-                : _referenceTransform.NonInertialReferenceFrame().AtUT( TimeManager.UT );
+                : _referenceTransform.NonInertialReferenceFrame().AtUT( TimeManager.UT ); // moves to where the body will be
 
             // ReferenceFrame.AtUT is used because we want to access the frame for the end of the frame, and FixedUpdate (caller) is called before ReferenceFrame updates.
             var sceneReferenceFrame = SceneReferenceFrameProvider.GetSceneReferenceFrame().AtUT( TimeManager.UT );

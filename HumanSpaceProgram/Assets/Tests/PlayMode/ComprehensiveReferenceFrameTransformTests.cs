@@ -113,17 +113,17 @@ namespace HSP_Tests_PlayMode
 
             if( transformType == typeof( FreeReferenceFrameTransform ) )
             {
-                go.AddComponent<Rigidbody>();
+                var rb = go.AddComponent<Rigidbody>();
                 return go.AddComponent<FreeReferenceFrameTransform>();
             }
             else if( transformType == typeof( FixedReferenceFrameTransform ) )
             {
-                go.AddComponent<Rigidbody>();
+                var rb = go.AddComponent<Rigidbody>();
                 return go.AddComponent<FixedReferenceFrameTransform>();
             }
             else if( transformType == typeof( KinematicReferenceFrameTransform ) )
             {
-                go.AddComponent<Rigidbody>();
+                var rb = go.AddComponent<Rigidbody>();
                 return go.AddComponent<KinematicReferenceFrameTransform>();
             }
             else if( transformType == typeof( DummyReferenceFrameTransform ) )
@@ -444,7 +444,7 @@ namespace HSP_Tests_PlayMode
                 }
             }
         }
-
+#error TODO - needs reference frame switching while integrating too. test that
         public IEnumerator TimeSimulation_VelocityIntegration_T( TestConfig config )
         {
             // Arrange
@@ -481,6 +481,7 @@ namespace HSP_Tests_PlayMode
             double endTime = TimeManager.UT;
             double actualDuration = endTime - startTime;
 
+            Debug.Log( actualDuration );
             // Verify position integration
             Vector3Dbl expectedPosition = initialPosition + testVelocity * actualDuration;
             Assert.That( sut.AbsolutePosition, Is.EqualTo( expectedPosition ).Using( vector3DblApproxComparer ),
@@ -529,6 +530,11 @@ namespace HSP_Tests_PlayMode
             for( int i = 0; i < 100; i++ )
             {
                 yield return new WaitForFixedUpdate();
+                double endTime2 = TimeManager.UT;
+                double actualDuration2 = endTime2 - startTime;
+                // Verify rotation integration (should be 90 degrees around Z axis)
+                QuaternionDbl expectedRotation2 = QuaternionDbl.Euler( testAngularVelocity * (actualDuration2 * 57.29577951308232) );
+                Debug.Log( actualDuration2 + " : " + sut.AbsoluteRotation + " : "  + expectedRotation2 );
 
                 if( TimeManager.UT - startTime >= testDuration )
                 {
@@ -537,9 +543,9 @@ namespace HSP_Tests_PlayMode
             }
             double endTime = TimeManager.UT;
             double actualDuration = endTime - startTime;
-
+            Debug.Log( actualDuration );
             // Verify rotation integration (should be 90 degrees around Z axis)
-            QuaternionDbl expectedRotation = QuaternionDbl.Euler( testAngularVelocity * actualDuration * 57.29577951308232 );
+            QuaternionDbl expectedRotation = QuaternionDbl.Euler( testAngularVelocity * (actualDuration * 57.29577951308232) );
             Assert.That( sut.AbsoluteRotation, Is.EqualTo( expectedRotation ).Using( quaternionDblApproxComparer ),
                 $"{config.TestName}: Rotation should integrate angular velocity over time" );
 

@@ -180,6 +180,8 @@ namespace HSP.CelestialBodies.Surfaces
             TryCreateQuadParentGameObject();
         }
 
+        bool disable = false;
+
         void Update()
         {
             if( PoIGetter == null )
@@ -253,6 +255,7 @@ namespace HSP.CelestialBodies.Surfaces
 
         private void TryRebuild()
         {
+#warning TODO removeme later
             if( UnityEngine.Input.GetKey(KeyCode.F))
             {
                 _canBuild = false;
