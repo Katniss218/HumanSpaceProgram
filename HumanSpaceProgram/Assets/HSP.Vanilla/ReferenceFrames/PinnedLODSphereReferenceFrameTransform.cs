@@ -36,7 +36,7 @@ namespace HSP.Vanilla.ReferenceFrames
                 this.Position = Vector3.zero;
             }
 
-            //LODQuad.ResetPositionAndRotationAll( _quadSphere ); // this (only partially) fixes the desync, but is slow.
+            LODQuad.ResetPositionAndRotationAll( _quadSphere ); // this (only partially) fixes the desync, but is slow.
 
             // with the fix:
             // when one of the quad parents is disabled and reenabled, that quad will start switching at a different time to the quad parents that were not disabled
@@ -56,7 +56,7 @@ namespace HSP.Vanilla.ReferenceFrames
             // If it was, the position of the quad would be the same regardless of where the parent is (within precision limits ofc).
 #warning    CHECK - is the position of the quad in the planet's frame constant? - we need to stop the sphere from rebuilding on liftoff (tie to input key?), otherwise the quad might move/get deleted
             // maybe it's related to the rebuild? hmm, the planet is moving but the quad itself uses old positions or somethin?
-            
+
             // position flickers even without rebuilds and seems shift relative to the planet.
 
             // after the position switches, the next frame seems to be fucked, and the frame after that is alright again?
@@ -71,9 +71,9 @@ namespace HSP.Vanilla.ReferenceFrames
 #warning INFO - timemanager.UT is 0.02 later than the reference frame returned by the scene reference frame provider. which is good, but something is still borked?
                 // maybe one thing uses that frame but the other thing doesn't?
                 // would be nice to have a getter for the 'next' frame as well.
-                //Debug.Log( TimeManager.UT + " : " + scenePosition.magnitude + " : " + (this.ReferencePosition).magnitude );
-                Debug.Log( TimeManager.UT + " : " + bodyPos.magnitude );
-
+                Debug.Log( TimeManager.UT + " : " + scenePosition.magnitude + " : " + (this.ReferencePosition).magnitude + " : " + bodyPos.magnitude );
+                //Debug.Log( TimeManager.UT + " : " + bodyPos.magnitude );
+#warning TODO - except today, it wasn't being fucked... weird.
             }
             // with the fix, the (this.ReferenceTransform.Position - scenePosition).magnitude increases by around 1000 each time the parent is shifted.
             // without the fix, the position is shifted apparently by more than 1000, closer to 2000 but not quite.

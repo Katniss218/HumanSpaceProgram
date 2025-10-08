@@ -93,15 +93,16 @@ namespace HSP_Tests_PlayMode
         /// <summary>
         /// Creates a test scene with TimeManager and ReferenceFrameManager
         /// </summary>
-        static (GameObject manager, TimeManager timeManager, GameplaySceneReferenceFrameManager refFrameManager) CreateTestScene()
+        static (GameObject manager, TimeManager timeManager, GameplaySceneReferenceFrameManager refFrameManager, AssertMonoBehaviour assertMonoBeh) CreateTestScene()
         {
             GameObject manager = new GameObject( "TestManager" );
             TimeManager timeManager = manager.AddComponent<TimeManager>();
             GameplaySceneReferenceFrameManager refFrameManager = manager.AddComponent<GameplaySceneReferenceFrameManager>();
             GameplaySceneReferenceFrameManager.Instance = refFrameManager;
             KinematicReferenceFrameTransform.AddPlayerLoopSystem();
+            var assertMonoBeh = manager.AddComponent<AssertMonoBehaviour>();
 
-            return (manager, timeManager, refFrameManager);
+            return (manager, timeManager, refFrameManager, assertMonoBeh);
         }
 
         /// <summary>
@@ -150,7 +151,7 @@ namespace HSP_Tests_PlayMode
         public IEnumerator ManualPositionSetting_T( TestConfig config )
         {
             // Arrange
-            var (manager, timeManager, refFrameManager) = CreateTestScene();
+            var (manager, timeManager, refFrameManager, assertMonoBeh) = CreateTestScene();
             GameplaySceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredReferenceFrame( TimeManager.UT, Vector3Dbl.zero ) );
 
             yield return new WaitForFixedUpdate();
@@ -197,7 +198,7 @@ namespace HSP_Tests_PlayMode
         public IEnumerator ManualRotationSetting_T( TestConfig config )
         {
             // Arrange
-            var (manager, timeManager, refFrameManager) = CreateTestScene();
+            var (manager, timeManager, refFrameManager, assertMonoBeh) = CreateTestScene();
             GameplaySceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredReferenceFrame( TimeManager.UT, Vector3Dbl.zero ) );
 
             yield return new WaitForFixedUpdate();
@@ -247,7 +248,7 @@ namespace HSP_Tests_PlayMode
         public IEnumerator ManualVelocitySetting_T( TestConfig config )
         {
             // Arrange
-            var (manager, timeManager, refFrameManager) = CreateTestScene();
+            var (manager, timeManager, refFrameManager, assertMonoBeh) = CreateTestScene();
             GameplaySceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredReferenceFrame( TimeManager.UT, Vector3Dbl.zero ) );
 
             yield return new WaitForFixedUpdate();
@@ -297,7 +298,7 @@ namespace HSP_Tests_PlayMode
         public IEnumerator ManualAngularVelocitySetting_T( TestConfig config )
         {
             // Arrange
-            var (manager, timeManager, refFrameManager) = CreateTestScene();
+            var (manager, timeManager, refFrameManager, assertMonoBeh) = CreateTestScene();
             GameplaySceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredReferenceFrame( TimeManager.UT, Vector3Dbl.zero ) );
 
             yield return new WaitForFixedUpdate();
@@ -348,7 +349,7 @@ namespace HSP_Tests_PlayMode
         public IEnumerator ReferenceFrameSwitching_PositionPreservation_T( TestConfig config )
         {
             // Arrange
-            var (manager, timeManager, refFrameManager) = CreateTestScene();
+            var (manager, timeManager, refFrameManager, assertMonoBeh) = CreateTestScene();
             GameplaySceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredReferenceFrame( TimeManager.UT, Vector3Dbl.zero ) );
 
             yield return new WaitForFixedUpdate();
@@ -395,7 +396,7 @@ namespace HSP_Tests_PlayMode
         public IEnumerator ReferenceFrameSwitching_RotationPreservation_T( TestConfig config )
         {
             // Arrange
-            var (manager, timeManager, refFrameManager) = CreateTestScene();
+            var (manager, timeManager, refFrameManager, assertMonoBeh) = CreateTestScene();
             GameplaySceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredReferenceFrame( TimeManager.UT, Vector3Dbl.zero ) );
 
             yield return new WaitForFixedUpdate();
@@ -444,11 +445,16 @@ namespace HSP_Tests_PlayMode
                 }
             }
         }
-#error TODO - needs reference frame switching while integrating too. test that
+#warning TODO - needs reference frame switching while integrating too. test that
+#warning tests for the object reference frame getters too.
+#warning  TODO - assert test every frame instead of only at the end.
+        // maybe using an assert monobehaviour and an assert func?
+        // we need to validate the values inside each update callback function.
+
         public IEnumerator TimeSimulation_VelocityIntegration_T( TestConfig config )
         {
             // Arrange
-            var (manager, timeManager, refFrameManager) = CreateTestScene();
+            var (manager, timeManager, refFrameManager, assertMonoBeh) = CreateTestScene();
             GameplaySceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredReferenceFrame( TimeManager.UT, Vector3Dbl.zero ) );
 
             yield return new WaitForFixedUpdate(); // resumes at the end of fixedupdate, after physicsupdate, right before 'update'
@@ -468,6 +474,23 @@ namespace HSP_Tests_PlayMode
             double startTime = TimeManager.UT;
             double testDuration = 1.0; // 1 second
 
+            assertMonoBeh.TimeProvider = () => TimeManager.OldUT;
+            assertMonoBeh.OnFixedUpdate( ( ut ) =>
+            {
+                double deltaTime = TimeManager.OldUT - startTime;
+                Vector3Dbl expectedPosition = initialPosition + testVelocity * deltaTime;
+                Assert.That( sut.AbsolutePosition, Is.EqualTo( expectedPosition ).Using( vector3DblApproxComparer ),
+                    $"{config.TestName}: OnFixedUpdate - Position should integrate velocity over time" );
+            } );
+            assertMonoBeh.OnUpdate( ( ut ) =>
+            {
+                double deltaTime = TimeManager.UT - startTime;
+                Vector3Dbl expectedPosition = initialPosition + testVelocity * deltaTime;
+                Assert.That( sut.AbsolutePosition, Is.EqualTo( expectedPosition ).Using( vector3DblApproxComparer ),
+                    $"{config.TestName}: OnUpdate - Position should integrate velocity over time" );
+            } );
+            assertMonoBeh.Enable();
+
             // Simulate time passage
             for( int i = 0; i < 100; i++ )
             {
@@ -485,7 +508,8 @@ namespace HSP_Tests_PlayMode
             // Verify position integration
             Vector3Dbl expectedPosition = initialPosition + testVelocity * actualDuration;
             Assert.That( sut.AbsolutePosition, Is.EqualTo( expectedPosition ).Using( vector3DblApproxComparer ),
-                $"{config.TestName}: Position should integrate velocity over time" );
+                $"{config.TestName}: Finish - Position should integrate velocity over time" );
+            assertMonoBeh.Disable();
 
             // Cleanup
             UnityEngine.Object.DestroyImmediate( manager );
@@ -506,7 +530,7 @@ namespace HSP_Tests_PlayMode
         public IEnumerator TimeSimulation_AngularVelocityIntegration_T( TestConfig config )
         {
             // Arrange
-            var (manager, timeManager, refFrameManager) = CreateTestScene();
+            var (manager, timeManager, refFrameManager, assertMonoBeh) = CreateTestScene();
             GameplaySceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredReferenceFrame( TimeManager.UT, Vector3Dbl.zero ) );
 
             yield return new WaitForFixedUpdate();
@@ -572,7 +596,7 @@ namespace HSP_Tests_PlayMode
         public IEnumerator FrameTiming_ValueConsistency_T( TestConfig config )
         {
             // Arrange
-            var (manager, timeManager, refFrameManager) = CreateTestScene();
+            var (manager, timeManager, refFrameManager, assertMonoBeh) = CreateTestScene();
             GameplaySceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredReferenceFrame( TimeManager.UT, Vector3Dbl.zero ) );
 
             yield return new WaitForFixedUpdate();
@@ -629,7 +653,7 @@ namespace HSP_Tests_PlayMode
         public IEnumerator EventFiring_ValueChanges_T( TestConfig config )
         {
             // Arrange
-            var (manager, timeManager, refFrameManager) = CreateTestScene();
+            var (manager, timeManager, refFrameManager, assertMonoBeh) = CreateTestScene();
             GameplaySceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredReferenceFrame( TimeManager.UT, Vector3Dbl.zero ) );
 
             yield return new WaitForFixedUpdate();
@@ -705,7 +729,7 @@ namespace HSP_Tests_PlayMode
         public IEnumerator EdgeCases_ZeroValues_T( TestConfig config )
         {
             // Arrange
-            var (manager, timeManager, refFrameManager) = CreateTestScene();
+            var (manager, timeManager, refFrameManager, assertMonoBeh) = CreateTestScene();
             GameplaySceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredReferenceFrame( TimeManager.UT, Vector3Dbl.zero ) );
 
             yield return new WaitForFixedUpdate();
@@ -753,7 +777,7 @@ namespace HSP_Tests_PlayMode
         public IEnumerator EdgeCases_LargeValues_T( TestConfig config )
         {
             // Arrange
-            var (manager, timeManager, refFrameManager) = CreateTestScene();
+            var (manager, timeManager, refFrameManager, assertMonoBeh) = CreateTestScene();
             GameplaySceneReferenceFrameManager.RequestSceneReferenceFrameSwitch( new CenteredReferenceFrame( TimeManager.UT, Vector3Dbl.zero ) );
 
             yield return new WaitForFixedUpdate();

@@ -202,17 +202,17 @@ namespace HSP.Trajectories
 
             if( instance._simulators[SIMULATOR_INDEX].GetSimulatedInterval().duration == 0 )
             {
-                instance._simulators[SIMULATOR_INDEX].SetInitialTime( TimeManager.UT - TimeManager.FixedDeltaTime );
+                instance._simulators[SIMULATOR_INDEX].SetInitialTime( TimeManager.OldUT );
             }
             if( instance._simulators[PREDICTION_SIMULATOR_INDEX].GetSimulatedInterval().duration == 0 )
             {
-                instance._simulators[PREDICTION_SIMULATOR_INDEX].SetInitialTime( TimeManager.UT - TimeManager.FixedDeltaTime );
+                instance._simulators[PREDICTION_SIMULATOR_INDEX].SetInitialTime( TimeManager.OldUT );
             }
 #warning TODO - the first evaluation starts at 0 and simulates to 0 + deltaTime + duration
             // start = 0.2 - 0.2
             // end = 0.2 + duration
             instance._simulators[SIMULATOR_INDEX].Simulate( TimeManager.UT );
-            instance._simulators[PREDICTION_SIMULATOR_INDEX].Simulate( TimeManager.UT - TimeManager.FixedDeltaTime + FlightPlanDuration );
+            instance._simulators[PREDICTION_SIMULATOR_INDEX].Simulate( TimeManager.OldUT + FlightPlanDuration );
 
             foreach( var trajectoryTransform in instance._transforms )
             {
