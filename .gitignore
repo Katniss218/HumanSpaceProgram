@@ -2,6 +2,5 @@
 
 HumanSpaceProgram/log.txt
 HumanSpaceProgram/settings.json
-HumanSpaceProgram/**/scenario_settings.json
-HumanSpaceProgram/**/timeline_settings.json
-
+HumanSpaceProgram/Saves/
+**/settings_loadingfailed.json
