@@ -1,5 +1,6 @@
 using HSP.ReferenceFrames;
 using HSP.Time;
+using HSP.Vanilla.Scenes.GameplayScene;
 using HSP.Vessels;
 using UnityEngine;
 
@@ -43,7 +44,7 @@ namespace HSP.Vanilla.Scenes.DesignScene
         [HSPEventListener( HSPEvent_DESIGN_SCENE_LOAD.ID, ADD_SCENE_REFERENCE_FRAME_MANAGER )]
         private static void AddSceneReferenceFrameManager()
         {
-            DesignSceneM.Instance.gameObject.AddComponent<SceneReferenceFrameManager>();
+            GameplaySceneReferenceFrameManager.Instance = DesignSceneM.Instance.gameObject.AddComponent<GameplaySceneReferenceFrameManager>();
         }
 
         [HSPEventListener( HSPEvent_DESIGN_SCENE_LOAD.ID, ADD_ACTIVE_OBJECT_MANAGER )]

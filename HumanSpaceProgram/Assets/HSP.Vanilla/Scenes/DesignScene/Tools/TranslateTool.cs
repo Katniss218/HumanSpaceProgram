@@ -120,7 +120,7 @@ namespace HSP.Vanilla.Scenes.DesignScene.Tools
                     c.direction = 2;
                     c.center = new Vector3( 0, 0, c.height / 2 );
                 } );
-            _handles.RaycastCamera = SceneCamera.Camera.GetComponent<Camera>();
+            _handles.RaycastCamera = SceneCamera.GetCamera<DesignSceneM>();
         }
     }
 }

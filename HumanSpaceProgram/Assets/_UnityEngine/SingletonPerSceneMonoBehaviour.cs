@@ -51,7 +51,7 @@ namespace UnityPlus.SceneManagement
             foreach( var newInstance in instances )
             {
                 Scene instanceScene = newInstance.gameObject.scene;
-                if( __instances.ContainsKey( scene ) )
+                if( __instances.TryGetValue( scene, out var x ) && instanceScene == scene && x != newInstance )
                 {
                     throw new SingletonInstanceException( $"Too many instances of {nameof( MonoBehaviour )} {typeof( T ).Name} in scene {instanceScene.name}." );
                 }
@@ -70,6 +70,17 @@ namespace UnityPlus.SceneManagement
             }
 
             return instance;
+        }
+
+        protected static void SetInstance( Scene scene, T value )
+        {
+            // Use with care. Allows custom logic. Allows being set to a nonnull value when another different instance still exists.
+            if( !scene.isLoaded )
+            {
+                throw new System.ArgumentException( "The scene must be loaded.", nameof( scene ) );
+            }
+
+            __instances[scene] = value;
         }
     }
 }

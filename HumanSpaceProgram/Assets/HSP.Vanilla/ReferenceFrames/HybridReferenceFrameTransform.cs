@@ -1,10 +1,7 @@
 ﻿using HSP.ReferenceFrames;
 using HSP.Time;
-using HSP.Vanilla.Scenes.AlwaysLoadedScene;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.LowLevel;
 using UnityEngine.PlayerLoop;
@@ -17,6 +14,21 @@ namespace HSP.Vanilla
     [DisallowMultipleComponent]
     public class HybridReferenceFrameTransform : MonoBehaviour, IReferenceFrameTransform, IPhysicsTransform
     {
+        private ISceneReferenceFrameProvider _sceneReferenceFrameProvider;
+        public ISceneReferenceFrameProvider SceneReferenceFrameProvider
+        {
+            get => _sceneReferenceFrameProvider;
+            set
+            {
+                if( _sceneReferenceFrameProvider == value )
+                    return;
+
+                _sceneReferenceFrameProvider?.UnsubscribeIfSubscribed( this );
+                _sceneReferenceFrameProvider = value;
+                _sceneReferenceFrameProvider?.SubscribeIfNotSubscribed( this );
+            }
+        }
+
         private bool _allowSceneSimulation = false;
         /// <summary>
         /// If true, the object is allowed to simulate using scene space, allowing for collisions, when the position and velocity are within the range allowed for scene space simulation.
@@ -93,7 +105,7 @@ namespace HSP.Vanilla
                 // Set both absolute and rigidbody because the call might happen after physics/fixedupdate.
                 _rb.position = value;
                 transform.position = value;
-                var absolutePos = SceneReferenceFrameManager.ReferenceFrame.InverseTransformPosition( value );
+                var absolutePos = SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformPosition( value );
                 _actualAbsolutePosition = absolutePos;
                 _requestedAbsolutePosition = absolutePos;
 
@@ -107,20 +119,20 @@ namespace HSP.Vanilla
             get
             {
                 if( _isSceneSpace )
-                    return SceneReferenceFrameManager.ReferenceFrame.TransformPosition( _rb.position );
+                    return SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformPosition( _rb.position );
                 else
                     return _actualAbsolutePosition;
             }
             set
             {
-                var scenePos = SceneReferenceFrameManager.ReferenceFrame.InverseTransformPosition( value );
+                var scenePos = SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformPosition( value );
                 if( _isSceneSpace && (Math.Abs( scenePos.x ) > PositionRange || Math.Abs( scenePos.y ) > PositionRange || Math.Abs( scenePos.z ) > PositionRange) )
                 {
                     SwitchToAbsoluteMode();
                 }
                 _actualAbsolutePosition = value;
                 _requestedAbsolutePosition = value;
-                ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, value );
+                ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, value );
 
                 OnAbsolutePositionChanged?.Invoke();
                 OnAnyValueChanged?.Invoke();
@@ -135,7 +147,7 @@ namespace HSP.Vanilla
                 // Set both absolute and rigidbody because the call might happen after physics/fixedupdate.
                 _rb.rotation = value;
                 transform.rotation = value;
-                var absoluteRot = SceneReferenceFrameManager.ReferenceFrame.InverseTransformRotation( value );
+                var absoluteRot = SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformRotation( value );
                 _actualAbsoluteRotation = absoluteRot;
                 _requestedAbsoluteRotation = absoluteRot;
 
@@ -149,7 +161,7 @@ namespace HSP.Vanilla
             get
             {
                 if( _isSceneSpace )
-                    return SceneReferenceFrameManager.ReferenceFrame.TransformRotation( this.gameObject.activeInHierarchy ? _rb.rotation : transform.rotation ); // Apparently, rigidbody.rotation gets set to identity when disabled...
+                    return SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformRotation( this.gameObject.activeInHierarchy ? _rb.rotation : transform.rotation ); // Apparently, rigidbody.rotation gets set to identity when disabled...
                 else
                     return _actualAbsoluteRotation;
             }
@@ -157,7 +169,7 @@ namespace HSP.Vanilla
             {
                 _actualAbsoluteRotation = value;
                 _requestedAbsoluteRotation = value;
-                ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, value );
+                ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, value );
 
                 OnAbsoluteRotationChanged?.Invoke();
                 OnAnyValueChanged?.Invoke();
@@ -176,7 +188,7 @@ namespace HSP.Vanilla
 
                 if( _isSceneSpace )
                     _rb.velocity = value;
-                _absoluteVelocity = SceneReferenceFrameManager.ReferenceFrame.InverseTransformVelocity( value );
+                _absoluteVelocity = SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformVelocity( value );
 
                 OnAbsoluteVelocityChanged?.Invoke();
                 OnAnyValueChanged?.Invoke();
@@ -188,13 +200,13 @@ namespace HSP.Vanilla
             get
             {
                 if( _isSceneSpace )
-                    return SceneReferenceFrameManager.ReferenceFrame.TransformVelocity( _rb.velocity );
+                    return SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformVelocity( _rb.velocity );
                 else
                     return _absoluteVelocity;
             }
             set
             {
-                var sceneVel = SceneReferenceFrameManager.ReferenceFrame.InverseTransformVelocity( value );
+                var sceneVel = SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformVelocity( value );
                 if( _isSceneSpace && (Math.Abs( sceneVel.x ) > VelocityRange || Math.Abs( sceneVel.y ) > VelocityRange || Math.Abs( sceneVel.z ) > VelocityRange) )
                 {
                     SwitchToAbsoluteMode();
@@ -202,7 +214,7 @@ namespace HSP.Vanilla
 
                 _absoluteVelocity = value;
                 if( _isSceneSpace )
-                    ReferenceFrameTransformUtils.SetSceneVelocityFromAbsolute( _rb, value );
+                    ReferenceFrameTransformUtils.SetSceneVelocityFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), _rb, value );
 
                 OnAbsoluteVelocityChanged?.Invoke();
                 OnAnyValueChanged?.Invoke();
@@ -216,7 +228,7 @@ namespace HSP.Vanilla
             {
                 if( _isSceneSpace )
                     _rb.angularVelocity = value;
-                _absoluteAngularVelocity = SceneReferenceFrameManager.ReferenceFrame.InverseTransformAngularVelocity( value );
+                _absoluteAngularVelocity = SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformAngularVelocity( value );
 
                 OnAbsoluteAngularVelocityChanged?.Invoke();
                 OnAnyValueChanged?.Invoke();
@@ -228,7 +240,7 @@ namespace HSP.Vanilla
             get
             {
                 if( _isSceneSpace )
-                    return SceneReferenceFrameManager.ReferenceFrame.TransformAngularVelocity( _rb.angularVelocity );
+                    return SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAngularVelocity( _rb.angularVelocity );
                 else
                     return _absoluteAngularVelocity;
             }
@@ -236,16 +248,16 @@ namespace HSP.Vanilla
             {
                 _absoluteAngularVelocity = value;
                 if( _isSceneSpace )
-                    ReferenceFrameTransformUtils.SetSceneAngularVelocityFromAbsolute( _rb, value );
+                    ReferenceFrameTransformUtils.SetSceneAngularVelocityFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), _rb, value );
 
                 OnAbsoluteAngularVelocityChanged?.Invoke();
                 OnAnyValueChanged?.Invoke();
             }
         }
 
-        public Vector3 Acceleration => (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformAcceleration( _absoluteAcceleration );
+        public Vector3 Acceleration => (Vector3)SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformAcceleration( _absoluteAcceleration );
         public Vector3Dbl AbsoluteAcceleration => _absoluteAcceleration;
-        public Vector3 AngularAcceleration => (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformAngularAcceleration( _absoluteAngularAcceleration );
+        public Vector3 AngularAcceleration => (Vector3)SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformAngularAcceleration( _absoluteAngularAcceleration );
         public Vector3Dbl AbsoluteAngularAcceleration => _absoluteAngularAcceleration;
 
         public event Action OnAbsolutePositionChanged;
@@ -291,7 +303,7 @@ namespace HSP.Vanilla
 
         public void AddForce( Vector3 force )
         {
-            _absoluteAcceleration += SceneReferenceFrameManager.ReferenceFrame.TransformAcceleration( (Vector3Dbl)force / Mass );
+            _absoluteAcceleration += SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAcceleration( (Vector3Dbl)force / Mass );
 
             if( _isSceneSpace )
             {
@@ -303,8 +315,9 @@ namespace HSP.Vanilla
         {
             Vector3 leverArm = position - this._rb.worldCenterOfMass;
             Vector3Dbl torque = Vector3Dbl.Cross( force, leverArm );
-            _absoluteAcceleration += SceneReferenceFrameManager.ReferenceFrame.TransformAcceleration( (Vector3Dbl)force / Mass );
-            _absoluteAngularAcceleration += SceneReferenceFrameManager.ReferenceFrame.TransformAngularAcceleration( torque / this.GetInertia( torque.NormalizeToVector3() ) );
+            _absoluteAcceleration += SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAcceleration( (Vector3Dbl)force / Mass );
+            if( torque.magnitude != 0 )
+                _absoluteAngularAcceleration += SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAngularAcceleration( torque / this.GetInertia( torque.NormalizeToVector3() ) );
 
             if( _isSceneSpace )
             {
@@ -314,7 +327,7 @@ namespace HSP.Vanilla
 
         public void AddTorque( Vector3 torque )
         {
-            _absoluteAngularAcceleration += SceneReferenceFrameManager.ReferenceFrame.TransformAngularAcceleration( (Vector3Dbl)torque / this.GetInertia( torque.normalized ) );
+            _absoluteAngularAcceleration += SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAngularAcceleration( (Vector3Dbl)torque / this.GetInertia( torque.normalized ) );
 
             if( _isSceneSpace )
             {
@@ -324,7 +337,7 @@ namespace HSP.Vanilla
 
         private void SwitchToAbsoluteMode()
         {
-            IReferenceFrame sceneReferenceFrame = SceneReferenceFrameManager.ReferenceFrame;
+            IReferenceFrame sceneReferenceFrame = SceneReferenceFrameProvider.GetSceneReferenceFrame();
 
             _absoluteVelocity = sceneReferenceFrame.TransformVelocity( _rb.velocity );
             _actualAbsolutePosition = sceneReferenceFrame.TransformPosition( _rb.position );
@@ -341,7 +354,7 @@ namespace HSP.Vanilla
 
         private void SwitchToSceneMode()
         {
-            IReferenceFrame sceneReferenceFrame = SceneReferenceFrameManager.ReferenceFrame;
+            IReferenceFrame sceneReferenceFrame = SceneReferenceFrameProvider.GetSceneReferenceFrame();
 
             _isSceneSpace = true;
             _rb.isKinematic = false;
@@ -359,7 +372,7 @@ namespace HSP.Vanilla
         {
             if( this.HasComponentOtherThan<IReferenceFrameTransform>( this ) )
             {
-                Debug.LogWarning( $"Tried to add a {nameof( HybridReferenceFrameTransform )} to a game object that already has a {nameof( IReferenceFrameTransform )}. This is not allowed. Remove the previous physics object first." );
+                Debug.LogWarning( $"Tried to add a {this.GetType().Name} to a game object that already has a {nameof( IReferenceFrameTransform )}. This is not allowed. Remove the previous physics object first." );
                 Destroy( this );
                 return;
             }
@@ -368,6 +381,8 @@ namespace HSP.Vanilla
             _rb.collisionDetectionMode = CollisionDetectionMode.Discrete; // Continuous (in any of its flavors) "jumps" when sitting on top of something when reference frame switches.
             _rb.interpolation = RigidbodyInterpolation.None; // DO NOT INTERPOLATE. Doing so will desync `rigidbody.position` and `transform.position`.
             _rb.isKinematic = !_isSceneSpace;
+            _rb.drag = 0;
+            _rb.angularDrag = 0;
         }
 
         void FixedUpdate()
@@ -380,7 +395,7 @@ namespace HSP.Vanilla
                     Vector3 sceneVel = _rb.velocity;
 
                     if( Mathf.Abs( scenePos.x ) > PositionRange || Mathf.Abs( scenePos.y ) > PositionRange || Mathf.Abs( scenePos.z ) > PositionRange
-                     || Mathf.Abs( sceneVel.x ) > PositionRange || Mathf.Abs( sceneVel.y ) > PositionRange || Mathf.Abs( sceneVel.z ) > PositionRange
+                     || Mathf.Abs( sceneVel.x ) > VelocityRange || Mathf.Abs( sceneVel.y ) > VelocityRange || Mathf.Abs( sceneVel.z ) > VelocityRange
                      || TimeManager.TimeScale > MaxTimeScale )
                     {
                         SwitchToAbsoluteMode();
@@ -388,11 +403,16 @@ namespace HSP.Vanilla
                 }
                 else
                 {
-                    Vector3 scenePos = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformPosition( _actualAbsolutePosition );
-                    Vector3 sceneVel = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformVelocity( _absoluteVelocity );
+                    var frame = SceneReferenceFrameProvider.GetSceneReferenceFrame();
+                    Vector3 scenePos = (Vector3)frame.InverseTransformPosition( _actualAbsolutePosition );
+                    Vector3 sceneVel = (Vector3)frame.InverseTransformVelocity( _absoluteVelocity );
 
+                    if( _absoluteVelocity.magnitude < 1000 )
+                    {
+                        Debug.Log( _absoluteVelocity );
+                    }
                     if( Mathf.Abs( scenePos.x ) <= PositionRange && Mathf.Abs( scenePos.y ) <= PositionRange && Mathf.Abs( scenePos.z ) <= PositionRange
-                     && Mathf.Abs( sceneVel.x ) <= PositionRange && Mathf.Abs( sceneVel.y ) <= PositionRange && Mathf.Abs( sceneVel.z ) <= PositionRange
+                     && Mathf.Abs( sceneVel.x ) <= VelocityRange && Mathf.Abs( sceneVel.y ) <= VelocityRange && Mathf.Abs( sceneVel.z ) <= VelocityRange
                      && TimeManager.TimeScale <= MaxTimeScale )
                     {
                         SwitchToSceneMode();
@@ -402,7 +422,7 @@ namespace HSP.Vanilla
 
             if( _isSceneSpace )
             {
-                if( SceneReferenceFrameManager.ReferenceFrame is INonInertialReferenceFrame frame )
+                if( SceneReferenceFrameProvider.GetSceneReferenceFrame() is INonInertialReferenceFrame frame )
                 {
                     Vector3Dbl localPos = frame.InverseTransformPosition( this.AbsolutePosition );
                     Vector3Dbl localVel = this.Velocity;
@@ -416,7 +436,7 @@ namespace HSP.Vanilla
             }
             else
             {
-                IReferenceFrame sceneReferenceFrameAfterPhysicsProcessing = SceneReferenceFrameManager.ReferenceFrame.AtUT( TimeManager.UT );
+                IReferenceFrame sceneReferenceFrameAfterPhysicsProcessing = SceneReferenceFrameProvider.GetSceneReferenceFrame().AtUT( TimeManager.UT );
 
                 // `_actualAbsolutePosition` should be up to date due to the callback inside physics step, which was invoked in the previous frame.
 
@@ -444,39 +464,41 @@ namespace HSP.Vanilla
                 _absoluteAngularVelocity = sceneReferenceFrame.TransformAngularVelocity( _rb.angularVelocity );
 
                 if( Mathf.Abs( scenePos.x ) > PositionRange || Mathf.Abs( scenePos.y ) > PositionRange || Mathf.Abs( scenePos.z ) > PositionRange
-                 || Mathf.Abs( sceneVel.x ) > PositionRange || Mathf.Abs( sceneVel.y ) > PositionRange || Mathf.Abs( sceneVel.z ) > PositionRange )
+                 || Mathf.Abs( sceneVel.x ) > VelocityRange || Mathf.Abs( sceneVel.y ) > VelocityRange || Mathf.Abs( sceneVel.z ) > VelocityRange )
                 {
                     SwitchToAbsoluteMode();
                 }
 
-                ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, _actualAbsolutePosition, data.NewFrame );
-                ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, _actualAbsoluteRotation );
-                ReferenceFrameTransformUtils.SetSceneVelocityFromAbsolute( _rb, _absoluteVelocity );
-                ReferenceFrameTransformUtils.SetSceneAngularVelocityFromAbsolute( _rb, _absoluteAngularVelocity );
+                ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( data.NewFrame, transform, _rb, _actualAbsolutePosition );
+                ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( data.NewFrame, transform, _rb, _actualAbsoluteRotation );
+                ReferenceFrameTransformUtils.SetSceneVelocityFromAbsolute( data.NewFrame, _rb, _absoluteVelocity );
+                ReferenceFrameTransformUtils.SetSceneAngularVelocityFromAbsolute( data.NewFrame, _rb, _absoluteAngularVelocity );
             }
             else
             {
                 Vector3Dbl absolutePosition = this.AbsolutePosition;
-                Vector3 scenePos = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformPosition( absolutePosition );
+                Vector3 scenePos = (Vector3)SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformPosition( absolutePosition );
                 _rb.position = scenePos;
                 transform.position = scenePos;
                 _actualAbsolutePosition = absolutePosition;
 
                 QuaternionDbl absoluteRotation = this.AbsoluteRotation;
-                Quaternion sceneRot = (Quaternion)SceneReferenceFrameManager.ReferenceFrame.InverseTransformRotation( absoluteRotation );
+                Quaternion sceneRot = (Quaternion)SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformRotation( absoluteRotation );
                 _rb.rotation = sceneRot;
                 transform.rotation = sceneRot;
                 _actualAbsoluteRotation = absoluteRotation;
             }
         }
 
-        void OnEnable()
+        protected virtual void OnEnable()
         {
+            _sceneReferenceFrameProvider?.SubscribeIfNotSubscribed( this );
             _activeHybridTransforms.Add( this );
         }
 
-        void OnDisable()
+        protected virtual void OnDisable()
         {
+            _sceneReferenceFrameProvider?.UnsubscribeIfSubscribed( this );
             _activeHybridTransforms.Remove( this );
         }
 
@@ -545,7 +567,7 @@ namespace HSP.Vanilla
         public static SerializationMapping HybridReferenceFrameTransformMapping()
         {
             return new MemberwiseSerializationMapping<HybridReferenceFrameTransform>()
-                //.WithMember( "allow_scene_simulation", o => o.AllowSceneSimulation )
+                .WithMember( "scene_reference_frame_provider", o => o.SceneReferenceFrameProvider )
                 .WithMember( "allow_scene_simulation", o =>
                 {
                     return o.AllowSceneSimulation;

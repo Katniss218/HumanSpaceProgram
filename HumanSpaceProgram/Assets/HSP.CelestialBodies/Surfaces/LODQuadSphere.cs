@@ -14,7 +14,7 @@ namespace HSP.CelestialBodies.Surfaces
     /// <summary>
     /// Adds a solid surface to a celestial body.
     /// </summary>
-    [RequireComponent( typeof( CelestialBody ) )]
+    [RequireComponent( typeof( ICelestialBody ) )]
     public sealed class LODQuadSphere : MonoBehaviour
     {
         int _edgeSubdivisions = 4;
@@ -65,7 +65,7 @@ namespace HSP.CelestialBodies.Surfaces
         /// <summary>
         /// Gets the celestial body that this LOD sphere belongs to.
         /// </summary>
-        public CelestialBody CelestialBody { get; private set; }
+        public ICelestialBody CelestialBody { get; private set; }
 
         /// <summary>
         /// The object that the built quads are parented to.
@@ -76,6 +76,20 @@ namespace HSP.CelestialBodies.Surfaces
         /// Specifies how the quads of this LOD sphere behaves.
         /// </summary>
         public LODQuadMode Mode { get; private set; }
+
+        private Layer _layer = Layer.DEFAULT;
+        public Layer Layer
+        {
+            get => _layer;
+            set
+            {
+                if( IsBuilding )
+                    throw new InvalidOperationException( $"Can't set {nameof( Layer )} of a LOD sphere while it's building." );
+
+                _layer = value;
+                ClearAllQuads();
+            }
+        }
 
         /// <remarks>
         /// Calling this method will force a rebuild.
@@ -89,6 +103,9 @@ namespace HSP.CelestialBodies.Surfaces
             ClearAllQuads();
         }
 
+        /// <summary>
+        /// Gets all jobs assigned to this LODQuadSphere, regardless of filtering.
+        /// </summary>
         public ILODQuadModifier[][] Jobs { get; private set; }
 
         /// <summary>
@@ -135,9 +152,9 @@ namespace HSP.CelestialBodies.Surfaces
             set
             {
                 _materials = value;
-                foreach( var lod in _currentQuads )
+                foreach( var lod in CurrentQuads.Values )
                 {
-                    lod.Value.Quad.ResetMaterial();
+                    lod.Quad.ResetMaterial();
                 }
             }
         }
@@ -154,8 +171,7 @@ namespace HSP.CelestialBodies.Surfaces
 
         void Awake()
         {
-            // Possibly move this to a child, so it can be disabled without disabling entire CB.
-            CelestialBody = this.GetComponent<CelestialBody>();
+            CelestialBody = this.GetComponent<ICelestialBody>();
         }
 
         void Start()
@@ -164,11 +180,13 @@ namespace HSP.CelestialBodies.Surfaces
             TryCreateQuadParentGameObject();
         }
 
+        bool disable = false;
+
         void Update()
         {
             if( PoIGetter == null )
             {
-                Debug.LogWarning( $"The {nameof( PoIGetter )} is null." );
+                Debug.LogWarning( $"The {nameof( PoIGetter )} is null on celestial body '{CelestialBody.ID}'." );
                 return;
             }
 
@@ -186,6 +204,7 @@ namespace HSP.CelestialBodies.Surfaces
         void OnDestroy()
         {
             _builder?.Dispose();
+            _builder = null;
             foreach( var oldRebuildData in _currentQuads.Values )
             {
                 oldRebuildData.Dispose();
@@ -206,7 +225,8 @@ namespace HSP.CelestialBodies.Surfaces
             if( IsBuilding )
             {
                 _builder.Dispose();
-                Debug.LogWarning( $"{nameof( LODQuadSphere )} on celestial body '{CelestialBody.ID}' was disabled while building." );
+                _builder = null; // Important to avoid double disposal on scene unloads.
+                Debug.LogWarning( $"{nameof( LODQuadSphere )} on celestial body '{CelestialBody.ID}' was disabled while building. This is usually the case when unloading a scene." );
             }
         }
 
@@ -222,17 +242,27 @@ namespace HSP.CelestialBodies.Surfaces
 
         private void ClearAllQuads()
         {
-            foreach( var kvp in _currentQuads )
+            foreach( var quad in _currentQuads.Values )
             {
-                Destroy( kvp.Value.Quad );
-                kvp.Value.Dispose();
+                Destroy( quad.Quad );
+                quad.Dispose();
             }
             _currentQuads.Clear();
             _currentTree = new LODQuadTree( MaxDepth );
         }
 
+        bool _canBuild = true;
+
         private void TryRebuild()
         {
+#warning TODO removeme later
+            if( UnityEngine.Input.GetKey(KeyCode.F))
+            {
+                _canBuild = false;
+            }
+            if( !_canBuild )
+                return;
+
             if( _builder != null )
                 throw new InvalidOperationException( $"Tried to start building while already building." );
             if( PoIGetter == null )
@@ -382,6 +412,7 @@ namespace HSP.CelestialBodies.Surfaces
         public static SerializationMapping LODQuadSphereMapping()
         {
             return new MemberwiseSerializationMapping<LODQuadSphere>()
+                .WithMember( "layer", o => o.Layer )
                 .WithMember( "mode", o => o.Mode )
                 .WithMember( "edge_subdivisions", o => o.EdgeSubdivisions )
                 .WithMember( "max_depth", o => o.MaxDepth )

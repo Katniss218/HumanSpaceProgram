@@ -24,7 +24,7 @@ namespace HSP.CelestialBodies.Surfaces
         /// <summary>
         /// The radius of the celestial body.
         /// </summary>
-        public CelestialBody CelestialBody { get; private set; }
+        public ICelestialBody CelestialBody { get; private set; }
 
         /// <summary>
         /// The number of vertices per side.
@@ -93,6 +93,7 @@ namespace HSP.CelestialBodies.Surfaces
         public void Dispose()
         {
             // Don't dispose of the ResultMesh because it's owned by the quad.
+            // Known bug: This sometimes throws an exception when unloading the scene because the scene unload code runs first and deallocates the nativearrays.
 
             ResultVertices.Dispose();
             ResultNormals.Dispose();

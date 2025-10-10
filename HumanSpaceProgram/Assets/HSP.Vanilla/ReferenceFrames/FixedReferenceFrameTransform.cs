@@ -1,8 +1,6 @@
-﻿using HSP.CelestialBodies;
-using HSP.ReferenceFrames;
+﻿using HSP.ReferenceFrames;
 using HSP.Time;
 using System;
-using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
 
@@ -13,8 +11,23 @@ namespace HSP.Vanilla
     /// </summary>
     [RequireComponent( typeof( Rigidbody ) )]
     [DisallowMultipleComponent]
-    public class FixedReferenceFrameTransform : MonoBehaviour, IReferenceFrameTransform, IPhysicsTransform
+    public sealed class FixedReferenceFrameTransform : MonoBehaviour, IReferenceFrameTransform, IPhysicsTransform
     {
+        private ISceneReferenceFrameProvider _sceneReferenceFrameProvider;
+        public ISceneReferenceFrameProvider SceneReferenceFrameProvider
+        {
+            get => _sceneReferenceFrameProvider;
+            set
+            {
+                if( _sceneReferenceFrameProvider == value )
+                    return;
+
+                _sceneReferenceFrameProvider?.UnsubscribeIfSubscribed( this );
+                _sceneReferenceFrameProvider = value;
+                _sceneReferenceFrameProvider?.SubscribeIfNotSubscribed( this );
+            }
+        }
+
         Vector3Dbl _absolutePosition = Vector3Dbl.zero;
         QuaternionDbl _absoluteRotation = QuaternionDbl.identity;
 
@@ -27,9 +40,9 @@ namespace HSP.Vanilla
             }
             set
             {
-                this._absolutePosition = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( value );
+                this._absolutePosition = SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformPosition( value );
                 MakeCacheInvalid();
-                ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, _absolutePosition );
+                ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, _absolutePosition );
                 OnAbsolutePositionChanged?.Invoke();
                 OnAnyValueChanged?.Invoke();
             }
@@ -42,7 +55,7 @@ namespace HSP.Vanilla
             {
                 _absolutePosition = value;
                 MakeCacheInvalid();
-                ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, value );
+                ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, value );
                 OnAbsolutePositionChanged?.Invoke();
                 OnAnyValueChanged?.Invoke();
             }
@@ -57,9 +70,9 @@ namespace HSP.Vanilla
             }
             set
             {
-                this._absoluteRotation = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( value );
+                this._absoluteRotation = SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformRotation( value );
                 MakeCacheInvalid();
-                ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, _absoluteRotation );
+                ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, _absoluteRotation );
                 OnAbsoluteRotationChanged?.Invoke();
                 OnAnyValueChanged?.Invoke();
             }
@@ -72,7 +85,7 @@ namespace HSP.Vanilla
             {
                 _absoluteRotation = value;
                 MakeCacheInvalid();
-                ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, value );
+                ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, value );
                 OnAbsoluteRotationChanged?.Invoke();
                 OnAnyValueChanged?.Invoke();
             }
@@ -230,8 +243,8 @@ namespace HSP.Vanilla
             if( IsCacheValid() )
                 return;
 
-            MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame );
-            RecalculateCache( SceneReferenceFrameManager.ReferenceFrame );
+            MoveScenePositionAndRotation( SceneReferenceFrameProvider.GetSceneReferenceFrame() );
+            RecalculateCache( SceneReferenceFrameProvider.GetSceneReferenceFrame() );
             MakeCacheValid();
         }
 
@@ -247,7 +260,7 @@ namespace HSP.Vanilla
         // Exact comparison of the axes catches the most cases (and it's gonna be set to match exactly so it's okay)
         // Vector3's `==` operator does approximate comparison.
         private bool IsCacheValid() => (_rb.position.x == _oldPosition.x && _rb.position.y == _oldPosition.y && _rb.position.z == _oldPosition.z)
-            && SceneReferenceFrameManager.ReferenceFrame.EqualsIgnoreUT( _cachedSceneReferenceFrame );
+            && SceneReferenceFrameProvider.GetSceneReferenceFrame().EqualsIgnoreUT( _cachedSceneReferenceFrame );
 
         private void MakeCacheValid() => _oldPosition = _rb.position;
 
@@ -257,7 +270,7 @@ namespace HSP.Vanilla
         {
             if( this.HasComponentOtherThan<IReferenceFrameTransform>( this ) )
             {
-                Debug.LogWarning( $"Tried to add a {nameof( FixedReferenceFrameTransform )} to a game object that already has a {nameof( IReferenceFrameTransform )}. This is not allowed. Remove the previous physics object first." );
+                Debug.LogWarning( $"Tried to add a {this.GetType().Name} to a game object that already has a {nameof( IReferenceFrameTransform )}. This is not allowed. Remove the previous physics object first." );
                 Destroy( this );
                 return;
             }
@@ -266,29 +279,33 @@ namespace HSP.Vanilla
             _rb.collisionDetectionMode = CollisionDetectionMode.Discrete;
             _rb.interpolation = RigidbodyInterpolation.None; // DO NOT INTERPOLATE. Doing so will desync `rigidbody.position` and `transform.position`.
             _rb.isKinematic = true;
+            _rb.drag = 0;
+            _rb.angularDrag = 0;
         }
 
         void FixedUpdate()
         {
-            MoveScenePositionAndRotation( SceneReferenceFrameManager.ReferenceFrame.AtUT( TimeManager.UT ) ); // Move, because the scene might be moving, and move ensures that the body is swept instead of teleported.
+            MoveScenePositionAndRotation( SceneReferenceFrameProvider.GetSceneReferenceFrame().AtUT( TimeManager.UT ) ); // Move, because the scene might be moving, and move ensures that the body is swept instead of teleported.
         }
 
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
 #warning TODO - let the ReferenceFrameTransformUtils.SetScenePositionFromAbsolute use a custom frame. It's equal, but it would be better to use the event data.
             // This one is already idempotent as it simply recalculates the same absolute values to scene space.
-            ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, _absolutePosition, data.NewFrame );
-            ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, _absoluteRotation );
+            ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( data.NewFrame, transform, _rb, _absolutePosition );
+            ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( data.NewFrame, transform, _rb, _absoluteRotation );
             RecalculateCache( data.NewFrame );
         }
 
         void OnEnable()
         {
+            _sceneReferenceFrameProvider?.SubscribeIfNotSubscribed( this );
             _rb.isKinematic = true; // Force kinematic.
         }
 
         void OnDisable()
         {
+            _sceneReferenceFrameProvider?.UnsubscribeIfSubscribed( this );
             _rb.isKinematic = true;
         }
 
@@ -316,6 +333,7 @@ namespace HSP.Vanilla
         public static SerializationMapping FixedPhysicsObjectMapping()
         {
             return new MemberwiseSerializationMapping<FixedReferenceFrameTransform>()
+                .WithMember( "scene_reference_frame_provider", o => o.SceneReferenceFrameProvider )
                 .WithMember( "mass", o => o.Mass )
                 .WithMember( "local_center_of_mass", o => o.LocalCenterOfMass )
 

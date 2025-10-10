@@ -61,12 +61,29 @@ namespace HSP.CelestialBodies.Surfaces
         {
 #warning TODO - when activated, the position is sometimes wrong. The position of the parent transform looks alright, but the quads are fucked relative to it.
             IReferenceFrame bodyReferenceFrame = QuadSphere.CelestialBody.ReferenceFrameTransform.OrientedInertialReferenceFrame();
+            IReferenceFrame sceneReferenceFrame = QuadSphere.CelestialBody.ReferenceFrameTransform.SceneReferenceFrameProvider.GetSceneReferenceFrame();
 
-            Vector3Dbl airfPos = bodyReferenceFrame.TransformPosition( Node.SphereCenter * QuadSphere.CelestialBody.Radius );
-            QuaternionDbl airfRot = bodyReferenceFrame.TransformRotation( QuaternionDbl.identity );
+            ResetPositionAndRotationImpl( bodyReferenceFrame, sceneReferenceFrame );
+        }
 
-            Vector3 scenePos = (Vector3)SceneReferenceFrameManager.ReferenceFrame.InverseTransformPosition( airfPos );
-            Quaternion sceneRot = (Quaternion)SceneReferenceFrameManager.ReferenceFrame.InverseTransformRotation( airfRot );
+        public static void ResetPositionAndRotationAll( LODQuadSphere quadSphere )
+        {
+            IReferenceFrame bodyReferenceFrame = quadSphere.CelestialBody.ReferenceFrameTransform.OrientedInertialReferenceFrame();
+            IReferenceFrame sceneReferenceFrame = quadSphere.CelestialBody.ReferenceFrameTransform.SceneReferenceFrameProvider.GetSceneReferenceFrame();
+
+            foreach( var node in quadSphere.CurrentQuads.Values )
+            {
+                node.Quad.ResetPositionAndRotationImpl( bodyReferenceFrame, sceneReferenceFrame );
+            }
+        }
+
+        private void ResetPositionAndRotationImpl( IReferenceFrame bodyReferenceFrame, IReferenceFrame sceneReferenceFrame )
+        {
+            Vector3Dbl absolutePos = bodyReferenceFrame.TransformPosition( Node.SphereCenter * QuadSphere.CelestialBody.Radius );
+            QuaternionDbl absoluteRot = bodyReferenceFrame.TransformRotation( QuaternionDbl.identity );
+
+            Vector3 scenePos = (Vector3)sceneReferenceFrame.InverseTransformPosition( absolutePos );
+            Quaternion sceneRot = (Quaternion)sceneReferenceFrame.InverseTransformRotation( absoluteRot );
 
             this.transform.SetPositionAndRotation( scenePos, sceneRot );
         }
@@ -78,6 +95,7 @@ namespace HSP.CelestialBodies.Surfaces
             gameObject.transform.localRotation = Quaternion.identity;
             gameObject.transform.localScale = Vector3.one;
             gameObject.transform.SetParent( sphere.QuadParent, false );
+            gameObject.SetLayer( (int)sphere.Layer );
             gameObject.SetActive( false );
 
             LODQuad lodQuad = gameObject.AddComponent<LODQuad>();

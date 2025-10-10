@@ -1,5 +1,4 @@
 ﻿using HSP.CelestialBodies;
-using HSP.ReferenceFrames;
 using HSP.ResourceFlow;
 using HSP.Time;
 using HSP.Vessels;
@@ -252,7 +251,7 @@ namespace HSP.Vanilla.Components
             if( vessel != null )
             {
                 Vector3Dbl airfAcceleration = GravityUtils.GetNBodyGravityAcceleration( vessel.ReferenceFrameTransform.AbsolutePosition );
-                Vector3 sceneAcceleration = SceneReferenceFrameManager.ReferenceFrame.InverseTransformDirection( (Vector3)airfAcceleration );
+                Vector3 sceneAcceleration = vessel.ReferenceFrameTransform.SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformDirection( (Vector3)airfAcceleration );
                 Vector3 vesselAcceleration = vessel.ReferenceFrameTransform.Acceleration;
 
                 // acceleration due to external forces (gravity) minus the acceleration of the vessel.

@@ -1,5 +1,6 @@
 using HSP.Vanilla.Scenes.GameplayScene;
 using UnityEngine;
+using UnityPlus.AssetManagement;
 
 namespace HSP.Vanilla.Scenes.DesignScene.Cameras
 {
@@ -66,6 +67,10 @@ namespace HSP.Vanilla.Scenes.DesignScene.Cameras
 
             _uiCamera.nearClipPlane = (float)MathD.Map( zoomDist, MIN_ZOOM_DISTANCE, NEAR_CUTOFF_DISTANCE, 0.5f, 100f );
             _uiCamera.farClipPlane = (float)MathD.Map( zoomDist, MIN_ZOOM_DISTANCE, NEAR_CUTOFF_DISTANCE, 0.5f * 10000f, 100f * 10000f );
+
+            _nearCamera.eventMask = 0; // Setting eventMask = 0 stops the annoying mouse event errors when the camera is far away from scene origin.
+            _effectCamera.eventMask = 0;
+            _uiCamera.eventMask = 0;
 
             if( this.transform.position.magnitude > NEAR_CUTOFF_DISTANCE )
             {
@@ -162,6 +167,9 @@ namespace HSP.Vanilla.Scenes.DesignScene.Cameras
 
             cameraController.CameraParent = cameraParentGameObject.transform;
             cameraController.ZoomDist = 5f;
+
+            Skybox skybox = nearCameraGameObject.AddComponent<Skybox>();
+            skybox.material = AssetRegistry.Get<Material>( "builtin::HSP._DevUtils/skybox" );
 
             _cameraPivot.SetActive( false );
         }

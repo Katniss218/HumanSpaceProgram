@@ -41,6 +41,10 @@ namespace UnityEngine
                 }
                 return __instance;
             }
+            set // Use with care. Allows custom logic. Allows being set to a nonnull value when another different instance still exists.
+            {
+                __instance = value;
+            }
         }
 
         /// <summary>

@@ -1,30 +1,66 @@
-﻿using HSP.ReferenceFrames;
-using HSP.Time;
-using HSP.Vanilla;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace HSP_Tests_PlayMode
 {
     public class AssertMonoBehaviour : MonoBehaviour
     {
-        public IReferenceFrameTransform sut;
+        public Func<double> TimeProvider;
 
-        void FixedUpdate()
+        List<Action<double>> _onFixedUpdate = new();
+        List<Action<double>> _onUpdate = new();
+
+        private bool _enabled = false;
+
+        public void OnFixedUpdate( Action<double> action )
         {
-            if( sut == null )
-                return;
-
-            Debug.Log( TimeManager.UT + " - " + sut.Position + " : " + sut.AbsolutePosition );
+            _onFixedUpdate.Add( action );
+        }
+        public void OnUpdate( Action<double> action )
+        {
+            _onUpdate.Add( action );
         }
 
-#warning TODO - make a list of delegates that will assert, that will be called at different times
-        // asserts should use the current time to verify they know what values they should have.
-        // the time since start (unityengine.time.time) can be used to cross check.
-        // expected values at each time can be baked into the delegates in the lambda closure.
+        public void Enable()
+        {
+            _enabled = true;
+        }
+        public void Disable()
+        {
+            _enabled = false;
+        }
+
+        private void Awake()
+        {
+            if( TimeProvider == null )
+            {
+                TimeProvider = () => UnityEngine.Time.time;
+            }
+        }
+
+        private void FixedUpdate()
+        {
+            if( !_enabled || _onFixedUpdate == null )
+                return;
+
+            double time = TimeProvider();
+            foreach( var action in _onFixedUpdate )
+            {
+                action?.Invoke( time );
+            }
+        }
+
+        private void Update()
+        {
+            if( !_enabled || _onUpdate == null )
+                return;
+
+            double time = TimeProvider();
+            foreach( var action in _onUpdate )
+            {
+                action?.Invoke( time );
+            }
+        }
     }
 }

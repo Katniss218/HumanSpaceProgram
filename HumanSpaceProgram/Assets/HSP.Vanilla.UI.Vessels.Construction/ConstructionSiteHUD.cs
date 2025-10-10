@@ -1,4 +1,5 @@
-﻿using HSP.Vessels.Construction;
+﻿using HSP.Vanilla.Scenes.GameplayScene;
+using HSP.Vessels.Construction;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
@@ -104,7 +105,7 @@ namespace HSP.Vanilla.UI.Vessels.Construction
             _progressImage.fillAmount = percent;
             _statusIcon.Sprite = GetStatusSprite();
 
-            ((RectTransform)this.transform).SetScreenPosition( SceneCamera.Camera, ConstructionSite.transform.position );
+            ((RectTransform)this.transform).SetScreenPosition( SceneCamera.GetCamera<GameplaySceneM>(), ConstructionSite.transform.position );
         }
 
         protected internal static T Create<T>( IUIElementContainer parent, FConstructionSite constructionSite ) where T : ConstructionSiteHUD

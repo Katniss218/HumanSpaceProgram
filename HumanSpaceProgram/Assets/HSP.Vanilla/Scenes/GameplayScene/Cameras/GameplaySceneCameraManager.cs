@@ -141,11 +141,14 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
             //
 
             _nearCamera.nearClipPlane = (float)MathD.Map( zoomDist, MIN_ZOOM_DISTANCE, NEAR_CUTOFF_DISTANCE, NEAR_MIN, NEAR_MAX );
-
             _effectCamera.nearClipPlane = _effectCameraNearPlane * (1 + (zoomDist * ZOOM_NEAR_PLANE_MULT));
 
             _uiCamera.nearClipPlane = (float)MathD.Map( zoomDist, MIN_ZOOM_DISTANCE, NEAR_CUTOFF_DISTANCE, 0.5f, 100f );
             _uiCamera.farClipPlane = (float)MathD.Map( zoomDist, MIN_ZOOM_DISTANCE, NEAR_CUTOFF_DISTANCE, 0.5f * 10000f, 100f * 10000f );
+            _nearCamera.eventMask = 0; // Setting eventMask = 0 stops the annoying mouse event errors when the camera is far away from scene origin.
+            _farCamera.eventMask = 0;
+            _effectCamera.eventMask = 0;
+            _uiCamera.eventMask = 0;
 
             if( this.transform.position.magnitude > NEAR_CUTOFF_DISTANCE )
             {
@@ -196,6 +199,8 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
                 | Layer.Unity_TransparentFx.ToMask()
                 | Layer.Unity_IgnoreRaycast.ToMask()
                 | Layer.Unity_Water.ToMask()
+                | Layer.CELESTIAL_BODY.ToMask()
+                | Layer.CELESTIAL_BODY_LIGHT.ToMask()
                 | Layer.PART_OBJECT.ToMask()
                 | Layer.PART_OBJECT_LIGHT.ToMask()
                 | Layer.VESSEL_DESIGN_HELD.ToMask();
@@ -288,6 +293,9 @@ namespace HSP.Vanilla.Scenes.GameplayScene.Cameras
             bufferCombiner.NearCamera = nearCamera;
             bufferCombiner.EffectCamera = effectCamera;
             bufferCombiner.MergeDepthShader = AssetRegistry.Get<Shader>( "builtin::Resources/Shaders/merge_depth" );
+
+            Skybox skybox = farCameraGameObject.AddComponent<Skybox>();
+            skybox.material = AssetRegistry.Get<Material>( "builtin::HSP._DevUtils/skybox" );
 
             _cameraPivot.SetActive( false );
         }

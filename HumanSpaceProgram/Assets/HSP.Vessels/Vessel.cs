@@ -31,7 +31,7 @@ namespace HSP.Vessels
     /// <remarks>
     /// Vessels exist only in the gameplay scene.
     /// </remarks>
-    public sealed partial class Vessel : MonoBehaviour
+    public sealed partial class Vessel : MonoBehaviour, IVessel
     {
         [SerializeField]
         private string _displayName;
@@ -83,9 +83,6 @@ namespace HSP.Vessels
             }
         }
 
-        /// <summary>
-        /// Returns the transform that is the local space of the vessel.
-        /// </summary>
         public Transform ReferenceTransform => this.transform;
 
         // the active vessel has also glithed out and accelerated to the speed of light at least once after jettisonning the side tanks on the pad.
@@ -135,8 +132,6 @@ namespace HSP.Vessels
 
             HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_VESSEL_CREATED.ID, this );
             this.gameObject.SetLayer( (int)Layer.PART_OBJECT, true );
-
-           // VesselManager.Register( this );
         }
 
         private void OnDestroy()

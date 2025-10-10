@@ -1,8 +1,6 @@
-﻿using HSP.CelestialBodies;
-using HSP.ReferenceFrames;
+﻿using HSP.ReferenceFrames;
 using HSP.Time;
 using System;
-using System.Linq;
 using UnityEngine;
 using UnityPlus.Serialization;
 
@@ -15,21 +13,36 @@ namespace HSP.Vanilla
     [DisallowMultipleComponent]
     public class PinnedReferenceFrameTransform : MonoBehaviour, IReferenceFrameTransform, IPhysicsTransform
     {
-        CelestialBody _referenceBody = null;
+        private ISceneReferenceFrameProvider _sceneReferenceFrameProvider;
+        public ISceneReferenceFrameProvider SceneReferenceFrameProvider
+        {
+            get => _sceneReferenceFrameProvider;
+            set
+            {
+                if( _sceneReferenceFrameProvider == value )
+                    return;
+
+                _sceneReferenceFrameProvider?.UnsubscribeIfSubscribed( this );
+                _sceneReferenceFrameProvider = value;
+                _sceneReferenceFrameProvider?.SubscribeIfNotSubscribed( this );
+            }
+        }
+
+        IReferenceFrameTransform _referenceTransform = null;
         Vector3Dbl _referencePosition = Vector3.zero;
         QuaternionDbl _referenceRotation = QuaternionDbl.identity;
 
-        public CelestialBody ReferenceBody
+        public IReferenceFrameTransform ReferenceTransform
         {
-            get => _referenceBody;
+            get => _referenceTransform;
             set
             {
-                _referenceBody = value;
+                _referenceTransform = value;
                 if( value != null )
                 {
                     MakeCacheInvalid();
-                    ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
-                    ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );
+                    ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, AbsolutePosition );
+                    ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, AbsoluteRotation );
                     SetPositionAndRotation();
                     OnAbsolutePositionChanged?.Invoke();
                     OnAbsoluteRotationChanged?.Invoke();
@@ -45,7 +58,7 @@ namespace HSP.Vanilla
             {
                 _referencePosition = value;
                 MakeCacheInvalid();
-                ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
+                ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, AbsolutePosition );
                 SetPositionAndRotation();
                 OnAbsolutePositionChanged?.Invoke();
                 OnAnyValueChanged?.Invoke();
@@ -59,21 +72,21 @@ namespace HSP.Vanilla
             {
                 _referenceRotation = value;
                 MakeCacheInvalid();
-                ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );
+                ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, AbsoluteRotation );
                 SetPositionAndRotation();
                 OnAbsoluteRotationChanged?.Invoke();
                 OnAnyValueChanged?.Invoke();
             }
         }
 
-        public void SetReference( CelestialBody referenceBody, Vector3Dbl referencePosition, QuaternionDbl referenceRotation )
+        public void SetReference( IReferenceFrameTransform referenceTransform, Vector3Dbl referencePosition, QuaternionDbl referenceRotation )
         {
-            _referenceBody = referenceBody;
+            _referenceTransform = referenceTransform;
             _referencePosition = referencePosition;
             _referenceRotation = referenceRotation;
             MakeCacheInvalid();
-            ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( transform, _rb, AbsolutePosition );
-            ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( transform, _rb, AbsoluteRotation );
+            ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, AbsolutePosition );
+            ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( SceneReferenceFrameProvider.GetSceneReferenceFrame(), transform, _rb, AbsoluteRotation );
             OnAbsolutePositionChanged?.Invoke();
             OnAbsoluteRotationChanged?.Invoke();
             OnAnyValueChanged?.Invoke();
@@ -88,8 +101,8 @@ namespace HSP.Vanilla
             }
             set
             {
-                Vector3Dbl absolutePosition = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( value );
-                ReferencePosition = _referenceBody.ReferenceFrameTransform.OrientedReferenceFrame().InverseTransformPosition( absolutePosition );
+                Vector3Dbl absolutePosition = SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformPosition( value );
+                ReferencePosition = _referenceTransform.OrientedReferenceFrame().InverseTransformPosition( absolutePosition );
             }
         }
 
@@ -102,7 +115,7 @@ namespace HSP.Vanilla
             }
             set
             {
-                ReferencePosition = _referenceBody.ReferenceFrameTransform.OrientedReferenceFrame().InverseTransformPosition( value );
+                ReferencePosition = _referenceTransform.OrientedReferenceFrame().InverseTransformPosition( value );
             }
         }
 
@@ -114,8 +127,8 @@ namespace HSP.Vanilla
             }
             set
             {
-                QuaternionDbl absoluteRotation = SceneReferenceFrameManager.ReferenceFrame.TransformRotation( value );
-                ReferenceRotation = _referenceBody.ReferenceFrameTransform.OrientedReferenceFrame().InverseTransformRotation( absoluteRotation );
+                QuaternionDbl absoluteRotation = SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformRotation( value );
+                ReferenceRotation = _referenceTransform.OrientedReferenceFrame().InverseTransformRotation( absoluteRotation );
             }
         }
 
@@ -128,7 +141,7 @@ namespace HSP.Vanilla
             }
             set
             {
-                ReferenceRotation = _referenceBody.ReferenceFrameTransform.OrientedReferenceFrame().InverseTransformRotation( value );
+                ReferenceRotation = _referenceTransform.OrientedReferenceFrame().InverseTransformRotation( value );
             }
         }
 
@@ -234,7 +247,7 @@ namespace HSP.Vanilla
         {
             get
             {
-                if (___rb == null)
+                if( ___rb == null )
                     ___rb = this.GetComponent<Rigidbody>();
                 return ___rb;
             }
@@ -257,11 +270,11 @@ namespace HSP.Vanilla
 
         private void SetPositionAndRotation()
         {
-            if( ReferenceBody == null )
-                return;
+            IReferenceFrame bodyFrame = _referenceTransform == null
+                ? new CenteredReferenceFrame( TimeManager.UT, Vector3Dbl.zero )
+                : _referenceTransform.OrientedInertialReferenceFrame();
 
-            IReferenceFrame sceneReferenceFrame = SceneReferenceFrameManager.ReferenceFrame;
-            IReferenceFrame bodyFrame = ReferenceBody.ReferenceFrameTransform.OrientedInertialReferenceFrame();
+            IReferenceFrame sceneReferenceFrame = SceneReferenceFrameProvider.GetSceneReferenceFrame();
             Vector3 pos = (Vector3)sceneReferenceFrame.InverseTransformPosition( bodyFrame.TransformPosition( _referencePosition ) );
             Quaternion rot = (Quaternion)sceneReferenceFrame.InverseTransformRotation( bodyFrame.TransformRotation( _referenceRotation ) );
 
@@ -277,21 +290,24 @@ namespace HSP.Vanilla
             if( IsCacheValid() )
                 return;
 
-            RecalculateCache( SceneReferenceFrameManager.ReferenceFrame );
+            RecalculateCache( SceneReferenceFrameProvider.GetSceneReferenceFrame() );
         }
 
         private void RecalculateCache( IReferenceFrame sceneReferenceFrame )
         {
-            if( _referenceBody == null )
-                return;
+            IReferenceFrame bodyFrame = _referenceTransform == null
+                ? new CenteredReferenceFrame( TimeManager.UT, Vector3Dbl.zero )
+                : _referenceTransform.NonInertialReferenceFrame();
 
-            INonInertialReferenceFrame bodyFrame = _referenceBody.ReferenceFrameTransform.NonInertialReferenceFrame();
             _cachedAbsolutePosition = bodyFrame.TransformPosition( _referencePosition );
             _cachedAbsoluteRotation = bodyFrame.TransformRotation( _referenceRotation );
             _cachedAbsoluteVelocity = bodyFrame.TransformVelocity( Vector3Dbl.zero );
             _cachedAbsoluteAngularVelocity = bodyFrame.TransformAngularVelocity( Vector3Dbl.zero );
 
-            _cachedAbsoluteVelocity += bodyFrame.GetTangentialVelocity( _referencePosition );
+            if( bodyFrame is INonInertialReferenceFrame nirf )
+            {
+                _cachedAbsoluteVelocity += nirf.GetTangentialVelocity( _referencePosition );
+            }
 
             _cachedVelocity = (Vector3)sceneReferenceFrame.InverseTransformVelocity( _cachedAbsoluteVelocity );
             _cachedAngularVelocity = (Vector3)sceneReferenceFrame.InverseTransformAngularVelocity( _cachedAbsoluteVelocity );
@@ -317,7 +333,7 @@ namespace HSP.Vanilla
         {
             if( this.HasComponentOtherThan<IReferenceFrameTransform>( this ) )
             {
-                Debug.LogWarning( $"Tried to add a {nameof( PinnedReferenceFrameTransform )} to a game object that already has a {nameof( IReferenceFrameTransform )}. This is not allowed. Remove the previous physics object first." );
+                Debug.LogWarning( $"Tried to add a {this.GetType().Name} to a game object that already has a {nameof( IReferenceFrameTransform )}. This is not allowed. Remove the previous physics object first." );
                 Destroy( this );
                 return;
             }
@@ -326,16 +342,18 @@ namespace HSP.Vanilla
             _rb.collisionDetectionMode = CollisionDetectionMode.Discrete;
             _rb.interpolation = RigidbodyInterpolation.None; // DO NOT INTERPOLATE. Doing so will desync `rigidbody.position` and `transform.position`.
             _rb.isKinematic = true;
+            _rb.drag = 0;
+            _rb.angularDrag = 0;
         }
 
         protected virtual void FixedUpdate()
         {
-            if( ReferenceBody == null )
-                return;
+            IReferenceFrame bodyFrame = _referenceTransform == null
+                ? new CenteredReferenceFrame( TimeManager.UT, Vector3Dbl.zero )
+                : _referenceTransform.NonInertialReferenceFrame().AtUT( TimeManager.UT ); // moves to where the body will be
 
             // ReferenceFrame.AtUT is used because we want to access the frame for the end of the frame, and FixedUpdate (caller) is called before ReferenceFrame updates.
-            var sceneReferenceFrame = SceneReferenceFrameManager.ReferenceFrame.AtUT( TimeManager.UT );
-            var bodyFrame = ReferenceBody.ReferenceFrameTransform.NonInertialReferenceFrame().AtUT( TimeManager.UT );
+            var sceneReferenceFrame = SceneReferenceFrameProvider.GetSceneReferenceFrame().AtUT( TimeManager.UT );
 
             Vector3 pos = (Vector3)sceneReferenceFrame.InverseTransformPosition( bodyFrame.TransformPosition( _referencePosition ) );
             Quaternion rot = (Quaternion)sceneReferenceFrame.InverseTransformRotation( bodyFrame.TransformRotation( _referenceRotation ) );
@@ -351,11 +369,13 @@ namespace HSP.Vanilla
 
         protected virtual void OnEnable()
         {
+            _sceneReferenceFrameProvider?.SubscribeIfNotSubscribed( this );
             _rb.isKinematic = true; // Force kinematic.
         }
 
         protected virtual void OnDisable()
         {
+            _sceneReferenceFrameProvider?.UnsubscribeIfSubscribed( this );
             _rb.isKinematic = true;
         }
 
@@ -382,12 +402,13 @@ namespace HSP.Vanilla
         public static SerializationMapping PinnedPhysicsObjectMapping()
         {
             return new MemberwiseSerializationMapping<PinnedReferenceFrameTransform>()
+                .WithMember( "scene_reference_frame_provider", o => o.SceneReferenceFrameProvider )
                 .WithMember( "mass", o => o.Mass )
                 .WithMember( "local_center_of_mass", o => o.LocalCenterOfMass )
 
                 .WithMember( "DO_NOT_TOUCH", o => true, ( o, value ) => o._rb.isKinematic = true )
 
-                .WithMember( "reference_body", o => o.ReferenceBody == null ? null : o.ReferenceBody.ID, ( o, value ) => o.ReferenceBody = value == null ? null : CelestialBodyManager.Get( value ) )
+                .WithMember( "reference_transform", ObjectContext.Ref, o => o.ReferenceTransform )
                 .WithMember( "reference_position", o => o.ReferencePosition )
                 .WithMember( "reference_rotation", o => o.ReferenceRotation );
         }

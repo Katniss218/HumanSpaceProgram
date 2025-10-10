@@ -67,6 +67,7 @@
     <Compile Include="Assets\HSP.Vessels\SymmetryDataContainer.cs" />
     <Compile Include="Assets\HSP.Vessels\Serialization\PartFactory.cs" />
     <Compile Include="Assets\HSP.Vessels\VesselHierarchyUtils.cs" />
+    <Compile Include="Assets\HSP.Vessels\IVessel.cs" />
     <Compile Include="Assets\HSP.Vessels\Vessel_Ex.cs" />
   </ItemGroup>
   <ItemGroup>

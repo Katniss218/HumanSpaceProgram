@@ -60,20 +60,24 @@
   <ItemGroup>
     <Compile Include="Assets\HSP.Vanilla.UI\Components\UITextReadout_Velocity.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\UIControlSetupWindow.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI\Scenes\MapScene\MapVesselHUD.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Timelines\UITimelineMetadata.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\ControlSetupWindowComponentUI.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Timelines\UISaveMetadata.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\UIPartWindowComponent.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI\Scenes\MapScene\MapCelestialBodyHUDManager.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\UISequenceAction.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\CanvasRegistry.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Scenes\DesignScene\UIPartListEntry.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\UISequencerPanel.cs" />
-    <Compile Include="Assets\HSP.Vanilla.UI\Scenes\GameplayMapScene\MapSceneUIFactory.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI\Scenes\MapScene\MapSceneUIFactory.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\GameplaySequencerPanelFactory.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI\Scenes\MapScene\EphemerisDrawer.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Timelines\UISaveWindow.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Scenes\DesignScene\UIPartList.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\UITextReadout_ElapsedUT.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Settings\UISettingsPage.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI\Scenes\MapScene\MapVesselHUDManager.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\UIIResourceContainer.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Scenes\DesignScene\DesignSceneUIFactory.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Components\ControlSetupControlGroupUI.cs" />
@@ -83,6 +87,8 @@
     <Compile Include="Assets\HSP.Vanilla.UI\Components\UISequenceElement.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Settings\TimelineSettings\UISettingsPage_Scenario.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Scenes\GameplayScene\GameplaySceneUIFactory.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI\Scenes\MapScene\MapCelestialBodyHUD.cs" />
+    <Compile Include="Assets\HSP.Vanilla.UI\Scenes\MapScene\OnStartup.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Scenes\GameplayScene\GameplayEscapeUIFactory.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\WindowRelationHighlight.cs" />
     <Compile Include="Assets\HSP.Vanilla.UI\Scenes\MainMenuScene\MainMenuSceneUIFactory.cs" />

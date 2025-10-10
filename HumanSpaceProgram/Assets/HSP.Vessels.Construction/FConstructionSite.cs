@@ -264,7 +264,7 @@ namespace HSP.Vessels.Construction
         /// <param name="parent"></param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
-        public static FConstructionSite CreateOrAppend( Transform ghostRoot, Transform parent )
+        public static FConstructionSite CreateOrAppend( SceneReferenceFrameManager sceneReferenceFrame, Transform ghostRoot, Transform parent )
         {
             // step 6. Player places the ghost.
             // assume the position is already set.
@@ -274,14 +274,15 @@ namespace HSP.Vessels.Construction
                 throw new InvalidOperationException( $"Can't add something that is under ongoing construction - it should be/have been already added." );
             }
 
+            var sceneFrame = sceneReferenceFrame.referenceFrame;
+
             if( parent == null )
             {
                 Vessel vessel = VesselFactory.CreatePartless( HSPSceneManager.GetScene( ghostRoot.gameObject ),
-                    SceneReferenceFrameManager.ReferenceFrame.TransformPosition( ghostRoot.position ),
-                    SceneReferenceFrameManager.ReferenceFrame.TransformRotation( ghostRoot.rotation ),
-                    Vector3Dbl.zero,
-                    Vector3Dbl.zero );
-#warning TODO - Vector3Dbl.zero will cause the vessel to not have correct velocity relative to where it's being placed.
+                    sceneFrame.TransformPosition( ghostRoot.position ),
+                    sceneFrame.TransformRotation( ghostRoot.rotation ),
+                    sceneFrame.TransformVelocity( Vector3Dbl.zero ),
+                    sceneFrame.TransformAngularVelocity( Vector3Dbl.zero ) );
 
                 vessel.RootPart = ghostRoot;
                 parent = vessel.gameObject.transform;

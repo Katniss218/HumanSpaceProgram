@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.LowLevel;
 using UnityEngine.PlayerLoop;
@@ -35,9 +34,16 @@ namespace HSP.Time
         public static float TimeScale { get => _timeScale; }
 
         /// <summary>
-        /// Returns the current frame's universal time, in [s].
+        /// Returns the target universal time for the current fixed update/update, in [s] since epoch.
         /// </summary>
         public static double UT { get; private set; }
+        /// <summary>
+        /// Returns the previous frame's universal time, in [s] since epoch.
+        /// </summary>
+        /// <remarks>
+        /// <see cref="UT"/> updates at the very start of each FixedUpdate, OldUT contains the value of UT before that update.
+        /// </remarks>
+        public static double OldUT { get; private set; }
 
         public static float FixedUnscaledDeltaTime { get => UnityEngine.Time.fixedUnscaledDeltaTime; }
         public static float UnscaledDeltaTime { get => UnityEngine.Time.unscaledDeltaTime; }
@@ -130,6 +136,7 @@ namespace HSP.Time
         public static void SetUT( double ut )
         {
             UT = ut;
+            OldUT = ut;
         }
 
         /// <summary>
@@ -190,6 +197,7 @@ namespace HSP.Time
             if( !instanceExists )
                 return;
 
+            OldUT = UT;
             UT += FixedDeltaTime;
         }
 
@@ -198,7 +206,7 @@ namespace HSP.Time
         public static SerializationMapping TimeStepManagerMapping()
         {
             return new MemberwiseSerializationMapping<TimeManager>()
-                .WithMember( "ut", o => TimeManager.UT, ( o, value ) => TimeManager.UT = value );
+                .WithMember( "ut", o => UT, ( o, value ) => { UT = value; OldUT = value; } );
         }
     }
 }

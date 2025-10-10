@@ -30,7 +30,7 @@ namespace HSP
         _12 = 12,
         _13 = 13,
         _14 = 14,
-        _15 = 15,
+        MAP_ONLY = 15,
         _16 = 16,
         _17 = 17,
         _18 = 18,
@@ -40,7 +40,7 @@ namespace HSP
         /// </summary>
         PART_OBJECT = 20,
         /// <summary>
-        /// A light that illuminates <see cref="PART_OBJECT_LIGHT"/>.
+        /// A light that illuminates <see cref="PART_OBJECT"/>.
         /// </summary>
         PART_OBJECT_LIGHT = 21,
         _22 = 22,

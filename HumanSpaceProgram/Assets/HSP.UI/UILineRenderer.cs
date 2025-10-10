@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 namespace HSP.UI
 {
-	/// <summary>
-	/// Draws a polyline using the Unity the UI system.
-	/// </summary>
-	[RequireComponent( typeof( CanvasRenderer ) )]
+    /// <summary>
+    /// Draws a polyline using the Unity the UI system.
+    /// </summary>
+    [RequireComponent( typeof( CanvasRenderer ) )]
 	public class UILineRenderer : MaskableGraphic
 	{
+        [SerializeField]
 		private Vector2[] _points;
 		/// <summary>
 		/// The points that define the line.
@@ -28,7 +24,8 @@ namespace HSP.UI
 			} 
 		}
 
-		private float _thickness = 10f;
+        [SerializeField]
+        private float _thickness = 10f;
 		/// <summary>
 		/// The thickness, in [px].
 		/// </summary>
@@ -45,8 +42,8 @@ namespace HSP.UI
 		protected override void OnPopulateMesh( VertexHelper vh )
 		{
 			vh.Clear();
-
-			if( _points == null || _points.Length < 2 )
+#warning TODO - Trying to draw a line with points that are far outside of the screen bounds results in infinite runaway memory allocation (for some reason).
+            if( _points == null || _points.Length < 2 )
 				return;
 
 			if( _thickness == 0 )

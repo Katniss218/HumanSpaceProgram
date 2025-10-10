@@ -152,14 +152,16 @@ namespace HSP.Vessels
             // Detach the parts from the old vessel.
             Vessel oldVessel = partToSplit.GetVessel();
 
+            var sceneFrame = oldVessel.ReferenceFrameTransform.SceneReferenceFrameProvider.GetSceneReferenceFrame();
+
             var vesselFrame = oldVessel.ReferenceFrameTransform.NonInertialReferenceFrame();
-            Vector3Dbl partPosAirf = SceneReferenceFrameManager.ReferenceFrame.TransformPosition( partToSplit.transform.position );
+            Vector3Dbl partPosAirf = sceneFrame.TransformPosition( partToSplit.transform.position );
             Vector3Dbl partPosInVesselSpace = vesselFrame.InverseTransformPosition( partPosAirf );
 
 #warning TODO - use a physically accurate calculation that preserves angular and linear momenta.
             Vessel newVessel = VesselFactory.CreatePartless( HSPSceneManager.GetScene( oldVessel.gameObject ),
                 partPosAirf,
-                SceneReferenceFrameManager.ReferenceFrame.TransformRotation( partToSplit.transform.rotation ),
+                sceneFrame.TransformRotation( partToSplit.transform.rotation ),
                 oldVessel.ReferenceFrameTransform.AbsoluteVelocity + vesselFrame.GetTangentialVelocity( partPosInVesselSpace ),
                 oldVessel.ReferenceFrameTransform.AbsoluteAngularVelocity );
 

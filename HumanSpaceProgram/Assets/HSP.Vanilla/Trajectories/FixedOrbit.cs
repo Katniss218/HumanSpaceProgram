@@ -9,7 +9,8 @@ namespace HSP.Vanilla.Trajectories
     /// <summary>
     /// A trajectory that remains stationary.
     /// </summary>
-    public class FixedOrbit : ITrajectory
+    [Obsolete( "Use the new trajectory system instead." )]
+    public class FixedOrbit
     {
         private Vector3Dbl _currentPosition;
         private QuaternionDbl _rotation;
@@ -26,12 +27,12 @@ namespace HSP.Vanilla.Trajectories
             this.Mass = mass;
         }
 
-        public TrajectoryBodyState GetCurrentState()
+        public TrajectoryStateVector GetCurrentState()
         {
-            return new TrajectoryBodyState( _currentPosition, Vector3Dbl.zero, Vector3Dbl.zero, Mass );
+            return new TrajectoryStateVector( _currentPosition, Vector3Dbl.zero, Vector3Dbl.zero, Mass );
         }
 
-        public void SetCurrentState( TrajectoryBodyState stateVector )
+        public void SetCurrentState( TrajectoryStateVector stateVector )
         {
             if( stateVector.AbsoluteVelocity != Vector3Dbl.zero )
                 throw new ArgumentException( $"Velocity must be zero.", nameof( stateVector ) );
@@ -42,7 +43,7 @@ namespace HSP.Vanilla.Trajectories
             Mass = stateVector.Mass;
         }
 
-        public TrajectoryBodyState GetStateAtUT( double ut )
+        public TrajectoryStateVector GetStateAtUT( double ut )
         {
             return GetCurrentState();
         }
@@ -62,7 +63,7 @@ namespace HSP.Vanilla.Trajectories
             return true;
         }
 
-        public void Step( IEnumerable<TrajectoryBodyState> attractors, double dt )
+        public void Step( IEnumerable<TrajectoryStateVector> attractors, double dt )
         {
             UT += dt;
             return; // Do nothing, since stationary is not moving.

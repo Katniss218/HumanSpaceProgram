@@ -117,7 +117,7 @@ namespace HSP.Vanilla.Scenes.DesignScene.Tools
 					BoxCollider c = go.AddComponent<BoxCollider>();
 					c.size = new Vector3( 3.5f, 3.5f, 0.1f );
 				} );
-			_handles.RaycastCamera = SceneCamera.Camera.GetComponent<Camera>();
+			_handles.RaycastCamera = SceneCamera.GetCamera<DesignSceneM>();
 		}
 	}
 }

@@ -58,13 +58,29 @@
     <Analyzer Include="C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\HSP.Trajectories\ITrajectory.cs" />
+    <Compile Include="Assets\HSP.Trajectories\TrajectoryIntegrators\Yoshida4Integrator.cs" />
+    <Compile Include="Assets\HSP.Trajectories\VectorSimilarityUtils.cs" />
+    <Compile Include="Assets\HSP.Trajectories\TrajectoryIntegrators\RK2Integrator.cs" />
+    <Compile Include="Assets\HSP.Trajectories\AccelerationProviders\ManeuverNode.cs" />
     <Compile Include="Assets\HSP.Trajectories\OrbitalFrame.cs" />
+    <Compile Include="Assets\HSP.Trajectories\TrajectorySimulator2.cs" />
     <Compile Include="Assets\HSP.Trajectories\Components\FAnchor.cs" />
-    <Compile Include="Assets\HSP.Trajectories\TrajectoryManager.cs" />
+    <Compile Include="Assets\HSP.Trajectories\TrajectoryIntegrators\EulerIntegrator.cs" />
+    <Compile Include="Assets\HSP.Trajectories\TrajectoryStateVector.cs" />
     <Compile Include="Assets\HSP.Trajectories\OrbitalStateVector.cs" />
-    <Compile Include="Assets\HSP.Trajectories\TrajectoryTransform.cs" />
+    <Compile Include="Assets\HSP.Trajectories\TrajectorySimulationContext.cs" />
+    <Compile Include="Assets\HSP.Trajectories\TrajectoryIntegrators\RK45Integrator.cs" />
+    <Compile Include="Assets\HSP.Trajectories\ITrajectoryTransform.cs" />
+    <Compile Include="Assets\HSP.Trajectories\TrajectoryIntegrators\RK4Integrator.cs" />
+    <Compile Include="Assets\HSP.Trajectories\Ephemeris.cs" />
+    <Compile Include="Assets\HSP.Trajectories\TrajectoryIntegrators\VerletIntegrator.cs" />
+    <Compile Include="Assets\HSP.Trajectories\IReferenceFrameTransform_Ex.cs" />
+    <Compile Include="Assets\HSP.Trajectories\IReadonlyTrajectorySimulator.cs" />
+    <Compile Include="Assets\HSP.Trajectories\ITrajectoryStepProvider.cs" />
+    <Compile Include="Assets\HSP.Trajectories\VectorInterpolationUtils.cs" />
     <Compile Include="Assets\HSP.Trajectories\TrajectorySimulator.cs" />
+    <Compile Include="Assets\HSP.Trajectories\Ephemeris2.cs" />
+    <Compile Include="Assets\HSP.Trajectories\ITrajectoryIntegrator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\HSP.Trajectories\___HSP.Trajectories.asmdef" />
