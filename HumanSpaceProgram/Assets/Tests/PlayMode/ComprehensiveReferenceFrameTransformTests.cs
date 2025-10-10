@@ -474,15 +474,14 @@ namespace HSP_Tests_PlayMode
             double startTime = TimeManager.UT;
             double testDuration = 1.0; // 1 second
 
-            assertMonoBeh.TimeProvider = () => TimeManager.OldUT;
-            assertMonoBeh.OnFixedUpdate( ( ut ) =>
+            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.FixedUpdate, () =>
             {
                 double deltaTime = TimeManager.OldUT - startTime;
                 Vector3Dbl expectedPosition = initialPosition + testVelocity * deltaTime;
                 Assert.That( sut.AbsolutePosition, Is.EqualTo( expectedPosition ).Using( vector3DblApproxComparer ),
                     $"{config.TestName}: OnFixedUpdate - Position should integrate velocity over time" );
             } );
-            assertMonoBeh.OnUpdate( ( ut ) =>
+            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, () =>
             {
                 double deltaTime = TimeManager.UT - startTime;
                 Vector3Dbl expectedPosition = initialPosition + testVelocity * deltaTime;
