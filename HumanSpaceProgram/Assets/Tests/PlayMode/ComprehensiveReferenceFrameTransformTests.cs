@@ -1,15 +1,13 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using HSP;
 using HSP.ReferenceFrames;
 using HSP.Time;
 using HSP.Vanilla;
 using HSP.Vanilla.ReferenceFrames;
-using HSP.Vanilla.Scenes.AlwaysLoadedScene;
 using HSP.Vanilla.Scenes.GameplayScene;
 using HSP_Tests_PlayMode.NUnit;
 using NUnit.Framework;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.TestTools;
 
@@ -31,8 +29,6 @@ namespace HSP_Tests_PlayMode
         static IEqualityComparer<Vector3Dbl> vector3DblApproxComparer = new Vector3DblApproximateComparer( 0.0001 );
         static IEqualityComparer<Quaternion> quaternionApproxComparer = new QuaternionApproximateComparer( 0.0001f );
         static IEqualityComparer<QuaternionDbl> quaternionDblApproxComparer = new QuaternionDblApproximateComparer( 0.0001 );
-
-        #region Test Data and Setup
 
         /// <summary>
         /// Test configuration for different reference frame transform types
@@ -134,10 +130,6 @@ namespace HSP_Tests_PlayMode
 
             throw new ArgumentException( $"Unsupported transform type: {transformType}" );
         }
-
-        #endregion
-
-        #region Manual Value Setting Tests
 
         [UnityTest]
         public IEnumerator ManualPositionSetting_AllTypes()
@@ -333,10 +325,6 @@ namespace HSP_Tests_PlayMode
             UnityEngine.Object.DestroyImmediate( manager );
         }
 
-        #endregion
-
-        #region Reference Frame Switching Tests
-
         [UnityTest]
         public IEnumerator ReferenceFrameSwitching_PositionPreservation_AllTypes()
         {
@@ -429,10 +417,6 @@ namespace HSP_Tests_PlayMode
             // Cleanup
             UnityEngine.Object.DestroyImmediate( manager );
         }
-
-        #endregion
-
-        #region Time Simulation Tests
 
         [UnityTest]
         public IEnumerator TimeSimulation_VelocityIntegration_SupportedTypes()
@@ -576,10 +560,6 @@ namespace HSP_Tests_PlayMode
             UnityEngine.Object.DestroyImmediate( manager );
         }
 
-        #endregion
-
-        #region Frame Timing Tests
-
         [UnityTest]
         public IEnumerator FrameTiming_ValueConsistency_SupportedTypes()
         {
@@ -635,10 +615,6 @@ namespace HSP_Tests_PlayMode
             // Cleanup
             UnityEngine.Object.DestroyImmediate( manager );
         }
-
-        #endregion
-
-        #region Event Tests
 
         [UnityTest]
         public IEnumerator EventFiring_ValueChanges_AllTypes()
@@ -711,10 +687,6 @@ namespace HSP_Tests_PlayMode
             // Cleanup
             UnityEngine.Object.DestroyImmediate( manager );
         }
-
-        #endregion
-
-        #region Edge Case Tests
 
         [UnityTest]
         public IEnumerator EdgeCases_ZeroValues_AllTypes()
@@ -808,7 +780,5 @@ namespace HSP_Tests_PlayMode
             // Cleanup
             UnityEngine.Object.DestroyImmediate( manager );
         }
-
-        #endregion
     }
 }

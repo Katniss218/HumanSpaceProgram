@@ -130,11 +130,14 @@ namespace HSP.ReferenceFrames
                 && otherNormalizedUT.TransformAngularAcceleration( Vector3Dbl.zero ) == Vector3Dbl.zero;
         }
 
-        //[MapsInheritingFrom( typeof( OrientedReferenceFrame ) )]
+        [MapsInheritingFrom( typeof( OrientedReferenceFrame ) )]
         public static SerializationMapping OrientedReferenceFrameMapping()
         {
-#warning TODO - easier way to load memberwise objects that are immutable
-            throw new NotImplementedException();
+            return new MemberwiseSerializationMapping<OrientedReferenceFrame>()
+                .WithReadonlyMember( "reference_ut", o => o.ReferenceUT )
+                .WithReadonlyMember( "position", o => o._position )
+                .WithReadonlyMember( "rotation", o => o._rotation )
+                .WithFactory<double, Vector3Dbl, QuaternionDbl>( ( ut, pos, rot ) => new OrientedReferenceFrame( ut, pos, rot ) );
         }
     }
 }

@@ -94,7 +94,14 @@ namespace HSP_Tests_PlayMode
             {
                 if( entry.shouldRun == null || entry.shouldRun.Invoke() )
                 {
-                    entry.assert?.Invoke();
+                    try
+                    {
+                        entry.assert?.Invoke();
+                    }
+                    catch( Exception e )
+                    {
+                        Debug.LogException( e );
+                    }
 
                     if( entry.isOneShot )
                         RemoveAssert( Step.FixedUpdate, entry.assert );
@@ -108,7 +115,14 @@ namespace HSP_Tests_PlayMode
             {
                 if( entry.shouldRun == null || entry.shouldRun.Invoke() )
                 {
-                    entry.assert?.Invoke();
+                    try
+                    {
+                        entry.assert?.Invoke();
+                    }
+                    catch( Exception e )
+                    {
+                        Debug.LogException( e );
+                    }
 
                     if( entry.isOneShot )
                         RemoveAssert( Step.Update, entry.assert );
@@ -122,7 +136,14 @@ namespace HSP_Tests_PlayMode
             {
                 if( entry.shouldRun == null || entry.shouldRun.Invoke() )
                 {
-                    entry.assert?.Invoke();
+                    try
+                    {
+                        entry.assert?.Invoke();
+                    }
+                    catch( Exception e )
+                    {
+                        Debug.LogException( e );
+                    }
 
                     if( entry.isOneShot )
                         RemoveAssert( Step.LateUpdate, entry.assert );

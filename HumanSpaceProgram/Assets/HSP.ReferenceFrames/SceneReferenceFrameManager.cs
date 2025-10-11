@@ -16,7 +16,7 @@ namespace HSP.ReferenceFrames
     /// <remarks>
     /// This class works together with <see cref="IReferenceFrameTransform"/> and <see cref="IReferenceFrameSwitchResponder"/> to ensure that the objects respond to reference frame switches correctly.
     /// </remarks>
-    public abstract class SceneReferenceFrameManager : MonoBehaviour
+    public class SceneReferenceFrameManager : MonoBehaviour
     {
         public struct ReferenceFrameSwitchData
         {
@@ -89,7 +89,7 @@ namespace HSP.ReferenceFrames
             get => instance._referenceFrame;
             set => instance._referenceFrame = value;
         }*/
-#warning TODO - Consider including a getter for the 'referenceframe at end of current frame', which could consider incoming switches and return the frame after the switch.
+#warning TODO - Consider including a getter for the 'referenceframe after physics progessing (reference frame switch/integration)', which could consider incoming switches and return the frame after the switch.
 
         /// <summary>
         /// Returns true if a new reference frame is queued for switch at the next available time.
@@ -153,7 +153,7 @@ namespace HSP.ReferenceFrames
         }
 
         /// <summary>
-        /// The maximum distance from scene origin that the <see cref="TargetObject"/> can reach before a reference frame switch will happen.
+        /// The maximum distance from scene origin that the <see cref="targetObject"/> can reach before a reference frame switch will happen.
         /// </summary>
         /// <remarks>
         /// Larger values may make the vessel's parts appear spread apart (because of limited number of possible scene space positions to map to), and make shadows appear too soft, among other things.
@@ -161,12 +161,12 @@ namespace HSP.ReferenceFrames
         public float MaxRelativePosition { get; set; } = 500f;
 
         /// <summary>
-        /// The maximum scene-space velocity that the <see cref="TargetObject"/> can reach before a reference frame switch will happen.
+        /// The maximum scene-space velocity that the <see cref="targetObject"/> can reach before a reference frame switch will happen.
         /// </summary>
         public float MaxRelativeVelocity { get; set; } = 100f;
 
         /// <summary>
-        /// Ensures that the <see cref="TargetObject"/> is within the allowed values for position and velocity. Requests a reference frame switch if required.
+        /// Ensures that the <see cref="targetObject"/> is within the allowed values for position and velocity. Requests a reference frame switch if required.
         /// </summary>
         public void EnsureTargetObjectInSceneBounds()
         {
