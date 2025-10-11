@@ -93,6 +93,7 @@ namespace HSP_Tests_PlayMode
         {
             GameObject manager = new GameObject( "TestManager" );
             TimeManager timeManager = manager.AddComponent<TimeManager>();
+            TimeManager.SetUT( 0 );
             GameplaySceneReferenceFrameManager refFrameManager = manager.AddComponent<GameplaySceneReferenceFrameManager>();
             GameplaySceneReferenceFrameManager.Instance = refFrameManager;
             KinematicReferenceFrameTransform.AddPlayerLoopSystem();
@@ -462,15 +463,13 @@ namespace HSP_Tests_PlayMode
             {
                 double deltaTime = TimeManager.OldUT - startTime;
                 Vector3Dbl expectedPosition = initialPosition + testVelocity * deltaTime;
-                Assert.That( sut.AbsolutePosition, Is.EqualTo( expectedPosition ).Using( vector3DblApproxComparer ),
-                    $"{config.TestName}: OnFixedUpdate - Position should integrate velocity over time" );
+                Assert.That( sut.AbsolutePosition, Is.EqualTo( expectedPosition ).Using( vector3DblApproxComparer ) );
             } );
             assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, () =>
             {
                 double deltaTime = TimeManager.UT - startTime;
                 Vector3Dbl expectedPosition = initialPosition + testVelocity * deltaTime;
-                Assert.That( sut.AbsolutePosition, Is.EqualTo( expectedPosition ).Using( vector3DblApproxComparer ),
-                    $"{config.TestName}: OnUpdate - Position should integrate velocity over time" );
+                Assert.That( sut.AbsolutePosition, Is.EqualTo( expectedPosition ).Using( vector3DblApproxComparer ) );
             } );
             assertMonoBeh.Enable();
 
@@ -486,13 +485,6 @@ namespace HSP_Tests_PlayMode
             }
             double endTime = TimeManager.UT;
             double actualDuration = endTime - startTime;
-
-            Debug.Log( actualDuration );
-            // Verify position integration
-            Vector3Dbl expectedPosition = initialPosition + testVelocity * actualDuration;
-            Assert.That( sut.AbsolutePosition, Is.EqualTo( expectedPosition ).Using( vector3DblApproxComparer ),
-                $"{config.TestName}: Finish - Position should integrate velocity over time" );
-            assertMonoBeh.Disable();
 
             // Cleanup
             UnityEngine.Object.DestroyImmediate( manager );
@@ -533,28 +525,30 @@ namespace HSP_Tests_PlayMode
             double startTime = TimeManager.UT;
             double testDuration = 1;
 
+            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.FixedUpdate, () =>
+            {
+                double deltaTime = TimeManager.OldUT - startTime;
+                QuaternionDbl expectedRotation = QuaternionDbl.Euler( testAngularVelocity * (deltaTime * 57.29577951308232) );
+                Assert.That( sut.AbsoluteRotation, Is.EqualTo( expectedRotation ).Using( quaternionDblApproxComparer ) );
+            } );
+            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, () =>
+            {
+                double deltaTime = TimeManager.UT - startTime;
+                QuaternionDbl expectedRotation = QuaternionDbl.Euler( testAngularVelocity * (deltaTime * 57.29577951308232) );
+                Assert.That( sut.AbsoluteRotation, Is.EqualTo( expectedRotation ).Using( quaternionDblApproxComparer ) );
+            } );
+            assertMonoBeh.Enable();
+
             // Simulate time passage
             for( int i = 0; i < 100; i++ )
             {
                 yield return new WaitForFixedUpdate();
-                double endTime2 = TimeManager.UT;
-                double actualDuration2 = endTime2 - startTime;
-                // Verify rotation integration (should be 90 degrees around Z axis)
-                QuaternionDbl expectedRotation2 = QuaternionDbl.Euler( testAngularVelocity * (actualDuration2 * 57.29577951308232) );
-                Debug.Log( actualDuration2 + " : " + sut.AbsoluteRotation + " : "  + expectedRotation2 );
 
                 if( TimeManager.UT - startTime >= testDuration )
                 {
                     break;
                 }
             }
-            double endTime = TimeManager.UT;
-            double actualDuration = endTime - startTime;
-            Debug.Log( actualDuration );
-            // Verify rotation integration (should be 90 degrees around Z axis)
-            QuaternionDbl expectedRotation = QuaternionDbl.Euler( testAngularVelocity * (actualDuration * 57.29577951308232) );
-            Assert.That( sut.AbsoluteRotation, Is.EqualTo( expectedRotation ).Using( quaternionDblApproxComparer ),
-                $"{config.TestName}: Rotation should integrate angular velocity over time" );
 
             // Cleanup
             UnityEngine.Object.DestroyImmediate( manager );

@@ -106,6 +106,7 @@ namespace HSP_Tests_PlayMode
         [UnityTest]
         public IEnumerator RequestReferenceFrameSwitch_ReferenceFrameUpdatesAfterPhysicsProcessing()
         {
+#warning TODO - request switch in fixed update and in update, they should both have correct behaviour. - fixed update should have the isswitchrequested set to true if switch was requested from previous update.
             GameObject go = new GameObject();
             TimeManager timeManager = go.AddComponent<TimeManager>();
             SceneReferenceFrameManager sman = go.AddComponent<SceneReferenceFrameManager>();
@@ -125,13 +126,13 @@ namespace HSP_Tests_PlayMode
             assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.FixedUpdate, () => true, isOneShot: true, () =>
             {
                 fixedUpdateRan = true;
-                Assert.That( sman.referenceFrame, Is.EqualTo( initialFrame ), "Reference frame should not change during FixedUpdate" );
+                Assert.That( sman.referenceFrame, Is.EqualTo( initialFrame ) );
             } );
 
             // Verify that the reference frame has changed in Update (after physics step).
             assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, () => fixedUpdateRan, isOneShot: true, () =>
             {
-                Assert.That( sman.referenceFrame, Is.EqualTo( newFrame ), "Reference frame should be updated after physics processing" );
+                Assert.That( sman.referenceFrame, Is.EqualTo( newFrame ) );
             } );
 
             assertMonoBeh.Enable();

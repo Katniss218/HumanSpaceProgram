@@ -1,15 +1,13 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using HSP;
 using HSP.ReferenceFrames;
 using HSP.Time;
 using HSP.Vanilla;
 using HSP.Vanilla.ReferenceFrames;
-using HSP.Vanilla.Scenes.AlwaysLoadedScene;
 using HSP.Vanilla.Scenes.GameplayScene;
 using HSP_Tests_PlayMode.NUnit;
 using NUnit.Framework;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.TestTools;
 
@@ -96,6 +94,7 @@ namespace HSP_Tests_PlayMode
         {
             GameObject manager = new GameObject( "TestManager" );
             TimeManager timeManager = manager.AddComponent<TimeManager>();
+            TimeManager.SetUT( 0 );
             GameplaySceneReferenceFrameManager refFrameManager = manager.AddComponent<GameplaySceneReferenceFrameManager>();
             GameplaySceneReferenceFrameManager.Instance = refFrameManager;
             KinematicReferenceFrameTransform.AddPlayerLoopSystem();
