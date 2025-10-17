@@ -58,28 +58,21 @@ namespace HSP_Tests_PlayMode
 
             yield return new WaitForFixedUpdate();
 
-            int fixedUpdateStepsSinceLastUpdate = 0;
-            int fixedUpdateStepsTotal = 0;
-
-            const double tol = 1e-9;
             double startUT = TimeManager.UT;
 
             const double velocity = 10;
             IReferenceFrame cif = new CenteredInertialReferenceFrame( TimeManager.UT, Vector3Dbl.zero, new Vector3Dbl( velocity, 0, 0 ) );
             sman.RequestReferenceFrameSwitch( cif );
 
-            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.FixedUpdate, () =>
+            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.FixedUpdate, ( frameInfo ) =>
             {
-                fixedUpdateStepsSinceLastUpdate++;
-                fixedUpdateStepsTotal++;
-
                 // In fixed update, the frame is before it updates (updates during physics step), so we use oldUT here.
                 IReferenceFrame frame = sman.referenceFrame;
                 Vector3Dbl expectedPos = new Vector3Dbl( velocity * (TimeManager.OldUT - startUT), 0, 0 );
 
                 Assert.That( frame.TransformPosition( Vector3Dbl.zero ), Is.EqualTo( expectedPos ).Using( vector3DblApproxComparer ) );
             } );
-            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, () =>
+            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, ( frameInfo ) =>
             {
                 // In update, the frame is after it updates (updates during physics step), so we use UT here.
                 IReferenceFrame frame = sman.referenceFrame;
@@ -87,7 +80,7 @@ namespace HSP_Tests_PlayMode
 
                 Assert.That( frame.TransformPosition( Vector3Dbl.zero ), Is.EqualTo( expectedPos ).Using( vector3DblApproxComparer ) );
             } );
-            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.LateUpdate, () =>
+            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.LateUpdate, ( frameInfo ) =>
             {
                 // In late update, the frame is after it updates (updates during physics step), so we use UT here.
                 IReferenceFrame frame = sman.referenceFrame;
@@ -123,14 +116,14 @@ namespace HSP_Tests_PlayMode
 
             // Verify that the reference frame hasn't changed yet in FixedUpdate.
             bool fixedUpdateRan = false;
-            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.FixedUpdate, () => true, isOneShot: true, () =>
+            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.FixedUpdate, () => true, isOneShot: true, ( frameInfo ) =>
             {
                 fixedUpdateRan = true;
                 Assert.That( sman.referenceFrame, Is.EqualTo( initialFrame ) );
             } );
 
             // Verify that the reference frame has changed in Update (after physics step).
-            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, () => fixedUpdateRan, isOneShot: true, () =>
+            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, () => fixedUpdateRan, isOneShot: true, ( frameInfo ) =>
             {
                 Assert.That( sman.referenceFrame, Is.EqualTo( newFrame ) );
             } );
@@ -174,14 +167,14 @@ namespace HSP_Tests_PlayMode
 
             mockTarget.Position = new Vector3( 150, 0, 0 ); // Simulate movement (mock transform) by updating position manually.
 
-            bool wasFixedUpdate = false;
-            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.FixedUpdate, () => true, isOneShot: true, () =>
+            bool fixedUpdateRan = false;
+            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.FixedUpdate, () => true, isOneShot: true, ( frameInfo ) =>
             {
                 // switch not requested yet, but will be automatically if the position exceeds the bounds.
                 Assert.That( sman.IsSwitchRequested, Is.False );
-                wasFixedUpdate = true;
+                fixedUpdateRan = true;
             } );
-            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, () => wasFixedUpdate, isOneShot: true, () =>
+            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, () => fixedUpdateRan, isOneShot: true, ( frameInfo ) =>
             {
                 Assert.That( sman.IsSwitchRequested, Is.False );
 
@@ -252,13 +245,13 @@ namespace HSP_Tests_PlayMode
             // Switch requested immediately, but actually switched after the next physics step.
             Assert.That( sman.IsSwitchRequested, Is.True );
 
-            bool wasFixedUpdate = false;
-            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.FixedUpdate, () => true, isOneShot: true, () =>
+            bool fixedUpdateRan = false;
+            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.FixedUpdate, () => true, isOneShot: true, ( frameInfo ) =>
             {
                 Assert.That( sman.IsSwitchRequested, Is.True );
-                wasFixedUpdate = true;
+                fixedUpdateRan = true;
             } );
-            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, () => wasFixedUpdate, isOneShot: true, () =>
+            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, () => fixedUpdateRan, isOneShot: true, ( frameInfo ) =>
             {
                 Assert.That( sman.IsSwitchRequested, Is.False );
 
@@ -330,13 +323,13 @@ namespace HSP_Tests_PlayMode
 
             Assert.That( sman.IsSwitchRequested, Is.True );
 
-            bool wasFixedUpdate = false;
-            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.FixedUpdate, () => true, isOneShot: true, () =>
+            bool fixedUpdateRan = false;
+            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.FixedUpdate, () => true, isOneShot: true, ( frameInfo ) =>
             {
                 Assert.That( sman.IsSwitchRequested, Is.True );
-                wasFixedUpdate = true;
+                fixedUpdateRan = true;
             } );
-            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, () => wasFixedUpdate, isOneShot: true, () =>
+            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, () => fixedUpdateRan, isOneShot: true, ( frameInfo ) =>
             {
                 Assert.That( sman.IsSwitchRequested, Is.False );
 

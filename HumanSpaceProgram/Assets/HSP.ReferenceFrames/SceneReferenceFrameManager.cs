@@ -84,6 +84,7 @@ namespace HSP.ReferenceFrames
         ///     If you want to access what the reference frame will be at the end of the frame from e.g. FixedUpdate, use `ReferenceFrame.AtUT( TimeManager.UT )`.
         /// </remarks>
         public IReferenceFrame referenceFrame { get; protected set; } = new CenteredReferenceFrame( 0, Vector3Dbl.zero );
+        public IReferenceFrame pendingReferenceFrame => _frameToSwitchTo;
         /*public static IReferenceFrame ReferenceFrame
         {
             get => instance._referenceFrame;

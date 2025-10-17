@@ -459,13 +459,13 @@ namespace HSP_Tests_PlayMode
             double startTime = TimeManager.UT;
             double testDuration = 1.0; // 1 second
 
-            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.FixedUpdate, () =>
+            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.FixedUpdate, ( frameInfo ) =>
             {
                 double deltaTime = TimeManager.OldUT - startTime;
                 Vector3Dbl expectedPosition = initialPosition + testVelocity * deltaTime;
                 Assert.That( sut.AbsolutePosition, Is.EqualTo( expectedPosition ).Using( vector3DblApproxComparer ) );
             } );
-            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, () =>
+            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, ( frameInfo ) =>
             {
                 double deltaTime = TimeManager.UT - startTime;
                 Vector3Dbl expectedPosition = initialPosition + testVelocity * deltaTime;
@@ -525,13 +525,13 @@ namespace HSP_Tests_PlayMode
             double startTime = TimeManager.UT;
             double testDuration = 1;
 
-            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.FixedUpdate, () =>
+            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.FixedUpdate, ( frameInfo ) =>
             {
                 double deltaTime = TimeManager.OldUT - startTime;
                 QuaternionDbl expectedRotation = QuaternionDbl.Euler( testAngularVelocity * (deltaTime * 57.29577951308232) );
                 Assert.That( sut.AbsoluteRotation, Is.EqualTo( expectedRotation ).Using( quaternionDblApproxComparer ) );
             } );
-            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, () =>
+            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, ( frameInfo ) =>
             {
                 double deltaTime = TimeManager.UT - startTime;
                 QuaternionDbl expectedRotation = QuaternionDbl.Euler( testAngularVelocity * (deltaTime * 57.29577951308232) );

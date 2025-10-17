@@ -19,35 +19,28 @@ namespace HSP_Tests_PlayMode
 
             yield return new WaitForFixedUpdate();
 
-            int fixedUpdateStepsSinceLastUpdate = 0;
-            int fixedUpdateStepsTotal = 0;
-
             const double tol = 1e-9;
             double startUT = TimeManager.UT;
 
-            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.FixedUpdate, () =>
+            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.FixedUpdate, ( frameInfo ) =>
             {
-                fixedUpdateStepsSinceLastUpdate++;
-                fixedUpdateStepsTotal++;
 
                 double oldUT = TimeManager.OldUT;
                 double ut = TimeManager.UT;
                 double delta = TimeManager.FixedDeltaTime;
 
-                double expectedUT = startUT + (delta * fixedUpdateStepsTotal);
+                double expectedUT = startUT + (delta * (1 + frameInfo.TotalFixedUpdates));
 
                 Assert.That( ut, Is.EqualTo( expectedUT ).Within( tol ) );
                 Assert.That( oldUT, Is.EqualTo( expectedUT - delta ).Within( tol ) );
             } );
-            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, () =>
+            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, ( frameInfo ) =>
             {
                 double oldUT = TimeManager.OldUT;
                 double ut = TimeManager.UT;
                 double delta = TimeManager.FixedDeltaTime;
 
-                double expectedUT = startUT + (delta * fixedUpdateStepsTotal); // Since it updates at the start of fixedupdate, the correct value here is the same as in the last fixedupdate.
-
-                fixedUpdateStepsSinceLastUpdate = 0;
+                double expectedUT = startUT + (delta * frameInfo.TotalFixedUpdates); // Since it updates at the start of fixedupdate, the correct value here is the same as in the last fixedupdate.
 
                 Assert.That( ut, Is.EqualTo( expectedUT ).Within( tol ) );
                 Assert.That( oldUT, Is.EqualTo( expectedUT - delta ).Within( tol ) );

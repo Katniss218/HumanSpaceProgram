@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.LowLevel;
 using UnityEngine.PlayerLoop;
+using UnityEngine.UIElements;
 using UnityPlus;
 using UnityPlus.Serialization;
 
@@ -236,6 +237,21 @@ namespace HSP.Vanilla
             _absoluteAngularAcceleration += SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAngularAcceleration( (Vector3Dbl)torque / this.GetInertia( torque.normalized ) );
         }
 
+        public void AddAbsoluteForce( Vector3 force )
+        {
+            throw new NotImplementedException();
+        }
+
+        public void AddAbsoluteForceAtPosition( Vector3 force, Vector3Dbl position )
+        {
+            throw new NotImplementedException();
+        }
+
+        public void AddAbsoluteTorque( Vector3 force )
+        {
+            throw new NotImplementedException();
+        }
+
         protected virtual void Awake()
         {
             if( this.HasComponentOtherThan<IReferenceFrameTransform>( this ) )
@@ -260,7 +276,7 @@ namespace HSP.Vanilla
             // `_actualAbsolutePosition` should be up to date due to the callback inside physics step, which was invoked in the previous frame.
 
             _requestedAbsolutePosition = _actualAbsolutePosition + _absoluteVelocity * TimeManager.FixedDeltaTime;
-            QuaternionDbl deltaRotation = QuaternionDbl.Euler( _absoluteAngularVelocity * TimeManager.FixedDeltaTime * 57.29577951308232 );
+            QuaternionDbl deltaRotation = QuaternionDbl.AngleAxis( _absoluteAngularVelocity.magnitude * TimeManager.FixedDeltaTime * 57.29577951308232, _absoluteAngularVelocity );
             _requestedAbsoluteRotation = deltaRotation * _actualAbsoluteRotation;
 
             var requestedPos = (Vector3)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformPosition( _requestedAbsolutePosition );

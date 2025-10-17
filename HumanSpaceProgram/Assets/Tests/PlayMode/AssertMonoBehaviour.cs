@@ -6,6 +6,22 @@ namespace HSP_Tests_PlayMode
 {
     public class AssertMonoBehaviour : MonoBehaviour
     {
+        public sealed class FrameInfo
+        {
+            public int FixedUpdatesSinceLastUpdate { get; }
+            public int UpdatesSinceLastFixedUpdate { get; }
+            public int TotalFixedUpdates { get; }
+            public int TotalUpdates { get; }
+
+            public FrameInfo( int fixedUpdatesSinceLastUpdate, int updatesSinceLastFixedUpdate, int totalFixedUpdates, int totalUpdates )
+            {
+                FixedUpdatesSinceLastUpdate = fixedUpdatesSinceLastUpdate;
+                UpdatesSinceLastFixedUpdate = updatesSinceLastFixedUpdate;
+                TotalFixedUpdates = totalFixedUpdates;
+                TotalUpdates = totalUpdates;
+            }
+        }
+
         public enum Step
         {
             FixedUpdate,
@@ -17,9 +33,9 @@ namespace HSP_Tests_PlayMode
         {
             public Func<bool> shouldRun;
             public bool isOneShot;
-            public Action assert;
+            public Action<FrameInfo> assert;
 
-            public Entry( Func<bool> shouldRun, bool isOneShot, Action assert )
+            public Entry( Func<bool> shouldRun, bool isOneShot, Action<FrameInfo> assert )
             {
                 this.shouldRun = shouldRun;
                 this.isOneShot = isOneShot;
@@ -30,6 +46,12 @@ namespace HSP_Tests_PlayMode
         List<Entry> _onFixedUpdate = new();
         List<Entry> _onUpdate = new();
         List<Entry> _onLateUpdate = new();
+
+        int _fixedUpdateCount = 0;
+        int _updateCount = 0;
+
+        int _totalFixedUpdateCount = 0;
+        int _totalUpdateCount = 0;
 
         private List<Entry> GetList( Step when )
         {
@@ -46,23 +68,23 @@ namespace HSP_Tests_PlayMode
             }
         }
 
-        public void AddAssert( Step when, Action assert )
+        public void AddAssert( Step when, Action<FrameInfo> assert )
         {
             AddAssert( when, null, false, assert );
         }
 
-        public void AddAssert( Step when, Func<bool> shouldRun, Action assert )
+        public void AddAssert( Step when, Func<bool> shouldRun, Action<FrameInfo> assert )
         {
             AddAssert( when, shouldRun, false, assert );
         }
 
-        public void AddAssert( Step when, Func<bool> shouldRun, bool isOneShot, Action assert )
+        public void AddAssert( Step when, Func<bool> shouldRun, bool isOneShot, Action<FrameInfo> assert )
         {
             var list = GetList( when );
             list.Add( new Entry( shouldRun, isOneShot, assert ) );
         }
 
-        public void RemoveAssert( Step when, Action assert )
+        public void RemoveAssert( Step when, Action<FrameInfo> assert )
         {
             var list = GetList( when );
             for( int i = list.Count - 1; i >= 0; i-- )
@@ -87,8 +109,15 @@ namespace HSP_Tests_PlayMode
             this.enabled = false;
         }
 
+        private FrameInfo GetFrameInfo()
+        {
+            return new FrameInfo( _fixedUpdateCount, _updateCount, _totalFixedUpdateCount, _totalUpdateCount );
+        }
+
         void FixedUpdate()
         {
+            var frameInfo = GetFrameInfo();
+
             // Iterate on a snapshot - ToArray() - so the assert can remove itself.
             foreach( var entry in _onFixedUpdate.ToArray() )
             {
@@ -96,7 +125,7 @@ namespace HSP_Tests_PlayMode
                 {
                     try
                     {
-                        entry.assert?.Invoke();
+                        entry.assert?.Invoke( frameInfo );
                     }
                     catch( Exception e )
                     {
@@ -107,17 +136,23 @@ namespace HSP_Tests_PlayMode
                         RemoveAssert( Step.FixedUpdate, entry.assert );
                 }
             }
+
+            _fixedUpdateCount++;
+            _totalFixedUpdateCount++;
+            _updateCount = 0;
         }
 
         void Update()
         {
+            var frameInfo = GetFrameInfo();
+
             foreach( var entry in _onUpdate.ToArray() )
             {
                 if( entry.shouldRun == null || entry.shouldRun.Invoke() )
                 {
                     try
                     {
-                        entry.assert?.Invoke();
+                        entry.assert?.Invoke( frameInfo );
                     }
                     catch( Exception e )
                     {
@@ -128,17 +163,23 @@ namespace HSP_Tests_PlayMode
                         RemoveAssert( Step.Update, entry.assert );
                 }
             }
+
+            _updateCount++;
+            _totalUpdateCount++;
+            _fixedUpdateCount = 0;
         }
 
         void LateUpdate()
         {
+            var frameInfo = GetFrameInfo();
+
             foreach( var entry in _onLateUpdate.ToArray() )
             {
                 if( entry.shouldRun == null || entry.shouldRun.Invoke() )
                 {
                     try
                     {
-                        entry.assert?.Invoke();
+                        entry.assert?.Invoke( frameInfo );
                     }
                     catch( Exception e )
                     {

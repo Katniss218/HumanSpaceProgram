@@ -234,11 +234,11 @@ namespace HSP.Vanilla
 
         public void AddForceAtPosition( Vector3 force, Vector3 position )
         {
+            var referenceFrame = SceneReferenceFrameProvider.GetSceneReferenceFrame();
             Vector3 leverArm = position - this._rb.worldCenterOfMass;
-            _absoluteAccelerationSum += SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAcceleration( (Vector3Dbl)force / Mass );
-            _absoluteAngularAccelerationSum += SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAngularAcceleration( Vector3Dbl.Cross( force, leverArm ) / Mass );
+            _absoluteAccelerationSum += referenceFrame.TransformAcceleration( (Vector3Dbl)force / Mass );
+            _absoluteAngularAccelerationSum += referenceFrame.TransformAngularAcceleration( Vector3Dbl.Cross( force, leverArm ) / Mass );
 
-            // TODO - In the future possibly cache the values across a frame and apply it once instead of n-times.
             this._rb.AddForceAtPosition( force, position, ForceMode.Force );
         }
 
@@ -247,6 +247,31 @@ namespace HSP.Vanilla
             _absoluteAngularAccelerationSum += SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAngularAcceleration( (Vector3Dbl)torque / Mass );
 
             this._rb.AddTorque( torque, ForceMode.Force );
+        }
+
+        public void AddAbsoluteForce( Vector3 force )
+        {
+            _absoluteAccelerationSum += (Vector3Dbl)force / Mass;
+
+            this._rb.AddForce( SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformDirection( force ), ForceMode.Force );
+        }
+
+        public void AddAbsoluteForceAtPosition( Vector3 force, Vector3Dbl position )
+        {
+            var referenceFrame = SceneReferenceFrameProvider.GetSceneReferenceFrame();
+            Vector3Dbl leverArm = position - referenceFrame.TransformPosition( this._rb.worldCenterOfMass );
+            _absoluteAccelerationSum += referenceFrame.TransformAcceleration( (Vector3Dbl)force / Mass );
+            _absoluteAngularAccelerationSum += referenceFrame.TransformAngularAcceleration( Vector3Dbl.Cross( force, leverArm ) / Mass );
+
+            this._rb.AddForceAtPosition( referenceFrame.InverseTransformDirection( force ), (Vector3)referenceFrame.InverseTransformPosition( position ), ForceMode.Force );
+            throw new NotImplementedException();
+        }
+
+        public void AddAbsoluteTorque( Vector3 torque )
+        {
+            _absoluteAngularAccelerationSum += (Vector3Dbl)torque / Mass;
+
+            this._rb.AddTorque( SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformDirection( torque ), ForceMode.Force );
         }
 
         protected void RecalculateCacheIfNeeded()

@@ -12,6 +12,10 @@ namespace HSP.Vanilla.Scenes.GameplayScene
             get => Instance.referenceFrame;
             set => Instance.referenceFrame = value;
         }
+        public static IReferenceFrame PendingReferenceFrame
+        {
+            get => Instance.pendingReferenceFrame;
+        }
 
         public static IReferenceFrameTransform TargetObject
         {

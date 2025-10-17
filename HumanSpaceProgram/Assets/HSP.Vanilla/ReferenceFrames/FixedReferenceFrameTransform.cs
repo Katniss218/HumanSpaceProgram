@@ -227,6 +227,21 @@ namespace HSP.Vanilla
             return; // 'Fixed' is always stationary.
         }
 
+        public void AddAbsoluteForce( Vector3 force )
+        {
+            return;
+        }
+
+        public void AddAbsoluteForceAtPosition( Vector3 force, Vector3Dbl position )
+        {
+            return;
+        }
+
+        public void AddAbsoluteTorque( Vector3 force )
+        {
+            return;
+        }
+
         private void MoveScenePositionAndRotation( IReferenceFrame sceneReferenceFrame )
         {
             var pos = (Vector3)sceneReferenceFrame.InverseTransformPosition( _absolutePosition );
