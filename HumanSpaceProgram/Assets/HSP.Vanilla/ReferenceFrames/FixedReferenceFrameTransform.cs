@@ -222,24 +222,24 @@ namespace HSP.Vanilla
             return; // 'Fixed' is always stationary.
         }
 
-        public void AddTorque( Vector3 force )
+        public void AddTorque( Vector3 torque )
         {
             return; // 'Fixed' is always stationary.
         }
 
         public void AddAbsoluteForce( Vector3 force )
         {
-            return;
+            return; // 'Fixed' is always stationary.
         }
 
         public void AddAbsoluteForceAtPosition( Vector3 force, Vector3Dbl position )
         {
-            return;
+            return; // 'Fixed' is always stationary.
         }
 
-        public void AddAbsoluteTorque( Vector3 force )
+        public void AddAbsoluteTorque( Vector3 torque )
         {
-            return;
+            return; // 'Fixed' is always stationary.
         }
 
         private void MoveScenePositionAndRotation( IReferenceFrame sceneReferenceFrame )
@@ -296,6 +296,7 @@ namespace HSP.Vanilla
             _rb.isKinematic = true;
             _rb.drag = 0;
             _rb.angularDrag = 0;
+            _rb.maxAngularVelocity = float.PositiveInfinity;
         }
 
         void FixedUpdate()

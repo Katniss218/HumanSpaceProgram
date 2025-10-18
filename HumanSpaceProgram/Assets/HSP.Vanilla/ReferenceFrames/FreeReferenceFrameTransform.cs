@@ -236,15 +236,16 @@ namespace HSP.Vanilla
         {
             var referenceFrame = SceneReferenceFrameProvider.GetSceneReferenceFrame();
             Vector3 leverArm = position - this._rb.worldCenterOfMass;
+            Vector3 torque = Vector3.Cross( leverArm, force );
             _absoluteAccelerationSum += referenceFrame.TransformAcceleration( (Vector3Dbl)force / Mass );
-            _absoluteAngularAccelerationSum += referenceFrame.TransformAngularAcceleration( Vector3Dbl.Cross( force, leverArm ) / Mass );
+            _absoluteAngularAccelerationSum += referenceFrame.TransformAngularAcceleration( torque / (float)this.GetInertia( torque.normalized ) );
 
             this._rb.AddForceAtPosition( force, position, ForceMode.Force );
         }
 
         public void AddTorque( Vector3 torque )
         {
-            _absoluteAngularAccelerationSum += SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAngularAcceleration( (Vector3Dbl)torque / Mass );
+            _absoluteAngularAccelerationSum += SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAngularAcceleration( (Vector3Dbl)torque / this.GetInertia( torque.normalized ) );
 
             this._rb.AddTorque( torque, ForceMode.Force );
         }
@@ -260,16 +261,16 @@ namespace HSP.Vanilla
         {
             var referenceFrame = SceneReferenceFrameProvider.GetSceneReferenceFrame();
             Vector3Dbl leverArm = position - referenceFrame.TransformPosition( this._rb.worldCenterOfMass );
-            _absoluteAccelerationSum += referenceFrame.TransformAcceleration( (Vector3Dbl)force / Mass );
-            _absoluteAngularAccelerationSum += referenceFrame.TransformAngularAcceleration( Vector3Dbl.Cross( force, leverArm ) / Mass );
+            Vector3Dbl torque = Vector3Dbl.Cross( leverArm, force );
+            _absoluteAccelerationSum +=  (Vector3Dbl)force / Mass;
+            _absoluteAngularAccelerationSum += torque / this.GetInertia( torque.NormalizeToVector3() );
 
             this._rb.AddForceAtPosition( referenceFrame.InverseTransformDirection( force ), (Vector3)referenceFrame.InverseTransformPosition( position ), ForceMode.Force );
-            throw new NotImplementedException();
         }
 
         public void AddAbsoluteTorque( Vector3 torque )
         {
-            _absoluteAngularAccelerationSum += (Vector3Dbl)torque / Mass;
+            _absoluteAngularAccelerationSum += (Vector3Dbl)torque / this.GetInertia( torque.normalized );
 
             this._rb.AddTorque( SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformDirection( torque ), ForceMode.Force );
         }
@@ -327,6 +328,7 @@ namespace HSP.Vanilla
             _rb.isKinematic = false;
             _rb.drag = 0;
             _rb.angularDrag = 0;
+            _rb.maxAngularVelocity = float.PositiveInfinity;
         }
 
         protected virtual void FixedUpdate()
@@ -345,6 +347,7 @@ namespace HSP.Vanilla
                 this._rb.AddTorque( angAcc, ForceMode.Acceleration );
             }
 
+#warning TODO - modify it so that this runs after physics step and computes the correct values.
             // If the object is colliding, we will use its rigidbody accelerations, because we don't have access to the forces due to collisions.
             // Otherwise, we use our more precise method that relies on full encapsulation of the rigidbody.
             if( IsColliding )

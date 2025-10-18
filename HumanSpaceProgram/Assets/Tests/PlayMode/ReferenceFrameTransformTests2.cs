@@ -1,4 +1,4 @@
-using HSP.ReferenceFrames;
+﻿using HSP.ReferenceFrames;
 using HSP.Time;
 using HSP.Vanilla;
 using HSP.Vanilla.ReferenceFrames;
@@ -30,7 +30,6 @@ namespace HSP_Tests_PlayMode
             TimeManager.SetUT( 0 );
             GameplaySceneReferenceFrameManager refFrameManager = manager.AddComponent<GameplaySceneReferenceFrameManager>();
             GameplaySceneReferenceFrameManager.Instance = refFrameManager;
-            KinematicReferenceFrameTransform.AddPlayerLoopSystem();
             var assertMonoBeh = manager.AddComponent<AssertMonoBehaviour>();
 
             return (manager, timeManager, refFrameManager, assertMonoBeh);
@@ -353,12 +352,12 @@ namespace HSP_Tests_PlayMode
             UnityEngine.Object.DestroyImmediate( manager );
         }
 
-        [TestCase( typeof( FreeReferenceFrameTransform ), ExpectedResult = null )]
-        [TestCase( typeof( KinematicReferenceFrameTransform ), ExpectedResult = null )]
-        [TestCase( typeof( HybridReferenceFrameTransform ), ExpectedResult = null )]
-        [TestCase( typeof( HybridReferenceFrameTransform ), ExpectedResult = null )]
+        [TestCase( typeof( FreeReferenceFrameTransform ), 1, 2, 3, ExpectedResult = null )]
+        [TestCase( typeof( KinematicReferenceFrameTransform ), 100, 200, 300, ExpectedResult = null )]
+        [TestCase( typeof( HybridReferenceFrameTransform ), 1, 2, 3, ExpectedResult = null )] // tests scene sim and switch
+        [TestCase( typeof( HybridReferenceFrameTransform ), 10000, 20000, 30000, ExpectedResult = null )] // tests absolute sim and switch
         [UnityTest]
-        public IEnumerator ForceApplication( Type transformType )
+        public IEnumerator ForceApplication( Type transformType, double vx, double vy, double vz )
         {
             var (manager, timeManager, refFrameManager, assertMonoBeh) = CreateTestScene();
 
@@ -368,7 +367,7 @@ namespace HSP_Tests_PlayMode
             // --- Initial state (absolute and scene aligned for test simplicity) ---
             Vector3Dbl initialPosition = new Vector3Dbl( 0, 0, 0 );
             QuaternionDbl initialRotation = QuaternionDbl.identity;
-            Vector3Dbl initialVelocity = Vector3Dbl.zero;
+            Vector3Dbl initialVelocity = new Vector3Dbl( vx, vy, vz );
             Vector3Dbl initialAngularVelocity = Vector3Dbl.zero;
 
             sut.AbsolutePosition = initialPosition;
@@ -388,47 +387,221 @@ namespace HSP_Tests_PlayMode
             Vector3Dbl expectedVelocity = initialVelocity;
             Vector3Dbl expectedAcceleration = Vector3Dbl.zero;
 
-            // Force that was applied during the previous fixed update.
-            Vector3Dbl lastFixedUpdateTotalForceAbs = Vector3Dbl.zero;
-
             assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.FixedUpdate, ( frameInfo ) =>
             {
-                double mass = Math.Max( physicsSut.Mass, 1e-9 );
-
-                expectedAcceleration = lastFixedUpdateTotalForceAbs / mass;
-
                 var prevExpectedPosition = expectedPosition;
                 var prevExpectedVelocity = expectedVelocity;
-
-                // integrate velocity and position (semi-implicit Euler)
-                var nextVelocity = prevExpectedVelocity + expectedAcceleration * TimeManager.FixedDeltaTime;
-                var nextPosition = prevExpectedPosition + nextVelocity * TimeManager.FixedDeltaTime;
-
-                Assert.That( sut.AbsolutePosition, Is.EqualTo( prevExpectedPosition ).Using( vector3DblApproxComparer ) );
-                Assert.That( sut.AbsoluteVelocity, Is.EqualTo( prevExpectedVelocity ).Using( vector3DblApproxComparer ) );
-                Assert.That( sut.AbsoluteAcceleration, Is.EqualTo( expectedAcceleration ).Using( vector3DblApproxComparer ) );
+                var prevExpectedAcceleration = expectedAcceleration;
 
                 Vector3Dbl absoluteFromScene = forceVectorInSceneSpace;       // scene->absolute (identity in test)
                 Vector3Dbl absoluteFromAbsolute = forceVectorInAbsoluteSpace; // already absolute
 
-                // store the total force that will be present *during* the next integration step
-                lastFixedUpdateTotalForceAbs = absoluteFromScene + absoluteFromAbsolute;
+                var force = absoluteFromScene + absoluteFromAbsolute;
+
+                // integrate velocity and position (semi-implicit Euler)
+                var nextAcceleration = force / physicsSut.Mass;
+                var nextVelocity = prevExpectedVelocity + nextAcceleration * TimeManager.FixedDeltaTime;
+                var nextPosition = prevExpectedPosition + nextVelocity * TimeManager.FixedDeltaTime;
 
                 physicsSut.AddForce( forceVectorInSceneSpace );
                 physicsSut.AddAbsoluteForce( forceVectorInAbsoluteSpace );
 
                 // Update the expected state to the "post-step" values so Update() assertions can compare against them.
-                expectedVelocity = nextVelocity;
                 expectedPosition = nextPosition;
+                expectedVelocity = nextVelocity;
+                expectedAcceleration = nextAcceleration;
+
+                Assert.That( sut.AbsolutePosition, Is.EqualTo( prevExpectedPosition ).Using( vector3DblApproxComparer ) );
+                Assert.That( sut.AbsoluteVelocity, Is.EqualTo( prevExpectedVelocity ).Using( vector3DblApproxComparer ) );
+                Assert.That( sut.AbsoluteAcceleration, Is.EqualTo( prevExpectedAcceleration ).Using( vector3DblApproxComparer ) );
             } );
 
             assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, ( frameInfo ) =>
             {
-                if( frameInfo.FixedUpdatesSinceLastUpdate > 0 )
-                    return;
-
                 //Assert.That( sut.AbsolutePosition, Is.EqualTo( expectedPosition ).Using( vector3DblApproxComparer ) );
                 //Assert.That( sut.AbsoluteVelocity, Is.EqualTo( expectedVelocity ).Using( vector3DblApproxComparer ) );
+                //Assert.That( sut.AbsoluteAcceleration, Is.EqualTo( expectedAcceleration ).Using( vector3DblApproxComparer ) );
+            } );
+
+            assertMonoBeh.Enable();
+
+            yield return new WaitForSeconds( 2f );
+
+            UnityEngine.Object.DestroyImmediate( manager );
+        }
+
+        [TestCase( typeof( FreeReferenceFrameTransform ), 1, 2, 3, ExpectedResult = null )]
+        [TestCase( typeof( KinematicReferenceFrameTransform ), 100, 200, 300, ExpectedResult = null )]
+        [TestCase( typeof( HybridReferenceFrameTransform ), 1, 2, 3, ExpectedResult = null )] // tests scene sim and switch
+        [TestCase( typeof( HybridReferenceFrameTransform ), 10000, 20000, 30000, ExpectedResult = null )] // tests absolute sim and switch
+        [UnityTest]
+        public IEnumerator TorqueApplication( Type transformType, double vx, double vy, double vz )
+        {
+            var (manager, timeManager, refFrameManager, assertMonoBeh) = CreateTestScene();
+
+            IReferenceFrameTransform sut = CreateObject( transformType, new GameplaySceneReferenceFrameProvider() );
+            IPhysicsTransform physicsSut = (IPhysicsTransform)sut;
+
+            // --- Initial state (absolute and scene aligned for test simplicity) ---
+            Vector3Dbl initialPosition = new Vector3Dbl( 0, 0, 0 );
+            QuaternionDbl initialRotation = QuaternionDbl.identity;
+            Vector3Dbl initialVelocity = new Vector3Dbl( vx, vy, vz );
+            Vector3Dbl initialAngularVelocity = Vector3Dbl.zero;
+
+            sut.AbsolutePosition = initialPosition;
+            sut.AbsoluteRotation = initialRotation;
+            sut.AbsoluteVelocity = initialVelocity;
+            sut.AbsoluteAngularVelocity = initialAngularVelocity;
+
+            physicsSut.Mass = 1000f;
+            physicsSut.MomentsOfInertia = new Vector3( 1000f, 500f, 200f );
+
+            Vector3 torqueInSceneSpace = new Vector3( 0f, 1000f, 0f );    // scene-space torque
+            Vector3 torqueInAbsoluteSpace = new Vector3( 0f, 500f, 0f );  // absolute torque
+
+            Vector3Dbl expectedAngularVelocity = initialAngularVelocity;
+            Vector3Dbl expectedAngularAcceleration = Vector3Dbl.zero;
+
+            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.FixedUpdate, ( frameInfo ) =>
+            {
+                var prevExpectedAngularVelocity = expectedAngularVelocity;
+                var prevExpectedAngularAcceleration = expectedAngularAcceleration;
+
+                Vector3Dbl absoluteFromSceneTorque = torqueInSceneSpace;
+                Vector3Dbl absoluteFromAbsoluteTorque = torqueInAbsoluteSpace;
+
+                var netTorque = absoluteFromSceneTorque + absoluteFromAbsoluteTorque;
+
+                var I = physicsSut.MomentsOfInertia;
+                Vector3Dbl nextAngularAcceleration = new Vector3Dbl(
+                    netTorque.x / I.x,
+                    netTorque.y / I.y,
+                    netTorque.z / I.z
+                );
+
+                Vector3Dbl nextAngularVelocity = prevExpectedAngularVelocity + nextAngularAcceleration * TimeManager.FixedDeltaTime;
+
+                physicsSut.AddTorque( torqueInSceneSpace );
+                physicsSut.AddAbsoluteTorque( torqueInAbsoluteSpace );
+
+                expectedAngularAcceleration = nextAngularAcceleration;
+                expectedAngularVelocity = nextAngularVelocity;
+
+                Assert.That( sut.AbsoluteAngularVelocity, Is.EqualTo( prevExpectedAngularVelocity ).Using( vector3DblApproxComparer ) );
+                Assert.That( sut.AbsoluteAngularAcceleration, Is.EqualTo( prevExpectedAngularAcceleration ).Using( vector3DblApproxComparer ) );
+            } );
+
+            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, ( frameInfo ) =>
+            {
+                //Assert.That( sut.AbsoluteAngularVelocity, Is.EqualTo( expectedAngularVelocity ).Using( vector3DblApproxComparer ) );
+                //Assert.That( sut.AbsoluteAngularAcceleration, Is.EqualTo( expectedAngularAcceleration ).Using( vector3DblApproxComparer ) );
+            } );
+
+            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, ( frameInfo ) => { } );
+
+            assertMonoBeh.Enable();
+
+            yield return new WaitForSeconds( 2f );
+
+            UnityEngine.Object.DestroyImmediate( manager );
+        }
+
+        // ----- Force-at-position application tests -----
+        [TestCase( typeof( FreeReferenceFrameTransform ), 1, 2, 3, ExpectedResult = null )]
+        [TestCase( typeof( KinematicReferenceFrameTransform ), 100, 200, 300, ExpectedResult = null )]
+        [TestCase( typeof( HybridReferenceFrameTransform ), 1, 2, 3, ExpectedResult = null )] // tests scene sim and switch
+        [TestCase( typeof( HybridReferenceFrameTransform ), 10000, 20000, 30000, ExpectedResult = null )] // tests absolute sim and switch
+        [UnityTest]
+        public IEnumerator ForceAtPositionApplication( Type transformType, double vx, double vy, double vz )
+        {
+            var (manager, timeManager, refFrameManager, assertMonoBeh) = CreateTestScene();
+
+            IReferenceFrameTransform sut = CreateObject( transformType, new GameplaySceneReferenceFrameProvider() );
+            IPhysicsTransform physicsSut = (IPhysicsTransform)sut;
+
+            // --- Initial state (absolute and scene aligned for test simplicity) ---
+            Vector3Dbl initialPosition = new Vector3Dbl( 0, 0, 0 );
+            QuaternionDbl initialRotation = QuaternionDbl.identity;
+            Vector3Dbl initialVelocity = new Vector3Dbl( vx, vy, vz );
+            Vector3Dbl initialAngularVelocity = Vector3Dbl.zero;
+
+            sut.AbsolutePosition = initialPosition;
+            sut.AbsoluteRotation = initialRotation;
+            sut.AbsoluteVelocity = initialVelocity;
+            sut.AbsoluteAngularVelocity = initialAngularVelocity;
+
+            // Set mass and inertia for predictable physics
+            physicsSut.Mass = 1000f; // [kg]
+            physicsSut.MomentsOfInertia = new Vector3( 1000f, 1000f, 1000f );
+
+            // Forces + application points (scene-space and absolute-space)
+            Vector3 forceInSceneSpace = new Vector3( 1000f, 0f, 0f );
+            Vector3 pointInSceneSpace = new Vector3( 0.0f, 1.0f, 0.0f );
+
+            Vector3 forceInAbsoluteSpace = new Vector3( 500f, 0f, 0f );
+            Vector3 pointInAbsoluteSpace = new Vector3( 0.0f, -2.0f, 0.0f );
+
+            Vector3Dbl expectedPosition = initialPosition;
+            Vector3Dbl expectedVelocity = initialVelocity;
+            Vector3Dbl expectedAcceleration = Vector3Dbl.zero;
+            Vector3Dbl expectedAngularVelocity = initialAngularVelocity;
+            Vector3Dbl expectedAngularAcceleration = Vector3Dbl.zero;
+
+            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.FixedUpdate, ( frameInfo ) =>
+            {
+                var prevExpectedPosition = expectedPosition;
+                var prevExpectedVelocity = expectedVelocity;
+                var prevExpectedAcceleration = expectedAcceleration;
+                var prevExpectedAngularVelocity = expectedAngularVelocity;
+                var prevExpectedAngularAcceleration = expectedAngularAcceleration;
+
+                // Convert scene-space force/point to absolute (identity in our test)
+                Vector3Dbl absForceFromScene = forceInSceneSpace;
+                Vector3Dbl absPointFromScene = pointInSceneSpace;
+                Vector3Dbl absForceFromAbsolute = forceInAbsoluteSpace;
+                Vector3Dbl absPointFromAbsolute = pointInAbsoluteSpace;
+
+                Vector3Dbl torqueFromScene = Vector3Dbl.Cross( absPointFromScene - prevExpectedPosition, absForceFromScene );
+                Vector3Dbl torqueFromAbsolute = Vector3Dbl.Cross( absPointFromAbsolute - prevExpectedPosition, absForceFromAbsolute );
+                Vector3Dbl netTorque = torqueFromScene + torqueFromAbsolute;
+
+                var I = physicsSut.MomentsOfInertia;
+                Vector3Dbl nextAngularAcceleration = new Vector3Dbl(
+                    netTorque.x / I.x,
+                    netTorque.y / I.y,
+                    netTorque.z / I.z
+                );
+                var force = absForceFromScene + absForceFromAbsolute;
+
+                // integrate velocity and position (semi-implicit Euler)
+                var nextAcceleration = force / physicsSut.Mass;
+                var nextVelocity = prevExpectedVelocity + nextAcceleration * TimeManager.FixedDeltaTime;
+                var nextPosition = prevExpectedPosition + nextVelocity * TimeManager.FixedDeltaTime;
+                Vector3Dbl nextAngularVelocity = prevExpectedAngularVelocity + nextAngularAcceleration * TimeManager.FixedDeltaTime;
+
+                physicsSut.AddForceAtPosition( forceInSceneSpace, pointInSceneSpace );
+                physicsSut.AddAbsoluteForceAtPosition( forceInAbsoluteSpace, pointInAbsoluteSpace );
+
+                // Update the expected state to the "post-step" values so Update() assertions can compare against them.
+                expectedPosition = nextPosition;
+                expectedVelocity = nextVelocity;
+                expectedAcceleration = nextAcceleration;
+                expectedAngularAcceleration = nextAngularAcceleration;
+                expectedAngularVelocity = nextAngularVelocity;
+
+                Assert.That( sut.AbsolutePosition, Is.EqualTo( prevExpectedPosition ).Using( vector3DblApproxComparer ) );
+                Assert.That( sut.AbsoluteVelocity, Is.EqualTo( prevExpectedVelocity ).Using( vector3DblApproxComparer ) );
+                Assert.That( sut.AbsoluteAcceleration, Is.EqualTo( prevExpectedAcceleration ).Using( vector3DblApproxComparer ) );
+
+                Assert.That( sut.AbsoluteAngularVelocity, Is.EqualTo( prevExpectedAngularVelocity ).Using( vector3DblApproxComparer ) );
+
+#warning TODO - Free transform only updates these once fixedupdate comes, whereas hybrid/kinematic update them immediately as forces are applied. updating after physicsprocessing is correct.
+                Assert.That( sut.AbsoluteAngularAcceleration, Is.EqualTo( prevExpectedAngularAcceleration ).Using( vector3DblApproxComparer ) );
+            } );
+
+            assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, ( frameInfo ) => 
+            { 
+
             } );
 
             assertMonoBeh.Enable();

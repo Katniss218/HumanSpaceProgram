@@ -226,10 +226,11 @@ namespace HSP.Vanilla
 
         public void AddForceAtPosition( Vector3 force, Vector3 position )
         {
+            var referenceFrame = SceneReferenceFrameProvider.GetSceneReferenceFrame();
             Vector3 leverArm = position - this._rb.worldCenterOfMass;
-            Vector3Dbl torque = Vector3Dbl.Cross( force, leverArm );
-            _absoluteAcceleration += SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAcceleration( (Vector3Dbl)force / Mass );
-            _absoluteAngularAcceleration += SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAngularAcceleration( torque / this.GetInertia( torque.NormalizeToVector3() ) );
+            Vector3Dbl torque = Vector3Dbl.Cross( leverArm, force );
+            _absoluteAcceleration += referenceFrame.TransformAcceleration( (Vector3Dbl)force / Mass );
+            _absoluteAngularAcceleration += referenceFrame.TransformAngularAcceleration( torque / this.GetInertia( torque.NormalizeToVector3() ) );
         }
 
         public void AddTorque( Vector3 torque )
@@ -239,17 +240,21 @@ namespace HSP.Vanilla
 
         public void AddAbsoluteForce( Vector3 force )
         {
-            throw new NotImplementedException();
+            _absoluteAcceleration += (Vector3Dbl)force / Mass;
         }
 
         public void AddAbsoluteForceAtPosition( Vector3 force, Vector3Dbl position )
         {
-            throw new NotImplementedException();
+            var referenceFrame = SceneReferenceFrameProvider.GetSceneReferenceFrame();
+            Vector3Dbl leverArm = position - referenceFrame.TransformPosition( this._rb.worldCenterOfMass );
+            Vector3Dbl torque = Vector3Dbl.Cross( leverArm, force );
+            _absoluteAcceleration += (Vector3Dbl)force / Mass;
+            _absoluteAngularAcceleration += torque / this.GetInertia( torque.NormalizeToVector3() );
         }
 
-        public void AddAbsoluteTorque( Vector3 force )
+        public void AddAbsoluteTorque( Vector3 torque )
         {
-            throw new NotImplementedException();
+            _absoluteAngularAcceleration += (Vector3Dbl)torque / this.GetInertia( torque.normalized );
         }
 
         protected virtual void Awake()
@@ -267,22 +272,11 @@ namespace HSP.Vanilla
             _rb.isKinematic = true;
             _rb.drag = 0;
             _rb.angularDrag = 0;
+            _rb.maxAngularVelocity = float.PositiveInfinity;
         }
 
         protected virtual void FixedUpdate()
         {
-            IReferenceFrame sceneReferenceFrameAfterPhysicsProcessing = SceneReferenceFrameProvider.GetSceneReferenceFrame().AtUT( TimeManager.UT );
-
-            // `_actualAbsolutePosition` should be up to date due to the callback inside physics step, which was invoked in the previous frame.
-
-            _requestedAbsolutePosition = _actualAbsolutePosition + _absoluteVelocity * TimeManager.FixedDeltaTime;
-            QuaternionDbl deltaRotation = QuaternionDbl.AngleAxis( _absoluteAngularVelocity.magnitude * TimeManager.FixedDeltaTime * 57.29577951308232, _absoluteAngularVelocity );
-            _requestedAbsoluteRotation = deltaRotation * _actualAbsoluteRotation;
-
-            var requestedPos = (Vector3)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformPosition( _requestedAbsolutePosition );
-            var requestedRot = (Quaternion)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformRotation( _requestedAbsoluteRotation );
-
-            _rb.Move( requestedPos, requestedRot );
         }
 
         public virtual void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
@@ -304,6 +298,11 @@ namespace HSP.Vanilla
         {
             _sceneReferenceFrameProvider?.SubscribeIfNotSubscribed( this );
             _activeKinematicTransforms.Add( this );
+            if( _activeKinematicTransforms.Count == 1 )
+            {
+                PlayerLoopUtils.InsertSystemAfter<FixedUpdate>( in _afterFixedUpdatePlayerLoopSystem, typeof( FixedUpdate.ScriptRunBehaviourFixedUpdate ) );
+                PlayerLoopUtils.AddSystem<FixedUpdate, FixedUpdate.PhysicsFixedUpdate>( in _playerLoopSystem );
+            }
             _rb.isKinematic = true; // Force kinematic.
         }
 
@@ -311,6 +310,11 @@ namespace HSP.Vanilla
         {
             _sceneReferenceFrameProvider?.UnsubscribeIfSubscribed( this );
             _activeKinematicTransforms.Remove( this );
+            if( _activeKinematicTransforms.Count == 0 )
+            {
+                PlayerLoopUtils.RemoveSystem<FixedUpdate>( in _afterFixedUpdatePlayerLoopSystem );
+                PlayerLoopUtils.RemoveSystem<FixedUpdate, FixedUpdate.PhysicsFixedUpdate>( in _playerLoopSystem );
+            }
             _rb.isKinematic = true;
         }
 
@@ -334,33 +338,52 @@ namespace HSP.Vanilla
         }
 
 
-        public const string ADD_PLAYER_LOOP_SYSTEM = "12431242132131";
-
-#warning TODO - change this so that tests can use it too. change to whenever the first is added/removed. use a better API than the current unityplus one.
-        // Imo it's kind of ugly using HSPEvent_STARTUP_IMMEDIATELY to mess with player loop, but it is what it is.
-        [HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, ADD_PLAYER_LOOP_SYSTEM )]
-        public static void AddPlayerLoopSystem()
+        private static PlayerLoopSystem _afterFixedUpdatePlayerLoopSystem = new PlayerLoopSystem()
         {
-            PlayerLoopUtils.AddSystem<FixedUpdate, FixedUpdate.PhysicsFixedUpdate>( in _playerLoopSystem );
-        }
-
+            type = typeof( KinematicReferenceFrameTransform ),
+            updateDelegate = AfterFixedUpdate,
+            subSystemList = null
+        };
         private static PlayerLoopSystem _playerLoopSystem = new PlayerLoopSystem()
         {
-            type = typeof( SceneReferenceFrameManager ),
+            type = typeof( KinematicReferenceFrameTransform ),
             updateDelegate = InsidePhysicsStep,
             subSystemList = null
         };
 
-        static List<KinematicReferenceFrameTransform> _activeKinematicTransforms = new();
+        private static List<KinematicReferenceFrameTransform> _activeKinematicTransforms = new();
 
-        static void InsidePhysicsStep()
+        private static void AfterFixedUpdate() // we update it here (after all fixed behaviour updates)
+                                       // because otherwise the execution order might fuck things,
+                                       // and I don't want to change the order manually.
         {
-            // Assume that other objects aren't allowed to get the absolute position/velocity during physics step, as it is undefined (changes) during it.
+            foreach( var t in _activeKinematicTransforms )
+            {
+                IReferenceFrame sceneReferenceFrameAfterPhysicsProcessing = t.SceneReferenceFrameProvider.GetSceneReferenceFrame().AtUT( TimeManager.UT );
+
+                // `_actualAbsolutePosition` should be up to date due to the callback inside physics step, which was invoked in the previous frame.
+
+                var vel = t._absoluteVelocity + t._absoluteAcceleration * TimeManager.FixedDeltaTime;
+                var angvel = t._absoluteAngularVelocity + t._absoluteAngularAcceleration * TimeManager.FixedDeltaTime;
+
+                t._requestedAbsolutePosition = t._actualAbsolutePosition + vel * TimeManager.FixedDeltaTime;
+                QuaternionDbl deltaRotation = QuaternionDbl.AngleAxis( angvel.magnitude * TimeManager.FixedDeltaTime * 57.29577951308232, angvel );
+                t._requestedAbsoluteRotation = deltaRotation * t._actualAbsoluteRotation;
+
+                var requestedPos = (Vector3)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformPosition( t._requestedAbsolutePosition );
+                var requestedRot = (Quaternion)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformRotation( t._requestedAbsoluteRotation );
+
+                t._rb.Move( requestedPos, requestedRot );
+            }
+        }
+
+        private static void InsidePhysicsStep()
+        {
+            // Assume that other objects aren't allowed to get the absolute position/velocity *in* the physics step, as it is undefined (changes) during it.
             foreach( var t in _activeKinematicTransforms )
             {
                 t._absoluteVelocity += t._absoluteAcceleration * TimeManager.FixedDeltaTime;
                 t._absoluteAngularVelocity += t._absoluteAngularAcceleration * TimeManager.FixedDeltaTime;
-
 
                 t._absoluteAcceleration = Vector3Dbl.zero;
                 t._absoluteAngularAcceleration = Vector3Dbl.zero;

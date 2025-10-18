@@ -96,7 +96,6 @@ namespace HSP_Tests_PlayMode
             TimeManager.SetUT( 0 );
             GameplaySceneReferenceFrameManager refFrameManager = manager.AddComponent<GameplaySceneReferenceFrameManager>();
             GameplaySceneReferenceFrameManager.Instance = refFrameManager;
-            KinematicReferenceFrameTransform.AddPlayerLoopSystem();
             var assertMonoBeh = manager.AddComponent<AssertMonoBehaviour>();
 
             return (manager, timeManager, refFrameManager, assertMonoBeh);

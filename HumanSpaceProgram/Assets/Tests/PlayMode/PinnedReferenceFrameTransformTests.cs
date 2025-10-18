@@ -97,7 +97,6 @@ namespace HSP_Tests_PlayMode
             TimeManager.SetUT( 0 );
             GameplaySceneReferenceFrameManager refFrameManager = manager.AddComponent<GameplaySceneReferenceFrameManager>();
             GameplaySceneReferenceFrameManager.Instance = refFrameManager;
-            KinematicReferenceFrameTransform.AddPlayerLoopSystem();
 
             return (manager, timeManager, refFrameManager);
         }

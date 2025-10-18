@@ -31,7 +31,10 @@ namespace HSP.Vanilla.ReferenceFrames
 
         protected override void OnEnable()
         {
-            LODQuad.ResetPositionAndRotationAll( _quadSphere );
+            if( _quadSphere != null )
+            {
+                LODQuad.ResetPositionAndRotationAll( _quadSphere );
+            }
 
             base.OnEnable();
         }
@@ -44,6 +47,7 @@ namespace HSP.Vanilla.ReferenceFrames
             var p = sphere.QuadParent.gameObject.AddComponent<PinnedLODSphereReferenceFrameTransform>();
             p.SceneReferenceFrameProvider = sphere.CelestialBody.ReferenceFrameTransform.SceneReferenceFrameProvider;
             p._quadSphere = sphere;
+            LODQuad.ResetPositionAndRotationAll( sphere );
             Vector3Dbl localPos = Vector3Dbl.zero;
             p.SetReference( sphere.CelestialBody, localPos, Quaternion.identity );
         }

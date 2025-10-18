@@ -326,7 +326,7 @@ namespace HSP.Vanilla
         public void AddForceAtPosition( Vector3 force, Vector3 position )
         {
             Vector3 leverArm = position - this._rb.worldCenterOfMass;
-            Vector3Dbl torque = Vector3Dbl.Cross( force, leverArm );
+            Vector3Dbl torque = Vector3Dbl.Cross( leverArm, force );
             _absoluteAcceleration += SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAcceleration( (Vector3Dbl)force / Mass );
             if( torque.magnitude != 0 )
                 _absoluteAngularAcceleration += SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAngularAcceleration( torque / this.GetInertia( torque.NormalizeToVector3() ) );
@@ -349,17 +349,37 @@ namespace HSP.Vanilla
 
         public void AddAbsoluteForce( Vector3 force )
         {
-            throw new NotImplementedException();
+            _absoluteAcceleration += (Vector3Dbl)force / Mass;
+
+            if( _isSceneSpace )
+            {
+                this._rb.AddForce( SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformDirection( force ), ForceMode.Force );
+            }
         }
 
         public void AddAbsoluteForceAtPosition( Vector3 force, Vector3Dbl position )
         {
-            throw new NotImplementedException();
+            var referenceFrame = SceneReferenceFrameProvider.GetSceneReferenceFrame();
+            Vector3Dbl leverArm = position - referenceFrame.TransformPosition( this._rb.worldCenterOfMass );
+            Vector3Dbl torque = Vector3Dbl.Cross( leverArm, force );
+            _absoluteAcceleration += (Vector3Dbl)force / Mass;
+            if( torque.magnitude != 0 )
+                _absoluteAngularAcceleration += torque / this.GetInertia( torque.NormalizeToVector3() );
+
+            if( _isSceneSpace )
+            {
+                this._rb.AddForceAtPosition( referenceFrame.InverseTransformDirection( force ), (Vector3)referenceFrame.InverseTransformPosition( position ), ForceMode.Force );
+            }
         }
 
-        public void AddAbsoluteTorque( Vector3 force )
+        public void AddAbsoluteTorque( Vector3 torque )
         {
-            throw new NotImplementedException();
+            _absoluteAngularAcceleration += (Vector3Dbl)torque / this.GetInertia( torque.normalized );
+
+            if( _isSceneSpace )
+            {
+                this._rb.AddTorque( SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformDirection( torque ), ForceMode.Force );
+            }
         }
 
         private void SwitchToAbsoluteMode()
@@ -411,6 +431,7 @@ namespace HSP.Vanilla
             _rb.isKinematic = !_isSceneSpace;
             _rb.drag = 0;
             _rb.angularDrag = 0;
+            _rb.maxAngularVelocity = float.PositiveInfinity;
         }
 
         void FixedUpdate()
@@ -442,36 +463,22 @@ namespace HSP.Vanilla
                         SwitchToSceneMode();
                     }
                 }
-            }
 
-            if( _isSceneSpace )
-            {
-                if( SceneReferenceFrameProvider.GetSceneReferenceFrame() is INonInertialReferenceFrame frame )
+                if( _isSceneSpace )
                 {
-                    Vector3Dbl localPos = frame.InverseTransformPosition( this.AbsolutePosition );
-                    Vector3Dbl localVel = this.Velocity;
-                    Vector3Dbl localAngVel = this.AngularVelocity;
-                    Vector3 linAcc = (Vector3)frame.GetFicticiousAcceleration( localPos, localVel );
-                    Vector3 angAcc = (Vector3)frame.GetFictitiousAngularAcceleration( localPos, localAngVel );
+                    // apply noninertial force.
+                    if( SceneReferenceFrameProvider.GetSceneReferenceFrame() is INonInertialReferenceFrame frame )
+                    {
+                        Vector3Dbl localPos = frame.InverseTransformPosition( AbsolutePosition );
+                        Vector3Dbl localVel = Velocity;
+                        Vector3Dbl localAngVel = AngularVelocity;
+                        Vector3 linAcc = (Vector3)frame.GetFicticiousAcceleration( localPos, localVel );
+                        Vector3 angAcc = (Vector3)frame.GetFictitiousAngularAcceleration( localPos, localAngVel );
 
-                    this._rb.AddForce( linAcc, ForceMode.Acceleration );
-                    this._rb.AddTorque( angAcc, ForceMode.Acceleration );
+                        _rb.AddForce( linAcc, ForceMode.Acceleration );
+                        _rb.AddTorque( angAcc, ForceMode.Acceleration );
+                    }
                 }
-            }
-            else
-            {
-                IReferenceFrame sceneReferenceFrameAfterPhysicsProcessing = SceneReferenceFrameProvider.GetSceneReferenceFrame().AtUT( TimeManager.UT );
-
-                // `_actualAbsolutePosition` should be up to date due to the callback inside physics step, which was invoked in the previous frame.
-
-                _requestedAbsolutePosition = _actualAbsolutePosition + _absoluteVelocity * TimeManager.FixedDeltaTime;
-                QuaternionDbl deltaRotation = QuaternionDbl.AngleAxis( _absoluteAngularVelocity.magnitude * TimeManager.FixedDeltaTime * 57.29577951308232, _absoluteAngularVelocity );
-                _requestedAbsoluteRotation = deltaRotation * _actualAbsoluteRotation;
-
-                var requestedPos = (Vector3)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformPosition( _requestedAbsolutePosition );
-                var requestedRot = (Quaternion)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformRotation( _requestedAbsoluteRotation );
-
-                _rb.Move( requestedPos, requestedRot );
             }
         }
 
@@ -520,6 +527,7 @@ namespace HSP.Vanilla
             _activeHybridTransforms.Add( this );
             if( _activeHybridTransforms.Count == 1 )
             {
+                PlayerLoopUtils.InsertSystemAfter<FixedUpdate>( in _afterFixedUpdatePlayerLoopSystem, typeof( FixedUpdate.ScriptRunBehaviourFixedUpdate ) );
                 PlayerLoopUtils.AddSystem<FixedUpdate, FixedUpdate.PhysicsFixedUpdate>( in _playerLoopSystem );
             }
         }
@@ -530,6 +538,7 @@ namespace HSP.Vanilla
             _activeHybridTransforms.Remove( this );
             if( _activeHybridTransforms.Count == 0 )
             {
+                PlayerLoopUtils.RemoveSystem<FixedUpdate>( in _afterFixedUpdatePlayerLoopSystem );
                 PlayerLoopUtils.RemoveSystem<FixedUpdate, FixedUpdate.PhysicsFixedUpdate>( in _playerLoopSystem );
             }
         }
@@ -554,15 +563,12 @@ namespace HSP.Vanilla
         }
 
 
-        public const string ADD_PLAYER_LOOP_SYSTEM = "76523523453544";
-
-        // Imo it's kind of ugly using HSPEvent_STARTUP_IMMEDIATELY to mess with player loop, but it is what it is.
-        //[HSPEventListener( HSPEvent_STARTUP_IMMEDIATELY.ID, ADD_PLAYER_LOOP_SYSTEM )]
-        static void AddPlayerLoopSystem()
+        private static PlayerLoopSystem _afterFixedUpdatePlayerLoopSystem = new PlayerLoopSystem()
         {
-            PlayerLoopUtils.AddSystem<FixedUpdate, FixedUpdate.PhysicsFixedUpdate>( in _playerLoopSystem );
-        }
-
+            type = typeof( HybridReferenceFrameTransform ),
+            updateDelegate = AfterFixedUpdate,
+            subSystemList = null
+        };
         private static PlayerLoopSystem _playerLoopSystem = new PlayerLoopSystem()
         {
             type = typeof( SceneReferenceFrameManager ),
@@ -572,6 +578,32 @@ namespace HSP.Vanilla
 
         static List<HybridReferenceFrameTransform> _activeHybridTransforms = new();
 
+        private static void AfterFixedUpdate() // we update it here (after all fixed behaviour updates)
+                                               // because otherwise the execution order might fuck things,
+                                               // and I don't want to change the order manually.
+        {
+            foreach( var t in _activeHybridTransforms )
+            {
+                if( !t._isSceneSpace )
+                {
+                    IReferenceFrame sceneReferenceFrameAfterPhysicsProcessing = t.SceneReferenceFrameProvider.GetSceneReferenceFrame().AtUT( TimeManager.UT );
+
+                    // `_actualAbsolutePosition` should be up to date due to the callback inside physics step, which was invoked in the previous frame.
+
+                    var vel = t._absoluteVelocity + t._absoluteAcceleration * TimeManager.FixedDeltaTime;
+                    var angvel = t._absoluteAngularVelocity + t._absoluteAngularAcceleration * TimeManager.FixedDeltaTime;
+
+                    t._requestedAbsolutePosition = t._actualAbsolutePosition + vel * TimeManager.FixedDeltaTime;
+                    QuaternionDbl deltaRotation = QuaternionDbl.AngleAxis( angvel.magnitude * TimeManager.FixedDeltaTime * 57.29577951308232, angvel );
+                    t._requestedAbsoluteRotation = deltaRotation * t._actualAbsoluteRotation;
+
+                    var requestedPos = (Vector3)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformPosition( t._requestedAbsolutePosition );
+                    var requestedRot = (Quaternion)sceneReferenceFrameAfterPhysicsProcessing.InverseTransformRotation( t._requestedAbsoluteRotation );
+
+                    t._rb.Move( requestedPos, requestedRot );
+                }
+            }
+        }
         static void InsidePhysicsStep()
         {
             // This is required to happen indide physics step to properly account for all forces added during fixedupdate IF THE OBJECT IS IN ABSOLUTE MODE.

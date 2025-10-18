@@ -263,7 +263,7 @@ namespace HSP.Vanilla
             return;
         }
 
-        public void AddTorque( Vector3 force )
+        public void AddTorque( Vector3 torque )
         {
             return;
         }
@@ -278,7 +278,7 @@ namespace HSP.Vanilla
             return;
         }
 
-        public void AddAbsoluteTorque( Vector3 force )
+        public void AddAbsoluteTorque( Vector3 torque )
         {
             return;
         }
@@ -310,7 +310,6 @@ namespace HSP.Vanilla
 
         private void RecalculateCache( IReferenceFrame sceneReferenceFrame )
         {
-#warning TODO - decide what the convention for this should be. do we include tangential vel or not?
             IReferenceFrame bodyFrame = _referenceTransform == null
                 ? new CenteredReferenceFrame( TimeManager.UT, Vector3Dbl.zero )
                 : _referenceTransform.NonInertialReferenceFrame(); // Needs to be a non-inertial frame to have angular velocity.
@@ -323,7 +322,6 @@ namespace HSP.Vanilla
             if( bodyFrame is INonInertialReferenceFrame nirf )
             {
                 _cachedAbsoluteVelocity += nirf.GetTangentialVelocity( _referencePosition );
-                Debug.Log( nirf.GetTangentialVelocity( _referencePosition ).magnitude );
             }
 
             _cachedVelocity = (Vector3)sceneReferenceFrame.InverseTransformVelocity( _cachedAbsoluteVelocity );
@@ -361,6 +359,7 @@ namespace HSP.Vanilla
             _rb.isKinematic = true;
             _rb.drag = 0;
             _rb.angularDrag = 0;
+            _rb.maxAngularVelocity = float.PositiveInfinity;
         }
 
         protected virtual void FixedUpdate()
