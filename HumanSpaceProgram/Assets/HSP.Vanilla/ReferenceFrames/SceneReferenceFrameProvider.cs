@@ -14,11 +14,11 @@ namespace HSP.Vanilla.ReferenceFrames
 
         public void SubscribeIfNotSubscribed( IReferenceFrameSwitchResponder responder )
         {
-            GameplaySceneReferenceFrameManager.Instance.Subscribe( responder );
+            GameplaySceneReferenceFrameManager.Instance?.Subscribe( responder );
         }
         public void UnsubscribeIfSubscribed( IReferenceFrameSwitchResponder responder )
         {
-            GameplaySceneReferenceFrameManager.Instance.Unsubscribe( responder );
+            GameplaySceneReferenceFrameManager.Instance?.Unsubscribe( responder );
         }
 
         [MapsInheritingFrom( typeof( GameplaySceneReferenceFrameProvider ) )]
@@ -37,11 +37,11 @@ namespace HSP.Vanilla.ReferenceFrames
 
         public void SubscribeIfNotSubscribed( IReferenceFrameSwitchResponder responder )
         {
-            MapSceneReferenceFrameManager.Instance.Subscribe( responder );
+            MapSceneReferenceFrameManager.Instance?.Subscribe( responder );
         }
         public void UnsubscribeIfSubscribed( IReferenceFrameSwitchResponder responder )
         {
-            MapSceneReferenceFrameManager.Instance.Unsubscribe( responder );
+            MapSceneReferenceFrameManager.Instance?.Unsubscribe( responder );
         }
 
         [MapsInheritingFrom( typeof( MapSceneReferenceFrameProvider ) )]

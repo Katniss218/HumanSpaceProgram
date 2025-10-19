@@ -44,7 +44,8 @@ namespace HSP.Vanilla.Scenes.DesignScene
         [HSPEventListener( HSPEvent_DESIGN_SCENE_LOAD.ID, ADD_SCENE_REFERENCE_FRAME_MANAGER )]
         private static void AddSceneReferenceFrameManager()
         {
-            GameplaySceneReferenceFrameManager.Instance = DesignSceneM.Instance.gameObject.AddComponent<GameplaySceneReferenceFrameManager>();
+            // TODO - make its own?
+            DesignSceneM.Instance.gameObject.AddComponent<GameplaySceneReferenceFrameManager>();
         }
 
         [HSPEventListener( HSPEvent_DESIGN_SCENE_LOAD.ID, ADD_ACTIVE_OBJECT_MANAGER )]

@@ -99,7 +99,6 @@ namespace HSP_Tests_PlayMode
         [UnityTest]
         public IEnumerator RequestReferenceFrameSwitch_ReferenceFrameUpdatesAfterPhysicsProcessing()
         {
-#warning TODO - request switch in fixed update and in update, they should both have correct behaviour. - fixed update should have the isswitchrequested set to true if switch was requested from previous update.
             GameObject go = new GameObject();
             TimeManager timeManager = go.AddComponent<TimeManager>();
             SceneReferenceFrameManager sman = go.AddComponent<SceneReferenceFrameManager>();

@@ -158,7 +158,6 @@ namespace HSP.Vanilla.UI.Scenes.DesignScene
                 _toolOptionsPanel.Destroy();
             }
 
-#warning TODO - this tool-specific ui belongs to where the tools are.
             Type toolType = DesignSceneToolManager.ActiveToolType;
             if( toolType != null )
             {

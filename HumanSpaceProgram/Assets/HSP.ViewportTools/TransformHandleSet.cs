@@ -99,8 +99,6 @@ namespace HSP.ViewportTools
         /// <param name="colliderConfigurator">Use to add the appropriate collider.</param>
         public void CreateXYZHandles<T>( Mesh mesh, Material material, Action<GameObject> colliderConfigurator ) where T : TransformHandle
         {
-            // TODO - the collider adder thing being a delegate is kinda ugly and prone to abuse.
-
             foreach( var h in _handles )
             {
                 Destroy( h.gameObject );

@@ -159,6 +159,10 @@ namespace HSP.Vessels
             Vector3Dbl partPosInVesselSpace = vesselFrame.InverseTransformPosition( partPosAirf );
 
 #warning TODO - use a physically accurate calculation that preserves angular and linear momenta.
+            // Needs to calculate the correct rotational inertia for the 2 bodies being split.
+            // we could potentially cache the inertias for each 'part' and combine them so to not recalculate from each collider/allow custom inertia tensors.
+            // then set set the velocities/angular velocities based on conservation of momentum and masses/inertia of both objects.
+
             Vessel newVessel = VesselFactory.CreatePartless( HSPSceneManager.GetScene( oldVessel.gameObject ),
                 partPosAirf,
                 sceneFrame.TransformRotation( partToSplit.transform.rotation ),

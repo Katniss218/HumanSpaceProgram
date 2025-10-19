@@ -1,11 +1,21 @@
 ﻿using HSP.ReferenceFrames;
+using UnityEngine;
 
 namespace HSP.Vanilla.Scenes.MapScene
 {
     public class MapSceneReferenceFrameManager : SceneReferenceFrameManager
     {
-#warning TODO - add auto-instance setting
-        public static MapSceneReferenceFrameManager Instance;
+        private static MapSceneReferenceFrameManager __instance;
+        public static MapSceneReferenceFrameManager Instance
+        {
+            get
+            {
+                if( __instance == null )
+                    SingletonMonoBehaviourUtils.InstanceExists<MapSceneReferenceFrameManager>( out __instance );
+
+                return __instance; // may be null.
+            }
+        }
 
         public static IReferenceFrame ReferenceFrame
         {

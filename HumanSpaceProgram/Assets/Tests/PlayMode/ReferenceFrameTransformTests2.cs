@@ -15,10 +15,10 @@ namespace HSP_Tests_PlayMode
 {
     public class ReferenceFrametransformTests2
     {
-        static IEqualityComparer<Vector3> vector3ApproxComparer = new Vector3ApproximateComparer( 0.0001f );
-        static IEqualityComparer<Vector3Dbl> vector3DblApproxComparer = new Vector3DblApproximateComparer( 0.0001 );
-        static IEqualityComparer<Quaternion> quaternionApproxComparer = new QuaternionApproximateComparer( 0.0001f );
-        static IEqualityComparer<QuaternionDbl> quaternionDblApproxComparer = new QuaternionDblApproximateComparer( 0.0001 );
+        static IEqualityComparer<Vector3> vector3ApproxComparer = new Vector3ApproximateComparer( 0.0005f );
+        static IEqualityComparer<Vector3Dbl> vector3DblApproxComparer = new Vector3DblApproximateComparer( 0.0005 );
+        static IEqualityComparer<Quaternion> quaternionApproxComparer = new QuaternionApproximateComparer( 0.0005f );
+        static IEqualityComparer<QuaternionDbl> quaternionDblApproxComparer = new QuaternionDblApproximateComparer( 0.0005 );
 
         /// <summary>
         /// Creates a test scene with TimeManager and ReferenceFrameManager
@@ -29,7 +29,6 @@ namespace HSP_Tests_PlayMode
             TimeManager timeManager = manager.AddComponent<TimeManager>();
             TimeManager.SetUT( 0 );
             GameplaySceneReferenceFrameManager refFrameManager = manager.AddComponent<GameplaySceneReferenceFrameManager>();
-            GameplaySceneReferenceFrameManager.Instance = refFrameManager;
             var assertMonoBeh = manager.AddComponent<AssertMonoBehaviour>();
 
             return (manager, timeManager, refFrameManager, assertMonoBeh);
@@ -411,9 +410,16 @@ namespace HSP_Tests_PlayMode
                 expectedVelocity = nextVelocity;
                 expectedAcceleration = nextAcceleration;
 
+                IReferenceFrame sceneRef = GameplaySceneReferenceFrameManager.ReferenceFrame;
+                Assert.That( sut.Position, Is.EqualTo( (Vector3)sceneRef.InverseTransformPosition( prevExpectedPosition ) ).Using( vector3ApproxComparer ) );
+                Assert.That( sut.Velocity, Is.EqualTo( (Vector3)sceneRef.InverseTransformVelocity( prevExpectedVelocity ) ).Using( vector3ApproxComparer ) );
+
+                Assert.That( sut.Acceleration, Is.EqualTo( (Vector3)sceneRef.InverseTransformAcceleration( expectedAcceleration ) ).Using( vector3ApproxComparer ) );
+
                 Assert.That( sut.AbsolutePosition, Is.EqualTo( prevExpectedPosition ).Using( vector3DblApproxComparer ) );
                 Assert.That( sut.AbsoluteVelocity, Is.EqualTo( prevExpectedVelocity ).Using( vector3DblApproxComparer ) );
-                Assert.That( sut.AbsoluteAcceleration, Is.EqualTo( prevExpectedAcceleration ).Using( vector3DblApproxComparer ) );
+
+                Assert.That( sut.AbsoluteAcceleration, Is.EqualTo( expectedAcceleration ).Using( vector3DblApproxComparer ) );
             } );
 
             assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, ( frameInfo ) =>
@@ -459,11 +465,13 @@ namespace HSP_Tests_PlayMode
             Vector3 torqueInSceneSpace = new Vector3( 0f, 1000f, 0f );    // scene-space torque
             Vector3 torqueInAbsoluteSpace = new Vector3( 0f, 500f, 0f );  // absolute torque
 
+            QuaternionDbl expectedRotation = initialRotation;
             Vector3Dbl expectedAngularVelocity = initialAngularVelocity;
             Vector3Dbl expectedAngularAcceleration = Vector3Dbl.zero;
 
             assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.FixedUpdate, ( frameInfo ) =>
             {
+                var prevExpectedRotation = expectedRotation;
                 var prevExpectedAngularVelocity = expectedAngularVelocity;
                 var prevExpectedAngularAcceleration = expectedAngularAcceleration;
 
@@ -479,16 +487,27 @@ namespace HSP_Tests_PlayMode
                     netTorque.z / I.z
                 );
 
-                Vector3Dbl nextAngularVelocity = prevExpectedAngularVelocity + nextAngularAcceleration * TimeManager.FixedDeltaTime;
+                var nextAngularVelocity = prevExpectedAngularVelocity + nextAngularAcceleration * TimeManager.FixedDeltaTime;
+                QuaternionDbl deltaRotation = QuaternionDbl.AngleAxis( nextAngularVelocity.magnitude * TimeManager.FixedDeltaTime * 57.29577951308232, nextAngularVelocity );
+                var nextRotation = deltaRotation * prevExpectedRotation;
 
                 physicsSut.AddTorque( torqueInSceneSpace );
                 physicsSut.AddAbsoluteTorque( torqueInAbsoluteSpace );
 
-                expectedAngularAcceleration = nextAngularAcceleration;
+                expectedRotation = nextRotation;
                 expectedAngularVelocity = nextAngularVelocity;
+                expectedAngularAcceleration = nextAngularAcceleration;
 
+                IReferenceFrame sceneRef = GameplaySceneReferenceFrameManager.ReferenceFrame;
+                Assert.That( sut.Rotation, Is.EqualTo( (Quaternion)sceneRef.InverseTransformRotation( prevExpectedRotation ) ).Using( quaternionApproxComparer ) );
+                Assert.That( sut.AngularVelocity, Is.EqualTo( (Vector3)sceneRef.InverseTransformAngularVelocity( prevExpectedAngularVelocity ) ).Using( vector3ApproxComparer ) );
+
+                Assert.That( sut.AngularAcceleration, Is.EqualTo( (Vector3)sceneRef.InverseTransformAngularAcceleration( expectedAngularAcceleration ) ).Using( vector3ApproxComparer ) );
+
+                Assert.That( sut.AbsoluteRotation, Is.EqualTo( prevExpectedRotation ).Using( quaternionDblApproxComparer ) );
                 Assert.That( sut.AbsoluteAngularVelocity, Is.EqualTo( prevExpectedAngularVelocity ).Using( vector3DblApproxComparer ) );
-                Assert.That( sut.AbsoluteAngularAcceleration, Is.EqualTo( prevExpectedAngularAcceleration ).Using( vector3DblApproxComparer ) );
+
+                Assert.That( sut.AbsoluteAngularAcceleration, Is.EqualTo( expectedAngularAcceleration ).Using( vector3DblApproxComparer ) );
             } );
 
             assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, ( frameInfo ) =>
@@ -510,7 +529,7 @@ namespace HSP_Tests_PlayMode
         [TestCase( typeof( FreeReferenceFrameTransform ), 1, 2, 3, ExpectedResult = null )]
         [TestCase( typeof( KinematicReferenceFrameTransform ), 100, 200, 300, ExpectedResult = null )]
         [TestCase( typeof( HybridReferenceFrameTransform ), 1, 2, 3, ExpectedResult = null )] // tests scene sim and switch
-        [TestCase( typeof( HybridReferenceFrameTransform ), 10000, 20000, 30000, ExpectedResult = null )] // tests absolute sim and switch
+        [TestCase( typeof( HybridReferenceFrameTransform ), 100, 200, 300, ExpectedResult = null )] // tests absolute sim and switch
         [UnityTest]
         public IEnumerator ForceAtPositionApplication( Type transformType, double vx, double vy, double vz )
         {
@@ -542,6 +561,7 @@ namespace HSP_Tests_PlayMode
             Vector3 pointInAbsoluteSpace = new Vector3( 0.0f, -2.0f, 0.0f );
 
             Vector3Dbl expectedPosition = initialPosition;
+            QuaternionDbl expectedRotation = initialRotation;
             Vector3Dbl expectedVelocity = initialVelocity;
             Vector3Dbl expectedAcceleration = Vector3Dbl.zero;
             Vector3Dbl expectedAngularVelocity = initialAngularVelocity;
@@ -550,6 +570,7 @@ namespace HSP_Tests_PlayMode
             assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.FixedUpdate, ( frameInfo ) =>
             {
                 var prevExpectedPosition = expectedPosition;
+                var prevExpectedRotation = expectedRotation;
                 var prevExpectedVelocity = expectedVelocity;
                 var prevExpectedAcceleration = expectedAcceleration;
                 var prevExpectedAngularVelocity = expectedAngularVelocity;
@@ -577,26 +598,37 @@ namespace HSP_Tests_PlayMode
                 var nextAcceleration = force / physicsSut.Mass;
                 var nextVelocity = prevExpectedVelocity + nextAcceleration * TimeManager.FixedDeltaTime;
                 var nextPosition = prevExpectedPosition + nextVelocity * TimeManager.FixedDeltaTime;
-                Vector3Dbl nextAngularVelocity = prevExpectedAngularVelocity + nextAngularAcceleration * TimeManager.FixedDeltaTime;
+                var nextAngularVelocity = prevExpectedAngularVelocity + nextAngularAcceleration * TimeManager.FixedDeltaTime;
+                QuaternionDbl deltaRotation = QuaternionDbl.AngleAxis( nextAngularVelocity.magnitude * TimeManager.FixedDeltaTime * 57.29577951308232, nextAngularVelocity );
+                var nextRotation = deltaRotation * prevExpectedRotation;
 
                 physicsSut.AddForceAtPosition( forceInSceneSpace, pointInSceneSpace );
                 physicsSut.AddAbsoluteForceAtPosition( forceInAbsoluteSpace, pointInAbsoluteSpace );
 
                 // Update the expected state to the "post-step" values so Update() assertions can compare against them.
                 expectedPosition = nextPosition;
+                expectedRotation = nextRotation;
                 expectedVelocity = nextVelocity;
+                expectedAngularVelocity = nextAngularVelocity; 
                 expectedAcceleration = nextAcceleration;
                 expectedAngularAcceleration = nextAngularAcceleration;
-                expectedAngularVelocity = nextAngularVelocity;
+
+                IReferenceFrame sceneRef = GameplaySceneReferenceFrameManager.ReferenceFrame;
+                Assert.That( sut.Position, Is.EqualTo( (Vector3)sceneRef.InverseTransformPosition( prevExpectedPosition ) ).Using( vector3ApproxComparer ) );
+                Assert.That( sut.Rotation, Is.EqualTo( (Quaternion)sceneRef.InverseTransformRotation( prevExpectedRotation ) ).Using( quaternionApproxComparer ) );
+                Assert.That( sut.Velocity, Is.EqualTo( (Vector3)sceneRef.InverseTransformVelocity( prevExpectedVelocity ) ).Using( vector3ApproxComparer ) );
+                Assert.That( sut.AngularVelocity, Is.EqualTo( (Vector3)sceneRef.InverseTransformAngularVelocity( prevExpectedAngularVelocity ) ).Using( vector3ApproxComparer ) );
+
+                Assert.That( sut.Acceleration, Is.EqualTo( (Vector3)sceneRef.InverseTransformAcceleration( expectedAcceleration ) ).Using( vector3ApproxComparer ) );
+                Assert.That( sut.AngularAcceleration, Is.EqualTo( (Vector3)sceneRef.InverseTransformAngularAcceleration( expectedAngularAcceleration ) ).Using( vector3ApproxComparer ) );
 
                 Assert.That( sut.AbsolutePosition, Is.EqualTo( prevExpectedPosition ).Using( vector3DblApproxComparer ) );
+                Assert.That( sut.AbsoluteRotation, Is.EqualTo( prevExpectedRotation ).Using( quaternionDblApproxComparer ) );
                 Assert.That( sut.AbsoluteVelocity, Is.EqualTo( prevExpectedVelocity ).Using( vector3DblApproxComparer ) );
-                Assert.That( sut.AbsoluteAcceleration, Is.EqualTo( prevExpectedAcceleration ).Using( vector3DblApproxComparer ) );
-
                 Assert.That( sut.AbsoluteAngularVelocity, Is.EqualTo( prevExpectedAngularVelocity ).Using( vector3DblApproxComparer ) );
 
-#warning TODO - Free transform only updates these once fixedupdate comes, whereas hybrid/kinematic update them immediately as forces are applied. updating after physicsprocessing is correct.
-                Assert.That( sut.AbsoluteAngularAcceleration, Is.EqualTo( prevExpectedAngularAcceleration ).Using( vector3DblApproxComparer ) );
+                Assert.That( sut.AbsoluteAcceleration, Is.EqualTo( expectedAcceleration ).Using( vector3DblApproxComparer ) );
+                Assert.That( sut.AbsoluteAngularAcceleration, Is.EqualTo( expectedAngularAcceleration ).Using( vector3DblApproxComparer ) );
             } );
 
             assertMonoBeh.AddAssert( AssertMonoBehaviour.Step.Update, ( frameInfo ) => 

@@ -68,7 +68,7 @@ namespace HSP.Vanilla.Scenes.GameplayScene
         [HSPEventListener( HSPEvent_GAMEPLAY_SCENE_LOAD.ID, ADD_SCENE_REFERENCE_FRAME_MANAGER )]
         private static void AddSceneReferenceFrameManager()
         {
-            GameplaySceneReferenceFrameManager.Instance = GameplaySceneM.Instance.gameObject.AddComponent<GameplaySceneReferenceFrameManager>();
+            GameplaySceneM.Instance.gameObject.AddComponent<GameplaySceneReferenceFrameManager>();
             GameplaySceneReferenceFrameManager.Instance.MaxRelativePosition = 1024.0f;
             GameplaySceneReferenceFrameManager.Instance.MaxRelativeVelocity = 64.0f;
         }

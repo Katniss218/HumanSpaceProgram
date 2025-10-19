@@ -5,16 +5,7 @@ using UnityEngine;
 
 namespace HSP.Trajectories
 {
-    public interface IReadonlyEphemeris
-    {
-        double HighUT { get; }
-        double LowUT { get; }
-        double Duration { get; }
-        int Count { get; }
-        int Capacity { get; }
-        TrajectoryStateVector Evaluate( double ut );
-    }
-
+    [Obsolete( "Use Ephemeris2 instead, it has adaptive resolution and better interpolation." )]
     public sealed class Ephemeris : IReadonlyEphemeris
     {
         /// <summary>
