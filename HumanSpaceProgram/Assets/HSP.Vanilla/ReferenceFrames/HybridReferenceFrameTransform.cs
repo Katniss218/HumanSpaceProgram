@@ -315,6 +315,9 @@ namespace HSP.Vanilla
 
         public void AddForce( Vector3 force )
         {
+            if( force.sqrMagnitude < 1e-6 )
+                return;
+
             _absoluteAcceleration += SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAcceleration( (Vector3Dbl)force / Mass );
 
             if( _isSceneSpace )
@@ -325,20 +328,28 @@ namespace HSP.Vanilla
 
         public void AddForceAtPosition( Vector3 force, Vector3 position )
         {
-            Vector3 leverArm = position - this._rb.worldCenterOfMass;
-            Vector3Dbl torque = Vector3Dbl.Cross( leverArm, force );
-            _absoluteAcceleration += SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAcceleration( (Vector3Dbl)force / Mass );
-            if( torque.magnitude != 0 )
-                _absoluteAngularAcceleration += SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAngularAcceleration( torque / this.GetInertia( torque.NormalizeToVector3() ) );
+            if( force.sqrMagnitude < 1e-6 )
+                return;
 
+            Vector3 leverArm = position - this._rb.worldCenterOfMass;
+            _absoluteAcceleration += SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAcceleration( (Vector3Dbl)force / Mass );
             if( _isSceneSpace )
+                this._rb.AddForce( force, ForceMode.Force );
+
+            Vector3Dbl torque = Vector3Dbl.Cross( leverArm, force );
+            if( torque.sqrMagnitude > 1e-6 )
             {
-                this._rb.AddForceAtPosition( force, position, ForceMode.Force );
+                _absoluteAngularAcceleration += torque / this.GetInertia( torque.NormalizeToVector3() );
+                if( _isSceneSpace )
+                    this._rb.AddTorque( (Vector3)torque, ForceMode.Force );
             }
         }
 
         public void AddTorque( Vector3 torque )
         {
+            if( torque.sqrMagnitude < 1e-6 )
+                return;
+
             _absoluteAngularAcceleration += SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAngularAcceleration( (Vector3Dbl)torque / this.GetInertia( torque.normalized ) );
 
             if( _isSceneSpace )
@@ -349,6 +360,9 @@ namespace HSP.Vanilla
 
         public void AddAbsoluteForce( Vector3 force )
         {
+            if( force.sqrMagnitude < 1e-6 )
+                return;
+
             _absoluteAcceleration += (Vector3Dbl)force / Mass;
 
             if( _isSceneSpace )
@@ -359,21 +373,29 @@ namespace HSP.Vanilla
 
         public void AddAbsoluteForceAtPosition( Vector3 force, Vector3Dbl position )
         {
+            if( force.sqrMagnitude < 1e-6 )
+                return;
+
             var referenceFrame = SceneReferenceFrameProvider.GetSceneReferenceFrame();
+            _absoluteAcceleration += (Vector3Dbl)force / Mass;
+            if( _isSceneSpace )
+                this._rb.AddForce( referenceFrame.InverseTransformDirection( force ), ForceMode.Force );
+
             Vector3Dbl leverArm = position - referenceFrame.TransformPosition( this._rb.worldCenterOfMass );
             Vector3Dbl torque = Vector3Dbl.Cross( leverArm, force );
-            _absoluteAcceleration += (Vector3Dbl)force / Mass;
-            if( torque.magnitude != 0 )
-                _absoluteAngularAcceleration += torque / this.GetInertia( torque.NormalizeToVector3() );
-
-            if( _isSceneSpace )
+            if( torque.sqrMagnitude > 1e-6 )
             {
-                this._rb.AddForceAtPosition( referenceFrame.InverseTransformDirection( force ), (Vector3)referenceFrame.InverseTransformPosition( position ), ForceMode.Force );
+                _absoluteAngularAcceleration += torque / this.GetInertia( torque.NormalizeToVector3() );
+                if( _isSceneSpace )
+                    this._rb.AddTorque( (Vector3)referenceFrame.InverseTransformDirection( (Vector3)torque ), ForceMode.Force );
             }
         }
 
         public void AddAbsoluteTorque( Vector3 torque )
         {
+            if( torque.sqrMagnitude < 1e-6 )
+                return;
+
             _absoluteAngularAcceleration += (Vector3Dbl)torque / this.GetInertia( torque.normalized );
 
             if( _isSceneSpace )

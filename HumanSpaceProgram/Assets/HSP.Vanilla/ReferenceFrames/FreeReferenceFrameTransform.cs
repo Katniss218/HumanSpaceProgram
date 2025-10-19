@@ -231,6 +231,9 @@ namespace HSP.Vanilla
 
         public void AddForce( Vector3 force )
         {
+            if( force.sqrMagnitude < 1e-6 )
+                return;
+
             _absoluteAccelerationSum += SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAcceleration( (Vector3Dbl)force / Mass );
 
             this._rb.AddForce( force, ForceMode.Force );
@@ -238,17 +241,27 @@ namespace HSP.Vanilla
 
         public void AddForceAtPosition( Vector3 force, Vector3 position )
         {
+            if( force.sqrMagnitude < 1e-6 )
+                return;
+
             var referenceFrame = SceneReferenceFrameProvider.GetSceneReferenceFrame();
+            _absoluteAccelerationSum += referenceFrame.TransformAcceleration( (Vector3Dbl)force / Mass );
+            this._rb.AddForce( force, ForceMode.Force );
+
             Vector3 leverArm = position - this._rb.worldCenterOfMass;
             Vector3 torque = Vector3.Cross( leverArm, force );
-            _absoluteAccelerationSum += referenceFrame.TransformAcceleration( (Vector3Dbl)force / Mass );
-            _absoluteAngularAccelerationSum += referenceFrame.TransformAngularAcceleration( torque / (float)this.GetInertia( torque.normalized ) );
-
-            this._rb.AddForceAtPosition( force, position, ForceMode.Force );
+            if( torque.sqrMagnitude > 1e-6 )
+            {
+                _absoluteAngularAccelerationSum += referenceFrame.TransformAngularAcceleration( torque / (float)this.GetInertia( torque.normalized ) );
+                this._rb.AddTorque( torque, ForceMode.Force );
+            }
         }
 
         public void AddTorque( Vector3 torque )
         {
+            if( torque.sqrMagnitude < 1e-6 )
+                return;
+
             _absoluteAngularAccelerationSum += SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAngularAcceleration( (Vector3Dbl)torque / this.GetInertia( torque.normalized ) );
 
             this._rb.AddTorque( torque, ForceMode.Force );
@@ -256,6 +269,9 @@ namespace HSP.Vanilla
 
         public void AddAbsoluteForce( Vector3 force )
         {
+            if( force.sqrMagnitude < 1e-6 )
+                return;
+
             _absoluteAccelerationSum += (Vector3Dbl)force / Mass;
 
             this._rb.AddForce( SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformDirection( force ), ForceMode.Force );
@@ -263,17 +279,27 @@ namespace HSP.Vanilla
 
         public void AddAbsoluteForceAtPosition( Vector3 force, Vector3Dbl position )
         {
+            if( force.sqrMagnitude < 1e-6 )
+                return;
+
             var referenceFrame = SceneReferenceFrameProvider.GetSceneReferenceFrame();
+            _absoluteAccelerationSum +=  (Vector3Dbl)force / Mass;
+            this._rb.AddForce( referenceFrame.InverseTransformDirection( force ), ForceMode.Force );
+
             Vector3Dbl leverArm = position - referenceFrame.TransformPosition( this._rb.worldCenterOfMass );
             Vector3Dbl torque = Vector3Dbl.Cross( leverArm, force );
-            _absoluteAccelerationSum +=  (Vector3Dbl)force / Mass;
-            _absoluteAngularAccelerationSum += torque / this.GetInertia( torque.NormalizeToVector3() );
-
-            this._rb.AddForceAtPosition( referenceFrame.InverseTransformDirection( force ), (Vector3)referenceFrame.InverseTransformPosition( position ), ForceMode.Force );
+            if( torque.sqrMagnitude > 1e-6 )
+            {
+                _absoluteAngularAccelerationSum += torque / this.GetInertia( torque.NormalizeToVector3() );
+                this._rb.AddTorque( referenceFrame.InverseTransformDirection( (Vector3)torque ), ForceMode.Force );
+            }
         }
 
         public void AddAbsoluteTorque( Vector3 torque )
         {
+            if( torque.sqrMagnitude < 1e-6 )
+                return;
+
             _absoluteAngularAccelerationSum += (Vector3Dbl)torque / this.GetInertia( torque.normalized );
 
             this._rb.AddTorque( SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformDirection( torque ), ForceMode.Force );

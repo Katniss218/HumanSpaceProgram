@@ -220,39 +220,61 @@ namespace HSP.Vanilla
 
         public void AddForce( Vector3 force )
         {
+            if( force.sqrMagnitude < 1e-6 )
+                return;
+
             _absoluteAcceleration += SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAcceleration( (Vector3Dbl)force / Mass );
         }
 
         public void AddForceAtPosition( Vector3 force, Vector3 position )
         {
+            if( force.sqrMagnitude < 1e-6 )
+                return;
+
             var referenceFrame = SceneReferenceFrameProvider.GetSceneReferenceFrame();
+            _absoluteAcceleration += referenceFrame.TransformAcceleration( (Vector3Dbl)force / Mass );
+
             Vector3 leverArm = position - this._rb.worldCenterOfMass;
             Vector3Dbl torque = Vector3Dbl.Cross( leverArm, force );
-            _absoluteAcceleration += referenceFrame.TransformAcceleration( (Vector3Dbl)force / Mass );
-            _absoluteAngularAcceleration += referenceFrame.TransformAngularAcceleration( torque / this.GetInertia( torque.NormalizeToVector3() ) );
+            if( torque.sqrMagnitude > 1e-6 )
+                _absoluteAngularAcceleration += referenceFrame.TransformAngularAcceleration( torque / this.GetInertia( torque.NormalizeToVector3() ) );
         }
 
         public void AddTorque( Vector3 torque )
         {
+            if( torque.sqrMagnitude < 1e-6 )
+                return;
+
             _absoluteAngularAcceleration += SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAngularAcceleration( (Vector3Dbl)torque / this.GetInertia( torque.normalized ) );
         }
 
         public void AddAbsoluteForce( Vector3 force )
         {
+            if( force.sqrMagnitude < 1e-6 )
+                return;
+
             _absoluteAcceleration += (Vector3Dbl)force / Mass;
         }
 
         public void AddAbsoluteForceAtPosition( Vector3 force, Vector3Dbl position )
         {
+            if( force.sqrMagnitude < 1e-6 )
+                return;
+
             var referenceFrame = SceneReferenceFrameProvider.GetSceneReferenceFrame();
+            _absoluteAcceleration += (Vector3Dbl)force / Mass;
+
             Vector3Dbl leverArm = position - referenceFrame.TransformPosition( this._rb.worldCenterOfMass );
             Vector3Dbl torque = Vector3Dbl.Cross( leverArm, force );
-            _absoluteAcceleration += (Vector3Dbl)force / Mass;
-            _absoluteAngularAcceleration += torque / this.GetInertia( torque.NormalizeToVector3() );
+            if( torque.sqrMagnitude > 1e-6 )
+                _absoluteAngularAcceleration += torque / this.GetInertia( torque.NormalizeToVector3() );
         }
 
         public void AddAbsoluteTorque( Vector3 torque )
         {
+            if( torque.sqrMagnitude < 1e-6 )
+                return;
+
             _absoluteAngularAcceleration += (Vector3Dbl)torque / this.GetInertia( torque.normalized );
         }
 
@@ -353,8 +375,8 @@ namespace HSP.Vanilla
         private static List<KinematicReferenceFrameTransform> _activeKinematicTransforms = new();
 
         private static void AfterFixedUpdate() // we update it here (after all fixed behaviour updates)
-                                       // because otherwise the execution order might fuck things,
-                                       // and I don't want to change the order manually.
+                                               // because otherwise the execution order might fuck things,
+                                               // and I don't want to change the order manually.
         {
             foreach( var t in _activeKinematicTransforms )
             {
