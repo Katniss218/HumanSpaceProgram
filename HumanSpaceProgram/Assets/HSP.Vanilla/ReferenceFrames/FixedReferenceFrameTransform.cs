@@ -222,7 +222,22 @@ namespace HSP.Vanilla
             return; // 'Fixed' is always stationary.
         }
 
-        public void AddTorque( Vector3 force )
+        public void AddTorque( Vector3 torque )
+        {
+            return; // 'Fixed' is always stationary.
+        }
+
+        public void AddAbsoluteForce( Vector3 force )
+        {
+            return; // 'Fixed' is always stationary.
+        }
+
+        public void AddAbsoluteForceAtPosition( Vector3 force, Vector3Dbl position )
+        {
+            return; // 'Fixed' is always stationary.
+        }
+
+        public void AddAbsoluteTorque( Vector3 torque )
         {
             return; // 'Fixed' is always stationary.
         }
@@ -281,6 +296,7 @@ namespace HSP.Vanilla
             _rb.isKinematic = true;
             _rb.drag = 0;
             _rb.angularDrag = 0;
+            _rb.maxAngularVelocity = float.PositiveInfinity;
         }
 
         void FixedUpdate()
@@ -290,8 +306,6 @@ namespace HSP.Vanilla
 
         public void OnSceneReferenceFrameSwitch( SceneReferenceFrameManager.ReferenceFrameSwitchData data )
         {
-#warning TODO - let the ReferenceFrameTransformUtils.SetScenePositionFromAbsolute use a custom frame. It's equal, but it would be better to use the event data.
-            // This one is already idempotent as it simply recalculates the same absolute values to scene space.
             ReferenceFrameTransformUtils.SetScenePositionFromAbsolute( data.NewFrame, transform, _rb, _absolutePosition );
             ReferenceFrameTransformUtils.SetSceneRotationFromAbsolute( data.NewFrame, transform, _rb, _absoluteRotation );
             RecalculateCache( data.NewFrame );

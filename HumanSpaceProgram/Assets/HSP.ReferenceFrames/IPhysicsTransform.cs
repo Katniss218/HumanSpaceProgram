@@ -51,5 +51,21 @@ namespace HSP.ReferenceFrames
         /// Applies a torque (in scene space) through the center of mass, in [N*m].
         /// </summary>
         void AddTorque( Vector3 torque );
+
+        /// <summary>
+        /// Applies a force (in absolute inertial reference frame) through the center of mass, in [N].
+        /// </summary>
+        void AddAbsoluteForce( Vector3 force );
+
+        /// <summary>
+        /// Applies a force (in absolute inertial reference frame) at the specified position, in [N]. <br/>
+        /// By extension, can organically apply torque.
+        /// </summary>
+        void AddAbsoluteForceAtPosition( Vector3 force, Vector3Dbl position );
+
+        /// <summary>
+        /// Applies a torque (in absolute inertial reference frame) through the center of mass, in [N*m].
+        /// </summary>
+        void AddAbsoluteTorque( Vector3 torque );
     }
 }

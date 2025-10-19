@@ -136,11 +136,14 @@ namespace HSP.ReferenceFrames
                 && otherNormalizedUT.TransformAngularAcceleration( Vector3Dbl.zero ) == Vector3Dbl.zero;
         }
 
-        //[MapsInheritingFrom( typeof( CenteredInertialReferenceFrame ) )]
+        [MapsInheritingFrom( typeof( CenteredInertialReferenceFrame ) )]
         public static SerializationMapping CenteredInertialReferenceFrameMapping()
         {
-#warning TODO - easier way to load memberwise objects that are immutable
-            throw new NotImplementedException();
+            return new MemberwiseSerializationMapping<CenteredInertialReferenceFrame>()
+                .WithReadonlyMember( "reference_ut", o => o.ReferenceUT )
+                .WithReadonlyMember( "position", o => o._position )
+                .WithReadonlyMember( "velocity", o => o._velocity )
+                .WithFactory<double, Vector3Dbl, Vector3Dbl>( ( ut, pos, vel ) => new CenteredInertialReferenceFrame( ut, pos, vel ) );
         }
     }
 }

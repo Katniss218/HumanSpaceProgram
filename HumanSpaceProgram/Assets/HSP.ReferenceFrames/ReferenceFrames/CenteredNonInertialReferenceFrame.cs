@@ -58,14 +58,34 @@ namespace HSP.ReferenceFrames
             var newPos = _position
                 + (_velocity * deltaTime)
                 + (0.5 * _acceleration * (deltaTime * deltaTime));
-            var newRot =
-                QuaternionDbl.AngleAxis( 0.5 * _angularAcceleration.magnitude * (deltaTime * deltaTime) * 57.29577951308232, _angularAcceleration )
-                * QuaternionDbl.AngleAxis( _angularVelocity.magnitude * deltaTime * 57.29577951308232, _angularVelocity );
+
+            var angVelMag = _angularVelocity.magnitude;
+            var angAccMag = _angularAcceleration.magnitude;
+            var hasAngularMotion = (angVelMag > 1e-12) || (angAccMag > 1e-12);
 
             Vector3Dbl newVelocity = _velocity + (_acceleration * deltaTime);
             Vector3Dbl newAngularVelocity = _angularVelocity + (_angularAcceleration * deltaTime);
 
-            return new OrientedNonInertialReferenceFrame( ut, newPos, newRot, newVelocity, newAngularVelocity, _acceleration, _angularAcceleration );
+            if( hasAngularMotion )
+            {
+                var newRot = QuaternionDbl.identity;
+                if( angVelMag > 1e-12 )
+                {
+                    var angVelRot = QuaternionDbl.AngleAxis( angVelMag * deltaTime * 57.29577951308232, _angularVelocity );
+                    newRot = angVelRot * newRot;
+                }
+                if( angAccMag > 1e-12 )
+                {
+                    var angAccRot = QuaternionDbl.AngleAxis( 0.5 * angAccMag * (deltaTime * deltaTime) * 57.29577951308232, _angularAcceleration );
+                    newRot = angAccRot * newRot;
+                }
+
+                return new OrientedNonInertialReferenceFrame( ut, newPos, newRot, newVelocity, newAngularVelocity, _acceleration, _angularAcceleration );
+            }
+            else
+            {
+                return new CenteredNonInertialReferenceFrame( ut, newPos, newVelocity, _acceleration );
+            }
         }
 
 
@@ -122,7 +142,7 @@ namespace HSP.ReferenceFrames
 
         public Vector3Dbl TransformAngularVelocity( Vector3Dbl localAngularVelocity )
         {
-            return Vector3Dbl.Subtract( localAngularVelocity, _angularVelocity );
+            return Vector3Dbl.Add( localAngularVelocity, _angularVelocity );
         }
         public Vector3Dbl InverseTransformAngularVelocity( Vector3Dbl globalAngularVelocity )
         {
@@ -147,23 +167,30 @@ namespace HSP.ReferenceFrames
 
         public Vector3Dbl GetFicticiousAcceleration( Vector3Dbl localPosition, Vector3Dbl localVelocity )
         {
-            // TODO - handle near-zeroes in the terms.
+            // centrifugal acceleration.
+            Vector3Dbl result = -Vector3Dbl.Cross( _angularVelocity, Vector3Dbl.Cross( _angularVelocity, localPosition ) );
 
-            var centrifugalAcc = Vector3Dbl.Cross( _angularVelocity, Vector3Dbl.Cross( _angularVelocity, localPosition ) );
+            // coriolis acceleration.
+            result -= 2.0 * Vector3Dbl.Cross( _angularVelocity, localVelocity );
 
-            var coriolisAcc = -2.0 * Vector3Dbl.Cross( _angularVelocity, localVelocity );
+            // euler acceleration.
+            result -= Vector3Dbl.Cross( _angularAcceleration, localPosition );
 
-            var eulerAcc = -Vector3Dbl.Cross( _angularAcceleration, localPosition );
+            // linear acceleration.
+            result -= _acceleration;
 
-            var linearAcc = -_acceleration;
-
-            return (centrifugalAcc + coriolisAcc + eulerAcc + linearAcc);
+            return result;
         }
 
         public Vector3Dbl GetFictitiousAngularAcceleration( Vector3Dbl localPosition, Vector3Dbl localAngularVelocity )
         {
             // If not accounted for, the object would pick up rotational velocity from the frame.
-            return (-_angularAcceleration);
+            Vector3Dbl result = -_angularAcceleration;
+
+            // Result of the frame's angular velocity axis not matching the object's.
+            result -= Vector3Dbl.Cross( _angularVelocity, localAngularVelocity );
+
+            return result;
         }
 
         public bool Equals( IReferenceFrame other )
@@ -194,11 +221,18 @@ namespace HSP.ReferenceFrames
                 && otherNormalizedUT.TransformAngularAcceleration( Vector3Dbl.zero ) == this._angularAcceleration;
         }
 
-        //[MapsInheritingFrom( typeof( CenteredNonInertialReferenceFrame ) )]
+
+        [MapsInheritingFrom( typeof( CenteredNonInertialReferenceFrame ) )]
         public static SerializationMapping CenteredNonInertialReferenceFrameMapping()
         {
-#warning TODO - easier way to load memberwise objects that are immutable
-            throw new NotImplementedException();
+            return new MemberwiseSerializationMapping<CenteredNonInertialReferenceFrame>()
+                .WithReadonlyMember( "reference_ut", o => o.ReferenceUT )
+                .WithReadonlyMember( "position", o => o._position )
+                .WithReadonlyMember( "velocity", o => o._velocity )
+                .WithReadonlyMember( "angular_velocity", o => o._angularVelocity )
+                .WithReadonlyMember( "acceleration", o => o._acceleration )
+                .WithReadonlyMember( "angular_acceleration", o => o._angularAcceleration )
+                .WithFactory<double, Vector3Dbl, Vector3Dbl, Vector3Dbl, Vector3Dbl, Vector3Dbl>( ( ut, pos, vel, angVel, acc, angAcc ) => new CenteredNonInertialReferenceFrame( ut, pos, vel, angVel, acc, angAcc ) );
         }
     }
 }

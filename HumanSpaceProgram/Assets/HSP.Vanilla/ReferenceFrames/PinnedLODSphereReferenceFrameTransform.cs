@@ -18,8 +18,6 @@ namespace HSP.Vanilla.ReferenceFrames
 
         protected override void FixedUpdate()
         {
-            base.FixedUpdate();
-
             Vector3 scenePosition = this.Position;
             // TODO - Potentially needs a synchronized approach to prevent flickering. Verify that this can't be fixed by better handling of float precision or fixing any potential bugs in the pinned transform.
             if( scenePosition.magnitude > MaxPosition )
@@ -27,6 +25,18 @@ namespace HSP.Vanilla.ReferenceFrames
                 this.Position = Vector3.zero;
                 LODQuad.ResetPositionAndRotationAll( _quadSphere );
             }
+
+            base.FixedUpdate(); // updating after reduces flickering, but doesn't completly eliminate it.
+        }
+
+        protected override void OnEnable()
+        {
+            if( _quadSphere != null )
+            {
+                LODQuad.ResetPositionAndRotationAll( _quadSphere );
+            }
+
+            base.OnEnable();
         }
 
         public const string ADD_PINNED_LOD_REFERENCE_TRANSFORM = HSPEvent.NAMESPACE_HSP + ".addpinnedlreftrans";
@@ -37,6 +47,7 @@ namespace HSP.Vanilla.ReferenceFrames
             var p = sphere.QuadParent.gameObject.AddComponent<PinnedLODSphereReferenceFrameTransform>();
             p.SceneReferenceFrameProvider = sphere.CelestialBody.ReferenceFrameTransform.SceneReferenceFrameProvider;
             p._quadSphere = sphere;
+            LODQuad.ResetPositionAndRotationAll( sphere );
             Vector3Dbl localPos = Vector3Dbl.zero;
             p.SetReference( sphere.CelestialBody, localPos, Quaternion.identity );
         }

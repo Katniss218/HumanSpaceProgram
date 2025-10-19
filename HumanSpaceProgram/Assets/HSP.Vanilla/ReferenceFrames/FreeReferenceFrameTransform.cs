@@ -1,7 +1,11 @@
 ﻿using HSP.ReferenceFrames;
 using HSP.Time;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.LowLevel;
+using UnityEngine.PlayerLoop;
+using UnityPlus;
 using UnityPlus.Serialization;
 
 namespace HSP.Vanilla
@@ -150,10 +154,10 @@ namespace HSP.Vanilla
             }
         }
 
-        public Vector3 Acceleration => _cachedAcceleration;
-        public Vector3Dbl AbsoluteAcceleration => _cachedAbsoluteAcceleration;
-        public Vector3 AngularAcceleration => _cachedAngularAcceleration;
-        public Vector3Dbl AbsoluteAngularAcceleration => _cachedAbsoluteAngularAcceleration;
+        public Vector3 Acceleration => (Vector3)SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformAcceleration( _absoluteAccelerationSum );
+        public Vector3Dbl AbsoluteAcceleration => _absoluteAccelerationSum;
+        public Vector3 AngularAcceleration => (Vector3)SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformAngularAcceleration( _absoluteAngularAccelerationSum );
+        public Vector3Dbl AbsoluteAngularAcceleration => _absoluteAngularAccelerationSum;
 
         /// <summary> The scene frame in which the cached values are expressed. </summary>
         IReferenceFrame _cachedSceneReferenceFrame = null;
@@ -234,19 +238,45 @@ namespace HSP.Vanilla
 
         public void AddForceAtPosition( Vector3 force, Vector3 position )
         {
+            var referenceFrame = SceneReferenceFrameProvider.GetSceneReferenceFrame();
             Vector3 leverArm = position - this._rb.worldCenterOfMass;
-            _absoluteAccelerationSum += SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAcceleration( (Vector3Dbl)force / Mass );
-            _absoluteAngularAccelerationSum += SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAngularAcceleration( Vector3Dbl.Cross( force, leverArm ) / Mass );
+            Vector3 torque = Vector3.Cross( leverArm, force );
+            _absoluteAccelerationSum += referenceFrame.TransformAcceleration( (Vector3Dbl)force / Mass );
+            _absoluteAngularAccelerationSum += referenceFrame.TransformAngularAcceleration( torque / (float)this.GetInertia( torque.normalized ) );
 
-            // TODO - In the future possibly cache the values across a frame and apply it once instead of n-times.
             this._rb.AddForceAtPosition( force, position, ForceMode.Force );
         }
 
         public void AddTorque( Vector3 torque )
         {
-            _absoluteAngularAccelerationSum += SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAngularAcceleration( (Vector3Dbl)torque / Mass );
+            _absoluteAngularAccelerationSum += SceneReferenceFrameProvider.GetSceneReferenceFrame().TransformAngularAcceleration( (Vector3Dbl)torque / this.GetInertia( torque.normalized ) );
 
             this._rb.AddTorque( torque, ForceMode.Force );
+        }
+
+        public void AddAbsoluteForce( Vector3 force )
+        {
+            _absoluteAccelerationSum += (Vector3Dbl)force / Mass;
+
+            this._rb.AddForce( SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformDirection( force ), ForceMode.Force );
+        }
+
+        public void AddAbsoluteForceAtPosition( Vector3 force, Vector3Dbl position )
+        {
+            var referenceFrame = SceneReferenceFrameProvider.GetSceneReferenceFrame();
+            Vector3Dbl leverArm = position - referenceFrame.TransformPosition( this._rb.worldCenterOfMass );
+            Vector3Dbl torque = Vector3Dbl.Cross( leverArm, force );
+            _absoluteAccelerationSum +=  (Vector3Dbl)force / Mass;
+            _absoluteAngularAccelerationSum += torque / this.GetInertia( torque.NormalizeToVector3() );
+
+            this._rb.AddForceAtPosition( referenceFrame.InverseTransformDirection( force ), (Vector3)referenceFrame.InverseTransformPosition( position ), ForceMode.Force );
+        }
+
+        public void AddAbsoluteTorque( Vector3 torque )
+        {
+            _absoluteAngularAccelerationSum += (Vector3Dbl)torque / this.GetInertia( torque.normalized );
+
+            this._rb.AddTorque( SceneReferenceFrameProvider.GetSceneReferenceFrame().InverseTransformDirection( torque ), ForceMode.Force );
         }
 
         protected void RecalculateCacheIfNeeded()
@@ -302,6 +332,7 @@ namespace HSP.Vanilla
             _rb.isKinematic = false;
             _rb.drag = 0;
             _rb.angularDrag = 0;
+            _rb.maxAngularVelocity = float.PositiveInfinity;
         }
 
         protected virtual void FixedUpdate()
@@ -320,6 +351,7 @@ namespace HSP.Vanilla
                 this._rb.AddTorque( angAcc, ForceMode.Acceleration );
             }
 
+#warning TODO - modify it so that this runs after physics step and computes the correct values.
             // If the object is colliding, we will use its rigidbody accelerations, because we don't have access to the forces due to collisions.
             // Otherwise, we use our more precise method that relies on full encapsulation of the rigidbody.
             if( IsColliding )
@@ -359,12 +391,22 @@ namespace HSP.Vanilla
         protected virtual void OnEnable()
         {
             _sceneReferenceFrameProvider?.SubscribeIfNotSubscribed( this );
+            _activeFreeTransforms.Add( this );
+            if( _activeFreeTransforms.Count == 1 )
+            {
+                PlayerLoopUtils.AddSystem<FixedUpdate, FixedUpdate.PhysicsFixedUpdate>( in _playerLoopSystem );
+            }
             _rb.isKinematic = false; // Can't do `enabled = false` (doesn't exist) for a rigidbody, so we set it to kinematic instead.
         }
 
         protected virtual void OnDisable()
         {
             _sceneReferenceFrameProvider?.UnsubscribeIfSubscribed( this );
+            _activeFreeTransforms.Remove( this );
+            if( _activeFreeTransforms.Count == 0 )
+            {
+                PlayerLoopUtils.RemoveSystem<FixedUpdate, FixedUpdate.PhysicsFixedUpdate>( in _playerLoopSystem );
+            }
             _rb.isKinematic = true; // Can't do `enabled = false` (doesn't exist) for a rigidbody, so we set it to kinematic instead.
         }
 
@@ -385,6 +427,25 @@ namespace HSP.Vanilla
         protected virtual void OnCollisionExit( Collision collision )
         {
             IsColliding = false;
+        }
+
+        private static PlayerLoopSystem _playerLoopSystem = new PlayerLoopSystem()
+        {
+            type = typeof( KinematicReferenceFrameTransform ),
+            updateDelegate = InsidePhysicsStep,
+            subSystemList = null
+        };
+
+        private static List<FreeReferenceFrameTransform> _activeFreeTransforms = new();
+
+        private static void InsidePhysicsStep()
+        {
+            // Assume that other objects aren't allowed to get the absolute position/velocity *in* the physics step, as it is undefined (changes) during it.
+            foreach( var t in _activeFreeTransforms )
+            {
+                t._absoluteAccelerationSum = Vector3Dbl.zero;
+                t._absoluteAngularAccelerationSum = Vector3Dbl.zero;
+            }
         }
 
         [MapsInheritingFrom( typeof( FreeReferenceFrameTransform ) )]

@@ -59,17 +59,21 @@ namespace HSP.CelestialBodies.Surfaces
 
         public void ResetPositionAndRotation()
         {
-#warning TODO - when activated, the position is sometimes wrong. The position of the parent transform looks alright, but the quads are fucked relative to it.
-            IReferenceFrame bodyReferenceFrame = QuadSphere.CelestialBody.ReferenceFrameTransform.OrientedInertialReferenceFrame();
-            IReferenceFrame sceneReferenceFrame = QuadSphere.CelestialBody.ReferenceFrameTransform.SceneReferenceFrameProvider.GetSceneReferenceFrame();
+            var refTransform = QuadSphere.CelestialBody.ReferenceFrameTransform;
+            IReferenceFrame bodyReferenceFrame = refTransform.OrientedInertialReferenceFrame();
+            IReferenceFrame sceneReferenceFrame = refTransform.SceneReferenceFrameProvider.GetSceneReferenceFrame();
 
             ResetPositionAndRotationImpl( bodyReferenceFrame, sceneReferenceFrame );
         }
 
         public static void ResetPositionAndRotationAll( LODQuadSphere quadSphere )
         {
-            IReferenceFrame bodyReferenceFrame = quadSphere.CelestialBody.ReferenceFrameTransform.OrientedInertialReferenceFrame();
-            IReferenceFrame sceneReferenceFrame = quadSphere.CelestialBody.ReferenceFrameTransform.SceneReferenceFrameProvider.GetSceneReferenceFrame();
+            if( quadSphere == null )
+                throw new System.ArgumentNullException( nameof( quadSphere ) );
+
+            var refTransform = quadSphere.CelestialBody.ReferenceFrameTransform;
+            IReferenceFrame bodyReferenceFrame = refTransform.OrientedInertialReferenceFrame();
+            IReferenceFrame sceneReferenceFrame = refTransform.SceneReferenceFrameProvider.GetSceneReferenceFrame();
 
             foreach( var node in quadSphere.CurrentQuads.Values )
             {

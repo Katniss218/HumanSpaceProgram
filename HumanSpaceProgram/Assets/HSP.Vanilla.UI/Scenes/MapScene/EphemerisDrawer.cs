@@ -348,7 +348,6 @@ namespace HSP.Vanilla.UI.Scenes.MapScene
 
                 AddPointAvoidDuplicate( entry.worldPoints, left.worldPos, right.worldPos );
             }
-            Debug.Log( $"EphemerisDrawer: body={body.gameObject.name} iters={iters} output={entry.worldPoints.Count}" );
 
             if( entry.worldPoints.Count >= 2 )
             {

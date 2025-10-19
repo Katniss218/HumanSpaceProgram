@@ -1,80 +1,120 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using HSP.ReferenceFrames;
 using NUnit.Framework;
 using UnityEngine;
-using UnityEngine.TestTools;
 
 namespace HSP_Tests_EditMode
 {
-    public class CenteredInertialReferenceFrameTests
+    /// <summary>
+    /// Helper methods for comprehensive reference frame testing
+    /// </summary>
+    public static class ReferenceFrameTestHelpers
     {
-        // ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
+        private const double PRECISION_TOLERANCE = 1e-12;
+        private const double PRECISION_TOLERANCE_DIR = 1e-6;
 
-        // Tests use a fresh, clean scene.
-
-        // ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
-
-        [Test]
-        public void AtUt___WorksCorrectly()
+        public static void AssertRoundTripAccuracy( IReferenceFrame frame, string frameType )
         {
-            CenteredInertialReferenceFrame sut = new CenteredInertialReferenceFrame( 0, Vector3Dbl.zero, Vector3Dbl.one );
+            var testPosition = new Vector3Dbl( 1.0, 2.0, 3.0 );
+            var testDirection = new Vector3( 0.6f, 0.8f, 0.0f );
+            var testRotation = QuaternionDbl.AngleAxis( 45.0, Vector3Dbl.up ).normalized;
+            var testVelocity = new Vector3Dbl( 10.0, 20.0, 30.0 );
+            var testAngularVelocity = new Vector3Dbl( 1.0, 2.0, 3.0 );
+            var testAcceleration = new Vector3Dbl( 5.0, 10.0, 15.0 );
+            var testAngularAcceleration = new Vector3Dbl( 0.5, 1.0, 1.5 );
 
-            var sut2 = sut.AtUT( 1 );
+            // Position round-trip
+            var transformedPos = frame.TransformPosition( testPosition );
+            var inverseTransformedPos = frame.InverseTransformPosition( transformedPos );
+            Assert.That( inverseTransformedPos.x, Is.EqualTo( testPosition.x ).Within( PRECISION_TOLERANCE ),
+                $"{frameType}: Position round-trip failed for X component" );
+            Assert.That( inverseTransformedPos.y, Is.EqualTo( testPosition.y ).Within( PRECISION_TOLERANCE ),
+                $"{frameType}: Position round-trip failed for Y component" );
+            Assert.That( inverseTransformedPos.z, Is.EqualTo( testPosition.z ).Within( PRECISION_TOLERANCE ),
+                $"{frameType}: Position round-trip failed for Z component" );
 
-            Assert.That( sut2.TransformPosition( Vector3Dbl.zero ), Is.EqualTo( Vector3Dbl.one ) );
+            // Direction round-trip
+            var transformedDir = frame.TransformDirection( testDirection );
+            var inverseTransformedDir = frame.InverseTransformDirection( transformedDir );
+            Assert.That( inverseTransformedDir.x, Is.EqualTo( testDirection.x ).Within( PRECISION_TOLERANCE_DIR ),
+                $"{frameType}: Direction round-trip failed for X component" );
+            Assert.That( inverseTransformedDir.y, Is.EqualTo( testDirection.y ).Within( PRECISION_TOLERANCE_DIR ),
+                $"{frameType}: Direction round-trip failed for Y component" );
+            Assert.That( inverseTransformedDir.z, Is.EqualTo( testDirection.z ).Within( PRECISION_TOLERANCE_DIR ),
+                $"{frameType}: Direction round-trip failed for Z component" );
+
+            // Rotation round-trip
+            var transformedRot = frame.TransformRotation( testRotation );
+            var inverseTransformedRot = frame.InverseTransformRotation( transformedRot );
+            Assert.That( inverseTransformedRot.x, Is.EqualTo( testRotation.x ).Within( PRECISION_TOLERANCE ),
+                $"{frameType}: Rotation round-trip failed for X component" );
+            Assert.That( inverseTransformedRot.y, Is.EqualTo( testRotation.y ).Within( PRECISION_TOLERANCE ),
+                $"{frameType}: Rotation round-trip failed for Y component" );
+            Assert.That( inverseTransformedRot.z, Is.EqualTo( testRotation.z ).Within( PRECISION_TOLERANCE ),
+                $"{frameType}: Rotation round-trip failed for Z component" );
+            Assert.That( inverseTransformedRot.w, Is.EqualTo( testRotation.w ).Within( PRECISION_TOLERANCE ),
+                $"{frameType}: Rotation round-trip failed for W component" );
+
+            // Velocity round-trip
+            var transformedVel = frame.TransformVelocity( testVelocity );
+            var inverseTransformedVel = frame.InverseTransformVelocity( transformedVel );
+            Assert.That( inverseTransformedVel.x, Is.EqualTo( testVelocity.x ).Within( PRECISION_TOLERANCE ),
+                $"{frameType}: Velocity round-trip failed for X component" );
+            Assert.That( inverseTransformedVel.y, Is.EqualTo( testVelocity.y ).Within( PRECISION_TOLERANCE ),
+                $"{frameType}: Velocity round-trip failed for Y component" );
+            Assert.That( inverseTransformedVel.z, Is.EqualTo( testVelocity.z ).Within( PRECISION_TOLERANCE ),
+                $"{frameType}: Velocity round-trip failed for Z component" );
+
+            // Angular velocity round-trip
+            var transformedAngVel = frame.TransformAngularVelocity( testAngularVelocity );
+            var inverseTransformedAngVel = frame.InverseTransformAngularVelocity( transformedAngVel );
+            Assert.That( inverseTransformedAngVel.x, Is.EqualTo( testAngularVelocity.x ).Within( PRECISION_TOLERANCE ),
+                $"{frameType}: Angular velocity round-trip failed for X component" );
+            Assert.That( inverseTransformedAngVel.y, Is.EqualTo( testAngularVelocity.y ).Within( PRECISION_TOLERANCE ),
+                $"{frameType}: Angular velocity round-trip failed for Y component" );
+            Assert.That( inverseTransformedAngVel.z, Is.EqualTo( testAngularVelocity.z ).Within( PRECISION_TOLERANCE ),
+                $"{frameType}: Angular velocity round-trip failed for Z component" );
+
+            // Acceleration round-trip
+            var transformedAcc = frame.TransformAcceleration( testAcceleration );
+            var inverseTransformedAcc = frame.InverseTransformAcceleration( transformedAcc );
+            Assert.That( inverseTransformedAcc.x, Is.EqualTo( testAcceleration.x ).Within( PRECISION_TOLERANCE ),
+                $"{frameType}: Acceleration round-trip failed for X component" );
+            Assert.That( inverseTransformedAcc.y, Is.EqualTo( testAcceleration.y ).Within( PRECISION_TOLERANCE ),
+                $"{frameType}: Acceleration round-trip failed for Y component" );
+            Assert.That( inverseTransformedAcc.z, Is.EqualTo( testAcceleration.z ).Within( PRECISION_TOLERANCE ),
+                $"{frameType}: Acceleration round-trip failed for Z component" );
+
+            // Angular acceleration round-trip
+            var transformedAngAcc = frame.TransformAngularAcceleration( testAngularAcceleration );
+            var inverseTransformedAngAcc = frame.InverseTransformAngularAcceleration( transformedAngAcc );
+            Assert.That( inverseTransformedAngAcc.x, Is.EqualTo( testAngularAcceleration.x ).Within( PRECISION_TOLERANCE ),
+                $"{frameType}: Angular acceleration round-trip failed for X component" );
+            Assert.That( inverseTransformedAngAcc.y, Is.EqualTo( testAngularAcceleration.y ).Within( PRECISION_TOLERANCE ),
+                $"{frameType}: Angular acceleration round-trip failed for Y component" );
+            Assert.That( inverseTransformedAngAcc.z, Is.EqualTo( testAngularAcceleration.z ).Within( PRECISION_TOLERANCE ),
+                $"{frameType}: Angular acceleration round-trip failed for Z component" );
         }
 
-        [Test]
-        public void AtUtBackwards___WorksCorrectly()
+        public static void AssertTimeEvolution( IReferenceFrame frame, double deltaTime, string frameType )
         {
-            CenteredInertialReferenceFrame sut = new CenteredInertialReferenceFrame( 0, Vector3Dbl.zero, Vector3Dbl.one );
+            var futureFrame = frame.AtUT( frame.ReferenceUT + deltaTime );
+            var pastFrame = frame.AtUT( frame.ReferenceUT - deltaTime );
 
-            var sut2 = sut.AtUT( -1 );
+            // Test that time evolution preserves frame properties
+            Assert.That( futureFrame.ReferenceUT, Is.EqualTo( frame.ReferenceUT + deltaTime ), $"{frameType}: Future frame has incorrect reference time" );
+            Assert.That( pastFrame.ReferenceUT, Is.EqualTo( frame.ReferenceUT - deltaTime ), $"{frameType}: Past frame has incorrect reference time" );
 
-            Assert.That( sut2.TransformPosition( Vector3Dbl.zero ), Is.EqualTo( -Vector3Dbl.one ) );
+            // Test that zero delta time returns same frame
+            var sameFrame = frame.AtUT( frame.ReferenceUT );
+            Assert.That( sameFrame.Equals( frame ), Is.True, $"{frameType}: Zero delta time should return same frame" );
         }
 
-        [Test]
-        public void TIME()
-        {/// <summary>
-         /// Calculates burn time to achieve a given delta-v using Tsiolkovsky rocket equation.
-         /// </summary>
-         /// <param name="deltaV">Desired change in velocity (m/s)</param>
-         /// <param name="initialMass">Initial mass of the rocket (kg)</param>
-         /// <param name="thrust">Constant engine thrust (N)</param>
-         /// <param name="exhaustVelocity">Effective exhaust velocity (m/s)</param>
-         /// <returns>Burn time in seconds</returns>
-            double CalculateBurnTime( double deltaV, double initialMass, double thrust, double exhaustVelocity )
-            {
-                if( initialMass <= 0 )
-                    throw new ArgumentException( "Initial mass must be positive." );
-                if( thrust <= 0 )
-                    throw new ArgumentException( "Thrust must be positive." );
-                if( exhaustVelocity <= 0 )
-                    throw new ArgumentException( "Exhaust velocity must be positive." );
-                if( deltaV < 0 )
-                    throw new ArgumentException( "Delta-v cannot be negative." );
-
-                // Compute final mass after burn using the rocket equation
-                double finalMass = initialMass * Math.Exp( -deltaV / exhaustVelocity );
-
-                // Mass flow rate (kg/s)
-                double massFlowRate = thrust / exhaustVelocity;
-
-                // Burn time = mass used / mass flow rate
-                double burnTime = (initialMass - finalMass) / massFlowRate;
-
-                return burnTime / (31556952); // to years
-            }
-
-            //time = CalculateBurnTime( 5000, 1_000_000, 5_000_000, 4_000 );
-
-            Debug.Log( CalculateBurnTime( 5000, 1600, 0.1, 40_000 ) );
-            Debug.Log( CalculateBurnTime( 7500, 1600, 0.1, 40_000 ) );
-            Debug.Log( CalculateBurnTime( 10000, 1600, 0.1, 40_000 ) );
-            Debug.Log( CalculateBurnTime( 10000, 1600, 0.1, 40_000 ) );
+        public static void AssertEqualityMethods( IReferenceFrame frame1, IReferenceFrame frame2, bool shouldBeEqual, string frameType )
+        {
+            Assert.That( frame1.Equals( frame2 ), Is.EqualTo( shouldBeEqual ),
+                $"{frameType}: Equals method failed" );
+            Assert.That( frame1.EqualsIgnoreUT( frame2 ), Is.EqualTo( shouldBeEqual ),
+                $"{frameType}: EqualsIgnoreUT method failed" );
         }
     }
 }

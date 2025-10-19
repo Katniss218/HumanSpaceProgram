@@ -263,7 +263,22 @@ namespace HSP.Vanilla
             return;
         }
 
-        public void AddTorque( Vector3 force )
+        public void AddTorque( Vector3 torque )
+        {
+            return;
+        }
+
+        public void AddAbsoluteForce( Vector3 force )
+        {
+            return;
+        }
+
+        public void AddAbsoluteForceAtPosition( Vector3 force, Vector3Dbl position )
+        {
+            return;
+        }
+
+        public void AddAbsoluteTorque( Vector3 torque )
         {
             return;
         }
@@ -297,7 +312,7 @@ namespace HSP.Vanilla
         {
             IReferenceFrame bodyFrame = _referenceTransform == null
                 ? new CenteredReferenceFrame( TimeManager.UT, Vector3Dbl.zero )
-                : _referenceTransform.NonInertialReferenceFrame();
+                : _referenceTransform.NonInertialReferenceFrame(); // Needs to be a non-inertial frame to have angular velocity.
 
             _cachedAbsolutePosition = bodyFrame.TransformPosition( _referencePosition );
             _cachedAbsoluteRotation = bodyFrame.TransformRotation( _referenceRotation );
@@ -310,7 +325,7 @@ namespace HSP.Vanilla
             }
 
             _cachedVelocity = (Vector3)sceneReferenceFrame.InverseTransformVelocity( _cachedAbsoluteVelocity );
-            _cachedAngularVelocity = (Vector3)sceneReferenceFrame.InverseTransformAngularVelocity( _cachedAbsoluteVelocity );
+            _cachedAngularVelocity = (Vector3)sceneReferenceFrame.InverseTransformAngularVelocity( _cachedAbsoluteAngularVelocity );
 
             _cachedAbsoluteAcceleration = bodyFrame.TransformAcceleration( Vector3Dbl.zero );
             _cachedAbsoluteAngularAcceleration = bodyFrame.TransformAngularAcceleration( Vector3Dbl.zero );
@@ -344,13 +359,16 @@ namespace HSP.Vanilla
             _rb.isKinematic = true;
             _rb.drag = 0;
             _rb.angularDrag = 0;
+            _rb.maxAngularVelocity = float.PositiveInfinity;
         }
 
         protected virtual void FixedUpdate()
         {
             IReferenceFrame bodyFrame = _referenceTransform == null
                 ? new CenteredReferenceFrame( TimeManager.UT, Vector3Dbl.zero )
-                : _referenceTransform.NonInertialReferenceFrame().AtUT( TimeManager.UT ); // moves to where the body will be
+                : _referenceTransform.NonInertialReferenceFrame().AtUT( TimeManager.UT ); // moves to where the body will be, but this might be inaccurate
+                                                                                          // - ideally we need to get the actual target pos just before physics step?
+                                                                                          // - (if something runs in fixed update after this runs, then it can change the returned reference frame and make it no longer valid)
 
             // ReferenceFrame.AtUT is used because we want to access the frame for the end of the frame, and FixedUpdate (caller) is called before ReferenceFrame updates.
             var sceneReferenceFrame = SceneReferenceFrameProvider.GetSceneReferenceFrame().AtUT( TimeManager.UT );
