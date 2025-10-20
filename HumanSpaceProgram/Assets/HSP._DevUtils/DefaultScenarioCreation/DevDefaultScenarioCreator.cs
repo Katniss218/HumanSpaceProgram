@@ -143,8 +143,8 @@ namespace HSP._DevUtils
             conn.End2.Position = new Vector3( 0.0f, 1.5f, 0.0f );
             conn.CrossSectionArea = 0.1f;
 
-            Substance sbsF = AssetRegistry.Get<Substance>( "substance.f" );
-            Substance sbsOX = AssetRegistry.Get<Substance>( "substance.ox" );
+            Substance sbsF = AssetRegistry.Get<Substance>( "Vanilla::Assets/substances/fuel" );
+            Substance sbsOX = AssetRegistry.Get<Substance>( "Vanilla::Assets/substances/oxidizer" );
 
             var tankSmallTank = tankP.GetComponent<FBulkContainer_Sphere>();
             tankSmallTank.Contents = new SubstanceStateCollection(

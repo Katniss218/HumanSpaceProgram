@@ -2222,13 +2222,13 @@
                                                 "value": [
                                                     {
                                                         "substance": {
-                                                            "$assetref": "substance.f"
+                                                            "$assetref": "Vanilla::Assets/substances/fuel"
                                                         },
                                                         "mass_amount": 3500
                                                     },
                                                     {
                                                         "substance": {
-                                                            "$assetref": "substance.ox"
+                                                            "$assetref": "Vanilla::Assets/substances/oxidizer"
                                                         },
                                                         "mass_amount": 3500
                                                     }

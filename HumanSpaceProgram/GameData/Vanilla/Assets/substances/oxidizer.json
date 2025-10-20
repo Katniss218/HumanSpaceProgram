@@ -1,0 +1,11 @@
+{
+    "$type": "HSP.ResourceFlow.Substance, HSP.ResourceFlow, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+    "display_name": "Oxidizer",
+    "density": 1000,
+    "display_color": {
+        "r": 0.2509804,
+        "g": 0.5607843,
+        "b": 1.0,
+        "a": 1.0
+    }
+}

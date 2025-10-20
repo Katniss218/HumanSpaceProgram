@@ -1,7 +1,5 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace UnityPlus.AssetManagement
@@ -10,9 +8,12 @@ namespace UnityPlus.AssetManagement
     /// A static registry for assets. <br/>
     /// Register assets at startup. Request them after registering.
     /// </summary>
+    /// <remarks>
+    /// The assets are associated 1-to-1 with string IDs.
+    /// </remarks>
     public static class AssetRegistry
     {
-        struct LazyAsset
+        private struct LazyAsset
         {
             public Func<object> loader;
             public bool isCacheable;
@@ -30,30 +31,55 @@ namespace UnityPlus.AssetManagement
 
         // An `asset` in this context is more broad than just Unity asset, since it can be an arbitrary class (reference type).
 
-        static Dictionary<string, object> _cache = new Dictionary<string, object>();
-        static Dictionary<object, string> _inverseCache = new Dictionary<object, string>();
+        private static Dictionary<string, object> _loaded = new Dictionary<string, object>();
+        private static Dictionary<object, string> _inverseLoaded = new Dictionary<object, string>();
 
         // Assets don't have to all be loaded and cached immediately at startup.
         // An asset can be `lazy-loaded` if a loader method is provided.
         // With this an asset loading and caching can be deferred to when the asset is requested.
 
-        static Dictionary<string, LazyAsset> _lazyRegistry = new Dictionary<string, LazyAsset>();
+        private static Dictionary<string, LazyAsset> _lazyRegistry = new Dictionary<string, LazyAsset>();
 
         /// <summary>
-        /// The number of cached assets in the registry.
+        /// The number of cached (loaded) assets in the registry.
         /// </summary>
-        public static int CachedCount => _cache.Count;
+        public static int LoadedCount => _loaded.Count;
+
         /// <summary>
         /// The number of lazy loaders in the registry.
         /// </summary>
         public static int LazyCount => _lazyRegistry.Count;
 
         /// <summary>
-        /// Retrieves a registered asset, performs type conversion on the returned asset to the requested type.
+        /// Checks if any asset is registered under the specified asset ID.
+        /// </summary>
+        public static bool IsRegistered( string assetID )
+        {
+            return _loaded.ContainsKey( assetID ) || _lazyRegistry.ContainsKey( assetID );
+        }
+
+        /// <summary>
+        /// Checks if a lazy loader is registered under the specified asset ID.
+        /// </summary>
+        public static bool IsRegisteredLazy( string assetID )
+        {
+            return _lazyRegistry.ContainsKey( assetID );
+        }
+
+        /// <summary>
+        /// Checks if an asset is cached (has been loaded) under the specified asset ID.
+        /// </summary>
+        public static bool IsLoaded( string assetID )
+        {
+            return _loaded.ContainsKey( assetID );
+        }
+
+        /// <summary>
+        /// Retrieves a registered asset, performs graceful type conversion on the asset to the requested type.
         /// </summary>
         /// <remarks>
-        /// If nothing is registered under the specified <paramref name="assetID"/>, the registry will try to use a delegate to lazy-load an asset with a given <paramref name="assetID"/>. <br/>
-        /// Lazy-loaded assets that are cacheable will be cached after loading, and a cached instance will be returned.
+        /// If no asset has been registered (loaded) for the specified <paramref name="assetID"/>, and there exists a lazy loader for the asset, it will be invoked to load the asset. <br/>
+        /// Lazy-loaded assets that are marked as 'cacheable' will be cached after loading, and a cached instance will be returned.
         /// </remarks>
         /// <typeparam name="T">The requested type.</typeparam>
         /// <param name="assetID">The asset ID under which the asset is registered.</param>
@@ -68,7 +94,7 @@ namespace UnityPlus.AssetManagement
             }
 
             // Try to get an already loaded asset.
-            if( _cache.TryGetValue( assetID, out object val ) )
+            if( _loaded.TryGetValue( assetID, out object val ) )
             {
                 return val as T;
             }
@@ -76,7 +102,17 @@ namespace UnityPlus.AssetManagement
             // Try to load a lazy asset.
             if( _lazyRegistry.TryGetValue( assetID, out LazyAsset lazy ) )
             {
-                object asset = lazy.loader();
+                object asset = null;
+                try
+                {
+                    asset = lazy.loader.Invoke();
+                }
+                catch( Exception ex )
+                {
+                    Debug.LogError( $"Failed to load an asset with ID '{assetID}' using its lazy loader." );
+                    Debug.LogException( ex );
+                }
+
                 if( asset != null )
                 {
                     if( lazy.isCacheable )
@@ -102,7 +138,7 @@ namespace UnityPlus.AssetManagement
                 throw new ArgumentNullException( nameof( assetRef ), $"Asset to get the asset ID of can't be null." );
             }
 
-            if( _inverseCache.TryGetValue( assetRef, out string assetID ) )
+            if( _inverseLoaded.TryGetValue( assetRef, out string assetID ) )
             {
                 return assetID;
             }
@@ -111,17 +147,17 @@ namespace UnityPlus.AssetManagement
         }
 
         /// <summary>
-        /// Returns all registered assets, optionally with a given prefix.
+        /// Returns all loaded assets, optionally filtered to those whose asset IDs start with the given prefix.
         /// </summary>
         /// <remarks>
         /// This method doesn't include lazy-loaded assets, unless already cached.
         /// </remarks>
-        /// <param name="path">The optional prefix that all the returned assets must match.</param>
+        /// <param name="path">The optional prefix that all the returned asset IDs must start with.</param>
         public static (string assetID, T asset)[] GetAll<T>( string path = null ) where T : class
         {
             List<(string, T)> assets = new List<(string, T)>();
 
-            foreach( var kvp in _cache )
+            foreach( var kvp in _loaded )
             {
                 if( kvp.Value is not T )
                     continue;
@@ -136,7 +172,7 @@ namespace UnityPlus.AssetManagement
         }
 
         /// <summary>
-        /// Registers an object as an asset.
+        /// Registers the given (loaded) object as an asset.
         /// </summary>
         /// <remarks>
         /// Replaces the previous entry, if any is registered.
@@ -145,38 +181,22 @@ namespace UnityPlus.AssetManagement
         /// <param name="asset">The asset object to register.</param>
         public static void Register( string assetID, object asset )
         {
-            if( asset == null )
-            {
-                throw new ArgumentNullException( nameof( asset ), $"Asset to register can't be null." );
-            }
             if( assetID == null )
             {
                 throw new ArgumentNullException( nameof( assetID ), $"Asset ID of an asset to register can't be null." );
             }
+            if( asset == null )
+            {
+                throw new ArgumentNullException( nameof( asset ), $"Asset to register can't be null." );
+            }
 
-            _cache[assetID] = asset;
-            _inverseCache[asset] = assetID;
+            // Dispose previous when the support for that is added.
+            _loaded[assetID] = asset;
+            _inverseLoaded[asset] = assetID;
         }
 
         /// <summary>
-        /// Registers a lazy-loaded (on-demand) asset.
-        /// </summary>
-        /// <remarks>
-        /// A lazy-loaded asset will only be loaded if/when it's requested. <br />
-        /// A loaded asset will remain cached after you call <see cref="UnregisterLazy"/> on it. <br />
-        /// The lazy-loader is *NOT* unloaded, so the cached asset itself can be later unloaded and then reloaded if needed.
-        /// </remarks>
-        /// <param name="assetID">The Asset ID to register the object under.</param>
-        /// <param name="loader">The function that will load the asset when requested.</param>
-        /// <param name="isCacheable">Whether or not the loaded value can be cached. <br/> True if the asset is persistent and singleton, otherwise should be false.</param>
-        public static void RegisterLazy( string assetID, Func<object> loader, bool isCacheable )
-        {
-            // loader example: `() => PNGLoad(imagePathVariable);`
-            _lazyRegistry[assetID] = new LazyAsset( loader, isCacheable );
-        }
-
-        /// <summary>
-        /// Unregisters an asset.
+        /// Unregisters and unloads an asset.
         /// </summary>
         /// <param name="assetID">The asset ID that the asset is registered under.</param>
         /// <returns>True if the asset existed in the registry, otherwise false.</returns>
@@ -187,10 +207,10 @@ namespace UnityPlus.AssetManagement
                 throw new ArgumentNullException( nameof( assetID ), $"Asset ID of an asset to unregister can't be null." );
             }
 
-            if( _cache.TryGetValue( assetID, out object asset ) )
+            if( _loaded.TryGetValue( assetID, out object asset ) )
             {
-                _inverseCache.Remove( asset );
-                _cache.Remove( assetID );
+                _inverseLoaded.Remove( asset );
+                _loaded.Remove( assetID );
                 return true;
             }
 
@@ -198,7 +218,7 @@ namespace UnityPlus.AssetManagement
         }
 
         /// <summary>
-        /// Unregisters an asset.
+        /// Unregisters and unloads an asset.
         /// </summary>
         /// <param name="assetRef">The asset to unregister.</param>
         /// <returns>True if the asset existed in the registry, otherwise false.</returns>
@@ -209,10 +229,10 @@ namespace UnityPlus.AssetManagement
                 throw new ArgumentNullException( nameof( assetRef ), $"Asset to unregister can't be null." );
             }
 
-            if( _inverseCache.TryGetValue( assetRef, out string assetID ) )
+            if( _inverseLoaded.TryGetValue( assetRef, out string assetID ) )
             {
-                _inverseCache.Remove( assetRef );
-                _cache.Remove( assetID );
+                _inverseLoaded.Remove( assetRef );
+                _loaded.Remove( assetID );
                 return true;
             }
 
@@ -220,7 +240,34 @@ namespace UnityPlus.AssetManagement
         }
 
         /// <summary>
-        /// Unregisters a lazy loader.
+        /// Registers a lazy-loaded asset. <br/>
+        /// The lazy loader will be invoked when the asset is requested. <br/>
+        /// </summary>
+        /// <remarks>
+        /// Replaces the previous entry, if any is registered. <br/>
+        /// The asset loaded by the lazy loader will remain cached after the lazy loader itself has been unregistered, and needs to be unloaded separately. <br />
+        /// The lazy-loader itself is never unregistered unless the <see cref="UnregisterLazy"/> function is called.
+        /// </remarks>
+        /// <param name="assetID">The Asset ID to register the object under.</param>
+        /// <param name="loader">The function that will load the asset when requested.</param>
+        /// <param name="isCacheable">Whether or not the loaded value can be cached. <br/> True if the asset is persistent and singleton, otherwise should be false.</param>
+        public static void RegisterLazy( string assetID, Func<object> loader, bool isCacheable )
+        {
+            if( assetID == null )
+            {
+                throw new ArgumentNullException( nameof( assetID ), $"Asset ID of an asset to register can't be null." );
+            }
+            if( loader == null )
+            {
+                throw new ArgumentNullException( nameof( loader ), $"Lazy-loader function can't be null." );
+            }
+
+            // loader example: `() => PNGLoad(imagePathVariable);`
+            _lazyRegistry[assetID] = new LazyAsset( loader, isCacheable );
+        }
+
+        /// <summary>
+        /// Unregisters a lazy loader function for the given asset ID.
         /// </summary>
         public static bool UnregisterLazy( string assetID )
         {
@@ -233,41 +280,41 @@ namespace UnityPlus.AssetManagement
         }
 
         /// <summary>
-        /// Removes the specified asset from cache.
+        /// Unloads the specified lazy-loaded asset from cache.
         /// </summary>
         /// <remarks>
-        /// If there is no lazy loader registered for the specified asset ID, it will not unload.
+        /// The specified asset will only unload if there is a lazy loader registered for its asset ID.
         /// </remarks>
         /// <param name="assetID">The asset to unregister.</param>
-        /// <returns>True if the asset has been removed from cache. Otherwise false.</returns>
-        public static bool TryUncache( string assetID )
+        /// <returns>True if the asset has been unloaded. Otherwise false.</returns>
+        public static bool TryUnloadCachedLazy( string assetID )
         {
             if( _lazyRegistry.ContainsKey( assetID ) )
             {
-                if( _cache.TryGetValue( assetID, out object asset ) )
-                    _inverseCache.Remove( asset );
-                _cache.Remove( assetID );
+                if( _loaded.TryGetValue( assetID, out object asset ) )
+                    _inverseLoaded.Remove( asset );
+                _loaded.Remove( assetID );
                 return true;
             }
             return false;
         }
 
         /// <summary>
-        /// Removes the specified asset from cache.
+        /// Unloads the specified lazy-loaded asset from cache.
         /// </summary>
         /// <remarks>
-        /// If there is no lazy loader registered for the asset ID of the specified asset, it will not unload.
+        /// The specified asset will only unload if there is a lazy loader registered for its asset ID.
         /// </remarks>
         /// <param name="asset">The asset to unregister.</param>
-        /// <returns>True if the asset has been removed from cache. Otherwise false.</returns>
-        public static bool TryUncache( object asset )
+        /// <returns>True if the asset has been unloaded. Otherwise false.</returns>
+        public static bool TryUnloadCachedLazy( object asset )
         {
-            if( _inverseCache.TryGetValue( asset, out string assetID ) )
+            if( _inverseLoaded.TryGetValue( asset, out string assetID ) )
             {
                 if( _lazyRegistry.ContainsKey( assetID ) )
                 {
-                    _cache.Remove( assetID );
-                    _inverseCache.Remove( asset );
+                    _loaded.Remove( assetID );
+                    _inverseLoaded.Remove( asset );
                     return true;
                 }
             }

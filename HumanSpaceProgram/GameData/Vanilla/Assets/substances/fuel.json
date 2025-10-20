@@ -1,0 +1,11 @@
+{
+    "$type": "HSP.ResourceFlow.Substance, HSP.ResourceFlow, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null",
+    "display_name": "Fuel",
+    "density": 1000,
+    "display_color": {
+        "r": 1.0,
+        "g": 0.3764706,
+        "b": 0.2509804,
+        "a": 1.0
+    }
+}
