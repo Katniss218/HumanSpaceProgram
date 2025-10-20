@@ -1,5 +1,4 @@
-﻿using HSP.Content.Mods;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using Version = HSP.Content.Version;
@@ -14,7 +13,7 @@ namespace HSP.Content
         /// <summary>
         /// The name of the folder that contains the external game assets, including mods.
         /// </summary>
-        public const string ContentDirectoryName = "GameData";
+        public const string CONTENT_DIRECTORY_NAME = "GameData";
 
         /// <summary>
         /// Computes the path to the directory where the external game assets, including mods, are located.
@@ -24,7 +23,7 @@ namespace HSP.Content
         /// </remarks>
         public static string GetContentDirectoryPath()
         {
-            string path = Path.Combine( ApplicationUtils.GetBaseDirectoryPath(), ContentDirectoryName );
+            string path = Path.Combine( ApplicationUtils.GetBaseDirectoryPath(), CONTENT_DIRECTORY_NAME );
 
             if( !Directory.Exists( path ) )
                 Directory.CreateDirectory( path );

@@ -9,7 +9,7 @@ namespace HSP.Content
     /// <remarks>
     /// Can be used to compare if 2 versions are compatible with each other, or if breaking changes occurred.
     /// </remarks>
-    public struct Version
+    public readonly struct Version
     {
         /// <summary>
         /// The number indicating the major (breaking) part of the version.
@@ -41,30 +41,6 @@ namespace HSP.Content
             return v1.Major == v2.Major;
         }
 
-        public static bool operator <( Version v1, Version v2 )
-        {
-            if( v1.Major < v2.Major ) return true;
-            if( v1.Major > v2.Major ) return false;
-            return v1.Minor < v2.Minor;
-        }
-
-        public static bool operator >( Version v1, Version v2 )
-        {
-            if( v1.Major > v2.Major ) return true;
-            if( v1.Major < v2.Major ) return false;
-            return v1.Minor > v2.Minor;
-        }
-
-        public static bool operator ==( Version v1, Version v2 )
-        {
-            return v1.Minor == v2.Minor && v1.Major == v2.Major;
-        }
-
-        public static bool operator !=( Version v1, Version v2 )
-        {
-            return v1.Minor != v2.Minor || v1.Major != v2.Major;
-        }
-
         public override bool Equals( object obj )
         {
             if( obj is not Version v )
@@ -81,7 +57,7 @@ namespace HSP.Content
 
         public override string ToString()
         {
-            return Major.ToString( "#########0" ) + "." + Minor.ToString( "#########0" );
+            return Major.ToString() + "." + Minor.ToString();
         }
 
         /// <summary>
@@ -90,14 +66,60 @@ namespace HSP.Content
         /// <exception cref="ArgumentException">The string doesn't match any known valid version format.</exception>
         public static Version Parse( string s )
         {
-            string[] strings = s.Split( '.' );
-            if( strings.Length != 2 )
+            string[] parts = s.Split( '.' );
+            if( parts.Length != 2 || !int.TryParse( parts[0], out int major ) || !int.TryParse( parts[1], out int minor ) )
             {
-                throw new ArgumentException( $"String to parse must be a valid version ('n.n').", nameof( s ) );
+                throw new ArgumentException( "String to parse must be a valid version ('n.n').", nameof( s ) );
             }
-            int major = int.Parse( strings[0] );
-            int minor = int.Parse( strings[1] );
+
             return new Version( major, minor );
+        }
+
+        /// <summary>
+        /// Attempts to parse a version from its string representation.
+        /// </summary>
+        public static bool TryParse( string s, out Version result )
+        {
+            string[] parts = s.Split( '.' );
+            if( parts.Length != 2 || !int.TryParse( parts[0], out int major ) || !int.TryParse( parts[1], out int minor ) )
+            {
+                result = default;
+                return false;
+            }
+
+            result = new Version( major, minor );
+            return true;
+        }
+
+        public static bool operator <( Version v1, Version v2 )
+        {
+            return v1.Major < v2.Major || (v1.Major == v2.Major && v1.Minor < v2.Minor);
+        }
+
+        public static bool operator >( Version v1, Version v2 )
+        {
+            return v1.Major > v2.Major || (v1.Major == v2.Major && v1.Minor > v2.Minor);
+        }
+
+        public static bool operator <=( Version v1, Version v2 )
+        {
+            return v1.Major < v2.Major || (v1.Major == v2.Major && v1.Minor <= v2.Minor);
+        }
+
+        public static bool operator >=( Version v1, Version v2 )
+        {
+            return v1.Major > v2.Major || (v1.Major == v2.Major && v1.Minor >= v2.Minor);
+        }
+
+
+        public static bool operator ==( Version v1, Version v2 )
+        {
+            return v1.Major == v2.Major && v1.Minor == v2.Minor;
+        }
+
+        public static bool operator !=( Version v1, Version v2 )
+        {
+            return v1.Major != v2.Major || v1.Minor != v2.Minor;
         }
 
 

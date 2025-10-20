@@ -1,3 +1,4 @@
+using HSP.Content.Mods;
 using HSP.Time;
 using HSP.Timelines.Serialization;
 using System;
@@ -220,6 +221,8 @@ namespace HSP.Timelines
             SaveLoadFinishFunc();
 
             CurrentTimeline.SaveToDisk();
+            scenario.FileVersion = ScenarioMetadata.CURRENT_SCENARIO_FILE_VERSION;
+            scenario.ModVersions = ModManager.GetCurrentModVersions();
             scenario.SaveToDisk();
             HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_SCENARIO_SAVE.ID, eScenario );
         }
@@ -264,6 +267,7 @@ namespace HSP.Timelines
 
             CurrentTimeline.SaveToDisk();
             save.FileVersion = SaveMetadata.CURRENT_SAVE_FILE_VERSION;
+            save.ModVersions = ModManager.GetCurrentModVersions();
             save.SaveToDisk();
             instance._currentSave = save;
             HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_TIMELINE_SAVE.ID, eSave );
@@ -306,6 +310,7 @@ namespace HSP.Timelines
             {
                 throw new ScenarioNotFoundException( loadedTimeline.ScenarioID, ex );
             }
+#error TODO - scenario mod version check.
 
             try
             {
@@ -314,6 +319,21 @@ namespace HSP.Timelines
             catch( Exception ex )
             {
                 throw new SaveNotFoundException( timelineId, saveId, ex );
+            }
+#error TODO - save mod version check.
+
+            // Validate mod versions and apply migrations
+            try
+            {
+                ValidateAndMigrateSave( loadedSave );
+            }
+            catch( IncompatibleSaveException )
+            {
+                throw; // Re-throw as-is
+            }
+            catch( Exception ex )
+            {
+                throw new IncompatibleSaveException( $"Failed to validate or migrate save file: {ex.Message}", ex, null, loadedSave.ModVersions, ModManager.GetCurrentModVersions() );
             }
 
             var eLoad = new LoadEventData( loadedScenario, loadedTimeline, loadedSave );
@@ -349,6 +369,7 @@ namespace HSP.Timelines
             {
                 throw new ScenarioNotFoundException( timeline.ScenarioID, ex );
             }
+#error TODO - scenario mod version check.
 
             var eNew = new StartNewEventData( loadedScenario, timeline );
             RefStore = new BidirectionalReferenceStore();
@@ -361,6 +382,35 @@ namespace HSP.Timelines
             instance._currentTimeline = timeline;
             instance._currentSave = new SaveMetadata( timeline.TimelineID );
             HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_TIMELINE_NEW.ID, eNew );
+        }
+
+
+        /// <summary>
+        /// Validates mod versions and applies migrations to a save file.
+        /// </summary>
+        /// <param name="save">The save metadata to validate and migrate</param>
+        private static void ValidateAndMigrateSave( SaveMetadata save )
+        {
+            if( save.ModVersions == null || save.ModVersions.Count == 0 )
+            {
+                // No mod versions recorded, assume it's compatible
+                return;
+            }
+
+            var currentVersions = ModManager.GetCurrentModVersions();
+            var modIssues = ModManager.GetModCompatibilityIssues( save.ModVersions );
+
+            // Check for missing mods or version mismatches
+            if( modIssues.Count > 0 )
+            {
+                // may be incompatible.
+            }
+
+            // Apply migrations if needed
+            if( !SaveMigrationRegistry.ApplyMigrations( null, save.ModVersions, currentVersions ) )
+            {
+                throw new IncompatibleSaveException( "Failed to apply migrations to save file.", modIssues, save.ModVersions, currentVersions );
+            }
         }
     }
 }
