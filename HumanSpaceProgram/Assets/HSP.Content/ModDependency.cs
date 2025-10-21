@@ -17,7 +17,7 @@ namespace HSP.Content
         /// <summary>
         /// The version constraint for the required mod. Null means any version is acceptable.
         /// </summary>
-        public VersionConstraint? Versions { get; set; }
+        public VersionConstraint? Version { get; set; }
 
         /// <summary>
         /// Whether this dependency is optional. If a dependency is missing, the mod will not load, unless the missing dependency is optional. <br/>
@@ -32,13 +32,13 @@ namespace HSP.Content
         public ModDependency( string id, VersionConstraint? versions = null )
         {
             this.ID = id;
-            this.Versions = versions;
+            this.Version = versions;
         }
 
         public ModDependency( string id, VersionConstraint? versions, bool isOptional )
         {
             this.ID = id;
-            this.Versions = versions;
+            this.Version = versions;
             this.IsOptional = isOptional;
         }
 
@@ -47,18 +47,18 @@ namespace HSP.Content
         /// </summary>
         public bool IsSatisfiedBy( Version version )
         {
-            if( Versions == null )
+            if( Version == null )
                 return true;
 
-            return Versions.Value.IsSatisfiedBy( version );
+            return Version.Value.IsSatisfiedBy( version );
         }
 
         public override string ToString()
         {
             string result = ID;
-            if( Versions.HasValue )
+            if( Version.HasValue )
             {
-                result += $" {Versions.Value}";
+                result += $" {Version.Value}";
             }
             if( IsOptional )
             {
@@ -72,7 +72,7 @@ namespace HSP.Content
         {
             return new MemberwiseSerializationMapping<ModDependency>()
                 .WithMember( "id", o => o.ID )
-                .WithMember( "versions", o => o.Versions )
+                .WithMember( "version", o => o.Version )
                 .WithMember( "optional", o => o.IsOptional );
         }
     }

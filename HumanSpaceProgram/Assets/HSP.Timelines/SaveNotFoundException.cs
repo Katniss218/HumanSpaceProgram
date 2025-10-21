@@ -3,6 +3,9 @@ using System.Runtime.Serialization;
 
 namespace HSP.Timelines
 {
+    /// <summary>
+    /// Exception thrown when a specific save cannot be found.
+    /// </summary>
     public class SaveNotFoundException : Exception
     {
         public string TimelineID { get; }

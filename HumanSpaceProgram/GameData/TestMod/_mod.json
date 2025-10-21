@@ -1,0 +1,15 @@
+﻿{
+    "mod_id": "TestMod",
+    "version": "0.0",
+    "name": "Test Mod",
+    "author": "Katniss",
+    "description": "This is a test mod with some dummy functionality.",
+    "dependencies": {
+        "value": [
+            {
+                "id": "Vanilla",
+                "version": ">=1.0"
+            }
+        ]
+    }
+}

@@ -3,10 +3,10 @@ using System;
 namespace HSP.Timelines
 {
     /// <summary>
-    /// Specifies that a method should be used to migrate save data from one version to another.
+    /// Specifies that a method should be used to migrate save data from one version to another. The data is modified in-place.
     /// </summary>
     /// <remarks>
-    /// This attribute can be applied to any static method with the signature `static void Method(SerializedData data)`.
+    /// This attribute can be applied to any static method with the signature `static void Method(ref SerializedData data)`.
     /// The method will be called to migrate save data from the specified fromVersion to the toVersion.
     /// </remarks>
     [AttributeUsage( AttributeTargets.Method, AllowMultiple = false )]

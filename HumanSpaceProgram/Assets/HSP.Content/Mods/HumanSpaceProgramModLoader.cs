@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using UnityPlus;
 
 namespace HSP.Content.Mods
 {
@@ -41,10 +42,12 @@ namespace HSP.Content.Mods
             }
         }
 
+        public const string LOAD_MOD_ASSEMBLIES = HSPEvent.NAMESPACE_HSP + ".load_mod_assemblies";
+
         /// <summary>
         /// Loads all mods and their assemblies from the GameData directory.
         /// </summary>
-        [HSPEventListener( HSPEvent_STARTUP_LOAD_MOD_ASSEMBLIES.ID, HSPEvent.NAMESPACE_HSP + ".load_mod_assemblies" )]
+        [HSPEventListener( HSPEvent_STARTUP_LOAD_MOD_ASSEMBLIES.ID, LOAD_MOD_ASSEMBLIES )]
         private static void LoadModAssemblies()
         {
             string gameDataDirectory = HumanSpaceProgramContent.GetContentDirectoryPath();
@@ -55,118 +58,74 @@ namespace HSP.Content.Mods
             Debug.Log( $"The content directory is: '{gameDataDirectory}'" );
 
             // Discover and load all mod metadata
-            Dictionary<string, ModMetadata> discoveredMods = new Dictionary<string, ModMetadata>();
-            List<string> modDirectories = new List<string>();
+            HashSet<ModMetadata> modsToLoad = new();
+            List<string> modDirectories = new();
 
             foreach( var directory in HumanSpaceProgramContent.GetAllModDirectories() )
             {
                 string modId = HumanSpaceProgramContent.GetModID( directory );
                 modDirectories.Add( directory );
 
+                ModMetadata metadata = null;
                 try
                 {
-                    ModMetadata metadata = ModMetadata.LoadFromDisk( directory );
-                    discoveredMods[modId] = metadata;
-                    Debug.Log( $"Discovered mod: {metadata.Name} v{metadata.ModVersion} ({modId})" );
+                    metadata = ModMetadata.LoadFromDisk( directory );
                 }
                 catch( FileNotFoundException )
                 {
                     Debug.LogWarning( $"Mod directory '{directory}' is missing a mod manifest file, skipping." );
+                    continue;
                 }
                 catch( Exception ex )
                 {
-                    Debug.LogError( $"Failed to load mod metadata from '{directory}': {ex.Message}" );
+                    Debug.LogError( $"Failed to load mod metadata file from '{directory}': {ex.Message}" );
                     Debug.LogException( ex );
+                    continue;
                 }
+
+                if( modsToLoad.Contains( metadata ) )
+                {
+                    throw new ModLoaderException( $"Duplicate mod ID '{modId}' found in directory '{directory}', aborting mod loading." );
+                }
+
+                modsToLoad.Add( metadata );
+                Debug.Log( $"Discovered mod: {metadata.Name} v{metadata.ModVersion} ({modId})" );
             }
 
             // Topologically sort mods by dependencies.
-            List<string> sortedModIds = TopologicalSort( discoveredMods );
-            if( sortedModIds == null )
+            List<ModMetadata> sortedMods = ITopologicallySortable_Ex.SortDependencies<ModMetadata, string>( modsToLoad, mod => mod.ModID, mod => null, mod => mod.Dependencies?.Select( d => d.ID ), out bool hasCircularDependency );
+            if( hasCircularDependency )
             {
 #warning TODO - log which mods are involved in the circular dependency.
-                Debug.LogError( "Circular dependency detected in mods, aborting mod loading." );
-                return;
+                throw new ModLoaderException( "Circular dependency detected among mods, aborting mod loading." );
             }
 
             // Load mods in sorted order.
-            foreach( string modId in sortedModIds )
+            foreach( var mod in sortedMods )
             {
-                if( !discoveredMods.TryGetValue( modId, out ModMetadata mod ) )
-                    continue;
-
-                var unsatisfiedDeps = mod.GetUnsatisfiedDependencies( _loadedMods );
-                if( unsatisfiedDeps.Count > 0 )
+                IEnumerable<ModDependency> unsatisfiedDeps = mod.GetUnsatisfiedDependencies( _loadedMods );
+                if( unsatisfiedDeps.Any() )
                 {
-                    Debug.LogError( $"Mod '{modId}' has unsatisfied dependencies: {string.Join( ", ", unsatisfiedDeps )}" );
+                    Debug.LogError( $"Mod '{mod.ModID}' has unsatisfied dependencies: {string.Join( ", ", unsatisfiedDeps )}" );
                     continue;
                 }
 
-                string modDirectory = modDirectories.First( d => HumanSpaceProgramContent.GetModID( d ) == modId );
-                LoadAssembliesRecursive( modDirectory );
+                string modDirectory = modDirectories.First( d => HumanSpaceProgramContent.GetModID( d ) == mod.ModID );
+                try
+                {
+                    LoadAssembliesRecursive( modDirectory );
+                }
+                catch( Exception ex )
+                {
+                    // Abort because this could potentially cause a very bad state internally (failed dependencies, etc) if it were allowed to continue.
+                    throw new ModLoaderException( $"Failed to load assemblies for mod '{mod.ModID}', aborting mod loading.", ex );
+                }
 
-                _loadedMods[modId] = mod;
-                Debug.Log( $"Loaded mod: {mod.Name} v{mod.ModVersion} ({modId})" );
+                _loadedMods[mod.ModID] = mod;
+                Debug.Log( $"Loaded mod: {mod.Name} v{mod.ModVersion} ({mod.ModID})" );
             }
 
             Debug.Log( $"Loaded {_loadedMods.Count} mods successfully." );
-
-        }
-
-        /// <summary>
-        /// Performs topological sort of mods based on their dependencies.
-        /// Returns null if a circular dependency is detected.
-        /// </summary>
-        private static List<string> TopologicalSort( Dictionary<string, ModMetadata> mods )
-        {
-            List<string> result = new List<string>();
-            HashSet<string> visited = new HashSet<string>();
-            HashSet<string> visiting = new HashSet<string>();
-
-            foreach( string modId in mods.Keys )
-            {
-                if( !visited.Contains( modId ) )
-                {
-                    if( !VisitMod( modId, mods, visited, visiting, result ) )
-                    {
-                        return null; // Circular dependency detected
-                    }
-                }
-            }
-
-            return result;
-        }
-
-        private static bool VisitMod( string modId, Dictionary<string, ModMetadata> mods, HashSet<string> visited, HashSet<string> visiting, List<string> result )
-        {
-#warning TODO - move to use the topological sort by delegates later.
-            if( visiting.Contains( modId ) )
-                return false; // Circular dependency
-
-            if( visited.Contains( modId ) )
-                return true; // Already processed
-
-            visiting.Add( modId );
-
-            if( mods.TryGetValue( modId, out ModMetadata mod ) )
-            {
-                foreach( var dependency in mod.Dependencies )
-                {
-                    if( !dependency.IsOptional && mods.ContainsKey( dependency.ID ) )
-                    {
-                        if( !VisitMod( dependency.ID, mods, visited, visiting, result ) )
-                        {
-                            return false; // Circular dependency in dependencies
-                        }
-                    }
-                }
-            }
-
-            visiting.Remove( modId );
-            visited.Add( modId );
-            result.Add( modId );
-
-            return true;
         }
     }
 }

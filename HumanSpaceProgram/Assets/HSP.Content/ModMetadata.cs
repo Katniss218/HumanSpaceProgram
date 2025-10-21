@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityPlus.Serialization;
 using UnityPlus.Serialization.DataHandlers;
 using Version = HSP.Content.Version;
@@ -42,6 +43,8 @@ namespace HSP.Content
         /// A description of this mod.
         /// </summary>
         public string Description { get; set; }
+
+        public bool ExcludeFromSaves { get; set; } = false;
 
         /// <summary>
         /// The dependencies of this mod.
@@ -132,8 +135,11 @@ namespace HSP.Content
         /// </summary>
         /// <param name="loadedMods">Dictionary of loaded mods keyed by mod ID</param>
         /// <returns>List of unsatisfied dependencies</returns>
-        public List<ModDependency> GetUnsatisfiedDependencies( Dictionary<string, ModMetadata> loadedMods )
+        public IEnumerable<ModDependency> GetUnsatisfiedDependencies( Dictionary<string, ModMetadata> loadedMods )
         {
+            if( Dependencies == null || Dependencies.Count == 0 )
+                return Enumerable.Empty<ModDependency>();
+
             List<ModDependency> unsatisfied = new List<ModDependency>();
 
             foreach( var dependency in Dependencies )
@@ -165,6 +171,7 @@ namespace HSP.Content
                 .WithMember( "name", o => o.Name )
                 .WithMember( "author", o => o.Author )
                 .WithMember( "description", o => o.Description )
+                .WithMember( "exclude_from_saves", o => o.ExcludeFromSaves )
                 .WithMember( "dependencies", o => o.Dependencies );
         }
     }

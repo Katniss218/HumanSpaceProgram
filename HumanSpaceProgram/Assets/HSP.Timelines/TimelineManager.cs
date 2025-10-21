@@ -1,10 +1,15 @@
+using HSP.Content;
 using HSP.Content.Mods;
 using HSP.Time;
 using HSP.Timelines.Serialization;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityPlus.Serialization;
+using UnityPlus.Serialization.DataHandlers;
 using UnityPlus.Serialization.ReferenceMaps;
+using Version = HSP.Content.Version;
 
 namespace HSP.Timelines
 {
@@ -222,7 +227,7 @@ namespace HSP.Timelines
 
             CurrentTimeline.SaveToDisk();
             scenario.FileVersion = ScenarioMetadata.CURRENT_SCENARIO_FILE_VERSION;
-            scenario.ModVersions = ModManager.GetCurrentModVersions();
+            scenario.ModVersions = ModManager.GetCurrentSaveModVersions();
             scenario.SaveToDisk();
             HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_SCENARIO_SAVE.ID, eScenario );
         }
@@ -267,7 +272,7 @@ namespace HSP.Timelines
 
             CurrentTimeline.SaveToDisk();
             save.FileVersion = SaveMetadata.CURRENT_SAVE_FILE_VERSION;
-            save.ModVersions = ModManager.GetCurrentModVersions();
+            save.ModVersions = ModManager.GetCurrentSaveModVersions();
             save.SaveToDisk();
             instance._currentSave = save;
             HSPEvent.EventManager.TryInvoke( HSPEvent_AFTER_TIMELINE_SAVE.ID, eSave );
@@ -310,7 +315,10 @@ namespace HSP.Timelines
             {
                 throw new ScenarioNotFoundException( loadedTimeline.ScenarioID, ex );
             }
-#error TODO - scenario mod version check.
+            if( !ModManager.AreRequiredModsLoaded( loadedScenario.ModVersions ) )
+            {
+                throw new IncompatibleSaveException();
+            }
 
             try
             {
@@ -320,20 +328,26 @@ namespace HSP.Timelines
             {
                 throw new SaveNotFoundException( timelineId, saveId, ex );
             }
-#error TODO - save mod version check.
+            if( !ModManager.AreRequiredModsLoaded( loadedSave.ModVersions ) )
+            {
+                throw new IncompatibleSaveException();
+            }
 
-            // Validate mod versions and apply migrations
-            try
+            if( NeedsMigration( loadedSave ) )
             {
-                ValidateAndMigrateSave( loadedSave );
-            }
-            catch( IncompatibleSaveException )
-            {
-                throw; // Re-throw as-is
-            }
-            catch( Exception ex )
-            {
-                throw new IncompatibleSaveException( $"Failed to validate or migrate save file: {ex.Message}", ex, null, loadedSave.ModVersions, ModManager.GetCurrentModVersions() );
+                try
+                {
+                    BackupSave( loadedSave );
+                    MigrateSave( loadedSave );
+                }
+                catch( IncompatibleSaveException )
+                {
+                    throw; // Re-throw as-is
+                }
+                catch( Exception ex )
+                {
+                    throw new IncompatibleSaveException( $"Failed to validate or migrate save file: {ex.Message}", ex );
+                }
             }
 
             var eLoad = new LoadEventData( loadedScenario, loadedTimeline, loadedSave );
@@ -358,7 +372,7 @@ namespace HSP.Timelines
             {
                 throw new InvalidOperationException( $"Can't create a new timeline while already saving or loading." );
             }
-#warning TODO - validation for already existing timelines, possibly overwrite, but prompt user (elsewhere, here doesnt prompt)
+#warning TODO - validation for already existing timelines, possibly overwrite, but prompt user (elsewhere, code here shouldn't interact with gui)
 
             ScenarioMetadata loadedScenario;
             try
@@ -369,7 +383,10 @@ namespace HSP.Timelines
             {
                 throw new ScenarioNotFoundException( timeline.ScenarioID, ex );
             }
-#error TODO - scenario mod version check.
+            if( !ModManager.AreRequiredModsLoaded( loadedScenario.ModVersions ) )
+            {
+                throw new IncompatibleSaveException();
+            }
 
             var eNew = new StartNewEventData( loadedScenario, timeline );
             RefStore = new BidirectionalReferenceStore();
@@ -385,31 +402,101 @@ namespace HSP.Timelines
         }
 
 
-        /// <summary>
-        /// Validates mod versions and applies migrations to a save file.
-        /// </summary>
-        /// <param name="save">The save metadata to validate and migrate</param>
-        private static void ValidateAndMigrateSave( SaveMetadata save )
+        public static void BackupScenario( ScenarioMetadata scenario )
         {
-            if( save.ModVersions == null || save.ModVersions.Count == 0 )
+            if( scenario == null )
+                throw new ArgumentNullException( nameof( scenario ) );
+
+            BackupUtil.BackupDirectory( scenario.GetRootDirectory(), Path.GetDirectoryName( scenario.GetRootDirectory() ) );
+        }
+
+        public static void BackupSave( SaveMetadata save )
+        {
+            if( save == null )
+                throw new ArgumentNullException( nameof( save ) );
+
+            BackupUtil.BackupDirectory( save.GetRootDirectory(), Path.GetDirectoryName( save.GetRootDirectory() ) );
+        }
+
+
+        public static bool NeedsMigration( SaveMetadata save )
+        {
+            return NeedsMigration( save.ModVersions );
+        }
+
+        public static bool NeedsMigration( ScenarioMetadata scenario )
+        {
+            return NeedsMigration( scenario.ModVersions );
+        }
+
+        private static bool NeedsMigration( Dictionary<string, Version> modVersions )
+        {
+            if( modVersions == null || modVersions.Count == 0 )
             {
-                // No mod versions recorded, assume it's compatible
-                return;
+                return false;
             }
 
+            var loadedModVersions = ModManager.GetCurrentModVersions();
+
+            foreach( var modVersion in loadedModVersions )
+            {
+                if( !modVersions.TryGetValue( modVersion.Key, out var savedVersion ) )
+                {
+                    // Mod is new, no migration needed.
+                    continue;
+                }
+
+#warning TODO - use a separate 'save version' inside the mod json maybe?
+                if( !Version.AreCompatible( modVersion.Value, savedVersion ) )
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+
+        /// <summary>
+        /// Applies migrations to a save file.
+        /// </summary>
+        /// <param name="save">The save metadata to migrate</param>
+        public static void MigrateSave( SaveMetadata save, bool force = false )
+        {
+            MigrateSaveData( save.GetRootDirectory(), save.ModVersions, force );
+        }
+
+        /// <summary>
+        /// Applies migrations to a save file.
+        /// </summary>
+        /// <param name="scenario">The scenario to migrate</param>
+        public static void MigrateScenario( ScenarioMetadata scenario, bool force = false )
+        {
+            MigrateSaveData( scenario.GetRootDirectory(), scenario.ModVersions, force );
+        }
+
+        /// <summary>
+        /// Migrates the contents of a save directory (save or scenario).
+        /// </summary>
+        private static void MigrateSaveData( string directory, Dictionary<string, Version> modVersions, bool force )
+        {
             var currentVersions = ModManager.GetCurrentModVersions();
-            var modIssues = ModManager.GetModCompatibilityIssues( save.ModVersions );
 
-            // Check for missing mods or version mismatches
-            if( modIssues.Count > 0 )
-            {
-                // may be incompatible.
-            }
+#warning TODO - maybe use some sort of 'window' to view the files instead of operating on the file system directly? that way we have more control over the files.
+            // that same window could be used for the patches as it's basically equivalent to what I came up with for the addressing of different data files.
+            // that same window could also have more knowledge about other files, etc (cross-talk).
 
-            // Apply migrations if needed
-            if( !SaveMigrationRegistry.ApplyMigrations( null, save.ModVersions, currentVersions ) )
+
+            // Enumerate all data (json) files in the save directory, migrate, then save them back.
+            var files = Directory.GetFiles( directory, "*.json", SearchOption.AllDirectories );
+            foreach( var file in files )
             {
-                throw new IncompatibleSaveException( "Failed to apply migrations to save file.", modIssues, save.ModVersions, currentVersions );
+                var handler = new JsonSerializedDataHandler( file );
+                var data = handler.Read();
+
+                SaveMigrationRegistry.Migrate( ref data, modVersions, currentVersions, force );
+
+                handler.Write( data );
             }
         }
     }

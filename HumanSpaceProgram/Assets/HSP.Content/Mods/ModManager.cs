@@ -13,8 +13,8 @@ namespace HSP.Content.Mods
         /// <summary>
         /// Gets the metadata for a loaded mod.
         /// </summary>
-        /// <param name="modId">The ID of the mod to retrieve</param>
-        /// <returns>The mod metadata, or null if not loaded</returns>
+        /// <param name="modId">The ID of the mod to retrieve.</param>
+        /// <returns>The mod metadata, or null if not loaded.</returns>
         public static ModMetadata GetLoadedMod( string modId )
         {
             if( string.IsNullOrEmpty( modId ) )
@@ -26,8 +26,8 @@ namespace HSP.Content.Mods
         /// <summary>
         /// Checks if a mod is currently loaded.
         /// </summary>
-        /// <param name="modId">The ID of the mod to check</param>
-        /// <returns>True if the mod is loaded</returns>
+        /// <param name="modId">The ID of the mod to check.</param>
+        /// <returns>True if the mod is loaded.</returns>
         public static bool IsModLoaded( string modId )
         {
             return !string.IsNullOrEmpty( modId ) && HumanSpaceProgramModLoader.LoadedMods.ContainsKey( modId );
@@ -36,18 +36,27 @@ namespace HSP.Content.Mods
         /// <summary>
         /// Gets the current versions of all loaded mods.
         /// </summary>
-        /// <returns>Dictionary mapping mod IDs to their current versions</returns>
+        /// <returns>Dictionary mapping mod IDs to their current versions.</returns>
         public static Dictionary<string, Version> GetCurrentModVersions()
         {
             return HumanSpaceProgramModLoader.LoadedMods.ToDictionary( kvp => kvp.Key, kvp => kvp.Value.ModVersion );
         }
 
         /// <summary>
+        /// Gets the current versions of all loaded mods.
+        /// </summary>
+        /// <returns>Dictionary mapping mod IDs to their current versions.</returns>
+        public static Dictionary<string, Version> GetCurrentSaveModVersions()
+        {
+            return HumanSpaceProgramModLoader.LoadedMods.Where( kvp => !kvp.Value.ExcludeFromSaves ).ToDictionary( kvp => kvp.Key, kvp => kvp.Value.ModVersion );
+        }
+
+        /// <summary>
         /// Validates that all required mod versions are loaded and compatible.
         /// </summary>
-        /// <param name="required">Dictionary of required mod versions</param>
-        /// <returns>True if all required mods are loaded with compatible versions</returns>
-        public static bool ValidateModVersions( Dictionary<string, Version> required )
+        /// <param name="required">Dictionary of required mod versions.</param>
+        /// <returns>True if all required mods are loaded with compatible versions.</returns>
+        public static bool AreRequiredModsLoaded( Dictionary<string, Version> required )
         {
             if( required == null )
                 return true;
@@ -72,37 +81,37 @@ namespace HSP.Content.Mods
             return true;
         }
 
-        /// <summary>
-        /// Gets detailed information about mod version mismatches.
-        /// </summary>
-        /// <param name="required">Dictionary of required mod versions</param>
-        /// <returns>List of mod version issues</returns>
-        public static List<ModDependencyIssue> GetModCompatibilityIssues( Dictionary<string, Version> required )
-        {
-            List<ModDependencyIssue> issues = new List<ModDependencyIssue>();
+        ///// <summary>
+        ///// Gets detailed information about mod version mismatches.
+        ///// </summary>
+        ///// <param name="required">Dictionary of required mod versions.</param>
+        ///// <returns>List of mod version issues.</returns>
+        //public static List<ModDependencyIssue> GetModCompatibilityIssues( Dictionary<string, Version> required )
+        //{
+        //    List<ModDependencyIssue> issues = new List<ModDependencyIssue>();
 
-            if( required == null )
-                return issues;
+        //    if( required == null )
+        //        return issues;
 
-            foreach( var kvp in required )
-            {
-                string modId = kvp.Key;
-                Version requiredVersion = kvp.Value;
+        //    foreach( var kvp in required )
+        //    {
+        //        string modId = kvp.Key;
+        //        Version requiredVersion = kvp.Value;
 
-                if( !IsModLoaded( modId ) )
-                {
-                    issues.Add( new ModDependencyIssue( modId, ModDependencyIssueType.Missing, requiredVersion, null ) );
-                    continue;
-                }
+        //        if( !IsModLoaded( modId ) )
+        //        {
+        //            issues.Add( new ModDependencyIssue( modId, ModDependencyIssueType.Missing, requiredVersion, null ) );
+        //            continue;
+        //        }
 
-                ModMetadata loadedMod = GetLoadedMod( modId );
-                if( loadedMod.ModVersion != requiredVersion )
-                {
-                    issues.Add( new ModDependencyIssue( modId, ModDependencyIssueType.VersionMismatch, requiredVersion, loadedMod.ModVersion ) );
-                }
-            }
+        //        ModMetadata loadedMod = GetLoadedMod( modId );
+        //        if( loadedMod.ModVersion != requiredVersion )
+        //        {
+        //            issues.Add( new ModDependencyIssue( modId, ModDependencyIssueType.VersionMismatch, requiredVersion, loadedMod.ModVersion ) );
+        //        }
+        //    }
 
-            return issues;
-        }
+        //    return issues;
+        //}
     }
 }

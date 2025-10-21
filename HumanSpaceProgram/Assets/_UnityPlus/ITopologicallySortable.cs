@@ -7,7 +7,7 @@ namespace UnityPlus
     public interface ITopologicallySortable<T>
     {
         /// <summary>
-        /// Gets the ID of this object.
+        /// Gets the ID of THIS object.
         /// </summary>
         T ID { get; }
 

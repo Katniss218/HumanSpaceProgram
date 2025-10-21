@@ -6,7 +6,7 @@ using Version = HSP.Content.Version;
 namespace HSP.Content
 {
     /// <summary>
-    /// Contains utility methods relating to the structure of HSP's content / files.
+    /// Provides utilities relating to the structure of HSP's content / files.
     /// </summary>
     public class HumanSpaceProgramContent
     {
@@ -98,6 +98,9 @@ namespace HSP.Content
             return $"{modId}::{relPath}";
         }
 
+        /// <summary>
+        /// Gets the asset path that's associated with the given asset ID. The extension is provided separately, as asset IDs don't use it.
+        /// </summary>
         public static string GetAssetPath( string assetId, string extension )
         {
             string[] split = assetId.Split( "::" );

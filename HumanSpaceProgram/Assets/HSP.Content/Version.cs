@@ -9,7 +9,7 @@ namespace HSP.Content
     /// <remarks>
     /// Can be used to compare if 2 versions are compatible with each other, or if breaking changes occurred.
     /// </remarks>
-    public readonly struct Version
+    public readonly struct Version : IEquatable<Version>, IComparable<Version>
     {
         /// <summary>
         /// The number indicating the major (breaking) part of the version.
@@ -28,17 +28,19 @@ namespace HSP.Content
         }
 
         /// <summary>
-        /// Checks if two versions (of the same thing) are compatible with each other.
+        /// Checks if two versions are compatible with each other.
         /// </summary>
         /// <remarks>
         /// Versions are compatible if they don't have any breaking changes between them (major is the same).
         /// </remarks>
-        /// <param name="v1">The first version.</param>
-        /// <param name="v2">The second version.</param>
-        /// <returns>True if the versions are compatible. False otherwise.</returns>
         public static bool AreCompatible( Version v1, Version v2 )
         {
             return v1.Major == v2.Major;
+        }
+
+        public bool Equals( Version other )
+        {
+            return this == other;
         }
 
         public override bool Equals( object obj )
@@ -48,6 +50,16 @@ namespace HSP.Content
                 return false;
             }
             return this == v;
+        }
+
+        public int CompareTo( Version other )
+        {
+            int majorCmp = Major.CompareTo( other.Major );
+            if( majorCmp != 0 )
+            {
+                return majorCmp;
+            }
+            return Minor.CompareTo( other.Minor );
         }
 
         public override int GetHashCode()
@@ -69,7 +81,7 @@ namespace HSP.Content
             string[] parts = s.Split( '.' );
             if( parts.Length != 2 || !int.TryParse( parts[0], out int major ) || !int.TryParse( parts[1], out int minor ) )
             {
-                throw new ArgumentException( "String to parse must be a valid version ('n.n').", nameof( s ) );
+                throw new ArgumentException( "The version string must be two integers separated by a '.' dot.", nameof( s ) );
             }
 
             return new Version( major, minor );

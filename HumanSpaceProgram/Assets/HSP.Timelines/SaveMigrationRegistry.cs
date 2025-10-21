@@ -1,3 +1,4 @@
+using HSP.Content.Mods;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace HSP.Timelines
     /// </summary>
     public static class SaveMigrationRegistry
     {
-        private static Dictionary<string, List<Migration>> _migrations = new Dictionary<string, List<Migration>>();
+        private static Dictionary<string, List<SaveMigration>> _migrations = new Dictionary<string, List<SaveMigration>>();
 
         public const string DISCOVER_SAVE_MIGRATIONS = HSPEvent.NAMESPACE_HSP + ".discover_save_migrations";
 
@@ -21,6 +22,24 @@ namespace HSP.Timelines
         private static void DiscoverSaveMigrations()
         {
             DiscoverMigrations( AppDomain.CurrentDomain.GetAssemblies() );
+        }
+
+        private static bool IsValidMigrationMethod( MethodInfo method )
+        {
+            if( !method.IsStatic )
+                return false;
+
+            ParameterInfo[] parameters = method.GetParameters();
+            if( parameters.Length != 1 )
+                return false;
+
+            if( parameters[0].ParameterType != typeof( SerializedData ).MakeByRefType() )
+                return false;
+
+            if( method.ReturnType != typeof( void ) )
+                return false;
+
+            return true;
         }
 
         /// <summary>
@@ -73,6 +92,90 @@ namespace HSP.Timelines
             Debug.Log( $"Discovered {_migrations.Values.Sum( list => list.Count )} save migrations across {_migrations.Count} mods." );
         }
 
+#warning TODO - some migrations need to be able to use the file system (to change the structure of the save, those should run first)
+        /// <summary>
+        /// Applies migrations to save data.
+        /// </summary>
+        /// <param name="data">The save data to migrate</param>
+        /// <param name="fromVersions">The mod versions when the save was created</param>
+        /// <param name="toVersions">The current mod versions</param>
+        /// <param name="force">If true, forces the migration even if there are mod version mismatches or other issues.</param>
+        /// <returns>True if migration was successful</returns>
+        public static void Migrate( ref SerializedData data, Dictionary<string, Version> fromVersions, Dictionary<string, Version> toVersions, bool force )
+        {
+            if( data == null || fromVersions == null || toVersions == null )
+                return;
+
+            foreach( var kvp in fromVersions )
+            {
+                string modId = kvp.Key;
+                Version fromVersion = kvp.Value;
+
+                if( !toVersions.TryGetValue( modId, out Version toVersion ) && !force )
+                {
+                    throw new SaveMigrationException( $"Mod '{modId}' was present when save was created but is not currently loaded." );
+                }
+
+                if( fromVersion > toVersion && !force )
+                {
+                    throw new SaveMigrationException( $"Mod '{modId}' has a newer version ({fromVersion}) in the save than the currently loaded version ({toVersion}). Downgrades are not supported." );
+                }
+
+                if( fromVersion == toVersion )
+                    continue; // No migration needed
+
+                if( !TryGetMigrationChain( modId, fromVersion, toVersion, out var migrationChain ) && !force )
+                {
+                    throw new SaveMigrationException( $"No save migration chain found for mod '{modId}' for versions {fromVersion} -> {toVersion}." );
+                }
+
+                foreach( var migration in migrationChain )
+                {
+                    try
+                    {
+                        migration.MigrationFunc( ref data );
+                        Debug.Log( $"Applied save migration for mod '{modId}' from {migration.FromVersion} to {migration.ToVersion}" );
+                    }
+                    catch( Exception ex )
+                    {
+                        throw new SaveMigrationException( $"Failed to apply migration for mod '{modId}' from {migration.FromVersion} to {migration.ToVersion}: {ex.Message}", ex );
+                    }
+                }
+            }
+        }
+
+        private static void RegisterMigration( SaveMigrationAttribute attr, MethodInfo method )
+        {
+            if( !ModManager.IsModLoaded( attr.ModID ) )
+            {
+                throw new InvalidOperationException( $"Cannot register migration for mod '{attr.ModID}' because the mod is not loaded. Mods shouldn't register migrations for other mods." );
+            }
+
+            if( !_migrations.TryGetValue( attr.ModID, out List<SaveMigration> modMigrations ) )
+            {
+                modMigrations = new List<SaveMigration>();
+                _migrations[attr.ModID] = modMigrations;
+            }
+
+            if( !Version.TryParse( attr.FromVersion, out Version fromVersion ) )
+            {
+                Debug.LogError( $"Invalid FromVersion '{attr.FromVersion}' in migration for mod '{attr.ModID}'." );
+                return;
+            }
+            if( !Version.TryParse( attr.ToVersion, out Version toVersion ) )
+            {
+                Debug.LogError( $"Invalid ToVersion '{attr.ToVersion}' in migration for mod '{attr.ModID}'." );
+                return;
+            }
+
+            SaveMigrationFunc migrationFunc = (SaveMigrationFunc)Delegate.CreateDelegate( typeof( SaveMigrationFunc ), method );
+
+            var migration = new SaveMigration( fromVersion, toVersion, migrationFunc, attr.Description );
+            modMigrations.Add( migration );
+
+            Debug.Log( $"Registered migration for mod '{attr.ModID}': {migration}" );
+        }
+
         /// <summary>
         /// Gets a migration chain from one version to another for a specific mod.
         /// </summary>
@@ -80,136 +183,52 @@ namespace HSP.Timelines
         /// <param name="fromVersion">The version to migrate from</param>
         /// <param name="toVersion">The version to migrate to</param>
         /// <returns>Ordered list of migrations, or null if no path exists</returns>
-        public static List<Migration> GetMigrationChain( string modId, Version fromVersion, Version toVersion )
+        public static bool TryGetMigrationChain( string modId, Version fromVersion, Version toVersion, out IEnumerable<SaveMigration> migrations )
         {
-            if( !_migrations.TryGetValue( modId, out List<Migration> modMigrations ) )
-                return null;
+            migrations = null;
+
+            if( !_migrations.TryGetValue( modId, out List<SaveMigration> modMigrations ) )
+                return false;
 
             if( fromVersion == toVersion )
-                return new List<Migration>(); // No migration needed
-
-            // Build a graph of migrations and find the shortest path
-            var migrationGraph = BuildMigrationGraph( modMigrations );
-            return FindMigrationPath( migrationGraph, fromVersion, toVersion );
-        }
-
-        /// <summary>
-        /// Applies migrations to save data.
-        /// </summary>
-        /// <param name="data">The save data to migrate</param>
-        /// <param name="fromVersions">The mod versions when the save was created</param>
-        /// <param name="toVersions">The current mod versions</param>
-        /// <returns>True if migration was successful</returns>
-        public static bool ApplyMigrations( SerializedData data, Dictionary<string, Version> fromVersions, Dictionary<string, Version> toVersions )
-        {
-            if( data == null || fromVersions == null || toVersions == null )
-                return true; // Nothing to migrate
-
-            bool anyMigrationApplied = false;
-
-            foreach( var kvp in fromVersions )
             {
-                string modId = kvp.Key;
-                Version fromVersion = kvp.Value;
-
-                if( !toVersions.TryGetValue( modId, out Version toVersion ) )
-                {
-                    Debug.LogError( $"Mod '{modId}' was present when save was created but is not currently loaded." );
-                    return false;
-                }
-
-                if( fromVersion == toVersion )
-                    continue; // No migration needed
-
-                var migrationChain = GetMigrationChain( modId, fromVersion, toVersion );
-                if( migrationChain == null )
-                {
-                    Debug.LogError( $"No migration path found for mod '{modId}' from version {fromVersion} to {toVersion}." );
-                    return false;
-                }
-
-                foreach( var migration in migrationChain )
-                {
-                    try
-                    {
-                        migration.MigrationFunc( data );
-                        Debug.Log( $"Applied migration for mod '{modId}' from {migration.FromVersion} to {migration.ToVersion}" );
-                        anyMigrationApplied = true;
-                    }
-                    catch( Exception ex )
-                    {
-                        Debug.LogError( $"Failed to apply migration for mod '{modId}' from {migration.FromVersion} to {migration.ToVersion}: {ex.Message}" );
-                        Debug.LogException( ex );
-                        return false;
-                    }
-                }
+                migrations = Enumerable.Empty<SaveMigration>();
+                return true;
             }
 
-            return true;
+            Dictionary<Version, List<SaveMigration>> graph = BuildMigrationGraph( modMigrations );
+
+            return TryFindMigrationPath( graph, fromVersion, toVersion, out migrations );
         }
 
-        private static bool IsValidMigrationMethod( MethodInfo method )
+        private static Dictionary<Version, List<SaveMigration>> BuildMigrationGraph( List<SaveMigration> migrations )
         {
-            if( !method.IsStatic )
-                return false;
-
-            ParameterInfo[] parameters = method.GetParameters();
-            if( parameters.Length != 1 )
-                return false;
-
-            if( parameters[0].ParameterType != typeof( SerializedData ) )
-                return false;
-
-            if( method.ReturnType != typeof( void ) )
-                return false;
-
-            return true;
-        }
-
-        private static void RegisterMigration( SaveMigrationAttribute attr, MethodInfo method )
-        {
-            if( !_migrations.TryGetValue( attr.ModID, out List<Migration> modMigrations ) )
-            {
-                modMigrations = new List<Migration>();
-                _migrations[attr.ModID] = modMigrations;
-            }
-
-            Version fromVersion = Version.Parse( attr.FromVersion );
-            Version toVersion = Version.Parse( attr.ToVersion );
-
-            Action<SerializedData> migrationFunc = (Action<SerializedData>)Delegate.CreateDelegate( typeof( Action<SerializedData> ), method );
-
-            var migration = new Migration( fromVersion, toVersion, migrationFunc, attr.Description );
-            modMigrations.Add( migration );
-
-            Debug.Log( $"Registered migration for mod '{attr.ModID}': {fromVersion} -> {toVersion}" );
-        }
-
-        private static Dictionary<Version, List<Migration>> BuildMigrationGraph( List<Migration> migrations )
-        {
-            var graph = new Dictionary<Version, List<Migration>>();
+            Dictionary<Version, List<SaveMigration>> graph = new();
 
             foreach( var migration in migrations )
             {
-                if( !graph.TryGetValue( migration.FromVersion, out List<Migration> outgoing ) )
+                if( !graph.TryGetValue( migration.FromVersion, out List<SaveMigration> migrationsForVersion ) )
                 {
-                    outgoing = new List<Migration>();
-                    graph[migration.FromVersion] = outgoing;
+                    migrationsForVersion = new List<SaveMigration>();
+                    graph[migration.FromVersion] = migrationsForVersion;
                 }
-                outgoing.Add( migration );
+
+                migrationsForVersion.Add( migration );
             }
 
             return graph;
         }
 
-        private static List<Migration> FindMigrationPath( Dictionary<Version, List<Migration>> graph, Version fromVersion, Version toVersion )
+        private static bool TryFindMigrationPath( Dictionary<Version, List<SaveMigration>> graph, Version fromVersion, Version toVersion, out IEnumerable<SaveMigration> migrations )
         {
-            var queue = new Queue<Version>();
-            var visited = new HashSet<Version>();
-            var parent = new Dictionary<Version, Migration>();
+            Queue<Version> queue = new();
+            HashSet<Version> visited = new();
+            Dictionary<Version, SaveMigration> parent = new();
 
             queue.Enqueue( fromVersion );
             visited.Add( fromVersion );
+
+            // BFS
 
             while( queue.Count > 0 )
             {
@@ -217,20 +236,20 @@ namespace HSP.Timelines
 
                 if( current == toVersion )
                 {
-                    // Reconstruct path
-                    var path = new List<Migration>();
+                    List<SaveMigration> path = new();
                     Version pathVersion = toVersion;
 
-                    while( parent.TryGetValue( pathVersion, out Migration migration ) )
+                    while( parent.TryGetValue( pathVersion, out SaveMigration migration ) )
                     {
                         path.Insert( 0, migration );
                         pathVersion = migration.FromVersion;
                     }
 
-                    return path;
+                    migrations = path;
+                    return true;
                 }
 
-                if( graph.TryGetValue( current, out List<Migration> outgoing ) )
+                if( graph.TryGetValue( current, out List<SaveMigration> outgoing ) )
                 {
                     foreach( var migration in outgoing )
                     {
@@ -244,31 +263,8 @@ namespace HSP.Timelines
                 }
             }
 
-            return null; // No path found
-        }
-    }
-
-    /// <summary>
-    /// Represents a single migration step.
-    /// </summary>
-    public struct Migration
-    {
-        public Version FromVersion { get; }
-        public Version ToVersion { get; }
-        public Action<SerializedData> MigrationFunc { get; }
-        public string Description { get; }
-
-        public Migration( Version fromVersion, Version toVersion, Action<SerializedData> migrationFunc, string description = null )
-        {
-            this.FromVersion = fromVersion;
-            this.ToVersion = toVersion;
-            this.MigrationFunc = migrationFunc;
-            this.Description = description;
-        }
-
-        public override string ToString()
-        {
-            return $"{FromVersion} -> {ToVersion}" + ( string.IsNullOrEmpty( Description ) ? "" : $" ({Description})" );
+            migrations = null;
+            return false;
         }
     }
 }
